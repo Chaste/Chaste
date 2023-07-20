@@ -240,7 +240,7 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
     c_vector<double,2> projected_force_between_nodes_2d;
     double force_dot_normal = inner_prod(force_between_nodes, outward_normal_unit_vector);
 
-    for (unsigned i=0; i<2; i++)
+    for (unsigned i = 0; i < 2; ++i)
     {
         projected_force_between_nodes_2d[i] = force_between_nodes[i]
                                               - force_dot_normal*outward_normal_unit_vector[i]

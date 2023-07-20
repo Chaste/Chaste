@@ -104,6 +104,8 @@ protected:
     WntConcentrationType GetWntType();
 
     /**
+     * Overridden SetG1Duration() method.
+     * 
      * Stochastically set the G1 duration. The G1 duration is taken
      * from a normal distribution whose mean is the G1 duration given
      * in AbstractPhaseBasedCellCycleModel, for the cell type, and whose standard deviation
@@ -112,7 +114,7 @@ protected:
      * Called on cell creation at the start of a simulation, and for both
      * parent and daughter cells at cell division.
      */
-    void SetG1Duration();
+    void SetG1Duration() override;
 
     /**
      * Protected copy-constructor for use by CreateCellCycleModel.
@@ -140,12 +142,12 @@ public:
     /**
      * Overridden UpdateCellCyclePhase() method.
      */
-    virtual void UpdateCellCyclePhase();
+    virtual void UpdateCellCyclePhase() override;
 
     /**
      * Overridden InitialiseDaughterCell() method.
      */
-    virtual void InitialiseDaughterCell();
+    virtual void InitialiseDaughterCell() override;
 
     /**
      * Overridden builder method to create new copies of
@@ -153,7 +155,7 @@ public:
      *
      * @return the new cell-cycle model
      */
-    virtual AbstractCellCycleModel* CreateCellCycleModel();
+    virtual AbstractCellCycleModel* CreateCellCycleModel() override;
 
     /**
      * @return mUseCellProliferativeTypeDependentG1Duration
@@ -171,7 +173,7 @@ public:
      * Overridden CanCellTerminallyDifferentiate() method.
      * @return whether cell can terminally differentiate
      */
-    virtual bool CanCellTerminallyDifferentiate();
+    virtual bool CanCellTerminallyDifferentiate() override;
 
     /**
      * @return mWntStemThreshold
@@ -214,7 +216,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

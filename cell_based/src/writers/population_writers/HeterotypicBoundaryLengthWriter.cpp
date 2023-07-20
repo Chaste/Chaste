@@ -79,23 +79,20 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
         std::set<unsigned> neighbour_indices = pCellPopulation->GetNeighbouringNodeIndices(index);
 
         // Iterate over these neighbours
-        for (auto neighbour_iter = neighbour_indices.begin();
-             neighbour_iter != neighbour_indices.end();
-             ++neighbour_iter)
+        for (auto neighbour_iter : neighbour_indices)
         {
             // Get the length of the edge shared with this neighbour
-            unsigned neighbour_index = *neighbour_iter;
-            double edge_length = pCellPopulation->GetVoronoiEdgeLength(index,neighbour_index);
+            double edge_length = pCellPopulation->GetVoronoiEdgeLength(index, neighbour_iter);
 
             // Ignore ghost nodes (in the case of a MeshBasedCellPopulationWithGhostNodes)
             ///\todo #2273 - check we have correctly dealt with ghost nodes
-            if (!pCellPopulation->IsGhostNode(neighbour_index))
+            if (!pCellPopulation->IsGhostNode(neighbour_iter))
             {
                 total_shared_edges_length += edge_length;
                 total_num_pairs += 1.0;
 
                 // Store whether this neighbour is labelled
-                CellPtr p_neighbour_cell = pCellPopulation->GetCellUsingLocationIndex(neighbour_index);
+                CellPtr p_neighbour_cell = pCellPopulation->GetCellUsingLocationIndex(neighbour_iter);
                 bool neighbour_is_labelled = p_neighbour_cell->template HasCellProperty<CellLabel>();
 
                 // If this cell is labelled and its neighbour is not, or vice versa...
@@ -145,18 +142,13 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
         std::set<unsigned> neighbour_node_indices = pCellPopulation->rGetMesh().GetVonNeumannNeighbouringNodeIndices(index);
 
         // Iterate over these neighbours
-        for (auto neighbour_iter = neighbour_node_indices.begin();
-             neighbour_iter != neighbour_node_indices.end();
-             ++neighbour_iter)
+        for (auto neighbour_iter : neighbour_node_indices)
         {
             // Assume the lattice is comprised of uniform unit lattice sites
             double edge_length = 1.0;
-
-            unsigned neighbour_index = *neighbour_iter;
-
-            if (pCellPopulation->IsCellAttachedToLocationIndex(neighbour_index))
+            if (pCellPopulation->IsCellAttachedToLocationIndex(neighbour_iter))
             {
-                CellPtr p_neighbour_cell = pCellPopulation->GetCellUsingLocationIndex(neighbour_index);
+                CellPtr p_neighbour_cell = pCellPopulation->GetCellUsingLocationIndex(neighbour_iter);
 
                 total_shared_edges_length += edge_length;
                 total_num_pairs += 1.0;
@@ -218,15 +210,13 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
         if (!neighbour_indices.empty())
         {
             // Iterate over these neighbours
-            for (auto neighbour_iter = neighbour_indices.begin();
-                 neighbour_iter != neighbour_indices.end();
-                 ++neighbour_iter)
+            for (auto neighbour_iter : neighbour_indices)
             {
                 // Store the radius of the node corresponding to this neighbour
-                double neighbour_radius = pCellPopulation->GetNode(*neighbour_iter)->GetRadius();
+                double neighbour_radius = pCellPopulation->GetNode(neighbour_iter)->GetRadius();
 
                 // Get the (approximate) length of the edge shared with this neighbour
-                double separation = pCellPopulation->rGetMesh().GetDistanceBetweenNodes(node_index, *neighbour_iter);
+                double separation = pCellPopulation->rGetMesh().GetDistanceBetweenNodes(node_index, neighbour_iter);
                 double sum_of_radii = node_radius + neighbour_radius;
 
                 // If the neighbours are close enough, then approximate their 'edge length'
@@ -244,7 +234,7 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
                     total_num_pairs += 1.0;
 
                     // Store whether this neighbour is labelled
-                    CellPtr p_neighbour_cell = pCellPopulation->GetCellUsingLocationIndex(*neighbour_iter);
+                    CellPtr p_neighbour_cell = pCellPopulation->GetCellUsingLocationIndex(neighbour_iter);
                     bool neighbour_is_labelled = p_neighbour_cell->template HasCellProperty<CellLabel>();
 
                     // If this cell is labelled and its neighbour is not, or vice versa...
@@ -301,12 +291,10 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
             std::set<unsigned> neighbour_node_indices = pCellPopulation->rGetMesh().GetVonNeumannNeighbouringNodeIndices(global_index);
 
             // Iterate over these neighbours
-            for (auto neighbour_iter = neighbour_node_indices.begin();
-                 neighbour_iter != neighbour_node_indices.end();
-                 ++neighbour_iter)
+            for (auto neighbour_iter : neighbour_node_indices)
             {
                 // Get the elements containing this neighbour
-                std::set<unsigned> neighbour_elem_indices = pCellPopulation->GetNode(*neighbour_iter)->rGetContainingElementIndices();
+                std::set<unsigned> neighbour_elem_indices = pCellPopulation->GetNode(neighbour_iter)->rGetContainingElementIndices();
 
                 if (neighbour_elem_indices.size() == 1)
                 {
@@ -339,13 +327,11 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
         std::set<unsigned> neighbour_node_indices = pCellPopulation->GetNeighbouringLocationIndices(*cell_iter);
 
         // Iterate over these neighbours
-        for (auto neighbour_iter = neighbour_node_indices.begin();
-             neighbour_iter != neighbour_node_indices.end();
-             ++neighbour_iter)
+        for (auto neighbour_iter : neighbour_node_indices)
         {
             total_num_pairs += 1.0;
 
-            CellPtr p_neighbour_cell = pCellPopulation->GetCellUsingLocationIndex(*neighbour_iter);
+            CellPtr p_neighbour_cell = pCellPopulation->GetCellUsingLocationIndex(neighbour_iter);
             bool neighbour_is_labelled = p_neighbour_cell->template HasCellProperty<CellLabel>();
 
             // If this cell is labelled and its neighbour is not, or vice versa...
@@ -395,19 +381,16 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
         std::set<unsigned> neighbour_elem_indices = pCellPopulation->rGetMesh().GetNeighbouringElementIndices(elem_index);
 
         // Iterate over these neighbours
-        for (auto neighbour_iter = neighbour_elem_indices.begin();
-             neighbour_iter != neighbour_elem_indices.end();
-             ++neighbour_iter)
+        for (auto neighbour_iter : neighbour_elem_indices)
         {
             // Get the length of the edge shared with this neighbour
-            unsigned neighbour_index = *neighbour_iter;
-            double edge_length = pCellPopulation->rGetMesh().GetEdgeLength(elem_index, neighbour_index);
+            double edge_length = pCellPopulation->rGetMesh().GetEdgeLength(elem_index, neighbour_iter);
 
             total_shared_edges_length += edge_length;
             total_num_pairs += 1.0;
 
             // Store whether this neighbour is labelled
-            CellPtr p_neighbour_cell = pCellPopulation->GetCellUsingLocationIndex(*neighbour_iter);
+            CellPtr p_neighbour_cell = pCellPopulation->GetCellUsingLocationIndex(neighbour_iter);
             bool neighbour_is_labelled = p_neighbour_cell->template HasCellProperty<CellLabel>();
 
             // If this cell is labelled and its neighbour is not, or vice versa...

@@ -160,9 +160,8 @@ inline void save_construct_data(
 
     std::vector<std::string> keys = t->GetKeys();
 
-    for (auto iter = keys.begin(); iter != keys.end(); ++iter)
+    for (auto key : keys)
     {
-        std::string key = *iter;
         ar << key;
         Vec vec_data = t->GetItem(key);
 

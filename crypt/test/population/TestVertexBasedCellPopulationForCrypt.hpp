@@ -99,7 +99,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned i=0; i<vertex_mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i < vertex_mesh.GetNumElements(); ++i)
         {
             WntCellCycleModel* p_cell_cycle_model = new WntCellCycleModel;
             p_cell_cycle_model->SetDimension(2);

@@ -85,7 +85,7 @@ public:
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
         MutableMesh<2, 2>* p_mesh = generator.GetMesh();
 
-        double crypt_length = (double)num_cells_depth * sqrt(3.0) / 2.0;
+        double crypt_length = static_cast<double>(num_cells_depth) * sqrt(3.0) / 2.0;
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
@@ -165,7 +165,7 @@ public:
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, thickness_of_ghost_layer);
         MutableMesh<2, 2>* p_mesh = generator.GetMesh();
 
-        double crypt_length = (double)num_cells_depth * sqrt(3.0) / 2.0;
+        double crypt_length = static_cast<double>(num_cells_depth) * sqrt(3.0) / 2.0;
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
@@ -179,7 +179,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        for (unsigned i = 0; i < location_indices.size(); i++)
+        for (unsigned i = 0; i < location_indices.size(); ++i)
         {
             SimpleWntCellCycleModel* p_model = new SimpleWntCellCycleModel();
             p_model->SetDimension(2);

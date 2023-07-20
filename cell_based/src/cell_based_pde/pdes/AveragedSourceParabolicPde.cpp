@@ -37,10 +37,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApoptoticCellProperty.hpp"
 
 template<unsigned DIM>
-AveragedSourceParabolicPde<DIM>::AveragedSourceParabolicPde(AbstractCellPopulation<DIM,DIM>& rCellPopulation,
-                                                            double duDtCoefficient,
-                                                            double diffusionCoefficient,
-                                                            double sourceCoefficient)
+AveragedSourceParabolicPde<DIM>::AveragedSourceParabolicPde(
+    AbstractCellPopulation<DIM, DIM>& rCellPopulation,
+    double duDtCoefficient,
+    double diffusionCoefficient,
+    double sourceCoefficient)
     : mrCellPopulation(rCellPopulation),
       mDuDtCoefficient(duDtCoefficient),
       mDiffusionCoefficient(diffusionCoefficient),
@@ -49,13 +50,15 @@ AveragedSourceParabolicPde<DIM>::AveragedSourceParabolicPde(AbstractCellPopulati
 }
 
 template<unsigned DIM>
-const AbstractCellPopulation<DIM,DIM>& AveragedSourceParabolicPde<DIM>::rGetCellPopulation() const
+const AbstractCellPopulation<DIM, DIM>& AveragedSourceParabolicPde<DIM>::rGetCellPopulation() const
 {
     return mrCellPopulation;
 }
 
 template<unsigned DIM>
-void AveragedSourceParabolicPde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>& rCoarseMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap) // must be called before solve
+void AveragedSourceParabolicPde<DIM>::SetupSourceTerms(
+    TetrahedralMesh<DIM, DIM>& rCoarseMesh,
+    std::map<CellPtr, unsigned>* pCellPdeElementMap) // must be called before solve
 {
     // Allocate memory
     mCellDensityOnCoarseElements.resize(rCoarseMesh.GetNumElements());
@@ -64,7 +67,10 @@ void AveragedSourceParabolicPde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>&
         mCellDensityOnCoarseElements[elem_index] = 0.0;
     }
 
-    // Loop over cells, find which coarse element it is in, and add 1 to mSourceTermOnCoarseElements[elem_index]
+    /*
+     * Loop over cells, find which coarse element it is in, and add 1 to 
+     * mSourceTermOnCoarseElements[elem_index].
+     */
     for (auto cell_iter = mrCellPopulation.Begin();
          cell_iter != mrCellPopulation.End();
          ++cell_iter)
@@ -107,7 +113,7 @@ double AveragedSourceParabolicPde<DIM>::ComputeDuDtCoefficientFunction(const Cha
 }
 
 template<unsigned DIM>
-double AveragedSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM,DIM>* pElement)
+double AveragedSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM, DIM>* pElement)
 {
     assert(!mCellDensityOnCoarseElements.empty());
     double coefficient = mSourceCoefficient * mCellDensityOnCoarseElements[pElement->GetIndex()];
@@ -126,7 +132,7 @@ double AveragedSourceParabolicPde<DIM>::ComputeSourceTermAtNode(const Node<DIM>&
 // LCOV_EXCL_STOP
 
 template<unsigned DIM>
-c_matrix<double,DIM,DIM> AveragedSourceParabolicPde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
+c_matrix<double, DIM, DIM> AveragedSourceParabolicPde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM, DIM>* pElement)
 {
     return mDiffusionCoefficient*identity_matrix<double>(DIM);
 }

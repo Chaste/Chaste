@@ -43,9 +43,9 @@ AbstractPhaseBasedCellCycleModel::AbstractPhaseBasedCellCycleModel()
         // Default parameter values all have units of hours.
         mStemCellG1Duration(14.0),
         mTransitCellG1Duration(2.0),
-        mSDuration(5.0),               // apparently between 5-6 hours normally
-        mG2Duration(4.0),              // apparently 3-4 hours normally
-        mMDuration(1.0)               // taken from Meineke et al, 2001 (doi:10.1046/j.0960-7722.2001.00216.x)
+        mSDuration(5.0), // apparently between 5-6 hours normally
+        mG2Duration(4.0), // apparently 3-4 hours normally
+        mMDuration(1.0) // taken from Meineke et al, 2001 (doi:10.1046/j.0960-7722.2001.00216.x)
 {
 }
 
@@ -53,7 +53,8 @@ AbstractPhaseBasedCellCycleModel::~AbstractPhaseBasedCellCycleModel()
 {
 }
 
-AbstractPhaseBasedCellCycleModel::AbstractPhaseBasedCellCycleModel(const AbstractPhaseBasedCellCycleModel& rModel)
+AbstractPhaseBasedCellCycleModel::AbstractPhaseBasedCellCycleModel(
+    const AbstractPhaseBasedCellCycleModel& rModel)
     : AbstractCellCycleModel(rModel),
       mCurrentCellCyclePhase(rModel.mCurrentCellCyclePhase),
       mG1Duration(rModel.mG1Duration),
@@ -149,13 +150,15 @@ double AbstractPhaseBasedCellCycleModel::GetMinimumGapDuration() const
     return mMinimumGapDuration;
 }
 
-void AbstractPhaseBasedCellCycleModel::SetStemCellG1Duration(double stemCellG1Duration)
+void AbstractPhaseBasedCellCycleModel::SetStemCellG1Duration(
+    double stemCellG1Duration)
 {
     assert(stemCellG1Duration >= 0.0);
     mStemCellG1Duration = stemCellG1Duration;
 }
 
-void AbstractPhaseBasedCellCycleModel::SetTransitCellG1Duration(double transitCellG1Duration)
+void AbstractPhaseBasedCellCycleModel::SetTransitCellG1Duration(
+    double transitCellG1Duration)
 {
     assert(transitCellG1Duration >= 0.0);
     mTransitCellG1Duration = transitCellG1Duration;
@@ -179,13 +182,15 @@ void AbstractPhaseBasedCellCycleModel::SetMDuration(double MDuration)
     mMDuration = MDuration;
 }
 
-void AbstractPhaseBasedCellCycleModel::SetMinimumGapDuration(double minimumGapDuration)
+void AbstractPhaseBasedCellCycleModel::SetMinimumGapDuration(
+    double minimumGapDuration)
 {
     assert(minimumGapDuration > 0.0);
     mMinimumGapDuration = minimumGapDuration;
 }
 
-void AbstractPhaseBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void AbstractPhaseBasedCellCycleModel::OutputCellCycleModelParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<StemCellG1Duration>" << mStemCellG1Duration << "</StemCellG1Duration>\n";
     *rParamsFile << "\t\t\t<TransitCellG1Duration>" << mTransitCellG1Duration << "</TransitCellG1Duration>\n";

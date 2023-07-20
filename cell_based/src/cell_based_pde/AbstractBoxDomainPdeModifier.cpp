@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LinearBasisFunction.hpp"
 
 template<unsigned DIM>
-AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
+AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM, DIM> > pPde,
                                                                 boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
                                                                 bool isNeumannBoundaryCondition,
                                                                 boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid,
@@ -84,7 +84,7 @@ bool AbstractBoxDomainPdeModifier<DIM>::AreBcsSetOnBoxBoundary()
 }
 
 template<unsigned DIM>
-void AbstractBoxDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
+void AbstractBoxDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM, DIM>& rCellPopulation, std::string outputDirectory)
 {
     AbstractPdeModifier<DIM>::SetupSolve(rCellPopulation, outputDirectory);
 
@@ -95,7 +95,7 @@ template<unsigned DIM>
 void AbstractBoxDomainPdeModifier<DIM>::GenerateFeMesh(boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid, double stepSize)
 {
     // Create a regular coarse tetrahedral mesh
-    this->mpFeMesh = new TetrahedralMesh<DIM,DIM>();
+    this->mpFeMesh = new TetrahedralMesh<DIM, DIM>();
     switch (DIM)
     {
         case 1:
@@ -114,10 +114,10 @@ void AbstractBoxDomainPdeModifier<DIM>::GenerateFeMesh(boost::shared_ptr<ChasteC
     // Get centroid of meshCuboid
     ChastePoint<DIM> upper = pMeshCuboid->rGetUpperCorner();
     ChastePoint<DIM> lower = pMeshCuboid->rGetLowerCorner();
-    c_vector<double,DIM> centre_of_cuboid = 0.5*(upper.rGetLocation() + lower.rGetLocation());
+    c_vector<double, DIM> centre_of_cuboid = 0.5*(upper.rGetLocation() + lower.rGetLocation());
 
     // Find the centre of the PDE mesh
-    c_vector<double,DIM> centre_of_coarse_mesh = zero_vector<double>(DIM);
+    c_vector<double, DIM> centre_of_coarse_mesh = zero_vector<double>(DIM);
     for (unsigned i = 0; i < this->mpFeMesh->GetNumNodes(); ++i)
     {
         centre_of_coarse_mesh += this->mpFeMesh->GetNode(i)->rGetLocation();
@@ -129,7 +129,7 @@ void AbstractBoxDomainPdeModifier<DIM>::GenerateFeMesh(boost::shared_ptr<ChasteC
 }
 
 template<unsigned DIM>
-void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     // Store the PDE solution in an accessible form
     ReplicatableVector solution_repl(this->mSolution);
@@ -208,7 +208,7 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
 }
 
 template<unsigned DIM>
-void AbstractBoxDomainPdeModifier<DIM>::InitialiseCellPdeElementMap(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void AbstractBoxDomainPdeModifier<DIM>::InitialiseCellPdeElementMap(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     mCellPdeElementMap.clear();
 
@@ -224,7 +224,7 @@ void AbstractBoxDomainPdeModifier<DIM>::InitialiseCellPdeElementMap(AbstractCell
 }
 
 template<unsigned DIM>
-void AbstractBoxDomainPdeModifier<DIM>::UpdateCellPdeElementMap(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void AbstractBoxDomainPdeModifier<DIM>::UpdateCellPdeElementMap(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     // Find the element of mpCoarsePdeMesh that contains each cell and populate mCellPdeElementMap
     for (auto cell_iter = rCellPopulation.Begin();

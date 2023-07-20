@@ -45,7 +45,8 @@ LabelDependentBernoulliTrialCellCycleModel::LabelDependentBernoulliTrialCellCycl
 {
 }
 
-LabelDependentBernoulliTrialCellCycleModel::LabelDependentBernoulliTrialCellCycleModel(const LabelDependentBernoulliTrialCellCycleModel& rModel)
+LabelDependentBernoulliTrialCellCycleModel::LabelDependentBernoulliTrialCellCycleModel(
+    const LabelDependentBernoulliTrialCellCycleModel& rModel)
    : AbstractCellCycleModel(rModel),
      mDivisionProbability(rModel.mDivisionProbability),
      mLabelledDivisionProbability(rModel.mLabelledDivisionProbability),
@@ -91,7 +92,8 @@ AbstractCellCycleModel* LabelDependentBernoulliTrialCellCycleModel::CreateCellCy
     return new LabelDependentBernoulliTrialCellCycleModel(*this);
 }
 
-void LabelDependentBernoulliTrialCellCycleModel::SetDivisionProbability(double divisionProbability)
+void LabelDependentBernoulliTrialCellCycleModel::SetDivisionProbability(
+    double divisionProbability)
 {
     mDivisionProbability = divisionProbability;
 }
@@ -101,7 +103,8 @@ double LabelDependentBernoulliTrialCellCycleModel::GetDivisionProbability()
     return mDivisionProbability;
 }
 
-void LabelDependentBernoulliTrialCellCycleModel::SetLabelledDivisionProbability(double labelledDivisionProbability)
+void LabelDependentBernoulliTrialCellCycleModel::SetLabelledDivisionProbability(
+    double labelledDivisionProbability)
 {
     mLabelledDivisionProbability = labelledDivisionProbability;
 }
@@ -111,7 +114,8 @@ double LabelDependentBernoulliTrialCellCycleModel::GetLabelledDivisionProbabilit
     return mLabelledDivisionProbability;
 }
 
-void LabelDependentBernoulliTrialCellCycleModel::SetMinimumDivisionAge(double minimumDivisionAge)
+void LabelDependentBernoulliTrialCellCycleModel::SetMinimumDivisionAge(
+    double minimumDivisionAge)
 {
     mMinimumDivisionAge = minimumDivisionAge;
 }
@@ -131,7 +135,8 @@ double LabelDependentBernoulliTrialCellCycleModel::GetAverageStemCellCycleTime()
     return 1.0/mDivisionProbability;
 }
 
-void LabelDependentBernoulliTrialCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void LabelDependentBernoulliTrialCellCycleModel::OutputCellCycleModelParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<DivisionProbability>" << mDivisionProbability << "</DivisionProbability>\n";
     *rParamsFile << "\t\t\t<MinimumDivisionAge>" << mMinimumDivisionAge << "</MinimumDivisionAge>\n";

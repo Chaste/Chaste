@@ -78,13 +78,15 @@ void SimpleOxygenBasedCellCycleModel::UpdateCellCyclePhase()
 
             if (oxygen_concentration < mQuiescentConcentration)
             {
-                mG1Duration += (1 - std::max(oxygen_concentration, 0.0)/mQuiescentConcentration)*dt;
+                mG1Duration += 
+                    (1 - std::max(oxygen_concentration, 0.0)/mQuiescentConcentration)*dt;
             }
         }
     }
 }
 
-SimpleOxygenBasedCellCycleModel::SimpleOxygenBasedCellCycleModel(const SimpleOxygenBasedCellCycleModel& rModel)
+SimpleOxygenBasedCellCycleModel::SimpleOxygenBasedCellCycleModel(
+    const SimpleOxygenBasedCellCycleModel& rModel)
    : AbstractSimplePhaseBasedCellCycleModel(rModel),
      mCurrentHypoxicDuration(rModel.mCurrentHypoxicDuration),
      mCurrentHypoxiaOnsetTime(rModel.mCurrentHypoxiaOnsetTime),
@@ -131,12 +133,13 @@ void SimpleOxygenBasedCellCycleModel::UpdateHypoxicDuration()
         if (mCurrentHypoxicDuration > mCriticalHypoxicDuration && RandomNumberGenerator::Instance()->ranf() < prob_of_death)
         {
             /*
-             * This method is usually called within a CellBasedSimulation, after the CellPopulation
-             * has called CellPropertyRegistry::TakeOwnership(). This means that were we to call
-             * CellPropertyRegistry::Instance() here when adding the ApoptoticCellProperty, we would
-             * be creating a new CellPropertyRegistry. In this case the ApoptoticCellProperty cell
-             * count would be incorrect. We must therefore access the ApoptoticCellProperty via the
-             * cell's CellPropertyCollection.
+             * This method is usually called within a CellBasedSimulation, after 
+             * the CellPopulation has called CellPropertyRegistry::TakeOwnership(). 
+             * This means that were we to call CellPropertyRegistry::Instance() 
+             * here when adding the ApoptoticCellProperty, we would be creating 
+             * a new CellPropertyRegistry. In this case the ApoptoticCellProperty 
+             * cell count would be incorrect. We must therefore access the 
+             * ApoptoticCellProperty via the cell's CellPropertyCollection.
              */
             boost::shared_ptr<AbstractCellProperty> p_apoptotic_property =
                 mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
@@ -145,7 +148,10 @@ void SimpleOxygenBasedCellCycleModel::UpdateHypoxicDuration()
     }
     else
     {
-        // Reset the cell's hypoxic duration and update the time at which the onset of hypoxia occurs
+        /*
+         * Reset the cell's hypoxic duration and update the time at which the 
+         * onset of hypoxia occurs.
+         */
         mCurrentHypoxicDuration = 0.0;
         mCurrentHypoxiaOnsetTime = SimulationTime::Instance()->GetTime();
     }
@@ -156,7 +162,8 @@ double SimpleOxygenBasedCellCycleModel::GetHypoxicConcentration() const
     return mHypoxicConcentration;
 }
 
-void SimpleOxygenBasedCellCycleModel::SetHypoxicConcentration(double hypoxicConcentration)
+void SimpleOxygenBasedCellCycleModel::SetHypoxicConcentration(
+    double hypoxicConcentration)
 {
     assert(hypoxicConcentration<=1.0);
     assert(hypoxicConcentration>=0.0);
@@ -168,7 +175,8 @@ double SimpleOxygenBasedCellCycleModel::GetQuiescentConcentration() const
     return mQuiescentConcentration;
 }
 
-void SimpleOxygenBasedCellCycleModel::SetQuiescentConcentration(double quiescentConcentration)
+void SimpleOxygenBasedCellCycleModel::SetQuiescentConcentration(
+    double quiescentConcentration)
 {
     assert(quiescentConcentration <= 1.0);
     assert(quiescentConcentration >= 0.0);
@@ -180,19 +188,22 @@ double SimpleOxygenBasedCellCycleModel::GetCriticalHypoxicDuration() const
     return mCriticalHypoxicDuration;
 }
 
-void SimpleOxygenBasedCellCycleModel::SetCriticalHypoxicDuration(double criticalHypoxicDuration)
+void SimpleOxygenBasedCellCycleModel::SetCriticalHypoxicDuration(
+    double criticalHypoxicDuration)
 {
     assert(criticalHypoxicDuration >= 0.0);
     mCriticalHypoxicDuration = criticalHypoxicDuration;
 }
 
-void SimpleOxygenBasedCellCycleModel::SetCurrentHypoxiaOnsetTime(double currentHypoxiaOnsetTime)
+void SimpleOxygenBasedCellCycleModel::SetCurrentHypoxiaOnsetTime(
+    double currentHypoxiaOnsetTime)
 {
     assert(currentHypoxiaOnsetTime >= 0.0);
     mCurrentHypoxiaOnsetTime = currentHypoxiaOnsetTime;
 }
 
-void SimpleOxygenBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void SimpleOxygenBasedCellCycleModel::OutputCellCycleModelParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<HypoxicConcentration>" << mHypoxicConcentration << "</HypoxicConcentration>\n";
     *rParamsFile << "\t\t\t<QuiescentConcentration>" << mQuiescentConcentration << "</QuiescentConcentration>\n";

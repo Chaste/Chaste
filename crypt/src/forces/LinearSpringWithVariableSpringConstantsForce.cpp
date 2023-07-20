@@ -230,9 +230,9 @@ void LinearSpringWithVariableSpringConstantsForce<DIM>::AddForceContribution(Abs
 
     MeshBasedCellPopulation<DIM>* p_static_cast_cell_population = static_cast<MeshBasedCellPopulation<DIM>*>(&rCellPopulation);
 
-    for (typename MeshBasedCellPopulation<DIM>::SpringIterator spring_iterator = p_static_cast_cell_population->SpringsBegin();
-        spring_iterator != p_static_cast_cell_population->SpringsEnd();
-        ++spring_iterator)
+    for (auto spring_iterator = p_static_cast_cell_population->SpringsBegin();
+         spring_iterator != p_static_cast_cell_population->SpringsEnd();
+         ++spring_iterator)
     {
         unsigned nodeA_global_index = spring_iterator.GetNodeA()->GetIndex();
         unsigned nodeB_global_index = spring_iterator.GetNodeB()->GetIndex();

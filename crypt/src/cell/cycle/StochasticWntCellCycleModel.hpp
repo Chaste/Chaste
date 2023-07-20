@@ -120,12 +120,13 @@ public:
      *
      * @return the new cell-cycle model
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    AbstractCellCycleModel* CreateCellCycleModel() override;
 
     /**
+     * Overridden InitialiseDaughterCell() method.
      * Set the duration of the G2 phase for the daughter cell.
      */
-    void InitialiseDaughterCell();
+    void InitialiseDaughterCell() override;
 
     /**
      * Initialise the cell-cycle model at the start of a simulation.
@@ -134,25 +135,28 @@ public:
      * sets the cell type according to the current beta catenin level
      * and sets a random G2 duration.
      */
-    void Initialise();
+    void Initialise() override;
 
     /**
+     * Overridden ResetForDivision() method.
      * Reset cell-cycle model by calling AbstractOdeBasedPhaseBasedCellCycleModel::ResetForDivision()
      * and setting a new random G2 duration.
      */
-    void ResetForDivision();
+    void ResetForDivision() override;
 
     /**
+     * Overridden GetG2Duration() method.
+     * 
      * @return the duration of the G2 phase.
      */
-    double GetG2Duration() const;
+    double GetG2Duration() const override;
 
     /**
      * Overridden OutputCellCycleModelParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 // Declare identifier for the serializer

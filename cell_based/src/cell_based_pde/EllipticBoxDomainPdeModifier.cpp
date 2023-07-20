@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleLinearEllipticSolver.hpp"
 
 template<unsigned DIM>
-EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
+EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM, DIM> > pPde,
                                                                 boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
                                                                 bool isNeumannBoundaryCondition,
                                                                 boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid,
@@ -58,10 +58,10 @@ EllipticBoxDomainPdeModifier<DIM>::~EllipticBoxDomainPdeModifier()
 }
 
 template<unsigned DIM>
-void EllipticBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void EllipticBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     // Set up boundary conditions
-    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = ConstructBoundaryConditionsContainer(rCellPopulation);
+    std::shared_ptr<BoundaryConditionsContainer<DIM, DIM,1> > p_bcc = ConstructBoundaryConditionsContainer(rCellPopulation);
 
     this->UpdateCellPdeElementMap(rCellPopulation);
 
@@ -71,8 +71,8 @@ void EllipticBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopula
 
     // Use SimpleLinearEllipticSolver as Averaged Source PDE
     ///\todo allow other PDE classes to be used with this modifier
-    SimpleLinearEllipticSolver<DIM,DIM> solver(this->mpFeMesh,
-                                               boost::static_pointer_cast<AbstractLinearEllipticPde<DIM,DIM> >(this->GetPde()).get(),
+    SimpleLinearEllipticSolver<DIM, DIM> solver(this->mpFeMesh,
+                                               boost::static_pointer_cast<AbstractLinearEllipticPde<DIM, DIM> >(this->GetPde()).get(),
                                                p_bcc.get());
 
     ///\todo Use solution at previous time step as an initial guess for Solve()
@@ -87,7 +87,7 @@ void EllipticBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopula
 }
 
 template<unsigned DIM>
-void EllipticBoxDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
+void EllipticBoxDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM, DIM>& rCellPopulation, std::string outputDirectory)
 {
     AbstractBoxDomainPdeModifier<DIM>::SetupSolve(rCellPopulation,outputDirectory);
 
@@ -97,9 +97,9 @@ void EllipticBoxDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DI
 }
 
 template<unsigned DIM>
-std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainer(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+std::shared_ptr<BoundaryConditionsContainer<DIM, DIM,1> > EllipticBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainer(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
-    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
+    std::shared_ptr<BoundaryConditionsContainer<DIM, DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM, DIM,1>(false));
 
     // To be well-defined, elliptic PDE problems on box domains require at least some Dirichlet boundary conditions
     ///\todo Replace this assertion with an exception in the constructor
@@ -122,7 +122,7 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeMod
         {
             if (coarse_element_indices_in_map.find(i) == coarse_element_indices_in_map.end())
             {
-                Element<DIM,DIM>* p_element = this->mpFeMesh->GetElement(i);
+                Element<DIM, DIM>* p_element = this->mpFeMesh->GetElement(i);
                 for (unsigned j = 0; j < DIM + 1; ++j)
                 {
                     unsigned node_index = p_element->GetNodeGlobalIndex(j);

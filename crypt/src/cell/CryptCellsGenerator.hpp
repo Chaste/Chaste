@@ -151,7 +151,7 @@ void CryptCellsGenerator<CELL_CYCLE_MODEL>::Generate(
     boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
 
     // Loop over the mesh and populate rCells
-    for (unsigned i=0; i<mesh_size; i++)
+    for (unsigned i = 0; i < mesh_size; ++i)
     {
         // Find the location of this cell
         double y = 0.0;

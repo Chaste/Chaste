@@ -102,22 +102,18 @@ public:
 
         // Impose boundary condition
         std::map<Node<2>*, c_vector<double,2> > old_locations;
-        for (auto cell_iter = cell_population.rGetCells().begin();
-             cell_iter != cell_population.rGetCells().end();
-             ++cell_iter)
+        for (auto p_cell : cell_population.rGetCells())
         {
-            Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
+            Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(p_cell);
             old_locations[p_node] = p_node->rGetLocation();
         }
 
         boundary_condition.ImposeBoundaryCondition(old_locations);
 
         // Test that all nodes satisfy the boundary condition
-        for (auto cell_iter = cell_population.rGetCells().begin();
-             cell_iter != cell_population.rGetCells().end();
-             ++cell_iter)
+        for (auto p_cell : cell_population.rGetCells())
         {
-            Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
+            Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(p_cell);
             c_vector<double, 2> location;
             location = p_node->rGetLocation();
             if (old_locations[p_node][0] < 2.0)
@@ -170,11 +166,9 @@ public:
 
         // Impose boundary condition
         std::map<Node<2>*, c_vector<double,2> > old_locations;
-        for (auto cell_iter = cell_population.rGetCells().begin();
-             cell_iter != cell_population.rGetCells().end();
-             ++cell_iter)
+        for (auto p_cell : cell_population.rGetCells())
         {
-            Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
+            Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(p_cell);
             old_locations[p_node] = p_node->rGetLocation();
         }
 
@@ -407,23 +401,19 @@ public:
         // Store the location of each node prior to imposing the boundary condition
         std::map<Node<3>*, c_vector<double,3> > old_locations;
 
-        for (auto cell_iter = population_3d.rGetCells().begin();
-             cell_iter != population_3d.rGetCells().end();
-             ++cell_iter)
+        for (auto p_cell : population_3d.rGetCells())
         {
-            c_vector<double,3> location = population_3d.GetLocationOfCellCentre(*cell_iter);
-            unsigned index = population_3d.GetLocationIndexUsingCell(*cell_iter);
+            c_vector<double,3> location = population_3d.GetLocationOfCellCentre(p_cell);
+            unsigned index = population_3d.GetLocationIndexUsingCell(p_cell);
             Node<3>* p_node = mesh_3d.GetNode(index);
             old_locations[p_node] = location;
         }
 
         bc_3d.ImposeBoundaryCondition(old_locations);
 
-        for (auto cell_iter = population_3d.rGetCells().begin();
-             cell_iter != population_3d.rGetCells().end();
-             ++cell_iter)
+        for (auto p_cell : population_3d.rGetCells())
         {
-            c_vector<double,3> new_direction = population_3d.GetLocationOfCellCentre(*cell_iter)- centre_3d;
+            c_vector<double,3> new_direction = population_3d.GetLocationOfCellCentre(p_cell)- centre_3d;
 
             //Check it's at the right distance from the centre
             double new_distance = norm_2(new_direction);
@@ -431,7 +421,7 @@ public:
 
             //Check that the direction is correct i.e that the new direction is parallel to the old direction
             new_direction /= new_distance;
-            unsigned index = population_3d.GetLocationIndexUsingCell(*cell_iter);
+            unsigned index = population_3d.GetLocationIndexUsingCell(p_cell);
             Node<3>* p_node = mesh_3d.GetNode(index);
             c_vector<double,3> old_direction =  old_locations[p_node] - centre_3d;
             old_direction /= norm_2(old_direction);

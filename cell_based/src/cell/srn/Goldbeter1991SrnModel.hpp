@@ -101,28 +101,28 @@ public:
      *
      * @return Returns a copy of the current SRN model.
      */
-    AbstractSrnModel* CreateSrnModel();
+    AbstractSrnModel* CreateSrnModel() override;
 
     /**
      * Initialise the SRN model at the start of a simulation.
      *
      * This overridden method sets up a new Delta-Notch ODE system.
      */
-    void Initialise();
+    void Initialise() override;
 
     /**
      * Overridden SimulateToTime() method for custom behaviour.
      *
      * \todo #2752 say what it does in this class
      */
-    void SimulateToCurrentTime();
+    void SimulateToCurrentTime() override;
 
     /**
-     * Output SRN model parameters to file.
+     * Overridden OutputSrnModelParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputSrnModelParameters(out_stream& rParamsFile);
+    void OutputSrnModelParameters(out_stream& rParamsFile) override;
 
     /**
      * @return the value of the state variable C in the ODE system.

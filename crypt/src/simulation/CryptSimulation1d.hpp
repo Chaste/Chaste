@@ -101,14 +101,12 @@ public:
     virtual ~CryptSimulation1d();
 
     /**
-     * Outputs simulation parameters to file
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * Overridden OutputSimulationParameters() method.
+     * Outputs simulation parameters to file.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputSimulationParameters(out_stream& rParamsFile);
+    void OutputSimulationParameters(out_stream& rParamsFile) override;
 };
 
 // Declare identifier for the serializer

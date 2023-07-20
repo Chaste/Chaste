@@ -516,7 +516,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM, SPACE_DIM>::Solve()
                  ++cell_iter)
             {
                 unsigned index = mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
-                const c_vector<double,SPACE_DIM>& position = mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
+                const c_vector<double, SPACE_DIM>& position = mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
 
                 c_vector<double, SPACE_DIM> velocity; // Two lines for profile build
                 velocity = (position - old_cell_locations[*cell_iter])/mDt;

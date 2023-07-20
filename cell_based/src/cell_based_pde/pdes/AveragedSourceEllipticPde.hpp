@@ -52,20 +52,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Grad.(D*Grad(u)) + k*u*rho(x) = 0,
  *
- * where the scalars D and k are specified by the members mDiffusionCoefficient and
- * mSourceCoefficient, respectively. Their values must be set in the constructor.
+ * where the scalars D and k are specified by the members mDiffusionCoefficient 
+ * and mSourceCoefficient, respectively. Their values must be set in the 
+ * constructor.
  *
  * The function rho(x) denotes the local density of non-apoptotic cells. This
- * quantity is computed for each element of a 'coarse' finite element mesh that is
- * passed to the method SetupSourceTerms() and stored in the member mCellDensityOnCoarseElements.
- * For a point x, rho(x) is defined to be the number of non-apoptotic cells whose
- * centres lie in each finite element containing that point, scaled by the area of
- * that element.
+ * quantity is computed for each element of a 'coarse' finite element mesh that 
+ * is passed to the method SetupSourceTerms() and stored in the member 
+ * mCellDensityOnCoarseElements. For a point x, rho(x) is defined to be the 
+ * number of non-apoptotic cells whose centres lie in each finite element 
+ * containing that point, scaled by the area of that element.
  *
- * \todo make member names and methods consistent with those of AveragedSourceParabolicPde (#2876)
+ * \todo make member names and methods consistent with those of 
+ * AveragedSourceParabolicPde (#2876)
  */
 template<unsigned DIM>
-class AveragedSourceEllipticPde : public AbstractLinearEllipticPde<DIM,DIM>
+class AveragedSourceEllipticPde : public AbstractLinearEllipticPde<DIM, DIM>
 {
     friend class TestCellBasedEllipticPdes;
 
@@ -129,9 +131,12 @@ public:
      * Set up the source terms.
      *
      * @param rCoarseMesh reference to the coarse mesh
-     * @param pCellPdeElementMap optional pointer to the map from cells to coarse elements
+     * @param pCellPdeElementMap optional pointer to the map from cells to 
+     *     coarse elements
      */
-    void virtual SetupSourceTerms(TetrahedralMesh<DIM,DIM>& rCoarseMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap=nullptr);
+    virtual void SetupSourceTerms(
+        TetrahedralMesh<DIM, DIM>& rCoarseMesh,
+        std::map<CellPtr, unsigned>* pCellPdeElementMap=nullptr);
 
     /**
      * Overridden ComputeConstantInUSourceTerm() method.
@@ -142,7 +147,9 @@ public:
      * @return the constant in u part of the source term, i.e g(x) in
      *  Div(D Grad u)  +  f(x)u + g(x) = 0.
      */
-    double ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement);
+    double ComputeConstantInUSourceTerm(
+        const ChastePoint<DIM>& rX,
+        Element<DIM, DIM>* pElement);
 
     /**
      * Overridden ComputeLinearInUCoeffInSourceTerm() method.
@@ -150,10 +157,12 @@ public:
      * @param rX The point in space
      * @param pElement the element
      *
-     * @return the coefficient of u in the linear part of the source term, i.e f(x) in
-     *  Div(D Grad u)  +  f(x)u + g(x) = 0.
+     * @return the coefficient of u in the linear part of the source term, i.e 
+     *     f(x) in Div(D Grad u)  +  f(x)u + g(x) = 0.
      */
-    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement);
+    double ComputeLinearInUCoeffInSourceTerm(
+        const ChastePoint<DIM>& rX,
+        Element<DIM, DIM>* pElement);
 
     /**
      * Overridden ComputeDiffusionTerm() method.
@@ -162,7 +171,7 @@ public:
      *
      * @return a matrix.
      */
-    c_matrix<double,DIM,DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX);
+    c_matrix<double, DIM, DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX);
 
     /**
      * @return the uptake rate.

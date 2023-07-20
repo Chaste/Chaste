@@ -103,6 +103,7 @@ private:
     void UpdateNode3dLocationMap(AbstractCellPopulation<2>& rCellPopulation);
 
     /**
+     * Overidden CalculateForceBetweenNodes() method.
      * Calculates the force between two nodes.
      *
      * Note that this assumes they are connected and is called by rCalculateVelocitiesOfEachNode()
@@ -113,7 +114,7 @@ private:
      *
      * @return The force exerted on Node A by Node B.
      */
-    c_vector<double,2> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex, unsigned nodeBGlobalIndex, AbstractCellPopulation<2>& rCellPopulation);
+    c_vector<double,2> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex, unsigned nodeBGlobalIndex, AbstractCellPopulation<2>& rCellPopulation) override;
 
 public:
 

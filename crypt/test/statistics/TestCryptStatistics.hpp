@@ -115,7 +115,7 @@ public:
 
         unsigned expected_indices[6] = {0,1,3,4,7,8};
 
-        for (unsigned i=0; i<test_section.size(); i++)
+        for (unsigned i = 0; i < test_section.size(); ++i)
         {
             TS_ASSERT_EQUALS(crypt.GetLocationIndexUsingCell(test_section[i]), expected_indices[i]);
         }
@@ -128,7 +128,7 @@ public:
 
         unsigned expected_indices_vertical[6] = {0,1,3,6,7};
 
-        for (unsigned i=0; i<test_section_vertical.size(); i++)
+        for (unsigned i = 0; i < test_section_vertical.size(); ++i)
         {
             TS_ASSERT_EQUALS(crypt.GetLocationIndexUsingCell(test_section_vertical[i]), expected_indices_vertical[i]);
         }
@@ -140,7 +140,7 @@ public:
 
         unsigned expected_indices_periodic[6] = {0,1,3,5,6,8};
 
-        for (unsigned i=0; i<test_section_periodic.size(); i++)
+        for (unsigned i = 0; i < test_section_periodic.size(); ++i)
         {
             TS_ASSERT_EQUALS(crypt.GetLocationIndexUsingCell(test_section_periodic[i]), expected_indices_periodic[i]);
         }
@@ -152,7 +152,7 @@ public:
 
         unsigned expected_indices_periodic_2[6] = {0,2,3,5,6,7};
 
-        for (unsigned i=0; i<test_section_periodic_2.size(); i++)
+        for (unsigned i = 0; i < test_section_periodic_2.size(); ++i)
         {
             TS_ASSERT_EQUALS(crypt.GetLocationIndexUsingCell(test_section_periodic_2[i]), expected_indices_periodic_2[i]);
         }
@@ -164,7 +164,7 @@ public:
         TS_ASSERT_EQUALS(test_section_periodic_3.size(), 3u);
         unsigned expected_indices_periodic_3[6] = {2,4,8};
 
-        for (unsigned i=0; i<test_section_periodic_3.size(); i++)
+        for (unsigned i = 0; i < test_section_periodic_3.size(); ++i)
         {
             TS_ASSERT_EQUALS(crypt.GetLocationIndexUsingCell(test_section_periodic_3[i]), expected_indices_periodic_3[i]);
         }
@@ -194,7 +194,7 @@ public:
 
         // This awkward way of setting up the cells is a result of #430
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<location_indices.size(); i++)
+        for (unsigned i = 0; i < location_indices.size(); ++i)
         {
             cells.push_back(temp_cells[location_indices[i]]);
         }
@@ -225,7 +225,7 @@ public:
         // Test CryptStatistics::GetCryptSectionPeriodic() by labelling a column of cells...
         CryptStatistics crypt_statistics(crypt);
         std::vector<CellPtr> test_section = crypt_statistics.GetCryptSectionPeriodic(crypt_length + 2.0, 8.0, 8.0);
-        for (unsigned i=0; i<test_section.size(); i++)
+        for (unsigned i = 0; i < test_section.size(); ++i)
         {
             test_section[i]->AddCellProperty(crypt.GetCellPropertyRegistry()->Get<CellLabel>());
         }
@@ -356,11 +356,11 @@ public:
         unsigned num_simulations = 2;
 
         // Guess of maximum number of cells a crypt section may contain
-        unsigned max_length_of_crypt_section = 5 * static_cast<unsigned>(sqrt(pow(cells_across/2.0+1,2.0) + pow((double)cells_up,2.0)));
+        unsigned max_length_of_crypt_section = 5 * static_cast<unsigned>(sqrt(pow(cells_across/2.0+1,2.0) + pow(static_cast<double>(cells_up), 2.0)));
 
         std::vector<unsigned> labelled_cells_counter(max_length_of_crypt_section);
 
-        for (unsigned i=0; i<max_length_of_crypt_section; i++)
+        for (unsigned i = 0; i < max_length_of_crypt_section; ++i)
         {
             labelled_cells_counter[i] = 0;
         }
@@ -398,7 +398,7 @@ public:
 
             // This awkward way of setting up the cells is a result of #430
             std::vector<CellPtr> cells;
-            for (unsigned i=0; i<location_indices.size(); i++)
+            for (unsigned i = 0; i < location_indices.size(); ++i)
             {
                 cells.push_back(temp_cells[location_indices[i]]);
             }
@@ -465,7 +465,7 @@ public:
         std::vector<double> percentage_of_labelled_cells(max_length_of_crypt_section);
         for (unsigned index=0; index < max_length_of_crypt_section; index ++)
         {
-            percentage_of_labelled_cells[index] = (double) labelled_cells_counter[index]/num_simulations;
+            percentage_of_labelled_cells[index] = static_cast<double>(labelled_cells_counter[index]) / num_simulations;
         }
 
         // Write data to file

@@ -43,7 +43,8 @@ UniformCellCycleModel::UniformCellCycleModel()
 {
 }
 
-UniformCellCycleModel::UniformCellCycleModel(const UniformCellCycleModel& rModel)
+UniformCellCycleModel::UniformCellCycleModel(
+    const UniformCellCycleModel& rModel)
    : AbstractSimpleCellCycleModel(rModel),
      mMinCellCycleDuration(rModel.mMinCellCycleDuration),
      mMaxCellCycleDuration(rModel.mMaxCellCycleDuration)
@@ -77,7 +78,8 @@ void UniformCellCycleModel::SetCellCycleDuration()
     }
     else
     {
-        mCellCycleDuration = mMinCellCycleDuration + (mMaxCellCycleDuration - mMinCellCycleDuration) * p_gen->ranf(); // U[MinCCD,MaxCCD]
+        mCellCycleDuration = mMinCellCycleDuration + 
+            (mMaxCellCycleDuration - mMinCellCycleDuration) * p_gen->ranf(); // U[MinCCD,MaxCCD]
     }
 }
 

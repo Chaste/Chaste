@@ -78,11 +78,12 @@ private:
     void ChangeCellProliferativeTypeDueToCurrentBetaCateninLevel();
 
     /**
+     * Overridden AdjustOdeParameters() method.
      * Adjust any ODE parameters needed before solving until currentTime.
      *
      * @param currentTime  the time up to which the system will be solved.
      */
-    void AdjustOdeParameters(double currentTime);
+    void AdjustOdeParameters(double currentTime) override;
 
 protected:
 
@@ -111,11 +112,11 @@ public:
     AbstractVanLeeuwen2009WntSwatCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
 
     /**
-     * See AbstractCellCycleModel::Initialise()
+     * Overridden Initialise() method.
      *
      * In this case we set up a new ODE system for a daughter cell.
      */
-    void Initialise();
+    void Initialise() override;
 
     /**
      * @return the level of membrane bound beta-catenin. To be used in cell-cell adhesion calculations.
@@ -136,8 +137,7 @@ public:
      * Allocate the mOdeSystem variable using the appropriate
      * hypothesis (one or two).
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param wntConcentration Wnt concentration
      * @param pMutationState Mutation state
@@ -149,7 +149,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 CLASS_IS_ABSTRACT(AbstractVanLeeuwen2009WntSwatCellCycleModel)

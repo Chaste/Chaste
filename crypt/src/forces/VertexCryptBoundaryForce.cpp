@@ -63,7 +63,7 @@ void VertexCryptBoundaryForce<DIM>::AddForceContribution(AbstractCellPopulation<
     }
 
     // Iterate over nodes
-    for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = p_cell_population->rGetMesh().GetNodeIteratorBegin();
+    for (auto node_iter = p_cell_population->rGetMesh().GetNodeIteratorBegin();
          node_iter != p_cell_population->rGetMesh().GetNodeIteratorEnd();
          ++node_iter)
     {

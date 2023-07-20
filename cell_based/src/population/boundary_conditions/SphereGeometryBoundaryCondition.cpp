@@ -81,7 +81,7 @@ void SphereGeometryBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::ma
          ++cell_iter)
     {
         // Find the radial distance between this cell and the surface of the sphere
-        c_vector<double,DIM> cell_location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
+        c_vector<double, DIM> cell_location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
         double radius = norm_2(cell_location - mCentreOfSphere);
         assert(radius != 0.0); //Can't project the centre to anywhere sensible
 
@@ -111,7 +111,7 @@ bool SphereGeometryBoundaryCondition<DIM>::VerifyBoundaryCondition()
          ++cell_iter)
     {
         // Find the radial distance between this cell and the surface of the sphere
-        c_vector<double,DIM> cell_location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
+        c_vector<double, DIM> cell_location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
         double radius = norm_2(cell_location - mCentreOfSphere);
 
         // If the cell is too far from the surface of the sphere...

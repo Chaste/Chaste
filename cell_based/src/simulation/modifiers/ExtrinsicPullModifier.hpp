@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * nodes or else just the right-most nodes.
  */
 template<unsigned DIM>
-class ExtrinsicPullModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
+class ExtrinsicPullModifier : public AbstractCellBasedSimulationModifier<DIM, DIM>
 {
 private:
 
@@ -63,7 +63,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM,DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM, DIM> >(*this);
         archive & mApplyExtrinsicPullToAllNodes;
         archive & mSpeed;
     }

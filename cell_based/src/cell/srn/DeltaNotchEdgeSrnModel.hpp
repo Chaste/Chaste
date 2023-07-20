@@ -96,35 +96,40 @@ public:
     /**
      * Default constructor calls base class.
      *
-     * @param pOdeSolver An optional pointer to a cell-cycle model ODE solver object (allows the use of different ODE solvers)
+     * @param pOdeSolver An optional pointer to a cell-cycle model ODE solver 
+     *     object (allows the use of different ODE solvers)
      */
-    DeltaNotchEdgeSrnModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
+    DeltaNotchEdgeSrnModel(
+        boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
 
     /**
      * Overridden builder method to create new copies of this SRN model.
      *
      * @return a copy of the current SRN model.
      */
-    virtual AbstractSrnModel* CreateSrnModel();
+    virtual AbstractSrnModel* CreateSrnModel() override;
 
     /**
      * Initialise the SRN model at the start of a simulation.
      *
      * This overridden method sets up a new Delta-Notch ODE system.
      */
-    virtual void Initialise();
+    virtual void Initialise() override;
 
     /**
-     * This method is called when a new edge is created (e.g. after cell division or T1 swap)
+     * Overridden InitialiseDaughterCell() method.
+     * 
+     * This method is called when a new edge is created (e.g. after cell 
+     * division or T1 swap)
      */
-    virtual void InitialiseDaughterCell();
+    virtual void InitialiseDaughterCell() override;
 
     /**
      * Overridden SimulateToTime() method for custom behaviour.
      * Updates parameters (such as neighbour or interior Delta/Notch) and
      * runs the simulation to current time
      */
-    virtual void SimulateToCurrentTime();
+    virtual void SimulateToCurrentTime() override;
 
     /**
      * Update the levels of Delta and Notch of neighbouring edge sensed by this edge
@@ -179,21 +184,22 @@ public:
     double GetInteriorNotch() const;
 
     /**
+     * OveriddenOutputSrnModelParameters() method.
      * Output SRN model parameters to file.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputSrnModelParameters(out_stream& rParamsFile);
+    virtual void OutputSrnModelParameters(out_stream& rParamsFile) override;
 
     /**
      * Adds Delta/Notch from the input SRN model to this model.
-     * Override the method declared in AbstractSrnModel class
+     * Overrides the method declared in AbstractSrnModel class
      * 
      * @param pOtherSrn Pointer to an SRN
      * @param scale scale factor
      */
     virtual void AddSrnQuantities(AbstractSrnModel* pOtherSrn,
-                                  const double scale = 1.0);
+                                  const double scale = 1.0) override;
 
     /**
      * Here we assume that when a neighbouring junctions shrinks, 25% of its Delta/Notch
@@ -202,7 +208,7 @@ public:
      * 
      * @param pShrunkEdgeSrn Pointer to an SRN
      */
-    virtual void AddShrunkEdgeSrn(AbstractSrnModel* pShrunkEdgeSrn);
+    virtual void AddShrunkEdgeSrn(AbstractSrnModel* pShrunkEdgeSrn) override;
 
     /**
      * Here we add Delta/Notch when junctions merge via common vertex deletion
@@ -210,7 +216,7 @@ public:
      * 
      * @param pMergedEdgeSrn Pointer to an SRN
      */
-    virtual void AddMergedEdgeSrn(AbstractSrnModel* pMergedEdgeSrn);
+    virtual void AddMergedEdgeSrn(AbstractSrnModel* pMergedEdgeSrn) override;
 
     /**
      * By default, Edge concentrations are split according to the lengths of two new edges , when an edge is split, 
@@ -219,7 +225,7 @@ public:
      * 
      * @param relativePosition position of the node splitting the two new edges relative to the original edge, used when splitting Edge concentrations
      */
-    virtual void SplitEdgeSrn(const double relativePosition);
+    virtual void SplitEdgeSrn(const double relativePosition) override;
 };
 
 typedef boost::shared_ptr<DeltaNotchEdgeSrnModel> DeltaNotchEdgeSrnModelPtr;

@@ -46,7 +46,7 @@ MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNode
      double ghostCellSpringStiffness,
      double ghostGhostSpringStiffness,
      double ghostSpringRestLength)
-             : MeshBasedCellPopulation<DIM,DIM>(rMesh, rCells, locationIndices, deleteMesh, false), // do not call the base class Validate()
+             : MeshBasedCellPopulation<DIM, DIM>(rMesh, rCells, locationIndices, deleteMesh, false), // do not call the base class Validate()
                mGhostCellSpringStiffness(ghostCellSpringStiffness),
                mGhostGhostSpringStiffness(ghostGhostSpringStiffness),
                mGhostSpringRestLength(ghostSpringRestLength)
@@ -87,7 +87,7 @@ MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNode
     double ghostCellSpringStiffness,
     double ghostGhostSpringStiffness,
     double ghostSpringRestLength)
-    : MeshBasedCellPopulation<DIM,DIM>(rMesh),
+    : MeshBasedCellPopulation<DIM, DIM>(rMesh),
       mGhostCellSpringStiffness(ghostCellSpringStiffness),
       mGhostGhostSpringStiffness(ghostGhostSpringStiffness),
       mGhostSpringRestLength(ghostSpringRestLength)
@@ -183,7 +183,7 @@ CellPtr MeshBasedCellPopulationWithGhostNodes<DIM>::AddCell(
     CellPtr pParentCell)
 {
     // Add new cell to population
-    CellPtr p_created_cell = MeshBasedCellPopulation<DIM,DIM>::AddCell(pNewCell, pParentCell);
+    CellPtr p_created_cell = MeshBasedCellPopulation<DIM, DIM>::AddCell(pNewCell, pParentCell);
     assert(p_created_cell == pNewCell);
 
     // Update size of mIsGhostNode if necessary
@@ -234,7 +234,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::RemoveGhostNode(
 {
     assert(mIsGhostNode[nodeIndex]);
 
-    static_cast<MutableMesh<DIM,DIM>&>((this->mrMesh)).DeleteNodePriorToReMesh(nodeIndex);
+    static_cast<MutableMesh<DIM, DIM>&>((this->mrMesh)).DeleteNodePriorToReMesh(nodeIndex);
 }
 
 template<unsigned DIM>

@@ -151,7 +151,7 @@ TetrahedralMesh<DIM, DIM>* CaBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeM
         cell_index++;
     }
 
-    return new MutableMesh<DIM,DIM>(temp_nodes);
+    return new MutableMesh<DIM, DIM>(temp_nodes);
 }
 
 template<unsigned DIM>
@@ -174,11 +174,11 @@ std::set<unsigned> CaBasedCellPopulation<DIM>::GetNeighbouringLocationIndices(
     std::set<unsigned> candidates = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetMooreNeighbouringNodeIndices(index);
 
     std::set<unsigned> neighbour_indices;
-    for (auto iter = candidates.begin(); iter != candidates.end(); ++iter)
+    for (auto iter : candidates)
     {
-        if (!IsSiteAvailable(*iter, pCell))
+        if (!IsSiteAvailable(iter, pCell))
         {
-            neighbour_indices.insert(*iter);
+            neighbour_indices.insert(iter);
         }
     }
 
@@ -209,7 +209,7 @@ void CaBasedCellPopulation<DIM>::AddCellUsingLocationIndex(
     }
 
     mAvailableSpaces[index]--;
-    AbstractCellPopulation<DIM,DIM>::AddCellUsingLocationIndex(index, pCell);
+    AbstractCellPopulation<DIM, DIM>::AddCellUsingLocationIndex(index, pCell);
 }
 
 template<unsigned DIM>
@@ -217,7 +217,7 @@ void CaBasedCellPopulation<DIM>::RemoveCellUsingLocationIndex(
     unsigned index,
     CellPtr pCell)
 {
-    AbstractCellPopulation<DIM,DIM>::RemoveCellUsingLocationIndex(index, pCell);
+    AbstractCellPopulation<DIM, DIM>::RemoveCellUsingLocationIndex(index, pCell);
     mAvailableSpaces[index]++;
     assert(mAvailableSpaces[index] <= mLatticeCarryingCapacity);
 }

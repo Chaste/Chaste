@@ -59,7 +59,7 @@ AbstractGrowingDomainPdeModifier<DIM>::~AbstractGrowingDomainPdeModifier()
 }
 
 template<unsigned DIM>
-void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     if (this->mDeleteFeMesh)
     {
@@ -81,7 +81,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
 }
 
 template<unsigned DIM>
-void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     // Store the PDE solution in an accessible form
     ReplicatableVector solution_repl(this->mSolution);
@@ -126,7 +126,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
             Node<DIM>* p_tet_node = this->mpFeMesh->GetNode(tet_node_index);
 
             // Get the containing elements and average the contribution from each one
-            for (typename Node<DIM>::ContainingElementIterator element_iter = p_tet_node->ContainingElementsBegin();
+            for (auto element_iter = p_tet_node->ContainingElementsBegin();
                  element_iter != p_tet_node->ContainingElementsEnd();
                  ++element_iter)
             {

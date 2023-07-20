@@ -36,9 +36,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellBasedEllipticPdeSolver.hpp"
 
 template<unsigned DIM>
-CellBasedEllipticPdeSolver<DIM>::CellBasedEllipticPdeSolver(TetrahedralMesh<DIM,DIM>* pMesh,
-                              AbstractLinearEllipticPde<DIM,DIM>* pPde,
-                              BoundaryConditionsContainer<DIM,DIM,1>* pBoundaryConditions)
+CellBasedEllipticPdeSolver<DIM>::CellBasedEllipticPdeSolver(TetrahedralMesh<DIM, DIM>* pMesh,
+                              AbstractLinearEllipticPde<DIM, DIM>* pPde,
+                              BoundaryConditionsContainer<DIM, DIM,1>* pBoundaryConditions)
     : SimpleLinearEllipticSolver<DIM, DIM>(pMesh, pPde, pBoundaryConditions)
 {
 }
@@ -101,7 +101,7 @@ template<unsigned DIM>
 void CellBasedEllipticPdeSolver<DIM>::InitialiseForSolve(Vec initialSolution)
 {
     // Linear system created here
-    SimpleLinearEllipticSolver<DIM,DIM>::InitialiseForSolve(initialSolution);
+    SimpleLinearEllipticSolver<DIM, DIM>::InitialiseForSolve(initialSolution);
 
     this->mpLinearSystem->SetMatrixIsSymmetric(true);
 }

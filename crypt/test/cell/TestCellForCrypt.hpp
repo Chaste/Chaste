@@ -109,7 +109,7 @@ public:
         WntConcentration<2>::Instance()->SetConstantWntValueForTesting(1.0);
 
         // Go forward through time
-        for (unsigned i=0; i<20; i++)
+        for (unsigned i = 0; i < 20; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
         }
@@ -154,7 +154,7 @@ public:
         const double expected_g1_duration = 5.971;
 #endif //CHASTE_CVODE
 
-        for (unsigned i=0; i<num_steps/2; i++)
+        for (unsigned i = 0; i < num_steps/2; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             double time = p_simulation_time->GetTime();
@@ -181,7 +181,7 @@ public:
 
         TS_ASSERT_DELTA(time_of_birth, time_of_birth2, 1e-9);
 
-        for (unsigned i=0; i<num_steps/2; i++)
+        for (unsigned i = 0; i < num_steps/2; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             double time = p_simulation_time->GetTime();
@@ -241,7 +241,7 @@ public:
         double SG2MDuration3 = p_cell_model->GetSDuration() + 5.55918 + p_cell_model->GetMDuration();
         double g1_duration = 5.971;
 
-        for (unsigned i=0; i<num_steps/2; i++)
+        for (unsigned i = 0; i < num_steps/2; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             double time = p_simulation_time->GetTime();
@@ -266,7 +266,7 @@ public:
 
         TS_ASSERT_DELTA(time_of_birth, time_of_birth2, 1e-9);
 
-        for (unsigned i=0; i<num_steps/2; i++)
+        for (unsigned i = 0; i < num_steps/2; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             double time = p_simulation_time->GetTime();

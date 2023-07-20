@@ -48,19 +48,25 @@ double UniformSourceParabolicPde<DIM>::GetCoefficient() const
 }
 
 template<unsigned DIM>
-double UniformSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM,DIM>* pElement)
+double UniformSourceParabolicPde<DIM>::ComputeSourceTerm(
+    const ChastePoint<DIM>& rX,
+    double u,
+    Element<DIM, DIM>* pElement)
 {
     return mSourceCoefficient;
 }
 
 template<unsigned DIM>
-c_matrix<double,DIM,DIM> UniformSourceParabolicPde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
+c_matrix<double, DIM, DIM> UniformSourceParabolicPde<DIM>::ComputeDiffusionTerm(
+    const ChastePoint<DIM>& rX,
+    Element<DIM, DIM>* pElement)
 {
     return identity_matrix<double>(DIM);
 }
 
 template<unsigned DIM>
-double UniformSourceParabolicPde<DIM>::ComputeDuDtCoefficientFunction(const ChastePoint<DIM>& rX)
+double UniformSourceParabolicPde<DIM>::ComputeDuDtCoefficientFunction(
+    const ChastePoint<DIM>& rX)
 {
     return 1.0;
 }

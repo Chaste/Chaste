@@ -48,19 +48,24 @@ double UniformSourceEllipticPde<DIM>::GetCoefficient() const
 }
 
 template<unsigned DIM>
-double UniformSourceEllipticPde<DIM>::ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
+double UniformSourceEllipticPde<DIM>::ComputeConstantInUSourceTerm(
+    const ChastePoint<DIM>& rX,
+    Element<DIM, DIM>* pElement)
 {
     return 0.0;
 }
 
 template<unsigned DIM>
-double UniformSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
+double UniformSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTerm(
+    const ChastePoint<DIM>& rX,
+    Element<DIM, DIM>* pElement)
 {
     return mSourceCoefficient;
 }
 
 template<unsigned DIM>
-c_matrix<double,DIM,DIM> UniformSourceEllipticPde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX)
+c_matrix<double, DIM, DIM> UniformSourceEllipticPde<DIM>::ComputeDiffusionTerm(
+  const ChastePoint<DIM>& rX)
 {
     return identity_matrix<double>(DIM);
 }

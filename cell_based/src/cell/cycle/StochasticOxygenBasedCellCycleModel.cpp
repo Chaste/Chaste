@@ -40,7 +40,8 @@ StochasticOxygenBasedCellCycleModel::StochasticOxygenBasedCellCycleModel()
 {
 }
 
-StochasticOxygenBasedCellCycleModel::StochasticOxygenBasedCellCycleModel(const StochasticOxygenBasedCellCycleModel& rModel)
+StochasticOxygenBasedCellCycleModel::StochasticOxygenBasedCellCycleModel(
+    const StochasticOxygenBasedCellCycleModel& rModel)
    : SimpleOxygenBasedCellCycleModel(rModel),
      mStochasticG2Duration(rModel.mStochasticG2Duration)
 {
@@ -108,7 +109,8 @@ AbstractCellCycleModel* StochasticOxygenBasedCellCycleModel::CreateCellCycleMode
     return new StochasticOxygenBasedCellCycleModel(*this);
 }
 
-void StochasticOxygenBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void StochasticOxygenBasedCellCycleModel::OutputCellCycleModelParameters(
+    out_stream& rParamsFile)
 {
     // No new parameters to output, so just call method on direct parent class
     SimpleOxygenBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);

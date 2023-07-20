@@ -37,7 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellLabel.hpp"
 
-Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
+Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel(
+    boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : AbstractOdeBasedPhaseBasedCellCycleModel(SimulationTime::Instance()->GetTime(), pOdeSolver)
 {
     if (!mpOdeSolver)
@@ -48,7 +49,8 @@ Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel(boost
     SetDt(0.0001);
 }
 
-Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel(const Alarcon2004OxygenBasedCellCycleModel& rModel)
+Alarcon2004OxygenBasedCellCycleModel::Alarcon2004OxygenBasedCellCycleModel(
+    const Alarcon2004OxygenBasedCellCycleModel& rModel)
     : AbstractOdeBasedPhaseBasedCellCycleModel(rModel)
 {
     /*
@@ -102,7 +104,8 @@ void Alarcon2004OxygenBasedCellCycleModel::Initialise()
     AbstractOdeBasedPhaseBasedCellCycleModel::Initialise();
 }
 
-void Alarcon2004OxygenBasedCellCycleModel::AdjustOdeParameters(double currentTime)
+void Alarcon2004OxygenBasedCellCycleModel::AdjustOdeParameters(
+    double currentTime)
 {
     // Pass this time step's oxygen concentration into the solver as a constant over this time step
     mpOdeSystem->rGetStateVariables()[5] = mpCell->GetCellData()->GetItem("oxygen");
@@ -112,7 +115,8 @@ void Alarcon2004OxygenBasedCellCycleModel::AdjustOdeParameters(double currentTim
     static_cast<Alarcon2004OxygenBasedCellCycleOdeSystem*>(mpOdeSystem)->SetIsLabelled(is_labelled);
 }
 
-void Alarcon2004OxygenBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void Alarcon2004OxygenBasedCellCycleModel::OutputCellCycleModelParameters(
+    out_stream& rParamsFile)
 {
     // No new parameters to output, so just call method on direct parent class
     AbstractOdeBasedPhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);

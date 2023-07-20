@@ -127,7 +127,7 @@ public:
      *
      * @return whether the cell is ready to divide.
      */
-    virtual bool ReadyToDivide();
+    virtual bool ReadyToDivide() override;
 
     /**
      * Overridden builder method to create new instances of
@@ -135,7 +135,7 @@ public:
      *
      * @return new cell-cycle model
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    AbstractCellCycleModel* CreateCellCycleModel() override;
 
     /**
      * Set the value of mDivisionProbability.
@@ -184,21 +184,21 @@ public:
      *
      * @return the average cell cycle time for cells of transit proliferative type
      */
-    double GetAverageTransitCellCycleTime();
+    double GetAverageTransitCellCycleTime() override;
 
     /**
      * Overridden GetAverageStemCellCycleTime() method.
      *
      * @return the average cell cycle time for cells of stem proliferative type
      */
-    double GetAverageStemCellCycleTime();
+    double GetAverageStemCellCycleTime() override;
 
     /**
      * Overridden OutputCellCycleModelParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 // Declare identifier for the serializer

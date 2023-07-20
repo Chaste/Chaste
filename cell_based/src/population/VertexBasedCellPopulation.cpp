@@ -320,7 +320,7 @@ unsigned VertexBasedCellPopulation<DIM>::RemoveDeadCells()
 template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::CheckForStepSizeException(
     unsigned nodeIndex,
-    c_vector<double,DIM>& rDisplacement,
+    c_vector<double, DIM>& rDisplacement,
     double dt)
 {
     double length = norm_2(rDisplacement);

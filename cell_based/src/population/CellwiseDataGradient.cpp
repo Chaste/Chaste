@@ -49,7 +49,7 @@ void CellwiseDataGradient<DIM>::SetupGradients(
     const std::string& rItemName)
 {
     MeshBasedCellPopulation<DIM>* pCellPopulation = static_cast<MeshBasedCellPopulation<DIM>*>(&(rCellPopulation));
-    TetrahedralMesh<DIM,DIM>& r_mesh = pCellPopulation->rGetMesh();
+    TetrahedralMesh<DIM, DIM>& r_mesh = pCellPopulation->rGetMesh();
 
     // Initialise gradients size
     unsigned num_nodes = pCellPopulation->GetNumNodes();
@@ -65,7 +65,7 @@ void CellwiseDataGradient<DIM>::SetupGradients(
 
     for (unsigned elem_index = 0; elem_index < num_elements; ++elem_index)
     {
-        Element<DIM,DIM>& r_elem = *(r_mesh.GetElement(elem_index));
+        Element<DIM, DIM>& r_elem = *(r_mesh.GetElement(elem_index));
 
         // Calculate the basis functions at any point (eg zero) in the element
         c_matrix<double, DIM, DIM> jacobian, inverse_jacobian;
@@ -141,7 +141,7 @@ void CellwiseDataGradient<DIM>::SetupGradients(
             //     ++element_iter)
             //{
             //    // Then loop over nodes therein
-            //    Element<DIM,DIM>& r_adjacent_elem = *(r_mesh.GetElement(*element_iter));
+            //    Element<DIM, DIM>& r_adjacent_elem = *(r_mesh.GetElement(*element_iter));
             //    for (unsigned local_node_index = 0; local_node_index < DIM + 1; ++local_node_index)
             //    {
             //        unsigned adjacent_node_global_index = r_adjacent_elem.GetNodeGlobalIndex(local_node_index);

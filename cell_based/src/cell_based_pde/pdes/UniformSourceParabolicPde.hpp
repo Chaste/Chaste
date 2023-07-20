@@ -57,7 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * on which to solve the PDE.
  */
 template <unsigned DIM>
-class UniformSourceParabolicPde : public AbstractLinearParabolicPde<DIM,DIM>
+class UniformSourceParabolicPde : public AbstractLinearParabolicPde<DIM, DIM>
 {
     friend class TestCellBasedParabolicPdes;
 
@@ -74,7 +74,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-       archive & boost::serialization::base_object<AbstractLinearParabolicPde<DIM,DIM> >(*this);
+       archive & boost::serialization::base_object<AbstractLinearParabolicPde<DIM, DIM> >(*this);
        archive & mSourceCoefficient;
     }
 
@@ -104,7 +104,7 @@ public:
      *
      * @return the the source term.
      */
-    double ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM,DIM>* pElement=NULL);
+    double ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM, DIM>* pElement=NULL);
 
     /**
      * Overridden ComputeDiffusionTerm() method.
@@ -114,7 +114,7 @@ public:
      *
      * @return a matrix.
      */
-    c_matrix<double, DIM, DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement=NULL);
+    c_matrix<double, DIM, DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM, DIM>* pElement=NULL);
 
     /**
      * Overridden ComputeDuDtCoefficientFunction() method.

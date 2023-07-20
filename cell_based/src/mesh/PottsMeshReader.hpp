@@ -142,44 +142,60 @@ public:
     {}
 
     /**
+     * Overridden GetNumElements() method.
+     * 
      * @return the number of elements in the mesh.
      */
-    unsigned GetNumElements() const;
+    unsigned GetNumElements() const override;
 
     /**
+     * Overridden GetNumNodes() method.
+     * 
      * @return the number of nodes in the mesh.
      */
-    unsigned GetNumNodes() const;
+    unsigned GetNumNodes() const override;
 
     /**
+     * Overridden GetNumElementAttributes() method.
+     * 
      * @return the number of attributes in the mesh
      */
-    unsigned GetNumElementAttributes() const;
+    unsigned GetNumElementAttributes() const override;
 
     /**
+     * Overridden GetNumFaces() method.
+     * 
      * @return the number of faces in the mesh (synonym of GetNumEdges()).
      */
-    unsigned GetNumFaces() const;
+    unsigned GetNumFaces() const override;
 
     /**
+     * Overridden GetNextFaceData() method.
+     * 
      * @return a vector of the nodes of each face in turn.
      */
-    ElementData GetNextFaceData();
+    ElementData GetNextFaceData() override;
 
     /**
+     * Overridden Reset() method.
      * Reset pointers to beginning.
      */
-    void Reset();
+    void Reset() override;
 
     /**
+     * Overridden GetNextNode() method.
+     * 
      * @return the coordinates of each node in turn.
      */
-    std::vector<double> GetNextNode();
+    std::vector<double> GetNextNode() override;
 
     /**
-     * @return the nodes of each element (and any attribute information, if there is any) in turn.
+     * Overridden GetNextElementData() method.
+     * 
+     * @return the nodes of each element (and any attribute information, if 
+     *     there is any) in turn.
      */
-    ElementData GetNextElementData();
+    ElementData GetNextElementData() override;
 };
 
 #endif /*POTTSMESHREADER_HPP_*/

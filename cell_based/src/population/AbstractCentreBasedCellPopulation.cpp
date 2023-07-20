@@ -208,7 +208,7 @@ std::set<unsigned> AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::Ge
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CheckForStepSizeException(
     unsigned nodeIndex,
-    c_vector<double,SPACE_DIM>& rDisplacement,
+    c_vector<double, SPACE_DIM>& rDisplacement,
     double dt)
 {
     double length = norm_2(rDisplacement);

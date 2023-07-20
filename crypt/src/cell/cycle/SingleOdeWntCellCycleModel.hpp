@@ -92,12 +92,14 @@ private:
     void ChangeCellProliferativeTypeDueToCurrentBetaCateninLevel();
 
     /**
+     * Overridden AdjustOdeParameters() method.
+     * 
      * Adjust any ODE parameters needed before solving until currentTime.
      * Defaults to do nothing.
      *
      * @param currentTime  the time up to which the system will be solved.
      */
-    virtual void AdjustOdeParameters(double currentTime);
+    virtual void AdjustOdeParameters(double currentTime) override;
 
 protected:
 
@@ -132,12 +134,14 @@ public:
      * sets the cell type according to the current beta catenin level
      * and sets a random G2 duration.
      */
-    void Initialise();
+    void Initialise() override;
 
     /**
-     * This specialisation updates the beta-catenin level
+     * Overridden UpdateCellCyclePhase() method.
+     * 
+     * This specialisation updates the beta-catenin level.
      */
-    void UpdateCellCyclePhase();
+    void UpdateCellCyclePhase() override;
 
     /**
      * Overridden builder method to create new copies of
@@ -145,7 +149,7 @@ public:
      *
      * @return the new cell-cycle model
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    AbstractCellCycleModel* CreateCellCycleModel() override;
 
     /**
      * @return the total beta-catenin concentration
@@ -169,7 +173,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 // Declare identifier for the serializer

@@ -180,11 +180,9 @@ public:
                             std::inserter(ghost_node_indices, ghost_node_indices.begin()));
 
         std::vector<bool> is_ghost_node(p_mesh->GetNumNodes(), false);
-        for (auto it = ghost_node_indices.begin();
-             it != ghost_node_indices.end();
-             ++it)
+        for (auto it : ghost_node_indices)
         {
-            is_ghost_node[*it] = true;
+            is_ghost_node[it] = true;
         }
 
         // Note in the following that some compilers (clang on recent OSX) can't cope with operator== overloading in CxxTest TS_ASSERT_EQUALS

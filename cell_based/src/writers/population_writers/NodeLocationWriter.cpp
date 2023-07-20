@@ -57,7 +57,7 @@ void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulation(
     {
         if (!node_iter->IsDeleted())
         {
-            const c_vector<double,SPACE_DIM>& position = node_iter->rGetLocation();
+            const c_vector<double, SPACE_DIM>& position = node_iter->rGetLocation();
 
             for (unsigned i = 0; i < SPACE_DIM; ++i)
             {
@@ -77,7 +77,7 @@ void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
     {
         if (!node_iter->IsDeleted())
         {
-            const c_vector<double,SPACE_DIM>& position = node_iter->rGetLocation();
+            const c_vector<double, SPACE_DIM>& position = node_iter->rGetLocation();
 
             for (unsigned i = 0; i < SPACE_DIM; ++i)
             {

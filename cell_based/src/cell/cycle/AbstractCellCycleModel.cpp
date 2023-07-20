@@ -46,7 +46,8 @@ AbstractCellCycleModel::~AbstractCellCycleModel()
 {
 }
 
-AbstractCellCycleModel::AbstractCellCycleModel(const AbstractCellCycleModel& rModel)
+AbstractCellCycleModel::AbstractCellCycleModel(
+    const AbstractCellCycleModel& rModel)
     : mBirthTime(rModel.mBirthTime),
       mReadyToDivide(rModel.mReadyToDivide),
       mDimension(rModel.mDimension)

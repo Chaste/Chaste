@@ -40,11 +40,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 
 /**
- * A stochastic cell-cycle model employed by Meineke et al (2001) in their off-lattice
- * model of the intestinal crypt (doi:10.1046/j.0960-7722.2001.00216.x). Cells that
- * are proliferating are assigned G1 phase durations drawn from a uniform distribution,
- * which differs between stem and transit amplifying cells. All other cell-cycle phases
- * are held constant.
+ * A stochastic cell-cycle model employed by Meineke et al (2001) in their 
+ * off-lattice model of the intestinal crypt 
+ * (doi:10.1046/j.0960-7722.2001.00216.x). Cells that are proliferating are 
+ * assigned G1 phase durations drawn from a uniform distribution, which differs 
+ * between stem and transit amplifying cells. All other cell-cycle phases are 
+ * held constant.
  */
 class UniformG1GenerationalCellCycleModel : public AbstractSimpleGenerationalCellCycleModel
 {
@@ -120,14 +121,14 @@ public:
      *
      * @return new cell-cycle model
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    AbstractCellCycleModel* CreateCellCycleModel() override;
 
     /**
      * Overridden OutputCellCycleModelParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

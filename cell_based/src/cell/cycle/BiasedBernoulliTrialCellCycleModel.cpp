@@ -43,7 +43,8 @@ BiasedBernoulliTrialCellCycleModel::BiasedBernoulliTrialCellCycleModel()
 {
 }
 
-BiasedBernoulliTrialCellCycleModel::BiasedBernoulliTrialCellCycleModel(const BiasedBernoulliTrialCellCycleModel& rModel)
+BiasedBernoulliTrialCellCycleModel::BiasedBernoulliTrialCellCycleModel(
+    const BiasedBernoulliTrialCellCycleModel& rModel)
    : AbstractCellCycleModel(rModel),
      mMaxDivisionProbability(rModel.mMaxDivisionProbability),
      mMinimumDivisionAge(rModel.mMinimumDivisionAge)
@@ -96,7 +97,8 @@ double BiasedBernoulliTrialCellCycleModel::GetMaxDivisionProbability()
     return mMaxDivisionProbability;
 }
 
-void BiasedBernoulliTrialCellCycleModel::SetMinimumDivisionAge(double minimumDivisionAge)
+void BiasedBernoulliTrialCellCycleModel::SetMinimumDivisionAge(
+    double minimumDivisionAge)
 {
     assert(minimumDivisionAge >= 0.0);
     mMinimumDivisionAge = minimumDivisionAge;
@@ -117,7 +119,8 @@ double BiasedBernoulliTrialCellCycleModel::GetAverageStemCellCycleTime()
     return 1.0/mMaxDivisionProbability;
 }
 
-void BiasedBernoulliTrialCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void BiasedBernoulliTrialCellCycleModel::OutputCellCycleModelParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<MaxDivisionProbability>" << mMaxDivisionProbability << "</MaxDivisionProbability>\n";
     *rParamsFile << "\t\t\t<MinimumDivisionAge>" << mMinimumDivisionAge << "</MinimumDivisionAge>\n";

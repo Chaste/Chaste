@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * cell cycle models.
  */
 template<unsigned DIM>
-class DeltaNotchEdgeInteriorTrackingModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
+class DeltaNotchEdgeInteriorTrackingModifier : public AbstractCellBasedSimulationModifier<DIM, DIM>
 {
     /** Needed for serialization. */
     friend class boost::serialization::access;

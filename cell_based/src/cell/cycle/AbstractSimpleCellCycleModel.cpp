@@ -45,7 +45,8 @@ AbstractSimpleCellCycleModel::~AbstractSimpleCellCycleModel()
 {
 }
 
-AbstractSimpleCellCycleModel::AbstractSimpleCellCycleModel(const AbstractSimpleCellCycleModel& rModel)
+AbstractSimpleCellCycleModel::AbstractSimpleCellCycleModel(
+    const AbstractSimpleCellCycleModel& rModel)
     : AbstractCellCycleModel(rModel),
       mCellCycleDuration(rModel.mCellCycleDuration)
 {
@@ -77,7 +78,7 @@ bool AbstractSimpleCellCycleModel::ReadyToDivide()
 
     if (!mReadyToDivide)
     {
-        if (GetAge() >= mCellCycleDuration )
+        if (GetAge() >= mCellCycleDuration)
         {
             mReadyToDivide = true;
         }
@@ -96,7 +97,8 @@ double AbstractSimpleCellCycleModel::GetCellCycleDuration() const
     return mCellCycleDuration;
 }
 
-void AbstractSimpleCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void AbstractSimpleCellCycleModel::OutputCellCycleModelParameters(
+    out_stream& rParamsFile)
 {
     // Call method on direct parent class
     AbstractCellCycleModel::OutputCellCycleModelParameters(rParamsFile);

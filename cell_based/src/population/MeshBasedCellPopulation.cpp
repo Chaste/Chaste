@@ -355,15 +355,15 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::Update(
         this->mLocationCellMap.clear();
         this->mCellLocationMap.clear();
 
-        for (auto it = this->mCells.begin(); it != this->mCells.end(); ++it)
+        for (auto it : this->mCells)
         {
-            unsigned old_node_index = old_cell_location_map[(*it).get()];
+            unsigned old_node_index = old_cell_location_map[it.get()];
 
             // This shouldn't ever happen, as the cell vector only contains living cells
             assert(!node_map.IsDeleted(old_node_index));
 
             unsigned new_node_index = node_map.GetNewIndex(old_node_index);
-            this->SetCellUsingLocationIndex(new_node_index,*it);
+            this->SetCellUsingLocationIndex(new_node_index, it);
 
             if (old_node_radius_map[old_node_index] > 0.0)
             {
@@ -381,17 +381,17 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::Update(
     {
         if (old_node_radius_map[this->mCellLocationMap[(*(this->mCells.begin())).get()]] > 0.0)
         {
-            for (auto it = this->mCells.begin(); it != this->mCells.end(); ++it)
+            for (auto it : this->mCells)
             {
-                unsigned node_index = this->mCellLocationMap[(*it).get()];
+                unsigned node_index = this->mCellLocationMap[it.get()];
                 this->GetNode(node_index)->SetRadius(old_node_radius_map[node_index]);
             }
         }
         if (output_node_velocities)
         {
-            for (auto it = this->mCells.begin(); it != this->mCells.end(); ++it)
+            for (auto it : this->mCells)
             {
-                unsigned node_index = this->mCellLocationMap[(*it).get()];
+                unsigned node_index = this->mCellLocationMap[it.get()];
                 this->GetNode(node_index)->AddAppliedForceContribution(old_node_applied_force_map[node_index]);
             }
         }
@@ -1100,10 +1100,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CheckCellPointers()
 {
     bool res = true;
-    for (auto it = this->mCells.begin(); it != this->mCells.end(); ++it)
+    for (auto p_cell : this->mCells)
     {
-        CellPtr p_cell = *it;
-        assert(p_cell);
         AbstractCellCycleModel* p_model = p_cell->GetCellCycleModel();
         assert(p_model);
 

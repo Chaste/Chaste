@@ -95,19 +95,19 @@ public:
     double GetRadius() const;
 
     /**
+     * Overridden CheckAndLavelCellsForApoptosisOrDeath() method.
      * Loop over cells and kills cells outside boundary.
      */
-    virtual void CheckAndLabelCellsForApoptosisOrDeath();
+    virtual void CheckAndLabelCellsForApoptosisOrDeath() override;
 
     /**
      * Outputs cell killer parameters to file
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputCellKillerParameters(out_stream& rParamsFile);
+    void OutputCellKillerParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

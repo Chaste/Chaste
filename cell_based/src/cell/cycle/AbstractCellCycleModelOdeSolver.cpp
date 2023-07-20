@@ -45,10 +45,11 @@ AbstractCellCycleModelOdeSolver::~AbstractCellCycleModelOdeSolver()
 {
 }
 
-void AbstractCellCycleModelOdeSolver::SolveAndUpdateStateVariable(AbstractOdeSystem* pAbstractOdeSystem,
-                                                                  double startTime,
-                                                                  double endTime,
-                                                                  double timeStep)
+void AbstractCellCycleModelOdeSolver::SolveAndUpdateStateVariable(
+    AbstractOdeSystem* pAbstractOdeSystem,
+    double startTime,
+    double endTime,
+    double timeStep)
 {
     assert(IsSetUp());
     mpOdeSolver->SolveAndUpdateStateVariable(pAbstractOdeSystem, startTime, endTime, timeStep);
@@ -66,7 +67,8 @@ double AbstractCellCycleModelOdeSolver::GetStoppingTime()
     return mpOdeSolver->GetStoppingTime();
 }
 
-void AbstractCellCycleModelOdeSolver::SetSizeOfOdeSystem(unsigned sizeOfOdeSystem)
+void AbstractCellCycleModelOdeSolver::SetSizeOfOdeSystem(
+    unsigned sizeOfOdeSystem)
 {
     mSizeOfOdeSystem = sizeOfOdeSystem;
 }

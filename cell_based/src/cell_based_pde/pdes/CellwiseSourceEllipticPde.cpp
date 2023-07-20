@@ -36,14 +36,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellwiseSourceEllipticPde.hpp"
 
 template<unsigned DIM>
-CellwiseSourceEllipticPde<DIM>::CellwiseSourceEllipticPde(AbstractCellPopulation<DIM,DIM>& rCellPopulation, double sourceCoefficient)
+CellwiseSourceEllipticPde<DIM>::CellwiseSourceEllipticPde(
+    AbstractCellPopulation<DIM, DIM>& rCellPopulation,
+    double sourceCoefficient)
     : mrCellPopulation(rCellPopulation),
       mSourceCoefficient(sourceCoefficient)
 {
 }
 
 template<unsigned DIM>
-const AbstractCellPopulation<DIM,DIM>& CellwiseSourceEllipticPde<DIM>::rGetCellPopulation() const
+const AbstractCellPopulation<DIM, DIM>& CellwiseSourceEllipticPde<DIM>::rGetCellPopulation() const
 {
     return mrCellPopulation;
 }
@@ -55,14 +57,18 @@ double CellwiseSourceEllipticPde<DIM>::GetCoefficient() const
 }
 
 template<unsigned DIM>
-double CellwiseSourceEllipticPde<DIM>::ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
+double CellwiseSourceEllipticPde<DIM>::ComputeConstantInUSourceTerm(
+    const ChastePoint<DIM>& rX,
+    Element<DIM, DIM>* pElement)
 {
     return 0.0;
 }
 
 // LCOV_EXCL_START
 template<unsigned DIM>
-double CellwiseSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
+double CellwiseSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTerm(
+    const ChastePoint<DIM>& rX,
+    Element<DIM, DIM>* pElement)
 {
     NEVER_REACHED;
     return 0.0;
@@ -70,7 +76,8 @@ double CellwiseSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTerm(const C
 // LCOV_EXCL_STOP
 
 template<unsigned DIM>
-double CellwiseSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTermAtNode(const Node<DIM>& rNode)
+double CellwiseSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTermAtNode(
+    const Node<DIM>& rNode)
 {
     double source_coefficient = 0.0;
 
@@ -83,7 +90,8 @@ double CellwiseSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTermAtNode(c
 }
 
 template<unsigned DIM>
-c_matrix<double,DIM,DIM> CellwiseSourceEllipticPde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX)
+c_matrix<double, DIM, DIM> CellwiseSourceEllipticPde<DIM>::ComputeDiffusionTerm(
+    const ChastePoint<DIM>& rX)
 {
     return identity_matrix<double>(DIM);
 }

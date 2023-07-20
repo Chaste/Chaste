@@ -182,6 +182,7 @@ public:
     const boost::shared_ptr<AbstractCellMutationState> GetMutationState() const;
 
     /**
+     * Overridden EvaluateYDerivatives() method.
      * Compute the RHS of the WntCellCycle system of ODEs.
      *
      * Returns a vector representing the RHS of the ODEs at each time step, y' = [y1' ... yn'].
@@ -191,9 +192,10 @@ public:
      * @param rY value of the solution vector used to evaluate the RHS.
      * @param rDY filled in with the resulting derivatives (using Alarcons et al. (2004) system of equations).
      */
-    void EvaluateYDerivatives(double time, const std::vector<double>& rY, std::vector<double>& rDY);
+    void EvaluateYDerivatives(double time, const std::vector<double>& rY, std::vector<double>& rDY) override;
 
     /**
+     * Overridden CalculateStoppingEvent() method.
      * This also contains a calculation of dY[1], copied from EvaluateYDerivatives.
      * Ensure they do not get out of sync!
      *
@@ -202,9 +204,10 @@ public:
      *
      * @return whether we have reached the stopping event
      */
-    bool CalculateStoppingEvent(double time, const std::vector<double>& rY);
+    bool CalculateStoppingEvent(double time, const std::vector<double>& rY) override;
 
     /**
+     * Overridden CalculateRootFunction() method.
      * When using CVODE this function is called instead of CalculateStoppingEvent.
      * It allows the point at which rY[1] reaches 1 to be found to greater precision.
      *
@@ -213,7 +216,7 @@ public:
      *
      * @return function value - giving CVODE an estimate of how close we are to the root.
      */
-    double CalculateRootFunction(double time, const std::vector<double>& rY);
+    double CalculateRootFunction(double time, const std::vector<double>& rY) override;
 
     /**
      * @return #mWntLevel.

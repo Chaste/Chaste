@@ -107,14 +107,14 @@ public:
     virtual ~AbstractSimpleCellCycleModel();
 
     /**
-     * See AbstractCellCycleModel::ResetForDivision()
+     * Overridden ResetForDivision() method.
      *
      * @return whether the cell is ready to divide (enter M phase).
      */
-    virtual bool ReadyToDivide();
+    virtual bool ReadyToDivide() override;
 
-    /** See AbstractCellCycleModel::ResetForDivision() */
-    virtual void ResetForDivision();
+    /** Overridden ResetForDivision() method. */
+    virtual void ResetForDivision() override;
 
     /**
      * Overridden InitialiseDaughterCell() method.
@@ -122,13 +122,14 @@ public:
      * Set the new cell's cell cycle duration once it has been created after division.
      * This is by calling SetCellCycleDuration() defined in child classes.
      */
-    void InitialiseDaughterCell();
+    void InitialiseDaughterCell() override;
 
-    /** See AbstractPhaseBasedCellCycleModel::Initialise()
+    /**
+     * Overridden Initialise() method.
      *
      * Calls SetCellCycleDuration() defined in child classes.
      */
-    virtual void Initialise();
+    virtual void Initialise() override;
 
     /**
      * This method is implemented in Subclasses to set the cell cycle duration of the cell.
@@ -147,12 +148,11 @@ public:
     /**
      * Outputs cell cycle model parameters to file.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile)=0;
+    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile) = 0;
 };
 
 CLASS_IS_ABSTRACT(AbstractSimpleCellCycleModel)

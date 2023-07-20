@@ -215,7 +215,7 @@ public:
         p_wnt->SetCryptLength(crypt_length);
         TS_ASSERT_EQUALS(p_wnt->IsWntSetUp(), false);   // only fully set up when a cell population is assigned
 
-        // Test GetWntLevel(double) method
+        // Test GetWntLevel() method
         double height = 100;
         double wnt_level = 0.0;
 
@@ -248,7 +248,7 @@ public:
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             WntCellCycleModel* p_model = new WntCellCycleModel();
             p_model->SetDimension(2);
@@ -432,7 +432,7 @@ public:
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             WntCellCycleModel* p_model = new WntCellCycleModel();
             p_model->SetDimension(2);

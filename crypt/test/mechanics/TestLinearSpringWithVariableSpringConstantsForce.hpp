@@ -217,7 +217,7 @@ public:
         unsigned num_cells = location_indices.empty() ? p_mesh->GetNumNodes() : location_indices.size();
         cells.reserve(num_cells);
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             double y = 0.0;
             if (std::find(location_indices.begin(), location_indices.end(), i) != location_indices.end())
@@ -388,7 +388,7 @@ public:
         unsigned num_cells = location_indices.empty() ? p_mesh->GetNumNodes() : location_indices.size();
         cells.reserve(num_cells);
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             unsigned generation;
             double y = 0.0;
@@ -650,7 +650,7 @@ public:
             boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
             boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
-            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
             {
                 FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
                 CellPtr p_cell(new Cell(p_state, p_model));
@@ -715,10 +715,10 @@ public:
         // Create a NodeBasedCellPopulation
         std::vector<Node<2>*> nodes;
         unsigned num_nodes = 10;
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
-            double x = (double)(i);
-            double y = (double)(i);
+            double x = static_cast<double>(i);
+            double y = static_cast<double>(i);
             nodes.push_back(new Node<2>(i, true, x, y));
         }
 
@@ -745,7 +745,7 @@ public:
                 "LinearSpringWithVariableSpringConstantsForce is to be used with a subclass of MeshBasedCellPopulation only");
 
         // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }

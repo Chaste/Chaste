@@ -286,7 +286,7 @@ public:
         c_vector<double,2> centre(2);
         centre[0] = 0.0;
         centre[1] = 0.0;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             centre += mesh.GetNode(i)->rGetLocation();
         }

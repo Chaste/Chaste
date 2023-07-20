@@ -73,7 +73,7 @@ public:
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, thickness_of_ghost_layer);
         MutableMesh<2, 2>* p_mesh = generator.GetMesh();
 
-        double crypt_length = (double)num_cells_depth * sqrt(3.0) / 2.0;
+        double crypt_length = static_cast<double>(num_cells_depth) * sqrt(3.0) / 2.0;
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
@@ -86,7 +86,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-        for (unsigned i = 0; i < location_indices.size(); i++)
+        for (unsigned i = 0; i < location_indices.size(); ++i)
         {
             SimpleWntCellCycleModel* p_model = new SimpleWntCellCycleModel;
             p_model->SetDimension(2);
@@ -121,7 +121,7 @@ public:
 
         unsigned expected_indices[10] = { 350, 377, 402, 429, 454, 481, 506, 533, 558, 585 };
 
-        for (unsigned i = 0; i < test_section.size(); i++)
+        for (unsigned i = 0; i < test_section.size(); ++i)
         {
             TS_ASSERT_EQUALS(crypt.GetLocationIndexUsingCell(test_section[i]), expected_indices[i]);
         }

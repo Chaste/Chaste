@@ -36,8 +36,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DeltaNotchInteriorSrnModel.hpp"
 #include "DeltaNotchEdgeSrnModel.hpp"
 
-DeltaNotchInteriorSrnModel::DeltaNotchInteriorSrnModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
-        : AbstractOdeSrnModel(2, pOdeSolver)
+DeltaNotchInteriorSrnModel::DeltaNotchInteriorSrnModel(
+    boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
+    : AbstractOdeSrnModel(2, pOdeSolver)
 {
     if (mpOdeSolver == boost::shared_ptr<AbstractCellCycleModelOdeSolver>())
     {
@@ -54,8 +55,9 @@ DeltaNotchInteriorSrnModel::DeltaNotchInteriorSrnModel(boost::shared_ptr<Abstrac
     assert(mpOdeSolver->IsSetUp());
 }
 
-DeltaNotchInteriorSrnModel::DeltaNotchInteriorSrnModel(const DeltaNotchInteriorSrnModel& rModel)
-        : AbstractOdeSrnModel(rModel)
+DeltaNotchInteriorSrnModel::DeltaNotchInteriorSrnModel(
+    const DeltaNotchInteriorSrnModel& rModel)
+    : AbstractOdeSrnModel(rModel)
 {
     /*
      * Set each member variable of the new SRN model that inherits
@@ -75,7 +77,7 @@ DeltaNotchInteriorSrnModel::DeltaNotchInteriorSrnModel(const DeltaNotchInteriorS
     assert(rModel.GetOdeSystem());
     AbstractOdeSystem* p_parent_system(rModel.GetOdeSystem());
     SetOdeSystem(new DeltaNotchInteriorOdeSystem(p_parent_system->rGetStateVariables()));
-    for (unsigned i=0; i < p_parent_system->GetNumberOfParameters(); ++i)
+    for (unsigned i = 0; i < p_parent_system->GetNumberOfParameters(); ++i)
     {
         mpOdeSystem->SetParameter(i, p_parent_system->GetParameter(i));
     }

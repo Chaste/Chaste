@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * contact inhibition cell cycle models.
  */
 template<unsigned DIM>
-class VolumeTrackingModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
+class VolumeTrackingModifier : public AbstractCellBasedSimulationModifier<DIM, DIM>
 {
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -61,7 +61,7 @@ class VolumeTrackingModifier : public AbstractCellBasedSimulationModifier<DIM,DI
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM,DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM, DIM> >(*this);
     }
 
 public:
@@ -84,7 +84,7 @@ public:
      * @param rCellPopulation reference to the cell population
      */
     virtual void UpdateAtEndOfTimeStep(
-        AbstractCellPopulation<DIM,DIM>& rCellPopulation) override;
+        AbstractCellPopulation<DIM, DIM>& rCellPopulation) override;
 
     /**
      * Overridden SetupSolve() method.
@@ -96,7 +96,7 @@ public:
      *                        output is stored
      */
     virtual void SetupSolve(
-        AbstractCellPopulation<DIM,DIM>& rCellPopulation,
+        AbstractCellPopulation<DIM, DIM>& rCellPopulation,
         std::string outputDirectory) override;
 
     /**
@@ -105,7 +105,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    void UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    void UpdateCellData(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
     /**
      * Overridden OutputSimulationModifierParameters() method.

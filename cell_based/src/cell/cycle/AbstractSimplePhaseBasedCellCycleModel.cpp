@@ -46,7 +46,8 @@ AbstractSimplePhaseBasedCellCycleModel::~AbstractSimplePhaseBasedCellCycleModel(
 {
 }
 
-AbstractSimplePhaseBasedCellCycleModel::AbstractSimplePhaseBasedCellCycleModel(const AbstractSimplePhaseBasedCellCycleModel& rModel)
+AbstractSimplePhaseBasedCellCycleModel::AbstractSimplePhaseBasedCellCycleModel(
+    const AbstractSimplePhaseBasedCellCycleModel& rModel)
     : AbstractPhaseBasedCellCycleModel(rModel)
 {
     /*
@@ -129,7 +130,8 @@ void AbstractSimplePhaseBasedCellCycleModel::UpdateCellCyclePhase()
     }
 }
 
-void AbstractSimplePhaseBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void AbstractSimplePhaseBasedCellCycleModel::OutputCellCycleModelParameters(
+    out_stream& rParamsFile)
 {
     // No new parameters to output, so just call method on direct parent class
     AbstractPhaseBasedCellCycleModel::OutputCellCycleModelParameters(rParamsFile);

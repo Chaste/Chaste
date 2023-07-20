@@ -35,8 +35,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractOdeBasedCellCycleModel.hpp"
 
-AbstractOdeBasedCellCycleModel::AbstractOdeBasedCellCycleModel(double lastTime,
-                                                               boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
+AbstractOdeBasedCellCycleModel::AbstractOdeBasedCellCycleModel(
+    double lastTime,
+    boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : CellCycleModelOdeHandler(lastTime, pOdeSolver),
       mDivideTime(lastTime)
 {
@@ -47,7 +48,8 @@ AbstractOdeBasedCellCycleModel::~AbstractOdeBasedCellCycleModel()
 {
 }
 
-AbstractOdeBasedCellCycleModel::AbstractOdeBasedCellCycleModel(const AbstractOdeBasedCellCycleModel& rModel)
+AbstractOdeBasedCellCycleModel::AbstractOdeBasedCellCycleModel(
+    const AbstractOdeBasedCellCycleModel& rModel)
     : AbstractCellCycleModel(rModel),
       CellCycleModelOdeHandler(rModel),
       mDivideTime(rModel.mDivideTime)
@@ -122,7 +124,8 @@ double AbstractOdeBasedCellCycleModel::GetOdeStopTime()
     return stop_time;
 }
 
-void AbstractOdeBasedCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void AbstractOdeBasedCellCycleModel::OutputCellCycleModelParameters(
+    out_stream& rParamsFile)
 {
     // No new parameters to output, so just call method on direct parent class
     AbstractCellCycleModel::OutputCellCycleModelParameters(rParamsFile);

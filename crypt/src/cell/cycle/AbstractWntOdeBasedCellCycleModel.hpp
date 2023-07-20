@@ -81,9 +81,11 @@ protected:
     double GetWntLevel() const;
 
     /**
+     * Overridden UpdateCellCyclePhase() method.
+     * 
      * Call base class UpdateCellCyclePhase, then UpdateCellProliferativeType.
      */
-    void UpdateCellCyclePhase();
+    void UpdateCellCyclePhase() override;
 
     /**
      * Protected copy-constructor for use by CreateCellCycleModel.
@@ -115,13 +117,14 @@ public:
     virtual ~AbstractWntOdeBasedCellCycleModel();
 
     /**
+     * Overridden ResetForDivision() method.
      * Resets the Wnt Model to the start of the cell cycle (this model does not cycle naturally)
      * Cells are given a new birth time and cell cycle proteins are reset.
      * Note that the Wnt pathway proteins maintain their current values.
      *
      * Should only be called by the Cell::Divide() method.
      */
-    void ResetForDivision();
+    void ResetForDivision() override;
 
     /**
      * Updates the current cell type to reflect whether the
@@ -134,8 +137,7 @@ public:
     /**
      * Change cell type to reflect current levels of beta-catenin.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      */
     virtual void ChangeCellProliferativeTypeDueToCurrentBetaCateninLevel()=0;
 
@@ -143,27 +145,27 @@ public:
      * Overridden GetAverageTransitCellCycleTime() method.
      * @return time
      */
-    double GetAverageTransitCellCycleTime();
+    double GetAverageTransitCellCycleTime() override;
 
     /**
      * Overridden GetAverageStemCellCycleTime() method.
      * @return time
      */
-    double GetAverageStemCellCycleTime();
+    double GetAverageStemCellCycleTime() override;
 
     /**
      * Overridden CanCellTerminallyDifferentiate() method.
      * @return whether cell can terminally differentiate
      *
      */
-    virtual bool CanCellTerminallyDifferentiate();
+    virtual bool CanCellTerminallyDifferentiate() override;
 
     /**
      * Overridden OutputCellCycleModelParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 CLASS_IS_ABSTRACT(AbstractWntOdeBasedCellCycleModel)

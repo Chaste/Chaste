@@ -144,7 +144,7 @@ public:
         {
             node_indices.insert(p_mesh->GetNode(i)->GetIndex());
         }
-        for (unsigned i=0; i<location_indices.size(); i++)
+        for (unsigned i = 0; i < location_indices.size(); ++i)
         {
             location_indices_set.insert(location_indices[i]);
         }
@@ -222,7 +222,7 @@ public:
         {
             node_indices.insert(p_mesh->GetNode(i)->GetIndex());
         }
-        for (unsigned i=0; i<location_indices.size(); i++)
+        for (unsigned i = 0; i < location_indices.size(); ++i)
         {
             location_indices_set.insert(location_indices[i]);
         }

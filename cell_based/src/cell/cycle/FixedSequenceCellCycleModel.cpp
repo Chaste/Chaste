@@ -46,7 +46,8 @@ FixedSequenceCellCycleModel::FixedSequenceCellCycleModel()
       mStemCellG1Duration = mTransitCellG1Duration;
 }
 
-FixedSequenceCellCycleModel::FixedSequenceCellCycleModel(const FixedSequenceCellCycleModel& rModel)
+FixedSequenceCellCycleModel::FixedSequenceCellCycleModel(
+    const FixedSequenceCellCycleModel& rModel)
    :  ExponentialG1GenerationalCellCycleModel(rModel)
 {
     /*
@@ -73,10 +74,10 @@ AbstractCellCycleModel* FixedSequenceCellCycleModel::CreateCellCycleModel()
 
 void FixedSequenceCellCycleModel::SetG1Duration()
 {
-    CellCycleTimesGenerator* p_cell_cycle_times_generator = CellCycleTimesGenerator::Instance();
+    CellCycleTimesGenerator* p_cell_cycle_times_generator =  CellCycleTimesGenerator::Instance();
 
-    if (    mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>()
-            || mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>() )
+    if (mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>()
+        || mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
     {
         // Generate an exponential random number with mScale
         mG1Duration = p_cell_cycle_times_generator->GetNextCellCycleTime();
@@ -105,17 +106,20 @@ double FixedSequenceCellCycleModel::GetRate()
     return p_cell_cycle_times_generator->GetRate();
 }
 
-void FixedSequenceCellCycleModel::SetStemCellG1Duration(double stemCellG1Duration)
+void FixedSequenceCellCycleModel::SetStemCellG1Duration(
+    double stemCellG1Duration)
 {
     EXCEPTION("This cell cycle model does not differentiate stem cells and transit cells, please use SetRate() instead");
 }
 
-void FixedSequenceCellCycleModel::SetTransitCellG1Duration(double transitCellG1Duration)
+void FixedSequenceCellCycleModel::SetTransitCellG1Duration(
+    double transitCellG1Duration)
 {
     EXCEPTION("This cell cycle model does not differentiate stem cells and transit cells, please use SetRate() instead");
 }
 
-void FixedSequenceCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void FixedSequenceCellCycleModel::OutputCellCycleModelParameters(
+    out_stream& rParamsFile)
 {
      *rParamsFile << "\t\t\t<Rate>" << CellCycleTimesGenerator::Instance()->GetRate() << "</Rate>\n";
 

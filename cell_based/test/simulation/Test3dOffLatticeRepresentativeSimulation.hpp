@@ -189,9 +189,7 @@ public:
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
 
-        for (auto real_node_iter = real_node_indices.begin();
-             real_node_iter != real_node_indices.end();
-             ++real_node_iter)
+        for (unsigned i = 0; i < real_node_indices.size(); ++i)
         {
             FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_state, p_model));

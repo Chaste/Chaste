@@ -39,7 +39,8 @@ FixedG1GenerationalCellCycleModel::FixedG1GenerationalCellCycleModel()
 {
 }
 
-FixedG1GenerationalCellCycleModel::FixedG1GenerationalCellCycleModel(const FixedG1GenerationalCellCycleModel& rModel)
+FixedG1GenerationalCellCycleModel::FixedG1GenerationalCellCycleModel(
+    const FixedG1GenerationalCellCycleModel& rModel)
    : AbstractSimpleGenerationalCellCycleModel(rModel)
 {
     /*
@@ -61,7 +62,8 @@ AbstractCellCycleModel* FixedG1GenerationalCellCycleModel::CreateCellCycleModel(
     return new FixedG1GenerationalCellCycleModel(*this);
 }
 
-void FixedG1GenerationalCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void FixedG1GenerationalCellCycleModel::OutputCellCycleModelParameters(
+    out_stream& rParamsFile)
 {
     // No new parameters to output, so just call method on direct parent class
     AbstractSimpleGenerationalCellCycleModel::OutputCellCycleModelParameters(rParamsFile);

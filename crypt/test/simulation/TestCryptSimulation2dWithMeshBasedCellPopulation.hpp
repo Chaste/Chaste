@@ -96,21 +96,21 @@ private:
      * but is fairly thorough.  Used for testing serialization.
      */
     template<unsigned DIM>
-    void CompareMeshes(MutableMesh<DIM,DIM>* pMesh1,
-                       MutableMesh<DIM,DIM>* pMesh2)
+    void CompareMeshes(MutableMesh<DIM, DIM>* pMesh1,
+                       MutableMesh<DIM, DIM>* pMesh2)
     {
         TS_ASSERT_EQUALS(pMesh1->GetNumAllNodes(), pMesh2->GetNumAllNodes());
         TS_ASSERT_EQUALS(pMesh1->GetNumNodes(), pMesh2->GetNumNodes());
         TS_ASSERT_EQUALS(pMesh1->GetNumBoundaryNodes(), pMesh2->GetNumBoundaryNodes());
 
-        for (unsigned i=0; i<pMesh1->GetNumAllNodes(); i++)
+        for (unsigned i = 0; i < pMesh1->GetNumAllNodes(); ++i)
         {
             Node<DIM>* p_node = pMesh1->GetNode(i);
             Node<DIM>* p_node2 = pMesh2->GetNode(i);
             TS_ASSERT_EQUALS(p_node->IsDeleted(), p_node2->IsDeleted());
             TS_ASSERT_EQUALS(p_node->GetIndex(), p_node2->GetIndex());
             TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), p_node2->IsBoundaryNode());
-            for (unsigned j=0; j<DIM; j++)
+            for (unsigned j = 0; j < DIM; ++j)
             {
                 TS_ASSERT_DELTA(p_node->rGetLocation()[j], p_node2->rGetLocation()[j], 1e-16);
             }
@@ -121,13 +121,13 @@ private:
         TS_ASSERT_EQUALS(pMesh1->GetNumBoundaryElements(), pMesh2->GetNumBoundaryElements());
         TS_ASSERT_EQUALS(pMesh1->GetNumAllBoundaryElements(), pMesh2->GetNumAllBoundaryElements());
 
-        typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter2 = pMesh2->GetElementIteratorBegin();
-        for (typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter = pMesh1->GetElementIteratorBegin();
+        typename AbstractTetrahedralMesh<DIM, DIM>::ElementIterator iter2 = pMesh2->GetElementIteratorBegin();
+        for (auto iter = pMesh1->GetElementIteratorBegin();
              iter != pMesh1->GetElementIteratorEnd();
              ++iter, ++iter2)
         {
             TS_ASSERT_EQUALS(iter->GetNumNodes(), iter2->GetNumNodes());
-            for (unsigned i=0; i<iter->GetNumNodes(); i++)
+            for (unsigned i = 0; i < iter->GetNumNodes(); ++i)
             {
                 TS_ASSERT_EQUALS(iter->GetNodeGlobalIndex(i), iter2->GetNodeGlobalIndex(i));
             }
@@ -281,7 +281,7 @@ public:
 
        std::vector<bool> ghost_node_indices_before = crypt.rGetGhostNodes();
        unsigned num_ghosts_before = 0;
-       for (unsigned i=0; i<ghost_node_indices_before.size(); i++)
+       for (unsigned i = 0; i < ghost_node_indices_before.size(); ++i)
        {
            if (ghost_node_indices_before[i])
            {
@@ -300,7 +300,7 @@ public:
 
        std::vector<bool> ghost_node_indices_after = crypt.rGetGhostNodes();
        unsigned num_ghosts_after = 0;
-       for (unsigned i=0; i<ghost_node_indices_after.size(); i++)
+       for (unsigned i = 0; i < ghost_node_indices_after.size(); ++i)
        {
            if (ghost_node_indices_after[i])
            {
@@ -344,7 +344,7 @@ public:
 
         // Save old node locations
         std::vector<c_vector<double, 2> > old_posns(p_mesh->GetNumNodes());
-        for (unsigned i=0; i<p_mesh->GetNumAllNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumAllNodes(); ++i)
         {
             old_posns[i][0] = p_mesh->GetNode(i)->rGetLocation()[0];
             old_posns[i][1] = p_mesh->GetNode(i)->rGetLocation()[1];
@@ -359,11 +359,11 @@ public:
         std::set<unsigned> location_indices_set;
         std::set<unsigned> ghost_node_indices;
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             node_indices.insert(p_mesh->GetNode(i)->GetIndex());
         }
-        for (unsigned i=0; i<location_indices.size(); i++)
+        for (unsigned i = 0; i < location_indices.size(); ++i)
         {
             location_indices_set.insert(location_indices[i]);
         }
@@ -493,7 +493,7 @@ public:
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true); // true = mature cells
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             cells[i]->SetBirthTime(-11.5);
         }
@@ -1099,7 +1099,7 @@ public:
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);// true = mature cells
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             cells[i]->SetBirthTime(-11.5);
         }
@@ -1888,7 +1888,7 @@ public:
 
         // This awkward way of setting up the cells is a result of #430
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<location_indices.size(); i++)
+        for (unsigned i = 0; i < location_indices.size(); ++i)
         {
             cells.push_back(temp_cells[location_indices[i]]);
         }

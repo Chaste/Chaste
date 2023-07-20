@@ -89,7 +89,7 @@ public:
      *
      * @param rOldLocations the node locations before any boundary conditions are applied
      */
-    void ImposeBoundaryCondition(const std::map<Node<DIM>*, c_vector<double, DIM> >& rOldLocations);
+    void ImposeBoundaryCondition(const std::map<Node<DIM>*, c_vector<double, DIM> >& rOldLocations) override;
 
     /**
      * Overridden VerifyBoundaryCondition() method.
@@ -98,7 +98,7 @@ public:
      *
      * @return whether the boundary conditions are satisfied.
      */
-    bool VerifyBoundaryCondition();
+    bool VerifyBoundaryCondition() override;
 
     /**
      * Set method for mUseJiggledBottomCells
@@ -116,7 +116,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputCellPopulationBoundaryConditionParameters(out_stream& rParamsFile);
+    void OutputCellPopulationBoundaryConditionParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

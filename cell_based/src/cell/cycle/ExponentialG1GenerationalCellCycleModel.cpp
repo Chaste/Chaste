@@ -45,7 +45,8 @@ ExponentialG1GenerationalCellCycleModel::ExponentialG1GenerationalCellCycleModel
 {
 }
 
-ExponentialG1GenerationalCellCycleModel::ExponentialG1GenerationalCellCycleModel(const ExponentialG1GenerationalCellCycleModel& rModel)
+ExponentialG1GenerationalCellCycleModel::ExponentialG1GenerationalCellCycleModel(
+    const ExponentialG1GenerationalCellCycleModel& rModel)
    :  AbstractSimpleGenerationalCellCycleModel(rModel),
       mRate(rModel.mRate)
 {
@@ -104,7 +105,8 @@ void ExponentialG1GenerationalCellCycleModel::SetRate(double rate)
     SetStemCellG1Duration(1.0/rate);
 }
 
-void ExponentialG1GenerationalCellCycleModel::SetStemCellG1Duration(double stemCellG1Duration)
+void ExponentialG1GenerationalCellCycleModel::SetStemCellG1Duration(
+    double stemCellG1Duration)
 {
     assert(stemCellG1Duration > 0.0);
     mStemCellG1Duration = stemCellG1Duration;
@@ -112,7 +114,8 @@ void ExponentialG1GenerationalCellCycleModel::SetStemCellG1Duration(double stemC
     mRate = 1.0/stemCellG1Duration;
 }
 
-void ExponentialG1GenerationalCellCycleModel::SetTransitCellG1Duration(double transitCellG1Duration)
+void ExponentialG1GenerationalCellCycleModel::SetTransitCellG1Duration(
+    double transitCellG1Duration)
 {
     assert(transitCellG1Duration > 0.0);
     mTransitCellG1Duration = transitCellG1Duration;
@@ -120,7 +123,8 @@ void ExponentialG1GenerationalCellCycleModel::SetTransitCellG1Duration(double tr
     mRate = 1.0/transitCellG1Duration;
 }
 
-void ExponentialG1GenerationalCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void ExponentialG1GenerationalCellCycleModel::OutputCellCycleModelParameters(
+    out_stream& rParamsFile)
 {
      *rParamsFile << "\t\t\t<Rate>" << mRate << "</Rate>\n";
 

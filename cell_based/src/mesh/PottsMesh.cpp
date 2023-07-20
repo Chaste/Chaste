@@ -38,10 +38,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 template<unsigned DIM>
-PottsMesh<DIM>::PottsMesh(std::vector<Node<DIM>*> nodes,
-                          std::vector<PottsElement<DIM>*> pottsElements,
-                          std::vector<std::set<unsigned> > vonNeumannNeighbouringNodeIndices,
-                          std::vector<std::set<unsigned> > mooreNeighbouringNodeIndices)
+PottsMesh<DIM>::PottsMesh(
+    std::vector<Node<DIM>*> nodes,
+    std::vector<PottsElement<DIM>*> pottsElements,
+    std::vector<std::set<unsigned> > vonNeumannNeighbouringNodeIndices,
+    std::vector<std::set<unsigned> > mooreNeighbouringNodeIndices)
 {
     // Reset member variables and clear mNodes, mElements.
     Clear();
@@ -206,13 +207,12 @@ double PottsMesh<DIM>::GetSurfaceAreaOfElement(unsigned index)
     double surface_area = 0.0;
     for (unsigned node_index = 0; node_index < num_nodes; ++node_index)
     {
-        std::set<unsigned> neighbouring_node_indices = GetVonNeumannNeighbouringNodeIndices(p_element->GetNode(node_index)->GetIndex());
+        std::set<unsigned> neighbouring_node_indices = 
+            GetVonNeumannNeighbouringNodeIndices(p_element->GetNode(node_index)->GetIndex());
         unsigned local_edges = 2*DIM;
-        for (auto iter = neighbouring_node_indices.begin();
-             iter != neighbouring_node_indices.end();
-             ++iter)
+        for (auto iter : neighbouring_node_indices)
         {
-            std::set<unsigned> neighbouring_node_element_indices = this->mNodes[*iter]->rGetContainingElementIndices();
+            std::set<unsigned> neighbouring_node_element_indices = this->mNodes[iter]->rGetContainingElementIndices();
 
             if (!(neighbouring_node_element_indices.empty()) && (local_edges!=0))
             {
@@ -276,18 +276,17 @@ void PottsMesh<DIM>::DeleteNode(unsigned index)
     // Remove from Elements
     std::set<unsigned> containing_element_indices = this->mNodes[index]->rGetContainingElementIndices();
 
-    for (auto iter = containing_element_indices.begin();
-         iter != containing_element_indices.end();
-         ++iter)
+    for (auto iter : containing_element_indices)
     {
-        assert(mElements[*iter]->GetNumNodes() > 0);
-        if (mElements[*iter]->GetNumNodes() == 1)
+        assert(mElements[iter]->GetNumNodes() > 0);
+        if (mElements[iter]->GetNumNodes() == 1)
         {
-            DeleteElement(*iter);
+            DeleteElement(iter);
         }
         else
         {
-            this->mElements[*iter]->DeleteNode(this->mElements[*iter]->GetNodeLocalIndex(index));
+            unsigned local_index = this->mElements[iter]->GetNodeLocalIndex(index);
+            this->mElements[iter]->DeleteNode(local_index);
         }
     }
 
@@ -336,28 +335,28 @@ void PottsMesh<DIM>::DeleteNode(unsigned index)
         // in the Moore and Von Neuman neighbourhoods.
         std::set<unsigned> von_neuman = mVonNeumannNeighbouringNodeIndices[node_index];
         mVonNeumannNeighbouringNodeIndices[node_index].clear();
-        for (auto iter = von_neuman.begin(); iter != von_neuman.end(); ++iter)
+        for (auto iter : von_neuman)
         {
-            if (*iter >= index)
+            if (iter >= index)
             {
-                mVonNeumannNeighbouringNodeIndices[node_index].insert(*iter-1);
+                mVonNeumannNeighbouringNodeIndices[node_index].insert(iter - 1);
             }
             else
             {
-                mVonNeumannNeighbouringNodeIndices[node_index].insert(*iter);
+                mVonNeumannNeighbouringNodeIndices[node_index].insert(iter);
             }
         }
         std::set<unsigned> moore = mMooreNeighbouringNodeIndices[node_index];
         mMooreNeighbouringNodeIndices[node_index].clear();
-        for (auto iter = moore.begin(); iter != moore.end(); ++iter)
+        for (auto iter : moore)
         {
-            if (*iter >= index)
+            if (iter >= index)
             {
-                mMooreNeighbouringNodeIndices[node_index].insert(*iter-1);
+                mMooreNeighbouringNodeIndices[node_index].insert(iter - 1);
             }
             else
             {
-                mMooreNeighbouringNodeIndices[node_index].insert(*iter);
+                mMooreNeighbouringNodeIndices[node_index].insert(iter);
             }
         }
     }
@@ -545,11 +544,9 @@ std::set<unsigned> PottsMesh<DIM>::GetNeighbouringElementIndices(unsigned elemen
         std::set<unsigned> neighbouring_node_indices = GetVonNeumannNeighbouringNodeIndices(p_node->GetIndex());
 
          // Iterate over these neighbouring nodes
-         for (auto neighbour_iter = neighbouring_node_indices.begin();
-              neighbour_iter != neighbouring_node_indices.end();
-              ++neighbour_iter)
+         for (auto neighbour_iter : neighbouring_node_indices)
          {
-             std::set<unsigned> neighbouring_node_containing_elem_indices = this->GetNode(*neighbour_iter)->rGetContainingElementIndices();
+             std::set<unsigned> neighbouring_node_containing_elem_indices = this->GetNode(neighbour_iter)->rGetContainingElementIndices();
 
              assert(neighbouring_node_containing_elem_indices.size()<2); // Either in element or in medium
 
@@ -642,4 +639,3 @@ template class PottsMesh<3>;
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(PottsMesh)
-

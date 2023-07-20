@@ -135,14 +135,13 @@ public:
      * a warning/error message and a suggested smaller dt that should avoid the 
      * problem.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param nodeIndex Index of the node in question (allows us to check whether this is a ghost or particle)
      * @param rDisplacement Movement vector of the node at this time step
      * @param dt Current time step size
      */
-    virtual void CheckForStepSizeException(unsigned nodeIndex, c_vector<double,SPACE_DIM>& rDisplacement, double dt)=0;
+    virtual void CheckForStepSizeException(unsigned nodeIndex, c_vector<double, SPACE_DIM>& rDisplacement, double dt)=0;
 
     /**
      * Get the damping constant for this node - ie d in drdt = F/d.

@@ -107,7 +107,7 @@ public:
      *
      * Here we don't do anything as this is a null SRN model.
      */
-    void SimulateToCurrentTime();
+    void SimulateToCurrentTime() override;
 
     /*
      * Overridden CreateSrnModel() method.
@@ -125,7 +125,7 @@ public:
      *
      * @return new SRN model
      */
-    AbstractSrnModel* CreateSrnModel();
+    AbstractSrnModel* CreateSrnModel() override;
 };
 
 // Declare identifier for the serializer

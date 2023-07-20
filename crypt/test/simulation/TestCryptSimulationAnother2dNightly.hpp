@@ -79,9 +79,9 @@ public:
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
         unsigned cells_across = 6;
-        double domain_width = (double)cells_across-1.0;
+        double domain_width = static_cast<double>(cells_across) - 1.0;
         unsigned cells_up = 12;
-        double domain_height = ((double)cells_up-1.0)*sqrt(3.0)/2.0;
+        double domain_height = (static_cast<double>(cells_up) - 1.0)*sqrt(3.0)/2.0;
         unsigned thickness_of_ghost_layer = 4;
 
         HoneycombMeshGenerator generator(cells_across, cells_up,thickness_of_ghost_layer);
@@ -155,7 +155,7 @@ public:
 
         std::vector<bool> ghost_node_indices_after = (static_cast<MeshBasedCellPopulationWithGhostNodes<2>* >(&(simulator.rGetCellPopulation())))->rGetGhostNodes();
         unsigned num_ghosts = 0;
-        for (unsigned i=0; i<ghost_node_indices_after.size(); i++)
+        for (unsigned i = 0; i < ghost_node_indices_after.size(); ++i)
         {
             if (ghost_node_indices_after[i])
             {

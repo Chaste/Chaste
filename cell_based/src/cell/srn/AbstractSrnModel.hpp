@@ -197,8 +197,7 @@ public:
     /**
      * Simulate the SRN to the current time.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      */
     virtual void SimulateToCurrentTime()=0;
 
@@ -215,8 +214,7 @@ public:
     /**
      * Builder method to create new instances of the SRN model.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * This method is called by Cell::Divide() to create a SRN
      * model for the daughter cell.  Note that the parent SRN
@@ -242,8 +240,7 @@ public:
     /**
      * Output SRN model parameters to file.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */

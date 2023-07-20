@@ -177,11 +177,9 @@ public:
                             std::inserter(particle_indices, particle_indices.begin()));
 
         std::vector<bool> is_particle(mesh.GetNumNodes(), false);
-        for (auto it = particle_indices.begin();
-             it != particle_indices.end();
-             ++it)
+        for (auto it : particle_indices)
         {
-            TS_ASSERT_EQUALS(cell_population.GetNode(*it)->IsParticle(), true)
+            TS_ASSERT_EQUALS(cell_population.GetNode(it)->IsParticle(), true)
         }
 
         // Test the GetParticleIndices method

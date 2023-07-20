@@ -462,8 +462,8 @@ public:
         cells.push_back(p_stem_cell);
         std::vector<CellPtr>::iterator cell_iterator;
 
-        unsigned i=0;
-        while (p_simulation_time->GetTime()< end_time)
+        unsigned i = 0;
+        while (p_simulation_time->GetTime() < end_time)
         {
             // Produce the offspring of the cells
             p_simulation_time->IncrementTimeOneStep();

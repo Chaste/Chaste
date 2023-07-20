@@ -35,7 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "DeltaNotchEdgeSrnModel.hpp"
 
-DeltaNotchEdgeSrnModel::DeltaNotchEdgeSrnModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
+DeltaNotchEdgeSrnModel::DeltaNotchEdgeSrnModel(
+    boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : AbstractOdeSrnModel(2, pOdeSolver)
 {
     if (mpOdeSolver == boost::shared_ptr<AbstractCellCycleModelOdeSolver>())
@@ -53,7 +54,8 @@ DeltaNotchEdgeSrnModel::DeltaNotchEdgeSrnModel(boost::shared_ptr<AbstractCellCyc
     assert(mpOdeSolver->IsSetUp());
 }
 
-DeltaNotchEdgeSrnModel::DeltaNotchEdgeSrnModel(const DeltaNotchEdgeSrnModel& rModel)
+DeltaNotchEdgeSrnModel::DeltaNotchEdgeSrnModel(
+    const DeltaNotchEdgeSrnModel& rModel)
     : AbstractOdeSrnModel(rModel)
 {
     /*
@@ -73,7 +75,7 @@ DeltaNotchEdgeSrnModel::DeltaNotchEdgeSrnModel(const DeltaNotchEdgeSrnModel& rMo
     assert(rModel.GetOdeSystem());
     AbstractOdeSystem* p_parent_system(rModel.GetOdeSystem());
     SetOdeSystem(new DeltaNotchEdgeOdeSystem(p_parent_system->rGetStateVariables()));
-    for (unsigned i=0; i < p_parent_system->GetNumberOfParameters(); ++i)
+    for (unsigned i = 0; i < p_parent_system->GetNumberOfParameters(); ++i)
     {
         mpOdeSystem->SetParameter(i, p_parent_system->GetParameter(i));
     }

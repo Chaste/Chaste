@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * BiasedBernoulliTrialCellCycleModel class.
  */
 template<unsigned DIM>
-class DivisionBiasTrackingModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
+class DivisionBiasTrackingModifier : public AbstractCellBasedSimulationModifier<DIM, DIM>
 {
 private:
 
@@ -71,7 +71,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM,DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM, DIM> >(*this);
     }
 
 public:

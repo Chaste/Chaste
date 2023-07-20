@@ -83,22 +83,34 @@ public:
     /** @return a pointer to the singleton instance, creating it if necessary. */
     static boost::shared_ptr<CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER> > Instance();
 
-    /** @return whether the instance in existence and fully set up. */
+    /**
+     * Overridden IsSetUp() method.
+     * 
+     * @return whether the instance in existence and fully set up.
+     */
     bool IsSetUp();
 
-    /** Initialise the ODE solver. */
-    void Initialise();
+    /**
+     * Overridden Initialise() method. 
+     * Initialise the ODE solver.
+     */
+    void Initialise() override;
 
     /**
+     * Overridden IsAdaptive() method. 
+     * 
      * @return true iff this is an adaptive solver such as CVODE for which it is safe to set the 'timestep'
      * to be the outer simulation timestep, because the ODE solver will use this as its maximum, not actual,
      * timestep.
      *
      * By default calls the base class version; it is defined here so that specializations can override it.
      */
-    virtual bool IsAdaptive();
+    virtual bool IsAdaptive() override;
 
-    /** Reset the instance. */
+    /**
+     * Overridden Reset() method. 
+     * Reset the instance. 
+     */
     void Reset();
 };
 

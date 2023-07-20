@@ -102,11 +102,9 @@ void AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>::AddForceContributi
 
         std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >& r_node_pairs = p_static_cast_cell_population->rGetNodePairs();
 
-        for (auto iter = r_node_pairs.begin();
-             iter != r_node_pairs.end();
-             ++iter)
+        for (auto iter : r_node_pairs)
         {
-            std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > pair = *iter;
+            std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > pair = iter;
 
             unsigned node_a_index = pair.first->GetIndex();
             unsigned node_b_index = pair.second->GetIndex();

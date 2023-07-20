@@ -104,7 +104,7 @@ void AbstractWntOdeBasedCellCycleModel::ResetForDivision()
     // Keep the Wnt pathway in the same state but reset the cell cycle part
     // Cell cycle is proteins 0 to 4 (first 5 ODEs)
     std::vector<double> init_conds = mpOdeSystem->GetInitialConditions();
-    for (unsigned i=0; i<5; i++)
+    for (unsigned i = 0; i < 5; ++i)
     {
        mpOdeSystem->rGetStateVariables()[i] = init_conds[i];
     }

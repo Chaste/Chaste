@@ -50,18 +50,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Grad.(Grad(u)) + k*u*rho(x) = 0,
  *
- * where the scalar k is specified by the member mSourceCoefficient, whose value must
- * be set in the constructor.
+ * where the scalar k is specified by the member mSourceCoefficient, whose value 
+ * must be set in the constructor.
  *
  * For a node of the finite element mesh with location x, the function rho(x)
  * equals one if there is a non-apoptotic cell associated with x, and
  * zero otherwise. Here, 'associated with' takes a different meaning for each
- * cell population class, and is encoded in the method IsPdeNodeAssociatedWithNonApoptoticCell().
+ * cell population class, and is encoded in the method 
+ * IsPdeNodeAssociatedWithNonApoptoticCell().
  *
  * \todo make member names and methods consistent with those of CellwiseSourceParabolicPde
  */
 template<unsigned DIM>
-class CellwiseSourceEllipticPde : public AbstractLinearEllipticPde<DIM,DIM>
+class CellwiseSourceEllipticPde : public AbstractLinearEllipticPde<DIM, DIM>
 {
     friend class TestCellBasedEllipticPdes;
 
@@ -98,7 +99,9 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param sourceCoefficient the source term coefficient (defaults to 0.0)
      */
-    CellwiseSourceEllipticPde(AbstractCellPopulation<DIM, DIM>& rCellPopulation, double sourceCoefficient=0.0);
+    CellwiseSourceEllipticPde(
+        AbstractCellPopulation<DIM, DIM>& rCellPopulation,
+        double sourceCoefficient=0.0);
 
     /**
      * @return const reference to the cell population (used in archiving).
@@ -119,7 +122,9 @@ public:
      * @return the constant in u part of the source term, i.e g(x) in
      *  Div(D Grad u)  +  f(x)u + g(x) = 0.
      */
-    virtual double ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement);
+    virtual double ComputeConstantInUSourceTerm(
+        const ChastePoint<DIM>& rX,
+        Element<DIM, DIM>* pElement);
 
     /**
      * Overridden ComputeLinearInUCoeffInSourceTerm() method.
@@ -130,7 +135,9 @@ public:
      * @return the coefficient of u in the linear part of the source term, i.e f(x) in
      *  Div(D Grad u)  +  f(x)u + g(x) = 0.
      */
-    virtual double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement);
+    virtual double ComputeLinearInUCoeffInSourceTerm(
+        const ChastePoint<DIM>& rX,
+        Element<DIM, DIM>* pElement);
 
     /**
      * Overridden ComputeLinearInUCoeffInSourceTermAtNode() method.
@@ -139,7 +146,8 @@ public:
      * @return the coefficient of u in the linear part of the source term, i.e f(x) in
      *  Div(D Grad u)  +  f(x)u + g(x) = 0.
      */
-    virtual double ComputeLinearInUCoeffInSourceTermAtNode(const Node<DIM>& rNode);
+    virtual double ComputeLinearInUCoeffInSourceTermAtNode(
+        const Node<DIM>& rNode);
 
     /**
      * Overridden ComputeDiffusionTerm() method.
@@ -148,7 +156,8 @@ public:
      *
      * @return a matrix.
      */
-    virtual c_matrix<double,DIM,DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX);
+    virtual c_matrix<double, DIM, DIM> ComputeDiffusionTerm(
+        const ChastePoint<DIM>& rX);
 };
 
 #include "SerializationExportWrapper.hpp"

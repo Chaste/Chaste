@@ -88,11 +88,12 @@ private:
 protected:
 
     /**
+     * Overridden SetG1Duration() method.
      * Stochastically set the G1 duration following an exponential distribution. Called on cell creation at
      * the start of a simulation, and for both parent and daughter
      * cells at cell division.
      */
-    virtual void SetG1Duration();
+    virtual void SetG1Duration() override;
 
     /**
      * Protected copy-constructor for use by CreateCellCycleModel.
@@ -123,7 +124,7 @@ public:
      *
      * @return new cell-cycle model
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    AbstractCellCycleModel* CreateCellCycleModel() override;
 
     /**
      * Return the rate parameter (lambda) of the exponential distribution.
@@ -151,7 +152,7 @@ public:
      *
      * @param stemCellG1Duration  the new value of mStemCellG1Duration
      */
-    virtual void SetStemCellG1Duration(double stemCellG1Duration);
+    virtual void SetStemCellG1Duration(double stemCellG1Duration) override;
 
     /**
      * Overridden SetTransitCellG1Duration() method.
@@ -161,14 +162,14 @@ public:
      *
      * @param transitCellG1Duration  the new value of mTransitCellG1Duration
      */
-    virtual void SetTransitCellG1Duration(double transitCellG1Duration);
+    virtual void SetTransitCellG1Duration(double transitCellG1Duration) override;
 
     /**
      * Overridden OutputCellCycleModelParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

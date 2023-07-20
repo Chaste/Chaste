@@ -368,17 +368,16 @@ public:
         // Assign roughly half the cells to undergo apoptotis. Set their location index as
         // a cell data item to check ordering in output VTK file
         std::list<CellPtr> cells2 = cell_population.rGetCells();
-        std::list<CellPtr>::iterator it;
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-        for (it = cells2.begin(); it != cells2.end(); ++it)
+        for (auto it : cells2)
         {
-            (*it)->SetApoptosisTime(3);
+            it->SetApoptosisTime(3);
             double random_number = p_gen->ranf();
             if (random_number < 0.5)
             {
-                (*it)->AddCellProperty(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>());
+                it->AddCellProperty(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>());
             }
-            (*it)->GetCellData()->SetItem("Location Index For Test", double(cell_population.GetLocationIndexUsingCell((*it))));
+            it->GetCellData()->SetItem("Location Index For Test", double(cell_population.GetLocationIndexUsingCell(it)));
         }
 
         // Set up cell-based simulation

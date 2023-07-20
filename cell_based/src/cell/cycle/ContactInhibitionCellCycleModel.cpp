@@ -46,7 +46,8 @@ ContactInhibitionCellCycleModel::ContactInhibitionCellCycleModel()
 {
 }
 
-ContactInhibitionCellCycleModel::ContactInhibitionCellCycleModel(const ContactInhibitionCellCycleModel& rModel)
+ContactInhibitionCellCycleModel::ContactInhibitionCellCycleModel(
+    const ContactInhibitionCellCycleModel& rModel)
     : AbstractSimplePhaseBasedCellCycleModel(rModel),
       mQuiescentVolumeFraction(rModel.mQuiescentVolumeFraction),
       mEquilibriumVolume(rModel.mEquilibriumVolume),
@@ -143,7 +144,8 @@ AbstractCellCycleModel* ContactInhibitionCellCycleModel::CreateCellCycleModel()
     return new ContactInhibitionCellCycleModel(*this);
 }
 
-void ContactInhibitionCellCycleModel::SetQuiescentVolumeFraction(double quiescentVolumeFraction)
+void ContactInhibitionCellCycleModel::SetQuiescentVolumeFraction(
+    double quiescentVolumeFraction)
 {
     mQuiescentVolumeFraction = quiescentVolumeFraction;
 }
@@ -153,7 +155,8 @@ double ContactInhibitionCellCycleModel::GetQuiescentVolumeFraction() const
     return mQuiescentVolumeFraction;
 }
 
-void ContactInhibitionCellCycleModel::SetEquilibriumVolume(double equilibriumVolume)
+void ContactInhibitionCellCycleModel::SetEquilibriumVolume(
+    double equilibriumVolume)
 {
     mEquilibriumVolume = equilibriumVolume;
 }
@@ -173,7 +176,8 @@ double ContactInhibitionCellCycleModel::GetCurrentQuiescentOnsetTime() const
     return mCurrentQuiescentOnsetTime;
 }
 
-void ContactInhibitionCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void ContactInhibitionCellCycleModel::OutputCellCycleModelParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<QuiescentVolumeFraction>" << mQuiescentVolumeFraction << "</QuiescentVolumeFraction>\n";
     *rParamsFile << "\t\t\t<EquilibriumVolume>" << mEquilibriumVolume << "</EquilibriumVolume>\n";

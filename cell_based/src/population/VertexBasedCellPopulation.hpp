@@ -339,7 +339,7 @@ public:
      * @param dt Current time step size
      */
     virtual void CheckForStepSizeException(unsigned nodeIndex,
-                                           c_vector<double,DIM>& rDisplacement,
+                                           c_vector<double, DIM>& rDisplacement,
                                            double dt);
 
     /**
@@ -693,7 +693,7 @@ inline void save_construct_data(
     Archive & ar, const VertexBasedCellPopulation<DIM> * t, const unsigned int file_version)
 {
     // Save data required to construct instance
-    const MutableVertexMesh<DIM,DIM>* p_mesh = &(t->rGetMesh());
+    const MutableVertexMesh<DIM, DIM>* p_mesh = &(t->rGetMesh());
     ar & p_mesh;
 
     const VertexBasedPopulationSrn<DIM>& pop_srn = t->rGetVertexBasedPopulationSrn();
@@ -709,7 +709,7 @@ inline void load_construct_data(
     Archive & ar, VertexBasedCellPopulation<DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance
-    MutableVertexMesh<DIM,DIM>* p_mesh;
+    MutableVertexMesh<DIM, DIM>* p_mesh;
     ar >> p_mesh;
 
     VertexBasedPopulationSrn<DIM> pop_srn;

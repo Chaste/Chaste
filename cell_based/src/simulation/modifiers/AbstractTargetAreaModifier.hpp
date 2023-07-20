@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * It is used to implement growth in vertex-based simulations.
  */
 template<unsigned DIM>
-class AbstractTargetAreaModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
+class AbstractTargetAreaModifier : public AbstractCellBasedSimulationModifier<DIM, DIM>
 {
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -59,7 +59,7 @@ class AbstractTargetAreaModifier : public AbstractCellBasedSimulationModifier<DI
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM,DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM, DIM> >(*this);
         archive & mReferenceTargetArea;
     }
 
@@ -129,8 +129,7 @@ public:
     /**
      * Helper method to update the target area property of an individual cell.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param pCell pointer to the cell
      */

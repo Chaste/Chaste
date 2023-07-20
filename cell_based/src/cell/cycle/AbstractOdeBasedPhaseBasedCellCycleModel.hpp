@@ -146,18 +146,20 @@ public:
     void SetBirthTime(double birthTime);
 
     /**
+     * Overridden ResetForDivision() method.
+     * 
      * For a naturally cycling model this does not need to be overridden in the
      * subclasses. But most models should override this function and then
      * call AbstractOdeBasedPhaseBasedCellCycleModel::ResetForDivision() from inside their version.
      */
-    virtual void ResetForDivision();
+    virtual void ResetForDivision() override;
 
     /**
-     * Outputs cell cycle model parameters to file.
+     * Overridden OutputCellCycleModelParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 CLASS_IS_ABSTRACT(AbstractOdeBasedPhaseBasedCellCycleModel)

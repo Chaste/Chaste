@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \todo document class
  */
 template<unsigned DIM>
-class DeltaNotchEdgeTrackingModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
+class DeltaNotchEdgeTrackingModifier : public AbstractCellBasedSimulationModifier<DIM, DIM>
 {
 
     /** Needed for serialization. */

@@ -103,13 +103,13 @@ public:
     /**
      * Overridden SetG1Duration().
      */
-    void SetG1Duration();
+    void SetG1Duration() override;
 
     /**
      * Overridden builder method to create new copies of this cell-cycle model.
      * @return a pointer to the GammaG1CellCycleModel created.
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    AbstractCellCycleModel* CreateCellCycleModel() override;
 
     /**
      * Set mShape.
@@ -140,7 +140,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

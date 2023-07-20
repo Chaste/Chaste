@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AveragedSourceParabolicPde.hpp"
 
 template<unsigned DIM>
-AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
+AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM, DIM> > pPde,
                                               boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
                                               bool isNeumannBoundaryCondition,
                                               Vec solution)
@@ -74,7 +74,7 @@ AbstractPdeModifier<DIM>::~AbstractPdeModifier()
 }
 
 template<unsigned DIM>
-boost::shared_ptr<AbstractLinearPde<DIM,DIM> > AbstractPdeModifier<DIM>::GetPde()
+boost::shared_ptr<AbstractLinearPde<DIM, DIM> > AbstractPdeModifier<DIM>::GetPde()
 {
     return mpPde;
 }
@@ -111,7 +111,7 @@ bool AbstractPdeModifier<DIM>::HasAveragedSourcePde()
 }
 
 template<unsigned DIM>
-void AbstractPdeModifier<DIM>::SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap)
+void AbstractPdeModifier<DIM>::SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM, DIM>* pMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap)
 {
     assert(HasAveragedSourcePde());
     if (boost::dynamic_pointer_cast<AveragedSourceEllipticPde<DIM> >(mpPde) != nullptr)
@@ -137,13 +137,13 @@ Vec AbstractPdeModifier<DIM>::GetSolution() const
 }
 
 template<unsigned DIM>
-TetrahedralMesh<DIM,DIM>* AbstractPdeModifier<DIM>::GetFeMesh() const
+TetrahedralMesh<DIM, DIM>* AbstractPdeModifier<DIM>::GetFeMesh() const
 {
     return mpFeMesh;
 }
 
 template<unsigned DIM>
-void AbstractPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory)
+void AbstractPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM, DIM>& rCellPopulation, std::string outputDirectory)
 {
     // Cache the output directory
     this->mOutputDirectory = outputDirectory;
@@ -159,7 +159,7 @@ void AbstractPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCell
 }
 
 template<unsigned DIM>
-void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     if (mOutputSolutionAtPdeNodes)
     {
@@ -173,7 +173,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
             for (unsigned i = 0; i < mpFeMesh->GetNumNodes(); ++i)
             {
                 (*mpVizPdeSolutionResultsFile) << i << " ";
-                const c_vector<double,DIM>& r_location = mpFeMesh->GetNode(i)->rGetLocation();
+                const c_vector<double, DIM>& r_location = mpFeMesh->GetNode(i)->rGetLocation();
                 for (unsigned k = 0; k < DIM; ++k)
                 {
                     (*mpVizPdeSolutionResultsFile) << r_location[k] << " ";
@@ -193,7 +193,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
         std::ostringstream time_string;
         time_string << SimulationTime::Instance()->GetTimeStepsElapsed();
         std::string results_file = "pde_results_" + mDependentVariableName + "_" + time_string.str();
-        VtkMeshWriter<DIM,DIM>* p_vtk_mesh_writer = new VtkMeshWriter<DIM,DIM>(mOutputDirectory, results_file, false);
+        VtkMeshWriter<DIM, DIM>* p_vtk_mesh_writer = new VtkMeshWriter<DIM, DIM>(mOutputDirectory, results_file, false);
 
         ReplicatableVector solution_repl(mSolution);
         std::vector<double> pde_solution;
@@ -211,7 +211,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
 }
 
 template<unsigned DIM>
-void AbstractPdeModifier<DIM>::UpdateAtEndOfSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+void AbstractPdeModifier<DIM>::UpdateAtEndOfSolve(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     if (mOutputSolutionAtPdeNodes)
     {

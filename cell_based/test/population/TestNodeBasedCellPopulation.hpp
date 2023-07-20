@@ -91,8 +91,8 @@ private:
     void DimensionTestSimpleNodeBasedCellPopulation(std::string meshFilename)
     {
         // Create a simple mesh
-        TrianglesMeshReader<DIM,DIM> mesh_reader(meshFilename);
-        TetrahedralMesh<DIM,DIM> generating_mesh;
+        TrianglesMeshReader<DIM, DIM> mesh_reader(meshFilename);
+        TetrahedralMesh<DIM, DIM> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh

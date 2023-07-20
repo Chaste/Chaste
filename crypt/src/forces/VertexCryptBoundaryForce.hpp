@@ -97,7 +97,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
+    void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation) override;
 
     /** @return mForceStrength */
     double GetForceStrength() const;
@@ -107,7 +107,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputForceParameters(out_stream& rParamsFile);
+    void OutputForceParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

@@ -90,11 +90,9 @@ void BuskeCompressionForce<DIM>::AddForceContribution(
         std::set<unsigned> neighbouring_node_indices = p_static_cast_cell_population->GetNeighbouringNodeIndices(node_index);
 
         // Loop over this set
-        for (auto iter = neighbouring_node_indices.begin();
-             iter != neighbouring_node_indices.end();
-             ++iter)
+        for (auto iter : neighbouring_node_indices)
         {
-            Node<DIM>* p_node_j = rCellPopulation.GetNode(*iter);
+            Node<DIM>* p_node_j = rCellPopulation.GetNode(iter);
 
             // Get the location of this node
             const c_vector<double, DIM>& r_node_j_location = p_node_j->rGetLocation();

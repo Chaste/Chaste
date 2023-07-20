@@ -118,9 +118,9 @@ public:
      * @param pPde pointer to the PDE
      * @param pBoundaryConditions pointer to the boundary conditions
      */
-    CellBasedParabolicPdeSolver(TetrahedralMesh<DIM,DIM>* pMesh,
-                                AbstractLinearParabolicPde<DIM,DIM>* pPde,
-                                BoundaryConditionsContainer<DIM,DIM,1>* pBoundaryConditions);
+    CellBasedParabolicPdeSolver(TetrahedralMesh<DIM, DIM>* pMesh,
+                                AbstractLinearParabolicPde<DIM, DIM>* pPde,
+                                BoundaryConditionsContainer<DIM, DIM,1>* pBoundaryConditions);
 
     /**
      * Destructor.

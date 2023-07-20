@@ -138,6 +138,7 @@ public:
     const boost::shared_ptr<AbstractCellMutationState> GetMutationState() const;
 
     /**
+     * Overridden EvaluateYDerivatives() method.
      * Compute the RHS of the WntCellCycle system of ODEs.
      *
      * Returns a vector representing the RHS of the ODEs at each time step, y' = [y1' ... yn'].
@@ -147,7 +148,7 @@ public:
      * @param rY value of the solution vector used to evaluate the RHS.
      * @param rDY filled in with the resulting derivatives (using Alarcons et al. (2004) system of equations).
      */
-    void EvaluateYDerivatives(double time, const std::vector<double>& rY, std::vector<double>& rDY);
+    void EvaluateYDerivatives(double time, const std::vector<double>& rY, std::vector<double>& rDY) override;
 
     /**
      * @return #mWntLevel.

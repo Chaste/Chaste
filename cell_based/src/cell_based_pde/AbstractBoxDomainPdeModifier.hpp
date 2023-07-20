@@ -109,7 +109,7 @@ public:
      * @param stepSize step size to be used in the FE mesh (defaults to 1.0, i.e. the default cell size)
      * @param solution solution vector (defaults to NULL)
      */
-    AbstractBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=boost::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
+    AbstractBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM, DIM> > pPde=boost::shared_ptr<AbstractLinearPde<DIM, DIM> >(),
                                  boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
                                  bool isNeumannBoundaryCondition=true,
                                  boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid=boost::shared_ptr<ChasteCuboid<DIM> >(),
@@ -148,7 +148,7 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param outputDirectory the output directory, relative to where Chaste output is stored
      */
-    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
+    virtual void SetupSolve(AbstractCellPopulation<DIM, DIM>& rCellPopulation, std::string outputDirectory);
 
     /**
      * Helper method to generate the mesh.
@@ -165,14 +165,14 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    void UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    void UpdateCellData(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
     /**
      * Initialise mCellPdeElementMap.
      *
      * @param rCellPopulation reference to the cell population
      */
-    void InitialiseCellPdeElementMap(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    void InitialiseCellPdeElementMap(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
     /**
      * Update the mCellPdeElementMap
@@ -182,7 +182,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    void UpdateCellPdeElementMap(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    void UpdateCellPdeElementMap(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
     /**
      * Overridden OutputSimulationModifierParameters() method.

@@ -87,7 +87,7 @@ protected:
      *
      * Write initial beta catenin results to file if required.
      */
-    void SetupSolve();
+    void SetupSolve() override;
 
 public:
 
@@ -122,14 +122,11 @@ public:
     void SetBottomCellAncestors();
 
     /**
-     * Outputs simulation parameters to file
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * Overridden OutputSimulationParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputSimulationParameters(out_stream& rParamsFile);
+    void OutputSimulationParameters(out_stream& rParamsFile) override;
 };
 
 // Declare identifier for the serializer

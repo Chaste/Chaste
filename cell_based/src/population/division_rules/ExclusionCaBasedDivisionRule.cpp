@@ -50,11 +50,9 @@ bool ExclusionCaBasedDivisionRule<SPACE_DIM>::IsRoomToDivide(
     std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<SPACE_DIM>*>(&(rCellPopulation.rGetMesh()))->GetMooreNeighbouringNodeIndices(node_index);
 
     // Iterate through the neighbours to see if there are any available sites
-    for (auto neighbour_iter = neighbouring_node_indices.begin();
-         neighbour_iter != neighbouring_node_indices.end();
-         ++neighbour_iter)
+    for (auto neighbour_iter : neighbouring_node_indices)
     {
-        if (rCellPopulation.IsSiteAvailable(*neighbour_iter, pParentCell))
+        if (rCellPopulation.IsSiteAvailable(neighbour_iter, pParentCell))
         {
             is_room = true;
             break;
@@ -90,15 +88,14 @@ unsigned ExclusionCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(Cel
     double total_propensity = 0.0;
 
     // Select neighbour at random
-    for (auto neighbour_iter = neighbouring_node_indices.begin();
-         neighbour_iter != neighbouring_node_indices.end();
-         ++neighbour_iter)
+    for (auto neighbour_iter : neighbouring_node_indices)
     {
-        neighbouring_node_indices_vector.push_back(*neighbour_iter);
+        neighbouring_node_indices_vector.push_back(neighbour_iter);
 
-        double propensity_dividing_into_neighbour = rCellPopulation.EvaluateDivisionPropensity(parent_node_index,*neighbour_iter,pParentCell);
+        double propensity_dividing_into_neighbour 
+            = rCellPopulation.EvaluateDivisionPropensity(parent_node_index, neighbour_iter, pParentCell);
 
-        if (!(rCellPopulation.IsSiteAvailable(*neighbour_iter, pParentCell)))
+        if (!(rCellPopulation.IsSiteAvailable(neighbour_iter, pParentCell)))
         {
             propensity_dividing_into_neighbour = 0.0;
         }

@@ -252,7 +252,7 @@ public:
      */
     virtual void CheckForStepSizeException(
         unsigned nodeIndex,
-        c_vector<double,SPACE_DIM>& rDisplacement,
+        c_vector<double, SPACE_DIM>& rDisplacement,
         double dt) override;
 
     /**

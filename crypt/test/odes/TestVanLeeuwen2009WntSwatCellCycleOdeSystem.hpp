@@ -121,7 +121,7 @@ public:
         TS_ASSERT_DELTA(derivs[4],1.549680000000000e-02, 1e-5);
 
         // Inge's
-        for (unsigned i=5; i<initial_conditions.size(); i++)
+        for (unsigned i = 5; i < initial_conditions.size(); ++i)
         {
             TS_ASSERT_DELTA(derivs[i],0.0, 1e-9);
         }
@@ -174,7 +174,7 @@ public:
         TS_ASSERT_DELTA(derivs[4],1.549680000000000e-02, 1e-5);
 
         // Inge's
-        for (unsigned i=5; i<derivs.size(); i++)
+        for (unsigned i = 5; i < derivs.size(); ++i)
         {
             TS_ASSERT_DELTA(derivs[i],0.0, 1e-9);
         }
@@ -226,7 +226,7 @@ public:
         TS_ASSERT_DELTA(derivs[3],-7.449833887043188e-03, 1e-5);
         TS_ASSERT_DELTA(derivs[4],1.549680000000000e-02, 1e-5);
 
-        for (unsigned i=5; i<initial_conditions.size(); i++)
+        for (unsigned i = 5; i < initial_conditions.size(); ++i)
         {
             TS_ASSERT_DELTA(derivs[i],0.0, 1e-9);
         }
@@ -281,7 +281,7 @@ public:
         TS_ASSERT_DELTA(derivs[2], 5.545234672425986e+00, 1e-4);
         TS_ASSERT_DELTA(derivs[3],-7.449833887043188e-03, 1e-5);
         TS_ASSERT_DELTA(derivs[4], 1.549680000000000e-02, 1e-5);
-        for (unsigned i=5; i<initial_conditions.size(); i++)
+        for (unsigned i = 5; i < initial_conditions.size(); ++i)
         {
             TS_ASSERT_DELTA(derivs[i],0.0, 1e-9);
         }
@@ -331,11 +331,11 @@ public:
 
         // Test derivatives are correct at t=0 for these initial conditions
         // (figures from Matlab code)
-        TS_ASSERT_DELTA(derivs[0],-1.586627673253325e-02, 1e-5);
-        TS_ASSERT_DELTA(derivs[1],-5.532201118824132e-05, 1e-5);
-        TS_ASSERT_DELTA(derivs[2],5.676110199115955e+00, 1e-4);
-        TS_ASSERT_DELTA(derivs[3],-7.449833887043188e-03, 1e-5);
-        TS_ASSERT_DELTA(derivs[4],1.549680000000000e-02, 1e-5);
+        TS_ASSERT_DELTA(derivs[0], -1.586627673253325e-02, 1e-5);
+        TS_ASSERT_DELTA(derivs[1], -5.532201118824132e-05, 1e-5);
+        TS_ASSERT_DELTA(derivs[2], 5.676110199115955e+00, 1e-4);
+        TS_ASSERT_DELTA(derivs[3], -7.449833887043188e-03, 1e-5);
+        TS_ASSERT_DELTA(derivs[4], 1.549680000000000e-02, 1e-5);
         TS_ASSERT_DELTA(derivs[5], 0, 1e-5);
         TS_ASSERT_DELTA(derivs[6], 0, 1e-5);
         TS_ASSERT_DELTA(derivs[7], 0, 1e-5);
@@ -343,9 +343,9 @@ public:
         TS_ASSERT_DELTA(derivs[9], 0, 1e-5);
         TS_ASSERT_DELTA(derivs[10], 12.5, 1e-5);
 
-        for (unsigned i=11; i<initial_conditions.size(); i++)
+        for (unsigned i = 11; i < initial_conditions.size(); ++i)
         {
-            TS_ASSERT_DELTA(derivs[i],0.0, 1e-9);
+            TS_ASSERT_DELTA(derivs[i], 0.0, 1e-9);
         }
     }
     /**
@@ -392,13 +392,13 @@ public:
 
         // Test derivatives are correct at t=0 for these initial conditions
         // (figures from Matlab code)
-        TS_ASSERT_DELTA(derivs[0],-1.586627673253325e-02, 1e-5);
-        TS_ASSERT_DELTA(derivs[1],-5.532201118824132e-05, 1e-5);
-        TS_ASSERT_DELTA(derivs[2],9.917397507286381e+00, 1e-4);
-        TS_ASSERT_DELTA(derivs[3],-7.449833887043188e-03, 1e-5);
-        TS_ASSERT_DELTA(derivs[4],1.549680000000000e-02, 1e-5);
+        TS_ASSERT_DELTA(derivs[0], -1.586627673253325e-02, 1e-5);
+        TS_ASSERT_DELTA(derivs[1], -5.532201118824132e-05, 1e-5);
+        TS_ASSERT_DELTA(derivs[2], 9.917397507286381e+00, 1e-4);
+        TS_ASSERT_DELTA(derivs[3], -7.449833887043188e-03, 1e-5);
+        TS_ASSERT_DELTA(derivs[4], 1.549680000000000e-02, 1e-5);
 
-        for (unsigned i=5; i<initial_conditions.size(); i++)
+        for (unsigned i = 5; i < initial_conditions.size(); ++i)
         {
             TS_ASSERT_DELTA(derivs[i],0.0, 1e-9);
         }
@@ -640,7 +640,7 @@ public:
         CryptCellsGenerator<VanLeeuwen2009WntSwatCellCycleModelHypothesisOne> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             cells[i]->SetBirthTime(-1.1); // just to make the test run a bit quicker
         }

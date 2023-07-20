@@ -94,6 +94,7 @@ public:
     bool IsNodeOnBase(unsigned NodeIndex, PottsMesh<2>* pPottsMesh);
 
     /**
+     * Overridden IsRoomToDivide() method.
      * Return whether there is room to divide at all.
      *
      * @param pParentCell  The cell to divide
@@ -101,9 +102,10 @@ public:
      * @return if the site is available.
      */
     virtual bool IsRoomToDivide(CellPtr pParentCell,
-                                CaBasedCellPopulation<2>& rCellPopulation);
+                                CaBasedCellPopulation<2>& rCellPopulation) override;
 
     /**
+     * Overridden CalculateDaughterNodeIndex() method.
      * Return the index for the Daughter node.
      * This method can be used to move cells out of the way as necessary.
      *
@@ -116,7 +118,7 @@ public:
      */
     virtual unsigned CalculateDaughterNodeIndex(CellPtr pNewCell,
                                                 CellPtr pParentCell,
-                                                CaBasedCellPopulation<2>& rCellPopulation);
+                                                CaBasedCellPopulation<2>& rCellPopulation) override;
 };
 
 #include "SerializationExportWrapper.hpp"

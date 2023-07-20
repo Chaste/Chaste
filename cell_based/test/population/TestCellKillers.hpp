@@ -117,13 +117,11 @@ public:
         }
 
         // Store 'locations' of cells which are not dead
-        for (auto cell_iter = r_cells.begin();
-             cell_iter != r_cells.end();
-             ++cell_iter)
+        for (auto p_cell : r_cells)
         {
-            if (!(*cell_iter)->IsDead())
+            if (!(p_cell->IsDead()))
             {
-                Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
+                Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(p_cell);
                 c_vector<double, 2> location;
                 location = p_node->rGetLocation();
                 old_locations.insert(location[0] + location[1]*1000);
@@ -134,13 +132,11 @@ public:
         cell_population.RemoveDeadCells();
 
         // Check that dead cells are removed from the mesh
-        std::set< double > new_locations;
-        for (auto cell_iter = r_cells.begin();
-             cell_iter != r_cells.end();
-             ++cell_iter)
+        std::set<double> new_locations;
+        for (auto p_cell : r_cells)
         {
-            TS_ASSERT_EQUALS((*cell_iter)->IsDead(), false);
-            Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
+            TS_ASSERT_EQUALS(p_cell->IsDead(), false);
+            Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(p_cell);
             c_vector<double, 2> location;
             location = p_node->rGetLocation();
             new_locations.insert(location[0] + location[1]*1000);
@@ -222,13 +218,11 @@ public:
         p_simulation_time->IncrementTimeOneStep();
 
         // Store 'locations' of cells which are not dead
-        for (auto cell_iter = r_cells.begin();
-             cell_iter != r_cells.end();
-             ++cell_iter)
+        for (auto p_cell : r_cells)
         {
-            if (!(*cell_iter)->IsDead())
+            if (!(p_cell->IsDead()))
             {
-                Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
+                Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(p_cell);
                 c_vector<double, 2> location;
                 location = p_node->rGetLocation();
                 old_locations.insert(location[0] + location[1]*1000);
@@ -239,13 +233,11 @@ public:
         cell_population.RemoveDeadCells();
 
         // Check that dead cells are removed from the mesh
-        std::set< double > new_locations;
-        for (auto cell_iter = r_cells.begin();
-             cell_iter != r_cells.end();
-             ++cell_iter)
+        std::set<double> new_locations;
+        for (auto p_cell : r_cells)
         {
-            TS_ASSERT_EQUALS((*cell_iter)->IsDead(), false);
-            Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
+            TS_ASSERT_EQUALS(p_cell->IsDead(), false);
+            Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(p_cell);
             c_vector<double, 2> location;
             location = p_node->rGetLocation();
             new_locations.insert(location[0] + location[1]*1000);
@@ -312,14 +304,12 @@ public:
         p_simulation_time->IncrementTimeOneStep();
 
         // Store 'locations' of cells which are not dead
-        std::set< double > old_locations;
-        for (auto cell_iter = r_cells.begin();
-             cell_iter != r_cells.end();
-             ++cell_iter)
+        std::set<double> old_locations;
+        for (auto p_cell : r_cells)
         {
-            if (!(*cell_iter)->IsDead())
+            if (!(p_cell->IsDead()))
             {
-                Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
+                Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(p_cell);
                 c_vector<double, 2> location;
                 location = p_node->rGetLocation();
                 old_locations.insert(location[0] + location[1]*1000);
@@ -330,13 +320,11 @@ public:
         cell_population.RemoveDeadCells();
 
         // Check that dead cells are removed from the mesh
-        std::set< double > new_locations;
-        for (auto cell_iter = r_cells.begin();
-             cell_iter != r_cells.end();
-             ++cell_iter)
+        std::set<double> new_locations;
+        for (auto p_cell : r_cells)
         {
-            TS_ASSERT_EQUALS((*cell_iter)->IsDead(), false);
-            Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
+            TS_ASSERT_EQUALS(p_cell->IsDead(), false);
+            Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(p_cell);
             c_vector<double, 2> location;
             location = p_node->rGetLocation();
             new_locations.insert(location[0] + location[1]*1000);

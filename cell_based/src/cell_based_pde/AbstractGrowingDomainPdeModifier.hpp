@@ -80,7 +80,7 @@ public:
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
      * @param solution solution vector (defaults to NULL)
      */
-    AbstractGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=boost::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
+    AbstractGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM, DIM> > pPde=boost::shared_ptr<AbstractLinearPde<DIM, DIM> >(),
                                      boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
                                      bool isNeumannBoundaryCondition=true,
                                      Vec solution=nullptr);
@@ -95,7 +95,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    void GenerateFeMesh(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    void GenerateFeMesh(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
     /**
      * Helper method to copy the PDE solution to CellData
@@ -104,7 +104,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    void UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    void UpdateCellData(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
 
     /**

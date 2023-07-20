@@ -222,7 +222,7 @@ public:
 
         // Set up cells by iterating through the nodes
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             UniformG1GenerationalCellCycleModel* p_model = new UniformG1GenerationalCellCycleModel();
 
@@ -321,7 +321,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
         boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double birth_time;
             if (i == 1)
@@ -393,7 +393,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
 
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             UniformG1GenerationalCellCycleModel* p_model = new UniformG1GenerationalCellCycleModel();
 
@@ -486,7 +486,7 @@ public:
         unsigned num_cells_at_start = mesh.GetNumNodes();
         std::vector<CellPtr> cells;
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             TysonNovakCellCycleModel* p_model = new TysonNovakCellCycleModel();
 
@@ -578,7 +578,7 @@ public:
 
         unsigned num_cells = mesh.GetNumNodes();
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<num_cells; i++)
+        for (unsigned i = 0; i < num_cells; ++i)
         {
             FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
@@ -685,7 +685,7 @@ public:
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
 
-        for (unsigned i=0; i<num_cells; i++)
+        for (unsigned i = 0; i < num_cells; ++i)
         {
             WntCellCycleModel* p_cell_cycle_model1 = new WntCellCycleModel();
 
@@ -787,7 +787,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
 
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
 
@@ -871,7 +871,7 @@ public:
         TS_ASSERT_EQUALS(r_mesh1.GetNumNodes(), r_mesh2.GetNumNodes());
         TS_ASSERT_EQUALS(r_mesh1.GetNumBoundaryNodes(), r_mesh2.GetNumBoundaryNodes());
 
-        for (unsigned i=0; i<r_mesh1.GetNumAllNodes(); i++)
+        for (unsigned i = 0; i < r_mesh1.GetNumAllNodes(); ++i)
         {
             Node<1>* p_node = r_mesh1.GetNode(i);
             Node<1>* p_node2 = r_mesh2.GetNode(i);
@@ -893,7 +893,7 @@ public:
              ++it, ++it2)
         {
             TS_ASSERT_EQUALS(it->GetNumNodes(), it2->GetNumNodes());
-            for (unsigned i=0; i<it->GetNumNodes(); i++)
+            for (unsigned i = 0; i < it->GetNumNodes(); ++i)
             {
                 TS_ASSERT_EQUALS(it->GetNodeGlobalIndex(i), it2->GetNodeGlobalIndex(i));
             }
@@ -936,7 +936,7 @@ public:
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
 
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             UniformG1GenerationalCellCycleModel* p_model = new UniformG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_model));

@@ -42,7 +42,8 @@ UniformG1GenerationalCellCycleModel::UniformG1GenerationalCellCycleModel()
 {
 }
 
-UniformG1GenerationalCellCycleModel::UniformG1GenerationalCellCycleModel(const UniformG1GenerationalCellCycleModel& rModel)
+UniformG1GenerationalCellCycleModel::UniformG1GenerationalCellCycleModel(
+    const UniformG1GenerationalCellCycleModel& rModel)
    : AbstractSimpleGenerationalCellCycleModel(rModel)
 {
     /*
@@ -76,11 +77,13 @@ void UniformG1GenerationalCellCycleModel::SetG1Duration()
 
     if (mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
     {
-        mG1Duration = GetStemCellG1Duration() + 4*p_gen->ranf(); // U[14,18] for default parameters (mStemCellG1Duration) according to Meineke
+        // U[14,18] for default parameters (mStemCellG1Duration) according to Meineke
+        mG1Duration = GetStemCellG1Duration() + 4*p_gen->ranf();
     }
     else if (mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
     {
-        mG1Duration = GetTransitCellG1Duration() + 2*p_gen->ranf(); // U[4,6] for default parameters (mTransitG1CellDuration) according to Meineke
+        // U[4,6] for default parameters (mTransitG1CellDuration) according to Meineke
+        mG1Duration = GetTransitCellG1Duration() + 2*p_gen->ranf(); 
     }
     else if (mpCell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
     {

@@ -55,7 +55,6 @@ typedef boost::shared_ptr<AbstractSrnModel> AbstractSrnModelPtr;
  */
 class CellSrnModel : public AbstractSrnModel
 {
-
 private:
 
     /** Needed for serialization. */
@@ -84,7 +83,9 @@ private:
 protected:
 
     /**
-     * Copy constructor. Called ONLY when a cell division occurs. See parent class comment for details
+     * Copy constructor. Called ONLY when a cell division occurs. See parent 
+     * class comment for details.
+     * 
      * @param rModel SRN model to be copied
      */
     CellSrnModel(const CellSrnModel &rModel);
@@ -112,27 +113,28 @@ public:
     ~CellSrnModel();
 
     /**
+     * Overridden Initialise() method.
      * Initialize constituent SRN models.
      */
-    virtual void Initialise();
+    virtual void Initialise() override;
 
     /**
      * Calls SRN model specific behaviour at the time of cell division.
      * All constituent SRNs models (edge and/or interior, if there are any) call their
      * implementation of this method.
      */
-    virtual void ResetForDivision();
+    virtual void ResetForDivision() override;
 
     /**
      * Simulate SRN models.
      */
-    virtual void SimulateToCurrentTime();
+    virtual void SimulateToCurrentTime() override;
 
     /**
      * Called in Cell::Divide()
      * @return
      */
-    virtual AbstractSrnModel* CreateSrnModel();
+    virtual AbstractSrnModel* CreateSrnModel() override;
 
     /**
      * Adds a vector of SRN models to this cell.
@@ -183,11 +185,11 @@ public:
     AbstractSrnModelPtr GetInteriorSrn() const;
 
     /**
-     * Overriden method. We Set mpCell for each SRN contained in this cell.
+     * Overridden method. We Set mpCell for each SRN contained in this cell.
      * 
      * @param pCell pointer to a Cell
      */
-    virtual void SetCell(CellPtr pCell);
+    virtual void SetCell(CellPtr pCell) override;
 };
 
 // Declare identifier for the serializer

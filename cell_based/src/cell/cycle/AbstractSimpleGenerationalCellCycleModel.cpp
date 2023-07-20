@@ -49,7 +49,8 @@ AbstractSimpleGenerationalCellCycleModel::~AbstractSimpleGenerationalCellCycleMo
 {
 }
 
-AbstractSimpleGenerationalCellCycleModel::AbstractSimpleGenerationalCellCycleModel(const AbstractSimpleGenerationalCellCycleModel& rModel)
+AbstractSimpleGenerationalCellCycleModel::AbstractSimpleGenerationalCellCycleModel(
+    const AbstractSimpleGenerationalCellCycleModel& rModel)
     : AbstractSimplePhaseBasedCellCycleModel(rModel),
       mGeneration(rModel.mGeneration),
       mMaxTransitGenerations(rModel.mMaxTransitGenerations)
@@ -83,13 +84,14 @@ void AbstractSimpleGenerationalCellCycleModel::ResetForDivision()
     if (mGeneration > mMaxTransitGenerations)
     {
         /*
-         * This method is usually called within a CellBasedSimulation, after the CellPopulation
-         * has called CellPropertyRegistry::TakeOwnership(). This means that were we to call
-         * CellPropertyRegistry::Instance() here when setting the CellProliferativeType, we
-         * would be creating a new CellPropertyRegistry. In this case the cell proliferative
-         * type counts, as returned by AbstractCellPopulation::GetCellProliferativeTypeCount(),
-         * would be incorrect. We must therefore access the CellProliferativeType via the cell's
-         * CellPropertyCollection.
+         * This method is usually called within a CellBasedSimulation, after the 
+         * CellPopulation has called CellPropertyRegistry::TakeOwnership(). This 
+         * means that were we to call CellPropertyRegistry::Instance() here when 
+         * setting the CellProliferativeType, we would be creating a new 
+         * CellPropertyRegistry. In this case the cell proliferative type counts, 
+         * as returned by AbstractCellPopulation::GetCellProliferativeTypeCount(), 
+         * would be incorrect. We must therefore access the CellProliferativeType 
+         * via the cell's CellPropertyCollection.
          */
         boost::shared_ptr<AbstractCellProperty> p_diff_type =
             mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<DifferentiatedCellProliferativeType>();
@@ -101,17 +103,17 @@ void AbstractSimpleGenerationalCellCycleModel::ResetForDivision()
 void AbstractSimpleGenerationalCellCycleModel::InitialiseDaughterCell()
 {
     /*
-     * If the parent cell is a stem cell then its generation was reset
-     * to zero when ResetForDivision() was called. The daughter cell's
-     * generation must therefore be incremented here.
+     * If the parent cell is a stem cell then its generation was reset to zero 
+     * when ResetForDivision() was called. The daughter cell's generation must 
+     * therefore be incremented here.
      */
     if (mGeneration == 0)
     {
         mGeneration = 1;
     }
     /*
-     * In generation-based cell-cycle models, the daughter cell
-     * is always of type transit or differentiated.
+     * In generation-based cell-cycle models, the daughter cell is always of 
+     * type transit or differentiated.
      */
     boost::shared_ptr<AbstractCellProperty> p_transit_type =
         mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<TransitCellProliferativeType>();
@@ -126,7 +128,8 @@ void AbstractSimpleGenerationalCellCycleModel::InitialiseDaughterCell()
     AbstractSimplePhaseBasedCellCycleModel::InitialiseDaughterCell();
 }
 
-void AbstractSimpleGenerationalCellCycleModel::SetGeneration(unsigned generation)
+void AbstractSimpleGenerationalCellCycleModel::SetGeneration(
+    unsigned generation)
 {
     mGeneration = generation;
 }
@@ -136,7 +139,8 @@ unsigned AbstractSimpleGenerationalCellCycleModel::GetGeneration() const
     return mGeneration;
 }
 
-void AbstractSimpleGenerationalCellCycleModel::SetMaxTransitGenerations(unsigned maxTransitGenerations)
+void AbstractSimpleGenerationalCellCycleModel::SetMaxTransitGenerations(
+    unsigned maxTransitGenerations)
 {
     mMaxTransitGenerations = maxTransitGenerations;
 }
@@ -146,7 +150,8 @@ unsigned AbstractSimpleGenerationalCellCycleModel::GetMaxTransitGenerations() co
     return mMaxTransitGenerations;
 }
 
-void AbstractSimpleGenerationalCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void AbstractSimpleGenerationalCellCycleModel::OutputCellCycleModelParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<MaxTransitGenerations>" << mMaxTransitGenerations << "</MaxTransitGenerations>\n";
 

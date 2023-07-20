@@ -95,6 +95,7 @@ public:
     TysonNovakCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
 
     /**
+     * Overridden Initialise() method.
      * Initialise the cell-cycle model at the start of a simulation.
      *
      * This method will be called precisely once per cell set up in the initial
@@ -105,13 +106,14 @@ public:
      * can know where its cell is located in space. If relevant to the simulation,
      * any singletons will also have been initialised.
      */
-    void Initialise();
+    void Initialise() override;
 
     /**
+     * Overridden ResetForDivision() method.
      * Reset cell-cycle model by calling AbstractOdeBasedCellCycleModelWithStoppingEvent::ResetForDivision()
      * and setting initial conditions for protein concentrations.
      */
-    void ResetForDivision();
+    void ResetForDivision() override;
 
     /**
      * Overridden builder method to create new copies of
@@ -119,37 +121,38 @@ public:
      *
      * @return new cell-cycle model
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    AbstractCellCycleModel* CreateCellCycleModel() override;
 
     /**
+     * Overridden InitialiseDaughterCell() method.
      * If the daughter cell type is stem, change it to transit.
      */
-    void InitialiseDaughterCell();
+    void InitialiseDaughterCell()  override;
 
     /**
      * Overridden GetAverageTransitCellCycleTime() method.
      * @return time
      */
-    double GetAverageTransitCellCycleTime();
+    double GetAverageTransitCellCycleTime() override;
 
     /**
      * Overridden GetAverageStemCellCycleTime() method.
      * @return time
      */
-    double GetAverageStemCellCycleTime();
+    double GetAverageStemCellCycleTime() override;
 
     /**
      * Overridden CanCellTerminallyDifferentiate() method.
      * @return whether cell can terminally differentiate
      */
-    bool CanCellTerminallyDifferentiate();
+    bool CanCellTerminallyDifferentiate() override;
 
     /**
      * Overridden OutputCellCycleModelParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 // Declare identifier for the serializer

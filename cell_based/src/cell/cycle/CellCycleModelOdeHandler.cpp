@@ -35,8 +35,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellCycleModelOdeHandler.hpp"
 
-CellCycleModelOdeHandler::CellCycleModelOdeHandler(double lastTime,
-                                                   boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
+CellCycleModelOdeHandler::CellCycleModelOdeHandler(
+    double lastTime,
+    boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : mDt(DOUBLE_UNSET),
       mpOdeSystem(nullptr),
       mpOdeSolver(pOdeSolver),
@@ -53,7 +54,8 @@ CellCycleModelOdeHandler::~CellCycleModelOdeHandler()
     }
 }
 
-CellCycleModelOdeHandler::CellCycleModelOdeHandler(const CellCycleModelOdeHandler& rHandler)
+CellCycleModelOdeHandler::CellCycleModelOdeHandler(
+    const CellCycleModelOdeHandler& rHandler)
     : mDt(rHandler.mDt),
       mpOdeSystem(rHandler.mpOdeSystem),
       mpOdeSolver(rHandler.mpOdeSolver),
@@ -129,7 +131,8 @@ void CellCycleModelOdeHandler::SetLastTime(double lastTime)
     mLastTime = lastTime;
 }
 
-void CellCycleModelOdeHandler::SetStateVariables(const std::vector<double>& rStateVariables)
+void CellCycleModelOdeHandler::SetStateVariables(
+    const std::vector<double>& rStateVariables)
 {
     assert(mpOdeSystem);
     mpOdeSystem->SetStateVariables(rStateVariables);
@@ -141,10 +144,12 @@ std::vector<double> CellCycleModelOdeHandler::GetProteinConcentrations() const
     return mpOdeSystem->rGetStateVariables();
 }
 
-void CellCycleModelOdeHandler::SetProteinConcentrationsForTestsOnly(double lastTime, std::vector<double> proteinConcentrations)
+void CellCycleModelOdeHandler::SetProteinConcentrationsForTestsOnly(
+    double lastTime,
+    std::vector<double> proteinConcentrations)
 {
     assert(mpOdeSystem != nullptr);
-    assert(proteinConcentrations.size()==mpOdeSystem->rGetStateVariables().size());
+    assert(proteinConcentrations.size() == mpOdeSystem->rGetStateVariables().size());
     mLastTime = lastTime;
     mpOdeSystem->SetStateVariables(proteinConcentrations);
 }

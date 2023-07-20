@@ -964,7 +964,7 @@ public:
      * @return The width (maximum distance to centroid) of the cell population
      *     in each dimension
      */
-    c_vector<double,SPACE_DIM> GetSizeOfCellPopulation();
+    c_vector<double, SPACE_DIM> GetSizeOfCellPopulation();
 
     /**
      * @return whether there is room into which a given cell may divide.

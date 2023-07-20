@@ -68,11 +68,12 @@ private:
     }
 
     /**
+     * Overridden AdjustOdeParameters() method.
      * Adjust any ODE parameters needed before solving until currentTime.
      *
      * @param currentTime  the time up to which the system will be solved.
      */
-    void AdjustOdeParameters(double currentTime);
+    void AdjustOdeParameters(double currentTime) override;
 
 protected:
 
@@ -101,6 +102,8 @@ public:
     Alarcon2004OxygenBasedCellCycleModel(boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
 
     /**
+     * OVerridden ResetForDivision() method.
+     * 
      * Resets the oxygen-based model to the start of the cell cycle
      * (this model does not cycle naturally). Cells are given a new
      * birth time and cell cycle proteins are reset. Note that the
@@ -108,30 +111,31 @@ public:
      *
      * Should only be called by the Cell Divide() method.
      */
-    virtual void ResetForDivision();
+    virtual void ResetForDivision() override;
 
     /**
      * Overridden builder method to create new copies of
      * this cell-cycle model.
      *
      * @return new cell-cycle model
-     *
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    AbstractCellCycleModel* CreateCellCycleModel() override;
 
     /**
+     * Overridden Initialise() method.
+     * 
      * Initialise the cell-cycle model at the start of a simulation.
      *
      * This overridden method sets up a new ODE system.
      */
-    void Initialise();
+    void Initialise() override;
 
     /**
      * Overridden OutputCellCycleModelParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 // Declare identifier for the serializer

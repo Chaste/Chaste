@@ -127,7 +127,7 @@ public:
     /**
      * Overridden UpdateCellCyclePhase() method.
      */
-    void UpdateCellCyclePhase();
+    void UpdateCellCyclePhase() override;
 
     /**
      * Method for updating mCurrentHypoxicDuration,
@@ -151,7 +151,7 @@ public:
      *
      * @return new cell-cycle model
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    AbstractCellCycleModel* CreateCellCycleModel() override;
 
     /**
      * @return mHypoxicConcentration
@@ -201,7 +201,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 // Declare identifier for the serializer

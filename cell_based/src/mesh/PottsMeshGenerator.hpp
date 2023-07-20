@@ -42,9 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsMesh.hpp"
 
 /**
- * Generator of regular Potts meshes, used as starting points for many simulations.
- *
- * This class takes in options such as width, height,
+ * Generator of regular Potts meshes, used as starting points for many 
+ * simulations. This class takes in options such as width and height.
  *
  * NOTE: the user should delete the mesh after use to manage memory.
  */
@@ -64,17 +63,25 @@ public:
      * @param numNodesAcross  The number of columns of nodes in the mesh
      * @param numElementsAcross  The number of columns of elements in the mesh
      * @param elementWidth  Width of the elements
-     * @param numNodesUp  The number of rows of nodes in the mesh (defaults to 1)
-     * @param numElementsUp  The number of rows of elements in the mesh (defaults to 1)
+     * @param numNodesUp  The number of rows of nodes in the mesh (defaults to 
+     *     1)
+     * @param numElementsUp  The number of rows of elements in the mesh 
+     *     (defaults to 1)
      * @param elementHeight  Height of the elements (defaults to 1)
      * @param numNodesDeep  The number nodes deep for this mesh (defaults to 1)
-     * @param numElementsDeep  The number of elements deep for this mesh (defaults to 1)
-     * @param elementDepth  The number of rows of nodes in each element (defaults to 1)
-     * @param startAtBottomLeft  If true then the mesh starts in the bottom left corner
-     *     of the domain rather than the centre, used for simple tests (defaults to false)
-     * @param isPeriodicInX  If true then the mesh is periodic in the x dimension (defaults to false)
-     * @param isPeriodicInY  If true then the mesh is periodic in the y dimension (defaults to false)
-     * @param isPeriodicInZ  If true then the mesh is periodic in the y dimension (defaults to false)
+     * @param numElementsDeep  The number of elements deep for this mesh 
+     *     (defaults to 1)
+     * @param elementDepth  The number of rows of nodes in each element 
+     *     (defaults to 1)
+     * @param startAtBottomLeft  If true then the mesh starts in the bottom left 
+     *     corner of the domain rather than the centre, used for simple tests 
+     *     (defaults to false)
+     * @param isPeriodicInX  If true then the mesh is periodic in the x 
+     *     dimension (defaults to false)
+     * @param isPeriodicInY  If true then the mesh is periodic in the y 
+     *     dimension (defaults to false)
+     * @param isPeriodicInZ  If true then the mesh is periodic in the y 
+     *     dimension (defaults to false)
      */
     PottsMeshGenerator(unsigned numNodesAcross,
                        unsigned numElementsAcross,
@@ -96,7 +103,8 @@ public:
     virtual ~PottsMeshGenerator();
 
     /**
-     * Helper method to calculate the Moore and Von Neumann Neighbourhoods of all nodes
+     * Helper method to calculate the Moore and Von Neumann Neighbourhoods of 
+     * all nodes
      *
      * @param isPeriodicInX  If true then the mesh is periodic in the x dimension
      */

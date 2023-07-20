@@ -63,7 +63,8 @@ double AlwaysDivideCellCycleModel::GetAverageStemCellCycleTime()
     return DBL_MAX;
 }
 
-void AlwaysDivideCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void AlwaysDivideCellCycleModel::OutputCellCycleModelParameters(
+    out_stream& rParamsFile)
 {
     // No new parameters to output, so just call method on direct parent class
     AbstractCellCycleModel::OutputCellCycleModelParameters(rParamsFile);

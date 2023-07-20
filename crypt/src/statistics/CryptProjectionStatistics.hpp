@@ -46,7 +46,7 @@ class CryptProjectionStatistics : public AbstractCryptStatistics
 private:
 
     /**
-     * CellIsInSection method.
+     * CellIsInSection() method.
      *
      * @param angle  The angle between the crypt section and the x axis in the projection
      * @param rCellPosition  The vector of a cell's position

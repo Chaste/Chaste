@@ -113,7 +113,7 @@ public:
     /**
      * Overridden SetCellCycleDuration() method to add stochastic cell cycle times
      */
-    void SetCellCycleDuration();
+    void SetCellCycleDuration() override;
 
     /**
      * Overridden builder method to create new copies of
@@ -121,7 +121,7 @@ public:
      *
      * @return new cell-cycle model
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    AbstractCellCycleModel* CreateCellCycleModel() override;
 
     /**
      * @return mMinCellCycleDuration
@@ -152,21 +152,21 @@ public:
      *
      * @return the average of mMinCellCycleDuration and mMaxCellCycleDuration
      */
-    double GetAverageTransitCellCycleTime();
+    double GetAverageTransitCellCycleTime() override;
 
     /**
      * Overridden GetAverageStemCellCycleTime() method.
      *
      * @return the average of mMinCellCycleDuration and mMaxCellCycleDuration
      */
-    double GetAverageStemCellCycleTime();
+    double GetAverageStemCellCycleTime() override;
 
     /**
      * Overridden OutputCellCycleModelParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

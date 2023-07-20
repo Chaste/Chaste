@@ -57,10 +57,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * For a node of the finite element mesh with location x, the function rho(x)
  * equals one if there is a non-apoptotic cell associated with x, and
  * zero otherwise. Here, 'associated with' takes a different meaning for each
- * cell population class, and is encoded in the method IsPdeNodeAssociatedWithNonApoptoticCell().
+ * cell population class, and is encoded in the method 
+ * IsPdeNodeAssociatedWithNonApoptoticCell().
  */
 template<unsigned DIM>
-class CellwiseSourceParabolicPde : public AbstractLinearParabolicPde<DIM,DIM>
+class CellwiseSourceParabolicPde : public AbstractLinearParabolicPde<DIM, DIM>
 {
     friend class TestCellBasedParabolicPdes;
 
@@ -94,7 +95,10 @@ protected:
     /** Diffusion coefficient. */
     double mDiffusionCoefficient;
 
-    /** Coefficient of the rate of uptake of the dependent variable by non-apoptotic cells. */
+    /**
+     * Coefficient of the rate of uptake of the dependent variable by 
+     * non-apoptotic cells.
+     */
     double mSourceCoefficient;
 
 public:
@@ -120,7 +124,8 @@ public:
     /**
      * Overridden ComputeDuDtCoefficientFunction() method.
      *
-     * @return the function c(x) in "c(x) du/dt = Grad.(DiffusionTerm(x)*Grad(u))+LinearSourceTerm(x)+NonlinearSourceTerm(x, u)"
+     * @return the function c(x) in 
+     *     "c(x) du/dt = Grad.(DiffusionTerm(x)*Grad(u))+LinearSourceTerm(x)+NonlinearSourceTerm(x, u)"
      *
      * @param rX the point in space at which the function c is computed
      */
@@ -131,19 +136,22 @@ public:
      *
      * @return computed source term.
      *
-     * @param rX the point in space at which the nonlinear source term is computed
+     * @param rX the point in space at which the nonlinear source term is 
+     *     computed
      * @param u the value of the dependent variable at the point
-     * @param pElement the mesh element that x is contained in (optional; defaults to NULL).
+     * @param pElement the mesh element that x is contained in (optional; 
+     *     defaults to NULL).
      */
     virtual double ComputeSourceTerm(const ChastePoint<DIM>& rX,
                                      double u,
-                                     Element<DIM,DIM>* pElement=NULL);
+                                     Element<DIM, DIM>* pElement=NULL);
 
     /**
      * Overridden ComputeSourceTermAtNode() method.
      *
-     * Note that for CellWise Parabolic PDEs used with CellBasedParabolicPdeSolver
-     * this method returns the coefficient of the linear component of the source term.
+     * Note that for CellWise Parabolic PDEs used with 
+     * CellBasedParabolicPdeSolver this method returns the coefficient of the 
+     * linear component of the source term.
      *
      * @return computed source term at a node.
      *
@@ -156,11 +164,14 @@ public:
      * Overridden ComputeDiffusionTerm() method.
      *
      * @param rX the point in space at which the diffusion term is computed
-     * @param pElement the mesh element that x is contained in (optional; defaults to NULL).
+     * @param pElement the mesh element that x is contained in (optional; 
+     *     defaults to NULL).
      *
      * @return a matrix.
      */
-    virtual c_matrix<double,DIM,DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement=NULL);
+    virtual c_matrix<double, DIM, DIM> ComputeDiffusionTerm(
+        const ChastePoint<DIM>& rX,
+        Element<DIM, DIM>* pElement=NULL);
 };
 
 #include "SerializationExportWrapper.hpp"

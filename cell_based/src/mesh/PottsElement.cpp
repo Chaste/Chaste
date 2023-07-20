@@ -40,7 +40,7 @@ template<unsigned DIM>
 PottsElement<DIM>::PottsElement(
     unsigned index,
     const std::vector<Node<DIM>*>& rNodes)
-    : MutableElement<DIM,DIM>(index, rNodes)
+    : MutableElement<DIM, DIM>(index, rNodes)
 {
     this->RegisterWithNodes();
 }
@@ -51,7 +51,7 @@ PottsElement<DIM>::~PottsElement()
 }
 
 template<unsigned DIM>
-void PottsElement<DIM>::AddNode(Node<DIM>* pNode,  const unsigned& rIndex)
+void PottsElement<DIM>::AddNode(Node<DIM>* pNode, const unsigned& rIndex)
 {
     // Add element to this node
     pNode->AddElement(this->mIndex);

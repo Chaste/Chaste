@@ -35,7 +35,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractOdeSrnModel.hpp"
 
-AbstractOdeSrnModel::AbstractOdeSrnModel(unsigned stateSize, boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
+AbstractOdeSrnModel::AbstractOdeSrnModel(
+    unsigned stateSize,
+    boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver)
     : AbstractSrnModel(),
       CellCycleModelOdeHandler(SimulationTime::Instance()->GetTime(), pOdeSolver),
       mStateSize(stateSize)
@@ -119,7 +121,8 @@ void AbstractOdeSrnModel::ResetForDivision()
     mFinishedRunningOdes = false;
 }
 
-void AbstractOdeSrnModel::SetInitialConditions(std::vector<double> initialConditions)
+void AbstractOdeSrnModel::SetInitialConditions(
+    std::vector<double> initialConditions)
 {
     assert(initialConditions.size() == mStateSize);
     mInitialConditions = initialConditions;

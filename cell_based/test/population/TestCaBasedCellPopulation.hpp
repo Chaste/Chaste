@@ -287,15 +287,13 @@ public:
         bool foundother = false;
 
         // This set iterator is iterator in pointer order (the order of addresses in memory); this order can be arbitrary
-        for (auto iter = cells_on_lattice.begin();
-             iter != cells_on_lattice.end();
-             ++iter)
+        for (auto iter : cells_on_lattice)
         {
-            if ((*iter)->GetCellId() == 0)
+            if (iter->GetCellId() == 0)
             {
                 found0 = true;
             }
-            else if ((*iter)->GetCellId() == 1)
+            else if (iter->GetCellId() == 1)
             {
                 found1 = true;
             }

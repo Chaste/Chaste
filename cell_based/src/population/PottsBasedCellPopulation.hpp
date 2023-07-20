@@ -69,7 +69,7 @@ private:
      * CreateElementTessellation() and can be accessed by calling 
      * GetElementTessellation().
      */
-    VertexMesh<DIM,DIM>* mpElementTessellation;
+    VertexMesh<DIM, DIM>* mpElementTessellation;
 
     /**
      * A static cast of the Abstract mesh from `AbstractCellPopulation` for use 
@@ -81,7 +81,7 @@ private:
      * Pointer to a MutableMesh that can be created from the nodes of the 
      * PottsMesh in order to solve PDEs on the population.
      */
-    MutableMesh<DIM,DIM>* mpMutableMesh;
+    MutableMesh<DIM, DIM>* mpMutableMesh;
 
     /** The temperature of the system. Initialized to 0.1 in the constructor. */
     double mTemperature;
@@ -415,7 +415,7 @@ public:
     /**
      * @return a reference to mpElementTessellation.
      */
-    VertexMesh<DIM,DIM>* GetElementTessellation();
+    VertexMesh<DIM, DIM>* GetElementTessellation();
 
     /**
      * Create a mutable mesh from the nodes of the Potts mesh. Used for solving PDEs
@@ -425,7 +425,7 @@ public:
     /**
      * @return the Mutable Mesh
      */
-    MutableMesh<DIM,DIM>* GetMutableMesh();
+    MutableMesh<DIM, DIM>* GetMutableMesh();
 
     /**
      * Overridden AddUpdateRule() method.

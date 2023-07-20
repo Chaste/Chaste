@@ -137,7 +137,7 @@ public:
         p_other_stem_cell->InitialiseCellCycleModel();
 
         // Progress both cells through the cell cycle
-        for (unsigned i=0; i<num_timesteps; i++)
+        for (unsigned i = 0; i < num_timesteps; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             double time = p_simulation_time->GetTime();
@@ -255,7 +255,7 @@ public:
 #endif //CHASTE_CVODE
 
         // Progress through the cell cycle under a constant Wnt concentration
-        for (unsigned i=0; i<21*num_timesteps/30.0; i++)
+        for (unsigned i = 0; i < 21*num_timesteps/30.0; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
 
@@ -337,7 +337,7 @@ public:
         TS_ASSERT_DELTA(test_results[21], 1.000000000000000, tol);
 
         // Now progress through the cell cycle under a decreasing Wnt concentration
-        for (unsigned i=0; i<9*num_timesteps/30.0; i++)
+        for (unsigned i = 0; i < 9*num_timesteps/30.0; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             double time = p_simulation_time->GetTime();
@@ -489,7 +489,7 @@ public:
 #endif //CHASTE_CVODE
 
         // Progress through the cell cycle under a constant Wnt concentration
-        for (unsigned i=0; i<num_timesteps; i++)
+        for (unsigned i = 0; i < num_timesteps; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
 
@@ -563,7 +563,7 @@ public:
         double expected_g1_duration = 4.8084;
 #endif //CHASTE_CVODE
 
-        for (unsigned i=0; i<num_timesteps/2; i++)
+        for (unsigned i = 0; i < num_timesteps/2; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             CheckReadyToDivideAndPhaseIsUpdated(p_cell_model_1, expected_g1_duration);
@@ -577,7 +577,7 @@ public:
 #endif //CHASTE_CVODE
 
         TS_ASSERT_DELTA(SG2M_duration, 10.0, 1e-5);
-        for (unsigned i=0; i<num_timesteps/2; i++)
+        for (unsigned i = 0; i < num_timesteps/2; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             CheckReadyToDivideAndPhaseIsUpdated(p_cell_model_1, expected_g1_duration);
@@ -627,7 +627,7 @@ public:
         double expected_g1_duration = 7.8342;
 #endif //CHASTE_CVODE
 
-        for (unsigned i=0; i<num_timesteps/2; i++)
+        for (unsigned i = 0; i < num_timesteps/2; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             CheckReadyToDivideAndPhaseIsUpdated(p_cell_model_1, expected_g1_duration);
@@ -641,7 +641,7 @@ public:
 #endif //CHASTE_CVODE
 
         // Test progress through the cell cycle
-        for (unsigned i=0; i<num_timesteps/2; i++)
+        for (unsigned i = 0; i < num_timesteps/2; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             CheckReadyToDivideAndPhaseIsUpdated(p_cell_model_1, expected_g1_duration);
@@ -691,7 +691,7 @@ public:
 #endif //CHASTE_CVODE
 
         // Test progress through the cell cycle
-        for (unsigned i=0; i<num_timesteps/2; i++)
+        for (unsigned i = 0; i < num_timesteps/2; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             CheckReadyToDivideAndPhaseIsUpdated(p_cell_model_2, expected_g1_duration);
@@ -706,7 +706,7 @@ public:
 #endif //CHASTE_CVODE
 
         // Test progress through the cell cycle
-        for (unsigned i=0; i<num_timesteps/2; i++)
+        for (unsigned i = 0; i < num_timesteps/2; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             CheckReadyToDivideAndPhaseIsUpdated(p_cell_model_2, expected_g1_duration);
@@ -756,7 +756,7 @@ public:
 #endif //CHASTE_CVODE
 
         // Test progress through the cell cycle
-        for (unsigned i=0; i<num_timesteps/2; i++)
+        for (unsigned i = 0; i < num_timesteps/2; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             CheckReadyToDivideAndPhaseIsUpdated(p_cell_model_2, expected_g1_duration);
@@ -770,7 +770,7 @@ public:
 #endif //CHASTE_CVODE
 
         // Test progress through the cell cycle
-        for (unsigned i=0; i<num_timesteps/2; i++)
+        for (unsigned i = 0; i < num_timesteps/2; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             CheckReadyToDivideAndPhaseIsUpdated(p_cell_model_2, expected_g1_duration);
@@ -812,7 +812,7 @@ public:
         // for the SG2M time (default 10) in this case 3.17399 + 6
 
         // Test progress through the cell cycle
-        for (unsigned i=0; i<num_timesteps; i++)
+        for (unsigned i = 0; i < num_timesteps; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             double time = p_simulation_time->GetTime();

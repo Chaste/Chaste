@@ -107,7 +107,7 @@ TetrahedralMesh<DIM, DIM>* NodeBasedCellPopulation<DIM>::GetTetrahedralMeshForPd
             new Node<DIM>(node_iter->GetIndex(),node_iter->rGetLocation(), node_iter->IsBoundaryNode()));
     }
 
-    return new MutableMesh<DIM,DIM>(temp_nodes);
+    return new MutableMesh<DIM, DIM>(temp_nodes);
 }
 
 template<unsigned DIM>
@@ -205,15 +205,15 @@ void NodeBasedCellPopulation<DIM>::UpdateMapsAfterRemesh(NodeMap& map)
         this->mLocationCellMap.clear();
         this->mCellLocationMap.clear();
 
-        for (auto it = this->mCells.begin(); it != this->mCells.end(); ++it)
+        for (auto it : this->mCells)
         {
-            unsigned old_node_index = old_map[(*it).get()];
+            unsigned old_node_index = old_map[it.get()];
 
             // This shouldn't ever happen, as the cell vector only contains living cells
             assert(!map.IsDeleted(old_node_index));
 
             unsigned new_node_index = map.GetNewIndex(old_node_index);
-            this->SetCellUsingLocationIndex(new_node_index,*it);
+            this->SetCellUsingLocationIndex(new_node_index, it);
         }
 
         this->Validate();
@@ -407,12 +407,12 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNodesWithinNeighbourhoodRadi
     std::vector<unsigned>& near_nodes = p_node_i->rGetNeighbours();
 
     // Find which ones are actually close
-    for (auto iter = near_nodes.begin(); iter != near_nodes.end(); ++iter)
+    for (auto iter : near_nodes)
     {
         // Be sure not to return the index itself.
-        if ((*iter) != index)
+        if (iter != index)
         {
-            Node<DIM>* p_node_j = this->GetNode((*iter));
+            Node<DIM>* p_node_j = this->GetNode(iter);
 
             // Get the location of this node
             const c_vector<double, DIM>& r_node_j_location = p_node_j->rGetLocation();
@@ -428,7 +428,7 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNodesWithinNeighbourhoodRadi
             if (distance_between_nodes <= neighbourhoodRadius)// + DBL_EPSILSON)
             {
                 // ...then add this node index to the set of neighbouring node indices
-                neighbouring_node_indices.insert((*iter));
+                neighbouring_node_indices.insert(iter);
             }
         }
     }
@@ -462,12 +462,12 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
     std::vector<unsigned>& near_nodes = p_node_i->rGetNeighbours();
 
     // Find which ones are actually close
-    for (auto iter = near_nodes.begin(); iter != near_nodes.end(); ++iter)
+    for (auto iter : near_nodes)
     {
         // Be sure not to return the index itself
-        if ((*iter) != index)
+        if (iter != index)
         {
-            Node<DIM>* p_node_j = this->GetNode((*iter));
+            Node<DIM>* p_node_j = this->GetNode(iter);
 
             // Get the location of this node
             const c_vector<double, DIM>& r_node_j_location = p_node_j->rGetLocation();
@@ -487,12 +487,12 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
             // Make sure that the max_interaction distance is smaller than or equal to the box collection size
             if (!(max_interaction_distance <= mpNodesOnlyMesh->GetMaximumInteractionDistance()))
             {
-                EXCEPTION("mpNodesOnlyMesh::mMaxInteractionDistance is smaller than the sum of radius of cell " << index << " (" << radius_of_cell_i << ") and cell " << (*iter) << " (" << radius_of_cell_j <<"). Make the cut-off larger to avoid errors.");
+                EXCEPTION("mpNodesOnlyMesh::mMaxInteractionDistance is smaller than the sum of radius of cell " << index << " (" << radius_of_cell_i << ") and cell " << iter << " (" << radius_of_cell_j <<"). Make the cut-off larger to avoid errors.");
             }
             if (distance_between_nodes <= max_interaction_distance)// + DBL_EPSILSON) //Assumes that max_interaction_distance is of order 1
             {
                 // ...then add this node index to the set of neighbouring node indices
-                neighbouring_node_indices.insert((*iter));
+                neighbouring_node_indices.insert(iter);
             }
         }
     }

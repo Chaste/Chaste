@@ -85,7 +85,7 @@ public:
 
         double s_g2_duration = p_cell_cycle_model1->GetSG2MDuration();
 
-        for (unsigned i=0; i<num_steps/2; i++)
+        for (unsigned i = 0; i < num_steps/2; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             double time = p_simulation_time->GetTime();
@@ -110,7 +110,7 @@ public:
 
         TS_ASSERT_DELTA(time_of_birth, time_of_birth2, 1e-9);
 
-        for (unsigned i=0; i<num_steps/2; i++)
+        for (unsigned i = 0; i < num_steps/2; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             double time = p_simulation_time->GetTime();
@@ -159,7 +159,7 @@ public:
 
         double s_g2_duration = p_cell_cycle_model1->GetSG2MDuration();
 
-        for (unsigned i=0; i<num_steps/2; i++)
+        for (unsigned i = 0; i < num_steps/2; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             double time = p_simulation_time->GetTime();
@@ -184,7 +184,7 @@ public:
 
         TS_ASSERT_DELTA(time_of_birth, time_of_birth2, 1e-9);
 
-        for (unsigned i=0; i<num_steps/2; i++)
+        for (unsigned i = 0; i < num_steps/2; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             double time = p_simulation_time->GetTime();
@@ -249,7 +249,7 @@ public:
 
         double s_g2_duration = p_cell_cycle_model1->GetSG2MDuration();
 
-        for (unsigned i=0; i<num_steps/2; i++)
+        for (unsigned i = 0; i < num_steps/2; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             double time = p_simulation_time->GetTime();
@@ -274,7 +274,7 @@ public:
 
         TS_ASSERT_DELTA(time_of_birth, time_of_birth2, 1e-9);
 
-        for (unsigned i=0; i<num_steps/2; i++)
+        for (unsigned i = 0; i < num_steps/2; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             double time = p_simulation_time->GetTime();

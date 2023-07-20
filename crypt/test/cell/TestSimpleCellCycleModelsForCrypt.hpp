@@ -129,7 +129,7 @@ public:
         p_cell->SetCellProliferativeType(p_stem_type);
         p_cell->InitialiseCellCycleModel();
 
-        for (unsigned i=0; i<num_timesteps/3; i++)
+        for (unsigned i = 0; i < num_timesteps/3; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
 
@@ -157,7 +157,7 @@ public:
         // the first two random numbers generated
         double new_g1_duration = mSecondRandomNumber;
         double new_g1_duration2 = mThirdRandomNumber;
-        for (unsigned i=0; i<num_timesteps/3; i++)
+        for (unsigned i = 0; i < num_timesteps/3; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             CheckReadyToDivideAndPhaseIsUpdated(p_cycle_model, new_g1_duration);
@@ -194,7 +194,7 @@ public:
         new_g1_duration = mFourthRandomNumber;
         new_g1_duration2 = mFifthRandomNumber;
 
-        for (unsigned i=0; i<num_timesteps/3; i++)
+        for (unsigned i = 0; i < num_timesteps/3; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             CheckReadyToDivideAndPhaseIsUpdated(p_cycle_model, new_g1_duration);
@@ -240,7 +240,7 @@ public:
 
         // Test the GetCurrentCellCyclePhase() and ReadyToDivide() methods
         double first_g1_duration = mFirstRandomNumber;
-        for (unsigned i=0; i<num_timesteps/3; i++)
+        for (unsigned i = 0; i < num_timesteps/3; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
 
@@ -268,7 +268,7 @@ public:
         // The numbers for the G1 durations are taken from
         // the first two random numbers generated
         new_g1_duration = mSecondRandomNumber;
-        for (unsigned i=0; i<num_timesteps/3; i++)
+        for (unsigned i = 0; i < num_timesteps/3; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             CheckReadyToDivideAndPhaseIsUpdated(p_cycle_model4, new_g1_duration);

@@ -56,14 +56,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * be set in the constructor.
  *
  * The function rho(x) denotes the local density of non-apoptotic cells. This
- * quantity is computed for each element of a 'coarse' finite element mesh that is
- * passed to the method SetupSourceTerms() and stored in the member mCellDensityOnCoarseElements.
- * For a point x, rho(x) is defined to be the number of non-apoptotic cells whose
- * centres lie in each finite element containing that point, scaled by the area of
- * that element.
+ * quantity is computed for each element of a 'coarse' finite element mesh that 
+ * is passed to the method SetupSourceTerms() and stored in the member 
+ * mCellDensityOnCoarseElements. For a point x, rho(x) is defined to be the 
+ * number of non-apoptotic cells whose centres lie in each finite element 
+ * containing that point, scaled by the area of that element.
  */
 template<unsigned DIM>
-class AveragedSourceParabolicPde : public AbstractLinearParabolicPde<DIM,DIM>
+class AveragedSourceParabolicPde : public AbstractLinearParabolicPde<DIM, DIM>
 {
     friend class TestCellBasedParabolicPdes;
 
@@ -127,17 +127,19 @@ public:
     /**
      * Set up the source terms.
      *
-     * \todo this is identical to the one in AveragedSourceEllipticPde so refactor.
+     * \todo this is identical to the one in AveragedSourceEllipticPde so 
+     * refactor.
      *
      * @param rCoarseMesh reference to the coarse mesh
      * @param pCellPdeElementMap optional pointer to the map from cells to coarse elements
      */
-    void virtual SetupSourceTerms(TetrahedralMesh<DIM,DIM>& rCoarseMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap=nullptr);
+    void virtual SetupSourceTerms(TetrahedralMesh<DIM, DIM>& rCoarseMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap=nullptr);
 
     /**
      * Overridden ComputeDuDtCoefficientFunction() method.
      *
-     * @return the function c(x) in "c(x) du/dt = Grad.(DiffusionTerm(x)*Grad(u))+LinearSourceTerm(x)+NonlinearSourceTerm(x, u)"
+     * @return the function c(x) in 
+     *     "c(x) du/dt = Grad.(DiffusionTerm(x)*Grad(u))+LinearSourceTerm(x)+NonlinearSourceTerm(x, u)"
      *
      * @param rX the point in space at which the function c is computed
      */
@@ -148,13 +150,15 @@ public:
      *
      * @return computed source term.
      *
-     * @param rX the point in space at which the nonlinear source term is computed
+     * @param rX the point in space at which the nonlinear source term is 
+     *     computed
      * @param u the value of the dependent variable at the point
-     * @param pElement the mesh element that x is contained in (optional; defaults to NULL).
+     * @param pElement the mesh element that x is contained in (optional; 
+     *     defaults to NULL).
      */
     virtual double ComputeSourceTerm(const ChastePoint<DIM>& rX,
                                      double u,
-                                     Element<DIM,DIM>* pElement=NULL);
+                                     Element<DIM, DIM>* pElement=NULL);
 
     /**
      * Overridden ComputeSourceTermAtNode() method. That is never called.
@@ -170,11 +174,14 @@ public:
      * Overridden ComputeDiffusionTerm() method.
      *
      * @param rX the point in space at which the diffusion term is computed
-     * @param pElement the mesh element that x is contained in (optional; defaults to NULL).
+     * @param pElement the mesh element that x is contained in (optional; 
+     *     defaults to NULL).
      *
      * @return a matrix.
      */
-    virtual c_matrix<double,DIM,DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement=NULL);
+    virtual c_matrix<double, DIM, DIM> ComputeDiffusionTerm(
+        const ChastePoint<DIM>& rX,
+        Element<DIM, DIM>* pElement=NULL);
 
     /**
      * @return the uptake rate.

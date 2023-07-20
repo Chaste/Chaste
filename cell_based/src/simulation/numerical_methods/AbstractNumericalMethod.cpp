@@ -214,7 +214,7 @@ void AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>::SafeNodePositionUpdate(
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>::DetectStepSizeExceptions(
     unsigned nodeIndex,
-    c_vector<double,SPACE_DIM>& displacement, double dt)
+    c_vector<double, SPACE_DIM>& displacement, double dt)
 {
     try
     {

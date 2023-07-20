@@ -233,7 +233,7 @@ public:
         // Set up cells by iterating through the mesh nodes
         unsigned num_cells = location_indices.size();
         std::vector<CellPtr> cells;
-        for (unsigned i=0; i<num_cells; i++)
+        for (unsigned i = 0; i < num_cells; ++i)
         {
             MAKE_PTR(WildTypeCellMutationState, p_state);
             MAKE_PTR(StemCellProliferativeType, p_stem_type);
@@ -473,7 +473,7 @@ public:
         CryptCellsGenerator<WntCellCycleModel> cells_generator;
         cells_generator.Generate(cells, p_mesh, location_indices, true);
 
-        for (unsigned i=0; i<p_mesh->GetNumAllNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumAllNodes(); ++i)
         {
             double x = p_mesh->GetNode(i)->GetPoint().rGetLocation()[0];
             double y = p_mesh->GetNode(i)->GetPoint().rGetLocation()[1];

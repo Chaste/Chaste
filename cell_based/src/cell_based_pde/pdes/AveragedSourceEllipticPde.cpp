@@ -37,9 +37,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApoptoticCellProperty.hpp"
 
 template<unsigned DIM>
-AveragedSourceEllipticPde<DIM>::AveragedSourceEllipticPde(AbstractCellPopulation<DIM>& rCellPopulation,
-                                                          double sourceCoefficient,
-                                                          double diffusionCoefficient)
+AveragedSourceEllipticPde<DIM>::AveragedSourceEllipticPde(
+    AbstractCellPopulation<DIM>& rCellPopulation,
+    double sourceCoefficient,
+    double diffusionCoefficient)
     : mrCellPopulation(rCellPopulation),
       mSourceCoefficient(sourceCoefficient),
       mDiffusionCoefficient(diffusionCoefficient)
@@ -59,7 +60,9 @@ double AveragedSourceEllipticPde<DIM>::GetCoefficient() const
 }
 
 template<unsigned DIM>
-void AveragedSourceEllipticPde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>& rCoarseMesh, std::map< CellPtr, unsigned >* pCellPdeElementMap) // must be called before solve
+void AveragedSourceEllipticPde<DIM>::SetupSourceTerms(
+    TetrahedralMesh<DIM, DIM>& rCoarseMesh,
+    std::map< CellPtr, unsigned >* pCellPdeElementMap) // must be called before solve
 {
     // Allocate memory
     mCellDensityOnCoarseElements.resize(rCoarseMesh.GetNumElements());
@@ -105,26 +108,32 @@ void AveragedSourceEllipticPde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>& 
 }
 
 template<unsigned DIM>
-double AveragedSourceEllipticPde<DIM>::ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
+double AveragedSourceEllipticPde<DIM>::ComputeConstantInUSourceTerm(
+    const ChastePoint<DIM>& rX,
+    Element<DIM, DIM>* pElement)
 {
     return 0.0;
 }
 
 template<unsigned DIM>
-double AveragedSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement) // now takes in element
+double AveragedSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTerm(
+    const ChastePoint<DIM>& rX,
+    Element<DIM, DIM>* pElement) // now takes in element
 {
     assert(!mCellDensityOnCoarseElements.empty());
     return mSourceCoefficient * mCellDensityOnCoarseElements[pElement->GetIndex()];
 }
 
 template<unsigned DIM>
-c_matrix<double,DIM,DIM> AveragedSourceEllipticPde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX)
+c_matrix<double, DIM, DIM> AveragedSourceEllipticPde<DIM>::ComputeDiffusionTerm(
+    const ChastePoint<DIM>& rX)
 {
     return mDiffusionCoefficient*identity_matrix<double>(DIM);
 }
 
 template<unsigned DIM>
-double AveragedSourceEllipticPde<DIM>::GetUptakeRateForElement(unsigned elementIndex)
+double AveragedSourceEllipticPde<DIM>::GetUptakeRateForElement(
+    unsigned elementIndex)
 {
     return this->mCellDensityOnCoarseElements[elementIndex];
 }

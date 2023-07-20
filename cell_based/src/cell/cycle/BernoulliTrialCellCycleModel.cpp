@@ -43,7 +43,8 @@ BernoulliTrialCellCycleModel::BernoulliTrialCellCycleModel()
 {
 }
 
-BernoulliTrialCellCycleModel::BernoulliTrialCellCycleModel(const BernoulliTrialCellCycleModel& rModel)
+BernoulliTrialCellCycleModel::BernoulliTrialCellCycleModel(
+    const BernoulliTrialCellCycleModel& rModel)
    : AbstractCellCycleModel(rModel),
      mDivisionProbability(rModel.mDivisionProbability),
      mMinimumDivisionAge(rModel.mMinimumDivisionAge)
@@ -83,7 +84,8 @@ AbstractCellCycleModel* BernoulliTrialCellCycleModel::CreateCellCycleModel()
     return new BernoulliTrialCellCycleModel(*this);
 }
 
-void BernoulliTrialCellCycleModel::SetDivisionProbability(double divisionProbability)
+void BernoulliTrialCellCycleModel::SetDivisionProbability(
+    double divisionProbability)
 {
     mDivisionProbability = divisionProbability;
 }
@@ -93,7 +95,8 @@ double BernoulliTrialCellCycleModel::GetDivisionProbability()
     return mDivisionProbability;
 }
 
-void BernoulliTrialCellCycleModel::SetMinimumDivisionAge(double minimumDivisionAge)
+void BernoulliTrialCellCycleModel::SetMinimumDivisionAge(
+    double minimumDivisionAge)
 {
     mMinimumDivisionAge = minimumDivisionAge;
 }
@@ -113,7 +116,8 @@ double BernoulliTrialCellCycleModel::GetAverageStemCellCycleTime()
     return 1.0/mDivisionProbability;
 }
 
-void BernoulliTrialCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
+void BernoulliTrialCellCycleModel::OutputCellCycleModelParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<DivisionProbability>" << mDivisionProbability << "</DivisionProbability>\n";
     *rParamsFile << "\t\t\t<MinimumDivisionAge>" << mMinimumDivisionAge << "</MinimumDivisionAge>\n";

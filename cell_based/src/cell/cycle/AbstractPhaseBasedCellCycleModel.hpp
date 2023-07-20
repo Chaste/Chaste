@@ -155,14 +155,16 @@ public:
     virtual ~AbstractPhaseBasedCellCycleModel();
 
     /**
-     * See AbstractCellCycleModel::ResetForDivision()
+     * Overridden ResetForDivision() method.
      *
      * @return whether the cell is ready to divide (enter M phase).
      */
-    virtual bool ReadyToDivide();
+    virtual bool ReadyToDivide() override;
 
-    /** See AbstractCellCycleModel::ResetForDivision() */
-    virtual void ResetForDivision();
+    /**
+     * Overridden ResetForDivision() method.
+     */
+    virtual void ResetForDivision() override;
 
     /**
      * Set the phase the cell-cycle model is currently in. This method is called
@@ -170,8 +172,7 @@ public:
      * based on how far through the cell cycle it is, i.e. whether it has
      * completed M, G1, S and G2 phases.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      */
     virtual void UpdateCellCyclePhase()=0;
 
@@ -251,16 +252,20 @@ public:
     void SetMDuration(double mDuration);
 
     /**
+     * Overridden GetAverageTransitCellCycleTime() method.
+     * 
      * @return the typical cell cycle duration for a transit cell, in hours.
      * This method is overridden in some subclasses.
      */
-    virtual double GetAverageTransitCellCycleTime();
+    virtual double GetAverageTransitCellCycleTime() override;
 
     /**
+     * Overridden GetAverageStemCellCycleTime() method.
+     * 
      * @return the typical cell cycle duration for a stem cell, in hours.
      * This method is overridden in some subclasses.
      */
-    virtual double GetAverageStemCellCycleTime();
+    virtual double GetAverageStemCellCycleTime() override;
 
     /**
      * @return mMinimumGapDuration
@@ -275,14 +280,15 @@ public:
     void SetMinimumGapDuration(double minimumGapDuration);
 
     /**
+     * Overridden OutputCellCycleModelParameters() method.
+     * 
      * Outputs cell cycle model parameters to file.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile)=0;
+    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile) = 0;
 };
 
 CLASS_IS_ABSTRACT(AbstractPhaseBasedCellCycleModel)

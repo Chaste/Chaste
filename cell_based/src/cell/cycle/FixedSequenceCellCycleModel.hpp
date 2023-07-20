@@ -90,11 +90,12 @@ private:
 protected:
 
     /**
+     * Overridden SetG1Duration() method.
      * Stochastically set the G1 duration following the sequence in CellCycleTimesGenerator. Called on cell creation at
      * the start of a simulation, and for both parent and daughter
      * cells at cell division.
      */
-    void SetG1Duration();
+    void SetG1Duration() override;
 
     /**
      * Protected copy-constructor for use by CreateCellCycleModel.
@@ -124,7 +125,7 @@ public:
      *
      * @return new cell cycle model
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    AbstractCellCycleModel* CreateCellCycleModel() override;
 
     /**
      * Overridden SetRate method.
@@ -148,7 +149,7 @@ public:
      *
      * @param stemCellG1Duration  the new value of mStemCellG1Duration
      */
-    void SetStemCellG1Duration(double stemCellG1Duration);
+    void SetStemCellG1Duration(double stemCellG1Duration) override;
 
     /**
      * Overridden SetTransitCellG1Duration() method.
@@ -158,14 +159,15 @@ public:
      *
      * @param transitCellG1Duration  the new value of mTransitCellG1Duration
      */
-    void SetTransitCellG1Duration(double transitCellG1Duration);
+    void SetTransitCellG1Duration(double transitCellG1Duration) override;
 
     /**
+     * Overridden OutputCellCycleModelParameters() method.
      * Outputs cell cycle model parameters to file.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 
 };
 

@@ -123,7 +123,7 @@ public:
     /**
      * Overridden UpdateCellCyclePhase() method.
      */
-    void UpdateCellCyclePhase();
+    void UpdateCellCyclePhase() override;
 
     /**
      * Overridden builder method to create new instances of
@@ -132,7 +132,7 @@ public:
      * @return new cell-cycle model
      *
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    AbstractCellCycleModel* CreateCellCycleModel() override;
 
     /**
      * @param quiescentVolumeFraction
@@ -169,7 +169,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 // Declare identifier for the serializer

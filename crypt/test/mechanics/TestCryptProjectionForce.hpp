@@ -92,7 +92,7 @@ public:
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_state, p_model));
@@ -204,7 +204,7 @@ public:
         TS_ASSERT_DELTA(force_on_spring[1], 0.0, 1e-4);
 
         // Test force calculation for a particular node
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
              cell_population.GetNode(i)->ClearAppliedForce();
         }
@@ -271,7 +271,7 @@ public:
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_state, p_model));
@@ -296,7 +296,7 @@ public:
 
         crypt_projection_force.SetWntChemotaxis(false);
 
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
              cell_population.GetNode(i)->ClearAppliedForce();
         }
@@ -312,7 +312,7 @@ public:
         // Now turn on Wnt-chemotaxis
         crypt_projection_force.SetWntChemotaxis(true);
 
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
              cell_population.GetNode(i)->ClearAppliedForce();
         }
@@ -352,7 +352,7 @@ public:
             boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
             boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
-            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
             {
                 FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
                 CellPtr p_cell(new Cell(p_state, p_model));
@@ -413,7 +413,7 @@ private:
         boost::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
         boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
 
-        for (unsigned i=0; i<rLocationIndices.size(); i++)
+        for (unsigned i = 0; i < rLocationIndices.size(); ++i)
         {
             FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
 
@@ -432,8 +432,9 @@ private:
         }
     }
 
-    void DoTestZeroForces(MeshBasedCellPopulationWithGhostNodes<2>& rCellPopulation,
-                          std::vector<AbstractForce<2>* >& rForces)
+    void DoTestZeroForces(
+        MeshBasedCellPopulationWithGhostNodes<2>& rCellPopulation,
+        std::vector<AbstractForce<2>* >& rForces)
     {
         for (unsigned i = 0; i < rCellPopulation.GetNumNodes(); ++i)
         {
@@ -441,11 +442,9 @@ private:
         }
 
         // Add force contributions
-        for (auto iter = rForces.begin();
-             iter != rForces.end();
-             ++iter)
+        for (auto p_force : rForces)
         {
-             (*iter)->AddForceContribution(rCellPopulation);
+            p_force->AddForceContribution(rCellPopulation);
         }
 
         for (auto cell_iter = rCellPopulation.Begin();
@@ -511,11 +510,9 @@ public:
             }
 
             // Add force contributions
-            for (auto iter = forces.begin();
-                 iter != forces.end();
-                 ++iter)
+            for (auto p_force : forces)
             {
-                 (*iter)->AddForceContribution(cell_population);
+                p_force->AddForceContribution(cell_population);
             }
 
             // Forces should be twice the forces found using Meineke alone (since a flat crypt is used)
@@ -555,10 +552,10 @@ public:
         // Create a NodeBasedCellPopulation
         std::vector<Node<2>*> nodes;
         unsigned num_nodes = 10;
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
-            double x = (double)(i);
-            double y = (double)(i);
+            double x = static_cast<double>(i);
+            double y = static_cast<double>(i);
             nodes.push_back(new Node<2>(i, true, x, y));
         }
 
@@ -585,7 +582,7 @@ public:
                 "CryptProjectionForce is to be used with a subclass of MeshBasedCellPopulation only");
 
         // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }

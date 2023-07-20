@@ -100,17 +100,24 @@ public:
      * Constructor.
      *
      * @param rCellPopulation reference to the cell population
-     * @param coefficient the coefficient of consumption of nutrient by cells (defaults to 0.0)
+     * @param coefficient the coefficient of consumption of nutrient by cells 
+     *     (defaults to 0.0)
      */
-    VolumeDependentAveragedSourceEllipticPde(AbstractCellPopulation<DIM>& rCellPopulation, double coefficient=0.0);
+    VolumeDependentAveragedSourceEllipticPde(
+        AbstractCellPopulation<DIM>& rCellPopulation,
+        double coefficient=0.0);
 
     /**
+     * Overridden SetupSourceTerms() method.
      * Set up the source terms.
      *
      * @param rCoarseMesh reference to the coarse mesh
-     * @param pCellPdeElementMap optional pointer to the map from cells to coarse elements
+     * @param pCellPdeElementMap optional pointer to the map from cells to 
+     *     coarse elements
      */
-    void SetupSourceTerms(TetrahedralMesh<DIM,DIM>& rCoarseMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap=nullptr);
+    void SetupSourceTerms(
+        TetrahedralMesh<DIM, DIM>& rCoarseMesh,
+        std::map<CellPtr, unsigned>* pCellPdeElementMap=nullptr) override;
 };
 
 #include "SerializationExportWrapper.hpp"

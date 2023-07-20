@@ -109,7 +109,7 @@ public:
         p_cell->InitialiseCellCycleModel();
 
         // Test the cell-cycle model is behaving correctly
-        for (unsigned i=0; i<num_timesteps/3; i++)
+        for (unsigned i = 0; i < num_timesteps/3; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
 
@@ -149,7 +149,7 @@ public:
         // the first two random numbers generated
         double new_g1_duration = mSecondRandomNumber;
         double new_g1_duration2 = mThirdRandomNumber;
-        for (unsigned i=0; i<num_timesteps/3; i++)
+        for (unsigned i = 0; i < num_timesteps/3; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             CheckReadyToDivideAndPhaseIsUpdated(p_cycle_model, new_g1_duration);
@@ -194,7 +194,7 @@ public:
         new_g1_duration = mFourthRandomNumber;
         new_g1_duration2 = mFifthRandomNumber;
 
-        for (unsigned i=0; i<num_timesteps/3; i++)
+        for (unsigned i = 0; i < num_timesteps/3; ++i)
         {
             p_simulation_time->IncrementTimeOneStep();
             CheckReadyToDivideAndPhaseIsUpdated(p_cycle_model, new_g1_duration);

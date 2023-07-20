@@ -38,10 +38,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/scoped_array.hpp>
 
 template<unsigned DIM>
-PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned numElementsAcross, unsigned elementWidth,
-                                            unsigned numNodesUp, unsigned numElementsUp, unsigned elementHeight,
-                                            unsigned numNodesDeep, unsigned numElementsDeep, unsigned elementDepth,
-                                            bool startAtBottomLeft, bool isPeriodicInX, bool isPeriodicInY ,bool isPeriodicInZ)
+PottsMeshGenerator<DIM>::PottsMeshGenerator(
+    unsigned numNodesAcross,
+    unsigned numElementsAcross,
+    unsigned elementWidth,
+    unsigned numNodesUp,
+    unsigned numElementsUp,
+    unsigned elementHeight,
+    unsigned numNodesDeep,
+    unsigned numElementsDeep,
+    unsigned elementDepth,
+    bool startAtBottomLeft,
+    bool isPeriodicInX,
+    bool isPeriodicInY,
+    bool isPeriodicInZ)
 {
     assert(numNodesAcross > 0);
     assert(numNodesUp > 0);
@@ -56,7 +66,7 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
     std::vector<std::set<unsigned> > moore_neighbours;
     std::vector<std::set<unsigned> > von_neumann_neighbours;
 
-    unsigned num_nodes = numNodesAcross*numNodesUp*numNodesDeep;
+    unsigned num_nodes = numNodesAcross * numNodesUp * numNodesDeep;
 
     unsigned next_node_index = 0;
     boost::scoped_array<unsigned> node_indices(new unsigned[elementWidth*elementHeight*elementDepth]);
@@ -75,9 +85,9 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
     }
 
     /*
-     * Create the nodes, row by row, from the bottom up
-     * On the first and last row we have numNodesAcross nodes, all of which are boundary
-     * nodes. On each interior row we have numNodesAcross nodes, the first and last nodes
+     * Create the nodes, row by row, from the bottom up. On the first and last 
+     * row we have numNodesAcross nodes, all of which are boundary nodes. On 
+     * each interior row we have numNodesAcross nodes, the first and last nodes
      * are boundary nodes.
      */
     for (unsigned k = 0; k < numNodesDeep; ++k)
@@ -119,12 +129,13 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                     {
                         for (unsigned k = 0; k < elementWidth; ++k)
                         {
-                            node_indices[m*elementHeight*elementWidth + l*elementWidth + k] = n*elementDepth*numNodesUp*numNodesAcross +
-                                                                                              j*elementHeight*numNodesAcross +
-                                                                                              i*elementWidth +
-                                                                                              m*numNodesAcross*numNodesUp +
-                                                                                              l*numNodesAcross +
-                                                                                              k + index_offset;
+                            node_indices[m*elementHeight*elementWidth + l*elementWidth + k] 
+                                = n*elementDepth*numNodesUp*numNodesAcross +
+                                  j*elementHeight*numNodesAcross +
+                                  i*elementWidth +
+                                  m*numNodesAcross*numNodesUp +
+                                  l*numNodesAcross +
+                                  k + index_offset;
                         }
                     }
                 }
@@ -157,7 +168,8 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
             case 2:
             {
                 /*
-                 * This stores the available neighbours using the following numbering:
+                 * This stores the available neighbours using the following 
+                 * numbering:
                  *
                  *  1-----0-----7
                  *  |     |     |

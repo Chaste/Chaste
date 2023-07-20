@@ -81,17 +81,15 @@ protected:
     std::vector< std::set<unsigned> > mMooreNeighbouringNodeIndices;
 
     /**
-     * Solve node mapping method. This overridden method is required
-     * as it is pure virtual in the base class.
+     * Overridden SolveNodeMapping() method.
      *
      * @param index the global index of the node
      * @return local index
      */
-    unsigned SolveNodeMapping(unsigned index) const;
+    unsigned SolveNodeMapping(unsigned index) const override;
 
     /**
-     * Solve element mapping method. This overridden method is required
-     * as it is pure virtual in the base class.
+     * SolveElementMapping() method.
      *
      * @param index the global index of the element
      * @return local index
@@ -99,8 +97,7 @@ protected:
     unsigned SolveElementMapping(unsigned index) const;
 
     /**
-     * Solve boundary element mapping method. This overridden method is required
-     * as it is pure virtual in the base class.
+     * SolveBoundaryElementMapping() method.
      *
      * @param index the global index of the boundary element
      * @return local index
@@ -167,7 +164,8 @@ public:
      *
      * @param skipDeletedElements whether to include deleted element
      */
-    inline PottsElementIterator GetElementIteratorBegin(bool skipDeletedElements=true);
+    inline PottsElementIterator GetElementIteratorBegin(
+        bool skipDeletedElements=true);
 
     /**
      * @return an iterator to one past the last element in the mesh.
@@ -183,8 +181,10 @@ public:
      *
      * @param nodes vector of pointers to nodes
      * @param pottsElements vector of pointers to PottsElements
-     * @param vonNeumannNeighbouringNodeIndices vector of set of Moore neighbours for each node
-     * @param mooreNeighbouringNodeIndices vector of set of Von Neumann neighbours for each node
+     * @param vonNeumannNeighbouringNodeIndices vector of set of Moore 
+     *     neighbours for each node
+     * @param mooreNeighbouringNodeIndices vector of set of Von Neumann 
+     *     neighbours for each node
      */
     PottsMesh(std::vector<Node<DIM>*> nodes,
               std::vector<PottsElement<DIM>*> pottsElements,
@@ -202,6 +202,8 @@ public:
     virtual ~PottsMesh();
 
     /**
+     * Overridden GetNumNodes() method.
+     * 
      * @return the number of Nodes in the mesh.
      */
     virtual unsigned GetNumNodes() const;
@@ -212,7 +214,8 @@ public:
     virtual unsigned GetNumElements() const;
 
     /**
-     * @return the number of PottsElements in the mesh, including those marked as deleted.
+     * @return the number of PottsElements in the mesh, including those marked 
+     * as deleted.
      */
     unsigned GetNumAllElements() const;
 
@@ -269,7 +272,8 @@ public:
     virtual double GetSurfaceAreaOfElement(unsigned index);
 
     /**
-     * Given a node, return a set containing the indices of its Moore neighbouring nodes.
+     * Given a node, return a set containing the indices of its Moore 
+     * neighbouring nodes.
      *
      * @param nodeIndex global index of the node
      * @return neighbouring node indices in Moore neighbourhood
@@ -277,7 +281,8 @@ public:
     std::set<unsigned> GetMooreNeighbouringNodeIndices(unsigned nodeIndex);
 
     /**
-     * Given a node, return a set containing the indices of its Von Neumann neighbouring nodes.
+     * Given a node, return a set containing the indices of its Von Neumann 
+     * neighbouring nodes.
      *
      * @param nodeIndex global index of the node
      * @return neighbouring node indices in Von Neumann neighbourhood
@@ -285,7 +290,8 @@ public:
     std::set<unsigned> GetVonNeumannNeighbouringNodeIndices(unsigned nodeIndex);
 
     /**
-     * Mark a node as deleted. Note that in a Potts mesh this requires the elements and connectivity to be updated accordingly.
+     * Mark a node as deleted. Note that in a Potts mesh this requires the 
+     * elements and connectivity to be updated accordingly.
      *
      * @param index  the global index of a specified node
      */
@@ -300,18 +306,18 @@ public:
     void DeleteElement(unsigned index);
 
     /**
-     * Remove deleted elements and reorder them appropriately
-     *
+     * Remove deleted elements and reorder them appropriately.
      */
     void RemoveDeletedElements();
 
     /**
-     * Divide an element by assigning half the nodes to each new element in numerical order.
-     * If an odd number of nodes then the existing element has one more node than the new element.
-     *
+     * Divide an element by assigning half the nodes to each new element in 
+     * numerical order. If an odd number of nodes then the existing element has 
+     * one more node than the new element.
      *
      * @param pElement the element to divide
-     * @param placeOriginalElementBelow whether to place the original element below (in the y direction) the new element (defaults to false)
+     * @param placeOriginalElementBelow whether to place the original element 
+     *     below (in the y direction) the new element (defaults to false)
      *
      * @return the index of the new element
      */
@@ -328,7 +334,8 @@ public:
     unsigned AddElement(PottsElement<DIM>* pNewElement);
 
     /**
-     * Given an element, find a set containing the indices of its neighbouring elements.
+     * Given an element, find a set containing the indices of its neighbouring 
+     * elements.
      *
      * @param elementIndex global index of the element
      * @return its neighbouring element indices

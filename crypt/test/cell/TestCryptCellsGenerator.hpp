@@ -79,7 +79,7 @@ public:
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumNodes());
 
         // Test that cells were generated correctly
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             double height = p_mesh->GetNode(i)->rGetLocation()[1];
             unsigned generation = static_cast<FixedG1GenerationalCellCycleModel*>(cells[i]->GetCellCycleModel())->GetGeneration();
@@ -136,7 +136,7 @@ public:
         double y3 = 4.0;
 
         // Test that cells were generated correctly
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             double height = p_mesh->GetNode(i)->rGetLocation()[1];
             unsigned generation = static_cast<UniformG1GenerationalCellCycleModel*>(cells[i]->GetCellCycleModel())->GetGeneration();
@@ -171,9 +171,9 @@ public:
         // Test that cells were generated correctly
         TS_ASSERT_EQUALS(new_cells.size(), p_mesh->GetNumNodes());
 
-        for (unsigned i=0; i<new_cells.size(); i++)
+        for (unsigned i = 0; i < new_cells.size(); ++i)
         {
-            TS_ASSERT_DELTA(new_cells[i]->GetBirthTime(), -(double)(i), 1e-9);
+            TS_ASSERT_DELTA(new_cells[i]->GetBirthTime(), -static_cast<double>(i), 1e-9);
         }
     }
 
@@ -201,9 +201,9 @@ public:
         // Test that cells were generated correctly
         TS_ASSERT_EQUALS(new_cells.size(), p_mesh->GetNumNodes());
 
-        for (unsigned i=0; i<new_cells.size(); i++)
+        for (unsigned i = 0; i < new_cells.size(); ++i)
         {
-            TS_ASSERT_DELTA(new_cells[i]->GetBirthTime(), -(double)(i), 1e-9);
+            TS_ASSERT_DELTA(new_cells[i]->GetBirthTime(), -static_cast<double>(i), 1e-9);
         }
     }
 
@@ -224,7 +224,7 @@ public:
         // Test that cells were generated correctly
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumNodes());
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             TS_ASSERT_DELTA(cells[i]->GetBirthTime(), 0.0, 1e-9);
         }
@@ -235,9 +235,9 @@ public:
         // Test that cells were generated correctly
         TS_ASSERT_EQUALS(new_cells.size(), p_mesh->GetNumNodes());
 
-        for (unsigned i=0; i<new_cells.size(); i++)
+        for (unsigned i = 0; i < new_cells.size(); ++i)
         {
-            TS_ASSERT_DELTA(new_cells[i]->GetBirthTime(), -(double)(i), 1e-9);
+            TS_ASSERT_DELTA(new_cells[i]->GetBirthTime(), -static_cast<double>(i), 1e-9);
         }
     }
 
@@ -258,7 +258,7 @@ public:
         // Test that cells were generated correctly
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumNodes());
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             TS_ASSERT_DELTA(cells[i]->GetBirthTime(), 0.0, 1e-9);
         }
@@ -281,7 +281,7 @@ public:
         // Test that cells were generated correctly
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumNodes());
 
-        for (unsigned i=0; i<cells.size(); i++)
+        for (unsigned i = 0; i < cells.size(); ++i)
         {
             TS_ASSERT_DELTA(cells[i]->GetBirthTime(), 0.0, 1e-9);
         }
@@ -292,9 +292,9 @@ public:
         // Test that cells were generated correctly
         TS_ASSERT_EQUALS(new_cells.size(), p_mesh->GetNumNodes());
 
-        for (unsigned i=0; i<new_cells.size(); i++)
+        for (unsigned i = 0; i < new_cells.size(); ++i)
         {
-            TS_ASSERT_DELTA(new_cells[i]->GetBirthTime(), -(double)(i), 1e-9);
+            TS_ASSERT_DELTA(new_cells[i]->GetBirthTime(), -static_cast<double>(i), 1e-9);
         }
     }
 
@@ -323,7 +323,7 @@ public:
           TS_ASSERT_EQUALS(stochastic_cells.size(), p_mesh->GetNumElements());
 
           // Test that cells were generated correctly
-          for (unsigned i=0; i<fixed_cells.size(); i++)
+          for (unsigned i = 0; i < fixed_cells.size(); ++i)
           {
               double height = p_mesh->GetCentroidOfElement(i)[1];
               unsigned fixed_generation = static_cast<FixedG1GenerationalCellCycleModel*>(fixed_cells[i]->GetCellCycleModel())->GetGeneration();

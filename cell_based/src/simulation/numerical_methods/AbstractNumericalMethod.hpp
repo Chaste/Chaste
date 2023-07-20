@@ -151,7 +151,7 @@ protected:
      * @param displacement Displacement of the node this step
      * @param dt Time step size
      */
-    void DetectStepSizeExceptions(unsigned nodeIndex, c_vector<double,SPACE_DIM>& displacement, double dt);
+    void DetectStepSizeExceptions(unsigned nodeIndex, c_vector<double, SPACE_DIM>& displacement, double dt);
 
 public:
 
@@ -218,8 +218,7 @@ public:
     /**
      * Updates node positions according to Newton's 2nd law with overdamping.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param dt Time step size
      */

@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * parabolic PDE coupled to a cell-based simulation.
  */
 template<unsigned DIM>
-class AbstractPdeModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
+class AbstractPdeModifier : public AbstractCellBasedSimulationModifier<DIM, DIM>
 {
 private:
 
@@ -67,7 +67,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM,DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<DIM, DIM> >(*this);
         archive & mpPde;
         archive & mpBoundaryCondition;
         archive & mIsNeumannBoundaryCondition;
@@ -84,7 +84,7 @@ protected:
     /**
      * Shared pointer to a linear PDE object.
      */
-    boost::shared_ptr<AbstractLinearPde<DIM,DIM> > mpPde;
+    boost::shared_ptr<AbstractLinearPde<DIM, DIM> > mpPde;
 
     /**
      * Shared pointer to a boundary condition object.
@@ -108,7 +108,7 @@ protected:
     Vec mSolution;
 
     /** Pointer to the finite element mesh on which to solve the PDE. */
-    TetrahedralMesh<DIM,DIM>* mpFeMesh;
+    TetrahedralMesh<DIM, DIM>* mpFeMesh;
 
     /** Store the output directory name. */
     std::string mOutputDirectory;
@@ -141,7 +141,7 @@ public:
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
      * @param solution solution vector (defaults to NULL)
      */
-    AbstractPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=NULL,
+    AbstractPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM, DIM> > pPde=NULL,
                         boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
                         bool isNeumannBoundaryCondition=true,
                         Vec solution=nullptr);
@@ -154,7 +154,7 @@ public:
     /**
      * @return mpPde
      */
-    boost::shared_ptr<AbstractLinearPde<DIM,DIM> > GetPde();
+    boost::shared_ptr<AbstractLinearPde<DIM, DIM> > GetPde();
 
     /**
      * @return mpBoundaryCondition
@@ -192,7 +192,7 @@ public:
      * @param pMesh Pointer to a tetrahedral mesh
      * @param pCellPdeElementMap map between cells and elements
      */
-    void SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM,DIM>* pMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap=nullptr);
+    void SetUpSourceTermsForAveragedSourcePde(TetrahedralMesh<DIM, DIM>* pMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap=nullptr);
 
     /**
      * @return mSolution.
@@ -207,7 +207,7 @@ public:
     /**
      * @return mpFeMesh.
      */
-    TetrahedralMesh<DIM,DIM>* GetFeMesh() const;
+    TetrahedralMesh<DIM, DIM>* GetFeMesh() const;
 
     /**
      * Overridden SetupSolve() method.
@@ -218,7 +218,7 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param outputDirectory the output directory, relative to where Chaste output is stored
      */
-    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
+    virtual void SetupSolve(AbstractCellPopulation<DIM, DIM>& rCellPopulation, std::string outputDirectory);
 
     /**
      * Overridden UpdateAtEndOfTimeStep() method.
@@ -227,7 +227,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)=0;
+    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM, DIM>& rCellPopulation)=0;
 
     /**
      * Overridden UpdateAtEndOfOutputTimeStep() method,
@@ -238,7 +238,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void UpdateAtEndOfOutputTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    virtual void UpdateAtEndOfOutputTimeStep(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
     /**
      * Overridden UpdateAtEndOfSolve() method.
@@ -247,7 +247,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void UpdateAtEndOfSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    virtual void UpdateAtEndOfSolve(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
     /**
      * Set whether to calculate and save the gradient of the solution to CellData.

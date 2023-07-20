@@ -414,7 +414,7 @@ public:
         void TestDeltaNotchEdgeInteriorSrnCreateCopy()
         {
             auto p_cell_srn_model = new CellSrnModel();
-            ffor (unsigned i = 0; i < 4; ++i)
+            for (unsigned i = 0; i < 4; ++i)
             {
                 boost::shared_ptr<DeltaNotchEdgeSrnModel> p_delta_notch_edge_srn_model(new DeltaNotchEdgeSrnModel());
 

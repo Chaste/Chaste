@@ -200,7 +200,6 @@ public:
      *
      * @param lastTime the SimulationTime at which the protein concentrations apply
      * @param proteinConcentrations a standard vector of doubles of protein concentrations
-     *
      */
     void SetProteinConcentrationsForTestsOnly(double lastTime, std::vector<double> proteinConcentrations);
 };

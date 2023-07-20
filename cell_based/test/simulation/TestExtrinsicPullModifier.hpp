@@ -107,9 +107,9 @@ public:
             TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(node_idx)->rGetLocation()[0], i + 0.5, 1e-6);
             node_idx++;
         }
-        for (unsigned j=1; j<5; ++j)
+        for (unsigned j = 1; j < 5; ++j)
         {
-            for (unsigned i = 0; i < =2; ++i)
+            for (unsigned i = 0; i <= 2; ++i)
             {
                 double x_coord = ((j%4 == 0)||(j%4 == 3)) ? i+0.5 : i;
                 if ((node_idx == 10) || (node_idx == 13))
@@ -123,7 +123,7 @@ public:
                 node_idx++;
             }
         }
-        for (unsigned i=1; i<2; ++i)
+        for (unsigned i = 1; i < 2; ++i)
         {
             TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(node_idx)->rGetLocation()[0], i, 1e-6);
             node_idx++;

@@ -110,22 +110,25 @@ public:
     /**
      * Overridden InitialiseDaughterCell() method.
      */
-    void InitialiseDaughterCell();
+    void InitialiseDaughterCell() override;
 
     /**
+     * Overridden Initialise() method.
      * Initialise the cell-cycle model at the start of a simulation.
      */
-    void Initialise();
+    void Initialise() override;
 
     /**
      * Overridden ResetForDivision() method.
      */
-    void ResetForDivision();
+    void ResetForDivision() override;
 
     /**
+     * Overridden GetG2Duration() method.
+     * 
      * @return mStochasticG2Duration.
      */
-    double GetG2Duration() const;
+    double GetG2Duration() const override;
 
     /**
      * Overridden builder method to create new copies of
@@ -133,14 +136,14 @@ public:
      *
      * @return new cell-cycle model
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    AbstractCellCycleModel* CreateCellCycleModel() override;
 
     /**
      * Overridden OutputCellCycleModelParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 // Declare identifier for the serializer

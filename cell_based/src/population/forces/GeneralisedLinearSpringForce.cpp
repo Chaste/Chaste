@@ -114,7 +114,7 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>
     {
         if (distance_between_nodes >= this->GetCutOffLength())
         {
-            return zero_vector<double>(SPACE_DIM); // c_vector<double,SPACE_DIM>() is not guaranteed to be fresh memory
+            return zero_vector<double>(SPACE_DIM); // c_vector<double, SPACE_DIM>() is not guaranteed to be fresh memory
         }
     }
 

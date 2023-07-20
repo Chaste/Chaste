@@ -457,7 +457,7 @@ void PottsBasedCellPopulation<DIM>::CreateElementTessellation()
 }
 
 template<unsigned DIM>
-VertexMesh<DIM,DIM>* PottsBasedCellPopulation<DIM>::GetElementTessellation()
+VertexMesh<DIM, DIM>* PottsBasedCellPopulation<DIM>::GetElementTessellation()
 {
 //    assert(mpElementTessellation != NULL);
     return mpElementTessellation;
@@ -476,11 +476,11 @@ void PottsBasedCellPopulation<DIM>::CreateMutableMesh()
       nodes.push_back(new Node<DIM>(node_index, r_location));
     }
 
-    mpMutableMesh = new MutableMesh<DIM,DIM>(nodes);
+    mpMutableMesh = new MutableMesh<DIM, DIM>(nodes);
 }
 
 template<unsigned DIM>
-MutableMesh<DIM,DIM>* PottsBasedCellPopulation<DIM>::GetMutableMesh()
+MutableMesh<DIM, DIM>* PottsBasedCellPopulation<DIM>::GetMutableMesh()
 {
     assert(mpMutableMesh);
     return mpMutableMesh;

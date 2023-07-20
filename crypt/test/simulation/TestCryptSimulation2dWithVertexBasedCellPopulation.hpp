@@ -72,11 +72,11 @@ private:
      * but is fairly thorough.  Used for testing serialization.
      */
     template<unsigned DIM>
-    void CompareMeshes(VertexMesh<DIM,DIM>* pMesh1, VertexMesh<DIM,DIM>* pMesh2)
+    void CompareMeshes(VertexMesh<DIM, DIM>* pMesh1, VertexMesh<DIM, DIM>* pMesh2)
     {
         TS_ASSERT_EQUALS(pMesh1->GetNumNodes(), pMesh2->GetNumNodes());
 
-        for (unsigned i=0; i<pMesh1->GetNumNodes(); i++)
+        for (unsigned i = 0; i < pMesh1->GetNumNodes(); ++i)
         {
             Node<DIM>* p_node1 = pMesh1->GetNode(i);
             Node<DIM>* p_node2 = pMesh2->GetNode(i);
@@ -86,7 +86,7 @@ private:
 
             TS_ASSERT_EQUALS(p_node1->IsBoundaryNode(), p_node2->IsBoundaryNode());
 
-            for (unsigned j=0; j<DIM; j++)
+            for (unsigned j = 0; j < DIM; ++j)
             {
                 TS_ASSERT_DELTA(p_node1->rGetLocation()[j], p_node2->rGetLocation()[j], 1e-4);
             }
@@ -94,15 +94,15 @@ private:
 
         TS_ASSERT_EQUALS(pMesh1->GetNumElements(), pMesh2->GetNumElements());
 
-        for (typename VertexMesh<DIM,DIM>::VertexElementIterator iter = pMesh1->GetElementIteratorBegin();
+        for (auto iter = pMesh1->GetElementIteratorBegin();
              iter != pMesh1->GetElementIteratorEnd();
              ++iter)
         {
             unsigned elem_index = iter->GetIndex();
-            VertexElement<DIM,DIM>* p_elt2 = pMesh2->GetElement(elem_index);
+            VertexElement<DIM, DIM>* p_elt2 = pMesh2->GetElement(elem_index);
             TS_ASSERT_EQUALS(iter->GetNumNodes(), p_elt2->GetNumNodes());
 
-            for (unsigned j=0; j<iter->GetNumNodes(); j++)
+            for (unsigned j = 0; j < iter->GetNumNodes(); ++j)
             {
                 TS_ASSERT_EQUALS(iter->GetNodeGlobalIndex(j), p_elt2->GetNodeGlobalIndex(j));
             }
@@ -140,7 +140,7 @@ public:
 
         // Save old node locations
         std::vector<c_vector<double, 2> > old_node_locations(p_mesh->GetNumNodes());
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             old_node_locations[i][0] = p_mesh->GetNode(i)->rGetLocation()[0];
             old_node_locations[i][1] = p_mesh->GetNode(i)->rGetLocation()[1];

@@ -70,7 +70,7 @@ unsigned PottsMeshReader<SPACE_DIM>::GetNumElementAttributes() const
 template<unsigned SPACE_DIM>
 ElementData PottsMeshReader<SPACE_DIM>::GetNextFaceData()
 {
-    /// \todo Implement this method (#1663, #1377)
+    ///\todo Implement this method (#1663, #1377)
     ElementData ret;
     ret.NodeIndices = std::vector<unsigned>();
     ret.AttributeValue = 0;
@@ -80,7 +80,7 @@ ElementData PottsMeshReader<SPACE_DIM>::GetNextFaceData()
 template<unsigned SPACE_DIM>
 unsigned PottsMeshReader<SPACE_DIM>::GetNumFaces() const
 {
-    /// \todo Implement this method (#1663)
+    ///\todo Implement this method (#1663)
     return 0;
 }
 
@@ -90,7 +90,6 @@ void PottsMeshReader<SPACE_DIM>::Reset()
     CloseFiles();
     OpenFiles();
     ReadHeaders();
-
     mNodesRead = 0;
     mElementsRead = 0;
 }
@@ -243,7 +242,9 @@ void PottsMeshReader<SPACE_DIM>::CloseFiles()
 }
 
 template<unsigned SPACE_DIM>
-void PottsMeshReader<SPACE_DIM>::GetNextLineFromStream(std::ifstream& fileStream, std::string& rawLine)
+void PottsMeshReader<SPACE_DIM>::GetNextLineFromStream(
+    std::ifstream& fileStream,
+    std::string& rawLine)
 {
     bool line_is_blank;
 

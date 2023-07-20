@@ -433,16 +433,14 @@ public:
         cell_population.mCellLocationMap.clear();
         cell_population.mLocationCellMap.clear();
 
-        for (auto cell_iter = cell_population.mCells.begin();
-             cell_iter != cell_population.mCells.end();
-             ++cell_iter)
+        for (auto cell_iter : cell_population.mCells)
         {
             // The cell vector should only ever contain living cells
-            unsigned old_elem_index = old_map[(*cell_iter).get()];
+            unsigned old_elem_index = old_map[cell_iter.get()];
             assert(!element_map.IsDeleted(old_elem_index));
 
             unsigned new_elem_index = element_map.GetNewIndex(old_elem_index);
-            cell_population.SetCellUsingLocationIndex(new_elem_index, *cell_iter);
+            cell_population.SetCellUsingLocationIndex(new_elem_index, cell_iter);
         }
 
         VertexBasedPopulationSrn<2>* population_srn(&cell_population.rGetVertexBasedPopulationSrn());

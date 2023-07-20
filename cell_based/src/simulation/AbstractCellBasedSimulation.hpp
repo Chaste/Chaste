@@ -262,8 +262,7 @@ protected:
      * Helper method to output additional simulations parameters and information defined in
      * subclasses to file.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
@@ -506,8 +505,7 @@ public:
     /**
      * Outputs simulation parameters to file
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * As this method is pure virtual, it must be overridden in subclasses.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */

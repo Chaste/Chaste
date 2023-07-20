@@ -103,7 +103,7 @@ public:
         // Create a force system
         VertexCryptBoundaryForce<2> force(100);
 
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
             cell_population.GetNode(i)->ClearAppliedForce();
         }
@@ -111,7 +111,7 @@ public:
         force.AddForceContribution(cell_population);
 
         // Check forces are correct
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        for (unsigned i = 0; i < cell_population.GetNumNodes(); ++i)
         {
             TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[0], 0.0, 1e-4);
 
@@ -135,10 +135,10 @@ public:
         // Create a NodeBasedCellPopulation
         std::vector<Node<2>*> nodes;
         unsigned num_nodes = 10;
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
-            double x = (double)(i);
-            double y = (double)(i);
+            double x = static_cast<double>(i);
+            double y = static_cast<double>(i);
             nodes.push_back(new Node<2>(i, true, x, y));
         }
         // Convert this to a NodesOnlyMesh
@@ -164,7 +164,7 @@ public:
                 "VertexCryptBoundaryForce is to be used with VertexBasedCellPopulations only");
 
         // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }

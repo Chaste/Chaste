@@ -140,12 +140,10 @@ std::vector<double> DiscreteSystemForceCalculator::CalculateFtAndFn(
 
     c_vector<double,2> unit_vec_between_nodes(2);
 
-    for (auto iter = neighbouring_node_indices.begin();
-         iter != neighbouring_node_indices.end();
-         ++iter)
+    for (auto iter : neighbouring_node_indices)
     {
         // The method GetAngleBetweenNodes() returns an angle in the range (-pi,pi]
-        alpha = r_mesh.GetAngleBetweenNodes(index, *iter);
+        alpha = r_mesh.GetAngleBetweenNodes(index, iter);
 
         assert(alpha <= M_PI);
         assert(alpha > -M_PI);
@@ -156,19 +154,17 @@ std::vector<double> DiscreteSystemForceCalculator::CalculateFtAndFn(
             c_vector<double,2> force_between_nodes = zero_vector<double>(2);
 
             // Iterate over vector of forces present and add up forces between nodes
-            for (auto force_iter = mForceCollection.begin();
-                 force_iter != mForceCollection.end();
-                 ++force_iter)
+            for (auto force_iter : mForceCollection)
             {
-               force_between_nodes += (*force_iter)->CalculateForceBetweenNodes(index, *iter, mrCellPopulation);
+               force_between_nodes += force_iter->CalculateForceBetweenNodes(index, iter, mrCellPopulation);
             }
 
             unit_vec_between_nodes[0] = cos(alpha);
             unit_vec_between_nodes[1] = sin(alpha);
 
-            double plusminus_norm_force = inner_prod(force_between_nodes,unit_vec_between_nodes);
-            tangential_force += plusminus_norm_force * cos(alpha-theta);
-            normal_force += plusminus_norm_force * sin(alpha-theta);
+            double plusminus_norm_force = inner_prod(force_between_nodes, unit_vec_between_nodes);
+            tangential_force += plusminus_norm_force * cos(alpha - theta);
+            normal_force += plusminus_norm_force * sin(alpha - theta);
         }
     }
 
@@ -188,8 +184,7 @@ std::vector<double> DiscreteSystemForceCalculator::GetSamplingAngles(
 
     std::vector<double> sampling_angles(4*neighbouring_node_indices.size());
 
-    unsigned i=0;
-
+    unsigned i = 0;
     for (auto iter = neighbouring_node_indices.begin();
          iter != neighbouring_node_indices.end();
          ++iter)

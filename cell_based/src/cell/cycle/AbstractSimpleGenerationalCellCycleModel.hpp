@@ -108,13 +108,15 @@ public:
     virtual ~AbstractSimpleGenerationalCellCycleModel();
 
     /** Overridden ResetForDivision() method. */
-    void ResetForDivision();
+    void ResetForDivision() override;
 
     /**
+     * Overridden InitialiseDaughterCell() method.
+     * 
      * Set the new cell's G1 duration once it has been created after division.
      * The duration will be based on cell type.
      */
-    void InitialiseDaughterCell();
+    void InitialiseDaughterCell() override;
 
     /**
      * Sets the cell's generation.
@@ -145,7 +147,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 CLASS_IS_ABSTRACT(AbstractSimpleGenerationalCellCycleModel)

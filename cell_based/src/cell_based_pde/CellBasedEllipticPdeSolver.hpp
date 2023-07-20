@@ -129,9 +129,9 @@ public:
      * @param pPde pointer to the PDE
      * @param pBoundaryConditions pointer to the boundary conditions
      */
-    CellBasedEllipticPdeSolver(TetrahedralMesh<DIM,DIM>* pMesh,
-                       AbstractLinearEllipticPde<DIM,DIM>* pPde,
-                       BoundaryConditionsContainer<DIM,DIM,1>* pBoundaryConditions);
+    CellBasedEllipticPdeSolver(TetrahedralMesh<DIM, DIM>* pMesh,
+                       AbstractLinearEllipticPde<DIM, DIM>* pPde,
+                       BoundaryConditionsContainer<DIM, DIM,1>* pBoundaryConditions);
 
     /**
      * Destructor.

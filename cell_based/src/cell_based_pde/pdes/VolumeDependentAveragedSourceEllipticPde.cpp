@@ -37,7 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApoptoticCellProperty.hpp"
 
 template<unsigned DIM>
-VolumeDependentAveragedSourceEllipticPde<DIM>::VolumeDependentAveragedSourceEllipticPde(AbstractCellPopulation<DIM>& rCellPopulation, double coefficient)
+VolumeDependentAveragedSourceEllipticPde<DIM>::VolumeDependentAveragedSourceEllipticPde(
+    AbstractCellPopulation<DIM>& rCellPopulation, double coefficient)
     : AveragedSourceEllipticPde<DIM>(rCellPopulation, coefficient)
 {
     assert(bool(dynamic_cast<NodeBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))));
@@ -45,7 +46,9 @@ VolumeDependentAveragedSourceEllipticPde<DIM>::VolumeDependentAveragedSourceElli
 }
 
 template<unsigned DIM>
-void VolumeDependentAveragedSourceEllipticPde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>& rCoarseMesh,  std::map< CellPtr, unsigned >* pCellPdeElementMap) // must be called before solve
+void VolumeDependentAveragedSourceEllipticPde<DIM>::SetupSourceTerms(
+    TetrahedralMesh<DIM, DIM>& rCoarseMesh,
+    std::map< CellPtr, unsigned >* pCellPdeElementMap) // must be called before solve
 {
     // Allocate memory
     this->mCellDensityOnCoarseElements.resize(rCoarseMesh.GetNumElements());
@@ -54,7 +57,10 @@ void VolumeDependentAveragedSourceEllipticPde<DIM>::SetupSourceTerms(Tetrahedral
         this->mCellDensityOnCoarseElements[elem_index] = 0.0;
     }
 
-    // Loop over cells, find which coarse element it is in, and add volume to the mSourceTermOnCoarseElements[elem_index];
+    /*
+     * Loop over cells, find which coarse element it is in, and add volume to 
+     * the mSourceTermOnCoarseElements[elem_index].
+     */
     for (auto cell_iter = this->mrCellPopulation.Begin();
          cell_iter != this->mrCellPopulation.End();
          ++cell_iter)
