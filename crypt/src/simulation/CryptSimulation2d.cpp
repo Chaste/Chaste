@@ -131,11 +131,9 @@ void CryptSimulation2d::SetBottomCellAncestors()
     }
 
     unsigned index = 0;
-    for (auto cell_iter = mrCellPopulation.Begin();
-         cell_iter != mrCellPopulation.End();
-         ++cell_iter)
+    for (auto cell_iter : mrCellPopulation)
     {
-        if (mrCellPopulation.GetLocationOfCellCentre(*cell_iter)[1] < threshold_height)
+        if (mrCellPopulation.GetLocationOfCellCentre(cell_iter)[1] < threshold_height)
         {
             MAKE_PTR_ARGS(CellAncestor, p_cell_ancestor, (index++));
             cell_iter->SetAncestor(p_cell_ancestor);

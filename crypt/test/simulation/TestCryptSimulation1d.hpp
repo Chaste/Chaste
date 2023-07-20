@@ -646,11 +646,9 @@ public:
         TS_ASSERT_EQUALS(cell_type_count[2], 3u);
         TS_ASSERT_EQUALS(cell_type_count[3], 0u);
 
-        for (auto cell_iter = simulator.rGetCellPopulation().Begin();
-             cell_iter != simulator.rGetCellPopulation().End();
-             ++cell_iter)
+        for (auto cell_iter : simulator.rGetCellPopulation())
         {
-            c_vector<double, 1> cell_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
+            c_vector<double, 1> cell_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(cell_iter);
             double x = cell_location[0];
 
             if (fabs(x) < 1e-2)
@@ -741,11 +739,9 @@ public:
         simulator.Solve();
 
         // Check that nothing has moved below y=0
-        for (auto cell_iter = crypt.Begin();
-             cell_iter != crypt.End();
-             ++cell_iter)
+        for (auto cell_iter : crypt)
         {
-            TS_ASSERT_LESS_THAN(-1e-15, crypt.GetLocationOfCellCentre(*cell_iter)[0]);
+            TS_ASSERT_LESS_THAN(-1e-15, crypt.GetLocationOfCellCentre(cell_iter)[0]);
         }
 
         std::vector<unsigned> cell_mutation_state_count = simulator.rGetCellPopulation().GetCellMutationStateCount();

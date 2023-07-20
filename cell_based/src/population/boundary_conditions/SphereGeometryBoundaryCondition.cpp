@@ -76,12 +76,10 @@ template<unsigned DIM>
 void SphereGeometryBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::map<Node<DIM>*, c_vector<double, DIM> >& rOldLocations)
 {
     // Iterate over the cell population
-    for (auto cell_iter = this->mpCellPopulation->Begin();
-         cell_iter != this->mpCellPopulation->End();
-         ++cell_iter)
+    for (auto cell_iter : *(this->mpCellPopulation))
     {
         // Find the radial distance between this cell and the surface of the sphere
-        c_vector<double, DIM> cell_location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
+        c_vector<double, DIM> cell_location = this->mpCellPopulation->GetLocationOfCellCentre(cell_iter);
         double radius = norm_2(cell_location - mCentreOfSphere);
         assert(radius != 0.0); //Can't project the centre to anywhere sensible
 
@@ -92,7 +90,7 @@ void SphereGeometryBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::ma
             c_vector<double, DIM> location_on_sphere =
                 mCentreOfSphere + mRadiusOfSphere*(cell_location - mCentreOfSphere)/radius;
 
-            unsigned node_index = this->mpCellPopulation->GetLocationIndexUsingCell(*cell_iter);
+            unsigned node_index = this->mpCellPopulation->GetLocationIndexUsingCell(cell_iter);
             Node<DIM>* p_node = this->mpCellPopulation->GetNode(node_index);
 
             p_node->rGetModifiableLocation() = location_on_sphere;
@@ -106,12 +104,10 @@ bool SphereGeometryBoundaryCondition<DIM>::VerifyBoundaryCondition()
     bool condition_satisfied = true;
 
     // Iterate over the cell population
-    for (auto cell_iter = this->mpCellPopulation->Begin();
-         cell_iter != this->mpCellPopulation->End();
-         ++cell_iter)
+    for (auto cell_iter : *(this->mpCellPopulation))
     {
         // Find the radial distance between this cell and the surface of the sphere
-        c_vector<double, DIM> cell_location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
+        c_vector<double, DIM> cell_location = this->mpCellPopulation->GetLocationOfCellCentre(cell_iter);
         double radius = norm_2(cell_location - mCentreOfSphere);
 
         // If the cell is too far from the surface of the sphere...

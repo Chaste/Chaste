@@ -49,9 +49,9 @@ void PottsBasedCellPopulation<DIM>::Validate()
     // Check each element has only one cell associated with it
     std::vector<unsigned> validated_element = std::vector<unsigned>(this->GetNumElements(), 0);
 
-    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
+    for (auto cell_iter : this->mCells)
     {
-        unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
+        unsigned elem_index = this->GetLocationIndexUsingCell(cell_iter);
         validated_element[elem_index]++;
     }
 
@@ -137,10 +137,10 @@ TetrahedralMesh<DIM, DIM>* PottsBasedCellPopulation<DIM>::GetTetrahedralMeshForP
     std::vector<Node<DIM>*> temp_nodes;
 
     // Create nodes at the centre of the cells
-    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
+    for (auto cell_iter : this->mCells)
     {
-        unsigned index = this->GetLocationIndexUsingCell(*cell_iter);
-        c_vector<double, DIM> location = this->GetLocationOfCellCentre(*cell_iter);
+        unsigned index = this->GetLocationIndexUsingCell(cell_iter);
+        c_vector<double, DIM> location = this->GetLocationOfCellCentre(cell_iter);
         temp_nodes.push_back(new Node<DIM>(index, location));
     }
 
@@ -218,7 +218,7 @@ unsigned PottsBasedCellPopulation<DIM>::RemoveDeadCells()
         if ((*cell_iter)->IsDead())
         {
             // Get the location index corresponding to this cell
-            unsigned location_index = this->GetLocationIndexUsingCell(*cell_iter);
+            unsigned location_index = this->GetLocationIndexUsingCell((*cell_iter));
 
             // Use this to remove the cell from the population
             mpPottsMesh->DeleteElement(location_index);
@@ -533,9 +533,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
 
     // Iterate over any cell writers that are present
     unsigned num_nodes = GetNumNodes();
-    for (auto cell_writer_iter = this->mCellWriters.begin();
-         cell_writer_iter != this->mCellWriters.end();
-         ++cell_writer_iter)
+    for (auto cell_writer_iter : this->mCellWriters)
     {
         // Create vector to store VTK cell data
         std::vector<double> vtk_cell_data(num_nodes);
@@ -563,11 +561,11 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
                 CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
 
                 // Populate the vector of VTK cell data
-                vtk_cell_data[node_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(p_cell, this);
+                vtk_cell_data[node_index] = cell_writer_iter->GetCellDataForVtkOutput(p_cell, this);
             }
         }
 
-        mesh_writer.AddPointData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
+        mesh_writer.AddPointData(cell_writer_iter->GetVtkCellDataName(), vtk_cell_data);
     }
 
     // When outputting any CellData, we assume that the first cell is representative of all cells
@@ -648,11 +646,9 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
 
             std::set<unsigned> target_neighbouring_node_indices = this->rGetMesh().GetVonNeumannNeighbouringNodeIndices(node_index);
 
-            for (auto neighbour_iter = target_neighbouring_node_indices.begin();
-                 neighbour_iter != target_neighbouring_node_indices.end();
-                 ++neighbour_iter)
+            for (auto neighbour_iter : target_neighbouring_node_indices)
             {
-                std::set<unsigned> neighbouring_element_indices = this->rGetMesh().GetNode(*neighbour_iter)->rGetContainingElementIndices();
+                std::set<unsigned> neighbouring_element_indices = this->rGetMesh().GetNode(neighbour_iter)->rGetContainingElementIndices();
 
                 // If different cells add a line
                 if (element_indices != neighbouring_element_indices)
@@ -660,7 +656,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
                     std::vector<Node<2>*> element_nodes;
 
                     const c_vector<double, 2>& r_node_location = this->mrMesh.GetNode(node_index)->rGetLocation();
-                    const c_vector<double, 2>& r_neighbour_node_location = this->mrMesh.GetNode(*neighbour_iter)->rGetLocation();
+                    const c_vector<double, 2>& r_neighbour_node_location = this->mrMesh.GetNode(neighbour_iter)->rGetLocation();
 
                     c_vector<double, 2> unit_tangent = r_neighbour_node_location - r_node_location;
 

@@ -148,9 +148,7 @@ void ParabolicBoxDomainPdeModifier<DIM>::SetupInitialSolutionVector(AbstractCell
 
     double initial_condition = rCellPopulation.Begin()->GetCellData()->GetItem(this->mDependentVariableName);
 
-    for (auto cell_iter = rCellPopulation.Begin();
-         cell_iter != rCellPopulation.End();
-         ++cell_iter)
+    for (auto cell_iter : rCellPopulation)
     {
         double initial_condition_at_cell = cell_iter->GetCellData()->GetItem(this->mDependentVariableName);
         UNUSED_OPT(initial_condition_at_cell);

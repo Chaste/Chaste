@@ -57,11 +57,9 @@ void ApoptoticCellKiller<SPACE_DIM>::CheckAndLabelSingleCellForApoptosis(
 template<unsigned SPACE_DIM>
 void ApoptoticCellKiller<SPACE_DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 {
-    for (auto cell_iter = this->mpCellPopulation->Begin();
-        cell_iter != this->mpCellPopulation->End();
-        ++cell_iter)
+    for (auto cell_iter : *(this->mpCellPopulation))
     {
-        CheckAndLabelSingleCellForApoptosis(*cell_iter);
+        CheckAndLabelSingleCellForApoptosis(cell_iter);
     }
 }
 

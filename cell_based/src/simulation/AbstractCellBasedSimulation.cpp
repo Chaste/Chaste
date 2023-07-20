@@ -101,9 +101,7 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM, SPACE_DIM>::DoCellBirth()
     unsigned num_births_this_step = 0;
 
     // Iterate over all cells, seeing if each one can be divided
-    for (auto cell_iter = mrCellPopulation.Begin();
-         cell_iter != mrCellPopulation.End();
-         ++cell_iter)
+    for (auto cell_iter : mrCellPopulation)
     {
         // Check if this cell is ready to divide
         double cell_age = cell_iter->GetAge();
@@ -112,7 +110,7 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM, SPACE_DIM>::DoCellBirth()
             if (cell_iter->ReadyToDivide())
             {
                 // Check if there is room into which the cell may divide
-                if (mrCellPopulation.IsRoomToDivide(*cell_iter))
+                if (mrCellPopulation.IsRoomToDivide(cell_iter))
                 {
                     // Store parent ID for output if required
                     unsigned parent_cell_id = cell_iter->GetCellId();
@@ -128,7 +126,7 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM, SPACE_DIM>::DoCellBirth()
                      */
                     if (mrCellPopulation.template HasWriter<CellDivisionLocationsWriter>())
                     {
-                        c_vector<double, SPACE_DIM> cell_location = mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
+                        c_vector<double, SPACE_DIM> cell_location = mrCellPopulation.GetLocationOfCellCentre(cell_iter);
 
                         std::stringstream division_info;
                         division_info << SimulationTime::Instance()->GetTime() << "\t";
@@ -142,7 +140,7 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM, SPACE_DIM>::DoCellBirth()
                     }
 
                     // Add the new cell to the cell population
-                    mrCellPopulation.AddCell(p_new_cell, *cell_iter);
+                    mrCellPopulation.AddCell(p_new_cell, cell_iter);
 
                     // Update counter
                     num_births_this_step++;
@@ -162,11 +160,9 @@ unsigned AbstractCellBasedSimulation<ELEMENT_DIM, SPACE_DIM>::DoCellRemoval()
      * This labels cells as dead or apoptosing. It does not actually remove the 
      * cells, mrCellPopulation.RemoveDeadCells() needs to be called for this.
      */
-    for (auto killer_iter = mCellKillers.begin();
-         killer_iter != mCellKillers.end();
-         ++killer_iter)
+    for (auto killer_iter : mCellKillers)
     {
-        (*killer_iter)->CheckAndLabelCellsForApoptosisOrDeath();
+        killer_iter->CheckAndLabelCellsForApoptosisOrDeath();
     }
 
     num_deaths_this_step += mrCellPopulation.RemoveDeadCells();
@@ -432,9 +428,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM, SPACE_DIM>::Solve()
      * negative birth times so that some are initially almost ready to divide.
      */
     LOG(1, "Setting up cells...");
-    for (auto cell_iter = mrCellPopulation.Begin();
-         cell_iter != mrCellPopulation.End();
-         ++cell_iter)
+    for (auto cell_iter : mrCellPopulation)
     {
         /*
          * We don't use the result; this call is just to force the cells to age
@@ -484,11 +478,9 @@ void AbstractCellBasedSimulation<ELEMENT_DIM, SPACE_DIM>::Solve()
         std::map<CellPtr, c_vector<double, SPACE_DIM> > old_cell_locations;
         if (mOutputCellVelocities && at_sampling_timestep)
         {
-            for (auto cell_iter = mrCellPopulation.Begin();
-                 cell_iter != mrCellPopulation.End();
-                 ++cell_iter)
+            for (auto cell_iter : mrCellPopulation)
             {
-                old_cell_locations[*cell_iter] = mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
+                old_cell_locations[cell_iter] = mrCellPopulation.GetLocationOfCellCentre(cell_iter);
             }
         }
 
@@ -511,15 +503,13 @@ void AbstractCellBasedSimulation<ELEMENT_DIM, SPACE_DIM>::Solve()
             // Offset as doing this before we increase time by mDt
             *mpCellVelocitiesFile << p_time->GetTime() + mDt<< "\t";
 
-            for (auto cell_iter = mrCellPopulation.Begin();
-                 cell_iter != mrCellPopulation.End();
-                 ++cell_iter)
+            for (auto cell_iter : mrCellPopulation)
             {
-                unsigned index = mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
-                const c_vector<double, SPACE_DIM>& position = mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
+                unsigned index = mrCellPopulation.GetLocationIndexUsingCell(cell_iter);
+                const c_vector<double, SPACE_DIM>& position = mrCellPopulation.GetLocationOfCellCentre(cell_iter);
 
                 c_vector<double, SPACE_DIM> velocity; // Two lines for profile build
-                velocity = (position - old_cell_locations[*cell_iter])/mDt;
+                velocity = (position - old_cell_locations[cell_iter])/mDt;
 
                 *mpCellVelocitiesFile << index  << " ";
                 for (unsigned i = 0; i < SPACE_DIM; ++i)

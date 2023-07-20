@@ -254,13 +254,13 @@ public:
 
         for (unsigned j = 0; j < cell_population.GetNumNodes(); ++j)
         {
-            c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
+            c_vector<double, 2> actual_location = cell_population.GetNode(j)->rGetLocation();
 
             double damping =  cell_population.GetDampingConstant(j);
-            c_vector<double, 2> expectedLocation;
-            expectedLocation = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
+            c_vector<double, 2> expected_location;
+            expected_location = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
 
-            TS_ASSERT_DELTA(norm_2(actualLocation - expectedLocation), 0, 1e-6);
+            TS_ASSERT_DELTA(norm_2(actual_location - expected_location), 0, 1e-6);
         }
     }
 
@@ -305,17 +305,15 @@ public:
         p_fe_method->UpdateAllNodePositions(dt);
 
         //Check the answer (for cell associated nodes only)
-        for (auto cell_iter = cell_population.Begin();
-            cell_iter != cell_population.End();
-            ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            int j = cell_population.GetLocationIndexUsingCell(*cell_iter);
-            c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
+            unsigned j = cell_population.GetLocationIndexUsingCell(cell_iter);
+            c_vector<double, 2> actual_location = cell_population.GetNode(j)->rGetLocation();
 
             double damping =  cell_population.GetDampingConstant(j);
-            c_vector<double, 2> expectedLocation;
-            expectedLocation = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
-            TS_ASSERT_DELTA(norm_2(actualLocation - expectedLocation), 0, 1e-9);
+            c_vector<double, 2> expected_location;
+            expected_location = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
+            TS_ASSERT_DELTA(norm_2(actual_location - expected_location), 0, 1e-9);
         }
     }
 
@@ -364,13 +362,13 @@ public:
 
         for (unsigned j = 0; j < cell_population.GetNumNodes(); ++j)
         {
-            c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
+            c_vector<double, 2> actual_location = cell_population.GetNode(j)->rGetLocation();
 
             double damping =  cell_population.GetDampingConstant(j);
-            c_vector<double, 2> expectedLocation;
-            expectedLocation = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
+            c_vector<double, 2> expected_location;
+            expected_location = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
 
-            TS_ASSERT_DELTA(norm_2(actualLocation - expectedLocation), 0, 1e-12);
+            TS_ASSERT_DELTA(norm_2(actual_location - expected_location), 0, 1e-12);
         }
     }
 
@@ -420,13 +418,13 @@ public:
 
         // for (unsigned j = 0; j < cell_population.GetNumNodes(); ++j)
         // {
-        //     c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
+        //     c_vector<double, 2> actual_location = cell_population.GetNode(j)->rGetLocation();
 
         //     double damping =  cell_population.GetDampingConstant(j);
-        //     c_vector<double, 2> expectedLocation;
-        //     expectedLocation = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
+        //     c_vector<double, 2> expected_location;
+        //     expected_location = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
 
-        //     TS_ASSERT_DELTA(norm_2(actualLocation - expectedLocation), 0, 1e-12);
+        //     TS_ASSERT_DELTA(norm_2(actual_location - expected_location), 0, 1e-12);
         // }
     }
 
@@ -478,13 +476,13 @@ public:
 
         for (unsigned j = 0; j < cell_population.GetNumNodes(); ++j)
         {
-            c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
+            c_vector<double, 2> actual_location = cell_population.GetNode(j)->rGetLocation();
 
             double damping =  cell_population.GetDampingConstant(j);
-            c_vector<double, 2> expectedLocation;
-            expectedLocation = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
+            c_vector<double, 2> expected_location;
+            expected_location = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
 
-            TS_ASSERT_DELTA(norm_2(actualLocation - expectedLocation), 0, 1e-12);
+            TS_ASSERT_DELTA(norm_2(actual_location - expected_location), 0, 1e-12);
         }
     }
 
@@ -532,13 +530,13 @@ public:
 
         for (unsigned j = 0; j < cell_population.GetNumNodes(); ++j)
         {
-            c_vector<double, 2> actualLocation = cell_population.GetNode(j)->rGetLocation();
+            c_vector<double, 2> actual_location = cell_population.GetNode(j)->rGetLocation();
 
             double damping =  cell_population.GetDampingConstant(j);
-            c_vector<double, 2> expectedLocation;
-            expectedLocation = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
+            c_vector<double, 2> expected_location;
+            expected_location = p_test_force->GetExpectedOneStepLocationFE(j, damping, old_posns[j], dt);
 
-            TS_ASSERT_DELTA(norm_2(actualLocation - expectedLocation), 0, 1e-12);
+            TS_ASSERT_DELTA(norm_2(actual_location - expected_location), 0, 1e-12);
         }
     }
 

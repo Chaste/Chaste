@@ -230,12 +230,10 @@ public:
 
             // Check that the mesh has nodes at the centre of the cells
             unsigned i = 0;
-            for (auto cell_iter = ca_cell_population.Begin();
-                 cell_iter != ca_cell_population.End();
-                 ++cell_iter)
+            for (auto cell_iter : ca_cell_population)
             {
-                TS_ASSERT_DELTA(p_pde_modifier->mpFeMesh->GetNode(i)->rGetLocation()[0], ca_cell_population.GetLocationOfCellCentre(*cell_iter)[0],1e-5);
-                TS_ASSERT_DELTA(p_pde_modifier->mpFeMesh->GetNode(i)->rGetLocation()[1], ca_cell_population.GetLocationOfCellCentre(*cell_iter)[1],1e-5);
+                TS_ASSERT_DELTA(p_pde_modifier->mpFeMesh->GetNode(i)->rGetLocation()[0], ca_cell_population.GetLocationOfCellCentre(cell_iter)[0],1e-5);
+                TS_ASSERT_DELTA(p_pde_modifier->mpFeMesh->GetNode(i)->rGetLocation()[1], ca_cell_population.GetLocationOfCellCentre(cell_iter)[1],1e-5);
                 ++i;
             }
         }
@@ -382,11 +380,9 @@ public:
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseEllipticPdeWithMeshOnDisk");
 
         // Test the solution against the exact solution
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            c_vector<double,2> cell_location = cell_population.GetLocationOfCellCentre(*cell_iter);
+            c_vector<double,2> cell_location = cell_population.GetLocationOfCellCentre(cell_iter);
             double r = sqrt(cell_location(0)*cell_location(0) + cell_location(1)*cell_location(1));
             double u_exact = boost::math::cyl_bessel_j(0,r) / boost::math::cyl_bessel_j(0,1);
 
@@ -449,11 +445,9 @@ public:
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseEllipticPdeWithMeshOnHeterogeneousDisk");
 
         // Test the solution against the exact solution
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            c_vector<double,2> cell_location = cell_population.GetLocationOfCellCentre(*cell_iter);
+            c_vector<double,2> cell_location = cell_population.GetLocationOfCellCentre(cell_iter);
             double r = sqrt(cell_location(0)*cell_location(0) + cell_location(1)*cell_location(1));
 
             double J005 = boost::math::cyl_bessel_j(0,0.5);

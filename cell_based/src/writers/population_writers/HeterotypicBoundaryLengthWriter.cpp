@@ -65,12 +65,10 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
     pCellPopulation->CreateVoronoiTessellation();
 
     // Iterate over cells
-    for (auto cell_iter = pCellPopulation->Begin();
-         cell_iter != pCellPopulation->End();
-         ++cell_iter)
+    for (auto cell_iter : *pCellPopulation)
     {
         // Get the location index corresponding to this cell
-        unsigned index = pCellPopulation->GetLocationIndexUsingCell(*cell_iter);
+        unsigned index = pCellPopulation->GetLocationIndexUsingCell(cell_iter);
 
         // Store whether this cell is labelled
         bool cell_is_labelled = cell_iter->template HasCellProperty<CellLabel>();
@@ -128,12 +126,10 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
     double total_num_pairs = 0.0;
 
     // Iterate over cells
-    for (auto cell_iter = pCellPopulation->Begin();
-         cell_iter != pCellPopulation->End();
-         ++cell_iter)
+    for (auto cell_iter : *pCellPopulation)
     {
         // Get the location index corresponding to this cell
-        unsigned index = pCellPopulation->GetLocationIndexUsingCell(*cell_iter);
+        unsigned index = pCellPopulation->GetLocationIndexUsingCell(cell_iter);
 
         // Store whether this cell is labelled
         bool cell_is_labelled = cell_iter->template HasCellProperty<CellLabel>();
@@ -193,15 +189,13 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
     double total_num_pairs = 0.0;
 
     // Loop over cells
-    for (auto cell_iter = pCellPopulation->Begin();
-         cell_iter != pCellPopulation->End();
-         ++cell_iter)
+    for (auto cell_iter : *pCellPopulation)
     {
         // Store whether this cell is labelled
         bool cell_is_labelled = cell_iter->template HasCellProperty<CellLabel>();
 
         // Store the radius of the node corresponding to this cell
-        unsigned node_index = pCellPopulation->GetLocationIndexUsingCell(*cell_iter);
+        unsigned node_index = pCellPopulation->GetLocationIndexUsingCell(cell_iter);
         double node_radius = pCellPopulation->GetNode(node_index)->GetRadius();
 
         // Get the set of neighbouring node indices
@@ -273,14 +267,12 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
     double total_num_pairs = 0.0;
 
     // Iterate over cells
-    for (auto cell_iter = pCellPopulation->Begin();
-         cell_iter != pCellPopulation->End();
-         ++cell_iter)
+    for (auto cell_iter : *pCellPopulation)
     {
         // Store whether this cell is labelled
         bool cell_is_labelled = cell_iter->template HasCellProperty<CellLabel>();
 
-        unsigned elem_index = pCellPopulation->GetLocationIndexUsingCell(*cell_iter);
+        unsigned elem_index = pCellPopulation->GetLocationIndexUsingCell(cell_iter);
         unsigned num_nodes_in_elem = pCellPopulation->rGetMesh().GetElement(elem_index)->GetNumNodes();
 
         // Iterate over nodes contained in the element corresponding to this cell
@@ -324,7 +316,7 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
             }
         }
 
-        std::set<unsigned> neighbour_node_indices = pCellPopulation->GetNeighbouringLocationIndices(*cell_iter);
+        std::set<unsigned> neighbour_node_indices = pCellPopulation->GetNeighbouringLocationIndices(cell_iter);
 
         // Iterate over these neighbours
         for (auto neighbour_iter : neighbour_node_indices)
@@ -369,15 +361,13 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
     double total_num_pairs = 0.0;
 
     // Iterate over cells
-    for (auto cell_iter = pCellPopulation->Begin();
-         cell_iter != pCellPopulation->End();
-         ++cell_iter)
+    for (auto cell_iter : *pCellPopulation)
     {
         // Store whether this cell is labelled
         bool cell_is_labelled = cell_iter->template HasCellProperty<CellLabel>();
 
         // Get the set of neighbouring element indices
-        unsigned elem_index = pCellPopulation->GetLocationIndexUsingCell(*cell_iter);
+        unsigned elem_index = pCellPopulation->GetLocationIndexUsingCell(cell_iter);
         std::set<unsigned> neighbour_elem_indices = pCellPopulation->rGetMesh().GetNeighbouringElementIndices(elem_index);
 
         // Iterate over these neighbours

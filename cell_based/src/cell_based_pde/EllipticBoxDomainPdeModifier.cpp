@@ -109,11 +109,9 @@ std::shared_ptr<BoundaryConditionsContainer<DIM, DIM,1> > EllipticBoxDomainPdeMo
     {
         // Get the set of coarse element indices that contain cells
         std::set<unsigned> coarse_element_indices_in_map;
-        for (auto cell_iter = rCellPopulation.Begin();
-             cell_iter != rCellPopulation.End();
-             ++cell_iter)
+        for (auto cell_iter : rCellPopulation)
         {
-            coarse_element_indices_in_map.insert(this->mCellPdeElementMap[*cell_iter]);
+            coarse_element_indices_in_map.insert(this->mCellPdeElementMap[cell_iter]);
         }
 
         // Find the node indices associated with elements whose indices are NOT in the set coarse_element_indices_in_map

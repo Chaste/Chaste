@@ -96,11 +96,9 @@ void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCondition(
 
         if (dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>*>(this->mpCellPopulation))
         {
-            for (auto cell_iter = this->mpCellPopulation->Begin();
-                 cell_iter != this->mpCellPopulation->End();
-                 ++cell_iter)
+            for (auto cell_iter : *(this->mpCellPopulation))
             {
-                unsigned node_index = this->mpCellPopulation->GetLocationIndexUsingCell(*cell_iter);
+                unsigned node_index = this->mpCellPopulation->GetLocationIndexUsingCell(cell_iter);
                 Node<SPACE_DIM>* p_node = this->mpCellPopulation->GetNode(node_index);
 
                 c_vector<double, SPACE_DIM> node_location = p_node->rGetLocation();
@@ -169,11 +167,9 @@ bool PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::VerifyBoundaryCondition()
     }
     else
     {
-        for (auto cell_iter = this->mpCellPopulation->Begin();
-             cell_iter != this->mpCellPopulation->End();
-             ++cell_iter)
+        for (auto cell_iter : *(this->mpCellPopulation))
         {
-            c_vector<double, SPACE_DIM> cell_location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
+            c_vector<double, SPACE_DIM> cell_location = this->mpCellPopulation->GetLocationOfCellCentre(cell_iter);
 
             if (inner_prod(cell_location - mPointOnPlane, mNormalToPlane) > 0.0)
             {

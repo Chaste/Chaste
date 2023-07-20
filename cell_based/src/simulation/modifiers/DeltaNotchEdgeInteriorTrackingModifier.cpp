@@ -76,9 +76,7 @@ void DeltaNotchEdgeInteriorTrackingModifier<DIM>::UpdateCellData(
      * First recover each cell's Notch and Delta concentrations from the ODEs 
      * and store in CellData and CellEdgeData.
      */
-    for (auto cell_iter = rCellPopulation.Begin();
-         cell_iter != rCellPopulation.End();
-         ++cell_iter)
+    for (auto cell_iter : rCellPopulation)
     {
         auto p_cell_edge_model = static_cast<CellSrnModel*>(cell_iter->GetSrnModel());
 
@@ -111,9 +109,7 @@ void DeltaNotchEdgeInteriorTrackingModifier<DIM>::UpdateCellData(
     }
 
     // After the edge data is filled, fill the edge neighbour data
-    for (auto cell_iter = rCellPopulation.Begin();
-         cell_iter != rCellPopulation.End();
-         ++cell_iter)
+    for (auto cell_iter : rCellPopulation)
     {
         auto p_cell_edge_model = static_cast<CellSrnModel*>(cell_iter->GetSrnModel());
         const unsigned num_cell_edges = p_cell_edge_model->GetNumEdgeSrn();
@@ -139,7 +135,7 @@ void DeltaNotchEdgeInteriorTrackingModifier<DIM>::UpdateCellData(
         for (unsigned i = 0; i < num_cell_edges; ++i)
         {
             // Get neighbouring cell's values of delta on this
-            auto elem_neighbours = rCellPopulation.GetNeighbouringEdgeIndices(*cell_iter, i);
+            auto elem_neighbours = rCellPopulation.GetNeighbouringEdgeIndices(cell_iter, i);
             double mean_delta = 0;
             for (auto neighbourIndex : elem_neighbours)
             {

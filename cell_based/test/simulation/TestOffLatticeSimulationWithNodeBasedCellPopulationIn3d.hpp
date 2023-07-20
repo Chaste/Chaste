@@ -143,11 +143,9 @@ public:
         simulator.Solve();
 
         // Check some results
-        for (auto cell_iter = simulator.rGetCellPopulation().Begin();
-             cell_iter != simulator.rGetCellPopulation().End();
-             ++cell_iter)
+        for (auto cell_iter : simulator.rGetCellPopulation())
         {
-            c_vector<double,3> node_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
+            c_vector<double,3> node_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(cell_iter);
             TS_ASSERT_DELTA(norm_2(node_location-centre), radius, 1e-3);
         }
 
@@ -232,11 +230,9 @@ public:
         simulator.Solve();
 
         // Check some results
-        for (auto cell_iter = simulator.rGetCellPopulation().Begin();
-             cell_iter != simulator.rGetCellPopulation().End();
-             ++cell_iter)
+        for (auto cell_iter : simulator.rGetCellPopulation())
         {
-            c_vector<double,3> node_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
+            c_vector<double,3> node_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(cell_iter);
 
             TS_ASSERT_LESS_THAN_EQUALS(-0.5, node_location[0]);
             TS_ASSERT_LESS_THAN_EQUALS(node_location[0], 0.5);
@@ -288,7 +284,7 @@ public:
         // Use node iterators to make sure we only get the nodes from this process for parallel implementation
         PeriodicNodesOnlyMesh<3>::NodeIterator node_iter_begin = mesh.GetNodeIteratorBegin();
         PeriodicNodesOnlyMesh<3>::NodeIterator node_iter_end = mesh.GetNodeIteratorEnd();
-        for ( PeriodicNodesOnlyMesh<3>::NodeIterator node_iter = node_iter_begin; node_iter != node_iter_end; ++node_iter )
+        for (PeriodicNodesOnlyMesh<3>::NodeIterator node_iter = node_iter_begin; node_iter != node_iter_end; ++node_iter)
         {
             double x_node = (*node_iter).rGetLocation()[0];
             TS_ASSERT_LESS_THAN_EQUALS(0,x_node);
@@ -446,7 +442,7 @@ public:
         // Use node iterators to make sure we only get the nodes from this process for parallel implementation
         PeriodicNodesOnlyMesh<3>::NodeIterator node_iter_begin = mesh.GetNodeIteratorBegin();
         PeriodicNodesOnlyMesh<3>::NodeIterator node_iter_end = mesh.GetNodeIteratorEnd();
-        for ( PeriodicNodesOnlyMesh<3>::NodeIterator node_iter = node_iter_begin; node_iter != node_iter_end; ++node_iter )
+        for (PeriodicNodesOnlyMesh<3>::NodeIterator node_iter = node_iter_begin; node_iter != node_iter_end; ++node_iter)
         {
             double y_node = (*node_iter).rGetLocation()[1];
             TS_ASSERT_LESS_THAN_EQUALS(0,y_node);
@@ -603,7 +599,7 @@ public:
         // Use node iterators to make sure we only get the nodes from this process for parallel implementation
         PeriodicNodesOnlyMesh<3>::NodeIterator node_iter_begin = mesh.GetNodeIteratorBegin();
         PeriodicNodesOnlyMesh<3>::NodeIterator node_iter_end = mesh.GetNodeIteratorEnd();
-        for ( PeriodicNodesOnlyMesh<3>::NodeIterator node_iter = node_iter_begin; node_iter != node_iter_end; ++node_iter )
+        for (PeriodicNodesOnlyMesh<3>::NodeIterator node_iter = node_iter_begin; node_iter != node_iter_end; ++node_iter)
         {
             double z_node = (*node_iter).rGetLocation()[2];
             TS_ASSERT_LESS_THAN_EQUALS(0,z_node);
@@ -762,7 +758,7 @@ public:
         // Use node iterators to make sure we only get the nodes from this process for parallel implementation
         PeriodicNodesOnlyMesh<3>::NodeIterator node_iter_begin = mesh.GetNodeIteratorBegin();
         PeriodicNodesOnlyMesh<3>::NodeIterator node_iter_end = mesh.GetNodeIteratorEnd();
-        for ( PeriodicNodesOnlyMesh<3>::NodeIterator node_iter = node_iter_begin; node_iter != node_iter_end; ++node_iter )
+        for (PeriodicNodesOnlyMesh<3>::NodeIterator node_iter = node_iter_begin; node_iter != node_iter_end; ++node_iter)
         {
             const c_vector<double,3>& node_location = (*node_iter).rGetLocation();
             TS_ASSERT_LESS_THAN_EQUALS(0,node_location[0]);

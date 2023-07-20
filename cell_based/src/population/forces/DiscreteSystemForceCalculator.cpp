@@ -111,7 +111,7 @@ void DiscreteSystemForceCalculator::WriteResultsToFile(
 
     for (unsigned i = 0; i < r_mesh.GetNumNodes(); ++i)
     {
-        global_index = (double) i;
+        global_index = static_cast<double>(i);
 
         x = r_mesh.GetNode(i)->rGetLocation()[0];
         y = r_mesh.GetNode(i)->rGetLocation()[1];

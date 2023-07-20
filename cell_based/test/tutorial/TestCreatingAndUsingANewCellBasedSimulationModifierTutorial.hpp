@@ -163,14 +163,12 @@ public:
         /*
          * Next, we iterate over the cell population...
          */
-        for (auto cell_iter = rCellPopulation.Begin();
-             cell_iter != rCellPopulation.End();
-             ++cell_iter)
+        for (auto cell_iter : rCellPopulation)
         {
             /*
              * ...find its height...
              */
-            double cell_height = rCellPopulation.GetLocationOfCellCentre(*cell_iter)[1];
+            double cell_height = rCellPopulation.GetLocationOfCellCentre(cell_iter)[1];
 
             /*
              * ...and store this in the {{{CellData}}} item "height".

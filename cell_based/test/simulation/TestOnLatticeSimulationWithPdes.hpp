@@ -148,9 +148,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.Solve();
 
         // Test solution is constant
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             double analytic_solution = 1.0;
             // Test that PDE solver is working correctly
@@ -232,9 +230,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.Solve();
 
         // Test solution is constant
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             double analytic_solution = 1.0;
             // Test that PDE solver is working correctly
@@ -299,9 +295,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.Solve();
 
         // Test solution is constant
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             double analytic_solution = 1.0;
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient"), analytic_solution, 1e-2);
@@ -355,9 +349,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.Solve();
 
         // Test solution is constant
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             double analytic_solution = 1.0;
             // Test that PDE solver is working correctly
@@ -412,9 +404,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.Solve();
 
         // Test that PDE solver is working correctly
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("nutrient"),1.0, 1e-2);
         }
@@ -527,9 +517,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.Solve();
 
         // Test solution is constant
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             double analytic_solution = 1.0;
             // Test that PDE solver is working correctly
@@ -550,9 +538,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         TS_ASSERT_DELTA(norm_2(centre_diff), 0.0, 1e-4);
 
         // Test solution is constant
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             double analytic_solution = 1.0;
 
@@ -617,9 +603,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.Solve();
 
         // Test solution is constant
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             double analytic_solution = 1.0;
 

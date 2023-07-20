@@ -54,17 +54,15 @@ double RadialSloughingCellKiller::GetRadius() const
 
 void RadialSloughingCellKiller::CheckAndLabelCellsForApoptosisOrDeath()
 {
-    for (auto cell_iter = this->mpCellPopulation->Begin();
-         cell_iter != this->mpCellPopulation->End();
-         ++cell_iter)
+    for (auto cell_iter : this->mpCellPopulation)
     {
         // Get distance from centre of cell population
-        double r = norm_2(this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter) - mCentre);
+        double r = norm_2(this->mpCellPopulation->GetLocationOfCellCentre(cell_iter) - mCentre);
 
         if (r > mRadius)
         {
             // Mark the cell as killed and store removal information if required.
-            this->mpCellPopulation->KillCell(*cell_iter, "RadialSloughingCellKiller");
+            this->mpCellPopulation->KillCell(cell_iter, "RadialSloughingCellKiller");
         }
     }
 }

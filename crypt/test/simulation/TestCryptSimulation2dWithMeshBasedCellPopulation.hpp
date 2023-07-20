@@ -372,12 +372,10 @@ public:
                             location_indices_set.begin(), location_indices_set.end(),
                             std::inserter(ghost_node_indices, ghost_node_indices.begin()));
 
-        for (auto cell_iter = simulator.rGetCellPopulation().Begin();
-             cell_iter != simulator.rGetCellPopulation().End();
-             ++cell_iter)
+        for (auto cell_iter : simulator.rGetCellPopulation())
         {
-            unsigned index = simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter);
-            c_vector<double, 2> cell_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(*cell_iter);
+            unsigned index = simulator.rGetCellPopulation().GetLocationIndexUsingCell(cell_iter);
+            c_vector<double, 2> cell_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(cell_iter);
 
             AbstractOffLatticeCellPopulation<2,2>* p_offLattice_pop = dynamic_cast<AbstractOffLatticeCellPopulation<2,2>* >(&(simulator.rGetCellPopulation()));
             double damping = p_offLattice_pop->GetDampingConstant(index);
@@ -534,9 +532,7 @@ public:
         simulator.Solve();
 
         // All fully differentiated cells have sloughed off
-        for (auto cell_iter = crypt.Begin();
-             cell_iter != crypt.End();
-             ++cell_iter)
+        for (auto cell_iter : crypt)
         {
              TS_ASSERT_EQUALS(cell_iter->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>(), false);
         }
@@ -1042,11 +1038,9 @@ public:
         simulator.Solve();
 
         // Check that nothing has moved below y=0
-        for (auto cell_iter = crypt.Begin();
-             cell_iter != crypt.End();
-             ++cell_iter)
+        for (auto cell_iter : crypt)
         {
-            TS_ASSERT_LESS_THAN(-1e-15, crypt.GetLocationOfCellCentre(*cell_iter)[1]);
+            TS_ASSERT_LESS_THAN(-1e-15, crypt.GetLocationOfCellCentre(cell_iter)[1]);
         }
 
         std::vector<unsigned> cell_mutation_state_count = simulator.rGetCellPopulation().GetCellMutationStateCount();
@@ -1533,18 +1527,18 @@ public:
 
         // Move the first cell (which should be on y=0) down a bit
         AbstractCellPopulation<2>::Iterator cell_iter = crypt.Begin();
-        TS_ASSERT_DELTA(crypt.GetLocationOfCellCentre(*cell_iter)[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(crypt.GetLocationOfCellCentre(cell_iter)[1], 0.0, 1e-6);
 
         // Move the cell (can't use the iterator for this as it is const)
         crypt.GetNode(0)->rGetModifiableLocation()[1] = -0.1;
-        TS_ASSERT_LESS_THAN(crypt.GetLocationOfCellCentre(*cell_iter)[1], 0.0);
+        TS_ASSERT_LESS_THAN(crypt.GetLocationOfCellCentre(cell_iter)[1], 0.0);
 
         // Run simulation
         simulator.Solve();
 
         // The cell should have been pulled up, but not above y=0. However it should
         // then been moved to above y=0 by the jiggling
-        TS_ASSERT_LESS_THAN(0.0, crypt.GetLocationOfCellCentre(*cell_iter)[1]);
+        TS_ASSERT_LESS_THAN(0.0, crypt.GetLocationOfCellCentre(cell_iter)[1]);
     }
 
     /**

@@ -74,14 +74,12 @@ std::vector<CellPtr> CryptProjectionStatistics::GetCryptSection(double angle)
 
     // Loop over cells and add to the store if they are within a cell's radius of the
     // specified line
-    for (auto cell_iter = mrCrypt.Begin();
-         cell_iter != mrCrypt.End();
-         ++cell_iter)
+    for (auto cell_iter : mrCrypt)
     {
-        if (CellIsInSection(angle, mrCrypt.GetLocationOfCellCentre(*cell_iter)))
+        if (CellIsInSection(angle, mrCrypt.GetLocationOfCellCentre(cell_iter)))
         {
             // Set up a pair, equal to (cell,r) and insert
-            std::pair<CellPtr, double> pair(*cell_iter, norm_2(mrCrypt.GetLocationOfCellCentre(*cell_iter)));
+            std::pair<CellPtr, double> pair(cell_iter, norm_2(mrCrypt.GetLocationOfCellCentre(cell_iter)));
             cells_list.push_back(pair);
         }
     }

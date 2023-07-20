@@ -190,7 +190,7 @@ template<unsigned DIM>
 double PottsMesh<DIM>::GetVolumeOfElement(unsigned index)
 {
     PottsElement<DIM>* p_element = GetElement(index);
-    double element_volume = (double) p_element->GetNumNodes();
+    double element_volume = static_cast<double>(p_element->GetNumNodes());
     return element_volume;
 }
 
@@ -445,8 +445,8 @@ unsigned PottsMesh<DIM>::DivideElement(PottsElement<DIM>* pElement,
             counter_2++;
         }
     }
-    height_midpoint_1 /= (double)counter_1;
-    height_midpoint_2 /= (double)counter_2;
+    height_midpoint_1 /= static_cast<double>(counter_1);
+    height_midpoint_2 /= static_cast<double>(counter_2);
 
     for (unsigned i = num_nodes; i > 0; --i)
     {

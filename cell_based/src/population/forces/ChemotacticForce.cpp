@@ -65,14 +65,12 @@ void ChemotacticForce<DIM>::AddForceContribution(
     CellwiseDataGradient<DIM> gradients;
     gradients.SetupGradients(rCellPopulation, "nutrient");
 
-    for (auto cell_iter = rCellPopulation.Begin();
-         cell_iter != rCellPopulation.End();
-         ++cell_iter)
+    for (auto cell_iter : rCellPopulation)
     {
         // Only labelled cells move chemotactically
         if (cell_iter->template HasCellProperty<CellLabel>())
         {
-            unsigned node_global_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+            unsigned node_global_index = rCellPopulation.GetLocationIndexUsingCell(cell_iter);
 
             c_vector<double, DIM>& r_gradient = gradients.rGetGradient(node_global_index);
             double nutrient_concentration = cell_iter->GetCellData()->GetItem("nutrient");

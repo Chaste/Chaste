@@ -124,18 +124,16 @@ public:
      * any cell whose centre is located outside the ellipse (''x''/20)^2^ + (''y''/10)^2^ < 1. */
     void CheckAndLabelCellsForApoptosisOrDeath()
     {
-        for (auto cell_iter = this->mpCellPopulation->Begin();
-            cell_iter != this->mpCellPopulation->End();
-            ++cell_iter)
+        for (auto cell_iter : *(this->mpCellPopulation))
         {
             c_vector<double, 2> location;
-            location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
+            location = this->mpCellPopulation->GetLocationOfCellCentre(cell_iter);
 
             if (pow(location[0]/20, 2) + pow(location[1]/10, 2) > 1.0)
             {
                 /* This line marks the cell as killed and stores removal information for use by
                  * by the cell writers if the writer {{{CellRemovalLocationsWriter}}} is included.*/
-                this->mpCellPopulation->KillCell(*cell_iter, "MyCellKiller");
+                this->mpCellPopulation->KillCell(cell_iter, "MyCellKiller");
             }
         }
     }
@@ -239,12 +237,10 @@ public:
 
         /* ... and check that any cell whose centre is located outside the ellipse
          * (''x''/20)^2^ + (''y''/10)^2^ < 1 has indeed been labelled as dead. */
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            double x = cell_population.GetLocationOfCellCentre(*cell_iter)[0];
-            double y = cell_population.GetLocationOfCellCentre(*cell_iter)[1];
+            double x = cell_population.GetLocationOfCellCentre(cell_iter)[0];
+            double y = cell_population.GetLocationOfCellCentre(cell_iter)[1];
 
             if (pow(x/20, 2) + pow(y/10, 2) > 1.0)
             {
@@ -260,12 +256,10 @@ public:
          * remaining cells are indeed located within the ellipse. */
         cell_population.RemoveDeadCells();
 
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            double x = cell_population.GetLocationOfCellCentre(*cell_iter)[0];
-            double y = cell_population.GetLocationOfCellCentre(*cell_iter)[1];
+            double x = cell_population.GetLocationOfCellCentre(cell_iter)[0];
+            double y = cell_population.GetLocationOfCellCentre(cell_iter)[1];
 
             TS_ASSERT_LESS_THAN_EQUALS(pow(x/20, 2) + pow(y/10, 2) > 1.0, 1.0);
         }

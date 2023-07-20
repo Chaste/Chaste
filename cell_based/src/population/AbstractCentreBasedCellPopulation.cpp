@@ -284,12 +284,10 @@ void AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AcceptCellWriter
          node_iter != this->rGetMesh().GetNodeIteratorEnd();
          ++node_iter)
     {
-        for (auto cell_writer_iter = this->mCellWriters.begin();
-             cell_writer_iter != this->mCellWriters.end();
-             ++cell_writer_iter)
+        for (auto cell_writer_iter : this->mCellWriters)
         {
             CellPtr cell_from_node = this->GetCellUsingLocationIndex(node_iter->GetIndex());
-            this->AcceptCellWriter(*cell_writer_iter, cell_from_node);
+            this->AcceptCellWriter(cell_writer_iter, cell_from_node);
         }
     }
 }

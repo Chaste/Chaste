@@ -131,14 +131,11 @@ double VertexBasedCellPopulation<DIM>::GetDampingConstant(unsigned nodeIndex)
         EXCEPTION("At time " << SimulationTime::Instance()->GetTime() << ", Node " << nodeIndex << " is not contained in any elements, so GetDampingConstant() returns zero");
     }
 
-    double temp = 1.0/((double) num_containing_elements);
-    for (auto iter = containing_elements.begin();
-         iter != containing_elements.end();
-         ++iter)
+    double temp = 1.0 / static_cast<double>(num_containing_elements);
+    for (auto iter : containing_elements)
     {
-        CellPtr p_cell = this->GetCellUsingLocationIndex(*iter);
+        CellPtr p_cell = this->GetCellUsingLocationIndex(iter);
         bool cell_is_wild_type = p_cell->GetMutationState()->IsType<WildTypeCellMutationState>();
-
         if (cell_is_wild_type)
         {
             average_damping_constant += this->GetDampingConstantNormal()*temp;
@@ -369,16 +366,14 @@ void VertexBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
         this->mCellLocationMap.clear();
         this->mLocationCellMap.clear();
 
-        for (auto cell_iter = this->mCells.begin();
-             cell_iter != this->mCells.end();
-             ++cell_iter)
+        for (auto cell_iter : this->mCells)
         {
             // The cell vector should only ever contain living cells
-            unsigned old_elem_index = old_map[(*cell_iter).get()];
+            unsigned old_elem_index = old_map[(cell_iter).get()];
             assert(!element_map.IsDeleted(old_elem_index));
 
             unsigned new_elem_index = element_map.GetNewIndex(old_elem_index);
-            this->SetCellUsingLocationIndex(new_elem_index, *cell_iter);
+            this->SetCellUsingLocationIndex(new_elem_index, cell_iter);
         }
 
         /*
@@ -408,9 +403,9 @@ void VertexBasedCellPopulation<DIM>::Validate()
 {
     // Check each element has only one cell attached
     std::vector<unsigned> validated_element = std::vector<unsigned>(this->GetNumElements(), 0);
-    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
+    for (auto cell_iter : this->mCells)
     {
-        unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
+        unsigned elem_index = this->GetLocationIndexUsingCell(cell_iter);
         validated_element[elem_index]++;
     }
 
@@ -528,9 +523,7 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(
     if (num_cells > 0)
     {
         // Iterate over any cell writers that are present
-        for (auto cell_writer_iter = this->mCellWriters.begin();
-             cell_writer_iter != this->mCellWriters.end();
-             ++cell_writer_iter)
+        for (auto cell_writer_iter : this->mCellWriters)
         {
             // Create vector to store VTK cell data
             std::vector<double> vtk_cell_data(num_cells);
@@ -548,10 +541,10 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(
                 assert(p_cell);
 
                 // Populate the vector of VTK cell data
-                vtk_cell_data[elem_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(p_cell, this);
+                vtk_cell_data[elem_index] = cell_writer_iter->GetCellDataForVtkOutput(p_cell, this);
             }
 
-            mesh_writer.AddCellData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
+            mesh_writer.AddCellData(cell_writer_iter->GetVtkCellDataName(), vtk_cell_data);
         }
 
         // When outputting any CellData, we assume that the first cell is representative of all cells
@@ -614,9 +607,7 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(
 
         // Iterate over any cell writers that are present
         unsigned num_cells = this->GetNumAllCells();
-        for (auto cell_writer_iter = this->mCellWriters.begin();
-             cell_writer_iter != this->mCellWriters.end();
-             ++cell_writer_iter)
+        for (auto cell_writer_iter : this->mCellWriters)
         {
             // Create vector to store VTK cell data
             std::vector<double> vtk_cell_data(num_cells);
@@ -635,10 +626,10 @@ void VertexBasedCellPopulation<DIM>::WriteCellEdgeVtkResultsToFile(
                 assert(p_cell);
 
                 // Populate the vector of VTK cell data
-                vtk_cell_data[elem_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(p_cell, this);
+                vtk_cell_data[elem_index] = cell_writer_iter->GetCellDataForVtkOutput(p_cell, this);
             }
 
-            mesh_writer.AddCellData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
+            mesh_writer.AddCellData(cell_writer_iter->GetVtkCellDataName(), vtk_cell_data);
         }
 
         // When outputting any CellData, we assume that the first cell is representative of all cells
@@ -1031,23 +1022,19 @@ TetrahedralMesh<DIM, DIM>* VertexBasedCellPopulation<DIM>::GetTetrahedralMeshFor
     (*p_edge_file) << tetrahedral_edges.size() << "\t1" << std::endl;
 
     unsigned edge_index = 0;
-    for (auto edge_iter = tetrahedral_edges.begin();
-         edge_iter != tetrahedral_edges.end();
-         ++edge_iter)
+    for (auto edge_iter : tetrahedral_edges)
     {
-        std::pair<unsigned, unsigned> this_edge = *edge_iter;
-
-        // To be a boundary edge both nodes need to be boundary nodes.
+        // To be a boundary edge, both nodes must be boundary nodes
         bool is_boundary_edge = false;
-        if (this_edge.first  < mpMutableVertexMesh->GetNumNodes() &&
-            this_edge.second  < mpMutableVertexMesh->GetNumNodes())
+        if (edge_iter.first  < mpMutableVertexMesh->GetNumNodes() &&
+            edge_iter.second  < mpMutableVertexMesh->GetNumNodes())
         {
-            is_boundary_edge = (mpMutableVertexMesh->GetNode(this_edge.first)->IsBoundaryNode() &&
-                                mpMutableVertexMesh->GetNode(this_edge.second)->IsBoundaryNode() );
+            is_boundary_edge = (mpMutableVertexMesh->GetNode(edge_iter.first)->IsBoundaryNode() &&
+                                mpMutableVertexMesh->GetNode(edge_iter.second)->IsBoundaryNode() );
         }
         unsigned is_boundary_edge_unsigned = is_boundary_edge ? 1 : 0;
 
-        (*p_edge_file) << edge_index++ << "\t" << this_edge.first << "\t" << this_edge.second << "\t" << is_boundary_edge_unsigned << std::endl;
+        (*p_edge_file) << edge_index++ << "\t" << edge_iter.first << "\t" << edge_iter.second << "\t" << is_boundary_edge_unsigned << std::endl;
     }
     p_edge_file->close();
 
@@ -1170,12 +1157,10 @@ double VertexBasedCellPopulation<DIM>::GetCellDataItemAtPdeNode(
 
             // Average over data from containing elements (cells)
             std::set<unsigned> containing_elements = p_node->rGetContainingElementIndices();
-            for (auto index_iter = containing_elements.begin();
-                 index_iter != containing_elements.end();
-                 ++index_iter)
+            for (auto index_iter : containing_elements)
             {
-                assert(*index_iter < num_nodes);
-                CellPtr p_cell = this->GetCellUsingLocationIndex(*index_iter);
+                assert(index_iter < num_nodes);
+                CellPtr p_cell = this->GetCellUsingLocationIndex(index_iter);
                 value += p_cell->GetCellData()->GetItem(rVariableName);
             }
             value /= containing_elements.size();

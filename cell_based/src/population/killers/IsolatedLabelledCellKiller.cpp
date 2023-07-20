@@ -59,26 +59,22 @@ void IsolatedLabelledCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
     if (num_labelled_cells > 1)
     {
         // Iterate over cell population
-        for (auto cell_iter = this->mpCellPopulation->Begin();
-             cell_iter != this->mpCellPopulation->End();
-             ++cell_iter)
+        for (auto cell_iter : *(this->mpCellPopulation))
         {
             // Only consider cells with the CellLabel property
             if (cell_iter->template HasCellProperty<CellLabel>())
             {
                 // Get the element index corresponding to this cell
-                unsigned elem_index = this->mpCellPopulation->GetLocationIndexUsingCell(*cell_iter);
+                unsigned elem_index = this->mpCellPopulation->GetLocationIndexUsingCell(cell_iter);
 
                 // Get the set of neighbouring element indices
                 std::set<unsigned> neighbouring_elem_indices = vertex_mesh.GetNeighbouringElementIndices(elem_index);
 
                 // Check if any of the corresponding cells have the CellLabel property...
                 unsigned num_labelled_neighbours = 0;
-                for (auto elem_iter = neighbouring_elem_indices.begin();
-                     elem_iter != neighbouring_elem_indices.end();
-                     ++elem_iter)
+                for (auto elem_iter : neighbouring_elem_indices)
                 {
-                    if (this->mpCellPopulation->GetCellUsingLocationIndex(*elem_iter)->template HasCellProperty<CellLabel>())
+                    if (this->mpCellPopulation->GetCellUsingLocationIndex(elem_iter)->template HasCellProperty<CellLabel>())
                     {
                         num_labelled_neighbours++;
                     }
@@ -88,7 +84,7 @@ void IsolatedLabelledCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
                 if (num_labelled_neighbours == 0)
                 {
                     // Mark the cell as killed and store removal information if required.
-                    this->mpCellPopulation->KillCell(*cell_iter, "IsolatedLabelledCellKiller");
+                    this->mpCellPopulation->KillCell(cell_iter, "IsolatedLabelledCellKiller");
                 }
             }
         }

@@ -282,7 +282,7 @@ public:
 
         AbstractCellPopulation<2>::Iterator cell_iter = crypt.Begin();
 
-        double wnt_at_cell0 = p_wnt->GetWntLevel(*cell_iter);
+        double wnt_at_cell0 = p_wnt->GetWntLevel(cell_iter);
 
         double a = p_wnt->GetCryptProjectionParameterA();
         double b = p_wnt->GetCryptProjectionParameterB();
@@ -291,18 +291,18 @@ public:
 
         while (cell_iter != crypt.End())
         {
-            TS_ASSERT_DELTA(p_wnt->GetWntLevel(*cell_iter), wnt_at_cell0, 1e-12);
+            TS_ASSERT_DELTA(p_wnt->GetWntLevel(cell_iter), wnt_at_cell0, 1e-12);
 
             // Test GetWntGradient(CellPtr) method
-            c_vector<double,2> cell_location = crypt.GetLocationOfCellCentre(*cell_iter);
+            c_vector<double,2> cell_location = crypt.GetLocationOfCellCentre(cell_iter);
             double r = norm_2(cell_location);
 
             c_vector<double,2> expected_wnt_gradient;
             expected_wnt_gradient[0] = -cell_location[0]*pow(r,b-1.0)/(a*r);
             expected_wnt_gradient[1] = -cell_location[1]*pow(r,b-1.0)/(a*r);
 
-            TS_ASSERT_DELTA(p_wnt->GetWntGradient(*cell_iter)[0],expected_wnt_gradient[0],1e-6);
-            TS_ASSERT_DELTA(p_wnt->GetWntGradient(*cell_iter)[1],expected_wnt_gradient[1],1e-6);
+            TS_ASSERT_DELTA(p_wnt->GetWntGradient(cell_iter)[0],expected_wnt_gradient[0],1e-6);
+            TS_ASSERT_DELTA(p_wnt->GetWntGradient(cell_iter)[1],expected_wnt_gradient[1],1e-6);
 
             ++cell_iter;
         }
@@ -456,14 +456,12 @@ public:
         // As there is no cell-based simulation we must explicitly initialise the cells
         crypt.InitialiseCells();
 
-        for (auto cell_iter = crypt.Begin();
-             cell_iter != crypt.End();
-             ++cell_iter)
+        for (auto cell_iter : crypt)
         {
             WntCellCycleModel* p_model = static_cast<WntCellCycleModel*>(cell_iter->GetCellCycleModel());
             std::vector<double> proteins = p_model->GetProteinConcentrations();
 
-            if (crypt.GetLocationOfCellCentre(*cell_iter)[1] == 0.0)
+            if (crypt.GetLocationOfCellCentre(cell_iter)[1] == 0.0)
             {
                 TS_ASSERT_DELTA(proteins[5], 4.975124378109454e-03, 1e-3);
                 TS_ASSERT_DELTA(proteins[6]+proteins[7], 6.002649406788524e-01, 1e-3);
@@ -471,7 +469,7 @@ public:
             }
             else
             {
-                TS_ASSERT_DELTA(crypt.GetLocationOfCellCentre(*cell_iter)[1], 1.0, 1e-12);
+                TS_ASSERT_DELTA(crypt.GetLocationOfCellCentre(cell_iter)[1], 1.0, 1e-12);
                 TS_ASSERT_DELTA(proteins[5], 1.000, 1e-3);
                 TS_ASSERT_DELTA(proteins[6]+proteins[7], 0.0074, 1e-3);
                 TS_ASSERT_DELTA(proteins[8], 0.00, 1e-3);

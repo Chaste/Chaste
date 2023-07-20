@@ -89,12 +89,10 @@ void VolumeTrackingModifier<DIM>::UpdateCellData(
     }
 
     // Iterate over cell population
-    for (auto cell_iter = rCellPopulation.Begin();
-         cell_iter != rCellPopulation.End();
-         ++cell_iter)
+    for (auto cell_iter : rCellPopulation)
     {
         // Get the volume of this cell
-        double cell_volume = rCellPopulation.GetVolumeOfCell(*cell_iter);
+        double cell_volume = rCellPopulation.GetVolumeOfCell(cell_iter);
 
         // Store the cell's volume in CellData
         cell_iter->GetCellData()->SetItem("volume", cell_volume);

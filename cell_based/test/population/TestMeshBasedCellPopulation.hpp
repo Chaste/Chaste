@@ -123,12 +123,10 @@ private:
         cell_population.SetMeinekeDivisionSeparation(0.5);
 
         unsigned counter = 0;
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             // Test operator* and that cells are in sync
-            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), counter);
+            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(cell_iter), counter);
 
             // Test operator-> and that cells are in sync
             TS_ASSERT_DELTA(cell_iter->GetAge(), (double)counter, 1e-12);
@@ -247,13 +245,13 @@ public:
 
         // Create two cell pairs
         std::list<CellPtr>::iterator cell_iter = cell_population.rGetCells().begin();
-        CellPtr cell_0 = *cell_iter++;
-        CellPtr cell_1 = *cell_iter;
-        std::pair<CellPtr, CellPtr> cell_pair1 = cell_population.CreateCellPair(cell_0, cell_1);
-        std::pair<CellPtr, CellPtr> cell_pair2 = cell_population.CreateCellPair(cell_1, cell_0);
+        CellPtr p_cell_0 = *(cell_iter++);
+        CellPtr p_cell_1 = *cell_iter;
+        std::pair<CellPtr, CellPtr> cell_pair1 = cell_population.CreateCellPair(p_cell_0, p_cell_1);
+        std::pair<CellPtr, CellPtr> cell_pair2 = cell_population.CreateCellPair(p_cell_1, p_cell_0);
         TS_ASSERT_EQUALS(cell_pair1, cell_pair2);
-        TS_ASSERT_EQUALS((cell_pair1.first == cell_0 || cell_pair1.first == cell_1), true);
-        TS_ASSERT_EQUALS((cell_pair1.second == cell_0 || cell_pair1.second == cell_1), true);
+        TS_ASSERT_EQUALS((cell_pair1.first == p_cell_0 || cell_pair1.first == p_cell_1), true);
+        TS_ASSERT_EQUALS((cell_pair1.second == p_cell_0 || cell_pair1.second == p_cell_1), true);
         TS_ASSERT_DIFFERS(cell_pair1.first,  cell_pair1.second);
     }
 
@@ -643,12 +641,10 @@ public:
         // Get actual cell node indices
         std::set<unsigned> node_indices;
 
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             // Record node index corresponding to cell
-            unsigned node_index = cell_population.GetLocationIndexUsingCell(*cell_iter);
+            unsigned node_index = cell_population.GetLocationIndexUsingCell(cell_iter);
             node_indices.insert(node_index);
         }
 
@@ -861,9 +857,7 @@ public:
         cell_population.SetBoundVoronoiTessellation(false);
 
         // Coverage of writing CellData to VTK
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             cell_iter->GetCellData()->SetItem("var1", (double) 0.0);
             cell_iter->GetCellData()->SetItem("var2", (double) 3.0);
@@ -1159,9 +1153,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "MeshBasedCellPopulation-3-3");
 
         // Coverage of writing CellData to VTK
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             cell_iter->GetCellData()->SetItem("a variable", 0.0);
             cell_iter->GetCellData()->SetItem("another", 100.0);
@@ -1243,16 +1235,14 @@ public:
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Loop over nodes
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             // Record node location
-            c_vector<double,2> node_location = cell_population.GetLocationOfCellCentre(*cell_iter);
+            c_vector<double,2> node_location = cell_population.GetLocationOfCellCentre(cell_iter);
 
             // Test GetLocationOfCellCentre()
-            TS_ASSERT_DELTA(node_location[0], cell_population.GetLocationOfCellCentre(*cell_iter)[0], 1e-9);
-            TS_ASSERT_DELTA(node_location[1], cell_population.GetLocationOfCellCentre(*cell_iter)[1], 1e-9);
+            TS_ASSERT_DELTA(node_location[0], cell_population.GetLocationOfCellCentre(cell_iter)[0], 1e-9);
+            TS_ASSERT_DELTA(node_location[1], cell_population.GetLocationOfCellCentre(cell_iter)[1], 1e-9);
         }
 
         // Test GetWidth() method
@@ -1284,18 +1274,14 @@ public:
         cell_population.SetDataOnAllCells("variable", 100.0);
 
         //Check that the data made it there and that copies of the data are independent
-        for (auto cell_iter = cell_population.Begin();
-                 cell_iter != cell_population.End();
-                 ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             TS_ASSERT_EQUALS(cell_iter->GetCellData()->GetItem("variable"), 100.0);
             cell_iter->GetCellData()->SetItem("variable", 1.0);
         }
 
         cell_population.SetDataOnAllCells("added variable", 200.0);
-        for (auto cell_iter = cell_population.Begin();
-                 cell_iter != cell_population.End();
-                 ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             TS_ASSERT_EQUALS(cell_iter->GetCellData()->GetItem("added variable"), 200.0);
             cell_iter->GetCellData()->SetItem("added variable", 1.0);
@@ -1340,12 +1326,10 @@ public:
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // loop over them to run to time 0.0;
             unsigned index_for_data = 0;
-            for (auto cell_iter = p_cell_population->Begin();
-                 cell_iter != p_cell_population->End();
-                 ++cell_iter)
+            for (auto cell_iter : *p_cell_population)
             {
                 cell_iter->ReadyToDivide();
-                cell_locations.push_back(p_cell_population->GetLocationOfCellCentre(*cell_iter));
+                cell_locations.push_back(p_cell_population->GetLocationOfCellCentre(cell_iter));
                 // Add cell data
                 cell_iter->GetCellData()->SetItem("data", (double) index_for_data);
                 index_for_data++;
@@ -1389,14 +1373,12 @@ public:
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // this checks that individual cells and their models are archived.
             unsigned counter = 0;
-            for (auto cell_iter = p_cell_population->Begin();
-                 cell_iter!=p_cell_population->End();
-                 ++cell_iter)
+            for (auto cell_iter : *p_cell_population)
             {
                 TS_ASSERT_DELTA(cell_iter->GetAge(),(double)(counter),1e-7);
-                TS_ASSERT_DELTA(p_cell_population->GetLocationOfCellCentre(*cell_iter)[0], cell_locations[counter][0], 1e-9);
-                TS_ASSERT_DELTA(p_cell_population->GetLocationOfCellCentre(*cell_iter)[1], cell_locations[counter][1], 1e-9);
-                TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("data"), (double) p_cell_population->GetLocationIndexUsingCell(*cell_iter), 1e-12);
+                TS_ASSERT_DELTA(p_cell_population->GetLocationOfCellCentre(cell_iter)[0], cell_locations[counter][0], 1e-9);
+                TS_ASSERT_DELTA(p_cell_population->GetLocationOfCellCentre(cell_iter)[1], cell_locations[counter][1], 1e-9);
+                TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("data"), (double) p_cell_population->GetLocationIndexUsingCell(cell_iter), 1e-12);
                 counter++;
             }
 
@@ -1510,11 +1492,9 @@ public:
         cell_population.SetCellAncestorsToLocationIndices();
 
         unsigned counter = 0;
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            TS_ASSERT_EQUALS(cell_iter->GetAncestor(), cell_population.GetLocationIndexUsingCell(*cell_iter));
+            TS_ASSERT_EQUALS(cell_iter->GetAncestor(), cell_population.GetLocationIndexUsingCell(cell_iter));
             counter++;
         }
         TS_ASSERT_EQUALS(counter, 5u);
@@ -1524,9 +1504,7 @@ public:
         TS_ASSERT_EQUALS(remaining_ancestors.size(), 5u);
 
         // Reallocate ancestors
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             // Set all cells to have the same ancestor
             MAKE_PTR_ARGS(CellAncestor, p_cell_ancestor, (1u));
@@ -1556,13 +1534,11 @@ public:
         p_mesh->GetNode(0)->MarkAsDeleted();
 
         // Test IsCellAssociatedWithADeletedLocation() method
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            bool is_deleted = cell_population.IsCellAssociatedWithADeletedLocation(*cell_iter);
+            bool is_deleted = cell_population.IsCellAssociatedWithADeletedLocation(cell_iter);
 
-            if (cell_population.GetLocationIndexUsingCell(*cell_iter) == 0)
+            if (cell_population.GetLocationIndexUsingCell(cell_iter) == 0)
             {
                 TS_ASSERT_EQUALS(is_deleted, true);
             }

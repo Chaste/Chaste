@@ -61,23 +61,21 @@ void VolumeDependentAveragedSourceEllipticPde<DIM>::SetupSourceTerms(
      * Loop over cells, find which coarse element it is in, and add volume to 
      * the mSourceTermOnCoarseElements[elem_index].
      */
-    for (auto cell_iter = this->mrCellPopulation.Begin();
-         cell_iter != this->mrCellPopulation.End();
-         ++cell_iter)
+    for (auto cell_iter : this->mrCellPopulation)
     {
         unsigned elem_index = 0;
-        const ChastePoint<DIM>& r_position_of_cell = this->mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
+        const ChastePoint<DIM>& r_position_of_cell = this->mrCellPopulation.GetLocationOfCellCentre(cell_iter);
 
         if (pCellPdeElementMap != nullptr)
         {
-            elem_index = (*pCellPdeElementMap)[*cell_iter];
+            elem_index = (*pCellPdeElementMap)[cell_iter];
         }
         else
         {
             elem_index = rCoarseMesh.GetContainingElementIndex(r_position_of_cell);
         }
 
-        unsigned node_index = this->mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+        unsigned node_index = this->mrCellPopulation.GetLocationIndexUsingCell(cell_iter);
 
         Node<DIM>* p_node = this->mrCellPopulation.GetNode(node_index);
         double radius = p_node->GetRadius();

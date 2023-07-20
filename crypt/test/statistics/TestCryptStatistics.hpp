@@ -242,9 +242,7 @@ public:
         FileComparison( results_file2, "crypt/test/data/MakeMeinekeGraphs/results.vizcelltypes").CompareFiles();
 
         // Next, test LabelSPhaseCells()
-        for (auto cell_iter = crypt.Begin();
-             cell_iter != crypt.End();
-             ++cell_iter)
+        for (auto cell_iter : crypt)
         {
             cell_iter->RemoveCellProperty<CellLabel>();
         }
@@ -252,9 +250,7 @@ public:
 
         // Iterate over cells checking for correct labels
         unsigned counter = 0;
-        for (auto cell_iter = crypt.Begin();
-             cell_iter != crypt.End();
-             ++cell_iter)
+        for (auto cell_iter : crypt)
         {
             bool is_labelled = cell_iter->HasCellProperty<CellLabel>();
             bool in_s_phase = (static_cast <AbstractPhaseBasedCellCycleModel*>(cell_iter->GetCellCycleModel())->GetCurrentCellCyclePhase() == S_PHASE);
@@ -274,9 +270,7 @@ public:
 
         // Iterate over cells checking for correct labels
         counter = 0;
-        for (auto cell_iter = crypt.Begin();
-             cell_iter != crypt.End();
-             ++cell_iter)
+        for (auto cell_iter : crypt)
         {
             TS_ASSERT_EQUALS(cell_iter->GetMutationState()->IsType<WildTypeCellMutationState>(), true);
             TS_ASSERT_EQUALS(cell_iter->HasCellProperty<CellLabel>(), false);
@@ -298,14 +292,12 @@ public:
 
         MAKE_PTR(ApcOneHitCellMutationState, p_apc1);
 
-        for (auto cell_iter = crypt.Begin();
-             cell_iter != crypt.End();
-             ++cell_iter)
+        for (auto cell_iter : crypt)
         {
             bool in_section = false;
             for (unsigned vector_index=0; vector_index<test_section.size(); vector_index++)
             {
-                if (test_section[vector_index] == *cell_iter)
+                if (test_section[vector_index] == cell_iter)
                 {
                     in_section = true;
                 }

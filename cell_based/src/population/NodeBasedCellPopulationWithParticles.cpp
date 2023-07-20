@@ -171,9 +171,9 @@ void NodeBasedCellPopulationWithParticles<DIM>::Validate()
     }
 
     // Look through all of the cells and record what node they are associated with.
-    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
+    for (auto cell_iter : this->mCells)
     {
-        unsigned node_index = this->GetLocationIndexUsingCell((*cell_iter));
+        unsigned node_index = this->GetLocationIndexUsingCell(cell_iter);
 
         // If the node attached to this cell is labelled as a particle, then throw an error
         if (this->GetNode(node_index)->IsParticle())
@@ -183,13 +183,11 @@ void NodeBasedCellPopulationWithParticles<DIM>::Validate()
         validated_nodes[node_index] = true;
     }
 
-    for (auto map_iter = validated_nodes.begin();
-         map_iter != validated_nodes.end();
-         ++map_iter)
+    for (auto map_iter : validated_nodes)
     {
-        if (!map_iter->second)
+        if (!map_iter.second)
         {
-            EXCEPTION("Node " << map_iter->first << " does not appear to be a particle or has a cell associated with it");
+            EXCEPTION("Node " << map_iter.first << " does not appear to be a particle or has a cell associated with it");
         }
     }
 }
@@ -202,14 +200,12 @@ void NodeBasedCellPopulationWithParticles<DIM>::AcceptCellWritersAcrossPopulatio
          ++node_iter)
     {
         // If it isn't a particle then there might be cell writers attached
-        if (! this->IsParticle(node_iter->GetIndex()))
+        if (!this->IsParticle(node_iter->GetIndex()))
         {
-            for (auto cell_writer_iter = this->mCellWriters.begin();
-                 cell_writer_iter != this->mCellWriters.end();
-                 ++cell_writer_iter)
+            for (auto cell_writer_iter : this->mCellWriters)
             {
                 CellPtr cell_from_node = this->GetCellUsingLocationIndex(node_iter->GetIndex());
-                this->AcceptCellWriter(*cell_writer_iter, cell_from_node);
+                this->AcceptCellWriter(cell_writer_iter, cell_from_node);
             }
         }
     }
@@ -255,9 +251,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(
     mesh_writer.SetParallelFiles(*(this->mpNodesOnlyMesh));
 
     // Iterate over any cell writers that are present
-    for (auto cell_writer_iter = this->mCellWriters.begin();
-         cell_writer_iter != this->mCellWriters.end();
-         ++cell_writer_iter)
+    for (auto cell_writer_iter : this->mCellWriters)
     {
         // Create vector to store VTK cell data
         std::vector<double> vtk_cell_data(num_nodes);
@@ -278,18 +272,18 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(
             {
                 // ...otherwise we populate the vector of VTK cell data as usual
                 CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
-                vtk_cell_data[node_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(p_cell, this);
+                vtk_cell_data[node_index] = cell_writer_iter->GetCellDataForVtkOutput(p_cell, this);
             }
         }
 
-        mesh_writer.AddPointData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
+        mesh_writer.AddPointData(cell_writer_iter->GetVtkCellDataName(), vtk_cell_data);
     }
 
     // Loop over cells
-    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
+    for (auto cell_iter : this->mCells)
     {
         // Get the node index corresponding to this cell
-        unsigned global_index = this->GetLocationIndexUsingCell(*cell_iter);
+        unsigned global_index = this->GetLocationIndexUsingCell(cell_iter);
         unsigned node_index = this->rGetMesh().SolveNodeMapping(global_index);
 
         for (unsigned var = 0; var < num_cell_data_items; ++var)
@@ -308,7 +302,7 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(
          ++node_iter)
     {
         unsigned node_index = node_iter->GetIndex();
-        particles[node_index] = (double) (this->IsParticle(node_index));
+        particles[node_index] = static_cast<double>(this->IsParticle(node_index));
     }
 
     mesh_writer.AddPointData("Non-particles", particles);

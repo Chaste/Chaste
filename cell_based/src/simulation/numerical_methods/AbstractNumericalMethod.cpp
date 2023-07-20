@@ -130,11 +130,9 @@ void AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryConditions(
     std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldNodeLocations)
 {
     // Apply any boundary conditions
-    for (auto bcs_iter = mpBoundaryConditions->begin();
-         bcs_iter != mpBoundaryConditions->end();
-         ++bcs_iter)
+    for (auto bcs_iter : *mpBoundaryConditions)
     {
-        (*bcs_iter)->ImposeBoundaryCondition(rOldNodeLocations);
+        bcs_iter->ImposeBoundaryCondition(rOldNodeLocations);
     }
 }
 

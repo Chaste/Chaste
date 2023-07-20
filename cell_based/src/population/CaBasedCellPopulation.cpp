@@ -145,9 +145,9 @@ TetrahedralMesh<DIM, DIM>* CaBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeM
 
     // Create nodes at the centre of the cells
     unsigned cell_index = 0;
-    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
+    for (auto cell_iter : this->mCells)
     {
-        temp_nodes.push_back(new Node<DIM>(cell_index, this->GetLocationOfCellCentre(*cell_iter)));
+        temp_nodes.push_back(new Node<DIM>(cell_index, this->GetLocationOfCellCentre(cell_iter)));
         cell_index++;
     }
 
@@ -293,12 +293,10 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
     {
         // Iterate over cells
         ///\todo make this sweep random
-        for (auto cell_iter = this->mCells.begin();
-             cell_iter != this->mCells.end();
-             ++cell_iter)
+        for (auto cell_iter : this->mCells)
         {
             // Loop over neighbours and calculate probability of moving (make sure all probabilities are <1)
-            unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
+            unsigned node_index = this->GetLocationIndexUsingCell(cell_iter);
 
             // Find a random available neighbouring node to overwrite current site
             std::set<unsigned> neighbouring_node_indices = static_cast<PottsMesh<DIM>& >((this->mrMesh)).GetMooreNeighbouringNodeIndices(node_index);
@@ -318,7 +316,7 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
 
                     neighbouring_node_indices_vector.push_back(*iter);
 
-                    if (IsSiteAvailable(*iter, *cell_iter))
+                    if (IsSiteAvailable(*iter, cell_iter))
                     {
                         // Iterating over the update rule
                         for (auto iter_rule = this->mUpdateRuleCollection.begin();
@@ -326,7 +324,7 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                              ++iter_rule)
                         {
                             // This static cast is fine, since we assert the update rule must be a CA update rule in AddUpdateRule()
-                            double p = (boost::static_pointer_cast<AbstractCaUpdateRule<DIM> >(*iter_rule))->EvaluateProbability(node_index, *iter, *this, dt, 1, *cell_iter);
+                            double p = (boost::static_pointer_cast<AbstractCaUpdateRule<DIM> >(*iter_rule))->EvaluateProbability(node_index, *iter, *this, dt, 1, cell_iter);
                             probability_of_moving += p;
                             if (probability_of_moving < 0)
                             {
@@ -364,7 +362,7 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                     {
                         // Move the cell to this neighbour location
                         unsigned chosen_neighbour_location_index = neighbouring_node_indices_vector[counter];
-                        this->MoveCellInLocationMap((*cell_iter), node_index, chosen_neighbour_location_index);
+                        this->MoveCellInLocationMap((cell_iter), node_index, chosen_neighbour_location_index);
                         break;
                     }
                 }
@@ -665,10 +663,10 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
     // Populate a vector of nodes associated with cell locations, by iterating through the list of cells
     std::vector<Node<DIM>*> nodes;
     unsigned node_index = 0;
-    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
+    for (auto cell_iter : this->mCells)
     {
         // Get the location index of this cell and update the counter number_of_cells_at_site
-        unsigned location_index = this->GetLocationIndexUsingCell(*cell_iter);
+        unsigned location_index = this->GetLocationIndexUsingCell(cell_iter);
         number_of_cells_at_site[location_index]++;
         assert(number_of_cells_at_site[location_index] <= mLatticeCarryingCapacity);
 
@@ -683,7 +681,7 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
 
             if (DIM == 2)
             {
-                double angle = (double)number_of_cells_at_site[location_index]*2.0*M_PI/(double)mLatticeCarryingCapacity;
+                double angle = static_cast<double>(number_of_cells_at_site[location_index])*2.0*M_PI / static_cast<double>(mLatticeCarryingCapacity);
                 offset[0] = 0.2*sin(angle);
                 offset[1] = 0.2*cos(angle);
             }
@@ -707,9 +705,7 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
     }
 
     // Iterate over any cell writers that are present
-    for (auto cell_writer_iter = this->mCellWriters.begin();
-         cell_writer_iter != this->mCellWriters.end();
-         ++cell_writer_iter)
+    for (auto cell_writer_iter : this->mCellWriters)
     {
         // Create vector to store VTK cell data
         // (using a default value of -1 to correspond to an empty lattice site)
@@ -717,23 +713,19 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
 
         // Loop over cells
         unsigned cell_index = 0;
-        for (auto cell_iter = this->Begin();
-             cell_iter != this->End();
-             ++cell_iter)
+        for (auto cell_iter : this->mCells)
         {
             // Populate the vector of VTK cell data
-            vtk_cell_data[cell_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(*cell_iter, this);
+            vtk_cell_data[cell_index] = cell_writer_iter->GetCellDataForVtkOutput(cell_iter, this);
             cell_index++;
         }
 
-        mesh_writer.AddPointData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
+        mesh_writer.AddPointData(cell_writer_iter->GetVtkCellDataName(), vtk_cell_data);
     }
 
     // Loop over cells to output the cell data
     unsigned cell_index = 0;
-    for (auto cell_iter = this->Begin();
-         cell_iter != this->End();
-         ++cell_iter)
+    for (auto cell_iter : this->mCells)
     {
         for (unsigned var = 0; var < num_cell_data_items; ++var)
         {

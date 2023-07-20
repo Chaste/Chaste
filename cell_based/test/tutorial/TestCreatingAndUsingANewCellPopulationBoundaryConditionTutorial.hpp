@@ -138,11 +138,9 @@ public:
      */
     void ImposeBoundaryCondition(const std::map<Node<2>*, c_vector<double, 2> >& rOldLocations)
     {
-        for (auto cell_iter = this->mpCellPopulation->Begin();
-             cell_iter != this->mpCellPopulation->End();
-             ++cell_iter)
+        for (auto cell_iter : *(this->mpCellPopulation))
         {
-            unsigned node_index = this->mpCellPopulation->GetLocationIndexUsingCell(*cell_iter);
+            unsigned node_index = this->mpCellPopulation->GetLocationIndexUsingCell(cell_iter);
             Node<2>* p_node = this->mpCellPopulation->GetNode(node_index);
             double y_coordinate = p_node->rGetLocation()[1];
 
@@ -166,11 +164,9 @@ public:
     {
         bool condition_satisfied = true;
 
-        for (auto cell_iter = this->mpCellPopulation->Begin();
-             cell_iter != this->mpCellPopulation->End();
-             ++cell_iter)
+        for (auto cell_iter : *(this->mpCellPopulation))
         {
-            c_vector<double, 2> cell_location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
+            c_vector<double, 2> cell_location = this->mpCellPopulation->GetLocationOfCellCentre(cell_iter);
             double y_coordinate = cell_location(1);
 
             if ((y_coordinate < 0.0) || (y_coordinate > 5.0))

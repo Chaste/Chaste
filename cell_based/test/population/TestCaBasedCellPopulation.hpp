@@ -116,11 +116,9 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetIterateRandomlyOverUpdateRuleCollection(), false);
 
         // For coverage of GetVolumeOfCell()
-        for (auto cell_iter2 = cell_population.Begin();
-             cell_iter2 != cell_population.End();
-             ++cell_iter2)
+        for (auto cell_iter2 : cell_population)
         {
-            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter2), 1.0, 1e-6);
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_iter2), 1.0, 1e-6);
         }
 
         // For coverage of GetWidth() method (note that this returns the size of the underlying mesh, not the population of cells)
@@ -341,9 +339,7 @@ public:
 
         // Coverage of writing CellData to VTK
         double index = 0.0;
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             index++;
             cell_iter->GetCellData()->SetItem("var1", 3.0);
@@ -701,11 +697,9 @@ public:
         CaBasedCellPopulation<2u> cell_population(*p_mesh, cells, location_indices);
 
         unsigned location_index = 0;
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), location_index);
+            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(cell_iter), location_index);
             location_index++;
         }
 
@@ -713,11 +707,9 @@ public:
         TS_ASSERT_THROWS_NOTHING(cell_population.UpdateCellLocations(0.1));
 
         location_index = 0;
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), location_index);
+            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(cell_iter), location_index);
             location_index++;
         }
 
@@ -806,9 +798,7 @@ public:
                 new CaBasedCellPopulation<2>(*p_mesh, cells, location_indices, 4);
 
             // Run each cell to time 0
-            for (auto cell_iter = p_cell_population->Begin();
-                 cell_iter != p_cell_population->End();
-                 ++cell_iter)
+            for (auto cell_iter : *p_cell_population)
             {
                 cell_iter->ReadyToDivide();
             }

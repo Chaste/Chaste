@@ -73,35 +73,31 @@ void SloughingCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
     {
         case 1:
         {
-            for (auto cell_iter = this->mpCellPopulation->Begin();
-                 cell_iter != this->mpCellPopulation->End();
-                 ++cell_iter)
+            for (auto cell_iter : this->mpCellPopulation)
             {
-                double x = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter)[0];
+                double x = this->mpCellPopulation->GetLocationOfCellCentre(cell_iter)[0];
 
                 if (x > mSloughHeight)
                 {
                     // Mark the cell as killed and store removal information if required.
-                    this->mpCellPopulation->KillCell(*cell_iter, "SloughingCellKiller");
+                    this->mpCellPopulation->KillCell(cell_iter, "SloughingCellKiller");
                 }
             }
             break;
         }
         case 2:
         {
-            for (auto cell_iter = this->mpCellPopulation->Begin();
-                 cell_iter != this->mpCellPopulation->End();
-                 ++cell_iter)
+            for (auto cell_iter : this->mpCellPopulation)
             {
                 c_vector<double, 2> location;
-                location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
+                location = this->mpCellPopulation->GetLocationOfCellCentre(cell_iter);
                 double x = location[0];
                 double y = location[1];
 
                 if ((y>mSloughHeight) || (mSloughSides && ((x<0.0) || (x>mSloughWidth))))
                 {
                     // Mark the cell as killed and store removal information if required.
-                    this->mpCellPopulation->KillCell(*cell_iter, "SloughingCellKiller");
+                    this->mpCellPopulation->KillCell(cell_iter, "SloughingCellKiller");
                 }
             }
             break;

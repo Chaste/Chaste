@@ -83,12 +83,10 @@ public:
         TS_ASSERT_EQUALS(sloughing_cell_killer.GetIdentifier(), "SloughingCellKiller-2");
 
         // Check that cells were labelled for death correctly
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            double x = cell_population.GetLocationOfCellCentre(*cell_iter)[0];
-            double y = cell_population.GetLocationOfCellCentre(*cell_iter)[1];
+            double x = cell_population.GetLocationOfCellCentre(cell_iter)[0];
+            double y = cell_population.GetLocationOfCellCentre(cell_iter)[1];
 
             if ((x<0) || (x>0.5) || (y>0.5))
             {
@@ -102,12 +100,10 @@ public:
 
         cell_population.RemoveDeadCells();
 
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            double x = cell_population.GetLocationOfCellCentre(*cell_iter)[0];
-            double y = cell_population.GetLocationOfCellCentre(*cell_iter)[1];
+            double x = cell_population.GetLocationOfCellCentre(cell_iter)[0];
+            double y = cell_population.GetLocationOfCellCentre(cell_iter)[1];
 
             TS_ASSERT_LESS_THAN_EQUALS(x, 0.5);
             TS_ASSERT_LESS_THAN_EQUALS(y, 0.5);
@@ -136,11 +132,9 @@ public:
         sloughing_cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         // Check that cells were labelled for death correctly
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            double y = cell_population.GetLocationOfCellCentre(*cell_iter)[1];
+            double y = cell_population.GetLocationOfCellCentre(cell_iter)[1];
             if (y > 0.5)
             {
                 TS_ASSERT_EQUALS(cell_iter->IsDead(), true);
@@ -153,11 +147,9 @@ public:
 
         cell_population.RemoveDeadCells();
 
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            double y = cell_population.GetLocationOfCellCentre(*cell_iter)[1];
+            double y = cell_population.GetLocationOfCellCentre(cell_iter)[1];
             TS_ASSERT_LESS_THAN_EQUALS(y, 0.5);
         }
     }
@@ -185,11 +177,9 @@ public:
         sloughing_cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         // Check that cells were labelled for death correctly
-        for (auto cell_iter = cell_population.Begin();
-            cell_iter != cell_population.End();
-            ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            double x = cell_population.GetLocationOfCellCentre(*cell_iter)[0];
+            double x = cell_population.GetLocationOfCellCentre(cell_iter)[0];
             if (x > crypt_length)
             {
                 TS_ASSERT_EQUALS(cell_iter->IsDead(), true);
@@ -203,11 +193,9 @@ public:
         // Check that dead cells were correctly removed
         cell_population.RemoveDeadCells();
 
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            double x = cell_population.GetLocationOfCellCentre(*cell_iter)[0];
+            double x = cell_population.GetLocationOfCellCentre(cell_iter)[0];
             TS_ASSERT_LESS_THAN_EQUALS(x, crypt_length);
         }
     }
@@ -308,11 +296,9 @@ public:
         radial_cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         // Check that cells were labelled for death correctly
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            double r = norm_2(cell_population.GetLocationOfCellCentre(*cell_iter) - centre);
+            double r = norm_2(cell_population.GetLocationOfCellCentre(cell_iter) - centre);
 
             if (r > radius)
             {
@@ -328,11 +314,9 @@ public:
         cell_population.RemoveDeadCells();
 
         // Check that we are correctly left with cells inside the circle of death
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            double r = norm_2(cell_population.GetLocationOfCellCentre(*cell_iter) - centre);
+            double r = norm_2(cell_population.GetLocationOfCellCentre(cell_iter) - centre);
             TS_ASSERT_LESS_THAN_EQUALS(r, radius);
         }
     }

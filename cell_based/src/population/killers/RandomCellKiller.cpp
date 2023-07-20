@@ -85,11 +85,9 @@ void RandomCellKiller<DIM>::CheckAndLabelSingleCellForApoptosis(CellPtr pCell)
 template<unsigned DIM>
 void RandomCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 {
-    for (auto cell_iter = this->mpCellPopulation->Begin();
-         cell_iter != this->mpCellPopulation->End();
-         ++cell_iter)
+    for (auto cell_iter : *(this->mpCellPopulation))
     {
-        CheckAndLabelSingleCellForApoptosis(*cell_iter);
+        CheckAndLabelSingleCellForApoptosis(cell_iter);
     }
 }
 

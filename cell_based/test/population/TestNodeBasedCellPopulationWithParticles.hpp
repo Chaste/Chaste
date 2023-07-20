@@ -188,11 +188,9 @@ public:
 
         // Check the iterator doesn't loop over particles
         unsigned counter = 0;
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            unsigned node_index = cell_population.GetLocationIndexUsingCell(*cell_iter);
+            unsigned node_index = cell_population.GetLocationIndexUsingCell(cell_iter);
             TS_ASSERT(!is_particle[node_index]);
             counter++;
         }
@@ -234,9 +232,7 @@ public:
 
         // Iterate over cell population and check there is a single cell
         unsigned counter = 0;
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             counter++;
         }
@@ -253,9 +249,7 @@ public:
 
         // Iterate over cell population and check there are now no cells
         counter = 0;
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             counter++;
         }
@@ -351,12 +345,10 @@ public:
         // Get actual cell node indices
         std::set<unsigned> node_indices_with_particles;
 
-        for (auto cell_iter = cell_population_with_particles.Begin();
-             cell_iter != cell_population_with_particles.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population_with_particles)
         {
             // Record node index corresponding to cell
-            unsigned node_index_with_particles = cell_population_with_particles.GetLocationIndexUsingCell(*cell_iter);
+            unsigned node_index_with_particles = cell_population_with_particles.GetLocationIndexUsingCell(cell_iter);
             node_indices_with_particles.insert(node_index_with_particles);
         }
 
@@ -490,9 +482,7 @@ public:
         NodeBasedCellPopulationWithParticles<3> cell_population(*p_mesh, cells, location_indices);
 
         // Coverage of writing CellData to VTK
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             cell_iter->GetCellData()->SetItem("var0", 1.0);
             cell_iter->GetCellData()->SetItem("var1", 2.0);
@@ -593,9 +583,7 @@ public:
 
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // loop over them to run to time 0.0;
-            for (auto cell_iter = p_cell_population->Begin();
-                cell_iter != p_cell_population->End();
-                ++cell_iter)
+            for (auto cell_iter : *p_cell_population)
             {
                 cell_iter->ReadyToDivide();
             }
@@ -635,9 +623,7 @@ public:
             // this checks that individual cells and their models are archived.
             unsigned counter = 0;
 
-            for (auto cell_iter = p_cell_population->Begin();
-                 cell_iter != p_cell_population->End();
-                 ++cell_iter)
+            for (auto cell_iter : *p_cell_population)
             {
                 TS_ASSERT_DELTA(cell_iter->GetAge(), (double)(counter), 1e-7);
                 counter++;

@@ -195,9 +195,9 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::Validate()
 {
     std::vector<bool> validated_node = std::vector<bool>(this->GetNumNodes(), false);
 
-    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
+    for (auto cell_iter : this->mCells)
     {
-        unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
+        unsigned node_index = this->GetLocationIndexUsingCell(cell_iter);
         validated_node[node_index] = true;
     }
 
@@ -660,35 +660,29 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteVtkResultsToFile(
 
         // Iterate over any cell writers that are present
         unsigned num_cells = this->GetNumAllCells();
-        for (auto cell_writer_iter = this->mCellWriters.begin();
-             cell_writer_iter != this->mCellWriters.end();
-             ++cell_writer_iter)
+        for (auto cell_writer_iter : this->mCellWriters)
         {
             // Create vector to store VTK cell data
             std::vector<double> vtk_cell_data(num_cells);
 
             // Loop over cells
-            for (auto cell_iter = this->Begin();
-                 cell_iter != this->End();
-                 ++cell_iter)
+            for (auto cell_iter : this->mCells)
             {
                 // Get the node index corresponding to this cell
-                unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
+                unsigned node_index = this->GetLocationIndexUsingCell(cell_iter);
 
                 // Populate the vector of VTK cell data
-                vtk_cell_data[node_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(*cell_iter, this);
+                vtk_cell_data[node_index] = cell_writer_iter->GetCellDataForVtkOutput(cell_iter, this);
             }
 
-            cells_writer.AddPointData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
+            cells_writer.AddPointData(cell_writer_iter->GetVtkCellDataName(), vtk_cell_data);
         }
 
         // Loop over cells
-        for (auto cell_iter = this->Begin();
-             cell_iter != this->End();
-             ++cell_iter)
+        for (auto cell_iter : this->mCells)
         {
             // Get the node index corresponding to this cell
-            unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
+            unsigned node_index = this->GetLocationIndexUsingCell(cell_iter);
 
             for (unsigned var = 0; var < num_cell_data_items; ++var)
             {
@@ -716,9 +710,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteVtkResultsToFile(
 
         // Iterate over any cell writers that are present
         unsigned num_cells = this->GetNumAllCells();
-        for (auto cell_writer_iter = this->mCellWriters.begin();
-             cell_writer_iter != this->mCellWriters.end();
-             ++cell_writer_iter)
+        for (auto cell_writer_iter : this->mCellWriters)
         {
             // Create vector to store VTK cell data
             std::vector<double> vtk_cell_data(num_cells);
@@ -736,10 +728,10 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteVtkResultsToFile(
                 CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
 
                 // Populate the vector of VTK cell data
-                vtk_cell_data[elem_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(p_cell, this);
+                vtk_cell_data[elem_index] = cell_writer_iter->GetCellDataForVtkOutput(p_cell, this);
             }
 
-            mesh_writer.AddCellData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
+            mesh_writer.AddCellData(cell_writer_iter->GetVtkCellDataName(), vtk_cell_data);
         }
 
         // Loop over elements of mpVoronoiTessellation

@@ -179,19 +179,15 @@ void OffLatticeSimulation<ELEMENT_DIM, SPACE_DIM>::ApplyBoundaries(
     std::map<Node<SPACE_DIM>*,c_vector<double, SPACE_DIM> > oldNodeLoctions)
 {
     // Apply any boundary conditions
-    for (auto bcs_iter = mBoundaryConditions.begin();
-         bcs_iter != mBoundaryConditions.end();
-         ++bcs_iter)
+    for (auto bcs_iter : mBoundaryConditions)
     {
-        (*bcs_iter)->ImposeBoundaryCondition(oldNodeLoctions);
+        bcs_iter->ImposeBoundaryCondition(oldNodeLoctions);
     }
 
     // Verify that each boundary condition is now satisfied
-    for (auto bcs_iter = mBoundaryConditions.begin();
-         bcs_iter != mBoundaryConditions.end();
-         ++bcs_iter)
+    for (auto bcs_iter : mBoundaryConditions)
     {
-        if (!((*bcs_iter)->VerifyBoundaryCondition()))
+        if (!(bcs_iter->VerifyBoundaryCondition()))
         {
             EXCEPTION("The cell population boundary conditions are incompatible.");
         }

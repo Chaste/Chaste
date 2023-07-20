@@ -74,11 +74,9 @@ void AbstractTargetAreaModifier<DIM>::UpdateTargetAreas(
      * Loop over the list of cells, rather than using the population iterator, 
      * so as to include dead cells.
      */
-    for (auto cell_iter = rCellPopulation.rGetCells().begin();
-         cell_iter != rCellPopulation.rGetCells().end();
-         ++cell_iter)
+    for (auto cell_iter : rCellPopulation.rGetCells())
     {
-        UpdateTargetAreaOfCell(*cell_iter);
+        UpdateTargetAreaOfCell(cell_iter);
     }
 }
 

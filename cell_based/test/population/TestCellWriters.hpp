@@ -153,11 +153,9 @@ public:
         // Output data for each cell to file
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            cell_writer.VisitCell(*cell_iter, &cell_population);
+            cell_writer.VisitCell(cell_iter, &cell_population);
         }
         cell_writer.CloseFile();
 
@@ -249,11 +247,9 @@ public:
         CellAncestorWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            cell_writer.VisitCell(*cell_iter, &cell_population);
+            cell_writer.VisitCell(cell_iter, &cell_population);
         }
         cell_writer.CloseFile();
 
@@ -350,11 +346,9 @@ public:
         CellDeltaNotchWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            cell_writer.VisitCell(*cell_iter, &cell_population);
+            cell_writer.VisitCell(cell_iter, &cell_population);
         }
         cell_writer.CloseFile();
 
@@ -436,11 +430,9 @@ public:
         CellDataItemWriter<2,2> cell_writer("test_variable");
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            cell_writer.VisitCell(*cell_iter, &cell_population);
+            cell_writer.VisitCell(cell_iter, &cell_population);
         }
         cell_writer.CloseFile();
 
@@ -537,11 +529,9 @@ public:
         CellIdWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            cell_writer.VisitCell(*cell_iter, &cell_population);
+            cell_writer.VisitCell(cell_iter, &cell_population);
         }
         cell_writer.CloseFile();
 
@@ -632,11 +622,9 @@ public:
         CellLabelWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            cell_writer.VisitCell(*cell_iter, &cell_population);
+            cell_writer.VisitCell(cell_iter, &cell_population);
         }
         cell_writer.CloseFile();
 
@@ -716,11 +704,9 @@ public:
         CellLocationIndexWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            cell_writer.VisitCell(*cell_iter, &cell_population);
+            cell_writer.VisitCell(cell_iter, &cell_population);
         }
 
         cell_writer.CloseFile();
@@ -810,11 +796,9 @@ public:
         CellMutationStatesWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            cell_writer.VisitCell(*cell_iter, &cell_population);
+            cell_writer.VisitCell(cell_iter, &cell_population);
         }
         cell_writer.CloseFile();
 
@@ -903,11 +887,9 @@ public:
         CellProliferativePhasesWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            cell_writer.VisitCell(*cell_iter, &cell_population);
+            cell_writer.VisitCell(cell_iter, &cell_population);
         }
         cell_writer.CloseFile();
 
@@ -1011,11 +993,9 @@ public:
         CellProliferativeTypesWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (auto other_cell_iter = cell_population.Begin();
-             other_cell_iter != cell_population.End();
-             ++other_cell_iter)
+        for (auto other_cell_iter : cell_population)
         {
-            cell_writer.VisitCell(*other_cell_iter, &cell_population);
+            cell_writer.VisitCell(other_cell_iter, &cell_population);
         }
         cell_writer.CloseFile();
 
@@ -1121,11 +1101,9 @@ public:
         LegacyCellProliferativeTypesWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (auto other_cell_iter = cell_population.Begin();
-             other_cell_iter != cell_population.End();
-             ++other_cell_iter)
+        for (auto other_cell_iter : cell_population)
         {
-            cell_writer.VisitCell(*other_cell_iter, &cell_population);
+            cell_writer.VisitCell(other_cell_iter, &cell_population);
         }
         cell_writer.CloseFile();
 
@@ -1221,11 +1199,9 @@ public:
         CellCycleModelProteinConcentrationsWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            cell_writer.VisitCell(*cell_iter, &cell_population);
+            cell_writer.VisitCell(cell_iter, &cell_population);
         }
         cell_writer.CloseFile();
 
@@ -1352,11 +1328,9 @@ public:
         CellVolumesWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            cell_writer.VisitCell(*cell_iter, &cell_population);
+            cell_writer.VisitCell(cell_iter, &cell_population);
         }
         cell_writer.CloseFile();
 
@@ -1432,11 +1406,9 @@ public:
             CellRosetteRankWriter<2, 2> cell_writer;
             cell_writer.OpenOutputFile(output_file_handler);
             cell_writer.WriteTimeStamp();
-            for (auto cell_iter = cell_population.Begin();
-                 cell_iter != cell_population.End();
-                 ++cell_iter)
+            for (auto cell_iter : cell_population)
             {
-                cell_writer.VisitCell(*cell_iter, &cell_population);
+                cell_writer.VisitCell(cell_iter, &cell_population);
             }
             cell_writer.CloseFile();
 
@@ -1482,11 +1454,9 @@ public:
             CellRosetteRankWriter<2, 2> cell_writer;
             cell_writer.OpenOutputFile(output_file_handler);
             cell_writer.WriteTimeStamp();
-            for (auto cell_iter = cell_population.Begin();
-                 cell_iter != cell_population.End();
-                 ++cell_iter)
+            for (auto cell_iter : cell_population)
             {
-                TS_ASSERT_THROWS_THIS(cell_writer.VisitCell(*cell_iter, &cell_population),
+                TS_ASSERT_THROWS_THIS(cell_writer.VisitCell(cell_iter, &cell_population),
                                       "Rosettte rank is only associated with vertex-based cell populations");
             }
             cell_writer.CloseFile();
@@ -1561,11 +1531,9 @@ public:
         CellRadiusWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            cell_writer.VisitCell(*cell_iter, &cell_population);
+            cell_writer.VisitCell(cell_iter, &cell_population);
         }
         cell_writer.CloseFile();
 
@@ -1652,9 +1620,9 @@ public:
         CellAppliedForceWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (auto cell_iter = cell_population.Begin(); cell_iter != cell_population.End(); ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            cell_writer.VisitCell(*cell_iter, &cell_population);
+            cell_writer.VisitCell(cell_iter, &cell_population);
         }
         cell_writer.CloseFile();
 

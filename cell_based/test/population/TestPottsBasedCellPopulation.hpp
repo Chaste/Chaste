@@ -110,11 +110,9 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetIterateRandomlyOverUpdateRuleCollection(), false);
 
         // For coverage of GetVolumeOfCell()
-        for (auto cell_iter2 = cell_population.Begin();
-             cell_iter2 != cell_population.End();
-             ++cell_iter2)
+        for (auto cell_iter2 : cell_population)
         {
-            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter2), 4.0, 1e-6);
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_iter2), 4.0, 1e-6);
         }
 
         // Test GetNeighbouringLocationIndices() method
@@ -143,13 +141,11 @@ public:
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells, false, false);
 
         // Test IsCellAssociatedWithADeletedLocation() method
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            bool is_deleted = cell_population.IsCellAssociatedWithADeletedLocation(*cell_iter);
+            bool is_deleted = cell_population.IsCellAssociatedWithADeletedLocation(cell_iter);
 
-            if (cell_population.GetLocationIndexUsingCell(*cell_iter) == 0)
+            if (cell_population.GetLocationIndexUsingCell(cell_iter) == 0)
             {
                 TS_ASSERT_EQUALS(is_deleted, true);
             }
@@ -593,7 +589,7 @@ public:
             expected(0) = 0.5 + 2*(i%2 != 0);
             expected(1) = 0.5 + 2*(i > 1);
 
-            double drift = norm_2(cell_location-expected);
+            double drift = norm_2(cell_location - expected);
             TS_ASSERT_LESS_THAN(drift, 1e-6);
 
             ++cell_iter;
@@ -659,9 +655,7 @@ public:
 
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // loop over them to run to time 0.0;
-            for (auto cell_iter = p_cell_population->Begin();
-                 cell_iter != p_cell_population->End();
-                 ++cell_iter)
+            for (auto cell_iter : *p_cell_population)
             {
                 cell_iter->ReadyToDivide();
             }

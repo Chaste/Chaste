@@ -58,12 +58,10 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulatio
     // Calculate the distance between each node and the centre of the cell population, as well as the maximum of these
     std::map<double, CellPtr> radius_cell_map;
     double max_distance_from_centre = 0.0;
-    for (auto cell_iter = pCellPopulation->Begin();
-         cell_iter != pCellPopulation->End();
-         ++cell_iter)
+    for (auto cell_iter : *pCellPopulation)
     {
-        double distance = norm_2(pCellPopulation->GetLocationOfCellCentre(*cell_iter) - centre);
-        radius_cell_map[distance] = *cell_iter;
+        double distance = norm_2(pCellPopulation->GetLocationOfCellCentre(cell_iter) - centre);
+        radius_cell_map[distance] = cell_iter;
 
         if (distance > max_distance_from_centre)
         {
@@ -75,7 +73,7 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulatio
     std::vector<double> radius_intervals;
     for (unsigned i = 0; i < mNumRadialBins; ++i)
     {
-        double upper_radius = max_distance_from_centre*((double) i+1)/((double) mNumRadialBins);
+        double upper_radius = max_distance_from_centre * (static_cast<double>(i + 1)) / static_cast<double>(mNumRadialBins);
         radius_intervals.push_back(upper_radius);
     }
 
@@ -96,7 +94,7 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulatio
         }
         if (counter != 0)
         {
-            average_solution /= (double) counter;
+            average_solution /= static_cast<double>(counter);
         }
 
         // Write results to file
@@ -115,12 +113,10 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
     // Calculate the distance between each node and the centre of the cell population, as well as the maximum of these
     std::map<double, CellPtr> radius_cell_map;
     double max_distance_from_centre = 0.0;
-    for (auto cell_iter = pCellPopulation->Begin();
-         cell_iter != pCellPopulation->End();
-         ++cell_iter)
+    for (auto cell_iter : *pCellPopulation)
     {
-        double distance = norm_2(pCellPopulation->GetLocationOfCellCentre(*cell_iter) - centre);
-        radius_cell_map[distance] = *cell_iter;
+        double distance = norm_2(pCellPopulation->GetLocationOfCellCentre(cell_iter) - centre);
+        radius_cell_map[distance] = cell_iter;
 
         if (distance > max_distance_from_centre)
         {
@@ -132,7 +128,7 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
     std::vector<double> radius_intervals;
     for (unsigned i = 0; i < mNumRadialBins; ++i)
     {
-        double upper_radius = max_distance_from_centre*((double) i+1)/((double) mNumRadialBins);
+        double upper_radius = max_distance_from_centre * static_cast<double>(i + 1) / static_cast<double>(mNumRadialBins);
         radius_intervals.push_back(upper_radius);
     }
 
@@ -153,7 +149,7 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
         }
         if (counter != 0)
         {
-            average_solution /= (double) counter;
+            average_solution /= static_cast<double>(counter);
         }
 
         // Write results to file

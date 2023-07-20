@@ -64,11 +64,9 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopula
     std::map<unsigned,unsigned> local_cell_id_location_index_map;
 
     unsigned local_cell_id = 0;
-    for (auto cell_iter = pCellPopulation->Begin();
-         cell_iter != pCellPopulation->End();
-         ++cell_iter)
+    for (auto cell_iter : *pCellPopulation)
     {
-        local_cell_id_location_index_map[pCellPopulation->GetLocationIndexUsingCell(*cell_iter)] = local_cell_id;
+        local_cell_id_location_index_map[pCellPopulation->GetLocationIndexUsingCell(cell_iter)] = local_cell_id;
         local_cell_id++;
     }
     assert(local_cell_id == num_cells);
@@ -80,33 +78,29 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopula
         adjacency_matrix[i] = 0;
     }
 
-    for (auto cell_iter = pCellPopulation->Begin();
-         cell_iter != pCellPopulation->End();
-         ++cell_iter)
+    for (auto cell_iter : *pCellPopulation)
     {
         // Determine whether this cell is labelled
         bool cell_is_labelled = cell_iter->template HasCellProperty<CellLabel>();
 
         // Get the location index corresponding to this cell
-        unsigned index = pCellPopulation->GetLocationIndexUsingCell(*cell_iter);
+        unsigned index = pCellPopulation->GetLocationIndexUsingCell(cell_iter);
 
         // Get the set of neighbouring location indices
-        std::set<unsigned> neighbour_indices = pCellPopulation->GetNeighbouringLocationIndices(*cell_iter);
+        std::set<unsigned> neighbour_indices = pCellPopulation->GetNeighbouringLocationIndices(cell_iter);
 
         // If this cell has any neighbours (as defined by mesh/population/interaction distance)...
         if (!neighbour_indices.empty())
         {
             unsigned local_cell_index = local_cell_id_location_index_map[index];
 
-            for (auto neighbour_iter = neighbour_indices.begin();
-                 neighbour_iter != neighbour_indices.end();
-                 ++neighbour_iter)
+            for (auto neighbour_iter : neighbour_indices)
             {
                 // If both cell_iter and p_neighbour_cell are not labelled, then set type_of_link to 1
                 unsigned type_of_link = 1;
 
                 // Determine whether this neighbour is labelled
-                CellPtr p_neighbour_cell = pCellPopulation->GetCellUsingLocationIndex(*neighbour_iter);
+                CellPtr p_neighbour_cell = pCellPopulation->GetCellUsingLocationIndex(neighbour_iter);
                 bool neighbour_is_labelled = p_neighbour_cell->template HasCellProperty<CellLabel>();
 
                 if (cell_is_labelled != neighbour_is_labelled)
@@ -120,7 +114,7 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopula
                     type_of_link = 2;
                 }
 
-                unsigned local_neighbour_index = local_cell_id_location_index_map[*neighbour_iter];
+                unsigned local_neighbour_index = local_cell_id_location_index_map[neighbour_iter];
                 adjacency_matrix[local_cell_index + num_cells*local_neighbour_index] = type_of_link;
                 adjacency_matrix[num_cells*local_cell_index + local_neighbour_index] = type_of_link;
             }
@@ -149,11 +143,9 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
     std::map<unsigned,unsigned> local_cell_id_location_index_map;
 
     unsigned local_cell_id = 0;
-    for (auto cell_iter = pCellPopulation->Begin();
-         cell_iter != pCellPopulation->End();
-         ++cell_iter)
+    for (auto cell_iter : *pCellPopulation)
     {
-        local_cell_id_location_index_map[pCellPopulation->GetLocationIndexUsingCell(*cell_iter)] = local_cell_id;
+        local_cell_id_location_index_map[pCellPopulation->GetLocationIndexUsingCell(cell_iter)] = local_cell_id;
         local_cell_id++;
     }
     assert(local_cell_id == num_cells);
@@ -165,33 +157,29 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
         adjacency_matrix[i] = 0;
     }
 
-    for (auto cell_iter = pCellPopulation->Begin();
-         cell_iter != pCellPopulation->End();
-         ++cell_iter)
+    for (auto cell_iter : *pCellPopulation)
     {
         // Determine whether this cell is labelled
         bool cell_is_labelled = cell_iter->template HasCellProperty<CellLabel>();
 
         // Get the location index corresponding to this cell
-        unsigned index = pCellPopulation->GetLocationIndexUsingCell(*cell_iter);
+        unsigned index = pCellPopulation->GetLocationIndexUsingCell(cell_iter);
 
         // Get the set of neighbouring location indices
-        std::set<unsigned> neighbour_indices = pCellPopulation->GetNeighbouringLocationIndices(*cell_iter);
+        std::set<unsigned> neighbour_indices = pCellPopulation->GetNeighbouringLocationIndices(cell_iter);
 
         // If this cell has any neighbours (as defined by mesh/population/interaction distance)...
         if (!neighbour_indices.empty())
         {
             unsigned local_cell_index = local_cell_id_location_index_map[index];
 
-            for (auto neighbour_iter = neighbour_indices.begin();
-                 neighbour_iter != neighbour_indices.end();
-                 ++neighbour_iter)
+            for (auto neighbour_iter : neighbour_indices)
             {
                 // If both cell_iter and p_neighbour_cell are not labelled, then set type_of_link to 1
                 unsigned type_of_link = 1;
 
                 // Determine whether this neighbour is labelled
-                CellPtr p_neighbour_cell = pCellPopulation->GetCellUsingLocationIndex(*neighbour_iter);
+                CellPtr p_neighbour_cell = pCellPopulation->GetCellUsingLocationIndex(neighbour_iter);
                 bool neighbour_is_labelled = p_neighbour_cell->template HasCellProperty<CellLabel>();
 
                 if (cell_is_labelled != neighbour_is_labelled)
@@ -205,7 +193,7 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
                     type_of_link = 2;
                 }
 
-                unsigned local_neighbour_index = local_cell_id_location_index_map[*neighbour_iter];
+                unsigned local_neighbour_index = local_cell_id_location_index_map[neighbour_iter];
                 adjacency_matrix[local_cell_index + num_cells*local_neighbour_index] = type_of_link;
                 adjacency_matrix[num_cells*local_cell_index + local_neighbour_index] = type_of_link;
             }

@@ -307,9 +307,7 @@ public:
         TS_ASSERT_EQUALS(num_cells_at_division, 2u);
 
         // Iterate over the cells, checking their target areas
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             double target_area_at_division = cell_iter->GetCellData()->GetItem("target area");
             TS_ASSERT_DELTA(target_area_at_division,1.0,1e-9);
@@ -323,9 +321,7 @@ public:
         unsigned num_cells_after_division = simulator.rGetCellPopulation().GetNumRealCells();
         TS_ASSERT_EQUALS(num_cells_after_division, 2u);
 
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             double target_area_after_division = cell_iter->GetCellData()->GetItem("target area");
             TS_ASSERT_DELTA(target_area_after_division,1.0,1e-9);

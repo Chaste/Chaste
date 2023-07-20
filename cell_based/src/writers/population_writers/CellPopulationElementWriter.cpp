@@ -105,11 +105,9 @@ void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
     PottsBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     // Loop over cells and find associated elements so in the same order as the cells in output files
-    for (auto cell_iter = pCellPopulation->Begin();
-         cell_iter != pCellPopulation->End();
-         ++cell_iter)
+    for (auto cell_iter : *pCellPopulation)
     {
-        unsigned elem_index = pCellPopulation->GetLocationIndexUsingCell(*cell_iter);
+        unsigned elem_index = pCellPopulation->GetLocationIndexUsingCell(cell_iter);
 
         // Hack that covers the case where the element is associated with a cell that has just been killed (#1129)
         bool elem_corresponds_to_dead_cell = false;
@@ -142,11 +140,9 @@ void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
     VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     // Loop over cells and find associated elements so in the same order as the cells in output files
-    for (auto cell_iter = pCellPopulation->Begin();
-         cell_iter != pCellPopulation->End();
-         ++cell_iter)
+    for (auto cell_iter : *pCellPopulation)
     {
-        unsigned elem_index = pCellPopulation->GetLocationIndexUsingCell(*cell_iter);
+        unsigned elem_index = pCellPopulation->GetLocationIndexUsingCell(cell_iter);
 
         // Hack that covers the case where the element is associated with a cell that has just been killed (#1129)
         bool elem_corresponds_to_dead_cell = false;

@@ -270,11 +270,9 @@ public:
 
         // Now test SetupSourceTerms() when a map between cells and FE mesh elements is supplied
         std::map<CellPtr, unsigned> cell_pde_element_map;
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            cell_pde_element_map[*cell_iter] = 0;
+            cell_pde_element_map[cell_iter] = 0;
         }
 
         pde.SetupSourceTerms(fe_mesh, &cell_pde_element_map);

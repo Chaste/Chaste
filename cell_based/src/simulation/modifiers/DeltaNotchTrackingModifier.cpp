@@ -74,9 +74,7 @@ void DeltaNotchTrackingModifier<DIM>::UpdateCellData(
     rCellPopulation.Update();
 
     // First recover each cell's Notch and Delta concentrations from the ODEs and store in CellData
-    for (auto cell_iter = rCellPopulation.Begin();
-         cell_iter != rCellPopulation.End();
-         ++cell_iter)
+    for (auto cell_iter : rCellPopulation)
     {
         DeltaNotchSrnModel* p_model = static_cast<DeltaNotchSrnModel*>(cell_iter->GetSrnModel());
         double this_delta = p_model->GetDelta();
@@ -88,12 +86,10 @@ void DeltaNotchTrackingModifier<DIM>::UpdateCellData(
     }
 
     // Next iterate over the population to compute and store each cell's neighbouring Delta concentration in CellData
-    for (auto cell_iter = rCellPopulation.Begin();
-         cell_iter != rCellPopulation.End();
-         ++cell_iter)
+    for (auto cell_iter : rCellPopulation)
     {
         // Get the set of neighbouring location indices
-        std::set<unsigned> neighbour_indices = rCellPopulation.GetNeighbouringLocationIndices(*cell_iter);
+        std::set<unsigned> neighbour_indices = rCellPopulation.GetNeighbouringLocationIndices(cell_iter);
 
         // Compute this cell's average neighbouring Delta concentration and store in CellData
         if (!neighbour_indices.empty())

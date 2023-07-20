@@ -153,7 +153,7 @@ public:
 
         for (unsigned i = 0; i < num_steps; ++i)
         {
-            double time_should_be = i*first_end/(double)num_steps;
+            double time_should_be = i*first_end / static_cast<double>(num_steps);
             TS_ASSERT_DELTA(p_simulation_time->GetTime(), time_should_be, 1e-9);
             p_simulation_time->IncrementTimeOneStep();
         }
@@ -164,7 +164,7 @@ public:
 
         for (unsigned i = 0; i < num_steps; ++i)
         {
-            double time_should_be = first_end + i*(second_end-first_end)/(double)num_steps;
+            double time_should_be = first_end + i*(second_end - first_end) / static_cast<double>(num_steps);
             TS_ASSERT_DELTA(p_simulation_time->GetTime(), time_should_be, 1e-9);
             p_simulation_time->IncrementTimeOneStep();
         }

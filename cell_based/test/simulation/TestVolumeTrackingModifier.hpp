@@ -135,11 +135,9 @@ public:
         TS_ASSERT(generated.Exists());
 
         // Test that the volumes of the cells are correct in CellData at the first timestep
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), cell_iter->GetCellData()->GetItem("volume"), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_iter), cell_iter->GetCellData()->GetItem("volume"), 1e-4);
         }
 
         simulator.SetEndTime(2.0);
@@ -148,11 +146,9 @@ public:
         simulator.Solve();
 
         // Test that the volumes of the cells are correct in CellData at the end time
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), cell_iter->GetCellData()->GetItem("volume"), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_iter), cell_iter->GetCellData()->GetItem("volume"), 1e-4);
         }
 
         // Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
@@ -207,11 +203,9 @@ public:
         simulator.Solve();
 
         // Test that the volumes of the cells are correct in CellData at the first timestep
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_iter), (cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
         }
 
         simulator.SetEndTime(2.0);
@@ -220,11 +214,9 @@ public:
         simulator.Solve();
 
         // Test that the volumes of the cells are correct in CellData at the end time
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_iter), (cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
         }
 
         // Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
@@ -280,11 +272,9 @@ public:
         simulator.Solve();
 
         // Test that the volumes of the cells are correct in CellData at the first timestep
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_iter), (cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
         }
 
         simulator.SetEndTime(2.0);
@@ -293,11 +283,9 @@ public:
         simulator.Solve();
 
         // Test that the volumes of the cells are correct in CellData at the end time
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_iter), (cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
         }
 
         // Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)
@@ -356,11 +344,9 @@ public:
         simulator.Solve();
 
         // Test that the volumes of the cells are correct in CellData at the first timestep
-        for (auto cell_iter = cell_population.Begin();
-          cell_iter != cell_population.End();
-          ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_iter), (cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
         }
 
         simulator.SetEndTime(2.0);
@@ -369,11 +355,9 @@ public:
         simulator.Solve();
 
         // Test that the volumes of the cells are correct in CellData at the end time
-        for (auto cell_iter = cell_population.Begin();
-          cell_iter != cell_population.End();
-          ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), (*cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_iter), (cell_iter)->GetCellData()->GetItem("volume"), 1e-4);
         }
 
         // Check that the correct number of cells are labelled (i.e. experiencing contact inhibition)

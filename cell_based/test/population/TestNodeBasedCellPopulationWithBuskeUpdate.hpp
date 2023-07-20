@@ -170,9 +170,7 @@ public:
 
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // loop over them to run to time 0.0;
-            for (auto cell_iter = p_cell_population->Begin();
-                cell_iter != p_cell_population->End();
-                ++cell_iter)
+            for (auto cell_iter : *p_cell_population)
             {
                 cell_iter->ReadyToDivide();
             }
@@ -212,9 +210,7 @@ public:
             // this checks that individual cells and their models are archived.
             unsigned counter = 0;
 
-            for (auto cell_iter = p_cell_population->Begin();
-                 cell_iter != p_cell_population->End();
-                 ++cell_iter)
+            for (auto cell_iter : *p_cell_population)
             {
                 TS_ASSERT_DELTA(cell_iter->GetAge(), (double)(counter), 1e-7);
                 counter++;

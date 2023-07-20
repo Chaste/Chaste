@@ -1156,9 +1156,7 @@ public:
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements(), std::vector<unsigned>(), p_diff_type);
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
         double value = 0.0;
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             cell_iter->GetCellData()->SetItem("this average", value);
             value += 1.0;
@@ -1199,9 +1197,7 @@ public:
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> mesh_based_cells_generator;
             mesh_based_cells_generator.GenerateBasic(mesh_based_cells, p_tet_mesh->GetNumNodes());
             MeshBasedCellPopulation<2> mesh_based_cell_population(*p_tet_mesh, mesh_based_cells);
-            for (auto cell_iter = mesh_based_cell_population.Begin();
-                 cell_iter != mesh_based_cell_population.End();
-                 ++cell_iter)
+            for (auto cell_iter : mesh_based_cell_population)
             {
                  cell_iter->GetCellData()->SetItem("this average", 1.0);
             }
@@ -1222,9 +1218,7 @@ public:
             location_indices.push_back(13);
             location_indices.push_back(17);
             CaBasedCellPopulation<2> ca_based_cell_population(*p_ca_based_mesh, ca_based_cells, location_indices);
-            for (auto cell_iter = ca_based_cell_population.Begin();
-                 cell_iter != ca_based_cell_population.End();
-                 ++cell_iter)
+            for (auto cell_iter : ca_based_cell_population)
             {
                  cell_iter->GetCellData()->SetItem("this average", 1.0);
             }
@@ -1242,9 +1236,7 @@ public:
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> node_based_generator;
             node_based_generator.GenerateBasic(node_based_cells, node_based_mesh.GetNumNodes());
             NodeBasedCellPopulation<2> node_based_cell_population(node_based_mesh, node_based_cells);
-            for (auto cell_iter = node_based_cell_population.Begin();
-                 cell_iter != node_based_cell_population.End();
-                 ++cell_iter)
+            for (auto cell_iter : node_based_cell_population)
             {
                  cell_iter->GetCellData()->SetItem("this average", 1.0);
             }
@@ -1263,9 +1255,7 @@ public:
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> potts_based_cells_generator;
             potts_based_cells_generator.GenerateBasic(potts_based_cells, p_potts_based_mesh->GetNumElements());
             PottsBasedCellPopulation<2> potts_based_cell_population(*p_potts_based_mesh, potts_based_cells);
-            for (auto cell_iter = potts_based_cell_population.Begin();
-                 cell_iter != potts_based_cell_population.End();
-                 ++cell_iter)
+            for (auto cell_iter : potts_based_cell_population)
             {
                  cell_iter->GetCellData()->SetItem("this average", 1.0);
             }

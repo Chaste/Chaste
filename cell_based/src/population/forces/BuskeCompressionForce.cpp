@@ -68,12 +68,10 @@ void BuskeCompressionForce<DIM>::AddForceContribution(
     c_vector<double, DIM> unit_vector;
 
     // Loop over cells in the population
-    for (auto cell_iter = rCellPopulation.Begin();
-         cell_iter != rCellPopulation.End();
-         ++cell_iter)
+    for (auto cell_iter : rCellPopulation)
     {
         // Get the node index corresponding to this cell
-        unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+        unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(cell_iter);
 
         Node<DIM>* p_node_i = rCellPopulation.GetNode(node_index);
 

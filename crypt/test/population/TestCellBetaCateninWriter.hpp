@@ -86,11 +86,9 @@ public:
         CellBetaCateninWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            cell_writer.VisitCell(*cell_iter, &cell_population);
+            cell_writer.VisitCell(cell_iter, &cell_population);
         }
         cell_writer.CloseFile();
 

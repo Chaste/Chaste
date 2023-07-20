@@ -116,12 +116,10 @@ private:
         boost::shared_ptr<CellPropertyRegistry> p_population_registry = node_based_cell_population.GetCellPropertyRegistry();
 
         unsigned counter = 0;
-        for (auto cell_iter = node_based_cell_population.Begin();
-             cell_iter != node_based_cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : node_based_cell_population)
         {
             // Test operator* and that cells are in sync
-            TS_ASSERT_EQUALS(node_based_cell_population.GetLocationIndexUsingCell(*cell_iter), counter*PetscTools::GetNumProcs() + PetscTools::GetMyRank());
+            TS_ASSERT_EQUALS(node_based_cell_population.GetLocationIndexUsingCell(cell_iter), counter*PetscTools::GetNumProcs() + PetscTools::GetMyRank());
 
             // Test operator-> and that cells are in sync
             TS_ASSERT_DELTA(cell_iter->GetAge(), (double)counter, 1e-12);
@@ -542,11 +540,9 @@ public:
 
             // Test that each cell's location index is correct.
             unsigned index = 0;
-            for (auto cell_iter = node_based_cell_population.Begin();
-                 cell_iter != node_based_cell_population.End();
-                 ++cell_iter)
+            for (auto cell_iter : node_based_cell_population)
             {
-                unsigned global_index = node_based_cell_population.GetLocationIndexUsingCell(*cell_iter);
+                unsigned global_index = node_based_cell_population.GetLocationIndexUsingCell(cell_iter);
                 unsigned local_index = mesh.SolveNodeMapping(global_index);
                 TS_ASSERT_EQUALS(local_index, index);
                 index++;
@@ -568,8 +564,8 @@ public:
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(generating_mesh, 1e-1);
         for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
-                node_iter != mesh.GetNodeIteratorEnd();
-                ++node_iter)
+             node_iter != mesh.GetNodeIteratorEnd();
+             ++node_iter)
         {
             node_iter->SetRadius(0.1);
         }
@@ -622,8 +618,8 @@ public:
         mesh.ConstructNodesWithoutMesh(generating_mesh, 1.2);
 
         for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
-                node_iter != mesh.GetNodeIteratorEnd();
-                ++node_iter)
+             node_iter != mesh.GetNodeIteratorEnd();
+             ++node_iter)
         {
             node_iter->SetRadius(0.1);
         }
@@ -750,8 +746,8 @@ public:
         mesh.ConstructNodesWithoutMesh(generating_mesh, 0.1);
 
         for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
-                node_iter != mesh.GetNodeIteratorEnd();
-                ++node_iter)
+             node_iter != mesh.GetNodeIteratorEnd();
+             ++node_iter)
         {
             node_iter->SetRadius(0.55);
         }
@@ -794,8 +790,8 @@ public:
 
         // Re set the radii
         for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
-                node_iter != mesh.GetNodeIteratorEnd();
-                ++node_iter)
+             node_iter != mesh.GetNodeIteratorEnd();
+             ++node_iter)
         {
             node_iter->SetRadius(0.55);
         }
@@ -814,8 +810,8 @@ public:
 
         // Re set the radii
         for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
-                node_iter != mesh.GetNodeIteratorEnd();
-                ++node_iter)
+             node_iter != mesh.GetNodeIteratorEnd();
+             ++node_iter)
         {
             node_iter->SetRadius(0.55);
         }
@@ -1002,11 +998,9 @@ public:
         cell_population.SetCellAncestorsToLocationIndices();
 
         unsigned counter = 0;
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            TS_ASSERT_EQUALS(cell_iter->GetAncestor(), cell_population.GetLocationIndexUsingCell(*cell_iter));
+            TS_ASSERT_EQUALS(cell_iter->GetAncestor(), cell_population.GetLocationIndexUsingCell(cell_iter));
             counter ++;
         }
         TS_ASSERT_EQUALS(counter, mesh.GetNumNodes());
@@ -1016,9 +1010,7 @@ public:
         TS_ASSERT_EQUALS(remaining_ancestors.size(), mesh.GetNumNodes());
 
         // Reallocate ancestors
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             // Set all cells to have the same ancestor
             MAKE_PTR_ARGS(CellAncestor, p_cell_ancestor, (1u));
@@ -1050,16 +1042,14 @@ public:
         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
 
         // Loop over nodes
-        for (auto cell_iter = node_based_cell_population.Begin();
-             cell_iter != node_based_cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : node_based_cell_population)
         {
             // Record node location
-            c_vector<double, 2> node_location = node_based_cell_population.GetLocationOfCellCentre(*cell_iter);
+            c_vector<double, 2> node_location = node_based_cell_population.GetLocationOfCellCentre(cell_iter);
 
             // Test GetLocationOfCellCentre()
-            TS_ASSERT_DELTA(node_location[0], node_based_cell_population.GetLocationOfCellCentre(*cell_iter)[0], 1e-9);
-            TS_ASSERT_DELTA(node_location[1], node_based_cell_population.GetLocationOfCellCentre(*cell_iter)[1], 1e-9);
+            TS_ASSERT_DELTA(node_location[0], node_based_cell_population.GetLocationOfCellCentre(cell_iter)[0], 1e-9);
+            TS_ASSERT_DELTA(node_location[1], node_based_cell_population.GetLocationOfCellCentre(cell_iter)[1], 1e-9);
         }
 
         // Test GetWidth() method
@@ -1099,11 +1089,9 @@ public:
         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
 
         node_based_cell_population.Update(); // so cell neighbours are calculated
-        for (auto cell_iter = node_based_cell_population.Begin();
-             cell_iter != node_based_cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : node_based_cell_population)
         {
-            TS_ASSERT_DELTA(node_based_cell_population.GetVolumeOfCell(*cell_iter), M_PI*0.5*0.5, 1e-6);
+            TS_ASSERT_DELTA(node_based_cell_population.GetVolumeOfCell(cell_iter), M_PI*0.5*0.5, 1e-6);
         }
 
         // For coverage of WriteResultsToFiles()
@@ -1130,9 +1118,7 @@ public:
         node_based_cell_population.AddCellWriter<CellIdWriter>();
 
         // Coverage of writing CellData to VTK
-        for (auto cell_iter = node_based_cell_population.Begin();
-             cell_iter != node_based_cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : node_based_cell_population)
         {
             cell_iter->GetCellData()->SetItem("var0", 0.0);
             cell_iter->GetCellData()->SetItem("var1", 3.0);
@@ -1430,9 +1416,7 @@ public:
         TS_ASSERT_EQUALS(node_based_cell_population.GetIdentifier(), "NodeBasedCellPopulation-2");
 
         // Loop over cells to run to time 0
-        for (auto cell_iter = node_based_cell_population.Begin();
-             cell_iter != node_based_cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : node_based_cell_population)
         {
             cell_iter->ReadyToDivide();
         }
@@ -1502,9 +1486,7 @@ public:
 
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // loop over them to run to time 0.0;
-            for (auto cell_iter = p_cell_population->Begin();
-                cell_iter != p_cell_population->End();
-                ++cell_iter)
+            for (auto cell_iter : *p_cell_population)
             {
                 cell_iter->ReadyToDivide();
             }
@@ -1546,9 +1528,7 @@ public:
             // this checks that individual cells and their models are archived.
             unsigned counter = 0;
 
-            for (auto cell_iter = p_cell_population->Begin();
-                 cell_iter != p_cell_population->End();
-                 ++cell_iter)
+            for (auto cell_iter : *p_cell_population)
             {
                 TS_ASSERT_DELTA(cell_iter->GetAge(), (double)(counter), 1e-7);
                 counter++;

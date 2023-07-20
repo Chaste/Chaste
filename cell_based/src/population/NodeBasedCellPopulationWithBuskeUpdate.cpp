@@ -73,10 +73,10 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(double dt)
     Vec& r_vector = solver.rGetForceVector();
 
     // Iterate over all nodes associated with real cells to construct the matrix A
-    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
+    for (auto cell_iter : this->mCells)
     {
         // Get index of node associated with cell
-        unsigned global_node_index = this->GetLocationIndexUsingCell((*cell_iter));
+        unsigned global_node_index = this->GetLocationIndexUsingCell(cell_iter);
 
         // Get the local index using the mesh
         unsigned node_index = this->rGetMesh().SolveNodeMapping(global_node_index);
@@ -170,10 +170,10 @@ void NodeBasedCellPopulationWithBuskeUpdate<DIM>::UpdateNodeLocations(double dt)
     ReplicatableVector soln_next_timestep_repl(soln_next_timestep);
 
     // Iterate over all nodes associated with real cells to update the node locations
-    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
+    for (auto cell_iter : this->mCells)
     {
         // Get index of node associated with cell
-        unsigned global_node_index = this->GetLocationIndexUsingCell((*cell_iter));
+        unsigned global_node_index = this->GetLocationIndexUsingCell(cell_iter);
 
         unsigned node_index = this->rGetMesh().SolveNodeMapping(global_node_index);
 

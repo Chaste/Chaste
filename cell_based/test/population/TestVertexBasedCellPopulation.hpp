@@ -116,12 +116,10 @@ public:
         unsigned counter = 0;
 
         // Test VertexBasedCellPopulation::Iterator
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             // Test operator* and that cells are in sync
-            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), counter);
+            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(cell_iter), counter);
 
             // Test operator-> and that cells are in sync
             TS_ASSERT_DELTA(cell_iter->GetAge(), (double)counter, 1e-12);
@@ -145,19 +143,15 @@ public:
         TS_ASSERT_DELTA(width_y, 2.8867, 1e-4);
 
         // For coverage of GetVolumeOfCell()
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(*cell_iter), sqrt(3.0)/2, 1e-6);
+            TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_iter), sqrt(3.0)/2, 1e-6);
         }
 
         // For coverage of GetRosetteRankOfCell()
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            TS_ASSERT_EQUALS(cell_population.GetRosetteRankOfCell(*cell_iter), 3u);
+            TS_ASSERT_EQUALS(cell_population.GetRosetteRankOfCell(cell_iter), 3u);
         }
 
         // Test GetNeighbouringLocationIndices() method
@@ -820,12 +814,10 @@ public:
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells, false, false);
 
         // Test IsCellAssociatedWithADeletedLocation() method
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            bool is_deleted = cell_population.IsCellAssociatedWithADeletedLocation(*cell_iter);
-            bool cell_has_index_5 = (cell_population.GetLocationIndexUsingCell(*cell_iter) == 5);
+            bool is_deleted = cell_population.IsCellAssociatedWithADeletedLocation(cell_iter);
+            bool cell_has_index_5 = (cell_population.GetLocationIndexUsingCell(cell_iter) == 5);
 
             TS_ASSERT_EQUALS(is_deleted, cell_has_index_5);
         }
@@ -896,12 +888,10 @@ public:
         // Get actual cell element indices
         std::set<unsigned> element_indices;
 
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             // Record element index corresponding to cell
-            unsigned element_index = cell_population.GetLocationIndexUsingCell(*cell_iter);
+            unsigned element_index = cell_population.GetLocationIndexUsingCell(cell_iter);
             element_indices.insert(element_index);
         }
 
@@ -994,9 +984,7 @@ public:
         cell_population.AddCellWriter<CellVolumesWriter>();
 
         // Coverage of writing CellData to VTK
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             cell_iter->GetCellData()->SetItem("var0", 0.0);
             cell_iter->GetCellData()->SetItem("var1", 3.0);
@@ -1104,9 +1092,7 @@ public:
 
             // Cells have been given birth times of 0 and -1.
             // Loop over them to run to time 0.0;
-            for (auto cell_iter = p_cell_population->Begin();
-                 cell_iter != p_cell_population->End();
-                 ++cell_iter)
+            for (auto cell_iter : *p_cell_population)
             {
                 cell_iter->ReadyToDivide();
             }
@@ -1151,9 +1137,7 @@ public:
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // this checks that individual cells and their models are archived.
             unsigned counter = 0;
-            for (auto cell_iter = p_cell_population->Begin();
-                 cell_iter != p_cell_population->End();
-                 ++cell_iter)
+            for (auto cell_iter : *p_cell_population)
             {
                 TS_ASSERT_DELTA(cell_iter->GetAge(), (double)(counter), 1e-7);
                 counter++;
@@ -1315,9 +1299,7 @@ public:
 
             // Cells have been given birth times of 0 and -1.
             // Loop over them to run to time 0.0;
-            for (auto cell_iter = p_cell_population->Begin();
-                 cell_iter != p_cell_population->End();
-                 ++cell_iter)
+            for (auto cell_iter : *p_cell_population)
             {
                 cell_iter->ReadyToDivide();
             }
@@ -1359,9 +1341,7 @@ public:
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // this checks that individual cells and their models are archived.
             unsigned counter = 0;
-            for (auto cell_iter = p_cell_population->Begin();
-                 cell_iter != p_cell_population->End();
-                 ++cell_iter)
+            for (auto cell_iter : *p_cell_population)
             {
                 TS_ASSERT_DELTA(cell_iter->GetAge(), (double)(counter), 1e-7);
                 counter++;

@@ -90,11 +90,9 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
     unsigned cell_index = 0;
 
     unsigned index_in_solution_repl = 0;
-    for (auto cell_iter = rCellPopulation.Begin();
-         cell_iter != rCellPopulation.End();
-         ++cell_iter)
+    for (auto cell_iter : rCellPopulation)
     {
-        unsigned tet_node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+        unsigned tet_node_index = rCellPopulation.GetLocationIndexUsingCell(cell_iter);
 
         ///\todo Consider how to remove dynamic_casts here
         if (dynamic_cast<VertexBasedCellPopulation<DIM>*>(&rCellPopulation) != nullptr)

@@ -61,15 +61,13 @@ void CryptProjectionForce::UpdateNode3dLocationMap(AbstractCellPopulation<2>& rC
     c_vector<double, 3> node_location_3d;
 
     // Only consider nodes corresponding to real cells
-    for (auto cell_iter = rCellPopulation.Begin();
-         cell_iter != rCellPopulation.End();
-         ++cell_iter)
+    for (auto cell_iter : rCellPopulation)
     {
         // Get node index
-        unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+        unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(cell_iter);
 
         // Get 3D location
-        node_location_2d = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
+        node_location_2d = rCellPopulation.GetLocationOfCellCentre(cell_iter);
 
         node_location_3d[0] = node_location_2d[0];
         node_location_3d[1] = node_location_2d[1];
@@ -280,14 +278,12 @@ void CryptProjectionForce::AddForceContribution(AbstractCellPopulation<2>& rCell
     {
         assert(WntConcentration<2>::Instance()->IsWntSetUp());
 
-        for (auto cell_iter = rCellPopulation.Begin();
-             cell_iter != rCellPopulation.End();
-             ++cell_iter)
+        for (auto cell_iter : rCellPopulation)
         {
             if (cell_iter->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
             {
-                c_vector<double, 2> wnt_chemotactic_force = mWntChemotaxisStrength*WntConcentration<2>::Instance()->GetWntGradient(*cell_iter);
-                unsigned index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+                c_vector<double, 2> wnt_chemotactic_force = mWntChemotaxisStrength*WntConcentration<2>::Instance()->GetWntGradient(cell_iter);
+                unsigned index = rCellPopulation.GetLocationIndexUsingCell(cell_iter);
 
                 rCellPopulation.GetNode(index)->AddAppliedForceContribution(wnt_chemotactic_force);
             }

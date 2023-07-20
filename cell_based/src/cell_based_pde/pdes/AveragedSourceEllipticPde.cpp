@@ -72,16 +72,14 @@ void AveragedSourceEllipticPde<DIM>::SetupSourceTerms(
     }
 
     // Loop over cells, find which coarse element it is in, and add 1 to mSourceTermOnCoarseElements[elem_index]
-    for (auto cell_iter = mrCellPopulation.Begin();
-         cell_iter != mrCellPopulation.End();
-         ++cell_iter)
+    for (auto cell_iter : mrCellPopulation)
     {
         unsigned elem_index = 0;
-        const ChastePoint<DIM>& r_position_of_cell = mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
+        const ChastePoint<DIM>& r_position_of_cell = mrCellPopulation.GetLocationOfCellCentre(cell_iter);
 
         if (pCellPdeElementMap != nullptr)
         {
-            elem_index = (*pCellPdeElementMap)[*cell_iter];
+            elem_index = (*pCellPdeElementMap)[cell_iter];
         }
         else
         {

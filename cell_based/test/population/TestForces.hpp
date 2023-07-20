@@ -134,11 +134,9 @@ public:
         linear_force.AddForceContribution(cell_population);
 
         // Test forces on non-ghost nodes
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            unsigned node_index = cell_population.GetLocationIndexUsingCell(*cell_iter);
+            unsigned node_index = cell_population.GetLocationIndexUsingCell(cell_iter);
 
             TS_ASSERT_DELTA(cell_population.GetNode(node_index)->rGetAppliedForce()[0], 0.0, 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(node_index)->rGetAppliedForce()[1], 0.0, 1e-4);
@@ -504,9 +502,7 @@ public:
             cell_population.GetNode(i)->ClearAppliedForce();
         }
 
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             cell_iter->AddCellProperty(p_label);
         }
@@ -824,12 +820,10 @@ public:
         }
         chemotactic_force.AddForceContribution(cell_population);
 
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            unsigned index = cell_population.GetLocationIndexUsingCell(*cell_iter);
-            double x = cell_population.GetLocationOfCellCentre(*cell_iter)[0];
+            unsigned index = cell_population.GetLocationIndexUsingCell(cell_iter);
+            double x = cell_population.GetLocationOfCellCentre(cell_iter)[0];
             double c = x/50;
             double norm_grad_c = 1.0/50.0;
             double force_magnitude = chemotactic_force.GetChemotacticForceMagnitude(c, norm_grad_c);
@@ -1670,9 +1664,7 @@ public:
         VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
 
         // Set the birth time to -5 such that the target area modifier assigns mature cell target areas
-        for (auto cell_iter = cell_population.Begin();
-                cell_iter != cell_population.End();
-                ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             cell_iter->SetBirthTime(-5.0);
         }
@@ -1746,9 +1738,7 @@ public:
         VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
 
         // Set the birth time to -5 such that the target area modifier assigns mature cell target areas
-        for (auto cell_iter = cell_population.Begin();
-                cell_iter != cell_population.End();
-                ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             cell_iter->SetBirthTime(-5.0);
         }

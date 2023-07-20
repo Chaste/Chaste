@@ -92,13 +92,11 @@ public:
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>(); // So outputs the labelled cells
 
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             if (RandomNumberGenerator::Instance()->ranf() < 0.5)
             {
-                (*cell_iter)->AddCellProperty(p_label);
+                (cell_iter)->AddCellProperty(p_label);
             }
         }
 

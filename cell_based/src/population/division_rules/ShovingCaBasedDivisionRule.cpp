@@ -91,13 +91,11 @@ unsigned ShovingCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(
     double total_propensity = 0.0;
 
     // Select neighbour at random
-    for (auto neighbour_iter = neighbouring_node_indices.begin();
-         neighbour_iter != neighbouring_node_indices.end();
-         ++neighbour_iter)
+    for (auto neighbour_iter : neighbouring_node_indices)
     {
-        neighbouring_node_indices_vector.push_back(*neighbour_iter);
-
-        double propensity_dividing_into_neighbour = rCellPopulation.EvaluateDivisionPropensity(parent_node_index,*neighbour_iter,pParentCell);
+        neighbouring_node_indices_vector.push_back(neighbour_iter);
+        double propensity_dividing_into_neighbour 
+            = rCellPopulation.EvaluateDivisionPropensity(parent_node_index, neighbour_iter, pParentCell);
 
         neighbouring_node_propensities.push_back(propensity_dividing_into_neighbour);
         total_propensity += propensity_dividing_into_neighbour;

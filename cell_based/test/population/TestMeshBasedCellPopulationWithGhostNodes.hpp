@@ -195,11 +195,9 @@ public:
 
         // Check the iterator doesn't loop over ghost nodes
         unsigned counter = 0;
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            unsigned node_index = cell_population.GetLocationIndexUsingCell(*cell_iter);
+            unsigned node_index = cell_population.GetLocationIndexUsingCell(cell_iter);
             TS_ASSERT( !(is_ghost_node[node_index]) );
             //TS_ASSERT_EQUALS(is_ghost_node[node_index], false); // might not compile on recent clang
             counter++;
@@ -246,9 +244,7 @@ public:
 
         // Iterate over cell population and check there is a single cell
         unsigned counter = 0;
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             counter++;
         }
@@ -265,9 +261,7 @@ public:
 
         // Iterate over cell population and check there are now no cells
         counter = 0;
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             counter++;
         }
@@ -379,11 +373,9 @@ public:
 
         TS_ASSERT_EQUALS(cell_population.GetVoronoiTessellation()->GetNumElements(), p_mesh->GetNumNodes());
 
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            unsigned node_index = cell_population.GetLocationIndexUsingCell(*cell_iter);
+            unsigned node_index = cell_population.GetLocationIndexUsingCell(cell_iter);
             double area = cell_population.GetVolumeOfVoronoiElement(node_index);
             TS_ASSERT_DELTA(area, sqrt(3.0)*scale_factor*scale_factor/2, 1e-6);
         }
@@ -470,12 +462,10 @@ public:
         // Get actual cell node indices
         std::set<unsigned> node_indices_with_ghost_nodes;
 
-        for (auto cell_iter = cell_population_with_ghost_nodes.Begin();
-             cell_iter != cell_population_with_ghost_nodes.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population_with_ghost_nodes)
         {
             // Record node index corresponding to cell
-            unsigned node_index_with_ghost_nodes = cell_population_with_ghost_nodes.GetLocationIndexUsingCell(*cell_iter);
+            unsigned node_index_with_ghost_nodes = cell_population_with_ghost_nodes.GetLocationIndexUsingCell(cell_iter);
             node_indices_with_ghost_nodes.insert(node_index_with_ghost_nodes);
         }
 
@@ -779,9 +769,7 @@ public:
         cell_population.SetBoundVoronoiTessellation(false);
 
         // Coverage of writing CellData to VTK
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             cell_iter->GetCellData()->SetItem("var1", (double) 0.0);
             cell_iter->GetCellData()->SetItem("var2", (double) 3.0);
@@ -1016,11 +1004,9 @@ public:
         cell_population.CreateVoronoiTessellation();
 
         // The Voronoi element corresponding to each real cell should be a regular hexagon
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            unsigned node_index = cell_population.GetLocationIndexUsingCell(*cell_iter);
+            unsigned node_index = cell_population.GetLocationIndexUsingCell(cell_iter);
             if (!cell_population.IsGhostNode(node_index))
             {
                 TS_ASSERT_DELTA(cell_population.GetVolumeOfVoronoiElement(node_index), sqrt(3.0)/2, 1e-4);
@@ -1177,18 +1163,14 @@ public:
         cell_population.SetDataOnAllCells("variable", 100.0);
 
         // Check that the data made it there and that copies of the data are independent
-        for (auto cell_iter = cell_population.Begin();
-                 cell_iter != cell_population.End();
-                 ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             TS_ASSERT_EQUALS(cell_iter->GetCellData()->GetItem("variable"), 100.0);
             cell_iter->GetCellData()->SetItem("variable", 1.0);
         }
 
         cell_population.SetDataOnAllCells("added variable", 200.0);
-        for (auto cell_iter = cell_population.Begin();
-                 cell_iter != cell_population.End();
-                 ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             TS_ASSERT_EQUALS(cell_iter->GetCellData()->GetItem("added variable"), 200.0);
             cell_iter->GetCellData()->SetItem("added variable", 1.0);

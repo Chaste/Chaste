@@ -74,25 +74,23 @@ std::vector<CellPtr> CryptStatistics::GetCryptSection(double yTop, double xBotto
     }
 
     // Loop over cells and add to the store if they are within a cell's radius of the specified line
-    for (auto cell_iter = mrCrypt.Begin();
-         cell_iter != mrCrypt.End();
-         ++cell_iter)
+    for (auto cell_iter : mrCrypt)
     {
         if (periodic)
         {
-            if (CellIsInSectionPeriodic(xBottom, xTop, yTop, mrCrypt.GetLocationOfCellCentre(*cell_iter)))
+            if (CellIsInSectionPeriodic(xBottom, xTop, yTop, mrCrypt.GetLocationOfCellCentre(cell_iter)))
             {
                 // Set up a pair, equal to (cell,y_val) and insert
-                std::pair<CellPtr, double> pair(*cell_iter, mrCrypt.GetLocationOfCellCentre(*cell_iter)[1]);
+                std::pair<CellPtr, double> pair(cell_iter, mrCrypt.GetLocationOfCellCentre(cell_iter)[1]);
                 cells_list.push_back(pair);
             }
         }
         else
         {
-            if (CellIsInSection(xBottom, xTop, yTop, mrCrypt.GetLocationOfCellCentre(*cell_iter)))
+            if (CellIsInSection(xBottom, xTop, yTop, mrCrypt.GetLocationOfCellCentre(cell_iter)))
             {
                 // Set up a pair, equal to (cell,y_val) and insert
-                std::pair<CellPtr, double> pair(*cell_iter, mrCrypt.GetLocationOfCellCentre(*cell_iter)[1]);
+                std::pair<CellPtr, double> pair(cell_iter, mrCrypt.GetLocationOfCellCentre(cell_iter)[1]);
                 cells_list.push_back(pair);
             }
         }

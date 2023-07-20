@@ -239,11 +239,9 @@ public:
         // Check the cell locations
         unsigned cell_locations[6] = {0,1,2,3,4,5};
         unsigned index = 0;
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter),cell_locations[index])
+            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(cell_iter),cell_locations[index])
             ++index;
         }
 
@@ -281,11 +279,9 @@ public:
         // Note the cell on node 3 has been shoved to node 6 and the new cell is on node 3
         unsigned new_cell_locations[7] = {0,1,2,6,4,5,3};
         index = 0;
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter),new_cell_locations[index])
+            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(cell_iter),new_cell_locations[index])
             ++index;
         }
 
@@ -310,11 +306,9 @@ public:
         // Note the cell on node 4 has been shoved to node 7 and the new cell is on node 4
         unsigned new_cell_locations_2[8] = {0,1,2,6,7,5,3,4};
         index = 0;
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter),new_cell_locations_2[index])
+            TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(cell_iter),new_cell_locations_2[index])
             ++index;
         }
     }

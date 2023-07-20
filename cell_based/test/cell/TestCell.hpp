@@ -467,43 +467,37 @@ public:
         {
             // Produce the offspring of the cells
             p_simulation_time->IncrementTimeOneStep();
-            cell_iterator = cells.begin();
-            while (cell_iterator < cells.end())
+
+            for (auto cell_iter : cells)
             {
-                if ((*cell_iterator)->ReadyToDivide())
+                if (cell_iter->ReadyToDivide())
                 {
-                    newly_born.push_back((*cell_iterator)->Divide());
+                    newly_born.push_back(cell_iter->Divide());
                 }
-                ++cell_iterator;
             }
 
             // Copy offspring in newly_born vector to cells vector
-            cell_iterator = newly_born.begin();
-            while (cell_iterator < newly_born.end())
+            for (auto cell_iter : newly_born)
             {
-                cells.push_back(*cell_iterator);
-                ++cell_iterator;
+                cells.push_back(cell_iter);
             }
             newly_born.clear();
 
             // Update cell counts
-            cell_iterator = cells.begin();
-            while (cell_iterator < cells.end())
+            for (auto cell_iter : cells)
             {
-                if ((*cell_iterator)->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
+                if (cell_iter->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
                 {
                     stem_cells[i]++;
                 }
-                else if ((*cell_iterator)->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
+                else if (cell_iter->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
                 {
                     transit_cells[i]++;
                 }
-                else if ((*cell_iterator)->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
+                else if (cell_iter->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
                 {
                     differentiated_cells[i]++;
                 }
-
-                ++cell_iterator;
             }
             times[i] = p_simulation_time->GetTime();
             i++;
@@ -695,51 +689,46 @@ public:
             while (p_simulation_time->GetTime()< end_time)
             {
                 p_simulation_time->IncrementTimeOneStep();
-                cell_iterator = cells.begin();
-                while (cell_iterator < cells.end())
+
+                for (auto cell_iter : cells)
                 {
-                    if ((*cell_iterator)->ReadyToDivide())
+                    if (cell_iter->ReadyToDivide())
                     {
-                        newly_born.push_back((*cell_iterator)->Divide());
+                        newly_born.push_back(cell_iter->Divide());
                     }
-                    ++cell_iterator;
                 }
 
                 // Copy offspring in newly_born vector to cells vector
-                cell_iterator = newly_born.begin();
-                while (cell_iterator < newly_born.end())
+                for (auto cell_iter : newly_born)
                 {
-                    cells.push_back(*cell_iterator);
-                    ++cell_iterator;
+                    cells.push_back(cell_iter);
                 }
-
                 newly_born.clear();
             }
-            cell_iterator = cells.begin();
-            while (cell_iterator < cells.end())
+
+            for (auto cell_iter : cells)
             {
-                if ((*cell_iterator)->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
+                if (cell_iter->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
                 {
                     stem_cells[simulation_number]++;
                     stem_cell_mean++;
                 }
-                else if ((*cell_iterator)->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
+                else if (cell_iter->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
                 {
                     transit_cells[simulation_number]++;
                     transit_cell_mean++;
                 }
-                else if ((*cell_iterator)->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
+                else if (cell_iter->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
                 {
                     differentiated_cells[simulation_number]++;
                     differentiated_cell_mean++;
                 }
-                ++cell_iterator;
             }
             cells.clear();
         }
-        stem_cell_mean=stem_cell_mean/(double) number_of_simulations;
-        transit_cell_mean=transit_cell_mean/(double) number_of_simulations;
-        differentiated_cell_mean=differentiated_cell_mean/(double) number_of_simulations;
+        stem_cell_mean = stem_cell_mean / static_cast<double>(number_of_simulations);
+        transit_cell_mean = transit_cell_mean / static_cast<double>(number_of_simulations);
+        differentiated_cell_mean = differentiated_cell_mean / static_cast<double>(number_of_simulations);
 
         TS_ASSERT_DELTA(stem_cell_mean, 1.0, 1e-12);
         TS_ASSERT_DELTA(transit_cell_mean, 2.0, 1.0);
@@ -809,10 +798,10 @@ public:
             cell_iterator = cells.begin();
             while (cell_iterator < cells.end())
             {
-                TS_ASSERT_EQUALS((*cell_iterator)->GetMutationState()->IsType<WildTypeCellMutationState>(), true);
-                if ((*cell_iterator)->ReadyToDivide())
+                TS_ASSERT_EQUALS((cell_iterator)->GetMutationState()->IsType<WildTypeCellMutationState>(), true);
+                if ((cell_iterator)->ReadyToDivide())
                 {
-                    newly_born.push_back((*cell_iterator)->Divide());
+                    newly_born.push_back((cell_iterator)->Divide());
                 }
                 ++cell_iterator;
             }
@@ -821,31 +810,29 @@ public:
             cell_iterator = newly_born.begin();
             while (cell_iterator < newly_born.end())
             {
-                cells.push_back(*cell_iterator);
+                cells.push_back(cell_iterator);
                 ++cell_iterator;
             }
             newly_born.clear();
 
             // Count number of cells of each type
-            cell_iterator = cells.begin();
             stem_cells[i] = 0;
             transit_cells[i] = 0;
             differentiated_cells[i] = 0;
-            while (cell_iterator < cells.end())
+            for (auto cell_iter : cells)
             {
-                if ((*cell_iterator)->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
+                if (cell_iter->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
                 {
                     stem_cells[i]++;
                 }
-                else if ((*cell_iterator)->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
+                else if (cell_iter->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
                 {
                     transit_cells[i]++;
                 }
-                else if ((*cell_iterator)->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
+                else if (cell_iter->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
                 {
                     differentiated_cells[i]++;
                 }
-                ++cell_iterator;
             }
 
             times[i] = p_simulation_time->GetTime();
@@ -1058,48 +1045,44 @@ public:
             // Produce the offspring of the cells
 
             p_simulation_time->IncrementTimeOneStep();
-            cell_iterator = cells.begin();
-            while (cell_iterator < cells.end())
+
+            for (auto cell_iter : cells)
             {
-                if (!(*cell_iterator)->IsDead())
+                if (!(cell_iter->IsDead())) ///\todo not needed?
                 {
-                    if ((*cell_iterator)->ReadyToDivide())
+                    if (cell_iter->ReadyToDivide())
                     {
-                        newly_born.push_back((*cell_iterator)->Divide());
+                        newly_born.push_back(cell_iter->Divide());
                     }
 
-                    if (((*cell_iterator)->GetAge() > 30))
+                    if (cell_iter->GetAge() > 30)
                     {
-                        (*cell_iterator)->StartApoptosis();
+                        cell_iter->StartApoptosis();
                     }
                 }
-                ++cell_iterator;
             }
 
             // Copy offspring in newly_born vector to cells vector
-            cell_iterator = newly_born.begin();
-            while (cell_iterator < newly_born.end())
+            for (auto cell_iter : newly_born)
             {
-                cells.push_back(*cell_iterator);
-                ++cell_iterator;
+                cells.push_back(cell_iter);
             }
             newly_born.clear();
 
             // Update cell counts
-            cell_iterator = cells.begin();
-            while (cell_iterator < cells.end())
+            for (auto cell_iter : cells)
             {
-                if (!(*cell_iterator)->IsDead())
+                if (!(cell_iter->IsDead())) ///\todo not needed?
                 {
-                    if ((*cell_iterator)->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
+                    if (cell_iter->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
                     {
                         stem_cells[i]++;
                     }
-                    else if ((*cell_iterator)->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
+                    else if (cell_iter->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
                     {
                         transit_cells[i]++;
                     }
-                    else if ((*cell_iterator)->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
+                    else if (cell_iter->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
                     {
                         differentiated_cells[i]++;
                     }
@@ -1108,8 +1091,6 @@ public:
                 {
                     dead_cells[i]++;
                 }
-
-                ++cell_iterator;
             }
             times[i] = p_simulation_time->GetTime();
             i++;

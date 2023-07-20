@@ -280,9 +280,7 @@ public:
         std::list<CellPtr>& r_cells = cell_population.rGetCells();
 
         // Reset each cell to have a StemCellProliferativeType
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             cell_iter->SetCellProliferativeType(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
         }
@@ -355,11 +353,9 @@ public:
         cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         // Check that cells were labelled for death correctly
-        for (auto cell_iter = cell_population.Begin();
-            cell_iter != cell_population.End();
-            ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            double x = cell_population.GetLocationOfCellCentre(*cell_iter)[0];
+            double x = cell_population.GetLocationOfCellCentre(cell_iter)[0];
             if (x > point(0))
             {
                 TS_ASSERT_EQUALS(cell_iter->IsDead(), true);
@@ -373,11 +369,9 @@ public:
         // Check that dead cells were correctly removed
         cell_population.RemoveDeadCells();
 
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            double x = cell_population.GetLocationOfCellCentre(*cell_iter)[0];
+            double x = cell_population.GetLocationOfCellCentre(cell_iter)[0];
             TS_ASSERT_LESS_THAN_EQUALS(x, point(0));
         }
     }
@@ -403,11 +397,9 @@ public:
         cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         // Check that cells were labelled for death correctly
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            double y = cell_population.GetLocationOfCellCentre(*cell_iter)[1];
+            double y = cell_population.GetLocationOfCellCentre(cell_iter)[1];
             if (y > 0.0)
             {
                 TS_ASSERT_EQUALS(cell_iter->IsDead(), true);
@@ -420,11 +412,9 @@ public:
 
         cell_population.RemoveDeadCells();
 
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            double y = cell_population.GetLocationOfCellCentre(*cell_iter)[1];
+            double y = cell_population.GetLocationOfCellCentre(cell_iter)[1];
             TS_ASSERT_LESS_THAN_EQUALS(y, 0.0);
         }
     }
@@ -449,11 +439,9 @@ public:
         cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         // Check that cells were labelled for death correctly
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            double z = cell_population.GetLocationOfCellCentre(*cell_iter)[2];
+            double z = cell_population.GetLocationOfCellCentre(cell_iter)[2];
             if (z > 0.0)
             {
                 TS_ASSERT_EQUALS(cell_iter->IsDead(), true);
@@ -466,11 +454,9 @@ public:
 
         cell_population.RemoveDeadCells();
 
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            double z = cell_population.GetLocationOfCellCentre(*cell_iter)[2];
+            double z = cell_population.GetLocationOfCellCentre(cell_iter)[2];
             TS_ASSERT_LESS_THAN_EQUALS(z, 0.0);
         }
     }
@@ -513,9 +499,7 @@ public:
         IsolatedLabelledCellKiller<2> cell_killer(&cell_population);
 
         // No cells should yet have been killed
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             TS_ASSERT_EQUALS(cell_iter->IsDead(), false);
         }
@@ -524,11 +508,9 @@ public:
         cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         // Cell 3 should have been killed
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            bool should_be_dead = (cell_population.GetLocationIndexUsingCell(*cell_iter) == 3);
+            bool should_be_dead = (cell_population.GetLocationIndexUsingCell(cell_iter) == 3);
             TS_ASSERT_EQUALS(cell_iter->IsDead(), should_be_dead);
         }
 
@@ -543,9 +525,7 @@ public:
         cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         // Although isolated, cell 0 should not have been killed, since it is the only labelled cell
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             TS_ASSERT_EQUALS(cell_iter->IsDead(), false);
         }

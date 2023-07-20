@@ -73,7 +73,7 @@ public:
 
         for (unsigned i = 0; i < cells.size(); ++i)
         {
-            TS_ASSERT_DELTA(cells[i]->GetBirthTime(), -(double)(i), 1e-9);
+            TS_ASSERT_DELTA(cells[i]->GetBirthTime(), -static_cast<double>(i), 1e-9);
             TS_ASSERT_EQUALS(cells[i]->GetCellCycleModel()->GetDimension(), 2u);
         }
 
@@ -110,7 +110,7 @@ public:
         // Test that cells were generated correctly
         for (unsigned i = 0; i < cells.size(); ++i)
         {
-            TS_ASSERT_DELTA(cells[i]->GetBirthTime(), -(double)(location_indices[i]), 1e-9);
+            TS_ASSERT_DELTA(cells[i]->GetBirthTime(), -static_cast<double>(location_indices[i]), 1e-9);
             TS_ASSERT_EQUALS(cells[i]->GetCellCycleModel()->GetDimension(), 2u);
         }
     }
@@ -133,7 +133,7 @@ public:
         // Test that cells were generated correctly
         for (unsigned i = 0; i < cells.size(); ++i)
         {
-            TS_ASSERT_DELTA(cells[i]->GetBirthTime(), -(double)(location_indices[i]), 1e-9);
+            TS_ASSERT_DELTA(cells[i]->GetBirthTime(), -static_cast<double>(location_indices[i]), 1e-9);
             TS_ASSERT_EQUALS(cells[i]->GetCellCycleModel()->GetDimension(), 2u);
             TS_ASSERT_EQUALS(cells[i]->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>(), true);
         }

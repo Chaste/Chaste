@@ -105,9 +105,9 @@ public:
         TS_ASSERT_DELTA(initial_conditions[1], 0.01, 1e-6);
         TS_ASSERT_DELTA(initial_conditions[2], 0.01, 1e-6);
 
-        double cpu_start_time = (double) std::clock();
+        double cpu_start_time = static_cast<double>(std::clock());
         solutions = ode_solver.Solve(&ode_system, initial_conditions, start_time, end_time, h_value, h_value);
-        double cpu_end_time = (double) std::clock();
+        double cpu_end_time = static_cast<double>(std::clock());
         double cpu_elapsed_time = (cpu_end_time - cpu_start_time)/(CLOCKS_PER_SEC);
         std::cout <<  "1. Solver Elapsed time = " << cpu_elapsed_time << "\n";
 

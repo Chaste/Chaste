@@ -187,11 +187,9 @@ public:
         simulator.Solve();
 
         // Check the correct solution was obtained
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            double radius = norm_2(cell_population.GetLocationOfCellCentre(*cell_iter));
+            double radius = norm_2(cell_population.GetLocationOfCellCentre(cell_iter));
             double analytic_solution = 1 - 0.25*(1 - pow(radius,2.0));
 
             // Get cell model
@@ -542,9 +540,7 @@ public:
 
         // Just check that we do indeed have three apoptotic cells
         unsigned num_apoptotic_cells = 0;
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             if (cell_iter->HasCellProperty<ApoptoticCellProperty>())
             {
@@ -697,11 +693,9 @@ public:
          * check the interpolated PDE solution is between the min and max of
          * the PDE solution on the nodes of that element.
          */
-        for (auto cell_iter = cell_population.Begin();
-            cell_iter != cell_population.End();
-            ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            unsigned elem_index = p_pde_modifier->GetFeMesh()->GetContainingElementIndex(cell_population.GetLocationOfCellCentre(*cell_iter));
+            unsigned elem_index = p_pde_modifier->GetFeMesh()->GetContainingElementIndex(cell_population.GetLocationOfCellCentre(cell_iter));
             Element<2,2>* p_element = p_coarse_mesh->GetElement(elem_index);
 
             double max0 = std::max(pde_solution0[p_element->GetNodeGlobalIndex(0)], pde_solution0[p_element->GetNodeGlobalIndex(1)]);
@@ -780,9 +774,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
 
         // Test solution is constant
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             double analytic_solution = 1.0;
             // Test that PDE solver is working correctly
@@ -1067,11 +1059,9 @@ public:
         simulator.Solve();
 
         // Check the correct solution was obtained
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            double radius = norm_2(cell_population.GetLocationOfCellCentre(*cell_iter));
+            double radius = norm_2(cell_population.GetLocationOfCellCentre(cell_iter));
             double analytic_solution = end_time - 0.25*(1 - pow(radius,2.0));
 
             // Test that PDE solver is working correctly
@@ -1190,9 +1180,7 @@ public:
         simulator.Solve();
 
         // Test solution is constant
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             double analytic_solution = 1.0;
             // Test that PDE solver is working correctly
@@ -1287,9 +1275,7 @@ public:
         simulator.Solve();
 
         // Test solution is constant
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             double analytic_solution = 1.0;
             // Test that PDE solver is working correctly
@@ -1370,12 +1356,10 @@ public:
         }
 
         // Find out how many cells lie in each element
-        for (auto cell_iter = cell_population.Begin();
-            cell_iter != cell_population.End();
-            ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             // Get containing element
-            unsigned containing_element_index = p_pde_modifier->mCellPdeElementMap[*cell_iter];
+            unsigned containing_element_index = p_pde_modifier->mCellPdeElementMap[cell_iter];
             cells_in_each_coarse_element[containing_element_index] += 1;
         }
 

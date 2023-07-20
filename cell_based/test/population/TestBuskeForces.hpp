@@ -107,7 +107,7 @@ public:
         for (unsigned step = 0; step < 40; ++step)
         {
             // Move nodes close together
-            double separation = 4.0 - (double)step/10.0;
+            double separation = 4.0 - static_cast<double>(step) / 10.0;
             cell_population.GetNode(1)->rGetModifiableLocation()[0] = separation;
 
             // Reset the vector of node forces
@@ -191,7 +191,7 @@ public:
         for (unsigned step = 0; step < 40; ++step)
         {
             // Move nodes close together
-            double separation = 4.0 - (double)step/10.0;
+            double separation = 4.0 - static_cast<double>(step) / 10.0;
             cell_population.GetNode(1)->rGetModifiableLocation()[0] = separation;
 
             // Reset the vector of node forces
@@ -271,7 +271,7 @@ public:
         for (unsigned step = 0; step < 40; ++step)
         {
             // Move nodes close together
-            double separation = 4.0 - (double)step/10.0;
+            double separation = 4.0 - static_cast<double>(step) / 10.0;
             cell_population.GetNode(1)->rGetModifiableLocation()[0] = separation;
 
             // Reset the vector of node forces
@@ -328,7 +328,7 @@ public:
         for (unsigned step = 0; step < 40; ++step)
         {
             // Move nodes close together
-            double separation = 4.0 - (double)step/10.0;
+            double separation = 4.0 - static_cast<double>(step) / 10.0;
             cell_population.GetNode(1)->rGetModifiableLocation()[0] = separation;
 
             // Reset the vector of node forces

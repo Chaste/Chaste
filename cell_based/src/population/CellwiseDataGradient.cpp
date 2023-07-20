@@ -114,11 +114,9 @@ void CellwiseDataGradient<DIM>::SetupGradients(
     }
 
     // Divide to obtain average gradient
-    for (auto cell_iter = pCellPopulation->Begin();
-         cell_iter != pCellPopulation->End();
-         ++cell_iter)
+    for (auto cell_iter : *pCellPopulation)
     {
-        unsigned node_global_index = pCellPopulation->GetLocationIndexUsingCell(*cell_iter);
+        unsigned node_global_index = pCellPopulation->GetLocationIndexUsingCell(cell_iter);
 
         if (!(num_real_elems_for_node[node_global_index] > 0))
         {
@@ -126,7 +124,7 @@ void CellwiseDataGradient<DIM>::SetupGradients(
             // This code is commented because CellwiseData Can't deal with ghost nodes so won't ever come into this statement see #1975
             //// The node is a real node which is not in any real element
             //// but should be connected to some cells (if more than one cell in mesh)
-            //Node<DIM>& this_node = *(pCellPopulation->GetNodeCorrespondingToCell(*cell_iter));
+            //Node<DIM>& this_node = *(pCellPopulation->GetNodeCorrespondingToCell(cell_iter));
             //
             //mGradients[node_global_index] = zero_vector<double>(DIM);
             //unsigned num_real_adjacent_nodes = 0;
@@ -153,7 +151,7 @@ void CellwiseDataGradient<DIM>::SetupGradients(
             //            // Calculate the contribution of gradient from this node
             //            Node<DIM>& adjacent_node = *(r_mesh.GetNode(adjacent_node_global_index));
             //
-            //            double this_cell_concentration = CellwiseData<DIM>::Instance()->GetValue(*cell_iter, 0);
+            //            double this_cell_concentration = CellwiseData<DIM>::Instance()->GetValue(cell_iter, 0);
             //            CellPtr p_adjacent_cell = pCellPopulation->GetCellUsingLocationIndex(adjacent_node_global_index);
             //            double adjacent_cell_concentration = CellwiseData<DIM>::Instance()->GetValue(p_adjacent_cell, 0);
             //

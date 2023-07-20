@@ -447,11 +447,9 @@ private:
             p_force->AddForceContribution(rCellPopulation);
         }
 
-        for (auto cell_iter = rCellPopulation.Begin();
-             cell_iter != rCellPopulation.End();
-             ++cell_iter)
+        for (auto cell_iter : rCellPopulation)
         {
-            unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+            unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(cell_iter);
 
             TS_ASSERT_DELTA(rCellPopulation.GetNode(node_index)->rGetAppliedForce()[0], 0.0, 1e-4);
             TS_ASSERT_DELTA(rCellPopulation.GetNode(node_index)->rGetAppliedForce()[1], 0.0, 1e-4);

@@ -210,16 +210,14 @@ public:
          * cells to move inwards towards the origin. Note that this will currently only work with subclasses of {{{AbstractCentreBasedCellPopulation}}}s as
          * we associate cells with nodes in the force calculation. However, this could easily be modified to make it work for {{{VertexBasedCellPopulation}}}s.
          */
-        for (auto cell_iter = rCellPopulation.Begin();
-             cell_iter != rCellPopulation.End();
-             ++cell_iter)
+        for (auto cell_iter : rCellPopulation)
         {
             if (cell_iter->HasCellProperty<MotileCellProperty>())
             {
-                unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+                unsigned node_index = rCellPopulation.GetLocationIndexUsingCell(cell_iter);
 
                 c_vector<double, 2> location;
-                location = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
+                location = rCellPopulation.GetLocationOfCellCentre(cell_iter);
                 c_vector<double, 2> force = -1.0 * mStrength * location;
                 rCellPopulation.GetNode(node_index)->AddAppliedForceContribution(force);
             }

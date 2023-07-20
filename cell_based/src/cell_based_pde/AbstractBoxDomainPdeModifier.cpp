@@ -134,18 +134,16 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
     // Store the PDE solution in an accessible form
     ReplicatableVector solution_repl(this->mSolution);
 
-    for (auto cell_iter = rCellPopulation.Begin();
-         cell_iter != rCellPopulation.End();
-         ++cell_iter)
+    for (auto cell_iter : rCellPopulation)
     {
         // The cells are not nodes of the mesh, so we must interpolate
         double solution_at_cell = 0.0;
 
         // Find the element in the FE mesh that contains this cell. CellElementMap has been updated so use this.
-        unsigned elem_index = mCellPdeElementMap[*cell_iter];
+        unsigned elem_index = mCellPdeElementMap[cell_iter];
         Element<DIM, DIM>* p_element = this->mpFeMesh->GetElement(elem_index);
 
-        const ChastePoint<DIM>& node_location = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
+        const ChastePoint<DIM>& node_location = rCellPopulation.GetLocationOfCellCentre(cell_iter);
 
         c_vector<double, DIM+1> weights = p_element->CalculateInterpolationWeights(node_location);
 
@@ -213,13 +211,11 @@ void AbstractBoxDomainPdeModifier<DIM>::InitialiseCellPdeElementMap(AbstractCell
     mCellPdeElementMap.clear();
 
     // Find the element of mpFeMesh that contains each cell and populate mCellPdeElementMap
-    for (auto cell_iter = rCellPopulation.Begin();
-         cell_iter != rCellPopulation.End();
-         ++cell_iter)
+    for (auto cell_iter : rCellPopulation)
     {
-        const ChastePoint<DIM>& r_position_of_cell = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
+        const ChastePoint<DIM>& r_position_of_cell = rCellPopulation.GetLocationOfCellCentre(cell_iter);
         unsigned elem_index = this->mpFeMesh->GetContainingElementIndex(r_position_of_cell);
-        mCellPdeElementMap[*cell_iter] = elem_index;
+        mCellPdeElementMap[cell_iter] = elem_index;
     }
 }
 
@@ -227,13 +223,11 @@ template<unsigned DIM>
 void AbstractBoxDomainPdeModifier<DIM>::UpdateCellPdeElementMap(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     // Find the element of mpCoarsePdeMesh that contains each cell and populate mCellPdeElementMap
-    for (auto cell_iter = rCellPopulation.Begin();
-         cell_iter != rCellPopulation.End();
-         ++cell_iter)
+    for (auto cell_iter : rCellPopulation)
     {
-        const ChastePoint<DIM>& r_position_of_cell = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
-        unsigned elem_index = this->mpFeMesh->GetContainingElementIndexWithInitialGuess(r_position_of_cell, mCellPdeElementMap[*cell_iter]);
-        mCellPdeElementMap[*cell_iter] = elem_index;
+        const ChastePoint<DIM>& r_position_of_cell = rCellPopulation.GetLocationOfCellCentre(cell_iter);
+        unsigned elem_index = this->mpFeMesh->GetContainingElementIndexWithInitialGuess(r_position_of_cell, mCellPdeElementMap[cell_iter]);
+        mCellPdeElementMap[cell_iter] = elem_index;
     }
 }
 

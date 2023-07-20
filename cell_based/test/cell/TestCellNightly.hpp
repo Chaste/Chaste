@@ -125,36 +125,32 @@ public:
             // Produce the offspring of the cells
             p_simulation_time->IncrementTimeOneStep();
             times[i] = p_simulation_time->GetTime();
-            cell_iterator = cells.begin();
+
             unsigned j = 0;
-            while (cell_iterator < cells.end())
+            for (auto cell_iter : cells)
             {
-                if ((*cell_iterator)->ReadyToDivide())
+                if (cell_iter->ReadyToDivide())
                 {
-                    newly_born.push_back((*cell_iterator)->Divide());
+                    newly_born.push_back(cell_iter->Divide());
                 }
-                ++cell_iterator;
                 j++;
             }
 
             // Copy offspring in newly_born vector to cells vector
-            cell_iterator = newly_born.begin();
-            while (cell_iterator < newly_born.end())
+            for (auto cell_iter : newly_born)
             {
-                cells.push_back(*cell_iterator);
-                ++cell_iterator;
+                cells.push_back(cell_iter);
             }
             newly_born.clear();
 
             // Update cell counts
-            cell_iterator = cells.begin();
-            while (cell_iterator < cells.end())
+            for (auto cell_iter : cells)
             {
-                if ((*cell_iterator)->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
+                if (cell_iter->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
                 {
                     stem_cells[i]++;
                 }
-                else if ((*cell_iterator)->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
+                else if (cell_iter->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
                 {
                     transit_cells[i]++;
                 }
@@ -162,7 +158,6 @@ public:
                 {
                     differentiated_cells[i]++;
                 }
-                ++cell_iterator;
             }
             i++;
         }

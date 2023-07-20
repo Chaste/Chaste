@@ -178,10 +178,10 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
      */
     if (mUseVariableRadii)
     {
-        for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
+        for (auto cell_iter : this->mCells)
         {
             double cell_radius = cell_iter->GetCellData()->GetItem("Radius");
-            unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
+            unsigned node_index = this->GetLocationIndexUsingCell(cell_iter);
             this->GetNode(node_index)->SetRadius(cell_radius);
         }
     }
@@ -614,10 +614,10 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
 
     // For each cell that this process owns, find the corresponding node index, which we only want to calculate once
     std::vector<unsigned> node_indices_in_cell_order;
-    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
+    for (auto cell_iter : this->mCells)
     {
         // Get the node index corresponding to this cell
-        unsigned global_index = this->GetLocationIndexUsingCell(*cell_iter);
+        unsigned global_index = this->GetLocationIndexUsingCell(cell_iter);
         unsigned node_index = this->rGetMesh().SolveNodeMapping(global_index);
 
         node_indices_in_cell_order.emplace_back(node_index);
@@ -748,7 +748,7 @@ void NodeBasedCellPopulation<DIM>::DeleteMovedCell(unsigned index)
     mpNodesOnlyMesh->DeleteMovedNode(index);
 
     // Update vector of cells
-    for (auto cell_iter = this->mCells.begin();
+     for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
          cell_iter != this->mCells.end();
          ++cell_iter)
     {

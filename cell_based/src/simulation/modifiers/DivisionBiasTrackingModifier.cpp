@@ -107,11 +107,9 @@ void DivisionBiasTrackingModifier<DIM>::UpdateCellData(
      * zero corresponds to a cell located at the centroid of the cell population.
      */
     std::vector<double> biases;
-    for (auto cell_iter = rCellPopulation.Begin();
-         cell_iter != rCellPopulation.End();
-         ++cell_iter)
+    for (auto cell_iter : rCellPopulation)
     {
-        double distance = inner_prod(rCellPopulation.GetLocationOfCellCentre(*cell_iter) - centroid, mDivisionBiasVector);
+        double distance = inner_prod(rCellPopulation.GetLocationOfCellCentre(cell_iter) - centroid, mDivisionBiasVector);
         biases.push_back(distance);
     }
 
@@ -125,9 +123,7 @@ void DivisionBiasTrackingModifier<DIM>::UpdateCellData(
 
     // Iterate over cell population
     unsigned i = 0;
-    for (auto cell_iter = rCellPopulation.Begin();
-         cell_iter != rCellPopulation.End();
-         ++cell_iter)
+    for (auto cell_iter : rCellPopulation)
     {
         // Store the cell's volume in CellData
         cell_iter->GetCellData()->SetItem("bias", biases[i]);

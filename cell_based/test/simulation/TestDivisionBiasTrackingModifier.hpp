@@ -122,12 +122,10 @@ public:
         // Test that the cell data are correct at the first timestep
         double y_min = cell_population.rGetMesh().CalculateBoundingBox().rGetLowerCorner()[1];
         double y_max = cell_population.rGetMesh().CalculateBoundingBox().rGetUpperCorner()[1];
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             double bias = cell_iter->GetCellData()->GetItem("bias");
-            double estimated_bias = (cell_population.GetLocationOfCellCentre(*cell_iter)[1] - y_min)/(y_max - y_min);
+            double estimated_bias = (cell_population.GetLocationOfCellCentre(cell_iter)[1] - y_min)/(y_max - y_min);
             
             TS_ASSERT_LESS_THAN_EQUALS(0.0, bias);
             TS_ASSERT_LESS_THAN_EQUALS(bias, 1.0);
@@ -140,12 +138,10 @@ public:
         // Test that the cell data are correct at the end time
         y_min = cell_population.rGetMesh().CalculateBoundingBox().rGetLowerCorner()[1];
         y_max = cell_population.rGetMesh().CalculateBoundingBox().rGetUpperCorner()[1];
-        for (auto cell_iter = cell_population.Begin();
-          cell_iter != cell_population.End();
-          ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             double bias = cell_iter->GetCellData()->GetItem("bias");
-            double estimated_bias = (cell_population.GetLocationOfCellCentre(*cell_iter)[1] - y_min)/(y_max - y_min);
+            double estimated_bias = (cell_population.GetLocationOfCellCentre(cell_iter)[1] - y_min)/(y_max - y_min);
             
             TS_ASSERT_LESS_THAN_EQUALS(0.0, bias);
             TS_ASSERT_LESS_THAN_EQUALS(bias, 1.0);
@@ -201,12 +197,10 @@ public:
         // Test that the cell data are correct at the first timestep
         double x_min = cell_population.rGetMesh().CalculateBoundingBox().rGetLowerCorner()[0];
         double x_max = cell_population.rGetMesh().CalculateBoundingBox().rGetUpperCorner()[0];
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             double bias = cell_iter->GetCellData()->GetItem("bias");
-            double estimated_bias = (cell_population.GetLocationOfCellCentre(*cell_iter)[0] - x_min)/(x_max - x_min);
+            double estimated_bias = (cell_population.GetLocationOfCellCentre(cell_iter)[0] - x_min)/(x_max - x_min);
             
             TS_ASSERT_LESS_THAN_EQUALS(0.0, bias);
             TS_ASSERT_LESS_THAN_EQUALS(bias, 1.0);
@@ -219,12 +213,10 @@ public:
         // Test that the cell data are correct at the end time
         x_min = cell_population.rGetMesh().CalculateBoundingBox().rGetLowerCorner()[0];
         x_max = cell_population.rGetMesh().CalculateBoundingBox().rGetUpperCorner()[0];
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             double bias = cell_iter->GetCellData()->GetItem("bias");
-            double estimated_bias = (cell_population.GetLocationOfCellCentre(*cell_iter)[0] - x_min)/(x_max - x_min);
+            double estimated_bias = (cell_population.GetLocationOfCellCentre(cell_iter)[0] - x_min)/(x_max - x_min);
             
             TS_ASSERT_LESS_THAN_EQUALS(0.0, bias);
             TS_ASSERT_LESS_THAN_EQUALS(bias, 1.0);
@@ -279,9 +271,7 @@ public:
         simulator.Solve();
 
         // Test that the cell data are in the correct interval in CellData at the first timestep
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             double bias = cell_iter->GetCellData()->GetItem("bias");
             TS_ASSERT_LESS_THAN_EQUALS(0.0, bias);
@@ -292,9 +282,7 @@ public:
         simulator.Solve();
 
         // Test that the cell data are in the correct interval in CellData at the end time
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             double bias = cell_iter->GetCellData()->GetItem("bias");
             TS_ASSERT_LESS_THAN_EQUALS(0.0, bias);
@@ -355,11 +343,9 @@ public:
         // Test that the cell data are correct at the first timestep
         double y_min = 100;
         double y_max = -100;
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            double y = cell_population.GetLocationOfCellCentre(*cell_iter)[1];
+            double y = cell_population.GetLocationOfCellCentre(cell_iter)[1];
             if (y >y_max)
             {
                 y_max = y;
@@ -369,12 +355,10 @@ public:
                 y_min = y;
             }
         }
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             double bias = cell_iter->GetCellData()->GetItem("bias");
-            double estimated_bias = (cell_population.GetLocationOfCellCentre(*cell_iter)[1] - y_min)/(y_max - y_min);
+            double estimated_bias = (cell_population.GetLocationOfCellCentre(cell_iter)[1] - y_min)/(y_max - y_min);
             
             TS_ASSERT_LESS_THAN_EQUALS(0.0, bias);
             TS_ASSERT_LESS_THAN_EQUALS(bias, 1.0);
@@ -387,11 +371,9 @@ public:
         // Test that the cell data are correct at the end time
         y_min = 100;
         y_max = -100;
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
-            double y = cell_population.GetLocationOfCellCentre(*cell_iter)[1];
+            double y = cell_population.GetLocationOfCellCentre(cell_iter)[1];
             if (y >y_max)
             {
                 y_max = y;
@@ -401,12 +383,10 @@ public:
                 y_min = y;
             }
         }
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             double bias = cell_iter->GetCellData()->GetItem("bias");
-            double estimated_bias = (cell_population.GetLocationOfCellCentre(*cell_iter)[1] - y_min)/(y_max - y_min);
+            double estimated_bias = (cell_population.GetLocationOfCellCentre(cell_iter)[1] - y_min)/(y_max - y_min);
             
             TS_ASSERT_LESS_THAN_EQUALS(0.0, bias);
             TS_ASSERT_LESS_THAN_EQUALS(bias, 1.0);

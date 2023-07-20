@@ -207,9 +207,9 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::Validate()
     assert(mIsGhostNode.size()==this->GetNumNodes());
 
     // Look through all of the cells and record what node they are associated with.
-    for (auto cell_iter = this->Begin(); cell_iter != this->End(); ++cell_iter)
+    for (auto cell_iter : this->mCells)
     {
-        unsigned node_index = this->GetLocationIndexUsingCell((*cell_iter));
+        unsigned node_index = this->GetLocationIndexUsingCell(cell_iter);
 
         // If the node attached to this cell is labelled as a ghost node, then throw an error
         if (mIsGhostNode[node_index])
@@ -292,12 +292,10 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::AcceptCellWritersAcrossPopulati
         // If it isn't a ghost node then there might be cell writers attached
         if (!this->IsGhostNode(node_iter->GetIndex()))
         {
-            for (auto cell_writer_iter = this->mCellWriters.begin();
-                 cell_writer_iter != this->mCellWriters.end();
-                 ++cell_writer_iter)
+            for (auto cell_writer_iter : this->mCellWriters)
             {
                 CellPtr p_cell_from_node = this->GetCellUsingLocationIndex(node_iter->GetIndex());
-                this->AcceptCellWriter(*cell_writer_iter, p_cell_from_node);
+                this->AcceptCellWriter(cell_writer_iter, p_cell_from_node);
             }
         }
     }
@@ -381,9 +379,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
 
         // Iterate over any cell writers that are present
         unsigned num_vtk_cells = this->rGetMesh().GetNumNodes();
-        for (auto cell_writer_iter = this->mCellWriters.begin();
-             cell_writer_iter != this->mCellWriters.end();
-             ++cell_writer_iter)
+        for (auto cell_writer_iter : this->mCellWriters)
         {
             // Create vector to store VTK cell data
             std::vector<double> vtk_cell_data(num_vtk_cells);
@@ -408,22 +404,22 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
                     CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
 
                     // Populate the vector of VTK cell data
-                    vtk_cell_data[node_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(p_cell, this);
+                    vtk_cell_data[node_index] = cell_writer_iter->GetCellDataForVtkOutput(p_cell, this);
                 }
             }
 
-            mesh_writer.AddPointData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
+            mesh_writer.AddPointData(cell_writer_iter->GetVtkCellDataName(), vtk_cell_data);
         }
 
         // Next, record which nodes are ghost nodes
         // Note that the cell writer hierarchy can not be used to do this as ghost nodes don't have corresponding cells.
         std::vector<double> ghosts(num_vtk_cells);
         for (auto node_iter = this->rGetMesh().GetNodeIteratorBegin();
-            node_iter != this->rGetMesh().GetNodeIteratorEnd();
-            ++node_iter)
+             node_iter != this->rGetMesh().GetNodeIteratorEnd();
+             ++node_iter)
         {
             unsigned node_index = node_iter->GetIndex();
-            ghosts[node_index]  = (double) (this->IsGhostNode(node_index));
+            ghosts[node_index] = static_cast<double>(this->IsGhostNode(node_index));
         }
         mesh_writer.AddPointData("Non-ghosts", ghosts);
 
@@ -443,9 +439,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
 
         // Iterate over any cell writers that are present
         unsigned num_vtk_cells = this->mpVoronoiTessellation->GetNumElements();
-        for (auto cell_writer_iter = this->mCellWriters.begin();
-             cell_writer_iter != this->mCellWriters.end();
-             ++cell_writer_iter)
+        for (auto cell_writer_iter : this->mCellWriters)
         {
             // Create vector to store VTK cell data
             std::vector<double> vtk_cell_data(num_vtk_cells);
@@ -471,11 +465,11 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
                     CellPtr p_cell = this->GetCellUsingLocationIndex(node_index);
 
                     // Populate the vector of VTK cell data
-                    vtk_cell_data[elem_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(p_cell, this);
+                    vtk_cell_data[elem_index] = cell_writer_iter->GetCellDataForVtkOutput(p_cell, this);
                 }
             }
 
-            mesh_writer.AddCellData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
+            mesh_writer.AddCellData(cell_writer_iter->GetVtkCellDataName(), vtk_cell_data);
         }
 
         // Next, record which nodes are ghost nodes
@@ -487,7 +481,7 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::WriteVtkResultsToFile(const std
         {
             unsigned elem_index = elem_iter->GetIndex();
             unsigned node_index = this->mpVoronoiTessellation->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
-            ghosts[elem_index]  = (double) (this->IsGhostNode(node_index));
+            ghosts[elem_index] = static_cast<double>(this->IsGhostNode(node_index));
         }
         mesh_writer.AddCellData("Non-ghosts", ghosts);
 

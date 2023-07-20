@@ -134,9 +134,7 @@ public:
          * {{{VertexBasedCellPopulation}}} object, the vector {{{cells}}} above is now empty, so we must use the
          * {{{Iterator}}} to loop over cells. */
          boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
-        for (auto cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
+        for (auto cell_iter : cell_population)
         {
             if (RandomNumberGenerator::Instance()->ranf() < 0.5)
             {

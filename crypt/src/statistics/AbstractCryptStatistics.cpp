@@ -49,9 +49,7 @@ AbstractCryptStatistics::~AbstractCryptStatistics()
 
 void AbstractCryptStatistics::LabelSPhaseCells()
 {
-    for (auto cell_iter = mrCrypt.Begin();
-         cell_iter != mrCrypt.End();
-         ++cell_iter)
+    for (auto cell_iter : mrCrypt)
     {
         if (static_cast <AbstractPhaseBasedCellCycleModel*>(cell_iter->GetCellCycleModel())->GetCurrentCellCyclePhase()== S_PHASE)
         {
@@ -75,9 +73,7 @@ void AbstractCryptStatistics::LabelSPhaseCells()
 
 void AbstractCryptStatistics::LabelAllCellsAsHealthy()
 {
-    for (auto cell_iter = mrCrypt.Begin();
-         cell_iter != mrCrypt.End();
-         ++cell_iter)
+    for (auto cell_iter : mrCrypt)
     {
         cell_iter->SetMutationState(mrCrypt.GetCellPropertyRegistry()->Get<WildTypeCellMutationState>());
         cell_iter->RemoveCellProperty<CellLabel>();

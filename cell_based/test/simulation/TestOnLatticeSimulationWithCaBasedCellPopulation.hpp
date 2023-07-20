@@ -147,7 +147,7 @@ public:
         p_diffusion_update_rule->SetDiffusionParameter(diffusion_parameter);
         simulator.AddUpdateRule(p_diffusion_update_rule);
 
-        for (unsigned i=1; i<=num_runs; ++i)
+        for (unsigned i = 1; i <= num_runs; ++i)
         {
             simulator.SetEndTime(delta_t*i);
 
@@ -165,7 +165,7 @@ public:
             // Reset the position of the cell
             simulator.rGetCellPopulation().MoveCellInLocationMap(*cell_iter, cell_location, 4u);
 
-            TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter), 4u);
+            TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(cell_iter), 4u);
         }
 
         // Check that we still have only one cell
@@ -414,9 +414,9 @@ public:
             // The point index should be the same as the entry in the "Location Index For Test" array at this stage.
             vtkSmartPointer<vtkUnstructuredGrid> p_grid = p_reader->GetOutput();
             unsigned counter = 0;
-            for (auto cell_iter = cell_population.Begin(); cell_iter != cell_population.End(); ++cell_iter)
+            for (auto cell_iter : cell_population)
             {
-                unsigned location_index = cell_population.GetLocationIndexUsingCell(*cell_iter);
+                unsigned location_index = cell_population.GetLocationIndexUsingCell(cell_iter);
                 TS_ASSERT(counter < unsigned(p_grid->GetNumberOfPoints()));
                 TS_ASSERT_EQUALS(location_index, unsigned(p_grid->GetPointData()->GetArray("Location Index For Test")->GetTuple1(counter)));
                 counter++;
@@ -484,12 +484,9 @@ public:
         // Loop over the cells and check their new positions
         unsigned cell_locations[8]= {0u, 10u, 11u, 3u, 4u, 2u, 1u, 6u};
         unsigned index = 0;
-        for (auto cell_iter = simulator.rGetCellPopulation().Begin();
-             cell_iter != simulator.rGetCellPopulation().End();
-             ++cell_iter)
+        for (auto cell_iter : simulator.rGetCellPopulation())
         {
-            TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter), cell_locations[index]);
-
+            TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(cell_iter), cell_locations[index]);
             index++;
         }
     }
@@ -546,29 +543,27 @@ public:
 
         // Loop over the cells and check their new positions
         unsigned node_index = 0;
-        for (auto cell_iter = simulator.rGetCellPopulation().Begin();
-             cell_iter != simulator.rGetCellPopulation().End();
-             ++cell_iter)
+        for (auto cell_iter : simulator.rGetCellPopulation())
         {
             if (node_index == 3)
             {
-                TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter), 7u);
+                TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(cell_iter), 7u);
             }
             else if (node_index == 7)
             {
-                TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter), 3u);
+                TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(cell_iter), 3u);
             }
             else if (node_index == 17)
             {
-                TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter), 21u);
+                TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(cell_iter), 21u);
             }
             else if (node_index == 21)
             {
-                TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter), 17u);
+                TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(cell_iter), 17u);
             }
             else
             {
-                TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter), node_index);
+                TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(cell_iter), node_index);
             }
             node_index++;
         }

@@ -1072,6 +1072,16 @@ public:
      * @return iterator pointing to one past the last cell in the cell population
      */
     Iterator End();
+
+    /**
+     * @return iterator pointing to the first cell in the cell population
+     */
+    Iterator begin();
+
+    /**
+     * @return iterator pointing to one past the last cell in the cell population
+     */
+    Iterator end();
 };
 
 TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractCellPopulation)
@@ -1157,6 +1167,18 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::End()
 {
     return Iterator(*this, this->mCells.end());
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::begin()
+{
+    return this->Begin();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::end()
+{
+    return this->End();
 }
 
 #endif /*ABSTRACTCELLPOPULATION_HPP_*/

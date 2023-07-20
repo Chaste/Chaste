@@ -62,16 +62,14 @@ const c_vector<double, DIM>& PlaneBasedCellKiller<DIM>::rGetNormalToPlane() cons
 template<unsigned DIM>
 void PlaneBasedCellKiller<DIM>::CheckAndLabelCellsForApoptosisOrDeath()
 {
-    for (auto cell_iter = this->mpCellPopulation->Begin();
-         cell_iter != this->mpCellPopulation->End();
-         ++cell_iter)
+    for (auto cell_iter : *(this->mpCellPopulation))
     {
-        c_vector<double, DIM> cell_location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
+        c_vector<double, DIM> cell_location = this->mpCellPopulation->GetLocationOfCellCentre(cell_iter);
 
         if (inner_prod(cell_location - mPointOnPlane, mNormalToPlane) > 0.0)
         {
             // Mark the cell as killed and store removal information if required.
-            this->mpCellPopulation->KillCell(*cell_iter, "PlaneBasedCellKiller");
+            this->mpCellPopulation->KillCell(cell_iter, "PlaneBasedCellKiller");
         }
     }
 }

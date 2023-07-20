@@ -290,9 +290,7 @@ public:
         unsigned num_transit = 0;
         unsigned num_differentiated = 0;
 
-        for (auto cell_iter = crypt.Begin();
-             cell_iter != crypt.End();
-             ++cell_iter)
+        for (auto cell_iter : crypt)
         {
             if (cell_iter->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
             {
@@ -524,9 +522,7 @@ public:
 
         unsigned number_of_cells = 0;
         unsigned number_of_mutant_cells = 0;
-        for (auto cell_iter = crypt.Begin();
-             cell_iter != crypt.End();
-             ++cell_iter)
+        for (auto cell_iter : crypt)
         {
             number_of_cells++;
             if (cell_iter->GetMutationState()->IsType<ApcTwoHitCellMutationState>())
