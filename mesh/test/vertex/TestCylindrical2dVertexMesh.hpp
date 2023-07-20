@@ -487,11 +487,11 @@ public:
             TS_ASSERT_EQUALS(voronoi_mesh.GetElement(elem_index)->GetNumNodes(), 6u);
             if (elem_index>2 && elem_index <6)
             {
-                TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(elem_index),sqrt(3.0)/2.0, 1e-4);
+                TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(elem_index), sqrt(3.0) / 2.0, 1e-4);
             }
             else
             {
-                TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(elem_index),0.9330, 1e-4);
+                TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(elem_index), 0.9330, 1e-4);
             }
         }
     }
@@ -509,9 +509,9 @@ public:
         p_delaunay_mesh->GetNode(6)->rGetModifiableLocation()[1] = 5.0;
         p_delaunay_mesh->GetNode(7)->rGetModifiableLocation()[1] = 5.0;
         p_delaunay_mesh->GetNode(8)->rGetModifiableLocation()[1] = 5.0;
-        p_delaunay_mesh->GetNode(9)->rGetModifiableLocation()[1] = 5.0 + sqrt(3.0)/2.0;
-        p_delaunay_mesh->GetNode(10)->rGetModifiableLocation()[1] = 5.0 + sqrt(3.0)/2.0;
-        p_delaunay_mesh->GetNode(11)->rGetModifiableLocation()[1] = 5.0 + sqrt(3.0)/2.0;
+        p_delaunay_mesh->GetNode(9)->rGetModifiableLocation()[1] = 5.0 + sqrt(3.0) / 2.0;
+        p_delaunay_mesh->GetNode(10)->rGetModifiableLocation()[1] = 5.0 + sqrt(3.0) / 2.0;
+        p_delaunay_mesh->GetNode(11)->rGetModifiableLocation()[1] = 5.0 + sqrt(3.0) / 2.0;
         
 
         TrianglesMeshWriter<2,2> mesh_writer("TestBoundedCylindricalVertexMeshWithVoid", "DelaunayMesh", false);
@@ -557,7 +557,7 @@ public:
         for (unsigned elem_index=0; elem_index<12; elem_index++)
         {
             TS_ASSERT_EQUALS(voronoi_mesh.GetElement(elem_index)->GetNumNodes(), 6u);
-            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(elem_index),0.9330, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(elem_index), 0.9330, 1e-4);
         }
     }
 
@@ -571,7 +571,7 @@ public:
         Cylindrical2dMesh* p_delaunay_mesh = generator.GetCylindricalMesh();
         
         // Move the top row of nodes up so that two of the image nodes overlap
-        p_delaunay_mesh->GetNode(7)->rGetModifiableLocation()[1] = sqrt(3)-1/sqrt(3);
+        p_delaunay_mesh->GetNode(7)->rGetModifiableLocation()[1] = sqrt(3) - 1 / sqrt(3);
         
         TrianglesMeshWriter<2,2> mesh_writer("TestBoundedCylindricalVertexMeshWithOverlappingImageNode", "DelaunayMesh", false);
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(*p_delaunay_mesh));
