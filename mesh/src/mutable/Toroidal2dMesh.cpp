@@ -500,7 +500,7 @@ void Toroidal2dMesh::ReconstructCylindricalMesh()
             for (unsigned i=0; i<3; i++)
             {
                 unsigned this_node_index = elem_iter->GetNodeGlobalIndex(i);
-                std::map<unsigned, unsigned>::iterator it = mImageToLeftOriginalNodeMap.find(this_node_index);
+                auto it = mImageToLeftOriginalNodeMap.find(this_node_index);
                 if (it != mImageToLeftOriginalNodeMap.end())
                 {
                     elem_iter->ReplaceNode(mNodes[this_node_index], mNodes[it->second]);
@@ -552,7 +552,7 @@ void Toroidal2dMesh::ReconstructCylindricalMesh()
     //             for (unsigned i=0; i<2; i++)
     //             {
     //                 unsigned this_node_index = p_boundary_element->GetNodeGlobalIndex(i);
-    //                 std::map<unsigned, unsigned>::iterator it = mImageToLeftOriginalNodeMap.find(this_node_index);
+    //                 auto it = mImageToLeftOriginalNodeMap.find(this_node_index);
     //                 if (it != mImageToLeftOriginalNodeMap.end())
     //                 {
     //                     p_boundary_element->ReplaceNode(mNodes[this_node_index], mNodes[it->second]);
@@ -637,7 +637,7 @@ void Toroidal2dMesh::ReconstructToroidalMesh()
             for (unsigned i=0; i<3; i++)
             {
                 unsigned this_node_index = elem_iter->GetNodeGlobalIndex(i);
-                std::map<unsigned, unsigned>::iterator it = mImageToBottomOriginalNodeMap.find(this_node_index);
+                auto it = mImageToBottomOriginalNodeMap.find(this_node_index);
                 if (it != mImageToBottomOriginalNodeMap.end())
                 {
                     elem_iter->ReplaceNode(mNodes[this_node_index], mNodes[it->second]);
@@ -686,7 +686,7 @@ void Toroidal2dMesh::ReconstructToroidalMesh()
     //             for (unsigned i=0; i<2; i++)
     //             {
     //                 unsigned this_node_index = p_boundary_element->GetNodeGlobalIndex(i);
-    //                 std::map<unsigned, unsigned>::iterator it = mImageToBottomOriginalNodeMap.find(this_node_index);
+    //                 auto it = mImageToBottomOriginalNodeMap.find(this_node_index);
     //                 if (it != mImageToBottomOriginalNodeMap.end())
     //                 {
     //                     p_boundary_element->ReplaceNode(mNodes[this_node_index], mNodes[it->second]);
@@ -828,7 +828,7 @@ void Toroidal2dMesh::CorrectCylindricalNonPeriodicMesh()
     assert(mLeftPeriodicBoundaryElementIndices.size()==mRightPeriodicBoundaryElementIndices.size());
 
     // Go through all of the elements on the left periodic boundary
-    for (std::set<unsigned>::iterator left_iter = mLeftPeriodicBoundaryElementIndices.begin();
+    for (auto left_iter = mLeftPeriodicBoundaryElementIndices.begin();
          left_iter != mLeftPeriodicBoundaryElementIndices.end();
          ++left_iter)
     {
@@ -849,7 +849,7 @@ void Toroidal2dMesh::CorrectCylindricalNonPeriodicMesh()
         }
 
         // Search the right hand side elements for the corresponding element
-        for (std::set<unsigned>::iterator right_iter = mRightPeriodicBoundaryElementIndices.begin();
+        for (auto right_iter = mRightPeriodicBoundaryElementIndices.begin();
              right_iter != mRightPeriodicBoundaryElementIndices.end();
              ++right_iter)
         {
@@ -934,7 +934,7 @@ void Toroidal2dMesh::CorrectToroidalNonPeriodicMesh()
     assert(mBottomPeriodicBoundaryElementIndices.size()==mTopPeriodicBoundaryElementIndices.size());
 
     // Go through all of the elements on the bottom periodic boundary
-    for (std::set<unsigned>::iterator bottom_iter = mBottomPeriodicBoundaryElementIndices.begin();
+    for (auto bottom_iter = mBottomPeriodicBoundaryElementIndices.begin();
          bottom_iter != mBottomPeriodicBoundaryElementIndices.end();
          ++bottom_iter)
     {
@@ -955,7 +955,7 @@ void Toroidal2dMesh::CorrectToroidalNonPeriodicMesh()
         }
 
         // Search the top hand side elements for the corresponding element
-        for (std::set<unsigned>::iterator top_iter = mTopPeriodicBoundaryElementIndices.begin();
+        for (auto top_iter = mTopPeriodicBoundaryElementIndices.begin();
              top_iter != mTopPeriodicBoundaryElementIndices.end();
              ++top_iter)
         {
@@ -1096,7 +1096,7 @@ void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingCylindricalPeriodicBound
     // {
     //     TRACE("Left");
     //     PRINT_VARIABLE(mLeftPeriodicBoundaryElementIndices.size());
-    //     for (std::set<unsigned>::iterator iter = mLeftPeriodicBoundaryElementIndices.begin();
+    //     for (auto iter = mLeftPeriodicBoundaryElementIndices.begin();
     //          iter != mLeftPeriodicBoundaryElementIndices.end();
     //          iter++)
     //     {
@@ -1104,7 +1104,7 @@ void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingCylindricalPeriodicBound
     //     }
     //     TRACE("Right");
     //     PRINT_VARIABLE(mRightPeriodicBoundaryElementIndices.size());
-    //     for (std::set<unsigned>::iterator iter = mRightPeriodicBoundaryElementIndices.begin();
+    //     for (auto iter = mRightPeriodicBoundaryElementIndices.begin();
     //          iter != mRightPeriodicBoundaryElementIndices.end();
     //          iter++)
     //     {
@@ -1182,7 +1182,7 @@ unsigned Toroidal2dMesh::GetCorrespondingCylindricalNodeIndex(unsigned nodeIndex
     unsigned corresponding_node_index = UINT_MAX;
 
     // If nodeIndex is a member of mRightOriginals, then find the corresponding node index in mRightImages
-    std::vector<unsigned>::iterator right_orig_iter = std::find(mRightOriginals.begin(), mRightOriginals.end(), nodeIndex);
+    auto right_orig_iter = std::find(mRightOriginals.begin(), mRightOriginals.end(), nodeIndex);
     if (right_orig_iter != mRightOriginals.end())
     {
         corresponding_node_index = mRightImages[right_orig_iter - mRightOriginals.begin()];
@@ -1190,7 +1190,7 @@ unsigned Toroidal2dMesh::GetCorrespondingCylindricalNodeIndex(unsigned nodeIndex
     else
     {
         // If nodeIndex is a member of mRightImages, then find the corresponding node index in mRightOriginals
-        std::vector<unsigned>::iterator right_im_iter = std::find(mRightImages.begin(), mRightImages.end(), nodeIndex);
+        auto right_im_iter = std::find(mRightImages.begin(), mRightImages.end(), nodeIndex);
         if (right_im_iter != mRightImages.end())
         {
             corresponding_node_index = mRightOriginals[right_im_iter - mRightImages.begin()];
@@ -1203,7 +1203,7 @@ unsigned Toroidal2dMesh::GetCorrespondingCylindricalNodeIndex(unsigned nodeIndex
             NEVER_REACHED;
 
             // // If nodeIndex is a member of mLeftOriginals, then find the corresponding node index in mLeftImages
-            // std::vector<unsigned>::iterator left_orig_iter = std::find(mLeftOriginals.begin(), mLeftOriginals.end(), nodeIndex);
+            // auto left_orig_iter = std::find(mLeftOriginals.begin(), mLeftOriginals.end(), nodeIndex);
             // if (left_orig_iter != mLeftOriginals.end())
             // {
             //     corresponding_node_index = mLeftImages[left_orig_iter - mLeftOriginals.begin()];
@@ -1211,7 +1211,7 @@ unsigned Toroidal2dMesh::GetCorrespondingCylindricalNodeIndex(unsigned nodeIndex
             // else
             // {
             //     // If nodeIndex is a member of mLeftImages, then find the corresponding node index in mLeftOriginals
-            //     std::vector<unsigned>::iterator left_im_iter = std::find(mLeftImages.begin(), mLeftImages.end(), nodeIndex);
+            //     auto left_im_iter = std::find(mLeftImages.begin(), mLeftImages.end(), nodeIndex);
             //     if (left_im_iter != mLeftImages.end())
             //     {
             //         corresponding_node_index = mLeftOriginals[left_im_iter - mLeftImages.begin()];
@@ -1231,7 +1231,7 @@ unsigned Toroidal2dMesh::GetCorrespondingToroidalNodeIndex(unsigned nodeIndex)
     unsigned corresponding_node_index = UINT_MAX;
 
     // If nodeIndex is a member of mTopOriginals, then find the corresponding node index in mTopImages
-    std::vector<unsigned>::iterator top_orig_iter = std::find(mTopOriginals.begin(), mTopOriginals.end(), nodeIndex);
+    auto top_orig_iter = std::find(mTopOriginals.begin(), mTopOriginals.end(), nodeIndex);
     if (top_orig_iter != mTopOriginals.end())
     {
         corresponding_node_index = mTopImages[top_orig_iter - mTopOriginals.begin()];
@@ -1239,7 +1239,7 @@ unsigned Toroidal2dMesh::GetCorrespondingToroidalNodeIndex(unsigned nodeIndex)
     else
     {
         // If nodeIndex is a member of mTopImages, then find the corresponding node index in mTopOriginals
-        std::vector<unsigned>::iterator top_im_iter = std::find(mTopImages.begin(), mTopImages.end(), nodeIndex);
+        auto top_im_iter = std::find(mTopImages.begin(), mTopImages.end(), nodeIndex);
         if (top_im_iter != mTopImages.end())
         {
             corresponding_node_index = mTopOriginals[top_im_iter - mTopImages.begin()];
@@ -1252,7 +1252,7 @@ unsigned Toroidal2dMesh::GetCorrespondingToroidalNodeIndex(unsigned nodeIndex)
             NEVER_REACHED;
 
             // // If nodeIndex is a member of mBottomOriginals, then find the corresponding node index in mBottomImages
-            // std::vector<unsigned>::iterator bottom_orig_iter = std::find(mBottomOriginals.begin(), mBottomOriginals.end(), nodeIndex);
+            // auto bottom_orig_iter = std::find(mBottomOriginals.begin(), mBottomOriginals.end(), nodeIndex);
             // if (bottom_orig_iter != mBottomOriginals.end())
             // {
             //     corresponding_node_index = mBottomImages[bottom_orig_iter - mBottomOriginals.begin()];
@@ -1260,7 +1260,7 @@ unsigned Toroidal2dMesh::GetCorrespondingToroidalNodeIndex(unsigned nodeIndex)
             // else
             // {
             //     // If nodeIndex is a member of mBottomImages, then find the corresponding node index in mBottomOriginals
-            //     std::vector<unsigned>::iterator bottom_im_iter = std::find(mBottomImages.begin(), mBottomImages.end(), nodeIndex);
+            //     auto bottom_im_iter = std::find(mBottomImages.begin(), mBottomImages.end(), nodeIndex);
             //     if (bottom_im_iter != mBottomImages.end())
             //     {
             //         corresponding_node_index = mBottomOriginals[bottom_im_iter - mBottomImages.begin()];

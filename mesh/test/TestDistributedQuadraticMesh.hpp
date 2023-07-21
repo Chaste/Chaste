@@ -137,7 +137,7 @@ public:
         // and check that all the nodes are within a certain distance of the centre of mass.
         c_vector<double,2> centre_of_mass = zero_vector<double>(2);
         unsigned counter = 0;
-        for (std::set<unsigned>::iterator iter = nodes_owned.begin();
+        for (auto iter = nodes_owned.begin();
             iter != nodes_owned.end();
             ++iter)
         {
@@ -152,9 +152,9 @@ public:
         centre_of_mass(0) /= counter;
         centre_of_mass(1) /= counter;
 
-        for (std::set<unsigned>::iterator iter = nodes_owned.begin();
-                    iter != nodes_owned.end();
-                    ++iter)
+        for (auto iter = nodes_owned.begin();
+             iter != nodes_owned.end();
+             ++iter)
         {
             double dx = mesh.GetNode(*iter)->rGetLocation()[0] - centre_of_mass(0);
             double dy = mesh.GetNode(*iter)->rGetLocation()[1] - centre_of_mass(1);
@@ -169,9 +169,9 @@ public:
         //ss << "res_" << PetscTools::GetNumProcs() << "_" << PetscTools::GetMyRank() << ".txt";
         //out_stream p_file = handler.OpenOutputFile(ss.str());
         //
-        //for (std::set<unsigned>::iterator iter = nodes_owned.begin();
-        //    iter != nodes_owned.end();
-        //    ++iter)
+        //for (auto iter = nodes_owned.begin();
+        //     iter != nodes_owned.end();
+        //     ++iter)
         //{
         //    *p_file << mesh.GetNode(*iter)->rGetLocation()[0] << " "
         //              << mesh.GetNode(*iter)->rGetLocation()[1] << std::endl;

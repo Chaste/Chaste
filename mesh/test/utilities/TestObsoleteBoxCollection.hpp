@@ -156,7 +156,7 @@ public:
             box_min_max_values(0) = i * cut_off_length - 0.1;
             box_min_max_values(1) = (i+1) * cut_off_length - 0.1;
 
-            for (std::set< Node<1>* >::iterator it_nodes_in_box = nodes_in_box.begin();
+            for (auto it_nodes_in_box = nodes_in_box.begin();
                  it_nodes_in_box != nodes_in_box.end();
                  it_nodes_in_box++)
             {
@@ -549,8 +549,7 @@ public:
             box_min_max_values(2) = indices(1)*cut_off_length - 0.1;
             box_min_max_values(3) = (indices(1)+1)*cut_off_length - 0.1;
 
-
-            for (std::set< Node<2>* >::iterator it_nodes_in_box = nodes_in_box.begin();
+            for (auto it_nodes_in_box = nodes_in_box.begin();
                  it_nodes_in_box != nodes_in_box.end();
                  it_nodes_in_box++)
             {

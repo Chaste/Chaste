@@ -206,9 +206,9 @@ void DistributedBoxCollection<DIM>::UpdateHaloBoxes()
     mHaloNodesLeft.clear();
     for (unsigned i=0; i<mHalosLeft.size(); i++)
     {
-        for (typename std::set<Node<DIM>* >::iterator iter=this->rGetBox(mHalosLeft[i]).rGetNodesContained().begin();
-                iter!=this->rGetBox(mHalosLeft[i]).rGetNodesContained().end();
-                iter++)
+        for (auto iter = this->rGetBox(mHalosLeft[i]).rGetNodesContained().begin();
+             iter!=this->rGetBox(mHalosLeft[i]).rGetNodesContained().end();
+             iter++)
         {
             mHaloNodesLeft.push_back((*iter)->GetIndex());
         }
@@ -218,9 +218,9 @@ void DistributedBoxCollection<DIM>::UpdateHaloBoxes()
     mHaloNodesRight.clear();
     for (unsigned i=0; i<mHalosRight.size(); i++)
     {
-        for (typename std::set<Node<DIM>* >::iterator iter=this->rGetBox(mHalosRight[i]).rGetNodesContained().begin();
-                iter!=this->rGetBox(mHalosRight[i]).rGetNodesContained().end();
-                iter++)
+        for (auto iter = this->rGetBox(mHalosRight[i]).rGetNodesContained().begin();
+             iter != this->rGetBox(mHalosRight[i]).rGetNodesContained().end();
+             iter++)
         {
             mHaloNodesRight.push_back((*iter)->GetIndex());
         }
@@ -792,7 +792,9 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                                 k_offset.push_back(nK-1);
                             }
 
-                            for ( std::vector<unsigned>::iterator k_offset_it = k_offset.begin(); k_offset_it != k_offset.end(); ++k_offset_it )
+                            for (auto k_offset_it = k_offset.begin();
+                                 k_offset_it != k_offset.end();
+                                 ++k_offset_it)
                             {
                                 z_offset = (*k_offset_it)*nI*nJ;
                                 // Periodicity adjustments
@@ -1213,7 +1215,9 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                     if ( is_xmin[i] )
                     {
                         // Loop over the z levels
-                        for ( std::vector<int>::iterator it = z_i_offsets.begin(); it != z_i_offsets.end(); it++ )
+                        for (auto it = z_i_offsets.begin();
+                             it != z_i_offsets.end();
+                             it++)
                         {
                             local_boxes.insert( i + (*it) + (M-1) ); // The right-most box on the same row
                             // We also need to check for y boundaries
@@ -1232,7 +1236,9 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                     else if ( is_xmax[i] )
                     {
                         // Loop over the z levels
-                        for ( std::vector<int>::iterator it = z_i_offsets.begin(); it != z_i_offsets.end(); it++ )
+                        for (auto it = z_i_offsets.begin();
+                             it != z_i_offsets.end();
+                             it++)
                         {
                             local_boxes.insert( i + (*it) - (M-1) ); // The left-most box on the same row
                             // We also need to check for y boundaries
@@ -1279,7 +1285,9 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                     }
 
                     // Now we add the different boxes, checking for left and right
-                    for ( std::vector<unsigned>::iterator it_opp_box = opp_box_i.begin(); it_opp_box != opp_box_i.end(); it_opp_box++ )
+                    for (auto it_opp_box = opp_box_i.begin();
+                         it_opp_box != opp_box_i.end();
+                         it_opp_box++)
                     {
                         local_boxes.insert( *it_opp_box );
                         if ( !is_xmin[i] )
@@ -1781,7 +1789,7 @@ void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex,
     const std::set<unsigned>& local_boxes_indices = rGetLocalBoxes(boxIndex);
 
     // Loop over all the local boxes
-    for (std::set<unsigned>::iterator box_iter = local_boxes_indices.begin();
+    for (auto box_iter = local_boxes_indices.begin();
          box_iter != local_boxes_indices.end();
          box_iter++)
     {
@@ -1802,7 +1810,7 @@ void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex,
         std::set< Node<DIM>* >& r_contained_neighbour_nodes = p_neighbour_box->rGetNodesContained();
 
         // Loop over these nodes
-        for (typename std::set<Node<DIM>*>::iterator neighbour_node_iter = r_contained_neighbour_nodes.begin();
+        for (auto neighbour_node_iter = r_contained_neighbour_nodes.begin();
              neighbour_node_iter != r_contained_neighbour_nodes.end();
              ++neighbour_node_iter)
         {
@@ -1810,7 +1818,7 @@ void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex,
             unsigned other_node_index = (*neighbour_node_iter)->GetIndex();
 
             // Loop over nodes in this box
-            for (typename std::set<Node<DIM>*>::iterator node_iter = r_contained_nodes.begin();
+            for (auto node_iter = r_contained_nodes.begin();
                  node_iter != r_contained_nodes.end();
                  ++node_iter)
             {
@@ -1826,7 +1834,6 @@ void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex,
                         (*neighbour_node_iter)->AddNeighbour(node_index);
                     }
                 }
-
             }
         }
     }

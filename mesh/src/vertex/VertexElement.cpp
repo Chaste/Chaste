@@ -85,7 +85,7 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
     }
 
     // Populate mNodes
-    for (typename std::set< Node<SPACE_DIM>* >::iterator node_iter = nodes_set.begin();
+    for (auto node_iter = nodes_set.begin();
          node_iter != nodes_set.end();
          ++node_iter)
     {

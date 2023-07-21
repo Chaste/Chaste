@@ -383,7 +383,9 @@ bool VoronoiVertexMeshGenerator::CheckForCongruentNodes(MutableVertexMesh<2,2>* 
 
                 assert(containing_elems.size() > 0);
 
-                for (std::set<unsigned>::iterator it = containing_elems.begin() ; it != containing_elems.end() ; ++it)
+                for (auto it = containing_elems.begin();
+                     it != containing_elems.end();
+                     ++it)
                 {
                     VertexElement<2,2>* p_this_elem = pMesh->GetElement(*it);
                     unsigned local_idx = p_this_elem->GetNodeLocalIndex(p_mesh_node_b->GetIndex());

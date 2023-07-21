@@ -555,7 +555,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
             unsigned node_A_index = p_node_A->GetIndex();
             unsigned node_B_index = p_node_B->GetIndex();
             bool original_element = false;
-            for (std::set<unsigned>::iterator iter = shared_elements.begin();
+            for (auto iter = shared_elements.begin();
                  iter != shared_elements.end();
                  ++iter)
             {
@@ -890,7 +890,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideEdge(Node<SPACE_DIM>* pNod
     // Iterate over common elements
     unsigned node_A_index = pNodeA->GetIndex();
     unsigned node_B_index = pNodeB->GetIndex();
-    for (std::set<unsigned>::iterator iter = shared_elements.begin();
+    for (auto iter = shared_elements.begin();
          iter != shared_elements.end();
          ++iter)
     {
@@ -1251,7 +1251,7 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
 
                     // index in boundary_element_centroids and boundary_element_indices
                     unsigned boundary_element_index = 0;
-                    for (std::vector<unsigned>::iterator elem_iter = boundary_element_indices.begin();
+                    for (auto elem_iter = boundary_element_indices.begin();
                          elem_iter != boundary_element_indices.end();
                          ++elem_iter)
                     {
@@ -2091,7 +2091,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(
         }
 
         // Get element A
-        std::set<unsigned>::iterator iter = elements_containing_intersecting_node.begin();
+        auto iter = elements_containing_intersecting_node.begin();
         unsigned element_a_index = *(iter);
         VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element_a = this->GetElement(element_a_index);
 
@@ -2445,7 +2445,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap([[maybe_unused]] V
             std::set<unsigned> containing_elements = p_node->rGetContainingElementIndices();
             containing_elements.erase(rElement.GetIndex());
             // For each of these elements...
-            for (std::set<unsigned>::iterator elem_iter = containing_elements.begin(); elem_iter != containing_elements.end(); ++elem_iter)
+            for (auto elem_iter = containing_elements.begin();
+                 elem_iter != containing_elements.end();
+                 ++elem_iter)
             {
                 VertexElement<ELEMENT_DIM, SPACE_DIM>* p_this_elem = this->GetElement(*elem_iter);
 

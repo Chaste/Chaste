@@ -105,7 +105,7 @@ private:
             if (box_collection.IsBoxOwned(i))
             {
                 std::set<Node<DIM>* > nodes = box_collection.rGetBox(i).rGetNodesContained();
-                for (typename std::set<Node<DIM>* >::iterator node_iter = nodes.begin();
+                for (auto node_iter = nodes.begin();
                      node_iter != nodes.end();
                      ++node_iter)
                 {
@@ -2510,10 +2510,12 @@ public:
 
         // Loop over and check each pair exists
         TS_ASSERT_EQUALS(pairs_should_be.size(), pairs_returned.size());
-        for ( std::set< std::pair<Node<2>*, Node<2>* > >::iterator it = pairs_should_be.begin(); it!= pairs_should_be.end(); ++it )
+        for (auto it = pairs_should_be.begin();
+             it != pairs_should_be.end();
+             ++it)
         {
-            std::set< std::pair<Node<2>*, Node<2>* > >::iterator pair_location = pairs_returned.find( *it );
-            if ( pair_location == pairs_returned.end() )
+            auto pair_location = pairs_returned.find( *it );
+            if (pair_location == pairs_returned.end())
             {
                 // Need to check the pair isn't added as the opposite pairing
                 pair_location = pairs_returned.find( std::make_pair( (*it).second, (*it).first ));

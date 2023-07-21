@@ -379,7 +379,7 @@ void Cylindrical2dMesh::ReconstructCylindricalMesh()
             for (unsigned i=0; i<3; i++)
             {
                 unsigned this_node_index = elem_iter->GetNodeGlobalIndex(i);
-                std::map<unsigned, unsigned>::iterator it = mImageToLeftOriginalNodeMap.find(this_node_index);
+                auto it = mImageToLeftOriginalNodeMap.find(this_node_index);
                 if (it != mImageToLeftOriginalNodeMap.end())
                 {
                     elem_iter->ReplaceNode(mNodes[this_node_index], mNodes[it->second]);
@@ -428,7 +428,7 @@ void Cylindrical2dMesh::ReconstructCylindricalMesh()
                 for (unsigned i=0; i<2; i++)
                 {
                     unsigned this_node_index = p_boundary_element->GetNodeGlobalIndex(i);
-                    std::map<unsigned, unsigned>::iterator it = mImageToLeftOriginalNodeMap.find(this_node_index);
+                    auto it = mImageToLeftOriginalNodeMap.find(this_node_index);
                     if (it != mImageToLeftOriginalNodeMap.end())
                     {
                         p_boundary_element->ReplaceNode(mNodes[this_node_index], mNodes[it->second]);
@@ -557,7 +557,7 @@ void Cylindrical2dMesh::CorrectNonPeriodicMesh()
     assert(mLeftPeriodicBoundaryElementIndices.size()==mRightPeriodicBoundaryElementIndices.size());
 
     // Go through all of the elements on the left periodic boundary
-    for (std::set<unsigned>::iterator left_iter = mLeftPeriodicBoundaryElementIndices.begin();
+    for (auto left_iter = mLeftPeriodicBoundaryElementIndices.begin();
          left_iter != mLeftPeriodicBoundaryElementIndices.end();
          ++left_iter)
     {
@@ -578,7 +578,7 @@ void Cylindrical2dMesh::CorrectNonPeriodicMesh()
         }
 
         // Search the right hand side elements for the corresponding element
-        for (std::set<unsigned>::iterator right_iter = mRightPeriodicBoundaryElementIndices.begin();
+        for (auto right_iter = mRightPeriodicBoundaryElementIndices.begin();
              right_iter != mRightPeriodicBoundaryElementIndices.end();
              ++right_iter)
         {
@@ -653,7 +653,7 @@ void Cylindrical2dMesh::UseTheseElementsToDecideMeshing(std::set<unsigned>& rMai
 
     // We find the four nodes surrounding the dodgy meshing, on each side.
     std::set<unsigned> main_four_nodes;
-    for (std::set<unsigned>::iterator left_iter = rMainSideElements.begin();
+    for (auto left_iter = rMainSideElements.begin();
          left_iter != rMainSideElements.end();
          ++left_iter)
     {
@@ -668,7 +668,7 @@ void Cylindrical2dMesh::UseTheseElementsToDecideMeshing(std::set<unsigned>& rMai
     assert(main_four_nodes.size() == 4);
 
     std::set<unsigned> other_four_nodes;
-    for (std::set<unsigned>::iterator iter = main_four_nodes.begin();
+    for (auto iter = main_four_nodes.begin();
          iter != main_four_nodes.end();
          ++iter)
     {
@@ -701,7 +701,7 @@ void Cylindrical2dMesh::UseTheseElementsToDecideMeshing(std::set<unsigned>& rMai
 
     // Now corresponding_elements contains the two elements which are going to be replaced by rMainSideElements
     unsigned num_elements = GetNumAllElements();
-    for (std::set<unsigned>::iterator iter = rMainSideElements.begin();
+    for (auto iter = rMainSideElements.begin();
          iter != rMainSideElements.end();
          ++iter)
     {
@@ -806,7 +806,7 @@ unsigned Cylindrical2dMesh::GetCorrespondingNodeIndex(unsigned nodeIndex)
     unsigned corresponding_node_index = UINT_MAX;
 
     // If nodeIndex is a member of mRightOriginals, then find the corresponding node index in mRightImages
-    std::vector<unsigned>::iterator right_orig_iter = std::find(mRightOriginals.begin(), mRightOriginals.end(), nodeIndex);
+    auto right_orig_iter = std::find(mRightOriginals.begin(), mRightOriginals.end(), nodeIndex);
     if (right_orig_iter != mRightOriginals.end())
     {
         corresponding_node_index = mRightImages[right_orig_iter - mRightOriginals.begin()];
@@ -814,7 +814,7 @@ unsigned Cylindrical2dMesh::GetCorrespondingNodeIndex(unsigned nodeIndex)
     else
     {
         // If nodeIndex is a member of mRightImages, then find the corresponding node index in mRightOriginals
-        std::vector<unsigned>::iterator right_im_iter = std::find(mRightImages.begin(), mRightImages.end(), nodeIndex);
+        auto right_im_iter = std::find(mRightImages.begin(), mRightImages.end(), nodeIndex);
         if (right_im_iter != mRightImages.end())
         {
             corresponding_node_index = mRightOriginals[right_im_iter - mRightImages.begin()];
@@ -822,7 +822,7 @@ unsigned Cylindrical2dMesh::GetCorrespondingNodeIndex(unsigned nodeIndex)
         else
         {
             // If nodeIndex is a member of mLeftOriginals, then find the corresponding node index in mLeftImages
-            std::vector<unsigned>::iterator left_orig_iter = std::find(mLeftOriginals.begin(), mLeftOriginals.end(), nodeIndex);
+            auto left_orig_iter = std::find(mLeftOriginals.begin(), mLeftOriginals.end(), nodeIndex);
             if (left_orig_iter != mLeftOriginals.end())
             {
                 corresponding_node_index = mLeftImages[left_orig_iter - mLeftOriginals.begin()];
@@ -830,7 +830,7 @@ unsigned Cylindrical2dMesh::GetCorrespondingNodeIndex(unsigned nodeIndex)
             else
             {
                 // If nodeIndex is a member of mLeftImages, then find the corresponding node index in mLeftOriginals
-                std::vector<unsigned>::iterator left_im_iter = std::find(mLeftImages.begin(), mLeftImages.end(), nodeIndex);
+                auto left_im_iter = std::find(mLeftImages.begin(), mLeftImages.end(), nodeIndex);
                 if (left_im_iter != mLeftImages.end())
                 {
                     corresponding_node_index = mLeftOriginals[left_im_iter - mLeftImages.begin()];

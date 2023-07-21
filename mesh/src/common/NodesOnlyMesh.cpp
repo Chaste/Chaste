@@ -256,7 +256,7 @@ void NodesOnlyMesh<SPACE_DIM>::ReMesh(NodeMap& map)
 template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::RemoveDeletedNodes(NodeMap& map)
 {
-    typename std::vector<Node<SPACE_DIM>* >::iterator node_iter = this->mNodes.begin();
+    auto node_iter = this->mNodes.begin();
     while (node_iter != this->mNodes.end())
     {
         if ((*node_iter)->IsDeleted())
@@ -651,9 +651,9 @@ template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::AddHaloNodesToBoxes()
 {
     // Add halo nodes
-    for (typename std::vector<boost::shared_ptr<Node<SPACE_DIM> > >::iterator halo_node_iter = mHaloNodes.begin();
-            halo_node_iter != mHaloNodes.end();
-            ++halo_node_iter)
+    for (auto halo_node_iter = mHaloNodes.begin();
+         halo_node_iter != mHaloNodes.end();
+         ++halo_node_iter)
     {
         unsigned box_index = mpBoxCollection->CalculateContainingBox((*halo_node_iter).get());
         mpBoxCollection->rGetHaloBox(box_index).AddNode((*halo_node_iter).get());

@@ -406,7 +406,7 @@ VertexMesh<3, 3>::VertexMesh(TetrahedralMesh<3, 3>& rMesh)
             std::vector<std::pair<double, unsigned> > index_angle_list;
 
             // Loop over each element containing this edge (i.e. those containing both nodes of the edge)
-            for (std::set<unsigned>::iterator index_iter = edge_element_indices.begin();
+            for (auto index_iter = edge_element_indices.begin();
                  index_iter != edge_element_indices.end();
                  ++index_iter)
             {
@@ -479,7 +479,7 @@ VertexMesh<3, 3>::VertexMesh(TetrahedralMesh<3, 3>& rMesh)
 
     // Populate mElements
     unsigned elem_count = 0;
-    for (std::map<unsigned, VertexElement<3, 3>*>::iterator element_iter = index_element_map.begin();
+    for (auto element_iter = index_element_map.begin();
          element_iter != index_element_map.end();
          ++element_iter)
     {
@@ -662,7 +662,7 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetDelaunayNodeIndexCorrespondingTo
     }
     else
     {
-        for (std::map<unsigned, unsigned>::iterator iter = mVoronoiElementIndexMap.begin();
+        for (auto iter = mVoronoiElementIndexMap.begin();
              iter != mVoronoiElementIndexMap.end();
              ++iter)
         {
@@ -688,7 +688,7 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVoronoiElementIndexCorresponding
     }
     else
     {
-        std::map<unsigned, unsigned>::iterator iter = mVoronoiElementIndexMap.find(nodeIndex);
+        auto iter = mVoronoiElementIndexMap.find(nodeIndex);
 
         if (iter == mVoronoiElementIndexMap.end())
         {
@@ -878,7 +878,7 @@ std::set<unsigned> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNeighbouringNodeIndice
     std::set<unsigned> containing_elem_indices = this->GetNode(nodeIndex)->rGetContainingElementIndices();
 
     // Iterate over these elements
-    for (std::set<unsigned>::iterator elem_iter = containing_elem_indices.begin();
+    for (auto elem_iter = containing_elem_indices.begin();
          elem_iter != containing_elem_indices.end();
          ++elem_iter)
     {
@@ -925,7 +925,7 @@ std::set<unsigned> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNeighbouringNodeNotAls
     std::set<unsigned> node_neighbours = GetNeighbouringNodeIndices(nodeIndex);
 
     // Check if each neighbour is also in this element; if not, add it to the set
-    for (std::set<unsigned>::iterator iter = node_neighbours.begin();
+    for (auto iter = node_neighbours.begin();
          iter != node_neighbours.end();
          ++iter)
     {

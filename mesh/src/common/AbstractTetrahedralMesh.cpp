@@ -217,10 +217,11 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckOutwardNormals()
 
             std::vector<unsigned> difference(ELEMENT_DIM);
 
-            std::vector<unsigned>::iterator set_iter = std::set_difference(
-                    element_node_indices.begin(),element_node_indices.end(),
-                    boundary_element_node_indices.begin(), boundary_element_node_indices.end(),
-                    difference.begin());
+            auto set_iter = std::set_difference(element_node_indices.begin(),
+                                                element_node_indices.end(),
+                                                boundary_element_node_indices.begin(),
+                                                boundary_element_node_indices.end(),
+                                                difference.begin());
             if (set_iter - difference.begin() == 1)
             {
                 p_opposite_node = this -> GetNodeOrHaloNode(difference[0]);

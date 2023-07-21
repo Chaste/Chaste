@@ -209,8 +209,9 @@ void PeriodicNodesOnlyMesh<SPACE_DIM>::RefreshMesh()
 {
     // Loop over the periodic dimensions and if they are
     // outside the domain, get the fmod and relocate
-    for ( typename std::vector<Node<SPACE_DIM> *>::iterator it_node = this->mNodes.begin();
-            it_node != this->mNodes.end(); ++it_node )
+    for (auto it_node = this->mNodes.begin();
+         it_node != this->mNodes.end();
+         ++it_node)
     {
         c_vector<double,SPACE_DIM> & location = (*it_node)->rGetModifiableLocation();
 

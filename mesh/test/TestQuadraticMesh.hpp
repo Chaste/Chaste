@@ -1010,7 +1010,9 @@ public:
         for (unsigned node_index = 0; node_index<mesh.GetNumNodes(); node_index++)
         {
             std::set<unsigned> elements = mesh.GetNode(node_index)->rGetContainingElementIndices();
-            for (std::set<unsigned>::iterator iter = elements.begin(); iter != elements.end(); iter++)
+            for (auto iter = elements.begin();
+                 iter != elements.end();
+                 iter++)
             {
                 Element<3,3>* p_element = mesh.GetElement(*iter);
                 bool found_node = false;
@@ -1026,7 +1028,9 @@ public:
             }
 
             std::set<unsigned> boundary_elements = mesh.GetNode(node_index)->rGetContainingBoundaryElementIndices();
-            for (std::set<unsigned>::iterator iter = boundary_elements.begin(); iter != boundary_elements.end(); iter++)
+            for (auto iter = boundary_elements.begin();
+                 iter != boundary_elements.end();
+                 iter++)
             {
                 BoundaryElement<2,3>* p_element = mesh.GetBoundaryElement(*iter);
                 bool found_node = false;

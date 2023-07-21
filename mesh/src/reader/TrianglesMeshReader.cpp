@@ -216,7 +216,7 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextElementData()
 
     if (mNodePermutationDefined)
     {
-        for (std::vector<unsigned>::iterator node_it = element_data.NodeIndices.begin();
+        for (auto node_it = element_data.NodeIndices.begin();
              node_it != element_data.NodeIndices.end();
              ++ node_it)
         {
@@ -249,7 +249,7 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextCableElementData
     // Node permutation can only be done with binary data...
 //    if (mNodePermutationDefined)
 //    {
-//        for (std::vector<unsigned>::iterator node_it = element_data.NodeIndices.begin();
+//        for (auto node_it = element_data.NodeIndices.begin();
 //             node_it != element_data.NodeIndices.end();
 //             ++ node_it)
 //        {
@@ -315,7 +315,7 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextFaceData()
 
     if (mNodePermutationDefined)
     {
-        for (std::vector<unsigned>::iterator node_it = ret_indices.begin();
+        for (auto node_it = ret_indices.begin();
              node_it != ret_indices.end();
              ++ node_it)
         {

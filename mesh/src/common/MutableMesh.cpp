@@ -523,8 +523,9 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::DeleteBoundaryNodeAt(unsigned index)
     mDeletedNodeIndices.push_back(index);
 
     // Update the boundary node vector
-    typename std::vector<Node<SPACE_DIM>*>::iterator b_node_iter
-    = std::find(this->mBoundaryNodes.begin(), this->mBoundaryNodes.end(), this->mNodes[index]);
+    auto b_node_iter = std::find(this->mBoundaryNodes.begin(),
+                                 this->mBoundaryNodes.end(),
+                                 this->mNodes[index]);
     this->mBoundaryNodes.erase(b_node_iter);
 
     // Remove boundary elements containing this node
@@ -864,9 +865,9 @@ std::vector<c_vector<unsigned, 5> > MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitLo
                     std::set<std::pair<unsigned, unsigned> >::iterator longest_edge_iter;
 
                     //Find the longest edge in the set and split it
-                    for (std::set<std::pair<unsigned, unsigned> >::iterator edge_iter = long_edges.begin();
-                            edge_iter != long_edges.end();
-                            ++edge_iter)
+                    for (auto edge_iter = long_edges.begin();
+                         edge_iter != long_edges.end();
+                         ++edge_iter)
                     {
                         unsigned node_a_global_index = edge_iter->first;
                         unsigned node_b_global_index = edge_iter->second;

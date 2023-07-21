@@ -660,15 +660,17 @@ void ObsoleteBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNo
         std::set<unsigned> local_boxes_indices = rGetLocalBoxes(this_node_box_index);
 
         // Loop over all the local boxes
-        for (std::set<unsigned>::iterator box_iter = local_boxes_indices.begin(); box_iter != local_boxes_indices.end();
-                box_iter++)
+        for (auto box_iter = local_boxes_indices.begin();
+             box_iter != local_boxes_indices.end();
+             box_iter++)
         {
             // Get the set of nodes contained in this box
             std::set<Node<DIM>*>& r_contained_nodes = mBoxes[*box_iter].rGetNodesContained();
 
             // Loop over these nodes
-            for (typename std::set<Node<DIM>*>::iterator node_iter = r_contained_nodes.begin();
-                    node_iter != r_contained_nodes.end(); ++node_iter)
+            for (auto node_iter = r_contained_nodes.begin();
+                 node_iter != r_contained_nodes.end();
+                 ++node_iter)
             {
                 // Get the index of the other node
                 unsigned other_node_index = (*node_iter)->GetIndex();
