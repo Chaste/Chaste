@@ -94,7 +94,7 @@ public:
      * @param width the periodic widths of the mesh. (Note if width=0.0 then not periodic)
      *
      */
-    PeriodicNodesOnlyMesh(c_vector<double,SPACE_DIM> width);
+    explicit PeriodicNodesOnlyMesh(c_vector<double,SPACE_DIM> width);
 
     /**
      * Set up the box collection

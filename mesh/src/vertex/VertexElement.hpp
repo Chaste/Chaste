@@ -114,7 +114,7 @@ public:
      *
      * @param index global index of the element
      */
-    VertexElement(unsigned index);
+    explicit VertexElement(unsigned index);
 
     /**
      * Constructor.

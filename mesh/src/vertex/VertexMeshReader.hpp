@@ -134,7 +134,7 @@ public:
      *
      * @param pathBaseName the base name for results files
      */
-    VertexMeshReader(std::string pathBaseName);
+    explicit VertexMeshReader(std::string pathBaseName);
 
     /**
      * Destructor.

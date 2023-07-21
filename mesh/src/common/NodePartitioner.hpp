@@ -87,9 +87,6 @@ public:
                                         std::set<unsigned>& rNodesOwned,
                                         std::vector<unsigned>& rProcessorsOffset,
                                         ChasteCuboid<SPACE_DIM>* pRegion);
-
-
-private:
 };
 
 #endif // NODEPARTITIONER_HPP_

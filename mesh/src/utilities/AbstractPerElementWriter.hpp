@@ -127,7 +127,7 @@ public:
      *
      * @param pMesh  The mesh whose elements we are going to write out data for.
      */
-    AbstractPerElementWriter(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
+    explicit AbstractPerElementWriter(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
      : mFileIsBinary(false),
        mpMesh(pMesh),
        mpMasterFile(nullptr)

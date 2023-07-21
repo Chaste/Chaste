@@ -132,15 +132,15 @@ public:
      *
      * @param pathBaseName Full file path of the input file
      */
-    VtkMeshReader(std::string pathBaseName);
+    explicit VtkMeshReader(std::string pathBaseName);
 
     /**
      * Alternative constructor, takes a vtkUnstructuredGrid that is already in memory as an input
      * parameter rather than a .vtu file
      *
-     * @param p_vtkUnstructuredGrid Pointer to a vtkUnstructuredGrid object
+     * @param pVtkUnstructuredGrid Pointer to a vtkUnstructuredGrid object
      */
-    VtkMeshReader(vtkUnstructuredGrid* p_vtkUnstructuredGrid);
+    explicit VtkMeshReader(vtkUnstructuredGrid* pVtkUnstructuredGrid);
 
     /**
      * Destructor

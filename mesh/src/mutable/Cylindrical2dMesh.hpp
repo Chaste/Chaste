@@ -221,7 +221,7 @@ public:
      *
      * @param width the width of the mesh (circumference)
      */
-    Cylindrical2dMesh(double width);
+    explicit Cylindrical2dMesh(double width);
 
     /**
      * A constructor which reads in a width and collection of nodes, then

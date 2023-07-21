@@ -89,7 +89,7 @@ public:
      *
      * @param index global index of the element
      */
-    MutableElement(unsigned index);
+    explicit MutableElement(unsigned index);
 
     /**
      * Constructor.

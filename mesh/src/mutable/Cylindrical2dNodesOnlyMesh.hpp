@@ -86,7 +86,7 @@ public:
      *
      * @param width the width of the mesh (circumference)
      */
-    Cylindrical2dNodesOnlyMesh(double width);
+    explicit Cylindrical2dNodesOnlyMesh(double width);
 
     /**
      * Set up the box collection

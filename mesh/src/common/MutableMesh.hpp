@@ -162,7 +162,6 @@ private:
      */
     bool CheckIsVoronoi(Element<ELEMENT_DIM, SPACE_DIM>* pElement, double maxPenetration);
 
-
 public:
 
     /**
@@ -175,7 +174,7 @@ public:
      *
      * @param nodes  a vector of nodes
      */
-    MutableMesh(std::vector<Node<SPACE_DIM> *> nodes);
+    explicit MutableMesh(std::vector<Node<SPACE_DIM> *> nodes);
 
     /**
      * Destructor.

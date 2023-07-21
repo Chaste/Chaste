@@ -62,7 +62,7 @@ public:
      *
      * @param size  the size of the NodeMap
      */
-    NodeMap(unsigned size);
+    explicit NodeMap(unsigned size);
 
     /**
      * Resize the NodeMap.

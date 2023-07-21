@@ -243,7 +243,7 @@ private:
 public:
 
     /**
-     * Con+structor.
+     * Constructor.
      *
      * @param width the periodic width of the mesh
      * @param depth the periodic depth of the mesh

@@ -198,7 +198,7 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::VtkMeshReader(vtkUnstructuredGrid* p_vtkUnstructuredGrid) :
+VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::VtkMeshReader(vtkUnstructuredGrid* pVtkUnstructuredGrid) :
     mIndexFromZero(true),
     mNumNodes(0),
     mNumElements(0),
@@ -217,7 +217,7 @@ VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::VtkMeshReader(vtkUnstructuredGrid* p_vtkUn
     mNodesPerElement(4),
     mVtkCellType(VTK_TETRA)
 {
-    mpVtkUnstructuredGrid = p_vtkUnstructuredGrid;
+    mpVtkUnstructuredGrid = pVtkUnstructuredGrid;
     CommonConstructor();
 }
 

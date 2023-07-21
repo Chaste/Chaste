@@ -131,7 +131,7 @@ public:
      *
      * @param rMesh the mesh for which to compute maps
      */
-    DistanceMapCalculator(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh);
+    explicit DistanceMapCalculator(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh);
 
      /**
      * Destructor - cleans up mNumHalosPerProcess (which is normally set to NULL anyway).

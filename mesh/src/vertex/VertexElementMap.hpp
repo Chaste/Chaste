@@ -58,7 +58,7 @@ public:
      *
      * @param size  the size of the VertexElementMap
      */
-    VertexElementMap(unsigned size);
+    explicit VertexElementMap(unsigned size);
 
     /**
      * Resize the VertexElementMap.

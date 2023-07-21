@@ -93,7 +93,7 @@ public:
      *
      * @param rPathBaseName  the base name of the files from which to read the mesh data
      */
-    MemfemMeshReader(const std::string& rPathBaseName);
+    explicit MemfemMeshReader(const std::string& rPathBaseName);
 
     /**
      * Destructor.
