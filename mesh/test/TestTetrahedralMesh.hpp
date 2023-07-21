@@ -2041,18 +2041,18 @@ public:
             // Show that the x-split and y-split have different indexing schemes
             // Normal meshes index in x-direction first
             c_vector<double, 3> xaxis1 = mesh_with_default_split.GetNode(width)->rGetLocation();
-            TS_ASSERT_DELTA(xaxis1[0], (double) width, 1e-5);
+            TS_ASSERT_DELTA(xaxis1[0], static_cast<double>(width), 1e-5);
             TS_ASSERT_DELTA(xaxis1[1], 0.0, 1e-5);
             TS_ASSERT_DELTA(xaxis1[2], 0.0, 1e-5);
             // The x split one indexes in y, then z so x-axis is in top layer
             c_vector<double, 3> xaxis2 = mesh_with_x_split.GetNode(width*(height+1)*(depth+1))->rGetLocation();
-            TS_ASSERT_DELTA(xaxis2[0], (double) width, 1e-5);
+            TS_ASSERT_DELTA(xaxis2[0], static_cast<double>(width), 1e-5);
             TS_ASSERT_DELTA(xaxis2[1], 0.0, 1e-5);
             TS_ASSERT_DELTA(xaxis2[2], 0.0, 1e-5);
 
             // the y split indexes in z first so x-axis is the end of the first layer
             c_vector<double, 3> xaxis3 = mesh_with_y_split.GetNode(width*(depth+1))->rGetLocation();
-            TS_ASSERT_DELTA(xaxis3[0], (double) width, 1e-5);
+            TS_ASSERT_DELTA(xaxis3[0], static_cast<double>(width), 1e-5);
             TS_ASSERT_DELTA(xaxis3[1], 0.0, 1e-5);
             TS_ASSERT_DELTA(xaxis3[2], 0.0, 1e-5);
 

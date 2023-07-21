@@ -219,7 +219,7 @@ public:
         double box_width = mesh.GetBoxCollection()->GetBoxWidth();
         double expected_domain_size[6] = {0.0, 3.0, 0.0, 3.0, 0.0, 3.0};
         // Distributed boxes will extend the range of the z dimension when there are redundant processes
-        expected_domain_size[5] = (double) std::max(3u, PetscTools::GetNumProcs());
+        expected_domain_size[5] = static_cast<double>(std::max(3u, PetscTools::GetNumProcs()));
 
         // Check the correct domain size has been set (swelled to be a multiple of the box width)
         for (unsigned i=0; i<3; i++)
@@ -714,7 +714,7 @@ public:
             AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
             node_index = node_iter->GetIndex();
 
-            TS_ASSERT_DELTA(mesh.GetNode(node_index)->GetRadius(), (double)(node_index+1), 1e-4);
+            TS_ASSERT_DELTA(mesh.GetNode(node_index)->GetRadius(), static_cast<double>(node_index+1), 1e-4);
             mesh.DeleteNode(node_index);
             TS_ASSERT_THROWS_THIS(mesh.DeleteNode(node_index), "Trying to delete a deleted node");
         }
@@ -748,12 +748,12 @@ public:
         if (PetscTools::AmMaster())
         {
             unsigned base_index = PetscTools::GetNumProcs();
-            TS_ASSERT_DELTA(mesh.GetNode(base_index)->GetRadius(),   (double)base_index + 1.0, 1e-4);
-            TS_ASSERT_DELTA(mesh.GetNode(2*base_index)->GetRadius(), (double)2*base_index + 1.0, 1e-4);
-            TS_ASSERT_DELTA(mesh.GetNode(3*base_index)->GetRadius(), (double)3*base_index + 1.0, 1e-4);
-            TS_ASSERT_DELTA(mesh.GetNode(4*base_index)->GetRadius(), (double)4*base_index + 1.0, 1e-4);
-            TS_ASSERT_DELTA(mesh.GetNode(5*base_index)->GetRadius(), (double)5*base_index + 1.0, 1e-4);
-            TS_ASSERT_DELTA(mesh.GetNode(6*base_index)->GetRadius(), (double)6*base_index + 1.0, 1e-4);
+            TS_ASSERT_DELTA(mesh.GetNode(base_index)->GetRadius(),   static_cast<double>(base_index) + 1.0, 1e-4);
+            TS_ASSERT_DELTA(mesh.GetNode(2*base_index)->GetRadius(), static_cast<double>(2*base_index) + 1.0, 1e-4);
+            TS_ASSERT_DELTA(mesh.GetNode(3*base_index)->GetRadius(), static_cast<double>(3*base_index) + 1.0, 1e-4);
+            TS_ASSERT_DELTA(mesh.GetNode(4*base_index)->GetRadius(), static_cast<double>(4*base_index) + 1.0, 1e-4);
+            TS_ASSERT_DELTA(mesh.GetNode(5*base_index)->GetRadius(), static_cast<double>(5*base_index) + 1.0, 1e-4);
+            TS_ASSERT_DELTA(mesh.GetNode(6*base_index)->GetRadius(), static_cast<double>(6*base_index) + 1.0, 1e-4);
         }
 
         // Free memory - the constructor does a deep copy of its input

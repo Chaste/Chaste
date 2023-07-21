@@ -166,7 +166,7 @@ public:
         std::vector<double> cell_ids;
         for (unsigned i=0; i<p_mesh_for_vtk->GetNumElements(); i++)
         {
-            double this_cell_id = (double) i;
+            double this_cell_id = static_cast<double>(i);
             cell_ids.push_back(this_cell_id);
         }
 
@@ -224,7 +224,7 @@ public:
         std::vector<double> cell_ids;
         for (unsigned i=0; i<p_mesh_for_vtk->GetNumElements(); i++)
         {
-            double this_cell_id = (double) i;
+            double this_cell_id = static_cast<double>(i);
             cell_ids.push_back(this_cell_id);
         }
 

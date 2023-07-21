@@ -237,7 +237,7 @@ public:
 
         for (unsigned node_index=0; node_index<mesh2.GetNumNodes(); node_index++)
         {
-            TS_ASSERT_DELTA(mesh2.GetNode(node_index)->rGetLocation()[0], (double) node_index, 1e-6);
+            TS_ASSERT_DELTA(mesh2.GetNode(node_index)->rGetLocation()[0], static_cast<double>(node_index), 1e-6);
         }
 
         for (unsigned elem_index=0; elem_index<mesh2.GetNumElements(); elem_index++)
@@ -266,7 +266,7 @@ public:
             }
             else
             {
-                TS_ASSERT_DELTA(mesh2.GetNode(node_index)->rGetLocation()[0], (double) node_index, 1e-6);
+                TS_ASSERT_DELTA(mesh2.GetNode(node_index)->rGetLocation()[0], static_cast<double>(node_index), 1e-6);
             }
         }
 
@@ -291,7 +291,7 @@ public:
             }
             else
             {
-                TS_ASSERT_DELTA(mesh2.GetNode(node_index)->rGetLocation()[0], (double) node_index, 1e-6);
+                TS_ASSERT_DELTA(mesh2.GetNode(node_index)->rGetLocation()[0], static_cast<double>(node_index), 1e-6);
             }
         }
 

@@ -64,8 +64,8 @@ private:
         {
             for ( unsigned i = 0; i < nx; i++ )
             {
-                double x = (double)i + 0.5*(double)(j % 2);
-                double y = (double)j * std::sqrt(3.0)/2.0;
+                double x = static_cast<double>(i) + 0.5*static_cast<double>(j % 2);
+                double y = static_cast<double>(j) * std::sqrt(3.0)/2.0;
                 nodes[j*nx+i] = new Node<2>(j*nx+i, false, x, y );
             }
         }

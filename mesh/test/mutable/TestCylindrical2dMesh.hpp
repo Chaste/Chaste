@@ -302,7 +302,7 @@ public:
             }
             if (i>15)
             {
-                TS_ASSERT_EQUALS(map.GetNewIndex(i), (unsigned)(i-1));
+                TS_ASSERT_EQUALS(map.GetNewIndex(i), static_cast<unsigned>(i - 1));
             }
         }
    }

@@ -82,7 +82,7 @@ public:
 
         // Zeroth node
         TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetPoint()[0], 0.0, 1e-12);
-        TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetPoint()[1], -(double)ghosts*sqrt(3.0)/2.0, 1e-5);
+        TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetPoint()[1], -static_cast<double>(ghosts)*sqrt(3.0)/2.0, 1e-5);
 
         // First real node
         int index = (num_cells_width)*ghosts; // 4 here is the number of ghost nodes in a row
@@ -134,7 +134,7 @@ public:
 
         TS_ASSERT_EQUALS(all_included, true);
 
-        TS_ASSERT_DELTA(p_mesh->GetWidth(0u), (double)num_cells_width, 1e-7);
+        TS_ASSERT_DELTA(p_mesh->GetWidth(0u), static_cast<double>(num_cells_width), 1e-7);
         TS_ASSERT_DELTA(p_mesh->GetWidth(1u), 21.6506, 1e-4);
     }
 
@@ -145,7 +145,7 @@ public:
         double width = 7.0;
         unsigned ghosts = 2;
 
-        double x_factor = width/(double)num_cells_width;
+        double x_factor = width / static_cast<double>(num_cells_width);
 
         CylindricalHoneycombMeshGenerator generator(num_cells_width, num_cells_depth, ghosts, width/num_cells_width);
         Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
@@ -158,7 +158,7 @@ public:
 
         // Zeroth node
         TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetPoint()[0], 0.0, 1e-12);
-        TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetPoint()[1], -x_factor*(double)ghosts*sqrt(3.0)/2.0, 1e-5);
+        TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetPoint()[1], -x_factor*static_cast<double>(ghosts)*sqrt(3.0)/2.0, 1e-5);
 
         // First real node
         int index = (num_cells_width)*ghosts; // 4 here is the number of ghost nodes in a row
@@ -210,7 +210,7 @@ public:
 
         TS_ASSERT_EQUALS(all_included, true);
 
-        TS_ASSERT_DELTA(p_mesh->GetWidth(0u), x_factor*(double)num_cells_width, 1e-7);
+        TS_ASSERT_DELTA(p_mesh->GetWidth(0u), x_factor*static_cast<double>(num_cells_width), 1e-7);
         TS_ASSERT_DELTA(p_mesh->GetWidth(1u), 18.9443, 1e-4);
     }
 };

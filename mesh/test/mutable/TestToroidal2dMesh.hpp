@@ -65,8 +65,8 @@ public:
 
         unsigned cells_across = 4;
         unsigned cells_up = 4;
-        double domain_width = (double) cells_across;
-        double domain_height = (double) cells_up*0.5*sqrt(3.0);
+        double domain_width = static_cast<double>(cells_across);
+        double domain_height = static_cast<double>(cells_up)*0.5*sqrt(3.0);
 
 
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up, 1,1);
@@ -308,7 +308,7 @@ public:
             }
             if (i>15)
             {
-                TS_ASSERT_EQUALS(map.GetNewIndex(i), (unsigned)(i-1));
+                TS_ASSERT_EQUALS(map.GetNewIndex(i), static_cast<unsigned>(i-1));
             }
         }
     }

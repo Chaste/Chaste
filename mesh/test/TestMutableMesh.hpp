@@ -1031,8 +1031,8 @@ public:
 
         mesh.ReIndex(map);
 
-        TS_ASSERT_EQUALS(mesh.GetNumNodes(), (unsigned)(num_old_nodes-2));
-        TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), (unsigned)(num_old_nodes-2));
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), static_cast<unsigned>(num_old_nodes-2));
+        TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), static_cast<unsigned>(num_old_nodes-2));
 
         TS_ASSERT_EQUALS(map.GetSize(), num_old_nodes);
         TS_ASSERT_EQUALS(map.IsDeleted(50), true);
@@ -1042,11 +1042,11 @@ public:
         {
             if (i<50)
             {
-                TS_ASSERT_EQUALS(map.GetNewIndex(i), (unsigned)(i-1));
+                TS_ASSERT_EQUALS(map.GetNewIndex(i), static_cast<unsigned>(i-1));
             }
             if (i>50)
             {
-                TS_ASSERT_EQUALS(map.GetNewIndex(i), (unsigned)(i-2));
+                TS_ASSERT_EQUALS(map.GetNewIndex(i), static_cast<unsigned>(i-2));
             }
         }
     }
@@ -1066,8 +1066,8 @@ public:
 
         mesh.ReIndex(map);
 
-        TS_ASSERT_EQUALS(mesh.GetNumNodes(), (unsigned)(num_old_nodes-2));
-        TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), (unsigned)(num_old_nodes-2));
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), static_cast<unsigned>(num_old_nodes-2));
+        TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), static_cast<unsigned>(num_old_nodes-2));
 
         TS_ASSERT_EQUALS(map.GetSize(), num_old_nodes);
         TS_ASSERT_EQUALS(map.IsDeleted(50), true);
@@ -1077,11 +1077,11 @@ public:
         {
             if (i<50)
             {
-                TS_ASSERT_EQUALS(map.GetNewIndex(i), (unsigned)(i-1));
+                TS_ASSERT_EQUALS(map.GetNewIndex(i), static_cast<unsigned>(i-1));
             }
             if (i>50)
             {
-                TS_ASSERT_EQUALS(map.GetNewIndex(i), (unsigned)(i-2));
+                TS_ASSERT_EQUALS(map.GetNewIndex(i), static_cast<unsigned>(i-2));
             }
         }
     }
@@ -1124,10 +1124,10 @@ public:
         mesh.DeleteElement(18);
         mesh.DeleteElement(0);
 
-        TS_ASSERT_EQUALS(mesh.GetNumElements(), (unsigned)(num_old_eles-2));
-        TS_ASSERT_EQUALS(mesh.GetNumAllElements(), (unsigned)(num_old_eles));
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), static_cast<unsigned>(num_old_eles-2));
+        TS_ASSERT_EQUALS(mesh.GetNumAllElements(), static_cast<unsigned>(num_old_eles));
 
-        TS_ASSERT_EQUALS(mesh.GetNumNodes(), (unsigned)(num_old_nodes));
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), static_cast<unsigned>(num_old_nodes));
 
         //Elements 18, 71, 74, 90, 380, 381 are the only elements using Node 241
         mesh.DeleteElement(71);
@@ -1136,17 +1136,17 @@ public:
         mesh.DeleteElement(380);
         mesh.DeleteElement(381);
 
-        TS_ASSERT_EQUALS(mesh.GetNumNodes(), (unsigned)(num_old_nodes - 1));
-        TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), (unsigned)(num_old_nodes));
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), static_cast<unsigned>(num_old_nodes - 1));
+        TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), static_cast<unsigned>(num_old_nodes));
 
         NodeMap map(num_old_nodes);
 
         mesh.ReIndex(map);
 
-        TS_ASSERT_EQUALS(mesh.GetNumNodes(), (unsigned)(num_old_nodes - 1));
-        TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), (unsigned)(num_old_nodes - 1));
-        TS_ASSERT_EQUALS(mesh.GetNumElements(), (unsigned)(num_old_eles - 7));
-        TS_ASSERT_EQUALS(mesh.GetNumAllElements(), (unsigned)(num_old_eles - 7));
+        TS_ASSERT_EQUALS(mesh.GetNumNodes(), static_cast<unsigned>(num_old_nodes - 1));
+        TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), static_cast<unsigned>(num_old_nodes - 1));
+        TS_ASSERT_EQUALS(mesh.GetNumElements(), static_cast<unsigned>(num_old_eles - 7));
+        TS_ASSERT_EQUALS(mesh.GetNumAllElements(), static_cast<unsigned>(num_old_eles - 7));
 
         TS_ASSERT_EQUALS(map.GetSize(), num_old_nodes);
         TS_ASSERT_EQUALS(map.IsDeleted(241), true);

@@ -911,8 +911,8 @@ public:
         // Test throwing an exception if a node doesn't lie in the union of the regions, or regions are not disjoint.
         if (PetscTools::IsParallel())
         {
-            ChastePoint<3> lower_wrong(-0.5, -0.5, ((double)rank+0.5));
-            ChastePoint<3> upper_wrong((double)(num_procs+1)+0.5, (double)(num_procs+1) + 0.5, ((double)(rank+1)+0.5));
+            ChastePoint<3> lower_wrong(-0.5, -0.5, (static_cast<double>(rank)+0.5));
+            ChastePoint<3> upper_wrong(static_cast<double>(num_procs+1)+0.5, static_cast<double>(num_procs+1) + 0.5, (static_cast<double>(rank+1)+0.5));
 
             ChasteCuboid<3> cuboid_wrong(lower_wrong, upper_wrong);
 
@@ -923,8 +923,8 @@ public:
             TS_ASSERT_THROWS_THIS(mesh.ConstructFromMeshReader(mesh_reader), "A node is either not in geometric region, or the regions are not disjoint.");
         }
 
-        ChastePoint<3> lower(-0.5, -0.5, ((double)rank-0.5));
-        ChastePoint<3> upper((double)(num_procs+1)+0.5, (double)(num_procs+1) + 0.5, ((double)(rank)+0.5));
+        ChastePoint<3> lower(-0.5, -0.5, (static_cast<double>(rank)-0.5));
+        ChastePoint<3> upper(static_cast<double>(num_procs+1)+0.5, static_cast<double>(num_procs+1) + 0.5, (static_cast<double>(rank)+0.5));
 
         ChasteCuboid<3> cuboid(lower, upper);
 
@@ -943,11 +943,10 @@ public:
                node_iter != mesh.GetNodeIteratorEnd();
                ++node_iter)
         {
-           TS_ASSERT_LESS_THAN(node_iter->rGetLocation()[2], (double)rank+0.5);
-           TS_ASSERT_LESS_THAN((double)rank-0.5, node_iter->rGetLocation()[2]);
+           TS_ASSERT_LESS_THAN(node_iter->rGetLocation()[2], static_cast<double>(rank)+0.5);
+           TS_ASSERT_LESS_THAN(static_cast<double>(rank)-0.5, node_iter->rGetLocation()[2]);
         }
     }
-
 
     void TestArchiving()
     {
@@ -1568,9 +1567,9 @@ public:
 
         // Test the bounding box methods
         ChasteCuboid<3> base_bounding_box=base_mesh.CalculateBoundingBox();
-        TS_ASSERT_EQUALS(base_bounding_box.GetWidth(0), (double) width);
-        TS_ASSERT_EQUALS(base_bounding_box.GetWidth(1), (double) height);
-        TS_ASSERT_EQUALS(base_bounding_box.GetWidth(2), (double) depth);
+        TS_ASSERT_EQUALS(base_bounding_box.GetWidth(0), static_cast<double>(width));
+        TS_ASSERT_EQUALS(base_bounding_box.GetWidth(1), static_cast<double>(height));
+        TS_ASSERT_EQUALS(base_bounding_box.GetWidth(2), static_cast<double>(depth));
         if (PetscTools::IsSequential())
         {
             TS_ASSERT_EQUALS(base_bounding_box.GetLongestAxis(), 1U); // Tie between 1 and 2
@@ -1580,9 +1579,9 @@ public:
             TS_ASSERT_EQUALS(base_bounding_box.GetLongestAxis(), 2U); // 2 wins outright
         }
         ChasteCuboid<3> constructed_bounding_box=constructed_mesh.CalculateBoundingBox();
-        TS_ASSERT_EQUALS(constructed_bounding_box.GetWidth(0), (double) width);
-        TS_ASSERT_EQUALS(constructed_bounding_box.GetWidth(1), (double) height);
-        TS_ASSERT_EQUALS(constructed_bounding_box.GetWidth(2), (double) depth);
+        TS_ASSERT_EQUALS(constructed_bounding_box.GetWidth(0), static_cast<double>(width));
+        TS_ASSERT_EQUALS(constructed_bounding_box.GetWidth(1), static_cast<double>(height));
+        TS_ASSERT_EQUALS(constructed_bounding_box.GetWidth(2), static_cast<double>(depth));
         if (PetscTools::IsSequential())
         {
             TS_ASSERT_EQUALS(constructed_bounding_box.GetLongestAxis(), 1U); // Tie between 1 and 2
@@ -1708,8 +1707,8 @@ public:
     {
         // 1D
         unsigned width = 4*PetscTools::GetNumProcs() - 1;
-        ChastePoint<1> lower_1d((double)PetscTools::GetMyRank()*(1+width/(double)PetscTools::GetNumProcs()));
-        ChastePoint<1> upper_1d((double)(1+PetscTools::GetMyRank())*(1+width/(double)PetscTools::GetNumProcs()));
+        ChastePoint<1> lower_1d(static_cast<double>(PetscTools::GetMyRank())*(1+width/static_cast<double>(PetscTools::GetNumProcs())));
+        ChastePoint<1> upper_1d(static_cast<double>(1+PetscTools::GetMyRank())*(1+width/static_cast<double>(PetscTools::GetNumProcs())));
         ChasteCuboid<1> cuboid_1d(lower_1d, upper_1d);
 
         TetrahedralMesh<1,1> base_mesh;
@@ -1736,8 +1735,8 @@ public:
         // 2D
         width = 2;
         unsigned height = 4*PetscTools::GetNumProcs()-1;
-        ChastePoint<2> lower_2d(0.0, (double)PetscTools::GetMyRank()*(1+height/(double)PetscTools::GetNumProcs()));
-        ChastePoint<2> upper_2d(1+width, (double)(1+PetscTools::GetMyRank())*(1+height/(double)PetscTools::GetNumProcs()));
+        ChastePoint<2> lower_2d(0.0, static_cast<double>(PetscTools::GetMyRank())*(1+height/static_cast<double>(PetscTools::GetNumProcs())));
+        ChastePoint<2> upper_2d(1+width, static_cast<double>(1+PetscTools::GetMyRank())*(1+height/static_cast<double>(PetscTools::GetNumProcs())));
         ChasteCuboid<2> cuboid_2d(lower_2d, upper_2d);
 
         TetrahedralMesh<2,2> base_mesh_2d;
@@ -1764,8 +1763,8 @@ public:
         // 3D
         height = 3;
         unsigned depth = 4*PetscTools::GetNumProcs()-1;
-        ChastePoint<3> lower_3d(0.0, 0.0, (double)PetscTools::GetMyRank()*(1+depth/(double)PetscTools::GetNumProcs()));
-        ChastePoint<3> upper_3d(1+width, 1+height, (double)(1+PetscTools::GetMyRank())*(1+depth/(double)PetscTools::GetNumProcs()));
+        ChastePoint<3> lower_3d(0.0, 0.0, static_cast<double>(PetscTools::GetMyRank())*(1+depth/static_cast<double>(PetscTools::GetNumProcs())));
+        ChastePoint<3> upper_3d(1+width, 1+height, static_cast<double>(1+PetscTools::GetMyRank())*(1+depth/static_cast<double>(PetscTools::GetNumProcs())));
         ChasteCuboid<3> cuboid_3d(lower_3d, upper_3d);
 
         TetrahedralMesh<3,3> base_mesh_3d;
@@ -2123,8 +2122,8 @@ public:
                 Node<2>* p_node2 = p_mesh2->GetNode((width+1)*(height+1)-1);
                 TS_ASSERT_DELTA(p_node1->GetPoint()[0], p_node2->GetPoint()[0], 1e-6);
                 TS_ASSERT_DELTA(p_node1->GetPoint()[0], p_node2->GetPoint()[0], 1e-6);
-                TS_ASSERT_DELTA(p_node1->GetPoint()[0], (double) width, 1e-6);
-                TS_ASSERT_DELTA(p_node1->GetPoint()[1], (double) height, 1e-6);
+                TS_ASSERT_DELTA(p_node1->GetPoint()[0], static_cast<double>(width), 1e-6);
+                TS_ASSERT_DELTA(p_node1->GetPoint()[1], static_cast<double>(height), 1e-6);
             }
             catch(Exception& e)
             {
@@ -2435,7 +2434,7 @@ public:
             if (mesh_with_default_split.GetDistributedVectorFactory()->IsGlobalIndexLocal(width))
             {
                 c_vector<double, 3> xaxis1 = mesh_with_default_split.GetNode(width)->rGetLocation();
-                TS_ASSERT_DELTA(xaxis1[0], (double) width, 1e-5);
+                TS_ASSERT_DELTA(xaxis1[0], static_cast<double>(width), 1e-5);
                 TS_ASSERT_DELTA(xaxis1[1], 0.0, 1e-5);
                 TS_ASSERT_DELTA(xaxis1[2], 0.0, 1e-5);
             }
@@ -2445,7 +2444,7 @@ public:
             if (mesh_with_x_split.GetDistributedVectorFactory()->IsGlobalIndexLocal(expected_xaxis2_index))
             {
                 c_vector<double, 3> xaxis2 = mesh_with_x_split.GetNode(expected_xaxis2_index)->rGetLocation();
-                TS_ASSERT_DELTA(xaxis2[0], (double) width, 1e-5);
+                TS_ASSERT_DELTA(xaxis2[0], static_cast<double>(width), 1e-5);
                 TS_ASSERT_DELTA(xaxis2[1], 0.0, 1e-5);
                 TS_ASSERT_DELTA(xaxis2[2], 0.0, 1e-5);
             }
@@ -2454,7 +2453,7 @@ public:
             if (mesh_with_y_split.GetDistributedVectorFactory()->IsGlobalIndexLocal(expected_xaxis3_index))
             {
                 c_vector<double, 3> xaxis3 = mesh_with_y_split.GetNode(expected_xaxis3_index)->rGetLocation();
-                TS_ASSERT_DELTA(xaxis3[0], (double) width, 1e-5);
+                TS_ASSERT_DELTA(xaxis3[0], static_cast<double>(width), 1e-5);
                 TS_ASSERT_DELTA(xaxis3[1], 0.0, 1e-5);
                 TS_ASSERT_DELTA(xaxis3[2], 0.0, 1e-5);
             }

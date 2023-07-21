@@ -72,8 +72,8 @@ public:
         double width = 8.0;
         double height = 22.0*sqrt(3)/2.0;
 
-        double x_factor = width/(double)num_cells_width;
-        double y_factor = height/(double)num_cells_height/sqrt(3.0)*2.0;
+        double x_factor = width/static_cast<double>(num_cells_width);
+        double y_factor = height/static_cast<double>(num_cells_height)/sqrt(3.0)*2.0;
 
         ToroidalHoneycombMeshGenerator generator(num_cells_width, num_cells_height, x_factor, y_factor);
         Toroidal2dMesh* p_mesh = generator.GetToroidalMesh();
@@ -104,8 +104,8 @@ public:
         double width = 7.0;
         double height = 4.0;
 
-        double x_factor = width/(double)num_cells_width;
-        double y_factor = height/(double)num_cells_height/sqrt(3.0)*2.0;
+        double x_factor = width/static_cast<double>(num_cells_width);
+        double y_factor = height/static_cast<double>(num_cells_height)/sqrt(3.0)*2.0;
 
         ToroidalHoneycombMeshGenerator generator(num_cells_width, num_cells_height, x_factor, y_factor);
         Toroidal2dMesh* p_mesh = generator.GetToroidalMesh();

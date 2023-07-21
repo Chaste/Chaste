@@ -280,7 +280,7 @@ public:
         std::vector<Node<1>*> nodes_1d;
         for (unsigned i=0; i<4; i++)
         {
-            nodes_1d.push_back(new Node<1>(i, false, 0.5*(double)i));
+            nodes_1d.push_back(new Node<1>(i, false, 0.5*static_cast<double>(i)));
         }
 
         std::vector<std::vector<Node<1>*> > nodes_elements_1d(3);
@@ -925,7 +925,7 @@ public:
         std::vector<Node<1>*> nodes_1d;
         for (unsigned i=0; i<4; i++)
         {
-            nodes_1d.push_back(new Node<1>(i, false, 0.5*(double)i));
+            nodes_1d.push_back(new Node<1>(i, false, 0.5*static_cast<double>(i)));
         }
         std::vector<std::vector<Node<1>*> > nodes_elements_1d(3);
         std::vector<VertexElement<1,1>*> elements_1d;
@@ -1001,7 +1001,7 @@ public:
         unsigned num_nodes = 1000;
         for (unsigned i=0; i<num_nodes; i++)
         {
-            double theta = 2.0*M_PI*(double)(i)/(double)(num_nodes);
+            double theta = 2.0*M_PI*static_cast<double>(i)/static_cast<double>(num_nodes);
             circle_nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
         }
         std::vector<VertexElement<2,2>*> circle_elements;
@@ -1016,7 +1016,7 @@ public:
         std::vector<Node<2>*> hexagon_nodes;
         for (unsigned i=0; i<6; i++)
         {
-            double theta = 2.0 * M_PI * (double)(i) / 6.0;
+            double theta = 2.0 * M_PI * static_cast<double>(i) / 6.0;
             hexagon_nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
         }
         std::vector<VertexElement<2,2>*> hexagon_elements;
@@ -1098,7 +1098,7 @@ public:
         unsigned num_nodes = 1000;
         for (unsigned i=0; i<num_nodes; i++)
         {
-            double theta = 2.0*M_PI*(double)(i)/(double)(num_nodes);
+            double theta = 2.0*M_PI*static_cast<double>(i)/static_cast<double>(num_nodes);
             circle_nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
         }
         std::vector<VertexElement<2,2>*> circle_elements;
@@ -1111,7 +1111,7 @@ public:
         std::vector<Node<2>*> hexagon_nodes;
         for (unsigned i=0; i<6; i++)
         {
-            double theta = 2.0 * M_PI * (double)(i) / 6.0;
+            double theta = 2.0 * M_PI * static_cast<double>(i) / 6.0;
             hexagon_nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
         }
         std::vector<VertexElement<2,2>*> hexagon_elements;
@@ -1188,7 +1188,7 @@ public:
         unsigned num_nodes = 1000;
         for (unsigned i=0; i<num_nodes; i++)
         {
-            double theta = 2.0*M_PI*(double)(i)/(double)(num_nodes);
+            double theta = 2.0*M_PI*static_cast<double>(i)/static_cast<double>(num_nodes);
             circle_nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
         }
         std::vector<VertexElement<2,2>*> circle_elements;
@@ -1201,7 +1201,7 @@ public:
         std::vector<Node<2>*> hexagon_nodes;
         for (unsigned i=0; i<6; i++)
         {
-            double theta = 2.0 * M_PI * (double)(i) / 6.0;
+            double theta = 2.0 * M_PI * static_cast<double>(i) / 6.0;
             hexagon_nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
         }
         std::vector<VertexElement<2,2>*> hexagon_elements;
@@ -1650,7 +1650,7 @@ public:
         std::vector<Node<2>*> hexagon_nodes;
         for (unsigned i=0; i<6; i++)
         {
-            double theta = 2.0 * M_PI * (double)(i) / 6.0;
+            double theta = 2.0 * M_PI * static_cast<double>(i) / 6.0;
             hexagon_nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
         }
         std::vector<VertexElement<2,2>*> hexagon_elements;

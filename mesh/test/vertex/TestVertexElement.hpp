@@ -233,7 +233,7 @@ public:
         unsigned num_nodes = 6;
         for (unsigned i=0; i<num_nodes; i++)
         {
-            double theta = 2.0*M_PI*(double)(i)/(double)(num_nodes);
+            double theta = 2.0*M_PI*static_cast<double>(i)/static_cast<double>(num_nodes);
             nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
         }
 
@@ -295,7 +295,7 @@ public:
         unsigned num_nodes = 6;
         for (unsigned i=0; i<num_nodes; i++)
         {
-            double theta = 2.0*M_PI*(double)(i)/(double)(num_nodes);
+            double theta = 2.0*M_PI*static_cast<double>(i)/static_cast<double>(num_nodes);
             nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
         }
 

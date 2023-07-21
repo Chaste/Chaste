@@ -93,15 +93,16 @@ public:
         unsigned ghosts = 2;
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, ghosts);
-        double length = (double)num_cells_depth*(sqrt(3.0)/2)*width/(double)num_cells_width;
+        double length = static_cast<double>(num_cells_depth)*(sqrt(3.0)/2)*width/static_cast<double>(num_cells_width);
 
         // Check the mesh
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
-        TS_ASSERT_EQUALS((unsigned)p_mesh->GetNumNodes(),(num_cells_width+2*ghosts)*(num_cells_depth+2*ghosts));
+        TS_ASSERT_EQUALS(static_cast<unsigned>(p_mesh->GetNumNodes()),
+            (num_cells_width+2*ghosts)*(num_cells_depth+2*ghosts));
 
         // Scaling factor
-        double spooky = (double) ghosts;
+        double spooky = static_cast<double>(ghosts);
 
         // Zeroth node
         TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetPoint()[0], -spooky, 1e-6);
@@ -158,7 +159,7 @@ public:
 
         TS_ASSERT_EQUALS(all_included, true);
 
-        TS_ASSERT_DELTA(p_mesh->GetWidth(0u), (width-1.0) + 2.0 * (double) ghosts + 0.5, 1e-7); // 11.5 as mesh is stagered and includes ghosts
+        TS_ASSERT_DELTA(p_mesh->GetWidth(0u), (width-1.0) + 2.0 * static_cast<double>(ghosts) + 0.5, 1e-7); // 11.5 as mesh is stagered and includes ghosts
         TS_ASSERT_DELTA(p_mesh->GetWidth(1u), 21.6506, 1e-4); // includes ghosts
     }
 
@@ -170,16 +171,17 @@ public:
         unsigned ghosts = 4;
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, ghosts, width/num_cells_width);
-        double length = (double)num_cells_depth*(sqrt(3.0)/2)*width/(double)num_cells_width;
+        double length = static_cast<double>(num_cells_depth)*(sqrt(3.0)/2)*width/static_cast<double>(num_cells_width);
 
         // Check the mesh
         MutableMesh<2,2>* p_mesh = generator.GetMesh();
 
-        TS_ASSERT_EQUALS((unsigned)p_mesh->GetNumNodes(), (num_cells_width+2*ghosts)*(num_cells_depth+2*ghosts));
+        TS_ASSERT_EQUALS(static_cast<unsigned>(p_mesh->GetNumNodes()),
+            (num_cells_width+2*ghosts)*(num_cells_depth+2*ghosts));
 
         // Scaling factor
-        double factor = (width/(double)num_cells_width);
-        double spooky = (double) ghosts;
+        double factor = (width/static_cast<double>(num_cells_width));
+        double spooky = static_cast<double>(ghosts);
 
         // Zeroth node
         TS_ASSERT_DELTA(p_mesh->GetNode(0)->GetPoint()[0], -spooky*factor, 1e-6);
