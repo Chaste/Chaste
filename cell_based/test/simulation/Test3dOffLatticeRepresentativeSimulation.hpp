@@ -108,7 +108,7 @@ public:
 
         for (unsigned k = 0; k < 2*nodes_up - 1; ++k) // Each layer going up
         {
-            z_coordinate = (double)k/2.0;
+            z_coordinate = static_cast<double>(k) / 2.0;
 
             bool is_even_layer = ((int)k % 2 == 0);
 
@@ -117,16 +117,19 @@ public:
                 // Want the nodes that sit at x=0,2,4,...
                 for (unsigned j = 0; j < nodes_depth; ++j)
                 {
-                    y_coordinate = (double)j;
+                    y_coordinate = static_cast<double>(j);
                     x_coordinate = 0.0;
 
                     for (unsigned i = 0; i < nodes_across; ++i)
                     {
                         nodes.push_back(new Node<3>(node_index,  false,  x_coordinate, y_coordinate, z_coordinate));
 
-                        if (x_coordinate < ghosts || x_coordinate > (double)nodes_across-1.0-ghosts
-                                || y_coordinate < ghosts || y_coordinate > (double)nodes_depth-1.0-ghosts
-                                || z_coordinate < ghosts|| z_coordinate > (double)nodes_up-1.0-ghosts)
+                        if (x_coordinate < ghosts
+                            || x_coordinate > static_cast<double>(nodes_across) - 1.0 - ghosts
+                            || y_coordinate < ghosts 
+                            || y_coordinate > static_cast<double>(nodes_depth) - 1.0 - ghosts
+                            || z_coordinate < ghosts 
+                            || z_coordinate > static_cast<double>(nodes_up) - 1.0 - ghosts)
                         {
                             ghost_node_indices.push_back(node_index);
                         }
@@ -145,16 +148,19 @@ public:
                 // Want the nodes that sit at x=1,3,5,...
                 for (unsigned j = 0; j < nodes_depth-1; ++j)
                 {
-                    y_coordinate = (double)j + 0.5;
+                    y_coordinate = static_cast<double>(j) + 0.5;
                     x_coordinate = 0.5;
 
                     for (unsigned i = 0; i < nodes_across-1; ++i)
                     {
                         nodes.push_back(new Node<3>(node_index,  false,  x_coordinate, y_coordinate, z_coordinate));
 
-                        if (x_coordinate < ghosts || x_coordinate > (double)nodes_across-1.0-ghosts
-                                || y_coordinate < ghosts || y_coordinate > (double)nodes_depth-1.0-ghosts
-                                || z_coordinate < ghosts|| z_coordinate > (double)nodes_up-1.0-ghosts)
+                        if (x_coordinate < ghosts 
+                            || x_coordinate > static_cast<double>(nodes_across) - 1.0 - ghosts
+                            || y_coordinate < ghosts 
+                            || y_coordinate > static_cast<double>(nodes_depth) - 1.0 - ghosts
+                            || z_coordinate < ghosts
+                            || z_coordinate > static_cast<double>(nodes_up) - 1.0 - ghosts)
                         {
                             ghost_node_indices.push_back(node_index);
                         }

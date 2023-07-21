@@ -533,8 +533,8 @@ public:
 
             c_vector<double, 2> node_location = p_node->rGetLocation();
             c_vector<double, 2> expected;
-            expected(0) = (double)(index%4);
-            expected(1) = (double)(index>3) + (double)(index>7) + (double)(index>11);
+            expected(0) = static_cast<double>(index % 4);
+            expected(1) = static_cast<double>(index > 3) + static_cast<double>(index > 7) + static_cast<double>(index > 11);
 
             double drift = norm_2(node_location-expected);
             TS_ASSERT_LESS_THAN(drift, 1e-6);

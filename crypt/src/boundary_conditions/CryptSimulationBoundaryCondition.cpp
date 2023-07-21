@@ -66,7 +66,7 @@ void CryptSimulationBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::m
     if (dynamic_cast<AbstractCentreBasedCellPopulation<DIM>*>(this->mpCellPopulation))
     {
         // Iterate over all nodes associated with real cells to update their positions
-        for (auto cell_iter : this->mpCellPopulation)
+        for (auto cell_iter : *(this->mpCellPopulation))
         {
             // Get index of node associated with cell
             unsigned node_index = this->mpCellPopulation->GetLocationIndexUsingCell(cell_iter);
@@ -161,7 +161,7 @@ bool CryptSimulationBoundaryCondition<DIM>::VerifyBoundaryCondition()
      * Here we verify that the boundary condition is still satisfied by simply
      * checking that no cells lies below the y=0 boundary.
      */
-    for (auto cell_iter : this->mpCellPopulation)
+    for (auto cell_iter : *(this->mpCellPopulation))
     {
         // Get index of node associated with cell
         unsigned node_index = this->mpCellPopulation->GetLocationIndexUsingCell(cell_iter);

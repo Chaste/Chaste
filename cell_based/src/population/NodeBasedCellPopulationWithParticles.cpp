@@ -171,9 +171,11 @@ void NodeBasedCellPopulationWithParticles<DIM>::Validate()
     }
 
     // Look through all of the cells and record what node they are associated with.
-    for (auto cell_iter : this->mCells)
+    for (auto cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
     {
-        unsigned node_index = this->GetLocationIndexUsingCell(cell_iter);
+        unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
 
         // If the node attached to this cell is labelled as a particle, then throw an error
         if (this->GetNode(node_index)->IsParticle())
@@ -280,10 +282,12 @@ void NodeBasedCellPopulationWithParticles<DIM>::WriteVtkResultsToFile(
     }
 
     // Loop over cells
-    for (auto cell_iter : this->mCells)
+    for (auto cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
     {
         // Get the node index corresponding to this cell
-        unsigned global_index = this->GetLocationIndexUsingCell(cell_iter);
+        unsigned global_index = this->GetLocationIndexUsingCell(*cell_iter);
         unsigned node_index = this->rGetMesh().SolveNodeMapping(global_index);
 
         for (unsigned var = 0; var < num_cell_data_items; ++var)

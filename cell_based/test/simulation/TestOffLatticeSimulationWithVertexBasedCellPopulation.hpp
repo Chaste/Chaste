@@ -74,7 +74,7 @@ public:
         unsigned num_nodes = 20;
         for (unsigned i = 0; i < num_nodes; ++i)
         {
-            double theta = M_PI + 2.0 * M_PI * (double)(i) / (double)(num_nodes);
+            double theta = M_PI + 2.0 * M_PI * static_cast<double>(i) / static_cast<double>(num_nodes);
             nodes.push_back(new Node<2>(i, true, cos(theta), sin(theta)));
         }
 
@@ -132,7 +132,7 @@ public:
         unsigned num_nodes = 20;
         for (unsigned i = 0; i < num_nodes; ++i)
         {
-            double theta = M_PI + 2.0 * M_PI * (double)(i) / (double)(num_nodes);
+            double theta = M_PI + 2.0 * M_PI * static_cast<double>(i) / static_cast<double>(num_nodes);
             nodes.push_back(new Node<2>(i, true, cos(theta), sin(theta)));
         }
 
@@ -191,7 +191,7 @@ public:
         unsigned num_nodes = 20;
         for (unsigned i = 0; i < num_nodes; ++i)
         {
-            double theta = M_PI + 2.0 * M_PI * (double)(i) / (double)(num_nodes);
+            double theta = M_PI + 2.0 * M_PI * static_cast<double>(i) / static_cast<double>(num_nodes);
             nodes.push_back(new Node<2>(i, true, cos(theta), sin(theta)));
         }
 
@@ -377,7 +377,7 @@ public:
 
         for (unsigned i = 0; i < cells.size(); ++i)
         {
-            cells[i]->SetBirthTime(-(double)i - 19.0);
+            cells[i]->SetBirthTime(-static_cast<double>(i) - 19.0);
         }
 
         // Create cell population
@@ -676,7 +676,7 @@ public:
         unsigned num_nodes = 20;
         for (unsigned i = 0; i < num_nodes; ++i)
         {
-            double theta = M_PI + 2.0 * M_PI * (double)(i) / (double)(num_nodes);
+            double theta = M_PI + 2.0 * M_PI * static_cast<double>(i) / static_cast<double>(num_nodes);
             nodes.push_back(new Node<2>(i, true, cos(theta), sin(theta)));
         }
 

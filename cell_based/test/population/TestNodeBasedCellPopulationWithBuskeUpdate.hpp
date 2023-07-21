@@ -212,7 +212,7 @@ public:
 
             for (auto cell_iter : *p_cell_population)
             {
-                TS_ASSERT_DELTA(cell_iter->GetAge(), (double)(counter), 1e-7);
+                TS_ASSERT_DELTA(cell_iter->GetAge(), static_cast<double>(counter), 1e-7);
                 counter++;
             }
 

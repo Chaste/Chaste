@@ -403,9 +403,11 @@ void VertexBasedCellPopulation<DIM>::Validate()
 {
     // Check each element has only one cell attached
     std::vector<unsigned> validated_element = std::vector<unsigned>(this->GetNumElements(), 0);
-    for (auto cell_iter : this->mCells)
+     for (auto cell_iter = this->Begin();
+          cell_iter != this->End();
+          ++cell_iter)
     {
-        unsigned elem_index = this->GetLocationIndexUsingCell(cell_iter);
+        unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
         validated_element[elem_index]++;
     }
 

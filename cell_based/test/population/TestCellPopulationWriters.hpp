@@ -575,7 +575,10 @@ public:
                 for (unsigned i = 0; i < 6; ++i)
                 {
                     unsigned node_index = i + 6*j;
-                    nodes.push_back(new Node<2>(node_index, false, (double)i, (double)j));
+                    nodes.push_back(new Node<2>(node_index,
+                                                false,
+                                                static_cast<double>(i),
+                                                static_cast<double>(j)));
                 }
             }
             NodesOnlyMesh<2> mesh;

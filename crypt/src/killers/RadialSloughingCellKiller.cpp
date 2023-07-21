@@ -54,7 +54,7 @@ double RadialSloughingCellKiller::GetRadius() const
 
 void RadialSloughingCellKiller::CheckAndLabelCellsForApoptosisOrDeath()
 {
-    for (auto cell_iter : this->mpCellPopulation)
+    for (auto cell_iter : *(this->mpCellPopulation))
     {
         // Get distance from centre of cell population
         double r = norm_2(this->mpCellPopulation->GetLocationOfCellCentre(cell_iter) - mCentre);

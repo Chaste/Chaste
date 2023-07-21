@@ -304,7 +304,7 @@ public:
         {
             c_vector<double, 2> division_axis = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
             TS_ASSERT_DELTA(norm_2(division_axis), 1.0, 1e-6);
-            average_axis += division_axis / (double)N;
+            average_axis += division_axis / static_cast<double>(N);
         }
         average_axis /= N;
         double mu_estimate = atan2(average_axis(1), average_axis(0));

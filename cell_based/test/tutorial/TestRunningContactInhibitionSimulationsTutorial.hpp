@@ -148,7 +148,7 @@ public:
         {
             ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
             p_cycle_model->SetDimension(2);
-            p_cycle_model->SetBirthTime(-2.0*(double)i);
+            p_cycle_model->SetBirthTime(-2.0*static_cast<double>(i));
             p_cycle_model->SetQuiescentVolumeFraction(0.5);
             p_cycle_model->SetEquilibriumVolume(1.0);
 
@@ -261,7 +261,7 @@ public:
             {
                 ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
                 p_cycle_model->SetDimension(2);
-                p_cycle_model->SetBirthTime(-2.0*(double)i);
+                p_cycle_model->SetBirthTime(-2.0*static_cast<double>(i));
                 p_cycle_model->SetQuiescentVolumeFraction(0.8);
                 p_cycle_model->SetEquilibriumVolume(1.0);
 
@@ -357,7 +357,7 @@ public:
         {
             ContactInhibitionCellCycleModel* p_cycle_model = new ContactInhibitionCellCycleModel();
             p_cycle_model->SetDimension(2);
-            p_cycle_model->SetBirthTime(-(double)i - 2.0); // So all out of M phase
+            p_cycle_model->SetBirthTime(-static_cast<double>(i) - 2.0); // So all out of M phase
             p_cycle_model->SetQuiescentVolumeFraction(0.9);
             p_cycle_model->SetEquilibriumVolume(1.0);
 

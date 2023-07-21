@@ -276,7 +276,7 @@ public:
 
         for (unsigned i = 0; i < num_cells; ++i)
         {
-            sample_mean_g1_duration += static_cast<MyCellCycleModel*>(cells[i]->GetCellCycleModel())->GetG1Duration()/ (double) num_cells;
+            sample_mean_g1_duration += static_cast<MyCellCycleModel*>(cells[i]->GetCellCycleModel())->GetG1Duration() / static_cast<double>(num_cells);
         }
 
         TS_ASSERT_DELTA(sample_mean_g1_duration, expected_mean_g1_duration, 0.1);

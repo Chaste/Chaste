@@ -56,7 +56,8 @@ private:
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
-     * Archive the cell-cycle model and random number generator, never used directly - boost uses this.
+     * Archive the cell-cycle model and random number generator, never used 
+     * directly - boost uses this.
      *
      * @param archive the archive
      * @param version the current version of this class
@@ -82,25 +83,28 @@ protected:
      * type, then the G1 phase duration is drawn from the uniform distribution
      * U[14,18]. If the cell has transit proliferative type (semi-differentiated),
      * then the G1 phase duration is drawn from the uniform distribution U[4,6].
-     * These two distributions, proposed by Meineke et al (doi:10.1046/j.0960-7722.2001.00216.x),
-     * reflect indirect biological observations that stem cells cycle more
-     * slowly than their progeny.
+     * These two distributions, proposed by Meineke et al 
+     * (doi:10.1046/j.0960-7722.2001.00216.x), reflect indirect biological 
+     * observations that stem cells cycle more slowly than their progeny.
      *
-     * If the cell is differentiated, then the G1 phase duration is set to DBL_MAX,
-     * so that the cell will never reach the end of G1 phase.
+     * If the cell is differentiated, then the G1 phase duration is set to 
+     * DBL_MAX, so that the cell will never reach the end of G1 phase.
      */
     void SetG1Duration();
 
     /**
      * Protected copy-constructor for use by CreateCellCycleModel().
      *
-     * The only way for external code to create a copy of a cell-cycle model
-     * is by calling that method, to ensure that a model of the correct subclass is created.
-     * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
+     * The only way for external code to create a copy of a cell-cycle model is 
+     * by calling that method, to ensure that a model of the correct subclass is 
+     * created. This copy-constructor helps subclasses to ensure that all member 
+     * variables are correctly copied when this happens.
      *
-     * This method is called by child classes to set member variables for a daughter cell upon cell division.
-     * Note that the parent cell cycle model will have had ResetForDivision() called just before CreateCellCycleModel() is called,
-     * so performing an exact copy of the parent is suitable behaviour. Any daughter-cell-specific initialisation
+     * This method is called by child classes to set member variables for a 
+     * daughter cell upon cell division. Note that the parent cell cycle model 
+     * will have had ResetForDivision() called just before 
+     * CreateCellCycleModel() is called, so performing an exact copy of the 
+     * parent is suitable behaviour. Any daughter-cell-specific initialisation
      * can be done in InitialiseDaughterCell().
      *
      * @param rModel the cell cycle model to copy.
@@ -110,8 +114,9 @@ protected:
 public:
 
     /**
-     * Constructor - just a default, mBirthTime is set in the AbstractCellCycleModel class.
-     * mG1Duration is set very high, it is set for the individual cells when InitialiseDaughterCell is called
+     * Constructor - just a default, mBirthTime is set in the 
+     * AbstractCellCycleModel class. mG1Duration is set very high, it is set for 
+     * the individual cells when InitialiseDaughterCell is called.
      */
     UniformG1GenerationalCellCycleModel();
 

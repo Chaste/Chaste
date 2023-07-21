@@ -82,7 +82,7 @@ private:
         std::vector<Node<3>* > nodes;
         for (unsigned i = 0; i < PetscTools::GetNumProcs(); ++i)
         {
-            nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.5+(double)i));
+            nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.5 + static_cast<double>(i)));
         }
 
         mpNodesOnlyMesh = new NodesOnlyMesh<3>;

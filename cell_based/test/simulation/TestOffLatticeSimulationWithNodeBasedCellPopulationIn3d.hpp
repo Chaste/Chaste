@@ -84,9 +84,9 @@ private:
             {
                 for ( unsigned i = 0; i < nx; i++ )
                 {
-                    double x = (double)i + 0.5*(double)(j%2) + 0.5*(double)(k%2) - (double)( ((j+2)*k)%2);
-                    double y = sqrt(3.0)/2.0 * (double)j;
-                    double z = sqrt(3.0)/2.0 * (double)k;
+                    double x = static_cast<double>(i) + 0.5*static_cast<double>(j%2) + 0.5*static_cast<double>(k%2) - static_cast<double>(((j+2)*k)%2);
+                    double y = sqrt(3.0)/2.0 * static_cast<double>(j);
+                    double z = sqrt(3.0)/2.0 * static_cast<double>(k);
                     nodes[ k*nx*ny + j*nx + i ] = new Node<3>(i+j*nx+k*nx*ny, false, x, y, z );
                 }
             }

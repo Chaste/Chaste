@@ -154,7 +154,7 @@ public:
 
             if ((elem_index != 4) && (elem_index <= 7))
             {
-                expected_area *= 0.5*(1 + ((double)elem_index)/7.0);
+                expected_area *= 0.5*(1 + static_cast<double>(elem_index) / 7.0);
             }
 
             double actual_area = p_cell->GetCellData()->GetItem("target area");

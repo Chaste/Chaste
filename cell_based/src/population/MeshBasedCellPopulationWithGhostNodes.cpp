@@ -207,9 +207,11 @@ void MeshBasedCellPopulationWithGhostNodes<DIM>::Validate()
     assert(mIsGhostNode.size()==this->GetNumNodes());
 
     // Look through all of the cells and record what node they are associated with.
-    for (auto cell_iter : this->mCells)
+    for (auto cell_iter = this->Begin();
+        cell_iter != this->End();
+        ++cell_iter)
     {
-        unsigned node_index = this->GetLocationIndexUsingCell(cell_iter);
+        unsigned node_index = this->GetLocationIndexUsingCell(*cell_iter);
 
         // If the node attached to this cell is labelled as a ghost node, then throw an error
         if (mIsGhostNode[node_index])

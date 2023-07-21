@@ -771,8 +771,8 @@ public:
         // Coverage of writing CellData to VTK
         for (auto cell_iter : cell_population)
         {
-            cell_iter->GetCellData()->SetItem("var1", (double) 0.0);
-            cell_iter->GetCellData()->SetItem("var2", (double) 3.0);
+            cell_iter->GetCellData()->SetItem("var1", 0.0);
+            cell_iter->GetCellData()->SetItem("var2", 3.0);
         }
 
         cell_population.SetCellAncestorsToLocationIndices();

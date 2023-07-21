@@ -84,11 +84,11 @@ private:
             unsigned num_processors = PetscTools::GetNumProcs();
             for (unsigned i = 0; i < num_processors; ++i)
             {
-                nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.5 + (double)i));
+                nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.5 + static_cast<double>(i)));
             }
 
             c_vector<double, 3> periodic_width = zero_vector<double>(3);
-            periodic_width[2] = (double)num_processors;
+            periodic_width[2] = static_cast<double>(num_processors);
 
             mpPeriodicNodesOnlyMesh = new PeriodicNodesOnlyMesh<3>(periodic_width);
             mpPeriodicNodesOnlyMesh->ConstructNodesWithoutMesh(nodes, 1.0); // Cutoff length of means we need at least 3 processors
@@ -208,7 +208,7 @@ public:
             {
                 // Move node to the next location.
                 c_vector<double, 3> new_location = zero_vector<double>(3);
-                new_location[2] = (double)PetscTools::GetNumProcs() - 0.4;
+                new_location[2] = static_cast<double>(PetscTools::GetNumProcs()) - 0.4;
                 ChastePoint<3> point(new_location);
                 mpPeriodicNodesOnlyMesh->GetNode(0)->SetPoint(point);
             }
@@ -233,7 +233,7 @@ public:
                 TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->GetNumRealCells(), 1u);
 
                 AbstractMesh<3, 3>::NodeIterator node_iter = mpPeriodicNodesOnlyMesh->GetNodeIteratorBegin();
-                TS_ASSERT_DELTA(node_iter->rGetLocation()[2], (double)PetscTools::GetNumProcs() - 0.4, 1e-4);
+                TS_ASSERT_DELTA(node_iter->rGetLocation()[2], static_cast<double>(PetscTools::GetNumProcs()) - 0.4, 1e-4);
             }
         }
     }

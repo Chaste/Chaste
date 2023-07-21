@@ -1527,18 +1527,18 @@ public:
 
         // Move the first cell (which should be on y=0) down a bit
         AbstractCellPopulation<2>::Iterator cell_iter = crypt.Begin();
-        TS_ASSERT_DELTA(crypt.GetLocationOfCellCentre(cell_iter)[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(crypt.GetLocationOfCellCentre(*cell_iter)[1], 0.0, 1e-6);
 
         // Move the cell (can't use the iterator for this as it is const)
         crypt.GetNode(0)->rGetModifiableLocation()[1] = -0.1;
-        TS_ASSERT_LESS_THAN(crypt.GetLocationOfCellCentre(cell_iter)[1], 0.0);
+        TS_ASSERT_LESS_THAN(crypt.GetLocationOfCellCentre(*cell_iter)[1], 0.0);
 
         // Run simulation
         simulator.Solve();
 
         // The cell should have been pulled up, but not above y=0. However it should
         // then been moved to above y=0 by the jiggling
-        TS_ASSERT_LESS_THAN(0.0, crypt.GetLocationOfCellCentre(cell_iter)[1]);
+        TS_ASSERT_LESS_THAN(0.0, crypt.GetLocationOfCellCentre(*cell_iter)[1]);
     }
 
     /**

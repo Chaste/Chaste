@@ -186,11 +186,11 @@ public:
         TS_ASSERT_EQUALS(cell_iter->GetCellProliferativeType()->IsType<StemCellProliferativeType>(), true);
 
         // Check initially at x=0
-        TS_ASSERT_DELTA(crypt.GetLocationOfCellCentre(cell_iter)[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(crypt.GetLocationOfCellCentre(*cell_iter)[0], 0.0, 1e-6);
 
         // Now move to the left a bit
         crypt.GetNode(0)->rGetModifiableLocation()[0] = -0.1;
-        TS_ASSERT_LESS_THAN(crypt.GetLocationOfCellCentre(cell_iter)[0], 0.0);
+        TS_ASSERT_LESS_THAN(crypt.GetLocationOfCellCentre(*cell_iter)[0], 0.0);
 
         // Pass this cell population to a boundary condition object
         CryptSimulationBoundaryCondition<1> boundary_condition(&crypt);
@@ -203,7 +203,7 @@ public:
          * there is no Wnt stimulus. It should be unaffected by jiggling, which is not imposed
          * in 1D.
          */
-        TS_ASSERT_DELTA(0.0, crypt.GetLocationOfCellCentre(cell_iter)[0], 1e-3);
+        TS_ASSERT_DELTA(0.0, crypt.GetLocationOfCellCentre(*cell_iter)[0], 1e-3);
 
         // The nodes should all now be at their original locations
         std::map<Node<1>*, c_vector<double, 1> > node_locations_after;
@@ -240,9 +240,9 @@ public:
 
         // Now move the first cell (which should be on y=0) down a bit
         AbstractCellPopulation<2>::Iterator cell_iter = crypt.Begin();
-        TS_ASSERT_DELTA(crypt.GetLocationOfCellCentre(cell_iter)[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(crypt.GetLocationOfCellCentre(*cell_iter)[1], 0.0, 1e-6);
         crypt.GetNode(0)->rGetModifiableLocation()[1] = -0.1;
-        TS_ASSERT_LESS_THAN(crypt.GetLocationOfCellCentre(cell_iter)[1], 0.0);
+        TS_ASSERT_LESS_THAN(crypt.GetLocationOfCellCentre(*cell_iter)[1], 0.0);
 
         // Create a boundary condition object
         CryptSimulationBoundaryCondition<2> boundary_condition(&crypt);
@@ -252,7 +252,7 @@ public:
         boundary_condition.ImposeBoundaryCondition(node_locations_before);
 
         // The first cell should have been moved back by the boundary condition object
-        TS_ASSERT_DELTA(crypt.GetLocationOfCellCentre(cell_iter)[1], 0.0, 1e-4);
+        TS_ASSERT_DELTA(crypt.GetLocationOfCellCentre(*cell_iter)[1], 0.0, 1e-4);
 
         // The nodes should all now be at their original locations
         std::map<Node<2>*, c_vector<double, 2> > node_locations_after;
@@ -298,9 +298,9 @@ public:
         TS_ASSERT_EQUALS(cell_iter->GetCellProliferativeType()->IsType<StemCellProliferativeType>(), true);
         cell_iter->SetCellProliferativeType(p_transit_type);
         TS_ASSERT_EQUALS(cell_iter->GetCellProliferativeType()->IsType<TransitCellProliferativeType>(), true);
-        TS_ASSERT_DELTA(crypt.GetLocationOfCellCentre(cell_iter)[1], 0.0, 1e-6);
+        TS_ASSERT_DELTA(crypt.GetLocationOfCellCentre(*cell_iter)[1], 0.0, 1e-6);
         crypt.GetNode(1)->rGetModifiableLocation()[1] = -0.1;
-        TS_ASSERT_LESS_THAN(crypt.GetLocationOfCellCentre(cell_iter)[1], 0.0);
+        TS_ASSERT_LESS_THAN(crypt.GetLocationOfCellCentre(*cell_iter)[1], 0.0);
 
         // Create a boundary condition object
         CryptSimulationBoundaryCondition<2> boundary_condition(&crypt);
@@ -316,9 +316,9 @@ public:
          * then have been moved to above y=0 by the jiggling.
          */
         AbstractCellPopulation<2>::Iterator cell_iter2 = crypt.Begin();
-        TS_ASSERT_DELTA(0.0, crypt.GetLocationOfCellCentre(cell_iter2)[1], 1e-3);
+        TS_ASSERT_DELTA(0.0, crypt.GetLocationOfCellCentre(*cell_iter2)[1], 1e-3);
         ++cell_iter2;
-        TS_ASSERT_LESS_THAN(0.0, crypt.GetLocationOfCellCentre(cell_iter2)[1]);
+        TS_ASSERT_LESS_THAN(0.0, crypt.GetLocationOfCellCentre(*cell_iter2)[1]);
     }
 
     void TestImposeBoundaryConditionWithWnt1d()
@@ -350,10 +350,10 @@ public:
         // Now move the first cell (which should be on x=0) to the left a bit
         AbstractCellPopulation<1>::Iterator cell_iter = crypt.Begin();
         // Check initially at x=0
-        TS_ASSERT_DELTA(crypt.GetLocationOfCellCentre(cell_iter)[0], 0.0, 1e-6);
+        TS_ASSERT_DELTA(crypt.GetLocationOfCellCentre(*cell_iter)[0], 0.0, 1e-6);
         // Now move to the left a bit
         crypt.GetNode(0)->rGetModifiableLocation()[0] = -0.1;
-        TS_ASSERT_DELTA(-0.1, crypt.GetLocationOfCellCentre(cell_iter)[0], 1e-3);
+        TS_ASSERT_DELTA(-0.1, crypt.GetLocationOfCellCentre(*cell_iter)[0], 1e-3);
 
         // Pass this cell population to a boundary condition object
         CryptSimulationBoundaryCondition<1> boundary_condition(&crypt);
@@ -362,7 +362,7 @@ public:
         boundary_condition.ImposeBoundaryCondition(node_locations_before);
 
         // This node will be moved back to 0.0
-        TS_ASSERT_DELTA(0.0, crypt.GetLocationOfCellCentre(cell_iter)[0], 1e-3);
+        TS_ASSERT_DELTA(0.0, crypt.GetLocationOfCellCentre(*cell_iter)[0], 1e-3);
 
         // Tidy up
         WntConcentration<1>::Destroy();
@@ -391,7 +391,7 @@ public:
         // Move the first cell (which should be on y=0) down a bit
         AbstractCellPopulation<2>::Iterator cell_iter = crypt.Begin();
         crypt.GetNode(0)->rGetModifiableLocation()[1] = -0.1;
-        c_vector<double, 2> perturbed_location = crypt.GetLocationOfCellCentre(cell_iter);
+        c_vector<double, 2> perturbed_location = crypt.GetLocationOfCellCentre(*cell_iter);
 
         // Create a boundary condition object
         CryptSimulationBoundaryCondition<2> boundary_condition(&crypt);
@@ -411,7 +411,7 @@ public:
          * The first cell should not have been moved by the boundary condition object,
          * and hence should remain in its perturbed location.
          */
-        c_vector<double, 2> location_after = crypt.GetLocationOfCellCentre(cell_iter);
+        c_vector<double, 2> location_after = crypt.GetLocationOfCellCentre(*cell_iter);
         TS_ASSERT_DELTA(location_after[0], perturbed_location[0], 1e-3);
         TS_ASSERT_DELTA(location_after[1], location_after[1], 1e-3);
 

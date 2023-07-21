@@ -235,7 +235,7 @@ public:
             CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetCellProliferativeType(p_stem_type);
 
-            double birth_time = -1.0 - ((double) i/p_mesh->GetNumNodes())*18.0;
+            double birth_time = -1.0 - (static_cast<double>(i)/p_mesh->GetNumNodes())*18.0;
             p_cell->SetBirthTime(birth_time);
             cells.push_back(p_cell);
         }
@@ -332,7 +332,7 @@ public:
             p_model->SetStemCellG1Duration(8.0);
             p_model->SetTransitCellG1Duration(8.0);
 
-            double birth_time = -1.0 - ((double) i/p_mesh->GetNumNodes())*18.0;
+            double birth_time = -1.0 - (static_cast<double>(i)/p_mesh->GetNumNodes())*18.0;
             p_cell->SetBirthTime(birth_time);
 
             // Make the cell apoptotic if near the centre
@@ -411,7 +411,7 @@ public:
 
             CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetCellProliferativeType(p_stem_type);
-            double birth_time = -1.0 - ((double) i/p_mesh->GetNumNodes())*18.0;
+            double birth_time = -1.0 - (static_cast<double>(i)/p_mesh->GetNumNodes())*18.0;
             p_cell->SetBirthTime(birth_time);
 
             // Make the cell apoptotic if near the centre
@@ -805,7 +805,7 @@ public:
 
             CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetCellProliferativeType(p_stem_type);
-            double birth_time = -1.0 - ((double) i/p_mesh->GetNumNodes())*18.0;
+            double birth_time = -1.0 - (static_cast<double>(i)/p_mesh->GetNumNodes())*18.0;
             p_cell->SetBirthTime(birth_time);
 
             cells.push_back(p_cell);
@@ -897,7 +897,7 @@ public:
 
             CellPtr p_cell(new Cell(p_state, p_model));
             p_cell->SetCellProliferativeType(p_stem_type);
-            double birth_time = -1.0 - ((double) i/p_mesh->GetNumNodes())*18.0;
+            double birth_time = -1.0 - (static_cast<double>(i)/p_mesh->GetNumNodes())*18.0;
             p_cell->SetBirthTime(birth_time);
 
             cells.push_back(p_cell);

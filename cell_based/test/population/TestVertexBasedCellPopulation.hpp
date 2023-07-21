@@ -122,7 +122,7 @@ public:
             TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(cell_iter), counter);
 
             // Test operator-> and that cells are in sync
-            TS_ASSERT_DELTA(cell_iter->GetAge(), (double)counter, 1e-12);
+            TS_ASSERT_DELTA(cell_iter->GetAge(), static_cast<double>(counter), 1e-12);
 
             TS_ASSERT_EQUALS(counter, p_mesh->GetElement(counter)->GetIndex());
 
@@ -1139,7 +1139,7 @@ public:
             unsigned counter = 0;
             for (auto cell_iter : *p_cell_population)
             {
-                TS_ASSERT_DELTA(cell_iter->GetAge(), (double)(counter), 1e-7);
+                TS_ASSERT_DELTA(cell_iter->GetAge(), static_cast<double>(counter), 1e-7);
                 counter++;
             }
 
@@ -1343,7 +1343,7 @@ public:
             unsigned counter = 0;
             for (auto cell_iter : *p_cell_population)
             {
-                TS_ASSERT_DELTA(cell_iter->GetAge(), (double)(counter), 1e-7);
+                TS_ASSERT_DELTA(cell_iter->GetAge(), static_cast<double>(counter), 1e-7);
                 counter++;
             }
 
@@ -1522,14 +1522,14 @@ public:
         // Set the cell data item "foo" on each cell
         for (unsigned index = 0; index < cell_population.GetNumElements(); ++index)
         {
-            double value = (double)index;
+            double value = static_cast<double>(index);
             cell_population.GetCellUsingLocationIndex(index)->GetCellData()->SetItem(var_name, value);
         }
 
         // The PDE mesh nodes 48 to 60 coincide with the cell centroids
-        for (unsigned index=48; index<60; ++index)
+        for (unsigned index = 48; index < 60; ++index)
         {
-            double expected_value = (double)index - 48.0;
+            double expected_value = static_cast<double>(index) - 48.0;
             TS_ASSERT_DELTA(cell_population.GetCellDataItemAtPdeNode(index,var_name), expected_value, 1e-6);
         }
 

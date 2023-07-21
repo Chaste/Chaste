@@ -165,7 +165,7 @@ public:
             // Reset the position of the cell
             simulator.rGetCellPopulation().MoveCellInLocationMap(*cell_iter, cell_location, 4u);
 
-            TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(cell_iter), 4u);
+            TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter), 4u);
         }
 
         // Check that we still have only one cell
@@ -177,7 +177,7 @@ public:
         double probability_of_occupation[9];
         for (unsigned i = 0; i < 9; ++i)
         {
-            probability_of_occupation[i] = (double) location_of_cell[i]/(double) num_runs;
+            probability_of_occupation[i] = static_cast<double>(location_of_cell[i]) / static_cast<double>(num_runs);
         }
 
         // Note that these simulations are stochastic and so the tolerances are relatively loose
@@ -355,7 +355,7 @@ public:
         {
             location_indices.push_back(index);
         }
-        TS_ASSERT_EQUALS(location_indices.size(),p_mesh->GetNumNodes());
+        TS_ASSERT_EQUALS(location_indices.size(), p_mesh->GetNumNodes());
 
         // Create cell population
         CaBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
@@ -368,16 +368,17 @@ public:
         // Assign roughly half the cells to undergo apoptotis. Set their location index as
         // a cell data item to check ordering in output VTK file
         std::list<CellPtr> cells2 = cell_population.rGetCells();
+        std::list<CellPtr>::iterator it;
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-        for (auto it : cells2)
+        for (it = cells2.begin(); it != cells2.end(); ++it)
         {
-            it->SetApoptosisTime(3);
+            (*it)->SetApoptosisTime(3);
             double random_number = p_gen->ranf();
             if (random_number < 0.5)
             {
-                it->AddCellProperty(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>());
+                (*it)->AddCellProperty(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>());
             }
-            it->GetCellData()->SetItem("Location Index For Test", double(cell_population.GetLocationIndexUsingCell(it)));
+            (*it)->GetCellData()->SetItem("Location Index For Test", double(cell_population.GetLocationIndexUsingCell(*it)));
         }
 
         // Set up cell-based simulation

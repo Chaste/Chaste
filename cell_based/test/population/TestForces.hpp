@@ -1023,7 +1023,7 @@ public:
 
         for (unsigned i = 0; i < num_nodes; ++i)
         {
-            angles[i] = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
+            angles[i] = M_PI + 2.0 * M_PI * static_cast<double>(i) / static_cast<double>(num_nodes);
             nodes.push_back(new Node<2>(i, true, cos(angles[i]), sin(angles[i])));
         }
 
@@ -1310,7 +1310,7 @@ public:
 
         for (unsigned i = 0; i < num_nodes; ++i)
         {
-            angles[i] = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
+            angles[i] = M_PI + 2.0 * M_PI * static_cast<double>(i) / static_cast<double>(num_nodes);
             nodes.push_back(new Node<2>(i, true, cos(angles[i]), sin(angles[i])));
         }
 
@@ -1420,7 +1420,7 @@ public:
 
         for (unsigned i = 0; i < num_nodes; ++i)
         {
-            angles[i] = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
+            angles[i] = M_PI + 2.0 * M_PI * static_cast<double>(i) / static_cast<double>(num_nodes);
             nodes.push_back(new Node<2>(i, true, cos(angles[i]), sin(angles[i])));
         }
 
@@ -1551,7 +1551,7 @@ public:
         std::vector<double> angles = std::vector<double>(num_nodes);
         for (unsigned i = 0; i < num_nodes; ++i)
         {
-            angles[i] = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
+            angles[i] = M_PI + 2.0 * M_PI * static_cast<double>(i) / static_cast<double>(num_nodes);
             nodes.push_back(new Node<2>(i, true, cos(angles[i]), sin(angles[i])));
         }
 
@@ -1882,7 +1882,7 @@ public:
         std::vector<double> angles = std::vector<double>(num_nodes);
         for (unsigned i = 0; i < num_nodes; ++i)
         {
-            angles[i] = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
+            angles[i] = M_PI + 2.0 * M_PI * static_cast<double>(i) / static_cast<double>(num_nodes);
             nodes.push_back(new Node<2>(i, true, cos(angles[i]), sin(angles[i])));
         }
         std::vector<VertexElement<2,2>*> elements;
@@ -1922,8 +1922,8 @@ public:
         unsigned num_nodes = 10;
         for (unsigned i = 0; i < num_nodes; ++i)
         {
-            double x = (double)(i);
-            double y = (double)(i);
+            double x = static_cast<double>(i);
+            double y = static_cast<double>(i);
             nodes.push_back(new Node<2>(i, true, x, y));
         }
 

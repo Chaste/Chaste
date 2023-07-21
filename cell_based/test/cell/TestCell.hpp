@@ -684,8 +684,6 @@ public:
             cells.push_back(p_stem_cell);
 
             // Produce the offspring of the cells
-            std::vector<CellPtr>::iterator cell_iterator = cells.begin();
-
             while (p_simulation_time->GetTime()< end_time)
             {
                 p_simulation_time->IncrementTimeOneStep();
@@ -787,31 +785,25 @@ public:
         std::vector<unsigned> differentiated_cells(num_steps);
         std::vector<double> times(num_steps);
 
-        std::vector<CellPtr>::iterator cell_iterator;
-
         unsigned i = 0;
         while (!p_simulation_time->IsFinished())
         {
             p_simulation_time->IncrementTimeOneStep();
 
             // Produce the offspring of the cells
-            cell_iterator = cells.begin();
-            while (cell_iterator < cells.end())
+            for (auto cell_iter : cells)
             {
-                TS_ASSERT_EQUALS((cell_iterator)->GetMutationState()->IsType<WildTypeCellMutationState>(), true);
-                if ((cell_iterator)->ReadyToDivide())
+                TS_ASSERT_EQUALS(cell_iter->GetMutationState()->IsType<WildTypeCellMutationState>(), true);
+                if (cell_iter->ReadyToDivide())
                 {
-                    newly_born.push_back((cell_iterator)->Divide());
+                    newly_born.push_back(cell_iter->Divide());
                 }
-                ++cell_iterator;
             }
 
             // Copy offspring in newly_born vector to cells vector
-            cell_iterator = newly_born.begin();
-            while (cell_iterator < newly_born.end())
+            for (auto cell_iter : newly_born)
             {
-                cells.push_back(cell_iterator);
-                ++cell_iterator;
+                cells.push_back(cell_iter);
             }
             newly_born.clear();
 

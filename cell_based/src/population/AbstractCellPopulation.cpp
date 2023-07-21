@@ -124,7 +124,9 @@ AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::~AbstractCellPopulation()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::InitialiseCells()
 {
-    for (auto cell_iter : mCells)
+    for (auto cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
     {
         cell_iter->InitialiseCellCycleModel();
         cell_iter->InitialiseSrnModel();
@@ -136,7 +138,9 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetDataOnAllCells(
     const std::string& rDataName,
     double dataValue)
 {
-    for (auto cell_iter : mCells)
+    for (auto cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
     {
         cell_iter->GetCellData()->SetItem(rDataName, dataValue);
     }
@@ -158,7 +162,9 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetNumRealCells()
 {
     unsigned counter = 0;
-    for (auto cell_iter : mCells)
+    for (auto cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
     {
         counter++;
     }
@@ -174,9 +180,11 @@ unsigned AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetNumAllCells()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetCellAncestorsToLocationIndices()
 {
-    for (auto cell_iter : mCells)
+    for (auto cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
     {
-        MAKE_PTR_ARGS(CellAncestor, p_cell_ancestor, (mCellLocationMap[(cell_iter).get()]));
+        MAKE_PTR_ARGS(CellAncestor, p_cell_ancestor, (mCellLocationMap[(*cell_iter).get()]));
         cell_iter->SetAncestor(p_cell_ancestor);
     }
 }
@@ -185,7 +193,9 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::set<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellAncestors()
 {
     std::set<unsigned> remaining_ancestors;
-    for (auto cell_iter : mCells)
+    for (auto cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
     {
         remaining_ancestors.insert(cell_iter->GetAncestor());
     }
@@ -301,9 +311,11 @@ std::vector<unsigned> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellCyc
             EXCEPTION("You are trying to record the cell cycle phase of cells with a non phase based cell cycle model.");
         }
 
-        for (auto cell_iter : mCells)
+        for (auto cell_iter = this->Begin();
+             cell_iter != this->End();
+             ++cell_iter)
         {
-            switch (static_cast<AbstractPhaseBasedCellCycleModel*>((cell_iter)->GetCellCycleModel())->GetCurrentCellCyclePhase())
+            switch (static_cast<AbstractPhaseBasedCellCycleModel*>((*cell_iter)->GetCellCycleModel())->GetCurrentCellCyclePhase())
             {
                 case G_ZERO_PHASE:
                 {
@@ -501,9 +513,11 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCentroidOfCellPopulation()
 {
     mCentroid = zero_vector<double>(SPACE_DIM);
-    for (auto cell_iter : mCells)
+    for (auto cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
     {
-        mCentroid += GetLocationOfCellCentre(cell_iter);
+        mCentroid += GetLocationOfCellCentre(*cell_iter);
     }
     mCentroid /= this->GetNumRealCells();
 
@@ -749,11 +763,13 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AcceptCellWritersAcrossPopulation()
 {
-    for (auto cell_iter : mCells)
+    for (auto cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
     {
         for (auto cell_writer_iter : mCellWriters)
         {
-            AcceptCellWriter(cell_writer_iter, cell_iter);
+            AcceptCellWriter(cell_writer_iter, *cell_iter);
         }
     }
 }
@@ -778,13 +794,15 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationInfo(
      */
     std::set<std::string> unique_cell_cycle_models;
     std::vector<CellPtr> first_cell_with_unique_CCM;
-    for (auto cell_iter : mCells)
+    for (auto cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
     {
         std::string identifier = cell_iter->GetCellCycleModel()->GetIdentifier();
         if (unique_cell_cycle_models.count(identifier) == 0)
         {
             unique_cell_cycle_models.insert(identifier);
-            first_cell_with_unique_CCM.push_back(cell_iter);
+            first_cell_with_unique_CCM.push_back(*cell_iter);
         }
     }
 
@@ -807,13 +825,15 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationInfo(
      */
     std::set<std::string> unique_srn_models;
     std::vector<CellPtr> first_cell_with_unique_SRN;
-    for (auto cell_iter : mCells)
+    for (auto cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
     {
         std::string identifier = cell_iter->GetSrnModel()->GetIdentifier();
         if (unique_srn_models.count(identifier) == 0)
         {
             unique_srn_models.insert(identifier);
-            first_cell_with_unique_SRN.push_back(cell_iter);
+            first_cell_with_unique_SRN.push_back(*cell_iter);
         }
     }
 
@@ -950,9 +970,11 @@ c_vector<double, SPACE_DIM> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetS
 
     // Loop over cells and find the maximum distance from the centre of mass in each dimension
     c_vector<double, SPACE_DIM> max_distance_from_centre = zero_vector<double>(SPACE_DIM);
-    for (auto cell_iter : mCells)
+    for (auto cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
     {
-        c_vector<double, SPACE_DIM> cell_location = GetLocationOfCellCentre(cell_iter);
+        c_vector<double, SPACE_DIM> cell_location = GetLocationOfCellCentre(*cell_iter);
 
         // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
         c_vector<double, SPACE_DIM> displacement;

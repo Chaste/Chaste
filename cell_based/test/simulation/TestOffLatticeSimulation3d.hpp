@@ -208,9 +208,9 @@ public:
         mesh_writer.WriteFilesUsingMesh(*p_mesh);
 
         c_vector<double, 3> spheroid_centre;
-        spheroid_centre[0] = 0.5*((double) width);
-        spheroid_centre[1] = 0.5*((double) height);
-        spheroid_centre[2] = 0.5*((double) depth);
+        spheroid_centre[0] = 0.5 * static_cast<double>(width);
+        spheroid_centre[1] = 0.5 * static_cast<double>(height);
+        spheroid_centre[2] = 0.5 * static_cast<double>(depth);
 
         // Set up cells by iterating through the mesh nodes
         unsigned num_nodes = p_mesh->GetNumAllNodes();
@@ -252,7 +252,7 @@ public:
 
             cells2.push_back(p_cell);
 
-            if (norm_2(node_location - spheroid_centre) <= 0.5*sqrt(3.0)*1.01*((double) min_spatial_dimension)/3.0)
+            if (norm_2(node_location - spheroid_centre) <= 0.5*sqrt(3.0)*1.01*static_cast<double>(min_spatial_dimension)/3.0)
             {
                 location_indices.push_back(i);
                 cells.push_back(p_cell);

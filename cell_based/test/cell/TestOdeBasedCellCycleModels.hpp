@@ -216,7 +216,7 @@ public:
         std::vector<double> test_results(6);
         for (unsigned i = 0; i < 6; ++i)
         {
-            test_results[i] = static_cast<double>i;
+            test_results[i] = static_cast<double>(i);
         }
         p_cell_model->SetProteinConcentrationsForTestsOnly(1.0, test_results);
         proteins = p_cell_model->GetProteinConcentrations();

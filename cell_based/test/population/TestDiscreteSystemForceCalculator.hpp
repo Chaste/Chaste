@@ -109,10 +109,10 @@ public:
 
         for (unsigned i=1; i<6; ++i)
         {
-            expected_sampling_angles.push_back(-M_PI +((double) i)*M_PI/3.0 - epsilon);
-            expected_sampling_angles.push_back(-M_PI +((double) i)*M_PI/3.0 - epsilon);
-            expected_sampling_angles.push_back(-M_PI +((double) i)*M_PI/3.0 + epsilon);
-            expected_sampling_angles.push_back(-M_PI +((double) i)*M_PI/3.0 + epsilon);
+            expected_sampling_angles.push_back(-M_PI + (static_cast<double>(i))*M_PI/3.0 - epsilon);
+            expected_sampling_angles.push_back(-M_PI + (static_cast<double>(i))*M_PI/3.0 - epsilon);
+            expected_sampling_angles.push_back(-M_PI + (static_cast<double>(i))*M_PI/3.0 + epsilon);
+            expected_sampling_angles.push_back(-M_PI + (static_cast<double>(i))*M_PI/3.0 + epsilon);
         }
         expected_sampling_angles.push_back(M_PI - epsilon);
         expected_sampling_angles.push_back(M_PI - epsilon);

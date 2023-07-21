@@ -129,13 +129,14 @@ private:
             TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(cell_iter), counter);
 
             // Test operator-> and that cells are in sync
-            TS_ASSERT_DELTA(cell_iter->GetAge(), (double)counter, 1e-12);
+            TS_ASSERT_DELTA(cell_iter->GetAge(), static_cast<double>(counter), 1e-12);
 
             counter++;
         }
 
         TS_ASSERT_EQUALS(counter, cell_population.GetNumRealCells());
-        //Since no cells died, this should be all cells in the mesh.
+
+        // Since no cells died, this should be all cells in the mesh
         TS_ASSERT_EQUALS(counter, cell_population.GetNumAllCells());
     }
 
@@ -859,8 +860,8 @@ public:
         // Coverage of writing CellData to VTK
         for (auto cell_iter : cell_population)
         {
-            cell_iter->GetCellData()->SetItem("var1", (double) 0.0);
-            cell_iter->GetCellData()->SetItem("var2", (double) 3.0);
+            cell_iter->GetCellData()->SetItem("var1", 0.0);
+            cell_iter->GetCellData()->SetItem("var2", 3.0);
         }
 
         cell_population.SetCellAncestorsToLocationIndices();
@@ -1331,7 +1332,7 @@ public:
                 cell_iter->ReadyToDivide();
                 cell_locations.push_back(p_cell_population->GetLocationOfCellCentre(cell_iter));
                 // Add cell data
-                cell_iter->GetCellData()->SetItem("data", (double) index_for_data);
+                cell_iter->GetCellData()->SetItem("data", static_cast<double>(index_for_data));
                 index_for_data++;
             }
 
@@ -1375,10 +1376,10 @@ public:
             unsigned counter = 0;
             for (auto cell_iter : *p_cell_population)
             {
-                TS_ASSERT_DELTA(cell_iter->GetAge(),(double)(counter),1e-7);
+                TS_ASSERT_DELTA(cell_iter->GetAge(), static_cast<double>(counter), 1e-7);
                 TS_ASSERT_DELTA(p_cell_population->GetLocationOfCellCentre(cell_iter)[0], cell_locations[counter][0], 1e-9);
                 TS_ASSERT_DELTA(p_cell_population->GetLocationOfCellCentre(cell_iter)[1], cell_locations[counter][1], 1e-9);
-                TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("data"), (double) p_cell_population->GetLocationIndexUsingCell(cell_iter), 1e-12);
+                TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("data"), static_cast<double>(p_cell_population->GetLocationIndexUsingCell(cell_iter)), 1e-12);
                 counter++;
             }
 

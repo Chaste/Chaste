@@ -87,7 +87,11 @@ public:
             {
                 for (unsigned k = 0; k < cells_across; ++k)
                 {
-                    nodes.push_back(new Node<3>(index, false,  (double) i * scaling , (double) j * scaling, (double) k * scaling));
+                    nodes.push_back(new Node<3>(index,
+                                                false,
+                                                static_cast<double>(i)*scaling,
+                                                static_cast<double>(j)*scaling,
+                                                static_cast<double>(k)*scaling));
                     index++;
                 }
             }

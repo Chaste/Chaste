@@ -122,7 +122,7 @@ private:
             TS_ASSERT_EQUALS(node_based_cell_population.GetLocationIndexUsingCell(cell_iter), counter*PetscTools::GetNumProcs() + PetscTools::GetMyRank());
 
             // Test operator-> and that cells are in sync
-            TS_ASSERT_DELTA(cell_iter->GetAge(), (double)counter, 1e-12);
+            TS_ASSERT_DELTA(cell_iter->GetAge(), static_cast<double>(counter), 1e-12);
 
             // Test that the cell property registry belonging to the population has made it into the cell's cell property collections.
             CellPropertyRegistry* p_cell_registry = cell_iter->rGetCellPropertyCollection().GetCellPropertyRegistry();
@@ -1530,7 +1530,7 @@ public:
 
             for (auto cell_iter : *p_cell_population)
             {
-                TS_ASSERT_DELTA(cell_iter->GetAge(), (double)(counter), 1e-7);
+                TS_ASSERT_DELTA(cell_iter->GetAge(), static_cast<double>(counter), 1e-7);
                 counter++;
             }
 
