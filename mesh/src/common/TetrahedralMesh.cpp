@@ -102,7 +102,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(
     // Add elements    
     this->mElements.reserve(rMeshReader.GetNumElements());
     for (unsigned element_index = 0;
-         element_index < (unsigned)rMeshReader.GetNumElements();
+         element_index < rMeshReader.GetNumElements();
          ++element_index)
     {
         ElementData element_data = rMeshReader.GetNextElementData();
@@ -218,7 +218,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ReadNodesPerProcessorFile(
     else
     {
         EXCEPTION("Unable to read nodes per processor file " + 
-                  rNodesPerProcessorFile);
+            rNodesPerProcessorFile);
     }
 
     unsigned sum = 0;
@@ -230,8 +230,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ReadNodesPerProcessorFile(
     if (sum != this->GetNumNodes())
     {
         EXCEPTION("Sum of nodes per processor, " << sum << 
-                  ", not equal to number of nodes in mesh, " << 
-                  this->GetNumNodes());
+            ", not equal to number of nodes in mesh, " << this->GetNumNodes());
     }
 
     unsigned num_owned = nodes_per_processor_vec[PetscTools::GetMyRank()];
@@ -249,8 +248,8 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsConforming()
 {
     /*
-     * Each face of each element is a set of node indices.
-     * We form a set of these in order to get their parity:
+     * Each face of each element is a set of node indices. We form a set of 
+     * these in order to get their parity:
      *   all faces which appear once are inserted into the set;
      *   all faces which appear twice are inserted and then removed from the set;
      *   we're assuming that faces never appear more than twice.
@@ -272,6 +271,7 @@ bool TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsConforming()
                     face_info.insert(iter->GetNodeGlobalIndex(node_index));
                 }
             }
+
             // Face is now formed - attempt to find it
             auto find_face = odd_parity_faces.find(face_info);
             if (find_face != odd_parity_faces.end())
@@ -289,9 +289,8 @@ bool TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsConforming()
     }
 
     /*
-     * At this point the odd parity faces should be the same as the
-     * boundary elements. We could check this explicitly or we could
-     * just count them.
+     * At this point the odd parity faces should be the same as the boundary 
+     elements. We could check this explicitly or we could just count them.
      */
     return (odd_parity_faces.size() == this->GetNumBoundaryElements());
 }
@@ -305,7 +304,8 @@ double TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetVolume()
          iter != this->GetElementIteratorEnd();
          ++iter)
     {
-        mesh_volume += iter->GetVolume(mElementJacobianDeterminants[iter->GetIndex()]);
+        mesh_volume += 
+            iter->GetVolume(mElementJacobianDeterminants[iter->GetIndex()]);
     }
 
     return mesh_volume;
@@ -324,7 +324,7 @@ double TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceArea()
     }
 
     double mesh_surface = 0.0;
-    typename TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::BoundaryElementIterator it = this->GetBoundaryElementIteratorBegin();
+    auto it = this->GetBoundaryElementIteratorBegin();
 
     while (it != this->GetBoundaryElementIteratorEnd())
     {
@@ -353,7 +353,8 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::PermuteNodes()
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::PermuteNodes(const std::vector<unsigned>& perm)
+void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::PermuteNodes(
+    const std::vector<unsigned>& perm)
 {
     // Let's not do this if there are any deleted nodes
     assert(this->GetNumAllNodes() == this->GetNumNodes());
@@ -364,15 +365,18 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::PermuteNodes(const std::vector<uns
     std::vector<Node<SPACE_DIM>*> copy_m_nodes;
     copy_m_nodes.assign(this->mNodes.begin(), this->mNodes.end());
 
-    for (unsigned original_index = 0; original_index < this->mNodes.size(); original_index++)
+    for (unsigned original_index = 0;
+         original_index < this->mNodes.size();
+         ++original_index)
     {
         assert(perm[original_index] < this->mNodes.size());
-        //perm[original_index] holds the new assigned index of that node
+
+        // perm[original_index] holds the new assigned index of that node
         this->mNodes[perm[original_index]] = copy_m_nodes[original_index];
     }
 
     // Update indices
-    for (unsigned index = 0; index < this->mNodes.size(); index++)
+    for (unsigned index = 0; index < this->mNodes.size(); ++index)
     {
         this->mNodes[index]->SetIndex(index);
     }
@@ -382,7 +386,10 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::PermuteNodes(const std::vector<uns
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetContainingElementIndexWithInitialGuess(const ChastePoint<SPACE_DIM>& rTestPoint, unsigned startingElementGuess, bool strict)
+unsigned TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetContainingElementIndexWithInitialGuess(
+    const ChastePoint<SPACE_DIM>& rTestPoint,
+    unsigned startingElementGuess,
+    bool strict)
 {
     assert(startingElementGuess < this->GetNumElements());
 

@@ -40,12 +40,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cassert>
 
-///////////////////////////////////////////////////////////////////////////////////
-// Implementation
-///////////////////////////////////////////////////////////////////////////////////
-
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractElement<ELEMENT_DIM, SPACE_DIM>::AbstractElement(unsigned index, const std::vector<Node<SPACE_DIM>*>& rNodes)
+AbstractElement<ELEMENT_DIM, SPACE_DIM>::AbstractElement(
+    unsigned index,
+    const std::vector<Node<SPACE_DIM>*>& rNodes)
     : mNodes(rNodes),
       mIndex(index),
       mIsDeleted(false),
@@ -62,7 +60,8 @@ AbstractElement<ELEMENT_DIM, SPACE_DIM>::AbstractElement(unsigned index)
       mIsDeleted(false),
       mOwnership(true),
       mpElementAttributes(nullptr)
-{}
+{
+}
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractElement<ELEMENT_DIM, SPACE_DIM>::~AbstractElement()
@@ -71,10 +70,12 @@ AbstractElement<ELEMENT_DIM, SPACE_DIM>::~AbstractElement()
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractElement<ELEMENT_DIM, SPACE_DIM>::ReplaceNode(Node<SPACE_DIM>* pOldNode, Node<SPACE_DIM>* pNewNode)
+void AbstractElement<ELEMENT_DIM, SPACE_DIM>::ReplaceNode(
+    Node<SPACE_DIM>* pOldNode,
+    Node<SPACE_DIM>* pNewNode)
 {
     assert(pOldNode != pNewNode);
-    for (unsigned i=0; i<this->mNodes.size(); i++)
+    for (unsigned i = 0; i < this->mNodes.size(); ++i)
     {
         if (this->mNodes[i] == pOldNode)
         {
@@ -86,7 +87,9 @@ void AbstractElement<ELEMENT_DIM, SPACE_DIM>::ReplaceNode(Node<SPACE_DIM>* pOldN
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNodeLocation(unsigned localIndex, unsigned dimension) const
+double AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNodeLocation(
+    unsigned localIndex,
+    unsigned dimension) const
 {
     assert(dimension < SPACE_DIM);
     assert((unsigned)localIndex < mNodes.size());
@@ -94,28 +97,32 @@ double AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNodeLocation(unsigned localIn
 }
 
 /*
- * Note for future reference: this used to return a reference to a c_vector, in which case a
- * weird error arose where it compiled, ran and passed on some machines but failed the tests
- * (bad_size errors) on another machine.  So be careful if you think about changing it!
+ * Note for future reference: this used to return a reference to a c_vector, in 
+ * which case a weird error arose where it compiled, ran and passed on some 
+ * machines but failed the tests (bad_size errors) on another machine. So be 
+ * careful if you think about changing it!
  */
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNodeLocation(unsigned localIndex) const
+c_vector<double, SPACE_DIM> AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNodeLocation(
+    unsigned localIndex) const
 {
-    assert((unsigned)localIndex < mNodes.size());
+    assert(localIndex < mNodes.size());
     return mNodes[localIndex]->rGetLocation();
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNodeGlobalIndex(unsigned localIndex) const
+unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNodeGlobalIndex(
+    unsigned localIndex) const
 {
-    assert((unsigned)localIndex < mNodes.size());
+    assert(localIndex < mNodes.size());
     return mNodes[localIndex]->GetIndex();
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-Node<SPACE_DIM>* AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNode(unsigned localIndex) const
+Node<SPACE_DIM>* AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNode(
+    unsigned localIndex) const
 {
-    assert((unsigned)localIndex < mNodes.size());
+    assert(localIndex < mNodes.size());
     return mNodes[localIndex];
 }
 
@@ -185,7 +192,8 @@ unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetUnsignedAttribute()
 
     if (CompareDoubles::WithinAnyTolerance(double_attr, unsigned_attr) == false)
     {
-        EXCEPTION("Element attribute '"<< double_attr <<"' cannot be converted to an unsigned.");
+        EXCEPTION("Element attribute '"<< double_attr << 
+            "' cannot be converted to an unsigned.");
     }
     return unsigned_attr;
 }
@@ -200,10 +208,10 @@ void AbstractElement<ELEMENT_DIM, SPACE_DIM>::ConstructElementAttributes()
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractElement<ELEMENT_DIM, SPACE_DIM>::AddElementAttribute(double attribute)
+void AbstractElement<ELEMENT_DIM, SPACE_DIM>::AddElementAttribute(
+    double attribute)
 {
     ConstructElementAttributes();
-
     mpElementAttributes->AddAttribute(attribute);
 }
 
