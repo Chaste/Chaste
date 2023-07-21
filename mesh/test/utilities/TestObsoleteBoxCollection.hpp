@@ -156,17 +156,12 @@ public:
             box_min_max_values(0) = i * cut_off_length - 0.1;
             box_min_max_values(1) = (i+1) * cut_off_length - 0.1;
 
-            for (auto it_nodes_in_box = nodes_in_box.begin();
-                 it_nodes_in_box != nodes_in_box.end();
-                 it_nodes_in_box++)
+            for (auto node_iter : nodes_in_box)
             {
-                Node<1>* current_node = *it_nodes_in_box;
-                double x_position = current_node->rGetLocation()[0];
-
+                double x_position = node_iter->rGetLocation()[0];
                 double epsilon = 1e-12;
-
-                TS_ASSERT_LESS_THAN(box_min_max_values(0)-epsilon, x_position);
-                TS_ASSERT_LESS_THAN(x_position, box_min_max_values(1)+epsilon);
+                TS_ASSERT_LESS_THAN(box_min_max_values(0) - epsilon, x_position);
+                TS_ASSERT_LESS_THAN(x_position, box_min_max_values(1) + epsilon);
             }
         }
 
@@ -549,20 +544,16 @@ public:
             box_min_max_values(2) = indices(1)*cut_off_length - 0.1;
             box_min_max_values(3) = (indices(1)+1)*cut_off_length - 0.1;
 
-            for (auto it_nodes_in_box = nodes_in_box.begin();
-                 it_nodes_in_box != nodes_in_box.end();
-                 it_nodes_in_box++)
+            for (auto node_iter : nodes_in_box)
             {
-                Node<2>* current_node = *it_nodes_in_box;
-                double x_position = current_node->rGetLocation()[0];
-                double y_position = current_node->rGetLocation()[1];
-
+                double x_position = node_iter->rGetLocation()[0];
+                double y_position = node_iter->rGetLocation()[1];
                 double epsilon = 1e-12;
 
-                TS_ASSERT_LESS_THAN(box_min_max_values(0)-epsilon, x_position);
-                TS_ASSERT_LESS_THAN(x_position, box_min_max_values(1)+epsilon);
-                TS_ASSERT_LESS_THAN(box_min_max_values(2)-epsilon, y_position);
-                TS_ASSERT_LESS_THAN(y_position, box_min_max_values(3)+epsilon);
+                TS_ASSERT_LESS_THAN(box_min_max_values(0) - epsilon, x_position);
+                TS_ASSERT_LESS_THAN(x_position, box_min_max_values(1) + epsilon);
+                TS_ASSERT_LESS_THAN(box_min_max_values(2) - epsilon, y_position);
+                TS_ASSERT_LESS_THAN(y_position, box_min_max_values(3) + epsilon);
             }
         }
     }

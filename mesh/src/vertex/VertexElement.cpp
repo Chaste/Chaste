@@ -85,11 +85,9 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
     }
 
     // Populate mNodes
-    for (auto node_iter = nodes_set.begin();
-         node_iter != nodes_set.end();
-         ++node_iter)
+    for (auto node_iter : nodes_set)
     {
-         this->mNodes.push_back(*node_iter);
+         this->mNodes.push_back(node_iter);
     }
 
     // Register element with nodes

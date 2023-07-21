@@ -660,36 +660,32 @@ void ObsoleteBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNo
         std::set<unsigned> local_boxes_indices = rGetLocalBoxes(this_node_box_index);
 
         // Loop over all the local boxes
-        for (auto box_iter = local_boxes_indices.begin();
-             box_iter != local_boxes_indices.end();
-             box_iter++)
+        for (auto box_iter : local_boxes_indices)
         {
             // Get the set of nodes contained in this box
-            std::set<Node<DIM>*>& r_contained_nodes = mBoxes[*box_iter].rGetNodesContained();
+            std::set<Node<DIM>*>& r_contained_nodes = mBoxes[box_iter].rGetNodesContained();
 
             // Loop over these nodes
-            for (auto node_iter = r_contained_nodes.begin();
-                 node_iter != r_contained_nodes.end();
-                 ++node_iter)
+            for (auto node_iter : r_contained_nodes)
             {
                 // Get the index of the other node
-                unsigned other_node_index = (*node_iter)->GetIndex();
+                unsigned other_node_index = node_iter->GetIndex();
 
                 // If we're in the same box, then take care not to store the node pair twice
-                if (*box_iter == this_node_box_index)
+                if (box_iter == this_node_box_index)
                 {
                     if (other_node_index > this_node->GetIndex())
                     {
-                        rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>(this_node, (*node_iter)));
+                        rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>(this_node, node_iter));
                         this_node->AddNeighbour(other_node_index);
-                        (*node_iter)->AddNeighbour(node_index);
+                        node_iter->AddNeighbour(node_index);
                     }
                 }
                 else
                 {
-                    rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>(this_node, (*node_iter)));
+                    rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>(this_node, node_iter));
                     this_node->AddNeighbour(other_node_index);
-                    (*node_iter)->AddNeighbour(node_index);
+                    node_iter->AddNeighbour(node_index);
                 }
             }
         }

@@ -206,11 +206,9 @@ void DistributedBoxCollection<DIM>::UpdateHaloBoxes()
     mHaloNodesLeft.clear();
     for (unsigned i=0; i<mHalosLeft.size(); i++)
     {
-        for (auto iter = this->rGetBox(mHalosLeft[i]).rGetNodesContained().begin();
-             iter!=this->rGetBox(mHalosLeft[i]).rGetNodesContained().end();
-             iter++)
+        for (auto iter : this->rGetBox(mHalosLeft[i]).rGetNodesContained())
         {
-            mHaloNodesLeft.push_back((*iter)->GetIndex());
+            mHaloNodesLeft.push_back(iter->GetIndex());
         }
     }
 
@@ -218,11 +216,9 @@ void DistributedBoxCollection<DIM>::UpdateHaloBoxes()
     mHaloNodesRight.clear();
     for (unsigned i=0; i<mHalosRight.size(); i++)
     {
-        for (auto iter = this->rGetBox(mHalosRight[i]).rGetNodesContained().begin();
-             iter != this->rGetBox(mHalosRight[i]).rGetNodesContained().end();
-             iter++)
+        for (auto iter : this->rGetBox(mHalosRight[i]).rGetNodesContained())
         {
-            mHaloNodesRight.push_back((*iter)->GetIndex());
+            mHaloNodesRight.push_back(iter->GetIndex());
         }
     }
 }
@@ -792,11 +788,9 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                                 k_offset.push_back(nK-1);
                             }
 
-                            for (auto k_offset_it = k_offset.begin();
-                                 k_offset_it != k_offset.end();
-                                 ++k_offset_it)
+                            for (auto k_offset_it : k_offset)
                             {
-                                z_offset = (*k_offset_it)*nI*nJ;
+                                z_offset = k_offset_it * nI * nJ;
                                 // Periodicity adjustments
                                 int pX = (int) mIsPeriodicInX;
                                 int pY = (int) mIsPeriodicInY;
@@ -1215,40 +1209,36 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                     if ( is_xmin[i] )
                     {
                         // Loop over the z levels
-                        for (auto it = z_i_offsets.begin();
-                             it != z_i_offsets.end();
-                             it++)
+                        for (auto it : z_i_offsets)
                         {
-                            local_boxes.insert( i + (*it) + (M-1) ); // The right-most box on the same row
+                            local_boxes.insert(i + it + M - 1); // The right-most box on the same row
                             // We also need to check for y boundaries
-                            if ( !is_ymin[i] )
+                            if (!is_ymin[i])
                             {
-                                local_boxes.insert( i + (*it) - 1 ); // The right-most box one row below
+                                local_boxes.insert(i + it - 1); // The right-most box one row below
                             }
-                            if ( !is_ymax[i] )
+                            if (!is_ymax[i])
                             {
-                                local_boxes.insert( i + (*it) + (2*M-1) ); // The right-most box one row above
+                                local_boxes.insert(i + it + 2*M - 1); // The right-most box one row above
                             }
                         }
                     }
 
                     // If we are on the right, add the nine on the left
-                    else if ( is_xmax[i] )
+                    else if (is_xmax[i])
                     {
                         // Loop over the z levels
-                        for (auto it = z_i_offsets.begin();
-                             it != z_i_offsets.end();
-                             it++)
+                        for (auto it : z_i_offsets)
                         {
-                            local_boxes.insert( i + (*it) - (M-1) ); // The left-most box on the same row
+                            local_boxes.insert(i + it - M + 1); // The left-most box on the same row
                             // We also need to check for y boundaries
-                            if ( !is_ymin[i] )
+                            if (!is_ymin[i])
                             {
-                                local_boxes.insert( i + (*it) - (2*M-1) ); // The left-most box one row below
+                                local_boxes.insert(i + it - 2*M + 1); // The left-most box one row below
                             }
-                            if ( !is_ymax[i] )
+                            if (!is_ymax[i])
                             {
-                                local_boxes.insert( i + (*it) + 1 ); // The left-most box one row below
+                                local_boxes.insert(i + it + 1); // The left-most box one row below
                             }
                         }
                     }
@@ -1285,18 +1275,16 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                     }
 
                     // Now we add the different boxes, checking for left and right
-                    for (auto it_opp_box = opp_box_i.begin();
-                         it_opp_box != opp_box_i.end();
-                         it_opp_box++)
+                    for (auto it_opp_box : opp_box_i)
                     {
-                        local_boxes.insert( *it_opp_box );
+                        local_boxes.insert(it_opp_box);
                         if ( !is_xmin[i] )
                         {
-                            local_boxes.insert( *it_opp_box - 1 );
+                            local_boxes.insert(it_opp_box - 1);
                         }
                         if ( !is_xmax[i] )
                         {
-                            local_boxes.insert( *it_opp_box + 1 );
+                            local_boxes.insert(it_opp_box + 1);
                         }
                     }
                 }
@@ -1789,20 +1777,18 @@ void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex,
     const std::set<unsigned>& local_boxes_indices = rGetLocalBoxes(boxIndex);
 
     // Loop over all the local boxes
-    for (auto box_iter = local_boxes_indices.begin();
-         box_iter != local_boxes_indices.end();
-         box_iter++)
+    for (auto box_iter : local_boxes_indices)
     {
         Box<DIM>* p_neighbour_box;
 
         // Establish whether box is locally owned or halo.
-        if (IsBoxOwned(*box_iter))
+        if (IsBoxOwned(box_iter))
         {
-            p_neighbour_box = &mBoxes[*box_iter - mMinBoxIndex];
+            p_neighbour_box = &mBoxes[box_iter - mMinBoxIndex];
         }
         else // Assume it is a halo.
         {
-            p_neighbour_box = &mHaloBoxes[mHaloBoxesMapping[*box_iter]];
+            p_neighbour_box = &mHaloBoxes[mHaloBoxesMapping[box_iter]];
         }
         assert(p_neighbour_box);
 
@@ -1810,28 +1796,24 @@ void DistributedBoxCollection<DIM>::AddPairsFromBox(unsigned boxIndex,
         std::set< Node<DIM>* >& r_contained_neighbour_nodes = p_neighbour_box->rGetNodesContained();
 
         // Loop over these nodes
-        for (auto neighbour_node_iter = r_contained_neighbour_nodes.begin();
-             neighbour_node_iter != r_contained_neighbour_nodes.end();
-             ++neighbour_node_iter)
+        for (auto neighbour_node_iter : r_contained_neighbour_nodes)
         {
             // Get the index of the other node
-            unsigned other_node_index = (*neighbour_node_iter)->GetIndex();
+            unsigned other_node_index = neighbour_node_iter->GetIndex();
 
             // Loop over nodes in this box
-            for (auto node_iter = r_contained_nodes.begin();
-                 node_iter != r_contained_nodes.end();
-                 ++node_iter)
+            for (auto node_iter : r_contained_nodes)
             {
-                unsigned node_index = (*node_iter)->GetIndex();
+                unsigned node_index = node_iter->GetIndex();
 
                 // If we're in the same box, then take care not to store the node pair twice
-                if (*box_iter != boxIndex || other_node_index > node_index)
+                if (box_iter != boxIndex || other_node_index > node_index)
                 {
-                    rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>((*node_iter), (*neighbour_node_iter)));
+                    rNodePairs.push_back(std::pair<Node<DIM>*, Node<DIM>*>(node_iter, neighbour_node_iter));
                     if (mCalculateNodeNeighbours)
                     {
-                        (*node_iter)->AddNeighbour(other_node_index);
-                        (*neighbour_node_iter)->AddNeighbour(node_index);
+                        node_iter->AddNeighbour(other_node_index);
+                        neighbour_node_iter->AddNeighbour(node_index);
                     }
                 }
             }

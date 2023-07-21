@@ -828,13 +828,9 @@ void Toroidal2dMesh::CorrectCylindricalNonPeriodicMesh()
     assert(mLeftPeriodicBoundaryElementIndices.size()==mRightPeriodicBoundaryElementIndices.size());
 
     // Go through all of the elements on the left periodic boundary
-    for (auto left_iter = mLeftPeriodicBoundaryElementIndices.begin();
-         left_iter != mLeftPeriodicBoundaryElementIndices.end();
-         ++left_iter)
+    for (auto left_iter : mLeftPeriodicBoundaryElementIndices)
     {
-        unsigned elem_index = *left_iter;
-
-        Element<2,2>* p_element = GetElement(elem_index);
+        Element<2,2>* p_element = GetElement(left_iter);
 
         /*
          * Make lists of the nodes which the elements on the left contain and
@@ -849,13 +845,9 @@ void Toroidal2dMesh::CorrectCylindricalNonPeriodicMesh()
         }
 
         // Search the right hand side elements for the corresponding element
-        for (auto right_iter = mRightPeriodicBoundaryElementIndices.begin();
-             right_iter != mRightPeriodicBoundaryElementIndices.end();
-             ++right_iter)
+        for (auto right_iter : mRightPeriodicBoundaryElementIndices)
         {
-            unsigned corresponding_elem_index = *right_iter;
-
-            Element<2,2>* p_corresponding_element = GetElement(corresponding_elem_index);
+            Element<2,2>* p_corresponding_element = GetElement(right_iter);
 
             bool is_corresponding_node = true;
 
@@ -876,8 +868,8 @@ void Toroidal2dMesh::CorrectCylindricalNonPeriodicMesh()
                 // See #3043 and Cylindrical2dMesh
                 NEVER_REACHED;
                 // Remove original and corresponding element from sets
-                // temp_left_hand_side_elements.erase(elem_index);
-                // temp_right_hand_side_elements.erase(corresponding_elem_index);
+                // temp_left_hand_side_elements.erase(left_iter);
+                // temp_right_hand_side_elements.erase(right_iter);
             }
         }
     }
@@ -934,13 +926,9 @@ void Toroidal2dMesh::CorrectToroidalNonPeriodicMesh()
     assert(mBottomPeriodicBoundaryElementIndices.size()==mTopPeriodicBoundaryElementIndices.size());
 
     // Go through all of the elements on the bottom periodic boundary
-    for (auto bottom_iter = mBottomPeriodicBoundaryElementIndices.begin();
-         bottom_iter != mBottomPeriodicBoundaryElementIndices.end();
-         ++bottom_iter)
+    for (auto bottom_iter : mBottomPeriodicBoundaryElementIndices)
     {
-        unsigned elem_index = *bottom_iter;
-
-        Element<2,2>* p_element = GetElement(elem_index);
+        Element<2,2>* p_element = GetElement(bottom_iter);
 
         /*
          * Make lists of the nodes which the elements on the bottom contain and
@@ -955,13 +943,9 @@ void Toroidal2dMesh::CorrectToroidalNonPeriodicMesh()
         }
 
         // Search the top hand side elements for the corresponding element
-        for (auto top_iter = mTopPeriodicBoundaryElementIndices.begin();
-             top_iter != mTopPeriodicBoundaryElementIndices.end();
-             ++top_iter)
+        for (auto top_iter : mTopPeriodicBoundaryElementIndices)
         {
-            unsigned corresponding_elem_index = *top_iter;
-
-            Element<2,2>* p_corresponding_element = GetElement(corresponding_elem_index);
+            Element<2,2>* p_corresponding_element = GetElement(top_iter);
 
             bool is_corresponding_node = true;
 
@@ -983,8 +967,8 @@ void Toroidal2dMesh::CorrectToroidalNonPeriodicMesh()
                 NEVER_REACHED;
 
                 // Remove original and corresponding element from sets
-                //temp_bottom_hand_side_elements.erase(elem_index);
-                temp_top_hand_side_elements.erase(corresponding_elem_index);
+                //temp_bottom_hand_side_elements.erase(bottom_iter);
+                temp_top_hand_side_elements.erase(top_iter);
             }
         }
     }
@@ -1083,35 +1067,8 @@ void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingCylindricalPeriodicBound
         }
     }
 
-//    if (mLeftPeriodicBoundaryElementIndices.size() != mRightPeriodicBoundaryElementIndices.size())
-//    {
-//        mMismatchedBoundaryElements = true;
-//        // In here - if you hit this case, we want to stop the test and move on, so we work with a stopping event
-//
-//    }
-
     // Every boundary element on the left must have a corresponding element on the right
     assert(mLeftPeriodicBoundaryElementIndices.size() == mRightPeriodicBoundaryElementIndices.size());
-    // if(mLeftPeriodicBoundaryElementIndices.size() != mRightPeriodicBoundaryElementIndices.size())
-    // {
-    //     TRACE("Left");
-    //     PRINT_VARIABLE(mLeftPeriodicBoundaryElementIndices.size());
-    //     for (auto iter = mLeftPeriodicBoundaryElementIndices.begin();
-    //          iter != mLeftPeriodicBoundaryElementIndices.end();
-    //          iter++)
-    //     {
-    //         PRINT_VARIABLE(*iter);
-    //     }
-    //     TRACE("Right");
-    //     PRINT_VARIABLE(mRightPeriodicBoundaryElementIndices.size());
-    //     for (auto iter = mRightPeriodicBoundaryElementIndices.begin();
-    //          iter != mRightPeriodicBoundaryElementIndices.end();
-    //          iter++)
-    //     {
-    //         PRINT_VARIABLE(*iter);
-    //     }
-
-    // }
 }
 
 void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingToroidalPeriodicBoundaries()

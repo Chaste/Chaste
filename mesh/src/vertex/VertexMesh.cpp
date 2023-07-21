@@ -406,19 +406,17 @@ VertexMesh<3, 3>::VertexMesh(TetrahedralMesh<3, 3>& rMesh)
             std::vector<std::pair<double, unsigned> > index_angle_list;
 
             // Loop over each element containing this edge (i.e. those containing both nodes of the edge)
-            for (auto index_iter = edge_element_indices.begin();
-                 index_iter != edge_element_indices.end();
-                 ++index_iter)
+            for (auto index_iter : edge_element_indices)
             {
                 // Calculate angle
-                c_vector<double, 3> vertex_vector = mNodes[*index_iter]->rGetLocation() - mid_edge;
+                c_vector<double, 3> vertex_vector = mNodes[index_iter]->rGetLocation() - mid_edge;
 
                 double local_vertex_dot_basis_vector1 = inner_prod(vertex_vector, basis_vector1);
                 double local_vertex_dot_basis_vector2 = inner_prod(vertex_vector, basis_vector2);
 
                 double angle = atan2(local_vertex_dot_basis_vector2, local_vertex_dot_basis_vector1);
 
-                std::pair<double, unsigned> pair(angle, *index_iter);
+                std::pair<double, unsigned> pair(angle, index_iter);
                 index_angle_list.push_back(pair);
             }
 
@@ -479,12 +477,10 @@ VertexMesh<3, 3>::VertexMesh(TetrahedralMesh<3, 3>& rMesh)
 
     // Populate mElements
     unsigned elem_count = 0;
-    for (auto element_iter = index_element_map.begin();
-         element_iter != index_element_map.end();
-         ++element_iter)
+    for (auto element_iter : index_element_map)
     {
-        mElements.push_back(element_iter->second);
-        mVoronoiElementIndexMap[element_iter->first] = elem_count;
+        mElements.push_back(element_iter.second);
+        mVoronoiElementIndexMap[element_iter.first] = elem_count;
         elem_count++;
     }
 
@@ -662,13 +658,11 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetDelaunayNodeIndexCorrespondingTo
     }
     else
     {
-        for (auto iter = mVoronoiElementIndexMap.begin();
-             iter != mVoronoiElementIndexMap.end();
-             ++iter)
+        for (auto iter : mVoronoiElementIndexMap)
         {
-            if (iter->second == elementIndex)
+            if (iter.second == elementIndex)
             {
-                node_index = iter->first;
+                node_index = iter.first;
                 break;
             }
         }
@@ -878,21 +872,19 @@ std::set<unsigned> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNeighbouringNodeIndice
     std::set<unsigned> containing_elem_indices = this->GetNode(nodeIndex)->rGetContainingElementIndices();
 
     // Iterate over these elements
-    for (auto elem_iter = containing_elem_indices.begin();
-         elem_iter != containing_elem_indices.end();
-         ++elem_iter)
+    for (auto elem_iter : containing_elem_indices)
     {
         // Find the local index of this node in this element
-        unsigned local_index = GetElement(*elem_iter)->GetNodeLocalIndex(nodeIndex);
+        unsigned local_index = GetElement(elem_iter)->GetNodeLocalIndex(nodeIndex);
 
         // Find the global indices of the preceding and successive nodes in this element
-        unsigned num_nodes = GetElement(*elem_iter)->GetNumNodes();
+        unsigned num_nodes = GetElement(elem_iter)->GetNumNodes();
         unsigned previous_local_index = (local_index + num_nodes - 1) % num_nodes;
         unsigned next_local_index = (local_index + 1) % num_nodes;
 
         // Add the global indices of these two nodes to the set of neighbouring node indices
-        neighbouring_node_indices.insert(GetElement(*elem_iter)->GetNodeGlobalIndex(previous_local_index));
-        neighbouring_node_indices.insert(GetElement(*elem_iter)->GetNodeGlobalIndex(next_local_index));
+        neighbouring_node_indices.insert(GetElement(elem_iter)->GetNodeGlobalIndex(previous_local_index));
+        neighbouring_node_indices.insert(GetElement(elem_iter)->GetNodeGlobalIndex(next_local_index));
     }
 
     return neighbouring_node_indices;
@@ -925,13 +917,11 @@ std::set<unsigned> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNeighbouringNodeNotAls
     std::set<unsigned> node_neighbours = GetNeighbouringNodeIndices(nodeIndex);
 
     // Check if each neighbour is also in this element; if not, add it to the set
-    for (auto iter = node_neighbours.begin();
-         iter != node_neighbours.end();
-         ++iter)
+    for (auto iter : node_neighbours)
     {
-        if (node_indices_in_this_element.find(*iter) == node_indices_in_this_element.end())
+        if (node_indices_in_this_element.find(iter) == node_indices_in_this_element.end())
         {
-            neighbouring_node_indices_not_in_this_element.insert(*iter);
+            neighbouring_node_indices_not_in_this_element.insert(iter);
         }
     }
 

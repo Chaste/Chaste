@@ -557,13 +557,9 @@ void Cylindrical2dMesh::CorrectNonPeriodicMesh()
     assert(mLeftPeriodicBoundaryElementIndices.size()==mRightPeriodicBoundaryElementIndices.size());
 
     // Go through all of the elements on the left periodic boundary
-    for (auto left_iter = mLeftPeriodicBoundaryElementIndices.begin();
-         left_iter != mLeftPeriodicBoundaryElementIndices.end();
-         ++left_iter)
+    for (auto left_iter : mLeftPeriodicBoundaryElementIndices)
     {
-        unsigned elem_index = *left_iter;
-
-        Element<2,2>* p_element = GetElement(elem_index);
+        Element<2,2>* p_element = GetElement(left_iter);
 
         /*
          * Make lists of the nodes which the elements on the left contain and
@@ -578,13 +574,9 @@ void Cylindrical2dMesh::CorrectNonPeriodicMesh()
         }
 
         // Search the right hand side elements for the corresponding element
-        for (auto right_iter = mRightPeriodicBoundaryElementIndices.begin();
-             right_iter != mRightPeriodicBoundaryElementIndices.end();
-             ++right_iter)
+        for (auto right_iter : mRightPeriodicBoundaryElementIndices)
         {
-            unsigned corresponding_elem_index = *right_iter;
-
-            Element<2,2>* p_corresponding_element = GetElement(corresponding_elem_index);
+            Element<2,2>* p_corresponding_element = GetElement(right_iter);
 
             bool is_corresponding_node = true;
 
@@ -602,8 +594,8 @@ void Cylindrical2dMesh::CorrectNonPeriodicMesh()
             if (is_corresponding_node)
             {
                 // Remove original and corresponding element from sets
-                temp_left_hand_side_elements.erase(elem_index);
-                temp_right_hand_side_elements.erase(corresponding_elem_index);
+                temp_left_hand_side_elements.erase(left_iter);
+                temp_right_hand_side_elements.erase(right_iter);
             }
         }
     }
@@ -653,12 +645,9 @@ void Cylindrical2dMesh::UseTheseElementsToDecideMeshing(std::set<unsigned>& rMai
 
     // We find the four nodes surrounding the dodgy meshing, on each side.
     std::set<unsigned> main_four_nodes;
-    for (auto left_iter = rMainSideElements.begin();
-         left_iter != rMainSideElements.end();
-         ++left_iter)
+    for (auto left_iter : rMainSideElements)
     {
-        unsigned elem_index = *left_iter;
-        Element<2,2>* p_element = GetElement(elem_index);
+        Element<2,2>* p_element = GetElement(left_iter);
         for (unsigned i=0; i<3; i++)
         {
             unsigned index = p_element->GetNodeGlobalIndex(i);
@@ -668,11 +657,9 @@ void Cylindrical2dMesh::UseTheseElementsToDecideMeshing(std::set<unsigned>& rMai
     assert(main_four_nodes.size() == 4);
 
     std::set<unsigned> other_four_nodes;
-    for (auto iter = main_four_nodes.begin();
-         iter != main_four_nodes.end();
-         ++iter)
+    for (auto iter : main_four_nodes)
     {
-        other_four_nodes.insert(GetCorrespondingNodeIndex(*iter));
+        other_four_nodes.insert(GetCorrespondingNodeIndex(iter));
     }
     assert(other_four_nodes.size() == 4);
 
@@ -701,11 +688,9 @@ void Cylindrical2dMesh::UseTheseElementsToDecideMeshing(std::set<unsigned>& rMai
 
     // Now corresponding_elements contains the two elements which are going to be replaced by rMainSideElements
     unsigned num_elements = GetNumAllElements();
-    for (auto iter = rMainSideElements.begin();
-         iter != rMainSideElements.end();
-         ++iter)
+    for (auto iter : rMainSideElements)
     {
-        Element<2,2>* p_main_element = GetElement(*iter);
+        Element<2,2>* p_main_element = GetElement(iter);
         std::vector<Node<2>*> nodes;
 
         // Put corresponding nodes into a std::vector

@@ -105,11 +105,9 @@ private:
             if (box_collection.IsBoxOwned(i))
             {
                 std::set<Node<DIM>* > nodes = box_collection.rGetBox(i).rGetNodesContained();
-                for (auto node_iter = nodes.begin();
-                     node_iter != nodes.end();
-                     ++node_iter)
+                for (auto node_iter : nodes)
                 {
-                    delete (*node_iter);
+                    delete node_iter;
                 }
             }
         }
@@ -2510,17 +2508,15 @@ public:
 
         // Loop over and check each pair exists
         TS_ASSERT_EQUALS(pairs_should_be.size(), pairs_returned.size());
-        for (auto it = pairs_should_be.begin();
-             it != pairs_should_be.end();
-             ++it)
+        for (auto it : pairs_should_be)
         {
-            auto pair_location = pairs_returned.find( *it );
+            auto pair_location = pairs_returned.find(it);
             if (pair_location == pairs_returned.end())
             {
                 // Need to check the pair isn't added as the opposite pairing
-                pair_location = pairs_returned.find( std::make_pair( (*it).second, (*it).first ));
+                pair_location = pairs_returned.find(std::make_pair(it.second, it.first));
             }
-            TS_ASSERT_DIFFERS( pair_location, pairs_returned.end() );
+            TS_ASSERT_DIFFERS(pair_location, pairs_returned.end());
         }
 
         for (unsigned i=0; i<points.size(); i++)

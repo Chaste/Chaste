@@ -555,11 +555,9 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
             unsigned node_A_index = p_node_A->GetIndex();
             unsigned node_B_index = p_node_B->GetIndex();
             bool original_element = false;
-            for (auto iter = shared_elements.begin();
-                 iter != shared_elements.end();
-                 ++iter)
+            for (auto iter : shared_elements)
             {
-                VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = this->GetElement(*iter);
+                VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = this->GetElement(iter);
                 original_element = p_element->GetIndex() == pElement->GetIndex();
 
                 // Find which node has the lower local index in this element
@@ -890,11 +888,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideEdge(Node<SPACE_DIM>* pNod
     // Iterate over common elements
     unsigned node_A_index = pNodeA->GetIndex();
     unsigned node_B_index = pNodeB->GetIndex();
-    for (auto iter = shared_elements.begin();
-         iter != shared_elements.end();
-         ++iter)
+    for (auto iter : shared_elements)
     {
-        VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = this->GetElement(*iter);
+        VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = this->GetElement(iter);
 
         // Find which node has the lower local index in this element
         unsigned local_indexA = p_element->GetNodeLocalIndex(node_A_index);
@@ -920,7 +916,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideEdge(Node<SPACE_DIM>* pNod
         }
 
         // Add new node to this element
-        this->GetElement(*iter)->AddNode(p_new_node, index);
+        this->GetElement(iter)->AddNode(p_new_node, index);
     }
 }
 
@@ -1167,13 +1163,11 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
 
                 auto first_neighbour_indices = node_iter->rGetContainingElementIndices();
 
-                for (auto elem_iter = first_neighbour_indices.begin();
-                     elem_iter != first_neighbour_indices.end();
-                     ++elem_iter)
+                for (auto elem_iter : first_neighbour_indices)
                 {
-                    auto p_element = this->GetElement(*elem_iter);
+                    auto p_element = this->GetElement(elem_iter);
 
-                    for (auto local_node_index = 0u;
+                    for (unsigned local_node_index = 0;
                          local_node_index < p_element->GetNumNodes();
                          ++local_node_index)
                     {
@@ -1184,11 +1178,9 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
                 // Get all first and second neighbours
                 std::set<unsigned> all_neighbours;
 
-                for (auto second_node_iter = first_neighbour_node_indices.begin();
-                     second_node_iter != first_neighbour_node_indices.end();
-                     ++second_node_iter)
+                for (auto second_node_iter : first_neighbour_node_indices)
                 {
-                    auto containing_element_indices = this->GetNode(*second_node_iter)->rGetContainingElementIndices();
+                    auto containing_element_indices = this->GetNode(second_node_iter)->rGetContainingElementIndices();
                     all_neighbours.insert(containing_element_indices.begin(),
                                           containing_element_indices.end());
                 }
@@ -1202,18 +1194,14 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
                     std::inserter(second_neighbour_indices, second_neighbour_indices.begin()));
 
                 // Loop over second neighbours only
-                for (auto elem_iter = second_neighbour_indices.begin();
-                     elem_iter != second_neighbour_indices.end();
-                     ++elem_iter)
+                for (auto elem_iter : second_neighbour_indices)
                 {
-                    unsigned elem_index = *elem_iter;
-
                     // Node should not be part of this element
-                    assert(node_iter->rGetContainingElementIndices().count(elem_index) == 0);
+                    assert(node_iter->rGetContainingElementIndices().count(elem_iter) == 0);
 
-                    if (this->ElementIncludesPoint(node_iter->rGetLocation(), elem_index))
+                    if (this->ElementIncludesPoint(node_iter->rGetLocation(), elem_iter))
                     {
-                        PerformIntersectionSwap(&(*node_iter), elem_index);
+                        PerformIntersectionSwap(&(*node_iter), elem_iter);
                         return true;
                     }
                 }
@@ -1241,7 +1229,7 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
 
             // Second: Check intersections only for those nodes and elements within
             // mDistanceForT3SwapChecking within each other (node<-->element centroid)
-            for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->GetNodeIteratorBegin();
+            for (auto node_iter = this->GetNodeIteratorBegin();
                  node_iter != this->GetNodeIteratorEnd();
                  ++node_iter)
             {
@@ -1251,12 +1239,10 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
 
                     // index in boundary_element_centroids and boundary_element_indices
                     unsigned boundary_element_index = 0;
-                    for (auto elem_iter = boundary_element_indices.begin();
-                         elem_iter != boundary_element_indices.end();
-                         ++elem_iter)
+                    for (auto elem_iter : boundary_element_indices)
                     {
                         // Check that the node is not part of this element
-                        if (node_iter->rGetContainingElementIndices().count(*elem_iter) == 0)
+                        if (node_iter->rGetContainingElementIndices().count(elem_iter) == 0)
                         {
                             c_vector<double, SPACE_DIM> node_location = node_iter->rGetLocation();
                             c_vector<double, SPACE_DIM> element_centroid = boundary_element_centroids[boundary_element_index];
@@ -1264,9 +1250,9 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
 
                             if (node_element_distance < mDistanceForT3SwapChecking)
                             {
-                                if (this->ElementIncludesPoint(node_iter->rGetLocation(), *elem_iter))
+                                if (this->ElementIncludesPoint(node_iter->rGetLocation(), elem_iter))
                                 {
-                                    this->PerformT3Swap(&(*node_iter), *elem_iter);
+                                    this->PerformT3Swap(&(*node_iter), elem_iter);
                                     return true;
                                 }
                             }
@@ -2445,11 +2431,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap([[maybe_unused]] V
             std::set<unsigned> containing_elements = p_node->rGetContainingElementIndices();
             containing_elements.erase(rElement.GetIndex());
             // For each of these elements...
-            for (auto elem_iter = containing_elements.begin();
-                 elem_iter != containing_elements.end();
-                 ++elem_iter)
+            for (auto elem_iter : containing_elements)
             {
-                VertexElement<ELEMENT_DIM, SPACE_DIM>* p_this_elem = this->GetElement(*elem_iter);
+                VertexElement<ELEMENT_DIM, SPACE_DIM>* p_this_elem = this->GetElement(elem_iter);
 
                 neigh_indices.insert(p_this_elem->GetIndex());
 
