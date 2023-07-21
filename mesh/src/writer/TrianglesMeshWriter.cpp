@@ -336,38 +336,43 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFacesAsEdges()
         return;
     }
 
-    assert(SPACE_DIM == 3 && ELEMENT_DIM == 2);    // LCOV_EXCL_LINE
-
-    std::string face_file_name = this->mBaseName;
-    face_file_name = face_file_name + ".edge";
-
-    out_stream p_face_file = this->mpOutputFileHandler->OpenOutputFile(face_file_name, std::ios::binary | std::ios::trunc);
-
-    // Write the boundary face header
-    unsigned num_faces = this->GetNumBoundaryFaces();
-
-    unsigned max_bdy_marker = 0;
-    std::vector<double> default_marker(0);
-
-    *p_face_file << num_faces << "\t";
-    *p_face_file << max_bdy_marker;
-    if (this->mFilesAreBinary)
+    if constexpr (SPACE_DIM == 3 && ELEMENT_DIM == 2)
     {
-        *p_face_file << "\tBIN\n";
+        std::string face_file_name = this->mBaseName;
+        face_file_name = face_file_name + ".edge";
+
+        out_stream p_face_file = this->mpOutputFileHandler->OpenOutputFile(face_file_name, std::ios::binary | std::ios::trunc);
+
+        // Write the boundary face header
+        unsigned num_faces = this->GetNumBoundaryFaces();
+
+        unsigned max_bdy_marker = 0;
+        std::vector<double> default_marker(0);
+
+        *p_face_file << num_faces << "\t";
+        *p_face_file << max_bdy_marker;
+        if (this->mFilesAreBinary)
+        {
+            *p_face_file << "\tBIN\n";
+        }
+        else
+        {
+            *p_face_file << "\n";
+        }
+
+        // Write each face's data
+        for (unsigned item_num=0; item_num<num_faces; item_num++)
+        {
+            ElementData face_data = this->GetNextBoundaryElement();
+            WriteItem(p_face_file, item_num, face_data.NodeIndices, default_marker);
+        }
+        *p_face_file << comment << "\n";
+        p_face_file->close();
     }
     else
     {
-        *p_face_file << "\n";
+        NEVER_REACHED;
     }
-
-    // Write each face's data
-    for (unsigned item_num=0; item_num<num_faces; item_num++)
-    {
-        ElementData face_data = this->GetNextBoundaryElement();
-        WriteItem(p_face_file, item_num, face_data.NodeIndices, default_marker);
-    }
-    *p_face_file << comment << "\n";
-    p_face_file->close();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

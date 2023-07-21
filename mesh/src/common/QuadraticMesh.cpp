@@ -75,28 +75,33 @@ QuadraticMesh<DIM>::QuadraticMesh(double spaceStep, double width, double height,
 template<unsigned DIM>
 void QuadraticMesh<DIM>::ConstructLinearMesh(unsigned numElemX)
 {
-    assert(DIM==1); // LCOV_EXCL_LINE
-
-    AbstractTetrahedralMesh<DIM,DIM>::ConstructLinearMesh(numElemX);
-    assert (this->mNodes.size() == numElemX+1);
-    mNumVertices = numElemX+1;
-    c_vector<double, DIM> top;
-    top[0] = numElemX;
-
-    unsigned mid_node_index=mNumVertices;
-    for (unsigned element_index=0; element_index<numElemX; element_index++)
+    if constexpr (DIM == 1)
     {
-        c_vector<double, DIM> x_value_mid_node;
-        x_value_mid_node[0] = element_index+0.5;
+        AbstractTetrahedralMesh<DIM,DIM>::ConstructLinearMesh(numElemX);
+        assert (this->mNodes.size() == numElemX+1);
+        mNumVertices = numElemX+1;
+        c_vector<double, DIM> top;
+        top[0] = numElemX;
 
-        Node<DIM>* p_mid_node = MakeNewInternalNode(mid_node_index, x_value_mid_node, top);
+        unsigned mid_node_index=mNumVertices;
+        for (unsigned element_index=0; element_index<numElemX; element_index++)
+        {
+            c_vector<double, DIM> x_value_mid_node;
+            x_value_mid_node[0] = element_index+0.5;
 
-        //Put in element and cross-reference
-        this->mElements[element_index]->AddNode(p_mid_node);
-        p_mid_node->AddElement(element_index);
+            Node<DIM>* p_mid_node = MakeNewInternalNode(mid_node_index, x_value_mid_node, top);
+
+            //Put in element and cross-reference
+            this->mElements[element_index]->AddNode(p_mid_node);
+            p_mid_node->AddElement(element_index);
+        }
+
+        this->RefreshMesh();
     }
-
-    this->RefreshMesh();
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template<unsigned DIM>
@@ -416,49 +421,54 @@ unsigned QuadraticMesh<DIM>::GetNumVertices() const
 template<unsigned DIM>
 void QuadraticMesh<DIM>::ConstructFromLinearMeshReader(AbstractMeshReader<DIM, DIM>& rMeshReader)
 {
-    assert(DIM != 1); // LCOV_EXCL_LINE
-
-    //Make a linear mesh
-    TetrahedralMesh<DIM,DIM>::ConstructFromMeshReader(rMeshReader);
-
-    NodeMap unused_map(this->GetNumNodes());
-
-    if (DIM==2)  // In 2D, remesh using triangle via library calls
+    if constexpr (DIM != 1)
     {
-        struct triangulateio mesher_input, mesher_output;
-        this->InitialiseTriangulateIo(mesher_input);
-        this->InitialiseTriangulateIo(mesher_output);
+        // Make a linear mesh
+        TetrahedralMesh<DIM,DIM>::ConstructFromMeshReader(rMeshReader);
 
-        mesher_input.numberoftriangles = this->GetNumElements();
-        mesher_input.trianglelist = (int *) malloc(this->GetNumElements() * (DIM+1) * sizeof(int));
-        this->ExportToMesher(unused_map, mesher_input, mesher_input.trianglelist);
+        NodeMap unused_map(this->GetNumNodes());
 
-        // Library call
-        triangulate((char*)"Qzero2", &mesher_input, &mesher_output, nullptr);
+        if (DIM == 2)  // In 2D, remesh using triangle via library calls
+        {
+            struct triangulateio mesher_input, mesher_output;
+            this->InitialiseTriangulateIo(mesher_input);
+            this->InitialiseTriangulateIo(mesher_output);
 
-        this->ImportFromMesher(mesher_output, mesher_output.numberoftriangles, mesher_output.trianglelist, mesher_output.numberofedges, mesher_output.edgelist, mesher_output.edgemarkerlist);
-        CountVertices();
-        QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(this, nullptr);
+            mesher_input.numberoftriangles = this->GetNumElements();
+            mesher_input.trianglelist = (int *) malloc(this->GetNumElements() * (DIM+1) * sizeof(int));
+            this->ExportToMesher(unused_map, mesher_input, mesher_input.trianglelist);
 
-        //Tidy up triangle
-        this->FreeTriangulateIo(mesher_input);
-        this->FreeTriangulateIo(mesher_output);
+            // Library call
+            triangulate((char*)"Qzero2", &mesher_input, &mesher_output, nullptr);
+
+            this->ImportFromMesher(mesher_output, mesher_output.numberoftriangles, mesher_output.trianglelist, mesher_output.numberofedges, mesher_output.edgelist, mesher_output.edgemarkerlist);
+            CountVertices();
+            QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(this, nullptr);
+
+            //Tidy up triangle
+            this->FreeTriangulateIo(mesher_input);
+            this->FreeTriangulateIo(mesher_output);
+        }
+        else // in 3D, remesh using tetgen
+        {
+
+            class tetgen::tetgenio mesher_input, mesher_output;
+
+            mesher_input.numberoftetrahedra = this->GetNumElements();
+            mesher_input.tetrahedronlist = new int[this->GetNumElements() * (DIM+1)];
+            this->ExportToMesher(unused_map, mesher_input, mesher_input.tetrahedronlist);
+
+            // Library call
+            tetgen::tetrahedralize((char*)"Qzro2", &mesher_input, &mesher_output);
+
+            this->ImportFromMesher(mesher_output, mesher_output.numberoftetrahedra, mesher_output.tetrahedronlist, mesher_output.numberoftrifaces, mesher_output.trifacelist, nullptr);
+            CountVertices();
+            QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(this, nullptr);
+        }
     }
-    else // in 3D, remesh using tetgen
+    else
     {
-
-        class tetgen::tetgenio mesher_input, mesher_output;
-
-        mesher_input.numberoftetrahedra = this->GetNumElements();
-        mesher_input.tetrahedronlist = new int[this->GetNumElements() * (DIM+1)];
-        this->ExportToMesher(unused_map, mesher_input, mesher_input.tetrahedronlist);
-
-        // Library call
-        tetgen::tetrahedralize((char*)"Qzro2", &mesher_input, &mesher_output);
-
-        this->ImportFromMesher(mesher_output, mesher_output.numberoftetrahedra, mesher_output.tetrahedronlist, mesher_output.numberoftrifaces, mesher_output.trifacelist, nullptr);
-        CountVertices();
-        QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(this, nullptr);
+        NEVER_REACHED;
     }
 }
 

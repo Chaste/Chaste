@@ -258,83 +258,101 @@ void QuadraticMeshHelper<DIM>::CheckBoundaryElements(AbstractTetrahedralMesh<DIM
 }
 
 template<unsigned DIM>
-void QuadraticMeshHelper<DIM>::AddNodeToBoundaryElement(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
-                                                        BoundaryElement<DIM-1,DIM>* pBoundaryElement,
-                                                        Node<DIM>* pNode)
+void QuadraticMeshHelper<DIM>::AddNodeToBoundaryElement(
+    [[maybe_unused]] AbstractTetrahedralMesh<DIM, DIM>* pMesh,
+    [[maybe_unused]] BoundaryElement<DIM-1,DIM>* pBoundaryElement,
+    [[maybe_unused]] Node<DIM>* pNode)
 {
-    assert(DIM > 1); // LCOV_EXCL_LINE
-
-    // Add node to the boundary node list
-    if (!pNode->IsBoundaryNode())
+    if constexpr (DIM > 1)
     {
-        pNode->SetAsBoundaryNode();
-        pMesh->mBoundaryNodes.push_back(pNode);
-    }
-    // Add it to the boundary element
-    pBoundaryElement->AddNode(pNode);
-}
-
-template<unsigned DIM>
-void QuadraticMeshHelper<DIM>::AddNodeToBoundaryElement(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
-                                                        BoundaryElement<DIM-1,DIM>* pBoundaryElement,
-                                                        Element<DIM,DIM>* pElement,
-                                                        unsigned internalNode)
-{
-    assert(DIM > 1); // LCOV_EXCL_LINE
-    assert(internalNode >= DIM+1);
-    assert(internalNode < (DIM+1)*(DIM+2)/2);
-    Node<DIM>* p_internal_node = pElement->GetNode(internalNode);
-    AddNodeToBoundaryElement(pMesh, pBoundaryElement, p_internal_node);
-}
-
-template<unsigned DIM>
-void QuadraticMeshHelper<DIM>::AddExtraBoundaryNodes(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
-                                                     BoundaryElement<DIM-1,DIM>* pBoundaryElement,
-                                                     Element<DIM,DIM>* pElement,
-                                                     unsigned nodeIndexOppositeToFace)
-{
-    assert(DIM!=1); // LCOV_EXCL_LINE
-    if (DIM==2)
-    {
-        assert(nodeIndexOppositeToFace<3);
-        // the single internal node of the element's face will be numbered 'face+3'
-        AddNodeToBoundaryElement(pMesh, pBoundaryElement, pElement, nodeIndexOppositeToFace+3);
+        // Add node to the boundary node list
+        if (!pNode->IsBoundaryNode())
+        {
+            pNode->SetAsBoundaryNode();
+            pMesh->mBoundaryNodes.push_back(pNode);
+        }
+        // Add it to the boundary element
+        pBoundaryElement->AddNode(pNode);
     }
     else
     {
-        assert(DIM==3);
+        NEVER_REACHED;
+    }
+}
 
-        unsigned b_elem_n0 = pBoundaryElement->GetNodeGlobalIndex(0);
-        unsigned b_elem_n1 = pBoundaryElement->GetNodeGlobalIndex(1);
+template<unsigned DIM>
+void QuadraticMeshHelper<DIM>::AddNodeToBoundaryElement(
+    [[maybe_unused]] AbstractTetrahedralMesh<DIM, DIM>* pMesh,
+    [[maybe_unused]] BoundaryElement<DIM-1,DIM>* pBoundaryElement,
+    [[maybe_unused]] Element<DIM,DIM>* pElement,
+    unsigned internalNode)
+{
+    if constexpr (DIM > 1)
+    {
+        assert(internalNode >= DIM+1);
+        assert(internalNode < (DIM+1)*(DIM+2)/2);
+        Node<DIM>* p_internal_node = pElement->GetNode(internalNode);
+        AddNodeToBoundaryElement(pMesh, pBoundaryElement, p_internal_node);
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
+}
 
-        unsigned offset;
-        bool reverse;
+template<unsigned DIM>
+void QuadraticMeshHelper<DIM>::AddExtraBoundaryNodes(
+    [[maybe_unused]] AbstractTetrahedralMesh<DIM, DIM>* pMesh,
+    [[maybe_unused]] BoundaryElement<DIM-1,DIM>* pBoundaryElement,
+    [[maybe_unused]] Element<DIM,DIM>* pElement,
+    unsigned nodeIndexOppositeToFace)
+{
+    if constexpr (DIM != 1)
+    {
+        if (DIM == 2)
+        {
+            assert(nodeIndexOppositeToFace<3);
+            // the single internal node of the element's face will be numbered 'face+3'
+            AddNodeToBoundaryElement(pMesh, pBoundaryElement, pElement, nodeIndexOppositeToFace+3);
+        }
+        else // DIM == 3
+        {
+            unsigned b_elem_n0 = pBoundaryElement->GetNodeGlobalIndex(0);
+            unsigned b_elem_n1 = pBoundaryElement->GetNodeGlobalIndex(1);
 
-        if (nodeIndexOppositeToFace==0)
-        {
-            // face opposite to node 0 = {1,2,3}, with corresponding internals {9,8,5}
-            HelperMethod1(b_elem_n0, b_elem_n1, pElement, 1, 2, 3, offset, reverse);
-            HelperMethod2(pMesh, pBoundaryElement, pElement, 9, 8, 5, offset, reverse);
+            unsigned offset;
+            bool reverse;
+
+            if (nodeIndexOppositeToFace==0)
+            {
+                // face opposite to node 0 = {1,2,3}, with corresponding internals {9,8,5}
+                HelperMethod1(b_elem_n0, b_elem_n1, pElement, 1, 2, 3, offset, reverse);
+                HelperMethod2(pMesh, pBoundaryElement, pElement, 9, 8, 5, offset, reverse);
+            }
+            else if (nodeIndexOppositeToFace==1)
+            {
+                // face opposite to node 1 = {2,0,3}, with corresponding internals {7,9,6}
+                HelperMethod1(b_elem_n0, b_elem_n1, pElement, 2, 0, 3, offset, reverse);
+                HelperMethod2(pMesh, pBoundaryElement, pElement, 7, 9, 6, offset, reverse);
+            }
+            else if (nodeIndexOppositeToFace==2)
+            {
+                // face opposite to node 2 = {0,1,3}, with corresponding internals {8,7,4}
+                HelperMethod1(b_elem_n0, b_elem_n1, pElement, 0, 1, 3, offset, reverse);
+                HelperMethod2(pMesh, pBoundaryElement, pElement, 8, 7, 4, offset, reverse);
+            }
+            else
+            {
+                assert(nodeIndexOppositeToFace==3);
+                // face opposite to node 3 = {0,1,2}, with corresponding internals {5,6,4}
+                HelperMethod1(b_elem_n0, b_elem_n1, pElement, 0, 1, 2, offset, reverse);
+                HelperMethod2(pMesh, pBoundaryElement, pElement, 5, 6, 4, offset, reverse);
+            }
         }
-        else if (nodeIndexOppositeToFace==1)
-        {
-            // face opposite to node 1 = {2,0,3}, with corresponding internals {7,9,6}
-            HelperMethod1(b_elem_n0, b_elem_n1, pElement, 2, 0, 3, offset, reverse);
-            HelperMethod2(pMesh, pBoundaryElement, pElement, 7, 9, 6, offset, reverse);
-        }
-        else if (nodeIndexOppositeToFace==2)
-        {
-            // face opposite to node 2 = {0,1,3}, with corresponding internals {8,7,4}
-            HelperMethod1(b_elem_n0, b_elem_n1, pElement, 0, 1, 3, offset, reverse);
-            HelperMethod2(pMesh, pBoundaryElement, pElement, 8, 7, 4, offset, reverse);
-        }
-        else
-        {
-            assert(nodeIndexOppositeToFace==3);
-            // face opposite to node 3 = {0,1,2}, with corresponding internals {5,6,4}
-            HelperMethod1(b_elem_n0, b_elem_n1, pElement, 0, 1, 2, offset, reverse);
-            HelperMethod2(pMesh, pBoundaryElement, pElement, 5, 6, 4, offset, reverse);
-        }
+    }
+    else
+    {
+        NEVER_REACHED;
     }
 }
 

@@ -159,24 +159,20 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
         {
             // Form a set of all the element indices we are going to own
             // (union of the sets from the lines in the NCL file)
-            for (std::set<unsigned>::iterator iter = rNodesOwned.begin();
-                 iter != rNodesOwned.end();
-                 ++iter)
+            for (auto iter : rNodesOwned)
             {
-                std::vector<unsigned> containing_elements = rMeshReader.GetContainingElementIndices( *iter );
-                rElementsOwned.insert( containing_elements.begin(), containing_elements.end() );
+                std::vector<unsigned> containing_elements = rMeshReader.GetContainingElementIndices(iter);
+                rElementsOwned.insert(containing_elements.begin(), containing_elements.end());
             }
 
             // Iterate through that set rather than mTotalNumElements (knowing that we own a least one node in each line)
             // Then read all the data into a node_index set
             std::set<unsigned> node_index_set;
 
-            for (std::set<unsigned>::iterator iter = rElementsOwned.begin();
-                 iter != rElementsOwned.end();
-                 ++iter)
+            for (auto iter : rElementsOwned)
             {
-                ElementData element_data = rMeshReader.GetElementData(*iter);
-                node_index_set.insert( element_data.NodeIndices.begin(), element_data.NodeIndices.end() );
+                ElementData element_data = rMeshReader.GetElementData(iter);
+                node_index_set.insert(element_data.NodeIndices.begin(), element_data.NodeIndices.end());
             }
 
             // Subtract off the rNodesOwned set to produce rHaloNodesOwned.
@@ -187,7 +183,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
         }
         else
         {
-            for (unsigned element_number = 0; element_number < mTotalNumElements; element_number++)
+            for (unsigned element_number = 0; element_number < mTotalNumElements; ++element_number)
             {
                 ElementData element_data = rMeshReader.GetNextElementData();
 
@@ -814,303 +810,93 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(uns
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMesh(unsigned width, unsigned height, bool stagger)
 {
-    assert(SPACE_DIM == 2);     // LCOV_EXCL_LINE
-    assert(ELEMENT_DIM == 2);     // LCOV_EXCL_LINE
-    //Check that there are enough nodes to make the parallelisation worthwhile
-    if (height==0)
+    if constexpr (SPACE_DIM == 2 && ELEMENT_DIM == 2)
     {
-        EXCEPTION("There aren't enough nodes to make parallelisation worthwhile");
-    }
-
-    // Hook to pick up when we are using a geometric partition.
-    if (mPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
-    {
-        if (!mpSpaceRegion)
+        //Check that there are enough nodes to make the parallelisation worthwhile
+        if (height==0)
         {
-            EXCEPTION("Space region not set for GEOMETRIC partition of DistributedTetrahedralMesh");
+            EXCEPTION("There aren't enough nodes to make parallelisation worthwhile");
         }
 
-        // Write a serial file, the load on distributed processors.
-        ///\todo probably faster to make mesh from scratch.
+        // Hook to pick up when we are using a geometric partition.
+        if (mPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
         {
-            TrianglesMeshWriter<ELEMENT_DIM,SPACE_DIM> mesh_writer("", "temp_rectangular_mesh");
-            TetrahedralMesh<ELEMENT_DIM,SPACE_DIM> base_mesh;
-            base_mesh.ConstructRectangularMesh(width, height);
-            mesh_writer.WriteFilesUsingMesh(base_mesh);
-        }
-        PetscTools::Barrier();
-
-        OutputFileHandler output_handler("", false);
-
-        std::string output_dir = output_handler.GetOutputDirectoryFullPath();
-        TrianglesMeshReader<ELEMENT_DIM,SPACE_DIM> mesh_reader(output_dir+"temp_rectangular_mesh");
-
-        this->ConstructFromMeshReader(mesh_reader);
-    }
-    else
-    {
-        //Use dumb partition so that archiving doesn't permute anything
-        mPartitioning=DistributedTetrahedralMeshPartitionType::DUMB;
-
-        mTotalNumNodes=(width+1)*(height+1);
-        mTotalNumBoundaryElements=(width+height)*2;
-        mTotalNumElements=width*height*2;
-
-        //Use DistributedVectorFactory to make a dumb partition of space
-        DistributedVectorFactory y_partition(height+1);
-        unsigned lo_y = y_partition.GetLow();
-        unsigned hi_y = y_partition.GetHigh();
-        //Dumb partition of nodes has to be such that each process gets complete slices
-        assert(!this->mpDistributedVectorFactory);
-        this->mpDistributedVectorFactory = new DistributedVectorFactory(mTotalNumNodes, (width+1)*y_partition.GetLocalOwnership());
-        if (this->mpDistributedVectorFactory->GetLocalOwnership() == 0)
-        {
-            // It's a short mesh and this process owns no nodes.
-            // This return cannot be covered by regular testing, but is covered by the Nightly -np 3 builder
-            return;  //LCOV_EXCL_LINE
-        }
-
-        /* am_top_most is like PetscTools::AmTopMost() but accounts for the fact that a
-         * higher numbered process may have dropped out of this construction altogether
-         * (because is has no local ownership)
-         */
-        bool am_top_most = (this->mpDistributedVectorFactory->GetHigh() == mTotalNumNodes);
-
-
-        if (!PetscTools::AmMaster())
-        {
-            //Allow for a halo node
-            lo_y--;
-        }
-        if (!am_top_most)
-        {
-            //Allow for a halo node
-            hi_y++;
-        }
-
-        //Construct the nodes
-        for (unsigned j=lo_y; j<hi_y; j++)
-        {
-            for (unsigned i=0; i<width+1; i++)
+            if (!mpSpaceRegion)
             {
-                bool is_boundary=false;
-                if (i==0 || j==0 || i==width || j==height)
-                {
-                    is_boundary=true;
-                }
-                unsigned global_node_index=((width+1)*(j) + i); //Verified from sequential
-                Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(global_node_index, is_boundary, i, j);
-                if (j<y_partition.GetLow() || j==y_partition.GetHigh() )
-                {
-                    //Beyond left or right it's a halo node
-                    RegisterHaloNode(global_node_index);
-                    mHaloNodes.push_back(p_node);
-                }
-                else
-                {
-                    RegisterNode(global_node_index);
-                    this->mNodes.push_back(p_node);
-                }
-                if (is_boundary)
-                {
-                    this->mBoundaryNodes.push_back(p_node);
-                }
+                EXCEPTION("Space region not set for GEOMETRIC partition of DistributedTetrahedralMesh");
             }
-        }
 
-        //Construct the boundary elements
-        unsigned belem_index;
-        //Top
-        if (am_top_most)
-        {
-           for (unsigned i=0; i<width; i++)
-           {
-                std::vector<Node<SPACE_DIM>*> nodes;
-                nodes.push_back(GetNodeOrHaloNode( height*(width+1)+i+1 ));
-                nodes.push_back(GetNodeOrHaloNode( height*(width+1)+i ));
-                belem_index=i;
-                RegisterBoundaryElement(belem_index);
-                this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index,nodes));
-            }
-        }
-
-        //Right
-        for (unsigned j=lo_y+1; j<hi_y; j++)
-        {
-            std::vector<Node<SPACE_DIM>*> nodes;
-            nodes.push_back(GetNodeOrHaloNode( (width+1)*j-1 ));
-            nodes.push_back(GetNodeOrHaloNode( (width+1)*(j+1)-1 ));
-            belem_index=width+j-1;
-            RegisterBoundaryElement(belem_index);
-            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index,nodes));
-        }
-
-        //Bottom
-        if (PetscTools::AmMaster())
-        {
-            for (unsigned i=0; i<width; i++)
+            // Write a serial file, the load on distributed processors.
+            ///\todo probably faster to make mesh from scratch.
             {
-                std::vector<Node<SPACE_DIM>*> nodes;
-                nodes.push_back(GetNodeOrHaloNode( i ));
-                nodes.push_back(GetNodeOrHaloNode( i+1 ));
-                belem_index=width+height+i;
-                RegisterBoundaryElement(belem_index);
-                this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index,nodes));
+                TrianglesMeshWriter<ELEMENT_DIM,SPACE_DIM> mesh_writer("", "temp_rectangular_mesh");
+                TetrahedralMesh<ELEMENT_DIM,SPACE_DIM> base_mesh;
+                base_mesh.ConstructRectangularMesh(width, height);
+                mesh_writer.WriteFilesUsingMesh(base_mesh);
             }
+            PetscTools::Barrier();
+
+            OutputFileHandler output_handler("", false);
+
+            std::string output_dir = output_handler.GetOutputDirectoryFullPath();
+            TrianglesMeshReader<ELEMENT_DIM,SPACE_DIM> mesh_reader(output_dir+"temp_rectangular_mesh");
+
+            this->ConstructFromMeshReader(mesh_reader);
         }
-
-        //Left
-        for (unsigned j=lo_y; j<hi_y-1; j++)
+        else
         {
-            std::vector<Node<SPACE_DIM>*> nodes;
-            nodes.push_back(GetNodeOrHaloNode( (width+1)*(j+1) ));
-            nodes.push_back(GetNodeOrHaloNode( (width+1)*(j) ));
-            belem_index=2*width+height+j;
-            RegisterBoundaryElement(belem_index);
-            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index,nodes));
-        }
+            //Use dumb partition so that archiving doesn't permute anything
+            mPartitioning=DistributedTetrahedralMeshPartitionType::DUMB;
 
+            mTotalNumNodes=(width+1)*(height+1);
+            mTotalNumBoundaryElements=(width+height)*2;
+            mTotalNumElements=width*height*2;
 
-        //Construct the elements
-        unsigned elem_index;
-        for (unsigned j=lo_y; j<hi_y-1; j++)
-        {
-            for (unsigned i=0; i<width; i++)
+            //Use DistributedVectorFactory to make a dumb partition of space
+            DistributedVectorFactory y_partition(height+1);
+            unsigned lo_y = y_partition.GetLow();
+            unsigned hi_y = y_partition.GetHigh();
+            //Dumb partition of nodes has to be such that each process gets complete slices
+            assert(!this->mpDistributedVectorFactory);
+            this->mpDistributedVectorFactory = new DistributedVectorFactory(mTotalNumNodes, (width+1)*y_partition.GetLocalOwnership());
+            if (this->mpDistributedVectorFactory->GetLocalOwnership() == 0)
             {
-                unsigned parity=(i+(height-j))%2;//Note that parity is measured from the top-left (not bottom left) for historical reasons
-                unsigned nw=(j+1)*(width+1)+i; //ne=nw+1
-                unsigned sw=(j)*(width+1)+i;   //se=sw+1
-                std::vector<Node<SPACE_DIM>*> upper_nodes;
-                upper_nodes.push_back(GetNodeOrHaloNode( nw ));
-                upper_nodes.push_back(GetNodeOrHaloNode( nw+1 ));
-                if (stagger==false  || parity == 1)
-                {
-                    upper_nodes.push_back(GetNodeOrHaloNode( sw+1 ));
-                }
-                else
-                {
-                    upper_nodes.push_back(GetNodeOrHaloNode( sw ));
-                }
-                elem_index=2*(j*width+i);
-                RegisterElement(elem_index);
-                this->mElements.push_back(new Element<ELEMENT_DIM,SPACE_DIM>(elem_index,upper_nodes));
-                std::vector<Node<SPACE_DIM>*> lower_nodes;
-                lower_nodes.push_back(GetNodeOrHaloNode( sw+1 ));
-                lower_nodes.push_back(GetNodeOrHaloNode( sw ));
-                if (stagger==false  ||parity == 1)
-                {
-                    lower_nodes.push_back(GetNodeOrHaloNode( nw ));
-                }
-                else
-                {
-                    lower_nodes.push_back(GetNodeOrHaloNode( nw+1 ));
-                }
-                elem_index++;
-                RegisterElement(elem_index);
-                this->mElements.push_back(new Element<ELEMENT_DIM,SPACE_DIM>(elem_index,lower_nodes));
+                // It's a short mesh and this process owns no nodes.
+                // This return cannot be covered by regular testing, but is covered by the Nightly -np 3 builder
+                return;  //LCOV_EXCL_LINE
             }
-        }
-    }
-}
+
+            /* am_top_most is like PetscTools::AmTopMost() but accounts for the fact that a
+            * higher numbered process may have dropped out of this construction altogether
+            * (because is has no local ownership)
+            */
+            bool am_top_most = (this->mpDistributedVectorFactory->GetHigh() == mTotalNumNodes);
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigned width,
-        unsigned height,
-        unsigned depth)
-{
-    assert(SPACE_DIM == 3);     // LCOV_EXCL_LINE
-    assert(ELEMENT_DIM == 3);     // LCOV_EXCL_LINE
-    //Check that there are enough nodes to make the parallelisation worthwhile
-    if (depth==0)
-    {
-        EXCEPTION("There aren't enough nodes to make parallelisation worthwhile");
-    }
+            if (!PetscTools::AmMaster())
+            {
+                //Allow for a halo node
+                lo_y--;
+            }
+            if (!am_top_most)
+            {
+                //Allow for a halo node
+                hi_y++;
+            }
 
-    // Hook to pick up when we are using a geometric partition.
-    if (mPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
-    {
-        if (!mpSpaceRegion)
-        {
-            EXCEPTION("Space region not set for GEOMETRIC partition of DistributedTetrahedralMesh");
-        }
-
-        // Write a serial file, the load on distributed processors.
-        ///\todo probably faster to make mesh from scratch.
-        {
-            TrianglesMeshWriter<ELEMENT_DIM,SPACE_DIM> mesh_writer("", "temp_cuboid_mesh");
-            TetrahedralMesh<ELEMENT_DIM,SPACE_DIM> base_mesh;
-            base_mesh.ConstructCuboid(width, height, depth);
-            mesh_writer.WriteFilesUsingMesh(base_mesh);
-        }
-        PetscTools::Barrier();
-
-        OutputFileHandler output_handler("", false);
-
-        std::string output_dir = output_handler.GetOutputDirectoryFullPath();
-        TrianglesMeshReader<ELEMENT_DIM,SPACE_DIM> mesh_reader(output_dir+"temp_cuboid_mesh");
-
-        this->ConstructFromMeshReader(mesh_reader);
-    }
-    else
-    {
-        //Use dumb partition so that archiving doesn't permute anything
-        mPartitioning=DistributedTetrahedralMeshPartitionType::DUMB;
-
-        mTotalNumNodes=(width+1)*(height+1)*(depth+1);
-        mTotalNumBoundaryElements=((width*height)+(width*depth)+(height*depth))*4;//*2 for top-bottom, *2 for tessellating each unit square
-        mTotalNumElements=width*height*depth*6;
-
-        //Use DistributedVectorFactory to make a dumb partition of space
-        DistributedVectorFactory z_partition(depth+1);
-        unsigned lo_z = z_partition.GetLow();
-        unsigned hi_z = z_partition.GetHigh();
-
-        //Dumb partition of nodes has to be such that each process gets complete slices
-        assert(!this->mpDistributedVectorFactory);
-        this->mpDistributedVectorFactory = new DistributedVectorFactory(mTotalNumNodes, (width+1)*(height+1)*z_partition.GetLocalOwnership());
-        if (this->mpDistributedVectorFactory->GetLocalOwnership() == 0)
-        {
-            // It's a short mesh and this process owns no nodes.
-            // This return cannot be covered by regular testing, but is covered by the Nightly -np 3 builder
-            return;  //LCOV_EXCL_LINE
-        }
-
-        /* am_top_most is like PetscTools::AmTopMost() but accounts for the fact that a
-         * higher numbered process may have dropped out of this construction altogether
-         * (because is has no local ownership)
-         */
-        bool am_top_most = (this->mpDistributedVectorFactory->GetHigh() == mTotalNumNodes);
-
-        if (!PetscTools::AmMaster())
-        {
-            //Allow for a halo node
-            lo_z--;
-        }
-        if (!am_top_most)
-        {
-            //Allow for a halo node
-            hi_z++;
-        }
-
-        //Construct the nodes
-        unsigned global_node_index;
-        for (unsigned k=lo_z; k<hi_z; k++)
-        {
-            for (unsigned j=0; j<height+1; j++)
+            //Construct the nodes
+            for (unsigned j=lo_y; j<hi_y; j++)
             {
                 for (unsigned i=0; i<width+1; i++)
                 {
-                    bool is_boundary = false;
-                    if (i==0 || j==0 || k==0 || i==width || j==height || k==depth)
+                    bool is_boundary=false;
+                    if (i==0 || j==0 || i==width || j==height)
                     {
-                        is_boundary = true;
+                        is_boundary=true;
                     }
-                    global_node_index = (k*(height+1)+j)*(width+1)+i;
-
-                    Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(global_node_index, is_boundary, i, j, k);
-
-                    if (k<z_partition.GetLow() || k==z_partition.GetHigh() )
+                    unsigned global_node_index=((width+1)*(j) + i); //Verified from sequential
+                    Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(global_node_index, is_boundary, i, j);
+                    if (j<y_partition.GetLow() || j==y_partition.GetHigh() )
                     {
                         //Beyond left or right it's a halo node
                         RegisterHaloNode(global_node_index);
@@ -1121,163 +907,383 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
                         RegisterNode(global_node_index);
                         this->mNodes.push_back(p_node);
                     }
-
                     if (is_boundary)
                     {
                         this->mBoundaryNodes.push_back(p_node);
                     }
                 }
             }
-        }
 
-        // Construct the elements
-
-        unsigned element_nodes[6][4] = {{0, 1, 5, 7}, {0, 1, 3, 7},
-                                        {0, 2, 3, 7}, {0, 2, 6, 7},
-                                        {0, 4, 6, 7}, {0, 4, 5, 7}};
-        std::vector<Node<SPACE_DIM>*> tetrahedra_nodes;
-
-        for (unsigned k=lo_z; k<hi_z-1; k++)
-        {
-            unsigned belem_index = 0;
-            if (k != 0)
+            //Construct the boundary elements
+            unsigned belem_index;
+            //Top
+            if (am_top_most)
             {
-                // height*width squares on upper face, k layers of 2*height+2*width square aroun
-                belem_index =   2*(height*width+k*2*(height+width));
+            for (unsigned i=0; i<width; i++)
+            {
+                    std::vector<Node<SPACE_DIM>*> nodes;
+                    nodes.push_back(GetNodeOrHaloNode( height*(width+1)+i+1 ));
+                    nodes.push_back(GetNodeOrHaloNode( height*(width+1)+i ));
+                    belem_index=i;
+                    RegisterBoundaryElement(belem_index);
+                    this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index,nodes));
+                }
             }
 
-            for (unsigned j=0; j<height; j++)
+            //Right
+            for (unsigned j=lo_y+1; j<hi_y; j++)
+            {
+                std::vector<Node<SPACE_DIM>*> nodes;
+                nodes.push_back(GetNodeOrHaloNode( (width+1)*j-1 ));
+                nodes.push_back(GetNodeOrHaloNode( (width+1)*(j+1)-1 ));
+                belem_index=width+j-1;
+                RegisterBoundaryElement(belem_index);
+                this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index,nodes));
+            }
+
+            //Bottom
+            if (PetscTools::AmMaster())
             {
                 for (unsigned i=0; i<width; i++)
                 {
-                    // Compute the nodes' index
-                    unsigned global_node_indices[8];
-                    unsigned local_node_index = 0;
+                    std::vector<Node<SPACE_DIM>*> nodes;
+                    nodes.push_back(GetNodeOrHaloNode( i ));
+                    nodes.push_back(GetNodeOrHaloNode( i+1 ));
+                    belem_index=width+height+i;
+                    RegisterBoundaryElement(belem_index);
+                    this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index,nodes));
+                }
+            }
 
-                    for (unsigned z = 0; z < 2; z++)
+            //Left
+            for (unsigned j=lo_y; j<hi_y-1; j++)
+            {
+                std::vector<Node<SPACE_DIM>*> nodes;
+                nodes.push_back(GetNodeOrHaloNode( (width+1)*(j+1) ));
+                nodes.push_back(GetNodeOrHaloNode( (width+1)*(j) ));
+                belem_index=2*width+height+j;
+                RegisterBoundaryElement(belem_index);
+                this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index,nodes));
+            }
+
+
+            //Construct the elements
+            unsigned elem_index;
+            for (unsigned j=lo_y; j<hi_y-1; j++)
+            {
+                for (unsigned i=0; i<width; i++)
+                {
+                    unsigned parity=(i+(height-j))%2;//Note that parity is measured from the top-left (not bottom left) for historical reasons
+                    unsigned nw=(j+1)*(width+1)+i; //ne=nw+1
+                    unsigned sw=(j)*(width+1)+i;   //se=sw+1
+                    std::vector<Node<SPACE_DIM>*> upper_nodes;
+                    upper_nodes.push_back(GetNodeOrHaloNode( nw ));
+                    upper_nodes.push_back(GetNodeOrHaloNode( nw+1 ));
+                    if (stagger==false  || parity == 1)
                     {
-                        for (unsigned y = 0; y < 2; y++)
-                        {
-                            for (unsigned x = 0; x < 2; x++)
-                            {
-                                global_node_indices[local_node_index] = i+x+(width+1)*(j+y+(height+1)*(k+z));
+                        upper_nodes.push_back(GetNodeOrHaloNode( sw+1 ));
+                    }
+                    else
+                    {
+                        upper_nodes.push_back(GetNodeOrHaloNode( sw ));
+                    }
+                    elem_index=2*(j*width+i);
+                    RegisterElement(elem_index);
+                    this->mElements.push_back(new Element<ELEMENT_DIM,SPACE_DIM>(elem_index,upper_nodes));
+                    std::vector<Node<SPACE_DIM>*> lower_nodes;
+                    lower_nodes.push_back(GetNodeOrHaloNode( sw+1 ));
+                    lower_nodes.push_back(GetNodeOrHaloNode( sw ));
+                    if (stagger==false  ||parity == 1)
+                    {
+                        lower_nodes.push_back(GetNodeOrHaloNode( nw ));
+                    }
+                    else
+                    {
+                        lower_nodes.push_back(GetNodeOrHaloNode( nw+1 ));
+                    }
+                    elem_index++;
+                    RegisterElement(elem_index);
+                    this->mElements.push_back(new Element<ELEMENT_DIM,SPACE_DIM>(elem_index,lower_nodes));
+                }
+            }
+        }
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
+}
 
-                                local_node_index++;
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigned width,
+        unsigned height,
+        unsigned depth)
+{
+    if constexpr (SPACE_DIM == 3 && ELEMENT_DIM == 3)
+    {
+        //Check that there are enough nodes to make the parallelisation worthwhile
+        if (depth==0)
+        {
+            EXCEPTION("There aren't enough nodes to make parallelisation worthwhile");
+        }
+
+        // Hook to pick up when we are using a geometric partition.
+        if (mPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
+        {
+            if (!mpSpaceRegion)
+            {
+                EXCEPTION("Space region not set for GEOMETRIC partition of DistributedTetrahedralMesh");
+            }
+
+            // Write a serial file, the load on distributed processors.
+            ///\todo probably faster to make mesh from scratch.
+            {
+                TrianglesMeshWriter<ELEMENT_DIM,SPACE_DIM> mesh_writer("", "temp_cuboid_mesh");
+                TetrahedralMesh<ELEMENT_DIM,SPACE_DIM> base_mesh;
+                base_mesh.ConstructCuboid(width, height, depth);
+                mesh_writer.WriteFilesUsingMesh(base_mesh);
+            }
+            PetscTools::Barrier();
+
+            OutputFileHandler output_handler("", false);
+
+            std::string output_dir = output_handler.GetOutputDirectoryFullPath();
+            TrianglesMeshReader<ELEMENT_DIM,SPACE_DIM> mesh_reader(output_dir+"temp_cuboid_mesh");
+
+            this->ConstructFromMeshReader(mesh_reader);
+        }
+        else
+        {
+            //Use dumb partition so that archiving doesn't permute anything
+            mPartitioning=DistributedTetrahedralMeshPartitionType::DUMB;
+
+            mTotalNumNodes=(width+1)*(height+1)*(depth+1);
+            mTotalNumBoundaryElements=((width*height)+(width*depth)+(height*depth))*4;//*2 for top-bottom, *2 for tessellating each unit square
+            mTotalNumElements=width*height*depth*6;
+
+            //Use DistributedVectorFactory to make a dumb partition of space
+            DistributedVectorFactory z_partition(depth+1);
+            unsigned lo_z = z_partition.GetLow();
+            unsigned hi_z = z_partition.GetHigh();
+
+            //Dumb partition of nodes has to be such that each process gets complete slices
+            assert(!this->mpDistributedVectorFactory);
+            this->mpDistributedVectorFactory = new DistributedVectorFactory(mTotalNumNodes, (width+1)*(height+1)*z_partition.GetLocalOwnership());
+            if (this->mpDistributedVectorFactory->GetLocalOwnership() == 0)
+            {
+                // It's a short mesh and this process owns no nodes.
+                // This return cannot be covered by regular testing, but is covered by the Nightly -np 3 builder
+                return;  //LCOV_EXCL_LINE
+            }
+
+            /* am_top_most is like PetscTools::AmTopMost() but accounts for the fact that a
+            * higher numbered process may have dropped out of this construction altogether
+            * (because is has no local ownership)
+            */
+            bool am_top_most = (this->mpDistributedVectorFactory->GetHigh() == mTotalNumNodes);
+
+            if (!PetscTools::AmMaster())
+            {
+                //Allow for a halo node
+                lo_z--;
+            }
+            if (!am_top_most)
+            {
+                //Allow for a halo node
+                hi_z++;
+            }
+
+            //Construct the nodes
+            unsigned global_node_index;
+            for (unsigned k=lo_z; k<hi_z; k++)
+            {
+                for (unsigned j=0; j<height+1; j++)
+                {
+                    for (unsigned i=0; i<width+1; i++)
+                    {
+                        bool is_boundary = false;
+                        if (i==0 || j==0 || k==0 || i==width || j==height || k==depth)
+                        {
+                            is_boundary = true;
+                        }
+                        global_node_index = (k*(height+1)+j)*(width+1)+i;
+
+                        Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(global_node_index, is_boundary, i, j, k);
+
+                        if (k<z_partition.GetLow() || k==z_partition.GetHigh() )
+                        {
+                            //Beyond left or right it's a halo node
+                            RegisterHaloNode(global_node_index);
+                            mHaloNodes.push_back(p_node);
+                        }
+                        else
+                        {
+                            RegisterNode(global_node_index);
+                            this->mNodes.push_back(p_node);
+                        }
+
+                        if (is_boundary)
+                        {
+                            this->mBoundaryNodes.push_back(p_node);
+                        }
+                    }
+                }
+            }
+
+            // Construct the elements
+
+            unsigned element_nodes[6][4] = {{0, 1, 5, 7}, {0, 1, 3, 7},
+                                            {0, 2, 3, 7}, {0, 2, 6, 7},
+                                            {0, 4, 6, 7}, {0, 4, 5, 7}};
+            std::vector<Node<SPACE_DIM>*> tetrahedra_nodes;
+
+            for (unsigned k=lo_z; k<hi_z-1; k++)
+            {
+                unsigned belem_index = 0;
+                if (k != 0)
+                {
+                    // height*width squares on upper face, k layers of 2*height+2*width square aroun
+                    belem_index =   2*(height*width+k*2*(height+width));
+                }
+
+                for (unsigned j=0; j<height; j++)
+                {
+                    for (unsigned i=0; i<width; i++)
+                    {
+                        // Compute the nodes' index
+                        unsigned global_node_indices[8];
+                        unsigned local_node_index = 0;
+
+                        for (unsigned z = 0; z < 2; z++)
+                        {
+                            for (unsigned y = 0; y < 2; y++)
+                            {
+                                for (unsigned x = 0; x < 2; x++)
+                                {
+                                    global_node_indices[local_node_index] = i+x+(width+1)*(j+y+(height+1)*(k+z));
+
+                                    local_node_index++;
+                                }
                             }
                         }
-                    }
 
-                    for (unsigned m = 0; m < 6; m++)
-                    {
-                        // Tetrahedra #m
-
-                        tetrahedra_nodes.clear();
-
-                        for (unsigned n = 0; n < 4; n++)
+                        for (unsigned m = 0; m < 6; m++)
                         {
-                            tetrahedra_nodes.push_back(GetNodeOrHaloNode( global_node_indices[element_nodes[m][n]] ));
+                            // Tetrahedra #m
+
+                            tetrahedra_nodes.clear();
+
+                            for (unsigned n = 0; n < 4; n++)
+                            {
+                                tetrahedra_nodes.push_back(GetNodeOrHaloNode( global_node_indices[element_nodes[m][n]] ));
+                            }
+                            unsigned elem_index = 6 * ((k*height+j)*width+i)+m;
+                            RegisterElement(elem_index);
+                            this->mElements.push_back(new Element<ELEMENT_DIM,SPACE_DIM>(elem_index, tetrahedra_nodes));
                         }
-                        unsigned elem_index = 6 * ((k*height+j)*width+i)+m;
-                        RegisterElement(elem_index);
-                        this->mElements.push_back(new Element<ELEMENT_DIM,SPACE_DIM>(elem_index, tetrahedra_nodes));
-                    }
 
-                    //Are we at a boundary?
-                    std::vector<Node<SPACE_DIM>*> triangle_nodes;
+                        //Are we at a boundary?
+                        std::vector<Node<SPACE_DIM>*> triangle_nodes;
 
-                    if (i == 0) //low face at x==0
-                    {
-                        triangle_nodes.clear();
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[0] ));
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[2] ));
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[6] ));
-                        RegisterBoundaryElement(belem_index);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
-                        triangle_nodes.clear();
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[0] ));
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[6] ));
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[4] ));
-                        RegisterBoundaryElement(belem_index);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
-                    }
-                    if (i == width-1) //high face at x=width
-                    {
-                        triangle_nodes.clear();
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[1] ));
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[5] ));
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[7] ));
-                        RegisterBoundaryElement(belem_index);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
-                        triangle_nodes.clear();
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[1] ));
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[7] ));
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[3] ));
-                        RegisterBoundaryElement(belem_index);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
-                    }
-                    if (j == 0) //low face at y==0
-                    {
-                        triangle_nodes.clear();
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[0] ));
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[5] ));
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[1] ));
-                        RegisterBoundaryElement(belem_index);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
-                        triangle_nodes.clear();
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[0] ));
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[4] ));
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[5] ));
-                        RegisterBoundaryElement(belem_index);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
-                    }
-                    if (j == height-1) //high face at y=height
-                    {
-                        triangle_nodes.clear();
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[2] ));
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[3] ));
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[7] ));
-                        RegisterBoundaryElement(belem_index);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
-                        triangle_nodes.clear();
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[2] ));
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[7] ));
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[6] ));
-                        RegisterBoundaryElement(belem_index);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
-                    }
-                    if (k == 0) //low face at z==0
-                    {
-                        triangle_nodes.clear();
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[0] ));
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[3] ));
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[2] ));
-                        RegisterBoundaryElement(belem_index);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
-                        triangle_nodes.clear();
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[0] ));
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[1] ));
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[3] ));
-                        RegisterBoundaryElement(belem_index);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
-                    }
-                    if (k == depth-1) //high face at z=depth
-                    {
-                        triangle_nodes.clear();
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[4] ));
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[7] ));
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[5] ));
-                        RegisterBoundaryElement(belem_index);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
-                        triangle_nodes.clear();
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[4] ));
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[6] ));
-                        triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[7] ));
-                        RegisterBoundaryElement(belem_index);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
-                    }
-                }//i
-            }//j
-        }//k
+                        if (i == 0) //low face at x==0
+                        {
+                            triangle_nodes.clear();
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[0] ));
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[2] ));
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[6] ));
+                            RegisterBoundaryElement(belem_index);
+                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                            triangle_nodes.clear();
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[0] ));
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[6] ));
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[4] ));
+                            RegisterBoundaryElement(belem_index);
+                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                        }
+                        if (i == width-1) //high face at x=width
+                        {
+                            triangle_nodes.clear();
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[1] ));
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[5] ));
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[7] ));
+                            RegisterBoundaryElement(belem_index);
+                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                            triangle_nodes.clear();
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[1] ));
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[7] ));
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[3] ));
+                            RegisterBoundaryElement(belem_index);
+                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                        }
+                        if (j == 0) //low face at y==0
+                        {
+                            triangle_nodes.clear();
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[0] ));
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[5] ));
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[1] ));
+                            RegisterBoundaryElement(belem_index);
+                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                            triangle_nodes.clear();
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[0] ));
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[4] ));
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[5] ));
+                            RegisterBoundaryElement(belem_index);
+                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                        }
+                        if (j == height-1) //high face at y=height
+                        {
+                            triangle_nodes.clear();
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[2] ));
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[3] ));
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[7] ));
+                            RegisterBoundaryElement(belem_index);
+                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                            triangle_nodes.clear();
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[2] ));
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[7] ));
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[6] ));
+                            RegisterBoundaryElement(belem_index);
+                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                        }
+                        if (k == 0) //low face at z==0
+                        {
+                            triangle_nodes.clear();
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[0] ));
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[3] ));
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[2] ));
+                            RegisterBoundaryElement(belem_index);
+                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                            triangle_nodes.clear();
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[0] ));
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[1] ));
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[3] ));
+                            RegisterBoundaryElement(belem_index);
+                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                        }
+                        if (k == depth-1) //high face at z=depth
+                        {
+                            triangle_nodes.clear();
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[4] ));
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[7] ));
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[5] ));
+                            RegisterBoundaryElement(belem_index);
+                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                            triangle_nodes.clear();
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[4] ));
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[6] ));
+                            triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[7] ));
+                            RegisterBoundaryElement(belem_index);
+                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                        }
+                    }//i
+                }//j
+            }//k
+        }
+    }
+    else
+    {
+        NEVER_REACHED;
     }
 }
 

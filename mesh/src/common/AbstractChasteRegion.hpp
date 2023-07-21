@@ -48,7 +48,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Abstract base class for Chaste regions.
  */
-
 template <unsigned SPACE_DIM>
 class AbstractChasteRegion
 {
@@ -63,19 +62,23 @@ class AbstractChasteRegion
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        // No member variables, but this is here so boost is happy serializing these classes.
+        /*
+         * No member variables, but this is here so boost is happy serializing 
+         * these classes.
+         */
     }
+
 public:
 
     /**
-     * Constructor
+     * Constructor.
      */
     AbstractChasteRegion()
     {}
 
     /**
+     * Cleans any data which the concrete class may have created (archiving).
      * \todo Proper memory management
-     * Cleans any data which the concrete class may have created (archiving)
      */
     virtual void Destroy()
     {
@@ -89,13 +92,15 @@ public:
     }
 
     /**
-     * Checks whether the Chaste point is contained in the region. implemented in the concrete classes
+     * Checks whether the Chaste point is contained in the region. Implemented 
+     * in the concrete classes.
      *
      * @param rPointToCheck Point to be checked to be contained in the region
-     * @return true if the point is contained, false otherwise
+     * 
+     * @return true if the point is contained, false otherwise.
      */
-
-    virtual bool DoesContain(const ChastePoint<SPACE_DIM>& rPointToCheck) const = 0;
+    virtual bool DoesContain(
+        const ChastePoint<SPACE_DIM>& rPointToCheck) const = 0;
 };
 
 TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractChasteRegion)
@@ -105,8 +110,8 @@ namespace serialization {
 /**
  * Specify a version number for archive backwards compatibility.
  *
- * This is how to do BOOST_CLASS_VERSION(AbstractChasteRegion, 1)
- * with a templated class.
+ * This is how to do BOOST_CLASS_VERSION(AbstractChasteRegion, 1) with a 
+ * templated class.
  */
 template <unsigned SPACE_DIM>
 struct version<AbstractChasteRegion<SPACE_DIM> >

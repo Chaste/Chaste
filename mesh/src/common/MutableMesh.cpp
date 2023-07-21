@@ -734,26 +734,24 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(NodeMap& map)
 
         // Create a map between node indices and node locations
         std::map<double, unsigned> location_index_map;
-        for (unsigned i=0; i<this->mNodes.size(); i++)
+        for (unsigned i = 0; i < this->mNodes.size(); ++i)
         {
             location_index_map[this->mNodes[i]->rGetLocation()[0]] = this->mNodes[i]->GetIndex();
         }
 
         // Use this map to generate a vector of node indices that are ordered spatially
         std::vector<unsigned> node_indices_ordered_spatially;
-        for (std::map<double, unsigned>::iterator iter = location_index_map.begin();
-             iter != location_index_map.end();
-             ++iter)
+        for (auto iter : location_index_map)
         {
-            node_indices_ordered_spatially.push_back(iter->second);
+            node_indices_ordered_spatially.push_back(iter.second);
         }
 
         // Construct the elements
         this->mElements.reserve(old_node_locations.size()-1);
-        for (unsigned element_index=0; element_index<old_node_locations.size()-1; element_index++)
+        for (unsigned element_index = 0; element_index < old_node_locations.size()-1; ++element_index)
         {
             std::vector<Node<SPACE_DIM>*> nodes;
-            for (unsigned j=0; j<2; j++)
+            for (unsigned j = 0; j < 2; ++j)
             {
                 unsigned global_node_index = node_indices_ordered_spatially[element_index + j];
                 assert(global_node_index < this->mNodes.size());
@@ -773,7 +771,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(NodeMap& map)
 
         this->RefreshJacobianCachedData();
     }
-    else if (SPACE_DIM==2)  // In 2D, remesh using triangle via library calls
+    else if (SPACE_DIM == 2)  // In 2D, remesh using triangle via library calls
     {
         struct triangulateio mesher_input, mesher_output;
         this->InitialiseTriangulateIo(mesher_input);
@@ -814,97 +812,101 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<c_vector<unsigned, 5> > MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitLongEdges(double cutoffLength)
 {
-    assert(ELEMENT_DIM == 2);     // LCOV_EXCL_LINE
-    assert(SPACE_DIM == 3);     // LCOV_EXCL_LINE
-
-    std::vector<c_vector<unsigned, 5> > history;
-
-    bool long_edge_exists = true;
-
-    while (long_edge_exists)
+    if constexpr (SPACE_DIM == 3 && ELEMENT_DIM == 2)
     {
-        std::set<std::pair<unsigned, unsigned> > long_edges;
+        std::vector<c_vector<unsigned, 5> > history;
 
-        // Loop over elements to check for Long edges
-        for (typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator elem_iter = this->GetElementIteratorBegin();
-             elem_iter != this->GetElementIteratorEnd();
-             ++elem_iter)
+        bool long_edge_exists = true;
+
+        while (long_edge_exists)
         {
-            unsigned num_nodes = ELEMENT_DIM+1;
+            std::set<std::pair<unsigned, unsigned> > long_edges;
 
-            // Loop over element vertices
-            for (unsigned local_index=0; local_index<num_nodes; local_index++)
+            // Loop over elements to check for Long edges
+            for (typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator elem_iter = this->GetElementIteratorBegin();
+                elem_iter != this->GetElementIteratorEnd();
+                ++elem_iter)
             {
-                // Find locations of current node (node a) and anticlockwise node (node b)
-                Node<SPACE_DIM>* p_node_a = elem_iter->GetNode(local_index);
-                unsigned local_index_plus_one = (local_index+1)%num_nodes; /// \todo use iterators to tidy this up
-                Node<SPACE_DIM>* p_node_b = elem_iter->GetNode(local_index_plus_one);
+                unsigned num_nodes = ELEMENT_DIM+1;
 
-                // Find distance between nodes
-                double distance_between_nodes = this->GetDistanceBetweenNodes(p_node_a->GetIndex(), p_node_b->GetIndex());
-
-                if (distance_between_nodes > cutoffLength)
+                // Loop over element vertices
+                for (unsigned local_index=0; local_index<num_nodes; local_index++)
                 {
-                    if (p_node_a->GetIndex() < p_node_b->GetIndex())
+                    // Find locations of current node (node a) and anticlockwise node (node b)
+                    Node<SPACE_DIM>* p_node_a = elem_iter->GetNode(local_index);
+                    unsigned local_index_plus_one = (local_index+1)%num_nodes; /// \todo use iterators to tidy this up
+                    Node<SPACE_DIM>* p_node_b = elem_iter->GetNode(local_index_plus_one);
+
+                    // Find distance between nodes
+                    double distance_between_nodes = this->GetDistanceBetweenNodes(p_node_a->GetIndex(), p_node_b->GetIndex());
+
+                    if (distance_between_nodes > cutoffLength)
                     {
-                        std::pair<unsigned, unsigned> long_edge(p_node_a->GetIndex(),p_node_b->GetIndex());
-                        long_edges.insert(long_edge);
-                    }
-                    else
-                    {
-                        std::pair<unsigned, unsigned> long_edge(p_node_b->GetIndex(),p_node_a->GetIndex());
-                        long_edges.insert(long_edge);
+                        if (p_node_a->GetIndex() < p_node_b->GetIndex())
+                        {
+                            std::pair<unsigned, unsigned> long_edge(p_node_a->GetIndex(),p_node_b->GetIndex());
+                            long_edges.insert(long_edge);
+                        }
+                        else
+                        {
+                            std::pair<unsigned, unsigned> long_edge(p_node_b->GetIndex(),p_node_a->GetIndex());
+                            long_edges.insert(long_edge);
+                        }
                     }
                 }
             }
-        }
 
-        if (long_edges.size() > 0) //Split the edges in decreasing order.
-        {
-            while (long_edges.size() > 0)
+            if (long_edges.size() > 0) //Split the edges in decreasing order.
             {
-                double longest_edge = 0.0;
-                std::set<std::pair<unsigned, unsigned> >::iterator longest_edge_iter;
-
-                //Find the longest edge in the set and split it
-                for (std::set<std::pair<unsigned, unsigned> >::iterator edge_iter = long_edges.begin();
-                         edge_iter != long_edges.end();
-                         ++edge_iter)
+                while (long_edges.size() > 0)
                 {
-                    unsigned node_a_global_index = edge_iter->first;
-                    unsigned node_b_global_index = edge_iter->second;
+                    double longest_edge = 0.0;
+                    std::set<std::pair<unsigned, unsigned> >::iterator longest_edge_iter;
 
-                    double distance_between_nodes = this->GetDistanceBetweenNodes(node_a_global_index, node_b_global_index);
-
-                    if (distance_between_nodes > longest_edge)
+                    //Find the longest edge in the set and split it
+                    for (std::set<std::pair<unsigned, unsigned> >::iterator edge_iter = long_edges.begin();
+                            edge_iter != long_edges.end();
+                            ++edge_iter)
                     {
-                        longest_edge = distance_between_nodes;
-                        longest_edge_iter = edge_iter;
+                        unsigned node_a_global_index = edge_iter->first;
+                        unsigned node_b_global_index = edge_iter->second;
+
+                        double distance_between_nodes = this->GetDistanceBetweenNodes(node_a_global_index, node_b_global_index);
+
+                        if (distance_between_nodes > longest_edge)
+                        {
+                            longest_edge = distance_between_nodes;
+                            longest_edge_iter = edge_iter;
+                        }
                     }
+                    assert(longest_edge >0);
+
+                    c_vector<unsigned, 3> new_node_index = SplitEdge(this->GetNode(longest_edge_iter->first), this->GetNode(longest_edge_iter->second));
+
+                    c_vector<unsigned, 5> node_set;
+                    node_set(0) = new_node_index[0];
+                    node_set(1) = longest_edge_iter->first;
+                    node_set(2) = longest_edge_iter->second;
+                    node_set(3) = new_node_index[1];
+                    node_set(4) = new_node_index[2];
+                    history.push_back(node_set);
+
+                    // Delete pair from set
+                    long_edges.erase(*longest_edge_iter);
                 }
-                assert(longest_edge >0);
-
-                c_vector<unsigned, 3> new_node_index = SplitEdge(this->GetNode(longest_edge_iter->first), this->GetNode(longest_edge_iter->second));
-
-                c_vector<unsigned, 5> node_set;
-                node_set(0) = new_node_index[0];
-                node_set(1) = longest_edge_iter->first;
-                node_set(2) = longest_edge_iter->second;
-                node_set(3) = new_node_index[1];
-                node_set(4) = new_node_index[2];
-                history.push_back(node_set);
-
-                // Delete pair from set
-                long_edges.erase(*longest_edge_iter);
+            }
+            else
+            {
+                long_edge_exists = false;
             }
         }
-        else
-        {
-            long_edge_exists = false;
-        }
+
+        return history;
     }
-
-    return history;
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

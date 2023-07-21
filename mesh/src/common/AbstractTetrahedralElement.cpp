@@ -148,7 +148,6 @@ void AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::CalculateJacobian(c_mat
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::CalculateWeightedDirection(c_vector<double, SPACE_DIM>& rWeightedDirection, double& rJacobianDeterminant)
 {
-
     if (ELEMENT_DIM >= SPACE_DIM)
     {
         assert(ELEMENT_DIM == SPACE_DIM);
@@ -287,20 +286,25 @@ AbstractTetrahedralElement<0, SPACE_DIM>::AbstractTetrahedralElement(unsigned in
     : AbstractElement<0, SPACE_DIM>(index, rNodes)
 {
     // Sanity checking
-    //unsigned total_nodes = 1;
     assert(this->mNodes.size() == 1);
-    assert(SPACE_DIM > 0);     // LCOV_EXCL_LINE
 
-    // This is so we know it's the first time of asking
-    // Create Jacobian
-    c_vector<double, SPACE_DIM> weighted_direction;
-    double det;
+    if constexpr (SPACE_DIM > 0)
+    {
+        // This is so we know it's the first time of asking
+        // Create Jacobian
+        c_vector<double, SPACE_DIM> weighted_direction;
+        double det;
 
-    CalculateWeightedDirection(weighted_direction, det);
+        CalculateWeightedDirection(weighted_direction, det);
 
-    // If determinant < 0 then element nodes are listed clockwise.
-    // We want them anticlockwise.
-    assert(det > 0.0);
+        // If determinant < 0 then element nodes are listed clockwise.
+        // We want them anticlockwise.
+        assert(det > 0.0);
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template<unsigned SPACE_DIM>
@@ -314,24 +318,34 @@ void AbstractTetrahedralElement<0, SPACE_DIM>::CalculateWeightedDirection(
         c_vector<double, SPACE_DIM>& rWeightedDirection,
         double& rJacobianDeterminant)
 {
-    assert(SPACE_DIM > 0);     // LCOV_EXCL_LINE
+    if constexpr (SPACE_DIM > 0)
+    {
+        // End point of a line
+        rWeightedDirection = zero_vector<double>(SPACE_DIM);
+        rWeightedDirection(0) = 1.0;
 
-    // End point of a line
-    rWeightedDirection = zero_vector<double>(SPACE_DIM);
-    rWeightedDirection(0) = 1.0;
-
-    rJacobianDeterminant = 1.0;
+        rJacobianDeterminant = 1.0;
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template<unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> AbstractTetrahedralElement<0, SPACE_DIM>::CalculateNormal()
 {
-    assert(SPACE_DIM > 0);     // LCOV_EXCL_LINE
-
-    // End point of a line
-    c_vector<double, SPACE_DIM> normal = zero_vector<double>(SPACE_DIM);
-    ///\todo should throw?
-    return normal;
+    if constexpr (SPACE_DIM > 0)
+    {
+        // End point of a line
+        c_vector<double, SPACE_DIM> normal = zero_vector<double>(SPACE_DIM);
+        ///\todo should throw?
+        return normal;
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template<unsigned SPACE_DIM>

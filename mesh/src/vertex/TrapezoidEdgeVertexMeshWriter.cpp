@@ -60,139 +60,150 @@ void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(Ve
                                                                               const std::string& stamp)
 {
 #ifdef CHASTE_VTK
-    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE
-
-    // Create VTK mesh
-    MakeVtkMesh(rMesh);
-
-    // Now write VTK mesh to file
-    assert(mpVtkUnstructedMesh->CheckAttributes() == 0);
-    vtkXMLUnstructuredGridWriter* p_writer = vtkXMLUnstructuredGridWriter::New();
-#if VTK_MAJOR_VERSION >= 6
-    p_writer->SetInputData(mpVtkUnstructedMesh);
-#else
-    p_writer->SetInput(mpVtkUnstructedMesh);
-#endif
-    // Uninitialised stuff arises (see #1079), but you can remove valgrind problems by removing compression:
-    // **** REMOVE WITH CAUTION *****
-    p_writer->SetCompressor(nullptr);
-    // **** REMOVE WITH CAUTION *****
-
-    std::string vtk_file_name = this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName;
-    if (!stamp.empty())
+    if constexpr (SPACE_DIM == 2)
     {
-        vtk_file_name += "_" + stamp;
-    }
-    vtk_file_name += ".vtu";
+        // Create VTK mesh
+        MakeVtkMesh(rMesh);
 
-    p_writer->SetFileName(vtk_file_name.c_str());
-    // p_writer->PrintSelf(std::cout, vtkIndent());
-    p_writer->Write();
-    p_writer->Delete(); // Reference counted
+        // Now write VTK mesh to file
+        assert(mpVtkUnstructedMesh->CheckAttributes() == 0);
+        vtkXMLUnstructuredGridWriter* p_writer = vtkXMLUnstructuredGridWriter::New();
+#if VTK_MAJOR_VERSION >= 6
+        p_writer->SetInputData(mpVtkUnstructedMesh);
+#else
+        p_writer->SetInput(mpVtkUnstructedMesh);
+#endif
+        // Uninitialised stuff arises (see #1079), but you can remove valgrind problems by removing compression:
+        // **** REMOVE WITH CAUTION *****
+        p_writer->SetCompressor(nullptr);
+        // **** REMOVE WITH CAUTION *****
+
+        std::string vtk_file_name = this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName;
+        if (!stamp.empty())
+        {
+            vtk_file_name += "_" + stamp;
+        }
+        vtk_file_name += ".vtu";
+
+        p_writer->SetFileName(vtk_file_name.c_str());
+        // p_writer->PrintSelf(std::cout, vtkIndent());
+        p_writer->Write();
+        p_writer->Delete(); // Reference counted
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 #endif // CHASTE_VTK
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
 {
-    // Only 2D version is supported at the moment
-    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE
 #ifdef CHASTE_VTK
-    // Make the Vtk mesh
-    vtkPoints* p_pts = vtkPoints::New(VTK_DOUBLE);
-    p_pts->GetData()->SetName("Vertex positions");
-    /*
-     * Populating points. First, outer points of elements
-     */
-    const unsigned n_vertices = rMesh.GetNumNodes();
-    for (unsigned node_num = 0; node_num < rMesh.GetNumNodes(); node_num++)
+    // Only 2D version is supported at the moment
+    if constexpr (SPACE_DIM == 2)
     {
-        c_vector<double, 2> position;
-        position = rMesh.GetNode(node_num)->rGetLocation();
-        p_pts->InsertPoint(node_num, position[0], position[1], 0.0);
-    }
-    /*
-     * Populating inner points.
-     * [_________________][_____][_________]....[_____]
-     *      ^^^^^^^^^^^    ^^^^^  ^^^^^^^^        ^^^^
-     *  Outer points       Cell_1  Cell_2        Cell_{num_elements}
-     *                              Inner Points
-     * cell_offset_dist stores the distance from the beginning of p_pts array for each element
-     * Note that the number of inner points equals to the number of nodes of each element
-     */
-    const unsigned num_elements = rMesh.GetNumElements();
-    std::vector<unsigned> cell_offset_dist(rMesh.GetNumElements());
-    cell_offset_dist[0] = n_vertices;
-    for (unsigned i = 1; i < num_elements; ++i)
-        cell_offset_dist[i] = cell_offset_dist[i - 1] + rMesh.GetElement(i - 1)->GetNumNodes();
-    // Coefficient 0<=alpha<=1 represents how thin the trapezoid is
-    const double alpha = 0.8;
-    typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_end = rMesh.GetElementIteratorEnd();
-    for (auto elem = rMesh.GetElementIteratorBegin(); elem != elem_end; ++elem)
-    {
-        const unsigned num_elem_nodes = elem->GetNumNodes();
-        const c_vector<double, SPACE_DIM> elem_centroid = rMesh.GetCentroidOfElement(elem->GetIndex());
-        for (unsigned elem_node_num = 0; elem_node_num < num_elem_nodes; elem_node_num++)
+        // Make the Vtk mesh
+        vtkPoints* p_pts = vtkPoints::New(VTK_DOUBLE);
+        p_pts->GetData()->SetName("Vertex positions");
+        /*
+        * Populating points. First, outer points of elements
+        */
+        const unsigned n_vertices = rMesh.GetNumNodes();
+        for (unsigned node_num = 0; node_num < rMesh.GetNumNodes(); node_num++)
         {
-            c_vector<double, SPACE_DIM> node_position(2);
-            node_position = elem->GetNode(elem_node_num)->rGetLocation();
-            const double new_x = (node_position[0] - elem_centroid[0]) * alpha + elem_centroid[0];
-            const double new_y = (node_position[1] - elem_centroid[1]) * alpha + elem_centroid[1];
-            p_pts->InsertPoint(cell_offset_dist[elem->GetIndex()] + elem_node_num,
-                               new_x, new_y, 0.0);
+            c_vector<double, 2> position;
+            position = rMesh.GetNode(node_num)->rGetLocation();
+            p_pts->InsertPoint(node_num, position[0], position[1], 0.0);
         }
-    }
-    mpVtkUnstructedMesh->SetPoints(p_pts);
-    p_pts->Delete(); // Reference counted
-    unsigned total_num_edges = 0;
-    for (auto elem = rMesh.GetElementIteratorBegin(); elem != elem_end; ++elem)
-    {
-        // First do the trapezoids for each edge
-        for (unsigned edge_index = 0; edge_index < elem->GetNumEdges(); ++edge_index)
+        /*
+        * Populating inner points.
+        * [_________________][_____][_________]....[_____]
+        *      ^^^^^^^^^^^    ^^^^^  ^^^^^^^^        ^^^^
+        *  Outer points       Cell_1  Cell_2        Cell_{num_elements}
+        *                              Inner Points
+        * cell_offset_dist stores the distance from the beginning of p_pts array for each element
+        * Note that the number of inner points equals to the number of nodes of each element
+        */
+        const unsigned num_elements = rMesh.GetNumElements();
+        std::vector<unsigned> cell_offset_dist(rMesh.GetNumElements());
+        cell_offset_dist[0] = n_vertices;
+        for (unsigned i = 1; i < num_elements; ++i)
+            cell_offset_dist[i] = cell_offset_dist[i - 1] + rMesh.GetElement(i - 1)->GetNumNodes();
+        // Coefficient 0<=alpha<=1 represents how thin the trapezoid is
+        const double alpha = 0.8;
+        typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_end = rMesh.GetElementIteratorEnd();
+        for (auto elem = rMesh.GetElementIteratorBegin(); elem != elem_end; ++elem)
         {
+            const unsigned num_elem_nodes = elem->GetNumNodes();
+            const c_vector<double, SPACE_DIM> elem_centroid = rMesh.GetCentroidOfElement(elem->GetIndex());
+            for (unsigned elem_node_num = 0; elem_node_num < num_elem_nodes; elem_node_num++)
+            {
+                c_vector<double, SPACE_DIM> node_position(2);
+                node_position = elem->GetNode(elem_node_num)->rGetLocation();
+                const double new_x = (node_position[0] - elem_centroid[0]) * alpha + elem_centroid[0];
+                const double new_y = (node_position[1] - elem_centroid[1]) * alpha + elem_centroid[1];
+                p_pts->InsertPoint(cell_offset_dist[elem->GetIndex()] + elem_node_num,
+                                new_x, new_y, 0.0);
+            }
+        }
+        mpVtkUnstructedMesh->SetPoints(p_pts);
+        p_pts->Delete(); // Reference counted
+        unsigned total_num_edges = 0;
+        for (auto elem = rMesh.GetElementIteratorBegin(); elem != elem_end; ++elem)
+        {
+            // First do the trapezoids for each edge
+            for (unsigned edge_index = 0; edge_index < elem->GetNumEdges(); ++edge_index)
+            {
+                vtkCell* p_cell;
+                p_cell = vtkQuad::New();
+                const unsigned num_trap_nodes = p_cell->GetNumberOfEdges(); // 4 in 2D, 8 in 3D
+                assert(num_trap_nodes == 4);
+                vtkIdList* p_cell_id_list = p_cell->GetPointIds();
+                p_cell_id_list->SetNumberOfIds(num_trap_nodes);
+                auto p_edge = elem->GetEdge(edge_index);
+                assert(p_edge->GetNumNodes() == 2);
+
+                // See the diagram above for storing pattern
+                std::array<unsigned, 2> base_ids = { { p_edge->GetNode(0)->GetIndex(), p_edge->GetNode(1)->GetIndex() } };
+                std::array<unsigned, 2> top_ids = { { elem->GetNodeLocalIndex(base_ids[0])
+                                                        + cell_offset_dist[elem->GetIndex()],
+                                                    elem->GetNodeLocalIndex(base_ids[1]) + cell_offset_dist[elem->GetIndex()] } };
+
+                // Assuming counter-clockwise ordering
+                p_cell_id_list->SetId(0, base_ids[0]);
+                p_cell_id_list->SetId(1, base_ids[1]);
+                p_cell_id_list->SetId(2, top_ids[1]);
+                p_cell_id_list->SetId(3, top_ids[0]);
+                mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
+                p_cell->Delete(); // Reference counted
+                total_num_edges++;
+            }
+
+            // Now do the internal cell
             vtkCell* p_cell;
-            p_cell = vtkQuad::New();
-            const unsigned num_trap_nodes = p_cell->GetNumberOfEdges(); // 4 in 2D, 8 in 3D
-            assert(num_trap_nodes == 4);
+            p_cell = vtkPolygon::New();
+            const unsigned num_elem_nodes = elem->GetNumNodes();
             vtkIdList* p_cell_id_list = p_cell->GetPointIds();
-            p_cell_id_list->SetNumberOfIds(num_trap_nodes);
-            auto p_edge = elem->GetEdge(edge_index);
-            assert(p_edge->GetNumNodes() == 2);
+            p_cell_id_list->SetNumberOfIds(num_elem_nodes);
+            for (unsigned j = 0; j < num_elem_nodes; ++j)
+            {
+                p_cell_id_list->SetId(j, cell_offset_dist[elem->GetIndex()] + j);
+            }
 
-            // See the diagram above for storing pattern
-            std::array<unsigned, 2> base_ids = { { p_edge->GetNode(0)->GetIndex(), p_edge->GetNode(1)->GetIndex() } };
-            std::array<unsigned, 2> top_ids = { { elem->GetNodeLocalIndex(base_ids[0])
-                                                      + cell_offset_dist[elem->GetIndex()],
-                                                  elem->GetNodeLocalIndex(base_ids[1]) + cell_offset_dist[elem->GetIndex()] } };
-
-            // Assuming counter-clockwise ordering
-            p_cell_id_list->SetId(0, base_ids[0]);
-            p_cell_id_list->SetId(1, base_ids[1]);
-            p_cell_id_list->SetId(2, top_ids[1]);
-            p_cell_id_list->SetId(3, top_ids[0]);
             mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
+
             p_cell->Delete(); // Reference counted
-            total_num_edges++;
         }
 
-        // Now do the internal cell
-        vtkCell* p_cell;
-        p_cell = vtkPolygon::New();
-        const unsigned num_elem_nodes = elem->GetNumNodes();
-        vtkIdList* p_cell_id_list = p_cell->GetPointIds();
-        p_cell_id_list->SetNumberOfIds(num_elem_nodes);
-        for (unsigned j = 0; j < num_elem_nodes; ++j)
-        {
-            p_cell_id_list->SetId(j, cell_offset_dist[elem->GetIndex()] + j);
-        }
-
-        mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
-
-        p_cell->Delete(); // Reference counted
+        // For 2D case. For 3D, we should sum the total number of faces + num_elements
+        assert(total_num_edges + num_elements == mpVtkUnstructedMesh->GetNumberOfCells());
     }
-
-    // For 2D case. For 3D, we should sum the total number of faces + num_elements
-    assert(total_num_edges + num_elements == mpVtkUnstructedMesh->GetNumberOfCells());
+    else
+    {
+        NEVER_REACHED;
+    }
 #endif // CHASTE_VTK
 }
 

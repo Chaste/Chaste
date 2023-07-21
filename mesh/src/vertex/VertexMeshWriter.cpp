@@ -126,53 +126,59 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexElementData VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElementWithFaces()
 {
     // This method should only be called in 3D
-    assert(SPACE_DIM == 3);    // LCOV_EXCL_LINE
-    assert(mpMesh);
-    assert(this->mNumElements == mpMesh->GetNumElements());
-
-    // Create data structure for this element
-    VertexElementData elem_data;
-
-    // Store node indices owned by this element
-    elem_data.NodeIndices.resize((*(mpIters->pElemIter))->GetNumNodes());
-    for (unsigned j=0; j<elem_data.NodeIndices.size(); j++)
+    if constexpr (SPACE_DIM == 3)
     {
-        unsigned old_index = (*(mpIters->pElemIter))->GetNodeGlobalIndex(j);
-        elem_data.NodeIndices[j] = mpMesh->IsMeshChanging() ? mpNodeMap->GetNewIndex(old_index) : old_index;
-    }
+        assert(mpMesh);
+        assert(this->mNumElements == mpMesh->GetNumElements());
 
-    // Store faces owned by this element
-    elem_data.Faces.resize((*(mpIters->pElemIter))->GetNumFaces());
-    for (unsigned i=0; i<elem_data.Faces.size(); i++)
-    {
-        // Get pointer to this face
-        VertexElement<ELEMENT_DIM-1, SPACE_DIM>* p_face = (*(mpIters->pElemIter))->GetFace(i);
+        // Create data structure for this element
+        VertexElementData elem_data;
 
-        // Create data structure for this face
-        ElementData face_data;
-
-        // Store this face's index
-        face_data.AttributeValue = p_face->GetIndex();
-
-        // Store node indices owned by this face
-        face_data.NodeIndices.resize(p_face->GetNumNodes());
-        for (unsigned j=0; j<face_data.NodeIndices.size(); j++)
+        // Store node indices owned by this element
+        elem_data.NodeIndices.resize((*(mpIters->pElemIter))->GetNumNodes());
+        for (unsigned j=0; j<elem_data.NodeIndices.size(); j++)
         {
-            unsigned old_index = p_face->GetNodeGlobalIndex(j);
-            face_data.NodeIndices[j] = mpMesh->IsMeshChanging() ? mpNodeMap->GetNewIndex(old_index) : old_index;
+            unsigned old_index = (*(mpIters->pElemIter))->GetNodeGlobalIndex(j);
+            elem_data.NodeIndices[j] = mpMesh->IsMeshChanging() ? mpNodeMap->GetNewIndex(old_index) : old_index;
         }
 
-        // Store this face
-        elem_data.Faces[i] = face_data;
+        // Store faces owned by this element
+        elem_data.Faces.resize((*(mpIters->pElemIter))->GetNumFaces());
+        for (unsigned i=0; i<elem_data.Faces.size(); i++)
+        {
+            // Get pointer to this face
+            VertexElement<ELEMENT_DIM-1, SPACE_DIM>* p_face = (*(mpIters->pElemIter))->GetFace(i);
 
-        ///\todo Store face orientations? (#1076/#1377)
+            // Create data structure for this face
+            ElementData face_data;
+
+            // Store this face's index
+            face_data.AttributeValue = p_face->GetIndex();
+
+            // Store node indices owned by this face
+            face_data.NodeIndices.resize(p_face->GetNumNodes());
+            for (unsigned j=0; j<face_data.NodeIndices.size(); j++)
+            {
+                unsigned old_index = p_face->GetNodeGlobalIndex(j);
+                face_data.NodeIndices[j] = mpMesh->IsMeshChanging() ? mpNodeMap->GetNewIndex(old_index) : old_index;
+            }
+
+            // Store this face
+            elem_data.Faces[i] = face_data;
+
+            ///\todo Store face orientations? (#1076/#1377)
+        }
+
+        // Set attribute
+        elem_data.AttributeValue = (unsigned)(*(mpIters->pElemIter))->GetAttribute();
+        ++(*(mpIters->pElemIter));
+
+        return elem_data;
     }
-
-    // Set attribute
-    elem_data.AttributeValue = (unsigned)(*(mpIters->pElemIter))->GetAttribute();
-    ++(*(mpIters->pElemIter));
-
-    return elem_data;
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -208,35 +214,40 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, std::string stamp)
 {
 #ifdef CHASTE_VTK
-    assert(SPACE_DIM==3 || SPACE_DIM == 2);    // LCOV_EXCL_LINE
-
-    // Create VTK mesh
-    MakeVtkMesh(rMesh);
-
-    // Now write VTK mesh to file
-    assert(mpVtkUnstructedMesh->CheckAttributes() == 0);
-    vtkXMLUnstructuredGridWriter* p_writer = vtkXMLUnstructuredGridWriter::New();
-#if VTK_MAJOR_VERSION >= 6
-    p_writer->SetInputData(mpVtkUnstructedMesh);
-#else
-    p_writer->SetInput(mpVtkUnstructedMesh);
-#endif
-    // Uninitialised stuff arises (see #1079), but you can remove valgrind problems by removing compression:
-    // **** REMOVE WITH CAUTION *****
-    p_writer->SetCompressor(nullptr);
-    // **** REMOVE WITH CAUTION *****
-
-    std::string vtk_file_name = this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName;
-    if (stamp != "")
+    if constexpr (SPACE_DIM == 2 || SPACE_DIM == 3)
     {
-        vtk_file_name += "_" + stamp;
-    }
-    vtk_file_name += ".vtu";
+        // Create VTK mesh
+        MakeVtkMesh(rMesh);
 
-    p_writer->SetFileName(vtk_file_name.c_str());
-    //p_writer->PrintSelf(std::cout, vtkIndent());
-    p_writer->Write();
-    p_writer->Delete(); // Reference counted
+        // Now write VTK mesh to file
+        assert(mpVtkUnstructedMesh->CheckAttributes() == 0);
+        vtkXMLUnstructuredGridWriter* p_writer = vtkXMLUnstructuredGridWriter::New();
+#if VTK_MAJOR_VERSION >= 6
+        p_writer->SetInputData(mpVtkUnstructedMesh);
+#else
+        p_writer->SetInput(mpVtkUnstructedMesh);
+#endif
+        // Uninitialised stuff arises (see #1079), but you can remove valgrind problems by removing compression:
+        // **** REMOVE WITH CAUTION *****
+        p_writer->SetCompressor(nullptr);
+        // **** REMOVE WITH CAUTION *****
+
+        std::string vtk_file_name = this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName;
+        if (stamp != "")
+        {
+            vtk_file_name += "_" + stamp;
+        }
+        vtk_file_name += ".vtu";
+
+        p_writer->SetFileName(vtk_file_name.c_str());
+        //p_writer->PrintSelf(std::cout, vtkIndent());
+        p_writer->Write();
+        p_writer->Delete(); // Reference counted
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 #endif //CHASTE_VTK
 }
 
@@ -399,122 +410,127 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(VertexMesh<EL
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 {
-    std::string comment = "# " + ChasteBuildInfo::GetProvenanceString();
-
-    // Write node file
-    std::string node_file_name = this->mBaseName + ".node";
-    out_stream p_node_file = this->mpOutputFileHandler->OpenOutputFile(node_file_name);
-
-    // Write the node header
-    unsigned num_attr = 0;
-    unsigned max_bdy_marker = 1; // as we include boundary node information in the node file
-    unsigned num_nodes = this->GetNumNodes();
-
-    *p_node_file << num_nodes << "\t";
-    *p_node_file << SPACE_DIM << "\t";
-    *p_node_file << num_attr << "\t";
-    *p_node_file << max_bdy_marker << "\n";
-    *p_node_file << std::setprecision(6);
-
-    // Write each node's data
-    for (unsigned item_num=0; item_num<num_nodes; item_num++)
+    if constexpr (SPACE_DIM == 2 || SPACE_DIM == 3)
     {
-        std::vector<double> current_item = this->GetNextNode();
-        *p_node_file << item_num;
-        for (unsigned i=0; i<SPACE_DIM+1; i++)
+        std::string comment = "# " + ChasteBuildInfo::GetProvenanceString();
+
+        // Write node file
+        std::string node_file_name = this->mBaseName + ".node";
+        out_stream p_node_file = this->mpOutputFileHandler->OpenOutputFile(node_file_name);
+
+        // Write the node header
+        unsigned num_attr = 0;
+        unsigned max_bdy_marker = 1; // as we include boundary node information in the node file
+        unsigned num_nodes = this->GetNumNodes();
+
+        *p_node_file << num_nodes << "\t";
+        *p_node_file << SPACE_DIM << "\t";
+        *p_node_file << num_attr << "\t";
+        *p_node_file << max_bdy_marker << "\n";
+        *p_node_file << std::setprecision(6);
+
+        // Write each node's data
+        for (unsigned item_num=0; item_num<num_nodes; item_num++)
         {
-            *p_node_file << "\t" << current_item[i];
-        }
-        *p_node_file << "\n";
-    }
-    *p_node_file << comment << "\n";
-    p_node_file->close();
-
-    // Write element file
-    std::string element_file_name = this->mBaseName + ".cell";
-    out_stream p_element_file = this->mpOutputFileHandler->OpenOutputFile(element_file_name);
-
-    // Write the element header
-    num_attr = 1; //Always write element attributes
-    unsigned num_elements = this->GetNumElements();
-    *p_element_file << num_elements << "\t" << num_attr << "\n";
-
-    // Write each element's data
-    for (unsigned item_num=0; item_num<num_elements; item_num++)
-    {
-        if (SPACE_DIM == 2) // In 2D, write the node indices owned by this element
-        {
-            // Get data for this element
-            ElementData elem_data = this->GetNextElement();
-
-            // Get the node indices owned by this element
-            std::vector<unsigned> node_indices = elem_data.NodeIndices;
-
-            // Write this element's index and the number of nodes owned by it to file
-            *p_element_file << item_num <<  "\t" << node_indices.size();
-
-            // Write the node indices owned by this element to file
-            for (unsigned i=0; i<node_indices.size(); i++)
+            std::vector<double> current_item = this->GetNextNode();
+            *p_node_file << item_num;
+            for (unsigned i=0; i<SPACE_DIM+1; i++)
             {
-                *p_element_file << "\t" << node_indices[i];
+                *p_node_file << "\t" << current_item[i];
             }
-
-            *p_element_file << "\t" << elem_data.AttributeValue;
-
-            // New line
-            *p_element_file << "\n";
+            *p_node_file << "\n";
         }
-        else // 3D
+        *p_node_file << comment << "\n";
+        p_node_file->close();
+
+        // Write element file
+        std::string element_file_name = this->mBaseName + ".cell";
+        out_stream p_element_file = this->mpOutputFileHandler->OpenOutputFile(element_file_name);
+
+        // Write the element header
+        num_attr = 1; //Always write element attributes
+        unsigned num_elements = this->GetNumElements();
+        *p_element_file << num_elements << "\t" << num_attr << "\n";
+
+        // Write each element's data
+        for (unsigned item_num=0; item_num<num_elements; item_num++)
         {
-            assert(SPACE_DIM == 3);    // LCOV_EXCL_LINE
-
-            // Get data for this element
-            VertexElementData elem_data_with_faces = this->GetNextElementWithFaces();
-
-            // Get the node indices owned by this element
-            std::vector<unsigned> node_indices = elem_data_with_faces.NodeIndices;
-
-            // Write this element's index and the number of nodes owned by it to file
-            *p_element_file << item_num <<  "\t" << node_indices.size();
-
-            // Write the node indices owned by this element to file
-            for (unsigned i=0; i<node_indices.size(); i++)
+            if (SPACE_DIM == 2) // In 2D, write the node indices owned by this element
             {
-                *p_element_file << "\t" << node_indices[i];
-            }
+                // Get data for this element
+                ElementData elem_data = this->GetNextElement();
 
-            // Get the faces owned by this element (if any)
-            std::vector<ElementData> faces = elem_data_with_faces.Faces;
+                // Get the node indices owned by this element
+                std::vector<unsigned> node_indices = elem_data.NodeIndices;
 
-            // Write the number of faces owned by this element to file
-            *p_element_file << "\t" << faces.size();
-
-            for (unsigned j=0; j<faces.size(); j++)
-            {
-                // Get the node indices owned by this face
-                std::vector<unsigned> face_node_indices = faces[j].NodeIndices;
-
-                // Write this face's index and the number of nodes owned by it to file
-                *p_element_file << "\t" << faces[j].AttributeValue <<  "\t" << face_node_indices.size();
+                // Write this element's index and the number of nodes owned by it to file
+                *p_element_file << item_num <<  "\t" << node_indices.size();
 
                 // Write the node indices owned by this element to file
-                for (unsigned i=0; i<face_node_indices.size(); i++)
+                for (unsigned i=0; i<node_indices.size(); i++)
                 {
-                    *p_element_file << "\t" << face_node_indices[i];
+                    *p_element_file << "\t" << node_indices[i];
                 }
 
-                ///\todo Store face orientations? (#1076/#1377)
+                *p_element_file << "\t" << elem_data.AttributeValue;
+
+                // New line
+                *p_element_file << "\n";
             }
+            else // SPACE_DIM == 3
+            {
+                // Get data for this element
+                VertexElementData elem_data_with_faces = this->GetNextElementWithFaces();
 
-            *p_element_file << "\t" << elem_data_with_faces.AttributeValue;
+                // Get the node indices owned by this element
+                std::vector<unsigned> node_indices = elem_data_with_faces.NodeIndices;
 
-            // New line
-            *p_element_file << "\n";
+                // Write this element's index and the number of nodes owned by it to file
+                *p_element_file << item_num <<  "\t" << node_indices.size();
+
+                // Write the node indices owned by this element to file
+                for (unsigned i=0; i<node_indices.size(); i++)
+                {
+                    *p_element_file << "\t" << node_indices[i];
+                }
+
+                // Get the faces owned by this element (if any)
+                std::vector<ElementData> faces = elem_data_with_faces.Faces;
+
+                // Write the number of faces owned by this element to file
+                *p_element_file << "\t" << faces.size();
+
+                for (unsigned j=0; j<faces.size(); j++)
+                {
+                    // Get the node indices owned by this face
+                    std::vector<unsigned> face_node_indices = faces[j].NodeIndices;
+
+                    // Write this face's index and the number of nodes owned by it to file
+                    *p_element_file << "\t" << faces[j].AttributeValue <<  "\t" << face_node_indices.size();
+
+                    // Write the node indices owned by this element to file
+                    for (unsigned i=0; i<face_node_indices.size(); i++)
+                    {
+                        *p_element_file << "\t" << face_node_indices[i];
+                    }
+
+                    ///\todo Store face orientations? (#1076/#1377)
+                }
+
+                *p_element_file << "\t" << elem_data_with_faces.AttributeValue;
+
+                // New line
+                *p_element_file << "\n";
+            }
         }
-    }
 
-    *p_element_file << comment << "\n";
-    p_element_file->close();
+        *p_element_file << comment << "\n";
+        p_element_file->close();
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 ///////// Explicit instantiation///////

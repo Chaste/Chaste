@@ -551,55 +551,68 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::GenerateVerticesFromElementCircumcentre
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEdgeLength(unsigned elementIndex1, unsigned elementIndex2)
+double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEdgeLength(
+    [[maybe_unused]] unsigned elementIndex1,
+    [[maybe_unused]] unsigned elementIndex2)
 {
-    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE - code will be removed at compile time
-
-    std::set<unsigned> node_indices_1;
-    for (unsigned i = 0; i < mElements[elementIndex1]->GetNumNodes(); i++)
+    if constexpr (SPACE_DIM == 2)
     {
-        node_indices_1.insert(mElements[elementIndex1]->GetNodeGlobalIndex(i));
+        std::set<unsigned> node_indices_1;
+        for (unsigned i = 0; i < mElements[elementIndex1]->GetNumNodes(); i++)
+        {
+            node_indices_1.insert(mElements[elementIndex1]->GetNodeGlobalIndex(i));
+        }
+        std::set<unsigned> node_indices_2;
+        for (unsigned i = 0; i < mElements[elementIndex2]->GetNumNodes(); i++)
+        {
+            node_indices_2.insert(mElements[elementIndex2]->GetNodeGlobalIndex(i));
+        }
+
+        std::set<unsigned> shared_nodes;
+        std::set_intersection(node_indices_1.begin(), node_indices_1.end(),
+                            node_indices_2.begin(), node_indices_2.end(),
+                            std::inserter(shared_nodes, shared_nodes.begin()));
+
+        if (shared_nodes.size() == 1)
+        {
+            // It's possible that these two elements are actually infinite but are on the edge of the domain
+            EXCEPTION("Elements " << elementIndex1 << " and " << elementIndex2 << " share only one node.");
+        }
+        assert(shared_nodes.size() == 2);
+
+        unsigned index1 = *(shared_nodes.begin());
+        unsigned index2 = *(++(shared_nodes.begin()));
+
+        double edge_length = this->GetDistanceBetweenNodes(index1, index2);
+        return edge_length;
     }
-    std::set<unsigned> node_indices_2;
-    for (unsigned i = 0; i < mElements[elementIndex2]->GetNumNodes(); i++)
+    else
     {
-        node_indices_2.insert(mElements[elementIndex2]->GetNodeGlobalIndex(i));
+        NEVER_REACHED;
     }
-
-    std::set<unsigned> shared_nodes;
-    std::set_intersection(node_indices_1.begin(), node_indices_1.end(),
-                          node_indices_2.begin(), node_indices_2.end(),
-                          std::inserter(shared_nodes, shared_nodes.begin()));
-
-    if (shared_nodes.size() == 1)
-    {
-        // It's possible that these two elements are actually infinite but are on the edge of the domain
-        EXCEPTION("Elements " << elementIndex1 << " and " << elementIndex2 << " share only one node.");
-    }
-    assert(shared_nodes.size() == 2);
-
-    unsigned index1 = *(shared_nodes.begin());
-    unsigned index2 = *(++(shared_nodes.begin()));
-
-    double edge_length = this->GetDistanceBetweenNodes(index1, index2);
-    return edge_length;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetElongationShapeFactorOfElement(unsigned index)
+double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetElongationShapeFactorOfElement(
+    [[maybe_unused]] unsigned index)
 {
-    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE - code will be removed at compile time
+    if constexpr (SPACE_DIM == 2)
+    {
+        c_vector<double, 3> moments = CalculateMomentsOfElement(index);
 
-    c_vector<double, 3> moments = CalculateMomentsOfElement(index);
+        double discriminant = sqrt((moments(0) - moments(1)) * (moments(0) - moments(1)) + 4.0 * moments(2) * moments(2));
 
-    double discriminant = sqrt((moments(0) - moments(1)) * (moments(0) - moments(1)) + 4.0 * moments(2) * moments(2));
+        // Note that as the matrix of second moments of area is symmetric, both its eigenvalues are real
+        double largest_eigenvalue = (moments(0) + moments(1) + discriminant) * 0.5;
+        double smallest_eigenvalue = (moments(0) + moments(1) - discriminant) * 0.5;
 
-    // Note that as the matrix of second moments of area is symmetric, both its eigenvalues are real
-    double largest_eigenvalue = (moments(0) + moments(1) + discriminant) * 0.5;
-    double smallest_eigenvalue = (moments(0) + moments(1) - discriminant) * 0.5;
-
-    double elongation_shape_factor = sqrt(largest_eigenvalue / smallest_eigenvalue);
-    return elongation_shape_factor;
+        double elongation_shape_factor = sqrt(largest_eigenvalue / smallest_eigenvalue);
+        return elongation_shape_factor;
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -691,27 +704,33 @@ unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVoronoiElementIndexCorresponding
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetRosetteRankOfElement(unsigned index)
+unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetRosetteRankOfElement(
+    [[maybe_unused]] unsigned index)
 {
-    assert(SPACE_DIM == 2 || SPACE_DIM == 3); // LCOV_EXCL_LINE - code will be removed at compile time
-
-    // Get pointer to this element
-    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
-
-    // Loop over nodes in the current element and find which is contained in the most elements
-    unsigned rosette_rank = 0;
-    for (unsigned node_idx = 0; node_idx < p_element->GetNumNodes(); node_idx++)
+    if constexpr (SPACE_DIM == 2 || SPACE_DIM == 3)
     {
-        unsigned num_elems_this_node = p_element->GetNode(node_idx)->rGetContainingElementIndices().size();
+        // Get pointer to this element
+        VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
 
-        if (num_elems_this_node > rosette_rank)
+        // Loop over nodes in the current element and find which is contained in the most elements
+        unsigned rosette_rank = 0;
+        for (unsigned node_idx = 0; node_idx < p_element->GetNumNodes(); node_idx++)
         {
-            rosette_rank = num_elems_this_node;
-        }
-    }
+            unsigned num_elems_this_node = p_element->GetNode(node_idx)->rGetContainingElementIndices().size();
 
-    // Return the rosette rank
-    return rosette_rank;
+            if (num_elems_this_node > rosette_rank)
+            {
+                rosette_rank = num_elems_this_node;
+            }
+        }
+
+        // Return the rosette rank
+        return rosette_rank;
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -1185,90 +1204,100 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVectorFromAto
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeOfElement(unsigned index)
 {
-    assert(SPACE_DIM == 2 || SPACE_DIM == 3); // LCOV_EXCL_LINE - code will be removed at compile time
-
-    // Get pointer to this element
-    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
-
-    double element_volume = 0.0;
-    if (SPACE_DIM == 2)
+    if constexpr (SPACE_DIM == 2 || SPACE_DIM == 3)
     {
-        // We map the first vertex to the origin and employ GetVectorFromAtoB() to allow for periodicity
-        c_vector<double, SPACE_DIM> first_node_location = p_element->GetNodeLocation(0);
-        c_vector<double, SPACE_DIM> pos_1 = zero_vector<double>(SPACE_DIM);
+        // Get pointer to this element
+        VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
 
-        unsigned num_nodes = p_element->GetNumNodes();
-        for (unsigned local_index = 0; local_index < num_nodes; local_index++)
+        double element_volume = 0.0;
+        if (SPACE_DIM == 2)
         {
-            c_vector<double, SPACE_DIM> next_node_location = p_element->GetNodeLocation((local_index + 1) % num_nodes);
-            c_vector<double, SPACE_DIM> pos_2 = GetVectorFromAtoB(first_node_location, next_node_location);
+            // We map the first vertex to the origin and employ GetVectorFromAtoB() to allow for periodicity
+            c_vector<double, SPACE_DIM> first_node_location = p_element->GetNodeLocation(0);
+            c_vector<double, SPACE_DIM> pos_1 = zero_vector<double>(SPACE_DIM);
 
-            double this_x = pos_1[0];
-            double this_y = pos_1[1];
-            double next_x = pos_2[0];
-            double next_y = pos_2[1];
+            unsigned num_nodes = p_element->GetNumNodes();
+            for (unsigned local_index = 0; local_index < num_nodes; local_index++)
+            {
+                c_vector<double, SPACE_DIM> next_node_location = p_element->GetNodeLocation((local_index + 1) % num_nodes);
+                c_vector<double, SPACE_DIM> pos_2 = GetVectorFromAtoB(first_node_location, next_node_location);
 
-            element_volume += 0.5 * (this_x * next_y - next_x * this_y);
+                double this_x = pos_1[0];
+                double this_y = pos_1[1];
+                double next_x = pos_2[0];
+                double next_y = pos_2[1];
 
-            pos_1 = pos_2;
+                element_volume += 0.5 * (this_x * next_y - next_x * this_y);
+
+                pos_1 = pos_2;
+            }
         }
+        else
+        {
+            // Loop over faces and add up pyramid volumes
+            c_vector<double, SPACE_DIM> pyramid_apex = p_element->GetNodeLocation(0);
+            for (unsigned face_index = 0; face_index < p_element->GetNumFaces(); face_index++)
+            {
+                // Get pointer to face
+                VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* p_face = p_element->GetFace(face_index);
+
+                // Calculate the area of the face and get unit normal to this face
+                c_vector<double, SPACE_DIM> unit_normal;
+                double face_area = CalculateUnitNormalToFaceWithArea(p_face, unit_normal);
+
+                // Calculate the perpendicular distance from the plane of the face to the chosen apex
+                c_vector<double, SPACE_DIM> base_to_apex = GetVectorFromAtoB(p_face->GetNodeLocation(0), pyramid_apex);
+                double perpendicular_distance = fabs(inner_prod(base_to_apex, unit_normal));
+
+                // Use these to calculate the volume of the pyramid formed by the face and the point pyramid_apex
+                element_volume += face_area * perpendicular_distance / 3;
+            }
+        }
+
+        // We take the absolute value just in case the nodes were really oriented clockwise
+        return fabs(element_volume);
     }
     else
     {
-        // Loop over faces and add up pyramid volumes
-        c_vector<double, SPACE_DIM> pyramid_apex = p_element->GetNodeLocation(0);
-        for (unsigned face_index = 0; face_index < p_element->GetNumFaces(); face_index++)
-        {
-            // Get pointer to face
-            VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* p_face = p_element->GetFace(face_index);
-
-            // Calculate the area of the face and get unit normal to this face
-            c_vector<double, SPACE_DIM> unit_normal;
-            double face_area = CalculateUnitNormalToFaceWithArea(p_face, unit_normal);
-
-            // Calculate the perpendicular distance from the plane of the face to the chosen apex
-            c_vector<double, SPACE_DIM> base_to_apex = GetVectorFromAtoB(p_face->GetNodeLocation(0), pyramid_apex);
-            double perpendicular_distance = fabs(inner_prod(base_to_apex, unit_normal));
-
-            // Use these to calculate the volume of the pyramid formed by the face and the point pyramid_apex
-            element_volume += face_area * perpendicular_distance / 3;
-        }
+        NEVER_REACHED;
     }
-
-    // We take the absolute value just in case the nodes were really oriented clockwise
-    return fabs(element_volume);
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceAreaOfElement(unsigned index)
 {
-    assert(SPACE_DIM == 2 || SPACE_DIM == 3); // LCOV_EXCL_LINE - code will be removed at compile time
-
-    // Get pointer to this element
-    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
-
-    double surface_area = 0.0;
-    if (SPACE_DIM == 2)
+    if constexpr (SPACE_DIM == 2 || SPACE_DIM == 3)
     {
-        unsigned num_nodes = p_element->GetNumNodes();
-        unsigned this_node_index = p_element->GetNodeGlobalIndex(0);
-        for (unsigned local_index = 0; local_index < num_nodes; local_index++)
-        {
-            unsigned next_node_index = p_element->GetNodeGlobalIndex((local_index + 1) % num_nodes);
+        // Get pointer to this element
+        VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
 
-            surface_area += this->GetDistanceBetweenNodes(this_node_index, next_node_index);
-            this_node_index = next_node_index;
+        double surface_area = 0.0;
+        if (SPACE_DIM == 2)
+        {
+            unsigned num_nodes = p_element->GetNumNodes();
+            unsigned this_node_index = p_element->GetNodeGlobalIndex(0);
+            for (unsigned local_index = 0; local_index < num_nodes; local_index++)
+            {
+                unsigned next_node_index = p_element->GetNodeGlobalIndex((local_index + 1) % num_nodes);
+
+                surface_area += this->GetDistanceBetweenNodes(this_node_index, next_node_index);
+                this_node_index = next_node_index;
+            }
         }
+        else // SPACE_DIM == 3
+        {
+            // Loop over faces and add up areas
+            for (unsigned face_index = 0; face_index < p_element->GetNumFaces(); face_index++)
+            {
+                surface_area += CalculateAreaOfFace(p_element->GetFace(face_index));
+            }
+        }
+        return surface_area;
     }
     else
     {
-        // Loop over faces and add up areas
-        for (unsigned face_index = 0; face_index < p_element->GetNumFaces(); face_index++)
-        {
-            surface_area += CalculateAreaOfFace(p_element->GetFace(face_index));
-        }
+        NEVER_REACHED;
     }
-    return surface_area;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1615,8 +1644,6 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetPreviousEdgeG
 {
     if constexpr (SPACE_DIM == 2)
     {
-        assert(SPACE_DIM == 2); // LCOV_EXCL_LINE - code will be removed at compile time
-
         const unsigned num_nodes_in_element = pElement->GetNumNodes();
 
         // We add an extra num_nodes_in_element-1 in the line below as otherwise this term can be negative, which breaks the % operator
@@ -1691,8 +1718,6 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateUnitNormalToFaceWithArea(
 {
     if constexpr (SPACE_DIM == 3)
     {
-        assert(SPACE_DIM == 3); // LCOV_EXCL_LINE - code will be removed at compile time
-
         // As we are in 3D, the face must have at least three vertices
         assert(pFace->GetNumNodes() >= 3u);
 

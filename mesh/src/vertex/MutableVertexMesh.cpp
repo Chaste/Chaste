@@ -414,9 +414,6 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
 {
     if constexpr (ELEMENT_DIM == 2 && SPACE_DIM == 2)
     {
-        assert(SPACE_DIM == 2); // LCOV_EXCL_LINE
-        assert(ELEMENT_DIM == SPACE_DIM); // LCOV_EXCL_LINE
-
         // Storing element edge map prior to division. This is needed for division recording.
         std::vector<unsigned> edgeIds;
         for (unsigned i = 0; i < pElement->GetNumEdges(); i++)

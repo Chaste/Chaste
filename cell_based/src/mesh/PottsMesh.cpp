@@ -198,34 +198,39 @@ template<unsigned DIM>
 double PottsMesh<DIM>::GetSurfaceAreaOfElement(unsigned index)
 {
     ///\todo not implemented in 3d yet
-    assert(DIM==2 || DIM==3); // LCOV_EXCL_LINE
-
-    // Helper variables
-    PottsElement<DIM>* p_element = GetElement(index);
-    unsigned num_nodes = p_element->GetNumNodes();
-
-    double surface_area = 0.0;
-    for (unsigned node_index = 0; node_index < num_nodes; ++node_index)
+    if constexpr (DIM==2 || DIM==3)
     {
-        std::set<unsigned> neighbouring_node_indices = 
-            GetVonNeumannNeighbouringNodeIndices(p_element->GetNode(node_index)->GetIndex());
-        unsigned local_edges = 2*DIM;
-        for (auto iter : neighbouring_node_indices)
-        {
-            std::set<unsigned> neighbouring_node_element_indices = this->mNodes[iter]->rGetContainingElementIndices();
+        // Helper variables
+        PottsElement<DIM>* p_element = GetElement(index);
+        unsigned num_nodes = p_element->GetNumNodes();
 
-            if (!(neighbouring_node_element_indices.empty()) && (local_edges!=0))
+        double surface_area = 0.0;
+        for (unsigned node_index = 0; node_index < num_nodes; ++node_index)
+        {
+            std::set<unsigned> neighbouring_node_indices = 
+                GetVonNeumannNeighbouringNodeIndices(p_element->GetNode(node_index)->GetIndex());
+            unsigned local_edges = 2*DIM;
+            for (auto iter : neighbouring_node_indices)
             {
-                unsigned neighbouring_node_element_index = *(neighbouring_node_element_indices.begin());
-                if (neighbouring_node_element_index == index)
+                std::set<unsigned> neighbouring_node_element_indices = this->mNodes[iter]->rGetContainingElementIndices();
+
+                if (!(neighbouring_node_element_indices.empty()) && (local_edges!=0))
                 {
-                    local_edges--;
+                    unsigned neighbouring_node_element_index = *(neighbouring_node_element_indices.begin());
+                    if (neighbouring_node_element_index == index)
+                    {
+                        local_edges--;
+                    }
                 }
             }
+            surface_area += local_edges;
         }
-        surface_area += local_edges;
+        return surface_area;
     }
-    return surface_area;
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template<unsigned DIM>
@@ -383,126 +388,131 @@ unsigned PottsMesh<DIM>::DivideElement(PottsElement<DIM>* pElement,
                                        bool placeOriginalElementBelow)
 {
     /// Not implemented in 1d
-    assert(DIM==2 || DIM==3); // LCOV_EXCL_LINE
-
-    // Store the number of nodes in the element (this changes when nodes are deleted from the element)
-    unsigned num_nodes = pElement->GetNumNodes();
-
-    if (num_nodes < 2)
+    if constexpr (DIM==2 || DIM==3)
     {
-        EXCEPTION("Tried to divide a Potts element with only one node. Cell dividing too often given dynamic parameters.");
-    }
+        // Store the number of nodes in the element (this changes when nodes are deleted from the element)
+        unsigned num_nodes = pElement->GetNumNodes();
 
-    // Copy the nodes in this element
-    std::vector<Node<DIM>*> nodes_elem;
-    for (unsigned i = 0; i < num_nodes; ++i)
-    {
-        nodes_elem.push_back(pElement->GetNode(i));
-    }
-
-    // Get the index of the new element
-    unsigned new_element_index;
-    if (mDeletedElementIndices.empty())
-    {
-        new_element_index = this->mElements.size();
-    }
-    else
-    {
-        new_element_index = mDeletedElementIndices.back();
-        mDeletedElementIndices.pop_back();
-        delete this->mElements[new_element_index];
-    }
-
-    // Add the new element to the mesh
-    AddElement(new PottsElement<DIM>(new_element_index, nodes_elem));
-
-    /**
-     * Remove the correct nodes from each element. If placeOriginalElementBelow is true,
-     * place the original element below (in the y direction or z in 3d) the new element; otherwise,
-     * place it above.
-     */
-    unsigned half_num_nodes = num_nodes/2; // This will round down
-    assert(half_num_nodes > 0);
-    assert(half_num_nodes < num_nodes);
-
-    // Find lowest element
-    ///\todo this could be more efficient
-    double height_midpoint_1 = 0.0;
-    double height_midpoint_2 = 0.0;
-    unsigned counter_1 = 0;
-    unsigned counter_2 = 0;
-
-    for (unsigned i = 0; i < num_nodes; ++i)
-    {
-        if (i < half_num_nodes)
+        if (num_nodes < 2)
         {
-            height_midpoint_1 += pElement->GetNode(i)->rGetLocation()[DIM - 1];
-            counter_1++;
+            EXCEPTION("Tried to divide a Potts element with only one node. Cell dividing too often given dynamic parameters.");
+        }
+
+        // Copy the nodes in this element
+        std::vector<Node<DIM>*> nodes_elem;
+        for (unsigned i = 0; i < num_nodes; ++i)
+        {
+            nodes_elem.push_back(pElement->GetNode(i));
+        }
+
+        // Get the index of the new element
+        unsigned new_element_index;
+        if (mDeletedElementIndices.empty())
+        {
+            new_element_index = this->mElements.size();
         }
         else
         {
-            height_midpoint_2 += pElement->GetNode(i)->rGetLocation()[DIM -1];
-            counter_2++;
+            new_element_index = mDeletedElementIndices.back();
+            mDeletedElementIndices.pop_back();
+            delete this->mElements[new_element_index];
         }
-    }
-    height_midpoint_1 /= static_cast<double>(counter_1);
-    height_midpoint_2 /= static_cast<double>(counter_2);
 
-    for (unsigned i = num_nodes; i > 0; --i)
+        // Add the new element to the mesh
+        AddElement(new PottsElement<DIM>(new_element_index, nodes_elem));
+
+        /**
+         * Remove the correct nodes from each element. If placeOriginalElementBelow is true,
+         * place the original element below (in the y direction or z in 3d) the new element; otherwise,
+         * place it above.
+         */
+        unsigned half_num_nodes = num_nodes/2; // This will round down
+        assert(half_num_nodes > 0);
+        assert(half_num_nodes < num_nodes);
+
+        // Find lowest element
+        ///\todo this could be more efficient
+        double height_midpoint_1 = 0.0;
+        double height_midpoint_2 = 0.0;
+        unsigned counter_1 = 0;
+        unsigned counter_2 = 0;
+
+        for (unsigned i = 0; i < num_nodes; ++i)
+        {
+            if (i < half_num_nodes)
+            {
+                height_midpoint_1 += pElement->GetNode(i)->rGetLocation()[DIM - 1];
+                counter_1++;
+            }
+            else
+            {
+                height_midpoint_2 += pElement->GetNode(i)->rGetLocation()[DIM -1];
+                counter_2++;
+            }
+        }
+        height_midpoint_1 /= static_cast<double>(counter_1);
+        height_midpoint_2 /= static_cast<double>(counter_2);
+
+        for (unsigned i = num_nodes; i > 0; --i)
+        {
+            if (i-1 >= half_num_nodes)
+            {
+                if (height_midpoint_1 < height_midpoint_2)
+                {
+                    if (placeOriginalElementBelow)
+                    {
+                        pElement->DeleteNode(i-1);
+                    }
+                    else
+                    {
+                        this->mElements[new_element_index]->DeleteNode(i-1);
+                    }
+                }
+                else
+                {
+                    if (placeOriginalElementBelow)
+                    {
+                        this->mElements[new_element_index]->DeleteNode(i-1);
+                    }
+                    else
+                    {
+                        pElement->DeleteNode(i-1);
+                    }
+                }
+            }
+            else // i-1 < half_num_nodes
+            {
+                if (height_midpoint_1 < height_midpoint_2)
+                {
+                    if (placeOriginalElementBelow)
+                    {
+                        this->mElements[new_element_index]->DeleteNode(i-1);
+                    }
+                    else
+                    {
+                        pElement->DeleteNode(i-1);
+                    }
+                }
+                else
+                {
+                    if (placeOriginalElementBelow)
+                    {
+                        pElement->DeleteNode(i-1);
+                    }
+                    else
+                    {
+                        this->mElements[new_element_index]->DeleteNode(i-1);
+                    }
+                }
+            }
+        }
+
+        return new_element_index;
+    }
+    else
     {
-        if (i-1 >= half_num_nodes)
-        {
-            if (height_midpoint_1 < height_midpoint_2)
-            {
-                if (placeOriginalElementBelow)
-                {
-                    pElement->DeleteNode(i-1);
-                }
-                else
-                {
-                    this->mElements[new_element_index]->DeleteNode(i-1);
-                }
-            }
-            else
-            {
-                if (placeOriginalElementBelow)
-                {
-                    this->mElements[new_element_index]->DeleteNode(i-1);
-                }
-                else
-                {
-                    pElement->DeleteNode(i-1);
-                }
-            }
-        }
-        else // i-1 < half_num_nodes
-        {
-            if (height_midpoint_1 < height_midpoint_2)
-            {
-                if (placeOriginalElementBelow)
-                {
-                    this->mElements[new_element_index]->DeleteNode(i-1);
-                }
-                else
-                {
-                    pElement->DeleteNode(i-1);
-                }
-            }
-            else
-            {
-                if (placeOriginalElementBelow)
-                {
-                    pElement->DeleteNode(i-1);
-                }
-                else
-                {
-                    this->mElements[new_element_index]->DeleteNode(i-1);
-                }
-            }
-        }
+        NEVER_REACHED;
     }
-
-    return new_element_index;
 }
 
 template<unsigned DIM>

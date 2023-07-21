@@ -278,73 +278,83 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddCellData(std::string dataName, std
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorCellData(std::string dataName, std::vector<c_vector<double,SPACE_DIM*(SPACE_DIM+1)/2> > dataPayload)
 {
-    assert(SPACE_DIM != 1);    // LCOV_EXCL_LINE
-
-    vtkDoubleArray* p_vectors = vtkDoubleArray::New();
-    p_vectors->SetName(dataName.c_str());
-    p_vectors->SetNumberOfComponents(SPACE_DIM*SPACE_DIM);
-    for (unsigned i=0; i<dataPayload.size(); i++)
+    if constexpr (SPACE_DIM != 1)
     {
-        if (SPACE_DIM == 2)
+        vtkDoubleArray* p_vectors = vtkDoubleArray::New();
+        p_vectors->SetName(dataName.c_str());
+        p_vectors->SetNumberOfComponents(SPACE_DIM*SPACE_DIM);
+        for (unsigned i=0; i<dataPayload.size(); i++)
         {
-            p_vectors->InsertNextValue(dataPayload[i](0)); //a11
-            p_vectors->InsertNextValue(dataPayload[i](1)); //a12
-            p_vectors->InsertNextValue(dataPayload[i](1)); //a21
-            p_vectors->InsertNextValue(dataPayload[i](2)); //a22
+            if (SPACE_DIM == 2)
+            {
+                p_vectors->InsertNextValue(dataPayload[i](0)); //a11
+                p_vectors->InsertNextValue(dataPayload[i](1)); //a12
+                p_vectors->InsertNextValue(dataPayload[i](1)); //a21
+                p_vectors->InsertNextValue(dataPayload[i](2)); //a22
+            }
+            else // SPACE_DIM == 3
+            {
+                p_vectors->InsertNextValue(dataPayload[i](0)); //a11
+                p_vectors->InsertNextValue(dataPayload[i](1)); //a12
+                p_vectors->InsertNextValue(dataPayload[i](2)); //a13
+                p_vectors->InsertNextValue(dataPayload[i](1)); //a21
+                p_vectors->InsertNextValue(dataPayload[i](3)); //a22
+                p_vectors->InsertNextValue(dataPayload[i](4)); //a23
+                p_vectors->InsertNextValue(dataPayload[i](2)); //a31
+                p_vectors->InsertNextValue(dataPayload[i](4)); //a32
+                p_vectors->InsertNextValue(dataPayload[i](5)); //a33
+            }
         }
-        else if (SPACE_DIM == 3)
-        {
-            p_vectors->InsertNextValue(dataPayload[i](0)); //a11
-            p_vectors->InsertNextValue(dataPayload[i](1)); //a12
-            p_vectors->InsertNextValue(dataPayload[i](2)); //a13
-            p_vectors->InsertNextValue(dataPayload[i](1)); //a21
-            p_vectors->InsertNextValue(dataPayload[i](3)); //a22
-            p_vectors->InsertNextValue(dataPayload[i](4)); //a23
-            p_vectors->InsertNextValue(dataPayload[i](2)); //a31
-            p_vectors->InsertNextValue(dataPayload[i](4)); //a32
-            p_vectors->InsertNextValue(dataPayload[i](5)); //a33
-        }
-    }
 
-    vtkCellData* p_cell_data = mpVtkUnstructedMesh->GetCellData();
-    p_cell_data->AddArray(p_vectors);
-    p_vectors->Delete(); //Reference counted
+        vtkCellData* p_cell_data = mpVtkUnstructedMesh->GetCellData();
+        p_cell_data->AddArray(p_vectors);
+        p_vectors->Delete(); //Reference counted
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorCellData(std::string dataName, std::vector<c_matrix<double,SPACE_DIM,SPACE_DIM> > dataPayload)
 {
-    assert(SPACE_DIM != 1);    // LCOV_EXCL_LINE
-
-    vtkDoubleArray* p_vectors = vtkDoubleArray::New();
-    p_vectors->SetName(dataName.c_str());
-    p_vectors->SetNumberOfComponents(SPACE_DIM*SPACE_DIM);
-    for (unsigned i=0; i<dataPayload.size(); i++)
+    if constexpr (SPACE_DIM != 1)
     {
-        if (SPACE_DIM == 2)
+        vtkDoubleArray* p_vectors = vtkDoubleArray::New();
+        p_vectors->SetName(dataName.c_str());
+        p_vectors->SetNumberOfComponents(SPACE_DIM*SPACE_DIM);
+        for (unsigned i=0; i<dataPayload.size(); i++)
         {
-            p_vectors->InsertNextValue(dataPayload[i](0,0)); //a11
-            p_vectors->InsertNextValue(dataPayload[i](0,1)); //a12
-            p_vectors->InsertNextValue(dataPayload[i](1,0)); //a21
-            p_vectors->InsertNextValue(dataPayload[i](1,1)); //a22
+            if (SPACE_DIM == 2)
+            {
+                p_vectors->InsertNextValue(dataPayload[i](0,0)); //a11
+                p_vectors->InsertNextValue(dataPayload[i](0,1)); //a12
+                p_vectors->InsertNextValue(dataPayload[i](1,0)); //a21
+                p_vectors->InsertNextValue(dataPayload[i](1,1)); //a22
+            }
+            else // SPACE_DIM == 3
+            {
+                p_vectors->InsertNextValue(dataPayload[i](0,0)); //a11
+                p_vectors->InsertNextValue(dataPayload[i](0,1)); //a12
+                p_vectors->InsertNextValue(dataPayload[i](0,2)); //a13
+                p_vectors->InsertNextValue(dataPayload[i](1,0)); //a21
+                p_vectors->InsertNextValue(dataPayload[i](1,1)); //a22
+                p_vectors->InsertNextValue(dataPayload[i](1,2)); //a23
+                p_vectors->InsertNextValue(dataPayload[i](2,0)); //a31
+                p_vectors->InsertNextValue(dataPayload[i](2,1)); //a32
+                p_vectors->InsertNextValue(dataPayload[i](2,2)); //a33
+            }
         }
-        else if (SPACE_DIM == 3)
-        {
-            p_vectors->InsertNextValue(dataPayload[i](0,0)); //a11
-            p_vectors->InsertNextValue(dataPayload[i](0,1)); //a12
-            p_vectors->InsertNextValue(dataPayload[i](0,2)); //a13
-            p_vectors->InsertNextValue(dataPayload[i](1,0)); //a21
-            p_vectors->InsertNextValue(dataPayload[i](1,1)); //a22
-            p_vectors->InsertNextValue(dataPayload[i](1,2)); //a23
-            p_vectors->InsertNextValue(dataPayload[i](2,0)); //a31
-            p_vectors->InsertNextValue(dataPayload[i](2,1)); //a32
-            p_vectors->InsertNextValue(dataPayload[i](2,2)); //a33
-        }
-    }
 
-    vtkCellData* p_cell_data = mpVtkUnstructedMesh->GetCellData();
-    p_cell_data->AddArray(p_vectors);
-    p_vectors->Delete(); //Reference counted
+        vtkCellData* p_cell_data = mpVtkUnstructedMesh->GetCellData();
+        p_cell_data->AddArray(p_vectors);
+        p_vectors->Delete(); //Reference counted
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 
@@ -509,37 +519,42 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorPointData(std::string dataName, std::vector<c_matrix<double,SPACE_DIM,SPACE_DIM> > dataPayload)
 {
-    assert(SPACE_DIM != 1);    // LCOV_EXCL_LINE
-
-    vtkDoubleArray* p_vectors = vtkDoubleArray::New();
-    p_vectors->SetName(dataName.c_str());
-    p_vectors->SetNumberOfComponents(SPACE_DIM*SPACE_DIM);
-    for (unsigned i=0; i<dataPayload.size(); i++)
+    if constexpr (SPACE_DIM != 1)
     {
-        if (SPACE_DIM == 2)
+        vtkDoubleArray* p_vectors = vtkDoubleArray::New();
+        p_vectors->SetName(dataName.c_str());
+        p_vectors->SetNumberOfComponents(SPACE_DIM*SPACE_DIM);
+        for (unsigned i=0; i<dataPayload.size(); i++)
         {
-            p_vectors->InsertNextValue(dataPayload[i](0,0)); //a11
-            p_vectors->InsertNextValue(dataPayload[i](0,1)); //a12
-            p_vectors->InsertNextValue(dataPayload[i](1,0)); //a21
-            p_vectors->InsertNextValue(dataPayload[i](1,1)); //a22
+            if (SPACE_DIM == 2)
+            {
+                p_vectors->InsertNextValue(dataPayload[i](0,0)); //a11
+                p_vectors->InsertNextValue(dataPayload[i](0,1)); //a12
+                p_vectors->InsertNextValue(dataPayload[i](1,0)); //a21
+                p_vectors->InsertNextValue(dataPayload[i](1,1)); //a22
+            }
+            else // SPACE_DIM == 3
+            {
+                p_vectors->InsertNextValue(dataPayload[i](0,0)); //a11
+                p_vectors->InsertNextValue(dataPayload[i](0,1)); //a12
+                p_vectors->InsertNextValue(dataPayload[i](0,2)); //a13
+                p_vectors->InsertNextValue(dataPayload[i](1,0)); //a21
+                p_vectors->InsertNextValue(dataPayload[i](1,1)); //a22
+                p_vectors->InsertNextValue(dataPayload[i](1,2)); //a23
+                p_vectors->InsertNextValue(dataPayload[i](2,0)); //a31
+                p_vectors->InsertNextValue(dataPayload[i](2,1)); //a32
+                p_vectors->InsertNextValue(dataPayload[i](2,2)); //a33
+            }
         }
-        else if (SPACE_DIM == 3)
-        {
-            p_vectors->InsertNextValue(dataPayload[i](0,0)); //a11
-            p_vectors->InsertNextValue(dataPayload[i](0,1)); //a12
-            p_vectors->InsertNextValue(dataPayload[i](0,2)); //a13
-            p_vectors->InsertNextValue(dataPayload[i](1,0)); //a21
-            p_vectors->InsertNextValue(dataPayload[i](1,1)); //a22
-            p_vectors->InsertNextValue(dataPayload[i](1,2)); //a23
-            p_vectors->InsertNextValue(dataPayload[i](2,0)); //a31
-            p_vectors->InsertNextValue(dataPayload[i](2,1)); //a32
-            p_vectors->InsertNextValue(dataPayload[i](2,2)); //a33
-        }
-    }
 
-    vtkPointData* p_point_data = mpVtkUnstructedMesh->GetPointData();
-    p_point_data->AddArray(p_vectors);
-    p_vectors->Delete(); //Reference counted
+        vtkPointData* p_point_data = mpVtkUnstructedMesh->GetPointData();
+        p_point_data->AddArray(p_vectors);
+        p_vectors->Delete(); //Reference counted
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

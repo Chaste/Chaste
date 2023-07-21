@@ -75,24 +75,21 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(
     unsigned num_nodes = rMeshReader.GetNumNodes();
 
     /*
-     * Reserve memory for nodes, so we don't have problems with
-     * pointers stored in elements becoming invalid.
+     * Reserve memory for nodes, so we don't have problems with pointers stored 
+     * in elements becoming invalid.
      */
     this->mNodes.reserve(num_nodes);
 
     rMeshReader.Reset();
 
-    //typename std::map<std::pair<unsigned,unsigned>,unsigned>::const_iterator iterator;
-    //std::map<std::pair<unsigned,unsigned>,unsigned> internal_nodes_map;
-
     // Add nodes
     std::vector<double> coords;
-    for (unsigned node_index = 0; node_index < num_nodes; node_index++)
+    for (unsigned node_index = 0; node_index < num_nodes; ++node_index)
     {
         coords = rMeshReader.GetNextNode();
         Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(node_index, coords, false);
 
-        for (unsigned i = 0; i < rMeshReader.GetNodeAttributes().size(); i++)
+        for (unsigned i = 0; i < rMeshReader.GetNodeAttributes().size(); ++i)
         {
             double attribute = rMeshReader.GetNodeAttributes()[i];
             p_node->AddNodeAttribute(attribute);
@@ -100,31 +97,34 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(
         this->mNodes.push_back(p_node);
     }
 
-    //unsigned new_node_index = mNumCornerNodes;
-
     rMeshReader.Reset();
-    // Add elements
-    //new_node_index = mNumCornerNodes;
-    this->mElements.reserve(rMeshReader.GetNumElements());
 
-    for (unsigned element_index = 0; element_index < (unsigned)rMeshReader.GetNumElements(); element_index++)
+    // Add elements    
+    this->mElements.reserve(rMeshReader.GetNumElements());
+    for (unsigned element_index = 0;
+         element_index < (unsigned)rMeshReader.GetNumElements();
+         ++element_index)
     {
         ElementData element_data = rMeshReader.GetNextElementData();
         std::vector<Node<SPACE_DIM>*> nodes;
 
         /*
-         * NOTE: currently just reading element vertices from mesh reader - even if it
-         * does contain information about internal nodes (ie for quadratics) this is
-         * ignored here and used elsewhere: ie don't do this:
+         * NOTE: currently just reading element vertices from mesh reader - even 
+         * if it does contain information about internal nodes (i.e. for 
+         * quadratics) this is ignored here and used elsewhere: i.e. don't do 
+         * this:
          *   unsigned nodes_size = node_indices.size();
+         * 
+         * Note: num vertices = ELEMENT_DIM+1, may not be equal to nodes_size.
          */
-        for (unsigned j = 0; j < ELEMENT_DIM + 1; j++) // num vertices=ELEMENT_DIM+1, may not be equal to nodes_size.
+        for (unsigned j = 0; j < ELEMENT_DIM + 1; ++j)
         {
             assert(element_data.NodeIndices[j] < this->mNodes.size());
             nodes.push_back(this->mNodes[element_data.NodeIndices[j]]);
         }
 
-        Element<ELEMENT_DIM, SPACE_DIM>* p_element = new Element<ELEMENT_DIM, SPACE_DIM>(element_index, nodes);
+        Element<ELEMENT_DIM, SPACE_DIM>* p_element = 
+            new Element<ELEMENT_DIM, SPACE_DIM>(element_index, nodes);
 
         this->mElements.push_back(p_element);
 
@@ -137,27 +137,35 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(
     }
 
     // Add boundary elements and nodes
-    for (unsigned face_index = 0; face_index < (unsigned)rMeshReader.GetNumFaces(); face_index++)
+    for (unsigned face_index = 0;
+         face_index < rMeshReader.GetNumFaces();
+         ++face_index)
     {
         ElementData face_data = rMeshReader.GetNextFaceData();
         std::vector<unsigned> node_indices = face_data.NodeIndices;
 
         /*
-         * NOTE: unlike the above where we just read element *vertices* from mesh reader, here we are
-         * going to read a quadratic mesh with internal elements.
-         * (There are only a few meshes with internals in the face file that we might as well use them.)
-         *
+         * NOTE: unlike the above where we just read element *vertices* from 
+         * mesh reader, here we are going to read a quadratic mesh with internal 
+         * elements. (There are only a few meshes with internals in the face 
+         * file that we might as well use them.)
          */
         std::vector<Node<SPACE_DIM>*> nodes;
-        for (unsigned node_index = 0; node_index < node_indices.size(); node_index++)
+        for (unsigned node_index = 0;
+             node_index < node_indices.size();
+             ++node_index)
         {
             assert(node_indices[node_index] < this->mNodes.size());
+
             // Add Node pointer to list for creating an element
             nodes.push_back(this->mNodes[node_indices[node_index]]);
         }
 
-        // This is a boundary face, so ensure all its nodes are marked as boundary nodes
-        for (unsigned j = 0; j < nodes.size(); j++)
+        /*
+         * This is a boundary face, so ensure all its nodes are marked as 
+         * boundary nodes.
+         */
+        for (unsigned j = 0; j < nodes.size(); ++j)
         {
             if (!nodes[j]->IsBoundaryNode())
             {
@@ -165,12 +173,13 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(
                 this->mBoundaryNodes.push_back(nodes[j]);
             }
 
-            // Register the index that this bounday element will have with the node
+            // Register this bounday element's index with the node
             nodes[j]->AddBoundaryElement(face_index);
         }
 
         // The added elements will be deleted in our destructor
-        BoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>* p_boundary_element = new BoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>(face_index, nodes);
+        BoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>* p_boundary_element = 
+            new BoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>(face_index, nodes);
         this->mBoundaryElements.push_back(p_boundary_element);
 
         if (rMeshReader.GetNumFaceAttributes() > 0)
@@ -187,7 +196,8 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ReadNodesPerProcessorFile(const std::string& rNodesPerProcessorFile)
+void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ReadNodesPerProcessorFile(
+    const std::string& rNodesPerProcessorFile)
 {
     std::vector<unsigned> nodes_per_processor_vec;
 
@@ -207,19 +217,21 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ReadNodesPerProcessorFile(const st
     }
     else
     {
-        EXCEPTION("Unable to read nodes per processor file " + rNodesPerProcessorFile);
+        EXCEPTION("Unable to read nodes per processor file " + 
+                  rNodesPerProcessorFile);
     }
 
     unsigned sum = 0;
-    for (unsigned i = 0; i < nodes_per_processor_vec.size(); i++)
+    for (unsigned i = 0; i < nodes_per_processor_vec.size(); ++i)
     {
         sum += nodes_per_processor_vec[i];
     }
 
     if (sum != this->GetNumNodes())
     {
-        EXCEPTION("Sum of nodes per processor, " << sum
-                                                 << ", not equal to number of nodes in mesh, " << this->GetNumNodes());
+        EXCEPTION("Sum of nodes per processor, " << sum << 
+                  ", not equal to number of nodes in mesh, " << 
+                  this->GetNumNodes());
     }
 
     unsigned num_owned = nodes_per_processor_vec[PetscTools::GetMyRank()];
@@ -229,7 +241,8 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ReadNodesPerProcessorFile(const st
         EXCEPTION("Number of processes doesn't match the size of the nodes-per-processor file");
     }
     delete this->mpDistributedVectorFactory;
-    this->mpDistributedVectorFactory = new DistributedVectorFactory(this->GetNumNodes(), num_owned);
+    this->mpDistributedVectorFactory = 
+        new DistributedVectorFactory(this->GetNumNodes(), num_owned);
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -244,14 +257,14 @@ bool TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsConforming()
      */
     std::set<std::set<unsigned> > odd_parity_faces;
 
-    for (typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator iter = this->GetElementIteratorBegin();
+    for (auto iter = this->GetElementIteratorBegin();
          iter != this->GetElementIteratorEnd();
          ++iter)
     {
-        for (unsigned face_index = 0; face_index <= ELEMENT_DIM; face_index++)
+        for (unsigned face_index = 0; face_index <= ELEMENT_DIM; ++face_index)
         {
             std::set<unsigned> face_info;
-            for (unsigned node_index = 0; node_index <= ELEMENT_DIM; node_index++)
+            for (unsigned node_index = 0; node_index <= ELEMENT_DIM; ++node_index)
             {
                 // Leave one index out each time
                 if (node_index != face_index)
@@ -260,7 +273,7 @@ bool TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsConforming()
                 }
             }
             // Face is now formed - attempt to find it
-            std::set<std::set<unsigned> >::iterator find_face = odd_parity_faces.find(face_info);
+            auto find_face = odd_parity_faces.find(face_info);
             if (find_face != odd_parity_faces.end())
             {
                 // Face was in set, so it now has even parity.
@@ -288,7 +301,7 @@ double TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetVolume()
 {
     double mesh_volume = 0.0;
 
-    for (typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator iter = this->GetElementIteratorBegin();
+    for (auto iter = this->GetElementIteratorBegin();
          iter != this->GetElementIteratorEnd();
          ++iter)
     {
@@ -479,32 +492,38 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetAngleBetweenNodes(unsigned indexA, unsigned indexB)
+double TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetAngleBetweenNodes(
+    [[maybe_unused]] unsigned indexA,
+    [[maybe_unused]] unsigned indexB)
 {
-    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE
-    assert(SPACE_DIM == ELEMENT_DIM); // LCOV_EXCL_LINE
-
-    double x_difference = this->mNodes[indexB]->rGetLocation()[0] - this->mNodes[indexA]->rGetLocation()[0];
-    double y_difference = this->mNodes[indexB]->rGetLocation()[1] - this->mNodes[indexA]->rGetLocation()[1];
-
-    if (x_difference == 0)
+    if constexpr (SPACE_DIM == 2 && ELEMENT_DIM == 2)
     {
-        if (y_difference > 0)
-        {
-            return M_PI / 2.0;
-        }
-        else if (y_difference < 0)
-        {
-            return -M_PI / 2.0;
-        }
-        else
-        {
-            EXCEPTION("Tried to compute polar angle of (0,0)");
-        }
-    }
+        double x_difference = this->mNodes[indexB]->rGetLocation()[0] - this->mNodes[indexA]->rGetLocation()[0];
+        double y_difference = this->mNodes[indexB]->rGetLocation()[1] - this->mNodes[indexA]->rGetLocation()[1];
 
-    double angle = atan2(y_difference, x_difference);
-    return angle;
+        if (x_difference == 0)
+        {
+            if (y_difference > 0)
+            {
+                return M_PI / 2.0;
+            }
+            else if (y_difference < 0)
+            {
+                return -M_PI / 2.0;
+            }
+            else
+            {
+                EXCEPTION("Tried to compute polar angle of (0,0)");
+            }
+        }
+
+        double angle = atan2(y_difference, x_difference);
+        return angle;
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////

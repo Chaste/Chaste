@@ -396,28 +396,36 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Rotate(c_matrix<double, SPACE_DIM, SP
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Rotate(c_vector<double, 3> axis, double angle)
+void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Rotate(
+    c_vector<double, 3> axis,
+    [[maybe_unused]] double angle)
 {
-    assert(SPACE_DIM == 3); // LCOV_EXCL_LINE
-    const double norm = norm_2(axis);
-    c_vector<double, 3> unit_axis = axis / norm;
+    if constexpr (SPACE_DIM == 3)
+    {
+        const double norm = norm_2(axis);
+        c_vector<double, 3> unit_axis = axis / norm;
 
-    c_matrix<double, 3, 3> rotation_matrix;
+        c_matrix<double, 3, 3> rotation_matrix;
 
-    const double c = cos(angle);
-    const double s = sin(angle);
+        const double c = cos(angle);
+        const double s = sin(angle);
 
-    rotation_matrix(0, 0) = unit_axis(0) * unit_axis(0) + c * (1 - unit_axis(0) * unit_axis(0));
-    rotation_matrix(0, 1) = unit_axis(0) * unit_axis(1) * (1 - c) - unit_axis(2) * s;
-    rotation_matrix(1, 0) = unit_axis(0) * unit_axis(1) * (1 - c) + unit_axis(2) * s;
-    rotation_matrix(1, 1) = unit_axis(1) * unit_axis(1) + c * (1 - unit_axis(1) * unit_axis(1));
-    rotation_matrix(0, 2) = unit_axis(0) * unit_axis(2) * (1 - c) + unit_axis(1) * s;
-    rotation_matrix(1, 2) = unit_axis(1) * unit_axis(2) * (1 - c) - unit_axis(0) * s;
-    rotation_matrix(2, 0) = unit_axis(0) * unit_axis(2) * (1 - c) - unit_axis(1) * s;
-    rotation_matrix(2, 1) = unit_axis(1) * unit_axis(2) * (1 - c) + unit_axis(0) * s;
-    rotation_matrix(2, 2) = unit_axis(2) * unit_axis(2) + c * (1 - unit_axis(2) * unit_axis(2));
+        rotation_matrix(0, 0) = unit_axis(0) * unit_axis(0) + c * (1 - unit_axis(0) * unit_axis(0));
+        rotation_matrix(0, 1) = unit_axis(0) * unit_axis(1) * (1 - c) - unit_axis(2) * s;
+        rotation_matrix(1, 0) = unit_axis(0) * unit_axis(1) * (1 - c) + unit_axis(2) * s;
+        rotation_matrix(1, 1) = unit_axis(1) * unit_axis(1) + c * (1 - unit_axis(1) * unit_axis(1));
+        rotation_matrix(0, 2) = unit_axis(0) * unit_axis(2) * (1 - c) + unit_axis(1) * s;
+        rotation_matrix(1, 2) = unit_axis(1) * unit_axis(2) * (1 - c) - unit_axis(0) * s;
+        rotation_matrix(2, 0) = unit_axis(0) * unit_axis(2) * (1 - c) - unit_axis(1) * s;
+        rotation_matrix(2, 1) = unit_axis(1) * unit_axis(2) * (1 - c) + unit_axis(0) * s;
+        rotation_matrix(2, 2) = unit_axis(2) * unit_axis(2) + c * (1 - unit_axis(2) * unit_axis(2));
 
-    Rotate(rotation_matrix);
+        Rotate(rotation_matrix);
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

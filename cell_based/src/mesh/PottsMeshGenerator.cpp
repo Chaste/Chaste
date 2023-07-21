@@ -565,7 +565,6 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(
         {
             case 2:
             {
-                assert(DIM == 2);
                 /*
                  * This stores the available neighbours using the following numbering:
                  *
@@ -641,8 +640,6 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(
             }
             case 3:
             {
-                assert(DIM == 3);
-
                 /*
                  * This stores the available neighbours using the following numbering:
                  *

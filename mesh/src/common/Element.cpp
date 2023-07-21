@@ -162,41 +162,47 @@ c_vector<double,SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateCircumsph
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double Element<ELEMENT_DIM, SPACE_DIM>::CalculateQuality()
 {
-    assert(SPACE_DIM == ELEMENT_DIM);     // LCOV_EXCL_LINE
-    if (SPACE_DIM == 1)
+    if constexpr (SPACE_DIM == ELEMENT_DIM)
     {
-        return 1.0;
+        if (SPACE_DIM == 1)
+        {
+            return 1.0;
+        }
+
+        c_matrix<double, SPACE_DIM, ELEMENT_DIM> jacobian;
+        c_matrix<double, ELEMENT_DIM, SPACE_DIM> jacobian_inverse;
+        double jacobian_determinant;
+
+        this->CalculateInverseJacobian(jacobian, jacobian_determinant, jacobian_inverse);
+
+        c_vector<double, SPACE_DIM+1> circum=CalculateCircumsphere(jacobian, jacobian_inverse);
+        if (SPACE_DIM == 2)
+        {
+            /* Want Q=(Area_Tri / Area_Cir) / (Area_Equilateral_Tri / Area_Equilateral_Cir)
+            * Area_Tri = |Jacobian| /2
+            * Area_Cir = Pi * r^2
+            * Area_Eq_Tri = (3*sqrt(3.0)/4)*R^2
+            * Area_Eq_Tri = Pi * R^2
+            * Q= (2*|Jacobian|)/3*sqrt(3.0)*r^2)
+            */
+            return 2.0*jacobian_determinant/(3.0*sqrt(3.0)*circum[SPACE_DIM]);
+        }
+        assert(SPACE_DIM == 3);
+        /* Want Q=(Vol_Tet / Vol_CirS) / (Vol_Plat_Tet / Vol_Plat_CirS)
+        *  Vol_Tet  = |Jacobian| /6
+        *  Vol_CirS = 4*Pi*r^3/3
+        *  Vol_Plat_Tet  = 8*sqrt(3.0)*R^3/27
+        *  Vol_Plat_CirS = 4*Pi*R^3/3
+        * Q= 3*sqrt(3.0)*|Jacobian|/ (16*r^3)
+        */
+
+        return (3.0*sqrt(3.0)*jacobian_determinant)
+            /(16.0*circum[SPACE_DIM]*sqrt(circum[SPACE_DIM]));
     }
-
-    c_matrix<double, SPACE_DIM, ELEMENT_DIM> jacobian;
-    c_matrix<double, ELEMENT_DIM, SPACE_DIM> jacobian_inverse;
-    double jacobian_determinant;
-
-    this->CalculateInverseJacobian(jacobian, jacobian_determinant, jacobian_inverse);
-
-    c_vector<double, SPACE_DIM+1> circum=CalculateCircumsphere(jacobian, jacobian_inverse);
-    if (SPACE_DIM == 2)
+    else
     {
-        /* Want Q=(Area_Tri / Area_Cir) / (Area_Equilateral_Tri / Area_Equilateral_Cir)
-         * Area_Tri = |Jacobian| /2
-         * Area_Cir = Pi * r^2
-         * Area_Eq_Tri = (3*sqrt(3.0)/4)*R^2
-         * Area_Eq_Tri = Pi * R^2
-         * Q= (2*|Jacobian|)/3*sqrt(3.0)*r^2)
-         */
-        return 2.0*jacobian_determinant/(3.0*sqrt(3.0)*circum[SPACE_DIM]);
+        NEVER_REACHED;
     }
-    assert(SPACE_DIM == 3);
-    /* Want Q=(Vol_Tet / Vol_CirS) / (Vol_Plat_Tet / Vol_Plat_CirS)
-      *  Vol_Tet  = |Jacobian| /6
-      *  Vol_CirS = 4*Pi*r^3/3
-      *  Vol_Plat_Tet  = 8*sqrt(3.0)*R^3/27
-      *  Vol_Plat_CirS = 4*Pi*R^3/3
-     * Q= 3*sqrt(3.0)*|Jacobian|/ (16*r^3)
-      */
-
-    return (3.0*sqrt(3.0)*jacobian_determinant)
-           /(16.0*circum[SPACE_DIM]*sqrt(circum[SPACE_DIM]));
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

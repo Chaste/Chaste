@@ -46,15 +46,20 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
       mOrientations(rOrientations)
 {
     // This constructor should only be used in 3D
-    assert(SPACE_DIM == 3);    // LCOV_EXCL_LINE - code will be removed at compile time
-
-    // Each face must have an associated orientation
-    assert(mFaces.size() == mOrientations.size());
-
-    if (SPACE_DIM == ELEMENT_DIM)
+    if constexpr (SPACE_DIM == 3)
     {
-        // Register element with nodes
-        this->RegisterWithNodes();
+        // Each face must have an associated orientation
+        assert(mFaces.size() == mOrientations.size());
+
+        if (SPACE_DIM == ELEMENT_DIM)
+        {
+            // Register element with nodes
+            this->RegisterWithNodes();
+        }
+    }
+    else
+    {
+        NEVER_REACHED;
     }
 }
 
