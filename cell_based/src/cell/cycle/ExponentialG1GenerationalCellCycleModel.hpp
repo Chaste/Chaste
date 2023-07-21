@@ -108,7 +108,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    ExponentialG1GenerationalCellCycleModel(const ExponentialG1GenerationalCellCycleModel& rModel);
+    explicit ExponentialG1GenerationalCellCycleModel(const ExponentialG1GenerationalCellCycleModel& rModel);
 
 public:
 

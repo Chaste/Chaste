@@ -83,7 +83,7 @@ public:
      *
      * @param rCrypt The crypt
      */
-    CryptStatistics(MeshBasedCellPopulation<2>& rCrypt);
+    explicit CryptStatistics(MeshBasedCellPopulation<2>& rCrypt);
 
     /**
      * Get all cells within a cell width of the section defined as the line between points (xBottom,0)

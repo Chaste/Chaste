@@ -101,7 +101,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    UniformCellCycleModel(const UniformCellCycleModel& rModel);
+    explicit UniformCellCycleModel(const UniformCellCycleModel& rModel);
 
 public:
 

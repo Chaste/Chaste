@@ -110,7 +110,7 @@ protected:
      *
      * @param rModel  the SRN model to copy.
      */
-    AbstractOdeSrnModel(const AbstractOdeSrnModel& rModel);
+    explicit AbstractOdeSrnModel(const AbstractOdeSrnModel& rModel);
 
 public:
     /**

@@ -84,7 +84,7 @@ public:
      * 
      * @param rFileName the name of the file to write to.
      */
-    AbstractCellPopulationCountWriter(const std::string& rFileName);
+    explicit AbstractCellPopulationCountWriter(const std::string& rFileName);
 
     /**
      * Write the header to file.

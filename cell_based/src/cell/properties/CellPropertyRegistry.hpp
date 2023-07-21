@@ -111,8 +111,9 @@ private:
 
     /**
      * Copy constructor.
+     * \todo never defined?
      */
-    CellPropertyRegistry(const CellPropertyRegistry&);
+    explicit CellPropertyRegistry(const CellPropertyRegistry&);
 
     /**
      * Overloaded assignment operator.

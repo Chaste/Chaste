@@ -93,7 +93,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    AbstractSimpleGenerationalCellCycleModel(const AbstractSimpleGenerationalCellCycleModel& rModel);
+    explicit AbstractSimpleGenerationalCellCycleModel(const AbstractSimpleGenerationalCellCycleModel& rModel);
 
 public:
 

@@ -103,7 +103,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    BiasedBernoulliTrialCellCycleModel(const BiasedBernoulliTrialCellCycleModel& rModel);
+    explicit BiasedBernoulliTrialCellCycleModel(const BiasedBernoulliTrialCellCycleModel& rModel);
 
 public:
 

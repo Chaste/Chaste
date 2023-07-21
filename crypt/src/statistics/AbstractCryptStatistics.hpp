@@ -55,7 +55,7 @@ public:
      *
      * @param rCrypt The crypt
      */
-    AbstractCryptStatistics(MeshBasedCellPopulation<2>& rCrypt);
+    explicit AbstractCryptStatistics(MeshBasedCellPopulation<2>& rCrypt);
 
     /**
      * Destructor.

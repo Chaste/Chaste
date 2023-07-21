@@ -111,7 +111,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    ContactInhibitionCellCycleModel(const ContactInhibitionCellCycleModel& rModel);
+    explicit ContactInhibitionCellCycleModel(const ContactInhibitionCellCycleModel& rModel);
 
 public:
 

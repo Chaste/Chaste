@@ -133,7 +133,7 @@ public:
      *
      * @param pathBaseName the base name for results files
      */
-    PottsMeshReader(std::string pathBaseName);
+    explicit PottsMeshReader(std::string pathBaseName);
 
     /**
      * Destructor.

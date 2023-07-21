@@ -96,7 +96,7 @@ public:
      *
      * @param rMesh a mutable nodes-only mesh
      */
-    NodeBasedCellPopulationWithBuskeUpdate(NodesOnlyMesh<DIM>& rMesh);
+    explicit NodeBasedCellPopulationWithBuskeUpdate(NodesOnlyMesh<DIM>& rMesh);
 
     /**
      * Overridden UpdateNodeLocations() method.

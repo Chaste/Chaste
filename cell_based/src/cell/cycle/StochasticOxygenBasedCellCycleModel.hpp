@@ -98,7 +98,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    StochasticOxygenBasedCellCycleModel(const StochasticOxygenBasedCellCycleModel& rModel);
+    explicit StochasticOxygenBasedCellCycleModel(const StochasticOxygenBasedCellCycleModel& rModel);
 
 public:
 

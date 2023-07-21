@@ -85,7 +85,7 @@ public:
      *
      * @param rDaughterLocation the specified location of the daughter cell
      */
-    FixedCentreBasedDivisionRule(c_vector<double, SPACE_DIM>& rDaughterLocation);
+    explicit FixedCentreBasedDivisionRule(c_vector<double, SPACE_DIM>& rDaughterLocation);
 
     /**
      * Empty destructor.

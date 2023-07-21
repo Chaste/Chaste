@@ -80,7 +80,7 @@ public:
      *
      * @param pCellPopulation pointer to the cell population
      */
-    CryptSimulationBoundaryCondition(AbstractCellPopulation<DIM>* pCellPopulation);
+    explicit CryptSimulationBoundaryCondition(AbstractCellPopulation<DIM>* pCellPopulation);
 
     /**
      * Overridden ImposeBoundaryCondition() method.

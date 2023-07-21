@@ -84,7 +84,7 @@ public:
      *
      * @param rDivisionVector the specified division vector
      */
-    FixedVertexBasedDivisionRule(c_vector<double, SPACE_DIM>& rDivisionVector);
+    explicit FixedVertexBasedDivisionRule(c_vector<double, SPACE_DIM>& rDivisionVector);
 
     /**
      * Empty destructor.

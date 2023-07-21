@@ -76,7 +76,7 @@ public:
      *
      * @param pCellPopulation pointer to the cell population.
      */
-    AbstractCellKiller(AbstractCellPopulation<SPACE_DIM>* pCellPopulation);
+    explicit AbstractCellKiller(AbstractCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
      * Destructor.

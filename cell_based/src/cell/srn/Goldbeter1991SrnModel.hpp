@@ -84,7 +84,7 @@ protected:
      *
      * @param rModel  the SRN model to copy.
      */
-    Goldbeter1991SrnModel(const Goldbeter1991SrnModel& rModel);
+    explicit Goldbeter1991SrnModel(const Goldbeter1991SrnModel& rModel);
 
 public:
 

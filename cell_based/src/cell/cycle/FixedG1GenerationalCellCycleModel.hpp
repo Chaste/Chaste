@@ -78,7 +78,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    FixedG1GenerationalCellCycleModel(const FixedG1GenerationalCellCycleModel& rModel);
+    explicit FixedG1GenerationalCellCycleModel(const FixedG1GenerationalCellCycleModel& rModel);
 
 public:
 

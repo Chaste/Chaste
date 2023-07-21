@@ -115,7 +115,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    SimpleOxygenBasedCellCycleModel(const SimpleOxygenBasedCellCycleModel& rModel);
+    explicit SimpleOxygenBasedCellCycleModel(const SimpleOxygenBasedCellCycleModel& rModel);
 
 public:
 

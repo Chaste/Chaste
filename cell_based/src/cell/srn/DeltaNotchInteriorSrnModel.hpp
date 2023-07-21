@@ -86,7 +86,7 @@ protected:
      *
      * @param rModel  the SRN model to copy.
      */
-    DeltaNotchInteriorSrnModel(const DeltaNotchInteriorSrnModel& rModel);
+    explicit DeltaNotchInteriorSrnModel(const DeltaNotchInteriorSrnModel& rModel);
 
 public:
 

@@ -71,7 +71,7 @@ public:
      *
      * @param pCellPopulation pointer to the cell population.
      */
-    ApoptoticCellKiller(AbstractCellPopulation<SPACE_DIM>* pCellPopulation);
+    explicit ApoptoticCellKiller(AbstractCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
      * Starts apoptosis if the cell has been given the ApoptoticCellProperty.

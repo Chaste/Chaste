@@ -165,7 +165,7 @@ public:
      *
      * @param rMesh a Ca mesh.
      */
-    CaBasedCellPopulation(PottsMesh<DIM>& rMesh);
+    explicit CaBasedCellPopulation(PottsMesh<DIM>& rMesh);
 
     /**
      * Destructor, which frees any memory allocated by the constructor.

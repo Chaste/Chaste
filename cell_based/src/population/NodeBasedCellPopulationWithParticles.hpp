@@ -117,7 +117,7 @@ public:
      *
      * @param rMesh a mutable nodes-only mesh
      */
-    NodeBasedCellPopulationWithParticles(NodesOnlyMesh<DIM>& rMesh);
+    explicit NodeBasedCellPopulationWithParticles(NodesOnlyMesh<DIM>& rMesh);
 
     /**
      * Update mIsParticle if required by a remesh.

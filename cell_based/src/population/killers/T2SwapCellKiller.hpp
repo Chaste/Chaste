@@ -80,7 +80,7 @@ public:
      *
      * @param pCellPopulation pointer to the cell population
      */
-    T2SwapCellKiller(AbstractCellPopulation<DIM>* pCellPopulation);
+    explicit T2SwapCellKiller(AbstractCellPopulation<DIM>* pCellPopulation);
 
     /**
      * Overridden CheckAndLabelCellsForApoptosisOrDeath() method.

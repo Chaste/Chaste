@@ -193,7 +193,7 @@ public:
      *
      * @param rMesh a mutable tetrahedral mesh.
      */
-    MeshBasedCellPopulation(MutableMesh<ELEMENT_DIM, SPACE_DIM>& rMesh);
+    explicit MeshBasedCellPopulation(MutableMesh<ELEMENT_DIM, SPACE_DIM>& rMesh);
 
     /**
      * Destructor.

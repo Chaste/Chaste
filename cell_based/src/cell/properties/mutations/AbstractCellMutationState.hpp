@@ -92,7 +92,7 @@ public:
      *
      * @param colour  what colour cells with this mutation state should be in the visualizer
      */
-    AbstractCellMutationState(unsigned colour);
+    explicit AbstractCellMutationState(unsigned colour);
 
     /**
      * Virtual destructor, to make this class polymorphic.

@@ -81,7 +81,7 @@ public:
      * 
      * @param centre the specified axis along which division probability is biased
      */
-    DivisionBiasTrackingModifier(c_vector<double, DIM> divisionBiasVector);
+    explicit DivisionBiasTrackingModifier(c_vector<double, DIM> divisionBiasVector);
 
     /**
      * Destructor.

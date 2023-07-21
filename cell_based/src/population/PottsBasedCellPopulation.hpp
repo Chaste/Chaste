@@ -166,7 +166,7 @@ public:
      *
      * @param rMesh a vertex mesh.
      */
-    PottsBasedCellPopulation(PottsMesh<DIM>& rMesh);
+    explicit PottsBasedCellPopulation(PottsMesh<DIM>& rMesh);
 
     /**
      * Destructor, which frees any memory allocated by the constructor.

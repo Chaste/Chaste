@@ -99,7 +99,7 @@ public:
      * Default constructor.
      * @param rFileName the name of the file to write to.
      */
-    AbstractCellWriter(const std::string& rFileName);
+    explicit AbstractCellWriter(const std::string& rFileName);
 
     /**
      * Get a double associated with a cell. This method reduces duplication

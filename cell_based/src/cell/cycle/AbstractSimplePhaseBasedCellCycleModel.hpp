@@ -94,7 +94,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    AbstractSimplePhaseBasedCellCycleModel(const AbstractSimplePhaseBasedCellCycleModel& rModel);
+    explicit AbstractSimplePhaseBasedCellCycleModel(const AbstractSimplePhaseBasedCellCycleModel& rModel);
 
 public:
 

@@ -90,7 +90,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    Alarcon2004OxygenBasedCellCycleModel(const Alarcon2004OxygenBasedCellCycleModel& rModel);
+    explicit Alarcon2004OxygenBasedCellCycleModel(const Alarcon2004OxygenBasedCellCycleModel& rModel);
 
 public:
 

@@ -91,7 +91,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    GammaG1CellCycleModel(const GammaG1CellCycleModel& rModel);
+    explicit GammaG1CellCycleModel(const GammaG1CellCycleModel& rModel);
 
 public:
 

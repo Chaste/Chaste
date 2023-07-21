@@ -100,7 +100,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    BernoulliTrialCellCycleModel(const BernoulliTrialCellCycleModel& rModel);
+    explicit BernoulliTrialCellCycleModel(const BernoulliTrialCellCycleModel& rModel);
 
 public:
 

@@ -82,7 +82,7 @@ public:
      * Default constructor.
      * @param rFileName the name of the file to write to.
      */
-    AbstractCellPopulationWriter(const std::string& rFileName);
+    explicit AbstractCellPopulationWriter(const std::string& rFileName);
 
     /**
      * Write the header to file.

@@ -88,7 +88,7 @@ protected:
      *
      * @param rHandler ODE handler to copy.
      */
-    CellCycleModelOdeHandler(const CellCycleModelOdeHandler& rHandler);
+    explicit CellCycleModelOdeHandler(const CellCycleModelOdeHandler& rHandler);
 
     /**
      * Timestep to use when solving the ODE system.

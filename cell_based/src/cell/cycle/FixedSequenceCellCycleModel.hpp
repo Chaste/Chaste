@@ -110,7 +110,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    FixedSequenceCellCycleModel(const FixedSequenceCellCycleModel& rModel);
+    explicit FixedSequenceCellCycleModel(const FixedSequenceCellCycleModel& rModel);
 
 public:
 

@@ -108,7 +108,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    LabelDependentBernoulliTrialCellCycleModel(const LabelDependentBernoulliTrialCellCycleModel& rModel);
+    explicit LabelDependentBernoulliTrialCellCycleModel(const LabelDependentBernoulliTrialCellCycleModel& rModel);
 
 public:
 

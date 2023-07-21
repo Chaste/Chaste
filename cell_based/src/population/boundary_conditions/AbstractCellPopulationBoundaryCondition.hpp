@@ -77,7 +77,7 @@ public:
      *
      * @param pCellPopulation pointer to the cell population.
      */
-    AbstractCellPopulationBoundaryCondition(
+    explicit AbstractCellPopulationBoundaryCondition(
         AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
 
     /**

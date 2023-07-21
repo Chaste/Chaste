@@ -283,7 +283,7 @@ public:
      *
      * @param rMesh a mutable nodes-only mesh
      */
-    NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh);
+    explicit NodeBasedCellPopulation(NodesOnlyMesh<DIM>& rMesh);
 
     /**
      * Destructor.

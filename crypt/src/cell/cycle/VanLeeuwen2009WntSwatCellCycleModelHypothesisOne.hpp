@@ -74,7 +74,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    VanLeeuwen2009WntSwatCellCycleModelHypothesisOne(const VanLeeuwen2009WntSwatCellCycleModelHypothesisOne& rModel);
+    explicit VanLeeuwen2009WntSwatCellCycleModelHypothesisOne(const VanLeeuwen2009WntSwatCellCycleModelHypothesisOne& rModel);
 
 public:
 

@@ -82,7 +82,7 @@ protected:
      *
      * @param rModel  the SRN model to copy.
      */
-    DeltaNotchSrnModel(const DeltaNotchSrnModel& rModel);
+    explicit DeltaNotchSrnModel(const DeltaNotchSrnModel& rModel);
 
 public:
 

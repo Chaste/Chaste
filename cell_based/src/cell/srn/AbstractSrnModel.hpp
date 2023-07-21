@@ -126,7 +126,7 @@ protected:
      *
      * @param rModel the SRN model to copy.
      */
-    AbstractSrnModel(const AbstractSrnModel& rModel);
+    explicit AbstractSrnModel(const AbstractSrnModel& rModel);
 
 public:
 

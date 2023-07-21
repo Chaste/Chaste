@@ -100,7 +100,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    AbstractWntOdeBasedCellCycleModel(const AbstractWntOdeBasedCellCycleModel& rModel);
+    explicit AbstractWntOdeBasedCellCycleModel(const AbstractWntOdeBasedCellCycleModel& rModel);
 
 public:
 

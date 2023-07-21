@@ -88,7 +88,7 @@ protected:
      * 
      * @param rModel SRN model to be copied
      */
-    CellSrnModel(const CellSrnModel &rModel);
+    explicit CellSrnModel(const CellSrnModel &rModel);
 
 public:
 

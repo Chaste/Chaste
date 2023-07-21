@@ -89,7 +89,7 @@ protected:
      *
      * @param rModel  the SRN model to copy.
      */
-    DeltaNotchEdgeSrnModel(const DeltaNotchEdgeSrnModel& rModel);
+    explicit DeltaNotchEdgeSrnModel(const DeltaNotchEdgeSrnModel& rModel);
 
 public:
 

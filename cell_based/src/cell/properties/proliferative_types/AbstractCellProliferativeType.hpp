@@ -92,7 +92,7 @@ public:
      *
      * @param colour  what colour cells with this proliferative type should be in the visualizer
      */
-    AbstractCellProliferativeType(unsigned colour);
+    explicit AbstractCellProliferativeType(unsigned colour);
 
     /**
      * Virtual destructor, to make this class polymorphic.

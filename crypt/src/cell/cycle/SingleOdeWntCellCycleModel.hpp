@@ -116,7 +116,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    SingleOdeWntCellCycleModel(const SingleOdeWntCellCycleModel& rModel);
+    explicit SingleOdeWntCellCycleModel(const SingleOdeWntCellCycleModel& rModel);
 
 public:
 

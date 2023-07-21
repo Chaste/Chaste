@@ -107,7 +107,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    WntCellCycleModel(const WntCellCycleModel& rModel);
+    explicit WntCellCycleModel(const WntCellCycleModel& rModel);
 
 public:
 

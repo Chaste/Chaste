@@ -101,7 +101,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    StochasticWntCellCycleModel(const StochasticWntCellCycleModel& rModel);
+    explicit StochasticWntCellCycleModel(const StochasticWntCellCycleModel& rModel);
 
 public:
     /**

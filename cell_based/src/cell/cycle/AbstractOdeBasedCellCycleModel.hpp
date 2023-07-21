@@ -96,7 +96,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    AbstractOdeBasedCellCycleModel(const AbstractOdeBasedCellCycleModel& rModel);
+    explicit AbstractOdeBasedCellCycleModel(const AbstractOdeBasedCellCycleModel& rModel);
 
 public:
 

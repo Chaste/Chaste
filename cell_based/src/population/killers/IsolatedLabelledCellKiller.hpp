@@ -77,7 +77,7 @@ public:
      *
      * @param pCellPopulation pointer to a cell population
      */
-    IsolatedLabelledCellKiller(AbstractCellPopulation<DIM>* pCellPopulation);
+    explicit IsolatedLabelledCellKiller(AbstractCellPopulation<DIM>* pCellPopulation);
 
     /**
      * Overridden CheckAndLabelCellsForApoptosisOrDeath() method.

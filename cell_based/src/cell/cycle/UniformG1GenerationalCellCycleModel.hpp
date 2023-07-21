@@ -109,7 +109,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    UniformG1GenerationalCellCycleModel(const UniformG1GenerationalCellCycleModel& rModel);
+    explicit UniformG1GenerationalCellCycleModel(const UniformG1GenerationalCellCycleModel& rModel);
 
 public:
 

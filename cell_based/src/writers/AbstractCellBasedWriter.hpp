@@ -79,7 +79,7 @@ public:
      *
      * @param rFileName the name of the file to write to.
      */
-    AbstractCellBasedWriter(const std::string& rFileName);
+    explicit AbstractCellBasedWriter(const std::string& rFileName);
 
     /**
      * Virtual destructor.

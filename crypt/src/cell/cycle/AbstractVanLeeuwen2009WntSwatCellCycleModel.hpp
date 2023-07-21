@@ -100,7 +100,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    AbstractVanLeeuwen2009WntSwatCellCycleModel(const AbstractVanLeeuwen2009WntSwatCellCycleModel& rModel);
+    explicit AbstractVanLeeuwen2009WntSwatCellCycleModel(const AbstractVanLeeuwen2009WntSwatCellCycleModel& rModel);
 
 public:
 

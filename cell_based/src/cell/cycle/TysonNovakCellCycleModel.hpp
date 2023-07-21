@@ -83,7 +83,7 @@ protected:
      *
      * @param rModel the cell cycle model to copy.
      */
-    TysonNovakCellCycleModel(const TysonNovakCellCycleModel& rModel);
+    explicit TysonNovakCellCycleModel(const TysonNovakCellCycleModel& rModel);
 
 public:
 

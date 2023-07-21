@@ -62,7 +62,7 @@ public:
      *
      * @param rCrypt The crypt
      */
-    CryptProjectionStatistics(MeshBasedCellPopulation<2>& rCrypt);
+    explicit CryptProjectionStatistics(MeshBasedCellPopulation<2>& rCrypt);
 
     /**
      * GetCryptSection method. Takes in an angle from the
