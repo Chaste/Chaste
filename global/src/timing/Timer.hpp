@@ -39,21 +39,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 
 /**
- *  A very simple lightweight benchmarking tool. Call Timer::Reset() to reset the timer
- *  and Timer::Print() to print the time elapsed to stdout.
+ * A very simple lightweight benchmarking tool. Call Timer::Reset() to reset the 
+ * timer and Timer::Print() to print the time elapsed to stdout.
  *
- *  Usage:
+ * Usage:
  *
- *  Timer::Reset();
- *  //do something
- *  Timer::PrintAndReset("First thing");
- *  //do something else
- *  Timer::Print("Other thing");
+ * Timer::Reset();
+ * // do something
+ * Timer::PrintAndReset("First thing");
+ * // do something else
+ * Timer::Print("Other thing");
  *
- *  which outputs (for example):
+ * which outputs (for example):
  *
- *  First thing time: 10s
- *  Other thing time: 2s
+ * First thing time: 10s
+ * Other thing time: 2s
  */
 class Timer
 {
@@ -70,10 +70,10 @@ public:
     static void Reset();
 
     /**
-     * Print the elapsed wall-clock time (to std::cout and the Log file (under logging-level 2))
-     * preceded by the message provided.
+     * Print the elapsed wall-clock time (to std::cout and the Log file (under 
+     * logging-level 2)) preceded by the message provided.
      *
-     * @param message
+     * @param message user-specified message
      */
     static void Print(std::string message);
 
@@ -91,10 +91,11 @@ public:
     static double GetWallTime();
 
     /**
-     * Print the elapsed wall-clock time (to std::cout and the Log file (under logging-level 2))
-     * preceded by the message provided, and also reset the timer.
+     * Print the elapsed wall-clock time (to std::cout and the Log file (under 
+     * logging-level 2)) preceded by the message provided, and also reset the 
+     * timer.
      *
-     * @param message
+     * @param message user-specified message
      */
     static void PrintAndReset(std::string message);
 };

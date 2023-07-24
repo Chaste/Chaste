@@ -34,8 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /*
- * If using older an older PETSc (pre-3.2) include some citations here from a more recent version.
- * (The following are from 3.5.2)
+ * If using older an older PETSc (pre-3.2) include some citations here from a 
+ * more recent version. (The following are from 3.5.2)
  */
 static PetscBool PetscCite1 = PETSC_FALSE;
 const char PetscCitation1[] = "@TechReport{petsc-user-ref,\n"

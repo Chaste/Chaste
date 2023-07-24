@@ -80,9 +80,8 @@ unsigned RandomNumberGenerator::randMod(unsigned base)
     /*
      * The contents of this method are copied out of
      * boost/include/boost/random/uniform_smallint.hpp lines 235 - 255
-     * as of v 1.48 (preserved at least as far as 1.51).
-     * to make sure we get the same
-     * result on earlier versions of boost.
+     * as of v 1.48 (preserved at least as far as 1.51) to make sure we get the 
+     * same result on earlier versions of boost.
      *
      * It was then simplified as we know '_min' is zero, '_max' is 'base-1u'
      * and all the types are unsigneds.
@@ -95,8 +94,10 @@ unsigned RandomNumberGenerator::randMod(unsigned base)
 
     if (base - 1u >= base_range)
     {
-        // This was in the original boost file for when '_min' is large, but here it is zero so
-        // we shouldn't ever reach this.
+        /*
+         * This was in the original boost file for when '_min' is large, but 
+         * here it is zero so we shouldn't ever reach this.
+         */
         NEVER_REACHED;
         //return val;
     }
@@ -123,8 +124,10 @@ double RandomNumberGenerator::NormalRandomDeviate(double mean, double stdDev)
 
 double RandomNumberGenerator::GammaRandomDeviate(double shape, double scale)
 {
-// make a gamma distribution and `merge' this distribution with our random number generator
-
+    /*
+     * Make a gamma distribution and `merge' this distribution with our random 
+     * number generator.
+     */
 #if BOOST_VERSION < 106400
     boost::random::gamma_distribution_v165<> gd(shape);
     boost::variate_generator<boost::mt19937&, boost::random::gamma_distribution_v165<> > var_gamma(mMersenneTwisterGenerator, gd);
@@ -137,8 +140,10 @@ double RandomNumberGenerator::GammaRandomDeviate(double shape, double scale)
 
 double RandomNumberGenerator::ExponentialRandomDeviate(double scale)
 {
-// make an exponential distribution and `merge' this distribution with our random number generator
-
+    /*
+     * Make an exponential distribution and `merge' this distribution with our 
+     * random number generator.
+     */
 #if BOOST_VERSION < 106400
     boost::random::exponential_distribution_v165<> ed(scale);
     boost::variate_generator<boost::mt19937&, boost::random::exponential_distribution_v165<> > var_exponential(mMersenneTwisterGenerator, ed);
@@ -154,7 +159,10 @@ void RandomNumberGenerator::Reseed(unsigned seed)
 {
     mMersenneTwisterGenerator.seed(seed);
 
-    // Because this does some Box-Muller type thing it remembers if you don't reset it - see #2633
+    /*
+     * Because this does some Box-Muller type thing it remembers if you don't 
+     * reset it - see #2633.
+     */
     mGenerateStandardNormal.distribution().reset();
 
     // Probably don't need to do this, but it probably is good practice!
@@ -164,7 +172,7 @@ void RandomNumberGenerator::Reseed(unsigned seed)
 void RandomNumberGenerator::Shuffle(unsigned num, std::vector<unsigned>& rValues)
 {
     rValues.resize(num);
-    for (unsigned i = 0; i < num; i++)
+    for (unsigned i = 0; i < num; ++i)
     {
         rValues[i] = i;
     }

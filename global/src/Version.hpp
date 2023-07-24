@@ -42,7 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/algorithm/string/trim.hpp>
 
 /**
- * A class with static methods providing various information about this build of Chaste.
+ * A class with static methods providing various information about this build of 
+ * Chaste.
  */
 class ChasteBuildInfo
 {
@@ -58,42 +59,43 @@ public:
     static const char* GetRootDir();
 
     /**
-     * @return A string representation of the current Chaste version. This combines the
-     * information from GetMajorReleaseNumber, GetMinorReleaseNumber, and GetRevisionNumber.
+     * @return A string representation of the current Chaste version. This 
+     *     combines the information from GetMajorReleaseNumber, 
+     *     GetMinorReleaseNumber, and GetRevisionNumber.
      */
     static std::string GetVersionString();
 
     /**
-     * @return The major number of the "current" Chaste release.
-     * If this is a development build, this will be the number of the last release.
+     * @return The major number of the "current" Chaste release. If this is a 
+     *     development build, this will be the number of the last release.
      *
      * @note This must be set manually by modifying CMakeLists.txt.
      */
     static unsigned GetMajorReleaseNumber();
 
     /**
-     * @return The minor number of the "current" Chaste release.
-     * If this is a development build, this will be the number of the last release.
+     * @return The minor number of the "current" Chaste release. If this is a 
+     *     development build, this will be the number of the last release.
      *
      * @note This must be set manually by modifying CMakeLists.txt.
      */
     static unsigned GetMinorReleaseNumber();
 
     /**
-     * @return  Get the Git revision number of the Chaste source tree.
-     *
-     * If the file ReleaseVersion.txt exists in the directory given by GetRootDir, then
-     * we assume this is not a working copy, and read the version information from there.
-     *
-     * Otherwise, we assume this is a checked-out tree, and get Git revision info via CMake
-     * during the build.  Whether the working copy is modified is ignored by this method; use
-     * IsWorkingCopyModified to test that.
+     * @return  Get the Git revision number of the Chaste source tree. If the 
+     *     file ReleaseVersion.txt exists in the directory given by GetRootDir, 
+     *     then we assume this is not a working copy, and read the version 
+     *     information from there. Otherwise, we assume this is a checked-out 
+     *     tree, and get Git revision info via CMake during the build. Whether 
+     *     the working copy is modified is ignored by this method; use 
+     *     IsWorkingCopyModified to test that.
      */
     static unsigned long long GetRevisionNumber();
 
     /**
-     * @return  If this Chaste was built from a subversion working copy, then return whether there
-     * were local modifications.  If it's not a working copy, return false.
+     * @return  If this Chaste was built from a subversion working copy, then 
+     *     return whether there were local modifications. If it's not a working 
+     *     copy, return false.
      */
     static bool IsWorkingCopyModified();
 
@@ -103,9 +105,10 @@ public:
     static const char* GetBuildTime();
 
     /**
-     * @return Get the current date and time, in the same format as GetBuildTime.
-     * The returned 'string' is statically allocated, so you don't need to free the memory.
-     * However, if you call this method again, the contents will be overwritten.
+     * @return Get the current date and time, in the same format as 
+     *     GetBuildTime. The returned 'string' is statically allocated, so you 
+     *     don't need to free the memory. However, if you call this method 
+     *     again, the contents will be overwritten.
      */
     static const char* GetCurrentTime();
 
@@ -115,8 +118,8 @@ public:
     static const char* GetBuilderUnameInfo();
 
     /**
-     * @return  Information about this build of Chaste: the build type used, whether libraries
-     * were used, and if so what kind.
+     * @return  Information about this build of Chaste: the build type used, 
+     *     whether libraries were used, and if so what kind.
      */
     static const char* GetBuildInformation();
 
@@ -151,17 +154,18 @@ public:
     static const std::map<std::string, std::string>& rGetIfProjectsModified();
 
     /**
-     * @return  A single-line string representation of the provenance information to be attached
-     * to any files we generate.  This includes the version of the Chaste code used, how and
-     * when it was built, and the current date and time.
+     * @return  A single-line string representation of the provenance 
+     *     information to be attached to any files we generate. This includes 
+     *     the version of the Chaste code used, how and when it was built, and 
+     *     the current date and time.
      */
     static std::string GetProvenanceString();
 
     /**
-     * @return  A single-line string representation the version of chaste_codegen being used.
+     * @return  A single-line string representation the version of 
+     *     chaste_codegen being used.
      */
     static std::string GetChasteCodegenVersion();
-
 };
 
 #endif // VERSION_HPP_

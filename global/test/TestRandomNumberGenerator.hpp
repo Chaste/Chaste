@@ -72,7 +72,7 @@ public:
 
         // Period of rand and random will be about 2^31-1 == INT_MAX ~= UINT_MAX/2
         TS_ASSERT_LESS_THAN_EQUALS(2147483647U /*2^31-1*/, period_srand);
-        TS_ASSERT_LESS_THAN_EQUALS((unsigned)INT_MAX, period_srand);
+        TS_ASSERT_LESS_THAN_EQUALS(static_cast<unsigned>(INT_MAX), period_srand);
         TS_ASSERT_LESS_THAN_EQUALS(period_srand, UINT_MAX);
 
         RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
@@ -314,7 +314,7 @@ public:
             for (unsigned j = 0; j < 5; j++)
             {
                 // Probability of i going to position j
-                double prob = (double)results[i][j] / num_trials;
+                double prob = static_cast<double>(results[i][j]) / num_trials;
 
                 /*
                  * This test could fail with very low probability (just rerun).

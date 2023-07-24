@@ -38,17 +38,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <petsc.h>
 #include <petscksp.h>
+
 /**
- * Throw an exception if the PETSc error number (what is generally denoted 'ierr' in
- * PETSc code) is non-zero - see PETSCEXCEPT
+ * Throw an exception if the PETSc error number (what is generally denoted 
+ * 'ierr' in PETSc code) is non-zero - see PETSCEXCEPT
  *
  * @param petscError PETSc error number
  * @param line
  * @param funct
  * @param file
  */
-extern void PetscException(PetscInt petscError, unsigned line,
-                           const char* funct, const char* file);
+extern void PetscException(
+    PetscInt petscError,
+    unsigned line,
+    const char* funct,
+    const char* file);
 
 /**
  * Throw an exception if the KSP error indicates linear solve failure - see
@@ -59,8 +63,11 @@ extern void PetscException(PetscInt petscError, unsigned line,
  * @param funct
  * @param file
  */
-extern void KspException(PetscInt kspError, unsigned line,
-                         const char* funct, const char* file);
+extern void KspException(
+    PetscInt kspError,
+    unsigned line,
+    const char* funct,
+    const char* file);
 
 /**
  * Throw a warning if the KSP error indicates linear solve failure - see
@@ -70,33 +77,28 @@ extern void KspException(PetscInt kspError, unsigned line,
  */
 extern void KspWarnIfFailed(PetscInt kspError);
 
-
-/** Helper function for above functions - convert a KSP error number into an error message */
+/**
+ * Helper function for above functions - convert a KSP error number into an 
+ * error message.
+ */
 std::string GetKspErrorMessage(PetscInt kspError);
 
-
 /**
- * Positive codes mean that there's an error.
- * Zero means success.
- * Negative codes should never happen, but we'll throw anyway.
+ * Positive codes mean that there's an error. Zero means success. Negative codes 
+ * should never happen, but we'll throw anyway.
  */
 #define PETSCEXCEPT(n) PetscException(n, __LINE__, __func__, __FILE__)
 
 /**
- * Positive codes mean that the KSP converged.
- * Negative codes mean that the KSP diverged, i.e. there's a problem.
- *
- * Throw an Exception if KSP failed to solve.
+ * Positive codes mean that the KSP converged. Negative codes mean that the KSP 
+ * diverged, i.e. there's a problem. Throw an Exception if KSP failed to solve.
  */
 #define KSPEXCEPT(n)  KspException(n, __LINE__, __func__, __FILE__)
 
 /**
- * Positive codes mean that the KSP converged.
- * Negative codes mean that the KSP diverged, i.e. there's a problem.
- *
- * Throw a Warning if KSP failed to solve.
+ * Positive codes mean that the KSP converged. Negative codes mean that the KSP 
+ * diverged, i.e. there's a problem. Throw a Warning if KSP failed to solve.
  */
 #define KSPWARNIFFAILED(n)  KspWarnIfFailed(n)
-
 
 #endif /*PETSCEXCEPTION_HPP_*/

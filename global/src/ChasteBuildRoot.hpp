@@ -38,36 +38,35 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * @file
- * A collection of functions providing information about the
- * filesystem layout of this Chaste source tree.
+ * A collection of functions providing information about the filesystem layout 
+ * of this Chaste source tree.
  */
 
 #include <string>
 
 /**
- * @return the path to the root directory of the Chaste build tree.
- * Will always give you the absolute path with a trailing slash.
+ * @return the path to the root directory of the Chaste build tree. Will always 
+ *     give you the absolute path with a trailing slash.
  */
 const char* ChasteBuildRootDir();
 
 /**
- * @return the path to the root directory of the Chaste source tree.
- * Will always give you the absolute path with a trailing slash.
+ * @return the path to the root directory of the Chaste source tree. Will always 
+ *     give you the absolute path with a trailing slash.
  */
 const char* ChasteSourceRootDir();
 
 /**
- * @return the folder in which compiled files are placed for the given
- * Chaste component.
- * Will always give you the absolute path with a trailing slash.
- *
  * @param rComponent  e.g. global, heart, pde, ...
+ * 
+ * @return the folder in which compiled files are placed for the given Chaste 
+ * component. Will always give you the absolute path with a trailing slash.
  */
 std::string ChasteComponentBuildDir(const std::string& rComponent);
 
 /**
- * @return the name of the folder within the 'build' dir of a component
- * that contains the compiled files.
+ * @return the name of the folder within the 'build' dir of a component that 
+ *     contains the compiled files.
  */
 std::string ChasteBuildDirName();
 

@@ -42,36 +42,45 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * This is a helper class to handle a FIFO collection of subdirectories.
  *
- * All the subdirectories will be created inside a base directory provided
- * in the constructor. The maximum number of concurrent subdirectories is
- * specified in the the constructor. Once this number is reached, the next
- * call to CreateNextDir() will delete the oldest directory as a side effect.
+ * All the subdirectories will be created inside a base directory provided in 
+ * the constructor. The maximum number of concurrent subdirectories is specified 
+ * in the the constructor. Once this number is reached, the next call to 
+ * CreateNextDir() will delete the oldest directory as a side effect.
  */
 class OutputDirectoryFifoQueue
 {
 private:
 
-    std::string mBaseDirectory; /**< Base directory for all the subdirectories to be created. */
-    unsigned mQueueMaxSize; /**< Maximum number of subdirectories*/
-    std::queue<std::string> mQueue;  /**<The queue of names of subdirectories currently on the disk*/
+    /** Base directory for all the subdirectories to be created. */
+    std::string mBaseDirectory;
+
+    /** Maximum number of subdirectories. */
+    unsigned mQueueMaxSize;
+
+    /** The queue of names of subdirectories currently on the disk. */
+    std::queue<std::string> mQueue;
 
 public:
 
     /**
      * Constructor.
      *
-     * @param rBaseDirectory base directory for all the subdirectories to be created
+     * @param rBaseDirectory base directory for all the subdirectories to be 
+     *     created
      * @param queueMaxSize maximum number of subdirectories
      */
-    OutputDirectoryFifoQueue(const std::string& rBaseDirectory, unsigned queueMaxSize);
+    OutputDirectoryFifoQueue(
+        const std::string& rBaseDirectory,
+        unsigned queueMaxSize);
 
     /**
-     * Creates a subdirectory called rSubdirectoryName deleting the oldest subdirectory
-     * if the maximum number has been reached.
+     * Creates a subdirectory called rSubdirectoryName deleting the oldest 
+     * subdirectory if the maximum number has been reached.
      *
      * @note Must be called collectively.
      *
      * @param rSubdirectoryName subdirectory name
+     * 
      * @return new directory name relative to the base directory
      */
     std::string CreateNextDir(const std::string& rSubdirectoryName);

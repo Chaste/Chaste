@@ -64,7 +64,10 @@ public:
      * @param startTime the start time
      * @param endTime the end time
      */
-    ProgressReporter(std::string outputDirectory, double startTime, double endTime);
+    ProgressReporter(
+        std::string outputDirectory,
+        double startTime,
+        double endTime);
 
     /**
      * Destructor.
@@ -72,8 +75,8 @@ public:
     ~ProgressReporter();
 
     /**
-     * Calculates the percentage completed using the time given and the start and end
-     * time and prints to file if another percent has been done.
+     * Calculates the percentage completed using the time given and the start 
+     * and end time and prints to file if another percent has been done.
      *
      * @param currentTime the given time
      */

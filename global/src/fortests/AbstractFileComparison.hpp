@@ -49,43 +49,47 @@ class AbstractFileComparison
 public:
 
     /**
-     * Specify two files to compare, and open them for reading.
-     * Actual comparison is done by calling CompareFiles.
+     * Specify two files to compare, and open them for reading. Actual 
+     * comparison is done by calling CompareFiles.
      *
      * @param rFileFinder1  first file
      * @param rFileFinder2  second file
-     * @param calledCollectively  If true there will be a barrier before opening files, and only master compares contents.
-     * @param suppressOutput  If true then no errors will go to TS_TRACE(). Should only be set for the test of this class.
+     * @param calledCollectively  If true there will be a barrier before opening 
+     *     files, and only master compares contents.
+     * @param suppressOutput  If true then no errors will go to TS_TRACE(). 
+     *     Should only be set for the test of this class.
      */
     AbstractFileComparison(const FileFinder& rFileFinder1,
                            const FileFinder& rFileFinder2,
                            bool calledCollectively,
-                           bool suppressOutput):
-        mFilename1(rFileFinder1.GetAbsolutePath()),
-        mFilename2(rFileFinder2.GetAbsolutePath()),
-        mCalledCollectively(calledCollectively),
-        mSuppressOutput(suppressOutput)
+                           bool suppressOutput)
+        : mFilename1(rFileFinder1.GetAbsolutePath()),
+          mFilename2(rFileFinder2.GetAbsolutePath()),
+          mCalledCollectively(calledCollectively),
+          mSuppressOutput(suppressOutput)
     {
         Setup();
     }
 
     /**
-     * Specify two files to compare, and open them for reading.
-     * Actual comparison is done by calling CompareFiles.
+     * Specify two files to compare, and open them for reading. Actual 
+     * comparison is done by calling CompareFiles.
      *
      * @param fileName1  first file
      * @param fileName2  second file
-     * @param calledCollectively  If true there will be a barrier before opening files, and only master compares contents.
-     * @param suppressOutput  If true then no errors will go to TS_TRACE(). Should only be set for the test of this class.
+     * @param calledCollectively  If true there will be a barrier before opening 
+     *     files, and only master compares contents.
+     * @param suppressOutput  If true then no errors will go to TS_TRACE(). 
+     *     Should only be set for the test of this class.
      */
     AbstractFileComparison(std::string fileName1,
                            std::string fileName2,
                            bool calledCollectively,
-                           bool suppressOutput):
-        mFilename1(fileName1),
-        mFilename2(fileName2),
-        mCalledCollectively(calledCollectively),
-        mSuppressOutput(suppressOutput)
+                           bool suppressOutput)
+        : mFilename1(fileName1),
+          mFilename2(fileName2),
+          mCalledCollectively(calledCollectively),
+          mSuppressOutput(suppressOutput)
     {
         Setup();
     }
@@ -115,21 +119,33 @@ protected:
     std::ifstream* mpFile1; /**< First file */
     std::ifstream* mpFile2; /**< Second file */
 
-    unsigned mLineNum; /**< Counter for the line number we are on (in FileComparision) */
+    /** Counter for the line number we are on (in FileComparison) */
+    unsigned mLineNum;
 
-    bool mCalledCollectively; /**< If true there will be a barrier before opening files, and only master compares contents. */
+    /**
+     * If true there will be a barrier before opening files, and only master 
+     * compares contents.
+     */
+    bool mCalledCollectively;
 
-    /** Whether we should suppress output from this class, just for a clean looking test */
+    /**
+     * Whether we should suppress output from this class, just for a clean 
+     * looking test.
+     */
     bool mSuppressOutput;
 
     /**
-     * This method closes and reopens files so that another CompareFiles() command can be run on the same object.
+     * This method closes and reopens files so that another CompareFiles() 
+     * command can be run on the same object.
      */
     void ResetFiles()
     {
         if (!mCalledCollectively || PetscTools::AmMaster())
         {
-            // We want to reset the files to allow this method to be called again, with different tolerances for instance.
+            /*
+             * We want to reset the files to allow this method to be called 
+             * again, with different tolerances for instance.
+             */
             mpFile1->close();
             mpFile2->close();
             mpFile1->open(mFilename1.c_str());
@@ -139,7 +155,9 @@ protected:
     }
 
     /**
-     * This helper method just moves forward the two file pointers to skip some header lines.
+     * This helper method just moves forward the two file pointers to skip some 
+     * header lines.
+     * 
      * @param numLinesToSkip  The number of header lines to skip
      */
     void SkipHeaderLines(unsigned numLinesToSkip)
@@ -151,8 +169,12 @@ protected:
                 char buffer[1024];
                 mpFile1->getline(buffer, 1024);
                 mpFile2->getline(buffer, 1024);
-                TS_ASSERT(!mpFile1->fail()); // Here we assume there are at least "ignoreFirstFewLines" lines...
-                TS_ASSERT(!mpFile2->fail()); // ...and that they are lines of no more than 1024 characters
+
+                // Assume there are at least "ignoreFirstFewLines" lines...
+                TS_ASSERT(!mpFile1->fail()); 
+
+                // ...and they are lines of no more than 1024 characters
+                TS_ASSERT(!mpFile2->fail()); 
                 mLineNum++;
             }
         }

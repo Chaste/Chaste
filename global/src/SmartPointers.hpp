@@ -38,14 +38,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * @file
- * Includes the Boost shared_ptr smart pointer, and defines some useful macros to save
- * typing when using it.
+ * Includes the Boost shared_ptr smart pointer, and defines some useful macros 
+ * to save typing when using it.
  */
 
 #include <boost/shared_ptr.hpp>
 
 /**
  * Create a new instance of a class and assign it to a smart pointer.
+ * 
  * @param ABS_TYPE  the type of the base of the class hierarchy
  * @param TYPE  the type of the concrete instance to create
  * @param NAME  the name of the pointer variable
@@ -55,6 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * Create a new instance of a class and assign it to a smart pointer.
+ * 
  * @param TYPE  the type of the concrete instance to create
  * @param NAME  the name of the pointer variable
  * @param ARGS  constructor arguments for the instance, in brackets
@@ -63,6 +65,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * Create a new instance of a class and assign it to a smart pointer.
+ * 
  * @param TYPE  the type of the concrete instance to create
  * @param NAME  the name of the pointer variable
  */
@@ -70,6 +73,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * Create a new class instance and reset a smart pointer to point at it.
+ * 
  * @param NAME  the name of the pointer variable
  * @param TYPE  the type of the concrete instance to create
  * @param ARGS  constructor arguments for the instance, in brackets

@@ -41,17 +41,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/split_member.hpp>
 
 /**
- * This is a "wrapper" allowing more straightforward serialization of singleton classes.
- * Any singleton class which needs to be serialized should inherit from this base.  It
- * provides both part of the "singleton-ness" (by inheriting from boost::noncopyable),
- * and also a method GetSerializationWrapper().  Users of the singleton which wish to
- * serialize it should not do so directly.  Instead, they should call GetSerializationWrapper
- * and serialize the returned pointer.  Doing so will ensure that only a single global
- * instance of the singleton is maintained when loading from an archive.
+ * This is a "wrapper" allowing more straightforward serialization of singleton 
+ * classes. Any singleton class which needs to be serialized should inherit from 
+ * this base. It provides both part of the "singleton-ness" (by inheriting from 
+ * boost::noncopyable), and also a method GetSerializationWrapper(). Users of 
+ * the singleton which wish to serialize it should not do so directly. Instead, 
+ * they should call GetSerializationWrapper and serialize the returned pointer. 
+ * Doing so will ensure that only a single global instance of the singleton is 
+ * maintained when loading from an archive.
  *
- * Note that if this is not done, and the singleton is serialized directly via the
- * instance pointer, then objects loaded from the archive will refer to a different instance
- * of the singleton from other code!
+ * Note that if this is not done, and the singleton is serialized directly via 
+ * the instance pointer, then objects loaded from the archive will refer to a 
+ * different instance of the singleton from other code!
  *
  * Usage examples:
  *
@@ -73,15 +74,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             archive & p_wrapper;
  * \endcode
  *
- * Note that immediately after a load the wrapper pointer loaded into becomes invalid; call
- * GetSerializationWrapper again if you need a new wrapper for a subsequent save.
+ * Note that immediately after a load the wrapper pointer loaded into becomes 
+ * invalid; call GetSerializationWrapper again if you need a new wrapper for a 
+ * subsequent save.
  */
 template<class SINGLETON_CLASS>
 class SerializableSingleton : private boost::noncopyable
 {
 public:
     /**
-     * @return the wrapper object to use to serialize the related singleton instance.
+     * @return the wrapper object to use to serialize the related singleton 
+     *     instance.
      */
     SerializableSingleton<SINGLETON_CLASS>* GetSerializationWrapper() const
     {
@@ -118,11 +121,13 @@ private:
         archive & *p_instance;
         archive & p_instance;
 
-        // To avoid a memory leak, we now need to delete this (temporary) wrapper, and
-        // ideally tell the archive that it should be using the instance's instead.
-        // Unfortunately reset_object_address doesn't work from within load(), so we
-        // just create a new wrapper each time; not too bad.
-        //archive.reset_object_address(p_instance->GetSerializationWrapper(), this);
+        /*
+         * To avoid a memory leak, we now need to delete this (temporary) 
+         * wrapper, and ideally tell the archive that it should be using the 
+         * instance's instead. Unfortunately reset_object_address doesn't work 
+         * from within load(), so we just create a new wrapper each time; not 
+         * too bad.
+         */
         delete this;
     }
     BOOST_SERIALIZATION_SPLIT_MEMBER()

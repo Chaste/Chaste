@@ -94,8 +94,8 @@ public:
         TS_ASSERT_EQUALS(local_size, factory2.GetLocalOwnership());
         TS_ASSERT_EQUALS(total, factory2.GetProblemSize());
 
-        TS_ASSERT_EQUALS((unsigned)(petsc_hi), factory2.GetHigh());
-        TS_ASSERT_EQUALS((unsigned)(petsc_lo), factory2.GetLow());
+        TS_ASSERT_EQUALS(static_cast<unsigned>(petsc_hi), factory2.GetHigh());
+        TS_ASSERT_EQUALS(static_cast<unsigned>(petsc_lo), factory2.GetLow());
 
         // Uneven test (as above): calculate total number of elements in the vector
         unsigned total_elements = (num_procs+1)*num_procs/2;
@@ -110,8 +110,8 @@ public:
         unsigned expected_lo = (my_rank+1)*my_rank/2;
         unsigned expected_hi = (my_rank+2)*(my_rank+1)/2;
 
-        TS_ASSERT_EQUALS((unsigned)petsc_lo, expected_lo);
-        TS_ASSERT_EQUALS((unsigned)petsc_hi, expected_hi);
+        TS_ASSERT_EQUALS(static_cast<unsigned>(petsc_lo), expected_lo);
+        TS_ASSERT_EQUALS(static_cast<unsigned>(petsc_hi), expected_hi);
 
         PetscTools::Destroy(petsc_vec);
         PetscTools::Destroy(petsc_vec2);
@@ -168,8 +168,8 @@ public:
         // calculate the range
         PetscInt petsc_lo, petsc_hi;
         VecGetOwnershipRange(vec, &petsc_lo, &petsc_hi);
-        unsigned lo=(unsigned)petsc_lo;
-        unsigned hi=(unsigned)petsc_hi;
+        unsigned lo = static_cast<unsigned>(petsc_lo);
+        unsigned hi = static_cast<unsigned>(petsc_hi);
         // create 20 element petsc vector
         Vec striped;
         VecCreateMPI(PETSC_COMM_WORLD, 2*(hi-lo) , 2*vec_size, &striped);
@@ -265,7 +265,7 @@ public:
              index!= distributed_vector.End();
              ++index)
         {
-            distributed_vector[index] =  -(double)(index.Local*index.Global);
+            distributed_vector[index] = -static_cast<double>(index.Local*index.Global);
             linear[index] =  -1;
             quadratic[index] =  index.Local+1;
             linear_chunk[index] = -1;
@@ -281,8 +281,8 @@ public:
         // Calculate my range
         PetscInt petsc_lo, petsc_hi;
         VecGetOwnershipRange(petsc_vec,&petsc_lo,&petsc_hi);
-        unsigned lo = (unsigned)petsc_lo;
-        unsigned hi = (unsigned)petsc_hi;
+        unsigned lo = static_cast<unsigned>(petsc_lo);
+        unsigned hi = static_cast<unsigned>(petsc_hi);
 
         // Read some values
         double* p_striped;
@@ -294,7 +294,7 @@ public:
         for (unsigned global_index=lo; global_index<hi; global_index++)
         {
             unsigned local_index = global_index - lo;
-            TS_ASSERT_EQUALS(p_vec[local_index], -(double)local_index*global_index);
+            TS_ASSERT_EQUALS(p_vec[local_index], -static_cast<double>(local_index*global_index));
             TS_ASSERT_EQUALS(p_striped[2*local_index], -1.0);
             TS_ASSERT_EQUALS(p_striped[2*local_index+1], local_index+1);
 
@@ -351,8 +351,8 @@ public:
         unsigned expected_lo = (my_rank+1)*my_rank/2;
         unsigned expected_hi = (my_rank+2)*(my_rank+1)/2;
 
-        TS_ASSERT_EQUALS((unsigned)petsc_lo, expected_lo);
-        TS_ASSERT_EQUALS((unsigned)petsc_hi, expected_hi);
+        TS_ASSERT_EQUALS(static_cast<unsigned>(petsc_lo), expected_lo);
+        TS_ASSERT_EQUALS(static_cast<unsigned>(petsc_hi), expected_hi);
 
         // Test that we are able to share the global low values
         std::vector<unsigned> global_lows = factory.rGetGlobalLows();
@@ -375,7 +375,7 @@ public:
                     index!= distributed_vector.End();
                     ++index)
             {
-                distributed_vector[index] = (double) PetscTools::GetMyRank();
+                distributed_vector[index] = static_cast<double>(PetscTools::GetMyRank());
             }
        }
 
@@ -393,7 +393,7 @@ public:
                     index!= distributed_vector_read.End();
                     ++index)
             {
-                TS_ASSERT_EQUALS(distributed_vector_read[index], (double) PetscTools::GetMyRank());
+                TS_ASSERT_EQUALS(distributed_vector_read[index], static_cast<double>(PetscTools::GetMyRank()));
                 distributed_vector_read[index] = 2.0;
             }
         }

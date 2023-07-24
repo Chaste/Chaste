@@ -39,7 +39,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "PetscTools.hpp"
 
-ProgressReporter::ProgressReporter(std::string outputDirectory, double startTime, double endTime)
+ProgressReporter::ProgressReporter(
+    std::string outputDirectory,
+    double startTime,
+    double endTime)
     : mStartTime(startTime),
       mEndTime(endTime),
       mLastPercentage(UINT_MAX)
@@ -60,7 +63,7 @@ ProgressReporter::~ProgressReporter()
 {
     if (PetscTools::AmMaster())
     {
-        if (mLastPercentage!=100)
+        if (mLastPercentage != 100)
         {
             *mpFile << "100% completed" << std::endl;
         }
@@ -71,8 +74,10 @@ ProgressReporter::~ProgressReporter()
 
 void ProgressReporter::Update(double currentTime)
 {
-    unsigned percentage = (unsigned)( (currentTime - mStartTime)/(mEndTime - mStartTime)*100 );
-    if (mLastPercentage==UINT_MAX || percentage > mLastPercentage)
+    unsigned percentage = 
+        static_cast<unsigned>((currentTime - mStartTime)/(mEndTime - mStartTime)*100);
+
+    if (mLastPercentage == UINT_MAX || percentage > mLastPercentage)
     {
         if (PetscTools::AmMaster())
         {

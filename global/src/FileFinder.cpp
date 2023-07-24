@@ -146,7 +146,7 @@ void FileFinder::SetPath(const std::string& rRelativePath, RelativeTo::Value rel
     }
 
     // Remove any trailing /
-    std::string::iterator it = mAbsPath.end();
+    auto it = mAbsPath.end();
     while (it != mAbsPath.begin() && *(--it) == '/')
     {
         // Iterator was decremented in the while test

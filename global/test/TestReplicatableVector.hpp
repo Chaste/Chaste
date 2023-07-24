@@ -57,7 +57,7 @@ public:
 
         TS_ASSERT_EQUALS(rep_vector[0], 15);
         TS_ASSERT_EQUALS(rep_vector[1], 20);
-        TS_ASSERT_EQUALS(rep_vector.GetSize(), (unsigned) VEC_SIZE);
+        TS_ASSERT_EQUALS(rep_vector.GetSize(), static_cast<unsigned>(VEC_SIZE));
 
         rep_vector.Resize(5);
         TS_ASSERT_EQUALS(rep_vector.GetSize(), 5u);

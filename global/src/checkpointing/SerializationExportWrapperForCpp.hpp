@@ -39,8 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * @file
  *
- * Companion file to SerializationExportWrapper.hpp, for inclusion
- * in .cpp files.  See SerializationExportWrapper.hpp for more information.
+ * Companion file to SerializationExportWrapper.hpp, for inclusion in .cpp 
+ * files. See SerializationExportWrapper.hpp for more information.
  */
 
 #define CHASTE_SERIALIZATION_CPP

@@ -39,8 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "GenericEventHandler.hpp"
 
 /**
- * An event handler class with event types suitable for cardiac electrophysiological
- * simulations.
+ * An event handler class with event types suitable for cardiac 
+ * electrophysiological simulations.
  *
  * It also contains events suitable to most generic PDE solvers too.
  */
@@ -48,7 +48,9 @@ class HeartEventHandler : public GenericEventHandler<16, HeartEventHandler>
 {
 public:
 
-    /** Character array holding heart event names. There are eleven heart events. */
+    /**
+     * Character array holding heart event names. There are eleven heart events. 
+     */
     static const char* EventName[16];
 
     /** Definition of heart event types. */

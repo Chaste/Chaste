@@ -40,15 +40,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 
 /**
- * "Mix-in" base class for any class that needs to provide a unique ID specifying
- * what type the derived class is.
+ * "Mix-in" base class for any class that needs to provide a unique ID 
+ * specifying what type the derived class is.
  *
- * All you need to do to use this is inherit from this class at the base of
- * your hierarchy, and provide a Boost Serialization export key for every
- * concrete class.  Also, any test in which the GetIdentifier method is used,
- * even via the main cell_based code, \b must include CheckpointArchiveTypes.hpp
- * or CellBasedSimulationArchiver.hpp as the first Chaste header included.
- * Failure to do so will result in a segmentation fault.
+ * All you need to do to use this is inherit from this class at the base of your 
+ * hierarchy, and provide a Boost Serialization export key for every concrete 
+ * class. Also, any test in which the GetIdentifier method is used, even via the 
+ * main cell_based code, \b must include CheckpointArchiveTypes.hpp or 
+ * CellBasedSimulationArchiver.hpp as the first Chaste header included. Failure 
+ * to do so will result in a segmentation fault.
  */
 class Identifiable
 {
@@ -60,8 +60,6 @@ public:
     virtual ~Identifiable();
 
     /**
-     * @return the unique identifier of the concrete class.
-     *
      * This method uses Boost's serialization's extended_type_info and returns
      * the identifier of the derived class (this is defined when the macro
      * CHASTE_CLASS_EXPORT is invoked in each derived class, and is usually just
@@ -69,21 +67,23 @@ public:
      *
      * Note that you must include the header CheckpointArchiveTypes.hpp in any
      * test suite that calls this method.
+     * 
+     * @return the unique identifier of the concrete class.
      */
     std::string GetIdentifier() const;
 
 private:
 
     /**
-     * @return a name which is suitable for use as an XML element name
      * Templated classes get Boost Serialization export keys that look like
-     * "pack<void (NameOfDerivedType< DIM >)>::type".
-     * This method converts it to a nice name suitable for use as an XML element name,
-     * i.e. of the form "NameOfDerivedType-DIM".
-     * Works for classes templated over any number of parameters, providing the
-     * values are allowable in XML element names.
-     *
+     * "pack<void (NameOfDerivedType< DIM >)>::type". This method converts it to 
+     * a nice name suitable for use as an XML element name, i.e. of the form 
+     * "NameOfDerivedType-DIM". Works for classes templated over any number of 
+     * parameters, providing the values are allowable in XML element names.
+     * 
      * @param identifier  the identifier to tidy
+     * 
+     * @return a name which is suitable for use as an XML element name
      */
     std::string TidyTemplatedExportIdentifier(std::string identifier) const;
 };

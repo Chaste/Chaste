@@ -38,10 +38,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 bool DistributedVector::IsGlobalIndexLocal(unsigned globalIndex)
 {
-    return (mLo<=globalIndex && globalIndex<mHi);
+    return (mLo <= globalIndex && globalIndex < mHi);
 }
 
-DistributedVector::DistributedVector(Vec vec, DistributedVectorFactory* pFactory, bool readOnly)
+DistributedVector::DistributedVector(
+    Vec vec,
+    DistributedVectorFactory* pFactory,
+    bool readOnly)
     : mVec(vec),
       mpFactory(pFactory),
       mReadOnly(readOnly)
@@ -55,7 +58,7 @@ DistributedVector::DistributedVector(Vec vec, DistributedVectorFactory* pFactory
 
     if (mReadOnly)
     {
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) // PETSc 3.2 or later
         // Request read-only access properly
         VecGetArrayRead(vec, (const PetscScalar**)&mpVec);
 #else
@@ -71,14 +74,14 @@ DistributedVector::DistributedVector(Vec vec, DistributedVectorFactory* pFactory
     // Set mSizeMultiplier by reading the vec size.
     PetscInt size;
     VecGetSize(vec, &size);
-    mSizeMultiplier = (unsigned) size / mProblemSize;
-    assert ((mSizeMultiplier * mProblemSize) == (unsigned)size);
+    mSizeMultiplier = static_cast<unsigned>(size) / mProblemSize;
+    assert((mSizeMultiplier * mProblemSize) == static_cast<unsigned>(size));
 }
 
 double& DistributedVector::operator[](unsigned globalIndex)
 {
     assert(mSizeMultiplier == 1);
-    if (mLo<=globalIndex && globalIndex<mHi)
+    if (mLo <= globalIndex && globalIndex < mHi)
     {
         return mpVec[globalIndex - mLo];
     }
@@ -96,16 +99,11 @@ void DistributedVector::Restore()
     assert(mReadOnly == false);
     VecRestoreArray(mVec, &mpVec);
 
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
-    /**
-     * mpVec is NULL after this function call
-     */
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) // PETSc 3.2 or later
+    // mpVec is NULL after this function call
     VecGetArray(mVec, &mpVec);
 #endif
-
 }
-
-// Iterator class
 
 bool DistributedVector::Iterator::operator!=(const Iterator& rOther)
 {
@@ -118,8 +116,6 @@ DistributedVector::Iterator& DistributedVector::Iterator::operator++()
     Global++;
     return(*this);
 }
-
-// Iterator creation
 
 DistributedVector::Iterator DistributedVector::Begin()
 {

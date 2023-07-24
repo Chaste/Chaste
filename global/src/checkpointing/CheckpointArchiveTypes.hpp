@@ -41,9 +41,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Boost library includes for the archive types used by Chaste.
  *
- * Intended for use by SerializationExportWrapper.hpp, by tests of
- * archiving and code that needs to directly create an archive itself
- * e.g. *SimulationArchiver classes.
+ * Intended for use by SerializationExportWrapper.hpp, by tests of archiving and 
+ * code that needs to directly create an archive itself, e.g. 
+ * *SimulationArchiver classes.
  */
 
 #include <boost/archive/text_iarchive.hpp>

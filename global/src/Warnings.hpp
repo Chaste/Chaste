@@ -42,50 +42,55 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * The Warnings singleton class collects warnings via the AddWarning() method
- * or the WARNING macro.  This is to provide a mechanism for informing the user of
- * error which are less severe than those demanding exceptions or assertions. (Errors
- * which can be repaired immediately.)
+ * or the WARNING macro.  This is to provide a mechanism for informing the user 
+ * of error which are less severe than those demanding exceptions or assertions. 
+ * (Errors which can be repaired immediately.)
  *
  * Warnings can be polled with GetNumWarnings() and GetNextWarningMessage().
- * Warnings can be ignored and destroyed with QuietDestroy().
- * All warnings left at the close of the test suite (not the individual test), or
- * the close of the executable, will be printed to the screen.
+ * Warnings can be ignored and destroyed with QuietDestroy(). All warnings left 
+ * at the close of the test suite (not the individual test), or the close of the 
+ * executable, will be printed to the screen.
  */
 class Warnings
 {
 private:
 
-    static Warnings* mpInstance; /**<  Pointer to the single instance. For use as singleton */
+    /** Pointer to the single instance. For use as singleton. */
+    static Warnings* mpInstance; 
 
-    /** Container type for warnings */
+    /** Container type for warnings. */
     typedef std::deque<std::pair<std::string, std::string> > WarningsContainerType;
 
-    WarningsContainerType mWarningMessages; /**< Warnings messages.  First in pair is the context (line number etc.).  Second in pair is the actual warning, */
+    /**
+     * Warnings messages. First in pair is the context (line number etc.). 
+     * Second in pair is the actual warning.
+     */
+    WarningsContainerType mWarningMessages;
 
 protected:
 
     /**
-     * Protected constructor.
-     * Use Instance() to access the Warnings singleton.
+     * Protected constructor. Use Instance() to access the Warnings singleton.
      */
     Warnings();
 
 public:
 
     /**
-     * Default destroyer (takes the place of a destructor, using the std::atexit directive).
-     * Prints all warning messages to stdout.
+     * Default destroyer (takes the place of a destructor, using the std::atexit 
+     * directive). Prints all warning messages to stdout.
      */
     static void NoisyDestroy();
 
     /**
-     * Public destroyer (takes the place of a destructor but is called by the user to make sure
-     * that no warnings appear).
+     * Public destroyer (takes the place of a destructor but is called by the 
+     * user to make sure that no warnings appear).
      */
     static void QuietDestroy();
 
     /**
-     * Prints all warning messages to stdout without changing the state of the Warnings.
+     * Prints all warning messages to stdout without changing the state of the 
+     * Warnings.
      */
     static void PrintWarnings();
 
@@ -94,21 +99,28 @@ public:
      *
      * @param rMessage  the message
      * @param rFilename  which source file threw the exception
-     * @param lineNumber  which line number of the source file threw the exception
-     * @param onlyOnce  whether to only log the first warning thrown from this location
+     * @param lineNumber  which line number of the source file threw the 
+     *     exception
+     * @param onlyOnce  whether to only log the first warning thrown from this 
+     *     location
      */
-    void AddWarning(const std::string& rMessage, const std::string& rFilename, unsigned lineNumber, bool onlyOnce=false);
+    void AddWarning(
+      const std::string& rMessage,
+      const std::string& rFilename,
+      unsigned lineNumber,
+      bool onlyOnce=false);
 
     /**
      * Get the message associated with the exception with file and line number.
      *
-     * @return The message set when the exception was thrown including file and line number information
+     * @return The message set when the exception was thrown including file and 
+     *     line number information
      */
     std::string PopWarning() const;
 
     /**
-     * @return a pointer to the Warnings object.
-     * The object is created the first time this method is called.
+     * @return a pointer to the Warnings object. The object is created the first 
+     *     time this method is called.
      */
     static Warnings* Instance();
 
@@ -118,7 +130,7 @@ public:
     unsigned GetNumWarnings();
 
     /**
-     * @return next warning.  Remove and inspect a warning.
+     * @return next warning. Remove and inspect a warning.
      */
     std::string GetNextWarningMessage();
 };
@@ -131,9 +143,9 @@ public:
 }
 
 /**
- * Warn only the first time line is reached. Note: this does not base whether to not warn
- * again on the message content, just on whether the line of code where this macro is placed
- * has been reached. In other words:
+ * Warn only the first time line is reached. Note: this does not base whether to 
+ * not warn again on the message content, just on whether the line of code where 
+ * this macro is placed has been reached. In other words:
  *
  * for (unsigned i=0; i<10; i++)
  * {
@@ -147,10 +159,10 @@ public:
  *
  * will warn twice.
  */
-#define WARN_ONCE_ONLY(message)                                                     \
-{                                                                                   \
-    std::stringstream msg_stream;                                                   \
-    msg_stream << message;                                                          \
-    Warnings::Instance()->AddWarning(msg_stream.str(), __FILE__, __LINE__, true);   \
+#define WARN_ONCE_ONLY(message)                                                   \
+{                                                                                 \
+    std::stringstream msg_stream;                                                 \
+    msg_stream << message;                                                        \
+    Warnings::Instance()->AddWarning(msg_stream.str(), __FILE__, __LINE__, true); \
 }
 #endif // _WARNINGS_HPP_

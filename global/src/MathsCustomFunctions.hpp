@@ -74,7 +74,7 @@ unsigned SmallPow(unsigned x, unsigned exponent);
 bool Divides(double smallerNumber, double largerNumber);
 
 /**
- * @return the result of dividing (unsigned) numerator by denominator,
+ * @return the result of dividing static_cast<unsigned> numerator by denominator,
  * rounded up (away from 0), and overflow-safe for large integers up to UINT_MAX.
  *
  * @param numerator the numerator

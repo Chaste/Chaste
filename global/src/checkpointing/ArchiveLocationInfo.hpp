@@ -42,17 +42,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * Mini-class to help with 'archiving' various classes that don't write their
- * data directly to the archive file.  They thus need to know information
- * about where the archive is being written to, in order to write their own
- * files into the same folder.  The main methods are GetArchiveDirectory and
+ * data directly to the archive file. They thus need to know information about 
+ * where the archive is being written to, in order to write their own files into 
+ * the same folder. The main methods are GetArchiveDirectory and 
  * SetArchiveDirectory.
  *
  * This functionality is used by the meshes, LinearSystem and HeartConfig.
  *
  * For the benefit of the meshes (and the cell_based code), there are also
- * shortcut methods SetMeshPathname and GetMeshFilename, allowing you to
- * specify the base file name for the mesh.  This is needed because the cell_based
- * code adds timestamp information to the file name.
+ * shortcut methods SetMeshPathname and GetMeshFilename, allowing you to specify 
+ * the base file name for the mesh. This is needed because the cell_based code 
+ * adds timestamp information to the file name.
  */
 class ArchiveLocationInfo
 {
@@ -72,20 +72,26 @@ public:
      * @param rDirectory  the directory to write to.
      * @param rFilename  the base name (minus extension) for the mesh files.
      */
-    static void SetMeshPathname(const FileFinder& rDirectory, const std::string& rFilename);
+    static void SetMeshPathname(
+        const FileFinder& rDirectory,
+        const std::string& rFilename);
 
     /**
      * Set the location to write mesh files.
      *
-     * @param rDirectory  the directory to write to (if relative, assumes relative to CHASTE_TEST_OUTPUT).
+     * @param rDirectory  the directory to write to (if relative, assumes 
+     *     relative to CHASTE_TEST_OUTPUT).
      * @param rFilename  the base name (minus extension) for the mesh files.
      */
-    static void SetMeshPathname(const std::string& rDirectory, const std::string& rFilename);
+    static void SetMeshPathname(
+        const std::string& rDirectory,
+        const std::string& rFilename);
 
     /**
      * Set the filename for mesh files.
      *
-     * @param rFilename  the base name (minus extension) for the mesh files, used to put on a timestamp.
+     * @param rFilename  the base name (minus extension) for the mesh files, 
+     *     used to put on a timestamp.
      */
     static void SetMeshFilename(const std::string& rFilename);
 
@@ -97,17 +103,17 @@ public:
     static std::string GetMeshFilename();
 
     /**
-     * Get the directory that archives are being written to.
-     * Will always end in a '/'.
+     * Get the directory that archives are being written to. Will always end in 
+     * a '/'.
      *
      * @return full path to directory
      */
     static std::string GetArchiveDirectory();
 
     /**
-     * Get the full path to an output file which has a name unique to the current
-     * process.  Useful for ensuring that each process writes to / reads from a
-     * separate file when running in parallel.
+     * Get the full path to an output file which has a name unique to the 
+     * current process. Useful for ensuring that each process writes to / reads 
+     * from a separate file when running in parallel.
      *
      * The path will have the form "path_to_output_dir/rFileName.process_rank"
      *
@@ -115,8 +121,9 @@ public:
      * @param procId  the process id number (defaults to current process)
      * @return a full path to the file for this process
      */
-    static std::string GetProcessUniqueFilePath(const std::string& rFileName,
-                                                unsigned procId=PetscTools::GetMyRank());
+    static std::string GetProcessUniqueFilePath(
+        const std::string& rFileName,
+        unsigned procId=PetscTools::GetMyRank());
 
     /**
      * Set the directory that archives are being written to.
@@ -126,9 +133,9 @@ public:
     static void SetArchiveDirectory(const FileFinder& rDirectory);
 
     /**
-     * Get the directory to which the archives are being written.
-     * Remove CHASTE_TEST_OUTPUT prefix (assuming it exists); if it doesn't, returns the absolute path.
-     * Will always end in a '/'.
+     * Get the directory to which the archives are being written. Remove 
+     * CHASTE_TEST_OUTPUT prefix (assuming it exists); if it doesn't, returns 
+     * the absolute path. Will always end in a '/'.
      *
      * @return relative path to directory
      */

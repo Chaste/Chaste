@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @file
  *
  * Defines some macros to register versions of templated classes with the
- * serialization library, for all space dimensions.  Also contains wrappers
+ * serialization library, for all space dimensions. Also contains wrappers
  * around BOOST_CLASS_EXPORT and related functionality, which take care of
  * the differences introduced in new versions of Boost.
  *
@@ -60,8 +60,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * To handle all situations in Chaste:
  *   1. In .hpp files, include this header after the class definition.
- *   2. In .cpp files, after any other includes, include SerializationExportWrapperForCpp.hpp.
- * In both cases, CHASTE_CLASS_EXPORT should be used instead of BOOST_CLASS_EXPORT.
+ *   2. In .cpp files, after any other includes, include 
+ *      SerializationExportWrapperForCpp.hpp.
+ * In both cases, CHASTE_CLASS_EXPORT should be used instead of 
+ * BOOST_CLASS_EXPORT.
  *
  * There are also variant macros for common cases of templated classes:
  *  - EXPORT_TEMPLATE_CLASS_SAME_DIMS
@@ -70,10 +72,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  - EXPORT_TEMPLATE_CLASS2
  *  - EXPORT_TEMPLATE_CLASS3
  *
- * The latter 3 macros are usable in any situation where a class has up to 3 template parameters,
- * and you know what values will be needed.  Unfortunately a fully general template solution seems
- * to be impossible in any Boost version (the library makes use of either explicit instantiation or
- * singleton class instantiation).
+ * The latter 3 macros are usable in any situation where a class has up to 3 
+ * template parameters, and you know what values will be needed. Unfortunately a 
+ * fully general template solution seems to be impossible in any Boost version 
+ * (the library makes use of either explicit instantiation or singleton class 
+ * instantiation).
  */
 
 #include <boost/version.hpp>
@@ -116,6 +119,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #undef CHASTE_CLASS_EXPORT_TEMPLATED
 /**
  * General export for templated classes.
+ * 
  * @param T  a type
  * @param S  a unique string for the class + specific template parameter values
  */
@@ -125,6 +129,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #undef CHASTE_CLASS_EXPORT_INTERNAL
 /**
  * What CHASTE_CLASS_EXPORT expands to when it isn't a no-op.
+ * 
  * @param T  the class to export
  */
 #define CHASTE_CLASS_EXPORT_INTERNAL(T)        \
@@ -151,6 +156,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * General export for templated classes.
+ * 
  * @param T  a type
  * @param S  a unique string for the class + specific template parameter values
  */
@@ -165,10 +171,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    BOOST_CLASS_EXPORT_KEY(T)
 
 #else // BOOST_VERSION < 103600 || (BOOST_VERSION >= 103800 && BOOST_VERSION < 104100)
-//Do exactly as we did before (so that archives created with 1.33 don't have to be re-generated)
+// Do exactly as we did before (so that archives created with 1.33 don't have to be re-generated)
 
 /**
  * General export for templated classes.
+ * 
  * @param T  a type
  * @param S  a unique string for the class + specific template parameter values
  */
@@ -189,7 +196,8 @@ template<class> struct pack;
  * Argument pack for macros.  Used to give a type for templated classes when exporting.
  * See http://lists.boost.org/Archives/boost/2004/08/70149.php for more.
  *
- * \todo Check if we need this on Boost>=1.38.  Even if it's not needed there, we might still need it to load earlier archives.
+ * \todo Check if we need this on Boost>=1.38.  Even if it's not needed there, 
+ * we might still need it to load earlier archives.
  */
 template<class T> struct pack<void (T)> {
     typedef T type; /**< Type definition. */
@@ -197,6 +205,7 @@ template<class T> struct pack<void (T)> {
 
 /**
  * Defines the export key for a class templated over 1 parameter.
+ * 
  * @param CLASS  the class
  * @param P1  the template parameter
  */
@@ -205,6 +214,7 @@ template<class T> struct pack<void (T)> {
 
 /**
  * Defines the export key for a class templated over 2 parameters.
+ * 
  * @param CLASS  the class
  * @param P1  the first template parameter
  * @param P2  the second template parameter
@@ -214,6 +224,7 @@ template<class T> struct pack<void (T)> {
 
 /**
  * Defines the export key for a class templated over 3 parameters.
+ * 
  * @param CLASS  the class
  * @param P1  the first template parameter
  * @param P2  the second template parameter
@@ -224,6 +235,7 @@ template<class T> struct pack<void (T)> {
 
 /**
  * Defines the export type for a class templated over 1 parameter.
+ * 
  * @param CLASS  the class
  * @param P1  the template parameter
  */
@@ -231,6 +243,7 @@ template<class T> struct pack<void (T)> {
 
 /**
  * Defines the export type for a class templated over 2 parameters.
+ * 
  * @param CLASS  the class
  * @param P1  the first template parameter
  * @param P2  the second template parameter
@@ -239,6 +252,7 @@ template<class T> struct pack<void (T)> {
 
 /**
  * Defines the export type for a class templated over 3 parameters.
+ * 
  * @param CLASS  the class
  * @param P1  the first template parameter
  * @param P2  the second template parameter
@@ -250,8 +264,11 @@ template<class T> struct pack<void (T)> {
 #endif // SERIALIZATIONEXPORTWRAPPER_HPP_
 ////////////////////////////////////////////////////////////////////////////////
 
-// Since CHASTE_CLASS_EXPORT_TEMPLATED and CHASTE_CLASS_EXPORT_INTERNAL are re-defined for the .cpp file
-// in some Boost versions, the following macros will also need re-defining.
+/*
+ * Since CHASTE_CLASS_EXPORT_TEMPLATED and CHASTE_CLASS_EXPORT_INTERNAL are 
+ * re-defined for the .cpp file in some Boost versions, the following macros 
+ * will also need re-defining.
+ */
 
 #ifdef EXPORT_TEMPLATE_CLASS3_INTERNAL
 // Avoid re-definition when called from a .cpp file
@@ -265,8 +282,9 @@ template<class T> struct pack<void (T)> {
 // Macros for templated classes
 
 /**
- * Export a templated class with 3 parameters.
- * This is the definition of EXPORT_TEMPLATE_CLASS3 when it isn't a no-op.
+ * Export a templated class with 3 parameters. This is the definition of 
+ * EXPORT_TEMPLATE_CLASS3 when it isn't a no-op.
+ * 
  * @param CLASS the class (without parameters)
  * @param E  first template parameter
  * @param S  second template parameter
@@ -276,8 +294,9 @@ template<class T> struct pack<void (T)> {
     CHASTE_CLASS_EXPORT_TEMPLATED( CHASTE_PACK_3(CLASS, E, S, P), CHASTE_EXPORT_KEY_3(CLASS, E, S, P) )
 
 /**
- * Export a templated class with 2 parameters.
- * This is the definition of EXPORT_TEMPLATE_CLASS2 when it isn't a no-op.
+ * Export a templated class with 2 parameters. This is the definition of 
+ * EXPORT_TEMPLATE_CLASS2 when it isn't a no-op.
+ * 
  * @param CLASS the class (without parameters)
  * @param E  first template parameter
  * @param S  second template parameter
@@ -288,6 +307,7 @@ template<class T> struct pack<void (T)> {
 /**
  * Export a templated class with 1 parameter.
  * This is the definition of EXPORT_TEMPLATE_CLASS1 when it isn't a no-op.
+ * 
  * @param CLASS the class (without parameters)
  * @param D  template parameter
  */
@@ -296,8 +316,9 @@ template<class T> struct pack<void (T)> {
 
 /**
  * Export a class templated over both element and space dimension, for all valid
- * combinations.
- * This is the definition of EXPORT_TEMPLATE_CLASS_ALL_DIMS when it isn't a no-op.
+ * combinations. This is the definition of EXPORT_TEMPLATE_CLASS_ALL_DIMS when 
+ * it isn't a no-op.
+ * 
  * @param CLASS the class (without parameters)
  */
 #define EXPORT_TEMPLATE_CLASS_ALL_DIMS_INTERNAL(CLASS) \
@@ -310,7 +331,8 @@ template<class T> struct pack<void (T)> {
 
 /**
  * Export a class templated over a single dimension, for 1, 2 and 3 dimensions.
- * This is the definition of EXPORT_TEMPLATE_CLASS_SAME_DIMS when it isn't a no-op.
+ * This is the definition of EXPORT_TEMPLATE_CLASS_SAME_DIMS when it isn't a 
+ * no-op.
  * @param CLASS the class (without parameters)
  */
 #define EXPORT_TEMPLATE_CLASS_SAME_DIMS_INTERNAL(CLASS) \
@@ -318,8 +340,10 @@ template<class T> struct pack<void (T)> {
     EXPORT_TEMPLATE_CLASS1(CLASS, 2) \
     EXPORT_TEMPLATE_CLASS1(CLASS, 3)
 
-// Now define the macros that users actually call.
-// Again this goes outside the include guard, so it is seen by both .hpp and .cpp files.
+/*
+ * Now define the macros that users actually call. Again this goes outside the 
+ * include guard, so it is seen by both .hpp and .cpp files.
+ */
 
 // However, we don't want to define things twice, so...
 #if !defined(CHASTE_CLASS_EXPORT) || defined(CHASTE_SERIALIZATION_CPP)
@@ -347,23 +371,27 @@ template<class T> struct pack<void (T)> {
 #define CHASTE_CLASS_EXPORT(T)                 CHASTE_CLASS_EXPORT_INTERNAL(T)
 /**
  * Export a class templated over a single dimension, for 1, 2 and 3 dimensions.
+ * 
  * @param CLASS the class (without parameters)
  */
 #define EXPORT_TEMPLATE_CLASS_SAME_DIMS(CLASS) EXPORT_TEMPLATE_CLASS_SAME_DIMS_INTERNAL(CLASS)
 /**
  * Export a class templated over both element and space dimension, for all valid
  * combinations.
+ * 
  * @param CLASS the class (without parameters)
  */
 #define EXPORT_TEMPLATE_CLASS_ALL_DIMS(CLASS)  EXPORT_TEMPLATE_CLASS_ALL_DIMS_INTERNAL(CLASS)
 /**
  * Export a templated class with 1 parameter.
+ * 
  * @param CLASS the class (without parameters)
  * @param D  template parameter
  */
 #define EXPORT_TEMPLATE_CLASS1(CLASS, D)       EXPORT_TEMPLATE_CLASS1_INTERNAL(CLASS, D)
 /**
  * Export a templated class with 2 parameters.
+ * 
  * @param CLASS the class (without parameters)
  * @param E  first template parameter
  * @param S  second template parameter
@@ -371,6 +399,7 @@ template<class T> struct pack<void (T)> {
 #define EXPORT_TEMPLATE_CLASS2(CLASS, E, S)    EXPORT_TEMPLATE_CLASS2_INTERNAL(CLASS, E, S)
 /**
  * Export a templated class with 3 parameters.
+ * 
  * @param CLASS the class (without parameters)
  * @param E  first template parameter
  * @param S  second template parameter
@@ -382,38 +411,44 @@ template<class T> struct pack<void (T)> {
 
 /**
  * No-op for this Boost version in this setting.
- * @param T
+ * 
+ * @param T  the class
  */
 #define CHASTE_CLASS_EXPORT(T)
 /**
  * No-op for this Boost version in this setting.
- * @param CLASS
+ * 
+ * @param CLASS  the class
  */
 #define EXPORT_TEMPLATE_CLASS_SAME_DIMS(CLASS)
 /**
  * No-op for this Boost version in this setting.
- * @param CLASS
+ * 
+ * @param CLASS  the class
  */
 #define EXPORT_TEMPLATE_CLASS_ALL_DIMS(CLASS)
 /**
  * No-op for this Boost version in this setting.
- * @param CLASS
- * @param D
+ * 
+ * @param CLASS  the class
+ * @param D  template parameter
  */
 #define EXPORT_TEMPLATE_CLASS1(CLASS, D)
 /**
  * No-op for this Boost version in this setting.
- * @param CLASS
- * @param E
- * @param S
+ * 
+ * @param CLASS  the class
+ * @param E  first template parameter
+ * @param S  second template parameter
  */
 #define EXPORT_TEMPLATE_CLASS2(CLASS, E, S)
 /**
  * No-op for this Boost version in this setting.
- * @param CLASS
- * @param E
- * @param S
- * @param P
+ * 
+ * @param CLASS  the class
+ * @param E  first template parameter
+ * @param S  second template parameter
+ * @param P  third template parameter
  */
 #define EXPORT_TEMPLATE_CLASS3(CLASS, E, S, P)
 

@@ -48,9 +48,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * Specialization for input archives.
- * @param rDirectory
- * @param rFileNameBase
- * @param procId
+ * 
+ * @param rDirectory  folder containing archive files
+ * @param rFileNameBase  base name of archive files
+ * @param procId  the process id number
  */
 template<>
 ArchiveOpener<boost::archive::text_iarchive, std::ifstream>::ArchiveOpener(
@@ -64,12 +65,14 @@ ArchiveOpener<boost::archive::text_iarchive, std::ifstream>::ArchiveOpener(
 {
     // Figure out where things live
     ArchiveLocationInfo::SetArchiveDirectory(rDirectory);
-    std::string private_path = ArchiveLocationInfo::GetProcessUniqueFilePath(rFileNameBase, procId);
+    std::string private_path = 
+        ArchiveLocationInfo::GetProcessUniqueFilePath(rFileNameBase, procId);
     std::stringstream common_path;
     common_path << ArchiveLocationInfo::GetArchiveDirectory() << rFileNameBase;
 
     // Try to open the main archive for replicated data
-    mpCommonStream = new std::ifstream(common_path.str().c_str(), std::ios::binary);
+    mpCommonStream = 
+        new std::ifstream(common_path.str().c_str(), std::ios::binary);
     if (!mpCommonStream->is_open())
     {
         delete mpCommonStream;
@@ -84,7 +87,10 @@ ArchiveOpener<boost::archive::text_iarchive, std::ifstream>::ArchiveOpener(
     {
         if (boost_exception.code == boost::archive::archive_exception::unsupported_version)
         {
-            // This is forward compatibility issue.  We can't open the archive because it's been written by a more recent Boost.
+            /*
+             * This is forward compatibility issue. We can't open the archive 
+             * because it's been written by a more recent Boost.
+             */
             delete mpCommonArchive;
             delete mpCommonStream;
             EXCEPTION("Could not open Boost archive '" + common_path.str() + "' because it was written by a more recent Boost.  Check process-specific archives too");
@@ -121,15 +127,16 @@ ArchiveOpener<boost::archive::text_iarchive, std::ifstream>::~ArchiveOpener()
 
 /**
  * Specialization for output archives.
- * @param rDirectory
- * @param rFileNameBase
- * @param procId
+ * 
+ * @param rDirectory  folder containing archive files
+ * @param rFileNameBase  base name of archive files
+ * @param procId  the process id number
  */
 template<>
 ArchiveOpener<boost::archive::text_oarchive, std::ofstream>::ArchiveOpener(
-        const FileFinder& rDirectory,
-        const std::string& rFileNameBase,
-        unsigned procId)
+    const FileFinder& rDirectory,
+    const std::string& rFileNameBase,
+    unsigned procId)
     : mpCommonStream(nullptr),
       mpPrivateStream(nullptr),
       mpCommonArchive(nullptr),
@@ -148,7 +155,8 @@ ArchiveOpener<boost::archive::text_oarchive, std::ofstream>::ArchiveOpener(
         // Ensure the directory exists
         OutputFileHandler handler(ArchiveLocationInfo::GetArchiveRelativePath(), false);
     }
-    std::string private_path = ArchiveLocationInfo::GetProcessUniqueFilePath(rFileNameBase);
+    std::string private_path = 
+        ArchiveLocationInfo::GetProcessUniqueFilePath(rFileNameBase);
     std::stringstream common_path;
     common_path << ArchiveLocationInfo::GetArchiveDirectory() << rFileNameBase;
 
@@ -164,7 +172,10 @@ ArchiveOpener<boost::archive::text_oarchive, std::ofstream>::ArchiveOpener(
     }
     else
     {
-        // Non-master processes need to go through the serialization methods, but not write any data
+        /*
+         * Non-master processes need to go through the serialization methods, 
+         * but not write any data.
+         */
 #ifdef _MSC_VER
         mpCommonStream = new std::ofstream("NUL", std::ios::binary | std::ios::trunc);
 #else
@@ -202,10 +213,11 @@ ArchiveOpener<boost::archive::text_oarchive, std::ofstream>::~ArchiveOpener()
     delete mpCommonArchive;
     delete mpCommonStream;
 
-    /* In a parallel setting, make sure all processes have finished writing before
-     * continuing, to avoid nasty race conditions.
-     * For example, many tests will write an archive then immediately read it back
-     * in, which could easily break without this.
+    /*
+     * In a parallel setting, make sure all processes have finished writing 
+     * before continuing, to avoid nasty race conditions. For example, many 
+     * tests will write an archive then immediately read it back in, which could 
+     * easily break without this.
      */
     PetscTools::Barrier("~ArchiveOpener");
 }

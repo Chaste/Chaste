@@ -51,13 +51,13 @@ Warnings::Warnings()
 {
 }
 
-void Warnings::NoisyDestroy(void)
+void Warnings::NoisyDestroy()
 {
     PrintWarnings();
     QuietDestroy();
 }
 
-void Warnings::QuietDestroy(void)
+void Warnings::QuietDestroy()
 {
     if (mpInstance)
     {
@@ -66,18 +66,17 @@ void Warnings::QuietDestroy(void)
     }
 }
 
-void Warnings::PrintWarnings(void)
+void Warnings::PrintWarnings()
 {
     if (mpInstance)
     {
-        for (WarningsContainerType::iterator it = mpInstance->mWarningMessages.begin();
+        for (auto it = mpInstance->mWarningMessages.begin();
              it != mpInstance->mWarningMessages.end();
              ++it)
         {
             /*
-             * Look at my warnings please.
-             * First in pair is the context.
-             * Second in pair is that actual warning.
+             * Look at my warnings please. First in pair is the context. Second 
+             * in pair is that actual warning.
              */
             std::cout << it->first << it->second << std::endl;
         }
@@ -94,7 +93,11 @@ Warnings* Warnings::Instance()
     return mpInstance;
 }
 
-void Warnings::AddWarning(const std::string& rMessage, const std::string& rFilename, unsigned lineNumber, bool onlyOnce)
+void Warnings::AddWarning(
+    const std::string& rMessage,
+    const std::string& rFilename,
+    unsigned lineNumber,
+    bool onlyOnce)
 {
     std::string posix_filename(ChastePosixPathFixer::ToPosix(fs::path(rFilename)));
     std::stringstream line_number_stream;
@@ -126,7 +129,9 @@ std::string Warnings::GetNextWarningMessage()
     {
         EXCEPTION("There are no warnings");
     }
-    std::string message = mWarningMessages.front().second; // Second in pair is the actual warning
+    
+    // Second in pair is the actual warning
+    std::string message = mWarningMessages.front().second;
     mWarningMessages.pop_front();
 
     return message;

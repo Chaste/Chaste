@@ -38,21 +38,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /**
- * This is a little helper wrapper for CommandLineArguments that
- * allows a test to replace ALL of the command line arguments
- * by calling the constructor.
+ * This is a little helper wrapper for CommandLineArguments that allows a test 
+ * to replace ALL of the command line arguments by calling the constructor.
  *
- * It is useful for allowing more tests on code that reads
- * CommandLineArguments without resorting to acceptance tests of executables.
+ * It is useful for allowing more tests on code that reads CommandLineArguments 
+ * without resorting to acceptance tests of executables.
  */
 class CommandLineArgumentsMocker
 {
 public:
     /**
-     * Only available constructor.
-     * This replaces all of the command line arguments that were being used (but remembers them).
+     * Only available constructor. This replaces all of the command line 
+     * arguments that were being used (but remembers them).
      *
-     * @param newArguments  a string of command line arguments to put into the singleton CommandLineArguments class.
+     * @param newArguments  a string of command line arguments to put into the 
+     *     singleton CommandLineArguments class.
      */
     CommandLineArgumentsMocker(std::string newArguments);
 
@@ -67,11 +67,13 @@ private:
 
     /** The new number of arguments */
     int mNumArgs;
+
     /** The new arguments */
     char** mpArgs;
 
     /** The location of the old number of arguments */
     int* mpNumOldArgs;
+
     /** The location of the old arguments */
     char*** mpOldArgs;
 };

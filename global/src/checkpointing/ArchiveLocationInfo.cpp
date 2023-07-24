@@ -43,13 +43,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 std::string ArchiveLocationInfo::mDirAbsPath = "";
 std::string ArchiveLocationInfo::mMeshFilename = "mesh";
 
-void ArchiveLocationInfo::SetMeshPathname(const FileFinder& rDirectory, const std::string& rFilename)
+void ArchiveLocationInfo::SetMeshPathname(
+    const FileFinder& rDirectory,
+    const std::string& rFilename)
 {
     SetArchiveDirectory(rDirectory);
     mMeshFilename = rFilename;
 }
 
-void ArchiveLocationInfo::SetMeshPathname(const std::string& rDirectory, const std::string& rFilename)
+void ArchiveLocationInfo::SetMeshPathname(
+    const std::string& rDirectory,
+    const std::string& rFilename)
 {
     bool is_absolute = FileFinder::IsAbsolutePath(rDirectory);
     RelativeTo::Value relative_to;
@@ -90,8 +94,8 @@ std::string ArchiveLocationInfo::GetArchiveDirectory()
 }
 
 std::string ArchiveLocationInfo::GetProcessUniqueFilePath(
-        const std::string& rFileName,
-        unsigned procId)
+    const std::string& rFileName,
+    unsigned procId)
 {
     std::stringstream filepath;
     filepath << GetArchiveDirectory() << rFileName << "." << procId;

@@ -75,11 +75,18 @@ void FpeSignalToAbort(int sig_num, siginfo_t* info, void* context)
 
 void PetscSetupUtils::InitialisePetsc()
 {
-    // The CommandLineArguments instance is filled in by the cxxtest test suite runner.
+    /*
+     * The CommandLineArguments instance is filled in by the cxxtest test suite 
+     * runner.
+     */
     CommandLineArguments* p_args = CommandLineArguments::Instance();
     PETSCEXCEPT(PetscInitialize(p_args->p_argc, p_args->p_argv, PETSC_NULL, PETSC_NULL));
-    // Work around what seems to be an Intel compiler bug/quirk that makes the cache stale,
-    // by using an explicit reset to ensure all code is aware we're running in parallel.
+
+    /*
+     * Work around what seems to be an Intel compiler bug/quirk that makes the 
+     * cache stale, by using an explicit reset to ensure all code is aware we're 
+     * running in parallel.
+     */
     PetscTools::ResetCache();
 }
 
@@ -87,9 +94,13 @@ void PetscSetupUtils::CommonSetup()
 {
     InitialisePetsc();
 
-    if ((PETSC_VERSION_MAJOR < 3) || (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR < 5)) // PETSc 3.4 or earlier
+    // PETSc 3.4 or earlier
+    if ((PETSC_VERSION_MAJOR < 3) || (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR < 5))
     {
-        // Add some PETSc citations if we're not using the built-in citation mechanisms
+        /*
+         * Add some PETSc citations if we're not using the built-in citation 
+         * mechanisms.
+         */
         Citations::Register(PetscCitation1, &PetscCite1);
         Citations::Register(PetscCitation2, &PetscCite2);
     }
@@ -110,7 +121,11 @@ void PetscSetupUtils::CommonSetup()
 #ifdef TEST_FOR_FPE
     // Give all PETSc enabled tests the ability to trap for divide-by-zero
     feenableexcept(FE_DIVBYZERO | FE_INVALID);
-    // Catch all SIGFPE signals and convert them to exceptions (before PETSc gets to them)
+
+    /*
+     * Catch all SIGFPE signals and convert them to exceptions (before PETSc 
+     * gets to them).
+     */
     struct sigaction sa;
     sa.sa_sigaction = FpeSignalToAbort;
     sa.sa_flags = SA_RESETHAND | SA_SIGINFO;
@@ -121,7 +136,10 @@ void PetscSetupUtils::CommonSetup()
 
 void PetscSetupUtils::CommonFinalize()
 {
-    // This does nothing if we are on a new PETSc, just allows Chaste to print citations instead in this case
+    /*
+     * This does nothing if we are on a new PETSc, just allows Chaste to print 
+     * citations instead in this case.
+     */
     Citations::Print();
 
     PETSCEXCEPT(PetscFinalize());

@@ -52,9 +52,9 @@ public:
         PetscLogEventRegister(&my_event, "My first event", 0);
 
 #endif
-        (void)PetscLogEventBegin(my_event,0,0,0,0);
-        for (unsigned i=0; i<1000000; i++);
-        (void)PetscLogEventEnd(my_event,0,0,0,0);
+        (void)PetscLogEventBegin(my_event, 0, 0, 0, 0);
+        for (unsigned i = 0; i < 1000000; ++i);
+        (void)PetscLogEventEnd(my_event, 0, 0, 0, 0);
 
 #if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
         PetscLogEvent my_event2;
@@ -64,18 +64,20 @@ public:
         PetscLogEventRegister(&my_event2, "My second event", 0);
 #endif
 
-        (void)PetscLogEventBegin(my_event2,0,0,0,0);
-        for (unsigned i=0; i<1000000; i++);
-        (void)PetscLogEventEnd(my_event2,0,0,0,0);
+        (void)PetscLogEventBegin(my_event2, 0, 0, 0, 0);
+        for (unsigned i = 0; i < 1000000; ++i);
+        (void)PetscLogEventEnd(my_event2, 0, 0, 0, 0);
 
-        (void)PetscLogEventBegin(24,0,0,0,0);
-        for (unsigned i=0; i<1000000; i++);
-        (void)PetscLogEventEnd(24,0,0,0,0);
+        (void)PetscLogEventBegin(24, 0, 0, 0, 0);
+        for (unsigned i = 0; i < 1000000; ++i);
+        (void)PetscLogEventEnd(24, 0, 0, 0, 0);
 
         //PetscLogPrintDetailed(MPI_COMM_WORLD, filename);
     }
-    // this test should be run on the command line with -log_summary
-    // to check that a summary is given
+    /*
+     * This test should be run on the command line with -log_summary to check 
+     * that a summary is given.
+     */
 };
 
 #endif /*TESTPETSCEVENTS_HPP_*/

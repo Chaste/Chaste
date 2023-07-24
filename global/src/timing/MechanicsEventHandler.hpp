@@ -59,7 +59,10 @@ public:
         ALL
     } MechanicsEventType;
 
-    /** Character array holding mechanics event names. There are seven mechanics events. */
+    /**
+     * Character array holding mechanics event names. There are seven mechanics 
+     * events. 
+     */
     static const char* EventName[7];
 };
 

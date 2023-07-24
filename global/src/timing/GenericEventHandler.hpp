@@ -45,14 +45,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A generic base class providing the functionality for timing various events.
- * Subclasses provide the event codes and names; see HeartEventHandler for an example.
+ * Subclasses provide the event codes and names; see HeartEventHandler for an 
+ * example.
  *
  * Note: this class assume that, for any given concrete class, the last event
  * represents the total time, and thus wraps all other events.
  *
- * The methods in this class are not implemented separately as then they would not be
- * inline, which could impact performance; we generally want timing routines to be very
- * lightweight.
+ * The methods in this class are not implemented separately as then they would 
+ * not be inline, which could impact performance; we generally want timing 
+ * routines to be very lightweight.
  */
 template <unsigned NUM_EVENTS, class CONCRETE>
 class GenericEventHandler
@@ -69,18 +70,18 @@ private:
     bool mInUse; /**< Determines if any of the event have begun */
 
     /**
-     * Sleep for a specified number of milliseconds.
-     * Used in testing.
-     * Ought to be more portable than sleep() or usleep().
+     * Sleep for a specified number of milliseconds. Used in testing. Ought to 
+     * be more portable than sleep() or usleep().
      *
-     * @param milliseconds  minimum number of milliseconds for which to sleep (ought to be a multiple of 10)
+     * @param milliseconds  minimum number of milliseconds for which to sleep 
+     *     (ought to be a multiple of 10)
      */
     static inline void MilliSleep(unsigned milliseconds)
     {
         double min_Wtime = milliseconds/1000.0 + Timer::GetElapsedTime();
         while (Timer::GetElapsedTime() < min_Wtime)
         {
-            //pause;
+            // pause;
         }
     }
 
@@ -88,6 +89,7 @@ private:
      * Convert a wall clock time to milliseconds.
      *
      * @param wallTime  the wall time
+     * 
      * @return time in milliseconds.
      */
     inline double ConvertWallTimeToMilliseconds(double wallTime)
@@ -96,9 +98,11 @@ private:
     }
 
     /**
-     * Convert a wall clock time to seconds.  (Identity function in this implementation.)
+     * Convert a wall clock time to seconds. (Identity function in this 
+     * implementation.)
      *
      * @param wallTime  the wall time
+     * 
      * @return Time in seconds
      */
     inline double ConvertWallTimeToSeconds(double wallTime)
@@ -146,11 +150,11 @@ public:
     }
 
     /**
-     * @return The time (in milliseconds) accounted so far to the given event.
-     *
-     * Will automatically determine if the event is currently ongoing or not.
-     *
      * @param event  the index of an event (this must be less than NUM_EVENTS)
+     * 
+     * @return The time (in milliseconds) accounted so far to the given event. 
+     *     Will automatically determine if the event is currently ongoing or 
+     *     not.
      */
     static double GetElapsedTime(unsigned event)
     {
@@ -158,12 +162,9 @@ public:
     }
 
     /**
-     * Print a report on the timed events and reset the handler.
-     *
-     * Assumes all events have ended.
-     *
-     * If there is a collection of processes then the report will include an
-     * average and maximum over all CPUs.
+     * Print a report on the timed events and reset the handler. Assumes all 
+     * events have ended. If there is a collection of processes then the report 
+     * will include an average and maximum over all CPUs.
      */
     static void Report()
     {
@@ -186,13 +187,18 @@ public:
         Instance()->EnableImpl();
     }
 
-    /** Disable the event handler, so that event durations are no longer recorded. */
+    /**
+     * Disable the event handler, so that event durations are no longer 
+     * recorded. 
+     */
     static void Disable()
     {
         Instance()->DisableImpl();
     }
 
-    /** Check whether the event handler is enabled.
+    /**
+     * Check whether the event handler is enabled.
+     * 
      * @return true if enabled
      */
     static bool IsEnabled()
@@ -245,6 +251,7 @@ private:
 #endif
         mInUse = true;
         assert(event<NUM_EVENTS);
+
         // Check that we are recording the total
         if (event != NUM_EVENTS-1) // If use <, Intel complains when NUM_EVENTS==1
         {
@@ -298,11 +305,11 @@ private:
     }
 
     /**
-     * @return The time (in milliseconds) accounted so far to the given event.
-     *
-     * Will automatically determine if the event is currently ongoing or not.
-     *
      * @param event  the index of an event (this must be less than NUM_EVENTS)
+     * 
+     * @return The time (in milliseconds) accounted so far to the given event.
+     *     Will automatically determine if the event is currently ongoing or 
+     *     not.
      */
     double GetElapsedTimeImpl(unsigned event)
     {
@@ -324,12 +331,9 @@ private:
     }
 
     /**
-     * Print a report on the timed events and reset the handler.
-     *
-     * Assumes all events have ended.
-     *
-     * If there is a collection of processes then the report will include an
-     * average and maximum over all CPUs.
+     * Print a report on the timed events and reset the handler. Assumes all 
+     * events have ended. If there is a collection of processes then the report 
+     * will include an average and maximum over all CPUs.
      */
     void ReportImpl()
     {
@@ -355,11 +359,11 @@ private:
 
         // Make the output precision depend on total run time
         const char* format;
-        if (total > 999999.0)      // 11.5 days
+        if (total > 999999.0) // 11.5 days
         {
-            format = "%8.0f ";     // will allow up to 115 days before columns unaligned
+            format = "%8.0f "; // will allow up to 115 days before columns unaligned
         }
-        else if (total > 9999.0)   // 2.7 hours
+        else if (total > 9999.0) // 2.7 hours
         {
             format = "%8.1f ";
         }
@@ -457,13 +461,18 @@ private:
         mEnabled = true;
     }
 
-    /** Disable the event handler, so that event durations are no longer recorded. */
+    /**
+     * Disable the event handler, so that event durations are no longer 
+     * recorded. 
+     */
     void DisableImpl()
     {
         mEnabled = false;
     }
 
-    /** Check whether the event handler is enabled.
+    /**
+     * Check whether the event handler is enabled.
+     * 
      * @return true if enabled
      */
     bool IsEnabledImpl()

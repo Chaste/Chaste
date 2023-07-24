@@ -40,8 +40,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include <iostream>
 
-// Private methods
-
 void ReplicatableVector::RemovePetscContext()
 {
     if (mToAll != nullptr)
@@ -62,8 +60,6 @@ void ReplicatableVector::RemovePetscContext()
         mpData = nullptr;
     }
 }
-
-// Constructors & destructors
 
 ReplicatableVector::ReplicatableVector()
     : mpData(nullptr),
@@ -96,8 +92,6 @@ ReplicatableVector::~ReplicatableVector()
     RemovePetscContext();
 }
 
-// Vector interface methods
-
 unsigned ReplicatableVector::GetSize()
 {
     return mSize;
@@ -117,7 +111,8 @@ void ReplicatableVector::Resize(unsigned size)
 // LCOV_EXCL_START
     catch(std::bad_alloc &badAlloc)
     {
-        std::cout << "Failed to allocate a ReplicatableVector of size " << size  << std::endl;
+        std::cout << "Failed to allocate a ReplicatableVector of size " 
+                  << size  << std::endl;
         PetscTools::ReplicateException(true);
         throw badAlloc;
     }
@@ -139,13 +134,22 @@ void ReplicatableVector::Replicate(unsigned lo, unsigned hi)
     // Create a PetSC vector with the array containing the distributed data
     Vec distributed_vec;
 
-#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 3) //PETSc 3.3 or later
-    //Extra argument is block size
-    VecCreateMPIWithArray(PETSC_COMM_WORLD, 1, hi-lo, this->GetSize(), &mpData[lo], &distributed_vec);
+#if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 3) // PETSc 3.3 or later
+    // Extra argument is block size
+    VecCreateMPIWithArray(PETSC_COMM_WORLD,
+                          1,
+                          hi - lo,
+                          this->GetSize(),
+                          &mpData[lo],
+                          &distributed_vec);
 #else
-    VecCreateMPIWithArray(PETSC_COMM_WORLD, hi-lo, this->GetSize(), &mpData[lo], &distributed_vec);
+    VecCreateMPIWithArray(PETSC_COMM_WORLD,
+                          hi - lo,
+                          this->GetSize(),
+                          &mpData[lo],
+                          &distributed_vec);
 #endif
-#if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
+#if (PETSC_VERSION_MAJOR == 3) // PETSc 3.x.x
     VecSetOption(distributed_vec, VEC_IGNORE_OFF_PROC_ENTRIES, PETSC_TRUE);
 #else
     VecSetOption(distributed_vec, VEC_IGNORE_OFF_PROC_ENTRIES);
@@ -170,13 +174,16 @@ void ReplicatableVector::ReplicatePetscVector(Vec vec)
     }
     if (mReplicated == nullptr)
     {
-        // This creates mToAll (the scatter context) and mReplicated (to store values)
+        /*
+         * This creates mToAll (the scatter context) and mReplicated (to store 
+         * values).
+         */
         VecScatterCreateToAll(vec, &mToAll, &mReplicated);
     }
 
     // Replicate the data
-//PETSc-3.x.x or PETSc-2.3.3
-#if ((PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x
+// PETSc-3.x.x or PETSc-2.3.3
+#if ((PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) // 2.3.3 or 3.x.x
     VecScatterBegin(mToAll, vec, mReplicated, INSERT_VALUES, SCATTER_FORWARD);
     VecScatterEnd  (mToAll, vec, mReplicated, INSERT_VALUES, SCATTER_FORWARD);
 #else
@@ -186,10 +193,11 @@ void ReplicatableVector::ReplicatePetscVector(Vec vec)
 #endif
 
     // Information is now in mReplicated PETSc vector
+
     // Copy into mData
     double* p_replicated;
     VecGetArray(mReplicated, &p_replicated);
-    for (unsigned i=0; i<size; i++)
+    for (unsigned i = 0; i < size; ++i)
     {
         mpData[i] = p_replicated[i];
     }

@@ -56,13 +56,13 @@ public:
         TS_ASSERT(PetscTools::IsInitialised());
         PetscInt my_rank;
         MPI_Comm_rank(PETSC_COMM_WORLD, &my_rank);
-        TS_ASSERT_EQUALS(PetscTools::GetMyRank(), (unsigned)my_rank);
+        TS_ASSERT_EQUALS(PetscTools::GetMyRank(), static_cast<unsigned>(my_rank));
         bool am_master = (my_rank == 0);
         TS_ASSERT_EQUALS( PetscTools::AmMaster(), am_master);
 
         int num_procs;
         MPI_Comm_size(PETSC_COMM_WORLD, &num_procs);
-        TS_ASSERT_EQUALS( PetscTools::GetNumProcs(), (unsigned)num_procs);
+        TS_ASSERT_EQUALS( PetscTools::GetNumProcs(), static_cast<unsigned>(num_procs));
         bool is_sequential = (num_procs==1);
         TS_ASSERT_EQUALS( PetscTools::IsSequential(), is_sequential);
         TS_ASSERT_EQUALS( PetscTools::IsParallel(), !is_sequential);
@@ -150,7 +150,7 @@ public:
         unsigned nonzeros_allocated;
 
         MatGetInfo(mat2,MAT_LOCAL,&info);
-        nonzeros_allocated = (unsigned) info.nz_allocated;
+        nonzeros_allocated = static_cast<unsigned>(info.nz_allocated);
 
         if (PetscTools::IsSequential())
         {
@@ -170,7 +170,7 @@ public:
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR <= 10)
             expected_nz_per_row = 4 + 4; // Older PETSc versions could over-allocate the blockdiagonal
 #endif
-            TS_ASSERT_EQUALS( nonzeros_allocated, (unsigned)(expected_nz_per_row*(hi-lo)) );
+            TS_ASSERT_EQUALS(nonzeros_allocated, static_cast<unsigned>(expected_nz_per_row*(hi-lo)));
         }
 
         PetscTools::Destroy(mat2);
@@ -273,7 +273,7 @@ public:
             {
                 for (int col=0; col<10; col++)
                 {
-                    MatSetValue(matrix, row, col, (double) 10*row+col+1, INSERT_VALUES);
+                    MatSetValue(matrix, row, col, static_cast<double>(10*row+col+1), INSERT_VALUES);
                 }
 
                 double value = row;
@@ -312,11 +312,11 @@ public:
                 {
                     double value;
                     MatGetValues(matrix_read, 1, &row, 1, &col, &value);
-                    TS_ASSERT_EQUALS(value, (double) 10*row+col+1);
+                    TS_ASSERT_EQUALS(value, static_cast<double>(10*row+col+1));
                 }
 
             unsigned local_index = row-lo;
-            TS_ASSERT_EQUALS(p_vector_read[local_index], (double)row);
+            TS_ASSERT_EQUALS(p_vector_read[local_index], static_cast<double>(row));
             }
         }
 
@@ -364,11 +364,11 @@ public:
                 {
                     double value;
                     MatGetValues(matrix_read, 1, &row, 1, &col, &value);
-                    TS_ASSERT_EQUALS(value, (double) 10*row+col+1);
+                    TS_ASSERT_EQUALS(value, static_cast<double>(10*row+col+1));
                 }
 
             unsigned local_index = row-lo;
-            TS_ASSERT_EQUALS(p_vector_read[local_index], (double)row);
+            TS_ASSERT_EQUALS(p_vector_read[local_index], static_cast<double>(row));
             }
         }
 
@@ -397,15 +397,15 @@ public:
         unsigned expected_lo = (my_rank+1)*my_rank/2;
         unsigned expected_hi = (my_rank+2)*(my_rank+1)/2;
 
-        TS_ASSERT_EQUALS((unsigned)petsc_lo, expected_lo);
-        TS_ASSERT_EQUALS((unsigned)petsc_hi, expected_hi);
+        TS_ASSERT_EQUALS(static_cast<unsigned>(petsc_lo), expected_lo);
+        TS_ASSERT_EQUALS(static_cast<unsigned>(petsc_hi), expected_hi);
 
         PetscTools::Destroy(petsc_vec_uneven);
     }
 
     void TestHasParMetis()
     {
-        //This just covers the method, as there is no other way to test if ParMetis is available.
+        // This just covers the method, as there is no other way to test if ParMetis is available.
         std::cout << "Testing to see if Petsc is configured with ParMetis support. " << std::endl;
         PetscTools::HasParMetis();
     }

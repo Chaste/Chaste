@@ -40,7 +40,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "MathsCustomFunctions.hpp"
 
-TimeStepper::TimeStepper(double startTime, double endTime, double dt, bool enforceConstantTimeStep, std::vector<double> additionalTimes)
+TimeStepper::TimeStepper(
+    double startTime,
+    double endTime,
+    double dt,
+    bool enforceConstantTimeStep,
+    std::vector<double> additionalTimes)
     : mStart(startTime),
       mEnd(endTime),
       mDt(dt),
@@ -54,8 +59,11 @@ TimeStepper::TimeStepper(double startTime, double endTime, double dt, bool enfor
         EXCEPTION("The simulation duration must be positive, not " << endTime-startTime);
     }
 
-    // Remove any additionalTimes entries which fall too close to a time when the stepper would stop anyway
-    for (unsigned i=0; i<additionalTimes.size(); i++)
+    /*
+     * Remove any additionalTimes entries which fall too close to a time when 
+     * the stepper would stop anyway.
+     */
+    for (unsigned i = 0; i < additionalTimes.size(); ++i)
     {
         if (i > 0)
         {
@@ -68,10 +76,13 @@ TimeStepper::TimeStepper(double startTime, double endTime, double dt, bool enfor
 
         double time_interval = additionalTimes[i] - startTime;
 
-        // When mDt divides this interval (and the interval is positive) then we are going there anyway
+        /*
+         * When mDt divides this interval (and the interval is positive) then we 
+         * are going there anyway.
+         */
         if (!Divides(mDt, time_interval) && (time_interval > DBL_EPSILON))
         {
-            //mAdditionalTimes.push_back(additionalTimes[i]);
+            // mAdditionalTimes.push_back(additionalTimes[i]);
             EXCEPTION("Additional times are now deprecated.  Use only to check whether the given times are met: e.g. Electrode events should only happen on printing steps.");
         }
     }
@@ -86,7 +97,10 @@ TimeStepper::TimeStepper(double startTime, double endTime, double dt, bool enfor
         mEpsilon = DBL_EPSILON*mEnd;
     }
 
-    // If enforceConstantTimeStep check whether the times are such that we won't have a variable dt
+    /*
+     * If enforceConstantTimeStep check whether the times are such that we won't 
+     * have a variable dt.
+     */
     if (enforceConstantTimeStep)
     {
         double expected_end_time = mStart + mDt*EstimateTimeSteps();
@@ -107,9 +121,11 @@ double TimeStepper::CalculateNextTime()
 {
     double next_time = mStart + (mTotalTimeStepsTaken + 1)*mDt;
 
-    // Does the next time bring us very close to the end time?
-    // Note that the inequality in this guard matches the inversion of the guard in the enforceConstantTimeStep
-    // calculation of the constructor
+    /*
+     * Does the next time bring us very close to the end time? Note that the 
+     * inequality in this guard matches the inversion of the guard in the 
+     * enforceConstantTimeStep calculation of the constructor.
+     */
     if (mEnd - next_time <= mEpsilon)
     {
         next_time = mEnd;
@@ -169,7 +185,7 @@ bool TimeStepper::IsTimeAtEnd() const
 
 unsigned TimeStepper::EstimateTimeSteps() const
 {
-    return (unsigned) floor((mEnd - mStart)/mDt + 0.5);
+    return static_cast<unsigned>(floor((mEnd - mStart)/mDt + 0.5));
 }
 
 unsigned TimeStepper::GetTotalTimeStepsTaken() const
@@ -182,16 +198,16 @@ void TimeStepper::ResetTimeStep(double dt)
     assert(dt > 0);
     /*
      * The error in subtracting two numbers of the same magnitude is about
-     * DBL_EPSILON times that magnitude (we use the sum of the two numbers
-     * here as a conservative estimate of their maximum). When both mDt and
-     * dt are small then the error should be around DBL_EPSILON.
+     * DBL_EPSILON times that magnitude (we use the sum of the two numbers here 
+     * as a conservative estimate of their maximum). When both mDt and dt are 
+     * small then the error should be around DBL_EPSILON.
      */
     double scale = DBL_EPSILON*(mDt + dt);
     if (mDt + dt < 1.0)
     {
         scale = DBL_EPSILON;
     }
-    if (fabs(mDt-dt) > scale)
+    if (fabs(mDt - dt) > scale)
     {
         mDt = dt;
         mStart = mTime;

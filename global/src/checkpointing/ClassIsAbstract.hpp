@@ -38,25 +38,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /** @file
  *
- * This file defines 4 macros to assist with explicitly declaring
- * to the Boost Serialization library when a class is abstract.
- * The interface for doing this changed in Boost 1.36.0, hence this
- * wrapper.
+ * This file defines 4 macros to assist with explicitly declaring to the Boost 
+ * Serialization library when a class is abstract. The interface for doing this 
+ * changed in Boost 1.36.0, hence this wrapper.
  *
- * The easy case is for a non-templated class.  For example, if you
- * have a class called AbstractClass, use
+ * The easy case is for a non-templated class. For example, if you have a class 
+ * called AbstractClass, use
  *     CLASS_IS_ABSTRACT(AbstractClass)
  *
- * For classes templated over either 1 or 2 unsigned parameters, there
- * are helper macros TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED and
- * TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED.  For example, with a class
+ * For classes templated over either 1 or 2 unsigned parameters, there are 
+ * helper macros TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED and 
+ * TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED. For example, with a class
  *     template<unsigned SPACE_DIM, unsigned ELEMENT_DIM>
  *     class AbstractTemplatedClass { ... };
  * use
  *     TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(AbstractTemplatedClass)
  *
- * For a general templated class, you have to do a little extra work.
- * For example, with a class
+ * For a general templated class, you have to do a little extra work. For 
+ * example, with a class
  *     template<class C, unsigned U>
  *     class AbstractTemplatedClass { ... };
  * use
@@ -81,8 +80,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/assume_abstract.hpp>
 
 /**
- * Explicitly mark a non-templated class as being abstract
- * (Boost 1.36 and later).
+ * Explicitly mark a non-templated class as being abstract (Boost 1.36 and 
+ * later).
+ * 
  * @param T  the class
  */
 #define CLASS_IS_ABSTRACT(T) BOOST_SERIALIZATION_ASSUME_ABSTRACT(T)
@@ -100,8 +100,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/is_abstract.hpp>
 
 /**
- * Explicitly mark a non-templated class as being abstract
- * (Boost 1.35 and earlier).
+ * Explicitly mark a non-templated class as being abstract (Boost 1.35 and 
+ * earlier).
+ * 
  * @param T  the class
  */
 #define CLASS_IS_ABSTRACT(T) BOOST_IS_ABSTRACT(T)
@@ -119,8 +120,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif // BOOST_VERSION >= 103600
 
 /**
- * Convenience macro to declare a class templated over a single unsigned
- * as abstract.
+ * Convenience macro to declare a class templated over a single unsigned as 
+ * abstract.
+ * 
  * @param T  the class
  */
 #define TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(T) \
@@ -135,8 +137,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     }}
 
 /**
- * Convenience macro to declare a class templated over 2 unsigneds
- * as abstract.
+ * Convenience macro to declare a class templated over 2 unsigneds as abstract.
+ * 
  * @param T  the class
  */
 #define TEMPLATED_CLASS_IS_ABSTRACT_2_UNSIGNED(T) \
@@ -151,8 +153,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     }}
 
 /**
- * Convenience macro to declare a class templated over 3 unsigneds
- * as abstract.
+ * Convenience macro to declare a class templated over 3 unsigneds as abstract.
+ * 
  * @param T  the class
  */
 #define TEMPLATED_CLASS_IS_ABSTRACT_3_UNSIGNED(T) \

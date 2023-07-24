@@ -35,5 +35,5 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "MechanicsEventHandler.hpp"
 
-const char* MechanicsEventHandler::EventName[] = { "Assemble", "Solve", "Update", "AllMech",
-                                                   "NonMech", "Output", "Total" };
+const char* MechanicsEventHandler::EventName[] = 
+    { "Assemble", "Solve", "Update", "AllMech", "NonMech", "Output", "Total" };

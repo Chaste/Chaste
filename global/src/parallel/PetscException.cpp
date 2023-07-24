@@ -40,11 +40,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 #include "ChasteBuildRoot.hpp"
 
-
 /*
- * Positive codes mean that there's an error.
- * Zero means success.
- * Negative codes should never happen, but we'll throw anyway.
+ * Positive codes mean that there's an error. Zero means success. Negative codes 
+ * should never happen, but we'll throw anyway.
  */
 void PetscException(PetscInt petscError,
                     unsigned line,
@@ -57,8 +55,8 @@ void PetscException(PetscInt petscError,
         char default_message[30]="Unknown PETSc error code";
 
         /*
-         * PetscErrorMessage will swing p_text to point to the error code's message
-         * ...but only if it's a valid code.
+         * PetscErrorMessage will swing p_text to point to the error code's 
+         * message... but only if it's a valid code.
          */
         PetscErrorMessage(petscError, &p_text, nullptr);
         if (p_text == nullptr)
@@ -66,9 +64,10 @@ void PetscException(PetscInt petscError,
             p_text=default_message;
         }
 
-// /todo #2656 - remove ifdef after cmake transition
+///\todo #2656 - remove ifdef after cmake transition
 #ifdef CHASTE_CMAKE
-        const size_t root_dir_length = std::char_traits<char>::length(ChasteSourceRootDir());
+        const size_t root_dir_length = 
+            std::char_traits<char>::length(ChasteSourceRootDir());
         EXCEPTION(p_text << " in function '" << funct  << "' on line "
                   << line << " of file ./" << file+root_dir_length);
 #else
@@ -79,14 +78,14 @@ void PetscException(PetscInt petscError,
 }
 
 /*
- * Positive codes mean that the KSP converged.
- * Negative codes mean that the KSP diverged, i.e. there's a problem.
+ * Positive codes mean that the KSP converged. Negative codes mean that the KSP 
+ * diverged, i.e. there's a problem.
  */
 std::string GetKspErrorMessage(PetscInt kspError)
 {
     std::string err_string;
 
-#if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
+#if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) // PETSc 2.2
     switch (kspError)
     {
         case KSP_DIVERGED_ITS:
@@ -111,17 +110,22 @@ std::string GetKspErrorMessage(PetscInt kspError)
             err_string = "Unknown KSP error code";
     }
 #else
-    // This array contains the strings describing KSP convergence/divergence reasons.
-    // It is exported by libpetscksp.a
+    /*
+     * This array contains the strings describing KSP convergence/divergence 
+     * reasons. It is exported by libpetscksp.a.
+     */
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
-    //External declaration of KSPConvergedReasons already happens
+    // External declaration of KSPConvergedReasons already happens
     extern const char * const *KSPConvergedReasons;
 #else
     extern const char **KSPConvergedReasons;
 #endif
 
-    // The code for the last known error (-10) is hardcoded in PETSc, in future releases it might change.
-    // It is defined in src/ksp/ksp/interface/dlregisksp.c
+    /*
+     * The code for the last known error (-10) is hardcoded in PETSc, in future 
+     * releases it might change. It is defined in 
+     * src/ksp/ksp/interface/dlregisksp.c.
+     */
     if (kspError >= -10)
     {
         err_string = KSPConvergedReasons[kspError];
@@ -136,8 +140,8 @@ std::string GetKspErrorMessage(PetscInt kspError)
 }
 
 /*
- * Positive codes mean that the KSP converged.
- * Negative codes mean that the KSP diverged, i.e. there's a problem.
+ * Positive codes mean that the KSP converged. Negative codes mean that the KSP 
+ * diverged, i.e. there's a problem.
  */
 void KspException(PetscInt kspError,
                   unsigned line,
@@ -147,7 +151,7 @@ void KspException(PetscInt kspError,
     if (kspError < 0)
     {
         std::stringstream err_string_stream;
-        // /todo #2656 - remove ifdef after cmake transition
+        ///\todo #2656 - remove ifdef after cmake transition
 #ifdef CHASTE_CMAKE
         const size_t root_dir_length = std::char_traits<char>::length(ChasteSourceRootDir());
         err_string_stream << GetKspErrorMessage(kspError) << " in function '" << funct << "' on line "

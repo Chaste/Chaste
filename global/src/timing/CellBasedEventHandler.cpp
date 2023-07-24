@@ -35,6 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CellBasedEventHandler.hpp"
 
-const char* CellBasedEventHandler::EventName[] = { "Setup", "Death", "Birth",
-                                                "Update_Pop", "Update_Sim", "Tessellate", "Force",
-                                                "Position", "Output", "Pde", "Total" };
+const char* CellBasedEventHandler::EventName[] = 
+    { "Setup", "Death", "Birth", "Update_Pop", "Update_Sim", "Tessellate", 
+      "Force", "Position", "Output", "Pde", "Total" };

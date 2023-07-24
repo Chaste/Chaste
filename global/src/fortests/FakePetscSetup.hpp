@@ -33,14 +33,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-//Note that this name deliberately clashes.  We want to avoid a test being both sequential and parallel.
+/* 
+ * Note that this name deliberately clashes. We want to avoid a test being both 
+ * sequential and parallel.
+ */
 #ifndef _PETSCSETUPANDFINALIZE_HPP_
 #define _PETSCSETUPANDFINALIZE_HPP_
 
 /**
- * This file is designed to be included by any test suites that DO NOT use PETSc.
- * It does the PETSc initialisation and finalisation at the top of a test suite, in order to make
- * sure that only one process is left to run the actual tests.
+ * This file is designed to be included by any test suites that DO NOT use 
+ * PETSc. It does the PETSc initialisation and finalisation at the top of a test 
+ * suite, in order to make sure that only one process is left to run the actual 
+ * tests.
  */
 
 #include <cxxtest/GlobalFixture.h>
@@ -57,9 +61,9 @@ class PetscSetup : public CxxTest::GlobalFixture
 public:
 
     /**
-     * Run the standard setup method for PETSc, but then fake being a single process.
-     * Only the process with PETSc rank zero continues beyond setUpWorld(); the others
-     * exit gracefully.
+     * Run the standard setup method for PETSc, but then fake being a single 
+     * process. Only the process with PETSc rank zero continues beyond 
+     * setUpWorld(); the others exit gracefully.
      *
      * Note that we need to keep MPI initialized so we can use MPI_Wtime etc.
      *
@@ -80,8 +84,10 @@ public:
             exit(0);
         }
 
-        // Fool PETSc into thinking it was only run on one process.
-        // This ensures any barriers etc. don't cause deadlock.
+        /*
+         * Fool PETSc into thinking it was only run on one process. This ensures 
+         * any barriers etc. don't cause deadlock.
+         */
         PETSC_COMM_WORLD = MPI_COMM_SELF;
         PetscSetupUtils::ResetStatusCache();
 
@@ -90,11 +96,15 @@ public:
 
     /**
      * Clean up PETSc on the master process after running tests.
+     * 
      * @return true (by CxxTest convention)
      */
     bool tearDownWorld()
     {
-        // Remind PETSc there were originally more processes so MPI is finalized properly.
+        /*
+         * Remind PETSc there were originally more processes so MPI is finalized 
+         * properly.
+         */
         PETSC_COMM_WORLD = MPI_COMM_WORLD;
         PetscSetupUtils::CommonFinalize();
         return true;

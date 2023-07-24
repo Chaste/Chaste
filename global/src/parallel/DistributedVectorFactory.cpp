@@ -54,16 +54,18 @@ void DistributedVectorFactory::CalculateOwnership(Vec vec)
     PetscInt petsc_lo, petsc_hi;
     VecGetOwnershipRange(vec, &petsc_lo, &petsc_hi);
     mGlobalLows.clear();
-    mLo = (unsigned)petsc_lo;
-    mHi = (unsigned)petsc_hi;
-    // vector size
+    mLo = static_cast<unsigned>(petsc_lo);
+    mHi = static_cast<unsigned>(petsc_hi);
+
+    // Vector size
     PetscInt size;
     VecGetSize(vec, &size);
-    mProblemSize = (unsigned) size;
+    mProblemSize = static_cast<unsigned>(size);
     mNumProcs = PetscTools::GetNumProcs();
 }
 
-void DistributedVectorFactory::SetFromFactory(DistributedVectorFactory* pFactory)
+void DistributedVectorFactory::SetFromFactory(
+    DistributedVectorFactory* pFactory)
 {
     if (pFactory->GetNumProcs() != mNumProcs)
     {
@@ -85,7 +87,9 @@ DistributedVectorFactory::DistributedVectorFactory(Vec vec)
     CalculateOwnership(vec);
 }
 
-DistributedVectorFactory::DistributedVectorFactory(unsigned size, PetscInt local)
+DistributedVectorFactory::DistributedVectorFactory(
+    unsigned size,
+    PetscInt local)
     : mPetscStatusKnown(false),
       mpOriginalFactory(nullptr)
 {
@@ -97,15 +101,17 @@ DistributedVectorFactory::DistributedVectorFactory(unsigned size, PetscInt local
     PetscTools::Destroy(vec);
 }
 
-DistributedVectorFactory::DistributedVectorFactory(DistributedVectorFactory* pOriginalFactory)
+DistributedVectorFactory::DistributedVectorFactory(
+    DistributedVectorFactory* pOriginalFactory)
     : mPetscStatusKnown(false),
       mpOriginalFactory(pOriginalFactory)
 {
     assert(mpOriginalFactory != nullptr);
 
     /*
-     * Normally called when mpOriginalFactory->GetNumProcs() != PetscTools::GetNumProcs()
-     * so ignore mpOriginalFactory->GetLocalOwnership()
+     * Normally called when mpOriginalFactory->GetNumProcs() != 
+     * PetscTools::GetNumProcs(), so ignore 
+     * mpOriginalFactory->GetLocalOwnership()
      */
     Vec vec = PetscTools::CreateVec(mpOriginalFactory->GetProblemSize());
 
@@ -113,7 +119,11 @@ DistributedVectorFactory::DistributedVectorFactory(DistributedVectorFactory* pOr
     PetscTools::Destroy(vec);
 }
 
-DistributedVectorFactory::DistributedVectorFactory(unsigned lo, unsigned hi, unsigned size, unsigned numProcs)
+DistributedVectorFactory::DistributedVectorFactory(
+    unsigned lo,
+    unsigned hi,
+    unsigned size,
+    unsigned numProcs)
     : mLo(lo),
       mHi(hi),
       mProblemSize(size),
@@ -138,8 +148,8 @@ void DistributedVectorFactory::CheckForPetsc()
     PetscInitialized(&petsc_is_initialised);
 
     /*
-     * Tripping this assertion means that PETSc and MPI weren't intialised.
-     * A unit test should include the global fixture:
+     * Tripping this assertion means that PETSc and MPI weren't intialised. A 
+     * unit test should include the global fixture:
      * #include "PetscSetupAndFinalize.hpp"
      */
     assert(petsc_is_initialised);
@@ -148,12 +158,12 @@ void DistributedVectorFactory::CheckForPetsc()
 
 bool DistributedVectorFactory::IsGlobalIndexLocal(unsigned globalIndex)
 {
-    return (mLo<=globalIndex && globalIndex<mHi);
+    return (mLo <= globalIndex && globalIndex < mHi);
 }
 
 Vec DistributedVectorFactory::CreateVec()
 {
-    Vec vec = PetscTools::CreateVec(mProblemSize, mHi-mLo);
+    Vec vec = PetscTools::CreateVec(mProblemSize, mHi - mLo);
     return vec;
 }
 
@@ -161,8 +171,10 @@ Vec DistributedVectorFactory::CreateVec(unsigned stride)
 {
     Vec vec;
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 3) //PETSc 3.3 or later
-    //In PETSc 3.3 we cannot alter the stride (block size) after it has been created
-    //There is no VecCreateMPI with block size
+    /*
+     * In PETSc 3.3 we cannot alter the stride (block size) after it has been 
+     * created. There is no VecCreateMPI with block size.
+     */
     VecCreate(PETSC_COMM_WORLD, &vec);
     VecSetBlockSize(vec, stride);
     VecSetSizes(vec, stride*(mHi-mLo), stride*mProblemSize);
@@ -172,7 +184,7 @@ Vec DistributedVectorFactory::CreateVec(unsigned stride)
     VecCreateMPI(PETSC_COMM_WORLD, stride*(mHi-mLo), stride*mProblemSize, &vec);
     VecSetBlockSize(vec, stride);
 #endif
-#if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
+#if (PETSC_VERSION_MAJOR == 3) // PETSc 3.x.x
         VecSetOption(vec, VEC_IGNORE_OFF_PROC_ENTRIES, PETSC_TRUE);
 #else
         VecSetOption(vec, VEC_IGNORE_OFF_PROC_ENTRIES);
@@ -180,7 +192,9 @@ Vec DistributedVectorFactory::CreateVec(unsigned stride)
     return vec;
 }
 
-DistributedVector DistributedVectorFactory::CreateDistributedVector(Vec vec, bool readOnly)
+DistributedVector DistributedVectorFactory::CreateDistributedVector(
+    Vec vec,
+    bool readOnly)
 {
     DistributedVector dist_vector(vec, this, readOnly);
     return dist_vector;
@@ -194,7 +208,13 @@ std::vector<unsigned> &DistributedVectorFactory::rGetGlobalLows()
         mGlobalLows.resize(PetscTools::GetNumProcs());
 
         // Exchange data
-        MPI_Allgather( &mLo, 1, MPI_UNSIGNED, &mGlobalLows[0], 1, MPI_UNSIGNED, PETSC_COMM_WORLD);
+        MPI_Allgather(&mLo,
+                      1,
+                      MPI_UNSIGNED,
+                      &mGlobalLows[0],
+                      1,
+                      MPI_UNSIGNED,
+                      PETSC_COMM_WORLD);
       }
 
     return  mGlobalLows;

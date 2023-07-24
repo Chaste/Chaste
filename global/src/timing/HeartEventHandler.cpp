@@ -35,8 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "HeartEventHandler.hpp"
 
-const char* HeartEventHandler::EventName[] =  { "InMesh", "Init", "AssSys", "Ode",
-                                           "Comms", "AssRhs", "NeuBCs", "DirBCs",
-                                           "Ksp", "Output", "DataConversion",
-                                           "PostProc", "User1", "User2",
-                                           "User3","Total" };
+const char* HeartEventHandler::EventName[] = 
+    { "InMesh", "Init", "AssSys", "Ode", "Comms", "AssRhs", "NeuBCs", "DirBCs", 
+      "Ksp", "Output", "DataConversion", "PostProc", "User1", "User2", "User3", 
+      "Total" };

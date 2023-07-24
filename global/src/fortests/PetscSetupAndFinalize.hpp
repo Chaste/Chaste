@@ -37,8 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _PETSCSETUPANDFINALIZE_HPP_
 
 /**
- * This file is designed to be included by any test suites that use PETSc.
- * It controls the PETSc initialisation and finalisation.
+ * This file is designed to be included by any test suites that use PETSc. It 
+ * controls the PETSc initialisation and finalisation.
  */
 
 #include "PetscSetupUtils.hpp"
@@ -54,6 +54,7 @@ public:
 
     /**
      * Standard setup method for PETSc.
+     * 
      * @return true (by CxxTest convention)
      */
     bool setUpWorld()
@@ -63,11 +64,12 @@ public:
     }
     /**
      * Clean up PETSc after running all tests.
+     * 
      * @return true (by CxxTest convention)
      */
     bool tearDownWorld()
     {
-        /// Causes memory failure (and seg fault) in PETSc 3.2 with MPICH-1
+        // Causes memory failure (and seg fault) in PETSc 3.2 with MPICH-1
         PetscSetupUtils::CommonFinalize();
         return true;
     }

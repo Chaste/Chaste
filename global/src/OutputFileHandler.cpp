@@ -46,7 +46,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "GetCurrentWorkingDirectory.hpp"
 #include "PetscTools.hpp"
 
-
 const std::string OutputFileHandler::SIG_FILE_NAME(".chaste_deletable_folder");
 
 /**
@@ -62,6 +61,7 @@ void CleanFolder(const fs::path& rPath, bool isTop)
 {
     assert(fs::is_directory(rPath));
     fs::directory_iterator end_iter;
+
     // First recursively remove the children
     for (fs::directory_iterator dir_iter(rPath); dir_iter != end_iter; ++dir_iter)
     {
@@ -78,6 +78,7 @@ void CleanFolder(const fs::path& rPath, bool isTop)
             }
         }
     }
+
     // Now remove the folder itself, if not top
     if (!isTop)
     {
@@ -86,15 +87,17 @@ void CleanFolder(const fs::path& rPath, bool isTop)
 }
 
 
-OutputFileHandler::OutputFileHandler(const std::string& rDirectory,
-                                     bool cleanOutputDirectory)
+OutputFileHandler::OutputFileHandler(
+    const std::string& rDirectory,
+    bool cleanOutputDirectory)
 {
     CommonConstructor(rDirectory, cleanOutputDirectory);
 }
 
 
-OutputFileHandler::OutputFileHandler(const FileFinder& rDirectory,
-                                     bool cleanOutputDirectory)
+OutputFileHandler::OutputFileHandler(
+    const FileFinder& rDirectory,
+    bool cleanOutputDirectory)
 {
     FileFinder output_root("", RelativeTo::ChasteTestOutput);
     std::string relative_path;
@@ -116,9 +119,9 @@ OutputFileHandler::OutputFileHandler(const FileFinder& rDirectory,
     CommonConstructor(relative_path, cleanOutputDirectory);
 }
 
-
-void OutputFileHandler::CommonConstructor(const std::string& rDirectory,
-                                          bool cleanOutputDirectory)
+void OutputFileHandler::CommonConstructor(
+    const std::string& rDirectory,
+    bool cleanOutputDirectory)
 {
     // Is it a valid request for a directory?
     if (rDirectory.find("..") != std::string::npos)
@@ -127,10 +130,12 @@ void OutputFileHandler::CommonConstructor(const std::string& rDirectory,
                   " due to it potentially being above, and cleaning, CHASTE_TEST_OUTPUT.");
         // Note: in Boost 1.48 and above we could use 'canonical' to check this better
     }
-    //The notion of absolute path on Windows is rather different.
-    //For example, / and /foo are not absolute paths.
-    //However, fs::path.has_root_path() captures the intended semantics here as follows
 
+    /*
+     * The notion of absolute path on Windows is rather different. For example, 
+     * / and /foo are not absolute paths. However, fs::path.has_root_path() 
+     * captures the intended semantics here as follows.
+     */
     if (fs::path(rDirectory).has_root_path())
     {
         EXCEPTION("The constructor argument to OutputFileHandler must be a relative path; '"
@@ -218,7 +223,9 @@ std::string OutputFileHandler::MakeFoldersAndReturnFullPath(const std::string& r
 
             // Now make all the sub-folders requested one-by-one and add the .chaste_deletable_folder file to them
             fs::path next_folder(output_root);
-            for (fs::path::iterator path_iter = rel_path.begin(); path_iter != rel_path.end(); ++path_iter)
+            for (fs::path::iterator path_iter = rel_path.begin();
+                 path_iter != rel_path.end();
+                 ++path_iter)
             {
                 next_folder /= *path_iter;
                 bool created_dir = fs::create_directory(next_folder);

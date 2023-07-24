@@ -37,8 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PETSCSETUPUTILS_HPP_
 
 /**
- * Common code for setting up and tearing down tests.
- * Used by PetscSetupAndFinalize.hpp and FakePetscSetup.hpp
+ * Common code for setting up and tearing down tests. Used by 
+ * PetscSetupAndFinalize.hpp and FakePetscSetup.hpp
  */
 class PetscSetupUtils
 {
@@ -54,8 +54,8 @@ public:
     static void InitialisePetsc();
 
     /**
-     * Call PetscTools::ResetCache().
-     * Used by FakePetscSetup.hpp to ensure the cache doesn't reflect being run in parallel.
+     * Call PetscTools::ResetCache(). Used by FakePetscSetup.hpp to ensure the 
+     * cache doesn't reflect being run in parallel.
      */
     static void ResetStatusCache();
 
@@ -63,8 +63,6 @@ public:
      * The global finalize (prints citations).
      */
     static void CommonFinalize();
-
-private:
 };
 
 #endif // PETSCSETUPUTILS_HPP_

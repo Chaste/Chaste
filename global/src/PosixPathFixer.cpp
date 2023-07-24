@@ -40,6 +40,7 @@ std::string ChastePosixPathFixer::ToPosix(const fs::path path)
 #ifdef _MSC_VER
     return path.generic_string();
 #else
-    return path.string(); //Doesn't matter on systems that already use POSIX path format
+    // Doesn't matter on systems that already use POSIX path format
+    return path.string();
 #endif
 }

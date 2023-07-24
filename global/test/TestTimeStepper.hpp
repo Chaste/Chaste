@@ -58,7 +58,7 @@ public:
     void TestOverflow()
     {
         TimeStepper stepper(0.0, DBL_MAX, DBL_EPSILON);
-        stepper.mTotalTimeStepsTaken = (unsigned)(-1);
+        stepper.mTotalTimeStepsTaken = static_cast<unsigned>(-1);
         TS_ASSERT(!stepper.IsTimeAtEnd());
         TS_ASSERT_THROWS_THIS(stepper.AdvanceOneTimeStep(), "Time step counter has overflowed.");
     }
@@ -91,7 +91,7 @@ public:
 
         TimeStepper stepper(start_time, end_time, timestep);
 
-        TS_ASSERT_EQUALS(stepper.EstimateTimeSteps(), (unsigned) floor((end_time - start_time)/timestep) );
+        TS_ASSERT_EQUALS(stepper.EstimateTimeSteps(), static_cast<unsigned>(floor((end_time - start_time)/timestep)));
 
         double real_time_step = timestep;
         unsigned time_step_number = 0;

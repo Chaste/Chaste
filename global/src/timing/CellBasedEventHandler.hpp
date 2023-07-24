@@ -45,7 +45,10 @@ class CellBasedEventHandler : public GenericEventHandler<11, CellBasedEventHandl
 {
 public:
 
-    /** Character array holding cell_based event names. There are eleven cell_based events. */
+    /**
+     * Character array holding cell_based event names. There are eleven 
+     * cell_based events. 
+     */
     static const char* EventName[11];
 
     /** Definition of cell_based event types. */

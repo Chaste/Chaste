@@ -40,9 +40,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileFinder.hpp"
 #include "PetscTools.hpp"
 
-OutputDirectoryFifoQueue::OutputDirectoryFifoQueue(const std::string& rBaseDirectory, unsigned queueMaxSize) :
-    mBaseDirectory(rBaseDirectory),
-    mQueueMaxSize(queueMaxSize)
+OutputDirectoryFifoQueue::OutputDirectoryFifoQueue(
+    const std::string& rBaseDirectory,
+    unsigned queueMaxSize)
+    : mBaseDirectory(rBaseDirectory),
+      mQueueMaxSize(queueMaxSize)
 {
     // Create the base directory
     OutputFileHandler handler(mBaseDirectory);
@@ -51,7 +53,8 @@ OutputDirectoryFifoQueue::OutputDirectoryFifoQueue(const std::string& rBaseDirec
     assert(mQueue.empty());
 }
 
-std::string OutputDirectoryFifoQueue::CreateNextDir(const std::string& rSubdirectoryName)
+std::string OutputDirectoryFifoQueue::CreateNextDir(
+    const std::string& rSubdirectoryName)
 {
     std::string subdirectory_full_name = mBaseDirectory + "/" + rSubdirectoryName;
 

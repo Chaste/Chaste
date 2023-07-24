@@ -53,11 +53,9 @@ class NumericFileComparison : public AbstractFileComparison
 {
 private:
     /**
-     * Read the next token in the file as a double.
-     *
-     * If we detect a comment skip the line.
-     * If we detect a word assign the value A_WORD.
-     * If we find nothing to read assign  NOTHING_TO_READ.
+     * Read the next token in the file as a double. If we detect a comment, skip 
+     * the line. If we detect a word, assign the value A_WORD. If we find 
+     * nothing to read, assign NOTHING_TO_READ.
      *
      * @param pFile  The file from which to attempt to read a double.
      * @param rData  The double to assign a value to.
@@ -66,7 +64,10 @@ private:
     {
         if (!(*pFile>>rData))
         {
-            // Cannot read the next token from file as a number, so try a word instead
+            /*
+             * Cannot read the next token from file as a number, so try a word 
+             * instead.
+             */
             std::string word;
             pFile->clear(); // reset the "failbit"
             if (*pFile >> word)
@@ -89,50 +90,77 @@ private:
 public:
 
     /**
-     * Specify two files to compare, and open them for reading.
-     * Actual comparison is done by calling CompareFiles.
+     * Specify two files to compare, and open them for reading. Actual 
+     * comparison is done by calling CompareFiles.
      *
      * @param fileName1  first file
      * @param fileName2  second file
-     * @param calledCollectively  If true there will be a barrier before opening files, and only master compares contents.
-     * @param suppressOutput  If true then no errors will go to TS_TRACE(). Should only be set for the test of this class.
+     * @param calledCollectively  If true there will be a barrier before opening 
+     *     files, and only master compares contents.
+     * @param suppressOutput  If true then no errors will go to TS_TRACE(). 
+     *     Should only be set for the test of this class.
      */
-    NumericFileComparison(std::string fileName1, std::string fileName2, bool calledCollectively=true, bool suppressOutput = false)
-        : AbstractFileComparison(fileName1, fileName2, calledCollectively, suppressOutput)
+    NumericFileComparison(
+        std::string fileName1,
+        std::string fileName2,
+        bool calledCollectively=true,
+        bool suppressOutput = false)
+        : AbstractFileComparison(fileName1,
+                                 fileName2,
+                                 calledCollectively,
+                                 suppressOutput)
     {
     }
 
     /**
-     * Specify two files to compare, and open them for reading.
-     * Actual comparison is done by calling CompareFiles.
+     * Specify two files to compare, and open them for reading. Actual 
+     * comparison is done by calling CompareFiles.
      *
      * @param rFileName1  first file
      * @param rFileName2  second file
-     * @param calledCollectively  If true there will be a barrier before opening files, and only master compares contents.
-     * @param suppressOutput  If true then no errors will go to TS_TRACE(). Should only be set for the test of this class.
+     * @param calledCollectively  If true there will be a barrier before opening 
+     *     files, and only master compares contents.
+     * @param suppressOutput  If true then no errors will go to TS_TRACE(). 
+     *     Should only be set for the test of this class.
      */
-    NumericFileComparison(const FileFinder& rFileName1, const FileFinder& rFileName2, bool calledCollectively=true, bool suppressOutput = false)
-        : AbstractFileComparison(rFileName1, rFileName2, calledCollectively, suppressOutput)
+    NumericFileComparison(
+        const FileFinder& rFileName1,
+        const FileFinder& rFileName2,
+        bool calledCollectively=true,
+        bool suppressOutput = false)
+        : AbstractFileComparison(rFileName1,
+                                 rFileName2,
+                                 calledCollectively,
+                                 suppressOutput)
     {
     }
 
-
     /**
-     * @return true if the files are identical to within tolerance.
-     * Compare the files under both relative and absolute tolerances.
-     * The comparison only fails if neither tolerance holds.  The
-     * default settings effectively require numbers to match exactly.
+     * Compare the files under both relative and absolute tolerances. The 
+     * comparison only fails if neither tolerance holds. The default settings 
+     * effectively require numbers to match exactly.
      *
-     * @param absTol  absolute tolerance on difference between numbers
-     * @param ignoreFirstFewLines  how many lines to ignore from the comparison
-     * @param relTol  relative tolerance on difference between numbers
-     * @param doTsAssert  Whether to throw a TS_ASSERT internally (switched off for testing only)
+     * @param absTol  absolute tolerance on difference between numbers (defaults 
+     *     to DBL_EPSILON)
+     * @param ignoreFirstFewLines  how many lines to ignore from the comparison 
+     *     (defaults to 0)
+     * @param relTol  relative tolerance on difference between numbers (defaults 
+     *     to DBL_EPSILON)
+     * @param doTsAssert  Whether to throw a TS_ASSERT internally (defaults to 
+     *     true; switched off for testing only)
+     * 
+     * @return true if the files are identical to within tolerance.
      */
-    bool CompareFiles(double absTol=DBL_EPSILON, unsigned ignoreFirstFewLines=0,
-                      double relTol=DBL_EPSILON, bool doTsAssert=true)
+    bool CompareFiles(
+        double absTol=DBL_EPSILON,
+        unsigned ignoreFirstFewLines=0,
+        double relTol=DBL_EPSILON,
+        bool doTsAssert=true)
     {
-
-        // Usually only the master process does the checking, this can be switched off in the constructor.
+        /*
+         * Usually only the master process does the checking, this can be 
+         * switched off in the constructor.
+         */
         if (mCalledCollectively && !PetscTools::AmMaster())
         {
             return true;
@@ -149,7 +177,8 @@ public:
         {
             ReadNextToken(mpFile1, data1);
             ReadNextToken(mpFile2, data2);
-            bool ok = CompareDoubles::WithinAnyTolerance(data1, data2, relTol, absTol);
+            bool ok = 
+                CompareDoubles::WithinAnyTolerance(data1, data2, relTol, absTol);
             if (!ok)
             {
                 if (failures++ < max_display_failures && !mSuppressOutput)
@@ -159,23 +188,28 @@ public:
                 }
             }
         }
-        while (data1 != NOTHING_TO_READ && data2 != NOTHING_TO_READ); // If either is a NOTHING_TO_READ, then it means that there's nothing to read from the file
+        while (data1 != NOTHING_TO_READ && data2 != NOTHING_TO_READ);
+        /*
+         * If either is a NOTHING_TO_READ, then it means that there's nothing to 
+         * read from the file.
+         */
 
         if (doTsAssert)
         {
             // Force CxxTest error if there were any major differences
             TS_ASSERT_EQUALS(failures, 0u);
+
             // If that assertion tripped...
             if (failures > 0u && !mSuppressOutput)
             {
-                // Report the paths to the files
+                // ...report the paths to the files
                 TS_TRACE("Files " + mFilename1 + " and " + mFilename2 + " numerically differ.");
             }
         }
 
         ResetFiles();
 
-        return (failures==0);
+        return (failures == 0);
     }
 };
 

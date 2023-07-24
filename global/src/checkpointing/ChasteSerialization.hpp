@@ -40,8 +40,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @file
  *
  * This header is a wrapper including some of the Boost serialization library
- * headers, along with a couple of standard C++ headers required to fix bugs
- * in Boost.
+ * headers, along with a couple of standard C++ headers required to fix bugs in 
+ * Boost.
  *
  * Include this header in place of <boost/serialization/access.hpp>
  */
@@ -59,13 +59,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #if BOOST_VERSION < 103800
 #error "Chaste doesn't support versions of Boost earlier than 1.38."
 #elif BOOST_VERSION == 104100
-// There's a bug in 1.41 with shared_ptr support; see e.g. http://sourceforge.net/apps/trac/easystroke/ticket/21
+/*
+ * There's a bug in 1.41 with shared_ptr support; see e.g. 
+ * http://sourceforge.net/apps/trac/easystroke/ticket/21
+ */
 #error "Chaste won't work with Boost 1.41 due to a bug in its serialization library."
 #endif
 
 /**
- * \todo #2417 Mac OS X doesn't appear to be able to checkpoint dynamically loaded
- * models, so that functionality is switched off here.
+ * \todo #2417 Mac OS X doesn't appear to be able to checkpoint dynamically 
+ * loaded models, so that functionality is switched off here.
  */
 #ifndef CHASTE_CAN_CHECKPOINT_DLLS
 #ifndef __APPLE__
@@ -74,10 +77,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 /**
- * Add some missing #includes for boost 1.56 and boost 1.57,
- * these are to work around bugs in these boost versions.
- *
- * See tickets #2585 (boost 1.56) and #2626 (boost 1.57).
+ * Add some missing #includes for boost 1.56 and boost 1.57, these are to work 
+ * around bugs in these boost versions. See tickets #2585 (boost 1.56) and #2626 
+ * (boost 1.57).
  */
 #if BOOST_VERSION == 105600
 #include <boost/serialization/singleton.hpp>
@@ -89,10 +91,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 /**
- * Add a missing #include for boost 1.74, which is needed
- * to work around a big in that boost version.
- *
- * See #3038
+ * Add a missing #include for boost 1.74, which is needed to work around a big 
+ * in that boost version.  See #3038.
  */
 #if BOOST_VERSION == 107400
 #include <boost/serialization/library_version_type.hpp>

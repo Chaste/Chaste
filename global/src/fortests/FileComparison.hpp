@@ -42,7 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Compare files to check for any differences (in numeric and/or string values).
  *
- * By default this class ignores all lines which (in both files) start with '#' or '!'.
+ * By default this class ignores all lines which (in both files) start with 
+ * '#' or '!'.
  */
 class FileComparison : public AbstractFileComparison
 {
@@ -59,21 +60,33 @@ private:
      */
     std::vector<std::string> mCommentLineStarts;
 
-    /** Any lines which (in both files) contain one of these strings will be ignored. */
+    /**
+     * Any lines which (in both files) contain one of these strings will be 
+     * ignored. 
+     */
     std::vector<std::string> mIgnorableContent;
 
 public:
     /**
-     * Specify two files to compare, and open them for reading.
-     * Actual comparison is done by calling CompareFiles.
+     * Specify two files to compare, and open them for reading. Actual 
+     * comparison is done by calling CompareFiles.
      *
      * @param fileName1  first file
      * @param fileName2  second file
-     * @param calledCollectively  if true there will be a barrier before opening files, and only master compares contents.
-     * @param suppressOutput  if true then no errors will go to TS_TRACE(). Should only be set for the test of this class.
+     * @param calledCollectively  if true there will be a barrier before opening 
+     *     files, and only master compares contents.
+     * @param suppressOutput  if true then no errors will go to TS_TRACE(). 
+     *     Should only be set for the test of this class.
      */
-    FileComparison(std::string fileName1, std::string fileName2, bool calledCollectively=true, bool suppressOutput = false)
-        : AbstractFileComparison(fileName1, fileName2, calledCollectively, suppressOutput),
+    FileComparison(
+        std::string fileName1,
+        std::string fileName2,
+        bool calledCollectively=true,
+        bool suppressOutput = false)
+        : AbstractFileComparison(fileName1,
+                                 fileName2,
+                                 calledCollectively,
+                                 suppressOutput),
           mIgnoreCommentLines(true),
           mIgnoreBlankLines(false)
     {
@@ -81,16 +94,25 @@ public:
     }
 
     /**
-     * Specify two files to compare, and open them for reading.
-     * Actual comparison is done by calling CompareFiles.
+     * Specify two files to compare, and open them for reading. Actual 
+     * comparison is done by calling CompareFiles.
      *
      * @param rFileName1  first file finder
      * @param rFileName2  second file finder
-     * @param calledCollectively  if true there will be a barrier before opening files, and only master compares contents.
-     * @param suppressOutput  if true then no errors will go to TS_TRACE(). Should only be set for the test of this class.
+     * @param calledCollectively  if true there will be a barrier before opening 
+     *     files, and only master compares contents.
+     * @param suppressOutput  if true then no errors will go to TS_TRACE(). 
+     *     Should only be set for the test of this class.
      */
-    FileComparison(const FileFinder& rFileName1, const FileFinder& rFileName2, bool calledCollectively=true, bool suppressOutput = false)
-        : AbstractFileComparison(rFileName1, rFileName2, calledCollectively, suppressOutput),
+    FileComparison(
+        const FileFinder& rFileName1,
+        const FileFinder& rFileName2,
+        bool calledCollectively=true,
+        bool suppressOutput = false)
+        : AbstractFileComparison(rFileName1,
+                                 rFileName2,
+                                 calledCollectively,
+                                 suppressOutput),
           mIgnoreCommentLines(true),
           mIgnoreBlankLines(false)
     {
@@ -100,7 +122,8 @@ public:
     /**
      * Set some line starts that define comments in the files.
      *
-     * These are ignored by default and when #mIgnoreCommentLines is explicitly set to true.
+     * These are ignored by default and when #mIgnoreCommentLines is explicitly 
+     * set to true.
      */
     void SetupCommentLines()
     {
@@ -113,6 +136,7 @@ public:
     /**
      * Whether or not we should ignore lines starting with a comment symbol
      * (the default symbols are '#' and '!', set by SetupCommentLines).
+     * 
      * @param ignore  whether to ignore these lines.  If set to false, existing
      *      defined comment symbols are also cleared, so that an entirely new
      *      set may be defined with SetIgnoreLinesBeginningWith.
@@ -127,9 +151,10 @@ public:
     }
 
     /**
-     * Set whether or not we should ignore blank lines.  If only one of the files being
-     * compared has a blank line, if this mode is on we just skip that line and see if the
-     * next content line matches the other file.
+     * Set whether or not we should ignore blank lines. If only one of the files 
+     * being compared has a blank line, if this mode is on we just skip that 
+     * line and see if the next content line matches the other file.
+     * 
      * @param ignore  whether to ignore blank lines appearing only in one file
      */
     void IgnoreBlankLines(bool ignore=true)
@@ -138,10 +163,11 @@ public:
     }
 
     /**
-     * Set an additional line start which should be treated as a comment and ignored
-     * (and therefore switch on #mIgnoreCommentLines = true).
+     * Set an additional line start which should be treated as a comment and 
+     * ignored (and therefore switch on #mIgnoreCommentLines = true).
      *
-     * @param lineStart  the beginning of a line which should be treated as a comment
+     * @param lineStart  the beginning of a line which should be treated as a 
+     *     comment
      */
     void SetIgnoreLinesBeginningWith(std::string lineStart)
     {
@@ -150,8 +176,8 @@ public:
     }
 
     /**
-     * Add the given string to #mIgnorableContent, and hence ignore differences in lines
-     * which contain that text in both files.
+     * Add the given string to #mIgnorableContent, and hence ignore differences 
+     * in lines which contain that text in both files.
      *
      * @param rIgnorableText  the text indicating lines to ignore
      */
@@ -164,11 +190,15 @@ public:
      * @return true if the files are identical, barring ignored content.
      *
      * @param ignoreFirstFewLines  how many lines to ignore from the comparison
-     * @param doTsAssert  whether to throw a TS_ASSERT internally (switched off for testing only)
+     * @param doTsAssert  whether to throw a TS_ASSERT internally (switched off 
+     *     for testing only)
      */
     bool CompareFiles(unsigned ignoreFirstFewLines=0, bool doTsAssert=true)
     {
-        // Usually only the master process does the checking, this can be switched off in the constructor.
+        /*
+         * Usually only the master process does the checking, this can be 
+         * switched off in the constructor.
+         */
         if (mCalledCollectively && !PetscTools::AmMaster())
         {
             return true;
@@ -191,7 +221,10 @@ public:
 
             if (mIgnoreBlankLines)
             {
-                // Keep reading lines until we see non-blank, end-of-file or read error
+                /*
+                 * Keep reading lines until we see non-blank, end-of-file or 
+                 * read error.
+                 */
                 while (buffer1.empty() && mpFile1->good())
                 {
                     getline(*mpFile1, buffer1);
@@ -248,7 +281,8 @@ public:
                 {
                     // Display error
                     std::stringstream message;
-                    message << "Line " << mLineNum << " differs in files " << mFilename1 << " and " << mFilename2;
+                    message << "Line " << mLineNum << " differs in files " 
+                            << mFilename1 << " and " << mFilename2;
 
                     TS_TRACE(message.str());
                     TS_TRACE( buffer1 );
@@ -258,12 +292,16 @@ public:
             mLineNum++;
         }
         while (mpFile1->good() && mpFile2->good());
-        // If either is not good(), then it means that there's nothing to read from the file, or a file input error.
+        /*
+         * If either is not good(), then it means that there's nothing to read 
+         * from the file, or a file input error.
+         */
 
         if (doTsAssert)
         {
             // Force CxxTest error if there were any major differences
             TS_ASSERT_EQUALS(failures, 0u);
+
             // If that assertion tripped...
             if (failures > 0u && !mSuppressOutput)
             {

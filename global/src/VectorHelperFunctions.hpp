@@ -39,8 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * @file
  *
- * A selection of helper functions to be able to access std::vector<double>
- * and CVODE's N_Vector types using the same interface.  These are used by
+ * A selection of helper functions to be able to access std::vector<double> and 
+ * CVODE's N_Vector types using the same interface. These are used by 
  * AbstractParameterisedSystem and some tests.
  */
 
@@ -58,23 +58,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 /**
- * @return The vector component
- * Helper function to get a vector component.
- *
- * This isn't a member so that we can specialise it without having to
- * specialise the whole class.
+ * Helper function to get a vector component. This isn't a member so that we can 
+ * specialise it without having to specialise the whole class.
  *
  * @param rVec  the vector to access
  * @param index  the index of the component to get
+ * 
+ * @return The vector component
  */
 template <typename VECTOR>
 inline double GetVectorComponent(const VECTOR& rVec, unsigned index);
 
 /**
- * Helper function to set a vector component.
- *
- * This isn't a member so that we can specialise it without having to
- * specialise the whole class.
+ * Helper function to set a vector component. This isn't a member so that we can 
+ * specialise it without having to specialise the whole class.
  *
  * @param rVec  the vector to modify
  * @param index  the index of the component to set
@@ -84,22 +81,19 @@ template <typename VECTOR>
 inline void SetVectorComponent(VECTOR& rVec, unsigned index, double value);
 
 /**
- * Helper function to determine a vector's size.
- *
- * This isn't a member so that we can specialise it without having to
- * specialise the whole class.
+ * Helper function to determine a vector's size. This isn't a member so that we 
+ * can specialise it without having to specialise the whole class.
  *
  * @param rVec  the vector
+ * 
  * @return  its size
  */
 template <typename VECTOR>
 inline unsigned GetVectorSize(const VECTOR& rVec);
 
 /**
- * Helper function to initialise a vector to be empty/unset.
- *
- * This isn't a member so that we can specialise it without having to
- * specialise the whole class.
+ * Helper function to initialise a vector to be empty/unset. This isn't a member 
+ * so that we can specialise it without having to specialise the whole class.
  *
  * @param rVec  the vector
  */
@@ -107,11 +101,10 @@ template <typename VECTOR>
 inline void InitialiseEmptyVector(VECTOR& rVec);
 
 /**
- * If the given vector is empty, set it to have a particular size, allocating memory if necessary.
- * It is a no-op if the vector is non-empty.
- *
- * This isn't a member so that we can specialise it without having to
- * specialise the whole class.
+ * If the given vector is empty, set it to have a particular size, allocating 
+ * memory if necessary. It is a no-op if the vector is non-empty. This isn't a 
+ * member so that we can specialise it without having to specialise the whole 
+ * class.
  *
  * @param rVec  the empty vector
  * @param size  the size to create it as
@@ -120,7 +113,8 @@ template <typename VECTOR>
 inline void CreateVectorIfEmpty(VECTOR& rVec, unsigned size);
 
 /**
- * Helper function to create a new empty/unset vector, useful for defining a default parameter value.
+ * Helper function to create a new empty/unset vector, useful for defining a 
+ * default parameter value.
  *
  * @return a new vector
  */
@@ -131,16 +125,15 @@ inline VECTOR CreateEmptyVector();
  * Helper function to test whether a vector is empty/unset.
  *
  * @param rVec  the vector
+ * 
  * @return true if empty
  */
 template <typename VECTOR>
 inline bool IsEmptyVector(VECTOR& rVec);
 
 /**
- * Helper function to delete a vector.
- *
- * This isn't a member so that we can specialise it without having to
- * specialise the whole class.
+ * Helper function to delete a vector. This isn't a member so that we can 
+ * specialise it without having to specialise the whole class.
  *
  * @param rVec  the vector
  */
@@ -148,22 +141,20 @@ template <typename VECTOR>
 inline void DeleteVector(VECTOR& rVec);
 
 /**
- * Helper function to create a fresh copy of a vector.
- *
- * This isn't a member so that we can specialise it without having to
- * specialise the whole class.
+ * Helper function to create a fresh copy of a vector. This isn't a member so 
+ * that we can specialise it without having to specialise the whole class.
  *
  * @param rVec  the vector to copy
+ * 
  * @return A copy
  */
 template <typename VECTOR>
 inline VECTOR CopyVector(VECTOR& rVec);
 
 /**
- * A helper function to copy a VECTOR into a std::vector<double>.
- *
- * This isn't a member so that we can specialise it without having to
- * specialise the whole class.
+ * A helper function to copy a VECTOR into a std::vector<double>. This isn't a 
+ * member so that we can specialise it without having to specialise the whole 
+ * class.
  *
  * @param rSrc  source vector
  * @param rDest  destination vector; will be resized and filled
@@ -172,10 +163,9 @@ template <typename VECTOR>
 inline void CopyToStdVector(const VECTOR& rSrc, std::vector<double>& rDest);
 
 /**
- * A helper function to copy a std::vector<double> into a VECTOR.
- *
- * This isn't a member so that we can specialise it without having to
- * specialise the whole class.
+ * A helper function to copy a std::vector<double> into a VECTOR. This isn't a 
+ * member so that we can specialise it without having to specialise the whole 
+ * class.
  *
  * @param rSrc  source vector
  * @param rDest  destination vector; must exist and be the correct size
@@ -187,8 +177,10 @@ inline void CopyFromStdVector(const std::vector<double>& rSrc, VECTOR& rDest);
 
 /**
  * Specialisation for std::vector<double>.
+ * 
  * @param rVec
  * @param index
+ * 
  * @return vector component
  */
 template <>
@@ -200,6 +192,7 @@ inline double GetVectorComponent(const std::vector<double>& rVec, unsigned index
 
 /**
  * Specialisation for std::vector<double>.
+ * 
  * @param rVec
  * @param index
  * @param value
@@ -213,7 +206,9 @@ inline void SetVectorComponent(std::vector<double>& rVec, unsigned index, double
 
 /**
  * Specialisation for std::vector<double>.
+ * 
  * @param rVec
+ * 
  * @return size
  */
 template <>
@@ -224,6 +219,7 @@ inline unsigned GetVectorSize(const std::vector<double>& rVec)
 
 /**
  * Specialisation for std::vector<double>.
+ * 
  * @param rVec
  */
 template <>
@@ -233,6 +229,7 @@ inline void InitialiseEmptyVector(std::vector<double>& rVec)
 
 /**
  * Specialisation for std::vector<double>.
+ * 
  * @param rVec
  * @param size
  */
@@ -247,6 +244,7 @@ inline void CreateVectorIfEmpty(std::vector<double>& rVec, unsigned size)
 
 /**
  * Specialisation for std::vector<double>.
+ * 
  * @return empty vector
  */
 template <>
@@ -257,7 +255,9 @@ inline std::vector<double> CreateEmptyVector()
 
 /**
  * Specialisation for std::vector<double>.
+ * 
  * @param rVec
+ * 
  * @return true if empty
  */
 template <>
@@ -268,6 +268,7 @@ inline bool IsEmptyVector(std::vector<double>& rVec)
 
 /**
  * Specialisation for std::vector<double>.
+ * 
  * @param rVec
  */
 template <>
@@ -277,7 +278,9 @@ inline void DeleteVector(std::vector<double>& rVec)
 
 /**
  * Specialisation for std::vector<double>.
+ * 
  * @param rVec
+ * 
  * @return copy
  */
 template <>
@@ -288,6 +291,7 @@ inline std::vector<double> CopyVector(std::vector<double>& rVec)
 
 /**
  * Specialisation for std::vector<double>.
+ * 
  * @param rSrc
  * @param rDest
  */
@@ -299,6 +303,7 @@ inline void CopyToStdVector(const std::vector<double>& rSrc, std::vector<double>
 
 /**
  * Specialisation for std::vector<double>.
+ * 
  * @param rSrc
  * @param rDest
  */
@@ -314,8 +319,10 @@ inline void CopyFromStdVector(const std::vector<double>& rSrc, std::vector<doubl
 
 /**
  * Specialisation for CVODE's N_Vector type.
+ * 
  * @param rVec
  * @param index
+ * 
  * @return the vector component
  */
 template <>
@@ -327,6 +334,7 @@ inline double GetVectorComponent(const N_Vector& rVec, unsigned index)
 
 /**
  * Specialisation for CVODE's N_Vector type.
+ * 
  * @param rVec
  * @param index
  * @param value
@@ -340,7 +348,9 @@ inline void SetVectorComponent(N_Vector& rVec, unsigned index, double value)
 
 /**
  * Specialisation for CVODE's N_Vector type.
+ * 
  * @param rVec
+ * 
  * @return size
  */
 template <>
@@ -352,6 +362,7 @@ inline unsigned GetVectorSize(const N_Vector& rVec)
 
 /**
  * Specialisation for CVODE's N_Vector type.
+ * 
  * @param rVec
  */
 template <>
@@ -362,6 +373,7 @@ inline void InitialiseEmptyVector(N_Vector& rVec)
 
 /**
  * Specialisation for CVODE's N_Vector type.
+ * 
  * @param rVec
  * @param size
  */
@@ -380,6 +392,7 @@ inline void CreateVectorIfEmpty(N_Vector& rVec, unsigned size)
 
 /**
  * Specialisation for CVODE's N_Vector type.
+ * 
  * @return empty vector
  */
 template <>
@@ -390,7 +403,9 @@ inline N_Vector CreateEmptyVector()
 
 /**
  * Specialisation for CVODE's N_Vector type.
+ * 
  * @param rVec
+ * 
  * @return true if empty
  */
 template <>
@@ -401,6 +416,7 @@ inline bool IsEmptyVector(N_Vector& rVec)
 
 /**
  * Specialisation for CVODE's N_Vector type.
+ * 
  * @param rVec
  */
 template <>
@@ -415,7 +431,9 @@ inline void DeleteVector(N_Vector& rVec)
 
 /**
  * Specialisation for CVODE's N_Vector type.
+ * 
  * @param rVec
+ * 
  * @return copy
  */
 template <>
@@ -426,7 +444,7 @@ inline N_Vector CopyVector(N_Vector& rVec)
     {
         copy = N_VClone(rVec);
         unsigned size = NV_LENGTH_S(rVec);
-        for (unsigned i = 0; i < size; i++)
+        for (unsigned i = 0; i < size; ++i)
         {
             NV_Ith_S(copy, i) = NV_Ith_S(rVec, i);
         }
@@ -447,11 +465,13 @@ inline void CopyToStdVector(const N_Vector& rSrc, std::vector<double>& rDest)
     realtype* p_src = NV_DATA_S(rSrc);
     if (!rDest.empty() && p_src == &(rDest[0]))
         return;
+
     // Set dest size
     long size = NV_LENGTH_S(rSrc);
     rDest.resize(size);
+
     // Copy data
-    for (long i = 0; i < size; i++)
+    for (long i = 0; i < size; ++i)
     {
         rDest[i] = p_src[i];
     }
@@ -475,7 +495,7 @@ inline void CopyFromStdVector(const std::vector<double>& rSrc, N_Vector& rDest)
     assert(size == (long)rSrc.size());
 
     // Copy data
-    for (long i = 0; i < size; i++)
+    for (long i = 0; i < size; ++i)
     {
         p_dest[i] = rSrc[i];
     }
@@ -485,6 +505,7 @@ inline void CopyFromStdVector(const std::vector<double>& rSrc, N_Vector& rDest)
  * Make a standard vector from an N_Vector
  *
  * @param v  A CVODE N_Vector to copy the entries from
+ * 
  * @return a std::vector of the entries of the N_Vector.
  */
 inline std::vector<double> MakeStdVec(N_Vector v)
@@ -495,9 +516,10 @@ inline std::vector<double> MakeStdVec(N_Vector v)
 }
 
 /**
- * Make an N_Vector from a standard vector
+ * Make an N_Vector from a standard vector.
  *
  * @param rSrc a std::vector to copy the entries from
+ * 
  * @return an N_Vector of the entries from the std::vector.
  */
 inline N_Vector MakeNVector(const std::vector<double>& rSrc)

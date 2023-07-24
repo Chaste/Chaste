@@ -39,11 +39,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LogFile.hpp"
 #include "PetscTools.hpp"
 
-double Timer::msStartTime = 0.0; // In case user forgets to Reset() before printing.
+// In case user forgets to Reset() before printing
+double Timer::msStartTime = 0.0; 
 
 void Timer::Reset()
 {
-    msStartTime = GetWallTime(); // Arbitrary start time in seconds
+    // Arbitrary start time in seconds
+    msStartTime = GetWallTime();
 }
 
 double Timer::GetWallTime()

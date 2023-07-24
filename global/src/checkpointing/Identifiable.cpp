@@ -44,13 +44,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/type_info_implementation.hpp>
 #include "Warnings.hpp"
 
-std::string Identifiable::TidyTemplatedExportIdentifier(std::string identifier) const
+std::string Identifiable::TidyTemplatedExportIdentifier(
+    std::string identifier) const
 {
-    // First remove spaces, so identifier now takes the form "pack<void(NameOfDerivedType<DIM>)>::type"
-    std::string::iterator end_pos = std::remove(identifier.begin(), identifier.end(), ' ');
+    /*
+     * First remove spaces, so identifier now takes the form 
+     * "pack<void(NameOfDerivedType<DIM>)>::type"
+     */
+    auto end_pos = std::remove(identifier.begin(), identifier.end(), ' ');
     identifier.erase(end_pos, identifier.end());
 
-    // Then remove "pack<void(", so identifier now takes the form "NameOfDerivedType<DIM>)>::type"
+    /*
+     * Then remove "pack<void(", so identifier now takes the form 
+     * "NameOfDerivedType<DIM>)>::type"
+     */
     const std::string s_pack = "pack<void(";
     std::string::size_type i = identifier.find(s_pack);
     if (i != identifier.npos)
@@ -58,7 +65,10 @@ std::string Identifiable::TidyTemplatedExportIdentifier(std::string identifier) 
         identifier.erase(i, s_pack.length());
     }
 
-    // Then replace "<" with "-", so identifier now takes the form "NameOfDerivedType-DIM>)>::type"
+    /*
+     * Then replace "<" with "-", so identifier now takes the form 
+     * "NameOfDerivedType-DIM>)>::type"
+     */
     const std::string s_open = "<";
     const std::string s_dash = "-";
     i = identifier.find(s_open);
@@ -76,7 +86,10 @@ std::string Identifiable::TidyTemplatedExportIdentifier(std::string identifier) 
         i = identifier.find(s_comma, i);
     }
 
-    // Finally remove ">)>::type", so that identifier now takes the form "NameOfDerivedType-DIM"
+    /*
+     * Finally remove ">)>::type", so that identifier now takes the form 
+     * "NameOfDerivedType-DIM"
+     */
     const std::string s_end = ">)>::type";
     i = identifier.find(s_end);
     if (i != identifier.npos)

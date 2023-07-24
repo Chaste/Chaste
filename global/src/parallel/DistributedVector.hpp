@@ -47,10 +47,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class DistributedVectorFactory;
 
 /**
- * Gives access to the local portion of a PETSc vector via an iterator.
- *
- * It also provides two nested classes for accessing vectors with particular
- * memory layouts: striped and chunked.
+ * Gives access to the local portion of a PETSc vector via an iterator. It also 
+ * provides two nested classes for accessing vectors with particular memory 
+ * layouts: striped and chunked.
  */
 class DistributedVector
 {
@@ -85,10 +84,11 @@ private:
      */
     DistributedVectorFactory* mpFactory;
 
-    /** A hint to PETSc that we only want to read from the vector (and never write).
-     *  Note that it may still be possible to alter the content of the vector in an
-     *  inconsistent way -- the user is responsible for ensuring that this doesn't happen.
-     *  The only makes sense with PETSc 3.2 and above.
+    /**
+     * A hint to PETSc that we only want to read from the vector (and never 
+     * write). Note that it may still be possible to alter the content of the 
+     * vector in an inconsistent way -- the user is responsible for ensuring 
+     * that this doesn't happen. The only makes sense with PETSc 3.2 and above.
      */
     bool mReadOnly;
 
@@ -96,26 +96,32 @@ private:
 public:
 
     /**
-     * Test if the given global index is owned by the current process, i.e. is local to it.
+     * Test if the given global index is owned by the current process, i.e. is 
+     * local to it.
      *
-     * @param globalIndex
+     * @param globalIndex a global index
+     * 
      * @return true if the global index can be accessed by this process
      */
     bool IsGlobalIndexLocal(unsigned globalIndex);
 
     /**
-     * Constructor.
-     * This class represents the portion of a distributed PETSc vector on this process.
-     *
-     * Note that this class does NOT take over responsibility for destroying the Vec.
+     * Constructor. This class represents the portion of a distributed PETSc 
+     * vector on this process. Note that this class does NOT take over 
+     * responsibility for destroying the Vec.
      *
      * @param vec PETSc vector of which this class shall be a portion
-     * @param readOnly A suggestion to PETSc that we are not going to change the content of the Vec
-     *        (Note that it may still be possible to alter the content of the vector in an
-     *         inconsistent way -- the user is responsible for ensuring that this doesn't happen.)     *
-     * @param pFactory pointer to the DistributedVectorFactory used to create this vector
+     * @param readOnly A suggestion to PETSc that we are not going to change the 
+     *     content of the Vec (Note that it may still be possible to alter the 
+     *     content of the vector in an inconsistent way -- the user is 
+     *     responsible for ensuring that this doesn't happen.)
+     * @param pFactory pointer to the DistributedVectorFactory used to create 
+     *     this vector
      */
-    DistributedVector(Vec vec, DistributedVectorFactory* pFactory, bool readOnly=false);
+    DistributedVector(
+        Vec vec,
+        DistributedVectorFactory* pFactory,
+        bool readOnly=false);
 
     /**
      * @return #mHi - The next index above the top one owned by the process.
@@ -142,21 +148,24 @@ public:
     }
 
     /**
+     * Do not use if stride > 1. For use in tests. Will throw a 
+     * DistributedVectorException if the specified element is not on this 
+     * process.
+     * 
      * @param globalIndex
+     * 
      * @return value of distributed vector at globalIndex
-     * Do not use if stride>1.
-     * For use in tests.
-     * Will throw a DistributedVectorException if the specified element is not on this process.
      */
     double& operator[](unsigned globalIndex);
 
     /**
-     * Store elements that have been written to
-     * back into the PETSc vector. Call after you have finished writing.
-     * It appears that you do not need to call this if you only read from the vector.
+     * Store elements that have been written to back into the PETSc vector. Call 
+     * after you have finished writing. It appears that you do not need to call 
+     * this if you only read from the vector.
      *
-     * Calling this method when the #mReadOnly flag is set results in error (as a
-     * reminder that there should be no changes to the data in the original Vec).
+     * Calling this method when the #mReadOnly flag is set results in error (as 
+     * a reminder that there should be no changes to the data in the original 
+     * Vec).
      */
     void Restore();
 
@@ -167,18 +176,25 @@ public:
     class Iterator
     {
     public:
-        unsigned Local;  /**< Current index, local to this process. */
-        unsigned Global; /**< Current index, global to the whole PETSc vector. */
+
+        /** Current index, local to this process. */
+        unsigned Local;
+
+        /** Current index, global to the whole PETSc vector. */
+        unsigned Global; 
 
         /**
          * Compare two indices for inequality.
          *
          * @param rOther
+         * 
          * @return true when not equal
          */
         bool operator!=(const Iterator& rOther);
 
-        /** Increment the iterator to the next index.
+        /**
+         * Increment the iterator to the next index.
+         * 
          * @return incremented operator
          */
         Iterator& operator++();
@@ -187,18 +203,29 @@ public:
     /**
      * Provide access to a particular stripe of a striped vector.
      *
-     * A striped vector has multiple types of information encoded within a single
-     * vector, with a layout like [x_1, y_1, z_1, x_2, y_2, z_2, ... x_n, y_n, z_n].
-     * This class provides easy access to, for example, the x values.
+     * A striped vector has multiple types of information encoded within a 
+     * single vector, with a layout like [x_1, y_1, z_1, x_2, y_2, z_2, ... x_n, 
+     * y_n, z_n]. This class provides easy access to, for example, the x values.
      */
     class Stripe
     {
-        unsigned mStride; /**< Number of types of information in the vector. */
-        unsigned mStripe; /**< The number of this stripe within the vector starting from 0. */
-        double* mpVec;    /**< The local part of the underlying PETSc vector. */
-        unsigned mLo;     /**< The first entry owned by the current processor. */
-        unsigned mHi;     /**< One above the last entry owned by the current processor. */
-        DistributedVectorFactory* mpFactory; /**< The factory that created our parent vector. */
+        /** Number of types of information in the vector. */
+        unsigned mStride;
+
+        /** The number of this stripe within the vector starting from 0. */
+        unsigned mStripe;
+
+        /** The local part of the underlying PETSc vector. */
+        double* mpVec;
+
+        /** The first entry owned by the current processor. */
+        unsigned mLo;
+
+        /** One above the last entry owned by the current processor. */
+        unsigned mHi;
+
+        /** The factory that created our parent vector. */
+        DistributedVectorFactory* mpFactory; 
 
     public:
         /**
@@ -227,11 +254,12 @@ public:
         }
 
         /**
-         * Access a particular element of the stripe if on this processor.
-         * For use in tests. Will throw a DistributedVectorException if
-         * the specified element is not on this process.
+         * Access a particular element of the stripe if on this processor. For 
+         * use in tests. Will throw a DistributedVectorException if the 
+         * specified element is not on this process.
          *
          * @param globalIndex index within the stripe
+         * 
          * @return value of striped vector
          */
         double& operator[](unsigned globalIndex)
@@ -245,6 +273,7 @@ public:
 
         /**
          * @param index
+         * 
          * @return value of striped distributed vector pointed to by index.
          */
         double& operator[](Iterator index)
@@ -256,16 +285,25 @@ public:
     /**
      * Provide access to a particular chunk of a chunked vector.
      *
-     * A chunked vector has multiple types of information encoded within a single
-     * vector, with a layout like [x_1, x_2, ..., x_n, y_1, y_2, ... y_n].
-     * This class provides easy access to, for example, the x values.
+     * A chunked vector has multiple types of information encoded within a 
+     * single vector, with a layout like [x_1, x_2, ..., x_n, y_1, y_2, ... 
+     * y_n]. This class provides easy access to, for example, the x values.
      */
     class Chunk
     {
-        unsigned mOffset; /**< The start of this chunk within the locally-owned part of the vector. */
-        double* mpVec;    /**< The local part of the underlying PETSc vector. */
-        unsigned mLo;     /**< The first entry owned by the current processor. */
-        unsigned mHi;     /**< One above the last entry owned by the current processor. */
+        /**
+         * The start of this chunk within the locally-owned part of the vector. 
+         */
+        unsigned mOffset;
+
+        /** The local part of the underlying PETSc vector. */
+        double* mpVec;
+
+        /** The first entry owned by the current processor. */
+        unsigned mLo;
+
+        /** One above the last entry owned by the current processor. */     
+        unsigned mHi;
 
     public:
         /**
@@ -284,18 +322,19 @@ public:
         }
 
         /**
-         * Access a particular element of the chunk if on this processor.
-         * For use in tests. Will throw a DistributedVectorException if
-         * the specified element is not on this process.
+         * Access a particular element of the chunk if on this processor. For 
+         * use in tests. Will throw a DistributedVectorException if the 
+         * specified element is not on this process.
          *
          * @param globalIndex index within the chunk
+         * 
          * @return value of striped vector
          */
         double& operator[](unsigned globalIndex)
         {
             if (mLo <= globalIndex && globalIndex < mHi)
             {
-                //localIndex = globalIndex - mLo
+                // localIndex = globalIndex - mLo
                 return mpVec[mOffset + globalIndex - mLo];
             }
             throw DistributedVectorException();
@@ -303,6 +342,7 @@ public:
 
         /**
          * @param index
+         * 
          * @return value of striped distributed vector pointed to by index.
          */
         double& operator[](Iterator index)
@@ -312,21 +352,22 @@ public:
     };
 
     /**
-     * @return iterator pointing to the first element of the distributed
-     * vector on this process
+     * @return iterator pointing to the first element of the distributed vector 
+     * on this process.
      */
     Iterator Begin();
 
     /**
      * @return iterator pointing to one past the last element of the distributed
-     * vector on this process
+     * vector on this process.
      */
     Iterator End();
 
     /**
      * @param index
-     * @return value of distributed vector pointed to by index.
-     * Do not use if stride>1.
+     * 
+     * @return value of distributed vector pointed to by index. Do not use if 
+     * stride > 1.
      */
     double& operator[](Iterator index);
 };

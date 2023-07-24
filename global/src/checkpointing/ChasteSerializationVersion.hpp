@@ -41,15 +41,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * @file
- * Provide a wrapper around Boost's serialization version to cope with changes in library
- * interface.
+ * Provide a wrapper around Boost's serialization version to cope with changes 
+ * in library interface.
  * Include this header in place of <boost/serialization/version.hpp>
  *
- * For simple classes T, a version number N can be specified just by using the Boost macro
- * BOOST_CLASS_VERSION(T, N)
+ * For simple classes T, a version number N can be specified just by using the 
+ * Boost macro BOOST_CLASS_VERSION(T, N)
  *
- * However, templated classes need to expand the definition of this macro, the contents of
- * which changed in Boost 1.44.  Use the CHASTE_VERSION_CONTENT macro within your template.
+ * However, templated classes need to expand the definition of this macro, the 
+ * contents of which changed in Boost 1.44. Use the CHASTE_VERSION_CONTENT macro 
+ * within your template.
  *
  * For example:
 \code
@@ -74,6 +75,7 @@ struct version<AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM> >
 
 /**
  * Content for the Boost serialization version template on Boost 1.44 and above.
+ * 
  * @param N  the version number
  */
 #define CHASTE_VERSION_CONTENT(N)                             \
@@ -85,13 +87,13 @@ struct version<AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM> >
 
 /**
  * Content for the Boost serialization version template on Boost 1.43 and below.
+ * 
  * @param N  the version number
  */
 #define CHASTE_VERSION_CONTENT(N)                             \
     BOOST_STATIC_CONSTANT(unsigned, value = N)
 
 #endif // BOOST_VERSION >= 104400
-
 
 // gcov doesn't like this file...
 // LCOV_EXCL_STOP

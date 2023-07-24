@@ -45,16 +45,15 @@ namespace boost
 {
 namespace random
 {
-
-    // The algorithm is taken from Knuth
-
     /**
- * The gamma distribution is a continuous distribution with two
- * parameters alpha and beta.  It produces values > 0.
- *
- * It has
- * \f$\displaystyle p(x) = x^{\alpha-1}\frac{e^{-x/\beta}}{\beta^\alpha\Gamma(\alpha)}\f$.
- */
+     * The algorithm is taken from Knuth.
+     * 
+     * The gamma distribution is a continuous distribution with two parameters, 
+     * alpha and beta. It produces values > 0.
+     *
+     * It has
+     * \f$\displaystyle p(x) = x^{\alpha-1}\frac{e^{-x/\beta}}{\beta^\alpha\Gamma(\alpha)}\f$.
+     */
     template <class RealType = double>
     class gamma_distribution_v165
     {
@@ -68,11 +67,11 @@ namespace random
             typedef gamma_distribution_v165 distribution_type;
 
             /**
-         * Constructs a @c param_type object from the "alpha" and "beta"
-         * parameters.
-         *
-         * Requires: alpha > 0 && beta > 0
-         */
+             * Constructs a @c param_type object from the "alpha" and "beta"
+             * parameters.
+             *
+             * Requires: alpha > 0 && beta > 0
+             */
             param_type(const RealType& alpha_arg = RealType(1.0),
                        const RealType& beta_arg = RealType(1.0))
                     : _alpha(alpha_arg), _beta(beta_arg)
@@ -126,10 +125,10 @@ namespace random
 #endif
 
         /**
-     * Creates a new gamma_distribution with parameters "alpha" and "beta".
-     *
-     * Requires: alpha > 0 && beta > 0
-     */
+         * Creates a new gamma_distribution with parameters "alpha" and "beta".
+         *
+         * Requires: alpha > 0 && beta > 0
+         */
         explicit gamma_distribution_v165(const result_type& alpha_arg = result_type(1.0),
                                          const result_type& beta_arg = result_type(1.0))
                 : _exp(result_type(1)), _alpha(alpha_arg), _beta(beta_arg)
@@ -146,7 +145,7 @@ namespace random
             init();
         }
 
-        // compiler-generated copy ctor and assignment operator are fine
+        // Compiler-generated copy ctor and assignment operator are fine
 
         /** Returns the "alpha" paramter of the distribution. */
         RealType alpha() const { return _alpha; }

@@ -108,7 +108,7 @@ unsigned CommandLineArguments::GetUnsignedCorrespondingToOption(const std::strin
     {
         EXCEPTION("Option is a negative number and cannot be converted to unsigned.");
     }
-    return (unsigned)(i);
+    return static_cast<unsigned>(i);
 }
 
 int CommandLineArguments::GetIndexForArgument(std::string rOption)

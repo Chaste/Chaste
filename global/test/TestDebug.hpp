@@ -62,7 +62,7 @@ public:
 
         unsigned my_var = 3141;
         PRINT_VARIABLE(my_var);
-        use_vars += (double) my_var;
+        use_vars += static_cast<double>(my_var);
 
         double another_var = 2.81;
         PRINT_2_VARIABLES(my_var, another_var);

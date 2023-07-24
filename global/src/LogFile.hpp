@@ -188,7 +188,7 @@ public:
     {
         if (mFileSet)
         {
-            (*mpOutStream) << std::setprecision((int)mPrecision) << message << std::flush;
+            (*mpOutStream) << std::setprecision(static_cast<int>(mPrecision)) << message << std::flush;
         }
 
         return *this;

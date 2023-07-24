@@ -46,27 +46,32 @@ class ReplicatableVector
 {
 private:
 
-    double* mpData;     /**< The wrapped PeTSc vector. */
-    unsigned mSize;     /**< The length of the vector. */
-    VecScatter mToAll;   /**< Variable holding information for replicating a PETSc vector. */
-    Vec mReplicated;     /**< Vector to hold concentrated copy of replicated vector. */
+    /** The wrapped PeTSc vector. */
+    double* mpData;
 
-    /**
-     * Clear data. Used in resize method and destructor.
-     */
+    /** The length of the vector. */
+    unsigned mSize;
+
+    /** Variable holding information for replicating a PETSc vector. */
+    VecScatter mToAll;
+
+    /** Vector to hold concentrated copy of replicated vector. */
+    Vec mReplicated;
+
+    /** Clear data. Used in resize method and destructor. */
     void RemovePetscContext();
 
 public:
 
     /**
-     * Default constructor.
-     * Note that the vector will need to be resized before it can be used.
+     * Default constructor. Note that the vector will need to be resized before 
+     * it can be used.
      */
     ReplicatableVector();
 
     /**
-     * Constructor taking in PETSc vector, which is immediately
-     * replicated into the internal data
+     * Constructor taking in PETSc vector, which is immediately replicated into 
+     * the internal data
      *
      * @param vec a PETSc vector
      */
@@ -80,8 +85,7 @@ public:
     ReplicatableVector(unsigned size);
 
     /**
-     * Default destructor.
-     * Remove PETSc context.
+     * Default destructor. Remove PETSc context.
      */
     ~ReplicatableVector();
 
@@ -101,15 +105,15 @@ public:
      * Access the vector.
      *
      * @param index the index of the vector to return
+     * 
      * @return reference to component of the vector
      */
     double& operator[](unsigned index);
 
     /**
-     * Replicate this vector over all processes.
-     *
-     * Each process knows its local part of the vector.  This method shares that knowledge
-     * across all the processes.
+     * Replicate this vector over all processes. Each process knows its local 
+     * part of the vector. This method shares that knowledge across all the 
+     * processes.
      *
      * @param lo  The start of our ownership range
      * @param hi  One past the end of our ownership range
@@ -117,12 +121,10 @@ public:
     void Replicate(unsigned lo, unsigned hi);
 
     /**
-     * Replicate the given PETSc vector over all processes.
-     *
-     * Each process knows its local part of the vector.  This method shares that knowledge
-     * across all the processes, storing it in this object.
-     *
-     * Our data vector will automatically be resized to fit the whole PETSc vector.
+     * Replicate the given PETSc vector over all processes. Each process knows 
+     * its local part of the vector. This method shares that knowledge across 
+     * all the processes, storing it in this object. Our data vector will 
+     * automatically be resized to fit the whole PETSc vector.
      *
      * @param vec  The PETSc vector to replicate.
      */
