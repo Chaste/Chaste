@@ -75,6 +75,8 @@ public:
         
         TS_ASSERT_EQUALS(p_mesh->SolveElementMapping(1), 1u);
         TS_ASSERT_EQUALS(p_mesh->SolveBoundaryElementMapping(1), 1u);
+
+        delete p_mesh;
     }
 
     void TestSetupFluidVelocityGrids()
@@ -85,6 +87,8 @@ public:
         ImmersedBoundaryMesh<2, 2>* p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems);
         TS_ASSERT(&(p_mesh->rGet2dVelocityGrids()));
         TS_ASSERT(&(p_mesh->rGetModifiable2dVelocityGrids()));      
+
+        delete p_mesh;
     }
     
     void Test3DVelocityGrids()
@@ -129,6 +133,7 @@ public:
 
             // Write the nodes to file
             (*p_arch) << p_mesh;
+
             delete p_mesh;
         }
 
