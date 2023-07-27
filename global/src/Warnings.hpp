@@ -147,7 +147,7 @@ public:
  * not warn again on the message content, just on whether the line of code where 
  * this macro is placed has been reached. In other words:
  *
- * for (unsigned i=0; i<10; i++)
+ * for (unsigned i = 0; i < 10; ++i)
  * {
  *    WARN_ONCE_ONLY("Don't make me angry");
  * }

@@ -530,7 +530,7 @@ bool FileFinder::IsAbsolutePath(const std::string& rPath)
 
 void FileFinder::ReplaceSpacesWithUnderscores(std::string& rPath)
 {
-    for (std::string::iterator it = rPath.begin(); it != rPath.end(); ++it)
+    for (auto it = rPath.begin(); it != rPath.end(); ++it)
     {
         if (*it == ' ')
         {
@@ -541,7 +541,7 @@ void FileFinder::ReplaceSpacesWithUnderscores(std::string& rPath)
 
 void FileFinder::ReplaceUnderscoresWithSpaces(std::string& rPath)
 {
-    for (std::string::iterator it = rPath.begin(); it != rPath.end(); ++it)
+    for (auto it = rPath.begin(); it != rPath.end(); ++it)
     {
         if (*it == '_')
         {

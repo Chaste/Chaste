@@ -48,7 +48,7 @@ public:
 
     void TestSmallPowUnsigned()
     {
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i = 0; i < 10; ++i)
         {
             TS_ASSERT_EQUALS(SmallPow(5u, i), static_cast<unsigned>(floor(0.5 + std::pow(5.0, i))));
         }
@@ -56,9 +56,12 @@ public:
 
     void TestSmallPowFloatingPoint()
     {
-        // SmallPow is specialised for exponents 0, 1, 2, 3, 4 and the falls back to std::pow, so testing
-        // up to and including an exponent of 5 is necessary to test all of our functionality
-        for (unsigned i=0; i<6; i++)
+        /*
+         * SmallPow is specialised for exponents 0, 1, 2, 3, 4 and the falls 
+         * back to std::pow, so testing up to and including an exponent of 5 is 
+         * necessary to test all of our functionality.
+         */
+        for (unsigned i = 0; i < 6; ++i)
         {
             TS_ASSERT_DELTA(SmallPow(0.0, i), std::pow(0.0, i), 1e-12);
             TS_ASSERT_DELTA(SmallPow(-1.67e3, i), std::pow(-1.67e3, i), 1e-12);

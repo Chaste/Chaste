@@ -53,7 +53,7 @@ public:
     void Run()
     {
         int total = 0;
-        for (int i=0; i<1e8; i++)
+        for (unsigned i = 0; i < 1e8; ++i)
         {
             total += Method(i);
         }
@@ -74,7 +74,7 @@ public:
     void Run()
     {
         int total = 0;
-        for (int i=0; i<1e8; i++)
+        for (unsigned i = 0; i < 1e8; ++i)
         {
             total += Method(i);
         }
@@ -132,7 +132,7 @@ public:
     void Run()
     {
         int total = 0;
-        for (int i=0; i<1e8; i++)
+        for (unsigned i = 0; i < 1e8; ++i)
         {
             total += static_cast<Derived*>(this)->Method(i);
         }

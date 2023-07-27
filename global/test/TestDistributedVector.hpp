@@ -178,7 +178,7 @@ public:
         VecGetArray(vec, &p_vec);
         double* p_striped;
         VecGetArray(striped, &p_striped);
-        for (unsigned global_index=lo; global_index<hi; global_index++)
+        for (unsigned global_index = lo; global_index < hi; ++global_index)
         {
             unsigned local_index = global_index - lo;
             p_vec[local_index] = local_index*global_index;
@@ -203,7 +203,7 @@ public:
         TS_ASSERT_EQUALS(distributed_vector.Begin().Global,lo);
         TS_ASSERT_EQUALS(distributed_vector.End().Global,hi);
         // read some values
-        for (DistributedVector::Iterator index = distributed_vector.Begin();
+        for (auto index = distributed_vector.Begin();
              index!= distributed_vector.End();
              ++index)
         {
@@ -261,7 +261,7 @@ public:
         DistributedVector::Chunk quadratic_chunk(distributed_vector_chunked, 1);
 
         // Write some values
-        for (DistributedVector::Iterator index = distributed_vector.Begin();
+        for (auto index = distributed_vector.Begin();
              index!= distributed_vector.End();
              ++index)
         {
@@ -291,7 +291,7 @@ public:
         VecGetArray(chunked, &p_chunked);
         double* p_vec;
         VecGetArray(petsc_vec, &p_vec);
-        for (unsigned global_index=lo; global_index<hi; global_index++)
+        for (unsigned global_index = lo; global_index < hi; ++global_index)
         {
             unsigned local_index = global_index - lo;
             TS_ASSERT_EQUALS(p_vec[local_index], -static_cast<double>(local_index*global_index));
@@ -357,7 +357,7 @@ public:
         // Test that we are able to share the global low values
         std::vector<unsigned> global_lows = factory.rGetGlobalLows();
         TS_ASSERT_EQUALS(global_lows.size(), num_procs);
-        for (unsigned proc_index=0; proc_index<num_procs; proc_index++)
+        for (unsigned proc_index = 0; proc_index < num_procs; ++proc_index)
         {
             TS_ASSERT_EQUALS(global_lows[proc_index], (proc_index+1)*proc_index/2);
         }
@@ -371,9 +371,9 @@ public:
 
         {
             DistributedVector distributed_vector = factory.CreateDistributedVector(petsc_vec);
-            for (DistributedVector::Iterator index = distributed_vector.Begin();
-                    index!= distributed_vector.End();
-                    ++index)
+            for (auto index = distributed_vector.Begin();
+                 index!= distributed_vector.End();
+                 ++index)
             {
                 distributed_vector[index] = static_cast<double>(PetscTools::GetMyRank());
             }
@@ -389,9 +389,9 @@ public:
         {
             DistributedVector distributed_vector_read = factory.CreateDistributedVector(petsc_vec, true);
 
-            for (DistributedVector::Iterator index = distributed_vector_read.Begin();
-                    index!= distributed_vector_read.End();
-                    ++index)
+            for (auto index = distributed_vector_read.Begin();
+                 index!= distributed_vector_read.End();
+                 ++index)
             {
                 TS_ASSERT_EQUALS(distributed_vector_read[index], static_cast<double>(PetscTools::GetMyRank()));
                 distributed_vector_read[index] = 2.0;

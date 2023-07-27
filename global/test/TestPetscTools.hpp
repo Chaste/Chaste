@@ -79,14 +79,14 @@ public:
         ReplicatableVector vec1_repl(vec1);
 
         TS_ASSERT_EQUALS(vec1_repl.GetSize(), 10u);
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i = 0; i < 10; ++i)
         {
             TS_ASSERT_DELTA(vec1_repl[i], 3.41, 1e-12);
         }
 
         // Test CreateVec which uses a std::vector of data
         std::vector<double> data(10);
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i = 0; i < 10; ++i)
         {
             data[i] = i+0.45;
         }
@@ -96,7 +96,7 @@ public:
         ReplicatableVector vec2_repl(vec2);
 
         TS_ASSERT_EQUALS(vec2_repl.GetSize(), 10u);
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i = 0; i < 10; ++i)
         {
             TS_ASSERT_DELTA(vec2_repl[i], i+0.45, 1e-12);
         }
@@ -267,11 +267,11 @@ public:
         PetscInt lo, hi;
         VecGetOwnershipRange(vector, &lo, &hi);
 
-        for (int row=0; row<10; row++)
+        for (int row = 0; row < 10; ++row)
         {
             if (row >= lo && row < hi)
             {
-                for (int col=0; col<10; col++)
+                for (int col = 0; col < 10; ++col)
                 {
                     MatSetValue(matrix, row, col, static_cast<double>(10*row+col+1), INSERT_VALUES);
                 }
@@ -304,11 +304,11 @@ public:
         double* p_vector_read;
         VecGetArray(vector_read, &p_vector_read);
 
-        for (PetscInt row=0; row<10; row++)
+        for (PetscInt row = 0; row < 10; ++row)
         {
-            if (lo<=row && row<hi)
+            if (lo <= row && row < hi)
             {
-                for (PetscInt col=0; col<10; col++)
+                for (PetscInt col = 0; col < 10; ++col)
                 {
                     double value;
                     MatGetValues(matrix_read, 1, &row, 1, &col, &value);
@@ -356,18 +356,18 @@ public:
         double* p_vector_read;
         VecGetArray(vector_read, &p_vector_read);
 
-        for (PetscInt row=0; row<10; row++)
+        for (PetscInt row = 0; row < 10; ++row)
         {
-            if (lo<=row && row<hi)
+            if (lo <= row && row < hi)
             {
-                for (PetscInt col=0; col<10; col++)
+                for (PetscInt col = 0; col < 10; ++col)
                 {
                     double value;
                     MatGetValues(matrix_read, 1, &row, 1, &col, &value);
                     TS_ASSERT_EQUALS(value, static_cast<double>(10*row+col+1));
                 }
 
-            unsigned local_index = row-lo;
+            unsigned local_index = row - lo;
             TS_ASSERT_EQUALS(p_vector_read[local_index], static_cast<double>(row));
             }
         }

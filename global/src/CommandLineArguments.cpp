@@ -115,9 +115,9 @@ int CommandLineArguments::GetIndexForArgument(std::string rOption)
 {
     TestOptionFormat(rOption);
 
-    for (int i=1; i<*p_argc; i++)
+    for (int i = 1; i < *p_argc; ++i)
     {
-        if (rOption==std::string((*p_argv)[i]))
+        if (rOption == std::string((*p_argv)[i]))
         {
             return i;
         }
@@ -130,10 +130,10 @@ int CommandLineArguments::GetNumberOfArgumentsForOption(const std::string& rOpti
     int start_idx = GetIndexForArgument(rOption);
 
     int end_idx = start_idx;
-    for (int i=start_idx+1; i<*p_argc; i++)
+    for (int i = start_idx + 1; i < *p_argc; ++i)
     {
         std::string argument = std::string((*p_argv)[i]);
-        if (argument.substr(0,1)=="-" && argument.substr(1,1).find_first_of("0123456789")==std::string::npos)
+        if (argument.substr(0,1) == "-" && argument.substr(1,1).find_first_of("0123456789")==std::string::npos)
         {
             break;
         }
@@ -166,7 +166,7 @@ std::vector<std::string> CommandLineArguments::GetStringsCorrespondingToOption(c
 {
     std::vector<std::string> strings;
     int num_args = GetNumberOfArgumentsForOption(rOption, true);
-    for (int i=1; i<=num_args; ++i)
+    for (int i = 1; i <= num_args; ++i)
     {
         strings.push_back(GetStringCorrespondingToOption(rOption, i));
     }
@@ -177,7 +177,7 @@ std::vector<double> CommandLineArguments::GetDoublesCorrespondingToOption(const 
 {
     std::vector<double> doubles;
     int num_args = GetNumberOfArgumentsForOption(rOption, true);
-    for (int i=1; i<=num_args; ++i)
+    for (int i = 1; i <= num_args; ++i)
     {
         doubles.push_back(GetDoubleCorrespondingToOption(rOption, i));
     }
@@ -188,7 +188,7 @@ std::vector<unsigned> CommandLineArguments::GetUnsignedsCorrespondingToOption(co
 {
     std::vector<unsigned> unsigneds;
     int num_args = GetNumberOfArgumentsForOption(rOption, true);
-    for (int i=1; i<=num_args; ++i)
+    for (int i = 1; i <= num_args; ++i)
     {
         unsigneds.push_back(GetUnsignedCorrespondingToOption(rOption, i));
     }
@@ -199,7 +199,7 @@ std::vector<int> CommandLineArguments::GetIntsCorrespondingToOption(const std::s
 {
     std::vector<int> ints;
     int num_args = GetNumberOfArgumentsForOption(rOption, true);
-    for (int i=1; i<=num_args; ++i)
+    for (int i = 1; i <= num_args; ++i)
     {
         ints.push_back(GetIntCorrespondingToOption(rOption, i));
     }

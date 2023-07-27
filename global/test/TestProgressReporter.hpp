@@ -53,7 +53,7 @@ public:
             ProgressReporter progress_bar("ProgressReporter", 1.0, 10.0);
 
             progress_bar.PrintInitialising();
-            for (unsigned i=0; i<=1000; i++)
+            for (unsigned i = 0; i <= 1000; ++i)
             {
                 double t = 1.0 + ((i+0.0)/1000)*9.0;
                 progress_bar.Update(t);
@@ -76,7 +76,7 @@ public:
             try
             {
                 progress_bar.PrintInitialising();
-                for (unsigned i=0; i<=900; i++)
+                for (unsigned i = 0; i <= 900; ++i)
                 {
                     double t = 1.0 + ((i+0.0)/1000)*9.0 - smidge;
                     progress_bar.Update(t);

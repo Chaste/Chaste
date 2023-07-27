@@ -73,12 +73,11 @@ public:
             boost::shared_ptr<ClassOfSimpleVariables> p_new_class(new ClassOfSimpleVariables(42,"hello",doubles,bools));
 
             // Send the class
-            for (unsigned p=1; p < PetscTools::GetNumProcs(); p++)
+            for (unsigned p = 1; p < PetscTools::GetNumProcs(); ++p)
             {
                 // Arguments are object, destination, tag
                 communicator.SendObject(p_new_class, p, 123);
             }
-
         }
         else
         {
@@ -121,7 +120,7 @@ public:
             boost::shared_ptr<ClassOfSimpleVariables> p_new_class(new ClassOfSimpleVariables(42,"hello",doubles,bools));
 
             // Send the class
-            for (unsigned p=0; p < PetscTools::GetNumProcs(); p++)
+            for (unsigned p = 0; p < PetscTools::GetNumProcs(); ++p)
             {
                 if (p != PetscTools::GetMyRank())
                 {
@@ -135,7 +134,7 @@ public:
         {
             boost::shared_ptr<ClassOfSimpleVariables> p_recv_class;
 
-            for (unsigned p=0; p < PetscTools::GetNumProcs(); p++)
+            for (unsigned p = 0; p < PetscTools::GetNumProcs(); ++p)
             {
                 if (p != PetscTools::GetMyRank())
                 {
@@ -180,7 +179,7 @@ public:
             boost::shared_ptr<ClassOfSimpleVariables> p_new_class(new ClassOfSimpleVariables(42,"hello",doubles,bools));
 
             // Send the class
-            for (unsigned p=1; p < PetscTools::GetNumProcs(); p++)
+            for (unsigned p = 1; p < PetscTools::GetNumProcs(); ++p)
             {
                 // Arguments are object, destination, tag
                 p_new_class->mVectorOfDoubles[1] = 1.2 + p;

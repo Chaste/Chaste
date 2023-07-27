@@ -238,7 +238,7 @@ public:
             if (mIgnoreCommentLines)
             {
                 bool skip_this_line = false;
-                for (unsigned i=0; i<mCommentLineStarts.size(); i++)
+                for (unsigned i = 0; i < mCommentLineStarts.size(); ++i)
                 {
                     // Check for lines starting with a comment symbol
                     size_t found1 = buffer1.find(mCommentLineStarts[i]);

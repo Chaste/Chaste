@@ -164,7 +164,9 @@ protected:
     {
         if (!mCalledCollectively || PetscTools::AmMaster())
         {
-            for (unsigned line_number=0; line_number<numLinesToSkip; line_number++)
+            for (unsigned line_number = 0;
+                 line_number < numLinesToSkip;
+                 ++line_number)
             {
                 char buffer[1024];
                 mpFile1->getline(buffer, 1024);

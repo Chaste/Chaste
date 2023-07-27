@@ -65,7 +65,7 @@ public:
 
     void TestReplication()
     {
-        for (int vec_size=0; vec_size<10; vec_size++)
+        for (int vec_size = 0; vec_size < 10; ++vec_size)
         {
             int lo, hi;
             Vec temp_vec = PetscTools::CreateVec(vec_size);
@@ -73,16 +73,16 @@ public:
             PetscTools::Destroy(temp_vec); // vector no longer needed
 
             ReplicatableVector rep_vector(vec_size);
-            for (int global_index=0; global_index<vec_size; global_index++)
+            for (int global_index = 0; global_index < vec_size; ++global_index)
             {
                 rep_vector[global_index]=lo;
             }
 
             rep_vector.Replicate(lo, hi);
 
-            for (int global_index=0; global_index<vec_size; global_index++)
+            for (int global_index = 0; global_index < vec_size; ++global_index)
             {
-                if (lo<=global_index && global_index<hi)
+                if (lo <= global_index && global_index < hi)
                 {
                     TS_ASSERT_EQUALS(rep_vector[global_index], lo);
                 }
@@ -103,7 +103,7 @@ public:
         double* p_petsc_vec;
 
         VecGetArray(petsc_vec, &p_petsc_vec);
-        for (int global_index=lo; global_index<hi; global_index++)
+        for (int global_index = lo; global_index < hi; ++global_index)
         {
             int local_index = global_index - lo;
             p_petsc_vec[local_index]=lo;
@@ -115,9 +115,9 @@ public:
         ReplicatableVector rep_vec;
         rep_vec.ReplicatePetscVector(petsc_vec);
 
-        for (int global_index=0; global_index<VEC_SIZE; global_index++)
+        for (int global_index = 0; global_index < VEC_SIZE; ++global_index)
         {
-            if (lo<=global_index && global_index<hi)
+            if (lo <= global_index && global_index < hi)
             {
                 TS_ASSERT_EQUALS(rep_vec[global_index], lo);
             }
@@ -135,15 +135,15 @@ public:
         int lo, hi;
         Vec petsc_vec = PetscTools::CreateVec(VEC_SIZE);
 
-        VecGetOwnershipRange(petsc_vec,&lo,&hi);
+        VecGetOwnershipRange(petsc_vec, &lo, &hi);
 
         double* p_petsc_vec;
 
         VecGetArray(petsc_vec, &p_petsc_vec);
-        for (int global_index=lo; global_index<hi; global_index++)
+        for (int global_index = lo; global_index < hi; ++global_index)
         {
             int local_index = global_index - lo;
-            p_petsc_vec[local_index]=lo;
+            p_petsc_vec[local_index] = lo;
         }
         VecRestoreArray(petsc_vec, &p_petsc_vec);
         VecAssemblyBegin(petsc_vec);
@@ -151,9 +151,9 @@ public:
 
         ReplicatableVector rep_vec(petsc_vec);
 
-        for (int global_index=0; global_index<VEC_SIZE; global_index++)
+        for (int global_index = 0; global_index < VEC_SIZE; ++global_index)
         {
-            if (lo<=global_index && global_index<hi)
+            if (lo <= global_index && global_index < hi)
             {
                 TS_ASSERT_EQUALS(rep_vec[global_index], lo);
             }

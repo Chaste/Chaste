@@ -160,7 +160,7 @@ public:
 
         p_log_file->WriteHeader("Complete human");
 
-        // for (unsigned i=0; i<1e9; i++);
+        // for (unsigned i = 0; i < 1e9; ++i);
         p_log_file->WriteElapsedTime(" -> ");
 
         LogFile::Close();

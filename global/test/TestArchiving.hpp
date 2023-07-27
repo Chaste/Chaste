@@ -231,7 +231,7 @@ public:
 
             ClassOfSimpleVariables* p_one_in_set = NULL;
             ClassOfSimpleVariables* p_two_in_set = NULL;
-            for (std::set<ClassOfSimpleVariables*>::iterator it = a_set.begin();
+            for (auto it = a_set.begin();
                  it != a_set.end();
                  ++it)
             {
@@ -252,7 +252,7 @@ public:
 
             ClassOfSimpleVariables* p_one_in_list = NULL;
             ClassOfSimpleVariables* p_two_in_list = NULL;
-            for (std::list<ClassOfSimpleVariables>::iterator it = a_list.begin();
+            for (auto it = a_list.begin();
                  it != a_list.end();
                  ++it)
             {

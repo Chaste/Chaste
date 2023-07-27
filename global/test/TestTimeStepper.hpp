@@ -334,8 +334,8 @@ public:
 
             TimeStepper stepper(0.0, 1.0, 0.1, false);
 
-            //Run for 5 steps
-            for (int i=0; i<5; i++)
+            // Run for 5 steps
+            for (unsigned i = 0; i < 5; ++i)
             {
                 stepper.AdvanceOneTimeStep();
             }
@@ -347,7 +347,7 @@ public:
             output_arch << p_stepper_for_archiving;
 
 
-            //Exhibit normal behaviour after archive snapshot
+            // Exhibit normal behaviour after archive snapshot
             stepper.AdvanceOneTimeStep();
             TS_ASSERT_DELTA(stepper.GetTime(), 0.6, 1e-10);
             TS_ASSERT_DELTA(stepper.GetNextTime(), 0.7, 1e-10);

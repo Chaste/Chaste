@@ -65,11 +65,11 @@ void PetscTools::ResetCache()
 
         PetscInt num_procs;
         MPI_Comm_size(PETSC_COMM_WORLD, &num_procs);
-        mNumProcessors = (unsigned)num_procs;
+        mNumProcessors = static_cast<unsigned>(num_procs);
 
         PetscInt my_rank;
         MPI_Comm_rank(PETSC_COMM_WORLD, &my_rank);
-        mRank = (unsigned)my_rank;
+        mRank = static_cast<unsigned>(my_rank);
     }
     else
     {
@@ -155,7 +155,7 @@ void PetscTools::BeginRoundRobin()
 {
     Barrier("PetscTools::RoundRobin"); // We want barriers both before all and after all, just in case
     const unsigned my_rank = GetMyRank();
-    for (unsigned turn = 0; turn < my_rank; turn++)
+    for (unsigned turn = 0; turn < my_rank; ++turn)
     {
         Barrier("PetscTools::RoundRobin");
     }
@@ -164,7 +164,7 @@ void PetscTools::BeginRoundRobin()
 void PetscTools::EndRoundRobin()
 {
     const unsigned num_procs = GetNumProcs();
-    for (unsigned turn = GetMyRank(); turn < num_procs; turn++)
+    for (unsigned turn = GetMyRank(); turn < num_procs; ++turn)
     {
         Barrier("PetscTools::RoundRobin");
     }
@@ -190,11 +190,16 @@ MPI_Comm PetscTools::GetWorld()
 bool PetscTools::ReplicateBool(bool flag)
 {
     CheckCache();
-    unsigned my_flag = (unsigned)flag;
+    unsigned my_flag = static_cast<unsigned>(flag);
     unsigned anyones_flag_is_true = my_flag;
     if (mPetscIsInitialised && !mIsolateProcesses)
     {
-        MPI_Allreduce(&my_flag, &anyones_flag_is_true, 1, MPI_UNSIGNED, MPI_MAX, PETSC_COMM_WORLD);
+        MPI_Allreduce(&my_flag,
+                      &anyones_flag_is_true,
+                      1,
+                      MPI_UNSIGNED,
+                      MPI_MAX,
+                      PETSC_COMM_WORLD);
     }
     return (anyones_flag_is_true == 1);
 }
@@ -245,9 +250,9 @@ Vec PetscTools::CreateVec(std::vector<double> data)
     int lo, hi;
     VecGetOwnershipRange(ret, &lo, &hi);
 
-    for (int global_index = lo; global_index < hi; global_index++)
+    for (int global_index = lo; global_index < hi; ++global_index)
     {
-        int local_index = global_index - lo;
+        unsigned local_index = global_index - lo;
         p_ret[local_index] = data[global_index];
     }
     VecRestoreArray(ret, &p_ret);
@@ -278,7 +283,7 @@ void PetscTools::SetupMat(Mat& rMat, int numRows, int numColumns,
 {
     assert(numRows > 0);
     assert(numColumns > 0);
-    if ((int)rowPreallocation > numColumns)
+    if (static_cast<int>(rowPreallocation) > numColumns)
     {
         WARNING("Preallocation failure: requested number of nonzeros per row greater than number of columns"); //+rowPreallocation+">"+numColumns);
         rowPreallocation = numColumns;
@@ -511,7 +516,7 @@ PetscErrorCode PetscTools::ChasteMatCopy(Mat A, Mat B, MatStructure str)
 
     ierr = MatGetOwnershipRange(A, &rstart, &rend);
     CHKERRQ(ierr);
-    for (i = rstart; i < rend; i++)
+    for (i = rstart; i < rend; ++i)
     {
         ierr = MatGetRow(A, i, &nz, &cwork, &vwork);
         CHKERRQ(ierr);

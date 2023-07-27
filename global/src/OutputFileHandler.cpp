@@ -223,7 +223,7 @@ std::string OutputFileHandler::MakeFoldersAndReturnFullPath(const std::string& r
 
             // Now make all the sub-folders requested one-by-one and add the .chaste_deletable_folder file to them
             fs::path next_folder(output_root);
-            for (fs::path::iterator path_iter = rel_path.begin();
+            for (auto path_iter = rel_path.begin();
                  path_iter != rel_path.end();
                  ++path_iter)
             {

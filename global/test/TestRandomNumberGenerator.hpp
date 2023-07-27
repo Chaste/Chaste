@@ -62,7 +62,7 @@ public:
         srand(0);
         int first = rand();
         unsigned period_srand;
-        for (period_srand = 0;; period_srand++)
+        for (period_srand = 0;; ++period_srand)
         {
             if (rand() == first)
             {
@@ -79,7 +79,7 @@ public:
         double double_first = p_gen->ranf();
 
         unsigned period_class;
-        for (period_class = 0;; period_class++)
+        for (period_class = 0;; ++period_class)
         {
             if (p_gen->ranf() == double_first)
             {
@@ -179,7 +179,7 @@ public:
             boost::archive::text_oarchive output_arch(ofs);
 
             // Generate some random numbers before archiving
-            for (unsigned i = 0; i < 11; i++)
+            for (unsigned i = 0; i < 11; ++i)
             {
                 p_gen->ranf();
                 p_gen->randMod(1 + 3 * i);
@@ -197,14 +197,14 @@ public:
             }
 
             // Generator saved here - record the next 11 uniform numbers
-            for (unsigned i = 0; i < 11; i++)
+            for (unsigned i = 0; i < 11; ++i)
             {
                 double random = p_gen->ranf();
                 generated_numbers.push_back(random);
             }
 
             // Record some numbers from the normal distribution too.
-            for (unsigned i = 0; i < 11; i++)
+            for (unsigned i = 0; i < 11; ++i)
             {
                 double random = p_gen->NormalRandomDeviate(0.5, 0.1);
                 generated_numbers.push_back(random);
@@ -217,7 +217,7 @@ public:
         {
             RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
             p_gen->Reseed(25); // any old seed, different from that above
-            for (unsigned i = 0; i < 7; i++) // generate some numbers
+            for (unsigned i = 0; i < 7; ++i) // generate some numbers
             {
                 p_gen->ranf();
                 p_gen->NormalRandomDeviate(0.5, 0.1);
@@ -244,7 +244,7 @@ public:
             }
 
             // Random Number generator restored; now check it generates the same numbers as the one we saved
-            for (unsigned i = 0; i < generated_numbers.size(); i++)
+            for (unsigned i = 0; i < generated_numbers.size(); ++i)
             {
                 double random;
                 if (i < 11)
@@ -270,10 +270,10 @@ public:
         std::vector<unsigned> shuffled_results;
         p_gen->Shuffle(5, shuffled_results);
 
-        for (unsigned i = 0; i < 5; i++)
+        for (unsigned i = 0; i < 5; ++i)
         {
             bool found = false;
-            for (unsigned j = 0; j < shuffled_results.size(); j++)
+            for (unsigned j = 0; j < shuffled_results.size(); ++j)
             {
                 if (shuffled_results[j] == i)
                 {
@@ -286,20 +286,20 @@ public:
 
         unsigned num_trials = 1000000;
         unsigned results[5][5];
-        for (unsigned i = 0; i < 5; i++)
+        for (unsigned i = 0; i < 5; ++i)
         {
-            for (unsigned j = 0; j < 5; j++)
+            for (unsigned j = 0; j < 5; ++j)
             {
                 results[i][j] = 0u;
             }
         }
 
-        for (unsigned trial = 0; trial < num_trials; trial++)
+        for (unsigned trial = 0; trial < num_trials; ++trial)
         {
             p_gen->Shuffle(5, shuffled_results);
-            for (unsigned i = 0; i < 5; i++)
+            for (unsigned i = 0; i < 5; ++i)
             {
-                for (unsigned j = 0; j < 5; j++)
+                for (unsigned j = 0; j < 5; ++j)
                 {
                     if (shuffled_results[j] == i)
                     {
@@ -309,9 +309,9 @@ public:
             }
         }
 
-        for (unsigned i = 0; i < 5; i++)
+        for (unsigned i = 0; i < 5; ++i)
         {
-            for (unsigned j = 0; j < 5; j++)
+            for (unsigned j = 0; j < 5; ++j)
             {
                 // Probability of i going to position j
                 double prob = static_cast<double>(results[i][j]) / num_trials;
@@ -341,14 +341,14 @@ public:
 
         // Make an identity permutation vector and put it through the generic version of shuffle
         std::vector<boost::shared_ptr<unsigned> > identity_perm_for_shuffle(test_size);
-        for (unsigned i = 0; i < test_size; i++)
+        for (unsigned i = 0; i < test_size; ++i)
         {
             boost::shared_ptr<unsigned> p_i(new unsigned(i));
             identity_perm_for_shuffle[i] = p_i;
         }
         p_gen->Shuffle(identity_perm_for_shuffle);
 
-        for (unsigned i = 0; i < test_size; i++)
+        for (unsigned i = 0; i < test_size; ++i)
         {
             TS_ASSERT_EQUALS(empty_perm_for_shuffle[i], *identity_perm_for_shuffle[i]);
         }
@@ -405,7 +405,7 @@ public:
         TS_ASSERT_EQUALS(p_gen->randMod(6), 3u);
         TS_ASSERT_DELTA(p_gen->ranf(), 0.3337, 1e-4);
 
-        for (unsigned i = 0; i < 1000; i++)
+        for (unsigned i = 0; i < 1000; ++i)
         {
             p_gen->StandardNormalRandomDeviate();
         }

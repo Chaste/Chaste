@@ -70,7 +70,7 @@ void PrintTheStack()
     char** symbol_list = backtrace_symbols(address_list, num_addresses);
 
     // iterate over the returned symbol lines.
-    for (unsigned i = 0; i < num_addresses; i++)
+    for (unsigned i = 0; i < num_addresses; ++i)
     {
         // We could demangle, but this may not be portable on GNU Linux versus Mac OSX
         // char* ret = abi::__cxa_demangle(begin_name, funcname, &funcnamesize, &status);

@@ -98,7 +98,7 @@ public:
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
         //And a streaming warning
         std::string best_hope = "Murray";
-        for (unsigned year=2005; year<2020; year++)
+        for (unsigned year = 2005; year < 2020; ++year)
         {
             if (year != 2013)
             {
@@ -125,7 +125,7 @@ public:
 
     void TestWarningOnlyOnceReset()
     {
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i = 0; i < 10; ++i)
         {
             ThrowWarning();
         }

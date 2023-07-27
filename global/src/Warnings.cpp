@@ -107,7 +107,7 @@ void Warnings::AddWarning(
 
     if (onlyOnce)
     {
-        WarningsContainerType::iterator it = find(mWarningMessages.begin(), mWarningMessages.end(), item);
+        auto it = find(mWarningMessages.begin(), mWarningMessages.end(), item);
         if (it != mWarningMessages.end())
         {
             return;

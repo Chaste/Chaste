@@ -160,7 +160,7 @@ void PrintMemory();
  * @param v */
 #define PRINT_VECTOR(v) \
     { std::cout << FormDebugHead() << #v " = {"; \
-      for (unsigned _i=0; _i<v.size(); _i++) { \
+      for (unsigned _i=0; _i<v.size(); ++_i) { \
           std::cout << (_i==0?"":",") << v[_i]; } \
       std::cout << "}" << std::endl << std::flush; }
 

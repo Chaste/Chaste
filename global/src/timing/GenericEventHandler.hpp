@@ -226,7 +226,7 @@ private:
      */
     void ResetImpl()
     {
-        for (unsigned event=0; event<NUM_EVENTS; event++)
+        for (unsigned event = 0; event < NUM_EVENTS; ++event)
         {
             mWallTime[event] = 0.0;
             mHasBegun[event] = false;
@@ -346,7 +346,7 @@ private:
             EXCEPTION("Asked to report on an event handler which is set to zero.");
         }
         // Check that all events are finished
-        for (unsigned event=0; event<NUM_EVENTS; event++)
+        for (unsigned event = 0; event < NUM_EVENTS; ++event)
         {
             if (mHasBegun[event])
             {
@@ -380,7 +380,7 @@ private:
                 // Report the process number at the beginning of the line
                 printf("%3u: ", PetscTools::GetMyRank()); //5 chars
             }
-            for (unsigned event=0; event<NUM_EVENTS; event++)
+            for (unsigned event = 0; event < NUM_EVENTS; ++event)
             {
                 const double secs = ConvertWallTimeToSeconds(mWallTime[event]);
                 printf(format, secs);
@@ -399,7 +399,7 @@ private:
             {
                 total = ConvertWallTimeToSeconds(total_cpu_time[top_event]);
                 printf("avg: "); //5 chars
-                for (unsigned event=0; event<NUM_EVENTS; event++)
+                for (unsigned event = 0; event < NUM_EVENTS; ++event)
                 {
                     const double secs = ConvertWallTimeToSeconds(total_cpu_time[event]);
                     printf(format, secs/PetscTools::GetNumProcs());
@@ -414,7 +414,7 @@ private:
             {
                 total = ConvertWallTimeToSeconds(max_cpu_time[top_event]);
                 printf("max: "); //5 chars
-                for (unsigned event=0; event<NUM_EVENTS; event++)
+                for (unsigned event = 0; event < NUM_EVENTS; ++event)
                 {
                     const double secs = ConvertWallTimeToSeconds(max_cpu_time[event]);
                     printf(format, secs);
@@ -446,7 +446,7 @@ private:
                 // Report the process number at the beginning of the line
                 printf("Proc "); //5 chars
             }
-            for (unsigned event=0; event<NUM_EVENTS; event++)
+            for (unsigned event = 0; event < NUM_EVENTS; ++event)
             {
                 printf("%15s%2s", CONCRETE::EventName[event], "");
             }
