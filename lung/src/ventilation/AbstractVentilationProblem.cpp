@@ -100,22 +100,21 @@ AbstractVentilationProblem::Initialise()
         ///\todo #2300 There's redundancy here because there are now two walkers
         AirwayPropertiesCalculator properties_calculator(mMesh, mOutletNodeIndex);
         std::vector<AirwayBranch*> branches = properties_calculator.GetBranches();
-        for (std::vector<AirwayBranch*>::iterator branch_it=branches.begin(); branch_it != branches.end(); branch_it++)
+        for (auto branch_it : branches)
         {
-            std::list<Element<1,3>* > branch_elements = (*branch_it)->GetElements();
+            std::list<Element<1,3>* > branch_elements = branch_it->GetElements();
             if (branch_elements.size() > 1u)
             {
-                double branch_length = (*branch_it)->GetLength();
+                double branch_length = branch_it->GetLength();
 
-                for (std::list<Element<1,3>* >::const_iterator element_iterator=branch_elements.begin();
-                        element_iterator != branch_elements.end(); ++element_iterator)
+                for (auto element_iter : branch_elements)
                 {
-                    (*element_iterator)->rGetElementAttributes()[SEGMENT_LENGTH] = branch_length;
+                    element_iter->rGetElementAttributes()[SEGMENT_LENGTH] = branch_length;
                 }
             }
 //            else
 //            {
-//                assert( (*branch_it)->GetLength() == branch_elements.front()->rGetElementAttributes()[SEGMENT_LENGTH]);
+//                assert(branch_it->GetLength() == branch_elements.front()->rGetElementAttributes()[SEGMENT_LENGTH]);
 //            }
         }
     }

@@ -345,7 +345,7 @@ void AirwayGenerator::GrowApex(Apex& rApex)
             vtkIdType end_id = InsertBranch(cloud, rApex.mStartId, rApex.mOriginalDirection, end_location);
 
             if (std::sqrt(vtkMath::Distance2BetweenPoints(mAirwayTree->GetPoints()->GetPoint(rApex.mStartId), end_location)) > mLengthLimit
-                && (unsigned)cloud->GetNumberOfPoints() > mPointLimit
+                && static_cast<unsigned>(cloud->GetNumberOfPoints()) > mPointLimit
                 && end_id != -1)
             {
                 double end_direction[3];
@@ -372,7 +372,7 @@ void AirwayGenerator::GrowApex(Apex& rApex)
             vtkIdType end_id = InsertBranch(cloud, rApex.mStartId, rApex.mOriginalDirection, end_location);
 
             if (std::sqrt(vtkMath::Distance2BetweenPoints(mAirwayTree->GetPoints()->GetPoint(rApex.mStartId), end_location)) > mLengthLimit
-                && (unsigned)cloud->GetNumberOfPoints() > mPointLimit
+                && static_cast<unsigned>(cloud->GetNumberOfPoints()) > mPointLimit
                 && end_id != -1)
             {
                 double end_direction[3];
@@ -434,17 +434,13 @@ void AirwayGenerator::InvalidateClosestPoint(double point[3], vtkSmartPointer<vt
 
 void AirwayGenerator::Generate()
 {
-    for (std::deque<AirwayGeneration>::iterator gen_iter = mGenerations.begin();
-         gen_iter != mGenerations.end();
-         ++gen_iter)
+    for (auto gen_iter : mGenerations)
     {
-        gen_iter->DistributeGrowthPoints(mSeedPointCloud, mInvalidIds);
+        gen_iter.DistributeGrowthPoints(mSeedPointCloud, mInvalidIds);
 
-        for (std::deque<Apex>::iterator apex_iter = gen_iter->GetApices().begin();
-            apex_iter != gen_iter->GetApices().end();
-            ++apex_iter)
+        for (auto apex_iter : gen_iter.GetApices())
         {
-            GrowApex(*apex_iter);
+            GrowApex(apex_iter);
         }
     }
 }
@@ -551,11 +547,9 @@ void AirwayGenerator::CalculateHorsfieldOrder()
 
     order->SetNumberOfValues(mAirwayTree->GetNumberOfPoints());
 
-    for (std::vector<unsigned>::iterator iter = mStartIds.begin();
-         iter != mStartIds.end();
-         ++iter)
+    for (auto iter : mStartIds)
     {
-        HorsfieldProcessPoint(*iter, order, processed_points);
+        HorsfieldProcessPoint(iter, order, processed_points);
     }
 
     mAirwayTree->GetPointData()->AddArray(order);
@@ -572,11 +566,9 @@ void AirwayGenerator::MarkStartIds()
         start_ids->SetValue(i, 0.0);
     }
 
-    for (std::vector<unsigned>::iterator iter = mStartIds.begin();
-        iter != mStartIds.end();
-        ++iter)
+    for (auto iter : mStartIds)
     {
-        start_ids->SetValue(*iter, 1.0);
+        start_ids->SetValue(iter, 1.0);
     }
 
     mAirwayTree->GetPointData()->AddArray(start_ids);

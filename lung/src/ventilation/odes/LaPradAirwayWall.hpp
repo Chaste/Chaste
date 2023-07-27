@@ -91,32 +91,34 @@ public:
     virtual void SetPleuralPressure(double pressure);
 
     /**
-     * @param RIn The parameter RIn
+     * @param rIn The parameter RIn
      */
-    void SetRIn(double);
+    void SetRIn(double rIn);
 
      /**
-     * @param ROut The parameter ROut
+     * @param rOut The parameter ROut
      */
-    void SetROut(double);
+    void SetROut(double rOut);
 
      /**
      * @param k1 The parameter k1
      */
-    void Setk1(double);
+    void Setk1(double k1);
 
     /**
      * @param k2 The parameter k2
      */
-    void Setk2(double);
+    void Setk2(double k2);
 
     /**
      * @param k3 The parameter k3
      */
-    void Setk3(double);
+    void Setk3(double k3);
 
     /**
     * Works out the difference between the pressure and the pressure needed to produce a particular radius
+    * 
+    * @param radius \todo
     */
     double CalculatePressureRadiusResidual(double radius);
 

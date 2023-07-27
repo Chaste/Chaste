@@ -43,7 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef CHASTE_VTK
 
-#define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
+// Cut out the strstream deprecated warning for now (gcc4.3)
+#define _BACKWARD_BACKWARD_WARNING_H 1
 #include "vtkVersion.h"
 
 #if ((VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
@@ -67,26 +68,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSelectEnclosedPoints.h"
 
 /**
- * Auxiliary class representing a growth apex in the system
+ * Auxiliary class representing a growth apex in the system.
  *
- * A growth apex contains all the information required to grow a branch
+ * A growth apex contains all the information required to grow a branch.
  */
 class Apex
 {
 public:
-    /** The location of this growth apex */
+    /** The location of this growth apex. */
     double mCurrentLocation[3];
 
-    /** The direction of this growth apex */
+    /** The direction of this growth apex. */
     double mOriginalDirection[3];
 
-    /** The direction of the parent branch of this growth apex */
+    /** The direction of the parent branch of this growth apex. */
     double mParentDirection[3];
 
-    /** The ID of the the point in the airway tree to grow this apex from */
+    /** The ID of the the point in the airway tree to grow this apex from. */
     vtkIdType mStartId;
 
-    /** The generation number of this apex */
+    /** The generation number of this apex. */
     unsigned mGeneration;
 
     /** The point cloud that this apex will attempt to grow into. */
@@ -94,38 +95,53 @@ public:
 };
 
 /**
- * Utility class representing a complete generation of growth apices
+ * Utility class representing a complete generation of growth apices.
  */
 class AirwayGeneration
 {
 public:
-    /** Constructor */
-    AirwayGeneration(unsigned generationNumber);
+    /**
+     * Constructor. 
+     * 
+     * @param generationNumber \todo
+     */
+    explicit AirwayGeneration(unsigned generationNumber);
 
     /**
-     * Add an apex to this generation
+     * Add an apex to this generation.
      *
      * @param startId The Id number of the start point of this growth apex
      * @param originalDirection The current direction of this growth apex
-     * @param parentDirection The direction of the parent branch of this growth apex
+     * @param parentDirection The direction of the parent branch of this growth 
+     *     apex
      */
-    void AddApex(unsigned startId, double currentLocation[3], double currentDirection[3], double parentDirection[3]);
+    void AddApex(
+        unsigned startId,
+        double currentLocation[3],
+        double currentDirection[3],
+        double parentDirection[3]);
 
     /**
-     * Distributes current growth points to the growth apices
+     * Distributes current growth points to the growth apices.
      *
      * @param pAllGrowthPoints Polydata containing the growth points
      * @param invalidIds A set of invalid growth point ids
      */
-    void DistributeGrowthPoints(vtkSmartPointer<vtkPolyData> pAllGrowthPoints, std::set<unsigned>& invalidIds);
+    void DistributeGrowthPoints(
+        vtkSmartPointer<vtkPolyData> pAllGrowthPoints,
+        std::set<unsigned>& invalidIds);
 
-    /** Returns the apices associated with this generation */
+    /** @return the apices associated with this generation. */
     std::deque<Apex>& GetApices();
 
-    /** Sets a maximum radius for points to be assigned to an apex */
+    /**
+     * Set a maximum radius for points to be assigned to an apex.
+     * 
+     * @param radius \todo
+     */
     void SetDistributionRadius(double radius);
 
-    /** Gets maximum radius for points to be assigned to an apex */
+    /** @return maximum radius for points to be assigned to an apex. */
     double GetDistributionRadius();
 
 private:
@@ -135,7 +151,7 @@ private:
     /** All the growth apices associated with this generation. */
     std::deque<Apex> mApices;
 
-    /** The maximum radius within which a point can be distributed to an apex */
+    /** The maximum radius within which a point can be distributed to an apex. */
     double mDistributionRadius;
 };
 

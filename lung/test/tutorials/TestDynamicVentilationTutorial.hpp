@@ -214,11 +214,9 @@ public: // Tests should be public!
         std::map<unsigned, AbstractAcinarUnit*>& acinar_map = problem.rGetAcinarUnitMap();
         double lung_volume = 0;
 
-        for (std::map<unsigned, AbstractAcinarUnit*>::iterator iter = acinar_map.begin();
-             iter != acinar_map.end();
-             ++iter)
+        for (auto iter : acinar_map)
         {
-            lung_volume += iter->second->GetVolume();
+            lung_volume += iter.second->GetVolume();
         }
 
         std::cout << "The total lung volume at the end of the simulation is " << lung_volume*1e3 << " L. " << std::endl;

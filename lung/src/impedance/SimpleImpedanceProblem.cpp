@@ -39,17 +39,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cmath>
 
-SimpleImpedanceProblem::SimpleImpedanceProblem(TetrahedralMesh<1,3>& rAirwaysMesh, unsigned rootIndex)
+SimpleImpedanceProblem::SimpleImpedanceProblem(
+    TetrahedralMesh<1,3>& rAirwaysMesh,
+    unsigned rootIndex)
     : mrMesh(rAirwaysMesh),
       mOutletNodeIndex(rootIndex),
       mWalker(rAirwaysMesh, rootIndex),
-      mRho(1.1500),                   //air density in Kg/m^3
-      mMu(1.9e-5),                    //air viscosity in Pa s
-      mH(5.8*98.0665*1e3),            //Tissue elastance in Pa/m^3 (5.8 cmH2O/L)
+      mRho(1.1500),                  // air density in Kg/m^3
+      mMu(1.9e-5),                   // air viscosity in Pa s
+      mH(5.8*98.0665*1e3),           // Tissue elastance in Pa/m^3 (5.8 cmH2O/L)
       mLengthScaling(1.0)
 {
     mAcinarH = mH*(mrMesh.GetNumBoundaryNodes() - 1);
-
     mFrequencies.push_back(1.0);
     mFrequencies.push_back(2.0);
     mFrequencies.push_back(3.0);
@@ -61,7 +62,6 @@ SimpleImpedanceProblem::SimpleImpedanceProblem(TetrahedralMesh<1,3>& rAirwaysMes
 
 SimpleImpedanceProblem::~SimpleImpedanceProblem()
 {
-
 }
 
 void SimpleImpedanceProblem::SetFrequency(double frequency)
@@ -89,13 +89,17 @@ void SimpleImpedanceProblem::SetElastance(double elastance)
 void SimpleImpedanceProblem::Solve()
 {
     Node<3>* p_node = mrMesh.GetNode(mOutletNodeIndex);
-    Element<1,3>* p_element = mrMesh.GetElement(*(p_node->ContainingElementsBegin()));
+    Element<1,3>* p_element = 
+        mrMesh.GetElement(*(p_node->ContainingElementsBegin()));
 
     mImpedances.resize(mFrequencies.size());
 
-    for (unsigned frequency_index = 0; frequency_index < mFrequencies.size(); ++frequency_index)
+    for (unsigned frequency_index = 0;
+         frequency_index < mFrequencies.size();
+         ++frequency_index)
     {
-        mImpedances[frequency_index] = CalculateElementImpedance(p_element, mFrequencies[frequency_index]);
+        mImpedances[frequency_index] = 
+            CalculateElementImpedance(p_element, mFrequencies[frequency_index]);
     }
 }
 
@@ -115,12 +119,14 @@ TetrahedralMesh<1, 3>& SimpleImpedanceProblem::rGetMesh()
     return mrMesh;
 }
 
-std::complex<double> SimpleImpedanceProblem::CalculateElementImpedance(Element<1,3>* pElement, double frequency)
+std::complex<double> SimpleImpedanceProblem::CalculateElementImpedance(
+    Element<1,3>* pElement,
+    double frequency)
 {
     std::complex<double> Z(0, 0);
 
-    //Get children
-    if (mWalker.GetNumberOfChildElements(pElement) == 0u) //Branch is terminal, hence consider to be an acinus
+    // Get children
+    if (mWalker.GetNumberOfChildElements(pElement) == 0u) // Branch is terminal, hence consider to be an acinus
     {
         Z = CalculateAcinusImpedance(mWalker.GetDistalNode(pElement), frequency);
     }
@@ -169,7 +175,9 @@ std::complex<double> SimpleImpedanceProblem::CalculateElementImpedance(Element<1
     return R + I_inertance + Z;
 }
 
-std::complex<double> SimpleImpedanceProblem::CalculateAcinusImpedance(Node<3>* pNode, double frequency)
+std::complex<double> SimpleImpedanceProblem::CalculateAcinusImpedance(
+    Node<3>* pNode,
+    double frequency)
 {
     if (frequency == 0.0)
     {
@@ -182,7 +190,6 @@ std::complex<double> SimpleImpedanceProblem::CalculateAcinusImpedance(Node<3>* p
     return -i*mAcinarH/omega;
 }
 
-
 void SimpleImpedanceProblem::SetRho(double rho)
 {
     mRho = rho;
@@ -193,12 +200,16 @@ void  SimpleImpedanceProblem::SetMu(double mu)
     mMu = mu;
 }
 
-double SimpleImpedanceProblem::CalculateElementResistance(double radius, double length)
+double SimpleImpedanceProblem::CalculateElementResistance(
+    double radius,
+    double length)
 {
     return 8*mMu*length/(M_PI*radius*radius*radius*radius);
 }
 
-double SimpleImpedanceProblem::CalculateElementInertance(double radius, double length)
+double SimpleImpedanceProblem::CalculateElementInertance(
+    double radius,
+    double length)
 {
     return mRho*length/(M_PI*radius*radius);
 }

@@ -118,19 +118,16 @@ public:
 
         generator.DistributePoints();
 
-        //Check that the correct number of points have been distributed
-        typedef std::pair<AirwayGenerator*, LungLocation> pair_type;
-        for (std::vector<pair_type>::iterator iter = generator.mLobeGenerators.begin();
-            iter != generator.mLobeGenerators.end();
-            ++iter)
+        // Check that the correct number of points have been distributed
+        for (auto iter : generator.mLobeGenerators)
         {
-            if (iter->second == LEFT) //Two lung lobes, therefore half the number of points are expected
+            if (iter.second == LEFT) //Two lung lobes, therefore half the number of points are expected
             {
-                TS_ASSERT_DELTA(iter->first->GetPointCloud()->GetNumberOfPoints(), 25, 2);
+                TS_ASSERT_DELTA(iter.first->GetPointCloud()->GetNumberOfPoints(), 25, 2);
             }
-            else //iter->second == RIGHT
+            else // iter.second == RIGHT
             {
-                TS_ASSERT_DELTA(iter->first->GetPointCloud()->GetNumberOfPoints(), 50, 2);
+                TS_ASSERT_DELTA(iter.first->GetPointCloud()->GetNumberOfPoints(), 50, 2);
             }
         }
 
@@ -169,19 +166,16 @@ public:
 
         generator.DistributePoints();
 
-        //Check that the correct number of points have been distributed
-        typedef std::pair<AirwayGenerator*, LungLocation> pair_type;
-        for (std::vector<pair_type>::iterator iter = generator.mLobeGenerators.begin();
-            iter != generator.mLobeGenerators.end();
-            ++iter)
+        // Check that the correct number of points have been distributed
+        for (auto iter : generator.mLobeGenerators)
         {
-            if (iter->second == LEFT) //Two lung lobes, therefore half the number of points are expected
+            if (iter.second == LEFT) //Two lung lobes, therefore half the number of points are expected
             {
-                TS_ASSERT_DELTA(iter->first->GetPointCloud()->GetNumberOfPoints(), 50, 6);
+                TS_ASSERT_DELTA(iter.first->GetPointCloud()->GetNumberOfPoints(), 50, 6);
             }
-            else //iter->second == RIGHT
+            else // iter.second == RIGHT
             {
-                TS_ASSERT_DELTA(iter->first->GetPointCloud()->GetNumberOfPoints(), 50, 6);
+                TS_ASSERT_DELTA(iter.first->GetPointCloud()->GetNumberOfPoints(), 50, 6);
             }
         }
 

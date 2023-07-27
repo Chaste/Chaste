@@ -59,7 +59,7 @@ AirwayPropertiesCalculator::AirwayPropertiesCalculator(TetrahedralMesh<1,3>& rAi
 
 AirwayPropertiesCalculator::~AirwayPropertiesCalculator()
 {
-    for (std::vector<AirwayBranch*>::iterator iter = mBranches.begin();
+    for (auto iter = mBranches.begin();
          iter != mBranches.end();
          ++iter)
     {
@@ -282,13 +282,11 @@ unsigned AirwayPropertiesCalculator::GetMaximumTerminalGeneration()
 {
     unsigned max_generation = 0;
 
-    for (std::vector<AirwayBranch*>::iterator iter = mBranches.begin();
-         iter != mBranches.end();
-         ++iter)
+    for (auto iter : mBranches)
     {
-        if ((*iter)->IsTerminal())
+        if (iter->IsTerminal())
         {
-            unsigned generation = mWalker.GetElementGeneration((*iter)->GetElements().front());
+            unsigned generation = mWalker.GetElementGeneration(iter->GetElements().front());
             if (generation > max_generation)
             {
                 max_generation = generation;
@@ -303,13 +301,11 @@ unsigned AirwayPropertiesCalculator::GetMinimumTerminalGeneration()
 {
     unsigned min_generation = std::numeric_limits<unsigned>::max();
 
-    for (std::vector<AirwayBranch*>::iterator iter = mBranches.begin();
-         iter != mBranches.end();
-         ++iter)
+    for (auto iter : mBranches)
     {
-        if ((*iter)->IsTerminal())
+        if (iter->IsTerminal())
         {
-            unsigned generation = mWalker.GetElementGeneration((*iter)->GetElements().front());
+            unsigned generation = mWalker.GetElementGeneration(iter->GetElements().front());
             if (generation < min_generation)
             {
                 min_generation = generation;
@@ -325,13 +321,11 @@ unsigned AirwayPropertiesCalculator::GetMeanTerminalGeneration()
     unsigned mean_generation = 0;
     unsigned terminal_branches_count = 0;
 
-    for (std::vector<AirwayBranch*>::iterator iter = mBranches.begin();
-         iter != mBranches.end();
-         ++iter)
+    for (auto iter : mBranches)
     {
-        if ((*iter)->IsTerminal())
+        if (iter->IsTerminal())
         {
-            unsigned generation = mWalker.GetElementGeneration((*iter)->GetElements().front());
+            unsigned generation = mWalker.GetElementGeneration(iter->GetElements().front());
 
             mean_generation += generation;
             terminal_branches_count++;
@@ -384,24 +378,22 @@ void AirwayPropertiesCalculator::CalculateBranchProperties()
     mLengthOneOverLengthTwoSpread = 0.0;
     unsigned lengthOneOverLengthTwoCount = 0u;
 
-    for (std::vector<AirwayBranch*>::iterator iter = mBranches.begin();
-         iter != mBranches.end();
-         ++iter)
+    for (auto iter : mBranches)
     {
-        bool is_major = (*iter)->IsMajor();
-        double length = (*iter)->GetLength();
-        double diameter = 2*(*iter)->GetAverageRadius();
+        bool is_major = iter->IsMajor();
+        double length = iter->GetLength();
+        double diameter = 2 * iter->GetAverageRadius();
 
         assert(diameter > 0.0); //The airway tree must have a well defined set of radii to calculate branch properties
 
         mLengthOverDiameterMean += length/diameter;
 
-        if ((*iter)->GetParent() != nullptr)
+        if (iter->GetParent() != nullptr)
         {
-            double theta = (*iter)->GetBranchAngle();
-            double parent_diameter = 2*(*iter)->GetParent()->GetAverageRadius();
+            double theta = iter->GetBranchAngle();
+            double parent_diameter = 2 * iter->GetParent()->GetAverageRadius();
 
-            mLengthOverLengthParentMean += length/(*iter)->GetParent()->GetLength();
+            mLengthOverLengthParentMean += length / iter->GetParent()->GetLength();
             mDiameterOverParentDiameterMean += diameter/parent_diameter;
 
             mThetaMean += theta;
@@ -427,7 +419,7 @@ void AirwayPropertiesCalculator::CalculateBranchProperties()
                 thetaParentDiameter2mmTo1mmCount++;
             }
 
-            if ((*iter)->GetSibling() != nullptr)
+            if (iter->GetSibling() != nullptr)
             {
                 if (is_major)
                 {
@@ -440,27 +432,27 @@ void AirwayPropertiesCalculator::CalculateBranchProperties()
                 {
                     mThetaMinorBranches += theta;
                     mLengthOverDiameterMinorChildMean += length/diameter;
-                    mMinorDiameterOverMajorDiameterMean += diameter/(2*(*iter)->GetSibling()->GetAverageRadius());
+                    mMinorDiameterOverMajorDiameterMean += diameter/(2 * iter->GetSibling()->GetAverageRadius());
                     mMinorDiameterOverParentDiameterMean += diameter/parent_diameter;
                     minorBranchesCount++;
                 }
 
-                if (length < (*iter)->GetSibling()->GetLength())
+                if (length < iter->GetSibling()->GetLength())
                 {
-                    mLengthOneOverLengthTwoMean += length/(*iter)->GetSibling()->GetLength();
+                    mLengthOneOverLengthTwoMean += length / iter->GetSibling()->GetLength();
                     lengthOneOverLengthTwoCount++;
                 }
             }
 
-            if ((*iter)->GetParent() != nullptr && length < (*iter)->GetParent()->GetLength())
+            if (iter->GetParent() != nullptr && length < iter->GetParent()->GetLength())
             {
                 lengthOverParentLengthLessThanOneCount++;
             }
         }
 
-        if ((*iter)->GetParent() != nullptr && (*iter)->GetParent()->GetSibling() != nullptr && (*iter)->GetSibling() != nullptr)
+        if (iter->GetParent() != nullptr && iter->GetParent()->GetSibling() != nullptr && iter->GetSibling() != nullptr)
         {
-            mPhiMean += (*iter)->GetRotationAngle();
+            mPhiMean += iter->GetRotationAngle();
             phiMeanCount++;
         }
     }
@@ -516,7 +508,7 @@ void AirwayPropertiesCalculator::CalculateBranchProperties()
     {
         mDiameterOverParentDiameterMean /= (mBranches.size() - 1);
         mLengthOverLengthParentMean /= (mBranches.size() - 1);
-        mPercentageLengthOverParentLengthLessThanOne = ((double)lengthOverParentLengthLessThanOneCount)/((double)(mBranches.size() - 1));
+        mPercentageLengthOverParentLengthLessThanOne = static_cast<double>(lengthOverParentLengthLessThanOneCount)/(static_cast<double>(mBranches.size()) - 1);
     }
 
     if (lengthOneOverLengthTwoCount > 0u)

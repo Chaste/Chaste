@@ -42,16 +42,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef CHASTE_VTK
 
-#define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
+// Cut out the strstream deprecated warning for now (gcc4.3)
+#define _BACKWARD_BACKWARD_WARNING_H 1
 #include "vtkVersion.h"
 #include "vtkPolyVertex.h"
 
 #if ((VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 
-AirwayGeneration::AirwayGeneration(unsigned generation_number) : mGenerationNumber(generation_number), mDistributionRadius(DBL_MAX)
-{}
+AirwayGeneration::AirwayGeneration(unsigned generation_number)
+    : mGenerationNumber(generation_number),
+      mDistributionRadius(DBL_MAX)
+{
+}
 
-void AirwayGeneration::AddApex(unsigned startId, double currentLocation[3], double originalDirection[3], double parentBranch[3])
+void AirwayGeneration::AddApex(
+    unsigned startId,
+    double currentLocation[3],
+    double originalDirection[3],
+    double parentBranch[3])
 {
     Apex apex;
     apex.mStartId = startId;
@@ -66,9 +74,12 @@ void AirwayGeneration::AddApex(unsigned startId, double currentLocation[3], doub
     mApices.push_back(apex);
 }
 
-void AirwayGeneration::DistributeGrowthPoints(vtkSmartPointer<vtkPolyData> pAllGrowthPoints, std::set<unsigned>& invalidIds)
+void AirwayGeneration::DistributeGrowthPoints(
+    vtkSmartPointer<vtkPolyData> pAllGrowthPoints,
+    std::set<unsigned>& invalidIds)
 {
-    if (mApices.size() == 0) // Nothing to do if we don't have any apices
+    // Nothing to do if we don't have any apices
+    if (mApices.size() == 0)
     {
         return;
     }
@@ -79,21 +90,25 @@ void AirwayGeneration::DistributeGrowthPoints(vtkSmartPointer<vtkPolyData> pAllG
     apex_poly_data->SetPoints(apex_points);
     apex_points->SetNumberOfPoints(mApices.size());
 
-    for (std::deque<Apex>::iterator iter = mApices.begin();
-        iter != mApices.end();
-        ++iter)
+    for (auto iter = mApices.begin();
+         iter != mApices.end();
+         ++iter)
     {
         apex_points->SetPoint(iter - mApices.begin(), iter->mCurrentLocation);
     }
 
     // Build a point locator to find apices
-    vtkSmartPointer<vtkPointLocator> apex_locator = vtkSmartPointer<vtkPointLocator>::New();
+    vtkSmartPointer<vtkPointLocator> apex_locator = 
+        vtkSmartPointer<vtkPointLocator>::New();
     apex_locator->SetDataSet(apex_poly_data);
     apex_locator->BuildLocator();
 
-    for (int index = 0; index < pAllGrowthPoints->GetNumberOfPoints(); ++index)
+    for (unsigned index = 0;
+         index < pAllGrowthPoints->GetNumberOfPoints();
+         ++index)
     {
-        if (!invalidIds.count(index)) // Only copy over valid ids
+        // Only copy over valid ids
+        if (!invalidIds.count(index))
         {
             // Find closest apex
             double growth_point[3];
@@ -102,7 +117,8 @@ void AirwayGeneration::DistributeGrowthPoints(vtkSmartPointer<vtkPolyData> pAllG
             double dist;
             int closest_apex_id = apex_locator->FindClosestPointWithinRadius(mDistributionRadius, growth_point, dist);
 
-            if (closest_apex_id != -1) // No point within the radius
+            // No point within the radius
+            if (closest_apex_id != -1)
             {
                 assert(sqrt(dist) <= mDistributionRadius);
 
@@ -112,20 +128,23 @@ void AirwayGeneration::DistributeGrowthPoints(vtkSmartPointer<vtkPolyData> pAllG
         }
     }
 
-    // Some vtk filters get confused by individual points, so we add each point to a poly_vertex to keep them happy
-    for (std::deque<Apex>::iterator apex_iter = GetApices().begin();
-         apex_iter != GetApices().end();
-         ++apex_iter)
+    /*
+     * Some vtk filters get confused by individual points, so we add each point 
+     * to a poly_vertex to keep them happy.
+     */
+    for (auto apex_iter : GetApices())
     {
         vtkSmartPointer<vtkPolyVertex> poly_vertex = vtkSmartPointer<vtkPolyVertex>::New();
-        poly_vertex->GetPointIds()->SetNumberOfIds(apex_iter->mPointCloud->GetNumberOfPoints());
+        poly_vertex->GetPointIds()->SetNumberOfIds(apex_iter.mPointCloud->GetNumberOfPoints());
 
-        for (int i = 0; i < apex_iter->mPointCloud->GetNumberOfPoints(); ++i)
+        for (unsigned i = 0;
+             i < apex_iter.mPointCloud->GetNumberOfPoints();
+             ++i)
         {
             poly_vertex->GetPointIds()->SetId(i, i);
         }
-        apex_iter->mPointCloud->Allocate(1,1);
-        apex_iter->mPointCloud->InsertNextCell(poly_vertex->GetCellType(), poly_vertex->GetPointIds());
+        apex_iter.mPointCloud->Allocate(1,1);
+        apex_iter.mPointCloud->InsertNextCell(poly_vertex->GetCellType(), poly_vertex->GetPointIds());
     }
 }
 

@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSTLReader.h"
 
 /**
- * Calculates a number of morphological properties for a set of lung lobes
+ * Calculates a number of morphological properties for a set of lung lobes.
  */
 class LobePropertiesCalculator
 {
@@ -65,7 +65,7 @@ public:
     ~LobePropertiesCalculator();
 
     /**
-     * Allows the user to add a lung lobe from a file
+     * Allow the user to add a lung lobe from a file.
      *
      * This method assumes that the file is a .stl file.
      *
@@ -73,49 +73,58 @@ public:
      * @param lungLocation Is this a right or a left lung lobe?
      * @param rName A string identifying the lobe
      */
-    void AddLobe(const std::string& rFileName, LungLocation lungLocation, const std::string& rName);
+    void AddLobe(
+      const std::string& rFileName,
+      LungLocation lungLocation,
+      const std::string& rName);
 
     /**
-     * Adds a lobe to the mesh generator
+     * Add a lobe to the mesh generator.
      *
      * @param pLobeSurface A VTK poly data containing the surface of the lobe
      * @param lungLocation Is this a right or a left lung lobe?
      * @param rName A string identifying the lobe
      */
-    void AddLobe(vtkSmartPointer<vtkPolyData> pLobeSurface, LungLocation lungLocation, const std::string& rName);
+    void AddLobe(
+      vtkSmartPointer<vtkPolyData> pLobeSurface,
+      LungLocation lungLocation,
+      const std::string& rName);
 
     /**
-     * @return The total volume of all the registered lobes
+     * @return The total volume of all the registered lobes.
      */
     double GetTotalVolume();
 
     /**
      * @param rName The name of the lobe to get the volume for
-     * @return The absolute volume of the given lobe
+     * 
+     * @return The absolute volume of the given lobe.
      */
     double GetLobeVolume(const std::string& rName);
 
     /**
      * @param pLobeSurface A VTK poly data containing the surface of the lobe
-     * @return The absolute volume of the given lobe
+     * 
+     * @return The absolute volume of the given lobe.
      */
     double GetLobeVolume(vtkSmartPointer<vtkPolyData> pLobeSurface);
 
-
     /**
      * @param rName The name of the lobe to get the fraction of total volume for
-     * @return The volume of the given lobe as a fraction of the total
+     * 
+     * @return The volume of the given lobe as a fraction of the total.
      */
     double GetLobeVolumeFraction(const std::string& rName);
 
     /**
      * @param pLobeSurface A VTK poly data containing the surface of the lobe
-     * @return The volume of the given lobe as a fraction of the total
+     * 
+     * @return The volume of the given lobe as a fraction of the total.
      */
     double GetLobeVolumeFraction(vtkSmartPointer<vtkPolyData> pLobeSurface);
 
 private:
-    /** A map containing the lobar surface definitions */
+    /** A map containing the lobar surface definitions. */
     std::map< std::string, std::pair< vtkSmartPointer<vtkPolyData>, LungLocation> > mLobesMap;
 };
 

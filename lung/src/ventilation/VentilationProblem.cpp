@@ -37,23 +37,35 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 
 /**
- * Helper function for varying terminal fluxes in order to match terminal pressure boundary conditions
- * Uses a pre-computed (approximate when not dense) mTerminalInteractionMatrix as the Jacobian for a non-linear
- * search.
- *  * If the system is small and Poiseuille flow is used then mTerminalInteractionMatrix is exact and the SNES should converge immediately
- *  * If the system is large then only the near-diagonal interactions are retained, the Jacobian is approximate but the system is linear
- *  * If Pedley is used then the resistances are all under-estimates and the system is non-linear (used with the linear Jacobian)
+ * Helper function for varying terminal fluxes in order to match terminal 
+ * pressure boundary conditions.
+ * Uses a pre-computed (approximate when not dense) mTerminalInteractionMatrix 
+ * as the Jacobian for a non-linear search.
+ *  * If the system is small and Poiseuille flow is used then 
+ *    mTerminalInteractionMatrix is exact and the SNES should converge 
+ *    immediately
+ *  * If the system is large then only the near-diagonal interactions are 
+ *    retained, the Jacobian is approximate but the system is linear
+ *  * If Pedley is used then the resistances are all under-estimates and the 
+ *    system is non-linear (used with the linear Jacobian)
  * This function is written in the require form for PETSc SNES:
  * @param snes The PETSc SNES object
  * @param solution_guess The terminal input fluxes
- * @param residual The difference between the terminal pressures and the required pressure boundary conditions
+ * @param residual The difference between the terminal pressures and the 
+ *    required pressure boundary conditions
  * @param pContext A pointer to the VentilationProblem which called the SNES
+ * 
  * @return 0 error code
  */
-PetscErrorCode ComputeSnesResidual(SNES snes, Vec solution_guess, Vec residual, void* pContext);
+PetscErrorCode ComputeSnesResidual(
+    SNES snes,
+    Vec solution_guess,
+    Vec residual,
+    void* pContext);
 
-
-VentilationProblem::VentilationProblem(const std::string& rMeshDirFilePath, unsigned rootIndex)
+VentilationProblem::VentilationProblem(
+    const std::string& rMeshDirFilePath,
+    unsigned rootIndex)
     : AbstractVentilationProblem(rMeshDirFilePath, rootIndex),
       mFluxGivenAtInflow(false),
       mFluxGivenAtOutflow(false),
@@ -78,7 +90,7 @@ void VentilationProblem::Initialise()
 
 VentilationProblem::~VentilationProblem()
 {
-    /* Remove the PETSc context used in the iterative solver */
+    // Remove the PETSc context used in the iterative solver
     if (mTerminalInteractionMatrix)
     {
         PetscTools::Destroy(mTerminalInteractionMatrix);
@@ -88,24 +100,25 @@ VentilationProblem::~VentilationProblem()
     }
 }
 
-
 void VentilationProblem::SolveDirectFromFlux()
 {
-    /* Work back through the node iterator looking for internal nodes: bifurcations or joints
+    /*
+     * Work back through the node iterator looking for internal nodes: 
+     * bifurcations or joints.
      *
-     * Each parent flux is equal to the sum of its children
-     * Note that we can't iterate all the way back to the root node, but that's okay
-     * because the root is not a bifurcation.  Also note that we can't use a NodeIterator
-     * because it does not have operator--
+     * Each parent flux is equal to the sum of its children. Note that we can't 
+     * iterate all the way back to the root node, but that's okay, because the 
+     * root is not a bifurcation. Also note that we can't use a NodeIterator
+     * because it does not have operator--.
      *
-     * The extra do/while loop is only required when the nodes do not appear in graph order
-     * In this case we need to scan the tree more than once (up to depth of tree times) before the fluces are correctly propagated
-     *
+     * The extra do/while loop is only required when the nodes do not appear in 
+     * graph order. In this case we need to scan the tree more than once (up to 
+     * depth of tree times) before the fluces are correctly propagated.
      */
     if (!mNodesInGraphOrder)
     {
         // Unset internal fluxes
-        for (AbstractTetrahedralMesh<1,3>::ElementIterator iter = mMesh.GetElementIteratorBegin();
+        for (auto iter = mMesh.GetElementIteratorBegin();
              iter != mMesh.GetElementIteratorEnd();
              ++iter)
         {
@@ -128,12 +141,16 @@ void VentilationProblem::SolveDirectFromFlux()
             if (p_node->IsBoundaryNode() == false)
             {
                 Node<3>::ContainingElementIterator element_iterator = p_node->ContainingElementsBegin();
-                // This assertion will trip if a node is not actually in the airway tree and will prevent operator++ from hanging
+
+                /*
+                 * This assertion will trip if a node is not actually in the 
+                 * airway tree and will prevent operator++ from hanging.
+                 */
                 assert(element_iterator != p_node->ContainingElementsEnd());
                 unsigned parent_index = *element_iterator;
                 ++element_iterator;
 
-                for (mFlux[parent_index]=0.0; element_iterator != p_node->ContainingElementsEnd(); ++element_iterator)
+                for (mFlux[parent_index] = 0.0; element_iterator != p_node->ContainingElementsEnd(); ++element_iterator)
                 {
                     mFlux[parent_index] += mFlux[*element_iterator];
                 }
@@ -155,12 +172,13 @@ void VentilationProblem::SolveDirectFromFlux()
     while (!mNodesInGraphOrder && some_flux_zero && !all_flux_zero);
 
     // Poiseuille flow at each edge
-    for (AbstractTetrahedralMesh<1,3>::ElementIterator iter = mMesh.GetElementIteratorBegin();
+    for (auto iter = mMesh.GetElementIteratorBegin();
          iter != mMesh.GetElementIteratorEnd();
          ++iter)
     {
-        /* Poiseuille flow gives:
-         *  pressure_node_1 - pressure_node_2 - resistance * flux = 0
+        /*
+         * Poiseuille flow gives:
+         *     pressure_node_1 - pressure_node_2 - resistance * flux = 0
          */
         double flux = mFlux[iter->GetIndex()];
         double resistance = CalculateResistance(*iter, mDynamicResistance, flux);
@@ -172,39 +190,47 @@ void VentilationProblem::SolveDirectFromFlux()
 
 void VentilationProblem::SetupIterativeSolver()
 {
-    //double start = Timer::GetElapsedTime();
     mNumNonZeroesPerRow = std::min(mNumNonZeroesPerRow, mMesh.GetNumBoundaryNodes()-1);
-    MatCreateSeqAIJ(PETSC_COMM_SELF, mMesh.GetNumBoundaryNodes()-1, mMesh.GetNumBoundaryNodes()-1, mNumNonZeroesPerRow, nullptr, &mTerminalInteractionMatrix);
+    MatCreateSeqAIJ(PETSC_COMM_SELF,
+                    mMesh.GetNumBoundaryNodes() - 1,
+                    mMesh.GetNumBoundaryNodes() - 1,
+                    mNumNonZeroesPerRow,
+                    nullptr,
+                    &mTerminalInteractionMatrix);
     PetscMatTools::SetOption(mTerminalInteractionMatrix, MAT_SYMMETRIC);
     PetscMatTools::SetOption(mTerminalInteractionMatrix, MAT_SYMMETRY_ETERNAL);
 
-    /* Map each edge to its terminal descendants so that we can keep track
-     * of which terminals can affect each other via a particular edge.
+    /*
+     * Map each edge to its terminal descendants so that we can keep track of 
+     which terminals can affect each other via a particular edge.
      */
     mEdgeDescendantNodes.resize(mMesh.GetNumElements());
-    unsigned terminal_index=0;
-    //First set up all the boundary nodes
-    for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = mMesh.GetBoundaryNodeIteratorBegin();
-              iter != mMesh.GetBoundaryNodeIteratorEnd();
-              ++iter)
+    unsigned terminal_index = 0;
+
+    // First set up all the boundary nodes
+    for (auto iter = mMesh.GetBoundaryNodeIteratorBegin();
+         iter != mMesh.GetBoundaryNodeIteratorEnd();
+         ++iter)
     {
         unsigned node_index = (*iter)->GetIndex();
         if (node_index != mOutletNodeIndex)
         {
-            unsigned parent_index =  *((*iter)->ContainingElementsBegin());
+            unsigned parent_index = *((*iter)->ContainingElementsBegin());
             mTerminalToNodeIndex[terminal_index] = node_index;
             mTerminalToEdgeIndex[terminal_index] = parent_index;
             mEdgeDescendantNodes[parent_index].insert(terminal_index++);
         }
     }
+
     /*
-     *  The outer loop here is for special cases where we find an internal node before its descendants - i.e. nodes
-     *  are not in graph order.
-     *  In this case we need to scan the tree more than once (up to depth of tree times) before the sets are correctly propagated
+     * The outer loop here is for special cases where we find an internal node 
+     * before its descendants - i.e. nodes are not in graph order. In this case 
+     * we need to scan the tree more than once (up to depth of tree times) 
+     * before the sets are correctly propagated
      */
     while (mEdgeDescendantNodes[mOutletNodeIndex].size() != terminal_index)
     {
-        //Work back up the tree making the unions of the sets of descendants
+        // Work back up the tree making the unions of the sets of descendants
         for (unsigned node_index = mMesh.GetNumNodes() - 1; node_index > 0; --node_index)
         {
             Node<3>* p_node = mMesh.GetNode(node_index);
@@ -223,7 +249,7 @@ void VentilationProblem::SetupIterativeSolver()
 
     FillInteractionMatrix(false);
 
-    assert( terminal_index == mMesh.GetNumBoundaryNodes()-1);
+    assert(terminal_index == mMesh.GetNumBoundaryNodes() - 1);
     VecCreateSeq(PETSC_COMM_SELF, terminal_index, &mTerminalFluxChangeVector);
     VecCreateSeq(PETSC_COMM_SELF, terminal_index, &mTerminalPressureChangeVector);
 
@@ -235,33 +261,23 @@ void VentilationProblem::SetupIterativeSolver()
 #endif
     KSPSetFromOptions(mTerminalKspSolver);
     KSPSetUp(mTerminalKspSolver);
-//    PRINT_VARIABLE(Timer::GetElapsedTime() - start);
 }
 
 void VentilationProblem::FillInteractionMatrix(bool redoExisting)
 {
     assert(!redoExisting);
-    if (redoExisting)
-    {
-//        MatZeroEntries(mTerminalInteractionMatrix);
-    }
-    // Use the descendant sets to build the mTerminalInteractionMatrix structure of resistances
-    for (AbstractTetrahedralMesh<1,3>::ElementIterator iter = mMesh.GetElementIteratorBegin();
-            iter != mMesh.GetElementIteratorEnd();
-            ++iter)
+
+    /*
+     * Use the descendant sets to build the mTerminalInteractionMatrix structure 
+     * of resistances.
+     */
+    for (auto iter = mMesh.GetElementIteratorBegin();
+         iter != mMesh.GetElementIteratorEnd();
+         ++iter)
     {
         unsigned parent_index = iter->GetIndex();
-        double parent_resistance=0.0;
-        if (redoExisting)
-        {
- //           assert(mDynamicResistance);
- //           parent_resistance=CalculateResistance(*iter);
-        }
-        else
-        {
-            parent_resistance=CalculateResistance(*iter, true, mFlux[parent_index]);
-        }
-        std::vector<PetscInt> indices( mEdgeDescendantNodes[parent_index].begin(), mEdgeDescendantNodes[parent_index].end() );
+        double parent_resistance = CalculateResistance(*iter, true, mFlux[parent_index]);
+        std::vector<PetscInt> indices(mEdgeDescendantNodes[parent_index].begin(), mEdgeDescendantNodes[parent_index].end());
         if (mEdgeDescendantNodes[parent_index].size() <= mNumNonZeroesPerRow)
         {
             std::vector<double> resistance_to_add(indices.size()*indices.size(), parent_resistance);
@@ -282,12 +298,16 @@ void VentilationProblem::FillInteractionMatrix(bool redoExisting)
 }
 
 PetscErrorCode
-ComputeSnesResidual(SNES snes, Vec terminal_flux_solution, Vec terminal_pressure_difference, void* pContext)
+ComputeSnesResidual(
+    SNES snes,
+    Vec terminal_flux_solution,
+    Vec terminal_pressure_difference,
+    void* pContext)
 {
     // Gain access to the ventilation problem
     VentilationProblem* p_original_ventilation_problem =  (VentilationProblem*) pContext;
 
-    /* Copy the  fluxes given in the initial guess into the problem */
+    // Copy the  fluxes given in the initial guess into the problem
     double* p_terminal_flux_vector;
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
     // Request read-only access properly
@@ -298,32 +318,32 @@ ComputeSnesResidual(SNES snes, Vec terminal_flux_solution, Vec terminal_pressure
 
     unsigned num_terminals = p_original_ventilation_problem->mMesh.GetNumBoundaryNodes()-1u;
 
-    for (unsigned terminal=0; terminal<num_terminals; terminal++)
+    for (unsigned terminal = 0; terminal < num_terminals; ++terminal)
     {
         unsigned edge_index = p_original_ventilation_problem->mTerminalToEdgeIndex[terminal];
         p_original_ventilation_problem->mFlux[edge_index] =  p_terminal_flux_vector[terminal];
-        //if (terminal == 0) PRINT_2_VARIABLES(edge_index, p_terminal_flux_vector[terminal]);
     }
 
-
-    /* Solve the direct problem */
+    // Solve the direct problem
     p_original_ventilation_problem->SolveDirectFromFlux();
 
-    /* Form a residual from the new pressures */
-    for (unsigned terminal=0; terminal<num_terminals; terminal++)
+    // Form a residual from the new pressures
+    for (unsigned terminal = 0; terminal < num_terminals; ++terminal)
     {
         unsigned node_index = p_original_ventilation_problem->mTerminalToNodeIndex[terminal];
-        // How far we are away from matching this boundary condition.
+
+        // How far we are away from matching this boundary condition
         double delta_pressure = p_original_ventilation_problem->mPressureCondition[node_index] - p_original_ventilation_problem->mPressure[node_index];
         VecSetValue(terminal_pressure_difference, terminal, delta_pressure, INSERT_VALUES);
-        //if (terminal == 0) PRINT_4_VARIABLES(node_index, p_original_ventilation_problem->mPressureCondition[node_index], p_original_ventilation_problem->mPressure[node_index], delta_pressure);
     }
     return 0;
 }
 
 void VentilationProblem::SolveFromPressureWithSnes()
 {
-    assert( !mFluxGivenAtInflow );  // It's not a direct solve
+    // It's not a direct solve
+    assert(!mFluxGivenAtInflow);
+
     if (mTerminalInteractionMatrix == nullptr)
     {
         SetupIterativeSolver();
@@ -332,8 +352,12 @@ void VentilationProblem::SolveFromPressureWithSnes()
     SNES snes;
     SNESCreate(PETSC_COMM_SELF, &snes);
 
-    // Set the residual creation function (direct solve flux->pressure followed by pressure matching)
+    /*
+     * Set the residual creation function (direct solve flux->pressure followed 
+     * by pressure matching).
+     */
     SNESSetFunction(snes, mTerminalPressureChangeVector /*residual*/ , &ComputeSnesResidual, this);
+
     // The approximate Jacobian has been precomputed so we are going to wing it
     SNESSetJacobian(snes, mTerminalInteractionMatrix, mTerminalInteractionMatrix, /*&ComputeSnesJacobian*/ nullptr, this);
 #if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x
@@ -383,7 +407,6 @@ void VentilationProblem::SolveFromPressureWithSnes()
 
     ///\todo #2300 If used with time-stepping we should maintain a permanent SNES object
     SNESDestroy(PETSC_DESTROY_PARAM(snes));
-
 }
 
 void VentilationProblem::SolveIterativelyFromPressure()
@@ -392,9 +415,10 @@ void VentilationProblem::SolveIterativelyFromPressure()
     {
         SetupIterativeSolver();
     }
-//    double start = Timer::GetElapsedTime();
-    /* Now use the pressure boundary conditions to determine suitable flux boundary conditions
-     * and iteratively update them until we are done
+
+    /*
+     * Now use the pressure boundary conditions to determine suitable flux 
+     * boundary conditions and iteratively update them until we are done.
      */
     assert(mPressure[mOutletNodeIndex] == mPressureCondition[mOutletNodeIndex]);
 
@@ -410,13 +434,15 @@ void VentilationProblem::SolveIterativelyFromPressure()
     double last_norm_pressure_change;
     Vec old_terminal_pressure_change;
     VecDuplicate(mTerminalPressureChangeVector, &old_terminal_pressure_change);
-    for (unsigned iteration = 0; iteration < max_iterations && converged==false; iteration++)
+    for (unsigned iteration = 0; iteration < max_iterations && converged==false; ++iteration)
     {
-        for (unsigned terminal=0; terminal<num_terminals; terminal++)
+        for (unsigned terminal = 0; terminal < num_terminals; ++terminal)
         {
             unsigned node_index = mTerminalToNodeIndex[terminal];
+
             // How far we are away from matching this boundary condition.
             double delta_pressure = mPressure[node_index] - mPressureCondition[node_index];
+
             // Offset the first iteration
             if (iteration == 0)
             {
@@ -438,20 +464,22 @@ void VentilationProblem::SolveIterativelyFromPressure()
         double* p_terminal_flux_change_vector;
         VecGetArray(mTerminalFluxChangeVector, &p_terminal_flux_change_vector);
 
-        for (unsigned terminal=0; terminal<num_terminals; terminal++)
+        for (unsigned terminal = 0; terminal < num_terminals; ++terminal)
         {
             double estimated_terminal_flux_change=p_terminal_flux_change_vector[terminal];
             unsigned edge_index = mTerminalToEdgeIndex[terminal];
-            mFlux[edge_index] +=  estimated_terminal_flux_change;
+            mFlux[edge_index] += estimated_terminal_flux_change;
         }
         SolveDirectFromFlux();
-        /* Look at the magnitude of the response */
 
-        for (unsigned terminal=0; terminal<num_terminals; terminal++)
+        // Look at the magnitude of the response
+        for (unsigned terminal = 0; terminal < num_terminals; ++terminal)
         {
             unsigned node_index = mTerminalToNodeIndex[terminal];
-            // How far we are away from matching this boundary condition.
+
+            // How far we are away from matching this boundary condition
             double delta_pressure = mPressure[node_index] - mPressureCondition[node_index];
+
             // Offset the first iteration
             if (iteration == 0)
             {
@@ -469,7 +497,8 @@ void VentilationProblem::SolveIterativelyFromPressure()
         VecDot(mTerminalPressureChangeVector, old_terminal_pressure_change, &pressure_change_dot_product);
         if (pressure_change_dot_product < 0.0)
         {
-            /* The pressure correction has changed sign
+            /*
+             * The pressure correction has changed sign
              *  * so we have overshot the root
              *  * back up by setting a correction factor
              */
@@ -479,7 +508,7 @@ void VentilationProblem::SolveIterativelyFromPressure()
 //            {
 //                terminal_flux_correction *= 0.99;
 //            }
-            for (unsigned terminal=0; terminal<num_terminals; terminal++)
+            for (unsigned terminal = 0; terminal < num_terminals; ++terminal)
             {
                 double estimated_terminal_flux_change=p_terminal_flux_change_vector[terminal];
                 unsigned edge_index = mTerminalToEdgeIndex[terminal];
@@ -494,9 +523,7 @@ void VentilationProblem::SolveIterativelyFromPressure()
     }
 
     PetscTools::Destroy(old_terminal_pressure_change);
-//    PRINT_2_VARIABLES(Timer::GetElapsedTime() - start, mDynamicResistance);
 }
-
 
 void VentilationProblem::SetOutflowPressure(double pressure)
 {
@@ -504,8 +531,9 @@ void VentilationProblem::SetOutflowPressure(double pressure)
     mPressure[mOutletNodeIndex] = pressure;
 }
 
-
-void VentilationProblem::SetPressureAtBoundaryNode(const Node<3>& rNode, double pressure)
+void VentilationProblem::SetPressureAtBoundaryNode(
+    const Node<3>& rNode,
+    double pressure)
 {
     if (rNode.IsBoundaryNode() == false)
     {
@@ -551,12 +579,12 @@ void VentilationProblem::Solve()
     else
     {
         SolveIterativelyFromPressure();
-        //SolveFromPressureWithSnes();
     }
 }
 
-void VentilationProblem::GetSolutionAsFluxesAndPressures(std::vector<double>& rFluxesOnEdges,
-                                                         std::vector<double>& rPressuresOnNodes)
+void VentilationProblem::GetSolutionAsFluxesAndPressures(
+    std::vector<double>& rFluxesOnEdges,
+    std::vector<double>& rPressuresOnNodes)
 {
     rFluxesOnEdges = mFlux;
     rPressuresOnNodes = mPressure;

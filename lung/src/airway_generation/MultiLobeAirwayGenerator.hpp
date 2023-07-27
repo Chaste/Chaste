@@ -42,7 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef CHASTE_VTK
 
-#define _BACKWARD_BACKWARD_WARNING_H 1 //Cut out the strstream deprecated warning for now (gcc4.3)
+// Cut out the strstream deprecated warning for now (gcc4.3)
+#define _BACKWARD_BACKWARD_WARNING_H 1
 #include "vtkVersion.h"
 
 #include "TetrahedralMesh.hpp"
@@ -53,11 +54,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /**
- * Multi Lobe Airway Generator
+ * Multi Lobe Airway Generator.
  *
- * This class wraps `AirwayGenerator` to facilitate easy generation of airway trees for a set of lungs with
- * multiple lobes. The class assumes that the major airways have been obtained from images and are available
- * to provide start points for airways generation.
+ * This class wraps `AirwayGenerator` to facilitate easy generation of airway 
+ * trees for a set of lungs with multiple lobes. The class assumes that the 
+ * major airways have been obtained from images and are available to provide 
+ * start points for airways generation.
  */
 class MultiLobeAirwayGenerator
 {
@@ -67,18 +69,22 @@ public:
     /**
      * Constructor
      *
-     * @param rAirwaysMesh Mesh of the major airways. The generated airways will be appended to this mesh
-     * @param pointDistanceLimit Specifies whether to limit the size of terminal generations using a heuristic limit
+     * @param rAirwaysMesh Mesh of the major airways. The generated airways will 
+     *     be appended to this mesh
+     * @param pointDistanceLimit Specifies whether to limit the size of terminal 
+     *     generations using a heuristic limit (defaults to false)
      */
-    MultiLobeAirwayGenerator(TetrahedralMesh<1,3>& rAirwaysMesh, bool pointDistanceLimit = false);
+    MultiLobeAirwayGenerator(
+        TetrahedralMesh<1,3>& rAirwaysMesh,
+        bool pointDistanceLimit = false);
 
     /**
-     * Destructor
+     * Destructor.
      */
     ~MultiLobeAirwayGenerator();
 
     /**
-     * Allows the user to add a lung lobe from a file
+     * Allows the user to add a lung lobe from a file.
      *
      * This method assumes that the file is a .stl file.
      *
@@ -88,15 +94,17 @@ public:
     void AddLobe(const std::string& rFileName, LungLocation lungLocation);
 
     /**
-     * Adds a lobe to the mesh generator
+     * Adds a lobe to the mesh generator.
      *
      * @param pLobeSurface A VTK poly data containing the surface of the lobe
      * @param lungLocation Is this a right or a left lung lobe?
      */
-    void AddLobe(vtkSmartPointer<vtkPolyData> pLobeSurface, LungLocation lungLocation);
+    void AddLobe(
+        vtkSmartPointer<vtkPolyData> pLobeSurface,
+        LungLocation lungLocation);
 
     /**
-     * Counts the number of lobes added in each lung location
+     * Counts the number of lobes added in each lung location.
      *
      * @param lungLocation Is this a right or a left lung lobe?
      * @return The number of lobes in this lung location
@@ -104,12 +112,14 @@ public:
     unsigned GetNumLobes(LungLocation lungLocation);
 
     /**
-     * Assigns the end points of the major airway tree to initial growth apices in the correct lobes
+     * Assigns the end points of the major airway tree to initial growth apices 
+     * in the correct lobes.
      */
     void AssignGrowthApices();
 
     /**
-     * Distributes the correct number of points to the clouds of the individual lobe generators
+     * Distributes the correct number of points to the clouds of the individual 
+     * lobe generators.
      */
     void DistributePoints();
 
@@ -120,49 +130,54 @@ public:
      *
      * Either this method should be used or SetPointVolume should be used, not both
      *
-     * @param rNumberOfPointsPerLung The target number of generation points for each lung
+     * @param rNumberOfPointsPerLung The target number of generation points for 
+     *     each lung
      */
-    void SetNumberOfPointsPerLung(const unsigned& rNumberOfPointsPerLung );
+    void SetNumberOfPointsPerLung(const unsigned& rNumberOfPointsPerLung);
 
     /**
      * Sets the target volume of generation points.
      *
-     * Either this method should be used or SetNumberOfPointsPerLung should be used, not both
+     * Either this method should be used or SetNumberOfPointsPerLung should be 
+     *     used, not both
      *
      * @param rVolume The target volume associated with each generation point
      */
-    void SetPointVolume(const double& rVolume );
+    void SetPointVolume(const double& rVolume);
 
     /**
      * Sets the minimum branch length for generated airways.
      *
-     * @param rMinimumbranchLength The minimum branch length for generated airways
+     * @param rMinimumbranchLength The minimum branch length for generated 
+     *     airways
      */
     void SetMinimumBranchLength(const double& rMinimumbranchLength);
 
     /**
-     * Sets the minimum number of points in a point cloud
+     * Sets the minimum number of points in a point cloud.
      *
      * @param rPointLimit The minimum number of points in a point cloud
      */
     void SetPointLimit(const unsigned& rPointLimit);
 
     /**
-     * Sets the maximum angle with the parent branch for generated branches
+     * Sets the maximum angle with the parent branch for generated branches.
      *
-     * @param rAngleLimit The maximum angle with the parent branch for generated branches
+     * @param rAngleLimit The maximum angle with the parent branch for generated 
+     *     branches
      */
     void SetAngleLimit(const double& rAngleLimit);
 
     /**
-     * Sets the fraction of the distance towards the centre of the point cloud assigned to a new branch's length
+     * Sets the fraction of the distance towards the centre of the point cloud 
+     * assigned to a new branch's length.
      *
      * @param rBranchingFraction The branch fraction
      */
     void SetBranchingFraction(const double& rBranchingFraction);
 
     /**
-     * The scaling factor for generated airway diameters
+     * The scaling factor for generated airway diameters.
      *
      * @param rDiameterRatio Scaling factor for generated airway diameters
      */
@@ -178,34 +193,37 @@ public:
 
 private:
 
-    /** A mesh containing the major airways.  */
+    /** A mesh containing the major airways. */
     TetrahedralMesh<1,3>& mAirwaysMesh;
 
-    /** A vector containing the left lobes associated with this generator */
+    /** A vector containing the left lobes associated with this generator. */
     std::vector<std::pair<AirwayGenerator*, LungLocation> > mLobeGenerators;
 
-    /** The target number of points per lung */
+    /** The target number of points per lung. */
     unsigned mNumberOfPointsPerLung;
 
-    /** The target Volume for points in lung */
+    /** The target Volume for points in lung. */
     double mPointVolume;
 
-    /** The minimum branch length for generated airways */
+    /** The minimum branch length for generated airways. */
     double mMinimumBranchLength;
 
-    /** The minimum number of points in a point cloud */
+    /** The minimum number of points in a point cloud. */
     unsigned mPointLimit;
 
-    /** The maximum angle with the parent branch for generated branches */
+    /** The maximum angle with the parent branch for generated branches. */
     double mAngleLimit;
 
-    /** The fraction of the distance towards the centre of the point cloud assigned to a new branch's length */
+    /**
+     * The fraction of the distance towards the centre of the point cloud 
+     * assigned to a new branch's length.
+     */
     double mBranchingFraction;
 
-    /** The scaling factor for generated airway diameters */
+    /** The scaling factor for generated airway diameters. */
     double mDiameterRatio;
 
-    /** A flag to turn on the point distance limit heuristic */
+    /** A flag to turn on the point distance limit heuristic. */
     bool mPointDistanceLimit;
 };
 

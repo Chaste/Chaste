@@ -62,11 +62,9 @@ double AirwayBranch::GetLength()
     c_matrix<double, 3, 1> jacobian; //not used
     double element_length = 0.0;
 
-    for (std::list<Element<1,3>*>::iterator iter = mElements.begin();
-         iter != mElements.end();
-         ++iter)
+    for (auto iter : mElements)
     {
-        (*iter)->CalculateJacobian(jacobian, element_length);
+        iter->CalculateJacobian(jacobian, element_length);
         length += element_length;
     }
 
@@ -81,20 +79,18 @@ double AirwayBranch::GetAverageRadius()
     c_matrix<double, 3, 1> jacobian; //not used
     double element_length = 0.0;
 
-    for (std::list<Element<1,3>* >::iterator iter = mElements.begin();
-         iter != mElements.end();
-         ++iter)
+    for (auto iter : mElements)
     {
-        (*iter)->CalculateJacobian(jacobian, element_length);
+        iter->CalculateJacobian(jacobian, element_length);
         length += element_length;
 
         if (mRadiusOnEdge)
         {
-            radius += element_length*((*iter)->GetAttribute());
+            radius += element_length*(iter->GetAttribute());
         }
         else
         {
-            radius += element_length*((*iter)->GetNode(0)->rGetNodeAttributes()[0] + (*iter)->GetNode(1)->rGetNodeAttributes()[0])/2.0;
+            radius += element_length*(iter->GetNode(0)->rGetNodeAttributes()[0] + iter->GetNode(1)->rGetNodeAttributes()[0])/2.0;
         }
     }
 
@@ -108,20 +104,18 @@ double AirwayBranch::GetPoiseuilleResistance()
     c_matrix<double, 3, 1> jacobian; //not used
     double element_length = 0.0;
 
-    for (std::list<Element<1,3>*>::iterator iter = mElements.begin();
-         iter != mElements.end();
-         ++iter)
+    for (auto iter : mElements)
     {
-        (*iter)->CalculateJacobian(jacobian, element_length);
+        iter->CalculateJacobian(jacobian, element_length);
 
         double radius = 0.0;
         if (mRadiusOnEdge)
         {
-            radius = (*iter)->GetAttribute();
+            radius = iter->GetAttribute();
         }
         else
         {
-            radius = ((*iter)->GetNode(0)->rGetNodeAttributes()[0] + (*iter)->GetNode(1)->rGetNodeAttributes()[0])/2.0;
+            radius = (iter->GetNode(0)->rGetNodeAttributes()[0] + iter->GetNode(1)->rGetNodeAttributes()[0])/2.0;
         }
 
         resistance += element_length/SmallPow(radius, 4);
@@ -365,16 +359,11 @@ double AirwayBranch::GetBranchVolume()
 
     double volume = 0.0;
 
-    for (std::list<Element<1,3>* >::iterator iter = mElements.begin();
-         iter != mElements.end();
-         ++iter)
+    for (auto iter : mElements)
     {
-        Element<1,3>* current_elem = *iter;
-
-        double r1 = current_elem->GetNode(0)->rGetNodeAttributes()[0];
-        double r2 = current_elem->GetNode(1)->rGetNodeAttributes()[0];
-
-        double elem_length = norm_2(current_elem->GetNodeLocation(0) - current_elem->GetNodeLocation(1));
+        double r1 = iter->GetNode(0)->rGetNodeAttributes()[0];
+        double r2 = iter->GetNode(1)->rGetNodeAttributes()[0];
+        double elem_length = norm_2(iter->GetNodeLocation(0) - iter->GetNodeLocation(1));
 
         // Volume of a truncated cone
         volume += (M_PI * (r1*r1 + r1*r2 + r2*r2) * elem_length / 3);
@@ -389,16 +378,11 @@ double AirwayBranch::GetBranchLateralSurfaceArea()
 
     double lateralSurfaceArea = 0.0;
 
-    for (std::list<Element<1,3>* >::iterator iter = mElements.begin();
-         iter != mElements.end();
-         ++iter)
+    for (auto iter : mElements)
     {
-        Element<1,3>* current_elem = *iter;
-
-        double r1 = current_elem->GetNode(0)->rGetNodeAttributes()[0];
-        double r2 = current_elem->GetNode(1)->rGetNodeAttributes()[0];
-
-        double elem_length = norm_2(current_elem->GetNodeLocation(0) - current_elem->GetNodeLocation(1));
+        double r1 = iter->GetNode(0)->rGetNodeAttributes()[0];
+        double r2 = iter->GetNode(1)->rGetNodeAttributes()[0];
+        double elem_length = norm_2(iter->GetNodeLocation(0) - iter->GetNodeLocation(1));
 
         // Volume of a truncated cone
         lateralSurfaceArea += (M_PI * (r1 + r2) * sqrt((r1-r2)*(r1-r2) + elem_length * elem_length));
@@ -414,16 +398,12 @@ c_vector<double, 3> AirwayBranch::GetBranchCentroid()
     c_vector<double, 3> centroid;
     centroid.clear();
 
-    for (std::list<Element<1,3>* >::iterator iter = mElements.begin();
-         iter != mElements.end();
-         ++iter)
+    for (auto iter : mElements)
     {
-        Element<1,3>* current_elem = *iter;
+        double r1 = iter->GetNode(0)->rGetNodeAttributes()[0];
+        double r2 = iter->GetNode(1)->rGetNodeAttributes()[0];
 
-        double r1 = current_elem->GetNode(0)->rGetNodeAttributes()[0];
-        double r2 = current_elem->GetNode(1)->rGetNodeAttributes()[0];
-
-        c_vector<double, 3> along_element = current_elem->GetNodeLocation(1) - current_elem->GetNodeLocation(0);
+        c_vector<double, 3> along_element = iter->GetNodeLocation(1) - iter->GetNodeLocation(0);
         double elem_length = norm_2(along_element);
 
         // Volume of a truncated cone
@@ -434,7 +414,7 @@ c_vector<double, 3> AirwayBranch::GetBranchCentroid()
         double centroid_offset = elem_length * (r1*r1 + 2*r1*r2 + 3*r2*r2) / (4 * (r1*r1 + r1*r2 + r2*r2));
 
         // Increment centroid by average node position, weighted by local volume
-        centroid += local_volume * ( current_elem->GetNodeLocation(0) + centroid_offset * (along_element / elem_length) );
+        centroid += local_volume * (iter->GetNodeLocation(0) + centroid_offset * (along_element / elem_length));
     }
 
     return centroid / volume;

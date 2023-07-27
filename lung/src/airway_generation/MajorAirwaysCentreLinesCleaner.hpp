@@ -44,19 +44,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Class to trim back centrelines of major airways.
  *
- * Segmentations of the airways decrease in quality towards the most distal segmented branches.
- * Furthermore, the airway generator always starts generating with a bifurcation. This may not
- * be appropriate for a partially segmented airway. The MajorAirwaysCentreLinesCleaner allows
- * the removal of airways in a major airways centerline below a given order. The model will
- * be trimmed back to the bifurcation below which either child is of the given order.
+ * Segmentations of the airways decrease in quality towards the most distal 
+ * segmented branches. Furthermore, the airway generator always starts 
+ * generating with a bifurcation. This may not be appropriate for a partially 
+ * segmented airway. The MajorAirwaysCentreLinesCleaner allows the removal of 
+ * airways in a major airways centerline below a given order. The model will be 
+ * trimmed back to the bifurcation below which either child is of the given order.
  */
 class MajorAirwaysCentreLinesCleaner
 {
 public:
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param rMesh The centrelines mesh to clean. Note that this mesh will be edited in place.
+     * @param rMesh The centrelines mesh to clean. Note that this mesh will be 
+     *     edited in place.
      * @param rootIndex The root node index corresponding to the trachea.
      */
     MajorAirwaysCentreLinesCleaner(MutableMesh<1,3>& rMesh,
@@ -65,7 +67,8 @@ public:
     /**
      * Trims back the mesh to the given order.
      *
-     * All branches below each bifurcation with one or more children of the given order will be removed.
+     * All branches below each bifurcation with one or more children of the 
+     * given order will be removed.
      *
      * @param order Horsfield order to remove branches from
      */
@@ -79,43 +82,35 @@ public:
     void CleanTerminalsHueristic();
 
     /**
-     * Removes any nodes from an airway tree that are not associated with elements.
+     * Removes any nodes from an airway tree that are not associated with 
+     * elements.
      */
     void CleanIsolatedNodes();
 
 private:
-    /**
-     * A mesh containing the major airways
-     */
+    /** A mesh containing the major airways. */
     MutableMesh<1,3>& mrMesh;
 
-    /**
-     * The index of the root of the airway tree (trachea)
-     */
+    /** The index of the root of the airway tree (trachea). */
     unsigned mOutletNodeIndex;
 
-    /**
-     * Used to navigate through the airways mesh.
-     */
+    /** Used to navigate through the airways mesh. */
     AirwayTreeWalker mWalker;
 
-    /**
-     * Used to calculate order on the airways mesh.
-     */
+    /** Used to calculate order on the airways mesh. */
     AirwayPropertiesCalculator mCalculator;
 
-    /**
-     * Maximum order below which elements will be discarded
-     */
+    /** Maximum order below which elements will be discarded. */
     unsigned mMaxOrder;
 
     /**
-     * Recursively processes the given element
+     * Recursively processes the given element.
      *
      * @param pElement The element to recursively process
-     * @param delete_me A flag to determine if this element should be deleted or not *after* processing its children
+     * @param deleteMe A flag to determine if this element should be deleted or 
+     *     not *after* processing its children
      */
-    void CleanElementUsingHorsfieldOrder(Element<1,3>* pElement, bool delete_me);
+    void CleanElementUsingHorsfieldOrder(Element<1,3>* pElement, bool deleteMe);
 };
 
 #endif // MAJOR_AIRWAYS_CENTRE_LINES_CLEANER_HPP_

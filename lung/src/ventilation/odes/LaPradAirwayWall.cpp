@@ -72,8 +72,8 @@ double LaPradAirwayWall::CalculatePressureRadiusResidual(double radius)
     for (int i = 0; i < 10000; i++)
     {
 
-        double RVal = mRIn + (double)i*(mROut - mRIn)/(10000. - 1.);
-        rValues[i] = rin + (double)i*(rout - rin)/(10000. - 1.);
+        double RVal = mRIn + static_cast<double>(i)*(mROut - mRIn)/(10000. - 1.);
+        rValues[i] = rin + static_cast<double>(i)*(rout - rin)/(10000. - 1.);
         functionValues[i] = ((rValues[i]/RVal)*(rValues[i]/RVal) - (RVal/rValues[i])*(RVal/rValues[i]))*(mk1*sqrt(1. + (RVal/rValues[i])*(RVal/rValues[i]) + (rValues[i]/RVal)*(rValues[i]/RVal) - 3.) + mk2*sqrt(1 + (RVal/rValues[i])*(RVal/rValues[i]) + (rValues[i]/RVal)*(rValues[i]/RVal) - 3.)*exp(mk3*(1. + (RVal/rValues[i])*(RVal/rValues[i]) + (rValues[i]/RVal)*(rValues[i]/RVal) - 3.)*(1 + (RVal/rValues[i])*(RVal/rValues[i]) + (rValues[i]/RVal)*(rValues[i]/RVal) - 3.)))/rValues[i];
     }
 

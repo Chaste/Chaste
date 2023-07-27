@@ -40,68 +40,65 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 
 /**
- * A class to facilitate easy calculation of clinically relevant impedance metrics from impedance simulations.
+ * A class to facilitate easy calculation of clinically relevant impedance 
+ * metrics from impedance simulations.
  *
- * Note that this class will attempt to interpolate values if insufficient frequency data is available, but
- * for increased accuracy it is advisable that the frequency list contains 5Hz, 20Hz and a few entries close
- * to the actual resonant frequency (~10Hz in a healthy human, less in an asthmatic)
+ * Note that this class will attempt to interpolate values if insufficient 
+ * frequency data is available, but for increased accuracy it is advisable that 
+ * the frequency list contains 5Hz, 20Hz and a few entries close to the actual 
+ * resonant frequency (~10Hz in a healthy human, less in an asthmatic)
  */
 class ImpedancePostProcessor
 {
 
 public:
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param rFrequencies A vector of test frequencies. Must be monotonically increasing.
+     * @param rFrequencies A vector of test frequencies. Must be monotonically 
+     *     increasing.
      * @param rImpedances A corresponding vector of impedances.
      */
-    ImpedancePostProcessor(std::vector<double>& rFrequencies, std::vector<std::complex<double> >& rImpedances);
+    ImpedancePostProcessor(
+      std::vector<double>& rFrequencies,
+      std::vector<std::complex<double> >& rImpedances);
 
     /**
-     * Returns the resistance at 5Hz minus the resistance at 20Hz
+     * Returns the resistance at 5Hz minus the resistance at 20Hz.
      *
-     * @return R5 - R20
+     * @return R5 - R20.
      */
     double GetR5MinusR20();
 
     /**
-     * Gets the resonant frequency of the lung (FRes)
+     * Gets the resonant frequency of the lung (FRes).
      *
-     * @return The resonant frequency of the lung
+     * @return The resonant frequency of the lung.
      */
     double GetResonantFrequency();
 
     /**
-     * Gets the integral of the reactance between 5Hz and FRes
+     * Gets the integral of the reactance between 5Hz and FRes.
      *
-     * @return The integral of the reactance between 5Hz and FRes
+     * @return The integral of the reactance between 5Hz and FRes.
      */
     double GetAx();
 
     /**
-     * Gets the average of the resistance from 5Hz onwards
+     * Gets the average of the resistance from 5Hz onwards.
      *
-     * @return The average of the resistance from 5Hz onwards
+     * @return The average of the resistance from 5Hz onwards.
      */
     double GetRrs();
 
-
-    /**
-     * Gets the std deviation of the resistance from 5Hz onwards
-     *
-     * @return The std deviation of the resistance from 5Hz onwards
-     */
-//    double GetStdDevRrs();
-
 private:
     /**
-     * The set of test frequencies
+     * The set of test frequencies.
      */
     std::vector<double>& mrFrequencies;
 
     /**
-     * The set of impedances
+     * The set of impedances.
      */
     std::vector<std::complex<double> >& mrImpedances;
 };

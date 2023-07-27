@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <list>
 
 /**
- * Represents a single airway made up of multiple <1,3> elements
+ * Represents a single airway made up of multiple <1,3> elements.
  */
 class AirwayBranch
 {
@@ -51,26 +51,28 @@ public:
     /**
      * Constructor.
      *
-     * @param radiusOnEdge Specifies whether radii are specified on nodes or on elements
+     * @param radiusOnEdge Specifies whether radii are specified on nodes or on 
+     *     elements
      */
     AirwayBranch(bool radiusOnEdge = false);
 
     /**
-     * Adds an element to the branch list
+     * Adds an element to the branch list.
      *
      * @param pElement A pointer to the element to add
      */
     void AddElement(Element<1,3>* pElement);
 
     /**
-     * Returns the list of elements that make up this branch
+     * Returns the list of elements that make up this branch.
      *
      * @return A list of pointers to elements that make up the branch
      */
     std::list<Element<1,3>* > GetElements();
 
     /**
-     * @return The true length of the branch (obtained by traversing the constitutive elements)
+     * @return The true length of the branch (obtained by traversing the 
+     *     constitutive elements)
      */
     double GetLength();
 
@@ -80,32 +82,32 @@ public:
     double GetAverageRadius();
 
     /**
-     * @return the Poiseuille resistance, up to a constant, of this branch
+     * @return the Poiseuille resistance, up to a constant, of this branch.
      */
     double GetPoiseuilleResistance();
 
     /**
-     * @return The direction of the branch (from the start node to the end node)
+     * @return The direction of the branch (from the start node to the end node).
      */
     c_vector<double, 3> GetDirection();
 
     /**
-     * @return true if this is a major branch
+     * @return true if this is a major branch.
      */
     bool IsMajor();
 
     /**
-     * @return The angle of this branch with respect to its parent
+     * @return The angle of this branch with respect to its parent.
      */
     double GetBranchAngle();
 
     /**
-     * @return The rotation angle of this branch
+     * @return The rotation angle of this branch.
      */
     double GetRotationAngle();
 
     /**
-     * @return Vector of all children of this branch
+     * @return Vector of all children of this branch.
      */
     std::vector<AirwayBranch*> GetAllChildren();
 
@@ -115,12 +117,12 @@ public:
     void AddChild(AirwayBranch* pChild);
 
     /**
-     * @return The first child branch of this branch
+     * @return The first child branch of this branch.
      */
     AirwayBranch* GetChildOne();
 
     /**
-     * @return The second child branch of this branch
+     * @return The second child branch of this branch.
      */
     AirwayBranch* GetChildTwo();
 
@@ -135,12 +137,12 @@ public:
     void SetChildTwo(AirwayBranch* pChildTwo);
 
     /**
-     * @return The sibling branch of this branch
+     * @return The sibling branch of this branch.
      */
     AirwayBranch* GetSibling();
 
     /**
-     * @return The parent branch of this branch
+     * @return The parent branch of this branch.
      */
     AirwayBranch* GetParent();
 
@@ -155,7 +157,7 @@ public:
     void SetParent(AirwayBranch* pParent);
 
     /**
-     * @return unsigned index of branch
+     * @return unsigned index of branch.
      */
     unsigned GetIndex();
 
@@ -165,79 +167,85 @@ public:
     void SetIndex(unsigned index);
 
     /**
-     * Finds proximal node of branch.  Assumes only that elements are ordered
+     * Finds proximal node of branch. Assumes only that elements are ordered
      * Proximal to Distal, which should be assured when branches are set up.
      *
-     * @return pointer to proximal node of branch
+     * @return pointer to proximal node of branch.
      */
     Node<3>* GetProximalNode();
 
     /**
-     * Finds distal node of branch.  Assumes only that elements are ordered
+     * Finds distal node of branch. Assumes only that elements are ordered
      * Proximal to Distal, which should be assured when branches are set up.
      *
-     * @return pointer to proximal node of branch
+     * @return pointer to proximal node of branch.
      */
     Node<3>* GetDistalNode();
 
     /**
      * Calculate branch volume.
-     * Note: this is based just on radius at each node; not well defined locally near branch-points.
+     * Note: this is based just on radius at each node; not well defined locally 
+     * near branch-points.
      *
-     * @return total volume of this branch
+     * @return total volume of this branch.
      */
     double GetBranchVolume();
 
     /**
      * Calculate lateral surface area of this branch.
-     * Note: this is based just on radius at each node; not well defined locally near branch-points.
+     * Note: this is based just on radius at each node; not well defined locally 
+     * near branch-points.
      *
-     * @return lateral surface area this branch
+     * @return lateral surface area this branch.
      */
     double GetBranchLateralSurfaceArea();
 
     /**
      * Calculate centroid of this branch.
-     * Note: this is based just on radius at each node; not well defined locally near branch-points.
+     * Note: this is based just on radius at each node; not well defined locally 
+     * near branch-points.
      *
-     * @return centroid of this branch
+     * @return centroid of this branch.
      */
     c_vector<double, 3> GetBranchCentroid();
 
     /**
-     * @return True if this is a terminal airway branch
+     * @return True if this is a terminal airway branch.
      */
     bool IsTerminal();
 
 private:
     /**
-     * A list of elements that make up this branch
+     * A list of elements that make up this branch.
      * These are assumed to be in order, from start element to end element!
      */
     std::list< Element<1,3>* > mElements;
 
     /**
-     * A vector of all children of current branch
+     * A vector of all children of current branch.
      * There will be more than two if trifurcations are present in the tree.
      */
     std::vector<AirwayBranch*> mAllChildren;
 
-    /** The first child of this branch */
+    /** The first child of this branch. */
     AirwayBranch* mpChildOne;
 
-    /** The second child of this branch */
+    /** The second child of this branch. */
     AirwayBranch* mpChildTwo;
 
-    /** The parent of this branch */
+    /** The parent of this branch. */
     AirwayBranch* mpParent;
 
-    /** The sibling of this branch */
+    /** The sibling of this branch. */
     AirwayBranch* mpSibling;
 
-    /** Branch index.  Currently optional and set in AirwayPropertiesCalculator. \todo: add index into constructors */
+    /**
+     * Branch index. Currently optional and set in AirwayPropertiesCalculator. 
+     * \todo: add index into constructors
+     */
     unsigned mIndex;
 
-    /** Flag to indicate whether airway radii are specified on nodes or edges */
+    /** Flag to indicate whether airway radii are specified on nodes or edges. */
     bool mRadiusOnEdge;
 };
 

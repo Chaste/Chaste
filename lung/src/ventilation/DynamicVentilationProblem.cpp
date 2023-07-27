@@ -64,7 +64,7 @@ DynamicVentilationProblem::DynamicVentilationProblem(AbstractAcinarUnitFactory* 
 
 DynamicVentilationProblem::~DynamicVentilationProblem()
 {
-    for (std::map<unsigned, AbstractAcinarUnit*>::iterator iter = mAcinarMap.begin();
+    for (auto iter = mAcinarMap.begin();
          iter != mAcinarMap.end();
          ++iter )
     {

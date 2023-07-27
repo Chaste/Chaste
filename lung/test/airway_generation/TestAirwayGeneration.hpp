@@ -178,7 +178,7 @@ private:
             }
         }
 
-        assert((unsigned)cube->GetNumberOfPoints() == points_per_dimension*points_per_dimension*points_per_dimension);
+        assert(static_cast<unsigned>(cube->GetNumberOfPoints()) == points_per_dimension*points_per_dimension*points_per_dimension);
 
         return cube;
     }

@@ -95,7 +95,7 @@ double HiornsAirwayWall::CalculatePressureRadiusResidual(double radius)
         //  for (int it = 0; it < numberTrap; it++)
         //  {
 
-            //  double tVal = lowerlimit + ((double)it/((double)numberTrap - 1.))*(upperlimit - lowerlimit);
+            //  double tVal = lowerlimit + (static_cast<double>(it)/(static_cast<double>(numberTrap) - 1.))*(upperlimit - lowerlimit);
             //  tVals[it] = tVal;
             //  integrandVals[it] = (2.*exp(tVal*tVal)/sqrt(M_PI));
 

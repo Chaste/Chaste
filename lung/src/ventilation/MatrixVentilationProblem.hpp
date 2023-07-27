@@ -46,14 +46,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A class for solving one-dimensional flow in pipe problems on branching trees.
  *
- * At graph edges: each pipe models Poiseuille flow (flux is linearly proportional to the pressure drop)
+ * At graph edges: each pipe models Poiseuille flow (flux is linearly 
+ * proportional to the pressure drop)
  * At graph nodes: the flux is balanced so that mass is conserved.
  *
  * Works in 3D <1,3>
- * Current functionality: pressure boundary conditions are set on each of the boundary nodes
- * Solves for pressure at internal nodes and flux on edges
+ * Current functionality: pressure boundary conditions are set on each of the 
+ * boundary nodes.
+ * Solves for pressure at internal nodes and flux on edges.
  *
- * In this subclass all node pressures and edge fluxes are solved simultaneously using a direct matrix solution.
+ * In this subclass all node pressures and edge fluxes are solved simultaneously 
+ * using a direct matrix solution.
  */
 class MatrixVentilationProblem : public AbstractVentilationProblem
 {

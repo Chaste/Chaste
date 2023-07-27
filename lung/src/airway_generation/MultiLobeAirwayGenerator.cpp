@@ -66,8 +66,7 @@ MultiLobeAirwayGenerator::MultiLobeAirwayGenerator(TetrahedralMesh<1,3>& rAirway
 MultiLobeAirwayGenerator::~MultiLobeAirwayGenerator()
 {
     // Deallocate the individual airway generators
-    typedef std::pair<AirwayGenerator*, LungLocation> pair_type;
-    for (std::vector<pair_type>::iterator generators_iter = mLobeGenerators.begin();
+    for (auto generators_iter = mLobeGenerators.begin();
          generators_iter != mLobeGenerators.end();
          ++generators_iter)
     {
@@ -101,12 +100,9 @@ unsigned MultiLobeAirwayGenerator::GetNumLobes(LungLocation lungLocation)
 {
     unsigned lobe_count = 0u;
 
-    typedef std::pair<AirwayGenerator*, LungLocation> pair_type;
-    for (std::vector<pair_type>::iterator generators_iter = mLobeGenerators.begin();
-         generators_iter != mLobeGenerators.end();
-         ++generators_iter)
+    for (auto generators_iter : mLobeGenerators)
     {
-        if (generators_iter->second == lungLocation)
+        if (generators_iter.second == lungLocation)
         {
             lobe_count++;
         }
@@ -117,10 +113,8 @@ unsigned MultiLobeAirwayGenerator::GetNumLobes(LungLocation lungLocation)
 
 void MultiLobeAirwayGenerator::AssignGrowthApices()
 {
-    typedef std::pair<AirwayGenerator*, LungLocation> pair_type;
-
     // Create the initial growth apices for each major airways end point
-    for (TetrahedralMesh<1,3>::NodeIterator iter = mAirwaysMesh.GetNodeIteratorBegin();
+    for (auto iter = mAirwaysMesh.GetNodeIteratorBegin();
          iter != mAirwaysMesh.GetNodeIteratorEnd();
          ++iter)
     {
@@ -152,11 +146,9 @@ void MultiLobeAirwayGenerator::AssignGrowthApices()
 
             bool end_point_assigned = false;
 
-            for (std::vector<pair_type>::iterator generators_iter = mLobeGenerators.begin();
-                 generators_iter != mLobeGenerators.end();
-                 ++generators_iter)
+            for (auto generators_iter : mLobeGenerators)
             {
-                if (generators_iter->first->IsInsideLobeSurface(origin))
+                if (generators_iter.first->IsInsideLobeSurface(origin))
                 {
                     end_point_assigned = true;
                     vtkSmartPointer<vtkPolyData> cloud = vtkSmartPointer<vtkPolyData>::New();
@@ -164,7 +156,7 @@ void MultiLobeAirwayGenerator::AssignGrowthApices()
 
                     //\todo This needs to be given the correct generation number.
                     // Unfortunately, this isn't available in the data and will have to be calculated.
-                    generators_iter->first->AddInitialApex(origin, dir, dir, radius, 0);
+                    generators_iter.first->AddInitialApex(origin, dir, dir, radius, 0);
                 }
             }
 
@@ -173,15 +165,13 @@ void MultiLobeAirwayGenerator::AssignGrowthApices()
                 double dist_min = DBL_MAX;
                 AirwayGenerator* p_generator = nullptr;
 
-                for (std::vector<pair_type>::iterator generators_iter = mLobeGenerators.begin();
-                     generators_iter != mLobeGenerators.end();
-                     ++generators_iter)
+                for (auto generators_iter : mLobeGenerators)
                 {
-                    double dist = generators_iter->first->DistanceFromLobeSurface(origin);
+                    double dist = generators_iter.first->DistanceFromLobeSurface(origin);
                     if (dist < dist_min)
                     {
                         dist_min = dist;
-                        p_generator = generators_iter->first;
+                        p_generator = generators_iter.first;
                     }
                 }
                 p_generator->AddInitialApex(origin, dir, dir, radius, 0);
@@ -204,31 +194,23 @@ void MultiLobeAirwayGenerator::DistributePoints()
         lung_volumes[LEFT] = 0.0;
         lung_volumes[RIGHT] = 0.0;
 
-        typedef std::pair<AirwayGenerator*, LungLocation> pair_type;
-        for (std::vector<pair_type>::iterator generators_iter = mLobeGenerators.begin();
-             generators_iter != mLobeGenerators.end();
-             ++generators_iter)
+        for (auto generators_iter : mLobeGenerators)
         {
-            lung_volumes[generators_iter->second] += generators_iter->first->CalculateLobeVolume();
+            lung_volumes[generators_iter.second] += generators_iter.first->CalculateLobeVolume();
         }
 
         // Distribute the initial point clouds
-        for (std::vector<pair_type>::iterator generators_iter = mLobeGenerators.begin();
-             generators_iter != mLobeGenerators.end();
-             ++generators_iter)
+        for (auto generators_iter : mLobeGenerators)
         {
-            unsigned num_points =  static_cast<unsigned>((generators_iter->first->CalculateLobeVolume() / lung_volumes[generators_iter->second]) * mNumberOfPointsPerLung + 0.5);
-            generators_iter->first->CreatePointCloudUsingTargetPoints(num_points);
+            unsigned num_points =  static_cast<unsigned>((generators_iter.first->CalculateLobeVolume() / lung_volumes[generators_iter.second]) * mNumberOfPointsPerLung + 0.5);
+            generators_iter.first->CreatePointCloudUsingTargetPoints(num_points);
         }
     }
     else if (mNumberOfPointsPerLung == 0u && mPointVolume > 0.0)
     {
-        typedef std::pair<AirwayGenerator*, LungLocation> pair_type;
-        for (std::vector<pair_type>::iterator generators_iter = mLobeGenerators.begin();
-             generators_iter != mLobeGenerators.end();
-             ++generators_iter)
+        for (auto generators_iter : mLobeGenerators)
         {
-            generators_iter->first->CreatePointCloudUsingTargetVolume(mPointVolume);
+            generators_iter.first->CreatePointCloudUsingTargetVolume(mPointVolume);
         }
     }
     else
@@ -330,18 +312,15 @@ void MultiLobeAirwayGenerator::Generate(std::string rOutputDirectory, std::strin
 #endif
 
     // Loop over generators, generate and merge the results
-    typedef std::pair<AirwayGenerator*, LungLocation> pair_type;
-    for (std::vector<pair_type>::iterator generators_iter = mLobeGenerators.begin();
-         generators_iter != mLobeGenerators.end();
-         ++generators_iter)
+    for (auto generators_iter : mLobeGenerators)
     {
-        generators_iter->first->Generate();
-        generators_iter->first->CalculateHorsfieldOrder();
-        generators_iter->first->CalculateRadii(mDiameterRatio);
-        generators_iter->first->MarkStartIds();
+        generators_iter.first->Generate();
+        generators_iter.first->CalculateHorsfieldOrder();
+        generators_iter.first->CalculateRadii(mDiameterRatio);
+        generators_iter.first->MarkStartIds();
 
 #if VTK_MAJOR_VERSION >= 6
-        append_filter->AddInputData(generators_iter->first->GetAirwayTree());
+        append_filter->AddInputData(generators_iter.first->GetAirwayTree());
 #else
         append_filter->AddInput(generators_iter->first->GetAirwayTree());
 #endif
@@ -374,7 +353,7 @@ void MultiLobeAirwayGenerator::Generate(std::string rOutputDirectory, std::strin
 
     std::set<std::set<int> > cell_set;
 
-    for (unsigned i = 0; i < (unsigned) appended_grid->GetNumberOfCells(); ++i)
+    for (unsigned i = 0; i < static_cast<unsigned>(appended_grid->GetNumberOfCells()); ++i)
     {
         vtkSmartPointer<vtkLine> line = (vtkLine*) appended_grid->GetCell(i);
 

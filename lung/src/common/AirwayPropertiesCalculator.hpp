@@ -42,10 +42,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AirwayBranch.hpp"
 
 /**
- * Calculates a number of morphological properties for an airway tree
+ * Calculates a number of morphological properties for an airway tree.
  *
- * Properties include adding the airway generation as an attribute to the tree, calculating branching and rotation angles
- * and length/diameter ratios.
+ * Properties include adding the airway generation as an attribute to the tree, 
+ * calculating branching and rotation angles and length/diameter ratios.
  */
 class AirwayPropertiesCalculator
 {
@@ -54,136 +54,166 @@ public:
      * Constructor
      *
      * @param rAirwaysMesh A mesh containing the airway tree to analyze
-     * @param rootIndex The index of the inlet node (trachea entrance)
-     * @param radiusOnEdge Whether airway radii are defined element wise or nodally.
+     * @param rootIndex The index of the inlet node (trachea entrance); defaults 
+     *     to 0
+     * @param radiusOnEdge Whether airway radii are defined element wise or 
+     *     nodally; defaults to false
      */
     AirwayPropertiesCalculator(TetrahedralMesh<1,3>& rAirwaysMesh,
                                unsigned rootIndex = 0u,
                                bool radiusOnEdge = false);
 
     /**
-     * Destructor
+     * Destructor.
      */
     ~AirwayPropertiesCalculator();
 
-
     /**
-     * Get branch Generation
+     * Get branch generation.
      *
-     * @param pBranch The branch to get the Generation for
-     * @return The branch's Generation order
+     * @param pBranch The branch to get the generation for
+     * 
+     * @return The branch's generation order.
      */
     unsigned GetBranchGeneration(AirwayBranch* pBranch);
 
     /**
-     * Get branch Horsfield Order
+     * Get branch Horsfield Order.
      *
      * @param pBranch The branch to get the Horsfield order for
-     * @return The branch's Horsfield order
+     * 
+     * @return The branch's Horsfield order.
      */
     unsigned GetBranchHorsfieldOrder(AirwayBranch* pBranch);
 
     /**
-     * Get branch Strahler Order
+     * Get branch Strahler Order.
      *
      * @param pBranch The branch to get the Strahler order for
-     * @return The branch's Strahler order
+     * 
+     * @return The branch's Strahler order.
      */
     unsigned GetBranchStrahlerOrder(AirwayBranch* pBranch);
 
-    /** @return */
+    /** @return \todo */
     double GetLengthOneOverLengthTwoMean() const;
 
-    /** @return */
+    /** @return \todo */
     double GetLengthOverDiameterMajorChildMean() const;
 
-    /** @return */
+    /** @return \todo */
     double GetLengthOverDiameterMean() const;
 
-    /** @return */
+    /** @return \todo */
     double GetLengthOverDiameterMinorChildMean() const;
 
-    /** @return */
+    /** @return \todo */
     double GetLengthOverLengthParentMean() const;
 
-    /** @return */
+    /** @return \todo */
     double GetDiameterOverParentDiameterMean() const;
 
-    /** @return */
+    /** @return \todo */
     double GetMajorDiameterOverParentDiameterMean() const;
 
-    /** @return */
+    /** @return \todo */
     double GetMinorDiameterOverMajorDiameterMean() const;
 
-    /** @return */
+    /** @return \todo */
     double GetMinorDiameterOverParentDiameterMean() const;
 
-    /** @return */
+    /** @return \todo */
     double GetPercentageLengthOverParentLengthLessThanOne() const;
 
-    /** @return */
+    /** @return \todo */
     double GetPhiMean() const;
 
-    /** @return */
+    /** @return \todo */
     double GetThetaMajorBranches() const;
 
-    /** @return */
+    /** @return \todo */
     double GetThetaMean() const;
 
-    /** @return */
+    /** @return \todo */
     double GetThetaMinorBranches() const;
 
-    /** @return */
+    /** @return \todo */
     double GetThetaParentDiameter2mmTo1mm() const;
 
-    /** @return */
+    /** @return \todo */
     double GetThetaParentDiameter3mmTo2mm() const;
 
-    /** @return */
+    /** @return \todo */
     double GetThetaParentDiameter4mmTo3mm() const;
 
-    /** @return */
+    /** @return \todo */
     double GetThetaParentDiameterGreaterThan4mm() const;
 
-    /** @return A vector of branches in the airway tree */
+    /** @return A vector of branches in the airway tree. */
     std::vector<AirwayBranch*> GetBranches();
 
-    /** @return A vector of total subtree lengths, defined for each branch of the tree */
+    /**
+     * @return A vector of total subtree lengths, defined for each branch of the 
+     *     tree.
+     */
     std::vector<double> GetSubtreeBranchLengths();
 
-    /** @return A vector of total subtree volumes, defined for each branch of the tree */
+    /**
+     * @return A vector of total subtree volumes, defined for each branch of the 
+     *     tree.
+     */
     std::vector<double> GetSubtreeBranchVolumes();
 
-    /** @return A vector of total subtree lateral surface areas, defined for each branch of the tree */
+    /**
+     * @return A vector of total subtree lateral surface areas, defined for 
+     *     each branch of the tree.
+     * */
     std::vector<double> GetSubtreeBranchLateralSurfaceAreas();
 
-    /** @return A vector of total subtree Poiseuille resistances, defined for each branch of the tree */
+    /**
+     * @return A vector of total subtree Poiseuille resistances, defined for 
+     *     each branch of the tree.
+     */
     std::vector<double> GetSubtreePoiseuilleResistances();
 
-    /** @return A vector of total subtree centroids, defined for each branch of the tree */
+    /**
+     * @return A vector of total subtree centroids, defined for each branch of 
+     *     the tree.
+     */
     std::vector<c_vector<double, 3> > GetSubtreeCentroids();
 
-    /** @return A vector of upstream lengths, defined for each branch of the tree */
+    /**
+     * @return A vector of upstream lengths, defined for each branch of the 
+     *     tree.
+     */
     std::vector<double> GetUpstreamBranchLengths();
 
-    /** @return A vector of upstream volumes, defined for each branch of the tree */
+    /**
+     * @return A vector of upstream volumes, defined for each branch of the 
+     *     tree.
+     */
     std::vector<double> GetUpstreamBranchVolumes();
 
-    /** @return A vector of upstream lateral surface areas, defined for each branch of the tree */
+    /**
+     * @return A vector of upstream lateral surface areas, defined for each 
+     *     branch of the tree.
+     */
     std::vector<double> GetUpstreamBranchLateralSurfaceAreas();
 
-    /** @return A vector of upstream Poiseuille resistances, defined for each branch of the tree */
+    /**
+     * @return A vector of upstream Poiseuille resistances, defined for each 
+     *     branch of the tree.
+     */
     std::vector<double> GetUpstreamPoiseuilleResistances();
 
-    /** @return The maximum generation number of the terminal branches */
+    /** @return The maximum generation number of the terminal branches. */
     unsigned GetMaximumTerminalGeneration();
 
-    /** @return The minimum generation number of the terminal branches */
+    /** @return The minimum generation number of the terminal branches. */
     unsigned GetMinimumTerminalGeneration();
 
-    /** @return The mean generation number of the terminal branches */
+    /** @return The mean generation number of the terminal branches. */
     unsigned GetMeanTerminalGeneration();
-
 
     /**
      * Calculates the properties of all branches.
@@ -208,142 +238,184 @@ public:
 
 private:
 
-    /** A mesh containing the airways tree.  */
+    /** A mesh containing the airways tree. */
     TetrahedralMesh<1,3>& mAirwaysMesh;
 
-    unsigned mOutletNodeIndex; /**< The outlet node is the root of the branching tree structure */
+    /** The outlet node is the root of the branching tree structure. */
+    unsigned mOutletNodeIndex;
 
-    /** Allows easy traversal of the airway tree */
+    /** Allows easy traversal of the airway tree. */
     AirwayTreeWalker mWalker;
 
-    /** Flag indicating whether airway radii are defined nodally or on elements */
+    /**
+     * Flag indicating whether airway radii are defined nodally or on elements.
+     */
     bool mRadiusOnEdge;
 
-    /** An easy access list of airway branches */
+    /** An easy access list of airway branches. */
     std::vector<AirwayBranch*> mBranches;
 
-    /** The average branch angle of the tree */
+    /** The average branch angle of the tree. */
     double mThetaMean;
 
-    /** The branch angle spread */
+    /** The branch angle spread. */
     double mThetaSpread;
 
-    /** The branch angle for branches with a parent diameter greater than 4mm */
+    /**
+     * The branch angle for branches with a parent diameter greater than 4mm.
+     */
     double mThetaParentDiameterGreaterThan4mm;
 
-    /** The branch angle for branches with a parent diameter greater between 4mm and 3mm */
+    /**
+     * The branch angle for branches with a parent diameter greater between 4mm 
+     * and 3mm.
+     */
     double mThetaParentDiameter4mmTo3mm;
 
-    /** The branch angle for branches with a parent diameter greater between 3mm and 2mm */
+    /**
+     * The branch angle for branches with a parent diameter greater between 3mm 
+     * and 2mm.
+     */
     double mThetaParentDiameter3mmTo2mm;
 
-    /** The branch angle for branches with a parent diameter greater between 2mm and 1mm */
+    /**
+     * The branch angle for branches with a parent diameter greater between 2mm 
+     * and 1mm.
+     */
     double mThetaParentDiameter2mmTo1mm;
 
-    /** The branch angle for major branches */
+    /** The branch angle for major branches. */
     double mThetaMajorBranches;
 
-    /** The branch angle for major branches spread */
+    /** The branch angle for major branches spread. */
     double mThetaMajorBranchesSpread;
 
-    /** The branch angle for minor branches */
+    /** The branch angle for minor branches. */
     double mThetaMinorBranches;
 
-    /** The branch angle for minor branches spread */
+    /** The branch angle for minor branches spread. */
     double mThetaMinorBranchesSpread;
 
-    /** The average rotation angle */
+    /** The average rotation angle. */
     double mPhiMean;
 
-    /** The rotation angle spread */
+    /** The rotation angle spread. */
     double mPhiSpread;
 
-    /** The average length over diameter */
+    /** The average length over diameter. */
     double mLengthOverDiameterMean;
 
-    /** The length over diameter spread */
+    /** The length over diameter spread. */
     double mLengthOverDiameterSpread;
 
-    /** The length over diameter for minor branches mean value */
+    /** The length over diameter for minor branches mean value. */
     double mLengthOverDiameterMinorChildMean;
 
-    /** The length over diameter for minor branches spread */
+    /** The length over diameter for minor branches spread. */
     double mLengthOverDiameterMinorChildSpread;
 
-    /** The length over diameter for major branches mean value */
+    /** The length over diameter for major branches mean value. */
     double mLengthOverDiameterMajorChildMean;
 
-    /** The length over diameter for major branches spread */
+    /** The length over diameter for major branches spread. */
     double mLengthOverDiameterMajorChildSpread;
 
-    /** The diameter over the parent diameter mean */
+    /** The diameter over the parent diameter mean. */
     double mDiameterOverParentDiameterMean;
 
-    /** The minor diameter over the major diameter mean */
+    /** The minor diameter over the major diameter mean. */
     double mMinorDiameterOverMajorDiameterMean;
 
-    /** The minor diameter over the major diameter spread */
+    /** The minor diameter over the major diameter spread. */
     double mMinorDiameterOverMajorDiameterSpread;
 
-    /** The minor diameter over the parent diameter mean */
+    /** The minor diameter over the parent diameter mean. */
     double mMinorDiameterOverParentDiameterMean;
 
-    /** The minor diameter over the parent diameter spread */
+    /** The minor diameter over the parent diameter spread. */
     double mMinorDiameterOverParentDiameterSpread;
 
-    /** The major diameter over the parent diameter mean */
+    /** The major diameter over the parent diameter mean. */
     double mMajorDiameterOverParentDiameterMean;
 
-    /** The major diameter over the parent diameter spread */
+    /** The major diameter over the parent diameter spread. */
     double mMajorDiameterOverParentDiameterSpread;
 
-    /** The length over the parent length mean */
+    /** The length over the parent length mean. */
     double mLengthOverLengthParentMean;
 
-    /** The length over the parent length spread */
+    /** The length over the parent length spread. */
     double mLengthOverLengthParentSpread;
 
-    /** The percentage of branches that are shorter than their parent */
+    /** The percentage of branches that are shorter than their parent. */
     double mPercentageLengthOverParentLengthLessThanOne;
 
-    /** The ratio of sibling lengths mean */
+    /** The ratio of sibling lengths mean. */
     double mLengthOneOverLengthTwoMean;
 
-    /** The ratio of sibling lengths spread */
+    /** The ratio of sibling lengths spread. */
     double mLengthOneOverLengthTwoSpread;
 
-    /** For each branch, the total length of all branches in the distal direction */
+    /**
+     * For each branch, the total length of all branches in the distal 
+     * direction.
+     */
     std::vector<double> mTotalSubtreeBranchLength;
 
-    /** For each branch, the total volume of all branches in the distal direction */
+    /**
+     * For each branch, the total volume of all branches in the distal 
+     * direction.
+     */
     std::vector<double> mTotalSubtreeBranchVolume;
 
-    /** For each branch, the total lateral surface area of all branches in the distal direction */
+    /**
+     * For each branch, the total lateral surface area of all branches in the 
+     * distal direction.
+     */
     std::vector<double> mTotalSubtreeBranchLateralSurfaceArea;
 
-    /** For each branch, the Poiseuille resistance of all branches in the distal direction */
+    /**
+     * For each branch, the Poiseuille resistance of all branches in the distal 
+     * direction,
+     */
     std::vector<double> mTotalSubtreePoiseuilleResistance;
 
-    /** For each branch, the centroid (by volume) all branches in the distal direction */
+    /**
+     * For each branch, the centroid (by volume) all branches in the distal 
+     * direction.
+     */
     std::vector<c_vector<double, 3> > mTotalSubtreeCentroid;
 
-    /** For each branch, the total length of all branches in the proximal (tracheal) direction */
+    /**
+     * For each branch, the total length of all branches in the proximal 
+     * (tracheal) direction.
+     */
     std::vector<double> mUpstreamPathBranchLengths;
 
-    /** For each branch, the total volume of all branches in the proximal (tracheal) direction */
+    /**
+     * For each branch, the total volume of all branches in the proximal 
+     * (tracheal) direction.
+     */
     std::vector<double> mUpstreamPathBranchVolumes;
 
-    /** For each branch, the total lateral surface area of all branches in the proximal (tracheal) direction */
+    /**
+     * For each branch, the total lateral surface area of all branches in the 
+     * proximal (tracheal) direction.
+     */
     std::vector<double> mUpstreamPathBranchLateralSurfaceAreas;
 
-    /** For each branch, the Poiseuille resistance of all branches in the proximal (tracheal) direction */
+    /**
+     * For each branch, the Poiseuille resistance of all branches in the 
+     * proximal (tracheal) direction.
+     */
     std::vector<double> mUpstreamPathPoiseuilleResistances;
 
-
     /**
-     * Recursively setup multiple element branches to allow properties to be calculated easily
+     * Recursively setup multiple element branches to allow properties to be 
+     * calculated easily.
      *
-     * @param pElement The current element (should not have been added to the branch yet)
+     * @param pElement The current element (should not have been added to the 
+     *     branch yet)
      * @param pBranch The current branch
      */
     void SetupBranches(Element<1,3>* pElement, AirwayBranch* pBranch);

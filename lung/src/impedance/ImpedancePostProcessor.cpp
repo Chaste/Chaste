@@ -40,9 +40,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <complex>
 #include <algorithm>
 
-ImpedancePostProcessor::ImpedancePostProcessor(std::vector<double>& rFrequencies,
-                                               std::vector<std::complex<double> >& rImpedances) : mrFrequencies(rFrequencies),
-                                                                                                  mrImpedances(rImpedances)
+ImpedancePostProcessor::ImpedancePostProcessor(
+    std::vector<double>& rFrequencies,
+    std::vector<std::complex<double> >& rImpedances)
+    : mrFrequencies(rFrequencies),
+    mrImpedances(rImpedances)
 {
     assert(mrFrequencies.size() == mrImpedances.size());
 
@@ -52,7 +54,6 @@ ImpedancePostProcessor::ImpedancePostProcessor(std::vector<double>& rFrequencies
         EXCEPTION("Impedance post processor requires data points at 5 Hz & 20 Hz");
     }
 }
-
 
 double ImpedancePostProcessor::GetR5MinusR20()
 {
@@ -75,11 +76,10 @@ double ImpedancePostProcessor::GetR5MinusR20()
     return R5 - R20;
 }
 
-
 double ImpedancePostProcessor::GetResonantFrequency()
 {
-    unsigned lower_bound_index = 0u;
-    unsigned upper_bound_index = 0u;
+    unsigned lower_bound_index = 0;
+    unsigned upper_bound_index = 0;
 
     for (unsigned freq_index = 0; freq_index < mrFrequencies.size(); ++freq_index)
     {

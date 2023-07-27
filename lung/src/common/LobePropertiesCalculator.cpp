@@ -49,7 +49,10 @@ LobePropertiesCalculator::~LobePropertiesCalculator()
 {
 }
 
-void LobePropertiesCalculator::AddLobe(const std::string& rFileName, LungLocation lungLocation, const std::string& rName)
+void LobePropertiesCalculator::AddLobe(
+    const std::string& rFileName,
+    LungLocation lungLocation,
+    const std::string& rName)
 {
     vtkSmartPointer<vtkSTLReader> reader = vtkSmartPointer<vtkSTLReader>::New();
     reader->SetFileName(rFileName.c_str());
@@ -58,8 +61,10 @@ void LobePropertiesCalculator::AddLobe(const std::string& rFileName, LungLocatio
     AddLobe(reader->GetOutput(), lungLocation, rName);
 }
 
-
-void LobePropertiesCalculator::AddLobe(vtkSmartPointer<vtkPolyData> pLobeSurface, LungLocation lungLocation, const std::string& rName)
+void LobePropertiesCalculator::AddLobe(
+    vtkSmartPointer<vtkPolyData> pLobeSurface,
+    LungLocation lungLocation,
+    const std::string& rName)
 {
     mLobesMap[rName] = std::make_pair(pLobeSurface, lungLocation);
 }
@@ -68,10 +73,9 @@ double LobePropertiesCalculator::GetTotalVolume()
 {
     double total_volume = 0.0;
 
-    std::map< std::string, std::pair< vtkSmartPointer<vtkPolyData>, LungLocation> >::iterator iter;
-    for (iter = mLobesMap.begin(); iter != mLobesMap.end(); ++iter)
+    for (auto iter : mLobesMap)
     {
-        total_volume += GetLobeVolume(iter->second.first);
+        total_volume += GetLobeVolume(iter.second.first);
     }
 
     return total_volume;
@@ -82,7 +86,8 @@ double LobePropertiesCalculator::GetLobeVolume(const std::string& rName)
     return GetLobeVolume(mLobesMap[rName].first);
 }
 
-double LobePropertiesCalculator::GetLobeVolume(vtkSmartPointer<vtkPolyData> pLobeSurface)
+double LobePropertiesCalculator::GetLobeVolume(
+    vtkSmartPointer<vtkPolyData> pLobeSurface)
 {
     vtkSmartPointer<vtkMassProperties> mass_properties = vtkSmartPointer<vtkMassProperties>::New();
 #if VTK_MAJOR_VERSION >= 6
@@ -99,7 +104,8 @@ double LobePropertiesCalculator::GetLobeVolumeFraction(const std::string& rName)
     return GetLobeVolume(rName)/GetTotalVolume();
 }
 
-double LobePropertiesCalculator::GetLobeVolumeFraction(vtkSmartPointer<vtkPolyData> pLobeSurface)
+double LobePropertiesCalculator::GetLobeVolumeFraction(
+    vtkSmartPointer<vtkPolyData> pLobeSurface)
 {
     return GetLobeVolume(pLobeSurface)/GetTotalVolume();
 }

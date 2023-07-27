@@ -48,7 +48,7 @@ class AirwayRemesher
 {
 public:
     /**
-     * Constructor
+     * Constructor.
      *
      * @param rMesh The centrelines mesh to remesh.
      * @param rootIndex The root node index corresponding to the trachea.
@@ -59,8 +59,9 @@ public:
     /**
      * Creates a remeshed version of the underlying mesh.
      *
-     * This version attempts to balance the mesh in such a way as to minimise the
-     * condition number matrices resulting from Poiseuille based network flow problems.
+     * This version attempts to balance the mesh in such a way as to minimise 
+     * the condition number matrices resulting from Poiseuille based network 
+     * flow problems.
      *
      * @param rOutputMesh The mesh object to be written to.
      * @param maximumResistance The maximum allowed resistance of an element
@@ -78,24 +79,16 @@ public:
     void Remesh(MutableMesh<1,3>& rOutputMesh);
 
 private:
-    /**
-     * A mesh containing the major airways
-     */
+    /** A mesh containing the major airways. */
     TetrahedralMesh<1,3>& mrMesh;
 
-    /**
-     * The index of the root of the airway tree (trachea)
-     */
+    /** The index of the root of the airway tree (trachea). */
     unsigned mOutletNodeIndex;
 
-    /**
-     * Used to navigate through the airways mesh.
-     */
+    /** Used to navigate through the airways mesh. */
     AirwayTreeWalker mWalker;
 
-    /**
-     * Used to calculate order on the airways mesh.
-     */
+    /** Used to calculate order on the airways mesh. */
     AirwayPropertiesCalculator mCalculator;
 };
 
