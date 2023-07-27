@@ -139,10 +139,10 @@ public:
         {
             //Assume that this is called 4x3 times per element and we get the same rGradPhi for each element
             //Check the rows sum to 0
-            for (unsigned row=0; row<2; row++)
+            for (unsigned row = 0; row < 2; ++row)
             {
-                double sum=0.0;
-                for (unsigned col=0; col<3; col++)
+                double sum = 0.0;
+                for (unsigned col = 0; col < 3; ++col)
                 {
                     sum += rGradPhi(row, col);
                 }
@@ -185,7 +185,7 @@ public:
 
         // Set initial condition u(0,x) = sin(x*pi)
         std::vector<double> init_cond(mesh.GetNumNodes());
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             init_cond[i] = sin(x*M_PI);
@@ -198,7 +198,7 @@ public:
         ReplicatableVector result_repl(result);
 
         // Solution should be u = e^{-t*pi*pi} sin(x*pi), t=1
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double u = exp(-0.1*M_PI*M_PI)*sin(x*M_PI);
@@ -241,7 +241,7 @@ public:
 
         // Set initial condition u(0,x) = sin(x*pi)-0.5*x*x
         std::vector<double> init_cond(mesh.GetNumNodes());
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             init_cond[i] = sin(x*M_PI)-0.5*x*x;
@@ -254,7 +254,7 @@ public:
         ReplicatableVector result_repl(result);
 
         // Solution should be u = e^{-t*pi*pi} sin(x*pi) + 0.5*x^2, t=1
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double u = exp(-0.1*M_PI*M_PI)*sin(x*M_PI)-0.5*x*x;
@@ -296,7 +296,7 @@ public:
         // Set initial condition u(0,x) = x + sin(pi*x/2)
         const double PI_over_2 = M_PI/2.0;
         std::vector<double> init_cond(mesh.GetNumNodes());
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             init_cond[i] = x + sin(PI_over_2*x);
@@ -309,7 +309,7 @@ public:
         ReplicatableVector result_repl(result);
 
         // Check result
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double u = x + exp(-0.5*PI_over_2*PI_over_2)*sin(x*PI_over_2);
@@ -355,7 +355,7 @@ public:
          * is an eigenfunction of the heat equation.
          */
         std::vector<double> init_cond(mesh.GetNumNodes());
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];
@@ -409,7 +409,7 @@ public:
             TS_ASSERT_LESS_THAN_EQUALS(solver.numIncrementInterpolatedGradientCalled, 3u*3u*mesh.GetNumLocalElements());
         }
         // Check solution is u = e^{-2*t*pi*pi} sin(x*pi)*sin(y*pi), t=1
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];
@@ -432,7 +432,7 @@ public:
 #endif //CHASTE_VTK
 
         // Test that there are .txt files
-        for (unsigned timestep=0; timestep<101; timestep++)
+        for (unsigned timestep = 0; timestep < 101; ++timestep)
         {
             std::stringstream filename;
             filename << "txt_output/results_Variable_0_" << timestep << ".txt";
@@ -478,7 +478,7 @@ public:
 
         // Set initial condition u(0,x,y) = sin(x*pi)*sin(y*pi)-0.25*(x^2+y^2)
         std::vector<double> init_cond(mesh.GetNumNodes());
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];
@@ -492,7 +492,7 @@ public:
         ReplicatableVector result_repl(result);
 
         // Check solution is u = e^{-t*2*pi*pi} sin(x*pi) sin(y*pi) - 0.25(x^2+y^2), t=0.1
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];
@@ -546,7 +546,7 @@ public:
         VecGetArray(initial_condition, &p_initial_condition);
         int lo, hi;
         VecGetOwnershipRange(initial_condition, &lo, &hi);
-        for (int global_index = lo; global_index < hi; global_index++)
+        for (int global_index = lo; global_index < hi; ++global_index)
         {
             int local_index = global_index - lo;
             double x = mesh.GetNode(global_index)->GetPoint()[0];
@@ -564,7 +564,7 @@ public:
         VecGetArray(result, &p_result);
 
         // Check solution is u = e^{-t*2*pi*pi} sin(x*pi) sin(y*pi) - 0.25(x^2+y^2), t=0.1
-        for (int global_index = lo; global_index < hi; global_index++)
+        for (int global_index = lo; global_index < hi; ++global_index)
         {
             int local_index = global_index - lo;
             double x = mesh.GetNode(global_index)->GetPoint()[0];
@@ -632,7 +632,7 @@ public:
 
         // Set initial condition u(0,x,y) = sin(0.5*M_PI*x)*sin(M_PI*y)+x
         std::vector<double> init_cond(mesh.GetNumNodes());
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];
@@ -646,7 +646,7 @@ public:
         ReplicatableVector result_repl(result);
 
         // Check solution is u = e^{-5/4*M_PI*M_PI*t} sin(0.5*M_PI*x)*sin(M_PI*y)+x, t=0.1
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];
@@ -716,7 +716,7 @@ public:
 
         // Set initial condition u(0,x,y) = sin(0.5*M_PI*x)*sin(M_PI*y)+x
         std::vector<double> init_cond(mesh.GetNumNodes());
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];
@@ -730,7 +730,7 @@ public:
         ReplicatableVector result_repl(result);
 
         // Check solution is u = e^{-5/4*M_PI*M_PI*t} sin(0.5*M_PI*x)*sin(M_PI*y)+x, t=0.1
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];
@@ -780,7 +780,7 @@ public:
         ReplicatableVector result_repl(result);
 
         // Check solution is constant throughout the mesh
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             TS_ASSERT_DELTA(result_repl[i],-84.5, 0.0002);
         }
@@ -831,7 +831,7 @@ public:
         ReplicatableVector result_repl(result);
 
         // Check solution is constant throughout the mesh
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             TS_ASSERT_DELTA(result_repl[i],-84.5, 0.0001);
         }
@@ -896,7 +896,7 @@ public:
         VecGetOwnershipRange(initial_condition, &lo, &hi);
 
         // Stimulate
-        for (int global_index = lo; global_index < hi; global_index++)
+        for (int global_index = lo; global_index < hi; ++global_index)
         {
             int local_index = global_index - lo;
             p_initial_condition[local_index] = 0;
@@ -990,7 +990,7 @@ public:
 
         // Set initial condition u(0,x) = sin(x*pi)
         std::vector<double> init_cond(mesh.GetNumNodes());
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             init_cond[i] = sin(x*M_PI);
@@ -1006,7 +1006,7 @@ public:
         ReplicatableVector result_repl(result);
 
         // Check solution is u = e^{-t*pi*pi} sin(x*pi), t=1
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double u = exp(-0.1*M_PI*M_PI)*sin(x*M_PI);

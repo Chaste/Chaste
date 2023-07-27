@@ -39,8 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractHdf5Converter.hpp"
 
 /**
- * This class converts from Hdf5 format to meshalyzer format, ie, for
- * voltage, one file, which looks like
+ * This class converts from Hdf5 format to meshalyzer format, i.e., for voltage, 
+ * one file, which looks like
  *
  * V_node_0_time_0
  * ..
@@ -54,8 +54,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * The files that are written are [base_name]_V.dat or [base_name]_Phi_e.dat,
  * where [base_name] is the base name of the original .h5 file. The new files
- * are written in the same directory as the .h5 file. All paths are relative
- * to the CHASTE_TEST_OUTPUT directory.
+ * are written in the same directory as the .h5 file. All paths are relative to 
+ * the CHASTE_TEST_OUTPUT directory.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class Hdf5ToMeshalyzerConverter : public AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>
@@ -63,9 +63,9 @@ class Hdf5ToMeshalyzerConverter : public AbstractHdf5Converter<ELEMENT_DIM, SPAC
 private:
 
     /**
-     * A helper method which takes in a string, which must be 'V' or 'Phi_e'
-     * and reads the data corresponding to that string, writing it out in
-     * meshalyzer format.
+     * A helper method which takes in a string, which must be 'V' or 'Phi_e' and 
+     * reads the data corresponding to that string, writing it out in meshalyzer 
+     * format.
      *
      * @param type the type of data stored in this file (V/Phi_e)
      */
@@ -76,13 +76,17 @@ public:
     /**
      * Constructor, which does the conversion.
      *
-     * @note This method is collective, and hence must be called by all processes.
+     * @note This method is collective, and hence must be called by all 
+     *     processes.
      *
-     * @param rInputDirectory  The input directory, relative to CHASTE_TEST_OUTPUT, where the .h5 file has been written
+     * @param rInputDirectory  The input directory, relative to 
+     *     CHASTE_TEST_OUTPUT, where the .h5 file has been written
      * @param rFileBaseName  The base name of the data file.
      * @param pMesh  Pointer to the mesh.
-     * @param usingOriginalNodeOrdering  Whether HDF5 output was written using the original node ordering
-     * @param precision  The precision (number of digits) to use in writing numerical data to file.
+     * @param usingOriginalNodeOrdering  Whether HDF5 output was written using 
+     *     the original node ordering
+     * @param precision  The precision (number of digits) to use in writing 
+     *     numerical data to file (defaults to 0).
      */
     Hdf5ToMeshalyzerConverter(const FileFinder& rInputDirectory,
                               const std::string& rFileBaseName,

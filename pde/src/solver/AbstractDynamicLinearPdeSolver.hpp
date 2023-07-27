@@ -149,7 +149,7 @@ public:
      *
      * @param pMesh the mesh
      */
-    AbstractDynamicLinearPdeSolver(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
+    explicit AbstractDynamicLinearPdeSolver(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
 
     /**
      * Set the times to solve between.
@@ -237,7 +237,7 @@ void AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Initia
     mpHdf5Writer->DefineFixedDimension((this->mpMesh)->GetNumNodes());
 
     // Only used to get an estimate of the number of timesteps below
-    unsigned estimated_num_printing_timesteps = 1u + (unsigned)((mTend - mTstart)/(mIdealTimeStep*mPrintingTimestepMultiple));
+    unsigned estimated_num_printing_timesteps = 1u + static_cast<unsigned>((mTend - mTstart)/(mIdealTimeStep*mPrintingTimestepMultiple));
 
     /**
      * Note: For now, writing variable names as 'Variable_0' etc; in the future,
@@ -246,7 +246,7 @@ void AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Initia
      * DefineUnlimitedDimension()
      */
     assert(mVariableColumnIds.empty());
-    for (unsigned i=0; i<PROBLEM_DIM; i++)
+    for (unsigned i = 0; i < PROBLEM_DIM; ++i)
     {
         std::stringstream variable_name;
         variable_name << "Variable_" << i;

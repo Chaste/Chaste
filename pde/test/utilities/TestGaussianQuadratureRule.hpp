@@ -62,11 +62,11 @@ public:
         TS_ASSERT_DELTA(quad_rule1.GetWeight(0), 1.0, DBL_EPSILON);
 
         // 1d
-        for (unsigned order=0; order<3; order++)
+        for (unsigned order = 0; order < 3; ++order)
         {
             GaussianQuadratureRule<1> quad_rule(order);
 
-            for (unsigned i=0; i<quad_rule.GetNumQuadPoints(); i++)
+            for (unsigned i = 0; i < quad_rule.GetNumQuadPoints(); ++i)
             {
                 TS_ASSERT_LESS_THAN_EQUALS( quad_rule.GetWeight(i),1);
                 TS_ASSERT_LESS_THAN_EQUALS(0, quad_rule.GetWeight(i));
@@ -77,11 +77,11 @@ public:
         }
 
         // 2d
-        for (unsigned order=0; order<3; order++)
+        for (unsigned order = 0; order < 3; ++order)
         {
             GaussianQuadratureRule<2> quad_rule(order);
 
-            for (unsigned i=0; i<quad_rule.GetNumQuadPoints(); i++)
+            for (unsigned i = 0; i < quad_rule.GetNumQuadPoints(); ++i)
             {
                 TS_ASSERT_LESS_THAN_EQUALS( quad_rule.GetWeight(i),1);
                 TS_ASSERT_LESS_THAN_EQUALS(-quad_rule.GetWeight(i),0);
@@ -94,11 +94,11 @@ public:
         }
 
         // 3d
-        for (unsigned order=0; order<4; order++)
+        for (unsigned order = 0; order < 4; ++order)
         {
             GaussianQuadratureRule<3> quad_rule(order);
 
-            for (unsigned i=0; i<quad_rule.GetNumQuadPoints(); i++)
+            for (unsigned i = 0; i < quad_rule.GetNumQuadPoints(); ++i)
             {
                 TS_ASSERT_LESS_THAN_EQUALS( quad_rule.GetWeight(i),1);
                 TS_ASSERT_LESS_THAN_EQUALS(-quad_rule.GetWeight(i),0);
@@ -129,12 +129,12 @@ public:
      */
     void TestGaussianQuadratureRuleIntegralOneD()
     {
-        for (unsigned order=0; order<6; order++)
+        for (unsigned order = 0; order < 6; ++order)
         {
             GaussianQuadratureRule<1> quad_rule(order);
 
-            //Test that the rule can be used to integrate the polynomials 0, x, x^2, x^3 ... on the interval [1,3]
-            for (unsigned poly_degree=0; poly_degree<=order; poly_degree++)
+            // Test that the rule can be used to integrate the polynomials 0, x, x^2, x^3 ... on the interval [1,3]
+            for (unsigned poly_degree = 0; poly_degree <= order; ++poly_degree)
             {
                 std::vector<Node<1>*> nodes2;
                 nodes2.push_back(new Node<1>(0, false, 1.0));
@@ -150,15 +150,17 @@ public:
                 double x1 = element.GetNodeLocation(0,0);
                 double x2 = element.GetNodeLocation(1,0);
 
-                for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
+                for (unsigned quad_index = 0;
+                     quad_index < quad_rule.GetNumQuadPoints();
+                     ++quad_index)
                 {
                     const ChastePoint<1>& quad_point = quad_rule.rGetQuadPoint(quad_index);
                     const ChastePoint<1> transformed_quad_point =
                         ChastePoint<1>((1-quad_point[0])*x1 + quad_point[0]*x2);
 
-                    double integrand_value = pow(transformed_quad_point[0],(double)poly_degree);
+                    double integrand_value = pow(transformed_quad_point[0], static_cast<double>(poly_degree));
 
-                    integral+= integrand_value*jacobian_determinant
+                    integral += integrand_value*jacobian_determinant
                                *quad_rule.GetWeight(quad_index);
                 }
 
@@ -166,7 +168,7 @@ public:
                 //
                 // \int_0^3 x^p dx = [(1/(p+1))*x^(p+1)]_1^3
                 //
-                TS_ASSERT_DELTA(integral, 1.0/(poly_degree+1.0)*(pow(3.0,(double)poly_degree+1)-1), 1e-12); // Largest integral is about 100
+                TS_ASSERT_DELTA(integral, 1.0/(poly_degree+1.0)*(pow(3.0,static_cast<double>(poly_degree)+1)-1), 1e-12); // Largest integral is about 100
 
                 delete nodes2[0];
                 delete nodes2[1];
@@ -189,25 +191,29 @@ public:
                                   {1.0/20, 1.0/120, 0,      0, 0},
                                   {1.0/30, 0.0, 0.0, 0.0, 0.0} };
 
-        for (unsigned order=0; order<4; order++)
+        for (unsigned order = 0; order < 4; ++order)
         {
             GaussianQuadratureRule<2> quad_rule(order);
 
-            for (unsigned poly_degree_x=0; poly_degree_x<=order; poly_degree_x++)
+            for (unsigned poly_degree_x = 0;
+                 poly_degree_x <= order;
+                 ++poly_degree_x)
             {
 
-                for (unsigned poly_degree_y=0; poly_degree_y<=order-poly_degree_x; poly_degree_y++)
+                for (unsigned poly_degree_y = 0;
+                     poly_degree_y <= order - poly_degree_x;
+                     ++poly_degree_y)
                 {
                     double integral = 0.0;
 
-                    for (unsigned quad_index=0;
-                         quad_index<quad_rule.GetNumQuadPoints();
-                         quad_index++)
+                    for (unsigned quad_index = 0;
+                         quad_index < quad_rule.GetNumQuadPoints();
+                         ++quad_index)
                     {
                         const ChastePoint<2>& quad_point = quad_rule.rGetQuadPoint(quad_index);
 
-                        integral += pow(quad_point[0], (double)poly_degree_x)
-                                    *pow(quad_point[1], (double)poly_degree_y)
+                        integral += pow(quad_point[0], static_cast<double>(poly_degree_x))
+                                    *pow(quad_point[1], static_cast<double>(poly_degree_y))
                                     *quad_rule.GetWeight(quad_index);
                     }
 
@@ -269,35 +275,35 @@ public:
             };
 
         // Test up to order 3 in 3D
-        for (unsigned order=0; order<4; order++)
+        for (unsigned order = 0; order < 4; ++order)
         {
             GaussianQuadratureRule<3> quad_rule(order);
 
-            for (unsigned poly_degree_x=0;
-                 poly_degree_x<=order;
-                 poly_degree_x++)
+            for (unsigned poly_degree_x = 0;
+                 poly_degree_x <= order;
+                 ++poly_degree_x)
             {
 
-                for (unsigned poly_degree_y=0;
-                     poly_degree_y<=order-poly_degree_x;
-                     poly_degree_y++)
+                for (unsigned poly_degree_y = 0;
+                     poly_degree_y <= order-poly_degree_x;
+                     ++poly_degree_y)
                 {
 
-                    for (unsigned poly_degree_z=0;
-                         poly_degree_z<=order-poly_degree_x-poly_degree_y;
-                         poly_degree_z++)
+                    for (unsigned poly_degree_z = 0;
+                         poly_degree_z <= order-poly_degree_x-poly_degree_y;
+                         ++poly_degree_z)
                     {
                         double integral = 0.0;
 
-                        for (unsigned quad_index=0;
-                             quad_index<quad_rule.GetNumQuadPoints();
-                             quad_index++)
+                        for (unsigned quad_index = 0;
+                             quad_index < quad_rule.GetNumQuadPoints();
+                             ++quad_index)
                         {
                             const ChastePoint<3>& quad_point = quad_rule.rGetQuadPoint(quad_index);
 
-                            integral += pow(quad_point[0], (double)poly_degree_x)
-                                        * pow(quad_point[1], (double)poly_degree_y)
-                                        * pow(quad_point[2], (double)poly_degree_z)
+                            integral += pow(quad_point[0], static_cast<double>(poly_degree_x))
+                                        * pow(quad_point[1], static_cast<double>(poly_degree_y))
+                                        * pow(quad_point[2], static_cast<double>(poly_degree_z))
                                         * quad_rule.GetWeight(quad_index);
                         }
 

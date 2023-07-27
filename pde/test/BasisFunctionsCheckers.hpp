@@ -57,16 +57,16 @@ public:
     {
         unsigned size = evaluationPoints.size(); // number of evalutation points and basis functions too
 
-        assert(size==ELEMENT_DIM+1);
+        assert(size == ELEMENT_DIM+1);
 
         double expected_evaluation;
 
-        for (unsigned point_index=0; point_index<size; point_index++)
+        for (unsigned point_index = 0; point_index < size; ++point_index)
         {
             c_vector<double, ELEMENT_DIM+1> basis_function_vector;
             LinearBasisFunction<ELEMENT_DIM>::ComputeBasisFunctions(*(evaluationPoints[point_index]), basis_function_vector);
 
-            for (unsigned func_index=0; func_index<size; func_index ++)
+            for (unsigned func_index = 0; func_index < size; ++func_index)
             {
                 if (func_index == point_index)
                 {
@@ -89,16 +89,16 @@ public:
     {
         unsigned size = evaluationPoints.size(); // number of evalutation points and basis functions too
 
-        assert(size==(ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2);
+        assert(size == (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2);
 
         double expected_evaluation;
 
-        for (unsigned point_index=0; point_index<size; point_index++)
+        for (unsigned point_index = 0; point_index < size; ++point_index)
         {
             c_vector<double, (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2> basis_function_vector;
             QuadraticBasisFunction<ELEMENT_DIM>::ComputeBasisFunctions(*(evaluationPoints[point_index]), basis_function_vector);
 
-            for (unsigned func_index=0; func_index<size; func_index ++)
+            for (unsigned func_index = 0; func_index < size; ++func_index)
             {
                 if (func_index == point_index)
                 {

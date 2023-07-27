@@ -80,13 +80,14 @@ protected:
     PetscInt mOwnershipRangeHi;
 
     /**
-     * The main assembly method. Protected, should only be called through Assemble(),
-     * AssembleMatrix() or AssembleVector() which set mAssembleMatrix, mAssembleVector
-     * accordingly. Pure and therefore is implemented in child classes. Will involve looping
-     * over elements (which may be volume, surface or cable elements), and computing
-     * integrals and adding them to the vector or matrix
+     * The main assembly method. Protected, should only be called through 
+     * Assemble(), AssembleMatrix() or AssembleVector() which set 
+     * mAssembleMatrix, mAssembleVector accordingly. Pure and therefore is 
+     * implemented in child classes. Will involve looping over elements (which 
+     * may be volume, surface or cable elements), and computing integrals and 
+     * adding them to the vector or matrix
      */
-    virtual void DoAssemble()=0;
+    virtual void DoAssemble() = 0;
 
 public:
 

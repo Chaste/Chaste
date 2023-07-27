@@ -136,14 +136,14 @@ private:
 
         double dt = PdeSimulationTime::GetPdeTimeStep();
 
-        for (unsigned i=0; i<ELEMENT_DIM+1; i++) // essentially a loop over the basis functions
+        for (unsigned i = 0; i < ELEMENT_DIM+1; ++i) // essentially a loop over the basis functions
         {
-            for (unsigned j=0; j<ELEMENT_DIM+1; j++) // essentially a loop over the basis functions
+            for (unsigned j = 0; j < ELEMENT_DIM+1; ++j) // essentially a loop over the basis functions
             {
                 // mass matrix
                 ret(i,j) = rPhi(i)*rPhi(j);
                 // -dt * stiffness matrix
-                for (unsigned dim=0; dim<SPACE_DIM; dim++)
+                for (unsigned dim = 0; dim < SPACE_DIM; ++dim)
                 {
                     ret(i,j) -= dt * rGradPhi(dim,i)*rGradPhi(dim,j);
                 }
@@ -292,7 +292,7 @@ public:
         solver.SetTimes(0.0, 0.2);
 
         std::vector<double> init_cond(mesh.GetNumNodes(), 0.0);
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];

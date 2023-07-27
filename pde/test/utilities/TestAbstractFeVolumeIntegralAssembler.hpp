@@ -63,9 +63,9 @@ private:
         Element<DIM,DIM>* pElement)
     {
         c_vector<double,1*(DIM+1)> vec;
-        for (unsigned i=0; i<DIM+1; i++)
+        for (unsigned i = 0; i < DIM + 1; ++i)
         {
-            vec(i)=1.0;
+            vec(i) = 1.0;
         }
         return vec;
     }
@@ -93,11 +93,11 @@ private:
         Element<DIM,DIM>* pElement)
     {
         c_matrix<double,1*(DIM+1),1*(DIM+1)> mat;
-        for (unsigned i=0; i<DIM+1; i++)
+        for (unsigned i = 0; i < DIM+1; ++i)
         {
-            for (unsigned j=0; j<DIM+1; j++)
+            for (unsigned j = 0; j < DIM+1; ++j)
             {
-                mat(i,j)=1.0;
+                mat(i,j) = 1.0;
             }
         }
         return mat;
@@ -123,9 +123,9 @@ private:
         Element<DIM,DIM>* pElement)
     {
         c_matrix<double,1*(DIM+1),1*(DIM+1)> mat;
-        for (unsigned i=0; i<DIM+1; i++)
+        for (unsigned i = 0; i < DIM+1; ++i)
         {
-            for (unsigned j=0; j<DIM+1; j++)
+            for (unsigned j = 0; j < DIM+1; ++j)
             {
                 mat(i,j)=1.0;
             }
@@ -142,7 +142,7 @@ private:
         Element<DIM,DIM>* pElement)
     {
         c_vector<double,1*(DIM+1)> vec;
-        for (unsigned i=0; i<DIM+1; i++)
+        for (unsigned i = 0; i < DIM+1; ++i)
         {
             vec(i)=1.0;
         }
@@ -214,7 +214,7 @@ private:
 
         ReplicatableVector vec_repl(vec);
         double volume_of_element = DIM==1 ? h : (DIM==2 ? 0.5*h*h : h*h*h/6);
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             TS_ASSERT_DELTA(vec_repl[i], volume_of_element*mesh.GetNode(i)->GetNumContainingElements(), 1e-4);
         }
@@ -253,9 +253,9 @@ public:
 
         int lo, hi;
         MatGetOwnershipRange(mat, &lo, &hi);
-        for (unsigned i=lo; i<(unsigned)hi; i++)
+        for (unsigned i=lo; i<static_cast<unsigned>(hi); ++i)
         {
-            for (unsigned j=0; j<mesh.GetNumNodes(); j++)
+            for (unsigned j = 0; j < mesh.GetNumNodes(); ++j)
             {
                 double value = PetscMatTools::GetElement(mat,i,j);
                 TS_ASSERT_DELTA(value, h, 1e-4);
@@ -297,10 +297,10 @@ public:
 
         ReplicatableVector vec_repl(vec);
 
-        for (unsigned i=lo; i<(unsigned)hi; i++)
+        for (unsigned i=lo; i<static_cast<unsigned>(hi); ++i)
         {
             TS_ASSERT_DELTA(vec_repl[i], h, 1e-4);
-            for (unsigned j=0; j<mesh.GetNumNodes(); j++)
+            for (unsigned j = 0; j < mesh.GetNumNodes(); ++j)
             {
                 double value = PetscMatTools::GetElement(mat,i,j);
                 TS_ASSERT_DELTA(value, h, 1e-4);
@@ -317,10 +317,10 @@ public:
 
         ReplicatableVector vec_repl2(vec);
 
-        for (unsigned i=lo; i<(unsigned)hi; i++)
+        for (unsigned i=lo; i<static_cast<unsigned>(hi); ++i)
         {
             TS_ASSERT_DELTA(vec_repl2[i], h, 1e-4);
-            for (unsigned j=0; j<mesh.GetNumNodes(); j++)
+            for (unsigned j = 0; j < mesh.GetNumNodes(); ++j)
             {
                 double value = PetscMatTools::GetElement(mat,i,j);
                 TS_ASSERT_DELTA(value, h, 1e-4);
@@ -339,10 +339,10 @@ public:
 
         ReplicatableVector vec_repl3(vec);
 
-        for (unsigned i=lo; i<(unsigned)hi; i++)
+        for (unsigned i=lo; i<static_cast<unsigned>(hi); ++i)
         {
             TS_ASSERT_DELTA(vec_repl3[i], h, 1e-4);
-            for (unsigned j=0; j<mesh.GetNumNodes(); j++)
+            for (unsigned j = 0; j < mesh.GetNumNodes(); ++j)
             {
                 double value = PetscMatTools::GetElement(mat,i,j);
                 // value is 0.0 now
@@ -355,9 +355,9 @@ public:
 
         PetscMatTools::Finalise(mat);
 
-        for (unsigned i=lo; i<(unsigned)hi; i++)
+        for (unsigned i=lo; i<static_cast<unsigned>(hi); ++i)
         {
-            for (unsigned j=0; j<mesh.GetNumNodes(); j++)
+            for (unsigned j = 0; j < mesh.GetNumNodes(); ++j)
             {
                 double value = PetscMatTools::GetElement(mat,i,j);
                 TS_ASSERT_DELTA(value, h, 1e-4);
@@ -388,9 +388,9 @@ public:
         int lo, hi;
         MatGetOwnershipRange(mat, &lo, &hi);
 
-        for (unsigned i=lo; i<(unsigned)hi; i++)
+        for (unsigned i=lo; i<static_cast<unsigned>(hi); ++i)
         {
-            for (unsigned j=0; j<mesh.GetNumNodes(); j++)
+            for (unsigned j = 0; j < mesh.GetNumNodes(); ++j)
             {
                 double value = PetscMatTools::GetElement(mat,i,j);
                 if (i>0 && i<mesh.GetNumNodes()-1)
@@ -526,9 +526,9 @@ public:
         int lo, hi;
         MatGetOwnershipRange(mat, &lo, &hi);
 
-        for (unsigned i=lo; i<(unsigned)hi; i++)
+        for (unsigned i=lo; i<static_cast<unsigned>(hi); ++i)
         {
-            for (unsigned j=0; j<mesh.GetNumNodes(); j++)
+            for (unsigned j = 0; j < mesh.GetNumNodes(); ++j)
             {
                 double value = PetscMatTools::GetElement(mat,i,j);
                 if (i>0 && i<mesh.GetNumNodes()-1)

@@ -53,11 +53,13 @@ double PdeSimulationTime::GetTime()
     return mTime;
 }
 
-void PdeSimulationTime::SetPdeTimeStepAndNextTime(double timestep, double next_time)
+void PdeSimulationTime::SetPdeTimeStepAndNextTime(
+    double timestep,
+    double next_time)
 {
-    assert( fabs(next_time - timestep - mTime) < 2.0*DBL_EPSILON*next_time);
+    assert(fabs(next_time - timestep - mTime) < 2.0*DBL_EPSILON*next_time);
     mPdeTimeStep = timestep;
-    mPdeTimeStepInverse = 1.0/timestep;
+    mPdeTimeStepInverse = 1.0 / timestep;
     mNextTime = next_time;
 }
 

@@ -74,9 +74,9 @@ private:
     {
         c_matrix<double,2*(DIM+1),2*(DIM+1)> ret = zero_matrix<double>(2*(DIM+1), 2*(DIM+1));
 
-        for (unsigned i=0; i<DIM+1; i++)
+        for (unsigned i = 0; i < DIM+1; ++i)
         {
-            for (unsigned j=0; j<DIM+1; j++)
+            for (unsigned j = 0; j < DIM+1; ++j)
             {
                 matrix_column<c_matrix<double,DIM,DIM+1> > grad_phi_i(rGradPhi,i);
                 matrix_column<c_matrix<double,DIM,DIM+1> > grad_phi_j(rGradPhi,j);
@@ -100,7 +100,7 @@ private:
     {
         c_vector<double,2*(DIM+1)> ret;
 
-        for (unsigned i=0; i<DIM+1; i++)
+        for (unsigned i = 0; i < DIM+1; ++i)
         {
             matrix_column<c_matrix<double,DIM,DIM+1> > grad_phi_i(rGradPhi, i);
             matrix_row<c_matrix<double,2,DIM> > gradU0(rGradU, 0);
@@ -155,9 +155,9 @@ private:
     {
         c_matrix<double,2*(2+1),2*(2+1)> ret;
 
-        for (unsigned i=0; i<2+1; i++)
+        for (unsigned i = 0; i < 2+1; ++i)
         {
-            for (unsigned j=0; j<2+1; j++)
+            for (unsigned j = 0; j < 2+1; ++j)
             {
                 matrix_column<c_matrix<double,2,2+1> > grad_phi_i(rGradPhi, i);
                 matrix_column<c_matrix<double,2,2+1> > grad_phi_j(rGradPhi, j);
@@ -182,7 +182,7 @@ private:
     {
         c_vector<double,2*(2+1)> ret;
 
-        for (unsigned i=0; i<2+1; i++)
+        for (unsigned i = 0; i < 2+1; ++i)
         {
             matrix_column<c_matrix<double,2,2+1> > grad_phi_i(rGradPhi,i);
             matrix_row<c_matrix<double,2,2> > gradU0(rGradU, 0);
@@ -287,7 +287,7 @@ private:
         // (result_repl[2*i+1]) equal to 2 times the 1-unknown
         // solution (as lambda=4))
         //////////////////////////////////////////////////////////////////////////
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             TS_ASSERT_DELTA(result_repl[2*i],   result_1unknown_repl[i], 1e-4);
             TS_ASSERT_DELTA(result_repl[2*i+1], 2*result_1unknown_repl[i], 1e-4);
@@ -393,7 +393,7 @@ public:
         // solution of the 1-unknown problem and the v solutions
         // (result_repl[2*i+1]) are equal to the 1-unknown
         // solution
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             TS_ASSERT_DELTA(result_repl[2*i]  , result_1unknown_repl[i], 1e-6);
             TS_ASSERT_DELTA(result_repl[2*i+1], result_1unknown_repl[i], 1e-6);
@@ -461,11 +461,11 @@ public:
         int size;
         VecGetSize(result,&size);
 
-        TS_ASSERT_EQUALS(size, (int)mesh.GetNumNodes()*2);
+        TS_ASSERT_EQUALS(size, static_cast<int>(mesh.GetNumNodes())*2);
 
         ReplicatableVector result_repl(result);
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];

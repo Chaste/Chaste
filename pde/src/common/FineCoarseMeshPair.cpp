@@ -36,7 +36,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FineCoarseMeshPair.hpp"
 
 template<unsigned DIM>
-FineCoarseMeshPair<DIM>::FineCoarseMeshPair(AbstractTetrahedralMesh<DIM,DIM>& rFineMesh, AbstractTetrahedralMesh<DIM,DIM>& rCoarseMesh)
+FineCoarseMeshPair<DIM>::FineCoarseMeshPair(
+    AbstractTetrahedralMesh<DIM, DIM>& rFineMesh,
+    AbstractTetrahedralMesh<DIM, DIM>& rCoarseMesh)
     : mrFineMesh(rFineMesh),
       mrCoarseMesh(rCoarseMesh),
       mpFineMeshBoxCollection(nullptr),
@@ -84,9 +86,7 @@ void FineCoarseMeshPair<DIM>::DeleteCoarseBoxCollection()
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////
-//   Setting up boxes methods
-////////////////////////////////////////////////////////////////////////////////////
+// Setting up boxes methods
 
 template<unsigned DIM>
 void FineCoarseMeshPair<DIM>::SetUpBoxesOnFineMesh(double boxWidth)
@@ -101,9 +101,10 @@ void FineCoarseMeshPair<DIM>::SetUpBoxesOnCoarseMesh(double boxWidth)
 }
 
 template<unsigned DIM>
-void FineCoarseMeshPair<DIM>::SetUpBoxes(AbstractTetrahedralMesh<DIM, DIM>& rMesh,
-                                         double boxWidth,
-                                         DistributedBoxCollection<DIM>*& rpBoxCollection)
+void FineCoarseMeshPair<DIM>::SetUpBoxes(
+    AbstractTetrahedralMesh<DIM, DIM>& rMesh,
+    double boxWidth,
+    DistributedBoxCollection<DIM>*& rpBoxCollection)
 {
     if (rpBoxCollection)
     {
@@ -115,8 +116,8 @@ void FineCoarseMeshPair<DIM>::SetUpBoxes(AbstractTetrahedralMesh<DIM, DIM>& rMes
     ChasteCuboid<DIM> bounding_box = rMesh.CalculateBoundingBox();
 
     // Set up the boxes using a domain that is slightly larger than the fine mesh
-    c_vector<double,2*DIM> extended_min_and_max;
-    for (unsigned i=0; i<DIM; i++)
+    c_vector<double, 2*DIM> extended_min_and_max;
+    for (unsigned i = 0; i < DIM; ++i)
     {
         double width = bounding_box.GetWidth(i);
 
@@ -130,11 +131,12 @@ void FineCoarseMeshPair<DIM>::SetUpBoxes(AbstractTetrahedralMesh<DIM, DIM>& rMes
     if (boxWidth < 0)
     {
         /*
-         * Use default value = max(max_edge_length, w20),  where w20 is the width
+         * Use default value = max(max_edge_length, w20), where w20 is the width
          * corresponding to 20 boxes in the x-direction.
          *
-         * BoxCollection creates an extra box so divide by 19 not 20. Add a little
-         * bit on to ensure minor numerical fluctuations don't change the answer.
+         * BoxCollection creates an extra box so divide by 19 not 20. Add a 
+         * little bit on to ensure minor numerical fluctuations don't change the 
+         * answer.
          */
         boxWidth = (extended_min_and_max(1) - extended_min_and_max(0))/19.000000001;
 
@@ -150,13 +152,16 @@ void FineCoarseMeshPair<DIM>::SetUpBoxes(AbstractTetrahedralMesh<DIM, DIM>& rMes
     rpBoxCollection = new DistributedBoxCollection<DIM>(boxWidth, extended_min_and_max);
     rpBoxCollection->SetupAllLocalBoxes();
 
-    // For each element, if ANY of its nodes are physically in a box, put that element in that box
-    for (unsigned i=0; i<rMesh.GetNumElements(); i++)
+    /*
+     * For each element, if ANY of its nodes are physically in a box, put that 
+     * element in that box.
+     */
+    for (unsigned i = 0; i < rMesh.GetNumElements(); ++i)
     {
         Element<DIM,DIM>* p_element = rMesh.GetElement(i);
 
         std::set<unsigned> box_indices_each_node_this_elem;
-        for (unsigned j=0; j<DIM+1; j++) // num vertices per element
+        for (unsigned j = 0; j < DIM + 1; ++j) // num vertices per element
         {
             Node<DIM>* p_node = p_element->GetNode(j);
             // Only take note of box inclusions which are in our domain
@@ -166,27 +171,23 @@ void FineCoarseMeshPair<DIM>::SetUpBoxes(AbstractTetrahedralMesh<DIM, DIM>& rMes
                 box_indices_each_node_this_elem.insert(box_index);
             }
         }
-        for (std::set<unsigned>::iterator iter = box_indices_each_node_this_elem.begin();
-            iter != box_indices_each_node_this_elem.end();
-            ++iter)
+        for (auto iter : box_indices_each_node_this_elem)
         {
-            assert(rpBoxCollection->IsBoxOwned( *iter ));
-            rpBoxCollection->rGetBox( *iter ).AddElement(p_element);
+            assert(rpBoxCollection->IsBoxOwned(iter));
+            rpBoxCollection->rGetBox(iter).AddElement(p_element);
         }
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////
-// ComputeFineElementsAndWeightsForCoarseQuadPoints()
-// and
-// ComputeFineElementsAndWeightsForCoarseNodes()
-// and
-// common method
-////////////////////////////////////////////////////////////////////////////////////
+/*
+ * ComputeFineElementsAndWeightsForCoarseQuadPoints() and
+ * ComputeFineElementsAndWeightsForCoarseNodes() and common method.
+ */
 
 template<unsigned DIM>
-void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseQuadPoints(GaussianQuadratureRule<DIM>& rQuadRule,
-                                                                               bool safeMode)
+void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseQuadPoints(
+    GaussianQuadratureRule<DIM>& rQuadRule,
+    bool safeMode)
 {
     if (mpFineMeshBoxCollection == nullptr)
     {
@@ -198,13 +199,13 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseQuadPoints(G
 
     // Resize the elements and weights vector.
     mFineMeshElementsAndWeights.resize(quad_point_posns.Size());
+
     // Make sure that, in parallel, silent processes have their structs initialised to zero values
-    for (unsigned i=0; i<mFineMeshElementsAndWeights.size(); i++)
+    for (unsigned i = 0; i < mFineMeshElementsAndWeights.size(); ++i)
     {
         mFineMeshElementsAndWeights[i].ElementNum = 0u;
         mFineMeshElementsAndWeights[i].Weights = zero_vector<double>(DIM+1);
     }
-
 
     // LCOV_EXCL_START
     if (CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
@@ -213,9 +214,8 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseQuadPoints(G
     }
     // LCOV_EXCL_STOP
 
-
     ResetStatisticsVariables();
-    for (unsigned i=0; i<quad_point_posns.Size(); i++)
+    for (unsigned i = 0; i < quad_point_posns.Size(); ++i)
     {
         // LCOV_EXCL_START
         if (CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
@@ -225,7 +225,9 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseQuadPoints(G
         // LCOV_EXCL_STOP
 
         // Get the box this point is in
-        unsigned box_for_this_point = mpFineMeshBoxCollection->CalculateContainingBox( quad_point_posns.rGet(i) );
+        unsigned box_for_this_point = 
+            mpFineMeshBoxCollection->CalculateContainingBox(quad_point_posns.rGet(i));
+
         if (mpFineMeshBoxCollection->IsBoxOwned(box_for_this_point))
         {
             // A chaste point version of the c-vector is needed for the GetContainingElement call.
@@ -236,31 +238,34 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseQuadPoints(G
         else
         {
             assert(mFineMeshElementsAndWeights[i].ElementNum == 0u);
-            assert(norm_2(mFineMeshElementsAndWeights[i].Weights) == 0.0 );
+            assert(norm_2(mFineMeshElementsAndWeights[i].Weights) == 0.0);
         }
     }
     ShareFineElementData();
     if (mStatisticsCounters[1] > 0)
     {
-        WARNING(mStatisticsCounters[1] << " of " << quad_point_posns.Size() << " coarse-mesh quadrature points were outside the fine mesh");
+        WARNING(mStatisticsCounters[1] << " of " << quad_point_posns.Size() 
+                << " coarse-mesh quadrature points were outside the fine mesh");
     }
 }
 
 template<unsigned DIM>
-void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseNodes(bool safeMode)
+void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseNodes(
+    bool safeMode)
 {
-    if (mpFineMeshBoxCollection==nullptr)
+    if (mpFineMeshBoxCollection == nullptr)
     {
         EXCEPTION("Call SetUpBoxesOnFineMesh() before ComputeFineElementsAndWeightsForCoarseNodes()");
     }
 
-    // Resize the elements and weights vector.
+    // Resize the elements and weights vector
     mFineMeshElementsAndWeights.resize(mrCoarseMesh.GetNumNodes());
+
     // Make sure that, in parallel, silent processes have their structs initialised to zero values
-    for (unsigned i=0; i<mFineMeshElementsAndWeights.size(); i++)
+    for (unsigned i = 0; i < mFineMeshElementsAndWeights.size(); ++i)
     {
         mFineMeshElementsAndWeights[i].ElementNum = 0u;
-        mFineMeshElementsAndWeights[i].Weights = zero_vector<double>(DIM+1);
+        mFineMeshElementsAndWeights[i].Weights = zero_vector<double>(DIM + 1);
     }
 
     // LCOV_EXCL_START
@@ -270,9 +275,8 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseNodes(bool s
     }
     // LCOV_EXCL_STOP
 
-
     ResetStatisticsVariables();
-    for (unsigned i=0; i<mrCoarseMesh.GetNumNodes(); i++)
+    for (unsigned i = 0; i < mrCoarseMesh.GetNumNodes(); ++i)
     {
         // LCOV_EXCL_START
         if (CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
@@ -284,7 +288,9 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseNodes(bool s
         Node<DIM>* p_node = mrCoarseMesh.GetNode(i);
 
         // Get the box this point is in
-        unsigned box_for_this_point = mpFineMeshBoxCollection->CalculateContainingBox( p_node->rGetModifiableLocation() );
+        unsigned box_for_this_point = 
+            mpFineMeshBoxCollection->CalculateContainingBox(p_node->rGetModifiableLocation());
+
         if (mpFineMeshBoxCollection->IsBoxOwned(box_for_this_point))
         {
             // A chaste point version of the c-vector is needed for the GetContainingElement call
@@ -297,24 +303,27 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementsAndWeightsForCoarseNodes(bool s
 }
 
 /**
- * \todo: could possibly merge with ComputeCoarseElementForGivenPoint(). Difference between
- * the methods are: this uses fine mesh and fine mesh box, computes weights as well (and sets
- * the element and weight in the vec), rather than returning the element, and this method
- * saves information in mStatisticsCounters.
+ * \todo: could possibly merge with ComputeCoarseElementForGivenPoint(). 
+ * Difference between the methods are: this uses fine mesh and fine mesh box, 
+ * computes weights as well (and sets the element and weight in the vec), rather 
+ * than returning the element, and this method saves information in 
+ * mStatisticsCounters.
  */
 template<unsigned DIM>
-void FineCoarseMeshPair<DIM>::ComputeFineElementAndWeightForGivenPoint(ChastePoint<DIM>& rPoint,
-                                                                       bool safeMode,
-                                                                       unsigned boxForThisPoint,
-                                                                       unsigned index)
+void FineCoarseMeshPair<DIM>::ComputeFineElementAndWeightForGivenPoint(
+    ChastePoint<DIM>& rPoint,
+    bool safeMode,
+    unsigned boxForThisPoint,
+    unsigned index)
 {
     std::set<unsigned> test_element_indices;
 
     /*
-     * The elements to try (initially) are those contained in the box the point is in.
+     * The elements to try (initially) are those contained in the box the point 
+     * is in.
      *
-     * Note: it is possible the point to be in an element not 'in' this box, as it is
-     * possible for all element nodes to be in different boxes.
+     * Note: it is possible the point to be in an element not 'in' this box, as 
+     * it is possible for all element nodes to be in different boxes.
      */
     CollectElementsInContainingBox(mpFineMeshBoxCollection, boxForThisPoint, test_element_indices);
 
@@ -333,7 +342,7 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementAndWeightForGivenPoint(ChastePoi
 
         mStatisticsCounters[0]++;
     }
-    catch(Exception&) //not_in_box
+    catch (Exception&) //not_in_box
     {
         // Now try all elements, trying the elements contained in the boxes local to this element first
         test_element_indices.clear();
@@ -346,7 +355,7 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementAndWeightForGivenPoint(ChastePoi
             weight = mrFineMesh.GetElement(elem_index)->CalculateInterpolationWeights(rPoint);
             mStatisticsCounters[0]++;
         }
-        catch(Exception&) //not_in_local_boxes
+        catch (Exception&) //not_in_local_boxes
         {
             if (safeMode)
             {
@@ -392,18 +401,15 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementAndWeightForGivenPoint(ChastePoi
     mFineMeshElementsAndWeights[index].Weights = weight;
 }
 
-////////////////////////////////////////////////////////////////////////////////////
-// ComputeCoarseElementsForFineNodes
-// and
-// ComputeCoarseElementsForFineElementCentroids
-// and
-// common method
-////////////////////////////////////////////////////////////////////////////////////
+/*
+ * ComputeCoarseElementsForFineNodes and 
+ * ComputeCoarseElementsForFineElementCentroids and common method.
+ */
 
 template<unsigned DIM>
 void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineNodes(bool safeMode)
 {
-    if (mpCoarseMeshBoxCollection==nullptr)
+    if (mpCoarseMeshBoxCollection == nullptr)
     {
         EXCEPTION("Call SetUpBoxesOnCoarseMesh() before ComputeCoarseElementsForFineNodes()");
     }
@@ -418,7 +424,7 @@ void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineNodes(bool safeMode)
     mCoarseElementsForFineNodes.resize(mrFineMesh.GetNumNodes(), 0.0);
 
     ResetStatisticsVariables();
-    for (unsigned i=0; i<mCoarseElementsForFineNodes.size(); i++)
+    for (unsigned i = 0; i < mCoarseElementsForFineNodes.size(); ++i)
     {
         // LCOV_EXCL_START
         if (CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
@@ -430,7 +436,8 @@ void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineNodes(bool safeMode)
         ChastePoint<DIM> point = mrFineMesh.GetNode(i)->GetPoint();
 
         // Get the box this point is in
-        unsigned box_for_this_point = mpCoarseMeshBoxCollection->CalculateContainingBox(mrFineMesh.GetNode(i)->rGetModifiableLocation());
+        unsigned box_for_this_point = 
+            mpCoarseMeshBoxCollection->CalculateContainingBox(mrFineMesh.GetNode(i)->rGetModifiableLocation());
         if (mpCoarseMeshBoxCollection->IsBoxOwned(box_for_this_point))
         {
             mCoarseElementsForFineNodes[i] = ComputeCoarseElementForGivenPoint(point, safeMode, box_for_this_point);
@@ -440,9 +447,10 @@ void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineNodes(bool safeMode)
 }
 
 template<unsigned DIM>
-void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineElementCentroids(bool safeMode)
+void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineElementCentroids(
+    bool safeMode)
 {
-    if (mpCoarseMeshBoxCollection==nullptr)
+    if (mpCoarseMeshBoxCollection == nullptr)
     {
         EXCEPTION("Call SetUpBoxesOnCoarseMesh() before ComputeCoarseElementsForFineElementCentroids()");
     }
@@ -458,7 +466,7 @@ void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineElementCentroids(bool 
     mCoarseElementsForFineElementCentroids.resize(mrFineMesh.GetNumElements(), 0.0);
 
     ResetStatisticsVariables();
-    for (unsigned i=0; i<mrFineMesh.GetNumElements(); i++)
+    for (unsigned i = 0; i < mrFineMesh.GetNumElements(); ++i)
     {
         // LCOV_EXCL_START
         if (CommandLineArguments::Instance()->OptionExists("-mesh_pair_verbose"))
@@ -471,26 +479,30 @@ void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineElementCentroids(bool 
         ChastePoint<DIM> point(point_cvec);
 
         // Get the box this point is in
-        unsigned box_for_this_point = mpCoarseMeshBoxCollection->CalculateContainingBox( point_cvec );
+        unsigned box_for_this_point = mpCoarseMeshBoxCollection->CalculateContainingBox(point_cvec);
 
         if (mpCoarseMeshBoxCollection->IsBoxOwned(box_for_this_point))
         {
-            mCoarseElementsForFineElementCentroids[i] = ComputeCoarseElementForGivenPoint(point, safeMode, box_for_this_point);
+            mCoarseElementsForFineElementCentroids[i] = 
+                ComputeCoarseElementForGivenPoint(point, safeMode, box_for_this_point);
         }
     }
     ShareCoarseElementData();
 }
 
 template<unsigned DIM>
-unsigned FineCoarseMeshPair<DIM>::ComputeCoarseElementForGivenPoint(ChastePoint<DIM>& rPoint,
-                                                                    bool safeMode,
-                                                                    unsigned boxForThisPoint)
+unsigned FineCoarseMeshPair<DIM>::ComputeCoarseElementForGivenPoint(
+    ChastePoint<DIM>& rPoint,
+    bool safeMode,
+    unsigned boxForThisPoint)
 {
     /**
-     * \todo: could possibly merge with ComputeFineElementAndWeightForGivenPoint(). Differences
-     * between the methods are: the other method uses fine mesh and fine mesh box, computes
-     * weights as well (and sets the element and weight in the vec), rather than returning the
-     * element, and that method saves information in mStatisticsCounters.
+     * \todo: could possibly merge with 
+     * ComputeFineElementAndWeightForGivenPoint(). Differences between the 
+     * methods are: the other method uses fine mesh and fine mesh box, computes
+     * weights as well (and sets the element and weight in the vec), rather than 
+     * returning the element, and that method saves information in 
+     * mStatisticsCounters.
      */
     std::set<unsigned> test_element_indices;
     CollectElementsInContainingBox(mpCoarseMeshBoxCollection, boxForThisPoint, test_element_indices);
@@ -506,7 +518,7 @@ unsigned FineCoarseMeshPair<DIM>::ComputeCoarseElementForGivenPoint(ChastePoint<
 
         mStatisticsCounters[0]++;
     }
-    catch(Exception&) // not_in_box
+    catch (Exception&) // not_in_box
     {
         // Now try all elements, trying the elements contained in the boxes local to this element first
         test_element_indices.clear();
@@ -517,7 +529,7 @@ unsigned FineCoarseMeshPair<DIM>::ComputeCoarseElementForGivenPoint(ChastePoint<
             elem_index = mrCoarseMesh.GetContainingElementIndex(rPoint, false, test_element_indices, true);
             mStatisticsCounters[0]++;
         }
-        catch(Exception&) // not_in_local_boxes
+        catch (Exception&) // not_in_local_boxes
         {
             if (safeMode)
             {
@@ -553,45 +565,37 @@ unsigned FineCoarseMeshPair<DIM>::ComputeCoarseElementForGivenPoint(ChastePoint<
     return elem_index;
 }
 
-////////////////////////////////////////////////////////////////////////////////////
 // Helper methods for code
-////////////////////////////////////////////////////////////////////////////////////
 
 template<unsigned DIM>
-void FineCoarseMeshPair<DIM>::CollectElementsInContainingBox(DistributedBoxCollection<DIM>*& rpBoxCollection,
-                                                             unsigned boxIndex,
-                                                             std::set<unsigned>& rElementIndices)
+void FineCoarseMeshPair<DIM>::CollectElementsInContainingBox(
+    DistributedBoxCollection<DIM>*& rpBoxCollection,
+    unsigned boxIndex,
+    std::set<unsigned>& rElementIndices)
 {
-    for (typename std::set<Element<DIM,DIM>*>::iterator elem_iter = rpBoxCollection->rGetBox(boxIndex).rGetElementsContained().begin();
-         elem_iter != rpBoxCollection->rGetBox(boxIndex).rGetElementsContained().end();
-         ++elem_iter)
+    for (auto elem_iter : rpBoxCollection->rGetBox(boxIndex).rGetElementsContained())
     {
-        rElementIndices.insert((*elem_iter)->GetIndex());
+        rElementIndices.insert(elem_iter->GetIndex());
     }
 }
 
 template<unsigned DIM>
-void FineCoarseMeshPair<DIM>::CollectElementsInLocalBoxes(DistributedBoxCollection<DIM>*& rpBoxCollection,
-                                                          unsigned boxIndex,
-                                                          std::set<unsigned>& rElementIndices)
+void FineCoarseMeshPair<DIM>::CollectElementsInLocalBoxes(
+    DistributedBoxCollection<DIM>*& rpBoxCollection,
+    unsigned boxIndex,
+    std::set<unsigned>& rElementIndices)
 {
     std::set<unsigned> local_boxes = rpBoxCollection->rGetLocalBoxes(boxIndex);
-    for (std::set<unsigned>::iterator local_box_iter = local_boxes.begin();
-         local_box_iter != local_boxes.end();
-         ++local_box_iter)
+    for (auto local_box_iter : local_boxes)
     {
-        for (typename std::set<Element<DIM,DIM>*>::iterator elem_iter = rpBoxCollection->rGetBox(*local_box_iter).rGetElementsContained().begin();
-             elem_iter != rpBoxCollection->rGetBox(*local_box_iter).rGetElementsContained().end();
-             ++elem_iter)
+        for (auto elem_iter : rpBoxCollection->rGetBox(local_box_iter).rGetElementsContained())
         {
-            rElementIndices.insert((*elem_iter)->GetIndex());
+            rElementIndices.insert(elem_iter->GetIndex());
         }
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////
 // Statistics related methods
-////////////////////////////////////////////////////////////////////////////////////
 
 template<unsigned DIM>
 void FineCoarseMeshPair<DIM>::ResetStatisticsVariables()
@@ -609,21 +613,28 @@ void FineCoarseMeshPair<DIM>::ShareFineElementData()
         return;
     }
 
-    // This sums the results so it isn't idempotent: you get a different result if you call this method twice
-    // Should not matter: the methods which call this helper method have reset everything which is about to be shared
+    /*
+     * This sums the results so it isn't idempotent: you get a different result 
+     * if you call this method twice. Should not matter: the methods which call 
+     * this helper method have reset everything which is about to be shared.
+     */
     std::vector<unsigned> local_counters = mStatisticsCounters;
-    MPI_Allreduce(&local_counters[0], &mStatisticsCounters[0], 2u, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
-
+    MPI_Allreduce(&local_counters[0],
+                  &mStatisticsCounters[0],
+                  2u,
+                  MPI_UNSIGNED,
+                  MPI_SUM,
+                  PETSC_COMM_WORLD);
 
     // Get all the element number and weights into a contiguous format
     unsigned elements_size = mFineMeshElementsAndWeights.size();
     std::vector<unsigned> all_element_indices(elements_size);
     unsigned weights_size = elements_size*(DIM+1);
     std::vector<double> all_weights(weights_size);
-    for (unsigned index=0; index<mFineMeshElementsAndWeights.size(); index++)
+    for (unsigned index = 0; index < mFineMeshElementsAndWeights.size(); ++index)
     {
         all_element_indices[index] = mFineMeshElementsAndWeights[index].ElementNum;
-        for (unsigned j=0; j<DIM+1; j++)
+        for (unsigned j = 0; j < DIM + 1; ++j)
         {
             all_weights[index*(DIM+1)+j] = mFineMeshElementsAndWeights[index].Weights[j];
         }
@@ -632,14 +643,24 @@ void FineCoarseMeshPair<DIM>::ShareFineElementData()
     // Copy and share
     std::vector<unsigned> local_all_element_indices = all_element_indices;
     std::vector<double> local_all_weights = all_weights;
-    MPI_Allreduce(&local_all_element_indices[0], &all_element_indices[0], elements_size, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
-    MPI_Allreduce( &local_all_weights[0], &all_weights[0], weights_size, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+    MPI_Allreduce(&local_all_element_indices[0],
+                  &all_element_indices[0],
+                  elements_size,
+                  MPI_UNSIGNED,
+                  MPI_SUM,
+                  PETSC_COMM_WORLD);
+    MPI_Allreduce(&local_all_weights[0],
+                  &all_weights[0],
+                  weights_size,
+                  MPI_DOUBLE,
+                  MPI_SUM,
+                  PETSC_COMM_WORLD);
 
     // Put back into the regular data structure
-    for (unsigned index=0; index<mFineMeshElementsAndWeights.size(); index++)
+    for (unsigned index = 0; index < mFineMeshElementsAndWeights.size(); ++index)
     {
         mFineMeshElementsAndWeights[index].ElementNum = all_element_indices[index];
-        for (unsigned j=0; j<DIM+1; j++)
+        for (unsigned j = 0; j < DIM + 1; ++j)
         {
             mFineMeshElementsAndWeights[index].Weights[j] = all_weights[index*(DIM+1)+j] ;
         }
@@ -654,21 +675,42 @@ void FineCoarseMeshPair<DIM>::ShareCoarseElementData()
         return;
     }
 
-    // This sums the results so it isn't idempotent: you get a different result if you call this method twice
-    // Should not matter: the methods which call this helper method have reset #mStatisticsCounters
+    /*
+     * This sums the results so it isn't idempotent: you get a different result 
+     * if you call this method twice. Should not matter: the methods which call 
+     * this helper method have reset #mStatisticsCounters.
+     */
     std::vector<unsigned> local_counters = mStatisticsCounters;
-    MPI_Allreduce(&local_counters[0], &mStatisticsCounters[0], 2u, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
+    MPI_Allreduce(&local_counters[0],
+                  &mStatisticsCounters[0],
+                  2u,
+                  MPI_UNSIGNED,
+                  MPI_SUM,
+                  PETSC_COMM_WORLD);
 
-    // The rest uses "max" so it is idempotent.  You can safely re-share results between processes without them changing.
+    /*
+     * The rest uses "max" so it is idempotent. You can safely re-share results 
+     * between processes without them changing.
+     */
     if (mCoarseElementsForFineNodes.empty() == false)
     {
         std::vector<unsigned> temp_coarse_elements = mCoarseElementsForFineNodes;
-        MPI_Allreduce( &temp_coarse_elements[0], &mCoarseElementsForFineNodes[0], mCoarseElementsForFineNodes.size(), MPI_UNSIGNED, MPI_MAX, PETSC_COMM_WORLD);
+        MPI_Allreduce(&temp_coarse_elements[0],
+                      &mCoarseElementsForFineNodes[0],
+                      mCoarseElementsForFineNodes.size(),
+                      MPI_UNSIGNED,
+                      MPI_MAX,
+                      PETSC_COMM_WORLD);
     }
     if (mCoarseElementsForFineElementCentroids.empty() == false)
     {
         std::vector<unsigned> temp_coarse_elements = mCoarseElementsForFineElementCentroids;
-        MPI_Allreduce( &temp_coarse_elements[0], &mCoarseElementsForFineElementCentroids[0], mCoarseElementsForFineElementCentroids.size(), MPI_UNSIGNED, MPI_MAX, PETSC_COMM_WORLD);
+        MPI_Allreduce(&temp_coarse_elements[0],
+                      &mCoarseElementsForFineElementCentroids[0],
+                      mCoarseElementsForFineElementCentroids.size(),
+                      MPI_UNSIGNED,
+                      MPI_MAX,
+                      PETSC_COMM_WORLD);
     }
 }
 
@@ -688,15 +730,14 @@ void FineCoarseMeshPair<DIM>::PrintStatistics()
     if (mNotInMesh.size() > 0)
     {
         std::cout << "\tIndices and weights for points (nodes/quad points) for which no containing element was found:\n";
-        for (unsigned i=0; i<mNotInMesh.size(); i++)
+        for (unsigned i = 0; i < mNotInMesh.size(); ++i)
         {
             std::cout << "\t\t" << mNotInMesh[i] << ", " << mNotInMeshNearestElementWeights[i] << "\n";
         }
     }
 }
 
-///////// Explicit instantiation///////
-
+// Explicit instantiation
 template class FineCoarseMeshPair<1>;
 template class FineCoarseMeshPair<2>;
 template class FineCoarseMeshPair<3>;

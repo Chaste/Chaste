@@ -401,7 +401,9 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::save(
     typedef typename std::map<unsigned, const AbstractBoundaryCondition<SPACE_DIM> *> archive_map_type;
 
     // Save Dirichlet conditions
-    for (unsigned index_of_unknown=0; index_of_unknown<PROBLEM_DIM; index_of_unknown++)
+    for (unsigned index_of_unknown = 0;
+         index_of_unknown < PROBLEM_DIM;
+         ++index_of_unknown)
     {
         archive_map_type bc_map;
         typename BaseClassType::DirichletIteratorType it = this->mpDirichletMap[index_of_unknown]->begin();
@@ -417,7 +419,9 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::save(
     }
 
     // Save Neumann conditions
-    for (unsigned index_of_unknown=0; index_of_unknown<PROBLEM_DIM; index_of_unknown++)
+    for (unsigned index_of_unknown = 0;
+         index_of_unknown<PROBLEM_DIM;
+         ++index_of_unknown)
     {
         archive_map_type bc_map;
         for (NeumannMapIterator it = mpNeumannMap[index_of_unknown]->begin();
@@ -446,16 +450,19 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::MergeFromAr
     std::set<const AbstractBoundaryCondition<SPACE_DIM>*> used_bcs;
 
     // Load Dirichlet conditions
-    for (unsigned index_of_unknown=0; index_of_unknown<PROBLEM_DIM; index_of_unknown++)
+    for (unsigned index_of_unknown = 0;
+         index_of_unknown < PROBLEM_DIM;
+         ++index_of_unknown)
     {
         archive_map_type bc_map;
         archive & bc_map;
-        for (typename archive_map_type::iterator it = bc_map.begin();
-             it != bc_map.end();
-             ++it)
+        for (const auto& it : bc_map)
         {
-            unsigned node_index = it->first;
-            this->mHasDirichletBCs=true;  //We know that a Dirichlet is being added, even if not by this process
+            unsigned node_index = it.first;
+
+            // We know that a Dirichlet is being added, even if not by this process
+            this->mHasDirichletBCs = true;
+
             Node<SPACE_DIM>* p_node;
             try
             {
@@ -464,25 +471,25 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::MergeFromAr
             catch (Exception&)
             {
                 // It's a distributed mesh and we don't own this node - skip to the next BC
-                maybe_unused_bcs.insert(it->second);
+                maybe_unused_bcs.insert(it.second);
                 continue;
             }
-            AddDirichletBoundaryCondition(p_node, it->second, index_of_unknown, false);
-            used_bcs.insert(it->second);
+            AddDirichletBoundaryCondition(p_node, it.second, index_of_unknown, false);
+            used_bcs.insert(it.second);
         }
     }
     this->mCheckedAndCommunicatedIfDirichletBcs=true; // Whether the Dirichlet BCC was empty or not, all processes know the status.
 
     // Load Neumann conditions
-    for (unsigned index_of_unknown=0; index_of_unknown<PROBLEM_DIM; index_of_unknown++)
+    for (unsigned index_of_unknown = 0;
+         index_of_unknown < PROBLEM_DIM;
+         ++index_of_unknown)
     {
         archive_map_type bc_map;
         archive & bc_map;
-        for (typename archive_map_type::iterator it = bc_map.begin();
-             it != bc_map.end();
-             ++it)
+        for (const auto& it : bc_map)
         {
-            unsigned boundary_element_index = it->first;
+            unsigned boundary_element_index = it.first;
             BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>* p_boundary_element;
             try
             {
@@ -491,20 +498,20 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::MergeFromAr
             catch (Exception&)
             {
                 // It's a distributed mesh and we don't own this element - skip to the next BC
-                maybe_unused_bcs.insert(it->second);
+                maybe_unused_bcs.insert(it.second);
                 continue;
             }
-            AddNeumannBoundaryCondition(p_boundary_element, it->second, index_of_unknown);
-            used_bcs.insert(it->second);
+            AddNeumannBoundaryCondition(p_boundary_element, it.second, index_of_unknown);
+            used_bcs.insert(it.second);
         }
     }
 
-    // Free any unused BCs
-    for (typename std::set<const AbstractBoundaryCondition<SPACE_DIM>*>::iterator it=maybe_unused_bcs.begin();
+    // Free any unused BCs (don't use range-based loop, since deleting things)
+    for (auto it = maybe_unused_bcs.begin();
          it != maybe_unused_bcs.end();
          ++it)
     {
-        typename std::set<const AbstractBoundaryCondition<SPACE_DIM>*>::iterator used = used_bcs.find(*it);
+        auto used = used_bcs.find(*it);
         if (used == used_bcs.end())
         {
             delete (*it);

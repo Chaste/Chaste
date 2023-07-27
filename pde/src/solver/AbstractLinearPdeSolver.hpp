@@ -63,7 +63,7 @@ public:
      *
      * @param pMesh the mesh
      */
-    AbstractLinearPdeSolver(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
+    explicit AbstractLinearPdeSolver(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
         : mpLinearSystem(nullptr),
           mpMesh(pMesh)
     {

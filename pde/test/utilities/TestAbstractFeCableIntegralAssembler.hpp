@@ -178,7 +178,7 @@ public:
             TS_ASSERT_DELTA(vec_repl[i], 0.0, 1e-4);
         }
         TS_ASSERT_DELTA(vec_repl[55], -h*coefficient*0.5, 1e-4);
-        for (unsigned i=56; i<65; i++)
+        for (unsigned i=56; i<65; ++i)
         {
             TS_ASSERT_DELTA(vec_repl[i], -h*coefficient, 1e-4);
         }
@@ -193,7 +193,7 @@ public:
         // Test matrix assembly
         int lo, hi;
         MatGetOwnershipRange(mat, &lo, &hi);
-        for (unsigned i=lo; i<(unsigned)hi; i++)
+        for (unsigned i=lo; i<static_cast<unsigned>(hi); ++i)
         {
             // Central cable nodes
             if (i > 55 && i < 65)

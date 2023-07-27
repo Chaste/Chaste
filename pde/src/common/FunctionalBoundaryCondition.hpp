@@ -49,7 +49,8 @@ class FunctionalBoundaryCondition : public AbstractBoundaryCondition<SPACE_DIM>
 private:
 
     /**
-     * The function pointer used to determine the value of the boundary condition at a given point.
+     * The function pointer used to determine the value of the boundary 
+     * condition at a given point.
      *
      * @param rX a point in space
      */
@@ -59,12 +60,13 @@ public:
 
     /**
      * Typical use:
-     *  pBoundaryCondition = new FunctionalBoundaryCondition(&function_name);
+     *     pBoundaryCondition = new FunctionalBoundaryCondition(&function_name);
      *
      * @param func Pointer to a function to be used for evaluating this boundary
      *     condition
      */
-    FunctionalBoundaryCondition(double (*func)(const ChastePoint<SPACE_DIM>& rX));
+    explicit FunctionalBoundaryCondition(
+        double (*func)(const ChastePoint<SPACE_DIM>& rX));
 
     /**
      * @return the value of the boundary condition at a given point.

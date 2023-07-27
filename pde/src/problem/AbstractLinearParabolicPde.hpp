@@ -49,8 +49,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * AbstractLinearParabolicPde class.
  *
  * A general PDE of the form:
- * c(x) du/dt = Grad.(DiffusionTerm(x)*Grad(u))+LinearSourceTerm(x)+NonlinearSourceTerm(x, u)
- *
+ * c(x) du/dt = Grad.(DiffusionTerm(x)*Grad(u)) + LinearSourceTerm(x) 
+ *                                              + NonlinearSourceTerm(x, u).
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
 class AbstractLinearParabolicPde : public AbstractLinearPde<ELEMENT_DIM, SPACE_DIM>
@@ -87,47 +87,53 @@ public:
     {}
 
     /**
-     * @return the function c(x) in "c(x) du/dt = Grad.(DiffusionTerm(x)*Grad(u))+LinearSourceTerm(x)+NonlinearSourceTerm(x, u)"
+     * @return the function c(x) in "c(x) du/dt = 
+     *     Grad.(DiffusionTerm(x)*Grad(u)) + LinearSourceTerm(x) 
+     *                                     +  NonlinearSourceTerm(x, u)"
      *
      * @param rX the point in space at which the function c is computed
      */
-    virtual double ComputeDuDtCoefficientFunction(const ChastePoint<SPACE_DIM>& rX)=0;
+    virtual double ComputeDuDtCoefficientFunction(
+        const ChastePoint<SPACE_DIM>& rX) = 0;
 
     /**
-     * @return computed source term.
-     *
-     * @param rX the point in space at which the nonlinear source term is computed
+     * @param rX the point in space at which the nonlinear source term is 
+     *     computed
      * @param u the value of the dependent variable at the point
      * @param pElement the element that we are inside
+     * 
+     * @return computed source term.
      */
-    virtual double ComputeSourceTerm(const ChastePoint<SPACE_DIM>& rX,
-                                     double u,
-                                     Element<ELEMENT_DIM,SPACE_DIM>* pElement=nullptr)=0;
+    virtual double ComputeSourceTerm(
+        const ChastePoint<SPACE_DIM>& rX,
+        double u,
+        Element<ELEMENT_DIM,SPACE_DIM>* pElement=nullptr) = 0;
 
     /**
-     * @return computed source term at a node.
-     *
      * @param rNode the node at which the nonlinear source term is computed
      * @param u the value of the dependent variable at the node
+     * 
+     * @return computed source term at a node.
      */
     virtual double ComputeSourceTermAtNode(const Node<SPACE_DIM>& rNode,
                                            double u);
 
-
     /**
-     * @return computed diffusion term. The diffusion tensor should be symmetric and positive definite.
-     *
      * @param rX The point in space at which the diffusion term is computed.
      * @param pElement The mesh element that x is contained in (optional).
-     * @return A matrix.
+     * 
+     * @return computed diffusion term. The diffusion tensor should be symmetric 
+     *     and positive definite.
      */
-    virtual c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(const ChastePoint<SPACE_DIM>& rX,
-                                                                        Element<ELEMENT_DIM,SPACE_DIM>* pElement=NULL)=0;
+    virtual c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(
+        const ChastePoint<SPACE_DIM>& rX,
+        Element<ELEMENT_DIM,SPACE_DIM>* pElement = NULL) = 0;
 };
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double AbstractLinearParabolicPde<ELEMENT_DIM, SPACE_DIM>::ComputeSourceTermAtNode(const Node<SPACE_DIM>& rNode,
-                                                                                   double u)
+double AbstractLinearParabolicPde<ELEMENT_DIM, SPACE_DIM>::ComputeSourceTermAtNode(
+    const Node<SPACE_DIM>& rNode,
+    double u)
 {
     return ComputeSourceTerm(rNode.GetPoint(), u);
 }

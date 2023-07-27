@@ -36,17 +36,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Hdf5ToXdmfConverter.hpp"
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-Hdf5ToXdmfConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToXdmfConverter(const FileFinder& rInputDirectory,
-                                                                 const std::string& rFileBaseName,
-                                                                 AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
-    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(rInputDirectory, rFileBaseName, pMesh, "xdmf_output", 0u),
-      XdmfMeshWriter<ELEMENT_DIM,SPACE_DIM>(rInputDirectory.GetRelativePath(FileFinder("", RelativeTo::ChasteTestOutput)) + "/xdmf_output",
-                                            rFileBaseName, false /* Not cleaning directory*/)
+Hdf5ToXdmfConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToXdmfConverter(
+    const FileFinder& rInputDirectory,
+    const std::string& rFileBaseName,
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
+    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(
+          rInputDirectory,
+          rFileBaseName,
+          pMesh,
+          "xdmf_output",
+          0u),
+      XdmfMeshWriter<ELEMENT_DIM,SPACE_DIM>(
+          rInputDirectory.GetRelativePath(FileFinder("", RelativeTo::ChasteTestOutput)) + "/xdmf_output",
+                                          rFileBaseName, false /* Not cleaning directory*/)
 {
     // Set number of time steps
     std::vector<double> time_values = this->mpReader->GetUnlimitedDimensionValues();
     unsigned num_timesteps = time_values.size();
     this->mNumberOfTimePoints = num_timesteps;
+
     // Set time step size
     if (num_timesteps > 1)
     {
@@ -59,9 +67,10 @@ Hdf5ToXdmfConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToXdmfConverter(const FileFinde
 #ifndef _MSC_VER
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void Hdf5ToXdmfConverter<ELEMENT_DIM, SPACE_DIM>::AddDataOnNodes(XERCES_CPP_NAMESPACE_QUALIFIER DOMElement* pGridElement,
-                                                                 XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* pDomDocument,
-                                                                 unsigned timeStep)
+void Hdf5ToXdmfConverter<ELEMENT_DIM, SPACE_DIM>::AddDataOnNodes(
+    XERCES_CPP_NAMESPACE_QUALIFIER DOMElement* pGridElement,
+    XERCES_CPP_NAMESPACE_QUALIFIER DOMDocument* pDomDocument,
+    unsigned timeStep)
 {
     // Use xerces namespace for convenience
     XERCES_CPP_NAMESPACE_USE
@@ -69,7 +78,7 @@ void Hdf5ToXdmfConverter<ELEMENT_DIM, SPACE_DIM>::AddDataOnNodes(XERCES_CPP_NAME
     unsigned num_timesteps = this->mpReader->GetUnlimitedDimensionValues().size();
 
     // Loop over variables
-    for (unsigned var_index=0; var_index<this->mNumVariables; var_index++)
+    for (unsigned var_index = 0; var_index < this->mNumVariables; ++var_index)
     {
         std::string variable_name = this->mpReader->GetVariableNames()[var_index];
 
@@ -84,7 +93,7 @@ void Hdf5ToXdmfConverter<ELEMENT_DIM, SPACE_DIM>::AddDataOnNodes(XERCES_CPP_NAME
         /*
          * e.g. <DataItem Dimensions="1 12 1" ItemType="HyperSlab">
          */
-        DOMElement* p_hype_element =  pDomDocument->createElement(X("DataItem"));
+        DOMElement* p_hype_element = pDomDocument->createElement(X("DataItem"));
         p_hype_element->setAttribute(X("ItemType"), X("HyperSlab"));
         std::stringstream dim_stream;
 
@@ -100,7 +109,7 @@ void Hdf5ToXdmfConverter<ELEMENT_DIM, SPACE_DIM>::AddDataOnNodes(XERCES_CPP_NAME
         /*
          * e.g. <DataItem Dimensions="3 3" Format="XML">
          */
-        DOMElement* p_xml_element =  pDomDocument->createElement(X("DataItem"));
+        DOMElement* p_xml_element = pDomDocument->createElement(X("DataItem"));
         p_xml_element->setAttribute(X("Format"), X("XML"));
         p_xml_element->setAttribute(X("Dimensions"), X("3 3"));
         p_hype_element->appendChild(p_xml_element);
@@ -119,7 +128,7 @@ void Hdf5ToXdmfConverter<ELEMENT_DIM, SPACE_DIM>::AddDataOnNodes(XERCES_CPP_NAME
         /*
          * e.g. <DataItem Dimensions="2 12 2" Format="HDF" NumberType="Float" Precision="8">
          */
-        DOMElement* p_hdf_element =  pDomDocument->createElement(X("DataItem"));
+        DOMElement* p_hdf_element = pDomDocument->createElement(X("DataItem"));
         p_hdf_element->setAttribute(X("Format"), X("HDF"));
         p_hdf_element->setAttribute(X("NumberType"), X("Float"));
         p_hdf_element->setAttribute(X("Precision"), X("8"));

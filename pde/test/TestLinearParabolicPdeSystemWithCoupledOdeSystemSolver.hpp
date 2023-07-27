@@ -84,7 +84,7 @@ public:
         // Create the correct number of ODE systems
         double a = 5.0;
         std::vector<AbstractOdeSystemForCoupledPdeSystem*> ode_systems;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             ode_systems.push_back(new OdeSystemForCoupledHeatEquationWithSource(a));
         }
@@ -103,7 +103,7 @@ public:
 
         // Set initial condition u(x,0) = 1 + cos(pi*x)
         std::vector<double> init_cond(mesh.GetNumNodes());
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             init_cond[i] = 1 + cos(M_PI*x);
@@ -123,7 +123,7 @@ public:
          *
          * with t = t_end.
          */
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
 
@@ -138,7 +138,7 @@ public:
         }
 
         // Test the method GetOdeSystemAtNode()
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             TS_ASSERT(solver.GetOdeSystemAtNode(i) != NULL);
             TS_ASSERT_DELTA(static_cast<OdeSystemForCoupledHeatEquationWithSource*>(solver.GetOdeSystemAtNode(i))->GetA(), 5.0, 1e-6);
@@ -174,7 +174,7 @@ public:
         // Create the correct number of ODE systems
         double a = 5.0;
         std::vector<AbstractOdeSystemForCoupledPdeSystem*> ode_systems;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             ode_systems.push_back(new OdeSystemForCoupledHeatEquation(a));
         }
@@ -189,7 +189,7 @@ public:
 
         // Set initial condition u(x,0) = 1 - x
         std::vector<double> init_cond(mesh.GetNumNodes());
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             init_cond[i] = 1 - x;
@@ -209,7 +209,7 @@ public:
          *
          * with t = t_end.
          */
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double u = 1 - x;
@@ -241,7 +241,7 @@ public:
         // Create the correct number of ODE systems
         double a = 5.0;
         std::vector<AbstractOdeSystemForCoupledPdeSystem*> ode_systems;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             ode_systems.push_back(new OdeSystemForCoupledHeatEquation(a));
         }
@@ -262,7 +262,7 @@ public:
          * which is an eigenfunction of the heat equation.
          */
         std::vector<double> init_cond(mesh.GetNumNodes());
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];
@@ -283,7 +283,7 @@ public:
          *
          * with t = t_end.
          */
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];
@@ -317,7 +317,7 @@ public:
         // Create the correct number of ODE systems
         double a = 5.0;
         std::vector<AbstractOdeSystemForCoupledPdeSystem*> ode_systems;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             ode_systems.push_back(new OdeSystemForCoupledHeatEquation(a));
         }
@@ -336,7 +336,7 @@ public:
          * which is an eigenfunction of the heat equation.
          */
         std::vector<double> init_cond(mesh.GetNumNodes());
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];
@@ -432,7 +432,7 @@ public:
 
         // Create initial conditions that are random perturbations of the uniform steady state
         std::vector<double> init_conds(2*mesh.GetNumNodes());
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             init_conds[2*i] = fabs(2.0 + RandomNumberGenerator::Instance()->ranf());
             init_conds[2*i + 1] = fabs(0.75 + RandomNumberGenerator::Instance()->ranf());
@@ -447,7 +447,7 @@ public:
         // Write results for visualization in gnuplot
         OutputFileHandler handler("TestSchnackenbergCoupledPdeSystemIn1dWithNonZeroDirichlet", false);
         out_stream results_file = handler.OpenOutputFile("schnackenberg.dat");
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double u = solution_repl[2*i];

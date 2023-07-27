@@ -194,11 +194,11 @@ private:
          */
         c_matrix<double,2*3,2*3> ret = zero_matrix<double>(2*3, 2*3);
 
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j = 0; j < 3; ++j)
             {
-                for (unsigned k=0; k<2; k++)
+                for (unsigned k = 0; k < 2; ++k)
                 {
                     // stiffness matrix on diagonal 'blocks'
                     ret(2*i,  2*j)   += rGradPhi(k,i)*rGradPhi(k,j);
@@ -223,7 +223,7 @@ private:
     {
         c_vector<double,2*3> ret;
 
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             ret(2*i)   = -f(rX[0],rX[1]) * rPhi(i);
             ret(2*i+1) = -g(rX[0],rX[1]) * rPhi(i);
@@ -324,9 +324,9 @@ private:
         // this is how to get the current timestep
         double dt = PdeSimulationTime::GetPdeTimeStep();
 
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j = 0; j < 3; ++j)
             {
                 // mass matrix on the diagonal blocks
                 ret(3*i,  3*j)   =  rPhi(i)*rPhi(j)/dt;
@@ -339,7 +339,7 @@ private:
                 ret(3*i+1,3*j+2) =  -2*rPhi(i)*rPhi(j);
 
                 // stiffness matrix on the diagonal blocks
-                for (unsigned dim=0; dim<2; dim++)
+                for (unsigned dim = 0; dim < 2; ++dim)
                 {
                     ret(3*i,  3*j)   += rGradPhi(dim,i)*rGradPhi(dim,j);
                     ret(3*i+1,3*j+1) += rGradPhi(dim,i)*rGradPhi(dim,j);
@@ -370,7 +370,7 @@ private:
         double dt = PdeSimulationTime::GetPdeTimeStep();
         double inverse_dt = PdeSimulationTime::GetPdeTimeStepInverse();
 
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             ret(3*i)   =  u* inverse_dt * rPhi(i);
             ret(3*i+1) =  v* inverse_dt * rPhi(i);
@@ -427,7 +427,7 @@ public:
         ReplicatableVector result_repl(result);
 
         /* Compare against the exact solution. */
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];

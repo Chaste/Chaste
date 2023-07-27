@@ -38,11 +38,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * \todo Integrate with other time stepping classes or remove?
- * A small convenience class providing a consistent global time to the
- * PDE solver classes.
+ * A small convenience class providing a consistent global time to the PDE 
+ * solver classes.
  *
- * This isn't technically a singleton, as it's implemented with static
- * data and methods.
+ * This isn't technically a singleton, as it's implemented with static data and 
+ * methods.
  */
 class PdeSimulationTime
 {
@@ -59,18 +59,19 @@ public:
     static double GetTime();
 
     /**
-     * Set the current PDE timestep.
-     *
-     * The method checks that next_time ~= mTime + timestep
+     * Set the current PDE timestep. The method checks that 
+     * next_time ~= mTime + timestep.
+     * 
      * @param timestep  the current timestep
      * @param next_time  the next time (as given by the PDE time stepper).
+     * \todo rename argument to nextTime
      */
     static void SetPdeTimeStepAndNextTime(double timestep, double next_time);
 
     /** @return the current PDE timestep. */
     static double GetPdeTimeStep();
 
-    /** @return the next time (time after time-step has been made).*/
+    /** @return the next time (time after time-step has been made). */
     static double GetNextTime();
 
     /** @return 1/dt. */
@@ -84,10 +85,11 @@ private:
     /** The timestep used in the PDE solve. */
     static double mPdeTimeStep;
 
-    /** The next time (from the original PDE time-stepper).
+    /**
+     * The next time (from the original PDE time-stepper).
      * mNextTime ~= mTime + mPdeTimeStep.
-     * Note that this is stored explicitly because if we do the addition
-     * then the answer will be off by mTime*DBL_EPSILON.
+     * Note that this is stored explicitly because if we do the addition then 
+     * the answer will be off by mTime*DBL_EPSILON.
      */
     static double mNextTime;
 

@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * A simple parabolic PDE used in tests.
  */
 template <unsigned DIM>
-class SimpleUniformSourceParabolicPde : public AbstractLinearParabolicPde<DIM,DIM>
+class SimpleUniformSourceParabolicPde : public AbstractLinearParabolicPde<DIM, DIM>
 {
     friend class TestCellBasedParabolicPdes;
 
@@ -64,7 +64,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-       archive & boost::serialization::base_object<AbstractLinearParabolicPde<DIM,DIM> >(*this);
+       archive & boost::serialization::base_object<AbstractLinearParabolicPde<DIM, DIM> >(*this);
        archive & mCoefficient;
     }
 
@@ -76,9 +76,10 @@ public:
     /**
      * Constructor.
      *
-     * @param coefficient the source term (rate of production) of the dependent variable (defaults to 0.0)
+     * @param coefficient the source term (rate of production) of the dependent 
+     *     variable (defaults to 0.0)
      */
-    SimpleUniformSourceParabolicPde(double coefficient=0.0);
+    SimpleUniformSourceParabolicPde(double coefficient = 0.0);
 
     /**
      * @return mCoefficient
@@ -88,28 +89,37 @@ public:
     /**
      * Overridden ComputeSourceTerm() method.
      *
-     * @param rX the point in space at which the nonlinear source term is computed
+     * @param rX the point in space at which the nonlinear source term is 
+     *     computed
      * @param u the value of the dependent variable at the point
-     * @param pElement The element
+     * @param pElement The element (optional; defaults to NULL)
      *
-     * @return the the source term.
+     * @return the source term.
      */
-    double ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM,DIM>* pElement=NULL);
+    double ComputeSourceTerm(
+        const ChastePoint<DIM>& rX,
+        double u,
+        Element<DIM, DIM>* pElement = NULL);
 
     /**
      * Overridden ComputeDiffusionTerm() method.
      *
      * @param rX the point in space at which the diffusion term is computed
-     * @param pElement the mesh element that x is contained in (optional; defaults to NULL).
+     * @param pElement the mesh element that x is contained in (optional; 
+     *     defaults to NULL).
      *
      * @return a matrix.
      */
-    c_matrix<double, DIM, DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement=NULL);
+    c_matrix<double, DIM, DIM> ComputeDiffusionTerm(
+        const ChastePoint<DIM>& rX,
+        Element<DIM, DIM>* pElement = NULL);
 
     /**
      * Overridden ComputeDuDtCoefficientFunction() method.
      *
-     * @return the function c(x) in "c(x) du/dt = Grad.(DiffusionTerm(x)*Grad(u))+LinearSourceTerm(x)+NonlinearSourceTerm(x, u)"
+     * @return the function c(x) in "c(x) du/dt = 
+     *     Grad.(DiffusionTerm(x)*Grad(u))+LinearSourceTerm(x) + 
+     *     NonlinearSourceTerm(x, u)"
      *
      * @param rX the point in space at which the function c is computed
      */

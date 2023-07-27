@@ -91,58 +91,66 @@ public:
     {}
 
     /**
-     * @return computed constant in u part of the source term, i.e g(x) in
-     * Div(D Grad u)  +  f(x)u + g(x) = 0, at a given point.
-     *
      * @param rX The point in space
      * @param pElement The element
-     */
-    virtual double ComputeConstantInUSourceTerm(const ChastePoint<SPACE_DIM>& rX,
-                                                Element<ELEMENT_DIM,SPACE_DIM>* pElement)=0;
-
-    /**
-     * @return computed coefficient of u in the linear part of the source term, i.e f(x) in
-     * Div(D Grad u)  +  f(x)u + g(x) = 0, at a given point in space.
-     *
-     * @param rX The point in space
-     * @param pElement
-     */
-    virtual double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<SPACE_DIM>& rX,
-                                                     Element<ELEMENT_DIM,SPACE_DIM>* pElement)=0;
-
-    /**
-     * @return computed diffusion term at a given point. The diffusion tensor should be symmetric and positive definite
-     *
-     * @param rX The point in space at which the diffusion term is computed.
-     * @return A matrix.
-     */
-    virtual c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(const ChastePoint<SPACE_DIM>& rX)=0;
-
-    /**
+     * 
      * @return computed constant in u part of the source term, i.e g(x) in
-     * Div(D Grad u)  +  f(x)u + g(x) = 0, at a given node.
-     *
-     * @param rNode the node
+     * Div(D Grad u)  +  f(x)u + g(x) = 0, at a given point.
      */
-    virtual double ComputeConstantInUSourceTermAtNode(const Node<SPACE_DIM>& rNode);
+    virtual double ComputeConstantInUSourceTerm(
+        const ChastePoint<SPACE_DIM>& rX,
+        Element<ELEMENT_DIM,SPACE_DIM>* pElement) = 0;
 
     /**
-     * @return computed coefficient of u in the linear part of the source term, i.e f(x) in
-     * Div(D Grad u)  +  f(x)u + g(x) = 0, at a given node.
-     *
-     * @param rNode the node
+     * @param rX The point in space
+     * @param pElement The element
+     * 
+     * @return computed coefficient of u in the linear part of the source term, 
+     *     i.e f(x) in Div(D Grad u) + f(x)u + g(x) = 0, at a given point in 
+     *     space.
      */
-    virtual double ComputeLinearInUCoeffInSourceTermAtNode(const Node<SPACE_DIM>& rNode);
+    virtual double ComputeLinearInUCoeffInSourceTerm(
+        const ChastePoint<SPACE_DIM>& rX,
+        Element<ELEMENT_DIM,SPACE_DIM>* pElement) = 0;
+
+    /**
+     * @param rX The point in space at which the diffusion term is computed
+     * 
+     * @return computed diffusion term at a given point. The diffusion tensor 
+     *     should be symmetric and positive definite
+     */
+    virtual c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(
+        const ChastePoint<SPACE_DIM>& rX) = 0;
+
+    /**
+     * @param rNode the node
+     * 
+     * @return computed constant in u part of the source term, i.e g(x) in
+     *     Div(D Grad u)  +  f(x)u + g(x) = 0, at a given node.
+     */
+    virtual double ComputeConstantInUSourceTermAtNode(
+        const Node<SPACE_DIM>& rNode);
+
+    /**
+     * @param rNode the node
+     * 
+     * @return computed coefficient of u in the linear part of the source term, 
+     *     i.e f(x) in Div(D Grad u)  +  f(x)u + g(x) = 0, at a given node.
+     */
+    virtual double ComputeLinearInUCoeffInSourceTermAtNode(
+        const Node<SPACE_DIM>& rNode);
 };
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double AbstractLinearEllipticPde<ELEMENT_DIM, SPACE_DIM>::ComputeConstantInUSourceTermAtNode(const Node<SPACE_DIM>& rNode)
+double AbstractLinearEllipticPde<ELEMENT_DIM, SPACE_DIM>::ComputeConstantInUSourceTermAtNode(
+    const Node<SPACE_DIM>& rNode)
 {
     return ComputeConstantInUSourceTerm(rNode.GetPoint(), nullptr);
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double AbstractLinearEllipticPde<ELEMENT_DIM, SPACE_DIM>::ComputeLinearInUCoeffInSourceTermAtNode(const Node<SPACE_DIM>& rNode)
+double AbstractLinearEllipticPde<ELEMENT_DIM, SPACE_DIM>::ComputeLinearInUCoeffInSourceTermAtNode(
+    const Node<SPACE_DIM>& rNode)
 {
     return ComputeLinearInUCoeffInSourceTerm(rNode.GetPoint(), nullptr);
 }

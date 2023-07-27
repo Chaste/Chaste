@@ -279,9 +279,9 @@ public:
         TS_ASSERT_DELTA(pde.ComputeSourceTerm(point,DBL_MAX), 0.1, 1e-6);
         TS_ASSERT_DELTA(pde.ComputeDuDtCoefficientFunction(point), 1.0, 1e-6);
         c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
-        for (unsigned i=0; i<2; i++)
+        for (unsigned i = 0; i < 2; ++i)
         {
-            for (unsigned j=0; j<2; j++)
+            for (unsigned j = 0; j < 2; ++j)
             {
                 double value = 0.0;
                 if (i == j)

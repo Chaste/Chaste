@@ -105,11 +105,11 @@ private:
          * and prods and so on (see BidomainAssembler) - efficiency not
          * needed for this test though.
          */
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j = 0; j < 3; ++j)
             {
-                for (unsigned k=0; k<2; k++)
+                for (unsigned k = 0; k < 2; ++k)
                 {
                     ret(2*i,  2*j)   += rGradPhi(k,i)*rGradPhi(k,j);
                     ret(2*i+1,2*j+1) += rGradPhi(k,i)*rGradPhi(k,j);
@@ -128,7 +128,7 @@ private:
     {
         c_vector<double,2*(2+1)> ret;
 
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             ret(2*i)   =         rX[0]*rPhi(i);
             ret(2*i+1) = mLambda*rX[0]*rPhi(i);
@@ -213,11 +213,11 @@ private:
          * and prods and so on (see BidomainAssembler) - efficiency not
          * needed for this test though.
          */
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j = 0; j < 3; ++j)
             {
-                for (unsigned k=0; k<2; k++)
+                for (unsigned k = 0; k < 2; ++k)
                 {
                     ret(2*i,  2*j)   += rGradPhi(k,i)*rGradPhi(k,j);
                     ret(2*i+1,2*j+1) += rGradPhi(k,i)*rGradPhi(k,j);
@@ -239,7 +239,7 @@ private:
     {
        c_vector<double,2*(2+1)> ret;
 
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             ret(2*i)   = - f(rX[0],rX[1]) * rPhi(i);
             ret(2*i+1) = - g(rX[0],rX[1]) * rPhi(i);
@@ -320,7 +320,7 @@ public:
          * (result_2unknowns_repl[2*i+1]) are equal to two times the
          * 1-unknown solution.
          */
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             TS_ASSERT_DELTA(result_2unknowns_repl[2*i]  ,   result_1unknown_repl[i], 1e-10);
             TS_ASSERT_DELTA(result_2unknowns_repl[2*i+1], 2*result_1unknown_repl[i], 1e-10);
@@ -408,7 +408,7 @@ public:
          * (result_2unknowns_repl[2*i+1]) are equal to the 1-unknown
          * solution.
          */
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             TS_ASSERT_DELTA(result_2unknowns_repl[2*i]  , result_1unknown_repl[i], 1e-6);
             TS_ASSERT_DELTA(result_2unknowns_repl[2*i+1], result_1unknown_repl[i], 1e-6);
@@ -449,7 +449,7 @@ public:
         //OutputFileHandler handler("Something");
         //out_stream p_file = handler.OpenOutputFile("file.txt");
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];

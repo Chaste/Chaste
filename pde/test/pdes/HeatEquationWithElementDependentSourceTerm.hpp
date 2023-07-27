@@ -46,11 +46,16 @@ template <int SPACE_DIM>
 class HeatEquationWithElementDependentSourceTerm : public AbstractLinearParabolicPde<SPACE_DIM>
 {
 public:
-    double ComputeSourceTerm(const ChastePoint<SPACE_DIM>& , double, Element<SPACE_DIM,SPACE_DIM>* pElement)
+    double ComputeSourceTerm(
+        const ChastePoint<SPACE_DIM>& rX,
+        double, Element<SPACE_DIM,SPACE_DIM>* pElement)
     {
-        // This is intended to mock different source terms in different mesh regions
-        // (to do it in practice you'd have to make a list of the elements in each region)
-        if (pElement->GetIndex()==0u)
+        /*
+         * This is intended to mock different source terms in different mesh 
+         * regions (to do it in practice you'd have to make a list of the 
+         * elements in each region).
+         */
+        if (pElement->GetIndex() == 0u)
         {
             return 0.0;
         }
@@ -60,12 +65,14 @@ public:
         }
     }
 
-    c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(const ChastePoint<SPACE_DIM>& , Element<SPACE_DIM,SPACE_DIM>* pElement=NULL)
+    c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(
+        const ChastePoint<SPACE_DIM>& rX,
+        Element<SPACE_DIM,SPACE_DIM>* pElement = NULL)
     {
         return identity_matrix<double>(SPACE_DIM);
     }
 
-    double ComputeDuDtCoefficientFunction(const ChastePoint<SPACE_DIM>& )
+    double ComputeDuDtCoefficientFunction(const ChastePoint<SPACE_DIM>& rX)
     {
         return 1;
     }

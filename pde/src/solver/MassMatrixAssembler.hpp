@@ -87,14 +87,14 @@ public:
 
         if (mUseMassLumping)
         {
-            for (unsigned row=0; row<ELEMENT_DIM+1; row++)
+            for (unsigned row = 0; row < ELEMENT_DIM + 1; ++row)
             {
-                for (unsigned column=0; column<ELEMENT_DIM+1; column++)
+                for (unsigned column = 0; column < ELEMENT_DIM + 1; ++column)
                 {
                     if (row != column)
                     {
-                        mass_matrix(row,row) += mass_matrix(row,column);
-                        mass_matrix(row,column) = 0.0;
+                        mass_matrix(row, row) += mass_matrix(row, column);
+                        mass_matrix(row, column) = 0.0;
                     }
                 }
             }

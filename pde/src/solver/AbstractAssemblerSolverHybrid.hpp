@@ -42,12 +42,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NaturalNeumannSurfaceTermAssembler.hpp"
 
 /**
- * A class which inherits from AbstractFeVolumeIntegralAssembler and implements a method SetupGivenLinearSystem(), which sets up
- * the given linear system using the assembler part of this class, which can be called by SetUpLinearSystem() on a
- * concrete solver.
+ * A class which inherits from AbstractFeVolumeIntegralAssembler and implements 
+ * a method SetupGivenLinearSystem(), which sets up the given linear system 
+ * using the assembler part of this class, which can be called by 
+ * SetUpLinearSystem() on a concrete solver.
  *
- * It assumes natural Neumann boundary conditions are needed and uses a NaturalNeumannSurfaceTermAssembler for this
- * part of the vector.
+ * It assumes natural Neumann boundary conditions are needed and uses a 
+ * NaturalNeumannSurfaceTermAssembler for this part of the vector.
  *
  * See SimpleLinearEllipticSolver for an example of a concrete class
  */
@@ -57,15 +58,16 @@ class AbstractAssemblerSolverHybrid
 {
 protected:
 
-    /** An assembler for Neumann surface integrals, which are assumed to arise from natural Neumann boundary
-     *  conditions, ie such that this surface integral is (for a 1-unknown problem) integral(g phi_i dS),
-     *  where g is the Neumann boundary condition function
+    /**
+     * An assembler for Neumann surface integrals, which are assumed to arise 
+     * from natural Neumann boundary conditions, i.e. such that this surface 
+     * integral is (for a 1-unknown problem) integral(g phi_i dS), where g is 
+     * the Neumann boundary condition function.
      */
     NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM> mNaturalNeumannSurfaceTermAssembler;
 
-    /** Boundary conditions container */
+    /** Boundary conditions container. */
     BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>* mpBoundaryConditions;
-
 
 public:
 
@@ -75,8 +77,9 @@ public:
      * @param pMesh pointer to the mesh
      * @param pBoundaryConditions pointer to the boundary conditions.
      */
-    AbstractAssemblerSolverHybrid(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                                  BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>* pBoundaryConditions)
+    AbstractAssemblerSolverHybrid(
+        AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
+        BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>* pBoundaryConditions)
         : AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, true, true, INTERPOLATION_LEVEL>(pMesh),
           mNaturalNeumannSurfaceTermAssembler(pMesh,pBoundaryConditions),
           mpBoundaryConditions(pBoundaryConditions)
@@ -93,24 +96,29 @@ public:
     }
 
     /**
-     * Implementation of AbstractLinearPdeSolver::SetupLinearSystem, using the assembler that this class
-     * also inherits from. Concrete classes inheriting from both this class and
-     * AbstractLinearPdeSolver can then have a one-line implementation of
-     * AbstractLinearPdeSolver::SetupLinearSystem which calls this method.
+     * Implementation of AbstractLinearPdeSolver::SetupLinearSystem, using the 
+     * assembler that this class also inherits from. Concrete classes inheriting 
+     * from both this class and AbstractLinearPdeSolver can then have a one-line 
+     * implementation of AbstractLinearPdeSolver::SetupLinearSystem which calls 
+     * this method.
      *
-     * @param currentSolution The current solution which can be used in setting up
-     *  the linear system if needed (NULL if there isn't a current solution)
-     * @param computeMatrix Whether to compute the LHS matrix of the linear system
-     *  (mainly for dynamic solves)
+     * @param currentSolution The current solution which can be used in setting 
+     *    up the linear system if needed (NULL if there isn't a current solution)
+     * @param computeMatrix Whether to compute the LHS matrix of the linear 
+     *     system (mainly for dynamic solves)
      * @param pLinearSystem  The linear system to set up.
      */
-    void SetupGivenLinearSystem(Vec currentSolution, bool computeMatrix, LinearSystem* pLinearSystem);
+    void SetupGivenLinearSystem(
+        Vec currentSolution,
+        bool computeMatrix,
+        LinearSystem* pLinearSystem);
 };
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, InterpolationLevel INTERPOLATION_LEVEL>
-void AbstractAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, INTERPOLATION_LEVEL>::SetupGivenLinearSystem(Vec currentSolution,
-                                                                                                                     bool computeMatrix,
-                                                                                                                     LinearSystem* pLinearSystem)
+void AbstractAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, INTERPOLATION_LEVEL>::SetupGivenLinearSystem(
+    Vec currentSolution,
+    bool computeMatrix,
+    LinearSystem* pLinearSystem)
 {
     assert(pLinearSystem->rGetLhsMatrix() != nullptr);
     assert(pLinearSystem->rGetRhsVector() != nullptr);
@@ -133,8 +141,10 @@ void AbstractAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, INTERPOL
         this->AssembleVector();
     }
 
-    // Add the Neumann boundary conditions. The boundary conditions put into the BoundaryConditionsContainer
-    // are assumed to be natural Neumann BCs.
+    /*
+     * Add the Neumann boundary conditions. The boundary conditions put into the 
+     * BoundaryConditionsContainer are assumed to be natural Neumann BCs.
+     */
     mNaturalNeumannSurfaceTermAssembler.SetVectorToAssemble(pLinearSystem->rGetRhsVector(), false);
     mNaturalNeumannSurfaceTermAssembler.Assemble();
 

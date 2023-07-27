@@ -63,30 +63,32 @@ public:
         {
             std::vector<Node<1>*> nodes(num_nodes);
 
-            for (int i=0; i<num_nodes; i++)
+            for (int i = 0; i < num_nodes; ++i)
             {
                 nodes[i] = new Node<1>(i,true,0);
                 ConstBoundaryCondition<1>* p_boundary_condition =
-                    new ConstBoundaryCondition<1>((double)i);
+                    new ConstBoundaryCondition<1>(static_cast<double>(i));
                 bcc1.AddDirichletBoundaryCondition(nodes[i], p_boundary_condition);
             }
             bcc1.ResetDirichletCommunication();
             TS_ASSERT(bcc1.HasDirichletBoundaryConditions());
 
-            for (int i=0; i<num_nodes; i++)
+            for (int i = 0; i < num_nodes; ++i)
             {
                 double value = bcc1.GetDirichletBCValue(nodes[i]);
                 TS_ASSERT_DELTA( value, i, 1e-12 );
             }
 
-            for (int i=0; i<num_nodes; i++)
+            for (int i = 0; i < num_nodes; ++i)
             {
                 delete nodes[i];
             }
         }
         int num_elem = 10;
         std::vector<BoundaryElement<0,1> > elements;
-        for (unsigned element_index=0; element_index< (unsigned) num_elem; element_index++)
+        for (unsigned element_index = 0;
+             element_index < static_cast<unsigned>(num_elem);
+             ++element_index)
         {
             std::vector<Node<1>*> nodes;
             Node<1>* node = new Node<1>(element_index,true,0);
@@ -95,14 +97,14 @@ public:
             BoundaryElement<0,1> element(element_index, nodes);
             elements.push_back(element);
         }
-        for (int i=0; i<num_elem; i++)
+        for (int i = 0; i < num_elem; ++i)
         {
             ConstBoundaryCondition<1>* p_boundary_condition =
-                new ConstBoundaryCondition<1>((double)i);
+                new ConstBoundaryCondition<1>(static_cast<double>(i));
             bcc1.AddNeumannBoundaryCondition(&elements[i], p_boundary_condition);
         }
 
-        for (int i=0; i<num_elem; i++)
+        for (int i = 0; i < num_elem; ++i)
         {
             double value = bcc1.GetNeumannBCValue(&elements[i], elements[i].GetNode(0)->GetIndex() );
             TS_ASSERT_DELTA( value, i, 1e-12 );
@@ -115,28 +117,30 @@ public:
         BoundaryConditionsContainer<2,2,1> bcc2;
 
         std::vector<Node<2>*> nodes2(num_nodes);
-        for (int i=0; i<num_nodes; i++)
+        for (int i = 0; i < num_nodes; ++i)
         {
             nodes2[i] = new Node<2>(i,true,0,0);
             ConstBoundaryCondition<2>* p_boundary_condition =
-                new ConstBoundaryCondition<2>((double)i);
+                new ConstBoundaryCondition<2>(static_cast<double>(i));
             bcc2.AddDirichletBoundaryCondition(nodes2[i], p_boundary_condition);
         }
 
-        for (int i=0; i<num_nodes; i++)
+        for (int i = 0; i < num_nodes; ++i)
         {
             double value = bcc2.GetDirichletBCValue(nodes2[i]);
             TS_ASSERT_DELTA( value, i, 1e-12 );
         }
 
-        for (int i=0; i<num_nodes; i++)
+        for (int i = 0; i < num_nodes; ++i)
         {
             delete nodes2[i];
         }
 
         num_elem = 10;
         std::vector<BoundaryElement<1,2> > elements2;
-        for (unsigned element_index=0; element_index< (unsigned) num_elem; element_index++)
+        for (unsigned element_index = 0;
+             element_index < static_cast<unsigned>(num_elem);
+             ++element_index)
         {
             std::vector<Node<2>* > nodes;
             Node<2>* node0 = new Node<2>(element_index,true,0,0);
@@ -148,14 +152,14 @@ public:
 
             elements2.push_back(element);
         }
-        for (int i=0; i<num_elem; i++)
+        for (int i = 0; i < num_elem; ++i)
         {
             ConstBoundaryCondition<2>* p_boundary_condition =
-                new ConstBoundaryCondition<2>((double)i);
+                new ConstBoundaryCondition<2>(static_cast<double>(i));
             bcc2.AddNeumannBoundaryCondition(&elements2[i], p_boundary_condition);
         }
 
-        for (int i=0; i<num_elem; i++)
+        for (int i = 0; i < num_elem; ++i)
         {
             double value = bcc2.GetNeumannBCValue(&elements2[i], elements2[i].GetNode(0)->GetIndex() );
             TS_ASSERT_DELTA( value, i, 1e-12 );
@@ -169,32 +173,32 @@ public:
         BoundaryConditionsContainer<3,3,1> bcc3;
 
         std::vector<Node<3>*> nodes3(num_nodes);
-        for (int i=0; i<num_nodes; i++)
+        for (int i = 0; i < num_nodes; ++i)
         {
             nodes3[i] = new Node<3>(i,true,0,0);
             ConstBoundaryCondition<3>* p_boundary_condition =
-                new ConstBoundaryCondition<3>((double)i);
+                new ConstBoundaryCondition<3>(static_cast<double>(i));
             bcc3.AddDirichletBoundaryCondition(nodes3[i], p_boundary_condition);
         }
 
-        for (int i=0; i<num_nodes; i++)
+        for (int i = 0; i < num_nodes; ++i)
         {
             double value = bcc3.GetDirichletBCValue(nodes3[i]);
             TS_ASSERT_DELTA( value, i, 1e-12 );
         }
-        for (int i=0; i<num_nodes; i++)
+        for (int i = 0; i < num_nodes; ++i)
         {
             delete nodes3[i];
         }
 
         num_elem = 10;
         std::vector<BoundaryElement<2,3> > elements3;
-        for (int element_index=0; element_index<num_elem; element_index++)
+        for (int element_index = 0; element_index < num_elem; ++element_index)
         {
             std::vector<Node<3>* > nodes;
-            Node<3>* node0 = new Node<3>(element_index,true,0,0,0);
-            Node<3>* node1 = new Node<3>(element_index,true,1,0,0);
-            Node<3>* node2 = new Node<3>(element_index,true,0,1,0);
+            Node<3>* node0 = new Node<3>(element_index, true, 0, 0, 0);
+            Node<3>* node1 = new Node<3>(element_index, true, 1, 0, 0);
+            Node<3>* node2 = new Node<3>(element_index, true, 0, 1, 0);
             nodes.push_back(node0);
             nodes.push_back(node1);
             nodes.push_back(node2);
@@ -202,14 +206,14 @@ public:
 
             elements3.push_back(element);
         }
-        for (int i=0; i<num_elem; i++)
+        for (int i = 0; i < num_elem; ++i)
         {
             ConstBoundaryCondition<3>* p_boundary_condition =
-                new ConstBoundaryCondition<3>((double)i);
+                new ConstBoundaryCondition<3>(static_cast<double>(i));
             bcc3.AddNeumannBoundaryCondition(&elements3[i], p_boundary_condition);
         }
 
-        for (int i=0; i<num_elem; i++)
+        for (int i = 0; i < num_elem; ++i)
         {
             double value = bcc3.GetNeumannBCValue(&elements3[i], elements3[i].GetNode(0)->GetIndex() );
             TS_ASSERT_DELTA( value, i, 1e-12 );
@@ -223,9 +227,9 @@ public:
     {
         const int SIZE = 10;
         LinearSystem linear_system(SIZE, SIZE);
-        for (int i=0; i<SIZE; i++)
+        for (int i = 0; i < SIZE; ++i)
         {
-            for (int j=0; j<SIZE; j++)
+            for (int j = 0; j < SIZE; ++j)
             {
                 // LHS matrix is all 1s
                 linear_system.SetMatrixElement(i,j,1);
@@ -240,7 +244,7 @@ public:
         BoundaryConditionsContainer<3,3,1> bcc3;
 
         // Apply dirichlet boundary conditions to all but last node
-        for (int i=0; i<SIZE-1; i++)
+        for (int i = 0; i < SIZE-1; ++i)
         {
             nodes_array[i] = new Node<3>(i,true);
             ConstBoundaryCondition<3>* p_boundary_condition =
@@ -255,7 +259,7 @@ public:
         // apply dirichlet bcs to matrix but not rhs vector
         bcc3.ApplyDirichletToLinearProblem(linear_system, true, false);
         ReplicatableVector vec_repl(linear_system.GetRhsVector());
-        for (unsigned i=0; i<(unsigned)SIZE; i++)
+        for (unsigned i = 0; i < static_cast<unsigned>(SIZE); ++i)
         {
             TS_ASSERT_EQUALS(vec_repl[i], 2.0);
         }
@@ -283,18 +287,18 @@ public:
         /// \todo: this is very naughty. Must be checked in parallel as well.
         PetscInt lo, hi;
         PetscMatTools::GetOwnershipRange(linear_system.rGetLhsMatrix(), lo, hi);
-        for (int row=lo; row<hi; row++)
+        for (int row = lo; row < hi; ++row)
         {
             if (row<SIZE-1)
             {
-                for (int column=0; column<row; column++)
+                for (int column = 0; column < row; ++column)
                 {
                     TS_ASSERT_EQUALS(linear_system.GetMatrixElement(row,column), 0);
                 }
 
                 TS_ASSERT_EQUALS(linear_system.GetMatrixElement(row,row), 1);
 
-                for (int column=row+1; column<SIZE; column++)
+                for (int column = row + 1; column < SIZE; ++column)
                 {
                     TS_ASSERT_EQUALS(linear_system.GetMatrixElement(row,column), 0);
                 }
@@ -302,7 +306,7 @@ public:
 
             if (row==SIZE-1)
             {
-                for (int column=0; column<SIZE; column++)
+                for (int column = 0; column < SIZE; ++column)
                 {
                     TS_ASSERT_EQUALS(linear_system.GetMatrixElement(row,column), 1);
                 }
@@ -321,7 +325,7 @@ public:
             TS_ASSERT_DELTA(d_solution[index], expected, 1e-6 );
         }
 
-        for (int i=0; i<SIZE-1; i++)
+        for (int i = 0; i < SIZE-1; ++i)
         {
             delete nodes_array[i];
         }
@@ -334,9 +338,9 @@ public:
         LinearSystem linear_system(SIZE, SIZE);
         linear_system.SetMatrixIsSymmetric(true);
 
-        for (int i=0; i<SIZE; i++)
+        for (int i = 0; i < SIZE; ++i)
         {
-            for (int j=0; j<SIZE; j++)
+            for (int j = 0; j < SIZE; ++j)
             {
                 // LHS matrix is all 1s
                 linear_system.SetMatrixElement(i,j,1);
@@ -351,7 +355,7 @@ public:
         BoundaryConditionsContainer<3,3,1> bcc3;
 
         // Apply dirichlet boundary conditions to all but last node
-        for (int i=0; i<SIZE-1; i++)
+        for (int i = 0; i < SIZE-1; ++i)
         {
             nodes_array[i] = new Node<3>(i,true);
             ConstBoundaryCondition<3>* p_boundary_condition =
@@ -375,16 +379,16 @@ public:
         int lo, hi;
         linear_system.GetOwnershipRange(lo, hi);
 
-        for (int row=lo; row<hi; row++)
+        for (int row = lo; row < hi; ++row)
         {
-            for (int column=0; column<row; column++)
+            for (int column = 0; column < row; ++column)
             {
                 TS_ASSERT_EQUALS(linear_system.GetMatrixElement(row,column), 0);
             }
 
             TS_ASSERT_EQUALS(linear_system.GetMatrixElement(row,row), 1);
 
-            for (int column=row+1; column<SIZE; column++)
+            for (int column = row + 1; column < SIZE; ++column)
             {
                 TS_ASSERT_EQUALS(linear_system.GetMatrixElement(row,column), 0);
             }
@@ -402,7 +406,7 @@ public:
             TS_ASSERT_DELTA(d_solution[index], expected, 1e-6 );
         }
 
-        for (int i=0; i<SIZE-1; i++)
+        for (int i = 0; i < SIZE-1; ++i)
         {
             delete nodes_array[i];
         }
@@ -435,7 +439,7 @@ public:
         Node<3>* nodes_array[SIZE];
         BoundaryConditionsContainer<3,3,1> bcc3;
 
-        for (int i = 0; i < SIZE-1; i++)
+        for (int i = 0; i < SIZE-1; ++i)
         {
             nodes_array[i] = new Node<3>(i, true);
             ConstBoundaryCondition<3>* p_boundary_condition =
@@ -462,7 +466,7 @@ public:
             }
         }
 
-        for (int i=0; i < SIZE-1; i++)
+        for (int i=0; i < SIZE-1; ++i)
         {
             delete nodes_array[i];
         }
@@ -483,7 +487,7 @@ public:
         bcc.DefineZeroDirichletOnMeshBoundary(&mesh);
 
         // Check boundary nodes have the right condition
-        for (int i=0; i<4; i++)
+        for (int i = 0; i < 4; ++i)
         {
             double value = bcc.GetDirichletBCValue(mesh.GetNode(i));
             TS_ASSERT_DELTA(value, 0.0, 1e-12);
@@ -602,9 +606,9 @@ public:
         LinearSystem linear_system(template_vec, 2*SIZE);
         PetscTools::Destroy(template_vec);
 
-        for (int i = 0; i < 2*SIZE; i++)
+        for (int i = 0; i < 2*SIZE; ++i)
         {
-            for (int j = 0; j < 2*SIZE; j++)
+            for (int j = 0; j < 2*SIZE; ++j)
             {
                 // LHS matrix is all 1s
                 linear_system.SetMatrixElement(i,j,1);
@@ -619,7 +623,7 @@ public:
         BoundaryConditionsContainer<3,3,2> bcc32;
 
         // Apply dirichlet boundary conditions to all but last node
-        for (int i = 0; i < SIZE-1; i++)
+        for (int i = 0; i < SIZE-1; ++i)
         {
             nodes_array[i] = new Node<3>(i,true);
 
@@ -663,7 +667,7 @@ public:
 
         }
 
-        for (int i = 0; i < SIZE-1; i++)
+        for (int i = 0; i < SIZE-1; ++i)
         {
             delete nodes_array[i];
         }
@@ -680,9 +684,9 @@ public:
         LinearSystem linear_system(template_vec, 3*SIZE);
         PetscTools::Destroy(template_vec);
 
-        for (int i = 0; i < 3*SIZE; i++)
+        for (int i = 0; i < 3*SIZE; ++i)
         {
-            for (int j = 0; j < 3*SIZE; j++)
+            for (int j = 0; j < 3*SIZE; ++j)
             {
                 // LHS matrix is all 1s
                 linear_system.SetMatrixElement(i,j,1);
@@ -697,7 +701,7 @@ public:
         BoundaryConditionsContainer<3,3,3> bcc33;
 
         // Apply dirichlet boundary conditions to all but last node
-        for (int i = 0; i < SIZE-1; i++)
+        for (int i = 0; i < SIZE-1; ++i)
         {
             nodes_array[i] = new Node<3>(i,true);
 
@@ -737,7 +741,7 @@ public:
             }
 
         }
-        for (int i = 0; i < SIZE-1; i++)
+        for (int i = 0; i < SIZE-1; ++i)
         {
             delete nodes_array[i];
         }
@@ -761,7 +765,7 @@ public:
         int lo, hi;
         VecGetOwnershipRange(solution, &lo, &hi);
 
-        for (int global_index=lo; global_index<hi; global_index++)
+        for (int global_index = lo; global_index < hi; ++global_index)
         {
             int local_index = global_index - lo;
             p_solution[local_index] = global_index;
@@ -774,7 +778,7 @@ public:
         Node<3>* nodes_array[SIZE];
         BoundaryConditionsContainer<3,3,3> bcc33;
 
-        for (int i = 0; i < SIZE; i++)
+        for (int i = 0; i < SIZE; ++i)
         {
             nodes_array[i] = new Node<3>(i,true);
 
@@ -792,7 +796,7 @@ public:
         VecGetArray(solution, &p_solution);
         VecGetArray(residual, &p_residual);
 
-        for (int global_index = lo; global_index < hi; global_index++)
+        for (int global_index = lo; global_index < hi; ++global_index)
         {
             int local_index = global_index - lo;
 
@@ -812,7 +816,7 @@ public:
                 TS_ASSERT_DELTA(p_residual[local_index], global_index+3, 1e-12);
             }
         }
-        for (int i = 0; i < SIZE; i++)
+        for (int i = 0; i < SIZE; ++i)
         {
             delete nodes_array[i];
         }
@@ -833,9 +837,9 @@ public:
         LinearSystem linear_system(template_vec, 2*SIZE);
         PetscTools::Destroy(template_vec);
 
-        for (int i = 0; i < 2*SIZE; i++)
+        for (int i = 0; i < 2*SIZE; ++i)
         {
-            for (int j = 0; j < 2*SIZE; j++)
+            for (int j = 0; j < 2*SIZE; ++j)
             {
                 // LHS matrix is all 2s
                 linear_system.SetMatrixElement(i,j,2);
@@ -849,7 +853,7 @@ public:
         Node<3>* nodes[SIZE];
         BoundaryConditionsContainer<3,3,2> bcc;
 
-        for (unsigned i=0; i<SIZE-1; i++)
+        for (unsigned i = 0; i < SIZE-1; ++i)
         {
             nodes[i] = new Node<3>(i,true);
         }
@@ -886,14 +890,14 @@ public:
 
         PetscInt lo, hi;
         PetscMatTools::GetOwnershipRange(r_mat, lo, hi);
-        for (int i=lo; i<hi; i++)
+        for (int i=lo; i<hi; ++i)
         {
             if (i==0 || i==1 || i==4 || i==5)
             {
                 unsigned col_one = i;
                 unsigned col_minus_one = i+2;
 
-                for (unsigned j=0; j<2*SIZE; j++)
+                for (unsigned j = 0; j < 2*SIZE; ++j)
                 {
                     double val = 0.0;
                     if (j==col_one)
@@ -909,14 +913,14 @@ public:
             }
             else
             {
-                for (unsigned j=0; j<2*SIZE; j++)
+                for (unsigned j = 0; j < 2*SIZE; ++j)
                 {
                     TS_ASSERT_DELTA( PetscMatTools::GetElement(r_mat, i, j), 2.0, 1e-12);
                 }
             }
         }
 
-        for (unsigned i=0; i<SIZE-1; i++)
+        for (unsigned i = 0; i < SIZE-1; ++i)
         {
             delete nodes[i];
         }

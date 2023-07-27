@@ -39,8 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractHdf5Converter.hpp"
 
 /**
- * This class converts from Hdf5 format to Vtk format.
- * The output will be one .vtu file with separate vtkPointData for each time step.
+ * This class converts from Hdf5 format to Vtk format. The output will be one 
+ * .vtu file with separate vtkPointData for each time step.
  */
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class Hdf5ToVtkConverter : public AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>
@@ -49,13 +49,17 @@ public:
     /**
      * Constructor, which does the conversion and writes the .vtu file.
      *
-     * @note This method is collective, and hence must be called by all processes.
+     * @note This method is collective, and hence must be called by all 
+     *     processes.
      *
-     * @param rInputDirectory The input directory, relative to CHASTE_TEST_OUTPUT, where the .h5 file has been written
+     * @param rInputDirectory The input directory, relative to 
+     *     CHASTE_TEST_OUTPUT, where the .h5 file has been written
      * @param rFileBaseName The base name of the data file.
      * @param pMesh Pointer to the mesh.
-     * @param parallelVtk When true, write with .pvtu and fragment meshes (only works for DistributedTetrahedralMesh)
-     * @param usingOriginalNodeOrdering Whether HDF5 output was written using the original node ordering
+     * @param parallelVtk When true, write with .pvtu and fragment meshes (only 
+     *     works for DistributedTetrahedralMesh)
+     * @param usingOriginalNodeOrdering Whether HDF5 output was written using 
+     *     the original node ordering
      */
     Hdf5ToVtkConverter(const FileFinder& rInputDirectory,
                        const std::string& rFileBaseName,

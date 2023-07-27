@@ -35,8 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractBoundaryConditionsContainerImplementation.hpp"
 
-//////////////// Explicit instantiation//////////////
-
+// Explicit instantiation
 template class AbstractBoundaryConditionsContainer<1,1,1>;
 template class AbstractBoundaryConditionsContainer<1,2,1>;
 template class AbstractBoundaryConditionsContainer<1,3,1>;

@@ -57,7 +57,7 @@ public:
     void TestAssertionWithNonRationalTimeStep()
     {
         PdeSimulationTime::SetTime(5.0);
-        for (unsigned i=1; i<100; i++)
+        for (unsigned i=1; i<100; ++i)
         {
             double end_time = 5.0+0.1*i;
             /*

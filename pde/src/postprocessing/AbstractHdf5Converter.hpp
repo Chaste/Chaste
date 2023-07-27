@@ -43,24 +43,28 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /**
- * The derived children of this class convert output from Hdf5 format to
- * a range of other formats for postprocessing.
+ * The derived children of this class convert output from Hdf5 format to a range 
+ * of other formats for postprocessing.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class AbstractHdf5Converter
 {
 private:
+
     /**
-     * Have a look in the HDF5 file and generate a list of the datasets that it contains.
+     * Have a look in the HDF5 file and generate a list of the datasets that it 
+     * contains.
      *
      * @param rH5Folder  The directory the h5 file is in.
      * @param rFileName  The name of the h5 file.
      */
-    void GenerateListOfDatasets(const FileFinder& rH5Folder, const std::string& rFileName);
+    void GenerateListOfDatasets(
+        const FileFinder& rH5Folder,
+        const std::string& rFileName);
 
 protected:
 
-    /** Folder that the h5 file to convert resides in */
+    /** Folder that the h5 file to convert resides in. */
     const FileFinder& mrH5Folder;
 
     /** Pointer to reader of the dataset to be converted. */
@@ -75,14 +79,12 @@ protected:
     /**
      * The datasets that we are working with.
      *
-     * 'Data' is a special case and handled slightly
-     * differently as all variables use the same 'time'.
+     * 'Data' is a special case and handled slightly differently as all 
+     * variables use the same 'time'.
      */
     std::vector<std::string> mDatasetNames;
 
-    /**
-     * The index of the dataset that is currently open.
-     */
+    /** The index of the dataset that is currently open. */
     unsigned mOpenDatasetIndex;
 
     /** Pointer to a mesh. */
@@ -92,21 +94,20 @@ protected:
     OutputFileHandler* mpOutputFileHandler;
 
     /**
-     * Get the subdirectory in which the converted output is stored,
-     * relative to the input directory.
+     * Get the subdirectory in which the converted output is stored, relative to 
+     * the input directory.
      */
     std::string mRelativeSubdirectory;
 
     /**
-     * The precision with which to write files:
-     * that is, the number of digits to use in numerical output.
+     * The precision with which to write files: that is, the number of digits to 
+     * use in numerical output.
      */
     unsigned mPrecision;
 
     /**
-     * Close the existing dataset and open a new one.
-     *
-     * This method deletes the existing mpDataReader, and opens a new one for the new dataset.
+     * Close the existing dataset and open a new one. This method deletes the 
+     * existing mpDataReader, and opens a new one for the new dataset.
      *
      * @return whether a new dataset is open, false if we have run out of them.
      */
@@ -119,10 +120,12 @@ public:
      *
      * @note This method is collective, and must be called by all processes.
      *
-     * @param rInputDirectory  The input directory, where the .h5 file to post-process is.
+     * @param rInputDirectory  The input directory, where the .h5 file to 
+     *     post-process is.
      * @param rFileBaseName  The base name of the data file.
      * @param pMesh  Pointer to the mesh.
-     * @param rSubdirectoryName  Name for the output directory to be created (relative to inputDirectory).
+     * @param rSubdirectoryName  Name for the output directory to be created 
+     *     (relative to inputDirectory).
      * @param precision  The number of digits to use in numerical output to file.
      */
     AbstractHdf5Converter(const FileFinder& rInputDirectory,
@@ -142,7 +145,8 @@ public:
     ~AbstractHdf5Converter();
 
     /**
-     * @return the relative path of the sub-directory in which the converted output is stored.
+     * @return the relative path of the sub-directory in which the converted 
+     *     output is stored.
      */
     std::string GetSubdirectory();
 };

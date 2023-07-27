@@ -45,8 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * A simple elliptic PDE in 1 unknown with nonlinear diffusion term as
  * well as nonlinear source term:
  *
- *  0 = Grad.(DiffusionTerm(x,u)*Grad(u))+LinearSourceTerm(x)+NonlinearSourceTerm(x, u)
- *
+ *  0 = Grad.(DiffusionTerm(x,u)*Grad(u)) + LinearSourceTerm(x)
+ *                                        + NonlinearSourceTerm(x, u).
  */
 template <unsigned SPACE_DIM>
 class AbstractNonlinearEllipticPde
@@ -54,43 +54,54 @@ class AbstractNonlinearEllipticPde
 public:
 
     /**
-     * @return computed linear source term.
-     *
      * @param rX the point in space at which the linear source term is computed
+     * 
+     * @return computed linear source term.
      */
-    virtual double ComputeLinearSourceTerm(const ChastePoint<SPACE_DIM>& rX)=0;
+    virtual double ComputeLinearSourceTerm(const ChastePoint<SPACE_DIM>& rX) = 0;
 
     /**
+     * @param rX the point in space at which the nonlinear source term is 
+     *     computed
+     * @param u the value of the dependent variable at the point
+     * 
      * @return computed nonlinear source term.
-     *
-     * @param rX the point in space at which the nonlinear source term is computed
-     * @param u the value of the dependent variable at the point
      */
-    virtual double ComputeNonlinearSourceTerm(const ChastePoint<SPACE_DIM>& rX, double u)=0;
+    virtual double ComputeNonlinearSourceTerm(
+        const ChastePoint<SPACE_DIM>& rX,
+        double u) = 0;
 
     /**
-     * @return computed diffusion term. The diffusion tensor should be symmetric and positive definite.
-     *
-     * @param rX the point in space at which the diffusion term is computed.
+     * @param rX the point in space at which the diffusion term is computed
      * @param u the value of the dependent variable at the point
+     * 
+     * @return computed diffusion term. The diffusion tensor should be symmetric 
+     * and positive definite.
      */
-    virtual c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(const ChastePoint<SPACE_DIM>& rX, double u)=0;
+    virtual c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(
+        const ChastePoint<SPACE_DIM>& rX,
+        double u) = 0;
 
     /**
+     * @param rX the point in space at which the diffusion term is computed
+     * @param u the value of the dependent variable at the point
+     * 
      * @return computed derivative of diffusion term.
-     *
-     * @param rX the point in space at which the diffusion term is computed.
-     * @param u the value of the dependent variable at the point
      */
-    virtual c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTermPrime(const ChastePoint<SPACE_DIM>& rX, double u)=0;
+    virtual c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTermPrime(
+        const ChastePoint<SPACE_DIM>& rX,
+        double u) = 0;
 
     /**
-     * @return computed derivative of nonlinear source term.
-     *
-     * @param rX the point in space at which the nonlinear source term is computed
+     * @param rX the point in space at which the nonlinear source term is 
+     *     computed
      * @param u the value of the dependent variable at the point
+     * 
+     * @return computed derivative of nonlinear source term.
      */
-    virtual double ComputeNonlinearSourceTermPrime(const ChastePoint<SPACE_DIM>& rX, double u)=0;
+    virtual double ComputeNonlinearSourceTermPrime(
+        const ChastePoint<SPACE_DIM>& rX,
+        double u) = 0;
 
     /**
      * Destructor.

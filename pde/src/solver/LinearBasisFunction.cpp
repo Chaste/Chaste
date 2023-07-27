@@ -284,13 +284,20 @@ c_vector<double,1> LinearBasisFunction<1>::ComputeBasisFunctionDerivative(
  * @param rReturnValue A reference to a vector, to be filled in
  */
 template <unsigned ELEMENT_DIM>
-void LinearBasisFunction<ELEMENT_DIM>::ComputeBasisFunctions(const ChastePoint<ELEMENT_DIM>& rPoint,
-                                                          c_vector<double, ELEMENT_DIM+1>& rReturnValue)
+void LinearBasisFunction<ELEMENT_DIM>::ComputeBasisFunctions(
+    const ChastePoint<ELEMENT_DIM>& rPoint,
+    c_vector<double, ELEMENT_DIM+1>& rReturnValue)
 {
-    assert(ELEMENT_DIM < 4 && ELEMENT_DIM > 0);
-    for (unsigned i=0; i<ELEMENT_DIM+1; i++)
+    if constexpr(ELEMENT_DIM < 4 && ELEMENT_DIM > 0)
     {
-        rReturnValue(i) = ComputeBasisFunction(rPoint, i);
+        for (unsigned i = 0; i < ELEMENT_DIM + 1; ++i)
+        {
+            rReturnValue(i) = ComputeBasisFunction(rPoint, i);
+        }
+    }
+    else
+    {
+        NEVER_REACHED;
     }
 }
 
@@ -318,15 +325,21 @@ void LinearBasisFunction<0>::ComputeBasisFunctions(const ChastePoint<0>& rPoint,
  *     a matrix in local index order.
  */
 template <unsigned ELEMENT_DIM>
-void LinearBasisFunction<ELEMENT_DIM>::ComputeBasisFunctionDerivatives(const ChastePoint<ELEMENT_DIM>& rPoint,
-                                                                    c_matrix<double, ELEMENT_DIM, ELEMENT_DIM+1>& rReturnValue)
+void LinearBasisFunction<ELEMENT_DIM>::ComputeBasisFunctionDerivatives(
+    const ChastePoint<ELEMENT_DIM>& rPoint,
+    c_matrix<double, ELEMENT_DIM, ELEMENT_DIM+1>& rReturnValue)
 {
-    assert(ELEMENT_DIM < 4 && ELEMENT_DIM > 0);
-
-    for (unsigned j=0; j<ELEMENT_DIM+1; j++)
+    if constexpr (ELEMENT_DIM < 4 && ELEMENT_DIM > 0)
     {
-        matrix_column<c_matrix<double, ELEMENT_DIM, ELEMENT_DIM+1> > column(rReturnValue, j);
-        column = ComputeBasisFunctionDerivative(rPoint, j);
+        for (unsigned j = 0; j < ELEMENT_DIM + 1; ++j)
+        {
+            matrix_column<c_matrix<double, ELEMENT_DIM, ELEMENT_DIM+1> > column(rReturnValue, j);
+            column = ComputeBasisFunctionDerivative(rPoint, j);
+        }
+    }
+    else
+    {
+        NEVER_REACHED;
     }
 }
 
@@ -345,14 +358,20 @@ void LinearBasisFunction<ELEMENT_DIM>::ComputeBasisFunctionDerivatives(const Cha
  *     derivative along each axis.
  */
 template <unsigned ELEMENT_DIM>
-void LinearBasisFunction<ELEMENT_DIM>::ComputeTransformedBasisFunctionDerivatives(const ChastePoint<ELEMENT_DIM>& rPoint,
-                                                                               const c_matrix<double, ELEMENT_DIM, ELEMENT_DIM>& rInverseJacobian,
-                                                                               c_matrix<double, ELEMENT_DIM, ELEMENT_DIM+1>& rReturnValue)
+void LinearBasisFunction<ELEMENT_DIM>::ComputeTransformedBasisFunctionDerivatives(
+    const ChastePoint<ELEMENT_DIM>& rPoint,
+    const c_matrix<double, ELEMENT_DIM, ELEMENT_DIM>& rInverseJacobian,
+    c_matrix<double, ELEMENT_DIM, ELEMENT_DIM+1>& rReturnValue)
 {
-    assert(ELEMENT_DIM < 4 && ELEMENT_DIM > 0);
-
-    ComputeBasisFunctionDerivatives(rPoint, rReturnValue);
-    rReturnValue = prod(trans(rInverseJacobian), rReturnValue);
+    if constexpr (ELEMENT_DIM < 4 && ELEMENT_DIM > 0)
+    {
+        ComputeBasisFunctionDerivatives(rPoint, rReturnValue);
+        rReturnValue = prod(trans(rInverseJacobian), rReturnValue);
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 // Explicit instantiation

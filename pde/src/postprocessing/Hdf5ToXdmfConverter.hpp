@@ -38,10 +38,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractHdf5Converter.hpp"
 #include "XdmfMeshWriter.hpp"
+
 /**
- * This class "converts" from Hdf5 format to XDMF format.
- * The output will be one .xdmf master file with separate geometry/topology files.
- * The HDF5 data is not converted, but is rather linked to by the .xdmf master file
+ * This class "converts" from Hdf5 format to XDMF format. The output will be one 
+ * .xdmf master file with separate geometry/topology files. The HDF5 data is not 
+ * converted, but is rather linked to by the .xdmf master file.
  */
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class Hdf5ToXdmfConverter :
@@ -49,12 +50,15 @@ class Hdf5ToXdmfConverter :
     public XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>
 {
 public:
+
     /**
      * Constructor, which does the conversion and writes the .vtu file.
      *
-     * @note This method is collective, and hence must be called by all processes.
+     * @note This method is collective, and hence must be called by all 
+     * processes.
      *
-     * @param rInputDirectory The input directory, relative to CHASTE_TEST_OUTPUT, where the .h5 file has been written
+     * @param rInputDirectory The input directory, relative to 
+     *     CHASTE_TEST_OUTPUT, where the .h5 file has been written
      * @param rFileBaseName The base name of the data file.
      * @param pMesh Pointer to the mesh.
      */
@@ -63,8 +67,10 @@ public:
             AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
 #ifndef _MSC_VER
     /**
-     * Generate Attribute tags and append to the element.  Here this is a dummy class, but can be
-     * overloaded with real variables elsewhere (see pde/src/postprocesssing/Hdf5toXdmfConverter).
+     * Generate Attribute tags and append to the element. Here this is a dummy 
+     * class, but can be overloaded with real variables elsewhere (see 
+     * pde/src/postprocesssing/Hdf5toXdmfConverter).
+     * 
      * @param pGridElement  Pointer to DOMElement to append Attribute tags to.
      * @param pDomDocument  Pointer to DOMDocument to generate new elements.
      * @param timeStep  Index of time point to write.

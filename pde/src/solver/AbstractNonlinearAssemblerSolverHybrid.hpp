@@ -256,19 +256,26 @@ AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Abs
        mpBoundaryConditions(pBoundaryConditions)
 {
     /*
-     * Note: if this is run with SPACE_DIM != ELEMENT_DIM the class has to be checked:
-     * there may be lots of places where we should be using SPACE_DIM not ELEMENT_DIM.
+     * Note: if this is run with SPACE_DIM != ELEMENT_DIM the class has to be 
+     * checked: there may be lots of places where we should be using SPACE_DIM 
+     * not ELEMENT_DIM.
      */
-    assert(SPACE_DIM==ELEMENT_DIM);
-    assert(pMesh!=nullptr);
-    assert(pBoundaryConditions!=nullptr);
+    if constexpr (SPACE_DIM == ELEMENT_DIM)
+    {
+        assert(pMesh!=nullptr);
+        assert(pBoundaryConditions!=nullptr);
 
-    mpSolver = new SimplePetscNonlinearSolver;
-    mWeAllocatedSolverMemory = true;
+        mpSolver = new SimplePetscNonlinearSolver;
+        mWeAllocatedSolverMemory = true;
 
-    assert(mpMesh->GetNumNodes() == mpMesh->GetDistributedVectorFactory()->GetProblemSize());
+        assert(mpMesh->GetNumNodes() == mpMesh->GetDistributedVectorFactory()->GetProblemSize());
 
-    mpNeumannSurfaceTermsAssembler = new NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>(pMesh,pBoundaryConditions);
+        mpNeumannSurfaceTermsAssembler = new NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>(pMesh,pBoundaryConditions);
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
@@ -369,7 +376,9 @@ void AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>
     unsigned hi = ihi;
 
     // Iterate over entries in the input vector
-    for (unsigned global_index_outer = 0; global_index_outer < num_unknowns; global_index_outer++)
+    for (unsigned global_index_outer = 0;
+         global_index_outer < num_unknowns;
+         ++global_index_outer)
     {
         // Only perturb if we own it
         PetscVecTools::AddToElement(current_guess_copy, global_index_outer, h);
@@ -382,8 +391,8 @@ void AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>
         double* p_result;
         ///\todo This loop is setting the column "global_index_outer" of
         /// the Jacobian matrix to the result vector in a non-sparse way.
-        PETSCEXCEPT( VecGetArray(result, &p_result) );
-        for (unsigned global_index=lo; global_index < hi; global_index++)
+        PETSCEXCEPT(VecGetArray(result, &p_result));
+        for (unsigned global_index = lo; global_index < hi; ++global_index)
         {
             double result_entry = p_result[ global_index - lo];
             if (!CompareDoubles::IsNearZero(result_entry, near_hsquared))
@@ -391,7 +400,7 @@ void AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>
                 PetscMatTools::SetElement(*pJacobian, global_index, global_index_outer, result_entry);
             }
         }
-        PETSCEXCEPT( VecRestoreArray(result, &p_result) );
+        PETSCEXCEPT(VecRestoreArray(result, &p_result));
 
         PetscVecTools::AddToElement(current_guess_copy, global_index_outer, -h);
     }

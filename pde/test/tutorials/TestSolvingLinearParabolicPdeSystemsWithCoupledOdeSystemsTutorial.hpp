@@ -162,7 +162,7 @@ public:
         /* We create a vector of initial conditions for u and v that are random perturbations
          * of the spatially uniform steady state and pass this to the solver. */
         std::vector<double> init_conds(2*mesh.GetNumNodes());
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             init_conds[2*i] = fabs(2.0 + RandomNumberGenerator::Instance()->ranf());
             init_conds[2*i + 1] = fabs(0.75 + RandomNumberGenerator::Instance()->ranf());

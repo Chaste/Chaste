@@ -73,7 +73,7 @@ public:
      * @param value The value of this boundary condition at all points where it
      *    is applied.
      */
-    ConstBoundaryCondition(const double value);
+    explicit ConstBoundaryCondition(const double value);
 
     /**
      * @param rX The point at which this boundary condition is to be evaluated.

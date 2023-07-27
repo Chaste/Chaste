@@ -36,22 +36,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractHdf5Converter.hpp"
 #include "Version.hpp"
 
-
 /*
- * Operator function to be called by H5Literate [HDF5 1.8.x] or H5Giterate [HDF5 1.6.x] (in TestListingDatasetsInAnHdf5File).
+ * Operator function to be called by H5Literate [HDF5 1.8.x] or H5Giterate 
+ * [HDF5 1.6.x] (in TestListingDatasetsInAnHdf5File).
  */
 herr_t op_func (hid_t loc_id,
                 const char *name,
                 const H5L_info_t *info,
                 void *operator_data);
 
-
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>::AbstractHdf5Converter(const FileFinder& rInputDirectory,
-                                                                     const std::string& rFileBaseName,
-                                                                     AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
-                                                                     const std::string& rSubdirectoryName,
-                                                                     unsigned precision)
+AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>::AbstractHdf5Converter(
+    const FileFinder& rInputDirectory,
+    const std::string& rFileBaseName,
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+    const std::string& rSubdirectoryName,
+    unsigned precision)
     : mrH5Folder(rInputDirectory),
       mFileBaseName(rFileBaseName),
       mOpenDatasetIndex(UNSIGNED_UNSET),
@@ -76,9 +76,13 @@ void AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>::WriteInfoFile()
     {
         std::string time_info_filename;
 
-        // If the dataset is just "Data" then we will leave the original filename as it is (to avoid confusion!)
-        // If the dataset is a new variant like "Postprocessing" then we will put the dataset name in the output.
-        if (mDatasetNames[mOpenDatasetIndex]=="Data")
+        /*
+         * If the dataset is just "Data" then we will leave the original 
+         * filename as it is (to avoid confusion!). If the dataset is a new 
+         * variant like "Postprocessing" then we will put the dataset name in 
+         * the output.
+         */
+        if (mDatasetNames[mOpenDatasetIndex] == "Data")
         {
            time_info_filename = mFileBaseName + "_times.info";
         }
@@ -126,8 +130,11 @@ bool AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::MoveOntoNextDataset()
         return false;
     }
 
-    // If we haven't read anything yet, start at the beginning, otherwise increment by one.
-    if (mOpenDatasetIndex==UNSIGNED_UNSET)
+    /*
+     * If we haven't read anything yet, start at the beginning, otherwise 
+     * increment by one.
+     */
+    if (mOpenDatasetIndex == UNSIGNED_UNSET)
     {
         mOpenDatasetIndex = 0u;
     }
@@ -154,8 +161,9 @@ bool AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::MoveOntoNextDataset()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::GenerateListOfDatasets(const FileFinder& rH5Folder,
-                                                                          const std::string& rFileName)
+void AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::GenerateListOfDatasets(
+    const FileFinder& rH5Folder,
+    const std::string& rFileName)
 {
     /*
      * Open file.
@@ -170,17 +178,22 @@ void AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::GenerateListOfDatasets(const 
 
     H5Fclose(file);
 
-    // Remove datasets that end in "_Unlimited", as these are paired up with other ones!
+    /*
+     * Remove datasets that end in "_Unlimited", as these are paired up with 
+     * other ones!
+     */
     std::string ending = "_Unlimited";
 
     // Strip off the independent variables from the list
     std::vector<std::string>::iterator iter;
     for (iter = mDatasetNames.begin(); iter != mDatasetNames.end(); )
     {
-        // If the dataset name is "Time" OR ...
-        // it is longer than the ending we are looking for ("_Unlimited") ...
-        // ... AND it ends with the string we are looking for,
-        // then erase it.
+        /*
+         * If the dataset name is "Time" OR ...
+         * it is longer than the ending we are looking for ("_Unlimited") ...
+         * ... AND it ends with the string we are looking for,
+         * then erase it.
+         */
         if ((*(iter) == "Time") ||
             ((iter->length() > ending.length()) &&
             (0 == iter->compare(iter->length() - ending.length(), ending.length(), ending))))
@@ -197,9 +210,8 @@ void AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::GenerateListOfDatasets(const 
 /*
  * HDF5 Operator function.
  *
- * Puts the name of the objects (in this case 'datasets')
- * in an HDF5 file into a std::vector for us to use for
- * iterating over the file.
+ * Puts the name of the objects (in this case 'datasets') in an HDF5 file into a 
+ * std::vector for us to use for iterating over the file.
  *
  * This was based on a couple of HDF5 example files.
  */
@@ -207,12 +219,12 @@ herr_t op_func (hid_t loc_id, const char *name,
                 const H5L_info_t *info,
                 void *operator_data)
 {
-    std::vector<std::string>* p_dataset_names = static_cast<std::vector< std::string > * >(operator_data);
+    std::vector<std::string>* p_dataset_names = 
+        static_cast<std::vector< std::string >*>(operator_data);
 
     /*
-     * Get type of the object and display its name and type.
-     * The name of the object is passed to this function by
-     * the Library.
+     * Get type of the object and display its name and type. The name of the 
+     * object is passed to this function by the Library.
      */
     H5O_info_t infobuf;
     H5Oget_info_by_name (loc_id, name, &infobuf, H5P_DEFAULT);
@@ -229,9 +241,13 @@ herr_t op_func (hid_t loc_id, const char *name,
 //              break;
         default:
             NEVER_REACHED;
-            // If you ever do reach here, it means that an HDF5 file you are trying to convert contains
-            // something other than a 'Dataset', which is the usual data structure we write out in Chaste.
-            // The above commented out lines should help you figure out what it is, and how it got there.
+            /*
+             * If you ever do reach here, it means that an HDF5 file you are 
+             * trying to convert contains something other than a 'Dataset', 
+             * which is the usual data structure we write out in Chaste. The 
+             * above commented out lines should help you figure out what it is, 
+             * and how it got there.
+             */
     }
     return 0;
 }

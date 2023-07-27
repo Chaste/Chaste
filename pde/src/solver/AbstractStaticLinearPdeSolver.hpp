@@ -55,7 +55,7 @@ public:
      *
      * @param pMesh the mesh
      */
-    AbstractStaticLinearPdeSolver(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
+    explicit AbstractStaticLinearPdeSolver(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
         : AbstractLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>(pMesh)
     {
     }

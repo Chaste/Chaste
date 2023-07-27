@@ -216,7 +216,9 @@ void AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::As
     c_vector<double, ELEMENT_DIM>  phi;
 
     // Loop over Gauss points
-    for (unsigned quad_index=0; quad_index<mpSurfaceQuadRule->GetNumQuadPoints(); quad_index++)
+    for (unsigned quad_index = 0;
+         quad_index < mpSurfaceQuadRule->GetNumQuadPoints();
+         ++quad_index)
     {
         const ChastePoint<ELEMENT_DIM-1>& quad_point = mpSurfaceQuadRule->rGetQuadPoint(quad_index);
 
@@ -230,7 +232,7 @@ void AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::As
         ChastePoint<SPACE_DIM> x(0,0,0);
 
         this->ResetInterpolatedQuantities();
-        for (unsigned i=0; i<rSurfaceElement.GetNumNodes(); i++)
+        for (unsigned i = 0; i < rSurfaceElement.GetNumNodes(); ++i)
         {
             const c_vector<double, SPACE_DIM> node_loc = rSurfaceElement.GetNode(i)->rGetLocation();
             x.rGetLocation() += phi(i)*node_loc;

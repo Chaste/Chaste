@@ -39,11 +39,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractHdf5Converter.hpp"
 
 /**
- * This class converts from Hdf5 format to a .txt format that is readable by Matlab.
- *
- * There is one output file per variable per timestep, giving the values of that variable
- * at that time over each of the nodes.
- *
+ * This class converts from Hdf5 format to a .txt format that is readable by 
+ * Matlab. There is one output file per variable per timestep, giving the values 
+ * of that variable at that time over each of the nodes.
  */
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class Hdf5ToTxtConverter : public AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>
@@ -53,7 +51,8 @@ public:
     /**
      * Constructor, which does the conversion and writes the .txt file.
      *
-     * @param rInputDirectory  The input directory, where the .h5 file has been written.
+     * @param rInputDirectory  The input directory, where the .h5 file has been 
+     *     written.
      * @param rFileBaseName  The base name of the data file.
      * @param pMesh  Pointer to the mesh.
      */

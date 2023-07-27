@@ -260,7 +260,7 @@ c_matrix<double, PROBLEM_DIM*(ELEMENT_DIM+1), PROBLEM_DIM*(ELEMENT_DIM+1)> Linea
     c_matrix<double, PROBLEM_DIM*(ELEMENT_DIM+1), PROBLEM_DIM*(ELEMENT_DIM+1)> matrix_term = zero_matrix<double>(PROBLEM_DIM*(ELEMENT_DIM+1), PROBLEM_DIM*(ELEMENT_DIM+1));
 
     // Loop over PDEs and populate matrix_term
-    for (unsigned pde_index=0; pde_index<PROBLEM_DIM; pde_index++)
+    for (unsigned pde_index = 0; pde_index < PROBLEM_DIM; ++pde_index)
     {
         double this_dudt_coefficient = mpPdeSystem->ComputeDuDtCoefficientFunction(rX, pde_index);
         c_matrix<double, SPACE_DIM, SPACE_DIM> this_pde_diffusion_term = mpPdeSystem->ComputeDiffusionTerm(rX, pde_index, pElement);
@@ -268,9 +268,9 @@ c_matrix<double, PROBLEM_DIM*(ELEMENT_DIM+1), PROBLEM_DIM*(ELEMENT_DIM+1)> Linea
             prod(trans(rGradPhi), c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>(prod(this_pde_diffusion_term, rGradPhi)) )
                 + timestep_inverse * this_dudt_coefficient * outer_prod(rPhi, rPhi);
 
-        for (unsigned i=0; i<ELEMENT_DIM+1; i++)
+        for (unsigned i = 0; i < ELEMENT_DIM + 1; ++i)
         {
-            for (unsigned j=0; j<ELEMENT_DIM+1; j++)
+            for (unsigned j = 0; j < ELEMENT_DIM + 1; ++j)
             {
                 matrix_term(i*PROBLEM_DIM + pde_index, j*PROBLEM_DIM + pde_index) = this_stiffness_matrix(i,j);
             }
@@ -293,14 +293,14 @@ c_vector<double, PROBLEM_DIM*(ELEMENT_DIM+1)> LinearParabolicPdeSystemWithCouple
     vector_term = zero_vector<double>(PROBLEM_DIM*(ELEMENT_DIM+1));
 
     // Loop over PDEs and populate vector_term
-    for (unsigned pde_index=0; pde_index<PROBLEM_DIM; pde_index++)
+    for (unsigned pde_index = 0; pde_index < PROBLEM_DIM; ++pde_index)
     {
         double this_dudt_coefficient = mpPdeSystem->ComputeDuDtCoefficientFunction(rX, pde_index);
         double this_source_term = mpPdeSystem->ComputeSourceTerm(rX, rU, mInterpolatedOdeStateVariables, pde_index);
-        c_vector<double, ELEMENT_DIM+1> this_vector_term;
+        c_vector<double, ELEMENT_DIM + 1> this_vector_term;
         this_vector_term = (this_source_term + timestep_inverse*this_dudt_coefficient*rU(pde_index))* rPhi;
 
-        for (unsigned i=0; i<ELEMENT_DIM+1; i++)
+        for (unsigned i = 0; i < ELEMENT_DIM + 1; ++i)
         {
             vector_term(i*PROBLEM_DIM + pde_index) = this_vector_term(i);
         }
@@ -328,7 +328,7 @@ void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, 
     {
         unsigned num_state_variables = mOdeSystemsAtNodes[0]->GetNumberOfStateVariables();
 
-        for (unsigned i=0; i<num_state_variables; i++)
+        for (unsigned i = 0; i < num_state_variables; ++i)
         {
             mInterpolatedOdeStateVariables[i] += phiI * mOdeSystemsAtNodes[pNode->GetIndex()]->rGetStateVariables()[i];
         }
@@ -416,7 +416,7 @@ LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, PROBL
 {
     if (mOdeSystemsPresent)
     {
-        for (unsigned i=0; i<mOdeSystemsAtNodes.size(); i++)
+        for (unsigned i = 0; i < mOdeSystemsAtNodes.size(); ++i)
         {
             delete mOdeSystemsAtNodes[i];
         }
@@ -436,10 +436,12 @@ void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, 
         std::vector<double> current_soln_this_node(PROBLEM_DIM);
 
         // Loop over nodes
-        for (unsigned node_index=0; node_index<mpMesh->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0;
+             node_index<mpMesh->GetNumNodes();
+             ++node_index)
         {
             // Store the current solution to the PDE system at this node
-            for (unsigned pde_index=0; pde_index<PROBLEM_DIM; pde_index++)
+            for (unsigned pde_index = 0; pde_index < PROBLEM_DIM; ++pde_index)
             {
                 double current_soln_this_pde_this_node = soln_repl[PROBLEM_DIM*node_index + pde_index];
                 current_soln_this_node[pde_index] = current_soln_this_pde_this_node;
@@ -566,12 +568,12 @@ void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, 
      */
     ReplicatableVector solution_repl(solution);
     unsigned num_nodes = mpMesh->GetNumNodes();
-    for (unsigned pde_index=0; pde_index<PROBLEM_DIM; pde_index++)
+    for (unsigned pde_index = 0; pde_index < PROBLEM_DIM; ++pde_index)
     {
         // Store the solution of this PDE at each node
         std::vector<double> pde_index_data;
         pde_index_data.resize(num_nodes, 0.0);
-        for (unsigned node_index=0; node_index<num_nodes; node_index++)
+        for (unsigned node_index = 0; node_index < num_nodes; ++node_index)
         {
             pde_index_data[node_index] = solution_repl[PROBLEM_DIM*node_index + pde_index];
         }
@@ -593,21 +595,21 @@ void LinearParabolicPdeSystemWithCoupledOdeSystemSolver<ELEMENT_DIM, SPACE_DIM, 
         std::vector<std::vector<double> > ode_data;
         unsigned num_odes = mOdeSystemsAtNodes[0]->rGetStateVariables().size();
         ode_data.resize(num_odes);
-        for (unsigned ode_index=0; ode_index<num_odes; ode_index++)
+        for (unsigned ode_index = 0; ode_index < num_odes; ++ode_index)
         {
             ode_data[ode_index].resize(num_nodes, 0.0);
         }
 
-        for (unsigned node_index=0; node_index<num_nodes; node_index++)
+        for (unsigned node_index = 0; node_index < num_nodes; ++node_index)
         {
             std::vector<double> all_odes_this_node = mOdeSystemsAtNodes[node_index]->rGetStateVariables();
-            for (unsigned i=0; i<num_odes; i++)
+            for (unsigned i = 0; i < num_odes; ++i)
             {
                 ode_data[i][node_index] = all_odes_this_node[i];
             }
         }
 
-        for (unsigned ode_index=0; ode_index<num_odes; ode_index++)
+        for (unsigned ode_index = 0; ode_index < num_odes; ++ode_index)
         {
             std::vector<double> ode_index_data = ode_data[ode_index];
 

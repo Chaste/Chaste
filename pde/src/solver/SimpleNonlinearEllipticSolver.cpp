@@ -105,7 +105,7 @@ SimpleNonlinearEllipticSolver<ELEMENT_DIM,SPACE_DIM>::SimpleNonlinearEllipticSol
     :  AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM,SPACE_DIM,1>(pMesh,pBoundaryConditions),
        mpNonlinearEllipticPde(pPde)
 {
-    assert(pPde!=nullptr);
+    assert(pPde != nullptr);
 }
 
 // Explicit instantiation

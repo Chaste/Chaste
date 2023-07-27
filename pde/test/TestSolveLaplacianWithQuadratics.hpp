@@ -105,7 +105,9 @@ private:
         c_matrix<double, DIM, NUM_BASES_PER_ELEMENT> grad_phi;
 
         // Loop over Gauss points
-        for (unsigned quad_index=0; quad_index < mpQuadRule->GetNumQuadPoints(); quad_index++)
+        for (unsigned quad_index = 0;
+             quad_index < mpQuadRule->GetNumQuadPoints();
+             ++quad_index)
         {
             const ChastePoint<DIM>& quad_point = mpQuadRule->rGetQuadPoint(quad_index);
 
@@ -193,7 +195,7 @@ private:
                 //element.GetStiffnessMatrixGlobalIndices(PROBLEM_DIM, p_indices);
 
                 unsigned p_indices[STENCIL_SIZE];
-                for (unsigned i=0; i<STENCIL_SIZE; i++)
+                for (unsigned i = 0; i < STENCIL_SIZE; ++i)
                 {
                     p_indices[i] = element.GetNodeGlobalIndex(i);
                 }
@@ -290,7 +292,7 @@ public:
         Vec solution = solver.Solve();
         ReplicatableVector sol_repl(solution);
 
-        for (unsigned i=0; i<quad_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < quad_mesh.GetNumNodes(); ++i)
         {
             double x = quad_mesh.GetNode(i)->rGetLocation()[0];
             double u = sol_repl[i];
@@ -340,7 +342,7 @@ public:
          * nodes.
          */
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), quad_mesh.GetNumVertices());
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double lin_x = mesh.GetNode(i)->rGetLocation()[0];
             double lin_y = mesh.GetNode(i)->rGetLocation()[1];
@@ -398,7 +400,7 @@ public:
          * nodes.
          */
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), quad_mesh.GetNumVertices());
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             unsigned quad_index=i;
             //Quad mesh has a minor permutation: vertex node 4 now appears at index 81
@@ -459,7 +461,7 @@ public:
 
         // compare results - the following assumes the vertex nodes in the
         // quad mesh come before all the internal nodes
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double u_1 = sol_lin_repl[i];
             double u_2 = sol_quads_repl[i];

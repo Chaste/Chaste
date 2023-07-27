@@ -43,61 +43,72 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 
 /**
- * A simple class which takes in a mesh and a quadrature rule, and collects
- * all the quadrature points in physical space (rather than in natural element coordinates)
- * together in one data structure, for access.
+ * A simple class which takes in a mesh and a quadrature rule, and collects all 
+ * the quadrature points in physical space (rather than in natural element 
+ * coordinates) together in one data structure, for access.
  *
  * In a distributed mesh, a set of quad points can still be accessed for a given
- * element but then any missing data is marked with DOUBLE_UNSET
+ * element but then any missing data is marked with DOUBLE_UNSET.
  */
 template<unsigned DIM>
 class QuadraturePointsGroup
 {
 private:
 
-    /** The quadrature points in physical space */
-    std::vector<c_vector<double,DIM> > data;
+    /** The quadrature points in physical space. */
+    std::vector<c_vector<double, DIM> > data;
 
-    /** Number of elements in given mesh */
+    /** Number of elements in given mesh. */
     unsigned mNumElements;
 
-    /** Number of quad points per element in given rule */
+    /** Number of quadrature points per element in given rule. */
     unsigned mNumQuadPointsPerElement;
 
 public:
 
     /**
-     * Constructor takes in a mesh and a rule and computes and stores all
-     * the quad points in physical space.
+     * Constructor takes in a mesh and a rule and computes and stores all the 
+     * quad points in physical space.
      *
-     * @param rMesh
-     * @param rQuadRule
+     * @param rMesh the mesh
+     * @param rQuadRule the quadrature rule, used to determine the number of 
+     *     quadrature points per element.
      */
-    QuadraturePointsGroup(AbstractTetrahedralMesh<DIM,DIM>& rMesh,
+    QuadraturePointsGroup(AbstractTetrahedralMesh<DIM, DIM>& rMesh,
                           GaussianQuadratureRule<DIM>& rQuadRule);
 
     /**
-     * @return a stored quadrature point by element index and quad index in the element.
-     *
-     * @param elementIndex
-     * @param quadIndex
+     * @param elementIndex the element index
+     * @param quadIndex the quadrature point index
+     * 
+     * @return a stored quadrature point by element index and quad index in the 
+     *     element.
      */
     c_vector<double,DIM>& rGet(unsigned elementIndex, unsigned quadIndex);
 
     /**
+     * @param i the quadrature point index
+     * 
      * @return the i-th stored quadrature point.
-     *
-     * @param i
+     * \todo rename argument for clarity
      */
-    c_vector<double,DIM>& rGet(unsigned i);
+    c_vector<double, DIM>& rGet(unsigned i);
 
-    /** @return number of elements in the mesh that was given in the constructor */
+    /**
+     * @return number of elements in the mesh that was given in the constructor. 
+     */
     unsigned GetNumElements() const;
 
-    /** @return number of quad points per element in the rule that was given in the constructor */
+    /**
+     * @return number of quad points per element in the rule that was given in 
+     *     the constructor.
+     */
     unsigned GetNumQuadPointsPerElement() const;
 
-    /** @return total size, i.e. total number of quad points, i.e. num_elem times num_quad_points_per_elem */
+    /**
+     * @return total size, i.e. total number of quad points, i.e. num_elem times 
+     *     num_quad_points_per_elem
+     */
     unsigned Size() const;
 };
 

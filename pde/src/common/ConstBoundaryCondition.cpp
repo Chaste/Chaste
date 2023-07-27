@@ -42,13 +42,13 @@ ConstBoundaryCondition<SPACE_DIM>::ConstBoundaryCondition(const double value)
 }
 
 template<unsigned SPACE_DIM>
-double ConstBoundaryCondition<SPACE_DIM>::GetValue(const ChastePoint<SPACE_DIM>& rX) const
+double ConstBoundaryCondition<SPACE_DIM>::GetValue(
+    const ChastePoint<SPACE_DIM>& rX) const
 {
     return mValue;
 }
 
-//////////////// Explicit instantiation//////////////
-
+// Explicit instantiation
 template class ConstBoundaryCondition<1>;
 template class ConstBoundaryCondition<2>;
 template class ConstBoundaryCondition<3>;

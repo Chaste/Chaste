@@ -84,7 +84,7 @@ public:
         ReplicatableVector result_repl(result);
 
         // Solution should be u = 0.5*x*(3-x)
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double u = 0.5*x*(3-x);
@@ -120,7 +120,7 @@ public:
         ReplicatableVector result_repl(result);
 
         // Solution should be u = 0.5*x*(3-x)
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double u = 0.5*x*(3-x);
@@ -160,7 +160,7 @@ public:
         ReplicatableVector result_repl(result);
 
         // Solution should be u = -r^2/2 + r, where r is the distance along the branches
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             //This only works because the x,y,z coordinates are aligned to the axes
             //should really calculate distances along the branches properly!

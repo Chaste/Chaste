@@ -83,16 +83,16 @@ private:
 
         double sigma_i = 1+rX[2] + 0.5*rX[2]*rX[2];
 
-        for (unsigned i=0; i<2; i++)
+        for (unsigned i = 0; i < 2; ++i)
         {
-            for (unsigned j=0; j<2; j++)
+            for (unsigned j = 0; j < 2; ++j)
             {
                 ret(2*i,  2*j)   =  mBeta*rPhi(i)*rPhi(j);
                 ret(2*i+1,2*j)   = -mBeta*rPhi(i)*rPhi(j);
                 ret(2*i,  2*j+1) = -mBeta*rPhi(i)*rPhi(j);
                 ret(2*i+1,2*j+1) =  mBeta*rPhi(i)*rPhi(j);
 
-                for (unsigned dim=0; dim<DIM; dim++)
+                for (unsigned dim = 0; dim < DIM; ++dim)
                 {
                     ret(2*i+1,2*j+1) += sigma_i*rGradPhi(dim,i)*rGradPhi(dim,j);
                 }
@@ -131,12 +131,12 @@ private:
     {
         c_matrix<double,PROBLEM_DIM*(DIM+1),PROBLEM_DIM*(DIM+1)> ret = zero_matrix<double>(PROBLEM_DIM*(DIM+1),PROBLEM_DIM*(DIM+1));
 
-        for (unsigned i=0; i<DIM+1; i++)
+        for (unsigned i = 0; i < DIM+1; ++i)
         {
-            for (unsigned j=0; j<DIM+1; j++)
+            for (unsigned j = 0; j < DIM+1; ++j)
             {
                 // stiffness matrix in 'top-left block'
-                for (unsigned dim=0; dim<DIM; dim++)
+                for (unsigned dim = 0; dim < DIM; ++dim)
                 {
                     ret(2*i,2*j) += rGradPhi(dim,i)*rGradPhi(dim,j);
                 }

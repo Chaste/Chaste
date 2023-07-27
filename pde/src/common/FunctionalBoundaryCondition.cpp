@@ -36,19 +36,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FunctionalBoundaryCondition.hpp"
 
 template<unsigned SPACE_DIM>
-FunctionalBoundaryCondition<SPACE_DIM>::FunctionalBoundaryCondition(double (*func)(const ChastePoint<SPACE_DIM>& rX))
+FunctionalBoundaryCondition<SPACE_DIM>::FunctionalBoundaryCondition(
+    double (*func)(const ChastePoint<SPACE_DIM>& rX))
     : mFunction(func)
 {
 }
 
 template<unsigned SPACE_DIM>
-double FunctionalBoundaryCondition<SPACE_DIM>::GetValue( const ChastePoint<SPACE_DIM>& rX) const
+double FunctionalBoundaryCondition<SPACE_DIM>::GetValue(
+    const ChastePoint<SPACE_DIM>& rX) const
 {
     return mFunction(rX);
 }
 
-//////////////// Explicit instantiation//////////////
-
+// Explicit instantiation
 template class FunctionalBoundaryCondition<1>;
 template class FunctionalBoundaryCondition<2>;
 template class FunctionalBoundaryCondition<3>;

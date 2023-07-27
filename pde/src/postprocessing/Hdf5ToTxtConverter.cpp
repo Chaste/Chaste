@@ -44,10 +44,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-Hdf5ToTxtConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToTxtConverter(const FileFinder& rInputDirectory,
-                                                               const std::string& rFileBaseName,
-                                                               AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
-    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(rInputDirectory, rFileBaseName, pMesh, "txt_output", 0u)
+Hdf5ToTxtConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToTxtConverter(
+    const FileFinder& rInputDirectory,
+    const std::string& rFileBaseName,
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
+    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(
+          rInputDirectory,
+          rFileBaseName,
+          pMesh,
+          "txt_output",
+          0u)
 {
     // Make sure that we are never trying to write from an incomplete data HDF5 file
     assert(this->mpReader->GetNumberOfRows() == pMesh->GetNumNodes());
@@ -63,10 +69,10 @@ Hdf5ToTxtConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToTxtConverter(const FileFinder&
     ReplicatableVector repl_data(num_nodes);
 
     // Loop over time steps
-    for (unsigned time_step=0; time_step<num_timesteps; time_step++)
+    for (unsigned time_step = 0; time_step < num_timesteps; ++time_step)
     {
         // Loop over variables
-        for (unsigned var_index=0; var_index<this->mNumVariables; var_index++)
+        for (unsigned var_index = 0; var_index < this->mNumVariables; ++var_index)
         {
             std::string variable_name = this->mpReader->GetVariableNames()[var_index];
 
@@ -82,7 +88,7 @@ Hdf5ToTxtConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToTxtConverter(const FileFinder&
 
             if (PetscTools::AmMaster())
             {
-                for (unsigned i=0; i<num_nodes; i++)
+                for (unsigned i = 0; i < num_nodes; ++i)
                 {
                     *p_file << repl_data[i] << "\n";
                 }

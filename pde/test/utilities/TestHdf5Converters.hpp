@@ -284,7 +284,7 @@ public:
         files_to_compare.push_back("cube_2mm_12_elements_Phi_e_0.txt");
         files_to_compare.push_back("cube_2mm_12_elements_Phi_e_1.txt");
 
-        for (unsigned i=0; i<files_to_compare.size(); i++)
+        for (unsigned i = 0; i < files_to_compare.size(); ++i)
         {
             std::cout << "Comparing generated and reference " << files_to_compare[i] << std::endl;
             FileFinder generated_file(working_directory +"/txt_output/" + files_to_compare[i], RelativeTo::ChasteTestOutput);
@@ -412,7 +412,7 @@ public:
         variable_names.push_back("I_Na_tot");
 
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
-        for (unsigned i=0; i<variable_names.size(); i++)
+        for (unsigned i = 0; i < variable_names.size(); ++i)
         {
             // Compare the results files
             FileComparison(test_output_directory + "/" + output_dir + "/output/many_variables_"
@@ -451,7 +451,7 @@ public:
         files_to_compare.push_back("cube_2mm_12_elements_geometry_0.xml");
         files_to_compare.push_back("cube_2mm_12_elements_topology_0.xml");
 
-        for (unsigned i=0; i<files_to_compare.size(); i++)
+        for (unsigned i = 0; i < files_to_compare.size(); ++i)
         {
             std::cout << "Comparing generated and reference " << files_to_compare[i] << std::endl;
             FileFinder generated_file(working_directory +"/xdmf_output/" + files_to_compare[i], RelativeTo::ChasteTestOutput);

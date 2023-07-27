@@ -221,7 +221,6 @@ protected:
         return true;
     }
 
-
 public:
 
     /**
@@ -229,7 +228,7 @@ public:
      *
      * @param pMesh The mesh
      */
-    AbstractFeVolumeIntegralAssembler(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
+    explicit AbstractFeVolumeIntegralAssembler(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
 
     /**
      * Destructor.
@@ -334,11 +333,17 @@ void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_
         const c_matrix<double, ELEMENT_DIM, SPACE_DIM>& rInverseJacobian,
         c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rReturnValue)
 {
-    assert(ELEMENT_DIM < 4 && ELEMENT_DIM > 0);
-    static c_matrix<double, ELEMENT_DIM, ELEMENT_DIM+1> grad_phi;
+    if constexpr (ELEMENT_DIM < 4 && ELEMENT_DIM > 0)
+    {
+        static c_matrix<double, ELEMENT_DIM, ELEMENT_DIM+1> grad_phi;
 
-    LinearBasisFunction<ELEMENT_DIM>::ComputeBasisFunctionDerivatives(rPoint, grad_phi);
-    rReturnValue = prod(trans(rInverseJacobian), grad_phi);
+        LinearBasisFunction<ELEMENT_DIM>::ComputeBasisFunctionDerivatives(rPoint, grad_phi);
+        rReturnValue = prod(trans(rInverseJacobian), grad_phi);
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
@@ -375,7 +380,9 @@ void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_
     c_matrix<double, SPACE_DIM, ELEMENT_DIM+1> grad_phi;
 
     // Loop over Gauss points
-    for (unsigned quad_index=0; quad_index < mpQuadRule->GetNumQuadPoints(); quad_index++)
+    for (unsigned quad_index = 0;
+         quad_index < mpQuadRule->GetNumQuadPoints();
+         ++quad_index)
     {
         const ChastePoint<ELEMENT_DIM>& quad_point = mpQuadRule->rGetQuadPoint(quad_index);
 
@@ -397,7 +404,7 @@ void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_
         this->ResetInterpolatedQuantities();
 
         // Interpolation
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             const Node<SPACE_DIM>* p_node = rElement.GetNode(i);
 
@@ -412,7 +419,9 @@ void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_
             unsigned node_global_index = rElement.GetNodeGlobalIndex(i);
             if (this->mCurrentSolutionOrGuessReplicated.GetSize() > 0)
             {
-                for (unsigned index_of_unknown=0; index_of_unknown<(INTERPOLATION_LEVEL!=CARDIAC ? PROBLEM_DIM : 1); index_of_unknown++)
+                for (unsigned index_of_unknown = 0;
+                     index_of_unknown<(INTERPOLATION_LEVEL!=CARDIAC ? PROBLEM_DIM : 1);
+                     ++index_of_unknown)
                 {
                     /*
                      * If we have a solution (e.g. this is a dynamic problem) then
@@ -425,9 +434,9 @@ void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_
                     double u_at_node = this->GetCurrentSolutionOrGuessValue(node_global_index, index_of_unknown);
                     u(index_of_unknown) += phi(i)*u_at_node;
 
-                    if (INTERPOLATION_LEVEL==NONLINEAR) // don't need to construct grad_phi or grad_u in other cases
+                    if (INTERPOLATION_LEVEL == NONLINEAR) // don't need to construct grad_phi or grad_u in other cases
                     {
-                        for (unsigned j=0; j<SPACE_DIM; j++)
+                        for (unsigned j = 0; j < SPACE_DIM; ++j)
                         {
                             grad_u(index_of_unknown,j) += grad_phi(j,i)*u_at_node;
                         }

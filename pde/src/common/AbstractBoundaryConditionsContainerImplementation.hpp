@@ -40,30 +40,32 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-AbstractBoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AbstractBoundaryConditionsContainer(bool deleteConditions)
+AbstractBoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::AbstractBoundaryConditionsContainer(
+    bool deleteConditions)
     : mHasDirichletBCs(false),
       mCheckedAndCommunicatedIfDirichletBcs(false),
       mDeleteConditions(deleteConditions)
 {
-    for (unsigned index_of_unknown=0; index_of_unknown<PROBLEM_DIM; index_of_unknown++)
+    for (unsigned index_of_unknown = 0; index_of_unknown < PROBLEM_DIM; ++index_of_unknown)
     {
-        mpDirichletMap[index_of_unknown] = new std::map< const Node<SPACE_DIM> *, const AbstractBoundaryCondition<SPACE_DIM>*, LessThanNode<SPACE_DIM> >;
+        mpDirichletMap[index_of_unknown] = 
+            new std::map<const Node<SPACE_DIM>*, const AbstractBoundaryCondition<SPACE_DIM>*, LessThanNode<SPACE_DIM> >;
     }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-AbstractBoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::~AbstractBoundaryConditionsContainer()
+AbstractBoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::~AbstractBoundaryConditionsContainer()
 {
     DeleteDirichletBoundaryConditions();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-bool AbstractBoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::HasDirichletBoundaryConditions()
+bool AbstractBoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::HasDirichletBoundaryConditions()
 {
     if (!mCheckedAndCommunicatedIfDirichletBcs)
     {
-        bool i_have_dirichlet=false;
-        for (unsigned i=0; i<PROBLEM_DIM; i++)
+        bool i_have_dirichlet = false;
+        for (unsigned i = 0; i < PROBLEM_DIM; ++i)
         {
             if (!mpDirichletMap[i]->empty())
             {
@@ -78,9 +80,10 @@ bool AbstractBoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Has
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-void AbstractBoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::DeleteDirichletBoundaryConditions(std::set<const AbstractBoundaryCondition<SPACE_DIM>*> alreadyDeletedConditions)
+void AbstractBoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::DeleteDirichletBoundaryConditions(
+    std::set<const AbstractBoundaryCondition<SPACE_DIM>*> alreadyDeletedConditions)
 {
-    for (unsigned i=0; i<PROBLEM_DIM; i++)
+    for (unsigned i = 0; i < PROBLEM_DIM; ++i)
     {
         if (mpDirichletMap[i])
         {
@@ -108,10 +111,11 @@ void AbstractBoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Del
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-double AbstractBoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::GetDirichletBCValue(const Node<SPACE_DIM>* pBoundaryNode, unsigned indexOfUnknown)
+double AbstractBoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::GetDirichletBCValue(
+    const Node<SPACE_DIM>* pBoundaryNode,
+    unsigned indexOfUnknown)
 {
     assert(indexOfUnknown < PROBLEM_DIM);
-    //assert(pBoundaryNode->IsBoundaryNode());
 
     mDirichIterator = mpDirichletMap[indexOfUnknown]->find(pBoundaryNode);
     assert(mDirichIterator != mpDirichletMap[indexOfUnknown]->end());
@@ -120,7 +124,9 @@ double AbstractBoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::G
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-bool AbstractBoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::HasDirichletBoundaryCondition(const Node<SPACE_DIM>* pNode, unsigned indexOfUnknown)
+bool AbstractBoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::HasDirichletBoundaryCondition(
+    const Node<SPACE_DIM>* pNode,
+    unsigned indexOfUnknown)
 {
     assert(indexOfUnknown < PROBLEM_DIM);
 

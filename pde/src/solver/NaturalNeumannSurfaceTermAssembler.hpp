@@ -118,9 +118,9 @@ c_vector<double, PROBLEM_DIM*ELEMENT_DIM> NaturalNeumannSurfaceTermAssembler<ELE
     c_vector<double, ELEMENT_DIM*PROBLEM_DIM> ret;
     c_vector<double, PROBLEM_DIM> neumann_bc_values;
 
-    for (unsigned i=0; i<ELEMENT_DIM; i++)
+    for (unsigned i = 0; i < ELEMENT_DIM; ++i)
     {
-        for (unsigned problem_dim = 0; problem_dim<PROBLEM_DIM; problem_dim++)
+        for (unsigned problem_dim = 0; problem_dim < PROBLEM_DIM; ++problem_dim)
         {
             double neumann_bc_value = this->mpBoundaryConditions->GetNeumannBCValue(&rSurfaceElement, rX, problem_dim);
 

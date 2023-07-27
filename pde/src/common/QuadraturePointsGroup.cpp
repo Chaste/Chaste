@@ -37,28 +37,30 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 template<unsigned DIM>
-QuadraturePointsGroup<DIM>::QuadraturePointsGroup(AbstractTetrahedralMesh<DIM,DIM>& rMesh,
-                                                  GaussianQuadratureRule<DIM>& rQuadRule)
+QuadraturePointsGroup<DIM>::QuadraturePointsGroup(
+    AbstractTetrahedralMesh<DIM,DIM>& rMesh,
+    GaussianQuadratureRule<DIM>& rQuadRule)
 {
     c_vector<double, DIM> unset;
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
-        unset(i)=DOUBLE_UNSET;
+        unset(i) = DOUBLE_UNSET;
     }
     mNumElements = rMesh.GetNumElements();
     mNumQuadPointsPerElement = rQuadRule.GetNumQuadPoints();
     data.resize(mNumElements*mNumQuadPointsPerElement, unset);
 
     // Loop over elements
-    for (typename AbstractTetrahedralMesh<DIM, DIM>::ElementIterator iter = rMesh.GetElementIteratorBegin();
-                  iter != rMesh.GetElementIteratorEnd();
-                  ++iter)
+    for (auto iter = rMesh.GetElementIteratorBegin();
+        iter != rMesh.GetElementIteratorEnd();
+        ++iter)
     {
-//        Element<DIM,DIM>& r_elem = *(rMesh.GetElement(elem_index));
         unsigned elem_index = iter->GetIndex();
 
         c_vector<double, DIM+1> linear_phi;
-        for (unsigned quad_index=0; quad_index<rQuadRule.GetNumQuadPoints(); quad_index++)
+        for (unsigned quad_index = 0;
+             quad_index < rQuadRule.GetNumQuadPoints();
+             ++quad_index)
         {
             const ChastePoint<DIM>& quadrature_point = rQuadRule.rGetQuadPoint(quad_index);
 
@@ -66,31 +68,35 @@ QuadraturePointsGroup<DIM>::QuadraturePointsGroup(AbstractTetrahedralMesh<DIM,DI
 
             // Interpolate to calculate quadrature point
             c_vector<double,DIM> physical_quad_point = zero_vector<double>(DIM);
-            for (unsigned node_index=0; node_index<DIM+1; node_index++)
+            for (unsigned node_index = 0; node_index < DIM + 1; ++node_index)
             {
-                physical_quad_point += linear_phi(node_index)*(iter->GetNode(node_index))->rGetLocation();
+                physical_quad_point += 
+                    linear_phi(node_index)*(iter->GetNode(node_index))->rGetLocation();
             }
 
             // Save the quadrature point
-            assert(elem_index<mNumElements);
-            assert(quad_index<mNumQuadPointsPerElement);
-            data[ elem_index*mNumQuadPointsPerElement + quad_index ] = physical_quad_point;
+            assert(elem_index < mNumElements);
+            assert(quad_index < mNumQuadPointsPerElement);
+            data[elem_index * mNumQuadPointsPerElement + quad_index] = 
+                physical_quad_point;
         }
     }
 }
 
 template<unsigned DIM>
-c_vector<double,DIM>& QuadraturePointsGroup<DIM>::rGet(unsigned elementIndex, unsigned quadIndex)
+c_vector<double,DIM>& QuadraturePointsGroup<DIM>::rGet(
+    unsigned elementIndex,
+    unsigned quadIndex)
 {
-    assert(elementIndex<mNumElements);
-    assert(quadIndex<mNumQuadPointsPerElement);
-    return data[ elementIndex*mNumQuadPointsPerElement + quadIndex ];
+    assert(elementIndex < mNumElements);
+    assert(quadIndex < mNumQuadPointsPerElement);
+    return data[elementIndex * mNumQuadPointsPerElement + quadIndex];
 }
 
 template<unsigned DIM>
 c_vector<double,DIM>& QuadraturePointsGroup<DIM>::rGet(unsigned i)
 {
-    assert(i < mNumElements*mNumQuadPointsPerElement);
+    assert(i < mNumElements * mNumQuadPointsPerElement);
     return data[i];
 }
 
@@ -109,11 +115,10 @@ unsigned QuadraturePointsGroup<DIM>::GetNumQuadPointsPerElement() const
 template<unsigned DIM>
 unsigned QuadraturePointsGroup<DIM>::Size() const
 {
-    return mNumElements*mNumQuadPointsPerElement;
+    return mNumElements * mNumQuadPointsPerElement;
 }
 
-//////////////// Explicit instantiation//////////////
-
+// Explicit instantiation
 template class QuadraturePointsGroup<1>;
 template class QuadraturePointsGroup<2>;
 template class QuadraturePointsGroup<3>;

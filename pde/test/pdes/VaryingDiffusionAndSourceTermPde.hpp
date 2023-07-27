@@ -50,8 +50,8 @@ class VaryingDiffusionAndSourceTermPde : public AbstractLinearEllipticPde<SPACE_
 private:
     double DistanceFromOrigin(const ChastePoint<SPACE_DIM>& x)
     {
-        double sum=0;
-        for (int i=0; i<SPACE_DIM; i++)
+        double sum = 0;
+        for (unsigned i = 0; i < SPACE_DIM; ++i)
         {
             sum += x[i]*x[i];
         }
@@ -61,7 +61,7 @@ private:
 public:
     double ComputeConstantInUSourceTerm(const ChastePoint<SPACE_DIM>& rX, Element<SPACE_DIM,SPACE_DIM>*)
     {
-        return pow(DistanceFromOrigin(rX),3.0);
+        return pow(DistanceFromOrigin(rX), 3.0);
     }
 
     double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<SPACE_DIM>& , Element<SPACE_DIM,SPACE_DIM>*)

@@ -149,7 +149,7 @@ public:
         ReplicatableVector answer_repl(answer);
 
         // Check result
-        for (unsigned i=0; i<answer_repl.GetSize(); i++)
+        for (unsigned i = 0; i < answer_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double u = sqrt(x*(1-x));
@@ -192,7 +192,7 @@ public:
         ReplicatableVector answer_repl(answer);
 
         // Check result
-        for (unsigned i=0; i<answer_repl.GetSize(); i++)
+        for (unsigned i = 0; i < answer_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double u = sqrt(x*(4-x));
@@ -224,7 +224,7 @@ public:
 
         // Set up initial Guess
         std::vector<double> init_guess(mesh.GetNumNodes());
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             init_guess[i] = 1.0+0.01*i*i;
         }
@@ -234,7 +234,7 @@ public:
         ReplicatableVector answer_repl(answer);
 
         // Check result
-        for (unsigned i=0; i<answer_repl.GetSize(); i++)
+        for (unsigned i = 0; i < answer_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double u = exp(0.5*(3.0*x-x*x));
@@ -266,7 +266,9 @@ public:
 
         // Set up initial Guess
         Vec initial_guess = PetscTools::CreateVec(mesh.GetNumNodes());
-        for (unsigned global_index=0; global_index<mesh.GetNumNodes(); global_index++)
+        for (unsigned global_index = 0;
+             global_index < mesh.GetNumNodes();
+             ++global_index)
         {
             PetscVecTools::SetElement(initial_guess, global_index, 1.5-0.15*global_index);
         }
@@ -276,7 +278,7 @@ public:
         ReplicatableVector answer_repl(answer);
 
         // Check result
-        for (unsigned i=0; i<answer_repl.GetSize(); i++)
+        for (unsigned i = 0; i < answer_repl.GetSize(); ++i)
         {
             // note: 2.0*(exp(-x)-x*exp(-1.0) is always >= 0 for these values of x,
             // however when x=1, 2.0*(exp(-x)-x*exp(-1.0) should be
@@ -315,9 +317,9 @@ public:
 
         // Set up initial Guess
         std::vector<double> init_guess(mesh.GetNumNodes());
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
-            double x1=0.1*(double)(i);
+            double x1=0.1*static_cast<double>(i);
             init_guess[i] =  0.35*(1-x1*x1);
         }
         Vec initial_guess = PetscTools::CreateVec(init_guess);
@@ -326,7 +328,7 @@ public:
         ReplicatableVector answer_repl(answer);
 
         // Check result
-        for (unsigned i=0; i<answer_repl.GetSize(); i++)
+        for (unsigned i = 0; i < answer_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double u = x*exp(-x);
@@ -364,9 +366,11 @@ public:
         // Set up initial Guess
         Vec initial_guess = PetscTools::CreateVec(mesh.GetNumNodes());
         double x1;
-        for (unsigned global_index=0; global_index<mesh.GetNumNodes(); global_index++)
+        for (unsigned global_index = 0;
+             global_index<mesh.GetNumNodes();
+             ++global_index)
         {
-            x1=0.1*(double)(global_index);
+            x1 = 0.1*static_cast<double>(global_index);
             PetscVecTools::SetElement(initial_guess, global_index, 0.35*(1-x1*x1));
         }
         PetscVecTools::Finalise(initial_guess);
@@ -375,7 +379,7 @@ public:
         ReplicatableVector answer_repl(answer);
 
         // Check result
-        for (unsigned i=0; i<answer_repl.GetSize(); i++)
+        for (unsigned i = 0; i < answer_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double u = exp(-x);
@@ -423,7 +427,7 @@ public:
         Vec answer = solver.Solve(initial_guess, true);
         ReplicatableVector answer_repl(answer);
 
-        for (unsigned i=0; i<answer_repl.GetSize(); i++)
+        for (unsigned i = 0; i < answer_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double u = sqrt(x*(4-x));
@@ -469,7 +473,7 @@ public:
         ReplicatableVector answer_repl(answer);
 
         // Check result
-        for (unsigned i=0; i<answer_repl.GetSize(); i++)
+        for (unsigned i = 0; i < answer_repl.GetSize(); ++i)
         {
             c_vector<double, 2> r;
             r(0) = mesh.GetNode(i)->GetPoint()[0];
@@ -538,7 +542,7 @@ public:
         ReplicatableVector answer_repl(answer);
 
         // Check result
-        for (unsigned i=0; i<answer_repl.GetSize(); i++)
+        for (unsigned i = 0; i < answer_repl.GetSize(); ++i)
         {
             double y = mesh.GetNode(i)->GetPoint()[1];
             double u = sqrt(y*(4-y));
@@ -620,7 +624,7 @@ public:
         ReplicatableVector answer_repl(answer);
 
         // Check result
-        for (unsigned i=0; i<answer_repl.GetSize(); i++)
+        for (unsigned i = 0; i < answer_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];
@@ -635,7 +639,7 @@ public:
         ReplicatableVector answer_repl2(answer);
 
         // Check result
-        for (unsigned i=0; i<answer_repl.GetSize(); i++)
+        for (unsigned i = 0; i < answer_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];
@@ -718,7 +722,7 @@ public:
         ReplicatableVector answer_repl(answer);
 
         // Check result
-        for (unsigned i=0; i<answer_repl.GetSize(); i++)
+        for (unsigned i = 0; i < answer_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];
@@ -733,7 +737,7 @@ public:
         ReplicatableVector answer_repl2(answer);
 
         // Check result
-        for (unsigned i=0; i<answer_repl.GetSize(); i++)
+        for (unsigned i = 0; i < answer_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];

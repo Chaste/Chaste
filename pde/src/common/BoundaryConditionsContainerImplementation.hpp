@@ -46,12 +46,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ReplicatableVector.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::BoundaryConditionsContainer(bool deleteConditions)
-            : AbstractBoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>(deleteConditions)
+BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::BoundaryConditionsContainer(
+    bool deleteConditions)
+     : AbstractBoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>(deleteConditions)
 {
     mLoadedFromArchive = false;
 
-    for (unsigned index_of_unknown=0; index_of_unknown<PROBLEM_DIM; index_of_unknown++)
+    for (unsigned index_of_unknown = 0; index_of_unknown < PROBLEM_DIM; ++index_of_unknown)
     {
         mpNeumannMap[index_of_unknown] = new std::map< const BoundaryElement<ELEMENT_DIM-1, SPACE_DIM> *, const AbstractBoundaryCondition<SPACE_DIM>*>;
 
@@ -70,7 +71,7 @@ BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::~BoundaryConditi
 {
     // Keep track of what boundary condition objects we've deleted
     std::set<const AbstractBoundaryCondition<SPACE_DIM>*> deleted_conditions;
-    for (unsigned i=0; i<PROBLEM_DIM; i++)
+    for (unsigned i = 0; i < PROBLEM_DIM; ++i)
     {
         NeumannMapIterator neumann_iterator = mpNeumannMap[i]->begin();
         while (neumann_iterator != mpNeumannMap[i]->end() )
@@ -79,7 +80,7 @@ BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::~BoundaryConditi
             if (deleted_conditions.count(neumann_iterator->second) == 0)
             {
                 deleted_conditions.insert(neumann_iterator->second);
-                //Leave the zero boundary condition until last
+                // Leave the zero boundary condition until last
                 if (neumann_iterator->second != mpZeroBoundaryCondition)
                 {
                     if (this->mDeleteConditions)
@@ -103,10 +104,11 @@ BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::~BoundaryConditi
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AddDirichletBoundaryCondition(const Node<SPACE_DIM>* pBoundaryNode,
-                                        const AbstractBoundaryCondition<SPACE_DIM>* pBoundaryCondition,
-                                        unsigned indexOfUnknown,
-                                        bool checkIfBoundaryNode)
+void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AddDirichletBoundaryCondition(
+    const Node<SPACE_DIM>* pBoundaryNode,
+    const AbstractBoundaryCondition<SPACE_DIM>* pBoundaryCondition,
+    unsigned indexOfUnknown,
+    bool checkIfBoundaryNode)
 {
     assert(indexOfUnknown < PROBLEM_DIM);
     if (checkIfBoundaryNode)
@@ -118,25 +120,30 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AddDirichle
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AddPeriodicBoundaryCondition(const Node<SPACE_DIM>* pNode1,
-                                                                                                  const Node<SPACE_DIM>* pNode2)
+void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AddPeriodicBoundaryCondition(
+    const Node<SPACE_DIM>* pNode1,
+    const Node<SPACE_DIM>* pNode2)
 {
     assert(pNode1->IsBoundaryNode());
     assert(pNode2->IsBoundaryNode());
 
-    // will assume the periodic BC is to be applied to ALL unknowns, can't really imagine a
-    // situation where this isn't going to be true. If necessary can easily change this method
-    // to take in the index of the unknown
-    for (unsigned i=0; i<PROBLEM_DIM; i++)
+    /*
+     * Will assume the periodic BC is to be applied to ALL unknowns, can't 
+     * really imagine a situation where this isn't going to be true. If 
+     * necessary can easily change this method to take in the index of the 
+     * unknown.
+     */
+    for (unsigned i = 0; i < PROBLEM_DIM; ++i)
     {
         (*(this->mpPeriodicBcMap[i]))[pNode1] = pNode2;
     }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AddNeumannBoundaryCondition( const BoundaryElement<ELEMENT_DIM-1, SPACE_DIM> * pBoundaryElement,
-                                      const AbstractBoundaryCondition<SPACE_DIM> * pBoundaryCondition,
-                                      unsigned indexOfUnknown)
+void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AddNeumannBoundaryCondition(
+    const BoundaryElement<ELEMENT_DIM-1, SPACE_DIM> * pBoundaryElement,
+    const AbstractBoundaryCondition<SPACE_DIM> * pBoundaryCondition,
+    unsigned indexOfUnknown)
 {
     assert(indexOfUnknown < PROBLEM_DIM);
 
@@ -157,7 +164,7 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AddNeumannB
         mAnyNonZeroNeumannConditionsForUnknown[indexOfUnknown] = true;
     }
 
-    for (unsigned unknown=0; unknown<PROBLEM_DIM; unknown++)
+    for (unsigned unknown = 0; unknown < PROBLEM_DIM; ++unknown)
     {
         if (unknown == indexOfUnknown)
         {
@@ -176,20 +183,23 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AddNeumannB
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::DefineZeroDirichletOnMeshBoundary(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                                           unsigned indexOfUnknown)
+void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::DefineZeroDirichletOnMeshBoundary(
+    AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
+    unsigned indexOfUnknown)
 {
     this->DefineConstantDirichletOnMeshBoundary(pMesh, 0.0, indexOfUnknown);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::DefineConstantDirichletOnMeshBoundary(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                                               double value,
-                                               unsigned indexOfUnknown)
+void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::DefineConstantDirichletOnMeshBoundary(
+    AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
+    double value,
+    unsigned indexOfUnknown)
 {
     assert(indexOfUnknown < PROBLEM_DIM);
+
     // In applying a condition to the boundary, we need to be sure that the boundary exists
-    assert(PetscTools::ReplicateBool( pMesh->GetNumBoundaryNodes() > 0 ) );
+    assert(PetscTools::ReplicateBool(pMesh->GetNumBoundaryNodes() > 0));
 
     ConstBoundaryCondition<SPACE_DIM>* p_boundary_condition = new ConstBoundaryCondition<SPACE_DIM>(value);
 
@@ -203,8 +213,9 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::DefineConst
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::DefineZeroNeumannOnMeshBoundary(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                                         unsigned indexOfUnknown)
+void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::DefineZeroNeumannOnMeshBoundary(
+    AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
+    unsigned indexOfUnknown)
 {
     assert(indexOfUnknown < PROBLEM_DIM);
 
@@ -303,12 +314,12 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyDirich
             lo = lo_s; hi = hi_s;
         }
         // Initialise all local entries to DBL_MAX, i.e. don't know if there's a condition
-        for (unsigned i=lo; i<hi; i++)
+        for (unsigned i = lo; i < hi; ++i)
         {
             dirichlet_conditions[i] = DBL_MAX;
         }
         // Now fill in the ones we know
-        for (unsigned index_of_unknown=0; index_of_unknown<PROBLEM_DIM; index_of_unknown++)
+        for (unsigned index_of_unknown = 0; index_of_unknown < PROBLEM_DIM; ++index_of_unknown)
         {
             this->mDirichIterator = this->mpDirichletMap[index_of_unknown]->begin();
 
@@ -330,7 +341,7 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyDirich
 
         // Which rows have conditions?
         std::vector<unsigned> rows_to_zero;
-        for (unsigned i=0; i<dirichlet_conditions.GetSize(); i++)
+        for (unsigned i = 0; i < dirichlet_conditions.GetSize(); ++i)
         {
             if (dirichlet_conditions[i] != DBL_MAX)
             {
@@ -341,7 +352,7 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyDirich
         if (matrix_is_symmetric)
         {
             // Modify the matrix columns
-            for (unsigned i=0; i<rows_to_zero.size(); i++)
+            for (unsigned i = 0; i < rows_to_zero.size(); ++i)
             {
                 unsigned col = rows_to_zero[i];
                 double minus_value = -dirichlet_conditions[col];
@@ -397,7 +408,7 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyDirich
          * Apply the actual boundary condition to the RHS, note this must be
          * done after the modification to the RHS vector.
          */
-        for (unsigned index_of_unknown=0; index_of_unknown<PROBLEM_DIM; index_of_unknown++)
+        for (unsigned index_of_unknown = 0; index_of_unknown < PROBLEM_DIM; ++index_of_unknown)
         {
             this->mDirichIterator = this->mpDirichletMap[index_of_unknown]->begin();
 
@@ -424,7 +435,7 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyPeriod
                                                                                                      bool applyToRhsVector)
 {
     bool has_periodic_bcs = false;
-    for (unsigned i=0; i<PROBLEM_DIM; i++)
+    for (unsigned i = 0; i < PROBLEM_DIM; ++i)
     {
         if (!mpPeriodicBcMap[i]->empty())
         {
@@ -438,7 +449,7 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyPeriod
     if (applyToMatrix)
     {
         std::vector<unsigned> rows_to_zero;
-        for (unsigned index_of_unknown=0; index_of_unknown<PROBLEM_DIM; index_of_unknown++)
+        for (unsigned index_of_unknown = 0; index_of_unknown < PROBLEM_DIM; ++index_of_unknown)
         {
             for (typename std::map< const Node<SPACE_DIM> *, const Node<SPACE_DIM> * >::const_iterator iter = mpPeriodicBcMap[index_of_unknown]->begin();
                 iter != mpPeriodicBcMap[index_of_unknown]->end();
@@ -452,7 +463,7 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyPeriod
 
         rLinearSystem.ZeroMatrixRowsWithValueOnDiagonal(rows_to_zero, 1.0);
 
-        for (unsigned index_of_unknown=0; index_of_unknown<PROBLEM_DIM; index_of_unknown++)
+        for (unsigned index_of_unknown = 0; index_of_unknown < PROBLEM_DIM; ++index_of_unknown)
         {
             for (typename std::map< const Node<SPACE_DIM> *, const Node<SPACE_DIM> * >::const_iterator iter = mpPeriodicBcMap[index_of_unknown]->begin();
                 iter != mpPeriodicBcMap[index_of_unknown]->end();
@@ -470,7 +481,7 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyPeriod
 
     if (applyToRhsVector)
     {
-        for (unsigned index_of_unknown=0; index_of_unknown<PROBLEM_DIM; index_of_unknown++)
+        for (unsigned index_of_unknown = 0; index_of_unknown < PROBLEM_DIM; ++index_of_unknown)
         {
             for (typename std::map< const Node<SPACE_DIM> *, const Node<SPACE_DIM> * >::const_iterator iter = mpPeriodicBcMap[index_of_unknown]->begin();
                  iter != mpPeriodicBcMap[index_of_unknown]->end();
@@ -490,7 +501,7 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyDirich
         Vec residual,
         DistributedVectorFactory& rFactory)
 {
-    for (unsigned index_of_unknown=0; index_of_unknown<PROBLEM_DIM; index_of_unknown++)
+    for (unsigned index_of_unknown = 0; index_of_unknown < PROBLEM_DIM; ++index_of_unknown)
     {
         this->mDirichIterator = this->mpDirichletMap[index_of_unknown]->begin();
 
@@ -522,15 +533,15 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyDirichletToNonlinearJacobian(Mat jacobian)
 {
     unsigned num_boundary_conditions = 0;
-    for (unsigned index_of_unknown=0; index_of_unknown<PROBLEM_DIM; index_of_unknown++)
+    for (unsigned index_of_unknown = 0; index_of_unknown < PROBLEM_DIM; ++index_of_unknown)
     {
         num_boundary_conditions += this->mpDirichletMap[index_of_unknown]->size();
     }
 
     std::vector<unsigned> rows_to_zero(num_boundary_conditions);
 
-    unsigned counter=0;
-    for (unsigned index_of_unknown=0; index_of_unknown<PROBLEM_DIM; index_of_unknown++)
+    unsigned counter = 0;
+    for (unsigned index_of_unknown = 0; index_of_unknown < PROBLEM_DIM; ++index_of_unknown)
     {
         this->mDirichIterator = this->mpDirichletMap[index_of_unknown]->begin();
 
@@ -550,7 +561,7 @@ bool BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Validate(Ab
 {
     bool valid = true;
 
-    for (unsigned index_of_unknown=0; index_of_unknown<PROBLEM_DIM; index_of_unknown++)
+    for (unsigned index_of_unknown = 0; index_of_unknown < PROBLEM_DIM; ++index_of_unknown)
     {
         // Iterate over surface elements
         typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::BoundaryElementIterator elt_iter
@@ -560,7 +571,7 @@ bool BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Validate(Ab
             if (!HasNeumannBoundaryCondition(*elt_iter, index_of_unknown))
             {
                 // Check for Dirichlet conditions on this element's nodes
-                for (unsigned i=0; i<(*elt_iter)->GetNumNodes(); i++)
+                for (unsigned i = 0; i < (*elt_iter)->GetNumNodes(); ++i)
                 {
                     if (!this->HasDirichletBoundaryCondition((*elt_iter)->GetNode(i)))
                     {
@@ -613,7 +624,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 bool BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AnyNonZeroNeumannConditions()
 {
     bool ret = false;
-    for (unsigned index_of_unknown=0; index_of_unknown<PROBLEM_DIM; index_of_unknown++)
+    for (unsigned index_of_unknown = 0; index_of_unknown < PROBLEM_DIM; ++index_of_unknown)
     {
         if (mAnyNonZeroNeumannConditionsForUnknown[index_of_unknown] == true)
         {

@@ -133,7 +133,7 @@ public:
 
         // Initial condition u(0,x,y) = sin(0.5*M_PI*x)*sin(M_PI*y)+x
         std::vector<double> init_cond(mesh.GetNumNodes());
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];
@@ -151,7 +151,7 @@ public:
         ReplicatableVector result_repl(result);
 
         // Check solution is u = e^{-5/4*M_PI*M_PI*t} sin(0.5*M_PI*x)*sin(M_PI*y)+x, t=0.1
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];
@@ -191,7 +191,7 @@ public:
          * this is an eigenfunction of the heat equation.
          */
         std::vector<double> init_cond(mesh.GetNumNodes());
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];
@@ -210,7 +210,7 @@ public:
         ReplicatableVector result_repl(result);
 
         // Check solution is u = e^{-3*t*pi*pi} sin(x*pi)*sin(y*pi)*sin(z*pi), t=0.1
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];
@@ -268,7 +268,7 @@ public:
 
         int lo, hi;
         VecGetOwnershipRange(initial_condition, &lo, &hi);
-        for (int global_index = lo; global_index < hi; global_index++)
+        for (int global_index = lo; global_index < hi; ++global_index)
         {
             int local_index = global_index - lo;
             double x = mesh.GetNode(global_index)->GetPoint()[0];
@@ -290,7 +290,7 @@ public:
         VecGetArray(result, &p_result);
 
         // Solution should be u = e^{-t*2*pi*pi} sin(x*pi) sin(y*pi) sin(z*pi) - 1/6(x^2+y^2+z^2), t=0.1
-        for (int global_index = lo; global_index < hi; global_index++)
+        for (int global_index = lo; global_index < hi; ++global_index)
         {
             int local_index = global_index - lo;
             double x = mesh.GetNode(global_index)->GetPoint()[0];
@@ -375,7 +375,7 @@ public:
 
         int lo, hi;
         VecGetOwnershipRange(initial_condition, &lo, &hi);
-        for (int global_index = lo; global_index < hi; global_index++)
+        for (int global_index = lo; global_index < hi; ++global_index)
         {
             int local_index = global_index - lo;
             double x = mesh.GetNode(global_index)->GetPoint()[0];
@@ -397,7 +397,7 @@ public:
         VecGetArray(result, &p_result);
 
         // Solution should be u = e^{-5/2*PI*PI*t} sin(0.5*PI*x)*sin(PI*y)*sin(PI*z)+x, t=0.1
-        for (int global_index = lo; global_index < hi; global_index++)
+        for (int global_index = lo; global_index < hi; ++global_index)
         {
             int local_index = global_index - lo;
             double x = mesh.GetNode(global_index)->GetPoint()[0];

@@ -221,7 +221,7 @@ public:
         TS_ASSERT_DELTA(trans_deriv(0,2),  1.2, 1e-12);
 
         // Free nodes
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -262,7 +262,7 @@ public:
         TS_ASSERT_DELTA(trans_deriv(1,5),-0.64, 1e-12);
 
         // Free nodes
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -325,7 +325,7 @@ public:
         TS_ASSERT_DELTA(trans_deriv(2,9),0.12, 1e-12);
 
         // Free nodes
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); ++i)
         {
             delete nodes[i];
         }

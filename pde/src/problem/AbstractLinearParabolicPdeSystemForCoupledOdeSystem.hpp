@@ -47,63 +47,78 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * A system of parabolic PDEs, which may be coupled via their source terms:
  *
- * d/dt (u_i) = div (D(x) grad (u_i)) + f_i (x, u_0, ..., u_{p-1}, v_0, ..., v_{q-1}),  i=0,...,p-1.
+ * d/dt (u_i) = div (D(x) grad (u_i))
+ *                + f_i (x, u_0, ..., u_{p-1}, v_0, ..., v_{q-1}),  i=0,...,p-1.
  *
- * Here p denotes the size of the PDE system and each source term f_i may be nonlinear.
- * The variables v_0, ..., v_{q-1} are assumed to satisfy a coupled ODE system of the form
+ * Here p denotes the size of the PDE system and each source term f_i may be 
+ * nonlinear. The variables v_0, ..., v_{q-1} are assumed to satisfy a coupled 
+ * ODE system of the form
  *
  * d/dt (v_j) = g_j(x, u_0, ..., u_{p-1}, v_0, ..., v_{q-1}),  j=0,...,q-1.
  *
- * Such systems may be solved using LinearParabolicPdeSystemWithCoupledOdeSystemSolver.
+ * Such systems may be solved using 
+ * LinearParabolicPdeSystemWithCoupledOdeSystemSolver.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM, unsigned PROBLEM_DIM=1>
 class AbstractLinearParabolicPdeSystemForCoupledOdeSystem
 {
 public:
+
     /**
-     * @return computed function c_i(x).
-     *
      * @param rX the point x at which the function c_i is computed
      * @param pdeIndex the index of the PDE, denoted by i above
+     * 
+     * @return computed function c_i(x).
      */
-    virtual double ComputeDuDtCoefficientFunction(const ChastePoint<SPACE_DIM>& rX, unsigned pdeIndex)=0;
+    virtual double ComputeDuDtCoefficientFunction(
+        const ChastePoint<SPACE_DIM>& rX,
+        unsigned pdeIndex) = 0;
 
     /**
-     * @return computed source term f_i(x, u_1, u_2, ..., u_p) at a point in space.
-     *
      * @param rX the point x at which the nonlinear source term is computed
-     * @param rU the vector of dependent variables (u_1, u_2, ..., u_p) at the point x
-     * @param rOdeSolution the ODE system state vector (v_1, ..., v_q) at the point x (if an ODE system is present)
+     * @param rU the vector of dependent variables (u_1, u_2, ..., u_p) at the 
+     *     point x
+     * @param rOdeSolution the ODE system state vector (v_1, ..., v_q) at the 
+     *     point x (if an ODE system is present)
      * @param pdeIndex the index of the PDE, denoted by i above
+     * 
+     * @return computed source term f_i(x, u_1, u_2, ..., u_p) at a point in 
+     *     space.
      */
-    virtual double ComputeSourceTerm(const ChastePoint<SPACE_DIM>& rX,
-                                     c_vector<double,PROBLEM_DIM>& rU,
-                                     std::vector<double>& rOdeSolution,
-                                     unsigned pdeIndex)=0;
+    virtual double ComputeSourceTerm(
+        const ChastePoint<SPACE_DIM>& rX,
+        c_vector<double,PROBLEM_DIM>& rU,
+        std::vector<double>& rOdeSolution,
+        unsigned pdeIndex) = 0;
 
     /**
-     * @return computed source term f_i(x, u_1, u_2, ..., u_p) at a node.
-     *
      * @param rNode the node at which the nonlinear source term f_i is computed
-     * @param rU the vector of dependent variables (u_1, u_2, ..., u_p) at the node
-     * @param rOdeSolution the ODE system state vector (v_1, ..., v_q) at the node (if an ODE system is present)
+     * @param rU the vector of dependent variables (u_1, u_2, ..., u_p) at the 
+     *     node
+     * @param rOdeSolution the ODE system state vector (v_1, ..., v_q) at the 
+     *     node (if an ODE system is present)
      * @param pdeIndex the index of the PDE, denoted by i above
+     * 
+     * @return computed source term f_i(x, u_1, u_2, ..., u_p) at a node.
      */
-    virtual double ComputeSourceTermAtNode(const Node<SPACE_DIM>& rNode,
-                                           c_vector<double,PROBLEM_DIM>& rU,
-                                           std::vector<double>& rOdeSolution,
-                                           unsigned pdeIndex);
+    virtual double ComputeSourceTermAtNode(
+        const Node<SPACE_DIM>& rNode,
+        c_vector<double,PROBLEM_DIM>& rU,
+        std::vector<double>& rOdeSolution,
+        unsigned pdeIndex);
 
     /**
-     * @return computed diffusion term D_i(x) at a point in space. The diffusion tensor should be symmetric and positive definite.
-     *
      * @param rX The point x at which the diffusion term D_i is computed
      * @param pdeIndex the index of the PDE, denoted by i above
      * @param pElement The mesh element that x is contained in (optional)
+     * 
+     * @return computed diffusion term D_i(x) at a point in space. The diffusion 
+     *     tensor should be symmetric and positive definite.
      */
-    virtual c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(const ChastePoint<SPACE_DIM>& rX,
-                                                                        unsigned pdeIndex,
-                                                                        Element<ELEMENT_DIM,SPACE_DIM>* pElement=NULL)=0;
+    virtual c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(
+        const ChastePoint<SPACE_DIM>& rX,
+        unsigned pdeIndex,
+        Element<ELEMENT_DIM,SPACE_DIM>* pElement = NULL) = 0;
 
     /**
      * Destructor.
@@ -112,12 +127,14 @@ public:
     {}
 };
 
-///////////////////////////////////////////////////////////////////////////////////
 // Implementation
-///////////////////////////////////////////////////////////////////////////////////
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-double AbstractLinearParabolicPdeSystemForCoupledOdeSystem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::ComputeSourceTermAtNode(const Node<SPACE_DIM>& rNode, c_vector<double,PROBLEM_DIM>& rU, std::vector<double>& rOdeSolution, unsigned pdeIndex)
+double AbstractLinearParabolicPdeSystemForCoupledOdeSystem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::ComputeSourceTermAtNode(
+    const Node<SPACE_DIM>& rNode,
+    c_vector<double,PROBLEM_DIM>& rU,
+    std::vector<double>& rOdeSolution,
+    unsigned pdeIndex)
 {
     return ComputeSourceTerm(rNode.GetPoint(), rU, rOdeSolution, pdeIndex);
 }

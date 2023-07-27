@@ -77,7 +77,7 @@ public:
         TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights().size(), num_quads_per_element*coarse_mesh.GetNumAllElements());
         TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights().size(), 12u);
 
-        for (unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)
+        for (unsigned i = 0; i < mesh_pair.rGetElementsAndWeights().size(); ++i)
         {
             // All coarse mesh quad points are in the same fine element
             TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights()[i].ElementNum, 1u);
@@ -88,7 +88,7 @@ public:
              * position of the point in that element when transformed to the
              * canonical element.
              */
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j = 0; j < 3; ++j)
             {
                 TS_ASSERT_LESS_THAN(-1e14, mesh_pair.rGetElementsAndWeights()[i].Weights(j));
                 TS_ASSERT_LESS_THAN(mesh_pair.rGetElementsAndWeights()[i].Weights(j), 1.0+1e-14);
@@ -114,19 +114,18 @@ public:
         TS_ASSERT_EQUALS(mesh_pair.mpFineMeshBoxCollection->GetNumBoxes(), 4*4*4u);
 
         // For each node, find containing box. That box should contain any element that node is in.
-        for (unsigned i=0; i<fine_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < fine_mesh.GetNumNodes(); ++i)
         {
             unsigned box_index = mesh_pair.mpFineMeshBoxCollection->CalculateContainingBox(fine_mesh.GetNode(i));
             if (mesh_pair.mpFineMeshBoxCollection->IsBoxOwned(box_index))
             {
                 assert(fine_mesh.GetNode(i)->rGetContainingElementIndices().size() > 0);
 
-                for (std::set<unsigned>::iterator iter = fine_mesh.GetNode(i)->rGetContainingElementIndices().begin();
-                        iter != fine_mesh.GetNode(i)->rGetContainingElementIndices().end();
-                        ++iter)
+                for (auto iter : fine_mesh.GetNode(i)->rGetContainingElementIndices())
                 {
-                    Element<3,3>* p_element = fine_mesh.GetElement(*iter);
-                    TS_ASSERT_DIFFERS( mesh_pair.mpFineMeshBoxCollection->rGetBox(box_index).rGetElementsContained().find(p_element), mesh_pair.mpFineMeshBoxCollection->rGetBox(box_index).rGetElementsContained().end() )
+                    Element<3,3>* p_element = fine_mesh.GetElement(iter);
+                    TS_ASSERT_DIFFERS(mesh_pair.mpFineMeshBoxCollection->rGetBox(box_index).rGetElementsContained().find(p_element), 
+                                      mesh_pair.mpFineMeshBoxCollection->rGetBox(box_index).rGetElementsContained().end())
                 }
             }
         }
@@ -147,7 +146,7 @@ public:
         TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights()[10].ElementNum, 217u);
         TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights()[20].ElementNum, 1094u);
 
-        for (unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)
+        for (unsigned i = 0; i < mesh_pair.rGetElementsAndWeights().size(); ++i)
         {
             TS_ASSERT_LESS_THAN(mesh_pair.rGetElementsAndWeights()[i].ElementNum, fine_mesh.GetNumElements());
 
@@ -158,7 +157,7 @@ public:
              * is the position of the point in that element when transformed to the
              * canonical element.
              */
-            for (unsigned j=0; j<4; j++)
+            for (unsigned j = 0; j < 4; ++j)
             {
                 TS_ASSERT_LESS_THAN(-1e14, mesh_pair.rGetElementsAndWeights()[i].Weights(j));
                 TS_ASSERT_LESS_THAN(mesh_pair.rGetElementsAndWeights()[i].Weights(j), 1.0+1e-14);
@@ -204,12 +203,12 @@ public:
         }
         TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights().size(), 6*8u);
 
-        for (unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)
+        for (unsigned i = 0; i < mesh_pair.rGetElementsAndWeights().size(); ++i)
         {
             TS_ASSERT_LESS_THAN(mesh_pair.rGetElementsAndWeights()[i].ElementNum, fine_mesh.GetNumElements());
 
             // comment out this test as now some of the weights are negative/greater than one
-            //for (unsigned j=0; j<4; j++)
+            //for (unsigned j = 0; j < 4; ++j)
             //{
             //    TS_ASSERT_LESS_THAN(-1e14, mesh_pair.rGetElementsAndWeights()[i].Weights(j));
             //    TS_ASSERT_LESS_THAN(mesh_pair.rGetElementsAndWeights()[i].Weights(j), 1.0+1e-14);
@@ -222,7 +221,7 @@ public:
          * be outside the fine mesh.
          */
         QuadraturePointsGroup<3> quad_point_posns(coarse_mesh, quad_rule);
-        for (unsigned i=0; i<mesh_pair.mNotInMesh.size(); i++)
+        for (unsigned i = 0; i < mesh_pair.mNotInMesh.size(); ++i)
         {
             double x = quad_point_posns.rGet(mesh_pair.mNotInMesh[i])(0);
             TS_ASSERT_LESS_THAN(1.0, x);
@@ -337,7 +336,7 @@ public:
         }
         TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights().size(), 6*8u);
 
-        for (unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)
+        for (unsigned i = 0; i < mesh_pair.rGetElementsAndWeights().size(); ++i)
         {
             TS_ASSERT_LESS_THAN(mesh_pair.rGetElementsAndWeights()[i].ElementNum, fine_mesh.GetNumElements());
         }
@@ -348,7 +347,7 @@ public:
          * be outside the fine mesh.
          */
         QuadraturePointsGroup<3> quad_point_posns(coarse_mesh, quad_rule);
-        for (unsigned i=0; i<mesh_pair.mNotInMesh.size(); i++)
+        for (unsigned i = 0; i < mesh_pair.mNotInMesh.size(); ++i)
         {
             double x = quad_point_posns.rGet(mesh_pair.mNotInMesh[i])(0);
             TS_ASSERT_LESS_THAN(1.0, x);
@@ -426,7 +425,7 @@ public:
         ChastePoint<2> upper_right(0.75, 0.75);
         TS_ASSERT_EQUALS(coarse_mesh.GetContainingElementIndex(upper_right), upper_right_element_index);
 
-        for (unsigned i=0; i<fine_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < fine_mesh.GetNumNodes(); ++i)
         {
             double x = fine_mesh.GetNode(i)->rGetLocation()[0];
             double y = fine_mesh.GetNode(i)->rGetLocation()[1];
@@ -455,7 +454,7 @@ public:
         fine_mesh.Scale(1e-2, 1e-2);
         fine_mesh.Translate(-1.1e-2, -1.1e-2);
         mesh_pair.ComputeCoarseElementsForFineNodes(true);
-        for (unsigned i=0; i<fine_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < fine_mesh.GetNumNodes(); ++i)
         {
             TS_ASSERT_EQUALS(mesh_pair.rGetCoarseElementsForFineNodes()[i], lower_left_element_index);
         }
@@ -464,7 +463,7 @@ public:
         mesh_pair.rGetCoarseElementsForFineNodes()[0] = 189342958;
         // Call again with safeMode=false this time (same results, faster)
         mesh_pair.ComputeCoarseElementsForFineNodes(false);
-        for (unsigned i=0; i<fine_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < fine_mesh.GetNumNodes(); ++i)
         {
             TS_ASSERT_EQUALS(mesh_pair.rGetCoarseElementsForFineNodes()[i], lower_left_element_index);
         }
@@ -500,7 +499,7 @@ public:
         TS_ASSERT_EQUALS(coarse_mesh.GetContainingElementIndex(upper_right), upper_right_element_index);
 
         TS_ASSERT_EQUALS( mesh_pair.rGetCoarseElementsForFineElementCentroids().size(), fine_mesh.GetNumElements());
-        for (unsigned i=0; i<fine_mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i < fine_mesh.GetNumElements(); ++i)
         {
             double x = fine_mesh.GetElement(i)->CalculateCentroid()(0);
             double y = fine_mesh.GetElement(i)->CalculateCentroid()(1);
@@ -536,7 +535,7 @@ public:
         fine_mesh.Translate(-1.1e-2, -1.1e-2);
         mesh_pair.ComputeCoarseElementsForFineElementCentroids(true);
         TS_ASSERT_EQUALS( mesh_pair.rGetCoarseElementsForFineElementCentroids().size(), fine_mesh.GetNumElements());
-        for (unsigned i=0; i<fine_mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i < fine_mesh.GetNumElements(); ++i)
         {
             TS_ASSERT_EQUALS( mesh_pair.rGetCoarseElementsForFineElementCentroids()[i], lower_left_element_index);
         }
@@ -572,14 +571,14 @@ public:
         TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights()[2].ElementNum, 0u);
         TS_ASSERT_EQUALS(mesh_pair.rGetElementsAndWeights()[3].ElementNum, 2u);
 
-        for (unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)
+        for (unsigned i = 0; i < mesh_pair.rGetElementsAndWeights().size(); ++i)
         {
             TS_ASSERT_LESS_THAN(mesh_pair.rGetElementsAndWeights()[i].ElementNum, fine_mesh.GetNumElements());
 
             // All the weights should be between 0 and 1 as no coarse nodes are
             // Note weights = (1-psi_x-psi_y-psi_z, psi_x, psi_y, psi_z), where psi is the position of the
             // point in that element when transformed to the canonical element
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j = 0; j < 3; ++j)
             {
                 TS_ASSERT_LESS_THAN(-1e14, mesh_pair.rGetElementsAndWeights()[i].Weights(j));
                 TS_ASSERT_LESS_THAN(mesh_pair.rGetElementsAndWeights()[i].Weights(j), 1.0+1e-14);

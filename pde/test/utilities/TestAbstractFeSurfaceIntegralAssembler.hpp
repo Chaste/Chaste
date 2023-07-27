@@ -53,9 +53,9 @@ private:
         ChastePoint<DIM>& rX)
     {
         c_vector<double,1*(DIM)> vec;
-        for (unsigned i=0; i<DIM; i++)
+        for (unsigned i = 0; i < DIM; ++i)
         {
-            vec(i)=1.0;
+            vec(i) = 1.0;
         }
         return vec;
     }
@@ -105,7 +105,7 @@ public:
         TS_ASSERT_DELTA(vec_repl[0], 1.0 + offset, 1e-4);
         TS_ASSERT_DELTA(vec_repl[mesh.GetNumNodes()-1], 1.0 + offset, 1e-4);
 
-        for (unsigned i=1; i<mesh.GetNumNodes()-1; i++)
+        for (unsigned i = 1; i < mesh.GetNumNodes()-1; ++i)
         {
             TS_ASSERT_DELTA(vec_repl[i], 0.0 + offset, 1e-4);
         }

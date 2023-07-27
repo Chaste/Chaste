@@ -272,7 +272,7 @@ public:
         out_stream p_file = output_file_handler.OpenOutputFile("linear_solution.txt");
 
         /* Loop over the entries of the solution. */
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             /* Get the x and y-values of the node corresponding to this entry. The method
              * {{{GetNode}}} on the mesh class returns a pointer to a {{{Node}}}. */
@@ -377,7 +377,7 @@ public:
         /* We can now compare the solution of the parabolic PDE at t=1 with the static solution,
          * to see if the static equilibrium solution was reached in the former. (Ideally we should
          * compute some relative error, but we just compute an absolute error for simplicity.) */
-        for (unsigned i=0; i<static_solution_repl.GetSize(); i++)
+        for (unsigned i = 0; i < static_solution_repl.GetSize(); ++i)
         {
             TS_ASSERT_DELTA( solution_repl[i], static_solution_repl[i], 1e-3);
         }

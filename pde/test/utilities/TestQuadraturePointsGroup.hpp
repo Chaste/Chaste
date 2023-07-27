@@ -96,20 +96,24 @@ public:
         TS_ASSERT_EQUALS(group.GetNumQuadPointsPerElement(), 3u);
 
         // Element 0
-        for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
+        for (unsigned quad_index = 0;
+             quad_index < quad_rule.GetNumQuadPoints();
+             ++quad_index)
         {
             c_vector<double,2> quad_point = group.rGet(0, quad_index);
-            TS_ASSERT_LESS_THAN(quad_point(0)+quad_point(1), 1.0); // quad point in elem 0, so x+y<1
+            TS_ASSERT_LESS_THAN(quad_point(0) + quad_point(1), 1.0); // quad point in elem 0, so x+y<1
         }
         // Element 1
-        for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
+        for (unsigned quad_index = 0;
+             quad_index < quad_rule.GetNumQuadPoints();
+             ++quad_index)
         {
             c_vector<double,2> quad_point = group.rGet(1, quad_index);
-            TS_ASSERT_LESS_THAN(1.0, quad_point(0)+quad_point(1)); // quad point in elem 1, so x+y>1
+            TS_ASSERT_LESS_THAN(1.0, quad_point(0) + quad_point(1)); // quad point in elem 1, so x+y>1
         }
 
         TS_ASSERT_EQUALS(group.Size(), 6u);
-        for (unsigned index=0; index<group.Size(); index++)
+        for (unsigned index = 0; index < group.Size(); ++index)
         {
             TS_ASSERT_LESS_THAN_EQUALS(group.rGet(index)[0], 5.0/6.0);
             TS_ASSERT_LESS_THAN_EQUALS(1.0/6.0, group.rGet(index)[0]);
@@ -135,8 +139,10 @@ public:
         // Element 0
         try
         {
-            mesh.GetElement(0); //Throws if not owned
-            for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
+            mesh.GetElement(0); // Throws if not owned
+            for (unsigned quad_index = 0;
+                 quad_index < quad_rule.GetNumQuadPoints();
+                 ++quad_index)
             {
                 c_vector<double,2> quad_point = group.rGet(0, quad_index);
                 TS_ASSERT_LESS_THAN(quad_point(0)+quad_point(1), 1.0); // quad point in elem 0, so x+y<1
@@ -144,8 +150,10 @@ public:
         }
         catch (Exception&)
         {
-            //If not, then we know nothing about these quad points
-            for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
+            // If not, then we know nothing about these quad points
+            for (unsigned quad_index = 0;
+                 quad_index < quad_rule.GetNumQuadPoints();
+                 ++quad_index)
             {
                 c_vector<double,2> quad_point = group.rGet(0, quad_index);
                 TS_ASSERT_EQUALS(quad_point(0), DOUBLE_UNSET);
@@ -156,8 +164,10 @@ public:
         // Element 1
         try
         {
-            mesh.GetElement(0); //Throws if not owned
-            for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
+            mesh.GetElement(0); // Throws if not owned
+            for (unsigned quad_index = 0;
+                 quad_index < quad_rule.GetNumQuadPoints();
+                 ++quad_index)
             {
                 c_vector<double,2> quad_point = group.rGet(1, quad_index);
                 TS_ASSERT_LESS_THAN(1.0, quad_point(0)+quad_point(1)); // quad point in elem 1, so x+y>1
@@ -165,8 +175,10 @@ public:
         }
         catch (Exception&)
         {
-            //If not, then we know nothing about these quad points
-            for (unsigned quad_index=0; quad_index<quad_rule.GetNumQuadPoints(); quad_index++)
+            // If not, then we know nothing about these quad points
+            for (unsigned quad_index = 0;
+                 quad_index < quad_rule.GetNumQuadPoints();
+                 ++quad_index)
             {
                 c_vector<double,2> quad_point = group.rGet(0, quad_index);
                 TS_ASSERT_EQUALS(quad_point(0), DOUBLE_UNSET);
@@ -175,7 +187,7 @@ public:
         }
 
         TS_ASSERT_EQUALS(group.Size(), 6u);
-        for (unsigned index=0; index<group.Size(); index++)
+        for (unsigned index = 0; index < group.Size(); ++index)
         {
             double quad_x = group.rGet(index)[0];
             if (quad_x != DOUBLE_UNSET)

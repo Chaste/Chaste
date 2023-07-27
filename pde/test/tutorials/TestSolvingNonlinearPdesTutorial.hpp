@@ -241,7 +241,7 @@ public:
         /* Once solved, we can check the obtained solution against the analytical
          * solution. */
         ReplicatableVector answer_repl(answer);
-        for (unsigned i=0; i<answer_repl.GetSize(); i++)
+        for (unsigned i = 0; i < answer_repl.GetSize(); ++i)
         {
             double y = mesh.GetNode(i)->GetPoint()[1];
             double exact_u = sqrt(y*(4-y));

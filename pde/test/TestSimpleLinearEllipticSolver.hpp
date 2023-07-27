@@ -115,7 +115,7 @@ public:
         ReplicatableVector result_repl(result);
 
         // Solution should be u = 0.5*x*(3-x)
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double u = 0.5*x*(3-x);
@@ -151,7 +151,7 @@ public:
 
         Vec result = solver.Solve();
         ReplicatableVector result_repl(result);
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double u = 1 - 0.5*(x+1)*(5+x);
@@ -190,7 +190,7 @@ public:
 
         Vec result = solver.Solve();
         ReplicatableVector result_repl(result);
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double u = -0.5*x*x - 2*x - 0.5;
@@ -214,7 +214,7 @@ public:
         BoundaryConditionsContainer<2,2,1> bcc;
         ConstBoundaryCondition<2>* p_boundary_condition = new ConstBoundaryCondition<2>(0.0);
         DistributedVectorFactory* p_factory = mesh.GetDistributedVectorFactory();
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             if (p_factory->IsGlobalIndexLocal(i))
             {
@@ -262,7 +262,7 @@ public:
 
         Vec result = solver.Solve();
         ReplicatableVector result_repl(result);
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             c_vector<double, 2> r;
             r(0) = mesh.GetNode(i)->GetPoint()[0];
@@ -300,7 +300,7 @@ public:
 
         Vec result = solver.Solve();
         ReplicatableVector result_repl(result);
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double u = -(x*x*x/12.0)-(333/(4*x))+4+1000.0/12.0;
@@ -368,9 +368,11 @@ public:
         int lo, hi;
         VecGetOwnershipRange(result, &lo, &hi);
         VecGetArray(result, &p_result);
-        for (unsigned global_index=0; global_index < mesh.GetNumNodes(); global_index++)
+        for (unsigned global_index = 0;
+             global_index < mesh.GetNumNodes();
+             ++global_index)
         {
-            int local_index=global_index - lo;
+            int local_index = global_index - lo;
             double r = mesh.GetNode(global_index)->GetPoint()[0];
             double z = mesh.GetNode(global_index)->GetPoint()[1];
             double u;
@@ -427,7 +429,7 @@ public:
         ReplicatableVector result_repl(result);
 
         // Solution should be -1/6*(x^2 + y^2 +z^2)
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];
@@ -492,7 +494,7 @@ public:
         ReplicatableVector result_repl(result);
 
         // Solution should be -1/6*(x^2 + y^2 +z^2)
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];
@@ -521,7 +523,7 @@ public:
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(0), p_boundary_condition);
 
         p_boundary_condition = new ConstBoundaryCondition<1>(2.0);
-        unsigned last_node = (unsigned)(mesh.GetNumNodes()-1);
+        unsigned last_node = static_cast<unsigned>(mesh.GetNumNodes() - 1);
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(last_node), p_boundary_condition);
 
         // Solver
@@ -532,7 +534,7 @@ public:
 
         // Solution should be u = a sin(x) + cos(x), where a = (2-cos1)/sin1
         double a = (2-cos(2.0))/sin(2.0);
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double u = a*sin(2*x) + cos(2*x);
@@ -578,7 +580,7 @@ public:
         ReplicatableVector result_repl(result);
 
         // Solution should be u = exp(xy)
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];
@@ -657,7 +659,7 @@ public:
         ReplicatableVector result_repl(result);
 
         // Solution should be u = 0.5*x*(3-x)
-        for (unsigned i=0; i<result_repl.GetSize(); i++)
+        for (unsigned i = 0; i < result_repl.GetSize(); ++i)
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double u = 0.5*x*(3-x);
@@ -696,13 +698,13 @@ public:
 
         // Boundary conditions
         BoundaryConditionsContainer<2,2,1> bcc;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
             if (fabs(x) < 1e-6)
             {
-                for (unsigned j=0; j<mesh.GetNumNodes(); j++)
+                for (unsigned j = 0; j < mesh.GetNumNodes(); ++j)
                 {
                     double x2 = mesh.GetNode(j)->rGetLocation()[0];
                     double y2 = mesh.GetNode(j)->rGetLocation()[1];
@@ -734,7 +736,7 @@ public:
         ReplicatableVector res_repl(result);
         OutputFileHandler handler("PeriodicBcs");
         out_stream p_file = handler.OpenOutputFile("result.txt");
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             *p_file << mesh.GetNode(i)->rGetLocation()[0] << " " << mesh.GetNode(i)->rGetLocation()[1] << " " << res_repl[i] << "\n";
         }
@@ -742,7 +744,7 @@ public:
 
         // test the periodicity has been enforced
         assert(identified_nodes.size()>0);
-        for (unsigned i=0; i<identified_nodes.size(); i++)
+        for (unsigned i = 0; i < identified_nodes.size(); ++i)
         {
             TS_ASSERT_DELTA(res_repl[identified_nodes[i].first], res_repl[identified_nodes[i].second], 1e-8);
         }
@@ -790,9 +792,9 @@ public:
         double max_error;
         double total_error; // Integrated up over small volume, so smaller than max error!
 
-        for (unsigned i=0; i<7u; i++)
+        for (unsigned i = 0; i < 7u; ++i)
         {
-            double node_spacing_in_mesh = 0.1/(double)(SmallPow(2u,i));
+            double node_spacing_in_mesh = 0.1 / static_cast<double>(SmallPow(2u,i));
 
             RunAnalyticProblemWithSpaceStep(node_spacing_in_mesh, max_error, total_error);
         }

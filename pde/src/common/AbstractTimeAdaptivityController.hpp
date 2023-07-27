@@ -40,27 +40,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  *  Abstract class for defining rules for adaptive time-stepping.
- *
  */
 class AbstractTimeAdaptivityController
 {
 private:
 
-    /** Minimum timestep to be used */
+    /** Minimum timestep to be used. */
     double mMinimumTimeStep;
 
-    /** Maximum timestep to be used */
+    /** Maximum timestep to be used. */
     double mMaximumTimeStep;
 
     /**
-     * @return the timestep based on the
-     * current solution and current time. Doesn't need to be checked to be
-     * between the minimum and maximum timesteps.
-     *
      * @param currentTime current time
      * @param currentSolution current solution
+     * 
+     * @return the timestep based on the current solution and current time. 
+     * Doesn't need to be checked to be between the minimum and maximum 
+     * timesteps.
      */
-    virtual double ComputeTimeStep(double currentTime, Vec currentSolution)=0;
+    virtual double ComputeTimeStep(double currentTime, Vec currentSolution) = 0;
 
 public:
 
@@ -70,7 +69,9 @@ public:
      * @param minimumTimeStep minimum timestep to be used
      * @param maximumTimeStep maximum timestep to be used
      */
-    AbstractTimeAdaptivityController(double minimumTimeStep, double maximumTimeStep)
+    AbstractTimeAdaptivityController(
+        double minimumTimeStep,
+        double maximumTimeStep)
         : mMinimumTimeStep(minimumTimeStep),
           mMaximumTimeStep(maximumTimeStep)
     {
@@ -85,10 +86,10 @@ public:
     }
 
     /**
-     * @return the actual timestep to be used.
-     *
      * @param currentTime current time
      * @param currentSolution current solution
+     * 
+     * @return the actual timestep to be used.
      */
     double GetNextTimeStep(double currentTime, Vec currentSolution)
     {

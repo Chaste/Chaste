@@ -203,7 +203,7 @@ public:
      *
      * @param pMesh The mesh
      */
-    AbstractFeCableIntegralAssembler(MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
+    explicit AbstractFeCableIntegralAssembler(MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
 
     /**
      * Destructor.
@@ -359,7 +359,7 @@ void AbstractFeCableIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_A
     c_matrix<double, SPACE_DIM, NUM_CABLE_ELEMENT_NODES> grad_phi;
 
     // Loop over Gauss points
-    for (unsigned quad_index=0; quad_index < mpCableQuadRule->GetNumQuadPoints(); quad_index++)
+    for (unsigned quad_index = 0; quad_index < mpCableQuadRule->GetNumQuadPoints(); ++quad_index)
     {
         const ChastePoint<CABLE_ELEMENT_DIM>& quad_point = mpCableQuadRule->rGetQuadPoint(quad_index);
 
@@ -381,7 +381,7 @@ void AbstractFeCableIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_A
         this->ResetInterpolatedQuantities();
 
         // Interpolation
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             const Node<SPACE_DIM>* p_node = rElement.GetNode(i);
 
@@ -396,7 +396,9 @@ void AbstractFeCableIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_A
             unsigned node_global_index = rElement.GetNodeGlobalIndex(i);
             if (this->mCurrentSolutionOrGuessReplicated.GetSize() > 0)
             {
-                for (unsigned index_of_unknown=0; index_of_unknown<(INTERPOLATION_LEVEL!=CARDIAC ? PROBLEM_DIM : 1); index_of_unknown++)
+                for (unsigned index_of_unknown = 0;
+                     index_of_unknown < (INTERPOLATION_LEVEL!=CARDIAC ? PROBLEM_DIM : 1);
+                     ++index_of_unknown)
                 {
                     /*
                      * If we have a solution (e.g. this is a dynamic problem) then
@@ -412,7 +414,7 @@ void AbstractFeCableIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_A
 //// See assertion in constructor
 //                    if (INTERPOLATION_LEVEL==NONLINEAR) // don't need to construct grad_phi or grad_u in other cases
 //                    {
-//                        for (unsigned j=0; j<SPACE_DIM; j++)
+//                        for (unsigned j = 0; j < SPACE_DIM; ++j)
 //                        {
 //                            grad_u(index_of_unknown,j) += grad_phi(j,i)*u_at_node;
 //                        }
