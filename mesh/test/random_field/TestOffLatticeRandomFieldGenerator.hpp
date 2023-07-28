@@ -100,6 +100,9 @@ public:
             
             std::transform(randomField.begin(), randomField.end(), randomField.begin(), [] (const double& v) { return std::abs(v); });
             auto sum = std::accumulate(randomField.begin(), randomField.end(), 0.0);
+            for (auto& node : nodes) {
+                delete node;
+            }
             TS_ASSERT(sum > 0.0)
         }
         { // 2D
@@ -130,6 +133,9 @@ public:
 
             std::transform(randomField.begin(), randomField.end(), randomField.begin(), [] (const double& v) { return std::abs(v); });
             auto sum = std::accumulate(randomField.begin(), randomField.end(), 0.0);
+            for (auto& node : nodes) {
+                delete node;
+            }
             TS_ASSERT(sum > 0.0)
         }
     }
@@ -160,6 +166,10 @@ public:
         }
 
         const std::vector<double> grf = gen.SampleRandomFieldAtTime(nodes, 0.0);
+
+        for (auto& node : nodes) {
+            delete node;
+        }
 
         for (const auto& val : grf)
         {
