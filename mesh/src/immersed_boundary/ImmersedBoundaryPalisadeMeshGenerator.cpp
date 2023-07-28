@@ -107,6 +107,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
 
     if (apical_cutoff < 0.5 * cell_height || apical_cutoff > cell_height || periapical_cutoff < basal_cutoff)
     {
+        Clear();
         EXCEPTION("Something went wrong calculating the height of top surface of the cell."); //LCOV_EXCL_LINE
     }
 
@@ -160,6 +161,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
          (corner_indices[2] == UINT_MAX) ||
          (corner_indices[3] == UINT_MAX) )
     {
+        Clear();
         EXCEPTION("At least one corner not tagged"); //LCOV_EXCL_LINE
     }
 
@@ -168,12 +170,14 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
          (corner_indices[LEFT_APICAL_CORNER] > corner_indices[LEFT_BASAL_CORNER]) ||
          (corner_indices[LEFT_BASAL_CORNER] > corner_indices[RIGHT_BASAL_CORNER]) )
     {
+        Clear();
         EXCEPTION("Something went wrong when tagging corner locations"); //LCOV_EXCL_LINE
     }
 
     if ( corner_indices[LEFT_APICAL_CORNER] - corner_indices[RIGHT_APICAL_CORNER] !=
          corner_indices[RIGHT_BASAL_CORNER] - corner_indices[LEFT_BASAL_CORNER] )
     {
+        Clear();
         EXCEPTION("Apical and basal surfaces are different sizes"); //LCOV_EXCL_LINE
     }
 
@@ -227,6 +231,7 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     {
         if (randomYMult != 0.0)
         {
+            Clear();
             EXCEPTION("Currently no random y variation allowed with an apical lamina");
         }
 
