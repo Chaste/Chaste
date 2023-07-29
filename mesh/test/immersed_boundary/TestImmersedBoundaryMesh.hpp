@@ -91,23 +91,6 @@ public:
         delete p_mesh;
     }
     
-    void Test3DVelocityGrids()
-    {
-        /*
-        ///\todo
-        //Should these methods exist? There is no implementation for 4D nodes
-        // Why do the 3D grid methods return 4D arrays? Ditto for 2D 
-        // Create a square test mesh
-        std::vector<Node<4>*> nodes;
-
-        std::vector<ImmersedBoundaryElement<2, 4>*> elems;
-
-        ImmersedBoundaryMesh<2,4>* mesh = new ImmersedBoundaryMesh<2, 4>(nodes, elems);
-        TS_ASSERT(&(mesh->rGet3dVelocityGrids()));
-        TS_ASSERT(&(mesh->rGetModifiable3dVelocityGrids()));
-        */
-    }
-
     void TestArchiving()
     {
         EXIT_IF_PARALLEL;
@@ -1215,10 +1198,11 @@ public:
         }
         {
             // A 3x3 honeycomb will just have a single non-boundary element
-            ImmersedBoundaryHoneycombMeshGenerator gen(6u, 6u, 6u, 0.05, 0.2);
+            ImmersedBoundaryHoneycombMeshGenerator gen(3u, 3u, 6u, 0.05, 0.2);
             auto p_mesh = gen.GetMesh();
-            std::cout << p_mesh->GetVoronoiSurfaceAreaOfElement(10) << "\n";
-            ///\todo Fix this test
+
+            // Only central element has an area
+            TS_ASSERT_DELTA(p_mesh->GetVoronoiSurfaceAreaOfElement(4), 0.593846, 0.001);
         }
 
         // Single element
