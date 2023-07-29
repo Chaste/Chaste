@@ -73,6 +73,8 @@ public:
 
         ImmersedBoundaryFftInterface<2> fft(p_mesh, in.data(), comp.data(), out.data(), true);
         TS_ASSERT_EQUALS(fft.mRealDims[0], p_mesh->GetNumGridPtsX());
+
+        delete p_mesh;
     }
 
     void TestFftExecuteForward()
@@ -105,6 +107,8 @@ public:
         {
             TS_ASSERT_DELTA(i, 0.0, 1e-6);
         }
+
+        delete p_mesh;
     }
 
     void TestFftExecuteInverse()
@@ -142,6 +146,8 @@ public:
         {
             TS_ASSERT_DELTA(i, 0.0, 1e-6);
         }
+
+        delete p_mesh;
     }
 };
 
