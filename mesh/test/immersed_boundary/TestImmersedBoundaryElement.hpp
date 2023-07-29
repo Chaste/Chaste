@@ -107,6 +107,10 @@ public:
         element.SetIsBoundaryElement(true);
         TS_ASSERT_EQUALS(element.IsElementOnBoundary(), true);
         TS_ASSERT_DIFFERS(&(element.rGetCornerNodes()), nullptr);
+        
+        for (auto& node : nodes) {
+          delete node;
+        }
     }
 };
 
