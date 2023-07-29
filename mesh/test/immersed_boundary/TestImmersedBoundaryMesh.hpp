@@ -219,6 +219,12 @@ public:
                 
             lams[0]->MarkAsDeleted();
             TS_ASSERT_EQUALS(&(*ib_mesh.GetLaminaIteratorBegin(true)), lams[1]); 
+            
+            for (unsigned int i = 1; i < 6; i++) {
+                for (auto& node : nodes[i]) {
+                    delete node;
+                }
+            }
         }
     }
 
