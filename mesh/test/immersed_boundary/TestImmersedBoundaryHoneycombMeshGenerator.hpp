@@ -50,7 +50,6 @@ class TestImmersedBoundaryHoneycombMeshGenerator : public CxxTest::TestSuite
 {
 public:
 
-    ///\todo Improve testing
     void TestBoundaryElementsAreTaggedCorrectly()
     {
         /*
@@ -129,6 +128,60 @@ public:
             TS_ASSERT_EQUALS(p_mesh->GetElement(13)->IsElementOnBoundary(), true);
             TS_ASSERT_EQUALS(p_mesh->GetElement(14)->IsElementOnBoundary(), true);
         }
+    }
+
+    void TestCorrectNumberNodesGenerated() {
+        // 3 nodes per edge
+        {
+            ImmersedBoundaryHoneycombMeshGenerator gen(3u, 3u, 3u, 0.05, 0.2);
+            auto p_mesh = gen.GetMesh();
+            
+            for (unsigned int i = 0; i < 9; i++) {
+                TS_ASSERT_EQUALS(p_mesh->GetElement(i)->GetNumNodes(), 18);
+            }
+        }
+        // 5 nodes per edge
+        {
+            ImmersedBoundaryHoneycombMeshGenerator gen(3u, 3u, 5u, 0.05, 0.2);
+            auto p_mesh = gen.GetMesh();
+            
+            for (unsigned int i = 0; i < 9; i++) {
+                TS_ASSERT_EQUALS(p_mesh->GetElement(i)->GetNumNodes(), 30);
+            }
+        }
+    } 
+    
+    void TestNodePositioning() {
+        // 3 nodes per edge
+        {
+            ImmersedBoundaryHoneycombMeshGenerator gen(3u, 3u, 3u, 0.05, 0.2);
+            auto p_mesh = gen.GetMesh();
+            
+            // Left hand row
+            auto el0 = p_mesh->GetElement(0);
+            auto el1 = p_mesh->GetElement(1);
+            auto el2 = p_mesh->GetElement(2);
+
+            // Nodes within elements 0, 1 & 1, 2 should only differ in y coordinate
+            for (unsigned int i = 0; i < 18; i++) {
+                TS_ASSERT_EQUALS(el0->GetNodeLocation(i)[0], el1->GetNodeLocation(i)[0]);
+                TS_ASSERT_EQUALS(el0->GetNodeLocation(i)[0], el2->GetNodeLocation(i)[0]);
+            }
+            
+            // y coordinates should be equally spaced for el0 to el1 & el1 to el2
+            for (unsigned int i = 0; i < 18; i++) {
+                auto diff1 = el0->GetNodeLocation(i)[1] - el1->GetNodeLocation(i)[1];
+                auto diff2 = el1->GetNodeLocation(i)[1] - el2->GetNodeLocation(i)[1];
+                TS_ASSERT_DELTA(diff1, diff2, 0.001);
+            }
+
+            // Nodes within elements 0, 6 should only differ in x coordinate
+            auto el6 = p_mesh->GetElement(6);
+            for (unsigned int i = 0; i < 18; i++) {
+                TS_ASSERT_EQUALS(el0->GetNodeLocation(i)[1], el6->GetNodeLocation(i)[1]);
+            }
+        }
+      
     }
 };
 
