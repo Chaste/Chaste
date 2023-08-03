@@ -200,6 +200,47 @@ public:
     void TestPropagateForcesToFluidGrid()
     {
         ///\todo Test this method
+        // Test by setting up a mesh with a single node, element.
+        // Position node in specific locations and then apply single force
+        // Check that force is correctly split to grid
+        {
+            // Create a single node, single element mesh
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+
+            std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+
+            ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
+            
+            // Set up a cell population
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+            ImmersedBoundaryCellPopulation<2> cell_population(&mesh, cells);
+            
+            // Set up and apply a force to the node
+            c_vector<double, 2> force;
+            force[0] = i * 0.01;
+            force[1] = 2 * i * 0.01;
+            nodes[0]->AddAppliedForceContribution(force);
+            
+            // Set up simulation modifier
+            ImmersedBoundarySimulationModifier<2> modifier;
+            modifier.SetupConstantMemberVariables(cell_population);
+            
+            // Check that force grids are zero before force propagation
+            auto forceGrids = modifier.mpArrays->rGetModifiableForceGrids(); 
+            for (unsigned int grid = 0; grid <= 1; grid++) {
+                for (unsigned int x = 0; x < modifier.mpMesh->GetNumGridPtsX(); x++) {
+                    for (unsigned int y = 0; y < modifier.mpMesh->GetNumGridPtsY(); y++) {
+                        TS_ASSERT_EQUALS(forceGrids[grid][x][y], 0.0);
+                    }
+                }
+            }
+            
+        }
     }
 
     void TestPropagateFluidSourcesToGrid()
@@ -210,11 +251,13 @@ public:
     void TestSolveNavierStokesSpectral()
     {
         ///\todo Test this method
+        // This calls Upwind2d
     }
 
     void TestUpdateFluidVelocityGrids()
     {
         ///\todo Test this method
+        // This calls all other untested methods
     }
 
     void TestDelta1D()
@@ -246,11 +289,14 @@ public:
     void TestUpdateAtEndOfTimeStep()
     {
         ///\todo Test this method
+        // This method calls mpBoxCollection->CalculateNodePairs then UpdateFluidVelocityGrids
     }
 
     void TestSetupSolve()
     {
         ///\todo Test this method
+        // This just calls SetupConstantMemberVariables (already tested) and then UpdateFluidVelocityGrids 
+        // is it redundant to test this if both are tested?
     }
 
     void TestAddImmersedBoundaryForce()

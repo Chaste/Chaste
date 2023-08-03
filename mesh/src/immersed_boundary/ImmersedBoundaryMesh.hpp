@@ -92,6 +92,9 @@ protected:
      */
     double mSummaryOfNodeLocations;
 
+    /** The distance above which a cell vertex moving will trigger a step size exception */
+    double mCellRearrangementThreshold;
+
     /**
      * A halo distance around the unit square, used when calculating the node voronoi diagram
      */
@@ -414,6 +417,14 @@ public:
     std::vector<FluidSource<SPACE_DIM>*>& rGetBalancingFluidSources();
 
     /**
+     * Given a node, find a set containing the indices of its neighbouring nodes.
+     *
+     * @param nodeIndex global index of the node
+     * @return its neighbouring node indices
+     */
+    std::set<unsigned> GetNeighbouringNodeIndices(unsigned nodeIndex);
+
+    /**
      * @param index  the global index of a specified immersed boundary element.
      *
      * @return a pointer to the immersed boundary element
@@ -646,6 +657,11 @@ public:
      * @return mNeighbourDist
      */
     double GetNeighbourDist() const;
+
+    /**
+     * @return the maximum distance a cell vertex can move without triggering a step size exception
+     */
+    double GetCellRearrangementThreshold();
 
     /**
      * @param the new value of mNeighbourDist

@@ -52,7 +52,12 @@ struct ImmersedBoundaryElementData
 {
     std::vector<unsigned> NodeIndices; /**< Vector of Node indices owned by the element. */
     unsigned AttributeValue; /**< Attribute value associated with the element. */
-    //\todo: add fluid source and other Element members
+
+    bool hasFluidSource;
+    unsigned fluidSourceIndex;
+    std::vector<unsigned> cornerNodeIndices;
+    double averageNodeSpacing;
+    bool isBoundaryElement; 
 };
 
 /**

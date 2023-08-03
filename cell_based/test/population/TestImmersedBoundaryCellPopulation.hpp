@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ApcOneHitCellMutationState.hpp"
 #include "ApcTwoHitCellMutationState.hpp"
 #include "ApoptoticCellProperty.hpp"
+#include "ArchiveOpener.hpp"
 #include "BetaCateninOneHitCellMutationState.hpp"
 #include "CellAgesWriter.hpp"
 #include "CellAncestorWriter.hpp"
@@ -61,6 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellVolumesWriter.hpp"
 #include "CheckpointArchiveTypes.hpp"
 #include "FixedVertexBasedDivisionRule.hpp"
+#include "FixedG1GenerationalCellCycleModel.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "FileComparison.hpp"
 #include "OffLatticeSimulation.hpp"
@@ -78,7 +80,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
 
-///\todo Vary the cell population geometry across tests
 class TestImmersedBoundaryCellPopulation : public AbstractCellBasedTestSuite
 {
 public:
@@ -171,8 +172,6 @@ public:
         TS_ASSERT_DELTA(cell_0_centre[0], 0.1950, 1e-6);
         TS_ASSERT_DELTA(cell_0_centre[1], 0.505641, 1e-6);
 
-        ///\todo Test GetNeighbouringNodeIndices() and GetNeighbouringLocationIndices() and implement these methods
-
         // Test GetWidth() returns the correct values
         TS_ASSERT_DELTA(cell_population.GetWidth(0), 0.9891, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetWidth(1), 0.4481, 1e-4);
@@ -181,8 +180,6 @@ public:
         CellPtr p_cell_1 = *(++(cell_population.Begin()));
         double cell_1_volume = cell_population.GetVolumeOfCell(p_cell_1);
         TS_ASSERT_DELTA(cell_1_volume, 0.0774, 1e-4);
-
-        ///\todo With this mesh generator, does cell 0 correspond to the basement lamina?
 
         // Test SetNode() works correctly
         c_vector<double, 2> new_location;
@@ -198,7 +195,6 @@ public:
         TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetLocation()[1], new_location[1], 1e-12);
     }
 
-    ///\todo Check output files by eye too
     void TestWritersWithImmersedBoundaryCellPopulation()
     {
         // Set up SimulationTime (needed if VTK is used)
@@ -259,7 +255,6 @@ public:
 
         cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
         cell_population.AddCellPopulationCountWriter<CellProliferativeTypesCountWriter>();
-        cell_population.AddCellPopulationCountWriter<CellProliferativePhasesCountWriter>();
 
         cell_population.AddCellWriter<CellAgesWriter>();
         cell_population.AddCellWriter<CellAncestorWriter>();
@@ -295,22 +290,20 @@ public:
         // Compare output with saved files of what they should look like
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
-//        FileComparison(results_dir + "results.viznodes", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.viznodes").CompareFiles();
-//        FileComparison(results_dir + "results.vizelements", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.vizelements").CompareFiles();
-//\todo: figure out what these tests are actually doing...
-//        FileComparison(results_dir + "cellages.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/cellages.dat").CompareFiles();
-//        FileComparison(results_dir + "results.vizancestors", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.vizancestors").CompareFiles();
-//        FileComparison(results_dir + "loggedcell.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/loggedcell.dat").CompareFiles();
-//        FileComparison(results_dir + "results.vizlabels", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.vizlabels").CompareFiles();
-//        FileComparison(results_dir + "results.vizlocationindices", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.vizlocationindices").CompareFiles();
-//        FileComparison(results_dir + "results.vizmutationstates", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.vizmutationstates").CompareFiles();
-//        FileComparison(results_dir + "results.vizcellphases", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.vizcellphases").CompareFiles();
-//        FileComparison(results_dir + "results.vizcelltypes", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.vizcelltypes").CompareFiles();
-//        FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/cellareas.dat").CompareFiles();
-//
-//        FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/cellmutationstates.dat").CompareFiles();
-//        FileComparison(results_dir + "cellcyclephases.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/cellcyclephases.dat").CompareFiles();
-//        FileComparison(results_dir + "celltypes.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/celltypes.dat").CompareFiles();
+        FileComparison(results_dir + "results.viznodes", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.viznodes").CompareFiles();
+        FileComparison(results_dir + "results.vizelements", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.vizelements").CompareFiles();
+        FileComparison(results_dir + "cellages.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/cellages.dat").CompareFiles();
+        FileComparison(results_dir + "results.vizancestors", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.vizancestors").CompareFiles();
+        FileComparison(results_dir + "loggedcell.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/loggedcell.dat").CompareFiles();
+        FileComparison(results_dir + "results.vizlabels", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.vizlabels").CompareFiles();
+        FileComparison(results_dir + "results.vizlocationindices", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.vizlocationindices").CompareFiles();
+        FileComparison(results_dir + "results.vizmutationstates", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.vizmutationstates").CompareFiles();
+        FileComparison(results_dir + "results.vizcellphases", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.vizcellphases").CompareFiles();
+        FileComparison(results_dir + "results.vizcelltypes", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.vizcelltypes").CompareFiles();
+        FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/cellareas.dat").CompareFiles();
+        FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/cellmutationstates.dat").CompareFiles();
+        FileComparison(results_dir + "cellcyclephases.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/cellcyclephases.dat").CompareFiles();
+        FileComparison(results_dir + "celltypes.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/celltypes.dat").CompareFiles();
 
         // Test that the cell population parameters are output correctly
         out_stream parameter_file = output_file_handler.OpenOutputFile("results.parameters");
@@ -336,7 +329,90 @@ public:
  #endif //CHASTE_VTK
     }
 
-    ///\todo Test archiving?
+    void TestArchiving()
+    {
+        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
+        std::string archive_file = "immersed_boundary_cell_population_2d.arch";
+
+        // The following line is required because the loading of a cell population
+        // is usually called by the method CellBasedSimulation::Load()
+        ArchiveLocationInfo::SetMeshFilename("immersed_boundary_mesh_2d");
+
+        // Create mesh
+        ImmersedBoundaryMeshReader<2, 2> mesh_reader("mesh/test/data/ib_mesh_2d");
+        ImmersedBoundaryMesh<2, 2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Archive cell population
+        {
+            // Need to set up time
+            unsigned num_steps = 10;
+            SimulationTime* p_simulation_time = SimulationTime::Instance();
+            p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
+
+            // Create an Immersed Boundary cell population object
+            std::vector<CellPtr> cells;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasic(cells, mesh.GetNumElements());
+
+            // Create cell population
+            AbstractCellPopulation<2>* const p_cell_population = new ImmersedBoundaryCellPopulation<2>(mesh, cells);
+
+            // Cells have been given birth times of 0, -1, -2, -3, -4.
+            // loop over them to run to time 0.0;
+            for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
+                 cell_iter != p_cell_population->End();
+                 ++cell_iter)
+            {
+                cell_iter->ReadyToDivide();
+            }
+
+            // Create output archive
+            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
+
+            auto ib_pop = dynamic_cast<ImmersedBoundaryCellPopulation<2>*>(p_cell_population);
+            ib_pop->SetReMeshFrequency(4);
+            ib_pop->SetInteractionDistance(0.3);
+            ib_pop->SetIfPopulationHasActiveSources(true);
+
+            // Archive the cell population
+            (*p_arch) << static_cast<const SimulationTime&>(*p_simulation_time);
+            (*p_arch) << p_cell_population;
+
+            // Tidy up
+            SimulationTime::Destroy();
+            delete p_cell_population;
+        }
+
+        // Restore cell population
+        {
+            // Need to set up time
+            unsigned num_steps = 10;
+            SimulationTime* p_simulation_time = SimulationTime::Instance();
+            p_simulation_time->SetStartTime(0.0);
+            p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
+            p_simulation_time->IncrementTimeOneStep();
+
+            AbstractCellPopulation<2>* p_cell_population;
+
+            // Create an input archive
+            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
+
+            // Restore the cell population
+            (*p_arch) >> *p_simulation_time;
+            (*p_arch) >> p_cell_population;
+
+            ImmersedBoundaryCellPopulation<2>* p_static_population = static_cast<ImmersedBoundaryCellPopulation<2>*>(p_cell_population);
+            TS_ASSERT_EQUALS(p_static_population->GetReMeshFrequency(), 4);
+            TS_ASSERT_EQUALS(p_static_population->GetInteractionDistance(), 0.3);
+            TS_ASSERT_EQUALS(p_static_population->DoesPopulationHaveActiveSources(), true);
+
+            // Tidy up
+            delete p_cell_population;
+        }
+    }
 };
 
 #endif /*TESTIMMERSEDBOUNDARYCELLPOPULATION_HPP_*/

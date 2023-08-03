@@ -37,10 +37,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iomanip>
 
+#include "ApoptoticCellProperty.hpp"
 #include "CellPopulationElementWriter.hpp"
 #include "ImmersedBoundaryMeshWriter.hpp"
 #include "ImmersedBoundaryBoundaryCellWriter.hpp"
 #include "ShortAxisImmersedBoundaryDivisionRule.hpp"
+#include "StepSizeException.hpp"
 #include "Warnings.hpp"
 
 template <unsigned DIM>
@@ -54,7 +56,8 @@ ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(ImmersedBoun
           mIntrinsicSpacing(0.01),
           mPopulationHasActiveSources(false),
           mOutputNodeRegionToVtk(false),
-          mReMeshFrequency(UINT_MAX)
+          mReMeshFrequency(UINT_MAX),
+          mThrowStepSizeException(true)
 {
     mpImmersedBoundaryMesh = static_cast<ImmersedBoundaryMesh<DIM, DIM>*>(&(this->mrMesh));
     mpImmersedBoundaryDivisionRule.reset(new ShortAxisImmersedBoundaryDivisionRule<DIM>());
@@ -253,37 +256,8 @@ CellPtr ImmersedBoundaryCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr p
 template <unsigned DIM>
 unsigned ImmersedBoundaryCellPopulation<DIM>::RemoveDeadCells()
 {
-    unsigned num_removed = 0;
-    //\todo: may need to implement this
-
-    /*for (std::list<CellPtr>::iterator it = this->mCells.begin();
-         it != this->mCells.end();
-         )
-    {
-        if ((*it)->IsDead())
-        {
-            // Count the cell as dead
-            num_removed++;
-
-            // Remove the element from the mesh if it is not deleted yet
-            ///\todo (#2489) this should cause an error - we should fix this!
-            if (!(this->GetElement(this->GetLocationIndexUsingCell((*it)))->IsDeleted()))
-            {
-                // This warning relies on the fact that there is only one other possibility for
-                // vertex elements to be marked as deleted: a T2 swap
-                WARN_ONCE_ONLY("A Cell is removed without performing a T2 swap. This could leave a void in the mesh.");
-                mpImmersedBoundaryMesh->DeleteElementPriorToReMesh(this->GetLocationIndexUsingCell((*it)));
-            }
-
-            // Delete the cell
-            it = this->mCells.erase(it);
-        }
-        else
-        {
-            ++it;
-        }
-    }*/
-    return num_removed;
+    // todo - What constitutes a cell in immersed boundary
+    return 0;
 }
 
 template <unsigned DIM>
@@ -532,7 +506,25 @@ void ImmersedBoundaryCellPopulation<DIM>::Validate()
 template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::CheckForStepSizeException(unsigned nodeIndex, c_vector<double, DIM>& displacement, double dt)
 {
-    //\todo: deal with this method...
+    double length = boost::numeric::ublas::norm_2(displacement);
+
+    if (length > 0.5*mpImmersedBoundaryMesh->GetCellRearrangementThreshold())
+    {
+        displacement *= 0.5*mpImmersedBoundaryMesh->GetCellRearrangementThreshold()/length;
+
+        std::ostringstream message;
+        message << "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted ";
+        message << "so the motion has been restricted. Use a smaller timestep to avoid these warnings.";
+
+        double suggested_step = 0.95*dt*((0.5*mpImmersedBoundaryMesh->GetCellRearrangementThreshold())/length);
+
+        // The first time we see this behaviour, throw a StepSizeException, but not more than once
+        if(mThrowStepSizeException)
+        {
+            mThrowStepSizeException = false;
+            throw StepSizeException(suggested_step, message.str(), false);
+        }
+    }
 }
 
 template <unsigned DIM>
@@ -544,13 +536,13 @@ void ImmersedBoundaryCellPopulation<DIM>::AcceptPopulationWriter(boost::shared_p
 template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter)
 {
-    //pPopulationWriter->Visit(this);
+    pPopulationEventWriter->Visit(this);
 }
 
 template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
 {
-//    pPopulationCountWriter->Visit(this);
+    pPopulationCountWriter->Visit(this);
 }
 
 template <unsigned DIM>
@@ -731,183 +723,175 @@ double ImmersedBoundaryCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
     return width;
 }
 
-///\todo: implement this.  May need to put method back in to mesh class
 template <unsigned DIM>
 std::set<unsigned> ImmersedBoundaryCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned index)
 {
-    std::set<unsigned> neighbouring_indices;
-    return neighbouring_indices;
+    return mpImmersedBoundaryMesh->GetNeighbouringNodeIndices(index);
 }
 
 template <unsigned DIM>
 TetrahedralMesh<DIM, DIM>* ImmersedBoundaryCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier()
 {
-    //    // This method only works in 2D sequential
-    //    assert(DIM == 2);
-    //    assert(PetscTools::IsSequential());
-    //
-    //    unsigned num_vertex_nodes = mpMutableVertexMesh->GetNumNodes();
-    //    unsigned num_vertex_elements = mpMutableVertexMesh->GetNumElements();
-    //
-    //    std::string mesh_file_name = "mesh";
-    //
-    //    // Get a unique temporary foldername
-    //    std::stringstream pid;
-    //    pid << getpid();
-    //    OutputFileHandler output_file_handler("2D_temporary_tetrahedral_mesh_" + pid.str());
-    //    std::string output_dir = output_file_handler.GetOutputDirectoryFullPath();
-    //
-    //    // Compute the number of nodes in the TetrahedralMesh
-    //    unsigned num_tetrahedral_nodes = num_vertex_nodes + num_vertex_elements;
-    //
-    //    // Write node file
-    //    out_stream p_node_file = output_file_handler.OpenOutputFile(mesh_file_name+".node");
-    //    (*p_node_file) << std::scientific;
-    //    (*p_node_file) << std::setprecision(20);
-    //    (*p_node_file) << num_tetrahedral_nodes << "\t2\t0\t1" << std::endl;
-    //
-    //    // Begin by writing each node in the VertexMesh
-    //    for (unsigned node_index=0; node_index<num_vertex_nodes; node_index++)
-    //    {
-    //        Node<DIM>* p_node = mpMutableVertexMesh->GetNode(node_index);
-    //
-    //        ///\todo will the nodes in mpMutableVertexMesh always have indices 0,1,2,...? (#2221)
-    //        unsigned index = p_node->GetIndex();
-    //        const c_vector<double, DIM>& r_location = p_node->rGetLocation();
-    //        unsigned is_boundary_node = p_node->IsBoundaryNode() ? 1 : 0;
-    //
-    //        (*p_node_file) << index << "\t" << r_location[0] << "\t" << r_location[1] << "\t" << is_boundary_node << std::endl;
-    //    }
-    //
-    //    // Now write an additional node at each VertexElement's centroid
-    //    unsigned num_tetrahedral_elements = 0;
-    //    for (unsigned vertex_elem_index=0; vertex_elem_index<num_vertex_elements; vertex_elem_index++)
-    //    {
-    //        unsigned index = num_vertex_nodes + vertex_elem_index;
-    //
-    //        c_vector<double, DIM> location = mpMutableVertexMesh->GetCentroidOfElement(vertex_elem_index);
-    //
-    //        // Any node located at a VertexElement's centroid will not be a boundary node
-    //        unsigned is_boundary_node = 0;
-    //        (*p_node_file) << index << "\t" << location[0] << "\t" << location[1] << "\t" << is_boundary_node << std::endl;
-    //
-    //        // Also keep track of how many tetrahedral elements there will be
-    //        num_tetrahedral_elements += mpMutableVertexMesh->GetElement(vertex_elem_index)->GetNumNodes();
-    //    }
-    //    p_node_file->close();
-    //
-    //    // Write element file
-    //    out_stream p_elem_file = output_file_handler.OpenOutputFile(mesh_file_name+".ele");
-    //    (*p_elem_file) << std::scientific;
-    //    (*p_elem_file) << num_tetrahedral_elements << "\t3\t0" << std::endl;
-    //
-    //    std::set<std::pair<unsigned, unsigned> > tetrahedral_edges;
-    //
-    //    unsigned tetrahedral_elem_index = 0;
-    //    for (unsigned vertex_elem_index=0; vertex_elem_index<num_vertex_elements; vertex_elem_index++)
-    //    {
-    //        VertexElement<DIM, DIM>* p_vertex_element = mpMutableVertexMesh->GetElement(vertex_elem_index);
-    //
-    //        // Iterate over nodes owned by this VertexElement
-    //        unsigned num_nodes_in_vertex_element = p_vertex_element->GetNumNodes();
-    //        for (unsigned local_index=0; local_index<num_nodes_in_vertex_element; local_index++)
-    //        {
-    //            unsigned node_0_index = p_vertex_element->GetNodeGlobalIndex(local_index);
-    //            unsigned node_1_index = p_vertex_element->GetNodeGlobalIndex((local_index+1)%num_nodes_in_vertex_element);
-    //            unsigned node_2_index = num_vertex_nodes + vertex_elem_index;
-    //
-    //            (*p_elem_file) << tetrahedral_elem_index++ << "\t" << node_0_index << "\t" << node_1_index << "\t" << node_2_index << std::endl;
-    //
-    //            // Add edges to the set if they are not already present
-    //            std::pair<unsigned, unsigned> edge_0 = this->CreateOrderedPair(node_0_index, node_1_index);
-    //            std::pair<unsigned, unsigned> edge_1 = this->CreateOrderedPair(node_1_index, node_2_index);
-    //            std::pair<unsigned, unsigned> edge_2 = this->CreateOrderedPair(node_2_index, node_0_index);
-    //
-    //            tetrahedral_edges.insert(edge_0);
-    //            tetrahedral_edges.insert(edge_1);
-    //            tetrahedral_edges.insert(edge_2);
-    //        }
-    //    }
-    //    p_elem_file->close();
-    //
-    //    // Write edge file
-    //    out_stream p_edge_file = output_file_handler.OpenOutputFile(mesh_file_name+".edge");
-    //    (*p_edge_file) << std::scientific;
-    //    (*p_edge_file) << tetrahedral_edges.size() << "\t1" << std::endl;
-    //
-    //    unsigned edge_index = 0;
-    //    for (std::set<std::pair<unsigned, unsigned> >::iterator edge_iter = tetrahedral_edges.begin();
-    //         edge_iter != tetrahedral_edges.end();
-    //         ++edge_iter)
-    //    {
-    //        std::pair<unsigned, unsigned> this_edge = *edge_iter;
-    //
-    //        // To be a boundary edge both nodes need to be boundary nodes.
-    //        bool is_boundary_edge = false;
-    //        if (this_edge.first  < mpMutableVertexMesh->GetNumNodes() &&
-    //            this_edge.second  < mpMutableVertexMesh->GetNumNodes())
-    //        {
-    //            is_boundary_edge = (mpMutableVertexMesh->GetNode(this_edge.first)->IsBoundaryNode() &&
-    //                                mpMutableVertexMesh->GetNode(this_edge.second)->IsBoundaryNode() );
-    //        }
-    //        unsigned is_boundary_edge_unsigned = is_boundary_edge ? 1 : 0;
-    //
-    //        (*p_edge_file) << edge_index++ << "\t" << this_edge.first << "\t" << this_edge.second << "\t" << is_boundary_edge_unsigned << std::endl;
-    //    }
-    //    p_edge_file->close();
-    //
-    //    // Having written the mesh to file, now construct it using TrianglesMeshReader
-    //    TetrahedralMesh<DIM, DIM>* p_mesh = new TetrahedralMesh<DIM, DIM>;
-    //
-    //    // Nested scope so reader is destroyed before we remove the temporary files
-    //    {
-    //        TrianglesMeshReader<DIM, DIM> mesh_reader(output_dir + mesh_file_name);
-    //        p_mesh->ConstructFromMeshReader(mesh_reader);
-    //    }
-    //
-    //    // Delete the temporary files
-    //    output_file_handler.FindFile("").Remove();
-    //
-    //    // The original files have been deleted, it is better if the mesh object forgets about them
-    //    p_mesh->SetMeshHasChangedSinceLoading();
-    //
-    //    return p_mesh;
-
-    return NULL;
+    // This method only works in 2D sequential
+    assert(DIM == 2);
+    assert(PetscTools::IsSequential());
+    
+    unsigned num_vertex_nodes = mpImmersedBoundaryMesh->GetNumNodes();
+    unsigned num_vertex_elements = mpImmersedBoundaryMesh->GetNumElements();
+    
+    std::string mesh_file_name = "mesh";
+    
+    // Get a unique temporary foldername
+    std::stringstream pid;
+    pid << getpid();
+    OutputFileHandler output_file_handler("2D_temporary_tetrahedral_mesh_" + pid.str());
+    std::string output_dir = output_file_handler.GetOutputDirectoryFullPath();
+    
+    // Compute the number of nodes in the TetrahedralMesh
+    unsigned num_tetrahedral_nodes = num_vertex_nodes + num_vertex_elements;
+    
+    // Write node file
+    out_stream p_node_file = output_file_handler.OpenOutputFile(mesh_file_name+".node");
+    (*p_node_file) << std::scientific;
+    (*p_node_file) << std::setprecision(20);
+    (*p_node_file) << num_tetrahedral_nodes << "\t2\t0\t1" << std::endl;
+    
+    // Begin by writing each node in the VertexMesh
+    auto nodes = mpImmersedBoundaryMesh->rGetNodes();
+    for (auto p_node : nodes)
+    {
+        unsigned index = p_node->GetIndex();
+        const c_vector<double, DIM>& r_location = p_node->rGetLocation();
+        unsigned is_boundary_node = p_node->IsBoundaryNode() ? 1 : 0;
+    
+        (*p_node_file) << index << "\t" << r_location[0] << "\t" << r_location[1] << "\t" << is_boundary_node << std::endl;
+    }
+    
+    // Now write an additional node at each ImmersedBoundaryElement's centroid
+    unsigned num_tetrahedral_elements = 0;
+    for (unsigned vertex_elem_index=0; vertex_elem_index<num_vertex_elements; vertex_elem_index++)
+    {
+        unsigned index = num_vertex_nodes + vertex_elem_index;
+    
+        c_vector<double, DIM> location = mpImmersedBoundaryMesh->GetCentroidOfElement(vertex_elem_index);
+    
+        // Any node located at a ImmersedBoundaryElement's centroid will not be a boundary node
+        unsigned is_boundary_node = 0;
+        (*p_node_file) << index << "\t" << location[0] << "\t" << location[1] << "\t" << is_boundary_node << std::endl;
+    
+        // Also keep track of how many tetrahedral elements there will be
+        num_tetrahedral_elements += mpImmersedBoundaryMesh->GetElement(vertex_elem_index)->GetNumNodes();
+    }
+    p_node_file->close();
+    
+    // Write element file
+    out_stream p_elem_file = output_file_handler.OpenOutputFile(mesh_file_name+".ele");
+    (*p_elem_file) << std::scientific;
+    (*p_elem_file) << num_tetrahedral_elements << "\t3\t0" << std::endl;
+    
+    std::set<std::pair<unsigned, unsigned> > tetrahedral_edges;
+    
+    unsigned tetrahedral_elem_index = 0;
+    for (unsigned vertex_elem_index=0; vertex_elem_index<num_vertex_elements; vertex_elem_index++)
+    {
+        ImmersedBoundaryElement<DIM, DIM>* p_vertex_element = mpImmersedBoundaryMesh->GetElement(vertex_elem_index);
+    
+        // Iterate over nodes owned by this ImmersedBoundaryElement
+        unsigned num_nodes_in_vertex_element = p_vertex_element->GetNumNodes();
+        for (unsigned local_index=0; local_index<num_nodes_in_vertex_element; local_index++)
+        {
+            unsigned node_0_index = p_vertex_element->GetNodeGlobalIndex(local_index);
+            unsigned node_1_index = p_vertex_element->GetNodeGlobalIndex((local_index+1)%num_nodes_in_vertex_element);
+            unsigned node_2_index = num_vertex_nodes + vertex_elem_index;
+    
+            (*p_elem_file) << tetrahedral_elem_index++ << "\t" << node_0_index << "\t" << node_1_index << "\t" << node_2_index << std::endl;
+    
+            // Add edges to the set if they are not already present
+            std::pair<unsigned, unsigned> edge_0 = this->CreateOrderedPair(node_0_index, node_1_index);
+            std::pair<unsigned, unsigned> edge_1 = this->CreateOrderedPair(node_1_index, node_2_index);
+            std::pair<unsigned, unsigned> edge_2 = this->CreateOrderedPair(node_2_index, node_0_index);
+    
+            tetrahedral_edges.insert(edge_0);
+            tetrahedral_edges.insert(edge_1);
+            tetrahedral_edges.insert(edge_2);
+        }
+    }
+    p_elem_file->close();
+    
+    // Write edge file
+    out_stream p_edge_file = output_file_handler.OpenOutputFile(mesh_file_name+".edge");
+    (*p_edge_file) << std::scientific;
+    (*p_edge_file) << tetrahedral_edges.size() << "\t1" << std::endl;
+    
+    unsigned edge_index = 0;
+    for (std::set<std::pair<unsigned, unsigned> >::iterator edge_iter = tetrahedral_edges.begin();
+         edge_iter != tetrahedral_edges.end();
+         ++edge_iter)
+    {
+        std::pair<unsigned, unsigned> this_edge = *edge_iter;
+    
+        // To be a boundary edge both nodes need to be boundary nodes.
+        bool is_boundary_edge = false;
+        if (this_edge.first  < mpImmersedBoundaryMesh->GetNumNodes() &&
+            this_edge.second  < mpImmersedBoundaryMesh->GetNumNodes())
+        {
+            is_boundary_edge = (mpImmersedBoundaryMesh->GetNode(this_edge.first)->IsBoundaryNode() &&
+                                mpImmersedBoundaryMesh->GetNode(this_edge.second)->IsBoundaryNode() );
+        }
+        unsigned is_boundary_edge_unsigned = is_boundary_edge ? 1 : 0;
+    
+        (*p_edge_file) << edge_index++ << "\t" << this_edge.first << "\t" << this_edge.second << "\t" << is_boundary_edge_unsigned << std::endl;
+    }
+    p_edge_file->close();
+    
+    // Having written the mesh to file, now construct it using TrianglesMeshReader
+    TetrahedralMesh<DIM, DIM>* p_mesh = new TetrahedralMesh<DIM, DIM>;
+    
+    // Nested scope so reader is destroyed before we remove the temporary files
+    {
+        TrianglesMeshReader<DIM, DIM> mesh_reader(output_dir + mesh_file_name);
+        p_mesh->ConstructFromMeshReader(mesh_reader);
+    }
+    
+    // Delete the temporary files
+    output_file_handler.FindFile("").Remove();
+    
+    // The original files have been deleted, it is better if the mesh object forgets about them
+    p_mesh->SetMeshHasChangedSinceLoading();
+    
+    return p_mesh;
 }
 
 template <unsigned DIM>
 bool ImmersedBoundaryCellPopulation<DIM>::IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex)
 {
-    //    bool non_apoptotic_cell_present = true;
-    //
-    //    if (pdeNodeIndex < this->GetNumNodes())
-    //    {
-    //        std::set<unsigned> containing_element_indices = this->GetNode(pdeNodeIndex)->rGetContainingElementIndices();
-    //
-    //        for (std::set<unsigned>::iterator iter = containing_element_indices.begin();
-    //             iter != containing_element_indices.end();
-    //             iter++)
-    //        {
-    //            if (this->GetCellUsingLocationIndex(*iter)->template HasCellProperty<ApoptoticCellProperty>() )
-    //            {
-    //                non_apoptotic_cell_present = false;
-    //                break;
-    //            }
-    //        }
-    //    }
-    //    else
-    //    {
-    //        /*
-    //         * This node of the tetrahedral finite element mesh is in the centre of the element of the
-    //         * vertex-based cell population, so we can use an offset to compute which cell to interrogate.
-    //         */
-    //        non_apoptotic_cell_present = !(this->GetCellUsingLocationIndex(pdeNodeIndex - this->GetNumNodes())->template HasCellProperty<ApoptoticCellProperty>());
-    //    }
-    //
-    //    return non_apoptotic_cell_present;
+    bool non_apoptotic_cell_present = true;
 
-    return true;
+    if (pdeNodeIndex < this->GetNumNodes())
+    {
+        std::set<unsigned> containing_element_indices = this->GetNode(pdeNodeIndex)->rGetContainingElementIndices();
+
+        for (std::set<unsigned>::iterator iter = containing_element_indices.begin();
+             iter != containing_element_indices.end();
+             iter++)
+        {
+            if (this->GetCellUsingLocationIndex(*iter)->template HasCellProperty<ApoptoticCellProperty>() )
+            {
+                non_apoptotic_cell_present = false;
+                break;
+            }
+        }
+    }
+    else
+    {
+        /*
+         * This node of the tetrahedral finite element mesh is in the centre of the element of the
+         * vertex-based cell population, so we can use an offset to compute which cell to interrogate.
+         */
+        non_apoptotic_cell_present = !(this->GetCellUsingLocationIndex(pdeNodeIndex - this->GetNumNodes())->template HasCellProperty<ApoptoticCellProperty>());
+    }
+
+    return non_apoptotic_cell_present;
 }
 
 template <unsigned DIM>
@@ -916,49 +900,47 @@ double ImmersedBoundaryCellPopulation<DIM>::GetCellDataItemAtPdeNode(unsigned pd
                                                                      bool dirichletBoundaryConditionApplies,
                                                                      double dirichletBoundaryValue)
 {
-    //    unsigned num_nodes = this->GetNumNodes();
-    //    double value = 0.0;
-    //
-    //    // Cells correspond to nodes in the centre of the vertex element; nodes on vertices have averaged values from containing cells
-    //
-    //    if (pdeNodeIndex >= num_nodes)
-    //    {
-    //        // Offset to relate elements in vertex mesh to nodes in tetrahedral mesh
-    //        assert(pdeNodeIndex-num_nodes < num_nodes);
-    //
-    //        CellPtr p_cell = this->GetCellUsingLocationIndex(pdeNodeIndex - num_nodes);
-    //        value = p_cell->GetCellData()->GetItem(rVariableName);
-    //    }
-    //    else
-    //    {
-    //        ///\todo Work out a better way to do the nodes not associated with cells
-    //        if (dirichletBoundaryConditionApplies)
-    //        {
-    //            // We need to impose the Dirichlet boundaries again here as not represented in cell data
-    //            value = dirichletBoundaryValue;
-    //        }
-    //        else
-    //        {
-    //            assert(pdeNodeIndex < num_nodes);
-    //            Node<DIM>* p_node = this->GetNode(pdeNodeIndex);
-    //
-    //            // Average over data from containing elements (cells)
-    //            std::set<unsigned> containing_elements = p_node->rGetContainingElementIndices();
-    //            for (std::set<unsigned>::iterator index_iter = containing_elements.begin();
-    //                 index_iter != containing_elements.end();
-    //                 ++index_iter)
-    //            {
-    //                assert(*index_iter < num_nodes);
-    //                CellPtr p_cell = this->GetCellUsingLocationIndex(*index_iter);
-    //                value += p_cell->GetCellData()->GetItem(rVariableName);
-    //            }
-    //            value /= containing_elements.size();
-    //        }
-    //    }
-    //
-    //    return value;
+    unsigned num_nodes = this->GetNumNodes();
+    double value = 0.0;
 
-    return 0.0;
+    // Cells correspond to nodes in the centre of the vertex element; nodes on vertices have averaged values from containing cells
+
+    if (pdeNodeIndex >= num_nodes)
+    {
+        // Offset to relate elements in vertex mesh to nodes in tetrahedral mesh
+        assert(pdeNodeIndex-num_nodes < num_nodes);
+
+        CellPtr p_cell = this->GetCellUsingLocationIndex(pdeNodeIndex - num_nodes);
+        value = p_cell->GetCellData()->GetItem(rVariableName);
+    }
+    else
+    {
+        ///\todo Work out a better way to do the nodes not associated with cells
+        if (dirichletBoundaryConditionApplies)
+        {
+            // We need to impose the Dirichlet boundaries again here as not represented in cell data
+            value = dirichletBoundaryValue;
+        }
+        else
+        {
+            assert(pdeNodeIndex < num_nodes);
+            Node<DIM>* p_node = this->GetNode(pdeNodeIndex);
+
+            // Average over data from containing elements (cells)
+            std::set<unsigned> containing_elements = p_node->rGetContainingElementIndices();
+            for (std::set<unsigned>::iterator index_iter = containing_elements.begin();
+                 index_iter != containing_elements.end();
+                 ++index_iter)
+            {
+                assert(*index_iter < num_nodes);
+                CellPtr p_cell = this->GetCellUsingLocationIndex(*index_iter);
+                value += p_cell->GetCellData()->GetItem(rVariableName);
+            }
+            value /= containing_elements.size();
+        }
+    }
+
+    return value;
 }
 
 template <unsigned DIM>

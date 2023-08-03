@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
+#include "ImmersedBoundaryCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellProliferativePhasesCountWriter<ELEMENT_DIM, SPACE_DIM>::CellProliferativePhasesCountWriter()
@@ -95,6 +96,12 @@ void CellProliferativePhasesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBase
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellProliferativePhasesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+    VisitAnyPopulation(pCellPopulation);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void CellProliferativePhasesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }

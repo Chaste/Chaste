@@ -146,7 +146,9 @@ std::vector<double> ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextN
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryElementData ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextImmersedBoundaryElement()
 {
-    ///\todo Assert this method should only be called in 2D? (#1076/#1377)
+    if constexpr (SPACE_DIM != 2) {
+        EXCEPTION("ImmersedBoundaryMeshWriter::GetNextImmersedBoundaryElement is not yet implemetned in 3D!");
+    }
 
     assert(this->mNumElements == mpMesh->GetNumElements());
 
@@ -159,6 +161,24 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::
 
     // Set attribute
     elem_data.AttributeValue = (*(mpIters->pElemIter))->GetAttribute();
+    
+    // Immersed boundary specific data
+    auto& element = *(*mpIters->pElemIter);
+    
+    if (element.GetFluidSource() != nullptr) {
+        elem_data.hasFluidSource = true;
+        elem_data.fluidSourceIndex = element.GetFluidSource()->GetIndex();
+    } else {
+        elem_data.hasFluidSource = false;
+    }
+
+    for (auto cornerNode : element.rGetCornerNodes()) {
+        elem_data.cornerNodeIndices.push_back(cornerNode->GetIndex());
+    }
+
+    elem_data.averageNodeSpacing = element.GetAverageNodeSpacing();
+    
+    elem_data.isBoundaryElement = element.IsElementOnBoundary();
 
     ++(*(mpIters->pElemIter));
 
@@ -168,7 +188,9 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryElementData ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextImmersedBoundaryLamina()
 {
-    ///\todo Assert this method should only be called in 2D? (#1076/#1377)
+    if constexpr (SPACE_DIM != 2) {
+        EXCEPTION("ImmersedBoundaryMeshWriter::GetNextImmersedBoundaryLamina is not yet implemetned in 3D!");
+    }
 
     assert(mNumLaminas == mpMesh->GetNumLaminas());
 
@@ -181,6 +203,29 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::
 
     // Set attribute
     lamina_data.AttributeValue = (*(mpIters->pLamIter))->GetAttribute();
+
+    // Immersed boundary specific data
+    auto& lamina = *(*mpIters->pLamIter);
+
+    try {
+        lamina.GetFluidSource();
+        if (lamina.GetFluidSource() != nullptr) {
+            lamina_data.hasFluidSource = true;
+            lamina_data.fluidSourceIndex = lamina.GetFluidSource()->GetIndex();
+        } else {
+            lamina_data.hasFluidSource = false;
+        }
+    } catch(Exception& e) {
+        lamina_data.hasFluidSource = false;
+    }
+    
+    for (auto cornerNode : lamina.rGetCornerNodes()) {
+        lamina_data.cornerNodeIndices.push_back(cornerNode->GetIndex());
+    }
+
+    lamina_data.averageNodeSpacing = lamina.GetAverageNodeSpacing();
+    
+    lamina_data.isBoundaryElement = lamina.IsElementOnBoundary();
 
     ++(*(mpIters->pLamIter));
 
@@ -288,17 +333,13 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
 
                 // Get the number of parts, and put the first index onto the back of the vector for convenience
                 const auto num_parts = start_idx_each_part.size();
-                std::cout << "num_parts: " << num_parts << "\n";
 
                 for (unsigned part = 0; part < num_parts; ++part)
                 {
                     const long this_start = start_idx_each_part[part];
-                    std::cout << this_start << "\n";
                     const long next_start = start_idx_each_part[AdvanceMod(part, 1, num_parts)];
-                    std::cout << next_start << "\n";
 
                     const long num_nodes_this_part = next_start > this_start ? next_start - this_start : num_nodes + next_start - this_start;
-                    std::cout << num_nodes_this_part << "\n";
 
                     // Identify the extra points that need to be added
                     std::vector<c_vector<double, SPACE_DIM>> extra_locations;
@@ -307,11 +348,8 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
                     {
                         const auto& r_start_pos = iter->GetNode(this_start)->rGetLocation();
                         const auto& r_end_pos = iter->GetNode(AdvanceMod(this_start, -1, num_nodes))->rGetLocation();
-                        std::cout << "r_start_pos: " << r_start_pos[0] << ", " << r_start_pos[1] << "\n";
-                        std::cout << "r_end_pos: " << r_end_pos[0] << ", " << r_end_pos[1] << "\n";
 
                         const c_vector<double, SPACE_DIM> vec_a2b = rMesh.GetVectorFromAtoB(r_start_pos, r_end_pos);
-                        std::cout << "vec_a2b: " << vec_a2b[0] << ", " << vec_a2b[1] << "\n";
                         extra_locations.emplace_back(GetIntersectionOfEdgeWithBoundary(r_start_pos, r_start_pos + vec_a2b));
                     }
 
@@ -319,8 +357,6 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
                     {
                         const auto& r_start_pos = iter->GetNode(AdvanceMod(next_start, -1, num_nodes))->rGetLocation();
                         const auto& r_end_pos = iter->GetNode(next_start)->rGetLocation();
-                        std::cout << "r_start_pos: " << r_start_pos[0] << ", " << r_start_pos[1] << "\n";
-                        std::cout << "r_end_pos: " << r_end_pos[0] << ", " << r_end_pos[1] << "\n";
 
                         const c_vector<double, SPACE_DIM> vec_a2b = rMesh.GetVectorFromAtoB(r_start_pos, r_end_pos);
                         extra_locations.emplace_back(GetIntersectionOfEdgeWithBoundary(r_start_pos, r_start_pos + vec_a2b));
@@ -552,7 +588,26 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 
             *p_element_file << "\t" << elem_data.AttributeValue;
 
-            //\todo: add fluid source and other Element members
+            // Has fluid source
+            *p_element_file << "\t" << elem_data.hasFluidSource;
+
+            // Fluid source index
+            if (elem_data.hasFluidSource) {
+                *p_element_file << "\t" << elem_data.fluidSourceIndex;
+            }
+
+            // Corner node indices
+            *p_element_file << "\t" << elem_data.cornerNodeIndices.size();
+            
+            for (auto nodeIndex : elem_data.cornerNodeIndices) {
+                *p_element_file << "\t" << nodeIndex;
+            }
+            
+            // Average node spacing
+            *p_element_file << "\t" << elem_data.averageNodeSpacing;
+            
+            // Is boundary element
+            *p_element_file << "\t" << elem_data.isBoundaryElement; 
 
             // New line
             *p_element_file << "\n";
@@ -595,7 +650,27 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 
             *p_lamina_file << "\t" << lamina_data.AttributeValue;
 
-            //\todo: add fluid source and other Element members
+            // Has fluid source
+            *p_lamina_file << "\t" << lamina_data.hasFluidSource;
+
+            // Fluid source index
+            if (lamina_data.hasFluidSource) {
+                *p_lamina_file << "\t" << lamina_data.fluidSourceIndex;
+            }
+
+            // Corner node indices
+            *p_lamina_file << "\t" << lamina_data.cornerNodeIndices.size();
+            
+            for (auto nodeIndex : lamina_data.cornerNodeIndices) {
+                *p_lamina_file << "\t" << nodeIndex;
+            }
+            
+            // Average node spacing
+            *p_lamina_file << "\t" << lamina_data.averageNodeSpacing;
+            
+            // Is boundary lamina
+            *p_lamina_file << "\t" << lamina_data.isBoundaryElement; 
+
 
             // New line
             *p_lamina_file << "\n";
@@ -654,25 +729,19 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::FindElementOverlaps(Imm
             parts.clear();
         }
         
-        std::cerr << "Looking for overlaps...\n";
-
         // We loop over each element and the node index at each discontinuity due to periodic boundaries
         for (auto iter = rMesh.GetElementIteratorBegin(); iter != rMesh.GetElementIteratorEnd(); ++iter)
         {
-            std::cerr << "New element\n";
             for (unsigned node_idx = 0; node_idx < iter->GetNumNodes(); ++node_idx)
             {
                 const unsigned prev_idx = AdvanceMod(node_idx, -1, iter->GetNumNodes());
 
                 const auto& this_location = iter->GetNode(node_idx)->rGetLocation();
-                std::cerr << "this_location: " << this_location[0] << ", " << this_location[1] << "\n";
                 const auto& prev_location = iter->GetNode(prev_idx)->rGetLocation();
-                std::cerr << "prev_location: " << prev_location[0] << ", " << prev_location[1] << "\n";
 
                 if (norm_inf(this_location - prev_location) > 0.5)
                 {
                     mElementParts[iter->GetIndex()].emplace_back(node_idx);
-                    std::cerr << "Overlap found\n";
                 }
             }
         }
@@ -699,10 +768,6 @@ c_vector<double, SPACE_DIM> ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::
     std::vector<geom_point> intersections;
     for (const auto& boundary_edge : mBoundaryEdges)
     {
-        std::cout << "start: " << start.get<0>() << ", " << start.get<1>() << "\n";
-        std::cout << "end: " << end.get<0>() << ", " << end.get<1>() << "\n";
-        std::cout << "boundary_edge: " << boundary_edge.first.get<0>() << ", " << boundary_edge.first.get<1>() << "\n";
-        std::cout << "boundary_edge: " << boundary_edge.second.get<0>() << ", " << boundary_edge.second.get<1>() << "\n";
         if (boost::geometry::intersects(edge, boundary_edge))
         {
             boost::geometry::intersection(edge, boundary_edge, intersections);
@@ -710,7 +775,6 @@ c_vector<double, SPACE_DIM> ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::
         }
     }
 
-    std::cerr << "Intersections size: " << intersections.size() << "\n";
     // There should be exactly one intersection
     if (intersections.size() != 1)
     {

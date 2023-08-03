@@ -56,7 +56,6 @@ class TestImmersedBoundaryMeshWriter : public CxxTest::TestSuite
 {
 public:
 
-    ///\todo Improve testing
     void TestImmersedBoundaryMeshWriterIn2d()
     {
         /*
@@ -150,6 +149,7 @@ public:
         OutputFileHandler handler("TestIbMeshWriterIn2d", false);
         std::string results_file1 = handler.GetOutputDirectoryFullPath() + "ib_mesh_2d.node";
         std::string results_file2 = handler.GetOutputDirectoryFullPath() + "ib_mesh_2d.elem";
+        std::string results_file3 = handler.GetOutputDirectoryFullPath() + "ib_mesh_2d.lam";
         
         // Test adding point data
         ib_mesh_writer.AddPointData("test", {1.0, 1.0});
@@ -159,6 +159,9 @@ public:
 
         FileComparison comparer2(results_file2,"mesh/test/data/TestIbMeshWriter/ib_mesh_2d.elem");
         TS_ASSERT(comparer2.CompareFiles());
+
+        FileComparison comparer3(results_file3,"mesh/test/data/TestIbMeshWriter/ib_mesh_2d.lam");
+        TS_ASSERT(comparer3.CompareFiles());
     }
     
     void TestImmersedBoundaryMeshWriterVTKCornerOverlap()

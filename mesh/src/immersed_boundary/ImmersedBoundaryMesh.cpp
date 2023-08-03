@@ -54,7 +54,8 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
         : mNumGridPtsX(numGridPtsX),
           mNumGridPtsY(numGridPtsY),
           mElementDivisionSpacing(DOUBLE_UNSET),
-          mSummaryOfNodeLocations(DOUBLE_UNSET)
+          mSummaryOfNodeLocations(DOUBLE_UNSET),
+          mCellRearrangementThreshold(0.05)
 {
     // Clear mNodes and mElements
     Clear();
@@ -522,6 +523,36 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::~ImmersedBoundaryMesh()
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::set<unsigned> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetNeighbouringNodeIndices(unsigned nodeIndex)
+{
+    // Create a set of neighbouring node indices
+    std::set<unsigned> neighbouring_node_indices;
+
+    // Find the indices of the elements owned by this node
+    std::set<unsigned> containing_elem_indices = this->GetNode(nodeIndex)->rGetContainingElementIndices();
+
+    // Iterate over these elements
+    for (std::set<unsigned>::iterator elem_iter = containing_elem_indices.begin();
+         elem_iter != containing_elem_indices.end();
+         ++elem_iter)
+    {
+        // Find the local index of this node in this element
+        unsigned local_index = GetElement(*elem_iter)->GetNodeLocalIndex(nodeIndex);
+
+        // Find the global indices of the preceding and successive nodes in this element
+        unsigned num_nodes = GetElement(*elem_iter)->GetNumNodes();
+        unsigned previous_local_index = (local_index + num_nodes - 1) % num_nodes;
+        unsigned next_local_index = (local_index + 1) % num_nodes;
+
+        // Add the global indices of these two nodes to the set of neighbouring node indices
+        neighbouring_node_indices.insert(GetElement(*elem_iter)->GetNodeGlobalIndex(previous_local_index));
+        neighbouring_node_indices.insert(GetElement(*elem_iter)->GetNodeGlobalIndex(next_local_index));
+    }
+
+    return neighbouring_node_indices;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SolveNodeMapping(unsigned index) const
 {
     assert(index < this->mNodes.size());
@@ -670,6 +701,12 @@ multi_array<double, 4>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetModifi
     return m3dVelocityGrids;
 }
 */
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetCellRearrangementThreshold()
+{
+    return mCellRearrangementThreshold;
+}
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetVectorFromAtoB(const c_vector<double, SPACE_DIM>& rLocation1, const c_vector<double, SPACE_DIM>& rLocation2)

@@ -97,6 +97,12 @@ private:
 
     /** Call ReMesh every ReMeshFrequency number of time steps */
     unsigned mReMeshFrequency;
+    
+    /** Used to ensure step size exception is only thrown once */
+    bool mThrowStepSizeException;
+    
+    /** Distance above which a vertex movement will trigger a step size exception */ 
+    double mCellRearranagementThreshold;
 
     /**
      * Overridden WriteVtkResultsToFile() method.
