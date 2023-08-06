@@ -103,12 +103,12 @@ public:
         TS_ASSERT_EQUALS(grid_row_data, expected_grid_row_data);
         
         ImmersedBoundaryElementData element_data = reader.GetNextImmersedBoundaryElementData();
-        ImmersedBoundaryElementData expected_element_data {{0, 1, 2}, 0};
+        ImmersedBoundaryElementData expected_element_data {{0, 1, 2}, 0, false, 0, {}, 0.0, false};
         TS_ASSERT_EQUALS(element_data.NodeIndices, expected_element_data.NodeIndices);
         TS_ASSERT_EQUALS(element_data.AttributeValue, expected_element_data.AttributeValue);
     
         ImmersedBoundaryElementData lamina_data = reader.GetNextImmersedBoundaryLaminaData();
-        ImmersedBoundaryElementData expected_lamina_data {{15, 16, 17, 18, 19}, 0};
+        ImmersedBoundaryElementData expected_lamina_data {{15, 16, 17, 18, 19}, 0, false, 0, {}, 0.0, false};
         TS_ASSERT_EQUALS(lamina_data.NodeIndices, expected_lamina_data.NodeIndices);
         TS_ASSERT_EQUALS(lamina_data.AttributeValue, expected_lamina_data.AttributeValue);
     }
