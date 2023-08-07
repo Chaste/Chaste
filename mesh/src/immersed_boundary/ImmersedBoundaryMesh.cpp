@@ -599,7 +599,10 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
     // Delete element sources
     for (auto source : mElementFluidSources)
     {
-        delete(source);
+        if (source != nullptr) {
+            std::cout << "Deleting " << source << "\n";
+            delete(source);
+        }
     }
     this->mElementFluidSources.clear();
 
@@ -667,6 +670,13 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetCharacteristicNodeSpacing(
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<FluidSource<SPACE_DIM>*>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetElementFluidSources()
 {
+    mElementFluidSources.clear();
+    for (const auto& element : mElements) {
+        std::cout << "Element \n";
+        if (element->GetFluidSource() != nullptr) {
+            mElementFluidSources.push_back(element->GetFluidSource());
+        }
+    }
     return mElementFluidSources;
 }
 

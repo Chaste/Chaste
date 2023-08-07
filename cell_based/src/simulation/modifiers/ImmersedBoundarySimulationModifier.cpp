@@ -468,7 +468,7 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateFluidSourcesToGrid()
             // Get location and strength of this source
             c_vector<double, DIM> source_location = this_source->rGetLocation();
             double source_strength = this_source->GetStrength();
-
+            
             // Get first grid index in each dimension, taking account of possible wrap-around
             first_idx_x = unsigned(floor(source_location[0] / mGridSpacingX)) + numGridPtsX - 1;
             first_idx_y = unsigned(floor(source_location[1] / mGridSpacingY)) + numGridPtsY - 1;

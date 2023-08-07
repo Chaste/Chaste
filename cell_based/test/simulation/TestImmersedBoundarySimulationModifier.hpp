@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "FileComparison.hpp"
+#include "FluidSource.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
 #include "ImmersedBoundaryLinearInteractionForce.hpp"
@@ -60,7 +61,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
 
-///\todo Improve testing
 class TestImmersedBoundarySimulationModifier : public AbstractCellBasedTestSuite
 {
 public:
@@ -199,31 +199,31 @@ public:
 
     void TestPropagateForcesToFluidGrid()
     {
-        ///\todo Test this method
-        // Test by setting up a mesh with a single node, element.
-        // Position node in specific locations and then apply single force
-        // Check that force is correctly split to grid
         {
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
+
             // Create a single node, single element mesh
             std::vector<Node<2>*> nodes;
-            nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+            nodes.push_back(new Node<2>(0, true, 0.55, 0.55));
+            nodes.push_back(new Node<2>(1, true, 0.2, 0.2));
+            nodes.push_back(new Node<2>(2, true, 0.1, 0.2));
 
             std::vector<ImmersedBoundaryElement<2, 2>*> elems;
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
-            ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
+            ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
             
             // Set up a cell population
             std::vector<CellPtr> cells;
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
             CellsGenerator<UniformCellCycleModel, 2> cells_generator;
-            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
-            ImmersedBoundaryCellPopulation<2> cell_population(&mesh, cells);
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
+            ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
             
             // Set up and apply a force to the node
             c_vector<double, 2> force;
-            force[0] = i * 0.01;
-            force[1] = 2 * i * 0.01;
+            force[0] = 0.01;
+            force[1] = 0.01;
             nodes[0]->AddAppliedForceContribution(force);
             
             // Set up simulation modifier
@@ -231,7 +231,7 @@ public:
             modifier.SetupConstantMemberVariables(cell_population);
             
             // Check that force grids are zero before force propagation
-            auto forceGrids = modifier.mpArrays->rGetModifiableForceGrids(); 
+            auto& forceGrids = modifier.mpArrays->rGetModifiableForceGrids(); 
             for (unsigned int grid = 0; grid <= 1; grid++) {
                 for (unsigned int x = 0; x < modifier.mpMesh->GetNumGridPtsX(); x++) {
                     for (unsigned int y = 0; y < modifier.mpMesh->GetNumGridPtsY(); y++) {
@@ -240,18 +240,130 @@ public:
                 }
             }
             
+            modifier.PropagateForcesToFluidGrid();
+            
+            // Check that there are only 16 non-zero entries per grid
+            unsigned int nonZeroEntriesCount = 0;
+            for (unsigned int grid = 0; grid <= 1; grid++) {
+                for (unsigned int x = 0; x < modifier.mpMesh->GetNumGridPtsX(); x++) {
+                    for (unsigned int y = 0; y < modifier.mpMesh->GetNumGridPtsY(); y++) {
+                        if (forceGrids[grid][x][y] != 0.0) {
+                            nonZeroEntriesCount += 1;
+                        }
+                    }
+                }
+            }
+            TS_ASSERT_EQUALS(nonZeroEntriesCount, 32u);
+            
+            // Check the non-zero entries' values
+            TS_ASSERT_DELTA(forceGrids[0][4][4], 0.0020, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[0][4][5], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[0][4][6], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[0][4][7], 0.0020, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[0][5][4], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[0][5][5], 0.0707, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[0][5][6], 0.0707, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[0][5][7], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[0][6][4], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[0][6][5], 0.0707, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[0][6][6], 0.0707, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[0][6][7], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[0][7][4], 0.0020, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[0][7][5], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[0][7][6], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[0][7][7], 0.0020, 0.0001); 
+
+            TS_ASSERT_DELTA(forceGrids[1][4][4], 0.0020, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[1][4][5], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[1][4][6], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[1][4][7], 0.0020, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[1][5][4], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[1][5][5], 0.0707, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[1][5][6], 0.0707, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[1][5][7], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[1][6][4], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[1][6][5], 0.0707, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[1][6][6], 0.0707, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[1][6][7], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[1][7][4], 0.0020, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[1][7][5], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[1][7][6], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[1][7][7], 0.0020, 0.0001); 
         }
     }
 
     void TestPropagateFluidSourcesToGrid()
     {
-        ///\todo Test this method
+        {
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
+            
+            // Create a single node, single element mesh
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, true, 0.55, 0.55));
+            nodes.push_back(new Node<2>(1, true, 0.2, 0.2));
+            nodes.push_back(new Node<2>(2, true, 0.1, 0.2));
+
+            std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+            
+
+            ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
+            auto& balancingFluidSources = mesh.rGetBalancingFluidSources();
+            balancingFluidSources.clear();
+            
+            FluidSource<2>* fluidSource = new FluidSource<2>(0, 0.55, 0.55);
+            fluidSource->SetStrength(0.1);
+            elems.back()->SetFluidSource(fluidSource);
+            
+            // Set up a cell population
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
+            ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
+            
+            // Set up simulation modifier
+            ImmersedBoundarySimulationModifier<2> modifier;
+            modifier.SetupConstantMemberVariables(cell_population);
+            
+            modifier.PropagateFluidSourcesToGrid();
+            
+            // Check that there are only 16 non-zero entries per grid
+            auto& forceGrids = modifier.mpArrays->rGetModifiableRightHandSideGrids(); 
+            unsigned int nonZeroEntriesCount = 0;
+            for (unsigned int x = 0; x < modifier.mpMesh->GetNumGridPtsX(); x++) {
+                for (unsigned int y = 0; y < modifier.mpMesh->GetNumGridPtsY(); y++) {
+                    if (abs(forceGrids[2][x][y]) > 0.0001) {
+                        nonZeroEntriesCount += 1;
+                    }
+                }
+            }
+            TS_ASSERT_EQUALS(nonZeroEntriesCount, 16u);
+            
+            // Check the non-zero entries' values
+            TS_ASSERT_DELTA(forceGrids[2][4][4], 0.0536, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[2][4][5], 0.3124, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[2][4][6], 0.3124, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[2][4][7], 0.0536, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[2][5][4], 0.3124, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[2][5][5], 1.8213, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[2][5][6], 1.8213, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[2][5][7], 0.3124, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[2][6][4], 0.3124, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[2][6][5], 1.8213, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[2][6][6], 1.8213, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[2][6][7], 0.3124, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[2][7][4], 0.0536, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[2][7][5], 0.3124, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[2][7][6], 0.3124, 0.0001); 
+            TS_ASSERT_DELTA(forceGrids[2][7][7], 0.0536, 0.0001); 
+
+        }
     }
 
     void TestSolveNavierStokesSpectral()
     {
         ///\todo Test this method
-        // This calls Upwind2d
     }
 
     void TestUpdateFluidVelocityGrids()
@@ -283,7 +395,195 @@ public:
 
     void TestUpwind2d()
     {
-        ///\todo Test this method
+        // Input field = constant 0 everywhere
+        {
+            // Set up SimulationTime - needed by SetupConstantMemberVariables()
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
+            
+            // Create a single node, single element mesh
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, true, 0.55, 0.55));
+            nodes.push_back(new Node<2>(1, true, 0.2, 0.2));
+            nodes.push_back(new Node<2>(2, true, 0.1, 0.2));
+
+            std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+
+            ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
+            
+            // Set up a cell population
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
+            ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
+            
+            // Set up simulation modifier
+            ImmersedBoundarySimulationModifier<2> modifier;
+            modifier.SetupConstantMemberVariables(cell_population);
+
+            multi_array<double, 3>& vel_grids   = mesh.rGetModifiable2dVelocityGrids();
+            multi_array<double, 3>& rhs_grids   = modifier.mpArrays->rGetModifiableRightHandSideGrids();
+
+            for (unsigned dim = 0; dim < 2; ++dim)
+            {
+                for (unsigned x = 0; x < 10; ++x)
+                {
+                    for (unsigned y = 0; y < 10; ++y)
+                    {
+                        TS_ASSERT_DELTA(vel_grids[dim][x][y], 0.0, 0.00001);
+                        TS_ASSERT_DELTA(rhs_grids[dim][x][y], 0.0, 0.00001);
+                    }
+                }
+            }
+
+            modifier.Upwind2d(vel_grids, rhs_grids);
+            
+            for (unsigned dim = 0; dim < 2; ++dim)
+            {
+                for (unsigned x = 0; x < 10; ++x)
+                {
+                    for (unsigned y = 0; y < 10; ++y)
+                    {
+                        TS_ASSERT_DELTA(vel_grids[dim][x][y], 0.0, 0.00001);
+                        TS_ASSERT_DELTA(rhs_grids[dim][x][y], 0.0, 0.00001);
+                    }
+                }
+            }
+            
+            SimulationTime::Instance()->Destroy();
+        }
+        
+        // Input field = constant 1.0 everywhere
+        {
+            // Set up SimulationTime - needed by SetupConstantMemberVariables()
+            SimulationTime::Instance()->SetStartTime(0.0);
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
+            
+            // Create a single node, single element mesh
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, true, 0.55, 0.55));
+            nodes.push_back(new Node<2>(1, true, 0.2, 0.2));
+            nodes.push_back(new Node<2>(2, true, 0.1, 0.2));
+
+            std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+
+            ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
+            
+            // Set up a cell population
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
+            ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
+            
+            // Set up simulation modifier
+            ImmersedBoundarySimulationModifier<2> modifier;
+            modifier.SetupConstantMemberVariables(cell_population);
+
+            multi_array<double, 3>& vel_grids   = mesh.rGetModifiable2dVelocityGrids();
+            multi_array<double, 3>& rhs_grids   = modifier.mpArrays->rGetModifiableRightHandSideGrids();
+
+            for (unsigned dim = 0; dim < 2; ++dim)
+            {
+                for (unsigned x = 0; x < 10; ++x)
+                {
+                    for (unsigned y = 0; y < 10; ++y)
+                    {
+                        vel_grids[dim][x][y] = 1.0;
+                    }
+                }
+            }
+
+            for (unsigned dim = 0; dim < 2; ++dim)
+            {
+                for (unsigned x = 0; x < 10; ++x)
+                {
+                    for (unsigned y = 0; y < 10; ++y)
+                    {
+                        TS_ASSERT_DELTA(rhs_grids[dim][x][y], 0.0, 0.00001);
+                    }
+                }
+            }
+
+            modifier.Upwind2d(vel_grids, rhs_grids);
+            
+            for (unsigned dim = 0; dim < 2; ++dim)
+            {
+                for (unsigned x = 0; x < 10; ++x)
+                {
+                    for (unsigned y = 0; y < 10; ++y)
+                    {
+                        TS_ASSERT_DELTA(rhs_grids[dim][x][y], 0.0, 0.00001);
+                    }
+                }
+            }
+            SimulationTime::Instance()->Destroy();
+        }
+
+        // Test propagation
+        {
+            // Set up SimulationTime - needed by SetupConstantMemberVariables()
+            SimulationTime::Instance()->SetStartTime(0.0);
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
+            
+            // Create a single node, single element mesh
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, true, 0.55, 0.55));
+            nodes.push_back(new Node<2>(1, true, 0.2, 0.2));
+            nodes.push_back(new Node<2>(2, true, 0.1, 0.2));
+
+            std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+
+            ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
+            
+            // Set up a cell population
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
+            ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
+            
+            // Set up simulation modifier
+            ImmersedBoundarySimulationModifier<2> modifier;
+            modifier.SetupConstantMemberVariables(cell_population);
+
+            multi_array<double, 3>& vel_grids   = mesh.rGetModifiable2dVelocityGrids();
+            multi_array<double, 3>& rhs_grids   = modifier.mpArrays->rGetModifiableRightHandSideGrids();
+
+            for (unsigned dim = 0; dim < 2; ++dim)
+            {
+                for (unsigned x = 0; x < 10; ++x)
+                {
+                    for (unsigned y = 0; y < 10; ++y)
+                    {
+                        TS_ASSERT_DELTA(vel_grids[dim][x][y], 0.0, 0.00001);
+                        TS_ASSERT_DELTA(rhs_grids[dim][x][y], 0.0, 0.00001);
+                    }
+                }
+            }
+            
+            vel_grids[0][1][1] = 0.1;
+            vel_grids[0][1][5] = -0.1;
+            vel_grids[1][5][1] = 0.1;
+            vel_grids[1][5][5] = -0.1;
+
+            modifier.Upwind2d(vel_grids, rhs_grids);
+            
+            TS_ASSERT_DELTA(rhs_grids[0][1][1], 0.1, 0.001); 
+            TS_ASSERT_DELTA(rhs_grids[0][1][5], -0.1, 0.001); 
+            TS_ASSERT_DELTA(rhs_grids[0][5][1], 0.0, 0.001); 
+            TS_ASSERT_DELTA(rhs_grids[0][5][5], -0.0, 0.001); 
+
+            TS_ASSERT_DELTA(rhs_grids[1][1][1], 0.0, 0.001); 
+            TS_ASSERT_DELTA(rhs_grids[1][1][5], -0.0, 0.001); 
+            TS_ASSERT_DELTA(rhs_grids[1][5][1], 0.1, 0.001); 
+            TS_ASSERT_DELTA(rhs_grids[1][5][5], -0.1, 0.001); 
+
+            SimulationTime::Instance()->Destroy();
+        }
     }
 
     void TestUpdateAtEndOfTimeStep()
