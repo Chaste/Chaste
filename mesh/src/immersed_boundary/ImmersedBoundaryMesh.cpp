@@ -600,7 +600,6 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
     for (auto source : mElementFluidSources)
     {
         if (source != nullptr) {
-            std::cout << "Deleting " << source << "\n";
             delete(source);
         }
     }

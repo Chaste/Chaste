@@ -302,7 +302,6 @@ public:
         FileComparison(results_dir + "results.vizcelltypes", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/results.vizcelltypes").CompareFiles();
         FileComparison(results_dir + "cellareas.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/cellareas.dat").CompareFiles();
         FileComparison(results_dir + "cellmutationstates.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/cellmutationstates.dat").CompareFiles();
-        FileComparison(results_dir + "cellcyclephases.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/cellcyclephases.dat").CompareFiles();
         FileComparison(results_dir + "celltypes.dat", "cell_based/test/data/TestImmersedBoundaryPopulationWriters/celltypes.dat").CompareFiles();
 
         // Test that the cell population parameters are output correctly

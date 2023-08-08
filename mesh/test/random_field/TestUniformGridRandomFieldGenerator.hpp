@@ -231,16 +231,16 @@ public:
 
             // If the field is not constant everywhere, interpolation is linear
             {
-                std::vector<double> constant_field(8, 1.0);
-                constant_field[4] = 2.0;
+                std::vector<double> field(8, 1.0);
+                field[4] = 2.0;
 
-                TS_ASSERT_DELTA(gen.Interpolate(constant_field, Create_c_vector(3.0 / 8.0)), 1.0, 1e-6); // below
-                TS_ASSERT_DELTA(gen.Interpolate(constant_field, Create_c_vector(4.0 / 8.0)), 2.0, 1e-6); // exactly at the point we changed
-                TS_ASSERT_DELTA(gen.Interpolate(constant_field, Create_c_vector(5.0 / 8.0)), 1.0, 1e-6); // above
+                TS_ASSERT_DELTA(gen.Interpolate(field, Create_c_vector(3.0 / 8.0)), 1.0, 1e-6); // below
+                TS_ASSERT_DELTA(gen.Interpolate(field, Create_c_vector(4.0 / 8.0)), 2.0, 1e-6); // exactly at the point we changed
+                TS_ASSERT_DELTA(gen.Interpolate(field, Create_c_vector(5.0 / 8.0)), 1.0, 1e-6); // above
 
-                TS_ASSERT_DELTA(gen.Interpolate(constant_field, Create_c_vector(3.25 / 8.0)), 1.25, 1e-6); // quarter
-                TS_ASSERT_DELTA(gen.Interpolate(constant_field, Create_c_vector(3.5 / 8.0)), 1.5, 1e-6); // half
-                TS_ASSERT_DELTA(gen.Interpolate(constant_field, Create_c_vector(4.25 / 8.0)), 1.75, 1e-6); // one + quarter
+                TS_ASSERT_DELTA(gen.Interpolate(field, Create_c_vector(3.25 / 8.0)), 1.25, 1e-6); // quarter
+                TS_ASSERT_DELTA(gen.Interpolate(field, Create_c_vector(3.5 / 8.0)), 1.5, 1e-6); // half
+                TS_ASSERT_DELTA(gen.Interpolate(field, Create_c_vector(4.25 / 8.0)), 1.75, 1e-6); // one + quarter
             }
         }
 
@@ -307,13 +307,15 @@ public:
             // If the field is not constant everywhere, interpolation is a simple nearest-neighbour
             {
                 std::vector<double> constant_field(64, 3.45);
-                constant_field[59] = 4.56;
+                constant_field[21] = 4.56;
 
-                TS_ASSERT_DELTA(gen.Interpolate(constant_field, Create_c_vector(0.75, 0.5, 0.75)), 4.56, 1e-6); // bottom corner of 4.56 region
-                TS_ASSERT_DELTA(gen.Interpolate(constant_field, Create_c_vector(0.999, 0.749, 0.999)), 4.56, 1e-6); // top corner of 4.56 region
-                TS_ASSERT_DELTA(gen.Interpolate(constant_field, Create_c_vector(0.8, 0.6, 0.83)), 4.56, 1e-6); // mid 4.56 region
+                TS_ASSERT_DELTA(gen.Interpolate(constant_field, Create_c_vector(0.0, 0.0, 0.0)), 3.45, 1e-6); // Lower corner of supported region
+                TS_ASSERT_DELTA(gen.Interpolate(constant_field, Create_c_vector(0.25, 0.25, 0.25)), 4.56, 1e-6); // Center of supported region
+                TS_ASSERT_DELTA(gen.Interpolate(constant_field, Create_c_vector(0.5, 0.5, 0.5)), 3.45, 1e-6); // top corner of supported region
+                TS_ASSERT_DELTA(gen.Interpolate(constant_field, Create_c_vector(0.125, 0.25, 0.25)), 4.005, 1e-6); // mid 4.56 region
+                TS_ASSERT_DELTA(gen.Interpolate(constant_field, Create_c_vector(0.25, 0.25, 0.125)), 4.005, 1e-6); // mid 4.56 region
+                TS_ASSERT_DELTA(gen.Interpolate(constant_field, Create_c_vector(0.25, 0.375, 0.25)), 4.005, 1e-6); // mid 4.56 region
 
-                TS_ASSERT_DELTA(gen.Interpolate(constant_field, Create_c_vector(0.749, 0.499, 0.749)), 3.45, 1e-6); // outside 4.56 region (below)
                 TS_ASSERT_DELTA(gen.Interpolate(constant_field, Create_c_vector(1.0, 0.75, 1.0)), 3.45, 1e-6); // outside 4.56 region (above)
             }
         }

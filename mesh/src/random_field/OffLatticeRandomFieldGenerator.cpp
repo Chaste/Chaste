@@ -60,8 +60,8 @@ OffLatticeRandomFieldGenerator<SPACE_DIM>::OffLatticeRandomFieldGenerator(
     // Reset the box width if the default value is being used
     if (boxWidth == DOUBLE_UNSET)
     {
-        ///\todo: can we remove the magic number here?
-        boxWidth = std::min(4.0 * lengthScale, upperCorner[0] - lowerCorner[0]);
+        const double maxBoxWidth = 4.0 * lengthScale; 
+        boxWidth = std::min(maxBoxWidth, upperCorner[0] - lowerCorner[0]);
     }
 
     // Set up the box collection
@@ -86,7 +86,7 @@ OffLatticeRandomFieldGenerator<SPACE_DIM>::OffLatticeRandomFieldGenerator(
     );
 
     mpBoxCollection->SetupLocalBoxesHalfOnly();    
-    os = OpenSimplex2S(rand());
+    mOpenSimplex = OpenSimplex2S();
 }
 
 template <unsigned SPACE_DIM>
@@ -119,10 +119,9 @@ template <unsigned SPACE_DIM>
 void OffLatticeRandomFieldGenerator<SPACE_DIM>::SetRandomSeed(
     const unsigned seed)
 {
-    os = OpenSimplex2S(seed);
+    mOpenSimplex = OpenSimplex2S(seed);
 }
 
-///\todo: Check what this method actually should be doing - should presumably be sampling at node locations?
 template <unsigned SPACE_DIM>
 std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField(
     const std::vector<Node<SPACE_DIM>*>& rNodes)
@@ -135,7 +134,6 @@ std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField
     const std::vector<Node<SPACE_DIM>*>& rNodes,
     const double time)
 {
-    ///\todo: randomise seed
     auto reshape = [](const double val)
     {
         double dist_from_half = 2.0 * (0.5 - std::abs(0.5 - std::abs(val)));
@@ -152,17 +150,17 @@ std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField
         {
             case 1:
             {
-                samples[i] = reshape(reshape(os.noise2_XBeforeY(node_location[0] * mLengthScale, time + 0.5)));
+                samples[i] = reshape(reshape(mOpenSimplex.noise2_XBeforeY(node_location[0] * mLengthScale, time + 0.5)));
                 break;
             }            
             case 2:
             {
-                samples[i] = reshape(reshape(os.noise3_XYBeforeZ(node_location[0] * mLengthScale, node_location[1] * mLengthScale, time)));
+                samples[i] = reshape(reshape(mOpenSimplex.noise3_XYBeforeZ(node_location[0] * mLengthScale, node_location[1] * mLengthScale, time)));
                 break;
             }
             case 3:
             {
-                samples[i] = reshape(reshape(os.noise4_XYBeforeZW(node_location[0] * mLengthScale, node_location[1] * mLengthScale, node_location[2] * mLengthScale, time)));
+                samples[i] = reshape(reshape(mOpenSimplex.noise4_XYBeforeZW(node_location[0] * mLengthScale, node_location[1] * mLengthScale, node_location[2] * mLengthScale, time)));
                 break;
             }                
             default:

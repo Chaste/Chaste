@@ -81,13 +81,13 @@ UniformGridRandomFieldGenerator<SPACE_DIM>::UniformGridRandomFieldGenerator(
         mOneOverGridSpacing[dim] = mNumGridPts[dim] / (mUpperCorner[dim] - mLowerCorner[dim]);
     }
     
-    os = OpenSimplex2S(rand());
+    mOpenSimplex = OpenSimplex2S(0);
 }
 
 template <unsigned SPACE_DIM>
 void UniformGridRandomFieldGenerator<SPACE_DIM>::SetRandomSeed(const unsigned seed)
 {
-    os = OpenSimplex2S(seed);
+    mOpenSimplex = OpenSimplex2S(seed);
 }
 
 template <unsigned SPACE_DIM>
@@ -173,7 +173,6 @@ std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFiel
 template <unsigned SPACE_DIM>
 std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFieldAtTime(double time)
 { 
-    ///\todo randomise seed
     auto reshape = [](const double val)
     {
         double distFromHalf = 2.0 * (0.5 - std::abs(0.5 - std::abs(val)));
@@ -189,7 +188,7 @@ std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFiel
         {
             for (unsigned x = 0; x < mNumGridPts[0]; x++)
             {
-                samples[x] = reshape(reshape(os.noise2_XBeforeY(x * mLengthScale, time)));
+                samples[x] = reshape(reshape(mOpenSimplex.noise2_XBeforeY(x * mLengthScale, time)));
             }
             break;
         }        
@@ -199,7 +198,7 @@ std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFiel
             {
                 for (unsigned y = 0; y < mNumGridPts[1]; y++)
                 {
-                    samples[mNumGridPts[1] * y + x] = reshape(reshape(os.noise3_XYBeforeZ(x * mLengthScale, y * mLengthScale, time)));
+                    samples[mNumGridPts[1] * y + x] = reshape(reshape(mOpenSimplex.noise3_XYBeforeZ(x * mLengthScale, y * mLengthScale, time)));
                 }
             }
             break;
@@ -212,7 +211,7 @@ std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFiel
                 {
                     for (unsigned z = 0; z < mNumGridPts[2]; z++)
                     {
-                        samples[mNumGridPts[2] * z * y + mNumGridPts[1] * y + x] = reshape(reshape(os.noise4_XYBeforeZW(x * mLengthScale, y * mLengthScale, z * mLengthScale, time)));
+                        samples[mNumGridPts[2] * z * y + mNumGridPts[1] * y + x] = reshape(reshape(mOpenSimplex.noise4_XYBeforeZW(x * mLengthScale, y * mLengthScale, z * mLengthScale, time)));
                     }
                 }
             }
@@ -305,8 +304,59 @@ double UniformGridRandomFieldGenerator<SPACE_DIM>::Interpolate(const std::vector
         }
         case 3:
         {
-            // \todo: perform a suitable interpolation rather than just near neighbour
-            interpolated_value = rRandomField[GetLinearIndex(lower_left)];
+            // The value of the field at the eight points of the cube containing rLocation
+            std::array<long, SPACE_DIM> x_upper = lower_left;
+            x_upper[0] = (x_upper[0] + 1) % mNumGridPts[0];
+
+            std::array<long, SPACE_DIM> y_upper = lower_left;
+            y_upper[1] = (y_upper[1] + 1) % mNumGridPts[1];
+            
+            std::array<long, SPACE_DIM> z_upper = lower_left;
+            z_upper[2] = (z_upper[2] + 1) % mNumGridPts[2];
+
+            std::array<long, SPACE_DIM> xy_upper = x_upper;
+            xy_upper[1] = y_upper[1];
+
+            std::array<long, SPACE_DIM> xz_upper = x_upper;
+            xz_upper[2] = z_upper[2];
+
+            std::array<long, SPACE_DIM> yz_upper = y_upper;
+            yz_upper[2] = z_upper[2];
+            
+            std::array<long, SPACE_DIM> xyz_upper = xy_upper;
+            xyz_upper[2] = z_upper[2];
+
+            const double field_xyz_lower = rRandomField[GetLinearIndex(lower_left)];
+            const double field_x_upper = rRandomField[GetLinearIndex(x_upper)];
+            const double field_y_upper = rRandomField[GetLinearIndex(y_upper)];
+            const double field_z_upper = rRandomField[GetLinearIndex(z_upper)];
+            const double field_xy_upper = rRandomField[GetLinearIndex(xy_upper)];
+            const double field_xz_upper = rRandomField[GetLinearIndex(xz_upper)];
+            const double field_yz_upper = rRandomField[GetLinearIndex(yz_upper)];
+            const double field_xyz_upper = rRandomField[GetLinearIndex(xyz_upper)];
+
+            std::cout << "xyz upper: " << field_xyz_upper << "\n";
+
+            // Perform a trilinear interpolation
+            const std::array<double, SPACE_DIM> lower_location = GetPositionUsingGridIndex(lower_left);
+            const double dist_x_lower = rLocation[0] - lower_location[0];
+            const double dist_y_lower = rLocation[1] - lower_location[1];
+            const double dist_z_lower = rLocation[2] - lower_location[2];
+            
+            const double xd = dist_x_lower / mGridSpacing[0];
+            const double yd = dist_y_lower / mGridSpacing[1];
+            const double zd = dist_z_lower / mGridSpacing[2];
+
+            const double c00 = field_xyz_lower * (1.0 - xd) + (field_x_upper * xd);
+            const double c01 = field_z_upper * (1.0 - xd) + (field_xz_upper * xd);
+            const double c10 = field_y_upper * (1.0 - xd) + (field_xy_upper * xd);
+            const double c11 = field_yz_upper * (1.0 - xd) + (field_xyz_upper * xd);
+            
+            const double c0 = c00 * (1.0 - yd) + (c10 * yd);
+            const double c1 = c01 * (1.0 - yd) + (c11 * yd);
+            
+            const double c = c0 * (1.0 - zd) + (c1 * zd);
+            interpolated_value = c;
 
             break;
         }
@@ -322,7 +372,6 @@ long UniformGridRandomFieldGenerator<SPACE_DIM>::GetLinearIndex(std::array<long,
 {
     long linear_index;
 
-    ///\todo: double check I'm not calculating the transpose of each point
     switch(SPACE_DIM)
     {
         case 1:

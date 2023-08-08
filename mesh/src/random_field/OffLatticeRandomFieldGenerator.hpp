@@ -107,9 +107,9 @@ private:
                               const c_vector<double, SPACE_DIM>& rLocation2) const;
 
     /**
-     * \todo Document this. Why isn't it a member variable, e.g. mOpenSimplex?
+     * Noise generator
      */
-    OpenSimplex2S os;
+    OpenSimplex2S mOpenSimplex;
 
 public:
 
