@@ -344,11 +344,11 @@ if (Chaste_USE_VTK)
     #   1. VTK has renamed its components several times
     #   2. From VTK 9, a simple call to find_package(VTK) will try to find QT, which is not a Chaste dependency
     #
-    # We first find the VTK common library, which can have one of three names: this will populate the VTK version
+    # We first find the VTK common library, which can have one of two names: this will populate the VTK version
     # number. This is then used to find the specific list of required VTK components.
 
     # List of possible base modules across different VTK versions
-    set(POSSIBLE_VTK_BASE_MODULES CommonCore vtkCommonCore vtkCommon)
+    set(POSSIBLE_VTK_BASE_MODULES vtkCommonCore CommonCore)
 
     foreach (BASE_MODULE ${POSSIBLE_VTK_BASE_MODULES})
         find_package(VTK COMPONENTS ${BASE_MODULE} QUIET)
