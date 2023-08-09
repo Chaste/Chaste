@@ -534,8 +534,12 @@ list (APPEND Chaste_LINK_LIBRARIES "${MPI_CXX_LIBRARIES}")
 
 # make sure VTK libraries added after HDF5 so VTK's link with HDF5 isn't used
 if (Chaste_USE_VTK)
-    list (APPEND Chaste_INCLUDES "${VTK_INCLUDE_DIRS}")
-    list (APPEND Chaste_LINK_LIBRARIES "${VTK_LIBRARIES}")
+    if (VTK_MAJOR_VERSION LESS 9)
+        list(APPEND Chaste_INCLUDES "${VTK_INCLUDE_DIRS}")
+        list(APPEND Chaste_LINK_LIBRARIES "${VTK_LIBRARIES}")
+    else ()
+        target_link_libraries(Chaste_COMMON_DEPS INTERFACE ${VTK_LIBRARIES})
+    endif ()
 endif ()
 
 
