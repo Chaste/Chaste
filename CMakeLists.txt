@@ -194,6 +194,20 @@ if (WIN32 OR CYGWIN)
 endif (WIN32 OR CYGWIN)
 
 
+###############################################
+####  Create interface library for dependencies
+###############################################
+
+# See https://github.com/Chaste/Chaste/issues/36 re supporting VTK 9.x.
+#
+# Approach is to create a interface library (with no source files) that all Chaste dependencies are linked to. This
+# library is then linked against all Chaste libraries and executables.
+#
+# This allows modern CMake imported targets to be used for our dependencies, rather than populating lists of libaries
+# and include directories as we currently to. For now, this will only affect VTK 9.x, but should be expanded to all
+# dependencies in the future.
+add_library(Chaste_COMMON_DEPS INTERFACE)
+
 ################################
 #  FIND THIRD PARTY LIBRARIES  #
 ################################
