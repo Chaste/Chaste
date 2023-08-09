@@ -336,14 +336,31 @@ if (Chaste_AUTO_INSTALL_DEPS)
     endforeach ()
 endif ()
 
-
 ################################
 ####  Find VTK
 ################################
 if (Chaste_USE_VTK)
-    # First pass will identify the version number
-    find_package (VTK REQUIRED)
-    message (STATUS "VTK version: ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}")
+    # The complexity here is for two reasons:
+    #   1. VTK has renamed its components several times
+    #   2. From VTK 9, a simple call to find_package(VTK) will try to find QT, which is not a Chaste dependency
+    #
+    # We first find the VTK common library, which can have one of three names: this will populate the VTK version
+    # number. This is then used to find the specific list of required VTK components.
+
+    # List of possible base modules across different VTK versions
+    set(POSSIBLE_VTK_BASE_MODULES CommonCore vtkCommonCore vtkCommon)
+
+    foreach (BASE_MODULE ${POSSIBLE_VTK_BASE_MODULES})
+        find_package(VTK COMPONENTS ${BASE_MODULE} QUIET)
+        if (VTK_FOUND)
+            message (STATUS "VTK version: ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}")
+            break()
+        endif ()
+    endforeach ()
+
+    if (NOT ${VTK_FOUND})
+        message(FATAL_ERROR "Did not find VTK")
+    endif ()
 
     # Depending on the VTK version, we need different components. 5.x require the following
     if (VTK_MAJOR_VERSION EQUAL 5)
