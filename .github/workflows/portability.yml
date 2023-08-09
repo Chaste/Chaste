@@ -32,6 +32,8 @@ jobs:
             extra-build-args: ""
           - image: chaste/runner:jammy.portability-03
             extra-build-args: "-DChaste_USE_CVODE=OFF -DChaste_USE_VTK=OFF"
+          - image: chaste/runner:jammy.portability-dev
+            extra-build-args: ""
 
     runs-on: ubuntu-latest
 
