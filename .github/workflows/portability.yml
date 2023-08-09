@@ -33,7 +33,7 @@ jobs:
           - image: chaste/runner:jammy.portability-03
             extra-build-args: "-DChaste_USE_CVODE=OFF -DChaste_USE_VTK=OFF"
           - image: chaste/runner:jammy.portability-dev
-            extra-build-args: ""
+            extra-build-args: "-DChaste_ERROR_ON_WARNING=OFF"
 
     runs-on: ubuntu-latest
 
