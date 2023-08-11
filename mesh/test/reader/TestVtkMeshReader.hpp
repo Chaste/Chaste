@@ -73,7 +73,18 @@ typedef VtkMeshReader<3,3> MESH_READER3;
 
 class TestVtkMeshReader : public CxxTest::TestSuite
 {
-//Requires  "sudo aptitude install libvtk5-dev" or similar
+private:
+    bool IsRotation(const std::vector<unsigned>& sequence, const std::vector<unsigned>& target)
+    {
+        // Double the input sequence
+        std::vector<unsigned> doubled_sequence = sequence;
+        doubled_sequence.insert(doubled_sequence.end(), sequence.begin(), sequence.end());
+
+        // Search for the target sequence in the doubled sequence
+        return std::search(doubled_sequence.begin(), doubled_sequence.end(), target.begin(), target.end()) != doubled_sequence.end();
+    }
+
+    //Requires  "sudo aptitude install libvtk5-dev" or similar
 public:
 
     /**
@@ -202,27 +213,24 @@ public:
         TS_ASSERT_EQUALS(mesh_reader.GetNumFaces(), 20u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumEdges(), 20u);
 
+        // We don't care which order the nodes are in the face data, as long as they are correct up to a rotation.
+        // For instance, here, first_face_data.NodeIndices could either be {11, 3, 0}, {0, 11, 3} or {3, 0, 11}.
+        // VTK 9.2 started producing a different ordering, which necessitated updating this test.
+        // See https://github.com/Chaste/Chaste/issues/36
+
         ElementData first_face_data = mesh_reader.GetNextFaceData();
-        TS_ASSERT_EQUALS(first_face_data.NodeIndices[0], 11u);
-        TS_ASSERT_EQUALS(first_face_data.NodeIndices[1], 3u);
-        TS_ASSERT_EQUALS(first_face_data.NodeIndices[2], 0u);
+        TS_ASSERT(IsRotation(first_face_data.NodeIndices, {11u, 3u, 0u}))
 
         ElementData next_face_data = mesh_reader.GetNextFaceData();
-        TS_ASSERT_EQUALS(next_face_data.NodeIndices[0], 3u);
-        TS_ASSERT_EQUALS(next_face_data.NodeIndices[1], 8u);
-        TS_ASSERT_EQUALS(next_face_data.NodeIndices[2], 0u);
+        TS_ASSERT(IsRotation(next_face_data.NodeIndices, {3u, 8u, 0u}))
 
         mesh_reader.Reset();
 
         first_face_data = mesh_reader.GetNextEdgeData();
-        TS_ASSERT_EQUALS(first_face_data.NodeIndices[0], 11u);
-        TS_ASSERT_EQUALS(first_face_data.NodeIndices[1], 3u);
-        TS_ASSERT_EQUALS(first_face_data.NodeIndices[2], 0u);
+        TS_ASSERT(IsRotation(first_face_data.NodeIndices, {11u, 3u, 0u}))
 
         next_face_data = mesh_reader.GetNextEdgeData();
-        TS_ASSERT_EQUALS(next_face_data.NodeIndices[0], 3u);
-        TS_ASSERT_EQUALS(next_face_data.NodeIndices[1], 8u);
-        TS_ASSERT_EQUALS(next_face_data.NodeIndices[2], 0u);
+        TS_ASSERT(IsRotation(next_face_data.NodeIndices, {3u, 8u, 0u}))
 
         for (unsigned face=2; face<mesh_reader.GetNumFaces(); face++)
         {
