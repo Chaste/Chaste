@@ -117,7 +117,8 @@ template<unsigned SPACE_DIM>
 ImmersedBoundaryElement<1, SPACE_DIM>::ImmersedBoundaryElement(unsigned index, const std::vector<Node<SPACE_DIM>*>& rNodes)
     : MutableElement<1, SPACE_DIM>(index, rNodes),
       mpFluidSource(nullptr),
-      mAverageNodeSpacing(DOUBLE_UNSET)
+      mAverageNodeSpacing(DOUBLE_UNSET),
+      mIsBoundaryElement(false)
 {
 }
 
