@@ -330,6 +330,7 @@ public:
             
             // Check that there are only 16 non-zero entries per grid
             auto& forceGrids = modifier.mpArrays->rGetModifiableRightHandSideGrids(); 
+
             unsigned int nonZeroEntriesCount = 0;
             for (unsigned int x = 0; x < modifier.mpMesh->GetNumGridPtsX(); x++) {
                 for (unsigned int y = 0; y < modifier.mpMesh->GetNumGridPtsY(); y++) {
@@ -484,7 +485,7 @@ public:
 
             multi_array<double, 3>& vel_grids   = mesh.rGetModifiable2dVelocityGrids();
             multi_array<double, 3>& rhs_grids   = modifier.mpArrays->rGetModifiableRightHandSideGrids();
-
+            
             for (unsigned dim = 0; dim < 2; ++dim)
             {
                 for (unsigned x = 0; x < 10; ++x)

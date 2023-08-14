@@ -671,7 +671,6 @@ std::vector<FluidSource<SPACE_DIM>*>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DI
 {
     mElementFluidSources.clear();
     for (const auto& element : mElements) {
-        std::cout << "Element \n";
         if (element->GetFluidSource() != nullptr) {
             mElementFluidSources.push_back(element->GetFluidSource());
         }
@@ -826,16 +825,12 @@ c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetCen
             double this_y = pos_1[1];
             double next_x = pos_2[0];
             double next_y = pos_2[1];
-            //std::cout << "Element " << index << "   node " << local_index << " pos is (" << pos_1[0] << ", " << pos_1[1] << ")" << std::endl;
-            //std::cout << "Element " << index << "   node " << local_index + 1 << " pos is (" << pos_2[0] << ", " << pos_2[1] << ")" << std::endl;
 
             double signed_area_term = this_x * next_y - this_y * next_x;
-            //std::cout << "Signed area is " << signed_area_term << std::endl;
 
             centroid_x += (this_x + next_x) * signed_area_term;
             centroid_y += (this_y + next_y) * signed_area_term;
             element_signed_area += 0.5 * signed_area_term;
-            //std::cout << "Element signed area is " << element_signed_area << std::endl;
 
             pos_1 = pos_2;
         }
@@ -1310,9 +1305,6 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAx
         perp_axis(0) = -axisOfDivision(1);
         perp_axis(1) = axisOfDivision(0);
 
-        std::stringstream str;
-        str << "Centroid is " << centroid[0] << ", " << centroid[1] << "\n" << "Axis is " << axisOfDivision(0) << ", " << axisOfDivision(1) << "\n";
-        std::cout << str.str();
         /*
         * Find which edges the axis of division crosses by finding any node
         * that lies on the opposite side of the axis of division to its next
@@ -1325,8 +1317,6 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAx
         for (unsigned i = 0; i < num_nodes; i++)
         {
             bool is_next_node_on_left = (inner_prod(this->GetVectorFromAtoB(pElement->GetNodeLocation((i + 1) % num_nodes), centroid), perp_axis) >= 0);
-            std::stringstream left;
-            std::cout << left.str(); 
             if (is_current_node_on_left != is_next_node_on_left)
             {
                 intersecting_nodes.push_back(i);
@@ -1432,7 +1422,6 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBou
             c_vector<double, SPACE_DIM> centroid_to_i = this->GetVectorFromAtoB(centroid, pElement->GetNode(i)->rGetLocation());
             double perpendicular_dist = inner_prod(centroid_to_i, unit_perp);
 
-            std::cout << "perp dist: " << perpendicular_dist << ", half_spacing: " << half_spacing << "\n";
             if (fabs(perpendicular_dist) >= half_spacing)
             {
                 no_node_satisfied_condition_1 = false;
