@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "HoneycombMeshGenerator.hpp"
 #include "PeriodicNodesOnlyMesh.hpp"
@@ -81,7 +82,7 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
 
         // Convert this to a PeriodicNodesOnlyMesh
         c_vector<double,2> periodic_width = zero_vector<double>(2);
@@ -181,7 +182,7 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 5);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
 
         // Convert this to a PeriodicNodesOnlyMesh
         c_vector<double,2> periodic_width = zero_vector<double>(2);
@@ -240,7 +241,8 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+
 
         // Convert this to a PeriodicNodesOnlyMesh
         c_vector<double,2> periodic_width = zero_vector<double>(2);
@@ -286,7 +288,8 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+
 
         // Convert this to a PeriodicNodesOnlyMesh
         c_vector<double,2> periodic_width = zero_vector<double>(2);
@@ -345,7 +348,8 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+
 
         // Convert this to a PeriodicdNodesOnlyMesh
         c_vector<double,2> periodic_width = zero_vector<double>(2);
@@ -512,7 +516,8 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+
 
         // Convert this to a PeriodicNodesOnlyMesh
         c_vector<double,2> periodic_width = zero_vector<double>(2);

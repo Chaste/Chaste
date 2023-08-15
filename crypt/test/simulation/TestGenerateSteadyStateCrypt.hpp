@@ -83,7 +83,7 @@ public:
         unsigned thickness_of_ghost_layer = 3;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up,thickness_of_ghost_layer, crypt_width/cells_across);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         double crypt_length = cells_up*(sqrt(3.0)/2.0)*crypt_width/cells_across;
 

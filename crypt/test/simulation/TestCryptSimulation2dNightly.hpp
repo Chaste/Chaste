@@ -86,7 +86,7 @@ public:
         double crypt_width = num_cells_width-1.0;
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 2);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -160,7 +160,7 @@ public:
         //double crypt_length = num_cells_depth - 1.0;
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 2);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -222,7 +222,7 @@ public:
         unsigned num_cells_depth = 5;
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 2);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -330,7 +330,7 @@ public:
         unsigned thickness_of_ghost_layer = 4;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         double crypt_length = cells_up*(sqrt(3.0)/2);
 
@@ -379,7 +379,7 @@ public:
         unsigned thickness_of_ghost_layer = 4;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         double crypt_length = cells_up*(sqrt(3.0)/2);
 
@@ -462,7 +462,7 @@ public:
         unsigned thickness_of_ghost_layer = 4;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         double crypt_length = cells_up*(sqrt(3.0)/2);
 
@@ -547,7 +547,7 @@ public:
         unsigned thickness_of_ghost_layer = 4;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 

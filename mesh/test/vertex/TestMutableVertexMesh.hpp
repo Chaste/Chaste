@@ -1861,7 +1861,7 @@ public:
     void TestSetAndGetDistanceForT3SwapChecking()
     {
         HoneycombVertexMeshGenerator mesh_generator(10,10); // is_flat_bottom, T1swaptthreshold, T2swapthreshold, elementArea
-        MutableVertexMesh<2,2>* p_mesh = mesh_generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = mesh_generator.GetMesh();
         double standard_distance = p_mesh->GetDistanceForT3SwapChecking();
         TS_ASSERT_EQUALS(standard_distance, 5.0);
 

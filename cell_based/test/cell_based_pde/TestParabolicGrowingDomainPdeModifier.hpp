@@ -398,7 +398,7 @@ public:
     void TestMeshBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(6,6,0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
@@ -454,7 +454,7 @@ public:
     void TestNodeBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(6,6,0);
-        MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
@@ -518,7 +518,7 @@ public:
     void TestVertexBasedSquareMonolayer()
     {
         HoneycombVertexMeshGenerator generator(6,6);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         p_mesh->Translate(-0.5,-sqrt(3.0)/3); // Shift so cells are on top of those in the above centre-based tests
 

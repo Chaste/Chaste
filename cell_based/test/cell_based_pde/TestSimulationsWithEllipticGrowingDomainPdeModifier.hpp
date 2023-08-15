@@ -104,7 +104,7 @@ public:
     {
         // Create Mesh
         HoneycombVertexMeshGenerator generator(M_NUM_CELLS_ACROSS, M_NUM_CELLS_ACROSS);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create Cells
         std::vector<CellPtr> cells;
@@ -165,7 +165,7 @@ public:
     void TestEllipticGrowingDomainPdeModifierWithNodeBasedMonolayer()
     {
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS, M_NUM_CELLS_ACROSS,0);
-        MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
@@ -212,7 +212,7 @@ public:
     void TestEllipticGrowingDomainPdeModifierWithMeshBasedMonolayer()
     {
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS,M_NUM_CELLS_ACROSS,0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
 
         std::vector<CellPtr> cells;
         GenerateCells(p_mesh->GetNumNodes(),cells,1.0);
@@ -261,7 +261,7 @@ public:
     void TestEllipticGrowingDomainPdeModifierWithMeshBasedWithGhostNodesBasedMonolayer()
     {
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS,M_NUM_CELLS_ACROSS,2);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();

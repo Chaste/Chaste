@@ -115,13 +115,13 @@ public:
         location[1] = 1.0;
         Node<2>* p_node = new Node<2>(0u,location, false);
 
-        MutableMesh<2,2> conf_mesh;
-        conf_mesh.AddNode(p_node);
+        boost::shared_ptr<MutableMesh<2,2> > conf_mesh;
+        conf_mesh->AddNode(p_node);
 
         // Create cells
         std::vector<CellPtr> conf_cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(conf_cells, &conf_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(conf_cells, conf_mesh, std::vector<unsigned>(), true);
 
         // Create cell population
         MeshBasedCellPopulation<2,2> cell_population(conf_mesh, conf_cells);

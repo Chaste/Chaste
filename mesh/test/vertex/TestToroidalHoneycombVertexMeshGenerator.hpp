@@ -60,7 +60,7 @@ public:
                               "A toroidal mesh was created but a normal mesh is being requested.");
 
         // Create periodic mesh
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         // Test that the mesh has the correct numbers of nodes and elements
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u);

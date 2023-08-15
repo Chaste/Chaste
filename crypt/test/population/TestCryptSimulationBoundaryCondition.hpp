@@ -97,7 +97,7 @@ public:
     {
         // Create a 2d mesh-based cell population
         CylindricalHoneycombMeshGenerator generator(4, 4, 0, 1.0);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
         std::vector<CellPtr> cells;
@@ -222,7 +222,7 @@ public:
     {
         // Create a cell population
         CylindricalHoneycombMeshGenerator generator(4, 4, 0, 1.0);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         std::vector<CellPtr> cells;
@@ -272,7 +272,7 @@ public:
     {
         // Create a cell population
         CylindricalHoneycombMeshGenerator generator(4, 4, 0, 1.0);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         std::vector<CellPtr> cells;
@@ -372,7 +372,7 @@ public:
     {
         // Create a cell population
         CylindricalHoneycombMeshGenerator generator(4, 4, 0, 1.0);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         std::vector<CellPtr> cells;
@@ -463,7 +463,7 @@ public:
     {
         // Create a cell population
         CylindricalHoneycombMeshGenerator generator(4, 4, 0, 1.0);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         std::vector<CellPtr> cells;

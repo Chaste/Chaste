@@ -109,7 +109,7 @@ public:
         {
             // Create a MeshBasedCellPopulation
             HoneycombMeshGenerator generator(10, 10, 0);
-            MutableMesh<2,2>* p_mesh = generator.GetMesh();
+            boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
 
             std::vector<CellPtr> mesh_cells;
             cells_generator.GenerateBasic(mesh_cells, p_mesh->GetNumNodes());
@@ -131,7 +131,7 @@ public:
         {
             // Make a NodeBasedCellPopulation
             HoneycombMeshGenerator generator(10, 10, 0);
-            MutableMesh<2,2>* p_mesh = generator.GetMesh();
+            boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
             NodesOnlyMesh<2> node_mesh;
             node_mesh.ConstructNodesWithoutMesh(*p_mesh, 1.5);
 
@@ -154,7 +154,7 @@ public:
         {
             // Make a VertexBasedCellPopulation
             HoneycombVertexMeshGenerator generator(10, 10);
-            MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+            boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
             std::vector<CellPtr> vertex_cells;
             cells_generator.GenerateBasic(vertex_cells, p_mesh->GetNumElements());
@@ -477,7 +477,7 @@ public:
     void TestMeshBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(20,20,0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
@@ -523,7 +523,7 @@ public:
     void TestNodeBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(20,20,0);
-        MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
@@ -577,7 +577,7 @@ public:
     void TestVertexBasedSquareMonolayer()
     {
         HoneycombVertexMeshGenerator generator(20,20);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         p_mesh->Translate(-0.5,-sqrt(3.0)/3); // Shift so cells are on top of those in the above centre-based tests
 

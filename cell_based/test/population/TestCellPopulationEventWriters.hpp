@@ -82,7 +82,7 @@ public:
 
         // Create a simple 2D VertexBasedCellPopulation
         HoneycombVertexMeshGenerator generator(4, 6);
-        MutableVertexMesh<2, 2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -116,7 +116,7 @@ public:
         {
             // Coverage of the Visit() method when called on a MeshBasedCellPopulation
             HoneycombMeshGenerator tet_generator(5, 5, 0);
-            MutableMesh<2, 2>* p_tet_mesh = tet_generator.GetMesh();
+            boost::shared_ptr<MutableMesh<2,2> > p_tet_mesh = tet_generator.GetMesh();
             std::vector<CellPtr> mesh_based_cells;
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> mesh_based_cells_generator;
             mesh_based_cells_generator.GenerateBasic(mesh_based_cells, p_tet_mesh->GetNumNodes());
@@ -205,7 +205,7 @@ public:
 
         // Create a simple 2D VertexBasedCellPopulation
         HoneycombVertexMeshGenerator generator(4, 6);
-        MutableVertexMesh<2, 2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -239,7 +239,7 @@ public:
         {
             // Coverage of the Visit() method when called on a MeshBasedCellPopulation
             HoneycombMeshGenerator tet_generator(5, 5, 0);
-            MutableMesh<2, 2>* p_tet_mesh = tet_generator.GetMesh();
+            boost::shared_ptr<MutableMesh<2,2> > p_tet_mesh = tet_generator.GetMesh();
             std::vector<CellPtr> mesh_based_cells;
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> mesh_based_cells_generator;
             mesh_based_cells_generator.GenerateBasic(mesh_based_cells, p_tet_mesh->GetNumNodes());

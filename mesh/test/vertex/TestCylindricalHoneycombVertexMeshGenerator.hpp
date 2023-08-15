@@ -60,7 +60,7 @@ public:
                               "A cylindrical mesh was created but a normal mesh is being requested.");
 
         // Create periodic mesh
-        Cylindrical2dVertexMesh* p_cylindrical_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_cylindrical_mesh = generator.GetCylindricalMesh();
 
         // The periodic mesh should have the same number of elements but fewer nodes
         TS_ASSERT_EQUALS(p_cylindrical_mesh->GetNumElements(), 16u);
@@ -85,7 +85,7 @@ public:
 
         // Create periodic mesh with flat bottom
         CylindricalHoneycombVertexMeshGenerator generator3(4, 4, true);
-        Cylindrical2dVertexMesh* p_flat_cylindrical_mesh = generator3.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_flat_cylindrical_mesh = generator3.GetCylindricalMesh();
 
         // The flat bottomed periodic mesh should have the same number of elements and nodes
         TS_ASSERT_EQUALS(p_flat_cylindrical_mesh->GetNumElements(), 16u);

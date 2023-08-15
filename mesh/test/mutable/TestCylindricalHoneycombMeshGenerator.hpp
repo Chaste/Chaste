@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
+#include <boost/shared_ptr.hpp>
 #include "CylindricalHoneycombMeshGenerator.hpp"
 
 #include "FakePetscSetup.hpp"
@@ -46,7 +47,7 @@ class TestCylindricalHoneycombMeshGenerator : public CxxTest::TestSuite
 {
 private:
 
-    void Output2DNodesToFileCylindrical(Cylindrical2dMesh* pMesh, std::string fileName)
+    void Output2DNodesToFileCylindrical(boost::shared_ptr<Cylindrical2dMesh> pMesh, std::string fileName)
     {
         OutputFileHandler handler("");
         out_stream file = handler.OpenOutputFile(fileName);
@@ -72,7 +73,7 @@ public:
         unsigned ghosts = 2;
 
         CylindricalHoneycombMeshGenerator generator(num_cells_width, num_cells_depth, ghosts);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Check the mesh
         TS_ASSERT_THROWS_THIS(generator.GetMesh(),"A cylindrical mesh was created but a normal mesh is being requested.");
@@ -148,7 +149,7 @@ public:
         double x_factor = width/(double)num_cells_width;
 
         CylindricalHoneycombMeshGenerator generator(num_cells_width, num_cells_depth, ghosts, width/num_cells_width);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Check the mesh
         TS_ASSERT_THROWS_THIS(generator.GetMesh(),"A cylindrical mesh was created but a normal mesh is being requested.");

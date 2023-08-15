@@ -91,7 +91,7 @@ public:
 
         // Create a simple tetrahedral mesh
         HoneycombMeshGenerator generator(3, 3, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;

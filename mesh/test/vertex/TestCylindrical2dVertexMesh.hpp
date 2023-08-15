@@ -61,7 +61,7 @@ public:
     {
         // Create mesh
         CylindricalHoneycombVertexMeshGenerator generator(18, 25, true);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         for (unsigned node_index = 0; node_index < p_mesh->GetNumNodes(); node_index++)
         {
@@ -76,7 +76,7 @@ public:
     {
         // Create mesh
         CylindricalHoneycombVertexMeshGenerator generator(4, 4);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Test CalculateBoundingBox() method
         ChasteCuboid<2> bounds = p_mesh->CalculateBoundingBox();
@@ -104,7 +104,7 @@ public:
     {
         // Create mesh
         CylindricalHoneycombVertexMeshGenerator generator(4, 4);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         c_vector<double, 2> node18_location = p_mesh->GetNode(18)->rGetLocation();
         c_vector<double, 2> node19_location = p_mesh->GetNode(19)->rGetLocation();
@@ -133,7 +133,7 @@ public:
     {
         // Create mesh
         CylindricalHoneycombVertexMeshGenerator generator(4, 4);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Move one of the nodes to near the periodic boundary
         c_vector<double, 2> new_point_location;
@@ -162,7 +162,7 @@ public:
     {
         // Create mesh
         CylindricalHoneycombVertexMeshGenerator generator(6, 6);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 84u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 36u);
@@ -217,7 +217,7 @@ public:
     {
         // Test methods with a regular cylindrical honeycomb mesh
         CylindricalHoneycombVertexMeshGenerator generator(4, 4);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 40u);
 
@@ -283,7 +283,7 @@ public:
     {
         // Create mesh
         CylindricalHoneycombVertexMeshGenerator generator(4, 4);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 40u);
@@ -356,7 +356,7 @@ public:
         unsigned cells_up = 3;
         unsigned thickness_of_ghost_layer = 0;
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        Cylindrical2dMesh* p_delaunay_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_delaunay_mesh = generator.GetCylindricalMesh();
 
         TrianglesMeshWriter<2, 2> mesh_writer("TestVertexMeshWriters", "DelaunayMesh", false);
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(*p_delaunay_mesh));
@@ -440,7 +440,7 @@ public:
         unsigned cells_up = 3;
         unsigned thickness_of_ghost_layer = 0;
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        Cylindrical2dMesh* p_delaunay_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_delaunay_mesh = generator.GetCylindricalMesh();
 
         TrianglesMeshWriter<2,2> mesh_writer("TestBoundedCylindricalVertexMesh", "DelaunayMesh", false);
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(*p_delaunay_mesh));
@@ -503,7 +503,7 @@ public:
         unsigned cells_up = 4;
         unsigned thickness_of_ghost_layer = 0;
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        Cylindrical2dMesh* p_delaunay_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_delaunay_mesh = generator.GetCylindricalMesh();
         
         // Move the top row of nodes up so that there is a void beteen two rows of nodes
         p_delaunay_mesh->GetNode(6)->rGetModifiableLocation()[1] = 5.0;
@@ -568,7 +568,7 @@ public:
         unsigned cells_up = 3;
         unsigned thickness_of_ghost_layer = 0;
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        Cylindrical2dMesh* p_delaunay_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_delaunay_mesh = generator.GetCylindricalMesh();
         
         // Move the top row of nodes up so that two of the image nodes overlap
         p_delaunay_mesh->GetNode(7)->rGetModifiableLocation()[1] = sqrt(3) - 1 / sqrt(3);
@@ -624,7 +624,7 @@ public:
         unsigned num_cells_across = 4;
         unsigned num_cells_up = 7;
         CylindricalHoneycombVertexMeshGenerator generator(num_cells_across, num_cells_up);
-        AbstractMesh<2, 2>* const p_saved_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<AbstractMesh<2, 2> > const p_saved_mesh = boost::static_pointer_cast<AbstractMesh<2, 2> >(generator.GetCylindricalMesh());
 
         double crypt_width = num_cells_across;
 
@@ -639,14 +639,14 @@ public:
          */
         {
             // Serialize the mesh
-            TS_ASSERT_DELTA((static_cast<Cylindrical2dVertexMesh*>(p_saved_mesh))->GetWidth(0), crypt_width, 1e-7);
+            TS_ASSERT_DELTA((boost::static_pointer_cast<Cylindrical2dVertexMesh>(p_saved_mesh))->GetWidth(0), crypt_width, 1e-7);
 
             // Create output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
             // We have to serialize via a pointer here, or the derived class information is lost.
-            (*p_arch) << p_saved_mesh;
+            (*p_arch) << p_saved_mesh.get();
         }
 
         {
@@ -658,11 +658,12 @@ public:
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
             // Restore from the archive
+            // TODO: Is there a better way to load an archive into a smart pointer?
             (*p_arch) >> p_loaded_mesh;
 
             // Compare the loaded mesh against the original
-            Cylindrical2dVertexMesh* p_mesh2 = static_cast<Cylindrical2dVertexMesh*>(p_loaded_mesh);
-            Cylindrical2dVertexMesh* p_mesh = static_cast<Cylindrical2dVertexMesh*>(p_saved_mesh);
+            boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh2 = boost::shared_ptr<Cylindrical2dVertexMesh>(static_cast<Cylindrical2dVertexMesh*>(p_loaded_mesh));
+            boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = boost::static_pointer_cast<Cylindrical2dVertexMesh>(p_saved_mesh);
 
             // Compare width
             TS_ASSERT_DELTA(p_mesh2->GetWidth(0), crypt_width, 1e-7);
@@ -701,7 +702,7 @@ public:
             }
 
             // Tidy up
-            delete p_mesh2;
+            p_mesh2.reset();
         }
     }
 
@@ -711,7 +712,7 @@ public:
         unsigned num_cells_across = 6;
         unsigned num_cells_up = 12;
         CylindricalHoneycombVertexMeshGenerator generator(num_cells_across, num_cells_up);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Remesh
         VertexElementMap map(p_mesh->GetNumElements());
@@ -730,7 +731,7 @@ public:
         unsigned num_cells_across = 6;
         unsigned num_cells_up = 12;
         CylindricalHoneycombVertexMeshGenerator generator(num_cells_across, num_cells_up);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         unsigned num_old_nodes = p_mesh->GetNumNodes();
         unsigned num_old_elements = num_cells_across * num_cells_up;
@@ -800,7 +801,7 @@ public:
     {
         // Create mesh
         CylindricalHoneycombVertexMeshGenerator generator(4, 4);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 40u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u);

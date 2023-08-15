@@ -117,7 +117,7 @@ public:
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Impose a larger cell rearrangement threshold so that motion is uninhibited (see #1376)
         p_mesh->SetCellRearrangementThreshold(0.1);
@@ -184,7 +184,7 @@ public:
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -242,7 +242,7 @@ public:
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells, all differentiated
         std::vector<CellPtr> cells;
@@ -287,7 +287,7 @@ public:
 
         // Create mesh
         CylindricalHoneycombVertexMeshGenerator generator(4, 6);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells: the bottom row have StemCellProliferativeType and the rest have DifferentiatedCellProliferativeType
         std::vector<CellPtr> cells;
@@ -345,7 +345,7 @@ public:
         unsigned crypt_width = 10;
         unsigned crypt_height = 20;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -395,7 +395,7 @@ public:
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -450,7 +450,7 @@ public:
         unsigned crypt_width = 10;
         unsigned crypt_height = 20;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -504,7 +504,7 @@ public:
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells: the bottom row have StemCellProliferativeType and the rest have DifferentiatedCellProliferativeType
         std::vector<CellPtr> cells;
@@ -559,7 +559,7 @@ public:
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -620,7 +620,7 @@ public:
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -687,7 +687,7 @@ public:
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -734,7 +734,7 @@ public:
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -849,7 +849,7 @@ public:
         unsigned crypt_height = 4;
         double crypt_length = crypt_height*(sqrt(3.0)/2);
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;

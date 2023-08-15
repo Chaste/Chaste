@@ -133,7 +133,7 @@ public:
 
         // Also test constructors in honeycomb mesh (MutableVertexMesh)
         HoneycombVertexMeshGenerator generator(2, 2);
-        MutableVertexMesh<2, 2>* honeycombMesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > honeycombMesh = generator.GetMesh();
         TS_ASSERT_EQUALS(honeycombMesh->GetNumEdges(), 19u);
     }
 

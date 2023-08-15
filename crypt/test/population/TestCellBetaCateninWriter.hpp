@@ -59,13 +59,13 @@ public:
 
         // Set up a small MeshBasedCellPopulationWithGhostNodes using an appropriate cell-cycle model class
         CylindricalHoneycombMeshGenerator generator(5, 4, 1);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
         double domain_length_for_wnt = 4.0*(sqrt(3.0)/2);
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         std::vector<CellPtr> cells;
         CryptCellsGenerator<VanLeeuwen2009WntSwatCellCycleModelHypothesisOne> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, false);
+        cells_generator.Generate(cells, boost::static_pointer_cast<AbstractMesh<2, 2> >(p_mesh), location_indices, false);
 
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
 

@@ -62,7 +62,7 @@ public:
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(18, 24);
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 864u); // 2*18*24
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 432u); // 18*24
@@ -80,7 +80,7 @@ public:
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(4, 4);
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         // Test CalculateBoundingBox() method
         ChasteCuboid<2> bounds = p_mesh->CalculateBoundingBox();
@@ -111,7 +111,7 @@ public:
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(4, 4);
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         // Store the locations of some nodes
         c_vector<double, 2> node0_location = p_mesh->GetNode(0)->rGetLocation();
@@ -169,7 +169,7 @@ public:
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(4, 4);
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         // Move one of the nodes to near the periodic boundary
         c_vector<double, 2> new_point_location;
@@ -212,7 +212,7 @@ public:
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(6, 6);
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 72u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 36u);
@@ -295,7 +295,7 @@ public:
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(4, 4);
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 32u); // 2*4*4
 
@@ -366,7 +366,7 @@ public:
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(4, 4);
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 32u);
@@ -462,7 +462,7 @@ public:
         unsigned cells_across = 3;
         unsigned cells_up = 4;
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up);
-        Toroidal2dMesh* p_delaunay_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dMesh> p_delaunay_mesh = generator.GetToroidalMesh();
 
         TrianglesMeshWriter<2,2> mesh_writer("TestToroidalVertexMesh", "DelaunayMesh", false);
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(*p_delaunay_mesh));
@@ -575,7 +575,7 @@ public:
         unsigned cells_across = 5;
         unsigned cells_up = 6;
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up);
-        Toroidal2dMesh* p_delaunay_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dMesh> p_delaunay_mesh = generator.GetToroidalMesh();
 
         // Remove central node
         p_delaunay_mesh->DeleteNode(12);
@@ -679,7 +679,7 @@ public:
         unsigned num_cells_across = 4;
         unsigned num_cells_up = 6;
         ToroidalHoneycombVertexMeshGenerator generator(num_cells_across, num_cells_up);
-        AbstractMesh<2,2>* const p_saved_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<AbstractMesh<2,2> > const p_saved_mesh = boost::static_pointer_cast<AbstractMesh<2, 2> >(generator.GetToroidalMesh());
 
         double mesh_width = num_cells_across;
         double mesh_height = num_cells_up*1.5/sqrt(3.0);
@@ -695,14 +695,14 @@ public:
          */
         {
             // Serialize the mesh
-            TS_ASSERT_DELTA((static_cast<Toroidal2dVertexMesh*>(p_saved_mesh))->GetWidth(0), mesh_width, 1e-7);
+            TS_ASSERT_DELTA((boost::static_pointer_cast<Toroidal2dVertexMesh>(p_saved_mesh))->GetWidth(0), mesh_width, 1e-7);
 
             // Create output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
             // We have to serialize via a pointer here, or the derived class information is lost.
-            (*p_arch) << p_saved_mesh;
+            (*p_arch) << p_saved_mesh.get();
         }
 
         {
@@ -714,11 +714,12 @@ public:
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
             // Restore from the archive
+            // TODO: Is there a better way to load an archive into a smart pointer?
             (*p_arch) >> p_loaded_mesh;
 
             // Compare the loaded mesh against the original
-            Toroidal2dVertexMesh* p_mesh2 = static_cast<Toroidal2dVertexMesh*>(p_loaded_mesh);
-            Toroidal2dVertexMesh* p_mesh = static_cast<Toroidal2dVertexMesh*>(p_saved_mesh);
+            boost::shared_ptr<Toroidal2dVertexMesh> p_mesh2 = boost::shared_ptr<Toroidal2dVertexMesh>(static_cast<Toroidal2dVertexMesh*>(p_loaded_mesh));
+            boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = boost::static_pointer_cast<Toroidal2dVertexMesh>(p_saved_mesh);
 
             // Compare width
             TS_ASSERT_DELTA(p_mesh2->GetWidth(0), mesh_width, 1e-7);
@@ -759,7 +760,7 @@ public:
             }
 
             // Tidy up
-            delete p_mesh2;
+            p_mesh2.reset();
         }
     }
 
@@ -769,7 +770,7 @@ public:
         unsigned num_cells_across = 6;
         unsigned num_cells_up = 12;
         ToroidalHoneycombVertexMeshGenerator generator(num_cells_across, num_cells_up);
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         // Call Remesh()
         VertexElementMap map(p_mesh->GetNumElements());
@@ -788,7 +789,7 @@ public:
         unsigned num_cells_across = 6;
         unsigned num_cells_up = 12;
         ToroidalHoneycombVertexMeshGenerator generator(num_cells_across, num_cells_up);
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         unsigned num_old_nodes = p_mesh->GetNumNodes();
         unsigned num_old_elements = num_cells_across*num_cells_up;
@@ -872,7 +873,7 @@ public:
     {
         // Create mesh
         ToroidalHoneycombVertexMeshGenerator generator(4, 4);
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 32u); // 2*4*4
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u); // 4*4
@@ -937,7 +938,7 @@ public:
         unsigned cells_across = 4;
         unsigned cells_up = 4;
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up);
-        Toroidal2dMesh* p_delaunay_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dMesh> p_delaunay_mesh = generator.GetToroidalMesh();
 
         // Create a vertex mesh, the Voronoi tessellation, using the tetrahedral mesh
         Toroidal2dVertexMesh voronoi_mesh(*p_delaunay_mesh);

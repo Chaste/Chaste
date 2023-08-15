@@ -47,7 +47,7 @@ public:
     void TestSimpleMesh()
     {
         HoneycombVertexMeshGenerator generator(2, 2, false, 0.1, 0.1);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 16u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 4u);
@@ -58,7 +58,7 @@ public:
     void TestBoundaryNodes()
     {
         HoneycombVertexMeshGenerator generator(4, 4);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 48u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u);
@@ -77,7 +77,7 @@ public:
     void TestLargeMesh()
     {
         HoneycombVertexMeshGenerator generator(100, 100);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 20400u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 10000u);
@@ -86,7 +86,7 @@ public:
     void TestElementArea()
     {
         HoneycombVertexMeshGenerator generator(6, 6, false, 0.01, 0.001, 2.456);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 96u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 36u);
@@ -100,7 +100,7 @@ public:
     void TestFlatBottomMesh()
     {
         HoneycombVertexMeshGenerator generator(4, 4, true);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 44u);
 	 

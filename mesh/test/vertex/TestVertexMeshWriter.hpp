@@ -140,7 +140,7 @@ public:
     {
         // Create cylindrical mesh (i.e. one that is left/right periodic)
         CylindricalHoneycombVertexMeshGenerator generator(4, 4);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 40u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u);
@@ -198,7 +198,7 @@ public:
     {
         // Create toroidal mesh (i.e. one that is periodic in both directions)
         ToroidalHoneycombVertexMeshGenerator generator(4, 4);
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 32u); // 2*4*4
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u); // 4*4
