@@ -1607,7 +1607,7 @@ public:
         TS_ASSERT(vtk_file.Exists());
 
         // Check that we have 144 (6*4*6) edges and 68 cells
-        ifstream vtk_file_stream;
+        std::ifstream vtk_file_stream;
         vtk_file_stream.open (vtk_file.GetAbsolutePath());
         std::stringstream vtk_file_string_buffer;
         vtk_file_string_buffer << vtk_file_stream.rdbuf();
@@ -1678,7 +1678,7 @@ public:
         TS_ASSERT(vtk_file.Exists());
 
         // Check that we have 144 (6*4*6) edges and 68 cells
-        ifstream vtk_file_stream;
+        std::ifstream vtk_file_stream;
         vtk_file_stream.open (vtk_file.GetAbsolutePath());
         std::stringstream vtk_file_string_buffer;
         vtk_file_string_buffer << vtk_file_stream.rdbuf();
