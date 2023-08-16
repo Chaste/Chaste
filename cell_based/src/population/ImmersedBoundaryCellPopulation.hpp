@@ -102,7 +102,7 @@ private:
     bool mThrowStepSizeException;
     
     /** Distance above which a vertex movement will trigger a step size exception */ 
-    double mCellRearranagementThreshold;
+    double mCellRearrangementThreshold;
 
     /**
      * Overridden WriteVtkResultsToFile() method.
@@ -128,6 +128,11 @@ private:
     {
         archive& boost::serialization::base_object<AbstractOffLatticeCellPopulation<DIM> >(*this);
         archive& mpImmersedBoundaryDivisionRule;
+        archive& mPopulationHasActiveSources;
+        archive& mInteractionDistance;
+        archive& mReMeshFrequency;
+        archive& mThrowStepSizeException;
+        archive& mCellRearrangementThreshold;
     }
 
     /**
@@ -240,7 +245,7 @@ public:
     /**
      * @return the cell-cell interaction distance.
      */
-    double GetInteractionDistance();
+    double GetInteractionDistance() const;
 
     /**
      * @param newFrequency the new ReMesh frequency.
@@ -250,12 +255,33 @@ public:
     /**
      * @return mReMeshFrequency.
      */
-    unsigned GetReMeshFrequency();
+    unsigned GetReMeshFrequency() const;
+
+    /**
+     * @param throws whether an exception should be thrown
+     */
+    void SetThrowsStepSizeException(bool throws);
+
+    /**
+     * @return mThrowsStepSizeException.
+     */
+    bool ThrowsStepSizeException() const;
 
     /**
      * @return the intrinsic node spacing
      */
-    double GetIntrinsicSpacing();
+    double GetIntrinsicSpacing() const;
+
+    /**
+     * @param newThreshold the new cell rearrangement threshold
+     */
+    void SetCellRearrangementThreshold(double newThreshold);
+
+    /**
+     * @return mCellRearrangementThreshold.
+     */
+    double GetCellRearrangementThreshold() const;
+
 
     /**
      * Overridden GetLocationOfCellCentre() method.
@@ -496,7 +522,7 @@ public:
     /**
      * @return mPopulationHasActiveSources whether the population has active fluid sources
      */
-    bool DoesPopulationHaveActiveSources();
+    bool DoesPopulationHaveActiveSources() const;
 
     /**
      * @param pCell pointer to a cell
@@ -559,6 +585,11 @@ namespace serialization
         // Save data required to construct instance
         const ImmersedBoundaryMesh<DIM, DIM>* p_mesh = &(t->rGetMesh());
         ar& p_mesh;
+        ar& t->DoesPopulationHaveActiveSources();
+        ar& t->GetInteractionDistance();
+        ar& t->GetReMeshFrequency();
+        ar& t->ThrowsStepSizeException();
+        ar& t->GetCellRearrangementThreshold();
     }
 
     /**
@@ -572,9 +603,24 @@ namespace serialization
         // Retrieve data from archive required to construct new instance
         ImmersedBoundaryMesh<DIM, DIM>* p_mesh;
         ar >> p_mesh;
+        bool hasActiveSources = false;
+        ar >> hasActiveSources;
+        double interactionDistance = 0.0;
+        ar >> interactionDistance;
+        unsigned int reMeshFrequency = 1;
+        ar >> reMeshFrequency;
+        bool throwStepSizeException = false;
+        ar >> throwStepSizeException;
+        double cellRearrangementThreshold = 0.5;
+        ar >> cellRearrangementThreshold;
 
         // Invoke inplace constructor to initialise instance
         ::new (t) ImmersedBoundaryCellPopulation<DIM>(*p_mesh);
+        t->SetIfPopulationHasActiveSources(hasActiveSources);
+        t->SetInteractionDistance(interactionDistance);
+        t->SetReMeshFrequency(reMeshFrequency);
+        t->SetThrowsStepSizeException(true);
+        t->SetCellRearrangementThreshold(cellRearrangementThreshold);
     }
 }
 } // namespace ...

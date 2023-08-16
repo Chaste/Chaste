@@ -57,7 +57,8 @@ ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(ImmersedBoun
           mPopulationHasActiveSources(false),
           mOutputNodeRegionToVtk(false),
           mReMeshFrequency(UINT_MAX),
-          mThrowStepSizeException(true)
+          mThrowStepSizeException(true),
+          mCellRearrangementThreshold(0.5)
 {
     mpImmersedBoundaryMesh = static_cast<ImmersedBoundaryMesh<DIM, DIM>*>(&(this->mrMesh));
     mpImmersedBoundaryDivisionRule.reset(new ShortAxisImmersedBoundaryDivisionRule<DIM>());
@@ -86,7 +87,13 @@ ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(ImmersedBoun
 template <unsigned DIM>
 ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(ImmersedBoundaryMesh<DIM, DIM>& rMesh)
         : AbstractOffLatticeCellPopulation<DIM>(rMesh),
-          mDeleteMesh(true)
+          mDeleteMesh(true),
+          mIntrinsicSpacing(0.01),
+          mPopulationHasActiveSources(false),
+          mOutputNodeRegionToVtk(false),
+          mReMeshFrequency(UINT_MAX),
+          mThrowStepSizeException(true),
+          mCellRearrangementThreshold(0.5)
 {
     mpImmersedBoundaryMesh = static_cast<ImmersedBoundaryMesh<DIM, DIM>*>(&(this->mrMesh));
 }
@@ -171,7 +178,7 @@ void ImmersedBoundaryCellPopulation<DIM>::SetInteractionDistance(double new_dist
 }
 
 template <unsigned DIM>
-double ImmersedBoundaryCellPopulation<DIM>::GetInteractionDistance()
+double ImmersedBoundaryCellPopulation<DIM>::GetInteractionDistance() const
 {
     return mInteractionDistance;
 }
@@ -183,13 +190,37 @@ void ImmersedBoundaryCellPopulation<DIM>::SetReMeshFrequency(unsigned newFrequen
 }
 
 template <unsigned DIM>
-unsigned ImmersedBoundaryCellPopulation<DIM>::GetReMeshFrequency()
+unsigned ImmersedBoundaryCellPopulation<DIM>::GetReMeshFrequency() const
 {
     return mReMeshFrequency;
 }
 
 template <unsigned DIM>
-double ImmersedBoundaryCellPopulation<DIM>::GetIntrinsicSpacing()
+void ImmersedBoundaryCellPopulation<DIM>::SetCellRearrangementThreshold(double newThreshold)
+{
+    mCellRearrangementThreshold = newThreshold;
+}
+
+template <unsigned DIM>
+double ImmersedBoundaryCellPopulation<DIM>::GetCellRearrangementThreshold() const
+{
+    return mCellRearrangementThreshold;
+}
+
+template <unsigned DIM>
+void ImmersedBoundaryCellPopulation<DIM>::SetThrowsStepSizeException(bool throws)
+{
+    mThrowStepSizeException = throws;
+}
+
+template <unsigned DIM>
+bool ImmersedBoundaryCellPopulation<DIM>::ThrowsStepSizeException() const
+{
+    return mThrowStepSizeException;
+}
+
+template <unsigned DIM>
+double ImmersedBoundaryCellPopulation<DIM>::GetIntrinsicSpacing() const
 {
     return mIntrinsicSpacing;
 }
@@ -959,7 +990,7 @@ void ImmersedBoundaryCellPopulation<DIM>::SetImmersedBoundaryDivisionRule(boost:
 }
 
 template <unsigned DIM>
-bool ImmersedBoundaryCellPopulation<DIM>::DoesPopulationHaveActiveSources()
+bool ImmersedBoundaryCellPopulation<DIM>::DoesPopulationHaveActiveSources() const
 {
     return mPopulationHasActiveSources;
 }
