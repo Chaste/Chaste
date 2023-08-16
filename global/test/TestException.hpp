@@ -148,6 +148,17 @@ public:
 
         TS_ASSERT_THROWS_THIS(EXCEPT_IF_NOT(false), "Assertion tripped: false");
         TS_ASSERT_THROWS_NOTHING(EXCEPT_IF_NOT(true));
+
+        try
+        {
+            EXCEPTION("Testing what");
+        }
+        catch (const Exception& e)
+        {
+            std::string s1("\nChaste error: ./global/test/TestException.hpp:154: Testing what");
+            std::string s2(e.what());
+            TS_ASSERT_EQUALS(s1, s2);
+        }
     }
 };
 

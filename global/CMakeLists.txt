@@ -57,6 +57,7 @@ int main( )
 ")
 
 add_executable(timekeeper "${generate_dir}/timekeeper.cpp")
+target_link_libraries(timekeeper PRIVATE Chaste_COMMON_DEPS)
 
 ###################################################################
 #  Setup command to generate Version and BuildInfo at build-time  #

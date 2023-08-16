@@ -305,7 +305,7 @@ public:
                 TS_ASSERT_EQUALS(map.GetNewIndex(i), (unsigned)(i-1));
             }
         }
-   }
+    }
 
     void TestCylindricalReMeshOnSmallMesh()
     {
@@ -321,8 +321,64 @@ public:
         p_mesh->ReMesh(map);
 
         // Check that there are the correct number of everything
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), cells_across*cells_up);
-        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2*cells_across*(cells_up-1));
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), cells_across * cells_up);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2 * cells_across * (cells_up-1));
+        TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 1u); // boundary elements removed now halo nodes are used
+    }
+
+    /* 
+     * This test aims to approximate not having halo nodes by making less of them and 
+     * Moving them further away from the top and bottom of the mesh
+     */
+    void TestCylindricalReMeshOnSmallMeshWithoutHaloNodes()
+    {
+        unsigned cells_across = 6;
+        unsigned cells_up = 3;
+        unsigned thickness_of_ghost_layer = 0;
+
+        // Set up a mesh (no ghosts in this case)
+        CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
+        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+
+        // Change the halo parameters so still get longer edges.  
+        TS_ASSERT_EQUALS(p_mesh->GetHaloScalingFactor(),2.0);
+        TS_ASSERT_EQUALS(p_mesh->GetHaloOffset(),1.0);
+
+        p_mesh->SetHaloScalingFactor(0.5);
+        p_mesh->SetHaloOffset(5.0);
+
+        TS_ASSERT_EQUALS(p_mesh->GetHaloScalingFactor(),0.5);
+        TS_ASSERT_EQUALS(p_mesh->GetHaloOffset(),5.0);
+
+        // Peturb some nodes so not in three rows
+        for (typename AbstractMesh<2, 2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+         node_iter != p_mesh->GetNodeIteratorEnd();
+         ++node_iter)
+        {
+            c_vector<double, 2> node_location = node_iter->rGetLocation();
+
+            if (fabs(node_location(0)-1.0)<1e-5)
+            {
+                node_location(1)+=0.1;
+            }
+            else if (fabs(node_location(0)-3.0)<1e-5)
+            {
+                node_location(1)+=0.3;
+            }
+            else if (fabs(node_location(0)-5.0)<1e-5)
+            {
+                node_location(1)+=0.2;
+            }
+            
+            node_iter->rGetModifiableLocation() = node_location;
+        }
+
+        NodeMap map(p_mesh->GetNumNodes());
+        p_mesh->ReMesh(map);
+
+        // Check that there are the correct number of everything
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), cells_across * cells_up);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 30); // Diferent from previous test (24) as get some long edges due to distant halo nodes 
         TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 1u); // boundary elements removed now halo nodes are used
     }
 
@@ -342,7 +398,7 @@ public:
         // Test a normal distance calculation...
         c_vector<double, 2> vector = p_mesh->GetVectorFromAtoB(location1, location2);
         TS_ASSERT_DELTA(vector[0], 0.5, 1e-7);
-        TS_ASSERT_DELTA(vector[1], sqrt(3.0)/2.0, 1e-4);
+        TS_ASSERT_DELTA(vector[1], sqrt(3.0) / 2.0, 1e-4);
         TS_ASSERT_DELTA(norm_2(vector), 1.0, 1e-4);
         TS_ASSERT_DELTA(p_mesh->GetDistanceBetweenNodes(1, 4), 1.0, 1e-7);
 
@@ -355,7 +411,7 @@ public:
         // ...and the opposite vector
         vector = p_mesh->GetVectorFromAtoB(location2, location1);
         TS_ASSERT_DELTA(vector[0], -0.5, 1e-7);
-        TS_ASSERT_DELTA(vector[1], -sqrt(3.0)/2.0, 1e-4);
+        TS_ASSERT_DELTA(vector[1], -sqrt(3.0) / 2.0, 1e-4);
 
         // Test a periodic calculation
         location1[0] = 0.5;
@@ -469,8 +525,8 @@ public:
         Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
 
         // Check that there are the correct number of everything
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), cells_across*cells_up);
-        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2*cells_across*(cells_up-1));
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), cells_across * cells_up);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2 * cells_across * (cells_up - 1));
         TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 1u); // boundary elements removed now halo nodes are used
 
         c_vector<double,2> point;
@@ -486,12 +542,12 @@ public:
         TS_ASSERT_EQUALS(map.IsIdentityMap(), true);
 
         // Check that there are the correct number of everything
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), cells_across*cells_up+1);
-        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2*cells_across*(cells_up-1)+2);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), cells_across * cells_up + 1);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2 * cells_across * (cells_up - 1) + 2);
         TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 1u); // boundary elements removed now halo nodes are used
 
         // Check that we have moved the new node across
-        TS_ASSERT_DELTA(p_mesh->GetNode(new_index)->rGetLocation()[0], 3.0+point[0], 1e-7);
+        TS_ASSERT_DELTA(p_mesh->GetNode(new_index)->rGetLocation()[0], 3.0 + point[0], 1e-7);
         TS_ASSERT_DELTA(p_mesh->GetNode(new_index)->rGetLocation()[1], point[1], 1e-7);
 
         // Test GetWidth
@@ -532,7 +588,7 @@ public:
 
         // Halo of nodes is added 0.5 above and below the original mesh.
         TS_ASSERT_DELTA(original_mesh_height, new_mesh_height, 1.0 + 1e-5);
-        TS_ASSERT_EQUALS(new_num_nodes, original_num_nodes*2+2*num_original_halo_nodes);
+        TS_ASSERT_EQUALS(new_num_nodes, original_num_nodes * 2 + 2 * num_original_halo_nodes);
 
         NodeMap map(p_mesh->GetNumNodes());
         p_mesh->MutableMesh<2,2>::ReMesh(map);   // recreates the boundary elements
@@ -602,6 +658,9 @@ public:
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
         AbstractTetrahedralMesh<2,2>* const p_mesh = generator.GetCylindricalMesh();
 
+        static_cast<Cylindrical2dMesh*>(p_mesh)->SetHaloScalingFactor(0.5);
+        static_cast<Cylindrical2dMesh*>(p_mesh)->SetHaloOffset(5.0);
+
         /*
          * You need the const above to stop a BOOST_STATIC_ASSERTION failure.
          * This is because the serialization library only allows you to save tracked
@@ -662,6 +721,9 @@ public:
             TS_ASSERT_EQUALS(p_mesh->GetNumAllElements(), p_mesh2->GetNumAllElements());
             TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), p_mesh2->GetNumBoundaryElements());
             TS_ASSERT_EQUALS(p_mesh->GetNumAllBoundaryElements(), p_mesh2->GetNumAllBoundaryElements());
+
+            TS_ASSERT_EQUALS(static_cast<Cylindrical2dMesh*>(p_mesh2)->GetHaloScalingFactor(),0.5);
+            TS_ASSERT_EQUALS(static_cast<Cylindrical2dMesh*>(p_mesh2)->GetHaloOffset(),5.0);
 
             AbstractTetrahedralMesh<2,2>::ElementIterator iter2 = p_mesh2->GetElementIteratorBegin();
 
@@ -823,7 +885,7 @@ public:
             {
                 if (i%2 == 0)
                 {
-                   TS_ASSERT_EQUALS(indices[i], indices[i+1]);
+                   TS_ASSERT_EQUALS(indices[i], indices[i + 1]);
                 }
             }
         }
