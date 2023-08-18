@@ -485,19 +485,19 @@ public:
 
             if (PetscTools::AmMaster())
             {
-                TS_ASSERT_EQUALS(nodes_left.size(), 1u);;
+                TS_ASSERT_EQUALS(nodes_left.size(), 1u);
                 TS_ASSERT_EQUALS(nodes_right.size(), 0u);
                 TS_ASSERT_EQUALS(nodes_left[0], 0u);
             }
             if (PetscTools::GetMyRank()==1)
             {
-                TS_ASSERT_EQUALS(nodes_left.size(), 0u);;
+                TS_ASSERT_EQUALS(nodes_left.size(), 0u);
                 TS_ASSERT_EQUALS(nodes_right.size(), 1u);
                 TS_ASSERT_EQUALS(nodes_right[0], 1u);
             }
             if (PetscTools::GetMyRank()==2)
             {
-                TS_ASSERT_EQUALS(nodes_left.size(), 0u);;
+                TS_ASSERT_EQUALS(nodes_left.size(), 0u);
                 TS_ASSERT_EQUALS(nodes_right.size(), 1u);
                 TS_ASSERT_EQUALS(nodes_right[0], 2u);
             }

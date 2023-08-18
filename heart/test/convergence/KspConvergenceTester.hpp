@@ -56,7 +56,7 @@ public:
     }
     double Abscissa()
     {
-        return HeartConfig::Instance()->GetAbsoluteTolerance();;
+        return HeartConfig::Instance()->GetAbsoluteTolerance();
     }
 };
 

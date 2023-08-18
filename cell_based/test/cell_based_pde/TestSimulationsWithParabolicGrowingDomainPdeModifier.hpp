@@ -211,7 +211,7 @@ public:
     void TestParabolicGrowingDomainPdeModifierWithMeshBasedMonolayer()
     {
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS,M_NUM_CELLS_ACROSS,0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         GenerateCells(p_mesh->GetNumNodes(),cells,1.0);
@@ -259,7 +259,7 @@ public:
     void TestParabolicGrowingDomainPdeModifierWithMeshBasedWithGhostNodesBasedMonolayer()
     {
         HoneycombMeshGenerator generator(M_NUM_CELLS_ACROSS,M_NUM_CELLS_ACROSS,2);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();

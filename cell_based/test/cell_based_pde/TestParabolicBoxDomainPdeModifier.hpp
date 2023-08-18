@@ -179,7 +179,7 @@ public:
     void TestMeshBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(10,10,0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
@@ -253,7 +253,7 @@ public:
     void TestMeshBasedSquareMonolayerWithNeumanBcs()
     {
         HoneycombMeshGenerator generator(10,10,0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);

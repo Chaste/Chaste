@@ -109,7 +109,7 @@ public:
         {
             // Create a MeshBasedCellPopulation
             HoneycombMeshGenerator generator(10, 10, 0);
-            boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
+            boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
             std::vector<CellPtr> mesh_cells;
             cells_generator.GenerateBasic(mesh_cells, p_mesh->GetNumNodes());
@@ -131,7 +131,7 @@ public:
         {
             // Make a NodeBasedCellPopulation
             HoneycombMeshGenerator generator(10, 10, 0);
-            boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
+            boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
             NodesOnlyMesh<2> node_mesh;
             node_mesh.ConstructNodesWithoutMesh(*p_mesh, 1.5);
 
@@ -477,7 +477,7 @@ public:
     void TestMeshBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(20,20,0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
@@ -764,7 +764,7 @@ public:
 
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceEllipticPde<1>, p_pde, (cell_population, -0.1));
-        MAKE_PTR_ARGS(ConstBoundaryCondition<1>, p_bc, (1.0));;
+        MAKE_PTR_ARGS(ConstBoundaryCondition<1>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<1>, p_pde_modifier, (p_pde, p_bc, false));

@@ -85,7 +85,7 @@ public:
             unsigned cells_up = 5;
 
             HoneycombMeshGenerator generator(cells_across, cells_up, 0);
-            boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
+            boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
             // Create cells
             std::vector<CellPtr> cells;
@@ -154,7 +154,7 @@ public:
         unsigned cells_up = 5;
 
         HoneycombMeshGenerator generator(cells_across, cells_up, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -269,7 +269,7 @@ public:
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
         HoneycombMeshGenerator generator(3, 3, 1);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Create cells

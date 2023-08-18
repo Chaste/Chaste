@@ -447,7 +447,7 @@ public:
 
         // Create a 2D honeycomb mesh
         HoneycombMeshGenerator generator(2, 2, 2);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();//**Changed**//
 
         // Initial condition for delta, notch

@@ -517,7 +517,7 @@ public:
         {
             // Create a simple 2D cell population (use ghost nodes to avoid infinite edge lengths in the Voronoi tessellation)
             HoneycombMeshGenerator generator(5, 3, 2);
-            boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
+            boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
             std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
             std::vector<CellPtr> cells;
             CellsGenerator<FixedG1GenerationalCellCycleModel,2> cells_generator;

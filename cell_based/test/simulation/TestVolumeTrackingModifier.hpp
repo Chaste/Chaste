@@ -165,7 +165,7 @@ public:
 
         // Create a simple 2D MeshBasedCellPopulation
         HoneycombMeshGenerator generator(3, 3);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
@@ -237,7 +237,7 @@ public:
 
         // Create a simple 2D MeshBasedCellPopulationWithGhostNodes
         HoneycombMeshGenerator generator(3, 3, 3);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         MAKE_PTR(WildTypeCellMutationState, p_state);
@@ -386,7 +386,7 @@ public:
 
         // Create a simple 2D MeshBasedCellPopulation
         HoneycombMeshGenerator generator(2, 2, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);

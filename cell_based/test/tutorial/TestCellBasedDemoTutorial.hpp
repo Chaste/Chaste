@@ -269,7 +269,7 @@ public:
     {
         /* This time we just create a {{{MutableMesh}}} and use that to specify the spatial locations of cells.*/
         HoneycombMeshGenerator generator(2, 2);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;  //**Changed**//
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();  //**Changed**//
 
         /* We create the same number of cells as the previous test.*/
         std::vector<CellPtr> cells;
@@ -322,7 +322,7 @@ public:
          * Here we pass an extra argument to the {{{HoneycombMeshGenerator}}} which adds another 2 rows of
          * nodes round the mesh, known as ghost nodes.*/
         HoneycombMeshGenerator generator(2, 2, 2); //**Changed**//
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();;
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         /* We only want to create cells for non ghost nodes. To find these we get them from the {{{HoneycombMeshGenerator}}}
          * using the method {{{GetCellLocationIndices}}}. We also use a different {{{CellCycleModel}}}. Here we use a
