@@ -452,7 +452,7 @@ public:
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
 
         // Create mesh
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         unsigned counter = 0;
         for (PottsMesh<2>::NodeIterator iter = p_mesh->GetNodeIteratorBegin();
@@ -496,7 +496,7 @@ public:
     {
         // Create mesh
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         unsigned counter = 0;
         for (PottsMesh<2>::PottsElementIterator iter = p_mesh->GetElementIteratorBegin();
@@ -546,7 +546,7 @@ public:
     {
         // Create mesh
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Test CalculateBoundingBox() method
         ChasteCuboid<2> bounds=p_mesh->CalculateBoundingBox();
@@ -575,10 +575,10 @@ public:
          *     0----1----2
          */
         PottsMeshGenerator<2> generator(3, 1, 3, 3, 1, 3);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         PottsMeshGenerator<2> periodic_generator(3, 1, 3, 3, 1, 3, 1, 1, 1, false, true, true, true); // Last 3 variables are periodicity
-        PottsMesh<2>* p_periodic_mesh = periodic_generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_periodic_mesh = periodic_generator.GetMesh();
 
         // Test bottom left node
         std::set<unsigned> neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(0);
@@ -757,13 +757,13 @@ public:
          */
 
         PottsMeshGenerator<3> generator(3, 1, 3, 3, 1, 3, 3, 1, 3);
-        PottsMesh<3>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
 
         PottsMeshGenerator<3> x_periodic_generator(3, 1, 3, 3, 1, 3, 3, 1, 3, false, true, false, false); // Last 3 variables are periodicity
-        PottsMesh<3>* p_x_periodic_mesh = x_periodic_generator.GetMesh();
+        boost::shared_ptr<PottsMesh<3> > p_x_periodic_mesh = x_periodic_generator.GetMesh();
 
         PottsMeshGenerator<3> periodic_generator(3, 1, 3, 3, 1, 3, 3, 1, 3, false, true, true, true); // Last 3 variables are periodicity
-        PottsMesh<3>* p_periodic_mesh = periodic_generator.GetMesh();
+        boost::shared_ptr<PottsMesh<3> > p_periodic_mesh = periodic_generator.GetMesh();
 
         // Test bottom left node
         std::set<unsigned> neighbouring_sites = p_mesh->GetMooreNeighbouringNodeIndices(0);
@@ -905,9 +905,9 @@ public:
          *     0----1----2
          */
         PottsMeshGenerator<2> generator(3, 1, 3, 3, 1, 3);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
         PottsMeshGenerator<2> periodic_generator(3, 1, 3, 3, 1, 3, 1, 1, 1, false, true, true, true); // Last 3 variables are periodicity
-        PottsMesh<2>* p_periodic_mesh = periodic_generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_periodic_mesh = periodic_generator.GetMesh();
 
         // Test bottom left node
         std::set<unsigned> neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(0);
@@ -1051,11 +1051,11 @@ public:
          *     0------1------2           9------10-----11            18-----19-----20
          */
         PottsMeshGenerator<3> generator(3, 1, 3, 3, 1, 3, 3, 1, 3);
-        PottsMesh<3>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
         PottsMeshGenerator<3> x_periodic_generator(3, 1, 3, 3, 1, 3, 3, 1, 3, false, true, false, false); // Last 3 variables are periodicity
-        PottsMesh<3>* p_x_periodic_mesh = x_periodic_generator.GetMesh();
+        boost::shared_ptr<PottsMesh<3> > p_x_periodic_mesh = x_periodic_generator.GetMesh();
         PottsMeshGenerator<3> periodic_generator(3, 1, 3, 3, 1, 3, 3, 1, 3, false, true, true, true); // Last 3 variables are periodicity
-        PottsMesh<3>* p_periodic_mesh = periodic_generator.GetMesh();
+        boost::shared_ptr<PottsMesh<3> > p_periodic_mesh = periodic_generator.GetMesh();
 
         // Test bottom left node
         std::set<unsigned> neighbouring_sites = p_mesh->GetVonNeumannNeighbouringNodeIndices(0);
@@ -1290,7 +1290,7 @@ public:
     {
         // Create 2D mesh
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_DELTA(p_mesh->GetWidth(0), 3.0, 1e-4);
         TS_ASSERT_DELTA(p_mesh->GetWidth(1), 3.0, 1e-4);
@@ -1327,7 +1327,7 @@ public:
     {
         // Create 2D mesh
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         c_vector<double, 2> old_location1;
         old_location1 = p_mesh->GetNode(4)->rGetLocation();
@@ -1707,7 +1707,7 @@ public:
     {
         // Create simle mesh with 2 potts elements and connectivities
         PottsMeshGenerator<2> generator(2, 2, 1, 2, 1, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2u);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 4u);
@@ -1787,7 +1787,7 @@ public:
 
         // Create 2D mesh
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
-        AbstractMesh<2,2>* const p_mesh = generator.GetMesh();
+        boost::shared_ptr<AbstractMesh<2,2> > const p_mesh = generator.GetMesh();
 
         /*
          * You need the const above to stop a BOOST_STATIC_ASSERTION failure.
@@ -1802,15 +1802,16 @@ public:
 
         // Create an output archive
         {
-            TS_ASSERT_EQUALS((static_cast<PottsMesh<2>*>(p_mesh))->GetNumNodes(), 16u);
-            TS_ASSERT_EQUALS((static_cast<PottsMesh<2>*>(p_mesh))->GetNumElements(), 4u);
+            TS_ASSERT_EQUALS((boost::static_pointer_cast<PottsMesh<2> >(p_mesh))->GetNumNodes(), 16u);
+            TS_ASSERT_EQUALS((boost::static_pointer_cast<PottsMesh<2> >(p_mesh))->GetNumElements(), 4u);
 
             // Create output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
             // We have to serialize via a pointer here, or the derived class information is lost
-            (*p_arch) << p_mesh;
+            // TODO: Archive shared pointer?
+            (*p_arch) << p_mesh.get();
         }
 
         {
@@ -1822,10 +1823,11 @@ public:
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
             // Restore from the archive
+            // TODO: Load shared pointer?
             (*p_arch) >> p_mesh2;
 
-            PottsMesh<2>* p_mesh_original = static_cast<PottsMesh<2>*>(p_mesh);
-            PottsMesh<2>* p_mesh_loaded = static_cast<PottsMesh<2>*>(p_mesh2);
+            boost::shared_ptr<PottsMesh<2> > p_mesh_original = boost::static_pointer_cast<PottsMesh<2> >(p_mesh);
+            boost::shared_ptr<PottsMesh<2> > p_mesh_loaded = boost::shared_ptr<PottsMesh<2> >(static_cast<PottsMesh<2>* >(p_mesh2));
 
             // Compare the loaded mesh against the original
 

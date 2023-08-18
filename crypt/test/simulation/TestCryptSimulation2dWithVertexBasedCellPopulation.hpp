@@ -125,7 +125,7 @@ public:
         // Set up cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -189,7 +189,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -247,7 +247,7 @@ public:
         // Create cells, all differentiated
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 0.0, 0.0, 0.0, 0.0);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true, 0.0, 0.0, 0.0, 0.0);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -292,7 +292,7 @@ public:
         // Create cells: the bottom row have StemCellProliferativeType and the rest have DifferentiatedCellProliferativeType
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 0.8, 0.8, 0.8, 0.8);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true, 0.8, 0.8, 0.8, 0.8);
 
         // Cell 1 should divide at time t=0.05
         cells[0]->SetBirthTime(-23.95);
@@ -350,7 +350,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -400,7 +400,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<SimpleWntCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -455,7 +455,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<SimpleWntCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -509,7 +509,7 @@ public:
         // Create cells: the bottom row have StemCellProliferativeType and the rest have DifferentiatedCellProliferativeType
         std::vector<CellPtr> cells;
         CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 0.8, 0.8, 0.8, 0.8);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true, 0.8, 0.8, 0.8, 0.8);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -564,7 +564,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -598,11 +598,11 @@ public:
         p_simulator = CellBasedSimulationArchiver<2, CryptSimulation2d>::Load("VertexCrypt2DArchive", 0.0);
 
         // Create an identical mesh for comparison purposes
-        Cylindrical2dVertexMesh* p_mesh2 = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh2 = generator.GetCylindricalMesh();
 
         // Compare meshes
         VertexMesh<2,2>& r_mesh = (static_cast<VertexBasedCellPopulation<2>*>(&(p_simulator->rGetCellPopulation())))->rGetMesh();
-        CompareMeshes(p_mesh2, &r_mesh);
+        CompareMeshes(p_mesh2.get(), &r_mesh);
 
         // Test Warnings
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
@@ -625,7 +625,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -692,7 +692,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -739,7 +739,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -854,7 +854,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<VanLeeuwen2009WntSwatCellCycleModelHypothesisOne> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create crypt
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);

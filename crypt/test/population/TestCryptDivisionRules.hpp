@@ -115,13 +115,13 @@ public:
         location[1] = 1.0;
         Node<2>* p_node = new Node<2>(0u,location, false);
 
-        boost::shared_ptr<MutableMesh<2,2> > conf_mesh;
-        conf_mesh->AddNode(p_node);
+        MutableMesh<2,2> conf_mesh;
+        conf_mesh.AddNode(p_node);
 
         // Create cells
         std::vector<CellPtr> conf_cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(conf_cells, conf_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(conf_cells, &conf_mesh, std::vector<unsigned>(), true);
 
         // Create cell population
         MeshBasedCellPopulation<2,2> cell_population(conf_mesh, conf_cells);
@@ -220,7 +220,7 @@ public:
 
         // Create a simple Potts mesh
         PottsMeshGenerator<2> generator(3, 0, 0, 4, 0, 0,1,0,0,false, true); // Periodic in x
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create 6 cells in the bottom 2 rows
         std::vector<unsigned> location_indices;
@@ -329,7 +329,7 @@ public:
 
         // Create a simple Potts mesh
         PottsMeshGenerator<2> generator(3, 0, 0, 3, 0, 0, 1, 0, 0, false, true); // x periodic
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create 9 cells, one for each node
         std::vector<unsigned> location_indices;

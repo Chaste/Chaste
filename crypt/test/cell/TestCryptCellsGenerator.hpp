@@ -74,7 +74,7 @@ public:
         double y3 = 3.0;
 
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> generator;
-        generator.Generate(cells, boost::static_pointer_cast<AbstractMesh<2, 2> >(p_mesh), location_indices, true, y0, y1, y2, y3);
+        generator.Generate(cells, p_mesh.get(), location_indices, true, y0, y1, y2, y3);
 
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumNodes());
 
@@ -126,7 +126,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<UniformG1GenerationalCellCycleModel> generator;
-        generator.Generate(cells, p_mesh, location_indices, false);
+        generator.Generate(cells, p_mesh.get(), location_indices, false);
 
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumNodes());
 
@@ -189,7 +189,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<TysonNovakCellCycleModel> generator;
-        generator.Generate(cells, p_mesh, location_indices, true);
+        generator.Generate(cells, p_mesh.get(), location_indices, true);
 
         // Test that cells were generated correctly
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumNodes());
@@ -219,7 +219,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<WntCellCycleModel> generator;
-        generator.Generate(cells, p_mesh, location_indices, false);
+        generator.Generate(cells, p_mesh.get(), location_indices, false);
 
         // Test that cells were generated correctly
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumNodes());
@@ -253,7 +253,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<SimpleWntCellCycleModel> generator;
-        generator.Generate(cells, p_mesh, location_indices, false);
+        generator.Generate(cells, p_mesh.get(), location_indices, false);
 
         // Test that cells were generated correctly
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumNodes());
@@ -276,7 +276,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<StochasticWntCellCycleModel> generator;
-        generator.Generate(cells, p_mesh, location_indices, false);
+        generator.Generate(cells, p_mesh.get(), location_indices, false);
 
         // Test that cells were generated correctly
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumNodes());
@@ -314,10 +314,10 @@ public:
           // Create cells
           std::vector<CellPtr> fixed_cells, stochastic_cells;
           CryptCellsGenerator<FixedG1GenerationalCellCycleModel> fixed_cells_generator;
-          fixed_cells_generator.Generate(fixed_cells, boost::static_pointer_cast<AbstractMesh<2, 2> >(p_mesh), std::vector<unsigned>(), true, y0, y1, y2, y3, true);
+          fixed_cells_generator.Generate(fixed_cells, p_mesh.get(), std::vector<unsigned>(), true, y0, y1, y2, y3, true);
 
           CryptCellsGenerator<UniformG1GenerationalCellCycleModel> stochastic_cells_generator;
-          stochastic_cells_generator.Generate(stochastic_cells, boost::static_pointer_cast<AbstractMesh<2, 2> >(p_mesh), std::vector<unsigned>(), true, y0, y1, y2, y3, true);
+          stochastic_cells_generator.Generate(stochastic_cells, p_mesh.get(), std::vector<unsigned>(), true, y0, y1, y2, y3, true);
 
           TS_ASSERT_EQUALS(fixed_cells.size(), p_mesh->GetNumElements());
           TS_ASSERT_EQUALS(stochastic_cells.size(), p_mesh->GetNumElements());
@@ -368,7 +368,7 @@ public:
           // Create cells
           std::vector<CellPtr> cells;
           CryptCellsGenerator<SimpleWntCellCycleModel> cells_generator;
-          cells_generator.Generate(cells, boost::static_pointer_cast<AbstractMesh<2, 2> >(p_mesh), std::vector<unsigned>(), true, true);
+          cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true, true);
 
           // Test that the correct number cells was generated
           TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumElements());

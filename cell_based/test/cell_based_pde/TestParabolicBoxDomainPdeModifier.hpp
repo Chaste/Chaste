@@ -454,7 +454,7 @@ public:
     void TestPottsBasedSquareMonolayer()
     {
         PottsMeshGenerator<2> generator(100, 10, 4, 100, 10, 4);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Translate and scale so cells are on top of those in the above centre based tests.
         p_mesh->Translate(-31.5,-31.5);
@@ -525,7 +525,7 @@ public:
     void TestCaBasedSquareMonolayer()
     {
         PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Scale so cells are on top of those in the above centre based tests
         p_mesh->Scale(1.0,sqrt(3.0)*0.5);

@@ -80,7 +80,7 @@ public:
         // Set up cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo> cells_generator;
-        cells_generator.Generate(cells, boost::static_pointer_cast<AbstractMesh<2, 2> >(p_mesh), location_indices, false);
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, false);
 
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
 
@@ -121,7 +121,7 @@ public:
         // Set up cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, false);
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, false);
 
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
 
@@ -164,7 +164,7 @@ public:
         // Set up cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, false);
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, false);
 
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
 

@@ -132,7 +132,7 @@ public:
         /* We create the cells, using the same method as before. Here, though, we use a {{{SimpleWntCellCycleModel}}}.*/
         std::vector<CellPtr> cells;
         CryptCellsGenerator<SimpleWntCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, true);
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, true);
 
         /* We now create boost shared pointers to any mutations we wish to use.
          * We need to do this using the {{{CellPropertyRegistry}}}, otherwise

@@ -136,7 +136,7 @@ public:
          */
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 1.0, 2.0, 3.0, 4.0);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true, 1.0, 2.0, 3.0, 4.0);
 
         /* Create a cell population, as before. */
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -211,7 +211,7 @@ public:
          */
         std::vector<CellPtr> cells;
         CryptCellsGenerator<SimpleWntCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         /* Create a cell population, as before. */
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);

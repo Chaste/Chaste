@@ -100,7 +100,7 @@ public:
         // Set up cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, true);// true = mature cells
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, true);// true = mature cells
 
         // Create cell population
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
@@ -190,7 +190,7 @@ public:
         // Set up cells
         std::vector<CellPtr> temp_cells;
         CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(temp_cells, p_mesh, std::vector<unsigned>(), true, 0.3, 2.0, 3.0, 4.0, true);
+        cells_generator.Generate(temp_cells, p_mesh.get(), std::vector<unsigned>(), true, 0.3, 2.0, 3.0, 4.0, true);
 
         // This awkward way of setting up the cells is a result of #430
         std::vector<CellPtr> cells;
@@ -376,7 +376,7 @@ public:
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
         std::vector<unsigned> location_indices;
 
-        Cylindrical2dMesh* p_mesh;
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh;
         SimulationTime* p_simulation_time;
 
         // Loop over the number of simulations
@@ -394,7 +394,7 @@ public:
             // Set up cells
             std::vector<CellPtr> temp_cells;
             CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
-            cells_generator.Generate(temp_cells, p_mesh, std::vector<unsigned>(), true, 0.3, 2.0, 3.0, 4.0, true);
+            cells_generator.Generate(temp_cells, p_mesh.get(), std::vector<unsigned>(), true, 0.3, 2.0, 3.0, 4.0, true);
 
             // This awkward way of setting up the cells is a result of #430
             std::vector<CellPtr> cells;

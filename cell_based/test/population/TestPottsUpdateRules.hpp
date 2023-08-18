@@ -69,7 +69,7 @@ public:
     {
         // Create a simple 2D PottsMesh with 2 elements
         PottsMeshGenerator<2> generator(4, 1, 2, 4, 2, 2, 1, 1, 1, true); // last bool makes elements start in bottom left
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -128,7 +128,7 @@ public:
     {
         // Create a simple 2D PottsMesh with 2 elements
         PottsMeshGenerator<3> generator(4, 2, 2, 2, 1, 2, 4, 1, 2, true);
-        PottsMesh<3>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2u);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 32u);
@@ -218,7 +218,7 @@ public:
     {
         // Create a simple 2D PottsMesh with 2 elements
         PottsMeshGenerator<2> generator(4, 1, 2, 4, 2, 2, 1, 1, 1, true); // last bool makes elements start in bottom left
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -284,7 +284,7 @@ public:
     {
         // Create a simple 3D PottsMesh with 2 elements
         PottsMeshGenerator<3> generator(4, 2, 2, 4, 1, 2, 4, 1, 2, true);
-        PottsMesh<3>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2u);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 64u);
@@ -382,7 +382,7 @@ public:
     {
         // Create a simple 2D PottsMesh with 2 elements
         PottsMeshGenerator<2> generator(4, 1, 2, 4, 2, 2, 1, 1, 1, true); // last bool makes elements start in bottom left
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -448,7 +448,7 @@ public:
     {
         // Create a simple 2D PottsMesh with 2 elements
         PottsMeshGenerator<3> generator(4, 2, 2, 2, 1, 2, 4, 1, 2, true);
-        PottsMesh<3>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2u);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 32u);
@@ -546,7 +546,7 @@ public:
     {
         // Create a simple 2D PottsMesh with 4 elements
         PottsMeshGenerator<2> generator(5, 2, 2, 4, 2, 2, 1, 1, 1, true); // last bool makes elements start in bottom left
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -636,7 +636,7 @@ public:
     {
         // Create a simple 2D PottsMesh with 4 elements
         PottsMeshGenerator<3> generator(4, 2, 2, 2, 2, 1, 4, 1, 2, true);
-        PottsMesh<3>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 4u);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 32u);
@@ -750,7 +750,7 @@ public:
     {
         // Create a simple 2D PottsMesh with 2 elements
         PottsMeshGenerator<2> generator(4, 1, 2, 4, 1, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;

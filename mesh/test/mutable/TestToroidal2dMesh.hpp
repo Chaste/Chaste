@@ -505,6 +505,7 @@ public:
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
             // We have to serialize via a pointer here, or the derived class information is lost.
+            // TODO: Archive shared pointer?
             (*p_arch) << p_mesh.get();
         }
 
@@ -517,6 +518,7 @@ public:
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
             // Restore from the archive
+            // TODO: Load shared pointer?
             (*p_arch) >> p_mesh2;
 
             // Toroidal2dMesh now remeshes itself on load (convert from TrianglesMeshReader to normal format)

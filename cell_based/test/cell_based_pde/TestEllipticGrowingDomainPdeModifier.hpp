@@ -185,7 +185,7 @@ public:
         {
             // Make a PottsBasedCellPopulation
             PottsMeshGenerator<2> generator(50,5,5,50,5,5);
-            PottsMesh<2>* p_mesh = generator.GetMesh();
+            boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
             std::vector<CellPtr> potts_cells;
             cells_generator.GenerateBasic(potts_cells, p_mesh->GetNumElements());
@@ -206,7 +206,7 @@ public:
         {
             // Make a CaBasedCellPopulation
             PottsMeshGenerator<2> generator(50,0,0,50,0,0);
-            PottsMesh<2>* p_mesh = generator.GetMesh();
+            boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
             // Specify the location of each cell
             std::vector<unsigned> location_indices;
@@ -628,7 +628,7 @@ public:
     void TestPottsBasedSquareMonolayer()
     {
         PottsMeshGenerator<2> generator(100, 20, 4, 100, 20, 4);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Translate and scale so cells are on top of those in the above centre based tests
         p_mesh->Translate(-11.5,-11.5);
@@ -681,7 +681,7 @@ public:
     void TestCaBasedSquareMonolayer()
     {
         PottsMeshGenerator<2> generator(20, 0, 0, 20, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Scale so cells are on top of those in the above centre based tests
         p_mesh->Scale(1.0,sqrt(3.0)*0.5);

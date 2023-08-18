@@ -65,7 +65,7 @@ public:
 
         std::vector<CellPtr> cells;
         CryptCellsGenerator<VanLeeuwen2009WntSwatCellCycleModelHypothesisOne> cells_generator;
-        cells_generator.Generate(cells, boost::static_pointer_cast<AbstractMesh<2, 2> >(p_mesh), location_indices, false);
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, false);
 
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
 

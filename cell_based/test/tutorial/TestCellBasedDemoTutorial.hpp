@@ -471,7 +471,7 @@ public:
          * and there are arguments to make the domains periodic.
          */
         PottsMeshGenerator<2> generator(20, 2, 4, 20, 2, 4); //**Changed**//
-        PottsMesh<2>* p_mesh = generator.GetMesh(); //**Changed**//
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh(); //**Changed**//
 
         /* We generate one cell for each element as in vertex based simulations.*/
         std::vector<CellPtr> cells;
