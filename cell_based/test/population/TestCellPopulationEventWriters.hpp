@@ -138,7 +138,7 @@ public:
             location_indices.push_back(12);
             location_indices.push_back(13);
             location_indices.push_back(17);
-            CaBasedCellPopulation<2> ca_based_cell_population(*p_ca_based_mesh.get(), ca_based_cells, location_indices);
+            CaBasedCellPopulation<2> ca_based_cell_population(*p_ca_based_mesh, ca_based_cells, location_indices);
 
             TS_ASSERT_THROWS_NOTHING(division_writer.Visit(&ca_based_cell_population));
         }
