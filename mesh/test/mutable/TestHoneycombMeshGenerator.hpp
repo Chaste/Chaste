@@ -47,7 +47,7 @@ class TestHoneycombMeshGenerator : public CxxTest::TestSuite
 {
 private:
 
-    void Output2DNodesToFile(boost::shared_ptr<MutableMesh<2,2> > pMesh, std::string fileName)
+    void Output2DNodesToFile(MutableMesh<2,2>* pMesh, std::string fileName)
     {
         OutputFileHandler handler("");
         out_stream file = handler.OpenOutputFile(fileName);
@@ -278,7 +278,7 @@ public:
         {
             TS_ASSERT_LESS_THAN_EQUALS(norm_2(p_mesh->GetNode(i)->rGetLocation()), radius+epsilon);
         }
-        Output2DNodesToFile(p_mesh, "circular_mesh.dat");
+        Output2DNodesToFile(p_mesh.get(), "circular_mesh.dat");
     }
 
     void TestGetCircularMeshWithGhostNodesThrowsException()

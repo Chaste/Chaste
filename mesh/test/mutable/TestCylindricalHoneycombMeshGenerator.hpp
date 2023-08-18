@@ -47,7 +47,7 @@ class TestCylindricalHoneycombMeshGenerator : public CxxTest::TestSuite
 {
 private:
 
-    void Output2DNodesToFileCylindrical(boost::shared_ptr<Cylindrical2dMesh> pMesh, std::string fileName)
+    void Output2DNodesToFileCylindrical(Cylindrical2dMesh* pMesh, std::string fileName)
     {
         OutputFileHandler handler("");
         out_stream file = handler.OpenOutputFile(fileName);
@@ -78,7 +78,7 @@ public:
         // Check the mesh
         TS_ASSERT_THROWS_THIS(generator.GetMesh(),"A cylindrical mesh was created but a normal mesh is being requested.");
 
-        Output2DNodesToFileCylindrical(p_mesh, "cylindrical_node_positions.dat");
+        Output2DNodesToFileCylindrical(p_mesh.get(), "cylindrical_node_positions.dat");
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), (num_cells_width)*(num_cells_depth+2*ghosts));
 
         // Zeroth node
