@@ -701,9 +701,6 @@ public:
                     TS_ASSERT_EQUALS(p_elt->GetNodeGlobalIndex(j), p_elt2->GetNodeGlobalIndex(j));
                 }
             }
-
-            // Tidy up
-            p_mesh2.reset();
         }
     }
 
