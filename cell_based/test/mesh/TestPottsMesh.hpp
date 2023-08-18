@@ -1865,9 +1865,6 @@ public:
                                      p_mesh_loaded->GetElement(elem_index)->GetNodeGlobalIndex(local_index));
                 }
             }
-
-            // Tidy up
-            delete p_mesh2;
         }
     }
 
