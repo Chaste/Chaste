@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCRYPTCELLSGENERATOR_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include <boost/shared_ptr.hpp>
 #include "HoneycombMeshGenerator.hpp"
 #include "CylindricalHoneycombVertexMeshGenerator.hpp"
 #include "CryptCellsGenerator.hpp"

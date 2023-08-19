@@ -37,8 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCYLINDRICALHONEYCOMBMESHGENERATOR_HPP_
 
 #include <cxxtest/TestSuite.h>
-
 #include <boost/shared_ptr.hpp>
+
 #include "CylindricalHoneycombMeshGenerator.hpp"
 
 #include "FakePetscSetup.hpp"
