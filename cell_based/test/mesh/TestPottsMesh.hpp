@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTPOTTSMESH_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include <boost/serialization/shared_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include "CheckpointArchiveTypes.hpp"
@@ -1811,24 +1812,22 @@ public:
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
             // We have to serialize via a pointer here, or the derived class information is lost
-            // TODO: Archive shared pointer?
-            (*p_arch) << p_mesh.get();
+            (*p_arch) << p_mesh;
         }
 
         {
             // De-serialize and compare
-            AbstractMesh<2,2>* p_mesh2;
+            boost::shared_ptr<AbstractMesh<2,2> > p_mesh2;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
             // Restore from the archive
-            // TODO: Load shared pointer?
             (*p_arch) >> p_mesh2;
 
             boost::shared_ptr<PottsMesh<2> > p_mesh_original = boost::static_pointer_cast<PottsMesh<2> >(p_mesh);
-            boost::shared_ptr<PottsMesh<2> > p_mesh_loaded = boost::shared_ptr<PottsMesh<2> >(static_cast<PottsMesh<2>* >(p_mesh2));
+            boost::shared_ptr<PottsMesh<2> > p_mesh_loaded = boost::static_pointer_cast<PottsMesh<2> >(p_mesh2);
 
             // Compare the loaded mesh against the original
 

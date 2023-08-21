@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include <algorithm>
@@ -682,14 +683,12 @@ public:
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
             // We have to serialize via a pointer here, or the derived class information is lost.
-            // TODO: Archive shared pointer?
-            (*p_arch) << p_mesh.get();
+            (*p_arch) << p_mesh;
         }
 
         {
             // De-serialize and compare
-            // TODO: Load shared pointer?
-            AbstractTetrahedralMesh<2,2>* p_mesh2;
+            boost::shared_ptr<AbstractTetrahedralMesh<2,2> > p_mesh2;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -725,8 +724,8 @@ public:
             TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), p_mesh2->GetNumBoundaryElements());
             TS_ASSERT_EQUALS(p_mesh->GetNumAllBoundaryElements(), p_mesh2->GetNumAllBoundaryElements());
 
-            TS_ASSERT_EQUALS(static_cast<Cylindrical2dMesh*>(p_mesh2)->GetHaloScalingFactor(),0.5);
-            TS_ASSERT_EQUALS(static_cast<Cylindrical2dMesh*>(p_mesh2)->GetHaloOffset(),5.0);
+            TS_ASSERT_EQUALS(boost::static_pointer_cast<Cylindrical2dMesh>(p_mesh2)->GetHaloScalingFactor(),0.5);
+            TS_ASSERT_EQUALS(boost::static_pointer_cast<Cylindrical2dMesh>(p_mesh2)->GetHaloOffset(),5.0);
 
             AbstractTetrahedralMesh<2,2>::ElementIterator iter2 = p_mesh2->GetElementIteratorBegin();
 
@@ -740,9 +739,6 @@ public:
                     TS_ASSERT_EQUALS(iter->GetNodeGlobalIndex(i), iter2->GetNodeGlobalIndex(i));
                 }
             }
-
-            // We now need to free the mesh, since there is no honeycomb generator to do so.
-            delete p_mesh2;
         }
     }
 

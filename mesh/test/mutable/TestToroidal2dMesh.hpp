@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include <algorithm>
@@ -505,20 +506,18 @@ public:
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
             // We have to serialize via a pointer here, or the derived class information is lost.
-            // TODO: Archive shared pointer?
-            (*p_arch) << p_mesh.get();
+            (*p_arch) << p_mesh;
         }
 
         {
             // De-serialize and compare
-            AbstractTetrahedralMesh<2,2>* p_mesh2;
+            boost::shared_ptr<AbstractTetrahedralMesh<2,2> > p_mesh2;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
             // Restore from the archive
-            // TODO: Load shared pointer?
             (*p_arch) >> p_mesh2;
 
             // Toroidal2dMesh now remeshes itself on load (convert from TrianglesMeshReader to normal format)
@@ -561,9 +560,6 @@ public:
                     TS_ASSERT_EQUALS(iter->GetNodeGlobalIndex(i), iter2->GetNodeGlobalIndex(i));
                 }
             }
-
-            // We now need to free the mesh, since there is no honeycomb generator to do so.
-            delete p_mesh2;
         }
     }
 
