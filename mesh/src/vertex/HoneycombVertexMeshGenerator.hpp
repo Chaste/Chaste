@@ -84,9 +84,7 @@ public:
     /**
      * Empty destructor.
      */
-    virtual ~HoneycombVertexMeshGenerator()
-    {
-    }
+    virtual ~HoneycombVertexMeshGenerator() = default;
 
     /**
      * @return a 2D honeycomb mesh

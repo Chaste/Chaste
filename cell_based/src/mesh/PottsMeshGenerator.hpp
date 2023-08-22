@@ -94,9 +94,7 @@ public:
     /**
      * Empty destructor.
      */
-    virtual ~PottsMeshGenerator()
-    {
-    }
+    virtual ~PottsMeshGenerator() = default;
     
     /**
      * Helper method to calculate the Moore and Von Neumann Neighbourhoods of all nodes
