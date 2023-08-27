@@ -216,6 +216,17 @@ public:
 
     void TestInterpolate()
     {
+        { // lower left < 0
+
+            UniformGridRandomFieldGenerator<1> gen({{0.0}}, {{1.0}}, {{8}}, {{true}}, 0.3);
+
+            // If the field is constant everywhere then that constant should always be the interpolated value
+            {
+                std::vector<double> constant_field(8, 1.23);
+
+                TS_ASSERT_DELTA(gen.Interpolate(constant_field, Create_c_vector(-0.1)), 1.23, 1e-6);
+            }
+        }
         // 1D
         {
             UniformGridRandomFieldGenerator<1> gen({{0.0}}, {{1.0}}, {{8}}, {{true}}, 0.3);

@@ -1108,11 +1108,14 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetVoronoiSurfaceAreaOfElem
     }
 }
 
+// Excluded from coverage as it is impossible to construct a 1 dimensional element currently
+//LCOV_EXCL_START
 template <>
 double ImmersedBoundaryMesh<1, 1>::GetVoronoiSurfaceAreaOfElement(const unsigned elemIdx)
 {
     return 0.0;
 }
+//LCOV_EXCL_STOP
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetAverageNodeSpacingOfElement(unsigned index, bool recalculate)

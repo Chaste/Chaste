@@ -90,32 +90,6 @@ OffLatticeRandomFieldGenerator<SPACE_DIM>::OffLatticeRandomFieldGenerator(
 }
 
 template <unsigned SPACE_DIM>
-double OffLatticeRandomFieldGenerator<SPACE_DIM>::GetSquaredDistAtoB(
-    const c_vector<double, SPACE_DIM>& rLocation1,
-    const c_vector<double, SPACE_DIM>& rLocation2) const
-{
-    double dist_squared = 0.0;
-
-    // Loop over dimensions
-    for (unsigned dim = 0; dim < SPACE_DIM; ++dim)
-    {
-        // Get the (non-periodic) absolute difference
-        double delta_this_dim = std::fabs(rLocation2[dim] - rLocation1[dim]);
-
-        // If this dimension is periodic, recalculate the distance if necessary
-        if (mPeriodicity[dim])
-        {
-            const double domain_width_this_dim = mUpperCorner[dim] - mLowerCorner[dim];
-            delta_this_dim = std::min(delta_this_dim, domain_width_this_dim - delta_this_dim);
-        }
-
-        dist_squared += delta_this_dim * delta_this_dim;
-    }
-
-    return dist_squared;
-}
-
-template <unsigned SPACE_DIM>
 void OffLatticeRandomFieldGenerator<SPACE_DIM>::SetRandomSeed(
     const unsigned seed)
 {
@@ -126,7 +100,7 @@ template <unsigned SPACE_DIM>
 std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField(
     const std::vector<Node<SPACE_DIM>*>& rNodes)
 {
-    return this->SampleRandomFieldAtTime(rNodes, rand());
+    return this->SampleRandomFieldAtTime(rNodes, 0.0);
 }
 
 template <unsigned SPACE_DIM>

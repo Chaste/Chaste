@@ -146,9 +146,12 @@ std::vector<double> ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextN
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryElementData ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextImmersedBoundaryElement()
 {
+    // Can only be constructed in 2D currently
+    //LCOV_EXCL_START
     if constexpr (SPACE_DIM != 2) {
         EXCEPTION("ImmersedBoundaryMeshWriter::GetNextImmersedBoundaryElement is not yet implemetned in 3D!");
     }
+    //LCOV_EXCL_STOP
 
     assert(this->mNumElements == mpMesh->GetNumElements());
 
@@ -188,9 +191,11 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryElementData ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextImmersedBoundaryLamina()
 {
+    //LCOV_EXCL_START
     if constexpr (SPACE_DIM != 2) {
         EXCEPTION("ImmersedBoundaryMeshWriter::GetNextImmersedBoundaryLamina is not yet implemetned in 3D!");
     }
+    //LCOV_EXCL_STOP
 
     assert(mNumLaminas == mpMesh->GetNumLaminas());
 
@@ -209,18 +214,21 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::
 
     try {
         lamina.GetFluidSource();
+        // Can't really support 2D laminas at the moment
+        //LCOV_EXCL_START
         if (lamina.GetFluidSource() != nullptr) {
             lamina_data.hasFluidSource = true;
             lamina_data.fluidSourceIndex = lamina.GetFluidSource()->GetIndex();
         } else {
             lamina_data.hasFluidSource = false;
         }
+        //LCOV_EXCL_STOP
     } catch(Exception& e) {
         lamina_data.hasFluidSource = false;
     }
     
     for (auto cornerNode : lamina.rGetCornerNodes()) {
-        lamina_data.cornerNodeIndices.push_back(cornerNode->GetIndex());
+        lamina_data.cornerNodeIndices.push_back(cornerNode->GetIndex()); // LCOV_EXCL_LINE
     }
 
     lamina_data.averageNodeSpacing = lamina.GetAverageNodeSpacing();
@@ -460,10 +468,12 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
 #endif //CHASTE_VTK
 }
 
+//LCOV_EXCL_START
 template <>
 void ImmersedBoundaryMeshWriter<1, 1>::MakeVtkMesh(ImmersedBoundaryMesh<1, 1>& rMesh)
 {
 }
+//LCOV_EXCL_STOP
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddCellData(std::string dataName, std::vector<double> dataPayload)
@@ -655,14 +665,14 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 
             // Fluid source index
             if (lamina_data.hasFluidSource) {
-                *p_lamina_file << "\t" << lamina_data.fluidSourceIndex;
+                *p_lamina_file << "\t" << lamina_data.fluidSourceIndex; //LCOV_EXCL_LINE
             }
 
             // Corner node indices
             *p_lamina_file << "\t" << lamina_data.cornerNodeIndices.size();
             
             for (auto nodeIndex : lamina_data.cornerNodeIndices) {
-                *p_lamina_file << "\t" << nodeIndex;
+                *p_lamina_file << "\t" << nodeIndex; //LCOV_EXCL_LINE
             }
             
             // Average node spacing

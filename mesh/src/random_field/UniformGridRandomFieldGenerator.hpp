@@ -135,19 +135,6 @@ private:
     }
 
     /**
-     * Get the squared distance between two points, which is needed to calculate 
-     * the covariance matrix. This function takes into account possible 
-     * periodicity in the mesh.
-     * 
-     * @param rLocation1 the first location
-     * @param rLocation2 the second location
-     * 
-     * @return the squared distance between rLocation1 and rLocation2
-     */
-    double GetSquaredDistAtoB(const c_vector<double, SPACE_DIM>& rLocation1,
-                              const c_vector<double, SPACE_DIM>& rLocation2) const;
-
-    /**
      * Helper method for Interpolate(). Get the linear index (along the flat 
      * vector representing a random field instance) given the grid index
      * (x,y,z).
@@ -168,14 +155,6 @@ private:
      * @return the position in space of the (x,y,z) coordinate
      */
     std::array<double, SPACE_DIM> GetPositionUsingGridIndex(std::array<long, SPACE_DIM> gridIndex) const;
-
-    /**
-     * Get a unique representation of the parameters that can be used as a 
-     * filename when saving or loading fields.
-     * 
-     * @return A unique filename based on the parameters.
-     */
-    std::string GetFilenameFromParams() const;
 
     /**
      * Noise generator

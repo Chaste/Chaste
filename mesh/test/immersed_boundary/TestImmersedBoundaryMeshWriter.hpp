@@ -131,6 +131,7 @@ public:
 
         std::vector<ImmersedBoundaryElement<2, 2>*> elems;
         elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes_elem1));
+        elems[0]->AddCornerNode(nodes_elem1[0]);
         elems.push_back(new ImmersedBoundaryElement<2, 2>(1, nodes_elem2));
         elems.push_back(new ImmersedBoundaryElement<2, 2>(2, nodes_elem3));
 

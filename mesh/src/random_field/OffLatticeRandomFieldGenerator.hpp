@@ -95,18 +95,6 @@ private:
     }
 
     /**
-     * Get the squared distance between two points, which is needed to calculate 
-     * the covariance matrix. This function takes into account possible 
-     * periodicity in the mesh.
-     *
-     * @param rLocation1 the first location
-     * @param rLocation2 the second location
-     * @return the squared distance between rLocation1 and rLocation2
-     */
-    double GetSquaredDistAtoB(const c_vector<double, SPACE_DIM>& rLocation1,
-                              const c_vector<double, SPACE_DIM>& rLocation2) const;
-
-    /**
      * Noise generator
      */
     OpenSimplex2S mOpenSimplex;

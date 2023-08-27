@@ -274,7 +274,7 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::
     buffer_stream >> lamina_data.hasFluidSource;
 
     if (lamina_data.hasFluidSource) {
-        buffer_stream >> lamina_data.fluidSourceIndex;
+        buffer_stream >> lamina_data.fluidSourceIndex; //LCOV_EXCL_LINE
     }
     
     unsigned num_corner_nodes;

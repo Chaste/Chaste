@@ -70,8 +70,79 @@ public:
         );
     }
 
+    void TestSetRandomSeed()
+    {
+        const std::array<double, 1> lower_corner {{0.0}};
+        const std::array<double, 1> upper_corner {{10.0}};
+        const std::array<bool, 1> periodicity {{false}};
+        const double lengthscale = 0.1;
+
+        OffLatticeRandomFieldGenerator<1> gen(
+                lower_corner,
+                upper_corner,
+                periodicity,
+                lengthscale
+        );
+
+        auto p_gen = RandomNumberGenerator::Instance();
+        std::vector<Node<1>*> nodes(10);
+        for (unsigned node_idx = 0; node_idx < 10; ++node_idx)
+        {
+            nodes[node_idx] = new Node<1>(node_idx, Create_c_vector(10.0 * p_gen->ranf()));
+        }
+        
+        gen.SetRandomSeed(10);
+        auto res1 = gen.SampleRandomFieldAtTime(nodes, 0.0);
+        gen.SetRandomSeed(11);
+        auto res2 = gen.SampleRandomFieldAtTime(nodes, 0.0);
+
+        TS_ASSERT_DIFFERS(res1[0], res2[0]);
+        
+        for (auto& node : nodes) {
+            delete node;
+        }
+    }
+
     void TestSampleFromRandomField()
     {
+        { // Without specifying time
+            auto p_gen = RandomNumberGenerator::Instance();
+
+            const unsigned n = 100;
+
+            const std::array<double, 1> lower_corner {{0.0}};
+            const std::array<double, 1> upper_corner {{10.0}};
+            const std::array<bool, 1> periodicity {{false}};
+            const double lengthscale = 2.0;
+
+            OffLatticeRandomFieldGenerator<1> gen(
+                    lower_corner,
+                    upper_corner,
+                    periodicity,
+                    lengthscale
+            );
+            gen.SetRandomSeed(10);
+
+            // Generate some nodes
+            std::vector<Node<1>*> nodes(n);
+            for (unsigned node_idx = 0; node_idx < n; ++node_idx)
+            {
+                nodes[node_idx] = new Node<1>(node_idx, Create_c_vector(10.0 * p_gen->ranf()));
+            }
+            
+            auto randomField = gen.SampleRandomField(nodes);
+            for (auto val : randomField) {
+                std::cout << val << "\n";
+            }
+            
+            std::transform(randomField.begin(), randomField.end(), randomField.begin(), [] (const double& v) { return std::abs(v); });
+            auto sum = std::accumulate(randomField.begin(), randomField.end(), 0.0);
+
+            for (auto& node : nodes) {
+                delete node;
+            }
+            TS_ASSERT(sum > 0.0)
+        }
         { // 1D
             auto p_gen = RandomNumberGenerator::Instance();
 
@@ -127,6 +198,39 @@ public:
             for (unsigned node_idx = 0; node_idx < n; ++node_idx)
             {
                 nodes[node_idx] = new Node<2>(node_idx, Create_c_vector(10.0 * p_gen->ranf(), 10.0 * p_gen->ranf()));
+            }
+            
+            auto randomField = gen.SampleRandomFieldAtTime(nodes, 0.0);
+
+            std::transform(randomField.begin(), randomField.end(), randomField.begin(), [] (const double& v) { return std::abs(v); });
+            auto sum = std::accumulate(randomField.begin(), randomField.end(), 0.0);
+            for (auto& node : nodes) {
+                delete node;
+            }
+            TS_ASSERT(sum > 0.0)
+        }
+        { // 3D
+            auto p_gen = RandomNumberGenerator::Instance();
+
+            const unsigned n = 100;
+
+            const std::array<double, 3> lower_corner {{0.0, 0.0, 0.0}};
+            const std::array<double, 3> upper_corner {{10.0, 10.0, 10.0}};
+            const std::array<bool, 3> periodicity {{false, false, false}};
+            const double lengthscale = 2.0;
+
+            OffLatticeRandomFieldGenerator<3> gen(
+                    lower_corner,
+                    upper_corner,
+                    periodicity,
+                    lengthscale
+            );
+
+            // Generate some nodes
+            std::vector<Node<3>*> nodes(n);
+            for (unsigned node_idx = 0; node_idx < n; ++node_idx)
+            {
+                nodes[node_idx] = new Node<3>(node_idx, Create_c_vector(10.0 * p_gen->ranf(), 10.0 * p_gen->ranf(), 10.0 * p_gen->ranf()));
             }
             
             auto randomField = gen.SampleRandomFieldAtTime(nodes, 0.0);
