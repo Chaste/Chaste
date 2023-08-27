@@ -73,6 +73,7 @@ simulation/TestExtrinsicPullModifier.hpp
 simulation/TestNumericalMethods.hpp
 simulation/TestImmersedBoundaryPdeSolveMethods.hpp
 simulation/TestImmersedBoundarySimulationModifier.hpp
+simulation/TestImmersedBoundarySvgWriter.hpp
 simulation/TestRepresentativeImmersedBoundarySimulations.hpp
 simulation/TestOffLatticeSimulation.hpp
 simulation/TestOffLatticeSimulation3d.hpp

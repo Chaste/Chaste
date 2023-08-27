@@ -231,6 +231,8 @@ public:
         ib_mesh.SetNumGridPtsY(567u);
         TS_ASSERT_EQUALS(ib_mesh.GetNumGridPtsX(), 456u);
         TS_ASSERT_EQUALS(ib_mesh.GetNumGridPtsY(), 567u);
+        
+        TS_ASSERT_EQUALS(ib_mesh.GetCellRearrangementThreshold(), 0.05);
     }
 
     void TestGetVectorFromAtoB()
@@ -897,6 +899,32 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNeighbouringElementIndices(6u), std::set<unsigned>({3u, 7u}));
         TS_ASSERT_EQUALS(p_mesh->GetNeighbouringElementIndices(7u), std::set<unsigned>({3u, 4u, 6u, 8u}));
         TS_ASSERT_EQUALS(p_mesh->GetNeighbouringElementIndices(8u), std::set<unsigned>({4u, 5u, 7u}));
+    }
+
+    void TestGetNeighbouringNodeIndices()
+    {
+        // Make a few nodes
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.1, 0.1));
+        nodes.push_back(new Node<2>(1, true, 0.2, 0.1));
+        nodes.push_back(new Node<2>(2, true, 0.3, 0.2));
+
+        // Make two elements
+        std::vector<ImmersedBoundaryElement<2,2>*> elements;
+        elements.push_back(new ImmersedBoundaryElement<2,2>(0, nodes));
+        elements.push_back(new ImmersedBoundaryElement<2,2>(1, nodes));
+
+        // Make four laminas
+        std::vector<ImmersedBoundaryElement<1,2>*> lams;
+        lams.push_back(new ImmersedBoundaryElement<1,2>(0, nodes));
+        lams.push_back(new ImmersedBoundaryElement<1,2>(1, nodes));
+        lams.push_back(new ImmersedBoundaryElement<1,2>(2, nodes));
+        lams.push_back(new ImmersedBoundaryElement<1,2>(3, nodes));
+
+        // Make a mesh
+        ImmersedBoundaryMesh<2,2> ib_mesh(nodes, elements, lams);
+
+        TS_ASSERT_EQUALS(ib_mesh.GetNeighbouringNodeIndices(1u), std::set<unsigned>({0u, 2u}));
     }
 
     void TestGetPolygonDistribution()

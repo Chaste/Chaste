@@ -74,35 +74,64 @@ public:
 
     void TestImmersedBoundaryLinearInteractionForceMethods()
     {
-        // Create a small 1x1 mesh
-        ImmersedBoundaryHoneycombMeshGenerator gen(1, 1, 3, 0.1, 0.3);
-        ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
-        p_mesh->SetNumGridPtsXAndY(32);
+        // No additive noise
+        {
+            // Create a small 1x1 mesh
+            ImmersedBoundaryHoneycombMeshGenerator gen(1, 1, 3, 0.1, 0.3);
+            ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
+            p_mesh->SetNumGridPtsXAndY(32);
 
-        // Create a minimal cell population
-        std::vector<CellPtr> cells;
-        CellsGenerator<NoCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
-        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetInteractionDistance(0.01);
+            // Create a minimal cell population
+            std::vector<CellPtr> cells;
+            CellsGenerator<NoCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+            ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+            cell_population.SetInteractionDistance(0.01);
 
-        // Create two nodes and put them in a vector of pairs
-        Node<2> node0(0, true, 0.1, 0.1);
-        Node<2> node1(0, true, 0.2, 0.1);
-        std::vector<std::pair<Node<2>*, Node<2>*> > node_pair;
-        node_pair.push_back(std::pair<Node<2>*, Node<2>*>(&node0, &node1));
+            // Create two nodes and put them in a vector of pairs
+            Node<2> node0(0, true, 0.1, 0.1);
+            Node<2> node1(0, true, 0.2, 0.1);
+            std::vector<std::pair<Node<2>*, Node<2>*> > node_pair;
+            node_pair.push_back(std::pair<Node<2>*, Node<2>*>(&node0, &node1));
 
-        // Put the nodes in different elements so force calculation is triggered
-        node0.AddElement(0);
-        node1.AddElement(1);
+            // Put the nodes in different elements so force calculation is triggered
+            node0.AddElement(0);
+            node1.AddElement(1);
 
 
-        node0.ClearAppliedForce();
-        node1.ClearAppliedForce();
+            node0.ClearAppliedForce();
+            node1.ClearAppliedForce();
 
-        ImmersedBoundaryLinearInteractionForce<2> force;
-        force.AddImmersedBoundaryForceContribution(node_pair, cell_population);
+            ImmersedBoundaryLinearInteractionForce<2> force;
+            force.AddImmersedBoundaryForceContribution(node_pair, cell_population);
+        }
+        
+        // With additive noise
+        {
+            // Create a small mesh
+            ImmersedBoundaryHoneycombMeshGenerator gen(3, 3, 3, 0.1, 0.3);
+            ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
+            p_mesh->SetNumGridPtsXAndY(32);
+
+            // Create a minimal cell population
+            std::vector<CellPtr> cells;
+            CellsGenerator<NoCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+            ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+            cell_population.SetInteractionDistance(0.01);
+
+            for (auto node_iter = p_mesh->GetNodeIteratorBegin(); node_iter != p_mesh->GetNodeIteratorEnd(); ++node_iter) {
+                node_iter->ClearAppliedForce();
+            }
+            std::vector<std::pair<Node<2>*, Node<2>*>> pairs;
+            pairs.push_back(std::pair<Node<2>*, Node<2>*>(p_mesh->GetNode(0), p_mesh->GetNode(1)));
+
+            ImmersedBoundaryLinearInteractionForce<2> force;
+            force.SetAdditiveNormalNoise(true);
+            force.AddImmersedBoundaryForceContribution(pairs, cell_population);
+        }
     }
+    
 
     void TestArchivingOfImmersedBoundaryLinearInteractionForce()
     {
@@ -357,55 +386,55 @@ public:
 
     void TestImmersedBoundaryKinematicFeedbackForce()
     {
-//        // Test member variables
-//        {
-//            auto p_force = std::make_shared<ImmersedBoundaryKinematicFeedbackForce<2>>();
-//
-//            // Set member variables
-//            p_force->SetSpringConst(1.23);
-//            TS_ASSERT_DELTA(p_force->GetSpringConst(), 1.23, 1e-6);
-//        }
-//
-//        // Test CalculateRelativeVelocityComponent() helper method
-//        {
-//            auto p_force = std::make_shared<ImmersedBoundaryKinematicFeedbackForce<2>>();
-//            SimulationTime::Destroy();
-//            SimulationTime::Instance()->SetStartTime(0.0);
-//            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10u);
-//            double dt = SimulationTime::Instance()->GetTimeStep();
-//            TS_ASSERT_DELTA(dt, 0.1, 1e-6);
-//
-//            // Two nodes previous positions (0,0) and (1,0), new positions (0,0) and (1,1).
-//            // Unit perp should be (0,1), and velocity in that direction is just 1/dt
-//            c_vector<double, 2> unit_perp;
-//            c_vector<double, 2> previous_disp = Create_c_vector(1.0, 0.0);
-//            c_vector<double, 2> current_disp = Create_c_vector(1.0, 1.0);
-//            double vel_comp = p_force->CalculateRelativeVelocityComponent(previous_disp, current_disp, unit_perp);
-//
-//            TS_ASSERT_DELTA(vel_comp, 1.0 / dt, 1e-6);
-//            TS_ASSERT_DELTA(unit_perp[0], 0.0, 1e-6);
-//            TS_ASSERT_DELTA(unit_perp[1], 1.0, 1e-6);
-//
-//            //Two nodes previous positions (2,2) and (0,0), new positions (2,0) and (0,0).
-//            // Unit perp should be root2*(0.5,-0.5), and velocity in that direction is just -root(2)/dt
-//            previous_disp = Create_c_vector(-2.0, -2.0);
-//            current_disp = Create_c_vector(-2.0, 0.0);
-//            vel_comp = p_force->CalculateRelativeVelocityComponent(previous_disp, current_disp, unit_perp);
-//
-//            TS_ASSERT_DELTA(vel_comp, -sqrt(2.0) / dt, 1e-6);
-//            TS_ASSERT_DELTA(unit_perp[0], 0.5 * sqrt(2.0), 1e-6);
-//            TS_ASSERT_DELTA(unit_perp[1], -0.5 * sqrt(2.0), 1e-6);
-//
-//            // Same as previous example, but new positions (2,4) and (0,0).
-//            // Exactly the same, but velocity component is minus what it was before.
-//            previous_disp = Create_c_vector(-2.0, -2.0);
-//            current_disp = Create_c_vector(-2.0, -4.0);
-//            vel_comp = p_force->CalculateRelativeVelocityComponent(previous_disp, current_disp, unit_perp);
-//
-//            TS_ASSERT_DELTA(vel_comp, sqrt(2.0) / dt, 1e-6);
-//            TS_ASSERT_DELTA(unit_perp[0], 0.5 * sqrt(2.0), 1e-6);
-//            TS_ASSERT_DELTA(unit_perp[1], -0.5 * sqrt(2.0), 1e-6);
-//        }
+        // Test member variables
+        {
+            auto p_force = std::make_shared<ImmersedBoundaryKinematicFeedbackForce<2>>();
+
+            // Set member variables
+            p_force->SetSpringConst(1.23);
+            TS_ASSERT_DELTA(p_force->GetSpringConst(), 1.23, 1e-6);
+        }
+
+        // Test CalculateRelativeVelocityComponent() helper method
+        {
+            auto p_force = std::make_shared<ImmersedBoundaryKinematicFeedbackForce<2>>();
+            SimulationTime::Destroy();
+            SimulationTime::Instance()->SetStartTime(0.0);
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10u);
+            double dt = SimulationTime::Instance()->GetTimeStep();
+            TS_ASSERT_DELTA(dt, 0.1, 1e-6);
+
+            // Two nodes previous positions (0,0) and (1,0), new positions (0,0) and (1,1).
+            // Unit perp should be (0,1), and velocity in that direction is just 1/dt
+            c_vector<double, 2> unit_perp;
+            c_vector<double, 2> previous_disp = Create_c_vector(1.0, 0.0);
+            c_vector<double, 2> current_disp = Create_c_vector(1.0, 1.0);
+            double vel_comp = p_force->CalculateRelativeVelocityComponent(previous_disp, current_disp, unit_perp);
+
+            TS_ASSERT_DELTA(vel_comp, 1.0 / dt, 1e-6);
+            TS_ASSERT_DELTA(unit_perp[0], 0.0, 1e-6);
+            TS_ASSERT_DELTA(unit_perp[1], 1.0, 1e-6);
+
+            //Two nodes previous positions (2,2) and (0,0), new positions (2,0) and (0,0).
+            // Unit perp should be root2*(0.5,-0.5), and velocity in that direction is just -root(2)/dt
+            previous_disp = Create_c_vector(-2.0, -2.0);
+            current_disp = Create_c_vector(-2.0, 0.0);
+            vel_comp = p_force->CalculateRelativeVelocityComponent(previous_disp, current_disp, unit_perp);
+
+            TS_ASSERT_DELTA(vel_comp, -sqrt(2.0) / dt, 1e-6);
+            TS_ASSERT_DELTA(unit_perp[0], 0.5 * sqrt(2.0), 1e-6);
+            TS_ASSERT_DELTA(unit_perp[1], -0.5 * sqrt(2.0), 1e-6);
+
+            // Same as previous example, but new positions (2,4) and (0,0).
+            // Exactly the same, but velocity component is minus what it was before.
+            previous_disp = Create_c_vector(-2.0, -2.0);
+            current_disp = Create_c_vector(-2.0, -4.0);
+            vel_comp = p_force->CalculateRelativeVelocityComponent(previous_disp, current_disp, unit_perp);
+
+            TS_ASSERT_DELTA(vel_comp, sqrt(2.0) / dt, 1e-6);
+            TS_ASSERT_DELTA(unit_perp[0], 0.5 * sqrt(2.0), 1e-6);
+            TS_ASSERT_DELTA(unit_perp[1], -0.5 * sqrt(2.0), 1e-6);
+        }
 
         // Test correct force is added
         {
@@ -582,113 +611,113 @@ public:
 
         // Test correct force is added
         {
-//            // Create a minimal cell population
-//            std::vector<Node<2>*> nodes;
-//            nodes.push_back(new Node<2>(0u, Create_c_vector(0.5, 0.5)));
-//            nodes.push_back(new Node<2>(1u, Create_c_vector(0.6, 0.6)));
-//            nodes.push_back(new Node<2>(2u, Create_c_vector(0.6, 0.5))); //unused
-//            nodes.push_back(new Node<2>(3u, Create_c_vector(0.6, 0.6)));
-//            nodes.push_back(new Node<2>(4u, Create_c_vector(0.7, 0.6)));
-//            nodes.push_back(new Node<2>(5u, Create_c_vector(0.7, 0.7))); //unused
-//
-//            std::vector<ImmersedBoundaryElement<2, 2>*> elements;
-//            elements.push_back(new ImmersedBoundaryElement<2, 2>(0u, {nodes[0], nodes[1], nodes[2]}));
-//            elements.push_back(new ImmersedBoundaryElement<2, 2>(1u, {nodes[3], nodes[4], nodes[5]}));
-//
-//            ImmersedBoundaryMesh<2, 2> mesh(nodes, elements, {}, 8u, 8u);
-//
-//            //Create cells
-//            std::vector<CellPtr> cells;
-//            auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
-//            CellsGenerator<NoCellCycleModel, 2> cells_generator;
-//            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
-//
-//            // Create cell population
-//            ImmersedBoundaryCellPopulation<2> population(mesh, cells);
-//            population.SetInteractionDistance(10.0);
-//
-//            auto p_force = std::make_shared<ImmersedBoundaryKinematicFeedbackForce<2>>();
-//
-//            // Fudge so that the force on nodes is what would be "expected" if we did not have to correct for
-//            // immersed boundary interpolation onto fluid grid
-//            double force_factor = mesh.GetAverageNodeSpacingOfElement(0u, false) / population.GetIntrinsicSpacing();
-//            p_force->SetSpringConst(1.0 / force_factor);
-//
-//            SimulationTime::Destroy();
-//            SimulationTime::Instance()->SetStartTime(0.0);
-//            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10u);
-//            double dt = SimulationTime::Instance()->GetTimeStep();
-//            TS_ASSERT_DELTA(dt, 0.1, 1e-6);
-//
-//            p_force->mPreviousLocations = {Create_c_vector(0.5, 0.5),
-//                                           Create_c_vector(0.6, 0.6),
-//                                           Create_c_vector(0.6, 0.5), //unmoved
-//                                           Create_c_vector(0.6, 0.5),
-//                                           Create_c_vector(0.7, 0.7),
-//                                           Create_c_vector(0.7, 0.7)}; //unmoved
-//
-//            std::vector<std::pair<Node<2>*, Node<2>*>> node_pairs = {std::make_pair(nodes[0], nodes[3]),
-//                                                                     std::make_pair(nodes[1], nodes[4]),
-//                                                                     std::make_pair(nodes[2], nodes[5])};
-//
-//            p_force->AddImmersedBoundaryForceContribution(node_pairs, population);
-//
-//            TS_ASSERT_DELTA(mesh.GetNode(0u)->rGetAppliedForce()[0], 0.0, 1e-6);
-//            TS_ASSERT_DELTA(mesh.GetNode(0u)->rGetAppliedForce()[1], -1.0, 1e-6);
-//
-//            TS_ASSERT_DELTA(mesh.GetNode(1u)->rGetAppliedForce()[0], -0.5, 1e-6);
-//            TS_ASSERT_DELTA(mesh.GetNode(1u)->rGetAppliedForce()[1], 0.5, 1e-6);
-//
-//            TS_ASSERT_DELTA(mesh.GetNode(2u)->rGetAppliedForce()[0], 0.0, 1e-6); //not involved
-//            TS_ASSERT_DELTA(mesh.GetNode(2u)->rGetAppliedForce()[1], 0.0, 1e-6);
-//
-//            TS_ASSERT_DELTA(mesh.GetNode(3u)->rGetAppliedForce()[0], 0.0, 1e-6); //opposite to node 0
-//            TS_ASSERT_DELTA(mesh.GetNode(3u)->rGetAppliedForce()[1], 1.0, 1e-6);
-//
-//            TS_ASSERT_DELTA(mesh.GetNode(4u)->rGetAppliedForce()[0], 0.5, 1e-6); //opposite to node 1
-//            TS_ASSERT_DELTA(mesh.GetNode(4u)->rGetAppliedForce()[1], -0.5, 1e-6);
-//
-//            TS_ASSERT_DELTA(mesh.GetNode(5u)->rGetAppliedForce()[0], 0.0, 1e-6); //not involved
-//            TS_ASSERT_DELTA(mesh.GetNode(5u)->rGetAppliedForce()[1], 0.0, 1e-6);
-//
-//
-//            // If we do the exact same thing again, but with the pairs swapped, the forces should be identical
-//            for (auto&& node : mesh.rGetNodes())
-//            {
-//                node->ClearAppliedForce();
-//            }
-//
-//            // Need to reset the previous locations, as they will have been overwritten in the previous calculation
-//            p_force->mPreviousLocations = {Create_c_vector(0.5, 0.5),
-//                                           Create_c_vector(0.6, 0.6),
-//                                           Create_c_vector(0.6, 0.5), //unmoved
-//                                           Create_c_vector(0.6, 0.5),
-//                                           Create_c_vector(0.7, 0.7),
-//                                           Create_c_vector(0.7, 0.7)}; //unmoved
-//
-//            std::vector<std::pair<Node<2>*, Node<2>*>> swapped_node_pairs = {std::make_pair(nodes[3], nodes[0]),
-//                                                                             std::make_pair(nodes[4], nodes[1]),
-//                                                                             std::make_pair(nodes[5], nodes[2])};
-//
-//            p_force->AddImmersedBoundaryForceContribution(swapped_node_pairs, population);
-//
-//            TS_ASSERT_DELTA(mesh.GetNode(0u)->rGetAppliedForce()[0], 0.0, 1e-6);
-//            TS_ASSERT_DELTA(mesh.GetNode(0u)->rGetAppliedForce()[1], -1.0, 1e-6);
-//
-//            TS_ASSERT_DELTA(mesh.GetNode(1u)->rGetAppliedForce()[0], -0.5, 1e-6);
-//            TS_ASSERT_DELTA(mesh.GetNode(1u)->rGetAppliedForce()[1], 0.5, 1e-6);
-//
-//            TS_ASSERT_DELTA(mesh.GetNode(2u)->rGetAppliedForce()[0], 0.0, 1e-6); //not involved
-//            TS_ASSERT_DELTA(mesh.GetNode(2u)->rGetAppliedForce()[1], 0.0, 1e-6);
-//
-//            TS_ASSERT_DELTA(mesh.GetNode(3u)->rGetAppliedForce()[0], 0.0, 1e-6); //opposite to node 0
-//            TS_ASSERT_DELTA(mesh.GetNode(3u)->rGetAppliedForce()[1], 1.0, 1e-6);
-//
-//            TS_ASSERT_DELTA(mesh.GetNode(4u)->rGetAppliedForce()[0], 0.5, 1e-6); //opposite to node 1
-//            TS_ASSERT_DELTA(mesh.GetNode(4u)->rGetAppliedForce()[1], -0.5, 1e-6);
-//
-//            TS_ASSERT_DELTA(mesh.GetNode(5u)->rGetAppliedForce()[0], 0.0, 1e-6); //not involved
-//            TS_ASSERT_DELTA(mesh.GetNode(5u)->rGetAppliedForce()[1], 0.0, 1e-6);
+            // Create a minimal cell population
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0u, Create_c_vector(0.5, 0.5)));
+            nodes.push_back(new Node<2>(1u, Create_c_vector(0.6, 0.6)));
+            nodes.push_back(new Node<2>(2u, Create_c_vector(0.6, 0.5))); //unused
+            nodes.push_back(new Node<2>(3u, Create_c_vector(0.6, 0.6)));
+            nodes.push_back(new Node<2>(4u, Create_c_vector(0.7, 0.6)));
+            nodes.push_back(new Node<2>(5u, Create_c_vector(0.7, 0.7))); //unused
+
+            std::vector<ImmersedBoundaryElement<2, 2>*> elements;
+            elements.push_back(new ImmersedBoundaryElement<2, 2>(0u, {nodes[0], nodes[1], nodes[2]}));
+            elements.push_back(new ImmersedBoundaryElement<2, 2>(1u, {nodes[3], nodes[4], nodes[5]}));
+
+            ImmersedBoundaryMesh<2, 2> mesh(nodes, elements, {}, 8u, 8u);
+
+            //Create cells
+            std::vector<CellPtr> cells;
+            auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
+            CellsGenerator<NoCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
+
+            // Create cell population
+            ImmersedBoundaryCellPopulation<2> population(mesh, cells);
+            population.SetInteractionDistance(10.0);
+
+            auto p_force = std::make_shared<ImmersedBoundaryKinematicFeedbackForce<2>>();
+
+            // Fudge so that the force on nodes is what would be "expected" if we did not have to correct for
+            // immersed boundary interpolation onto fluid grid
+            double force_factor = mesh.GetAverageNodeSpacingOfElement(0u, false) / population.GetIntrinsicSpacing();
+            p_force->SetSpringConst(1.0 / force_factor);
+
+            SimulationTime::Destroy();
+            SimulationTime::Instance()->SetStartTime(0.0);
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10u);
+            double dt = SimulationTime::Instance()->GetTimeStep();
+            TS_ASSERT_DELTA(dt, 0.1, 1e-6);
+
+            p_force->mPreviousLocations = {Create_c_vector(0.5, 0.5),
+                                           Create_c_vector(0.6, 0.6),
+                                           Create_c_vector(0.6, 0.5), //unmoved
+                                           Create_c_vector(0.6, 0.5),
+                                           Create_c_vector(0.7, 0.7),
+                                           Create_c_vector(0.7, 0.7)}; //unmoved
+
+            std::vector<std::pair<Node<2>*, Node<2>*>> node_pairs = {std::make_pair(nodes[0], nodes[3]),
+                                                                     std::make_pair(nodes[1], nodes[4]),
+                                                                     std::make_pair(nodes[2], nodes[5])};
+
+            p_force->AddImmersedBoundaryForceContribution(node_pairs, population);
+
+            TS_ASSERT_DELTA(mesh.GetNode(0u)->rGetAppliedForce()[0], 0.0, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(0u)->rGetAppliedForce()[1], -1.0, 1e-6);
+
+            TS_ASSERT_DELTA(mesh.GetNode(1u)->rGetAppliedForce()[0], -0.5, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(1u)->rGetAppliedForce()[1], 0.5, 1e-6);
+
+            TS_ASSERT_DELTA(mesh.GetNode(2u)->rGetAppliedForce()[0], 0.0, 1e-6); //not involved
+            TS_ASSERT_DELTA(mesh.GetNode(2u)->rGetAppliedForce()[1], 0.0, 1e-6);
+
+            TS_ASSERT_DELTA(mesh.GetNode(3u)->rGetAppliedForce()[0], 0.0, 1e-6); //opposite to node 0
+            TS_ASSERT_DELTA(mesh.GetNode(3u)->rGetAppliedForce()[1], 1.0, 1e-6);
+
+            TS_ASSERT_DELTA(mesh.GetNode(4u)->rGetAppliedForce()[0], 0.5, 1e-6); //opposite to node 1
+            TS_ASSERT_DELTA(mesh.GetNode(4u)->rGetAppliedForce()[1], -0.5, 1e-6);
+
+            TS_ASSERT_DELTA(mesh.GetNode(5u)->rGetAppliedForce()[0], 0.0, 1e-6); //not involved
+            TS_ASSERT_DELTA(mesh.GetNode(5u)->rGetAppliedForce()[1], 0.0, 1e-6);
+
+
+            // If we do the exact same thing again, but with the pairs swapped, the forces should be identical
+            for (auto&& node : mesh.rGetNodes())
+            {
+                node->ClearAppliedForce();
+            }
+
+            // Need to reset the previous locations, as they will have been overwritten in the previous calculation
+            p_force->mPreviousLocations = {Create_c_vector(0.5, 0.5),
+                                           Create_c_vector(0.6, 0.6),
+                                           Create_c_vector(0.6, 0.5), //unmoved
+                                           Create_c_vector(0.6, 0.5),
+                                           Create_c_vector(0.7, 0.7),
+                                           Create_c_vector(0.7, 0.7)}; //unmoved
+
+            std::vector<std::pair<Node<2>*, Node<2>*>> swapped_node_pairs = {std::make_pair(nodes[3], nodes[0]),
+                                                                             std::make_pair(nodes[4], nodes[1]),
+                                                                             std::make_pair(nodes[5], nodes[2])};
+
+            p_force->AddImmersedBoundaryForceContribution(swapped_node_pairs, population);
+
+            TS_ASSERT_DELTA(mesh.GetNode(0u)->rGetAppliedForce()[0], 0.0, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(0u)->rGetAppliedForce()[1], -1.0, 1e-6);
+
+            TS_ASSERT_DELTA(mesh.GetNode(1u)->rGetAppliedForce()[0], -0.5, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(1u)->rGetAppliedForce()[1], 0.5, 1e-6);
+
+            TS_ASSERT_DELTA(mesh.GetNode(2u)->rGetAppliedForce()[0], 0.0, 1e-6); //not involved
+            TS_ASSERT_DELTA(mesh.GetNode(2u)->rGetAppliedForce()[1], 0.0, 1e-6);
+
+            TS_ASSERT_DELTA(mesh.GetNode(3u)->rGetAppliedForce()[0], 0.0, 1e-6); //opposite to node 0
+            TS_ASSERT_DELTA(mesh.GetNode(3u)->rGetAppliedForce()[1], 1.0, 1e-6);
+
+            TS_ASSERT_DELTA(mesh.GetNode(4u)->rGetAppliedForce()[0], 0.5, 1e-6); //opposite to node 1
+            TS_ASSERT_DELTA(mesh.GetNode(4u)->rGetAppliedForce()[1], -0.5, 1e-6);
+
+            TS_ASSERT_DELTA(mesh.GetNode(5u)->rGetAppliedForce()[0], 0.0, 1e-6); //not involved
+            TS_ASSERT_DELTA(mesh.GetNode(5u)->rGetAppliedForce()[1], 0.0, 1e-6);
         }
 
     }
@@ -700,38 +729,38 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ImmersedBoundaryKinematicFeedbackForce.arch";
 
         {
-//            auto p_force = boost::make_shared<ImmersedBoundaryKinematicFeedbackForce<2>>();
-//
-//            std::ofstream ofs(archive_filename.c_str());
-//            boost::archive::text_oarchive output_arch(ofs);
-//
-//            // Set member variables
-//            p_force->SetSpringConst(1.23);
-//            p_force->SetAdditiveNormalNoise(true);
-//            p_force->SetNormalNoiseMean(3.45);
-//            p_force->SetNormalNoiseStdDev(4.56);
-//
-//            // Serialize via pointer to the base class
-//            auto p_base = boost::static_pointer_cast<AbstractImmersedBoundaryForce<2>>(p_force);
-//            output_arch << p_base;
-//        }
-//
-//        {
-//            boost::shared_ptr<AbstractImmersedBoundaryForce<2>> p_force;
-//
-//            // Create an input archive
-//            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
-//            boost::archive::text_iarchive input_arch(ifs);
-//
-//            // Restore from the archive
-//            input_arch >> p_force;
-//            auto p_derived_force = boost::dynamic_pointer_cast<ImmersedBoundaryKinematicFeedbackForce<2>>(p_force);
-//
-//            // Check member variables have been correctly archived
-//            TS_ASSERT_DELTA(p_derived_force->GetSpringConst(), 1.23, 1e-6);
-//            TS_ASSERT(p_derived_force->GetAdditiveNormalNoise());
-//            TS_ASSERT_DELTA(p_derived_force->GetNormalNoiseMean(), 3.45, 1e-6);
-//            TS_ASSERT_DELTA(p_derived_force->GetNormalNoiseStdDev(), 4.56, 1e-6);
+            auto p_force = boost::make_shared<ImmersedBoundaryKinematicFeedbackForce<2>>();
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Set member variables
+            p_force->SetSpringConst(1.23);
+            p_force->SetAdditiveNormalNoise(true);
+            p_force->SetNormalNoiseMean(3.45);
+            p_force->SetNormalNoiseStdDev(4.56);
+
+            // Serialize via pointer to the base class
+            auto p_base = boost::static_pointer_cast<AbstractImmersedBoundaryForce<2>>(p_force);
+            output_arch << p_base;
+        }
+
+        {
+            boost::shared_ptr<AbstractImmersedBoundaryForce<2>> p_force;
+
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            // Restore from the archive
+            input_arch >> p_force;
+            auto p_derived_force = boost::dynamic_pointer_cast<ImmersedBoundaryKinematicFeedbackForce<2>>(p_force);
+
+            // Check member variables have been correctly archived
+            TS_ASSERT_DELTA(p_derived_force->GetSpringConst(), 1.23, 1e-6);
+            TS_ASSERT(p_derived_force->GetAdditiveNormalNoise());
+            TS_ASSERT_DELTA(p_derived_force->GetNormalNoiseMean(), 3.45, 1e-6);
+            TS_ASSERT_DELTA(p_derived_force->GetNormalNoiseStdDev(), 4.56, 1e-6);
         }
     }
 

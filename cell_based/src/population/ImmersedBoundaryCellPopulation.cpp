@@ -371,6 +371,8 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(
                 displacement *= characteristic_spacing / norm_2(displacement);
             }
 
+            CheckForStepSizeException(node_iter->GetIndex(), displacement, dt);
+
             // Get new node location
             node_location += displacement;
 
@@ -460,7 +462,7 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(
                 combined_sources[source_idx]->rGetModifiableLocation() = source_location;
             }
         }
-
+        
         // Finally, call ReMesh if required
         const auto numTimeSteps = SimulationTime::Instance()->GetTimeStepsElapsed();
         if (numTimeSteps > 0 && numTimeSteps % mReMeshFrequency == 0)

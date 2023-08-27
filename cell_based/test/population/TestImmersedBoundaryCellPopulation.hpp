@@ -66,6 +66,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "FileComparison.hpp"
 #include "OffLatticeSimulation.hpp"
+#include "ShortAxisImmersedBoundaryDivisionRule.hpp"
 #include "SmartPointers.hpp"
 #include "UniformCellCycleModel.hpp"
 
@@ -121,6 +122,15 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetReMeshFrequency(), UINT_MAX);
         cell_population.SetReMeshFrequency(5u);
         TS_ASSERT_EQUALS(cell_population.GetReMeshFrequency(), 5u);
+        
+        TS_ASSERT_EQUALS(cell_population.mOutputNodeRegionToVtk, false);
+        cell_population.SetOutputNodeRegionToVtk(true);
+        TS_ASSERT_EQUALS(cell_population.mOutputNodeRegionToVtk, true);
+        
+        auto division_rule = boost::shared_ptr<ShortAxisImmersedBoundaryDivisionRule<2>>(new ShortAxisImmersedBoundaryDivisionRule<2>());
+        cell_population.SetImmersedBoundaryDivisionRule(division_rule);
+        TS_ASSERT_EQUALS(cell_population.GetImmersedBoundaryDivisionRule().get(), division_rule.get());
+        
     }
 
     void TestMeshMethods()
@@ -193,6 +203,15 @@ public:
 
         TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetLocation()[0], new_location[0], 1e-12);
         TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetLocation()[1], new_location[1], 1e-12);
+        
+        // Test GetNumLaminas
+        TS_ASSERT_EQUALS(cell_population.GetNumLaminas(), 1);
+        
+        // Test adding ndoe from population - doesn't do anything
+        TS_ASSERT_EQUALS(cell_population.AddNode(nullptr), 0);
+        
+        TetrahedralMesh<2, 2>* tet_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
+        TS_ASSERT_DIFFERS(tet_mesh, nullptr);
     }
 
     void TestWritersWithImmersedBoundaryCellPopulation()

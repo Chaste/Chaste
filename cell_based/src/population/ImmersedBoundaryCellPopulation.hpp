@@ -64,6 +64,8 @@ private:
 
     /** To allow tests to directly access UpdateNodeLocation() */
     friend class TestImmersedBoundaryPdeSolveMethods;
+    
+    friend class TestImmersedBoundaryCellPopulation;
 
     /**
      * Whether to delete the mesh when we are destroyed.
