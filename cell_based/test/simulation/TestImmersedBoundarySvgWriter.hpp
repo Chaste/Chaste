@@ -39,6 +39,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Needed for test framework
 #include <cxxtest/TestSuite.h>
 
+// Must be included before other cell_based headers
+#include "CellBasedSimulationArchiver.hpp"
+
 // Includes from projects/ImmersedBoundary
 #include "ImmersedBoundaryMesh.hpp"
 #include "ImmersedBoundarySvgWriter.hpp"
@@ -75,6 +78,44 @@ public:
     {
       
     }
+
+    void TestArchiving()
+    {
+        // Create a file for archiving
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ImmersedBoundarySvgWriter.arch";
+
+        // Separate scope to write the archive
+        {
+            // Initialise a growth modifier and set a non-standard mature target area
+            ImmersedBoundarySvgWriter<2> writer;
+            writer.SetSamplingMultiple(10u);
+            writer.SetSvgSize(1200.0);
+
+            // Create an output archive
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Serialize
+            output_arch << writer;
+        }
+
+        // Separate scope to read the archive
+        {
+            ImmersedBoundarySvgWriter<2> writer;
+
+            // Restore the modifier
+            std::ifstream ifs(archive_filename.c_str());
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> writer;
+            
+            TS_ASSERT_EQUALS(writer.GetSamplingMultiple(), 10u);
+            TS_ASSERT_EQUALS(writer.GetSvgSize(), 1200.0);
+
+        }
+    }
+
 };
 
 #endif /*TESTIMMERSEDBOUNDARYSVGWRITER_HPP_*/

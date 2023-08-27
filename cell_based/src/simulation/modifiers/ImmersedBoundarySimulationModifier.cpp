@@ -146,7 +146,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(Abstr
     mpBoxCollection = std::make_unique<ObsoleteBoxCollection<DIM>>(
             mpCellPopulation->GetInteractionDistance(),
             domain_size,
-            true,
+            true, // LCOV_EXCL_LINE
             true
     );
     mpBoxCollection->SetupLocalBoxesHalfOnly();

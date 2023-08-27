@@ -67,12 +67,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
+#include "UniformCellCycleModel.hpp"
+#include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
 
 #include "MeshBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "CaBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
+#include "ImmersedBoundaryCellPopulation.hpp"
 #include "NodeBasedCellPopulationWithBuskeUpdate.hpp"
 #include "NodeBasedCellPopulationWithParticles.hpp"
 #include "PottsBasedCellPopulation.hpp"
@@ -259,6 +262,22 @@ public:
             vertex_based_cell_population.GetCellUsingLocationIndex(6)->AddCellProperty(p_new_label);
 
             TS_ASSERT_THROWS_NOTHING(adjacency_writer.Visit(&vertex_based_cell_population));
+        }
+        
+        // Coverage of the Visit() method when called with an ImmersedBoundaryCellPopulation
+        {
+            // Create an immersed boundary cell population object
+            ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
+            ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+
+            ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+            
+            TS_ASSERT_THROWS_NOTHING(adjacency_writer.Visit(&cell_population));
         }
     }
 
@@ -1402,6 +1421,22 @@ public:
 
             TS_ASSERT_THROWS_NOTHING(t1_swaps_writer.Visit(&potts_based_cell_population));
         }
+
+        // Coverage of the Visit() method when called with an ImmersedBoundaryCellPopulation
+        {
+            // Create an immersed boundary cell population object
+            ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
+            ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+
+            ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+            
+            TS_ASSERT_THROWS_NOTHING(t1_swaps_writer.Visit(&cell_population));
+        }
     }
 
     void TestVertexT1SwapLocationsWriterArchiving()
@@ -1524,6 +1559,22 @@ public:
             PottsBasedCellPopulation<2> potts_based_cell_population(*p_potts_based_mesh, potts_based_cells);
 
             TS_ASSERT_THROWS_NOTHING(t2_swaps_writer.Visit(&potts_based_cell_population));
+        }
+
+        // Coverage of the Visit() method when called with an ImmersedBoundaryCellPopulation
+        {
+            // Create an immersed boundary cell population object
+            ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
+            ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+
+            ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+            
+            TS_ASSERT_THROWS_NOTHING(t2_swaps_writer.Visit(&cell_population));
         }
     }
 
@@ -1648,6 +1699,22 @@ public:
 
             TS_ASSERT_THROWS_NOTHING(t3_swaps_writer.Visit(&potts_based_cell_population));
         }
+
+        // Coverage of the Visit() method when called with an ImmersedBoundaryCellPopulation
+        {
+            // Create an immersed boundary cell population object
+            ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
+            ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+
+            ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+            
+            TS_ASSERT_THROWS_NOTHING(t3_swaps_writer.Visit(&cell_population));
+        }
     }
 
     void TestVertexT3SwapLocationsWriterArchiving()
@@ -1769,6 +1836,22 @@ public:
             PottsBasedCellPopulation<2> potts_based_cell_population(*p_potts_based_mesh, potts_based_cells);
 
             TS_ASSERT_THROWS_NOTHING(intersection_swaps_writer.Visit(&potts_based_cell_population));
+        }
+
+        // Coverage of the Visit() method when called with an ImmersedBoundaryCellPopulation
+        {
+            // Create an immersed boundary cell population object
+            ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
+            ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+
+            ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+            
+            TS_ASSERT_THROWS_NOTHING(intersection_swaps_writer.Visit(&cell_population));
         }
     }
 
