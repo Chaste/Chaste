@@ -289,6 +289,8 @@ public:
             TS_ASSERT_DELTA(forceGrids[1][7][5], 0.0121, 0.0001); 
             TS_ASSERT_DELTA(forceGrids[1][7][6], 0.0121, 0.0001); 
             TS_ASSERT_DELTA(forceGrids[1][7][7], 0.0020, 0.0001); 
+
+            SimulationTime::Instance()->Destroy();
         }
     }
 
@@ -359,8 +361,11 @@ public:
             TS_ASSERT_DELTA(forceGrids[2][7][6], 0.3124, 0.0001); 
             TS_ASSERT_DELTA(forceGrids[2][7][7], 0.0536, 0.0001); 
 
+            SimulationTime::Instance()->Destroy();
+
         }
         { // With zero field sums
+            SimulationTime::Instance()->SetStartTime(0.0);
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
             
             // Create a single node, single element mesh
@@ -426,6 +431,8 @@ public:
             TS_ASSERT_DELTA(forceGrids[2][7][6], 0.3124, 0.0001); 
             TS_ASSERT_DELTA(forceGrids[2][7][7], 0.0536, 0.0001); 
 
+            SimulationTime::Instance()->Destroy();
+
         }
     }
     
@@ -459,8 +466,11 @@ public:
             modifier.SetNoiseSkip(3);
             modifier.SetupConstantMemberVariables(cell_population);
 
+            SimulationTime::Instance()->Destroy();
+
         } 
         { // Too many grid points
+            SimulationTime::Instance()->SetStartTime(0.0);
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
             
             // Create a single node, single element mesh

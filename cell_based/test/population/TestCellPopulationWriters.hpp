@@ -277,7 +277,7 @@ public:
 
             ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
             
-            TS_ASSERT_THROWS_NOTHING(adjacency_writer.Visit(&cell_population));
+            TS_ASSERT_THROWS_CONTAINS(adjacency_writer.Visit(&cell_population), "presence of laminas");
         }
     }
 

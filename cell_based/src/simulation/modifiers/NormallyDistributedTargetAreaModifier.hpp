@@ -77,6 +77,8 @@ class NormallyDistributedTargetAreaModifier : public AbstractTargetAreaModifier<
         archive & boost::serialization::base_object<AbstractTargetAreaModifier<DIM> >(*this);
         archive & mGrowthDuration;
     }
+    
+    friend class TestNormallyDistributedTargetAreaModifier;
 
     /**
      * The duration that a cell's target area to increase from 0.5*mReferenceTargetArea

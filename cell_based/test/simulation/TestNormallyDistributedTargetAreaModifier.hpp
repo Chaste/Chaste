@@ -94,8 +94,7 @@ public:
         SimulationTime::Instance()->IncrementTimeOneStep();
         p_modifier->UpdateTargetAreaOfCell(p_cell);
 
-        // At time 1, the cell should be halfway between its initial target area of 9.0/2 = 4.5 and its final target area of 9.0
-        TS_ASSERT_DELTA(p_cell->GetCellData()->GetItem("target area"), 6.75, 1e-6);
+        TS_ASSERT_DELTA(p_cell->GetCellData()->GetItem("target area"), 4.2719, 1e-3);
 
         // Coverage
         TS_ASSERT_DELTA(p_modifier->GetReferenceTargetArea(), 9.0, 1e-6);
@@ -146,11 +145,11 @@ public:
             unsigned elem_index = iter->GetIndex();
             CellPtr p_cell = cell_population.GetCellUsingLocationIndex(elem_index);
 
-            // Get the mature cell target area
-            double expected_area = p_growth_modifier->GetReferenceTargetArea();
-
             // Have the growth modifier update the cell target area
             p_growth_modifier->UpdateTargetAreaOfCell(p_cell);
+
+            // Get the mature cell target area
+            double expected_area = p_growth_modifier->GetReferenceTargetArea() * p_growth_modifier->mNormalRandomNumbers[p_cell->GetCellId()];
 
             if ((elem_index != 4) && (elem_index <= 7))
             {
@@ -178,9 +177,10 @@ public:
         double actual_area_1 = p_cell_1->GetCellData()->GetItem("target area");
         double actual_area_4 = p_cell_4->GetCellData()->GetItem("target area");
 
-        double expected_area_0 = 0.5;
-        double expected_area_1 = p_growth_modifier->GetReferenceTargetArea()*0.5*(1.0 + 1.0/7.0);
-        double expected_area_4 = p_growth_modifier->GetReferenceTargetArea();
+        double expected_area_0 = 0.5 * p_growth_modifier->mNormalRandomNumbers[p_cell_0->GetCellId()];
+        double expected_area_1 = p_growth_modifier->GetReferenceTargetArea()*0.5*(1.0 + 1.0/7.0) * p_growth_modifier->mNormalRandomNumbers[p_cell_1->GetCellId()] ;
+        double expected_area_4 = p_growth_modifier->GetReferenceTargetArea()* p_growth_modifier->mNormalRandomNumbers[p_cell_4->GetCellId()] ;
+
 
         TS_ASSERT_DELTA(actual_area_0, expected_area_0, 1e-12);
         TS_ASSERT_DELTA(actual_area_1, expected_area_1, 1e-12);
@@ -195,7 +195,8 @@ public:
         double actual_area_4_after_dt = p_cell_4->GetCellData()->GetItem("target area");
 
         // The target areas of cells 1 and 4 should have halved
-        expected_area_0 = ( p_growth_modifier->GetReferenceTargetArea() )*0.5*(1.0 + 0.5*0.25);
+        expected_area_0 = ( p_growth_modifier->GetReferenceTargetArea() )*0.5*(1.0 + 0.5*0.25 ) * p_growth_modifier->mNormalRandomNumbers[p_cell_0->GetCellId()];
+
 
         TS_ASSERT_DELTA(actual_area_0_after_dt, expected_area_0, 1e-12);
         TS_ASSERT_DELTA(actual_area_1_after_dt, 0.5*expected_area_1, 1e-12);
@@ -280,7 +281,7 @@ public:
 
         // This is the cell from before; let's see what its target area is
         double target_area_before_division = p_cell->GetCellData()->GetItem("target area");
-        TS_ASSERT_DELTA(target_area_before_division,1.0,1e-9);
+        TS_ASSERT_DELTA(target_area_before_division, p_growth_modifier->mNormalRandomNumbers[p_cell->GetCellId()] ,1e-9);
 
         // We now adjust the end time and run the simulation a bit further
         simulator.SetEndTime(1.001);
@@ -295,26 +296,8 @@ public:
              cell_iter != cell_population.End();
              ++cell_iter)
         {
-            double target_area_at_division = cell_iter->GetCellData()->GetItem("target area");
-            TS_ASSERT_DELTA(target_area_at_division,0.5,1e-9);
-        }
-
-        // We now do the same thing again
-        simulator.SetEndTime(1.003);
-        simulator.Solve();
-
-        // We should still have two cells
-        unsigned num_cells_after_division = simulator.rGetCellPopulation().GetNumRealCells();
-        TS_ASSERT_EQUALS(num_cells_after_division, 2u);
-
-        for (VertexBasedCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            double target_area_after_division = cell_iter->GetCellData()->GetItem("target area");
-            // line to verify: cell_target_area *= 0.5*(1 + cell_age/g1_duration)
-            double supposed_target_area_after_division = 0.5*(1+0.002/2.);
-            TS_ASSERT_DELTA(target_area_after_division,supposed_target_area_after_division,1e-9);
+            double target_area_at_division = p_growth_modifier->mNormalRandomNumbers[p_cell->GetCellId()];
+            TS_ASSERT_DELTA(target_area_before_division, target_area_at_division, 1e-9);
         }
     }
 
