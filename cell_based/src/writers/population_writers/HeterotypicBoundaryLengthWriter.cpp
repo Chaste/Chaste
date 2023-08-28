@@ -464,29 +464,32 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(ImmersedBoun
         auto p_edge = voronoi_cell.incident_edge();
         do
         {
-            // The global node index corresponding to a voronoi cell cell is encoded in its 'color' variable
-            const unsigned twin_node_idx = p_edge->twin()->cell()->color();
-            const unsigned twin_elem_idx = *r_mesh.GetNode(twin_node_idx)->ContainingElementsBegin();
-
-            // Check if the nodes are in different elements
-            if (this_elem_idx != twin_elem_idx)
+            if (p_edge->is_finite()) 
             {
-                // Add a pair to the set, which will record the total number of unique elem-elem interactions
-                const unsigned lo_idx = std::min(this_elem_idx, twin_elem_idx);
-                const unsigned hi_idx = std::max(this_elem_idx, twin_elem_idx);
-                total_elem_pairs.insert(std::make_pair(lo_idx, hi_idx));
+                // The global node index corresponding to a voronoi cell cell is encoded in its 'color' variable
+                const unsigned twin_node_idx = p_edge->twin()->cell()->color();
+                const unsigned twin_elem_idx = *r_mesh.GetNode(twin_node_idx)->ContainingElementsBegin();
 
-                const bool this_is_labelled = pCellPopulation->GetCellUsingLocationIndex(this_elem_idx)->template HasCellProperty<CellLabel>();
-                const bool twin_is_labelled = pCellPopulation->GetCellUsingLocationIndex(twin_elem_idx)->template HasCellProperty<CellLabel>();
-
-                const double edge_length = r_mesh.CalculateLengthOfVoronoiEdge(*p_edge);
-
-                total_shared_edges_length += edge_length;
-
-                if (this_is_labelled != twin_is_labelled)
+                // Check if the nodes are in different elements
+                if (this_elem_idx != twin_elem_idx)
                 {
-                    heterotypic_boundary_length += edge_length;
-                    heterotypic_elem_pairs.insert(std::make_pair(lo_idx, hi_idx));
+                    // Add a pair to the set, which will record the total number of unique elem-elem interactions
+                    const unsigned lo_idx = std::min(this_elem_idx, twin_elem_idx);
+                    const unsigned hi_idx = std::max(this_elem_idx, twin_elem_idx);
+                    total_elem_pairs.insert(std::make_pair(lo_idx, hi_idx));
+
+                    const bool this_is_labelled = pCellPopulation->GetCellUsingLocationIndex(this_elem_idx)->template HasCellProperty<CellLabel>();
+                    const bool twin_is_labelled = pCellPopulation->GetCellUsingLocationIndex(twin_elem_idx)->template HasCellProperty<CellLabel>();
+
+                    const double edge_length = r_mesh.CalculateLengthOfVoronoiEdge(*p_edge);
+
+                    total_shared_edges_length += edge_length;
+
+                    if (this_is_labelled != twin_is_labelled)
+                    {
+                        heterotypic_boundary_length += edge_length;
+                        heterotypic_elem_pairs.insert(std::make_pair(lo_idx, hi_idx));
+                    }
                 }
             }
 

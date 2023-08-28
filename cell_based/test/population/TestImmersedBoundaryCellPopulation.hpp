@@ -212,6 +212,17 @@ public:
         
         TetrahedralMesh<2, 2>* tet_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
         TS_ASSERT_DIFFERS(tet_mesh, nullptr);
+        
+        // Test adding new cell
+        boost::shared_ptr<AbstractCellProperty> p_wildtype(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        UniformCellCycleModel* p_model = new UniformCellCycleModel();
+        CellPtr p_cell(new Cell(p_wildtype, p_model));
+        TS_ASSERT_THROWS_NOTHING(cell_population.AddCell(p_cell, *(cell_population.rGetCells().begin())));
+        
+        TS_ASSERT(cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(0));
+        
+        TS_ASSERT(!cell_population.IsCellOnBoundary(p_cell));
+
     }
 
     void TestWritersWithImmersedBoundaryCellPopulation()

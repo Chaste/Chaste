@@ -53,8 +53,10 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
                                                                    unsigned numGridPtsY)
         : mNumGridPtsX(numGridPtsX),
           mNumGridPtsY(numGridPtsY),
+          mCharacteristicNodeSpacing(DOUBLE_UNSET),
           mElementDivisionSpacing(DOUBLE_UNSET),
-          mSummaryOfNodeLocations(DOUBLE_UNSET),
+          mNeighbourDist(0.1),
+          mSummaryOfNodeLocations(0.0),
           mCellRearrangementThreshold(0.05)
 {
     // Clear mNodes and mElements

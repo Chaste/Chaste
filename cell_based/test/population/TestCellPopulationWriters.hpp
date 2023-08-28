@@ -69,6 +69,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellsGenerator.hpp"
 #include "UniformCellCycleModel.hpp"
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
+#include "ImmersedBoundaryHoneycombMeshGenerator.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
 
 #include "MeshBasedCellPopulation.hpp"
@@ -407,6 +408,22 @@ public:
 
         TS_ASSERT_THROWS_THIS(area_writer_2d.Visit(&vertex_cell_population),
             "CellPopulationAreaWriter cannot be used with a VertexBasedCellPopulation");
+
+        // Coverage of the Visit() method when called with an ImmersedBoundaryCellPopulation
+        {
+            // Create an immersed boundary cell population object
+            ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
+            ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+
+            ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+            
+            TS_ASSERT_THROWS_CONTAINS(area_writer_2d.Visit(&cell_population), "cannot be used with a ImmersedBoundaryCellPopulation");
+        }
     }
 
     void TestCellPopulationAreaWriterArchiving()
@@ -832,6 +849,40 @@ public:
             labelled_boundary_writer.CloseFile();
 
             FileComparison(results_dir + "heterotypicboundary.dat", "cell_based/test/data/TestCellPopulationWriters/heterotypicboundary.dat_vertex_twice").CompareFiles();
+        }
+
+        // Test with an ImmersedBoundaryCellPopulation
+        {
+            // Create an immersed boundary cell population object
+            ImmersedBoundaryHoneycombMeshGenerator gen(5, 5, 5, 0.05, 0.2);
+            ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+
+            ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+            cell_population.InitialiseCells();
+
+            // Label a subset of the cells
+            boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+            cell_population.GetCellUsingLocationIndex(12)->AddCellProperty(p_label);
+            
+            // Create an output directory for the writer
+            std::string output_directory = "TestHeterotypicBoundaryLengthWriterImmersedBoundary";
+            OutputFileHandler output_file_handler(output_directory, false);
+            std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+            // Create a BoundaryNodeWriter and test that the correct output is generated
+            HeterotypicBoundaryLengthWriter<2,2> labelled_boundary_writer;
+            labelled_boundary_writer.OpenOutputFile(output_file_handler);
+            labelled_boundary_writer.WriteTimeStamp();
+            labelled_boundary_writer.Visit(&cell_population);
+            labelled_boundary_writer.WriteNewline();
+            labelled_boundary_writer.CloseFile();
+
+            FileComparison(results_dir + "heterotypicboundary.dat", "cell_based/test/data/TestCellPopulationWriters/heterotypicboundary.dat_immersedboundary").CompareFiles();
         }
     }
 

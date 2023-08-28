@@ -130,6 +130,47 @@ public:
             force.SetAdditiveNormalNoise(true);
             force.AddImmersedBoundaryForceContribution(pairs, cell_population);
         }
+
+        // With noise & laminas
+        {
+            // Create a small mesh
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+            nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
+            nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
+            nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
+
+            std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(1, nodes));
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(2, nodes));
+            
+            std::vector<ImmersedBoundaryElement<1, 2>*> lams;
+            lams.push_back(new ImmersedBoundaryElement<1, 2>(0, nodes));
+            lams.push_back(new ImmersedBoundaryElement<1, 2>(1, nodes));
+            lams.push_back(new ImmersedBoundaryElement<1, 2>(2, nodes));
+            
+            ImmersedBoundaryMesh<2,2> mesh(nodes, elems, lams);
+            auto p_mesh = &mesh;
+            p_mesh->SetNumGridPtsXAndY(32);
+
+            // Create a minimal cell population
+            std::vector<CellPtr> cells;
+            CellsGenerator<NoCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+            ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+            cell_population.SetInteractionDistance(0.01);
+
+            for (auto node_iter = p_mesh->GetNodeIteratorBegin(); node_iter != p_mesh->GetNodeIteratorEnd(); ++node_iter) {
+                node_iter->ClearAppliedForce();
+            }
+            std::vector<std::pair<Node<2>*, Node<2>*>> pairs;
+            pairs.push_back(std::pair<Node<2>*, Node<2>*>(p_mesh->GetNode(0), p_mesh->GetNode(1)));
+
+            ImmersedBoundaryLinearInteractionForce<2> force;
+            force.SetAdditiveNormalNoise(true);
+            force.AddImmersedBoundaryForceContribution(pairs, cell_population);
+        }
     }
     
 
