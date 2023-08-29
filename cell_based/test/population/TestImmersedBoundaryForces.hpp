@@ -227,8 +227,8 @@ public:
 
     void TestImmersedBoundaryMorseInteractionForceMethods()
     {
-        // Create a small 1x1 mesh
-        ImmersedBoundaryHoneycombMeshGenerator gen(1, 1, 3, 0.1, 0.3);
+        // Create a small 3x3 mesh
+        ImmersedBoundaryHoneycombMeshGenerator gen(3, 3, 3, 0.1, 0.3);
         ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
         p_mesh->SetNumGridPtsXAndY(32);
 
@@ -241,7 +241,7 @@ public:
 
         // Create two nodes and put them in a vector of pairs
         Node<2> node0(0, true, 0.1, 0.1);
-        Node<2> node1(0, true, 0.2, 0.1);
+        Node<2> node1(0, true, 0.102, 0.1);
         std::vector<std::pair<Node<2>*, Node<2>*> > node_pair;
         node_pair.push_back(std::pair<Node<2>*, Node<2>*>(&node0, &node1));
 
@@ -313,6 +313,34 @@ public:
     void TestImmersedBoundaryLinearMembraneForce()
     {
         ///\todo Test this class
+        // Create a small 3x3 mesh
+        ImmersedBoundaryHoneycombMeshGenerator gen(3, 3, 3, 0.1, 0.3);
+        ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
+        p_mesh->SetNumGridPtsXAndY(32);
+
+        // Create a minimal cell population
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetInteractionDistance(0.01);
+
+        // Create two nodes and put them in a vector of pairs
+        Node<2> node0(0, true, 0.1, 0.1);
+        Node<2> node1(0, true, 0.102, 0.1);
+        std::vector<std::pair<Node<2>*, Node<2>*> > node_pair;
+        node_pair.push_back(std::pair<Node<2>*, Node<2>*>(&node0, &node1));
+
+        // Put the nodes in different elements so force calculation is triggered
+        node0.AddElement(0);
+        node1.AddElement(1);
+
+
+        node0.ClearAppliedForce();
+        node1.ClearAppliedForce();
+
+        ImmersedBoundaryLinearMembraneForce<2> force;
+        force.AddImmersedBoundaryForceContribution(node_pair, cell_population);
     }
 
     void TestArchivingOfImmersedBoundaryLinearMembraneForce()
@@ -369,6 +397,34 @@ public:
     void TestImmersedBoundaryMorseMembraneForce()
     {
         ///\todo Test this class
+        // Create a small 3x3 mesh
+        ImmersedBoundaryHoneycombMeshGenerator gen(3, 3, 3, 0.1, 0.3);
+        ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
+        p_mesh->SetNumGridPtsXAndY(32);
+
+        // Create a minimal cell population
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetInteractionDistance(0.01);
+
+        // Create two nodes and put them in a vector of pairs
+        Node<2> node0(0, true, 0.1, 0.1);
+        Node<2> node1(0, true, 0.102, 0.1);
+        std::vector<std::pair<Node<2>*, Node<2>*> > node_pair;
+        node_pair.push_back(std::pair<Node<2>*, Node<2>*>(&node0, &node1));
+
+        // Put the nodes in different elements so force calculation is triggered
+        node0.AddElement(0);
+        node1.AddElement(1);
+
+
+        node0.ClearAppliedForce();
+        node1.ClearAppliedForce();
+
+        ImmersedBoundaryMorseMembraneForce<2> force;
+        force.AddImmersedBoundaryForceContribution(node_pair, cell_population);
     }
 
     void TestArchivingOfImmersedBoundaryMorseMembraneForce()
@@ -677,12 +733,14 @@ public:
             ImmersedBoundaryCellPopulation<2> population(mesh, cells);
             population.SetInteractionDistance(10.0);
 
-            auto p_force = std::make_shared<ImmersedBoundaryKinematicFeedbackForce<2>>();
+            auto p_force = std::make_shared<ImmersedBoundaryLinearDifferentialAdhesionForce<2>>();
 
             // Fudge so that the force on nodes is what would be "expected" if we did not have to correct for
             // immersed boundary interpolation onto fluid grid
-            double force_factor = mesh.GetAverageNodeSpacingOfElement(0u, false) / population.GetIntrinsicSpacing();
-            p_force->SetSpringConst(1.0 / force_factor);
+            p_force->SetLabelledCellToLabelledCellSpringConst(2.0);
+            p_force->SetLabelledCellToCellSpringConst(2.0);
+            p_force->SetCellToCellSpringConst(2.0);
+            p_force->SetRestLength(0.2);
 
             SimulationTime::Destroy();
             SimulationTime::Instance()->SetStartTime(0.0);
@@ -690,12 +748,6 @@ public:
             double dt = SimulationTime::Instance()->GetTimeStep();
             TS_ASSERT_DELTA(dt, 0.1, 1e-6);
 
-            p_force->mPreviousLocations = {Create_c_vector(0.5, 0.5),
-                                           Create_c_vector(0.6, 0.6),
-                                           Create_c_vector(0.6, 0.5), //unmoved
-                                           Create_c_vector(0.6, 0.5),
-                                           Create_c_vector(0.7, 0.7),
-                                           Create_c_vector(0.7, 0.7)}; //unmoved
 
             std::vector<std::pair<Node<2>*, Node<2>*>> node_pairs = {std::make_pair(nodes[0], nodes[3]),
                                                                      std::make_pair(nodes[1], nodes[4]),
@@ -728,14 +780,6 @@ public:
                 node->ClearAppliedForce();
             }
 
-            // Need to reset the previous locations, as they will have been overwritten in the previous calculation
-            p_force->mPreviousLocations = {Create_c_vector(0.5, 0.5),
-                                           Create_c_vector(0.6, 0.6),
-                                           Create_c_vector(0.6, 0.5), //unmoved
-                                           Create_c_vector(0.6, 0.5),
-                                           Create_c_vector(0.7, 0.7),
-                                           Create_c_vector(0.7, 0.7)}; //unmoved
-
             std::vector<std::pair<Node<2>*, Node<2>*>> swapped_node_pairs = {std::make_pair(nodes[3], nodes[0]),
                                                                              std::make_pair(nodes[4], nodes[1]),
                                                                              std::make_pair(nodes[5], nodes[2])};
@@ -767,16 +811,15 @@ public:
     {
         EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
         OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ImmersedBoundaryKinematicFeedbackForce.arch";
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ImmersedBoundaryLinearDifferentialAdhesionForce.arch";
 
         {
-            auto p_force = boost::make_shared<ImmersedBoundaryKinematicFeedbackForce<2>>();
+            auto p_force = boost::make_shared<ImmersedBoundaryLinearDifferentialAdhesionForce<2>>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
             // Set member variables
-            p_force->SetSpringConst(1.23);
             p_force->SetAdditiveNormalNoise(true);
             p_force->SetNormalNoiseMean(3.45);
             p_force->SetNormalNoiseStdDev(4.56);
@@ -795,10 +838,9 @@ public:
 
             // Restore from the archive
             input_arch >> p_force;
-            auto p_derived_force = boost::dynamic_pointer_cast<ImmersedBoundaryKinematicFeedbackForce<2>>(p_force);
+            auto p_derived_force = boost::dynamic_pointer_cast<ImmersedBoundaryLinearDifferentialAdhesionForce<2>>(p_force);
 
             // Check member variables have been correctly archived
-            TS_ASSERT_DELTA(p_derived_force->GetSpringConst(), 1.23, 1e-6);
             TS_ASSERT(p_derived_force->GetAdditiveNormalNoise());
             TS_ASSERT_DELTA(p_derived_force->GetNormalNoiseMean(), 3.45, 1e-6);
             TS_ASSERT_DELTA(p_derived_force->GetNormalNoiseStdDev(), 4.56, 1e-6);
@@ -911,6 +953,29 @@ public:
             {
                 FileFinder generated_file = output_file_handler.FindFile("ib_morse_mem.parameters");
                 FileFinder reference_file("cell_based/test/data/TestForces/ib_morse_mem.parameters",
+                                          RelativeTo::ChasteSourceRoot);
+                FileComparison comparer(generated_file, reference_file);
+                TS_ASSERT(comparer.CompareFiles());
+            }
+        }
+
+        // Test with ImmersedBoundaryDifferentialAdhesion
+        {
+            ImmersedBoundaryLinearDifferentialAdhesionForce<2> cell_cell_force;
+            cell_cell_force.SetRestLength(2.34);
+            cell_cell_force.SetAdditiveNormalNoise(true);
+            cell_cell_force.SetNormalNoiseMean(5.67);
+            cell_cell_force.SetNormalNoiseStdDev(6.78);
+
+            TS_ASSERT_EQUALS(cell_cell_force.GetIdentifier(), "ImmersedBoundaryLinearDifferentialAdhesionForce-2");
+
+            out_stream cell_cell_force_parameter_file = output_file_handler.OpenOutputFile("ib_diff_ad.parameters");
+            cell_cell_force.OutputImmersedBoundaryForceParameters(cell_cell_force_parameter_file);
+            cell_cell_force_parameter_file->close();
+
+            {
+                FileFinder generated_file = output_file_handler.FindFile("ib_diff_ad.parameters");
+                FileFinder reference_file("cell_based/test/data/TestForces/ib_diff_ad.parameters",
                                           RelativeTo::ChasteSourceRoot);
                 FileComparison comparer(generated_file, reference_file);
                 TS_ASSERT(comparer.CompareFiles());

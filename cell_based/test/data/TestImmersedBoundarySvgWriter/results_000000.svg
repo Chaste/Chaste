@@ -15,8 +15,14 @@
 	.glyph_2{fill:DarkGreen;}
 </style>
 <rect class="bg_rect" width="1600" height="1600"/>
-<circle class="node_0" cx="880" cy="720" r="217.478"/>
-<circle class="node_0" cx="320" cy="1280" r="217.478"/>
-<circle class="node_0" cx="160" cy="1280" r="217.478"/>
-<circle class="node_0" cx="1760" cy="1280" r="217.478"/>
+<circle class="node_0" cx="880" cy="720" r="117.879"/>
+<circle class="node_0" cx="320" cy="1280" r="117.879"/>
+<circle class="node_0" cx="16" cy="1280" r="117.879"/>
+<circle class="node_0" cx="1616" cy="1280" r="117.879"/>
+<circle class="node_0" cx="1584" cy="1280" r="117.879"/>
+<circle class="node_0" cx="-16" cy="1280" r="117.879"/>
+<circle class="node_0" cx="640" cy="1584" r="117.879"/>
+<circle class="node_0" cx="640" cy="-16" r="117.879"/>
+<circle class="node_0" cx="1120" cy="16" r="117.879"/>
+<circle class="node_0" cx="1120" cy="1616" r="117.879"/>
 </svg>

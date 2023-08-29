@@ -144,7 +144,10 @@ public:
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, true, 0.55, 0.55));
         nodes.push_back(new Node<2>(1, true, 0.2, 0.2));
-        nodes.push_back(new Node<2>(2, true, 0.1, 0.2));
+        nodes.push_back(new Node<2>(2, true, 0.01, 0.2));
+        nodes.push_back(new Node<2>(2, true, 0.99, 0.2));
+        nodes.push_back(new Node<2>(2, true, 0.4, 0.01));
+        nodes.push_back(new Node<2>(2, true, 0.7, 0.99));
 
         std::vector<ImmersedBoundaryElement<2, 2>*> elems;
         elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));

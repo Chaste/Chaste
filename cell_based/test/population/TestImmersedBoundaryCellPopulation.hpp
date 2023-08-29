@@ -224,6 +224,26 @@ public:
         TS_ASSERT(!cell_population.IsCellOnBoundary(p_cell));
 
     }
+    
+    void TestStepSizeException()
+    {
+        // Create an immersed boundary cell population object
+        ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
+        ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+
+        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetThrowsStepSizeException(true);
+        
+        c_vector<double, 2> displacement;
+        displacement[0] = 0.8;
+        displacement[1] = 0.8;
+        TS_ASSERT_THROWS_ANYTHING(cell_population.CheckForStepSizeException(0, displacement, 0.1));
+    }
 
     void TestWritersWithImmersedBoundaryCellPopulation()
     {
@@ -303,6 +323,7 @@ public:
         {
             cell_iter->GetCellData()->SetItem("var0", 0.0);
             cell_iter->GetCellData()->SetItem("var1", 3.0);
+            cell_iter->GetCellData()->SetItem("target area", 0.1);
         }
 
         std::string output_directory = "TestImmersedBoundaryPopulationWriters";
