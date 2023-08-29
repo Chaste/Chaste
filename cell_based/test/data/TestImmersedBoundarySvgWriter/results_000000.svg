@@ -1,0 +1,22 @@
+<svg version="1.1" baseProfile="full" width="1600px" height="1600px" viewBox="0 0 1600 1600" xmlns="http://www.w3.org/2000/svg">
+<style type="text/css">
+	.bg_rect{fill:darkgray;}
+	.node_0{fill:#990000;}
+	.node_1{fill:#cc0000;}
+	.node_2{fill:#e68a00;}
+	.node_3{fill:#ff9900;}
+	.node_4{fill:#006666;}
+	.node_5{fill:#009999;}
+	.node_6{fill:#000099;}
+	.node_7{fill:#0000cc;}
+	.node_8{fill:#FFFFFF;}
+	.glyph_0{fill:DarkRed;}
+	.glyph_1{fill:DarkBlue;}
+	.glyph_2{fill:DarkGreen;}
+</style>
+<rect class="bg_rect" width="1600" height="1600"/>
+<circle class="node_0" cx="880" cy="720" r="217.478"/>
+<circle class="node_0" cx="320" cy="1280" r="217.478"/>
+<circle class="node_0" cx="160" cy="1280" r="217.478"/>
+<circle class="node_0" cx="1760" cy="1280" r="217.478"/>
+</svg>

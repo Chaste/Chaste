@@ -1188,6 +1188,21 @@ public:
 
         TS_ASSERT_THROWS_THIS(node_velocity_writer.Visit(&potts_based_cell_population),
             "NodeVelocityWriter cannot be used with a PottsBasedCellPopulation");
+        
+        
+        // Create an immersed boundary cell population object
+        ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
+        ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+
+        ImmersedBoundaryCellPopulation<2> ib_cell_population(*p_mesh, cells);
+        
+        TS_ASSERT_THROWS_CONTAINS(node_velocity_writer.Visit(&ib_cell_population), "NodeVelocityWriter cannot be used with a ImmersedBoundaryCellPopulation");
+        
     }
 
     void TestNodeVelocityWriterArchiving()
@@ -1340,6 +1355,28 @@ public:
                  cell_iter->GetCellData()->SetItem("this average", 1.0);
             }
             TS_ASSERT_THROWS_NOTHING(radial_writer.Visit(&potts_based_cell_population));
+        }
+        
+        { // Test with an immersed boundary population
+            // Create an immersed boundary cell population object
+            ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
+            ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+
+            ImmersedBoundaryCellPopulation<2> ib_cell_population(*p_mesh, cells);
+
+            for (AbstractCellPopulation<2>::Iterator cell_iter=ib_cell_population.Begin();
+                 cell_iter!=ib_cell_population.End();
+                 ++cell_iter)
+            {
+                 cell_iter->GetCellData()->SetItem("this average", 1.0);
+            }
+            
+            TS_ASSERT_THROWS_NOTHING(radial_writer.Visit(&ib_cell_population));
         }
     }
 
@@ -2032,6 +2069,18 @@ public:
 
         TS_ASSERT_THROWS_THIS(voronoi_writer_2d.Visit(&vertex_cell_population),
             "VoronoiDataWriter cannot be used with a VertexBasedCellPopulation");
+        
+        // Test the correct exception is thrown if using an ImmersedBoundaryCellPopulation
+        ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
+        ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+
+        std::vector<CellPtr> ib_cells;
+        CellsGenerator<UniformCellCycleModel, 2> ib_cells_generator;
+        ib_cells_generator.GenerateBasicRandom(ib_cells, p_mesh->GetNumElements(), p_diff_type);
+
+        ImmersedBoundaryCellPopulation<2> ib_cell_population(*p_mesh, ib_cells);
+        
+        TS_ASSERT_THROWS_CONTAINS(voronoi_writer_2d.Visit(&ib_cell_population), "VoronoiDataWriter cannot be used with a ImmersedBoundaryCellPopulation");
     }
 
     void TestVoronoiDataWriterArchiving()
