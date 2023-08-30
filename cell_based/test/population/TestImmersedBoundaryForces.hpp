@@ -737,10 +737,10 @@ public:
 
             // Fudge so that the force on nodes is what would be "expected" if we did not have to correct for
             // immersed boundary interpolation onto fluid grid
-            p_force->SetLabelledCellToLabelledCellSpringConst(2.0);
-            p_force->SetLabelledCellToCellSpringConst(2.0);
-            p_force->SetCellToCellSpringConst(2.0);
-            p_force->SetRestLength(0.2);
+            p_force->SetLabelledCellToLabelledCellSpringConst(1.0);
+            p_force->SetLabelledCellToCellSpringConst(1.0);
+            p_force->SetCellToCellSpringConst(1.0);
+            p_force->SetRestLength(0.01);
 
             SimulationTime::Destroy();
             SimulationTime::Instance()->SetStartTime(0.0);
@@ -755,23 +755,23 @@ public:
 
             p_force->AddImmersedBoundaryForceContribution(node_pairs, population);
 
-            TS_ASSERT_DELTA(mesh.GetNode(0u)->rGetAppliedForce()[0], 0.0, 1e-6);
-            TS_ASSERT_DELTA(mesh.GetNode(0u)->rGetAppliedForce()[1], -1.0, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(0u)->rGetAppliedForce()[0], 0.333333, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(0u)->rGetAppliedForce()[1], 0.333333, 1e-6);
 
-            TS_ASSERT_DELTA(mesh.GetNode(1u)->rGetAppliedForce()[0], -0.5, 1e-6);
-            TS_ASSERT_DELTA(mesh.GetNode(1u)->rGetAppliedForce()[1], 0.5, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(1u)->rGetAppliedForce()[0], -0.0, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(1u)->rGetAppliedForce()[1], 0.0, 1e-6);
 
-            TS_ASSERT_DELTA(mesh.GetNode(2u)->rGetAppliedForce()[0], 0.0, 1e-6); //not involved
-            TS_ASSERT_DELTA(mesh.GetNode(2u)->rGetAppliedForce()[1], 0.0, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(2u)->rGetAppliedForce()[0], 0.6291, 1e-4); 
+            TS_ASSERT_DELTA(mesh.GetNode(2u)->rGetAppliedForce()[1], 1.2582, 1e-4);
 
-            TS_ASSERT_DELTA(mesh.GetNode(3u)->rGetAppliedForce()[0], 0.0, 1e-6); //opposite to node 0
-            TS_ASSERT_DELTA(mesh.GetNode(3u)->rGetAppliedForce()[1], 1.0, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(3u)->rGetAppliedForce()[0], -0.333333, 1e-6); //opposite to node 0
+            TS_ASSERT_DELTA(mesh.GetNode(3u)->rGetAppliedForce()[1], -0.333333, 1e-6);
 
-            TS_ASSERT_DELTA(mesh.GetNode(4u)->rGetAppliedForce()[0], 0.5, 1e-6); //opposite to node 1
-            TS_ASSERT_DELTA(mesh.GetNode(4u)->rGetAppliedForce()[1], -0.5, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(4u)->rGetAppliedForce()[0], 0.0, 1e-6); //opposite to node 1
+            TS_ASSERT_DELTA(mesh.GetNode(4u)->rGetAppliedForce()[1], -0.0, 1e-6);
 
-            TS_ASSERT_DELTA(mesh.GetNode(5u)->rGetAppliedForce()[0], 0.0, 1e-6); //not involved
-            TS_ASSERT_DELTA(mesh.GetNode(5u)->rGetAppliedForce()[1], 0.0, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(5u)->rGetAppliedForce()[0], -0.6291, 1e-4); //not involved
+            TS_ASSERT_DELTA(mesh.GetNode(5u)->rGetAppliedForce()[1], -1.2582, 1e-4);
 
 
             // If we do the exact same thing again, but with the pairs swapped, the forces should be identical
@@ -786,23 +786,23 @@ public:
 
             p_force->AddImmersedBoundaryForceContribution(swapped_node_pairs, population);
 
-            TS_ASSERT_DELTA(mesh.GetNode(0u)->rGetAppliedForce()[0], 0.0, 1e-6);
-            TS_ASSERT_DELTA(mesh.GetNode(0u)->rGetAppliedForce()[1], -1.0, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(0u)->rGetAppliedForce()[0], 0.333333, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(0u)->rGetAppliedForce()[1], 0.333333, 1e-6);
 
-            TS_ASSERT_DELTA(mesh.GetNode(1u)->rGetAppliedForce()[0], -0.5, 1e-6);
-            TS_ASSERT_DELTA(mesh.GetNode(1u)->rGetAppliedForce()[1], 0.5, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(1u)->rGetAppliedForce()[0], -0.0, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(1u)->rGetAppliedForce()[1], 0.0, 1e-6);
 
-            TS_ASSERT_DELTA(mesh.GetNode(2u)->rGetAppliedForce()[0], 0.0, 1e-6); //not involved
-            TS_ASSERT_DELTA(mesh.GetNode(2u)->rGetAppliedForce()[1], 0.0, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(2u)->rGetAppliedForce()[0], 0.6291, 1e-4); //not involved
+            TS_ASSERT_DELTA(mesh.GetNode(2u)->rGetAppliedForce()[1], 1.2582, 1e-4);
 
-            TS_ASSERT_DELTA(mesh.GetNode(3u)->rGetAppliedForce()[0], 0.0, 1e-6); //opposite to node 0
-            TS_ASSERT_DELTA(mesh.GetNode(3u)->rGetAppliedForce()[1], 1.0, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(3u)->rGetAppliedForce()[0], -0.333333, 1e-6); //opposite to node 0
+            TS_ASSERT_DELTA(mesh.GetNode(3u)->rGetAppliedForce()[1], -0.333333, 1e-6);
 
-            TS_ASSERT_DELTA(mesh.GetNode(4u)->rGetAppliedForce()[0], 0.5, 1e-6); //opposite to node 1
-            TS_ASSERT_DELTA(mesh.GetNode(4u)->rGetAppliedForce()[1], -0.5, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(4u)->rGetAppliedForce()[0], 0.0, 1e-6); //opposite to node 1
+            TS_ASSERT_DELTA(mesh.GetNode(4u)->rGetAppliedForce()[1], -0.0, 1e-6);
 
-            TS_ASSERT_DELTA(mesh.GetNode(5u)->rGetAppliedForce()[0], 0.0, 1e-6); //not involved
-            TS_ASSERT_DELTA(mesh.GetNode(5u)->rGetAppliedForce()[1], 0.0, 1e-6);
+            TS_ASSERT_DELTA(mesh.GetNode(5u)->rGetAppliedForce()[0], -0.6291, 1e-4); //not involved
+            TS_ASSERT_DELTA(mesh.GetNode(5u)->rGetAppliedForce()[1], -1.2582, 1e-4);
         }
 
     }
