@@ -77,7 +77,7 @@ public:
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -88,7 +88,7 @@ public:
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Test that the mesh and cells are correctly assigned
-        TS_ASSERT_EQUALS(&(cell_population.rGetMesh()), p_mesh);
+        TS_ASSERT_EQUALS(&(cell_population.rGetMesh()), p_mesh.get());
         TS_ASSERT_EQUALS(cell_population.GetNumElements(), p_mesh->GetNumElements());
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), p_mesh->GetNumNodes());
 
@@ -133,7 +133,7 @@ public:
     {
         // Create a Potts-based cell population but do not try to validate
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
         p_mesh->GetElement(0)->MarkAsDeleted();
 
         std::vector<CellPtr> cells;
@@ -164,7 +164,7 @@ public:
     {
         // Create a simple Potts mesh
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -231,7 +231,7 @@ public:
 
         // Create another simple potts-based mesh
         PottsMeshGenerator<2> generator2(4, 2, 2, 4, 2, 2);
-        PottsMesh<2>* p_mesh2 = generator2.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh2 = generator2.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells2;
@@ -254,7 +254,7 @@ public:
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -282,7 +282,7 @@ public:
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -308,7 +308,7 @@ public:
     {
         // Create a simple 2D PottsMesh with one cell
         PottsMeshGenerator<2> generator(2, 1, 2, 2, 1, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -355,7 +355,7 @@ public:
     {
         // Create a simple 2D PottsMesh with two cells
         PottsMeshGenerator<2> generator(4, 2, 2, 2, 1, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -389,7 +389,7 @@ public:
     {
         // Create a simple 2D PottsMesh with two cells
         PottsMeshGenerator<2> generator(4, 2, 2, 2, 1, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -426,7 +426,7 @@ public:
 //    {
 //        // Create a simple 2D PottsMesh
 //        PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
-//        PottsMesh<2>* p_mesh = generator.GetMesh();
+//        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 //
 //        // Create cells
 //        std::vector<CellPtr> cells;
@@ -458,7 +458,7 @@ public:
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(6, 2, 2, 6, 2, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -518,7 +518,7 @@ public:
     {
         // Create a Potts-based cell population
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -574,7 +574,7 @@ public:
     {
         // Create a Potts-based cell population
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -604,7 +604,7 @@ public:
     {
         // Create a simple 2D PottsMesh with one cell
         PottsMeshGenerator<2> generator(2, 1, 2, 2, 1, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -729,7 +729,7 @@ public:
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -752,7 +752,7 @@ public:
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -783,7 +783,7 @@ public:
     void TestGetCellDataItemAtPdeNode()
     {
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;

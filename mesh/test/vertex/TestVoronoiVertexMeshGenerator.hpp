@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTVORONOIVERTEXMESHGENERATOR_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include <boost/shared_ptr.hpp>
 
 #include "VoronoiVertexMeshGenerator.hpp"
 #include "MutableVertexMesh.hpp"
@@ -54,8 +55,8 @@ public:
 
         // Generate a mesh that is 20 cells wide, 12 high, with 4 Lloyd's relaxation steps and target average element area 1.23
         VoronoiVertexMeshGenerator generator(20, 12, 4, 1.23);
-        MutableVertexMesh<2,2>* p_mesh_a = generator.GetMesh();
-        MutableVertexMesh<2,2>* p_mesh_b = generator.GetMeshAfterReMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh_a = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh_b = generator.GetMeshAfterReMesh();
 
         // Check basic mesh properties are correct
         TS_ASSERT_EQUALS(p_mesh_a->GetNumNodes(), 550u);
@@ -83,7 +84,7 @@ public:
 
         // Generate a mesh that is 3 cells wide, 2 high, with 3 Lloyd's relaxation steps and target average element area 100.0
         VoronoiVertexMeshGenerator generator(3, 2, 3, 100.0);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Check basic mesh properties are correct
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 23u);
@@ -213,7 +214,7 @@ public:
 
         // Generate and get a toroidal mesh
         VoronoiVertexMeshGenerator generator(19, 11, 7, 1.0);
-        Toroidal2dVertexMesh* p_tor_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_tor_mesh = generator.GetToroidalMesh();
 
         // Check nothing happens when we ReMesh()
         TS_ASSERT_THROWS_NOTHING(p_tor_mesh->ReMesh());
@@ -235,7 +236,7 @@ public:
         double height = num_y * sqrt(area);
 
         VoronoiVertexMeshGenerator generator(num_x, num_y, num_relaxation_steps, area);
-        Toroidal2dVertexMesh* p_tor_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_tor_mesh = generator.GetToroidalMesh();
 
         // Verify that all node locations have been moved to be >= 0 and <= width & height
         for (unsigned node_idx = 0 ; node_idx < p_tor_mesh->GetNumNodes() ; node_idx++ )

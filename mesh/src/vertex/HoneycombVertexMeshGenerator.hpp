@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 #include <vector>
 
+#include <boost/shared_ptr.hpp>
 #include "MutableVertexMesh.hpp"
 
 /**
@@ -52,7 +53,7 @@ class HoneycombVertexMeshGenerator
 protected:
 
     /** A pointer to the mesh this class creates */
-    MutableVertexMesh<2,2>* mpMesh;
+    boost::shared_ptr<MutableVertexMesh<2,2> > mpMesh;
 
 public:
 
@@ -81,14 +82,14 @@ public:
     }
 
     /**
-     * Destructor - deletes the mesh object and pointer.
+     * Empty destructor.
      */
-    virtual ~HoneycombVertexMeshGenerator();
+    virtual ~HoneycombVertexMeshGenerator() = default;
 
     /**
      * @return a 2D honeycomb mesh
      */
-    virtual MutableVertexMesh<2,2>* GetMesh();
+    virtual boost::shared_ptr<MutableVertexMesh<2,2> > GetMesh();
 };
 
 #endif /*HONEYCOMBVERTEXMESHGENERATOR_HPP_*/

@@ -636,7 +636,7 @@ public:
         {
             double x = mesh.GetNode(i)->GetPoint()[0];
             double y = mesh.GetNode(i)->GetPoint()[1];
-            init_cond[i] = sin(0.5*M_PI*x)*sin(M_PI*y)+x;;
+            init_cond[i] = sin(0.5*M_PI*x)*sin(M_PI*y)+x;
         }
         Vec initial_condition = PetscTools::CreateVec(init_cond);
         solver.SetInitialCondition(initial_condition);

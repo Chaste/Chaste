@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 #include <vector>
 
+#include <boost/shared_ptr.hpp>
 #include "PottsMesh.hpp"
 
 /**
@@ -54,7 +55,7 @@ class PottsMeshGenerator
 protected:
 
     /** A pointer to the mesh this class creates */
-    PottsMesh<DIM>* mpMesh;
+    boost::shared_ptr<PottsMesh<DIM> > mpMesh;
 
 public:
 
@@ -91,10 +92,10 @@ public:
                        bool isPeriodicInZ = false);
 
     /**
-     * Destructor - deletes the mesh object and pointer.
+     * Empty destructor.
      */
-    virtual ~PottsMeshGenerator();
-
+    virtual ~PottsMeshGenerator() = default;
+    
     /**
      * Helper method to calculate the Moore and Von Neumann Neighbourhoods of all nodes
      *
@@ -105,7 +106,7 @@ public:
     /**
      * @return a Cuboid or rectangular Potts mesh.
      */
-    virtual PottsMesh<DIM>* GetMesh();
+    virtual boost::shared_ptr<PottsMesh<DIM> > GetMesh();
 };
 
 #endif /*POTTSMESHGENERATOR_HPP_*/

@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCYLINDRICALHONEYCOMBMESHGENERATOR_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include <boost/shared_ptr.hpp>
 
 #include "CylindricalHoneycombMeshGenerator.hpp"
 
@@ -72,12 +73,12 @@ public:
         unsigned ghosts = 2;
 
         CylindricalHoneycombMeshGenerator generator(num_cells_width, num_cells_depth, ghosts);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Check the mesh
         TS_ASSERT_THROWS_THIS(generator.GetMesh(),"A cylindrical mesh was created but a normal mesh is being requested.");
 
-        Output2DNodesToFileCylindrical(p_mesh, "cylindrical_node_positions.dat");
+        Output2DNodesToFileCylindrical(p_mesh.get(), "cylindrical_node_positions.dat");
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), (num_cells_width)*(num_cells_depth+2*ghosts));
 
         // Zeroth node
@@ -148,12 +149,12 @@ public:
         double x_factor = width/(double)num_cells_width;
 
         CylindricalHoneycombMeshGenerator generator(num_cells_width, num_cells_depth, ghosts, width/num_cells_width);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Check the mesh
         TS_ASSERT_THROWS_THIS(generator.GetMesh(),"A cylindrical mesh was created but a normal mesh is being requested.");
 
-        Output2DNodesToFileCylindrical(p_mesh, "cylindrical_node_positions.dat");
+        Output2DNodesToFileCylindrical(p_mesh.get(), "cylindrical_node_positions.dat");
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(),(num_cells_width)*(num_cells_depth+2*ghosts));
 
         // Zeroth node

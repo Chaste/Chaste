@@ -36,6 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CylindricalHoneycombMeshGenerator.hpp"
 
 #include <boost/foreach.hpp>
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 #include "RandomNumberGenerator.hpp"
 #include "MathsCustomFunctions.hpp"
 #include "ChasteSyscalls.hpp"
@@ -204,7 +206,7 @@ CylindricalHoneycombMeshGenerator::CylindricalHoneycombMeshGenerator(unsigned nu
     // Nested scope so the reader closes files before we delete them below.
     {
         TrianglesMeshReader<2,2> mesh_reader(output_file_handler.GetOutputDirectoryFullPath() + mMeshFilename);
-        mpMesh = new Cylindrical2dMesh(mDomainWidth);
+        mpMesh = boost::make_shared<Cylindrical2dMesh>(mDomainWidth);
         mpMesh->ConstructFromMeshReader(mesh_reader);
     }
 
@@ -218,13 +220,13 @@ CylindricalHoneycombMeshGenerator::CylindricalHoneycombMeshGenerator(unsigned nu
     mpMesh->SetMeshHasChangedSinceLoading();
 }
 
-MutableMesh<2,2>* CylindricalHoneycombMeshGenerator::GetMesh()
+boost::shared_ptr<MutableMesh<2,2> > CylindricalHoneycombMeshGenerator::GetMesh()
 {
     EXCEPTION("A cylindrical mesh was created but a normal mesh is being requested.");
     return mpMesh; // Not really
 }
 
-Cylindrical2dMesh* CylindricalHoneycombMeshGenerator::GetCylindricalMesh()
+boost::shared_ptr<Cylindrical2dMesh> CylindricalHoneycombMeshGenerator::GetCylindricalMesh()
 {
-    return (Cylindrical2dMesh*) mpMesh;
+    return boost::static_pointer_cast<Cylindrical2dMesh>(mpMesh);
 }

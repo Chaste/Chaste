@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTTOROIDALHONEYCOMBMESHGENERATOR_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include <boost/shared_ptr.hpp>
 
 #include "ToroidalHoneycombMeshGenerator.hpp"
 
@@ -46,7 +47,7 @@ class TestToroidalHoneycombMeshGenerator : public CxxTest::TestSuite
 {
 private:
 
-    void Output2DNodesToFileToroidal(Toroidal2dMesh* pMesh, std::string fileName)
+    void Output2DNodesToFileToroidal(boost::shared_ptr<Toroidal2dMesh> pMesh, std::string fileName)
     {
         OutputFileHandler handler("");
         out_stream file = handler.OpenOutputFile(fileName);
@@ -76,7 +77,7 @@ public:
         double y_factor = height/(double)num_cells_height/sqrt(3.0)*2.0;
 
         ToroidalHoneycombMeshGenerator generator(num_cells_width, num_cells_height, x_factor, y_factor);
-        Toroidal2dMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dMesh> p_mesh = generator.GetToroidalMesh();
 
         // Check the mesh
         TS_ASSERT_THROWS_THIS(generator.GetMesh(),"A Toroidal mesh was created but a normal mesh is being requested.");
@@ -108,7 +109,7 @@ public:
         double y_factor = height/(double)num_cells_height/sqrt(3.0)*2.0;
 
         ToroidalHoneycombMeshGenerator generator(num_cells_width, num_cells_height, x_factor, y_factor);
-        Toroidal2dMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dMesh> p_mesh = generator.GetToroidalMesh();
 
         // Check the mesh
         TS_ASSERT_THROWS_THIS(generator.GetMesh(),"A Toroidal mesh was created but a normal mesh is being requested.");
