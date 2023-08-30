@@ -463,6 +463,45 @@ public:
             delete p_cell_population;
         }
     }
+
+    void TestGetCellDataItemAtPdeNode()
+    {
+        // Create an immersed boundary cell population object
+        ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
+        ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+
+        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+        
+        for (auto& cell : cell_population.rGetCells()) {
+            cell->GetCellData()->SetItem("cell data", 0.2);
+        }
+
+        std::string str = "cell data";
+        TS_ASSERT_EQUALS(cell_population.GetCellDataItemAtPdeNode(0, str, true, 0.1), 0.1);
+    }
+
+    void TestGetNeighbouringNodeIndices()
+    {
+        // Create an immersed boundary cell population object
+        ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
+        ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+
+        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+        
+        
+        std::set<unsigned> expected_neighbours {};
+        TS_ASSERT_EQUALS(cell_population.GetNeighbouringNodeIndices(1), expected_neighbours);
+    }
 };
 
 #endif /*TESTIMMERSEDBOUNDARYCELLPOPULATION_HPP_*/
