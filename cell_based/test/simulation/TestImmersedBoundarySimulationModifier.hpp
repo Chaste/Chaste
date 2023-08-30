@@ -114,7 +114,7 @@ public:
 
         // Test that the correct exception is throw if trying to use the wrong cell population class
         HoneycombVertexMeshGenerator vertex_generator(2, 2);
-        MutableVertexMesh<2, 2>* p_vertex_mesh = vertex_generator.GetMesh();
+        MutableVertexMesh<2, 2>* p_vertex_mesh = vertex_generator.GetMesh().get();
         std::vector<CellPtr> vertex_cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<UniformCellCycleModel, 2> vertex_cells_generator;
