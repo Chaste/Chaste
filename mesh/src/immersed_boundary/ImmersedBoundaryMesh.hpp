@@ -659,6 +659,11 @@ public:
     double GetNeighbourDist() const;
 
     /**
+     * @param the new value of mCellRearrangementThreshold
+     */
+    void SetCellRearrangementThreshold(double cellRearrangementThreshold); 
+
+    /**
      * @return the maximum distance a cell vertex can move without triggering a step size exception
      */
     double GetCellRearrangementThreshold();
