@@ -90,7 +90,7 @@ public:
 
         // Test ComputeLinearInUCoeffInSourceTerm() method
         HoneycombMeshGenerator generator(5, 5, 0);
-        TetrahedralMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_mesh = generator.GetMesh();
         TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point, NULL), 0.05, 1e-6);
         TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point, p_mesh->GetElement(0)), 0.05, 1e-6);
     }
@@ -135,7 +135,7 @@ public:
     {
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
@@ -186,7 +186,7 @@ public:
 
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
@@ -233,7 +233,7 @@ public:
     {
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
@@ -310,7 +310,7 @@ public:
 
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
@@ -357,7 +357,7 @@ public:
     {
         // Create a cell population
         HoneycombMeshGenerator generator(5, 5, 0);
-        MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
         std::vector<CellPtr> cells;
@@ -410,7 +410,7 @@ public:
 
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
-        MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
         std::vector<CellPtr> cells;

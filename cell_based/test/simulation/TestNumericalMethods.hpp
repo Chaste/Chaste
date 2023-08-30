@@ -85,7 +85,7 @@ public:
             unsigned cells_up = 5;
 
             HoneycombMeshGenerator generator(cells_across, cells_up, 0);
-            MutableMesh<2,2>* p_mesh = generator.GetMesh();
+            boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
             // Create cells
             std::vector<CellPtr> cells;
@@ -154,7 +154,7 @@ public:
         unsigned cells_up = 5;
 
         HoneycombMeshGenerator generator(cells_across, cells_up, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -269,7 +269,7 @@ public:
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
 
         HoneycombMeshGenerator generator(3, 3, 1);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Create cells
@@ -324,7 +324,7 @@ public:
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
         HoneycombMeshGenerator generator(3, 3, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         MAKE_PTR(NodesOnlyMesh<2>, p_mesh);
@@ -379,7 +379,7 @@ public:
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
         HoneycombMeshGenerator generator(3, 3, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         MAKE_PTR(NodesOnlyMesh<2>, p_mesh);
@@ -435,7 +435,7 @@ public:
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
         HoneycombMeshGenerator generator(3, 3, 1);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         MAKE_PTR(NodesOnlyMesh<2>, p_mesh);
@@ -492,7 +492,7 @@ public:
     {
         // Create a simple 2D VertexMesh
         HoneycombVertexMeshGenerator generator(5, 3);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Impose a larger cell rearrangement threshold so that motion is uninhibited (see #1376)
         p_mesh->SetCellRearrangementThreshold(0.1);

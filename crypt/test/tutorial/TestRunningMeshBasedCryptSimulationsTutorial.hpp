@@ -144,7 +144,7 @@ public:
          * to ghost nodes).
          */
         CylindricalHoneycombMeshGenerator generator(6, 9, 2);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         /*
@@ -159,7 +159,7 @@ public:
          */
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, true);
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, true);
 
         /*
          * Now we have a mesh, a set of cells to go with it, and a vector of node indices
@@ -236,14 +236,14 @@ public:
         /* First we create a cylindrical mesh, and get the cell location indices, exactly as before.
          * Note that time is re-initialized to zero and random number generator is re-seeded to zero in the {{{AbstractCellBasedTestSuite}}}.*/
         CylindricalHoneycombMeshGenerator generator(6, 9, 2);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         /* We create the cells, using the same method as before. Here, though, we use a {{{WntCellCycleModel}}}.*/
         std::vector<CellPtr> cells;
         CryptCellsGenerator<WntCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, true);
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, true);
 
         /* We create the cell population, as before. */
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);

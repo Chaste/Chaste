@@ -69,7 +69,7 @@ public:
 
         // Make a simple Potts mesh
         PottsMeshGenerator<2> generator(3, 0, 0, 3, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create 6 cells in the bottom 2 rows
         std::vector<unsigned> location_indices;
@@ -167,7 +167,7 @@ public:
 
         // Create a simple Potts mesh
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create 9 cells in the central nodes
         std::vector<unsigned> location_indices;
@@ -249,7 +249,7 @@ public:
 
         // Create a simple Potts mesh
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create 25 cells, one for each node
         std::vector<unsigned> location_indices;

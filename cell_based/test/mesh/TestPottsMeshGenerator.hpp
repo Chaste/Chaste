@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTPOTTSMESHGENERATOR_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include <boost/shared_ptr.hpp>
 
 #include "CheckpointArchiveTypes.hpp"
 
@@ -57,7 +58,7 @@ public:
         PottsMeshGenerator<2> generator(9, 3, 3, 5, 2, 2, 1, 1, 1, true); // last bool makes elements start in bottom left
 
         // Create mesh
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 6u);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 45u);
@@ -144,7 +145,7 @@ public:
         PottsMeshGenerator<2> generator(6, 2, 2, 7, 2, 2); //should have a gap of one on the left right and bottom and 2 on the top
 
         // Create mesh
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 4u);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 42u);
@@ -232,7 +233,7 @@ public:
         PottsMeshGenerator<3> generator(4, 2, 2, 4, 2, 2, 6, 2, 2, true); // last bool makes elements start in bottom left
 
         // Create mesh
-        PottsMesh<3>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 8u);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 96u);
@@ -330,7 +331,7 @@ public:
         PottsMeshGenerator<3> generator(6, 2, 2, 4, 1, 2, 4, 1, 2); //should have a gap of one on all sides
 
         // Create mesh
-        PottsMesh<3>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2u);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 96u);
@@ -428,7 +429,7 @@ public:
         unsigned element_size = 2;
 
         PottsMeshGenerator<3> generator(domain_size, element_number, element_size, domain_size, element_number, element_size, domain_size, element_number, element_size);
-        PottsMesh<3>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 64u);
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 1000u);

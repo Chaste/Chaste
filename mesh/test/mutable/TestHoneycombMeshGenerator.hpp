@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTHONEYCOMBMESHGENERATOR_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include <boost/shared_ptr.hpp>
 
 #include "HoneycombMeshGenerator.hpp"
 
@@ -74,7 +75,7 @@ public:
 
         HoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
 
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 16u);
 
@@ -96,7 +97,7 @@ public:
         double length = (double)num_cells_depth*(sqrt(3.0)/2)*width/(double)num_cells_width;
 
         // Check the mesh
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS((unsigned)p_mesh->GetNumNodes(),(num_cells_width+2*ghosts)*(num_cells_depth+2*ghosts));
 
@@ -173,7 +174,7 @@ public:
         double length = (double)num_cells_depth*(sqrt(3.0)/2)*width/(double)num_cells_width;
 
         // Check the mesh
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS((unsigned)p_mesh->GetNumNodes(), (num_cells_width+2*ghosts)*(num_cells_depth+2*ghosts));
 
@@ -248,7 +249,7 @@ public:
         unsigned thickness_of_ghost_layer = 0;
 
         HoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 16u);
 
@@ -270,14 +271,14 @@ public:
         double radius = 3.5;
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetCircularMesh(radius);
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetCircularMesh(radius);
 
         double epsilon = 1e-5;
         for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
             TS_ASSERT_LESS_THAN_EQUALS(norm_2(p_mesh->GetNode(i)->rGetLocation()), radius+epsilon);
         }
-        Output2DNodesToFile(p_mesh, "circular_mesh.dat");
+        Output2DNodesToFile(p_mesh.get(), "circular_mesh.dat");
     }
 
     void TestGetCircularMeshWithGhostNodesThrowsException()
@@ -294,7 +295,7 @@ public:
     void TestCircularMeshIsJacobian()
     {
         HoneycombMeshGenerator generator(20, 20, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetCircularMesh(10);
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetCircularMesh(10);
 
         NodeMap map(p_mesh->GetNumAllNodes());
         p_mesh->ReMesh(map);
@@ -307,7 +308,7 @@ public:
         unsigned thickness_of_ghost_layer = 1;
 
         HoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 10404u);
 

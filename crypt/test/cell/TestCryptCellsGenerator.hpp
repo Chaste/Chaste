@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCRYPTCELLSGENERATOR_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include <boost/shared_ptr.hpp>
 #include "HoneycombMeshGenerator.hpp"
 #include "CylindricalHoneycombVertexMeshGenerator.hpp"
 #include "CryptCellsGenerator.hpp"
@@ -60,7 +61,7 @@ public:
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
-        TetrahedralMesh<2,2>* p_mesh = mesh_generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_mesh = mesh_generator.GetMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = mesh_generator.GetCellLocationIndices();
@@ -74,7 +75,7 @@ public:
         double y3 = 3.0;
 
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> generator;
-        generator.Generate(cells, p_mesh, location_indices, true, y0, y1, y2, y3);
+        generator.Generate(cells, p_mesh.get(), location_indices, true, y0, y1, y2, y3);
 
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumNodes());
 
@@ -118,7 +119,7 @@ public:
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
-        TetrahedralMesh<2,2>* p_mesh = mesh_generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_mesh = mesh_generator.GetMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = mesh_generator.GetCellLocationIndices();
@@ -126,7 +127,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<UniformG1GenerationalCellCycleModel> generator;
-        generator.Generate(cells, p_mesh, location_indices, false);
+        generator.Generate(cells, p_mesh.get(), location_indices, false);
 
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumNodes());
 
@@ -181,7 +182,7 @@ public:
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
-        TetrahedralMesh<2,2>* p_mesh = mesh_generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_mesh = mesh_generator.GetMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = mesh_generator.GetCellLocationIndices();
@@ -189,7 +190,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<TysonNovakCellCycleModel> generator;
-        generator.Generate(cells, p_mesh, location_indices, true);
+        generator.Generate(cells, p_mesh.get(), location_indices, true);
 
         // Test that cells were generated correctly
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumNodes());
@@ -211,7 +212,7 @@ public:
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
-        TetrahedralMesh<2,2>* p_mesh = mesh_generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_mesh = mesh_generator.GetMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = mesh_generator.GetCellLocationIndices();
@@ -219,7 +220,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<WntCellCycleModel> generator;
-        generator.Generate(cells, p_mesh, location_indices, false);
+        generator.Generate(cells, p_mesh.get(), location_indices, false);
 
         // Test that cells were generated correctly
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumNodes());
@@ -245,7 +246,7 @@ public:
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
-        TetrahedralMesh<2,2>* p_mesh = mesh_generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_mesh = mesh_generator.GetMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = mesh_generator.GetCellLocationIndices();
@@ -253,7 +254,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<SimpleWntCellCycleModel> generator;
-        generator.Generate(cells, p_mesh, location_indices, false);
+        generator.Generate(cells, p_mesh.get(), location_indices, false);
 
         // Test that cells were generated correctly
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumNodes());
@@ -268,7 +269,7 @@ public:
     {
         // Create mesh
         HoneycombMeshGenerator mesh_generator(5, 10, 0);
-        TetrahedralMesh<2,2>* p_mesh = mesh_generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_mesh = mesh_generator.GetMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = mesh_generator.GetCellLocationIndices();
@@ -276,7 +277,7 @@ public:
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<StochasticWntCellCycleModel> generator;
-        generator.Generate(cells, p_mesh, location_indices, false);
+        generator.Generate(cells, p_mesh.get(), location_indices, false);
 
         // Test that cells were generated correctly
         TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumNodes());
@@ -304,7 +305,7 @@ public:
           unsigned crypt_width = 4;
           unsigned crypt_height = 6;
           CylindricalHoneycombVertexMeshGenerator mesh_generator(crypt_width, crypt_height);
-          Cylindrical2dVertexMesh* p_mesh = mesh_generator.GetCylindricalMesh();
+          boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = mesh_generator.GetCylindricalMesh();
 
           double y0 = 1.0;
           double y1 = 2.0;
@@ -314,10 +315,10 @@ public:
           // Create cells
           std::vector<CellPtr> fixed_cells, stochastic_cells;
           CryptCellsGenerator<FixedG1GenerationalCellCycleModel> fixed_cells_generator;
-          fixed_cells_generator.Generate(fixed_cells, p_mesh, std::vector<unsigned>(), true, y0, y1, y2, y3, true);
+          fixed_cells_generator.Generate(fixed_cells, p_mesh.get(), std::vector<unsigned>(), true, y0, y1, y2, y3, true);
 
           CryptCellsGenerator<UniformG1GenerationalCellCycleModel> stochastic_cells_generator;
-          stochastic_cells_generator.Generate(stochastic_cells, p_mesh, std::vector<unsigned>(), true, y0, y1, y2, y3, true);
+          stochastic_cells_generator.Generate(stochastic_cells, p_mesh.get(), std::vector<unsigned>(), true, y0, y1, y2, y3, true);
 
           TS_ASSERT_EQUALS(fixed_cells.size(), p_mesh->GetNumElements());
           TS_ASSERT_EQUALS(stochastic_cells.size(), p_mesh->GetNumElements());
@@ -363,12 +364,12 @@ public:
           unsigned crypt_width = 4;
           unsigned crypt_height = 6;
           CylindricalHoneycombVertexMeshGenerator mesh_generator(crypt_width, crypt_height);
-          Cylindrical2dVertexMesh* p_mesh = mesh_generator.GetCylindricalMesh();
+          boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = mesh_generator.GetCylindricalMesh();
 
           // Create cells
           std::vector<CellPtr> cells;
           CryptCellsGenerator<SimpleWntCellCycleModel> cells_generator;
-          cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, true);
+          cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true, true);
 
           // Test that the correct number cells was generated
           TS_ASSERT_EQUALS(cells.size(), p_mesh->GetNumElements());
