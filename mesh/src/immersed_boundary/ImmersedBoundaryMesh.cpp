@@ -713,6 +713,14 @@ multi_array<double, 4>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetModifi
 */
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* newNode)
+{
+    newNode->SetIndex(this->mNodes.size());
+    this->mNodes.push_back(newNode);
+    return this->mNodes.size() - 1;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetCellRearrangementThreshold(double cellRearrangementThreshold)
 {
     mCellRearrangementThreshold = cellRearrangementThreshold;

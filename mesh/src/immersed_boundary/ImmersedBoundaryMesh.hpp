@@ -405,6 +405,11 @@ public:
      * @param the new characteristic node spacing.
      */
     void SetCharacteristicNodeSpacing(double node_spacing);
+    
+    /**
+     * Add a node to the mesh
+     */
+    unsigned AddNode(Node<SPACE_DIM>* newNode);
 
     /**
      * @return reference to vector of element-associated fluid sources
