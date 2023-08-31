@@ -122,14 +122,17 @@ public:
             ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
             cell_population.SetInteractionDistance(0.01);
 
-            for (auto node_iter = p_mesh->GetNodeIteratorBegin(); node_iter != p_mesh->GetNodeIteratorEnd(); ++node_iter) {
-                node_iter->ClearAppliedForce();
-            }
             std::vector<std::pair<Node<2>*, Node<2>*>> pairs;
             pairs.push_back(std::pair<Node<2>*, Node<2>*>(p_mesh->GetNode(0), p_mesh->GetNode(1)));
+            p_mesh->GetNode(0)->ClearAppliedForce();
+            p_mesh->GetNode(1)->ClearAppliedForce();
 
             ImmersedBoundaryLinearInteractionForce<2> force;
             force.SetAdditiveNormalNoise(true);
+            auto& nodes = cell_population.rGetMesh().rGetNodes();
+            for (auto& node : nodes) {
+                node->ClearAppliedForce();
+            }
             force.AddImmersedBoundaryForceContribution(pairs, cell_population);
         }
 
@@ -789,6 +792,10 @@ public:
             std::vector<std::pair<Node<2>*, Node<2>*>> node_pairs = {std::make_pair(nodes[0], nodes[3]),
                                                                      std::make_pair(nodes[1], nodes[4]),
                                                                      std::make_pair(nodes[2], nodes[5])};
+            
+            for (auto&& node : mesh.rGetNodes()) {
+                node->ClearAppliedForce();
+            }
 
             p_force->AddImmersedBoundaryForceContribution(node_pairs, population);
 
@@ -901,6 +908,9 @@ public:
             std::vector<std::pair<Node<2>*, Node<2>*>> node_pairs = {std::make_pair(nodes[0], nodes[3]),
                                                                      std::make_pair(nodes[1], nodes[4]),
                                                                      std::make_pair(nodes[2], nodes[5])};
+            for (auto&& node : mesh.rGetNodes()) {
+                node->ClearAppliedForce();
+            }
 
             p_force->AddImmersedBoundaryForceContribution(node_pairs, population);
 
@@ -956,6 +966,9 @@ public:
             std::vector<std::pair<Node<2>*, Node<2>*>> node_pairs = {std::make_pair(nodes[0], nodes[1]),
                                                                      std::make_pair(nodes[1], nodes[4]),
                                                                      std::make_pair(nodes[2], nodes[5])};
+            for (auto&& node : mesh.rGetNodes()) {
+                node->ClearAppliedForce();
+            }
 
             p_force->AddImmersedBoundaryForceContribution(node_pairs, population);
 
@@ -1012,6 +1025,9 @@ public:
             std::vector<std::pair<Node<2>*, Node<2>*>> node_pairs = {std::make_pair(nodes[0], nodes[3]),
                                                                      std::make_pair(nodes[1], nodes[4]),
                                                                      std::make_pair(nodes[2], nodes[5])};
+            for (auto&& node : mesh.rGetNodes()) {
+                node->ClearAppliedForce();
+            }
 
             p_force->SetAdditiveNormalNoise(true);
             p_force->AddImmersedBoundaryForceContribution(node_pairs, population);
@@ -1068,6 +1084,9 @@ public:
             std::vector<std::pair<Node<2>*, Node<2>*>> node_pairs = {std::make_pair(nodes[0], nodes[3]),
                                                                      std::make_pair(nodes[1], nodes[4]),
                                                                      std::make_pair(nodes[2], nodes[5])};
+            for (auto&& node : mesh.rGetNodes()) {
+                node->ClearAppliedForce();
+            }
 
             Node<2>* newNode = new Node<2>(6u, Create_c_vector(0.1, 0.1));
             newNode->ClearAppliedForce();
@@ -1184,6 +1203,12 @@ public:
             std::vector<std::pair<Node<2>*, Node<2>*>> node_pairs = {std::make_pair(nodes[0], nodes[3]),
                                                                      std::make_pair(nodes[1], nodes[4]),
                                                                      std::make_pair(nodes[2], nodes[5])};
+
+            for (auto&& node : mesh.rGetNodes())
+            {
+                node->ClearAppliedForce();
+            }
+
 
             p_force->AddImmersedBoundaryForceContribution(node_pairs, population);
 

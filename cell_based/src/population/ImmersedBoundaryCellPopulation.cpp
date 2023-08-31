@@ -234,6 +234,9 @@ std::set<unsigned> ImmersedBoundaryCellPopulation<DIM>::GetNeighbouringLocationI
 template <unsigned DIM>
 unsigned ImmersedBoundaryCellPopulation<DIM>::AddNode(Node<DIM>* pNewNode)
 {
+    if (pNewNode == nullptr) {
+        return 0;
+    }
     return mpImmersedBoundaryMesh->AddNode(pNewNode);
 }
 
