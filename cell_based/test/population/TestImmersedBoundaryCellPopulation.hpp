@@ -48,6 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BetaCateninOneHitCellMutationState.hpp"
 #include "CellAgesWriter.hpp"
 #include "CellAncestorWriter.hpp"
+#include "CellDivisionLocationsWriter.hpp"
 #include "CellIdWriter.hpp"
 #include "CellLabel.hpp"
 #include "CellLabelWriter.hpp"
@@ -213,6 +214,11 @@ public:
         TetrahedralMesh<2, 2>* tet_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
         TS_ASSERT_DIFFERS(tet_mesh, nullptr);
         
+        ImmersedBoundaryMesh<3, 3> ib_mesh_3d;
+        std::vector<CellPtr> cells_3d;
+        ImmersedBoundaryCellPopulation<3> cell_population_3d(ib_mesh_3d, cells_3d);
+        TS_ASSERT_THROWS_CONTAINS(cell_population_3d.GetTetrahedralMeshForPdeModifier(), "only implemented in 2D");
+
         // Test adding new cell
         boost::shared_ptr<AbstractCellProperty> p_wildtype(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         UniformCellCycleModel* p_model = new UniformCellCycleModel();
@@ -305,6 +311,10 @@ public:
 
         cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
         cell_population.AddCellPopulationCountWriter<CellProliferativeTypesCountWriter>();
+        
+        using WriterType = CellDivisionLocationsWriter<2, 2>;
+        MAKE_PTR(WriterType, cdlw);
+        cell_population.AddCellPopulationEventWriter(cdlw);
 
         cell_population.AddCellWriter<CellAgesWriter>();
         cell_population.AddCellWriter<CellAncestorWriter>();

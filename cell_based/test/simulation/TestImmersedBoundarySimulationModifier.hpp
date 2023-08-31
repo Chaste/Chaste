@@ -566,6 +566,7 @@ public:
             // Set up simulation modifier
             ImmersedBoundarySimulationModifier<2> modifier;
             modifier.SetAdditiveNormalNoise(true);
+            modifier.SetZeroFieldSums(true);
             modifier.SetupConstantMemberVariables(cell_population);
             modifier.SolveNavierStokesSpectral();
             

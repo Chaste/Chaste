@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "FileComparison.hpp"
 #include "ImmersedBoundaryElement.hpp"
+#include "ImmersedBoundaryEnumerations.hpp"
 #include "ImmersedBoundaryHoneycombMeshGenerator.hpp"
 #include "ImmersedBoundaryMesh.hpp"
 #include "NoCellCycleModel.hpp"
@@ -277,9 +278,9 @@ public:
             elems.push_back(new ImmersedBoundaryElement<2, 2>(2, nodes));
             
             std::vector<ImmersedBoundaryElement<1, 2>*> lams;
-            lams.push_back(new ImmersedBoundaryElement<1, 2>(0, nodes));
-            lams.push_back(new ImmersedBoundaryElement<1, 2>(1, nodes));
-            lams.push_back(new ImmersedBoundaryElement<1, 2>(2, nodes));
+            lams.push_back(new ImmersedBoundaryElement<1, 2>(3, nodes));
+            lams.push_back(new ImmersedBoundaryElement<1, 2>(4, nodes));
+            lams.push_back(new ImmersedBoundaryElement<1, 2>(5, nodes));
             
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems, lams);
             auto p_mesh = &mesh;
@@ -292,14 +293,15 @@ public:
             cell_population.SetInteractionDistance(0.01);
 
             // Create two nodes and put them in a vector of pairs
-            Node<2> node0(0, true, 0.1, 0.1);
-            Node<2> node1(0, true, 0.102, 0.1);
+            Node<2> node0(0, true, 0.7, 0.7);
+            Node<2> node1(0, true, 0.702, 0.7);
             std::vector<std::pair<Node<2>*, Node<2>*> > node_pair;
             node_pair.push_back(std::pair<Node<2>*, Node<2>*>(&node0, &node1));
 
             // Put the nodes in different elements so force calculation is triggered
             node0.AddElement(0);
             node1.AddElement(1);
+            node1.SetRegion(LAMINA_REGION);
 
 
             node0.ClearAppliedForce();
@@ -846,6 +848,174 @@ public:
 
             TS_ASSERT_DELTA(mesh.GetNode(5u)->rGetAppliedForce()[0], 0.0, 1e-6); //not involved
             TS_ASSERT_DELTA(mesh.GetNode(5u)->rGetAppliedForce()[1], 0.0, 1e-6);
+        }
+
+        // Coverage for lamina regions
+        {
+            // Create a minimal cell population
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0u, Create_c_vector(0.5, 0.5)));
+            nodes.back()->SetRegion(LAMINA_REGION);
+            nodes.push_back(new Node<2>(1u, Create_c_vector(0.6, 0.6)));
+            nodes.push_back(new Node<2>(2u, Create_c_vector(0.6, 0.5))); //unused
+            nodes.push_back(new Node<2>(3u, Create_c_vector(0.6, 0.6)));
+            nodes.push_back(new Node<2>(4u, Create_c_vector(0.7, 0.6)));
+            nodes.push_back(new Node<2>(5u, Create_c_vector(0.7, 0.7))); //unused
+
+            std::vector<ImmersedBoundaryElement<2, 2>*> elements;
+            elements.push_back(new ImmersedBoundaryElement<2, 2>(0u, {nodes[0], nodes[1], nodes[2]}));
+            elements.push_back(new ImmersedBoundaryElement<2, 2>(1u, {nodes[3], nodes[4], nodes[5]}));
+
+            ImmersedBoundaryMesh<2, 2> mesh(nodes, elements, {}, 8u, 8u);
+
+            //Create cells
+            std::vector<CellPtr> cells;
+            auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
+            CellsGenerator<NoCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
+
+            // Create cell population
+            ImmersedBoundaryCellPopulation<2> population(mesh, cells);
+            population.SetInteractionDistance(10.0);
+
+            auto p_force = std::make_shared<ImmersedBoundaryKinematicFeedbackForce<2>>();
+
+            // Fudge so that the force on nodes is what would be "expected" if we did not have to correct for
+            // immersed boundary interpolation onto fluid grid
+            double force_factor = mesh.GetAverageNodeSpacingOfElement(0u, false) / population.GetIntrinsicSpacing();
+            p_force->SetSpringConst(1.0 / force_factor);
+
+            SimulationTime::Destroy();
+            SimulationTime::Instance()->SetStartTime(0.0);
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10u);
+            double dt = SimulationTime::Instance()->GetTimeStep();
+            TS_ASSERT_DELTA(dt, 0.1, 1e-6);
+
+            p_force->mPreviousLocations = {Create_c_vector(0.5, 0.5),
+                                           Create_c_vector(0.6, 0.6),
+                                           Create_c_vector(0.6, 0.5), //unmoved
+                                           Create_c_vector(0.6, 0.5),
+                                           Create_c_vector(0.7, 0.7),
+                                           Create_c_vector(0.7, 0.7)}; //unmoved
+
+            std::vector<std::pair<Node<2>*, Node<2>*>> node_pairs = {std::make_pair(nodes[0], nodes[3]),
+                                                                     std::make_pair(nodes[1], nodes[4]),
+                                                                     std::make_pair(nodes[2], nodes[5])};
+
+            p_force->AddImmersedBoundaryForceContribution(node_pairs, population);
+
+        }
+
+        // Coverage for nodes in same element
+        {
+            // Create a minimal cell population
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0u, Create_c_vector(0.5, 0.5)));
+            nodes.push_back(new Node<2>(1u, Create_c_vector(0.6, 0.6)));
+            nodes.push_back(new Node<2>(2u, Create_c_vector(0.6, 0.5))); //unused
+            nodes.push_back(new Node<2>(3u, Create_c_vector(0.6, 0.6)));
+            nodes.push_back(new Node<2>(4u, Create_c_vector(0.7, 0.6)));
+            nodes.push_back(new Node<2>(5u, Create_c_vector(0.7, 0.7))); //unused
+
+            std::vector<ImmersedBoundaryElement<2, 2>*> elements;
+            elements.push_back(new ImmersedBoundaryElement<2, 2>(0u, {nodes[0], nodes[1], nodes[2]}));
+            elements.push_back(new ImmersedBoundaryElement<2, 2>(1u, {nodes[3], nodes[4], nodes[5]}));
+
+            ImmersedBoundaryMesh<2, 2> mesh(nodes, elements, {}, 8u, 8u);
+
+            //Create cells
+            std::vector<CellPtr> cells;
+            auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
+            CellsGenerator<NoCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
+
+            // Create cell population
+            ImmersedBoundaryCellPopulation<2> population(mesh, cells);
+            population.SetInteractionDistance(10.0);
+
+            auto p_force = std::make_shared<ImmersedBoundaryKinematicFeedbackForce<2>>();
+
+            // Fudge so that the force on nodes is what would be "expected" if we did not have to correct for
+            // immersed boundary interpolation onto fluid grid
+            double force_factor = mesh.GetAverageNodeSpacingOfElement(0u, false) / population.GetIntrinsicSpacing();
+            p_force->SetSpringConst(1.0 / force_factor);
+
+            SimulationTime::Destroy();
+            SimulationTime::Instance()->SetStartTime(0.0);
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10u);
+            double dt = SimulationTime::Instance()->GetTimeStep();
+            TS_ASSERT_DELTA(dt, 0.1, 1e-6);
+
+            p_force->mPreviousLocations = {Create_c_vector(0.5, 0.5),
+                                           Create_c_vector(0.6, 0.6),
+                                           Create_c_vector(0.6, 0.5), //unmoved
+                                           Create_c_vector(0.6, 0.5),
+                                           Create_c_vector(0.7, 0.7),
+                                           Create_c_vector(0.7, 0.7)}; //unmoved
+
+            std::vector<std::pair<Node<2>*, Node<2>*>> node_pairs = {std::make_pair(nodes[0], nodes[1]),
+                                                                     std::make_pair(nodes[1], nodes[4]),
+                                                                     std::make_pair(nodes[2], nodes[5])};
+
+            p_force->AddImmersedBoundaryForceContribution(node_pairs, population);
+
+        }
+
+        // Coverage for adding normal noise
+        {
+            // Create a minimal cell population
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0u, Create_c_vector(0.5, 0.5)));
+            nodes.back()->SetRegion(LAMINA_REGION);
+            nodes.push_back(new Node<2>(1u, Create_c_vector(0.6, 0.6)));
+            nodes.push_back(new Node<2>(2u, Create_c_vector(0.6, 0.5))); //unused
+            nodes.push_back(new Node<2>(3u, Create_c_vector(0.6, 0.6)));
+            nodes.push_back(new Node<2>(4u, Create_c_vector(0.7, 0.6)));
+            nodes.push_back(new Node<2>(5u, Create_c_vector(0.7, 0.7))); //unused
+
+            std::vector<ImmersedBoundaryElement<2, 2>*> elements;
+            elements.push_back(new ImmersedBoundaryElement<2, 2>(0u, {nodes[0], nodes[1], nodes[2]}));
+            elements.push_back(new ImmersedBoundaryElement<2, 2>(1u, {nodes[3], nodes[4], nodes[5]}));
+
+            ImmersedBoundaryMesh<2, 2> mesh(nodes, elements, {}, 8u, 8u);
+
+            //Create cells
+            std::vector<CellPtr> cells;
+            auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
+            CellsGenerator<NoCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
+
+            // Create cell population
+            ImmersedBoundaryCellPopulation<2> population(mesh, cells);
+            population.SetInteractionDistance(10.0);
+
+            auto p_force = std::make_shared<ImmersedBoundaryKinematicFeedbackForce<2>>();
+
+            // Fudge so that the force on nodes is what would be "expected" if we did not have to correct for
+            // immersed boundary interpolation onto fluid grid
+            double force_factor = mesh.GetAverageNodeSpacingOfElement(0u, false) / population.GetIntrinsicSpacing();
+            p_force->SetSpringConst(1.0 / force_factor);
+
+            SimulationTime::Destroy();
+            SimulationTime::Instance()->SetStartTime(0.0);
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10u);
+            double dt = SimulationTime::Instance()->GetTimeStep();
+            TS_ASSERT_DELTA(dt, 0.1, 1e-6);
+
+            p_force->mPreviousLocations = {Create_c_vector(0.5, 0.5),
+                                           Create_c_vector(0.6, 0.6),
+                                           Create_c_vector(0.6, 0.5), //unmoved
+                                           Create_c_vector(0.6, 0.5),
+                                           Create_c_vector(0.7, 0.7),
+                                           Create_c_vector(0.7, 0.7)}; //unmoved
+
+            std::vector<std::pair<Node<2>*, Node<2>*>> node_pairs = {std::make_pair(nodes[0], nodes[3]),
+                                                                     std::make_pair(nodes[1], nodes[4]),
+                                                                     std::make_pair(nodes[2], nodes[5])};
+
+            p_force->SetAdditiveNormalNoise(true);
+            p_force->AddImmersedBoundaryForceContribution(node_pairs, population);
+
         }
 
     }

@@ -531,7 +531,8 @@ void ImmersedBoundaryCellPopulation<DIM>::Validate()
         if (validated_element[i] > 1)
         {
             // This should never be reached as you can only set one cell per element index
-            EXCEPTION("At time " << SimulationTime::Instance()->GetTime() << ", Element " << i << " appears to have " << validated_element[i] << " cells associated with it");
+            NEVER_REACHED;
+            EXCEPTION("At time " << SimulationTime::Instance()->GetTime() << ", Element " << i << " appears to have " << validated_element[i] << " cells associated with it"); //LCOV_EXCL_LINE
         }
     }
 }
