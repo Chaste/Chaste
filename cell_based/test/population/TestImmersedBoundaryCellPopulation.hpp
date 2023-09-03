@@ -356,13 +356,14 @@ public:
             
             // Create a single node, single element mesh
             std::vector<Node<2>*> nodes;
-            nodes.push_back(new Node<2>(0, true, 0.55, 0.55));
-            nodes.push_back(new Node<2>(1, true, 0.2, 0.2));
-            nodes.push_back(new Node<2>(2, true, 0.1, 0.2));
+            // Position all nodes near the middle
+            nodes.push_back(new Node<2>(0, true, 0.58, 0.58));
+            nodes.push_back(new Node<2>(1, true, 0.59, 0.59));
+            nodes.push_back(new Node<2>(2, true, 0.58, 0.59));
 
             std::vector<ImmersedBoundaryElement<2, 2>*> elems;
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
-            FluidSource<2> source(0, 0.5, 0.5);
+            FluidSource<2> source(0, 0.01, 0.01);
             elems.back()->SetFluidSource(&source);
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
@@ -378,18 +379,15 @@ public:
             auto& velocityField = mesh.rGetModifiable2dVelocityGrids();
             for (unsigned dim = 0; dim < 2; ++dim)
             {
-                for (unsigned x = 0; x < 10; ++x)
-                {
-                    for (unsigned y = 0; y < 10; ++y)
-                    {
-                        velocityField[dim][x][y] = 10000.0;
-                    }
-                }
+                velocityField[dim][0][0] = 0.1;
+                velocityField[dim][0][1] = 0.1;
+                velocityField[dim][1][0] = 0.1;
+                velocityField[dim][1][1] = 0.1;
             }
             
             mesh.SetCharacteristicNodeSpacing(0.000001);
             cell_population.SetReMeshFrequency(1);
-            TS_ASSERT_THROWS_CONTAINS(cell_population.UpdateNodeLocations(0.1), "10x Characteristic");
+            TS_ASSERT_THROWS_CONTAINS(cell_population.UpdateNodeLocations(0.1), "Sources are moving more than 10x Characteristic");
         }
 
         { // UpdateNodeLocations() coverage with fluid sources
@@ -400,13 +398,15 @@ public:
             
             // Create a single node, single element mesh
             std::vector<Node<2>*> nodes;
-            nodes.push_back(new Node<2>(0, true, 0.55, 0.55));
-            nodes.push_back(new Node<2>(1, true, 0.2, 0.2));
-            nodes.push_back(new Node<2>(2, true, 0.1, 0.2));
+            // Position all nodes in top right corner
+            nodes.push_back(new Node<2>(0, true, 0.58, 0.58));
+            nodes.push_back(new Node<2>(1, true, 0.59, 0.59));
+            nodes.push_back(new Node<2>(2, true, 0.58, 0.59));
 
             std::vector<ImmersedBoundaryElement<2, 2>*> elems;
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
-            FluidSource<2> source(0, 0.5, 0.5);
+            // Position fluid source in bottom left corner
+            FluidSource<2> source(0, 0.01, 0.01);
             elems.back()->SetFluidSource(&source);
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
@@ -422,18 +422,20 @@ public:
             auto& velocityField = mesh.rGetModifiable2dVelocityGrids();
             for (unsigned dim = 0; dim < 2; ++dim)
             {
-                for (unsigned x = 0; x < 10; ++x)
-                {
-                    for (unsigned y = 0; y < 10; ++y)
-                    {
-                        velocityField[dim][x][y] = 0.1;
-                    }
-                }
+                velocityField[dim][0][0] = 0.1;
+                velocityField[dim][0][1] = 0.1;
+                velocityField[dim][1][0] = 0.1;
+                velocityField[dim][1][1] = 0.1;
             }
             
             mesh.SetCharacteristicNodeSpacing(0.01);
             cell_population.SetReMeshFrequency(1);
             TS_ASSERT_THROWS_NOTHING(cell_population.UpdateNodeLocations(0.1));
+            
+
+            // remesh coverage
+            SimulationTime::Instance()->IncrementTimeOneStep();
+            cell_population.UpdateNodeLocations(0.1);
         }
     }
 
