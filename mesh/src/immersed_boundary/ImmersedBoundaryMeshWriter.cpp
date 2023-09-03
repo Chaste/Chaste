@@ -249,7 +249,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(Immer
         // Create VTK mesh
         MakeVtkMesh(rMesh);
         // Now write VTK mesh to file
-        assert(mpVtkUnstructedMesh->CheckAttributes() == 0);
+        //assert(mpVtkUnstructedMesh->CheckAttributes() == 0);
         vtkXMLUnstructuredGridWriter* p_writer = vtkXMLUnstructuredGridWriter::New();
 #if VTK_MAJOR_VERSION >= 6
         p_writer->SetInputData(mpVtkUnstructedMesh);

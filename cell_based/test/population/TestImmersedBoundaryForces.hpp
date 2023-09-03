@@ -1094,6 +1094,66 @@ public:
             p_force->AddImmersedBoundaryForceContribution(node_pairs, population);
 
         }
+        {
+            // Create a minimal cell population
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0u, Create_c_vector(0.5, 0.5)));
+            nodes.back()->SetRegion(LAMINA_REGION);
+            nodes.push_back(new Node<2>(1u, Create_c_vector(0.6, 0.6)));
+            nodes.push_back(new Node<2>(2u, Create_c_vector(0.6, 0.5))); //unused
+            nodes.push_back(new Node<2>(3u, Create_c_vector(0.6, 0.6)));
+            nodes.push_back(new Node<2>(4u, Create_c_vector(0.7, 0.6)));
+            nodes.push_back(new Node<2>(5u, Create_c_vector(0.7, 0.7))); //unused
+
+            std::vector<ImmersedBoundaryElement<2, 2>*> elements;
+            elements.push_back(new ImmersedBoundaryElement<2, 2>(0u, {nodes[0], nodes[1], nodes[2]}));
+            elements.push_back(new ImmersedBoundaryElement<2, 2>(1u, {nodes[3], nodes[4], nodes[5]}));
+
+            ImmersedBoundaryMesh<2, 2> mesh(nodes, elements, {}, 8u, 8u);
+
+            //Create cells
+            std::vector<CellPtr> cells;
+            auto p_diff_type = boost::make_shared<DifferentiatedCellProliferativeType>();
+            CellsGenerator<NoCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
+
+            // Create cell population
+            ImmersedBoundaryCellPopulation<2> population(mesh, cells);
+            population.SetInteractionDistance(10.0);
+
+            auto p_force = std::make_shared<ImmersedBoundaryKinematicFeedbackForce<2>>();
+
+            // Fudge so that the force on nodes is what would be "expected" if we did not have to correct for
+            // immersed boundary interpolation onto fluid grid
+            double force_factor = mesh.GetAverageNodeSpacingOfElement(0u, false) / population.GetIntrinsicSpacing();
+            p_force->SetSpringConst(1.0 / force_factor);
+
+            SimulationTime::Destroy();
+            SimulationTime::Instance()->SetStartTime(0.0);
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10u);
+            double dt = SimulationTime::Instance()->GetTimeStep();
+            TS_ASSERT_DELTA(dt, 0.1, 1e-6);
+
+            p_force->mPreviousLocations = {Create_c_vector(0.5, 0.5),
+                                           Create_c_vector(0.6, 0.6),
+                                           Create_c_vector(0.6, 0.5), //unmoved
+                                           Create_c_vector(0.6, 0.5),
+                                           Create_c_vector(0.7, 0.7),
+                                           Create_c_vector(0.7, 0.7)}; //unmoved
+
+            std::vector<std::pair<Node<2>*, Node<2>*>> node_pairs = {std::make_pair(nodes[0], nodes[3]),
+                                                                     std::make_pair(nodes[1], nodes[4]),
+                                                                     std::make_pair(nodes[2], nodes[5])};
+            for (auto&& node : mesh.rGetNodes()) {
+                node->ClearAppliedForce();
+            }
+
+            Node<2>* newNode = new Node<2>(6u, Create_c_vector(0.1, 0.1));
+            newNode->ClearAppliedForce();
+            population.AddNode(newNode);
+            p_force->UpdatePreviousLocations(population);
+
+        }
 
     }
 

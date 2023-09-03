@@ -147,9 +147,9 @@ void ImmersedBoundaryKinematicFeedbackForce<DIM>::UpdatePreviousLocations(Immers
     {
         if (p_node->GetRegion() != LAMINA_REGION)
         {
-            if (p_node->GetIndex() > mPreviousLocations.size())
+            if (p_node->GetIndex() >= mPreviousLocations.size())
             {
-                mPreviousLocations.resize(p_node->GetIndex());
+                mPreviousLocations.resize(p_node->GetIndex() + 1);
             }
 
             mPreviousLocations[p_node->GetIndex()] = p_node->rGetLocation();

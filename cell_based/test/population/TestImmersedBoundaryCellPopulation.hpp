@@ -66,6 +66,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "DifferentiatedCellProliferativeType.hpp"
 #include "FileComparison.hpp"
+#include "ImmersedBoundaryEnumerations.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "ShortAxisImmersedBoundaryDivisionRule.hpp"
 #include "SmartPointers.hpp"
@@ -264,6 +265,48 @@ public:
 
         TS_ASSERT_THROWS_CONTAINS(ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells), "does not appear to have a cell associated");
     }
+    
+    void TestOverlyLargeDisplacements()
+    {
+        { // UpdateNodeLocations() coverage
+
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
+            
+            // Create a single node, single element mesh
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, true, 0.55, 0.55));
+            nodes.push_back(new Node<2>(1, true, 0.2, 0.2));
+            nodes.push_back(new Node<2>(2, true, 0.1, 0.2));
+
+            std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+
+            ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
+
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
+
+            ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
+
+            auto& velocityField = mesh.rGetModifiable2dVelocityGrids();
+            for (unsigned dim = 0; dim < 2; ++dim)
+            {
+                for (unsigned x = 0; x < 10; ++x)
+                {
+                    for (unsigned y = 0; y < 10; ++y)
+                    {
+                        velocityField[dim][x][y] = 10000.0;
+                    }
+                }
+            }
+            
+            mesh.SetCharacteristicNodeSpacing(0.000001);
+            cell_population.SetReMeshFrequency(1);
+            TS_ASSERT_THROWS_CONTAINS(cell_population.UpdateNodeLocations(0.1), "10x Characteristic");
+        }
+    }
 
     void TestWritersWithImmersedBoundaryCellPopulation()
     {
@@ -349,12 +392,18 @@ public:
             cell_iter->GetCellData()->SetItem("var1", 3.0);
             cell_iter->GetCellData()->SetItem("target area", 0.1);
         }
+        
+        // Set up node regions
+        for (auto iter = p_mesh->GetNodeIteratorBegin(); iter != p_mesh->GetNodeIteratorEnd(); ++iter) {
+            iter->SetRegion(LAMINA_REGION);
+        }
 
         std::string output_directory = "TestImmersedBoundaryPopulationWriters";
         OutputFileHandler output_file_handler(output_directory, false);
 
         cell_population.OpenWritersFiles(output_file_handler);
         cell_population.WriteResultsToFiles(output_directory);
+        cell_population.SetOutputNodeRegionToVtk(true);
 
         SimulationTime::Instance()->IncrementTimeOneStep();
         cell_population.Update();

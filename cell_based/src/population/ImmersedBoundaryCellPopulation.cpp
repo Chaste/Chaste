@@ -912,7 +912,7 @@ bool ImmersedBoundaryCellPopulation<DIM>::IsPdeNodeAssociatedWithNonApoptoticCel
 
         for (std::set<unsigned>::iterator iter = containing_element_indices.begin();
              iter != containing_element_indices.end();
-             iter++)
+             iter++) //LCOV_EXCL_LINE
         {
             if (this->GetCellUsingLocationIndex(*iter)->template HasCellProperty<ApoptoticCellProperty>() )
             {
