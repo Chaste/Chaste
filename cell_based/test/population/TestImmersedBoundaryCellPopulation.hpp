@@ -268,7 +268,7 @@ public:
     
     void TestOverlyLargeDisplacements()
     {
-        { // UpdateNodeLocations() coverage
+        { // UpdateNodeLocations() coverage > 10x
 
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
             
@@ -305,6 +305,135 @@ public:
             mesh.SetCharacteristicNodeSpacing(0.000001);
             cell_population.SetReMeshFrequency(1);
             TS_ASSERT_THROWS_CONTAINS(cell_population.UpdateNodeLocations(0.1), "10x Characteristic");
+        }
+
+        { // UpdateNodeLocations() coverage 
+
+            SimulationTime::Instance()->Destroy();
+            SimulationTime::Instance()->SetStartTime(0.0);
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
+            
+            // Create a single node, single element mesh
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, true, 0.55, 0.55));
+            nodes.push_back(new Node<2>(1, true, 0.2, 0.2));
+            nodes.push_back(new Node<2>(2, true, 0.1, 0.2));
+
+            std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+
+            ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
+
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
+
+            ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
+
+            auto& velocityField = mesh.rGetModifiable2dVelocityGrids();
+            for (unsigned dim = 0; dim < 2; ++dim)
+            {
+                for (unsigned x = 0; x < 10; ++x)
+                {
+                    for (unsigned y = 0; y < 10; ++y)
+                    {
+                        velocityField[dim][x][y] = 0.1;
+                    }
+                }
+            }
+            
+            mesh.SetCharacteristicNodeSpacing(0.01);
+            cell_population.SetReMeshFrequency(1);
+            TS_ASSERT_THROWS_NOTHING(cell_population.UpdateNodeLocations(0.1));
+        }
+
+        { // UpdateNodeLocations() coverage > 10x with fluid sources
+
+            SimulationTime::Instance()->Destroy();
+            SimulationTime::Instance()->SetStartTime(0.0);
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
+            
+            // Create a single node, single element mesh
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, true, 0.55, 0.55));
+            nodes.push_back(new Node<2>(1, true, 0.2, 0.2));
+            nodes.push_back(new Node<2>(2, true, 0.1, 0.2));
+
+            std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+            FluidSource<2> source(0, 0.5, 0.5);
+            elems.back()->SetFluidSource(&source);
+
+            ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
+
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
+
+            ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
+            cell_population.SetIfPopulationHasActiveSources(true);
+
+            auto& velocityField = mesh.rGetModifiable2dVelocityGrids();
+            for (unsigned dim = 0; dim < 2; ++dim)
+            {
+                for (unsigned x = 0; x < 10; ++x)
+                {
+                    for (unsigned y = 0; y < 10; ++y)
+                    {
+                        velocityField[dim][x][y] = 10000.0;
+                    }
+                }
+            }
+            
+            mesh.SetCharacteristicNodeSpacing(0.000001);
+            cell_population.SetReMeshFrequency(1);
+            TS_ASSERT_THROWS_CONTAINS(cell_population.UpdateNodeLocations(0.1), "10x Characteristic");
+        }
+
+        { // UpdateNodeLocations() coverage with fluid sources
+
+            SimulationTime::Instance()->Destroy();
+            SimulationTime::Instance()->SetStartTime(0.0);
+            SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
+            
+            // Create a single node, single element mesh
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, true, 0.55, 0.55));
+            nodes.push_back(new Node<2>(1, true, 0.2, 0.2));
+            nodes.push_back(new Node<2>(2, true, 0.1, 0.2));
+
+            std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+            FluidSource<2> source(0, 0.5, 0.5);
+            elems.back()->SetFluidSource(&source);
+
+            ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
+
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
+
+            ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
+            cell_population.SetIfPopulationHasActiveSources(true);
+
+            auto& velocityField = mesh.rGetModifiable2dVelocityGrids();
+            for (unsigned dim = 0; dim < 2; ++dim)
+            {
+                for (unsigned x = 0; x < 10; ++x)
+                {
+                    for (unsigned y = 0; y < 10; ++y)
+                    {
+                        velocityField[dim][x][y] = 0.1;
+                    }
+                }
+            }
+            
+            mesh.SetCharacteristicNodeSpacing(0.01);
+            cell_population.SetReMeshFrequency(1);
+            TS_ASSERT_THROWS_NOTHING(cell_population.UpdateNodeLocations(0.1));
         }
     }
 
