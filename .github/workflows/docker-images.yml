@@ -20,7 +20,8 @@ jobs:
       # https://github.com/docker/metadata-action
       with:
         images: |
-          chaste/base
+          # chaste/base
+          chaste/develop
         flavor: latest=true
         tags: |
           # type=schedule
