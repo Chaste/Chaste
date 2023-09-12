@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1
 
-# ARG BASE_TAG=latest
-# FROM chaste/base:${BASE_TAG}
-FROM chaste/develop
+ARG BASE_TAG=latest
+FROM chaste/base:${BASE_TAG}
+# FROM chaste/develop
 
 # Build Chaste: TAG can be a branch or release ('-' skips by default)
 ARG GIT_TAG=.
