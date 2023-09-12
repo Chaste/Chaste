@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted, docker
+    runs-on: docker
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
