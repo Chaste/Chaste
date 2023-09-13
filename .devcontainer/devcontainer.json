@@ -4,7 +4,7 @@
 
 	// To start from a bare environment with no pre-built Chaste libraries, uncomment the following line:
 	// "image": "chaste/base",
-	// If you prefer to start with a contianer with the latest Chaste release pre-built, use the following line:
+	// If you prefer to start with a container with the latest Chaste release pre-built, use the following line:
 	// "image": "chaste/release",
 	// Otherwise, to start from an image with pre-built Chaste libraries from the develop branch, use the following line:
 	"image": "chaste/develop",
@@ -20,8 +20,8 @@
 		{
 			// Warning: This assumes that a directory called `testoutput' exists at the same level as the Chaste folder
 			// "source": "${localWorkspaceFolder}/../testoutput",
-			"source": "${localWorkspaceFolder}/test_summary",
-			"target": "/home/testoutput",
+			"source": "${localWorkspaceFolder}/testoutput",
+			"target": "/home/chaste/testoutput",
 			"type": "bind"
 		}
 	],
