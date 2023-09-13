@@ -2,14 +2,13 @@
 
 ARG BASE_TAG=latest
 FROM chaste/base:${BASE_TAG}
-# FROM chaste/develop
 
-# Build Chaste: TAG can be a branch or release ('-' skips by default)
+# Build Chaste: GIT_TAG can be: a branch or release; '-' to skip; '.' to build local code
+ADD . ${CHASTE_SOURCE_DIR}
+# Fix git permissions issue CVE-2022-24765
+RUN git config --global --add safe.directory "${CHASTE_SOURCE_DIR}"
 ARG GIT_TAG=.
 ENV GIT_TAG=${GIT_TAG}
-ADD . ${CHASTE_SOURCE_DIR}
-RUN git config --global --add safe.directory /home/chaste/src
-RUN echo "Building Chaste ${GIT_TAG} in $PWD..." && ls
 RUN build_chaste.sh ${GIT_TAG}
 
 # Automatically mount the home directory in a volume to persist changes made there.
