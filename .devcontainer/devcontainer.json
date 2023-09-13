@@ -20,7 +20,7 @@
 		{
 			// Warning: This assumes that a directory called `testoutput' exists at the same level as the Chaste folder
 			// "source": "${localWorkspaceFolder}/../testoutput",
-			"source": "${localWorkspaceFolder}/testoutput",
+			"source": "${localWorkspaceFolder}/test_summary",
 			"target": "/home/chaste/testoutput",
 			"type": "bind"
 		}
