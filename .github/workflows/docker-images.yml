@@ -22,7 +22,6 @@ jobs:
           chaste/develop
         flavor: latest=true
         tags: |
-          type=ref,event=branch
           type=ref,event=pr
           type=sha
     - name: Set up QEMU
