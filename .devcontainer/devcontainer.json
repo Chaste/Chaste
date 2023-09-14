@@ -63,11 +63,8 @@
 	// "forwardPorts": [],
 
 	"onCreateCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
-	// "onCreateCommand": "apt update && apt install -y git && git config --global --add safe.directory /example"
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "build_chaste.sh develop",
-	// "postCreateCommand": "cmake -DCMAKE_BUILD_TYPE:STRING=Debug -DChaste_ERROR_ON_WARNING:BOOL=ON -DChaste_UPDATE_PROVENANCE:BOOL=OFF -H$CHASTE_SOURCE_DIR -B$CHASTE_BUILD_DIR", // && make --no-print-directory -j$(nproc) -C $CHASTE_BUILD_DIR",
-	// "postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
 	// "postStartCommand": "zsh"
 	"postAttachCommand": "bash",
 
@@ -76,18 +73,10 @@
 		"vscode":{
 			"extensions": [
 				"ms-vscode.cpptools-extension-pack",
-				"ms-vscode.cmake-tools"
+				"ms-vscode.cpptools-themes",
+				"ms-vscode.cmake-tools",
+				"josetr.cmake-language-support-vscode"
 			]
-			// TODO
-			// "settings": {
-			// 	// "terminal.integrated.shell.linux": "/bin/zsh"
-			// 	"terminal.integrated.defaultProfile.linux": "zsh",
-			// 	"terminal.integrated.profiles.linux": {
-			// 		"zsh": {
-			// 			"path": "/usr/bin/zsh"
-			// 		}
-			// 	}
-			// }
 		}
 	},
 
