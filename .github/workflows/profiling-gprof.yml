@@ -1,0 +1,107 @@
+name: Profiling GProf
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - '**'
+  push:
+    branches:
+      - develop
+
+jobs:
+  
+  build-and-test:
+
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+
+    runs-on: ubuntu-22.04
+
+    env:
+      CHASTE_DIR: ${{ github.workspace }}/Chaste
+      GPROF_DIR: ${{ github.workspace }}/profiling-gprof
+      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
+      CHASTE_BUILD_DIR: ${{ github.workspace }}/Chaste/chaste-build-dir
+
+    steps:
+
+      - name: get current datetime
+        id: get-datetime
+        run: echo "datetime=$(date +%Y-%m-%d_%H-%M-%S)" >> $GITHUB_OUTPUT
+
+      - name: checkout Chaste
+        uses: actions/checkout@v3
+        with:
+          repository: Chaste/Chaste
+          path: Chaste
+
+      - name: install dependencies
+        run: |
+          echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+          sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
+          sudo apt update
+          sudo apt install chaste-dependencies
+
+      - name: make build and test directories
+        run: |
+          mkdir -p ${CHASTE_BUILD_DIR}
+          mkdir -p ${CHASTE_TEST_OUTPUT}
+
+      - name: cmake configure
+        run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_PROFILE_GPROF_CPUS=2 ..
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+      - name: build profiling test pack
+        run: cmake --build . --target Profile --parallel 2
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+      - name: run profiling tests
+        run: cmake --build . --target profile --parallel 1
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+      - name: check if index file successfully created
+        id: index-exists
+        run: |
+          if [ -e ${CHASTE_BUILD_DIR}/profile/index.html ]; then
+            echo "Index file exists"
+            echo "index=True"  >> $GITHUB_OUTPUT
+          else
+            echo "Index file does not exist"
+            echo "index=False"  >> $GITHUB_OUTPUT
+          fi
+        if: always()
+        
+      - name: checkout profiling-gprof
+        uses: actions/checkout@v3
+        with:
+          repository: Chaste/profiling-gprof
+          path: profiling-gprof
+          fetch-depth: 0
+          token: ${{ secrets.PROFILING_GPROF_ACCESS }}
+        if: always() && steps.index-exists.outputs.index == 'True'
+
+      - name: copy results
+        run: |
+          mkdir ${GPROF_DIR}/log-files/${{ steps.get-datetime.outputs.datetime }}
+          cp ${CHASTE_BUILD_DIR}/profile/* ${GPROF_DIR}/log-files/${{ steps.get-datetime.outputs.datetime }}/
+        if: always() && steps.index-exists.outputs.index == 'True'
+
+      - name: generate index file
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install dominate
+          python write_index.py
+        working-directory: ${{ env.GPROF_DIR }}
+        if: always() && steps.index-exists.outputs.index == 'True'
+
+      - name: commit and push results
+        run: |
+          git config user.name "github-action"
+          git config user.email "github-action"
+          git add --all
+          git commit -m "upload gprof profiling results" || echo "No changes to commit"
+          git push
+        working-directory: ${{ env.GPROF_DIR }}
+        if: always() && steps.index-exists.outputs.index == 'True'

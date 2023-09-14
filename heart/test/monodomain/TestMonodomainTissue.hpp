@@ -165,7 +165,7 @@ public:
 
         // check the purkinje cells vector is empty
         TS_ASSERT(!monodomain_tissue.HasPurkinje());
-        TS_ASSERT_THROWS_ANYTHING(monodomain_tissue.rGetPurkinjeCellsDistributed().size());
+        TS_ASSERT_THROWS_ANYTHING(monodomain_tissue.rGetPurkinjeCellsDistributed());
         TS_ASSERT_THROWS_ANYTHING(monodomain_tissue.rGetPurkinjeIionicCacheReplicated().GetSize());
 
         // voltage that gets passed in solving ode
@@ -634,11 +634,6 @@ public:
             // Note: from Chaste release 3.1 onward we no longer support Boost 1.33.
             // The earliest version of Boost supported in 1.34
 
-            // Run the test with b=_hostconfig,boost=1-34_5 to save
-            /*
-               scons b=_hostconfig,boost=1-34_5 ts=heart/test/monodomain/TestMonodomainTissue.hpp
-             *
-             */
             MonodomainProblem<2> monodomain_problem( &cell_factory );
             monodomain_problem.SetMesh(&mixed_mesh);
             monodomain_problem.Initialise();

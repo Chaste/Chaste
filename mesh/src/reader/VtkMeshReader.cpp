@@ -103,11 +103,16 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
         mVtkCellType = VTK_LINE;
     }
 
-    //Determine if we have multiple cell types - such as cable elements in addition to tets/triangles
+#if (VTK_MAJOR_VERSION >= 9 && VTK_MINOR_VERSION >= 2)
+    const auto num_distinct_cell_types = static_cast<unsigned>(mpVtkUnstructuredGrid->GetDistinctCellTypesArray()->GetNumberOfTuples());
+#else  // VTK older than 9.2
     vtkCellTypes* cell_types = vtkCellTypes::New();
     mpVtkUnstructuredGrid->GetCellTypes(cell_types);
+    const auto num_distinct_cell_types = static_cast<unsigned>(cell_types->GetNumberOfTypes());
+    cell_types->Delete();
+#endif
 
-    if (cell_types->GetNumberOfTypes() > 1)
+    if (num_distinct_cell_types > 1u)
     {
         mNumCableElementAttributes = 1;
         for (unsigned cell_id = 0; cell_id < num_cells; ++cell_id)
@@ -132,9 +137,6 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
         //There is only 1 cell type, so all cells are elements
         mNumElements = num_cells;
     }
-
-    cell_types->Delete();
-
 
     // Extract the surface faces
     if (ELEMENT_DIM == 2u)

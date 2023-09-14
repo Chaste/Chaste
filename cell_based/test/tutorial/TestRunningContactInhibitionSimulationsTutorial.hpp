@@ -131,7 +131,7 @@ public:
         /* We use the honeycomb mesh generator to create a honeycomb mesh and
          * the associated mutable mesh. */
         HoneycombMeshGenerator generator(3, 3);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         /* We now create a vector of cell pointers. */
         std::vector<CellPtr> cells;
@@ -237,7 +237,7 @@ public:
     {
         /* Just as before we create a simple mesh. */
         HoneycombMeshGenerator generator(3, 3);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         /* We again create the cells. The difference here is that one of the cells is not contact-inhibited, but rather
          * is defined by a {{{UniformCellCycleModel}}}. */
@@ -345,7 +345,7 @@ public:
     {
         /* First we create a simple 2D MutableVertexMesh.*/
         HoneycombVertexMeshGenerator generator(2, 2);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         /*
          * We then create cells as before, only this time we need one per element. We also create the cell population (a {{{VertexBasedCellPopulation}}}).
@@ -385,8 +385,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        /* A {{{NagaiHondaForce}}} assumes that each cell has a target area assigned to it. In order to
-         * assign target areas to each cell and define how they grow, we add a {{{SimpleTargetAreaModifier}}}
+        /* In order to model cell growth between divisions, we add a {{{SimpleTargetAreaModifier}}}
          * to the simulator.
          */
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);

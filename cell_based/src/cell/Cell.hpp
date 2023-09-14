@@ -47,6 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellProliferativeType.hpp"
 #include "CellData.hpp"
 #include "CellVecData.hpp"
+#include "CellEdgeData.hpp"
+
 
 #include "AbstractCellCycleModel.hpp"
 #include "AbstractSrnModel.hpp"
@@ -90,9 +92,6 @@ class Cell : private boost::noncopyable, public boost::enable_shared_from_this<C
 {
 private:
 
-    /** Caches the result of ReadyToDivide() so Divide() can look at it. */
-    bool mCanDivide;
-
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -114,9 +113,13 @@ private:
         archive & mApoptosisTime;
         archive & mIsDead;
         archive & mIsLogged;
+        archive & mHasSrnModel;
     }
 
 protected:
+
+    /** Caches the result of ReadyToDivide() so Divide() can look at it. */
+    bool mCanDivide;
 
     /** The cell's property collection. */
     CellPropertyCollection mCellPropertyCollection;
@@ -148,6 +151,9 @@ protected:
     /** Whether the cell is being tracked specially. */
     bool mIsLogged;
 
+    /** Whether the cell has a sub-cellular reaction network (SRN) system of ODEs associated with it. */
+    bool mHasSrnModel;
+
 public:
 
     /**
@@ -171,7 +177,7 @@ public:
     /**
      * Destructor, which frees the memory allocated for our cell-cycle model.
      */
-    ~Cell();
+    virtual ~Cell();
 
     /**
      * @return the cell's proliferative type.
@@ -266,6 +272,13 @@ public:
     boost::shared_ptr<CellData> GetCellData() const;
 
     /**
+     * Get the CellEdgeData associated with the cell.
+     *
+     * @return a pointer to the cell edge data
+     */
+    boost::shared_ptr<CellEdgeData> GetCellEdgeData() const;
+
+    /**
      * Checks whether there is CellVecData associated with this cell
      *
      * @return whether the current cell stores CellVecData
@@ -358,7 +371,7 @@ public:
      *
      * @return the new daughter cell
      */
-    CellPtr Divide();
+    virtual CellPtr Divide();
 
     /**
      * Make the cell enter apoptosis and sets #mDeathTime using the apoptosis
@@ -400,7 +413,7 @@ public:
     bool IsLogged();
 
     /**
-     * Give the Cell an index which it passes to its children.
+     * Give the cell an index which it passes to its children.
      *
      * @param pCellAncestor the cell's ancestor
      */
@@ -416,6 +429,11 @@ public:
      * @return The cell identifier.
      */
     unsigned GetCellId() const;
+
+    /**
+     * @return Whether the cell has a sub-cellular reaction network (SRN) system of ODEs associated with it
+     */
+    bool HasSrnModel() const;
 };
 
 
@@ -436,13 +454,10 @@ inline void save_construct_data(
     // Save data required to construct instance
     const boost::shared_ptr<AbstractCellMutationState> p_mutation_state = t->GetMutationState();
     ar & p_mutation_state;
-
     const AbstractCellCycleModel* const p_cell_cycle_model = t->GetCellCycleModel();
     ar & p_cell_cycle_model;
-
     const AbstractSrnModel* const p_srn_model = t->GetSrnModel();
     ar & p_srn_model;
-
     const CellPropertyCollection& r_cell_property_collection = t->rGetCellPropertyCollection();
     ar & r_cell_property_collection;
 }

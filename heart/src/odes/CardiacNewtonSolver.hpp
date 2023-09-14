@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CARDIACNEWTONSOLVER_HPP_
 
 #include <cmath>
-#include "IsNan.hpp"
+
 #include "UblasCustomFunctions.hpp"
 #include "AbstractBackwardEulerCardiacCell.hpp"
 #include "Warnings.hpp"

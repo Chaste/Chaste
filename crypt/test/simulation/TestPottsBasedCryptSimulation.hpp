@@ -82,7 +82,7 @@ public:
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(20, 5, 4, 45, 10, 4, 1, 1, 1, true);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -136,12 +136,12 @@ public:
 
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(20, 5, 4, 45, 10, 4, 1, 1, 1, true);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 2.5, 8.0, 16.0, 36);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true, 2.5, 8.0, 16.0, 36);
 
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);

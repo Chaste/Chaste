@@ -131,6 +131,17 @@ void AbstractOdeSrnModel::OutputSrnModelParameters(out_stream& rParamsFile)
     AbstractSrnModel::OutputSrnModelParameters(rParamsFile);
 }
 
+void AbstractOdeSrnModel::ScaleSrnVariables(const double theta)
+{
+    assert(mpOdeSystem != nullptr);
+    for (unsigned i=0; i<mpOdeSystem->GetNumberOfStateVariables(); ++i)
+    {
+        const double old_value = mpOdeSystem->GetStateVariable(i);
+        const double new_value = theta*old_value;
+        mpOdeSystem->SetStateVariable(i, new_value);
+    }
+}
+
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
 CHASTE_CLASS_EXPORT(AbstractOdeSrnModel)

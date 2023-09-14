@@ -497,94 +497,98 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
     return neighbouring_node_indices;
 }
 
-template<unsigned DIM>
-double NodeBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
+template <unsigned DIM>
+double NodeBasedCellPopulation<DIM>::GetVolumeOfCell([[maybe_unused]] CellPtr pCell)
 {
     // Not implemented or tested in 1D
-    assert(DIM==2 ||DIM==3); // LCOV_EXCL_LINE
-
-    // Get node index corresponding to this cell
-    unsigned node_index = this->GetLocationIndexUsingCell(pCell);
-    Node<DIM>* p_node = this->GetNode(node_index);
-
-    // Get cell radius
-    double cell_radius = p_node->GetRadius();
-
-    // Begin code to approximate cell volume
-    double averaged_cell_radius = 0.0;
-    unsigned num_cells = 0;
-
-    // Get the location of this node
-    const c_vector<double, DIM>& r_node_i_location = GetNode(node_index)->rGetLocation();
-
-    // Get the set of node indices corresponding to this cell's neighbours
-    std::set<unsigned> neighbouring_node_indices = GetNeighbouringNodeIndices(node_index);
-
-    // THe number of neighbours in equilibrium configuration, from sphere packing problem
-    unsigned num_neighbours_equil;
-    if (DIM==2)
+    if constexpr ((DIM == 2) || (DIM == 3))
     {
-        num_neighbours_equil = 6;
-    }
-    else
-    {
-        assert(DIM==3);
-        num_neighbours_equil = 12;
-    }
+        // Get node index corresponding to this cell
+        unsigned node_index = this->GetLocationIndexUsingCell(pCell);
+        Node<DIM>* p_node = this->GetNode(node_index);
 
-    // Loop over this set
-    for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
-         iter != neighbouring_node_indices.end();
-         ++iter)
-    {
-        Node<DIM>* p_node_j = this->GetNode(*iter);
+        // Get cell radius
+        double cell_radius = p_node->GetRadius();
 
-        // Get the location of the neighbouring node
-        const c_vector<double, DIM>& r_node_j_location = p_node_j->rGetLocation();
+        // Begin code to approximate cell volume
+        double averaged_cell_radius = 0.0;
+        unsigned num_cells = 0;
 
-        double neighbouring_cell_radius = p_node_j->GetRadius();
+        // Get the location of this node
+        const c_vector<double, DIM>& r_node_i_location = GetNode(node_index)->rGetLocation();
 
-        // If this throws then you may not be considering all cell interactions use a larger cut off length
-        assert(cell_radius+neighbouring_cell_radius<mpNodesOnlyMesh->GetMaximumInteractionDistance());
+        // Get the set of node indices corresponding to this cell's neighbours
+        std::set<unsigned> neighbouring_node_indices = GetNeighbouringNodeIndices(node_index);
 
-        // Calculate the distance between the two nodes and add to cell radius
-        double separation = norm_2(mpNodesOnlyMesh->GetVectorFromAtoB(r_node_j_location, r_node_i_location));
-
-        if (separation < cell_radius+neighbouring_cell_radius)
+        // THe number of neighbours in equilibrium configuration, from sphere packing problem
+        unsigned num_neighbours_equil;
+        if (DIM == 2)
         {
-            // The effective radius is the mid point of the overlap
-            averaged_cell_radius = averaged_cell_radius + cell_radius - (cell_radius+neighbouring_cell_radius-separation)/2.0;
-            num_cells++;
+            num_neighbours_equil = 6;
         }
-    }
-    if (num_cells < num_neighbours_equil)
-    {
-        averaged_cell_radius += (num_neighbours_equil-num_cells)*cell_radius;
+        else // DIM == 3
+        {
+            num_neighbours_equil = 12;
+        }
 
-        averaged_cell_radius /= num_neighbours_equil;
+        // Loop over this set
+        for (std::set<unsigned>::iterator iter = neighbouring_node_indices.begin();
+            iter != neighbouring_node_indices.end();
+            ++iter)
+        {
+            Node<DIM>* p_node_j = this->GetNode(*iter);
+
+            // Get the location of the neighbouring node
+            const c_vector<double, DIM>& r_node_j_location = p_node_j->rGetLocation();
+
+            double neighbouring_cell_radius = p_node_j->GetRadius();
+
+            // If this throws then you may not be considering all cell interactions use a larger cut off length
+            assert(cell_radius+neighbouring_cell_radius<mpNodesOnlyMesh->GetMaximumInteractionDistance());
+
+            // Calculate the distance between the two nodes and add to cell radius
+            double separation = norm_2(mpNodesOnlyMesh->GetVectorFromAtoB(r_node_j_location, r_node_i_location));
+
+            if (separation < cell_radius+neighbouring_cell_radius)
+            {
+                // The effective radius is the mid point of the overlap
+                averaged_cell_radius = averaged_cell_radius + cell_radius - (cell_radius+neighbouring_cell_radius-separation)/2.0;
+                num_cells++;
+            }
+        }
+        if (num_cells < num_neighbours_equil)
+        {
+            averaged_cell_radius += (num_neighbours_equil-num_cells)*cell_radius;
+
+            averaged_cell_radius /= num_neighbours_equil;
+        }
+        else
+        {
+            averaged_cell_radius /= num_cells;
+        }
+        assert(averaged_cell_radius < mpNodesOnlyMesh->GetMaximumInteractionDistance()/2.0);
+
+        cell_radius = averaged_cell_radius;
+
+        // End code to approximate cell volume
+
+        // Calculate cell volume from radius of cell
+        double cell_volume = 0.0;
+        if (DIM == 2)
+        {
+            cell_volume = M_PI*cell_radius*cell_radius;
+        }
+        else // DIM == 3
+        {
+            cell_volume = (4.0/3.0)*M_PI*cell_radius*cell_radius*cell_radius;
+        }
+
+        return cell_volume;
     }
     else
     {
-        averaged_cell_radius /= num_cells;
+        NEVER_REACHED;
     }
-    assert(averaged_cell_radius < mpNodesOnlyMesh->GetMaximumInteractionDistance()/2.0);
-
-    cell_radius = averaged_cell_radius;
-
-    // End code to approximate cell volume
-
-    // Calculate cell volume from radius of cell
-    double cell_volume = 0.0;
-    if (DIM == 2)
-    {
-        cell_volume = M_PI*cell_radius*cell_radius;
-    }
-    else if (DIM == 3)
-    {
-        cell_volume = (4.0/3.0)*M_PI*cell_radius*cell_radius*cell_radius;
-    }
-
-    return cell_volume;
 }
 
 template<unsigned DIM>

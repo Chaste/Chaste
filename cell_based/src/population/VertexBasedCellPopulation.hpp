@@ -38,6 +38,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractOffLatticeCellPopulation.hpp"
 #include "MutableVertexMesh.hpp"
+#include "TrapezoidEdgeVertexMeshWriter.hpp"
+#include "VertexBasedPopulationSrn.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -46,6 +48,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 class AbstractVertexBasedDivisionRule; // Forward declaration to prevent circular include chain
+template<unsigned DIM>
+class VertexBasedPopulationSrn;
 
 /**
  * A facade class encapsulating a vertex-based cell population.
@@ -63,6 +67,8 @@ private:
      * This test uses the private constructor to simplify testing.
      */
     friend class TestVertexBasedDivisionRules;
+    friend class TestVertexBasedCellPopulation;
+    friend class TestMutableVertexMeshOperationsWithPopulationSrn;
 
     /**
      * Whether to delete the mesh when we are destroyed.
@@ -108,12 +114,43 @@ private:
      */
      bool mThrowStepSizeException = true;
 
+     /**
+      * SRN remapping helper class
+      */
+     VertexBasedPopulationSrn<DIM> mPopulationSrn;
+
+     /**
+      * Whether to write cell vtk results. True by default
+      */
+     bool mWriteCellVtkResults = true;
+
+     /**
+      * Whether to write edge vtk results. True by default
+      */
+     bool mWriteEdgeVtkResults = true;
+
     /**
-     * Overridden WriteVtkResultsToFile() method.
-     *
+     * Overridden WriteVtkResultsToFile() method. If the first cell uses the SrnCellModel,
+     * the WriteCellEdgeVtkResultsToFile() is used which outputs an edge-based representation of the cell,
+     * otherwise WriteCellVtkResultsToFile() is used to represent entire cells.
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
     virtual void WriteVtkResultsToFile(const std::string& rDirectory);
+
+    /**
+     * Writes a representation of cells to file.
+     * @param rDirectory
+     */
+    virtual void WriteCellVtkResultsToFile(const std::string& rDirectory);
+
+    /**
+     * Writes an edge-based representation of the cells to file.
+     * Each cell is divided into a number of triangles equaling the number of edges.
+     *
+     * Cell ID property is added by default so individual cells can still be differentiated.
+     * @param rDirectory
+     */
+    virtual void WriteCellEdgeVtkResultsToFile(const std::string& rDirectory);
 
     friend class boost::serialization::access;
     /**
@@ -167,7 +204,8 @@ public:
      *
      * @param rMesh a vertex mesh.
      */
-    VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh);
+    VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh,
+                              VertexBasedPopulationSrn<DIM>& rPopSrn);
 
     /**
      * Destructor, which frees any memory allocated by the constructor.
@@ -237,13 +275,26 @@ public:
 
     /**
      * Overridden GetNeighbouringLocationIndices() method.
-     *
-     * Given a cell, returns the set of location indices corresponding to neighbouring cells.
+     * Given a cell, returns the set of location indices corresponding to 
+     * neighbouring cells.
      *
      * @param pCell a cell
+     * 
      * @return the set of neighbouring location indices.
      */
     std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
+
+    /**
+     * Overridden GetNeighbouringEdgeIndices() method.
+     * Gets the local edge index of the neighbouring element and the element 
+     * index.
+     * 
+     * @param pCell  Cell pointer
+     * @param pEdgeIndex Local edge index
+     * 
+     * @return set of pairs consisting of element index neighbouring pCell and local edge index
+     */
+    std::set<std::pair<unsigned, unsigned>> GetNeighbouringEdgeIndices(CellPtr pCell, unsigned EdgeLocalIndex);
 
     /**
      * Overridden AddNode() method.
@@ -559,6 +610,29 @@ public:
      * @param restrictVertexMovement whether to restrict vertex movement in this simulation.
      */
     void SetRestrictVertexMovementBoolean(bool restrictVertexMovement);
+
+    /**
+     * Get VertexBasedPopulationSrn object. Used e.g. in TestMutableVertexMeshRemeshWithPopulationSrn.
+     * @return reference to mPopulationSrn
+     */
+    VertexBasedPopulationSrn<DIM>& rGetVertexBasedPopulationSrn();
+
+    /**
+     * @return const reference to mPopulationSrn (used in archiving).
+     */
+    const VertexBasedPopulationSrn<DIM>& rGetVertexBasedPopulationSrn() const;
+
+    /**
+     * Set whether to write cell vtk results
+     * @param new_val whether to write cell vtk
+     */
+    void SetWriteCellVtkResults(const bool new_val);
+
+    /**
+     * Set whether to write cell vtk results
+     * @param new_val whether to write cell vtk
+     */
+    void SetWriteEdgeVtkResults(const bool new_val);
 };
 
 #include "SerializationExportWrapper.hpp"
@@ -578,6 +652,9 @@ inline void save_construct_data(
     // Save data required to construct instance
     const MutableVertexMesh<DIM,DIM>* p_mesh = &(t->rGetMesh());
     ar & p_mesh;
+
+    const VertexBasedPopulationSrn<DIM>& pop_srn = t->rGetVertexBasedPopulationSrn();
+    ar & pop_srn;
 }
 
 /**
@@ -592,8 +669,10 @@ inline void load_construct_data(
     MutableVertexMesh<DIM,DIM>* p_mesh;
     ar >> p_mesh;
 
+    VertexBasedPopulationSrn<DIM> pop_srn;
+    ar & pop_srn;
     // Invoke inplace constructor to initialise instance
-    ::new(t)VertexBasedCellPopulation<DIM>(*p_mesh);
+    ::new(t)VertexBasedCellPopulation<DIM>(*p_mesh, pop_srn);
 }
 }
 } // namespace ...

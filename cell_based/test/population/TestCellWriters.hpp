@@ -312,7 +312,7 @@ public:
 
         // Create a regular vertex mesh
         HoneycombVertexMeshGenerator generator(2, 2);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create some cells, each with a cell-cycle model that incorporates a delta-notch ODE system
         std::vector<CellPtr> cells;
@@ -407,7 +407,7 @@ public:
 
         // Create a regular vertex mesh
         HoneycombVertexMeshGenerator generator(2, 2);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create some cells
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
@@ -692,7 +692,7 @@ public:
 
         // Create a simple CA-based cell population
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -1334,7 +1334,7 @@ public:
 
         // Create a simple vertex-based cell population
         HoneycombVertexMeshGenerator generator(4, 6);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
@@ -1413,7 +1413,7 @@ public:
 
             // Create a simple vertex-based cell population
             HoneycombVertexMeshGenerator generator(4, 6);
-            MutableVertexMesh<2, 2> *p_mesh = generator.GetMesh();
+            boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
             std::vector<CellPtr> cells;
             boost::shared_ptr<AbstractCellProperty> p_diff_type(
@@ -1458,7 +1458,7 @@ public:
         {
             // Create a simple CA-based cell population
             PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-            PottsMesh<2>* p_mesh = generator.GetMesh();
+            boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
             std::vector<CellPtr> cells;
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -1739,7 +1739,7 @@ public:
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         c_vector<double, 2> vec_data = cell_writer.GetVectorCellDataForVtkOutput(*(cell_population.Begin()), &cell_population);
-        for(auto& component : vec_data)
+        for (auto& component : vec_data)
         {
             TS_ASSERT_EQUALS(component, DOUBLE_UNSET);
         }

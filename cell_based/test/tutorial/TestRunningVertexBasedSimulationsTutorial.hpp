@@ -124,7 +124,7 @@ public:
         * cells) wide, and 2 elements high.
         */
         HoneycombVertexMeshGenerator generator(2, 2);    // Parameters are: cells across, cells up
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         /* Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
         * To do this, we use the `CellsGenerator` helper class, which is templated over the type
@@ -173,7 +173,7 @@ public:
 
         /* A {{{NagaiHondaForce}}} assumes that each cell has a target area. The target areas of cells are used to determine pressure
          * forces on each vertex and eventually determine the size of each cell in the simulation. In order to assign target areas to cells
-         * and update them in each time step we add a {{{SimpleTargetAreaModifier}}} to the simulation, which inherits from
+         * and update them in each time step to model growth, we add a {{{SimpleTargetAreaModifier}}} to the simulation, which inherits from
          *  {{{AbstractTargetAreaModifier}}}.
          */
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
@@ -216,7 +216,7 @@ public:
          * is 4 elements (i.e. cells) wide, and 4 elements high.
          */
         CylindricalHoneycombVertexMeshGenerator generator(4, 4);    // Parameters are: cells across, cells up
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         /* Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
         * This is exactly the same as the above test. */
@@ -243,7 +243,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_force);
         simulator.AddForce(p_force);
 
-        /* We also make a pointer to the target area modifier and add it to the simulator.
+        /* We also make a pointer to a target area modifier and add it to the simulator.
          */
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);

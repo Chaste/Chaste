@@ -140,7 +140,7 @@ public:
          * object to return the mesh, which is of type {{{MutableMesh}}}.
          */
         HoneycombMeshGenerator generator(10, 10, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         /*
          * Next, we need to create some cells. Unlike in the the crypt simulation

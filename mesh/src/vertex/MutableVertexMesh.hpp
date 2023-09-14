@@ -49,8 +49,10 @@ class VertexMeshWriter;
 #include <boost/serialization/split_member.hpp>
 
 #include "VertexMesh.hpp"
+#include "EdgeHelper.hpp"
 #include "RandomNumberGenerator.hpp"
 
+#include "VertexMeshOperationRecorder.hpp"
 /**
  * A mutable vertex-based mesh class, which inherits from VertexMesh and allows for local
  * remeshing. This is implemented through simple operations including node merging, neighbour
@@ -67,8 +69,15 @@ class MutableVertexMesh : public VertexMesh<ELEMENT_DIM, SPACE_DIM>
     friend class TestMutableVertexMesh;
     friend class TestMutableVertexMeshReMesh;
     friend class TestMutableVertexMeshRosetteMethods;
-
+    friend class TestMutableVertexEdges;
+    friend class TestCellEdgeInteriorSrn;
+    friend class TestMutableVertexMeshOperationsWithPopulationSrn;
 protected:
+    /** Whether we need to record mesh operations, e.g. when SRN models are used */
+    bool mTrackMeshOperations = false;
+
+    /** Helper class to record rearrangements and mesh operations */
+    VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM> mOperationRecorder = (VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>());
 
     /** The minimum distance apart that two nodes in the mesh can be without causing element rearrangement. */
     double mCellRearrangementThreshold;
@@ -112,21 +121,9 @@ protected:
     double mDistanceForT3SwapChecking;
 
     /**
-     * Locations of T1 swaps (the mid point of the moving nodes), stored so they can be accessed and output by the cell population.
-     * The locations are stored until they are cleared by ClearLocationsOfT1Swaps().
-     */
-    std::vector< c_vector<double, SPACE_DIM> > mLocationsOfT1Swaps;
-
-    /**
      * The location of the last T2 swap (the centre of the removed triangle), stored so it can be accessed by the T2SwapCellKiller.
      */
     c_vector<double, SPACE_DIM> mLastT2SwapLocation;
-
-    /**
-     * Locations of T3 swaps (the location of the intersection with the edge), stored so they can be accessed and output by the cell population.
-     * The locations are stored until they are cleared by ClearLocationsOfT3Swaps().
-     */
-    std::vector< c_vector<double, SPACE_DIM> > mLocationsOfT3Swaps;
 
     /**
      * Locations of intersection swaps (the mid point of the switching nodes), stored so they can be accessed and output by the cell population.
@@ -356,12 +353,12 @@ private:
         archive & mDeletedNodeIndices;
         archive & mDeletedElementIndices;
         archive & mDistanceForT3SwapChecking;
+        archive & mOperationRecorder;
+        archive & mCheckForT3Swaps;
         archive & mCheckForT3Swaps;
         ///\todo: maybe we should archive the mLocationsOfT1Swaps and mDeletedNodeIndices etc. as well?
-
         archive & boost::serialization::base_object<VertexMesh<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
-
 public:
 
     /**
@@ -532,6 +529,8 @@ public:
     bool GetCheckForInternalIntersections() const;
 
     /**
+     * This is a shortcut to get locations from mOperationRecorder
+     * @return the locations of the T3 swaps
      * @return mCheckForT3Swaps, either to check for T3 swaps or not.
      */
     bool GetCheckForT3Swaps() const;
@@ -547,6 +546,7 @@ public:
     c_vector<double, SPACE_DIM> GetLastT2SwapLocation();
 
     /**
+     * This is a shortcut to get locations from mOperationRecorder
      * @return the locations of the T3 swaps
      */
     std::vector< c_vector<double, SPACE_DIM> > GetLocationsOfT3Swaps();
@@ -699,6 +699,16 @@ public:
      * \todo This method seems to be redundant; remove it? (#2401)
      */
     void ReMesh();
+
+    /**
+     * @param track whether we need to track mesh operations during ReMesh
+     */
+    void SetMeshOperationTracking(const bool track);
+
+    /**
+     * @return pointer to the VertexMeshOperationRecorder
+     */
+    VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>* GetOperationRecorder();
 };
 
 #include "SerializationExportWrapper.hpp"

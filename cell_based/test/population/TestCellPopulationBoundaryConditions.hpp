@@ -49,6 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsMeshGenerator.hpp"
 #include "PlaneBoundaryCondition.hpp"
 #include "SphereGeometryBoundaryCondition.hpp"
+#include "SlidingBoundaryCondition.hpp"
 #include "MeshBasedCellPopulation.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "WildTypeCellMutationState.hpp"
@@ -76,7 +77,7 @@ public:
 
         // Create mesh
         HoneycombMeshGenerator generator(2, 2, 0);
-        MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -141,7 +142,7 @@ public:
 
         // Create mesh
         HoneycombMeshGenerator generator(2, 2, 0);
-        MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -200,7 +201,7 @@ public:
     {
         // Create mesh
         HoneycombVertexMeshGenerator generator(2, 2);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -291,7 +292,7 @@ public:
     {
         // Create a simple 2D PottsMesh
         PottsMeshGenerator<2> generator(6, 2, 2, 6, 2, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -441,6 +442,84 @@ public:
         TS_ASSERT_EQUALS(bc_3d.VerifyBoundaryCondition(), true);
     }
 
+    void TestSlidingBoundaryCondition()
+    {
+        // Create mesh
+        HoneycombVertexMeshGenerator generator(2, 2);
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        double threshold = 0.2;
+        SlidingBoundaryCondition<2> boundary_condition(&cell_population, threshold);
+
+        // Test GetThreshold() method
+        TS_ASSERT_DELTA(boundary_condition.GetThreshold(), threshold, 1e-6);
+
+        // Impose boundary condition
+        std::map<Node<2>*, c_vector<double,2> > old_locations;
+        for (MutableVertexMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
+             node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
+             ++node_iter)
+        {
+            old_locations[&(*node_iter)] = node_iter->rGetLocation();
+        }
+        boundary_condition.ImposeBoundaryCondition(old_locations);
+
+        // Test that all nodes satisfy the boundary condition
+        for (MutableVertexMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
+             node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
+             ++node_iter)
+        {
+            c_vector<double, 2> location;
+            location = node_iter->rGetLocation();
+            if (old_locations[&(*node_iter)][0] < threshold)
+            {
+                TS_ASSERT_DELTA(0.0, location[0], 1e-6);
+                TS_ASSERT_DELTA(location[1], old_locations[&(*node_iter)][1], 1e-6);
+            }
+            else
+            {
+                TS_ASSERT_DELTA(location[0], old_locations[&(*node_iter)][0], 1e-6);
+                TS_ASSERT_DELTA(location[1], old_locations[&(*node_iter)][1], 1e-6);
+            }
+        }
+
+        // Test VerifyBoundaryCondition() method
+        TS_ASSERT_EQUALS(boundary_condition.VerifyBoundaryCondition(), true);
+    }
+
+    void TestSlidingBoundaryConditionException()
+    {
+        // Create a simple 2D PottsMesh
+        PottsMeshGenerator<2> generator(6, 2, 2, 6, 2, 2);
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+
+        // Create cell population
+        PottsBasedCellPopulation<2> potts_cell_population(*p_mesh, cells);
+
+        // Attempt to set up cell population boundary condition
+        double threshold = 0.4;
+        SlidingBoundaryCondition<2> sliding_boundary_condition(&potts_cell_population, threshold);
+        std::map<Node<2>*, c_vector<double, 2> > old_locations;
+
+        // Test the correct exception is thrown
+        TS_ASSERT_THROWS_THIS(sliding_boundary_condition.ImposeBoundaryCondition(old_locations),
+            "SlidingBoundaryCondition requires a subclass of AbstractOffLatticeCellPopulation.");
+    }
+
     void TestArchivingOfPlaneBoundaryCondition()
     {
         EXIT_IF_PARALLEL;    // We cannot archive parallel cell based simulations yet.
@@ -563,6 +642,61 @@ public:
         }
     }
 
+    void TestArchivingOfSlidingBoundaryCondition()
+    {
+        EXIT_IF_PARALLEL;    // We cannot archive parallel cell based simulations yet.
+
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2,2> generating_mesh;
+        generating_mesh.ConstructFromMeshReader(mesh_reader);
+
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(generating_mesh, 1.5);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        NodeBasedCellPopulation<2> population(mesh, cells);
+
+        FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
+        std::string archive_file = "SlidingBoundaryCondition.arch";
+        ArchiveLocationInfo::SetMeshFilename("SlidingBoundaryCondition");
+
+        {
+            // Create an output archive
+            SlidingBoundaryCondition<2> boundary_condition(&population, 0.56);
+
+            TS_ASSERT_DELTA(boundary_condition.GetThreshold(), 0.56, 1e-6);
+
+            // Create an output archive
+            ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
+
+            // Serialize via pointer
+            AbstractCellPopulationBoundaryCondition<2>* const p_boundary_condition = &boundary_condition;
+            (*p_arch) << p_boundary_condition;
+        }
+
+        {
+            // Create an input archive
+            ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
+            boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
+
+            AbstractCellPopulationBoundaryCondition<2,2>* p_boundary_condition;
+
+            // Restore from the archive
+            (*p_arch) >> p_boundary_condition;
+
+            // Test we have restored the plane geometry correctly
+            TS_ASSERT_DELTA(static_cast<SlidingBoundaryCondition<2>*>(p_boundary_condition)->GetThreshold(), 0.56, 1e-6);
+
+            // Tidy up
+            delete p_boundary_condition->mpCellPopulation;
+            delete p_boundary_condition;
+       }
+    }
+
     void TestCellBoundaryConditionsOutputParameters()
     {
         EXIT_IF_PARALLEL;
@@ -612,6 +746,23 @@ public:
             // Compare the generated file in test output with a reference copy in the source code.
             FileFinder generated = output_file_handler.FindFile("sphere_results.parameters");
             FileFinder reference("cell_based/test/data/TestCellBoundaryConditionsOutputParameters/sphere_results.parameters",
+                    RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated, reference);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+
+        // Test with SlidingBoundaryCondition
+        SlidingBoundaryCondition<2> sliding_boundary_condition(&population, 0.56);
+        TS_ASSERT_EQUALS(sliding_boundary_condition.GetIdentifier(), "SlidingBoundaryCondition-2");
+
+        out_stream sliding_boundary_condition_parameter_file = output_file_handler.OpenOutputFile("sliding_results.parameters");
+        sliding_boundary_condition.OutputCellPopulationBoundaryConditionParameters(sliding_boundary_condition_parameter_file);
+        sliding_boundary_condition_parameter_file->close();
+
+        {
+            // Compare the generated file in test output with a reference copy in the source code.
+            FileFinder generated = output_file_handler.FindFile("sliding_results.parameters");
+            FileFinder reference("cell_based/test/data/TestCellBoundaryConditionsOutputParameters/sliding_results.parameters",
                     RelativeTo::ChasteSourceRoot);
             FileComparison comparer(generated, reference);
             TS_ASSERT(comparer.CompareFiles());

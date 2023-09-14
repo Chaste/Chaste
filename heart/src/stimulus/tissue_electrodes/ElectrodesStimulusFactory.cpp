@@ -35,10 +35,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ElectrodesStimulusFactory.hpp"
 #include "DistributedTetrahedralMesh.hpp"
-#include "IsNan.hpp"
 #include "HeartConfig.hpp"
 #include "GaussianQuadratureRule.hpp"
 #include "RegularStimulus.hpp"
+
+#include <cmath>
 
 template<unsigned DIM>
 ElectrodesStimulusFactory<DIM>::ElectrodesStimulusFactory(std::vector<std::pair<AbstractChasteRegion<DIM>*, AbstractChasteRegion<DIM>*> >& rElectrodePairs,
@@ -61,7 +62,7 @@ ElectrodesStimulusFactory<DIM>::ElectrodesStimulusFactory(std::vector<std::pair<
         (rElectrodePairs.size() != rStarts.size()) ||
         (rElectrodePairs.size() != rEnds.size()))
     {
-        EXCEPTION ("Vector of electrode pairs and vector of stimulation paremeters must have the same size");
+        EXCEPTION ("Vector of electrode pairs and vector of stimulation parameters must have the same size");
     }
 
     mMagnitudesElectrode1 = mrMagnitudes;

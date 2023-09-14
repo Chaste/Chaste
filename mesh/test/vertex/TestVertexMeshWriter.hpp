@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTVERTEXMESHWRITER_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include <boost/shared_ptr.hpp>
 
 #include <string>
 #include <fstream>
@@ -48,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CylindricalHoneycombVertexMeshGenerator.hpp"
 #include "ToroidalHoneycombVertexMeshGenerator.hpp"
 #include "FileComparison.hpp"
-
+#include "TrapezoidEdgeVertexMeshWriter.hpp"
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
@@ -140,7 +141,7 @@ public:
     {
         // Create cylindrical mesh (i.e. one that is left/right periodic)
         CylindricalHoneycombVertexMeshGenerator generator(4, 4);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 40u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u);
@@ -198,7 +199,7 @@ public:
     {
         // Create toroidal mesh (i.e. one that is periodic in both directions)
         ToroidalHoneycombVertexMeshGenerator generator(4, 4);
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 32u); // 2*4*4
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u); // 4*4
@@ -482,6 +483,17 @@ public:
         TS_ASSERT_EQUALS(mesh_reader2.GetNumNodes(), 7u);
         TS_ASSERT_EQUALS(mesh_reader2.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(mesh_reader2.GetNumElementAttributes(), 1u);
+    }
+
+    void TestTrapezoidEdgeVertexMeshWriter()
+    {
+        // The class is utilised when there are CellEdgeData associated with the mesh
+        // TrapezoidEdgeVertexMeshWriter() only outputs .vtk files for visualisation,
+        // where trapezoids represent edges.
+        // Here we only test for coverage of an implementation of WriteFiles() method
+        TrapezoidEdgeVertexMeshWriter<2,2> mesh_writer("TestTrapezoidEdgeVertexMeshWriter", "vertex_mesh");
+        //For coverage
+        mesh_writer.WriteFiles();
     }
 };
 

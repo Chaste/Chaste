@@ -273,7 +273,7 @@ public:
         {
             bidomain_problem.Solve();
         }
-        catch (Exception e)
+        catch (const Exception& e)
         {
             TS_FAIL(e.GetMessage());
         }
@@ -368,7 +368,7 @@ public:
             {
                 bidomain_problem.Solve();
             }
-            catch (Exception e)
+            catch (const Exception& e)
             {
                 TS_FAIL(e.GetMessage());
             }

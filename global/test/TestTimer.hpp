@@ -36,14 +36,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _TESTTIMER_HPP_
 #define _TESTTIMER_HPP_
 
+#include <cmath>
+
 #include <cxxtest/TestSuite.h>
-#include "Timer.hpp"
+
 #include "PetscSetupAndFinalize.hpp"
+#include "Timer.hpp"
 
 class TestTimer : public CxxTest::TestSuite
 {
 public:
-
     // Can't really test the timer, this is just for coverage and to illustrate usage
     void TestTheTimer()
     {
@@ -60,11 +62,15 @@ public:
         double elapsed_time = Timer::GetElapsedTime();
         TS_ASSERT_LESS_THAN_EQUALS(0, elapsed_time);
 
-        // Small amount of work in a loop that can't be optimized by unrolling
-        for (unsigned i=2; i<1000; )
+        // Small amount of work in a loop that can't be optimized by unrolling.
+        // Updated 2023-06-20 to make it even less likely the compiler will optimize this work away.
+        volatile double number = 0.0;
+        for (unsigned i = 1; i < 10'000; ++i)
         {
-            i += (int) floor(sqrt(i));
+            number += std::asinh(0.001 * i);
         }
+        TS_ASSERT_LESS_THAN(20'930.0, number);
+
         double elapsed_time2 = Timer::GetElapsedTime();
         TS_ASSERT_LESS_THAN(elapsed_time, elapsed_time2);
 

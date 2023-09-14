@@ -36,10 +36,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MUTABLEELEMENT_HPP_
 
 #include "AbstractElement.hpp"
+#include "Edge.hpp"
+#include "EdgeHelper.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
+
+template<unsigned SPACE_DIM>
+class EdgeHelper;
 
 /**
  *  A mutable element containing functionality
@@ -49,8 +54,6 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class MutableElement : public AbstractElement<ELEMENT_DIM, SPACE_DIM>
 {
 private:
-
-
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -69,6 +72,14 @@ private:
     {
         archive & boost::serialization::base_object<AbstractElement<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
+
+protected:
+
+    /** The edges forming this element **/
+    std::vector<Edge<SPACE_DIM>*> mEdges;
+
+    /** EdgeHelper class to keep track of edges */
+    EdgeHelper<SPACE_DIM>* mEdgeHelper;
 
 public:
 
@@ -150,11 +161,82 @@ public:
     unsigned GetNodeLocalIndex(unsigned globalIndex) const;
 
     /**
+     * Inform all edges forming this element that they are in this element.
+     */
+    void RegisterWithEdges();
+
+    /**
+     * Rebuild edges in this element.
+     */
+    void RebuildEdges();
+
+    /**
      * Get whether or not the element is on the boundary by seeing if contains boundary nodes.
      *
      * @return whether or not the element is on the boundary.
      */
     virtual bool IsElementOnBoundary() const;
+
+    /**
+     * Sets edge helper.
+     * 
+     * @param pEdgeHelper pointer to an edge helper
+     */
+    void SetEdgeHelper(EdgeHelper<SPACE_DIM>* pEdgeHelper);
+
+    /**
+     * Clear edges from element
+     */
+    void ClearEdges();
+
+    /**
+     * Builds edges from element nodes
+     */
+    void BuildEdges();
+
+    /**
+     * Gets the global index of the edge at localIndex
+     * @param localIndex local index of the edge in this element
+     * @return Global index of the edge
+     */
+    unsigned GetEdgeGlobalIndex(unsigned localIndex) const;
+
+    /**
+     * Gets the edge at localIndex
+     * @param localIndex local index of the edge in this element
+     * @return
+     */
+    Edge<SPACE_DIM>* GetEdge(unsigned localIndex) const;
+
+    /**
+     * @return Number of edges associated with this element
+     */
+    unsigned GetNumEdges() const;
+
+    /**
+     * Gets a set of element indices that neighours the element at the specified edge
+     * @param localIndex Local index of the edge in this element
+     * @return A set of element indices that neighbours this edge
+     */
+    std::set<unsigned> GetNeighbouringElementAtEdgeIndex(unsigned localIndex);
+
+    /**
+     * Checks if the element contains an edge.
+     * 
+     * @param pEdge pointer to an edge
+     * 
+     * @return whether the element contains pEdge
+     */
+    bool ContainsEdge(const Edge<SPACE_DIM>* pEdge) const;
+
+    /**
+     * Return the local index of an edge.
+     * 
+     * @param pEdge pointer to an edge
+     * 
+     * @return -1 if pEdge was not found, else the local index of pEdge
+     */
+    long GetLocalEdgeIndex(const Edge<SPACE_DIM>* pEdge) const;
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -170,6 +252,14 @@ public:
 template<unsigned SPACE_DIM>
 class MutableElement<1, SPACE_DIM> : public AbstractElement<1,SPACE_DIM>
 {
+protected:
+
+    /** The edges forming this element **/
+    std::vector<Edge<SPACE_DIM>*> mEdges;
+
+    /** EdgeHelper class to keep track of edges */
+    EdgeHelper<SPACE_DIM>* mEdgeHelper;
+
 public:
 
     /**
@@ -239,6 +329,59 @@ public:
     void AddNode(Node<SPACE_DIM>* pNode, const unsigned& rIndex);
 
     /**
+     * Get the edge at localIndex.
+     * 
+     * @param localIndex local index of an edge in this element
+     * @return pointer to the edge with given local index
+     */
+    Edge<SPACE_DIM>* GetEdge(unsigned localIndex) const;
+
+     /**
+     * Check if the element contains an edge.
+     * 
+     * @param pEdge pointer to an edge
+     * 
+     * @return whether the element contains pEdge
+     */
+    bool ContainsEdge(const Edge<SPACE_DIM>* pEdge) const;
+
+    /**
+     * @return Number of edges associated with this element
+     */
+    unsigned GetNumEdges() const;
+
+    /**
+     * Sets edge helper.
+     * 
+     * @param pEdgeHelper pointer to an edge helper
+     */
+    void SetEdgeHelper(EdgeHelper<SPACE_DIM>* pEdgeHelper);
+
+    /**
+     * Builds edges from element nodes
+     */
+    void BuildEdges();
+
+    /**
+     * Clear edges from element
+     */
+    void ClearEdges();
+
+    /**
+     * Gets the global index of the edge at localIndex
+     * @param localIndex local index of the edge in this element
+     * @return Global index of the edge
+     */
+    unsigned GetEdgeGlobalIndex(unsigned localIndex) const;
+
+    /**
+     * Gets a set of element indices that neighours the element at the specified edge
+     * @param localIndex Local index of the edge in this element
+     * @return A set of element indices that neighbours this edge
+     */
+    std::set<unsigned> GetNeighbouringElementAtEdgeIndex(unsigned localIndex);
+
+    /**
      * Calculate the local index of a node given a global index
      * if node is not contained in element return UINT_MAX
      *
@@ -248,11 +391,30 @@ public:
     unsigned GetNodeLocalIndex(unsigned globalIndex) const;
 
     /**
+     * Inform all edges forming this element that they are in this element.
+     */
+    void RegisterWithEdges();
+
+    /**
+     * Rebuild edges in this element.
+     */
+    void RebuildEdges();
+
+    /**
      * Get whether or not the element is on the boundary by seeing if contains boundary nodes.
      *
      * @return whether or not the element is on the boundary.
      */
     virtual bool IsElementOnBoundary() const;
+
+    /**
+     * Return the local index of an edge.
+     * 
+     * @param pEdge pointer to an edge
+     * 
+     * @return -1 if an edge was not found, else the local index of pEdge
+     */
+    long GetLocalEdgeIndex(const Edge<SPACE_DIM>* pEdge) const;
 };
 
 #endif /*MUTABLEELEMENT_HPP_*/

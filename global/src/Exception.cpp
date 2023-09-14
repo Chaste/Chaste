@@ -33,24 +33,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <cassert>
+#include "Exception.hpp"
+
 #include <iostream>
+#include <string>
 #include <petsc.h>
-#include <string>     // std::char_traits
 
 #include "Exception.hpp"
-#include "BoostFilesystem.hpp"
 #include "FileFinder.hpp"
 #include "PosixPathFixer.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
 #include "ChasteBuildRoot.hpp"
+#include "PosixPathFixer.hpp"
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR < 2 || PETSC_VERSION_MAJOR<3 ) // Before PETSc 3.2
 typedef PetscTruth PetscBool;
 #endif
 
 Exception::Exception(const std::string& rMessage,
-                     const std::string& rFilename, unsigned lineNumber)
+                     const std::string& rFilename, unsigned lineNumber) : std::runtime_error(rMessage)
 {
     SetMessage(rMessage, rFilename, lineNumber);
     ///// The following would write the error message to the log file, if one exists.
@@ -90,22 +91,26 @@ std::string Exception::GetShortMessage() const
     return mShortMessage;
 }
 
-std::string Exception::CheckShortMessage(std::string expected) const
+const char* Exception::what() const noexcept {
+    return mMessage.c_str();
+}
+
+std::string Exception::CheckShortMessage(const std::string& rExpected) const
 {
     std::string error;
-    if (mShortMessage != expected && mShortMessage != "Another process threw an exception; bailing out.")
+    if (mShortMessage != rExpected && mShortMessage != "Another process threw an exception; bailing out.")
     {
-        error = "Incorrect exception message thrown: expected (" + expected + "); got (" + mShortMessage + ").";
+        error = "Incorrect exception message thrown: expected (" + rExpected + "); got (" + mShortMessage + ").";
     }
     return error;
 }
 
-std::string Exception::CheckShortMessageContains(std::string expected) const
+std::string Exception::CheckShortMessageContains(const std::string& rExpected) const
 {
     std::string error;
-    if (mShortMessage.find(expected) == std::string::npos && mShortMessage != "Another process threw an exception; bailing out.")
+    if (mShortMessage.find(rExpected) == std::string::npos && mShortMessage != "Another process threw an exception; bailing out.")
     {
-        error = "Incorrect exception message thrown: expected it to contain (" + expected + "); got (" + mShortMessage + ").";
+        error = "Incorrect exception message thrown: expected it to contain (" + rExpected + "); got (" + mShortMessage + ").";
     }
     return error;
 }

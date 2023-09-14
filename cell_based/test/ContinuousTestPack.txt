@@ -13,6 +13,7 @@ cell/TestOdeBasedCellCycleModels.hpp
 cell/TestOdeBasedSrnModels.hpp
 cell/TestParallelCellsGenerator.hpp
 cell/TestSimpleCellCycleModels.hpp
+cell/TestEdgeInteriorSrn.hpp
 cell_based_pde/TestCellBasedEllipticPdes.hpp
 cell_based_pde/TestCellBasedEllipticPdeSolver.hpp
 cell_based_pde/TestCellBasedParabolicPdes.hpp
@@ -51,6 +52,7 @@ population/TestDiscreteSystemForceCalculator.hpp
 population/TestForces.hpp
 population/TestMeshBasedCellPopulation.hpp
 population/TestMeshBasedCellPopulationWithGhostNodes.hpp
+population/TestMutableVertexMeshOperationsWithPopulationSrn.hpp
 population/TestNodeBasedCellPopulation.hpp
 population/TestNodeBasedCellPopulationParallelMethods.hpp
 population/TestNodeBasedCellPopulationWithBuskeUpdate.hpp
@@ -61,7 +63,10 @@ population/TestPottsUpdateRules.hpp
 population/TestT2SwapCellKiller.hpp
 population/TestVertexBasedCellPopulation.hpp
 population/TestVertexBasedDivisionRules.hpp
+simulation/Test2dVertexBasedSimulationWithSrnModels.hpp
 simulation/TestDeltaNotchModifier.hpp
+simulation/TestDivisionBiasTrackingModifier.hpp
+simulation/TestExtrinsicPullModifier.hpp
 simulation/TestNumericalMethods.hpp
 simulation/TestOffLatticeSimulation.hpp
 simulation/TestOffLatticeSimulation3d.hpp
@@ -74,8 +79,8 @@ simulation/TestOnLatticeSimulationWithCaBasedCellPopulation.hpp
 simulation/TestOnLatticeSimulationWithPdes.hpp
 simulation/TestOnLatticeSimulationWithPottsBasedCellPopulation.hpp
 simulation/TestSimpleTargetAreaModifier.hpp
-simulation/TestTargetAreaLinearGrowthModifier.hpp
 simulation/TestStepSizeException.hpp
+simulation/TestTargetAreaLinearGrowthModifier.hpp
 simulation/TestVolumeTrackingModifier.hpp
 tutorial/TestCreatingAndUsingANewCellBasedSimulationModifierTutorial.hpp
 tutorial/TestCreatingAndUsingANewCellCycleModelTutorial.hpp
@@ -95,3 +100,4 @@ tutorial/TestRunningPottsBasedSimulationsTutorial.hpp
 tutorial/TestRunningTumourSpheroidSimulationsTutorial.hpp
 tutorial/TestRunningVertexBasedSimulationsTutorial.hpp
 tutorial/TestVisualizingWithParaviewTutorial.hpp
+

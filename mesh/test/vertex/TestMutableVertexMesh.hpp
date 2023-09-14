@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "VertexMeshReader.hpp"
 #include "VertexMeshWriter.hpp"
@@ -777,6 +778,55 @@ public:
         expected_elements_containing_node_6.insert(2);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNode(6)->rGetContainingElementIndices(), expected_elements_containing_node_6);
+
+        // Testing recording of cell division information
+        std::vector<CellDivisionInfo<2> > div_info = vertex_mesh.GetOperationRecorder()->GetCellDivisionInfo();
+        TS_ASSERT_DELTA(div_info[0].mLocation[0], 0.0, 1e-8);
+        TS_ASSERT_DELTA(div_info[0].mLocation[1], 0.0, 1e-8);
+        TS_ASSERT_DELTA(div_info[0].mDivisionAxis(0), 1.0, 1e-8);
+        TS_ASSERT_DELTA(div_info[0].mDivisionAxis(1), 0.0, 1e-8);
+        TS_ASSERT_DELTA(div_info[0].mDaughterLocation1[0], 0.0, 1e-8);
+        TS_ASSERT_DELTA(div_info[0].mDaughterLocation1[1], -1.0, 1e-8);
+        TS_ASSERT_DELTA(div_info[0].mDaughterLocation2[0], 0.0, 1e-8);
+        TS_ASSERT_DELTA(div_info[0].mDaughterLocation2[1], 1.0, 1e-8);
+
+        //Testing archiving of cell division info
+        OutputFileHandler handler("TestCellDivisionInfoArchiving", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellDivisionInfo.arch";
+
+        {
+            // Create an output archive
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Write the division info
+            output_arch << *vertex_mesh.GetOperationRecorder();
+        }
+
+        vertex_mesh.GetOperationRecorder()->ClearCellDivisionInfo();
+        div_info = vertex_mesh.GetOperationRecorder()->GetCellDivisionInfo();
+        TS_ASSERT_EQUALS(div_info.size(), 0u);
+
+        // Retrieve the archive
+        {
+            // Load cell division information info
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            VertexMeshOperationRecorder<2,2> recorder;
+            input_arch >> recorder;
+            std::vector<CellDivisionInfo<2> > all_info = recorder.GetCellDivisionInfo();
+            TS_ASSERT_EQUALS(all_info.size(), 1u);
+
+            TS_ASSERT_DELTA(all_info[0].mLocation[0], 0.0, 1e-8);
+            TS_ASSERT_DELTA(all_info[0].mLocation[1], 0.0, 1e-8);
+            TS_ASSERT_DELTA(all_info[0].mDivisionAxis(0), 1.0, 1e-8);
+            TS_ASSERT_DELTA(all_info[0].mDivisionAxis(1), 0.0, 1e-8);
+            TS_ASSERT_DELTA(all_info[0].mDaughterLocation1[0], 0.0, 1e-8);
+            TS_ASSERT_DELTA(all_info[0].mDaughterLocation1[1], -1.0, 1e-8);
+            TS_ASSERT_DELTA(all_info[0].mDaughterLocation2[0], 0.0, 1e-8);
+            TS_ASSERT_DELTA(all_info[0].mDaughterLocation2[1], 1.0, 1e-8);
+        }
     }
 
     void TestDivideVertexElementWithBoundaryNodes()
@@ -1812,7 +1862,7 @@ public:
     void TestSetAndGetDistanceForT3SwapChecking()
     {
         HoneycombVertexMeshGenerator mesh_generator(10,10); // is_flat_bottom, T1swaptthreshold, T2swapthreshold, elementArea
-        MutableVertexMesh<2,2>* p_mesh = mesh_generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = mesh_generator.GetMesh();
         double standard_distance = p_mesh->GetDistanceForT3SwapChecking();
         TS_ASSERT_EQUALS(standard_distance, 5.0);
 

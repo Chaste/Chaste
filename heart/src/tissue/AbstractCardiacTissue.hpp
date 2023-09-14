@@ -134,7 +134,7 @@ private:
                 case cp::media_type::NoFibreOrientation:
                     break;
 
-                default :
+                default:
                     NEVER_REACHED;
             }
         }

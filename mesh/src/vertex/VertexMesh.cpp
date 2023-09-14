@@ -98,6 +98,8 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nod
         }
     }
 
+    this->GenerateEdgesFromElements(mElements);
+
     this->mMeshChangesDuringSimulation = false;
 }
 
@@ -493,6 +495,36 @@ VertexMesh<3, 3>::VertexMesh(TetrahedralMesh<3, 3>& rMesh)
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
  */
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexMesh<ELEMENT_DIM, SPACE_DIM>::GenerateEdgesFromElements(
+    std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*>& rElements)
+{
+    // Build a list of unique edges from nodes within all the elements
+    for (auto elem : rElements)
+    {
+        elem->SetEdgeHelper(&mEdgeHelper);
+        elem->BuildEdges();
+    }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNumEdges() const
+{
+    return mEdgeHelper.GetNumEdges();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+Edge<SPACE_DIM>* VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEdge(unsigned index) const
+{
+    return mEdgeHelper.GetEdge(index);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+const EdgeHelper<SPACE_DIM>& VertexMesh<ELEMENT_DIM, SPACE_DIM>::rGetEdgeHelper() const
+{
+    return mEdgeHelper;
+}
+
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMesh<ELEMENT_DIM, SPACE_DIM>::GenerateVerticesFromElementCircumcentres(TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
 {
@@ -581,7 +613,7 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM, SPACE_DIM>::~VertexMesh()
 {
-    Clear();
+ Clear();
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -698,6 +730,7 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
         delete mFaces[i];
     }
     mFaces.clear();
+
 
     // Delete nodes
     for (unsigned i = 0; i < this->mNodes.size(); i++)
@@ -1014,6 +1047,7 @@ void VertexMesh<2, 2>::ConstructFromMeshReader(AbstractMeshReader<2, 2>& rMeshRe
             p_element->SetAttribute(attribute_value);
         }
     }
+    GenerateEdgesFromElements(mElements);
 }
 
 /// \cond Get Doxygen to ignore, since it's confused by these templates
@@ -1241,362 +1275,409 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceAreaOfElement(unsigned inde
 //                        2D-specific methods                       //
 //////////////////////////////////////////////////////////////////////
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::ElementIncludesPoint(const c_vector<double, SPACE_DIM>& rTestPoint, unsigned elementIndex)
+bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::ElementIncludesPoint(
+    [[maybe_unused]] const c_vector<double, SPACE_DIM>& rTestPoint, [[maybe_unused]] unsigned elementIndex)
 {
-    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE - code will be removed at compile time
-    assert(ELEMENT_DIM == SPACE_DIM); // LCOV_EXCL_LINE - code will be removed at compile time
-
-    // Get the element
-    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(elementIndex);
-    unsigned num_nodes = p_element->GetNumNodes();
-
-    // Initialise boolean
-    bool element_includes_point = false;
-
-    ///\todo (see #2387 and #2401) Investigate why the commented implementation causes Test2DVertexBasedCryptRepresentativeSimulation to fail
-    //    // Initialise boolean
-    //    bool element_includes_point = true;
-    //
-    //    unsigned winding_number = 0;
-    //
-    //    c_vector<double, SPACE_DIM> first_node_location = p_element->GetNodeLocation(0);
-    //    c_vector<double, SPACE_DIM> test_point = this->GetVectorFromAtoB(first_node_location, rTestPoint);
-    //    c_vector<double, SPACE_DIM> this_node_location = zero_vector<double>(SPACE_DIM);
-    //
-    //    // Loop over edges of the element
-    //    for (unsigned local_index=0; local_index<num_nodes; local_index++)
-    //    {
-    //        c_vector<double, SPACE_DIM> untransformed_vector = p_element->GetNodeLocation((local_index+1)%num_nodes);
-    //        c_vector<double, SPACE_DIM> next_node_location = this->GetVectorFromAtoB(first_node_location, untransformed_vector);
-    //
-    //        // If this edge is crossing upward...
-    //        if (this_node_location[1] <= test_point[1])
-    //        {
-    //            if (next_node_location[1] > test_point[1])
-    //            {
-    //                double is_left =  (next_node_location[0] - this_node_location[0])*(test_point[1] - this_node_location[1])
-    //                                 - (test_point[0] - this_node_location[0])*(next_node_location[1] - this_node_location[1]);
-    //
-    //                // ...and the test point is to the left of the edge...
-    //                if (is_left > DBL_EPSILON)
-    //                {
-    //                    // ...then there is a valid upward edge-ray intersection to the right of the test point
-    //                    winding_number++;
-    //                }
-    //            }
-    //        }
-    //        else
-    //        {
-    //            // ...otherwise, if the edge is crossing downward
-    //            if (next_node_location[1] <= test_point[1])
-    //            {
-    //                double is_left =  (next_node_location[0] - this_node_location[0])*(test_point[1] - this_node_location[1])
-    //                                 - (test_point[0] - this_node_location[0])*(next_node_location[1] - this_node_location[1]);
-    //
-    //                // ...and the test point is to the right of the edge...
-    //                if (is_left < -DBL_EPSILON)
-    //                {
-    //                    // ...then there is a valid downward edge-ray intersection to the right of the test point
-    //                    winding_number--;
-    //                }
-    //            }
-    //        }
-    //        this_node_location = next_node_location;
-    //    }
-    //
-    //    if (winding_number == 0)
-    //    {
-    //        element_includes_point = false;
-    //    }
-    /////////////////////////////////////////////////////////
-
-    // Remap the origin to the first vertex to allow alternative distance metrics to be used in subclasses
-    c_vector<double, SPACE_DIM> first_vertex = p_element->GetNodeLocation(0);
-    c_vector<double, SPACE_DIM> test_point = GetVectorFromAtoB(first_vertex, rTestPoint);
-
-    // Loop over edges of the element
-    c_vector<double, SPACE_DIM> vertexA = zero_vector<double>(SPACE_DIM);
-    for (unsigned local_index = 0; local_index < num_nodes; local_index++)
+    if constexpr (ELEMENT_DIM == 2 && SPACE_DIM == 2)
     {
-        // Check if this edge crosses the ray running out horizontally (increasing x, fixed y) from the test point
-        c_vector<double, SPACE_DIM> vector_a_to_point = GetVectorFromAtoB(vertexA, test_point);
+        // Get the element
+        VertexElement<2, 2>* p_element = GetElement(elementIndex);
+        const unsigned num_nodes = p_element->GetNumNodes();
 
-        // Pathological case - test point coincides with vertexA
-        // (we will check vertexB next time we go through the for loop)
-        if (norm_2(vector_a_to_point) < DBL_EPSILON)
+        // Initialise boolean
+        bool element_includes_point = false;
+
+        ///\todo (see #2387 and #2401) Investigate why the commented implementation causes Test2DVertexBasedCryptRepresentativeSimulation to fail
+        //    // Initialise boolean
+        //    bool element_includes_point = true;
+        //
+        //    unsigned winding_number = 0;
+        //
+        //    c_vector<double, SPACE_DIM> first_node_location = p_element->GetNodeLocation(0);
+        //    c_vector<double, SPACE_DIM> test_point = this->GetVectorFromAtoB(first_node_location, rTestPoint);
+        //    c_vector<double, SPACE_DIM> this_node_location = zero_vector<double>(SPACE_DIM);
+        //
+        //    // Loop over edges of the element
+        //    for (unsigned local_index=0; local_index<num_nodes; local_index++)
+        //    {
+        //        c_vector<double, SPACE_DIM> untransformed_vector = p_element->GetNodeLocation((local_index+1)%num_nodes);
+        //        c_vector<double, SPACE_DIM> next_node_location = this->GetVectorFromAtoB(first_node_location, untransformed_vector);
+        //
+        //        // If this edge is crossing upward...
+        //        if (this_node_location[1] <= test_point[1])
+        //        {
+        //            if (next_node_location[1] > test_point[1])
+        //            {
+        //                double is_left =  (next_node_location[0] - this_node_location[0])*(test_point[1] - this_node_location[1])
+        //                                 - (test_point[0] - this_node_location[0])*(next_node_location[1] - this_node_location[1]);
+        //
+        //                // ...and the test point is to the left of the edge...
+        //                if (is_left > DBL_EPSILON)
+        //                {
+        //                    // ...then there is a valid upward edge-ray intersection to the right of the test point
+        //                    winding_number++;
+        //                }
+        //            }
+        //        }
+        //        else
+        //        {
+        //            // ...otherwise, if the edge is crossing downward
+        //            if (next_node_location[1] <= test_point[1])
+        //            {
+        //                double is_left =  (next_node_location[0] - this_node_location[0])*(test_point[1] - this_node_location[1])
+        //                                 - (test_point[0] - this_node_location[0])*(next_node_location[1] - this_node_location[1]);
+        //
+        //                // ...and the test point is to the right of the edge...
+        //                if (is_left < -DBL_EPSILON)
+        //                {
+        //                    // ...then there is a valid downward edge-ray intersection to the right of the test point
+        //                    winding_number--;
+        //                }
+        //            }
+        //        }
+        //        this_node_location = next_node_location;
+        //    }
+        //
+        //    if (winding_number == 0)
+        //    {
+        //        element_includes_point = false;
+        //    }
+        /////////////////////////////////////////////////////////
+
+        // Remap the origin to the first vertex to allow alternative distance metrics to be used in subclasses
+        const c_vector<double, 2> first_vertex = p_element->GetNodeLocation(0);
+        c_vector<double, 2> test_point = GetVectorFromAtoB(first_vertex, rTestPoint);
+
+        // Loop over edges of the element
+        c_vector<double, 2> vertexA = zero_vector<double>(2);
+        for (unsigned local_index = 0; local_index < num_nodes; local_index++)
         {
-            return false;
-        }
+            // Check if this edge crosses the ray running out horizontally (increasing x, fixed y) from the test point
+            c_vector<double, 2> vector_a_to_point = GetVectorFromAtoB(vertexA, test_point);
 
-        c_vector<double, SPACE_DIM> vertexB = GetVectorFromAtoB(first_vertex, p_element->GetNodeLocation((local_index + 1) % num_nodes));
-        c_vector<double, SPACE_DIM> vector_b_to_point = GetVectorFromAtoB(vertexB, test_point);
-        c_vector<double, SPACE_DIM> vector_a_to_b = GetVectorFromAtoB(vertexA, vertexB);
-
-        // Pathological case - ray coincides with horizontal edge
-        if ((fabs(vector_a_to_b[1]) < DBL_EPSILON) && (fabs(vector_a_to_point[1]) < DBL_EPSILON) && (fabs(vector_b_to_point[1]) < DBL_EPSILON))
-        {
-            if ((vector_a_to_point[0] > 0) != (vector_b_to_point[0] > 0))
+            // Pathological case - test point coincides with vertexA
+            // (we will check vertexB next time we go through the for loop)
+            if (norm_2(vector_a_to_point) < DBL_EPSILON)
             {
                 return false;
             }
-        }
 
-        // Non-pathological case
-        // A and B on different sides of the line y = test_point[1]
-        if ((vertexA[1] > test_point[1]) != (vertexB[1] > test_point[1]))
-        {
-            // Intersection of y=test_point[1] and vector_a_to_b is on the right of test_point
-            if (test_point[0] < vertexA[0] + vector_a_to_b[0] * vector_a_to_point[1] / vector_a_to_b[1])
+            c_vector<double, 2> vertexB = GetVectorFromAtoB(first_vertex, p_element->GetNodeLocation((local_index + 1) % num_nodes));
+            c_vector<double, 2> vector_b_to_point = GetVectorFromAtoB(vertexB, test_point);
+            c_vector<double, 2> vector_a_to_b = GetVectorFromAtoB(vertexA, vertexB);
+
+            // Pathological case - ray coincides with horizontal edge
+            if ((fabs(vector_a_to_b[1]) < DBL_EPSILON) && (fabs(vector_a_to_point[1]) < DBL_EPSILON) && (fabs(vector_b_to_point[1]) < DBL_EPSILON))
             {
-                element_includes_point = !element_includes_point;
+                if ((vector_a_to_point[0] > 0) != (vector_b_to_point[0] > 0))
+                {
+                    return false;
+                }
             }
+
+            // Non-pathological case
+            // A and B on different sides of the line y = test_point[1]
+            if ((vertexA[1] > test_point[1]) != (vertexB[1] > test_point[1]))
+            {
+                // Intersection of y=test_point[1] and vector_a_to_b is on the right of test_point
+                if (test_point[0] < vertexA[0] + vector_a_to_b[0] * vector_a_to_point[1] / vector_a_to_b[1])
+                {
+                    element_includes_point = !element_includes_point;
+                }
+            }
+
+            vertexA = vertexB;
         }
-
-        vertexA = vertexB;
-    }
-    return element_includes_point;
-}
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestToPoint(const c_vector<double, SPACE_DIM>& rTestPoint, unsigned elementIndex)
-{
-    // Make sure that we are in the correct dimension - this code will be eliminated at compile time
-    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE - code will be removed at compile time
-    assert(ELEMENT_DIM == SPACE_DIM); // LCOV_EXCL_LINE - code will be removed at compile time
-
-    // Get the element
-    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(elementIndex);
-    unsigned num_nodes = p_element->GetNumNodes();
-
-    double min_squared_normal_distance = DBL_MAX;
-    unsigned min_distance_edge_index = UINT_MAX;
-
-    // Loop over edges of the element
-    for (unsigned local_index = 0; local_index < num_nodes; local_index++)
-    {
-        // Get the end points of this edge
-        c_vector<double, SPACE_DIM> vertexA = p_element->GetNodeLocation(local_index);
-        c_vector<double, SPACE_DIM> vertexB = p_element->GetNodeLocation((local_index + 1) % num_nodes);
-
-        c_vector<double, SPACE_DIM> vector_a_to_point = this->GetVectorFromAtoB(vertexA, rTestPoint);
-        c_vector<double, SPACE_DIM> vector_a_to_b = this->GetVectorFromAtoB(vertexA, vertexB);
-        double distance_a_to_b = norm_2(vector_a_to_b);
-
-        c_vector<double, SPACE_DIM> edge_ab_unit_vector = vector_a_to_b / norm_2(vector_a_to_b);
-        double distance_parallel_to_edge = inner_prod(vector_a_to_point, edge_ab_unit_vector);
-
-        double squared_distance_normal_to_edge = SmallPow(norm_2(vector_a_to_point), 2) - SmallPow(distance_parallel_to_edge, 2);
-
-        /*
-         * If the point lies almost bang on the supporting line of the edge, then snap to the line.
-         * This allows us to do floating point tie-breaks when line is exactly at a node.
-         * We adopt a similar approach if the point is at the same position as a point in the
-         * element.
-         */
-        if (squared_distance_normal_to_edge < DBL_EPSILON)
-        {
-            squared_distance_normal_to_edge = 0.0;
-        }
-
-        if (fabs(distance_parallel_to_edge) < DBL_EPSILON)
-        {
-            distance_parallel_to_edge = 0.0;
-        }
-        else if (fabs(distance_parallel_to_edge - distance_a_to_b) < DBL_EPSILON)
-        {
-            distance_parallel_to_edge = distance_a_to_b;
-        }
-
-        // Make sure node is within the confines of the edge and is the nearest edge to the node \this breaks for convex elements
-        if (squared_distance_normal_to_edge < min_squared_normal_distance && distance_parallel_to_edge >= 0 && distance_parallel_to_edge <= distance_a_to_b)
-        {
-            min_squared_normal_distance = squared_distance_normal_to_edge;
-            min_distance_edge_index = local_index;
-        }
-    }
-
-    assert(min_distance_edge_index < num_nodes);
-    return min_distance_edge_index;
-}
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, 3> VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElement(unsigned index)
-{
-    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE - code will be removed at compile time
-
-    // Define helper variables
-    VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
-    unsigned num_nodes = p_element->GetNumNodes();
-    c_vector<double, 3> moments = zero_vector<double>(3);
-
-    // Since we compute I_xx, I_yy and I_xy about the centroid, we must shift each vertex accordingly
-    c_vector<double, SPACE_DIM> centroid = GetCentroidOfElement(index);
-
-    c_vector<double, SPACE_DIM> this_node_location = p_element->GetNodeLocation(0);
-    c_vector<double, SPACE_DIM> pos_1 = this->GetVectorFromAtoB(centroid, this_node_location);
-
-    for (unsigned local_index = 0; local_index < num_nodes; local_index++)
-    {
-        unsigned next_index = (local_index + 1) % num_nodes;
-        c_vector<double, SPACE_DIM> next_node_location = p_element->GetNodeLocation(next_index);
-        c_vector<double, SPACE_DIM> pos_2 = this->GetVectorFromAtoB(centroid, next_node_location);
-
-        double signed_area_term = pos_1(0) * pos_2(1) - pos_2(0) * pos_1(1);
-        // Ixx
-        moments(0) += (pos_1(1) * pos_1(1) + pos_1(1) * pos_2(1) + pos_2(1) * pos_2(1)) * signed_area_term;
-
-        // Iyy
-        moments(1) += (pos_1(0) * pos_1(0) + pos_1(0) * pos_2(0) + pos_2(0) * pos_2(0)) * signed_area_term;
-
-        // Ixy
-        moments(2) += (pos_1(0) * pos_2(1) + 2 * pos_1(0) * pos_1(1) + 2 * pos_2(0) * pos_2(1) + pos_2(0) * pos_1(1)) * signed_area_term;
-
-        pos_1 = pos_2;
-    }
-
-    moments(0) /= 12;
-    moments(1) /= 12;
-    moments(2) /= 24;
-
-    /*
-     * If the nodes owned by the element were supplied in a clockwise rather
-     * than anticlockwise manner, or if this arose as a result of enforcing
-     * periodicity, then our computed quantities will be the wrong sign, so
-     * we need to fix this.
-     */
-    if (moments(0) < 0.0)
-    {
-        moments(0) = -moments(0);
-        moments(1) = -moments(1);
-        moments(2) = -moments(2);
-    }
-    return moments;
-}
-
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfElement(unsigned index)
-{
-    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE - code will be removed at compile time
-
-    c_vector<double, SPACE_DIM> short_axis = zero_vector<double>(SPACE_DIM);
-
-    // Calculate the moments of the element about its centroid (recall that I_xx and I_yy must be non-negative)
-    c_vector<double, 3> moments = CalculateMomentsOfElement(index);
-
-    // Normalise the moments vector to remove problem of a very small discriminant (see #2874)
-    moments /= norm_2(moments);
-
-    // If the principal moments are equal...
-    double discriminant = (moments(0) - moments(1)) * (moments(0) - moments(1)) + 4.0 * moments(2) * moments(2);
-    if (fabs(discriminant) < DBL_EPSILON)
-    {
-        // ...then every axis through the centroid is a principal axis, so return a random unit vector
-        short_axis(0) = RandomNumberGenerator::Instance()->ranf();
-        short_axis(1) = sqrt(1.0 - short_axis(0) * short_axis(0));
+        return element_includes_point;
     }
     else
     {
-        // If the product of inertia is zero, then the coordinate axes are the principal axes
-        if (fabs(moments(2)) < DBL_EPSILON)
+        NEVER_REACHED;
+    }
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetLocalIndexForElementEdgeClosestToPoint(
+    [[maybe_unused]] const c_vector<double, SPACE_DIM>& rTestPoint, [[maybe_unused]] unsigned elementIndex)
+{
+    if constexpr (ELEMENT_DIM == 2 && SPACE_DIM == 2)
+    {
+        // Get the element
+        VertexElement<2, 2>* p_element = GetElement(elementIndex);
+        const unsigned num_nodes = p_element->GetNumNodes();
+
+        double min_squared_normal_distance = DBL_MAX;
+        unsigned min_distance_edge_index = UINT_MAX;
+
+        // Loop over edges of the element
+        for (unsigned local_index = 0; local_index < num_nodes; local_index++)
         {
-            if (moments(0) < moments(1))
+            // Get the end points of this edge
+            const c_vector<double, 2> vertexA = p_element->GetNodeLocation(local_index);
+            const c_vector<double, 2> vertexB = p_element->GetNodeLocation((local_index + 1) % num_nodes);
+
+            const c_vector<double, 2> vector_a_to_point = this->GetVectorFromAtoB(vertexA, rTestPoint);
+            const c_vector<double, 2> vector_a_to_b = this->GetVectorFromAtoB(vertexA, vertexB);
+            const double distance_a_to_b = norm_2(vector_a_to_b);
+
+            const c_vector<double, 2> edge_ab_unit_vector = vector_a_to_b / norm_2(vector_a_to_b);
+            double distance_parallel_to_edge = inner_prod(vector_a_to_point, edge_ab_unit_vector);
+
+            double squared_distance_normal_to_edge = SmallPow(norm_2(vector_a_to_point), 2) - SmallPow(distance_parallel_to_edge, 2);
+
+            /*
+             * If the point lies almost bang on the supporting line of the edge, then snap to the line.
+             * This allows us to do floating point tie-breaks when line is exactly at a node.
+             * We adopt a similar approach if the point is at the same position as a point in the
+             * element.
+             */
+            if (squared_distance_normal_to_edge < DBL_EPSILON)
             {
-                short_axis(0) = 0.0;
-                short_axis(1) = 1.0;
+                squared_distance_normal_to_edge = 0.0;
             }
-            else
+
+            if (fabs(distance_parallel_to_edge) < DBL_EPSILON)
             {
-                short_axis(0) = 1.0;
-                short_axis(1) = 0.0;
+                distance_parallel_to_edge = 0.0;
             }
+            else if (fabs(distance_parallel_to_edge - distance_a_to_b) < DBL_EPSILON)
+            {
+                distance_parallel_to_edge = distance_a_to_b;
+            }
+
+            // Make sure node is within the confines of the edge and is the nearest edge to the node \this breaks for convex elements
+            if (squared_distance_normal_to_edge < min_squared_normal_distance && distance_parallel_to_edge >= 0 && distance_parallel_to_edge <= distance_a_to_b)
+            {
+                min_squared_normal_distance = squared_distance_normal_to_edge;
+                min_distance_edge_index = local_index;
+            }
+        }
+
+        assert(min_distance_edge_index < num_nodes);
+        return min_distance_edge_index;
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+c_vector<double, 3> VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomentsOfElement([[maybe_unused]] unsigned index)
+{
+    if constexpr (SPACE_DIM == 2)
+    {
+        // Define helper variables
+        VertexElement<ELEMENT_DIM, SPACE_DIM>* p_element = GetElement(index);
+        unsigned num_nodes = p_element->GetNumNodes();
+        c_vector<double, 3> moments = zero_vector<double>(3);
+
+        // Since we compute I_xx, I_yy and I_xy about the centroid, we must shift each vertex accordingly
+        c_vector<double, SPACE_DIM> centroid = GetCentroidOfElement(index);
+
+        c_vector<double, SPACE_DIM> this_node_location = p_element->GetNodeLocation(0);
+        c_vector<double, SPACE_DIM> pos_1 = this->GetVectorFromAtoB(centroid, this_node_location);
+
+        for (unsigned local_index = 0; local_index < num_nodes; local_index++)
+        {
+            unsigned next_index = (local_index + 1) % num_nodes;
+            c_vector<double, SPACE_DIM> next_node_location = p_element->GetNodeLocation(next_index);
+            c_vector<double, SPACE_DIM> pos_2 = this->GetVectorFromAtoB(centroid, next_node_location);
+
+            double signed_area_term = pos_1(0) * pos_2(1) - pos_2(0) * pos_1(1);
+            // Ixx
+            moments(0) += (pos_1(1) * pos_1(1) + pos_1(1) * pos_2(1) + pos_2(1) * pos_2(1)) * signed_area_term;
+
+            // Iyy
+            moments(1) += (pos_1(0) * pos_1(0) + pos_1(0) * pos_2(0) + pos_2(0) * pos_2(0)) * signed_area_term;
+
+            // Ixy
+            moments(2) += (pos_1(0) * pos_2(1) + 2 * pos_1(0) * pos_1(1) + 2 * pos_2(0) * pos_2(1) + pos_2(0) * pos_1(1)) * signed_area_term;
+
+            pos_1 = pos_2;
+        }
+
+        moments(0) /= 12;
+        moments(1) /= 12;
+        moments(2) /= 24;
+
+        /*
+         * If the nodes owned by the element were supplied in a clockwise rather
+         * than anticlockwise manner, or if this arose as a result of enforcing
+         * periodicity, then our computed quantities will be the wrong sign, so
+         * we need to fix this.
+         */
+        if (moments(0) < 0.0)
+        {
+            moments(0) = -moments(0);
+            moments(1) = -moments(1);
+            moments(2) = -moments(2);
+        }
+        return moments;
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetShortAxisOfElement([[maybe_unused]] unsigned index)
+{
+    if constexpr (SPACE_DIM == 2)
+    {
+
+        c_vector<double, SPACE_DIM> short_axis = zero_vector<double>(SPACE_DIM);
+
+        // Calculate the moments of the element about its centroid (recall that I_xx and I_yy must be non-negative)
+        c_vector<double, 3> moments = CalculateMomentsOfElement(index);
+
+        // Normalise the moments vector to remove problem of a very small discriminant (see #2874)
+        moments /= norm_2(moments);
+
+        // If the principal moments are equal...
+        double discriminant = (moments(0) - moments(1)) * (moments(0) - moments(1)) + 4.0 * moments(2) * moments(2);
+        if (fabs(discriminant) < DBL_EPSILON)
+        {
+            // ...then every axis through the centroid is a principal axis, so return a random unit vector
+            short_axis(0) = RandomNumberGenerator::Instance()->ranf();
+            short_axis(1) = sqrt(1.0 - short_axis(0) * short_axis(0));
         }
         else
         {
-            // Otherwise we find the eigenvector of the inertia matrix corresponding to the largest eigenvalue
-            double lambda = 0.5 * (moments(0) + moments(1) + sqrt(discriminant));
+            // If the product of inertia is zero, then the coordinate axes are the principal axes
+            if (fabs(moments(2)) < DBL_EPSILON)
+            {
+                if (moments(0) < moments(1))
+                {
+                    short_axis(0) = 0.0;
+                    short_axis(1) = 1.0;
+                }
+                else
+                {
+                    short_axis(0) = 1.0;
+                    short_axis(1) = 0.0;
+                }
+            }
+            else
+            {
+                // Otherwise we find the eigenvector of the inertia matrix corresponding to the largest eigenvalue
+                double lambda = 0.5 * (moments(0) + moments(1) + sqrt(discriminant));
 
-            short_axis(0) = 1.0;
-            short_axis(1) = (moments(0) - lambda) / moments(2);
+                short_axis(0) = 1.0;
+                short_axis(1) = (moments(0) - lambda) / moments(2);
 
-            // Normalise the short axis before returning it
-            short_axis /= norm_2(short_axis);
+                // Normalise the short axis before returning it
+                short_axis /= norm_2(short_axis);
+            }
         }
+
+        return short_axis;
     }
-
-    return short_axis;
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaGradientOfElementAtNode(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, unsigned localIndex)
+c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetAreaGradientOfElementAtNode(
+    [[maybe_unused]] VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, [[maybe_unused]] unsigned localIndex)
 {
-    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE - code will be removed at compile time
+    if constexpr (SPACE_DIM == 2)
+    {
+        unsigned num_nodes_in_element = pElement->GetNumNodes();
+        unsigned next_local_index = (localIndex + 1) % num_nodes_in_element;
 
-    unsigned num_nodes_in_element = pElement->GetNumNodes();
-    unsigned next_local_index = (localIndex + 1) % num_nodes_in_element;
+        // We add an extra num_nodes_in_element in the line below as otherwise this term can be negative, which breaks the % operator
+        unsigned previous_local_index = (num_nodes_in_element + localIndex - 1) % num_nodes_in_element;
 
-    // We add an extra num_nodes_in_element in the line below as otherwise this term can be negative, which breaks the % operator
-    unsigned previous_local_index = (num_nodes_in_element + localIndex - 1) % num_nodes_in_element;
+        c_vector<double, SPACE_DIM> previous_node_location = pElement->GetNodeLocation(previous_local_index);
+        c_vector<double, SPACE_DIM> next_node_location = pElement->GetNodeLocation(next_local_index);
+        c_vector<double, SPACE_DIM> difference_vector = this->GetVectorFromAtoB(previous_node_location, next_node_location);
 
-    c_vector<double, SPACE_DIM> previous_node_location = pElement->GetNodeLocation(previous_local_index);
-    c_vector<double, SPACE_DIM> next_node_location = pElement->GetNodeLocation(next_local_index);
-    c_vector<double, SPACE_DIM> difference_vector = this->GetVectorFromAtoB(previous_node_location, next_node_location);
+        c_vector<double, SPACE_DIM> area_gradient;
 
-    c_vector<double, SPACE_DIM> area_gradient;
+        area_gradient[0] = 0.5 * difference_vector[1];
+        area_gradient[1] = -0.5 * difference_vector[0];
 
-    area_gradient[0] = 0.5 * difference_vector[1];
-    area_gradient[1] = -0.5 * difference_vector[0];
-
-    return area_gradient;
+        return area_gradient;
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetPreviousEdgeGradientOfElementAtNode(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, unsigned localIndex)
+c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetPreviousEdgeGradientOfElementAtNode(
+    [[maybe_unused]] VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, [[maybe_unused]] unsigned localIndex)
 {
-    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE - code will be removed at compile time
+    if constexpr (SPACE_DIM == 2)
+    {
+        assert(SPACE_DIM == 2); // LCOV_EXCL_LINE - code will be removed at compile time
 
-    unsigned num_nodes_in_element = pElement->GetNumNodes();
+        const unsigned num_nodes_in_element = pElement->GetNumNodes();
 
-    // We add an extra num_nodes_in_element-1 in the line below as otherwise this term can be negative, which breaks the % operator
-    unsigned previous_local_index = (num_nodes_in_element + localIndex - 1) % num_nodes_in_element;
+        // We add an extra num_nodes_in_element-1 in the line below as otherwise this term can be negative, which breaks the % operator
+        const unsigned previous_local_index = (num_nodes_in_element + localIndex - 1) % num_nodes_in_element;
 
-    unsigned this_global_index = pElement->GetNodeGlobalIndex(localIndex);
-    unsigned previous_global_index = pElement->GetNodeGlobalIndex(previous_local_index);
+        const unsigned this_global_index = pElement->GetNodeGlobalIndex(localIndex);
+        const unsigned previous_global_index = pElement->GetNodeGlobalIndex(previous_local_index);
 
-    double previous_edge_length = this->GetDistanceBetweenNodes(this_global_index, previous_global_index);
-    assert(previous_edge_length > DBL_EPSILON);
+        const double previous_edge_length = this->GetDistanceBetweenNodes(this_global_index, previous_global_index);
+        assert(previous_edge_length > DBL_EPSILON);
 
-    c_vector<double, SPACE_DIM> previous_edge_gradient = this->GetVectorFromAtoB(pElement->GetNodeLocation(previous_local_index), pElement->GetNodeLocation(localIndex)) / previous_edge_length;
+        const c_vector<double, SPACE_DIM> previous_edge_gradient = this->GetVectorFromAtoB(pElement->GetNodeLocation(previous_local_index), pElement->GetNodeLocation(localIndex)) / previous_edge_length;
 
-    return previous_edge_gradient;
+        return previous_edge_gradient;
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNextEdgeGradientOfElementAtNode(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, unsigned localIndex)
+c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNextEdgeGradientOfElementAtNode(
+    [[maybe_unused]] VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, [[maybe_unused]] unsigned localIndex)
 {
-    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE - code will be removed at compile time
+    if constexpr (SPACE_DIM == 2)
+    {
+        const unsigned next_local_index = (localIndex + 1) % (pElement->GetNumNodes());
 
-    unsigned next_local_index = (localIndex + 1) % (pElement->GetNumNodes());
+        const unsigned this_global_index = pElement->GetNodeGlobalIndex(localIndex);
+        const unsigned next_global_index = pElement->GetNodeGlobalIndex(next_local_index);
 
-    unsigned this_global_index = pElement->GetNodeGlobalIndex(localIndex);
-    unsigned next_global_index = pElement->GetNodeGlobalIndex(next_local_index);
+        const double next_edge_length = this->GetDistanceBetweenNodes(this_global_index, next_global_index);
+        assert(next_edge_length > DBL_EPSILON);
 
-    double next_edge_length = this->GetDistanceBetweenNodes(this_global_index, next_global_index);
-    assert(next_edge_length > DBL_EPSILON);
+        const c_vector<double, SPACE_DIM> next_edge_gradient = this->GetVectorFromAtoB(pElement->GetNodeLocation(next_local_index), pElement->GetNodeLocation(localIndex)) / next_edge_length;
 
-    c_vector<double, SPACE_DIM> next_edge_gradient = this->GetVectorFromAtoB(pElement->GetNodeLocation(next_local_index), pElement->GetNodeLocation(localIndex)) / next_edge_length;
-
-    return next_edge_gradient;
+        return next_edge_gradient;
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetPerimeterGradientOfElementAtNode(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, unsigned localIndex)
+c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetPerimeterGradientOfElementAtNode(
+    [[maybe_unused]] VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement, [[maybe_unused]] unsigned localIndex)
 {
-    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE
+    if constexpr (SPACE_DIM == 2)
+    {
 
-    c_vector<double, SPACE_DIM> previous_edge_gradient = GetPreviousEdgeGradientOfElementAtNode(pElement, localIndex);
-    c_vector<double, SPACE_DIM> next_edge_gradient = GetNextEdgeGradientOfElementAtNode(pElement, localIndex);
+        c_vector<double, SPACE_DIM> previous_edge_gradient = GetPreviousEdgeGradientOfElementAtNode(pElement, localIndex);
+        c_vector<double, SPACE_DIM> next_edge_gradient = GetNextEdgeGradientOfElementAtNode(pElement, localIndex);
 
-    return previous_edge_gradient + next_edge_gradient;
+        return previous_edge_gradient + next_edge_gradient;
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1604,43 +1685,60 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetPerimeterGrad
 //////////////////////////////////////////////////////////////////////
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateUnitNormalToFaceWithArea(VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace, c_vector<double, SPACE_DIM>& rNormal)
+double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateUnitNormalToFaceWithArea(
+    [[maybe_unused]] VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace,
+    [[maybe_unused]] c_vector<double, SPACE_DIM>& rNormal)
 {
-    assert(SPACE_DIM == 3); // LCOV_EXCL_LINE - code will be removed at compile time
-
-    // As we are in 3D, the face must have at least three vertices
-    assert(pFace->GetNumNodes() >= 3u);
-
-    // Reset the answer
-    rNormal = zero_vector<double>(SPACE_DIM);
-
-    c_vector<double, SPACE_DIM> v_minus_v0 = this->GetVectorFromAtoB(pFace->GetNode(0)->rGetLocation(), pFace->GetNode(1)->rGetLocation());
-    for (unsigned local_index = 2; local_index < pFace->GetNumNodes(); local_index++)
+    if constexpr (SPACE_DIM == 3)
     {
-        c_vector<double, SPACE_DIM> vnext_minus_v0 = this->GetVectorFromAtoB(pFace->GetNode(0)->rGetLocation(), pFace->GetNode(local_index)->rGetLocation());
-        rNormal += VectorProduct(v_minus_v0, vnext_minus_v0);
-        v_minus_v0 = vnext_minus_v0;
+        assert(SPACE_DIM == 3); // LCOV_EXCL_LINE - code will be removed at compile time
+
+        // As we are in 3D, the face must have at least three vertices
+        assert(pFace->GetNumNodes() >= 3u);
+
+        // Reset the answer
+        rNormal = zero_vector<double>(SPACE_DIM);
+
+        c_vector<double, SPACE_DIM> v_minus_v0 = this->GetVectorFromAtoB(pFace->GetNode(0)->rGetLocation(), pFace->GetNode(1)->rGetLocation());
+        for (unsigned local_index = 2; local_index < pFace->GetNumNodes(); local_index++)
+        {
+            c_vector<double, SPACE_DIM> vnext_minus_v0 = this->GetVectorFromAtoB(pFace->GetNode(0)->rGetLocation(), pFace->GetNode(local_index)->rGetLocation());
+            rNormal += VectorProduct(v_minus_v0, vnext_minus_v0);
+            v_minus_v0 = vnext_minus_v0;
+        }
+        double magnitude = norm_2(rNormal);
+        if (magnitude != 0.0)
+        {
+            // Normalize the normal vector
+            rNormal /= magnitude;
+            // If all points are co-located, then magnitude==0.0 and there is potential for a floating point exception
+            // here if we divide by zero, so we'll move on.
+        }
+        return magnitude / 2.0;
     }
-    double magnitude = norm_2(rNormal);
-    if (magnitude != 0.0)
+    else
     {
-        // Normalize the normal vector
-        rNormal /= magnitude;
-        // If all points are co-located, then magnitude==0.0 and there is potential for a floating point exception
-        // here if we divide by zero, so we'll move on.
+        NEVER_REACHED;
     }
-    return magnitude / 2.0;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateAreaOfFace(VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace)
+double VertexMesh<ELEMENT_DIM, SPACE_DIM>::CalculateAreaOfFace(
+    [[maybe_unused]] VertexElement<ELEMENT_DIM - 1, SPACE_DIM>* pFace)
 {
-    assert(SPACE_DIM == 3); // LCOV_EXCL_LINE - code will be removed at compile time
-
-    // Get the unit normal to the plane of this face
-    c_vector<double, SPACE_DIM> unit_normal;
-    return CalculateUnitNormalToFaceWithArea(pFace, unit_normal);
+    if constexpr (SPACE_DIM == 3)
+    {
+        // Get the unit normal to the plane of this face
+        c_vector<double, SPACE_DIM> unit_normal;
+        return CalculateUnitNormalToFaceWithArea(pFace, unit_normal);
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
+
+
 
 /// Specialization to avoid compiler error about zero-sized arrays
 #if defined(__xlC__)

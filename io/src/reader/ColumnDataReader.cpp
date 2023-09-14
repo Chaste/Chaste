@@ -308,7 +308,7 @@ std::vector<double> ColumnDataReader::GetValues(const std::string& rVariableName
             {
                 ReadValueFromFile(datafile, column, fixedDimension);
             }
-            catch (Exception)
+            catch (const Exception&)
             {
                 break;
             }

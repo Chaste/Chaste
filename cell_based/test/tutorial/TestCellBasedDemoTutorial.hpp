@@ -118,7 +118,7 @@ public:
         /* The first thing we define is a 2D (specified by the <2,2>) mesh which holds the spatial information of the simulation. To do this we use one of a
          * number of {{{MeshGenerators}}}.*/
         HoneycombVertexMeshGenerator generator(2, 2);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         /* We now generate a collection of cells. We do this by using a {{{CellsGenerator}}} and we specify the proliferative
          * behaviour of the cell by choosing a {{{CellCycleModel}}}, here we choose a {{{UniformG1GenerationalCellCycleModel}}} where
@@ -153,7 +153,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_force);
         simulator.AddForce(p_force);
 
-        /* A {{{NagaiHondaForce}}} has to be used together with a child class of {{{AbstractTargetAreaModifier}}}.
+        /* We now pass a "target area modifier" to the simulation.
          * This modifies the target area of individual cells and thus alters the relative forces
          * between neighbouring cells.
          */
@@ -205,7 +205,7 @@ public:
          * that defines the connectivity in the mesh.
          */
         HoneycombMeshGenerator generator(2, 2); //**Changed**//
-        MutableMesh<2,2>* p_generating_mesh = generator.GetMesh(); //**Changed**//
+        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh(); //**Changed**//
         NodesOnlyMesh<2> mesh; //**Changed**//
         mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5); //**Changed**//
 
@@ -269,7 +269,7 @@ public:
     {
         /* This time we just create a {{{MutableMesh}}} and use that to specify the spatial locations of cells.*/
         HoneycombMeshGenerator generator(2, 2);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();  //**Changed**//
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();  //**Changed**//
 
         /* We create the same number of cells as the previous test.*/
         std::vector<CellPtr> cells;
@@ -322,7 +322,7 @@ public:
          * Here we pass an extra argument to the {{{HoneycombMeshGenerator}}} which adds another 2 rows of
          * nodes round the mesh, known as ghost nodes.*/
         HoneycombMeshGenerator generator(2, 2, 2); //**Changed**//
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         /* We only want to create cells for non ghost nodes. To find these we get them from the {{{HoneycombMeshGenerator}}}
          * using the method {{{GetCellLocationIndices}}}. We also use a different {{{CellCycleModel}}}. Here we use a
@@ -374,7 +374,7 @@ public:
         /* We now want to impose periodic boundaries on the domain. To do this we create a {{{Cylindrical2dMesh}}}
          * using a {{{CylindricalHoneycombMeshGenerator}}}.*/
         CylindricalHoneycombMeshGenerator generator(5, 2, 2); //**Changed**//
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh(); //**Changed**//
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh(); //**Changed**//
 
         /* Again we create one cell for each non ghost node. Note that we have changed back to using a {{{UniformG1GenerationalCellCycleModel}}}.*/
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -419,7 +419,7 @@ public:
         /* We make the same {{{Mesh}}}, {{{Cells}}}, {{{CellPopulation}}},
          * {{{CellBasedSimulation}}} and forces as before, all we change is the output directory.*/
         CylindricalHoneycombMeshGenerator generator(5, 2, 2);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
         std::vector<CellPtr> cells;
@@ -471,7 +471,7 @@ public:
          * and there are arguments to make the domains periodic.
          */
         PottsMeshGenerator<2> generator(20, 2, 4, 20, 2, 4); //**Changed**//
-        PottsMesh<2>* p_mesh = generator.GetMesh(); //**Changed**//
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh(); //**Changed**//
 
         /* We generate one cell for each element as in vertex based simulations.*/
         std::vector<CellPtr> cells;

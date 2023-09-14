@@ -293,7 +293,7 @@ def ignore_dir(dir_to_check):
     dir_ignores = ['Debug', 'Release', 'build', 'cxxtest', 'codegen_python3_venv',
                    'testoutput', 'doc', 'projects', 'hierwikiplugin']
 
-    dir_ignore_contains = ['Debug_', 'cmake-build', 'venv']
+    dir_ignore_contains = ['Debug_', 'chaste-build', 'cmake-build', 'venv']
 
     startchar_ignores = ['_', '.']
 
@@ -315,11 +315,10 @@ if __name__ == '__main__':
     # .cpp, .hpp., .py, .java are C++, Python and Java code.
     exts = ['.cpp', '.hpp', '.py', '.java']
 
-    # SCons files
     # output.chaste files in acceptance tests (all Chaste executables should output the valid copyright notice)
     # Version.cpp.in is the provenance file
-    named_files = ['SConscript', 'SConstruct', 'CMakeLists.txt', './LICENSE',
-                   'output.chaste', 'Version.cpp.in', 'Version_cmake.cpp.in']
+    named_files = ['SConstruct', 'CMakeLists.txt', './LICENSE',
+                   'output.chaste', 'Version.cpp.in']
 
     exclusions = []
 

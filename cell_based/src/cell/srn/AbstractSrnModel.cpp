@@ -36,7 +36,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractSrnModel.hpp"
 
 AbstractSrnModel::AbstractSrnModel()
-    : mSimulatedToTime(SimulationTime::Instance()->GetTime())
+    : mSimulatedToTime(SimulationTime::Instance()->GetTime()),
+      mEdgeLocalIndex(UNSIGNED_UNSET), 
+      mIsEdgeBasedModel(false)
 {
 }
 
@@ -53,7 +55,7 @@ void AbstractSrnModel::InitialiseDaughterCell()
 }
 
 AbstractSrnModel::AbstractSrnModel(const AbstractSrnModel& rModel)
-    : mSimulatedToTime(rModel.GetSimulatedToTime())
+    : mSimulatedToTime(rModel.GetSimulatedToTime()), mIsEdgeBasedModel(rModel.mIsEdgeBasedModel)
 {
     /*
      * Set each member variable of the new SRN model that inherits
@@ -99,15 +101,6 @@ double AbstractSrnModel::GetSimulatedToTime() const
     return mSimulatedToTime;
 }
 
-/*
-///\todo - make abstract? (#2752)
-void AbstractSrnModel::SimulateToCurrentTime()
-{
-    // This should be overridden
-    SetSimulatedToTime(SimulationTime::Instance()->GetTime());
-}
-*/
-
 void AbstractSrnModel::OutputSrnModelInfo(out_stream& rParamsFile)
 {
     std::string srn_model_type = GetIdentifier();
@@ -120,3 +113,51 @@ void AbstractSrnModel::OutputSrnModelInfo(out_stream& rParamsFile)
 void AbstractSrnModel::OutputSrnModelParameters(out_stream& rParamsFile)
 {
 }
+
+void AbstractSrnModel::SetEdgeLocalIndex(unsigned index)
+{
+    this->mEdgeLocalIndex = index;
+}
+
+unsigned AbstractSrnModel::GetEdgeLocalIndex()
+{
+    return this->mEdgeLocalIndex;
+}
+
+bool AbstractSrnModel::HasEdgeModel() const
+{
+    return this->mIsEdgeBasedModel;
+}
+
+void AbstractSrnModel::SetEdgeModelIndicator(const bool indicator)
+{
+    this->mIsEdgeBasedModel = indicator;
+}
+
+/*
+ * We exclude the following from coverage, as these methods are implemented elsewhere and tested accordingly
+ */
+// LCOV_EXCL_START
+void AbstractSrnModel::ScaleSrnVariables(const double theta)
+{
+}
+
+void AbstractSrnModel::AddSrnQuantities(AbstractSrnModel* pOtherSrn,
+                                        const double scale)
+{
+}
+
+void AbstractSrnModel::AddShrunkEdgeSrn(AbstractSrnModel* pShrunkEdgeSrn)
+{
+}
+
+void AbstractSrnModel::AddMergedEdgeSrn(AbstractSrnModel* pMergedEdgeSrn)
+{}
+
+void AbstractSrnModel::AddShrunkEdgeToInterior(AbstractSrnModel* pShrunkEdgeSrn)
+{}
+
+void AbstractSrnModel::SplitEdgeSrn(const double relativePosition)
+{}
+// LCOV_EXCL_STOP
+

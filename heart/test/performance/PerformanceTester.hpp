@@ -125,7 +125,7 @@ public:
         {
             cardiac_problem.Solve();
         }
-        catch (Exception e)
+        catch (const Exception& e)
         {
             std::cout<<"Warning - this run threw an exception.  Check performance results\n";
             throw(e);

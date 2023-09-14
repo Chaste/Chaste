@@ -126,7 +126,13 @@ lcov_list_width = 80
 # lcov_list_full_path is non-zero.
 lcov_list_truncate_max = 20
 
-# Specify the expression that should be used to ignore single lines.
-lcov_excl_line = (NEVER_REACHED|^\s*assert\s*\(|LCOV_EXCL_LINE|^\s*catch\s*\(|^\s*TERMINATE\s*\(|^\s*}\s*$)
-
-
+# Specify the expression that should be used to ignore single lines
+# Alternative 1: NEVER_REACHED         Ignore calls to NEVER_REACHED (defined in Exception.hpp)
+# Alternative 2: ^\s*assert\s*\(       Ignore lines beginning with "assert(" (surrounded by 0 or more whitespace characters)
+# Alternative 3: LCOV_EXCL_LINE        Ignore lines containing this magic string
+# Alternative 4: ^\s*catch\s*\(        Ignore lines beginning with "catch" (surrounded by 0 or more whitespace characters)
+# Alternative 5: ^\s*TERMINATE\s*\(    Ignore calls to TERMINATE() (defined in Exception.hpp)
+# Alternative 6: ^\s*}\s*$             Ignore lines exactly "}" (surrounded by 0 or more whitespace characters) (see #32)
+# Alternative 7: ^\s*default:\s*$      Ignore lines exactly "default:" (surrounded by 0 or more whitespace characters) (see #32)
+# Alternative 8: ^\s*:\s+              Ignore lines beginning with ":" (surrounded by 0 or more whitespace characters) (see #32)
+lcov_excl_line = (NEVER_REACHED|^\s*assert\s*\(|LCOV_EXCL_LINE|^\s*catch\s*\(|^\s*TERMINATE\s*\(|^\s*}\s*$|^\s*default:\s*$|^\s*:\s+)

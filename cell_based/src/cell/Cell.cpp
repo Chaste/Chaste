@@ -57,7 +57,8 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
       mApoptosisTime(0.25), // cell takes 15 min to fully undergo apoptosis
       mUndergoingApoptosis(false),
       mIsDead(false),
-      mIsLogged(false)
+      mIsLogged(false),
+      mHasSrnModel(false)
 {
     if (SimulationTime::Instance()->IsStartTimeSetUp()==false)
     {
@@ -71,11 +72,15 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
 
     mpCellCycleModel->SetCell(CellPtr(this, null_deleter()));
 
-    // Create a null srn model if none given
+    // Create a null SRN model if none given
     if (pSrnModel == nullptr)
     {
         pSrnModel = new NullSrnModel;
         mpSrnModel = pSrnModel;
+    }
+    else
+    {
+        mHasSrnModel = true;
     }
 
     mpSrnModel->SetCell(CellPtr(this, null_deleter()));
@@ -103,6 +108,13 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
         // Add empty cell data
         MAKE_PTR(CellData, p_cell_data);
         mCellPropertyCollection.AddProperty(p_cell_data);
+    }
+
+    if (!mCellPropertyCollection.HasPropertyType<CellEdgeData>())
+    {
+        // Add empty cell edge data
+        MAKE_PTR(CellEdgeData, p_cell_edge_data);
+        mCellPropertyCollection.AddProperty(p_cell_edge_data);
     }
 
     /*
@@ -198,6 +210,7 @@ void Cell::SetSrnModel(AbstractSrnModel* pSrnModel)
     }
     mpSrnModel = pSrnModel;
     mpSrnModel->SetCell(CellPtr(this, null_deleter()));
+    mHasSrnModel = true;
 }
 
 AbstractSrnModel* Cell::GetSrnModel() const
@@ -265,6 +278,19 @@ boost::shared_ptr<CellData> Cell::GetCellData() const
     assert(cell_data_collection.GetSize() <= 1);
 
     return boost::static_pointer_cast<CellData>(cell_data_collection.GetProperty());
+}
+
+boost::shared_ptr<CellEdgeData> Cell::GetCellEdgeData() const
+{
+    CellPropertyCollection collection = mCellPropertyCollection.GetPropertiesType<CellEdgeData>();
+
+    /*
+     * Note: In its current form the code requires each cell to have exactly
+     * one CellEdgeData object. This is reflected in the assertion below.
+     */
+    assert(collection.GetSize() <= 1);
+
+    return boost::static_pointer_cast<CellEdgeData>(collection.GetProperty());
 }
 
 bool Cell::HasCellVecData() const
@@ -451,6 +477,7 @@ bool Cell::ReadyToDivide()
 
     // NOTE - we run the SRN model here first before the CCM
     mpSrnModel->SimulateToCurrentTime();
+
     // This in turn runs any simulations within the CCM through ReadyToDivide();
     mCanDivide = mpCellCycleModel->ReadyToDivide();
 
@@ -485,6 +512,14 @@ CellPtr Cell::Divide()
     MAKE_PTR_ARGS(CellData, p_daughter_cell_data, (*p_cell_data));
     daughter_property_collection.AddProperty(p_daughter_cell_data);
 
+    // Get the existing copy of the cell edge data and remove it from the daughter cell
+    boost::shared_ptr<CellEdgeData> p_cell_edge_data = GetCellEdgeData();
+    daughter_property_collection.RemoveProperty(p_cell_edge_data);
+
+    // Create a new cell edge data object using the copy constructor and add this to the daughter cell
+    MAKE_PTR_ARGS(CellEdgeData, p_daughter_cell_edge_data, (*p_cell_edge_data));
+    daughter_property_collection.AddProperty(p_daughter_cell_edge_data);
+
     // Copy all cell Vec data (note we create a new object not just copying the pointer)
     if (daughter_property_collection.HasPropertyType<CellVecData>())
     {
@@ -508,4 +543,9 @@ CellPtr Cell::Divide()
     p_new_cell->SetApoptosisTime(mApoptosisTime);
 
     return p_new_cell;
+}
+
+bool Cell::HasSrnModel() const
+{
+    return mHasSrnModel;
 }

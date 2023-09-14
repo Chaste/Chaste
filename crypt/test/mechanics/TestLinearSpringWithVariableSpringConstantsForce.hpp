@@ -73,14 +73,14 @@ public:
       //This one is going to throw because the ghost layers haven't been set up properly
         CylindricalHoneycombMeshGenerator generator(6, 12, 0, 1.1);
 
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Set up cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, false);
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, false);
 
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
 
@@ -114,14 +114,14 @@ public:
         //Do it again, but with ghost layers set up properly
         CylindricalHoneycombMeshGenerator generator(6, 12, 2, 1.1);
         //                                                 ^-- That was a zero before
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Set up cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, false);
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, false);
 
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
 
@@ -157,14 +157,14 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
         CylindricalHoneycombMeshGenerator generator(6, 12, 0, 1.1);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Set up cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, false);
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, false);
 
         MeshBasedCellPopulationWithGhostNodes<2> crypt(*p_mesh, cells, location_indices);
 
@@ -205,7 +205,7 @@ public:
         unsigned thickness_of_ghost_layer = 3;
 
         HoneycombMeshGenerator generator(cells_across, cells_up,thickness_of_ghost_layer, crypt_width/cells_across);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         CellPropertyRegistry::Instance()->Clear();
@@ -376,7 +376,7 @@ public:
         unsigned thickness_of_ghost_layer = 3;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up,thickness_of_ghost_layer, crypt_width/cells_across);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         CellPropertyRegistry::Instance()->Clear();
@@ -554,7 +554,7 @@ public:
 
         // Set up stretched cell population
         HoneycombMeshGenerator generator(4, 4, 0, 2.0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         std::vector<CellPtr> cells;
@@ -584,7 +584,7 @@ public:
 
         // Now do similar tests for a squashed cell population
         HoneycombMeshGenerator generator2(4, 4, 0, 0.5);
-        MutableMesh<2,2>* p_mesh2 = generator2.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh2 = generator2.GetMesh();
         std::vector<unsigned> location_indices2 = generator2.GetCellLocationIndices();
 
         std::vector<CellPtr> cells2;

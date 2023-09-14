@@ -83,7 +83,7 @@ public:
         unsigned num_cells_depth = 5;
         unsigned num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        MutableMesh<2, 2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         double crypt_length = (double)num_cells_depth * sqrt(3.0) / 2.0;
 
@@ -92,7 +92,7 @@ public:
         // Set up cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<StochasticWntCellCycleModel> cell_generator;
-        cell_generator.Generate(cells, p_mesh, location_indices, true);
+        cell_generator.Generate(cells, p_mesh.get(), location_indices, true);
 
         // Set up cell population
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -163,7 +163,7 @@ public:
         unsigned thickness_of_ghost_layer = 3;
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, thickness_of_ghost_layer);
-        MutableMesh<2, 2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         double crypt_length = (double)num_cells_depth * sqrt(3.0) / 2.0;
 

@@ -43,9 +43,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexMeshWriter.hpp"
 #include "Warnings.hpp"
 
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include "ArchiveOpener.hpp"
+
 //This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
+/*
+ * Testing of edge infrastructure is also done here.
+ * In order to avoid duplication, tests for some edge infrastructure are also implemented in
+ * TestMutableVerteMeshOperationsWithPopulationSrn. There, explicit tests for correct edge rearrangements with SRNs
+ * are implemented.
+ */
 class TestMutableVertexMeshReMesh : public CxxTest::TestSuite
 {
 public:
@@ -81,8 +91,18 @@ public:
 
         MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
+        //For testing edge operations
+        vertex_mesh.SetMeshOperationTracking(true);
+
         // Merge nodes 3 and 4
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(3), vertex_mesh.GetNode(4));
+
+        // Test if the node merge operation has been recorded properly
+        auto operation_recorder = vertex_mesh.GetOperationRecorder();
+        const std::vector<EdgeOperation>& edge_operations = operation_recorder->GetEdgeOperations();
+        const unsigned num_operations = edge_operations.size();
+        TS_ASSERT_EQUALS(num_operations, 1u);
+        TS_ASSERT_EQUALS(edge_operations[0].GetOperation(), EDGE_OPERATION_NODE_MERGE);
 
         // Test the mesh is correctly updated
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 1u);
@@ -226,11 +246,37 @@ public:
 
         MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
+        // For testing edge operations
+        vertex_mesh.SetMeshOperationTracking(true);
+
         // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.1 * 2.0 / 1.5);
 
         // Perform a T1 swap on nodes 4 and 5
         vertex_mesh.IdentifySwapType(vertex_mesh.GetNode(4), vertex_mesh.GetNode(5));
+
+        // Test if the swap has been recorded properly
+        auto operation_recorder = vertex_mesh.GetOperationRecorder();
+        const std::vector<EdgeOperation>& edge_operations = operation_recorder->GetEdgeOperations();
+        const unsigned num_operations = edge_operations.size();
+    
+        // Two node merging operations in two elements and two new edge operations in the other two elements
+        TS_ASSERT_EQUALS(num_operations, 4u);
+        unsigned num_node_merges = 0;
+        unsigned num_new_edges = 0;
+        for (unsigned i=0; i<num_operations; ++i)
+        {
+            if (edge_operations[i].GetOperation() == EDGE_OPERATION_NODE_MERGE)
+            {
+                num_node_merges++;
+            }
+            if (edge_operations[i].GetOperation() == EDGE_OPERATION_ADD)
+            {
+                num_new_edges++;
+            }
+        }
+        TS_ASSERT_EQUALS(num_node_merges, 2u);
+        TS_ASSERT_EQUALS(num_node_merges, 2u);
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
@@ -264,16 +310,57 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 1.2 + 0.2 * sqrt(41.0), 1e-6);
         TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(3), 1.0 + 0.2 * sqrt(41.0), 1e-6);
 
+        // Test T1 swap information tracking
+        std::vector<T1SwapInfo<2> > swap_info
+                    = vertex_mesh.GetOperationRecorder()->GetT1SwapsInfo();
+        std::vector< c_vector<double, 2> > t1_locations = vertex_mesh.GetLocationsOfT1Swaps();
+        //Check location
         // Test T1 swap location tracking
-        std::vector<c_vector<double, 2> > t1_locations = vertex_mesh.GetLocationsOfT1Swaps();
         TS_ASSERT_EQUALS(t1_locations.size(), 1u);
         TS_ASSERT_DELTA(t1_locations[0][0], 0.5, 1e-6);
         TS_ASSERT_DELTA(t1_locations[0][1], 0.5, 1e-6);
+        //Check edge orientation
+        TS_ASSERT_DELTA(swap_info[0].mPreSwapEdge(0), 0.0, 1e-6);
+        TS_ASSERT_DELTA(swap_info[0].mPreSwapEdge(1), 0.2, 1e-6);
+        TS_ASSERT_DELTA(swap_info[0].mPostSwapEdge(0), -0.2, 1e-6);
+        TS_ASSERT_DELTA(swap_info[0].mPostSwapEdge(1), 0.0, 1e-6);
+
+        OutputFileHandler handler("TestT1InfoArchiving", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "T1Info.arch";
+
+        {
+            // Create an output archive
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Write VertexMeshOperationRecorder
+            output_arch << *vertex_mesh.GetOperationRecorder();
+        }
 
         // Test T1 swap location clearing
         vertex_mesh.ClearLocationsOfT1Swaps();
-        t1_locations = vertex_mesh.GetLocationsOfT1Swaps();
-        TS_ASSERT_EQUALS(t1_locations.size(), 0u);
+        swap_info = vertex_mesh.GetOperationRecorder()->GetT1SwapsInfo();
+        TS_ASSERT_EQUALS(swap_info.size(), 0u);
+
+        // Retrieve the archive
+        {
+            // Load T1 swap info
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            VertexMeshOperationRecorder<2,2> recorder;
+            input_arch >> recorder;
+            std::vector<T1SwapInfo<2> > all_swaps = recorder.GetT1SwapsInfo();
+            TS_ASSERT_EQUALS(all_swaps.size(), 1u);
+            T1SwapInfo<2> info = all_swaps[0];
+            TS_ASSERT_DELTA(info.mLocation[0], 0.5, 1e-6);
+            TS_ASSERT_DELTA(info.mLocation[1], 0.5, 1e-6);
+
+            TS_ASSERT_DELTA(info.mPreSwapEdge(0), 0.0, 1e-6);
+            TS_ASSERT_DELTA(info.mPreSwapEdge(1), 0.2, 1e-6);
+            TS_ASSERT_DELTA(info.mPostSwapEdge(0), -0.2, 1e-6);
+            TS_ASSERT_DELTA(info.mPostSwapEdge(1), 0.0, 1e-6);
+        }
     }
 
     void TestPerformT1SwapOnBoundary()
@@ -837,7 +924,8 @@ public:
         vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
         vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
 
-        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        vertex_mesh.SetMeshOperationTracking(true);//For coverage
 
         // Ensure that the inner edge will be considered for a swap
         vertex_mesh.SetCellRearrangementThreshold(0.11);
@@ -871,11 +959,11 @@ public:
         nodes.push_back(new Node<2>(5, false, 0.5, 0.3));
 
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1, nodes_elem_2, nodes_elem_3;
-        unsigned node_indices_elem_0[3] = { 3, 4, 5 };
-        unsigned node_indices_elem_1[4] = { 1, 2, 5, 4 };
-        unsigned node_indices_elem_2[4] = { 2, 0, 3, 5 };
-        unsigned node_indices_elem_3[4] = { 0, 1, 4, 3 };
-        for (unsigned i = 0; i < 4; i++)
+        unsigned node_indices_elem_0[3] = {3, 4, 5};
+        unsigned node_indices_elem_1[4] = {1, 2, 5, 4};
+        unsigned node_indices_elem_2[4] = {2, 0, 3, 5};
+        unsigned node_indices_elem_3[4] = {0, 1, 4, 3};
+        for (unsigned i=0; i<4; i++)
         {
             if (i < 3)
             {
@@ -886,18 +974,37 @@ public:
             nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
         }
 
-        std::vector<VertexElement<2, 2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
-        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
+        std::vector<VertexElement<2,2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
 
-        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        vertex_mesh.SetMeshOperationTracking(true);
+        vertex_mesh.SetMeshOperationTracking(true);
 
         // Perform a T2 swap on the central triangle element
-        VertexElement<2, 2>* p_element_0 = vertex_mesh.GetElement(0);
+        VertexElement<2,2>* p_element_0 = vertex_mesh.GetElement(0);
         c_vector<double, 2> centroid_of_element_0_before_swap = vertex_mesh.GetCentroidOfElement(0);
         vertex_mesh.PerformT2Swap(*p_element_0);
+
+        // Test if the swap has been recorded properly
+        auto operation_recorder = vertex_mesh.GetOperationRecorder();
+        const std::vector<EdgeOperation>& edge_operations = operation_recorder->GetEdgeOperations();
+        const unsigned num_operations = edge_operations.size();
+
+        // Two node merging operations in two elements and two new edge operations in the other two elements
+        TS_ASSERT_EQUALS(num_operations, 3u);
+        unsigned num_node_merges = 0;
+        for (unsigned i=0; i<num_operations; ++i)
+        {
+            if (edge_operations[i].GetOperation() == EDGE_OPERATION_NODE_MERGE)
+            {
+                num_node_merges++;
+            }
+        }
+        TS_ASSERT_EQUALS(num_node_merges, 3u);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 4u);
@@ -905,18 +1012,18 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumAllElements(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumAllNodes(), 7u);
 
-        for (unsigned j = 1; j < 4; j++)
+        for (unsigned j=1; j<4; j++)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNumNodes(), 3u);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(0), j % 3);
-            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(1), (j + 1) % 3);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(0), j%3);
+            TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(1), (j+1)%3);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(2), 6u);
         }
 
         // Test boundary property of nodes. All are boundary nodes except node 3.
-        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
         {
-            bool expected_boundary_node = (i != 3);
+            bool expected_boundary_node = (i!=3);
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
         }
 
@@ -927,6 +1034,52 @@ public:
         // Test the tracking of the T2 swap location:
         TS_ASSERT_DELTA(vertex_mesh.GetLastT2SwapLocation()[0], centroid_of_element_0_before_swap[0], 1e-10);
         TS_ASSERT_DELTA(vertex_mesh.GetLastT2SwapLocation()[1], centroid_of_element_0_before_swap[1], 1e-10);
+
+        // Test T2 swap information tracking
+        std::vector<T2SwapInfo<2> > swap_info
+        = vertex_mesh.GetOperationRecorder()->GetT2SwapsInfo();
+
+        //Check location
+        TS_ASSERT_EQUALS(swap_info.size(), 1u);
+        TS_ASSERT_DELTA(swap_info[0].mLocation(0), centroid_of_element_0_before_swap[0], 1e-10);
+        TS_ASSERT_DELTA(swap_info[0].mLocation(1), centroid_of_element_0_before_swap[1], 1e-10);
+        //Check cell ID of T2 swapped cell
+        TS_ASSERT_EQUALS(swap_info[0].mCellId, 0);
+
+        OutputFileHandler handler("TestT2InfoArchiving", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "T2Info.arch";
+
+        {
+            // Create an output archive
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Write the OperationRecorder object with the swap info
+            output_arch << *vertex_mesh.GetOperationRecorder();
+        }
+
+        // Test T2 swap info clearing
+        vertex_mesh.GetOperationRecorder()->ClearT2SwapsInfo();
+        swap_info = vertex_mesh.GetOperationRecorder()->GetT2SwapsInfo();
+        TS_ASSERT_EQUALS(swap_info.size(), 0u);
+
+        // Retrieve the archive
+        {
+            // Load T2 swap info
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            VertexMeshOperationRecorder<2,2> recorder;
+            input_arch >> recorder;
+            std::vector<T2SwapInfo<2> > all_swaps = recorder.GetT2SwapsInfo();
+            TS_ASSERT_EQUALS(all_swaps.size(), 1u);
+            T2SwapInfo<2> info = all_swaps[0];
+
+            TS_ASSERT_DELTA(info.mLocation[0], centroid_of_element_0_before_swap[0], 1e-10);
+            TS_ASSERT_DELTA(info.mLocation[1], centroid_of_element_0_before_swap[1], 1e-10);
+
+            TS_ASSERT_EQUALS(info.mCellId, 0);
+        }
     }
 
     void TestPerformT2SwapWithBoundaryNodes()
@@ -1570,27 +1723,27 @@ public:
          *    |_____________|
          */
         std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
-        nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
-        nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
-        nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
-        nodes.push_back(new Node<2>(4, true, 2.0, 0.0));
-        nodes.push_back(new Node<2>(5, true, 2.0, 1.0));
-        nodes.push_back(new Node<2>(6, true, 1.1, 0.5));
-        nodes.push_back(new Node<2>(7, true, -1.0, 0.0));
-        nodes.push_back(new Node<2>(8, true, -0.1, 0.5));
-        nodes.push_back(new Node<2>(9, true, -1.0, 1.0));
+        nodes.push_back(new Node<2>(0, true,   0.0,  0.0));
+        nodes.push_back(new Node<2>(1, true,   1.0,  0.0));
+        nodes.push_back(new Node<2>(2, true,   1.0,  1.0));
+        nodes.push_back(new Node<2>(3, true,   0.0,  1.0));
+        nodes.push_back(new Node<2>(4, true,   2.0,  0.0));
+        nodes.push_back(new Node<2>(5, true,   2.0,  1.0));
+        nodes.push_back(new Node<2>(6, true,   1.1,  0.5));
+        nodes.push_back(new Node<2>(7, true,  -1.0,  0.0));
+        nodes.push_back(new Node<2>(8, true,  -0.1,  0.5));
+        nodes.push_back(new Node<2>(9, true,  -1.0,  1.0));
         nodes.push_back(new Node<2>(10, true, -1.0, -1.0));
-        nodes.push_back(new Node<2>(11, true, 2.0, -1.0));
-        nodes.push_back(new Node<2>(12, true, 2.0, 0.5));
+        nodes.push_back(new Node<2>(11, true,  2.0, -1.0));
+        nodes.push_back(new Node<2>(12, true,  2.0,  0.5));
 
         std::vector<Node<2>*> nodes_in_element0, nodes_in_element1, nodes_in_element2, nodes_in_element3, nodes_in_element4;
-        unsigned node_indices_element_0[4] = { 0, 1, 2, 3 };
-        unsigned node_indices_element_1[3] = { 4, 12, 6 };
-        unsigned node_indices_element_2[3] = { 12, 5, 6 };
-        unsigned node_indices_element_3[3] = { 7, 8, 9 };
-        unsigned node_indices_element_4[6] = { 10, 11, 4, 1, 0, 7 };
-        for (unsigned i = 0; i < 6; i++)
+        unsigned node_indices_element_0[4] = {0, 1, 2, 3};
+        unsigned node_indices_element_1[3] = {4, 12, 6};
+        unsigned node_indices_element_2[3] = {12, 5, 6};
+        unsigned node_indices_element_3[3] = {7, 8, 9};
+        unsigned node_indices_element_4[6] = {10, 11, 4, 1, 0, 7};
+        for (unsigned i=0; i<6; i++)
         {
             if (i < 4)
             {
@@ -1605,14 +1758,15 @@ public:
             nodes_in_element4.push_back(nodes[node_indices_element_4[i]]);
         }
 
-        std::vector<VertexElement<2, 2>*> elements;
-        elements.push_back(new VertexElement<2, 2>(0, nodes_in_element0));
-        elements.push_back(new VertexElement<2, 2>(1, nodes_in_element1));
-        elements.push_back(new VertexElement<2, 2>(2, nodes_in_element2));
-        elements.push_back(new VertexElement<2, 2>(3, nodes_in_element3));
-        elements.push_back(new VertexElement<2, 2>(4, nodes_in_element4));
+        std::vector<VertexElement<2,2>*> elements;
+        elements.push_back(new VertexElement<2,2>(0, nodes_in_element0));
+        elements.push_back(new VertexElement<2,2>(1, nodes_in_element1));
+        elements.push_back(new VertexElement<2,2>(2, nodes_in_element2));
+        elements.push_back(new VertexElement<2,2>(3, nodes_in_element3));
+        elements.push_back(new VertexElement<2,2>(4, nodes_in_element4));
 
-        MutableVertexMesh<2, 2> mesh(nodes, elements);
+        MutableVertexMesh<2,2> mesh(nodes, elements);
+        mesh.SetMeshOperationTracking(true);
 
         // Test default value of mCheckForT3Swaps, as well as setting and getting
         TS_ASSERT_EQUALS(mesh.GetCheckForT3Swaps(), true);
@@ -1622,7 +1776,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetCheckForT3Swaps(), true);
 
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
-        mesh.SetCellRearrangementThreshold(0.1 * 1.0 / 1.5);
+        mesh.SetCellRearrangementThreshold(0.1*1.0/1.5);
 
         // Node 6 is close to, but not overlapping, an edge of element 0
         TS_ASSERT_EQUALS(mesh.ElementIncludesPoint(mesh.GetNode(6)->rGetLocation(), 0), false);
@@ -1648,10 +1802,36 @@ public:
         // Call method to update mesh in this situation
         mesh.ReMesh();
 
+        // Test if the swap has been recorded properly
+        auto operation_recorder = mesh.GetOperationRecorder();
+        const std::vector<EdgeOperation>& edge_operations = operation_recorder->GetEdgeOperations();
+        const unsigned num_operations = edge_operations.size();
+        //Two node merging operations in two elements and two new edge operations in the other two elements
+        TS_ASSERT_EQUALS(num_operations, 8u);
+        unsigned num_edge_splits = 0;
+        unsigned num_new_edges = 0;
+        std::vector<std::vector<unsigned> > element_to_operations(5);
+        for (unsigned i=0; i<num_operations; ++i)
+        {
+            if (edge_operations[i].GetOperation() == EDGE_OPERATION_SPLIT)
+            {
+                num_edge_splits++;
+            }
+            if (edge_operations[i].GetOperation() == EDGE_OPERATION_ADD)
+            {
+                num_new_edges++;
+            }
+            // Determine operations that an element underwent
+            const unsigned elem_index = edge_operations[i].GetElementIndex();
+            element_to_operations[elem_index].push_back(edge_operations[i].GetOperation());
+        }
+        TS_ASSERT_EQUALS(num_edge_splits, 5u);
+        TS_ASSERT_EQUALS(num_new_edges, 3u);
+
         // Save the mesh data using mesh writers
         std::string dirname = "TempyTempy";
         std::string mesh_filename = "vertex_remesh_T3";
-        VertexMeshWriter<2, 2> mesh_writer(dirname, mesh_filename, false);
+        VertexMeshWriter<2,2> mesh_writer(dirname, mesh_filename, false);
         mesh_writer.WriteFilesUsingMesh(mesh);
 
         // Check that node 6 has been moved onto the edge a new node has been created and both added to elements 0 amd 1
@@ -1680,12 +1860,12 @@ public:
         TS_ASSERT_EQUALS(mesh.GetElement(4)->GetNumNodes(), 6u);
 
         // Test that each element contains the correct nodes following the rearrangement
-        unsigned new_node_indices_element_0[9] = { 0, 1, 13, 6, 14, 2, 3, 15, 8 };
-        unsigned new_node_indices_element_1[4] = { 4, 12, 6, 13 };
-        unsigned new_node_indices_element_2[4] = { 12, 5, 14, 6 };
-        unsigned new_node_indices_element_3[4] = { 7, 8, 15, 9 };
-        unsigned new_node_indices_element_4[6] = { 10, 11, 4, 1, 0, 7 };
-        for (unsigned i = 0; i < 9; i++)
+        unsigned new_node_indices_element_0[9] = {0, 1, 13, 6, 14, 2, 3, 15, 8};
+        unsigned new_node_indices_element_1[4] = {4, 12, 6, 13};
+        unsigned new_node_indices_element_2[4] = {12, 5, 14, 6};
+        unsigned new_node_indices_element_3[4] = {7, 8, 15, 9};
+        unsigned new_node_indices_element_4[6] = {10, 11, 4, 1, 0, 7};
+        for (unsigned i=0; i<9; i++)
         {
             TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(i), new_node_indices_element_0[i]);
             if (i < 4)
@@ -1702,24 +1882,56 @@ public:
         }
 
         // Test boundary property of nodes (all are boundary nodes except node 6)
-        for (unsigned i = 0; i < mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
-            bool expected_boundary_node = (i != 6);
+            bool expected_boundary_node = (i!=6);
             TS_ASSERT_EQUALS(mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
         }
 
         // Test T3 swap Location tracking
-        std::vector<c_vector<double, 2> > t3_locations = mesh.GetLocationsOfT3Swaps();
-        TS_ASSERT_EQUALS(t3_locations.size(), 2u);
+        std::vector<T3SwapInfo<2> > swap_info
+                            = mesh.GetOperationRecorder()->GetT3SwapsInfo();
+        TS_ASSERT_EQUALS(swap_info.size(), 2u);
+        std::vector< c_vector<double, 2> > t3_locations = mesh.GetLocationsOfT3Swaps();
+
         TS_ASSERT_DELTA(t3_locations[0][0], 1.0, 1e-6);
         TS_ASSERT_DELTA(t3_locations[0][1], 0.5, 1e-6);
         TS_ASSERT_DELTA(t3_locations[1][0], 0.0, 1e-6);
         TS_ASSERT_DELTA(t3_locations[1][1], 0.5, 1e-6);
 
+        OutputFileHandler handler("TestT3InfoArchiving", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "T3Info.arch";
+
+        {
+            // Create an output archive
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Write the T3 swap info
+            output_arch << *mesh.GetOperationRecorder();
+        }
+
         // Test T3 swap Location clearing
         mesh.ClearLocationsOfT3Swaps();
-        t3_locations = mesh.GetLocationsOfT3Swaps();
-        TS_ASSERT_EQUALS(t3_locations.size(), 0u);
+        swap_info = mesh.GetOperationRecorder()->GetT3SwapsInfo();
+        TS_ASSERT_EQUALS(swap_info.size(), 0u);
+
+        // Retrieve the archive
+        {
+            // Load T3 swap info
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            VertexMeshOperationRecorder<2,2> recorder;
+            input_arch >> recorder;
+            std::vector<T3SwapInfo<2> > all_swaps = recorder.GetT3SwapsInfo();
+            TS_ASSERT_EQUALS(all_swaps.size(), 2u);
+
+            TS_ASSERT_DELTA(all_swaps[0].mLocation[0], 1.0, 1e-6);
+            TS_ASSERT_DELTA(all_swaps[0].mLocation[1], 0.5, 1e-6);
+            TS_ASSERT_DELTA(all_swaps[1].mLocation[0], 0.0, 1e-6);
+            TS_ASSERT_DELTA(all_swaps[1].mLocation[1], 0.5, 1e-6);
+        }
     }
 
     void TestPerformT3SwapException()
@@ -1872,6 +2084,9 @@ public:
         MutableVertexMesh<2, 2> vertex_mesh(nodes, elements);
 
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
+        vertex_mesh.SetCellRearrangementThreshold(0.1/1.5);
+        vertex_mesh.SetMeshOperationTracking(true);//For coverage
+        vertex_mesh.SetCellRearrangementThreshold(0.1 / 1.5);
         vertex_mesh.SetCellRearrangementThreshold(0.1 / 1.5);
 
         // Call PerformT3Swap(); note that we don't call ReMesh(), since this would also perform T1 swaps
@@ -1985,7 +2200,8 @@ public:
         elements.push_back(new VertexElement<2, 2>(0, nodes_in_element0));
         elements.push_back(new VertexElement<2, 2>(1, nodes_in_element1));
 
-        MutableVertexMesh<2, 2> vertex_mesh(nodes, elements);
+        MutableVertexMesh<2,2> vertex_mesh(nodes, elements);
+        vertex_mesh.SetMeshOperationTracking(true);//For coverage
 
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations.
         vertex_mesh.SetCellRearrangementThreshold(0.2);
@@ -2102,6 +2318,9 @@ public:
         MutableVertexMesh<2, 2> vertex_mesh(nodes, elements);
 
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
+        vertex_mesh.SetCellRearrangementThreshold(0.1*1.0/1.5);
+        vertex_mesh.SetMeshOperationTracking(true);//For coverage
+        vertex_mesh.SetCellRearrangementThreshold(0.1 * 1.0 / 1.5);
         vertex_mesh.SetCellRearrangementThreshold(0.1 * 1.0 / 1.5);
 
         // Node 6 and 8 are close to, but not overlapping, an edge of element 0
@@ -2223,7 +2442,8 @@ public:
         elements.push_back(new VertexElement<2, 2>(0, nodes_in_element0));
         elements.push_back(new VertexElement<2, 2>(1, nodes_in_element1));
 
-        MutableVertexMesh<2, 2> vertex_mesh(nodes, elements);
+        MutableVertexMesh<2,2> vertex_mesh(nodes, elements);
+        vertex_mesh.SetMeshOperationTracking(true);//For coverage
 
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.15);
@@ -2341,7 +2561,8 @@ public:
         elements.push_back(new VertexElement<2, 2>(2, nodes_in_element2));
         elements.push_back(new VertexElement<2, 2>(3, nodes_in_element3));
 
-        MutableVertexMesh<2, 2> vertex_mesh(nodes, elements);
+        MutableVertexMesh<2,2> vertex_mesh(nodes, elements);
+        vertex_mesh.SetMeshOperationTracking(true);//For coverage
 
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.1 * 1.0 / 1.5);
@@ -2462,6 +2683,7 @@ public:
         MutableVertexMesh<2, 2> vertex_mesh;
         vertex_mesh.ConstructFromMeshReader(mesh_reader);
 
+        vertex_mesh.SetMeshOperationTracking(true);//For coverage
         vertex_mesh.SetDistanceForT3SwapChecking(100.0);
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.1 * 1.0 / 1.5);
@@ -2532,7 +2754,8 @@ public:
         vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
         vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
 
-        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        vertex_mesh.SetMeshOperationTracking(true);//For coverage
 
         vertex_mesh.SetCellRearrangementThreshold(0.1);
 
@@ -2638,7 +2861,8 @@ public:
         vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
         vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
 
-        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        vertex_mesh.SetMeshOperationTracking(true);//For coverage
 
         vertex_mesh.SetCellRearrangementThreshold(0.1);
 
@@ -2706,7 +2930,8 @@ public:
         vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
         vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
 
-        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        vertex_mesh.SetMeshOperationTracking(true);//For coverage
 
         vertex_mesh.ReMesh(); // Edges too long so nothing happens
 
@@ -2811,7 +3036,8 @@ public:
         elements.push_back(new VertexElement<2, 2>(1, nodes_in_element1));
         elements.push_back(new VertexElement<2, 2>(2, nodes_in_element2));
 
-        MutableVertexMesh<2, 2> mesh(nodes, elements);
+        MutableVertexMesh<2,2> mesh(nodes, elements);
+        mesh.SetMeshOperationTracking(true);//For coverage
 
         // Set the threshold distance between vertices for a T3 swap as follows, to ease calculations
         mesh.SetCellRearrangementThreshold(0.1 * 1.0 / 1.5);
@@ -2922,7 +3148,8 @@ public:
         vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
         vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
 
-        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        vertex_mesh.SetMeshOperationTracking(true);//For coverage
 
         // Move node 4 so that it overlaps element 0
         ChastePoint<2> point = vertex_mesh.GetNode(4)->GetPoint();
@@ -3015,7 +3242,8 @@ public:
         vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
         vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
 
-        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        vertex_mesh.SetMeshOperationTracking(true);//For coverage
 
         // Move node 5 so that it overlaps element 0
         ChastePoint<2> point = vertex_mesh.GetNode(5)->GetPoint();

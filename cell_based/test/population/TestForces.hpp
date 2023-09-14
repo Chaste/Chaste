@@ -54,6 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NagaiHondaDifferentialAdhesionForce.hpp"
 #include "WelikyOsterForce.hpp"
 #include "FarhadifarForce.hpp"
+#include "PlanarPolarisedFarhadifarForce.hpp"
 #include "DiffusionForce.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "ApcOneHitCellMutationState.hpp"
@@ -84,7 +85,7 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
         HoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Create cells
@@ -424,7 +425,7 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
         HoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Create cells
@@ -641,16 +642,33 @@ public:
             TS_ASSERT(comparer.CompareFiles());
         }
 
-        FarhadifarForce<2> force;
-        TS_ASSERT_EQUALS(force.GetIdentifier(), "FarhadifarForce-2");
+        // Test with FarhadifarForce
+        FarhadifarForce<2> farhadifar_force;
+        TS_ASSERT_EQUALS(farhadifar_force.GetIdentifier(), "FarhadifarForce-2");
 
         out_stream farhadifar_force_parameter_file = output_file_handler.OpenOutputFile("farhadifar_results.parameters");
-        force.OutputForceParameters(farhadifar_force_parameter_file);
+        farhadifar_force.OutputForceParameters(farhadifar_force_parameter_file);
         farhadifar_force_parameter_file->close();
 
         {
             FileFinder generated_file = output_file_handler.FindFile("farhadifar_results.parameters");
             FileFinder reference_file("cell_based/test/data/TestForces/farhadifar_results.parameters",
+                    RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+
+        // Test with PlanarPolarisedFarhadifarForce
+        PlanarPolarisedFarhadifarForce<2> planar_force;
+        TS_ASSERT_EQUALS(planar_force.GetIdentifier(), "PlanarPolarisedFarhadifarForce-2");
+
+        out_stream planar_force_parameter_file = output_file_handler.OpenOutputFile("planar_results.parameters");
+        planar_force.OutputForceParameters(planar_force_parameter_file);
+        planar_force_parameter_file->close();
+
+        {
+            FileFinder generated_file = output_file_handler.FindFile("planar_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestForces/planar_results.parameters",
                     RelativeTo::ChasteSourceRoot);
             FileComparison comparer(generated_file,reference_file);
             TS_ASSERT(comparer.CompareFiles());
@@ -773,7 +791,7 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
         HoneycombMeshGenerator generator(cells_across, cells_up);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -1045,43 +1063,35 @@ public:
         TS_ASSERT_DELTA(force.GetNagaiHondaMembraneSurfaceEnergyParameter(), 10.0, 1e-12);
         TS_ASSERT_DELTA(force.GetNagaiHondaCellCellAdhesionEnergyParameter(), 0.5, 1e-12);
         TS_ASSERT_DELTA(force.GetNagaiHondaCellBoundaryAdhesionEnergyParameter(), 1.0, 1e-12);
+        TS_ASSERT_DELTA(force.GetNagaiHondaTargetAreaParameter(), 1.0, 1e-12);
 
         force.SetNagaiHondaDeformationEnergyParameter(5.8);
         force.SetNagaiHondaMembraneSurfaceEnergyParameter(17.9);
         force.SetNagaiHondaCellCellAdhesionEnergyParameter(0.3);
         force.SetNagaiHondaCellBoundaryAdhesionEnergyParameter(0.6);
+        force.SetNagaiHondaTargetAreaParameter(1.7);
 
         TS_ASSERT_DELTA(force.GetNagaiHondaDeformationEnergyParameter(), 5.8, 1e-12);
         TS_ASSERT_DELTA(force.GetNagaiHondaMembraneSurfaceEnergyParameter(), 17.9, 1e-12);
         TS_ASSERT_DELTA(force.GetNagaiHondaCellCellAdhesionEnergyParameter(), 0.3, 1e-12);
         TS_ASSERT_DELTA(force.GetNagaiHondaCellBoundaryAdhesionEnergyParameter(), 0.6, 1e-12);
+        TS_ASSERT_DELTA(force.GetNagaiHondaTargetAreaParameter(), 1.7, 1e-12);
 
         force.SetNagaiHondaDeformationEnergyParameter(100.0);
         force.SetNagaiHondaMembraneSurfaceEnergyParameter(10.0);
         force.SetNagaiHondaCellCellAdhesionEnergyParameter(1.0);
         force.SetNagaiHondaCellBoundaryAdhesionEnergyParameter(1.0);
+        force.SetNagaiHondaTargetAreaParameter(1.0);
 
+        // Calculate force on each node
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
             cell_population.GetNode(i)->ClearAppliedForce();
         }
-
-        // Currently, NagaiHonda force only works if used together with a target area growth modifier
-        // This tests that a meaningful error appears if we don't use a growth modifier
-        TS_ASSERT_THROWS_THIS(force.AddForceContribution(cell_population),
-                "You need to add an AbstractTargetAreaModifier to the simulation in order to use NagaiHondaForce");
-
-        // create our modifier, which sets the target areas for the cell population
-        // this is a workaround to make the test work
-        // #2488
-        MAKE_PTR(SimpleTargetAreaModifier<2>,p_growth_modifier);
-        p_growth_modifier->UpdateTargetAreas(cell_population);
-
         force.AddForceContribution(cell_population);
 
         // The force on each node should be radially inward, with the same magnitude for all nodes
         double force_magnitude = norm_2(cell_population.GetNode(0)->rGetAppliedForce());
-
         for (unsigned i=0; i<num_nodes; i++)
         {
             TS_ASSERT_DELTA(norm_2(cell_population.GetNode(i)->rGetAppliedForce()), force_magnitude, 1e-4);
@@ -1101,10 +1111,6 @@ public:
         {
             cell_population.GetNode(i)->ClearAppliedForce();
         }
-
-        //#2488 workaround
-        p_growth_modifier->UpdateTargetAreas(cell_population);
-
         force.AddForceContribution(cell_population);
 
         // The force on each node should not yet be affected by setting the cell to be apoptotic
@@ -1114,6 +1120,10 @@ public:
             TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[0], -force_magnitude*cos(angles[i]), 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[1], -force_magnitude*sin(angles[i]), 1e-4);
         }
+
+        // Modify cell target areas over time according to a simple growth model
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
+        p_growth_modifier->UpdateTargetAreas(cell_population);
 
         // Increment time
         p_simulation_time->IncrementTimeOneStep();
@@ -1157,6 +1167,7 @@ public:
             force.SetNagaiHondaMembraneSurfaceEnergyParameter(17.9);
             force.SetNagaiHondaCellCellAdhesionEnergyParameter(0.5);
             force.SetNagaiHondaCellBoundaryAdhesionEnergyParameter(0.6);
+            force.SetNagaiHondaTargetAreaParameter(3.2);
 
             // Serialize via pointer to most abstract class possible
             AbstractForce<2>* const p_force = &force;
@@ -1178,6 +1189,7 @@ public:
             TS_ASSERT_DELTA(static_cast<NagaiHondaForce<2>*>(p_force)->GetNagaiHondaMembraneSurfaceEnergyParameter(), 17.9, 1e-12);
             TS_ASSERT_DELTA(static_cast<NagaiHondaForce<2>*>(p_force)->GetNagaiHondaCellCellAdhesionEnergyParameter(), 0.5, 1e-12);
             TS_ASSERT_DELTA(static_cast<NagaiHondaForce<2>*>(p_force)->GetNagaiHondaCellBoundaryAdhesionEnergyParameter(), 0.6, 1e-12);
+            TS_ASSERT_DELTA(static_cast<NagaiHondaForce<2>*>(p_force)->GetNagaiHondaTargetAreaParameter(), 3.2, 1e-12);
 
             // Tidy up
             delete p_force;
@@ -1188,7 +1200,7 @@ public:
     {
         // Create a simple 2D VertexMesh
         HoneycombVertexMeshGenerator generator(3, 3);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -1448,37 +1460,31 @@ public:
         TS_ASSERT_DELTA(force.GetPerimeterContractilityParameter(), 0.04, 1e-12);
         TS_ASSERT_DELTA(force.GetLineTensionParameter(), 0.12, 1e-12);
         TS_ASSERT_DELTA(force.GetBoundaryLineTensionParameter(), 0.12, 1e-12);
+        TS_ASSERT_DELTA(force.GetTargetAreaParameter(), 1.0, 1e-12);
 
         force.SetAreaElasticityParameter(5.8);
         force.SetPerimeterContractilityParameter(17.9);
         force.SetLineTensionParameter(0.5);
         force.SetBoundaryLineTensionParameter(0.6);
+        force.SetTargetAreaParameter(2.9);
 
         TS_ASSERT_DELTA(force.GetAreaElasticityParameter(), 5.8, 1e-12);
         TS_ASSERT_DELTA(force.GetPerimeterContractilityParameter(), 17.9, 1e-12);
         TS_ASSERT_DELTA(force.GetLineTensionParameter(), 0.5, 1e-12);
         TS_ASSERT_DELTA(force.GetBoundaryLineTensionParameter(), 0.6, 1e-12);
+        TS_ASSERT_DELTA(force.GetTargetAreaParameter(), 2.9, 1e-12);
 
         force.SetAreaElasticityParameter(1.0);
         force.SetPerimeterContractilityParameter(0.04);
         force.SetLineTensionParameter(0.12);
         force.SetBoundaryLineTensionParameter(0.12);
+        force.SetTargetAreaParameter(1.0);
 
+        // Calculate force on each node
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
             cell_population.GetNode(i)->ClearAppliedForce();
         }
-
-        // Currently, the Farhadifar force only works if used together with a target area growth modifier
-        // This tests that a meaningful error appears if we don't use a growth modifier
-        TS_ASSERT_THROWS_THIS(force.AddForceContribution(cell_population),
-                "You need to add an AbstractTargetAreaModifier to the simulation in order to use a FarhadifarForce");
-
-        // create our modifier, which sets the target areas for the cell population
-
-        MAKE_PTR(SimpleTargetAreaModifier<2>,p_growth_modifier);
-        p_growth_modifier->UpdateTargetAreas(cell_population);
-
         force.AddForceContribution(cell_population);
 
         // The force on each node should be radially inward, with the same magnitude for all nodes
@@ -1504,9 +1510,6 @@ public:
             cell_population.GetNode(i)->ClearAppliedForce();
         }
 
-        //#2488 workaround
-        p_growth_modifier->UpdateTargetAreas(cell_population);
-
         force.AddForceContribution(cell_population);
 
         // The force on each node should not yet be affected by setting the cell to be apoptotic
@@ -1516,6 +1519,10 @@ public:
             TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[0], -force_magnitude*cos(angles[i]), 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(i)->rGetAppliedForce()[1], -force_magnitude*sin(angles[i]), 1e-4);
         }
+
+        // Modify cell target areas over time according to a simple growth model
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
+        p_growth_modifier->UpdateTargetAreas(cell_population);
 
         // Increment time
         p_simulation_time->IncrementTimeOneStep();
@@ -1542,8 +1549,82 @@ public:
         }
     }
 
+    void TestPlanarPolarisedFarhadifarForce()
+    {
+        // Construct a 2D vertex mesh consisting of a single element
+        std::vector<Node<2>*> nodes;
+        unsigned num_nodes = 9;
+        std::vector<double> angles = std::vector<double>(num_nodes);
+        for (unsigned i=0; i<num_nodes; i++)
+        {
+            angles[i] = M_PI+2.0*M_PI*(double)(i)/(double)(num_nodes);
+            nodes.push_back(new Node<2>(i, true, cos(angles[i]), sin(angles[i])));
+        }
+
+        std::vector<VertexElement<2,2>*> elements;
+        elements.push_back(new VertexElement<2,2>(0, nodes));
+
+        double cell_swap_threshold = 0.01;
+        double edge_division_threshold = 2.0;
+        MutableVertexMesh<2,2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
+
+        // Set up the cell
+        std::vector<CellPtr> cells;
+        MAKE_PTR(WildTypeCellMutationState, p_state);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
+        CellPtr p_cell(new Cell(p_state, p_model));
+        p_cell->SetCellProliferativeType(p_diff_type);
+        p_cell->SetBirthTime(-1.0);
+        cells.push_back(p_cell);
+
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(mesh, cells);
+        cell_population.InitialiseCells();
+
+        // Create force
+        PlanarPolarisedFarhadifarForce<2> force;
+
+        // Test get/set methods
+        TS_ASSERT_DELTA(force.GetAreaElasticityParameter(), 1.0, 1e-12);
+        TS_ASSERT_DELTA(force.GetPerimeterContractilityParameter(), 0.04, 1e-12);
+        TS_ASSERT_DELTA(force.GetLineTensionParameter(), 0.12, 1e-12);
+        TS_ASSERT_DELTA(force.GetBoundaryLineTensionParameter(), 0.12, 1e-12);
+        TS_ASSERT_DELTA(force.GetPlanarPolarisedLineTensionMultiplier(), 2.0, 1e-12);
+
+        force.SetPlanarPolarisedLineTensionMultiplier(4.0);
+        TS_ASSERT_DELTA(force.GetPlanarPolarisedLineTensionMultiplier(), 4.0, 1e-12);
+
+        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
+        {
+            cell_population.GetNode(i)->ClearAppliedForce();
+        }
+        
+        // Test GetLineTensionParameter()
+        c_vector<double, 2> applied_force_0;
+        applied_force_0 = cell_population.rGetMesh().GetNode(0)->rGetAppliedForce();
+        c_vector<double, 2> applied_force_1;
+        applied_force_1 = cell_population.rGetMesh().GetNode(1)->rGetAppliedForce();
+
+        for (unsigned node_idx = 0; node_idx < cell_population.GetNumNodes(); node_idx++)
+        {
+            Node<2>* p_node_A = cell_population.GetNode(node_idx);
+            Node<2>* p_node_B = cell_population.GetNode((node_idx + 1) % cell_population.GetNumNodes());
+            
+            double line_tension = force.GetLineTensionParameter(p_node_A, p_node_B, cell_population);
+            if ((node_idx == 1) || (node_idx == 2) || (node_idx == 6) || (node_idx == 7))
+            {
+                TS_ASSERT_DELTA(0.12, line_tension, 1e-12);
+            }
+            else
+            {
+                TS_ASSERT_DELTA(0.48, line_tension, 1e-12);
+            }
+        }
+    }
+
     void TestFarhadifarForceTerms()
-       {
+    {
         /**
          * Here we test that the forces are applied correctly to individual nodes.
          * We apply the force to something like this:
@@ -1749,6 +1830,54 @@ public:
             TS_ASSERT_DELTA(p_farhadifar_force->GetPerimeterContractilityParameter(), 17.9, 1e-12);
             TS_ASSERT_DELTA(p_farhadifar_force->GetLineTensionParameter(), 0.5, 1e-12);
             TS_ASSERT_DELTA(p_farhadifar_force->GetBoundaryLineTensionParameter(), 0.6, 1e-12);
+
+            // Tidy up
+            delete p_abstract_force;
+        }
+    }
+
+    void TestPlanarPolarisedFarhadifarForceArchiving()
+    {
+        EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "PlanarPolarisedFarhadifarForce.arch";
+
+        {
+            PlanarPolarisedFarhadifarForce<2> force;
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Set member variables
+            force.SetAreaElasticityParameter(5.8);
+            force.SetPerimeterContractilityParameter(17.9);
+            force.SetLineTensionParameter(0.5);
+            force.SetBoundaryLineTensionParameter(0.6);
+            force.SetPlanarPolarisedLineTensionMultiplier(5.2);
+
+            // Serialize via pointer to most abstract class possible
+            AbstractForce<2>* const p_force = &force;
+            output_arch << p_force;
+        }
+
+        {
+            AbstractForce<2>* p_abstract_force;
+
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            // Restore from the archive
+            input_arch >> p_abstract_force;
+
+            PlanarPolarisedFarhadifarForce<2>* p_planar_force = static_cast<PlanarPolarisedFarhadifarForce<2>*>(p_abstract_force);
+
+            // Check member variables have been correctly archived
+            TS_ASSERT_DELTA(p_planar_force->GetAreaElasticityParameter(), 5.8, 1e-12);
+            TS_ASSERT_DELTA(p_planar_force->GetPerimeterContractilityParameter(), 17.9, 1e-12);
+            TS_ASSERT_DELTA(p_planar_force->GetLineTensionParameter(), 0.5, 1e-12);
+            TS_ASSERT_DELTA(p_planar_force->GetBoundaryLineTensionParameter(), 0.6, 1e-12);
+            TS_ASSERT_DELTA(p_planar_force->GetPlanarPolarisedLineTensionMultiplier(), 5.2, 1e-12);
 
             // Tidy up
             delete p_abstract_force;
@@ -1965,7 +2094,7 @@ public:
 
         // Create a simple VertexBasedCellPopulation
         HoneycombVertexMeshGenerator mesh_generator(4, 6);
-        MutableVertexMesh<2,2>* p_mesh = mesh_generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = mesh_generator.GetMesh();
         for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
              node_iter != p_mesh->GetNodeIteratorEnd();
              ++node_iter)
@@ -2014,7 +2143,7 @@ public:
 
         // Create a simple MeshBasedCellPopulation
         HoneycombMeshGenerator mesh_generator(4, 6, 0);
-        MutableMesh<2,2>* p_mesh = mesh_generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = mesh_generator.GetMesh();
         for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
              node_iter != p_mesh->GetNodeIteratorEnd();
              ++node_iter)

@@ -426,7 +426,7 @@ public:
         /* We use the honeycomb vertex mesh generator to create a vertex mesh.
          */
         HoneycombVertexMeshGenerator generator(2, 2);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         /* Next, we create some cells. First, define the cells vector. */
         std::vector<CellPtr> cells;
@@ -461,7 +461,7 @@ public:
             cells.push_back(p_cell);
         }
 
-        /* Now that we have defined the mesh and cells, we can define the cell population, forces, areas modifier, and simulation
+        /* Now that we have defined the mesh and cells, we can define the cell population, forces, target area modifier, and simulation
          * in the same way as the other tutorials. */
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 

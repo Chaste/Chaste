@@ -108,7 +108,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -169,7 +169,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -241,7 +241,7 @@ public:
     {
         // Create a simple 2D MutableVertexMesh with only one cell
         HoneycombVertexMeshGenerator generator(1, 1);
-        MutableVertexMesh<2, 2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Set up cell.
         std::vector<CellPtr> cells;
@@ -268,7 +268,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -294,7 +294,7 @@ public:
     {
         // Create a simple 2D MutableVertexMesh
         HoneycombVertexMeshGenerator generator(5, 5);
-        MutableVertexMesh<2, 2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -333,7 +333,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -360,7 +360,7 @@ public:
     {
         // Create a simple 2D MutableVertexMesh
         HoneycombVertexMeshGenerator generator(3, 3);
-        MutableVertexMesh<2, 2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create a horseshoe-shaped mesh
         p_mesh->DeleteElementPriorToReMesh(0);
@@ -392,7 +392,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier#2488
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -426,7 +426,7 @@ public:
 
         // Create a simple 2D MutableVertexMesh
         HoneycombVertexMeshGenerator generator(4, 4);
-        MutableVertexMesh<2, 2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
         p_mesh->SetCellRearrangementThreshold(0.1);
 
         /*
@@ -460,7 +460,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -557,7 +557,7 @@ public:
     {
         // Create a simple 2D MutableVertexMesh with four cells
         HoneycombVertexMeshGenerator generator(2, 2);
-        MutableVertexMesh<2, 2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -587,7 +587,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -614,7 +614,7 @@ public:
     {
         // Create a simple 2D MutableVertexMesh with four cells
         HoneycombVertexMeshGenerator generator(2, 2);
-        MutableVertexMesh<2, 2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
         p_mesh->SetCellRearrangementThreshold(0.1);
 
         // Create cells
@@ -652,7 +652,7 @@ public:
         p_force->SetNagaiHondaLabelledCellBoundaryAdhesionEnergyParameter(40.0);
         simulator.AddForce(p_force);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -709,7 +709,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -751,7 +751,7 @@ public:
 
         // Create a simple 2D MutableVertexMesh
         HoneycombVertexMeshGenerator generator(3, 3);
-        MutableVertexMesh<2, 2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -771,7 +771,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
@@ -809,7 +809,7 @@ public:
 
         // Create a simple 2D MutableVertexMesh
         HoneycombVertexMeshGenerator generator(6, 6);
-        MutableVertexMesh<2, 2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -831,7 +831,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier #2488
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 

@@ -82,14 +82,11 @@ public:
      * NB: Produce archives with something similar to 
      *  cmake -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=/path/to/boost1.58 -DChaste_USE_CVODE=OFF /path/to/Chaste
      *  # YOUR MILEAGE MAY VARY because CMake is very good at finding other versions of Boost:
-     *  cmake -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=/home/jmpf/boost_1_58 -DBoost_NO_SYSTEM_PATHS=ON -DBoost_NO_BOOST_CMAKE=ON DChaste_USE_CVODE=FALSE ..
+     *  cmake -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=/home/jmpf/boost_1_58 -DBoost_NO_SYSTEM_PATHS=ON -DBoost_NO_BOOST_CMAKE=ON -DChaste_USE_CVODE=FALSE ..
      *  make TestGenerateSteadyStateCrypt
      *  ctest -R TestGenerateSteadyStateCrypt
      *  cp /tmp/$USER/testoutput/SteadyStateCrypt/archive/?*_150.* ../crypt/test/data/SteadyStateCrypt/archive/
      *
-     * OR to produce archives in CMake:
-     *  scons build=GccOpt_hostconfig,boost=1-58,use-cvode=0 test_suite=crypt/test/simulation/TestGenerateSteadyStateCrypt.hpp
-     *  cp /tmp/$USER/testoutput/SteadyStateCrypt/archive/?*_150.* crypt/test/data/SteadyStateCrypt/archive/
      *
      */
     void TestLoadArchive()

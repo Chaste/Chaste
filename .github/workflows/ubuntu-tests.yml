@@ -1,0 +1,110 @@
+name: Ubuntu tests
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - '**'
+  push:
+    branches:
+      - develop
+
+jobs:
+  
+  build-and-test:
+
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: "ubuntu-20.04"
+            codename: "focal"
+            cc: "gcc"
+            cxx: "g++"
+          - os: "ubuntu-22.04"
+            codename: "jammy"
+            cc: "gcc"
+            cxx: "g++"
+          - os: "ubuntu-22.04"
+            codename: "jammy"
+            cc: "icx"
+            cxx: "icpx"
+
+    env:
+      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
+      CC: ${{ matrix.cc }}
+      CXX: ${{ matrix.cxx }}
+
+    steps:
+    - name: checkout repository
+      uses: actions/checkout@v3
+
+    - name: install dependencies
+      run: |
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu ${{ matrix.codename }}/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
+        sudo apt update
+        sudo apt install chaste-dependencies
+
+    - name: install and set up Intel LLVM compiler
+      run: |
+        echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+        sudo wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+        sudo apt update
+        sudo apt install intel-oneapi-compiler-dpcpp-cpp
+        source /opt/intel/oneapi/setvars.sh
+        printenv >> $GITHUB_ENV
+      if: ${{ matrix.cc == 'icx' }}
+
+    - name: compiler version
+      run: |
+        ${CXX} --version
+
+    - name: make build and test directories
+      run: |
+        mkdir -p chaste-build-dir
+        mkdir -p ${CHASTE_TEST_OUTPUT}
+
+    - name: cmake configure
+      run: cmake -DCMAKE_BUILD_TYPE=Release ..
+      working-directory: chaste-build-dir
+
+    - name: build core libraries
+      run: cmake --build . --parallel 2 --target chaste_core
+      working-directory: chaste-build-dir
+
+    - name: build cell_based
+      run: cmake --build . --parallel 2 --target chaste_cell_based
+      working-directory: chaste-build-dir
+
+    - name: build crypt
+      run: cmake --build . --parallel 2 --target chaste_crypt
+      working-directory: chaste-build-dir
+
+    - name: build heart
+      run: cmake --build . --parallel 2 --target chaste_heart
+      working-directory: chaste-build-dir
+
+    - name: build lung
+      run: cmake --build . --parallel 2 --target chaste_lung
+      working-directory: chaste-build-dir
+
+    - name: build continuous test pack
+      run: cmake --build . --parallel 2 --target Continuous
+      working-directory: chaste-build-dir
+
+    - name: build nightly test pack
+      run: cmake --build . --parallel 2 --target Nightly
+      working-directory: chaste-build-dir
+
+    - name: run Continuous test pack
+      run: ctest -j2 -L Continuous --output-on-failure
+      working-directory: chaste-build-dir
+
+    - name: run Nightly test pack
+      run: ctest -j2 -L Nightly --output-on-failure
+      working-directory: chaste-build-dir

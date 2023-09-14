@@ -109,7 +109,7 @@ public:
         {
             // Create a MeshBasedCellPopulation
             HoneycombMeshGenerator generator(10, 10, 0);
-            MutableMesh<2,2>* p_mesh = generator.GetMesh();
+            boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
             std::vector<CellPtr> mesh_cells;
             cells_generator.GenerateBasic(mesh_cells, p_mesh->GetNumNodes());
@@ -131,7 +131,7 @@ public:
         {
             // Make a NodeBasedCellPopulation
             HoneycombMeshGenerator generator(10, 10, 0);
-            MutableMesh<2,2>* p_mesh = generator.GetMesh();
+            boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
             NodesOnlyMesh<2> node_mesh;
             node_mesh.ConstructNodesWithoutMesh(*p_mesh, 1.5);
 
@@ -154,7 +154,7 @@ public:
         {
             // Make a VertexBasedCellPopulation
             HoneycombVertexMeshGenerator generator(10, 10);
-            MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+            boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
             std::vector<CellPtr> vertex_cells;
             cells_generator.GenerateBasic(vertex_cells, p_mesh->GetNumElements());
@@ -185,7 +185,7 @@ public:
         {
             // Make a PottsBasedCellPopulation
             PottsMeshGenerator<2> generator(50,5,5,50,5,5);
-            PottsMesh<2>* p_mesh = generator.GetMesh();
+            boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
             std::vector<CellPtr> potts_cells;
             cells_generator.GenerateBasic(potts_cells, p_mesh->GetNumElements());
@@ -206,7 +206,7 @@ public:
         {
             // Make a CaBasedCellPopulation
             PottsMeshGenerator<2> generator(50,0,0,50,0,0);
-            PottsMesh<2>* p_mesh = generator.GetMesh();
+            boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
             // Specify the location of each cell
             std::vector<unsigned> location_indices;
@@ -477,7 +477,7 @@ public:
     void TestMeshBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(20,20,0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
@@ -523,7 +523,7 @@ public:
     void TestNodeBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(20,20,0);
-        MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
@@ -577,7 +577,7 @@ public:
     void TestVertexBasedSquareMonolayer()
     {
         HoneycombVertexMeshGenerator generator(20,20);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         p_mesh->Translate(-0.5,-sqrt(3.0)/3); // Shift so cells are on top of those in the above centre-based tests
 
@@ -628,7 +628,7 @@ public:
     void TestPottsBasedSquareMonolayer()
     {
         PottsMeshGenerator<2> generator(100, 20, 4, 100, 20, 4);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Translate and scale so cells are on top of those in the above centre based tests
         p_mesh->Translate(-11.5,-11.5);
@@ -681,7 +681,7 @@ public:
     void TestCaBasedSquareMonolayer()
     {
         PottsMeshGenerator<2> generator(20, 0, 0, 20, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Scale so cells are on top of those in the above centre based tests
         p_mesh->Scale(1.0,sqrt(3.0)*0.5);
@@ -764,7 +764,7 @@ public:
 
         // Create PDE and boundary condition objects
         MAKE_PTR_ARGS(CellwiseSourceEllipticPde<1>, p_pde, (cell_population, -0.1));
-        MAKE_PTR_ARGS(ConstBoundaryCondition<1>, p_bc, (1.0));;
+        MAKE_PTR_ARGS(ConstBoundaryCondition<1>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<1>, p_pde_modifier, (p_pde, p_bc, false));

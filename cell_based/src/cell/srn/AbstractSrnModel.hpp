@@ -44,19 +44,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 
+#include "Cell.hpp"
+#include "Exception.hpp"
 #include "OutputFileHandler.hpp"
 #include "SimulationTime.hpp"
-#include "Cell.hpp"
 
 class Cell; // Circular definition (cells need to know about SRN models and vice-versa)
 typedef boost::shared_ptr<Cell> CellPtr;
 
 /**
- * The AbstractSrnModel contains basic information to all sub-cellular reaction network (SRN) models.
+ * The AbstractSrnModel contains basic information to all sub-cellular reaction 
+ * network (SRN) models.
  *
  * SRN models are noncopyable since cells are noncopyable.
- *
- * \todo #2752 Thoroughly document this class
  */
 class AbstractSrnModel : public Identifiable
 {
@@ -80,12 +80,16 @@ private:
         // DO NOT archive & mpCell; -- The SrnModel is only ever archived from the Cell
         // which knows this and it is handled in the load_construct of Cell.
         archive & mSimulatedToTime;
+        archive & mEdgeLocalIndex;
+        archive & mIsEdgeBasedModel;
     }
 
     /**
-     * Prevent copy-assignment of this class, or its subclasses.
-     * Note that we do not define this method, therefore statements like "AbstractSrnModel new = old;" will not compile.
-     * We do not inherit from boost::noncopyable because we *do* define a protected copy-constructor, for use by CreateSrnModel.
+     * Prevent copy-assignment of this class, or its subclasses. Note that we do 
+     * not define this method, therefore statements like 
+     * "AbstractSrnModel new = old;" 
+     * will not compile. We do not inherit from boost::noncopyable because we 
+     * *do* define a protected copy-constructor, for use by CreateSrnModel.
      *
      * @return the new SRN model.
      */
@@ -93,25 +97,32 @@ private:
 
 protected:
 
-    /**
-     * The cell that this model is associated with.
-     */
+    /** The cell that this model is associated with. */
     CellPtr mpCell;
 
-    /**
-     * The time the SRN model has been simulated to.
-     */
+    /** The time the SRN model has been simulated to. */
     double mSimulatedToTime;
 
+    /** The local edge index when used as part of a edge-based SRN. */
+    unsigned mEdgeLocalIndex = UNSIGNED_UNSET;
+
+    /** Indicates if edge model has been introduced. False by default. */
+    bool mIsEdgeBasedModel = false;
+
     /**
-     * Protected copy-constructor for use by CreateSrnModel().  The only way for external code to create a copy of a SRN model
-     * is by calling that method, to ensure that a model of the correct subclass is created.
-     * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
+     * Protected copy-constructor for use by CreateSrnModel(). The only way for 
+     * external code to create a copy of a SRN model is by calling that method, 
+     * to ensure that a model of the correct subclass is created. 
+     * 
+     * This copy-constructor helps subclasses to ensure that all member 
+     * variables are correctly copied when this happens.
      *
-     * This method is called by child classes to set member variables for a daughter cell upon cell division.
-     * Note that the parent SRN model will have had ResetForDivision() called just before CreateSrnModel() is called,
-     * so performing an exact copy of the parent is suitable behaviour. Any daughter-cell-specific initialisation
-     * can be done in InitialiseDaughterCell().
+     * This method is called by child classes to set member variables for a 
+     * daughter cell upon cell division. Note that the parent SRN model will 
+     * have had ResetForDivision() called just before CreateSrnModel() is 
+     * called, so performing an exact copy of the parent is suitable behaviour. 
+     * Any daughter-cell-specific initialisation can be done in 
+     * InitialiseDaughterCell().
      *
      * @param rModel the SRN model to copy.
      */
@@ -137,7 +148,7 @@ public:
      *
      * @param pCell pointer to the cell
      */
-    void SetCell(CellPtr pCell);
+    virtual void SetCell(CellPtr pCell);
 
     /**
      * Initialise the SRN model at the start of a simulation.
@@ -216,7 +227,7 @@ public:
      *
      * Copy constructors are used to set all the member variables in the appropriate classes.
      *
-     *  @return new srn model
+     *  @return new SRN model
      */
     virtual AbstractSrnModel* CreateSrnModel()=0;
 
@@ -237,6 +248,79 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     virtual void OutputSrnModelParameters(out_stream& rParamsFile);
+
+    /**
+     * Sets the local edge index that this SRN object belongs to
+     * @param index
+     */
+    void SetEdgeLocalIndex(unsigned index);
+
+    /**
+     * Gets the local edge index that this SRN object belongs to
+     * @return
+     */
+    unsigned GetEdgeLocalIndex();
+
+    /**
+     * Indicates whether this SRN is part of the model with edge SRNs
+     * @return true if edge SRN has been introduced into the model
+     */
+    bool HasEdgeModel() const;
+
+    /**
+     * Sets this model to be part of an edge based SRN
+     */
+    void SetEdgeModelIndicator(const bool indicator);
+
+    /**
+     * Scales SRN variables by factor theta.
+     * Method overriden in AbstractOdeSrnModel.
+     */
+    virtual void ScaleSrnVariables(const double theta);
+
+    /**
+     * Adds SRN quantities (variables or parameters) to this.
+     * The quantities can be scaled by factor scale.
+     * This method is virtual and needs to be overriden by user-defined SRN model
+     * 
+     * @param pOtherSrn pointer to an SRN model
+     * @param scale scale factor
+     */
+    virtual void AddSrnQuantities(AbstractSrnModel* pOtherSrn,
+                                  const double scale = 1.0);
+
+    /**
+     * Adds the shrunk edge SRN quantities to this edge.
+     * This method is virtual and needs to be overriden by user-defined SRN model.
+     * 
+     * @param pShrunkEdgeSrn pointer to an SRN model
+     */
+    virtual void AddShrunkEdgeSrn(AbstractSrnModel* pShrunkEdgeSrn);
+
+    /**
+     * Adds the merged edge SRN quantities to this edge.
+     * This method is virtual and needs to be overriden by user-defined SRN model.
+     * 
+     * @param pMergedEdgeSrn pointer to an SRN model
+     */
+    virtual void AddMergedEdgeSrn(AbstractSrnModel* pMergedEdgeSrn);
+
+    /**
+     * Adds the shrunk edge SRN quantities to (this) interior SRN.
+     * This method is virtual and needs to be overriden by user-defined SRN model.
+     * 
+     * @param pShrunkEdgeSrn pointer to an SRN model
+     */
+    virtual void AddShrunkEdgeToInterior(AbstractSrnModel* pShrunkEdgeSrn);
+
+    /**
+     * Scales SRN quantities due to edge split. Amount of scaling may depend on the resulting proportions,
+     * deetermined by relative position of the node that splits the edge.
+     * This method is virtual and needs to be overriden by user-defined SRN model.
+     * 
+     * @param relativePosition how close the added node is to the previous node
+     */
+    virtual void SplitEdgeSrn(const double relativePosition);
 };
 
 CLASS_IS_ABSTRACT(AbstractSrnModel)

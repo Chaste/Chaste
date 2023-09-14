@@ -1,0 +1,101 @@
+name: Regenerate archive
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+
+    runs-on: ubuntu-latest
+
+    container:
+      image: chaste/runner:oldest-boost
+      env:
+        RUNNER_OFF: 1
+      volumes:
+        - runner_volume:/home/runner
+      options: --user 0 --cpus 2
+      
+    env:
+      CC: gcc
+      CXX: g++
+      
+    defaults:
+      run:
+        shell: bash
+      
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v3
+          
+      - name: compiler version
+        run: |
+          ${CXX} --version
+          
+      - name: make build and test directories
+        run: |
+          mkdir -p chaste-build-dir
+          mkdir -p chaste-test-dir
+          echo "CHASTE_TEST_OUTPUT=$(pwd)/chaste-test-dir" >> ${GITHUB_ENV}
+
+      - name: create initialisation script
+        run: |
+          echo "source /etc/profile.d/modules.sh" > init.sh
+          echo "module use /home/runner/modules/modulefiles" >> init.sh
+          echo "module purge" >> init.sh
+          echo "module load xsd" >> init.sh
+          echo "module load xercesc" >> init.sh
+          echo "module load boost" >> init.sh
+          echo "module load sundials" >> init.sh
+          echo "module load vtk" >> init.sh
+          echo "module load petsc_hdf5" >> init.sh
+        working-directory: chaste-build-dir
+
+      - name: set runner user privileges
+        run: |
+          chown -R runner:runner .
+          
+      - name: cmake configure
+        run: |
+          source init.sh
+          export CMAKE_PREFIX_PATH="${XERCESC_ROOT}:${XSD_ROOT}:${SUNDIALS_ROOT}:${VTK_ROOT}"
+          echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" >> ${GITHUB_ENV}
+          su -m runner -c "cmake \
+            -DBoost_NO_BOOST_CMAKE=ON \
+            -DBoost_NO_SYSTEM_PATHS=ON \
+            -DBOOST_ROOT=${BOOST_ROOT} \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DChaste_USE_CVODE=FALSE \
+            ${{ matrix.extra-build-args }} .."
+        working-directory: chaste-build-dir
+
+      - name: run TestChasteBuildInfo
+        run: |
+          source init.sh
+          su -m runner -c "cmake --build . --target TestChasteBuildInfo --parallel 2"
+          su -m runner -c "ctest -V -R TestChasteBuildInfo --output-on-failure"
+        working-directory: chaste-build-dir
+
+      - name: build TestGenerateSteadyStateCrypt
+        run: |
+          source init.sh
+          su -m runner -c "cmake --build . --target TestGenerateSteadyStateCrypt --parallel 2"
+        working-directory: chaste-build-dir
+
+      - name: run TestGenerateSteadyStateCrypt
+        run: |
+          source init.sh
+          su -m runner -c "ctest -j2 -R TestGenerateSteadyStateCrypt"
+        working-directory: chaste-build-dir
+
+      - name: Upload archive files
+        uses: actions/upload-artifact@v3
+        with:
+          name: crypt-archive
+          path: |
+            chaste-test-dir/SteadyStateCrypt/archive/cell_population_sim_at_time_150.arch
+            chaste-test-dir/SteadyStateCrypt/archive/cell_population_sim_at_time_150.arch.0
+            chaste-test-dir/SteadyStateCrypt/archive/mesh_150.edge
+            chaste-test-dir/SteadyStateCrypt/archive/mesh_150.ele
+            chaste-test-dir/SteadyStateCrypt/archive/mesh_150.ncl
+            chaste-test-dir/SteadyStateCrypt/archive/mesh_150.node

@@ -62,7 +62,7 @@ std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > CryptCentre
             c_vector<double, SPACE_DIM> proposed_new_parent_coords;
             //proposed_new_parent_coords = parent_coords - random_vector;
             proposed_new_parent_coords(0) = parent_coords(0) - random_vector(0);
-            c_vector<double, SPACE_DIM> proposed_new_daughter_coords;
+            c_vector<double, SPACE_DIM> proposed_new_daughter_coords = zero_vector<double>(SPACE_DIM);
             proposed_new_daughter_coords = parent_coords + random_vector;
 
             if ((proposed_new_parent_coords(0) >= 0.0) && (proposed_new_daughter_coords(0) >= 0.0))

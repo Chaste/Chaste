@@ -66,6 +66,12 @@ private:
     /** The bottom of the cylinder (y coordinate). */
     double mBottom;
 
+    /** Scaling factor used to calculate numebr of halo nodes */
+    double mHaloScalingFactor;
+
+    /** Scaling factor for offset of halo nodes */
+    double mHaloOffset;
+    
     /** The left nodes which have been mirrored during the remesh. */
     std::vector<unsigned> mLeftOriginals;
 
@@ -212,6 +218,8 @@ private:
         archive & mWidth;
         archive & mTop;
         archive & mBottom;
+        archive & mHaloScalingFactor;
+        archive & mHaloOffset;
     }
 
 public:
@@ -283,7 +291,32 @@ public:
      * @return The maximum distance between any nodes in this dimension.
      */
     double GetWidth(const unsigned& rDimension) const;
+ 
+    /**
+     * Set mHaloScalingFactor
+     *
+     * @param haloScalingFactor the new value of mHaloScalingFactor
+     */
+    void SetHaloScalingFactor(double haloScalingFactor);
 
+    /**
+     * @return mHaloScalingFactor
+     */
+    double GetHaloScalingFactor() const;
+
+    /**
+     * Set mHaloOffset
+     *
+     * @param haloOffset the new value of mHaloOffset
+     */
+    void SetHaloOffset(double haloOffset);
+
+    /**
+     * @return mHaloOffset
+     */
+    double GetHaloOffset() const;
+
+    
     /**
      * Overridden AddNode() method.
      *

@@ -26,6 +26,7 @@ _local/
 /heart/dynamic/tmp_*_*
 /heart/dynamic/luo_rudy_1991_dyn.*
 /codegen_python3_venv
+**/__pycache__/
 
 # Local hostconfig
 /python/hostconfig/local.py
@@ -62,6 +63,13 @@ _local/
 # IDE files
 \.vscode/
 cmake-build*
-\.idea
+.idea
 
 appredict_lookup_table_manifest.txt
+
+# Build directories
+Debug
+Release
+chaste-build*
+
+**/.uuid

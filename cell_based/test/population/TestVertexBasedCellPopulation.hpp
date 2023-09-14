@@ -36,6 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTVERTEXBASEDCELLPOPULATION_HPP_
 #define TESTVERTEXBASEDCELLPOPULATION_HPP_
 
+#include <iostream>
+#include <fstream>
+#include <regex>
+
 #include <cxxtest/TestSuite.h>
 
 #include <boost/archive/text_oarchive.hpp>
@@ -60,7 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ShortAxisVertexBasedDivisionRule.hpp"
 #include "FixedVertexBasedDivisionRule.hpp"
 #include "ApoptoticCellProperty.hpp"
-
+#include "CellSrnModel.hpp"
 // Cell writers
 #include "CellAgesWriter.hpp"
 #include "CellAncestorWriter.hpp"
@@ -94,7 +98,7 @@ public:
     {
         // Create a simple 2D VertexMesh
         HoneycombVertexMeshGenerator generator(5, 3);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -172,7 +176,7 @@ public:
     {
         // Create a simple vertex-based mesh
         HoneycombVertexMeshGenerator generator(3, 3);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -239,7 +243,7 @@ public:
 
         // Create anoter simple vertex-based mesh
         HoneycombVertexMeshGenerator generator2(3, 3);
-        MutableVertexMesh<2,2>* p_mesh2 = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh2 = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells2;
@@ -262,7 +266,7 @@ public:
     {
         // Create mesh
         HoneycombVertexMeshGenerator generator(3, 3);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(ApcOneHitCellMutationState, p_apc1);
@@ -372,7 +376,7 @@ public:
 
         // Create a simple vertex-based mesh
         HoneycombVertexMeshGenerator generator(4, 6);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -397,7 +401,7 @@ public:
 
         // Create a simple vertex-based mesh
         HoneycombVertexMeshGenerator generator(4, 6);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -444,6 +448,7 @@ public:
 
         // Make a vertex mesh
         MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        vertex_mesh.SetMeshOperationTracking(true);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 5u);
@@ -524,6 +529,34 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetElement(2)->GetNodeGlobalIndex(1), 2u);
         TS_ASSERT_EQUALS(cell_population.GetElement(2)->GetNodeGlobalIndex(2), 3u);
         TS_ASSERT_EQUALS(cell_population.GetElement(2)->GetNodeGlobalIndex(3), 6u);
+
+        // Test if the swap has been recorded properly
+        auto operation_recorder = vertex_mesh.GetOperationRecorder();
+        const std::vector<EdgeOperation>& edge_operations = operation_recorder->GetEdgeOperations();
+        const unsigned num_operations = edge_operations.size();
+
+        // Two node merging operations in two elements and two new edge operations in the other two elements
+        TS_ASSERT_EQUALS(num_operations, 2u);
+        unsigned num_edge_splits = 0;
+        unsigned num_divisions = 0;
+        std::vector<std::vector<unsigned> > element_to_operations(5);
+        for (unsigned i=0; i<num_operations; ++i)
+        {
+            if (edge_operations[i].GetOperation() == EDGE_OPERATION_DIVIDE)
+            {
+                num_divisions++;
+            }
+            if (edge_operations[i].GetOperation() == EDGE_OPERATION_SPLIT)
+            {
+                num_edge_splits++;
+            }
+            
+            // Determine operations that an element underwent
+            const unsigned elem_index = edge_operations[i].GetElementIndex();
+            element_to_operations[elem_index].push_back(edge_operations[i].GetOperation());
+        }
+        TS_ASSERT_EQUALS(num_divisions, 1u);
+        TS_ASSERT_EQUALS(num_edge_splits, 1u);
 
         // Test ownership of the new nodes
         std::set<unsigned> expected_elements_containing_node_5;
@@ -630,7 +663,7 @@ public:
     {
         // Create a mesh with 9 elements
         HoneycombVertexMeshGenerator generator(3, 3);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of -elem_index, so its age is elem_index
@@ -775,7 +808,7 @@ public:
     {
         // Create a simple vertex-based mesh
         HoneycombVertexMeshGenerator generator(4, 6);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
         p_mesh->GetElement(5)->MarkAsDeleted();
 
         // Create cells
@@ -805,7 +838,7 @@ public:
 
         // Create a simple vertex-based mesh
         HoneycombVertexMeshGenerator generator(4, 6);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -888,7 +921,7 @@ public:
 
         // Create a simple vertex-based cell population, comprising various cell types in various cell cycle phases
         HoneycombVertexMeshGenerator generator(4, 6);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         boost::shared_ptr<AbstractCellProperty> p_stem(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
         boost::shared_ptr<AbstractCellProperty> p_transit(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
@@ -1491,7 +1524,7 @@ public:
     {
         // Create a small cell population
         HoneycombVertexMeshGenerator generator(4, 4);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -1523,6 +1556,203 @@ public:
         // PDE mesh node 11 interpolates the value of "foo" from cells 1, 2 and 5
         double expected_value_11 = (1.0 + 2.0 + 5.0)/3.0;
         TS_ASSERT_DELTA(cell_population.GetCellDataItemAtPdeNode(11,var_name), expected_value_11, 1e-6);
+    }
+
+    /**
+     * Tests VTK writing when only CellEdgeData and no CellData have been specified
+     */
+    void TestOutputVtkCellEdges()
+    {
+#ifdef CHASTE_VTK
+        // Set up SimulationTime (needed if VTK is used)
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
+
+        // Create a simple vertex-based cell population, comprising various cell types in various cell cycle phases
+        HoneycombVertexMeshGenerator generator(4, 6);
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        for (unsigned elem_index=0; elem_index < p_mesh->GetNumElements(); elem_index++)
+        {
+            auto p_element = p_mesh->GetElement(elem_index);
+            const unsigned num_edges = p_element->GetNumEdges();
+            cells[elem_index]->GetCellEdgeData()->SetItem("data", std::vector<double>(num_edges, 1.0));
+        }
+
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        std::string output_directory = "TestVertexBasedCellPopulationWriteOutputVtkCellEdges";
+        cell_population.SetWriteCellVtkResults(false);
+                        cell_population.SetWriteEdgeVtkResults(true);
+        OutputFileHandler output_file_handler(output_directory, false);
+
+        cell_population.OpenWritersFiles(output_file_handler);
+
+        cell_population.WriteVtkResultsToFile(output_directory);
+
+        SimulationTime::Instance()->IncrementTimeOneStep();
+        cell_population.Update();
+        cell_population.WriteVtkResultsToFile(output_directory);
+
+        cell_population.CloseWritersFiles();
+
+        // Test that VTK writer has produced some files
+
+        // Initial condition file
+        FileFinder vtk_file(output_directory + "/results_0.vtu", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(vtk_file.Exists());
+
+        // Check that we have 144 (6*4*6) edges and 68 cells
+        std::ifstream vtk_file_stream;
+        vtk_file_stream.open (vtk_file.GetAbsolutePath());
+        std::stringstream vtk_file_string_buffer;
+        vtk_file_string_buffer << vtk_file_stream.rdbuf();
+        vtk_file_stream.close();
+        auto fileChar = vtk_file_string_buffer.str();
+        TS_ASSERT(std::regex_search(fileChar, std::regex("NumberOfCells=\"168\"")));
+
+
+        // Final file
+        FileFinder vtk_file2(output_directory + "/results_1.vtu", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(vtk_file2.Exists());
+
+        // PVD file
+        FileFinder vtk_file3(output_directory + "/results.pvd", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(vtk_file3.Exists());
+#endif //CHASTE_VTK
+
+
+    }
+
+    /**
+     * Tests VTK writing when both CellEdgeData and CellData have been specified
+     */
+    void TestOutputVtkCellEdgesWithInterior()
+    {
+#ifdef CHASTE_VTK
+        // Set up SimulationTime (needed if VTK is used)
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
+
+        // Create a simple vertex-based cell population, comprising various cell types in various cell cycle phases
+        HoneycombVertexMeshGenerator generator(4, 6);
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        for (unsigned elem_index=0; elem_index < p_mesh->GetNumElements(); elem_index++)
+        {
+            auto p_element = p_mesh->GetElement(elem_index);
+            const unsigned num_edges = p_element->GetNumEdges();
+            cells[elem_index]->GetCellEdgeData()->SetItem("data", std::vector<double>(num_edges, 1.0));
+            cells[elem_index]->GetCellData()->SetItem("Cell data", 1.0);
+        }
+
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        std::string output_directory = "TestVertexBasedCellPopulationWriteOutputVtkAllCellData";
+        cell_population.SetWriteCellVtkResults(true);
+                cell_population.SetWriteEdgeVtkResults(true);
+        OutputFileHandler output_file_handler(output_directory, false);
+
+        cell_population.OpenWritersFiles(output_file_handler);
+
+        cell_population.WriteVtkResultsToFile(output_directory);
+
+        SimulationTime::Instance()->IncrementTimeOneStep();
+        cell_population.Update();
+        cell_population.WriteVtkResultsToFile(output_directory);
+
+        cell_population.CloseWritersFiles();
+
+        // Test that VTK writer has produced some files
+
+        // Initial condition file
+        FileFinder vtk_file(output_directory + "/results_0.vtu", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(vtk_file.Exists());
+
+        // Check that we have 144 (6*4*6) edges and 68 cells
+        std::ifstream vtk_file_stream;
+        vtk_file_stream.open (vtk_file.GetAbsolutePath());
+        std::stringstream vtk_file_string_buffer;
+        vtk_file_string_buffer << vtk_file_stream.rdbuf();
+        vtk_file_stream.close();
+        auto fileChar = vtk_file_string_buffer.str();
+        TS_ASSERT(std::regex_search(fileChar, std::regex("NumberOfCells=\"168\"")));
+
+
+        // Final file
+        FileFinder vtk_file2(output_directory + "/results_1.vtu", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(vtk_file2.Exists());
+
+        // PVD file
+        FileFinder vtk_file3(output_directory + "/results.pvd", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(vtk_file3.Exists());
+#endif //CHASTE_VTK
+    }
+
+    /**
+         * Tests VTK writing when only CellData and no CellEdgeData have been specified
+         */
+    void TestOutputVtkCell()
+    {
+#ifdef CHASTE_VTK
+        // Set up SimulationTime (needed if VTK is used)
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
+
+        // Create a simple vertex-based cell population, comprising various cell types in various cell cycle phases
+        HoneycombVertexMeshGenerator generator(4, 6);
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        for (unsigned elem_index=0; elem_index < p_mesh->GetNumElements(); elem_index++)
+        {
+            cells[elem_index]->GetCellData()->SetItem("Cell data", 1.0);
+        }
+        TS_ASSERT(cells[0]->GetCellEdgeData()->GetNumItems()==0);
+        // Create cell population
+        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        std::string output_directory = "TestVertexBasedCellPopulationWriteOutputVtkWithCellData";
+        cell_population.SetWriteCellVtkResults(true);
+        cell_population.SetWriteEdgeVtkResults(false);
+
+        OutputFileHandler output_file_handler(output_directory, false);
+
+        cell_population.OpenWritersFiles(output_file_handler);
+
+        cell_population.WriteVtkResultsToFile(output_directory);
+
+        SimulationTime::Instance()->IncrementTimeOneStep();
+        cell_population.Update();
+        cell_population.WriteVtkResultsToFile(output_directory);
+
+        cell_population.CloseWritersFiles();
+
+
+        // Test that VTK writer has produced some files
+
+        // Initial condition file
+        FileFinder vtk_file(output_directory + "/results_0.vtu", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(vtk_file.Exists());
+
+        // Final file
+        FileFinder vtk_file2(output_directory + "/results_1.vtu", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(vtk_file2.Exists());
+
+        // PVD file
+        FileFinder vtk_file3(output_directory + "/results.pvd", RelativeTo::ChasteTestOutput);
+        TS_ASSERT(vtk_file3.Exists());
+#endif //CHASTE_VTK
     }
 };
 
