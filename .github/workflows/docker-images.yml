@@ -2,10 +2,9 @@ name: Docker Multi-Arch Develop Image CI
 
 on:
   push:
-    branches: [ "main", "develop" ]
-    # tags: "v*"
+    branches: [ "develop" ]
   pull_request:
-    branches: [ "main", "develop" ]
+    branches: [ "develop" ]
 
 jobs:
   build:
