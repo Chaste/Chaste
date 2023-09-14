@@ -1,0 +1,38 @@
+name: Doxygen
+
+on:
+  push:
+    branches:
+      - doxygen
+
+jobs:
+  
+  build-and-test:
+
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: checkout repository
+      uses: actions/checkout@v3
+
+    - name: install dependencies
+      run: |
+        sudo apt-get install graphviz
+        wget https://github.com/doxygen/doxygen/releases/download/Release_1_9_8/doxygen-1.9.8.linux.bin.tar.gz
+        tar -xzvf doxygen-1.9.8.linux.bin.tar.gz
+
+    - name: build doxygen
+      run: |
+        ( cat Doxyfile ; echo "PROJECT_NUMBER=$GITHUB_SHA" ) | doxygen-1.9.8/bin/doxygen - 2>doxygen-error.log 1>doxygen-output.log
+
+    - name: view output
+      run: cat doxygen-output.log
+
+    - name: view error log
+      run: cat doxygen-error.log
+
+    - name: Upload Documentation as Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: doxygen-html
+        path: doxygen/html/
