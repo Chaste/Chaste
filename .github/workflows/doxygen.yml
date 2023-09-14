@@ -23,7 +23,7 @@ jobs:
 
     - name: build doxygen
       run: |
-        ( cat Doxyfile ; echo "PROJECT_NUMBER=$GITHUB_SHA" ) | doxygen-1.9.8/bin/doxygen - 2>doxygen-error.log 1>doxygen-output.log
+        ( cat Doxyfile ; echo "PROJECT_NUMBER=Commit::$GITHUB_SHA" ) | doxygen-1.9.8/bin/doxygen - 2>doxygen-error.log 1>doxygen-output.log
 
     - name: view output
       run: cat doxygen-output.log
