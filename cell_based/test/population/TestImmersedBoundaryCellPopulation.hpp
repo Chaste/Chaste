@@ -211,8 +211,8 @@ public:
         // Test adding ndoe from population - doesn't do anything
         TS_ASSERT_EQUALS(cell_population.AddNode(nullptr), 0);
         
-        TetrahedralMesh<2, 2>* tet_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
-        TS_ASSERT_DIFFERS(tet_mesh, nullptr);
+        TetrahedralMesh<2, 2>* p_tet_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
+        TS_ASSERT_DIFFERS(p_tet_mesh, nullptr);
         
         ImmersedBoundaryMesh<3, 3> ib_mesh_3d;
         std::vector<CellPtr> cells_3d;
@@ -227,6 +227,9 @@ public:
         
         TS_ASSERT(cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(0));
         TS_ASSERT(!cell_population.IsCellOnBoundary(p_cell));
+       
+        // Tidy up
+        delete p_tet_mesh;
     }
     
     void TestStepSizeException()
