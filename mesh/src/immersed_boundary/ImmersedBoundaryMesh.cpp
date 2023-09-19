@@ -599,13 +599,11 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
     this->mNodes.clear();
 
     // Delete element sources
-    for (auto source : mElementFluidSources)
+    for (unsigned i = 0; i < mElementFluidSources.size(); ++i)
     {
-        if (source != nullptr) {
-            delete(source);
-        }
+        delete mElementFluidSources[i];
     }
-    this->mElementFluidSources.clear();
+    mElementFluidSources.clear();
 
     // Delete balancing sources
     for (auto source : mBalancingFluidSources)
