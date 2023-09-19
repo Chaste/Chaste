@@ -36,6 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ABSTRACTHDF5ACCESS_HPP_
 #define ABSTRACTHDF5ACCESS_HPP_
 
+#define H5_USE_110_API
+
 #include <hdf5.h>
 #include <string>
 #include "FileFinder.hpp"
