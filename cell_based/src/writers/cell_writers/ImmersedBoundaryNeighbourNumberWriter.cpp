@@ -45,13 +45,17 @@ ImmersedBoundaryNeighbourNumberWriter<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryN
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double ImmersedBoundaryNeighbourNumberWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+double ImmersedBoundaryNeighbourNumberWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataForVtkOutput(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     return static_cast<double>(pCellPopulation->GetNeighbouringLocationIndices(pCell).size());
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ImmersedBoundaryNeighbourNumberWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
+void ImmersedBoundaryNeighbourNumberWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(
+    CellPtr pCell,
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation)
 {
     unsigned location_index = pCellPopulation->GetLocationIndexUsingCell(pCell);
     unsigned cell_id = pCell->GetCellId();
@@ -60,7 +64,7 @@ void ImmersedBoundaryNeighbourNumberWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(Ce
     double num_neighbours = this->GetCellDataForVtkOutput(pCell, pCellPopulation);
 
     *this->mpOutStream << location_index << " " << cell_id << " ";
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i=0; i<SPACE_DIM; ++i)
     {
         *this->mpOutStream << centre_location[i] << " ";
     }

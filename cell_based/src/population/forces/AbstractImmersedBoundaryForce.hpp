@@ -42,12 +42,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 
 /**
- * An abstract immersed boundary force class, for use in 
- * immersed boundary cell-based simulations.
+ * An abstract immersed boundary force class, for use in  immersed boundary 
+ * cell-based simulations.
  * 
- * NOTE: while this class shares similarities with AbstractForce, 
- * it is not passed to a simulation object, but instead to an 
+ * NOTE: while this class shares similarities with AbstractForce, it is not 
+ * passed to a simulation object, but instead to an 
  * ImmersedBoundarySimulationModifier.
+ * 
+ * \todo explain why it's not passed directly to the simulation object
  */
 template<unsigned DIM>
 class AbstractImmersedBoundaryForce : public Identifiable
@@ -74,20 +76,32 @@ private:
 protected:
 
     /**
-     * Add the random noise to nodes, if mAdditiveNormalNoise is set.  This method handles randomization of the
-     * forces in such a way as to ensure no net change to forces across the whole domain.
+     * Add the random noise to nodes, if mAdditiveNormalNoise is set. This 
+     * method handles randomization of the forces in such a way as to ensure no 
+     * net change to forces across the whole domain.
      *
      * @param rCellPopulation an immersed boundary cell population
      */
-    void AddNormalNoiseToNodes(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
+    void AddNormalNoiseToNodes(
+        ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
 
-    /** Whether to apply multiplicative normal noise to the calculated force */
+    /** Whether to apply multiplicative normal noise to the calculated force. */
     bool mAdditiveNormalNoise;
 
-    /** The mean of the Normal distribution from which random noise variations are drawn */
+    /**
+     * The mean of the Normal distribution from which random noise variations 
+     * are drawn.
+     * 
+     * \todo Initialised to default value in constructor?
+     */
     double mNormalNoiseMean;
 
-    /** The standard deviation of the Normal distribution from which random noise variations are drawn */
+    /**
+     * The standard deviation of the Normal distribution from which random noise 
+     * variations are drawn.
+     * 
+     * \todo Initialised to default value in constructor?
+     */
     double mNormalNoiseStdDev;
 
 public:
@@ -103,12 +117,11 @@ public:
     virtual ~AbstractImmersedBoundaryForce();
 
     /**
-     * Calculates the force on each immersed boundary node.
+     * Calculates the force on each immersed boundary node. As this method is 
+     * pure virtual, it must be overridden in subclasses.
      *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
-     *
-     * @param rNodePairs reference to a vector set of node pairs between which to contribute the force
+     * @param rNodePairs reference to a vector set of node pairs between which 
+     *     to contribute the force
      * @param rCellPopulation an immersed boundary cell population
      */
     virtual void AddImmersedBoundaryForceContribution(
@@ -116,10 +129,8 @@ public:
         ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)=0;
 
     /**
-     * Outputs force parameters to file.
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * Outputs force parameters to file. As this method is pure virtual, it must 
+     * be overridden in subclasses.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
@@ -128,19 +139,31 @@ public:
     /** @return mAdditiveNormalNoise */
     bool GetAdditiveNormalNoise() const;
 
-    /** @param additiveNormalNoise whether to include multiplicative normal noise */
+    /**
+     * \todo document method
+     * 
+     * @param additiveNormalNoise whether to include multiplicative normal noise
+     */
     void SetAdditiveNormalNoise(bool additiveNormalNoise);
 
     /** @return mNormalNoiseMean */
     double GetNormalNoiseMean() const;
 
-    /** @param normalNoiseMean the new value of mNormalNoiseMean */
+    /**
+     * \todo document method
+     * 
+     * @param normalNoiseMean the new value of mNormalNoiseMean 
+     */
     void SetNormalNoiseMean(double normalNoiseMean);
 
     /** @return mNormalNoiseStdDev */
     double GetNormalNoiseStdDev() const;
 
-    /** @param normalNoiseStdDev the new value of mNormalNoiseStdDev */
+    /**
+     * \todo document method
+     * 
+     * @param normalNoiseStdDev the new value of mNormalNoiseStdDev
+     */
     void SetNormalNoiseStdDev(double normalNoiseStdDev);
 };
 

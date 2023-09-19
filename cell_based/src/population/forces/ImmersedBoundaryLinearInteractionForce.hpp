@@ -47,8 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 /**
- * A force class for use in immersed boundary simulations. This force implements elastic links between nodes in
- * adjacent immersed boundary.
+ * A force class for use in immersed boundary simulations. This force implements 
+ * elastic links between nodes in adjacent immersed boundaries.
  */
 template<unsigned DIM>
 class ImmersedBoundaryLinearInteractionForce : public AbstractImmersedBoundaryForce<DIM>

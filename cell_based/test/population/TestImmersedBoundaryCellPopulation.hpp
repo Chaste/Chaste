@@ -101,7 +101,7 @@ public:
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Test that GetDampingConstant() returns the correct value
-        for (unsigned node_index=0; node_index<cell_population.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < cell_population.GetNumNodes(); ++node_index)
         {
             TS_ASSERT_DELTA(cell_population.GetDampingConstant(node_index), 0.0, 1e-6);
         }
@@ -132,7 +132,6 @@ public:
         auto division_rule = boost::shared_ptr<ShortAxisImmersedBoundaryDivisionRule<2>>(new ShortAxisImmersedBoundaryDivisionRule<2>());
         cell_population.SetImmersedBoundaryDivisionRule(division_rule);
         TS_ASSERT_EQUALS(cell_population.GetImmersedBoundaryDivisionRule().get(), division_rule.get());
-        
     }
 
     void TestMeshMethods()
@@ -227,9 +226,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(cell_population.AddCell(p_cell, *(cell_population.rGetCells().begin())));
         
         TS_ASSERT(cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(0));
-        
         TS_ASSERT(!cell_population.IsCellOnBoundary(p_cell));
-
     }
     
     void TestStepSizeException()
@@ -290,14 +287,14 @@ public:
 
             ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
 
-            auto& velocityField = mesh.rGetModifiable2dVelocityGrids();
+            auto& r_velocity_field = mesh.rGetModifiable2dVelocityGrids();
             for (unsigned dim = 0; dim < 2; ++dim)
             {
                 for (unsigned x = 0; x < 10; ++x)
                 {
                     for (unsigned y = 0; y < 10; ++y)
                     {
-                        velocityField[dim][x][y] = 10000.0;
+                        r_velocity_field[dim][x][y] = 10000.0;
                     }
                 }
             }
@@ -331,14 +328,14 @@ public:
 
             ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
 
-            auto& velocityField = mesh.rGetModifiable2dVelocityGrids();
+            auto& r_velocity_field = mesh.rGetModifiable2dVelocityGrids();
             for (unsigned dim = 0; dim < 2; ++dim)
             {
                 for (unsigned x = 0; x < 10; ++x)
                 {
                     for (unsigned y = 0; y < 10; ++y)
                     {
-                        velocityField[dim][x][y] = 0.1;
+                        r_velocity_field[dim][x][y] = 0.1;
                     }
                 }
             }
@@ -376,13 +373,13 @@ public:
             ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
             cell_population.SetIfPopulationHasActiveSources(true);
 
-            auto& velocityField = mesh.rGetModifiable2dVelocityGrids();
+            auto& r_velocity_field = mesh.rGetModifiable2dVelocityGrids();
             for (unsigned dim = 0; dim < 2; ++dim)
             {
-                velocityField[dim][0][0] = 0.1;
-                velocityField[dim][0][1] = 0.1;
-                velocityField[dim][1][0] = 0.1;
-                velocityField[dim][1][1] = 0.1;
+                r_velocity_field[dim][0][0] = 0.1;
+                r_velocity_field[dim][0][1] = 0.1;
+                r_velocity_field[dim][1][0] = 0.1;
+                r_velocity_field[dim][1][1] = 0.1;
             }
             
             mesh.SetCharacteristicNodeSpacing(0.000001);
@@ -419,21 +416,20 @@ public:
             ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
             cell_population.SetIfPopulationHasActiveSources(true);
 
-            auto& velocityField = mesh.rGetModifiable2dVelocityGrids();
+            auto& r_velocity_field = mesh.rGetModifiable2dVelocityGrids();
             for (unsigned dim = 0; dim < 2; ++dim)
             {
-                velocityField[dim][0][0] = 0.1;
-                velocityField[dim][0][1] = 0.1;
-                velocityField[dim][1][0] = 0.1;
-                velocityField[dim][1][1] = 0.1;
+                r_velocity_field[dim][0][0] = 0.1;
+                r_velocity_field[dim][0][1] = 0.1;
+                r_velocity_field[dim][1][0] = 0.1;
+                r_velocity_field[dim][1][1] = 0.1;
             }
             
             mesh.SetCharacteristicNodeSpacing(0.01);
             cell_population.SetReMeshFrequency(1);
             TS_ASSERT_THROWS_NOTHING(cell_population.UpdateNodeLocations(0.1));
-            
 
-            // remesh coverage
+            // Remesh coverage
             SimulationTime::Instance()->IncrementTimeOneStep();
             cell_population.UpdateNodeLocations(0.1);
         }
@@ -454,16 +450,16 @@ public:
         boost::shared_ptr<AbstractCellProperty> p_wildtype(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
 
         std::vector<CellPtr> cells;
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index < p_mesh->GetNumElements(); ++elem_index)
         {
             UniformCellCycleModel* p_model = new UniformCellCycleModel();
 
             CellPtr p_cell(new Cell(p_wildtype, p_model));
-            if (elem_index%3 == 0)
+            if (elem_index % 3 == 0)
             {
                 p_cell->SetCellProliferativeType(p_stem);
             }
-            else if (elem_index%3 == 1)
+            else if (elem_index % 3 == 1)
             {
                 p_cell->SetCellProliferativeType(p_transit);
             }
@@ -515,7 +511,7 @@ public:
         cell_population.AddCellWriter<CellVolumesWriter>();
 
         // Coverage of writing CellData to VTK
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        for (auto cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
         {
@@ -525,7 +521,10 @@ public:
         }
         
         // Set up node regions
-        for (auto iter = p_mesh->GetNodeIteratorBegin(); iter != p_mesh->GetNodeIteratorEnd(); ++iter) {
+        for (auto iter = p_mesh->GetNodeIteratorBegin();
+             iter != p_mesh->GetNodeIteratorEnd();
+             ++iter)
+        {
             iter->SetRegion(LAMINA_REGION);
         }
 
@@ -614,7 +613,7 @@ public:
 
             // Cells have been given birth times of 0, -1, -2, -3, -4.
             // loop over them to run to time 0.0;
-            for (AbstractCellPopulation<2>::Iterator cell_iter = p_cell_population->Begin();
+            for (auto cell_iter = p_cell_population->Begin();
                  cell_iter != p_cell_population->End();
                  ++cell_iter)
             {
@@ -682,15 +681,14 @@ public:
 
             ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
             
-            for (auto& cell : cell_population.rGetCells()) {
-                cell->GetCellData()->SetItem("cell data", 0.2);
+            for (auto& p_cell : cell_population.rGetCells())
+            {
+                p_cell->GetCellData()->SetItem("cell data", 0.2);
             }
 
             std::string str = "cell data";
-            TS_ASSERT_EQUALS(cell_population.GetCellDataItemAtPdeNode(0, str, true, 0.1), 0.1);
-
-            auto numNodes = p_mesh->GetNumNodes();
-            TS_ASSERT_EQUALS(cell_population.GetCellDataItemAtPdeNode(numNodes + 1, str, true, 0.1), 0.2);
+            TS_ASSERT_DELTA(cell_population.GetCellDataItemAtPdeNode(0, str, true, 0.1), 0.1, 1e-9);
+            TS_ASSERT_DELTA(cell_population.GetCellDataItemAtPdeNode(p_mesh->GetNumNodes() + 1, str, true, 0.1), 0.2, 1e-9);
         }
         
         {
@@ -720,93 +718,69 @@ public:
             CellsGenerator<UniformCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
             ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
-            for (auto& cell : cell_population.rGetCells()) {
-                cell->GetCellData()->SetItem("cell data", 0.2);
+            for (auto& p_cell : cell_population.rGetCells())
+            {
+                p_cell->GetCellData()->SetItem("cell data", 0.2);
             }
-            
-            std::string str = "cell data";
+
             // Node contained in 1 element
+            ///\todo What does the comment on the line above refer to? Is this a copy/paste error?
+            std::string str = "cell data";
             TS_ASSERT_DELTA(cell_population.GetCellDataItemAtPdeNode(0, str, false, 0.1), 0.2, 0.0001);
         }
-        
     }
     
     void TestPdeNonApoptoticCell()
     {
+        /*
+         * Test overridden IsPdeNodeAssociatedWithNonApoptoticCell() method, 
+         * which returns whether a node, specified by its index in a tetrahedral 
+         * mesh for use with a PDE modifier, is associated with a non-apoptotic 
+         * cell.
+         * 
+         * \todo this seems an odd test, since there is not actually a PDE 
+         * modifier present.
+         */
+
+        // Create a small mesh
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
+        nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
+        nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
+
+        std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+        elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+        elems.push_back(new ImmersedBoundaryElement<2, 2>(1, nodes));
+        elems.push_back(new ImmersedBoundaryElement<2, 2>(2, nodes));
+        
+        std::vector<ImmersedBoundaryElement<1, 2>*> lams;
+        lams.push_back(new ImmersedBoundaryElement<1, 2>(0, nodes));
+        lams.push_back(new ImmersedBoundaryElement<1, 2>(1, nodes));
+        lams.push_back(new ImmersedBoundaryElement<1, 2>(2, nodes));
+        
+        ImmersedBoundaryMesh<2,2> mesh(nodes, elems, lams);
+        auto p_mesh = &mesh;
+        p_mesh->SetNumGridPtsXAndY(32);
+
+        // Create a minimal cell population
+        std::vector<CellPtr> cells;
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+        for (auto& p_cell : cell_population.rGetCells())
         {
-            // Create a small mesh
-            std::vector<Node<2>*> nodes;
-            nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
-            nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
-            nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
-            nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
-
-            std::vector<ImmersedBoundaryElement<2, 2>*> elems;
-            elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
-            elems.push_back(new ImmersedBoundaryElement<2, 2>(1, nodes));
-            elems.push_back(new ImmersedBoundaryElement<2, 2>(2, nodes));
-            
-            std::vector<ImmersedBoundaryElement<1, 2>*> lams;
-            lams.push_back(new ImmersedBoundaryElement<1, 2>(0, nodes));
-            lams.push_back(new ImmersedBoundaryElement<1, 2>(1, nodes));
-            lams.push_back(new ImmersedBoundaryElement<1, 2>(2, nodes));
-            
-            ImmersedBoundaryMesh<2,2> mesh(nodes, elems, lams);
-            auto p_mesh = &mesh;
-            p_mesh->SetNumGridPtsXAndY(32);
-
-            // Create a minimal cell population
-            std::vector<CellPtr> cells;
-            CellsGenerator<UniformCellCycleModel, 2> cells_generator;
-            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
-            ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
-            for (auto& cell : cell_population.rGetCells()) {
-                cell->GetCellData()->SetItem("cell data", 0.2);
-            }
-            MAKE_PTR(ApoptoticCellProperty, cellProperty);
-            cell_population.rGetCells().front()->AddCellProperty(cellProperty);
-            
-            std::string str = "cell data";
-            // Node contained in 1 element
-            TS_ASSERT(!cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(0));
+            p_cell->GetCellData()->SetItem("cell data", 0.2);
         }
-        {
-            // Create a small mesh
-            std::vector<Node<2>*> nodes;
-            nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
-            nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
-            nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
-            nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
+        MAKE_PTR(ApoptoticCellProperty, cellProperty);
+        cell_population.rGetCells().front()->AddCellProperty(cellProperty);
+        
+        std::string str = "cell data";
 
-            std::vector<ImmersedBoundaryElement<2, 2>*> elems;
-            elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
-            elems.push_back(new ImmersedBoundaryElement<2, 2>(1, nodes));
-            elems.push_back(new ImmersedBoundaryElement<2, 2>(2, nodes));
-            
-            std::vector<ImmersedBoundaryElement<1, 2>*> lams;
-            lams.push_back(new ImmersedBoundaryElement<1, 2>(0, nodes));
-            lams.push_back(new ImmersedBoundaryElement<1, 2>(1, nodes));
-            lams.push_back(new ImmersedBoundaryElement<1, 2>(2, nodes));
-            
-            ImmersedBoundaryMesh<2,2> mesh(nodes, elems, lams);
-            auto p_mesh = &mesh;
-            p_mesh->SetNumGridPtsXAndY(32);
-
-            // Create a minimal cell population
-            std::vector<CellPtr> cells;
-            CellsGenerator<UniformCellCycleModel, 2> cells_generator;
-            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
-            ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
-            for (auto& cell : cell_population.rGetCells()) {
-                cell->GetCellData()->SetItem("cell data", 0.2);
-            }
-            MAKE_PTR(ApoptoticCellProperty, cellProperty);
-            cell_population.rGetCells().front()->AddCellProperty(cellProperty);
-            
-            std::string str = "cell data";
-            // Node contained in 1 element
-            TS_ASSERT(!cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(4));
-        }
+        // Node contained in 1 element
+        ///\todo What does the comment on the line above refer to? Is this a copy/paste error?
+        TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(0), false);
+        TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(4), false);
     }
 
     void TestGetNeighbouringNodeIndices()
@@ -821,8 +795,7 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
-        
-        
+
         std::set<unsigned> expected_neighbours {};
         TS_ASSERT_EQUALS(cell_population.GetNeighbouringNodeIndices(1), expected_neighbours);
     }

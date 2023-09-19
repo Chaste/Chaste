@@ -46,7 +46,8 @@ AbstractImmersedBoundaryDivisionRule<SPACE_DIM>::~AbstractImmersedBoundaryDivisi
 }
 
 template <unsigned SPACE_DIM>
-void AbstractImmersedBoundaryDivisionRule<SPACE_DIM>::OutputCellImmersedBoundaryDivisionRuleInfo(out_stream& rParamsFile)
+void AbstractImmersedBoundaryDivisionRule<SPACE_DIM>::OutputCellImmersedBoundaryDivisionRuleInfo(
+    out_stream& rParamsFile)
 {
     std::string cell_division_rule_type = GetIdentifier();
 
@@ -56,7 +57,8 @@ void AbstractImmersedBoundaryDivisionRule<SPACE_DIM>::OutputCellImmersedBoundary
 }
 
 template <unsigned SPACE_DIM>
-void AbstractImmersedBoundaryDivisionRule<SPACE_DIM>::OutputCellImmersedBoundaryDivisionRuleParameters(out_stream& rParamsFile)
+void AbstractImmersedBoundaryDivisionRule<SPACE_DIM>::OutputCellImmersedBoundaryDivisionRuleParameters(
+    out_stream& rParamsFile)
 {
 }
 

@@ -99,17 +99,17 @@ private:
      * This relative velocity is a measure of shear between two boundaries, 
      * which this force class amplifies.
      *
-     * @param previousDisp displacement between a pair of interacting nodes at 
+     * @param rPreviousDisp displacement between a pair of interacting nodes at 
      *                     the previous time step
-     * @param currentDisp displacement between the same pair of interacting 
+     * @param rCurrentDisp displacement between the same pair of interacting 
      *                    nodes at the current time step
-     * @param unitPerp filled in as a unit vector perpendicular to previousDisp
+     * @param rUnitPerp filled in as a unit vector perpendicular to previousDisp
      * @return the component of the relative velocity of the nodes in the 
      *         direction of unitPerp
      */
-    double CalculateRelativeVelocityComponent(const c_vector<double, DIM>& previousDisp,
-                                              const c_vector<double, DIM>& currentDisp,
-                                              c_vector<double, DIM>& unitPerp);
+    double CalculateRelativeVelocityComponent(const c_vector<double, DIM>& rPreviousDisp,
+                                              const c_vector<double, DIM>& rCurrentDisp,
+                                              c_vector<double, DIM>& rUnitPerp);
 
 public:
 

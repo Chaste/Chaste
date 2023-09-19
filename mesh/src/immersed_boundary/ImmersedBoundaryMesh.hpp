@@ -385,31 +385,34 @@ public:
      * @return reference to modifiable 3d fluid velocity grids.
      */
     //multi_array<double, 4>& rGetModifiable3dVelocityGrids();
+    ///\todo why is this method commented out?
 
     /**
-     * @param the new number of fluid mesh points in the x direction.
+     * @param meshPointsX the new number of fluid mesh points in the x direction.
      */
-    void SetNumGridPtsX(unsigned mesh_points_x);
+    void SetNumGridPtsX(unsigned meshPointsX);
 
     /**
-     * @param the new number of fluid mesh points in the x direction.
+     * @param meshPointsY the new number of fluid mesh points in the x direction.
      */
-    void SetNumGridPtsY(unsigned mesh_points_y);
+    void SetNumGridPtsY(unsigned meshPointsY);
 
     /**
-     * @param the new number of fluid mesh points in both directions.
+     * @param numGridPts the new number of fluid mesh points in both directions.
      */
     void SetNumGridPtsXAndY(unsigned numGridPts);
 
     /**
      * @param the new characteristic node spacing.
      */
-    void SetCharacteristicNodeSpacing(double node_spacing);
+    void SetCharacteristicNodeSpacing(double nodeSpacing);
     
     /**
      * Add a node to the mesh
+     * 
+     * \todo document input argument
      */
-    unsigned AddNode(Node<SPACE_DIM>* newNode);
+    unsigned AddNode(Node<SPACE_DIM>* pNewNode);
 
     /**
      * @return reference to vector of element-associated fluid sources

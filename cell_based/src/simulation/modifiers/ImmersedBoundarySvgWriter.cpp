@@ -38,12 +38,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template <unsigned DIM>
 ImmersedBoundarySvgWriter<DIM>::ImmersedBoundarySvgWriter()
-        : AbstractCellBasedSimulationModifier<DIM>(),
-          mSamplingMultiple(100u),
-          mSvgSize(1600.0),
-          mOutputDirectory(""),
-          mSvgHeader(""),
-          mSvgFooter("")
+    : AbstractCellBasedSimulationModifier<DIM>(),
+      mSamplingMultiple(100u),
+      mSvgSize(1600.0),
+      mOutputDirectory(""),
+      mSvgHeader(""),
+      mSvgFooter("")
 {
 }
 
@@ -53,7 +53,8 @@ ImmersedBoundarySvgWriter<DIM>::~ImmersedBoundarySvgWriter()
 }
 
 template <unsigned DIM>
-void ImmersedBoundarySvgWriter<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM, DIM>& rCellPopulation)
+void ImmersedBoundarySvgWriter<DIM>::UpdateAtEndOfTimeStep(
+    AbstractCellPopulation<DIM, DIM>& rCellPopulation)
 {
     if (SimulationTime::Instance()->GetTimeStepsElapsed() % mSamplingMultiple == 0)
     {
@@ -72,7 +73,7 @@ void ImmersedBoundarySvgWriter<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulatio
 
         // Add all nodes to the svg file
         double node_rad = p_mesh->GetAverageNodeSpacingOfElement(0, false) * 0.35 * mSvgSize;
-        for (typename AbstractMesh<DIM, DIM>::NodeIterator it = p_mesh->GetNodeIteratorBegin();
+        for (auto it = p_mesh->GetNodeIteratorBegin();
              it != p_mesh->GetNodeIteratorEnd();
              ++it)
         {
@@ -86,7 +87,9 @@ void ImmersedBoundarySvgWriter<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulatio
 }
 
 template <unsigned DIM>
-void ImmersedBoundarySvgWriter<DIM>::SetupSolve(AbstractCellPopulation<DIM, DIM>& rCellPopulation, std::string outputDirectory)
+void ImmersedBoundarySvgWriter<DIM>::SetupSolve(
+    AbstractCellPopulation<DIM, DIM>& rCellPopulation,
+    std::string outputDirectory)
 {
     mOutputDirectory = outputDirectory;
 
@@ -141,7 +144,11 @@ void ImmersedBoundarySvgWriter<DIM>::SetupSolve(AbstractCellPopulation<DIM, DIM>
 }
 
 template <unsigned DIM>
-void ImmersedBoundarySvgWriter<DIM>::AddPointToSvgFile(out_stream& rSvgFile, c_vector<double, DIM> location, unsigned region, double rad)
+void ImmersedBoundarySvgWriter<DIM>::AddPointToSvgFile(
+    out_stream& rSvgFile,
+    c_vector<double, DIM> location,
+    unsigned region,
+    double rad)
 {
     double scaled_x = location[0] * mSvgSize;
     double scaled_y = (1.0 - location[1]) * mSvgSize;
@@ -185,7 +192,8 @@ void ImmersedBoundarySvgWriter<DIM>::AddPointToSvgFile(out_stream& rSvgFile, c_v
 }
 
 template <unsigned DIM>
-void ImmersedBoundarySvgWriter<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+void ImmersedBoundarySvgWriter<DIM>::OutputSimulationModifierParameters(
+    out_stream& rParamsFile)
 {
     // Call method on direct parent class
     AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
@@ -198,7 +206,8 @@ unsigned ImmersedBoundarySvgWriter<DIM>::GetSamplingMultiple() const
 }
 
 template <unsigned DIM>
-void ImmersedBoundarySvgWriter<DIM>::SetSamplingMultiple(unsigned samplingMultiple)
+void ImmersedBoundarySvgWriter<DIM>::SetSamplingMultiple(
+    unsigned samplingMultiple)
 {
     mSamplingMultiple = samplingMultiple;
 }

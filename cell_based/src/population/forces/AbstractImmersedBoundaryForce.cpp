@@ -51,7 +51,8 @@ AbstractImmersedBoundaryForce<DIM>::~AbstractImmersedBoundaryForce()
 }
 
 template<unsigned DIM>
-void AbstractImmersedBoundaryForce<DIM>::AddNormalNoiseToNodes(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
+void AbstractImmersedBoundaryForce<DIM>::AddNormalNoiseToNodes(
+    ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
 {
     RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
 
@@ -150,7 +151,8 @@ bool AbstractImmersedBoundaryForce<DIM>::GetAdditiveNormalNoise() const
 }
 
 template <unsigned DIM>
-void AbstractImmersedBoundaryForce<DIM>::SetAdditiveNormalNoise(bool additiveNormalNoise)
+void AbstractImmersedBoundaryForce<DIM>::SetAdditiveNormalNoise(
+    bool additiveNormalNoise)
 {
     mAdditiveNormalNoise = additiveNormalNoise;
 }
@@ -162,7 +164,8 @@ double AbstractImmersedBoundaryForce<DIM>::GetNormalNoiseMean() const
 }
 
 template <unsigned DIM>
-void AbstractImmersedBoundaryForce<DIM>::SetNormalNoiseMean(double normalNoiseMean)
+void AbstractImmersedBoundaryForce<DIM>::SetNormalNoiseMean(
+    double normalNoiseMean)
 {
     mNormalNoiseMean = normalNoiseMean;
 }
@@ -174,13 +177,15 @@ double AbstractImmersedBoundaryForce<DIM>::GetNormalNoiseStdDev() const
 }
 
 template <unsigned DIM>
-void AbstractImmersedBoundaryForce<DIM>::SetNormalNoiseStdDev(double normalNoiseStdDev)
+void AbstractImmersedBoundaryForce<DIM>::SetNormalNoiseStdDev(
+    double normalNoiseStdDev)
 {
     mNormalNoiseStdDev = normalNoiseStdDev;
 }
 
 template<unsigned DIM>
-void AbstractImmersedBoundaryForce<DIM>::OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)
+void AbstractImmersedBoundaryForce<DIM>::OutputImmersedBoundaryForceParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<AdditiveNormalNoise>" << mAdditiveNormalNoise << "</AdditiveNormalNoise>\n";
     *rParamsFile << "\t\t\t<NormalNoiseMean>" << mNormalNoiseMean << "</NormalNoiseMean>\n";

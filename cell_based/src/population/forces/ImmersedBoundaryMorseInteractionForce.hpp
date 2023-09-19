@@ -47,10 +47,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 /**
- * A force class for use in immersed boundary simulations. This force implements Morse-potential-like links between
- * nodes in adjacent immersed boundaries. https://en.wikipedia.org/wiki/Morse_potential
- * The well width is a constant interaction strength, the rest length is an equilibrium bond distance, and the well
- * width is a parameter governing the profile of the curve.
+ * A force class for use in immersed boundary simulations. This force implements 
+ * Morse-potential-like links between nodes in adjacent immersed boundaries 
+ * (https://en.wikipedia.org/wiki/Morse_potential). The well width is a constant 
+ * interaction strength, the rest length is an equilibrium bond distance, and 
+ * the well width is a parameter governing the profile of the curve.
  */
 template <unsigned DIM>
 class ImmersedBoundaryMorseInteractionForce : public AbstractImmersedBoundaryForce<DIM>

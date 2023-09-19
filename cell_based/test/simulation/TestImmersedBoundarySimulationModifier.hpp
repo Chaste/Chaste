@@ -148,7 +148,7 @@ public:
         // Create an immersed boundary cell population where each node holds a non-zero applied force
         ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
         ImmersedBoundaryMesh<2, 2>* p_mesh = gen.GetMesh();
-        for (unsigned i = 0; i < p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             c_vector<double, 2> force;
             force[0] = i * 0.01;
@@ -174,7 +174,7 @@ public:
         // Test ClearForcesAndSources() correctly resets the applied force on each node
         modifier.ClearForcesAndSources();
 
-        for (unsigned i = 0; i < p_mesh->GetNumNodes(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             TS_ASSERT_DELTA(p_mesh->GetNode(i)->rGetAppliedForce()[0], 0.0, 1e-6);
             TS_ASSERT_DELTA(p_mesh->GetNode(i)->rGetAppliedForce()[1], 0.0, 1e-6);
@@ -184,12 +184,12 @@ public:
         multi_array<double, 3>& r_force_grids = modifier.mpArrays->rGetModifiableForceGrids();
         multi_array<double, 3>& r_rhs_grid = modifier.mpArrays->rGetModifiableRightHandSideGrids();
 
-        for (unsigned x = 0; x < modifier.mpMesh->GetNumGridPtsX(); x++)
+        for (unsigned x = 0; x < modifier.mpMesh->GetNumGridPtsX(); ++x)
         {
-            for (unsigned y = 0; y < modifier.mpMesh->GetNumGridPtsY(); y++)
+            for (unsigned y = 0; y < modifier.mpMesh->GetNumGridPtsY(); ++y)
             {
                 TS_ASSERT_DELTA(r_rhs_grid[2][x][y], 0.0, 1e-6);
-                for (unsigned dim = 0; dim < 2; dim++)
+                for (unsigned dim = 0; dim < 2; ++dim)
                 {
                     TS_ASSERT_DELTA(r_force_grids[dim][x][y], 0.0, 1e-6);
                 }
@@ -231,11 +231,14 @@ public:
             modifier.SetupConstantMemberVariables(cell_population);
             
             // Check that force grids are zero before force propagation
-            auto& forceGrids = modifier.mpArrays->rGetModifiableForceGrids(); 
-            for (unsigned int grid = 0; grid <= 1; grid++) {
-                for (unsigned int x = 0; x < modifier.mpMesh->GetNumGridPtsX(); x++) {
-                    for (unsigned int y = 0; y < modifier.mpMesh->GetNumGridPtsY(); y++) {
-                        TS_ASSERT_EQUALS(forceGrids[grid][x][y], 0.0);
+            auto& r_force_grids = modifier.mpArrays->rGetModifiableForceGrids(); 
+            for (unsigned grid = 0; grid <= 1; ++grid)
+            {
+                for (unsigned x = 0; x < modifier.mpMesh->GetNumGridPtsX(); ++x)
+                {
+                    for (unsigned y = 0; y < modifier.mpMesh->GetNumGridPtsY(); ++y)
+                    {
+                        TS_ASSERT_EQUALS(r_force_grids[grid][x][y], 0.0);
                     }
                 }
             }
@@ -243,11 +246,15 @@ public:
             modifier.PropagateForcesToFluidGrid();
             
             // Check that there are only 16 non-zero entries per grid
-            unsigned int nonZeroEntriesCount = 0;
-            for (unsigned int grid = 0; grid <= 1; grid++) {
-                for (unsigned int x = 0; x < modifier.mpMesh->GetNumGridPtsX(); x++) {
-                    for (unsigned int y = 0; y < modifier.mpMesh->GetNumGridPtsY(); y++) {
-                        if (forceGrids[grid][x][y] != 0.0) {
+            unsigned nonZeroEntriesCount = 0;
+            for (unsigned grid = 0; grid <= 1; ++grid)
+            {
+                for (unsigned x = 0; x < modifier.mpMesh->GetNumGridPtsX(); ++x)
+                {
+                    for (unsigned y = 0; y < modifier.mpMesh->GetNumGridPtsY(); ++y)
+                    {
+                        if (r_force_grids[grid][x][y] != 0.0)
+                        {
                             nonZeroEntriesCount += 1;
                         }
                     }
@@ -256,39 +263,39 @@ public:
             TS_ASSERT_EQUALS(nonZeroEntriesCount, 32u);
             
             // Check the non-zero entries' values
-            TS_ASSERT_DELTA(forceGrids[0][4][4], 0.0020, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[0][4][5], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[0][4][6], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[0][4][7], 0.0020, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[0][5][4], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[0][5][5], 0.0707, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[0][5][6], 0.0707, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[0][5][7], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[0][6][4], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[0][6][5], 0.0707, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[0][6][6], 0.0707, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[0][6][7], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[0][7][4], 0.0020, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[0][7][5], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[0][7][6], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[0][7][7], 0.0020, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[0][4][4], 0.0020, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[0][4][5], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[0][4][6], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[0][4][7], 0.0020, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[0][5][4], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[0][5][5], 0.0707, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[0][5][6], 0.0707, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[0][5][7], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[0][6][4], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[0][6][5], 0.0707, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[0][6][6], 0.0707, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[0][6][7], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[0][7][4], 0.0020, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[0][7][5], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[0][7][6], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[0][7][7], 0.0020, 0.0001); 
 
-            TS_ASSERT_DELTA(forceGrids[1][4][4], 0.0020, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[1][4][5], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[1][4][6], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[1][4][7], 0.0020, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[1][5][4], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[1][5][5], 0.0707, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[1][5][6], 0.0707, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[1][5][7], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[1][6][4], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[1][6][5], 0.0707, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[1][6][6], 0.0707, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[1][6][7], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[1][7][4], 0.0020, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[1][7][5], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[1][7][6], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[1][7][7], 0.0020, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[1][4][4], 0.0020, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[1][4][5], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[1][4][6], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[1][4][7], 0.0020, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[1][5][4], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[1][5][5], 0.0707, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[1][5][6], 0.0707, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[1][5][7], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[1][6][4], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[1][6][5], 0.0707, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[1][6][6], 0.0707, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[1][6][7], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[1][7][4], 0.0020, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[1][7][5], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[1][7][6], 0.0121, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[1][7][7], 0.0020, 0.0001); 
 
             SimulationTime::Instance()->Destroy();
         }
@@ -367,12 +374,15 @@ public:
             modifier.PropagateFluidSourcesToGrid();
             
             // Check that there are only 16 non-zero entries per grid
-            auto& forceGrids = modifier.mpArrays->rGetModifiableRightHandSideGrids(); 
+            auto& r_force_grids = modifier.mpArrays->rGetModifiableRightHandSideGrids(); 
 
-            unsigned int nonZeroEntriesCount = 0;
-            for (unsigned int x = 0; x < modifier.mpMesh->GetNumGridPtsX(); x++) {
-                for (unsigned int y = 0; y < modifier.mpMesh->GetNumGridPtsY(); y++) {
-                    if (abs(forceGrids[2][x][y]) > 0.0001) {
+            unsigned nonZeroEntriesCount = 0;
+            for (unsigned x = 0; x < modifier.mpMesh->GetNumGridPtsX(); ++x)
+            {
+                for (unsigned y = 0; y < modifier.mpMesh->GetNumGridPtsY(); ++y)
+                {
+                    if (abs(r_force_grids[2][x][y]) > 0.0001)
+                    {
                         nonZeroEntriesCount += 1;
                     }
                 }
@@ -380,22 +390,22 @@ public:
             TS_ASSERT_EQUALS(nonZeroEntriesCount, 16u);
             
             // Check the non-zero entries' values
-            TS_ASSERT_DELTA(forceGrids[2][4][4], 0.0536, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][4][5], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][4][6], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][4][7], 0.0536, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][5][4], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][5][5], 1.8213, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][5][6], 1.8213, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][5][7], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][6][4], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][6][5], 1.8213, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][6][6], 1.8213, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][6][7], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][7][4], 0.0536, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][7][5], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][7][6], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][7][7], 0.0536, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][4][4], 0.0536, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][4][5], 0.3124, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][4][6], 0.3124, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][4][7], 0.0536, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][5][4], 0.3124, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][5][5], 1.8213, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][5][6], 1.8213, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][5][7], 0.3124, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][6][4], 0.3124, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][6][5], 1.8213, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][6][6], 1.8213, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][6][7], 0.3124, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][7][4], 0.0536, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][7][5], 0.3124, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][7][6], 0.3124, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][7][7], 0.0536, 0.0001); 
 
             SimulationTime::Instance()->Destroy();
 
@@ -437,12 +447,15 @@ public:
             modifier.PropagateFluidSourcesToGrid();
             
             // Check that there are only 16 non-zero entries per grid
-            auto& forceGrids = modifier.mpArrays->rGetModifiableRightHandSideGrids(); 
+            auto& r_force_grids = modifier.mpArrays->rGetModifiableRightHandSideGrids(); 
 
-            unsigned int nonZeroEntriesCount = 0;
-            for (unsigned int x = 0; x < modifier.mpMesh->GetNumGridPtsX(); x++) {
-                for (unsigned int y = 0; y < modifier.mpMesh->GetNumGridPtsY(); y++) {
-                    if (abs(forceGrids[2][x][y]) > 0.0001) {
+            unsigned nonZeroEntriesCount = 0;
+            for (unsigned x = 0; x < modifier.mpMesh->GetNumGridPtsX(); ++x)
+            {
+                for (unsigned y = 0; y < modifier.mpMesh->GetNumGridPtsY(); ++y)
+                {
+                    if (abs(r_force_grids[2][x][y]) > 0.0001)
+                    {
                         nonZeroEntriesCount += 1;
                     }
                 }
@@ -450,22 +463,22 @@ public:
             TS_ASSERT_EQUALS(nonZeroEntriesCount, 16u);
             
             // Check the non-zero entries' values
-            TS_ASSERT_DELTA(forceGrids[2][4][4], 0.0536, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][4][5], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][4][6], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][4][7], 0.0536, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][5][4], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][5][5], 1.8213, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][5][6], 1.8213, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][5][7], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][6][4], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][6][5], 1.8213, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][6][6], 1.8213, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][6][7], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][7][4], 0.0536, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][7][5], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][7][6], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(forceGrids[2][7][7], 0.0536, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][4][4], 0.0536, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][4][5], 0.3124, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][4][6], 0.3124, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][4][7], 0.0536, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][5][4], 0.3124, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][5][5], 1.8213, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][5][6], 1.8213, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][5][7], 0.3124, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][6][4], 0.3124, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][6][5], 1.8213, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][6][6], 1.8213, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][6][7], 0.3124, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][7][4], 0.0536, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][7][5], 0.3124, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][7][6], 0.3124, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][7][7], 0.0536, 0.0001); 
 
             SimulationTime::Instance()->Destroy();
 

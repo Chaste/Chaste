@@ -53,10 +53,11 @@ ImmersedBoundaryMorseInteractionForce<DIM>::~ImmersedBoundaryMorseInteractionFor
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryMorseInteractionForce<DIM>::AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
-                                                                                      ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
+void ImmersedBoundaryMorseInteractionForce<DIM>::AddImmersedBoundaryForceContribution(
+    std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
+    ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
 {
-    for (unsigned pair = 0; pair < rNodePairs.size(); pair++)
+    for (unsigned pair = 0; pair < rNodePairs.size(); ++pair)
     {
         // Interactions only exist between pairs of nodes that are not in the same boundary / lamina
         if (rCellPopulation.rGetMesh().NodesInDifferentElementOrLamina(rNodePairs[pair].first, rNodePairs[pair].second))
@@ -129,7 +130,8 @@ void ImmersedBoundaryMorseInteractionForce<DIM>::AddImmersedBoundaryForceContrib
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryMorseInteractionForce<DIM>::OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)
+void ImmersedBoundaryMorseInteractionForce<DIM>::OutputImmersedBoundaryForceParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<WellDepth>" << mWellDepth << "</WellDepth>\n";
     *rParamsFile << "\t\t\t<RestLength>" << mRestLength << "</RestLength>\n";
@@ -172,7 +174,8 @@ double ImmersedBoundaryMorseInteractionForce<DIM>::GetLaminaWellDepthMult() cons
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryMorseInteractionForce<DIM>::SetLaminaWellDepthMult(double laminaWellDepthMult)
+void ImmersedBoundaryMorseInteractionForce<DIM>::SetLaminaWellDepthMult(
+    double laminaWellDepthMult)
 {
     mLaminaWellDepthMult = laminaWellDepthMult;
 }
@@ -184,7 +187,8 @@ double ImmersedBoundaryMorseInteractionForce<DIM>::GetLaminaRestLengthMult() con
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryMorseInteractionForce<DIM>::SetLaminaRestLengthMult(double laminaRestLengthMult)
+void ImmersedBoundaryMorseInteractionForce<DIM>::SetLaminaRestLengthMult(
+    double laminaRestLengthMult)
 {
     mLaminaRestLengthMult = laminaRestLengthMult;
 }

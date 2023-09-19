@@ -227,11 +227,13 @@ ImmersedBoundaryPalisadeMeshGenerator::ImmersedBoundaryPalisadeMeshGenerator(uns
     {
         if (randomYMult != 0.0)
         {
-            for (auto& node : nodes) {
-                delete node;
+            for (auto& p_node : nodes)
+            {
+                delete p_node;
             }
-            for (auto& lam : ib_laminas) {
-                delete lam;
+            for (auto& p_lam : ib_laminas)
+            {
+                delete p_lam;
             }
             EXCEPTION("Currently no random y variation allowed with an apical lamina");
         }

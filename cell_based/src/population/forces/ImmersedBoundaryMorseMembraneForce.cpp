@@ -52,14 +52,15 @@ ImmersedBoundaryMorseMembraneForce<DIM>::~ImmersedBoundaryMorseMembraneForce()
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryMorseMembraneForce<DIM>::AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
-                                                                                   ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
+void ImmersedBoundaryMorseMembraneForce<DIM>::AddImmersedBoundaryForceContribution(
+    std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
+    ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
 {
     // Data common across the entire cell population
     double intrinsic_spacing_squared = rCellPopulation.GetIntrinsicSpacing() * rCellPopulation.GetIntrinsicSpacing();
 
     // Loop over all elements ( <DIM, DIM> )
-    for (typename ImmersedBoundaryMesh<DIM, DIM>::ImmersedBoundaryElementIterator elem_it = rCellPopulation.rGetMesh().GetElementIteratorBegin();
+    for (auto elem_it = rCellPopulation.rGetMesh().GetElementIteratorBegin();
          elem_it != rCellPopulation.rGetMesh().GetElementIteratorEnd();
          ++elem_it)
     {
@@ -67,7 +68,7 @@ void ImmersedBoundaryMorseMembraneForce<DIM>::AddImmersedBoundaryForceContributi
     }
 
     // Loop over all laminas ( <DIM-1, DIM> )
-    for (typename ImmersedBoundaryMesh<DIM, DIM>::ImmersedBoundaryLaminaIterator lam_it = rCellPopulation.rGetMesh().GetLaminaIteratorBegin();
+    for (auto lam_it = rCellPopulation.rGetMesh().GetLaminaIteratorBegin();
          lam_it != rCellPopulation.rGetMesh().GetLaminaIteratorEnd();
          ++lam_it)
     {
@@ -82,9 +83,10 @@ void ImmersedBoundaryMorseMembraneForce<DIM>::AddImmersedBoundaryForceContributi
 
 template <unsigned DIM>
 template <unsigned ELEMENT_DIM>
-void ImmersedBoundaryMorseMembraneForce<DIM>::CalculateForcesOnElement(ImmersedBoundaryElement<ELEMENT_DIM, DIM>& rElement,
-                                                                       ImmersedBoundaryCellPopulation<DIM>& rCellPopulation,
-                                                                       double intrinsicSpacingSquared)
+void ImmersedBoundaryMorseMembraneForce<DIM>::CalculateForcesOnElement(
+    ImmersedBoundaryElement<ELEMENT_DIM, DIM>& rElement,
+    ImmersedBoundaryCellPopulation<DIM>& rCellPopulation,
+    double intrinsicSpacingSquared)
 {
     // Get index and number of nodes of current element
     unsigned elem_idx = rElement.GetIndex();
@@ -94,17 +96,18 @@ void ImmersedBoundaryMorseMembraneForce<DIM>::CalculateForcesOnElement(ImmersedB
     std::vector<c_vector<double, DIM> > force_to_next(num_nodes);
 
     /*
-     * Get the node spacing ratio for this element.  The rest length and spring constant are derived from this
-     * characteristic length.
+     * Get the node spacing ratio for this element. The rest length and spring 
+     * constant are derived from this characteristic length.
      *
-     * The spring constant is derived with reference to the intrinsic spacing, so that with different node spacings
-     * the user-defined parameters do not have to be updated.
+     * The spring constant is derived with reference to the intrinsic spacing, 
+     * so that with different node spacings the user-defined parameters do not 
+     * have to be updated.
      *
-     * The correct factor to increase the spring constant by is (intrinsic spacing / node_spacing)^2.  One factor
-     * takes into account the energy considerations of the elastic springs, and the other takes account of the
+     * The correct factor to increase the spring constant by is (intrinsic 
+     * spacing / node_spacing)^2. One factor takes into account the energy 
+     * considerations of the elastic springs, and the other takes account of the
      * factor of node_spacing used in discretising the force relation.
      */
-
     double node_spacing = 0.0;
     double well_depth = 0.0;
     double rest_length = 0.0;
@@ -157,7 +160,8 @@ void ImmersedBoundaryMorseMembraneForce<DIM>::CalculateForcesOnElement(ImmersedB
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryMorseMembraneForce<DIM>::OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)
+void ImmersedBoundaryMorseMembraneForce<DIM>::OutputImmersedBoundaryForceParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<ElementWellDepth>" << mElementWellDepth << "</ElementWellDepth>\n";
     *rParamsFile << "\t\t\t<ElementRestLength>" << mElementRestLength << "</ElementRestLength>\n";
@@ -176,7 +180,8 @@ double ImmersedBoundaryMorseMembraneForce<DIM>::GetElementWellDepth() const
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryMorseMembraneForce<DIM>::SetElementWellDepth(double elementWellDepth)
+void ImmersedBoundaryMorseMembraneForce<DIM>::SetElementWellDepth(
+    double elementWellDepth)
 {
     mElementWellDepth = elementWellDepth;
 }
@@ -188,7 +193,8 @@ double ImmersedBoundaryMorseMembraneForce<DIM>::GetElementRestLength() const
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryMorseMembraneForce<DIM>::SetElementRestLength(double elementRestLength)
+void ImmersedBoundaryMorseMembraneForce<DIM>::SetElementRestLength(
+    double elementRestLength)
 {
     mElementRestLength = elementRestLength;
 }
@@ -200,7 +206,8 @@ double ImmersedBoundaryMorseMembraneForce<DIM>::GetLaminaWellDepth() const
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryMorseMembraneForce<DIM>::SetLaminaWellDepth(double laminaWellDepth)
+void ImmersedBoundaryMorseMembraneForce<DIM>::SetLaminaWellDepth(
+    double laminaWellDepth)
 {
     mLaminaWellDepth = laminaWellDepth;
 }
@@ -212,7 +219,8 @@ double ImmersedBoundaryMorseMembraneForce<DIM>::GetLaminaRestLength() const
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryMorseMembraneForce<DIM>::SetLaminaRestLength(double laminaRestLength)
+void ImmersedBoundaryMorseMembraneForce<DIM>::SetLaminaRestLength(
+    double laminaRestLength)
 {
     mLaminaRestLength = laminaRestLength;
 }

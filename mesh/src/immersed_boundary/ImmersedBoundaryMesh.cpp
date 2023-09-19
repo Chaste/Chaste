@@ -641,16 +641,16 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetNumGridPtsY() const
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetNumGridPtsX(unsigned mesh_points_x)
+void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetNumGridPtsX(unsigned meshPointsX)
 {
-    mNumGridPtsX = mesh_points_x;
+    mNumGridPtsX = meshPointsX;
     m2dVelocityGrids.resize(extents[2][mNumGridPtsX][mNumGridPtsY]);
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetNumGridPtsY(unsigned mesh_points_y)
+void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetNumGridPtsY(unsigned meshPointsY)
 {
-    mNumGridPtsY = mesh_points_y;
+    mNumGridPtsY = meshPointsY;
     m2dVelocityGrids.resize(extents[2][mNumGridPtsX][mNumGridPtsY]);
 }
 
@@ -663,9 +663,9 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetNumGridPtsXAndY(unsigned n
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetCharacteristicNodeSpacing(double node_spacing)
+void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetCharacteristicNodeSpacing(double nodeSpacing)
 {
-    mCharacteristicNodeSpacing = node_spacing;
+    mCharacteristicNodeSpacing = nodeSpacing;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -713,10 +713,11 @@ multi_array<double, 4>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetModifi
 */
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* newNode)
+unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::AddNode(
+    Node<SPACE_DIM>* pNewNode)
 {
-    newNode->SetIndex(this->mNodes.size());
-    this->mNodes.push_back(newNode);
+    pNewNode->SetIndex(this->mNodes.size());
+    this->mNodes.push_back(pNewNode);
     return this->mNodes.size() - 1;
 }
 

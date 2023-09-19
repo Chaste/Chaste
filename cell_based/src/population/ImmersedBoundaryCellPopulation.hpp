@@ -50,66 +50,72 @@ class AbstractImmersedBoundaryDivisionRule;
 /**
  * A facade class encapsulating an immersed boundary cell population.
  *
- * Contains a group of cells and maintains the associations
- * between CellPtrs and elements in the ImmersedBoundaryMesh.
+ * Contains a group of cells and maintains the associations between CellPtrs and 
+ * elements in the ImmersedBoundaryMesh.
  */
 template <unsigned DIM>
 class ImmersedBoundaryCellPopulation : public AbstractOffLatticeCellPopulation<DIM>
 {
 private:
-    /**
-     * This test uses the private constructor to simplify testing.
-     */
+    /** The test below uses the private constructor to simplify testing. */
     friend class TestImmersedBoundaryDivisionRules;
 
-    /** To allow tests to directly access UpdateNodeLocation() */
+    /** To allow tests to directly access UpdateNodeLocation(). */
     friend class TestImmersedBoundaryPdeSolveMethods;
     
     friend class TestImmersedBoundaryCellPopulation;
 
     /**
-     * Whether to delete the mesh when we are destroyed.
-     * Needed if this cell population has been de-serialized.
+     * Whether to delete the mesh when we are destroyed. Needed if this cell 
+     * population has been de-serialized.
      */
     bool mDeleteMesh;
 
     /**
-     * A static cast of the AbstractMesh from AbstractCellPopulation
-     * for use in this class
+     * A static cast of the AbstractMesh from AbstractCellPopulation for use in 
+     * this class.
      */
     ImmersedBoundaryMesh<DIM, DIM>* mpImmersedBoundaryMesh;
 
     /**
-     * A pointer to a division rule that is used to generate the axis when dividing cells.
-     * This is a specialisation for immersed boundary simulations.
+     * A pointer to a division rule that is used to generate the axis when 
+     * dividing cells. This is a specialisation for immersed boundary 
+     * simulations.
      */
     boost::shared_ptr<AbstractImmersedBoundaryDivisionRule<DIM> > mpImmersedBoundaryDivisionRule;
 
-    /** The intrinsic node spacing, relative to which various parameters must be calculated */
+    /**
+     * The intrinsic node spacing, relative to which various parameters must be 
+     * calculated.
+     */
     double mIntrinsicSpacing;
 
-    /** Whether the simulation has active fluid sources */
+    /** Whether the simulation has active fluid sources. */
     bool mPopulationHasActiveSources;
 
-    /** Whether to output node regions to VTK */
+    /** Whether to output node regions to VTK. */
     bool mOutputNodeRegionToVtk;
 
-    /** The distance over which cell-cell interactions occur */
+    /** The distance over which cell-cell interactions occur. */
     double mInteractionDistance;
 
-    /** Call ReMesh every ReMeshFrequency number of time steps */
+    /** Call ReMesh every ReMeshFrequency number of time steps. */
     unsigned mReMeshFrequency;
     
-    /** Used to ensure step size exception is only thrown once */
+    /** Used to ensure step size exception is only thrown once. */
     bool mThrowStepSizeException;
     
-    /** Distance above which a vertex movement will trigger a step size exception */ 
+    /**
+     * Distance above which a vertex movement will trigger a step size 
+     * exception. 
+     */ 
     double mCellRearrangementThreshold;
 
     /**
      * Overridden WriteVtkResultsToFile() method.
      *
-     * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
+     * @param rDirectory  pathname of the output directory, relative to where 
+     *     Chaste output is stored
      */
     virtual void WriteVtkResultsToFile(const std::string& rDirectory);
 
@@ -117,7 +123,8 @@ private:
     /**
      * Serialize the object and its member variables.
      *
-     * Note that serialization of the mesh and cells is handled by load/save_construct_data.
+     * Note that serialization of the mesh and cells is handled by 
+     * load/save_construct_data.
      *
      * Note also that member data related to writers is not saved - output must
      * be set up again by the caller after a restart.
@@ -138,20 +145,22 @@ private:
     }
 
     /**
-     * Helper method.
-     * Calculates the discrete delta approximation based on distance and grid spacing.
+     * Helper method. Calculate the discrete delta approximation based on 
+     * distance and grid spacing.
+     * 
+     * \todo document input arguments
      */
     double Delta1D(double dist, double spacing);
 
     /**
-     * Helper method for the constructor.
-     * Calculates an intrinsic length scale based on the size of elements in the mesh.
+     * Helper method for the constructor. Calculate an intrinsic length scale 
+     * based on the size of elements in the mesh.
      */
     double CalculateIntrinsicCellSize();
 
     /**
-     * Check the consistency of internal data structures.
-     * Each ImmersedBoundaryElement must have a CellPtr associated with it.
+     * Check the consistency of internal data structures. Each 
+     * ImmersedBoundaryElement must have a CellPtr associated with it.
      */
     void Validate();
 
@@ -162,11 +171,14 @@ public:
      * There must be precisely one CellPtr for each ImmersedBoundaryElement in
      * the mesh.
      *
-     * @param rMesh reference to a
+     * @param rMesh reference to a \todo complete documentation
      * @param rCells reference to a vector of CellPtrs
-     * @param deleteMesh set to true if you want the cell population to free the mesh memory on destruction (defaults to false)
-     * @param validate whether to validate the cell population when it is created (defaults to true)
-     * @param locationIndices an optional vector of location indices that correspond to real cells
+     * @param deleteMesh set to true if you want the cell population to free the 
+     *     mesh memory on destruction (defaults to false)
+     * @param validate whether to validate the cell population when it is 
+     *     created (defaults to true)
+     * @param locationIndices an optional vector of location indices that 
+     *     correspond to real cells
      */
     ImmersedBoundaryCellPopulation(ImmersedBoundaryMesh<DIM, DIM>& rMesh,
                                    std::vector<CellPtr>& rCells,
@@ -195,7 +207,7 @@ public:
     double GetDampingConstant(unsigned nodeIndex);
 
     /**
-     * @return reference to  mrMesh.
+     * @return reference to mrMesh.
      */
     ImmersedBoundaryMesh<DIM, DIM>& rGetMesh();
 
@@ -214,7 +226,8 @@ public:
     ImmersedBoundaryElement<DIM, DIM>* GetElement(unsigned elementIndex);
 
     /**
-     * Get a particular ImmersedBoundaryElement representing a lamina.
+     * Get a particular ImmersedBoundaryElement representing a lamina. 
+     * \todo explain what a "lamina" is
      *
      * @param laminaIndex the global index of the lamina
      *
@@ -240,9 +253,11 @@ public:
     unsigned GetNumNodes();
 
     /**
-     * @param the new cell-cell interaction distance.
+     * \todo document method
+     * 
+     * @param newDistance the new cell-cell interaction distance.
      */
-    void SetInteractionDistance(double new_distance);
+    void SetInteractionDistance(double newDistance);
 
     /**
      * @return the cell-cell interaction distance.
@@ -250,6 +265,8 @@ public:
     double GetInteractionDistance() const;
 
     /**
+     * \todo document method
+     * 
      * @param newFrequency the new ReMesh frequency.
      */
     void SetReMeshFrequency(unsigned newFrequency);
@@ -260,6 +277,8 @@ public:
     unsigned GetReMeshFrequency() const;
 
     /**
+     * \todo document method
+     * 
      * @param throws whether an exception should be thrown
      */
     void SetThrowsStepSizeException(bool throws);
@@ -275,6 +294,8 @@ public:
     double GetIntrinsicSpacing() const;
 
     /**
+     * \todo document method
+     * 
      * @param newThreshold the new cell rearrangement threshold
      */
     void SetCellRearrangementThreshold(double newThreshold);
@@ -284,17 +305,16 @@ public:
      */
     double GetCellRearrangementThreshold() const;
 
-
     /**
-     * Overridden GetLocationOfCellCentre() method.
-     *
-     * Find the centre of mass of a given cell (assuming uniform density).
-     * Note that, as there is no guarantee of convexity, this may lie
-     * outside the ImmersedBoundaryElement corresponding to the cell.
+     * Overridden GetLocationOfCellCentre() method. Find the centre of mass of a 
+     * given cell (assuming uniform density). Note that, as there is no 
+     * guarantee of convexity, this may lie outside the ImmersedBoundaryElement 
+     * corresponding to the cell.
      *
      * @param pCell a cell in the population
      *
-     * @return the location of the centre of mass of the element corresponding to this cell.
+     * @return the location of the centre of mass of the element corresponding 
+     *     to this cell.
      */
     c_vector<double, DIM> GetLocationOfCellCentre(CellPtr pCell);
 
@@ -308,23 +328,22 @@ public:
     Node<DIM>* GetNode(unsigned index);
 
     /**
-     * Overridden GetNeighbouringLocationIndices() method.
-     *
-     * Given a cell, returns the set of location indices corresponding to neighbouring cells.
-     *
-     * At least once per timestep, UpdateCellCentroids() should be called before this function.
+     * Overridden GetNeighbouringLocationIndices() method. Given a cell, returns 
+     * the set of location indices corresponding to neighbouring cells. At least 
+     * once per timestep, UpdateCellCentroids() should be called before this 
+     * function.
      *
      * @param pCell a cell
+     * 
      * @return the set of neighbouring location indices.
      */
     std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
 
     /**
-     * Overridden AddNode() method.
-     *
-     * Add a new node to the cell population.
+     * Overridden AddNode() method. Add a new node to the cell population.
      *
      * @param pNewNode pointer to the new node
+     * 
      * @return global index of new node in cell population
      */
     unsigned AddNode(Node<DIM>* pNewNode);
@@ -337,11 +356,11 @@ public:
     void UpdateNodeLocations(double dt);
 
     /**
-     * Overridden SetNode() method.
-     *
-     * Move the node with a given index to a new point in space.
+     * Overridden SetNode() method. Move the node with a given index to a new 
+     * point in space.
      *
      * @param index the index of the node to be moved
+     * 
      * @param rNewLocation the new target location of the node
      */
     void SetNode(unsigned index, ChastePoint<DIM>& rNewLocation);
@@ -353,7 +372,8 @@ public:
      *
      * @return pointer to the element.
      */
-    ImmersedBoundaryElement<DIM, DIM>* GetElementCorrespondingToCell(CellPtr pCell);
+    ImmersedBoundaryElement<DIM, DIM>* GetElementCorrespondingToCell(
+        CellPtr pCell);
 
     /**
      * Overridden AddCell() method.
@@ -362,15 +382,16 @@ public:
      *
      * @param pNewCell  the cell to add
      * @param pParentCell pointer to a parent cell (if required)
-     * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
+     * 
+     * @return address of cell as it appears in the cell list (internal of this 
+     *     method uses a copy constructor along the way)
      */
     CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell = CellPtr());
 
     /**
-     * Remove all cells labelled as dead.
-     *
-     * Note that after calling this method the cell population will be in an inconsistent state until
-     * the equivalent of a 'remesh' is performed! So don't try iterating over cells or anything
+     * Remove all cells labelled as dead. Note that after calling this method 
+     * the cell population will be in an inconsistent state until the equivalent 
+     * of a 'remesh' is performed! So don't try iterating over cells or anything
      * like that.
      *
      * @return number of cells removed
@@ -386,21 +407,24 @@ public:
     bool IsCellAssociatedWithADeletedLocation(CellPtr pCell);
 
     /**
-     * Remove the ImmersedBoundaryElements which have been marked as deleted, perform
-     * any cell rearrangements if required, and update the correspondence
-     * with CellPtrs.
+     * Remove the ImmersedBoundaryElements which have been marked as deleted, 
+     * perform any cell rearrangements if required, and update the 
+     * correspondence with CellPtrs.
      *
-     * @param hasHadBirthsOrDeaths - a bool saying whether cell population has had Births Or Deaths
-     * not needed in this cell population class
+     * @param hasHadBirthsOrDeaths - a bool saying whether cell population has 
+     *     had Births Or Deaths not needed in this cell population class
+     * 
+     * \todo why not needed? Cells should be able to divide and/or die in 
+     *     immersed boundary model simulations
      */
     void Update(bool hasHadBirthsOrDeaths = true);
 
     /**
-     * Overridden OpenWritersFiles() method.
+     * Overridden OpenWritersFiles() method. Open all files in 
+     * mCellPopulationWriters and mCellWriters for writing (not appending).
      *
-     * Open all files in mCellPopulationWriters and mCellWriters for writing (not appending).
-     *
-     * @param rOutputFileHandler handler for the directory in which to open this file.
+     * @param rOutputFileHandler handler for the directory in which to open this 
+     *     file.
      */
     virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler);
 
@@ -409,7 +433,8 @@ public:
      *
      * @param pPopulationWriter the population writer.
      */
-    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
+    virtual void AcceptPopulationWriter(
+        boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
 
     /**
      * Overridden AcceptPopulationWriter() method.
@@ -417,13 +442,15 @@ public:
      * @param pPopulationWriter the population writer.
      */
 
-    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter);
+    virtual void AcceptPopulationEventWriter(
+        boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter);
     /**
      * Overridden AcceptPopulationCountWriter() method.
      *
      * @param pPopulationCountWriter the population count writer.
      */
-    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
+    virtual void AcceptPopulationCountWriter(
+        boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
 
     /**
      * Overridden AcceptCellWriter() method.
@@ -431,12 +458,15 @@ public:
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
      */
-    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
+    virtual void AcceptCellWriter(
+        boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter,
+        CellPtr pCell);
 
     /**
      * Overridden GetVolumeOfCell() method.
      *
      * @param pCell boost shared pointer to a cell
+     * 
      * @return volume via associated mesh element
      */
     double GetVolumeOfCell(CellPtr pCell);
@@ -455,6 +485,7 @@ public:
      * GetWidth() on the mesh.
      *
      * @param rDimension a dimension (0,1 or 2)
+     * 
      * @return The maximum distance between any nodes in this dimension.
      */
     double GetWidth(const unsigned& rDimension);
@@ -463,6 +494,7 @@ public:
      * Overridden GetNeighbouringNodeIndices() method.
      *
      * @param index the node index
+     * 
      * @return the set of neighbouring node indices.
      */
     std::set<unsigned> GetNeighbouringNodeIndices(unsigned index);
@@ -481,7 +513,8 @@ public:
     /**
      * Overridden IsPdeNodeAssociatedWithNonApoptoticCell() method.
      *
-     * @param pdeNodeIndex inedx of a node in a tetrahedral mesh for use with a PDE modifier
+     * @param pdeNodeIndex index of a node in a tetrahedral mesh for use with a 
+     *     PDE modifier
      *
      * @return if a node, specified by its index in a tetrahedral mesh for use
      *         with a PDE modifier, is associated with a non-apoptotic cell.
@@ -495,13 +528,15 @@ public:
      * @param pdeNodeIndex index of a node in a tetrahedral mesh for use
      *         with a PDE modifier
      * @param rVariableName the name of the cell data item to get
-     * @param dirichletBoundaryConditionApplies where a Dirichlet boundary condition is used
-     *        (optional; defaults to false)
-     * @param dirichletBoundaryValue the value of the Dirichlet boundary condition, if used
-     *        (optional; defaults to 0.0)
+     * @param dirichletBoundaryConditionApplies where a Dirichlet boundary 
+     *     condition is used (optional; defaults to false)
+     * @param dirichletBoundaryValue the value of the Dirichlet boundary 
+     *     condition, if used (optional; defaults to 0.0)
      *
-     * @return the value of a CellData item (interpolated if necessary) at a node,
-     *         specified by its index in a tetrahedral mesh for use with a PDE modifier.
+     * @return the value of a CellData item (interpolated if necessary) at a 
+     *     node, specified by its index in a tetrahedral mesh for use with a PDE 
+     *     modifier.
+     * 
      * This method can be called by PDE modifier classes.
      */
     virtual double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
@@ -519,15 +554,18 @@ public:
      *
      * @param pImmersedBoundaryDivisionRule  pointer to the new division rule
      */
-    void SetImmersedBoundaryDivisionRule(boost::shared_ptr<AbstractImmersedBoundaryDivisionRule<DIM> > pImmersedBoundaryDivisionRule);
+    void SetImmersedBoundaryDivisionRule(
+        boost::shared_ptr<AbstractImmersedBoundaryDivisionRule<DIM> > pImmersedBoundaryDivisionRule);
 
     /**
-     * @return mPopulationHasActiveSources whether the population has active fluid sources
+     * @return mPopulationHasActiveSources whether the population has active 
+     *     fluid sources
      */
     bool DoesPopulationHaveActiveSources() const;
 
     /**
      * @param pCell pointer to a cell
+     * 
      * @return whether the cell is on the boundary of this population
      */
     bool IsCellOnBoundary(CellPtr pCell);
@@ -540,7 +578,7 @@ public:
     void SetIfPopulationHasActiveSources(bool hasActiveSources);
 
     /**
-     * Set whether to output node regions to vtk
+     * Set whether to output node regions to vtk.
      *
      * @param outputNodeRegionsToVtk whether to output node regions to vtk
      */
@@ -548,24 +586,29 @@ public:
 
     /**
      * Checks whether a given node displacement violates the movement threshold
-     * for this population. If so, a stepSizeException is generated that contains
-     * a warning/error message and a suggested smaller dt that should avoid the problem.
+     * for this population. If so, a stepSizeException is generated that 
+     * contains a warning/error message and a suggested smaller dt that should 
+     * avoid the problem.
      *
-     * @param nodeIndex Index of the node in question (allows us to check whether this is a ghost or particle)
-     * @param displacement Movement vector of the node at this time step
+     * @param nodeIndex Index of the node in question (allows us to check 
+     *     whether this is a ghost or particle)
+     * @param rDisplacement Movement vector of the node at this time step
      * @param dt Current time step size
      */
-    virtual void CheckForStepSizeException(unsigned nodeIndex, c_vector<double, DIM>& displacement, double dt);
+    virtual void CheckForStepSizeException(
+        unsigned nodeIndex,
+        c_vector<double, DIM>& rDisplacement,
+        double dt);
 
     /**
      * Overridden GetDefaultTimeStep() method.
      *
-     * @return a default value for the time step to use
-     * when simulating the cell population.
+     * @return a default value for the time step to use when simulating the cell 
+     *     population.
      *
-     * A hard-coded value of 0.002 is returned. However, note that the time
-     * step can be reset by calling SetDt() on the simulation object used to
-     * simulate the cell population.
+     * A hard-coded value of 0.002 is returned. However, note that the time step 
+     * can be reset by calling SetDt() on the simulation object used to simulate 
+     * the cell population.
      */
     virtual double GetDefaultTimeStep();
 };

@@ -216,23 +216,25 @@ private:
     /**
      * Calculates upwind difference of fluid velocity grids
      *
-     * @param input const reference to input grids
-     * @param output reference to output grids
+     * @param rInput const reference to input grids
+     * @param rOutput reference to output grids
      */
-    void Upwind2d(const multi_array<double, 3>& input, multi_array<double, 3>& output);
+    void Upwind2d(const multi_array<double, 3>& rInput, multi_array<double, 3>& rOutput);
 
     /**
      * Calculates the vector of central differences of the fluid source grid
      *
-     * @param rhs const reference to rhs grids which contain the fluid source strengths
-     * @param gradients reference to grids storing the graidents
+     * @param rRhs const reference to rhs grids which contain the fluid source strengths
+     * @param rGradients reference to grids storing the graidents
      */
-    void CalculateSourceGradients(const multi_array<double, 3>& rhs, multi_array<double, 3>& gradients);
+    void CalculateSourceGradients(const multi_array<double, 3>& rRhs, multi_array<double, 3>& rGradients);
 
     /**
-     * Removes any bias in field sums
+     * Remove any bias in field sums.
+     * 
+     * \todo document input argument
      */
-    void ZeroFieldSums(multi_array<double, 3>& field);
+    void ZeroFieldSums(multi_array<double, 3>& rField);
 
 public:
 

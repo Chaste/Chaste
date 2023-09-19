@@ -52,12 +52,16 @@ ImmersedBoundaryLinearInteractionForce<DIM>::~ImmersedBoundaryLinearInteractionF
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryLinearInteractionForce<DIM>::AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
-                                                                                       ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
+void ImmersedBoundaryLinearInteractionForce<DIM>::AddImmersedBoundaryForceContribution(
+    std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
+    ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
 {
-    for (unsigned pair = 0; pair < rNodePairs.size(); pair++)
+    for (unsigned pair = 0; pair < rNodePairs.size(); ++pair)
     {
-        // Interactions only exist between pairs of nodes that are not in the same boundary / lamina
+        /*
+         * Interactions only exist between pairs of nodes that are not in the 
+         * same boundary / lamina.
+         */
         if (rCellPopulation.rGetMesh().NodesInDifferentElementOrLamina(rNodePairs[pair].first, rNodePairs[pair].second))
         {
             Node<DIM>* p_node_a = rNodePairs[pair].first;
@@ -95,8 +99,10 @@ void ImmersedBoundaryLinearInteractionForce<DIM>::AddImmersedBoundaryForceContri
                 }
 
                 /*
-                 * We must scale each applied force by a factor of elem_spacing / local spacing, so that forces
-                 * balance when spread to the grid later (where the multiplicative factor is the local spacing)
+                 * We must scale each applied force by a factor of elem_spacing 
+                 * / local spacing, so that forces balance when spread to the 
+                 * grid later (where the multiplicative factor is the local 
+                 * spacing).
                  */
                 vec_a2b *= eff_spring_const * (normed_dist - eff_rest_length) / normed_dist;
 
@@ -117,7 +123,8 @@ void ImmersedBoundaryLinearInteractionForce<DIM>::AddImmersedBoundaryForceContri
 
 
 template<unsigned DIM>
-void ImmersedBoundaryLinearInteractionForce<DIM>::OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)
+void ImmersedBoundaryLinearInteractionForce<DIM>::OutputImmersedBoundaryForceParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<SpringConstant>" << mSpringConst << "</SpringConstant>\n";
     *rParamsFile << "\t\t\t<RestLength>" << mRestLength << "</RestLength>\n";
@@ -135,7 +142,8 @@ double ImmersedBoundaryLinearInteractionForce<DIM>::GetSpringConst() const
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryLinearInteractionForce<DIM>::SetSpringConst(double springConst)
+void ImmersedBoundaryLinearInteractionForce<DIM>::SetSpringConst(
+    double springConst)
 {
     mSpringConst = springConst;
 }
@@ -159,7 +167,8 @@ double ImmersedBoundaryLinearInteractionForce<DIM>::GetLaminaSpringConstMult() c
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryLinearInteractionForce<DIM>::SetLaminaSpringConstMult(double laminaSpringConstMult)
+void ImmersedBoundaryLinearInteractionForce<DIM>::SetLaminaSpringConstMult(
+    double laminaSpringConstMult)
 {
     mLaminaSpringConstMult = laminaSpringConstMult;
 }
@@ -171,7 +180,8 @@ double ImmersedBoundaryLinearInteractionForce<DIM>::GetLaminaRestLengthMult() co
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryLinearInteractionForce<DIM>::SetLaminaRestLengthMult(double laminaRestLengthMult)
+void ImmersedBoundaryLinearInteractionForce<DIM>::SetLaminaRestLengthMult(
+    double laminaRestLengthMult)
 {
     mLaminaRestLengthMult = laminaRestLengthMult;
 }

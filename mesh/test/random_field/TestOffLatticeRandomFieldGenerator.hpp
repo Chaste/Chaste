@@ -98,8 +98,9 @@ public:
 
         TS_ASSERT_DIFFERS(res1[0], res2[0]);
         
-        for (auto& node : nodes) {
-            delete node;
+        for (auto& p_node : nodes)
+        {
+            delete p_node;
         }
     }
 
@@ -138,8 +139,9 @@ public:
             std::transform(randomField.begin(), randomField.end(), randomField.begin(), [] (const double& v) { return std::abs(v); });
             auto sum = std::accumulate(randomField.begin(), randomField.end(), 0.0);
 
-            for (auto& node : nodes) {
-                delete node;
+            for (auto& p_node : nodes)
+            {
+                delete p_node;
             }
             TS_ASSERT(sum > 0.0)
         }
@@ -171,8 +173,9 @@ public:
             
             std::transform(randomField.begin(), randomField.end(), randomField.begin(), [] (const double& v) { return std::abs(v); });
             auto sum = std::accumulate(randomField.begin(), randomField.end(), 0.0);
-            for (auto& node : nodes) {
-                delete node;
+            for (auto& p_node : nodes)
+            {
+                delete p_node;
             }
             TS_ASSERT(sum > 0.0)
         }
@@ -204,8 +207,9 @@ public:
 
             std::transform(randomField.begin(), randomField.end(), randomField.begin(), [] (const double& v) { return std::abs(v); });
             auto sum = std::accumulate(randomField.begin(), randomField.end(), 0.0);
-            for (auto& node : nodes) {
-                delete node;
+            for (auto& p_node : nodes)
+            {
+                delete p_node;
             }
             TS_ASSERT(sum > 0.0)
         }
@@ -237,8 +241,9 @@ public:
 
             std::transform(randomField.begin(), randomField.end(), randomField.begin(), [] (const double& v) { return std::abs(v); });
             auto sum = std::accumulate(randomField.begin(), randomField.end(), 0.0);
-            for (auto& node : nodes) {
-                delete node;
+            for (auto& p_node : nodes)
+            {
+                delete p_node;
             }
             TS_ASSERT(sum > 0.0)
         }
@@ -271,8 +276,9 @@ public:
 
         const std::vector<double> grf = gen.SampleRandomFieldAtTime(nodes, 0.0);
 
-        for (auto& node : nodes) {
-            delete node;
+        for (auto& p_node : nodes)
+        {
+            delete p_node;
         }
 
         for (const auto& val : grf)

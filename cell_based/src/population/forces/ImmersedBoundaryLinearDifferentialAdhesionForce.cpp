@@ -57,9 +57,12 @@ void ImmersedBoundaryLinearDifferentialAdhesionForce<DIM>::AddImmersedBoundaryFo
         EXCEPTION("This force class cannot be used in the presence of lamina elements.");
     }
 
-    for (unsigned pair = 0; pair < rNodePairs.size(); pair++)
+    for (unsigned pair = 0; pair < rNodePairs.size(); ++pair)
     {
-        // Interactions only exist between pairs of nodes that are not in the same boundary / lamina
+        /*
+         * Interactions only exist between pairs of nodes that are not in the 
+         * same boundary / lamina.
+         */
         if (rCellPopulation.rGetMesh().NodesInDifferentElementOrLamina(rNodePairs[pair].first, rNodePairs[pair].second))
         {
             Node<DIM>* p_node_a = rNodePairs[pair].first;
@@ -117,7 +120,8 @@ void ImmersedBoundaryLinearDifferentialAdhesionForce<DIM>::AddImmersedBoundaryFo
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryLinearDifferentialAdhesionForce<DIM>::OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)
+void ImmersedBoundaryLinearDifferentialAdhesionForce<DIM>::OutputImmersedBoundaryForceParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<LabelledCellToLabelledCellSpringConst>" << mLabelledCellToLabelledCellSpringConst << "</LabelledCellToLabelledCellSpringConst>\n";
     *rParamsFile << "\t\t\t<LabelledCellToCellSpringConst>" << mLabelledCellToCellSpringConst << "</LabelledCellToCellSpringConst>\n";
@@ -135,7 +139,8 @@ double ImmersedBoundaryLinearDifferentialAdhesionForce<DIM>::GetRestLength() con
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryLinearDifferentialAdhesionForce<DIM>::SetRestLength(double restLength)
+void ImmersedBoundaryLinearDifferentialAdhesionForce<DIM>::SetRestLength(
+    double restLength)
 {
     mRestLength = restLength;
 }
@@ -173,7 +178,8 @@ double ImmersedBoundaryLinearDifferentialAdhesionForce<DIM>::GetCellToCellSpring
 }
 
 template<unsigned int DIM>
-void ImmersedBoundaryLinearDifferentialAdhesionForce<DIM>::SetCellToCellSpringConst(double cellToCellSpringConst)
+void ImmersedBoundaryLinearDifferentialAdhesionForce<DIM>::SetCellToCellSpringConst(
+    double cellToCellSpringConst)
 {
     mCellToCellSpringConst = cellToCellSpringConst;
 }

@@ -57,7 +57,10 @@ void ImmersedBoundaryKinematicFeedbackForce<DIM>::AddImmersedBoundaryForceContri
         UpdatePreviousLocations(rCellPopulation);
     }
 
-    // Calculate force only if neither node is in a lamina, and if nodes are in different elements
+    /*
+     * Calculate force only if neither node is in a lamina, and if nodes are in 
+     * different elements.
+     */
     auto condition_satisfied = [&rCellPopulation](const std::pair<Node<DIM>*, Node<DIM>*>& pair) -> bool
     {
         // Laminas do not participate in this force class
@@ -127,22 +130,26 @@ void ImmersedBoundaryKinematicFeedbackForce<DIM>::AddImmersedBoundaryForceContri
 
 template <unsigned DIM>
 double ImmersedBoundaryKinematicFeedbackForce<DIM>::CalculateRelativeVelocityComponent(
-    const c_vector<double, DIM>& previousDisp,
-    const c_vector<double, DIM>& currentDisp,
-    c_vector<double, DIM>& unitPerp)
+    const c_vector<double, DIM>& rPreviousDisp,
+    const c_vector<double, DIM>& rCurrentDisp,
+    c_vector<double, DIM>& rUnitPerp)
 {
     // Get a unit vector perpendicular to the line joining the nodes at the previous time step
-    unitPerp = Create_c_vector(-previousDisp[1], previousDisp[0]);
-    unitPerp /= norm_2(unitPerp);
+    rUnitPerp = Create_c_vector(-rPreviousDisp[1], rPreviousDisp[0]);
+    rUnitPerp /= norm_2(rUnitPerp);
 
     // Calculate the relative velocity component in the direction of the perpendicular
-    return inner_prod(currentDisp / SimulationTime::Instance()->GetTimeStep(), unitPerp);
+    return inner_prod(rCurrentDisp / SimulationTime::Instance()->GetTimeStep(), rUnitPerp);
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryKinematicFeedbackForce<DIM>::UpdatePreviousLocations(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
+void ImmersedBoundaryKinematicFeedbackForce<DIM>::UpdatePreviousLocations(
+    ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
 {
-    // Populate the mPreviousLocations vector with the current location of nodes, so it's ready for next time step
+    /*
+     * Populate the mPreviousLocations vector with the current location of 
+     * nodes, so it's ready for next time step.
+     */
     for (const auto& p_node : rCellPopulation.rGetMesh().rGetNodes())
     {
         if (p_node->GetRegion() != LAMINA_REGION)
@@ -158,7 +165,8 @@ void ImmersedBoundaryKinematicFeedbackForce<DIM>::UpdatePreviousLocations(Immers
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryKinematicFeedbackForce<DIM>::OutputImmersedBoundaryForceParameters(out_stream& rParamsFile)
+void ImmersedBoundaryKinematicFeedbackForce<DIM>::OutputImmersedBoundaryForceParameters(
+    out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<SpringConstant>" << mSpringConst << "</SpringConstant>\n";
 
@@ -173,7 +181,8 @@ double ImmersedBoundaryKinematicFeedbackForce<DIM>::GetSpringConst() const
 }
 
 template<unsigned DIM>
-void ImmersedBoundaryKinematicFeedbackForce<DIM>::SetSpringConst(double springConst)
+void ImmersedBoundaryKinematicFeedbackForce<DIM>::SetSpringConst(
+    double springConst)
 {
     mSpringConst = springConst;
 }

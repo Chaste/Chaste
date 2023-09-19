@@ -46,28 +46,33 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 
 template <unsigned DIM>
-ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(ImmersedBoundaryMesh<DIM, DIM>& rMesh,
-                                                                    std::vector<CellPtr>& rCells,
-                                                                    bool deleteMesh,
-                                                                    bool validate,
-                                                                    const std::vector<unsigned> locationIndices)
-        : AbstractOffLatticeCellPopulation<DIM>(rMesh, rCells, locationIndices),
-          mDeleteMesh(deleteMesh),
-          mIntrinsicSpacing(0.01),
-          mPopulationHasActiveSources(false),
-          mOutputNodeRegionToVtk(false),
-          mReMeshFrequency(UINT_MAX),
-          mThrowStepSizeException(true),
-          mCellRearrangementThreshold(0.5)
+ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(
+    ImmersedBoundaryMesh<DIM, DIM>& rMesh,
+    std::vector<CellPtr>& rCells,
+    bool deleteMesh,
+    bool validate,
+    const std::vector<unsigned> locationIndices)
+    : AbstractOffLatticeCellPopulation<DIM>(rMesh, rCells, locationIndices),
+      mDeleteMesh(deleteMesh),
+      mIntrinsicSpacing(0.01),
+      mPopulationHasActiveSources(false),
+      mOutputNodeRegionToVtk(false),
+      mReMeshFrequency(UINT_MAX),
+      mThrowStepSizeException(true),
+      mCellRearrangementThreshold(0.5)
 {
     mpImmersedBoundaryMesh = static_cast<ImmersedBoundaryMesh<DIM, DIM>*>(&(this->mrMesh));
     mpImmersedBoundaryDivisionRule.reset(new ShortAxisImmersedBoundaryDivisionRule<DIM>());
 
-    // If no location indices are specified, associate with elements from the mesh (assumed to be sequentially ordered).
+    /*
+     * If no location indices are specified, associate with elements from the 
+     * mesh (assumed to be sequentially ordered).
+     */
     std::list<CellPtr>::iterator it = this->mCells.begin();
     for (unsigned i = 0; it != this->mCells.end(); ++it, ++i)
     {
-        unsigned index = locationIndices.empty() ? i : locationIndices[i]; // assume that the ordering matches
+        // Assume that the ordering matches
+        unsigned index = locationIndices.empty() ? i : locationIndices[i];
         AbstractCellPopulation<DIM, DIM>::AddCellUsingLocationIndex(index, *it);
     }
 
@@ -85,15 +90,16 @@ ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(ImmersedBoun
 }
 
 template <unsigned DIM>
-ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(ImmersedBoundaryMesh<DIM, DIM>& rMesh)
-        : AbstractOffLatticeCellPopulation<DIM>(rMesh),
-          mDeleteMesh(true),
-          mIntrinsicSpacing(0.01),
-          mPopulationHasActiveSources(false),
-          mOutputNodeRegionToVtk(false),
-          mReMeshFrequency(UINT_MAX),
-          mThrowStepSizeException(true),
-          mCellRearrangementThreshold(0.5)
+ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(
+    ImmersedBoundaryMesh<DIM, DIM>& rMesh)
+    : AbstractOffLatticeCellPopulation<DIM>(rMesh),
+      mDeleteMesh(true),
+      mIntrinsicSpacing(0.01),
+      mPopulationHasActiveSources(false),
+      mOutputNodeRegionToVtk(false),
+      mReMeshFrequency(UINT_MAX),
+      mThrowStepSizeException(true),
+      mCellRearrangementThreshold(0.5)
 {
     mpImmersedBoundaryMesh = static_cast<ImmersedBoundaryMesh<DIM, DIM>*>(&(this->mrMesh));
 }
@@ -112,7 +118,7 @@ double ImmersedBoundaryCellPopulation<DIM>::CalculateIntrinsicCellSize()
 {
     double average_intrinsic_size = 0.0;
 
-    for (typename ImmersedBoundaryMesh<DIM, DIM>::ImmersedBoundaryElementIterator elem_iter = mpImmersedBoundaryMesh->GetElementIteratorBegin();
+    for (auto elem_iter = mpImmersedBoundaryMesh->GetElementIteratorBegin();
          elem_iter != mpImmersedBoundaryMesh->GetElementIteratorEnd();
          ++elem_iter)
     {
@@ -171,10 +177,10 @@ Node<DIM>* ImmersedBoundaryCellPopulation<DIM>::GetNode(unsigned index)
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryCellPopulation<DIM>::SetInteractionDistance(double new_distance)
+void ImmersedBoundaryCellPopulation<DIM>::SetInteractionDistance(double newDistance)
 {
-    assert(new_distance >= 0.0);
-    mInteractionDistance = new_distance;
+    assert(newDistance >= 0.0);
+    mInteractionDistance = newDistance;
 }
 
 template <unsigned DIM>
@@ -226,7 +232,8 @@ double ImmersedBoundaryCellPopulation<DIM>::GetIntrinsicSpacing() const
 }
 
 template <unsigned DIM>
-std::set<unsigned> ImmersedBoundaryCellPopulation<DIM>::GetNeighbouringLocationIndices(CellPtr pCell)
+std::set<unsigned> ImmersedBoundaryCellPopulation<DIM>::GetNeighbouringLocationIndices(
+    CellPtr pCell)
 {
     return mpImmersedBoundaryMesh->GetNeighbouringElementIndices(this->GetLocationIndexUsingCell(pCell));
 }
@@ -234,7 +241,8 @@ std::set<unsigned> ImmersedBoundaryCellPopulation<DIM>::GetNeighbouringLocationI
 template <unsigned DIM>
 unsigned ImmersedBoundaryCellPopulation<DIM>::AddNode(Node<DIM>* pNewNode)
 {
-    if (pNewNode == nullptr) {
+    if (pNewNode == nullptr)
+    {
         return 0;
     }
     return mpImmersedBoundaryMesh->AddNode(pNewNode);
@@ -247,7 +255,8 @@ void ImmersedBoundaryCellPopulation<DIM>::SetNode(unsigned nodeIndex, ChastePoin
 }
 
 template <unsigned DIM>
-ImmersedBoundaryElement<DIM, DIM>* ImmersedBoundaryCellPopulation<DIM>::GetElementCorrespondingToCell(CellPtr pCell)
+ImmersedBoundaryElement<DIM, DIM>* ImmersedBoundaryCellPopulation<DIM>::GetElementCorrespondingToCell(
+    CellPtr pCell)
 {
     return mpImmersedBoundaryMesh->GetElement(this->GetLocationIndexUsingCell(pCell));
 }
@@ -265,7 +274,9 @@ unsigned ImmersedBoundaryCellPopulation<DIM>::GetNumLaminas()
 }
 
 template <unsigned DIM>
-CellPtr ImmersedBoundaryCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
+CellPtr ImmersedBoundaryCellPopulation<DIM>::AddCell(
+    CellPtr pNewCell,
+    CellPtr pParentCell)
 {
     // Get the element associated with this cell
     ImmersedBoundaryElement<DIM, DIM>* p_element = GetElementCorrespondingToCell(pParentCell);
@@ -275,6 +286,7 @@ CellPtr ImmersedBoundaryCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr p
 
     // Divide the element
     unsigned new_elem_idx = mpImmersedBoundaryMesh->DivideElementAlongGivenAxis(p_element, division_vector, true);
+
     // Associate the new cell with the element
     this->mCells.push_back(pNewCell);
 
@@ -289,7 +301,7 @@ CellPtr ImmersedBoundaryCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr p
 template <unsigned DIM>
 unsigned ImmersedBoundaryCellPopulation<DIM>::RemoveDeadCells()
 {
-    // todo - What constitutes a cell in immersed boundary
+    ///\todo - What constitutes a cell in immersed boundary
     return 0;
 }
 
@@ -325,7 +337,7 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(
 
         // Iterate over all nodes
         c_vector<double, DIM> node_location;
-        for (typename ImmersedBoundaryMesh<DIM, DIM>::NodeIterator node_iter = this->rGetMesh().GetNodeIteratorBegin(false);
+        for (auto node_iter = this->rGetMesh().GetNodeIteratorBegin(false);
             node_iter != this->rGetMesh().GetNodeIteratorEnd();
             ++node_iter)
         {
@@ -347,9 +359,9 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(
             }
 
             // Loop over the 4x4 grid which will influence the displacement of the current node
-            for (unsigned x_idx = 0; x_idx < 4; x_idx++)
+            for (unsigned x_idx = 0; x_idx < 4; ++x_idx)
             {
-                for (unsigned y_idx = 0; y_idx < 4; y_idx++)
+                for (unsigned y_idx = 0; y_idx < 4; ++y_idx)
                 {
                     // The applied velocity is weighted by the delta function
                     delta = x_deltas[x_idx] * y_deltas[y_idx];
@@ -361,7 +373,7 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(
             // Normalise by timestep
             displacement *= dt;
 
-            //If the displacement is too big, warn the user once and scale it back
+            // If the displacement is too big, warn the user once and scale it back
             if (norm_2(displacement) > characteristic_spacing)
             {
                 if (norm_2(displacement) > 10.0 * characteristic_spacing)
@@ -379,7 +391,7 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(
             node_location += displacement;
 
             // Account for periodic boundary
-            for (unsigned i = 0; i < DIM; i++)
+            for (unsigned i = 0; i < DIM; ++i)
             {
                 node_location[i] = fmod(node_location[i] + 1.0, 1.0);
             }
@@ -415,7 +427,7 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(
                 first_idx_y = unsigned(floor(source_location[1] / grid_spacing_y)) + num_grid_pts_y - 1;
 
                 // Calculate all four indices and deltas in each dimension
-                for (unsigned i = 0; i < 4; i++)
+                for (unsigned i = 0; i < 4; ++i)
                 {
                     x_indices[i] = (first_idx_x + i) % num_grid_pts_x;
                     y_indices[i] = (first_idx_y + i) % num_grid_pts_y;
@@ -425,9 +437,9 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(
                 }
 
                 // Loop over the 4x4 grid which will influence the displacement of the current node
-                for (unsigned x_idx = 0; x_idx < 4; x_idx++)
+                for (unsigned x_idx = 0; x_idx < 4; ++x_idx)
                 {
-                    for (unsigned y_idx = 0; y_idx < 4; y_idx++)
+                    for (unsigned y_idx = 0; y_idx < 4; ++y_idx)
                     {
                         // The applied velocity is weighted by the delta function
                         delta = x_deltas[x_idx] * y_deltas[y_idx];
@@ -439,7 +451,7 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(
                 // Normalise by timestep
                 displacement *= dt;
 
-                //If the displacement is too big, warn the user once and scale it back
+                // If the displacement is too big, warn the user once and scale it back
                 if (norm_2(displacement) > characteristic_spacing)
                 {
                     if (norm_2(displacement) > 10.0 * characteristic_spacing)
@@ -455,7 +467,7 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(
                 source_location += displacement;
 
                 // Account for periodic boundary
-                for (unsigned i = 0; i < DIM; i++)
+                for (unsigned i = 0; i < DIM; ++i)
                 {
                     source_location[i] = fmod(source_location[i] + 1.0, 1.0);
                 }
@@ -496,7 +508,7 @@ void ImmersedBoundaryCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
     // If the first cell has target atea property, assume there is a target area modifier in place
     if (this->Begin()->GetCellData()->HasItem("target area"))
     {
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+        for (auto cell_iter = this->Begin();
              cell_iter != this->End();
              ++cell_iter)
         {
@@ -515,7 +527,7 @@ void ImmersedBoundaryCellPopulation<DIM>::Validate()
 {
     // Check each element has only one cell attached
     std::vector<unsigned> validated_element = std::vector<unsigned>(this->GetNumElements(), 0);
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = this->Begin();
+    for (auto cell_iter = this->Begin();
          cell_iter != this->End();
          ++cell_iter)
     {
@@ -523,7 +535,7 @@ void ImmersedBoundaryCellPopulation<DIM>::Validate()
         validated_element[elem_index]++;
     }
 
-    for (unsigned i = 0; i < validated_element.size(); i++)
+    for (unsigned i = 0; i < validated_element.size(); ++i)
     {
         if (validated_element[i] == 0)
         {
@@ -540,13 +552,16 @@ void ImmersedBoundaryCellPopulation<DIM>::Validate()
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryCellPopulation<DIM>::CheckForStepSizeException(unsigned nodeIndex, c_vector<double, DIM>& displacement, double dt)
+void ImmersedBoundaryCellPopulation<DIM>::CheckForStepSizeException(
+    unsigned nodeIndex,
+    c_vector<double, DIM>& rDisplacement,
+    double dt)
 {
-    double length = boost::numeric::ublas::norm_2(displacement);
+    double length = boost::numeric::ublas::norm_2(rDisplacement);
 
     if (length > 0.5*mpImmersedBoundaryMesh->GetCellRearrangementThreshold())
     {
-        displacement *= 0.5*mpImmersedBoundaryMesh->GetCellRearrangementThreshold()/length;
+        rDisplacement *= 0.5*mpImmersedBoundaryMesh->GetCellRearrangementThreshold()/length;
 
         std::ostringstream message;
         message << "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted ";
@@ -564,25 +579,29 @@ void ImmersedBoundaryCellPopulation<DIM>::CheckForStepSizeException(unsigned nod
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryCellPopulation<DIM>::AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
+void ImmersedBoundaryCellPopulation<DIM>::AcceptPopulationWriter(
+    boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
 {
     pPopulationWriter->Visit(this);
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryCellPopulation<DIM>::AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter)
+void ImmersedBoundaryCellPopulation<DIM>::AcceptPopulationEventWriter(
+    boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter)
 {
     pPopulationEventWriter->Visit(this);
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryCellPopulation<DIM>::AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
+void ImmersedBoundaryCellPopulation<DIM>::AcceptPopulationCountWriter(
+    boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
 {
     pPopulationCountWriter->Visit(this);
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryCellPopulation<DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
+void ImmersedBoundaryCellPopulation<DIM>::AcceptCellWriter(
+    boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
 {
     pCellWriter->VisitCell(pCell, this);
 }
@@ -600,7 +619,8 @@ double ImmersedBoundaryCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
+void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(
+    const std::string& rDirectory)
 {
 #ifdef CHASTE_VTK
     // Create mesh writer for VTK output
@@ -611,7 +631,9 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
     const std::vector<std::vector<unsigned>>& r_elem_parts = mesh_writer.rGetElementParts();
 
     // Iterate over any cell writers that are present
-    for (auto cell_writer_iter = this->mCellWriters.begin(); cell_writer_iter != this->mCellWriters.end(); ++cell_writer_iter)
+    for (auto cell_writer_iter = this->mCellWriters.begin();
+         cell_writer_iter != this->mCellWriters.end();
+         ++cell_writer_iter)
     {
         // Create vector to store VTK cell data
         std::vector<double> vtk_cell_data;
@@ -621,7 +643,10 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
              elem_iter != mpImmersedBoundaryMesh->GetElementIteratorEnd();
              ++elem_iter)
         {
-            // Get index of this element in the mesh, and the number of parts it is broken into for visualisation
+            /*
+             * Get index of this element in the mesh, and the number of parts it 
+             * is broken into for visualisation.
+             */
             const unsigned elem_index = elem_iter->GetIndex();
             const auto num_elem_parts = r_elem_parts[elem_index].empty() ? 1 : r_elem_parts[elem_index].size();
 
@@ -629,15 +654,21 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
             CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
             assert(p_cell);
 
-            // Populate the vector of VTK cell data.  We loop over the number of output cells as this takes into
-            // account that some elements will be broken into pieces for visualisation
-            for (unsigned elem_part = 0; elem_part < num_elem_parts; elem_part++)
+            /*
+             * Populate the vector of VTK cell data. We loop over the number of 
+             * output cells as this takes into account that some elements will 
+             * be broken into pieces for visualisation.
+             */
+            for (unsigned elem_part = 0; elem_part < num_elem_parts; ++elem_part)
             {
                 vtk_cell_data.push_back((*cell_writer_iter)->GetCellDataForVtkOutput(p_cell, this));
             }
         }
 
-        // Iterate over immersed boundary laminas (no associated cell) to ensure vtk_cell_data is the correct size
+        /*
+         * Iterate over immersed boundary laminas (no associated cell) to ensure 
+         * vtk_cell_data is the correct size.
+         */
         for (auto lam_iter = mpImmersedBoundaryMesh->GetLaminaIteratorBegin();
              lam_iter != mpImmersedBoundaryMesh->GetLaminaIteratorEnd();
              ++lam_iter)
@@ -648,12 +679,15 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
         mesh_writer.AddCellData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
     }
 
-    // When outputting any CellData, we assume that the first cell is representative of all cells
+    /*
+     * When outputting any CellData, we assume that the first cell is 
+     * representative of all cells.
+     */
     const unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
     std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
 
     std::vector<std::vector<double>> cell_data;
-    for (unsigned var = 0; var < num_cell_data_items; var++)
+    for (unsigned var = 0; var < num_cell_data_items; ++var)
     {
         std::vector<double> cell_data_var;
         cell_data.push_back(cell_data_var);
@@ -664,7 +698,10 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
          elem_iter != mpImmersedBoundaryMesh->GetElementIteratorEnd();
          ++elem_iter)
     {
-        // Get index of this element in the mesh, and the number of parts it is broken into for visualisation
+        /*
+         * Get index of this element in the mesh, and the number of parts it is 
+         * broken into for visualisation.
+         */
         const unsigned elem_index = elem_iter->GetIndex();
         const auto num_elem_parts = r_elem_parts[elem_index].empty() ? 1 : r_elem_parts[elem_index].size();
 
@@ -674,27 +711,33 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
 
         for (unsigned var = 0; var < num_cell_data_items; var++)
         {
-            // Populate the vector of VTK cell data.  We loop over the number of output cells as this takes into
-            // account that some elements will be broken into pieces for visualisation
-            for (unsigned elem_part = 0; elem_part < num_elem_parts; elem_part++)
+            /*
+             * Populate the vector of VTK cell data. We loop over the number of 
+             * output cells as this takes into account that some elements will 
+             * be broken into pieces for visualisation.
+             */
+            for (unsigned elem_part = 0; elem_part < num_elem_parts; ++elem_part)
             {
                 cell_data[var].push_back(p_cell->GetCellData()->GetItem(cell_data_names[var]));
             }
         }
     }
 
-    // Iterate over immersed boundary laminas (no associated cell) to ensure cell_data is the correct size
+    /*
+     * Iterate over immersed boundary laminas (no associated cell) to ensure 
+     * cell_data is the correct size.
+     */
     for (auto lam_iter = mpImmersedBoundaryMesh->GetLaminaIteratorBegin();
          lam_iter != mpImmersedBoundaryMesh->GetLaminaIteratorEnd();
          ++lam_iter)
     {
-        for (unsigned var = 0; var < num_cell_data_items; var++)
+        for (unsigned var = 0; var < num_cell_data_items; ++var)
         {
             cell_data[var].push_back(DOUBLE_UNSET);
         }
     }
 
-    for (unsigned var = 0; var < num_cell_data_items; var++)
+    for (unsigned var = 0; var < num_cell_data_items; ++var)
     {
         mesh_writer.AddCellData(cell_data_names[var], cell_data[var]);
     }
@@ -703,7 +746,7 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
     if (mOutputNodeRegionToVtk)
     {
         std::vector<double> node_regions;
-        for (typename ImmersedBoundaryMesh<DIM, DIM>::NodeIterator node_iter = mpImmersedBoundaryMesh->GetNodeIteratorBegin();
+        for (auto node_iter = mpImmersedBoundaryMesh->GetNodeIteratorBegin();
              node_iter != mpImmersedBoundaryMesh->GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -727,7 +770,8 @@ void ImmersedBoundaryCellPopulation<DIM>::WriteVtkResultsToFile(const std::strin
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryCellPopulation<DIM>::OpenWritersFiles(OutputFileHandler& rOutputFileHandler)
+void ImmersedBoundaryCellPopulation<DIM>::OpenWritersFiles(
+    OutputFileHandler& rOutputFileHandler)
 {
     if (this->mOutputResultsForChasteVisualizer)
     {
@@ -741,7 +785,8 @@ void ImmersedBoundaryCellPopulation<DIM>::OpenWritersFiles(OutputFileHandler& rO
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryCellPopulation<DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
+void ImmersedBoundaryCellPopulation<DIM>::OutputCellPopulationParameters(
+    out_stream& rParamsFile)
 {
     // Add the division rule parameters
     *rParamsFile << "\t\t<ImmersedBoundaryDivisionRule>\n";
@@ -760,7 +805,8 @@ double ImmersedBoundaryCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 }
 
 template <unsigned DIM>
-std::set<unsigned> ImmersedBoundaryCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned index)
+std::set<unsigned> ImmersedBoundaryCellPopulation<DIM>::GetNeighbouringNodeIndices(
+    unsigned index)
 {
     return mpImmersedBoundaryMesh->GetNeighbouringNodeIndices(index);
 }
@@ -770,8 +816,8 @@ TetrahedralMesh<DIM, DIM>* ImmersedBoundaryCellPopulation<DIM>::GetTetrahedralMe
 {
     // This method only works in 2D sequential
     assert(PetscTools::IsSequential());
-    if constexpr (DIM == 2) {
-        
+    if constexpr (DIM == 2)
+    {        
         unsigned num_vertex_nodes = mpImmersedBoundaryMesh->GetNumNodes();
         unsigned num_vertex_elements = mpImmersedBoundaryMesh->GetNumElements();
         
@@ -805,7 +851,9 @@ TetrahedralMesh<DIM, DIM>* ImmersedBoundaryCellPopulation<DIM>::GetTetrahedralMe
         
         // Now write an additional node at each ImmersedBoundaryElement's centroid
         unsigned num_tetrahedral_elements = 0;
-        for (unsigned vertex_elem_index=0; vertex_elem_index<num_vertex_elements; vertex_elem_index++)
+        for (unsigned vertex_elem_index = 0;
+             vertex_elem_index < num_vertex_elements;
+             ++vertex_elem_index)
         {
             unsigned index = num_vertex_nodes + vertex_elem_index;
         
@@ -828,13 +876,17 @@ TetrahedralMesh<DIM, DIM>* ImmersedBoundaryCellPopulation<DIM>::GetTetrahedralMe
         std::set<std::pair<unsigned, unsigned> > tetrahedral_edges;
         
         unsigned tetrahedral_elem_index = 0;
-        for (unsigned vertex_elem_index=0; vertex_elem_index<num_vertex_elements; vertex_elem_index++)
+        for (unsigned vertex_elem_index = 0;
+             vertex_elem_index < num_vertex_elements;
+             ++vertex_elem_index)
         {
             ImmersedBoundaryElement<DIM, DIM>* p_vertex_element = mpImmersedBoundaryMesh->GetElement(vertex_elem_index);
         
             // Iterate over nodes owned by this ImmersedBoundaryElement
             unsigned num_nodes_in_vertex_element = p_vertex_element->GetNumNodes();
-            for (unsigned local_index=0; local_index<num_nodes_in_vertex_element; local_index++)
+            for (unsigned local_index = 0;
+                 local_index < num_nodes_in_vertex_element;
+                 ++local_index)
             {
                 unsigned node_0_index = p_vertex_element->GetNodeGlobalIndex(local_index);
                 unsigned node_1_index = p_vertex_element->GetNodeGlobalIndex((local_index+1)%num_nodes_in_vertex_element);
@@ -860,7 +912,7 @@ TetrahedralMesh<DIM, DIM>* ImmersedBoundaryCellPopulation<DIM>::GetTetrahedralMe
         (*p_edge_file) << tetrahedral_edges.size() << "\t1" << std::endl;
         
         unsigned edge_index = 0;
-        for (std::set<std::pair<unsigned, unsigned> >::iterator edge_iter = tetrahedral_edges.begin();
+        for (auto edge_iter = tetrahedral_edges.begin();
              edge_iter != tetrahedral_edges.end();
              ++edge_iter)
         {
@@ -868,8 +920,8 @@ TetrahedralMesh<DIM, DIM>* ImmersedBoundaryCellPopulation<DIM>::GetTetrahedralMe
         
             // To be a boundary edge both nodes need to be boundary nodes.
             bool is_boundary_edge = false;
-            if (this_edge.first  < mpImmersedBoundaryMesh->GetNumNodes() &&
-                this_edge.second  < mpImmersedBoundaryMesh->GetNumNodes())
+            if (this_edge.first < mpImmersedBoundaryMesh->GetNumNodes() &&
+                this_edge.second < mpImmersedBoundaryMesh->GetNumNodes())
             {
                 is_boundary_edge = (mpImmersedBoundaryMesh->GetNode(this_edge.first)->IsBoundaryNode() &&
                                     mpImmersedBoundaryMesh->GetNode(this_edge.second)->IsBoundaryNode() );
@@ -892,11 +944,16 @@ TetrahedralMesh<DIM, DIM>* ImmersedBoundaryCellPopulation<DIM>::GetTetrahedralMe
         // Delete the temporary files
         output_file_handler.FindFile("").Remove();
         
-        // The original files have been deleted, it is better if the mesh object forgets about them
+        /*
+         * The original files have been deleted, it is better if the mesh object 
+         * forgets about them.
+         */
         p_mesh->SetMeshHasChangedSinceLoading();
         
         return p_mesh;
-    } else {
+    }
+    else
+    {
         EXCEPTION("ImmersedBoundaryCellPopulation::GetTetrahedralMeshForPDEModifier is only implemented in 2D");
     }
 }
@@ -910,7 +967,7 @@ bool ImmersedBoundaryCellPopulation<DIM>::IsPdeNodeAssociatedWithNonApoptoticCel
     {
         std::set<unsigned> containing_element_indices = this->GetNode(pdeNodeIndex)->rGetContainingElementIndices();
 
-        for (std::set<unsigned>::iterator iter = containing_element_indices.begin();
+        for (auto iter = containing_element_indices.begin();
              iter != containing_element_indices.end();
              iter++) //LCOV_EXCL_LINE
         {
@@ -924,8 +981,11 @@ bool ImmersedBoundaryCellPopulation<DIM>::IsPdeNodeAssociatedWithNonApoptoticCel
     else
     {
         /*
-         * This node of the tetrahedral finite element mesh is in the centre of the element of the
-         * vertex-based cell population, so we can use an offset to compute which cell to interrogate.
+         * This node of the tetrahedral finite element mesh is in the centre of 
+         * the element of the vertex-based cell population, so we can use an 
+         * offset to compute which cell to interrogate.
+         * 
+         * \todo update comment - this is an immersed boundary cell population
          */
         non_apoptotic_cell_present = !(this->GetCellUsingLocationIndex(pdeNodeIndex - this->GetNumNodes())->template HasCellProperty<ApoptoticCellProperty>());
     }
@@ -934,16 +994,19 @@ bool ImmersedBoundaryCellPopulation<DIM>::IsPdeNodeAssociatedWithNonApoptoticCel
 }
 
 template <unsigned DIM>
-double ImmersedBoundaryCellPopulation<DIM>::GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
-                                                                     std::string& rVariableName,
-                                                                     bool dirichletBoundaryConditionApplies,
-                                                                     double dirichletBoundaryValue)
+double ImmersedBoundaryCellPopulation<DIM>::GetCellDataItemAtPdeNode(
+    unsigned pdeNodeIndex,
+    std::string& rVariableName,
+    bool dirichletBoundaryConditionApplies,
+    double dirichletBoundaryValue)
 {
     unsigned num_nodes = this->GetNumNodes();
     double value = 0.0;
 
-    // Cells correspond to nodes in the centre of the vertex element; nodes on vertices have averaged values from containing cells
-
+    /*
+     * Cells correspond to nodes in the centre of the vertex element; nodes on 
+     * vertices have averaged values from containing cells.
+     */
     if (pdeNodeIndex >= num_nodes)
     {
         // Offset to relate elements in vertex mesh to nodes in tetrahedral mesh
@@ -967,7 +1030,7 @@ double ImmersedBoundaryCellPopulation<DIM>::GetCellDataItemAtPdeNode(unsigned pd
 
             // Average over data from containing elements (cells)
             std::set<unsigned> containing_elements = p_node->rGetContainingElementIndices();
-            for (std::set<unsigned>::iterator index_iter = containing_elements.begin();
+            for (auto index_iter = containing_elements.begin();
                  index_iter != containing_elements.end();
                  ++index_iter)
             {
@@ -989,7 +1052,8 @@ boost::shared_ptr<AbstractImmersedBoundaryDivisionRule<DIM> > ImmersedBoundaryCe
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryCellPopulation<DIM>::SetImmersedBoundaryDivisionRule(boost::shared_ptr<AbstractImmersedBoundaryDivisionRule<DIM> > pImmersedBoundaryDivisionRule)
+void ImmersedBoundaryCellPopulation<DIM>::SetImmersedBoundaryDivisionRule(
+    boost::shared_ptr<AbstractImmersedBoundaryDivisionRule<DIM> > pImmersedBoundaryDivisionRule)
 {
     mpImmersedBoundaryDivisionRule = pImmersedBoundaryDivisionRule;
 }
@@ -1007,13 +1071,15 @@ bool ImmersedBoundaryCellPopulation<DIM>::IsCellOnBoundary(CellPtr pCell)
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryCellPopulation<DIM>::SetIfPopulationHasActiveSources(bool hasActiveSources)
+void ImmersedBoundaryCellPopulation<DIM>::SetIfPopulationHasActiveSources(
+    bool hasActiveSources)
 {
     mPopulationHasActiveSources = hasActiveSources;
 }
 
 template <unsigned DIM>
-void ImmersedBoundaryCellPopulation<DIM>::SetOutputNodeRegionToVtk(bool outputNodeRegionsToVtk)
+void ImmersedBoundaryCellPopulation<DIM>::SetOutputNodeRegionToVtk(
+    bool outputNodeRegionsToVtk)
 {
     mOutputNodeRegionToVtk = outputNodeRegionsToVtk;
 }

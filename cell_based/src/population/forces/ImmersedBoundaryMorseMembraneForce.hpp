@@ -43,10 +43,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryCellPopulation.hpp"
 
 /**
- * A force class for use in immersed boundary simulations. This force implements Morse-potential-like links between
- * adjacent nodes in each immersed boundary. https://en.wikipedia.org/wiki/Morse_potential
- * The well width is a constant interaction strength, the rest length is an equilibrium bond distance, and the well
- * width is a parameter governing the profile of the curve.
+ * A force class for use in immersed boundary simulations. This force implements 
+ * Morse-potential-like links between adjacent nodes in each immersed boundary 
+ * (https://en.wikipedia.org/wiki/Morse_potential). The well width is a constant 
+ * interaction strength, the rest length is an equilibrium bond distance, and 
+ * the well width is a parameter governing the profile of the curve.
  */
 template <unsigned DIM>
 class ImmersedBoundaryMorseMembraneForce : public AbstractImmersedBoundaryForce<DIM>
@@ -104,7 +105,8 @@ private:
      * Helper method for AddImmersedBoundaryForceContribution.
      * Calculates forces, and can accept either an element or a lamina
      *
-     * @tparam ELEMENT_DIM either DIM or DIM-1 depending on whether receiving an element or a lamina
+     * @tparam ELEMENT_DIM either DIM or DIM-1 depending on whether receiving an 
+     *     element or a lamina
      * @param rElement the element or lamina add forces to
      * @param rCellPopulation the immersed boundary cell population
      */
@@ -122,16 +124,20 @@ public:
 
     /**
      * Overridden AddImmersedBoundaryForceContribution() method.
-     * Calculates basic elasticity in the membrane of each immersed boundary as a result of interactions.
+     * Calculates basic elasticity in the membrane of each immersed boundary as 
+     * a result of interactions.
      *
-     * @param rNodePairs reference to a vector set of node pairs between which to contribute the force
+     * @param rNodePairs reference to a vector set of node pairs between which to 
+     *     contribute the force
      * @param rCellPopulation reference to the cell population
      */
-    void AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
-                                              ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
+    void AddImmersedBoundaryForceContribution(
+        std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
+        ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
 
     /**
      * Overridden OutputImmersedBoundaryForceParameters() method.
+     * 
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputImmersedBoundaryForceParameters(out_stream& rParamsFile);

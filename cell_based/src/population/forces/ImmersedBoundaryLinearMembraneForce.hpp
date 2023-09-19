@@ -43,8 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryCellPopulation.hpp"
 
 /**
- * A force class for use in immersed boundary simulations. This force implements elastic links between adjacent nodes
- * in each immersed boundary.
+ * A force class for use in immersed boundary simulations. This force implements 
+ * elastic links between adjacent nodes in each immersed boundary.
  */
 template <unsigned DIM>
 class ImmersedBoundaryLinearMembraneForce : public AbstractImmersedBoundaryForce<DIM>
@@ -124,8 +124,9 @@ public:
      *                   to contribute the force
      * @param rCellPopulation reference to the cell population
      */
-    void AddImmersedBoundaryForceContribution(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
-                                              ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
+    void AddImmersedBoundaryForceContribution(
+        std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs,
+        ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
 
     /**
      * Overridden OutputImmersedBoundaryForceParameters() method.
