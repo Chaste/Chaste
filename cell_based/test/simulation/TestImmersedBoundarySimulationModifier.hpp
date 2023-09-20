@@ -246,7 +246,7 @@ public:
             modifier.PropagateForcesToFluidGrid();
             
             // Check that there are only 16 non-zero entries per grid
-            unsigned nonZeroEntriesCount = 0;
+            unsigned non_zero_entries_count = 0;
             for (unsigned grid = 0; grid <= 1; ++grid)
             {
                 for (unsigned x = 0; x < modifier.mpMesh->GetNumGridPtsX(); ++x)
@@ -255,12 +255,12 @@ public:
                     {
                         if (r_force_grids[grid][x][y] != 0.0)
                         {
-                            nonZeroEntriesCount += 1;
+                            non_zero_entries_count += 1;
                         }
                     }
                 }
             }
-            TS_ASSERT_EQUALS(nonZeroEntriesCount, 32u);
+            TS_ASSERT_EQUALS(non_zero_entries_count, 32u);
             
             // Check the non-zero entries' values
             TS_ASSERT_DELTA(r_force_grids[0][4][4], 0.0020, 0.0001); 
@@ -350,15 +350,14 @@ public:
 
             std::vector<ImmersedBoundaryElement<2, 2>*> elems;
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
-            
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
-            auto& balancingFluidSources = mesh.rGetBalancingFluidSources();
-            balancingFluidSources.clear();
+            auto& r_balancing_fluid_sources = mesh.rGetBalancingFluidSources();
+            r_balancing_fluid_sources.clear();
             
-            FluidSource<2>* fluidSource = new FluidSource<2>(0, 0.55, 0.55);
-            fluidSource->SetStrength(0.1);
-            elems.back()->SetFluidSource(fluidSource);
+            FluidSource<2>* p_fluid_source = new FluidSource<2>(0, 0.55, 0.55);
+            p_fluid_source->SetStrength(0.1);
+            elems.back()->SetFluidSource(p_fluid_source);
             
             // Set up a cell population
             std::vector<CellPtr> cells;
@@ -376,18 +375,18 @@ public:
             // Check that there are only 16 non-zero entries per grid
             auto& r_force_grids = modifier.mpArrays->rGetModifiableRightHandSideGrids(); 
 
-            unsigned nonZeroEntriesCount = 0;
+            unsigned non_zero_entries_count = 0;
             for (unsigned x = 0; x < modifier.mpMesh->GetNumGridPtsX(); ++x)
             {
                 for (unsigned y = 0; y < modifier.mpMesh->GetNumGridPtsY(); ++y)
                 {
                     if (abs(r_force_grids[2][x][y]) > 0.0001)
                     {
-                        nonZeroEntriesCount += 1;
+                        non_zero_entries_count += 1;
                     }
                 }
             }
-            TS_ASSERT_EQUALS(nonZeroEntriesCount, 16u);
+            TS_ASSERT_EQUALS(non_zero_entries_count, 16u);
             
             // Check the non-zero entries' values
             TS_ASSERT_DELTA(r_force_grids[2][4][4], 0.0536, 0.0001); 
@@ -422,15 +421,14 @@ public:
 
             std::vector<ImmersedBoundaryElement<2, 2>*> elems;
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
-            
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
-            auto& balancingFluidSources = mesh.rGetBalancingFluidSources();
-            balancingFluidSources.clear();
+            auto& r_balancing_fluid_sources = mesh.rGetBalancingFluidSources();
+            r_balancing_fluid_sources.clear();
             
-            FluidSource<2>* fluidSource = new FluidSource<2>(0, 0.55, 0.55);
-            fluidSource->SetStrength(0.1);
-            elems.back()->SetFluidSource(fluidSource);
+            FluidSource<2>* p_fluid_source = new FluidSource<2>(0, 0.55, 0.55);
+            p_fluid_source->SetStrength(0.1);
+            elems.back()->SetFluidSource(p_fluid_source);
             
             // Set up a cell population
             std::vector<CellPtr> cells;
@@ -449,18 +447,18 @@ public:
             // Check that there are only 16 non-zero entries per grid
             auto& r_force_grids = modifier.mpArrays->rGetModifiableRightHandSideGrids(); 
 
-            unsigned nonZeroEntriesCount = 0;
+            unsigned non_zero_entries_count = 0;
             for (unsigned x = 0; x < modifier.mpMesh->GetNumGridPtsX(); ++x)
             {
                 for (unsigned y = 0; y < modifier.mpMesh->GetNumGridPtsY(); ++y)
                 {
                     if (abs(r_force_grids[2][x][y]) > 0.0001)
                     {
-                        nonZeroEntriesCount += 1;
+                        non_zero_entries_count += 1;
                     }
                 }
             }
-            TS_ASSERT_EQUALS(nonZeroEntriesCount, 16u);
+            TS_ASSERT_EQUALS(non_zero_entries_count, 16u);
             
             // Check the non-zero entries' values
             TS_ASSERT_DELTA(r_force_grids[2][4][4], 0.0536, 0.0001); 
