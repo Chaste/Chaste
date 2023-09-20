@@ -101,7 +101,7 @@ public:
     /**
      * Destructor.
      */
-    virtual ~ImmersedBoundaryElement() = default;
+    virtual ~ImmersedBoundaryElement();
 
     /**
      * Set mpFluidSource.
