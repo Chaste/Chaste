@@ -56,7 +56,7 @@ ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElement(unsigne
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::~ImmersedBoundaryElement()
+ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::~ImmersedBoundaryElement()
 {
     if (mpFluidSource != nullptr)
     {
