@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
@@ -77,7 +78,7 @@ public:
     {
         // Create a simple 2D VertexMesh
         HoneycombVertexMeshGenerator generator(5, 5, false, 0.1, 0.5);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Translate mesh so that some points are below y=0
         p_mesh->Translate(0.0, -3.0);

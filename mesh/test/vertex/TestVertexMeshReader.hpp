@@ -135,7 +135,7 @@ public:
     void TestPermutedNodesFail()
     {
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/baddata/vertex_mesh_permuted_nodes");
-        TS_ASSERT_THROWS_THIS(for(unsigned i=0;i<mesh_reader.GetNumNodes();i++){mesh_reader.GetNextNode();}, "Data for node 3 missing")
+        TS_ASSERT_THROWS_THIS(for (unsigned i=0; i<mesh_reader.GetNumNodes(); i++) {mesh_reader.GetNextNode();}, "Data for node 3 missing")
     }
 
     /**

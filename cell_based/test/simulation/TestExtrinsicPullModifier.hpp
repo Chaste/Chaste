@@ -56,7 +56,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FarhadifarForce.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "VertexBasedCellPopulation.hpp"
-#include "SimpleTargetAreaModifier.hpp"
 #include "CellsGenerator.hpp"
 #include "Warnings.hpp"
 #include "FileComparison.hpp"
@@ -72,7 +71,7 @@ public:
 
         // Create a simple 2D VertexBasedCellPopulation
         HoneycombVertexMeshGenerator generator(2, 2);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
@@ -155,7 +154,7 @@ public:
 
         // Create a simple 2D VertexBasedCellPopulation
         HoneycombVertexMeshGenerator generator(2, 2);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create some cells, each with a cell-cycle model and srn that incorporates a delta-notch ODE system
         std::vector<CellPtr> cells;

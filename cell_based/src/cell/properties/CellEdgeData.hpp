@@ -50,16 +50,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 /**
- * Data associated with the cell's edges, for use when cells are physically represented as a VertexMesh.
- * Each data item is an array that has the same size and in the same order as edges in cell's associated VertexElement.
+ * Data associated with the cell's edges, for use when cells are physically 
+ * represented as a VertexMesh. Each data item is an array that has the same 
+ * size and in the same order as edges in cell's associated VertexElement.
  */
 class CellEdgeData : public AbstractCellProperty
 {
 private:
 
-    /**
-     * The cell edge data.
-     */
+    /** The cell edge data. */
     std::map<std::string, std::vector<double>> mCellEdgeData;
 
     /** Needed for serialization. */
@@ -89,16 +88,16 @@ public:
      * This assigns the cell edge data vector.
      *
      * @param rVariableName the name of the data to be set.
-     * @param data the vector of values to set it to.
+     * @param rData the vector of values to set it to.
      */
-    void SetItem(const std::string& rVariableName, const std::vector<double> &data);
+    void SetItem(const std::string& rVariableName, const std::vector<double>& rData);
 
     /**
      * Retrieves the cell edge data array.
+     * Throws if rVariableName has not been stored.
      *
-     * @param rVariableName the index of the data required.
-     * throws if rVariableName has not been stored
-     *
+     * @param rVariableName the name of the data to get.
+     * 
      * @return An array of cell edge data
      */
     std::vector<double> GetItem(const std::string& rVariableName) const;
@@ -106,14 +105,14 @@ public:
     /**
      * Retrieves the data of rVariableName at index
      *
-     * @param rVariableName
-     * @param index
+     * @param rVariableName the name of the data to get.
+     * @param index the index of the data of rVariableName
+     * 
      * @return A single value in the data array.
      */
-    double GetItemAtIndex(const std::string& rVariableName, const unsigned int index);
+    double GetItemAtIndex(const std::string& rVariableName, const unsigned index);
 
     /**
-     *
      * @return number of data items
      */
     unsigned GetNumItems() const;
@@ -130,4 +129,4 @@ public:
 // Declare identifier for the serializer
 CHASTE_CLASS_EXPORT(CellEdgeData)
 
-#endif //CELLEDGEDATA_HPP_
+#endif /* CELLEDGEDATA_HPP_ */

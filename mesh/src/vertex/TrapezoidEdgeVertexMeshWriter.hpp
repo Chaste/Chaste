@@ -136,7 +136,7 @@ public:
      */
     ~TrapezoidEdgeVertexMeshWriter();
 
-    void WriteFiles() override;
+    void WriteFiles();
 };
 
 #endif /*TRAPEZOIDEDGEVERTEXMESHWRITER_HPP_*/

@@ -89,12 +89,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "NagaiHondaDifferentialAdhesionForce.hpp"
 
-/*
- * Similar to the {{{NagaiHondaForce}}}, this force law requires a child class of {{{AbstractTargetAreaModifier}}} which
- * assigns target areas to each cell and updates this information in each time step. Here, we use the {{{SimpleTargetAreaModifier}}}.
- */
-#include "SimpleTargetAreaModifier.hpp"
-
 /* Having included all the necessary header files, we proceed by defining the test class. */
 class TestRunningDifferentialAdhesionSimulationsTutorial : public AbstractCellBasedTestSuite
 {
@@ -112,7 +106,7 @@ public:
     {
         /* First we create a regular vertex mesh. Here we choose to set the value of the cell rearrangement threshold. */
         HoneycombVertexMeshGenerator generator(5, 5);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
         p_mesh->SetCellRearrangementThreshold(0.1);
 
         /* We then create some cells using the helper class {{{CellsGenerator}}}. Note that in this simulation
@@ -174,12 +168,6 @@ public:
         p_force->SetNagaiHondaCellBoundaryAdhesionEnergyParameter(12.0);
         p_force->SetNagaiHondaLabelledCellBoundaryAdhesionEnergyParameter(40.0);
         simulator.AddForce(p_force);
-
-        /* A {{{NagaiHondaForceDifferentialAdhesionForce}}} assumes that each cell has been assigned a target area.
-         * The {{{SimpleTargetAreaModifier}}} will assign and update the target areas of all cells.
-         */
-        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
-        simulator.AddSimulationModifier(p_growth_modifier);
 
         /* Finally, we run the simulation. */
         simulator.Solve();

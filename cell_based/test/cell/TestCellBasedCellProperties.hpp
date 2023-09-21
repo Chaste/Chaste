@@ -129,12 +129,14 @@ public:
     {
         MAKE_PTR(CellData, p_cell_data);
 
-        TS_ASSERT_THROWS_THIS(p_cell_data->GetItem("thing1"), "The item thing1 is not stored");
+        TS_ASSERT_EQUALS(p_cell_data->HasItem("thing1"), false);
+        TS_ASSERT_THROWS_THIS(p_cell_data->GetItem("thing1"), "The item thing1 is not stored");       
 
         p_cell_data->SetItem("thing1", 1.0);
         p_cell_data->SetItem("thing2", 2.0);
         p_cell_data->SetItem("thing3", 3.0);
 
+        TS_ASSERT_EQUALS(p_cell_data->HasItem("thing1"), true);
         TS_ASSERT_DELTA(p_cell_data->GetItem("thing1"), 1.0, 1e-8);
         TS_ASSERT_DELTA(p_cell_data->GetItem("thing2"), 2.0, 1e-8);
         TS_ASSERT_DELTA(p_cell_data->GetItem("thing3"), 3.0, 1e-8);

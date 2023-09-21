@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "HoneycombMeshGenerator.hpp"
 #include "Cylindrical2dNodesOnlyMesh.hpp"
@@ -56,7 +57,7 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
@@ -90,7 +91,8 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
@@ -111,7 +113,8 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
@@ -155,7 +158,8 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
@@ -195,7 +199,8 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
@@ -251,7 +256,8 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
@@ -342,7 +348,8 @@ public:
         unsigned num_cells_across = 4;
         unsigned num_cells_up = 7;
         HoneycombMeshGenerator generator(num_cells_across,num_cells_up);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;

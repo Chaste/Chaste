@@ -91,7 +91,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * between neighbouring cells in the cell population, subject to each vertex.
  */
 #include "NagaiHondaForce.hpp"
-/* In conjunction with the {{{NagaiHondaForce}}}, we always have to use a child class of {{{AbstractTargetAreaModifier}}} as well.
+/* In conjunction with the {{{NagaiHondaForce}}}, we choose to use a child class 
+ * of {{{AbstractTargetAreaModifier}}} to model cell growth between divisions.
  * Here, we use the {{{SimpleTargetAreaModifier}}}.
  */
 #include "SimpleTargetAreaModifier.hpp"
@@ -120,7 +121,7 @@ public:
          * periodicity.
          */
          CylindricalHoneycombVertexMeshGenerator generator(6, 9);
-         Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+         boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         /* Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
          * To do this, we the `CryptCellsGenerator` helper class, which is templated over the type
@@ -135,7 +136,7 @@ public:
          */
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 1.0, 2.0, 3.0, 4.0);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true, 1.0, 2.0, 3.0, 4.0);
 
         /* Create a cell population, as before. */
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -151,9 +152,11 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_force);
         simulator.AddForce(p_force);
 
-        /* The {{{NagaiHondaForce}}} requires us to add a child class of {{{AbstractTargetAreaModifier}}} to the simulation.
-         * This modifier assigns and updates target areas to each cell throughout the simulation. The target
-         * areas are in turn used by the force law to determine the pressure forces on each vertex.
+        /* We next add a child class of {{{AbstractTargetAreaModifier}}} to the 
+         * simulation. This modifier assigns and updates target areas to each 
+         * cell throughout the simulation, modelling cell growth between 
+         * divisions. The target areas are in turn used by the force law to 
+         * determine the pressure forces on each vertex.
          */
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
@@ -199,7 +202,7 @@ public:
     {
         /* Create a cylindrical mesh, and get the cell location indices, as before. */
         CylindricalHoneycombVertexMeshGenerator generator(6, 9);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         /* Create a {{{std::vector}}} of {{{CellPtr}}}s.
          * Generate cells, which are assigned a {{{SimpleWntCellCycleModel}}} using
@@ -208,7 +211,7 @@ public:
          */
         std::vector<CellPtr> cells;
         CryptCellsGenerator<SimpleWntCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         /* Create a cell population, as before. */
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);

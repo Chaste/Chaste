@@ -100,8 +100,8 @@ public:
         // Test if the node merge operation has been recorded properly
         auto operation_recorder = vertex_mesh.GetOperationRecorder();
         const std::vector<EdgeOperation>& edge_operations = operation_recorder->GetEdgeOperations();
-        const unsigned int n_operations = edge_operations.size();
-        TS_ASSERT_EQUALS(n_operations, 1u);
+        const unsigned num_operations = edge_operations.size();
+        TS_ASSERT_EQUALS(num_operations, 1u);
         TS_ASSERT_EQUALS(edge_operations[0].GetOperation(), EDGE_OPERATION_NODE_MERGE);
 
         // Test the mesh is correctly updated
@@ -246,7 +246,7 @@ public:
 
         MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
-        //For testing edge operations
+        // For testing edge operations
         vertex_mesh.SetMeshOperationTracking(true);
 
         // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
@@ -258,19 +258,25 @@ public:
         // Test if the swap has been recorded properly
         auto operation_recorder = vertex_mesh.GetOperationRecorder();
         const std::vector<EdgeOperation>& edge_operations = operation_recorder->GetEdgeOperations();
-        const unsigned int n_operations = edge_operations.size();
-        //Two node merging operations in two elements and two new edge operations in the other two elements
-        TS_ASSERT_EQUALS(n_operations, 4u);
-        unsigned n_node_merges= 0, n_new_edges= 0;
-        for (unsigned int i=0; i<n_operations; ++i)
+        const unsigned num_operations = edge_operations.size();
+    
+        // Two node merging operations in two elements and two new edge operations in the other two elements
+        TS_ASSERT_EQUALS(num_operations, 4u);
+        unsigned num_node_merges = 0;
+        unsigned num_new_edges = 0;
+        for (unsigned i=0; i<num_operations; ++i)
         {
             if (edge_operations[i].GetOperation() == EDGE_OPERATION_NODE_MERGE)
-                n_node_merges++;
+            {
+                num_node_merges++;
+            }
             if (edge_operations[i].GetOperation() == EDGE_OPERATION_ADD)
-                n_new_edges++;
+            {
+                num_new_edges++;
+            }
         }
-        TS_ASSERT_EQUALS(n_node_merges, 2u);
-        TS_ASSERT_EQUALS(n_node_merges, 2u);
+        TS_ASSERT_EQUALS(num_node_merges, 2u);
+        TS_ASSERT_EQUALS(num_node_merges, 2u);
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
@@ -986,16 +992,19 @@ public:
         // Test if the swap has been recorded properly
         auto operation_recorder = vertex_mesh.GetOperationRecorder();
         const std::vector<EdgeOperation>& edge_operations = operation_recorder->GetEdgeOperations();
-        const unsigned int n_operations = edge_operations.size();
-        //Two node merging operations in two elements and two new edge operations in the other two elements
-        TS_ASSERT_EQUALS(n_operations, 3u);
-        unsigned n_node_merges= 0;
-        for (unsigned int i=0; i<n_operations; ++i)
+        const unsigned num_operations = edge_operations.size();
+
+        // Two node merging operations in two elements and two new edge operations in the other two elements
+        TS_ASSERT_EQUALS(num_operations, 3u);
+        unsigned num_node_merges = 0;
+        for (unsigned i=0; i<num_operations; ++i)
         {
             if (edge_operations[i].GetOperation() == EDGE_OPERATION_NODE_MERGE)
-                n_node_merges++;
+            {
+                num_node_merges++;
+            }
         }
-        TS_ASSERT_EQUALS(n_node_merges, 3u);
+        TS_ASSERT_EQUALS(num_node_merges, 3u);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 3u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 4u);
@@ -1796,23 +1805,28 @@ public:
         // Test if the swap has been recorded properly
         auto operation_recorder = mesh.GetOperationRecorder();
         const std::vector<EdgeOperation>& edge_operations = operation_recorder->GetEdgeOperations();
-        const unsigned int n_operations = edge_operations.size();
+        const unsigned num_operations = edge_operations.size();
         //Two node merging operations in two elements and two new edge operations in the other two elements
-        TS_ASSERT_EQUALS(n_operations, 8u);
-        unsigned n_edge_splits= 0, n_new_edges= 0;
-        std::vector<std::vector<unsigned int> > element_to_operations(5);
-        for (unsigned int i=0; i<n_operations; ++i)
+        TS_ASSERT_EQUALS(num_operations, 8u);
+        unsigned num_edge_splits = 0;
+        unsigned num_new_edges = 0;
+        std::vector<std::vector<unsigned> > element_to_operations(5);
+        for (unsigned i=0; i<num_operations; ++i)
         {
             if (edge_operations[i].GetOperation() == EDGE_OPERATION_SPLIT)
-                n_edge_splits++;
+            {
+                num_edge_splits++;
+            }
             if (edge_operations[i].GetOperation() == EDGE_OPERATION_ADD)
-                n_new_edges++;
-            //Determine operations that an element underwent
-            const unsigned int elem_index = edge_operations[i].GetElementIndex();
+            {
+                num_new_edges++;
+            }
+            // Determine operations that an element underwent
+            const unsigned elem_index = edge_operations[i].GetElementIndex();
             element_to_operations[elem_index].push_back(edge_operations[i].GetOperation());
         }
-        TS_ASSERT_EQUALS(n_edge_splits, 5u);
-        TS_ASSERT_EQUALS(n_new_edges, 3);
+        TS_ASSERT_EQUALS(num_edge_splits, 5u);
+        TS_ASSERT_EQUALS(num_new_edges, 3u);
 
         // Save the mesh data using mesh writers
         std::string dirname = "TempyTempy";
@@ -1899,7 +1913,7 @@ public:
 
         // Test T3 swap Location clearing
         mesh.ClearLocationsOfT3Swaps();
-        swap_info = mesh.GetOperationRecorder()->GetT3SwapsInfo();;
+        swap_info = mesh.GetOperationRecorder()->GetT3SwapsInfo();
         TS_ASSERT_EQUALS(swap_info.size(), 0u);
 
         // Retrieve the archive

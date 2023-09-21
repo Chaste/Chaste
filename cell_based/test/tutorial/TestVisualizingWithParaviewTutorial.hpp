@@ -122,7 +122,7 @@ public:
          * with no differentiation.
          */
         HoneycombMeshGenerator generator(10, 10);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
@@ -211,7 +211,7 @@ public:
          * in the x direction.
          */
         CylindricalHoneycombMeshGenerator generator(10, 10, 2);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         std::vector<CellPtr> cells;
@@ -276,7 +276,7 @@ public:
          * UserTutorials/RunningNodeBasedSimulations.
          */
         HoneycombMeshGenerator generator(10, 10, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
@@ -333,7 +333,7 @@ public:
          * cell-cycle model (with differentiation after a default number of generations).
          */
         HoneycombVertexMeshGenerator generator(6, 9);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -351,8 +351,8 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        /* We also make a pointer to target area modifier and add it to the simulator.
-         * The target area modifier assigns target areas to cells throughout the simulation.
+        /* We also make a pointer to a target area modifier and add it to the simulator.
+         * The target area modifier assigns target areas to cells throughout the simulation, modelling cell growth.
          */
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);

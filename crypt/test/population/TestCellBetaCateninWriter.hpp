@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/shared_ptr.hpp>
 #include "ArchiveOpener.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "FileComparison.hpp"
@@ -59,13 +60,13 @@ public:
 
         // Set up a small MeshBasedCellPopulationWithGhostNodes using an appropriate cell-cycle model class
         CylindricalHoneycombMeshGenerator generator(5, 4, 1);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
         double domain_length_for_wnt = 4.0*(sqrt(3.0)/2);
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         std::vector<CellPtr> cells;
         CryptCellsGenerator<VanLeeuwen2009WntSwatCellCycleModelHypothesisOne> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, false);
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, false);
 
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
 

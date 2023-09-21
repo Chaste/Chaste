@@ -150,7 +150,7 @@ public:
         unsigned num_cells_width = 6;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 2);
 
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Set up cells
@@ -288,7 +288,7 @@ public:
 
         double scale_factor = 1.2;
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, scale_factor);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
@@ -595,7 +595,7 @@ public:
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, thickness_of_ghosts);
 
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Set up cells
@@ -1003,7 +1003,7 @@ public:
     {
         // Create a small honeycomb mesh surrounded by a single layer of ghost nodes
         HoneycombMeshGenerator generator(2, 2, 1);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Create some cells
@@ -1166,7 +1166,7 @@ public:
         unsigned num_cells_width = 6;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 2);
 
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Set up cells
@@ -1205,7 +1205,7 @@ public:
     void TestGetTetrahedralMeshForPdeModifier()
     {
         HoneycombMeshGenerator generator(2, 2, 2);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         std::vector<CellPtr> cells;
@@ -1226,7 +1226,7 @@ public:
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, num_ghost_nodes);
 
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
         p_mesh->Scale(0.9,0.9);
 
         std::vector<unsigned> location_indices;

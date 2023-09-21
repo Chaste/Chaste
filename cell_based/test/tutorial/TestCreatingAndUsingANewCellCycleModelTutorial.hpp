@@ -386,7 +386,7 @@ public:
          */
         HoneycombMeshGenerator generator(10, 10, 0);
         /* Get the mesh using the {{{GetCircularMesh()}}} method. */
-        MutableMesh<2,2>* p_mesh = generator.GetCircularMesh(5);
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetCircularMesh(5);
 
         /* Next, we create some cells. First, define the cells vector. */
         std::vector<CellPtr> cells;

@@ -87,7 +87,7 @@ void AbstractCellCycleModelOdeSolver::CheckForStoppingEvents()
 #endif //CHASTE_CVODE
 }
 
-void AbstractCellCycleModelOdeSolver::SetMaxSteps(long int numSteps)
+void AbstractCellCycleModelOdeSolver::SetMaxSteps(long numSteps)
 {
 #ifdef CHASTE_CVODE
     assert(IsSetUp());

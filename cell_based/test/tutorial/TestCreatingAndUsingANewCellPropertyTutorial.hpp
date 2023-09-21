@@ -352,7 +352,7 @@ public:
          * circular domain of given radius, and use this to generate a {{{NodesOnlyMesh}}}
          * as follows. */
         HoneycombMeshGenerator generator(10, 10);
-        MutableMesh<2,2>* p_generating_mesh = generator.GetCircularMesh(5);
+        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetCircularMesh(5);
 
         NodesOnlyMesh<2> mesh;
         /* We construct the mesh using the generating mesh and a cut-off 1.5 which defines the

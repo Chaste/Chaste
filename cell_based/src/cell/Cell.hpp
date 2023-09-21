@@ -92,9 +92,6 @@ class Cell : private boost::noncopyable, public boost::enable_shared_from_this<C
 {
 private:
 
-    /** Caches the result of ReadyToDivide() so Divide() can look at it. */
-    bool mCanDivide;
-
     /** Needed for serialization. */
     friend class boost::serialization::access;
     /**
@@ -120,6 +117,9 @@ private:
     }
 
 protected:
+
+    /** Caches the result of ReadyToDivide() so Divide() can look at it. */
+    bool mCanDivide;
 
     /** The cell's property collection. */
     CellPropertyCollection mCellPropertyCollection;
@@ -151,8 +151,9 @@ protected:
     /** Whether the cell is being tracked specially. */
     bool mIsLogged;
 
-    /**Whether the cell has SRN associated to it*/
+    /** Whether the cell has a sub-cellular reaction network (SRN) system of ODEs associated with it. */
     bool mHasSrnModel;
+
 public:
 
     /**
@@ -176,7 +177,7 @@ public:
     /**
      * Destructor, which frees the memory allocated for our cell-cycle model.
      */
-    ~Cell();
+    virtual ~Cell();
 
     /**
      * @return the cell's proliferative type.
@@ -370,7 +371,7 @@ public:
      *
      * @return the new daughter cell
      */
-    CellPtr Divide();
+    virtual CellPtr Divide();
 
     /**
      * Make the cell enter apoptosis and sets #mDeathTime using the apoptosis
@@ -412,7 +413,7 @@ public:
     bool IsLogged();
 
     /**
-     * Give the Cell an index which it passes to its children.
+     * Give the cell an index which it passes to its children.
      *
      * @param pCellAncestor the cell's ancestor
      */
@@ -430,7 +431,7 @@ public:
     unsigned GetCellId() const;
 
     /**
-     * @return True if cell has SRN model associated to it
+     * @return Whether the cell has a sub-cellular reaction network (SRN) system of ODEs associated with it
      */
     bool HasSrnModel() const;
 };
