@@ -46,7 +46,9 @@ FluidSource<SPACE_DIM>::FluidSource(unsigned index, ChastePoint<SPACE_DIM> point
 }
 
 template<unsigned SPACE_DIM>
-FluidSource<SPACE_DIM>::FluidSource(unsigned index, c_vector<double, SPACE_DIM> location)
+FluidSource<SPACE_DIM>::FluidSource(
+    unsigned index,
+    c_vector<double, SPACE_DIM> location)
     : mIndex(index),
       mLocation(location),
       mStrength(0.0),
