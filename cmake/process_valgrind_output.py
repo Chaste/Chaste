@@ -32,6 +32,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import glob
 import os
+import pathlib
 import re
 import subprocess
 import sys
@@ -165,29 +166,73 @@ class ProcessValgrind:
             m = regexp.match(output_lines[lineno])
         return result
 
+    @staticmethod
+    def get_html_head():
+        return """
+<head>
+  <style>
+    .test-green {
+      color: green;
+    }
+    .test-orange {
+      color: orange;
+    }
+    .test-red {
+      color: red;
+    }
+  </style>
+  <title>Chaste valgrind memtest output</title>
+</head>
+"""
+
+    @staticmethod
+    def get_git_info():
+        chaste_source_dir = pathlib.Path(__file__).parent.parent
+
+        try:
+            branch = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=chaste_source_dir).strip().decode("utf-8")
+        except subprocess.CalledProcessError as _:
+            branch = "unknown branch"
+
+        try:
+            commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=chaste_source_dir).strip().decode("utf-8")
+        except subprocess.CalledProcessError as _:
+            commit = "unknown commit"
+
+        return branch, commit
+
 
 if __name__ == "__main__":
+
     files = glob.glob(sys.argv[1] + '/*_valgrind.txt')
-    index_file = open(sys.argv[1] + '/index.html', 'w')
     procVal = ProcessValgrind()
+    branch, commit = ProcessValgrind.get_git_info()
+
     ok = True
-    index_file.write('<!DOCTYPE html>\n')
-    index_file.write('<html>\n')
-    index_file.write('<body>\n')
-    for file in files:
-        filename = os.path.basename(file)
-        testname = re.match('(.*)_valgrind.txt', filename).group(1)
-        status = procVal.encode_status(open(file, 'r'))
-        colour = procVal.status_colour(status)
-        disp_status = procVal.display_status(status)
-        index_file.write(f'<p> <font color="{colour}">{testname}: {disp_status} <a href="{filename}">(test output)</a>\n')
-        if colour == 'red':
-            ok = False
-    index_file.write('</body>\n')
-    index_file.write('</html>\n')
-    index_file.close()
+
+    with open(sys.argv[1] + '/index.html', 'w') as index_file:
+
+        index_file.write('<!DOCTYPE html>\n')
+        index_file.write('<html lang="en">\n')
+        index_file.write(procVal.get_html_head())
+        index_file.write('<body>\n')
+        index_file.write(f'  <h2>Memtest output for commit <a href="https://github.com/Chaste/Chaste/commit/{commit}">{commit}</a> on branch {branch}</h2>')
+        for file in files:
+            filename = os.path.basename(file)
+            testname = re.match('(.*)_valgrind.txt', filename).group(1)
+            status = procVal.encode_status(open(file, 'r'))
+            colour = procVal.status_colour(status)
+            disp_status = procVal.display_status(status)
+            index_file.write(f'  <p class="test-{colour}">{testname}: {disp_status} <a href="{filename}">(test output)</a></p>\n')
+            if colour == 'red':
+                ok = False
+        index_file.write('</body>\n')
+        index_file.write('</html>\n')
+
     if not ok:
         print('Memory testing not 100% pass rate - failing memory testing.')
         sys.exit(1)
     else:
         print('Memory testing 100% - test passed.')
+
+
