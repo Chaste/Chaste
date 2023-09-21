@@ -5,6 +5,9 @@ on:
     branches: [ "**" ]
   push:
     branches: [ "develop" ]
+  # Schedule a weekly build on Sunday at 1am after rebuilding the base image
+  schedule:
+    - cron: '0 1 * * 0'
 
 jobs:
   build:
@@ -22,6 +25,7 @@ jobs:
           chaste/develop
         flavor: latest=true
         tags: |
+          type=schedule,pattern={{date 'YYYYMMDD'}}
           type=ref,event=pr
           type=sha
         labels: |
