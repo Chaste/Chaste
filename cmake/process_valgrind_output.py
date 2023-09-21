@@ -224,7 +224,7 @@ if __name__ == "__main__":
         index_file.write('<html lang="en">\n')
         index_file.write(ProcessValgrind.get_html_head())
         index_file.write('<body>\n')
-        index_file.write(f'  <h2>{ProcessValgrind.get_index_heading()}</h2>')
+        index_file.write(f'  <h2>{ProcessValgrind.get_index_heading()}</h2>\n')
         for file in files:
             filename = os.path.basename(file)
             testname = re.match('(.*)_valgrind.txt', filename).group(1)
