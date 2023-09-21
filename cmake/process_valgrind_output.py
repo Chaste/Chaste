@@ -186,7 +186,7 @@ class ProcessValgrind:
 """
 
     @staticmethod
-    def get_git_info():
+    def _get_git_info():
         chaste_source_dir = pathlib.Path(__file__).parent.parent
 
         try:
@@ -201,12 +201,20 @@ class ProcessValgrind:
 
         return branch, commit
 
+    @staticmethod
+    def get_index_heading():
+        branch, commit = ProcessValgrind._get_git_info()
+
+        if commit == "unknown commit":
+            return f'Memtest output for {commit} on {branch}'
+        else:
+            return f'Memtest output for commit <a href="https://github.com/Chaste/Chaste/commit/{commit}">{commit}</a> on branch {branch}'
+
 
 if __name__ == "__main__":
 
     files = glob.glob(sys.argv[1] + '/*_valgrind.txt')
     procVal = ProcessValgrind()
-    branch, commit = ProcessValgrind.get_git_info()
 
     ok = True
 
@@ -214,9 +222,9 @@ if __name__ == "__main__":
 
         index_file.write('<!DOCTYPE html>\n')
         index_file.write('<html lang="en">\n')
-        index_file.write(procVal.get_html_head())
+        index_file.write(ProcessValgrind.get_html_head())
         index_file.write('<body>\n')
-        index_file.write(f'  <h2>Memtest output for commit <a href="https://github.com/Chaste/Chaste/commit/{commit}">{commit}</a> on branch {branch}</h2>')
+        index_file.write(f'  <h2>{ProcessValgrind.get_index_heading()}</h2>')
         for file in files:
             filename = os.path.basename(file)
             testname = re.match('(.*)_valgrind.txt', filename).group(1)
