@@ -24,6 +24,11 @@ jobs:
         tags: |
           type=ref,event=pr
           type=sha
+        labels: |
+          org.opencontainers.image.title=Chaste Develop Image
+          org.opencontainers.image.description=Docker Develop Image for Chaste: Cancer, Heart and Soft Tissue Environment
+          org.opencontainers.image.url=https://hub.docker.com/repository/docker/chaste/develop/general
+          org.opencontainers.image.source=https://github.com/Chaste/chaste-docker
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
       # https://github.com/docker/setup-qemu-action
