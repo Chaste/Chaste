@@ -116,7 +116,7 @@ public:
          * cells) wide, and 2 nodes high.
          */
         HoneycombMeshGenerator generator(2, 2);    // Parameters are: cells across, cells up
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         /* Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
          * To do this, we use the `CellsGenerator` helper class, which is templated over the type
@@ -228,7 +228,7 @@ public:
          * of ghost nodes to make.
          */
         HoneycombMeshGenerator generator(2, 2, 2);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         /* We only want to create cells to attach to real nodes, so we
          * use the method {{{GetCellLocationIndices}}} to get the indices

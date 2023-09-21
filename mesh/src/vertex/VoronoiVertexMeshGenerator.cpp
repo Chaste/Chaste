@@ -34,6 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "VoronoiVertexMeshGenerator.hpp"
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 
 #if BOOST_VERSION >= 105200
 
@@ -56,18 +58,6 @@ VoronoiVertexMeshGenerator::VoronoiVertexMeshGenerator(unsigned numElementsX,
 {
     this->ValidateInputAndSetMembers();
     this->GenerateVoronoiMesh();
-}
-
-VoronoiVertexMeshGenerator::~VoronoiVertexMeshGenerator()
-{
-    if (mpMesh)
-    {
-        delete mpMesh;
-    }
-    if (mpTorMesh)
-    {
-        delete mpTorMesh;
-    }
 }
 
 void VoronoiVertexMeshGenerator::GenerateVoronoiMesh()
@@ -106,18 +96,18 @@ void VoronoiVertexMeshGenerator::GenerateVoronoiMesh()
     }
 }
 
-MutableVertexMesh<2,2>* VoronoiVertexMeshGenerator::GetMesh()
+boost::shared_ptr<MutableVertexMesh<2,2> > VoronoiVertexMeshGenerator::GetMesh()
 {
     return mpMesh;
 }
 
-MutableVertexMesh<2,2>* VoronoiVertexMeshGenerator::GetMeshAfterReMesh()
+boost::shared_ptr<MutableVertexMesh<2,2> > VoronoiVertexMeshGenerator::GetMeshAfterReMesh()
 {
     mpMesh->ReMesh();
     return mpMesh;
 }
 
-Toroidal2dVertexMesh* VoronoiVertexMeshGenerator::GetToroidalMesh()
+boost::shared_ptr<Toroidal2dVertexMesh> VoronoiVertexMeshGenerator::GetToroidalMesh()
 {
     /*
      * METHOD OUTLINE:
@@ -270,7 +260,8 @@ Toroidal2dVertexMesh* VoronoiVertexMeshGenerator::GetToroidalMesh()
      *
      * We then reposition all nodes to be within the box [0, width]x[0, height] to make mesh look nicer when visualised.
      */
-    mpTorMesh = new Toroidal2dVertexMesh(width, height, new_nodes, new_elems);
+    mpTorMesh = boost::make_shared<Toroidal2dVertexMesh>(width, height, new_nodes, new_elems);
+
     mpTorMesh->ReMesh();
 
     c_vector<double, 2> min_x_y;
@@ -681,9 +672,9 @@ void VoronoiVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_vector<
     // Create a new mesh with the current vector of nodes and elements
     if (mpMesh)
     {
-        delete mpMesh;
+        mpMesh.reset();
     }
-    mpMesh = new MutableVertexMesh<2,2>(nodes, elements);
+    mpMesh = boost::make_shared<MutableVertexMesh<2,2> >(nodes, elements);
 }
 
 void VoronoiVertexMeshGenerator::ValidateInputAndSetMembers()

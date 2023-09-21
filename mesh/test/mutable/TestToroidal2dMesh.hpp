@@ -40,6 +40,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/serialization/shared_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <algorithm>
 
@@ -70,7 +72,7 @@ public:
 
 
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up, 1,1);
-        Toroidal2dMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dMesh> p_mesh = generator.GetToroidalMesh();
 
         // Reset the mesh
         p_mesh = generator.GetToroidalMesh();
@@ -148,7 +150,7 @@ public:
 
     //     // Set up a mesh which can be mirrored (no scaling in this case)
     //     ToroidalHoneycombMeshGenerator generator(cells_across, cells_up, 1 , 1);
-    //     Toroidal2dMesh* p_mesh = generator.GetToroidalMesh();
+    //     boost::shared_ptr<Toroidal2dMesh> p_mesh = generator.GetToroidalMesh();
 
     //     // Create a mirrored load of nodes for the normal remesher to work with
     //     p_mesh->CreateMirrorNodes();
@@ -259,7 +261,7 @@ public:
 
         // Set up a mesh which can be mirrored (no scaling in this case)
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up, 1 , 1);
-        Toroidal2dMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dMesh> p_mesh = generator.GetToroidalMesh();
 
         NodeMap map(p_mesh->GetNumNodes());
         p_mesh->ReMesh(map);
@@ -279,7 +281,7 @@ public:
 
         // Set up a mesh which can be mirrored (no scaling in this case)
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up, 1 , 1);
-        Toroidal2dMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dMesh> p_mesh = generator.GetToroidalMesh();
 
         unsigned num_old_nodes = p_mesh->GetNumNodes();
 
@@ -320,7 +322,7 @@ public:
 
         // Set up a mesh which can be mirrored (no scaling in this case)
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up, 1 , 1);
-        Toroidal2dMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dMesh> p_mesh = generator.GetToroidalMesh();
 
         NodeMap map(p_mesh->GetNumNodes());
         p_mesh->ReMesh(map);
@@ -338,7 +340,7 @@ public:
 
         // Set up a mesh which can be mirrored (no scaling in this case)
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up, 1 , 1);
-        Toroidal2dMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dMesh> p_mesh = generator.GetToroidalMesh();
 
         c_vector<double, 2> location1 = p_mesh->GetNode(1)->rGetLocation();
         c_vector<double, 2> location2 = p_mesh->GetNode(4)->rGetLocation();
@@ -405,7 +407,7 @@ public:
         unsigned cells_up = 3;
 
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up, 1, 1);
-        Toroidal2dMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dMesh> p_mesh = generator.GetToroidalMesh();
 
         // Move one of the nodes to near the periodic boundary
         c_vector<double, 2> new_point_location;
@@ -435,7 +437,7 @@ public:
         unsigned cells_up = 3;
 
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up, 1, 1);
-        Toroidal2dMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dMesh> p_mesh = generator.GetToroidalMesh();
 
         // Check that there are the correct number of everything
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), cells_across*cells_up);
@@ -480,7 +482,7 @@ public:
         unsigned cells_up = 3;
 
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up, 1, 1);
-        AbstractTetrahedralMesh<2,2>* const p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<AbstractTetrahedralMesh<2,2> > const p_mesh = boost::static_pointer_cast<AbstractTetrahedralMesh<2,2> >(generator.GetToroidalMesh());
 
         /*
          * You need the const above to stop a BOOST_STATIC_ASSERTION failure.
@@ -509,7 +511,7 @@ public:
 
         {
             // De-serialize and compare
-            AbstractTetrahedralMesh<2,2>* p_mesh2;
+            boost::shared_ptr<AbstractTetrahedralMesh<2,2> > p_mesh2;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -558,9 +560,6 @@ public:
                     TS_ASSERT_EQUALS(iter->GetNodeGlobalIndex(i), iter2->GetNodeGlobalIndex(i));
                 }
             }
-
-            // We now need to free the mesh, since there is no honeycomb generator to do so.
-            delete p_mesh2;
         }
     }
 
@@ -634,7 +633,7 @@ public:
         unsigned cells_up = 12;
 
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up, 1, 1);
-        Toroidal2dMesh* const p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dMesh> const p_mesh = generator.GetToroidalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->CheckIsVoronoi(), true);
 
@@ -666,7 +665,7 @@ public:
         unsigned cells_across = 4;
         unsigned cells_up = 4;
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up);
-        Toroidal2dMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dMesh> p_mesh = generator.GetToroidalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 16u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 32u);

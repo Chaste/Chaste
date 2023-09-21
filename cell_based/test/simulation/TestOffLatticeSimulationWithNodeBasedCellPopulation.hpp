@@ -248,7 +248,7 @@ public:
         unsigned num_cells_depth = 3;
         unsigned num_cells_width = 3;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 6.0;
@@ -386,7 +386,7 @@ public:
         unsigned num_cells_depth = 3;
         unsigned num_cells_width = 3;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a PeriodicdNodesOnlyMesh
         c_vector<double,2> periodic_width = zero_vector<double>(2);
@@ -526,7 +526,7 @@ public:
         unsigned num_cells_depth = 3;
         unsigned num_cells_width = 3;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a PeriodicdNodesOnlyMesh
         c_vector<double,2> periodic_width = zero_vector<double>(2);
@@ -793,7 +793,7 @@ public:
         int num_cells_depth = 5;
         int num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -849,7 +849,7 @@ public:
         int num_cells_depth = 5;
         int num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -918,7 +918,7 @@ public:
         int num_cells_depth = 5;
         int num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        TetrahedralMesh<2, 2>* p_generating_mesh = generator.GetMesh();
+         boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -990,7 +990,7 @@ public:
         int num_cells_depth = 5;
         int num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -1047,7 +1047,7 @@ public:
         unsigned num_cells_depth = 5;
         unsigned num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        TetrahedralMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -1231,7 +1231,7 @@ public:
             unsigned num_cells_depth = 3;
             unsigned num_cells_width = 3;
             HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-            TetrahedralMesh<2, 2> *p_generating_mesh = generator.GetMesh();
+            boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = generator.GetMesh();
 
             // Convert this to a NodesOnlyMesh
             NodesOnlyMesh<2> mesh;

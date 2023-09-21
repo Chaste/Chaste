@@ -138,8 +138,8 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetDataOnAllCells(
     const std::string& rDataName,
     double dataValue)
 {
-    for (auto cell_iter = this->Begin();
-         cell_iter != this->End();
+    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter=this->Begin();
+         cell_iter!=this->End();
          ++cell_iter)
     {
         cell_iter->GetCellData()->SetItem(rDataName, dataValue);

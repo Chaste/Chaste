@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "ToroidalHoneycombVertexMeshGenerator.hpp"
 #include "FileComparison.hpp"
@@ -60,7 +61,7 @@ public:
                               "A toroidal mesh was created but a normal mesh is being requested.");
 
         // Create periodic mesh
-        Toroidal2dVertexMesh* p_mesh = generator.GetToroidalMesh();
+        boost::shared_ptr<Toroidal2dVertexMesh> p_mesh = generator.GetToroidalMesh();
 
         // Test that the mesh has the correct numbers of nodes and elements
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u);

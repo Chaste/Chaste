@@ -133,7 +133,7 @@ public:
 
         /* First we create a regular vertex mesh. */
         HoneycombVertexMeshGenerator generator(5, 5);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         /* We then create some cells, each with a cell-cycle model, {{{UniformG1GenerationalCellCycleModel}}} and a subcellular reaction network model
          * {{{DeltaNotchSrnModel}}}, which
@@ -221,7 +221,7 @@ public:
          * except we now create a 'nodes-only mesh' and {{{NodeBasedCellPopulation}}}.
          */
         HoneycombMeshGenerator generator(5, 5);
-        MutableMesh<2,2>* p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2> mesh;
         /* The mechanics cut-off length (second argument) is used in this simulation to determine nearest
          * neighbours for the purpose of the Delta/Notch intercellular signalling model.

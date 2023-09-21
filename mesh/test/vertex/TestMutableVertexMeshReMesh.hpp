@@ -1913,7 +1913,7 @@ public:
 
         // Test T3 swap Location clearing
         mesh.ClearLocationsOfT3Swaps();
-        swap_info = mesh.GetOperationRecorder()->GetT3SwapsInfo();;
+        swap_info = mesh.GetOperationRecorder()->GetT3SwapsInfo();
         TS_ASSERT_EQUALS(swap_info.size(), 0u);
 
         // Retrieve the archive

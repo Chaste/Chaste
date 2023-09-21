@@ -125,14 +125,14 @@ public:
          *
          * We first create a cylindrical mesh, and get the cell location indices, exactly as before. */
         CylindricalHoneycombMeshGenerator generator(6, 9, 2);
-        Cylindrical2dMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         /* We create the cells, using the same method as before. Here, though, we use a {{{SimpleWntCellCycleModel}}}.*/
         std::vector<CellPtr> cells;
         CryptCellsGenerator<SimpleWntCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, location_indices, true);
+        cells_generator.Generate(cells, p_mesh.get(), location_indices, true);
 
         /* We now create boost shared pointers to any mutations we wish to use.
          * We need to do this using the {{{CellPropertyRegistry}}}, otherwise

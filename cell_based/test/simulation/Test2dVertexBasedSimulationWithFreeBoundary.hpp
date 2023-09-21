@@ -67,7 +67,7 @@ public:
         // make the simulation
         std::vector<CellPtr> cells;
 
-        MutableVertexMesh<2,2>* p_mesh;
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh;
         VoronoiVertexMeshGenerator mesh_generator = VoronoiVertexMeshGenerator(35,35,1,1.0);
         p_mesh = mesh_generator.GetMesh();
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);

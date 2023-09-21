@@ -480,7 +480,7 @@ public:
 
         // Create a vertex-based cell population
         HoneycombVertexMeshGenerator generator(4, 3);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -693,7 +693,7 @@ public:
 
         {
             HoneycombVertexMeshGenerator generator(4,4);
-            MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+            boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
             std::vector<CellPtr> cells;
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -805,7 +805,7 @@ public:
 
         // Test with IsolatedLabelledCellKiller
         HoneycombVertexMeshGenerator generator(4,4);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;

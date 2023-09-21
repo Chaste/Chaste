@@ -139,7 +139,7 @@ public:
 
     void TestSendAndReceiveCells()
     {
-        unsigned index_of_node_to_send = mpNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();;
+        unsigned index_of_node_to_send = mpNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();
         mpNodeBasedCellPopulation->AddNodeAndCellToSendRight(index_of_node_to_send);
         mpNodeBasedCellPopulation->AddNodeAndCellToSendLeft(index_of_node_to_send);
 
@@ -168,7 +168,7 @@ public:
 
     void TestSendAndReceiveCellsNonBlocking()
     {
-        unsigned index_of_node_to_send = mpNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();;
+        unsigned index_of_node_to_send = mpNodesOnlyMesh->GetNodeIteratorBegin()->GetIndex();
         mpNodeBasedCellPopulation->AddNodeAndCellToSendRight(index_of_node_to_send);
         mpNodeBasedCellPopulation->AddNodeAndCellToSendLeft(index_of_node_to_send);
 

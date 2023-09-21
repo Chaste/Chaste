@@ -34,6 +34,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "ToroidalHoneycombVertexMeshGenerator.hpp"
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 
 ToroidalHoneycombVertexMeshGenerator::ToroidalHoneycombVertexMeshGenerator(unsigned numElementsAcross,
    unsigned numElementsUp,
@@ -114,16 +116,16 @@ ToroidalHoneycombVertexMeshGenerator::ToroidalHoneycombVertexMeshGenerator(unsig
     double mesh_width = numElementsAcross;
     double mesh_height = 1.5*numElementsUp/sqrt(3.0);
 
-    mpMesh = new Toroidal2dVertexMesh(mesh_width, mesh_height, nodes, elements, cellRearrangementThreshold, t2Threshold);
+    mpMesh = boost::make_shared<Toroidal2dVertexMesh>(mesh_width, mesh_height, nodes, elements, cellRearrangementThreshold, t2Threshold);
 }
 
-MutableVertexMesh<2,2>* ToroidalHoneycombVertexMeshGenerator::GetMesh()
+boost::shared_ptr<MutableVertexMesh<2,2> > ToroidalHoneycombVertexMeshGenerator::GetMesh()
 {
     EXCEPTION("A toroidal mesh was created but a normal mesh is being requested.");
     return mpMesh; // Not really
 }
 
-Toroidal2dVertexMesh* ToroidalHoneycombVertexMeshGenerator::GetToroidalMesh()
+boost::shared_ptr<Toroidal2dVertexMesh> ToroidalHoneycombVertexMeshGenerator::GetToroidalMesh()
 {
-    return (Toroidal2dVertexMesh*) mpMesh;
+    return boost::static_pointer_cast<Toroidal2dVertexMesh>(mpMesh);
 }

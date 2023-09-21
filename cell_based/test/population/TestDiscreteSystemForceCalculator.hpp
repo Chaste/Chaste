@@ -60,7 +60,7 @@ public:
     {
         // Set up a cell population
         HoneycombMeshGenerator mesh_generator(7, 5, 0, 2.0);
-        MutableMesh<2,2>* p_mesh = mesh_generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = mesh_generator.GetMesh();
         std::vector<unsigned> location_indices = mesh_generator.GetCellLocationIndices();
 
         CellsGenerator<FixedG1GenerationalCellCycleModel,2> cells_generator;
@@ -150,7 +150,7 @@ public:
     {
         // Set up a cell population
         HoneycombMeshGenerator mesh_generator(7, 5, 0, 2.0);
-        MutableMesh<2,2>* p_mesh = mesh_generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = mesh_generator.GetMesh();
 
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;
@@ -219,7 +219,7 @@ public:
         // Set up a cell population
 
         HoneycombMeshGenerator mesh_generator(7, 5, 0, 2.0);
-        MutableMesh<2,2>* p_mesh = mesh_generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = mesh_generator.GetMesh();
 
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;

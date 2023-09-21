@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTPOTTSMESHWRITER_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include <boost/shared_ptr.hpp>
 
 #include <string>
 #include <fstream>
@@ -60,7 +61,7 @@ public:
     {
         // Create 2D mesh with 2 square elements
         PottsMeshGenerator<2> generator(4, 2, 2, 2, 1, 2);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Create a Potts mesh writer
         PottsMeshWriter<2> potts_mesh_writer("TestPottsMeshWriter2d", "potts_mesh_2d");
@@ -88,7 +89,7 @@ public:
     {
         // Create 3D mesh with 2 square elements
         PottsMeshGenerator<3> generator(2, 2, 1, 2, 1, 2, 2, 1, 2);
-        PottsMesh<3>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
 
         // Create a Potts mesh writer
         PottsMeshWriter<3> potts_mesh_writer("TestPottsMeshWriter3d", "potts_mesh_3d");
