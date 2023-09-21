@@ -64,7 +64,7 @@ void QuadraticMeshHelper<DIM>::AddInternalNodesToElements(AbstractTetrahedralMes
 
         // Create a set of element indices we own
         std::set<unsigned> owned_element_indices;
-        for (typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter = pMesh->GetElementIteratorBegin();
+        for (auto iter = pMesh->GetElementIteratorBegin();
              iter != pMesh->GetElementIteratorEnd();
              ++iter)
         {
@@ -74,7 +74,7 @@ void QuadraticMeshHelper<DIM>::AddInternalNodesToElements(AbstractTetrahedralMes
         const std::vector<unsigned>& r_node_perm = pMesh->rGetNodePermutation();
 
         // Add the extra nodes (1 extra node in 1D, 3 in 2D, 6 in 3D) to the element data
-        for (typename AbstractMeshReader<DIM,DIM>::ElementIterator iter = pMeshReader->GetElementIteratorBegin(owned_element_indices);
+        for (auto iter = pMeshReader->GetElementIteratorBegin(owned_element_indices);
              iter != pMeshReader->GetElementIteratorEnd();
              ++iter)
         {
@@ -149,13 +149,11 @@ void QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(AbstractTetrahedralMes
         // This counter keeps track of our position in the file.
         unsigned next_face_on_file = 0u;
 
-        for (typename AbstractTetrahedralMesh<DIM,DIM>::BoundaryElementIterator iter
-                 = pMesh->GetBoundaryElementIteratorBegin();
+        for (auto iter = pMesh->GetBoundaryElementIteratorBegin();
              iter != pMesh->GetBoundaryElementIteratorEnd();
              ++iter)
         {
-
-            // collect the nodes of this boundary element in a set
+            // Collect the nodes of this boundary element in a set
             std::set<unsigned> boundary_element_node_indices;
             for (unsigned i=0; i<DIM; i++)
             {
@@ -169,7 +167,7 @@ void QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(AbstractTetrahedralMes
             // Note, if we know what elem it should be in (boundary_element_file_has_containing_element_info==true)
             // we will reset elem_index immediately (below)
             Node<DIM>* p_representative_node = (*iter)->GetNode(0);
-            for (typename Node<DIM>::ContainingElementIterator element_iter = p_representative_node->ContainingElementsBegin();
+            for (auto element_iter = p_representative_node->ContainingElementsBegin();
                  element_iter != p_representative_node->ContainingElementsEnd();
                  ++element_iter)
             {
@@ -247,8 +245,7 @@ void QuadraticMeshHelper<DIM>::CheckBoundaryElements(AbstractTetrahedralMesh<DIM
 {
 #ifndef NDEBUG
     unsigned expected_num_nodes = DIM*(DIM+1)/2;
-    for (typename AbstractTetrahedralMesh<DIM,DIM>::BoundaryElementIterator iter
-             = pMesh->GetBoundaryElementIteratorBegin();
+    for (auto iter = pMesh->GetBoundaryElementIteratorBegin();
          iter != pMesh->GetBoundaryElementIteratorEnd();
          ++iter)
     {

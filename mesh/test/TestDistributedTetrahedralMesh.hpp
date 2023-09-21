@@ -114,7 +114,7 @@ private:
         TS_ASSERT_EQUALS(rMesh1.GetNumLocalElements(), rMesh2.GetNumLocalElements());
 
         // Check that the nodes and elements of each mesh are identical
-        for (typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator iter = rMesh1.GetElementIteratorBegin();
+        for (auto iter = rMesh1.GetElementIteratorBegin();
              iter != rMesh1.GetElementIteratorEnd();
              ++iter)
         {
@@ -136,9 +136,10 @@ private:
     void CheckEverythingIsAssigned(DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh)
     {
         /*
-         * Check for consistent partitions (i.e. you own or "halo-own" every node in every element you own.
+         * Check for consistent partitions (i.e. you own or "halo-own" every 
+         * node in every element you own.
          */
-        for (typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator iter = rMesh.GetElementIteratorBegin();
+        for (auto iter = rMesh.GetElementIteratorBegin();
              iter != rMesh.GetElementIteratorEnd();
              ++iter)
         {
@@ -153,8 +154,8 @@ private:
         /*
          * Check that nodes are numbered consecutively
          */
-        typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator prev_node = rMesh.GetNodeIteratorBegin();
-        for (typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator current_node = ++rMesh.GetNodeIteratorBegin();
+        auto prev_node = rMesh.GetNodeIteratorBegin();
+        for (auto current_node = ++rMesh.GetNodeIteratorBegin();
              current_node != rMesh.GetNodeIteratorEnd();
              ++prev_node, ++current_node)
         {

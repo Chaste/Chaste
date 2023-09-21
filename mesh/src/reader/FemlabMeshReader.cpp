@@ -159,7 +159,7 @@ std::vector < std::vector < unsigned > >
 
                 std::vector < unsigned >first_index;
                 line_stream >> item_index;
-                first_index.push_back ((unsigned) (item_index - 0.5)); // item indices should be minus 1
+                first_index.push_back(static_cast<unsigned>(item_index - 0.5)); // item indices should be minus 1
                 tokenized_data.push_back (first_index);
             }
         }
@@ -173,7 +173,7 @@ std::vector < std::vector < unsigned > >
                 double item_index;
                 line_stream >> item_index;
                 tokenized_data[current_node].
-                push_back ((unsigned) (item_index - 0.5));
+                push_back(static_cast<unsigned>(item_index - 0.5));
                 current_node++;
             }
         }

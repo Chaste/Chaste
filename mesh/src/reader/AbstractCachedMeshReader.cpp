@@ -103,14 +103,11 @@ std::vector<std::string> AbstractCachedMeshReader<ELEMENT_DIM, SPACE_DIM>::GetRa
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractCachedMeshReader<ELEMENT_DIM, SPACE_DIM>::GetMaxNodeIndex()
 {
-    // Initialize an interator for the vector of nodes
-    std::vector<std::vector<unsigned> >::iterator the_iterator;
-
     unsigned max_node_index = 0; // Nice if it were negative
 
-    for (the_iterator = mElementData.begin(); the_iterator < mElementData.end(); the_iterator++)
+    for (auto iter : mElementData)
     {
-        std::vector<unsigned> indices = *the_iterator; // the_iterator points at each line in turn
+        std::vector<unsigned> indices = iter; // the_iterator points at each line in turn
 
         for (unsigned i = 0; i < ELEMENT_DIM+1; i++)
         {
@@ -127,14 +124,11 @@ unsigned AbstractCachedMeshReader<ELEMENT_DIM, SPACE_DIM>::GetMaxNodeIndex()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractCachedMeshReader<ELEMENT_DIM, SPACE_DIM>::GetMinNodeIndex()
 {
-    // Initialize an interator for the vector of nodes
-    std::vector<std::vector<unsigned> >::iterator the_iterator;
-
     unsigned min_node_index = UINT_MAX; // A large integer
 
-    for (the_iterator = mElementData.begin(); the_iterator < mElementData.end(); the_iterator++)
+    for (auto iter : mElementData)
     {
-        std::vector<unsigned> indices = *the_iterator; // the_iterator points at each line in turn
+        std::vector<unsigned> indices = iter; // the_iterator points at each line in turn
 
         for (unsigned i = 0; i < ELEMENT_DIM+1; i++)
         {

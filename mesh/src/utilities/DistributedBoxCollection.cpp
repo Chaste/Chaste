@@ -802,11 +802,11 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                                         // Check for x periodicity
                                         // i==(nI-1) only when we are periodic and on the right,
                                         // i==-1 only when we are periodic and on the left
-                                        box_to_add += ( (unsigned)(boxi==-1) - (unsigned)(boxi==(int)nI) )*nI;
+                                        box_to_add += ( static_cast<unsigned>(boxi==-1) - static_cast<unsigned>(boxi==(int)nI) )*nI;
                                         // Check for y periodicity
                                         // j==nJ only when we are periodic and on the right,
                                         // j==-1 only when we are periodic and on the left
-                                        box_to_add += ( (unsigned)(boxj==-1) - (unsigned)(boxj==(int)nJ) )*nI*nJ;
+                                        box_to_add += ( static_cast<unsigned>(boxj==-1) - static_cast<unsigned>(boxj==(int)nJ) )*nI*nJ;
                                         local_boxes.insert( box_to_add );
                                     }
                                 }

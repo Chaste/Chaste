@@ -45,16 +45,15 @@ CellVecData::CellVecData(const CellVecData& rAnotherCellVecData)
 {
     std::vector<std::string> keys = rAnotherCellVecData.GetKeys();
 
-    for (auto iter = keys.begin(); iter != keys.end(); ++iter)
+    for (auto iter : keys)
     {
-        std::string map_key = *iter;
-        Vec map_value = rAnotherCellVecData.GetItem(map_key);
+        Vec map_value = rAnotherCellVecData.GetItem(iter);
 
         Vec map_value_copy;
         VecDuplicate(map_value, &map_value_copy);
         VecCopy(map_value, map_value_copy);
 
-        mCellVecData[map_key] = map_value_copy;
+        mCellVecData[iter] = map_value_copy;
     }
 }
 
@@ -66,12 +65,15 @@ CellVecData::CellVecData(const std::map<std::string, Vec>& rCellVecDataMap)
 
 CellVecData::~CellVecData()
 {
-    // If the object was loaded from a checkpoint, the Vecs in the map need freeing. Otherwise is the user's responsibility.
+    /*
+     * If the object was loaded from a checkpoint, the Vecs in the map need 
+     * freeing. Otherwise this is the user's responsibility.
+     */
     if (mFreeVecs)
     {
-        for (auto iter = mCellVecData.begin(); iter != mCellVecData.end(); ++iter)
+        for (auto iter : mCellVecData)
         {
-            PetscTools::Destroy(iter->second);
+            PetscTools::Destroy(iter.second);
         }
     }
 }

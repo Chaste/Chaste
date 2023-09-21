@@ -275,7 +275,7 @@ void AbstractFeCableIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_A
     // Loop over elements
     if (this->mAssembleMatrix || this->mAssembleVector)
     {
-        for (typename MixedDimensionMesh<CABLE_ELEMENT_DIM, SPACE_DIM>::CableElementIterator iter = mpMesh->GetCableElementIteratorBegin();
+        for (auto iter = mpMesh->GetCableElementIteratorBegin();
              iter != mpMesh->GetCableElementIteratorEnd();
              ++iter)
         {

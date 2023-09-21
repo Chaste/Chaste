@@ -196,7 +196,7 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool
     {
         // First create an extended mesh to include points extended from the boundary
         std::vector<Node<2> *> nodes;
-        for (typename TetrahedralMesh<2,2>::NodeIterator node_iter = mpDelaunayMesh->GetNodeIteratorBegin();
+        for (auto node_iter = mpDelaunayMesh->GetNodeIteratorBegin();
             node_iter != mpDelaunayMesh->GetNodeIteratorEnd();
             ++node_iter)
         {
@@ -1052,7 +1052,7 @@ void VertexMesh<2, 2>::ConstructFromMeshReader(AbstractMeshReader<2, 2>& rMeshRe
         if (rMeshReader.GetNumElementAttributes() > 0)
         {
             assert(rMeshReader.GetNumElementAttributes() == 1);
-            unsigned attribute_value = (unsigned)element_data.AttributeValue;
+            unsigned attribute_value = static_cast<unsigned>(element_data.AttributeValue);
             p_element->SetAttribute(attribute_value);
         }
     }
@@ -1121,7 +1121,7 @@ void VertexMesh<3, 3>::ConstructFromMeshReader(AbstractMeshReader<3, 3>& rMeshRe
             ElementData face_data = element_data.Faces[i];
 
             // Get the face index
-            unsigned face_index = (unsigned)face_data.AttributeValue;
+            unsigned face_index = static_cast<unsigned>(face_data.AttributeValue);
 
             // Get the nodes owned by this face
             std::vector<Node<3>*> nodes_in_face;

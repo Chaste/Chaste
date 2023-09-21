@@ -329,7 +329,7 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::FinaliseForBath(bool compute
 #ifndef NDEBUG
     if (computeMatrix)
     {
-        for (typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator iter=this->mpMesh->GetNodeIteratorBegin();
+        for (auto iter = this->mpMesh->GetNodeIteratorBegin();
              iter != this->mpMesh->GetNodeIteratorEnd();
              ++iter)
         {
@@ -364,8 +364,7 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::FinaliseForBath(bool compute
      *  require reassembling the matrix before GetMatrixElement which generates massive communication
      *  overhead for large models and/or large core counts.
      */
-
-    for (typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator iter=this->mpMesh->GetNodeIteratorBegin();
+    for (auto iter = this->mpMesh->GetNodeIteratorBegin();
          iter != this->mpMesh->GetNodeIteratorEnd();
          ++iter)
     {

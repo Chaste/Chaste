@@ -170,7 +170,7 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
     CountVertices();
 
 //    assert(edge_to_internal_map.size() == this->GetNumNodes()-this->GetNumVertices());
-    for (typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter = this->GetElementIteratorBegin();
+    for (auto iter = this->GetElementIteratorBegin();
          iter != this->GetElementIteratorEnd();
          ++iter)
     {
@@ -187,7 +187,7 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
         }
     }
 
-    for (typename AbstractTetrahedralMesh<DIM,DIM>::BoundaryElementIterator iter = this->GetBoundaryElementIteratorBegin();
+    for (auto iter = this->GetBoundaryElementIteratorBegin();
          iter != this->GetBoundaryElementIteratorEnd();
          ++iter)
     {
@@ -351,7 +351,7 @@ void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, u
         }
     }
     CountVertices();
-    for (typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter = this->GetElementIteratorBegin();
+    for (auto iter = this->GetElementIteratorBegin();
          iter != this->GetElementIteratorEnd();
          ++iter)
     {
@@ -393,7 +393,7 @@ void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, u
          this->mNodes[internal_index]->AddElement(iter->GetIndex());
 
     }
-    for (typename AbstractTetrahedralMesh<DIM,DIM>::BoundaryElementIterator iter = this->GetBoundaryElementIteratorBegin();
+    for (auto iter = this->GetBoundaryElementIteratorBegin();
          iter != this->GetBoundaryElementIteratorEnd();
          ++iter)
     {

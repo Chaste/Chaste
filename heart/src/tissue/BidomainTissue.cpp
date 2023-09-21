@@ -133,7 +133,7 @@ void BidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
 
         unsigned local_element_index = 0;
 
-        for (typename AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>::ElementIterator iter = (this->mpMesh)->GetElementIteratorBegin();
+        for (auto iter = (this->mpMesh)->GetElementIteratorBegin();
              iter != (this->mpMesh)->GetElementIteratorEnd();
              ++iter)
         {

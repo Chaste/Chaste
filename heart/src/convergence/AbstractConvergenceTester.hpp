@@ -123,7 +123,7 @@ public:
     {
         double x = pNode->GetPoint()[0];
         double d_level = x/mStepSize;
-        unsigned level = (unsigned) d_level;
+        unsigned level = static_cast<unsigned>(d_level);
         assert(fabs(level-d_level) < DBL_MAX); //x ought to really be a multiple of the step size
 
         if (level < mLevels)
@@ -340,8 +340,8 @@ public:
             {
                 case 1:
                 {
-                    first_quadrant_node = (unsigned) (0.25*constructor.GetNumElements());
-                    third_quadrant_node = (unsigned) (0.75*constructor.GetNumElements());
+                    first_quadrant_node = static_cast<unsigned>(0.25*constructor.GetNumElements());
+                    third_quadrant_node = static_cast<unsigned>(0.75*constructor.GetNumElements());
                     break;
                 }
                 case 2:

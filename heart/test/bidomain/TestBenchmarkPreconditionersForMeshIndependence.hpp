@@ -61,7 +61,7 @@ private:
 
     void DisplayRun(unsigned numMesh)
     {
-        unsigned num_ele_across = (unsigned) pow(2, numMesh+1);// number of elements in each dimension
+        unsigned num_ele_across = static_cast<unsigned>(pow(2, numMesh+1)); // number of elements in each dimension
         double scaling = mMeshWidth/(double) num_ele_across;
 
         std::cout<<"================================================================================"<<std::endl;
@@ -101,7 +101,7 @@ public:
             // Do I need a unique name for the output file???
             //HeartConfig::Instance()->SetOutputFilenamePrefix ("Results");
 
-            unsigned num_ele_across = (unsigned) pow(2, mesh_index+1); // number of elements in each dimension
+            unsigned num_ele_across = static_cast<unsigned>(pow(2, mesh_index+1)); // number of elements in each dimension
             GeneralPlaneStimulusCellFactory<CELL, DIM> cell_factory(num_ele_across, constructor.GetWidth());
 
             CARDIAC_PROBLEM cardiac_problem(&cell_factory);

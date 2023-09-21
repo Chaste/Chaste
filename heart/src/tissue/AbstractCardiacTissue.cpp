@@ -316,7 +316,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::CreateIntracellularConductivi
 
         unsigned local_element_index = 0;
 
-        for (typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator it = mpMesh->GetElementIteratorBegin();
+        for (auto it = mpMesh->GetElementIteratorBegin();
              it != mpMesh->GetElementIteratorEnd();
              ++it)
         {

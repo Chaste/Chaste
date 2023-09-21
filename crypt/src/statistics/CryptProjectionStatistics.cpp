@@ -89,7 +89,7 @@ std::vector<CellPtr> CryptProjectionStatistics::GetCryptSection(double angle)
 
     // Copy to a vector
     std::vector<CellPtr> ordered_cells;
-    for (auto iter = cells_list.begin(); iter != cells_list.end(); ++iter)
+    for (auto& iter : cells_list)
     {
         ordered_cells.push_back(iter->first);
     }

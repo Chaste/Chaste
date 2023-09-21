@@ -72,7 +72,7 @@ public:
         int lo, hi;
         MatGetOwnershipRange(mat, &lo, &hi);
 
-        for (unsigned i=lo; i<(unsigned)hi; i++)
+        for (unsigned i = lo; i < static_cast<unsigned>(hi); ++i)
         {
             for (unsigned j=0; j<mesh.GetNumNodes(); j++)
             {

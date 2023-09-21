@@ -351,9 +351,9 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetHaloOffset(),5.0);
 
         // Peturb some nodes so not in three rows
-        for (typename AbstractMesh<2, 2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
-         node_iter != p_mesh->GetNodeIteratorEnd();
-         ++node_iter)
+        for (auto node_iter = p_mesh->GetNodeIteratorBegin();
+             node_iter != p_mesh->GetNodeIteratorEnd();
+             ++node_iter)
         {
             c_vector<double, 2> node_location = node_iter->rGetLocation();
 

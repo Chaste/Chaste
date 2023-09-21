@@ -301,7 +301,7 @@ OdeSolution RungeKuttaFehlbergIvpOdeSolver::Solve(AbstractOdeSystem* pOdeSystem,
     std::vector<double> working_memory(rYValues.size());
     // And solve...
     OdeSolution solutions;
-    //solutions.SetNumberOfTimeSteps((unsigned)(10.0*(startTime-endTime)/timeStep));
+    //solutions.SetNumberOfTimeSteps(static_cast<unsigned>(10.0*(startTime-endTime)/timeStep));
     bool return_solution = true;
     InternalSolve(solutions, pOdeSystem, rYValues, working_memory, startTime, endTime, timeStep, 1e-5, tolerance, return_solution);
     return solutions;

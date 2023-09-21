@@ -608,23 +608,23 @@ public:
         Hdf5DataReader data_reader1=p_bidomain_problem->GetDataReader();
         std::vector<double> times = data_reader1.GetUnlimitedDimensionValues();
 
-        TS_ASSERT_EQUALS( times.size(), (unsigned) 4);
-        TS_ASSERT_DELTA( times[0], 0.00, 1e-12);
-        TS_ASSERT_DELTA( times[1], 0.10, 1e-12);
-        TS_ASSERT_DELTA( times[2], 0.20, 1e-12);
-        TS_ASSERT_DELTA( times[3], 0.30, 1e-12);
+        TS_ASSERT_EQUALS(times.size(), 4u);
+        TS_ASSERT_DELTA(times[0], 0.00, 1e-12);
+        TS_ASSERT_DELTA(times[1], 0.10, 1e-12);
+        TS_ASSERT_DELTA(times[2], 0.20, 1e-12);
+        TS_ASSERT_DELTA(times[3], 0.30, 1e-12);
 
         //Get back node over all times
         std::vector<double> node_0 = data_reader1.GetVariableOverTime("V", 0);
-        TS_ASSERT_EQUALS( node_0.size(), 4U);
-        TS_ASSERT_DELTA( node_0[0], -83.853, 1e-10);
-        TS_ASSERT_DELTA( node_0[1], -83.8354, 5e-4);
-        TS_ASSERT_DELTA( node_0[2], -83.8266, 3e-4);
-        TS_ASSERT_DELTA( node_0[3], -83.8200, 3e-4);
+        TS_ASSERT_EQUALS(node_0.size(), 4u);
+        TS_ASSERT_DELTA(node_0[0], -83.853, 1e-10);
+        TS_ASSERT_DELTA(node_0[1], -83.8354, 5e-4);
+        TS_ASSERT_DELTA(node_0[2], -83.8266, 3e-4);
+        TS_ASSERT_DELTA(node_0[3], -83.8200, 3e-4);
         std::vector<double> node_5 = data_reader1.GetVariableOverTime("V", 5);
-        TS_ASSERT_EQUALS( node_5.size(), 4U);
+        TS_ASSERT_EQUALS(node_5.size(), 4u);
         std::vector<double> node_10 = data_reader1.GetVariableOverTime("V", 10);
-        TS_ASSERT_EQUALS( node_10.size(), 4U);
+        TS_ASSERT_EQUALS(node_10.size(), 4u);
 
         //Can't read back this node as it wasn't written
         TS_ASSERT_THROWS_THIS( data_reader1.GetVariableOverTime("V", 1),
@@ -647,11 +647,11 @@ public:
         Hdf5DataReader data_reader3=p_bidomain_problem->GetDataReader();
         times = data_reader3.GetUnlimitedDimensionValues();
 
-        TS_ASSERT_EQUALS( times.size(), (unsigned) 4);
-        TS_ASSERT_DELTA( times[0], 0.00,  1e-12);
-        TS_ASSERT_DELTA( times[1], 0.10,  1e-12);
-        TS_ASSERT_DELTA( times[2], 0.20,  1e-12);
-        TS_ASSERT_DELTA( times[3], 0.30,  1e-12);
+        TS_ASSERT_EQUALS(times.size(), 4u);
+        TS_ASSERT_DELTA(times[0], 0.00, 1e-12);
+        TS_ASSERT_DELTA(times[1], 0.10, 1e-12);
+        TS_ASSERT_DELTA(times[2], 0.20, 1e-12);
+        TS_ASSERT_DELTA(times[3], 0.30, 1e-12);
 
         delete p_bidomain_problem;
         HeartEventHandler::Enable();
@@ -1058,8 +1058,8 @@ public:
 
         std::vector<unsigned> rotation_perm;
 
-        unsigned number_nodes=11;
-        for (unsigned index=0; index<(unsigned)number_nodes; index++)
+        unsigned number_nodes = 11;
+        for (unsigned index = 0; index < number_nodes; ++index)
         {
             rotation_perm.push_back( (index + 3) % number_nodes); // 3, 4, ... 0, 1, 2
         }

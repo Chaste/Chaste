@@ -190,7 +190,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckOutwardNormals()
         //If the ELEMENT_DIM of the mesh is 1 then the boundary will have ELEMENT_DIM = 0
         EXCEPTION("1-D mesh has no boundary normals");
     }
-    for (typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::BoundaryElementIterator face_iter = this->GetBoundaryElementIteratorBegin();
+    for (auto face_iter = this->GetBoundaryElementIteratorBegin();
          face_iter != this->GetBoundaryElementIteratorEnd();
          ++face_iter)
     {
@@ -203,7 +203,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckOutwardNormals()
 
         Node<SPACE_DIM>* p_opposite_node = nullptr;
         Node<SPACE_DIM>* p_representative_node = (*face_iter)->GetNode(0);
-          for (typename Node<SPACE_DIM>::ContainingElementIterator element_iter = p_representative_node->ContainingElementsBegin();
+        for (auto element_iter = p_representative_node->ContainingElementsBegin();
              element_iter != p_representative_node->ContainingElementsEnd();
              ++element_iter)
         {
@@ -587,9 +587,9 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRegularSlabMesh(d
     {
         assert(depth>0.0);
     }
-    unsigned num_elem_x=(unsigned)((width+0.5*spaceStep)/spaceStep); //0.5*spaceStep is to ensure that rounding down snaps to correct number
-    unsigned num_elem_y=(unsigned)((height+0.5*spaceStep)/spaceStep);
-    unsigned num_elem_z=(unsigned)((depth+0.5*spaceStep)/spaceStep);
+    unsigned num_elem_x = static_cast<unsigned>((width+0.5*spaceStep)/spaceStep); //0.5*spaceStep is to ensure that rounding down snaps to correct number
+    unsigned num_elem_y = static_cast<unsigned>((height+0.5*spaceStep)/spaceStep);
+    unsigned num_elem_z = static_cast<unsigned>((depth+0.5*spaceStep)/spaceStep);
 
     //Make it obvious that actual_width_x etc. are temporaries used in spotting for exception
     {
@@ -816,9 +816,9 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMaximumNodeCo
     {
         forward_star_nodes.clear();
 
-        for (typename Node<SPACE_DIM>::ContainingElementIterator it = this->mNodes[local_node_index]->ContainingElementsBegin();
-                it != this->mNodes[local_node_index]->ContainingElementsEnd();
-                ++it)
+        for (auto it = this->mNodes[local_node_index]->ContainingElementsBegin();
+             it != this->mNodes[local_node_index]->ContainingElementsEnd();
+             ++it)
         {
             Element<ELEMENT_DIM, SPACE_DIM>* p_elem = this->GetElement(*it);
             for (unsigned i=0; i<nodes_per_element; i++)
@@ -906,7 +906,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateNodeExchange(
     node_sets_to_receive_per_process.resize(PetscTools::GetNumProcs());
     std::vector<unsigned> global_lows = this->GetDistributedVectorFactory()->rGetGlobalLows();
 
-    for (typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator iter = this->GetElementIteratorBegin();
+    for (auto iter = this->GetElementIteratorBegin();
          iter != this->GetElementIteratorEnd();
          ++iter)
     {
@@ -979,9 +979,9 @@ c_vector<double, 2> AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMi
     c_vector<double, 2> min_max;
     min_max[0] = DBL_MAX;
     min_max[1] = 0.0;
-    for (typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator ele_iter = GetElementIteratorBegin();
-            ele_iter != GetElementIteratorEnd();
-            ++ele_iter)
+    for (auto ele_iter = GetElementIteratorBegin();
+         ele_iter != GetElementIteratorEnd();
+         ++ele_iter)
     {
         c_vector<double, 2> ele_min_max = ele_iter->CalculateMinMaxEdgeLengths();
         if (ele_min_max[0] < min_max[0])

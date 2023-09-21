@@ -219,9 +219,9 @@ bool DistanceMapCalculator<ELEMENT_DIM, SPACE_DIM>::WorkOnLocalQueue(std::vector
             }
 
             // Loop over the elements containing the given node
-            for (typename Node<SPACE_DIM>::ContainingElementIterator element_iterator = p_current_node->ContainingElementsBegin();
-                element_iterator != p_current_node->ContainingElementsEnd();
-                ++element_iterator)
+            for (auto element_iterator = p_current_node->ContainingElementsBegin();
+                 element_iterator != p_current_node->ContainingElementsEnd();
+                 ++element_iterator)
             {
                 // Get a pointer to the container element
                 Element<ELEMENT_DIM, SPACE_DIM>* p_containing_element = mrMesh.GetElement(*element_iterator);

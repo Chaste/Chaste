@@ -70,8 +70,8 @@ private:
         // Check that we can iterate over the set of edges
         std::set< std::set<unsigned> > edges_visited;
 
-        for (typename MutableMesh<DIM,DIM>::EdgeIterator edge_iterator=mesh.EdgesBegin();
-             edge_iterator!=mesh.EdgesEnd();
+        for (auto edge_iterator = mesh.EdgesBegin();
+             edge_iterator != mesh.EdgesEnd();
              ++edge_iterator)
         {
             std::set<unsigned> node_pair;

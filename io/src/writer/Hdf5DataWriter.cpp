@@ -729,7 +729,7 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
     int vector_size;
     VecGetSize(petscVector, &vector_size);
 
-    if ((unsigned)vector_size != mDataFixedDimensionSize)
+    if (static_cast<unsigned>(vector_size) != mDataFixedDimensionSize)
     {
         EXCEPTION("Vector size doesn't match fixed dimension");
     }
@@ -777,7 +777,7 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
         memspace = H5Screate_simple(1, v_size, nullptr);
 
         hsize_t count[DATASET_DIMS] = { 1, mNumberOwned, 1 };
-        hsize_t offset_dims[DATASET_DIMS] = { mCurrentTimeStep, mOffset, (unsigned)(variableID) };
+        hsize_t offset_dims[DATASET_DIMS] = { mCurrentTimeStep, mOffset, static_cast<unsigned>(variableID) };
 
         hyperslab_space = H5Dget_space(mVariablesDatasetId);
         H5Sselect_hyperslab(hyperslab_space, H5S_SELECT_SET, offset_dims, nullptr, count, nullptr);
@@ -881,7 +881,7 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
     int vector_size;
     VecGetSize(petscVector, &vector_size);
 
-    if ((unsigned)vector_size != NUM_STRIPES * mDataFixedDimensionSize)
+    if (static_cast<unsigned>(vector_size) != NUM_STRIPES * mDataFixedDimensionSize)
     {
         EXCEPTION("Vector size doesn't match fixed dimension");
     }
@@ -913,7 +913,7 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
         hsize_t v_size[1] = { mNumberOwned * NUM_STRIPES };
         memspace = H5Screate_simple(1, v_size, nullptr);
 
-        hsize_t start[DATASET_DIMS] = { mCurrentTimeStep, mOffset, (unsigned)(firstVariableID) };
+        hsize_t start[DATASET_DIMS] = { mCurrentTimeStep, mOffset, static_cast<unsigned>(firstVariableID) };
         hsize_t stride[DATASET_DIMS] = { 1, 1, 1 }; //we are imposing contiguous variables, hence the stride is 1 (3rd component)
         hsize_t block_size[DATASET_DIMS] = { 1, mNumberOwned, 1 };
         hsize_t number_blocks[DATASET_DIMS] = { 1, 1, NUM_STRIPES };

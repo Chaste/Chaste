@@ -193,7 +193,7 @@ double ElectrodesStimulusFactory<DIM>::ComputeElectrodeTotalFlux(AbstractChasteR
     double total_electrode_flux = 0.0;
     double ret;
 
-    for (typename AbstractTetrahedralMesh<DIM,DIM>::NodeIterator node_iter=this->mpMesh->GetNodeIteratorBegin();
+    for (auto node_iter = this->mpMesh->GetNodeIteratorBegin();
          node_iter != this->mpMesh->GetNodeIteratorEnd();
          ++node_iter)
     {

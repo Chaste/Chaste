@@ -160,12 +160,12 @@ private:
 
         DistributedVector* p_dist_vector = new DistributedVector(petsc_vec, &factory);
 
-        unsigned min_row_index = (unsigned)(*p_dist_vector)[lo];
-        unsigned max_row_index = (unsigned)(*p_dist_vector)[hi-1];
+        unsigned min_row_index = static_cast<unsigned>((*p_dist_vector)[lo]);
+        unsigned max_row_index = static_cast<unsigned>((*p_dist_vector)[hi - 1]);
 
         // Work out how many halos there should be. # boundary processes * 3^(DIM-1)
-        unsigned num_boundary_processes = 2-(unsigned)(PetscTools::AmMaster()) - (unsigned)(PetscTools::AmTopMost());
-        unsigned correct_num_halos = num_boundary_processes*(unsigned)pow(3.0,(double)DIM-1);
+        unsigned num_boundary_processes = 2 - static_cast<unsigned>(PetscTools::AmMaster()) - static_cast<unsigned>(PetscTools::AmTopMost());
+        unsigned correct_num_halos = num_boundary_processes * static_cast<unsigned>(pow(3.0,(double)DIM-1));
 
         // Work out what the halo boxes should be.
         std::vector<unsigned> halos_should_be_right;
@@ -175,7 +175,7 @@ private:
         {
             // Only halos to the right. Code below calculates a layer of boxes.
             std::vector<unsigned> dimension_counters(DIM-1, 0);
-            for (unsigned i=0; i<(unsigned)pow(3.0,(double)DIM-1); /*Increment later*/)
+            for (unsigned i = 0; i < static_cast<unsigned>(pow(3.0,(double)DIM-1)); /*Increment later*/)
             {
                 c_vector<unsigned, DIM> box_coords;
                 for (int d=0; d< (int)DIM-1; d++)
@@ -188,7 +188,7 @@ private:
                 i++;
                 for (int var = 0; var < (int)DIM-1; var++)
                 {
-                  if (i%(unsigned)pow(3.0, (double)var) == 0)
+                  if (i % static_cast<unsigned>(pow(3.0, (double)var)) == 0)
                   {
                       dimension_counters[var] = ((dimension_counters[var]+1)%3);
                   }
@@ -201,7 +201,7 @@ private:
         {
             // Only halos to the right. Code below calculates a layer of boxes.
             std::vector<unsigned> dimension_counters(DIM-1, 0);
-            for (unsigned i=0; i<(unsigned)pow(3.0,(double)DIM-1); /*Increment later*/)
+            for (unsigned i = 0; i < static_cast<unsigned>(pow(3.0,(double)DIM-1)); /*Increment later*/)
             {
                 c_vector<unsigned, DIM> box_coords;
                 for (int d=0; d< (int)DIM-1; d++)
@@ -214,7 +214,7 @@ private:
                 i++;
                 for (int var = 0; var < (int)DIM-1; var++)
                 {
-                  if (i%(unsigned)pow(3.0, (double)var) == 0)
+                  if (i % static_cast<unsigned>(pow(3.0, (double)var)) == 0)
                   {
                       dimension_counters[var] = ((dimension_counters[var]+1)%3);
                   }
@@ -300,7 +300,7 @@ public:
         VecGetOwnershipRange(petsc_vec, &lo, &hi);
         PetscTools::Destroy(petsc_vec);
 
-        unsigned local_rows = (unsigned)(hi-lo);
+        unsigned local_rows = static_cast<unsigned>(hi - lo);
 
         TS_ASSERT_EQUALS(box_collection.GetNumLocalBoxes(), local_rows);
 

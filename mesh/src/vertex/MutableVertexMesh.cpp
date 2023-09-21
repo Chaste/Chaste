@@ -937,7 +937,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodesAndElements(Ve
         else
         {
             live_elements.push_back(this->mElements[i]);
-            rElementMap.SetNewIndex(i, (unsigned)(live_elements.size()-1));
+            rElementMap.SetNewIndex(i, static_cast<unsigned>(live_elements.size() - 1));
         }
     }
 
@@ -1053,7 +1053,7 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForSwapsFromShortEdges()
     if constexpr (ELEMENT_DIM == 2 && SPACE_DIM == 2)
     {
         // Loop over elements to check for T1 swaps
-        for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = this->GetElementIteratorBegin();
+        for (auto elem_iter = this->GetElementIteratorBegin();
              elem_iter != this->GetElementIteratorEnd();
              ++elem_iter)
         {
@@ -1119,7 +1119,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForT2Swaps(VertexElementMap& rElementMap)
 {
     // Loop over elements to check for T2 swaps
-    for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = this->GetElementIteratorBegin();
+    for (auto elem_iter = this->GetElementIteratorBegin();
          elem_iter != this->GetElementIteratorEnd();
          ++elem_iter)
     {
@@ -1214,7 +1214,7 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
             // First: find all boundary element and calculate their centroid only once
             std::vector<unsigned> boundary_element_indices;
             std::vector<c_vector<double, SPACE_DIM> > boundary_element_centroids;
-            for (typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator elem_iter = this->GetElementIteratorBegin();
+            for (auto elem_iter = this->GetElementIteratorBegin();
                  elem_iter != this->GetElementIteratorEnd();
                  ++elem_iter)
             {

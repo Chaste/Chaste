@@ -1197,7 +1197,7 @@ public:
                 TS_ASSERT_DELTA(p_linear_system->GetRhsVectorElement(i), rhs_values[i], 1e-9);
             }
 
-            for (unsigned row=(unsigned)lo; row<(unsigned)hi; row++)
+            for (unsigned row = static_cast<unsigned>(lo); row < static_cast<unsigned>(hi); ++row)
             {
                 for (unsigned col=0; col<size; col++)
                 {
@@ -1236,7 +1236,7 @@ public:
                 TS_ASSERT_DELTA(p_linear_system->GetRhsVectorElement(i), rhs_values[i], 1e-9);
             }
 
-            for (unsigned row=(unsigned)lo; row<(unsigned)hi; row++)
+            for (unsigned row = static_cast<unsigned>(lo); row < static_cast<unsigned>(hi); ++row)
             {
                 for (unsigned col=0; col<size; col++)
                 {

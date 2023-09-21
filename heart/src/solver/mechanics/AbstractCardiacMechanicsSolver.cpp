@@ -65,7 +65,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
 
     AbstractContractionCellFactory<DIM>* p_factory = mrElectroMechanicsProblemDefinition.GetContractionCellFactory();
 
-    for (typename AbstractTetrahedralMesh<DIM, DIM>::ElementIterator iter = this->mrQuadMesh.GetElementIteratorBegin();
+    for (auto iter = this->mrQuadMesh.GetElementIteratorBegin();
          iter != this->mrQuadMesh.GetElementIteratorEnd();
          ++iter)
     {

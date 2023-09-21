@@ -128,7 +128,7 @@ void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateJunction(const No
         typedef typename MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>::CableRangeAtNode CableRangeAtNode;
         CableRangeAtNode cable_range = mpMixedDimensionMesh->GetCablesAtNode(pNode);
         double total_cross_sectional_area = 0.0;
-        for (typename MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>::NodeCableIterator iter=cable_range.first;
+        for (auto iter = cable_range.first;
              iter != cable_range.second;
              ++iter)
         {
@@ -168,7 +168,7 @@ void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::SetMesh(AbstractTetrahe
         EXCEPTION("AbstractPurkinjeCellFactory must take a MixedDimensionMesh");
     }
     mLocalPurkinjeNodes.clear();
-    for (typename MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>::CableElementIterator iter = mpMixedDimensionMesh->GetCableElementIteratorBegin();
+    for (auto iter = mpMixedDimensionMesh->GetCableElementIteratorBegin();
           iter != mpMixedDimensionMesh->GetCableElementIteratorEnd();
           ++iter)
     {

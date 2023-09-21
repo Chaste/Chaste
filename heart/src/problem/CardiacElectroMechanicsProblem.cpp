@@ -351,7 +351,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
 
     ///\todo This is fragile: check how the TimeStepper does it, and possibly refactor the behaviour there
     /// into a static helper method if it isn't already.
-    mNumElecTimestepsPerMechTimestep = (unsigned) floor((mpProblemDefinition->GetMechanicsSolveTimestep()/HeartConfig::Instance()->GetPdeTimeStep())+0.5);
+    mNumElecTimestepsPerMechTimestep = static_cast<unsigned>(floor((mpProblemDefinition->GetMechanicsSolveTimestep()/HeartConfig::Instance()->GetPdeTimeStep()) + 0.5));
     if (fabs(mNumElecTimestepsPerMechTimestep*HeartConfig::Instance()->GetPdeTimeStep() - mpProblemDefinition->GetMechanicsSolveTimestep()) > 1e-6)
     {
         EXCEPTION("Electrics PDE timestep does not divide mechanics solve timestep");
@@ -969,7 +969,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::SetWatchedPosition(c_vec
 template<unsigned DIM, unsigned ELEC_PROB_DIM>
 void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::SetOutputDeformationGradientsAndStress(double timeStep)
 {
-    mNumTimestepsToOutputDeformationGradientsAndStress = (unsigned) floor((timeStep/mpProblemDefinition->GetMechanicsSolveTimestep())+0.5);
+    mNumTimestepsToOutputDeformationGradientsAndStress = static_cast<unsigned>(floor((timeStep/mpProblemDefinition->GetMechanicsSolveTimestep()) + 0.5));
     if (fabs(mNumTimestepsToOutputDeformationGradientsAndStress*mpProblemDefinition->GetMechanicsSolveTimestep() - timeStep) > 1e-6)
     {
         EXCEPTION("Timestep provided for SetOutputDeformationGradientsAndStress() is not a multiple of mechanics solve timestep");

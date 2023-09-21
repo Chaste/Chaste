@@ -121,7 +121,7 @@ public:
         : AbstractFeCableIntegralAssembler<ELEMENT_DIM,SPACE_DIM,2,false,true,NORMAL>(pMesh)
     {
         // Check radii have been set on the purkinje elements
-        for (typename MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>::CableElementIterator iter = pMesh->GetCableElementIteratorBegin();
+        for (auto iter = pMesh->GetCableElementIteratorBegin();
              iter != pMesh->GetCableElementIteratorEnd();
              ++iter)
         {

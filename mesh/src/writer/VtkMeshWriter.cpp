@@ -230,12 +230,12 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AugmentCellData()
         unsigned num_cable_pads = this->GetNumCableElements();
         if (mWriteParallelFiles)
         {
-            assert((unsigned)array->GetNumberOfTuples() == this->mpDistributedMesh->GetNumLocalElements());
+            assert(static_cast<unsigned>(array->GetNumberOfTuples()) == this->mpDistributedMesh->GetNumLocalElements());
             num_cable_pads =  this->mpMixedMesh->GetNumLocalCableElements();
         }
         else
         {
-            assert((unsigned)array->GetNumberOfTuples() == this->GetNumElements());
+            assert(static_cast<unsigned>(array->GetNumberOfTuples()) == this->GetNumElements());
         }
 
         //Check that tuples of size 3 will be big enough for padding the rest of the data
@@ -582,7 +582,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::SetParallelFiles( AbstractTetrahedral
     unsigned index = 0;
 
     // Owned nodes
-    for (typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator node_iter = rMesh.GetNodeIteratorBegin();
+    for (auto node_iter = rMesh.GetNodeIteratorBegin();
          node_iter != rMesh.GetNodeIteratorEnd();
          ++node_iter)
     {
@@ -593,9 +593,9 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::SetParallelFiles( AbstractTetrahedral
     // Halo nodes
     if (this->mpDistributedMesh)
     {
-        for (typename DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::HaloNodeIterator halo_iter=this->mpDistributedMesh->GetHaloNodeIteratorBegin();
-                halo_iter != this->mpDistributedMesh->GetHaloNodeIteratorEnd();
-                ++halo_iter)
+        for (auto halo_iter = this->mpDistributedMesh->GetHaloNodeIteratorBegin();
+             halo_iter != this->mpDistributedMesh->GetHaloNodeIteratorEnd();
+             ++halo_iter)
         {
             mGlobalToNodeIndexMap[(*halo_iter)->GetIndex()] = index;
             index++;
@@ -627,7 +627,7 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
         p_pts->GetData()->SetName("Vertex positions");
 
         // Owned nodes
-        for (typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator node_iter = rMesh.GetNodeIteratorBegin();
+        for (auto node_iter = rMesh.GetNodeIteratorBegin();
              node_iter != rMesh.GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -649,9 +649,9 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
         // Halo nodes
         if (this->mpDistributedMesh)
         {
-            for (typename DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::HaloNodeIterator halo_iter=this->mpDistributedMesh->GetHaloNodeIteratorBegin();
-                    halo_iter != this->mpDistributedMesh->GetHaloNodeIteratorEnd();
-                    ++halo_iter)
+            for (auto halo_iter = this->mpDistributedMesh->GetHaloNodeIteratorBegin();
+                 halo_iter != this->mpDistributedMesh->GetHaloNodeIteratorEnd();
+                 ++halo_iter)
             {
                 c_vector<double, SPACE_DIM> current_item = (*halo_iter)->rGetLocation();
                 if (SPACE_DIM == 3)
@@ -672,7 +672,7 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
         mpVtkUnstructedMesh->SetPoints(p_pts);
         p_pts->Delete(); //Reference counted
 
-        for (typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator elem_iter = rMesh.GetElementIteratorBegin();
+        for (auto elem_iter = rMesh.GetElementIteratorBegin();
              elem_iter != rMesh.GetElementIteratorEnd();
              ++elem_iter)
         {
@@ -706,7 +706,7 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
             AugmentCellData();
             //Make a blank cell radius data for the regular elements
             std::vector<double> radii(this->mpMixedMesh->GetNumLocalElements(), 0.0);
-            for (typename MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>::CableElementIterator elem_iter = this->mpMixedMesh->GetCableElementIteratorBegin();
+            for (auto elem_iter = this->mpMixedMesh->GetCableElementIteratorBegin();
                  elem_iter != this->mpMixedMesh->GetCableElementIteratorEnd();
                  ++elem_iter)
             {

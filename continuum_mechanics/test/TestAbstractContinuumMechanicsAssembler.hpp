@@ -274,11 +274,11 @@ public:
 
         int lo, hi;
         MatGetOwnershipRange(mat, &lo, &hi);
-        for (unsigned i=lo; i<(unsigned)hi; i++)
+        for (unsigned i = lo; i < static_cast<unsigned>(hi); ++i)
         {
-            for (unsigned j=0; j<6; j++)
+            for (unsigned j = 0; j < 6; ++j)
             {
-                TS_ASSERT_DELTA( PetscMatTools::GetElement(mat,i,j), correct_matrix[i][j], 1e-8 );
+                TS_ASSERT_DELTA(PetscMatTools::GetElement(mat, i, j), correct_matrix[i][j], 1e-8);
             }
         }
 
@@ -286,11 +286,11 @@ public:
         zero_matrix_assembler.SetMatrixToAssemble(mat, true);
         zero_matrix_assembler.Assemble();
         PetscMatTools::Finalise(mat);
-        for (unsigned i=lo; i<(unsigned)hi; i++)
+        for (unsigned i = lo; i < static_cast<unsigned>(hi); ++i)
         {
-            for (unsigned j=0; j<5; j++)
+            for (unsigned j = 0; j < 5; ++j)
             {
-                TS_ASSERT_DELTA( PetscMatTools::GetElement(mat,i,j), 0.0, 1e-8 );
+                TS_ASSERT_DELTA(PetscMatTools::GetElement(mat, i, j), 0.0, 1e-8);
             }
         }
 
@@ -361,22 +361,22 @@ public:
 
         //...except for the fact that any entry corresponding to pressure on an non-internal node
         //will have value 0
-        for (unsigned i=3; i<6; i++)
+        for (unsigned i = 3; i < 6; ++i)
         {
-            for (unsigned j=0; j<18; j++)
+            for (unsigned j = 0; j < 18; ++j)
             {
-                correct_matrix(3*i+2,j) = 0.0;
-                correct_matrix(j,3*i+2) = 0.0;
+                correct_matrix(3*i+2, j) = 0.0;
+                correct_matrix(j, 3*i+2) = 0.0;
             }
         }
 
         int lo, hi;
         MatGetOwnershipRange(mat, &lo, &hi);
-        for (unsigned i=lo; i<(unsigned)hi; i++)
+        for (unsigned i = lo; i < static_cast<unsigned>(hi); ++i)
         {
-            for (unsigned j=0; j<18; j++)
+            for (unsigned j = 0; j < 18; ++j)
             {
-                TS_ASSERT_DELTA( PetscMatTools::GetElement(mat,i,j), correct_matrix(i,j), 1e-8 );
+                TS_ASSERT_DELTA(PetscMatTools::GetElement(mat, i, j), correct_matrix(i,j), 1e-8);
             }
         }
 
@@ -405,15 +405,15 @@ public:
 
         ReplicatableVector vec_repl(vec);
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
-            TS_ASSERT_DELTA( vec_repl[4*i  ], 111, 1e-8 );
-            TS_ASSERT_DELTA( vec_repl[4*i+1], 111, 1e-8 );
-            TS_ASSERT_DELTA( vec_repl[4*i+2], 111, 1e-8 );
+            TS_ASSERT_DELTA(vec_repl[4*i  ], 111, 1e-8);
+            TS_ASSERT_DELTA(vec_repl[4*i+1], 111, 1e-8);
+            TS_ASSERT_DELTA(vec_repl[4*i+2], 111, 1e-8);
         }
-        for (unsigned i=0; i<mesh.GetNumVertices(); i++)
+        for (unsigned i = 0; i < mesh.GetNumVertices(); ++i)
         {
-            TS_ASSERT_DELTA( vec_repl[4*i+3], 222, 1e-8 );
+            TS_ASSERT_DELTA(vec_repl[4*i+3], 222, 1e-8);
         }
 
         c_matrix<double,40,40> correct_matrix;
@@ -458,7 +458,7 @@ public:
 
         int lo, hi;
         MatGetOwnershipRange(mat, &lo, &hi);
-        for (unsigned i=lo; i<(unsigned)hi; i++)
+        for (unsigned i = lo; i < static_cast<unsigned>(hi); ++i)
         {
             for (unsigned j=0; j<34; j++)
             {
@@ -505,7 +505,7 @@ public:
         // verify the above matrix is correctly typed.
         int lo, hi;
         MatGetOwnershipRange(mat2, &lo, &hi);
-        for (unsigned i=lo; i<(unsigned)hi; i++)
+        for (unsigned i = lo; i < static_cast<unsigned>(hi); ++i)
         {
             for (unsigned j=0; j<4; j++)
             {
@@ -514,7 +514,7 @@ public:
         }
 
         MatGetOwnershipRange(mat1, &lo, &hi);
-        for (unsigned i=lo; i<(unsigned)hi; i++)
+        for (unsigned i = lo; i < static_cast<unsigned>(hi); ++i)
         {
             for (unsigned j=0; j<3*quadratic_mesh.GetNumNodes(); j++)
             {

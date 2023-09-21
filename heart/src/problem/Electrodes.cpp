@@ -88,10 +88,9 @@ Electrodes<DIM>::Electrodes(AbstractTetrahedralMesh<DIM,DIM>& rMesh)
 
     // loop over boundary elements and add a non-zero phi_e boundary condition (ie extracellular
     // stimulus) if (assuming axis_index=0, etc) x=lowerValue (where x is the x-value of the centroid)
-    for (typename AbstractTetrahedralMesh<DIM,DIM>::BoundaryElementIterator iter
-            = mpMesh->GetBoundaryElementIteratorBegin();
-       iter != mpMesh->GetBoundaryElementIteratorEnd();
-       iter++)
+    for (auto iter = mpMesh->GetBoundaryElementIteratorBegin();
+         iter != mpMesh->GetBoundaryElementIteratorEnd();
+         iter++)
     {
         if (fabs((*iter)->CalculateCentroid()[axis_index] - global_min) < 1e-6)
         {
@@ -115,7 +114,7 @@ Electrodes<DIM>::Electrodes(AbstractTetrahedralMesh<DIM,DIM>& rMesh)
         // We will need to recalculate this when HasDirichletBoundaryConditions() is called.
         this->mpBoundaryConditionsContainer->ResetDirichletCommunication();
 
-        for (typename AbstractTetrahedralMesh<DIM,DIM>::NodeIterator iter=mpMesh->GetNodeIteratorBegin();
+        for (auto iter = mpMesh->GetNodeIteratorBegin();
              iter != mpMesh->GetNodeIteratorEnd();
              ++iter)
         {
@@ -170,17 +169,14 @@ bool Electrodes<DIM>::SwitchOn(double time)
 template<unsigned DIM>
 void Electrodes<DIM>::ComputeElectrodesAreasAndCheckEquality(unsigned dimensionIndex, double lowerValue, double upperValue)
 {
-    //
-    // loop over boundary elements and determine areas of the electrode faces
-    //
+    // Loop over boundary elements and determine areas of the electrode faces
     double local_left_area = 0.0;
     double local_right_area = 0.0;
 
     c_vector<double,DIM> weighted_direction;
     double jacobian_determinant;
 
-    for (typename AbstractTetrahedralMesh<DIM,DIM>::BoundaryElementIterator iter
-             = mpMesh->GetBoundaryElementIteratorBegin();
+    for (auto iter = mpMesh->GetBoundaryElementIteratorBegin();
          iter != mpMesh->GetBoundaryElementIteratorEnd();
          iter++)
     {

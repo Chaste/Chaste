@@ -101,7 +101,7 @@ unsigned PetscVecTools::GetSize(Vec vector)
 {
     PetscInt size;
     VecGetSize(vector, &size);
-    return (unsigned) size;
+    return static_cast<unsigned>(size);
 }
 
 void PetscVecTools::GetOwnershipRange(Vec vector, PetscInt& lo, PetscInt& hi)

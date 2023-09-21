@@ -368,7 +368,7 @@ void Hdf5DataReader::GetVariableOverNodes(Vec data,
 
     int lo, hi, size;
     VecGetSize(data, &size);
-    if ((unsigned)size != mDatasetDims[1])
+    if (static_cast<unsigned>(size) != mDatasetDims[1])
     {
         EXCEPTION("Could not read data because Vec is the wrong size");
     }
@@ -378,12 +378,12 @@ void Hdf5DataReader::GetVariableOverNodes(Vec data,
     if (hi > lo) // i.e. we own some...
     {
         // Define a dataset in memory for this process
-        hsize_t v_size[1] = {(unsigned)(hi-lo)};
+        hsize_t v_size[1] = {static_cast<unsigned>(hi - lo)};
         hid_t memspace = H5Screate_simple(1, v_size, nullptr);
 
         // Select hyperslab in the file.
-        hsize_t offset[3] = {timestep, (unsigned)(lo), column_index};
-        hsize_t count[3]  = {1, (unsigned)(hi-lo), 1};
+        hsize_t offset[3] = {timestep, static_cast<unsigned>(lo), column_index};
+        hsize_t count[3]  = {1, static_cast<unsigned>(hi - lo), 1};
         hid_t hyperslab_space = H5Dget_space(mVariablesDatasetId);
         H5Sselect_hyperslab(hyperslab_space, H5S_SELECT_SET, offset, nullptr, count, nullptr);
 

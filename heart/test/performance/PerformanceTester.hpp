@@ -100,7 +100,7 @@ public:
             prev_mesh_num = MeshNum;
         }
 
-        unsigned num_ele_across = (unsigned) pow(2, this->MeshNum+2);
+        unsigned num_ele_across = static_cast<unsigned>(pow(2, this->MeshNum+2));
         GeneralPlaneStimulusCellFactory<CELL, DIM> cell_factory(num_ele_across, mMeshWidth);
         CARDIAC_PROBLEM cardiac_problem(&cell_factory);
 

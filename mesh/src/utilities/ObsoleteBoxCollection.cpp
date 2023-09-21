@@ -83,7 +83,7 @@ ObsoleteBoxCollection<DIM>::ObsoleteBoxCollection(double boxWidth, c_vector<doub
     for (unsigned i = 0; i < DIM; i++)
     {
         ///\todo #2725 example: domain width of 1.0 and box width of 0.25, the following line will create 5 boxes not 4
-        mNumBoxesEachDirection(i) = (unsigned) floor((domainSize(2 * i + 1) - domainSize(2 * i)) / boxWidth + msFudge) + 1;
+        mNumBoxesEachDirection(i) = static_cast<unsigned>(floor((domainSize(2 * i + 1) - domainSize(2 * i)) / boxWidth + msFudge) + 1);
         num_boxes *= mNumBoxesEachDirection(i);
     }
 

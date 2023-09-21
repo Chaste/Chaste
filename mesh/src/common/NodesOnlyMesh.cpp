@@ -293,9 +293,9 @@ void NodesOnlyMesh<SPACE_DIM>::CalculateNodesOutsideLocalDomain()
     mNodesToSendRight.clear();
     mNodesToSendLeft.clear();
 
-    for (typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator node_iter = this->GetNodeIteratorBegin();
-            node_iter != this->GetNodeIteratorEnd();
-            ++node_iter)
+    for (auto node_iter = this->GetNodeIteratorBegin();
+         node_iter != this->GetNodeIteratorEnd();
+         ++node_iter)
     {
         unsigned owning_process = mpBoxCollection->GetProcessOwningNode(&(*node_iter));
         if (owning_process == PetscTools::GetMyRank())
@@ -535,7 +535,7 @@ bool NodesOnlyMesh<SPACE_DIM>::IsANodeCloseToDomainBoundary()
     int is_local_node_close = 0;
     c_vector<double, 2*SPACE_DIM> domain_boundary = mpBoxCollection->rGetDomainSize();
 
-    for (typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator node_iter = this->GetNodeIteratorBegin();
+    for (auto node_iter = this->GetNodeIteratorBegin();
          node_iter != this->GetNodeIteratorEnd();
          ++node_iter)
     {
@@ -638,9 +638,9 @@ template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::AddNodesToBoxes()
 {
      // Put the nodes in the boxes.
-     for (typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator node_iter = this->GetNodeIteratorBegin();
-               node_iter != this->GetNodeIteratorEnd();
-               ++node_iter)
+     for (auto node_iter = this->GetNodeIteratorBegin();
+          node_iter != this->GetNodeIteratorEnd();
+          ++node_iter)
      {
           unsigned box_index = mpBoxCollection->CalculateContainingBox(&(*node_iter));
           mpBoxCollection->rGetBox(box_index).AddNode(&(*node_iter));

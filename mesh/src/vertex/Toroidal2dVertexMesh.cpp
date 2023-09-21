@@ -106,7 +106,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
     {
         // First create an extended mesh to include points extended from the boundary
         std::vector<Node<2> *> nodes;
-        for (typename TetrahedralMesh<2,2>::NodeIterator node_iter = mpDelaunayMesh->GetNodeIteratorBegin();
+        for (auto node_iter = mpDelaunayMesh->GetNodeIteratorBegin();
             node_iter != mpDelaunayMesh->GetNodeIteratorEnd();
             ++node_iter)
         {
@@ -799,7 +799,7 @@ void Toroidal2dVertexMesh::ConstructFromMeshReader(AbstractMeshReader<2,2>& rMes
         if (rMeshReader.GetNumElementAttributes() > 0)
         {
             assert(rMeshReader.GetNumElementAttributes() == 1);
-            unsigned attribute_value = (unsigned) element_data.AttributeValue;
+            unsigned attribute_value = static_cast<unsigned>(element_data.AttributeValue);
             p_element->SetAttribute(attribute_value);
         }
     }

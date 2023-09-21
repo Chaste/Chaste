@@ -44,7 +44,7 @@ AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AbstractCorr
 {
     // Work out which elements can do SVI
     mElementsCanDoSvi.resize(pMesh->GetNumElements(), true);
-    for (typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator iter = pMesh->GetElementIteratorBegin();
+    for (auto iter = pMesh->GetElementIteratorBegin();
          iter != pMesh->GetElementIteratorEnd();
          ++iter)
     {

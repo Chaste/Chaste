@@ -202,9 +202,9 @@ public:
             //Not master process
             unsigned previous_index = 0u; //Used to check that the indices are monotone
             unsigned local_index = 0u;
-            for (typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator iter = mpMesh->GetElementIteratorBegin();
-                          iter != mpMesh->GetElementIteratorEnd();
-                          ++iter, local_index++)
+            for (auto iter = mpMesh->GetElementIteratorBegin();
+                 iter != mpMesh->GetElementIteratorEnd();
+                 ++iter, local_index++)
             {
                 unsigned element_index = iter->GetIndex();
                 //Check monotonicity

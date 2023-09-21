@@ -196,11 +196,11 @@ public:
         H5Sclose(filespace);
 
         // Define a dataset in memory for this process
-        hsize_t count[DIMS] = { (unsigned)(hi - lo) };
+        hsize_t count[DIMS] = { static_cast<unsigned>(hi - lo) };
         hid_t memspace = H5Screate_simple(DIMS, count, NULL);
 
         // Select hyperslab in the file.
-        hsize_t offset[DIMS] = { (unsigned)(lo) };
+        hsize_t offset[DIMS] = { static_cast<unsigned>(lo) };
         filespace = H5Dget_space(dset_id);
         H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, NULL, count, NULL);
 
@@ -246,7 +246,7 @@ public:
         // Check the index
         for (unsigned i = 0; i < data_size; i++)
         {
-            TS_ASSERT_EQUALS(((unsigned)data[i] % 100), i);
+            TS_ASSERT_EQUALS((static_cast<unsigned>(data[i]) % 100), i);
         }
 
         // Check the final component
@@ -1814,7 +1814,7 @@ public:
         short_perm.push_back(0u);
         TS_ASSERT_THROWS_THIS(writer.ApplyPermutation(short_perm), "Permutation doesn't match the expected problem size of 10");
 
-        for (unsigned index = 0; index < (unsigned)number_nodes; index++)
+        for (unsigned index = 0; index < static_cast<unsigned>(number_nodes); index++)
         {
             rotation_perm.push_back((index + 3) % number_nodes); // 3, 4, ... 0, 1, 2
             identity_perm.push_back(index);

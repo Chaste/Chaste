@@ -102,7 +102,7 @@ unsigned AbstractOdeSystemInformation::GetStateVariableIndex(const std::string& 
     {
         EXCEPTION("No state variable named '" + rName + "'.");
     }
-    return (unsigned)(it - mVariableNames.begin());
+    return static_cast<unsigned>(it - mVariableNames.begin());
 }
 
 bool AbstractOdeSystemInformation::HasStateVariable(const std::string& rName) const
@@ -142,7 +142,7 @@ unsigned AbstractOdeSystemInformation::GetParameterIndex(const std::string& rNam
     {
         EXCEPTION("No parameter named '" + rName + "'.");
     }
-    return (unsigned)(it - mParameterNames.begin());
+    return static_cast<unsigned>(it - mParameterNames.begin());
 }
 
 bool AbstractOdeSystemInformation::HasParameter(const std::string& rName) const
@@ -246,7 +246,7 @@ unsigned AbstractOdeSystemInformation::GetDerivedQuantityIndex(const std::string
     {
         EXCEPTION("No derived quantity named '" + rName + "'.");
     }
-    return (unsigned)(it - mDerivedQuantityNames.begin());
+    return static_cast<unsigned>(it - mDerivedQuantityNames.begin());
 }
 
 bool AbstractOdeSystemInformation::HasDerivedQuantity(const std::string& rName) const

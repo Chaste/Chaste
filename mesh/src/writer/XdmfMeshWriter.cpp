@@ -104,7 +104,7 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahe
     unsigned index = 0;
 
     // Owned nodes come first
-    for (typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator iter = rMesh.GetNodeIteratorBegin();
+    for (auto iter = rMesh.GetNodeIteratorBegin();
          iter != rMesh.GetNodeIteratorEnd();
          ++iter)
     {
@@ -121,9 +121,9 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahe
     // Halo nodes
     if (this->mpDistributedMesh)
     {
-        for (typename DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::HaloNodeIterator halo_iter=this->mpDistributedMesh->GetHaloNodeIteratorBegin();
-                halo_iter != this->mpDistributedMesh->GetHaloNodeIteratorEnd();
-                ++halo_iter)
+        for (auto halo_iter = this->mpDistributedMesh->GetHaloNodeIteratorBegin();
+             halo_iter != this->mpDistributedMesh->GetHaloNodeIteratorEnd();
+             ++halo_iter)
         {
             global_to_node_index_map[(*halo_iter)->GetIndex()] = index;
             index++;
@@ -158,7 +158,7 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahe
     }
     (*topology_file) << "<Topology TopologyType=\""<< top_type <<"\" NumberOfElements=\""<< num_elems <<"\">\n";
     (*topology_file) << "\t<DataItem Format=\"XML\" Dimensions=\""<< num_elems <<" "<< ELEMENT_DIM+1 <<"\">";
-    for (typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator elem_iter = rMesh.GetElementIteratorBegin();
+    for (auto elem_iter = rMesh.GetElementIteratorBegin();
          elem_iter != rMesh.GetElementIteratorEnd();
          ++elem_iter)
     {

@@ -179,8 +179,8 @@ public:
         PetscMatTools::GetOwnershipRange(purkinje_mat, lo, hi);
 
         //Check that the partitioning is exactly as expected
-        TS_ASSERT_EQUALS((unsigned)lo, 2*mesh.GetDistributedVectorFactory()->GetLow());
-        TS_ASSERT_EQUALS((unsigned)hi, 2*mesh.GetDistributedVectorFactory()->GetHigh());
+        TS_ASSERT_EQUALS(static_cast<unsigned>(lo), 2*mesh.GetDistributedVectorFactory()->GetLow());
+        TS_ASSERT_EQUALS(static_cast<unsigned>(hi), 2*mesh.GetDistributedVectorFactory()->GetHigh());
 
         for (AbstractTetrahedralMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
                 node_iter != mesh.GetNodeIteratorEnd(); ++node_iter)

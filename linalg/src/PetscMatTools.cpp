@@ -299,7 +299,7 @@ unsigned PetscMatTools::GetSize(Mat matrix)
 
     MatGetSize(matrix, &rows, &cols);
     assert(rows == cols);
-    return (unsigned) rows;
+    return static_cast<unsigned>(rows);
 }
 
 void PetscMatTools::GetOwnershipRange(Mat matrix, PetscInt& lo, PetscInt& hi)

@@ -84,7 +84,7 @@ void OrthotropicConductivityTensors<ELEMENT_DIM, SPACE_DIM>::Init(AbstractTetrah
 
         unsigned local_element_index = 0;
 
-        for (typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator it = this->mpMesh->GetElementIteratorBegin();
+        for (auto it = this->mpMesh->GetElementIteratorBegin();
              it != this->mpMesh->GetElementIteratorEnd();
              ++it)
         {

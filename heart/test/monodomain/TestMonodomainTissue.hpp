@@ -460,7 +460,7 @@ public:
 
         // Info about the first cell on this process (if any)
         bool has_cell = false;
-        unsigned cell_v_index = (unsigned)(-1);
+        unsigned cell_v_index = static_cast<unsigned>(-1);
         double cell_v = DBL_MAX;
 
         c_matrix<double, 1, 1> tensor_before_archiving;

@@ -209,8 +209,7 @@ private:
     // Hardcoded for the expected mesh
     void ApplyIdentityBlock()
     {
-        for (typename AbstractTetrahedralMesh<DIM,DIM>::NodeIterator
-                iter=this->mpMesh->GetNodeIteratorBegin();
+        for (auto iter = this->mpMesh->GetNodeIteratorBegin();
              iter != this->mpMesh->GetNodeIteratorEnd();
              ++iter)
         {

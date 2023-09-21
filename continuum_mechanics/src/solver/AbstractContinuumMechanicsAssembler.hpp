@@ -385,9 +385,8 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
     c_matrix<double, STENCIL_SIZE, STENCIL_SIZE> a_elem = zero_matrix<double>(STENCIL_SIZE,STENCIL_SIZE);
     c_vector<double, STENCIL_SIZE> b_elem = zero_vector<double>(STENCIL_SIZE);
 
-
     // Loop over elements
-    for (typename AbstractTetrahedralMesh<DIM, DIM>::ElementIterator iter = mpMesh->GetElementIteratorBegin();
+    for (auto iter = mpMesh->GetElementIteratorBegin();
          iter != mpMesh->GetElementIteratorEnd();
          ++iter)
     {

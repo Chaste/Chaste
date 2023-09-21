@@ -181,7 +181,7 @@ private:
         c_vector<double, STENCIL_SIZE> b_elem;
 
         // Loop over elements
-        for (typename AbstractTetrahedralMesh<DIM, DIM>::ElementIterator iter = mpQuadMesh->GetElementIteratorBegin();
+        for (auto iter = mpQuadMesh->GetElementIteratorBegin();
              iter != mpQuadMesh->GetElementIteratorEnd();
              ++iter)
         {

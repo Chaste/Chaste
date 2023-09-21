@@ -396,7 +396,7 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
                                      realtype tStart,
                                      realtype maxDt)
 {
-    assert((unsigned)NV_LENGTH_S(initialConditions) == GetNumberOfStateVariables());
+    assert(static_cast<unsigned>(NV_LENGTH_S(initialConditions)) == GetNumberOfStateVariables());
     assert(maxDt >= 0.0);
 
     // Find out if we need to (re-)initialise

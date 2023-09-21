@@ -170,7 +170,7 @@ VertexElementData VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElementWithFa
         }
 
         // Set attribute
-        elem_data.AttributeValue = (unsigned)(*(mpIters->pElemIter))->GetAttribute();
+        elem_data.AttributeValue = static_cast<unsigned>((*(mpIters->pElemIter))->GetAttribute());
         ++(*(mpIters->pElemIter));
 
         return elem_data;
@@ -319,7 +319,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DI
 
     mpVtkUnstructedMesh->SetPoints(p_pts);
     p_pts->Delete(); // Reference counted
-    for (typename VertexMesh<ELEMENT_DIM,SPACE_DIM>::VertexElementIterator iter = rMesh.GetElementIteratorBegin();
+    for (auto iter = rMesh.GetElementIteratorBegin();
          iter != rMesh.GetElementIteratorEnd();
          ++iter)
     {

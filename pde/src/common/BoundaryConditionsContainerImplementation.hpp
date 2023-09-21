@@ -451,9 +451,9 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyPeriod
         std::vector<unsigned> rows_to_zero;
         for (unsigned index_of_unknown = 0; index_of_unknown < PROBLEM_DIM; ++index_of_unknown)
         {
-            for (typename std::map< const Node<SPACE_DIM> *, const Node<SPACE_DIM> * >::const_iterator iter = mpPeriodicBcMap[index_of_unknown]->begin();
-                iter != mpPeriodicBcMap[index_of_unknown]->end();
-                ++iter)
+            for (auto iter = mpPeriodicBcMap[index_of_unknown]->begin();
+                 iter != mpPeriodicBcMap[index_of_unknown]->end();
+                 ++iter)
             {
                 unsigned node_index_1 = iter->first->GetIndex();
                 unsigned row_index_1 = PROBLEM_DIM*node_index_1 + index_of_unknown;
@@ -465,9 +465,9 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyPeriod
 
         for (unsigned index_of_unknown = 0; index_of_unknown < PROBLEM_DIM; ++index_of_unknown)
         {
-            for (typename std::map< const Node<SPACE_DIM> *, const Node<SPACE_DIM> * >::const_iterator iter = mpPeriodicBcMap[index_of_unknown]->begin();
-                iter != mpPeriodicBcMap[index_of_unknown]->end();
-                ++iter)
+            for (auto iter = mpPeriodicBcMap[index_of_unknown]->begin();
+                 iter != mpPeriodicBcMap[index_of_unknown]->end();
+                 ++iter)
             {
                 unsigned node_index_1 = iter->first->GetIndex();
                 unsigned node_index_2 = iter->second->GetIndex();
@@ -483,7 +483,7 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyPeriod
     {
         for (unsigned index_of_unknown = 0; index_of_unknown < PROBLEM_DIM; ++index_of_unknown)
         {
-            for (typename std::map< const Node<SPACE_DIM> *, const Node<SPACE_DIM> * >::const_iterator iter = mpPeriodicBcMap[index_of_unknown]->begin();
+            for (auto iter = mpPeriodicBcMap[index_of_unknown]->begin();
                  iter != mpPeriodicBcMap[index_of_unknown]->end();
                  ++iter)
             {

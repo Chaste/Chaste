@@ -180,7 +180,7 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
     {
         mNumFaces = 0;
         vtkSmartPointer<vtkIdList> enclosing_cells = vtkSmartPointer<vtkIdList>::New();
-        assert(mNumNodes == (unsigned) mpVtkUnstructuredGrid->GetNumberOfPoints());
+        assert(mNumNodes == static_cast<unsigned>(mpVtkUnstructuredGrid->GetNumberOfPoints()));
         for (unsigned point_index = 0; point_index < mNumNodes; ++point_index)
         {
             mpVtkUnstructuredGrid->GetPointCells(point_index, enclosing_cells);
@@ -396,7 +396,7 @@ ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextFaceData()
     else if (ELEMENT_DIM == 1u)
     {
         vtkSmartPointer<vtkIdList> enclosing_cells = vtkSmartPointer<vtkIdList>::New();
-        assert(mNumNodes == (unsigned) mpVtkUnstructuredGrid->GetNumberOfPoints());
+        assert(mNumNodes == static_cast<unsigned>(mpVtkUnstructuredGrid->GetNumberOfPoints()));
         for (unsigned point_index = mBoundaryFacesSkipped; point_index < mNumNodes; ++point_index)
         {
             mBoundaryFacesSkipped++;

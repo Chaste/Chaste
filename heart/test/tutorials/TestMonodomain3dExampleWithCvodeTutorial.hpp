@@ -202,7 +202,7 @@ public:
         {
             std::vector<unsigned> nodes_to_be_output;
             nodes_to_be_output.push_back(0);
-            nodes_to_be_output.push_back((unsigned)round( (mesh.GetNumNodes()-1)/2 ));
+            nodes_to_be_output.push_back(static_cast<unsigned>(round((mesh.GetNumNodes()-1) / 2)));
             nodes_to_be_output.push_back(mesh.GetNumNodes()-1);
             monodomain_problem.SetOutputNodes(nodes_to_be_output);
         }

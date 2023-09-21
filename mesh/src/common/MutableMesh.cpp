@@ -179,7 +179,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::SetNode(unsigned index,
 
     if (concreteMove)
     {
-        for (typename Node<SPACE_DIM>::ContainingBoundaryElementIterator it = this->mNodes[index]->ContainingBoundaryElementsBegin();
+        for (auto it = this->mNodes[index]->ContainingBoundaryElementsBegin();
              it != this->mNodes[index]->ContainingBoundaryElementsEnd();
              ++it)
         {
@@ -193,7 +193,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::SetNode(unsigned index,
                 EXCEPTION("Moving node caused a boundary element to have a non-positive Jacobian determinant");
             }
         }
-        for (typename Node<SPACE_DIM>::ContainingElementIterator it = this->mNodes[index]->ContainingElementsBegin();
+        for (auto it = this->mNodes[index]->ContainingElementsBegin();
              it != this->mNodes[index]->ContainingElementsEnd();
              ++it)
         {
@@ -234,9 +234,9 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::DeleteNode(unsigned index)
     {
         EXCEPTION("Trying to delete a deleted node");
     }
-    unsigned target_index = (unsigned)(-1);
-    bool found_target=false;
-    for (typename Node<SPACE_DIM>::ContainingElementIterator it = this->mNodes[index]->ContainingElementsBegin();
+    unsigned target_index = static_cast<unsigned>(-1);
+    bool found_target = false;
+    for (auto it = this->mNodes[index]->ContainingElementsBegin();
          !found_target && it != this->mNodes[index]->ContainingElementsEnd();
          ++it)
     {
@@ -494,7 +494,7 @@ unsigned MutableMesh<ELEMENT_DIM, SPACE_DIM>::RefineElement(
         p_new_element->UpdateNode(ELEMENT_DIM-1-i, this->mNodes[new_node_index]);
 
         // Third, add the new element to the set
-        if ((unsigned) new_elt_index == this->mElements.size())
+        if (new_elt_index == this->mElements.size())
         {
             this->mElements.push_back(p_new_element);
         }
@@ -623,7 +623,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReIndex(NodeMap& map)
             live_nodes.push_back(this->mNodes[i]);
             // the nodes will have their index set to be the index into the live_nodes
             // vector further down
-            map.SetNewIndex(i, (unsigned)(live_nodes.size()-1));
+            map.SetNewIndex(i, static_cast<unsigned>(live_nodes.size()-1));
         }
     }
 
@@ -824,9 +824,9 @@ std::vector<c_vector<unsigned, 5> > MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitLo
             std::set<std::pair<unsigned, unsigned> > long_edges;
 
             // Loop over elements to check for Long edges
-            for (typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator elem_iter = this->GetElementIteratorBegin();
-                elem_iter != this->GetElementIteratorEnd();
-                ++elem_iter)
+            for (auto elem_iter = this->GetElementIteratorBegin();
+                 elem_iter != this->GetElementIteratorEnd();
+                 ++elem_iter)
             {
                 unsigned num_nodes = ELEMENT_DIM+1;
 

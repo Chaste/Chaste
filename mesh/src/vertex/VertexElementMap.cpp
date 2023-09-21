@@ -81,7 +81,7 @@ unsigned VertexElementMap::GetNewIndex(unsigned oldIndex) const
     {
         EXCEPTION("VertexElement has been deleted");
     }
-    return (unsigned) mMap[oldIndex];
+    return static_cast<unsigned>(mMap[oldIndex]);
 }
 
 bool VertexElementMap::IsIdentityMap()

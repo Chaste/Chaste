@@ -79,9 +79,9 @@ double StreeterFibreGenerator<SPACE_DIM>::GetAveragedThicknessLocalNode(
     Node<SPACE_DIM>* p_current_node = this->mpMesh->GetNode(nodeIndex);
 
     // Loop over the elements containing the given node
-    for (typename Node<SPACE_DIM>::ContainingElementIterator element_iterator = p_current_node->ContainingElementsBegin();
-        element_iterator != p_current_node->ContainingElementsEnd();
-        ++element_iterator)
+    for (auto element_iterator = p_current_node->ContainingElementsBegin();
+         element_iterator != p_current_node->ContainingElementsEnd();
+         ++element_iterator)
     {
         // Get a pointer to the container element
         Element<SPACE_DIM,SPACE_DIM>* p_containing_element = this->mpMesh->GetElement(*element_iterator);

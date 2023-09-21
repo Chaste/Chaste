@@ -267,7 +267,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
                                                                 intra_h_conductivities,
                                                                 extra_h_conductivities);
         unsigned local_element_index = 0;
-        for (typename AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>::ElementIterator it = this->mpMesh->GetElementIteratorBegin();
+        for (auto it = this->mpMesh->GetElementIteratorBegin();
              it != this->mpMesh->GetElementIteratorEnd();
              ++it)
         {
@@ -403,7 +403,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
                                                                 intra_h_conductivities,
                                                                 extra_h_conductivities);
         unsigned local_element_index = 0;
-        for (typename AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>::ElementIterator iter = (this->mpMesh)->GetElementIteratorBegin();
+        for (auto iter = (this->mpMesh)->GetElementIteratorBegin();
              iter != (this->mpMesh)->GetElementIteratorEnd();
              ++iter)
         {

@@ -67,9 +67,9 @@ void VtkNonlinearElasticitySolutionWriter<DIM>::Write()
 
     // write the element attribute as cell data.
     std::vector<double> element_attribute;
-    for (typename QuadraticMesh<DIM>::ElementIterator iter = mpSolver->mrQuadMesh.GetElementIteratorBegin();
-        iter != mpSolver->mrQuadMesh.GetElementIteratorEnd();
-        ++iter)
+    for (auto iter = mpSolver->mrQuadMesh.GetElementIteratorBegin();
+         iter != mpSolver->mrQuadMesh.GetElementIteratorEnd();
+         ++iter)
     {
         element_attribute.push_back(iter->GetAttribute());
     }
@@ -105,7 +105,7 @@ void VtkNonlinearElasticitySolutionWriter<DIM>::Write()
             }
         }
 
-        for (typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter = mpSolver->mrQuadMesh.GetElementIteratorBegin();
+        for (auto iter = mpSolver->mrQuadMesh.GetElementIteratorBegin();
              iter != mpSolver->mrQuadMesh.GetElementIteratorEnd();
              ++iter)
         {

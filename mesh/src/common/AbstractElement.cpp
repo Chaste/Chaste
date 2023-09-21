@@ -92,7 +92,7 @@ double AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNodeLocation(
     unsigned dimension) const
 {
     assert(dimension < SPACE_DIM);
-    assert((unsigned)localIndex < mNodes.size());
+    assert(localIndex < mNodes.size());
     return mNodes[localIndex]->rGetLocation()[dimension];
 }
 
@@ -188,7 +188,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetUnsignedAttribute()
 {
     double double_attr = GetAttribute();
-    unsigned unsigned_attr = (unsigned) (double_attr + 0.5);
+    unsigned unsigned_attr = static_cast<unsigned>(double_attr + 0.5);
 
     if (CompareDoubles::WithinAnyTolerance(double_attr, unsigned_attr) == false)
     {

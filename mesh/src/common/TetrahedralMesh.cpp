@@ -712,7 +712,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::RefreshJacobianCachedData()
     this->mBoundaryElementJacobianDeterminants.resize(num_boundary_elements);
 
     // Update caches
-    for (typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator iter = this->GetElementIteratorBegin();
+    for (auto iter = this->GetElementIteratorBegin();
          iter != this->GetElementIteratorEnd();
          ++iter)
     {
@@ -722,7 +722,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::RefreshJacobianCachedData()
 
     if (ELEMENT_DIM < SPACE_DIM)
     {
-        for (typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator iter = this->GetElementIteratorBegin();
+        for (auto iter = this->GetElementIteratorBegin();
              iter != this->GetElementIteratorEnd();
              ++iter)
         {
@@ -731,7 +731,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::RefreshJacobianCachedData()
         }
     }
 
-    for (typename TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::BoundaryElementIterator itb = this->GetBoundaryElementIteratorBegin();
+    for (auto itb = this->GetBoundaryElementIteratorBegin();
          itb != this->GetBoundaryElementIteratorEnd();
          itb++)
     {
@@ -849,11 +849,10 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ExportToMesher(NodeMap& map, MESHE
 
         // Assume there is enough space for this
         mesherInput.numberofcorners = ELEMENT_DIM + 1;
-        for (typename TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator elem_iter = this->GetElementIteratorBegin();
+        for (auto elem_iter = this->GetElementIteratorBegin();
              elem_iter != this->GetElementIteratorEnd();
              ++elem_iter)
         {
-
             for (unsigned j = 0; j <= ELEMENT_DIM; j++)
             {
                 elementList[element_index * (ELEMENT_DIM + 1) + j] = (*elem_iter).GetNodeGlobalIndex(j);
@@ -874,7 +873,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ImportFromMesher(MESHER_IO& mesher
     Clear();
 
     // Construct the nodes
-    for (unsigned node_index = 0; node_index < (unsigned)mesherOutput.numberofpoints; node_index++)
+    for (unsigned node_index = 0; node_index < static_cast<unsigned>(mesherOutput.numberofpoints); node_index++)
     {
         this->mNodes.push_back(new Node<SPACE_DIM>(node_index, &mesherOutput.pointlist[node_index * SPACE_DIM], false));
     }

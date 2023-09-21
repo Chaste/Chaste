@@ -562,9 +562,9 @@ void AbstractContinuumMechanicsSolver<DIM>::CreateVtkOutput(std::string spatialS
 
     //Output the element attribute as cell data.
     std::vector<double> element_attribute;
-    for (typename QuadraticMesh<DIM>::ElementIterator iter = this->mrQuadMesh.GetElementIteratorBegin();
-        iter != this->mrQuadMesh.GetElementIteratorEnd();
-        ++iter)
+    for (auto iter = this->mrQuadMesh.GetElementIteratorBegin();
+         iter != this->mrQuadMesh.GetElementIteratorEnd();
+         ++iter)
     {
         element_attribute.push_back(iter->GetAttribute());
     }
@@ -605,7 +605,7 @@ void AbstractContinuumMechanicsSolver<DIM>::RemovePressureDummyValuesThroughLine
     unsigned num_internal_nodes_per_element = DIM==2 ? 3 : 6;
 
     // loop over elements, then loop over edges.
-    for (typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter = mrQuadMesh.GetElementIteratorBegin();
+    for (auto iter = mrQuadMesh.GetElementIteratorBegin();
          iter != mrQuadMesh.GetElementIteratorEnd();
          ++iter)
     {
@@ -869,7 +869,7 @@ void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
             num_non_zeros_each_row[i] = 0;
         }
 
-        for (typename AbstractMesh<DIM,DIM>::NodeIterator iter = mrQuadMesh.GetNodeIteratorBegin();
+        for (auto iter = mrQuadMesh.GetNodeIteratorBegin();
              iter != mrQuadMesh.GetNodeIteratorEnd();
              ++iter)
         {

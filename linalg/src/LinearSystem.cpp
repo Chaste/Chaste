@@ -214,7 +214,7 @@ LinearSystem::LinearSystem(Vec residualVector, Mat jacobianMatrix)
     if (mRhsVector)
     {
         VecGetSize(mRhsVector, &vec_size);
-        mSize = (unsigned)vec_size;
+        mSize = static_cast<unsigned>(vec_size);
         VecGetOwnershipRange(mRhsVector, &mOwnershipRangeLo, &mOwnershipRangeHi);
     }
     if (mLhsMatrix)
@@ -222,7 +222,7 @@ LinearSystem::LinearSystem(Vec residualVector, Mat jacobianMatrix)
         PetscInt mat_cols;
         MatGetSize(mLhsMatrix, &mat_size, &mat_cols);
         assert(mat_size == mat_cols);
-        mSize = (unsigned)mat_size;
+        mSize = static_cast<unsigned>(mat_size);
         MatGetOwnershipRange(mLhsMatrix, &mOwnershipRangeLo, &mOwnershipRangeHi);
 
         MatInfo matrix_info;
@@ -232,7 +232,7 @@ LinearSystem::LinearSystem(Vec residualVector, Mat jacobianMatrix)
          * Assuming that mLhsMatrix was created with PetscTools::SetupMat, the value
          * below should be equivalent to what was used as preallocation in that call.
          */
-        mRowPreallocation = (unsigned) matrix_info.nz_allocated / mSize;
+        mRowPreallocation = static_cast<unsigned>(matrix_info.nz_allocated) / mSize;
     }
     assert(!mRhsVector || !mLhsMatrix || vec_size == mat_size);
 
@@ -412,7 +412,7 @@ void LinearSystem::ZeroLinearSystem()
 
 unsigned LinearSystem::GetSize() const
 {
-    return (unsigned) mSize;
+    return static_cast<unsigned>(mSize);
 }
 
 void LinearSystem::SetNullBasis(Vec nullBasis[], unsigned numberOfBases)
@@ -503,7 +503,7 @@ unsigned LinearSystem::GetNumIterations() const
     PetscInt num_its;
     KSPGetIterationNumber(this->mKspSolver, &num_its);
 
-    return (unsigned) num_its;
+    return static_cast<unsigned>(num_its);
 }
 
 Vec& LinearSystem::rGetRhsVector()
@@ -1109,7 +1109,7 @@ Vec LinearSystem::Solve(Vec lhsGuess)
         }
 
         mTotalNumIterations += num_it;
-        if ((unsigned) num_it > mMaxNumIterations)
+        if (static_cast<unsigned>(num_it) > mMaxNumIterations)
         {
             mMaxNumIterations = num_it;
         }

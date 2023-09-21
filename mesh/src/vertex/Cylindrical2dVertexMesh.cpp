@@ -103,9 +103,9 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
     {
         // First create an extended mesh to include points extended from the boundary
         std::vector<Node<2> *> nodes;
-        for (typename TetrahedralMesh<2,2>::NodeIterator node_iter = mpDelaunayMesh->GetNodeIteratorBegin();
-            node_iter != mpDelaunayMesh->GetNodeIteratorEnd();
-            ++node_iter)
+        for (auto node_iter = mpDelaunayMesh->GetNodeIteratorBegin();
+             node_iter != mpDelaunayMesh->GetNodeIteratorEnd();
+             ++node_iter)
         {
             nodes.push_back(new Node<2>(node_iter->GetIndex(), node_iter->rGetLocation(),node_iter->IsBoundaryNode()));
         }

@@ -75,7 +75,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleR
     c_vector<double, STENCIL_SIZE> b_elem;
 
     // Loop over elements
-    for (typename AbstractTetrahedralMesh<DIM, DIM>::ElementIterator iter = this->mrQuadMesh.GetElementIteratorBegin();
+    for (auto iter = this->mrQuadMesh.GetElementIteratorBegin();
          iter != this->mrQuadMesh.GetElementIteratorEnd();
          ++iter)
     {
@@ -590,7 +590,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::FormInitialGuess()
 {
     this->mCurrentSolution.resize(this->mNumDofs, 0.0);
 
-    for (typename AbstractTetrahedralMesh<DIM, DIM>::ElementIterator iter = this->mrQuadMesh.GetElementIteratorBegin();
+    for (auto iter = this->mrQuadMesh.GetElementIteratorBegin();
          iter != this->mrQuadMesh.GetElementIteratorEnd();
          ++iter)
     {

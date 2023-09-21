@@ -255,9 +255,9 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
         ///\todo #1730 and we should be able to combine ASCII branch
         std::vector<double> coords;
         // Binary : load only the nodes which are needed
-        for (typename AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_it = rMeshReader.GetNodeIteratorBegin(nodes_owned);
-                      node_it != rMeshReader.GetNodeIteratorEnd();
-                      ++node_it)
+        for (auto node_it = rMeshReader.GetNodeIteratorBegin(nodes_owned);
+             node_it != rMeshReader.GetNodeIteratorEnd();
+             ++node_it)
         {
             // Loop over wholly-owned nodes
             unsigned global_node_index = node_it.GetIndex();
@@ -274,7 +274,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
 
             this->mNodes.push_back(p_node);
         }
-        for (typename AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_it = rMeshReader.GetNodeIteratorBegin(halo_nodes_owned);
+        for (auto node_it = rMeshReader.GetNodeIteratorBegin(halo_nodes_owned);
              node_it != rMeshReader.GetNodeIteratorEnd();
              ++node_it)
         {
@@ -319,8 +319,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
         }
     }
 
-    for (typename AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::ElementIterator elem_it
-             = rMeshReader.GetElementIteratorBegin(elements_owned);
+    for (auto elem_it = rMeshReader.GetElementIteratorBegin(elements_owned);
          elem_it != rMeshReader.GetElementIteratorEnd();
          ++elem_it)
     {
@@ -1465,7 +1464,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
 
     for (unsigned elem_index=0; elem_index<num_elements; elem_index++)
     {
-        if ((unsigned) global_element_partition[elem_index] == local_proc_index)
+        if (static_cast<unsigned>(global_element_partition[elem_index]) == local_proc_index)
         {
             rElementsOwned.insert(elem_index);
         }

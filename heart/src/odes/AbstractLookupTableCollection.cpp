@@ -63,7 +63,7 @@ void AbstractLookupTableCollection::GetTableProperties(const std::string& rKeyin
 void AbstractLookupTableCollection::SetTableProperties(const std::string& rKeyingVariableName, double min, double step, double max)
 {
     // Check inputs
-    unsigned num_steps = (unsigned) ((max-min)/step+0.5);
+    unsigned num_steps = static_cast<unsigned>((max-min)/step + 0.5);
     ///\todo remove magic number? (#1884)
     if (fabs(max - min - num_steps*step) > 1e-10)
     {

@@ -915,7 +915,7 @@ void AbstractNonlinearElasticitySolver<DIM>::WriteCurrentStrains(StrainType stra
 
     c_matrix<double,DIM,DIM> strain;
 
-    for (typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter = this->mrQuadMesh.GetElementIteratorBegin();
+    for (auto iter = this->mrQuadMesh.GetElementIteratorBegin();
          iter != this->mrQuadMesh.GetElementIteratorEnd();
          ++iter)
     {

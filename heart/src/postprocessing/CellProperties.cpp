@@ -267,7 +267,7 @@ std::vector<double> CellProperties::CalculateActionPotentialDurations(const doub
                 if (mrVoltage[t] < targets[ap_index])
                 {
                     apd_start_time = prev_t + ((targets[ap_index] - prev_v) / (mrVoltage[t] - prev_v)) * (mrTime[t] - prev_t);
-                    apd_starting_index = (unsigned)(t + 1); // Should be a safe conversion since t not allowed to go negative in this loop.
+                    apd_starting_index = static_cast<unsigned>(t + 1); // Should be a safe conversion since t not allowed to go negative in this loop.
                     break;
                 }
                 prev_t = mrTime[t];

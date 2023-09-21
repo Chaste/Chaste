@@ -74,9 +74,9 @@ OdeSolution AbstractGeneralizedRushLarsenCardiacCell::Compute(double tStart, dou
     {
         tSamp = mDt;
     }
-    const unsigned n_steps = (unsigned) floor((tEnd - tStart)/tSamp + 0.5);
+    const unsigned n_steps = static_cast<unsigned>(floor((tEnd - tStart)/tSamp + 0.5));
     assert(fabs(tStart+n_steps*tSamp - tEnd) < 1e-12);
-    const unsigned n_small_steps = (unsigned) floor(tSamp/mDt+0.5);
+    const unsigned n_small_steps = static_cast<unsigned>(floor(tSamp/mDt + 0.5));
     assert(fabs(mDt*n_small_steps - tSamp) < 1e-12);
 
     // Initialise solution store

@@ -175,7 +175,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
      */
     MatInfo matrix_info;
     MatGetInfo(connectivity_matrix, MAT_LOCAL, &matrix_info);
-    unsigned local_num_nz = (unsigned) matrix_info.nz_used;
+    unsigned local_num_nz = static_cast<unsigned>(matrix_info.nz_used);
 
     size_t size = (num_local_nodes+1)*sizeof(PetscInt);
     void* ptr;

@@ -124,7 +124,7 @@ template<class MeshType>
 void SetCircularTissueIn2dMesh(MeshType* pMesh,
                                double centreX, double centreY, double radius)
 {
-    for (typename MeshType::ElementIterator it = pMesh->GetElementIteratorBegin();
+    for (auto it = pMesh->GetElementIteratorBegin();
          it != pMesh->GetElementIteratorEnd();
          ++it)
     {

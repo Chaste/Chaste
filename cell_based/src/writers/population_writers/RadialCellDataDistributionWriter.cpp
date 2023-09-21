@@ -84,11 +84,11 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::VisitAnyPopulatio
         unsigned counter = 0;
         double average_solution = 0.0;
 
-        for (auto iter = radius_cell_map.begin(); iter != radius_cell_map.end(); ++iter)
+        for (auto&& [first, second] : radius_cell_map)
         {
-            if (iter->first > lower_radius && iter->first <= radius_intervals[i])
+            if (first > lower_radius && first <= radius_intervals[i])
             {
-                average_solution += (iter->second)->GetCellData()->GetItem(mVariableName);
+                average_solution += second->GetCellData()->GetItem(mVariableName);
                 counter++;
             }
         }
@@ -139,11 +139,11 @@ void RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
         unsigned counter = 0;
         double average_solution = 0.0;
 
-        for (auto iter = radius_cell_map.begin(); iter != radius_cell_map.end(); ++iter)
+        for (auto&& [first, second] : radius_cell_map)
         {
-            if (iter->first > lower_radius && iter->first <= radius_intervals[i])
+            if (first > lower_radius && first <= radius_intervals[i])
             {
-                average_solution += (iter->second)->GetCellData()->GetItem(mVariableName);
+                average_solution += second->GetCellData()->GetItem(mVariableName);
                 counter++;
             }
         }

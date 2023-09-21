@@ -233,9 +233,9 @@ OdeSolution AbstractBackwardEulerCardiacCell<SIZE>::Compute(double tStart, doubl
         tSamp = mDt;
     }
     double _n_steps = (tEnd - tStart) / tSamp;
-    const unsigned n_steps = (unsigned) floor(_n_steps+0.5);
+    const unsigned n_steps = static_cast<unsigned>(floor(_n_steps + 0.5));
     assert(fabs(tStart+n_steps*tSamp - tEnd) < 1e-12);
-    const unsigned n_small_steps = (unsigned) floor(tSamp/mDt+0.5);
+    const unsigned n_small_steps = static_cast<unsigned>(floor(tSamp/mDt + 0.5));
     assert(fabs(mDt*n_small_steps - tSamp) < 1e-12);
 
     // Initialise solution store
@@ -278,7 +278,7 @@ void AbstractBackwardEulerCardiacCell<SIZE>::ComputeExceptVoltage(double tStart,
     // each one, to update all state variables except for V, using backward Euler.
 
     // Check length of time interval
-    unsigned n_steps = (unsigned)((tEnd - tStart) / mDt + 0.5);
+    unsigned n_steps = static_cast<unsigned>((tEnd - tStart) / mDt + 0.5);
     assert(fabs(tStart + n_steps*mDt - tEnd) < 1e-12);
 
     // Loop over time
@@ -392,9 +392,9 @@ public:
             tSamp = mDt;
         }
         double _n_steps = (tEnd - tStart) / tSamp;
-        const unsigned n_steps = (unsigned) floor(_n_steps+0.5);
+        const unsigned n_steps = static_cast<unsigned>(floor(_n_steps + 0.5));
         assert(fabs(tStart+n_steps*tSamp - tEnd) < 1e-12);
-        const unsigned n_small_steps = (unsigned) floor(tSamp/mDt+0.5);
+        const unsigned n_small_steps = static_cast<unsigned>(floor(tSamp/mDt + 0.5));
         assert(fabs(mDt*n_small_steps - tSamp) < 1e-12);
 
         // Initialise solution store
@@ -445,7 +445,7 @@ public:
         // each one, to update all state variables except for V, using backward Euler.
 
         // Check length of time interval
-        unsigned n_steps = (unsigned)((tEnd - tStart) / mDt + 0.5);
+        unsigned n_steps = static_cast<unsigned>((tEnd - tStart) / mDt + 0.5);
         assert(fabs(tStart + n_steps*mDt - tEnd) < 1e-12);
 
         // Loop over time

@@ -126,7 +126,7 @@ private:
 
         // also check the size of the data is correct
         TS_ASSERT_EQUALS(solutions.rGetSolutions().size(),
-                         (unsigned) (num_timesteps+1));
+                         static_cast<unsigned>(num_timesteps+1));
 
         int last = num_timesteps;
 

@@ -293,7 +293,7 @@ void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_
     c_vector<double, STENCIL_SIZE> b_elem;
 
     // Loop over elements
-    for (typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator iter = mpMesh->GetElementIteratorBegin();
+    for (auto iter = mpMesh->GetElementIteratorBegin();
          iter != mpMesh->GetElementIteratorEnd();
          ++iter)
     {
