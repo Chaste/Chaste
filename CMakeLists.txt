@@ -976,9 +976,9 @@ if (Chaste_MEMORY_TESTING)
     set (NICENESS -n15)
     set (CTEST_COMMAND ctest)
     add_custom_target (memtest
-                       COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-j${Chaste_MEMORY_TESTING_CPUS}" "-L" Continuous "--output-on-failure"
+                       COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-j${Chaste_MEMORY_TESTING_CPUS}" "-L" Continuous_global "--output-on-failure"
                        COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_valgrind_output.py" "${Chaste_MEMORY_TESTING_OUTPUT_DIR}"
-                       DEPENDS Continuous
+                       DEPENDS global
                        WORKING_DIRECTORY ${Chaste_BINARY_DIR}
                        VERBATIM)
 endif ()
