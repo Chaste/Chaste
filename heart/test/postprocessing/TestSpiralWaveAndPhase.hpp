@@ -178,8 +178,7 @@ public:
 
         // Work out the index of the first time greater than or equal to tau.
         unsigned first_index = 0u;
-        for (unsigned i=0; i<times.size();
-        
+        for (unsigned i = 0; i < times.size(); ++i)        
         {
             if (times[i] >= tau + times[0])
             {
