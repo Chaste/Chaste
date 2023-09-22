@@ -84,7 +84,7 @@ void QuadraticMeshHelper<DIM>::AddInternalNodesToElements(AbstractTetrahedralMes
             assert(p_element->GetNumNodes()==DIM+1); // Element is initially linear
 
             // Add extra nodes to make it a quad element
-            for (unsigned j=DIM+1; j<(DIM+1)*(DIM+2)/2; j++)
+            for (unsigned j=DIM+1; j<(DIM+1)*(DIM+2)/2; ++j)
             {
                 unsigned node_index = nodes[j];
                 if (!r_node_perm.empty())
@@ -155,7 +155,7 @@ void QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(AbstractTetrahedralMes
         {
             // Collect the nodes of this boundary element in a set
             std::set<unsigned> boundary_element_node_indices;
-            for (unsigned i=0; i<DIM; i++)
+            for (unsigned i = 0; i < DIM; ++i)
             {
                 boundary_element_node_indices.insert( (*iter)->GetNodeGlobalIndex(i) );
             }

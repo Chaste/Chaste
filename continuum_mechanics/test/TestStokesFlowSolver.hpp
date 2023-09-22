@@ -74,7 +74,7 @@ public:
             // Boundary flow
             std::vector<unsigned> dirichlet_nodes;
             std::vector<c_vector<double,2> > dirichlet_flow;
-            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
             {
                 double x = mesh.GetNode(i)->rGetLocation()[0];
                 double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -108,7 +108,7 @@ public:
 
             solver.Solve();
 
-            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
             {
                 double x = mesh.GetNode(i)->rGetLocation()[0];
                 double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -121,7 +121,7 @@ public:
 
             // test the pressures
             std::vector<double>& r_pressures = solver.rGetPressures();
-            for (unsigned i=0; i<r_pressures.size(); i++)
+            for (unsigned i=0; i<r_pressures.size(); ++i)
             {
                 // solution is in finite element space, so FEM solution will be exact,
                 // apart from linear solver errors
@@ -149,7 +149,7 @@ public:
         // Boundary flow
         std::vector<unsigned> dirichlet_nodes;
         std::vector<c_vector<double,2> > dirichlet_flow;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -176,7 +176,7 @@ public:
 
         solver.Solve();
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -189,7 +189,7 @@ public:
 
         // test the pressures
         std::vector<double>& r_pressures = solver.rGetPressures();
-        for (unsigned i=0; i<r_pressures.size(); i++)
+        for (unsigned i=0; i<r_pressures.size(); ++i)
         {
             // solution is in finite element space, so FEM solution will be exact,
             // apart from linear solver errors
@@ -217,7 +217,7 @@ public:
         // Boundary flow
         std::vector<unsigned> dirichlet_nodes;
         std::vector<c_vector<double,2> > dirichlet_flow;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -245,7 +245,7 @@ public:
 
         solver.Solve();
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             double y = mesh.GetNode(i)->rGetLocation()[1];
             double exact_flow_x = y*(1-y);
@@ -264,7 +264,7 @@ public:
         double x = mesh.GetNode(0)->rGetLocation()[0];
         double constant = r_pressures[0] - 2*(1-x);
         // test the rest
-        for (unsigned i=1; i<r_pressures.size(); i++)
+        for (unsigned i=1; i<r_pressures.size(); ++i)
         {
             x = mesh.GetNode(i)->rGetLocation()[0];
             double exact_pressure = 2*(1-x) + constant;
@@ -307,7 +307,7 @@ public:
         // Boundary flow
         std::vector<unsigned> dirichlet_nodes;
         std::vector<c_vector<double,2> > dirichlet_flow;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -364,7 +364,7 @@ public:
 
         solver.Solve();
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -377,7 +377,7 @@ public:
 
         // test the pressures
         std::vector<double>& r_pressures = solver.rGetPressures();
-        for (unsigned i=0; i<r_pressures.size(); i++)
+        for (unsigned i=0; i<r_pressures.size(); ++i)
         {
             // solution is in finite element space, so FEM solution will be exact,
             // apart from linear solver errors
@@ -409,7 +409,7 @@ public:
             // Boundary flow
             std::vector<unsigned> dirichlet_nodes;
             std::vector<c_vector<double,2> > dirichlet_flow;
-            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
             {
                 double x = mesh.GetNode(i)->rGetLocation()[0];
                 double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -439,7 +439,7 @@ public:
             solver.Solve();
 
 
-            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
             {
                 double x = mesh.GetNode(i)->rGetLocation()[0];
                 double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -460,7 +460,7 @@ public:
             std::vector<double>& r_pressures = solver.rGetPressures();
 
             double pressure_difference = 0.0;
-            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
             {
                 double x = mesh.GetNode(i)->rGetLocation()[0];
                 double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -469,7 +469,7 @@ public:
             }
             pressure_difference /= mesh.GetNumVertices();
 
-            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
             {
                 double x = mesh.GetNode(i)->rGetLocation()[0];
                 double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -479,7 +479,7 @@ public:
         }
 
         std::cout << "Num_elements Linf_error_flow Linf_error_p\n";
-        for (unsigned i=0; i<num_runs; i++)
+        for (unsigned i=0; i<num_runs; ++i)
         {
             std::cout << num_elem[i] << " " << L_inf_error_flow[i] << " " << L_inf_error_p[i] << "\n";
         }
@@ -497,7 +497,7 @@ public:
         double res_flow[5] = { 1.51032, 0.250461, 0.0368664, 0.00464591, 0.000625753 };
         double res_p[5] = { 14.3527, 5.12699, 1.95504, 0.576949, 0.155241};
         assert(num_runs <= 5);
-        for (unsigned i=0; i<num_runs; i++)
+        for (unsigned i=0; i<num_runs; ++i)
         {
             TS_ASSERT_DELTA( L_inf_error_flow[i], res_flow[i], 1e-3);
             TS_ASSERT_DELTA( L_inf_error_p[i], res_p[i], 1e-3);
@@ -519,7 +519,7 @@ public:
         // Boundary flow
         std::vector<unsigned> dirichlet_nodes;
         std::vector<c_vector<double,2> > dirichlet_flow;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -572,7 +572,7 @@ public:
         std::vector<c_vector<double,2> >& r_flow = solver.rGetVelocities();
         std::vector<double>& r_pressures = solver.rGetPressures();
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             min_u = std::min(min_u, r_flow[i](0));
             max_u = std::max(max_u, r_flow[i](0));
@@ -598,7 +598,7 @@ public:
         TS_ASSERT_DELTA(max_v,  0.075, 5e-3);
 
         // find a node in the interior for which u and v both not small
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -657,7 +657,7 @@ public:
 
         std::vector<c_vector<double,3> >& r_solution = solver.rGetVelocities();
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -672,7 +672,7 @@ public:
         std::vector<double>& r_pressures = solver.rGetPressures();
         bool first = true;
         double value;
-        for (unsigned i=0; i<r_pressures.size(); i++)
+        for (unsigned i=0; i<r_pressures.size(); ++i)
         {
             if (first)
             {
@@ -736,7 +736,7 @@ public:
 
         std::vector<c_vector<double,3> >& r_solution = solver.rGetVelocities();
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];

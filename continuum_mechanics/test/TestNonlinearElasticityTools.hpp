@@ -56,7 +56,7 @@ public:
           = NonlinearElasticityTools<2>::GetNodesByComponentValue(mesh,0,0);
 
         TS_ASSERT_EQUALS(indices.size(), 21u);
-        for (unsigned i=0; i<indices.size(); i++)
+        for (unsigned i=0; i<indices.size(); ++i)
         {
             TS_ASSERT_DELTA(mesh.GetNode(indices[i])->rGetLocation()[0], 0.0, 1e-12);
         }
@@ -70,7 +70,7 @@ public:
           = NonlinearElasticityTools<3>::GetNodesByComponentValue(mesh3d,2,6.23435);
 
         TS_ASSERT_EQUALS(indices3d.size(), 13u);
-        for (unsigned i=0; i<indices3d.size(); i++)
+        for (unsigned i=0; i<indices3d.size(); ++i)
         {
             TS_ASSERT_DELTA(mesh3d.GetNode(indices3d[i])->rGetLocation()[2], 6.23435, 1e-12);
         }

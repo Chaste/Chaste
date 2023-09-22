@@ -76,7 +76,7 @@ private:
     {
         c_vector<double,3> centroid = pElement->CalculateCentroid();
         rData[0] = pElement->GetIndex();
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i=0; i<3; ++i)
         {
             rData[i+1] = centroid[i];
         }
@@ -86,7 +86,7 @@ private:
     {
         //Put square bracket on the first piece of data
         (*mpMasterFile)<<"["<<rData[0]<<"]\t";
-        for (unsigned i=1; i<4; i++)
+        for (unsigned i=1; i<4; ++i)
         {
             (*mpMasterFile)<<rData[i]<<"\t";
         }

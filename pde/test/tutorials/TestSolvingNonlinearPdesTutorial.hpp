@@ -166,7 +166,7 @@ public:
          */
         BoundaryConditionsContainer<2,2,1> bcc;
         ConstBoundaryCondition<2>* p_zero_bc = new ConstBoundaryCondition<2>(0.0);
-        for (TetrahedralMesh<2,2>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
+        for (auto node_iter = mesh.GetBoundaryNodeIteratorBegin();
              node_iter != mesh.GetBoundaryNodeIteratorEnd();
              node_iter++)
         {
@@ -184,7 +184,7 @@ public:
          */
         FunctionalBoundaryCondition<2>* p_functional_bc = new FunctionalBoundaryCondition<2>(&MyNeummanFunction);
         /* Loop over surface elements. */
-        for (TetrahedralMesh<2,2>::BoundaryElementIterator elt_iter = mesh.GetBoundaryElementIteratorBegin();
+        for (auto elt_iter = mesh.GetBoundaryElementIteratorBegin();
              elt_iter != mesh.GetBoundaryElementIteratorEnd();
              elt_iter++)
         {

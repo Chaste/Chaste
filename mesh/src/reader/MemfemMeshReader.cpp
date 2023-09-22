@@ -132,7 +132,7 @@ std::vector<std::vector<double> > MemfemMeshReader<ELEMENT_DIM, SPACE_DIM>::Toke
             std::vector<double> current_coords;
 
             // Form the vector which represents the position of this item
-            for (unsigned i=0; i<SPACE_DIM; i++)
+            for (unsigned i=0; i<SPACE_DIM; ++i)
             {
                 double item_coord;
                 line_stream >> item_coord;
@@ -165,7 +165,7 @@ std::vector<std::vector<unsigned> > MemfemMeshReader<ELEMENT_DIM, SPACE_DIM>::To
         {
             std::vector<unsigned> current_indices;
 
-            for (unsigned i=0; i<dimensionOfObject; i++)
+            for (unsigned i=0; i<dimensionOfObject; ++i)
             {
                 unsigned item_index;
                 line_stream >> item_index;

@@ -106,7 +106,7 @@ std::vector<double> VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextNode()
         std::vector<double> coordinates(SPACE_DIM+1);
 
         // Get the node coordinates using the node iterator (thus skipping deleted nodes)
-        for (unsigned j=0; j<SPACE_DIM; j++)
+        for (unsigned j = 0; j<SPACE_DIM; ++j)
         {
             coordinates[j] = (*(mpIters->pNodeIter))->GetPoint()[j];
         }
@@ -136,7 +136,7 @@ VertexElementData VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElementWithFa
 
         // Store node indices owned by this element
         elem_data.NodeIndices.resize((*(mpIters->pElemIter))->GetNumNodes());
-        for (unsigned j=0; j<elem_data.NodeIndices.size(); j++)
+        for (unsigned j = 0; j<elem_data.NodeIndices.size(); ++j)
         {
             unsigned old_index = (*(mpIters->pElemIter))->GetNodeGlobalIndex(j);
             elem_data.NodeIndices[j] = mpMesh->IsMeshChanging() ? mpNodeMap->GetNewIndex(old_index) : old_index;
@@ -144,7 +144,7 @@ VertexElementData VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElementWithFa
 
         // Store faces owned by this element
         elem_data.Faces.resize((*(mpIters->pElemIter))->GetNumFaces());
-        for (unsigned i=0; i<elem_data.Faces.size(); i++)
+        for (unsigned i = 0; i<elem_data.Faces.size(); ++i)
         {
             // Get pointer to this face
             VertexElement<ELEMENT_DIM-1, SPACE_DIM>* p_face = (*(mpIters->pElemIter))->GetFace(i);
@@ -157,7 +157,7 @@ VertexElementData VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElementWithFa
 
             // Store node indices owned by this face
             face_data.NodeIndices.resize(p_face->GetNumNodes());
-            for (unsigned j=0; j<face_data.NodeIndices.size(); j++)
+            for (unsigned j = 0; j<face_data.NodeIndices.size(); ++j)
             {
                 unsigned old_index = p_face->GetNodeGlobalIndex(j);
                 face_data.NodeIndices[j] = mpMesh->IsMeshChanging() ? mpNodeMap->GetNewIndex(old_index) : old_index;
@@ -192,7 +192,7 @@ ElementData VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElement()
 
         ElementData elem_data;
         elem_data.NodeIndices.resize((*(mpIters->pElemIter))->GetNumNodes());
-        for (unsigned j=0; j<elem_data.NodeIndices.size(); j++)
+        for (unsigned j = 0; j<elem_data.NodeIndices.size(); ++j)
         {
             unsigned old_index = (*(mpIters->pElemIter))->GetNodeGlobalIndex(j);
             elem_data.NodeIndices[j] = mpMesh->IsMeshChanging() ? mpNodeMap->GetNewIndex(old_index) : old_index;
@@ -334,7 +334,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DI
         }
         vtkIdList* p_cell_id_list = p_cell->GetPointIds();
         p_cell_id_list->SetNumberOfIds(iter->GetNumNodes());
-        for (unsigned j=0; j<iter->GetNumNodes(); ++j)
+        for (unsigned j = 0; j<iter->GetNumNodes(); ++j)
         {
             p_cell_id_list->SetId(j, iter->GetNodeGlobalIndex(j));
         }
@@ -350,7 +350,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddCellData(std::string dataName,
 #ifdef CHASTE_VTK
     vtkDoubleArray* p_scalars = vtkDoubleArray::New();
     p_scalars->SetName(dataName.c_str());
-    for (unsigned i=0; i<dataPayload.size(); i++)
+    for (unsigned i = 0; i<dataPayload.size(); ++i)
     {
         p_scalars->InsertNextValue(dataPayload[i]);
     }
@@ -367,7 +367,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddPointData(std::string dataName
 #ifdef CHASTE_VTK
     vtkDoubleArray* p_scalars = vtkDoubleArray::New();
     p_scalars->SetName(dataName.c_str());
-    for (unsigned i=0; i<dataPayload.size(); i++)
+    for (unsigned i = 0; i<dataPayload.size(); ++i)
     {
         p_scalars->InsertNextValue(dataPayload[i]);
     }
@@ -430,11 +430,11 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
         *p_node_file << std::setprecision(6);
 
         // Write each node's data
-        for (unsigned item_num=0; item_num<num_nodes; item_num++)
+        for (unsigned item_num = 0; item_num<num_nodes; item_num++)
         {
             std::vector<double> current_item = this->GetNextNode();
             *p_node_file << item_num;
-            for (unsigned i=0; i<SPACE_DIM+1; i++)
+            for (unsigned i = 0; i<SPACE_DIM+1; ++i)
             {
                 *p_node_file << "\t" << current_item[i];
             }
@@ -453,7 +453,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
         *p_element_file << num_elements << "\t" << num_attr << "\n";
 
         // Write each element's data
-        for (unsigned item_num=0; item_num<num_elements; item_num++)
+        for (unsigned item_num = 0; item_num<num_elements; item_num++)
         {
             if (SPACE_DIM == 2) // In 2D, write the node indices owned by this element
             {
@@ -467,7 +467,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
                 *p_element_file << item_num <<  "\t" << node_indices.size();
 
                 // Write the node indices owned by this element to file
-                for (unsigned i=0; i<node_indices.size(); i++)
+                for (unsigned i = 0; i<node_indices.size(); ++i)
                 {
                     *p_element_file << "\t" << node_indices[i];
                 }
@@ -489,7 +489,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
                 *p_element_file << item_num <<  "\t" << node_indices.size();
 
                 // Write the node indices owned by this element to file
-                for (unsigned i=0; i<node_indices.size(); i++)
+                for (unsigned i = 0; i<node_indices.size(); ++i)
                 {
                     *p_element_file << "\t" << node_indices[i];
                 }
@@ -500,7 +500,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
                 // Write the number of faces owned by this element to file
                 *p_element_file << "\t" << faces.size();
 
-                for (unsigned j=0; j<faces.size(); j++)
+                for (unsigned j = 0; j<faces.size(); ++j)
                 {
                     // Get the node indices owned by this face
                     std::vector<unsigned> face_node_indices = faces[j].NodeIndices;
@@ -509,7 +509,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
                     *p_element_file << "\t" << faces[j].AttributeValue <<  "\t" << face_node_indices.size();
 
                     // Write the node indices owned by this element to file
-                    for (unsigned i=0; i<face_node_indices.size(); i++)
+                    for (unsigned i = 0; i<face_node_indices.size(); ++i)
                     {
                         *p_element_file << "\t" << face_node_indices[i];
                     }

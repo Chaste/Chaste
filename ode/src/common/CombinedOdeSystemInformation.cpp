@@ -43,7 +43,7 @@ boost::shared_ptr<CombinedOdeSystemInformation> CombinedOdeSystemInformation::In
     // Get the information for the subsystems
     std::vector<boost::shared_ptr<const AbstractOdeSystemInformation> > info_vec;
     info_vec.reserve(rSubsystems.size());
-    for (unsigned i=0; i<rSubsystems.size(); i++)
+    for (unsigned i = 0; i<rSubsystems.size(); ++i)
     {
         info_vec.push_back(rSubsystems[i]->GetSystemInformation());
     }
@@ -52,12 +52,12 @@ boost::shared_ptr<CombinedOdeSystemInformation> CombinedOdeSystemInformation::In
 
     // Search to see if we have an information object for this sequence of
     // subsystems already.
-    for (unsigned i=0; i<msInstances.size(); i++)
+    for (unsigned i = 0; i<msInstances.size(); ++i)
     {
         if (info_vec.size() == msInstances[i].subsystemInformation.size())
         {
             bool equal = true;
-            for (unsigned j=0; j<info_vec.size(); j++)
+            for (unsigned j = 0; j<info_vec.size(); ++j)
             {
                 if (msInstances[i].subsystemInformation[j] != info_vec[j])
                 {
@@ -90,7 +90,7 @@ CombinedOdeSystemInformation::CombinedOdeSystemInformation(const std::vector<boo
 {
     // Figure out our size
     unsigned total_system_size = 0u;
-    for (unsigned i=0; i<rSubsystemInfo.size(); i++)
+    for (unsigned i = 0; i<rSubsystemInfo.size(); ++i)
     {
         total_system_size += rSubsystemInfo[i]->rGetStateVariableNames().size();
     }
@@ -99,7 +99,7 @@ CombinedOdeSystemInformation::CombinedOdeSystemInformation(const std::vector<boo
     mInitialConditions.reserve(total_system_size);
 
     // Set up our info from the subsystems
-    for (unsigned i=0; i<rSubsystemInfo.size(); i++)
+    for (unsigned i = 0; i<rSubsystemInfo.size(); ++i)
     {
         std::vector<double> inits = rSubsystemInfo[i]->GetInitialConditions();
         const std::vector<std::string>& names = rSubsystemInfo[i]->rGetStateVariableNames();
@@ -108,7 +108,7 @@ CombinedOdeSystemInformation::CombinedOdeSystemInformation(const std::vector<boo
         assert(inits.size() == system_size);
         assert(units.size() == system_size);
 
-        for (unsigned j=0; j<system_size; j++)
+        for (unsigned j = 0; j<system_size; ++j)
         {
             mVariableNames.push_back(names[j]);
             mVariableUnits.push_back(units[j]);

@@ -145,16 +145,15 @@ public:
 //// data isn't set up in the mesh. Therefore, rather than looping over boundary nodes, we
 //// we loop over all nodes, and set the node to be a boundary node before passing it into
 //// the BCC.
-//        for (MixedDimensionMesh<3,3>::BoundaryNodeIterator iter =
-//               mesh.GetBoundaryNodeIteratorBegin();
+//        for (auto iter = mesh.GetBoundaryNodeIteratorBegin();
 //             iter != mesh.GetBoundaryNodeIteratorEnd();
 //             iter++)
 
-        for (AbstractTetrahedralMesh<3,3>::NodeIterator current_node = mesh.GetNodeIteratorBegin();
-             current_node != mesh.GetNodeIteratorEnd();
-             ++current_node)
+        for (auto node_iter = mesh.GetNodeIteratorBegin();
+             node_iter != mesh.GetNodeIteratorEnd();
+             ++node_iter)
         {
-            Node<3>* p_node = &(*current_node); //Get pointer to the current node from the iterator
+            Node<3>* p_node = &(*node_iter); // Get pointer to the current node from the iterator
             double x = p_node->rGetLocation()[0];
             double y = p_node->rGetLocation()[1];
             double r = sqrt(x*x+y*y);
@@ -171,16 +170,17 @@ public:
         Vec result = cable_solver.Solve();
         double* p_result;
         VecGetArray(result, &p_result);
+
         // Solution should be u = log(r)/(2*pi)
-        for (AbstractTetrahedralMesh<3,3>::NodeIterator current_node = mesh.GetNodeIteratorBegin();
-             current_node != mesh.GetNodeIteratorEnd();
-             ++current_node)
+        for (auto node_iter = mesh.GetNodeIteratorBegin();
+             node_iter != mesh.GetNodeIteratorEnd();
+             ++node_iter)
         {
-            double x = current_node->GetPoint()[0];
-            double y = current_node->GetPoint()[1];
+            double x = node_iter->GetPoint()[0];
+            double y = node_iter->GetPoint()[1];
             double r = sqrt(x*x+y*y);
 
-            unsigned local_index = current_node->GetIndex() - mesh.GetDistributedVectorFactory()->GetLow();
+            unsigned local_index = node_iter->GetIndex() - mesh.GetDistributedVectorFactory()->GetLow();
             if (r > 0.1)
             {
                 // use a tolerance that is weighted by 1-r as accuracy will decrease as

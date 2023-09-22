@@ -203,13 +203,13 @@ template<unsigned DIM>
 void SetConductivities(BidomainProblem<DIM>& rProblem)
 {
     c_vector<double, DIM> conductivities;
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         conductivities[i] = 1.75;
     }
     HeartConfig::Instance()->SetIntracellularConductivities(conductivities);
 
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         conductivities[i] = 7.0;
     }
@@ -220,7 +220,7 @@ template<unsigned DIM>
 void SetConductivities(MonodomainProblem<DIM>& rProblem)
 {
     c_vector<double, DIM> conductivities;
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         conductivities[i] = 1.75;
     }
@@ -336,7 +336,7 @@ public:
             // Calculate positions of nodes 1/4 and 3/4 through the mesh
             unsigned third_quadrant_node;
             unsigned first_quadrant_node;
-            switch(DIM)
+            switch (DIM)
             {
                 case 1:
                 {

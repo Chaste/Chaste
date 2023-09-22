@@ -68,7 +68,7 @@ public:
     {
         unsigned stimulated_cells[] = { 0, 1, 11, 121 };
 
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i=0; i<4; ++i)
         {
             if ((stimulated_cells[i]>=lo) && (stimulated_cells[i]<hi))
             {

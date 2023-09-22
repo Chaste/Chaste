@@ -367,7 +367,7 @@ void AbstractVentilationProblem::SetPerGenerationDynamicResistance()
             {0.162, 0.239, 0.244, 0.295, 0.175, 0.303, 0.356, 0.566, 0.327};
 
     // Convert from gamma to C
-    for (unsigned i=0; i<9; i++)
+    for (unsigned i=0; i<9; ++i)
     {
         per_generation_pedley[i] *= 4.0*sqrt(2.0);
     }

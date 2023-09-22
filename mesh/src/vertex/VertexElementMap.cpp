@@ -86,7 +86,7 @@ unsigned VertexElementMap::GetNewIndex(unsigned oldIndex) const
 
 bool VertexElementMap::IsIdentityMap()
 {
-    for (unsigned i=0; i<mMap.size(); i++)
+    for (unsigned i=0; i<mMap.size(); ++i)
     {
         if (mMap[i] != i)
         {

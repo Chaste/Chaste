@@ -75,12 +75,12 @@ public:
     {
         double x = pNode->rGetLocation()[0];
         double y;
-        if (DIM==2)
+        if (DIM == 2)
         {
             y = pNode->rGetLocation()[1];
         }
 
-        if ((DIM==1 && fabs(x)<0.02+1e-6) || (DIM==2 && fabs(x)<0.02+1e-6 && fabs(y)<0.02+1e-6))
+        if ((DIM == 1 && fabs(x)<0.02+1e-6) || (DIM == 2 && fabs(x)<0.02+1e-6 && fabs(y)<0.02+1e-6))
         {
             return new CellLuoRudy1991FromCellML(this->mpSolver, this->mpStimulus);
         }
@@ -111,13 +111,13 @@ public:
     {
         double x = pNode->rGetLocation()[0];
         double y;
-        if (DIM==2)
+        if (DIM == 2)
         {
             y = pNode->rGetLocation()[1];
         }
 
         AbstractCvodeCell* p_cell;
-        if ((DIM==1 && fabs(x)<0.02+1e-6) || (DIM==2 && fabs(x)<0.02+1e-6 && fabs(y)<0.02+1e-6))
+        if ((DIM == 1 && fabs(x)<0.02+1e-6) || (DIM == 2 && fabs(x)<0.02+1e-6 && fabs(y)<0.02+1e-6))
         {
             p_cell =  new CellLuoRudy1991FromCellMLCvode(this->mpSolver, this->mpStimulus);
         }
@@ -187,7 +187,7 @@ public:
         HeartConfig::Instance()->SetSimulationDuration(4.0); //ms
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
 
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i=0; i<3; ++i)
         {
             // ICI - ionic current interpolation - the default
             {
@@ -269,7 +269,7 @@ public:
 
             if (i==0) // finest mesh
             {
-                for (unsigned j=0; j<final_voltage_ici.GetSize(); j++)
+                for (unsigned j=0; j<final_voltage_ici.GetSize(); ++j)
                 {
                     // visually checked they agree at this mesh resolution, and chosen tolerance from results
                     TS_ASSERT_DELTA(final_voltage_ici[j], final_voltage_svi[j], 0.3);

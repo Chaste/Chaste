@@ -78,7 +78,7 @@ public:
         double simulation_duration = 10000; // This increased to 1e6 to give the timings shown on #1795.
         double max_time_step = 1.0;
 
-        for (unsigned i = 0; i < 10; i++)
+        for (unsigned i = 0; i < 10; ++i)
         {
             boost::shared_ptr<CvodeAdaptor> p_cvode_adaptor(new CvodeAdaptor()); // moving this outside the loop causes seg-faults!
             p_cvode_adaptor->SetTolerances(1e-5, 1e-7); // Match AbstractCvodeCell

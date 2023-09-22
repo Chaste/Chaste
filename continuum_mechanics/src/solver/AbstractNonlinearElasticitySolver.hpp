@@ -171,9 +171,9 @@ public:
         assert(localIndex == pElement->GetIndex()); //Will fail when we move to DistributedQuadraticMesh
         //Flatten the matrix
         c_matrix<double, DIM, DIM> data = mpSolver->GetAverageStressPerElement(localIndex);
-        for (unsigned i=0; i<DIM; i++)
+        for (unsigned i = 0; i < DIM; ++i)
         {
-            for (unsigned j=0; j<DIM; j++)
+            for (unsigned j = 0; j < DIM; ++j)
             {
                 rData[i*DIM+j] = data(i,j);
             }
@@ -879,9 +879,9 @@ std::vector<c_vector<double,DIM> >& AbstractNonlinearElasticitySolver<DIM>::rGet
 {
     this->mSpatialSolution.clear();
     this->mSpatialSolution.resize(this->mrQuadMesh.GetNumNodes(), zero_vector<double>(DIM));
-    for (unsigned i=0; i<this->mrQuadMesh.GetNumNodes(); i++)
+    for (unsigned i = 0; i < this->mrQuadMesh.GetNumNodes(); ++i)
     {
-        for (unsigned j=0; j<DIM; j++)
+        for (unsigned j = 0; j < DIM; ++j)
         {
             this->mSpatialSolution[i](j) = this->mrQuadMesh.GetNode(i)->rGetLocation()[j] + this->mCurrentSolution[this->mProblemDimension*i+j];
         }
@@ -920,9 +920,9 @@ void AbstractNonlinearElasticitySolver<DIM>::WriteCurrentStrains(StrainType stra
          ++iter)
     {
         GetElementCentroidStrain(strainType, *iter, strain);
-        for (unsigned i=0; i<DIM; i++)
+        for (unsigned i = 0; i < DIM; ++i)
         {
-            for (unsigned j=0; j<DIM; j++)
+            for (unsigned j = 0; j < DIM; ++j)
             {
                 *p_file << strain(i,j) << " ";
             }
@@ -1001,7 +1001,7 @@ void AbstractNonlinearElasticitySolver<DIM>::AddStressToAverageStressPerElement(
     //
     // Similarly, for 3d we store
     // [T00 T01 T02 T11 T12 T22]
-    for (unsigned i=0; i<DIM*(DIM+1)/2; i++)
+    for (unsigned i = 0; i < DIM*(DIM+1)/2; ++i)
     {
         unsigned row;
         unsigned col;
@@ -1075,9 +1075,9 @@ void AbstractNonlinearElasticitySolver<DIM>::GetElementCentroidStrain(StrainType
 
     // Get the current displacement at the nodes
     static c_matrix<double,DIM,NUM_NODES_PER_ELEMENT> element_current_displacements;
-    for (unsigned II=0; II<NUM_NODES_PER_ELEMENT; II++)
+    for (unsigned II = 0; II < NUM_NODES_PER_ELEMENT; ++II)
     {
-        for (unsigned JJ=0; JJ<DIM; JJ++)
+        for (unsigned JJ = 0; JJ < DIM; ++JJ)
         {
             element_current_displacements(JJ,II) = this->mCurrentSolution[this->mProblemDimension*rElement.GetNodeGlobalIndex(II) + JJ];
         }
@@ -1097,7 +1097,7 @@ void AbstractNonlinearElasticitySolver<DIM>::GetElementCentroidStrain(StrainType
     }
     else
     {
-        assert(DIM==3);
+        assert(DIM == 3);
         quadrature_point.rGetLocation()(0) = 1.0/4.0;
         quadrature_point.rGetLocation()(1) = 1.0/4.0;
         quadrature_point.rGetLocation()(2) = 1.0/4.0;
@@ -1107,11 +1107,11 @@ void AbstractNonlinearElasticitySolver<DIM>::GetElementCentroidStrain(StrainType
 
     // Interpolate grad_u
     grad_u = zero_matrix<double>(DIM,DIM);
-    for (unsigned node_index=0; node_index<NUM_NODES_PER_ELEMENT; node_index++)
+    for (unsigned node_index = 0; node_index<NUM_NODES_PER_ELEMENT; ++node_index)
     {
-        for (unsigned i=0; i<DIM; i++)
+        for (unsigned i = 0; i < DIM; ++i)
         {
-            for (unsigned M=0; M<DIM; M++)
+            for (unsigned M = 0; M < DIM; ++M)
             {
                 grad_u(i,M) += grad_quad_phi(M,node_index)*element_current_displacements(i,node_index);
             }
@@ -1120,15 +1120,15 @@ void AbstractNonlinearElasticitySolver<DIM>::GetElementCentroidStrain(StrainType
 
     c_matrix<double,DIM,DIM> deformation_gradient;
 
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
-        for (unsigned M=0; M<DIM; M++)
+        for (unsigned M = 0; M < DIM; ++M)
         {
             deformation_gradient(i,M) = (i==M?1:0) + grad_u(i,M);
         }
     }
 
-    switch(strainType)
+    switch (strainType)
     {
         case DEFORMATION_GRADIENT_F:
         {
@@ -1143,9 +1143,9 @@ void AbstractNonlinearElasticitySolver<DIM>::GetElementCentroidStrain(StrainType
         case LAGRANGE_STRAIN_E:
         {
             c_matrix<double,DIM,DIM> C = prod(trans(deformation_gradient),deformation_gradient);
-            for (unsigned M=0; M<DIM; M++)
+            for (unsigned M = 0; M < DIM; ++M)
             {
-                for (unsigned N=0; N<DIM; N++)
+                for (unsigned N = 0; N < DIM; ++N)
                 {
                     rStrain(M,N) = 0.5* ( C(M,N)-(M==N?1:0) );
                 }
@@ -1192,7 +1192,7 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElement(
 
     c_vector<double,NUM_NODES_PER_BOUNDARY_ELEMENT> phi;
 
-    for (unsigned quad_index=0; quad_index<this->mpBoundaryQuadratureRule->GetNumQuadPoints(); quad_index++)
+    for (unsigned quad_index = 0; quad_index<this->mpBoundaryQuadratureRule->GetNumQuadPoints(); quad_index++)
     {
         double wJ = jacobian_determinant * this->mpBoundaryQuadratureRule->GetWeight(quad_index);
 
@@ -1208,7 +1208,7 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElement(
             case FUNCTIONAL_TRACTION:
             {
                 c_vector<double,DIM> X = zero_vector<double>(DIM);
-                for (unsigned node_index=0; node_index<NUM_NODES_PER_BOUNDARY_ELEMENT; node_index++)
+                for (unsigned node_index = 0; node_index<NUM_NODES_PER_BOUNDARY_ELEMENT; ++node_index)
                 {
                     X += phi(node_index)*this->mrQuadMesh.GetNode( rBoundaryElement.GetNodeGlobalIndex(node_index) )->rGetLocation();
                 }
@@ -1225,7 +1225,7 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElement(
         }
 
 
-        for (unsigned index=0; index<NUM_NODES_PER_BOUNDARY_ELEMENT*DIM; index++)
+        for (unsigned index = 0; index<NUM_NODES_PER_BOUNDARY_ELEMENT*DIM; index++)
         {
             unsigned spatial_dim = index%DIM;
             unsigned node_index = (index-spatial_dim)/DIM;
@@ -1290,18 +1290,18 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
 
     std::set<unsigned> potential_elements = rBoundaryElement.GetNode(0)->rGetContainingElementIndices();
     for (std::set<unsigned>::iterator iter = potential_elements.begin();
-        iter != potential_elements.end();
-        iter++)
+         iter != potential_elements.end();
+         iter++)
     {
         p_containing_vol_element = this->mrQuadMesh.GetElement(*iter);
 
         bool this_vol_ele_contains_surf_ele = true;
         // loop over the nodes of boundary element and see if they are in the volume element
-        for (unsigned i=1; i<NUM_NODES_PER_BOUNDARY_ELEMENT; i++) // don't need to start at 0, given looping over contain elems of node 0
+        for (unsigned i = 1; i < NUM_NODES_PER_BOUNDARY_ELEMENT; ++i) // don't need to start at 0, given looping over contain elems of node 0
         {
             unsigned surf_element_node_index = rBoundaryElement.GetNodeGlobalIndex(i);
             bool found_this_node = false;
-            for (unsigned j=0; j<p_containing_vol_element->GetNumNodes(); j++)
+            for (unsigned j = 0; j < p_containing_vol_element->GetNumNodes(); ++j)
             {
                 unsigned vol_element_node_index = p_containing_vol_element->GetNodeGlobalIndex(j);
                 if (surf_element_node_index == vol_element_node_index)
@@ -1324,10 +1324,10 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
 
     // Find the local node index in the volume element for each node in the boundary element
     std::vector<unsigned> surf_to_vol_map(NUM_NODES_PER_BOUNDARY_ELEMENT);
-    for (unsigned i=0; i<NUM_NODES_PER_BOUNDARY_ELEMENT; i++)
+    for (unsigned i = 0; i < NUM_NODES_PER_BOUNDARY_ELEMENT; ++i)
     {
         unsigned index = rBoundaryElement.GetNodeGlobalIndex(i);
-        for (unsigned j=0; j<NUM_NODES_PER_ELEMENT; j++)
+        for (unsigned j = 0; j < NUM_NODES_PER_ELEMENT; ++j)
         {
             if (p_containing_vol_element->GetNodeGlobalIndex(j)==index)
             {
@@ -1347,9 +1347,9 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
 
     // Get the current displacements at each node of the volume element, to be used in computing F
     static c_matrix<double,DIM,NUM_NODES_PER_ELEMENT> element_current_displacements;
-    for (unsigned II=0; II<NUM_NODES_PER_ELEMENT; II++)
+    for (unsigned II = 0; II<NUM_NODES_PER_ELEMENT; II++)
     {
-        for (unsigned JJ=0; JJ<DIM; JJ++)
+        for (unsigned JJ = 0; JJ<DIM; JJ++)
         {
             element_current_displacements(JJ,II) = this->mCurrentSolution[this->mProblemDimension*p_containing_vol_element->GetNodeGlobalIndex(II) + JJ];
         }
@@ -1368,7 +1368,7 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
 
     c_vector<double,DIM> normal = rBoundaryElement.CalculateNormal();
     c_matrix<double,1,DIM> normal_as_mat;
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         normal_as_mat(0,i) = normal(i);
     }
@@ -1386,7 +1386,7 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
             NEVER_REACHED;
     }
 
-    for (unsigned quad_index=0; quad_index<this->mpBoundaryQuadratureRule->GetNumQuadPoints(); quad_index++)
+    for (unsigned quad_index = 0; quad_index<this->mpBoundaryQuadratureRule->GetNumQuadPoints(); quad_index++)
     {
         double wJ = jacobian_determinant * this->mpBoundaryQuadratureRule->GetWeight(quad_index);
 
@@ -1400,7 +1400,7 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
         // however it is less fiddly to compute directly. Firstly, compute the corresponding physical location
         // of the quad point, by interpolating
         c_vector<double,DIM> X = zero_vector<double>(DIM);
-        for (unsigned node_index=0; node_index<NUM_NODES_PER_BOUNDARY_ELEMENT; node_index++)
+        for (unsigned node_index = 0; node_index<NUM_NODES_PER_BOUNDARY_ELEMENT; ++node_index)
         {
             X += quad_phi_surf_element(node_index)*rBoundaryElement.GetNode(node_index)->rGetLocation();
         }
@@ -1409,7 +1409,7 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
         // Now compute the xi coordinates of the quad point in the volume element
         c_vector<double,DIM+1> weight = p_containing_vol_element->CalculateInterpolationWeights(X);
         c_vector<double,DIM> xi;
-        for (unsigned i=0; i<DIM; i++)
+        for (unsigned i = 0; i < DIM; ++i)
         {
             xi(i) = weight(i+1); // Note, in 2d say, weights = [1-xi(0)-xi(1), xi(0), xi(1)]
         }
@@ -1428,11 +1428,11 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
         QuadraticBasisFunction<DIM>::ComputeTransformedBasisFunctionDerivatives(xi, inverse_jacobian_vol_element, grad_quad_phi_vol_element);
 
         F = identity_matrix<double>(DIM,DIM);
-        for (unsigned node_index=0; node_index<NUM_NODES_PER_ELEMENT; node_index++)
+        for (unsigned node_index = 0; node_index<NUM_NODES_PER_ELEMENT; ++node_index)
         {
-            for (unsigned i=0; i<DIM; i++)
+            for (unsigned i = 0; i < DIM; ++i)
             {
-                for (unsigned M=0; M<DIM; M++)
+                for (unsigned M = 0; M < DIM; ++M)
                 {
                     F(i,M) += grad_quad_phi_vol_element(M,node_index)*element_current_displacements(i,node_index);
                 }
@@ -1447,7 +1447,7 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
             c_vector<double,DIM> traction = detF*normal_pressure*prod(trans(invF),normal);
 
             // assemble
-            for (unsigned index=0; index<NUM_NODES_PER_BOUNDARY_ELEMENT*DIM; index++)
+            for (unsigned index = 0; index<NUM_NODES_PER_BOUNDARY_ELEMENT*DIM; index++)
             {
                 unsigned spatial_dim = index%DIM;
                 unsigned node_index = (index-spatial_dim)/DIM;
@@ -1465,22 +1465,22 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
         // bit below - see the documentation for this method to see why.
         if (assembleJacobian && ShouldAssembleMatrixTermForPressureOnDeformedBc())
         {
-            for (unsigned II=0; II<NUM_NODES_PER_BOUNDARY_ELEMENT; II++)
+            for (unsigned II = 0; II<NUM_NODES_PER_BOUNDARY_ELEMENT; II++)
             {
-                for (unsigned N=0; N<DIM; N++)
+                for (unsigned N = 0; N < DIM; ++N)
                 {
                     grad_quad_phi_surf_element(N,II) = grad_quad_phi_vol_element(N,surf_to_vol_map[II]);
                 }
             }
 
             static FourthOrderTensor<DIM,DIM,DIM,DIM> tensor1;
-            for (unsigned N=0; N<DIM; N++)
+            for (unsigned N = 0; N < DIM; ++N)
             {
-                for (unsigned e=0; e<DIM; e++)
+                for (unsigned e = 0; e<DIM; e++)
                 {
-                    for (unsigned M=0; M<DIM; M++)
+                    for (unsigned M = 0; M < DIM; ++M)
                     {
-                        for (unsigned d=0; d<DIM; d++)
+                        for (unsigned d = 0; d<DIM; d++)
                         {
                             tensor1(N,e,M,d) = invF(N,e)*invF(M,d) - invF(M,e)*invF(N,d);
                         }
@@ -1497,12 +1497,12 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
             static FourthOrderTensor<NUM_NODES_PER_BOUNDARY_ELEMENT,DIM,1,DIM> tensor3;
             tensor3.template SetAsContractionOnThirdDimension<DIM>( normal_as_mat, tensor2);
 
-            for (unsigned index1=0; index1<NUM_NODES_PER_BOUNDARY_ELEMENT*DIM; index1++)
+            for (unsigned index1 = 0; index1<NUM_NODES_PER_BOUNDARY_ELEMENT*DIM; index1++)
             {
                 unsigned spatial_dim1 = index1%DIM;
                 unsigned node_index1 = (index1-spatial_dim1)/DIM;
 
-                for (unsigned index2=0; index2<NUM_NODES_PER_BOUNDARY_ELEMENT*DIM; index2++)
+                for (unsigned index2 = 0; index2<NUM_NODES_PER_BOUNDARY_ELEMENT*DIM; index2++)
                 {
                     unsigned spatial_dim2 = index2%DIM;
                     unsigned node_index2 = (index2-spatial_dim2)/DIM;
@@ -1663,7 +1663,7 @@ double AbstractNonlinearElasticitySolver<DIM>::ComputeResidualAndGetNorm(bool al
             // Try to assemble the residual using this current solution
             AssembleSystem(true, false);
         }
-        catch(Exception&)
+        catch (Exception&)
         {
             // If fail (because e.g. ODEs fail to solve, or strains are too large for material law), return infinity
             return DBL_MAX;
@@ -1692,7 +1692,7 @@ void AbstractNonlinearElasticitySolver<DIM>::VectorSum(std::vector<double>& rX,
 {
     assert(rX.size()==rY.GetSize());
     assert(rY.GetSize()==rZ.size());
-    for (unsigned i=0; i<rX.size(); i++)
+    for (unsigned i = 0; i < rX.size(); ++i)
     {
         rZ[i] = rX[i] + a*rY[i];
     }
@@ -1791,9 +1791,9 @@ double AbstractNonlinearElasticitySolver<DIM>::TakeNewtonStep()
 //    ss << "all_" << counter++ << ".txt";
 //    out_stream p_file = handler.OpenOutputFile(ss.str());
 //    *p_file << std::setprecision(10);
-//    for (unsigned i=0; i<this->mNumDofs; i++)
+//    for (unsigned i = 0; i < this->mNumDofs; ++i)
 //    {
-//        for (unsigned j=0; j<this->mNumDofs; j++)
+//        for (unsigned j = 0; j < this->mNumDofs; ++j)
 //        {
 //            *p_file << PetscMatTools::GetElement(mrJacobianMatrix, i, j) << " ";
 //        }
@@ -1992,9 +1992,9 @@ double AbstractNonlinearElasticitySolver<DIM>::UpdateSolutionUsingLineSearch(Vec
 //
 //    if (this->mCompressibilityType==INCOMPRESSIBLE)
 //    {
-//        for (unsigned i=0; i<this->mrQuadMesh.GetNumNodes(); i++)
+//        for (unsigned i = 0; i < this->mrQuadMesh.GetNumNodes(); ++i)
 //        {
-//            for (unsigned j=0; j<DIM; j++)
+//            for (unsigned j = 0; j < DIM; ++j)
 //            {
 //                double value = update[(DIM+1)*i + j]*damping_values[best_index];
 //                l_inf_disp = std::max(l_inf_disp, fabs(value));
@@ -2005,9 +2005,9 @@ double AbstractNonlinearElasticitySolver<DIM>::UpdateSolutionUsingLineSearch(Vec
 //    }
 //    else
 //    {
-//        for (unsigned i=0; i<this->mrQuadMesh.GetNumNodes(); i++)
+//        for (unsigned i = 0; i < this->mrQuadMesh.GetNumNodes(); ++i)
 //        {
-//            for (unsigned j=0; j<DIM; j++)
+//            for (unsigned j = 0; j < DIM; ++j)
 //            {
 //                double value = update[DIM*i + j]*damping_values[best_index];
 //                l_inf_disp = std::max(l_inf_disp, fabs(value));
@@ -2231,7 +2231,7 @@ void AbstractNonlinearElasticitySolver<DIM>::ComputeResidual(Vec currentGuess, V
     // currentGuess, and write the output to residualVector, we have to copy do some copies below.
 
     ReplicatableVector guess_repl(currentGuess);
-    for (unsigned i=0; i<guess_repl.GetSize(); i++)
+    for (unsigned i = 0; i < guess_repl.GetSize(); ++i)
     {
         this->mCurrentSolution[i] = guess_repl[i];
     }
@@ -2254,7 +2254,7 @@ void AbstractNonlinearElasticitySolver<DIM>::ComputeJacobian(Vec currentGuess, M
 
     MechanicsEventHandler::BeginEvent(MechanicsEventHandler::ASSEMBLE);
     ReplicatableVector guess_repl(currentGuess);
-    for (unsigned i=0; i<guess_repl.GetSize(); i++)
+    for (unsigned i = 0; i < guess_repl.GetSize(); ++i)
     {
         this->mCurrentSolution[i] = guess_repl[i];
     }

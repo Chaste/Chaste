@@ -89,7 +89,7 @@ public:
         // Check that the nodes mapping is set up correctly
         if (PetscTools::AmMaster())
         {
-            for (unsigned i=0; i<nodes.size(); i+=PetscTools::GetNumProcs())
+            for (unsigned i = 0; i<nodes.size(); i+=PetscTools::GetNumProcs())
             {
                 TS_ASSERT(!(mesh.mNodesMapping.find(i) == mesh.mNodesMapping.end()));
                 TS_ASSERT_EQUALS(mesh.SolveNodeMapping(i), mesh.mNodesMapping[i]);
@@ -108,7 +108,7 @@ public:
              * will return an empty vector unless any attributes have
              * been set by the user.
              */
-            for (unsigned i=1; i<7; i++)
+            for (unsigned i=1; i<7; ++i)
             {
                 TS_ASSERT_EQUALS(mesh.GetNode(i)->HasNodeAttributes(), true);
                 TS_ASSERT_EQUALS(mesh.GetNode(i)->rGetNodeAttributes().size(), 0u);
@@ -121,7 +121,7 @@ public:
         mesh.SetMaximumInteractionDistance(5.0);
         TS_ASSERT_DELTA(mesh.GetMaximumInteractionDistance(), 5.0, 1e-4);
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -151,7 +151,7 @@ public:
         // Check that the nodes mapping is set up correctly
         if (PetscTools::AmMaster())
         {
-            for (unsigned i=0; i<nodes.size(); i+=PetscTools::GetNumProcs())
+            for (unsigned i = 0; i<nodes.size(); i+=PetscTools::GetNumProcs())
             {
                 TS_ASSERT(!(mesh.mNodesMapping.find(i) == mesh.mNodesMapping.end()));
                 TS_ASSERT_EQUALS(mesh.SolveNodeMapping(i), mesh.mNodesMapping[i]);
@@ -184,7 +184,7 @@ public:
         TS_ASSERT_DELTA(bounding_cuboid.rGetLowerCorner()[1], -1.0, 1e-10);
         TS_ASSERT_DELTA(bounding_cuboid.rGetLowerCorner()[2], 0.0, 1e-10);
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -195,7 +195,7 @@ public:
 
         ChasteCuboid<3> empty_bounding_cuboid = empty_mesh.CalculateBoundingBox(empty_nodes);
 
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i<3; ++i)
         {
             TS_ASSERT_DELTA(empty_bounding_cuboid.rGetLowerCorner()[i], empty_bounding_cuboid.rGetUpperCorner()[i], 1e-4);
         }
@@ -222,7 +222,7 @@ public:
         expected_domain_size[5] = static_cast<double>(std::max(3u, PetscTools::GetNumProcs()));
 
         // Check the correct domain size has been set (swelled to be a multiple of the box width)
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i<3; ++i)
         {
             TS_ASSERT_DELTA(set_domain_size[2*i], 0.0, 1e-4);
             TS_ASSERT_DELTA(set_domain_size[2*i+1], expected_domain_size[2*i+1], 1e-4);
@@ -264,7 +264,7 @@ public:
         TS_ASSERT_DELTA(swollen_box(2), 2, 1e-11);
         TS_ASSERT_DELTA(swollen_box(3), 201.5,1e-11);
         
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -315,7 +315,7 @@ public:
         TS_ASSERT_EQUALS(p_new_collection->CalculateContainingBox(nodes[2]), 87u);
         TS_ASSERT_EQUALS(p_new_collection->CalculateContainingBox(nodes[3]), 89u);
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -359,7 +359,7 @@ public:
 
         TS_ASSERT(enlarge);
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -406,7 +406,7 @@ public:
         // 12 x 12 x 9
         TS_ASSERT_EQUALS(mesh.mpBoxCollection->GetNumBoxes(), 1296u);
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -439,7 +439,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 0u);
         TS_ASSERT_EQUALS(mesh.GetNumAllBoundaryElements(), 0u);
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -526,7 +526,7 @@ public:
         }
 
         // Clean up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -555,7 +555,7 @@ public:
 
         // Add distance from origin into the node "point" data
         std::vector<double> distance;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             distance.push_back(norm_2(mesh.GetNode(i)->rGetLocation()));
         }
@@ -563,7 +563,7 @@ public:
 
         // Add boundary node "point" data
         std::vector<double> boundary;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             boundary.push_back(mesh.GetNode(i)->IsBoundaryNode());
         }
@@ -571,7 +571,7 @@ public:
 
         // Add fibre type to "point" data
         std::vector< c_vector<double, 3> > location;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             location.push_back(mesh.GetNode(i)->rGetLocation());
         }
@@ -580,7 +580,7 @@ public:
         writer.WriteFilesUsingMesh(mesh);
 
         // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -609,7 +609,7 @@ public:
         TrianglesMeshWriter<3,3> writer("TestMeshWriter", "3dNodesOnlyMesh");
         TS_ASSERT_THROWS_NOTHING(writer.WriteFilesUsingMesh(mesh));
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -631,7 +631,7 @@ public:
 
         }
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -757,7 +757,7 @@ public:
         }
 
         // Free memory - the constructor does a deep copy of its input
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -794,7 +794,7 @@ public:
         TS_ASSERT(!mesh.mpBoxCollection);
 
         // Clean up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -1009,7 +1009,7 @@ public:
             NodesOnlyMesh<3> mesh;
             mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
-            for (unsigned i=0; i<4; i++)
+            for (unsigned i = 0; i<4; ++i)
             {
                 mesh.GetNode(i)->SetRadius(1.2);
                 mesh.GetNode(i)->SetIsParticle(true);
@@ -1019,7 +1019,7 @@ public:
 
             (*p_arch) << p_mesh;
 
-            for (unsigned i=0; i<nodes.size(); i++)
+            for (unsigned i = 0; i<nodes.size(); ++i)
             {
                 delete nodes[i];
             }
@@ -1037,7 +1037,7 @@ public:
 
             TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 4u);
 
-            for (unsigned i=0; i<4; i++)
+            for (unsigned i = 0; i<4; ++i)
             {
                 TS_ASSERT_DELTA(p_mesh->GetNode(i)->GetRadius(), 1.2, 1e-15);
                 TS_ASSERT(p_mesh->GetNode(i)->IsParticle());
@@ -1082,7 +1082,7 @@ public:
             }
 
             // Tidy up
-            for (unsigned i=0; i<nodes.size(); i++)
+            for (unsigned i = 0; i<nodes.size(); ++i)
             {
                 delete nodes[i];
             }

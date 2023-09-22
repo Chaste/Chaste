@@ -112,7 +112,7 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahe
         index++;
         (*geometry_file) << "\n\t\t";
         c_vector<double, SPACE_DIM> current_item = (iter)->rGetLocation();
-        for (unsigned j=0; j<SPACE_DIM; j++)
+        for (unsigned j=0; j<SPACE_DIM; ++j)
         {
             (*geometry_file) << current_item[j] << "\t";
         }
@@ -129,7 +129,7 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahe
             index++;
             (*geometry_file) << "\n\t\t";
             c_vector<double, SPACE_DIM> current_item = (*halo_iter)->rGetLocation();
-            for (unsigned j=0; j<SPACE_DIM; j++)
+            for (unsigned j=0; j<SPACE_DIM; ++j)
             {
                 (*geometry_file) << current_item[j] << "\t";
             }
@@ -163,7 +163,7 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahe
          ++elem_iter)
     {
         (*topology_file) << "\n\t\t";
-        for (unsigned j=0; j<ELEMENT_DIM+1; j++)
+        for (unsigned j=0; j<ELEMENT_DIM+1; ++j)
         {
             unsigned local_index = global_to_node_index_map[ elem_iter->GetNodeGlobalIndex(j) ];
             (*topology_file) << local_index <<"\t";
@@ -203,7 +203,7 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
         {
             (*geometry_file) << "\n\t\t";
             std::vector<double> current_item = this->GetNextNode();
-            for (unsigned j=0; j<SPACE_DIM; j++)
+            for (unsigned j=0; j<SPACE_DIM; ++j)
             {
                 (*geometry_file) << current_item[j]<<"\t";
             }
@@ -228,7 +228,7 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
         {
             (*topology_file) << "\n\t\t";
             std::vector<unsigned> current_item = this->GetNextElement().NodeIndices;
-            for (unsigned j=0; j<ELEMENT_DIM+1; j++)
+            for (unsigned j=0; j<ELEMENT_DIM+1; ++j)
             {
                 (*topology_file) << current_item[j]<<"\t";
             }

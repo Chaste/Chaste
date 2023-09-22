@@ -104,7 +104,7 @@ c_vector<double,DIM> ContinuumMechanicsProblemDefinition<DIM>::EvaluateBodyForce
 template<unsigned DIM>
 c_vector<double,DIM> ContinuumMechanicsProblemDefinition<DIM>::GetBodyForce(c_vector<double,DIM>& rX, double t)
 {
-    switch(mBodyForceType)
+    switch (mBodyForceType)
     {
         case CONSTANT_BODY_FORCE:
         {
@@ -166,17 +166,18 @@ void ContinuumMechanicsProblemDefinition<DIM>::SetApplyNormalPressureOnDeformedS
 }
 
 template<unsigned DIM>
-void ContinuumMechanicsProblemDefinition<DIM>::SetZeroDirichletNodes(std::vector<unsigned>& rZeroDirichletNodes)
+void ContinuumMechanicsProblemDefinition<DIM>::SetZeroDirichletNodes(
+    std::vector<unsigned>& rZeroDirichletNodes)
 {
     mDirichletNodes = rZeroDirichletNodes;
 
-    for (unsigned i=0; i<mDirichletNodes.size(); i++)
+    for (unsigned i = 0; i < mDirichletNodes.size(); ++i)
     {
         assert(mDirichletNodes[i] < mrMesh.GetNumNodes());
     }
 
     mDirichletNodeValues.clear();
-    for (unsigned i=0; i<mDirichletNodes.size(); i++)
+    for (unsigned i = 0; i < mDirichletNodes.size(); ++i)
     {
         mDirichletNodeValues.push_back(zero_vector<double>(DIM));
     }

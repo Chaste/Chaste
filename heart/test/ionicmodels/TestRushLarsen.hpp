@@ -132,7 +132,7 @@ public:
 
         TS_ASSERT_EQUALS(mpRushLarsenCell->GetNumberOfStateVariables(),
                          reference_model.GetNumberOfStateVariables());
-        for (unsigned i=0; i<reference_model.GetNumberOfStateVariables(); i++)
+        for (unsigned i=0; i<reference_model.GetNumberOfStateVariables(); ++i)
         {
             TS_ASSERT_DELTA(mpRushLarsenCell->rGetStateVariables()[i],
                             reference_model.rGetStateVariables()[i], 1e-6);
@@ -150,7 +150,7 @@ public:
         reference_model.SetStimulusFunction(p_stimulus);
         OdeSolution solutions_ref = reference_model.Compute(0.0, 1.0, 0.01);
 
-        for (unsigned i=0; i<reference_model.GetNumberOfStateVariables(); i++)
+        for (unsigned i=0; i<reference_model.GetNumberOfStateVariables(); ++i)
         {
             TS_ASSERT_DELTA(solutions_RL.rGetSolutions().back()[i],
                             solutions_ref.rGetSolutions().back()[i], 1e-2);
@@ -166,7 +166,7 @@ public:
         reference_model_opt.SetStimulusFunction(p_stimulus);
         reference_model_opt.SolveAndUpdateState(0.0, 1.0);
 
-        for (unsigned i=0; i<reference_model.GetNumberOfStateVariables(); i++)
+        for (unsigned i=0; i<reference_model.GetNumberOfStateVariables(); ++i)
         {
             TS_ASSERT_DELTA(mpRushLarsenCellOpt->rGetStateVariables()[i],
                             reference_model_opt.rGetStateVariables()[i], 1e-2);
@@ -189,7 +189,7 @@ public:
         reference_model.SetTimestep(1e-6);
         OdeSolution ref_solution = reference_model.Compute(0.0, 1.0);
 
-        for (unsigned i=0; i<reference_model.GetNumberOfStateVariables(); i++)
+        for (unsigned i=0; i<reference_model.GetNumberOfStateVariables(); ++i)
         {
             double error1 = solutions_RL_stimulated_cell_order1.rGetSolutions().back()[i] - ref_solution.rGetSolutions().back()[i];
             double error2 = solutions_RL_stimulated_cell_order2.rGetSolutions().back()[i] - ref_solution.rGetSolutions().back()[i];

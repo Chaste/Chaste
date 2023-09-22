@@ -178,7 +178,7 @@ public:
         // We get the stretches directly as this test is a friend of CardiacElectroMechanicsProblem.
         std::vector<double> stretches = problem.mStretchesForEachMechanicsElement;
 
-        for (unsigned i=0; i<stretches.size(); i++)
+        for (unsigned i=0; i<stretches.size(); ++i)
         {
             c_vector<double, 2> centroid = p_mesh_m->GetElement(i)->CalculateCentroid();
 

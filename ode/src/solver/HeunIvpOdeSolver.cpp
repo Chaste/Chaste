@@ -60,7 +60,7 @@ void HeunIvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem
     pAbstractOdeSystem->EvaluateYDerivatives(time, rCurrentYValues, k1);
 
     // Add current y values to k1 values
-    for (unsigned i=0; i<num_equations; i++)
+    for (unsigned i=0; i<num_equations; ++i)
     {
         dy[i] = timeStep*k1[i] + rCurrentYValues[i];
     }
@@ -68,7 +68,7 @@ void HeunIvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem
     pAbstractOdeSystem->EvaluateYDerivatives(time+timeStep, dy, k2);
 
     // New solution
-    for (unsigned i=0; i<num_equations; i++)
+    for (unsigned i=0; i<num_equations; ++i)
     {
         rNextYValues[i] = rCurrentYValues[i] + timeStep*0.5*(k1[i] + k2[i]);
     }

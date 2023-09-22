@@ -91,7 +91,7 @@ public:
             TS_ASSERT_LESS_THAN_EQUALS(-voltage[index] + (Ek-30), 0);
 
             std::vector<double> ode_vars = bidomain_problem.GetBidomainTissue()->GetCardiacCell(index.Global)->GetStdVecStateVariables();
-            for (int j=0; j<8; j++)
+            for (int j=0; j<8; ++j)
             {
                 // if not voltage or calcium ion conc, test whether between 0 and 1
                 if ((j!=0) && (j!=7))
@@ -105,7 +105,7 @@ public:
             // final voltages for six nodes at the beginning of the mesh with a stride of 10
             double test_values[6]={11.5550, -78.3303, -83.7585, -83.8568,  -83.8570, -83.8568};
 
-            for (unsigned i=0; i<=5; i++)
+            for (unsigned i=0; i<=5; ++i)
             {
                 unsigned node=10*i; //Step through every 10th node
                 if (index.Global == node)

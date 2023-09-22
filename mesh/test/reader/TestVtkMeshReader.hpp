@@ -182,7 +182,7 @@ public:
         TS_ASSERT_EQUALS(next_element_data.NodeIndices[3], 11u);
         TS_ASSERT_EQUALS(next_element_data.AttributeValue, 0u);
 
-        for (unsigned i=2; i<mesh_reader.GetNumElements(); i++)
+        for (unsigned i=2; i<mesh_reader.GetNumElements(); ++i)
         {
             next_element_data = mesh_reader.GetNextElementData();
             TS_ASSERT_EQUALS(next_element_data.AttributeValue, 0u);
@@ -354,7 +354,7 @@ public:
         for (unsigned i = 0; i < 610; i+=60)
         {
 
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j=0; j<3; ++j)
             {
                 TS_ASSERT_DELTA(centroid[i][j], mesh.GetElement(i)->CalculateCentroid()[j], 1e-4);
             }
@@ -376,7 +376,7 @@ public:
         mesh_reader.GetPointData("Location", location);
         for (unsigned i = 0; i < 173; i+=17)
         {
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j=0; j<3; ++j)
             {
                 TS_ASSERT_DELTA(location[i][j], mesh.GetNode(i)->rGetLocation()[j], 1e-4);
             }
@@ -506,7 +506,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumCableElements(), 10u);
 
         // Cover exception - note that ConstructFromMeshReader has reset the reader
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i=0; i<10; ++i)
         {
             ElementData element_data = mesh_reader.GetNextCableElementData();
             TS_ASSERT_EQUALS(element_data.AttributeValue, i + 1.5);

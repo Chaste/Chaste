@@ -79,7 +79,7 @@ void ExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(
 
         // the ExtendedBidomainMassMatrixAssembler deals with the mass matrix
         // for both bath and nonbath problems
-        assert(SPACE_DIM==ELEMENT_DIM);
+        assert(SPACE_DIM == ELEMENT_DIM);
         ExtendedBidomainMassMatrixAssembler<SPACE_DIM> mass_matrix_assembler(this->mpMesh);
         mass_matrix_assembler.SetMatrixToAssemble(mMassMatrix);
         mass_matrix_assembler.Assemble();

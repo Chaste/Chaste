@@ -268,7 +268,7 @@ ExtendedBidomainProblem<DIM>::~ExtendedBidomainProblem()
 template<unsigned DIM>
 void ExtendedBidomainProblem<DIM>::SetIntracellularConductivitiesForSecondCell(c_vector<double, DIM> conductivities)
 {
-    for (unsigned i = 0; i < DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         mIntracellularConductivitiesSecondCell[i] = conductivities[i];
     }
@@ -280,7 +280,7 @@ void ExtendedBidomainProblem<DIM>::SetFixedExtracellularPotentialNodes(std::vect
 {
     assert(mFixedExtracellularPotentialNodes.size() == 0); ///\todo turn this into an exception if the user calls this twice...
     mFixedExtracellularPotentialNodes.resize(nodes.size());
-    for (unsigned i=0; i<nodes.size(); i++)
+    for (unsigned i=0; i<nodes.size(); ++i)
     {
         // the assembler checks that the nodes[i] is less than
         // the number of nodes in the mesh so this is not done here

@@ -84,7 +84,7 @@ void AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ResetIn
 {
     // reset ionic current, and state variables
     mIionicInterp = 0;
-    for (unsigned i=0; i<mStateVariablesAtQuadPoint.size(); i++)
+    for (unsigned i=0; i<mStateVariablesAtQuadPoint.size(); ++i)
     {
         mStateVariablesAtQuadPoint[i] = 0;
     }
@@ -99,7 +99,7 @@ void AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Increme
     mIionicInterp  += phiI * this->mpCardiacTissue->rGetIionicCacheReplicated()[ node_global_index ];
     // and state variables
     std::vector<double> state_vars = this->mpCardiacTissue->GetCardiacCellOrHaloCell(node_global_index)->GetStdVecStateVariables();
-    for (unsigned i=0; i<mStateVariablesAtQuadPoint.size(); i++)
+    for (unsigned i=0; i<mStateVariablesAtQuadPoint.size(); ++i)
     {
         mStateVariablesAtQuadPoint[i] += phiI * state_vars[i];
     }

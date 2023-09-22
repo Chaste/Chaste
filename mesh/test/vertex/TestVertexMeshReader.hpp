@@ -111,7 +111,7 @@ public:
         TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 1u);
 
         mesh_reader.Reset();
-        for (unsigned i=1; i<mesh_reader.GetNumElements(); i++)
+        for (unsigned i=1; i<mesh_reader.GetNumElements(); ++i)
         {
             ElementData data = mesh_reader.GetNextElementData();
             TS_ASSERT_EQUALS(data.AttributeValue, 0u);
@@ -135,7 +135,7 @@ public:
     void TestPermutedNodesFail()
     {
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/baddata/vertex_mesh_permuted_nodes");
-        TS_ASSERT_THROWS_THIS(for (unsigned i=0; i<mesh_reader.GetNumNodes(); i++) {mesh_reader.GetNextNode();}, "Data for node 3 missing")
+        TS_ASSERT_THROWS_THIS(for (unsigned i=0; i<mesh_reader.GetNumNodes(); ++i) {mesh_reader.GetNextNode();}, "Data for node 3 missing")
     }
 
     /**
@@ -160,7 +160,7 @@ public:
         TS_ASSERT_DELTA(next_node[0], 1.0, 1e-6);
         TS_ASSERT_DELTA(next_node[1], 0.0, 1e-6);
 
-        for (unsigned i=0; i<5; i++)
+        for (unsigned i=0; i<5; ++i)
         {
             TS_ASSERT_THROWS_NOTHING(next_node = mesh_reader.GetNextNode());
         }
@@ -179,7 +179,7 @@ public:
         VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
 
         std::vector<unsigned> next_element;
-        for (unsigned i=0; i<mesh_reader.GetNumElements(); i++)
+        for (unsigned i=0; i<mesh_reader.GetNumElements(); ++i)
         {
             TS_ASSERT_THROWS_NOTHING(next_element = mesh_reader.GetNextElementData().NodeIndices);
         }
@@ -206,7 +206,7 @@ public:
         // Test node indices
         std::vector<unsigned> node_indices = element_0_data.NodeIndices;
         TS_ASSERT_EQUALS(node_indices.size(), 8u);
-        for (unsigned i=0; i<8; i++)
+        for (unsigned i=0; i<8; ++i)
         {
             TS_ASSERT_EQUALS(node_indices[i], i);
         }
@@ -234,7 +234,7 @@ public:
         // Test the node indices are correct (use a set comparison in case of funny business relating to tetgen versions)
         std::set<unsigned> node_indices_expected;
         std::set<unsigned> node_indices_returned;
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i=0; i<4; ++i)
         {
             node_indices_expected.insert(i);
             node_indices_returned.insert(node_indices[i]);

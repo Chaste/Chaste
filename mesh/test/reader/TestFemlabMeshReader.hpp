@@ -158,7 +158,7 @@ public:
         TS_ASSERT_DELTA(next_node[0], 0.5, 1e-6);
         TS_ASSERT_DELTA(next_node[1], 1.0, 1e-6);
 
-        for (unsigned i=2; i<mpFemlabMeshReader->GetNumNodes(); i++)
+        for (unsigned i=2; i<mpFemlabMeshReader->GetNumNodes(); ++i)
         {
             TS_ASSERT_THROWS_NOTHING(next_node = mpFemlabMeshReader->GetNextNode());
         }
@@ -200,7 +200,7 @@ public:
         TS_ASSERT_EQUALS(next_element_data.NodeIndices[2], 53u);
         TS_ASSERT_EQUALS(next_element_data.AttributeValue, 0u);
 
-        for (unsigned i=2; i<mpFemlabMeshReader->GetNumElements(); i++)
+        for (unsigned i=2; i<mpFemlabMeshReader->GetNumElements(); ++i)
         {
             TS_ASSERT_THROWS_NOTHING(next_element_data = mpFemlabMeshReader->GetNextElementData());
         }
@@ -237,7 +237,7 @@ public:
         TS_ASSERT_EQUALS(next_face[0], 8u);
         TS_ASSERT_EQUALS(next_face[1], 9u);
 
-        for (unsigned i=2; i<mpFemlabMeshReader->GetNumFaces(); i++)
+        for (unsigned i=2; i<mpFemlabMeshReader->GetNumFaces(); ++i)
         {
             TS_ASSERT_THROWS_NOTHING(next_face = mpFemlabMeshReader->GetNextFaceData().NodeIndices);
         }

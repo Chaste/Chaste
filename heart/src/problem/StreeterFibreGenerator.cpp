@@ -186,127 +186,137 @@ void StreeterFibreGenerator<SPACE_DIM>::WriteHeaderOnMaster()
 template<unsigned SPACE_DIM>
 void StreeterFibreGenerator<SPACE_DIM>::PreWriteCalculations(OutputFileHandler& rOutputDirectory)
 {
-    assert(SPACE_DIM == 3);
-    if (mpGeometryInfo == NULL)
+    if constexpr (SPACE_DIM == 3)
     {
-        EXCEPTION("Files defining the heart surfaces not set");
-    }
-
-    // Open files
-    out_stream p_regions_file, p_thickness_file, p_ave_thickness_file;
-
-    //Make sure that only the master process writes the log files if requested.
-    bool logInfo = PetscTools::AmMaster() && mLogInfo;
-
-    if (logInfo)
-    {
-        p_regions_file  = rOutputDirectory.OpenOutputFile("node_regions.data");
-        p_thickness_file = rOutputDirectory.OpenOutputFile("wall_thickness.data");
-        p_ave_thickness_file = rOutputDirectory.OpenOutputFile("averaged_thickness.data");
-    }
-
-    //We expect that the apex to base has been set
-    if (fabs(norm_2(mApexToBase)) < DBL_EPSILON)
-    {
-        EXCEPTION("Apex to base vector has not been set");
-    }
-
-    // Compute wall thickness parameter
-    unsigned num_nodes = this->mpMesh->GetNumNodes();
-    for (unsigned node_index=0; node_index<num_nodes; node_index++)
-    {
-        double dist_epi, dist_endo;
-
-        HeartRegionType node_region = mpGeometryInfo->GetHeartRegion(node_index);
-
-        switch(node_region)
+        if (mpGeometryInfo == NULL)
         {
-            case HeartGeometryInformation<SPACE_DIM>::LEFT_VENTRICLE_SURFACE:
-            case HeartGeometryInformation<SPACE_DIM>::LEFT_VENTRICLE_WALL:
-                dist_epi = mpGeometryInfo->rGetDistanceMapEpicardium()[node_index];
-                dist_endo = mpGeometryInfo->rGetDistanceMapLeftVentricle()[node_index];
-                break;
-
-            case HeartGeometryInformation<SPACE_DIM>::RIGHT_VENTRICLE_SURFACE:
-            case HeartGeometryInformation<SPACE_DIM>::RIGHT_VENTRICLE_WALL:
-                dist_epi = mpGeometryInfo->rGetDistanceMapEpicardium()[node_index];
-                dist_endo = mpGeometryInfo->rGetDistanceMapRightVentricle()[node_index];
-                break;
-
-            case HeartGeometryInformation<SPACE_DIM>::LEFT_SEPTUM:
-                dist_epi = mpGeometryInfo->rGetDistanceMapRightVentricle()[node_index];
-                dist_endo = mpGeometryInfo->rGetDistanceMapLeftVentricle()[node_index];
-                break;
-
-            case HeartGeometryInformation<SPACE_DIM>::RIGHT_SEPTUM:
-                dist_epi = mpGeometryInfo->rGetDistanceMapLeftVentricle()[node_index];
-                dist_endo = mpGeometryInfo->rGetDistanceMapRightVentricle()[node_index];
-                break;
-
-            // LCOV_EXCL_START
-            case HeartGeometryInformation<SPACE_DIM>::UNKNOWN:
-                std::cerr << "Wrong distances node: " << node_index << "\t"
-                          << "Epi " << mpGeometryInfo->rGetDistanceMapEpicardium()[node_index] << "\t"
-                          << "RV " << mpGeometryInfo->rGetDistanceMapRightVentricle()[node_index] << "\t"
-                          << "LV " << mpGeometryInfo->rGetDistanceMapLeftVentricle()[node_index]
-                          << std::endl;
-
-                // Make wall_thickness=0 as in Martin's code
-                dist_epi = 1;
-                dist_endo = 0;
-                break;
-            // LCOV_EXCL_STOP
-
-            default:
-                NEVER_REACHED;
+            EXCEPTION("Files defining the heart surfaces not set");
         }
 
-        mWallThickness[node_index] = dist_endo / (dist_endo + dist_epi);
+        // Open files
+        out_stream p_regions_file, p_thickness_file, p_ave_thickness_file;
 
-        if (std::isnan(mWallThickness[node_index]))
+        //Make sure that only the master process writes the log files if requested.
+        bool logInfo = PetscTools::AmMaster() && mLogInfo;
+
+        if (logInfo)
         {
-            // LCOV_EXCL_START
-            /*
-             *  A node contained on both epicardium and lv (or rv) surfaces has wall thickness 0/0.
-             *  By setting its value to 0 we consider it contained only on the lv (or rv) surface.
-             */
-            mWallThickness[node_index] = 0;
-            // LCOV_EXCL_STOP
+            p_regions_file  = rOutputDirectory.OpenOutputFile("node_regions.data");
+            p_thickness_file = rOutputDirectory.OpenOutputFile("wall_thickness.data");
+            p_ave_thickness_file = rOutputDirectory.OpenOutputFile("averaged_thickness.data");
+        }
+
+        //We expect that the apex to base has been set
+        if (fabs(norm_2(mApexToBase)) < DBL_EPSILON)
+        {
+            EXCEPTION("Apex to base vector has not been set");
+        }
+
+        // Compute wall thickness parameter
+        unsigned num_nodes = this->mpMesh->GetNumNodes();
+        for (unsigned node_index = 0; node_index < num_nodes; ++node_index)
+        {
+            double dist_epi, dist_endo;
+
+            HeartRegionType node_region = mpGeometryInfo->GetHeartRegion(node_index);
+
+            switch (node_region)
+            {
+                case HeartGeometryInformation<SPACE_DIM>::LEFT_VENTRICLE_SURFACE:
+                case HeartGeometryInformation<SPACE_DIM>::LEFT_VENTRICLE_WALL:
+                    dist_epi = mpGeometryInfo->rGetDistanceMapEpicardium()[node_index];
+                    dist_endo = mpGeometryInfo->rGetDistanceMapLeftVentricle()[node_index];
+                    break;
+
+                case HeartGeometryInformation<SPACE_DIM>::RIGHT_VENTRICLE_SURFACE:
+                case HeartGeometryInformation<SPACE_DIM>::RIGHT_VENTRICLE_WALL:
+                    dist_epi = mpGeometryInfo->rGetDistanceMapEpicardium()[node_index];
+                    dist_endo = mpGeometryInfo->rGetDistanceMapRightVentricle()[node_index];
+                    break;
+
+                case HeartGeometryInformation<SPACE_DIM>::LEFT_SEPTUM:
+                    dist_epi = mpGeometryInfo->rGetDistanceMapRightVentricle()[node_index];
+                    dist_endo = mpGeometryInfo->rGetDistanceMapLeftVentricle()[node_index];
+                    break;
+
+                case HeartGeometryInformation<SPACE_DIM>::RIGHT_SEPTUM:
+                    dist_epi = mpGeometryInfo->rGetDistanceMapLeftVentricle()[node_index];
+                    dist_endo = mpGeometryInfo->rGetDistanceMapRightVentricle()[node_index];
+                    break;
+
+                // LCOV_EXCL_START
+                case HeartGeometryInformation<SPACE_DIM>::UNKNOWN:
+                    std::cerr << "Wrong distances node: " << node_index << "\t"
+                            << "Epi " << mpGeometryInfo->rGetDistanceMapEpicardium()[node_index] << "\t"
+                            << "RV " << mpGeometryInfo->rGetDistanceMapRightVentricle()[node_index] << "\t"
+                            << "LV " << mpGeometryInfo->rGetDistanceMapLeftVentricle()[node_index]
+                            << std::endl;
+
+                    // Make wall_thickness=0 as in Martin's code
+                    dist_epi = 1;
+                    dist_endo = 0;
+                    break;
+                // LCOV_EXCL_STOP
+
+                default:
+                    NEVER_REACHED;
+            }
+
+            mWallThickness[node_index] = dist_endo / (dist_endo + dist_epi);
+
+            if (std::isnan(mWallThickness[node_index]))
+            {
+                // LCOV_EXCL_START
+                /*
+                *  A node contained on both epicardium and lv (or rv) surfaces has wall thickness 0/0.
+                *  By setting its value to 0 we consider it contained only on the lv (or rv) surface.
+                */
+                mWallThickness[node_index] = 0;
+                // LCOV_EXCL_STOP
+            }
+
+            if (logInfo)
+            {
+                *p_regions_file << node_region*100 << "\n";
+                *p_thickness_file << mWallThickness[node_index] << "\n";
+            }
+        }
+
+        /*
+        *  For each node, average its value of e with the values of all the neighbours
+        */
+        std::vector<double> my_averaged_wall_thickness(num_nodes);
+        for (unsigned node_index = 0; node_index < num_nodes; ++node_index)
+        {
+            my_averaged_wall_thickness[node_index] = GetAveragedThicknessLocalNode(node_index, mWallThickness);
+        }
+
+        // Non-local information appear as zeros in the vector
+        MPI_Allreduce(&my_averaged_wall_thickness[0],
+                      &mAveragedWallThickness[0],
+                      num_nodes,
+                      MPI_DOUBLE,
+                      MPI_SUM,
+                      PETSC_COMM_WORLD);
+
+        if (logInfo)
+        {
+            for (unsigned node_index = 0; node_index < num_nodes; ++node_index)
+            {
+                *p_ave_thickness_file << mAveragedWallThickness[node_index] << "\n";
+            }
         }
 
         if (logInfo)
         {
-            *p_regions_file << node_region*100 << "\n";
-            *p_thickness_file << mWallThickness[node_index] << "\n";
+            p_regions_file->close();
+            p_thickness_file->close();
+            p_ave_thickness_file->close();
         }
     }
-
-    /*
-     *  For each node, average its value of e with the values of all the neighbours
-     */
-    std::vector<double> my_averaged_wall_thickness(num_nodes);
-    for (unsigned node_index=0; node_index<num_nodes; node_index++)
+    else
     {
-        my_averaged_wall_thickness[node_index] = GetAveragedThicknessLocalNode(node_index, mWallThickness);
-    }
-
-    // Non-local information appear as zeros in the vector
-    MPI_Allreduce(&my_averaged_wall_thickness[0], &mAveragedWallThickness[0], num_nodes,
-                  MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
-
-    if (logInfo)
-    {
-        for (unsigned node_index=0; node_index<num_nodes; node_index++)
-        {
-             *p_ave_thickness_file << mAveragedWallThickness[node_index] << "\n";
-        }
-    }
-
-    if (logInfo)
-    {
-        p_regions_file->close();
-        p_thickness_file->close();
-        p_ave_thickness_file->close();
+        NEVER_REACHED;
     }
 }
 

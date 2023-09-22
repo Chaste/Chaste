@@ -115,7 +115,7 @@ unsigned ShovingCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(
     unsigned daughter_node_index = UNSIGNED_UNSET;
 
     unsigned counter;
-    for (counter=0; counter < num_neighbours; ++counter)
+    for (counter = 0; counter < num_neighbours; ++counter)
     {
         total_probability += neighbouring_node_propensities[counter];
         if (total_probability >= random_number)

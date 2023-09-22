@@ -186,15 +186,15 @@ public:
                 node_iter != mesh.GetNodeIteratorEnd(); ++node_iter)
         {
             unsigned i = node_iter->GetIndex();
-            assert(lo<=(int)(2*i) && (int)(2*i)<hi);
-            for(unsigned j=0; j<mesh.GetNumNodes(); j++)
+            assert(lo <= static_cast<int>(2*i) && static_cast<int>(2*i) < hi);
+            for (unsigned j = 0; j < mesh.GetNumNodes(); ++j)
             {
                 TS_ASSERT_DELTA( PetscMatTools::GetElement(purkinje_mat,2*i,2*j),   PetscMatTools::GetElement(normal_mat,i,j), 1e-8);
                 TS_ASSERT_DELTA( PetscMatTools::GetElement(purkinje_mat,2*i,2*j+1), 0.0, 1e-8);
             }
 
-            assert(lo<=(int)(2*i+1) && (int)(2*i+1)<hi);
-            for(unsigned j=0; j<mesh.GetNumNodes(); j++)
+            assert(lo <= static_cast<int>(2*i+1) && static_cast<int>(2*i+1) < hi);
+            for (unsigned j = 0; j < mesh.GetNumNodes(); ++j)
             {
                 TS_ASSERT_DELTA( PetscMatTools::GetElement(purkinje_mat,2*i+1,2*j),   0.0, 1e-8);
                 TS_ASSERT_DELTA( PetscMatTools::GetElement(purkinje_mat,2*i+1,2*j+1), 0.0, 1e-8);
@@ -236,21 +236,21 @@ public:
              node_iter != mesh.GetNodeIteratorEnd(); ++node_iter)
         {
             unsigned i = node_iter->GetIndex();
-            assert(lo<=(int)(2*i) && (int)(2*i)<hi);
-            for (unsigned j=0; j<mesh.GetNumNodes(); j++)
+            assert(lo <= static_cast<int>(2*i) && static_cast<int>(2*i) < hi);
+            for (unsigned j=0; j<mesh.GetNumNodes(); ++j)
             {
                 TS_ASSERT_DELTA( PetscMatTools::GetElement(purkinje_mat,2*i,2*j), 0 , 1e-8);
                 TS_ASSERT_DELTA( PetscMatTools::GetElement(purkinje_mat,2*i,2*j+1), 0.0, 1e-8);
             }
 
-            assert(lo<=(int)(2*i+1) && (int)(2*i+1)<hi);
-            for (unsigned j=0; j<mesh.GetNumNodes(); j++)
+            assert(lo <= static_cast<int>(2*i+1) && static_cast<int>(2*i+1) < hi);
+            for (unsigned j = 0; j<mesh.GetNumNodes(); ++j)
             {
-                //Non-Purkinje are all zero
+                // Non-Purkinje are all zero
                 TS_ASSERT_DELTA( PetscMatTools::GetElement(purkinje_mat,2*i+1,2*j),   0.0, 1e-8);
 
-                //Make sure that columns associated with cable node have non-zero Purkinje entries
-                if ( (i>55) && (i<65) && (j>=i-1) && (j<=i+1))
+                // Make sure that columns associated with cable node have non-zero Purkinje entries
+                if ((i>55) && (i<65) && (j>=i-1) && (j<=i+1))
                 {
                     TS_ASSERT_DIFFERS( PetscMatTools::GetElement(purkinje_mat,2*i+1,2*j+1), 0.0);
                 }
@@ -399,14 +399,14 @@ public:
 
         // We don't explicitly test the values of the rhs, as this is also tested by comparing the solutions.
         // As the system matrices are different, the results won't be identical (but will be close) for the same linear solver tolerance.
-        // for(int i=lo; i<hi; i++)
+        // for (int i = lo; i < hi; ++i)
         // {
         //     TS_ASSERT_DELTA(PetscVecTools::GetElement(r_purk_rhs, 2*i), PetscVecTools::GetElement(r_mono_rhs, i), 1e-8);
         // }
 
-        for(int i=lo; i<hi; i++)
+        for (int i = lo; i < hi; ++i)
         {
-            for(unsigned j=0; j<mesh.GetNumNodes(); j++)
+            for (unsigned j = 0; j < mesh.GetNumNodes(); ++j)
             {
                 // 'top-left' block
                 TS_ASSERT_DELTA(PetscMatTools::GetElement(r_purk_mat, 2*i,2*j), PetscMatTools::GetElement(r_mono_mat, i,j), 1e-8);
@@ -416,13 +416,12 @@ public:
             }
         }
 
-
         ReplicatableVector soln_repl(solution);
         ReplicatableVector soln_mono_repl(solution_just_monodomain);
 
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
-            if(55<=i && i<=65) // purkinje nodes for this mesh
+            if (55<=i && i<=65) // purkinje nodes for this mesh
             {
                 //The Purkinje domain is a 1D line embedded within the tissue.
                 //It is stimulated in the same way as the tissue domain, therefore

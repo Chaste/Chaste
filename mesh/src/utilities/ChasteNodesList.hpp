@@ -129,7 +129,7 @@ inline void save_construct_data(
     // The ChastePoints have to be at unique addresses, otherwise Boost thinks that the first archive is sufficient
     std::vector <ChastePoint<SPACE_DIM>* > point_list;
 
-    for (unsigned i = 0; i < node_list.size(); i++)
+    for (unsigned i = 0; i < node_list.size(); ++i)
     {
         c_vector<double, SPACE_DIM> loc =  node_list[i]->rGetLocation();
         point_list.push_back(new  ChastePoint<SPACE_DIM>(loc));
@@ -139,7 +139,7 @@ inline void save_construct_data(
     }
 
     // Clean memory
-    for (unsigned i = 0; i < point_list.size(); i++)
+    for (unsigned i = 0; i < point_list.size(); ++i)
     {
         delete point_list[i];
     }
@@ -159,7 +159,7 @@ inline void load_construct_data(
 
     // Rebuild the node list based on the unarchived points and indices
     std::vector<Node<SPACE_DIM>* > node_list;
-    for (unsigned i = 0; i < size; i++)
+    for (unsigned i = 0; i < size; ++i)
     {
         ChastePoint<SPACE_DIM>* p_point;
         unsigned index;

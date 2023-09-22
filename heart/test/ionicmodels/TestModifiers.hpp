@@ -73,7 +73,7 @@ private:
 
     void setUp()
     {
-           if(!p_shannon){
+           if (!p_shannon){
                       boost::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus());
                    boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
                       OutputFileHandler handler("TestModifiers", true);
@@ -168,7 +168,7 @@ public:
         TimeModifier mod;
         double parameter = 2;
 
-        for (unsigned i=0; i<7; i++)
+        for (unsigned i=0; i<7; ++i)
         {
             double time = (double)i;
             double returned = mod.Calc(parameter, time);

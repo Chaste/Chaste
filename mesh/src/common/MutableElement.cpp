@@ -64,7 +64,7 @@ MutableElement<ELEMENT_DIM, SPACE_DIM>::~MutableElement()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableElement<ELEMENT_DIM, SPACE_DIM>::RegisterWithNodes()
 {
-    for (unsigned i=0; i<this->mNodes.size(); i++)
+    for (unsigned i=0; i<this->mNodes.size(); ++i)
     {
         this->mNodes[i]->AddElement(this->mIndex);
     }
@@ -77,12 +77,12 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::MarkAsDeleted()
     this->mIsDeleted = true;
 
     // Update nodes in the element so they know they are not contained by it
-    for (unsigned i=0; i<this->GetNumNodes(); i++)
+    for (unsigned i=0; i<this->GetNumNodes(); ++i)
     {
         this->mNodes[i]->RemoveElement(this->mIndex);
     }
     //Update edges in the element so they know they are not contained by it
-    for (unsigned i=0; i< GetNumEdges(); i++)
+    for (unsigned i=0; i< GetNumEdges(); ++i)
     {
         this->mEdges[i]->RemoveElement(this->mIndex);
     }
@@ -91,12 +91,12 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::MarkAsDeleted()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableElement<ELEMENT_DIM, SPACE_DIM>::ResetIndex(unsigned index)
 {
-    for (unsigned i=0; i<this->GetNumNodes(); i++)
+    for (unsigned i=0; i<this->GetNumNodes(); ++i)
     {
        this->mNodes[i]->RemoveElement(this->mIndex);
     }
 
-    for (unsigned i=0; i<this->GetNumEdges(); i++)
+    for (unsigned i=0; i<this->GetNumEdges(); ++i)
     {
         this->mEdges[i]->RemoveElement(this->mIndex);
     }
@@ -146,7 +146,7 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::DeleteNode(const unsigned& rIndex)
         // the section is replaced with edge --EN-- obtained from the EdgeHelper, this may be an existing edge
         // N0 --EN-- N2 ==E2== N0
 
-        unsigned rPrevIndex = ((int)rIndex-1) % this->mEdges.size();
+        unsigned rPrevIndex = (static_cast<int>(rIndex)-1) % this->mEdges.size();
         unsigned rNextIndex = (rIndex+1) % this->mEdges.size();
         if (rIndex==0)
             rPrevIndex = this->mEdges.size()-1;
@@ -225,7 +225,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned MutableElement<ELEMENT_DIM, SPACE_DIM>::GetNodeLocalIndex(unsigned globalIndex) const
 {
     unsigned local_index = UINT_MAX;
-    for (unsigned i=0; i<this->mNodes.size(); i++)
+    for (unsigned i=0; i<this->mNodes.size(); ++i)
     {
         if (this->GetNodeGlobalIndex(i) == globalIndex)
         {
@@ -255,7 +255,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MutableElement<ELEMENT_DIM, SPACE_DIM>::IsElementOnBoundary() const
 {
     bool is_element_on_boundary = false;
-    for (unsigned i=0; i<this->mNodes.size(); i++)
+    for (unsigned i=0; i<this->mNodes.size(); ++i)
     {
         if (this->GetNode(i)->IsBoundaryNode())
         {
@@ -293,7 +293,7 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::BuildEdges()
     if (SPACE_DIM == 2)
     {
         this->ClearEdges();
-        for (unsigned i = 0; i < this->mNodes.size(); i++)
+        for (unsigned i = 0; i < this->mNodes.size(); ++i)
         {
             unsigned i_next = (i+1) % this->mNodes.size();
             mEdges.push_back(mEdgeHelper->GetEdgeFromNodes(this->mIndex, this->mNodes[i], this->mNodes[i_next]));
@@ -382,7 +382,7 @@ MutableElement<1, SPACE_DIM>::~MutableElement()
 template<unsigned SPACE_DIM>
 void MutableElement<1, SPACE_DIM>::RegisterWithNodes()
 {
-    for (unsigned i=0; i<this->mNodes.size(); i++)
+    for (unsigned i=0; i<this->mNodes.size(); ++i)
     {
         this->mNodes[i]->AddElement(this->mIndex);
     }
@@ -395,7 +395,7 @@ void MutableElement<1, SPACE_DIM>::MarkAsDeleted()
     this->mIsDeleted = true;
 
     // Update nodes in the element so they know they are not contained by it
-    for (unsigned i=0; i<this->GetNumNodes(); i++)
+    for (unsigned i=0; i<this->GetNumNodes(); ++i)
     {
         this->mNodes[i]->RemoveElement(this->mIndex);
     }
@@ -404,7 +404,7 @@ void MutableElement<1, SPACE_DIM>::MarkAsDeleted()
 template <unsigned SPACE_DIM>
 void MutableElement<1, SPACE_DIM>::ResetIndex(unsigned index)
 {
-    for (unsigned i=0; i<this->GetNumNodes(); i++)
+    for (unsigned i=0; i<this->GetNumNodes(); ++i)
     {
        this->mNodes[i]->RemoveElement(this->mIndex);
     }
@@ -456,7 +456,7 @@ void MutableElement<1, SPACE_DIM>::BuildEdges()
     if (SPACE_DIM == 2)
     {
         this->ClearEdges();
-        for (unsigned i = 0; i < this->mNodes.size(); i++)
+        for (unsigned i = 0; i < this->mNodes.size(); ++i)
         {
             unsigned i_next = (i+1) % this->mNodes.size();
             mEdges.push_back(mEdgeHelper->GetEdgeFromNodes(this->mIndex, this->mNodes[i], this->mNodes[i_next]));
@@ -545,7 +545,7 @@ template<unsigned SPACE_DIM>
 unsigned MutableElement<1, SPACE_DIM>::GetNodeLocalIndex(unsigned globalIndex) const
 {
     unsigned local_index = UINT_MAX;
-    for (unsigned i=0; i<this->mNodes.size(); i++)
+    for (unsigned i=0; i<this->mNodes.size(); ++i)
     {
         if (this->GetNodeGlobalIndex(i) == globalIndex)
         {
@@ -570,7 +570,7 @@ template<unsigned SPACE_DIM>
 bool MutableElement<1, SPACE_DIM>::IsElementOnBoundary() const
 {
     bool is_element_on_boundary = false;
-    for (unsigned i=0; i<this->mNodes.size(); i++)
+    for (unsigned i=0; i<this->mNodes.size(); ++i)
     {
         if (this->GetNode(i)->IsBoundaryNode())
         {

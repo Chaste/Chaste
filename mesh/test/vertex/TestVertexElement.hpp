@@ -60,7 +60,7 @@ public:
         // Test RegisterWithNodes()
         element.RegisterWithNodes();
 
-        for (unsigned node_index=0; node_index<element.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index<element.GetNumNodes(); ++node_index)
         {
             TS_ASSERT_EQUALS(element.GetNode(node_index)->GetNumContainingElements(), 1u);
         }
@@ -115,13 +115,13 @@ public:
         // Test MarkAsDeleted()
         element.MarkAsDeleted();
 
-        for (unsigned node_index=0; node_index<element.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index<element.GetNumNodes(); ++node_index)
         {
             TS_ASSERT_EQUALS(element.GetNode(node_index)->GetNumContainingElements(), 0u);
         }
 
         // Tidy up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -184,7 +184,7 @@ public:
         faces.push_back(new VertexElement<2,3>(5, nodes_face_5));
 
         std::vector<bool> orientations(faces.size());
-        for (unsigned i=0; i<faces.size(); i++)
+        for (unsigned i = 0; i<faces.size(); ++i)
         {
             orientations[i] = true;
         }
@@ -207,17 +207,17 @@ public:
         TS_ASSERT_DELTA(element.GetFace(5)->GetNode(2)->rGetLocation()[2], 1.0, 1e-6);
 
         // Test orientations
-        for (unsigned face_index=0; face_index<element.GetNumFaces(); face_index++)
+        for (unsigned face_index = 0; face_index<element.GetNumFaces(); face_index++)
         {
             TS_ASSERT_EQUALS(element.FaceIsOrientatedClockwise(face_index), true);
         }
 
         // Tidy up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
-        for (unsigned i=0; i<faces.size(); i++)
+        for (unsigned i = 0; i<faces.size(); ++i)
         {
             delete faces[i];
         }
@@ -231,13 +231,13 @@ public:
         std::vector<Node<2>*> face_nodes;
         std::vector<bool> orientations;
         unsigned num_nodes = 6;
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i<num_nodes; ++i)
         {
             double theta = 2.0*M_PI*static_cast<double>(i)/static_cast<double>(num_nodes);
             nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
         }
 
-        for (unsigned i=0; i<num_nodes-1; i++)
+        for (unsigned i = 0; i<num_nodes-1; ++i)
         {
             face_nodes.clear();
             face_nodes.push_back(nodes[i]);
@@ -261,7 +261,7 @@ public:
         TS_ASSERT_EQUALS(vertex_element.GetNumFaces(), 6u);
 
         // Test that each face has the correct orientation and number of nodes
-        for (unsigned face_index=0; face_index<6; face_index++)
+        for (unsigned face_index = 0; face_index<6; face_index++)
         {
             TS_ASSERT_EQUALS(vertex_element.GetFace(face_index)->GetNumNodes(), 2u);
 
@@ -270,7 +270,7 @@ public:
         }
 
         // Tidy up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
             delete faces[i];
@@ -293,7 +293,7 @@ public:
         // Create nodes and Faces
         std::vector<Node<2>*> nodes;
         unsigned num_nodes = 6;
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i<num_nodes; ++i)
         {
             double theta = 2.0*M_PI*static_cast<double>(i)/static_cast<double>(num_nodes);
             nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
@@ -347,7 +347,7 @@ public:
         TS_ASSERT_DELTA(vertex_element.GetNode(4)->GetPoint()[1], 0.0, 1e-9);
 
         // Tidy up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -367,20 +367,20 @@ public:
         VertexElement<2,2> vertex_element(0, nodes);
         vertex_element.RegisterWithNodes();
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             TS_ASSERT_EQUALS(vertex_element.GetNode(i)->GetNumContainingElements(), 1u);
         }
 
         vertex_element.MarkAsDeleted();
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             TS_ASSERT_EQUALS(vertex_element.GetNode(i)->GetNumContainingElements(), 0u);
         }
 
         // Tidy up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -410,7 +410,7 @@ public:
         TS_ASSERT_DELTA(vertex_element.GetNode(2)->rGetLocation()[1], 1.3, 1e-12);
 
         // Tidy up
-        for (unsigned i=0; i<nodes.size(); ++i)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -483,11 +483,11 @@ public:
         TS_ASSERT_EQUALS(element.GetNumFaces(), 4u);
 
         // Tidy up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
-        for (unsigned i=0; i<faces.size(); i++)
+        for (unsigned i = 0; i<faces.size(); ++i)
         {
             delete faces[i];
         }
@@ -517,7 +517,7 @@ public:
         TS_ASSERT_EQUALS(vertex_element.GetNodeLocalIndex(0), UINT_MAX);
 
         // Tidy up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -542,7 +542,7 @@ public:
         TS_ASSERT_EQUALS(square_vertex_element.IsElementOnBoundary(), true);
 
         // Tidy up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -562,7 +562,7 @@ public:
         TS_ASSERT_EQUALS(line_vertex_element.IsElementOnBoundary(), true);
 
         // Tidy up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }

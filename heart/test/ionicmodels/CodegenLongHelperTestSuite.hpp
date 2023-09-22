@@ -161,7 +161,7 @@ private:
         std::vector<double> valid_voltages = GetVoltages(data_reader);
 
         TS_ASSERT_EQUALS(rTimes.size(), (valid_times.size() - 1) * outputFreq + 1);
-        for (unsigned i = 0; i < valid_times.size(); i++)
+        for (unsigned i = 0; i < valid_times.size(); ++i)
         {
             TS_ASSERT_DELTA(rTimes[i * outputFreq], valid_times[i], 1e-12);
             TS_ASSERT_DELTA(rVoltages[i * outputFreq], valid_voltages[i], tolerance);
@@ -253,7 +253,7 @@ protected:
         {
             auto special_model = std::find(all_models.begin(), all_models.end(), model);
             bool found = special_model != all_models.end();
-            if(found)
+            if (found)
             {
                 all_models.erase(special_model);
             }
@@ -312,7 +312,7 @@ public:
                     // We know this model does something that provokes one warning...
                     TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
                 }
-                else if(rModels[i] == "courtemanche_ramirez_nattel_1998")
+                else if (rModels[i] == "courtemanche_ramirez_nattel_1998")
                 {
                     // Can throw 1 lookup table warning
                    TS_ASSERT_LESS_THAN(Warnings::Instance()->GetNumWarnings(), 2u)

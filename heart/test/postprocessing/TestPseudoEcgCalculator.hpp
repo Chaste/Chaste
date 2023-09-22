@@ -143,7 +143,7 @@ public:
         // Because in this simple case d(gradV)=1, the result is simply -1/(15-x) evaluated
         // between 0 and 1
         double expected_result = -(1/14.0-1/15.0);
-        for (unsigned k = 0; k< number_of_time_steps; k++)
+        for (unsigned k = 0; k< number_of_time_steps; ++k)
         {
             pseudo_ecg = calculator.ComputePseudoEcgAtOneTimeStep(k);
             TS_ASSERT_DELTA(pseudo_ecg, expected_result,1e-6);
@@ -261,7 +261,7 @@ public:
         // Integrating by parts with f = 2x and g = 1/(15-x) and evaluating between 0 and 1
 
         double expected_result = -( (2/14.0) - 2.0*log(1/14.0) + 2.0*log(1/15.0));
-        for (unsigned k = 0; k< number_of_time_steps; k++)
+        for (unsigned k = 0; k< number_of_time_steps; ++k)
         {
             pseudo_ecg = calculator.ComputePseudoEcgAtOneTimeStep(k);
             TS_ASSERT_DELTA(pseudo_ecg, expected_result,1e-6);
@@ -272,7 +272,7 @@ public:
         calculator.SetDiffusionCoefficient(diff_coeff);
 
         //since we are assuming D to be constant, the expected result is just mulitplied by diff_coeff
-        for (unsigned k = 0; k< number_of_time_steps; k++)
+        for (unsigned k = 0; k< number_of_time_steps; ++k)
         {
             pseudo_ecg = calculator.ComputePseudoEcgAtOneTimeStep(k);
             TS_ASSERT_DELTA(pseudo_ecg, diff_coeff*expected_result,1e-6);
@@ -299,7 +299,7 @@ public:
         mesh.ConstructFromMeshReader(reader);
 
         // Set the x<0.25 and x>0.75 regions as the bath region
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i=0; i<mesh.GetNumElements(); ++i)
         {
             double x = mesh.GetElement(i)->CalculateCentroid()[0];
             if ((x<0.25) || (x>0.75))

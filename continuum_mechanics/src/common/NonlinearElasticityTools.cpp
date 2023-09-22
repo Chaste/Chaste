@@ -36,15 +36,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NonlinearElasticityTools.hpp"
 
 template<unsigned DIM>
-std::vector<unsigned> NonlinearElasticityTools<DIM>::GetNodesByComponentValue(TetrahedralMesh<DIM,DIM>& rMesh,
-                                                          unsigned component,
-                                                          double value)
+std::vector<unsigned> NonlinearElasticityTools<DIM>::GetNodesByComponentValue(
+    TetrahedralMesh<DIM,DIM>& rMesh,
+    unsigned component,
+    double value)
 {
     std::vector<unsigned> fixed_nodes;
     double tol = 1e-8;
-    for (unsigned i=0; i<rMesh.GetNumNodes(); i++)
+    for (unsigned i = 0; i < rMesh.GetNumNodes(); ++i)
     {
-        if (fabs(rMesh.GetNode(i)->rGetLocation()[component] - value)<1e-8)
+        if (fabs(rMesh.GetNode(i)->rGetLocation()[component] - value) < 1e-8)
         {
             fixed_nodes.push_back(i);
         }

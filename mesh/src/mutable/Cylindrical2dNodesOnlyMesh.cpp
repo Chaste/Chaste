@@ -155,7 +155,7 @@ void Cylindrical2dNodesOnlyMesh::RefreshMesh()
 
     // Check if the x values are in the domain, if not, get the fmod and relocate.
     unsigned num_nodes = mNodes.size();
-    for (unsigned i=0; i<num_nodes; i++)
+    for (unsigned i=0; i<num_nodes; ++i)
     {
         double& x_location = (mNodes[i]->rGetModifiableLocation())[0];
         if (x_location < 0.0)

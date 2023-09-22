@@ -726,7 +726,7 @@ public:
         unsigned num_files = 5;
         std::string test_file_names[5] = { "monodomain2d_mesh.pts", "monodomain2d_mesh.tri", "monodomain2d_V.dat",
                                            "ChasteParameters.xml", "ConductionVelocityFromNode0.dat" };
-        for (unsigned i = 0; i < num_files; i++)
+        for (unsigned i = 0; i < num_files; ++i)
         {
             TS_ASSERT(!handler.FindFile(test_file_names[i]).Exists());
         }
@@ -736,7 +736,7 @@ public:
 
         PetscTools::Barrier();
         // Compare output files
-        for (unsigned i = 0; i < num_files; i++)
+        for (unsigned i = 0; i < num_files; ++i)
         {
             if (test_file_names[i] == "monodomain2d_V.dat")
             {
@@ -1392,13 +1392,13 @@ public:
 
         std::vector<double> our_answer1 = reader.GetVariableOverTime("V", my_favourite_node1);
 
-        for (unsigned i = 0; i < right_answer1.size(); i++)
+        for (unsigned i = 0; i < right_answer1.size(); ++i)
         {
             TS_ASSERT_DELTA(our_answer1[i], right_answer1[i], 2e-4);
         }
 
         std::vector<double> our_answer2 = reader.GetVariableOverTime("V", my_favourite_node2);
-        for (unsigned i = 0; i < our_answer2.size(); i++)
+        for (unsigned i = 0; i < our_answer2.size(); ++i)
         {
             TS_ASSERT_DELTA(our_answer2[i], -83.85, 1e-2);
         }

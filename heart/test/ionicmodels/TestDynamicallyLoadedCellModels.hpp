@@ -383,7 +383,7 @@ public:
 //            {
 //                output_arch << p_const_cell;
 //            }
-//            catch(boost::archive::archive_exception& boost_exception)
+//            catch (boost::archive::archive_exception& boost_exception)
 //            {
 //                TS_ASSERT_EQUALS(boost_exception.code, boost::archive::archive_exception::unregistered_class);
 //                TS_FAIL("Archiving cell models in unavailable.  Please refer to  #2417");

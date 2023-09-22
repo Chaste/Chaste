@@ -64,7 +64,7 @@ void SteadyStateRunner::RunToSteadyStateImplementation()
     for (unsigned i = 0; i < mMaxNumPaces; i = i + num_paces_to_analyse)
     {
         // Look at two paces in the hope of detecting alternans and still saying we're steady-ish.
-        for (unsigned j = 0; j < num_paces_to_analyse; j++)
+        for (unsigned j = 0; j < num_paces_to_analyse; ++j)
         {
             // Pre-stimulus (can skip if stimulus is applied at t=0)
             if (stimulus_start_time > 0)
@@ -88,7 +88,7 @@ void SteadyStateRunner::RunToSteadyStateImplementation()
 
         // Calculate the change in the norm of the state variables
         double temp = 0;
-        for (unsigned j = 0; j < old_state_vars.size(); j++)
+        for (unsigned j = 0; j < old_state_vars.size(); ++j)
         {
             temp += fabs(new_state_vars[j] - old_state_vars[j]);
         }

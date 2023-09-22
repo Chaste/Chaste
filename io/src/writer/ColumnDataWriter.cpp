@@ -124,7 +124,7 @@ void ColumnDataWriter::CheckVariableName(const std::string& rName)
 
 void ColumnDataWriter::CheckUnitsName(const std::string& rName)
 {
-    for (unsigned i=0; i<rName.length(); i++)
+    for (unsigned i=0; i<rName.length(); ++i)
     {
         if (!isalnum(rName[i]) && !(rName[i]=='_'))
         {
@@ -288,7 +288,7 @@ void ColumnDataWriter::EndDefineMode()
              * In this scope the method "CreateFixedDimensionFile" has not been invoked,
              * because there is no mFixedDimensionSize available.
              */
-            for (unsigned i=0; i<mVariables.size(); i++)
+            for (unsigned i=0; i<mVariables.size(); ++i)
             {
                 (*mpCurrentOutputFile) << mVariables[i].mVariableName << "(" << mVariables[i].mVariableUnits << ")";
                 if (i < mVariables.size()-1)
@@ -331,7 +331,7 @@ void ColumnDataWriter::CreateFixedDimensionFile(const std::string& rFileName)
                                << "(" << mpFixedDimensionVariable->mVariableUnits << ") ";
     }
     // Write out the column headers and spaces for the rest of the file
-    for (unsigned i = 0; i < mVariables.size(); i++)
+    for (unsigned i = 0; i < mVariables.size(); ++i)
     {
         (*mpCurrentOutputFile) << mVariables[i].mVariableName << "(" << mVariables[i].mVariableUnits << ")";
         if (i < mVariables.size()-1)
@@ -342,7 +342,7 @@ void ColumnDataWriter::CreateFixedDimensionFile(const std::string& rFileName)
     (*mpCurrentOutputFile) << std::endl;
     mRowStartPosition = mpCurrentOutputFile->tellp();
     std::string blank_line(mRowWidth, ' ');
-    for (int i = 0; i < mFixedDimensionSize; i++)
+    for (int i = 0; i < mFixedDimensionSize; ++i)
     {
         (*mpCurrentOutputFile) << blank_line << std::endl;
     }
@@ -419,7 +419,7 @@ void ColumnDataWriter::PutVariable(int variableID, double variableValue, long di
         EXCEPTION("Cannot put variables when in Define mode");
     }
     // Check that variableID is in range (exception)
-    if (variableID > (int)mVariables.size() ||
+    if (variableID > static_cast<int>(mVariables.size()) ||
         (variableID != UNLIMITED_DIMENSION_VAR_ID &&
          variableID != FIXED_DIMENSION_VAR_ID &&
          variableID < 0))

@@ -117,7 +117,7 @@ public:
         vertex_mesh_writer.AddCellData("Cell IDs", cell_ids);
         // Add distance from origin into the node "point" data
         std::vector<double> distance;
-        for (unsigned i=0; i<basic_vertex_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<basic_vertex_mesh.GetNumNodes(); ++i)
         {
             distance.push_back(norm_2(basic_vertex_mesh.GetNode(i)->rGetLocation()));
         }
@@ -165,7 +165,7 @@ public:
 #ifdef CHASTE_VTK
         VertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
         std::vector<double> cell_ids;
-        for (unsigned i=0; i<p_mesh_for_vtk->GetNumElements(); i++)
+        for (unsigned i=0; i<p_mesh_for_vtk->GetNumElements(); ++i)
         {
             double this_cell_id = static_cast<double>(i);
             cell_ids.push_back(this_cell_id);
@@ -175,7 +175,7 @@ public:
 
         // Add distance from origin into the node "point" data
         std::vector<double> distance;
-        for (unsigned i=0; i<p_mesh_for_vtk->GetNumNodes(); i++)
+        for (unsigned i=0; i<p_mesh_for_vtk->GetNumNodes(); ++i)
         {
             distance.push_back(norm_2(p_mesh_for_vtk->GetNode(i)->rGetLocation()));
         }
@@ -223,7 +223,7 @@ public:
 #ifdef CHASTE_VTK
         VertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
         std::vector<double> cell_ids;
-        for (unsigned i=0; i<p_mesh_for_vtk->GetNumElements(); i++)
+        for (unsigned i=0; i<p_mesh_for_vtk->GetNumElements(); ++i)
         {
             double this_cell_id = static_cast<double>(i);
             cell_ids.push_back(this_cell_id);
@@ -233,7 +233,7 @@ public:
 
         // Add distance from origin into the node "point" data
         std::vector<double> distance;
-        for (unsigned i=0; i<p_mesh_for_vtk->GetNumNodes(); i++)
+        for (unsigned i=0; i<p_mesh_for_vtk->GetNumNodes(); ++i)
         {
             distance.push_back(norm_2(p_mesh_for_vtk->GetNode(i)->rGetLocation()));
         }
@@ -299,7 +299,7 @@ public:
 
          // Add distance from origin into the node "point" data
         std::vector<double> distance;
-        for (unsigned i=0; i<mesh3d.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh3d.GetNumNodes(); ++i)
         {
             distance.push_back(norm_2(mesh3d.GetNode(i)->rGetLocation()));
         }
@@ -358,7 +358,7 @@ public:
 
          // Add distance from origin into the node "point" data
         std::vector<double> distance;
-        for (unsigned i=0; i<mesh3d.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh3d.GetNumNodes(); ++i)
         {
             distance.push_back(norm_2(mesh3d.GetNode(i)->rGetLocation()));
         }

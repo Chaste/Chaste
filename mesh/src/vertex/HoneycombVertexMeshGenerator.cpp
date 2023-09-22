@@ -64,7 +64,7 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
      */
     if (!isFlatBottom)
     {
-        for (unsigned i = 0; i < numElementsAcross; i++)
+        for (unsigned i = 0; i < numElementsAcross; ++i)
         {
             Node<2>* p_node = new Node<2>(node_index, true, i + 0.5, 0);
             nodes.push_back(p_node);
@@ -77,11 +77,11 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
      * nodes. The same is true for the second row, if isFlatBottom is false. On 
      * other rows, the first and last nodes only are boundary nodes.
      */
-    for (unsigned j = 1; j < 2*numElementsUp + 1; j++)
+    for (unsigned j = 1; j < 2*numElementsUp + 1; ++j)
     {
         if ((j == 1) && isFlatBottom)
         {
-            for (unsigned i = 0; i <= numElementsAcross; i++)
+            for (unsigned i = 0; i <= numElementsAcross; ++i)
             {
                 double x_coord = ((j%4 == 0)||(j%4 == 3)) ? i + 0.5 : i;
                 double y_coord = 0.0;
@@ -93,7 +93,7 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
         }
         else
         {
-            for (unsigned i = 0; i <= numElementsAcross; i++)
+            for (unsigned i = 0; i <= numElementsAcross; ++i)
             {
                 double x_coord = ((j%4 == 0)||(j%4 == 3)) ? i + 0.5 : i;
                 double y_coord = (1.5*j - 0.5*(j%2))*0.5/sqrt(3.0);
@@ -116,7 +116,7 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
         nodes.push_back(p_node);
         node_index++;
     }
-    for (unsigned i=1; i<numElementsAcross; i++)
+    for (unsigned i=1; i<numElementsAcross; ++i)
     {
         double x_coord = (((2*numElementsUp+1)%4 == 0)||((2*numElementsUp+1)%4 == 3)) ? i+0.5 : i;
 
@@ -135,12 +135,12 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
      * Create the elements. The array node_indices contains the
      * global node indices from bottom, going anticlockwise.
      */
-    for (unsigned j = 0; j < numElementsUp; j++)
+    for (unsigned j = 0; j < numElementsUp; ++j)
     {
         if (j == 0 && isFlatBottom)
         {
             unsigned short_node_indices[5];
-            for (unsigned i = 0; i < numElementsAcross; i++)
+            for (unsigned i = 0; i < numElementsAcross; ++i)
             {
                 short_node_indices[0] = i;
                 short_node_indices[1] = i + 1;
@@ -149,7 +149,7 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
                 short_node_indices[4] = short_node_indices[2] - 1;
 
                 std::vector<Node<2>*> element_nodes;
-                for (unsigned k = 0; k < 5; k++)
+                for (unsigned k = 0; k < 5; ++k)
                 {
                     element_nodes.push_back(nodes[short_node_indices[k]]);
                 }
@@ -161,7 +161,7 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
         }
         else
         {
-            for (unsigned i = 0; i < numElementsAcross; i++)
+            for (unsigned i = 0; i < numElementsAcross; ++i)
             {
                 if (j == 0)
                 {
@@ -187,7 +187,7 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
                 node_indices[5] = node_indices[1] - 1;
 
                 std::vector<Node<2>*> element_nodes;
-                for (unsigned k = 0; k < 6; k++)
+                for (unsigned k = 0; k < 6; ++k)
                 {
                     element_nodes.push_back(nodes[node_indices[k]]);
                 }

@@ -561,10 +561,9 @@ public:
 
         // Boundary conditions
         BoundaryConditionsContainer<2,2,1> bcc;
-        for (TetrahedralMesh<2,2>::BoundaryNodeIterator iter =
-              mesh.GetBoundaryNodeIteratorBegin();
-            iter != mesh.GetBoundaryNodeIteratorEnd();
-            iter++)
+        for (auto iter = mesh.GetBoundaryNodeIteratorBegin();
+             iter != mesh.GetBoundaryNodeIteratorEnd();
+             iter++)
         {
             double x = (*iter)->GetPoint()[0];
             double y = (*iter)->GetPoint()[1];

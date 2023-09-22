@@ -39,24 +39,27 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCompressibleMaterialLaw.hpp"
 
 template<unsigned DIM>
-SolidMechanicsProblemDefinition<DIM>::SolidMechanicsProblemDefinition(AbstractTetrahedralMesh<DIM,DIM>& rMesh)
+SolidMechanicsProblemDefinition<DIM>::SolidMechanicsProblemDefinition(
+    AbstractTetrahedralMesh<DIM,DIM>& rMesh)
     : ContinuumMechanicsProblemDefinition<DIM>(rMesh),
       mSolveUsingSnes(false)
 {
 }
 
 template<unsigned DIM>
-void SolidMechanicsProblemDefinition<DIM>::SetFixedNodes(std::vector<unsigned>& rFixedNodes, std::vector<c_vector<double,DIM> >& rFixedNodeLocations)
+void SolidMechanicsProblemDefinition<DIM>::SetFixedNodes(
+    std::vector<unsigned>& rFixedNodes,
+    std::vector<c_vector<double,DIM> >& rFixedNodeLocations)
 {
-    assert(rFixedNodes.size()==rFixedNodeLocations.size());
+    assert(rFixedNodes.size() == rFixedNodeLocations.size());
     this->mDirichletNodes = rFixedNodes;
 
     this->mDirichletNodeValues.clear();
-    for (unsigned i=0; i<this->mDirichletNodes.size(); i++)
+    for (unsigned i = 0; i < this->mDirichletNodes.size(); ++i)
     {
         unsigned index = this->mDirichletNodes[i];
         c_vector<double,DIM> displacement;
-        for (unsigned j=0; j<DIM; j++)
+        for (unsigned j = 0; j < DIM; ++j)
         {
             double location = rFixedNodeLocations[i](j);
 
@@ -101,8 +104,9 @@ void SolidMechanicsProblemDefinition<DIM>::SetMaterialLaw(CompressibilityType co
 }
 
 template<unsigned DIM>
-void SolidMechanicsProblemDefinition<DIM>::SetMaterialLaw(CompressibilityType compressibilityType,
-                                                          std::vector<AbstractMaterialLaw<DIM>*>& rMaterialLaws)
+void SolidMechanicsProblemDefinition<DIM>::SetMaterialLaw(
+    CompressibilityType compressibilityType,
+    std::vector<AbstractMaterialLaw<DIM>*>& rMaterialLaws)
 {
     mIsHomogeneousMaterial = false;
     mCompressibilityType = compressibilityType;
@@ -114,7 +118,7 @@ void SolidMechanicsProblemDefinition<DIM>::SetMaterialLaw(CompressibilityType co
 
     if (compressibilityType == INCOMPRESSIBLE)
     {
-        for (unsigned i=0; i<rMaterialLaws.size(); i++)
+        for (unsigned i = 0; i < rMaterialLaws.size(); ++i)
         {
             assert(rMaterialLaws[i]);
             AbstractIncompressibleMaterialLaw<DIM>* p_law = dynamic_cast<AbstractIncompressibleMaterialLaw<DIM>*>(rMaterialLaws[i]);
@@ -124,7 +128,7 @@ void SolidMechanicsProblemDefinition<DIM>::SetMaterialLaw(CompressibilityType co
     }
     else
     {
-        for (unsigned i=0; i<rMaterialLaws.size(); i++)
+        for (unsigned i = 0; i < rMaterialLaws.size(); ++i)
         {
             assert(rMaterialLaws[i]);
             AbstractCompressibleMaterialLaw<DIM>* p_law = dynamic_cast<AbstractCompressibleMaterialLaw<DIM>*>(rMaterialLaws[i]);
@@ -138,7 +142,7 @@ template<unsigned DIM>
 bool SolidMechanicsProblemDefinition<DIM>::IsHomogeneousMaterial()
 {
     // If this fails, SetMaterialLaw() hasn't been called
-    assert(mIncompressibleMaterialLaws.size()!=0  ||  mCompressibleMaterialLaws.size()!=0 );
+    assert(mIncompressibleMaterialLaws.size() != 0 || mCompressibleMaterialLaws.size() != 0);
     return mIsHomogeneousMaterial;
 }
 

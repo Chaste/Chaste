@@ -273,7 +273,7 @@ double HeartGeometryInformation<SPACE_DIM>::GetDistanceToEndo(unsigned nodeIndex
     if (mNumberOfSurfacesProvided == 3)
     {
         HeartRegionType node_region = GetHeartRegion(nodeIndex);
-        switch(node_region)
+        switch (node_region)
         {
             case LEFT_VENTRICLE_WALL:
             case LEFT_VENTRICLE_SURFACE:
@@ -356,7 +356,7 @@ void HeartGeometryInformation<SPACE_DIM>::DetermineLayerForEachNode(double epiFr
     }
 
     mLayerForEachNode.resize(mpMesh->GetNumNodes());
-    for (unsigned i=0; i<mpMesh->GetNumNodes(); i++)
+    for (unsigned i=0; i<mpMesh->GetNumNodes(); ++i)
     {
         double position = CalculateRelativeWallPosition(i);
         if (position<endoFraction)
@@ -383,7 +383,7 @@ void HeartGeometryInformation<SPACE_DIM>::WriteLayerForEachNode(std::string outp
         out_stream p_file = handler.OpenOutputFile(file);
 
         assert(mLayerForEachNode.size()>0);
-        for (unsigned i=0; i<mpMesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<mpMesh->GetNumNodes(); ++i)
         {
             if (mLayerForEachNode[i]==EPI)
             {
@@ -423,7 +423,7 @@ ChasteCuboid<SPACE_DIM> HeartGeometryInformation<SPACE_DIM>::CalculateBoundingBo
         {
             const c_vector<double, SPACE_DIM>& r_position = mpMesh->GetNode(global_index)->rGetLocation();
             //Update max/min
-            for (unsigned i=0; i<SPACE_DIM; i++)
+            for (unsigned i=0; i<SPACE_DIM; ++i)
             {
                 if (r_position[i] < my_minimum_point[i])
                 {

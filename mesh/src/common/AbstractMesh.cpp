@@ -52,7 +52,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractMesh<ELEMENT_DIM, SPACE_DIM>::~AbstractMesh()
 {
     // Iterate over nodes and free the memory
-    for (unsigned i = 0; i < mNodes.size(); i++)
+    for (unsigned i = 0; i < mNodes.size(); ++i)
     {
         delete mNodes[i];
     }
@@ -243,7 +243,7 @@ ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingB
 
         // Iterate through nodes
         /// \todo #1322 use a const version of NodeIterator here
-        for (unsigned index = 0; index < rNodes.size(); index++)
+        for (unsigned index = 0; index < rNodes.size(); ++index)
         {
             if (!rNodes[index]->IsDeleted())
             {
@@ -252,7 +252,7 @@ ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingB
                 position = rNodes[index]->rGetLocation();
 
                 // Update max/min
-                for (unsigned i = 0; i < SPACE_DIM; i++)
+                for (unsigned i = 0; i < SPACE_DIM; ++i)
                 {
                     if (position[i] < minimum_point[i])
                     {
@@ -300,7 +300,7 @@ unsigned AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestNodeIndex(const ChasteP
 
     const c_vector<double, SPACE_DIM>& test_location = rTestPoint.rGetLocation();
     // Now loop through the nodes, calculating the distance and updating best_node_point_distance
-    for (unsigned node_index = 0; node_index < mNodes.size(); node_index++)
+    for (unsigned node_index = 0; node_index < mNodes.size(); ++node_index)
     {
         // Calculate the distance from the chosen point to the current node
         double node_point_distance = norm_2(GetVectorFromAtoB(mNodes[node_index]->rGetLocation(), test_location));
@@ -323,7 +323,7 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Scale(const double xScale, const doub
 {
     unsigned num_nodes = mNodes.size();
 
-    for (unsigned i = 0; i < num_nodes; i++)
+    for (unsigned i = 0; i < num_nodes; ++i)
     {
         c_vector<double, SPACE_DIM>& r_location = mNodes[i]->rGetModifiableLocation();
         if (SPACE_DIM >= 3)
@@ -372,7 +372,7 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Translate(const c_vector<double, SPAC
 {
     unsigned num_nodes = this->mNodes.size();
 
-    for (unsigned i = 0; i < num_nodes; i++)
+    for (unsigned i = 0; i < num_nodes; ++i)
     {
         c_vector<double, SPACE_DIM>& r_location = this->mNodes[i]->rGetModifiableLocation();
         r_location += rDisplacement;
@@ -386,7 +386,7 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::Rotate(c_matrix<double, SPACE_DIM, SP
 {
     unsigned num_nodes = this->mNodes.size();
 
-    for (unsigned i = 0; i < num_nodes; i++)
+    for (unsigned i = 0; i < num_nodes; ++i)
     {
         c_vector<double, SPACE_DIM>& r_location = this->mNodes[i]->rGetModifiableLocation();
         r_location = prod(rotationMatrix, r_location);

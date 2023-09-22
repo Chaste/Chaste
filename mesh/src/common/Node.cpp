@@ -62,7 +62,7 @@ Node<SPACE_DIM>::Node(unsigned index, ChastePoint<SPACE_DIM> point, bool isBound
 template<unsigned SPACE_DIM>
 Node<SPACE_DIM>::Node(unsigned index, std::vector<double> coords, bool isBoundaryNode)
 {
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i = 0; i < SPACE_DIM; ++i)
     {
         mLocation(i) = coords.at(i);
     }
@@ -94,7 +94,7 @@ Node<SPACE_DIM>::Node(unsigned index, bool isBoundaryNode, double v1, double v2,
 template<unsigned SPACE_DIM>
 Node<SPACE_DIM>::Node(unsigned index, double *location, bool isBoundaryNode)
 {
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i = 0; i < SPACE_DIM; ++i)
     {
         mLocation(i) = location[i];
     }

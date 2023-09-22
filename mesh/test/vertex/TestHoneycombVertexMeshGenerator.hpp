@@ -65,7 +65,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u);
 
         unsigned num_non_boundary_nodes = 0;
-        for (unsigned node_index=0; node_index<16u; node_index++)
+        for (unsigned node_index=0; node_index<16u; ++node_index)
         {
             if (!p_mesh->GetNode(node_index)->IsBoundaryNode())
             {
@@ -112,7 +112,7 @@ public:
 
         // Now loop over all nodes and find the minimum y position
         double min_y_position = p_mesh->GetNode(0)->rGetLocation()[1];
-        for (unsigned node_index = 0; node_index < 44; node_index++)
+        for (unsigned node_index = 0; node_index < 44; ++node_index)
         {
             double this_y_position = p_mesh->GetNode(node_index)->rGetLocation()[1];
             if (this_y_position < min_y_position)
@@ -123,7 +123,7 @@ public:
 	
         // Loop over all nodes again, find all nodes with that y position
         unsigned num_bottom_nodes = 0;
-        for (unsigned node_index = 0; node_index < 44; node_index++)
+        for (unsigned node_index = 0; node_index < 44; ++node_index)
         {
             double this_y_position = p_mesh->GetNode(node_index)->rGetLocation()[1];
             if (this_y_position == min_y_position)

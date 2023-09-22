@@ -41,9 +41,9 @@ double PolynomialMaterialLaw3d::Get_dW_dI1(double I1, double I2)
     // notes: use ints not unsigned as doing p-1
     // (except indexing from p=1 because multiplying by p, but
     // still safer to use ints)
-    for (int p=1; p<=(int)mN; p++)
+    for (int p = 1; p <= static_cast<int>(mN); ++p)
     {
-        for (int q=0; q<=(int)mN-p; q++)
+        for (int q = 0; q <= static_cast<int>(mN)-p; ++q)
         {
             ret += mAlpha[p][q] * p * pow(I1-3,p-1) * pow(I2-3,q);
         }
@@ -58,9 +58,9 @@ double PolynomialMaterialLaw3d::Get_dW_dI2(double I1, double I2)
     // notes: use ints not unsigned as doing q-1
     // (except indexing from q=1 because multiplying by q, but
     // still safer to use ints)
-    for (int p=0; p<=(int)mN; p++)
+    for (int p = 0; p <= static_cast<int>(mN); ++p)
     {
-        for (int q=1; q<=(int)mN-p; q++)
+        for (int q = 1; q <= static_cast<int>(mN)-p; ++q)
         {
             ret += mAlpha[p][q] * q * pow(I1-3,p) * pow(I2-3,q-1);
         }
@@ -75,9 +75,9 @@ double PolynomialMaterialLaw3d::Get_d2W_dI1(double I1, double I2)
     // notes: use ints not unsigned as doing p-1
     // (except indexing from p=2 because multiplying by p(p-1), but
     // still safer to use ints)
-    for (int p=2; p<=(int)mN; p++)
+    for (int p = 2; p <= static_cast<int>(mN); ++p)
     {
-        for (int q=0; q<=(int)mN-p; q++)
+        for (int q = 0; q <= static_cast<int>(mN)-p; ++q)
         {
             ret += mAlpha[p][q] * p * (p-1) * pow(I1-3,(p-1)*(p-2)) * pow((double)I2-3,(double)q);
         }
@@ -92,9 +92,9 @@ double PolynomialMaterialLaw3d::Get_d2W_dI2(double I1, double I2)
     // notes: use ints not unsigned as doing q-1
     // (except indexing from q=2 because multiplying by q(q-1), but
     // still safer to use ints)
-    for (int p=0; p<=(int)mN; p++)
+    for (int p = 0; p <= static_cast<int>(mN); ++p)
     {
-        for (int q=2; q<=(int)mN-p; q++)
+        for (int q = 2; q <= static_cast<int>(mN)-p; ++q)
         {
             ret += mAlpha[p][q] * q * (q-1) * pow((double)I1-3,(double)p) * pow(I2-3,(q-1)*(q-2));
         }
@@ -109,9 +109,9 @@ double PolynomialMaterialLaw3d::Get_d2W_dI1I2(double I1, double I2)
     // notes: use ints not unsigned as doing p-1
     // (except indexing from p=1,q=1 because multiplying by pq, but
     // still safer to use ints)
-    for (int p=1; p<=(int)mN; p++)
+    for (int p = 1; p <= static_cast<int>(mN); ++p)
     {
-        for (int q=1; q<=(int)mN-p; q++)
+        for (int q = 1; q <= static_cast<int>(mN)-p; ++q)
         {
             ret += mAlpha[p][q] * p * q * pow(I1-3,p-1) * pow(I2-3,q-1);
         }
@@ -137,14 +137,14 @@ PolynomialMaterialLaw3d::PolynomialMaterialLaw3d(unsigned n, std::vector<std::ve
     mN = n;
 
     // error checking: must have alpha[p][q]=0 if p+q>n
-    for (unsigned p=0; p<=mN; p++)
+    for (unsigned p = 0; p <= mN; ++p)
     {
         if (alpha[p].size() < mN+1-p)
         {
             EXCEPTION("alpha not big enough");
         }
 
-        for (unsigned q=0; q<alpha[p].size(); q++)
+        for (unsigned q = 0; q < alpha[p].size(); ++q)
         {
             if ((p+q>mN) && (fabs(alpha[p][q]) > 1e-12))
             {
@@ -160,10 +160,10 @@ std::vector<std::vector<double> > PolynomialMaterialLaw3d::GetZeroedAlpha(unsign
 {
     std::vector<std::vector<double> > alpha(n+1);
 
-    for (unsigned i=0; i<n+1; i++)
+    for (unsigned i = 0; i < n+1; ++i)
     {
         alpha[i].resize(n+1);
-        for (unsigned j=0; j<n+1; j++)
+        for (unsigned j = 0; j < n+1; ++j)
         {
             alpha[i][j] = 0.0;
         }

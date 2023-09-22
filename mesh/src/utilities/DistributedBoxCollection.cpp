@@ -51,7 +51,7 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
       mCalculateNodeNeighbours(true)
 {
     // If the domain size is not 'divisible' (i.e. fmod(width, box_size) > 0.0) we swell the domain to enforce this.
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         double r = fmod((domainSize[2*i+1]-domainSize[2*i]), boxWidth);
         if (r > 0.0)
@@ -63,12 +63,12 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
     mDomainSize = domainSize;
 
     // Set the periodicity across procs flag
-    mIsPeriodicAcrossProcs = (DIM==1 && mIsPeriodicInX) || (DIM==2 && mIsPeriodicInY) || (DIM==3 && mIsPeriodicInZ);
+    mIsPeriodicAcrossProcs = (DIM == 1 && mIsPeriodicInX) || (DIM == 2 && mIsPeriodicInY) || (DIM == 3 && mIsPeriodicInZ);
 
     // Calculate the number of boxes in each direction.
     mNumBoxesEachDirection = scalar_vector<unsigned>(DIM, 0u);
 
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         double counter = mDomainSize(2*i);
         while (counter + msFudge < mDomainSize(2*i+1))
@@ -91,7 +91,7 @@ DistributedBoxCollection<DIM>::DistributedBoxCollection(double boxWidth, c_vecto
 
     // Calculate how many boxes in a row / face. A useful piece of data in the class.
     mNumBoxes = 1u;
-    for (unsigned dim=0; dim<DIM; dim++)
+    for (unsigned dim = 0; dim<DIM; dim++)
     {
         mNumBoxes *= mNumBoxesEachDirection(dim);
     }
@@ -117,11 +117,11 @@ DistributedBoxCollection<DIM>::~DistributedBoxCollection()
 template<unsigned DIM>
 void DistributedBoxCollection<DIM>::EmptyBoxes()
 {
-    for (unsigned i=0; i<mBoxes.size(); i++)
+    for (unsigned i = 0; i<mBoxes.size(); ++i)
     {
         mBoxes[i].ClearNodes();
     }
-    for (unsigned i=0; i<mHaloBoxes.size(); i++)
+    for (unsigned i = 0; i<mHaloBoxes.size(); ++i)
     {
         mHaloBoxes[i].ClearNodes();
     }
@@ -143,7 +143,7 @@ void DistributedBoxCollection<DIM>::SetupHaloBoxes()
     // If I am not the top-most process, add halo structures above.
     if (!PetscTools::AmTopMost())
     {
-        for (unsigned i=0; i < mNumBoxesInAFace; i++)
+        for (unsigned i = 0; i < mNumBoxesInAFace; ++i)
         {
             Box<DIM> new_box;
             mHaloBoxes.push_back(new_box);
@@ -157,7 +157,7 @@ void DistributedBoxCollection<DIM>::SetupHaloBoxes()
     // the base process
     else if ( mIsPeriodicAcrossProcs )
     {
-        for (unsigned i=0; i < mNumBoxesInAFace; i++)
+        for (unsigned i = 0; i < mNumBoxesInAFace; ++i)
         {
             Box<DIM> new_box;
             mHaloBoxes.push_back(new_box);
@@ -171,7 +171,7 @@ void DistributedBoxCollection<DIM>::SetupHaloBoxes()
     // If I am not the bottom-most process, add halo structures below.
     if (!PetscTools::AmMaster())
     {
-        for (unsigned i=0; i< mNumBoxesInAFace; i++)
+        for (unsigned i = 0; i< mNumBoxesInAFace; ++i)
         {
             Box<DIM> new_box;
             mHaloBoxes.push_back(new_box);
@@ -186,7 +186,7 @@ void DistributedBoxCollection<DIM>::SetupHaloBoxes()
     // the top process
     else if ( mIsPeriodicAcrossProcs )
     {
-        for (unsigned i=0; i < mNumBoxesInAFace; i++)
+        for (unsigned i = 0; i < mNumBoxesInAFace; ++i)
         {
             Box<DIM> new_box;
             mHaloBoxes.push_back(new_box);
@@ -204,7 +204,7 @@ template<unsigned DIM>
 void DistributedBoxCollection<DIM>::UpdateHaloBoxes()
 {
     mHaloNodesLeft.clear();
-    for (unsigned i=0; i<mHalosLeft.size(); i++)
+    for (unsigned i = 0; i<mHalosLeft.size(); ++i)
     {
         for (auto iter : this->rGetBox(mHalosLeft[i]).rGetNodesContained())
         {
@@ -214,7 +214,7 @@ void DistributedBoxCollection<DIM>::UpdateHaloBoxes()
 
     // Send right
     mHaloNodesRight.clear();
-    for (unsigned i=0; i<mHalosRight.size(); i++)
+    for (unsigned i = 0; i<mHalosRight.size(); ++i)
     {
         for (auto iter : this->rGetBox(mHalosRight[i]).rGetNodesContained())
         {
@@ -311,7 +311,7 @@ template<unsigned DIM>
 unsigned DistributedBoxCollection<DIM>::CalculateContainingBox(c_vector<double, DIM>& rLocation)
 {
     // The node must lie inside the boundary of the box collection
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         if ((rLocation[i] < mDomainSize(2*i)) || !(rLocation[i] < mDomainSize(2*i+1)))
         {
@@ -321,7 +321,7 @@ unsigned DistributedBoxCollection<DIM>::CalculateContainingBox(c_vector<double, 
 
     // Compute the containing box index in each dimension
     c_vector<unsigned, DIM> containing_box_indices = scalar_vector<unsigned>(DIM, 0u);
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         double box_counter = mDomainSize(2*i);
         while (!((box_counter + mBoxWidth) > rLocation[i] + msFudge))
@@ -333,10 +333,10 @@ unsigned DistributedBoxCollection<DIM>::CalculateContainingBox(c_vector<double, 
 
     // Use these to compute the index of the containing box
     unsigned containing_box_index = 0;
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         unsigned temp = 1;
-        for (unsigned j=0; j<i; j++)
+        for (unsigned j = 0; j<i; ++j)
         {
             temp *= mNumBoxesEachDirection(j);
         }
@@ -490,8 +490,8 @@ int DistributedBoxCollection<DIM>::LoadBalance(std::vector<int> localDistributio
 {
     MPI_Status status;
 
-    int proc_right = (PetscTools::AmTopMost()) ? MPI_PROC_NULL : (int)PetscTools::GetMyRank() + 1;
-    int proc_left = (PetscTools::AmMaster()) ? MPI_PROC_NULL : (int)PetscTools::GetMyRank() - 1;
+    int proc_right = (PetscTools::AmTopMost()) ? MPI_PROC_NULL : static_cast<int>(PetscTools::GetMyRank()) + 1;
+    int proc_left = (PetscTools::AmMaster()) ? MPI_PROC_NULL : static_cast<int>(PetscTools::GetMyRank()) - 1;
 
     // A variable that will return the new number of rows.
     int new_rows = localDistribution.size();
@@ -516,12 +516,12 @@ int DistributedBoxCollection<DIM>::LoadBalance(std::vector<int> localDistributio
      * Calculate change in balance of loads by shifting the left/bottom boundary in either direction
      */
     int local_load = 0;
-    for (unsigned i=0; i<localDistribution.size(); i++)
+    for (unsigned i = 0; i<localDistribution.size(); ++i)
     {
         local_load += localDistribution[i];
     }
     int load_on_left_proc = 0;
-    for (unsigned i=0; i<node_distr_on_left_process.size(); i++)
+    for (unsigned i = 0; i<node_distr_on_left_process.size(); ++i)
     {
         load_on_left_proc += node_distr_on_left_process[i];
     }
@@ -645,10 +645,10 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
 
                         int j_mod = j; // This is used to account for y periodic boundaries
                         // If we are on the bottom of the processor, we may need to add the row below
-                        int dj = -1 * (int)(j == bottom_proc && (j > 0 || (mIsPeriodicInY && top_proc < nJ)) );
+                        int dj = -1 * static_cast<int>(j == bottom_proc && (j > 0 || (mIsPeriodicInY && top_proc < nJ)) );
                         int j_mod_2 = 0;
                         // The min ensures we don't go above the top boundary
-                        for (; dj < std::min((int)nJ-j_mod,(int)2); dj++ )
+                        for (; dj < std::min(static_cast<int>(nJ)-j_mod,static_cast<int>(2)); dj++ )
                         {
                             // We need to change to the top row if we are in the condition where dj == -1 and j == 0 which is only
                             // when we are periodic in y and the top row is on a different processor to the bottom row
@@ -659,8 +659,8 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
 
                             // The -1*dj ensures we get the upper left, the max ensures we don't hit the left boundary,
                             // the min ensures we don't hit the right boundary
-                            int boxi = std::max((int) i-1*std::abs(dj),(int) 0);
-                            for ( ; boxi < std::min((int)i+2,(int)nI); boxi++ )
+                            int boxi = std::max(static_cast<int>(i)-1*std::abs(dj), static_cast<int>(0));
+                            for ( ; boxi < std::min(static_cast<int>(i)+2,static_cast<int>(nI)); boxi++ )
                             {
                                 local_boxes.insert( (j_mod+dj+j_mod_2)*nI + boxi );
                             }
@@ -738,11 +738,11 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                             // Same z level
                             unsigned z_offset = k*nI*nJ;
                             // (See case dim=2 for commented code of X-Y implementation)
-                            int j_mod = (int)j;
-                            for ( int dj = 0; dj < std::min((int)nJ-j_mod,2); dj++ )
+                            int j_mod = static_cast<int>(j);
+                            for ( int dj = 0; dj < std::min(static_cast<int>(nJ)-j_mod,2); dj++ )
                             {
-                                for ( int boxi = std::max((int)i-1*dj,0);
-                                            boxi < std::min((int)i+2,(int)nI); boxi++ )
+                                for ( int boxi = std::max(static_cast<int>(i)-1*dj,0);
+                                            boxi < std::min(static_cast<int>(i)+2,static_cast<int>(nI)); boxi++ )
                                 {
                                     local_boxes.insert( z_offset + (j_mod+dj)*nI + boxi );
                                 }
@@ -792,21 +792,21 @@ void DistributedBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
                             {
                                 z_offset = k_offset_it * nI * nJ;
                                 // Periodicity adjustments
-                                int pX = (int) mIsPeriodicInX;
-                                int pY = (int) mIsPeriodicInY;
-                                for ( int boxi = std::max((int)i-1,-1*pX); boxi < std::min((int)i+2,(int)nI+pX); boxi++ )
+                                int pX = static_cast<int>(mIsPeriodicInX);
+                                int pY = static_cast<int>(mIsPeriodicInY);
+                                for (int boxi = std::max(static_cast<int>(i)-1,-1*pX); boxi < std::min(static_cast<int>(i)+2,static_cast<int>(nI)+pX); boxi++)
                                 {
-                                    for ( int boxj = std::max((int)j-1,-1*pY); boxj < std::min((int)j+2,(int)nJ+pY); boxj++ )
+                                    for (int boxj = std::max(static_cast<int>(j)-1,-1*pY); boxj < std::min(static_cast<int>(j)+2,static_cast<int>(nJ)+pY); boxj++)
                                     {
-                                        int box_to_add = z_offset + (boxj*(int)nI) + boxi;
+                                        int box_to_add = z_offset + (boxj*static_cast<int>(nI)) + boxi;
                                         // Check for x periodicity
                                         // i==(nI-1) only when we are periodic and on the right,
                                         // i==-1 only when we are periodic and on the left
-                                        box_to_add += ( static_cast<unsigned>(boxi==-1) - static_cast<unsigned>(boxi==(int)nI) )*nI;
+                                        box_to_add += ( static_cast<unsigned>(boxi==-1) - static_cast<unsigned>(boxi == static_cast<int>(nI)) )*nI;
                                         // Check for y periodicity
                                         // j==nJ only when we are periodic and on the right,
                                         // j==-1 only when we are periodic and on the left
-                                        box_to_add += ( static_cast<unsigned>(boxj==-1) - static_cast<unsigned>(boxj==(int)nJ) )*nI*nJ;
+                                        box_to_add += ( static_cast<unsigned>(boxj==-1) - static_cast<unsigned>(boxj == static_cast<int>(nJ)) )*nI*nJ;
                                         local_boxes.insert( box_to_add );
                                     }
                                 }
@@ -834,7 +834,7 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
     {
         case 1:
         {
-            for (unsigned i=mMinBoxIndex; i<mMaxBoxIndex+1; i++)
+            for (unsigned i=mMinBoxIndex; i<mMaxBoxIndex+1; ++i)
             {
                 std::set<unsigned> local_boxes;
 
@@ -866,7 +866,7 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
             std::vector<bool> is_ymin(N*M); // bottom
             std::vector<bool> is_ymax(N*M); // top
 
-            for (unsigned i=0; i<M*N; i++)
+            for (unsigned i = 0; i<M*N; ++i)
             {
                 is_xmin[i] = (i%M==0);
                 is_xmax[i] = ((i+1)%M==0);
@@ -874,7 +874,7 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                 is_ymax[i] = (i%(M*N)>=(N-1)*M);
             }
 
-            for (unsigned i=mMinBoxIndex; i<mMaxBoxIndex+1; i++)
+            for (unsigned i=mMinBoxIndex; i<mMaxBoxIndex+1; ++i)
             {
                 std::set<unsigned> local_boxes;
 
@@ -971,40 +971,40 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                         local_boxes.insert(i+1);
                     }
                 }
-                if(mIsPeriodicInY)
+                if (mIsPeriodicInY)
                 {
-                    if( (is_ymin[i]) && !(is_xmin[i]) )
+                    if ( (is_ymin[i]) && !(is_xmin[i]) )
                     {
                         local_boxes.insert(i+(N-1)*M-1);
                     }
-                    if( (is_ymin[i]) && !(is_xmax[i]) )
+                    if ( (is_ymin[i]) && !(is_xmax[i]) )
                     {
                         local_boxes.insert(i+(N-1)*M+1);
                     }
-                    if( (is_ymax[i]) && !(is_xmin[i]) )
+                    if ( (is_ymax[i]) && !(is_xmin[i]) )
                     {
                         local_boxes.insert(i-(N-1)*M-1);
                     }
-                    if( (is_ymax[i]) && !(is_xmax[i]) )
+                    if ( (is_ymax[i]) && !(is_xmax[i]) )
                     {
                         local_boxes.insert(i-(N-1)*M+1);
                     }
                 }
-                if(mIsPeriodicInX && mIsPeriodicInY)
+                if (mIsPeriodicInX && mIsPeriodicInY)
                 {
-                    if( i==0 ) // Lower left corner
+                    if ( i==0 ) // Lower left corner
                     {
                         local_boxes.insert(M*N-1); // Add upper right corner
                     }
-                    else if( i==(M-1) ) // Lower right corner
+                    else if ( i==(M-1) ) // Lower right corner
                     {
                         local_boxes.insert(M*(N-1)); // Add upper left corner
                     }
-                    else if( i==(M*(N-1)) ) // Upper left corner
+                    else if ( i==(M*(N-1)) ) // Upper left corner
                     {
                         local_boxes.insert(M-1); // Add lower right corner
                     }
-                    else if( i==(M*N-1) ) // Upper right corner
+                    else if ( i==(M*N-1) ) // Upper right corner
                     {
                         local_boxes.insert(0); // Lower left corner
                     }
@@ -1029,7 +1029,7 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
             std::vector<bool> is_zmin(N*M*P); // bottom layer
             std::vector<bool> is_zmax(N*M*P); // top layer
 
-            for (unsigned i=0; i<M*N*P; i++)
+            for (unsigned i = 0; i<M*N*P; ++i)
             {
                 is_xmin[i] = (i%M==0);
                 is_xmax[i] = ((i+1)%M==0);
@@ -1039,7 +1039,7 @@ void DistributedBoxCollection<DIM>::SetupAllLocalBoxes()
                 is_zmax[i] = (i>=M*N*(P-1));
             }
 
-            for (unsigned i=mMinBoxIndex; i<mMaxBoxIndex+1; i++)
+            for (unsigned i=mMinBoxIndex; i<mMaxBoxIndex+1; ++i)
             {
                 std::set<unsigned> local_boxes;
 
@@ -1658,7 +1658,7 @@ void DistributedBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& 
     rNodePairs.clear();
 
     // Create an empty neighbours set for each node
-    for (unsigned i=0; i<rNodes.size(); i++)
+    for (unsigned i = 0; i<rNodes.size(); ++i)
     {
         // Get the box containing this node as only nodes on this process have NodeAttributes
         // and therefore Neighbours setup.
@@ -1677,7 +1677,7 @@ void DistributedBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& 
 
     if (mCalculateNodeNeighbours)
     {
-        for (unsigned i = 0; i < rNodes.size(); i++)
+        for (unsigned i = 0; i < rNodes.size(); ++i)
         {
             // Get the box containing this node as only nodes on this process have NodeAttributes
             // and therefore Neighbours setup.
@@ -1697,7 +1697,7 @@ void DistributedBoxCollection<DIM>::CalculateInteriorNodePairs(std::vector<Node<
     rNodePairs.clear();
 
     // Create an empty neighbours set for each node
-    for (unsigned i=0; i<rNodes.size(); i++)
+    for (unsigned i = 0; i<rNodes.size(); ++i)
     {
         // Get the box containing this node as only nodes on this process have NodeAttributes
         // and therefore Neighbours setup.
@@ -1720,7 +1720,7 @@ void DistributedBoxCollection<DIM>::CalculateInteriorNodePairs(std::vector<Node<
 
     if (mCalculateNodeNeighbours)
     {
-        for (unsigned i = 0; i < rNodes.size(); i++)
+        for (unsigned i = 0; i < rNodes.size(); ++i)
         {
             // Get the box containing this node as only nodes on this process have NodeAttributes
             // and therefore Neighbours setup.
@@ -1748,7 +1748,7 @@ void DistributedBoxCollection<DIM>::CalculateBoundaryNodePairs(std::vector<Node<
 
     if (mCalculateNodeNeighbours)
     {
-        for (unsigned i = 0; i < rNodes.size(); i++)
+        for (unsigned i = 0; i < rNodes.size(); ++i)
         {
             // Get the box containing this node as only nodes on this process have NodeAttributes
             // and therefore Neighbours setup.

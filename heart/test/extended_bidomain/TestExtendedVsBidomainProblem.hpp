@@ -599,7 +599,7 @@ public:
 
         double first_cell_peak = -1000000.0;
         double second_cell_peak = -1000000.0;
-        for (unsigned i = 0; i < voltage_first_cell_extended.size(); i++)
+        for (unsigned i = 0; i < voltage_first_cell_extended.size(); ++i)
         {
             if (voltage_first_cell_extended[i] >=first_cell_peak)
             {

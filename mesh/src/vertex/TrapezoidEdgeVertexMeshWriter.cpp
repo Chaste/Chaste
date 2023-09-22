@@ -213,7 +213,7 @@ void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddCellData(std::str
 #ifdef CHASTE_VTK
     vtkDoubleArray* p_scalars = vtkDoubleArray::New();
     p_scalars->SetName(dataName.c_str());
-    for (unsigned i = 0; i < dataPayload.size(); i++)
+    for (unsigned i = 0; i < dataPayload.size(); ++i)
     {
         p_scalars->InsertNextValue(dataPayload[i]);
     }

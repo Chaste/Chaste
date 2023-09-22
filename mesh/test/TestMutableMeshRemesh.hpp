@@ -71,12 +71,12 @@ public:
         MutableMesh<3,3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             ChastePoint<3> point = mesh.GetNode(i)->GetPoint();
             ChastePoint<3> old_mesh_point = old_mesh.GetNode(i)->GetPoint();
 
-            for (int j=0; j<3; j++)
+            for (int j = 0; j<3; ++j)
             {
                 if (fabs(point[j]-0.0) >1e-6 && fabs(point[j]-1.0) >1e-6)
                 {
@@ -123,7 +123,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements()+1, old_mesh.GetNumElements());
 
         // Test to see whether triangle/ tetgen is renumbering the nodes
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             // The map turns out to be the identity map in this test
             TS_ASSERT_EQUALS(map.GetNewIndex(i), i);
@@ -131,7 +131,7 @@ public:
             const c_vector<double, 3> node_loc1 = mesh.GetNode(map.GetNewIndex(i))->rGetLocation();
             const c_vector<double, 3> node_loc2 = old_mesh.GetNode(i)->rGetLocation();
 
-            for (int j=0; j<3; j++)
+            for (int j = 0; j<3; ++j)
             {
                 TS_ASSERT_DELTA(node_loc1[j], node_loc2[j], 1e-6);
             }
@@ -153,7 +153,7 @@ public:
         unsigned num_elements_before = mesh.GetNumElements();
         unsigned num_boundary_elements_before = mesh.GetNumBoundaryElements();
 
-        for (unsigned elem_index=0; elem_index<mesh.GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index<mesh.GetNumElements(); elem_index++)
         {
             TS_ASSERT_EQUALS(mesh.GetElement(elem_index)->GetNodeGlobalIndex(0), elem_index);
             TS_ASSERT_EQUALS(mesh.GetElement(elem_index)->GetNodeGlobalIndex(1), elem_index+1);
@@ -169,7 +169,7 @@ public:
         // Merge two nodes
         mesh.MoveMergeNode(7, 6);
 
-        for (unsigned elem_index=0; elem_index<mesh.GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index<mesh.GetNumElements(); elem_index++)
         {
             if (elem_index == 7)
             {
@@ -198,14 +198,14 @@ public:
         NodeMap map(1);
         mesh.ReMesh(map);
 
-        for (unsigned elem_index=0; elem_index<mesh.GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index<mesh.GetNumElements(); elem_index++)
         {
             TS_ASSERT_EQUALS(mesh.GetElement(elem_index)->GetNodeGlobalIndex(0), elem_index);
             TS_ASSERT_EQUALS(mesh.GetElement(elem_index)->GetNodeGlobalIndex(1), elem_index+1);
         }
 
         TS_ASSERT_EQUALS(map.GetSize(), mesh.GetNumNodes()+1); // one node removed during remesh
-        for (unsigned i=0; i<7; i++)
+        for (unsigned i = 0; i<7; ++i)
         {
             // These are unchanged
             TS_ASSERT_EQUALS(map.GetNewIndex(i), i);
@@ -213,7 +213,7 @@ public:
         // This one has gone
         TS_ASSERT(map.IsDeleted(7));
         TS_ASSERT_THROWS_THIS(map.GetNewIndex(7),"Node has been deleted");
-        for (unsigned i=8; i<map.GetSize(); i++)
+        for (unsigned i=8; i<map.GetSize(); ++i)
         {
             // These have shuffled down
             TS_ASSERT_EQUALS(map.GetNewIndex(i), i-1);
@@ -235,12 +235,12 @@ public:
         TS_ASSERT_EQUALS(mesh2.GetNumElements(), 10u);
         TS_ASSERT_EQUALS(mesh2.GetNumNodes(), 11u);
 
-        for (unsigned node_index=0; node_index<mesh2.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index<mesh2.GetNumNodes(); ++node_index)
         {
             TS_ASSERT_DELTA(mesh2.GetNode(node_index)->rGetLocation()[0], static_cast<double>(node_index), 1e-6);
         }
 
-        for (unsigned elem_index=0; elem_index<mesh2.GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index<mesh2.GetNumElements(); elem_index++)
         {
             TS_ASSERT_EQUALS(mesh2.GetElement(elem_index)->GetNodeGlobalIndex(0), elem_index);
             TS_ASSERT_EQUALS(mesh2.GetElement(elem_index)->GetNodeGlobalIndex(1), elem_index+1);
@@ -258,7 +258,7 @@ public:
         TS_ASSERT_EQUALS(mesh2.GetNumElements(), 10u);
         TS_ASSERT_EQUALS(mesh2.GetNumNodes(), 12u);
 
-        for (unsigned node_index=0; node_index<mesh2.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < mesh2.GetNumNodes(); ++node_index)
         {
             if (node_index == 11)
             {
@@ -283,7 +283,7 @@ public:
         TS_ASSERT_EQUALS(mesh2.GetNumElements(), 11u);
         TS_ASSERT_EQUALS(mesh2.GetNumNodes(), 12u);
 
-        for (unsigned node_index=0; node_index<mesh2.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index<mesh2.GetNumNodes(); ++node_index)
         {
             if (node_index == 11)
             {
@@ -295,7 +295,7 @@ public:
             }
         }
 
-        for (unsigned elem_index=0; elem_index<mesh2.GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index<mesh2.GetNumElements(); elem_index++)
         {
             if (elem_index < 2)
             {
@@ -359,7 +359,7 @@ public:
         }
 
         TS_ASSERT_EQUALS(map.GetSize(), mesh.GetNumNodes()+1);//one node removed during remesh
-        for (unsigned i=0; i<431; i++)
+        for (unsigned i = 0; i<431; ++i)
         {
             // These are unchanged
             TS_ASSERT_EQUALS(map.GetNewIndex(i), i);
@@ -367,7 +367,7 @@ public:
         // This one has gone
         TS_ASSERT(map.IsDeleted(432));
         TS_ASSERT_THROWS_THIS(map.GetNewIndex(432),"Node has been deleted");
-        for (unsigned i=433; i<map.GetSize(); i++)
+        for (unsigned i=433; i<map.GetSize(); ++i)
         {
             // These have shuffled down
             TS_ASSERT_EQUALS(map.GetNewIndex(i), i-1);

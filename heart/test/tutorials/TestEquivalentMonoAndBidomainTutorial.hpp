@@ -274,7 +274,7 @@ public:
 
         /* We then check that the voltage at each node at the end of the simulation is the same
          * whether we did a bidomain simulation, or the equivalent monodomain simulation.*/
-        for (unsigned i=0; i<p_monodomain_results->GetSize(); i++)
+        for (unsigned i=0; i<p_monodomain_results->GetSize(); ++i)
         {
             TS_ASSERT_DELTA((*p_monodomain_results)[i], (*p_bidomain_results)[2u*i], 1e-6);
         }

@@ -70,7 +70,7 @@ void GRL1IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem
     double tempY;
 
     pAbstractOdeSystem->EvaluateYDerivatives(time, rCurrentYValues, mEvalF);
-    for (unsigned i=0; i<num_equations; i++)
+    for (unsigned i=0; i<num_equations; ++i)
     {
         tempY= rCurrentYValues[i];
         rCurrentYValues[i]=tempY+delta;
@@ -79,7 +79,7 @@ void GRL1IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem
         rCurrentYValues[i]=tempY;
     }
     // New solution
-    for (unsigned i=0; i<num_equations; i++)
+    for (unsigned i=0; i<num_equations; ++i)
     {
         // std::cout<<"Partial F"<< mPartialF[i]<<std::endl;
         if (fabs(mPartialF[i]) < delta)

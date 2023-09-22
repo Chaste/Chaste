@@ -72,7 +72,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
         // Create as many elements as there are nodes in the mesh
         mElements.reserve(num_elements);
 
-        for (unsigned elem_index=0; elem_index<num_elements; elem_index++)
+        for (unsigned elem_index = 0; elem_index<num_elements; elem_index++)
         {
             VertexElement<2,2>* p_element = new VertexElement<2,2>(elem_index);
             mElements.push_back(p_element);
@@ -82,17 +82,17 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
         GenerateVerticesFromElementCircumcentres(rMesh);
 
         // Loop over all generated nodes and check they're not outside [0,mWidth]x[0,mHeight]
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i<num_nodes; ++i)
         {
             CheckNodeLocation(mNodes[i]);
         }
 
         // Loop over elements of the Delaunay mesh (which are nodes/vertices of this mesh)
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i<num_nodes; ++i)
         {
             // Loop over nodes owned by this triangular element in the Delaunay mesh
             // Add this node/vertex to each of the 3 vertex elements
-            for (unsigned local_index=0; local_index<3; local_index++)
+            for (unsigned local_index = 0; local_index<3; local_index++)
             {
                 unsigned elem_index = mpDelaunayMesh->GetElement(i)->GetNodeGlobalIndex(local_index);
                 unsigned num_nodes_in_elem = mElements[elem_index]->GetNumNodes();
@@ -122,7 +122,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
             bool bad_element = false;
             double edge_threshold = 1.5; //TODO Make settable variable!
 
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j = 0; j<3; ++j)
             {
                 Node<2>* p_node_a = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex(j));
                 Node<2>* p_node_b = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex((j+1)%3));
@@ -135,7 +135,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
 
             if (bad_element)
             {
-                for (unsigned j=0; j<3; j++)
+                for (unsigned j = 0; j<3; ++j)
                 {
                     Node<2>* p_node_a = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex(j));
                     Node<2>* p_node_b = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex((j+1)%3));
@@ -165,7 +165,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
 
                         // Now add extra end nodes if appropriate.
                         unsigned num_sections = 1; // I.e. only at ends.
-                        for (unsigned section=0; section <= num_sections; section++)
+                        for (unsigned section = 0; section <= num_sections; section++)
                         {
                             double ratio = (double)section/(double)num_sections;
                             c_vector<double,2> new_node_location = -normal_vector + ratio*p_node_a->rGetLocation() + (1-ratio)*p_node_b->rGetLocation();
@@ -174,7 +174,8 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
                             bool node_clear = true;
                             double node_clearance = 0.3; // Make settable variable??
 
-                            for (unsigned i=0; i<nodes.size(); i++)
+                            for (unsigned i
+                            ; i<nodes.size(); ++i)
                             {
                                 double distance = norm_2(mpDelaunayMesh->GetVectorFromAtoB(nodes[i]->rGetLocation(), new_node_location));
                                 if (distance < node_clearance)
@@ -196,7 +197,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
         }
 
         // Loop over all nodes and check they're not outside [0,mWidth]x[0,mHeight]
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             CheckNodeLocation(nodes[i]);
         }
@@ -221,14 +222,14 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
         GenerateVerticesFromElementCircumcentres(extended_mesh);
 
         // Loop over all generated nodes and check they're not outside [0,mWidth]x[0,mHeight]
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i<num_nodes; ++i)
         {
             CheckNodeLocation(mNodes[i]);
         }
 
 
         // Loop over elements of the Delaunay mesh (which are nodes/vertices of this mesh)
-        for (unsigned i = 0; i < num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             // Loop over nodes owned by this triangular element in the Delaunay mesh
             // Add this node/vertex to each of the 3 vertex elements
@@ -248,7 +249,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
     }
 
     // Reorder mNodes anticlockwise
-    for (unsigned elem_index=0; elem_index<mElements.size(); elem_index++)
+    for (unsigned elem_index = 0; elem_index<mElements.size(); elem_index++)
     {
         /**
          * Create a std::vector of pairs, where each pair comprises the angle
@@ -256,7 +257,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
          * node's global index in the Voronoi mesh.
          */
         std::vector<std::pair<double, unsigned> > index_angle_list;
-        for (unsigned local_index=0; local_index<mElements[elem_index]->GetNumNodes(); local_index++)
+        for (unsigned local_index = 0; local_index<mElements[elem_index]->GetNumNodes(); local_index++)
         {
             c_vector<double, 2> vectorA = mpDelaunayMesh->GetNode(elem_index)->rGetLocation();
             c_vector<double, 2> vectorB = mElements[elem_index]->GetNodeLocation(local_index);
@@ -427,7 +428,7 @@ VertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
     std::vector<Node<2>*> temp_nodes;
     std::vector<VertexElement<2, 2>*> elements;
 
-    if(!mpDelaunayMesh) // No Delaunay mesh so less copies as all too top right
+    if (!mpDelaunayMesh) // No Delaunay mesh so less copies as all too top right
     {
         temp_nodes.resize(4 * num_nodes);
 
@@ -469,7 +470,7 @@ VertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
             bool element_straddles_top_bottom_boundary = false;
 
             const c_vector<double, 2>& r_this_node_location = elem_iter->GetNode(0)->rGetLocation();
-            for (unsigned local_index=0; local_index<num_nodes_in_elem; local_index++)
+            for (unsigned local_index = 0; local_index<num_nodes_in_elem; local_index++)
             {
                 const c_vector<double, 2>& r_next_node_location = elem_iter->GetNode((local_index+1)%num_nodes_in_elem)->rGetLocation();
                 c_vector<double, 2> vector;
@@ -486,7 +487,7 @@ VertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
             }
 
             // Use the above information when duplicating the element
-            for (unsigned local_index=0; local_index<num_nodes_in_elem; local_index++)
+            for (unsigned local_index = 0; local_index<num_nodes_in_elem; local_index++)
             {
                 unsigned this_node_index = elem_iter->GetNodeGlobalIndex(local_index);
 
@@ -526,7 +527,7 @@ VertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
         temp_nodes.resize(9*num_nodes);
 
         // Create nine copies of each node.
-        for (unsigned index=0; index<num_nodes; index++)
+        for (unsigned index = 0; index<num_nodes; index++)
         {
             c_vector<double, 2> location;
             location = GetNode(index)->rGetLocation();
@@ -583,7 +584,7 @@ VertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
             bool element_straddles_top_bottom_boundary = false;
 
             const c_vector<double, 2>& r_this_node_location = elem_iter->GetNode(0)->rGetLocation();
-            for (unsigned local_index=0; local_index<num_nodes_in_elem; local_index++)
+            for (unsigned local_index = 0; local_index<num_nodes_in_elem; local_index++)
             {
                 const c_vector<double, 2>& r_next_node_location = elem_iter->GetNode((local_index+1)%num_nodes_in_elem)->rGetLocation();
                 c_vector<double, 2> vector;
@@ -618,7 +619,7 @@ VertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
             }
 
             // Use the above information when duplicating the element
-            for (unsigned local_index=0; local_index<num_nodes_in_elem; local_index++)
+            for (unsigned local_index = 0; local_index<num_nodes_in_elem; local_index++)
             {
                 unsigned this_node_index = elem_iter->GetNodeGlobalIndex(local_index);
 
@@ -724,7 +725,7 @@ VertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
     // Now delete any nodes from the mesh for VTK that are not contained in any elements
     std::vector<Node<2>*> nodes;
     unsigned count = 0;
-    for (unsigned index=0; index<temp_nodes.size(); index++)
+    for (unsigned index = 0; index<temp_nodes.size(); index++)
     {
         unsigned num_elems_containing_this_node = temp_nodes[index]->rGetContainingElementIndices().size();
 
@@ -786,7 +787,7 @@ void Toroidal2dVertexMesh::ConstructFromMeshReader(AbstractMeshReader<2,2>& rMes
         // Get the nodes owned by this element
         std::vector<Node<2>*> nodes;
         unsigned num_nodes_in_element = element_data.NodeIndices.size();
-        for (unsigned j=0; j<num_nodes_in_element; j++)
+        for (unsigned j = 0; j<num_nodes_in_element; ++j)
         {
             assert(element_data.NodeIndices[j] < this->mNodes.size());
             nodes.push_back(this->mNodes[element_data.NodeIndices[j]]);

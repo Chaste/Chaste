@@ -256,7 +256,7 @@ public:
 
         if (mesh.rGetNodePermutation().size() > 0)
         {
-            for (unsigned i = 0; i < indices.size(); i++)
+            for (unsigned i = 0; i < indices.size(); ++i)
             {
                 indices[i] = mesh.rGetNodePermutation()[indices[i]];
             }
@@ -502,7 +502,7 @@ public:
         // now check that the second electrode was actually grounded
         Hdf5DataReader reader_extended(directory, filename);
 
-        for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
         {
             if (mesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(node_index))
             {
@@ -510,7 +510,7 @@ public:
                 {
                     unsigned node = mesh.GetNode(node_index)->GetIndex();
                     std::vector<double> phi_e_extended = reader_extended.GetVariableOverTime("Phi_e", node);
-                    for (unsigned j = 0; j < phi_e_extended.size(); j++)
+                    for (unsigned j = 0; j < phi_e_extended.size(); ++j)
                     {
                         TS_ASSERT_EQUALS(phi_e_extended[j], 0); // should be zero at all times
                     }

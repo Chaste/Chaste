@@ -381,7 +381,7 @@ public:
         out_stream p_file = handler.OpenOutputFile("5by5by5_fibres.ortho");
 
         *p_file << mechanics_mesh.GetNumElements() << "\n"; // first line is number of entries
-        for (unsigned i=0; i<mechanics_mesh.GetNumElements(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumElements(); ++i)
         {
             double X = mechanics_mesh.GetElement(i)->CalculateCentroid()(0);
             double theta = M_PI/3 - 10*X*2*M_PI/3; // 60 degrees when X=0, -60 when X=0.1;
@@ -404,7 +404,7 @@ public:
         QuadraturePointsGroup<3> quad_points(mechanics_mesh, quad_rule);
 
         *p_file2 << quad_points.Size() << "\n";
-        for (unsigned i=0; i<quad_points.Size(); i++)
+        for (unsigned i=0; i<quad_points.Size(); ++i)
         {
             double X = quad_points.rGet(i)(0);
             double theta = M_PI/3 - 10*X*2*M_PI/3;

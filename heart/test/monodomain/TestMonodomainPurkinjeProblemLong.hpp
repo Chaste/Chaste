@@ -223,7 +223,7 @@ public:
                 TS_ASSERT(fabs(soln_repl[2*i+1])>1e-6);
 
                 // hardcoded test for purkinje cell at opposite face (coordinates (0,0,0.1))
-                if( fabs(node_iter->rGetLocation()[2]-0.1)<1e-6 )
+                if ( fabs(node_iter->rGetLocation()[2]-0.1)<1e-6 )
                 {
                     TS_ASSERT_DELTA(soln_repl[2*i+1], -75.9912, 1e-4);
                 }

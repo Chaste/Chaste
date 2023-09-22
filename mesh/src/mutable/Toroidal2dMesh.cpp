@@ -65,7 +65,7 @@ Toroidal2dMesh::Toroidal2dMesh(double width, double depth, std::vector<Node<2>* 
     assert(width > 0.0);
     assert(depth > 0.0);
 
-    for (unsigned index=0; index<nodes.size(); index++)
+    for (unsigned index = 0; index<nodes.size(); index++)
     {
         Node<2>* p_temp_node = nodes[index];
         double x = p_temp_node->rGetLocation()[0];
@@ -121,7 +121,7 @@ void Toroidal2dMesh::CreateMirrorNodes()
     }
 
     // For each Bottom original node, create an image node and record its new index
-    for (unsigned i=0; i<mBottomOriginals.size(); i++)
+    for (unsigned i = 0; i<mBottomOriginals.size(); ++i)
     {
         c_vector<double, 2> location;
         location = mNodes[mBottomOriginals[i]]->rGetLocation();
@@ -133,7 +133,7 @@ void Toroidal2dMesh::CreateMirrorNodes()
     }
 
     // For each Top original node, create an image node and record its new index
-    for (unsigned i=0; i<mTopOriginals.size(); i++)
+    for (unsigned i = 0; i<mTopOriginals.size(); ++i)
     {
         c_vector<double, 2> location;
         location = mNodes[mTopOriginals[i]]->rGetLocation();
@@ -166,7 +166,7 @@ void Toroidal2dMesh::CreateMirrorNodes()
     }
 
     // For each left original node, create an image node and record its new index
-    for (unsigned i=0; i<mLeftOriginals.size(); i++)
+    for (unsigned i = 0; i<mLeftOriginals.size(); ++i)
     {
         c_vector<double, 2> location;
         location = mNodes[mLeftOriginals[i]]->rGetLocation();
@@ -178,7 +178,7 @@ void Toroidal2dMesh::CreateMirrorNodes()
     }
 
     // For each right original node, create an image node and record its new index
-    for (unsigned i=0; i<mRightOriginals.size(); i++)
+    for (unsigned i = 0; i<mRightOriginals.size(); ++i)
     {
         c_vector<double, 2> location;
         location = mNodes[mRightOriginals[i]]->rGetLocation();
@@ -204,7 +204,7 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
     rMap.ResetToIdentity();
 
     // Flag the deleted nodes as deleted in the map
-    for (unsigned i=0; i<old_num_all_nodes; i++)
+    for (unsigned i = 0; i<old_num_all_nodes; ++i)
     {
         if (mNodes[i]->IsDeleted())
         {
@@ -249,7 +249,7 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
         ++elem_iter)
     {
         unsigned num_nodes_outside = 0;
-        for (unsigned j=0; j<3; j++)
+        for (unsigned j = 0; j<3; ++j)
         {
             Node<2>* p_node = this->GetNode(elem_iter->GetNodeGlobalIndex(j));
 
@@ -278,7 +278,7 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
         ++elem_iter)
     {
         unsigned num_nodes_outside = 0;
-        for (unsigned j=0; j<2; j++)
+        for (unsigned j = 0; j<2; ++j)
         {
             Node<2>* p_node = this->GetNode((*elem_iter)->GetNodeGlobalIndex(j));
 
@@ -310,14 +310,14 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
     assert(mLeftOriginals.size() == mLeftImages.size());
     assert(mRightOriginals.size() == mRightImages.size());
 
-    for (unsigned i=0; i<mLeftOriginals.size(); i++)
+    for (unsigned i = 0; i<mLeftOriginals.size(); ++i)
     {
         mLeftOriginals[i] = big_map.GetNewIndex(mLeftOriginals[i]);
         mLeftImages[i] = big_map.GetNewIndex(mLeftImages[i]);
         mImageToLeftOriginalNodeMap[mLeftImages[i]] = mLeftOriginals[i];
     }
 
-    for (unsigned i=0; i<mRightOriginals.size(); i++)
+    for (unsigned i = 0; i<mRightOriginals.size(); ++i)
     {
         mRightOriginals[i] = big_map.GetNewIndex(mRightOriginals[i]);
         mRightImages[i] = big_map.GetNewIndex(mRightImages[i]);
@@ -356,14 +356,14 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
     assert(mBottomOriginals.size() == mBottomImages.size());
     assert(mTopOriginals.size() == mTopImages.size());
 
-    for (unsigned i=0; i<mBottomOriginals.size(); i++)
+    for (unsigned i = 0; i<mBottomOriginals.size(); ++i)
     {
         mBottomOriginals[i] = big_map.GetNewIndex(mBottomOriginals[i]);
         mBottomImages[i] = big_map.GetNewIndex(mBottomImages[i]);
         mImageToBottomOriginalNodeMap[mBottomImages[i]] = mBottomOriginals[i];
     }
 
-    for (unsigned i=0; i<mTopOriginals.size(); i++)
+    for (unsigned i = 0; i<mTopOriginals.size(); ++i)
     {
         mTopOriginals[i] = big_map.GetNewIndex(mTopOriginals[i]);
         mTopImages[i] = big_map.GetNewIndex(mTopImages[i]);
@@ -419,7 +419,7 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
      * Go through the reindex map and use it to populate the original NodeMap
      * (the one that is returned to the user).
      */
-    for (unsigned i=0; i<rMap.GetSize(); i++) // only going up to be size of map, not size of reindex_map
+    for (unsigned i = 0; i<rMap.GetSize(); ++i) // only going up to be size of map, not size of reindex_map
     {
         if (reindex_map.IsDeleted(i))
         {
@@ -462,7 +462,7 @@ void Toroidal2dMesh::ReconstructCylindricalMesh()
         unsigned number_of_left_image_nodes = 0;
         unsigned number_of_right_image_nodes = 0;
 
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i<3; ++i)
         {
             unsigned this_node_index = elem_iter->GetNodeGlobalIndex(i);
 
@@ -497,7 +497,7 @@ void Toroidal2dMesh::ReconstructCylindricalMesh()
          */
         if (number_of_left_image_nodes == 1 || number_of_left_image_nodes == 2)
         {
-            for (unsigned i=0; i<3; i++)
+            for (unsigned i = 0; i<3; ++i)
             {
                 unsigned this_node_index = elem_iter->GetNodeGlobalIndex(i);
                 auto it = mImageToLeftOriginalNodeMap.find(this_node_index);
@@ -522,7 +522,7 @@ void Toroidal2dMesh::ReconstructCylindricalMesh()
     //     if (!p_boundary_element->IsDeleted())
     //     {
     //         unsigned number_of_image_nodes = 0;
-    //         for (unsigned i=0; i<2; i++)
+    //         for (unsigned i = 0; i<2; ++i)
     //         {
     //             unsigned this_node_index = p_boundary_element->GetNodeGlobalIndex(i);
 
@@ -549,7 +549,7 @@ void Toroidal2dMesh::ReconstructCylindricalMesh()
     //          */
     //         if (number_of_image_nodes == 1)
     //         {
-    //             for (unsigned i=0; i<2; i++)
+    //             for (unsigned i = 0; i<2; ++i)
     //             {
     //                 unsigned this_node_index = p_boundary_element->GetNodeGlobalIndex(i);
     //                 auto it = mImageToLeftOriginalNodeMap.find(this_node_index);
@@ -572,13 +572,13 @@ void Toroidal2dMesh::ReconstructCylindricalMesh()
     // }
 
     // Delete all image nodes unless they have already gone
-    for (unsigned i=0; i<mLeftImages.size(); i++)
+    for (unsigned i = 0; i<mLeftImages.size(); ++i)
     {
         mNodes[mLeftImages[i]]->MarkAsDeleted();
         mDeletedNodeIndices.push_back(mLeftImages[i]);
     }
 
-    for (unsigned i=0; i<mRightImages.size(); i++)
+    for (unsigned i = 0; i<mRightImages.size(); ++i)
     {
         mNodes[mRightImages[i]]->MarkAsDeleted();
         mDeletedNodeIndices.push_back(mRightImages[i]);
@@ -599,7 +599,7 @@ void Toroidal2dMesh::ReconstructToroidalMesh()
         unsigned number_of_bottom_image_nodes = 0;
         unsigned number_of_top_image_nodes = 0;
 
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i<3; ++i)
         {
             unsigned this_node_index = elem_iter->GetNodeGlobalIndex(i);
 
@@ -634,7 +634,7 @@ void Toroidal2dMesh::ReconstructToroidalMesh()
          */
         if (number_of_bottom_image_nodes == 1 || number_of_bottom_image_nodes == 2)
         {
-            for (unsigned i=0; i<3; i++)
+            for (unsigned i = 0; i<3; ++i)
             {
                 unsigned this_node_index = elem_iter->GetNodeGlobalIndex(i);
                 auto it = mImageToBottomOriginalNodeMap.find(this_node_index);
@@ -657,7 +657,7 @@ void Toroidal2dMesh::ReconstructToroidalMesh()
     //     if (!p_boundary_element->IsDeleted())
     //     {
     //         unsigned number_of_image_nodes = 0;
-    //         for (unsigned i=0; i<2; i++)
+    //         for (unsigned i = 0; i<2; ++i)
     //         {
     //             unsigned this_node_index = p_boundary_element->GetNodeGlobalIndex(i);
     //             if (mImageToBottomOriginalNodeMap.find(this_node_index) != mImageToBottomOriginalNodeMap.end())
@@ -683,7 +683,7 @@ void Toroidal2dMesh::ReconstructToroidalMesh()
     //          */
     //         if (number_of_image_nodes == 1)
     //         {
-    //             for (unsigned i=0; i<2; i++)
+    //             for (unsigned i = 0; i<2; ++i)
     //             {
     //                 unsigned this_node_index = p_boundary_element->GetNodeGlobalIndex(i);
     //                 auto it = mImageToBottomOriginalNodeMap.find(this_node_index);
@@ -706,13 +706,13 @@ void Toroidal2dMesh::ReconstructToroidalMesh()
     // }
 
     // Delete all image nodes unless they have already gone
-    for (unsigned i=0; i<mBottomImages.size(); i++)
+    for (unsigned i = 0; i<mBottomImages.size(); ++i)
     {
         mNodes[mBottomImages[i]]->MarkAsDeleted();
         mDeletedNodeIndices.push_back(mBottomImages[i]);
     }
 
-    for (unsigned i=0; i<mTopImages.size(); i++)
+    for (unsigned i = 0; i<mTopImages.size(); ++i)
     {
         mNodes[mTopImages[i]]->MarkAsDeleted();
         mDeletedNodeIndices.push_back(mTopImages[i]);
@@ -838,7 +838,7 @@ void Toroidal2dMesh::CorrectCylindricalNonPeriodicMesh()
          */
         c_vector<unsigned,3> original_element_node_indices;
         c_vector<unsigned,3> corresponding_element_node_indices;
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i<3; ++i)
         {
             original_element_node_indices[i] = p_element->GetNodeGlobalIndex(i);
             corresponding_element_node_indices[i] = GetCorrespondingCylindricalNodeIndex(original_element_node_indices[i]);
@@ -851,7 +851,7 @@ void Toroidal2dMesh::CorrectCylindricalNonPeriodicMesh()
 
             bool is_corresponding_node = true;
 
-            for (unsigned i=0; i<3; i++)
+            for (unsigned i = 0; i<3; ++i)
             {
                 if ((corresponding_element_node_indices[i] != p_corresponding_element->GetNodeGlobalIndex(0)) &&
                     (corresponding_element_node_indices[i] != p_corresponding_element->GetNodeGlobalIndex(1)) &&
@@ -936,7 +936,7 @@ void Toroidal2dMesh::CorrectToroidalNonPeriodicMesh()
          */
         c_vector<unsigned,3> original_element_node_indices;
         c_vector<unsigned,3> corresponding_element_node_indices;
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i<3; ++i)
         {
             original_element_node_indices[i] = p_element->GetNodeGlobalIndex(i);
             corresponding_element_node_indices[i] = GetCorrespondingToroidalNodeIndex(original_element_node_indices[i]);
@@ -949,7 +949,7 @@ void Toroidal2dMesh::CorrectToroidalNonPeriodicMesh()
 
             bool is_corresponding_node = true;
 
-            for (unsigned i=0; i<3; i++)
+            for (unsigned i = 0; i<3; ++i)
             {
                 if ((corresponding_element_node_indices[i] != p_corresponding_element->GetNodeGlobalIndex(0)) &&
                     (corresponding_element_node_indices[i] != p_corresponding_element->GetNodeGlobalIndex(1)) &&
@@ -1021,7 +1021,7 @@ void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingCylindricalPeriodicBound
         unsigned number_of_left_image_nodes = 0;
         unsigned number_of_right_image_nodes = 0;
 
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i<3; ++i)
         {
             unsigned this_node_index = elem_iter->GetNodeGlobalIndex(i);
 
@@ -1087,7 +1087,7 @@ void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingToroidalPeriodicBoundari
         unsigned number_of_bottom_image_nodes = 0;
         unsigned number_of_top_image_nodes = 0;
 
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i<3; ++i)
         {
             unsigned this_node_index = elem_iter->GetNodeGlobalIndex(i);
 
@@ -1236,7 +1236,7 @@ void Toroidal2dMesh::RefreshMesh()
 {
     // Check if the (x,y) coordinates are in the domain, if not, get the fmod and relocate.
     unsigned num_nodes = mNodes.size();
-    for (unsigned i=0; i<num_nodes; i++)
+    for (unsigned i = 0; i<num_nodes; ++i)
     {
         double& x_location = (mNodes[i]->rGetModifiableLocation())[0];
         if (x_location < 0.0)

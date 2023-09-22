@@ -113,7 +113,7 @@ public:
             {
                 cardiac_problem.Solve();
             }
-            catch(Exception& e)
+            catch (Exception& e)
             {
                 std::cout << "Simulation threw an exception!" << std::endl;
                 std::cout << e.GetMessage() << std::endl;

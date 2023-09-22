@@ -42,27 +42,32 @@ c_vector<double, SPACE_DIM> CryptVertexBasedDivisionRule<SPACE_DIM>::CalculateCe
     CellPtr pParentCell,
     VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation)
 {
-    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE
-
-    c_vector<double, SPACE_DIM> axis_of_division;
-
-    double random_angle = 2.0*M_PI*RandomNumberGenerator::Instance()->ranf();
-    axis_of_division(0) = cos(random_angle);
-    axis_of_division(1) = sin(random_angle);
-
-    // We don't need to prescribe how 'stem' cells divide if Wnt is not present
-    bool is_wnt_included = WntConcentration<2>::Instance()->IsWntSetUp();
-    if (!is_wnt_included)
+    if constexpr (SPACE_DIM == 2)
     {
-        WntConcentration<2>::Destroy();
-        if (pParentCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
-        {
-            axis_of_division(0) = 1.0;
-            axis_of_division(1) = 0.0;
-        }
-    }
+      c_vector<double, SPACE_DIM> axis_of_division;
 
-    return axis_of_division;
+      double random_angle = 2.0*M_PI*RandomNumberGenerator::Instance()->ranf();
+      axis_of_division(0) = cos(random_angle);
+      axis_of_division(1) = sin(random_angle);
+
+      // We don't need to prescribe how 'stem' cells divide if Wnt is not present
+      bool is_wnt_included = WntConcentration<2>::Instance()->IsWntSetUp();
+      if (!is_wnt_included)
+      {
+          WntConcentration<2>::Destroy();
+          if (pParentCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
+          {
+              axis_of_division(0) = 1.0;
+              axis_of_division(1) = 0.0;
+          }
+      }
+
+      return axis_of_division;
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 // Explicit instantiation

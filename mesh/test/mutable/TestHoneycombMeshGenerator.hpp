@@ -54,7 +54,7 @@ private:
 
         unsigned num_nodes = pMesh->GetNumNodes();
 
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i=0; i<num_nodes; ++i)
         {
             c_vector<double, 2> location;
             location = pMesh->GetNode(i)->rGetLocation();
@@ -131,7 +131,7 @@ public:
         TS_ASSERT_EQUALS(location_indices.size(), p_mesh->GetNumNodes() - 2*(ghosts*(num_cells_width + 2*ghosts + num_cells_depth)));
 
         std::set<unsigned> correct_ghost_node_indices;
-        for (unsigned i=0; i<this_many_ghosts_at_start; i++)
+        for (unsigned i=0; i<this_many_ghosts_at_start; ++i)
         {
             correct_ghost_node_indices.insert(i);
         }
@@ -142,7 +142,7 @@ public:
         std::set<unsigned> location_indices_set;
         std::set<unsigned> ghost_node_indices;
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<p_mesh->GetNumNodes(); ++i)
         {
             node_indices.insert(p_mesh->GetNode(i)->GetIndex());
         }
@@ -210,7 +210,7 @@ public:
         TS_ASSERT_EQUALS(location_indices.size(), p_mesh->GetNumNodes() - 2*(ghosts*(num_cells_width + 2*ghosts + num_cells_depth)));
 
         std::set<unsigned> correct_ghost_node_indices;
-        for (unsigned i=0; i<this_many_ghosts_at_start; i++)
+        for (unsigned i=0; i<this_many_ghosts_at_start; ++i)
         {
             correct_ghost_node_indices.insert(i);
         }
@@ -221,7 +221,7 @@ public:
         std::set<unsigned> location_indices_set;
         std::set<unsigned> ghost_node_indices;
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<p_mesh->GetNumNodes(); ++i)
         {
             node_indices.insert(p_mesh->GetNode(i)->GetIndex());
         }
@@ -256,7 +256,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 16u);
 
         unsigned num_non_boundary_nodes = 0;
-        for (unsigned node_index=0; node_index<16u; node_index++)
+        for (unsigned node_index = 0; node_index < 16; ++node_index)
         {
             if (!p_mesh->GetNode(node_index)->IsBoundaryNode())
             {
@@ -276,7 +276,7 @@ public:
         boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetCircularMesh(radius);
 
         double epsilon = 1e-5;
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<p_mesh->GetNumNodes(); ++i)
         {
             TS_ASSERT_LESS_THAN_EQUALS(norm_2(p_mesh->GetNode(i)->rGetLocation()), radius+epsilon);
         }

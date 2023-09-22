@@ -156,9 +156,9 @@ private:
         TS_ASSERT_EQUALS(second.size(), second_bin.size());
         TS_ASSERT_EQUALS(third.size(), third_bin.size());
 
-        for (unsigned i = 0; i< fibres.size(); i++)
+        for (unsigned i = 0; i< fibres.size(); ++i)
         {
-            for (unsigned j = 0; j< 3u ; j++)
+            for (unsigned j = 0; j< 3u ; ++j)
             {
                 TS_ASSERT_DELTA(fibres[i][j], fibres_bin[i][j], 1e-16);
                 TS_ASSERT_DELTA(second[i][j], second_bin[i][j], 1e-16);
@@ -192,9 +192,9 @@ private:
 
         TS_ASSERT_EQUALS(fibres.size(), fibres_bin.size());
 
-        for (unsigned i = 0; i< fibres.size(); i++)
+        for (unsigned i = 0; i< fibres.size(); ++i)
         {
-            for (unsigned j = 0; j< 3u ; j++)
+            for (unsigned j = 0; j< 3u ; ++j)
             {
                 TS_ASSERT_DELTA(fibres[i][j], fibres_bin[i][j], 1e-16);
             }

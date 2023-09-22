@@ -175,7 +175,7 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::FinaliseLinearSystem(Vec exi
                 std::vector<unsigned> row_for_average;
                 row_for_average.push_back(mRowForAverageOfPhiZeroed);
                 this->mpLinearSystem->ZeroMatrixRowsWithValueOnDiagonal(row_for_average, 0.0);
-                for (unsigned col_index=0; col_index<matrix_size; col_index++)
+                for (unsigned col_index = 0; col_index<matrix_size; col_index++)
                 {
                     if (col_index%2 == 1)
                     {
@@ -262,7 +262,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetFixedExtracellularPotentialNodes(
             std::vector<unsigned> fixedExtracellularPotentialNodes)
 {
-    for (unsigned i=0; i<fixedExtracellularPotentialNodes.size(); i++)
+    for (unsigned i = 0; i<fixedExtracellularPotentialNodes.size(); ++i)
     {
         if (fixedExtracellularPotentialNodes[i] >= this->mpMesh->GetNumNodes() )
         {
@@ -275,7 +275,7 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetFixedExtracellularPotenti
     // We will need to recalculate this when HasDirichletBoundaryConditions() is called.
     GetBoundaryConditions()->ResetDirichletCommunication();
 
-    for (unsigned i=0; i<mFixedExtracellularPotentialNodes.size(); i++)
+    for (unsigned i = 0; i<mFixedExtracellularPotentialNodes.size(); ++i)
     {
         if (this->mpMesh->GetDistributedVectorFactory()->IsGlobalIndexLocal(mFixedExtracellularPotentialNodes[i]))
         {
@@ -341,9 +341,10 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::FinaliseForBath(bool compute
                 this->mpLinearSystem->GetOwnershipRange(local_lo, local_hi);
 
                 // If this processor owns i-th row, check it.
-                if ((local_lo <= (int)num_equation) && ((int)num_equation < local_hi))
+                if ((local_lo <= static_cast<int>(num_equation)) && (static_cast<int>(num_equation) < local_hi))
                 {
-                    for (unsigned column=0; column < this->mpLinearSystem->GetSize(); column++)
+                    for (unsigned column
+                    ; column < this->mpLinearSystem->GetSize(); column++)
                     {
                         assert(this->mpLinearSystem->GetMatrixElement(num_equation, column)==0.0);
                     }

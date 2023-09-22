@@ -54,7 +54,7 @@ private:
 
         unsigned num_nodes = pMesh->GetNumNodes();
 
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i=0; i<num_nodes; ++i)
         {
             c_vector<double, 2> location;
             location = pMesh->GetNode(i)->rGetLocation();
@@ -106,7 +106,7 @@ public:
 
         std::set<unsigned> correct_ghost_node_indices;
 
-        for (unsigned i=0; i< num_cells_width*ghosts; i++)
+        for (unsigned i=0; i< num_cells_width*ghosts; ++i)
         {
             correct_ghost_node_indices.insert(i);
         }
@@ -117,7 +117,7 @@ public:
         std::set<unsigned> location_indices_set;
         std::set<unsigned> ghost_node_indices;
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<p_mesh->GetNumNodes(); ++i)
         {
             node_indices.insert(p_mesh->GetNode(i)->GetIndex());
         }
@@ -182,7 +182,7 @@ public:
 
         std::set<unsigned> correct_ghost_node_indices;
 
-        for (unsigned i=0; i< num_cells_width*ghosts; i++)
+        for (unsigned i=0; i< num_cells_width*ghosts; ++i)
         {
             correct_ghost_node_indices.insert(i);
         }
@@ -193,7 +193,7 @@ public:
         std::set<unsigned> location_indices_set;
         std::set<unsigned> ghost_node_indices;
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<p_mesh->GetNumNodes(); ++i)
         {
             node_indices.insert(p_mesh->GetNode(i)->GetIndex());
         }

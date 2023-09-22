@@ -432,7 +432,7 @@ public:
          r_archive & this->mpDistributedVectorFactory; // Needed when loading
          const unsigned num_cells = r_cells_distributed.size();
          r_archive & num_cells;
-         for (unsigned i=0; i<num_cells; i++)
+         for (unsigned i=0; i<num_cells; ++i)
          {
              AbstractDynamicallyLoadableEntity* p_entity = dynamic_cast<AbstractDynamicallyLoadableEntity*>(r_cells_distributed[i]);
              bool is_dynamic = (p_entity != NULL);
@@ -486,7 +486,7 @@ public:
  #ifndef NDEBUG
          // Paranoia
          assert(rCells.size() == rSecondCells.size());
-         for (unsigned i=0; i<rCells.size(); i++)
+         for (unsigned i=0; i<rCells.size(); ++i)
          {
              assert(rCells[i] == NULL);
              assert(rSecondCells[i] == NULL);
@@ -562,7 +562,7 @@ public:
          r_archive & this->mpDistributedVectorFactory; // Needed when loading
          const unsigned num_cells = r_stimulus_distributed.size();
          r_archive & num_cells;
-         for (unsigned i=0; i<num_cells; i++)
+         for (unsigned i=0; i<num_cells; ++i)
          {
              r_archive & r_stimulus_distributed[i];
          }
@@ -589,7 +589,7 @@ public:
         rStimuli.resize(p_factory->GetLocalOwnership());
 #ifndef NDEBUG
           // Paranoia
-          for (unsigned i=0; i<rStimuli.size(); i++)
+          for (unsigned i=0; i<rStimuli.size(); ++i)
           {
               assert(rStimuli[i] == NULL);
           }
@@ -638,7 +638,7 @@ public:
      //archive the conductivity tensor of the second cell (which may not be dealt with by heartconfig)
      c_vector<double, SPACE_DIM>  intracellular_conductivities_second_cell = t->GetIntracellularConductivitiesSecondCell();
      //note that simple: ar & intracellular_conductivities_second_cell may not be liked by some boost versions
-     for (unsigned i = 0; i < SPACE_DIM; i++)
+     for (unsigned i = 0; i < SPACE_DIM; ++i)
      {
          ar & intracellular_conductivities_second_cell(i);
      }
@@ -669,7 +669,7 @@ public:
      //Load conductivities of the conductivity of the second cell.
      c_vector<double, SPACE_DIM>  intra_cond_second_cell;
      //note that simple: ar & intra_cond_second_cell may not be liked by some boost versions
-     for (unsigned i = 0; i < SPACE_DIM; i++)
+     for (unsigned i = 0; i < SPACE_DIM; ++i)
      {
          double cond;
          ar & cond;

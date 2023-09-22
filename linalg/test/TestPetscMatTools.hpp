@@ -136,9 +136,9 @@ public:
         PetscInt lo, hi;
         PetscMatTools::GetOwnershipRange(matrix, lo, hi);
 
-        for (int i=lo; i<hi; i++)
+        for (int i=lo; i<hi; ++i)
         {
-            for (unsigned j=0; j<size; j++)
+            for (unsigned j=0; j<size; ++j)
             {
                 TS_ASSERT_DELTA( PetscMatTools::GetElement(matrix, i, j), correct_mat[i][j], 1e-12);
             }

@@ -81,7 +81,7 @@ public:
 
         unsigned node_indices_elem_0[5] = { 0, 3, 4, 1, 2 };
         std::vector<Node<2>*> nodes_elem_0;
-        for (unsigned i = 0; i < 5; i++)
+        for (unsigned i = 0; i < 5; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
         }
@@ -109,7 +109,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 4u);
 
         // Test the correct nodes are boundary nodes
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
         }
@@ -158,7 +158,7 @@ public:
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
         unsigned node_indices_elem_0[4] = { 0, 1, 5, 6 };
         unsigned node_indices_elem_1[5] = { 1, 2, 3, 4, 5 };
-        for (unsigned i = 0; i < 5; i++)
+        for (unsigned i = 0; i < 5; ++i)
         {
             if (i < 4)
             {
@@ -181,7 +181,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
 
         // Test the correct nodes are boundary nodes
-        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
         }
@@ -195,7 +195,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 4u);
         unsigned node_indices_element_0[4] = { 0, 1, 4, 5 };
         unsigned node_indices_element_1[4] = { 1, 2, 3, 4 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
@@ -227,7 +227,7 @@ public:
         unsigned node_indices_elem_1[4] = { 2, 5, 4, 1 };
         unsigned node_indices_elem_2[3] = { 1, 4, 0 };
         unsigned node_indices_elem_3[4] = { 0, 4, 5, 3 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             if (i < 3)
             {
@@ -289,7 +289,7 @@ public:
         unsigned node_indices_element_1[3] = { 2, 4, 1 };
         unsigned node_indices_element_2[4] = { 1, 4, 5, 0 };
         unsigned node_indices_element_3[3] = { 0, 5, 3 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
@@ -387,7 +387,7 @@ public:
         unsigned node_indices_elem_0[3] = { 2, 3, 5 };
         unsigned node_indices_elem_1[3] = { 1, 4, 0 };
         unsigned node_indices_elem_2[4] = { 0, 4, 5, 3 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             if (i < 3)
             {
@@ -425,7 +425,7 @@ public:
         unsigned node_indices_element_0[4] = { 2, 3, 5, 4 };
         unsigned node_indices_element_1[4] = { 1, 4, 5, 0 };
         unsigned node_indices_element_2[4] = { 0, 5, 3 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
@@ -444,7 +444,7 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 1.0 + 0.2 * sqrt(41.0), 1e-6);
 
         // Test that the correct nodes are labelled as boundary nodes following the rearrangement
-        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); ++i)
         {
             bool expected_boundary_node = (i != 5);
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
@@ -475,7 +475,7 @@ public:
         unsigned node_indices_elem_0[4] = { 1, 2, 5, 4 };
         unsigned node_indices_elem_1[3] = { 1, 4, 0 };
         unsigned node_indices_elem_2[4] = { 0, 4, 5, 3 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             if (i < 3)
@@ -516,7 +516,7 @@ public:
         unsigned node_indices_element_0[3] = { 1, 2, 4 };
         unsigned node_indices_element_1[4] = { 1, 4, 5, 0 };
         unsigned node_indices_element_2[3] = { 0, 5, 3 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
             if (i < 3)
@@ -535,7 +535,7 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(2), 1.0 + 0.2 * sqrt(41.0), 1e-6);
 
         // Test that the correct nodes are labelled as boundary nodes following the rearrangement
-        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
         }
@@ -565,7 +565,7 @@ public:
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
         unsigned node_indices_elem_0[4] = { 0, 4, 5, 3 };
         unsigned node_indices_elem_1[4] = { 4, 1, 2, 5 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
@@ -596,7 +596,7 @@ public:
         // Test that each element contains the correct nodes following the rearrangement
         unsigned node_indices_element_0[3] = { 0, 5, 3 };
         unsigned node_indices_element_1[3] = { 4, 1, 2 };
-        for (unsigned i = 0; i < 3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
@@ -609,7 +609,7 @@ public:
         TS_ASSERT_DELTA(vertex_mesh.GetSurfaceAreaOfElement(1), 1.0 + 0.2 * sqrt(41.0), 1e-6);
 
         // Test that the correct nodes are labelled as boundary nodes following the rearrangement
-        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
         }
@@ -635,7 +635,7 @@ public:
         unsigned node_indices_elem_1[4] = { 2, 5, 4, 1 };
         unsigned node_indices_elem_2[3] = { 1, 4, 0 };
         unsigned node_indices_elem_3[4] = { 0, 4, 5, 3 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             if (i < 3)
             {
@@ -686,7 +686,7 @@ public:
         unsigned node_indices_elem_1[4] = { 2, 5, 4, 1 };
         unsigned node_indices_elem_2[3] = { 1, 4, 0 };
         unsigned node_indices_elem_3[4] = { 0, 4, 5, 3 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             if (i < 3)
             {
@@ -717,7 +717,7 @@ public:
         unsigned node_indices_element_2[4] = { 1, 4, 5, 0 };
         unsigned node_indices_element_3[3] = { 0, 5, 3 };
 
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
@@ -761,7 +761,7 @@ public:
         unsigned node_indices_elem_2[4] = {1, 10, 2, 9};
 
 
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i=0; i<10; ++i)
         {
             if (i < 8)
             {
@@ -799,7 +799,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 4u);
 
         // Test boundary property of nodes. All are boundary nodes except node 3.
-        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); ++i)
         {
             bool expected_boundary_node = (i!=5);
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
@@ -842,7 +842,7 @@ public:
         unsigned node_indices_elem_1[4] = { 5, 2, 3, 6 };
         unsigned node_indices_elem_2[4] = { 0, 4, 6, 3 };
         unsigned node_indices_elem_3[3] = { 4, 5, 6 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             if (i < 3)
             {
@@ -870,7 +870,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(3)->GetNumNodes(), 3u);
 
         // Test that each element still contains the correct nodes following the rearrangement
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_elem_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_elem_1[i]);
@@ -909,7 +909,7 @@ public:
         unsigned node_indices_elem_1[3] = { 1, 4, 3 };
         unsigned node_indices_elem_2[3] = { 0, 3, 2 };
 
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             if (i < 3)
@@ -963,7 +963,7 @@ public:
         unsigned node_indices_elem_1[4] = {1, 2, 5, 4};
         unsigned node_indices_elem_2[4] = {2, 0, 3, 5};
         unsigned node_indices_elem_3[4] = {0, 1, 4, 3};
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i=0; i<4; ++i)
         {
             if (i < 3)
             {
@@ -1012,7 +1012,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumAllElements(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumAllNodes(), 7u);
 
-        for (unsigned j=1; j<4; j++)
+        for (unsigned j=1; j<4; ++j)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNumNodes(), 3u);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(0), j%3);
@@ -1021,7 +1021,7 @@ public:
         }
 
         // Test boundary property of nodes. All are boundary nodes except node 3.
-        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); ++i)
         {
             bool expected_boundary_node = (i!=3);
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
@@ -1108,7 +1108,7 @@ public:
         unsigned node_indices_elem_0[3] = { 3, 4, 5 };
         unsigned node_indices_elem_1[4] = { 1, 2, 5, 4 };
         unsigned node_indices_elem_2[4] = { 2, 0, 3, 5 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             if (i < 3)
             {
@@ -1138,7 +1138,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumAllElements(), 3u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumAllNodes(), 7u);
 
-        for (unsigned j = 1; j < 3; j++)
+        for (unsigned j = 1; j < 3; ++j)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNumNodes(), 3u);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(j)->GetNodeGlobalIndex(0), j % 3);
@@ -1147,7 +1147,7 @@ public:
         }
 
         // Test boundary property of nodes. All are boundary nodes.
-        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
         }
@@ -1211,7 +1211,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh2.GetElement(1)->GetNodeGlobalIndex(2), 5u);
 
         // Test boundary property of nodes. All are boundary nodes.
-        for (unsigned i = 0; i < vertex_mesh2.GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh2.GetNumNodes(); ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh2.GetNode(i)->IsBoundaryNode(), true);
         }
@@ -1234,7 +1234,7 @@ public:
         unsigned node_indices_elem_1[3] = { 2, 5, 4 };
         unsigned node_indices_elem_2[4] = { 2, 0, 3, 5 };
         unsigned node_indices_elem_3[4] = { 0, 1, 4, 3 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             if (i < 3)
             {
@@ -1464,7 +1464,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh2.GetElement(1)->GetNodeGlobalIndex(2), 5u);
 
         // Test boundary property of nodes. All are boundary nodes.
-        for (unsigned i = 0; i < vertex_mesh2.GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh2.GetNumNodes(); ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh2.GetNode(i)->IsBoundaryNode(), true);
         }
@@ -1555,7 +1555,7 @@ public:
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
         unsigned node_indices_elem_0[5] = { 0, 1, 2, 5, 4 };
         unsigned node_indices_elem_1[5] = { 0, 4, 5, 2, 3 };
-        for (unsigned i = 0; i < 5; i++)
+        for (unsigned i = 0; i < 5; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
@@ -1598,7 +1598,7 @@ public:
         unsigned node_indices_elem_0[5] = { 0, 1, 6, 7, 8 };
         unsigned node_indices_elem_1[4] = { 1, 2, 3, 6 };
         unsigned node_indices_elem_2[4] = { 3, 4, 5, 6 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
@@ -1644,7 +1644,7 @@ public:
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
         unsigned node_indices_elem_0[5] = { 1, 2, 5, 4, 6 };
         unsigned node_indices_elem_1[5] = { 0, 6, 4, 5, 3 };
-        for (unsigned i = 0; i < 5; i++)
+        for (unsigned i = 0; i < 5; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
@@ -1689,7 +1689,7 @@ public:
         unsigned node_indices_elem_0[5] = { 1, 2, 5, 4, 6 };
         unsigned node_indices_elem_1[5] = { 0, 6, 4, 5, 3 };
         unsigned node_indices_elem_2[4] = { 2, 3, 5, 7 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
@@ -1743,7 +1743,7 @@ public:
         unsigned node_indices_element_2[3] = {12, 5, 6};
         unsigned node_indices_element_3[3] = {7, 8, 9};
         unsigned node_indices_element_4[6] = {10, 11, 4, 1, 0, 7};
-        for (unsigned i=0; i<6; i++)
+        for (unsigned i=0; i<6; ++i)
         {
             if (i < 4)
             {
@@ -1865,7 +1865,7 @@ public:
         unsigned new_node_indices_element_2[4] = {12, 5, 14, 6};
         unsigned new_node_indices_element_3[4] = {7, 8, 15, 9};
         unsigned new_node_indices_element_4[6] = {10, 11, 4, 1, 0, 7};
-        for (unsigned i=0; i<9; i++)
+        for (unsigned i=0; i<9; ++i)
         {
             TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(i), new_node_indices_element_0[i]);
             if (i < 4)
@@ -1882,7 +1882,7 @@ public:
         }
 
         // Test boundary property of nodes (all are boundary nodes except node 6)
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             bool expected_boundary_node = (i!=6);
             TS_ASSERT_EQUALS(mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
@@ -1964,7 +1964,7 @@ public:
         unsigned node_indices_element_1[3] = { 5, 6, 4 };
         unsigned node_indices_element_2[3] = { 6, 7, 4 };
         unsigned node_indices_element_3[3] = { 7, 8, 4 };
-        for (unsigned i = 0; i < 3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             nodes_in_element0.push_back(nodes[node_indices_element_0[i]]);
             nodes_in_element1.push_back(nodes[node_indices_element_1[i]]);
@@ -2010,7 +2010,7 @@ public:
         unsigned node_indices_element_0[4] = { 0, 1, 2, 3 };
         unsigned node_indices_element_1[3] = { 4, 5, 2 };
         unsigned node_indices_element_2[3] = { 0, 4, 1 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             nodes_in_element0.push_back(nodes[node_indices_element_0[i]]);
             if (i < 3)
@@ -2068,7 +2068,7 @@ public:
         unsigned node_indices_element_0[4] = { 0, 1, 2, 3 };
         unsigned node_indices_element_1[3] = { 5, 6, 4 };
         unsigned node_indices_element_2[3] = { 7, 4, 6 };
-        for (unsigned i = 0; i < 3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             nodes_in_element0.push_back(nodes[node_indices_element_0[i]]);
             nodes_in_element1.push_back(nodes[node_indices_element_1[i]]);
@@ -2122,7 +2122,7 @@ public:
         unsigned new_node_indices_element_0[7] = { 0, 1, 8, 4, 9, 2, 3 };
         unsigned new_node_indices_element_1[4] = { 5, 6, 4, 8 };
         unsigned new_node_indices_element_2[4] = { 7, 9, 4, 6 };
-        for (unsigned i = 0; i < 7; i++)
+        for (unsigned i = 0; i < 7; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), new_node_indices_element_0[i]);
             if (i < 4)
@@ -2133,7 +2133,7 @@ public:
         }
 
         // Test boundary property of nodes
-        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); ++i)
         {
             bool expected_boundary_node = (i != 4);
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
@@ -2190,7 +2190,7 @@ public:
         std::vector<Node<2>*> nodes_in_element0, nodes_in_element1;
         unsigned node_indices_element_0[4] = { 0, 1, 2, 3 };
         unsigned node_indices_element_1[4] = { 4, 5, 6, 7 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             nodes_in_element0.push_back(nodes[node_indices_element_0[i]]);
             nodes_in_element1.push_back(nodes[node_indices_element_1[i]]);
@@ -2258,9 +2258,9 @@ public:
 
         // The two elements should have 2 nodes in common and they should both be boundary nodes
         unsigned num_common_vertices = 0;
-        for (unsigned i = 0; i < vertex_mesh.GetElement(0)->GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh.GetElement(0)->GetNumNodes(); ++i)
         {
-            for (unsigned j = 0; j < vertex_mesh.GetElement(1)->GetNumNodes(); j++)
+            for (unsigned j = 0; j < vertex_mesh.GetElement(1)->GetNumNodes(); ++j)
             {
                 if ((vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i)) == (vertex_mesh.GetElement(1)->GetNodeGlobalIndex(j)))
                 {
@@ -2298,7 +2298,7 @@ public:
         unsigned node_indices_element_1[3] = { 1, 4, 6 };
         unsigned node_indices_element_2[3] = { 4, 5, 6 };
         unsigned node_indices_element_3[3] = { 7, 0, 8 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             nodes_in_element0.push_back(nodes[node_indices_element_0[i]]);
             if (i < 3)
@@ -2374,7 +2374,7 @@ public:
         unsigned new_node_indices_element_1[3] = { 1, 4, 6 };
         unsigned new_node_indices_element_2[4] = { 4, 5, 9, 6 };
         unsigned new_node_indices_element_3[3] = { 7, 0, 8 };
-        for (unsigned i = 0; i < 7; i++)
+        for (unsigned i = 0; i < 7; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), new_node_indices_element_0[i]);
             if (i < 3)
@@ -2389,7 +2389,7 @@ public:
         }
 
         // Test boundary property of nodes. All are boundary nodes except node 6.
-        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); ++i)
         {
             bool expected_boundary_node = (i != 6);
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
@@ -2432,7 +2432,7 @@ public:
         std::vector<Node<2>*> nodes_in_element0, nodes_in_element1;
         unsigned node_indices_element_0[4] = { 0, 3, 2, 1 };
         unsigned node_indices_element_1[4] = { 7, 6, 5, 4 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             nodes_in_element0.push_back(nodes[node_indices_element_0[i]]);
             nodes_in_element1.push_back(nodes[node_indices_element_1[i]]);
@@ -2478,9 +2478,9 @@ public:
 
         // The two elements should have 4 nodes in common and all the common nodes are boundary nodes
         unsigned num_common_vertices = 0;
-        for (unsigned i = 0; i < vertex_mesh.GetElement(0)->GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh.GetElement(0)->GetNumNodes(); ++i)
         {
-            for (unsigned j = 0; j < vertex_mesh.GetElement(1)->GetNumNodes(); j++)
+            for (unsigned j = 0; j < vertex_mesh.GetElement(1)->GetNumNodes(); ++j)
             {
                 if ((vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i)) == (vertex_mesh.GetElement(1)->GetNodeGlobalIndex(j)))
                 {
@@ -2500,9 +2500,9 @@ public:
 
         // The two elements should now only have 2 nodes in common and all the common nodes are boundary nodes
         num_common_vertices = 0;
-        for (unsigned i = 0; i < vertex_mesh.GetElement(0)->GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh.GetElement(0)->GetNumNodes(); ++i)
         {
-            for (unsigned j = 0; j < vertex_mesh.GetElement(1)->GetNumNodes(); j++)
+            for (unsigned j = 0; j < vertex_mesh.GetElement(1)->GetNumNodes(); ++j)
             {
                 if ((vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i)) == (vertex_mesh.GetElement(1)->GetNodeGlobalIndex(j)))
                 {
@@ -2541,7 +2541,7 @@ public:
         unsigned node_indices_element_1[4] = { 1, 4, 6, 9 };
         unsigned node_indices_element_2[3] = { 4, 5, 6 };
         unsigned node_indices_element_3[4] = { 7, 0, 10, 8 };
-        for (unsigned i = 0; i < 6; i++)
+        for (unsigned i = 0; i < 6; ++i)
         {
             nodes_in_element0.push_back(nodes[node_indices_element_0[i]]);
             if (i < 4)
@@ -2618,7 +2618,7 @@ public:
         unsigned new_node_indices_element_1[3] = { 1, 4, 6 };
         unsigned new_node_indices_element_2[4] = { 4, 5, 9, 6 };
         unsigned new_node_indices_element_3[3] = { 7, 0, 8 };
-        for (unsigned i = 0; i < 7; i++)
+        for (unsigned i = 0; i < 7; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), new_node_indices_element_0[i]);
             if (i < 3)
@@ -2633,7 +2633,7 @@ public:
         }
 
         // Test boundary property of nodes (all are boundary nodes except node 6)
-        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < vertex_mesh.GetNumNodes(); ++i)
         {
             bool expected_boundary_node = (i != 6);
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
@@ -2739,7 +2739,7 @@ public:
         unsigned node_indices_elem_0[5] = { 0, 1, 5, 4, 7 };
         unsigned node_indices_elem_1[4] = { 1, 2, 6, 5 };
         unsigned node_indices_elem_2[5] = { 7, 4, 6, 2, 3 };
-        for (unsigned i = 0; i < 5; i++)
+        for (unsigned i = 0; i < 5; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             if (i < 4)
@@ -2798,7 +2798,7 @@ public:
         unsigned node_indices_element_0[4] = { 0, 1, 4, 5 };
         unsigned node_indices_element_1[3] = { 1, 2, 4 };
         unsigned node_indices_element_2[4] = { 5, 4, 2, 3 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             if (i < 3)
@@ -2841,7 +2841,7 @@ public:
         unsigned node_indices_elem_2[7] = { 7, 8, 10, 2, 3, 6, 5 };
         unsigned node_indices_elem_3[3] = { 10, 8, 9 };
 
-        for (unsigned i = 0; i < 7; i++)
+        for (unsigned i = 0; i < 7; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
@@ -2915,7 +2915,7 @@ public:
         unsigned node_indices_elem_0[5] = { 0, 1, 5, 4, 7 };
         unsigned node_indices_elem_1[4] = { 1, 2, 6, 5 };
         unsigned node_indices_elem_2[5] = { 7, 4, 6, 2, 3 };
-        for (unsigned i = 0; i < 5; i++)
+        for (unsigned i = 0; i < 5; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             if (i < 4)
@@ -2973,7 +2973,7 @@ public:
         unsigned node_indices_element_0[4] = { 0, 1, 4, 5 };
         unsigned node_indices_element_1[3] = { 1, 2, 4 };
         unsigned node_indices_element_2[4] = { 5, 4, 2, 3 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             if (i < 3)
@@ -2984,7 +2984,7 @@ public:
         }
 
         // Test that the correct nodes are boundary nodes
-        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<vertex_mesh.GetNumNodes(); ++i)
         {
             bool expected_boundary_node = (i!=4);
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
@@ -3018,7 +3018,7 @@ public:
         unsigned node_indices_in_element0[6] = { 0, 1, 2, 3, 4, 5 };
         unsigned node_indices_in_element1[5] = { 5, 4, 6, 7, 8 };
         unsigned node_indices_in_element2[3] = { 7, 6, 9 };
-        for (unsigned i = 0; i < 6; i++)
+        for (unsigned i = 0; i < 6; ++i)
         {
             nodes_in_element0.push_back(nodes[node_indices_in_element0[i]]);
             if (i < 5)
@@ -3078,7 +3078,7 @@ public:
         unsigned node_indices_element_0[9] = { 0, 1, 2, 10, 6, 11, 3, 4, 5 };
         unsigned node_indices_element_1[6] = { 5, 4, 11, 6, 7, 8 };
         unsigned node_indices_element_2[4] = { 7, 6, 10, 9 };
-        for (unsigned i = 0; i < 9; i++)
+        for (unsigned i = 0; i < 9; ++i)
         {
             TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             if (i < 6)
@@ -3092,7 +3092,7 @@ public:
         }
 
         // Test that the correct nodes are boundary nodes
-        for (unsigned i = 0; i < mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             bool expected_boundary_node = (i != 6);
             TS_ASSERT_EQUALS(mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
@@ -3132,7 +3132,7 @@ public:
         unsigned node_indices_elem_1[4] = { 2, 5, 4, 1 };
         unsigned node_indices_elem_2[3] = { 1, 4, 0 };
         unsigned node_indices_elem_3[4] = { 0, 4, 5, 3 };
-        for (unsigned i = 0; i < 3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
@@ -3172,7 +3172,7 @@ public:
         unsigned node_indices_element_1[3] = { 2, 5, 1 };
         unsigned node_indices_element_2[4] = { 1, 5, 4, 0 };
         unsigned node_indices_element_3[3] = { 0, 4, 3 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
@@ -3226,7 +3226,7 @@ public:
         unsigned node_indices_elem_1[4] = { 0, 5, 4, 3 };
         unsigned node_indices_elem_2[3] = { 1, 5, 0 };
         unsigned node_indices_elem_3[4] = { 2, 4, 5, 1 };
-        for (unsigned i = 0; i < 3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
@@ -3264,7 +3264,7 @@ public:
         unsigned node_indices_element_1[3] = { 0, 4, 3 };
         unsigned node_indices_element_2[4] = { 1, 5, 4, 0 };
         unsigned node_indices_element_3[3] = { 2, 5, 1 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
@@ -3304,7 +3304,7 @@ public:
         unsigned node_indices_elem_1[4] = { 2, 5, 4, 1 };
         unsigned node_indices_elem_2[3] = { 4, 0, 1 };
         unsigned node_indices_elem_3[4] = { 0, 4, 5, 3 };
-        for (unsigned i = 0; i < 3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
@@ -3343,7 +3343,7 @@ public:
         unsigned node_indices_element_1[3] = { 2, 5, 1 };
         unsigned node_indices_element_2[4] = { 4, 0, 1, 5 };
         unsigned node_indices_element_3[3] = { 0, 4, 3 };
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
@@ -3397,7 +3397,7 @@ public:
         unsigned node_indices_elem_1[4] = { 2, 5, 4, 1 };
         unsigned node_indices_elem_2[3] = { 1, 4, 0 };
         unsigned node_indices_elem_3[4] = { 4, 5, 3 };
-        for (unsigned i = 0; i < 3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
@@ -3458,7 +3458,7 @@ public:
         unsigned node_indices_elem_1[4] = { 0, 5, 4, 3 };
         unsigned node_indices_elem_2[3] = { 1, 5, 0 };
         unsigned node_indices_elem_3[4] = { 2, 4, 5 };
-        for (unsigned i = 0; i < 3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
@@ -3522,17 +3522,17 @@ public:
         unsigned node_indices_elem_2[4] = { 1, 2, 6, 5 };
         unsigned node_indices_elem_3[3] = { 0, 1, 5 };
         unsigned node_indices_elem_4[5] = { 0, 5, 6, 7, 4 };
-        for (unsigned i = 0; i < 3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
         }
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
             nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
         }
-        for (unsigned i = 0; i < 5; i++)
+        for (unsigned i = 0; i < 5; ++i)
         {
             nodes_elem_4.push_back(nodes[node_indices_elem_4[i]]);
         }
@@ -3589,7 +3589,7 @@ public:
         unsigned node_indices_elem_0[3] = { 2, 3, 5 };
         unsigned node_indices_elem_1[4] = { 2, 5, 4, 1 };
         unsigned node_indices_elem_2[4] = { 0, 4, 5, 3 };
-        for (unsigned i = 0; i < 3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
@@ -3632,7 +3632,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 3u);
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             if (i < 3)
@@ -3683,7 +3683,7 @@ public:
         unsigned node_indices_elem_0[3] = { 2, 3, 4 };
         unsigned node_indices_elem_1[4] = { 0, 5, 4, 3 };
         unsigned node_indices_elem_2[4] = { 2, 4, 5, 1 };
-        for (unsigned i = 0; i < 3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
@@ -3726,7 +3726,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 3u);
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             if (i < 3)
@@ -3777,7 +3777,7 @@ public:
         unsigned node_indices_elem_0[3] = { 2, 3, 5 };
         unsigned node_indices_elem_1[4] = { 0, 4, 5, 3 };
         unsigned node_indices_elem_2[3] = { 1, 4, 0 };
-        for (unsigned i = 0; i < 3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
@@ -3819,7 +3819,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 4u);
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
@@ -3870,7 +3870,7 @@ public:
         unsigned node_indices_elem_0[3] = { 2, 3, 4 };
         unsigned node_indices_elem_1[4] = { 0, 5, 4, 3 };
         unsigned node_indices_elem_2[3] = { 1, 5, 0 };
-        for (unsigned i = 0; i < 3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
@@ -3912,7 +3912,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 4u);
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
@@ -3963,7 +3963,7 @@ public:
         unsigned node_indices_elem_0[3] = { 2, 3, 5 };
         unsigned node_indices_elem_1[4] = { 2, 5, 4, 1 };
         unsigned node_indices_elem_2[3] = { 1, 4, 0 };
-        for (unsigned i = 0; i < 3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
@@ -4005,7 +4005,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 4u);
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
@@ -4056,7 +4056,7 @@ public:
         unsigned node_indices_elem_0[3] = { 2, 3, 4 };
         unsigned node_indices_elem_1[4] = { 2, 4, 5, 1 };
         unsigned node_indices_elem_2[3] = { 1, 5, 0 };
-        for (unsigned i = 0; i < 3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_2.push_back(nodes[node_indices_elem_2[i]]);
@@ -4098,7 +4098,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNumNodes(), 4u);
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(2)->GetNodeGlobalIndex(i), node_indices_element_2[i]);
@@ -4147,7 +4147,7 @@ public:
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
         unsigned node_indices_elem_0[3] = { 3, 4, 2 };
         unsigned node_indices_elem_1[4] = { 0, 1, 2, 4 };
-        for (unsigned i = 0; i < 3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
@@ -4185,7 +4185,7 @@ public:
         unsigned node_indices_element_1[3] = { 0, 1, 4 };
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             if (i < 3)
@@ -4231,7 +4231,7 @@ public:
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
         unsigned node_indices_elem_0[3] = { 3, 4, 1 };
         unsigned node_indices_elem_1[4] = { 0, 2, 1, 4 };
-        for (unsigned i = 0; i < 3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
@@ -4269,7 +4269,7 @@ public:
         unsigned node_indices_element_1[3] = { 0, 1, 4 };
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             if (i < 3)
@@ -4315,7 +4315,7 @@ public:
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
         unsigned node_indices_elem_0[3] = { 1, 2, 3 };
         unsigned node_indices_elem_1[4] = { 0, 1, 3, 4 };
-        for (unsigned i = 0; i < 3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
@@ -4353,7 +4353,7 @@ public:
         unsigned node_indices_element_1[3] = { 0, 1, 3 };
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             if (i < 3)
@@ -4399,7 +4399,7 @@ public:
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
         unsigned node_indices_elem_0[3] = { 1, 2, 4 };
         unsigned node_indices_elem_1[4] = { 0, 1, 4, 3 };
-        for (unsigned i = 0; i < 3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
@@ -4437,7 +4437,7 @@ public:
         unsigned node_indices_element_1[3] = { 0, 1, 3 };
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 4u);
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 3u);
-        for (unsigned i = 0; i < 4; i++)
+        for (unsigned i = 0; i < 4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             if (i < 3)

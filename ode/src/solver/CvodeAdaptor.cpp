@@ -213,7 +213,7 @@ void CvodeAdaptor::SetupCvode(AbstractOdeSystem* pOdeSystem,
     if (!reinit && !mForceMinimalReset)
     {
         const unsigned size = GetVectorSize(rInitialY);
-        for (unsigned i = 0; i < size; i++)
+        for (unsigned i = 0; i < size; ++i)
         {
             if (!CompareDoubles::WithinAnyTolerance(GetVectorComponent(mLastSolutionState, i), GetVectorComponent(rInitialY, i)))
             {
@@ -597,7 +597,7 @@ void CvodeAdaptor::RecordStoppingPoint(double stopTime, N_Vector yEnd)
     {
         const unsigned size = GetVectorSize(yEnd);
         CreateVectorIfEmpty(mLastSolutionState, size);
-        for (unsigned i = 0; i < size; i++)
+        for (unsigned i = 0; i < size; ++i)
         {
             SetVectorComponent(mLastSolutionState, i, GetVectorComponent(yEnd, i));
         }

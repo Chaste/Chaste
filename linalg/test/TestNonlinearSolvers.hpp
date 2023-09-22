@@ -104,7 +104,7 @@ public:
 
         double tol = 1e-4;
 
-        for (int i=0; i<2; i++)
+        for (int i=0; i<2; ++i)
         {
             // the solution is x = 1/sqrt(2.0), y = 1/sqrt(2.0)
             TS_ASSERT_DELTA(answer_petsc_repl[i] ,1/sqrt(2.0),tol);
@@ -147,7 +147,7 @@ public:
 
         double tol = 1e-6;
 
-        for (int i=0; i<3; i++)
+        for (int i=0; i<3; ++i)
         {
             // the solution is x = 1/sqrt(3.0), y = 1/sqrt(3.0),  z = 1/sqrt(3.0)
             TS_ASSERT_DELTA(answer_petsc_repl[i] ,1/sqrt(3.0),tol);

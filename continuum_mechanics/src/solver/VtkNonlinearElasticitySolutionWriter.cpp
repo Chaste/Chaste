@@ -50,9 +50,9 @@ void VtkNonlinearElasticitySolutionWriter<DIM>::Write()
     // write the displacement
     std::vector<c_vector<double,DIM> > displacement(mpSolver->mrQuadMesh.GetNumNodes());
     std::vector<c_vector<double,DIM> >& r_spatial_solution = mpSolver->rGetSpatialSolution();
-    for (unsigned i=0; i<mpSolver->mrQuadMesh.GetNumNodes(); i++)
+    for (unsigned i = 0; i < mpSolver->mrQuadMesh.GetNumNodes(); ++i)
     {
-        for (unsigned j=0; j<DIM; j++)
+        for (unsigned j = 0; j < DIM; ++j)
         {
             displacement[i](j) = r_spatial_solution[i](j)- mpSolver->mrQuadMesh.GetNode(i)->rGetLocation()[j];
         }
@@ -82,7 +82,7 @@ void VtkNonlinearElasticitySolutionWriter<DIM>::Write()
         mTensorData.resize(mpSolver->mrQuadMesh.GetNumElements());
 
         std::string name;
-        switch(mElementWiseStrainType)
+        switch (mElementWiseStrainType)
         {
             case DEFORMATION_GRADIENT_F:
             {

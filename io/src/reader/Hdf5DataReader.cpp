@@ -103,7 +103,7 @@ void Hdf5DataReader::CommonConstructor()
     hsize_t dataset_max_sizes[AbstractHdf5Access::DATASET_DIMS];
     H5Sget_simple_extent_dims(variables_dataspace, mDatasetDims, dataset_max_sizes);
 
-    for (unsigned i=1; i<AbstractHdf5Access::DATASET_DIMS; i++)  // Zero is excluded since it may be unlimited
+    for (unsigned i=1; i<AbstractHdf5Access::DATASET_DIMS; ++i)  // Zero is excluded since it may be unlimited
     {
         assert(mDatasetDims[i] == dataset_max_sizes[i]);
     }
@@ -139,7 +139,7 @@ void Hdf5DataReader::CommonConstructor()
     H5Sget_simple_extent_dims(attribute_space, &attr_dataspace_dim, nullptr);
 
     unsigned num_columns = H5Sget_simple_extent_npoints(attribute_space);
-    char* string_array = (char *)malloc(sizeof(char)*MAX_STRING_SIZE*(int)num_columns);
+    char* string_array = (char *)malloc(sizeof(char)*MAX_STRING_SIZE*static_cast<int>(num_columns));
     H5Aread(attribute_id, attribute_type, string_array);
 
     // Loop over column names and store them.
@@ -228,9 +228,9 @@ std::vector<double> Hdf5DataReader::GetVariableOverTime(const std::string& rVari
     if (!mIsDataComplete)
     {
         unsigned node_index = 0;
-        for (node_index=0; node_index<mIncompleteNodeIndices.size(); node_index++)
+        for (node_index = 0; node_index < mIncompleteNodeIndices.size(); ++node_index)
         {
-            if (mIncompleteNodeIndices[node_index]==nodeIndex)
+            if (mIncompleteNodeIndices[node_index] == nodeIndex)
             {
                 actual_node_index = node_index;
                 break;

@@ -175,22 +175,22 @@ void ContinuumMechanicsNeumannBcsAssembler<DIM>::DoAssemble()
     {
         c_vector<double, STENCIL_SIZE> b_elem = zero_vector<double>(STENCIL_SIZE);
 
-        for (unsigned bc_index=0; bc_index<mpProblemDefinition->rGetTractionBoundaryElements().size(); bc_index++)
+        for (unsigned bc_index = 0; bc_index<mpProblemDefinition->rGetTractionBoundaryElements().size(); bc_index++)
         {
             BoundaryElement<DIM-1,DIM>& r_boundary_element = *(mpProblemDefinition->rGetTractionBoundaryElements()[bc_index]);
             AssembleOnBoundaryElement(r_boundary_element, b_elem, bc_index);
 
             unsigned p_indices[STENCIL_SIZE];
-            for (unsigned i=0; i<NUM_NODES_PER_ELEMENT; i++)
+            for (unsigned i = 0; i < NUM_NODES_PER_ELEMENT; ++i)
             {
-                for (unsigned j=0; j<DIM; j++)
+                for (unsigned j = 0; j < DIM; ++j)
                 {
                     p_indices[DIM*i+j] = (DIM+1)*r_boundary_element.GetNodeGlobalIndex(i) + j;
                 }
             }
             // Note: The pressure block of b_elem will be zero, but this bit still needs to be
             // set to avoid memory leaks.
-            for (unsigned i=0; i<DIM /*vertices per boundary elem */; i++)
+            for (unsigned i = 0; i < DIM /*vertices per boundary elem */; ++i)
             {
                 p_indices[DIM*NUM_NODES_PER_ELEMENT + i] = (DIM+1)*r_boundary_element.GetNodeGlobalIndex(i)+DIM;
             }
@@ -213,7 +213,7 @@ void ContinuumMechanicsNeumannBcsAssembler<DIM>::AssembleOnBoundaryElement(Bound
 
     c_vector<double,NUM_NODES_PER_ELEMENT> phi;
 
-    for (unsigned quad_index=0; quad_index<mpQuadRule->GetNumQuadPoints(); quad_index++)
+    for (unsigned quad_index = 0; quad_index<mpQuadRule->GetNumQuadPoints(); quad_index++)
     {
         double wJ = jacobian_determinant * mpQuadRule->GetWeight(quad_index);
         const ChastePoint<DIM-1>& quad_point = mpQuadRule->rGetQuadPoint(quad_index);
@@ -232,7 +232,7 @@ void ContinuumMechanicsNeumannBcsAssembler<DIM>::AssembleOnBoundaryElement(Bound
                 NEVER_REACHED;
         }
 
-        for (unsigned index=0; index<NUM_NODES_PER_ELEMENT*DIM; index++)
+        for (unsigned index = 0; index<NUM_NODES_PER_ELEMENT*DIM; index++)
         {
             unsigned spatial_dim = index%DIM;
             unsigned node_index = (index-spatial_dim)/DIM;

@@ -525,7 +525,7 @@ public:
         archive & mpDistributedVectorFactory; // Needed when loading
         const unsigned num_cells = r_cells_distributed.size();
         archive & num_cells;
-        for (unsigned i=0; i<num_cells; i++)
+        for (unsigned i=0; i<num_cells; ++i)
         {
             AbstractDynamicallyLoadableEntity* p_entity = dynamic_cast<AbstractDynamicallyLoadableEntity*>(r_cells_distributed[i]);
             bool is_dynamic = (p_entity != NULL);
@@ -577,7 +577,7 @@ public:
             mCellsDistributed.resize(p_mesh_factory->GetLocalOwnership());
 #ifndef NDEBUG
             // Paranoia
-            for (unsigned i=0; i<mCellsDistributed.size(); i++)
+            for (unsigned i=0; i<mCellsDistributed.size(); ++i)
             {
                 assert(mCellsDistributed[i] == NULL);
             }

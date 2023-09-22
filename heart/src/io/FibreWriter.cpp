@@ -67,7 +67,7 @@ void FibreWriter<DIM>::WriteAllAxi(const std::vector< c_vector<double, DIM> >& f
         }
         else
         {
-            for (unsigned j=0; j<DIM; j++)
+            for (unsigned j = 0; j < DIM; ++j)
             {
                 *p_axi_file << fibres[i][j] << "\t";
             }
@@ -101,15 +101,15 @@ void FibreWriter<DIM>::WriteAllOrtho(const std::vector< c_vector<double, DIM> >&
         else
         {
             //The ascii file is row-major
-            for (unsigned j=0; j<DIM; j++)
+            for (unsigned j = 0; j < DIM; ++j)
             {
                 *p_file << fibres[i][j] << "\t";
             }
-            for (unsigned j=0; j<DIM; j++)
+            for (unsigned j = 0; j < DIM; ++j)
             {
                 *p_file << second[i][j] << "\t";
             }
-            for (unsigned j=0; j<DIM; j++)
+            for (unsigned j = 0; j < DIM; ++j)
             {
                 *p_file << third[i][j] << "\t";
             }

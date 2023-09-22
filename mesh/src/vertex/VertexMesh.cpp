@@ -48,7 +48,7 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nod
     Clear();
 
     // Populate mNodes and mElements
-    for (unsigned node_index = 0; node_index < nodes.size(); node_index++)
+    for (unsigned node_index = 0; node_index < nodes.size(); ++node_index)
     {
         Node<SPACE_DIM>* p_temp_node = nodes[node_index];
         this->mNodes.push_back(p_temp_node);
@@ -92,7 +92,7 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nod
         unsigned element_index = p_element->GetIndex();
         unsigned num_nodes_in_element = p_element->GetNumNodes();
 
-        for (unsigned node_index = 0; node_index < num_nodes_in_element; node_index++)
+        for (unsigned node_index = 0; node_index < num_nodes_in_element; ++node_index)
         {
             p_element->GetNode(node_index)->AddElement(element_index);
         }
@@ -113,7 +113,7 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nod
     Clear();
 
     // Populate mNodes mFaces and mElements
-    for (unsigned node_index = 0; node_index < nodes.size(); node_index++)
+    for (unsigned node_index = 0; node_index < nodes.size(); ++node_index)
     {
         Node<SPACE_DIM>* p_temp_node = nodes[node_index];
         this->mNodes.push_back(p_temp_node);
@@ -135,7 +135,7 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nod
     for (unsigned index = 0; index < mElements.size(); index++)
     {
         VertexElement<ELEMENT_DIM, SPACE_DIM>* p_temp_vertex_element = mElements[index];
-        for (unsigned node_index = 0; node_index < p_temp_vertex_element->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < p_temp_vertex_element->GetNumNodes(); ++node_index)
         {
             Node<SPACE_DIM>* p_temp_node = p_temp_vertex_element->GetNode(node_index);
             p_temp_node->AddElement(p_temp_vertex_element->GetIndex());
@@ -178,7 +178,7 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool
         GenerateVerticesFromElementCircumcentres(rMesh);
 
         // Loop over elements of the Delaunay mesh (which are nodes/vertices of this mesh)
-        for (unsigned i = 0; i < num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             // Loop over nodes owned by this triangular element in the Delaunay mesh
             // Add this node/vertex to each of the 3 vertex elements
@@ -209,7 +209,7 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool
             elem_iter != mpDelaunayMesh->GetElementIteratorEnd();
             ++elem_iter)
         {
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j=0; j<3; ++j)
             {
                 Node<2>* p_node_a = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex(j));
                 Node<2>* p_node_b = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex((j+1)%3));
@@ -277,7 +277,7 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool
         GenerateVerticesFromElementCircumcentres(extended_mesh);
 
         // Loop over elements of the Delaunay mesh (which are nodes/vertices of this mesh)
-        for (unsigned i = 0; i < num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             // Loop over nodes owned by this triangular element in the Delaunay mesh
             // Add this node/vertex to each of the 3 vertex elements
@@ -529,14 +529,14 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::GenerateVerticesFromElementCircumcentre
     double jacobian_det;
 
     // Loop over elements of the Delaunay mesh and populate mNodes
-    for (unsigned i = 0; i < rMesh.GetNumElements(); i++)
+    for (unsigned i = 0; i < rMesh.GetNumElements(); ++i)
     {
         // Calculate the circumcentre of this element in the Delaunay mesh
         rMesh.GetInverseJacobianForElement(i, jacobian, jacobian_det, inverse_jacobian);
         c_vector<double, SPACE_DIM + 1> circumsphere = rMesh.GetElement(i)->CalculateCircumsphere(jacobian, inverse_jacobian);
 
         c_vector<double, SPACE_DIM> circumcentre;
-        for (unsigned j = 0; j < SPACE_DIM; j++)
+        for (unsigned j = 0; j < SPACE_DIM; ++j)
         {
             circumcentre(j) = circumsphere(j);
         }
@@ -554,12 +554,12 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEdgeLength(
     if constexpr (SPACE_DIM == 2)
     {
         std::set<unsigned> node_indices_1;
-        for (unsigned i = 0; i < mElements[elementIndex1]->GetNumNodes(); i++)
+        for (unsigned i = 0; i < mElements[elementIndex1]->GetNumNodes(); ++i)
         {
             node_indices_1.insert(mElements[elementIndex1]->GetNodeGlobalIndex(i));
         }
         std::set<unsigned> node_indices_2;
-        for (unsigned i = 0; i < mElements[elementIndex2]->GetNumNodes(); i++)
+        for (unsigned i = 0; i < mElements[elementIndex2]->GetNumNodes(); ++i)
         {
             node_indices_2.insert(mElements[elementIndex2]->GetNodeGlobalIndex(i));
         }
@@ -731,14 +731,14 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
 {
     // Delete elements
-    for (unsigned i = 0; i < mElements.size(); i++)
+    for (unsigned i = 0; i < mElements.size(); ++i)
     {
         delete mElements[i];
     }
     mElements.clear();
 
     // Delete faces
-    for (unsigned i = 0; i < mFaces.size(); i++)
+    for (unsigned i = 0; i < mFaces.size(); ++i)
     {
         delete mFaces[i];
     }
@@ -746,7 +746,7 @@ void VertexMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
 
 
     // Delete nodes
-    for (unsigned i = 0; i < this->mNodes.size(); i++)
+    for (unsigned i = 0; i < this->mNodes.size(); ++i)
     {
         delete this->mNodes[i];
     }
@@ -1017,7 +1017,7 @@ void VertexMesh<2, 2>::ConstructFromMeshReader(AbstractMeshReader<2, 2>& rMeshRe
 
     // Add nodes
     std::vector<double> node_data;
-    for (unsigned i = 0; i < num_nodes; i++)
+    for (unsigned i = 0; i < num_nodes; ++i)
     {
         node_data = rMeshReader.GetNextNode();
         unsigned is_boundary_node = (bool)node_data[2];
@@ -1039,7 +1039,7 @@ void VertexMesh<2, 2>::ConstructFromMeshReader(AbstractMeshReader<2, 2>& rMeshRe
         // Get the nodes owned by this element
         std::vector<Node<2>*> nodes;
         unsigned num_nodes_in_element = element_data.NodeIndices.size();
-        for (unsigned j = 0; j < num_nodes_in_element; j++)
+        for (unsigned j = 0; j < num_nodes_in_element; ++j)
         {
             assert(element_data.NodeIndices[j] < this->mNodes.size());
             nodes.push_back(this->mNodes[element_data.NodeIndices[j]]);
@@ -1077,7 +1077,7 @@ void VertexMesh<3, 3>::ConstructFromMeshReader(AbstractMeshReader<3, 3>& rMeshRe
 
     // Add nodes
     std::vector<double> node_data;
-    for (unsigned i = 0; i < num_nodes; i++)
+    for (unsigned i = 0; i < num_nodes; ++i)
     {
         node_data = rMeshReader.GetNextNode();
         unsigned is_boundary_node = (bool)node_data[3];
@@ -1106,7 +1106,7 @@ void VertexMesh<3, 3>::ConstructFromMeshReader(AbstractMeshReader<3, 3>& rMeshRe
         // Get the nodes owned by this element
         std::vector<Node<3>*> nodes;
         unsigned num_nodes_in_element = element_data.NodeIndices.size();
-        for (unsigned j = 0; j < num_nodes_in_element; j++)
+        for (unsigned j = 0; j < num_nodes_in_element; ++j)
         {
             assert(element_data.NodeIndices[j] < this->mNodes.size());
             nodes.push_back(this->mNodes[element_data.NodeIndices[j]]);
@@ -1115,7 +1115,7 @@ void VertexMesh<3, 3>::ConstructFromMeshReader(AbstractMeshReader<3, 3>& rMeshRe
         // Get the faces owned by this element
         std::vector<VertexElement<2, 3>*> faces;
         unsigned num_faces_in_element = element_data.Faces.size();
-        for (unsigned i = 0; i < num_faces_in_element; i++)
+        for (unsigned i = 0; i < num_faces_in_element; ++i)
         {
             // Get the data for this face
             ElementData face_data = element_data.Faces[i];
@@ -1126,7 +1126,7 @@ void VertexMesh<3, 3>::ConstructFromMeshReader(AbstractMeshReader<3, 3>& rMeshRe
             // Get the nodes owned by this face
             std::vector<Node<3>*> nodes_in_face;
             unsigned num_nodes_in_face = face_data.NodeIndices.size();
-            for (unsigned j = 0; j < num_nodes_in_face; j++)
+            for (unsigned j = 0; j < num_nodes_in_face; ++j)
             {
                 assert(face_data.NodeIndices[j] < this->mNodes.size());
                 nodes_in_face.push_back(this->mNodes[face_data.NodeIndices[j]]);
@@ -1145,7 +1145,7 @@ void VertexMesh<3, 3>::ConstructFromMeshReader(AbstractMeshReader<3, 3>& rMeshRe
             {
                 // ... otherwise use the member of mFaces with this index
                 bool face_added = false;
-                for (unsigned k = 0; k < mFaces.size(); k++)
+                for (unsigned k = 0; k < mFaces.size(); ++k)
                 {
                     if (mFaces[k]->GetIndex() == face_index)
                     {

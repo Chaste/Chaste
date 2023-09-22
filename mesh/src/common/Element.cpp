@@ -64,7 +64,7 @@ Element<ELEMENT_DIM, SPACE_DIM>::Element(const Element& rElement, const unsigned
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void Element<ELEMENT_DIM, SPACE_DIM>::RegisterWithNodes()
 {
-    for (unsigned i=0; i<this->mNodes.size(); i++)
+    for (unsigned i=0; i<this->mNodes.size(); ++i)
     {
         this->mNodes[i]->AddElement(this->mIndex);
     }
@@ -75,7 +75,7 @@ void Element<ELEMENT_DIM, SPACE_DIM>::MarkAsDeleted()
 {
     this->mIsDeleted = true;
     // Update nodes in this element so they know they are not contained by us
-    for (unsigned i=0; i<this->GetNumNodes(); i++)
+    for (unsigned i=0; i<this->GetNumNodes(); ++i)
     {
         this->mNodes[i]->RemoveElement(this->mIndex);
     }
@@ -104,7 +104,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void Element<ELEMENT_DIM, SPACE_DIM>::ResetIndex(unsigned index)
 {
     //std::cout << "ResetIndex - removing nodes.\n" << std::flush;
-    for (unsigned i=0; i<this->GetNumNodes(); i++)
+    for (unsigned i=0; i<this->GetNumNodes(); ++i)
     {
        //std::cout << "Node " << this->mNodes[i]->GetIndex() << " element "<< this->mIndex << std::flush;
        this->mNodes[i]->RemoveElement(this->mIndex);
@@ -125,33 +125,38 @@ c_vector<double,SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateCircumsph
      * where (x,y,z) is the circumcentre
      *
      */
-
-    assert(ELEMENT_DIM == SPACE_DIM);     // LCOV_EXCL_LINE
-    c_vector<double, ELEMENT_DIM> rhs;
-
-    for (unsigned j=0; j<ELEMENT_DIM; j++)
+    if constexpr (ELEMENT_DIM == SPACE_DIM)
     {
-        double squared_location=0.0;
-        for (unsigned i=0; i<SPACE_DIM; i++)
+        c_vector<double, ELEMENT_DIM> rhs;
+
+        for (unsigned j=0; j<ELEMENT_DIM; ++j)
         {
-            //mJacobian(i,j) is the i-th component of j-th vertex (relative to vertex 0)
-            squared_location += rJacobian(i,j)*rJacobian(i,j);
+            double squared_location=0.0;
+            for (unsigned i=0; i<SPACE_DIM; ++i)
+            {
+                //mJacobian(i,j) is the i-th component of j-th vertex (relative to vertex 0)
+                squared_location += rJacobian(i,j)*rJacobian(i,j);
+            }
+            rhs[j]=squared_location/2.0;
         }
-        rhs[j]=squared_location/2.0;
-    }
 
-    c_vector<double, SPACE_DIM> centre;
-    centre = prod(rhs, rInverseJacobian);
-    c_vector<double, SPACE_DIM+1> circum;
-    double squared_radius = 0.0;
-    for (unsigned i=0; i<SPACE_DIM; i++)
+        c_vector<double, SPACE_DIM> centre;
+        centre = prod(rhs, rInverseJacobian);
+        c_vector<double, SPACE_DIM+1> circum;
+        double squared_radius = 0.0;
+        for (unsigned i=0; i<SPACE_DIM; ++i)
+        {
+            circum[i] = centre[i] + this->GetNodeLocation(0,i);
+            squared_radius += centre[i]*centre[i];
+        }
+        circum[SPACE_DIM] = squared_radius;
+
+        return circum;
+    }
+    else
     {
-        circum[i] = centre[i] + this->GetNodeLocation(0,i);
-        squared_radius += centre[i]*centre[i];
+        NEVER_REACHED;
     }
-    circum[SPACE_DIM] = squared_radius;
-
-    return circum;
 }
 
 /**
@@ -211,10 +216,10 @@ c_vector <double, 2> Element<ELEMENT_DIM, SPACE_DIM>::CalculateMinMaxEdgeLengths
     c_vector <double, 2> min_max;
     min_max[0] = DBL_MAX; //Min initialised to very large
     min_max[1] = 0.0;     //Max initialised to zero
-    for (unsigned i=0; i<=ELEMENT_DIM; i++)
+    for (unsigned i=0; i<=ELEMENT_DIM; ++i)
     {
         c_vector<double, SPACE_DIM> loc_i = this->GetNodeLocation(i);
-        for (unsigned j=i+1; j<=ELEMENT_DIM; j++)
+        for (unsigned j=i+1; j<=ELEMENT_DIM; ++j)
         {
             double length = norm_2(this->GetNodeLocation(j) - loc_i);
             if (length < min_max[0])
@@ -234,84 +239,99 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateInterpolationWeights(const ChastePoint<SPACE_DIM>& rTestPoint)
 {
     // Can only test if it's a tetrahedral mesh in 3d, triangles in 2d...
-    assert(ELEMENT_DIM == SPACE_DIM);     // LCOV_EXCL_LINE
-
-    c_vector<double, SPACE_DIM+1> weights;
-
-    c_vector<double, SPACE_DIM> xi = CalculateXi(rTestPoint);
-
-    // Copy 3 weights and compute the fourth weight
-    weights[0] = 1.0;
-    for (unsigned i=1; i<=SPACE_DIM; i++)
+    if constexpr (ELEMENT_DIM == SPACE_DIM)
     {
-        weights[0] -= xi[i-1];
-        weights[i] = xi[i-1];
+        c_vector<double, SPACE_DIM+1> weights;
+
+        c_vector<double, SPACE_DIM> xi = CalculateXi(rTestPoint);
+
+        // Copy 3 weights and compute the fourth weight
+        weights[0] = 1.0;
+        for (unsigned i=1; i<=SPACE_DIM; ++i)
+        {
+            weights[0] -= xi[i-1];
+            weights[i] = xi[i-1];
+        }
+        return weights;
     }
-    return weights;
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateInterpolationWeightsWithProjection(const ChastePoint<SPACE_DIM>& rTestPoint)
 {
-    //Can only test if it's a tetrahedral mesh in 3d, triangles in 2d...
-    assert(ELEMENT_DIM == SPACE_DIM);     // LCOV_EXCL_LINE
-
-    c_vector<double, SPACE_DIM+1> weights = CalculateInterpolationWeights(rTestPoint);
-
-    // Check for negative weights and set them to zero.
-    bool negative_weight = false;
-
-    for (unsigned i=0; i<=SPACE_DIM; i++)
+    // Can only test if it's a tetrahedral mesh in 3d, triangles in 2d...
+    if constexpr (ELEMENT_DIM == SPACE_DIM)
     {
-        if (weights[i] < 0.0)
+        c_vector<double, SPACE_DIM+1> weights = CalculateInterpolationWeights(rTestPoint);
+
+        // Check for negative weights and set them to zero.
+        bool negative_weight = false;
+
+        for (unsigned i=0; i<=SPACE_DIM; ++i)
         {
-            weights[i] = 0.0;
+            if (weights[i] < 0.0)
+            {
+                weights[i] = 0.0;
 
-            negative_weight = true;
+                negative_weight = true;
+            }
         }
-    }
 
-    if (negative_weight == false)
-    {
-        // If there are no negative weights, there is nothing to do.
+        if (negative_weight == false)
+        {
+            // If there are no negative weights, there is nothing to do.
+            return weights;
+        }
+
+        // Renormalise so that all weights add to 1.0.
+
+        // Note that all elements of weights are now non-negative and so the l1-norm (sum of magnitudes) is equivalent to the sum of the elements of the vector
+        double sum = norm_1 (weights);
+
+        // l1-norm ought to be above 1 (because we scrubbed negative weights)
+        // However, if we scrubbed weights that were the size of the machine precision then we might be close to one (even less than 1).
+        assert( sum + DBL_EPSILON >= 1.0);
+
+        // We might skip this division when sum ~= 1
+        weights = weights/sum;
+
         return weights;
     }
-
-    // Renormalise so that all weights add to 1.0.
-
-    // Note that all elements of weights are now non-negative and so the l1-norm (sum of magnitudes) is equivalent to the sum of the elements of the vector
-    double sum = norm_1 (weights);
-
-    //l1-norm ought to be above 1 (because we scrubbed negative weights)
-    //However, if we scrubbed weights that were the size of the machine precision then we might be close to one (even less than 1).
-    assert( sum + DBL_EPSILON >= 1.0);
-
-    //We might skip this division when sum ~= 1
-    weights = weights/sum;
-
-    return weights;
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> Element<ELEMENT_DIM, SPACE_DIM>::CalculateXi(const ChastePoint<SPACE_DIM>& rTestPoint)
 {
-    //Can only test if it's a tetrahedral mesh in 3d, triangles in 2d...
-    assert(ELEMENT_DIM == SPACE_DIM);     // LCOV_EXCL_LINE
+    // Can only test if it's a tetrahedral mesh in 3d, triangles in 2d...
+    if constexpr (ELEMENT_DIM == SPACE_DIM)
+    {
+        // Find the location with respect to node 0
+    ///\todo: #1361 ComputeContainingElements and related methods, and methods called by that down to
+    /// here, should really take in const c_vector& rather than ChastePoints.
+        c_vector<double, SPACE_DIM> test_location=rTestPoint.rGetLocation()-this->GetNodeLocation(0);
 
-    // Find the location with respect to node 0
-///\todo: #1361 ComputeContainingElements and related methods, and methods called by that down to
-/// here, should really take in const c_vector& rather than ChastePoints.
-    c_vector<double, SPACE_DIM> test_location=rTestPoint.rGetLocation()-this->GetNodeLocation(0);
+        //Multiply by inverse Jacobian
+        c_matrix<double, SPACE_DIM, ELEMENT_DIM> jacobian;
+        c_matrix<double, ELEMENT_DIM, SPACE_DIM> inverse_jacobian;
+        double jacobian_determinant;
 
-    //Multiply by inverse Jacobian
-    c_matrix<double, SPACE_DIM, ELEMENT_DIM> jacobian;
-    c_matrix<double, ELEMENT_DIM, SPACE_DIM> inverse_jacobian;
-    double jacobian_determinant;
+        ///\todo #1326 This method shouldn't need a new Jacobian inverse for every Xi
+        this->CalculateInverseJacobian(jacobian, jacobian_determinant, inverse_jacobian);
 
-    ///\todo #1326 This method shouldn't need a new Jacobian inverse for every Xi
-    this->CalculateInverseJacobian(jacobian, jacobian_determinant, inverse_jacobian);
-
-    return prod(inverse_jacobian, test_location);
+        return prod(inverse_jacobian, test_location);
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 
@@ -319,32 +339,37 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool Element<ELEMENT_DIM, SPACE_DIM>::IncludesPoint(const ChastePoint<SPACE_DIM>& rTestPoint, bool strict)
 {
     // Can only test if it's a tetrahedral mesh in 3d, triangles in 2d...
-    assert(ELEMENT_DIM == SPACE_DIM);     // LCOV_EXCL_LINE
-
-    c_vector<double, SPACE_DIM+1> weights=CalculateInterpolationWeights(rTestPoint);
-
-    // If the point is in the simplex then all the weights should be positive.
-
-    for (unsigned i=0; i<=SPACE_DIM; i++)
+    if constexpr (ELEMENT_DIM == SPACE_DIM)
     {
-        if (strict)
+        c_vector<double, SPACE_DIM+1> weights = CalculateInterpolationWeights(rTestPoint);
+
+        // If the point is in the simplex then all the weights should be positive.
+
+        for (unsigned i=0; i<=SPACE_DIM; ++i)
         {
-            // Points can't be close to a face
-            if (weights[i] <= 2*DBL_EPSILON)
+            if (strict)
             {
-                return false;
+                // Points can't be close to a face
+                if (weights[i] <= 2*DBL_EPSILON)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                // Allow point to be close to a face
+                if (weights[i] < -2*DBL_EPSILON)
+                {
+                    return false;
+                }
             }
         }
-        else
-        {
-            // Allow point to be close to a face
-            if (weights[i] < -2*DBL_EPSILON)
-            {
-                return false;
-            }
-        }
+        return true;
     }
-    return true;
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 // Explicit instantiation

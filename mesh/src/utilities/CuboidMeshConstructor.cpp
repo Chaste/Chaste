@@ -40,17 +40,22 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CuboidMeshConstructor<ELEMENT_DIM, SPACE_DIM>::Construct(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh, unsigned meshRefinementNum, double meshWidth)
 {
     // The class has only been tested for ELEMENT_DIM == SPACE_DIM or ELEMENT_DIM == 1 && SPACE_DIM == 3
-    assert(ELEMENT_DIM == SPACE_DIM || (ELEMENT_DIM == 1 && SPACE_DIM == 3));
+    if constexpr (ELEMENT_DIM == SPACE_DIM || (ELEMENT_DIM == 1 && SPACE_DIM == 3))
+    {
+      mMeshWidth = meshWidth;
+      assert(meshRefinementNum < 30); // Sanity
 
-    mMeshWidth = meshWidth;
-    assert(meshRefinementNum < 30); // Sanity
-
-    // Create the mesh
-    unsigned mesh_size = SmallPow(2u, meshRefinementNum+2); // number of elements in each dimension
-    double scaling = mMeshWidth/(double) mesh_size;
-    rMesh.ConstructRegularSlabMesh(scaling, mMeshWidth, mMeshWidth, mMeshWidth);
-    mNumElements = rMesh.GetNumElements();
-    mNumNodes = rMesh.GetNumNodes();
+      // Create the mesh
+      unsigned mesh_size = SmallPow(2u, meshRefinementNum+2); // number of elements in each dimension
+      double scaling = mMeshWidth/(double) mesh_size;
+      rMesh.ConstructRegularSlabMesh(scaling, mMeshWidth, mMeshWidth, mMeshWidth);
+      mNumElements = rMesh.GetNumElements();
+      mNumNodes = rMesh.GetNumNodes();
+    }
+    else
+    {
+      NEVER_REACHED;
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

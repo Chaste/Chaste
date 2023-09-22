@@ -255,7 +255,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 12u);
 
         // Check all nodes have 2 attributes
-        for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
         {
             TS_ASSERT_EQUALS(mesh.GetNode(node_index)->rGetNodeAttributes().size(), 2u);
         }
@@ -301,7 +301,7 @@ public:
             mesh.GetBoundaryElementIteratorBegin();
         while (it != mesh.GetBoundaryElementIteratorEnd())
         {
-            for (unsigned i=0; i<(*it)->GetNumNodes(); i++)
+            for (unsigned i = 0; i<(*it)->GetNumNodes(); ++i)
             {
                 TS_ASSERT((*it)->GetNode(i)->IsBoundaryNode());
             }
@@ -809,7 +809,7 @@ public:
         mesh.GetDistributedVectorFactory(); //First touch should run SetElementOwnerships
 
         bool unowned_element = false;
-        for (unsigned ele_num=0; ele_num< mesh.GetNumElements(); ele_num++)
+        for (unsigned ele_num = 0; ele_num< mesh.GetNumElements(); ele_num++)
         {
             if (mesh.GetElement(ele_num)->GetOwnership() == false)
             {
@@ -834,7 +834,7 @@ public:
         TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
-        for (unsigned i=0; i<mesh.GetNumBoundaryElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumBoundaryElements(); ++i)
         {
             BoundaryElement<2,3>* p_b_element = mesh.GetBoundaryElement(i);
             c_vector<double, 3> normal;
@@ -924,7 +924,7 @@ public:
         // Assuming that each cube is split into 6 tetrahedra
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 6*width*height*depth );
 
-        for (unsigned i=0; i<mesh.GetNumBoundaryElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumBoundaryElements(); ++i)
         {
             BoundaryElement<2,3>* p_b_element = mesh.GetBoundaryElement(i);
             c_vector<double, 3> normal;
@@ -1000,7 +1000,7 @@ public:
         // Make identity permuation
         std::vector<unsigned> perm;
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             perm.push_back(i);
         }
@@ -1521,7 +1521,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumElementAttributes(), 1u);
 
         // The first few are unsigned
-        for (unsigned i=0; i<5; i++)
+        for (unsigned i = 0; i<5; ++i)
         {
             TS_ASSERT_EQUALS(mesh.GetElement(i)->GetUnsignedAttribute(), i%5+1);
         }
@@ -1535,7 +1535,7 @@ public:
 
         TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 1u);
 
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             TS_ASSERT_EQUALS(mesh.GetElement(i)->GetUnsignedAttribute(), (i+1)%3+1);
         }
@@ -1543,7 +1543,7 @@ public:
        TS_ASSERT_EQUALS(mesh_reader.GetNumFaceAttributes(), 1u);
 
         bool read_zero_attribute = false;
-        for (unsigned i=0; i<mesh.GetNumBoundaryElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumBoundaryElements(); ++i)
         {
             if (mesh.GetBoundaryElement(i)->GetUnsignedAttribute()==0u)
             {
@@ -1562,7 +1562,7 @@ public:
 
         TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 0u);
 
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             TS_ASSERT_DELTA(mesh.GetElement(i)->GetAttribute(), 0u, 1e-12);
         }
@@ -1573,7 +1573,7 @@ public:
         // * All internal edges are marked with 0
         // * All external edges were marked as 1 by triangle
         // * The final edge marker has been edited from 1 to 2
-        for (unsigned i=0; i<mesh.GetNumBoundaryElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumBoundaryElements(); ++i)
         {
             if (i==99)
             {

@@ -145,12 +145,17 @@ StokesFlowSolver<DIM>::StokesFlowSolver(AbstractTetrahedralMesh<DIM,DIM>& rQuadM
       mrProblemDefinition(rProblemDefinition),
       mKspAbsoluteTol(-1)
 {
-    assert(DIM==2 || DIM==3);
-    assert(!mrProblemDefinition.rGetDirichletNodes().empty());
-
-    mpStokesFlowAssembler = new StokesFlowAssembler<DIM>(&this->mrQuadMesh, &mrProblemDefinition);
-    mpStokesFlowPreconditionerAssembler = new StokesFlowPreconditionerAssembler<DIM>(&this->mrQuadMesh, &mrProblemDefinition);
-    mpNeumannBcsAssembler = new ContinuumMechanicsNeumannBcsAssembler<DIM>(&this->mrQuadMesh, &mrProblemDefinition);
+    if constexpr (DIM == 2 || DIM == 3)
+    {
+        assert(!mrProblemDefinition.rGetDirichletNodes().empty());
+        mpStokesFlowAssembler = new StokesFlowAssembler<DIM>(&this->mrQuadMesh, &mrProblemDefinition);
+        mpStokesFlowPreconditionerAssembler = new StokesFlowPreconditionerAssembler<DIM>(&this->mrQuadMesh, &mrProblemDefinition);
+        mpNeumannBcsAssembler = new ContinuumMechanicsNeumannBcsAssembler<DIM>(&this->mrQuadMesh, &mrProblemDefinition);
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template<unsigned DIM>
@@ -224,9 +229,9 @@ void StokesFlowSolver<DIM>::Solve()
 //    ///// For printing matrix when debugging
 //    OutputFileHandler handler("TEMP");
 //    out_stream p_file = handler.OpenOutputFile("matrix.txt");
-//    for (unsigned i=0; i<this->mNumDofs; i++)
+//    for (unsigned i = 0; i < this->mNumDofs; ++i)
 //    {
-//        for (unsigned j=0; j<this->mNumDofs; j++)
+//        for (unsigned j = 0; j < this->mNumDofs; ++j)
 //        {
 //            *p_file << PetscMatTools::GetElement(this->mSystemLhsMatrix, i, j) << " ";
 //        }
@@ -235,7 +240,7 @@ void StokesFlowSolver<DIM>::Solve()
 //    p_file->close();
 //
 //    out_stream p_file2 = handler.OpenOutputFile("rhs.txt");
-//    for (unsigned i=0; i<this->mNumDofs; i++)
+//    for (unsigned i = 0; i < this->mNumDofs; ++i)
 //    {
 //        *p_file2 << PetscVecTools::GetElement(this->mLinearSystemRhsVector, i) << "\n";
 //    }
@@ -264,7 +269,7 @@ void StokesFlowSolver<DIM>::Solve()
 
     // Copy solution into the std::vector
     ReplicatableVector solution_repl(solution);
-    for (unsigned i=0; i<this->mNumDofs; i++)
+    for (unsigned i = 0; i < this->mNumDofs; ++i)
     {
         this->mCurrentSolution[i] = solution_repl[i];
     }
@@ -325,9 +330,9 @@ template<unsigned DIM>
 std::vector<c_vector<double,DIM> >& StokesFlowSolver<DIM>::rGetSpatialSolution()
 {
     this->mSpatialSolution.resize(this->mrQuadMesh.GetNumNodes(), zero_vector<double>(DIM));
-    for (unsigned i=0; i<this->mrQuadMesh.GetNumNodes(); i++)
+    for (unsigned i = 0; i < this->mrQuadMesh.GetNumNodes(); ++i)
     {
-        for (unsigned j=0; j<DIM; j++)
+        for (unsigned j = 0; j < DIM; ++j)
         {
             // DIM+1 is the problem dimension
             this->mSpatialSolution[i](j) = this->mCurrentSolution[(DIM+1)*i+j];

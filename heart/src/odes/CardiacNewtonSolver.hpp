@@ -99,7 +99,7 @@ public:
             norm_of_update = norm_inf(mUpdate);
 
             // Update current guess and recalculate residual
-            for (unsigned i=0; i<SIZE; i++)
+            for (unsigned i=0; i<SIZE; ++i)
             {
                 rCurrentGuess[i] -= mUpdate[i];
             }
@@ -116,7 +116,7 @@ public:
                 //Work out where the biggest change in the guess has happened.
                 double relative_change_max = 0.0;
                 unsigned relative_change_direction = 0;
-                for (unsigned i=0; i<SIZE; i++)
+                for (unsigned i=0; i<SIZE; ++i)
                 {
                     double relative_change = fabs(mUpdate[i]/rCurrentGuess[i]);
                     if (relative_change > relative_change_max)
@@ -177,22 +177,22 @@ protected:
      */
     void SolveLinearSystem()
     {
-        for (unsigned i=0; i<SIZE; i++)
+        for (unsigned i = 0; i < SIZE; ++i)
         {
-            for (unsigned ii=i+1; ii<SIZE; ii++)
+            for (unsigned ii = i+1; ii < SIZE; ++ii)
             {
                 double fact = mJacobian[ii][i]/mJacobian[i][i];
-                for (unsigned j=i; j<SIZE; j++)
+                for (unsigned j = i; j < SIZE; ++j)
                 {
                     mJacobian[ii][j] -= fact*mJacobian[i][j];
                 }
                 mResidual[ii] -= fact*mResidual[i];
             }
         }
-        for (unsigned i=SIZE; i-- > 0; )
+        for (unsigned i = SIZE; i-- > 0;)
         {
             mUpdate[i] = mResidual[i];
-            for (unsigned j=i+1; j<SIZE; j++)
+            for (unsigned j = i+1; j < SIZE; ++j)
             {
                 mUpdate[i] -= mJacobian[i][j]*mUpdate[j];
             }

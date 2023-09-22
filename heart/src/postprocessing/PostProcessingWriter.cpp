@@ -80,7 +80,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
     {
         std::vector<std::pair<double,double> > apd_maps;
         HeartConfig::Instance()->GetApdMaps(apd_maps);
-        for (unsigned i=0; i<apd_maps.size(); i++)
+        for (unsigned i=0; i<apd_maps.size(); ++i)
         {
             WriteApdMapFile(apd_maps[i].first, apd_maps[i].second);
         }
@@ -90,7 +90,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
     {
         std::vector<double> upstroke_time_maps;
         HeartConfig::Instance()->GetUpstrokeTimeMaps(upstroke_time_maps);
-        for (unsigned i=0; i<upstroke_time_maps.size(); i++)
+        for (unsigned i=0; i<upstroke_time_maps.size(); ++i)
         {
             WriteUpstrokeTimeMap(upstroke_time_maps[i]);
         }
@@ -100,7 +100,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
     {
         std::vector<double> upstroke_velocity_maps;
         HeartConfig::Instance()->GetMaxUpstrokeVelocityMaps(upstroke_velocity_maps);
-        for (unsigned i=0; i<upstroke_velocity_maps.size(); i++)
+        for (unsigned i=0; i<upstroke_velocity_maps.size(); ++i)
         {
             WriteMaxUpstrokeVelocityMap(upstroke_velocity_maps[i]);
         }
@@ -114,7 +114,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
         //get the mesh here
         DistanceMapCalculator<ELEMENT_DIM, SPACE_DIM> dist_map_calculator(mrMesh);
 
-        for (unsigned i=0; i<conduction_velocity_maps.size(); i++)
+        for (unsigned i=0; i<conduction_velocity_maps.size(); ++i)
         {
             std::vector<double> distance_map;
             std::vector<unsigned> origin_surface;
@@ -140,7 +140,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
         /// needed because PseudoEcgCalculator makes its own Hdf5DataReader.
         delete mpDataReader;
 
-        for (unsigned i=0; i<electrodes.size(); i++)
+        for (unsigned i=0; i<electrodes.size(); ++i)
         {
             PseudoEcgCalculator<ELEMENT_DIM,SPACE_DIM,1> calculator(mrMesh,
                                                                     electrodes[i],
@@ -263,7 +263,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteUpstrokeTimeMap(double t
 {
     std::vector<std::vector<double> > output_data;
     //Fill in data
-    for (unsigned node_index = mLo; node_index < mHi; node_index++)
+    for (unsigned node_index = mLo; node_index < mHi; ++node_index)
     {
         std::vector<double> upstroke_times;
         try
@@ -271,7 +271,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteUpstrokeTimeMap(double t
             upstroke_times = mpCalculator->CalculateUpstrokeTimes(node_index, threshold);
             assert(upstroke_times.size() != 0);
         }
-        catch(Exception&)
+        catch (Exception&)
         {
             upstroke_times.push_back(0);
             assert(upstroke_times.size() == 1);
@@ -289,7 +289,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteMaxUpstrokeVelocityMap(d
 {
     std::vector<std::vector<double> > output_data;
     //Fill in data
-    for (unsigned node_index = mLo; node_index < mHi; node_index++)
+    for (unsigned node_index = mLo; node_index < mHi; ++node_index)
     {
         std::vector<double> upstroke_velocities;
         try
@@ -297,7 +297,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteMaxUpstrokeVelocityMap(d
             upstroke_velocities = mpCalculator->CalculateAllMaximumUpstrokeVelocities(node_index, threshold);
             assert(upstroke_velocities.size() != 0);
         }
-        catch(Exception&)
+        catch (Exception&)
         {
             upstroke_velocities.push_back(0);
             assert(upstroke_velocities.size() ==1);
@@ -323,7 +323,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteConductionVelocityMap(un
             conduction_velocities = mpCalculator->CalculateAllConductionVelocities(originNode, dest_node, distancesFromOriginNode[dest_node]);
             assert(conduction_velocities.size() != 0);
         }
-        catch(Exception&)
+        catch (Exception&)
         {
             conduction_velocities.push_back(0);
             assert(conduction_velocities.size() == 1);
@@ -342,7 +342,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteAboveThresholdDepolarisa
     std::vector<std::vector<double> > output_data;
 
     //Fill in data
-    for (unsigned node_index = mLo; node_index < mHi; node_index++)
+    for (unsigned node_index = mLo; node_index < mHi; ++node_index)
     {
         std::vector<double> upstroke_velocities;
         std::vector<unsigned> above_threshold_depolarisations;
@@ -354,7 +354,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteAboveThresholdDepolarisa
             upstroke_velocities = mpCalculator->CalculateAllMaximumUpstrokeVelocities(node_index, threshold);
             assert(upstroke_velocities.size() != 0);
         }
-        catch(Exception&)
+        catch (Exception&)
         {
             upstroke_velocities.push_back(0);
             assert(upstroke_velocities.size() == 1);
@@ -428,7 +428,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteVariablesOverTimeAtNodes
         {
             //allocate memory: NXM matrix where N = number of time steps and M number of requested nodes
             output_data.resize( mpDataReader->GetUnlimitedDimensionValues().size() );
-            for (unsigned j = 0; j < mpDataReader->GetUnlimitedDimensionValues().size(); j++)
+            for (unsigned j = 0; j < mpDataReader->GetUnlimitedDimensionValues().size(); ++j)
             {
                 output_data[j].resize(rNodeIndices.size());
             }
@@ -483,7 +483,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteGenericFileToMeshalyzer(
         // Write data
         for (unsigned line_number=0; line_number<rDataPayload.size(); line_number++)
         {
-            for (unsigned i = 0; i < rDataPayload[line_number].size(); i++)
+            for (unsigned i = 0; i < rDataPayload[line_number].size(); ++i)
             {
                 *p_file << rDataPayload[line_number][i] << "\t";
             }

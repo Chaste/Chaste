@@ -74,7 +74,7 @@ public:
         parallel_writer.EndDefineMode();
 
         // Write multiple times
-        for (unsigned i=0; i<REPETITIONS; i++)
+        for (unsigned i=0; i<REPETITIONS; ++i)
         {
             double time = (double)i;
             parallel_writer.PutVariable(time_var_id, time);

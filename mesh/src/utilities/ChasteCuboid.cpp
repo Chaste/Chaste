@@ -88,7 +88,7 @@ unsigned ChasteCuboid<SPACE_DIM>::GetLongestAxis() const
 {
     unsigned axis = 0;
     double max_dimension = 0.0;
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i=0; i<SPACE_DIM; ++i)
     {
         double dimension =  mUpperCorner[i] - mLowerCorner[i];
         if (dimension > max_dimension)

@@ -85,15 +85,15 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
     for (unsigned item_num=0; item_num<num_nodes; item_num++)
     {
         std::vector<double> current_item = this->GetNextNode(); //this->mNodeData[item_num];
-        for (unsigned i=0; i<SPACE_DIM; i++)
+        for (unsigned i=0; i<SPACE_DIM; ++i)
         {
             *p_node_file << current_item[i] << "\t";
         }
-        if (SPACE_DIM==2)
+        if (SPACE_DIM == 2)
         {
             *p_node_file << 0 << "\t";
         }
-        if (SPACE_DIM==1)
+        if (SPACE_DIM == 1)
         {
             *p_node_file << 0 << "\t" << 0 << "\t";
         }
@@ -133,7 +133,7 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
         ElementData element_data = this->GetNextElement();
 
         std::vector<unsigned> current_item = element_data.NodeIndices;
-        for (unsigned i=0; i<nodes_per_element; i++)
+        for (unsigned i=0; i<nodes_per_element; ++i)
         {
             if (this->mIndexFromZero)
             {
@@ -150,7 +150,7 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
     *p_element_file << comment;
     p_element_file->close();
 
-    if (ELEMENT_DIM==3)
+    if (ELEMENT_DIM == 3)
     {
         // Write boundary face file
         out_stream p_face_file = OpenFaceFile();
@@ -165,7 +165,7 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
         for (unsigned item_num=0; item_num<num_faces; item_num++)
         {
             ElementData current_item = this->GetNextBoundaryElement();
-            for (unsigned i=0; i<ELEMENT_DIM; i++)
+            for (unsigned i=0; i<ELEMENT_DIM; ++i)
             {
                 if (this->mIndexFromZero)
                 {
@@ -286,7 +286,7 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::CreateFilesWithHeaders()
     /*
      * Face file
      */
-    if (ELEMENT_DIM==3)
+    if (ELEMENT_DIM == 3)
     {
         // Write boundary face file
         out_stream p_face_file = OpenFaceFile();
@@ -314,15 +314,15 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
          ++iter)
     {
         const c_vector<double, SPACE_DIM>& r_current_item = iter->rGetLocation();
-        for (unsigned i=0; i<SPACE_DIM; i++)
+        for (unsigned i=0; i<SPACE_DIM; ++i)
         {
             *p_node_file << r_current_item[i] << "\t";
         }
-        if (SPACE_DIM==2)
+        if (SPACE_DIM == 2)
         {
             *p_node_file << 0 << "\t";
         }
-        if (SPACE_DIM==1)
+        if (SPACE_DIM == 1)
         {
             *p_node_file << 0 << "\t" << 0 << "\t";
         }
@@ -340,7 +340,7 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
     {
         if (this->mpDistributedMesh->CalculateDesignatedOwnershipOfElement(iter->GetIndex()))
         {
-            for (unsigned i=0; i<this->mNodesPerElement; i++)
+            for (unsigned i=0; i<this->mNodesPerElement; ++i)
             {
                 if (this->mIndexFromZero)
                 {
@@ -370,7 +370,7 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
         {
             if (this->mpDistributedMesh->CalculateDesignatedOwnershipOfBoundaryElement((*iter)->GetIndex()))
             {
-                for (unsigned i=0; i<ELEMENT_DIM; i++)
+                for (unsigned i=0; i<ELEMENT_DIM; ++i)
                 {
                     if (this->mIndexFromZero)
                     {

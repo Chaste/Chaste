@@ -75,9 +75,9 @@ private:
         //Compare data
         TS_ASSERT_EQUALS(fibres1.size(), fibres2.size());
 
-        for (unsigned i = 0u; i< fibres1.size(); i++)
+        for (unsigned i = 0u; i< fibres1.size(); ++i)
         {
-            for (unsigned j = 0; j< 3u ; j++)
+            for (unsigned j = 0; j< 3u ; ++j)
             {
                 TS_ASSERT_DELTA(fibres1[i][j], fibres2[i][j], 1e-10);
                 TS_ASSERT_DELTA(second1[i][j], second2[i][j], 1e-10);
@@ -202,7 +202,7 @@ public:
             TS_ASSERT(ifs.is_open());
             std::vector<double> payload;
             payload.reserve(mesh.GetNumNodes());
-            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
             {
                 double temp;
                 ifs >> temp;

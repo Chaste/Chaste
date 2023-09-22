@@ -232,7 +232,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetFixedExtracellularPotentialNodes(
             std::vector<unsigned> fixedExtracellularPotentialNodes)
 {
-    for (unsigned i=0; i<fixedExtracellularPotentialNodes.size(); i++)
+    for (unsigned i=0; i<fixedExtracellularPotentialNodes.size(); ++i)
     {
         if (fixedExtracellularPotentialNodes[i] >= this->mpMesh->GetNumNodes() )
         {
@@ -245,7 +245,7 @@ void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetFixedExtracellula
     // We will need to recalculate this when HasDirichletBoundaryConditions() is called.
     this->mpBoundaryConditions->ResetDirichletCommunication();
 
-    for (unsigned i=0; i<mFixedExtracellularPotentialNodes.size(); i++)
+    for (unsigned i=0; i<mFixedExtracellularPotentialNodes.size(); ++i)
     {
         if (this->mpMesh->GetDistributedVectorFactory()->IsGlobalIndexLocal(mFixedExtracellularPotentialNodes[i]))
         {

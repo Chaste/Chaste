@@ -70,7 +70,7 @@ public:
      */
     bool GiveUpConvergence()
     {
-        switch(DIM)
+        switch (DIM)
         {
             case 1:
             {
@@ -107,7 +107,7 @@ public:
      */
     int GetMeshNum()
     {
-        return (int) this->MeshNum; //unsigned -> int is just cosmetic here.  (The test looks prettier).
+        return static_cast<int>(this->MeshNum); //unsigned -> int is just cosmetic here.  (The test looks prettier).
     }
     /**
      * @return the space step in the Cartesian directions

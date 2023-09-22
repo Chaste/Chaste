@@ -82,10 +82,10 @@ public:
 
             TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 9u);
 
-            for (unsigned i = 0 ; i < box_collection.GetNumBoxes() ; i++)
+            for (unsigned i = 0 ; i < box_collection.GetNumBoxes() ; ++i)
             {
                 c_vector<int, 1u> grid_indices = box_collection.GetGridIndices(i);
-                TS_ASSERT_EQUALS(grid_indices(0), (int)i);
+                TS_ASSERT_EQUALS(grid_indices(0), static_cast<int>(i));
                 TS_ASSERT_EQUALS(box_collection.GetLinearIndex(grid_indices), i);
             }
         }
@@ -116,7 +116,7 @@ public:
             TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 729u);
 
             c_vector<double, 6> get_domain_size = box_collection.rGetDomainSize();
-            for (unsigned i=0; i<6; i++)
+            for (unsigned i = 0; i<6; ++i)
             {
                 TS_ASSERT_DELTA(get_domain_size(i), domain_size(i), 1e-15);
             }
@@ -141,7 +141,7 @@ public:
         TS_ASSERT_EQUALS(box_collection.IsOwned(NULL), true);
         TS_ASSERT_EQUALS(box_collection.IsBoxOwned(0), true);
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             unsigned box_index = box_collection.CalculateContainingBox(mesh.GetNode(i));
             box_collection.rGetBox(box_index).AddNode(mesh.GetNode(i));
@@ -149,7 +149,7 @@ public:
 
         TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 5u);
 
-        for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
+        for (unsigned i = 0; i<box_collection.GetNumBoxes(); ++i)
         {
             std::set< Node<1>* > nodes_in_box = box_collection.rGetBox(i).rGetNodesContained();
             c_vector<double, 2> box_min_max_values;
@@ -438,7 +438,7 @@ public:
         points[4] = new ChastePoint<1>(6.9);
 
         std::vector<Node<1>* > nodes;
-        for (unsigned i=0; i<points.size(); i++)
+        for (unsigned i = 0; i<points.size(); ++i)
         {
             nodes.push_back(new Node<1>(i, *(points[i]), false));
         }
@@ -453,7 +453,7 @@ public:
 
         box_collection.SetupLocalBoxesHalfOnly();
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             unsigned box_index = box_collection.CalculateContainingBox(nodes[i]);
             box_collection.rGetBox(box_index).AddNode(nodes[i]);
@@ -464,7 +464,7 @@ public:
         box_collection.CalculateNodePairs(nodes,pairs_returned_vector);
 
         std::set< std::pair<Node<1>*, Node<1>* > > pairs_returned;
-        for (unsigned i=0; i<pairs_returned_vector.size(); i++)
+        for (unsigned i = 0; i<pairs_returned_vector.size(); ++i)
         {
             pairs_returned.insert(pairs_returned_vector[i]);
         }
@@ -479,7 +479,7 @@ public:
         neighbours_should_be[2].insert(3);
         neighbours_should_be[3].insert(2);
         neighbours_should_be[4] = std::set<unsigned>();
-        for (unsigned i=0; i<nodes.size(); i++){
+        for (unsigned i = 0; i<nodes.size(); ++i){
             std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
             TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
         }
@@ -493,13 +493,13 @@ public:
 
         // Check we empty boxes correctly
         box_collection.EmptyBoxes();
-        for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
+        for (unsigned i = 0; i<box_collection.GetNumBoxes(); ++i)
         {
             TS_ASSERT_EQUALS(box_collection.rGetBox(i).rGetNodesContained().size(), 0u);
         }
 
         // Avoid memory leaks
-        for (unsigned i=0; i<points.size(); i++)
+        for (unsigned i = 0; i<points.size(); ++i)
         {
             delete nodes[i];
             delete points[i];
@@ -525,7 +525,7 @@ public:
 
         box_collection.SetupLocalBoxesHalfOnly();
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             unsigned box_index = box_collection.CalculateContainingBox(mesh.GetNode(i));
             box_collection.rGetBox(box_index).AddNode(mesh.GetNode(i));
@@ -533,7 +533,7 @@ public:
 
         TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 49u);
 
-        for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
+        for (unsigned i = 0; i<box_collection.GetNumBoxes(); ++i)
         {
             std::set< Node<2>* > nodes_in_box = box_collection.rGetBox(i).rGetNodesContained();
 
@@ -607,7 +607,7 @@ public:
         points[9] = new ChastePoint<2>(3.3, 3.6);
 
         std::vector<Node<2>* > nodes;
-        for (unsigned i=0; i<points.size(); i++)
+        for (unsigned i = 0; i<points.size(); ++i)
         {
             nodes.push_back(new Node<2>(i, *(points[i]), false));
         }
@@ -624,7 +624,7 @@ public:
 
         box_collection.SetupLocalBoxesHalfOnly();
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             unsigned box_index = box_collection.CalculateContainingBox(nodes[i]);
             box_collection.rGetBox(box_index).AddNode(nodes[i]);
@@ -635,7 +635,7 @@ public:
         box_collection.CalculateNodePairs(nodes,pairs_returned_vector);
 
         std::set< std::pair<Node<2>*, Node<2>* > > pairs_returned;
-        for (unsigned i=0; i<pairs_returned_vector.size(); i++)
+        for (unsigned i = 0; i<pairs_returned_vector.size(); ++i)
         {
             pairs_returned.insert(pairs_returned_vector[i]);
         }
@@ -680,7 +680,7 @@ public:
         neighbours_should_be[8].insert(6);
         neighbours_should_be[8].insert(7);
         neighbours_should_be[9] = std::set<unsigned>();
-        for (unsigned i=0; i<nodes.size(); i++){
+        for (unsigned i = 0; i<nodes.size(); ++i){
             std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
             TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
         }
@@ -710,7 +710,7 @@ public:
         TS_ASSERT_EQUALS(pairs_should_be, pairs_returned);
 
         // Avoid memory leaks
-        for (unsigned i=0; i<points.size(); i++)
+        for (unsigned i = 0; i<points.size(); ++i)
         {
             delete nodes[i];
             delete points[i];
@@ -721,11 +721,11 @@ public:
     {
         // 3D cube of nodes, set up so that there is one node in each of the 3x3x3 boxes.
         std::vector<Node<3>* > nodes;
-        for (unsigned k=0; k<3; k++)
+        for (unsigned k = 0; k<3; ++k)
         {
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j = 0; j<3; ++j)
             {
-                for (unsigned i=0; i<3; i++)
+                for (unsigned i = 0; i<3; ++i)
                 {
                     nodes.push_back(new Node<3>(i + 3*j + 9*k, false, 0.75 + 1.5*i, 0.75 + 1.5*j , 0.75 + 1.5*k));
                 }
@@ -745,23 +745,23 @@ public:
         ObsoleteBoxCollection<3> box_collection(cut_off_length, domain_size);
         box_collection.SetupLocalBoxesHalfOnly();
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             unsigned box_index = box_collection.CalculateContainingBox(nodes[i]);
             box_collection.rGetBox(box_index).AddNode(nodes[i]);
         }
 
         // Make sure there is exactly one node in each box
-        for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
+        for (unsigned i = 0; i<box_collection.GetNumBoxes(); ++i)
         {
             TS_ASSERT_EQUALS(box_collection.rGetBox(i).rGetNodesContained().size(), 1u);
         }
 
         // Calculate which pairs of nodes should be pairs
         std::map<unsigned, std::set<unsigned> > neighbours_should_be;
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
-            for (unsigned j=0; j<nodes.size(); j++)
+            for (unsigned j = 0; j<nodes.size(); ++j)
             {
                 if ((i < j) && norm_2(nodes[i]->rGetLocation() - nodes[j]->rGetLocation()) < 2.6)    // sqrt ( 1.5^2 + 1.5^2 + 1.5^2) rounded up.
                 {
@@ -776,7 +776,7 @@ public:
         box_collection.CalculateNodePairs(nodes, pairs_returned_vector);
 
         std::set< std::pair<unsigned, unsigned> > pairs_returned;
-        for (unsigned i=0; i<pairs_returned_vector.size(); i++)
+        for (unsigned i = 0; i<pairs_returned_vector.size(); ++i)
         {
             std::pair<Node<3>*, Node<3>* > this_pair = pairs_returned_vector[i];
             unsigned this_pair_first = (this_pair.first)->GetIndex();
@@ -802,7 +802,7 @@ public:
         pairs_of_13.push_back(25);
         pairs_of_13.push_back(26);
 
-        for (unsigned i=0; i<pairs_of_13.size(); i++)
+        for (unsigned i = 0; i<pairs_of_13.size(); ++i)
         {
             std::pair<unsigned, unsigned> pair(nodes[13]->GetIndex(), nodes[pairs_of_13[i]]->GetIndex());
             TS_ASSERT(pairs_returned.find(pair) != pairs_returned.end());
@@ -825,20 +825,20 @@ public:
         not_pairs_of_13.push_back(21);
         not_pairs_of_13.push_back(24);
 
-        for (unsigned i=0; i<not_pairs_of_13.size(); i++)
+        for (unsigned i = 0; i<not_pairs_of_13.size(); ++i)
         {
             std::pair<unsigned, unsigned> pair(nodes[13]->GetIndex(), nodes[not_pairs_of_13[i]]->GetIndex());
             TS_ASSERT(pairs_returned.find(pair) == pairs_returned.end());
         }
 
         // Check the neighbour lists
-        for (unsigned i=0; i<nodes.size(); i++){
+        for (unsigned i = 0; i<nodes.size(); ++i){
             std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
             TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
         }
 
         // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -1184,7 +1184,7 @@ public:
         unsigned num_offsets_phi = 8;
         std::vector<c_vector<double, 3> > offsets_to_test(num_offsets_theta * num_offsets_phi, zero_vector<double>(3));
 
-        for (unsigned offset_phi = 0 ; offset_phi < num_offsets_phi ; offset_phi++)
+        for (unsigned offset_phi = 0; offset_phi < num_offsets_phi; ++offset_phi)
         {
             double phi = M_PI * double(offset_phi) / double(num_offsets_phi);
 

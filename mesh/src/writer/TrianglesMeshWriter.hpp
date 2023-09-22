@@ -72,12 +72,12 @@ public:
     void WriteFiles();
 
     /**
-     * Write elements as faces (used in the case ELEMENT_DIM== SPACE_DIM-1)
+     * Write elements as faces (used in the case ELEMENT_DIM == SPACE_DIM-1)
      */
     void WriteElementsAsFaces();
 
     /**
-     * Write faces as edges (used in the case ELEMENT_DIM==2, SPACE_DIM==3)
+     * Write faces as edges (used in the case ELEMENT_DIM == 2, SPACE_DIM == 3)
      */
     void WriteFacesAsEdges();
 

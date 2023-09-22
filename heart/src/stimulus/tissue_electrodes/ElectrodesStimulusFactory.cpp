@@ -96,7 +96,7 @@ void ElectrodesStimulusFactory<DIM>::CheckForElectrodesIntersection()
         }
     }
     PetscTools::Barrier();
-    for (unsigned node_index = 0; node_index < nodes_in_all_electrodes.size(); node_index++)
+    for (unsigned node_index = 0; node_index < nodes_in_all_electrodes.size(); ++node_index)
     {
         unsigned number_of_hits = 0;
         for (unsigned node_to_check = 0; node_to_check < nodes_in_all_electrodes.size(); node_to_check++)

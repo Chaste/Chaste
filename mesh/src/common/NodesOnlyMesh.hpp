@@ -101,7 +101,7 @@ private:
         // Re-index the nodes according to what we've just read
         assert(GetNumNodes() == indices.size());
         this->mNodesMapping.clear();
-        for (unsigned i=0; i<this->mNodes.size(); i++)
+        for (unsigned i=0; i<this->mNodes.size(); ++i)
         {
             unsigned new_index = indices[i];
             this->mNodes[i]->SetIndex(new_index);

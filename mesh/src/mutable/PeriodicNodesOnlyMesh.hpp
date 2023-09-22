@@ -193,7 +193,7 @@ inline void load_construct_data(
 {
     // Retrieve data from archive required to construct new instance of the mesh
     c_vector<double,SPACE_DIM> width;
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i=0; i<SPACE_DIM; ++i)
     {
         double current_width;
         ar & current_width;

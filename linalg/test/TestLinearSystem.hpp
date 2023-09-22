@@ -66,7 +66,7 @@ public:
         TS_ASSERT_THROWS_THIS(LinearSystem too_big_to_be_dense(20), "You must provide a rowPreallocation argument for a large sparse system");
 
         const unsigned size_u = 3u;
-        const int size = (int) size_u;
+        const int size = static_cast<int>(size_u);
         LinearSystem ls(size_u);
         TS_ASSERT_EQUALS(ls.GetSize(), size_u);
         TS_ASSERT_EQUALS(PetscVecTools::GetSize(ls.GetRhsVector()), size_u);
@@ -163,7 +163,7 @@ public:
     void TestZeroingLinearSystem()
     {
         LinearSystem ls(5);
-        for (int i=0; i<5; i++)
+        for (int i=0; i<5; ++i)
         {
             ls.SetMatrixRow(i, (double)i);
             ls.SetRhsVectorElement(i, (double)i);
@@ -207,7 +207,7 @@ public:
     void TestZeroMatrixRowsWithValueOnDiagonal()
     {
         LinearSystem ls(5);
-        for (int i=0; i<5; i++)
+        for (int i=0; i<5; ++i)
         {
             ls.SetMatrixRow(i, (double)i);
             ls.SetRhsVectorElement(i, (double)i);
@@ -227,7 +227,7 @@ public:
         {
             if (lo<=row && row<hi)
             {
-                for (int i=0; i<5; (i+1==row? i+=2 : i++)) // for i=0,1..,row-1,row+1,..,5
+                for (int i=0; i<5; (i+1==row? i+=2 : ++i)) // for i=0,1..,row-1,row+1,..,5
                 {
                     TS_ASSERT_EQUALS(ls.GetMatrixElement(row,i), 0.0);
                 }
@@ -240,7 +240,7 @@ public:
     {
         // Make a linear system from which the vector becomes a template to use in a later constructor
         LinearSystem ls_template(5);
-        for (int i=0; i<5; i++)
+        for (int i=0; i<5; ++i)
         {
             ls_template.SetMatrixElement(i, i, 3.0);
         }
@@ -249,7 +249,7 @@ public:
 
         // The "false" says that we are allowed to do new mallocs without PETSc 3.3 causing an error
         LinearSystem ls(ls_template.rGetRhsVector(), 1, false);
-        for (int i=0; i<5; i++)
+        for (int i=0; i<5; ++i)
         {
             ls.SetMatrixElement(i, i, 3.0);
         }
@@ -264,7 +264,7 @@ public:
     void TestZeroingLinearSystemByColumn()
     {
         LinearSystem ls(5);
-        for (int i=0; i<5; i++)
+        for (int i=0; i<5; ++i)
         {
             ls.SetMatrixElement(i, i, 3.0);
         }
@@ -302,7 +302,7 @@ public:
     void TestZeroMatrixRowsAndColumnsWithValueOnDiagonal()
     {
         LinearSystem ls(5);
-        for (int i=0; i<5; i++)
+        for (int i=0; i<5; ++i)
         {
             ls.SetMatrixRow(i, (double)i);
         }
@@ -345,7 +345,7 @@ public:
     void TestGetMatrixRowDistributed()
     {
         LinearSystem ls(5);
-        for (int i=0; i<5; i++)
+        for (int i=0; i<5; ++i)
         {
             ls.SetMatrixRow(i, (double)i);
         }
@@ -1177,7 +1177,7 @@ public:
             }
             ls.AssembleFinalLinearSystem();
 
-            for (unsigned i=0; i<size; i++)
+            for (unsigned i=0; i<size; ++i)
             {
                 ls.SetRhsVectorElement(i, rhs_values[i]);
             }

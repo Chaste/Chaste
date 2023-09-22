@@ -73,7 +73,7 @@ public:
           mpStimulus(new RegularStimulus(rStimMag, rStimDuration, rPacingCycleLength, 0)),// Default stimulus introduced at t=0.
           mAreaOrVolume(rAreaOrVolume)
     {
-        assert(DIM==1 || DIM==2);
+        assert(DIM == 1 || DIM == 2);
     }
 
     AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<DIM>* pNode)
@@ -186,7 +186,7 @@ public:
 //                files.push_back("MaxUpstrokeVelocityMap_-30");
 //                files.push_back("UpstrokeTimeMap_-30");
 
-            for (unsigned i=0; i<files.size(); i++)
+            for (unsigned i=0; i<files.size(); ++i)
             {
                 FileFinder file_to_copy(HeartConfig::Instance()->GetOutputDirectory() + "/output/" + files[i] + ".dat", RelativeTo::ChasteTestOutput);
                 TS_ASSERT(file_to_copy.IsFile());

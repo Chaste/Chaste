@@ -45,7 +45,7 @@ void BackwardEulerIvpOdeSolver::ComputeResidual(AbstractOdeSystem* pAbstractOdeS
 {
     std::vector<double> dy(mSizeOfOdeSystem); //For JC to optimize
     pAbstractOdeSystem->EvaluateYDerivatives(time+timeStep, rCurrentGuess, dy);
-    for (unsigned i=0; i<mSizeOfOdeSystem; i++)
+    for (unsigned i = 0; i < mSizeOfOdeSystem; ++i)
     {
         mResidual[i] = rCurrentGuess[i] - timeStep * dy[i] - rCurrentYValues[i];
     }
@@ -57,9 +57,9 @@ void BackwardEulerIvpOdeSolver::ComputeJacobian(AbstractOdeSystem* pAbstractOdeS
                                                 std::vector<double>& rCurrentYValues,
                                                 std::vector<double>& rCurrentGuess)
 {
-    for (unsigned i=0; i<mSizeOfOdeSystem; i++)
+    for (unsigned i = 0; i < mSizeOfOdeSystem; ++i)
     {
-        for (unsigned j=0; j<mSizeOfOdeSystem; j++)
+        for (unsigned j=0; j<mSizeOfOdeSystem; ++j)
         {
             mJacobian[i][j] = 0.0;
         }
@@ -85,12 +85,12 @@ void BackwardEulerIvpOdeSolver::ComputeJacobian(AbstractOdeSystem* pAbstractOdeS
 void BackwardEulerIvpOdeSolver::SolveLinearSystem()
 {
     double fact;
-    for (unsigned i=0; i<mSizeOfOdeSystem; i++)
+    for (unsigned i = 0; i < mSizeOfOdeSystem; ++i)
     {
         for (unsigned ii=i+1; ii<mSizeOfOdeSystem; ii++)
         {
             fact = mJacobian[ii][i]/mJacobian[i][i];
-            for (unsigned j=i; j<mSizeOfOdeSystem; j++)
+            for (unsigned j=i; j<mSizeOfOdeSystem; ++j)
             {
                 mJacobian[ii][j] -= fact*mJacobian[i][j];
             }
@@ -101,7 +101,7 @@ void BackwardEulerIvpOdeSolver::SolveLinearSystem()
     for (int i=mSizeOfOdeSystem-1; i>=0; i--)
     {
         mUpdate[i] = mResidual[i];
-        for (unsigned j=i+1; j<mSizeOfOdeSystem; j++)
+        for (unsigned j=i+1; j<mSizeOfOdeSystem; ++j)
         {
             mUpdate[i] -= mJacobian[i][j]*mUpdate[j];
         }
@@ -112,7 +112,7 @@ void BackwardEulerIvpOdeSolver::SolveLinearSystem()
 double BackwardEulerIvpOdeSolver::ComputeNorm(double* pVector)
 {
     double norm = 0.0;
-    for (unsigned i=0; i<mSizeOfOdeSystem; i++)
+    for (unsigned i = 0; i < mSizeOfOdeSystem; ++i)
     {
         if (fabs(pVector[i]) > norm)
         {
@@ -135,14 +135,14 @@ void BackwardEulerIvpOdeSolver::ComputeNumericalJacobian(AbstractOdeSystem* pAbs
     double epsilon = mNumericalJacobianEpsilon;
 
     ComputeResidual(pAbstractOdeSystem, timeStep, time, rCurrentYValues, rCurrentGuess);
-    for (unsigned i=0; i<mSizeOfOdeSystem; i++)
+    for (unsigned i = 0; i < mSizeOfOdeSystem; ++i)
     {
         residual[i] = mResidual[i];
     }
 
     for (unsigned global_column=0; global_column<mSizeOfOdeSystem; global_column++)
     {
-        for (unsigned i=0; i<mSizeOfOdeSystem; i++)
+        for (unsigned i = 0; i < mSizeOfOdeSystem; ++i)
         {
             guess_perturbed[i] = rCurrentGuess[i];
         }
@@ -150,14 +150,14 @@ void BackwardEulerIvpOdeSolver::ComputeNumericalJacobian(AbstractOdeSystem* pAbs
         guess_perturbed[global_column] += epsilon;
 
         ComputeResidual(pAbstractOdeSystem, timeStep, time, rCurrentYValues, guess_perturbed);
-        for (unsigned i=0; i<mSizeOfOdeSystem; i++)
+        for (unsigned i = 0; i < mSizeOfOdeSystem; ++i)
         {
             residual_perturbed[i] = mResidual[i];
         }
 
         // Compute residual_perturbed - residual
         double one_over_eps = 1.0/epsilon;
-        for (unsigned i=0; i<mSizeOfOdeSystem; i++)
+        for (unsigned i = 0; i < mSizeOfOdeSystem; ++i)
         {
             mJacobian[i][global_column] = one_over_eps*(residual_perturbed[i] - residual[i]);
         }
@@ -196,7 +196,7 @@ void BackwardEulerIvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstract
         norm = ComputeNorm(mUpdate);
 
         // Update current guess
-        for (unsigned i=0; i<mSizeOfOdeSystem; i++)
+        for (unsigned i = 0; i < mSizeOfOdeSystem; ++i)
         {
             current_guess[i] -= mUpdate[i];
         }
@@ -220,7 +220,7 @@ BackwardEulerIvpOdeSolver::BackwardEulerIvpOdeSolver(unsigned sizeOfOdeSystem)
     mUpdate = new double[mSizeOfOdeSystem];
 
     mJacobian = new double*[mSizeOfOdeSystem];
-    for (unsigned i=0; i<mSizeOfOdeSystem; i++)
+    for (unsigned i = 0; i < mSizeOfOdeSystem; ++i)
     {
         mJacobian[i] = new double[mSizeOfOdeSystem];
     }
@@ -232,7 +232,7 @@ BackwardEulerIvpOdeSolver::~BackwardEulerIvpOdeSolver()
     delete[] mResidual;
     delete[] mUpdate;
 
-    for (unsigned i=0; i<mSizeOfOdeSystem; i++)
+    for (unsigned i = 0; i < mSizeOfOdeSystem; ++i)
     {
         delete[] mJacobian[i];
     }

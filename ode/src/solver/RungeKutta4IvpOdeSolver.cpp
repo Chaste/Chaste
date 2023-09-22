@@ -61,28 +61,28 @@ void RungeKutta4IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOd
     std::vector<double>& dy = rNextYValues; // re-use memory
 
     pAbstractOdeSystem->EvaluateYDerivatives(time, rCurrentYValues, dy);
-    for (unsigned i=0; i<num_equations; i++)
+    for (unsigned i=0; i<num_equations; ++i)
     {
         k1[i] = timeStep*dy[i];
         yki[i] = rCurrentYValues[i] + 0.5*k1[i];
     }
 
     pAbstractOdeSystem->EvaluateYDerivatives(time+0.5*timeStep, yki, dy);
-    for (unsigned i=0; i<num_equations; i++)
+    for (unsigned i=0; i<num_equations; ++i)
     {
         k2[i] = timeStep*dy[i];
         yki[i] = rCurrentYValues[i] + 0.5*k2[i];
     }
 
     pAbstractOdeSystem->EvaluateYDerivatives(time+0.5*timeStep, yki, dy);
-    for (unsigned i=0; i<num_equations; i++)
+    for (unsigned i=0; i<num_equations; ++i)
     {
         k3[i] = timeStep*dy[i];
         yki[i] = rCurrentYValues[i] + k3[i];
     }
 
     pAbstractOdeSystem->EvaluateYDerivatives(time+timeStep, yki, dy);
-    for (unsigned i=0; i<num_equations; i++)
+    for (unsigned i=0; i<num_equations; ++i)
     {
         k4[i] = timeStep*dy[i];
         rNextYValues[i] = rCurrentYValues[i] + (k1[i]+2*k2[i]+2*k3[i]+k4[i])/6.0;

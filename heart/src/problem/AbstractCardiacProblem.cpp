@@ -270,7 +270,7 @@ Vec AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::CreateInitialCo
     std::vector<DistributedVector::Stripe> stripe;
     stripe.reserve(PROBLEM_DIM);
 
-    for (unsigned i = 0; i < PROBLEM_DIM; i++)
+    for (unsigned i = 0; i < PROBLEM_DIM; ++i)
     {
         stripe.push_back(DistributedVector::Stripe(ic, i));
     }
@@ -700,7 +700,7 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::DefineWriterCo
                     EXCEPTION("HeartConfig setting `GetOutputUsingOriginalNodeOrdering` is meaningless when outputting particular nodes in parallel. (Nodes are written with their original indices by default).");
                 }
                 std::vector<unsigned> nodes_to_output_permuted(mNodesToOutput.size());
-                for (unsigned i = 0; i < mNodesToOutput.size(); i++)
+                for (unsigned i = 0; i < mNodesToOutput.size(); ++i)
                 {
                     nodes_to_output_permuted[i] = mpMesh->rGetNodePermutation()[mNodesToOutput[i]];
                 }

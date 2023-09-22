@@ -94,9 +94,9 @@ private:
             TS_ASSERT_EQUALS(third1.size(), third2.size());
         }
 
-        for (unsigned i = 0u; i < fibres1.size(); i++)
+        for (unsigned i = 0u; i < fibres1.size(); ++i)
         {
-            for (unsigned j=0u; j<3u; j++)
+            for (unsigned j=0u; j<3u; ++j)
             {
                 TS_ASSERT_DELTA( fibres1[i][j] , fibres2[i][j] , tol);
                 if (generatedFileType == ORTHO && referenceFileType == ORTHO)

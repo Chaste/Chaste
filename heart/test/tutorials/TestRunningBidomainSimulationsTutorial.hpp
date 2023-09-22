@@ -257,7 +257,7 @@ public:
          * will mention how to do parallel access).
          */
         ReplicatableVector res_repl(bidomain_problem.GetSolution());
-        for (unsigned i=0; i<res_repl.GetSize(); i++)
+        for (unsigned i=0; i<res_repl.GetSize(); ++i)
         {
         //    std::cout << res_repl[i] << "\n";
         }

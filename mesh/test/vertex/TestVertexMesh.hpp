@@ -79,7 +79,7 @@ private:
         unsigned node_indices_face_7[3] = {6, 8, 3};
         unsigned node_indices_face_8[3] = {3, 8, 5};
         unsigned node_indices_face_9[3] = {5, 8, 7};
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i<4; ++i)
         {
             nodes_faces[0].push_back(nodes[node_indices_face_0[i]]);
             nodes_faces[1].push_back(nodes[node_indices_face_1[i]]);
@@ -99,7 +99,7 @@ private:
         // Make the faces
         std::vector<VertexElement<2,3>*> faces;
 
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i = 0; i<10; ++i)
         {
             faces.push_back(new VertexElement<2,3>(i, nodes_faces[i]));
         }
@@ -109,14 +109,14 @@ private:
         std::vector<bool> orientations_0, orientations_1;
 
         // Cube element
-        for (unsigned i=0; i<6; i++)
+        for (unsigned i = 0; i<6; ++i)
         {
             faces_element_0.push_back(faces[i]);
             orientations_0.push_back(true);
         }
 
         // Pyramid element
-        for (unsigned i=6; i<10; i++)
+        for (unsigned i=6; i<10; ++i)
         {
             faces_element_1.push_back(faces[i]);
             orientations_1.push_back(true);
@@ -170,7 +170,7 @@ private:
 
         std::vector<VertexElement<2,3>*> faces(5);
         std::vector<bool> orientations(5);
-        for (unsigned i=0; i<5; i++)
+        for (unsigned i = 0; i<5; ++i)
         {
             faces[i] = new VertexElement<2,3>(i, nodes_faces[i]);
             orientations[i] = true;
@@ -278,14 +278,14 @@ public:
     {
         // Create a 1D mesh comprising four nodes and three elements
         std::vector<Node<1>*> nodes_1d;
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i<4; ++i)
         {
             nodes_1d.push_back(new Node<1>(i, false, 0.5*static_cast<double>(i)));
         }
 
         std::vector<std::vector<Node<1>*> > nodes_elements_1d(3);
         std::vector<VertexElement<1,1>*> elements_1d;
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i<3; ++i)
         {
             nodes_elements_1d[i].push_back(nodes_1d[i]);
             nodes_elements_1d[i].push_back(nodes_1d[i+1]);
@@ -325,7 +325,7 @@ public:
         nodes_2d.push_back(new Node<2>(6, false, 2.0, 3.0));
 
         std::vector<std::vector<Node<2>*> > nodes_elements_2d(2);
-        for (unsigned i=0; i<5; i++)
+        for (unsigned i = 0; i<5; ++i)
         {
             nodes_elements_2d[0].push_back(nodes_2d[i]);
         }
@@ -644,7 +644,7 @@ public:
 
             // Compare the loaded mesh against the original
             TS_ASSERT_EQUALS(p_mesh_original->GetNumNodes(), p_mesh_loaded->GetNumNodes());
-            for (unsigned node_index=0; node_index<p_mesh_original->GetNumNodes(); node_index++)
+            for (unsigned node_index = 0; node_index<p_mesh_original->GetNumNodes(); ++node_index)
             {
                 Node<2>* p_node = p_mesh_original->GetNode(node_index);
                 Node<2>* p_node2 = p_mesh_loaded->GetNode(node_index);
@@ -654,19 +654,19 @@ public:
 
                 TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), p_node2->IsBoundaryNode());
 
-                for (unsigned dimension=0; dimension<2; dimension++)
+                for (unsigned dimension = 0; dimension<2; dimension++)
                 {
                     TS_ASSERT_DELTA(p_node->rGetLocation()[dimension], p_node2->rGetLocation()[dimension], 1e-4);
                 }
             }
 
             TS_ASSERT_EQUALS(p_mesh_original->GetNumElements(), p_mesh_loaded->GetNumElements());
-            for (unsigned elem_index=0; elem_index < p_mesh_original->GetNumElements(); elem_index++)
+            for (unsigned elem_index = 0; elem_index < p_mesh_original->GetNumElements(); elem_index++)
             {
                 TS_ASSERT_EQUALS(p_mesh_original->GetElement(elem_index)->GetNumNodes(),
                                  p_mesh_loaded->GetElement(elem_index)->GetNumNodes());
 
-                for (unsigned local_index=0; local_index<p_mesh_original->GetElement(elem_index)->GetNumNodes(); local_index++)
+                for (unsigned local_index = 0; local_index<p_mesh_original->GetElement(elem_index)->GetNumNodes(); local_index++)
                 {
                     TS_ASSERT_EQUALS(p_mesh_original->GetElement(elem_index)->GetNodeGlobalIndex(local_index),
                                      p_mesh_loaded->GetElement(elem_index)->GetNodeGlobalIndex(local_index));
@@ -727,7 +727,7 @@ public:
 
             // Compare the loaded mesh against the original
             TS_ASSERT_EQUALS(p_mesh_original->GetNumNodes(), p_mesh_loaded->GetNumNodes());
-            for (unsigned node_index=0; node_index<p_mesh_original->GetNumNodes(); node_index++)
+            for (unsigned node_index = 0; node_index < p_mesh_original->GetNumNodes(); ++node_index)
             {
                 Node<3>* p_node = p_mesh_original->GetNode(node_index);
                 Node<3>* p_node2 = p_mesh_loaded->GetNode(node_index);
@@ -737,14 +737,14 @@ public:
 
                 TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), p_node2->IsBoundaryNode());
 
-                for (unsigned dimension=0; dimension<3; dimension++)
+                for (unsigned dimension = 0; dimension<3; dimension++)
                 {
                     TS_ASSERT_DELTA(p_node->rGetLocation()[dimension], p_node2->rGetLocation()[dimension], 1e-4);
                 }
             }
 
             TS_ASSERT_EQUALS(p_mesh_original->GetNumElements(), p_mesh_loaded->GetNumElements());
-            for (unsigned elem_index=0; elem_index < p_mesh_original->GetNumElements(); elem_index++)
+            for (unsigned elem_index = 0; elem_index < p_mesh_original->GetNumElements(); elem_index++)
             {
                 TS_ASSERT_EQUALS(p_mesh_original->GetElement(elem_index)->GetNumNodes(),
                                  p_mesh_loaded->GetElement(elem_index)->GetNumNodes());
@@ -752,7 +752,7 @@ public:
                 TS_ASSERT_EQUALS(p_mesh_original->GetElement(elem_index)->GetNumFaces(),
                                  p_mesh_loaded->GetElement(elem_index)->GetNumFaces());
 
-                for (unsigned local_index=0; local_index<p_mesh_original->GetElement(elem_index)->GetNumNodes(); local_index++)
+                for (unsigned local_index = 0; local_index<p_mesh_original->GetElement(elem_index)->GetNumNodes(); local_index++)
                 {
                     TS_ASSERT_EQUALS(p_mesh_original->GetElement(elem_index)->GetNodeGlobalIndex(local_index),
                                      p_mesh_loaded->GetElement(elem_index)->GetNodeGlobalIndex(local_index));
@@ -923,13 +923,13 @@ public:
     {
         // Test method with a 1D mesh
         std::vector<Node<1>*> nodes_1d;
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i<4; ++i)
         {
             nodes_1d.push_back(new Node<1>(i, false, 0.5*static_cast<double>(i)));
         }
         std::vector<std::vector<Node<1>*> > nodes_elements_1d(3);
         std::vector<VertexElement<1,1>*> elements_1d;
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i<3; ++i)
         {
             nodes_elements_1d[i].push_back(nodes_1d[i]);
             nodes_elements_1d[i].push_back(nodes_1d[i+1]);
@@ -999,7 +999,7 @@ public:
         // Test method with a single element that is close to circular
         std::vector<Node<2>*> circle_nodes;
         unsigned num_nodes = 1000;
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i<num_nodes; ++i)
         {
             double theta = 2.0*M_PI*static_cast<double>(i)/static_cast<double>(num_nodes);
             circle_nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
@@ -1014,7 +1014,7 @@ public:
 
         // Test method with a single hexagonal element centred at the origin
         std::vector<Node<2>*> hexagon_nodes;
-        for (unsigned i=0; i<6; i++)
+        for (unsigned i = 0; i<6; ++i)
         {
             double theta = 2.0 * M_PI * static_cast<double>(i) / 6.0;
             hexagon_nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
@@ -1096,7 +1096,7 @@ public:
         // Test method with a single element that is close to circular
         std::vector<Node<2>*> circle_nodes;
         unsigned num_nodes = 1000;
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i<num_nodes; ++i)
         {
             double theta = 2.0*M_PI*static_cast<double>(i)/static_cast<double>(num_nodes);
             circle_nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
@@ -1109,7 +1109,7 @@ public:
 
         // Test method with a single hexagonal element centred at the origin
         std::vector<Node<2>*> hexagon_nodes;
-        for (unsigned i=0; i<6; i++)
+        for (unsigned i = 0; i<6; ++i)
         {
             double theta = 2.0 * M_PI * static_cast<double>(i) / 6.0;
             hexagon_nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
@@ -1186,7 +1186,7 @@ public:
         // Test method with a single element that is close to circular
         std::vector<Node<2>*> circle_nodes;
         unsigned num_nodes = 1000;
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i<num_nodes; ++i)
         {
             double theta = 2.0*M_PI*static_cast<double>(i)/static_cast<double>(num_nodes);
             circle_nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
@@ -1199,7 +1199,7 @@ public:
 
         // Test method with a single hexagonal element centred at the origin
         std::vector<Node<2>*> hexagon_nodes;
-        for (unsigned i=0; i<6; i++)
+        for (unsigned i = 0; i<6; ++i)
         {
             double theta = 2.0 * M_PI * static_cast<double>(i) / 6.0;
             hexagon_nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
@@ -1523,7 +1523,7 @@ public:
         VertexMesh<2,2> regular_mesh;
         regular_mesh.ConstructFromMeshReader(mesh_reader);
 
-        for (unsigned i=0; i<regular_mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i<regular_mesh.GetNumElements(); ++i)
         {
             c_vector<double, 3> regular_moments = regular_mesh.CalculateMomentsOfElement(i);
             TS_ASSERT_DELTA(regular_moments(0), 5*sqrt(3.0)/16/9, 1e-6); // Ixx
@@ -1648,7 +1648,7 @@ public:
 
         // Test method with a single hexagonal element centred at the origin
         std::vector<Node<2>*> hexagon_nodes;
-        for (unsigned i=0; i<6; i++)
+        for (unsigned i = 0; i<6; ++i)
         {
             double theta = 2.0 * M_PI * static_cast<double>(i) / 6.0;
             hexagon_nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
@@ -1791,7 +1791,7 @@ public:
         square_elements.push_back(new VertexElement<2,2>(0, square_nodes));
         VertexMesh<2,2> square_mesh(square_nodes, square_elements);
 
-        for (unsigned i=0; i<square_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<square_mesh.GetNumNodes(); ++i)
         {
             TS_ASSERT_EQUALS(square_mesh.GetNode(i)->IsBoundaryNode(), false);
         }
@@ -1801,7 +1801,7 @@ public:
         VertexMesh<2,2> regular_mesh;
         regular_mesh.ConstructFromMeshReader(regular_mesh_reader);
 
-        for (unsigned i=0; i<regular_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<regular_mesh.GetNumNodes(); ++i)
         {
             bool expected_boundary_node = (i==6 || i==9) ? false : true;
             TS_ASSERT_EQUALS(regular_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
@@ -1812,7 +1812,7 @@ public:
         VertexMesh<2,2> larger_regular_mesh;
         larger_regular_mesh.ConstructFromMeshReader(larger_regular_mesh_reader);
 
-        for (unsigned i=0; i<larger_regular_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<larger_regular_mesh.GetNumNodes(); ++i)
         {
             bool expected_boundary_node = true;
             if (i==8 || i==9 || i==12 || i==13 || i==16 || i==17 || i==20 || i==21)
@@ -2205,14 +2205,14 @@ public:
         TS_ASSERT_DELTA(voronoi_mesh.CalculateAreaOfFace(voronoi_mesh.GetFace(2u)), 2.3864, 1e-4); //Six point, but is triangle
         TS_ASSERT_DELTA(voronoi_mesh.CalculateAreaOfFace(voronoi_mesh.GetFace(4u)), 0.0000, 1e-12); //Degenerate triangle
         TS_ASSERT_DELTA(voronoi_mesh.CalculateAreaOfFace(voronoi_mesh.GetFace(5u)), 2.7556, 1e-4); //Triangle
-        for (unsigned i=0; i<15; i++)
+        for (unsigned i = 0; i<15; ++i)
         {
             voronoi_mesh.CalculateAreaOfFace(voronoi_mesh.GetFace(i));
         }
         TS_ASSERT_EQUALS(voronoi_mesh.GetNumElements(), 5u);
         TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(0u), 7.5937, 1e-4);
         double volume=0.0;
-        for (unsigned i=0; i< voronoi_mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i< voronoi_mesh.GetNumElements(); ++i)
         {
             volume += voronoi_mesh.GetVolumeOfElement(i);
         }

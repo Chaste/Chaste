@@ -208,7 +208,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddCellData(std::string dataName, std
 {
     vtkDoubleArray* p_scalars = vtkDoubleArray::New();
     p_scalars->SetName(dataName.c_str());
-    for (unsigned i=0; i<dataPayload.size(); i++)
+    for (unsigned i=0; i<dataPayload.size(); ++i)
     {
         p_scalars->InsertNextValue(dataPayload[i]);
     }
@@ -222,7 +222,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AugmentCellData()
 {
     unsigned num_cell_arrays = mpVtkUnstructedMesh->GetCellData()->GetNumberOfArrays();
-    for (unsigned i = 0; i < num_cell_arrays; i++)
+    for (unsigned i = 0; i < num_cell_arrays; ++i)
     {
         vtkDataArray* array = mpVtkUnstructedMesh->GetCellData()->GetArray(i);
 
@@ -257,14 +257,14 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddCellData(std::string dataName, std
     vtkDoubleArray* p_vectors = vtkDoubleArray::New();
     p_vectors->SetName(dataName.c_str());
     p_vectors->SetNumberOfComponents(3);
-    for (unsigned i=0; i<dataPayload.size(); i++)
+    for (unsigned i=0; i<dataPayload.size(); ++i)
     {
-        for (unsigned j=0; j<SPACE_DIM; j++)
+        for (unsigned j=0; j<SPACE_DIM; ++j)
         {
             p_vectors->InsertNextValue(dataPayload[i][j]);
         }
         //When SPACE_DIM<3, then pad
-        for (unsigned j=SPACE_DIM; j<3; j++)
+        for (unsigned j=SPACE_DIM; j<3; ++j)
         {
             p_vectors->InsertNextValue(0.0);
         }
@@ -283,7 +283,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorCellData(std::string dataNam
         vtkDoubleArray* p_vectors = vtkDoubleArray::New();
         p_vectors->SetName(dataName.c_str());
         p_vectors->SetNumberOfComponents(SPACE_DIM*SPACE_DIM);
-        for (unsigned i=0; i<dataPayload.size(); i++)
+        for (unsigned i=0; i<dataPayload.size(); ++i)
         {
             if (SPACE_DIM == 2)
             {
@@ -324,7 +324,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorCellData(std::string dataNam
         vtkDoubleArray* p_vectors = vtkDoubleArray::New();
         p_vectors->SetName(dataName.c_str());
         p_vectors->SetNumberOfComponents(SPACE_DIM*SPACE_DIM);
-        for (unsigned i=0; i<dataPayload.size(); i++)
+        for (unsigned i=0; i<dataPayload.size(); ++i)
         {
             if (SPACE_DIM == 2)
             {
@@ -421,7 +421,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
         }
     }
 
-    for (unsigned i=0; i<dataPayload.size(); i++)
+    for (unsigned i=0; i<dataPayload.size(); ++i)
     {
         p_scalars->InsertNextValue(dataPayload[i]);
     }
@@ -465,7 +465,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
                 unsigned global_node_index = mNodesToSendPerProcess[send_to][node];
                 unsigned local_node_index = global_node_index
                             - this->mpDistributedMesh->GetDistributedVectorFactory()->GetLow();
-                for (unsigned j=0; j<SPACE_DIM; j++)
+                for (unsigned j=0; j<SPACE_DIM; ++j)
                 {
                     send_data[ node*SPACE_DIM + j ] = dataPayload[local_node_index][j];
                 }
@@ -489,7 +489,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
                 unsigned global_node_index = mNodesToReceivePerProcess[receive_from][node];
                 unsigned halo_index = mGlobalToNodeIndexMap[global_node_index];
                 assert( halo_index >= this->mpDistributedMesh->GetNumLocalNodes() );
-                for (unsigned j=0; j<SPACE_DIM; j++)
+                for (unsigned j=0; j<SPACE_DIM; ++j)
                 {
                     dataPayload[halo_index][j] = receive_data[ node*SPACE_DIM + j ];
                 }
@@ -498,14 +498,14 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
     }
 
     p_vectors->SetNumberOfComponents(3);
-    for (unsigned i=0; i<dataPayload.size(); i++)
+    for (unsigned i=0; i<dataPayload.size(); ++i)
     {
-        for (unsigned j=0; j<SPACE_DIM; j++)
+        for (unsigned j=0; j<SPACE_DIM; ++j)
         {
             p_vectors->InsertNextValue(dataPayload[i][j]);
         }
         //When SPACE_DIM<3, then pad
-        for (unsigned j=SPACE_DIM; j<3; j++)
+        for (unsigned j=SPACE_DIM; j<3; ++j)
         {
             p_vectors->InsertNextValue(0.0);
         }
@@ -524,7 +524,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorPointData(std::string dataNa
         vtkDoubleArray* p_vectors = vtkDoubleArray::New();
         p_vectors->SetName(dataName.c_str());
         p_vectors->SetNumberOfComponents(SPACE_DIM*SPACE_DIM);
-        for (unsigned i=0; i<dataPayload.size(); i++)
+        for (unsigned i=0; i<dataPayload.size(); ++i)
         {
             if (SPACE_DIM == 2)
             {

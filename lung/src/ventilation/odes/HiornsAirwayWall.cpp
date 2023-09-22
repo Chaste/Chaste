@@ -103,7 +103,7 @@ double HiornsAirwayWall::CalculatePressureRadiusResidual(double radius)
 
         //  integralStuff = (0.5*(integrandVals[0] + integrandVals[numberTrap - 1]));
         //  integralStuff = integralStuff*(tVals[1] - tVals[0]);
-        //  for (int i = 1; i < (numberTrap - 1); i++)
+        //  for (int i = 1; i < (numberTrap - 1); ++i)
         //  {
             //  integralStuff = integralStuff + integrandVals[i]*(tVals[1] - tVals[0]);
         //  }

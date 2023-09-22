@@ -106,7 +106,7 @@ public:
         std::vector<double> valid_voltages = valid_reader.GetValues("Vm");
 
         TS_ASSERT_EQUALS(times.size(), valid_times.size());
-        for (unsigned i=0; i<valid_times.size(); i++)
+        for (unsigned i=0; i<valid_times.size(); ++i)
         {
             TS_ASSERT_DELTA(times[i], valid_times[i], 1e-12);
             TS_ASSERT_DELTA(voltages[i], valid_voltages[i], tolerance);
@@ -144,7 +144,7 @@ public:
         //create the times vector
         double k =0;
         std::vector<double> times;
-        for (unsigned i=0; i<voltages.size(); i++)
+        for (unsigned i=0; i<voltages.size(); ++i)
         {
           times.push_back(k);
           k=k+100;

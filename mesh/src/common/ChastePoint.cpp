@@ -60,7 +60,7 @@ ChastePoint<DIM>::ChastePoint(double v1, double v2, double v3)
 template<unsigned DIM>
 ChastePoint<DIM>::ChastePoint(std::vector<double> coords)
 {
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         mLocation(i) = coords.at(i);
     }

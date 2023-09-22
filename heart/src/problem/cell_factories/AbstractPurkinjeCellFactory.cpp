@@ -58,7 +58,7 @@ void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::ReadJunctionsFile()
         // HeartConfig::Instance()->GetMeshName() will throw an exception if no mesh name is defined
         pvj_file_name = HeartConfig::Instance()->GetMeshName() + ".pvj";
     }
-    catch(Exception&)
+    catch (Exception&)
     {
         file_specified = false;
     }

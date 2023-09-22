@@ -70,7 +70,7 @@ class MutableMesh : public TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>
 
         if (does_have_attributes)
         {
-            for (unsigned i=0; i<this->mNodes.size(); i++)
+            for (unsigned i=0; i<this->mNodes.size(); ++i)
             {
                 double radius;
                 radius = this->mNodes[i]->GetRadius();
@@ -100,7 +100,7 @@ class MutableMesh : public TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>
 
         if (does_have_attributes)
         {
-            for (unsigned i=0; i<this->mNodes.size(); i++)
+            for (unsigned i=0; i<this->mNodes.size(); ++i)
             {
                 double radius;
                 archive & radius;
@@ -116,7 +116,7 @@ class MutableMesh : public TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>
             }
         }
 
-        // If ELEMENT_DIM==SPACE_DIM do a remesh after archiving has finished to get right number of boundary nodes etc.
+        // If ELEMENT_DIM == SPACE_DIM do a remesh after archiving has finished to get right number of boundary nodes etc.
         // NOTE - Subclasses must archive their member variables BEFORE calling this method.
         if (ELEMENT_DIM == SPACE_DIM)
         {

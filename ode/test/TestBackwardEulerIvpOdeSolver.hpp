@@ -214,7 +214,7 @@ public:
 //        OutputFileHandler handler("");
 //        out_stream rabbit_file=handler.OpenOutputFile("foxrabbit.dat");
 //
-//        for (unsigned i=0; i<last; i++)
+//        for (unsigned i=0; i<last; ++i)
 //        {
 //            (*rabbit_file) << solutions.rGetSolutions()[i][0] << "\t" << solutions.rGetSolutions()[i][1] << "\n" << std::flush;
 //        }

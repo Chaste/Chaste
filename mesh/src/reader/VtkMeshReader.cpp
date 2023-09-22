@@ -169,7 +169,7 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
         {
             //The boundary face filter includes the cable elements - get rid of them
             unsigned num_all_cells = mNumFaces;
-            for (unsigned i=0; i<num_all_cells; i++)
+            for (unsigned i=0; i<num_all_cells; ++i)
             {
                if (mpVtkGeometryFilter->GetOutput()->GetCellType(i) == VTK_LINE)
                {
@@ -305,7 +305,7 @@ std::vector<double> VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextNode()
 
     std::vector<double> next_node;
 
-    for (unsigned i = 0; i < 3; i++)
+    for (unsigned i = 0; i < 3; ++i)
     {
         next_node.push_back( mpVtkUnstructuredGrid->GetPoint(mNodesRead)[i] );
     }
@@ -329,7 +329,7 @@ ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextElementData()
 
     ElementData next_element_data;
 
-    for (unsigned i = 0; i < mNodesPerElement; i++)
+    for (unsigned i = 0; i < mNodesPerElement; ++i)
     {
         next_element_data.NodeIndices.push_back(mpVtkUnstructuredGrid->GetCell(mElementsRead)->GetPointId(i));
     }
@@ -354,7 +354,7 @@ ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextCableElementData()
 
     ElementData next_element_data;
 
-    for (unsigned i = 0; i < 2; i++)
+    for (unsigned i = 0; i < 2; ++i)
     {
         next_element_data.NodeIndices.push_back(mpVtkUnstructuredGrid->GetCell(next_index)->GetPointId(i));
     }
@@ -383,14 +383,14 @@ ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextFaceData()
         {
             mBoundaryFacesSkipped++;
         }
-        for (unsigned i = 0; i < (mNodesPerElement-1); i++)
+        for (unsigned i = 0; i < (mNodesPerElement-1); ++i)
         {
             next_face_data.NodeIndices.push_back(mpVtkGeometryFilter->GetOutput()->GetCell(mBoundaryFacesRead + mBoundaryFacesSkipped)->GetPointId(i));
         }
     }
     else if (ELEMENT_DIM == 2u)
     {
-        for (unsigned i = 0; i < (mNodesPerElement-1); i++)
+        for (unsigned i = 0; i < (mNodesPerElement-1); ++i)
         {
             next_face_data.NodeIndices.push_back(mpVtkFilterEdges->GetOutput()->GetCell(mBoundaryFacesRead)->GetPointId(i));
         }
@@ -438,7 +438,7 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetCellData(std::string dataName, std
     }
 
     dataPayload.clear();
-    for (unsigned i = 0; i < mNumElements; i++)
+    for (unsigned i = 0; i < mNumElements; ++i)
     {
         dataPayload.push_back( p_scalars->GetTuple(i)[0] );
     }
@@ -461,10 +461,10 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetCellData(std::string dataName, std
     }
 
     dataPayload.clear();
-    for (unsigned i = 0; i < mNumElements; i++)
+    for (unsigned i = 0; i < mNumElements; ++i)
     {
         c_vector <double, SPACE_DIM> data;
-        for (unsigned j = 0; j < SPACE_DIM; j++)
+        for (unsigned j = 0; j < SPACE_DIM; ++j)
         {
             data[j]=  p_scalars->GetTuple(i)[j];
         }
@@ -491,7 +491,7 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetPointData(std::string dataName, st
 
     dataPayload.clear();
 
-    for (unsigned i = 0; i < mNumNodes; i++)
+    for (unsigned i = 0; i < mNumNodes; ++i)
     {
         dataPayload.push_back( p_scalars->GetTuple(i)[0] );
     }
@@ -514,10 +514,10 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetPointData(std::string dataName, st
         EXCEPTION("The point data '" + dataName + "' is not 3-vector data.");
     }
     dataPayload.clear();
-    for (unsigned i = 0; i < mNumNodes; i++)
+    for (unsigned i = 0; i < mNumNodes; ++i)
     {
         c_vector<double, SPACE_DIM> data;
-        for (unsigned j = 0; j< SPACE_DIM; j++)
+        for (unsigned j = 0; j< SPACE_DIM; ++j)
         {
             data[j] = p_scalars->GetTuple(i)[j];
         }

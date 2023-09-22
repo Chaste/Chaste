@@ -114,7 +114,7 @@ void CryptSimulationBoundaryCondition<DIM>::ImposeBoundaryCondition(const std::m
     else
     {
         // Iterate over all nodes to update their positions
-        for (unsigned node_index=0; node_index<this->mpCellPopulation->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < this->mpCellPopulation->GetNumNodes(); ++node_index)
         {
             // Get pointer to this node
             Node<DIM>* p_node = this->mpCellPopulation->GetNode(node_index);

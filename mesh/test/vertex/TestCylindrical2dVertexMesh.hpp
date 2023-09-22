@@ -65,7 +65,7 @@ public:
         CylindricalHoneycombVertexMeshGenerator generator(18, 25, true);
         boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
-        for (unsigned node_index = 0; node_index < p_mesh->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < p_mesh->GetNumNodes(); ++node_index)
         {
             std::set<unsigned> containing_elements = p_mesh->GetNode(node_index)->rGetContainingElementIndices();
             unsigned num_containing_elements = containing_elements.size();
@@ -224,7 +224,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 40u);
 
         // Test area and perimeter calculations for all elements
-        for (unsigned i = 0; i < p_mesh->GetNumElements(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumElements(); ++i)
         {
             TS_ASSERT_DELTA(p_mesh->GetVolumeOfElement(i), 0.8660, 1e-4);
             TS_ASSERT_DELTA(p_mesh->GetSurfaceAreaOfElement(i), 3.4641, 1e-4);
@@ -243,7 +243,7 @@ public:
         // Test CalculateMomentOfElement() for all elements
         // all elements are regular hexagons with edge 1/sqrt(3.0)
         c_vector<double, 3> moments;
-        for (unsigned i = 0; i < p_mesh->GetNumElements(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumElements(); ++i)
         {
             moments = p_mesh->CalculateMomentsOfElement(i);
 
@@ -673,7 +673,7 @@ public:
             // Compare nodes
             TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), p_mesh2->GetNumNodes());
 
-            for (unsigned i = 0; i < p_mesh->GetNumNodes(); i++)
+            for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
             {
                 Node<2>* p_node = p_mesh->GetNode(i);
                 Node<2>* p_node2 = p_mesh2->GetNode(i);
@@ -681,7 +681,7 @@ public:
                 TS_ASSERT_EQUALS(p_node->GetIndex(), p_node2->GetIndex());
 
                 TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), p_node2->IsBoundaryNode());
-                for (unsigned j = 0; j < 2; j++)
+                for (unsigned j = 0; j < 2; ++j)
                 {
                     TS_ASSERT_DELTA(p_node->rGetLocation()[j], p_node2->rGetLocation()[j], 1e-4);
                 }
@@ -691,12 +691,12 @@ public:
             TS_ASSERT_EQUALS(p_mesh->GetNumElements(), p_mesh2->GetNumElements());
             TS_ASSERT_EQUALS(p_mesh->GetNumAllElements(), p_mesh2->GetNumAllElements());
 
-            for (unsigned i = 0; i < p_mesh->GetNumElements(); i++)
+            for (unsigned i = 0; i < p_mesh->GetNumElements(); ++i)
             {
                 VertexElement<2, 2>* p_elt = p_mesh->GetElement(i);
                 VertexElement<2, 2>* p_elt2 = p_mesh2->GetElement(i);
                 TS_ASSERT_EQUALS(p_elt->GetNumNodes(), p_elt2->GetNumNodes());
-                for (unsigned j = 0; j < p_elt->GetNumNodes(); j++)
+                for (unsigned j = 0; j < p_elt->GetNumNodes(); ++j)
                 {
                     TS_ASSERT_EQUALS(p_elt->GetNodeGlobalIndex(j), p_elt2->GetNodeGlobalIndex(j));
                 }

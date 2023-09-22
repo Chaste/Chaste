@@ -108,7 +108,7 @@ c_vector<double, 3*ELEMENT_DIM> ExtendedBidomainNeumannSurfaceTermAssembler<ELEM
 //        ret(i+1) = rPhi(i)*sigma_i_times_grad_phi_i_second_cell_dot_n;
 //        ret(i+2) = rPhi(i)*(sigma_i_times_grad_phi_i_first_cell_dot_n + sigma_i_times_grad_phi_i_second_cell_dot_n + sigma_e_times_grad_phi_e_dot_n);
 //    }
-    for (unsigned i=0; i<ELEMENT_DIM; i++)
+    for (unsigned i=0; i<ELEMENT_DIM; ++i)
     {
         ret(3*i) = rPhi(i)*sigma_i_times_grad_phi_i_first_cell_dot_n;
         ret(3*i+1) = rPhi(i)*sigma_i_times_grad_phi_i_second_cell_dot_n;

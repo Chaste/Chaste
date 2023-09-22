@@ -198,7 +198,7 @@ public:
             TS_ASSERT_EQUALS(distance.size(), mesh.GetNumLocalNodes() );
             TS_ASSERT_EQUALS(distance_read.size(), mesh.GetNumLocalNodes()  + mesh.GetNumHaloNodes());
 
-            for (unsigned i=0; i<distance.size(); i++)
+            for (unsigned i = 0; i<distance.size(); ++i)
             {
                 TS_ASSERT_EQUALS(distance[i], distance_read[i]);
             }
@@ -207,9 +207,9 @@ public:
             vtk_reader.GetPointData("Location", location_read);
             TS_ASSERT_EQUALS(location.size(), mesh.GetNumLocalNodes() );
             TS_ASSERT_EQUALS(location_read.size(), mesh.GetNumLocalNodes()  + mesh.GetNumHaloNodes());
-            for (unsigned i=0; i<location.size(); i++)
+            for (unsigned i = 0; i<location.size(); ++i)
             {
-                for (unsigned j=0; j<3; j++)
+                for (unsigned j = 0; j<3; ++j)
                 {
                     TS_ASSERT_EQUALS(location[i][j], location_read[i][j]);
                 }
@@ -219,7 +219,7 @@ public:
             vtk_reader.GetCellData("Quality", quality_read);
             TS_ASSERT_EQUALS(quality.size(), mesh.GetNumLocalElements() );
             TS_ASSERT_EQUALS(quality_read.size(), mesh.GetNumLocalElements());
-            for (unsigned i=0; i<quality_read.size(); i++)
+            for (unsigned i = 0; i<quality_read.size(); ++i)
             {
                 TS_ASSERT_EQUALS(quality[i], quality_read[i]);
             }
@@ -228,9 +228,9 @@ public:
             vtk_reader.GetCellData("Centroid", centroid_read);
             TS_ASSERT_EQUALS(centroid.size(), mesh.GetNumLocalElements() );
             TS_ASSERT_EQUALS(centroid_read.size(), mesh.GetNumLocalElements());
-            for (unsigned i=0; i<centroid_read.size(); i++)
+            for (unsigned i = 0; i<centroid_read.size(); ++i)
             {
-                for (unsigned j=0; j<3; j++)
+                for (unsigned j = 0; j<3; ++j)
                 {
                     TS_ASSERT_EQUALS(centroid[i][j], centroid_read[i][j]);
                 }
@@ -255,7 +255,7 @@ public:
         // Add distance from origin into the node "point" data
         std::vector<double> rank;
         // Real rank for the owned nodes
-        for (unsigned i=0; i<mesh.GetNumLocalNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumLocalNodes(); ++i)
         {
             rank.push_back(PetscTools::GetMyRank());
         }
@@ -295,7 +295,7 @@ public:
             vtk_reader.GetPointData("Process rank", rank_read);
             TS_ASSERT_EQUALS(rank.size(), mesh.GetNumLocalNodes() );
             TS_ASSERT_EQUALS(rank_read.size(), mesh.GetNumLocalNodes()  + mesh.GetNumHaloNodes());
-            for (unsigned i=0; i<rank.size(); i++)
+            for (unsigned i = 0; i<rank.size(); ++i)
             {
                 TS_ASSERT_EQUALS(rank[i], rank_read[i]);
                 TS_ASSERT_EQUALS(rank_read[i], PetscTools::GetMyRank());
@@ -319,7 +319,7 @@ public:
 
         // Add distance from origin into the node "point" data
         std::vector<double> distance;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             distance.push_back(norm_2(mesh.GetNode(i)->rGetLocation()));
         }
@@ -327,7 +327,7 @@ public:
 
         // Add fibre type to "point" data
         std::vector< c_vector<double, 2> > location;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             location.push_back(mesh.GetNode(i)->rGetLocation());
         }
@@ -335,7 +335,7 @@ public:
 
         // Add element quality into the element "cell" data
         std::vector<double> quality;
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             quality.push_back(mesh.GetElement(i)->CalculateQuality());
         }
@@ -343,7 +343,7 @@ public:
 
         // Add fibre type to "cell" data
         std::vector< c_vector<double, 2> > centroid;
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             centroid.push_back(mesh.GetElement(i)->CalculateCentroid());
         }
@@ -352,7 +352,7 @@ public:
         // Add Jacobian tensor cell data, covering both the symmetric and non-symmetric tensor methods
         std::vector< c_matrix<double, 2, 2> > jacobian;
         std::vector< c_vector<double, 3> > squared_jacobian;
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             c_matrix<double, 2, 2> element_jacobian;
             double element_jacobian_determinant;
@@ -375,7 +375,7 @@ public:
 
         //Add tensor point data, we use the outer product of the node's location
         std::vector< c_matrix<double, 2, 2> > location_outer_product;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             c_matrix<double, 2, 2> element_location_outer_product;
             element_location_outer_product = outer_prod(trans(mesh.GetNode(i)->rGetLocation()), mesh.GetNode(i)->rGetLocation());
@@ -395,30 +395,30 @@ public:
             // Check that it has the correct data
             std::vector<double> distance_read;
             vtk_reader.GetPointData("Distance from origin", distance_read);
-            for (unsigned i=0; i<distance_read.size(); i++)
+            for (unsigned i = 0; i<distance_read.size(); ++i)
             {
                 TS_ASSERT_EQUALS(distance[i], distance_read[i]);
             }
             std::vector<c_vector<double,2> > location_read;
             vtk_reader.GetPointData("Location", location_read);
-            for (unsigned i=0; i<location_read.size(); i++)
+            for (unsigned i = 0; i<location_read.size(); ++i)
             {
-                for (unsigned j=0; j<2; j++)
+                for (unsigned j = 0; j<2; ++j)
                 {
                     TS_ASSERT_EQUALS(location[i][j], location_read[i][j]);
                 }
             }
             std::vector<double> quality_read;
             vtk_reader.GetCellData("Quality", quality_read);
-            for (unsigned i=0; i<quality_read.size(); i++)
+            for (unsigned i = 0; i<quality_read.size(); ++i)
             {
                 TS_ASSERT_EQUALS(quality[i], quality_read[i]);
             }
             std::vector<c_vector<double,2> > centroid_read;
             vtk_reader.GetCellData("Centroid", centroid_read);
-            for (unsigned i=0; i<centroid_read.size(); i++)
+            for (unsigned i = 0; i<centroid_read.size(); ++i)
             {
-                for (unsigned j=0; j<2; j++)
+                for (unsigned j = 0; j<2; ++j)
                 {
                     TS_ASSERT_EQUALS(centroid[i][j], centroid_read[i][j]);
                 }
@@ -445,7 +445,7 @@ public:
         // Add distance from origin into the node "point" data
         std::vector<double> rank;
         // Real rank for the owned nodes
-        for (unsigned i=0; i<mesh.GetNumLocalNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumLocalNodes(); ++i)
         {
             rank.push_back(PetscTools::GetMyRank());
         }
@@ -484,7 +484,7 @@ public:
             vtk_reader.GetPointData("Process rank", rank_read);
             TS_ASSERT_EQUALS(rank.size(), mesh.GetNumLocalNodes() );
             TS_ASSERT_EQUALS(rank_read.size(), mesh.GetNumLocalNodes()  + mesh.GetNumHaloNodes());
-            for (unsigned i=0; i<rank.size(); i++)
+            for (unsigned i = 0; i<rank.size(); ++i)
             {
                 TS_ASSERT_EQUALS(rank[i], rank_read[i]);
                 TS_ASSERT_EQUALS(rank_read[i], PetscTools::GetMyRank());
@@ -539,7 +539,7 @@ public:
 
         // Add element quality into the element "cell" data
         std::vector<double> quality;
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             quality.push_back(mesh.GetElement(i)->CalculateQuality());
         }
@@ -547,7 +547,7 @@ public:
 
         // Add fibre type to "cell" data
         std::vector< c_vector<double, 3> > centroid;
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             centroid.push_back(mesh.GetElement(i)->CalculateCentroid());
         }
@@ -555,7 +555,7 @@ public:
 
         // Add distance from origin into the node "point" data
         std::vector<double> distance;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             distance.push_back(norm_2(mesh.GetNode(i)->rGetLocation()));
         }
@@ -563,7 +563,7 @@ public:
 
         // Add fibre type to "point" data
         std::vector< c_vector<double, 3> > location;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             location.push_back(mesh.GetNode(i)->rGetLocation());
         }
@@ -572,7 +572,7 @@ public:
         // Add Jacobian tensor cell data, covering both the symmetric and non-symmetric tensor methods
         std::vector< c_matrix<double, 3, 3> > jacobian;
         std::vector< c_vector<double, 6> > squared_jacobian;
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             c_matrix<double, 3, 3> element_jacobian;
             double element_jacobian_determinant;
@@ -596,7 +596,7 @@ public:
 
         //Add tensor point data, we use the outer product of the node's location
         std::vector< c_matrix<double, 3, 3> > location_outer_product;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             c_matrix<double, 3, 3> element_location_outer_product;
             element_location_outer_product = outer_prod(trans(mesh.GetNode(i)->rGetLocation()), mesh.GetNode(i)->rGetLocation());
@@ -617,13 +617,13 @@ public:
             // Check that it has the correct data
             std::vector<double> distance_read;
             vtk_reader.GetPointData("Distance from origin", distance_read);
-            for (unsigned i=0; i<distance_read.size(); i++)
+            for (unsigned i = 0; i<distance_read.size(); ++i)
             {
                 TS_ASSERT_EQUALS(distance[i], distance_read[i]);
             }
             std::vector<double> quality_read;
             vtk_reader.GetCellData("Quality", quality_read);
-            for (unsigned i=0; i<quality_read.size(); i++)
+            for (unsigned i = 0; i<quality_read.size(); ++i)
             {
                 TS_ASSERT_EQUALS(quality[i], quality_read[i]);
             }
@@ -692,7 +692,7 @@ public:
 
         // Add distance from origin into the node "point" data
         std::vector<double> distance;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             distance.push_back(norm_2(mesh.GetNode(i)->rGetLocation()));
         }
@@ -700,7 +700,7 @@ public:
 
         // Add fibre type to "point" data
         std::vector< c_vector<double, 2> > location;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             location.push_back(mesh.GetNode(i)->rGetLocation());
         }
@@ -708,7 +708,7 @@ public:
 
         // Add element quality into the element "cell" data
         std::vector<double> quality;
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             quality.push_back(mesh.GetElement(i)->CalculateQuality());
         }
@@ -716,7 +716,7 @@ public:
 
         // Add fibre type to "cell" data
         std::vector< c_vector<double, 2> > centroid;
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             centroid.push_back(mesh.GetElement(i)->CalculateCentroid());
         }
@@ -734,30 +734,30 @@ public:
             // Check that it has the correct data
             std::vector<double> distance_read;
             vtk_reader.GetPointData("Distance from origin", distance_read);
-            for (unsigned i=0; i<distance_read.size(); i++)
+            for (unsigned i = 0; i<distance_read.size(); ++i)
             {
                 TS_ASSERT_EQUALS(distance[i], distance_read[i]);
             }
             std::vector<c_vector<double,2> > location_read;
             vtk_reader.GetPointData("Location", location_read);
-            for (unsigned i=0; i<location_read.size(); i++)
+            for (unsigned i = 0; i<location_read.size(); ++i)
             {
-                for (unsigned j=0; j<2; j++)
+                for (unsigned j = 0; j<2; ++j)
                 {
                     TS_ASSERT_EQUALS(location[i][j], location_read[i][j]);
                 }
             }
             std::vector<double> quality_read;
             vtk_reader.GetCellData("Quality", quality_read);
-            for (unsigned i=0; i<quality_read.size(); i++)
+            for (unsigned i = 0; i<quality_read.size(); ++i)
             {
                 TS_ASSERT_EQUALS(quality[i], quality_read[i]);
             }
             std::vector<c_vector<double,2> > centroid_read;
             vtk_reader.GetCellData("Centroid", centroid_read);
-            for (unsigned i=0; i<centroid_read.size(); i++)
+            for (unsigned i = 0; i<centroid_read.size(); ++i)
             {
-                for (unsigned j=0; j<2; j++)
+                for (unsigned j = 0; j<2; ++j)
                 {
                     TS_ASSERT_EQUALS(centroid[i][j], centroid_read[i][j]);
                 }
@@ -941,7 +941,7 @@ public:
 
         if (PetscTools::AmMaster())
         {
-            for (unsigned i=0; i<PetscTools::GetNumProcs(); i++)
+            for (unsigned i = 0; i<PetscTools::GetNumProcs(); ++i)
             {
                 std::stringstream chunk_name;
                 chunk_name << OutputFileHandler::GetChasteTestOutputDirectory();

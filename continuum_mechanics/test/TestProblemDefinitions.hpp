@@ -321,11 +321,11 @@ public:
         // set a heterogeneous law
         MooneyRivlinMaterialLaw<2> incomp_mooney_rivlin_law_2(2.0);
         std::vector<AbstractMaterialLaw<2>*> laws;
-        for (unsigned i=0; i<mesh.GetNumElements()/2; i++)
+        for (unsigned i = 0; i<mesh.GetNumElements()/2; ++i)
         {
             laws.push_back(&incomp_mooney_rivlin_law);
         }
-        for (unsigned i=mesh.GetNumElements()/2; i<mesh.GetNumElements(); i++)
+        for (unsigned i=mesh.GetNumElements()/2; i<mesh.GetNumElements(); ++i)
         {
             laws.push_back(&incomp_mooney_rivlin_law_2);
         }
@@ -333,11 +333,11 @@ public:
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,laws);
 
         TS_ASSERT_EQUALS(problem_defn.IsHomogeneousMaterial(), false);
-        for (unsigned i=0; i<mesh.GetNumElements()/2; i++)
+        for (unsigned i = 0; i<mesh.GetNumElements()/2; ++i)
         {
             TS_ASSERT_EQUALS(problem_defn.GetIncompressibleMaterialLaw(i), &incomp_mooney_rivlin_law);
         }
-        for (unsigned i=mesh.GetNumElements()/2; i<mesh.GetNumElements(); i++)
+        for (unsigned i=mesh.GetNumElements()/2; i<mesh.GetNumElements(); ++i)
         {
             TS_ASSERT_EQUALS(problem_defn.GetIncompressibleMaterialLaw(i), &incomp_mooney_rivlin_law_2);
         }
@@ -356,11 +356,11 @@ public:
         // set a heterogeneous law
         CompressibleMooneyRivlinMaterialLaw<2> comp_mooney_rivlin_law_2(4.0, 1.0);
         std::vector<AbstractMaterialLaw<2>*> comp_laws;
-        for (unsigned i=0; i<mesh.GetNumElements()/2; i++)
+        for (unsigned i = 0; i<mesh.GetNumElements()/2; ++i)
         {
             comp_laws.push_back(&comp_mooney_rivlin_law);
         }
-        for (unsigned i=mesh.GetNumElements()/2; i<mesh.GetNumElements(); i++)
+        for (unsigned i=mesh.GetNumElements()/2; i<mesh.GetNumElements(); ++i)
         {
             comp_laws.push_back(&comp_mooney_rivlin_law_2);
         }
@@ -368,11 +368,11 @@ public:
         problem_defn.SetMaterialLaw(COMPRESSIBLE,comp_laws);
 
         TS_ASSERT_EQUALS(problem_defn.IsHomogeneousMaterial(), false);
-        for (unsigned i=0; i<mesh.GetNumElements()/2; i++)
+        for (unsigned i = 0; i<mesh.GetNumElements()/2; ++i)
         {
             TS_ASSERT_EQUALS(problem_defn.GetCompressibleMaterialLaw(i), &comp_mooney_rivlin_law);
         }
-        for (unsigned i=mesh.GetNumElements()/2; i<mesh.GetNumElements(); i++)
+        for (unsigned i=mesh.GetNumElements()/2; i<mesh.GetNumElements(); ++i)
         {
             TS_ASSERT_EQUALS(problem_defn.GetCompressibleMaterialLaw(i), &comp_mooney_rivlin_law_2);
         }

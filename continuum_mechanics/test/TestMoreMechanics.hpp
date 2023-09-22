@@ -93,7 +93,7 @@ void InterpolateMechanicsSolutionToNewMesh(QuadraticMesh<3>& rCoarseMesh, std::v
 
     c_vector<double, (DIM+1)*(DIM+2)/2> quad_basis;
 
-    for (unsigned i=0; i<rFineMesh.GetNumNodes(); i++)
+    for (unsigned i=0; i<rFineMesh.GetNumNodes(); ++i)
     {
         // find containing elements and weights in coarse mesh
         ChastePoint<DIM> point = rFineMesh.GetNode(i)->GetPoint();
@@ -105,7 +105,7 @@ void InterpolateMechanicsSolutionToNewMesh(QuadraticMesh<3>& rCoarseMesh, std::v
         c_vector<double,DIM> xi;
         xi(0) = weight(1);
         xi(1) = weight(2);
-        if (DIM==3)
+        if (DIM == 3)
         {
             xi(2) = weight(3);
         }
@@ -120,7 +120,7 @@ void InterpolateMechanicsSolutionToNewMesh(QuadraticMesh<3>& rCoarseMesh, std::v
             unsigned coarse_node = p_coarse_element->GetNodeGlobalIndex(elem_node_index);
             c_vector<double,DIM+1> coarse_solution_at_node;
 
-            for (unsigned j=0; j<DIM; j++)
+            for (unsigned j = 0; j < DIM; ++j)
             {
                 coarse_solution_at_node(j) = rCoarseSolution[NUM_UNKNOWNS*coarse_node + j];
             }
@@ -132,7 +132,7 @@ void InterpolateMechanicsSolutionToNewMesh(QuadraticMesh<3>& rCoarseMesh, std::v
             fine_solution += coarse_solution_at_node*quad_basis(elem_node_index);
         }
 
-        for (unsigned j=0; j<DIM; j++)
+        for (unsigned j = 0; j < DIM; ++j)
         {
             rFineSolution[NUM_UNKNOWNS*i + j] = fine_solution(j);
         }
@@ -202,7 +202,7 @@ unsigned SolvePressureOnUnderside(QuadraticMesh<3>& rMesh, std::string outputDir
         {
             EXCEPTION("Badly-sized input");
         }
-        for (unsigned i=0; i<rSolution.size(); i++)
+        for (unsigned i=0; i<rSolution.size(); ++i)
         {
             solver.rGetCurrentSolution()[i] = rSolution[i];
         }
@@ -232,7 +232,7 @@ unsigned SolvePressureOnUnderside(QuadraticMesh<3>& rMesh, std::string outputDir
 
     rSolution.clear();
     rSolution.resize(solver.rGetCurrentSolution().size());
-    for (unsigned i=0; i<rSolution.size(); i++)
+    for (unsigned i=0; i<rSolution.size(); ++i)
     {
         rSolution[i] = solver.rGetCurrentSolution()[i];
     }
@@ -289,7 +289,7 @@ unsigned SolvePressureOnUndersideCompressible(QuadraticMesh<3>& rMesh, std::stri
         {
             EXCEPTION("Badly-sized input");
         }
-        for (unsigned i=0; i<rSolution.size(); i++)
+        for (unsigned i=0; i<rSolution.size(); ++i)
         {
             solver.rGetCurrentSolution()[i] = rSolution[i];
         }
@@ -319,7 +319,7 @@ unsigned SolvePressureOnUndersideCompressible(QuadraticMesh<3>& rMesh, std::stri
 
     rSolution.clear();
     rSolution.resize(solver.rGetCurrentSolution().size());
-    for (unsigned i=0; i<rSolution.size(); i++)
+    for (unsigned i=0; i<rSolution.size(); ++i)
     {
         rSolution[i] = solver.rGetCurrentSolution()[i];
     }

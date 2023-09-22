@@ -189,11 +189,11 @@ private:
     {
         TetrahedralMesh<DIM,DIM> mesh;
         double h = 0.1;
-        if (DIM==1)
+        if (DIM == 1)
         {
             mesh.ConstructRegularSlabMesh(h, 1.0);
         }
-        else if (DIM==2)
+        else if (DIM == 2)
         {
             mesh.ConstructRegularSlabMesh(h, 1.0, 1.0);
         }
@@ -213,7 +213,7 @@ private:
         PetscVecTools::Finalise(vec);
 
         ReplicatableVector vec_repl(vec);
-        double volume_of_element = DIM==1 ? h : (DIM==2 ? 0.5*h*h : h*h*h/6);
+        double volume_of_element = DIM == 1 ? h : (DIM == 2 ? 0.5*h*h : h*h*h/6);
         for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             TS_ASSERT_DELTA(vec_repl[i], volume_of_element*mesh.GetNode(i)->GetNumContainingElements(), 1e-4);

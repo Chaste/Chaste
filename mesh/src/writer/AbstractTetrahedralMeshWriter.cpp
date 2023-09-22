@@ -128,7 +128,7 @@ std::vector<double> AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNe
         {
             // Either this is a sequential mesh (and we own it all)
             // or it's parallel (and the master owns the first chunk)
-            for (unsigned j=0; j<SPACE_DIM; j++)
+            for (unsigned j=0; j<SPACE_DIM; ++j)
             {
                 coords[j] = (*(mpIters->pNodeIter))->GetPoint()[j];
             }
@@ -150,7 +150,7 @@ std::vector<double> AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNe
         boost::scoped_array<double> raw_coords(new double[SPACE_DIM]);
         MPI_Recv(raw_coords.get(), SPACE_DIM, MPI_DOUBLE, MPI_ANY_SOURCE, mNodeCounterForParallelMesh, PETSC_COMM_WORLD, &status);
         assert(status.MPI_ERROR == MPI_SUCCESS);
-        for (unsigned j=0; j<coords.size(); j++)
+        for (unsigned j=0; j<coords.size(); ++j)
         {
             coords[j] = raw_coords[j];
         }
@@ -179,7 +179,7 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElemen
             // Use the iterator
             assert(this->mNumElements == mpMesh->GetNumElements());
 
-            for (unsigned j=0; j<elem_data.NodeIndices.size(); j++)
+            for (unsigned j=0; j<elem_data.NodeIndices.size(); ++j)
             {
                 unsigned old_index = (*(mpIters->pElemIter))->GetNodeGlobalIndex(j);
                 elem_data.NodeIndices[j] = mpMesh->IsMeshChanging() ? mpNodeMap->GetNewIndex(old_index) : old_index;
@@ -201,7 +201,7 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElemen
                 assert(elem_data.NodeIndices.size() == mNodesPerElement);
                 assert(!p_element->IsDeleted());
                 // Master can use the local data to recover node indices & attribute
-                for (unsigned j=0; j<mNodesPerElement; j++)
+                for (unsigned j=0; j<mNodesPerElement; ++j)
                 {
                     elem_data.NodeIndices[j] = p_element->GetNodeGlobalIndex(j);
                 }
@@ -239,7 +239,7 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextBounda
             // Use the iterator
             assert(this->mNumBoundaryElements==mpMesh->GetNumBoundaryElements());
 
-            for (unsigned j=0; j<boundary_elem_data.NodeIndices.size(); j++)
+            for (unsigned j=0; j<boundary_elem_data.NodeIndices.size(); ++j)
             {
                 unsigned old_index = (*(*(mpIters->pBoundaryElemIter)))->GetNodeGlobalIndex(j);
                 boundary_elem_data.NodeIndices[j] = mpMesh->IsMeshChanging() ? mpNodeMap->GetNewIndex(old_index) : old_index;
@@ -260,7 +260,7 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextBounda
                 assert(!p_boundary_element->IsDeleted());
 
                 // Master can use the local data to recover node indices & attribute
-                for (unsigned j=0; j<ELEMENT_DIM; j++)
+                for (unsigned j=0; j<ELEMENT_DIM; ++j)
                 {
                     boundary_elem_data.NodeIndices[j] = p_boundary_element->GetNodeGlobalIndex(j);
                 }
@@ -305,7 +305,7 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextCableE
             assert(!p_element->IsDeleted());
 
             // Master can use the local data to recover node indices & attribute
-            for (unsigned j=0; j<2; j++)
+            for (unsigned j=0; j<2; ++j)
             {
                 elem_data.NodeIndices[j] = p_element->GetNodeGlobalIndex(j);
             }
@@ -419,7 +419,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteNclFile(
         const std::streamoff item_width = max_elements_all * sizeof(unsigned);
         // Copy the binary data, permuted
         std::vector<unsigned> elem_vector(max_elements_all);
-        for (unsigned node_index=0; node_index<rMesh.GetNumAllNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < rMesh.GetNumAllNodes(); ++node_index)
         {
             unsigned permuted_index = rMesh.rGetNodePermutation()[node_index];
             temp_ncl_file.seekg(data_start + item_width * permuted_index, std::ios_base::beg);
@@ -547,7 +547,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
             typedef typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator NodeIterType;
             for (NodeIterType it = mpMesh->GetNodeIteratorBegin(); it != mpMesh->GetNodeIteratorEnd(); ++it)
             {
-                for (unsigned j=0; j<SPACE_DIM; j++)
+                for (unsigned j=0; j<SPACE_DIM; ++j)
                 {
                     raw_coords[j] = it->GetPoint()[j];
                 }
@@ -565,7 +565,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
                 unsigned index = it->GetIndex();
                 if (mpDistributedMesh->CalculateDesignatedOwnershipOfElement(index) == true)
                 {
-                    for (unsigned j=0; j<mNodesPerElement; j++)
+                    for (unsigned j=0; j<mNodesPerElement; ++j)
                     {
                         raw_indices[j] = it->GetNodeGlobalIndex(j);
                     }
@@ -585,7 +585,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
                     unsigned index = (*it)->GetIndex();
                     if (mpDistributedMesh->CalculateDesignatedOwnershipOfBoundaryElement(index) == true)
                     {
-                        for (unsigned j=0; j<ELEMENT_DIM; j++)
+                        for (unsigned j=0; j<ELEMENT_DIM; ++j)
                         {
                             raw_face_indices[j] = (*it)->GetNodeGlobalIndex(j);
                         }
@@ -606,7 +606,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
                     if (mpMixedMesh->CalculateDesignatedOwnershipOfCableElement(index) == true)
                     {
                         unsigned raw_cable_element_indices[2];
-                        for (unsigned j=0; j<2; j++)
+                        for (unsigned j=0; j<2; ++j)
                         {
                             raw_cable_element_indices[j] = (*it)->GetNodeGlobalIndex(j);
                         }

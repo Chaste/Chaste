@@ -388,42 +388,47 @@ AbstractContinuumMechanicsSolver<DIM>::AbstractContinuumMechanicsSolver(Abstract
       mSystemLhsMatrix(nullptr),
       mPreconditionMatrix(nullptr)
 {
-    assert(DIM==2 || DIM==3);
-
-    //Check that the mesh is Quadratic
-    QuadraticMesh<DIM>* p_quad_mesh = dynamic_cast<QuadraticMesh<DIM>* >(&rQuadMesh);
-    DistributedQuadraticMesh<DIM>* p_distributed_quad_mesh = dynamic_cast<DistributedQuadraticMesh<DIM>* >(&rQuadMesh);
-
-    if ((p_quad_mesh == nullptr) && (p_distributed_quad_mesh == nullptr))
+    if constexpr (DIM == 2 || DIM == 3)
     {
-        EXCEPTION("Continuum mechanics solvers require a quadratic mesh");
+        // Check that the mesh is quadratic
+        QuadraticMesh<DIM>* p_quad_mesh = dynamic_cast<QuadraticMesh<DIM>* >(&rQuadMesh);
+        DistributedQuadraticMesh<DIM>* p_distributed_quad_mesh = dynamic_cast<DistributedQuadraticMesh<DIM>* >(&rQuadMesh);
+
+        if ((p_quad_mesh == nullptr) && (p_distributed_quad_mesh == nullptr))
+        {
+            EXCEPTION("Continuum mechanics solvers require a quadratic mesh");
+        }
+
+
+        mVerbose = (mrProblemDefinition.GetVerboseDuringSolve() ||
+                    CommandLineArguments::Instance()->OptionExists("-mech_verbose") ||
+                    CommandLineArguments::Instance()->OptionExists("-mech_very_verbose") );
+
+        mWriteOutput = (mOutputDirectory != "");
+        if (mWriteOutput)
+        {
+            mpOutputFileHandler = new OutputFileHandler(mOutputDirectory);
+        }
+
+        // See dox for mProblemDimension
+        mProblemDimension = mCompressibilityType==COMPRESSIBLE ? DIM : DIM+1;
+        mNumDofs = mProblemDimension*mrQuadMesh.GetNumNodes();
+
+        AllocateMatrixMemory();
+
+        // In general the Jacobian for a mechanics problem is non-polynomial.
+        // We therefore use the highest order integration rule available.
+        mpQuadratureRule = new GaussianQuadratureRule<DIM>(3);
+        // The boundary forcing terms (or tractions) are also non-polynomial in general.
+        // Again, we use the highest order integration rule available.
+        mpBoundaryQuadratureRule = new GaussianQuadratureRule<DIM-1>(3);
+
+        mCurrentSolution.resize(mNumDofs, 0.0);
     }
-
-
-    mVerbose = (mrProblemDefinition.GetVerboseDuringSolve() ||
-                CommandLineArguments::Instance()->OptionExists("-mech_verbose") ||
-                CommandLineArguments::Instance()->OptionExists("-mech_very_verbose") );
-
-    mWriteOutput = (mOutputDirectory != "");
-    if (mWriteOutput)
+    else
     {
-        mpOutputFileHandler = new OutputFileHandler(mOutputDirectory);
+        NEVER_REACHED;
     }
-
-    // See dox for mProblemDimension
-    mProblemDimension = mCompressibilityType==COMPRESSIBLE ? DIM : DIM+1;
-    mNumDofs = mProblemDimension*mrQuadMesh.GetNumNodes();
-
-    AllocateMatrixMemory();
-
-    // In general the Jacobian for a mechanics problem is non-polynomial.
-    // We therefore use the highest order integration rule available.
-    mpQuadratureRule = new GaussianQuadratureRule<DIM>(3);
-    // The boundary forcing terms (or tractions) are also non-polynomial in general.
-    // Again, we use the highest order integration rule available.
-    mpBoundaryQuadratureRule = new GaussianQuadratureRule<DIM-1>(3);
-
-    mCurrentSolution.resize(mNumDofs, 0.0);
 }
 
 template<unsigned DIM>
@@ -479,13 +484,13 @@ void AbstractContinuumMechanicsSolver<DIM>::WriteCurrentSpatialSolution(std::str
         out_stream p_file = mpOutputFileHandler->OpenOutputFile(file_name.str());
 
         std::vector<c_vector<double,DIM> >& r_spatial_solution = rGetSpatialSolution();
-        for (unsigned i=0; i<r_spatial_solution.size(); i++)
+        for (unsigned i = 0; i < r_spatial_solution.size(); ++i)
         {
-    //        for (unsigned j=0; j<DIM; j++)
+    //        for (unsigned j = 0; j < DIM; ++j)
     //        {
     //            *p_file << mrQuadMesh.GetNode(i)->rGetLocation()[j] << " ";
     //        }
-            for (unsigned j=0; j<DIM; j++)
+            for (unsigned j = 0; j < DIM; ++j)
             {
                 *p_file << r_spatial_solution[i](j) << " ";
             }
@@ -517,9 +522,9 @@ void AbstractContinuumMechanicsSolver<DIM>::WriteCurrentPressureSolution(int cou
             out_stream p_file = mpOutputFileHandler->OpenOutputFile(file_name.str());
 
             std::vector<double> &r_pressure = rGetPressures();
-            for (unsigned i = 0; i < r_pressure.size(); i++)
+            for (unsigned i = 0; i < r_pressure.size(); ++i)
             {
-                for (unsigned j = 0; j < DIM; j++)
+                for (unsigned j = 0; j < DIM; ++j)
                 {
                     *p_file << mrQuadMesh.GetNode(i)->rGetLocation()[j] << " ";
                 }
@@ -582,7 +587,7 @@ std::vector<double>& AbstractContinuumMechanicsSolver<DIM>::rGetPressures()
     mPressureSolution.clear();
     mPressureSolution.resize(mrQuadMesh.GetNumNodes());
 
-    for (unsigned i=0; i<mrQuadMesh.GetNumNodes(); i++)
+    for (unsigned i = 0; i<mrQuadMesh.GetNumNodes(); ++i)
     {
         mPressureSolution[i] = mCurrentSolution[mProblemDimension*i + DIM];
     }
@@ -602,14 +607,14 @@ void AbstractContinuumMechanicsSolver<DIM>::RemovePressureDummyValuesThroughLine
     unsigned internal_nodes_3d[6] = {4,5,6,7,8,9};
     unsigned neighbouring_vertices_3d[6][2] = { {0,1}, {1,2}, {0,2}, {0,3}, {1,3}, {2,3} };
 
-    unsigned num_internal_nodes_per_element = DIM==2 ? 3 : 6;
+    unsigned num_internal_nodes_per_element = DIM == 2 ? 3 : 6;
 
     // loop over elements, then loop over edges.
     for (auto iter = mrQuadMesh.GetElementIteratorBegin();
          iter != mrQuadMesh.GetElementIteratorEnd();
          ++iter)
     {
-        for (unsigned i=0; i<num_internal_nodes_per_element; i++)
+        for (unsigned i = 0; i<num_internal_nodes_per_element; ++i)
         {
             unsigned global_index;
             double left_val;
@@ -692,11 +697,11 @@ void AbstractContinuumMechanicsSolver<DIM>::ApplyDirichletBoundaryConditions(App
     // collect the entries to be altered
     ///////////////////////////////////////
 
-    for (unsigned i=0; i<mrProblemDefinition.rGetDirichletNodes().size(); i++)
+    for (unsigned i = 0; i < mrProblemDefinition.rGetDirichletNodes().size(); ++i)
     {
         unsigned node_index = mrProblemDefinition.rGetDirichletNodes()[i];
 
-        for (unsigned j=0; j<DIM; j++)
+        for (unsigned j = 0; j < DIM; ++j)
         {
             double dirichlet_val = mrProblemDefinition.rGetDirichletNodeValues()[i](j);
 
@@ -731,7 +736,7 @@ void AbstractContinuumMechanicsSolver<DIM>::ApplyDirichletBoundaryConditions(App
     if (applySymmetrically)
     {
         // Modify the matrix columns
-        for (unsigned i=0; i<rows.size(); i++)
+        for (unsigned i = 0; i < rows.size(); ++i)
         {
             unsigned col = rows[i];
             double minus_value = -values[i];
@@ -777,7 +782,7 @@ void AbstractContinuumMechanicsSolver<DIM>::ApplyDirichletBoundaryConditions(App
 
     if (type!=LINEAR_PROBLEM)
     {
-        for (unsigned i=0; i<rows.size(); i++)
+        for (unsigned i = 0; i < rows.size(); ++i)
         {
             PetscVecTools::SetElement(mResidualVector, rows[i], values[i]);
         }
@@ -785,7 +790,7 @@ void AbstractContinuumMechanicsSolver<DIM>::ApplyDirichletBoundaryConditions(App
 
     if (type!=NONLINEAR_PROBLEM_APPLY_TO_RESIDUAL_ONLY)
     {
-        for (unsigned i=0; i<rows.size(); i++)
+        for (unsigned i = 0; i < rows.size(); ++i)
         {
             PetscVecTools::SetElement(mLinearSystemRhsVector, rows[i], values[i]);
         }
@@ -800,12 +805,12 @@ void AbstractContinuumMechanicsSolver<DIM>::AddIdentityBlockForDummyPressureVari
     int lo, hi;
     VecGetOwnershipRange(mResidualVector, &lo, &hi);
 
-    for (unsigned i=0; i<mrQuadMesh.GetNumNodes(); i++)
+    for (unsigned i = 0; i < mrQuadMesh.GetNumNodes(); ++i)
     {
         if (mrQuadMesh.GetNode(i)->IsInternal())
         {
             unsigned row = (DIM+1)*i + DIM; // DIM+1 is the problem dimension
-            if (lo <= (int)row && (int)row < hi)
+            if (lo <= static_cast<int>(row) && static_cast<int>(row) < hi)
             {
                 if (type!=LINEAR_PROBLEM)
                 {
@@ -827,148 +832,152 @@ void AbstractContinuumMechanicsSolver<DIM>::AddIdentityBlockForDummyPressureVari
 template<unsigned DIM>
 void AbstractContinuumMechanicsSolver<DIM>::AllocateMatrixMemory()
 {
-    Vec template_vec = mrQuadMesh.GetDistributedVectorFactory()->CreateVec(mProblemDimension);
-
-    ///////////////////////////
-    // three vectors
-    ///////////////////////////
-    VecDuplicate(template_vec, &mResidualVector);
-    VecDuplicate(mResidualVector, &mLinearSystemRhsVector);
-    // the one is only allocated if it will be needed (in ApplyDirichletBoundaryConditions),
-    // depending on whether the matrix is kept symmetric.
-    mDirichletBoundaryConditionsVector = nullptr;
-    PetscTools::Destroy(template_vec);
-
-    ///////////////////////////
-    // two matrices
-    ///////////////////////////
-
-    int lo, hi;
-    VecGetOwnershipRange(mResidualVector, &lo, &hi);
-    PetscInt local_size = hi - lo;
-
-
-    if (DIM==2)
+    if constexpr (DIM == 2 || DIM == 3)
     {
-        // 2D: N elements around a point => 7N+3 non-zeros in that row? Assume N<=10 (structured mesh would have N_max=6) => 73.
-        unsigned num_non_zeros = std::min(75u, mNumDofs);
+        Vec template_vec = mrQuadMesh.GetDistributedVectorFactory()->CreateVec(mProblemDimension);
 
-        PetscTools::SetupMat(mSystemLhsMatrix, mNumDofs, mNumDofs, num_non_zeros, local_size, local_size);
-        PetscTools::SetupMat(mPreconditionMatrix, mNumDofs, mNumDofs, num_non_zeros, local_size, local_size);
+        ///////////////////////////
+        // three vectors
+        ///////////////////////////
+        VecDuplicate(template_vec, &mResidualVector);
+        VecDuplicate(mResidualVector, &mLinearSystemRhsVector);
+        // the one is only allocated if it will be needed (in ApplyDirichletBoundaryConditions),
+        // depending on whether the matrix is kept symmetric.
+        mDirichletBoundaryConditionsVector = nullptr;
+        PetscTools::Destroy(template_vec);
+
+        ///////////////////////////
+        // two matrices
+        ///////////////////////////
+
+        int lo, hi;
+        VecGetOwnershipRange(mResidualVector, &lo, &hi);
+        PetscInt local_size = hi - lo;
+
+        if (DIM == 2)
+        {
+            // 2D: N elements around a point => 7N+3 non-zeros in that row? Assume N<=10 (structured mesh would have N_max=6) => 73.
+            unsigned num_non_zeros = std::min(75u, mNumDofs);
+
+            PetscTools::SetupMat(mSystemLhsMatrix, mNumDofs, mNumDofs, num_non_zeros, local_size, local_size);
+            PetscTools::SetupMat(mPreconditionMatrix, mNumDofs, mNumDofs, num_non_zeros, local_size, local_size);
+        }
+        else // DIM == 3
+        {
+            // in 3d we get the number of containing elements for each node and use that to obtain an upper bound
+            // for the number of non-zeros for each DOF associated with that node.
+
+            int* num_non_zeros_each_row = new int[mNumDofs];
+            for (unsigned i = 0; i < mNumDofs; ++i)
+            {
+                num_non_zeros_each_row[i] = 0;
+            }
+
+            for (auto iter = mrQuadMesh.GetNodeIteratorBegin();
+                 iter != mrQuadMesh.GetNodeIteratorEnd();
+                 ++iter)
+            {
+                // this upper bound neglects the fact that two containing elements will share the same nodes..
+                // 4 = max num dofs associated with this node
+                // 30 = 3*9+3 = 3 dimensions x 9 other nodes on this element   +  3 vertices with a pressure unknown
+                unsigned num_non_zeros_upper_bound = 4 + 30*iter->GetNumContainingElements();
+
+                num_non_zeros_upper_bound = std::min(num_non_zeros_upper_bound, mNumDofs);
+
+                unsigned i = iter->GetIndex();
+
+                num_non_zeros_each_row[mProblemDimension*i + 0] = num_non_zeros_upper_bound;
+                num_non_zeros_each_row[mProblemDimension*i + 1] = num_non_zeros_upper_bound;
+                num_non_zeros_each_row[mProblemDimension*i + 2] = num_non_zeros_upper_bound;
+
+                if (mCompressibilityType==INCOMPRESSIBLE)
+                {
+                    if (!iter->IsInternal())
+                    {
+                        num_non_zeros_each_row[mProblemDimension*i + 3] = num_non_zeros_upper_bound;
+                    }
+                    else
+                    {
+                        num_non_zeros_each_row[mProblemDimension*i + 3] = 1;
+                    }
+                }
+            }
+
+            // NOTE: PetscTools::SetupMat() or the below creates a MATAIJ matrix, which means the matrix will
+            // be of type MATSEQAIJ if num_procs=1 and MATMPIAIJ otherwise. In the former case
+            // MatSeqAIJSetPreallocation MUST be called [MatMPIAIJSetPreallocation will have
+            // no effect (silently)], and vice versa in the latter case
+
+            /// We want to allocate different numbers of non-zeros per row, which means
+            /// PetscTools::SetupMat isn't that useful. We could call
+            //PetscTools::SetupMat(mSystemLhsMatrix, mNumDofs, mNumDofs, 0, PETSC_DECIDE, PETSC_DECIDE);
+            //PetscTools::SetupMat(mPreconditionMatrix, mNumDofs, mNumDofs, 0, PETSC_DECIDE, PETSC_DECIDE);
+            /// but we would get warnings due to the lack allocation
+
+            // possible todo: create a PetscTools::SetupMatNoAllocation()
+
+
+    #if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
+            MatCreate(PETSC_COMM_WORLD,local_size,local_size,mNumDofs,mNumDofs,&mSystemLhsMatrix);
+            MatCreate(PETSC_COMM_WORLD,local_size,local_size,mNumDofs,mNumDofs,&mPreconditionMatrix);
+    #else //New API
+            MatCreate(PETSC_COMM_WORLD,&mSystemLhsMatrix);
+            MatCreate(PETSC_COMM_WORLD,&mPreconditionMatrix);
+            MatSetSizes(mSystemLhsMatrix,local_size,local_size,mNumDofs,mNumDofs);
+            MatSetSizes(mPreconditionMatrix,local_size,local_size,mNumDofs,mNumDofs);
+    #endif
+
+            if (PetscTools::IsSequential())
+            {
+                MatSetType(mSystemLhsMatrix, MATSEQAIJ);
+                MatSetType(mPreconditionMatrix, MATSEQAIJ);
+                MatSeqAIJSetPreallocation(mSystemLhsMatrix,    PETSC_DEFAULT, num_non_zeros_each_row);
+                MatSeqAIJSetPreallocation(mPreconditionMatrix, PETSC_DEFAULT, num_non_zeros_each_row);
+            }
+            else
+            {
+                int* num_non_zeros_each_row_in_diag = new int[local_size];
+                int* num_non_zeros_each_row_off_diag = new int[local_size];
+                for (unsigned i = 0; i < unsigned(local_size); ++i)
+                {
+                    num_non_zeros_each_row_in_diag[i] = num_non_zeros_each_row[lo+i];
+                    num_non_zeros_each_row_off_diag[i] = num_non_zeros_each_row[lo+i];
+                    // In the on process ("diagonal block") there cannot be more non-zero columns specified than there are rows
+                    if (num_non_zeros_each_row_in_diag[i] > local_size)
+                    {
+                        num_non_zeros_each_row_in_diag[i] = local_size;
+                    }
+                }
+
+                MatSetType(mSystemLhsMatrix, MATMPIAIJ);
+                MatSetType(mPreconditionMatrix, MATMPIAIJ);
+                MatMPIAIJSetPreallocation(mSystemLhsMatrix,    PETSC_DEFAULT, num_non_zeros_each_row_in_diag, PETSC_DEFAULT, num_non_zeros_each_row_off_diag);
+                MatMPIAIJSetPreallocation(mPreconditionMatrix, PETSC_DEFAULT, num_non_zeros_each_row_in_diag, PETSC_DEFAULT, num_non_zeros_each_row_off_diag);
+            }
+
+            MatSetFromOptions(mSystemLhsMatrix);
+            MatSetFromOptions(mPreconditionMatrix);
+    #if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
+            MatSetOption(mSystemLhsMatrix, MAT_IGNORE_OFF_PROC_ENTRIES, PETSC_TRUE);
+            MatSetOption(mPreconditionMatrix, MAT_IGNORE_OFF_PROC_ENTRIES, PETSC_TRUE);
+    #else
+            MatSetOption(mSystemLhsMatrix, MAT_IGNORE_OFF_PROC_ENTRIES);
+            MatSetOption(mPreconditionMatrix, MAT_IGNORE_OFF_PROC_ENTRIES);
+    #endif
+
+            //unsigned total_non_zeros = 0;
+            //for (unsigned i = 0; i < mNumDofs; ++i)
+            //{
+            //   total_non_zeros += num_non_zeros_each_row[i];
+            //}
+            //std::cout << total_non_zeros << " versus " << 500*mNumDofs << "\n" << std::flush;
+
+            delete [] num_non_zeros_each_row;
+        }
     }
     else
     {
-        assert(DIM==3);
-
-        // in 3d we get the number of containing elements for each node and use that to obtain an upper bound
-        // for the number of non-zeros for each DOF associated with that node.
-
-        int* num_non_zeros_each_row = new int[mNumDofs];
-        for (unsigned i=0; i<mNumDofs; i++)
-        {
-            num_non_zeros_each_row[i] = 0;
-        }
-
-        for (auto iter = mrQuadMesh.GetNodeIteratorBegin();
-             iter != mrQuadMesh.GetNodeIteratorEnd();
-             ++iter)
-        {
-            // this upper bound neglects the fact that two containing elements will share the same nodes..
-            // 4 = max num dofs associated with this node
-            // 30 = 3*9+3 = 3 dimensions x 9 other nodes on this element   +  3 vertices with a pressure unknown
-            unsigned num_non_zeros_upper_bound = 4 + 30*iter->GetNumContainingElements();
-
-            num_non_zeros_upper_bound = std::min(num_non_zeros_upper_bound, mNumDofs);
-
-            unsigned i = iter->GetIndex();
-
-            num_non_zeros_each_row[mProblemDimension*i + 0] = num_non_zeros_upper_bound;
-            num_non_zeros_each_row[mProblemDimension*i + 1] = num_non_zeros_upper_bound;
-            num_non_zeros_each_row[mProblemDimension*i + 2] = num_non_zeros_upper_bound;
-
-            if (mCompressibilityType==INCOMPRESSIBLE)
-            {
-                if (!iter->IsInternal())
-                {
-                    num_non_zeros_each_row[mProblemDimension*i + 3] = num_non_zeros_upper_bound;
-                }
-                else
-                {
-                    num_non_zeros_each_row[mProblemDimension*i + 3] = 1;
-                }
-            }
-        }
-
-        // NOTE: PetscTools::SetupMat() or the below creates a MATAIJ matrix, which means the matrix will
-        // be of type MATSEQAIJ if num_procs=1 and MATMPIAIJ otherwise. In the former case
-        // MatSeqAIJSetPreallocation MUST be called [MatMPIAIJSetPreallocation will have
-        // no effect (silently)], and vice versa in the latter case
-
-        /// We want to allocate different numbers of non-zeros per row, which means
-        /// PetscTools::SetupMat isn't that useful. We could call
-        //PetscTools::SetupMat(mSystemLhsMatrix, mNumDofs, mNumDofs, 0, PETSC_DECIDE, PETSC_DECIDE);
-        //PetscTools::SetupMat(mPreconditionMatrix, mNumDofs, mNumDofs, 0, PETSC_DECIDE, PETSC_DECIDE);
-        /// but we would get warnings due to the lack allocation
-
-        // possible todo: create a PetscTools::SetupMatNoAllocation()
-
-
-#if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
-        MatCreate(PETSC_COMM_WORLD,local_size,local_size,mNumDofs,mNumDofs,&mSystemLhsMatrix);
-        MatCreate(PETSC_COMM_WORLD,local_size,local_size,mNumDofs,mNumDofs,&mPreconditionMatrix);
-#else //New API
-        MatCreate(PETSC_COMM_WORLD,&mSystemLhsMatrix);
-        MatCreate(PETSC_COMM_WORLD,&mPreconditionMatrix);
-        MatSetSizes(mSystemLhsMatrix,local_size,local_size,mNumDofs,mNumDofs);
-        MatSetSizes(mPreconditionMatrix,local_size,local_size,mNumDofs,mNumDofs);
-#endif
-
-        if (PetscTools::IsSequential())
-        {
-            MatSetType(mSystemLhsMatrix, MATSEQAIJ);
-            MatSetType(mPreconditionMatrix, MATSEQAIJ);
-            MatSeqAIJSetPreallocation(mSystemLhsMatrix,    PETSC_DEFAULT, num_non_zeros_each_row);
-            MatSeqAIJSetPreallocation(mPreconditionMatrix, PETSC_DEFAULT, num_non_zeros_each_row);
-        }
-        else
-        {
-            int* num_non_zeros_each_row_in_diag = new int[local_size];
-            int* num_non_zeros_each_row_off_diag = new int[local_size];
-            for (unsigned i=0; i<unsigned(local_size); i++)
-            {
-                num_non_zeros_each_row_in_diag[i] = num_non_zeros_each_row[lo+i];
-                num_non_zeros_each_row_off_diag[i] = num_non_zeros_each_row[lo+i];
-                // In the on process ("diagonal block") there cannot be more non-zero columns specified than there are rows
-                if (num_non_zeros_each_row_in_diag[i] > local_size)
-                {
-                    num_non_zeros_each_row_in_diag[i] = local_size;
-                }
-            }
-
-            MatSetType(mSystemLhsMatrix, MATMPIAIJ);
-            MatSetType(mPreconditionMatrix, MATMPIAIJ);
-            MatMPIAIJSetPreallocation(mSystemLhsMatrix,    PETSC_DEFAULT, num_non_zeros_each_row_in_diag, PETSC_DEFAULT, num_non_zeros_each_row_off_diag);
-            MatMPIAIJSetPreallocation(mPreconditionMatrix, PETSC_DEFAULT, num_non_zeros_each_row_in_diag, PETSC_DEFAULT, num_non_zeros_each_row_off_diag);
-        }
-
-        MatSetFromOptions(mSystemLhsMatrix);
-        MatSetFromOptions(mPreconditionMatrix);
-#if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
-        MatSetOption(mSystemLhsMatrix, MAT_IGNORE_OFF_PROC_ENTRIES, PETSC_TRUE);
-        MatSetOption(mPreconditionMatrix, MAT_IGNORE_OFF_PROC_ENTRIES, PETSC_TRUE);
-#else
-        MatSetOption(mSystemLhsMatrix, MAT_IGNORE_OFF_PROC_ENTRIES);
-        MatSetOption(mPreconditionMatrix, MAT_IGNORE_OFF_PROC_ENTRIES);
-#endif
-
-        //unsigned total_non_zeros = 0;
-        //for (unsigned i=0; i<mNumDofs; i++)
-        //{
-        //   total_non_zeros += num_non_zeros_each_row[i];
-        //}
-        //std::cout << total_non_zeros << " versus " << 500*mNumDofs << "\n" << std::flush;
-
-        delete [] num_non_zeros_each_row;
+        NEVER_REACHED;
     }
 }
 #endif // ABSTRACTCONTINUUMMECHANICSSOLVER_HPP_

@@ -403,7 +403,7 @@ public:
         NumericFileComparison comp2(file1, file2);
         TS_ASSERT(comp2.CompareFiles(1e-12));
 
-        for (unsigned i=0; i<451u; i++)
+        for (unsigned i=0; i<451u; ++i)
         {
             std::stringstream filename;
             filename << "postprocessingapd_" << i << ".exnode";
@@ -517,7 +517,7 @@ public:
         // See TestLongPostprocessing for one with some data in it.
         vtk_reader.GetPointData("Apd_90_minus_30_Map_000000", apd_data);
         TS_ASSERT_EQUALS(apd_data.size(), 221u);
-        for (unsigned i=0; i<apd_data.size(); i++)
+        for (unsigned i=0; i<apd_data.size(); ++i)
         {
             TS_ASSERT_DELTA(apd_data[i], 0.0, 1e-9);
         }
@@ -525,7 +525,7 @@ public:
         // and APD50 map
         vtk_reader.GetPointData("Apd_50_minus_30_Map_000000", apd_data);
         TS_ASSERT_EQUALS(apd_data.size(), 221u);
-        for (unsigned i=0; i<apd_data.size(); i++)
+        for (unsigned i=0; i<apd_data.size(); ++i)
         {
             TS_ASSERT_DELTA(apd_data[i], 0.0, 1e-9);
         }

@@ -161,7 +161,7 @@ void MutableMesh<1, 1>::RescaleMeshFromBoundaryNode(ChastePoint<1> updatedPoint,
     assert(this->GetNode(boundaryNodeIndex)->IsBoundaryNode());
     double scaleFactor = updatedPoint[0] / this->GetNode(boundaryNodeIndex)->GetPoint()[0];
     double temp;
-    for (unsigned i=0; i < boundaryNodeIndex+1; i++)
+    for (unsigned i=0; i < boundaryNodeIndex+1; ++i)
     {
         temp = scaleFactor * this->mNodes[i]->GetPoint()[0];
         ChastePoint<1> newPoint(temp);
@@ -241,7 +241,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::DeleteNode(unsigned index)
          ++it)
     {
         Element <ELEMENT_DIM,SPACE_DIM>* p_element = this->GetElement(*it);
-        for (unsigned i=0; i<=ELEMENT_DIM && !found_target; i++)
+        for (unsigned i=0; i<=ELEMENT_DIM && !found_target; ++i)
         {
             target_index = p_element->GetNodeGlobalIndex(i);
             try
@@ -472,7 +472,7 @@ unsigned MutableMesh<ELEMENT_DIM, SPACE_DIM>::RefineElement(
     //       overridden by AddNode, so it can safely be ignored
 
     // This loop constructs the extra elements which are going to fill the space
-    for (unsigned i = 0; i < ELEMENT_DIM; i++)
+    for (unsigned i = 0; i < ELEMENT_DIM; ++i)
     {
 
         // First, make a copy of the current element making sure we update its index
@@ -545,7 +545,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::DeleteBoundaryNodeAt(unsigned index)
     while (element_indices_iterator != element_indices.end())
     {
         Element<ELEMENT_DIM, SPACE_DIM>* p_element = this->GetElement(*element_indices_iterator);
-        for (unsigned i=0; i<p_element->GetNumNodes(); i++)
+        for (unsigned i=0; i<p_element->GetNumNodes(); ++i)
         {
             Node<SPACE_DIM>* p_node = p_element->GetNode(i);
             if (!p_node->IsDeleted())
@@ -569,7 +569,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReIndex(NodeMap& map)
 
     std::vector<Element<ELEMENT_DIM, SPACE_DIM> *> live_elements;
 
-    for (unsigned i=0; i<this->mElements.size(); i++)
+    for (unsigned i=0; i<this->mElements.size(); ++i)
     {
         assert(i==this->mElements[i]->GetIndex()); // We need this to be true to be able to reindex the Jacobian cache
         if (this->mElements[i]->IsDeleted())
@@ -611,7 +611,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReIndex(NodeMap& map)
     this->mElementJacobianDeterminants.resize(num_elements);
 
     std::vector<Node<SPACE_DIM> *> live_nodes;
-    for (unsigned i=0; i<this->mNodes.size(); i++)
+    for (unsigned i=0; i<this->mNodes.size(); ++i)
     {
         if (this->mNodes[i]->IsDeleted())
         {
@@ -632,7 +632,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReIndex(NodeMap& map)
     mDeletedNodeIndices.clear();
 
     std::vector<BoundaryElement<ELEMENT_DIM-1, SPACE_DIM> *> live_boundary_elements;
-    for (unsigned i=0; i<this->mBoundaryElements.size(); i++)
+    for (unsigned i=0; i<this->mBoundaryElements.size(); ++i)
     {
         if (this->mBoundaryElements[i]->IsDeleted())
         {
@@ -656,17 +656,17 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReIndex(NodeMap& map)
     this->mBoundaryElementWeightedDirections.resize(num_boundary_elements);
     this->mBoundaryElementJacobianDeterminants.resize(num_boundary_elements);
 
-    for (unsigned i=0; i<this->mNodes.size(); i++)
+    for (unsigned i=0; i<this->mNodes.size(); ++i)
     {
         this->mNodes[i]->SetIndex(i);
     }
 
-    for (unsigned i=0; i<this->mElements.size(); i++)
+    for (unsigned i=0; i<this->mElements.size(); ++i)
     {
         this->mElements[i]->ResetIndex(i);
     }
 
-    for (unsigned i=0; i<this->mBoundaryElements.size(); i++)
+    for (unsigned i=0; i<this->mBoundaryElements.size(); ++i)
     {
         this->mBoundaryElements[i]->ResetIndex(i);
     }
@@ -701,7 +701,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(NodeMap& map)
         // Store the node locations
         std::vector<c_vector<double, SPACE_DIM> > old_node_locations;
         unsigned new_index = 0;
-        for (unsigned i=0; i<this->GetNumAllNodes(); i++)
+        for (unsigned i=0; i<this->GetNumAllNodes(); ++i)
         {
             if (this->mNodes[i]->IsDeleted())
             {
@@ -719,7 +719,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(NodeMap& map)
         Clear();
 
         // Construct the nodes and boundary nodes
-        for (unsigned node_index=0; node_index<old_node_locations.size(); node_index++)
+        for (unsigned node_index = 0; node_index < old_node_locations.size(); ++node_index)
         {
             // As we're in 1D, the boundary nodes are simply at either end of the mesh
             bool is_boundary_node = (node_index==0 || node_index==old_node_locations.size()-1);
@@ -994,86 +994,92 @@ c_vector<unsigned, 3> MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitEdge(Node<SPACE_
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MutableMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsVoronoi(Element<ELEMENT_DIM, SPACE_DIM>* pElement, double maxPenetration)
 {
-    assert(ELEMENT_DIM == SPACE_DIM);     // LCOV_EXCL_LINE
-    unsigned num_nodes = pElement->GetNumNodes();
-    std::set<unsigned> neighbouring_elements_indices;
-    std::set< Element<ELEMENT_DIM,SPACE_DIM> *> neighbouring_elements;
-    std::set<unsigned> neighbouring_nodes_indices;
-
-    // Form a set of neighbouring elements via the nodes
-    for (unsigned i=0; i<num_nodes; i++)
+    if constexpr (ELEMENT_DIM == SPACE_DIM)
     {
-        Node<SPACE_DIM>* p_node = pElement->GetNode(i);
-        neighbouring_elements_indices = p_node->rGetContainingElementIndices();
-        for (std::set<unsigned>::const_iterator it = neighbouring_elements_indices.begin();
-             it != neighbouring_elements_indices.end();
-             ++it)
+        unsigned num_nodes = pElement->GetNumNodes();
+        std::set<unsigned> neighbouring_elements_indices;
+        std::set< Element<ELEMENT_DIM,SPACE_DIM> *> neighbouring_elements;
+        std::set<unsigned> neighbouring_nodes_indices;
+
+        // Form a set of neighbouring elements via the nodes
+        for (unsigned i=0; i<num_nodes; ++i)
         {
-            neighbouring_elements.insert(this->GetElement(*it));
-        }
-    }
-    neighbouring_elements.erase(pElement);
-
-    // For each neighbouring element find the supporting nodes
-    typedef typename std::set<Element<ELEMENT_DIM,SPACE_DIM> *>::const_iterator ElementIterator;
-
-    for (ElementIterator it = neighbouring_elements.begin();
-         it != neighbouring_elements.end();
-         ++it)
-    {
-        for (unsigned i=0; i<num_nodes; i++)
-        {
-            neighbouring_nodes_indices.insert((*it)->GetNodeGlobalIndex(i));
-        }
-    }
-
-    // Remove the nodes that support this element
-    for (unsigned i = 0; i < num_nodes; i++)
-    {
-        neighbouring_nodes_indices.erase(pElement->GetNodeGlobalIndex(i));
-    }
-
-    // Get the circumsphere information
-    c_vector<double, SPACE_DIM+1> this_circum_centre;
-
-    this_circum_centre = pElement->CalculateCircumsphere(this->mElementJacobians[pElement->GetIndex()], this->mElementInverseJacobians[pElement->GetIndex()]);
-
-    // Copy the actually circumcentre into a smaller vector
-    c_vector<double, ELEMENT_DIM> circum_centre;
-    for (unsigned i=0; i<ELEMENT_DIM; i++)
-    {
-        circum_centre[i] = this_circum_centre[i];
-    }
-
-    for (std::set<unsigned>::const_iterator it = neighbouring_nodes_indices.begin();
-         it != neighbouring_nodes_indices.end();
-         ++it)
-    {
-        c_vector<double, ELEMENT_DIM> node_location;
-        node_location = this->GetNode(*it)->rGetLocation();
-
-        // Calculate vector from circumcenter to node
-        node_location -= circum_centre;
-
-        // This is to calculate the squared distance between them
-        double squared_distance = inner_prod(node_location, node_location);
-
-        // If the squared distance is less than the elements circum-radius(squared),
-        // then the Voronoi property is violated.
-        if (squared_distance < this_circum_centre[ELEMENT_DIM])
-        {
-            // We know the node is inside the circumsphere, but we don't know how far
-            double radius = sqrt(this_circum_centre[ELEMENT_DIM]);
-            double distance = radius - sqrt(squared_distance);
-
-            // If the node penetration is greater than supplied maximum penetration factor
-            if (distance/radius > maxPenetration)
+            Node<SPACE_DIM>* p_node = pElement->GetNode(i);
+            neighbouring_elements_indices = p_node->rGetContainingElementIndices();
+            for (std::set<unsigned>::const_iterator it = neighbouring_elements_indices.begin();
+                it != neighbouring_elements_indices.end();
+                ++it)
             {
-                return false;
+                neighbouring_elements.insert(this->GetElement(*it));
             }
         }
+        neighbouring_elements.erase(pElement);
+
+        // For each neighbouring element find the supporting nodes
+        typedef typename std::set<Element<ELEMENT_DIM,SPACE_DIM> *>::const_iterator ElementIterator;
+
+        for (ElementIterator it = neighbouring_elements.begin();
+            it != neighbouring_elements.end();
+            ++it)
+        {
+            for (unsigned i=0; i<num_nodes; ++i)
+            {
+                neighbouring_nodes_indices.insert((*it)->GetNodeGlobalIndex(i));
+            }
+        }
+
+        // Remove the nodes that support this element
+        for (unsigned i = 0; i < num_nodes; ++i)
+        {
+            neighbouring_nodes_indices.erase(pElement->GetNodeGlobalIndex(i));
+        }
+
+        // Get the circumsphere information
+        c_vector<double, SPACE_DIM+1> this_circum_centre;
+
+        this_circum_centre = pElement->CalculateCircumsphere(this->mElementJacobians[pElement->GetIndex()], this->mElementInverseJacobians[pElement->GetIndex()]);
+
+        // Copy the actually circumcentre into a smaller vector
+        c_vector<double, ELEMENT_DIM> circum_centre;
+        for (unsigned i=0; i<ELEMENT_DIM; ++i)
+        {
+            circum_centre[i] = this_circum_centre[i];
+        }
+
+        for (std::set<unsigned>::const_iterator it = neighbouring_nodes_indices.begin();
+            it != neighbouring_nodes_indices.end();
+            ++it)
+        {
+            c_vector<double, ELEMENT_DIM> node_location;
+            node_location = this->GetNode(*it)->rGetLocation();
+
+            // Calculate vector from circumcenter to node
+            node_location -= circum_centre;
+
+            // This is to calculate the squared distance between them
+            double squared_distance = inner_prod(node_location, node_location);
+
+            // If the squared distance is less than the elements circum-radius(squared),
+            // then the Voronoi property is violated.
+            if (squared_distance < this_circum_centre[ELEMENT_DIM])
+            {
+                // We know the node is inside the circumsphere, but we don't know how far
+                double radius = sqrt(this_circum_centre[ELEMENT_DIM]);
+                double distance = radius - sqrt(squared_distance);
+
+                // If the node penetration is greater than supplied maximum penetration factor
+                if (distance/radius > maxPenetration)
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
-    return true;
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -1081,7 +1087,7 @@ bool MutableMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsVoronoi(double maxPenetration)
 {
     // Looping through all the elements in the mesh
     /// \todo use ElementIterator here?
-    for (unsigned i=0; i<this->mElements.size(); i++)
+    for (unsigned i=0; i<this->mElements.size(); ++i)
     {
         // Check if the element is not deleted
         if (!this->mElements[i]->IsDeleted())

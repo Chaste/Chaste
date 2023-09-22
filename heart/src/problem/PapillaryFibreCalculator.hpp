@@ -127,7 +127,7 @@ std::vector<c_vector<double,3> > PapillaryFibreCalculator::CalculateFibreOrienta
 
    // Calculate eigenvalues
    std::vector<c_vector<double,3> > fibre_orientations(mrMesh.GetNumElements());
-   for (unsigned i=0; i<fibre_orientations.size(); i++)
+   for (unsigned i=0; i<fibre_orientations.size(); ++i)
    {
        fibre_orientations[i] = CalculateEigenvectorForSmallestNonzeroEigenvalue(mSmoothedStructureTensors[i]);
    }
@@ -181,7 +181,7 @@ void PapillaryFibreCalculator::GetRadiusVectors()
 
 void PapillaryFibreCalculator::ConstructStructureTensors()
 {
-    for (unsigned i=0;i<mRadiusVectors.size();i++)
+    for (unsigned i=0;i<mRadiusVectors.size();++i)
     {
         mStructureTensors[i] = outer_prod(mRadiusVectors[i],mRadiusVectors[i]);
     }

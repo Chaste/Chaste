@@ -49,9 +49,9 @@ template<unsigned DIM>
 double UblasMatrixInfinityNorm(c_matrix<double,DIM,DIM> mat)
 {
     double ret = fabs(mat(0,0));
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
-        for (unsigned j=0; j<DIM; j++)
+        for (unsigned j = 0; j < DIM; ++j)
         {
             if (fabs(mat(i,j)) > ret)
             {
@@ -189,7 +189,7 @@ public:
             std::vector< c_vector<double, 3> > fibres;
             fibre_reader.GetAllAxi(fibres);
             TS_ASSERT_EQUALS(fibres.size(), 6u);
-            for (unsigned i=0; i<fibres.size()-1; i++)
+            for (unsigned i=0; i<fibres.size()-1; ++i)
             {
                 TS_ASSERT_DELTA(fibres[i][0], 1.0, 1e-10);//x
                 TS_ASSERT_DELTA(fibres[i][1], 0.0, 1e-10);//y
@@ -210,7 +210,7 @@ public:
             TS_ASSERT_EQUALS(fibres.size(), 6u);
             TS_ASSERT_EQUALS(second.size(), 6u);
             TS_ASSERT_EQUALS(third.size(), 6u);
-            for (unsigned i=0; i<fibres.size()-1; i++)
+            for (unsigned i=0; i<fibres.size()-1; ++i)
             {
                 TS_ASSERT_DELTA(fibres[i][0], 1.0, 1e-10);//x
                 TS_ASSERT_DELTA(fibres[i][1], 0.0, 1e-10);//y
@@ -342,9 +342,9 @@ public:
         fibre_reader.GetAllAxi(fibre_vector);
 
         TS_ASSERT_EQUALS(fibre_vector_bin.size(), fibre_vector.size());
-        for (unsigned i=0; i<fibre_vector_bin.size(); i++)
+        for (unsigned i=0; i<fibre_vector_bin.size(); ++i)
         {
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j=0; j<3; ++j)
             {
                 TS_ASSERT_DELTA(fibre_vector_bin[i][j], fibre_vector[i][j], 1e-9);
             }
@@ -367,7 +367,7 @@ public:
         {
             fibre_reader.GetFibreVector(i, ascii_vector);
             fibre_reader_bin.GetFibreVector(i, binary_vector);
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j=0; j<3; ++j)
             {
                 TS_ASSERT_DELTA(binary_vector[j], ascii_vector[j], 1e-9);
             }
@@ -397,9 +397,9 @@ public:
         TS_ASSERT_EQUALS(third_vector_bin.size(),  fibre_vector.size());
         TS_ASSERT_EQUALS(second_vector.size(),     fibre_vector.size());
         TS_ASSERT_EQUALS(third_vector.size(),      fibre_vector.size());
-        for (unsigned i=0; i<fibre_vector.size(); i++)
+        for (unsigned i=0; i<fibre_vector.size(); ++i)
         {
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j=0; j<3; ++j)
             {
                 TS_ASSERT_DELTA(fibre_vector_bin[i][j], fibre_vector[i][j], 1e-9);
                 TS_ASSERT_DELTA(second_vector_bin[i][j], second_vector[i][j], 1e-9);
@@ -433,7 +433,7 @@ public:
         TS_ASSERT_EQUALS(third_vector.size(),      fibre_vector.size());
         for (unsigned i=0; i<fibre_vector.size(); i+=2)
         {
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j=0; j<3; ++j)
             {
                 TS_ASSERT_DELTA(fibre_vector_bin[i][j], fibre_vector[i][j], 1e-9);
                 TS_ASSERT_DELTA(second_vector_bin[i][j], second_vector[i][j], 1e-9);

@@ -409,16 +409,16 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
             // See comments about ordering above.
             unsigned p_indices[STENCIL_SIZE];
             // Work out the mapping for spatial terms
-            for (unsigned i=0; i<NUM_NODES_PER_ELEMENT; i++)
+            for (unsigned i = 0; i < NUM_NODES_PER_ELEMENT; ++i)
             {
-                for (unsigned j=0; j<DIM; j++)
+                for (unsigned j = 0; j < DIM; ++j)
                 {
                     // DIM+1 on the right-hand side here is the problem dimension
                     p_indices[DIM*i+j] = (DIM+1)*r_element.GetNodeGlobalIndex(i) + j;
                 }
             }
             // Work out the mapping for pressure terms
-            for (unsigned i=0; i<NUM_VERTICES_PER_ELEMENT; i++)
+            for (unsigned i = 0; i < NUM_VERTICES_PER_ELEMENT; ++i)
             {
                 p_indices[DIM*NUM_NODES_PER_ELEMENT + i] = (DIM+1)*r_element.GetNodeGlobalIndex(i)+DIM;
             }
@@ -467,7 +467,7 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
     c_vector<double,DIM> body_force;
 
     // Loop over Gauss points
-    for (unsigned quadrature_index=0; quadrature_index < mpQuadRule->GetNumQuadPoints(); quadrature_index++)
+    for (unsigned quadrature_index = 0; quadrature_index < mpQuadRule->GetNumQuadPoints(); quadrature_index++)
     {
         double wJ = jacobian_determinant * mpQuadRule->GetWeight(quadrature_index);
         const ChastePoint<DIM>& quadrature_point = mpQuadRule->rGetQuadPoint(quadrature_index);
@@ -480,9 +480,9 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
 
         // interpolate X (ie physical location of this quad point).
         c_vector<double,DIM> X = zero_vector<double>(DIM);
-        for (unsigned vertex_index=0; vertex_index<NUM_VERTICES_PER_ELEMENT; vertex_index++)
+        for (unsigned vertex_index = 0; vertex_index<NUM_VERTICES_PER_ELEMENT; vertex_index++)
         {
-            for (unsigned j=0; j<DIM; j++)
+            for (unsigned j = 0; j < DIM; ++j)
             {
                 X(j) += linear_phi(vertex_index)*rElement.GetNode(vertex_index)->rGetLocation()(j);
             }
@@ -494,12 +494,12 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
                 = ComputeSpatialVectorTerm(quad_phi, grad_quad_phi, X, &rElement);
             c_vector<double,PRESSURE_BLOCK_SIZE_ELEMENTAL> b_pressure = ComputePressureVectorTerm(linear_phi, grad_linear_phi, X, &rElement);
 
-            for (unsigned i=0; i<SPATIAL_BLOCK_SIZE_ELEMENTAL; i++)
+            for (unsigned i = 0; i < SPATIAL_BLOCK_SIZE_ELEMENTAL; ++i)
             {
                 rBElem(i) += b_spatial(i)*wJ;
             }
 
-            for (unsigned i=0; i<PRESSURE_BLOCK_SIZE_ELEMENTAL; i++)
+            for (unsigned i = 0; i < PRESSURE_BLOCK_SIZE_ELEMENTAL; ++i)
             {
                 rBElem(SPATIAL_BLOCK_SIZE_ELEMENTAL + i) += b_pressure(i)*wJ;
             }
@@ -523,24 +523,24 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
             c_matrix<double,PRESSURE_BLOCK_SIZE_ELEMENTAL,PRESSURE_BLOCK_SIZE_ELEMENTAL> a_pressure_pressure
                 = ComputePressurePressureMatrixTerm(linear_phi, grad_linear_phi, X, &rElement);
 
-            for (unsigned i=0; i<SPATIAL_BLOCK_SIZE_ELEMENTAL; i++)
+            for (unsigned i = 0; i < SPATIAL_BLOCK_SIZE_ELEMENTAL; ++i)
             {
-                for (unsigned j=0; j<SPATIAL_BLOCK_SIZE_ELEMENTAL; j++)
+                for (unsigned j = 0; j < SPATIAL_BLOCK_SIZE_ELEMENTAL; ++j)
                 {
                     rAElem(i,j) += a_spatial_spatial(i,j)*wJ;
                 }
 
-                for (unsigned j=0; j<PRESSURE_BLOCK_SIZE_ELEMENTAL; j++)
+                for (unsigned j = 0; j < PRESSURE_BLOCK_SIZE_ELEMENTAL; ++j)
                 {
                     rAElem(i, SPATIAL_BLOCK_SIZE_ELEMENTAL + j) += a_spatial_pressure(i,j)*wJ;
                 }
             }
 
-            for (unsigned i=0; i<PRESSURE_BLOCK_SIZE_ELEMENTAL; i++)
+            for (unsigned i = 0; i < PRESSURE_BLOCK_SIZE_ELEMENTAL; ++i)
             {
                 if (BLOCK_SYMMETRIC_MATRIX)
                 {
-                    for (unsigned j=0; j<SPATIAL_BLOCK_SIZE_ELEMENTAL; j++)
+                    for (unsigned j = 0; j<SPATIAL_BLOCK_SIZE_ELEMENTAL; ++j)
                     {
                         rAElem(SPATIAL_BLOCK_SIZE_ELEMENTAL + i, j) += a_spatial_pressure(j,i)*wJ;
                     }
@@ -550,7 +550,7 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
                     NEVER_REACHED; // to-come: non-mixed problems
                 }
 
-                for (unsigned j=0; j<PRESSURE_BLOCK_SIZE_ELEMENTAL; j++)
+                for (unsigned j = 0; j<PRESSURE_BLOCK_SIZE_ELEMENTAL; ++j)
                 {
                     rAElem(SPATIAL_BLOCK_SIZE_ELEMENTAL + i, SPATIAL_BLOCK_SIZE_ELEMENTAL + j) += a_pressure_pressure(i,j)*wJ;
                 }

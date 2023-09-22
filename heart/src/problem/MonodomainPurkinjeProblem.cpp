@@ -129,13 +129,13 @@ void MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::WriteInfo(double time)
     VecStrideMin( this->mSolution, 1, PETSC_NULL, &v_purk_min );
 
     // avoid printing 1e-320 etc
-    if(fabs(v_purk_min)<1e-20)
+    if (fabs(v_purk_min)<1e-20)
     {
         // It's very hard to hit this, as you'd need the whole Purkinje system to be activated
         v_purk_min = 0.0; // LCOV_EXCL_LINE
     }
 
-    if(fabs(v_purk_max)<1e-20)
+    if (fabs(v_purk_max)<1e-20)
     {
         v_purk_max = 0.0;
     }

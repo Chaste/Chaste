@@ -92,16 +92,16 @@ private:
         //fibre to ensure conservation of current at branch points. See #1899.
         const double fibre_cross_section_area = M_PI*pElement->GetAttribute()*pElement->GetAttribute();
 
-        for(unsigned i=0; i<2; i++) // 2 = number of basis functions per cable element
+        for (unsigned i = 0; i < 2; ++i) // 2 = number of basis functions per cable element
         {
-            for(unsigned j=0; j<2; j++)  // 2 = number of basis functions per cable element
+            for (unsigned j = 0; j < 2; ++j)  // 2 = number of basis functions per cable element
             {
                 ret(2*i,  2*j)   = 0;  // [V,V] block
                 ret(2*i+1,2*j)   = 0;  // [Vpurkinje,V] block
                 ret(2*i,  2*j+1) = 0;  // [V,Vpurkinje] block
                 ret(2*i+1,2*j+1) = capacitance*chi*PdeSimulationTime::GetPdeTimeStepInverse()*rPhi(i)*rPhi(j);
 
-                for (unsigned dim=0; dim<SPACE_DIM; dim++)
+                for (unsigned dim = 0; dim < SPACE_DIM; ++dim)
                 {
                     ret(2*i+1,2*j+1) += conductivity*rGradPhi(dim,i)*rGradPhi(dim,j);
                 }

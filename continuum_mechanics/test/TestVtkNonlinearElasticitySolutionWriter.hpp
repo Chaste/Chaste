@@ -90,7 +90,7 @@ public:
             solver.Solve();
 
             // solution is currently no deformation. Hack into the solution and set it to be something known.
-            for (unsigned i=0; i<bar_mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<bar_mesh.GetNumNodes(); ++i)
             {
                 double X = bar_mesh.GetNode(i)->rGetLocation()[0];
                 double Y = bar_mesh.GetNode(i)->rGetLocation()[1];
@@ -131,7 +131,7 @@ public:
 
             // we can't really test the vtu file easily, but the strain data is stored in a member variable so we can
             // test it was computed correctly.
-            for (unsigned i=0; i<bar_mesh.GetNumElements(); i++)
+            for (unsigned i=0; i<bar_mesh.GetNumElements(); ++i)
             {
                 double X = bar_mesh.GetElement(i)->CalculateCentroid()[0];
                 if (X < 5)

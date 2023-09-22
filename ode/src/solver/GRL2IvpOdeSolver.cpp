@@ -76,7 +76,7 @@ void GRL2IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem
     mYinit = rNextYValues;
     pAbstractOdeSystem->EvaluateYDerivatives(time, rNextYValues, mEvalF);
 
-    for (unsigned i=0; i<num_equations; i++)
+    for (unsigned i=0; i<num_equations; ++i)
     {
         rNextYValues[i]=rNextYValues[i]+delta;
         pAbstractOdeSystem->EvaluateYDerivatives(time, rNextYValues, mTemp);
@@ -84,7 +84,7 @@ void GRL2IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem
         rNextYValues[i]=rNextYValues[i]-delta;
     }
     // Midpoint
-    for (unsigned i=0; i<num_equations; i++)
+    for (unsigned i=0; i<num_equations; ++i)
     {
         if (fabs(mPartialF[i])<delta)
         {
@@ -96,7 +96,7 @@ void GRL2IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem
         }
     }
     //Second half of the method
-    for (unsigned i=0; i<num_equations; i++)
+    for (unsigned i=0; i<num_equations; ++i)
     {
         ysave = rNextYValues[i];
         rNextYValues[i]=mYinit[i];
@@ -110,7 +110,7 @@ void GRL2IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSystem
     }
 
     //Final step update
-    for (unsigned i=0; i<num_equations; i++)
+    for (unsigned i=0; i<num_equations; ++i)
     {
         if (fabs(mPartialF[i])<delta)
         {

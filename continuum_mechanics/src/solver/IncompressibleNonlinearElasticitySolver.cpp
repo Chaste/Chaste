@@ -96,11 +96,11 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleR
             //// todo: assemble quickly by commenting the AssembleOnElement() and doing
             //// the following, to determine exact non-zeroes per row, and reallocate
             //// with correct nnz (by destroying old matrix and creating a new one)
-            //for (unsigned i=0; i<STENCIL_SIZE; i++)
+            //for (unsigned i = 0; i < STENCIL_SIZE; ++i)
             //{
-            //    for (unsigned j=0; j<STENCIL_SIZE; j++)
+            //    for (unsigned j = 0; j < STENCIL_SIZE; ++j)
             //    {
-            //        a_elem(i,j)=1.0;
+            //        a_elem(i,j) = 1.0;
             //    }
             //}
 
@@ -111,16 +111,16 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleR
             /////////////////////////////////////////////////////////////////////////////////////////
 
             unsigned p_indices[STENCIL_SIZE];
-            for (unsigned i=0; i<NUM_NODES_PER_ELEMENT; i++)
+            for (unsigned i = 0; i < NUM_NODES_PER_ELEMENT; ++i)
             {
-                for (unsigned j=0; j<DIM; j++)
+                for (unsigned j = 0; j < DIM; ++j)
                 {
                     // note: DIM+1 is the problem dimension (= this->mProblemDimension)
                     p_indices[DIM*i+j] = (DIM+1)*element.GetNodeGlobalIndex(i) + j;
                 }
             }
 
-            for (unsigned i=0; i<NUM_VERTICES_PER_ELEMENT; i++)
+            for (unsigned i = 0; i < NUM_VERTICES_PER_ELEMENT; ++i)
             {
                 // We assume the vertices are the first num_vertices nodes in the list of nodes
                 // in the element. Hence:
@@ -148,7 +148,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleR
 
     if (this->mrProblemDefinition.GetTractionBoundaryConditionType() != NO_TRACTIONS)
     {
-        for (unsigned bc_index=0; bc_index<this->mrProblemDefinition.rGetTractionBoundaryElements().size(); bc_index++)
+        for (unsigned bc_index = 0; bc_index<this->mrProblemDefinition.rGetTractionBoundaryElements().size(); bc_index++)
         {
             BoundaryElement<DIM-1,DIM>& r_boundary_element = *(this->mrProblemDefinition.rGetTractionBoundaryElements()[bc_index]);
 
@@ -161,9 +161,9 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleR
             this->AssembleOnBoundaryElement(r_boundary_element, a_boundary_elem, b_boundary_elem, assembleResidual, assembleJacobian, bc_index);
 
             unsigned p_indices[BOUNDARY_STENCIL_SIZE];
-            for (unsigned i=0; i<NUM_NODES_PER_BOUNDARY_ELEMENT; i++)
+            for (unsigned i = 0; i < NUM_NODES_PER_BOUNDARY_ELEMENT; ++i)
             {
-                for (unsigned j=0; j<DIM; j++)
+                for (unsigned j = 0; j < DIM; ++j)
                 {
                     // note: DIM+1, on the right hand side of the below, is the problem dimension (= this->mProblemDimension)
                     p_indices[DIM*i+j] = (DIM+1)*r_boundary_element.GetNodeGlobalIndex(i) + j;
@@ -235,9 +235,9 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
     // Get the current displacement at the nodes
     static c_matrix<double,DIM,NUM_NODES_PER_ELEMENT> element_current_displacements;
     static c_vector<double,NUM_VERTICES_PER_ELEMENT> element_current_pressures;
-    for (unsigned II=0; II<NUM_NODES_PER_ELEMENT; II++)
+    for (unsigned II = 0; II<NUM_NODES_PER_ELEMENT; II++)
     {
-        for (unsigned JJ=0; JJ<DIM; JJ++)
+        for (unsigned JJ = 0; JJ<DIM; JJ++)
         {
             // note: DIM+1, on the right hand side of the below, is the problem dimension (= this->mProblemDimension)
             element_current_displacements(JJ,II) = this->mCurrentSolution[(DIM+1)*rElement.GetNodeGlobalIndex(II) + JJ];
@@ -245,7 +245,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
     }
 
     // Get the current pressure at the vertices
-    for (unsigned II=0; II<NUM_VERTICES_PER_ELEMENT; II++)
+    for (unsigned II = 0; II<NUM_VERTICES_PER_ELEMENT; II++)
     {
         // At the moment we assume the vertices are the first num_vertices nodes in the list of nodes
         // in the mesh. Hence:
@@ -294,7 +294,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
     }
 
     // Loop over Gauss points
-    for (unsigned quadrature_index=0; quadrature_index < this->mpQuadratureRule->GetNumQuadPoints(); quadrature_index++)
+    for (unsigned quadrature_index = 0; quadrature_index < this->mpQuadratureRule->GetNumQuadPoints(); quadrature_index++)
     {
         // This is needed by the cardiac mechanics solver
         unsigned current_quad_point_global_index =   rElement.GetIndex()*this->mpQuadratureRule->GetNumQuadPoints()
@@ -319,7 +319,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
                 {
                     c_vector<double,DIM> X = zero_vector<double>(DIM);
                     // interpolate X (using the vertices and the /linear/ bases, as no curvilinear elements
-                    for (unsigned node_index=0; node_index<NUM_VERTICES_PER_ELEMENT; node_index++)
+                    for (unsigned node_index = 0; node_index < NUM_VERTICES_PER_ELEMENT; ++node_index)
                     {
                         X += linear_phi(node_index)*this->mrQuadMesh.GetNode( rElement.GetNodeGlobalIndex(node_index) )->rGetLocation();
                     }
@@ -339,11 +339,11 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
         // Interpolate grad_u and p
         grad_u = zero_matrix<double>(DIM,DIM);
 
-        for (unsigned node_index=0; node_index<NUM_NODES_PER_ELEMENT; node_index++)
+        for (unsigned node_index = 0; node_index<NUM_NODES_PER_ELEMENT; ++node_index)
         {
-            for (unsigned i=0; i<DIM; i++)
+            for (unsigned i = 0; i < DIM; ++i)
             {
-                for (unsigned M=0; M<DIM; M++)
+                for (unsigned M = 0; M < DIM; ++M)
                 {
                     grad_u(i,M) += grad_quad_phi(M,node_index)*element_current_displacements(i,node_index);
                 }
@@ -351,15 +351,15 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
         }
 
         double pressure = 0;
-        for (unsigned vertex_index=0; vertex_index<NUM_VERTICES_PER_ELEMENT; vertex_index++)
+        for (unsigned vertex_index = 0; vertex_index<NUM_VERTICES_PER_ELEMENT; vertex_index++)
         {
             pressure += linear_phi(vertex_index)*element_current_pressures(vertex_index);
         }
 
         // Calculate C, inv(C) and T
-        for (unsigned i=0; i<DIM; i++)
+        for (unsigned i = 0; i < DIM; ++i)
         {
-            for (unsigned M=0; M<DIM; M++)
+            for (unsigned M = 0; M < DIM; ++M)
             {
                 F(i,M) = (i==M?1:0) + grad_u(i,M);
             }
@@ -395,7 +395,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
             F_T = prod(F,T);
             F_T_grad_quad_phi = prod(F_T, grad_quad_phi);
 
-            for (unsigned index=0; index<NUM_NODES_PER_ELEMENT*DIM; index++)
+            for (unsigned index = 0; index<NUM_NODES_PER_ELEMENT*DIM; index++)
             {
                 unsigned spatial_dim = index%DIM;
                 unsigned node_index = (index-spatial_dim)/DIM;
@@ -410,7 +410,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
                                  * wJ;
             }
 
-            for (unsigned vertex_index=0; vertex_index<NUM_VERTICES_PER_ELEMENT; vertex_index++)
+            for (unsigned vertex_index = 0; vertex_index<NUM_VERTICES_PER_ELEMENT; vertex_index++)
             {
                 rBElem( NUM_NODES_PER_ELEMENT*DIM + vertex_index ) +=   linear_phi(vertex_index)
                                                                       * (detF - 1)
@@ -437,13 +437,13 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
             /////////////////////////////////////////////////////////////////////////////////////////////
 
             // Set up the tensor 0.5(dTdE(M,N,P,Q) + dTdE(M,N,Q,P))
-            for (unsigned M=0; M<DIM; M++)
+            for (unsigned M = 0; M < DIM; ++M)
             {
-                for (unsigned N=0; N<DIM; N++)
+                for (unsigned N = 0; N < DIM; ++N)
                 {
-                    for (unsigned P=0; P<DIM; P++)
+                    for (unsigned P = 0; P < DIM; ++P)
                     {
-                        for (unsigned Q=0; Q<DIM; Q++)
+                        for (unsigned Q = 0; Q < DIM; ++Q)
                         {
                             // This is NOT dSdF, just using this as storage space
                             dSdF(M,N,P,Q) = 0.5*(dTdE(M,N,P,Q) + dTdE(M,N,Q,P));
@@ -459,11 +459,11 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
             dSdF.template SetAsContractionOnFourthDimension<DIM>(F, dTdE);
 
             // Now add the T_{MN} delta_{ij} term
-            for (unsigned M=0; M<DIM; M++)
+            for (unsigned M = 0; M < DIM; ++M)
             {
-                for (unsigned N=0; N<DIM; N++)
+                for (unsigned N = 0; N < DIM; ++N)
                 {
-                    for (unsigned i=0; i<DIM; i++)
+                    for (unsigned i = 0; i < DIM; ++i)
                     {
                         dSdF(M,i,N,i) += T(M,N);
                     }
@@ -485,13 +485,13 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
             temp_tensor.template SetAsContractionOnFirstDimension<DIM>( trans_grad_quad_phi, dSdF );
             dSdF_quad_quad.template SetAsContractionOnThirdDimension<DIM>( trans_grad_quad_phi, temp_tensor );
 
-            for (unsigned index1=0; index1<NUM_NODES_PER_ELEMENT*DIM; index1++)
+            for (unsigned index1 = 0; index1<NUM_NODES_PER_ELEMENT*DIM; index1++)
             {
                 unsigned spatial_dim1 = index1%DIM;
                 unsigned node_index1 = (index1-spatial_dim1)/DIM;
 
 
-                for (unsigned index2=0; index2<NUM_NODES_PER_ELEMENT*DIM; index2++)
+                for (unsigned index2 = 0; index2<NUM_NODES_PER_ELEMENT*DIM; index2++)
                 {
                     unsigned spatial_dim2 = index2%DIM;
                     unsigned node_index2 = (index2-spatial_dim2)/DIM;
@@ -501,7 +501,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
                                               * wJ;
                 }
 
-                for (unsigned vertex_index=0; vertex_index<NUM_VERTICES_PER_ELEMENT; vertex_index++)
+                for (unsigned vertex_index = 0; vertex_index<NUM_VERTICES_PER_ELEMENT; vertex_index++)
                 {
                     unsigned index2 = NUM_NODES_PER_ELEMENT*DIM + vertex_index;
 
@@ -512,11 +512,11 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
                 }
             }
 
-            for (unsigned vertex_index=0; vertex_index<NUM_VERTICES_PER_ELEMENT; vertex_index++)
+            for (unsigned vertex_index = 0; vertex_index<NUM_VERTICES_PER_ELEMENT; vertex_index++)
             {
                 unsigned index1 = NUM_NODES_PER_ELEMENT*DIM + vertex_index;
 
-                for (unsigned index2=0; index2<NUM_NODES_PER_ELEMENT*DIM; index2++)
+                for (unsigned index2 = 0; index2<NUM_NODES_PER_ELEMENT*DIM; index2++)
                 {
                     unsigned spatial_dim2 = index2%DIM;
                     unsigned node_index2 = (index2-spatial_dim2)/DIM;
@@ -534,7 +534,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
                 // pressure-pressure block. Note, the rest of the
                 // entries are filled in at the end
                 /////////////////////////////////////////////////////
-                for (unsigned vertex_index2=0; vertex_index2<NUM_VERTICES_PER_ELEMENT; vertex_index2++)
+                for (unsigned vertex_index2 = 0; vertex_index2<NUM_VERTICES_PER_ELEMENT; vertex_index2++)
                 {
                     unsigned index2 = NUM_NODES_PER_ELEMENT*DIM + vertex_index2;
                     rAElemPrecond(index1,index2) +=   linear_phi(vertex_index)
@@ -566,9 +566,9 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
             //                                                    [ 0  M    ]
             rAElemPrecond = rAElemPrecond + rAElem;
 
-            for (unsigned i=NUM_NODES_PER_ELEMENT*DIM; i<STENCIL_SIZE; i++)
+            for (unsigned i= NUM_NODES_PER_ELEMENT*DIM; i < STENCIL_SIZE; ++i)
             {
-                for (unsigned j=0; j<NUM_NODES_PER_ELEMENT*DIM; j++)
+                for (unsigned j = 0; j < NUM_NODES_PER_ELEMENT*DIM; ++j)
                 {
                     rAElemPrecond(i,j) = 0.0;
                 }
@@ -578,7 +578,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
 
     if (this->mSetComputeAverageStressPerElement)
     {
-        for (unsigned i=0; i<DIM*(DIM+1)/2; i++)
+        for (unsigned i = 0; i < DIM*(DIM+1)/2; ++i)
         {
             this->mAverageStressesPerElement[rElement.GetIndex()](i) /= this->mpQuadratureRule->GetNumQuadPoints();
         }
@@ -600,7 +600,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::FormInitialGuess()
 
 
         // Loop over vertices and set pressure solution to be zero-strain-pressure
-        for (unsigned j=0; j<NUM_VERTICES_PER_ELEMENT; j++)
+        for (unsigned j = 0; j<NUM_VERTICES_PER_ELEMENT; ++j)
         {
             // We assume the vertices are the first num_vertices nodes in the list of nodes
             // in the element. Hence:

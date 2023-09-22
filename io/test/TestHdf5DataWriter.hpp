@@ -78,9 +78,9 @@ public:
         const unsigned X = 2;
         const unsigned Y = 5;
         int data[X][Y];
-        for (unsigned i = 0; i < X; i++)
+        for (unsigned i = 0; i < X; ++i)
         {
-            for (unsigned j = 0; j < Y; j++)
+            for (unsigned j = 0; j < Y; ++j)
             {
                 data[i][j] = 100 * PetscTools::GetMyRank() + 10 * i + j;
             }
@@ -244,7 +244,7 @@ public:
         TS_ASSERT_EQUALS(status, 0);
 
         // Check the index
-        for (unsigned i = 0; i < data_size; i++)
+        for (unsigned i = 0; i < data_size; ++i)
         {
             TS_ASSERT_EQUALS((static_cast<unsigned>(data[i]) % 100), i);
         }
@@ -254,7 +254,7 @@ public:
         MPI_Comm_size(PETSC_COMM_WORLD, &num_procs);
 
         // The last component was owned by processor "num_procs-1"
-        TS_ASSERT_EQUALS(((int)data[data_size - 1] / 100), num_procs - 1);
+        TS_ASSERT_EQUALS(static_cast<int>(data[data_size - 1]) / 100, num_procs - 1);
 
         H5Pclose(dxpl);
         H5Dclose(dataset_id);

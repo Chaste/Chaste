@@ -86,7 +86,7 @@ public:
                        'T', 'T', 'T', 'T', 'T',
                        'B','B','B'};
 
-        for (unsigned i=0; i<11; i++)
+        for (unsigned i=0; i<11; ++i)
         {
             if (p_mesh->GetDistributedVectorFactory()->IsGlobalIndexLocal(i))
             {
@@ -139,7 +139,7 @@ public:
         {
             mesh.GetElement(0)->SetAttribute(HeartRegionCode::GetValidBathId());
         }
-        catch(Exception&)
+        catch (Exception&)
         {
             // I don't own element 0
         }
@@ -171,7 +171,7 @@ public:
         mesh.ConstructFromMeshReader(reader);
 
         // set the x<0.25 and x>0.75 regions as the bath region
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i=0; i<mesh.GetNumElements(); ++i)
         {
             double x = mesh.GetElement(i)->CalculateCentroid()[0];
             if ((x<0.25) || (x>0.75))
@@ -189,7 +189,7 @@ public:
         ReplicatableVector sol_repl(sol);
 
         // test V = 0 for all bath nodes
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             if (HeartRegionCode::IsRegionBath( mesh.GetNode(i)->GetRegion() )) // bath
             {
@@ -198,7 +198,7 @@ public:
         }
 
         // test symmetry of V and phi_e
-        for (unsigned i=0; i<=(mesh.GetNumNodes()-1)/2; i++)
+        for (unsigned i=0; i<=(mesh.GetNumNodes()-1)/2; ++i)
         {
             unsigned opposite = mesh.GetNumNodes()-i-1;
             TS_ASSERT_DELTA(sol_repl[2*i], sol_repl[2*opposite], 2e-3);      // V
@@ -229,7 +229,7 @@ public:
         TetrahedralMesh<1,1> mesh;
         mesh.ConstructFromMeshReader(reader);
 
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i=0; i<mesh.GetNumElements(); ++i)
         {
             mesh.GetElement(i)->SetAttribute(HeartRegionCode::GetValidBathId());
         }
@@ -271,7 +271,7 @@ public:
         ReplicatableVector sol_repl(sol);
 
         // test phi = x*boundary_val/sigma (solution of phi''=0, phi(0)=0, sigma*phi'(1)=boundary_val
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             double bath_cond = HeartConfig::Instance()->GetBathConductivity();
             double x = mesh.GetNode(i)->rGetLocation()[0];
@@ -373,7 +373,7 @@ public:
          * We ran longer simulation for 350 ms and a nice AP was observed.
          */
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        for (unsigned i=0; i<p_mesh->GetNumNodes(); ++i)
         {
             // test V = 0 for all bath nodes and that an AP is triggered in the tissue
             if (HeartRegionCode::IsRegionBath( p_mesh->GetNode(i)->GetRegion() )) // bath
@@ -557,7 +557,7 @@ public:
             Vec sol = bidomain_problem.GetSolution();
             ReplicatableVector sol_repl(sol);
 
-            for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+            for (unsigned i=0; i<p_mesh->GetNumNodes(); ++i)
             {
                 // test phi_e close to 0 for all bath nodes since electrodes are off
                 if (HeartRegionCode::IsRegionBath( p_mesh->GetNode(i)->GetRegion() )) // bath
@@ -586,7 +586,7 @@ public:
              * We ran longer simulation for 350 ms and a nice AP was observed.
              */
 
-            for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+            for (unsigned i=0; i<p_mesh->GetNumNodes(); ++i)
             {
                 // test V = 0 for all bath nodes and that an AP is triggered in the tissue
                 if (HeartRegionCode::IsRegionBath( p_mesh->GetNode(i)->GetRegion() )) // bath
@@ -733,7 +733,7 @@ public:
             TS_ASSERT_EQUALS(p_mesh->GetNumElements(), r_mesh.GetNumElements());
 
             // Check that the bath is in the right place
-            for (unsigned i=0; i<r_mesh.GetNumElements(); i++)
+            for (unsigned i=0; i<r_mesh.GetNumElements(); ++i)
             {
                 double x = r_mesh.GetElement(i)->CalculateCentroid()[0];
                 double y = r_mesh.GetElement(i)->CalculateCentroid()[1];
@@ -752,7 +752,7 @@ public:
             }
 
             // Check that there's an exact correspondence between bath nodes and fake cells
-            for (unsigned i=r_mesh.GetDistributedVectorFactory()->GetLow(); i<r_mesh.GetDistributedVectorFactory()->GetHigh(); i++)
+            for (unsigned i=r_mesh.GetDistributedVectorFactory()->GetLow(); i<r_mesh.GetDistributedVectorFactory()->GetHigh(); ++i)
             {
                 TS_ASSERT_EQUALS(r_mesh.GetNode(i)->GetRegion(), p_mesh->GetNode(i)->GetRegion());
                 FakeBathCell* p_fake = dynamic_cast<FakeBathCell*>(p_abstract_problem->GetTissue()->GetCardiacCell(i));
@@ -777,7 +777,7 @@ public:
              * We are checking the last time step. This test will only make sure that an upstroke is triggered.
              * We ran longer simulation for 350 ms and a nice AP was observed.
              */
-            for (unsigned i=0; i<r_mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<r_mesh.GetNumNodes(); ++i)
             {
                 // test V = 0 for all bath nodes and that an AP is triggered in the tissue
                 if (HeartRegionCode::IsRegionBath(r_mesh.GetNode(i)->GetRegion()))
@@ -854,7 +854,7 @@ public:
              * We are checking the last time step. This test will only make sure that an upstroke is triggered.
              * We ran longer simulation for 350 ms and a nice AP was observed.
              */
-            for (unsigned i=0; i<r_mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<r_mesh.GetNumNodes(); ++i)
             {
                 // test V = 0 for all bath nodes and that an AP is triggered in the tissue
                 if (HeartRegionCode::IsRegionBath(r_mesh.GetNode(i)->GetRegion()))
@@ -959,7 +959,7 @@ public:
             char expected_node_regions[11]={ 'B', 'B', 'B',
                        'T', 'T', 'T', 'T', 'T',
                        'B','B','B'};
-            for (unsigned i=0; i<10; i++)
+            for (unsigned i=0; i<10; ++i)
             {
                 if (p_mesh->GetDistributedVectorFactory()->IsGlobalIndexLocal(i))
                 {

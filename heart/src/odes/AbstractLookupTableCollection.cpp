@@ -93,7 +93,7 @@ void AbstractLookupTableCollection::SetTimestep(double dt)
 unsigned AbstractLookupTableCollection::GetTableIndex(const std::string& rKeyingVariableName) const
 {
     unsigned i=0;
-    for (; i<mKeyingVariableNames.size(); i++)
+    for (; i<mKeyingVariableNames.size(); ++i)
     {
         if (mKeyingVariableNames[i] == rKeyingVariableName)
         {

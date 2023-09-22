@@ -44,7 +44,7 @@ PeriodicNodesOnlyMesh<SPACE_DIM>::PeriodicNodesOnlyMesh(c_vector<double,SPACE_DI
     // Convert periodic widths into a boolean vector
     mIsDimPeriodic = zero_vector<bool>(SPACE_DIM);
 
-    for (unsigned i = 0; i < SPACE_DIM; i++)
+    for (unsigned i = 0; i < SPACE_DIM; ++i)
     {
         if (width[i]>0.0)
         {
@@ -65,7 +65,7 @@ void PeriodicNodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c
     // Container for converting the periodic dims vector to a true/false input into box collection setup
     // For each periodic dimension:
 
-    for (unsigned i=0; i < SPACE_DIM; i++)
+    for (unsigned i=0; i < SPACE_DIM; ++i)
     {
         if (mIsDimPeriodic[i])
         {

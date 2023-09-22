@@ -64,7 +64,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::DetermineWatchedNodes()
     // find the nearest electrics mesh node
     double min_dist = DBL_MAX;
     unsigned node_index = UNSIGNED_UNSET;
-    for (unsigned i=0; i<mpElectricsMesh->GetNumNodes(); i++)
+    for (unsigned i = 0; i<mpElectricsMesh->GetNumNodes(); ++i)
     {
         double dist = norm_2(mWatchedLocation - mpElectricsMesh->GetNode(i)->rGetLocation());
         if (dist < min_dist)
@@ -101,7 +101,8 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::DetermineWatchedNodes()
     node_index = UNSIGNED_UNSET;
     c_vector<double,DIM> pos_at_min;
 
-    for (unsigned i=0; i<mpMechanicsMesh->GetNumNodes(); i++)
+    for (unsigned i
+    ; i<mpMechanicsMesh->GetNumNodes(); ++i)
     {
         c_vector<double,DIM> position = mpMechanicsMesh->GetNode(i)->rGetLocation();
 
@@ -157,7 +158,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::WriteWatchedLocationData
     //    double Ca = mpElectricsProblem->GetMonodomainTissue()->GetCardiacCell(mWatchedElectricsNodeIndex)->GetIntracellularCalciumConcentration();
 
     *mpWatchedLocationFile << time << " ";
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         *mpWatchedLocationFile << deformed_position[mWatchedMechanicsNodeIndex](i) << " ";
     }
@@ -384,7 +385,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
 
     if (mCompressibilityType==INCOMPRESSIBLE)
     {
-        switch(mpProblemDefinition->GetSolverType())
+        switch (mpProblemDefinition->GetSolverType())
         {
             case EXPLICIT:
                 mpCardiacMechSolver = new ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<DIM>,DIM>(
@@ -402,7 +403,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
     {
         // repeat above with Compressible solver rather than incompressible -
         // not the neatest but avoids having to template this class.
-        switch(mpProblemDefinition->GetSolverType())
+        switch (mpProblemDefinition->GetSolverType())
         {
             case EXPLICIT:
                 mpCardiacMechSolver = new ExplicitCardiacMechanicsSolver<CompressibleNonlinearElasticitySolver<DIM>,DIM>(
@@ -533,10 +534,10 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
                                                                *(this->mpMechanicsMesh),
                                                                WRITE_QUADRATIC_MESH);
         variable_names.push_back("V");
-        if (ELEC_PROB_DIM==2)
+        if (ELEC_PROB_DIM == 2)
         {
             variable_names.push_back("Phi_e");
-            if (mHasBath==true)
+            if (mHasBath == true)
             {
                 std::vector<std::string> regions;
                 regions.push_back("tissue");
@@ -702,7 +703,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         /////////////////////////////////////////////////////////////////////////
         LOG(2, "  Solving electrics");
         MechanicsEventHandler::BeginEvent(MechanicsEventHandler::NON_MECH);
-        for (unsigned i=0; i<mNumElecTimestepsPerMechTimestep; i++)
+        for (unsigned i = 0; i<mNumElecTimestepsPerMechTimestep; ++i)
         {
             double current_time = stepper.GetTime() + i*HeartConfig::Instance()->GetPdeTimeStep();
             double next_time = stepper.GetTime() + (i+1)*HeartConfig::Instance()->GetPdeTimeStep();
@@ -746,7 +747,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         LOG(2, "  Interpolating Ca_I and voltage");
 
         //Collect the distributed calcium data into one Vec to be later replicated
-        for (unsigned node_index = 0; node_index<mpElectricsMesh->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index<mpElectricsMesh->GetNumNodes(); ++node_index)
         {
             if (mpElectricsMesh->GetDistributedVectorFactory()->IsGlobalIndexLocal(node_index))
             {
@@ -761,14 +762,14 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         ReplicatableVector calcium_repl(calcium_data);//size = number of electrics nodes
 
         //interpolate values onto mechanics mesh
-        for (unsigned i=0; i<mpMeshPair->rGetElementsAndWeights().size(); i++)
+        for (unsigned i = 0; i<mpMeshPair->rGetElementsAndWeights().size(); ++i)
         {
             double interpolated_CaI = 0;
             double interpolated_voltage = 0;
 
             Element<DIM,DIM>& element = *(mpElectricsMesh->GetElement(mpMeshPair->rGetElementsAndWeights()[i].ElementNum));
 
-            for (unsigned node_index = 0; node_index<element.GetNumNodes(); node_index++)
+            for (unsigned node_index = 0; node_index < element.GetNumNodes(); ++node_index)
             {
                 unsigned global_index = element.GetNodeGlobalIndex(node_index);
                 double CaI_at_node =  calcium_repl[global_index];
@@ -814,7 +815,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
 //// For attempting to improve Newton convergence by quadratically extrapolating from
 //// last two solutions to guess next solution. See comments above
-//        for (unsigned i=0; i<mpMechanicsSolver->rGetCurrentSolution().size(); i++)
+//        for (unsigned i = 0; i<mpMechanicsSolver->rGetCurrentSolution().size(); ++i)
 //        {
 //            double current = mpMechanicsSolver->rGetCurrentSolution()[i];
 //            double previous = current_solution_previous_time_step[i];
@@ -946,7 +947,7 @@ template<unsigned DIM, unsigned ELEC_PROB_DIM>
 double CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Max(std::vector<double>& vec)
 {
     double max = -1e200;
-    for (unsigned i=0; i<vec.size(); i++)
+    for (unsigned i = 0; i<vec.size(); ++i)
     {
         if (vec[i]>max) max=vec[i];
     }

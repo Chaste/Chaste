@@ -282,48 +282,54 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteElementsAsFaces()
 {
-    std::string comment = "#\n# " + ChasteBuildInfo::GetProvenanceString();
-
-    std::string element_file_name = this->mBaseName;
-    if (ELEMENT_DIM == 1 && (SPACE_DIM == 2 || SPACE_DIM == 3))
+    if constexpr (SPACE_DIM != ELEMENT_DIM)
     {
-        element_file_name = element_file_name + ".edge";
-    }
-    else if (ELEMENT_DIM == 2 && SPACE_DIM == 3)
-    {
-        element_file_name = element_file_name + ".face";
-    }
+        std::string comment = "#\n# " + ChasteBuildInfo::GetProvenanceString();
 
-    out_stream p_element_file = this->mpOutputFileHandler->OpenOutputFile(element_file_name, std::ios::binary | std::ios::trunc);
+        std::string element_file_name = this->mBaseName;
+        if (ELEMENT_DIM == 1 && (SPACE_DIM == 2 || SPACE_DIM == 3))
+        {
+            element_file_name = element_file_name + ".edge";
+        }
+        else if (ELEMENT_DIM == 2 && SPACE_DIM == 3)
+        {
+            element_file_name = element_file_name + ".face";
+        }
 
-    // Write the element header
-    unsigned num_elements = this->GetNumElements();
-    assert(SPACE_DIM != ELEMENT_DIM);    // LCOV_EXCL_LINE
-    unsigned num_attr = 1;
+        out_stream p_element_file = this->mpOutputFileHandler->OpenOutputFile(element_file_name, std::ios::binary | std::ios::trunc);
 
-    *p_element_file << num_elements << "\t";
-    //*p_element_file << nodes_per_element << "\t";
-    *p_element_file << num_attr;
-    if (this->mFilesAreBinary)
-    {
-        *p_element_file << "\tBIN\n";
+        // Write the element header
+        unsigned num_elements = this->GetNumElements();
+        unsigned num_attr = 1;
+
+        *p_element_file << num_elements << "\t";
+        //*p_element_file << nodes_per_element << "\t";
+        *p_element_file << num_attr;
+        if (this->mFilesAreBinary)
+        {
+            *p_element_file << "\tBIN\n";
+        }
+        else
+        {
+            *p_element_file << "\n";
+        }
+
+        // Write each element's data
+        std::vector<double> attribute_values(1);
+        for (unsigned item_num=0; item_num<num_elements; item_num++)
+        {
+            ElementData element_data = this->GetNextElement();
+            attribute_values[0] =  element_data.AttributeValue;
+            WriteItem(p_element_file, item_num, element_data.NodeIndices, attribute_values);
+        }
+
+        *p_element_file << comment << "\n";
+        p_element_file->close();
     }
     else
     {
-        *p_element_file << "\n";
+        NEVER_REACHED;
     }
-
-    // Write each element's data
-    std::vector<double> attribute_values(1);
-    for (unsigned item_num=0; item_num<num_elements; item_num++)
-    {
-        ElementData element_data = this->GetNextElement();
-        attribute_values[0] =  element_data.AttributeValue;
-        WriteItem(p_element_file, item_num, element_data.NodeIndices, attribute_values);
-    }
-
-    *p_element_file << comment << "\n";
-    p_element_file->close();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -408,11 +414,11 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteItem(out_stream &pFile, u
     else
     {
         *pFile << itemNumber;
-        for (unsigned i=0; i<dataPacket.size(); i++)
+        for (unsigned i=0; i<dataPacket.size(); ++i)
         {
             *pFile << "\t" << dataPacket[i];
         }
-        for (unsigned i=0; i<rAttributes.size(); i++)
+        for (unsigned i=0; i<rAttributes.size(); ++i)
         {
             *pFile << "\t" << rAttributes[i];
         }

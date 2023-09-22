@@ -190,9 +190,9 @@ public:
         invAMatlab(2,1) = 54.00;
         invAMatlab(2,2) = -53.00;
         invA = Inverse(A);
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 3; ++i)
         {
-            for (int j = 0; j < 3; j++)
+            for (int j = 0; j < 3; ++j)
             {
                 TS_ASSERT_DELTA( invA(i,j), invAMatlab(i,j), 0.0000000001);
             }
@@ -209,9 +209,9 @@ public:
         invBMatlab(0,1) = 0.4717;
         invBMatlab(1,0) = 0.4717;
         invBMatlab(1,1) = -0.2264;
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < 2; ++i)
         {
-            for (int j = 0; j < 2; j++)
+            for (int j = 0; j < 2; ++j)
             {
                 TS_ASSERT_DELTA( invB(i,j), invBMatlab(i,j), 0.0001);
             }

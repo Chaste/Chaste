@@ -129,7 +129,7 @@ private:
                  PETSC_COMM_WORLD, &status);
         MeshEventHandler::EndEvent(MeshEventHandler::COMM1);
         // Convert to std::vector
-        for (unsigned j=0; j< rElementData.NodeIndices.size(); j++)
+        for (unsigned j=0; j< rElementData.NodeIndices.size(); ++j)
         {
             rElementData.NodeIndices[j] = raw_indices[j];
         }

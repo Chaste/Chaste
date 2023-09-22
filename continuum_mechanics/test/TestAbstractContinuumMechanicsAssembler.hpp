@@ -94,9 +94,9 @@ public:
         Element<DIM,DIM>* pElement)
     {
         c_matrix<double,SPATIAL_BLOCK_SIZE_ELEMENTAL,SPATIAL_BLOCK_SIZE_ELEMENTAL> ret;
-        for (unsigned i=0; i<SPATIAL_BLOCK_SIZE_ELEMENTAL; i++)
+        for (unsigned i = 0; i < SPATIAL_BLOCK_SIZE_ELEMENTAL; ++i)
         {
-            for (unsigned j=0; j<SPATIAL_BLOCK_SIZE_ELEMENTAL; j++)
+            for (unsigned j = 0; j < SPATIAL_BLOCK_SIZE_ELEMENTAL; ++j)
             {
                 ret(i,j) = mVal1;
             }
@@ -113,9 +113,9 @@ public:
         Element<DIM,DIM>* pElement)
     {
         c_matrix<double,SPATIAL_BLOCK_SIZE_ELEMENTAL,PRESSURE_BLOCK_SIZE_ELEMENTAL> ret;
-        for (unsigned i=0; i<SPATIAL_BLOCK_SIZE_ELEMENTAL; i++)
+        for (unsigned i = 0; i < SPATIAL_BLOCK_SIZE_ELEMENTAL; ++i)
         {
-            for (unsigned j=0; j<PRESSURE_BLOCK_SIZE_ELEMENTAL; j++)
+            for (unsigned j = 0; j < PRESSURE_BLOCK_SIZE_ELEMENTAL; ++j)
             {
                 ret(i,j) = mVal2;
             }
@@ -130,9 +130,9 @@ public:
         Element<DIM,DIM>* pElement)
     {
         c_matrix<double,PRESSURE_BLOCK_SIZE_ELEMENTAL,PRESSURE_BLOCK_SIZE_ELEMENTAL> ret;
-        for (unsigned i=0; i<PRESSURE_BLOCK_SIZE_ELEMENTAL; i++)
+        for (unsigned i = 0; i < PRESSURE_BLOCK_SIZE_ELEMENTAL; ++i)
         {
-            for (unsigned j=0; j<PRESSURE_BLOCK_SIZE_ELEMENTAL; j++)
+            for (unsigned j = 0; j < PRESSURE_BLOCK_SIZE_ELEMENTAL; ++j)
             {
                 ret(i,j) = mVal3;
             }
@@ -148,7 +148,7 @@ public:
         Element<DIM,DIM>* pElement)
     {
         c_vector<double,SPATIAL_BLOCK_SIZE_ELEMENTAL> ret;
-        for (unsigned i=0; i<SPATIAL_BLOCK_SIZE_ELEMENTAL; i++)
+        for (unsigned i = 0; i < SPATIAL_BLOCK_SIZE_ELEMENTAL; ++i)
         {
             ret(i) = mVal4;
         }
@@ -162,7 +162,7 @@ public:
             Element<DIM,DIM>* pElement)
     {
         c_vector<double,PRESSURE_BLOCK_SIZE_ELEMENTAL> ret;
-        for (unsigned i=0; i<PRESSURE_BLOCK_SIZE_ELEMENTAL; i++)
+        for (unsigned i = 0; i < PRESSURE_BLOCK_SIZE_ELEMENTAL; ++i)
         {
             ret(i) = mVal5;
         }
@@ -243,26 +243,24 @@ public:
         TS_ASSERT_THROWS_THIS(assembler.AssembleVector(), "Vector to be assembled has not been set");
         TS_ASSERT_THROWS_THIS(assembler.AssembleMatrix(), "Matrix to be assembled has not been set");
 
-
         assembler.SetVectorToAssemble(vec, true);
         assembler.SetMatrixToAssemble(mat, true);
         assembler.Assemble();
         PetscMatTools::Finalise(mat);
 
         ReplicatableVector vec_repl(vec);
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             // spatial vars
-            TS_ASSERT_DELTA( vec_repl[2*i], 111*h, 1e-8 );
+            TS_ASSERT_DELTA(vec_repl[2*i], 111*h, 1e-8);
         }
-        for (unsigned i=0; i<2; i++)
+        for (unsigned i = 0; i < 2; ++i)
         {
             // non-dummy pressure vars
-            TS_ASSERT_DELTA( vec_repl[2*i+1], 222*h, 1e-8 );
+            TS_ASSERT_DELTA(vec_repl[2*i+1], 222*h, 1e-8);
         }
         // dummy pressure vars
-        TS_ASSERT_DELTA( vec_repl[5], 0.0, 1e-8 );
-
+        TS_ASSERT_DELTA(vec_repl[5], 0.0, 1e-8);
 
         double correct_matrix[6][6] = { {2*h, 3*h, 2*h, 3*h, 2*h, 0.0},
                                         {3*h, 4*h, 3*h, 4*h, 3*h, 0.0},
@@ -328,22 +326,22 @@ public:
         PetscMatTools::Finalise(mat);
 
         ReplicatableVector vec_repl(vec);
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
-            TS_ASSERT_DELTA( vec_repl[3*i  ], 111*0.5, 1e-8 );
-            TS_ASSERT_DELTA( vec_repl[3*i+1], 111*0.5, 1e-8 );
+            TS_ASSERT_DELTA(vec_repl[3*i  ], 111*0.5, 1e-8);
+            TS_ASSERT_DELTA(vec_repl[3*i+1], 111*0.5, 1e-8);
         }
-        for (unsigned i=0; i<mesh.GetNumVertices(); i++)
+        for (unsigned i = 0; i < mesh.GetNumVertices(); ++i)
         {
-            TS_ASSERT_DELTA( vec_repl[3*i+2], 222*0.5, 1e-8 );
+            TS_ASSERT_DELTA(vec_repl[3*i+2], 222*0.5, 1e-8);
         }
 
         // set up correct matrix: disp-disp entries have value 2h, disp-pressure entries
         // have val 3h, and pressure-pressure entries have value 4h....
-        c_matrix<double,18,18> correct_matrix;
-        for (unsigned i=0; i<6; i++)
+        c_matrix<double, 18, 18> correct_matrix;
+        for (unsigned i = 0; i < 6; ++i)
         {
-            for (unsigned j=0; j<6; j++)
+            for (unsigned j = 0; j < 6; ++j)
             {
                 correct_matrix(3*i,  3*j)   = 2.0*0.5; // 0.5 is area of triangle
                 correct_matrix(3*i+1,3*j)   = 2.0*0.5; // 0.5 is area of triangle
@@ -419,9 +417,9 @@ public:
         c_matrix<double,40,40> correct_matrix;
         // set up correct matrix: disp-disp entries have value 5, disp-pressure entries
         // have val 10, and pressure-pressure entries have value 15....
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i = 0; i < 10; ++i)
         {
-            for (unsigned j=0; j<10; j++)
+            for (unsigned j = 0; j < 10; ++j)
             {
                 correct_matrix(4*i,  4*j)   = 5;
                 correct_matrix(4*i+1,4*j)   = 5;
@@ -433,26 +431,26 @@ public:
                 correct_matrix(4*i+1,4*j+2) = 5;
                 correct_matrix(4*i+2,4*j+2) = 5;
 
-                correct_matrix(4*i,  4*j+3) = 10;
-                correct_matrix(4*i+1,4*j+3) = 10;
-                correct_matrix(4*i+2,4*j+3) = 10;
+                correct_matrix(4*i, 4*j+3) = 10;
+                correct_matrix(4*i+1, 4*j+3) = 10;
+                correct_matrix(4*i+2, 4*j+3) = 10;
 
-                correct_matrix(4*i+3,4*j)   = 10;
-                correct_matrix(4*i+3,4*j+1) = 10;
-                correct_matrix(4*i+3,4*j+2) = 10;
+                correct_matrix(4*i+3, 4*j)   = 10;
+                correct_matrix(4*i+3, 4*j+1) = 10;
+                correct_matrix(4*i+3, 4*j+2) = 10;
 
-                correct_matrix(4*i+3,4*j+3) = 15;
+                correct_matrix(4*i+3, 4*j+3) = 15;
             }
         }
 
         //...except for the fact that any entry corresponding to pressure on an non-internal node
         //will have value 0
-        for (unsigned i=4; i<10; i++)
+        for (unsigned i = 4; i < 10; ++i)
         {
-            for (unsigned j=0; j<40; j++)
+            for (unsigned j = 0; j < 40; ++j)
             {
-                correct_matrix(4*i+3,j) = 0.0;
-                correct_matrix(j,4*i+3) = 0.0;
+                correct_matrix(4*i+3, j) = 0.0;
+                correct_matrix(j, 4*i+3) = 0.0;
             }
         }
 
@@ -460,7 +458,7 @@ public:
         MatGetOwnershipRange(mat, &lo, &hi);
         for (unsigned i = lo; i < static_cast<unsigned>(hi); ++i)
         {
-            for (unsigned j=0; j<34; j++)
+            for (unsigned j = 0; j < 34; ++j)
             {
                 TS_ASSERT_DELTA( PetscMatTools::GetElement(mat,i,j), correct_matrix(i,j), 1e-8 );
             }
@@ -507,7 +505,7 @@ public:
         MatGetOwnershipRange(mat2, &lo, &hi);
         for (unsigned i = lo; i < static_cast<unsigned>(hi); ++i)
         {
-            for (unsigned j=0; j<4; j++)
+            for (unsigned j = 0; j < 4; ++j)
             {
                 TS_ASSERT_DELTA( PetscMatTools::GetElement(mat2,i,j), correct_matrix[i][j], 1e-5 );
             }
@@ -516,7 +514,7 @@ public:
         MatGetOwnershipRange(mat1, &lo, &hi);
         for (unsigned i = lo; i < static_cast<unsigned>(hi); ++i)
         {
-            for (unsigned j=0; j<3*quadratic_mesh.GetNumNodes(); j++)
+            for (unsigned j = 0; j < 3*quadratic_mesh.GetNumNodes(); ++j)
             {
                 if (i%3==2 && j%3==2 && (i-2)/3<4 && (j-2)/3<4) // the pressure-pressure block, excl pressure values at non-vertices
                 {

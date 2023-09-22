@@ -70,7 +70,7 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
 
     mLocalInitialNodes.resize(rNodes.size(), false);
 
-    for (unsigned i=0; i<rNodes.size(); i++)
+    for (unsigned i=0; i<rNodes.size(); ++i)
     {
         if (mpBoxCollection->IsOwned(rNodes[i]))
         {
@@ -440,7 +440,7 @@ void NodesOnlyMesh<SPACE_DIM>::AddMovedNode(boost::shared_ptr<Node<SPACE_DIM> > 
         bool is_particle = pMovedNode->IsParticle();
         p_node->SetIsParticle(is_particle);
 
-        for (unsigned i=0; i<pMovedNode->GetNumNodeAttributes(); i++)
+        for (unsigned i=0; i<pMovedNode->GetNumNodeAttributes(); ++i)
         {
             double attribute = pMovedNode->rGetNodeAttributes()[i];
             p_node->AddNodeAttribute(attribute);
@@ -508,7 +508,7 @@ void NodesOnlyMesh<SPACE_DIM>::EnlargeBoxCollection()
     assert(mpBoxCollection);
 
     int num_local_rows = mpBoxCollection->GetNumLocalRows();
-    int new_local_rows = num_local_rows + (int)(PetscTools::AmTopMost()) + (int)(PetscTools::AmMaster());
+    int new_local_rows = num_local_rows + static_cast<int>(PetscTools::AmTopMost()) + static_cast<int>(PetscTools::AmMaster());
 
     c_vector<double, 2*SPACE_DIM> current_domain_size = mpBoxCollection->rGetDomainSize();
     c_vector<double, 2*SPACE_DIM> new_domain_size = current_domain_size;
@@ -597,7 +597,7 @@ void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(const std::vector<Node<SPACE_D
     swell_factor = (1 + swell_factor) * 1e-14; // Make sure that it's non-zero
 
     c_vector<double, 2*SPACE_DIM> domain_size;
-    for (unsigned i=0; i < SPACE_DIM; i++)
+    for (unsigned i=0; i < SPACE_DIM; ++i)
     {
         domain_size[2*i] = bounding_box.rGetLowerCorner()[i] - swell_factor;
         domain_size[2*i+1] = bounding_box.rGetUpperCorner()[i] + swell_factor;
@@ -718,7 +718,7 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructFromMeshReader(AbstractMeshReader<SPACE_
     TetrahedralMesh<SPACE_DIM, SPACE_DIM>::ConstructFromMeshReader(rMeshReader);
 
     // Set the correct global node indices
-    for (unsigned i=0; i<this->mNodes.size(); i++)
+    for (unsigned i=0; i<this->mNodes.size(); ++i)
     {
         this->mNodes[i]->SetIndex(GetNextAvailableIndex());
     }
@@ -729,7 +729,7 @@ std::vector<unsigned> NodesOnlyMesh<SPACE_DIM>::GetAllNodeIndices() const
 {
     std::vector<unsigned> indices(GetNumNodes()); // GetNumNodes = mNodes - mDeletedNodes
     unsigned live_index=0;
-    for (unsigned i=0; i<this->mNodes.size(); i++)
+    for (unsigned i=0; i<this->mNodes.size(); ++i)
     {
         // Only use nodes which are not deleted
         if (!this->mNodes[i]->IsDeleted())

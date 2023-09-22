@@ -193,7 +193,7 @@ public:
         coords[2] = 777.7;
         Node<3> node(0, coords);
 
-        for (int i=0; i<3; i++)
+        for (int i=0; i<3; ++i)
         {
             TS_ASSERT_DELTA(node.rGetLocation()[i], coords[i], 1e-12);
         }

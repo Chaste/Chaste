@@ -184,7 +184,7 @@ void AbstractCardiacCell::CheckForArchiveFix()
 //        assert(GetNumberOfStateVariables() == 8);
 //        unsigned var_index_map[8] = {2, 3, 1, 7, 0, 4, 5, 6};
 //        std::vector<double> old_state(this->mStateVariables);
-//        for (unsigned i=0; i<8; i++)
+//        for (unsigned i=0; i<8; ++i)
 //        {
 //            this->mStateVariables[var_index_map[i]] = old_state[i];
 //        }

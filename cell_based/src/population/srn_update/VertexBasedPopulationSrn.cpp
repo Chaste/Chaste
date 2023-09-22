@@ -163,7 +163,7 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
 
         // Remap index cannot be negative when it's a direct remap or an edge split
         assert(!((remap_status == 0 || remap_status == 1) && remap_index < 0));
-        switch(remap_status)
+        switch (remap_status)
         {
             // Edge SRN remains the same
             case 0:

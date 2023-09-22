@@ -94,14 +94,14 @@ void RKC21IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSyste
     // Work out w1
     pAbstractOdeSystem->EvaluateYDerivatives(time, w0, F0);
 
-    for (unsigned i=0; i<num_equations; i++)
+    for (unsigned i=0; i<num_equations; ++i)
     {
         w1[i] = w0[i] + mu1_tilde * timeStep * F0[i];
     }
 
     // Work next step
     pAbstractOdeSystem->EvaluateYDerivatives(time + mu1_tilde * timeStep, w1, F1);
-    for (unsigned i=0; i<num_equations; i++)
+    for (unsigned i=0; i<num_equations; ++i)
     {
         w2[i] = (1-mu2) * w0[i] + mu2 * w1[i] + mu2_tilde * timeStep * F1[i];// + gamma2_tilde*timeStep*F0[i]; -> never used
     }

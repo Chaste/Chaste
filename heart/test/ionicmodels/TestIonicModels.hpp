@@ -341,7 +341,7 @@ public:
         std::vector<double> state_variables_copy = hh52_be.GetStdVecStateVariables();
         hh52_be.ResetToInitialConditions();
         hh52_be.SolveAndUpdateState(0.0, end_time);
-        for (unsigned i=0; i<hh52_be.GetNumberOfStateVariables(); i++)
+        for (unsigned i=0; i<hh52_be.GetNumberOfStateVariables(); ++i)
         {
             TS_ASSERT_DELTA(hh52_be.GetStateVariable(i), state_variables_copy[i], 1e-6);
         }
@@ -458,7 +458,7 @@ public:
         // For coverage
         lr91_ode_system.ResetToInitialConditions();
         std::vector<double> inits = lr91_ode_system.GetInitialConditions();
-        for (unsigned i=0; i<inits.size(); i++)
+        for (unsigned i=0; i<inits.size(); ++i)
         {
             TS_ASSERT_EQUALS(lr91_ode_system.rGetStateVariables()[i], inits[i]);
         }

@@ -120,7 +120,7 @@ class ExtendedBidomainProblem : public AbstractCardiacProblem<DIM,DIM, 3>
         //archive & mpSolver;
 
         //archive the values for the conductivies of the second cell
-        for (unsigned i = 0; i < DIM; i++)
+        for (unsigned i = 0; i < DIM; ++i)
         {
             double conductivity = mIntracellularConductivitiesSecondCell(i);
             archive & conductivity;
@@ -181,7 +181,7 @@ class ExtendedBidomainProblem : public AbstractCardiacProblem<DIM,DIM, 3>
         //archive & mpSolver;
 
         //load the values for the conductivies of the second cell
-        for (unsigned i = 0; i < DIM; i++)
+        for (unsigned i = 0; i < DIM; ++i)
         {
             double conductivity;
             archive & conductivity;

@@ -69,7 +69,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
         // Create as many elements as there are nodes in the mesh
         mElements.reserve(num_elements);
 
-        for (unsigned elem_index=0; elem_index<num_elements; elem_index++)
+        for (unsigned elem_index = 0; elem_index<num_elements; elem_index++)
         {
             VertexElement<2,2>* p_element = new VertexElement<2,2>(elem_index);
             mElements.push_back(p_element);
@@ -79,17 +79,17 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
         GenerateVerticesFromElementCircumcentres(rMesh);
 
         // Loop over all nodes and check the x locations not outside [0,mWidth]
-        for (unsigned i=0; i<mNodes.size(); i++)
+        for (unsigned i = 0; i<mNodes.size(); ++i)
         {
             CheckNodeLocation(mNodes[i]);
         }
 
         // Loop over elements of the Delaunay mesh (which are nodes/vertices of this mesh)
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i = 0; i<num_nodes; ++i)
         {
             // Loop over nodes owned by this triangular element in the Delaunay mesh
             // Add this node/vertex to each of the 3 vertex elements
-            for (unsigned local_index=0; local_index<3; local_index++)
+            for (unsigned local_index = 0; local_index<3; local_index++)
             {
                 unsigned elem_index = mpDelaunayMesh->GetElement(i)->GetNodeGlobalIndex(local_index);
                 unsigned num_nodes_in_elem = mElements[elem_index]->GetNumNodes();
@@ -116,7 +116,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
             elem_iter != mpDelaunayMesh->GetElementIteratorEnd();
             ++elem_iter)
         {
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j = 0; j<3; ++j)
             {
                 Node<2>* p_node_a = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex(j));
                 Node<2>* p_node_b = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex((j+1)%3));
@@ -169,7 +169,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
                     bool node_clear = true;
                     double node_clearance = 0.01; 
 
-                    for (unsigned i=0; i<nodes.size(); i++)
+                    for (unsigned i = 0; i<nodes.size(); ++i)
                     {   
                         double distance = norm_2(mpDelaunayMesh->GetVectorFromAtoB(nodes[i]->rGetLocation(), new_node_location));
                         if (distance < node_clearance)
@@ -196,7 +196,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
             bool bad_element = false;
             double edge_threshold = 1.5; //TODO think about making this a setable variable!
 
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j = 0; j<3; ++j)
             {
                 Node<2>* p_node_a = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex(j));
                 Node<2>* p_node_b = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex((j+1)%3));
@@ -209,7 +209,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
 
             if (bad_element)
             {
-                for (unsigned j=0; j<3; j++)
+                for (unsigned j = 0; j<3; ++j)
                 {
                     Node<2>* p_node_a = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex(j));
                     Node<2>* p_node_b = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex((j+1)%3));
@@ -252,7 +252,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
         }
 
         // Loop over all nodes and check they're not outside [0,mWidth)
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             CheckNodeLocation(nodes[i]);
         }
@@ -277,12 +277,12 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
         GenerateVerticesFromElementCircumcentres(extended_mesh);
 
         // Loop over all nodes and check the x locations not outside [0,mWidth]
-        for (unsigned i=0; i<mNodes.size(); i++)
+        for (unsigned i = 0; i<mNodes.size(); ++i)
         {
             CheckNodeLocation(mNodes[i]);
         }
         // Loop over elements of the Delaunay mesh (which are nodes/vertices of this mesh)
-        for (unsigned i = 0; i < num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             // Loop over nodes owned by this triangular element in the Delaunay mesh
             // Add this node/vertex to each of the 3 vertex elements
@@ -302,7 +302,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
     }
 
     // Reorder mNodes anticlockwise
-    for (unsigned elem_index=0; elem_index<mElements.size(); elem_index++)
+    for (unsigned elem_index = 0; elem_index<mElements.size(); elem_index++)
     {
         /**
          * Create a std::vector of pairs, where each pair comprises the angle
@@ -310,7 +310,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
          * node's global index in the Voronoi mesh.
          */
         std::vector<std::pair<double, unsigned> > index_angle_list;
-        for (unsigned local_index=0; local_index<mElements[elem_index]->GetNumNodes(); local_index++)
+        for (unsigned local_index = 0; local_index<mElements[elem_index]->GetNumNodes(); local_index++)
         {
             c_vector<double, 2> vectorA = mpDelaunayMesh->GetNode(elem_index)->rGetLocation();
             c_vector<double, 2> vectorB = mElements[elem_index]->GetNodeLocation(local_index);
@@ -449,7 +449,7 @@ VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
     std::vector<VertexElement<2, 2>*> elements;
 
     // Create three copies of each node
-    for (unsigned index=0; index<num_nodes; index++)
+    for (unsigned index = 0; index<num_nodes; index++)
     {
         c_vector<double, 2> location;
         location = GetNode(index)->rGetLocation();
@@ -481,7 +481,7 @@ VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
         bool element_straddles_left_right_boundary = false;
 
         const c_vector<double, 2>& r_this_node_location = elem_iter->GetNode(0)->rGetLocation();
-        for (unsigned local_index=0; local_index<num_nodes_in_elem; local_index++)
+        for (unsigned local_index = 0; local_index<num_nodes_in_elem; local_index++)
         {
             const c_vector<double, 2>& r_next_node_location = elem_iter->GetNode((local_index+1)%num_nodes_in_elem)->rGetLocation();
             c_vector<double, 2> vector;
@@ -497,7 +497,7 @@ VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
          * the original Delaunay node
          */
         bool element_centre_on_right = true;
-        if(mpDelaunayMesh)
+        if (mpDelaunayMesh)
         {
                 unsigned delaunay_index = this->GetDelaunayNodeIndexCorrespondingToVoronoiElementIndex(elem_index);
                 double element_centre_x_location = this->mpDelaunayMesh->GetNode(delaunay_index)->rGetLocation()[0];
@@ -508,7 +508,7 @@ VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
         }
 
         // Use the above information when duplicating the element in the vtk mesh
-        for (unsigned local_index=0; local_index<num_nodes_in_elem; local_index++)
+        for (unsigned local_index = 0; local_index<num_nodes_in_elem; local_index++)
         {
             unsigned this_node_index = elem_iter->GetNodeGlobalIndex(local_index);
 
@@ -539,7 +539,7 @@ VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
     // Now delete any nodes from the mesh for VTK that are not contained in any elements
     std::vector<Node<2>*> nodes;
     unsigned count = 0;
-    for (unsigned index=0; index<temp_nodes.size(); index++)
+    for (unsigned index = 0; index<temp_nodes.size(); index++)
     {
         unsigned num_elems_containing_this_node = temp_nodes[index]->rGetContainingElementIndices().size();
 

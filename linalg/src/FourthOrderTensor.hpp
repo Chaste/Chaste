@@ -351,7 +351,7 @@ double& FourthOrderTensor<DIM1,DIM2,DIM3,DIM4>::operator()(unsigned M, unsigned 
 template<unsigned DIM1, unsigned DIM2, unsigned DIM3, unsigned DIM4>
 void FourthOrderTensor<DIM1,DIM2,DIM3,DIM4>::Zero()
 {
-    for (unsigned i=0; i<mData.size(); i++)
+    for (unsigned i=0; i<mData.size(); ++i)
     {
         mData[i] = 0.0;
     }

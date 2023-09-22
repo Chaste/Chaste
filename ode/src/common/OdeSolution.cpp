@@ -77,7 +77,7 @@ std::vector<double> OdeSolution::GetVariableAtIndex(unsigned index) const
     std::vector<double> answer;
     answer.reserve(mTimes.size());
     double temp_number;
-    for (unsigned i=0; i< mTimes.size(); ++i)
+    for (unsigned i = 0; i< mTimes.size(); ++i)
     {
         if (index < mSolutions[0].size())
         {
@@ -151,7 +151,7 @@ std::vector<double>& OdeSolution::rGetParameters(AbstractParameterisedSystem<VEC
     if (num_params > 0)
     {
         mParameters.reserve(num_params);
-        for (unsigned i=0; i<num_params; ++i)
+        for (unsigned i = 0; i<num_params; ++i)
         {
             mParameters.push_back(pOdeSystem->GetParameter(i));
         }
@@ -167,7 +167,7 @@ std::vector<std::vector<double> >& OdeSolution::rGetDerivedQuantities(AbstractPa
     {
         assert(mTimes.size() == mSolutions.size()); // Paranoia
         mDerivedQuantities.reserve(mTimes.size());
-        for (unsigned i=0; i<mTimes.size(); i++)
+        for (unsigned i = 0; i<mTimes.size(); ++i)
         {
             mDerivedQuantities.push_back(pOdeSystem->ComputeDerivedQuantities(mTimes[i], mSolutions[i]));
         }
@@ -189,7 +189,7 @@ std::vector<std::vector<double> >& OdeSolution::rGetDerivedQuantities(AbstractPa
 #else
         N_Vector state_vars = num_solutions > 0 ? N_VNew_Serial(mSolutions[0].size()) : nullptr;
 #endif
-        for (unsigned i=0; i<num_solutions; i++)
+        for (unsigned i = 0; i<num_solutions; ++i)
         {
             CopyFromStdVector(mSolutions[i], state_vars);
             N_Vector dqs = pOdeSystem->ComputeDerivedQuantities(mTimes[i], state_vars);
@@ -253,7 +253,7 @@ void OdeSolution::WriteToFile(std::string directoryName,
     var_ids.reserve(num_vars);
     if (mpOdeSystemInformation->rGetStateVariableNames().size() > 0)
     {
-        for (unsigned i=0; i<num_vars; i++)
+        for (unsigned i = 0; i<num_vars; ++i)
         {
             var_ids.push_back(writer.DefineVariable(mpOdeSystemInformation->rGetStateVariableNames()[i],
                                                     mpOdeSystemInformation->rGetStateVariableUnits()[i]));
@@ -261,7 +261,7 @@ void OdeSolution::WriteToFile(std::string directoryName,
     }
     else
     {
-        for (unsigned i=0; i<num_vars; i++)
+        for (unsigned i = 0; i<num_vars; ++i)
         {
             std::stringstream string_stream;
             string_stream << "var_" << i;
@@ -272,12 +272,12 @@ void OdeSolution::WriteToFile(std::string directoryName,
     if (includeDerivedQuantities)
     {
         var_ids.reserve(num_vars + num_params + num_derived_quantities);
-        for (unsigned i=0; i<num_params; ++i)
+        for (unsigned i = 0; i<num_params; ++i)
         {
             var_ids.push_back(writer.DefineVariable(mpOdeSystemInformation->rGetParameterNames()[i],
                                                     mpOdeSystemInformation->rGetParameterUnits()[i]));
         }
-        for (unsigned i=0; i<num_derived_quantities; i++)
+        for (unsigned i = 0; i<num_derived_quantities; ++i)
         {
             var_ids.push_back(writer.DefineVariable(mpOdeSystemInformation->rGetDerivedQuantityNames()[i],
                                                     mpOdeSystemInformation->rGetDerivedQuantityUnits()[i]));
@@ -291,20 +291,20 @@ void OdeSolution::WriteToFile(std::string directoryName,
 
     writer.EndDefineMode();
 
-    for (unsigned i=0; i<mSolutions.size(); i+=stepsPerRow)
+    for (unsigned i = 0; i<mSolutions.size(); i+=stepsPerRow)
     {
         writer.PutVariable(time_var_id, mTimes[i]);
-        for (unsigned j=0; j<num_vars; j++)
+        for (unsigned j = 0; j<num_vars; ++j)
         {
             writer.PutVariable(var_ids[j], mSolutions[i][j]);
         }
         if (includeDerivedQuantities)
         {
-            for (unsigned j=0; j<num_params; ++j)
+            for (unsigned j = 0; j<num_params; ++j)
             {
                 writer.PutVariable(var_ids[j+num_vars], mParameters[j]);
             }
-            for (unsigned j=0; j<num_derived_quantities; j++)
+            for (unsigned j = 0; j<num_derived_quantities; ++j)
             {
                 writer.PutVariable(var_ids[j+num_params+num_vars], mDerivedQuantities[i][j]);
             }

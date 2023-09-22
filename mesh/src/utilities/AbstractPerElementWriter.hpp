@@ -91,7 +91,7 @@ protected:
         }
         else
         {
-            for (unsigned i=0; i<DATA_SIZE; i++)
+            for (unsigned i=0; i<DATA_SIZE; ++i)
             {
                 (*mpMasterFile) << rData[i] << "\t";
             }

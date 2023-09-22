@@ -97,12 +97,12 @@ VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
             ReplicatableVector voltage_repl(voltage);
 
             // interpolate
-            for (unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)
+            for (unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); ++i)
             {
                 double interpolated_voltage = 0;
 
                 Element<DIM,DIM>& element = *(rElectricsMesh.GetElement(mesh_pair.rGetElementsAndWeights()[i].ElementNum));
-                for (unsigned node_index = 0; node_index<element.GetNumNodes(); node_index++)
+                for (unsigned node_index = 0; node_index < element.GetNumNodes(); ++node_index)
                 {
                     unsigned global_node_index = element.GetNodeGlobalIndex(node_index);
                     interpolated_voltage += voltage_repl[global_node_index]*mesh_pair.rGetElementsAndWeights()[i].Weights(node_index);

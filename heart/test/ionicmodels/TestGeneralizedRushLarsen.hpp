@@ -161,7 +161,7 @@ public:
 
         TS_ASSERT_EQUALS(mpGeneralizedRushLarsenCell->GetNumberOfStateVariables(),
                          reference_model.GetNumberOfStateVariables());
-        for (unsigned i=0; i<reference_model.GetNumberOfStateVariables(); i++)
+        for (unsigned i = 0; i<reference_model.GetNumberOfStateVariables(); ++i)
         {
             TS_ASSERT_DELTA(mpGeneralizedRushLarsenCell->rGetStateVariables()[i],
                             reference_model.rGetStateVariables()[i], 1e-6);
@@ -178,7 +178,7 @@ public:
         reference_model.SetStimulusFunction(p_stimulus);
         OdeSolution solutions_ref = reference_model.Compute(0.0, 1.0, 0.01);
 
-        for (unsigned i=0; i<reference_model.GetNumberOfStateVariables(); i++)
+        for (unsigned i = 0; i<reference_model.GetNumberOfStateVariables(); ++i)
         {
             TS_ASSERT_DELTA(solutions_GRL1.rGetSolutions().back()[i],
                             solutions_ref.rGetSolutions().back()[i], 1e-2);
@@ -196,7 +196,7 @@ public:
         mpGeneralizedRushLarsenCell->ResetToInitialConditions();
         mpGeneralizedRushLarsenCell->SetVoltage(-30);
         mpGeneralizedRushLarsenCell->SolveAndUpdateState(0.0, 1e-3);
-        for (unsigned i=0; i<mpGeneralizedRushLarsenCell->GetNumberOfStateVariables(); i++)
+        for (unsigned i = 0; i<mpGeneralizedRushLarsenCell->GetNumberOfStateVariables(); ++i)
         {
             TS_ASSERT_DELTA(mpGeneralizedRushLarsenCell->rGetStateVariables()[i],
                             solutions_GRL1_stimulated_cell_order1.rGetSolutions().back()[i], 1e-12);
@@ -211,7 +211,7 @@ public:
         reference_model_grl1.SetVoltage(-30);
         OdeSolution ref_solution_grl1 = reference_model_grl1.Compute(0.0, 1e-3);
 
-        for (unsigned i=0; i<reference_model_grl1.GetNumberOfStateVariables(); i++)
+        for (unsigned i = 0; i<reference_model_grl1.GetNumberOfStateVariables(); ++i)
         {
             double error1 = solutions_GRL1_stimulated_cell_order1.rGetSolutions().back()[i] - ref_solution_grl1.rGetSolutions().back()[i];
             TS_ASSERT_DELTA(fabs(error1),0,5e-7);
@@ -240,7 +240,7 @@ public:
         reference_model.SetTimestep(1e-6);
         OdeSolution ref_solution = reference_model.Compute(0.0, 1.0);
 
-        for (unsigned i=0; i<reference_model.GetNumberOfStateVariables(); i++)
+        for (unsigned i = 0; i<reference_model.GetNumberOfStateVariables(); ++i)
         {
             double error1 = solutions_GRL1_stimulated_cell_order1.rGetSolutions().back()[i] - ref_solution.rGetSolutions().back()[i];
             double error2 = solutions_GRL1_stimulated_cell_order2.rGetSolutions().back()[i] - ref_solution.rGetSolutions().back()[i];
@@ -274,7 +274,7 @@ public:
 
         TS_ASSERT_EQUALS(mpGeneralizedRushLarsenCell->GetNumberOfStateVariables(),
                          reference_model.GetNumberOfStateVariables());
-        for (unsigned i=0; i<reference_model.GetNumberOfStateVariables(); i++)
+        for (unsigned i = 0; i<reference_model.GetNumberOfStateVariables(); ++i)
         {
             TS_ASSERT_DELTA(mpGeneralizedRushLarsenCell->rGetStateVariables()[i],
                             reference_model.rGetStateVariables()[i], 1e-6);
@@ -290,7 +290,7 @@ public:
         reference_model.SetStimulusFunction(p_stimulus);
         OdeSolution solutions_ref = reference_model.Compute(0.0, 1.0, 0.01);
 
-        for (unsigned i=0; i<reference_model.GetNumberOfStateVariables(); i++)
+        for (unsigned i = 0; i<reference_model.GetNumberOfStateVariables(); ++i)
         {
             TS_ASSERT_DELTA(solutions_GRL2.rGetSolutions().back()[i],
                             solutions_ref.rGetSolutions().back()[i], 1e-2);
@@ -315,7 +315,7 @@ public:
         reference_model_grl2.SetVoltage(-30);
         OdeSolution ref_solution_grl2 = reference_model_grl2.Compute(0.0, 1e-3);
 
-        for (unsigned i=0; i<reference_model_grl2.GetNumberOfStateVariables(); i++)
+        for (unsigned i = 0; i<reference_model_grl2.GetNumberOfStateVariables(); ++i)
         {
             double error1 = solutions_GRL2_stimulated_cell_order2.rGetSolutions().back()[i] - ref_solution_grl2.rGetSolutions().back()[i];
             TS_ASSERT_DELTA(fabs(error1),0,5e-7);

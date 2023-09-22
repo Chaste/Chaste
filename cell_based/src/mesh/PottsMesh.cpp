@@ -198,7 +198,7 @@ template<unsigned DIM>
 double PottsMesh<DIM>::GetSurfaceAreaOfElement(unsigned index)
 {
     ///\todo not implemented in 3d yet
-    if constexpr (DIM==2 || DIM==3)
+    if constexpr (DIM == 2 || DIM == 3)
     {
         // Helper variables
         PottsElement<DIM>* p_element = GetElement(index);
@@ -388,7 +388,7 @@ unsigned PottsMesh<DIM>::DivideElement(PottsElement<DIM>* pElement,
                                        bool placeOriginalElementBelow)
 {
     /// Not implemented in 1d
-    if constexpr (DIM==2 || DIM==3)
+    if constexpr (DIM == 2 || DIM == 3)
     {
         // Store the number of nodes in the element (this changes when nodes are deleted from the element)
         unsigned num_nodes = pElement->GetNumNodes();

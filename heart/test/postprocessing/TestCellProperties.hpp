@@ -86,7 +86,7 @@ public:
         //Creating an artificial flat potential profile
         std::vector<double> times;
         std::vector<double> flat_v;
-        for (unsigned i = 0; i < 100; i++)
+        for (unsigned i = 0; i < 100; ++i)
         {
             times.push_back(i);
             flat_v.push_back(-85.0);
@@ -257,7 +257,7 @@ public:
         // Create the vectors to be passed to the CellProperties object
         std::vector<double> voltages(15001);
         std::vector<double> times(15001);
-        for (unsigned i = 0; i < 15001; i++)
+        for (unsigned i = 0; i < 15001; ++i)
         {
             apd_file >> voltages[i];
             times[i] = i;
@@ -337,7 +337,7 @@ public:
         // Create the vectors to be passed to the CellProperties object
         std::vector<double> voltages(2001);
         std::vector<double> times(2001);
-        for (unsigned i = 0; i < 2001; i++)
+        for (unsigned i = 0; i < 2001; ++i)
         {
             ead_file >> voltages[i];
             times[i] = i;

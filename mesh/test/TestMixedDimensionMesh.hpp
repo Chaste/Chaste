@@ -106,7 +106,7 @@ public:
         {
             TS_ASSERT_EQUALS(mesh.GetNumLocalCableElements(), 10u);
 
-            for (unsigned i=0; i<10u; i++)
+            for (unsigned i = 0; i<10u; ++i)
             {
                 Element<1,2>* p_cable_elt = mesh.GetCableElement(i);
                 TS_ASSERT_EQUALS(p_cable_elt->GetNumNodes(), 2u);
@@ -118,7 +118,7 @@ public:
                 TS_ASSERT( mesh.CalculateDesignatedOwnershipOfCableElement(i) );
             }
 
-            for (unsigned i=0; i<200u; i++)
+            for (unsigned i = 0; i<200u; ++i)
             {
                 Element<2,2>* p_elt = mesh.GetElement(i);
                 TS_ASSERT_EQUALS(p_elt->GetNumNodes(), 3u);
@@ -134,7 +134,7 @@ public:
                 // For a dumb partition, process 0 owns nodes 0 to 59
                 // Cables 0, 1, 2, 3, 4, 5
 
-                for (unsigned i=0; i<5u; i++)
+                for (unsigned i = 0; i<5u; ++i)
                 {
                     Element<1,2>* p_cable_elt = mesh.GetCableElement(i);
                     TS_ASSERT_EQUALS(p_cable_elt->GetNumNodes(), 2u);
@@ -154,7 +154,7 @@ public:
                 TS_ASSERT_EQUALS(mesh.GetNumLocalCableElements(), 5u);
                 TS_ASSERT_THROWS_THIS(mesh.GetCableElement(0), "Requested cable element 0 does not belong to processor 1");
 
-                for (unsigned i=5; i<10u; i++)
+                for (unsigned i=5; i<10u; ++i)
                 {
                     Element<1,2>* p_cable_elt = mesh.GetCableElement(i);
                     TS_ASSERT_EQUALS(p_cable_elt->GetNumNodes(), 2u);
@@ -350,7 +350,7 @@ public:
         //Test that every cable element has a designated owner
         {
             unsigned local_owned=0u;
-            for (unsigned i=0; i<dumb_partition_mesh.GetNumCableElements(); i++)
+            for (unsigned i = 0; i<dumb_partition_mesh.GetNumCableElements(); ++i)
             {
                 if (dumb_partition_mesh.CalculateDesignatedOwnershipOfCableElement(i))
                 {
@@ -396,7 +396,7 @@ public:
         //Test that every cable element has a designated owner
         {
             unsigned local_owned=0u;
-            for (unsigned i=0; i<partitioned_mesh.GetNumCableElements(); i++)
+            for (unsigned i = 0; i<partitioned_mesh.GetNumCableElements(); ++i)
             {
                 if (partitioned_mesh.CalculateDesignatedOwnershipOfCableElement(i))
                 {
@@ -465,7 +465,7 @@ public:
             TS_ASSERT_EQUALS(p_mesh2->GetNumLocalCableElements(), num_local_cable_elements);
 
             // Check elements have the right nodes
-            for (unsigned i=0; i<num_cable_elements; i++)
+            for (unsigned i = 0; i<num_cable_elements; ++i)
             {
                 try
                 {
@@ -473,9 +473,9 @@ public:
                     Element<1,2>* p_element2 = p_mesh2->GetCableElement(i);
                     TS_ASSERT_EQUALS(p_element->GetNodeGlobalIndex(0), p_element2->GetNodeGlobalIndex(0));
                 }
-                catch(Exception& e)
+                catch (Exception& e)
                 {
-                    TS_ASSERT_DIFFERS((int)e.GetShortMessage().find("does not belong to processor"),-1);
+                    TS_ASSERT_DIFFERS(static_cast<int>(e.GetShortMessage().find("does not belong to processor")), -1);
                 }
             }
             delete p_mesh2;

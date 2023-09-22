@@ -158,7 +158,7 @@ double PropagationPropertiesCalculator::CalculatePeakMembranePotential(unsigned 
 {
     std::vector<double>& r_voltages = rGetCachedVoltages(globalNodeIndex);
     double max = -DBL_MAX;
-    for (unsigned i=0; i<r_voltages.size(); i++)
+    for (unsigned i=0; i<r_voltages.size(); ++i)
     {
         if (r_voltages[i]>max)
         {
@@ -263,14 +263,14 @@ std::vector<double> PropagationPropertiesCalculator::CalculateAllConductionVeloc
     if (globalNearNodeIndex == globalFarNodeIndex)
     {
         // globalNearNodeIndex and globalFarNodeIndex are the same node, preventing a 0/0
-        for (unsigned i = 0 ; i < number_of_aps;i++)
+        for (unsigned i = 0 ; i < number_of_aps;++i)
         {
             conduction_velocities.push_back(0.0);
         }
     }
     else
     {
-        for (unsigned i = 0 ; i < number_of_aps;i++)
+        for (unsigned i = 0 ; i < number_of_aps;++i)
         {
             ///\todo remove magic number? (#1884)
             if (fabs(t_far[i] - t_near[i]) < 1e-8)

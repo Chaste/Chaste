@@ -202,7 +202,7 @@ public :
             Ca_trop_index = electrophys_model.GetStateVariableIndex("CaTrop");
             has_Ca_trop = true;
         }
-        catch(Exception&)
+        catch (Exception&)
         {
             has_Ca_trop = false;
         }
@@ -310,7 +310,7 @@ public :
             Ca_trop_index = electrophys_model.GetStateVariableIndex("CaTrop");
             has_Ca_trop = true;
         }
-        catch(Exception&)
+        catch (Exception&)
         {
             has_Ca_trop = false;
         }

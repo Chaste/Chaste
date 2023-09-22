@@ -135,7 +135,7 @@ public:
 
         int num_nodes = monodomain_problem.rGetMesh().GetNumNodes();
         // test final voltages have returned to the resting potential
-        for (int i=0; i<num_nodes; i++)
+        for (int i=0; i<num_nodes; ++i)
         {
             TS_ASSERT_DELTA(voltage_replicated[i], -84.5, 1);
         }

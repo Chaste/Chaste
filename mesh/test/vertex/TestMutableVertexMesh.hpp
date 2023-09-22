@@ -82,7 +82,7 @@ private:
         unsigned node_indices_face_7[3] = {6, 8, 3};
         unsigned node_indices_face_8[3] = {3, 8, 5};
         unsigned node_indices_face_9[3] = {5, 8, 7};
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i<4; ++i)
         {
             nodes_faces[0].push_back(nodes[node_indices_face_0[i]]);
             nodes_faces[1].push_back(nodes[node_indices_face_1[i]]);
@@ -102,7 +102,7 @@ private:
         // Make the faces
         std::vector<VertexElement<2,3>*> faces;
 
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i = 0; i<10; ++i)
         {
             faces.push_back(new VertexElement<2,3>(i, nodes_faces[i]));
         }
@@ -112,14 +112,14 @@ private:
         std::vector<bool> orientations_0, orientations_1;
 
         // Cube element
-        for (unsigned i=0; i<6; i++)
+        for (unsigned i = 0; i<6; ++i)
         {
             faces_element_0.push_back(faces[i]);
             orientations_0.push_back(true);
         }
 
         // Pyramid element
-        for (unsigned i=6; i<10; i++)
+        for (unsigned i = 6; i < 10; ++i)        
         {
             faces_element_1.push_back(faces[i]);
             orientations_1.push_back(true);
@@ -202,7 +202,7 @@ public:
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
         unsigned node_indices_elem_0[5] = {0, 1, 2, 3, 4};
         unsigned node_indices_elem_1[3] = {2, 5, 6};
-        for (unsigned i=0; i<5; i++)
+        for (unsigned i = 0; i<5; ++i)
         {
             nodes_elem_0.push_back(basic_nodes[node_indices_elem_0[i]]);
             if (i < 3)
@@ -449,7 +449,7 @@ public:
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
         unsigned node_indices_elem_0[5] = {0, 1, 2, 3, 4};
         unsigned node_indices_elem_1[3] = {2, 5, 6};
-        for (unsigned i=0; i<5; i++)
+        for (unsigned i = 0; i<5; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             if (i < 3)
@@ -513,7 +513,7 @@ public:
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
         unsigned node_indices_elem_0[5] = {0, 1, 2, 3, 4};
         unsigned node_indices_elem_1[3] = {2, 5, 6};
-        for (unsigned i=0; i<5; i++)
+        for (unsigned i = 0; i<5; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             if (i < 3)
@@ -605,7 +605,7 @@ public:
 
         // Make one rectangular element out of these nodes. Ordering for coverage.
         std::vector<Node<2>*> nodes_elem;
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i<4; ++i)
         {
             nodes_elem.push_back(basic_nodes[i]);
         }
@@ -631,7 +631,7 @@ public:
         // Test elements have correct nodes
         unsigned expected_node_indices_element_0[3] = {1, 2, 3};
         unsigned expected_node_indices_element_1[3] = {0, 1, 3};
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i<3; ++i)
         {
             TS_ASSERT_EQUALS(basic_vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), expected_node_indices_element_0[i]);
             TS_ASSERT_EQUALS(basic_vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), expected_node_indices_element_1[i]);
@@ -701,7 +701,7 @@ public:
 
         // Make a rectangular element out of nodes 0,1,2,3
         std::vector<Node<2>*> nodes_elem_0;
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i<4; ++i)
         {
             nodes_elem_0.push_back(nodes[i]);
         }
@@ -749,7 +749,7 @@ public:
         unsigned expected_node_indices_element_0[4] = {0, 5, 6, 3};
         unsigned expected_node_indices_element_1[3] = {1, 4, 2};
         unsigned expected_node_indices_element_2[4] = {5, 1, 2, 6};
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i<4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), expected_node_indices_element_0[i]);
             if (i < 3)
@@ -760,7 +760,7 @@ public:
         }
 
         // Test boundary nodes updated
-        for (unsigned i=0; i<7; i++)
+        for (unsigned i = 0; i<7; ++i)
         {
             bool expected_boundary_node = (i!=3 && i!=4 && i!=6);
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
@@ -855,7 +855,7 @@ public:
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
         unsigned node_indices_elem_0[4] = {0, 1, 2, 3};
         unsigned node_indices_elem_1[4] = {1, 4, 5, 2};
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i<4; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
@@ -898,7 +898,7 @@ public:
         unsigned expected_node_indices_element_0[4] = {0, 1 , 6, 7};
         unsigned expected_node_indices_element_1[5] = {1, 4, 5, 2, 6};
         unsigned expected_node_indices_element_2[4] = {6, 2, 3, 7};
-        for (unsigned i=0; i<5; i++)
+        for (unsigned i = 0; i<5; ++i)
         {
             if (i < 4)
             {
@@ -909,7 +909,7 @@ public:
         }
 
         // Test boundary nodes updated
-        for (unsigned i=0; i<8; i++)
+        for (unsigned i = 0; i<8; ++i)
         {
             bool expected_boundary_node = (i!=6);
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
@@ -958,7 +958,7 @@ public:
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
         unsigned node_indices_elem_0[7] = {0, 1, 2, 3, 4, 7, 6};
         unsigned node_indices_elem_1[4] = {6, 7, 4, 5};
-        for (unsigned i=0; i<7; i++)
+        for (unsigned i = 0; i<7; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             if (i < 4)
@@ -979,7 +979,7 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 8u);
 
         // Test correct nodes are boundary nodes
-        for (unsigned i=0; i<8; i++)
+        for (unsigned i = 0; i<8; ++i)
         {
             bool expected_boundary_node = (i!=7);
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);
@@ -995,13 +995,13 @@ public:
         // Test ownership
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNumNodes(), 7u);
         unsigned expected_node_indices[7] = {0, 1, 2, 3, 4, 7, 6};
-        for (unsigned i=0; i<7; i++)
+        for (unsigned i = 0; i<7; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), expected_node_indices[i]);
         }
 
         // Test correct nodes are boundary nodes
-        for (unsigned i=0; i<7; i++)
+        for (unsigned i = 0; i<7; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
         }
@@ -1025,7 +1025,7 @@ public:
         nodes.push_back(new Node<2>(7, false, 0.0, 1.0));
 
         std::vector<Node<2>*> nodes_elem;
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             nodes_elem.push_back(nodes[i]);
         }
@@ -1059,7 +1059,7 @@ public:
         std::vector<Node<2>*> nodes_elem_0, nodes_elem_1;
         unsigned node_indices_elem_0[4] = {0, 1, 2, 3};
         unsigned node_indices_elem_1[3] = {1, 4, 2};
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i<4; ++i)
         {
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
             if (i < 3)
@@ -1100,7 +1100,7 @@ public:
         unsigned expected_node_indices_element_0[4] = {0, 1, 5, 6};
         unsigned expected_node_indices_element_1[4] = {1, 4, 2, 5};
         unsigned expected_node_indices_element_2[4] = {5, 2, 3, 6};
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i<4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), expected_node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), expected_node_indices_element_1[i]);
@@ -1134,7 +1134,7 @@ public:
 
         // Make one element out of these nodes
         std::vector<Node<2>*> nodes_elem;
-        for (unsigned i=0; i<5; i++)
+        for (unsigned i = 0; i<5; ++i)
         {
             nodes_elem.push_back(nodes[i]);
         }
@@ -1173,7 +1173,7 @@ public:
         // Test elements have correct nodes
         TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNumNodes(), 5u);
         unsigned expected_node_indices_element_0[5] = {0, 1, 5, 6, 4};
-        for (unsigned i=0; i<5; i++)
+        for (unsigned i = 0; i<5; ++i)
         {
             TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(i), expected_node_indices_element_0[i]);
         }
@@ -1204,7 +1204,7 @@ public:
 
         // Make one rectangular element out of these nodes
         std::vector<Node<2>*> nodes_elem;
-        for (unsigned i=0; i<6; i++)
+        for (unsigned i = 0; i<6; ++i)
         {
             nodes_elem.push_back(nodes[i]);
         }
@@ -1231,7 +1231,7 @@ public:
         // Test elements have correct nodes
         unsigned node_indices_element_0[5] = {0, 1, 6, 7, 5};
         unsigned node_indices_element_1[5] = {6, 2, 3, 4, 7};
-        for (unsigned i=0; i<5; i++)
+        for (unsigned i = 0; i<5; ++i)
         {
             TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
@@ -1257,7 +1257,7 @@ public:
 
         // Make one rectangular element out of these nodes
         std::vector<Node<2>*> nodes_elem;
-        for (unsigned i=0; i<6; i++)
+        for (unsigned i = 0; i<6; ++i)
         {
             nodes_elem.push_back(nodes[i]);
         }
@@ -1311,7 +1311,7 @@ public:
 
         // Make a rectangular element out of nodes 0,1,2,3
         std::vector<Node<2>*> nodes_elem_0;
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i<4; ++i)
         {
             nodes_elem_0.push_back(nodes[i]);
         }
@@ -1351,14 +1351,14 @@ public:
         TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNumNodes(), 4u);
         unsigned node_indices_element_0[4] = {0, 4, 5, 3};
         unsigned node_indices_element_1[4] = {4, 1, 2, 5};
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i<4; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(0)->GetNodeGlobalIndex(i), node_indices_element_0[i]);
             TS_ASSERT_EQUALS(vertex_mesh.GetElement(1)->GetNodeGlobalIndex(i), node_indices_element_1[i]);
         }
 
         // Test boundary nodes updated
-        for (unsigned i=0; i<6; i++)
+        for (unsigned i = 0; i<6; ++i)
         {
             TS_ASSERT_EQUALS(vertex_mesh.GetNode(i)->IsBoundaryNode(), true);
         }
@@ -1447,7 +1447,8 @@ public:
             // Compare the loaded mesh against the original
             TS_ASSERT_EQUALS(p_mesh_original->GetNumNodes(), p_mesh_loaded->GetNumNodes());
 
-            for (unsigned node_index=0; node_index<p_mesh_original->GetNumNodes(); node_index++)
+            for (unsigned node_index
+            ; node_index<p_mesh_original->GetNumNodes(); ++node_index)
             {
                 Node<2>* p_node = p_mesh_original->GetNode(node_index);
                 Node<2>* p_node2 = p_mesh_loaded->GetNode(node_index);
@@ -1456,7 +1457,7 @@ public:
                 TS_ASSERT_EQUALS(p_node->GetIndex(), p_node2->GetIndex());
                 TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), p_node2->IsBoundaryNode());
 
-                for (unsigned dimension=0; dimension<2; dimension++)
+                for (unsigned dimension = 0; dimension<2; dimension++)
                 {
                     TS_ASSERT_DELTA(p_node->rGetLocation()[dimension], p_node2->rGetLocation()[dimension], 1e-4);
                 }
@@ -1464,12 +1465,12 @@ public:
 
             TS_ASSERT_EQUALS(p_mesh_original->GetNumElements(), p_mesh_loaded->GetNumElements());
 
-            for (unsigned elem_index=0; elem_index < p_mesh_original->GetNumElements(); elem_index++)
+            for (unsigned elem_index = 0; elem_index < p_mesh_original->GetNumElements(); elem_index++)
             {
                 TS_ASSERT_EQUALS(p_mesh_original->GetElement(elem_index)->GetNumNodes(),
                                  p_mesh_loaded->GetElement(elem_index)->GetNumNodes());
 
-                for (unsigned local_index=0; local_index<p_mesh_original->GetElement(elem_index)->GetNumNodes(); local_index++)
+                for (unsigned local_index = 0; local_index<p_mesh_original->GetElement(elem_index)->GetNumNodes(); local_index++)
                 {
                     TS_ASSERT_EQUALS(p_mesh_original->GetElement(elem_index)->GetNodeGlobalIndex(local_index),
                                      p_mesh_loaded->GetElement(elem_index)->GetNodeGlobalIndex(local_index));
@@ -1540,7 +1541,7 @@ public:
             // Compare the loaded mesh against the original
             TS_ASSERT_EQUALS(p_mesh_original->GetNumNodes(), p_mesh_loaded->GetNumNodes());
 
-            for (unsigned node_index=0; node_index<p_mesh_original->GetNumNodes(); node_index++)
+            for (unsigned node_index = 0; node_index < p_mesh_original->GetNumNodes(); ++node_index)
             {
                 Node<3>* p_node = p_mesh_original->GetNode(node_index);
                 Node<3>* p_node2 = p_mesh_loaded->GetNode(node_index);
@@ -1550,7 +1551,7 @@ public:
 
                 TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), p_node2->IsBoundaryNode());
 
-                for (unsigned dimension=0; dimension<3; dimension++)
+                for (unsigned dimension = 0; dimension<3; dimension++)
                 {
                     TS_ASSERT_DELTA(p_node->rGetLocation()[dimension], p_node2->rGetLocation()[dimension], 1e-4);
                 }
@@ -1558,7 +1559,7 @@ public:
 
             TS_ASSERT_EQUALS(p_mesh_original->GetNumElements(), p_mesh_loaded->GetNumElements());
 
-            for (unsigned elem_index=0; elem_index < p_mesh_original->GetNumElements(); elem_index++)
+            for (unsigned elem_index = 0; elem_index < p_mesh_original->GetNumElements(); elem_index++)
             {
                 TS_ASSERT_EQUALS(p_mesh_original->GetElement(elem_index)->GetNumNodes(),
                                  p_mesh_loaded->GetElement(elem_index)->GetNumNodes());
@@ -1566,7 +1567,7 @@ public:
                 TS_ASSERT_EQUALS(p_mesh_original->GetElement(elem_index)->GetNumFaces(),
                                  p_mesh_loaded->GetElement(elem_index)->GetNumFaces());
 
-                for (unsigned local_index=0; local_index<p_mesh_original->GetElement(elem_index)->GetNumNodes(); local_index++)
+                for (unsigned local_index = 0; local_index<p_mesh_original->GetElement(elem_index)->GetNumNodes(); local_index++)
                 {
                     TS_ASSERT_EQUALS(p_mesh_original->GetElement(elem_index)->GetNodeGlobalIndex(local_index),
                                      p_mesh_loaded->GetElement(elem_index)->GetNodeGlobalIndex(local_index));
@@ -1617,7 +1618,7 @@ public:
         unsigned node_indices_in_element0[3] = {0, 3, 4};
         unsigned node_indices_in_element1[3] = {1, 5, 2};
         unsigned node_indices_in_element2[4] = {0, 1, 2, 3};
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i = 0; i<4; ++i)
         {
             if (i < 3)
             {
@@ -1714,7 +1715,7 @@ public:
         unsigned expected_node_indices_element_0[4] = {0, 7, 3, 4};
         unsigned expected_node_indices_element_1[4] = {1, 5, 2, 8};
         unsigned expected_node_indices_element_2[7] = {0, 6, 1, 8, 2, 3, 7};
-        for (unsigned i=0; i<7; i++)
+        for (unsigned i = 0; i<7; ++i)
         {
             if (i < 4)
             {
@@ -1744,7 +1745,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetNode(8)->GetPoint()[1], 1.5, 1e-9);
 
         // Test boundary property of nodes. All are boundary nodes except nodes 7 and 8.
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             bool expected_boundary_node = (i!=7 && i!=8);
             TS_ASSERT_EQUALS(mesh.GetNode(i)->IsBoundaryNode(), expected_boundary_node);

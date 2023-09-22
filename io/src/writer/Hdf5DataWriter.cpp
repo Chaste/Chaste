@@ -137,7 +137,7 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
             mIsUnlimitedDimensionSet = true;
 
             // Sanity check other dimension sizes
-            for (unsigned i = 1; i < DATASET_DIMS; i++) // Zero is excluded since it is unlimited
+            for (unsigned i = 1; i < DATASET_DIMS; ++i) // Zero is excluded since it is unlimited
             {
                 assert(mDatasetDims[i] == dataset_max_sizes[i]);
             }
@@ -154,7 +154,7 @@ Hdf5DataWriter::Hdf5DataWriter(DistributedVectorFactory& rVectorFactory,
             unsigned num_columns = H5Sget_simple_extent_npoints(attribute_space);
             assert(num_columns == mDatasetDims[2]); // I think...
 
-            char* string_array = (char*)malloc(sizeof(char) * MAX_STRING_SIZE * (int)num_columns);
+            char* string_array = (char*)malloc(sizeof(char) * MAX_STRING_SIZE * static_cast<int>(num_columns));
             H5Aread(attribute_id, attribute_type, string_array);
 
             // Loop over columns/variables
@@ -413,7 +413,7 @@ void Hdf5DataWriter::DefineFixedDimension(const std::vector<unsigned>& rNodesToO
         }
     }
 
-    if ((int)rNodesToOuputOriginalIndices.back() >= vecSize  || (int)rNodesToOuputPermutedIndices.back() >= vecSize)
+    if (static_cast<int>(rNodesToOuputOriginalIndices.back()) >= vecSize  || static_cast<int>(rNodesToOuputPermutedIndices.back()) >= vecSize)
     {
         EXCEPTION("Vector size doesn't match nodes to output");
     }
@@ -436,19 +436,19 @@ void Hdf5DataWriter::ComputeIncompleteOffset()
     {
         //Need to reorder to columns so that mIncompletePermIndices is increasing
         std::vector<std::pair <unsigned, unsigned> > indices;
-        for (unsigned i = 0; i < mIncompletePermIndices.size(); i++)
+        for (unsigned i = 0; i < mIncompletePermIndices.size(); ++i)
         {
             indices.push_back(std::make_pair(mIncompletePermIndices[i], mIncompleteNodeIndices[i]));
         }
         std::sort(indices.begin(),indices.end());
-        for (unsigned i = 0; i < mIncompletePermIndices.size(); i++)
+        for (unsigned i = 0; i < mIncompletePermIndices.size(); ++i)
         {
             mIncompletePermIndices[i]=indices[i].first;
             mIncompleteNodeIndices[i]=indices[i].second;
         }
     }
 
-    for (unsigned i = 0; i < mIncompletePermIndices.size(); i++)
+    for (unsigned i = 0; i < mIncompletePermIndices.size(); ++i)
     {
         if (mIncompletePermIndices[i] < mLo)
         {
@@ -507,7 +507,7 @@ void Hdf5DataWriter::CheckVariableName(const std::string& rName)
 
 void Hdf5DataWriter::CheckUnitsName(const std::string& rName)
 {
-    for (unsigned i = 0; i < rName.length(); i++)
+    for (unsigned i = 0; i < rName.length(); ++i)
     {
         if (!isalnum(rName[i]) && !(rName[i] == '_'))
         {
@@ -811,7 +811,7 @@ void Hdf5DataWriter::PutVector(int variableID, Vec petscVector)
     {
         // Make a local copy of the data you own
         boost::scoped_array<double> local_data(new double[mNumberOwned]);
-        for (unsigned i = 0; i < mNumberOwned; i++)
+        for (unsigned i = 0; i < mNumberOwned; ++i)
         {
             local_data[i] = p_petsc_vector[mIncompletePermIndices[mOffset + i] - mLo];
         }
@@ -870,7 +870,7 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
     int firstVariableID = variableIDs[0];
 
     // Currently the method only works with consecutive columns, can be extended if needed
-    for (unsigned i = 1; i < variableIDs.size(); i++)
+    for (unsigned i = 1; i < variableIDs.size(); ++i)
     {
         if (variableIDs[i] - variableIDs[i - 1] != 1)
         {
@@ -952,7 +952,7 @@ void Hdf5DataWriter::PutStripedVector(std::vector<int> variableIDs, Vec petscVec
         {
             // Make a local copy of the data you own
             boost::scoped_array<double> local_data(new double[mNumberOwned * NUM_STRIPES]);
-            for (unsigned i = 0; i < mNumberOwned; i++)
+            for (unsigned i = 0; i < mNumberOwned; ++i)
             {
                 unsigned local_node_number = mIncompletePermIndices[mOffset + i] - mLo;
                 local_data[NUM_STRIPES * i] = p_petsc_vector[local_node_number * NUM_STRIPES];
@@ -1217,7 +1217,7 @@ bool Hdf5DataWriter::ApplyPermutation(const std::vector<unsigned>& rPermutation,
 
     // Fill up the pigeon holes
     bool identity_map = true;
-    for (unsigned i = 0; i < mDataFixedDimensionSize; i++)
+    for (unsigned i = 0; i < mDataFixedDimensionSize; ++i)
     {
         permutation_pigeon_hole.insert(rPermutation[i]);
         if (identity_map && i != rPermutation[i])
@@ -1236,7 +1236,7 @@ bool Hdf5DataWriter::ApplyPermutation(const std::vector<unsigned>& rPermutation,
      * so if any don't appear then either one appears twice or something out of
      * scope has appeared.
      */
-    for (unsigned i = 0; i < mDataFixedDimensionSize; i++)
+    for (unsigned i = 0; i < mDataFixedDimensionSize; ++i)
     {
         if (permutation_pigeon_hole.count(i) != 1u)
         {

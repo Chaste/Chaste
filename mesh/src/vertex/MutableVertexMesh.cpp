@@ -71,12 +71,12 @@ MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SP
     Clear();
 
     // Populate mNodes and mElements
-    for (unsigned node_index=0; node_index<nodes.size(); node_index++)
+    for (unsigned node_index = 0; node_index<nodes.size(); ++node_index)
     {
         Node<SPACE_DIM>* p_temp_node = nodes[node_index];
         this->mNodes.push_back(p_temp_node);
     }
-    for (unsigned elem_index=0; elem_index<vertexElements.size(); elem_index++)
+    for (unsigned elem_index = 0; elem_index<vertexElements.size(); elem_index++)
     {
         VertexElement<ELEMENT_DIM, SPACE_DIM>* p_temp_vertex_element = vertexElements[elem_index];
         this->mElements.push_back(p_temp_vertex_element);
@@ -89,10 +89,10 @@ MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SP
         std::set<unsigned> faces_counted;
 
         // Loop over mElements
-        for (unsigned elem_index=0; elem_index<this->mElements.size(); elem_index++)
+        for (unsigned elem_index = 0; elem_index<this->mElements.size(); elem_index++)
         {
             // Loop over faces of this element
-            for (unsigned face_index=0; face_index<this->mElements[elem_index]->GetNumFaces(); face_index++)
+            for (unsigned face_index = 0; face_index<this->mElements[elem_index]->GetNumFaces(); face_index++)
             {
                 VertexElement<ELEMENT_DIM-1, SPACE_DIM>* p_face = this->mElements[elem_index]->GetFace(face_index);
 
@@ -107,10 +107,10 @@ MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::MutableVertexMesh(std::vector<Node<SP
     }
 
     // Register elements with nodes
-    for (unsigned index=0; index<this->mElements.size(); index++)
+    for (unsigned index = 0; index<this->mElements.size(); index++)
     {
         VertexElement<ELEMENT_DIM, SPACE_DIM>* p_temp_vertex_element = this->mElements[index];
-        for (unsigned node_index=0; node_index<p_temp_vertex_element->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < p_temp_vertex_element->GetNumNodes(); ++node_index)
         {
             Node<SPACE_DIM>* p_temp_node = p_temp_vertex_element->GetNode(node_index);
             p_temp_node->AddElement(p_temp_vertex_element->GetIndex());
@@ -312,7 +312,7 @@ std::vector< c_vector<double, SPACE_DIM> > MutableVertexMesh<ELEMENT_DIM, SPACE_
 {
     std::vector<T1SwapInfo<SPACE_DIM> > swap_info = mOperationRecorder.GetT1SwapsInfo();
     std::vector< c_vector<double, SPACE_DIM> > swap_locations;
-    for (unsigned i=0; i<swap_info.size(); ++i)
+    for (unsigned i = 0; i<swap_info.size(); ++i)
     {
         swap_locations.push_back(swap_info[i].mLocation);
     }
@@ -330,7 +330,7 @@ std::vector< c_vector<double, SPACE_DIM> > MutableVertexMesh<ELEMENT_DIM, SPACE_
 {
     std::vector<T3SwapInfo<SPACE_DIM> > swap_info = mOperationRecorder.GetT3SwapsInfo();
     std::vector< c_vector<double, SPACE_DIM> > swap_locations;
-    for (unsigned i=0; i<swap_info.size(); ++i)
+    for (unsigned i = 0; i<swap_info.size(); ++i)
     {
         swap_locations.push_back(swap_info[i].mLocation);
     }
@@ -416,7 +416,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
     {
         // Storing element edge map prior to division. This is needed for division recording.
         std::vector<unsigned> edgeIds;
-        for (unsigned i = 0; i < pElement->GetNumEdges(); i++)
+        for (unsigned i = 0; i < pElement->GetNumEdges(); ++i)
         {
             edgeIds.push_back(pElement->GetEdge(i)->GetIndex());
         }
@@ -436,7 +436,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
         unsigned num_nodes = pElement->GetNumNodes();
         std::vector<unsigned> intersecting_nodes;
         bool is_current_node_on_left = (inner_prod(this->GetVectorFromAtoB(pElement->GetNodeLocation(0), centroid), perp_axis) >= 0);
-        for (unsigned i = 0; i < num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             bool is_next_node_on_left = (inner_prod(this->GetVectorFromAtoB(pElement->GetNodeLocation((i + 1) % num_nodes), centroid), perp_axis) >= 0);
             if (is_current_node_on_left != is_next_node_on_left)
@@ -459,7 +459,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
         std::vector<std::pair<VertexElement<ELEMENT_DIM, SPACE_DIM>*, unsigned> > edge_split_pairs;
         std::vector<double> relative_new_node;
         // Find the intersections between the axis of division and the element edges
-        for (unsigned i = 0; i < intersecting_nodes.size(); i++)
+        for (unsigned i = 0; i < intersecting_nodes.size(); ++i)
         {
             /*
              * Get pointers to the nodes forming the edge into which one new node will be inserted.
@@ -696,7 +696,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(
 
         // Copy the nodes in this element
         std::vector<Node<SPACE_DIM>*> nodes_elem;
-        for (unsigned i = 0; i < num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             nodes_elem.push_back(pElement->GetNode(i));
         }
@@ -730,7 +730,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(
         unsigned counter_1 = 0;
         unsigned counter_2 = 0;
 
-        for (unsigned i = 0; i < num_nodes; i++)
+        for (unsigned i = 0; i < num_nodes; ++i)
         {
             if (i >= node1_index && i <= node2_index)
             {
@@ -816,7 +816,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DeleteElementPriorToReMesh([[may
     if constexpr (SPACE_DIM == 2)
     {
         // Mark any nodes that are contained only in this element as deleted
-        for (unsigned i = 0; i < this->mElements[index]->GetNumNodes(); i++)
+        for (unsigned i = 0; i < this->mElements[index]->GetNumNodes(); ++i)
         {
             Node<SPACE_DIM>* p_node = this->mElements[index]->GetNode(i);
 
@@ -927,7 +927,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodesAndElements(Ve
     rElementMap.Resize(this->GetNumAllElements());
     // Remove any elements that have been marked for deletion and store all other elements in a temporary structure
     std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*> live_elements;
-    for (unsigned i=0; i<this->mElements.size(); i++)
+    for (unsigned i = 0; i<this->mElements.size(); ++i)
     {
         if (this->mElements[i]->IsDeleted())
         {
@@ -949,7 +949,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodesAndElements(Ve
     this->mElements = live_elements;
 
     // Finally, reset the element indices to run from zero
-    for (unsigned i=0; i<this->mElements.size(); i++)
+    for (unsigned i = 0; i<this->mElements.size(); ++i)
     {
         this->mElements[i]->ResetIndex(i);
     }
@@ -964,7 +964,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
     // Remove any nodes that have been marked for deletion and store all other nodes in a temporary structure
     // Also mark edges associated with the deleted nodes
     std::vector<Node<SPACE_DIM>*> live_nodes;
-    for (unsigned i=0; i<this->mNodes.size(); i++)
+    for (unsigned i = 0; i<this->mNodes.size(); ++i)
     {
         if (this->mNodes[i]->IsDeleted())
         {
@@ -983,7 +983,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::RemoveDeletedNodes()
     mDeletedNodeIndices.clear();
 
     // Finally, reset the node indices to run from zero
-    for (unsigned i=0; i<this->mNodes.size(); i++)
+    for (unsigned i = 0; i<this->mNodes.size(); ++i)
     {
         this->mNodes[i]->SetIndex(i);
     }
@@ -1775,7 +1775,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformNodeMerge(Node<SPACE_DIM>
         if (nodeA_elem_indices.count(*it) != 0)
         {
             std::vector<unsigned> edgeIds;
-            for (unsigned i = 0; i < this->mElements[*it]->GetNumEdges(); i++)
+            for (unsigned i = 0; i < this->mElements[*it]->GetNumEdges(); ++i)
             {
                 edgeIds.push_back(this->mElements[*it]->GetEdge(i)->GetIndex());
             }
@@ -1882,7 +1882,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(
                 ++it)
         {
             std::vector<unsigned> old_ids;
-            for (unsigned i=0; i<this->mElements[*it]->GetNumEdges(); ++i)
+            for (unsigned i = 0; i<this->mElements[*it]->GetNumEdges(); ++i)
             {
                 old_ids.push_back(this->mElements[*it]->GetEdge(i)->GetIndex());
             }
@@ -1895,7 +1895,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(
                 assert(nodeB_local_index < UINT_MAX);
 
                 std::vector<unsigned> old_ids;
-                for (unsigned i=0; i<this->mElements[*it]->GetNumEdges(); ++i)
+                for (unsigned i = 0; i<this->mElements[*it]->GetNumEdges(); ++i)
                 {
                     old_ids.push_back(this->mElements[*it]->GetEdge(i)->GetIndex());
                 }
@@ -1913,7 +1913,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(
                 assert(nodeA_local_index < UINT_MAX);
 
                 std::vector<unsigned> old_ids;
-                for (unsigned i=0; i<this->mElements[*it]->GetNumEdges(); ++i)
+                for (unsigned i = 0; i<this->mElements[*it]->GetNumEdges(); ++i)
                 {
                     old_ids.push_back(this->mElements[*it]->GetEdge(i)->GetIndex());
                 }
@@ -2409,7 +2409,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap([[maybe_unused]] V
 
         // Create a new node at the element's centroid; this will be a boundary node if any existing nodes were on the boundary
         bool is_node_on_boundary = false;
-        for (unsigned i = 0; i < 3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             if (rElement.GetNode(i)->IsBoundaryNode())
             {
@@ -2423,7 +2423,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap([[maybe_unused]] V
         std::set<unsigned> neigh_indices;
 
         // Loop over each of the three nodes contained in rElement
-        for (unsigned i = 0; i < 3; i++)
+        for (unsigned i = 0; i < 3; ++i)
         {
             // For each node, find the set of other elements containing it
             Node<SPACE_DIM>* p_node = rElement.GetNode(i);
@@ -2556,7 +2556,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(
         //Edge map before swap
         const unsigned num_edges = p_intersecting_element->GetNumEdges();
         std::vector<unsigned> old_ids(num_edges);
-        for (unsigned i=0; i<num_edges; ++i)
+        for (unsigned i = 0; i<num_edges; ++i)
         {
             old_ids[i] = p_intersecting_element->GetEdge(i)->GetIndex();
         }
@@ -2590,9 +2590,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(
                 // Find the number and indices of common vertices between element_1 and element_2
                 unsigned num_common_vertices = 0;
                 std::vector<unsigned> common_vertex_indices;
-                for (unsigned i = 0; i < p_element_common_1->GetNumNodes(); i++)
+                for (unsigned i = 0; i < p_element_common_1->GetNumNodes(); ++i)
                 {
-                    for (unsigned j = 0; j < p_element_common_2->GetNumNodes(); j++)
+                    for (unsigned j = 0; j < p_element_common_2->GetNumNodes(); ++j)
                     {
                         if (p_element_common_1->GetNodeGlobalIndex(i) == p_element_common_2->GetNodeGlobalIndex(j))
                         {
@@ -2959,9 +2959,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(
 
                     // Calculate the number of common vertices between element_1 and element_2
                     unsigned num_common_vertices = 0;
-                    for (unsigned i = 0; i < p_element_common_1->GetNumNodes(); i++)
+                    for (unsigned i = 0; i < p_element_common_1->GetNumNodes(); ++i)
                     {
-                        for (unsigned j = 0; j < p_element_common_2->GetNumNodes(); j++)
+                        for (unsigned j = 0; j < p_element_common_2->GetNumNodes(); ++j)
                         {
                             if (p_element_common_1->GetNodeGlobalIndex(i) == p_element_common_2->GetNodeGlobalIndex(j))
                             {
@@ -3163,9 +3163,9 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(
 
                     // Calculate the number of common vertices between element_1 and element_2
                     unsigned num_common_vertices = 0;
-                    for (unsigned i = 0; i < p_element_common_1->GetNumNodes(); i++)
+                    for (unsigned i = 0; i < p_element_common_1->GetNumNodes(); ++i)
                     {
-                        for (unsigned j = 0; j < p_element_common_2->GetNumNodes(); j++)
+                        for (unsigned j = 0; j < p_element_common_2->GetNumNodes(); ++j)
                         {
                             if (p_element_common_1->GetNodeGlobalIndex(i) == p_element_common_2->GetNodeGlobalIndex(j))
                             {

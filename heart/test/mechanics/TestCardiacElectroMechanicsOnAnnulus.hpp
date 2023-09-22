@@ -106,7 +106,7 @@ public:
 
         std::vector<unsigned> fixed_nodes;
         std::vector<c_vector<double,2> > fixed_node_locations;
-        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); ++i)
         {
             double x = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
@@ -205,7 +205,7 @@ public:
 
          std::vector<unsigned> fixed_nodes;
         std::vector<c_vector<double,2> > fixed_node_locations;
-        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); ++i)
         {
             double x = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double y = mechanics_mesh.GetNode(i)->rGetLocation()[1];

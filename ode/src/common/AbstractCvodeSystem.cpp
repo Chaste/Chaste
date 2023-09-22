@@ -190,7 +190,7 @@ void AbstractCvodeSystem::Init()
 #else
     mParameters = N_VNew_Serial(rGetParameterNames().size());
 #endif
-    for (int i = 0; i < NV_LENGTH_S(mParameters); i++)
+    for (int i = 0; i < NV_LENGTH_S(mParameters); ++i)
     {
         NV_Ith_S(mParameters, i) = 0.0;
     }
@@ -405,7 +405,7 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
     if (!reinit && !mForceMinimalReset)
     {
         const unsigned size = GetNumberOfStateVariables();
-        for (unsigned i = 0; i < size; i++)
+        for (unsigned i = 0; i < size; ++i)
         {
             if (!CompareDoubles::WithinAnyTolerance(GetVectorComponent(mLastSolutionState, i), GetVectorComponent(mStateVariables, i)))
             {
@@ -531,7 +531,7 @@ void AbstractCvodeSystem::RecordStoppingPoint(double stopTime)
     // next solve call, to work out whether we need to reset.
     const unsigned size = GetNumberOfStateVariables();
     CreateVectorIfEmpty(mLastSolutionState, size);
-    for (unsigned i = 0; i < size; i++)
+    for (unsigned i = 0; i < size; ++i)
     {
         SetVectorComponent(mLastSolutionState, i, GetVectorComponent(mStateVariables, i));
     }
@@ -597,7 +597,7 @@ void AbstractCvodeSystem::CvodeError(int flag, const char* msg,
     err << "\nState variables are now:\n";
     std::vector<double> state_vars = MakeStdVec(mStateVariables);
     std::vector<std::string> state_var_names = rGetStateVariableNames();
-    for (unsigned i = 0; i < state_vars.size(); i++)
+    for (unsigned i = 0; i < state_vars.size(); ++i)
     {
         err << "\t" << state_var_names[i] << "\t:\t" << state_vars[i] << std::endl;
     }
@@ -659,7 +659,7 @@ void AbstractCvodeSystem::ForceUseOfNumericalJacobian(bool useNumericalJacobian)
 //    realtype min_nudge = (fnorm != 0.0) ?
 //            (1000.0 * fabs(h) * DBL_EPSILON * size * fnorm) : 1.0;
 //
-//    for (unsigned j=0; j<size; j++)
+//    for (unsigned j=0; j<size; ++j)
 //    {
 //        // Check the j'th column of the Jacobian
 //        realtype yjsaved = p_y[j];
@@ -671,7 +671,7 @@ void AbstractCvodeSystem::ForceUseOfNumericalJacobian(bool useNumericalJacobian)
 //        N_VLinearSum(nudge_inv, nudge_ydot, -nudge_inv, ydot, numeric_jth_col);
 //        realtype* p_analytic_jth_col = DENSE_COL(jacobian, j);
 //
-//        for (unsigned i=0; i<size; i++)
+//        for (unsigned i=0; i<size; ++i)
 //        {
 //            if (!CompareDoubles::WithinAnyTolerance(p_numeric_jth_col[i], p_analytic_jth_col[i], rel_tol, abs_tol))
 //            {

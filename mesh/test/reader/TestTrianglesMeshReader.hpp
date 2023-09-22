@@ -117,7 +117,7 @@ public:
         TS_ASSERT_EQUALS(data1.NodeIndices[2], 310u);
         TS_ASSERT_EQUALS( mesh_reader.GetNumElementAttributes(), 0u);
 
-        for (unsigned i=1; i<mesh_reader.GetNumElements(); i++)
+        for (unsigned i=1; i<mesh_reader.GetNumElements(); ++i)
         {
             ElementData data = mesh_reader.GetNextElementData();
             TS_ASSERT_EQUALS(data.AttributeValue, 0u);
@@ -144,7 +144,7 @@ public:
         TS_ASSERT_EQUALS( mesh_reader.GetNumFaces(), 100u); // just boundary faces are read
         TS_ASSERT_EQUALS( mesh_reader.GetNumFaceAttributes(), 1u);
 
-        for (unsigned i=1; i<mesh_reader.GetNumFaces(); i++)
+        for (unsigned i=1; i<mesh_reader.GetNumFaces(); ++i)
         {
             ElementData data = mesh_reader.GetNextFaceData();
             TS_ASSERT_EQUALS(data.AttributeValue, 1u);
@@ -168,7 +168,7 @@ public:
         TS_ASSERT_EQUALS( mesh_reader.GetNumFaceAttributes(), 1u);
 
         bool read_zero_attribute = false;
-        for (unsigned i=0; i<mesh_reader.GetNumFaces(); i++)
+        for (unsigned i=0; i<mesh_reader.GetNumFaces(); ++i)
         {
             ElementData data = mesh_reader.GetNextFaceData();
             // Attributes are 0, 1, 2, or 3.
@@ -243,7 +243,7 @@ public:
         TS_ASSERT_DELTA(next_node[0], 1.0, 1e-6);
         TS_ASSERT_DELTA(next_node[1], 0.0, 1e-6);
 
-        for (int i=0; i<541; i++)
+        for (int i=0; i<541; ++i)
         {
             TS_ASSERT_THROWS_NOTHING(next_node = mesh_reader.GetNextNode());
         }
@@ -313,7 +313,7 @@ public:
 
         std::vector<unsigned> next_element;
 
-        for (unsigned i=0; i<mesh_reader.GetNumElements(); i++)
+        for (unsigned i=0; i<mesh_reader.GetNumElements(); ++i)
         {
             TS_ASSERT_THROWS_NOTHING(next_element = mesh_reader.GetNextElementData().NodeIndices);
         }
@@ -336,7 +336,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(next_edge = mesh_reader.GetNextFaceData().NodeIndices);
         TS_ASSERT_THROWS_NOTHING(next_edge = mesh_reader.GetNextFaceData().NodeIndices);
 
-        for (unsigned i=2; i<mesh_reader.GetNumEdges(); i++)
+        for (unsigned i=2; i<mesh_reader.GetNumEdges(); ++i)
         {
             TS_ASSERT_THROWS_NOTHING(next_edge = mesh_reader.GetNextEdgeData().NodeIndices);
         }
@@ -436,7 +436,7 @@ public:
         TS_ASSERT_EQUALS(next_element[1], 1u);   // right node
         TS_ASSERT_EQUALS(next_element[2], 11u);  // middle node
 
-        for (unsigned i=1; i<10; i++)
+        for (unsigned i=1; i<10; ++i)
         {
             next_element = mesh_reader.GetNextElementData().NodeIndices;
             TS_ASSERT_EQUALS(next_element.size(), 3u);
@@ -460,7 +460,7 @@ public:
         TS_ASSERT_EQUALS(next_element[4], 83u); // opposite to 0
         TS_ASSERT_EQUALS(next_element[5], 81u); // opposite to 54
 
-        for (unsigned i=1; i<128; i++)
+        for (unsigned i=1; i<128; ++i)
         {
             next_element = mesh_reader.GetNextElementData().NodeIndices;
             TS_ASSERT_EQUALS(next_element.size(), 6u);
@@ -477,7 +477,7 @@ public:
 
         TS_ASSERT_EQUALS(next_element.size(), 10u);
 
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i=0; i<10; ++i)
         {
             TS_ASSERT_EQUALS(next_element[i], i);
         }
@@ -490,7 +490,7 @@ public:
         TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 10u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 1u);
 
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i=0; i<10; ++i)
         {
             ElementData next_element_info = mesh_reader.GetNextElementData();
             std::vector<unsigned> nodes = next_element_info.NodeIndices;
@@ -558,7 +558,7 @@ public:
         {
             std::vector<double> ascii_location(3u);
             std::vector<double> binary_location(3u);
-            for (unsigned i=0; i<mesh_reader.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh_reader.GetNumNodes(); ++i)
             {
                 // Sequential reading in
                 ascii_location = mesh_reader_ascii.GetNextNode();
@@ -568,7 +568,7 @@ public:
                 TS_ASSERT_DELTA(ascii_location[2],binary_location[2],1e-12);
             }
             mesh_reader_ascii.Reset(); // You wouldn't believe how important this line is.
-            for (unsigned i=0; i<mesh_reader.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh_reader.GetNumNodes(); ++i)
             {
                 // Random access
                 ascii_location = mesh_reader_ascii.GetNextNode();
@@ -688,7 +688,7 @@ public:
         {
             ElementData ascii_node_indices;
             ElementData binary_node_indices;
-            for (unsigned i=0; i<mesh_reader.GetNumElements(); i++)
+            for (unsigned i=0; i<mesh_reader.GetNumElements(); ++i)
             {
                 // Sequential reading in
                 ascii_node_indices = mesh_reader_ascii.GetNextElementData();
@@ -700,7 +700,7 @@ public:
                 TS_ASSERT_DELTA(ascii_node_indices.AttributeValue,binary_node_indices.AttributeValue,1e-12);
             }
             mesh_reader_ascii.Reset(); // You wouldn't believe how important this line is.
-            for (unsigned i=0; i<mesh_reader.GetNumElements(); i++)
+            for (unsigned i=0; i<mesh_reader.GetNumElements(); ++i)
             {
                 // Random access for binary mesh
                 ascii_node_indices = mesh_reader_ascii.GetNextElementData();
@@ -827,7 +827,7 @@ public:
         {
             ElementData ascii_node_indices;
             ElementData binary_node_indices;
-            for (unsigned i=0; i<mesh_reader.GetNumFaces(); i++)
+            for (unsigned i=0; i<mesh_reader.GetNumFaces(); ++i)
             {
                 // Sequential reading in
                 ascii_node_indices = mesh_reader_ascii.GetNextFaceData();
@@ -838,7 +838,7 @@ public:
                 TS_ASSERT_DELTA(ascii_node_indices.AttributeValue,binary_node_indices.AttributeValue,1e-12);
             }
             mesh_reader_ascii.Reset(); // You wouldn't believe how important this line is.
-            for (unsigned i=0; i<mesh_reader.GetNumFaces(); i++)
+            for (unsigned i=0; i<mesh_reader.GetNumFaces(); ++i)
             {
                 // Sequential reading in
                 ascii_node_indices = mesh_reader_ascii.GetNextFaceData();
@@ -926,7 +926,7 @@ public:
 
         unsigned num_nodes = mesh_reader_3d.GetNumNodes();
         std::vector<unsigned> permutation(num_nodes);
-        for (unsigned node_index=0; node_index < num_nodes; node_index++)
+        for (unsigned node_index=0; node_index < num_nodes; ++node_index)
         {
             permutation[node_index] = num_nodes-node_index-1;
         }
@@ -944,7 +944,7 @@ public:
         TS_ASSERT_EQUALS(mesh_reader_3d_permuted.rGetNodePermutation()[8], 0u);
         TS_ASSERT_EQUALS(mesh_reader_3d_permuted.rGetNodePermutation()[0], 8u);
 
-        for (unsigned node_index=0; node_index < num_nodes; node_index++)
+        for (unsigned node_index=0; node_index < num_nodes; ++node_index)
         {
             for (unsigned dimension=0; dimension<SPACE_DIM; dimension++)
             {

@@ -277,7 +277,7 @@ void XmlTools::PrintNode(const std::string& rMsg, xercesc::DOMNode* pNode, bool 
         xercesc::DOMNamedNodeMap* p_attrs = pNode->getAttributes();
         if (p_attrs)
         {
-            for (XMLSize_t i=0; i<p_attrs->getLength(); i++)
+            for (XMLSize_t i=0; i<p_attrs->getLength(); ++i)
             {
                  xercesc::DOMNode* p_attr = p_attrs->item(i);
                  std::string value = X2C(p_attr->getNodeValue());
@@ -299,7 +299,7 @@ xercesc::DOMElement* XmlTools::SetNamespace(xercesc::DOMDocument* pDocument,
     std::vector<std::string> attr_values;
     if (p_orig_attrs)
     {
-        for (XMLSize_t i=0; i<p_orig_attrs->getLength(); i++)
+        for (XMLSize_t i=0; i<p_orig_attrs->getLength(); ++i)
         {
             DOMNode* p_attr = p_orig_attrs->item(i);
             attr_values.push_back(X2C(p_attr->getNodeValue()));
@@ -315,7 +315,7 @@ xercesc::DOMElement* XmlTools::SetNamespace(xercesc::DOMDocument* pDocument,
         assert(p_new_attrs);
         assert(p_new_attrs == p_orig_attrs);
         assert(p_new_attrs->getLength() == attr_values.size());
-        for (XMLSize_t i=0; i<p_new_attrs->getLength(); i++)
+        for (XMLSize_t i=0; i<p_new_attrs->getLength(); ++i)
         {
             DOMNode* p_attr = p_new_attrs->item(i);
             p_attr->setNodeValue(X(attr_values[i]));
@@ -429,7 +429,7 @@ void XmlTools::WrapContentInElement(xercesc::DOMDocument* pDocument,
     xercesc::DOMElement* p_wrapper_elt = pDocument->createElementNS(p_namespace_uri, p_qualified_name);
     // Move all child nodes of pElement to be children of p_wrapper_elt
     xercesc::DOMNodeList* p_children = pElement->getChildNodes();
-    for (unsigned i=0; i<p_children->getLength(); i++)
+    for (unsigned i=0; i<p_children->getLength(); ++i)
     {
         xercesc::DOMNode* p_child = pElement->removeChild(p_children->item(i));
         p_wrapper_elt->appendChild(p_child);

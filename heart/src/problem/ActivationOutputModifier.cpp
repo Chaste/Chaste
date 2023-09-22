@@ -55,7 +55,7 @@ void ActivationOutputModifier::FinaliseAtEnd()
     std::stringstream filepath_process_specific;
     filepath_process_specific << mFilename << "." << PetscTools::GetMyRank();
     out_stream file_stream_process_specific = output_handler.OpenOutputFile(filepath_process_specific.str().c_str());
-    for (unsigned i=0; i<mLocalSize; i++)
+    for (unsigned i=0; i<mLocalSize; ++i)
     {
         (*file_stream_process_specific) << mFirstActivitationTimes[i] <<",\t"
                 << mFirstRecoveryTimes[i] <<",\t"
@@ -76,7 +76,7 @@ void ActivationOutputModifier::FinaliseAtEnd()
         {
             file_stream = output_handler.OpenOutputFile(mFilename, std::ios::app);
         }
-        for (unsigned i=0; i<mLocalSize; i++)
+        for (unsigned i=0; i<mLocalSize; ++i)
         {
             (*file_stream) << mFirstActivitationTimes[i] <<",\t"
                     << mFirstRecoveryTimes[i] <<",\t"

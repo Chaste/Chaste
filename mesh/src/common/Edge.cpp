@@ -114,7 +114,7 @@ template<unsigned SPACE_DIM>
 void Edge<SPACE_DIM>::ReplaceNode(Node<SPACE_DIM>* pOldNode,
                                   Node<SPACE_DIM>* pNewNode)
 {
-    for (unsigned i = 0; i < 2; i++)
+    for (unsigned i = 0; i < 2; ++i)
     {
         if (this->mNodes[i] == pOldNode)
         {

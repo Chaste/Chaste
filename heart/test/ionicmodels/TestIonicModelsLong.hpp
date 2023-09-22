@@ -310,7 +310,7 @@ public:
         //create the times vector
         std::vector<double> times;
         double k =0;
-        for (unsigned i=0; i<voltages2.size(); i++)
+        for (unsigned i=0; i<voltages2.size(); ++i)
         {
           times.push_back(k);
           k=k+0.1;
@@ -457,7 +457,7 @@ public:
         //create the times vector
         std::vector<double> times;
         double k =0;
-        for (unsigned i=0; i<voltages2.size(); i++)
+        for (unsigned i=0; i<voltages2.size(); ++i)
         {
           times.push_back(k);
           k=k+0.1;

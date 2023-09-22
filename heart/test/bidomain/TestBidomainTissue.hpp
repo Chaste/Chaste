@@ -183,7 +183,7 @@ public:
         // Check that both the monodomain and bidomain tissue have the same ionic cache
         for (unsigned node_index = mesh.GetDistributedVectorFactory()->GetLow();
              node_index < mesh.GetDistributedVectorFactory()->GetHigh();
-             node_index++)
+             ++node_index)
         {
             TS_ASSERT_EQUALS(monodomain_tissue.rGetIionicCacheReplicated()[node_index], bidomain_tissue.rGetIionicCacheReplicated()[node_index]);
         }
@@ -444,9 +444,9 @@ public:
                 const c_matrix<double, 3, 3>& intra_tensor_after_archiving = p_bidomain_tissue->rGetIntracellularConductivityTensor(0);
                 const c_matrix<double, 3, 3>& extra_tensor_after_archiving = dynamic_cast<BidomainTissue<3>*>(p_bidomain_tissue)->rGetExtracellularConductivityTensor(0); //Naughty Gary using dynamic cast, but only for testing...
 
-                for (unsigned i=0; i<3; i++)
+                for (unsigned i=0; i<3; ++i)
                 {
-                    for (unsigned j=0; j<3; j++)
+                    for (unsigned j=0; j<3; ++j)
                     {
                         TS_ASSERT_DELTA(intra_tensor_before_archiving(i,j), intra_tensor_after_archiving(i,j), 1e-9);
                         TS_ASSERT_DELTA(extra_tensor_before_archiving(i,j), extra_tensor_after_archiving(i,j), 1e-9);

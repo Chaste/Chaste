@@ -90,7 +90,7 @@ public:
          // Ramp up step size up to maximum
          error = 1e-19;
          step_size_should_be = max_step_size;
-         for (unsigned i=0; i<4; i++)
+         for (unsigned i=0; i<4; ++i)
          {
             // Multiplies step size by 4 each time
             rkf_solver.AdjustStepSize(current_step_size, error, tolerance, max_step_size, min_step_size);
@@ -100,7 +100,7 @@ public:
 
          // Try to make step size too small
          error = 1e10;
-         for (unsigned i=0; i<2; i++)
+         for (unsigned i=0; i<2; ++i)
          {
             // Divides step size by 10 each time (still within acceptable bounds)
             rkf_solver.AdjustStepSize(current_step_size, error, tolerance, max_step_size, min_step_size);
@@ -173,7 +173,7 @@ public:
         TS_ASSERT_EQUALS(solutions.GetNumberOfTimeSteps(), 9u);
 
         // y values (from analytic result)
-        for (unsigned i=0; i<solutions.GetNumberOfTimeSteps(); i++)
+        for (unsigned i=0; i<solutions.GetNumberOfTimeSteps(); ++i)
         {
             double time = solutions.rGetTimes()[i];
             double y = (time+1.0)*(time+1.0) - 0.5*exp(time);
@@ -276,7 +276,7 @@ public:
         solutions = rkf_solver.Solve(&ode_system_with_events, state_variables, 0.0, 2.0, h_value, 1e-5);
         unsigned last = solutions.GetNumberOfTimeSteps();
 
-//        for (unsigned i=0; i<last+1; i++)
+//        for (unsigned i=0; i<last+1; ++i)
 //        {
 //            std::cout << "Time = " << solutions.rGetTimes()[i] <<
 //                " x = " << solutions.rGetSolutions()[i][0] << "\n" << std::flush;
@@ -349,7 +349,7 @@ public:
 //        OutputFileHandler handler("");
 //        out_stream rabbit_file=handler.OpenOutputFile("foxrabbit.dat");
 //
-//        for (unsigned i=0; i<last; i++)
+//        for (unsigned i=0; i<last; ++i)
 //        {
 //            (*rabbit_file) << solutions.rGetSolutions()[i][0] << "\t" << solutions.rGetSolutions()[i][1] << "\n" << std::flush;
 //        }

@@ -582,7 +582,7 @@ inline void save_construct_data(
 {
 
     // Save data required to construct instance
-    for (unsigned i = 0; i < SPACE_DIM; i++)
+    for (unsigned i = 0; i < SPACE_DIM; ++i)
     {
         //we archive coordinates of mLocation one by one
         //this is because earlier version of boost (<1.40, I think) cannot archive c_vectors
@@ -605,7 +605,7 @@ inline void load_construct_data(
 {
     // Retrieve data from archive required to construct new instance of Node
     c_vector<double,SPACE_DIM> location;
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i=0; i<SPACE_DIM; ++i)
     {
         double coordinate;
         ar & coordinate;//resume coordinates one by one

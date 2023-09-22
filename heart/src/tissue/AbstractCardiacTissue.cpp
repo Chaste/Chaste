@@ -297,7 +297,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::CreateIntracellularConductivi
             hetero_intra_conductivities.resize(num_local_elements, intra_conductivities);
         }
         // LCOV_EXCL_START
-        catch(std::bad_alloc &r_bad_alloc)
+        catch (std::bad_alloc &r_bad_alloc)
         {
             std::cout << "Failed to allocate std::vector of size " << num_local_elements << std::endl;
             PetscTools::ReplicateException(true);
@@ -328,7 +328,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::CreateIntracellularConductivi
                 if (conductivities_heterogeneity_areas[region_index]->DoesContain(element_centroid))
                 {
                     //We don't use ublas vector assignment here, because we might be getting a subvector of a 3-vector
-                    for (unsigned i=0; i<SPACE_DIM; i++)
+                    for (unsigned i=0; i<SPACE_DIM; ++i)
                     {
                         hetero_intra_conductivities[local_element_index][i] = intra_h_conductivities[region_index][i];
                     }
@@ -554,7 +554,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
                 std::cout << "All state variables are now:\n";
                 std::vector<double> state_vars = mCellsDistributed[index.Local]->GetStdVecStateVariables();
                 std::vector<std::string> state_var_names = mCellsDistributed[index.Local]->rGetStateVariableNames();
-                for (unsigned i=0; i<state_vars.size(); i++)
+                for (unsigned i=0; i<state_vars.size(); ++i)
                 {
                     std::cout << "\t" << state_var_names[i] << "\t:\t" << state_vars[i] << "\n";
                 }
@@ -632,7 +632,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
 
             // Pack send buffer
             unsigned send_size = 0;
-            for (unsigned i=0; i<number_of_cells_to_send; i++)
+            for (unsigned i=0; i<number_of_cells_to_send; ++i)
             {
                 unsigned global_cell_index = mNodesToSendPerProcess[send_to][i];
                 send_size += mCellsDistributed[global_cell_index - mpDistributedVectorFactory->GetLow()]->GetNumberOfStateVariables();
@@ -654,7 +654,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
             }
             // Receive buffer
             unsigned receive_size = 0;
-            for (unsigned i=0; i<number_of_cells_to_receive; i++)
+            for (unsigned i=0; i<number_of_cells_to_receive; ++i)
             {
                 unsigned halo_cell_index = mHaloGlobalToLocalIndexMap[mNodesToReceivePerProcess[receive_from][i]];
                 receive_size += mHaloCellsDistributed[halo_cell_index]->GetNumberOfStateVariables();

@@ -110,7 +110,7 @@ std::string Identifiable::GetIdentifier() const
 #if BOOST_VERSION >= 103700
     const boost::serialization::extended_type_info* p_type_info =
             boost::serialization::type_info_implementation<Identifiable>::type::get_const_instance().get_derived_extended_type_info(*this);
-    if(p_type_info!=nullptr)
+    if (p_type_info!=nullptr)
     {
         id = p_type_info->get_key();
     }

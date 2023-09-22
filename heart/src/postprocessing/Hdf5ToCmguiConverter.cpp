@@ -106,7 +106,7 @@ void Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::Write(std::string type)
             }
 
             // Write the data
-            for (unsigned i=0; i<num_nodes; i++)
+            for (unsigned i=0; i<num_nodes; ++i)
             {
                 // cmgui counts nodes from 1
                 *p_file << "Node: "<< i+1 << "\n";
@@ -213,7 +213,7 @@ void Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::WriteCmguiScript()
                        << "gfx modify g_element "<< HeartConfig::Instance()->GetOutputFilenamePrefix()<<" lines select_on material default data "<<variable_name<<" spectrum default selected_material default_selected; \n"
                        << "gfx modify g_element "<< HeartConfig::Instance()->GetOutputFilenamePrefix()<<" node_points glyph point general size \"1*1*1\" centre 0,0,0 font default select_on material default data "<<variable_name<<" spectrum default selected_material default_selected; \n"
                        << "# Load the data \n"
-                       << "for ($i=0; $i<" << num_timesteps << "; $i++) { \n"
+                       << "for ($i=0; $i<" << num_timesteps << "; $++i) { \n"
                        << "    gfx read node " << this->mFileBaseName << "_$i.exnode time $i\n" // ...while the data file from mFileBaseName...
                        << "}\n";
         p_script_file->close();

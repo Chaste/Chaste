@@ -67,7 +67,7 @@ void EllipticGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPo
     }
 
     // ...then record whether it is the correct size...
-    bool is_previous_solution_size_correct = (previous_solution_size == (int)this->mpFeMesh->GetNumNodes());
+    bool is_previous_solution_size_correct = (previous_solution_size == static_cast<int>(this->mpFeMesh->GetNumNodes()));
 
     // ...and if it is, store it as an initial guess for the PDE solver
     Vec initial_guess;

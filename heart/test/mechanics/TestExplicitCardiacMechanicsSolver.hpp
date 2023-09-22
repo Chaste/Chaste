@@ -152,7 +152,7 @@ public:
 
             // computations should be identical
             TS_ASSERT_EQUALS(expl_solver.GetNumNewtonIterations(), impl_solver.GetNumNewtonIterations());
-            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
             {
                 TS_ASSERT_DELTA(expl_solver.rGetDeformedPosition()[i](0),  impl_solver.rGetDeformedPosition()[i](0), 1e-9);
                 TS_ASSERT_DELTA(expl_solver.rGetDeformedPosition()[i](1),  impl_solver.rGetDeformedPosition()[i](1), 1e-9);
@@ -225,7 +225,7 @@ public:
             impl_solver.WriteCurrentSpatialSolution("solution","nodes",counter);
 
             // the solutions turn out to be very close to each other
-            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
             {
                 TS_ASSERT_DELTA(expl_solver.rGetDeformedPosition()[i](0),  impl_solver.rGetDeformedPosition()[i](0), 2e-3);
                 TS_ASSERT_DELTA(expl_solver.rGetDeformedPosition()[i](1),  impl_solver.rGetDeformedPosition()[i](1), 2e-3);
@@ -366,7 +366,7 @@ public:
         y[2] = -0.0077;
         y[3] = 0.0;
 
-        for (unsigned i=0; i < tension_fractions.size();i++)
+        for (unsigned i=0; i < tension_fractions.size();++i)
         {
             problem_defn.SetApplyIsotropicCrossFibreTension(true,tension_fractions[i]);
 

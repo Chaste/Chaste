@@ -702,7 +702,7 @@ public:
          * CheckForRosettes() a few times to ensure both scenarios happen.
          */
 
-        for (unsigned i = 0 ; i < 7 ; i++)
+        for (unsigned i = 0 ; i < 7 ; ++i)
         {
             // We also need to create meshes which we will CheckForRosettes
             MutableVertexMesh<2, 2>* p_rosette = ConstructFiveCellRosette();

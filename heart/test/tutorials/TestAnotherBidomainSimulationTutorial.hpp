@@ -103,7 +103,7 @@ public:
 //        TetrahedralMesh<2,2> mesh;
 //        TrianglesMeshReader<2,2> reader("mesh/test/data/2D_0_to_1mm_800_elements");
 //        mesh.ConstructFromMeshReader(reader);
-//        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+//        for (unsigned i=0; i<mesh.GetNumElements(); ++i)
 //        {
 //            double x = mesh.GetElement(i)->CalculateCentroid()[0];
 //            if (x<0.05)

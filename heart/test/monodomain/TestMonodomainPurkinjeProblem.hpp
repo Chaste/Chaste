@@ -173,7 +173,7 @@ public:
         {
             p_purkinje_cell = new CellLuoRudy1991FromCellML(mpSolver, mpZeroStimulus);
         }
-        if(mMakeJunction)
+        if (mMakeJunction)
         {
             /// Junctions - needs to have a dumb partition
             unsigned index = pNode->GetIndex();
@@ -230,7 +230,7 @@ public:
         {
             p_purkinje_cell = new CellLuoRudy1991FromCellML(mpSolver, mpZeroStimulus);
         }
-        if(mMakeJunction)
+        if (mMakeJunction)
         {
             CreateJunctionFromFile(pNode, p_purkinje_cell, pCardiacCell);
         }
@@ -366,15 +366,15 @@ public:
                  iter != mesh.GetCableElementIteratorEnd();
                  ++iter)
             {
-                if((*iter)->GetIndex() < 5) //parent branch
+                if ((*iter)->GetIndex() < 5) //parent branch
                 {
                     (*iter)->SetAttribute(1.0);
                 }
-                else if((*iter)->GetIndex() >= 5 && (*iter)->GetIndex() < 10) //first sub branch
+                else if ((*iter)->GetIndex() >= 5 && (*iter)->GetIndex() < 10) //first sub branch
                 {
                     (*iter)->SetAttribute(0.3);
                 }
-                else if((*iter)->GetIndex() >= 10 && (*iter)->GetIndex() < 15) //second sub branch
+                else if ((*iter)->GetIndex() >= 10 && (*iter)->GetIndex() < 15) //second sub branch
                 {
                     (*iter)->SetAttribute(0.4);
                 }
@@ -405,11 +405,11 @@ public:
              iter != mesh.GetCableElementIteratorEnd();
              ++iter)
         {
-            if((*iter)->GetIndex() < 5) //First half of branch
+            if ((*iter)->GetIndex() < 5) //First half of branch
             {
                 (*iter)->SetAttribute(1.0);
             }
-            else if((*iter)->GetIndex() >= 5 && (*iter)->GetIndex() < 10) //Second half of branch
+            else if ((*iter)->GetIndex() >= 5 && (*iter)->GetIndex() < 10) //Second half of branch
             {
                 (*iter)->SetAttribute(0.5);
             }
@@ -449,16 +449,16 @@ public:
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_VTK
 
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             // purkinje nodes for this mesh
-            if((55<=i && i<=65))
+            if ((55<=i && i<=65))
             {
                 //Compare the solution between the single Purkinje cable, the parent and first sub-branch
                 //of the branched Purkinje cables.
                 TS_ASSERT_DELTA(soln_repl_branched[2*i+1], soln_repl[2*i+1], 1e-5);
             }
-            else if(i == 71 || i == 82 || i == 93 || i == 104 || i == 115)
+            else if (i == 71 || i == 82 || i == 93 || i == 104 || i == 115)
             {
                 //Compare the solution between the single Purkinje cable and the second sub-branch of the branched solution
                 TS_ASSERT_DELTA(soln_repl_branched[2*i+1], soln_repl[(((i - 61) / 11) + 61)*2 + 1], 1e-5);
@@ -499,19 +499,19 @@ public:
                  iter != mesh.GetCableElementIteratorEnd();
                  ++iter)
             {
-                if((*iter)->GetIndex() < 5) //parent branch
+                if ((*iter)->GetIndex() < 5) //parent branch
                 {
                     (*iter)->SetAttribute(1.0);
                 }
-                else if((*iter)->GetIndex() >= 5 && (*iter)->GetIndex() < 10) //first sub branch
+                else if ((*iter)->GetIndex() >= 5 && (*iter)->GetIndex() < 10) //first sub branch
                 {
                     (*iter)->SetAttribute(1.0);
                 }
-                else if((*iter)->GetIndex() >= 10 && (*iter)->GetIndex() < 14) //second sub branch
+                else if ((*iter)->GetIndex() >= 10 && (*iter)->GetIndex() < 14) //second sub branch
                 {
                     (*iter)->SetAttribute(1.0);
                 }
-                else if((*iter)->GetIndex() == 14) //Second sub branch is made shorter to test anti-symmetry
+                else if ((*iter)->GetIndex() == 14) //Second sub branch is made shorter to test anti-symmetry
                 {
                     // set the radius to, essentially, zero. Can't set it to exactly zero as would then
                     // throw exception
@@ -544,19 +544,19 @@ public:
              iter != mesh.GetCableElementIteratorEnd();
              ++iter)
         {
-                if((*iter)->GetIndex() < 5) //parent branch
+                if ((*iter)->GetIndex() < 5) //parent branch
                 {
                     (*iter)->SetAttribute(1.0);
                 }
-                else if((*iter)->GetIndex() >= 5 && (*iter)->GetIndex() < 9) //first sub branch
+                else if ((*iter)->GetIndex() >= 5 && (*iter)->GetIndex() < 9) //first sub branch
                 {
                     (*iter)->SetAttribute(1.0);
                 }
-                else if((*iter)->GetIndex() >= 10 && (*iter)->GetIndex() < 15) //second sub branch
+                else if ((*iter)->GetIndex() >= 10 && (*iter)->GetIndex() < 15) //second sub branch
                 {
                     (*iter)->SetAttribute(1.0);
                 }
-                else if((*iter)->GetIndex() == 9) //First sub branch is made shorter to test anti-symmetry
+                else if ((*iter)->GetIndex() == 9) //First sub branch is made shorter to test anti-symmetry
                 {
                     // set the radius to, essentially, zero. Can't set it to exactly zero as would then
                     // throw exception
@@ -577,10 +577,10 @@ public:
             soln_repl_anti_branched.ReplicatePetscVector(purkinje_problem.GetSolution());
         }
 
-        for(unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             // Purkinje nodes for the parent branch
-            if((55<=i && i<=60))
+            if ((55<=i && i<=60))
             {
                 //Compare the solution between the parent branches of the two solutions
                 TS_ASSERT_DELTA(soln_repl_branched[2*i+1], soln_repl_anti_branched[2*i+1], 1e-5);
@@ -591,7 +591,7 @@ public:
                 TS_ASSERT_DELTA(soln_repl_branched[2*i+1], soln_repl_anti_branched[(((i - 60) * 11) + 60)*2 + 1], 1e-5);
                 TS_ASSERT_DELTA(soln_repl_branched[(((i - 60) * 11) + 60)*2 + 1], soln_repl_anti_branched[2*i+1], 1e-5);
             }
-            else if(i != 71 && i != 82 && i != 93 && i != 104 && i != 115) //These nodes are on the sub-branch, but their values are tested in the block above
+            else if (i != 71 && i != 82 && i != 93 && i != 104 && i != 115) //These nodes are on the sub-branch, but their values are tested in the block above
             {
                 TS_ASSERT_DELTA(soln_repl_branched[2*i+1], 0.0, 1e-4)
             }
@@ -648,7 +648,7 @@ public:
         purkinje_cell.SetVoltage(rest_voltage);
 
         double time_step = 0.01;
-        for (unsigned i=0; i<500; i++)
+        for (unsigned i=0; i<500; ++i)
         {
             double time = i*time_step;
             myocardial_cell.Compute(time, time+time_step, time_step);
@@ -675,7 +675,7 @@ public:
         TS_ASSERT_DELTA(p_myocardial_cell2->GetStimulus(dummy_time), 0.0, 1e-6);
 
         // Now simulate and check the results match those above
-        for (unsigned i=0; i<500; i++)
+        for (unsigned i=0; i<500; ++i)
         {
             double time = i*time_step;
             p_myocardial_cell2->Compute(time, time+time_step, time_step);

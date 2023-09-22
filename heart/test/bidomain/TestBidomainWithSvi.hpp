@@ -70,13 +70,13 @@ public:
     {
         double x = pNode->rGetLocation()[0];
         double y;
-        if (DIM==2)
+        if (DIM == 2)
         {
             y = pNode->rGetLocation()[1];
         }
 
-        if ((DIM==1 && fabs(x)<0.02+1e-6)
-             || (DIM==2 && fabs(x)<0.1+1e-6 && fabs(y)<0.1+1e-6) ) // 2D problem needs larger stimulus
+        if ((DIM == 1 && fabs(x)<0.02+1e-6)
+             || (DIM == 2 && fabs(x)<0.1+1e-6 && fabs(y)<0.1+1e-6) ) // 2D problem needs larger stimulus
         {
             return new CellLuoRudy1991FromCellML(this->mpSolver, this->mpStimulus);
         }
@@ -134,7 +134,7 @@ public:
         HeartConfig::Instance()->SetSimulationDuration(4.0); //ms
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
 
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i=0; i<3; ++i)
         {
             // ICI - ionic current interpolation - the default
             {
@@ -205,7 +205,7 @@ public:
             double voltage_at_0_03_finest_mesh;
             if (i==0) // finest mesh
             {
-                for (unsigned j=0; j<final_solution_ici.GetSize(); j++)
+                for (unsigned j=0; j<final_solution_ici.GetSize(); ++j)
                 {
                     // visually checked they agree at this mesh resolution, and chosen tolerance from results
                     TS_ASSERT_DELTA(final_solution_ici[j], final_solution_svi[j], 0.35);

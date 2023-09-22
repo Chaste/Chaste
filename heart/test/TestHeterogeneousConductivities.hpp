@@ -120,7 +120,7 @@ public:
         lo = mesh.GetDistributedVectorFactory()->GetLow();
         hi = mesh.GetDistributedVectorFactory()->GetHigh();
 
-        for (unsigned i=lo; i<hi; i++)
+        for (unsigned i=lo; i<hi; ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             if (x<width/2)

@@ -79,7 +79,7 @@ public:
         Element<3,3> element(INDEX_IS_NOT_USED, corner_nodes);
 
         // Check nodes on the new element have the right indices
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i=0; i<4; ++i)
         {
             TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(i), i);
         }
@@ -92,7 +92,7 @@ public:
         TS_ASSERT_DELTA(det, 1.0, 1e-5);
         TS_ASSERT_DELTA(element.GetVolume(det), 1.0/6.0, 1e-5);
 
-        for (unsigned i=0; i<corner_nodes.size(); i++)
+        for (unsigned i=0; i<corner_nodes.size(); ++i)
         {
             delete corner_nodes[i];
         }
@@ -120,9 +120,9 @@ public:
         // Test (and cover) equals operator
         another_element = element;
 
-        for (int i=0; i<4; i++)
+        for (int i=0; i<4; ++i)
         {
-            for (int j=0; j<3; j++)
+            for (int j=0; j<3; ++j)
             {
                 TS_ASSERT_DELTA(another_element.GetNode(i)->GetPoint()[j], element.GetNode(i)->GetPoint()[j], 1e-10);
             }
@@ -132,7 +132,7 @@ public:
         element.MarkAsDeleted();
         TS_ASSERT_DELTA(element.GetVolume(1.0), 0.0, 1e-6);
 
-        for (unsigned i=0; i<corner_nodes.size(); i++)
+        for (unsigned i=0; i<corner_nodes.size(); ++i)
         {
             delete corner_nodes[i];
             delete more_nodes[i];
@@ -152,7 +152,7 @@ public:
 
         TS_ASSERT_EQUALS(element.GetOwnership(), true);
 
-        for (unsigned i=0; i<corner_nodes.size(); i++)
+        for (unsigned i=0; i<corner_nodes.size(); ++i)
         {
             delete corner_nodes[i];
         }
@@ -449,7 +449,7 @@ public:
         another_copied_element.UpdateNode(1, update_for_node);
         TS_ASSERT_EQUALS(another_copied_element.GetNodeLocation(1, 2), 2.0);
 
-        for (unsigned i=0; i<corner_nodes.size(); i++)
+        for (unsigned i=0; i<corner_nodes.size(); ++i)
         {
             delete corner_nodes[i];
         }
@@ -491,7 +491,7 @@ public:
         delete p_fake_node;
         delete p_fake_node2;
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i=0; i<nodes.size(); ++i)
         {
             delete nodes[i];
             delete nodes_the_same[i];
@@ -550,7 +550,7 @@ public:
 
         TS_ASSERT_DELTA(element.CalculateQuality(), 1.0, 1e-7);
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i=0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -599,11 +599,11 @@ public:
         TS_ASSERT_DELTA(right_angle_min_max[1], sqrt(2.0), 1e-5);
 
 
-        for (unsigned i=0; i<equilateral_nodes.size(); i++)
+        for (unsigned i=0; i<equilateral_nodes.size(); ++i)
         {
             delete equilateral_nodes[i];
         }
-        for (unsigned i=0; i<right_angle_nodes.size(); i++)
+        for (unsigned i=0; i<right_angle_nodes.size(); ++i)
         {
             delete right_angle_nodes[i];
         }
@@ -654,11 +654,11 @@ public:
         TS_ASSERT_DELTA(right_angle_min_max[0], 1.0, 1e-5);
         TS_ASSERT_DELTA(right_angle_min_max[1], sqrt(2.0), 1e-5);
 
-        for (unsigned i=0; i<right_angle_nodes.size(); i++)
+        for (unsigned i=0; i<right_angle_nodes.size(); ++i)
         {
             delete right_angle_nodes[i];
         }
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i=0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -743,7 +743,7 @@ public:
         TS_ASSERT_DELTA(centroid[1], 0.25, 1e-8);
         TS_ASSERT_EQUALS(centroid[2], 0.25 );
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i=0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -851,7 +851,7 @@ public:
 
         // There's space on the node vector for 10 new points
         // but more than 10 should still work
-        for (int i=1; i<=20; i++)
+        for (int i=1; i<=20; ++i)
         {
             ChastePoint<1> new_point(0.1 - i*0.0005);
             mesh.RefineElement(p_first_element, new_point);

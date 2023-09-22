@@ -85,7 +85,7 @@ CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM>::CmguiMeshWriter(const std::string& rDire
 
     mNumNodesPerElement = ELEMENT_DIM+1;
     mReordering.resize(mNumNodesPerElement);
-    for (unsigned i=0; i<mNumNodesPerElement; i++)
+    for (unsigned i=0; i<mNumNodesPerElement; ++i)
     {
         mReordering[i] = i;
     }
@@ -106,7 +106,7 @@ void CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteFiles()
         std::vector<double> current_item = this->GetNextNode();
 
         *p_node_file << "Node:\t" << item_num+1 << "\t";
-        for (unsigned i=0; i<SPACE_DIM; i++)
+        for (unsigned i=0; i<SPACE_DIM; ++i)
         {
             *p_node_file << current_item[i] << "\t";
         }
@@ -132,7 +132,7 @@ void CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteFiles()
         assert(elem.AttributeValue < mRegionNames.size());
 
         *elem_files[elem.AttributeValue] << "Element:\t" << item_num+1 << " 0 0 Nodes:\t";
-        for (unsigned i=0; i<mNumNodesPerElement; i++)
+        for (unsigned i=0; i<mNumNodesPerElement; ++i)
         {
             *elem_files[elem.AttributeValue] << current_element[mReordering[i]]+1 << "\t";
         }
@@ -264,7 +264,7 @@ void CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteElementsFileHeader(std::vector
            *rElemFiles[region_index] << mCoordinatesFileHeader;
 
            // Now write the specification for each additional field
-           for (unsigned i = 0; i <  number_of_fields; i++)
+           for (unsigned i = 0; i <  number_of_fields; ++i)
            {
                //unsigned to string
                std::stringstream i_string;
@@ -291,7 +291,7 @@ void CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::CreateFilesWithHeaders()
      // Array with file descriptors for each of regions
      std::vector<boost::shared_ptr<std::ofstream> > elem_files = OpenElementFiles();
      WriteElementsFileHeader(elem_files);
-     for (unsigned i = 0; i < elem_files.size(); i++)
+     for (unsigned i = 0; i < elem_files.size(); ++i)
      {
          elem_files[i]->close();
      }
@@ -312,7 +312,7 @@ void CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
         const c_vector<double, SPACE_DIM>& r_current_item = iter->rGetLocation();
         *p_node_file << "Node:\t" << iter->GetIndex()+1 << "\t";
 
-        for (unsigned i=0; i<SPACE_DIM; i++)
+        for (unsigned i=0; i<SPACE_DIM; ++i)
         {
             *p_node_file << r_current_item[i] << "\t";
         }
@@ -335,7 +335,7 @@ void CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
             assert(iter->GetUnsignedAttribute() < mRegionNames.size());//segfault guard
 
             *elem_files[iter->GetUnsignedAttribute()] << "Element:\t" << iter->GetIndex()+1 << " 0 0 Nodes:\t";
-            for (unsigned i=0; i<this->mNodesPerElement; i++)
+            for (unsigned i=0; i<this->mNodesPerElement; ++i)
             {
                 *elem_files[iter->GetUnsignedAttribute()]  << iter->GetNodeGlobalIndex(i)+1 << "\t";
             }

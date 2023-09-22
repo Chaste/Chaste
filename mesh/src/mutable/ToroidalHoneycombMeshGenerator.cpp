@@ -85,9 +85,9 @@ ToroidalHoneycombMeshGenerator::ToroidalHoneycombMeshGenerator(unsigned numNodes
     (*p_node_file) << num_nodes << "\t2\t0\t1" << std::endl;
 
     unsigned node = 0;
-    for (unsigned i=0; i<num_nodes_along_depth; i++)
+    for (unsigned i=0; i<num_nodes_along_depth; ++i)
     {
-        for (unsigned j=0; j<num_nodes_along_width; j++)
+        for (unsigned j=0; j<num_nodes_along_width; ++j)
         {
             unsigned boundary = 0;
             if ((i==0) || (i==num_nodes_along_depth-1))
@@ -125,9 +125,9 @@ ToroidalHoneycombMeshGenerator::ToroidalHoneycombMeshGenerator(unsigned numNodes
 
     unsigned elem = 0;
     unsigned edge = 0;
-    for (unsigned i=0; i<num_elem_along_depth; i++)
+    for (unsigned i=0; i<num_elem_along_depth; ++i)
     {
-        for (unsigned j=0; j < num_elem_along_width; j++)
+        for (unsigned j=0; j < num_elem_along_width; ++j)
         {
             unsigned node0 =     i*num_nodes_along_width + j;
             unsigned node1 =     i*num_nodes_along_width + j+1;
@@ -164,7 +164,7 @@ ToroidalHoneycombMeshGenerator::ToroidalHoneycombMeshGenerator(unsigned numNodes
         }
     }
 
-    for (unsigned i=0; i<num_elem_along_depth; i++)
+    for (unsigned i=0; i<num_elem_along_depth; ++i)
     {
         unsigned node0, node1;
 
@@ -181,7 +181,7 @@ ToroidalHoneycombMeshGenerator::ToroidalHoneycombMeshGenerator(unsigned numNodes
         (*p_edge_file) << edge++ << "\t" << node0 << "\t" << node1 << "\t" << 1 << std::endl;
     }
 
-    for (unsigned j=0; j<num_elem_along_width; j++)
+    for (unsigned j=0; j<num_elem_along_width; ++j)
     {
         unsigned node0 = num_nodes_along_width*(num_nodes_along_depth-1) + j;
         unsigned node1 = num_nodes_along_width*(num_nodes_along_depth-1) + j+1;

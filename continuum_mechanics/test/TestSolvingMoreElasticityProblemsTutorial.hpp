@@ -103,7 +103,7 @@ public:
         std::vector<unsigned> fixed_nodes;
         std::vector<c_vector<double,2> > locations;
         /* Loop over the mesh nodes */
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             /* If the node is on the Y=0 surface (the LHS) */
             if (fabs(mesh.GetNode(i)->rGetLocation()[1]) < 1e-6)
@@ -217,7 +217,7 @@ public:
         locations.push_back(zero_vector<double>(2));
 
         /* For the rest, if the node is on the Y=0 surface.. */
-        for (unsigned i=1; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=1; i<mesh.GetNumNodes(); ++i)
         {
             if (fabs(mesh.GetNode(i)->rGetLocation()[1]) < 1e-6)
             {

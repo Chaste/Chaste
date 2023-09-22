@@ -170,7 +170,7 @@ public:
         delete p_mesh;
 
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i=0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -430,7 +430,7 @@ public:
         TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(p_mesh->GetNode(4)), 5u);
 
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i=0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -574,7 +574,7 @@ public:
             TS_ASSERT_EQUALS(p_static_cast_saved_mesh->GetNumNodes(), p_static_cast_loaded_mesh->GetNumNodes());
             TS_ASSERT_EQUALS(p_static_cast_saved_mesh->GetNumNodes(), 16u);
 
-            for (unsigned i=0; i<p_static_cast_saved_mesh->GetNumNodes(); i++)
+            for (unsigned i=0; i<p_static_cast_saved_mesh->GetNumNodes(); ++i)
             {
                 Node<2>* p_node = p_static_cast_saved_mesh->GetNode(i);
                 Node<2>* p_node2 = p_static_cast_loaded_mesh->GetNode(i);
@@ -584,7 +584,7 @@ public:
 
                 TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), p_node2->IsBoundaryNode());
 
-                for (unsigned j=0; j<2; j++)
+                for (unsigned j=0; j<2; j++)                
                 {
                     TS_ASSERT_DELTA(p_node->rGetLocation()[j], p_node2->rGetLocation()[j], 1e-4);
                 }

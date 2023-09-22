@@ -99,7 +99,7 @@ void PetscMatTools::SetRow(Mat matrix, PetscInt row, double value)
     {
         PetscInt rows, cols;
         MatGetSize(matrix, &rows, &cols);
-        for (PetscInt i=0; i<cols; i++)
+        for (PetscInt i=0; i<cols; ++i)
         {
             SetElement(matrix, row, i, value);
         }
@@ -128,7 +128,7 @@ void PetscMatTools::ZeroRowsWithValueOnDiagonal(Mat matrix, std::vector<unsigned
 #endif
 
     PetscInt* rows = new PetscInt[rRows.size()];
-    for (unsigned i=0; i<rRows.size(); i++)
+    for (unsigned i=0; i<rRows.size(); ++i)
     {
         rows[i] = rRows[i];
     }
@@ -168,7 +168,7 @@ void PetscMatTools::ZeroRowsWithValueOnDiagonal(Mat matrix, std::vector<unsigned
                 }
             }
             // Separate "gets" from "sets" so that we don't have to keep going into "assembled" mode
-            for (unsigned i=0; i<non_zero_cols.size();i++)
+            for (unsigned i=0; i<non_zero_cols.size();++i)
             {
                 SetElement(matrix, row, non_zero_cols[i], 0.0);
             }
@@ -211,7 +211,7 @@ void PetscMatTools::ZeroRowsAndColumnsWithValueOnDiagonal(Mat matrix, std::vecto
         MatGetRow(matrix, row, &num_cols, &cols, PETSC_NULL);
 
         // see which of these cols are in the list of cols to be zeroed
-        for (PetscInt i=0; i<num_cols; i++)
+        for (PetscInt i=0; i<num_cols; ++i)
         {
             if (std::binary_search(rowColIndices.begin(), rowColIndices.end(), cols[i]))
             {
@@ -232,7 +232,7 @@ void PetscMatTools::ZeroRowsAndColumnsWithValueOnDiagonal(Mat matrix, std::vecto
         {
             PetscInt* cols_to_zero = new PetscInt[num_cols_to_zero_this_row];
             double* zeros = new double[num_cols_to_zero_this_row];
-            for (unsigned i=0; i<num_cols_to_zero_this_row; i++)
+            for (unsigned i=0; i<num_cols_to_zero_this_row; ++i)
             {
                 cols_to_zero[i] = cols_to_zero_per_row[row-lo][i];
                 zeros[i] = 0.0;
@@ -277,7 +277,7 @@ void PetscMatTools::ZeroColumn(Mat matrix, PetscInt col)
 
     cols[0] = col;
 
-    for (unsigned i=0; i<size; i++)
+    for (unsigned i=0; i<size; ++i)
     {
         rows[i] = nonzero_rows[i];
         zeros[i] = 0.0;

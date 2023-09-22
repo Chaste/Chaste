@@ -90,23 +90,23 @@ TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::TrianglesMeshReader(std::string pat
     {
         EXCEPTION("Boundary element file should not have containing element info if it is quadratic");
     }
-    if (mOrderOfElements==1)
+    if (mOrderOfElements == 1)
     {
         mNodesPerElement = ELEMENT_DIM+1;
     }
     else
     {
-        assert(SPACE_DIM==ELEMENT_DIM); // LCOV_EXCL_LINE
+        assert(SPACE_DIM == ELEMENT_DIM); // LCOV_EXCL_LINE
         mNodesPerElement = (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2;
     }
 
-    if (mOrderOfBoundaryElements==1)
+    if (mOrderOfBoundaryElements == 1)
     {
         mNodesPerBoundaryElement = ELEMENT_DIM;
     }
     else
     {
-        assert(SPACE_DIM==ELEMENT_DIM); // LCOV_EXCL_LINE
+        assert(SPACE_DIM == ELEMENT_DIM); // LCOV_EXCL_LINE
         mNodesPerBoundaryElement = ELEMENT_DIM*(ELEMENT_DIM+1)/2;
     }
 
@@ -307,7 +307,7 @@ ElementData TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextFaceData()
 
             mFacesRead++;
         }
-        while (ELEMENT_DIM==2 && face_data.AttributeValue==0.0); //In triangles format we ignore internal edges (which are marked with attribute 0)
+        while (ELEMENT_DIM == 2 && face_data.AttributeValue == 0.0); //In triangles format we ignore internal edges (which are marked with attribute 0)
     }
 
     mBoundaryFacesRead++;
@@ -755,7 +755,7 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::ReadHeaders()
                         GetNextFaceData();
                         num_boundary_faces++;
                     }
-                    catch(Exception& e)
+                    catch (Exception& e)
                     {
                         if (mEofException)
                         {
@@ -871,7 +871,7 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextItemFromStream(std::ifs
         }
         if (rNumAttributes > 0)
         {
-            for (unsigned i = 0; i < rNumAttributes; i++)
+            for (unsigned i = 0; i < rNumAttributes; ++i)
             {
                 double attribute;
                 rFileStream.read((char*) &attribute, sizeof(double));
@@ -901,14 +901,14 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextItemFromStream(std::ifs
             EXCEPTION("Data for item " << expectedItemNumber << " missing");
         }
 
-        for (unsigned i=0; i<rDataPacket.size(); i++)
+        for (unsigned i=0; i<rDataPacket.size(); ++i)
         {
             buffer_stream >> rDataPacket[i];
         }
 
         if (rNumAttributes > 0)
         {
-            for (unsigned i = 0; i < rNumAttributes; i++)
+            for (unsigned i = 0; i < rNumAttributes; ++i)
             {
                 double attribute;
                 buffer_stream >> attribute;
@@ -931,46 +931,52 @@ std::string TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetMeshFileBaseName()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetOneDimBoundary()
 {
-    assert(ELEMENT_DIM == 1);    // LCOV_EXCL_LINE
-    mNumFaceAttributes = 0;
-    if (!mOneDimBoundary.empty())
+    if constexpr (ELEMENT_DIM == 1)
     {
-        // We have already read this and have reset the reader (probably from the mesh class)
-        return;
-    }
-    std::vector<unsigned> node_indices(2);
-    std::vector<double> dummy_attribute; // unused
-
-    // Count how many times we see each node
-    std::vector<unsigned> node_count(mNumNodes); // Covers the case if it's indexed from 1
-    for (unsigned element_index=0; element_index<mNumElements;element_index++)
-    {
-        GetNextItemFromStream(mElementsFile, element_index, node_indices, mNumElementAttributes, dummy_attribute);
-        if (!mIndexFromZero)
+        mNumFaceAttributes = 0;
+        if (!mOneDimBoundary.empty())
         {
-            // Adjust so we are indexing from zero
-            node_indices[0]--;
-            node_indices[1]--;
+            // We have already read this and have reset the reader (probably from the mesh class)
+            return;
         }
-        node_count[node_indices[0]]++;
-        node_count[node_indices[1]]++;
-    }
+        std::vector<unsigned> node_indices(2);
+        std::vector<double> dummy_attribute; // unused
 
-    // Find the ones which are terminals (only one mention)
-    for (unsigned node_index=0; node_index<mNumNodes;node_index++)
-    {
-        if (node_count[node_index] == 1u)
+        // Count how many times we see each node
+        std::vector<unsigned> node_count(mNumNodes); // Covers the case if it's indexed from 1
+        for (unsigned element_index=0; element_index<mNumElements;element_index++)
         {
-            mOneDimBoundary.push_back(node_index);
+            GetNextItemFromStream(mElementsFile, element_index, node_indices, mNumElementAttributes, dummy_attribute);
+            if (!mIndexFromZero)
+            {
+                // Adjust so we are indexing from zero
+                node_indices[0]--;
+                node_indices[1]--;
+            }
+            node_count[node_indices[0]]++;
+            node_count[node_indices[1]]++;
         }
-    }
 
-    // Close the file, reopen, and skip the header again
-    mElementsFile.close();
-    mElementsFile.clear(); // Older versions of gcc don't explicitly reset "fail" and "eof" flags in std::ifstream after calling close()
-    OpenElementsFile();
-    std::string buffer;
-    GetNextLineFromStream(mElementsFile, buffer);
+        // Find the ones which are terminals (only one mention)
+        for (unsigned node_index=0; node_index<mNumNodes;node_index++)
+        {
+            if (node_count[node_index] == 1u)
+            {
+                mOneDimBoundary.push_back(node_index);
+            }
+        }
+
+        // Close the file, reopen, and skip the header again
+        mElementsFile.close();
+        mElementsFile.clear(); // Older versions of gcc don't explicitly reset "fail" and "eof" flags in std::ifstream after calling close()
+        OpenElementsFile();
+        std::string buffer;
+        GetNextLineFromStream(mElementsFile, buffer);
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -978,7 +984,7 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::EnsureIndexingFromZero(std::ve
 {
     if (!mIndexFromZero) // If node indices do not start at zero move them all down one so they do
     {
-        for (unsigned i=0; i<rNodeIndices.size(); i++)
+        for (unsigned i=0; i<rNodeIndices.size(); ++i)
         {
             rNodeIndices[i]--;
         }

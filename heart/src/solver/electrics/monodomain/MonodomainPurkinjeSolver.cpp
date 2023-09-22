@@ -49,7 +49,7 @@ void MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(Vec curr
     /////////////////////////////////////////
     // set up LHS matrix (and mass matrix)
     /////////////////////////////////////////
-    if(computeMatrix)
+    if (computeMatrix)
     {
         mpVolumeAssembler->SetMatrixToAssemble(this->mpLinearSystem->rGetLhsMatrix(),false);
         mpVolumeAssembler->AssembleMatrix();
@@ -218,7 +218,7 @@ MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>::MonodomainPurkinjeSolver(
 {
     assert(pTissue);
     assert(pBoundaryConditions);
-    if(HeartConfig::Instance()->GetUseStateVariableInterpolation())
+    if (HeartConfig::Instance()->GetUseStateVariableInterpolation())
     {
         EXCEPTION("State-variable interpolation is not yet supported with Purkinje");
     }

@@ -2185,7 +2185,7 @@ void HeartConfig::SetOutputVariables(const std::vector<std::string>& rOutputVari
     // Erase or create a sequence
     var_type_sequence.clear();
 
-    for (unsigned i = 0; i < rOutputVariables.size(); i++)
+    for (unsigned i = 0; i < rOutputVariables.size(); ++i)
     {
         cp::var_type temp(rOutputVariables[i]);
         var_type_sequence.push_back(temp);
@@ -2537,7 +2537,7 @@ void HeartConfig::SetApdMaps(const std::vector<std::pair<double, double> >& apdM
     //Erase or create a sequence
     apd_maps_sequence.clear();
 
-    for (unsigned i = 0; i < apdMaps.size(); i++)
+    for (unsigned i = 0; i < apdMaps.size(); ++i)
     {
         XSD_CREATE_WITH_FIXED_ATTR2(cp::apd_map_type, temp,
                                     apdMaps[i].first, apdMaps[i].second,
@@ -2555,7 +2555,7 @@ void HeartConfig::SetUpstrokeTimeMaps(std::vector<double>& upstrokeTimeMaps)
     //Erase or create a sequence
     var_type_sequence.clear();
 
-    for (unsigned i = 0; i < upstrokeTimeMaps.size(); i++)
+    for (unsigned i = 0; i < upstrokeTimeMaps.size(); ++i)
     {
         XSD_CREATE_WITH_FIXED_ATTR1(cp::upstrokes_map_type, temp,
                                     upstrokeTimeMaps[i],
@@ -2573,7 +2573,7 @@ void HeartConfig::SetMaxUpstrokeVelocityMaps(std::vector<double>& maxUpstrokeVel
     //Erase or create a sequence
     max_upstroke_velocity_maps_sequence.clear();
 
-    for (unsigned i = 0; i < maxUpstrokeVelocityMaps.size(); i++)
+    for (unsigned i = 0; i < maxUpstrokeVelocityMaps.size(); ++i)
     {
         XSD_CREATE_WITH_FIXED_ATTR1(cp::max_upstrokes_velocity_map_type, temp,
                                     maxUpstrokeVelocityMaps[i],
@@ -2592,7 +2592,7 @@ void HeartConfig::SetConductionVelocityMaps(std::vector<unsigned>& conductionVel
     //Erase or create a sequence
     conduction_velocity_maps_sequence.clear();
 
-    for (unsigned i = 0; i < conductionVelocityMaps.size(); i++)
+    for (unsigned i = 0; i < conductionVelocityMaps.size(); ++i)
     {
         cp::conduction_velocity_map_type temp(conductionVelocityMaps[i]);
         conduction_velocity_maps_sequence.push_back(temp);
@@ -2608,7 +2608,7 @@ void HeartConfig::SetRequestedNodalTimeTraces(std::vector<unsigned>& requestedNo
     //Erase or create a sequence
     requested_nodes_sequence.clear();
 
-    for (unsigned i = 0; i < requestedNodes.size(); i++)
+    for (unsigned i = 0; i < requestedNodes.size(); ++i)
     {
         cp::node_number_type temp(requestedNodes[i]);
         requested_nodes_sequence.push_back(temp);
@@ -2625,7 +2625,7 @@ void HeartConfig::SetPseudoEcgElectrodePositions(const std::vector<ChastePoint<S
     //Erase or create a sequence
     electrodes_sequence.clear();
 
-    for (unsigned i = 0; i < rPseudoEcgElectrodePositions.size(); i++)
+    for (unsigned i = 0; i < rPseudoEcgElectrodePositions.size(); ++i)
     {
         cp::point_type temp(rPseudoEcgElectrodePositions[i].GetWithDefault(0),
                             rPseudoEcgElectrodePositions[i].GetWithDefault(1),
@@ -2988,7 +2988,7 @@ void XmlTransforms::TransformIonicModelDefinitions(xercesc::DOMDocument* pDocume
         XmlTools::WrapContentInElement(pDocument, p_elt_list[0], X("Hardcoded"));
         // Now do any region-specific definitions
         p_elt_list = XmlTools::FindElements(pRootElement, "Simulation/IonicModels/Region/IonicModel");
-        for (unsigned i = 0; i < p_elt_list.size(); i++)
+        for (unsigned i = 0; i < p_elt_list.size(); ++i)
         {
             XmlTools::WrapContentInElement(pDocument, p_elt_list[i], X("Hardcoded"));
         }

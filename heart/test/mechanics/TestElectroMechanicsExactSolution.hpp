@@ -213,7 +213,7 @@ public:
 
         std::vector<c_vector<double,2> >& r_solution = problem.rGetDeformedPosition();
 
-        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); ++i)
         {
             double X = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double Y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
@@ -226,7 +226,7 @@ public:
         }
 
         std::vector<double>& r_pressures = p_solver->rGetPressures();
-        for (unsigned i=0; i<r_pressures.size(); i++)
+        for (unsigned i=0; i<r_pressures.size(); ++i)
         {
             TS_ASSERT_DELTA( r_pressures[i]/(2*MATERIAL_PARAM), 1.0, 5e-3);
         }

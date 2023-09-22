@@ -100,10 +100,10 @@ public:
                                  };
 
 
-        for (unsigned i=0; i<14; i++)
+        for (unsigned i = 0; i < 14; ++i)
         {
             int global_index = stimulated_cells[i];
-            if ((global_index>=(int)lo) && (global_index<(int)hi))
+            if ((global_index >= static_cast<int>(lo)) && (global_index < static_cast<int>(hi)))
             {
                 int local_index = global_index - lo;
                 (*pCellsDistributed)[ local_index ]->SetStimulusFunction(mpStimulus);
@@ -155,7 +155,7 @@ public:
         bool stimulated_node_was_excited = false;
         bool unstimulated_node_was_excited = false;
 
-        for (unsigned i=0; i<voltage_values_at_node_37483.size(); i++)
+        for (unsigned i=0; i<voltage_values_at_node_37483.size(); ++i)
         {
             if (voltage_values_at_node_37483[i] > 0)
             {

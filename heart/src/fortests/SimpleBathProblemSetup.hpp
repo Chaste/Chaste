@@ -85,11 +85,11 @@ public:
         // stimulate centre node normally..
         bool is_centre;
 
-        if (DIM==1)
+        if (DIM == 1)
         {
             is_centre = (fabs(pNode->GetPoint()[0]-mStimulatedPoint(0)) < 1e-6);
         }
-        else if (DIM==2)
+        else if (DIM == 2)
         {
             is_centre = (    (fabs(pNode->GetPoint()[0]-mStimulatedPoint(0)) < 1e-6)
                           && (fabs(pNode->GetPoint()[1]-mStimulatedPoint(1)) < 1e-6) );

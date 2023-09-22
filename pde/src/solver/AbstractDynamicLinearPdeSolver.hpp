@@ -416,7 +416,7 @@ Vec AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Solve()
             // (This runs the cell ODE models in heart simulations)
             this->PrepareForSetupLinearSystem(solution);
         }
-        catch(Exception& e)
+        catch (Exception& e)
         {
             // We only need to clean up memory if we are NOT on the first PDE time step,
             // as someone else cleans up the mInitialCondition vector in higher classes.

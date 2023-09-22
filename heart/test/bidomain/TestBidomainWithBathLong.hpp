@@ -71,11 +71,11 @@ public:
         // stimulate centre node normally..
         bool is_centre;
 
-        if (DIM==1)
+        if (DIM == 1)
         {
             is_centre = (fabs(pNode->GetPoint()[0]-mStimulatedPoint(0)) < 1e-6);
         }
-        else if (DIM==2)
+        else if (DIM == 2)
         {
             is_centre = (    (fabs(pNode->GetPoint()[0]-mStimulatedPoint(0)) < 1e-6)
                           && (fabs(pNode->GetPoint()[1]-mStimulatedPoint(1)) < 1e-6) );
@@ -119,7 +119,7 @@ public:
         mesh.ConstructRegularSlabMesh(0.01, 0.1, 0.1, 0.1);
 
         // Set everything outside a central sphere (radius 0.4) to be bath
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i=0; i<mesh.GetNumElements(); ++i)
         {
             double x = mesh.GetElement(i)->CalculateCentroid()[0];
             double y = mesh.GetElement(i)->CalculateCentroid()[1];
@@ -139,7 +139,7 @@ public:
         ReplicatableVector sol_repl(sol);
 
         // test V = 0 for all bath nodes
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             if (HeartRegionCode::IsRegionBath( mesh.GetNode(i)->GetRegion() )) // bath
             {
@@ -174,7 +174,7 @@ public:
         mesh.ConstructFromMeshReader(reader);
 
         // Set everything outside a central circle (radius 0.4) to be bath
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i=0; i<mesh.GetNumElements(); ++i)
         {
             double x = mesh.GetElement(i)->CalculateCentroid()[0];
             double y = mesh.GetElement(i)->CalculateCentroid()[1];
@@ -203,7 +203,7 @@ public:
          * We are checking the last time step. This test will only make sure that an upstroke is triggered.
          * We ran longer simulation for 350 ms and a nice AP was observed.
          */
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             // test V = 0 for all bath nodes
             if (mesh.GetNode(i)->GetRegion()==1) // bath
@@ -242,7 +242,7 @@ public:
         mesh.ConstructFromMeshReader(reader);
 
         // Set everything outside a central sphere (radius 0.4) to be bath
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i=0; i<mesh.GetNumElements(); ++i)
         {
             double x = mesh.GetElement(i)->CalculateCentroid()[0];
             double y = mesh.GetElement(i)->CalculateCentroid()[1];
@@ -268,7 +268,7 @@ public:
 
         bool ap_triggered = false;
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             // test V = 0 for all bath nodes
             if (HeartRegionCode::IsRegionBath( mesh.GetNode(i)->GetRegion() )) // bath

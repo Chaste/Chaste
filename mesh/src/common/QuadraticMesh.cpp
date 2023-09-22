@@ -51,7 +51,7 @@ template<unsigned DIM>
 void QuadraticMesh<DIM>::CountVertices()
 {
     mNumVertices = 0;
-    for (unsigned i=0; i<this->GetNumNodes(); i++)
+    for (unsigned i = 0; i<this->GetNumNodes(); ++i)
     {
         bool is_internal = this->GetNode(i)->IsInternal();
         if (is_internal==false)
@@ -84,7 +84,7 @@ void QuadraticMesh<DIM>::ConstructLinearMesh(unsigned numElemX)
         top[0] = numElemX;
 
         unsigned mid_node_index=mNumVertices;
-        for (unsigned element_index=0; element_index<numElemX; element_index++)
+        for (unsigned element_index = 0; element_index<numElemX; element_index++)
         {
             c_vector<double, DIM> x_value_mid_node;
             x_value_mid_node[0] = element_index+0.5;
@@ -128,11 +128,11 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
     top[1]=numElemY;
     c_vector<double, DIM> node_pos;
 
-    for (unsigned j=0; j<numElemY+1; j++)
+    for (unsigned j = 0; j<numElemY+1; ++j)
     {
         node_pos[1]=j;
         //Add mid-way nodes to horizontal edges in this slice
-        for (unsigned i=0; i<numElemX; i++)
+        for (unsigned i = 0; i<numElemX; ++i)
         {
             unsigned left_index = j*(numElemX+1) + i;
             std::pair<unsigned,unsigned> edge(left_index, left_index+1 );
@@ -143,7 +143,7 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
 
         //Add the vertical and diagonal nodes to the mid-way above the last set of horizontal edges
         node_pos[1] = j+0.5;
-        for (unsigned i=0; i<numElemX+1; i++)
+        for (unsigned i = 0; i<numElemX+1; ++i)
         {
             node_pos[0] = i;
             unsigned left_index = j*(numElemX+1) + i;
@@ -175,7 +175,7 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
          ++iter)
     {
         unsigned local_index1=0;
-        for (unsigned index=0; index<=DIM; index++)
+        for (unsigned index = 0; index<=DIM; index++)
         {
             local_index1 = (local_index1+1)%(DIM+1);
             unsigned local_index2 = (local_index1+1)%(DIM+1);
@@ -205,7 +205,7 @@ template<unsigned DIM>
 Node<DIM>* QuadraticMesh<DIM>::MakeNewInternalNode(unsigned& rIndex, c_vector<double, DIM>& rLocation, c_vector<double, DIM>& rTop)
 {
     bool boundary = false;
-    for (unsigned dim=0; dim<DIM; dim++)
+    for (unsigned dim = 0; dim<DIM; dim++)
     {
         if (rLocation[dim] > rTop[dim])
         {
@@ -271,11 +271,11 @@ void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, u
     //layers to have predictable numbers
     std::map<std::pair<unsigned, unsigned>, unsigned> edge_to_internal_map;
     unsigned node_index = this->GetNumNodes();
-    for (unsigned k=0; k<numElemZ+1; k++)
+    for (unsigned k = 0; k<numElemZ+1; ++k)
     {
         //Add a slice of the mid-points to the edges and faces at this z=level
         node_pos[2] = k;
-        for (unsigned j=0; j<numElemY+1; j++)
+        for (unsigned j = 0; j<numElemY+1; ++j)
         {
             unsigned lo_z_lo_y = (numElemX+1)*((numElemY+1)*k + j);
             unsigned lo_z_hi_y = (numElemX+1)*((numElemY+1)*k + j + 1);
@@ -283,7 +283,7 @@ void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, u
             node_pos[1] = j;
 
             //The midpoints along the horizontal (y fixed) edges
-            for (unsigned i=0; i<numElemX+1; i++)
+            for (unsigned i = 0; i<numElemX+1; ++i)
             {
                 // i+.5, j, k
                 std::pair<unsigned,unsigned> edge(lo_z_lo_y+i, lo_z_lo_y+i+1);
@@ -293,7 +293,7 @@ void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, u
             }
             //The midpoints and face centres between two horizontal (y-fixed) strips
             node_pos[1] = j+0.5;
-            for (unsigned i=0; i<numElemX+1; i++)
+            for (unsigned i = 0; i<numElemX+1; ++i)
             {
                 // i, j+0.5, k
                 std::pair<unsigned,unsigned> edge(lo_z_lo_y+i, lo_z_hi_y+i);
@@ -310,7 +310,7 @@ void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, u
         }
         //Add a slice of the mid-points to the edges and faces mid-way up the cube z=level
         node_pos[2] = k+0.5;
-        for (unsigned j=0; j<numElemY+1; j++)
+        for (unsigned j = 0; j<numElemY+1; ++j)
         {
             node_pos[1] = j;
             unsigned lo_z_lo_y = (numElemX+1)*((numElemY+1)*k + j);
@@ -318,7 +318,7 @@ void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, u
             unsigned hi_z_hi_y = (numElemX+1)*((numElemY+1)*(k+1) + j + 1);
 
             //The midpoints along the horizontal (y fixed) edges
-            for (unsigned i=0; i<numElemX+1; i++)
+            for (unsigned i = 0; i<numElemX+1; ++i)
             {
                 // i, j, k+0.5
                 std::pair<unsigned,unsigned> edge(lo_z_lo_y+i, hi_z_lo_y+i);
@@ -334,7 +334,7 @@ void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, u
             }
             //The midpoints and face centres between two horizontal (y-fixed) strips
             node_pos[1] = j+0.5;
-            for (unsigned i=0; i<numElemX+1; i++)
+            for (unsigned i = 0; i<numElemX+1; ++i)
             {
                 // i, j+0.5, k+0.5
                 std::pair<unsigned,unsigned> edge(lo_z_lo_y+i, hi_z_hi_y+i);
@@ -398,7 +398,7 @@ void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, u
          ++iter)
     {
         unsigned local_index1=0;
-        for (unsigned index=0; index<DIM; index++)
+        for (unsigned index = 0; index<DIM; index++)
         {
             local_index1 = (local_index1+1)%(DIM);
             unsigned local_index2 = (local_index1+1)%(DIM);

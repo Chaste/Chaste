@@ -99,7 +99,7 @@ public:
         need_initialisation = true;
 
         // Test the RHF of the mesh
-        for (unsigned i = 0; i < bidomain_problem.rGetMesh().GetNumNodes(); i++)
+        for (unsigned i = 0; i < bidomain_problem.rGetMesh().GetNumNodes(); ++i)
         {
             if (bidomain_problem.rGetMesh().GetNode(i)->GetPoint()[0] == 0.05)
             {

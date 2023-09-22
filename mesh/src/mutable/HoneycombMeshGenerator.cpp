@@ -95,9 +95,9 @@ HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsi
     (*p_node_file) << num_nodes << "\t2\t0\t1" << std::endl;
 
     unsigned node = 0;
-    for (unsigned i=0; i<num_nodes_along_length; i++)
+    for (unsigned i = 0; i<num_nodes_along_length; ++i)
     {
-        for (unsigned j=0; j<num_nodes_along_width; j++)
+        for (unsigned j = 0; j<num_nodes_along_width; ++j)
         {
             if (i<ghosts || i>=(ghosts+mNumCellLength))
             {
@@ -143,9 +143,9 @@ HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsi
 
     unsigned elem = 0;
     unsigned edge = 0;
-    for (unsigned i=0; i<num_elem_along_length; i++)
+    for (unsigned i = 0; i<num_elem_along_length; ++i)
     {
-        for (unsigned j=0; j < num_elem_along_width; j++)
+        for (unsigned j = 0; j < num_elem_along_width; ++j)
         {
             unsigned node0 =     i*num_nodes_along_width + j;
             unsigned node1 =     i*num_nodes_along_width + j+1;
@@ -186,7 +186,7 @@ HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsi
         }
     }
 
-    for (unsigned i=0; i<num_elem_along_length; i++)
+    for (unsigned i = 0; i<num_elem_along_length; ++i)
     {
         unsigned node0, node1;
 
@@ -203,7 +203,7 @@ HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsi
         (*p_edge_file) << edge++ << "\t" << node0 << "\t" << node1 << "\t" << 1 << std::endl;
     }
 
-    for (unsigned j=0; j<num_elem_along_width; j++)
+    for (unsigned j = 0; j<num_elem_along_width; ++j)
     {
         unsigned node0 = num_nodes_along_width*(num_nodes_along_length-1) + j;
         unsigned node1 = num_nodes_along_width*(num_nodes_along_length-1) + j+1;
@@ -237,7 +237,7 @@ std::vector<unsigned> HoneycombMeshGenerator::GetCellLocationIndices()
 {
     std::vector<unsigned> location_indices;
 
-    for (unsigned i=0; i<mpMesh->GetNumNodes(); i++)
+    for (unsigned i = 0; i<mpMesh->GetNumNodes(); ++i)
     {
         if (mGhostNodeIndices.find(i)==mGhostNodeIndices.end())
         {
@@ -256,7 +256,7 @@ boost::shared_ptr<MutableMesh<2,2> > HoneycombMeshGenerator::GetCircularMesh(dou
 
     // Centre the mesh at (0,0)
     c_vector<double,2> centre = zero_vector<double>(2);
-    for (unsigned i=0; i<mpMesh->GetNumNodes(); i++)
+    for (unsigned i = 0; i<mpMesh->GetNumNodes(); ++i)
     {
         centre += mpMesh->GetNode(i)->rGetLocation();
     }
@@ -265,7 +265,7 @@ boost::shared_ptr<MutableMesh<2,2> > HoneycombMeshGenerator::GetCircularMesh(dou
     mpMesh->Translate(-centre[0], -centre[1]);
 
     // Iterate over nodes, deleting any that lie more than the specified radius from (0,0)
-    for (unsigned i=0; i<mpMesh->GetNumAllNodes(); i++)
+    for (unsigned i = 0; i<mpMesh->GetNumAllNodes(); ++i)
     {
         if (norm_2(mpMesh->GetNode(i)->rGetLocation()) >= radius)
         {

@@ -106,7 +106,7 @@ public:
         mC1 = c1;
         mC2 = c2;
         mC3 = c3;
-        if (DIM==3 && fabs(c1+2*c2+c3)>1e-8)
+        if (DIM == 3 && fabs(c1+2*c2+c3)>1e-8)
         {
             EXCEPTION("c1+2*c2+c3 should be equal to zero");
         }

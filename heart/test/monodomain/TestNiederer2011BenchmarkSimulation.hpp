@@ -186,7 +186,7 @@ private:
             reader.GetVariableOverNodes(voltage, "V", timestep);
             ReplicatableVector voltage_repl(voltage);
 
-            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
             {
                 double V = voltage_repl[i];
                 if (V > 0 && activation_times[i] < 0.0)
@@ -228,7 +228,7 @@ private:
         }
         out_stream p_diag_file = handler.OpenOutputFile(output_file1.str());
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             c_vector<double, 3> position =  mesh.GetNode(i)->rGetLocation();
             c_vector<double, 3>  projected_diagonal = unit_diagonal*inner_prod(unit_diagonal, position);
@@ -251,13 +251,13 @@ private:
         output_file << "activation" << "_h" << h << "_dt" << dt << ".dat";
         out_stream p_file = handler.OpenOutputFile(output_file.str());
 
-        for (unsigned i=0; i<activation_times.size(); i++)
+        for (unsigned i=0; i<activation_times.size(); ++i)
         {
             *p_file << activation_times[i] << "\n";
         }
         p_file->close();
 
-        for (unsigned i=0; i<activation_times.size(); i++)
+        for (unsigned i=0; i<activation_times.size(); ++i)
         {
             if (activation_times[i] < 0.0)
             {

@@ -44,8 +44,14 @@ double MooneyRivlinMaterialLaw<DIM>::Get_dW_dI1(double I1, double I2)
 template<unsigned DIM>
 double MooneyRivlinMaterialLaw<DIM>::Get_dW_dI2(double I1, double I2)
 {
-    assert(DIM == 3); // LCOV_EXCL_LINE
-    return mC2;
+    if constexpr (DIM == 3)
+    {
+        return mC2;
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template<unsigned DIM>
@@ -57,15 +63,27 @@ double MooneyRivlinMaterialLaw<DIM>::Get_d2W_dI1(double I1, double I2)
 template<unsigned DIM>
 double MooneyRivlinMaterialLaw<DIM>::Get_d2W_dI2(double I1, double I2)
 {
-    assert(DIM == 3); // LCOV_EXCL_LINE
-    return 0.0;
+    if constexpr (DIM == 3)
+    {
+        return 0.0;
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template<unsigned DIM>
 double MooneyRivlinMaterialLaw<DIM>::Get_d2W_dI1I2(double I1, double I2)
 {
-    assert(DIM == 3); // LCOV_EXCL_LINE
-    return 0.0;
+    if constexpr (DIM == 3)
+    {
+        return 0.0;
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template<unsigned DIM>
@@ -77,8 +95,14 @@ double MooneyRivlinMaterialLaw<DIM>::GetC1()
 template<unsigned DIM>
 double MooneyRivlinMaterialLaw<DIM>::GetC2()
 {
-    assert(DIM == 3); // LCOV_EXCL_LINE
-    return mC2;
+    if constexpr (DIM == 3)
+    {
+        return mC2;
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template<unsigned DIM>
@@ -86,17 +110,22 @@ MooneyRivlinMaterialLaw<DIM>::MooneyRivlinMaterialLaw(double c1, double c2)
     : mC1(c1),
       mC2(c2)
 {
-    assert(DIM==2 || DIM ==3);
-
-    // If dim==3, check that c2 was passed in, ie c2 isn't the default value
-    if ((DIM==3) && (c2<MINUS_LARGE+1))
+    if constexpr (DIM == 2 || DIM == 3)
     {
-        EXCEPTION("Two parameters needed for 3d Mooney-Rivlin");
+        // If dim==3, check that c2 was passed in, ie c2 isn't the default value
+        if ((DIM == 3) && (c2<MINUS_LARGE+1))
+        {
+            EXCEPTION("Two parameters needed for 3d Mooney-Rivlin");
+        }
+
+        if (c1 < 0.0)
+        {
+            EXCEPTION("c1 must be positive in mooney-rivlin"); // is this correct?
+        }
     }
-
-    if (c1 < 0.0)
+    else
     {
-        EXCEPTION("c1 must be positive in mooney-rivlin"); // is this correct?
+        NEVER_REACHED;
     }
 }
 

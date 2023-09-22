@@ -217,7 +217,7 @@ public:
         bool invalid_2 = true;//see below
 
         TS_ASSERT_EQUALS(fine_reader.GetUnlimitedDimensionValues().size(), 101u);
-        for (unsigned i=1; i<fine_reader.GetUnlimitedDimensionValues().size(); i++)
+        for (unsigned i=1; i<fine_reader.GetUnlimitedDimensionValues().size(); ++i)
         {
             fine_reader.GetVariableOverNodes(voltage_fine, "V", i);
             fine_reader.GetVariableOverNodes(phi_e_fine, "Phi_e", i);

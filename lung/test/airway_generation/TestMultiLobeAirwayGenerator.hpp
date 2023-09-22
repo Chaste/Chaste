@@ -189,7 +189,7 @@ public:
     unsigned CountIsInsideSurface(vtkSmartPointer<vtkSelectEnclosedPoints> pointSelector, double x, double y, double z)
     {
         unsigned count = 0;
-        for (unsigned i=0; i<sNumTrials; i++)
+        for (unsigned i=0; i<sNumTrials; ++i)
         {
             count += pointSelector->IsInsideSurface(x,y,z);
         }

@@ -175,14 +175,14 @@ private:
 
             int vm_col = writer.DefineVariable("Vm","mV");
 
-            if (PROBLEM_DIM==1)
+            if (PROBLEM_DIM == 1)
             {
                 writer.EndDefineMode();
                 writer.PutUnlimitedVariable(0.0);
                 writer.PutVector(vm_col, mSolution);
             }
 
-            if (PROBLEM_DIM==2)
+            if (PROBLEM_DIM == 2)
             {
                 int phie_col = writer.DefineVariable("Phie","mV");
                 std::vector<int> variable_ids;
@@ -279,7 +279,7 @@ private:
             Hdf5DataReader reader(archive_dir, "AbstractCardiacProblem_mSolution", !FileFinder::IsAbsolutePath(archive_dir));
             reader.GetVariableOverNodes(vm, "Vm", 0);
 
-            if (PROBLEM_DIM==1)
+            if (PROBLEM_DIM == 1)
             {
                 //reader.Close(); // no need to call close explicitly, done in the destructor
 
@@ -295,7 +295,7 @@ private:
                 }
             }
 
-            if (PROBLEM_DIM==2)
+            if (PROBLEM_DIM == 2)
             {
                 reader.GetVariableOverNodes(phie, "Phie", 0);
                 //reader.Close(); // no need to call close explicitly, done in the destructor

@@ -90,7 +90,7 @@ DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::DistributedTetrahedralMesh(D
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::~DistributedTetrahedralMesh()
 {
-    for (unsigned i=0; i<this->mHaloNodes.size(); i++)
+    for (unsigned i=0; i<this->mHaloNodes.size(); ++i)
     {
         delete this->mHaloNodes[i];
     }
@@ -266,7 +266,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
             Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(global_node_index, coords, false);
 
 // Node attributes in binary format are not yet supported, see #1730
-//            for (unsigned i = 0; i < rMeshReader.GetNodeAttributes().size(); i++)
+//            for (unsigned i = 0; i < rMeshReader.GetNodeAttributes().size(); ++i)
 //            {
 //                double attribute = rMeshReader.GetNodeAttributes()[i];
 //                p_node->AddNodeAttribute(attribute);
@@ -289,7 +289,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
     {
         // Ascii : Sequentially load all the nodes and store those owned (or halo-owned) by the process
         ///\todo #1930 We should use a reader set iterator for this bit now.
-        for (unsigned node_index=0; node_index < mTotalNumNodes; node_index++)
+        for (unsigned node_index=0; node_index < mTotalNumNodes; ++node_index)
         {
             std::vector<double> coords;
             /// \todo #1289 assert the node is not considered both owned and halo-owned.
@@ -301,7 +301,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
                 RegisterNode(node_index);
                 Node<SPACE_DIM>* p_node =  new Node<SPACE_DIM>(node_index, coords, false);
 
-                for (unsigned i = 0; i < rMeshReader.GetNodeAttributes().size(); i++)
+                for (unsigned i = 0; i < rMeshReader.GetNodeAttributes().size(); ++i)
                 {
                     double attribute = rMeshReader.GetNodeAttributes()[i];
                     p_node->AddNodeAttribute(attribute);
@@ -327,7 +327,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
         unsigned global_element_index = elem_it.GetIndex();
 
         std::vector<Node<SPACE_DIM>*> nodes;
-        for (unsigned j=0; j<ELEMENT_DIM+1; j++)
+        for (unsigned j=0; j<ELEMENT_DIM+1; ++j)
         {
             // Because we have populated mNodes and mHaloNodes above, we can now use this method, which should never throw
             nodes.push_back(this->GetNodeOrHaloNode(element_data.NodeIndices[j]));
@@ -355,7 +355,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
 
             bool own = false;
 
-            for (unsigned node_index=0; node_index<node_indices.size(); node_index++)
+            for (unsigned node_index=0; node_index<node_indices.size(); ++node_index)
             {
                 // if I own this node
                 if (mNodesMapping.find(node_indices[node_index]) != mNodesMapping.end())
@@ -374,7 +374,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
             //std::set<unsigned> containing_element_indices; // Elements that contain this face
             std::vector<Node<SPACE_DIM>*> nodes;
 
-            for (unsigned node_index=0; node_index<node_indices.size(); node_index++)
+            for (unsigned node_index=0; node_index<node_indices.size(); ++node_index)
             {
                 //because we have populated mNodes and mHaloNodes above, we can now use this method,
                 //which SHOULD never throw (but it does).
@@ -390,7 +390,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
 
             // This is a boundary face
             // Ensure all its nodes are marked as boundary nodes
-            for (unsigned j=0; j<nodes.size(); j++)
+            for (unsigned j=0; j<nodes.size(); ++j)
             {
                 if (!nodes[j]->IsBoundaryNode())
                 {
@@ -516,7 +516,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetHaloNodeIndices(std:
 {
     //Make sure the output vector is empty
     rHaloIndices.clear();
-    for (unsigned i=0; i<mHaloNodes.size(); i++)
+    for (unsigned i=0; i<mHaloNodes.size(); ++i)
     {
         rHaloIndices.push_back(mHaloNodes[i]->GetIndex());
     }
@@ -552,7 +552,7 @@ bool DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateDesignatedOwne
     {
         return(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateDesignatedOwnershipOfElement(elementIndex));
     }
-    catch(Exception&)      // we don't own the element
+    catch (Exception&)      // we don't own the element
     {
         return false;
     }
@@ -565,7 +565,7 @@ bool DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateDesignatedOwne
     {
         return(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateDesignatedOwnershipOfBoundaryElement(faceIndex));
     }
-    catch(Exception&)      //  we don't own the face
+    catch (Exception&)      //  we don't own the face
     {
         return false;
     }
@@ -691,118 +691,123 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ReorderNodes()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(unsigned width)
 {
-    assert(ELEMENT_DIM == 1);     // LCOV_EXCL_LINE
-
-     //Check that there are enough nodes to make the parallelisation worthwhile
-    if (width==0)
+    if constexpr (ELEMENT_DIM == 1)
     {
-        EXCEPTION("There aren't enough nodes to make parallelisation worthwhile");
-    }
-
-    // Hook to pick up when we are using a geometric partition.
-    if (mPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
-    {
-        if (!mpSpaceRegion)
+        //Check that there are enough nodes to make the parallelisation worthwhile
+        if (width==0)
         {
-            EXCEPTION("Space region not set for GEOMETRIC partition of DistributedTetrahedralMesh");
+            EXCEPTION("There aren't enough nodes to make parallelisation worthwhile");
         }
 
-        // Write a serial file, the load on distributed processors.
-        ///\todo probably faster to make mesh from scratch.
+        // Hook to pick up when we are using a geometric partition.
+        if (mPartitioning == DistributedTetrahedralMeshPartitionType::GEOMETRIC)
         {
-            TrianglesMeshWriter<ELEMENT_DIM,SPACE_DIM> mesh_writer("", "temp_linear_mesh");
-            TetrahedralMesh<ELEMENT_DIM,SPACE_DIM> base_mesh;
-            base_mesh.ConstructLinearMesh(width);
-            mesh_writer.WriteFilesUsingMesh(base_mesh);
-        }
-        PetscTools::Barrier();
-
-        OutputFileHandler output_handler("", false);
-
-        std::string output_dir = output_handler.GetOutputDirectoryFullPath();
-        TrianglesMeshReader<ELEMENT_DIM,SPACE_DIM> mesh_reader(output_dir+"temp_linear_mesh");
-
-        this->ConstructFromMeshReader(mesh_reader);
-    }
-    else    // use a default partition.
-    {
-        //Use dumb partition so that archiving doesn't permute anything
-        mPartitioning=DistributedTetrahedralMeshPartitionType::DUMB;
-        mTotalNumNodes=width+1;
-        mTotalNumBoundaryElements=2u;
-        mTotalNumElements=width;
-
-        //Use DistributedVectorFactory to make a dumb partition of the nodes
-        assert(!this->mpDistributedVectorFactory);
-        this->mpDistributedVectorFactory = new DistributedVectorFactory(mTotalNumNodes);
-        if (this->mpDistributedVectorFactory->GetLocalOwnership() == 0)
-        {
-            // It's a short mesh and this process owns no nodes.
-            // This return cannot be covered by regular testing, but is covered by the Nightly -np 3 builder
-            return;  //LCOV_EXCL_LINE
-        }
-
-        /* am_top_most is like PetscTools::AmTopMost() but accounts for the fact that a
-         * higher numbered process may have dropped out of this construction altogether
-         * (because is has no local ownership)
-         */
-        bool am_top_most = (this->mpDistributedVectorFactory->GetHigh() == mTotalNumNodes);
-
-        unsigned lo_node=this->mpDistributedVectorFactory->GetLow();
-        unsigned hi_node=this->mpDistributedVectorFactory->GetHigh();
-        if (!PetscTools::AmMaster())
-        {
-            //Allow for a halo node
-            lo_node--;
-        }
-        if (!am_top_most)
-        {
-            //Allow for a halo node
-            hi_node++;
-        }
-        Node<SPACE_DIM>* p_old_node=nullptr;
-        for (unsigned node_index=lo_node; node_index<hi_node; node_index++)
-        {
-            // create node or halo-node
-            Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(node_index, node_index==0 || node_index==width, node_index);
-            if (node_index<this->mpDistributedVectorFactory->GetLow() ||
-                node_index==this->mpDistributedVectorFactory->GetHigh() )
+            if (!mpSpaceRegion)
             {
-                //Beyond left or right it's a halo node
-                RegisterHaloNode(node_index);
-                mHaloNodes.push_back(p_node);
+                EXCEPTION("Space region not set for GEOMETRIC partition of DistributedTetrahedralMesh");
             }
-            else
-            {
-                RegisterNode(node_index);
-                this->mNodes.push_back(p_node); // create node
 
-                //A boundary face has to be wholely owned by the process
-                //Since, when ELEMENT_DIM>1 we have *at least* boundary node as a non-halo
-                if (node_index==0) // create left boundary node and boundary element
-                {
-                    this->mBoundaryNodes.push_back(p_node);
-                    RegisterBoundaryElement(0);
-                    this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(0, p_node) );
-                }
-                if (node_index==width) // create right boundary node and boundary element
-                {
-                    this->mBoundaryNodes.push_back(p_node);
-                    RegisterBoundaryElement(1);
-                    this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(1, p_node) );
-                }
-                }
-            if (node_index>lo_node) // create element
+            // Write a serial file, the load on distributed processors.
+            ///\todo probably faster to make mesh from scratch.
             {
-                std::vector<Node<SPACE_DIM>*> nodes;
-                nodes.push_back(p_old_node);
-                nodes.push_back(p_node);
-                RegisterElement(node_index-1);
-                this->mElements.push_back(new Element<ELEMENT_DIM,SPACE_DIM>(node_index-1, nodes) );
+                TrianglesMeshWriter<ELEMENT_DIM,SPACE_DIM> mesh_writer("", "temp_linear_mesh");
+                TetrahedralMesh<ELEMENT_DIM,SPACE_DIM> base_mesh;
+                base_mesh.ConstructLinearMesh(width);
+                mesh_writer.WriteFilesUsingMesh(base_mesh);
             }
-            //Keep track of the node which we've just created
-            p_old_node=p_node;
+            PetscTools::Barrier();
+
+            OutputFileHandler output_handler("", false);
+
+            std::string output_dir = output_handler.GetOutputDirectoryFullPath();
+            TrianglesMeshReader<ELEMENT_DIM,SPACE_DIM> mesh_reader(output_dir+"temp_linear_mesh");
+
+            this->ConstructFromMeshReader(mesh_reader);
         }
+        else    // use a default partition.
+        {
+            //Use dumb partition so that archiving doesn't permute anything
+            mPartitioning=DistributedTetrahedralMeshPartitionType::DUMB;
+            mTotalNumNodes=width+1;
+            mTotalNumBoundaryElements=2u;
+            mTotalNumElements=width;
+
+            //Use DistributedVectorFactory to make a dumb partition of the nodes
+            assert(!this->mpDistributedVectorFactory);
+            this->mpDistributedVectorFactory = new DistributedVectorFactory(mTotalNumNodes);
+            if (this->mpDistributedVectorFactory->GetLocalOwnership() == 0)
+            {
+                // It's a short mesh and this process owns no nodes.
+                // This return cannot be covered by regular testing, but is covered by the Nightly -np 3 builder
+                return;  //LCOV_EXCL_LINE
+            }
+
+            /* am_top_most is like PetscTools::AmTopMost() but accounts for the fact that a
+            * higher numbered process may have dropped out of this construction altogether
+            * (because is has no local ownership)
+            */
+            bool am_top_most = (this->mpDistributedVectorFactory->GetHigh() == mTotalNumNodes);
+
+            unsigned lo_node=this->mpDistributedVectorFactory->GetLow();
+            unsigned hi_node=this->mpDistributedVectorFactory->GetHigh();
+            if (!PetscTools::AmMaster())
+            {
+                //Allow for a halo node
+                lo_node--;
+            }
+            if (!am_top_most)
+            {
+                //Allow for a halo node
+                hi_node++;
+            }
+            Node<SPACE_DIM>* p_old_node=nullptr;
+            for (unsigned node_index=lo_node; node_index<hi_node; ++node_index)
+            {
+                // create node or halo-node
+                Node<SPACE_DIM>* p_node = new Node<SPACE_DIM>(node_index, node_index==0 || node_index==width, node_index);
+                if (node_index<this->mpDistributedVectorFactory->GetLow() ||
+                    node_index==this->mpDistributedVectorFactory->GetHigh() )
+                {
+                    //Beyond left or right it's a halo node
+                    RegisterHaloNode(node_index);
+                    mHaloNodes.push_back(p_node);
+                }
+                else
+                {
+                    RegisterNode(node_index);
+                    this->mNodes.push_back(p_node); // create node
+
+                    //A boundary face has to be wholely owned by the process
+                    //Since, when ELEMENT_DIM>1 we have *at least* boundary node as a non-halo
+                    if (node_index==0) // create left boundary node and boundary element
+                    {
+                        this->mBoundaryNodes.push_back(p_node);
+                        RegisterBoundaryElement(0);
+                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(0, p_node));
+                    }
+                    if (node_index == width) // create right boundary node and boundary element
+                    {
+                        this->mBoundaryNodes.push_back(p_node);
+                        RegisterBoundaryElement(1);
+                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(1, p_node));
+                    }
+                    }
+                if (node_index>lo_node) // create element
+                {
+                    std::vector<Node<SPACE_DIM>*> nodes;
+                    nodes.push_back(p_old_node);
+                    nodes.push_back(p_node);
+                    RegisterElement(node_index-1);
+                    this->mElements.push_back(new Element<ELEMENT_DIM,SPACE_DIM>(node_index-1, nodes));
+                }
+                // Keep track of the node which we've just created
+                p_old_node = p_node;
+            }
+        }
+    }
+    else
+    {
+        NEVER_REACHED;
     }
 }
 
@@ -884,9 +889,9 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMes
             }
 
             //Construct the nodes
-            for (unsigned j=lo_y; j<hi_y; j++)
+            for (unsigned j=lo_y; j<hi_y; ++j)
             {
-                for (unsigned i=0; i<width+1; i++)
+                for (unsigned i=0; i<width+1; ++i)
                 {
                     bool is_boundary=false;
                     if (i==0 || j==0 || i==width || j==height)
@@ -918,7 +923,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMes
             //Top
             if (am_top_most)
             {
-            for (unsigned i=0; i<width; i++)
+            for (unsigned i=0; i<width; ++i)
             {
                     std::vector<Node<SPACE_DIM>*> nodes;
                     nodes.push_back(GetNodeOrHaloNode( height*(width+1)+i+1 ));
@@ -930,7 +935,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMes
             }
 
             //Right
-            for (unsigned j=lo_y+1; j<hi_y; j++)
+            for (unsigned j=lo_y+1; j<hi_y; ++j)
             {
                 std::vector<Node<SPACE_DIM>*> nodes;
                 nodes.push_back(GetNodeOrHaloNode( (width+1)*j-1 ));
@@ -943,7 +948,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMes
             //Bottom
             if (PetscTools::AmMaster())
             {
-                for (unsigned i=0; i<width; i++)
+                for (unsigned i=0; i<width; ++i)
                 {
                     std::vector<Node<SPACE_DIM>*> nodes;
                     nodes.push_back(GetNodeOrHaloNode( i ));
@@ -955,7 +960,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMes
             }
 
             //Left
-            for (unsigned j=lo_y; j<hi_y-1; j++)
+            for (unsigned j=lo_y; j<hi_y-1; ++j)
             {
                 std::vector<Node<SPACE_DIM>*> nodes;
                 nodes.push_back(GetNodeOrHaloNode( (width+1)*(j+1) ));
@@ -968,9 +973,9 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMes
 
             //Construct the elements
             unsigned elem_index;
-            for (unsigned j=lo_y; j<hi_y-1; j++)
+            for (unsigned j=lo_y; j<hi_y-1; ++j)
             {
-                for (unsigned i=0; i<width; i++)
+                for (unsigned i=0; i<width; ++i)
                 {
                     unsigned parity=(i+(height-j))%2;//Note that parity is measured from the top-left (not bottom left) for historical reasons
                     unsigned nw=(j+1)*(width+1)+i; //ne=nw+1
@@ -1095,11 +1100,11 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
 
             //Construct the nodes
             unsigned global_node_index;
-            for (unsigned k=lo_z; k<hi_z; k++)
+            for (unsigned k=lo_z; k<hi_z; ++k)
             {
-                for (unsigned j=0; j<height+1; j++)
+                for (unsigned j=0; j<height+1; ++j)
                 {
-                    for (unsigned i=0; i<width+1; i++)
+                    for (unsigned i=0; i<width+1; ++i)
                     {
                         bool is_boundary = false;
                         if (i==0 || j==0 || k==0 || i==width || j==height || k==depth)
@@ -1137,7 +1142,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
                                             {0, 4, 6, 7}, {0, 4, 5, 7}};
             std::vector<Node<SPACE_DIM>*> tetrahedra_nodes;
 
-            for (unsigned k=lo_z; k<hi_z-1; k++)
+            for (unsigned k=lo_z; k<hi_z-1; ++k)
             {
                 unsigned belem_index = 0;
                 if (k != 0)
@@ -1146,9 +1151,9 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
                     belem_index =   2*(height*width+k*2*(height+width));
                 }
 
-                for (unsigned j=0; j<height; j++)
+                for (unsigned j=0; j<height; ++j)
                 {
-                    for (unsigned i=0; i<width; i++)
+                    for (unsigned i=0; i<width; ++i)
                     {
                         // Compute the nodes' index
                         unsigned global_node_indices[8];
@@ -1292,7 +1297,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Scale(const double xFac
     //Base class scale (scales node positions)
     AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Scale(xFactor, yFactor, zFactor);
     //Scales halos
-    for (unsigned i=0; i<mHaloNodes.size(); i++)
+    for (unsigned i=0; i<mHaloNodes.size(); ++i)
     {
         c_vector<double, SPACE_DIM>& r_location = mHaloNodes[i]->rGetModifiableLocation();
         if (SPACE_DIM>=3)
@@ -1318,300 +1323,306 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
         std::vector<unsigned>& rProcessorsOffset)
 {
     assert(PetscTools::IsParallel());
-    assert(ELEMENT_DIM==2 || ELEMENT_DIM==3); // LCOV_EXCL_LINE // Metis works with triangles and tetras
 
-    const unsigned num_elements = rMeshReader.GetNumElements();
-    const unsigned num_procs = PetscTools::GetNumProcs();
-    const unsigned local_proc_index = PetscTools::GetMyRank();
-
-    /*
-     *  Work out initial element distribution
-     */
-    boost::scoped_array<idxtype> element_distribution(new idxtype[num_procs+1]);
-    boost::scoped_array<int> element_counts(new int[num_procs]);
-
-    element_distribution[0] = 0;
-
-    for (unsigned proc_index=1; proc_index<num_procs; proc_index++)
+    if constexpr (ELEMENT_DIM == 2 || ELEMENT_DIM == 3) // Metis works with triangles and tetras
     {
-        element_distribution[proc_index] = element_distribution[proc_index-1] + num_elements/num_procs;
-        element_counts[proc_index-1] = element_distribution[proc_index] - element_distribution[proc_index-1];
-    }
+        const unsigned num_elements = rMeshReader.GetNumElements();
+        const unsigned num_procs = PetscTools::GetNumProcs();
+        const unsigned local_proc_index = PetscTools::GetMyRank();
 
-    element_distribution[num_procs] = num_elements;
-    element_counts[num_procs-1] = element_distribution[num_procs] - element_distribution[num_procs-1];
+        /*
+        *  Work out initial element distribution
+        */
+        boost::scoped_array<idxtype> element_distribution(new idxtype[num_procs+1]);
+        boost::scoped_array<int> element_counts(new int[num_procs]);
 
-    /*
-     *  Create distributed mesh data structure
-     */
-    idxtype first_local_element = element_distribution[local_proc_index];
-    idxtype last_plus_one_element = element_distribution[local_proc_index+1];
-    idxtype num_local_elements = last_plus_one_element - first_local_element;
+        element_distribution[0] = 0;
 
-    boost::scoped_array<idxtype> eind(new idxtype[num_local_elements*(ELEMENT_DIM+1)]);
-    boost::scoped_array<idxtype> eptr(new idxtype[num_local_elements+1]);
-
-    if (rMeshReader.IsFileFormatBinary() && first_local_element > 0)
-    {
-        // Advance the file pointer to the first element before the ones I own.
-        rMeshReader.GetElementData(first_local_element - 1);
-    }
-    else
-    {
-        // Advance the file pointer to the first element before the ones I own.
-        for (idxtype element_index = 0; element_index < first_local_element; element_index++)
+        for (unsigned proc_index=1; proc_index<num_procs; proc_index++)
         {
-            rMeshReader.GetNextElementData();
+            element_distribution[proc_index] = element_distribution[proc_index-1] + num_elements/num_procs;
+            element_counts[proc_index-1] = element_distribution[proc_index] - element_distribution[proc_index-1];
         }
-    }
 
-    unsigned counter = 0;
-    for (idxtype element_index = 0; element_index < num_local_elements; element_index++)
-    {
-        ElementData element_data;
+        element_distribution[num_procs] = num_elements;
+        element_counts[num_procs-1] = element_distribution[num_procs] - element_distribution[num_procs-1];
 
-        element_data = rMeshReader.GetNextElementData();
+        /*
+        *  Create distributed mesh data structure
+        */
+        idxtype first_local_element = element_distribution[local_proc_index];
+        idxtype last_plus_one_element = element_distribution[local_proc_index+1];
+        idxtype num_local_elements = last_plus_one_element - first_local_element;
 
-        eptr[element_index] = counter;
-        for (unsigned i=0; i<ELEMENT_DIM+1; i++)
+        boost::scoped_array<idxtype> eind(new idxtype[num_local_elements*(ELEMENT_DIM+1)]);
+        boost::scoped_array<idxtype> eptr(new idxtype[num_local_elements+1]);
+
+        if (rMeshReader.IsFileFormatBinary() && first_local_element > 0)
         {
-            eind[counter++] = element_data.NodeIndices[i];
+            // Advance the file pointer to the first element before the ones I own.
+            rMeshReader.GetElementData(first_local_element - 1);
         }
-    }
-    eptr[num_local_elements] = counter;
-
-    rMeshReader.Reset();
-
-    idxtype numflag = 0; // METIS speak for C-style numbering
-    /* Connectivity degree.
-     * Specifically, an GRAPH EDGE is placed between any two elements if and only if they share
-     * at least this many nodes.
-     *
-     * Manual recommends "for meshes containing only triangular, tetrahedral,
-     * hexahedral, or rectangular elements, this parameter can be set to two, three, four, or two, respectively.
-     */
-    idxtype ncommonnodes = 3; //Linear tetrahedra
-    if (ELEMENT_DIM == 2)
-    {
-        ncommonnodes = 2;
-    }
-
-    MPI_Comm communicator = PETSC_COMM_WORLD;
-
-    idxtype* xadj;
-    idxtype* adjncy;
-
-    Timer::Reset();
-    ParMETIS_V3_Mesh2Dual(element_distribution.get(), eptr.get(), eind.get(),
-                          &numflag, &ncommonnodes, &xadj, &adjncy, &communicator);
-    //Timer::Print("ParMETIS Mesh2Dual");
-
-    // Be more memory efficient, and get rid of (maybe large) arrays as soon as they're no longer needed, rather than at end of scope
-    eind.reset();
-    eptr.reset();
-
-    idxtype weight_flag = 0; // unweighted graph
-    idxtype n_constraints = 1; // number of weights that each vertex has (number of balance constraints)
-    idxtype n_subdomains = PetscTools::GetNumProcs();
-    idxtype options[3]; // extra options
-    options[0] = 0; // ignore extra options
-    idxtype edgecut;
-    boost::scoped_array<real_t> tpwgts(new real_t[n_subdomains]);
-    real_t ubvec_value = (real_t)1.05;
-    for (unsigned proc=0; proc<PetscTools::GetNumProcs(); proc++)
-    {
-        tpwgts[proc] = ((real_t)1.0)/n_subdomains;
-    }
-    boost::scoped_array<idxtype> local_partition(new idxtype[num_local_elements]);
-
-/*
- *  In order to use ParMETIS_V3_PartGeomKway, we need to sort out how to compute the coordinates of the
- *  centers of each element efficiently.
- *
- *  In the meantime use ParMETIS_V3_PartKway.
- */
-//    int n_dimensions = ELEMENT_DIM;
-//    float node_coordinates[num_local_elements*SPACE_DIM];
-//
-//    ParMETIS_V3_PartGeomKway(element_distribution, xadj, adjncy, NULL, NULL, &weight_flag, &numflag,
-//                             &n_dimensions, node_coordinates, &n_constraints, &n_subdomains, NULL, NULL,
-//                             options, &edgecut, local_partition, &communicator);
-
-    Timer::Reset();
-    ParMETIS_V3_PartKway(element_distribution.get(), xadj, adjncy, nullptr, nullptr, &weight_flag, &numflag,
-                         &n_constraints, &n_subdomains, tpwgts.get(), &ubvec_value,
-                         options, &edgecut, local_partition.get(), &communicator);
-    //Timer::Print("ParMETIS PartKway");
-    tpwgts.reset();
-
-    boost::scoped_array<idxtype> global_element_partition(new idxtype[num_elements]);
-
-    //idxtype is normally int (see metis-4.0/Lib/struct.h 17-22) but is 64bit on Windows
-    MPI_Datatype mpi_idxtype = MPI_LONG_LONG_INT;
-    if (sizeof(idxtype) == sizeof(int))
-    {
-        mpi_idxtype = MPI_INT;
-    }
-    boost::scoped_array<int> int_element_distribution(new int[num_procs+1]);
-    for (unsigned i=0; i<num_procs+1; ++i)
-    {
-        int_element_distribution[i] = element_distribution[i];
-    }
-    MPI_Allgatherv(local_partition.get(), num_local_elements, mpi_idxtype,
-                   global_element_partition.get(), element_counts.get(), int_element_distribution.get(), mpi_idxtype, PETSC_COMM_WORLD);
-
-    local_partition.reset();
-
-    for (unsigned elem_index=0; elem_index<num_elements; elem_index++)
-    {
-        if (static_cast<unsigned>(global_element_partition[elem_index]) == local_proc_index)
+        else
         {
-            rElementsOwned.insert(elem_index);
-        }
-    }
-
-    rMeshReader.Reset();
-    free(xadj);
-    free(adjncy);
-
-    unsigned num_nodes = rMeshReader.GetNumNodes();
-
-    // Initialise with no nodes known
-    std::vector<unsigned> global_node_partition(num_nodes, UNASSIGNED_NODE);
-
-    assert(rProcessorsOffset.size() == 0); // Making sure the vector is empty. After calling resize() only newly created memory will be initialised to 0.
-    rProcessorsOffset.resize(PetscTools::GetNumProcs(), 0);
-
-    /*
-     *  Work out node distribution based on initial element distribution returned by ParMETIS
-     *
-     *  In this loop we handle 4 different data structures:
-     *      global_node_partition and rProcessorsOffset are global,
-     *      rNodesOwned and rHaloNodesOwned are local.
-     */
-
-    /*
-     * Note that at this point each process has to read the entire element file in order to compute
-     * the node partition form the initial element distribution.
-     *  * Previously we randomly permuted the BIN file element access order on each process so that the processes
-     *    weren't reading the same file sectors at the same time
-     *  * We noted that with large files (above about 0.5 GigaByte) on HECToR the random access file reader
-     *    was spending all its time in fseekg.  This is presumably because each fseekg from the start of the file
-     *    involves multiple levels of indirect file block pointers.
-     *  * Hence the use of random element reading is only useful for the niche of moderately large meshes with
-     *    process counts in the thousands.
-     *  Hence BIN file element permuting is deprecated - we just read the file in order.
-     *  See
-     *  https://chaste.cs.ox.ac.uk/trac/browser/trunk/mesh/src/common/DistributedTetrahedralMesh.cpp?rev=19291#L1459
-     */
-
-    for (unsigned element_number = 0; element_number < mTotalNumElements; element_number++)
-    {
-        unsigned element_owner = global_element_partition[element_number];
-
-        ElementData element_data;
-
-        element_data = rMeshReader.GetNextElementData();
-
-        for (std::vector<unsigned>::const_iterator node_it = element_data.NodeIndices.begin();
-             node_it != element_data.NodeIndices.end();
-             ++node_it)
-        {
-            /*
-             * For each node in this element, check whether it hasn't been assigned to another processor yet.
-             * If so, assign it to the owner of the element. Otherwise, consider it halo.
-             */
-            if (global_node_partition[*node_it] == UNASSIGNED_NODE)
+            // Advance the file pointer to the first element before the ones I own.
+            for (idxtype element_index = 0; element_index < first_local_element; element_index++)
             {
-                if (element_owner == local_proc_index)
-                {
-                    rNodesOwned.insert(*node_it);
-                }
-
-                global_node_partition[*node_it] = element_owner;
-
-                // Offset is defined as the first node owned by a processor. We compute it incrementally.
-                // i.e. if node_index belongs to proc 3 (of 6) we have to shift the processors 4, 5, and 6
-                // offset a position.
-                for (unsigned proc=element_owner+1; proc<PetscTools::GetNumProcs(); proc++)
-                {
-                    rProcessorsOffset[proc]++;
-                }
+                rMeshReader.GetNextElementData();
             }
-            else
+        }
+
+        unsigned counter = 0;
+        for (idxtype element_index = 0; element_index < num_local_elements; element_index++)
+        {
+            ElementData element_data;
+
+            element_data = rMeshReader.GetNextElementData();
+
+            eptr[element_index] = counter;
+            for (unsigned i=0; i<ELEMENT_DIM+1; ++i)
             {
-                if (element_owner == local_proc_index)
+                eind[counter++] = element_data.NodeIndices[i];
+            }
+        }
+        eptr[num_local_elements] = counter;
+
+        rMeshReader.Reset();
+
+        idxtype numflag = 0; // METIS speak for C-style numbering
+        /* Connectivity degree.
+        * Specifically, an GRAPH EDGE is placed between any two elements if and only if they share
+        * at least this many nodes.
+        *
+        * Manual recommends "for meshes containing only triangular, tetrahedral,
+        * hexahedral, or rectangular elements, this parameter can be set to two, three, four, or two, respectively.
+        */
+        idxtype ncommonnodes = 3; //Linear tetrahedra
+        if (ELEMENT_DIM == 2)
+        {
+            ncommonnodes = 2;
+        }
+
+        MPI_Comm communicator = PETSC_COMM_WORLD;
+
+        idxtype* xadj;
+        idxtype* adjncy;
+
+        Timer::Reset();
+        ParMETIS_V3_Mesh2Dual(element_distribution.get(), eptr.get(), eind.get(),
+                            &numflag, &ncommonnodes, &xadj, &adjncy, &communicator);
+        //Timer::Print("ParMETIS Mesh2Dual");
+
+        // Be more memory efficient, and get rid of (maybe large) arrays as soon as they're no longer needed, rather than at end of scope
+        eind.reset();
+        eptr.reset();
+
+        idxtype weight_flag = 0; // unweighted graph
+        idxtype n_constraints = 1; // number of weights that each vertex has (number of balance constraints)
+        idxtype n_subdomains = PetscTools::GetNumProcs();
+        idxtype options[3]; // extra options
+        options[0] = 0; // ignore extra options
+        idxtype edgecut;
+        boost::scoped_array<real_t> tpwgts(new real_t[n_subdomains]);
+        real_t ubvec_value = (real_t)1.05;
+        for (unsigned proc=0; proc<PetscTools::GetNumProcs(); proc++)
+        {
+            tpwgts[proc] = ((real_t)1.0)/n_subdomains;
+        }
+        boost::scoped_array<idxtype> local_partition(new idxtype[num_local_elements]);
+
+    /*
+    *  In order to use ParMETIS_V3_PartGeomKway, we need to sort out how to compute the coordinates of the
+    *  centers of each element efficiently.
+    *
+    *  In the meantime use ParMETIS_V3_PartKway.
+    */
+    //    int n_dimensions = ELEMENT_DIM;
+    //    float node_coordinates[num_local_elements*SPACE_DIM];
+    //
+    //    ParMETIS_V3_PartGeomKway(element_distribution, xadj, adjncy, NULL, NULL, &weight_flag, &numflag,
+    //                             &n_dimensions, node_coordinates, &n_constraints, &n_subdomains, NULL, NULL,
+    //                             options, &edgecut, local_partition, &communicator);
+
+        Timer::Reset();
+        ParMETIS_V3_PartKway(element_distribution.get(), xadj, adjncy, nullptr, nullptr, &weight_flag, &numflag,
+                            &n_constraints, &n_subdomains, tpwgts.get(), &ubvec_value,
+                            options, &edgecut, local_partition.get(), &communicator);
+        //Timer::Print("ParMETIS PartKway");
+        tpwgts.reset();
+
+        boost::scoped_array<idxtype> global_element_partition(new idxtype[num_elements]);
+
+        //idxtype is normally int (see metis-4.0/Lib/struct.h 17-22) but is 64bit on Windows
+        MPI_Datatype mpi_idxtype = MPI_LONG_LONG_INT;
+        if (sizeof(idxtype) == sizeof(int))
+        {
+            mpi_idxtype = MPI_INT;
+        }
+        boost::scoped_array<int> int_element_distribution(new int[num_procs+1]);
+        for (unsigned i=0; i<num_procs+1; ++i)
+        {
+            int_element_distribution[i] = element_distribution[i];
+        }
+        MPI_Allgatherv(local_partition.get(), num_local_elements, mpi_idxtype,
+                    global_element_partition.get(), element_counts.get(), int_element_distribution.get(), mpi_idxtype, PETSC_COMM_WORLD);
+
+        local_partition.reset();
+
+        for (unsigned elem_index=0; elem_index<num_elements; elem_index++)
+        {
+            if (static_cast<unsigned>(global_element_partition[elem_index]) == local_proc_index)
+            {
+                rElementsOwned.insert(elem_index);
+            }
+        }
+
+        rMeshReader.Reset();
+        free(xadj);
+        free(adjncy);
+
+        unsigned num_nodes = rMeshReader.GetNumNodes();
+
+        // Initialise with no nodes known
+        std::vector<unsigned> global_node_partition(num_nodes, UNASSIGNED_NODE);
+
+        assert(rProcessorsOffset.size() == 0); // Making sure the vector is empty. After calling resize() only newly created memory will be initialised to 0.
+        rProcessorsOffset.resize(PetscTools::GetNumProcs(), 0);
+
+        /*
+        *  Work out node distribution based on initial element distribution returned by ParMETIS
+        *
+        *  In this loop we handle 4 different data structures:
+        *      global_node_partition and rProcessorsOffset are global,
+        *      rNodesOwned and rHaloNodesOwned are local.
+        */
+
+        /*
+        * Note that at this point each process has to read the entire element file in order to compute
+        * the node partition form the initial element distribution.
+        *  * Previously we randomly permuted the BIN file element access order on each process so that the processes
+        *    weren't reading the same file sectors at the same time
+        *  * We noted that with large files (above about 0.5 GigaByte) on HECToR the random access file reader
+        *    was spending all its time in fseekg.  This is presumably because each fseekg from the start of the file
+        *    involves multiple levels of indirect file block pointers.
+        *  * Hence the use of random element reading is only useful for the niche of moderately large meshes with
+        *    process counts in the thousands.
+        *  Hence BIN file element permuting is deprecated - we just read the file in order.
+        *  See
+        *  https://chaste.cs.ox.ac.uk/trac/browser/trunk/mesh/src/common/DistributedTetrahedralMesh.cpp?rev=19291#L1459
+        */
+
+        for (unsigned element_number = 0; element_number < mTotalNumElements; element_number++)
+        {
+            unsigned element_owner = global_element_partition[element_number];
+
+            ElementData element_data;
+
+            element_data = rMeshReader.GetNextElementData();
+
+            for (std::vector<unsigned>::const_iterator node_it = element_data.NodeIndices.begin();
+                node_it != element_data.NodeIndices.end();
+                ++node_it)
+            {
+                /*
+                * For each node in this element, check whether it hasn't been assigned to another processor yet.
+                * If so, assign it to the owner of the element. Otherwise, consider it halo.
+                */
+                if (global_node_partition[*node_it] == UNASSIGNED_NODE)
                 {
-                    //if (rNodesOwned.find(*node_it) == rNodesOwned.end())
-                    if (global_node_partition[*node_it] != local_proc_index)
+                    if (element_owner == local_proc_index)
                     {
-                        rHaloNodesOwned.insert(*node_it);
+                        rNodesOwned.insert(*node_it);
+                    }
+
+                    global_node_partition[*node_it] = element_owner;
+
+                    // Offset is defined as the first node owned by a processor. We compute it incrementally.
+                    // i.e. if node_index belongs to proc 3 (of 6) we have to shift the processors 4, 5, and 6
+                    // offset a position.
+                    for (unsigned proc=element_owner+1; proc<PetscTools::GetNumProcs(); proc++)
+                    {
+                        rProcessorsOffset[proc]++;
+                    }
+                }
+                else
+                {
+                    if (element_owner == local_proc_index)
+                    {
+                        //if (rNodesOwned.find(*node_it) == rNodesOwned.end())
+                        if (global_node_partition[*node_it] != local_proc_index)
+                        {
+                            rHaloNodesOwned.insert(*node_it);
+                        }
                     }
                 }
             }
         }
-    }
 
 
-    /*
-     * Refine element distribution. Add extra elements that parMETIS didn't consider initially but
-     * include any node owned by the processor. This ensures that all the system matrix rows are
-     * assembled locally.
-     * It may be that some of these elements are in the set of owned nodes erroneously.
-     * The original set of owned elements (from the k-way partition) informed a
-     * node partition.  It may be that an element near the edge of this new node
-     * partition may no longer be needed.
-     *
-     * Note that rather than clearing the set we could remove elements to the original element partition set
-     * with erase(), if (!element_owned) below.
-     */
-    rElementsOwned.clear();
-    rMeshReader.Reset();
-    for (unsigned element_number = 0; element_number < mTotalNumElements; element_number++)
-    {
-        ElementData element_data = rMeshReader.GetNextElementData();
-
-        bool element_owned = false;
-        std::set<unsigned> temp_halo_nodes;
-
-        for (std::vector<unsigned>::const_iterator node_it = element_data.NodeIndices.begin();
-             node_it != element_data.NodeIndices.end();
-             ++node_it)
+        /*
+        * Refine element distribution. Add extra elements that parMETIS didn't consider initially but
+        * include any node owned by the processor. This ensures that all the system matrix rows are
+        * assembled locally.
+        * It may be that some of these elements are in the set of owned nodes erroneously.
+        * The original set of owned elements (from the k-way partition) informed a
+        * node partition.  It may be that an element near the edge of this new node
+        * partition may no longer be needed.
+        *
+        * Note that rather than clearing the set we could remove elements to the original element partition set
+        * with erase(), if (!element_owned) below.
+        */
+        rElementsOwned.clear();
+        rMeshReader.Reset();
+        for (unsigned element_number = 0; element_number < mTotalNumElements; element_number++)
         {
-            if (rNodesOwned.find(*node_it) != rNodesOwned.end())
+            ElementData element_data = rMeshReader.GetNextElementData();
+
+            bool element_owned = false;
+            std::set<unsigned> temp_halo_nodes;
+
+            for (std::vector<unsigned>::const_iterator node_it = element_data.NodeIndices.begin();
+                node_it != element_data.NodeIndices.end();
+                ++node_it)
             {
-                element_owned = true;
-                rElementsOwned.insert(element_number);
+                if (rNodesOwned.find(*node_it) != rNodesOwned.end())
+                {
+                    element_owned = true;
+                    rElementsOwned.insert(element_number);
+                }
+                else
+                {
+                    temp_halo_nodes.insert(*node_it);
+                }
             }
-            else
+
+            if (element_owned)
             {
-                temp_halo_nodes.insert(*node_it);
+                rHaloNodesOwned.insert(temp_halo_nodes.begin(), temp_halo_nodes.end());
             }
         }
 
-        if (element_owned)
+        rMeshReader.Reset();
+
+        /*
+        *  Once we know the offsets we can compute the permutation vector
+        */
+        std::vector<unsigned> local_index(PetscTools::GetNumProcs(), 0);
+
+        this->mNodePermutation.resize(this->GetNumNodes());
+
+        for (unsigned node_index=0; node_index<this->GetNumNodes(); ++node_index)
         {
-            rHaloNodesOwned.insert(temp_halo_nodes.begin(), temp_halo_nodes.end());
+            unsigned partition = global_node_partition[node_index];
+            assert(partition != UNASSIGNED_NODE);
+
+            this->mNodePermutation[node_index] = rProcessorsOffset[partition] + local_index[partition];
+
+            local_index[partition]++;
         }
     }
-
-    rMeshReader.Reset();
-
-    /*
-     *  Once we know the offsets we can compute the permutation vector
-     */
-    std::vector<unsigned> local_index(PetscTools::GetNumProcs(), 0);
-
-    this->mNodePermutation.resize(this->GetNumNodes());
-
-    for (unsigned node_index=0; node_index<this->GetNumNodes(); node_index++)
+    else
     {
-        unsigned partition = global_node_partition[node_index];
-        assert(partition != UNASSIGNED_NODE);
-
-        this->mNodePermutation[node_index] = rProcessorsOffset[partition] + local_index[partition];
-
-        local_index[partition]++;
+        NEVER_REACHED;
     }
 }
 
@@ -1701,13 +1712,13 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Rotate(c_matrix<double, SPACE_DIM, SPACE_DIM> rotationMatrix)
 {
     // First do the extras
-    for (unsigned i=0; i<this->mHaloNodes.size(); i++)
+    for (unsigned i=0; i<this->mHaloNodes.size(); ++i)
     {
         c_vector<double, SPACE_DIM>& r_location = this->mHaloNodes[i]->rGetModifiableLocation();
         r_location = prod(rotationMatrix, r_location);
     }
     // Now a copy of the base class implementation
-    for (unsigned i=0; i<this->mNodes.size(); i++)
+    for (unsigned i=0; i<this->mNodes.size(); ++i)
     {
         c_vector<double, SPACE_DIM>& r_location = this->mNodes[i]->rGetModifiableLocation();
         r_location = prod(rotationMatrix, r_location);
@@ -1718,13 +1729,13 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Translate(const c_vector<double, SPACE_DIM>& rDisplacement)
 {
     // First do the extras
-    for (unsigned i=0; i<this->mHaloNodes.size(); i++)
+    for (unsigned i=0; i<this->mHaloNodes.size(); ++i)
     {
         c_vector<double, SPACE_DIM>& r_location = this->mHaloNodes[i]->rGetModifiableLocation();
         r_location += rDisplacement;
     }
     // Now a copy of the base class implementation
-    for (unsigned i=0; i<this->mNodes.size(); i++)
+    for (unsigned i=0; i<this->mNodes.size(); ++i)
     {
         c_vector<double, SPACE_DIM>& r_location = this->mNodes[i]->rGetModifiableLocation();
         r_location += rDisplacement;

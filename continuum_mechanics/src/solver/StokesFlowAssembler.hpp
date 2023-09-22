@@ -120,12 +120,12 @@ private:
 
         double mu = mpProblemDefinition->GetViscosity();
 
-        for (unsigned index1=0; index1<NUM_NODES_PER_ELEMENT*DIM; index1++)
+        for (unsigned index1 = 0; index1<NUM_NODES_PER_ELEMENT*DIM; index1++)
         {
             unsigned spatial_dim1 = index1%DIM;
             unsigned node_index1 = (index1-spatial_dim1)/DIM;
 
-            for (unsigned index2=0; index2<NUM_NODES_PER_ELEMENT*DIM; index2++)
+            for (unsigned index2 = 0; index2<NUM_NODES_PER_ELEMENT*DIM; index2++)
             {
                 unsigned spatial_dim2 = index2%DIM;
                 unsigned node_index2 = (index2-spatial_dim2)/DIM;
@@ -135,7 +135,7 @@ private:
                                       * rGradQuadPhi(spatial_dim1, node_index2)
                                       * rGradQuadPhi(spatial_dim2, node_index1);
 
-                for (unsigned k=0; k<DIM; k++)
+                for (unsigned k = 0; k < DIM; ++k)
                 {
                     ret(index1,index2) +=   mu
                                           * (spatial_dim1==spatial_dim2)
@@ -175,12 +175,12 @@ private:
     {
         c_matrix<double,SPATIAL_BLOCK_SIZE_ELEMENTAL,PRESSURE_BLOCK_SIZE_ELEMENTAL> ret = zero_matrix<double>(SPATIAL_BLOCK_SIZE_ELEMENTAL,PRESSURE_BLOCK_SIZE_ELEMENTAL);
 
-        for (unsigned index1=0; index1<NUM_NODES_PER_ELEMENT*DIM; index1++)
+        for (unsigned index1 = 0; index1<NUM_NODES_PER_ELEMENT*DIM; index1++)
         {
             unsigned spatial_dim1 = index1%DIM;
             unsigned node_index1 = (index1-spatial_dim1)/DIM;
 
-            for (unsigned index2=0; index2<NUM_VERTICES_PER_ELEMENT; index2++)
+            for (unsigned index2 = 0; index2<NUM_VERTICES_PER_ELEMENT; index2++)
             {
                 ret(index1,index2) += -rGradQuadPhi(spatial_dim1, node_index1) * rLinearPhi(index2);
             }
@@ -224,7 +224,7 @@ private:
 
         c_vector<double,DIM> body_force = mpProblemDefinition->GetBodyForce(rX, 0.0);
 
-        for (unsigned index=0; index<NUM_NODES_PER_ELEMENT*DIM; index++)
+        for (unsigned index = 0; index<NUM_NODES_PER_ELEMENT*DIM; index++)
         {
             unsigned spatial_dim = index%DIM;
             unsigned node_index = (index-spatial_dim)/DIM;

@@ -213,11 +213,11 @@ private:
     void runTestSimpleCoupledNonlinearPde()
     {
         std::string file;
-        if (DIM==1)
+        if (DIM == 1)
         {
             file = "mesh/test/data/1D_0_to_1_10_elements";
         }
-        else if (DIM==2)
+        else if (DIM == 2)
         {
             file = "mesh/test/data/disk_522_elements";
         }

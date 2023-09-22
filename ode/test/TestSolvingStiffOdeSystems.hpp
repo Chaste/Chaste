@@ -69,7 +69,7 @@ public:
         ode_solution = rk4_solver.Solve(&ode_system, ode_state_variables, 0.0, 0.01, 0.001, 0.001);
 
         int last = ode_solution.GetNumberOfTimeSteps();
-        for (int i=0; i<=last; i++)
+        for (int i = 0; i <= last; ++i)
         {
             double x = ode_solution.rGetSolutions()[i][0];
             TS_ASSERT_LESS_THAN(x, 9.7e3);
@@ -82,7 +82,7 @@ public:
         ode_solution2 = backward_euler_solver.Solve(&ode_system, ode_state_variables2, 0.0, 0.1, 0.001, 0.001);
 
         last = ode_solution2.GetNumberOfTimeSteps();
-        for (int i=0; i<=last; i++)
+        for (int i = 0; i <= last; ++i)
         {
             double x = ode_solution2.rGetSolutions()[i][0];
             TS_ASSERT_LESS_THAN(x, 9.7e3);

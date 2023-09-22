@@ -962,7 +962,7 @@ public:
         generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Set some model parameters for the cell-cycle model
-        for (unsigned index=0; index < cells.size(); ++index)
+        for (unsigned index = 0; index < cells.size(); ++index)
         {
             static_cast<FixedG1GenerationalCellCycleModel*>(cells[index]->GetCellCycleModel())->SetTransitCellG1Duration(8.0);
             static_cast<FixedG1GenerationalCellCycleModel*>(cells[index]->GetCellCycleModel())->SetStemCellG1Duration(8.0);

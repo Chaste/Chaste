@@ -247,9 +247,9 @@ OdeSolution AbstractBackwardEulerCardiacCell<SIZE>::Compute(double tStart, doubl
 
     // Loop over time
     double curr_time = tStart;
-    for (unsigned i=0; i<n_steps; i++)
+    for (unsigned i = 0; i<n_steps; ++i)
     {
-        for (unsigned j=0; j<n_small_steps; j++)
+        for (unsigned j = 0; j<n_small_steps; ++j)
         {
             curr_time = tStart + i*tSamp + j*mDt;
 
@@ -283,7 +283,7 @@ void AbstractBackwardEulerCardiacCell<SIZE>::ComputeExceptVoltage(double tStart,
 
     // Loop over time
     double curr_time;
-    for (unsigned i=0; i<n_steps; i++)
+    for (unsigned i = 0; i<n_steps; ++i)
     {
         curr_time = tStart + i*mDt;
 
@@ -406,9 +406,9 @@ public:
 
         // Loop over time
         double curr_time = tStart;
-        for (unsigned i=0; i<n_steps; i++)
+        for (unsigned i = 0; i<n_steps; ++i)
         {
-            for (unsigned j=0; j<n_small_steps; j++)
+            for (unsigned j = 0; j<n_small_steps; ++j)
             {
                 curr_time = tStart + i*tSamp + j*mDt;
 
@@ -450,7 +450,7 @@ public:
 
         // Loop over time
         double curr_time;
-        for (unsigned i=0; i<n_steps; i++)
+        for (unsigned i = 0; i<n_steps; ++i)
         {
             curr_time = tStart + i*mDt;
 
@@ -547,15 +547,15 @@ void DumpJacobianToFile(double time, const double rCurrentGuess[SIZE], double rJ
     }
     (*p_file) << std::endl;
     (*p_file) << "rCurrentGuess";
-    for (unsigned i=0; i<SIZE; i++)
+    for (unsigned i = 0; i<SIZE; ++i)
     {
         (*p_file) << " " << rCurrentGuess[i];
     }
     (*p_file) << std::endl;
     (*p_file) << "rJacobian";
-    for (unsigned i=0; i<SIZE; i++)
+    for (unsigned i = 0; i<SIZE; ++i)
     {
-        for (unsigned j=0; j<SIZE; j++)
+        for (unsigned j = 0; j<SIZE; ++j)
         {
             (*p_file) << " " << rJacobian[i][j];
         }

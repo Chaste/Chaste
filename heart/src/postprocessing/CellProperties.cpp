@@ -88,7 +88,7 @@ void CellProperties::CalculateProperties()
     double voltage_derivative;
     const double resting_potential_gradient_threshold = 1e-2; /// \todo #1495 a horrible magic number but seems to work OK.
 
-    for (unsigned i = 1; i <= time_steps; i++)
+    for (unsigned i = 1; i <= time_steps; ++i)
     {
         v = mrVoltage[i];
         t = mrTime[i];
@@ -325,7 +325,7 @@ std::vector<double> CellProperties::GetActionPotentialAmplitudes()
     CheckExceededThreshold();
     unsigned size = mPeakValues.size();
     std::vector<double> amplitudes(size);
-    for (unsigned i = 0; i < size; i++)
+    for (unsigned i = 0; i < size; ++i)
     {
         amplitudes[i] = (mPeakValues[i] - mRestingValues[i]);
     }

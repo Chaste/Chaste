@@ -79,7 +79,7 @@ void FibreReader<DIM>::GetAllAxi(std::vector< c_vector<double, DIM> >& direction
         EXCEPTION("Use GetAllOrtho when reading orthotropic fibres");
     }
     direction.reserve(mNumLinesOfData);
-    for (unsigned i=0; i<mNumLinesOfData; i++)
+    for (unsigned i=0; i<mNumLinesOfData; ++i)
     {
         c_vector<double, DIM> temp_vector;
         GetFibreVector(i, temp_vector, false);
@@ -99,7 +99,7 @@ void FibreReader<DIM>::GetAllOrtho(std::vector< c_vector<double, DIM> >& first_d
     {
         EXCEPTION("Use GetAllAxi when reading axisymmetric fibres");
     }
-    for (unsigned i=0; i<mNumLinesOfData; i++)
+    for (unsigned i=0; i<mNumLinesOfData; ++i)
     {
         c_matrix<double, DIM, DIM> temp_matrix;
         GetFibreSheetAndNormalMatrix(i, temp_matrix, true);
@@ -108,12 +108,12 @@ void FibreReader<DIM>::GetAllOrtho(std::vector< c_vector<double, DIM> >& first_d
         //for convenience it is stored column-wise.
         matrix_column<c_matrix<double, DIM, DIM> > col0(temp_matrix, 0);
         first_direction.push_back(col0);
-        if (DIM>=2)
+        if (DIM >= 2)
         {
             matrix_column<c_matrix<double, DIM, DIM> > col1(temp_matrix, 1);
             second_direction.push_back(col1);
         }
-        if (DIM==3)
+        if (DIM == 3)
         {
             matrix_column<c_matrix<double, DIM, DIM> > col2(temp_matrix, 2);
             third_direction.push_back(col2);
@@ -157,9 +157,9 @@ void FibreReader<DIM>::GetFibreSheetAndNormalMatrix(unsigned fibreIndex,
             EXCEPTION("A line is incomplete in " << mFilePath
                           << " - each line should contain " << DIM*DIM << " entries");
         }
-        for (unsigned i=0; i<DIM; i++)
+        for (unsigned i = 0; i < DIM; ++i)
         {
-            for (unsigned j=0; j<DIM; j++)
+            for (unsigned j = 0; j < DIM; ++j)
             {
                 rFibreMatrix(i,j) = mTokens[DIM*i + j];
             }
@@ -176,9 +176,9 @@ void FibreReader<DIM>::GetFibreSheetAndNormalMatrix(unsigned fibreIndex,
         temp = prod(trans(rFibreMatrix), rFibreMatrix);
 
         // Check temp is equal to the identity
-        for (unsigned i=0; i<DIM; i++)
+        for (unsigned i = 0; i < DIM; ++i)
         {
-            for (unsigned j=0; j<DIM; j++)
+            for (unsigned j = 0; j < DIM; ++j)
             {
                 double val = (i==j ? 1.0 : 0.0);
 
@@ -228,7 +228,7 @@ void FibreReader<DIM>::GetFibreVector(unsigned fibreIndex,
             EXCEPTION("A line is incomplete in " << mFilePath
                           << " - each line should contain " << DIM << " entries");
         }
-        for (unsigned i=0; i<DIM; i++)
+        for (unsigned i = 0; i < DIM; ++i)
         {
             rFibreVector(i) = mTokens[i];
         }

@@ -128,9 +128,9 @@ public:
         c_matrix<double,18,18> exact_A = zero_matrix<double>(18);
 
         // The diagonal 6x6 blocks
-        for (unsigned i=0; i<6; i++)
+        for (unsigned i=0; i<6; ++i)
         {
-            for (unsigned j=0; j<6; j++)
+            for (unsigned j=0; j<6; ++j)
             {
                 exact_A(3*i,  3*j)   = mu*A[i][j];
                 exact_A(3*i+1,3*j+1) = mu*A[i][j];
@@ -139,9 +139,9 @@ public:
 
 
         // The 6x3 Blocks
-        for (unsigned i=0; i<6; i++)
+        for (unsigned i=0; i<6; ++i)
         {
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j=0; j<3; ++j)
             {
                 exact_A(3*i,3*j+2)   = -Bx[i][j];
                 exact_A(3*i+1,3*j+2) = -By[i][j];
@@ -155,7 +155,7 @@ public:
         MatGetOwnershipRange(mat, &lo, &hi);
         for (unsigned i = lo; i < static_cast<unsigned>(hi); ++i)
         {
-            for (unsigned j=0; j<18; j++)
+            for (unsigned j=0; j<18; ++j)
             {
                 TS_ASSERT_DELTA(PetscMatTools::GetElement(mat,i,j), exact_A(i,j), 1e-9);
             }
@@ -166,7 +166,7 @@ public:
         // For these nodes, it can be shown that the integral of the corresponding
         // basis function is zero, i.e. \intgl_{canonical element} \phi_i dV = 0.0  for i=0,1,2, phi_i the
         // i-th QUADRATIC basis.
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i=0; i<3; ++i)
         {
             TS_ASSERT_DELTA(vec_repl[3*i],   g1*0.0, 1e-8);
             TS_ASSERT_DELTA(vec_repl[3*i+1], g2*0.0, 1e-8);
@@ -176,7 +176,7 @@ public:
         // For these nodes, it can be shown that the integral of the corresponding
         // basis function is 1/6, i.e. \intgl_{canonical element} \phi_i dV = 1/6  for i=3,4,5, phi_i the
         // i-th QUADRATIC basis.
-        for (unsigned i=3; i<6; i++)
+        for (unsigned i=3; i<6; ++i)
         {
             TS_ASSERT_DELTA(vec_repl[3*i],   g1/6.0, 1e-8);
             TS_ASSERT_DELTA(vec_repl[3*i+1], g2/6.0, 1e-8);
@@ -202,7 +202,7 @@ public:
         assembler.Assemble();
 
         ReplicatableVector vec_repl2(vec2);
-        for (unsigned i=3; i<6; i++)
+        for (unsigned i=3; i<6; ++i)
         {
             TS_ASSERT_DELTA(vec_repl2[3*i],   10.0/6.0, 1e-8);
             TS_ASSERT_DELTA(vec_repl2[3*i+1], 20.0/6.0, 1e-8);

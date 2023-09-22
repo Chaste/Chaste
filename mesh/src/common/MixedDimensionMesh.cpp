@@ -45,7 +45,7 @@ MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::MixedDimensionMesh(DistributedTetrah
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::~MixedDimensionMesh()
 {
-    for (unsigned i=0; i<mCableElements.size(); i++)
+    for (unsigned i=0; i<mCableElements.size(); ++i)
     {
         delete mCableElements[i];
     }
@@ -68,7 +68,7 @@ void MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(Abstrac
         //Convert the node indices from the original to the permuted
         if (!this->mNodePermutation.empty())
         {
-            for (unsigned j=0; j<2; j++) // cables are always 1d
+            for (unsigned j=0; j<2; ++j) // cables are always 1d
             {
                 element_data.NodeIndices[j] = this->mNodePermutation[ element_data.NodeIndices[j] ];
             }
@@ -76,7 +76,7 @@ void MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(Abstrac
 
         //Determine if we own any nodes on this cable element
         bool node_owned = false;
-        for (unsigned j=0; j<2; j++) // cables are always 1d
+        for (unsigned j=0; j<2; ++j) // cables are always 1d
         {
             try
             {
@@ -96,7 +96,7 @@ void MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(Abstrac
             std::vector<Node<SPACE_DIM>*> nodes;
             nodes.reserve(2u);
 
-            for (unsigned j=0; j<2; j++) // cables are always 1d
+            for (unsigned j=0; j<2; ++j) // cables are always 1d
             {
                 //Note that if we own one node on a cable element then we are likely to own the other.
                 //If not, we are likely to have a halo.

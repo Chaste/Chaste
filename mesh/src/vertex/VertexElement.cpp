@@ -76,9 +76,9 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
 
     // Make a set of nodes with mFaces
     std::set<Node<SPACE_DIM>* > nodes_set;
-    for (unsigned face_index=0; face_index<mFaces.size(); face_index++)
+    for (unsigned face_index = 0; face_index < mFaces.size(); ++face_index)
     {
-        for (unsigned node_index=0; node_index<mFaces[face_index]->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < mFaces[face_index]->GetNumNodes(); ++node_index)
         {
             nodes_set.insert(mFaces[face_index]->GetNode(node_index));
         }

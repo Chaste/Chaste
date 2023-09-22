@@ -232,7 +232,7 @@ public:
             = ppc_fs.CalculateAllActionPotentialDurationsForNodeRange(90, 1u, 7u, -30.0);
 
         TS_ASSERT_EQUALS(all_aps_for_node_range.size(), 6u);
-        for (unsigned i=0; i<all_aps_for_node_range.size(); i++)
+        for (unsigned i=0; i<all_aps_for_node_range.size(); ++i)
         {
             TS_ASSERT_EQUALS(all_aps_for_node_range[i].size(), 1u);
             //std::cout << "Node " << i+1 << ", APD = " << all_aps_for_node_range[i][0] << "\n";

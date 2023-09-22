@@ -144,7 +144,7 @@ public:
 
         // hack into the mechanics solver and set up the current solution so that it corresponds to
         // the square of tissue being stretched - see comment below
-        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mechanics_mesh.GetNumNodes(); ++i)
         {
             double X = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double Y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
@@ -164,7 +164,7 @@ public:
         double default_conductivity = conductivities(0);
 
         // test directly that the conductivity hasn't been modified
-        for (unsigned i=0; i<electrics_mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i<electrics_mesh.GetNumElements(); ++i)
         {
             const c_matrix<double,2,2>& r_tensor = problem.mpElectricsProblem->GetTissue()->rGetIntracellularConductivityTensor(i);
             TS_ASSERT_DELTA(r_tensor(0,0), default_conductivity, 1e-9);
@@ -193,7 +193,7 @@ public:
         ReplicatableVector start_voltage_repl(start_voltage);
         ReplicatableVector end_voltage_repl(end_voltage);
 
-        for (unsigned i=0; i<start_voltage_repl.GetSize(); i++)
+        for (unsigned i = 0; i<start_voltage_repl.GetSize(); ++i)
         {
             TS_ASSERT_LESS_THAN(start_voltage_repl[i], -90.0);
             TS_ASSERT_LESS_THAN(-90, end_voltage_repl[i]);
@@ -245,7 +245,7 @@ public:
 
         // hack into the mechanics solver and set up the current solution so that it corresponds to
         // the some stretch in the upper element
-        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mechanics_mesh.GetNumNodes(); ++i)
         {
             double X = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double Y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
@@ -272,7 +272,7 @@ public:
         double default_conductivity = conductivities(0);
 
         // test directly that the conductivity is being computed using the deformation
-        for (unsigned i=0; i<electrics_mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i<electrics_mesh.GetNumElements(); ++i)
         {
             // sigma = F^{-1} sigma_undef F^{-T},
             const c_matrix<double,2,2>& r_tensor = problem.mpElectricsProblem->GetTissue()->rGetIntracellularConductivityTensor(i);
@@ -305,7 +305,7 @@ public:
     {
         unsigned num_stimulated_nodes[2];
 
-        for (unsigned sim=0; sim<2; sim++)
+        for (unsigned sim = 0; sim<2; sim++)
         {
             PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 
@@ -321,7 +321,7 @@ public:
             std::vector<unsigned> fixed_nodes;
             std::vector<c_vector<double,2> > fixed_node_locations;
 
-            for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+            for (unsigned i = 0; i<mechanics_mesh.GetNumNodes(); ++i)
             {
                 double X = mechanics_mesh.GetNode(i)->rGetLocation()[0];
                 double Y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
@@ -367,7 +367,7 @@ public:
 
             // hack into the mechanics solver and set up the solution to be true solution
             // because the solution is quite far from the initial guess.
-            for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+            for (unsigned i = 0; i<mechanics_mesh.GetNumNodes(); ++i)
             {
                 double X = mechanics_mesh.GetNode(i)->rGetLocation()[0];
                 double Y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
@@ -386,7 +386,7 @@ public:
             ReplicatableVector voltage_repl(voltage);
 
             num_stimulated_nodes[sim] = 0;
-            for (unsigned i=0; i<voltage_repl.GetSize(); i++)
+            for (unsigned i = 0; i<voltage_repl.GetSize(); ++i)
             {
                 if (voltage_repl[i]>0.0)
                 {

@@ -50,20 +50,27 @@ BoundaryElement<ELEMENT_DIM, SPACE_DIM>::BoundaryElement(unsigned index, const s
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-BoundaryElement<ELEMENT_DIM, SPACE_DIM>::BoundaryElement(unsigned index, Node<SPACE_DIM>* pNode)
+BoundaryElement<ELEMENT_DIM, SPACE_DIM>::BoundaryElement(
+    unsigned index,
+    Node<SPACE_DIM>* pNode)
     : AbstractTetrahedralElement<ELEMENT_DIM,SPACE_DIM>(index)
 {
-    assert(ELEMENT_DIM == 0);     // LCOV_EXCL_LINE
-
-    // Store Node pointer
-    this->mNodes.push_back(pNode);
-    RegisterWithNodes();
+    if constexpr (ELEMENT_DIM == 0)
+    {
+        // Store Node pointer
+        this->mNodes.push_back(pNode);
+        RegisterWithNodes();
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void BoundaryElement<ELEMENT_DIM, SPACE_DIM>::RegisterWithNodes()
 {
-    for (unsigned i=0; i<this->mNodes.size(); i++)
+    for (unsigned i=0; i<this->mNodes.size(); ++i)
     {
         this->mNodes[i]->AddBoundaryElement(this->mIndex);
     }
@@ -72,7 +79,7 @@ void BoundaryElement<ELEMENT_DIM, SPACE_DIM>::RegisterWithNodes()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void BoundaryElement<ELEMENT_DIM, SPACE_DIM>::ResetIndex(unsigned index)
 {
-    for (unsigned i=0; i<this->GetNumNodes(); i++)
+    for (unsigned i=0; i<this->GetNumNodes(); ++i)
     {
         this->mNodes[i]->RemoveBoundaryElement(this->mIndex);
     }
@@ -86,7 +93,7 @@ void BoundaryElement<ELEMENT_DIM, SPACE_DIM>::MarkAsDeleted()
     this->mIsDeleted = true;
 //        this->mJacobianDeterminant = 0.0;
     // Update nodes in this element so they know they are not contained by us
-    for (unsigned i=0; i<this->GetNumNodes(); i++)
+    for (unsigned i=0; i<this->GetNumNodes(); ++i)
     {
         this->mNodes[i]->RemoveBoundaryElement(this->mIndex);
     }

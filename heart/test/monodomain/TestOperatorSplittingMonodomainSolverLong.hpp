@@ -139,7 +139,7 @@ public:
 
         bool some_node_depolarised = false;
         assert(final_voltage_normal.GetSize()==final_voltage_operator_splitting.GetSize());
-        for (unsigned j=0; j<final_voltage_normal.GetSize(); j++)
+        for (unsigned j=0; j<final_voltage_normal.GetSize(); ++j)
         {
             double tol = 4.7;
 

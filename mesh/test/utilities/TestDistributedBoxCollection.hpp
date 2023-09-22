@@ -62,7 +62,7 @@ private:
 
         // Construct a 3(x3(x3)) DistributedBoxCollection
         c_vector<double, 2*DIM> domain_size;
-        for (unsigned i=0; i<DIM; i++)
+        for (unsigned i = 0; i < DIM; ++i)
         {
             domain_size[2*i] = 0.0;
             domain_size[2*i+1] = 3.0;
@@ -74,7 +74,7 @@ private:
 
 
         // Put a node in each local box.
-        for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
+        for (unsigned i = 0; i<box_collection.GetNumBoxes(); ++i)
         {
             if (box_collection.IsBoxOwned(i))
             {
@@ -100,7 +100,7 @@ private:
         }
 
         // Tidy up.
-        for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
+        for (unsigned i = 0; i<box_collection.GetNumBoxes(); ++i)
         {
             if (box_collection.IsBoxOwned(i))
             {
@@ -124,7 +124,7 @@ private:
 
         // Construct a 3(x3(x3)) DistributedBoxCollection
         c_vector<double, 2*DIM> domain_size;
-        for (unsigned i=0; i<DIM; i++)
+        for (unsigned i = 0; i < DIM; ++i)
         {
             domain_size[2*i] = 0.0;
             domain_size[2*i+1] = 3.0;
@@ -136,7 +136,7 @@ private:
 
         // Work out how many rows of boxes I have.
         std::vector<unsigned> stacks_vector;
-        for (unsigned i=0;i<3;i++)
+        for (unsigned i=0;i<3;++i)
         {
             stacks_vector.push_back(i);
         }
@@ -178,7 +178,7 @@ private:
             for (unsigned i = 0; i < static_cast<unsigned>(pow(3.0,(double)DIM-1)); /*Increment later*/)
             {
                 c_vector<unsigned, DIM> box_coords;
-                for (int d=0; d< (int)DIM-1; d++)
+                for (int d = 0; d < static_cast<int>(DIM)-1; d++)
                 {
                     box_coords[d] = dimension_counters[d];
                 }
@@ -186,7 +186,7 @@ private:
 
                 // Increment counters.
                 i++;
-                for (int var = 0; var < (int)DIM-1; var++)
+                for (int var = 0; var < static_cast<int>(DIM)-1; var++)
                 {
                   if (i % static_cast<unsigned>(pow(3.0, (double)var)) == 0)
                   {
@@ -204,7 +204,7 @@ private:
             for (unsigned i = 0; i < static_cast<unsigned>(pow(3.0,(double)DIM-1)); /*Increment later*/)
             {
                 c_vector<unsigned, DIM> box_coords;
-                for (int d=0; d< (int)DIM-1; d++)
+                for (int d = 0; d < static_cast<int>(DIM) - 1; d++)
                 {
                     box_coords[d] = dimension_counters[d];
                 }
@@ -212,7 +212,7 @@ private:
 
                 // Increment counters.
                 i++;
-                for (int var = 0; var < (int)DIM-1; var++)
+                for (int var = 0; var < static_cast<int>(DIM) - 1; var++)
                 {
                   if (i % static_cast<unsigned>(pow(3.0, (double)var)) == 0)
                   {
@@ -272,7 +272,7 @@ public:
 
         box_collection.SetupAllLocalBoxes();
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             unsigned box_index = box_collection.CalculateContainingBox(mesh.GetNode(i));
             if (box_collection.IsBoxOwned(box_index))
@@ -291,7 +291,7 @@ public:
 
         // Make sure the default number of rows are set for each process.
         std::vector<unsigned> rows_vector;
-        for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
+        for (unsigned i = 0; i<box_collection.GetNumBoxes(); ++i)
         {
             rows_vector.push_back(i);
         }
@@ -345,7 +345,7 @@ public:
         if (PetscTools::IsSequential())
         {
             // In serial everything is an interior box.
-            for (unsigned i=0; i<5u; i++)
+            for (unsigned i = 0; i<5u; ++i)
             {
                 TS_ASSERT_EQUALS(box_collection.IsInteriorBox(i), true);
             }
@@ -353,7 +353,7 @@ public:
         else
         {
             TS_ASSERT_EQUALS(box_collection.IsInteriorBox(lo), false);
-            for (int i=lo+1; i<hi-2; i++)
+            for (int i=lo+1; i<hi-2; ++i)
             {
                 TS_ASSERT_EQUALS(box_collection.IsInteriorBox(i), true);
             }
@@ -1253,7 +1253,7 @@ public:
                         if ( pairs_returned_vector.size() != 1 )
                         {
                             printf("For node locations (%f,%f) and (%f,%f) on process %i, no pair found. Will be in boxes %i and %i\n",
-                                        node_a_location[0],node_a_location[1],node_b_location[0],node_b_location[1], (int)PetscTools::GetMyRank(),
+                                        node_a_location[0],node_a_location[1],node_b_location[0],node_b_location[1], static_cast<int>(PetscTools::GetMyRank()),
                                         box_collection.CalculateContainingBox(node_a_location), box_collection.CalculateContainingBox(node_b_location));
                         }
                         TS_ASSERT(pairs_returned_vector.size() == 1);
@@ -1314,7 +1314,7 @@ public:
         points[4] = new ChastePoint<1>(6.9);
 
         std::vector<Node<1>* > nodes;
-        for (unsigned i=0; i<points.size(); i++)
+        for (unsigned i = 0; i<points.size(); ++i)
         {
             nodes.push_back(new Node<1>(i, *(points[i]), false));
         }
@@ -1330,7 +1330,7 @@ public:
         box_collection.SetupLocalBoxesHalfOnly();
         TS_ASSERT_THROWS_THIS(box_collection.SetupLocalBoxesHalfOnly(), "Local Boxes Are Already Set");
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             unsigned box_index = box_collection.CalculateContainingBox(nodes[i]);
             if (box_collection.IsBoxOwned(box_index))
@@ -1346,7 +1346,7 @@ public:
         box_collection.CalculateNodePairs(nodes,pairs_returned_vector);
 
         std::set< std::pair<Node<1>*, Node<1>* > > pairs_returned;
-        for (unsigned i=0; i<pairs_returned_vector.size(); i++)
+        for (unsigned i = 0; i<pairs_returned_vector.size(); ++i)
         {
             pairs_returned.insert(pairs_returned_vector[i]);
         }
@@ -1366,7 +1366,7 @@ public:
                 neighbours_should_be[3].insert(2);
                 neighbours_should_be[4] = std::set<unsigned>();
 
-                for (unsigned i=0; i<nodes.size(); i++)
+                for (unsigned i = 0; i<nodes.size(); ++i)
                 {
                     std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
                     TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
@@ -1401,7 +1401,7 @@ public:
 
                         unsigned nodes_on_this_process[4] = {0,1,2,3};
 
-                        for (unsigned i=0; i<4; i++)
+                        for (unsigned i = 0; i<4; ++i)
                         {
                             unsigned node_index = nodes_on_this_process[i];
                             std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
@@ -1424,7 +1424,7 @@ public:
 
                         unsigned nodes_on_this_process[1] = {4};
 
-                        for (unsigned i=0; i<1; i++)
+                        for (unsigned i = 0; i<1; ++i)
                         {
                             unsigned node_index = nodes_on_this_process[i];
                             std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
@@ -1463,7 +1463,7 @@ public:
 
                         unsigned nodes_on_this_process[4] = {0,1,2,3};
 
-                        for (unsigned i=0; i<4; i++)
+                        for (unsigned i = 0; i<4; ++i)
                         {
                             unsigned node_index = nodes_on_this_process[i];
                             std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
@@ -1493,7 +1493,7 @@ public:
 
                         unsigned nodes_on_this_process[1] = {4};
 
-                        for (unsigned i=0; i<1; i++)
+                        for (unsigned i = 0; i<1; ++i)
                         {
                             unsigned node_index = nodes_on_this_process[i];
                             std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
@@ -1521,7 +1521,7 @@ public:
         }
 
         // Tidy up.
-        for (unsigned i=0; i<points.size(); i++)
+        for (unsigned i = 0; i<points.size(); ++i)
         {
             delete nodes[i];
             delete points[i];
@@ -1552,7 +1552,7 @@ public:
 
         box_collection.SetupLocalBoxesHalfOnly();
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             unsigned box_index = box_collection.CalculateContainingBox(mesh.GetNode(i));
             if (box_collection.IsBoxOwned(box_index))
@@ -1609,7 +1609,7 @@ public:
         if (PetscTools::IsSequential())
         {
             // In serial everything is an interior box.
-            for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
+            for (unsigned i = 0; i<box_collection.GetNumBoxes(); ++i)
             {
                 TS_ASSERT_EQUALS(box_collection.IsInteriorBox(i), true);
             }
@@ -1685,7 +1685,7 @@ public:
         points[9] = new ChastePoint<2>(3.3, 3.6);
 
         std::vector<Node<2>* > nodes;
-        for (unsigned i=0; i<points.size(); i++)
+        for (unsigned i = 0; i<points.size(); ++i)
         {
             nodes.push_back(new Node<2>(i, *(points[i]), false));
         }
@@ -1701,7 +1701,7 @@ public:
         DistributedBoxCollection<2> box_collection(cut_off_length, domain_size);
         box_collection.SetupLocalBoxesHalfOnly();
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             unsigned box_index = box_collection.CalculateContainingBox(nodes[i]);
             if (box_collection.IsBoxOwned(box_index))
@@ -1719,7 +1719,7 @@ public:
 
         // Put these into a set as they are easier to compare as they are ordered
         std::set< std::pair<Node<2>*, Node<2>* > > pairs_returned;
-        for (unsigned i=0; i<pairs_returned_vector.size(); i++)
+        for (unsigned i = 0; i<pairs_returned_vector.size(); ++i)
         {
             pairs_returned.insert(pairs_returned_vector[i]);
         }
@@ -1769,7 +1769,7 @@ public:
                 neighbours_should_be[8].insert(7);
                 neighbours_should_be[9] = std::set<unsigned>();
 
-                for (unsigned i=0; i<nodes.size(); i++)
+                for (unsigned i = 0; i<nodes.size(); ++i)
                 {
                     std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
                     TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
@@ -1845,7 +1845,7 @@ public:
 
                         unsigned nodes_on_this_process[7] = {2,3,4,5,6,7,8};
 
-                        for (unsigned i=0; i<7; i++)
+                        for (unsigned i = 0; i<7; ++i)
                         {
                             unsigned node_index = nodes_on_this_process[i];
                             std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
@@ -1890,7 +1890,7 @@ public:
 
                         unsigned nodes_on_this_process[2] = {0,1};
 
-                        for (unsigned i=0; i<2; i++)
+                        for (unsigned i = 0; i<2; ++i)
                         {
                             unsigned node_index = nodes_on_this_process[i];
                             std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
@@ -1954,7 +1954,8 @@ public:
 
                         unsigned nodes_on_this_process[7] = {2,3,4,5,6,7,8};
 
-                        for (unsigned i=0; i<7; i++)
+                        for (unsigned i
+                        ; i<7; ++i)
                         {
                             unsigned node_index = nodes_on_this_process[i];
                             std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
@@ -2002,7 +2003,7 @@ public:
 
                         unsigned nodes_on_this_process[2] = {0,1};
 
-                        for (unsigned i=0; i<2; i++)
+                        for (unsigned i = 0; i<2; ++i)
                         {
                             unsigned node_index = nodes_on_this_process[i];
                             std::vector<unsigned> expected(neighbours_should_be[node_index].begin(),
@@ -2031,7 +2032,7 @@ public:
         // Check we empty boxes correctly
         box_collection.EmptyBoxes();
 
-        for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
+        for (unsigned i = 0; i<box_collection.GetNumBoxes(); ++i)
         {
             if (box_collection.IsBoxOwned(i) )
             {
@@ -2039,7 +2040,7 @@ public:
             }
         }
 
-        for (unsigned i=0; i<points.size(); i++)
+        for (unsigned i = 0; i<points.size(); ++i)
         {
             delete nodes[i];
             delete points[i];
@@ -2055,11 +2056,11 @@ public:
         }
         // 3D cube of nodes, set up so that there is one node in each of the 3x3x3 boxes.
         std::vector<Node<3>* > nodes;
-        for (unsigned k=0; k<3; k++)
+        for (unsigned k = 0; k<3; ++k)
         {
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j = 0; j<3; ++j)
             {
-                for (unsigned i=0; i<3; i++)
+                for (unsigned i = 0; i<3; ++i)
                 {
                     nodes.push_back(new Node<3>(i + 3*j + 9*k, false, 0.75 + 1.5*i, 0.75 + 1.5*j , 0.75 + 1.5*k));
                 }
@@ -2079,7 +2080,7 @@ public:
         DistributedBoxCollection<3> box_collection(cut_off_length, domain_size);
         box_collection.SetupLocalBoxesHalfOnly();
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             unsigned box_index = box_collection.CalculateContainingBox(nodes[i]);
             if (box_collection.IsBoxOwned(box_index))
@@ -2098,7 +2099,7 @@ public:
         }
 
         // Make sure there is exactly one node in each box.
-        for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
+        for (unsigned i = 0; i<box_collection.GetNumBoxes(); ++i)
         {
             if (box_collection.IsBoxOwned(i))
             {
@@ -2108,9 +2109,9 @@ public:
 
         // Calculate which pairs of nodes should be pairs
         std::map<unsigned, std::set<unsigned> > neighbours_should_be;
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
-            for (unsigned j=0; j<nodes.size(); j++)
+            for (unsigned j = 0; j<nodes.size(); ++j)
             {
                 if ((i < j) && norm_2(nodes[i]->rGetLocation() - nodes[j]->rGetLocation()) < 2.6)    // sqrt ( 1.5^2 + 1.5^2 + 1.5^2) rounded up.
                 {
@@ -2125,7 +2126,7 @@ public:
         box_collection.CalculateNodePairs(nodes, pairs_returned_vector);
 
         std::set< std::pair<Node<3>*, Node<3>* > > pairs_returned;
-        for (unsigned i=0; i<pairs_returned_vector.size(); i++)
+        for (unsigned i = 0; i<pairs_returned_vector.size(); ++i)
         {
             pairs_returned.insert(pairs_returned_vector[i]);
         }
@@ -2183,7 +2184,7 @@ public:
             not_pairs_of_13.push_back(12);
             not_pairs_of_13.push_back(13);
 
-            for (unsigned i=0; i<not_pairs_of_13.size(); i++)
+            for (unsigned i = 0; i<not_pairs_of_13.size(); ++i)
             {
                 std::pair<Node<3>*, Node<3>* > pair(nodes[13], nodes[not_pairs_of_13[i]]);
                 TS_ASSERT(pairs_returned.find(pair) == pairs_returned.end());
@@ -2191,7 +2192,7 @@ public:
         }
 
         // Check the neighbour lists
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             if (box_collection.IsBoxOwned(i))
             {
@@ -2201,7 +2202,7 @@ public:
         }
 
         // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -2210,9 +2211,9 @@ public:
     void TestSplitNeighbourCalculation()
     {
         std::vector<Node<2>* > nodes;
-        for (unsigned j=0; j<3; j++)
+        for (unsigned j = 0; j<3; ++j)
         {
-            for (unsigned i=0; i<3; i++)
+            for (unsigned i = 0; i<3; ++i)
             {
                 nodes.push_back(new Node<2>(i + 3*j, false, 0.75 + 1.5*i, 0.75 + 1.5*j));
             }
@@ -2231,7 +2232,7 @@ public:
         box_collection.SetupLocalBoxesHalfOnly();
 
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             unsigned box_index = box_collection.CalculateContainingBox(nodes[i]);
             if (box_collection.IsBoxOwned(box_index))
@@ -2275,14 +2276,14 @@ public:
             // Check all nodes are empty!!!
             if (PetscTools::GetMyRank() == 0)
             {
-                for (unsigned i=0; i<6; i++)
+                for (unsigned i = 0; i<6; ++i)
                 {
                    TS_ASSERT_EQUALS((nodes[i]->rGetNeighbours()).size(), 0u);
                 }
             }
             if (PetscTools::GetMyRank() == 1)
             {
-                for (unsigned i=6; i<9; i++)
+                for (unsigned i=6; i<9; ++i)
                 {
                     TS_ASSERT_EQUALS((nodes[i]->rGetNeighbours()).size(), 0u);
                 }
@@ -2295,21 +2296,21 @@ public:
             // Note can only check on nodes owned by the process as NodeAttributed isn't set up on all nodes.
             if (PetscTools::GetMyRank() == 0)
             {
-                for (unsigned i=0; i<3; i++)
+                for (unsigned i = 0; i<3; ++i)
                 {
                    TS_ASSERT_EQUALS((nodes[i]->rGetNeighbours()).size(), 0u);
                 }
             }
             if (PetscTools::GetMyRank() == 1)
             {
-                for (unsigned i=3; i<6; i++)
+                for (unsigned i=3; i<6; ++i)
                 {
                     TS_ASSERT_EQUALS((nodes[i]->rGetNeighbours()).size(), 0u);
                 }
             }
             if (PetscTools::GetMyRank() == 2)
             {
-                for (unsigned i=6; i<9; i++)
+                for (unsigned i=6; i<9; ++i)
                 {
                     TS_ASSERT_EQUALS((nodes[i]->rGetNeighbours()).size(), 0u);
                 }
@@ -2359,7 +2360,7 @@ public:
             }
         }
         // Avoid memory leak
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -2382,7 +2383,7 @@ public:
         points[9] = new ChastePoint<2>(3.3, 3.6);
 
         std::vector<Node<2>* > nodes;
-        for (unsigned i=0; i<points.size(); i++)
+        for (unsigned i = 0; i<points.size(); ++i)
         {
             nodes.push_back(new Node<2>(i, *(points[i]), false));
         }
@@ -2400,7 +2401,7 @@ public:
         box_collection.SetupLocalBoxesHalfOnly();
 
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             unsigned box_index = box_collection.CalculateContainingBox(nodes[i]);
             box_collection.rGetBox(box_index).AddNode(nodes[i]);
@@ -2411,7 +2412,7 @@ public:
         box_collection.CalculateNodePairs(nodes,pairs_returned_vector);
 
         std::set< std::pair<Node<2>*, Node<2>* > > pairs_returned;
-        for (unsigned i=0; i<pairs_returned_vector.size(); i++)
+        for (unsigned i = 0; i<pairs_returned_vector.size(); ++i)
         {
             pairs_returned.insert(pairs_returned_vector[i]);
         }
@@ -2470,7 +2471,7 @@ public:
         neighbours_should_be[9].insert(0);
         neighbours_should_be[9].insert(1);
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             std::vector<unsigned> expected(neighbours_should_be[i].begin(), neighbours_should_be[i].end());
             TS_ASSERT_EQUALS(nodes[i]->rGetNeighbours(), expected);
@@ -2519,7 +2520,7 @@ public:
             TS_ASSERT_DIFFERS(pair_location, pairs_returned.end());
         }
 
-        for (unsigned i=0; i<points.size(); i++)
+        for (unsigned i = 0; i<points.size(); ++i)
         {
             delete nodes[i];
             delete points[i];
@@ -2546,7 +2547,7 @@ public:
         TS_ASSERT_EQUALS(box_collection.GetNumBoxes(), 9u * std::max(4u, PetscTools::GetNumProcs()));
         box_collection.SetupLocalBoxesHalfOnly();
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             unsigned box_index = box_collection.CalculateContainingBox(mesh.GetNode(i));
             if (box_collection.IsBoxOwned(box_index))
@@ -2640,7 +2641,7 @@ public:
         if (PetscTools::IsSequential())
         {
             // In serial everything is an interior box.
-            for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
+            for (unsigned i = 0; i<box_collection.GetNumBoxes(); ++i)
             {
                 TS_ASSERT_EQUALS(box_collection.IsInteriorBox(i), true);
             }
@@ -2675,7 +2676,7 @@ public:
 
          double cut_off_length = 1.6;
          c_vector<double, 6> domain_size;
-         for (unsigned i=0; i<3; i++)
+         for (unsigned i = 0; i<3; ++i)
          {
              domain_size[2*i] = 0.0;
              domain_size[2*i+1] = 4.8;
@@ -2718,7 +2719,7 @@ public:
              (*p_arch) >> p_box_collection;
              TS_ASSERT_EQUALS(num_boxes, p_box_collection->GetNumBoxes());
 
-             for (unsigned i=0; i<3; i++)
+             for (unsigned i = 0; i<3; ++i)
              {
                  TS_ASSERT_DELTA(0.0, p_box_collection->rGetDomainSize()[2*i], 1e-4);
                  TS_ASSERT_DELTA(domain_size[2*i+1], p_box_collection->rGetDomainSize()[2*i+1], 1e-4);
@@ -2836,12 +2837,12 @@ public:
 
         DistributedBoxCollection<1> box_collection(cut_off_length, domain_size);
 
-        for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
+        for (unsigned i = 0; i<box_collection.GetNumBoxes(); ++i)
         {
             if (box_collection.IsBoxOwned(i))
             {
                 // Add the same number of nodes as the box index.
-                for (unsigned k=0; k<i; k++)
+                for (unsigned k = 0; k<i; ++k)
                 {
                     nodes.push_back(new Node<1>(i, false));
                     box_collection.rGetBox(i).AddNode(nodes[k]);
@@ -2851,17 +2852,17 @@ public:
 
         std::vector<int> local_distribution = box_collection.CalculateNumberOfNodesInEachStrip();
         int counter = 0;
-        for (unsigned i=0; i<box_collection.GetNumBoxes(); i++)
+        for (unsigned i = 0; i<box_collection.GetNumBoxes(); ++i)
         {
             if (box_collection.IsBoxOwned(i))
             {
-                TS_ASSERT_EQUALS(local_distribution[counter], (int)i);
+                TS_ASSERT_EQUALS(local_distribution[counter], static_cast<int>(i));
                 counter++;
             }
         }
 
         // Tidy up
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }

@@ -105,7 +105,7 @@ public:
         const EdgeHelper<2>& edge_helper = p_mesh->rGetEdgeHelper();
         // There are two elements in our mesh
         // We test Edge class methods here
-        for (unsigned i = 0; i < 2; i++)
+        for (unsigned i = 0; i < 2; ++i)
         {
             VertexElement<2, 2>* p_element = elements[i];
             const unsigned num_edges = p_element->GetNumEdges();
@@ -118,14 +118,14 @@ public:
                 TS_ASSERT_EQUALS(p_element->ContainsEdge(p_edge), true);
             }
         }
-        for (unsigned i = 0; i < p_mesh->GetNumEdges(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumEdges(); ++i)
         {
             Edge<2>* p_edge = p_mesh->GetEdge(i);
             TS_ASSERT_EQUALS(edge_helper.GetEdge(i), p_edge);
             TS_ASSERT(elements[0]->ContainsEdge(p_edge) || elements[1]->ContainsEdge(p_edge));
         }
 
-        for (unsigned i = 0; i < 2; i++)
+        for (unsigned i = 0; i < 2; ++i)
         {
             VertexElement<2, 2>* p_element = elements[i];
             p_element->ClearEdges();
@@ -183,7 +183,7 @@ public:
         const EdgeHelper<2>& edge_helper = p_mesh->rGetEdgeHelper();
         // There are two elements in our mesh
         // We test Edge class methods here
-        for (unsigned i = 0; i < 2; i++)
+        for (unsigned i = 0; i < 2; ++i)
         {
             VertexElement<1, 2>* p_element = elements[i];
             const unsigned num_edges = p_element->GetNumEdges();
@@ -202,14 +202,14 @@ public:
             }
         }
 
-        for (unsigned i = 0; i < p_mesh->GetNumEdges(); i++)
+        for (unsigned i = 0; i < p_mesh->GetNumEdges(); ++i)
         {
             Edge<2>* p_edge = p_mesh->GetEdge(i);
             TS_ASSERT_EQUALS(edge_helper.GetEdge(i), p_edge);
             TS_ASSERT(elements[0]->ContainsEdge(p_edge) || elements[1]->ContainsEdge(p_edge));
         }
 
-        for (unsigned i = 0; i < 2; i++)
+        for (unsigned i = 0; i < 2; ++i)
         {
             VertexElement<1, 2>* p_element = elements[i];
             p_element->ClearEdges();

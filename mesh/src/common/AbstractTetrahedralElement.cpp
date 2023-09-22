@@ -50,9 +50,9 @@ void AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::RefreshJacobian(c_matri
     {
         EXCEPTION("Attempting to Refresh a deleted element");
     }
-    for (unsigned i=0; i<SPACE_DIM; i++)
+    for (unsigned i=0; i<SPACE_DIM; ++i)
     {
-        for (unsigned j=0; j!=ELEMENT_DIM; j++) // Does a j<ELEMENT_DIM without ever having to test j<0U (#186: pointless comparison of unsigned integer with zero)
+        for (unsigned j=0; j!=ELEMENT_DIM; ++j) // Does a j<ELEMENT_DIM without ever having to test j<0U (#186: pointless comparison of unsigned integer with zero)
         {
             rJacobian(i,j) = this->GetNodeLocation(j+1,i) - this->GetNodeLocation(0,i);
         }
@@ -108,40 +108,45 @@ AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::AbstractTetrahedralElement(u
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::CalculateJacobian(c_matrix<double, SPACE_DIM, ELEMENT_DIM>& rJacobian, double& rJacobianDeterminant)
 {
-
-    assert(ELEMENT_DIM <= SPACE_DIM);
-    RefreshJacobian(rJacobian);
-
+    if constexpr (ELEMENT_DIM <= SPACE_DIM)
     {
-        rJacobianDeterminant = Determinant(rJacobian);
-        if (rJacobianDeterminant <= DBL_EPSILON)
+        RefreshJacobian(rJacobian);
+
         {
-            std::stringstream message;
-            message << "Jacobian determinant is non-positive: "
-                    << "determinant = " << rJacobianDeterminant
-                    << " for element " << this->mIndex << " (" << ELEMENT_DIM
-                    << "D element in " << SPACE_DIM << "D space). Nodes are at:" << std::endl;
-
-            for (unsigned local_node_index=0u; local_node_index != ELEMENT_DIM+1; local_node_index++)
+            rJacobianDeterminant = Determinant(rJacobian);
+            if (rJacobianDeterminant <= DBL_EPSILON)
             {
-                c_vector<double, SPACE_DIM> location = this->GetNodeLocation(local_node_index);
-                message << "Node " << this->GetNodeGlobalIndex(local_node_index) << ":\t";
+                std::stringstream message;
+                message << "Jacobian determinant is non-positive: "
+                        << "determinant = " << rJacobianDeterminant
+                        << " for element " << this->mIndex << " (" << ELEMENT_DIM
+                        << "D element in " << SPACE_DIM << "D space). Nodes are at:" << std::endl;
 
-                for (unsigned i=0; i<SPACE_DIM; i++)
+                for (unsigned local_node_index=0u; local_node_index != ELEMENT_DIM+1; local_node_index++)
                 {
-                    message << location[i];
-                    if (i==SPACE_DIM - 1u)
+                    c_vector<double, SPACE_DIM> location = this->GetNodeLocation(local_node_index);
+                    message << "Node " << this->GetNodeGlobalIndex(local_node_index) << ":\t";
+
+                    for (unsigned i=0; i<SPACE_DIM; ++i)
                     {
-                        message << std::endl;
-                    }
-                    else
-                    {
-                        message << "\t";
+                        message << location[i];
+                        if (i==SPACE_DIM - 1u)
+                        {
+                            message << std::endl;
+                        }
+                        else
+                        {
+                            message << "\t";
+                        }
                     }
                 }
+                EXCEPTION(message.str());
             }
-            EXCEPTION(message.str());
-        }
+        }    
+    }
+    else
+    {
+        NEVER_REACHED;
     }
 }
 
@@ -166,23 +171,23 @@ void AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::CalculateWeightedDirect
     // This code is only used when ELEMENT_DIM<SPACE_DIM
     switch (ELEMENT_DIM)
     {
-        case 0:
-            // See specialised template for ELEMENT_DIM==0
-            NEVER_REACHED;
-            break;
         case 1:
+        {
             // Linear edge in a 2D plane or in 3D
-            rWeightedDirection=matrix_column<c_matrix<double,SPACE_DIM,ELEMENT_DIM> >(jacobian, 0);
+            rWeightedDirection = matrix_column<c_matrix<double,SPACE_DIM,ELEMENT_DIM> >(jacobian, 0);
             break;
+        }
         case 2:
+        {
             // Surface triangle in a 3d mesh
             assert(SPACE_DIM == 3);
             rWeightedDirection(0) = -SubDeterminant(jacobian, 0, 2);
             rWeightedDirection(1) =  SubDeterminant(jacobian, 1, 2);
             rWeightedDirection(2) = -SubDeterminant(jacobian, 2, 2);
             break;
+        }
         default:
-           ; // Not going to happen
+           NEVER_REACHED; // Not going to happen
     }
     rJacobianDeterminant = norm_2(rWeightedDirection);
 
@@ -217,7 +222,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::CalculateCentroid() const
 {
     c_vector<double, SPACE_DIM> centroid = zero_vector<double>(SPACE_DIM);
-    for (unsigned i=0; i<=ELEMENT_DIM; i++)
+    for (unsigned i=0; i<=ELEMENT_DIM; ++i)
     {
         centroid += this->mNodes[i]->rGetLocation();
     }
@@ -227,12 +232,18 @@ c_vector<double, SPACE_DIM> AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::CalculateInverseJacobian(c_matrix<double, SPACE_DIM, ELEMENT_DIM>& rJacobian, double& rJacobianDeterminant, c_matrix<double, ELEMENT_DIM, SPACE_DIM>& rInverseJacobian)
 {
-    assert(ELEMENT_DIM <= SPACE_DIM);     // LCOV_EXCL_LINE
-    CalculateJacobian(rJacobian, rJacobianDeterminant);
+    if constexpr (ELEMENT_DIM <= SPACE_DIM)
+    {
+        CalculateJacobian(rJacobian, rJacobianDeterminant);
 
-    // CalculateJacobian should make sure that the determinant is not close to zero (or, in fact, negative)
-    assert(rJacobianDeterminant > 0.0);
-    rInverseJacobian = Inverse(rJacobian);
+        // CalculateJacobian should make sure that the determinant is not close to zero (or, in fact, negative)
+        assert(rJacobianDeterminant > 0.0);
+        rInverseJacobian = Inverse(rJacobian);
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

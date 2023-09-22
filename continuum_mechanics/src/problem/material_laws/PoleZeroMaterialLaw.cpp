@@ -45,7 +45,7 @@ void PoleZeroMaterialLaw<DIM>::SetParameters(std::vector<std::vector<double> > k
                                              std::vector<std::vector<double> > a,
                                              std::vector<std::vector<double> > b)
 {
-    if (DIM!=2 && DIM !=3)
+    if (DIM != 2 && DIM != 3)
     {
         EXCEPTION("Can only have a 2 or 3d incompressible pole-zero law");
     }
@@ -54,13 +54,13 @@ void PoleZeroMaterialLaw<DIM>::SetParameters(std::vector<std::vector<double> > k
     assert(a.size() == DIM);
     assert(b.size() == DIM);
 
-    for (unsigned i = 0; i < DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         assert(k[i].size() == DIM);
         assert(a[i].size() == DIM);
         assert(b[i].size() == DIM);
 
-        for (unsigned j = 0; j < DIM; j++)
+        for (unsigned j = 0; j < DIM; ++j)
         {
             assert(k[i][j] == k[j][i]);
             assert(a[i][j] == a[j][i]);
@@ -72,9 +72,9 @@ void PoleZeroMaterialLaw<DIM>::SetParameters(std::vector<std::vector<double> > k
     mA = a;
     mB = b;
 
-    for (unsigned M=0; M<DIM; M++)
+    for (unsigned M = 0; M < DIM; ++M)
     {
-        for (unsigned N=0; N<DIM; N++)
+        for (unsigned N = 0; N < DIM; ++N)
         {
             mIdentity(M,N) = M==N ? 1.0 : 0.0;
         }
@@ -112,9 +112,9 @@ void PoleZeroMaterialLaw<DIM>::ComputeStressAndStressDerivative(c_matrix<double,
 
     c_matrix<double,DIM,DIM> E = 0.5*(C_transformed - mIdentity);
 
-    for (unsigned M=0; M<DIM; M++)
+    for (unsigned M = 0; M < DIM; ++M)
     {
-        for (unsigned N=0; N<DIM; N++)
+        for (unsigned N = 0; N < DIM; ++N)
         {
             double e = E(M,N);
             {
@@ -139,13 +139,13 @@ void PoleZeroMaterialLaw<DIM>::ComputeStressAndStressDerivative(c_matrix<double,
 
     if (computeDTdE)
     {
-        for (unsigned M=0; M<DIM; M++)
+        for (unsigned M = 0; M < DIM; ++M)
         {
-            for (unsigned N=0; N<DIM; N++)
+            for (unsigned N = 0; N < DIM; ++N)
             {
-                for (unsigned P=0; P<DIM; P++)
+                for (unsigned P = 0; P < DIM; ++P)
                 {
-                    for (unsigned Q=0; Q<DIM; Q++)
+                    for (unsigned Q = 0; Q < DIM; ++Q)
                     {
                         rDTdE(M,N,P,Q) = 2 * pressure * invC_transformed(M,P) * invC_transformed(Q,N);
                     }
@@ -182,9 +182,9 @@ template<unsigned DIM>
 void PoleZeroMaterialLaw<DIM>::ScaleMaterialParameters(double scaleFactor)
 {
     assert(scaleFactor > 0.0);
-    for (unsigned i=0; i<mK.size(); i++)
+    for (unsigned i = 0; i < mK.size(); ++i)
     {
-        for (unsigned j=0; j<mK[i].size(); j++)
+        for (unsigned j = 0; j < mK[i].size(); ++j)
         {
             mK[i][j] /= scaleFactor;
         }

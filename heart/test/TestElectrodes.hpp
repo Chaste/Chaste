@@ -101,7 +101,7 @@ public:
 
         unsigned num_grounded_nodes_reduced;
         int mpi_ret = MPI_Allreduce(&num_grounded_nodes, &num_grounded_nodes_reduced, 1, MPI_UNSIGNED, MPI_SUM, PETSC_COMM_WORLD);
-        TS_ASSERT_EQUALS(mpi_ret, (int)MPI_SUCCESS);
+        TS_ASSERT_EQUALS(mpi_ret, static_cast<int>(MPI_SUCCESS));
 
         TS_ASSERT_EQUALS(num_grounded_nodes_reduced, 11u);
 
@@ -185,7 +185,7 @@ public:
             c_vector<double, 2>& corner_node_location = mesh.GetNode(index)->rGetModifiableLocation();
             corner_node_location[0] -= 0.5;
         }
-        catch(Exception&)
+        catch (Exception&)
         {
             // Don't do anything if you don't own (or halo-own) the node
         }
@@ -251,7 +251,7 @@ public:
         }
 
         unsigned num_grounded_nodes = 0u;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             Node<3>* p_node = mesh.GetNode(i);
             if (p_bcc->HasDirichletBoundaryCondition(p_node, 1))

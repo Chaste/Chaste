@@ -124,7 +124,7 @@ private:
 
             // The elements have the same index and the nodes are located in the same position.
             TS_ASSERT_EQUALS(element_index, p_element_2->GetIndex());
-            for (unsigned node_local_index=0; node_local_index < iter->GetNumNodes(); node_local_index++)
+            for (unsigned node_local_index = 0; node_local_index < iter->GetNumNodes(); node_local_index++)
             {
                 TS_ASSERT_DELTA( norm_2( iter->GetNode(node_local_index)->rGetLocation() -
                                      p_element_2->GetNode(node_local_index)->rGetLocation() ), 0.0, 1e-10 );
@@ -143,7 +143,7 @@ private:
              iter != rMesh.GetElementIteratorEnd();
              ++iter)
         {
-            for (unsigned node_local_index=0; node_local_index<ELEMENT_DIM+1; node_local_index++)
+            for (unsigned node_local_index = 0; node_local_index<ELEMENT_DIM+1; node_local_index++)
             {
                 unsigned node_global_index = iter->GetNodeGlobalIndex(node_local_index);
 
@@ -169,12 +169,12 @@ private:
         {
             const unsigned num_global_nodes = rMesh.GetNumNodes();
             boost::scoped_array<unsigned> nodes_owned(new unsigned[num_global_nodes]);
-            for (unsigned index=0; index<num_global_nodes; index++)
+            for (unsigned index = 0; index<num_global_nodes; index++)
             {
                 nodes_owned[index]=0u;
             }
 
-            for (unsigned node_id=0; node_id<num_global_nodes;  node_id++)
+            for (unsigned node_id = 0; node_id<num_global_nodes;  node_id++)
             {
 
                 try
@@ -199,7 +199,7 @@ private:
             // Make sure every node is owned at least by one processor
             if (PetscTools::AmMaster())
             {
-                for (unsigned node_id=0; node_id<num_global_nodes; node_id++)
+                for (unsigned node_id = 0; node_id<num_global_nodes; node_id++)
                 {
                     TS_ASSERT(nodes_reduction[node_id] > 0u);
                 }
@@ -216,7 +216,7 @@ private:
             boost::scoped_array<unsigned> elements_owned(new unsigned[num_global_elements]);
 
             // Create a local map of the elements this processor owns
-            for (unsigned element_id=0; element_id<num_global_elements; element_id++)
+            for (unsigned element_id = 0; element_id<num_global_elements; element_id++)
             {
                 try
                 {
@@ -227,7 +227,7 @@ private:
 
                     total_elements_this_process++;
                 }
-                catch(Exception&)
+                catch (Exception&)
                 {
                     elements_owned[element_id] = 0;
                 }
@@ -242,7 +242,7 @@ private:
             // Make sure every element is owned at least by one processor
             if (PetscTools::AmMaster())
             {
-                for (unsigned element_id=0; element_id<num_global_elements; element_id++)
+                for (unsigned element_id = 0; element_id<num_global_elements; element_id++)
                 {
                     TS_ASSERT(elements_reduction[element_id] > 0);
                 }
@@ -258,7 +258,7 @@ private:
             boost::scoped_array<unsigned> b_elements_owned(new unsigned[num_global_b_elements]);
 
             // Create a local map of the boundary elements this processor owns
-            for (unsigned b_element_id=0; b_element_id<num_global_b_elements; b_element_id++)
+            for (unsigned b_element_id = 0; b_element_id<num_global_b_elements; b_element_id++)
             {
                 try
                 {
@@ -269,7 +269,7 @@ private:
 
                     total_b_elements_this_process++;
                 }
-                catch(Exception&)
+                catch (Exception&)
                 {
                     b_elements_owned[b_element_id] = 0;
                 }
@@ -284,7 +284,7 @@ private:
             // Make sure every boundary element is owned at least by one processor
             if (PetscTools::AmMaster())
             {
-                for (unsigned b_element_id=0; b_element_id<num_global_b_elements; b_element_id++)
+                for (unsigned b_element_id = 0; b_element_id<num_global_b_elements; b_element_id++)
                 {
                     TS_ASSERT(b_elements_reduction[b_element_id] > 0);
                 }
@@ -321,7 +321,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 10u);
 
         TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 1u);
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             try
             {
@@ -329,7 +329,7 @@ public:
                 TS_ASSERT_EQUALS(region, i%5+1);
                 TS_ASSERT_EQUALS(i, mesh.GetElement(i)->GetIndex());
             }
-            catch(Exception&)
+            catch (Exception&)
             {
                 // I don't own this element do I?
             }
@@ -385,15 +385,15 @@ public:
 
             TS_ASSERT_EQUALS(element_jacobian_determinant, jacobian_determinant);
 
-            for (unsigned row=0; row<2; row++)
+            for (unsigned row = 0; row<2; row++)
             {
-                for (unsigned col=0; col<2; col++)
+                for (unsigned col = 0; col<2; col++)
                 {
                     TS_ASSERT_EQUALS(element_inverse_jacobian(row,col), inverse_jacobian(row,col));
                 }
             }
         }
-        catch(Exception&)
+        catch (Exception&)
         {
             // I don't own this element do I?
         }
@@ -408,12 +408,12 @@ public:
 
             TS_ASSERT_EQUALS(element_jacobian_determinant, jacobian_determinant);
 
-            for (unsigned row=0; row<2; row++)
+            for (unsigned row = 0; row<2; row++)
             {
                 TS_ASSERT_EQUALS(element_direction(row), direction(row));
             }
         }
-        catch(Exception&)
+        catch (Exception&)
         {
             // I don't own this boundary element do I?
         }
@@ -430,7 +430,7 @@ public:
             Element<2,2>* p_sequ_element = seq_mesh.GetElement(element_index);
             TS_ASSERT_EQUALS(element_index, p_sequ_element->GetIndex());
 
-            for (unsigned node_local_index=0; node_local_index < iter->GetNumNodes(); node_local_index++)
+            for (unsigned node_local_index = 0; node_local_index < iter->GetNumNodes(); node_local_index++)
             {
                 TS_ASSERT_EQUALS(iter->GetNodeGlobalIndex(node_local_index),
                                  p_sequ_element->GetNodeGlobalIndex(node_local_index));
@@ -450,7 +450,7 @@ public:
             BoundaryElement<1,2>* p_sequ_boundary_element = seq_mesh.GetBoundaryElement(boundary_element_index);
             TS_ASSERT_EQUALS(boundary_element_index, p_sequ_boundary_element->GetIndex());
 
-            for (unsigned node_local_index=0; node_local_index < p_para_boundary_element->GetNumNodes(); node_local_index++)
+            for (unsigned node_local_index = 0; node_local_index < p_para_boundary_element->GetNumNodes(); node_local_index++)
             {
                 TS_ASSERT_EQUALS(p_para_boundary_element->GetNodeGlobalIndex(node_local_index),
                                  p_sequ_boundary_element->GetNodeGlobalIndex(node_local_index));
@@ -541,9 +541,9 @@ public:
 
             // The elements have the same index and the nodes are located in the same position.
             TS_ASSERT_EQUALS(element_index, p_sequ_element->GetIndex());
-            for (unsigned node_local_index=0; node_local_index < iter->GetNumNodes(); node_local_index++)
+            for (unsigned node_local_index = 0; node_local_index < iter->GetNumNodes(); node_local_index++)
             {
-                for (unsigned dim=0; dim<3; dim++)
+                for (unsigned dim = 0; dim<3; dim++)
                 {
                     TS_ASSERT_EQUALS(iter->GetNode(node_local_index)->GetPoint()[dim],
                                      p_sequ_element->GetNode(node_local_index)->GetPoint()[dim]);
@@ -562,9 +562,9 @@ public:
 
             // The boundary elements have the same index and the nodes are located in the same position.
             TS_ASSERT_EQUALS(boundary_element_index, p_sequ_boundary_element->GetIndex());
-            for (unsigned node_local_index=0; node_local_index < p_para_boundary_element->GetNumNodes(); node_local_index++)
+            for (unsigned node_local_index = 0; node_local_index < p_para_boundary_element->GetNumNodes(); node_local_index++)
             {
-                for (unsigned dim=0; dim<3; dim++)
+                for (unsigned dim = 0; dim<3; dim++)
                 {
                     TS_ASSERT_EQUALS(p_para_boundary_element->GetNode(node_local_index)->GetPoint()[dim],
                                      p_sequ_boundary_element->GetNode(node_local_index)->GetPoint()[dim]);
@@ -592,7 +592,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 12u);
 
         // Check all nodes have 2 attributes
-        for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
         {
             if (mesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(node_index) )
             {
@@ -839,14 +839,14 @@ public:
 
         TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 1u);
 
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             try
             {
                 unsigned region = mesh.GetElement(i)->GetUnsignedAttribute();
                 TS_ASSERT_EQUALS(region, (i+1)%3+1);
             }
-            catch(Exception&)
+            catch (Exception&)
             {
                 // I don't own this element do I?
             }
@@ -854,14 +854,14 @@ public:
 
         TS_ASSERT_EQUALS(mesh_reader.GetNumFaceAttributes(), 1u);
 
-        for (unsigned i=0; i<mesh.GetNumBoundaryElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumBoundaryElements(); ++i)
         {
             try
             {
                 unsigned region = mesh.GetBoundaryElement(i)->GetUnsignedAttribute();
                 TS_ASSERT_LESS_THAN(region, 4u);
             }
-            catch(Exception&)
+            catch (Exception&)
             {
                 // I don't own this element do I?
             }
@@ -1006,9 +1006,9 @@ public:
                 TS_ASSERT_DELTA(p_node1->GetPoint()[0], p_node2->GetPoint()[0], 1e-6);
                 TS_ASSERT_DELTA(p_node1->GetPoint()[1], p_node2->GetPoint()[1], 1e-6);
             }
-            catch(Exception& e)
+            catch (Exception& e)
             {
-                TS_ASSERT_DIFFERS((int)e.GetShortMessage().find("does not belong to processor"),-1);
+                TS_ASSERT_DIFFERS(static_cast<int>(e.GetShortMessage().find("does not belong to processor")), -1);
             }
 
             try
@@ -1017,9 +1017,9 @@ public:
                 Node<2>* p_node2 = p_mesh2->GetNode(500);
                 TS_ASSERT_DELTA(p_node1->GetPoint()[0], p_node2->GetPoint()[0], 1e-6);
             }
-            catch(Exception& e)
+            catch (Exception& e)
             {
-                TS_ASSERT_DIFFERS((int)e.GetShortMessage().find("does not belong to processor"),-1);
+                TS_ASSERT_DIFFERS(static_cast<int>(e.GetShortMessage().find("does not belong to processor")), -1);
             }
 
             // Check first element has the right nodes
@@ -1029,9 +1029,9 @@ public:
                 Element<2,2>* p_element2 = p_mesh2->GetElement(0);
                 TS_ASSERT_EQUALS(p_element->GetNodeGlobalIndex(0), p_element2->GetNodeGlobalIndex(0));
             }
-            catch(Exception& e)
+            catch (Exception& e)
             {
-                TS_ASSERT_DIFFERS((int)e.GetShortMessage().find("does not belong to processor"),-1);
+                TS_ASSERT_DIFFERS(static_cast<int>(e.GetShortMessage().find("does not belong to processor")), -1);
             }
 
             try
@@ -1040,9 +1040,9 @@ public:
                 Element<2,2>* p_element2 = p_mesh2->GetElement(500);
                 TS_ASSERT_EQUALS(p_element->GetNodeGlobalIndex(0), p_element2->GetNodeGlobalIndex(0));
             }
-            catch(Exception& e)
+            catch (Exception& e)
             {
-                TS_ASSERT_DIFFERS((int)e.GetShortMessage().find("does not belong to processor"),-1);
+                TS_ASSERT_DIFFERS(static_cast<int>(e.GetShortMessage().find("does not belong to processor")), -1);
             }
 
             // Check the halo nodes are right
@@ -1147,9 +1147,9 @@ public:
                 TS_ASSERT_DELTA(p_node1->GetPoint()[0], p_node2->GetPoint()[0], 1e-6);
                 TS_ASSERT_DELTA(p_node1->GetPoint()[1], p_node2->GetPoint()[1], 1e-6);
             }
-            catch(Exception& e)
+            catch (Exception& e)
             {
-                TS_ASSERT_DIFFERS((int)e.GetShortMessage().find("does not belong to processor"),-1);
+                TS_ASSERT_DIFFERS(static_cast<int>(e.GetShortMessage().find("does not belong to processor")), -1);
             }
 
             try
@@ -1158,9 +1158,9 @@ public:
                 Node<3>* p_node2 = p_mesh2->GetNode(500);
                 TS_ASSERT_DELTA(p_node1->GetPoint()[0], p_node2->GetPoint()[0], 1e-6);
             }
-            catch(Exception& e)
+            catch (Exception& e)
             {
-                TS_ASSERT_DIFFERS((int)e.GetShortMessage().find("does not belong to processor"),-1);
+                TS_ASSERT_DIFFERS(static_cast<int>(e.GetShortMessage().find("does not belong to processor")), -1);
             }
 
             // Check first element has the right nodes
@@ -1170,9 +1170,9 @@ public:
                 Element<3,3>* p_element2 = p_mesh2->GetElement(0);
                 TS_ASSERT_EQUALS(p_element->GetNodeGlobalIndex(0), p_element2->GetNodeGlobalIndex(0));
             }
-            catch(Exception& e)
+            catch (Exception& e)
             {
-                TS_ASSERT_DIFFERS((int)e.GetShortMessage().find("does not belong to processor"),-1);
+                TS_ASSERT_DIFFERS(static_cast<int>(e.GetShortMessage().find("does not belong to processor")), -1);
             }
 
             try
@@ -1181,9 +1181,9 @@ public:
                 Element<3,3>* p_element2 = p_mesh2->GetElement(500);
                 TS_ASSERT_EQUALS(p_element->GetNodeGlobalIndex(0), p_element2->GetNodeGlobalIndex(0));
             }
-            catch(Exception& e)
+            catch (Exception& e)
             {
-                TS_ASSERT_DIFFERS((int)e.GetShortMessage().find("does not belong to processor"),-1);
+                TS_ASSERT_DIFFERS(static_cast<int>(e.GetShortMessage().find("does not belong to processor")), -1);
             }
 
             // Check the halo nodes are right
@@ -1213,7 +1213,7 @@ private:
         TS_ASSERT_EQUALS(constructedMesh.GetNumElements(), readMesh.GetNumElements());
         TS_ASSERT_EQUALS(constructedMesh.GetNumLocalElements(), readMesh.GetNumLocalElements());
 
-        for (unsigned i=0; i<readMesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<readMesh.GetNumNodes(); ++i)
         {
             try
             {
@@ -1222,14 +1222,14 @@ private:
                 TS_ASSERT_THROWS_NOTHING(constructedMesh.GetNode(i));
                 TS_ASSERT_EQUALS(index, readMesh.SolveNodeMapping(i));
              }
-            catch(Exception&)
+            catch (Exception&)
             {
                 // Read mesh threw so does not own node
                 TS_ASSERT_THROWS_CONTAINS(constructedMesh.GetNode(i), "does not belong to processor");
             }
         }
 
-        for (unsigned i=0; i<readMesh.GetNumElements(); i++)
+        for (unsigned i = 0; i<readMesh.GetNumElements(); ++i)
         {
             try
             {
@@ -1238,14 +1238,14 @@ private:
                 TS_ASSERT_THROWS_NOTHING(constructedMesh.GetElement(i));
                 TS_ASSERT_EQUALS(index, readMesh.SolveElementMapping(i));
              }
-            catch(Exception&)
+            catch (Exception&)
             {
                 // Read mesh threw so does not own element
                 TS_ASSERT_THROWS_CONTAINS(constructedMesh.GetElement(i), "does not belong to processor");
             }
         }
 
-        for (unsigned i=0; i<readMesh.GetNumBoundaryElements(); i++)
+        for (unsigned i = 0; i<readMesh.GetNumBoundaryElements(); ++i)
         {
             try
             {
@@ -1254,7 +1254,7 @@ private:
                 TS_ASSERT_THROWS_NOTHING(constructedMesh.GetBoundaryElement(i));
                 TS_ASSERT_EQUALS(index, readMesh.SolveBoundaryElementMapping(i));
              }
-            catch(Exception&)
+            catch (Exception&)
             {
                 // Read mesh threw so does not own element
                 TS_ASSERT_THROWS_CONTAINS(constructedMesh.GetBoundaryElement(i), "does not belong to processor");
@@ -1335,7 +1335,7 @@ public:
         unsigned i = 0;
         for (DistributedTetrahedralMesh<1,1>::HaloNodeIterator it=small_mesh.GetHaloNodeIteratorBegin();
              it != small_mesh.GetHaloNodeIteratorEnd();
-             ++it,i++)
+             ++it,++i)
         {
             TS_ASSERT_EQUALS(halo_indices[i], (*it)->GetIndex());
         }
@@ -1984,7 +1984,7 @@ public:
         files_to_compare.push_back("ele");
         files_to_compare.push_back("face");
 
-        for (unsigned i=0; i<files_to_compare.size(); i++)
+        for (unsigned i = 0; i<files_to_compare.size(); ++i)
         {
             std::cout << "Comparing ." << files_to_compare[i] << std::endl;
             FileFinder generated_parallel(output_dir + "/par_cube_2mm_12_elements." + files_to_compare[i]);
@@ -2112,9 +2112,9 @@ public:
                 TS_ASSERT_DELTA(p_node1->GetPoint()[0], 0.0, 1e-6);
                 TS_ASSERT_DELTA(p_node1->GetPoint()[1], 0.0, 1e-6);
             }
-            catch(Exception& e)
+            catch (Exception& e)
             {
-                TS_ASSERT_DIFFERS((int)e.GetShortMessage().find("does not belong to processor"),-1);
+                TS_ASSERT_DIFFERS(static_cast<int>(e.GetShortMessage().find("does not belong to processor")), -1);
             }
 
             try
@@ -2126,9 +2126,9 @@ public:
                 TS_ASSERT_DELTA(p_node1->GetPoint()[0], static_cast<double>(width), 1e-6);
                 TS_ASSERT_DELTA(p_node1->GetPoint()[1], static_cast<double>(height), 1e-6);
             }
-            catch(Exception& e)
+            catch (Exception& e)
             {
-                TS_ASSERT_DIFFERS((int)e.GetShortMessage().find("does not belong to processor"),-1);
+                TS_ASSERT_DIFFERS(static_cast<int>(e.GetShortMessage().find("does not belong to processor")), -1);
             }
 
             // Check first element has the right nodes
@@ -2138,9 +2138,9 @@ public:
                 Element<2,2>* p_element2 = p_mesh2->GetElement(0);
                 TS_ASSERT_EQUALS(p_element->GetNodeGlobalIndex(0), p_element2->GetNodeGlobalIndex(0));
             }
-            catch(Exception& e)
+            catch (Exception& e)
             {
-                TS_ASSERT_DIFFERS((int)e.GetShortMessage().find("does not belong to processor"),-1);
+                TS_ASSERT_DIFFERS(static_cast<int>(e.GetShortMessage().find("does not belong to processor")), -1);
             }
 
             try
@@ -2149,9 +2149,9 @@ public:
                 Element<2,2>* p_element2 = p_mesh2->GetElement(500);
                 TS_ASSERT_EQUALS(p_element->GetNodeGlobalIndex(0), p_element2->GetNodeGlobalIndex(0));
             }
-            catch(Exception& e)
+            catch (Exception& e)
             {
-                TS_ASSERT_DIFFERS((int)e.GetShortMessage().find("does not belong to processor"),-1);
+                TS_ASSERT_DIFFERS(static_cast<int>(e.GetShortMessage().find("does not belong to processor")), -1);
             }
 
             // Check the halo nodes are right
@@ -2269,7 +2269,7 @@ public:
              ++iter)
         {
             bool any_local = false;
-            for (unsigned node_local_index=0; node_local_index < 4u; node_local_index++)
+            for (unsigned node_local_index = 0; node_local_index < 4u; node_local_index++)
             {
                 unsigned node_global_index = iter->GetNodeGlobalIndex(node_local_index);
                 if (mesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(node_global_index))

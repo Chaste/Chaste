@@ -118,7 +118,7 @@ public:
 
         const c_vector<double, 3>& const_point_location = point.rGetLocation();
 
-        for (int i=0; i<3; i++)
+        for (int i=0; i<3; ++i)
         {
             TS_ASSERT_DELTA(const_point_location[i], point[i], 1e-7);
         }

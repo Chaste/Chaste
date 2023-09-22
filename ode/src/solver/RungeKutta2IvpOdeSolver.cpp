@@ -56,7 +56,7 @@ void RungeKutta2IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOd
     // Work out k1
     pAbstractOdeSystem->EvaluateYDerivatives(time, rCurrentYValues, dy);
 
-    for (unsigned i=0; i<num_equations; i++)
+    for (unsigned i=0; i<num_equations; ++i)
     {
         k1[i] = timeStep*dy[i];
         k1[i] = k1[i]/2.0 + rCurrentYValues[i];
@@ -64,7 +64,7 @@ void RungeKutta2IvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOd
 
     // Work out k2 and new solution
     pAbstractOdeSystem->EvaluateYDerivatives(time+timeStep/2.0, k1, dy);
-    for (unsigned i=0; i<num_equations; i++)
+    for (unsigned i=0; i<num_equations; ++i)
     {
         rNextYValues[i] = rCurrentYValues[i] + timeStep*dy[i];
     }

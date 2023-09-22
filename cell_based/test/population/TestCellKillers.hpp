@@ -266,7 +266,7 @@ public:
         double lo_oxygen_concentration = 0.0;
 
         // Set the oxygen level for the cells
-        for (unsigned index=0; index < cells.size(); ++index)
+        for (unsigned index = 0; index < cells.size(); ++index)
         {
             cells[index]->GetCellData()->SetItem("oxygen", lo_oxygen_concentration);
         }

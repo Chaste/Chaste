@@ -58,7 +58,7 @@ void BidomainProblem<DIM>::AnalyseMeshForBath()
         bool any_bath_element_found = false;
 
         // Set nodes that are part of a heart element to be heart nodes
-        //for (unsigned i=0; i<this->mpMesh->GetNumElements(); i++)
+        //for (unsigned i=0; i<this->mpMesh->GetNumElements(); ++i)
         for (auto it = this->mpMesh->GetElementIteratorBegin();
              it != this->mpMesh->GetElementIteratorEnd();
              ++it)
@@ -67,7 +67,7 @@ void BidomainProblem<DIM>::AnalyseMeshForBath()
 
             if (HeartRegionCode::IsRegionTissue( r_element.GetUnsignedAttribute() ))
             {
-                for (unsigned j=0; j<r_element.GetNumNodes(); j++)
+                for (unsigned j=0; j<r_element.GetNumNodes(); ++j)
                 {
                     r_element.GetNode(j)->SetRegion(HeartRegionCode::GetValidTissueId());
                 }
@@ -184,7 +184,7 @@ template<unsigned DIM>
 void BidomainProblem<DIM>::SetFixedExtracellularPotentialNodes(std::vector<unsigned> nodes)
 {
     mFixedExtracellularPotentialNodes.resize(nodes.size());
-    for (unsigned i=0; i<nodes.size(); i++)
+    for (unsigned i=0; i<nodes.size(); ++i)
     {
         // the solver checks that the nodes[i] is less than
         // the number of nodes in the mesh so this is not done here

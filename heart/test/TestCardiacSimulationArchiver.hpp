@@ -184,7 +184,7 @@ public:
             // This new file should go from 1.0 to 2.0, in printing time steps of 0.1.
             std::vector<double> times = reader.GetUnlimitedDimensionValues();
             TS_ASSERT_EQUALS(times.size(),11u);
-            for (unsigned i=0; i<times.size(); i++)
+            for (unsigned i=0; i<times.size(); ++i)
             {
                 TS_ASSERT_DELTA(times[i], 1.0 + 0.1*(double)(i), 1e-9);
             }
@@ -432,7 +432,7 @@ private:
         if (currentTime == 0.0)
         {
             std::vector<double> inits;
-            for (unsigned i=p_factory->GetLow(); i<p_factory->GetHigh(); i++)
+            for (unsigned i=p_factory->GetLow(); i<p_factory->GetHigh(); ++i)
             {
                 AbstractCardiacCell* p_cell = static_cast<AbstractCardiacCell*>(p_problem->GetTissue()->GetCardiacCell(i));
                 FakeBathCell* p_fake_cell = dynamic_cast<FakeBathCell*>(p_cell);
@@ -444,7 +444,7 @@ private:
                     }
                     std::vector<double> state = p_cell->GetStateVariables();
                     TS_ASSERT_EQUALS(state.size(), inits.size());
-                    for (unsigned j=0; j<state.size(); j++)
+                    for (unsigned j=0; j<state.size(); ++j)
                     {
                         TS_ASSERT_DELTA(state[j], inits[j], 1e-10);
                     }
@@ -533,7 +533,7 @@ private:
         p_orig_problem->Solve();
         ReplicatableVector orig_soln(p_orig_problem->GetSolution());
         TS_ASSERT_EQUALS(migrated_soln_1.GetSize(), orig_soln.GetSize());
-        for (unsigned i=0; i<migrated_soln_1.GetSize(); i++)
+        for (unsigned i=0; i<migrated_soln_1.GetSize(); ++i)
         {
             double tol;
             if (PetscTools::GetNumProcs() < 4)
@@ -562,7 +562,7 @@ private:
         // and again compare the results
         ReplicatableVector migrated_soln_2(p_problem->GetSolution());
         TS_ASSERT_EQUALS(migrated_soln_1.GetSize(), migrated_soln_2.GetSize());
-        for (unsigned i=0; i<migrated_soln_1.GetSize(); i++)
+        for (unsigned i=0; i<migrated_soln_1.GetSize(); ++i)
         {
             TS_ASSERT_DELTA(migrated_soln_2[i], migrated_soln_1[i], ABS_TOL);
         }
@@ -644,7 +644,7 @@ public:
 
         // All cells at x=0 should have a SimpleStimulus(-80000, 1).
         DistributedVectorFactory* p_factory = p_problem->rGetMesh().GetDistributedVectorFactory();
-        for (unsigned i=p_factory->GetLow(); i<p_factory->GetHigh(); i++)
+        for (unsigned i=p_factory->GetLow(); i<p_factory->GetHigh(); ++i)
         {
             AbstractCardiacCellInterface* p_cell = p_problem->GetTissue()->GetCardiacCell(i);
             double x = p_problem->rGetMesh().GetNode(i)->GetPoint()[0];
@@ -745,7 +745,7 @@ public:
 
         // All cells should have no stimulus.
         DistributedVectorFactory* p_factory = p_problem->rGetMesh().GetDistributedVectorFactory();
-        for (unsigned i=p_factory->GetLow(); i<p_factory->GetHigh(); i++)
+        for (unsigned i=p_factory->GetLow(); i<p_factory->GetHigh(); ++i)
         {
             AbstractCardiacCellInterface* p_cell = p_problem->GetTissue()->GetCardiacCell(i);
             AbstractStimulusFunction* p_stim = p_cell->GetStimulusFunction().get();
@@ -864,7 +864,7 @@ private:
             if (p_factory->GetHigh() > p_factory->GetLow())
             {
                 std::vector<double> inits;
-                for (unsigned i=p_factory->GetLow(); i<p_factory->GetHigh(); i++)
+                for (unsigned i=p_factory->GetLow(); i<p_factory->GetHigh(); ++i)
                 {
                     AbstractCardiacCellInterface* p_cell = p_problem->GetTissue()->GetCardiacCell(i);
                     FakeBathCell* p_fake_cell = dynamic_cast<FakeBathCell*>(p_cell);
@@ -876,7 +876,7 @@ private:
                         }
                         std::vector<double> state = p_cell->GetStdVecStateVariables();
                         TS_ASSERT_EQUALS(state.size(), inits.size());
-                        for (unsigned j=0; j<state.size(); j++)
+                        for (unsigned j=0; j<state.size(); ++j)
                         {
                             TS_ASSERT_DELTA(state[j], inits[j], 1e-10);
                         }
@@ -965,7 +965,7 @@ public:
 
         // All cells at x=0 should have a SimpleStimulus(-25500, 2).
         DistributedVectorFactory* p_factory = p_problem->rGetMesh().GetDistributedVectorFactory();
-        for (unsigned i=p_factory->GetLow(); i<p_factory->GetHigh(); i++)
+        for (unsigned i=p_factory->GetLow(); i<p_factory->GetHigh(); ++i)
         {
             AbstractCardiacCellInterface* p_cell = p_problem->GetTissue()->GetCardiacCell(i);
             double x = p_problem->rGetMesh().GetNode(i)->GetPoint()[0];
@@ -1049,7 +1049,7 @@ public:
 
         // All cells should have a ZeroStimulus.
         DistributedVectorFactory* p_factory = p_problem->rGetMesh().GetDistributedVectorFactory();
-        for (unsigned i=p_factory->GetLow(); i<p_factory->GetHigh(); i++)
+        for (unsigned i=p_factory->GetLow(); i<p_factory->GetHigh(); ++i)
         {
             AbstractCardiacCellInterface* p_cell = p_problem->GetTissue()->GetCardiacCell(i);
             AbstractStimulusFunction* p_stim = p_cell->GetStimulusFunction().get();
@@ -1198,7 +1198,7 @@ public:
         mesh.ConstructFromMeshReader(reader);
         // Set the whole mesh to be bath
         DistributedVectorFactory* p_factory = mesh.GetDistributedVectorFactory();
-        for (unsigned i=p_factory->GetLow(); i<p_factory->GetHigh(); i++)
+        for (unsigned i=p_factory->GetLow(); i<p_factory->GetHigh(); ++i)
         {
             mesh.GetNode(i)->SetRegion(HeartRegionCode::GetValidBathId());
         }
@@ -1251,7 +1251,7 @@ public:
             TS_ASSERT(! p_bcc->AnyNonZeroNeumannConditions());
             TS_ASSERT( p_bcc->HasDirichletBoundaryConditions());
             DistributedVectorFactory* p_factory = p_problem->rGetMesh().GetDistributedVectorFactory();
-            for (unsigned i=p_factory->GetLow(); i<p_factory->GetHigh(); i++)
+            for (unsigned i=p_factory->GetLow(); i<p_factory->GetHigh(); ++i)
             {
                 Node<1>* p_node = p_problem->rGetMesh().GetNode(i);
                 TS_ASSERT(! p_bcc->HasDirichletBoundaryCondition(p_node, 0u));
@@ -1428,7 +1428,7 @@ public:
 
             std::vector<unsigned> archived_permutation = p_bidomain_problem->rGetMesh().rGetNodePermutation();
             TS_ASSERT_EQUALS(archived_permutation.size(), 11u);
-            for (unsigned i=0; i<archived_permutation.size(); i++)  //We use "size" rather than 11 in case the previous test failed
+            for (unsigned i=0; i<archived_permutation.size(); ++i)  //We use "size" rather than 11 in case the previous test failed
             {
                 TS_ASSERT_EQUALS(archived_permutation[i], permutation[i]);
             }

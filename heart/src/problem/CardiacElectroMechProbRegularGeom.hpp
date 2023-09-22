@@ -83,40 +83,45 @@ public:
                                               NULL,
                                               outputDirectory)
     {
-        assert(DIM==2); // the below assumes DIM==2
-
-        assert(width > 0.0);
-        assert(numMechanicsElementsEachDir > 0);
-        assert(numElectricsElementsEachDir > 0);
-
-        // create electrics mesh
-        this->mpElectricsMesh = new TetrahedralMesh<DIM,DIM>();
-
-        this->mpElectricsMesh->ConstructRegularSlabMesh(width/numElectricsElementsEachDir, width, width);
-
-        // create mechanics mesh
-        this->mpMechanicsMesh = new QuadraticMesh<DIM>(width/numMechanicsElementsEachDir, width, width);
-        LOG(2, "Width of meshes is " << width);
-        LOG(2, "Num nodes in electrical and mechanical meshes are: " << this->mpElectricsMesh->GetNumNodes() << ", " << this->mpMechanicsMesh->GetNumNodes() << "\n");
-
-        this->mpProblemDefinition = new ElectroMechanicsProblemDefinition<DIM>(*(this->mpMechanicsMesh));
-
-        // Fix the nodes on x=0
-        std::vector<unsigned> fixed_nodes;
-        for (unsigned i=0; i<this->mpMechanicsMesh->GetNumNodes(); i++)
+        if constexpr (DIM == 2)
         {
-            if (fabs(this->mpMechanicsMesh->GetNode(i)->rGetLocation()[0])<1e-6)
+            assert(width > 0.0);
+            assert(numMechanicsElementsEachDir > 0);
+            assert(numElectricsElementsEachDir > 0);
+
+            // create electrics mesh
+            this->mpElectricsMesh = new TetrahedralMesh<DIM,DIM>();
+
+            this->mpElectricsMesh->ConstructRegularSlabMesh(width/numElectricsElementsEachDir, width, width);
+
+            // create mechanics mesh
+            this->mpMechanicsMesh = new QuadraticMesh<DIM>(width/numMechanicsElementsEachDir, width, width);
+            LOG(2, "Width of meshes is " << width);
+            LOG(2, "Num nodes in electrical and mechanical meshes are: " << this->mpElectricsMesh->GetNumNodes() << ", " << this->mpMechanicsMesh->GetNumNodes() << "\n");
+
+            this->mpProblemDefinition = new ElectroMechanicsProblemDefinition<DIM>(*(this->mpMechanicsMesh));
+
+            // Fix the nodes on x=0
+            std::vector<unsigned> fixed_nodes;
+            for (unsigned i=0; i<this->mpMechanicsMesh->GetNumNodes(); ++i)
             {
-                fixed_nodes.push_back(i);
+                if (fabs(this->mpMechanicsMesh->GetNode(i)->rGetLocation()[0])<1e-6)
+                {
+                    fixed_nodes.push_back(i);
+                }
             }
+            this->mpProblemDefinition->SetZeroDisplacementNodes(fixed_nodes);
+
+            LOG(2, "Fixed the " << fixed_nodes.size() << " nodes on x=0");
+
+            this->mpProblemDefinition->SetUseDefaultCardiacMaterialLaw(compressibilityType);
+            this->mpProblemDefinition->SetContractionModel(contractionModel,contractionModelOdeTimeStep);
+            this->mpProblemDefinition->SetMechanicsSolveTimestep(mechanicsSolveTimestep);
         }
-        this->mpProblemDefinition->SetZeroDisplacementNodes(fixed_nodes);
-
-        LOG(2, "Fixed the " << fixed_nodes.size() << " nodes on x=0");
-
-        this->mpProblemDefinition->SetUseDefaultCardiacMaterialLaw(compressibilityType);
-        this->mpProblemDefinition->SetContractionModel(contractionModel,contractionModelOdeTimeStep);
-        this->mpProblemDefinition->SetMechanicsSolveTimestep(mechanicsSolveTimestep);
+        else
+        {
+            NEVER_REACHED;
+        }
     }
 
     ~CardiacElectroMechProbRegularGeom()

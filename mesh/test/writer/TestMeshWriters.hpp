@@ -548,7 +548,7 @@ public:
 
         // set up a deformed positions vector
         std::vector<c_vector<double,2> > deformed_positions(mesh.GetNumNodes(), zero_vector<double>(2));
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             deformed_positions[i](0) = 2*mesh.GetNode(i)->rGetLocation()[0];
             deformed_positions[i](1) = 3*mesh.GetNode(i)->rGetLocation()[1];
@@ -557,7 +557,7 @@ public:
         writer.WriteDeformationPositions(deformed_positions, 1);
 
         // ..and again
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             deformed_positions[i](0) = 4*mesh.GetNode(i)->rGetLocation()[0];
             deformed_positions[i](1) = 6*mesh.GetNode(i)->rGetLocation()[1];
@@ -615,7 +615,7 @@ public:
         writer_with_regions.WriteInitialMesh("init");
         // set up a deformed positions vector
         std::vector<c_vector<double,2> > deformed_positions_2(mesh.GetNumNodes(), zero_vector<double>(2));
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             deformed_positions_2[i](0) = 2*mesh.GetNode(i)->rGetLocation()[0];
             deformed_positions_2[i](1) = 3*mesh.GetNode(i)->rGetLocation()[1];
@@ -635,7 +635,7 @@ public:
         QuadraticMesh<2> mesh(0.5, 1.0, 2.0);
 
         // Displace the internal nodes so you can see if quadratically visualised or not
-        for (unsigned i=mesh.GetNumVertices(); i<mesh.GetNumNodes(); i++)
+        for (unsigned i=mesh.GetNumVertices(); i<mesh.GetNumNodes(); ++i)
         {
             mesh.GetNode(i)->rGetModifiableLocation()[0] += 0.02;
             mesh.GetNode(i)->rGetModifiableLocation()[1] += 0.02;
@@ -651,7 +651,7 @@ public:
 
         // Set up a deformed positions vector
         std::vector<c_vector<double,2> > deformed_positions(mesh.GetNumNodes(), zero_vector<double>(2));
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             deformed_positions[i](0) = 2*mesh.GetNode(i)->rGetLocation()[0];
             deformed_positions[i](1) = 3*mesh.GetNode(i)->rGetLocation()[1];
@@ -660,7 +660,7 @@ public:
         writer.WriteDeformationPositions(deformed_positions, 1);
 
         // ..and again
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             deformed_positions[i](0) = 4*mesh.GetNode(i)->rGetLocation()[0];
             deformed_positions[i](1) = 6*mesh.GetNode(i)->rGetLocation()[1];
@@ -704,7 +704,7 @@ public:
         QuadraticMesh<3> mesh(0.5, 1.0, 2.0, 3.0);
 
         // Displace the internal nodes so you can see if quadratically visualised or not
-        for (unsigned i=mesh.GetNumVertices(); i<mesh.GetNumNodes(); i++)
+        for (unsigned i=mesh.GetNumVertices(); i<mesh.GetNumNodes(); ++i)
         {
             mesh.GetNode(i)->rGetModifiableLocation()[0] += 0.02;
             mesh.GetNode(i)->rGetModifiableLocation()[1] += 0.02;
@@ -721,7 +721,7 @@ public:
 
         // Set up a deformed positions vector
         std::vector<c_vector<double,3> > deformed_positions(mesh.GetNumNodes(), zero_vector<double>(3));
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             deformed_positions[i](0) = 2*mesh.GetNode(i)->rGetLocation()[0];
             deformed_positions[i](1) = 3*mesh.GetNode(i)->rGetLocation()[1];
@@ -875,7 +875,7 @@ public:
         TrianglesMeshReader<1,1> reader3(handler.GetOutputDirectoryFullPath() + file_from_mesh_bin);
         TS_ASSERT_EQUALS(reader3.GetNumElements(), 10u);
         TS_ASSERT_EQUALS(reader3.GetNumElementAttributes(), 1u);
-        for (unsigned i=0; i<10; i++)
+        for (unsigned i=0; i<10; ++i)
         {
             double expected_attribute = i+1;
             if (i>=5)
@@ -966,7 +966,7 @@ public:
             reader_mesh.ConstructFromMeshReader(mesh_reader_reader);
 
 
-            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
             {
                 std::vector<double> orig_attr = mesh.GetNode(i)->rGetNodeAttributes();
                 std::vector<double> ascii_attr = ascii_mesh.GetNode(i)->rGetNodeAttributes();
@@ -986,7 +986,7 @@ public:
                     //TS_ASSERT_DELTA(orig_attr[attr_index], reader_attr[attr_index], 1e-15);
                 }
             }
-            for (unsigned i=0; i<mesh.GetNumElements(); i++)
+            for (unsigned i=0; i<mesh.GetNumElements(); ++i)
             {
                 TS_ASSERT_DELTA(mesh.GetElement(i)->GetAttribute(), ascii_mesh.GetElement(i)->GetAttribute(), 0.4 + 1e-12);
                 TS_ASSERT_DELTA(mesh.GetElement(i)->GetAttribute(), bin_mesh.GetElement(i)->GetAttribute(), 1e-15);
@@ -1020,9 +1020,9 @@ public:
         types_to_compare.push_back("ele");
         types_to_compare.push_back("face");
 
-        for (unsigned i=0; i<files_to_compare.size(); i++)
+        for (unsigned i=0; i<files_to_compare.size(); ++i)
         {
-            for (unsigned j=0; j<types_to_compare.size(); j++)
+            for (unsigned j=0; j<types_to_compare.size(); ++j)
             {
                 FileComparison comparer(results_dir + "/" + files_to_compare[i] + "." + types_to_compare[j],
                                         "mesh/test/data/simple_cube_binary." + types_to_compare[j]);

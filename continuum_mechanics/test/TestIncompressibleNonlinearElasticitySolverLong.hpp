@@ -218,7 +218,7 @@ public:
             l2_errors[run] = 0;
 
             std::vector<c_vector<double,3> >& r_solution = solver.rGetDeformedPosition();
-            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
             {
                 double X = mesh.GetNode(i)->rGetLocation()[0];
                 double Y = mesh.GetNode(i)->rGetLocation()[1];
@@ -246,7 +246,7 @@ public:
             l2_errors[run] /= mesh.GetNumNodes();
 
             std::vector<double>& r_pressures = solver.rGetPressures();
-            for (unsigned i=0; i<r_pressures.size(); i++)
+            for (unsigned i=0; i<r_pressures.size(); ++i)
             {
                 TS_ASSERT_DELTA(r_pressures[i]/(2*ThreeDimensionalModelProblem::c1), 1.0, 2e-1);
             }
@@ -315,7 +315,7 @@ public:
         std::vector<unsigned> fixed_nodes;
         std::vector<c_vector<double,3> > locations;
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             double X = mesh.GetNode(i)->rGetLocation()[0];
             double Y = mesh.GetNode(i)->rGetLocation()[1];
@@ -366,7 +366,7 @@ public:
 
         // Compare
         std::vector<c_vector<double,3> >& r_solution = solver.rGetDeformedPosition();
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
         {
             double X = mesh.GetNode(i)->rGetLocation()[0];
             double Y = mesh.GetNode(i)->rGetLocation()[1];

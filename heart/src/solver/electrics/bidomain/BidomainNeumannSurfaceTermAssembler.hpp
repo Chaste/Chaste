@@ -96,7 +96,7 @@ c_vector<double, 2*ELEMENT_DIM> BidomainNeumannSurfaceTermAssembler<ELEMENT_DIM,
     double sigma_e_times_grad_phi_e_dot_n = this->mpBoundaryConditions->GetNeumannBCValue(&rSurfaceElement, rX, 1);
 
     c_vector<double, 2*ELEMENT_DIM> ret;
-    for (unsigned i=0; i<ELEMENT_DIM; i++)
+    for (unsigned i=0; i<ELEMENT_DIM; ++i)
     {
         ret(2*i)   = rPhi(i)*sigma_i_times_grad_phi_i_dot_n;
         ret(2*i+1) = rPhi(i)*(sigma_i_times_grad_phi_i_dot_n + sigma_e_times_grad_phi_e_dot_n);

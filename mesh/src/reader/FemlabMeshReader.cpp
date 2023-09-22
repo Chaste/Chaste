@@ -145,7 +145,7 @@ std::vector < std::vector < unsigned > >
     std::vector < std::vector < unsigned > >tokenized_data;
 
     // There are dimensionOfObject lines to be read
-    for (unsigned i = 0; i < dimensionOfObject; i++)
+    for (unsigned i = 0; i < dimensionOfObject; ++i)
     {
         const std::string& r_line_of_data = rRawData[i];
         std::stringstream line_stream (r_line_of_data);

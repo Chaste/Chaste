@@ -98,7 +98,7 @@ void RungeKuttaFehlbergIvpOdeSolver::InternalSolve(OdeSolution& rSolution,
 
             // Find the maximum error in this vector
             double max_error = -DBL_MAX;
-            for (unsigned i=0; i<number_of_variables; i++)
+            for (unsigned i = 0; i<number_of_variables; ++i)
             {
                 if (mError[i] > max_error)
                 {
@@ -169,21 +169,21 @@ void RungeKuttaFehlbergIvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbs
 
     pAbstractOdeSystem->EvaluateYDerivatives(time, rCurrentYValues, dy);
 
-    for (unsigned i=0; i<num_equations; i++)
+    for (unsigned i = 0; i<num_equations; ++i)
     {
         mk1[i] = timeStep*dy[i];
         myk2[i] = rCurrentYValues[i] + 0.25*mk1[i];
     }
 
     pAbstractOdeSystem->EvaluateYDerivatives(time + 0.25*timeStep, myk2, dy);
-    for (unsigned i=0; i<num_equations; i++)
+    for (unsigned i = 0; i<num_equations; ++i)
     {
         mk2[i] = timeStep*dy[i];
         myk3[i] = rCurrentYValues[i] + 0.09375*mk1[i] + 0.28125*mk2[i];
     }
 
     pAbstractOdeSystem->EvaluateYDerivatives(time + 0.375*timeStep, myk3, dy);
-    for (unsigned i=0; i<num_equations; i++)
+    for (unsigned i = 0; i<num_equations; ++i)
     {
         mk3[i] = timeStep*dy[i];
         myk4[i] = rCurrentYValues[i] + m1932o2197*mk1[i] - m7200o2197*mk2[i]
@@ -191,7 +191,7 @@ void RungeKuttaFehlbergIvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbs
     }
 
     pAbstractOdeSystem->EvaluateYDerivatives(time+m12o13*timeStep, myk4, dy);
-    for (unsigned i=0; i<num_equations; i++)
+    for (unsigned i = 0; i<num_equations; ++i)
     {
         mk4[i] = timeStep*dy[i];
         myk5[i] = rCurrentYValues[i] + m439o216*mk1[i] - 8*mk2[i]
@@ -199,7 +199,7 @@ void RungeKuttaFehlbergIvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbs
     }
 
     pAbstractOdeSystem->EvaluateYDerivatives(time+timeStep, myk5, dy);
-    for (unsigned i=0; i<num_equations; i++)
+    for (unsigned i = 0; i<num_equations; ++i)
     {
         mk5[i] = timeStep*dy[i];
         myk6[i] = rCurrentYValues[i] - m8o27*mk1[i] + 2*mk2[i] - m3544o2565*mk3[i]
@@ -207,7 +207,7 @@ void RungeKuttaFehlbergIvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbs
     }
 
     pAbstractOdeSystem->EvaluateYDerivatives(time+0.5*timeStep, myk6, dy);
-    for (unsigned i=0; i<num_equations; i++)
+    for (unsigned i = 0; i<num_equations; ++i)
     {
         mk6[i] = timeStep*dy[i];
         mError[i] = (1/timeStep)*fabs(m1o360*mk1[i] - m128o4275*mk3[i]

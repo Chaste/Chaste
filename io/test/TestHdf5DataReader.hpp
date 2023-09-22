@@ -80,8 +80,8 @@ private:
         /*
          * Data  and output buffer initialization.
          */
-        for (j = 0; j < NX; j++) {
-        for (i = 0; i < NY; i++)
+        for (j = 0; j < NX; ++j) {
+        for (i = 0; i < NY; ++i)
             data[j][i] = i + j;
         }
         /*
@@ -171,11 +171,11 @@ public:
         // Create the file it's gonna be read
         WriteDataTestSimpleReadDirectlyWithHdf5();
 
-        for (j = 0; j < NX; j++)
+        for (j = 0; j < NX; ++j)
         {
-            for (i = 0; i < NY; i++)
+            for (i = 0; i < NY; ++i)
             {
-                for (k = 0; k < NZ; k++)
+                for (k = 0; k < NZ; ++k)
                     data_out[j][i][k] = 0;
             }
         }
@@ -349,7 +349,7 @@ public:
         TS_ASSERT_EQUALS(variable_names[2], "I_Na");
         TS_ASSERT_EQUALS(reader.GetUnit("I_Na"), "milliamperes");
 
-        for (unsigned node_index=0; node_index<NUMBER_NODES; node_index++)
+        for (unsigned node_index = 0; node_index < NUMBER_NODES; ++node_index)
         {
             std::vector<double> node_values = reader.GetVariableOverTime("Node", node_index);
             std::vector<double> i_k_values = reader.GetVariableOverTime("I_K", node_index);
@@ -359,7 +359,7 @@ public:
             TS_ASSERT_EQUALS(i_k_values.size(), 10u);
             TS_ASSERT_EQUALS(i_na_values.size(), 10u);
 
-            for (unsigned i=0; i<node_values.size(); i++)
+            for (unsigned i=0; i<node_values.size(); ++i)
             {
                 TS_ASSERT_DELTA( node_values[i], node_index, 1e-9);
                 TS_ASSERT_DELTA( i_k_values[i], i*1000 + 100 + node_index, 1e-9);
@@ -419,7 +419,7 @@ public:
 
         std::vector<double> unlimited_values = reader.GetUnlimitedDimensionValues();
 
-        for (unsigned i=0; i< unlimited_values.size(); i++)
+        for (unsigned i=0; i< unlimited_values.size(); ++i)
         {
             TS_ASSERT_EQUALS(unlimited_values[i], i);
         }
@@ -570,14 +570,14 @@ public:
         // Can read one of the nodes that was written
         std::vector<double> twenty_one = reader.GetVariableOverTime("Node", 21);
         TS_ASSERT_EQUALS(twenty_one.size(), 10u);
-        for (unsigned i=0; i<twenty_one.size(); i++)
+        for (unsigned i=0; i<twenty_one.size(); ++i)
         {
             TS_ASSERT_EQUALS(twenty_one[i], 21u);
         }
         // Can read more of the data
         std::vector<double> na_47 = reader.GetVariableOverTime("I_Na", 47);
         TS_ASSERT_EQUALS(na_47.size(), 10u);
-        for (unsigned i=0; i<na_47.size(); i++)
+        for (unsigned i=0; i<na_47.size(); ++i)
         {
             TS_ASSERT_EQUALS(na_47[i], i*1000u + 200u + 47u);
         }

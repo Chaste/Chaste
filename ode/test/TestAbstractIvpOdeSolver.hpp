@@ -289,7 +289,7 @@ public:
                               "You must first call ""CalculateDerivedQuantitiesAndParameters()"" in order to write derived quantities.");
 
         // Check solution and derived quantity for all times
-        for (unsigned i=0; i<solution.rGetSolutions().size(); i++)
+        for (unsigned i=0; i<solution.rGetSolutions().size(); ++i)
         {
             TS_ASSERT_DELTA(solution.rGetSolutions()[i][0], 5.0*solution.rGetTimes()[i], 1e-2);
              // (derived quantity = 2a+y)

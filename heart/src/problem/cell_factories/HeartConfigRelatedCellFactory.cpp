@@ -82,7 +82,7 @@ void HeartConfigRelatedCellFactory<SPACE_DIM>::PreconvertCellmlFiles()
     {
         LoadDynamicModel(mDefaultIonicModel, true);
     }
-    for (unsigned i=0; i<mIonicModelsDefined.size(); i++)
+    for (unsigned i=0; i<mIonicModelsDefined.size(); ++i)
     {
         if (mIonicModelsDefined[i].Dynamic().present())
         {
@@ -142,7 +142,7 @@ AbstractCardiacCellInterface* HeartConfigRelatedCellFactory<SPACE_DIM>::CreateCe
     else
     {
         assert(ionic_model.Hardcoded().present());
-        switch(ionic_model.Hardcoded().get())
+        switch (ionic_model.Hardcoded().get())
         {
             case(cp::ionic_models_available_type::LuoRudyI):
             {
@@ -390,7 +390,7 @@ void HeartConfigRelatedCellFactory<3u>::FillInCellularTransmuralAreas()
     std::vector<Node<3u>*> endo_nodes;
 
     //create the list of (pointer to object) nodes in each layer from the heterogeneities vector that was just filled in
-    for (unsigned node_index = 0; node_index < this->GetMesh()->GetNumNodes(); node_index++)
+    for (unsigned node_index = 0; node_index < this->GetMesh()->GetNumNodes(); ++node_index)
     {
         if (this->GetMesh()->GetDistributedVectorFactory()->IsGlobalIndexLocal(node_index) )
         {

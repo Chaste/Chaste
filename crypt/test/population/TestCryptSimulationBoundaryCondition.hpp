@@ -174,7 +174,7 @@ public:
 
         // Store the node locations
         std::map<Node<1>*, c_vector<double, 1> > node_locations_before;
-        for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
         {
             node_locations_before[crypt.GetNode(node_index)] = crypt.GetNode(node_index)->rGetLocation();
         }
@@ -207,12 +207,12 @@ public:
 
         // The nodes should all now be at their original locations
         std::map<Node<1>*, c_vector<double, 1> > node_locations_after;
-        for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
         {
             node_locations_after[crypt.GetNode(node_index)] = crypt.GetNode(node_index)->rGetLocation();
         }
 
-        for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
         {
             TS_ASSERT_DELTA(node_locations_before[crypt.GetNode(node_index)](0), node_locations_after[crypt.GetNode(node_index)](0), 1e-3);
         }
@@ -233,7 +233,7 @@ public:
 
         // Store the node locations
         std::map<Node<2>*, c_vector<double, 2> > node_locations_before;
-        for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < p_mesh->GetNumNodes(); ++node_index)
         {
             node_locations_before[crypt.GetNode(node_index)] = crypt.GetNode(node_index)->rGetLocation();
         }
@@ -256,12 +256,12 @@ public:
 
         // The nodes should all now be at their original locations
         std::map<Node<2>*, c_vector<double, 2> > node_locations_after;
-        for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < p_mesh->GetNumNodes(); ++node_index)
         {
             node_locations_after[crypt.GetNode(node_index)] = crypt.GetNode(node_index)->rGetLocation();
         }
 
-        for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < p_mesh->GetNumNodes(); ++node_index)
         {
             TS_ASSERT_DELTA(node_locations_before[crypt.GetNode(node_index)](0), node_locations_after[crypt.GetNode(node_index)](0), 1e-3);
             TS_ASSERT_DELTA(node_locations_before[crypt.GetNode(node_index)](1), node_locations_after[crypt.GetNode(node_index)](1), 1e-3);
@@ -284,7 +284,7 @@ public:
 
         // Store the node locations
         std::map<Node<2>*, c_vector<double, 2> > node_locations_before;
-        for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < p_mesh->GetNumNodes(); ++node_index)
         {
             node_locations_before[crypt.GetNode(node_index)] = crypt.GetNode(node_index)->rGetLocation();
         }
@@ -342,7 +342,7 @@ public:
 
         // Store the node locations
         std::map<Node<1>*, c_vector<double, 1> > node_locations_before;
-        for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
         {
             node_locations_before[crypt.GetNode(node_index)] = crypt.GetNode(node_index)->rGetLocation();
         }
@@ -383,7 +383,7 @@ public:
 
         // Store the node locations
         std::map<Node<2>*, c_vector<double, 2> > node_locations_before;
-        for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < p_mesh->GetNumNodes(); ++node_index)
         {
             node_locations_before[crypt.GetNode(node_index)] = crypt.GetNode(node_index)->rGetLocation();
         }
@@ -440,7 +440,7 @@ public:
 
         // Store the node locations
         std::map<Node<1>*, c_vector<double, 1> > node_locations_before;
-        for (unsigned node_index=0; node_index<mesh.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
         {
             node_locations_before[crypt.GetNode(node_index)] = crypt.GetNode(node_index)->rGetLocation();
         }
@@ -474,7 +474,7 @@ public:
 
         // Store the node locations
         std::map<Node<2>*, c_vector<double, 2> > node_locations_before;
-        for (unsigned node_index=0; node_index<p_mesh->GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < p_mesh->GetNumNodes(); ++node_index)
         {
             node_locations_before[crypt.GetNode(node_index)] = crypt.GetNode(node_index)->rGetLocation();
         }

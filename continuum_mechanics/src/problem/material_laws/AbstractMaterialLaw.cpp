@@ -62,14 +62,14 @@ void AbstractMaterialLaw<DIM>::ComputeCauchyStress(c_matrix<double,DIM,DIM>& rF,
      * which doesn't seem to compile anyway, as rF is a Tensor<2,DIM> and T is a
      * SymmetricTensor<2,DIM>.
      */
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
-        for (unsigned j=0; j<DIM; j++)
+        for (unsigned j = 0; j < DIM; ++j)
         {
             rSigma(i,j) = 0.0;
-            for (unsigned M=0; M<DIM; M++)
+            for (unsigned M = 0; M < DIM; ++M)
             {
-                for (unsigned N=0; N<DIM; N++)
+                for (unsigned N = 0; N < DIM; ++N)
                 {
                     rSigma(i,j) += rF(i,M)*T(M,N)*rF(j,N);
                 }

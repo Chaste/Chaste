@@ -84,14 +84,14 @@ private:
 
         // Set up expected node pairs
         std::set< std::set<unsigned> > expected_node_pairs;
-        for (unsigned i=0; i<mesh.GetNumAllElements(); i++)
+        for (unsigned i=0; i<mesh.GetNumAllElements(); ++i)
         {
             Element<DIM,DIM>* p_element = mesh.GetElement(i);
             if (!p_element->IsDeleted())
             {
-                for (unsigned j=0; j<DIM+1; j++)
+                for (unsigned j=0; j<DIM+1; ++j)
                 {
-                    for (unsigned k=0; k<DIM+1; k++)
+                    for (unsigned k=0; k<DIM+1; ++k)
                     {
                         unsigned node_A = p_element->GetNodeGlobalIndex(j);
                         unsigned node_B = p_element->GetNodeGlobalIndex(k);
@@ -179,7 +179,7 @@ public:
 
         ChastePoint<1> updatedPoint(1.5);
         mesh.RescaleMeshFromBoundaryNode(updatedPoint,10);
-        for (int i=0; i<11; i++)
+        for (int i=0; i<11; ++i)
         {
             TS_ASSERT_DELTA(mesh.GetNode(i)->GetPoint()[0], 1.5*(i/10.0), 0.001);
         }
@@ -1038,7 +1038,7 @@ public:
         TS_ASSERT_EQUALS(map.IsDeleted(50), true);
         TS_ASSERT_EQUALS(map.IsDeleted(0), true);
 
-        for (unsigned i=1; i<num_old_nodes; i++)
+        for (unsigned i=1; i<num_old_nodes; ++i)
         {
             if (i<50)
             {
@@ -1073,7 +1073,7 @@ public:
         TS_ASSERT_EQUALS(map.IsDeleted(50), true);
         TS_ASSERT_EQUALS(map.IsDeleted(0), true);
 
-        for (unsigned i=1; i<num_old_nodes; i++)
+        for (unsigned i=1; i<num_old_nodes; ++i)
         {
             if (i<50)
             {
@@ -1219,7 +1219,7 @@ public:
                 ++it2)
             {
                 c_vector<unsigned, 3> nodes;
-                for (unsigned i=0; i<3; i++)
+                for (unsigned i=0; i<3; ++i)
                 {
                     nodes[i]=it2->GetNodeGlobalIndex(i);
                 }
@@ -1268,7 +1268,7 @@ public:
                             it2 != static_cast<MutableMesh<2,2>* >(p_mesh2)->GetElementIteratorEnd();
                             ++it2)
             {
-                for (unsigned i=0; i<3; i++)
+                for (unsigned i=0; i<3; ++i)
                 {
                     TS_ASSERT_EQUALS(element_nodes[counter][i],it2->GetNodeGlobalIndex(i));
                 }

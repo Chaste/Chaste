@@ -293,7 +293,7 @@ public:
             TS_ASSERT_LESS_THAN_EQUALS(-voltage[index] + (Ek-30), 0);
 
             std::vector<double> r_ode_vars = bidomain_problem.GetBidomainTissue()->GetCardiacCell(index.Global)->GetStdVecStateVariables();
-            for (int j=0; j<8; j++)
+            for (int j=0; j<8; ++j)
             {
                 // if not voltage or calcium ion conc, test whether between 0 and 1
                 if ((j!=0) && (j!=7))
@@ -389,7 +389,7 @@ public:
                 TS_ASSERT_LESS_THAN_EQUALS(-voltage[index] + (Ek-30), 0);
 
                 std::vector<double> r_ode_vars = bidomain_problem.GetBidomainTissue()->GetCardiacCell(index.Global)->GetStdVecStateVariables();
-                for (int j=0; j<8; j++)
+                for (int j=0; j<8; ++j)
                 {
                     // if not voltage or calcium ion conc, test whether between 0 and 1
                     if ((j!=0) && (j!=7))
@@ -427,8 +427,8 @@ public:
             }
 
             // check mean of extracellular potential is 0
-            double local_phi_e=0.0;
-            double total_phi_e=0.0;
+            double local_phi_e = 0.0;
+            double total_phi_e = 0.0;
 
             for (DistributedVector::Iterator index = striped_voltage.Begin();
                  index != striped_voltage.End();
@@ -438,7 +438,7 @@ public:
             }
 
             int ierr = MPI_Allreduce(&local_phi_e, &total_phi_e, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
-            TS_ASSERT_EQUALS(ierr, (int)MPI_SUCCESS);
+            TS_ASSERT_EQUALS(ierr, static_cast<int>(MPI_SUCCESS));
 
             TS_ASSERT_DELTA(total_phi_e, 0, 1e-4);
 
@@ -701,7 +701,7 @@ public:
         std::string files[6] = {"res_mesh.pts","res_mesh.cnnx","ChasteParameters.xml",
                                 "res_Phi_e.dat","res_V.dat","res_times.info"};
 
-        for (unsigned i=0; i<6; i++)
+        for (unsigned i=0; i<6; ++i)
         {
             TS_ASSERT(handler.FindFile(files[i]).Exists());
         }
@@ -932,7 +932,7 @@ public:
         std::vector<double> node_5_phi = data_reader1.GetVariableOverTime("Phi_e", 5);
         TS_ASSERT_EQUALS( node_5_phi.size(), num_steps);
 
-        for (unsigned i=0; i<output_variables.size(); i++)
+        for (unsigned i=0; i<output_variables.size(); ++i)
         {
             unsigned global_index = 2+i*2;
             std::vector<double> values = data_reader1.GetVariableOverTime(output_variables[i], global_index);

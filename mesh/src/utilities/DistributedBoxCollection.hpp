@@ -110,7 +110,7 @@ private:
     /** Whether the domain is periodic in the Z dimension.*/
     bool mIsPeriodicInZ;
 
-    /** Whether the domain is periodic across different processors (i.e. in parallel if DIM==3 and periodic in z, or DIM==2 and periodic in Y)*/
+    /** Whether the domain is periodic across different processors (i.e. in parallel if DIM == 3 and periodic in z, or DIM == 2 and periodic in Y)*/
     bool mIsPeriodicAcrossProcs;
 
     /** Whether the local boxes have been setup or not. */
@@ -434,7 +434,7 @@ inline void save_construct_data(
 {
     // Save the number of rows that each process owns, so that on loading we can resume with
     // good load balance
-    int num_local_rows = (int)(t->GetNumRowsOfBoxes());
+    int num_local_rows = static_cast<int>(t->GetNumRowsOfBoxes());
     std::vector<int> num_rows(PetscTools::GetNumProcs());
     MPI_Gather(&num_local_rows, 1, MPI_INT, &num_rows[0], 1, MPI_INT, 0, PETSC_COMM_WORLD);
 
@@ -444,7 +444,7 @@ inline void save_construct_data(
         ar << are_boxes_set;
 
         c_vector<double, 2*DIM> domain_size = t->rGetDomainSize();
-        for (unsigned i=0; i<2*DIM; i++)
+        for (unsigned i=0; i<2*DIM; ++i)
         {
             ar << domain_size[i];
         }
@@ -471,7 +471,7 @@ inline void load_construct_data(
 
     // Retrieve data from archive required to construct new instance of Node
     c_vector<double,2*DIM> domain_size;
-    for (unsigned i=0; i<2*DIM; i++)
+    for (unsigned i=0; i<2*DIM; ++i)
     {
         double coordinate;
         ar & coordinate; //resume coordinates one by one
@@ -479,7 +479,7 @@ inline void load_construct_data(
     }
 
     // Shrink the domain size slightly so we get the correct size on construction
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         domain_size[2*i+1] -= 1e-14;
     }

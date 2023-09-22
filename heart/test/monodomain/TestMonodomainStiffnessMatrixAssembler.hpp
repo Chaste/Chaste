@@ -74,7 +74,7 @@ public:
 
         for (unsigned i = lo; i < static_cast<unsigned>(hi); ++i)
         {
-            for (unsigned j=0; j<mesh.GetNumNodes(); j++)
+            for (unsigned j=0; j<mesh.GetNumNodes(); ++j)
             {
                 double value = PetscMatTools::GetElement(mat,i,j);
                 if (i>0 && i<mesh.GetNumNodes()-1)

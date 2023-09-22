@@ -154,7 +154,7 @@ public:
         fixed_nodes.push_back(0);
         fixed_node_locations.push_back(zero_vector<double>(2));
 
-        for (unsigned i=1; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=1; i<mechanics_mesh.GetNumNodes(); ++i)
         {
             double X = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             if (fabs(X) < 1e-6) // ie, if X==0
@@ -262,7 +262,7 @@ public:
         Vec voltage = PetscTools::CreateVec(electrics_mesh.GetNumNodes());
         reader.GetVariableOverNodes(voltage, "V", num_timesteps-1);
         ReplicatableVector voltage_repl(voltage);
-        for (unsigned i=0; i<voltage_repl.GetSize(); i++)
+        for (unsigned i=0; i<voltage_repl.GetSize(); ++i)
         {
             TS_ASSERT_DELTA(voltage_repl[i], -81.9080, 1e-3);
         }
@@ -295,7 +295,7 @@ public:
 
         std::vector<unsigned> fixed_nodes;
         std::vector<c_vector<double,2> > fixed_node_locations;
-        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); ++i)
         {
             double x = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double y = mechanics_mesh.GetNode(i)->rGetLocation()[1];

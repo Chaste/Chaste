@@ -76,7 +76,7 @@ public:
      */
     AbstractContractionModel* CreateContractionCellForElement(Element<DIM, DIM>* pElement)
     {
-        switch(mContractionModelName)
+        switch (mContractionModelName)
         {
             case CONSTANT:
             {

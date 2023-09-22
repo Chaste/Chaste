@@ -80,7 +80,7 @@ ObsoleteBoxCollection<DIM>::ObsoleteBoxCollection(double boxWidth, c_vector<doub
     // Calculating the number of boxes in each direction and total number of boxes.
     unsigned num_boxes = 1;
 
-    for (unsigned i = 0; i < DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         ///\todo #2725 example: domain width of 1.0 and box width of 0.25, the following line will create 5 boxes not 4
         mNumBoxesEachDirection(i) = static_cast<unsigned>(floor((domainSize(2 * i + 1) - domainSize(2 * i)) / boxWidth + msFudge) + 1);
@@ -94,7 +94,7 @@ ObsoleteBoxCollection<DIM>::ObsoleteBoxCollection(double boxWidth, c_vector<doub
 template<unsigned DIM>
 void ObsoleteBoxCollection<DIM>::EmptyBoxes()
 {
-    for (unsigned i = 0; i < mBoxes.size(); i++)
+    for (unsigned i = 0; i < mBoxes.size(); ++i)
     {
         mBoxes[i].ClearNodes();
     }
@@ -112,7 +112,7 @@ template<unsigned DIM>
 unsigned ObsoleteBoxCollection<DIM>::CalculateContainingBox(c_vector<double, DIM>& rLocation)
 {
     // Confirm that the location is in the domain
-    for (unsigned i = 0; i < DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         if (!(rLocation[i] >= mDomainSize[2*i] && rLocation[i] <= mDomainSize[2*i + 1]))
         {
@@ -126,9 +126,9 @@ unsigned ObsoleteBoxCollection<DIM>::CalculateContainingBox(c_vector<double, DIM
 
     // Compute the containing box index in each dimension
     c_vector<int, DIM> containing_box_indices;
-    for (unsigned i = 0; i < DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
-        containing_box_indices[i] = (int) floor((rLocation[i] - mDomainSize(2 * i) + msFudge) / mBoxWidth);
+        containing_box_indices[i] = static_cast<int>(floor((rLocation[i] - mDomainSize(2 * i) + msFudge) / mBoxWidth));
     }
 
     return GetLinearIndex(containing_box_indices);
@@ -161,17 +161,17 @@ unsigned ObsoleteBoxCollection<DIM>::GetLinearIndex(c_vector<int, DIM> gridIndic
     for (unsigned dim = 0; dim < DIM; dim++)
     {
         // Check for values too large
-        if (gridIndices(dim) >= (int)mNumBoxesEachDirection(dim))
+        if (gridIndices(dim) >= static_cast<int>(mNumBoxesEachDirection(dim)))
         {
             assert(mIsDomainPeriodic(dim));
-            gridIndices(dim) -= (int)mNumBoxesEachDirection(dim);
+            gridIndices(dim) -= static_cast<int>(mNumBoxesEachDirection(dim));
         }
 
         // Check for negative values
         else if (gridIndices(dim) < 0)
         {
             assert(mIsDomainPeriodic(dim));
-            gridIndices(dim) += (int)mNumBoxesEachDirection(dim);
+            gridIndices(dim) += static_cast<int>(mNumBoxesEachDirection(dim));
         }
     }
 
@@ -640,7 +640,7 @@ void ObsoleteBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNo
     EmptyBoxes();
 
     // Create an empty set of neighbours for each node, and add each node to its correct box
-    for (unsigned node_index = 0; node_index < rNodes.size(); node_index++)
+    for (unsigned node_index = 0; node_index < rNodes.size(); ++node_index)
     {
         rNodes[node_index]->ClearNeighbours();
 
@@ -648,7 +648,7 @@ void ObsoleteBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNo
         mBoxes[box_index].AddNode(rNodes[node_index]);
     }
 
-    for (unsigned i = 0; i < rNodes.size(); i++)
+    for (unsigned i = 0; i < rNodes.size(); ++i)
     {
         Node<DIM>* this_node = rNodes[i];
         unsigned node_index = this_node->GetIndex();
@@ -691,7 +691,7 @@ void ObsoleteBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNo
         }
     }
 
-    for (unsigned i = 0; i < rNodes.size(); i++)
+    for (unsigned i = 0; i < rNodes.size(); ++i)
     {
         rNodes[i]->RemoveDuplicateNeighbours();
     }

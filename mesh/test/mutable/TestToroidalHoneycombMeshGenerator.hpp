@@ -54,7 +54,7 @@ private:
 
         unsigned num_nodes = pMesh->GetNumNodes();
 
-        for (unsigned i=0; i<num_nodes; i++)
+        for (unsigned i=0; i<num_nodes; ++i)
         {
             c_vector<double, 2> location;
             location = pMesh->GetNode(i)->rGetLocation();

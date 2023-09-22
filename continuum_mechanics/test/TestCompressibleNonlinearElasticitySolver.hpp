@@ -213,7 +213,7 @@ public:
         ///////////////////////////////////////////////////////////////////
         ReplicatableVector rhs_vec(solver.mResidualVector);
         TS_ASSERT_EQUALS( rhs_vec.GetSize(), 2U*25U );
-        for (unsigned i=0; i<rhs_vec.GetSize(); i++)
+        for (unsigned i = 0; i<rhs_vec.GetSize(); ++i)
         {
             TS_ASSERT_DELTA(rhs_vec[i], 0.0, 1e-12);
         }
@@ -228,7 +228,7 @@ public:
         int lo, hi;
         MatGetOwnershipRange(solver.mrJacobianMatrix, &lo, &hi);
 
-        for (unsigned j=0; j<num_dofs; j++)
+        for (unsigned j = 0; j<num_dofs; ++j)
         {
             solver.rGetCurrentSolution().clear();
             solver.rGetCurrentSolution().resize(num_dofs, 0.0);
@@ -238,9 +238,9 @@ public:
 
             ReplicatableVector perturbed_rhs( solver.mResidualVector );
 
-            for (unsigned i=0; i<num_dofs; i++)
+            for (unsigned i = 0; i < num_dofs; ++i)
             {
-                if ((lo<=(int)i) && ((int)i<hi))
+                if (lo <= static_cast<int>(i) && static_cast<int>(i) < hi)
                 {
                     double analytic_matrix_val = PetscMatTools::GetElement(solver.mrJacobianMatrix,i,j);
                     double numerical_matrix_val = (perturbed_rhs[i] - rhs_vec[i])/h;
@@ -282,7 +282,7 @@ public:
         solver.rGetCurrentSolution().clear();
         solver.rGetCurrentSolution().resize(num_dofs, 0.0);
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             solver.rGetCurrentSolution()[2*i]   = (lambda-1)*mesh.GetNode(i)->rGetLocation()[0];
             solver.rGetCurrentSolution()[2*i+1] = (mu-1)*mesh.GetNode(i)->rGetLocation()[1];
@@ -293,16 +293,16 @@ public:
 
         h=1e-8; // needs to be smaller for this one [COMMENT COPIED FROM INCOMPRESSIBLE VERSION OF THIS TEST]
 
-        for (unsigned j=0; j<num_dofs; j++)
+        for (unsigned j = 0; j<num_dofs; ++j)
         {
             solver.rGetCurrentSolution()[j] += h;
             solver.AssembleSystem(true, false);
 
             ReplicatableVector perturbed_rhs( solver.mResidualVector );
 
-            for (unsigned i=0; i<num_dofs; i++)
+            for (unsigned i = 0; i<num_dofs; ++i)
             {
-                if ((lo<=(int)i) && ((int)i<hi))
+                if ((lo <= static_cast<int>(i)) && (static_cast<int>(i) < hi))
                 {
                     double analytic_matrix_val = PetscMatTools::GetElement(solver.mrJacobianMatrix,i,j);
                     double numerical_matrix_val = (perturbed_rhs[i] - rhs_vec2[i])/h;
@@ -361,7 +361,7 @@ public:
         std::vector<c_vector<double,2> >& r_deformed_position
             = solver.rGetDeformedPosition();
 
-        for (unsigned i=0; i<r_deformed_position.size(); i++)
+        for (unsigned i = 0; i<r_deformed_position.size(); ++i)
         {
             TS_ASSERT_DELTA(mesh.GetNode(i)->rGetLocation()[0], r_deformed_position[i](0), 1e-8);
             TS_ASSERT_DELTA(mesh.GetNode(i)->rGetLocation()[1], r_deformed_position[i](1), 1e-8);
@@ -412,7 +412,7 @@ public:
 
         std::vector<unsigned> fixed_nodes;
         std::vector<c_vector<double,2> > locations;
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             if (fabs(mesh.GetNode(i)->rGetLocation()[0]) < 1e-6)
             {
@@ -469,7 +469,7 @@ public:
 
         std::vector<double> old_current_soln = solver.rGetCurrentSolution();
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             double exact_x = alpha*mesh.GetNode(i)->rGetLocation()[0];
             double exact_y = beta*mesh.GetNode(i)->rGetLocation()[1];
@@ -486,7 +486,7 @@ public:
         // test stresses. The 1st PK stress should satisfy S = [s(0) 0 ; 0 0], where s is the
         // applied traction. This has to be multiplied by F^{-T} to get the 2nd PK stress.
         assert(solver.mAverageStressesPerElement.size()==mesh.GetNumElements());
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             if (mesh.CalculateDesignatedOwnershipOfElement(i))
             {
@@ -506,14 +506,14 @@ public:
 
         std::vector<c_vector<double,2> >& r_solution = solver.rGetDeformedPosition();
 
-        for (unsigned i=0; i<fixed_nodes.size(); i++)
+        for (unsigned i = 0; i<fixed_nodes.size(); ++i)
         {
             unsigned index = fixed_nodes[i];
             TS_ASSERT_DELTA(r_solution[index](0), locations[i](0), 1e-8);
             TS_ASSERT_DELTA(r_solution[index](1), locations[i](1), 1e-8);
         }
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             double exact_x = alpha*mesh.GetNode(i)->rGetLocation()[0];
             double exact_y = beta*mesh.GetNode(i)->rGetLocation()[1];
@@ -527,7 +527,7 @@ public:
         // from 1st PK stress (for which we have SN=s => S(0,0) = traction_value) to 2nd PK stress,
         // using T = SF^{-T}
         assert(solver.mAverageStressesPerElement.size()==mesh.GetNumElements());
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             //if (mesh.CalculateDesignatedOwnershipOfElement(i)) ///\todo #2223 This is correct for a distributed mesh
             if (mesh.GetElement(i)->GetOwnership()) // For a shared mesh (not distributed) this is a larger set than the commented line above
@@ -625,7 +625,7 @@ public:
 
             std::vector<c_vector<double,2> >& r_solution = solver.rGetDeformedPosition();
 
-            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
             {
                 double X = mesh.GetNode(i)->rGetLocation()[0];
                 double Y = mesh.GetNode(i)->rGetLocation()[1];
@@ -667,10 +667,10 @@ public:
                 c_matrix<double,6,6> a_elem_incompressible;
                 c_vector<double,6> b_elem_incompressible;
 
-                for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+                for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
                 {
                     // spatial variables
-                    for (unsigned j=0; j<2; j++)
+                    for (unsigned j = 0; j<2; ++j)
                     {
                         incompressible_solver.mCurrentSolution[3*i+j] = solver.mCurrentSolution[2*i+j];
                     }
@@ -680,7 +680,7 @@ public:
 
                 incompressible_solver.AssembleOnBoundaryElement(*(boundary_elems[0]), a_elem_incompressible, b_elem_incompressible, true, false, 0);
 
-                for (unsigned i=0; i<6; i++)
+                for (unsigned i = 0; i<6; ++i)
                 {
                     TS_ASSERT_DELTA( b_elem_incompressible(i), b_elem(i), 1e-12 );
                 }
@@ -718,7 +718,7 @@ public:
         PetscVecTools::Zero(test_vec);
         PetscVecTools::Zero(product_vec);
 
-        for (unsigned i=0; i<N; i++)
+        for (unsigned i = 0; i<N; ++i)
         {
             PetscVecTools::SetElement(test_vec, i, 1.0);
 
@@ -810,7 +810,7 @@ public:
         locations.push_back(zero_vector<double>(2));
 
         // for the rest of the nodes, if X=0, set x=0, leave y free.
-        for (unsigned i=1; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=1; i<mesh.GetNumNodes(); ++i)
         {
             if (fabs(mesh.GetNode(i)->rGetLocation()[0]) < 1e-6)
             {
@@ -858,7 +858,7 @@ public:
 
         std::vector<c_vector<double,2> >& r_solution = solver.rGetDeformedPosition();
 
-        for (unsigned i=0; i<fixed_nodes.size(); i++)
+        for (unsigned i = 0; i<fixed_nodes.size(); ++i)
         {
             unsigned index = fixed_nodes[i];
             TS_ASSERT_DELTA(r_solution[index](0), 0.0, 1e-8);
@@ -867,7 +867,7 @@ public:
             TS_ASSERT_DELTA(r_solution[index](1), exact_y, 1e-5);
         }
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             double exact_x = alpha*mesh.GetNode(i)->rGetLocation()[0];
             double exact_y = beta*mesh.GetNode(i)->rGetLocation()[1];
@@ -896,7 +896,7 @@ public:
         locations.push_back(zero_vector<double>(3));
 
         // for the rest of the nodes, if Y=0, set y=0, leave x,z free.
-        for (unsigned i=1; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=1; i<mesh.GetNumNodes(); ++i)
         {
             if (fabs(mesh.GetNode(i)->rGetLocation()[1]) < 1e-6)
             {
@@ -930,7 +930,7 @@ public:
         std::vector<c_vector<double,3> >& r_solution = solver.rGetDeformedPosition();
 
         // just check the Y=0 nodes still have y=0 but have moved in X and Z (except for node at origin)
-        for (unsigned i=1; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=1; i<mesh.GetNumNodes(); ++i)
         {
             if (fabs(mesh.GetNode(i)->rGetLocation()[1]) < 1e-6)
             {
@@ -1038,7 +1038,7 @@ public:
         // Apply a deformation
         //
         // (x,y,z) = (aX, bY-cX, cZ+aY)
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             double X = mesh.GetNode(i)->rGetLocation()[0];
             double Y = mesh.GetNode(i)->rGetLocation()[1];
@@ -1056,7 +1056,7 @@ public:
         //     [0  a  c]
         c_matrix<double,3,3> F;
 
-        for (unsigned i=0; i<1 /*mesh.GetNumElements()*/; i++)
+        for (unsigned i = 0; i<1 /*mesh.GetNumElements()*/; ++i)
         {
             solver.GetElementCentroidStrain(DEFORMATION_GRADIENT_F,*(mesh.GetElement(i)), F);
 
@@ -1112,7 +1112,7 @@ public:
         solver.SetComputeAverageStressPerElementDuringSolve();
 
         assert(solver.mAverageStressesPerElement.size()==6u);
-        for (unsigned i=0; i<6; i++)
+        for (unsigned i = 0; i<6; ++i)
         {
             solver.mAverageStressesPerElement[i] = zero_vector<double>(6);
         }
@@ -1137,7 +1137,7 @@ public:
 
         solver.AddStressToAverageStressPerElement(T,2);
 
-        for (unsigned i=0; i<6; i++)
+        for (unsigned i = 0; i<6; ++i)
         {
             solver.mAverageStressesPerElement[3](i) = i;
         }
@@ -1146,9 +1146,9 @@ public:
         double corrrect_T3[3][3] = { {0, 1, 2}, {1, 3, 4}, {2, 4, 5} };
 
 
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i<3; ++i)
         {
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j = 0; j<3; ++j)
             {
                 TS_ASSERT_DELTA(solver.GetAverageStressPerElement(0)(i,j), T(i,j), 1e-12);
                 TS_ASSERT_DELTA(solver.GetAverageStressPerElement(1)(i,j), 2*T(i,j), 1e-12);
@@ -1160,9 +1160,9 @@ public:
 
         T(2,2) = 10.243;
 
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i<3; ++i)
         {
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j = 0; j<3; ++j)
             {
                 TS_ASSERT_DELTA(solver.GetAverageStressPerElement(2)(i,j), T(i,j), 1e-12);
             }
@@ -1197,7 +1197,7 @@ public:
         solver.SetComputeAverageStressPerElementDuringSolve();
 
         assert(solver.mAverageStressesPerElement.size()==2u);
-        for (unsigned i=0; i<2; i++)
+        for (unsigned i = 0; i<2; ++i)
         {
             solver.mAverageStressesPerElement[i] = zero_vector<double>(3);
         }
@@ -1209,9 +1209,9 @@ public:
         T(1,0) = 0.43;
         solver.AddStressToAverageStressPerElement(T,0);
 
-        for (unsigned i=0; i<2; i++)
+        for (unsigned i = 0; i<2; ++i)
         {
-            for (unsigned j=0; j<2; j++)
+            for (unsigned j = 0; j<2; ++j)
             {
                 TS_ASSERT_DELTA(solver.GetAverageStressPerElement(0)(i,j), T(i,j), 1e-12);
                 TS_ASSERT_DELTA(solver.GetAverageStressPerElement(1)(i,j), 0.0, 1e-12);

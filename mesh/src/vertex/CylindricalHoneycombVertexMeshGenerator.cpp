@@ -60,12 +60,12 @@ CylindricalHoneycombVertexMeshGenerator::CylindricalHoneycombVertexMeshGenerator
     unsigned element_index;
 
     // Create the nodes
-    for (unsigned j=0; j<=2*numElementsUp+1; j++)
+    for (unsigned j=0; j<=2*numElementsUp+1; ++j)
     {
         if (isFlatBottom && (j==1))
         {
             // Flat bottom to cylindrical mesh
-            for (unsigned i=0; i<=numElementsAcross-1; i++)
+            for (unsigned i=0; i<=numElementsAcross-1; ++i)
             {
                 Node<2>* p_node = new Node<2>(node_index, true, i, 0.0);
                 nodes.push_back(p_node);
@@ -78,7 +78,7 @@ CylindricalHoneycombVertexMeshGenerator::CylindricalHoneycombVertexMeshGenerator
          */
         else
         {
-            for (unsigned i=0; i<=numElementsAcross-1; i++)
+            for (unsigned i=0; i<=numElementsAcross-1; ++i)
             {
                 double x_coord = ((j%4 == 0)||(j%4 == 3)) ? i+0.5 : i;
                 double y_coord = (1.5*j - 0.5*(j%2))*0.5/sqrt(3.0);
@@ -95,9 +95,9 @@ CylindricalHoneycombVertexMeshGenerator::CylindricalHoneycombVertexMeshGenerator
      * Create the elements. The array node_indices contains the
      * global node indices from bottom, going anticlockwise.
      */
-    for (unsigned j=0; j<numElementsUp; j++)
+    for (unsigned j=0; j<numElementsUp; ++j)
     {
-        for (unsigned i=0; i<numElementsAcross; i++)
+        for (unsigned i=0; i<numElementsAcross; ++i)
         {
             element_index = j*numElementsAcross + i;
 
@@ -117,7 +117,7 @@ CylindricalHoneycombVertexMeshGenerator::CylindricalHoneycombVertexMeshGenerator
             }
 
             std::vector<Node<2>*> element_nodes;
-            for (unsigned k=0; k<6; k++)
+            for (unsigned k=0; k<6; ++k)
             {
                element_nodes.push_back(nodes[node_indices[k]]);
             }
@@ -129,7 +129,7 @@ CylindricalHoneycombVertexMeshGenerator::CylindricalHoneycombVertexMeshGenerator
     // If imposing a flat bottom, delete unnecessary nodes from the mesh
     if (isFlatBottom)
     {
-        for (unsigned i=0; i<numElementsAcross; i++)
+        for (unsigned i=0; i<numElementsAcross; ++i)
         {
             nodes[i]->SetPoint(nodes[i+numElementsAcross]->GetPoint());
         }

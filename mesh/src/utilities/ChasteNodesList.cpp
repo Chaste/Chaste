@@ -47,7 +47,7 @@ ChasteNodesList<SPACE_DIM>::~ChasteNodesList()
 {
     if (mOwnNodes)
     {
-        for (unsigned i=0; i<mListOfNodes.size(); i++)
+        for (unsigned i=0; i<mListOfNodes.size(); ++i)
         {
             delete mListOfNodes[i];
         }

@@ -91,7 +91,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->mBottomOriginals.size(), p_mesh->mBottomImages.size());
 
         // Check that the image nodes are where they should be.
-        for (unsigned i=0; i<p_mesh->mLeftOriginals.size(); i++)
+        for (unsigned i=0; i<p_mesh->mLeftOriginals.size(); ++i)
         {
             c_vector<double,2> original_location;
             original_location = p_mesh->GetNode(p_mesh->mLeftOriginals[i])->rGetLocation();
@@ -102,7 +102,7 @@ public:
             TS_ASSERT_DELTA(original_location[1], image_location[1], 1e-7);
         }
 
-        for (unsigned i=0; i<p_mesh->mRightOriginals.size(); i++)
+        for (unsigned i=0; i<p_mesh->mRightOriginals.size(); ++i)
         {
             c_vector<double,2> original_location;
             original_location = p_mesh->GetNode(p_mesh->mRightOriginals[i])->rGetLocation();
@@ -113,7 +113,7 @@ public:
             TS_ASSERT_DELTA(original_location[1], image_location[1], 1e-7);
         }
 
-        for (unsigned i=0; i<p_mesh->mBottomOriginals.size(); i++)
+        for (unsigned i=0; i<p_mesh->mBottomOriginals.size(); ++i)
         {
             c_vector<double,2> original_location;
             original_location = p_mesh->GetNode(p_mesh->mBottomOriginals[i])->rGetLocation();
@@ -124,7 +124,7 @@ public:
             TS_ASSERT_DELTA(original_location[0], image_location[0], 1e-7);
         }
 
-        for (unsigned i=0; i<p_mesh->mTopOriginals.size(); i++)
+        for (unsigned i=0; i<p_mesh->mTopOriginals.size(); ++i)
         {
             c_vector<double,2> original_location;
             original_location = p_mesh->GetNode(p_mesh->mTopOriginals[i])->rGetLocation();
@@ -160,12 +160,12 @@ public:
     //     p_mesh->MutableMesh<2,2>::ReMesh(map);
 
     //     // Re-Index the vectors regarding left/right nodes with the node map
-    //     for (unsigned i = 0; i<p_mesh->mLeftOriginals.size(); i++)
+    //     for (unsigned i = 0; i<p_mesh->mLeftOriginals.size(); ++i)
     //     {
     //          p_mesh->mLeftOriginals[i] = map.GetNewIndex(p_mesh->mLeftOriginals[i]);
     //          p_mesh->mLeftImages[i] = map.GetNewIndex(p_mesh->mLeftImages[i]);
     //     }
-    //     for (unsigned i = 0; i<p_mesh->mRightOriginals.size(); i++)
+    //     for (unsigned i = 0; i<p_mesh->mRightOriginals.size(); ++i)
     //     {
     //          p_mesh->mRightOriginals[i] = map.GetNewIndex(p_mesh->mRightOriginals[i]);
     //          p_mesh->mRightImages[i] = map.GetNewIndex(p_mesh->mRightImages[i]);
@@ -187,14 +187,14 @@ public:
     //          elem_iter != p_mesh->GetElementIteratorEnd();
     //          ++elem_iter)
     //     {
-    //         for (unsigned i=0; i<3; i++)
+    //         for (unsigned i=0; i<3; ++i)
     //         {
     //             unsigned this_node_index = elem_iter->GetNodeGlobalIndex(i);
 
     //             if (this_node_index==0)
     //             {
     //                 elements_for_node_0++;
-    //                 for (unsigned j=0; j<3; j++)
+    //                 for (unsigned j=0; j<3; ++j)
     //                 {
     //                     checksum_for_node_0 += elem_iter->GetNodeGlobalIndex(j);
     //                 }
@@ -202,7 +202,7 @@ public:
     //             if (this_node_index==11)
     //             {
     //                 elements_for_node_11++;
-    //                 for (unsigned j=0; j<3; j++)
+    //                 for (unsigned j=0; j<3; ++j)
     //                 {
     //                     checksum_for_node_11 += elem_iter->GetNodeGlobalIndex(j);
     //                 }
@@ -210,7 +210,7 @@ public:
     //             if (this_node_index==12)
     //             {
     //                 elements_for_node_12++;
-    //                 for (unsigned j=0; j<3; j++)
+    //                 for (unsigned j=0; j<3; ++j)
     //                 {
     //                     checksum_for_node_12 += elem_iter->GetNodeGlobalIndex(j);
     //                 }
@@ -218,7 +218,7 @@ public:
     //             if (this_node_index==18)
     //             {
     //                 elements_for_node_18++;
-    //                 for (unsigned j=0; j<3; j++)
+    //                 for (unsigned j=0; j<3; ++j)
     //                 {
     //                     checksum_for_node_18 += elem_iter->GetNodeGlobalIndex(j);
     //                 }
@@ -302,7 +302,7 @@ public:
         TS_ASSERT_EQUALS(map.GetSize(), num_old_nodes);
         TS_ASSERT_EQUALS(map.IsDeleted(15), true);
 
-        for (unsigned i=0; i<num_old_nodes; i++)
+        for (unsigned i=0; i<num_old_nodes; ++i)
         {
             if (i<15)
             {
@@ -530,14 +530,14 @@ public:
             TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), p_mesh2->GetNumNodes());
             TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryNodes(), p_mesh2->GetNumBoundaryNodes());
 
-            for (unsigned i=0; i<p_mesh->GetNumAllNodes(); i++)
+            for (unsigned i=0; i<p_mesh->GetNumAllNodes(); ++i)
             {
                 Node<2>* p_node = p_mesh->GetNode(i);
                 Node<2>* p_node2 = p_mesh2->GetNode(i);
                 TS_ASSERT_EQUALS(p_node->IsDeleted(), p_node2->IsDeleted());
                 TS_ASSERT_EQUALS(p_node->GetIndex(), p_node2->GetIndex());
                 TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), p_node2->IsBoundaryNode());
-                for (unsigned j=0; j<2; j++)
+                for (unsigned j=0; j<2; ++j)
                 {
                     TS_ASSERT_DELTA(p_node->rGetLocation()[j], p_node2->rGetLocation()[j], 1e-16);
                 }
@@ -555,7 +555,7 @@ public:
                  ++iter, ++iter2)
             {
                 TS_ASSERT_EQUALS(iter->GetNumNodes(), iter2->GetNumNodes());
-                for (unsigned i=0; i<iter->GetNumNodes(); i++)
+                for (unsigned i=0; i<iter->GetNumNodes(); ++i)
                 {
                     TS_ASSERT_EQUALS(iter->GetNodeGlobalIndex(i), iter2->GetNodeGlobalIndex(i));
                 }

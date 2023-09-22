@@ -69,7 +69,7 @@ public:
         std::vector<unsigned> fixed_nodes
           = NonlinearElasticityTools<2>::GetNodesByComponentValue(mesh,0,0.0);
 
-        for (unsigned run=0; run<2; run++)
+        for (unsigned run = 0; run<2; run++)
         {
             // Two runs - one with cross fibre tension applied, one without.
 
@@ -103,7 +103,7 @@ public:
             std::vector<double> calcium_conc(solver.GetTotalNumQuadPoints(), 0.0);
             std::vector<double> voltages(solver.GetTotalNumQuadPoints(), 0.0);
 
-            for (unsigned i=0; i<calcium_conc.size(); i++)
+            for (unsigned i = 0; i<calcium_conc.size(); ++i)
             {
                 calcium_conc[i] = 0.05;
             }
@@ -128,7 +128,7 @@ public:
             int lo, hi;
             MatGetOwnershipRange(solver.mrJacobianMatrix, &lo, &hi);
 
-            for (unsigned j=0; j<num_dofs; j++)
+            for (unsigned j = 0; j < num_dofs; ++j)
             {
                 solver.mCurrentSolution.clear();
                 solver.FormInitialGuess();
@@ -138,13 +138,13 @@ public:
 
                 ReplicatableVector perturbed_rhs( solver.mResidualVector );
 
-                for (unsigned i=0; i<num_dofs; i++)
+                for (unsigned i = 0; i < num_dofs; ++i)
                 {
-                    if ((lo<=(int)i) && ((int)i<hi))
+                    if ((lo <= static_cast<int>(i)) && (static_cast<int>(i) < hi))
                     {
                         double analytic_matrix_val = PetscMatTools::GetElement(solver.mrJacobianMatrix,i,j);
                         double numerical_matrix_val = (perturbed_rhs[i] - rhs_vec[i])/h;
-                        if ((fabs(analytic_matrix_val)>1e-6) && (fabs(numerical_matrix_val)>1e-6))
+                        if ((fabs(analytic_matrix_val) > 1e-6) && (fabs(numerical_matrix_val) > 1e-6))
                         {
                             // relative error
                             TS_ASSERT_DELTA( (analytic_matrix_val-numerical_matrix_val)/analytic_matrix_val, 0.0, 1e-2);
@@ -251,7 +251,7 @@ public:
 
         solver.Initialise();
         std::vector<double> calcium_conc(solver.GetTotalNumQuadPoints());
-        for (unsigned i=0; i<calcium_conc.size(); i++)
+        for (unsigned i = 0; i<calcium_conc.size(); ++i)
         {
             double Y = quad_points.rGet(i)(1);
             // 0.0002 is the initial Ca conc in Lr91, 0.001 is the greatest Ca conc
@@ -280,7 +280,7 @@ public:
 //        // to observe this - SEE FIGURE ATTACHED TO TICKET #757.
 //        // The lambda are constant for given Y if Y>0.1.5 (ie not near fixed nodes)
 //        // and a cubic polynomial can be fitted with matlab
-//        for (unsigned i=0; i<lambda.size(); i++)
+//        for (unsigned i = 0; i<lambda.size(); ++i)
 //        {
 //            TS_ASSERT_LESS_THAN(lambda[i], 1.0);
 //
@@ -396,7 +396,7 @@ public:
             QuadraturePointsGroup<2> quad_points(mesh, *(solver.GetQuadratureRule()));
 
             std::vector<double> calcium_conc(solver.GetTotalNumQuadPoints());
-            for (unsigned i=0; i<calcium_conc.size(); i++)
+            for (unsigned i = 0; i<calcium_conc.size(); ++i)
             {
                 double X = quad_points.rGet(i)(0);
                 // 0.0002 is the initial Ca conc in Lr91, 0.001 is the greatest Ca conc
@@ -518,7 +518,7 @@ public:
         std::vector<c_matrix<double,2,2> > deformation_gradients(mesh.GetNumElements());
 
         // initialise to junk
-        for (unsigned i=0; i<stretches.size(); i++)
+        for (unsigned i = 0; i<stretches.size(); ++i)
         {
             stretches[i] = 13482.534578;
             deformation_gradients[i](0,0)
@@ -529,7 +529,7 @@ public:
 
 
         solver.ComputeDeformationGradientAndStretchInEachElement(deformation_gradients, stretches);
-        for (unsigned i=0; i<stretches.size(); i++)
+        for (unsigned i = 0; i<stretches.size(); ++i)
         {
             TS_ASSERT_DELTA(stretches[i], 1.0, 1e-6);
             double err = MatrixNorm(deformation_gradients[i]-identity_matrix<double>(2));
@@ -538,7 +538,7 @@ public:
 
 
         // get the current solution (displacement), and contract in the non-fibre direction
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             unsigned j=1;
             // note: the 3 here is DIM+1, the problem dim for incompressible problems
@@ -551,7 +551,7 @@ public:
         c_matrix<double,2,2> correct_F = identity_matrix<double>(2);
         correct_F(1,1) = 0.9;        //in need of deletion even if all these 3 have no influence at all on this test
 
-        for (unsigned i=0; i<stretches.size(); i++)
+        for (unsigned i = 0; i<stretches.size(); ++i)
         {
             TS_ASSERT_DELTA(stretches[i], 1.0, 1e-6);
             double err = MatrixNorm(deformation_gradients[i]-correct_F);
@@ -559,7 +559,7 @@ public:
         }
 
         // contract in the fibre direction
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             unsigned j=0;
             // note: the 3 here is DIM+1, the problem dim for incompressible problems
@@ -569,7 +569,7 @@ public:
         // stretches should now be 0.8, F should be equal to [0.8,0;0,0.9]
         solver.ComputeDeformationGradientAndStretchInEachElement(deformation_gradients, stretches);
         correct_F(0,0) = 0.8;
-        for (unsigned i=0; i<stretches.size(); i++)
+        for (unsigned i = 0; i<stretches.size(); ++i)
         {
             TS_ASSERT_DELTA(stretches[i], 0.8, 1e-3);
             double err = MatrixNorm(deformation_gradients[i]-correct_F);
@@ -625,7 +625,7 @@ public:
 
         QuadraturePointsGroup<2> quad_points(mesh, *(solver.GetQuadratureRule()));
         std::vector<double> calcium_conc(solver.GetTotalNumQuadPoints());
-        for (unsigned i=0; i<calcium_conc.size(); i++)
+        for (unsigned i = 0; i<calcium_conc.size(); ++i)
         {
             double X = quad_points.rGet(i)(0);
             // 0.0002 is the initial Ca conc in Lr91, 0.001 is the greatest Ca conc
@@ -692,7 +692,7 @@ public:
         y[2] = -0.0008;
         y[3] = 0.0;
 
-        for (unsigned i=0; i < tension_fractions.size();i++)
+        for (unsigned i = 0; i < tension_fractions.size();++i)
         {
             problem_defn.SetApplyIsotropicCrossFibreTension(true,tension_fractions[i]);
 
@@ -718,7 +718,7 @@ public:
             // Set up a voltage and calcium level at each quadrature point.
             QuadraturePointsGroup<2> quad_points(mesh, *(solver.GetQuadratureRule()));
             std::vector<double> calcium_conc(solver.GetTotalNumQuadPoints());
-            for (unsigned j=0; j<calcium_conc.size(); j++)
+            for (unsigned j = 0; j<calcium_conc.size(); ++j)
             {
                 double X = quad_points.rGet(j)(0);
                 // 0.0002 is the initial Ca conc in Lr91, 0.001 is the greatest Ca conc
@@ -825,7 +825,7 @@ public:
         nodes.push_back(104);
         nodes.push_back(124);
 
-        for (unsigned node=0; node<4; node++)
+        for (unsigned node = 0; node<4; node++)
         {
             std::cout << "Node: " << nodes[node] << "\n";
             TS_ASSERT_DELTA(solver.rGetDeformedPosition()[nodes[node]](0), x[node], 1e-4);
@@ -916,7 +916,7 @@ public:
         nodes.push_back(104);
         nodes.push_back(124);
 
-        for (unsigned node=0; node<4; node++)
+        for (unsigned node = 0; node<4; node++)
         {
             std::cout << "Node: " << nodes[node] << "\n";
             TS_ASSERT_DELTA(solver.rGetDeformedPosition()[nodes[node]](0), x[node], 1e-3);

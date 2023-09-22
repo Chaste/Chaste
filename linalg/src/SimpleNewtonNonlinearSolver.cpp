@@ -44,7 +44,7 @@ SimpleNewtonNonlinearSolver::SimpleNewtonNonlinearSolver()
 {
     mTestDampingValues.push_back(-0.1);
     mTestDampingValues.push_back(0.05);
-    for (unsigned i=1; i<=12; i++)
+    for (unsigned i=1; i<=12; ++i)
     {
         double val = double(i)/10;
         mTestDampingValues.push_back(val);
@@ -113,7 +113,7 @@ Vec SimpleNewtonNonlinearSolver::Solve(PetscErrorCode (*pComputeResidual)(SNES,V
         double best_scaled_residual = 1e20; // large
 
         // Loop over all the possible damping value and determine which gives smallest residual
-        for (unsigned i=0; i<mTestDampingValues.size(); i++)
+        for (unsigned i=0; i<mTestDampingValues.size(); ++i)
         {
             // Note: WAXPY calls VecWAXPY(w,a,x,y) which computes w = ax+y
             PetscVecTools::WAXPY(test_vec,-mTestDampingValues[i],negative_update,current_solution);

@@ -62,9 +62,9 @@ private:
             {
                 out_stream p_file = handler.OpenOutputFile(rFilename, std::ios::app);
 
-                for (unsigned i=0; i<rNodeLayers.size(); i++)
+                for (unsigned i=0; i<rNodeLayers.size(); ++i)
                 {
-                    for (unsigned j=0; j<spaceDim; j++)
+                    for (unsigned j=0; j<spaceDim; ++j)
                     {
                        * p_file << (j == 0 ? "" : "  ") << (1+rNodeLayers[i]);
                     }
@@ -175,7 +175,7 @@ public:
         }
         ChasteCuboid<3> epi_bounding_box=info.CalculateBoundingBoxOfEpi();
         ChasteCuboid<3> endo_bounding_box=info.CalculateBoundingBoxOfEndo();
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i=0; i<3; ++i)
         {
             if (i==0)
             {
@@ -269,7 +269,7 @@ public:
         }
 
         ChasteCuboid<3> epi_bounding_box=info.CalculateBoundingBoxOfEpi();
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i=0; i<3; ++i)
         {
             TS_ASSERT_DELTA(epi_bounding_box.rGetUpperCorner()[i], 8.0, 1e-10);
             TS_ASSERT_DELTA(epi_bounding_box.rGetLowerCorner()[i], 0.0, 1e-10);
@@ -477,7 +477,7 @@ public:
 //            writer.AddPointData("Distance from epi", info.rGetDistanceMapEpicardium());
 //            writer.AddPointData("Relative wall distance", relative_wall_position);
 //            std::vector<double> errors;
-//            for (unsigned i=0;i<relative_wall_position.size();i++)
+//            for (unsigned i=0;i<relative_wall_position.size();++i)
 //            {
 //                errors.push_back(sequential_relative_wall_position[i] - relative_wall_position[mesh.rGetNodePermutation()[i]]);
 //            }
@@ -490,7 +490,7 @@ public:
         if (PetscTools::IsSequential())
         {
             TS_ASSERT(mesh.rGetNodePermutation().empty());
-            for (unsigned i=0;i<sequential_layers.size();i++)
+            for (unsigned i=0;i<sequential_layers.size();++i)
             {
                 TS_ASSERT_DELTA(sequential_relative_wall_position[i], relative_wall_position[i], 1e-15);
                 TS_ASSERT_EQUALS(sequential_layers[ i ], info.rGetLayerForEachNode()[ i ]);
@@ -503,7 +503,7 @@ public:
             //therefore we will find its data in rGetLayerForEachNode()[ permutation...]
 
             TS_ASSERT(mesh.rGetNodePermutation().empty() == false );
-            for (unsigned i=0;i<sequential_layers.size();i++)
+            for (unsigned i=0;i<sequential_layers.size();++i)
             {
                 TS_ASSERT_DELTA(sequential_relative_wall_position[i], relative_wall_position[mesh.rGetNodePermutation()[i]], 1e-15);
                 TS_ASSERT_EQUALS(sequential_layers[ i ], info.rGetLayerForEachNode()[ mesh.rGetNodePermutation()[i] ]);
@@ -533,7 +533,7 @@ public:
 
          unsigned low_index=mesh.GetDistributedVectorFactory()->GetLow();
          unsigned high_index=mesh.GetDistributedVectorFactory()->GetHigh();
-         for (unsigned node_index=low_index; node_index<high_index; node_index++)
+         for (unsigned node_index = low_index; node_index < high_index; ++node_index)
          {
              TS_ASSERT_EQUALS(info.GetHeartRegion(node_index), HeartGeometryInformation<3>::LEFT_VENTRICLE_WALL);
          }

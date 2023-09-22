@@ -64,7 +64,7 @@ public:
 
         // Change coordinates
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             Node<3>* p_node = mesh.GetNode(i);
             ChastePoint<3> point = p_node->GetPoint();
@@ -196,7 +196,7 @@ public:
         TetrahedralMesh<3,3> original_mesh;
         original_mesh.ConstructFromMeshReader(mesh_reader);
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             // Find new coordinates of the translated node
             Node<3>* p_node = mesh.GetNode(i);
@@ -245,7 +245,7 @@ public:
         TS_ASSERT_EQUALS(corner_before[1], 1.0);
         TS_ASSERT_EQUALS(corner_before[2], 1.0);
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             Node<3>* p_node = mesh.GetNode(i);
             ChastePoint<3> point = p_node->GetPoint();
@@ -389,7 +389,7 @@ public:
         transformation_matrix = prod (transformation_matrix, z_rotation_matrix);
         transformation_matrix = prod (transformation_matrix, translation_matrix);
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             Node<3>* p_node = mesh.GetNode(i);
             ChastePoint<3> point = p_node->GetPoint();
@@ -470,7 +470,7 @@ public:
         TetrahedralMesh<3,3> original_mesh;
         original_mesh.ConstructFromMeshReader(mesh_reader);
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             Node<3>* p_node = mesh.GetNode(i);
             ChastePoint<3> new_coordinate = p_node->GetPoint();
@@ -506,7 +506,7 @@ public:
         TetrahedralMesh<2,2> original_mesh;
         original_mesh.ConstructFromMeshReader(mesh_reader);
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             // Find new coordinates of the translated node
             Node<2>* p_node = mesh.GetNode(i);

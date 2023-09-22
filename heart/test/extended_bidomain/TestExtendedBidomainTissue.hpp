@@ -239,7 +239,7 @@ public:
         // Second cell is unstimulated throughout
         for (unsigned node_index = mesh.GetDistributedVectorFactory()->GetLow();
              node_index < mesh.GetDistributedVectorFactory()->GetHigh();
-             node_index++)
+             ++node_index)
         {
             TS_ASSERT_EQUALS(extended_bidomain_tissue.rGetIntracellularStimulusCacheReplicatedSecondCell()[node_index], 0);
         }
@@ -621,9 +621,9 @@ public:
             const c_matrix<double, 3, 3>& extra_tensor_after_archiving = p_extended_tissue->rGetExtracellularConductivityTensor(0);
 
             //check before archiving = after archiving
-            for (unsigned i=0; i<3; i++)
+            for (unsigned i=0; i<3; ++i)
             {
-                for (unsigned j=0; j<3; j++)
+                for (unsigned j=0; j<3; ++j)
                 {
                     TS_ASSERT_DELTA(intra_tensor_before_archiving(i,j), intra_tensor_after_archiving(i,j), 1e-9);
                     TS_ASSERT_DELTA(intra_tensor_second_cell_before_archiving(i,j), intra_tensor_second_cell_after_archiving(i,j), 1e-9);
@@ -654,7 +654,7 @@ public:
             TS_ASSERT_EQUALS(mesh.GetNumNodes(), p_extended_tissue->pGetMesh()->GetNumNodes());//note: this is allowed because GetNumNodes has const in the signature
 
             //check archiving of stimulus for first cell at some random times (it is unstimulated everywhere at all times)
-            for (unsigned i = 0; i < mesh.GetNumNodes(); i++)
+            for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
             {
                 if (mesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(i))
                 {

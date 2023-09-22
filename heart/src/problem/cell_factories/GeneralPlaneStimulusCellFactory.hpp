@@ -62,9 +62,9 @@ public:
         : PlaneStimulusCellFactory<CELL,ELEMENT_DIM, SPACE_DIM>(stimulusMagnitude,stimulusDuration) // These values are overridden below anyway.
     {
         stimulusMagnitude*=numEleAcross/(64.0);
-        // ELEMENT_DIM==1 Justification: elements go half size with each refinement
-        // ELEMENT_DIM==2 Justification: Triangles go quarter size with each refinement, but there are twice as many nodes on boundary
-        // ELEMENT_DIM==3 Hypothesis: Triangles go eighth size with each refinement, but there are four-times as many nodes on boundary
+        // ELEMENT_DIM == 1 Justification: elements go half size with each refinement
+        // ELEMENT_DIM == 2 Justification: Triangles go quarter size with each refinement, but there are twice as many nodes on boundary
+        // ELEMENT_DIM == 3 Hypothesis: Triangles go eighth size with each refinement, but there are four-times as many nodes on boundary
         stimulusMagnitude*=meshWidth/(0.2);
 
         this->mpStimulus.reset(new SimpleStimulus(stimulusMagnitude, stimulusDuration));

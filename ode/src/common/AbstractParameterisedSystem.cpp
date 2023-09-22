@@ -81,7 +81,7 @@ std::string AbstractParameterisedSystem<VECTOR>::GetStateMessage(const std::stri
     res << rMessage << std::endl << "State:" << std::endl;
     assert(rGetStateVariableNames().size()==GetVectorSize(Y));
     const std::vector<std::string>& r_units = rGetStateVariableUnits();
-    for (unsigned i=0; i<GetVectorSize(Y); i++)
+    for (unsigned i=0; i<GetVectorSize(Y); ++i)
     {
         res << "\t" << rGetStateVariableNames()[i] << ":" << GetVectorComponent(Y, i);
         if (!r_units.empty())
@@ -153,7 +153,7 @@ void AbstractParameterisedSystem<VECTOR>::SetStateVariables(const VECTOR& rState
     }
 
     CreateVectorIfEmpty(mStateVariables, mNumberOfStateVariables);
-    for (unsigned i=0; i<mNumberOfStateVariables; i++)
+    for (unsigned i=0; i<mNumberOfStateVariables; ++i)
     {
         SetVectorComponent(mStateVariables, i, GetVectorComponent(rStateVariables, i));
     }

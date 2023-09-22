@@ -41,7 +41,7 @@ CombinedOdeSystem::CombinedOdeSystem(std::vector<AbstractOdeSystem*> odeSystems)
     : AbstractOdeSystem(0) // will be set properly below
 {
     mOdeSystems = odeSystems;
-    for (unsigned i=0; i<odeSystems.size(); i++)
+    for (unsigned i = 0; i<odeSystems.size(); ++i)
     {
         mNumberOfStateVariables += odeSystems[i]->GetNumberOfStateVariables();
     }
@@ -53,7 +53,7 @@ CombinedOdeSystem::CombinedOdeSystem(std::vector<AbstractOdeSystem*> odeSystems)
     mWorkingStateVars.resize(num_systems);
     mWorkingDerivs.resize(num_systems);
     unsigned offset = 0;
-    for (unsigned i=0; i<num_systems; i++)
+    for (unsigned i = 0; i<num_systems; ++i)
     {
         unsigned num_vars = odeSystems[i]->GetNumberOfStateVariables();
         mWorkingStateVars[i].resize(num_vars);
@@ -88,17 +88,17 @@ void CombinedOdeSystem::EvaluateYDerivatives(
         std::vector<double>& rDY)
 {
     // Copy rY to subsystems
-    for (unsigned i=0; i<mOdeSystems.size(); i++)
+    for (unsigned i = 0; i<mOdeSystems.size(); ++i)
     {
         unsigned offset = mOffsets[i];
-        for (unsigned j=0; j<mOdeSystems[i]->GetNumberOfStateVariables(); j++)
+        for (unsigned j = 0; j<mOdeSystems[i]->GetNumberOfStateVariables(); ++j)
         {
             mWorkingStateVars[i][j] = rY[offset + j];
         }
     }
 
     // Set parameter values
-    for (unsigned i=0; i<mVariableParameterMaps.size(); i++)
+    for (unsigned i = 0; i<mVariableParameterMaps.size(); ++i)
     {
         std::map<unsigned, unsigned>& r_var_param_map = mVariableParameterMaps[i].theMap;
         // Iterate through map
@@ -112,16 +112,16 @@ void CombinedOdeSystem::EvaluateYDerivatives(
     }
 
     // Call EvaluateYDerivatives on subsystems
-    for (unsigned i=0; i<mOdeSystems.size(); i++)
+    for (unsigned i = 0; i<mOdeSystems.size(); ++i)
     {
         mOdeSystems[i]->EvaluateYDerivatives(time, mWorkingStateVars[i], mWorkingDerivs[i]);
     }
 
     // Copy derivatives to rDY
-    for (unsigned i=0; i<mOdeSystems.size(); i++)
+    for (unsigned i = 0; i<mOdeSystems.size(); ++i)
     {
         unsigned offset = mOffsets[i];
-        for (unsigned j=0; j<mOdeSystems[i]->GetNumberOfStateVariables(); j++)
+        for (unsigned j = 0; j<mOdeSystems[i]->GetNumberOfStateVariables(); ++j)
         {
             rDY[offset + j] = mWorkingDerivs[i][j];
         }

@@ -88,11 +88,11 @@ public :
         ///////////////////////
         // initial condition
         ///////////////////////
-        if (DIM==1)
+        if (DIM == 1)
         {
             mStateVariables[0] = cos(M_PI*mX[0]);
         }
-        else if (DIM==2)
+        else if (DIM == 2)
         {
             mStateVariables[0] = cos(M_PI*mX[0])*cos(M_PI*mX[1]);
         }
@@ -114,11 +114,11 @@ public :
         // We use the next timestep to be consistent with how GetStimulus(time) is called.
 
         double t = PdeSimulationTime::GetNextTime();
-        if (DIM==1)
+        if (DIM == 1)
         {
             return (-0.5*M_PI*M_PI + 1.5)*exp(-t)*cos(M_PI*mX[0]);
         }
-        else if (DIM==2)
+        else if (DIM == 2)
         {
             return (-0.5*M_PI*M_PI + 1.5)*exp(-t)*cos(M_PI*mX[0])*cos(M_PI*mX[1]);
         }
@@ -151,11 +151,11 @@ public:
     ///////////////////////
     double GetStimulus(double time)
     {
-        if (DIM==1)
+        if (DIM == 1)
         {
             return  -M_PI*M_PI *exp(-time)*cos(M_PI*mX[0]);
         }
-        else if (DIM==2)
+        else if (DIM == 2)
         {
 
             return  -M_PI*M_PI *exp(-time)*cos(M_PI*mX[0])*cos(M_PI*mX[1]);
@@ -232,7 +232,7 @@ public:
             reader.GetVariableOverNodes(voltage, "V", timestep);
             ReplicatableVector voltage_repl(voltage);
 
-            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
             {
                 double x = mesh.GetNode(i)->rGetLocation()[0];
 
@@ -294,7 +294,7 @@ public:
             reader.GetVariableOverNodes(voltage, "V", timestep);
             ReplicatableVector voltage_repl(voltage);
 
-            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
             {
                 double x=mesh.GetNode(i)->rGetLocation()[0];
                 double y=mesh.GetNode(i)->rGetLocation()[1];
@@ -362,7 +362,7 @@ public:
             reader.GetVariableOverNodes(voltage, "V", timestep);
             ReplicatableVector voltage_repl(voltage);
 
-            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
             {
                 double x=mesh.GetNode(i)->rGetLocation()[0];
                 double y=mesh.GetNode(i)->rGetLocation()[1];

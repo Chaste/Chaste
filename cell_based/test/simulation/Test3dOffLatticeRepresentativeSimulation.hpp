@@ -110,7 +110,7 @@ public:
         {
             z_coordinate = static_cast<double>(k) / 2.0;
 
-            bool is_even_layer = ((int)k % 2 == 0);
+            bool is_even_layer = (static_cast<int>(k) % 2 == 0);
 
             if (is_even_layer)
             {

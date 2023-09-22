@@ -315,29 +315,35 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceArea()
 {
     // ELEMENT_DIM-1 is the dimension of the boundary element
-    assert(ELEMENT_DIM >= 1);
-    const unsigned bound_element_dim = ELEMENT_DIM - 1;
-    assert(bound_element_dim < 3);
-    if (bound_element_dim == 0)
+    if constexpr (ELEMENT_DIM >= 1)
     {
-        return 0.0;
+        const unsigned bound_element_dim = ELEMENT_DIM - 1;
+        assert(bound_element_dim < 3);
+        if (bound_element_dim == 0)
+        {
+            return 0.0;
+        }
+
+        double mesh_surface = 0.0;
+        auto it = this->GetBoundaryElementIteratorBegin();
+
+        while (it != this->GetBoundaryElementIteratorEnd())
+        {
+            mesh_surface += mBoundaryElementJacobianDeterminants[(*it)->GetIndex()];
+            it++;
+        }
+
+        if (bound_element_dim == 2)
+        {
+            mesh_surface /= 2.0;
+        }
+
+        return mesh_surface;
     }
-
-    double mesh_surface = 0.0;
-    auto it = this->GetBoundaryElementIteratorBegin();
-
-    while (it != this->GetBoundaryElementIteratorEnd())
+    else
     {
-        mesh_surface += mBoundaryElementJacobianDeterminants[(*it)->GetIndex()];
-        it++;
+        NEVER_REACHED;
     }
-
-    if (bound_element_dim == 2)
-    {
-        mesh_surface /= 2.0;
-    }
-
-    return mesh_surface;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -425,7 +431,7 @@ unsigned TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetContainingElementIndexWithI
     // If it's in none of the elements, then throw
     std::stringstream ss;
     ss << "Point [";
-    for (unsigned j = 0; (int)j < (int)SPACE_DIM - 1; j++)
+    for (unsigned j = 0; static_cast<int>(j) < static_cast<int>(SPACE_DIM) - 1; ++j)
     {
         ss << rTestPoint[j] << ",";
     }
@@ -439,11 +445,11 @@ unsigned TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestElementIndex(const C
     EXCEPT_IF_NOT(ELEMENT_DIM == SPACE_DIM); // LCOV_EXCL_LINE // CalculateInterpolationWeights hits an assertion otherwise
     double max_min_weight = -std::numeric_limits<double>::infinity();
     unsigned closest_index = 0;
-    for (unsigned i = 0; i < this->mElements.size(); i++)
+    for (unsigned i = 0; i < this->mElements.size(); ++i)
     {
         c_vector<double, ELEMENT_DIM + 1> weight = this->mElements[i]->CalculateInterpolationWeights(rTestPoint);
         double neg_weight_sum = 0.0;
-        for (unsigned j = 0; j <= ELEMENT_DIM; j++)
+        for (unsigned j = 0; j <= ELEMENT_DIM; ++j)
         {
             if (weight[j] < 0.0)
             {
@@ -464,7 +470,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<unsigned> TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetContainingElementIndices(const ChastePoint<SPACE_DIM>& rTestPoint)
 {
     std::vector<unsigned> element_indices;
-    for (unsigned i = 0; i < this->mElements.size(); i++)
+    for (unsigned i = 0; i < this->mElements.size(); ++i)
     {
         if (this->mElements[i]->IncludesPoint(rTestPoint))
         {
@@ -479,15 +485,15 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
 {
     // Three loops, just like the destructor. note we don't delete boundary nodes.
-    for (unsigned i = 0; i < this->mBoundaryElements.size(); i++)
+    for (unsigned i = 0; i < this->mBoundaryElements.size(); ++i)
     {
         delete this->mBoundaryElements[i];
     }
-    for (unsigned i = 0; i < this->mElements.size(); i++)
+    for (unsigned i = 0; i < this->mElements.size(); ++i)
     {
         delete this->mElements[i];
     }
-    for (unsigned i = 0; i < this->mNodes.size(); i++)
+    for (unsigned i = 0; i < this->mNodes.size(); ++i)
     {
         delete this->mNodes[i];
     }
@@ -743,29 +749,47 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::RefreshJacobianCachedData()
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetJacobianForElement(unsigned elementIndex, c_matrix<double, SPACE_DIM, SPACE_DIM>& rJacobian, double& rJacobianDeterminant) const
 {
-    assert(ELEMENT_DIM <= SPACE_DIM);
-    assert(elementIndex < this->mElementJacobians.size());
-    rJacobian = this->mElementJacobians[elementIndex];
-    rJacobianDeterminant = this->mElementJacobianDeterminants[elementIndex];
+    if constexpr (ELEMENT_DIM <= SPACE_DIM)
+    {
+        assert(elementIndex < this->mElementJacobians.size());
+        rJacobian = this->mElementJacobians[elementIndex];
+        rJacobianDeterminant = this->mElementJacobianDeterminants[elementIndex];
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetInverseJacobianForElement(unsigned elementIndex, c_matrix<double, SPACE_DIM, ELEMENT_DIM>& rJacobian, double& rJacobianDeterminant, c_matrix<double, ELEMENT_DIM, SPACE_DIM>& rInverseJacobian) const
 {
-    assert(ELEMENT_DIM <= SPACE_DIM); // LCOV_EXCL_LINE
-    assert(elementIndex < this->mElementInverseJacobians.size());
-    rInverseJacobian = this->mElementInverseJacobians[elementIndex];
-    rJacobian = this->mElementJacobians[elementIndex];
-    rJacobianDeterminant = this->mElementJacobianDeterminants[elementIndex];
+    if constexpr (ELEMENT_DIM <= SPACE_DIM)
+    {
+        assert(elementIndex < this->mElementInverseJacobians.size());
+        rInverseJacobian = this->mElementInverseJacobians[elementIndex];
+        rJacobian = this->mElementJacobians[elementIndex];
+        rJacobianDeterminant = this->mElementJacobianDeterminants[elementIndex];
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetWeightedDirectionForElement(unsigned elementIndex, c_vector<double, SPACE_DIM>& rWeightedDirection, double& rJacobianDeterminant) const
 {
-    assert(ELEMENT_DIM < SPACE_DIM); // LCOV_EXCL_LINE
-    assert(elementIndex < this->mElementWeightedDirections.size());
-    rWeightedDirection = this->mElementWeightedDirections[elementIndex];
-    rJacobianDeterminant = this->mElementJacobianDeterminants[elementIndex];
+    if constexpr (ELEMENT_DIM < SPACE_DIM)
+    {
+        assert(elementIndex < this->mElementWeightedDirections.size());
+        rWeightedDirection = this->mElementWeightedDirections[elementIndex];
+        rJacobianDeterminant = this->mElementJacobianDeterminants[elementIndex];
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -827,7 +851,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ExportToMesher(NodeMap& map, MESHE
 
     mesherInput.numberofpoints = this->GetNumNodes();
     unsigned new_index = 0;
-    for (unsigned i = 0; i < this->GetNumAllNodes(); i++)
+    for (unsigned i = 0; i < this->GetNumAllNodes(); ++i)
     {
         if (this->mNodes[i]->IsDeleted())
         {
@@ -836,7 +860,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ExportToMesher(NodeMap& map, MESHE
         else
         {
             map.SetNewIndex(i, new_index);
-            for (unsigned j = 0; j < SPACE_DIM; j++)
+            for (unsigned j = 0; j < SPACE_DIM; ++j)
             {
                 mesherInput.pointlist[SPACE_DIM * new_index + j] = this->mNodes[i]->rGetLocation()[j];
             }
@@ -853,7 +877,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ExportToMesher(NodeMap& map, MESHE
              elem_iter != this->GetElementIteratorEnd();
              ++elem_iter)
         {
-            for (unsigned j = 0; j <= ELEMENT_DIM; j++)
+            for (unsigned j = 0; j <= ELEMENT_DIM; ++j)
             {
                 elementList[element_index * (ELEMENT_DIM + 1) + j] = (*elem_iter).GetNodeGlobalIndex(j);
             }
@@ -873,7 +897,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ImportFromMesher(MESHER_IO& mesher
     Clear();
 
     // Construct the nodes
-    for (unsigned node_index = 0; node_index < static_cast<unsigned>(mesherOutput.numberofpoints); node_index++)
+    for (unsigned node_index = 0; node_index < static_cast<unsigned>(mesherOutput.numberofpoints); ++node_index)
     {
         this->mNodes.push_back(new Node<SPACE_DIM>(node_index, &mesherOutput.pointlist[node_index * SPACE_DIM], false));
     }
@@ -885,7 +909,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ImportFromMesher(MESHER_IO& mesher
     for (unsigned element_index = 0; element_index < numberOfElements; element_index++)
     {
         std::vector<Node<SPACE_DIM>*> nodes;
-        for (unsigned j = 0; j < ELEMENT_DIM + 1; j++)
+        for (unsigned j = 0; j < ELEMENT_DIM + 1; ++j)
         {
             unsigned global_node_index = elementList[element_index * (nodes_per_element) + j];
             assert(global_node_index < this->mNodes.size());
@@ -905,7 +929,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ImportFromMesher(MESHER_IO& mesher
             this->mElements.push_back(p_element);
 
             // Add the internals to quadratics
-            for (unsigned j = ELEMENT_DIM + 1; j < nodes_per_element; j++)
+            for (unsigned j = ELEMENT_DIM + 1; j < nodes_per_element; ++j)
             {
                 unsigned global_node_index = elementList[element_index * nodes_per_element + j];
                 assert(global_node_index < this->mNodes.size());
@@ -939,7 +963,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ImportFromMesher(MESHER_IO& mesher
         if (edgeMarkerList == nullptr || edgeMarkerList[boundary_element_index] == 1)
         {
             std::vector<Node<SPACE_DIM>*> nodes;
-            for (unsigned j = 0; j < ELEMENT_DIM; j++)
+            for (unsigned j = 0; j < ELEMENT_DIM; ++j)
             {
                 unsigned global_node_index = faceList[boundary_element_index * ELEMENT_DIM + j];
                 assert(global_node_index < this->mNodes.size());

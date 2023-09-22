@@ -170,7 +170,7 @@ public:
         unsigned trials=25;
         unsigned pops=0;
         unsigned sequential_pops=0;
-        for (unsigned i=0; i<trials; i++)
+        for (unsigned i=0; i<trials; ++i)
         {
             unsigned index=RandomNumberGenerator::Instance()->randMod(parallel_distances.size());
             TS_ASSERT_DELTA(parallel_distance_calculator.SingleDistance(9260u, index), parallel_distances[index], 1e-15);
@@ -197,7 +197,7 @@ public:
          }
 
         //Reverse - to check that cached information is flushed.
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i=0; i<3; ++i)
         {
             unsigned index=RandomNumberGenerator::Instance()->randMod(parallel_distances.size());
             TS_ASSERT_DELTA(parallel_distance_calculator.SingleDistance(index, 9260u), parallel_distances[index], 1e-15);

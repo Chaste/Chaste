@@ -70,9 +70,9 @@ private:
 
         pLaw->ComputeStressAndStressDerivative(C,invC,pressure,T,dTdE,false);
 
-        for (unsigned M=0; M<DIM; M++)
+        for (unsigned M = 0; M < DIM; ++M)
         {
-            for (unsigned N=0; N<DIM; N++)
+            for (unsigned N = 0; N < DIM; ++N)
             {
                 TS_ASSERT_DELTA(T(M,N), 0.0, 1e-6);
             }
@@ -91,9 +91,9 @@ private:
 
         pLaw->ComputeStressAndStressDerivative(C,invC,0.0,T,dTdE,false);
 
-        for (unsigned M=0; M<DIM; M++)
+        for (unsigned M = 0; M < DIM; ++M)
         {
-            for (unsigned N=0; N<DIM; N++)
+            for (unsigned N = 0; N < DIM; ++N)
             {
                 TS_ASSERT_DELTA(T(M,N), 0.0, 1e-6);
             }
@@ -112,7 +112,7 @@ private:
         C(0,0) = 1.1;
         C(0,1) = C(1,0) = 0.1;
         C(1,1) = 0.9;
-        if (DIM==3)
+        if (DIM == 3)
         {
             C(2,2) = 0.95;
             C(0,2) = C(2,0) = 0;
@@ -128,7 +128,7 @@ private:
 
         double h=0.00001;
 
-        for (unsigned M=0; M<DIM; M++)
+        for (unsigned M = 0; M < DIM; ++M)
         {
             C(M,M) += h;     // just change C00 and C11 (and C22). Can't see how to compute numerical
                              // derivative of wrt C01,C10, given that C is assumed symmetric
@@ -138,9 +138,9 @@ private:
 
             pLaw->ComputeStressAndStressDerivative(C,invC,0.0,T,dTdE,true);
 
-            for (unsigned P=0; P<DIM; P++)
+            for (unsigned P = 0; P < DIM; ++P)
             {
-                for (unsigned Q=0; Q<DIM; Q++)
+                for (unsigned Q = 0; Q < DIM; ++Q)
                 {
                     double dtdc = (T(P,Q)-T_base(P,Q))/h;
                     //std::cout << P << Q << M << M << " " << dTdE(P,Q,M,M) << "\n";
@@ -165,7 +165,7 @@ private:
         C(0,0) = 1.06;
         C(0,1) = C(1,0) = 0.106;
         C(1,1) = 0.954;            // overall C satifies det(C) = 1
-        if (DIM==3)
+        if (DIM == 3)
         {
             C(2,2) = 1.0;
             C(0,2) = C(2,0) = 0;
@@ -183,7 +183,7 @@ private:
 
         double h=0.00001;
 
-        for (unsigned M=0; M<DIM; M++)
+        for (unsigned M = 0; M < DIM; ++M)
         {
             C(M,M) += h;     // just change C00 and C11 (and C22). Can't see how to compute numerical
                              // derivative of wrt C01,C10, given that C is assumed symmetric
@@ -193,9 +193,9 @@ private:
 
             pLaw->ComputeStressAndStressDerivative(C,invC,1.0,T,dTdE,true);
 
-            for (unsigned P=0; P<DIM; P++)
+            for (unsigned P = 0; P < DIM; ++P)
             {
-                for (unsigned Q=0; Q<DIM; Q++)
+                for (unsigned Q = 0; Q<DIM; Q++)
                 {
                     double dtdc = (T(P,Q)-T_base(P,Q))/h;
                     //std::cout << P << Q << M << M << " " << dTdE(P,Q,M,M) << "\n";
@@ -250,13 +250,13 @@ private:
         TS_ASSERT_DELTA(T_Xfibres(1,0), T_Yfibres(0,1), 1e-8);
 
         // dTdE_Xfibres(0,1,1,0) should be equal to dTdE_Yfibres(1,0,0,1), etc
-        for (unsigned M=0; M<2; M++)
+        for (unsigned M = 0; M<2; M++)
         {
-            for (unsigned N=0; N<2; N++)
+            for (unsigned N = 0; N<2; N++)
             {
-                for (unsigned P=0; P<2; P++)
+                for (unsigned P = 0; P<2; P++)
                 {
-                    for (unsigned Q=0; Q<2; Q++)
+                    for (unsigned Q = 0; Q<2; Q++)
                     {
                         TS_ASSERT_DELTA(dTdE_Xfibres(M,N,P,Q), dTdE_Yfibres((M+1)%2,(N+1)%2,(P+1)%2,(Q+1)%2), 1e-8);
                     }
@@ -342,26 +342,26 @@ public:
         c_matrix<double,3,3> T_transposeF = prod(T,trans(F));//T_as_unsym_tensor*transpose(F);
 
         // Check sigma is correct - sigma should be (1/detF) F * T * trans(F)
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i<3; ++i)
         {
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j = 0; j<3; ++j)
             {
                 TS_ASSERT_DELTA(sigma(i,j), F_T_tranF_over_detF(i,j), 1e-12);
             }
         }
 
         // Check S is correct
-        for (unsigned M=0; M<3; M++)
+        for (unsigned M = 0; M<3; M++)
         {
-            for (unsigned i=0; i<3; i++)
+            for (unsigned i = 0; i<3; ++i)
             {
                 TS_ASSERT_DELTA(S(M,i), T_transposeF(M,i), 1e-12);
             }
         }
 
-        for (unsigned M=0; M<3; M++)
+        for (unsigned M = 0; M<3; M++)
         {
-            for (unsigned N=0; N<3; N++)
+            for (unsigned N = 0; N<3; N++)
             {
                 // Check we gave a symmetric C
                 assert(C(M,N)==C(N,M));
@@ -519,9 +519,9 @@ public:
 
         poly_law.ComputeStressAndStressDerivative(C, invC, pressure, T, dTdE, true);
 
-        for (unsigned M=0; M<3; M++)
+        for (unsigned M = 0; M<3; M++)
         {
-            for (unsigned N=0; N<3; N++)
+            for (unsigned N = 0; N<3; N++)
             {
                 // Check we gave a symmetric C
                 assert(C(M,N)==C(N,M));
@@ -596,9 +596,9 @@ public:
         poly_law.Compute2ndPiolaKirchoffStress(identity_strain_3d,
                                                poly_law.GetZeroStrainPressure(),
                                                T_3d);
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i<3; ++i)
         {
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j = 0; j<3; ++j)
             {
                 TS_ASSERT_DELTA(T_3d(i,j),0.0,1e-12);
             }
@@ -608,7 +608,7 @@ public:
     void TestPoleZeroMaterialLaw()
     {
         std::vector<std::vector<double> > k(2),a(2),b(2);
-        for (unsigned i=0; i<2; i++)
+        for (unsigned i = 0; i<2; ++i)
         {
             k[i].resize(2);
             a[i].resize(2);
@@ -651,14 +651,14 @@ public:
 //        // C such that E_MN < 0, p=0 => T=0, dTdE=0;
 //        pole_zero_law.ComputeStressAndStressDerivative(C,invC,0.0,T,dTdE,true);
 //
-//        for (unsigned M=0; M<2; M++)
+//        for (unsigned M = 0; M<2; M++)
 //        {
-//            for (unsigned N=0; N<2; N++)
+//            for (unsigned N = 0; N<2; N++)
 //            {
 //                TS_ASSERT_DELTA(T(M,N), 0.0, 1e-9);
-//                for (unsigned P=0; P<2; P++)
+//                for (unsigned P = 0; P<2; P++)
 //                {
-//                    for (unsigned Q=0; Q<2; Q++)
+//                    for (unsigned Q = 0; Q<2; Q++)
 //                    {
 //                        TS_ASSERT_DELTA(dTdE(M,N,P,Q), 0.0, 1e-9);
 //                    }
@@ -694,13 +694,13 @@ public:
         TS_ASSERT_DELTA(dTdE(1,0,1,0), dtde10, 1e-9);
         TS_ASSERT_DELTA(dTdE(1,1,1,1), dtde11, 1e-9);
 
-        for (unsigned M=0; M<2; M++)
+        for (unsigned M = 0; M<2; M++)
         {
-            for (unsigned N=0; N<2; N++)
+            for (unsigned N = 0; N<2; N++)
             {
-                for (unsigned P=0; P<2; P++)
+                for (unsigned P = 0; P<2; P++)
                 {
-                    for (unsigned Q=0; Q<2; Q++)
+                    for (unsigned Q = 0; Q<2; Q++)
                     {
                         if ((P!=M) || (Q!=N))
                         {
@@ -720,14 +720,14 @@ public:
         pole_zero_law.ComputeStressAndStressDerivative(C, invC, 0.0, T,  dTdE,  true);
         pole_zero_law.ComputeStressAndStressDerivative(C, invC, 1.0, T2, dTdE2, true);
 
-        for (unsigned M=0; M<2; M++)
+        for (unsigned M = 0; M<2; M++)
         {
-            for (unsigned N=0; N<2; N++)
+            for (unsigned N = 0; N<2; N++)
             {
                 TS_ASSERT_DELTA(T(M,N) - T2(M,N), invC(M,N), 1e-6);
-                for (unsigned P=0; P<2; P++)
+                for (unsigned P = 0; P<2; P++)
                 {
-                    for (unsigned Q=0; Q<2; Q++)
+                    for (unsigned Q = 0; Q<2; Q++)
                     {
                         TS_ASSERT_DELTA(dTdE(M,N,P,Q)-dTdE2(M,N,P,Q), -2*invC(M,P)*invC(Q,N), 1e-6);
                     }
@@ -739,7 +739,7 @@ public:
     void TestPoleZeroMaterialLaw3d()
     {
         std::vector<std::vector<double> > k(3),a(3),b(3);
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i<3; ++i)
         {
             k[i].resize(3);
             a[i].resize(3);
@@ -1001,26 +1001,26 @@ public:
         c_matrix<double,3,3> T_transposeF = prod(T,trans(F));//T_as_unsym_tensor*transpose(F);
 
         // Check sigma is correct - sigma should be (1/detF) F * T * trans(F)
-        for (unsigned i=0; i<3; i++)
+        for (unsigned i = 0; i<3; ++i)
         {
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j = 0; j<3; ++j)
             {
                 TS_ASSERT_DELTA(sigma(i,j), F_T_tranF_over_detF(i,j), 1e-12);
             }
         }
 
         // Check S is correct
-        for (unsigned M=0; M<3; M++)
+        for (unsigned M = 0; M<3; M++)
         {
-            for (unsigned i=0; i<3; i++)
+            for (unsigned i = 0; i<3; ++i)
             {
                 TS_ASSERT_DELTA(S(M,i), T_transposeF(M,i), 1e-12);
             }
         }
 
-        for (unsigned M=0; M<3; M++)
+        for (unsigned M = 0; M<3; M++)
         {
-            for (unsigned N=0; N<3; N++)
+            for (unsigned N = 0; N<3; N++)
             {
                 // Check we gave a symmetric C
                 assert(C(M,N)==C(N,M));

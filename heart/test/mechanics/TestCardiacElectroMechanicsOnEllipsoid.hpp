@@ -125,7 +125,7 @@ public:
         std::vector<c_vector<double,3> > locations;
 
         bool first = true;
-        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); ++i)
         {
             double x = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double y = mechanics_mesh.GetNode(i)->rGetLocation()[1];

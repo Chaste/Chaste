@@ -328,7 +328,7 @@ public:
         *p_Y1_file << mechanics_mesh.GetNumElements() << "\n";
         *p_Y2_file << mechanics_mesh.GetNumElements() << "\n";
         *p_Z_file  << mechanics_mesh.GetNumElements() << "\n";
-        for (unsigned i=0; i<mechanics_mesh.GetNumElements(); i++)
+        for (unsigned i=0; i<mechanics_mesh.GetNumElements(); ++i)
         {
             //double X = mechanics_mesh.GetElement(i)->CalculateCentroid()(0);
             *p_X_file  << "1 0 0 0 1 0 0 0 1\n";
@@ -385,9 +385,9 @@ public:
         }
 
         // test the two results are identical
-        for (unsigned i=0; i<r_deformed_position_no_fibres.size(); i++)
+        for (unsigned i=0; i<r_deformed_position_no_fibres.size(); ++i)
         {
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j=0; j<3; ++j)
             {
                 TS_ASSERT_DELTA(r_deformed_position_no_fibres[i](j), r_deformed_position_fibres_alongX[i](j), 1e-8);
             }
@@ -453,9 +453,9 @@ public:
 
 
         // test the two results are identical
-        for (unsigned i=0; i<r_deformed_position_no_fibres.size(); i++)
+        for (unsigned i=0; i<r_deformed_position_no_fibres.size(); ++i)
         {
-            for (unsigned j=0; j<3; j++)
+            for (unsigned j=0; j<3; ++j)
             {
                 TS_ASSERT_DELTA(r_deformed_position_fibres_alongY1[i](j), r_deformed_position_fibres_alongY2[i](j), 1e-8);
             }

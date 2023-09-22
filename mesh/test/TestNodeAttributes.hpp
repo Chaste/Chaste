@@ -60,7 +60,7 @@ private:
         TS_ASSERT_DELTA(node_attributes.GetRadius(), 0.0, 1e-4);
         TS_ASSERT_EQUALS(node_attributes.IsParticle(), false);
 
-        for (unsigned i = 0; i < DIM; i++)
+        for (unsigned i = 0; i < DIM; ++i)
         {
             TS_ASSERT_DELTA(node_attributes.rGetAppliedForce()[i], 0.0, tol);
         }

@@ -67,13 +67,13 @@ public:
         TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(2), 11u);
         TS_ASSERT_DELTA(mesh.GetNode(11)->rGetLocation()[0], 0.05, 1e-12);
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             bool is_boundary_node = mesh.GetNode(i)->IsBoundaryNode();
             TS_ASSERT_EQUALS(is_boundary_node, ((x==0)||(x==1)));
         }
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             // Check internal nodes have corrent element associated with them
             std::set<unsigned> internal_node_elems;
@@ -96,13 +96,13 @@ public:
         TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(2), 11u);
         TS_ASSERT_DELTA(mesh.GetNode(11)->rGetLocation()[0], 0.05, 1e-12);
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             bool is_boundary_node = mesh.GetNode(i)->IsBoundaryNode();
             TS_ASSERT_EQUALS(is_boundary_node, ((x==0)||(x==1)));
         }
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             // Check internal nodes have correct element associated with them
             std::set<unsigned> internal_node_elems;
@@ -122,11 +122,11 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumVertices(), 81u);
 
         // Each element should have 6 nodes
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             TS_ASSERT_EQUALS(mesh.GetElement(i)->GetNumNodes(), 6u);
 
-            for (unsigned j=0; j<2; j++)
+            for (unsigned j = 0; j<2; ++j)
             {
                 // Check internal nodes have corrent element associated with them
                 TS_ASSERT(mesh.GetElement(i)->GetNode(j+3)->GetNumContainingElements() <= 2u);
@@ -164,7 +164,7 @@ public:
         // ...the midnode has to be computed (found) by the QuadraticMesh class
         TS_ASSERT_EQUALS( (*iter)->GetNodeGlobalIndex(2), 81u);
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -184,12 +184,12 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumVertices(), 4u);
 
         // Check getting global numbers of nodes 4-9 (in non-vertices)
-        for (unsigned i=4; i<10; i++)
+        for (unsigned i=4; i<10; ++i)
         {
             TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(i), i);
         }
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             TS_ASSERT_EQUALS(mesh.GetNode(i)->IsBoundaryNode(), true);
             TS_ASSERT_EQUALS(mesh.GetNode(i)->GetNumContainingElements(), 1u);
@@ -205,11 +205,11 @@ public:
         TS_ASSERT_EQUALS(mesh2.GetNumVertices(), 375u);
 
         // Each element should have 10 nodes
-        for (unsigned i=0; i<mesh2.GetNumElements(); i++)
+        for (unsigned i = 0; i<mesh2.GetNumElements(); ++i)
         {
             TS_ASSERT_EQUALS(mesh2.GetElement(i)->GetNumNodes(), 10u);
 
-            for (unsigned j=3; j<9; j++)
+            for (unsigned j=3; j<9; ++j)
             {
                 // Check internal nodes have corrent element associated with them
                 TS_ASSERT(mesh2.GetElement(i)->GetNode(j)->GetNumContainingElements() > 0u);
@@ -240,7 +240,7 @@ public:
         TS_ASSERT_EQUALS( (*iter)->GetNodeGlobalIndex(4), 388u);
         TS_ASSERT_EQUALS( (*iter)->GetNodeGlobalIndex(5), 391u);
 
-        for (unsigned i=0; i<mesh2.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh2.GetNumNodes(); ++i)
         {
             double x = mesh2.GetNode(i)->rGetLocation()[0];
             double y = mesh2.GetNode(i)->rGetLocation()[1];
@@ -266,7 +266,7 @@ public:
         c_matrix<double, 2, 2> jacob;
         c_matrix<double, 2, 2> inv;
 
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             TS_ASSERT_EQUALS(mesh.GetElement(i)->GetNumNodes(), 6u);
             mesh.GetInverseJacobianForElement(i, jacob, det, inv);
@@ -331,11 +331,11 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumVertices(), 11*6u);
 
         // Each element should have 6 nodes
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             TS_ASSERT_EQUALS(mesh.GetElement(i)->GetNumNodes(), 6u);
         }
-        for (unsigned i=0; i<mesh.GetNumBoundaryElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumBoundaryElements(); ++i)
         {
             TS_ASSERT_EQUALS(mesh.GetBoundaryElement(i)->GetNumNodes(), 3u);
         }
@@ -359,7 +359,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumVertices(), 2*3*4u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryNodes(), 90u);
 
-        for (unsigned i=1; i<mesh.GetNumNodes(); i++)
+        for (unsigned i=1; i<mesh.GetNumNodes(); ++i)
         {
             c_vector<double,3> x = mesh.GetNode(i)->rGetLocation();
 
@@ -375,7 +375,7 @@ public:
         // Second 1 by 1 by 1 mesh
         QuadraticMesh<3> mesh2(h, width, width, width);
 
-        for (unsigned i=1; i<mesh2.GetNumNodes(); i++)
+        for (unsigned i=1; i<mesh2.GetNumNodes(); ++i)
         {
             //Check that all nodes have containg elements
             TS_ASSERT_LESS_THAN(0u, mesh2.GetNode(i)->GetNumContainingElements());
@@ -402,7 +402,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryNodes(), 602u);
 
         // Each element should have 10 nodes
-        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             TS_ASSERT_EQUALS(mesh.GetElement(i)->GetNumNodes(), 10u);
         }
@@ -468,7 +468,7 @@ public:
                 TS_ASSERT_EQUALS( (*iter1)->GetNumNodes(), 6u );
                 TS_ASSERT_EQUALS( (*iter2)->GetNumNodes(), 6u );
 
-                for (unsigned i=0; i<6; i++)
+                for (unsigned i = 0; i<6; ++i)
                 {
                    TS_ASSERT_EQUALS( (*iter1)->GetNodeGlobalIndex(i), (*iter2)->GetNodeGlobalIndex(i));
                 }
@@ -490,7 +490,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 10u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryNodes(), 2u);
 
-        for (unsigned i=0; i<mesh.GetNumVertices(); i++)
+        for (unsigned i = 0; i<mesh.GetNumVertices(); ++i)
         {
             TS_ASSERT_DELTA(mesh.GetNode(i)->rGetLocation()[0], (i+0.0)/10, 1e-8);
 
@@ -501,7 +501,7 @@ public:
             TS_ASSERT_EQUALS(containing_elems.size(), (is_boundary ? 1u : 2u));
         }
 
-        for (unsigned i=mesh.GetNumVertices(); i<mesh.GetNumNodes(); i++)
+        for (unsigned i=mesh.GetNumVertices(); i<mesh.GetNumNodes(); ++i)
         {
             TS_ASSERT_DELTA(mesh.GetNode(i)->rGetLocation()[0], (i-11.0)/10 + 0.05, 1e-8);
 
@@ -598,12 +598,12 @@ public:
         TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumBoundaryNodes(), quad_mesh_read_back.GetNumBoundaryNodes());
         TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumVertices(), quad_mesh_read_back.GetNumVertices());
 
-        for (unsigned elem=0; elem<quad_mesh_constructed.GetNumElements(); elem++)
+        for (unsigned elem = 0; elem<quad_mesh_constructed.GetNumElements(); elem++)
         {
             Element<2,2>* p_elem_constructed =  quad_mesh_constructed.GetElement(elem);
             Element<2,2>* p_elem_read_back =  quad_mesh_read_back.GetElement(elem);
             TS_ASSERT_EQUALS(p_elem_constructed->GetNumNodes(), p_elem_read_back->GetNumNodes());
-            for (unsigned i = 0; i < p_elem_constructed->GetNumNodes(); i++)
+            for (unsigned i = 0; i < p_elem_constructed->GetNumNodes(); ++i)
             {
                 c_vector<double, 2> loc_read_back;
                 loc_read_back = p_elem_read_back->GetNode(i)->rGetLocation();
@@ -619,7 +619,7 @@ public:
         }
         // Can't check edges exactly because the linear to quadratic converter doesn't send any boundary information to the
         // external mesher.  (So the edges come back in a different order.)
-        for (unsigned b_elem=0; b_elem<quad_mesh_constructed.GetNumBoundaryElements(); b_elem++)
+        for (unsigned b_elem = 0; b_elem<quad_mesh_constructed.GetNumBoundaryElements(); b_elem++)
         {
             BoundaryElement<1,2>* p_b_elem_constructed =  quad_mesh_constructed.GetBoundaryElement(b_elem);
             BoundaryElement<1,2>* p_b_elem_read_back =  quad_mesh_read_back.GetBoundaryElement(b_elem);
@@ -651,12 +651,12 @@ public:
         TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumBoundaryNodes(), quad_mesh_read_back.GetNumBoundaryNodes());
         TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumVertices(), quad_mesh_read_back.GetNumVertices());
 
-        for (unsigned elem=0; elem<quad_mesh_constructed.GetNumElements(); elem++)
+        for (unsigned elem = 0; elem<quad_mesh_constructed.GetNumElements(); elem++)
         {
             Element<2,2>* p_elem_constructed =  quad_mesh_constructed.GetElement(elem);
             Element<2,2>* p_elem_read_back =  quad_mesh_read_back.GetElement(elem);
             TS_ASSERT_EQUALS(p_elem_constructed->GetNumNodes(), p_elem_read_back->GetNumNodes());
-            for (unsigned i = 0; i < p_elem_constructed->GetNumNodes(); i++)
+            for (unsigned i = 0; i < p_elem_constructed->GetNumNodes(); ++i)
             {
                 c_vector<double, 2> loc_read_back;
                 loc_read_back = p_elem_read_back->GetNode(i)->rGetLocation();
@@ -670,7 +670,7 @@ public:
         }
         // Can't check edges exactly because the linear to quadratic converter doesn't send any boundary information to the
         // external mesher.  (So the edges come back in a different order.)
-        for (unsigned b_elem=0; b_elem<quad_mesh_constructed.GetNumBoundaryElements(); b_elem++)
+        for (unsigned b_elem = 0; b_elem<quad_mesh_constructed.GetNumBoundaryElements(); b_elem++)
         {
             BoundaryElement<1,2>* p_b_elem_constructed =  quad_mesh_constructed.GetBoundaryElement(b_elem);
             BoundaryElement<1,2>* p_b_elem_read_back =  quad_mesh_read_back.GetBoundaryElement(b_elem);
@@ -706,12 +706,12 @@ public:
         TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumElements(), quad_mesh_read_back.GetNumElements());
         TS_ASSERT_EQUALS(quad_mesh_constructed.GetNumBoundaryElements(), quad_mesh_read_back.GetNumBoundaryElements());
 
-        for (unsigned elem=0; elem<quad_mesh_constructed.GetNumElements(); elem++)
+        for (unsigned elem = 0; elem<quad_mesh_constructed.GetNumElements(); elem++)
         {
             Element<3,3>* p_elem_constructed =  quad_mesh_constructed.GetElement(elem);
             Element<3,3>* p_elem_read_back =  quad_mesh_read_back.GetElement(elem);
             TS_ASSERT_EQUALS(p_elem_constructed->GetNumNodes(), p_elem_read_back->GetNumNodes());
-            for (unsigned i = 0; i < p_elem_constructed->GetNumNodes(); i++)
+            for (unsigned i = 0; i < p_elem_constructed->GetNumNodes(); ++i)
             {
                 c_vector<double, 3> loc_read_back;
                 loc_read_back = p_elem_read_back->GetNode(i)->rGetLocation();
@@ -727,7 +727,7 @@ public:
             }
         }
 
-        for (unsigned b_elem=0; b_elem<quad_mesh_constructed.GetNumBoundaryElements(); b_elem++)
+        for (unsigned b_elem = 0; b_elem<quad_mesh_constructed.GetNumBoundaryElements(); b_elem++)
         {
             BoundaryElement<2,3>* p_b_elem_constructed =  quad_mesh_constructed.GetBoundaryElement(b_elem);
             BoundaryElement<2,3>* p_b_elem_read_back =  quad_mesh_read_back.GetBoundaryElement(b_elem);
@@ -859,7 +859,7 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), quad_mesh.GetNumVertices());
-        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             unsigned quad_index=i;
             //Quad mesh has a minor permutation: vertex node 4 now appears at index 81
@@ -948,10 +948,10 @@ public:
                     iter != rMesh.GetElementIteratorEnd();
                     ++iter)
         {
-            for (unsigned i=0; i<iter->GetNumNodes(); i++)
+            for (unsigned i = 0; i<iter->GetNumNodes(); ++i)
             {
                 unsigned global_index1 = iter->GetNodeGlobalIndex(i);
-                for (unsigned j=i+1; j<iter->GetNumNodes(); j++)
+                for (unsigned j=i+1; j<iter->GetNumNodes(); ++j)
                 {
                     unsigned global_index2 = iter->GetNodeGlobalIndex(j);
                     PetscMatTools::SetElement(matrix, global_index1, global_index2, 1.0);
@@ -980,7 +980,7 @@ public:
             const PetscInt* column_indices;
             const PetscScalar* values;
             MatGetRow(matrix, row, &num_entries, &column_indices, &values);
-            for (PetscInt col=0; col<num_entries; col++)
+            for (PetscInt col = 0; col<num_entries; col++)
             {
                 if (column_indices[col] >= row)
                 {
@@ -1007,14 +1007,14 @@ public:
         double h = 1.0;
         mesh.ConstructRegularSlabMesh(h, 2.0, 1.0, 1.0);
 
-        for (unsigned node_index = 0; node_index<mesh.GetNumNodes(); node_index++)
+        for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
         {
             std::set<unsigned> elements = mesh.GetNode(node_index)->rGetContainingElementIndices();
             for (auto iter : elements)
             {
                 Element<3,3>* p_element = mesh.GetElement(iter);
                 bool found_node = false;
-                for (unsigned i=0; i<p_element->GetNumNodes(); i++)
+                for (unsigned i = 0; i<p_element->GetNumNodes(); ++i)
                 {
                     unsigned this_node = p_element->GetNodeGlobalIndex(i);
                     if (this_node == node_index)
@@ -1030,7 +1030,7 @@ public:
             {
                 BoundaryElement<2,3>* p_element = mesh.GetBoundaryElement(iter);
                 bool found_node = false;
-                for (unsigned i=0; i<p_element->GetNumNodes(); i++)
+                for (unsigned i = 0; i<p_element->GetNumNodes(); ++i)
                 {
                     unsigned this_node = p_element->GetNodeGlobalIndex(i);
                     if (this_node == node_index)

@@ -50,7 +50,7 @@ CompressibleExponentialLaw<DIM>::CompressibleExponentialLaw()
     mCompressibilityParam = 100.0;
 
     mB.resize(DIM);
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         mB[i].resize(DIM);
     }
@@ -66,9 +66,9 @@ CompressibleExponentialLaw<DIM>::CompressibleExponentialLaw()
         mB[2][1] = mB[1][2] = bsn;
     }
 
-    for (unsigned M=0; M<DIM; M++)
+    for (unsigned M = 0; M < DIM; ++M)
     {
-        for (unsigned N=0; N<DIM; N++)
+        for (unsigned N = 0; N < DIM; ++N)
         {
             mIdentity(M,N) = M==N ? 1.0 : 0.0;
         }
@@ -99,9 +99,9 @@ void CompressibleExponentialLaw<DIM>::ComputeStressAndStressDerivative(c_matrix<
     c_matrix<double,DIM,DIM> E = 0.5*(C_transformed - mIdentity);
 
     double QQ = 0;
-    for (unsigned M=0; M<DIM; M++)
+    for (unsigned M = 0; M < DIM; ++M)
     {
-        for (unsigned N=0; N<DIM; N++)
+        for (unsigned N = 0; N < DIM; ++N)
         {
             QQ += mB[M][N]*E(M,N)*E(M,N);
         }
@@ -112,17 +112,17 @@ void CompressibleExponentialLaw<DIM>::ComputeStressAndStressDerivative(c_matrix<
 
     double J = sqrt(Determinant(rC));
 
-    for (unsigned M=0; M<DIM; M++)
+    for (unsigned M = 0; M < DIM; ++M)
     {
-        for (unsigned N=0; N<DIM; N++)
+        for (unsigned N = 0; N < DIM; ++N)
         {
             rT(M,N) = multiplier*mB[M][N]*E(M,N) + mCompressibilityParam * J*log(J)*invC_transformed(M,N);
 
             if (computeDTdE)
             {
-                for (unsigned P=0; P<DIM; P++)
+                for (unsigned P = 0; P < DIM; ++P)
                 {
-                    for (unsigned Q=0; Q<DIM; Q++)
+                    for (unsigned Q = 0; Q < DIM; ++Q)
                     {
                         rDTdE(M,N,P,Q) =    multiplier * mB[M][N] * (M==P)*(N==Q)
                                          +  2*multiplier*mB[M][N]*mB[P][Q]*E(M,N)*E(P,Q)

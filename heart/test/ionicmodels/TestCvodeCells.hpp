@@ -195,7 +195,7 @@ public:
         lr91_cvode_system.SetVoltageDerivativeToZero();
         solution_cvode = lr91_cvode_system.Solve(end_time, end_time+100.0, max_timestep, sampling_time);
         std::vector<double> voltages = solution_cvode.GetVariableAtIndex(lr91_cvode_system.GetVoltageIndex());
-        for (unsigned i=0; i<voltages.size(); i++)
+        for (unsigned i = 0; i<voltages.size(); ++i)
         {
             TS_ASSERT_EQUALS(voltages[i], lr91_cvode_system.GetVoltage());
         }
@@ -273,7 +273,7 @@ public:
         N_Vector n_state_vars = lr91_cvode_system.GetStateVariables();
         TS_ASSERT_EQUALS(GetVectorSize(n_state_vars), GetVectorSize(s_state_vars));
         TS_ASSERT_EQUALS(GetVectorSize(n_state_vars), lr91_cvode_system.GetNumberOfStateVariables());
-        for (unsigned i=0; i<s_state_vars.size(); i++)
+        for (unsigned i = 0; i<s_state_vars.size(); ++i)
         {
             TS_ASSERT_DELTA(GetVectorComponent(n_state_vars,i), s_state_vars[i], 1e-9);
         }
@@ -281,7 +281,7 @@ public:
 
         s_state_vars[0] = -1000; // Alter one of the variables to check the below method works...
         lr91_cvode_system.SetStateVariables(s_state_vars);
-        for (unsigned i=0; i<s_state_vars.size(); i++)
+        for (unsigned i = 0; i<s_state_vars.size(); ++i)
         {
             TS_ASSERT_DELTA(lr91_cvode_system.GetStateVariable(i), s_state_vars[i], 1e-9);
         }
@@ -382,7 +382,7 @@ public:
 
         // Check we get the right answer both times
         std::vector<double> final_state_vars = solution_cvode.rGetSolutions().back();
-        for (unsigned i=0; i<final_state_vars.size(); i++)
+        for (unsigned i = 0; i<final_state_vars.size(); ++i)
         {
             TS_ASSERT_DELTA(final_state_vars[i], NV_Ith_S(state_vars_after_solve, i), 1e-6);
         }
@@ -422,7 +422,7 @@ public:
         TS_ASSERT_EQUALS(derived_quantity_cvode.size(),derived_quantity_chaste.size());
 
         double tolerance = 6e-2;
-        for (unsigned i=0; i<voltages_cvode.size(); ++i)
+        for (unsigned i = 0; i<voltages_cvode.size(); ++i)
         {
             // The tolerances for voltage are adjusted cleverly at upstroke in CompareCellModelResults below...
             TS_ASSERT_DELTA(voltages_cvode[i],voltages_chaste[i], 10*tolerance);
@@ -450,7 +450,7 @@ public:
         sh04_cvode_system->SetVoltageDerivativeToZero();
         solution_cvode = sh04_cvode_system->Solve(end_time, end_time+100.0, max_timestep, sampling_time);
         std::vector<double> voltages = solution_cvode.GetVariableAtIndex(sh04_cvode_system->GetVoltageIndex());
-        for (unsigned i=0; i<voltages.size(); i++)
+        for (unsigned i = 0; i<voltages.size(); ++i)
         {
             TS_ASSERT_EQUALS(voltages[i], sh04_cvode_system->GetVoltage());
         }
@@ -466,7 +466,7 @@ public:
         // see a reduced response.
         voltages = solution_cvode.GetVariableAtIndex(sh04_cvode_system->GetVoltageIndex());
         double test_v = solution_chaste.GetVariableAtIndex(sh04_cvode_system->GetVoltageIndex())[voltages.size()-1];
-        for (unsigned i=0; i<voltages.size(); i++)
+        for (unsigned i = 0; i<voltages.size(); ++i)
         {
             TS_ASSERT_LESS_THAN(voltages[i], test_v);
         }

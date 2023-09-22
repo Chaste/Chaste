@@ -285,8 +285,7 @@ public:
         // Dirichlet BCs to phi_e and phi_i
         //////////////////////////////////////////
 
-        for (MixedDimensionMesh<3,3>::BoundaryNodeIterator iter
-                = mesh.GetBoundaryNodeIteratorBegin();
+        for (auto iter = mesh.GetBoundaryNodeIteratorBegin();
              iter != mesh.GetBoundaryNodeIteratorEnd();
              iter++)
         {
@@ -296,7 +295,7 @@ public:
             double z = p_node->rGetLocation()[2];
             double r = sqrt(x*x+y*y);
 
-            if (fabs(r-1)<1e-3)
+            if (fabs(r-1) < 1e-3)
             {
                 // apply BC phi_e = 0
                 ConstBoundaryCondition<3>* p_bc = new ConstBoundaryCondition<3>(0.0);

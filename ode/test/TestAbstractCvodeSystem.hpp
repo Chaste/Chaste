@@ -336,7 +336,7 @@ public:
         N_Vector n_vec = MakeNVector(std_vec);
 
         TS_ASSERT_EQUALS(GetVectorSize(n_vec), GetVectorSize(std_vec));
-        for (unsigned i = 0; i < GetVectorSize(n_vec); i++)
+        for (unsigned i = 0; i < GetVectorSize(n_vec); ++i)
         {
             TS_ASSERT_DELTA(GetVectorComponent(n_vec, i), GetVectorComponent(std_vec, i), 1e-9);
         }
@@ -404,7 +404,7 @@ public:
             TS_ASSERT_EQUALS(ode.GetForceReset(), false);
             ode.SetForceReset(true);
             TS_ASSERT_EQUALS(ode.GetForceReset(), true);
-            for (unsigned i = 0; i < 10; i++)
+            for (unsigned i = 0; i < 10; ++i)
             {
                 ode.SetParameter("a", i); // dy/dt = a
                 ode.Solve(i, i + 1.0, 1.0);
@@ -418,7 +418,7 @@ public:
 
             // But we alter time which will trigger a reset to get the right answer.
             ode.SetStateVariable(0u, 0.0);
-            for (unsigned i = 0; i < 10; i++)
+            for (unsigned i = 0; i < 10; ++i)
             {
                 ode.SetParameter("a", i); // dy/dt = a
                 ode.Solve(i, i + 1.0, 1.0);
@@ -437,7 +437,7 @@ public:
             ode.SetMinimalReset(true);
             TS_ASSERT_EQUALS(ode.GetMinimalReset(), true);
             ode.SetStateVariable(0u, 0.0);
-            for (unsigned i = 0; i < 10; i++)
+            for (unsigned i = 0; i < 10; ++i)
             {
                 ode.SetParameter("a", i); // dy/dt = a
                 ode.Solve(15.0 + i, i + 16.0, 1.0);
@@ -483,13 +483,13 @@ public:
             // We copy the above sequential solve test and straddle a checkpoint
             // First solve with an automatic reset at each Solve call
             AbstractCvodeSystem* const p_ode2 = new ParameterisedCvode;
-            for (unsigned i = 0; i < 5; i++)
+            for (unsigned i = 0; i < 5; ++i)
             {
                 p_ode2->SetParameter("a", i); // dy/dx = i
                 p_ode2->Solve(i, i + 1.0, 1.0);
             }
             output_arch << p_ode2;
-            for (unsigned i = 5; i < 10; i++)
+            for (unsigned i = 5; i < 10; ++i)
             {
                 p_ode2->SetParameter("a", i); // dy/dx = i
                 p_ode2->Solve(i, i + 1.0, 1.0);
@@ -516,7 +516,7 @@ public:
 
             // Run for a while after checkpoint, check it agrees with the above test and
             // the ode system that was saved.
-            for (unsigned i = 5; i < 10; i++)
+            for (unsigned i = 5; i < 10; ++i)
             {
                 p_ode2->SetParameter("a", i); // dy/dx = i
                 p_ode2->Solve(i, i + 1.0, 1.0);

@@ -73,7 +73,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
 
         if (element.GetOwnership() == true)
         {
-            for (unsigned j=0; j<num_quad_pts_per_element; j++)
+            for (unsigned j=0; j<num_quad_pts_per_element; ++j)
             {
                 unsigned quad_pt_global_index = element.GetIndex()*num_quad_pts_per_element + j;
 
@@ -105,7 +105,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
 
     // initialise fibre/sheet direction matrix to be the identity, fibres in X-direction, and sheet in XY-plane
     mConstantFibreSheetDirections = zero_matrix<double>(DIM,DIM);
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         mConstantFibreSheetDirections(i,i) = 1.0;
     }
@@ -171,7 +171,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetCalciumAndVoltage
 
     ContractionModelInputParameters input_parameters;
 
-    for (unsigned i=0; i<rCalciumConcentrations.size(); i++)
+    for (unsigned i=0; i<rCalciumConcentrations.size(); ++i)
     {
         input_parameters.intracellularCalciumConcentration = rCalciumConcentrations[i];
         input_parameters.voltage = rVoltages[i];
@@ -212,7 +212,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
                                                                                                FourthOrderTensor<DIM,DIM,DIM,DIM>& rDTdE,
                                                                                                bool addToDTdE)
 {
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
         mCurrentElementFibreDirection(i) = this->mChangeOfBasisMatrix(i,0);
     }
@@ -254,7 +254,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
     {
         double sheet_cross_fraction = mrElectroMechanicsProblemDefinition.GetSheetTensionFraction();
 
-        for (unsigned i=0; i<DIM; i++)
+        for (unsigned i = 0; i < DIM; ++i)
         {
             mCurrentElementSheetDirection(i) = this->mChangeOfBasisMatrix(i,1);
         }
@@ -277,7 +277,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
         if (DIM>2)
         {
             double sheet_normal_cross_fraction = mrElectroMechanicsProblemDefinition.GetSheetNormalTensionFraction();
-            for (unsigned i=0; i<DIM; i++)
+            for (unsigned i = 0; i < DIM; ++i)
             {
                 mCurrentElementSheetNormalDirection(i) = this->mChangeOfBasisMatrix(i,2);
             }
@@ -302,13 +302,13 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
     {
         c_matrix<double,DIM,DIM> invC = Inverse(rC);
 
-        for (unsigned M=0; M<DIM; M++)
+        for (unsigned M = 0; M < DIM; ++M)
         {
-            for (unsigned N=0; N<DIM; N++)
+            for (unsigned N = 0; N < DIM; ++N)
             {
-                for (unsigned P=0; P<DIM; P++)
+                for (unsigned P = 0; P < DIM; ++P)
                 {
-                    for (unsigned Q=0; Q<DIM; Q++)
+                    for (unsigned Q = 0; Q < DIM; ++Q)
                     {
                         rDTdE(M,N,P,Q) +=   dTdE_coeff1 * mCurrentElementFibreDirection(M)
                                                         * mCurrentElementFibreDirection(N)
@@ -363,7 +363,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
 //    {
 //        double sheet_cross_fraction = mrElectroMechanicsProblemDefinition.GetSheetTensionFraction();
 //
-//        for (unsigned i=0; i<DIM; i++)
+//        for (unsigned i = 0; i < DIM; ++i)
 //        {
 //            mCurrentElementSheetDirection(i) = this->mChangeOfBasisMatrix(i,1);
 //        }
@@ -388,11 +388,11 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
 //        double dTdE_coeff_s2 = active_tension*detF/I4_sheet;
 //        if (addToDTdE)
 //        {
-//           for (unsigned M=0; M<DIM; M++)
+//           for (unsigned M = 0; M < DIM; ++M)
 //           {
-//               for (unsigned N=0; N<DIM; N++)
+//               for (unsigned N = 0; N < DIM; ++N)
 //               {
-//                   for (unsigned P=0; P<DIM; P++)
+//                   for (unsigned P = 0; P < DIM; ++P)
 //                   {
 //                       for (unsigned Q=0; Q<DIM; Q++)
 //                       {
@@ -440,7 +440,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ComputeDeformationGr
 
         // get the fibre direction for this element
         SetupChangeOfBasisMatrix(elem_index, 0); // 0 is quad index, and doesn't matter as checked that fibres not defined by quad pt above.
-        for (unsigned i=0; i<DIM; i++)
+        for (unsigned i = 0; i < DIM; ++i)
         {
             mCurrentElementFibreDirection(i) = this->mChangeOfBasisMatrix(i,0);
         }
@@ -463,11 +463,11 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ComputeDeformationGr
 
         // loop over the vertices and interpolate F, the deformation gradient
         // (note: could use matrix-mult if this becomes inefficient
-        for (unsigned node_index=0; node_index<NUM_VERTICES_PER_ELEMENT; node_index++)
+        for (unsigned node_index = 0; node_index < NUM_VERTICES_PER_ELEMENT; ++node_index)
         {
-            for (unsigned i=0; i<DIM; i++)
+            for (unsigned i = 0; i < DIM; ++i)
             {
-                for (unsigned M=0; M<DIM; M++)
+                for (unsigned M = 0; M < DIM; ++M)
                 {
                     F(i,M) += grad_lin_phi(M,node_index)*element_current_displacements(i,node_index);
                 }
@@ -519,9 +519,9 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetConstantFibreShee
     mConstantFibreSheetDirections = rFibreSheetMatrix;
     // check orthogonality
     c_matrix<double,DIM,DIM>  temp = prod(trans(rFibreSheetMatrix),rFibreSheetMatrix);
-    for (unsigned i=0; i<DIM; i++)
+    for (unsigned i = 0; i < DIM; ++i)
     {
-        for (unsigned j=0; j<DIM; j++)
+        for (unsigned j = 0; j < DIM; ++j)
         {
             double val = (i==j ? 1.0 : 0.0);
             if (fabs(temp(i,j)-val)>1e-4)

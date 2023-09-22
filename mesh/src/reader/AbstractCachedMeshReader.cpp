@@ -109,7 +109,7 @@ unsigned AbstractCachedMeshReader<ELEMENT_DIM, SPACE_DIM>::GetMaxNodeIndex()
     {
         std::vector<unsigned> indices = iter; // the_iterator points at each line in turn
 
-        for (unsigned i = 0; i < ELEMENT_DIM+1; i++)
+        for (unsigned i = 0; i < ELEMENT_DIM+1; ++i)
         {
             if (indices[i] > max_node_index)
             {
@@ -130,7 +130,7 @@ unsigned AbstractCachedMeshReader<ELEMENT_DIM, SPACE_DIM>::GetMinNodeIndex()
     {
         std::vector<unsigned> indices = iter; // the_iterator points at each line in turn
 
-        for (unsigned i = 0; i < ELEMENT_DIM+1; i++)
+        for (unsigned i = 0; i < ELEMENT_DIM+1; ++i)
         {
             if (indices[i] < min_node_index)
             {

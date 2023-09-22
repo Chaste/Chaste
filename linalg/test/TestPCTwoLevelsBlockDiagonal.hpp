@@ -292,7 +292,7 @@ public:
 //        std::cout << "num_nodes: " << mesh.GetNumNodes() << std::endl;
 //
 //        // set the x<0.15 and x>0.85 regions as the bath region
-//        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+//        for (unsigned i=0; i<mesh.GetNumElements(); ++i)
 //        {
 //            double x = mesh.GetElement(i)->CalculateCentroid()[0];
 //            if ((x<0.1) || (x>0.9))
@@ -314,7 +314,7 @@ public:
 //        // Nodes are not labeled until Initialise() is called.
 //        std::cout << "bath nodes: ";
 //        unsigned num_bath_nodes = 0;
-//        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+//        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
 //        {
 //            if (HeartRegionCode::IsRegionBath( mesh.GetNode(i)->GetRegion() ))
 //            {

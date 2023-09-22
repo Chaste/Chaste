@@ -249,7 +249,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
             hetero_intra_conductivities.resize(num_elements, intra_conductivities);
         }
         // LCOV_EXCL_START
-        catch(std::bad_alloc &badAlloc)
+        catch (std::bad_alloc &badAlloc)
         {
 
             std::cout << "Failed to allocate std::vector of size " << num_elements << std::endl;
@@ -279,7 +279,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
                 if (conductivities_heterogeneity_areas[region_index]->DoesContain(element_centroid))
                 {
                     // We don't use ublas vector assignment here, because we might be getting a subvector of a 3-vector
-                    for (unsigned i=0; i<SPACE_DIM; i++)
+                    for (unsigned i=0; i<SPACE_DIM; ++i)
                     {
                         hetero_intra_conductivities[local_element_index][i] = intra_h_conductivities[region_index][i];
                     }
@@ -386,7 +386,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
             hetero_extra_conductivities.resize(num_elements, extra_conductivities);
         }
         // LCOV_EXCL_START
-        catch(std::bad_alloc &badAlloc)
+        catch (std::bad_alloc &badAlloc)
         {
             std::cout << "Failed to allocate std::vector of size " << num_elements << std::endl;
             PetscTools::ReplicateException(true);
@@ -416,7 +416,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
                 if (conductivities_heterogeneity_areas[region_index]->DoesContain(element_centroid))
                 {
                     // We don't use ublas vector assignment here, because we might be getting a subvector of a 3-vector
-                    for (unsigned i=0; i<SPACE_DIM; i++)
+                    for (unsigned i=0; i<SPACE_DIM; ++i)
                     {
                         hetero_extra_conductivities[local_element_index][i] = extra_h_conductivities[region_index][i];
                     }
@@ -459,7 +459,7 @@ ExtendedBidomainTissue<SPACE_DIM>::~ExtendedBidomainTissue()
 template <unsigned SPACE_DIM>
 void ExtendedBidomainTissue<SPACE_DIM>::SetIntracellularConductivitiesSecondCell(c_vector<double, SPACE_DIM> conductivities)
 {
-    for (unsigned i = 0; i < SPACE_DIM; i++)
+    for (unsigned i = 0; i < SPACE_DIM; ++i)
     {
         mIntracellularConductivitiesSecondCell[i] = conductivities[i];
     }
