@@ -187,6 +187,19 @@ class ProcessValgrind:
 
     @staticmethod
     def _get_git_info():
+        """
+        Get branch and commit information either from GitHub Actions environment or local git repository.
+        Returns:
+            tuple: branch name, commit SHA
+        """
+
+        # Most likely, we're on GitHub actions, and we can get the info we need from environment variables
+        if os.environ.get('GITHUB_ACTIONS') == 'true':
+            branch = os.environ.get('GITHUB_REF_NAME')
+            commit = os.environ.get('GITHUB_SHA')
+            return branch, commit
+
+        # Otherwise, we interrogate the Git repository directly
         chaste_source_dir = pathlib.Path(__file__).parent.parent
 
         try:
