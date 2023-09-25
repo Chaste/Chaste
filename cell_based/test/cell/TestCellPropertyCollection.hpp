@@ -123,7 +123,7 @@ public:
         collection.AddProperty(p_apc1_mutation);
         CellPropertyCollection mutations = collection.GetPropertiesType<AbstractCellMutationState>();
         TS_ASSERT_EQUALS(mutations.GetSize(), 2u);
-        CellPropertyCollection::Iterator it = mutations.Begin();
+        auto it = mutations.Begin();
         TS_ASSERT_EQUALS(collection.HasProperty(*it), true);
         TS_ASSERT_EQUALS((*it)->IsSubType<AbstractCellMutationState>(), true);
         TS_ASSERT( (*it)->IsType<WildTypeCellMutationState>() || (*(++it))->IsType<WildTypeCellMutationState>() );

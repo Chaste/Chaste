@@ -317,7 +317,7 @@ public:
 
         DistributedVectorFactory factory(solution);
         DistributedVector d_solution = factory.CreateDistributedVector( solution );
-        for (DistributedVector::Iterator index = d_solution.Begin();
+        for (auto index = d_solution.Begin();
              index != d_solution.End();
              ++index)
         {
@@ -398,7 +398,7 @@ public:
 
         DistributedVectorFactory factory(solution);
         DistributedVector d_solution = factory.CreateDistributedVector( solution );
-        for (DistributedVector::Iterator index = d_solution.Begin();
+        for (auto index = d_solution.Begin();
              index != d_solution.End();
              ++index)
         {
@@ -425,7 +425,7 @@ public:
         DistributedVector d_residual = factory.CreateDistributedVector(residual);
 
 
-        for (DistributedVector::Iterator index = d_solution.Begin();
+        for (auto index = d_solution.Begin();
              index != d_solution.End();
              ++index)
         {
@@ -449,8 +449,7 @@ public:
 
         bcc3.ApplyDirichletToNonlinearResidual(solution, residual, factory);
 
-
-        for (DistributedVector::Iterator index = d_solution.Begin();
+        for (auto index = d_solution.Begin();
              index != d_solution.End();
              ++index)
         {
@@ -655,7 +654,7 @@ public:
         DistributedVector::Stripe solution0(d_solution,0);
         DistributedVector::Stripe solution1(d_solution,1);
 
-        for (DistributedVector::Iterator index = d_solution.Begin();
+        for (auto index = d_solution.Begin();
              index != d_solution.End();
              ++index)
         {
@@ -729,7 +728,7 @@ public:
         DistributedVector::Stripe solution1(d_solution,1);
         DistributedVector::Stripe solution2(d_solution,2);
 
-        for (DistributedVector::Iterator index = d_solution.Begin();
+        for (auto index = d_solution.Begin();
              index != d_solution.End();
              ++index)
         {

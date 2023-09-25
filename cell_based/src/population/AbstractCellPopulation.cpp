@@ -97,7 +97,7 @@ AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCellPopulation(
     mLocationCellMap.clear();
     mCellLocationMap.clear();
 
-    std::list<CellPtr>::iterator it = mCells.begin();
+    auto it = mCells.begin();
     for (unsigned i = 0; it != mCells.end(); ++it, ++i)
     {
         // Give each cell a pointer to the property registry (we have taken ownership in this constructor)
@@ -138,8 +138,8 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetDataOnAllCells(
     const std::string& rDataName,
     double dataValue)
 {
-    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter=this->Begin();
-         cell_iter!=this->End();
+    for (auto cell_iter = this->Begin();
+         cell_iter! = this->End();
          ++cell_iter)
     {
         cell_iter->GetCellData()->SetItem(rDataName, dataValue);
@@ -433,7 +433,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCellUsingLocationIndex(u
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::RemoveCellUsingLocationIndex(unsigned index, CellPtr pCell)
 {
-    std::set<CellPtr>::iterator cell_iter = mLocationCellMap[index].find(pCell);
+    auto cell_iter = mLocationCellMap[index].find(pCell);
 
     if (cell_iter == mLocationCellMap[index].end())
     {

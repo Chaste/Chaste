@@ -246,7 +246,7 @@ std::vector<double> Hdf5DataReader::GetVariableOverTime(const std::string& rVari
         EXCEPTION("The dataset '" << mDatasetName << "' doesn't contain info of node " << actual_node_index);
     }
 
-    std::map<std::string, unsigned>::iterator col_iter = mVariableToColumnIndex.find(rVariableName);
+    auto col_iter = mVariableToColumnIndex.find(rVariableName);
     if (col_iter == mVariableToColumnIndex.end())
     {
         EXCEPTION("The dataset '" << mDatasetName << "' doesn't contain data for variable " << rVariableName);
@@ -293,7 +293,7 @@ std::vector<std::vector<double> > Hdf5DataReader::GetVariableOverTimeOverMultipl
        EXCEPTION("The dataset '" << mDatasetName << "' doesn't contain info for node " << upperIndex-1);
     }
 
-    std::map<std::string, unsigned>::iterator col_iter = mVariableToColumnIndex.find(rVariableName);
+    auto col_iter = mVariableToColumnIndex.find(rVariableName);
     if (col_iter == mVariableToColumnIndex.end())
     {
         EXCEPTION("The dataset '" << mDatasetName << "' doesn't contain data for variable " << rVariableName);
@@ -353,7 +353,7 @@ void Hdf5DataReader::GetVariableOverNodes(Vec data,
         EXCEPTION("The dataset '" << mDatasetName << "' does not contain time dependent data");
     }
 
-    std::map<std::string, unsigned>::iterator col_iter = mVariableToColumnIndex.find(rVariableName);
+    auto col_iter = mVariableToColumnIndex.find(rVariableName);
     if (col_iter == mVariableToColumnIndex.end())
     {
         EXCEPTION("The dataset '" << mDatasetName << "' does not contain data for variable " << rVariableName);

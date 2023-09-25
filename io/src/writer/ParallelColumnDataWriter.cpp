@@ -104,7 +104,7 @@ void ParallelColumnDataWriter::PutVectorStripe(int variableId, DistributedVector
     DistributedVectorFactory* p_factory = rStripe.GetFactory();
     Vec unstriped_petsc = p_factory->CreateVec();
     DistributedVector unstriped = p_factory->CreateDistributedVector(unstriped_petsc);
-    for (DistributedVector::Iterator index = unstriped.Begin();
+    for (auto index = unstriped.Begin();
          index!= unstriped.End();
          ++index)
     {

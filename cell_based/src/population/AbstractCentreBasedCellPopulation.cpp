@@ -48,13 +48,13 @@ AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractCentreBasedCe
       mMeinekeDivisionSeparation(0.3) // educated guess
 {
     // If no location indices are specified, associate with nodes from the mesh.
-    std::list<CellPtr>::iterator it = this->mCells.begin();
+    auto cell_iter = this->mCells.begin();
     typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = rMesh.GetNodeIteratorBegin();
 
-    for (unsigned i = 0; it != this->mCells.end(); ++it, ++i, ++node_iter)
+    for (unsigned i = 0; cell_iter != this->mCells.end(); ++cell_iter, ++i, ++node_iter)
     {
         unsigned index = locationIndices.empty() ? node_iter->GetIndex() : locationIndices[i]; // assume that the ordering matches
-        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCellUsingLocationIndex(index,*it);
+        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCellUsingLocationIndex(index, *cell_iter);
     }
 
     mpCentreBasedDivisionRule.reset(new RandomDirectionCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>());

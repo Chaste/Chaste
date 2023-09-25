@@ -92,7 +92,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumElements(), p_mesh->GetNumElements());
         TS_ASSERT_EQUALS(cell_population.GetNumNodes(), p_mesh->GetNumNodes());
 
-        AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        auto cell_iter = cell_population.Begin();
         for (unsigned i = 0; i < cells.size(); ++i)
         {
             TS_ASSERT_EQUALS(*cell_iter, cells[i]);
@@ -326,7 +326,7 @@ public:
         p_new_cell->SetCellProliferativeType(p_stem_type);
 
         // Add new cell to the cell population by dividing the cell
-        AbstractCellPopulation<2>::Iterator cell_iter_1 = cell_population.Begin();
+        auto cell_iter_1 = cell_population.Begin();
         cell_population.AddCell(p_new_cell, *cell_iter_1);
 
         TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(p_new_cell), 1u);
@@ -335,7 +335,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 2u);
 
         // Check locations of parent and daughter cell
-        AbstractCellPopulation<2>::Iterator cell_iter_2 = cell_population.Begin();
+        auto cell_iter_2 = cell_population.Begin();
         TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter_2), 0u);
         ++cell_iter_2;
         TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter_2), 1u);
@@ -579,7 +579,7 @@ public:
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Test GetLocationOfCellCentre()
-        AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        auto cell_iter = cell_population.Begin();
 
         for (unsigned i = 0; i < 4; ++i)
         {

@@ -152,7 +152,7 @@ public:
         // Check some results
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 1124u);
 
-        AbstractCellPopulation<3>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
+        auto cell_iter = simulator.rGetCellPopulation().Begin();
 
         for (unsigned i = 0; i < 100; ++i)
         {

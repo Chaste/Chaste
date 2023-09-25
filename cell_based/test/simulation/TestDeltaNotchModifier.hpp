@@ -420,7 +420,7 @@ public:
 
         // Testing addition of topology update simulation modifier
         simulator.AddTopologyUpdateSimulationModifier(p_modifier);
-        std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<2> > >::iterator iter = simulator.GetTopologyUpdateSimulationModifiers()->begin();
+        auto iter = simulator.GetTopologyUpdateSimulationModifiers()->begin();
         TS_ASSERT(boost::static_pointer_cast<DeltaNotchTrackingModifier<2> >(*iter));
         TS_ASSERT_EQUALS(simulator.GetTopologyUpdateSimulationModifiers()->size(), 1u);
 

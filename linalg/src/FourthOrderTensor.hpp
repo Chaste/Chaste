@@ -161,8 +161,8 @@ void FourthOrderTensor<DIM1,DIM2,DIM3,DIM4>::SetAsContractionOnFirstDimension(co
 {
     Zero();
 
-    std::vector<double>::iterator iter = mData.begin();
-    std::vector<double>::iterator other_tensor_iter = rTensor.rGetData().begin();
+    auto iter = mData.begin();
+    auto other_tensor_iter = rTensor.rGetData().begin();
 
     for (unsigned d=0; d<DIM4; d++)
     {
@@ -204,8 +204,8 @@ void FourthOrderTensor<DIM1,DIM2,DIM3,DIM4>::SetAsContractionOnSecondDimension(c
 {
     Zero();
 
-    std::vector<double>::iterator iter = mData.begin();
-    std::vector<double>::iterator other_tensor_iter = rTensor.rGetData().begin();
+    auto iter = mData.begin();
+    auto other_tensor_iter = rTensor.rGetData().begin();
 
     for (unsigned d=0; d<DIM4; d++)
     {
@@ -250,8 +250,8 @@ void FourthOrderTensor<DIM1,DIM2,DIM3,DIM4>::SetAsContractionOnThirdDimension(co
 {
     Zero();
 
-    std::vector<double>::iterator iter = mData.begin();
-    std::vector<double>::iterator other_tensor_iter = rTensor.rGetData().begin();
+    auto iter = mData.begin();
+    auto other_tensor_iter = rTensor.rGetData().begin();
 
     for (unsigned d=0; d<DIM4; d++)
     {
@@ -297,8 +297,8 @@ void FourthOrderTensor<DIM1,DIM2,DIM3,DIM4>::SetAsContractionOnFourthDimension(c
 {
     Zero();
 
-    std::vector<double>::iterator iter = mData.begin();
-    std::vector<double>::iterator other_tensor_iter = rTensor.rGetData().begin();
+    auto iter = mData.begin();
+    auto other_tensor_iter = rTensor.rGetData().begin();
 
     for (unsigned d=0; d<DIM4; d++)
     {

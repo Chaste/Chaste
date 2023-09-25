@@ -356,7 +356,7 @@ public:
         DistributedVectorFactory factory(third_row);
 
         DistributedVector distributed_third_row = factory.CreateDistributedVector(third_row);
-        for (DistributedVector::Iterator index = distributed_third_row.Begin();
+        for (auto index = distributed_third_row.Begin();
              index!= distributed_third_row.End();
              ++index)
         {

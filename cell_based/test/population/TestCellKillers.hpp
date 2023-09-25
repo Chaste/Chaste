@@ -104,16 +104,16 @@ public:
 
         std::set<double> old_locations;
 
-        std::list<CellPtr>::iterator cell_it = r_cells.begin();
-        TS_ASSERT(!(*cell_it)->IsDead());
-        ++cell_it;
-        TS_ASSERT((*cell_it)->IsDead());
-        ++cell_it;
+        auto cell_iter = r_cells.begin();
+        TS_ASSERT(!(*cell_iter)->IsDead());
+        ++cell_iter;
+        TS_ASSERT((*cell_iter)->IsDead());
+        ++cell_iter;
 
-        while (cell_it != r_cells.end())
+        while (cell_iter != r_cells.end())
         {
-            TS_ASSERT(!(*cell_it)->IsDead());
-            ++cell_it;
+            TS_ASSERT(!(*cell_iter)->IsDead());
+            ++cell_iter;
         }
 
         // Store 'locations' of cells which are not dead
@@ -197,15 +197,15 @@ public:
         std::set<double> old_locations;
 
         bool apoptosis_cell_found = false;
-        std::list<CellPtr>::iterator cell_it = r_cells.begin();
-        ++cell_it;
-        while (cell_it != r_cells.end() && !apoptosis_cell_found)
+        auto cell_iter = r_cells.begin();
+        ++cell_iter;
+        while (cell_iter != r_cells.end() && !apoptosis_cell_found)
         {
-            if ((*cell_it)->HasApoptosisBegun())
+            if ((*cell_iter)->HasApoptosisBegun())
             {
                 apoptosis_cell_found = true;
             }
-            ++cell_it;
+            ++cell_iter;
         }
 
         TS_ASSERT_EQUALS(apoptosis_cell_found, true);

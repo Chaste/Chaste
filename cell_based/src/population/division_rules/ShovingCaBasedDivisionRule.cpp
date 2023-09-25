@@ -151,7 +151,7 @@ unsigned ShovingCaBasedDivisionRule<SPACE_DIM>::CalculateDaughterNodeIndex(
             IsNodeOnBoundary(neighbouring_node_indices.size());
 
             // Select the appropriate neighbour
-            std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
+            auto neighbour_iter = neighbouring_node_indices.begin();
             for (unsigned i = 0; i < counter; ++i)
             {
                 ++neighbour_iter;

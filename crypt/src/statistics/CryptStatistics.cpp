@@ -101,8 +101,8 @@ std::vector<CellPtr> CryptStatistics::GetCryptSection(double yTop, double xBotto
 
     // Copy to a vector
     std::vector<CellPtr> ordered_cells;
-    for (std::list<std::pair<CellPtr, double> >::iterator iter = cells_list.begin();
-         iter!=cells_list.end();
+    for (auto iter = cells_list.begin();
+         iter != cells_list.end();
          ++iter)
     {
         ordered_cells.push_back(iter->first);

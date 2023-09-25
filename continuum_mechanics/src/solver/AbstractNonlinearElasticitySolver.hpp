@@ -1291,7 +1291,7 @@ void AbstractNonlinearElasticitySolver<DIM>::AssembleOnBoundaryElementForPressur
     Element<DIM,DIM>* p_containing_vol_element = nullptr;
 
     std::set<unsigned> potential_elements = rBoundaryElement.GetNode(0)->rGetContainingElementIndices();
-    for (std::set<unsigned>::iterator iter = potential_elements.begin();
+    for (auto iter = potential_elements.begin();
          iter != potential_elements.end();
          iter++)
     {

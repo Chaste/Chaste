@@ -266,7 +266,7 @@ unsigned NodeBasedCellPopulation<DIM>::GetNumNodes()
 template<unsigned DIM>
 CellPtr NodeBasedCellPopulation<DIM>::GetCellUsingLocationIndex(unsigned index)
 {
-    std::map<unsigned, CellPtr>::iterator iter = mLocationHaloCellMap.find(index);
+    auto iter = mLocationHaloCellMap.find(index);
     if (iter != mLocationHaloCellMap.end())
     {
         return iter->second;
@@ -752,9 +752,9 @@ void NodeBasedCellPopulation<DIM>::DeleteMovedCell(unsigned index)
     mpNodesOnlyMesh->DeleteMovedNode(index);
 
     // Update vector of cells
-     for (std::list<CellPtr>::iterator cell_iter = this->mCells.begin();
-         cell_iter != this->mCells.end();
-         ++cell_iter)
+     for (auto cell_iter = this->mCells.begin();
+          cell_iter != this->mCells.end();
+          ++cell_iter)
     {
         if (this->GetLocationIndexUsingCell(*cell_iter) == index)
         {

@@ -109,7 +109,7 @@ public:
 
         double phi_e_at_tissue = DBL_MAX;
 
-        for (DistributedVector::Iterator index = distributed_solution.Begin();
+        for (auto index = distributed_solution.Begin();
              index!= distributed_solution.End();
              ++index)
         {

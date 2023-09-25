@@ -88,7 +88,7 @@ void CombinedOdeSystem::EvaluateYDerivatives(
         std::vector<double>& rDY)
 {
     // Copy rY to subsystems
-    for (unsigned i = 0; i<mOdeSystems.size(); ++i)
+    for (unsigned i = 0; i < mOdeSystems.size(); ++i)
     {
         unsigned offset = mOffsets[i];
         for (unsigned j = 0; j<mOdeSystems[i]->GetNumberOfStateVariables(); ++j)
@@ -98,11 +98,11 @@ void CombinedOdeSystem::EvaluateYDerivatives(
     }
 
     // Set parameter values
-    for (unsigned i = 0; i<mVariableParameterMaps.size(); ++i)
+    for (unsigned i = 0; i < mVariableParameterMaps.size(); ++i)
     {
         std::map<unsigned, unsigned>& r_var_param_map = mVariableParameterMaps[i].theMap;
         // Iterate through map
-        for (std::map<unsigned, unsigned>::iterator iter = r_var_param_map.begin();
+        for (auto iter = r_var_param_map.begin();
              iter != r_var_param_map.end();
              ++iter)
         {

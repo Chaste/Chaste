@@ -155,7 +155,7 @@ public:
             simulator.Solve();
 
             TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 1u);
-            AbstractCellPopulation<2>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
+            auto cell_iter = simulator.rGetCellPopulation().Begin();
 
             unsigned cell_location = simulator.rGetCellPopulation().GetLocationIndexUsingCell(*cell_iter);
             TS_ASSERT_LESS_THAN(cell_location, 9u);

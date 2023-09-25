@@ -81,11 +81,11 @@ CaBasedCellPopulation<DIM>::CaBasedCellPopulation(
     {
         // Create a set of node indices corresponding to empty sites.
         // Note iterating over mCells is OK as it has the same order as location indices at this point (its just coppied from rCells)
-        std::list<CellPtr>::iterator it = this->mCells.begin();
-        for (unsigned i = 0; it != this->mCells.end(); ++it, ++i)
+        auto cell_iter = this->mCells.begin();
+        for (unsigned i = 0; cell_iter != this->mCells.end(); ++cell_iter, ++i)
         {
             assert(i < locationIndices.size());
-            if (!IsSiteAvailable(locationIndices[i],*it))
+            if (!IsSiteAvailable(locationIndices[i],*cell_iter))
             {
                 EXCEPTION("One of the lattice sites has more cells than the carrying capacity. Check the initial cell locations.");
             }
@@ -424,8 +424,8 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                 unsigned num_neighbours = neighbouring_node_indices.size();
                 unsigned chosen_neighbour = p_gen->randMod(num_neighbours);
 
-                std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-                for (unsigned j = 0; j<chosen_neighbour; ++j)
+                auto neighbour_iter = neighbouring_node_indices.begin();
+                for (unsigned j = 0; j < chosen_neighbour; ++j)
                 {
                     neighbour_iter++;
                 }

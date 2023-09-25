@@ -66,7 +66,7 @@ public:
         DistributedVector interleaved_dist_vec = factory.CreateDistributedVector(interleaved_vec);
         DistributedVector::Stripe first_variable(interleaved_dist_vec, 0);
         DistributedVector::Stripe second_variable(interleaved_dist_vec, 1);
-        for (DistributedVector::Iterator index = interleaved_dist_vec.Begin();
+        for (auto index = interleaved_dist_vec.Begin();
              index!= interleaved_dist_vec.End();
              ++index)
         {
@@ -105,7 +105,7 @@ public:
         // Check destination vectors are [-1 -2 -3 ...] and [1 2 3 ...] respectively.
         DistributedVector dist_1st_var_vec = factory.CreateDistributedVector(first_variable_vec);
         DistributedVector dist_2nd_var_vec = factory.CreateDistributedVector(second_variable_vec);
-        for (DistributedVector::Iterator index = dist_1st_var_vec.Begin();
+        for (auto index = dist_1st_var_vec.Begin();
              index!= dist_1st_var_vec.End();
              ++index)
         {
@@ -138,7 +138,7 @@ public:
         // Fill in source vectors.
         DistributedVector dist_first_variable_vec = factory.CreateDistributedVector(first_variable_vec);
         DistributedVector dist_second_variable_vec = factory.CreateDistributedVector(second_variable_vec);
-        for (DistributedVector::Iterator index = dist_first_variable_vec.Begin();
+        for (auto index = dist_first_variable_vec.Begin();
              index!= dist_first_variable_vec.End();
              ++index)
         {
@@ -157,7 +157,7 @@ public:
         DistributedVector::Stripe dist_inter_vec_1st_var(dist_interleaved_vec, 0);
         DistributedVector::Stripe dist_inter_vec_2nd_var(dist_interleaved_vec, 1);
 
-        for (DistributedVector::Iterator index = dist_interleaved_vec.Begin();
+        for (auto index = dist_interleaved_vec.Begin();
              index!= dist_interleaved_vec.End();
              ++index)
         {

@@ -99,8 +99,8 @@ unsigned CryptShovingCaBasedDivisionRule::CalculateDaughterNodeIndex(CellPtr pNe
 
     std::set<unsigned> neighbouring_node_indices = static_cast_mesh->GetVonNeumannNeighbouringNodeIndices(parent_node_index);
 
-    std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-    for (unsigned  i = 0; i<direction; ++i)
+    auto neighbour_iter = neighbouring_node_indices.begin();
+    for (unsigned  i = 0; i < direction; ++i)
     {
         ++neighbour_iter;
     }
@@ -130,8 +130,8 @@ unsigned CryptShovingCaBasedDivisionRule::CalculateDaughterNodeIndex(CellPtr pNe
             IsNodeOnBase(current_node_index, static_cast_mesh);
 
             // Select the appropriate neighbour
-            std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
-            for (unsigned i = 0; i<num_neighbours-1; ++i)
+            auto neighbour_iter = neighbouring_node_indices.begin();
+            for (unsigned i = 0; i < num_neighbours - 1; ++i)
             {
                 ++neighbour_iter;
             }

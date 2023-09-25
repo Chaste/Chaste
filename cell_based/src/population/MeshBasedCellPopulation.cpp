@@ -505,7 +505,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::DivideLongSprings(
             std::pair<unsigned,unsigned> node_pair = this->CreateOrderedPair(node_a_index, node_b_index);
             double old_rest_length  = mSpringRestLengths[node_pair];
 
-            std::map<std::pair<unsigned,unsigned>, double>::iterator  iter = mSpringRestLengths.find(node_pair);
+            auto iter = mSpringRestLengths.find(node_pair);
             mSpringRestLengths.erase(iter);
 
             // Add new pairs
@@ -1301,7 +1301,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetRestLength(unsigned ind
     if (mHasVariableRestLength)
     {
         std::pair<unsigned,unsigned> node_pair = this->CreateOrderedPair(indexA, indexB);
-        std::map<std::pair<unsigned,unsigned>, double>::iterator iter = mSpringRestLengths.find(node_pair);
+        auto iter = mSpringRestLengths.find(node_pair);
 
         if (iter != mSpringRestLengths.end())
         {

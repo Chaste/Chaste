@@ -58,7 +58,7 @@ public:
 
         Vec petsc_vec = factory.CreateVec();
         DistributedVector distributed_vector = factory.CreateDistributedVector(petsc_vec);
-        for (DistributedVector::Iterator index = distributed_vector.Begin();
+        for (auto index = distributed_vector.Begin();
              index!= distributed_vector.End();
              ++index)
         {

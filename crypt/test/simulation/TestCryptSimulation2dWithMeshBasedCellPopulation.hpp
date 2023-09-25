@@ -992,7 +992,7 @@ public:
         crypt.AddCellWriter<CellAncestorWriter>();
         crypt.AddCellWriter<CellAgesWriter>();
 
-        AbstractCellPopulation<2>::Iterator cell_iterator = crypt.Begin();
+        auto cell_iterator = crypt.Begin();
         cell_iterator->SetBirthTime(-1.0);   // Make cell-cycle models do minimum work
         ++cell_iterator;
         cell_iterator->SetBirthTime(-1.0);
@@ -1254,7 +1254,7 @@ public:
         MeshBasedCellPopulation<2> conf_crypt(conf_mesh, conf_cells);
         conf_crypt.SetMeinekeDivisionSeparation(0.1);
 
-        AbstractCellPopulation<2>::Iterator conf_iter = conf_crypt.Begin();
+        auto conf_iter = conf_crypt.Begin();
 
         // Create crypt simulation from cell population
         CryptSimulation2d simulator(conf_crypt);
@@ -1294,7 +1294,7 @@ public:
         // Create cell population
         MeshBasedCellPopulation<2> conf_crypt(conf_mesh, conf_cells);
 
-        AbstractCellPopulation<2>::Iterator conf_iter = conf_crypt.Begin();
+        auto conf_iter = conf_crypt.Begin();
 
         // Create crypt simulation from cell population and force law
         CryptSimulation2d simulator(conf_crypt);
@@ -1339,7 +1339,7 @@ public:
         // Create cell population
         MeshBasedCellPopulation<2> cyl_crypt(cyl_mesh, cyl_cells);
 
-        AbstractCellPopulation<2>::Iterator cyl_iter = cyl_crypt.Begin();
+        auto cyl_iter = cyl_crypt.Begin();
 
         // Create crypt simulation from cell population
         CryptSimulation2d simulator(cyl_crypt);
@@ -1374,7 +1374,7 @@ public:
         // Create cell population
         MeshBasedCellPopulation<2> cyl_crypt(cyl_mesh, cyl_cells);
 
-        AbstractCellPopulation<2>::Iterator cyl_iter = cyl_crypt.Begin();
+        auto cyl_iter = cyl_crypt.Begin();
 
         // Create crypt simulation from cell population
         CryptSimulation2d simulator(cyl_crypt);
@@ -1526,7 +1526,7 @@ public:
         simulator.AddForce(p_linear_force);
 
         // Move the first cell (which should be on y=0) down a bit
-        AbstractCellPopulation<2>::Iterator cell_iter = crypt.Begin();
+        auto cell_iter = crypt.Begin();
         TS_ASSERT_DELTA(crypt.GetLocationOfCellCentre(*cell_iter)[1], 0.0, 1e-6);
 
         // Move the cell (can't use the iterator for this as it is const)

@@ -419,7 +419,7 @@ public:
         // Test SetNode() by moving node 0 by a small amount
         if (PetscTools::AmMaster())
         {
-            AbstractCellPopulation<2>::Iterator cell_iter = node_based_cell_population.Begin();
+            auto cell_iter = node_based_cell_population.Begin();
             c_vector<double,2> new_location = node_based_cell_population.GetLocationOfCellCentre(*cell_iter);
             new_location[0] += 1e-2;
             new_location[1] += 1e-2;

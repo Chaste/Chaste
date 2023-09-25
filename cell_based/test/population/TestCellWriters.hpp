@@ -979,7 +979,7 @@ public:
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         // For coverage of GetCellDataForVtkOutput() label a cell and set a cell to be apoptotic
-        AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        auto cell_iter = cell_population.Begin();
         cell_iter->AddCellProperty(p_label);
         ++cell_iter;
         cell_iter->AddCellProperty(p_apoptotic_state);
@@ -1087,7 +1087,7 @@ public:
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         // For coverage of GetCellDataForVtkOutput() label a cell and set a cell to be apoptotic
-        AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        auto cell_iter = cell_population.Begin();
         cell_iter->AddCellProperty(p_label);
         ++cell_iter;
         cell_iter->AddCellProperty(p_apoptotic_state);
@@ -1260,7 +1260,7 @@ public:
         CellCycleModelProteinConcentrationsWriter<2,2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
-        AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        auto cell_iter = cell_population.Begin();
 
         TS_ASSERT_THROWS_THIS(cell_writer.VisitCell(*cell_iter, &cell_population),
             "CellCycleModelProteinConcentrationsWriter cannot be used with a cell-cycle model that does not inherit from CellCycleModelOdeHandler");

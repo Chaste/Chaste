@@ -141,7 +141,7 @@ public:
         DistributedVector vec1 = p_factory->CreateDistributedVector(petsc_vec);
         DistributedVector::Stripe u1(vec1, 0);
         DistributedVector::Stripe v1(vec1, 1);
-        for (DistributedVector::Iterator index = vec1.Begin();
+        for (auto index = vec1.Begin();
              index != vec1.End();
              ++index)
         {
@@ -162,7 +162,7 @@ public:
         DistributedVector vec2 = p_factory->CreateDistributedVector(petsc_vec);
         DistributedVector::Stripe u2(vec2, 0);
         DistributedVector::Stripe v2(vec2, 1);
-        for (DistributedVector::Iterator index = vec2.Begin();
+        for (auto index = vec2.Begin();
              index != vec2.End();
              ++index)
         {
@@ -198,7 +198,7 @@ public:
         DistributedVector vec1 = p_factory->CreateDistributedVector(petsc_vec);
         DistributedVector::Stripe u1(vec1, 0);
         DistributedVector::Stripe v1(vec1, 1);
-        for (DistributedVector::Iterator index = vec1.Begin();
+        for (auto index = vec1.Begin();
              index != vec1.End();
              ++index)
         {
@@ -219,7 +219,7 @@ public:
         DistributedVector vec2 = p_factory->CreateDistributedVector(petsc_vec);
         DistributedVector::Stripe u2(vec2, 0);
         DistributedVector::Stripe v2(vec2, 1);
-        for (DistributedVector::Iterator index = vec2.Begin();
+        for (auto index = vec2.Begin();
              index != vec2.End();
              ++index)
         {

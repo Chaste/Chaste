@@ -180,7 +180,7 @@ public:
         }
 
         // Now move the first cell (which should be on x=0, and a stem cell) to the left a bit
-        AbstractCellPopulation<1>::Iterator cell_iter = crypt.Begin();
+        auto cell_iter = crypt.Begin();
 
         // Check is a stem cell
         TS_ASSERT_EQUALS(cell_iter->GetCellProliferativeType()->IsType<StemCellProliferativeType>(), true);
@@ -239,7 +239,7 @@ public:
         }
 
         // Now move the first cell (which should be on y=0) down a bit
-        AbstractCellPopulation<2>::Iterator cell_iter = crypt.Begin();
+        auto cell_iter = crypt.Begin();
         TS_ASSERT_DELTA(crypt.GetLocationOfCellCentre(*cell_iter)[1], 0.0, 1e-6);
         crypt.GetNode(0)->rGetModifiableLocation()[1] = -0.1;
         TS_ASSERT_LESS_THAN(crypt.GetLocationOfCellCentre(*cell_iter)[1], 0.0);
@@ -290,7 +290,7 @@ public:
         }
 
         // Move the first cell (which should be on y=0, and is a stem cell) down a bit
-        AbstractCellPopulation<2>::Iterator cell_iter = crypt.Begin();
+        auto cell_iter = crypt.Begin();
         crypt.GetNode(0)->rGetModifiableLocation()[1] = -0.1;
 
         // Also move the second cell (which should be on y=0, and we make a transit cell)
@@ -315,7 +315,7 @@ public:
          * second cell should not have been pulled up since it is a stem cell, but should
          * then have been moved to above y=0 by the jiggling.
          */
-        AbstractCellPopulation<2>::Iterator cell_iter2 = crypt.Begin();
+        auto cell_iter2 = crypt.Begin();
         TS_ASSERT_DELTA(0.0, crypt.GetLocationOfCellCentre(*cell_iter2)[1], 1e-3);
         ++cell_iter2;
         TS_ASSERT_LESS_THAN(0.0, crypt.GetLocationOfCellCentre(*cell_iter2)[1]);
@@ -348,7 +348,7 @@ public:
         }
 
         // Now move the first cell (which should be on x=0) to the left a bit
-        AbstractCellPopulation<1>::Iterator cell_iter = crypt.Begin();
+        auto cell_iter = crypt.Begin();
         // Check initially at x=0
         TS_ASSERT_DELTA(crypt.GetLocationOfCellCentre(*cell_iter)[0], 0.0, 1e-6);
         // Now move to the left a bit
@@ -389,7 +389,7 @@ public:
         }
 
         // Move the first cell (which should be on y=0) down a bit
-        AbstractCellPopulation<2>::Iterator cell_iter = crypt.Begin();
+        auto cell_iter = crypt.Begin();
         crypt.GetNode(0)->rGetModifiableLocation()[1] = -0.1;
         c_vector<double, 2> perturbed_location = crypt.GetLocationOfCellCentre(*cell_iter);
 

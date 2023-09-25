@@ -99,7 +99,7 @@ public:
 
         ///\todo this doesn't do anything as there aren't any cells!
         TS_ASSERT_EQUALS(cells.size(), 0u);
-        AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        auto cell_iter = cell_population.Begin();
         for (unsigned i = 0; i < cells.size(); ++i)
         {
             TS_ASSERT_EQUALS(*cell_iter, cells[i]);
@@ -178,7 +178,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetCellsUsingLocationIndex(1).size(), 1u);
 
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(),3u);
-        AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        auto cell_iter = cell_population.Begin();
         TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), 0u);
         ++cell_iter;
         TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), 0u);
@@ -573,7 +573,7 @@ public:
         p_new_cell->SetCellProliferativeType(p_stem_type);
 
         // Add new cell to the cell population by dividing the cell
-        AbstractCellPopulation<2>::Iterator cell_iter_1 = cell_population.Begin();
+        auto cell_iter_1 = cell_population.Begin();
         cell_population.AddCell(p_new_cell, *cell_iter_1);
 
         // Test that the initial cell is still in the same place
@@ -588,7 +588,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 2u);
 
         // Check locations of parent and daughter cell
-        AbstractCellPopulation<2>::Iterator cell_iter_2 = cell_population.Begin();
+        auto cell_iter_2 = cell_population.Begin();
         TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter_2), initial_cell_index);
         ++cell_iter_2;
         TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter_2), lattice_site);
@@ -634,7 +634,7 @@ public:
         p_new_cell->SetCellProliferativeType(p_stem_type);
 
         // Test thatAdd new cell to the cell population by dividing the cell
-        AbstractCellPopulation<2>::Iterator cell_iter_1 = cell_population.Begin();
+        auto cell_iter_1 = cell_population.Begin();
         TS_ASSERT_THROWS_THIS(cell_population.AddCell(p_new_cell, *cell_iter_1), "No free space to divide.");
     }
 

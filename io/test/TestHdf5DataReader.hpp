@@ -302,7 +302,7 @@ private:
         for (unsigned time_step=0; time_step<10; time_step++)
         {
             // Write some values
-            for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+            for (auto index = distributed_vector_1.Begin();
                  index!= distributed_vector_1.End();
                  ++index)
             {
@@ -407,7 +407,7 @@ public:
             distributed_vector_3.Restore();
 
             // Check values
-            for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+            for (auto index = distributed_vector_1.Begin();
                  index!= distributed_vector_1.End();
                  ++index)
             {
@@ -617,9 +617,9 @@ public:
             reader.GetVariableOverNodes(data, "Plasma", 1/*timestep*/);
             DistributedVector distributed_vector_1 = factory.CreateDistributedVector(data);
 
-            for (DistributedVector::Iterator index = distributed_vector_1.Begin();
-                                 index!= distributed_vector_1.End();
-                                 ++index)
+            for (auto index = distributed_vector_1.Begin();
+                 index != distributed_vector_1.End();
+                 ++index)
             {
                 // These magic numbers come from TestHdf5DataWriter - where they are written into the HDF5 file.
                 TS_ASSERT_DELTA(distributed_vector_1[index], 1*1000 + 100 + index.Global, 1e-9);

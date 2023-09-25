@@ -460,7 +460,6 @@ public:
         std::vector<double> times(time_steps);
 
         cells.push_back(p_stem_cell);
-        std::vector<CellPtr>::iterator cell_iterator;
 
         unsigned i = 0;
         while (p_simulation_time->GetTime() < end_time)
@@ -1029,7 +1028,6 @@ public:
         std::vector<double> times(num_time_steps);
 
         cells.push_back(p_stem_cell);
-        std::vector<CellPtr>::iterator cell_iterator;
 
         unsigned i = 0;
         while (p_simulation_time->GetTime() < end_time)

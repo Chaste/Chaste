@@ -69,11 +69,11 @@ VertexBasedCellPopulation<DIM>::VertexBasedCellPopulation(
      * If no location indices are specified, associate with elements from the 
      * mesh (assumed to be sequentially ordered).
      */
-    std::list<CellPtr>::iterator it = this->mCells.begin();
-    for (unsigned i = 0; it != this->mCells.end(); ++it, ++i)
+    auto cell_iter = this->mCells.begin();
+    for (unsigned i = 0; cell_iter != this->mCells.end(); ++cell_iter, ++i)
     {
         unsigned index = locationIndices.empty() ? i : locationIndices[i]; // assume that the ordering matches
-        AbstractCellPopulation<DIM, DIM>::AddCellUsingLocationIndex(index,*it);
+        AbstractCellPopulation<DIM, DIM>::AddCellUsingLocationIndex(index, *cell_iter);
     }
 
     // Check each element has only one cell attached

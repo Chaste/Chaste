@@ -46,11 +46,11 @@ AbstractOnLatticeCellPopulation<DIM>::AbstractOnLatticeCellPopulation(
       mUpdateNodesInRandomOrder(true),
       mIterateRandomlyOverUpdateRuleCollection(false)
 {
-    std::list<CellPtr>::iterator it = this->mCells.begin();
-    for (unsigned i = 0; it != this->mCells.end(); ++it, ++i)
+    auto cell_iter = this->mCells.begin();
+    for (unsigned i = 0; cell_iter != this->mCells.end(); ++cell_iter, ++i)
     {
         unsigned index = locationIndices.empty() ? i : locationIndices[i]; // assume that the ordering matches
-        AbstractCellPopulation<DIM>::AddCellUsingLocationIndex(index, *it);
+        AbstractCellPopulation<DIM>::AddCellUsingLocationIndex(index, *cell_iter);
     }
 }
 

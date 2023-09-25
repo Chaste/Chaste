@@ -291,7 +291,7 @@ void PottsBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
             unsigned num_neighbours = neighbouring_node_indices.size();
             unsigned chosen_neighbour = p_gen->randMod(num_neighbours);
 
-            std::set<unsigned>::iterator neighbour_iter = neighbouring_node_indices.begin();
+            auto neighbour_iter = neighbouring_node_indices.begin();
             for (unsigned j = 0; j < chosen_neighbour; ++j)
             {
                 neighbour_iter++;

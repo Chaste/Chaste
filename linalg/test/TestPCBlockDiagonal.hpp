@@ -98,7 +98,7 @@ public:
         DistributedVector::Stripe vm(distributed_solution, 0);
         DistributedVector::Stripe phi_e(distributed_solution, 1);
 
-        for (DistributedVector::Iterator index = distributed_solution.Begin();
+        for (auto index = distributed_solution.Begin();
              index!= distributed_solution.End();
              ++index)
         {

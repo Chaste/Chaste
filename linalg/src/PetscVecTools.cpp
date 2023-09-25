@@ -223,14 +223,13 @@ void PetscVecTools::DoInterleavedVecScatter(Vec interleavedVec, VecScatter first
 //    DistributedVector dist_1st_var_vec = factory.CreateDistributedVector(firstVariableVec);
 //    DistributedVector dist_2nd_var_vec = factory.CreateDistributedVector(secondVariableVec);
 //
-//    for (DistributedVector::Iterator index = dist_1st_var_vec.Begin();
+//    for (auto index = dist_1st_var_vec.Begin();
 //         index!= dist_1st_var_vec.End();
 //         ++index)
 //    {
 //        dist_1st_var_vec[index] = dist_inter_vec_1st_var[index];
 //        dist_2nd_var_vec[index] = dist_inter_vec_2nd_var[index];
 //    }
-
 
 //    //PETSc-3.x.x or PETSc-2.3.3
 //#if ((PETSC_VERSION_MAJOR == 3) || (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 3 && PETSC_VERSION_SUBMINOR == 3)) //2.3.3 or 3.x.x

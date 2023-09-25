@@ -448,7 +448,7 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumAllCells(), 25u);
 
         // Test new locations and concentrations (i.e that the results haven't changed since last revision.)
-        AbstractCellPopulation<2, 2>::Iterator cell_iter = simulator.rGetCellPopulation().Begin();
+        auto cell_iter = simulator.rGetCellPopulation().Begin();
         TS_ASSERT_DELTA(cell_iter->GetCellData()->GetItem("oxygen"), 0.6754, 1e-4);
         ++cell_iter;
         ++cell_iter;

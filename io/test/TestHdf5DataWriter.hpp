@@ -287,7 +287,7 @@ public:
         DistributedVector distributed_vector_2 = factory.CreateDistributedVector(petsc_data_2);
 
         // Write some values
-        for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+        for (auto index = distributed_vector_1.Begin();
              index != distributed_vector_1.End();
              ++index)
         {
@@ -342,7 +342,7 @@ public:
         Vec petsc_data_1 = factory.CreateVec();
         DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
 
-        for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+        for (auto index = distributed_vector_1.Begin();
              index != distributed_vector_1.End();
              ++index)
         {
@@ -380,7 +380,7 @@ public:
         Vec petsc_data_1 = factory.CreateVec();
         DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
 
-        for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+        for (auto index = distributed_vector_1.Begin();
              index != distributed_vector_1.End();
              ++index)
         {
@@ -420,7 +420,7 @@ public:
             Vec petsc_data_1 = factory.CreateVec();
             DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
 
-            for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+            for (auto index = distributed_vector_1.Begin();
                  index != distributed_vector_1.End();
                  ++index)
             {
@@ -462,7 +462,7 @@ public:
             Vec petsc_data_1 = factory.CreateVec();
             DistributedVector distributed_vector_1 = factory.CreateDistributedVector(petsc_data_1);
 
-            for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+            for (auto index = distributed_vector_1.Begin();
                  index != distributed_vector_1.End();
                  ++index)
             {
@@ -513,7 +513,7 @@ public:
         DistributedVector distributed_vector_2 = factory.CreateDistributedVector(petsc_data_2);
 
         // Write some values
-        for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+        for (auto index = distributed_vector_1.Begin();
              index != distributed_vector_1.End();
              ++index)
         {
@@ -570,7 +570,7 @@ public:
         for (unsigned time_step = 0; time_step < 10; time_step++)
         {
             // Write some values
-            for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+            for (auto index = distributed_vector_1.Begin();
                  index != distributed_vector_1.End();
                  ++index)
             {
@@ -636,7 +636,7 @@ public:
         for (unsigned time_step = 0; time_step < 10; time_step++)
         {
             // Write some values
-            for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+            for (auto index = distributed_vector_1.Begin();
                  index != distributed_vector_1.End();
                  ++index)
             {
@@ -687,7 +687,7 @@ public:
         for (unsigned time_step = 0; time_step < 10; time_step++)
         {
             // Write some values
-            for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+            for (auto index = distributed_vector_1.Begin();
                  index != distributed_vector_1.End();
                  ++index)
             {
@@ -746,7 +746,7 @@ public:
         Vec node_number = vec_factory.CreateVec();
         DistributedVector distributed_node_number = vec_factory.CreateDistributedVector(node_number);
 
-        for (DistributedVector::Iterator index = distributed_vector_short.Begin();
+        for (auto index = distributed_vector_short.Begin();
              index != distributed_vector_short.End();
              ++index)
         {
@@ -763,7 +763,7 @@ public:
 
         for (unsigned time_step = 0; time_step < 10; time_step++)
         {
-            for (DistributedVector::Iterator index = distributed_vector_long.Begin();
+            for (auto index = distributed_vector_long.Begin();
                  index != distributed_vector_long.End();
                  ++index)
             {
@@ -839,7 +839,7 @@ public:
 
         for (unsigned time_step = 0; time_step < 10; time_step++)
         {
-            for (DistributedVector::Iterator index = distributed_vector_long.Begin();
+            for (auto index = distributed_vector_long.Begin();
                  index != distributed_vector_long.End();
                  ++index)
             {
@@ -897,7 +897,7 @@ public:
         DistributedVector::Stripe vm_stripe(distributed_vector_long, 0);
         DistributedVector::Stripe phi_e_stripe(distributed_vector_long, 1);
 
-        for (DistributedVector::Iterator index = distributed_vector_long.Begin();
+        for (auto index = distributed_vector_long.Begin();
              index != distributed_vector_long.End();
              ++index)
         {
@@ -943,7 +943,7 @@ public:
 
         for (unsigned time_step = 0; time_step < 10; time_step++)
         {
-            for (DistributedVector::Iterator index = distributed_vector.Begin();
+            for (auto index = distributed_vector.Begin();
                  index != distributed_vector.End();
                  ++index)
             {
@@ -1005,7 +1005,7 @@ public:
 
         for (unsigned time_step = 0; time_step < 2; time_step++)
         {
-            for (DistributedVector::Iterator index = distributed_vector_long.Begin();
+            for (auto index = distributed_vector_long.Begin();
                  index != distributed_vector_long.End();
                  ++index)
             {
@@ -1092,7 +1092,7 @@ public:
         Vec petsc_data_short = factory.CreateVec();
         DistributedVector distributed_vector_short = factory.CreateDistributedVector(petsc_data_short);
 
-        for (DistributedVector::Iterator index = distributed_vector_short.Begin();
+        for (auto index = distributed_vector_short.Begin();
              index != distributed_vector_short.End();
              ++index)
         {
@@ -1104,7 +1104,7 @@ public:
         Vec petsc_data_long = factory2.CreateVec();
         DistributedVector distributed_vector_long = factory.CreateDistributedVector(petsc_data_long);
         DistributedVector::Stripe vm_stripe(distributed_vector_long, 0);
-        for (DistributedVector::Iterator index = distributed_vector_long.Begin();
+        for (auto index = distributed_vector_long.Begin();
              index != distributed_vector_long.End();
              ++index)
         {
@@ -1329,7 +1329,7 @@ public:
         Vec node_number = vec_factory.CreateVec();
         DistributedVector distributed_node_number = vec_factory.CreateDistributedVector(node_number);
 
-        for (DistributedVector::Iterator index = distributed_node_number.Begin();
+        for (auto index = distributed_node_number.Begin();
              index != distributed_node_number.End();
              ++index)
         {
@@ -1343,7 +1343,7 @@ public:
         Vec petsc_data_long = factory2.CreateVec();
         DistributedVector distributed_vector_long = factory2.CreateDistributedVector(petsc_data_long);
 
-        for (DistributedVector::Iterator index = distributed_vector_long.Begin();
+        for (auto index = distributed_vector_long.Begin();
              index != distributed_vector_long.End();
              ++index)
         {
@@ -1439,7 +1439,7 @@ public:
         for (unsigned time_step = 0; time_step < 10; time_step++)
         {
             // Fill in data
-            for (DistributedVector::Iterator index = phase_data.Begin();
+            for (auto index = phase_data.Begin();
                  index != phase_data.End();
                  ++index)
             {
@@ -1510,7 +1510,7 @@ public:
             for (unsigned time_step = 0; time_step < 10; time_step++)
             {
                 // Write some values
-                for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+                for (auto index = distributed_vector_1.Begin();
                      index != distributed_vector_1.End();
                      ++index)
                 {
@@ -1558,7 +1558,7 @@ public:
             for (unsigned time_step = 0; time_step < 2; time_step++)
             {
                 // Write some values
-                for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+                for (auto index = distributed_vector_1.Begin();
                      index != distributed_vector_1.End();
                      ++index)
                 {
@@ -1664,7 +1664,7 @@ public:
         for (unsigned time_step = 10; time_step < 15; time_step++)
         {
             // Fill in data
-            for (DistributedVector::Iterator index = node_data.Begin();
+            for (auto index = node_data.Begin();
                  index != node_data.End();
                  ++index)
             {
@@ -1742,7 +1742,7 @@ public:
         for (unsigned time_step = 15; time_step < 20; time_step++)
         {
             // Fill in data
-            for (DistributedVector::Iterator index = distributed_vector_long.Begin();
+            for (auto index = distributed_vector_long.Begin();
                  index != distributed_vector_long.End();
                  ++index)
             {
@@ -1850,7 +1850,7 @@ public:
 
         Vec petsc_data_short = factory.CreateVec();
         DistributedVector distributed_vector_short = factory.CreateDistributedVector(petsc_data_short);
-        for (DistributedVector::Iterator index = distributed_vector_short.Begin();
+        for (auto index = distributed_vector_short.Begin();
              index != distributed_vector_short.End();
              ++index)
         {
@@ -1864,7 +1864,7 @@ public:
         DistributedVector distributed_vector_long = factory.CreateDistributedVector(petsc_data_long);
         DistributedVector::Stripe vm_stripe(distributed_vector_long, 0);
         DistributedVector::Stripe phi_e_stripe(distributed_vector_long, 1);
-        for (DistributedVector::Iterator index = distributed_vector_long.Begin();
+        for (auto index = distributed_vector_long.Begin();
              index != distributed_vector_long.End();
              ++index)
         {

@@ -280,7 +280,7 @@ public:
         p_wnt->SetCryptLength(crypt_length);
         TS_ASSERT_EQUALS(p_wnt->IsWntSetUp(), true);    // set up again
 
-        AbstractCellPopulation<2>::Iterator cell_iter = crypt.Begin();
+        auto cell_iter = crypt.Begin();
 
         double wnt_at_cell0 = p_wnt->GetWntLevel(*cell_iter);
 

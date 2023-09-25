@@ -131,7 +131,7 @@ public:
         TS_ASSERT_DELTA(simulator.rGetCellPopulation().GetNode(node_idx)->rGetLocation()[0], 2, 1e-6);
 
         // Test set/get methods
-        std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<2> > >::iterator iter = simulator.GetSimulationModifiers()->begin();
+        auto iter = simulator.GetSimulationModifiers()->begin();
         TS_ASSERT(boost::static_pointer_cast<ExtrinsicPullModifier<2> >(*iter));        
         boost::static_pointer_cast<ExtrinsicPullModifier<2> >(*iter)->SetApplyExtrinsicPullToAllNodes(true);
         boost::static_pointer_cast<ExtrinsicPullModifier<2> >(*iter)->SetSpeed(2.0);

@@ -704,7 +704,7 @@ public:
         crypt.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
         crypt.AddCellPopulationCountWriter<CellProliferativeTypesCountWriter>();
 
-        AbstractCellPopulation<1>::Iterator cell_iterator = crypt.Begin();
+        auto cell_iterator = crypt.Begin();
         cell_iterator->SetBirthTime(-1.0);   // Make cell-cycle models do minimum work
         ++cell_iterator;
         cell_iterator->SetBirthTime(-1.0);

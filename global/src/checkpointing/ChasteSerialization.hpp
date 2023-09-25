@@ -47,8 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 // Apparently 'new' (for boost's two phase construction) isn't included sometimes...
-#include <new>
 #include <climits> // See #1024.
+#include <new>
 
 #include <boost/serialization/access.hpp>
 
@@ -73,7 +73,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CHASTE_CAN_CHECKPOINT_DLLS
 #ifndef __APPLE__
 #define CHASTE_CAN_CHECKPOINT_DLLS
-#endif //Not APPLE
+#endif // Not APPLE
 #endif
 
 /**
@@ -82,8 +82,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * (boost 1.57).
  */
 #if BOOST_VERSION == 105600
-#include <boost/serialization/singleton.hpp>
 #include <boost/serialization/extended_type_info.hpp>
+#include <boost/serialization/singleton.hpp>
 #endif
 
 #if BOOST_VERSION == 105700
@@ -91,8 +91,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 /**
- * Add a missing #include for boost 1.74, which is needed to work around a big 
- * in that boost version.  See #3038.
+ * Add a missing #include for boost 1.74, which is needed
+ * to work around a bug in that boost version.
+ *
+ * See #3038
  */
 #if BOOST_VERSION == 107400
 #include <boost/serialization/library_version_type.hpp>

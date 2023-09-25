@@ -245,7 +245,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Create two cell pairs
-        std::list<CellPtr>::iterator cell_iter = cell_population.rGetCells().begin();
+        auto cell_iter = cell_population.rGetCells().begin();
         CellPtr p_cell_0 = *(cell_iter++);
         CellPtr p_cell_1 = *cell_iter;
         std::pair<CellPtr, CellPtr> cell_pair1 = cell_population.CreateCellPair(p_cell_0, p_cell_1);
@@ -379,7 +379,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Test SetNode() by moving node 0 by a small amount
-        AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        auto cell_iter = cell_population.Begin();
         c_vector<double,2> new_location = cell_population.GetLocationOfCellCentre(*cell_iter);
         new_location[0] += 1e-2;
         new_location[1] += 1e-2;
@@ -764,7 +764,7 @@ public:
         TS_ASSERT_EQUALS(p_tessellation1->GetNumNodes(), 4u);
 
         // Move node 0 by a small amount
-        AbstractCellPopulation<3>::Iterator cell_iter = cell_population3d.Begin();
+        auto cell_iter = cell_population3d.Begin();
         c_vector<double,3> new_location = cell_population3d.GetLocationOfCellCentre(*cell_iter);
         new_location[0] += 1e-2;
         new_location[1] += 1e-2;
@@ -1456,7 +1456,7 @@ public:
         cell_population.CheckCellPointers();
 
         // Move cell 2
-        AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
+        auto cell_iter = cell_population.Begin();
         ++cell_iter;
         ++cell_iter;
         TS_ASSERT_EQUALS(cell_population.GetLocationIndexUsingCell(*cell_iter), 2u);
