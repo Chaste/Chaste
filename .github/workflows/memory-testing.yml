@@ -56,9 +56,9 @@ jobs:
         run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_MEMORY_TESTING_CPUS=6 ..
         working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
-      - name: build continuous test pack
-        run: cmake --build . --target Continuous --parallel 6
-        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+#      - name: build continuous test pack
+#        run: cmake --build . --target Continuous --parallel 6
+#        working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
       - name: run memtest
         run: cmake --build . --target memtest --parallel 6
