@@ -174,8 +174,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
                             bool node_clear = true;
                             double node_clearance = 0.3; // Make settable variable??
 
-                            for (unsigned i
-                            ; i<nodes.size(); ++i)
+                            for (unsigned i = 0; i < nodes.size(); ++i)
                             {
                                 double distance = norm_2(mpDelaunayMesh->GetVectorFromAtoB(nodes[i]->rGetLocation(), new_node_location));
                                 if (distance < node_clearance)

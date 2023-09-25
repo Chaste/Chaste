@@ -160,7 +160,7 @@ void CmguiDeformedSolutionsWriter<DIM>::WriteDeformationPositions(std::vector<c_
     {
         *p_node_file << "Node:\t" << index+1 << "\t";
 
-        for (unsigned i = 0; i < DIM; ++i)
+        for (unsigned i = 0; i < DIM; i++)
         {
             *p_node_file << rDeformedPositions[index](i) << "\t";
         }
@@ -186,7 +186,7 @@ void CmguiDeformedSolutionsWriter<DIM>::WriteCmguiScript(std::string fieldBaseNa
         *p_script_file << "gfx read node " << undeformedBaseName << " time -1\n";
     }
 
-    *p_script_file << "for ($i=0; $i<=" << mFinalCounter << "; $++i) { \n"
+    *p_script_file << "for ($i=0; $i<=" << mFinalCounter << "; $i++) { \n"
                    << "  gfx read node " << this->mBaseName << "_$i time $i\n"
                    << field_string
                    << "}\n";
