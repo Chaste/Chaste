@@ -98,7 +98,7 @@ public:
      *
      * @param rMesh  The mesh to calculate fibres on
      */
-    PapillaryFibreCalculator(TetrahedralMesh<3,3>& rMesh);
+    explicit PapillaryFibreCalculator(TetrahedralMesh<3,3>& rMesh);
 
     /**
      *  Main method - calculate the fibre orientations

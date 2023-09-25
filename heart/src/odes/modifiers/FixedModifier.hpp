@@ -75,7 +75,7 @@ public:
      * Constructor
      * @param value  The fixed value to use.
      */
-    FixedModifier(double value)
+    explicit FixedModifier(double value)
         : mValue(value)
     {
     }

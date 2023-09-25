@@ -109,7 +109,7 @@ public:
      *
      * @param odeSystems  the subsystems.
      */
-    CombinedOdeSystem(std::vector<AbstractOdeSystem*> odeSystems);
+    explicit CombinedOdeSystem(std::vector<AbstractOdeSystem*> odeSystems);
 
     /**
      * Configure a mapping between the state variables of one subsystem and

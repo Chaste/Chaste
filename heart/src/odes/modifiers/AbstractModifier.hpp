@@ -71,7 +71,7 @@ private:
     /**
      * Default constructor.
      */
-    AbstractModifier(void)
+    AbstractModifier()
     {
     }
 

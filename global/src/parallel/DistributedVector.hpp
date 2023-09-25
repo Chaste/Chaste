@@ -92,7 +92,6 @@ private:
      */
     bool mReadOnly;
 
-
 public:
 
     /**

@@ -61,7 +61,6 @@ public:
     {
     }
 
-
     /**
      *  Set the input parameters (none of which are used in this model)
      *  @param rInputParameters Structure containing voltage, [Ca]_i.

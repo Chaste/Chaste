@@ -85,7 +85,7 @@ public:
      * @param pCellFactory User defined cell factory which shows how the pde should
      *   create cells.
      */
-    MonodomainProblem(AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>* pCellFactory);
+    explicit MonodomainProblem(AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>* pCellFactory);
 
     /**
      * Constructor just used for archiving

@@ -97,7 +97,7 @@ public:
      *
      * @param pMesh pointer to the mesh
      */
-    BidomainMassMatrixAssembler(AbstractTetrahedralMesh<DIM,DIM>* pMesh)
+    explicit BidomainMassMatrixAssembler(AbstractTetrahedralMesh<DIM,DIM>* pMesh)
         : AbstractFeVolumeIntegralAssembler<DIM,DIM,2,false,true,CARDIAC>(pMesh)
     {
     }

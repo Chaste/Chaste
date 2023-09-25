@@ -128,7 +128,6 @@ public:
      */
     void InitialiseForSolve(Vec initialSolution);
 
-
     /**
      * Constructor
      *

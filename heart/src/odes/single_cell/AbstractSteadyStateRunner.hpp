@@ -88,7 +88,7 @@ public:
      *
      * @param pModel  The cell model to run to steady state.
      */
-    AbstractSteadyStateRunner(boost::shared_ptr<AbstractCvodeCell> pModel);
+    explicit AbstractSteadyStateRunner(boost::shared_ptr<AbstractCvodeCell> pModel);
 
     /**
      * Destructor (empty)

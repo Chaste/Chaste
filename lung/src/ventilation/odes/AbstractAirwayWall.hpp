@@ -42,7 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 class AbstractAirwayWall
 {
-
 public:
 
     /**
@@ -81,6 +80,5 @@ public:
      */
     virtual void SetPleuralPressure(double pressure) = 0;
 };
-
 
 #endif /*ABSTRACTAIRWAYWALL_HPP_*/

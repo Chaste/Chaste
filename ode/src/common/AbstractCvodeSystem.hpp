@@ -319,7 +319,7 @@ public:
      *
      * @param numberOfStateVariables  the number of state variables in the ODE system
      */
-    AbstractCvodeSystem(unsigned numberOfStateVariables);
+    explicit AbstractCvodeSystem(unsigned numberOfStateVariables);
 
     /**
      * Virtual destructor since we have virtual methods.

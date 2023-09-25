@@ -145,14 +145,16 @@ private:
     AbstractNonlinearElasticitySolver<DIM>* mpSolver; /**< Pointer to the parent class, set in constructor*/
 public:
 
-    /** Constructor
+    /**
+     * Constructor.
+     * 
      * @param pMesh  A pointer to the mesh whose elements we want to calculate data on.
      * @param pSolver  A pointer to the parent class, used to access data
      */
     StressPerElementWriter(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
                            AbstractNonlinearElasticitySolver<DIM>* pSolver)
-     : AbstractPerElementWriter<DIM, DIM, DIM*DIM>(pMesh),
-       mpSolver(pSolver)
+        : AbstractPerElementWriter<DIM, DIM, DIM*DIM>(pMesh),
+          mpSolver(pSolver)
     {
     }
 

@@ -116,7 +116,6 @@ protected:
     /** Pressures solution at each vertex of the mesh. Only valid if mCompressibilityType==INCOMPRESSIBLE. */
     std::vector<double> mPressureSolution;
 
-
     /**
      * The current solution, in the form (assuming 2d):
      *   Incompressible problem: [u1 v1 u2 v2 ... uN vN p1 p2 .. pM]
@@ -206,7 +205,6 @@ protected:
      */
     void AllocateMatrixMemory();
 
-
     /**
      * Apply the Dirichlet boundary conditions to the linear system.
      *
@@ -267,7 +265,6 @@ protected:
      *  @param type see above
      */
     void AddIdentityBlockForDummyPressureVariables(ApplyDirichletBcsType type);
-
 
     /**
      * For incompressible problems, we use the following ordering:

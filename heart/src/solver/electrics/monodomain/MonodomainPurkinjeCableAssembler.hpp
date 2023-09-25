@@ -117,7 +117,7 @@ public:
      * Constructor
      * @param pMesh a pointer to a MixedDimensionMesh
      */
-    MonodomainPurkinjeCableAssembler(MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
+    explicit MonodomainPurkinjeCableAssembler(MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
         : AbstractFeCableIntegralAssembler<ELEMENT_DIM,SPACE_DIM,2,false,true,NORMAL>(pMesh)
     {
         // Check radii have been set on the purkinje elements

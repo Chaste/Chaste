@@ -54,7 +54,7 @@ public:
      * @param newArguments  a string of command line arguments to put into the 
      *     singleton CommandLineArguments class.
      */
-    CommandLineArgumentsMocker(std::string newArguments);
+    explicit CommandLineArgumentsMocker(std::string newArguments);
 
     /**
      * Destructor.

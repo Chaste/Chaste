@@ -291,7 +291,7 @@ public:
     /** Constructor
      *  @param pMesh Pointer to the mesh
      */
-    AbstractContinuumMechanicsAssembler(AbstractTetrahedralMesh<DIM, DIM>* pMesh)
+    explicit AbstractContinuumMechanicsAssembler(AbstractTetrahedralMesh<DIM, DIM>* pMesh)
         : AbstractFeAssemblerInterface<CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MATRIX>(),
           mpMesh(pMesh)
     {

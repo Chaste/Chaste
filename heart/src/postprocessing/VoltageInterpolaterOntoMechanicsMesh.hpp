@@ -51,7 +51,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 class VoltageInterpolaterOntoMechanicsMesh
 {
-
 public:
     /**
      *  Constructor, also the main method of the class

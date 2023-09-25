@@ -95,7 +95,6 @@ private:
      */
     void SetupLinearSystem(Vec currentSolution, bool computeMatrix);
 
-
 public:
     /**
      * Constructor
@@ -106,9 +105,9 @@ public:
      * @param pBoundaryConditions pointer to the boundary conditions
      */
     ExtendedBidomainSolver(bool bathSimulation,
-                              AbstractTetrahedralMesh<ELEM_DIM,SPACE_DIM>* pMesh,
-                              ExtendedBidomainTissue<SPACE_DIM>* pTissue,
-                              BoundaryConditionsContainer<ELEM_DIM,SPACE_DIM,3>* pBoundaryConditions);
+                           AbstractTetrahedralMesh<ELEM_DIM,SPACE_DIM>* pMesh,
+                           ExtendedBidomainTissue<SPACE_DIM>* pTissue,
+                           BoundaryConditionsContainer<ELEM_DIM,SPACE_DIM,3>* pBoundaryConditions);
 
     /**
      * Destructor

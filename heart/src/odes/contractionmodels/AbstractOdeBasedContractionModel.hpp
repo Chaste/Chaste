@@ -71,7 +71,7 @@ public:
      *  Constructor
      *  @param numStateVariables number of state variables
      */
-    AbstractOdeBasedContractionModel(unsigned numStateVariables)
+    explicit AbstractOdeBasedContractionModel(unsigned numStateVariables)
         : AbstractOdeSystem(numStateVariables),
           AbstractContractionModel(),
           mTime(0.0)

@@ -99,7 +99,6 @@ protected:
      */
     void DoAssemble();
 
-
     /**
      * Calculate the contribution of a single element to the linear system.
      *

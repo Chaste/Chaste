@@ -131,7 +131,7 @@ public:
      * Constructor
      * @param rMesh the mesh
      */
-    ElectroMechanicsProblemDefinition(QuadraticMesh<DIM>& rMesh);
+    explicit ElectroMechanicsProblemDefinition(QuadraticMesh<DIM>& rMesh);
 
     /** Destructor */
     virtual ~ElectroMechanicsProblemDefinition();

@@ -77,12 +77,12 @@ protected:
      * @param rSubsystemInfo  the information objects of the ODE systems used to construct
      *     the system we are providing information about.
      */
-    CombinedOdeSystemInformation(const std::vector<boost::shared_ptr<const AbstractOdeSystemInformation> >& rSubsystemInfo);
+    explicit CombinedOdeSystemInformation(const std::vector<boost::shared_ptr<const AbstractOdeSystemInformation> >& rSubsystemInfo);
 
     /**
      * Copy constructor.  Not defined.
      */
-    CombinedOdeSystemInformation(const CombinedOdeSystemInformation&);
+    explicit CombinedOdeSystemInformation(const CombinedOdeSystemInformation&);
 
     /**
      * Overloaded assignment operator.  Not defined.

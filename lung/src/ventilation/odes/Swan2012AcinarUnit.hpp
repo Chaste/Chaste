@@ -54,11 +54,12 @@ class Swan2012AcinarUnit : public AbstractAcinarUnit
 friend class TestAcinarUnitModels;
 
 public:
-    /** Create a new acinar unit.
+    /**
+     * Create a new acinar unit.
      */
     Swan2012AcinarUnit();
 
-    /** Virtual destructor */
+    /** Virtual destructor. */
     virtual ~Swan2012AcinarUnit();
 
     /**

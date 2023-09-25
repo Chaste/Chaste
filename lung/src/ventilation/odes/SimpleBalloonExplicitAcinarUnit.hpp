@@ -53,11 +53,12 @@ class SimpleBalloonExplicitAcinarUnit : public AbstractAcinarUnit
 friend class TestAcinarUnitModels;
 
 public:
-    /** Create a new acinar unit.
+    /**
+     * Create a new acinar unit.
      */
     SimpleBalloonExplicitAcinarUnit();
 
-    /** Virtual destructor */
+    /** Virtual destructor. */
     virtual ~SimpleBalloonExplicitAcinarUnit();
 
     /**

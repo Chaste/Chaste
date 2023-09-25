@@ -82,7 +82,6 @@ protected:
      */
     virtual double Get_dW_dI3(double I1, double I2, double I3)=0;
 
-
     /**
      * @return the second derivative d^2W/dI1^2.
      *
@@ -109,7 +108,6 @@ protected:
      * @param I3 third principal invariant of C
      */
     virtual double Get_d2W_dI3(double I1, double I2, double I3)=0;
-
 
     /**
      * @return the second derivative d^2W/dI2dI3.

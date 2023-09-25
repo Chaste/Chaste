@@ -52,8 +52,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 class PurkinjeVentricularJunctionStimulus : public AbstractStimulusFunction
 {
-
-
 private:
     /**
      * The resistance across the Purkinje-ventricular junction
@@ -86,7 +84,7 @@ public:
      *
      * @param rJunctionResistance The resistance across the junction
      */
-    PurkinjeVentricularJunctionStimulus(const double& rJunctionResistance);
+    explicit PurkinjeVentricularJunctionStimulus(const double& rJunctionResistance);
 
     /**
      * Sets the pointer to the cell model on the ventricular side of the junction

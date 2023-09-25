@@ -64,7 +64,7 @@ public:
      *
      * @param a the value of the parameter mA
      */
-    OdeSystemForCoupledHeatEquation(double a)
+    explicit OdeSystemForCoupledHeatEquation(double a)
         : AbstractOdeSystemForCoupledPdeSystem(1,1),
           mA(a)
     {

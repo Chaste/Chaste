@@ -50,7 +50,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 class ImpedancePostProcessor
 {
-
 public:
     /**
      * Constructor.
@@ -60,8 +59,8 @@ public:
      * @param rImpedances A corresponding vector of impedances.
      */
     ImpedancePostProcessor(
-      std::vector<double>& rFrequencies,
-      std::vector<std::complex<double> >& rImpedances);
+        std::vector<double>& rFrequencies,
+        std::vector<std::complex<double> >& rImpedances);
 
     /**
      * Returns the resistance at 5Hz minus the resistance at 20Hz.

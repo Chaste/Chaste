@@ -70,7 +70,8 @@ class Nash2004ContractionModel : public AbstractOdeBasedContractionModel
 
 public:
     /** Constructor */
-    Nash2004ContractionModel() : AbstractOdeBasedContractionModel(1)
+    Nash2004ContractionModel()
+        : AbstractOdeBasedContractionModel(1)
     {
         this->mpSystemInfo = OdeSystemInformation<Nash2004ContractionModel>::Instance();
 

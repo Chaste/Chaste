@@ -48,7 +48,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template <class CELL, unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
 class GeneralPlaneStimulusCellFactory : public PlaneStimulusCellFactory<CELL,ELEMENT_DIM,SPACE_DIM>
 {
-
 public:
     /**
      * Constructor

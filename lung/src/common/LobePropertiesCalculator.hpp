@@ -54,13 +54,12 @@ class LobePropertiesCalculator
 {
 public:
     /**
-     * Constructor
-     *
+     * Constructor.
      */
     LobePropertiesCalculator();
 
     /**
-     * Destructor
+     * Destructor.
      */
     ~LobePropertiesCalculator();
 

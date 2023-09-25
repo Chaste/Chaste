@@ -90,7 +90,7 @@ public:
      *
      * @param pMesh pointer to the mesh
      */
-    ExtendedBidomainMassMatrixAssembler(AbstractTetrahedralMesh<DIM,DIM>* pMesh)
+    explicit ExtendedBidomainMassMatrixAssembler(AbstractTetrahedralMesh<DIM,DIM>* pMesh)
         : AbstractFeVolumeIntegralAssembler<DIM,DIM,3,false,true,NORMAL>(pMesh)
     {
     }

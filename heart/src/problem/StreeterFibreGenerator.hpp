@@ -133,7 +133,7 @@ public:
      *
      * @param rMesh  Reference to the tetrahedral mesh of the ventricles.
      */
-    StreeterFibreGenerator(AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>& rMesh);
+    explicit StreeterFibreGenerator(AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>& rMesh);
 
     /**
      * Destructor

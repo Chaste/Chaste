@@ -87,7 +87,6 @@ public:
     template<unsigned CONTRACTED_DIM>
     void SetAsContractionOnFirstDimension(const c_matrix<double,DIM1,CONTRACTED_DIM>& rMatrix, FourthOrderTensor<CONTRACTED_DIM,DIM2,DIM3,DIM4>& rTensor);
 
-
     /**
      * Set to be the inner product of a matrix another fourth order tensor, contracting on second component,
      * i.e. sets this tensor to be R, where

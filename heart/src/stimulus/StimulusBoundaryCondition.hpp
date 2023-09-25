@@ -56,7 +56,7 @@ public:
      *
      * @param pStimulus Stimulus object defining the parameters of the boundary condition
      */
-    StimulusBoundaryCondition(AbstractStimulusFunction* pStimulus);
+    explicit StimulusBoundaryCondition(AbstractStimulusFunction* pStimulus);
 
     /**
      * @param rX The point at which this boundary condition is to be evaluated.

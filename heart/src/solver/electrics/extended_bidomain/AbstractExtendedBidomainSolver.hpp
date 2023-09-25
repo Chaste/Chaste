@@ -89,7 +89,6 @@ protected:
      */
      unsigned mRowForAverageOfPhiZeroed;
 
-
     /**
      * Create the linear system object if it hasn't been already.
      * Can use an initial solution as PETSc template, or base it on the mesh size.
@@ -97,7 +96,6 @@ protected:
      * @param initialSolution an initial guess
      */
     void InitialiseForSolve(Vec initialSolution);
-
 
     /**
      *  Checks whether the linear system will have a solution (if so, infinite solutions) instead of
@@ -111,7 +109,6 @@ protected:
      *  is one dimensional with basis vector v = (0,0,1,0,0,1....0,0,1), so v.b = sum_{i=2,5,8..} b_i.
      */
     virtual void CheckCompatibilityCondition();
-
 
     /**
      *  PrepareForSetupLinearSystem

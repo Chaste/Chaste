@@ -73,7 +73,7 @@ public:
      * @param pCellFactory User defined cell factory which shows how the pde should
      *   create cells.
      */
-    BidomainWithBathProblem(AbstractCardiacCellFactory<DIM>* pCellFactory);
+    explicit BidomainWithBathProblem(AbstractCardiacCellFactory<DIM>* pCellFactory);
 
     /**
      * Constructor just used for archiving

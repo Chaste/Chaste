@@ -90,7 +90,6 @@ public:
     /** Constructor */
     Kerchoffs2003ContractionModel();
 
-
     /**
      *  The derivative function of the one state variable: "lc" in reference, the length of the contractile element
      *  @param time time

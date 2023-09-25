@@ -66,7 +66,6 @@ private:
     double mFluxScaling;  /**< In order to keep the pressure and flux solution at a comparable magnitude, so solve for mFluxScaling * flux.  This should be the same scale as Poiseuille resistance (comparable to viscosity).*/
     Vec mSolution; /**< Allow access to the solution of the linear system and use as a guess later */
 
-
     /** Assemble the linear system by writing in
      *  * flux balance at the nodes
      *  * Poiseuille flow in the edges

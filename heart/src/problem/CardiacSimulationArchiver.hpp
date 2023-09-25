@@ -64,7 +64,6 @@ public:
      */
     static void Save(PROBLEM_CLASS& rSimulationToArchive, const std::string& rDirectory, bool clearDirectory=true);
 
-
     /**
      * Unarchives a simulation from the directory specified.
      *

@@ -51,7 +51,7 @@ class SolidMechanicsProblemDefinition : public ContinuumMechanicsProblemDefiniti
 {
 private:
     /////////////////////////////
-    // material law
+    // Material law
     /////////////////////////////
     /**
      *  The material law, in the case of incompressible material laws. This vector is either of size 1, representing a
@@ -89,13 +89,12 @@ public:
      * Constructor. Note body force initialised to zero and density to 1.0
      * @param rMesh Tesh being solved on
      */
-    SolidMechanicsProblemDefinition(AbstractTetrahedralMesh<DIM,DIM>& rMesh);
+    explicit SolidMechanicsProblemDefinition(AbstractTetrahedralMesh<DIM,DIM>& rMesh);
 
     /** Destructor */
     virtual ~SolidMechanicsProblemDefinition()
     {
     }
-
 
     /**
      * Set a material law for the entire body (ie the homogeneous case). If compressibilityType==INCOMPRESSIBLE,
@@ -123,7 +122,6 @@ public:
      * SetMaterialLaw() must be called before calling this.
      */
     bool IsHomogeneousMaterial();
-
 
     /**
      * @return whether the material is incompressible or compressible.

@@ -51,7 +51,6 @@ typedef unsigned HeartRegionType;
  */
 class HeartRegionCode
 {
-
 public:
     /** @return a valid tissue identifier */
     static HeartRegionType GetValidTissueId();

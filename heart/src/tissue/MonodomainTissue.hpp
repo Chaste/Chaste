@@ -71,7 +71,6 @@ private:
         archive & boost::serialization::base_object<AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
 
-
 public:
     /**
      *  Constructor

@@ -113,7 +113,6 @@ public:
         }
     }
 
-
     /**
      * @return a newly createdcell model
      *

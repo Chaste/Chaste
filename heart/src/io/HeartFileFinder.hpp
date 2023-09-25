@@ -57,7 +57,7 @@ public:
      *
      * @param rPath  the path to the file to find
      */
-    HeartFileFinder(const cp::path_type& rPath);
+    explicit HeartFileFinder(const cp::path_type& rPath);
 };
 
 #endif /*HEARTFILEFINDER_HPP_*/

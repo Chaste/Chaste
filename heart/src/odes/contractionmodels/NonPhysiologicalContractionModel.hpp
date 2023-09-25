@@ -59,7 +59,7 @@ public:
     /** Constructor.
      *  @param option Number between 1 and 3 which determines which model is used. See class documentations
      */
-    NonPhysiologicalContractionModel(unsigned option);
+    explicit NonPhysiologicalContractionModel(unsigned option);
 
     /**
      *  Set the input parameters (none of which are used in this model

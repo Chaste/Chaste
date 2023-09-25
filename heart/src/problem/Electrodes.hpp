@@ -149,14 +149,13 @@ private:
 
 public:
 
-
     /** Constructor.
      * Needs only a reference to a mesh.
      * All other parameters from the HeartConfig class
      *
      *  @param rMesh The mesh, assumed to be a cuboid.
      */
-    Electrodes(AbstractTetrahedralMesh<DIM,DIM>& rMesh); // implemented in cpp
+    explicit Electrodes(AbstractTetrahedralMesh<DIM,DIM>& rMesh); // implemented in cpp
 
     /**
      *  @return the boundary conditions container in which is set up the Neumann

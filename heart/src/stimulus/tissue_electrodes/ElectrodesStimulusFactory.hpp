@@ -136,9 +136,7 @@ protected:
      */
     double ComputeElectrodeTotalFlux(AbstractChasteRegion<DIM>* pRegion, double stimulusMagnitude);
 
-
 public:
-
 
     /**
      * Constructor. Electrodes and stimulation parameters need to be passed in.

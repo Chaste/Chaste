@@ -186,7 +186,7 @@ public:
      *
      * @param sizeOfOdeSystem  the number of state variables in the ODE system
      */
-    BackwardEulerIvpOdeSolver(unsigned sizeOfOdeSystem);
+    explicit BackwardEulerIvpOdeSolver(unsigned sizeOfOdeSystem);
 
     /**
      * Destructor.

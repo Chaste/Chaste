@@ -117,8 +117,11 @@ public:
      *
      * @param rKspObject KSP object where we want to install the block diagonal preconditioner.
      */
-    PCBlockDiagonal(KSP& rKspObject);
+    explicit PCBlockDiagonal(KSP& rKspObject);
 
+    /**
+     * Destructor.
+     */
     ~PCBlockDiagonal();
 
 private:

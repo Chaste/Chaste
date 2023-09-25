@@ -95,7 +95,7 @@ public:
      * Constructor
      * @param pCellFactory  user defined cell factory which shows how the tissue should create cells.
      */
-    MonodomainPurkinjeProblem(AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>* pCellFactory);
+    explicit MonodomainPurkinjeProblem(AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>* pCellFactory);
 
     /**
      * Constructor just used for archiving

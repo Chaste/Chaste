@@ -62,7 +62,7 @@ public:
      *
      * @param contractionModelName  The name of the model to supply to the whole mesh.
      */
-    LabelBasedContractionCellFactory(ContractionModelName contractionModelName)
+    explicit LabelBasedContractionCellFactory(ContractionModelName contractionModelName)
         : AbstractContractionCellFactory<DIM>(),
           mContractionModelName(contractionModelName)
     {

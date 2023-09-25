@@ -75,14 +75,14 @@ public:
      *
      * @param vec a PETSc vector
      */
-    ReplicatableVector(Vec vec);
+    explicit ReplicatableVector(Vec vec);
 
     /**
      * Constructor to make a vector of given size.
      *
      * @param size the size of the vector
      */
-    ReplicatableVector(unsigned size);
+    explicit ReplicatableVector(unsigned size);
 
     /**
      * Default destructor. Remove PETSc context.

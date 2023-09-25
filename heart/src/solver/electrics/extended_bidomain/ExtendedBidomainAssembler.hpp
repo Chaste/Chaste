@@ -98,7 +98,6 @@ protected:
         c_matrix<double, 3, SPACE_DIM> &rGradU /* not used */,
         Element<ELEMENT_DIM,SPACE_DIM>* pElement);
 
-
 public:
 
     /**

@@ -86,7 +86,6 @@ protected:
     /** Boundary stencil size. */
     static const size_t BOUNDARY_STENCIL_SIZE = DIM*NUM_NODES_PER_BOUNDARY_ELEMENT;
 
-
     /**
      * Assemble residual or Jacobian on an element, using the current solution
      * stored in mCurrrentSolution. The ordering assumed is (in 2d)
@@ -125,7 +124,7 @@ protected:
 public:
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param rQuadMesh The quadratic mesh to solve on
      * @param rProblemDefinition an object defining in particular the body force and boundary conditions

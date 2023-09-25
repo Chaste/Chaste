@@ -94,7 +94,6 @@ private:
      */
     double mScaleFactor;
 
-
     /**
      *  The matrix has the form (except see comments about ordering above)
      *  [A    B ]
@@ -145,7 +144,6 @@ private:
             }
         }
         return ret;
-
     }
 
     /**
@@ -196,7 +194,6 @@ private:
     //    c_vector<double,DIM>& rX,
     //    Element<DIM,DIM>* pElement)
 
-
     /**
      *  The matrix has the form (except see comments about ordering above)
      *  [A    B ]
@@ -244,9 +241,10 @@ private:
 
 public:
     /**
-     * Constructor
-     * @param pMesh
-     * @param pProblemDefinition
+     * Constructor.
+     * 
+     * @param pMesh \todo document this argument 
+     * @param pProblemDefinition \todo document this argument
      */
     StokesFlowAssembler(AbstractTetrahedralMesh<DIM,DIM>* pMesh,
                         StokesFlowProblemDefinition<DIM>* pProblemDefinition)

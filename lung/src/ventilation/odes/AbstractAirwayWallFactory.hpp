@@ -82,13 +82,13 @@ public:
     /**
      * Default constructor.
      */
-    AbstractAirwayWallFactory() : mpMesh(nullptr)
+    AbstractAirwayWallFactory()
+        : mpMesh(nullptr)
     {
-
     }
 
     /**
-     * Destructor
+     * Destructor.
      */
     virtual ~AbstractAirwayWallFactory()
     {}

@@ -49,7 +49,6 @@ const unsigned MAX_STRING_SIZE = 100; /// \todo: magic number
  */
 class AbstractHdf5Access
 {
-
 protected:
     std::string mBaseName;                        /**< The base name for the data files. */
     std::string mDatasetName;                     /**< The base name for the dataset we are reading/writing. */

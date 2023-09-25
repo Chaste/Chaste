@@ -129,7 +129,7 @@ public:
      * @param vec is a PETSc vector which we want to use as the pattern for 
      *     future vectors produced by this factory
      */
-    DistributedVectorFactory(Vec vec);
+    explicit DistributedVectorFactory(Vec vec);
 
     /**
      * Set the problem size specifying distribution over local processor.
@@ -147,7 +147,7 @@ public:
      *
      * @param pOriginalFactory  see #mpOriginalFactory
      */
-    DistributedVectorFactory(DistributedVectorFactory* pOriginalFactory);
+    explicit DistributedVectorFactory(DistributedVectorFactory* pOriginalFactory);
 
     /**
      * Constructor intended for use in archiving.  Allows complete manual

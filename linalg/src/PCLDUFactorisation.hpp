@@ -145,8 +145,11 @@ public:
      *
      * @param rKspObject KSP object where we want to install the block diagonal preconditioner.
      */
-    PCLDUFactorisation(KSP& rKspObject);
+    explicit PCLDUFactorisation(KSP& rKspObject);
 
+    /**
+     * Destructor.
+     */
     ~PCLDUFactorisation();
 
 private:

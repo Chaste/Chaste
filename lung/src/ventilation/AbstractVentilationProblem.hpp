@@ -57,7 +57,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 class AbstractVentilationProblem
 {
-
 protected:
     /**
      * A helper enumeration used to keep track of the order in which things get added to edge attributes
@@ -131,7 +130,6 @@ protected:
      *
      */
     virtual void Initialise();
-
 
 public:
     /** Main constructor

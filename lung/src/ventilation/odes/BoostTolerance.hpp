@@ -38,15 +38,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * Small class to test if values are within tolerance for use with Boost nonlinear solvers.
+ * 
+ * \todo rename _eps to mEps
  */
-class Tolerance {
+class Tolerance
+{
 public:
 
     /**
      * @param eps The tolerance to solve within
      */
-    Tolerance(double eps) :
-        _eps(eps) {
+    explicit Tolerance(double eps)
+        : _eps(eps)
+    {
     }
 
     /**

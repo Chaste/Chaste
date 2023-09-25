@@ -102,7 +102,6 @@ private:
      */
     Vec mVecForConstructingRhs;
 
-
     /**
      *  Implementation of SetupLinearSystem() which uses the assembler to compute the
      *  LHS matrix, but sets up the RHS vector using the mass-matrix (constructed

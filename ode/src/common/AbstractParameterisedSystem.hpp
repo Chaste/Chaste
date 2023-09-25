@@ -128,11 +128,7 @@ public:
      *
      * @param numberOfStateVariables  the number of state variables in the ODE system
      */
-    AbstractParameterisedSystem(unsigned numberOfStateVariables);
-
-    //
-    // State variable methods
-    //
+    explicit AbstractParameterisedSystem(unsigned numberOfStateVariables);
 
     /**
      * @return the values of the state variables in the ODE system.

@@ -178,11 +178,10 @@ public:
      * @param rEndoFile: a file containing a list of global node indices on the endocardial surface
      * @param indexFromZero  true for native triangles files. false for Memfem files which are indexed from 1.
      */
-    HeartGeometryInformation (AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>& rMesh,
-                              const std::string& rEpiFile,
-                              const std::string& rEndoFile,
-                              bool indexFromZero);
-
+    HeartGeometryInformation(AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>& rMesh,
+                             const std::string& rEpiFile,
+                             const std::string& rEndoFile,
+                             bool indexFromZero);
 
     /**
      * Constructor for a three surface mesh.

@@ -86,7 +86,7 @@ protected:
     double mDensity;
 
     //////////////////////////////
-    // body force
+    // Body force
     //////////////////////////////
 
     /** The body force type */
@@ -99,7 +99,7 @@ protected:
     c_vector<double,DIM> (*mpBodyForceFunction)(c_vector<double,DIM>& rX, double t);
 
     //////////////////////////////
-    // tractions
+    // Tractions
     //////////////////////////////
 
     /** The traction (Neumann) boundary condition type */
@@ -126,7 +126,6 @@ protected:
     /** The normal pressure as a function if time (only used if mTractionBoundaryConditionType is set appropriately) */
     double (*mpNormalPressureFunction)(double t);
 
-
     ///////////////////////////////////////////
     // Dirichlet boundary conditions
     ///////////////////////////////////////////
@@ -147,7 +146,7 @@ public:
      * Constructor initialises the body force to zero and density to 1.0
      * @param rMesh  is the mesh being solved on
      */
-    ContinuumMechanicsProblemDefinition(AbstractTetrahedralMesh<DIM,DIM>& rMesh);
+    explicit ContinuumMechanicsProblemDefinition(AbstractTetrahedralMesh<DIM,DIM>& rMesh);
 
     /** Destructor */
     virtual ~ContinuumMechanicsProblemDefinition()

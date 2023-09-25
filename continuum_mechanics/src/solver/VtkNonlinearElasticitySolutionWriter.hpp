@@ -50,14 +50,15 @@ friend class TestVtkNonlinearElasticitySolutionWriter;
 private:
     /** Pointer to the mechanics solver which performed the calculation */
     AbstractNonlinearElasticitySolver<DIM>* mpSolver;
+  
     /** Whether to write strains for each element */
     bool mWriteElementWiseStrains;
+  
     /** What type of strain to write for each element, from: F = dx/dX, C = F^T F, E = 1/2 (C-I) */
     StrainType mElementWiseStrainType;
 
     /** Tensor data to be written to the .vtu file. This is a member variable only for testing reasons. */
     std::vector<c_matrix<double,DIM,DIM> > mTensorData;
-
 
     //// For future..
     //    bool mWriteNodewiseStresses;
@@ -66,10 +67,11 @@ private:
 public:
 
     /**
-     *  Constructor
-     *  @param rSolver mechanics solver which performed the calculation
+     * Constructor.
+     * 
+     * @param rSolver mechanics solver which performed the calculation
      */
-    VtkNonlinearElasticitySolutionWriter(AbstractNonlinearElasticitySolver<DIM>& rSolver)
+    explicit VtkNonlinearElasticitySolutionWriter(AbstractNonlinearElasticitySolver<DIM>& rSolver)
         : mpSolver(&rSolver),
           mWriteElementWiseStrains(false)
     {

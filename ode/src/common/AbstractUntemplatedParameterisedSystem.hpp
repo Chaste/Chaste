@@ -58,7 +58,7 @@ public:
      *
      * @param numberOfStateVariables  the number of state variables in the ODE system
      */
-    AbstractUntemplatedParameterisedSystem(unsigned numberOfStateVariables);
+    explicit AbstractUntemplatedParameterisedSystem(unsigned numberOfStateVariables);
 
     /** Make this class polymorphic. */
     virtual ~AbstractUntemplatedParameterisedSystem();
@@ -72,10 +72,6 @@ public:
      * @return the name of this system.
      */
     std::string GetSystemName() const;
-
-    //
-    // Attribute methods
-    //
 
     /**
      * @return the number of named attributes that this system has.

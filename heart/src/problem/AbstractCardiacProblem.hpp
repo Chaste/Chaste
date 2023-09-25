@@ -492,7 +492,7 @@ public:
      * @param pCellFactory User defined cell factory which shows how the pde should
      * create cells.
      */
-    AbstractCardiacProblem(AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>* pCellFactory);
+    explicit AbstractCardiacProblem(AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>* pCellFactory);
 
     /**
      * Constructor used by archiving.

@@ -90,7 +90,6 @@ class AbstractOdeSystem : public AbstractParameterisedSystem<std::vector<double>
 
 private:
 
-
     friend class boost::serialization::access;
     /**
      * Archive the member variables.
@@ -160,7 +159,7 @@ public:
      *
      * @param numberOfStateVariables  the number of state variables in the ODE system
      */
-    AbstractOdeSystem(unsigned numberOfStateVariables);
+    explicit AbstractOdeSystem(unsigned numberOfStateVariables);
 
     /**
      * Virtual destructor since we have virtual methods.

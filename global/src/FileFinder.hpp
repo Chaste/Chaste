@@ -107,7 +107,7 @@ public:
      *
      * @param rPath  the path to the file/dir to find
      */
-    FileFinder(const fs::path& rPath);
+    explicit FileFinder(const fs::path& rPath);
 
     /**
      * Needed because we have virtual methods.
