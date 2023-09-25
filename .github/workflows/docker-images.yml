@@ -1,8 +1,6 @@
 name: Docker Multi-Arch Develop Image CI
 
 on:
-  pull_request:
-    branches: [ "**" ]
   push:
     branches: [ "develop" ]
   # Schedule a weekly build on Sunday at 1am after rebuilding the base image
