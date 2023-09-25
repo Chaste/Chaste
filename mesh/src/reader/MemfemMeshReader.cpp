@@ -121,8 +121,7 @@ std::vector<std::vector<double> > MemfemMeshReader<ELEMENT_DIM, SPACE_DIM>::Toke
     std::vector<std::vector<double> > tokenized_data; // Output
 
     // Iterate over the lines of input
-    std::vector<std::string>::const_iterator the_iterator;
-    for (the_iterator = rRawData.begin(); the_iterator != rRawData.end(); the_iterator++ )
+    for (const auto& the_iterator : rRawData)
     {
         const std::string& r_line_of_data = *the_iterator;
         std::stringstream line_stream(r_line_of_data);
@@ -155,8 +154,7 @@ std::vector<std::vector<unsigned> > MemfemMeshReader<ELEMENT_DIM, SPACE_DIM>::To
 {
     std::vector<std::vector<unsigned> > tokenized_data;
 
-    std::vector<std::string>::const_iterator the_iterator;
-    for (the_iterator = rRawData.begin(); the_iterator != rRawData.end(); the_iterator++ )
+    for (const auto& the_iterator : rRawData)
     {
         const std::string& r_line_of_data = *the_iterator;
         std::stringstream line_stream(r_line_of_data);

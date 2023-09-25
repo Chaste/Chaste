@@ -68,9 +68,9 @@ unsigned CellData::GetNumItems() const
 std::vector<std::string> CellData::GetKeys() const
 {
     std::vector<std::string> keys;
-    for (std::map<std::string, double>::const_iterator it = mCellData.begin(); it != mCellData.end(); ++it)
+    for (const auto& it : mCellData)
     {
-        keys.push_back(it->first);
+        keys.push_back(it.first);
     }
 
     // From STL documentation we assume that the iterator is returning sorted keys sort(keys.begin(), keys.end());

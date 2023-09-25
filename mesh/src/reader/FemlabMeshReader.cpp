@@ -94,9 +94,7 @@ std::vector < std::vector<double> >
 
     // Iterate over the lines of input
     unsigned dimension_count = 0;
-    std::vector < std::string >::const_iterator the_iterator;
-    for (the_iterator = rRawData.begin(); the_iterator != rRawData.end();
-         the_iterator++)
+    for (const auto& the_iterator : rRawData)
     {
         const std::string& r_line_of_data = *the_iterator;
         std::stringstream line_stream (r_line_of_data);

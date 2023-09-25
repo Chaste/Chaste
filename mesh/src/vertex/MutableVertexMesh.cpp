@@ -1762,7 +1762,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformNodeMerge(Node<SPACE_DIM>
     unsigned node_B_index = pNodeB->GetIndex();
     // For rebuilding edges affected elements
     std::set<unsigned> rebuilt_elements;
-    for (std::set<unsigned>::const_iterator it = nodeB_elem_indices.begin(); it != nodeB_elem_indices.end(); ++it)
+    for (const auto& it : nodeB_elem_indices)
     {
         // Find the local index of node B in this element
         unsigned node_B_local_index = this->mElements[*it]->GetNodeLocalIndex(node_B_index);

@@ -107,9 +107,9 @@ unsigned CellVecData::GetNumItems() const
 std::vector<std::string> CellVecData::GetKeys() const
 {
     std::vector<std::string> keys;
-    for (std::map<std::string, Vec>::const_iterator it = mCellVecData.begin(); it != mCellVecData.end(); ++it)
+    for (const auto& it : mCellVecData)
     {
-        keys.push_back(it->first);
+        keys.push_back(it.first);
     }
 
     // From STL documentation we assume that the iterator is returning sorted keys sort(keys.begin(), keys.end());

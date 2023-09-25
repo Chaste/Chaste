@@ -936,11 +936,11 @@ c_vector<unsigned, 3> MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitEdge(Node<SPACE_
 
     unsigned counter = 1;
 
-    for (std::set<unsigned>::const_iterator it = intersection_elements.begin(); it != intersection_elements.end(); ++it)
+    for (const auto& it : intersection_elements)
     {
-        unsigned elementIndex = *it;
+        unsigned element_index = *it;
 
-        Element<ELEMENT_DIM,SPACE_DIM>* p_original_element = this->GetElement(elementIndex);
+        Element<ELEMENT_DIM,SPACE_DIM>* p_original_element = this->GetElement(element_index);
 
         // First, make a copy of the current element and assign an unused index
         Element<ELEMENT_DIM,SPACE_DIM>* p_new_element = new Element<ELEMENT_DIM,SPACE_DIM>(*p_original_element, UINT_MAX);
