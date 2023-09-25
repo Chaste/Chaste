@@ -343,7 +343,7 @@ public:
         DistributedVector::Stripe volume_stripe = DistributedVector::Stripe(ic, 0);
         DistributedVector::Stripe cable_stripe = DistributedVector::Stripe(ic, 1);
 
-        for (DistributedVector::Iterator index = ic.Begin();
+        for (auto index = ic.Begin();
              index != ic.End();
              ++index)
         {
@@ -353,7 +353,7 @@ public:
         }
         ic.Restore();
 
-        for (DistributedVector::Iterator index = ic2.Begin();
+        for (auto index = ic2.Begin();
              index != ic2.End();
              ++index)
         {

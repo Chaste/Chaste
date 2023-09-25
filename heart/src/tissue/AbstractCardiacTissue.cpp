@@ -139,7 +139,7 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
         // Should really do this for other processes too, but this is all we need
         // to get memory testing to pass, and leaking when we're about to die isn't
         // that bad!
-        for (std::vector<AbstractCardiacCellInterface*>::iterator cell_iterator = mCellsDistributed.begin();
+        for (auto cell_iterator = mCellsDistributed.begin();
              cell_iterator != mCellsDistributed.end();
              ++cell_iterator)
         {
@@ -197,7 +197,7 @@ template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
 AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::~AbstractCardiacTissue()
 {
     // Delete cells
-    for (std::vector<AbstractCardiacCellInterface*>::iterator iter = mCellsDistributed.begin();
+    for (auto iter = mCellsDistributed.begin();
          iter != mCellsDistributed.end();
          ++iter)
     {
@@ -205,7 +205,7 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::~AbstractCardiacTissue()
     }
 
     // Delete cells for halo nodes
-    for (std::vector<AbstractCardiacCellInterface*>::iterator iter = mHaloCellsDistributed.begin();
+    for (auto iter = mHaloCellsDistributed.begin();
          iter != mHaloCellsDistributed.end();
          ++iter)
     {
@@ -215,7 +215,7 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::~AbstractCardiacTissue()
     delete mpIntracellularConductivityTensors;
 
     // Delete Purkinje cells
-    for (std::vector<AbstractCardiacCellInterface*>::iterator iter = mPurkinjeCellsDistributed.begin();
+    for (auto iter = mPurkinjeCellsDistributed.begin();
          iter != mPurkinjeCellsDistributed.end();
          ++iter)
     {
@@ -484,7 +484,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
     try
     {
         double voltage_before_update;
-        for (DistributedVector::Iterator index = dist_solution.Begin();
+        for (auto index = dist_solution.Begin();
              index != dist_solution.End();
              ++index)
         {
@@ -585,7 +585,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
         DistributedVector::Stripe purkinje_voltage(dist_solution, 1);
         try
         {
-            for (DistributedVector::Iterator index = dist_solution.Begin();
+            for (auto index = dist_solution.Begin();
                  index != dist_solution.End();
                  ++index)
             {

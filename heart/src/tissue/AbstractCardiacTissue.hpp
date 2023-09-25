@@ -713,7 +713,7 @@ public:
         }
 
         // Delete any unused fake cells
-        for (std::set<FakeBathCell*>::iterator it = fake_cells_non_local.begin();
+        for (auto it = fake_cells_non_local.begin();
              it != fake_cells_non_local.end();
              ++it)
         {

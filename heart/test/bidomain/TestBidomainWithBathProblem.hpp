@@ -476,7 +476,7 @@ public:
          */
         bool ap_triggered = false;
 
-        for (DistributedVector::Iterator index = distributed_solution.Begin();
+        for (auto index = distributed_solution.Begin();
              index!= distributed_solution.End();
              ++index)
         {
@@ -681,7 +681,7 @@ public:
         DistributedVector::Stripe matrix_based_ex_pot(matrix_based_solution, 1);
         DistributedVector::Stripe non_matrix_based_ex_pot(non_matrix_based_solution, 1);
 
-        for (DistributedVector::Iterator index = matrix_based_solution.Begin();
+        for (auto index = matrix_based_solution.Begin();
              index != matrix_based_solution.End();
              ++index)
         {

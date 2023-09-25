@@ -42,9 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CheckMonoLr91Vars(MonodomainProblem<ELEMENT_DIM, SPACE_DIM>& problem)
 {
-
     DistributedVector voltage = problem.rGetMesh().GetDistributedVectorFactory()->CreateDistributedVector(problem.GetSolution());
-    for (DistributedVector::Iterator index = voltage.Begin();
+    for (auto index = voltage.Begin();
          index != voltage.End();
          ++index)
     {

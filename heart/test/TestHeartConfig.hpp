@@ -384,7 +384,7 @@ public:
         TS_ASSERT_EQUALS(parameter_settings[0].size(), 5u);
         TS_ASSERT_EQUALS(parameter_settings[1].size(), 3u);
         // Parameters get returned by name order since they're in a map
-        std::map<std::string, double>::iterator param_it = parameter_settings[0].begin();
+        auto param_it = parameter_settings[0].begin();
         TS_ASSERT_EQUALS(param_it->first, "ScaleFactorGkr");
         TS_ASSERT_EQUALS(param_it->second, 1.0);
         param_it++;

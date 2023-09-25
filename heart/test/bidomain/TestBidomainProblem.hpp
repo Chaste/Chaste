@@ -281,7 +281,7 @@ public:
         DistributedVector striped_voltage = bidomain_problem.GetSolutionDistributedVector();
         DistributedVector::Stripe voltage(striped_voltage,0);
 
-        for (DistributedVector::Iterator index = striped_voltage.Begin();
+        for (auto index = striped_voltage.Begin();
              index != striped_voltage.End();
              ++index)
         {
@@ -377,7 +377,7 @@ public:
             DistributedVector::Stripe voltage(striped_voltage,0);
             DistributedVector::Stripe phi_e(striped_voltage,1);
 
-            for (DistributedVector::Iterator index = striped_voltage.Begin();
+            for (auto index = striped_voltage.Begin();
                  index != striped_voltage.End();
                  ++index)
             {
@@ -430,7 +430,7 @@ public:
             double local_phi_e = 0.0;
             double total_phi_e = 0.0;
 
-            for (DistributedVector::Iterator index = striped_voltage.Begin();
+            for (auto index = striped_voltage.Begin();
                  index != striped_voltage.End();
                  ++index)
             {
@@ -536,7 +536,7 @@ public:
         DistributedVector::Stripe bidomain_voltage(dist_bidomain_voltage, 0);
         DistributedVector::Stripe extracellular_potential(dist_bidomain_voltage, 1);
 
-        for (DistributedVector::Iterator index = monodomain_voltage.Begin();
+        for (auto index = monodomain_voltage.Begin();
              index != monodomain_voltage.End();
              ++index)
         {
@@ -800,7 +800,7 @@ public:
         DistributedVector::Stripe ortho_ex_pot(orthotropic_solution, 1);
         DistributedVector::Stripe axi_ex_pot(axisymmetric_solution, 1);
 
-        for (DistributedVector::Iterator index = orthotropic_solution.Begin();
+        for (auto index = orthotropic_solution.Begin();
              index != orthotropic_solution.End();
              ++index)
         {

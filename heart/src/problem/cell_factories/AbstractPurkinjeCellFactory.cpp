@@ -211,7 +211,7 @@ void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateJunctionFromFile(
                                                                                 AbstractCardiacCellInterface* pPurkinjeCell,
                                                                                 AbstractCardiacCellInterface* pCardiacCell)
 {
-    std::map<unsigned, double>::iterator iter = mJunctionMap.find(pNode->GetIndex());
+    auto iter = mJunctionMap.find(pNode->GetIndex());
     if (iter != mJunctionMap.end())
     {
         CreateJunction(pNode, pPurkinjeCell, pCardiacCell, iter->second);

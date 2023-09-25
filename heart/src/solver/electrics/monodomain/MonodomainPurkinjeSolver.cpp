@@ -96,8 +96,7 @@ void MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(Vec curr
     double Am_purkinje = HeartConfig::Instance()->GetPurkinjeSurfaceAreaToVolumeRatio();
     double Cm_purkinje  = HeartConfig::Instance()->GetPurkinjeCapacitance();
 
-
-    for (DistributedVector::Iterator index = dist_vec_matrix_based.Begin();
+    for (auto index = dist_vec_matrix_based.Begin();
          index!= dist_vec_matrix_based.End();
          ++index)
     {

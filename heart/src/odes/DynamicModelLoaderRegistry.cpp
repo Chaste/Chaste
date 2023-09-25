@@ -53,7 +53,7 @@ DynamicCellModelLoaderPtr DynamicModelLoaderRegistry::GetLoader(const std::strin
 
     DynamicCellModelLoaderPtr p_loader;
     // Have we opened this library already?
-    std::map<std::string, DynamicCellModelLoaderWeakPtr>::iterator it = mLoaders.find(rPath);
+    auto it = mLoaders.find(rPath);
     if (it == mLoaders.end() || it->second.expired())
     {
         // Not loaded, or no longer used

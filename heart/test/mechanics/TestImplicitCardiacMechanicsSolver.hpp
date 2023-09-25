@@ -322,7 +322,7 @@ public:
 
         TS_ASSERT_EQUALS(mesh.GetContainingElementIndex(quad_points.rGet(21)), 3u);
 
-        std::map<unsigned,DataAtQuadraturePoint>::iterator iter = solver.rGetQuadPointToDataAtQuadPointMap().find(19);
+        auto iter = solver.rGetQuadPointToDataAtQuadPointMap().find(19);
         if (iter != solver.rGetQuadPointToDataAtQuadPointMap().end()) //ie because some processes won't own this in parallel
         {
             TS_ASSERT_DELTA(iter->second.Stretch, 0.9737, 2e-3);
@@ -420,7 +420,7 @@ public:
 
             // Was quad point 34 = 3*9 + 7 (quad 7 in element 3) when there were 9 quads per element
             // Investigate quad point 19 = 3*6 + 1 (quad 3 in element 3)
-            std::map<unsigned,DataAtQuadraturePoint>::iterator iter = solver.rGetQuadPointToDataAtQuadPointMap().find(19);
+            auto iter = solver.rGetQuadPointToDataAtQuadPointMap().find(19);
             if (iter != solver.rGetQuadPointToDataAtQuadPointMap().end()) //ie because some processes won't own this in parallel
             {
                 TS_ASSERT_DELTA(iter->second.Stretch, 0.9682, 1e-3);  // ** different value to previous test - attributing the difference in results to the fact mesh isn't rotation-invariant
@@ -646,7 +646,7 @@ public:
         TS_ASSERT_DELTA( solver.rGetDeformedPosition()[24](1), 0.9429, 1e-2);
         TS_ASSERT_DELTA( solver.rGetDeformedPosition()[24](0), 1.0565, 1e-2);
 
-        std::map<unsigned,DataAtQuadraturePoint>::iterator iter = solver.rGetQuadPointToDataAtQuadPointMap().find(19);
+        auto iter = solver.rGetQuadPointToDataAtQuadPointMap().find(19);
         if (iter != solver.rGetQuadPointToDataAtQuadPointMap().end()) //ie because some processes won't own this in parallel
         {
             TS_ASSERT_DELTA(iter->second.Stretch, 0.9682, 1e-3);

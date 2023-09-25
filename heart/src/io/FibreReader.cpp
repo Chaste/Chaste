@@ -271,7 +271,7 @@ unsigned FibreReader<DIM>::GetTokensAtNextLine()
     while (blank_line);
 
     // Get rid of any trailing whitespace
-    std::string::iterator iter = line.end();
+    auto iter = line.end();
     iter--;
     unsigned nchars2delete = 0;
     while (*iter == ' ' || *iter == '\t')

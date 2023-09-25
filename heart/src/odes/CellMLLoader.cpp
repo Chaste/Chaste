@@ -58,7 +58,7 @@ AbstractCardiacCellInterface* CellMLLoader::LoadCellMLFile(bool makeCvodeCell)
         mUseCvode = makeCvodeCell;
 
         // Remove or add the "--cvode" option to get the desired cell type
-        std::vector<std::string>::iterator it = std::find(mOptions.begin(), mOptions.end(), "--cvode");
+        auto it = std::find(mOptions.begin(), mOptions.end(), "--cvode");
         if (!makeCvodeCell && it != mOptions.end())
         {
             mOptions.erase(it);

@@ -75,7 +75,7 @@ Vec MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::CreateInitialCondition()
     DistributedVector ic = this->mpMesh->GetDistributedVectorFactory()->CreateDistributedVector(init_cond);
     DistributedVector::Stripe purkinje_voltage_stripe = DistributedVector::Stripe(ic, 1);
 
-    for (DistributedVector::Iterator index = ic.Begin();
+    for (auto index = ic.Begin();
          index != ic.End();
          ++index)
     {

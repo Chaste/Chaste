@@ -72,7 +72,7 @@ void OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem
     double Am = HeartConfig::Instance()->GetSurfaceAreaToVolumeRatio();
     double Cm  = HeartConfig::Instance()->GetCapacitance();
 
-    for (DistributedVector::Iterator index = dist_vec_matrix_based.Begin();
+    for (auto index = dist_vec_matrix_based.Begin();
          index!= dist_vec_matrix_based.End();
          ++index)
     {

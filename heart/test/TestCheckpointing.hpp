@@ -93,7 +93,7 @@ public:
         DistributedVector::Stripe single_phie(single_solution,1);
         DistributedVector::Stripe multiple_vm(multiple_solution,0);
         DistributedVector::Stripe multiple_phie(multiple_solution,1);
-        for (DistributedVector::Iterator index = single_solution.Begin();
+        for (auto index = single_solution.Begin();
              index != single_solution.End();
              ++index)
         {

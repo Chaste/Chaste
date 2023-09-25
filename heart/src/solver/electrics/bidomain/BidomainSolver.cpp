@@ -112,7 +112,7 @@ void BidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(
 
     if (!(this->mBathSimulation))
     {
-        for (DistributedVector::Iterator index = dist_vec_matrix_based.Begin();
+        for (auto index = dist_vec_matrix_based.Begin();
              index!= dist_vec_matrix_based.End();
              ++index)
         {
@@ -126,11 +126,10 @@ void BidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(
     }
     else
     {
-        for (DistributedVector::Iterator index = dist_vec_matrix_based.Begin();
+        for (auto index = dist_vec_matrix_based.Begin();
              index!= dist_vec_matrix_based.End();
              ++index)
         {
-
             if (!HeartRegionCode::IsRegionBath( this->mpMesh->GetNode(index.Global)->GetRegion()))
             {
                 double V = distributed_current_solution_vm[index];

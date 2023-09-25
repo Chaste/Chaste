@@ -195,7 +195,7 @@ public:
         ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2>* p_solver
             = dynamic_cast<ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2>*>(problem.mpCardiacMechSolver);
 
-        for (std::map<unsigned,DataAtQuadraturePoint>::iterator iter = p_solver->rGetQuadPointToDataAtQuadPointMap().begin();
+        for (auto iter = p_solver->rGetQuadPointToDataAtQuadPointMap().begin();
              iter != p_solver->rGetQuadPointToDataAtQuadPointMap().end();
              iter++)
         {

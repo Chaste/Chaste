@@ -575,7 +575,7 @@ public:
         // hardcoded result to check against
         // assumes endtime = 1.3
         unsigned corners_checked = 0;
-        for (DistributedVector::Iterator node_index = voltage.Begin();
+        for (auto node_index = voltage.Begin();
              node_index != voltage.End();
              ++node_index)
         {
@@ -614,7 +614,7 @@ public:
         // hardcoded result to check against
         // assumes endtime = 1.3
         unsigned edges_checked = 0;
-        for (DistributedVector::Iterator node_index = voltage.Begin();
+        for (auto node_index = voltage.Begin();
              node_index != voltage.End();
              ++node_index)
         {

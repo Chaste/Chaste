@@ -113,9 +113,9 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
     mpVariableFibreSheetDirections = NULL;
 
     // Check that we are using the right kind of solver.
-    for (std::map<unsigned,DataAtQuadraturePoint>::iterator iter = this->mQuadPointToDataAtQuadPointMap.begin();
-            iter != this->mQuadPointToDataAtQuadPointMap.end();
-            iter++)
+    for (auto iter = this->mQuadPointToDataAtQuadPointMap.begin();
+         iter != this->mQuadPointToDataAtQuadPointMap.end();
+         iter++)
     {
         if (!IsImplicitSolver() && (*iter).second.ContractionModel->IsStretchRateDependent())
         {
@@ -171,13 +171,13 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetCalciumAndVoltage
 
     ContractionModelInputParameters input_parameters;
 
-    for (unsigned i=0; i<rCalciumConcentrations.size(); ++i)
+    for (unsigned i = 0; i < rCalciumConcentrations.size(); ++i)
     {
         input_parameters.intracellularCalciumConcentration = rCalciumConcentrations[i];
         input_parameters.voltage = rVoltages[i];
 
 ///\todo #1828 / #1211 don't pass in entire vector
-        std::map<unsigned,DataAtQuadraturePoint>::iterator iter = mQuadPointToDataAtQuadPointMap.find(i);
+        auto iter = mQuadPointToDataAtQuadPointMap.find(i);
         if (iter != mQuadPointToDataAtQuadPointMap.end())
         {
             iter->second.ContractionModel->SetInputParameters(input_parameters);

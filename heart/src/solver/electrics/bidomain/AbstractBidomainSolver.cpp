@@ -113,7 +113,7 @@ Vec AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::GenerateNullBasis() const
     DistributedVector dist_null_basis = p_factory->CreateDistributedVector(null_basis);
     DistributedVector::Stripe null_basis_stripe_0(dist_null_basis,0);
     DistributedVector::Stripe null_basis_stripe_1(dist_null_basis,1);
-    for (DistributedVector::Iterator index = dist_null_basis.Begin();
+    for (auto index = dist_null_basis.Begin();
          index != dist_null_basis.End();
          ++index)
     {
@@ -208,7 +208,7 @@ void AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::CheckCompatibilityCondition(
     DistributedVector::Stripe distributed_rhs_phi_entries(distributed_rhs,1);
 
     double local_sum=0;
-    for (DistributedVector::Iterator index = distributed_rhs.Begin();
+    for (auto index = distributed_rhs.Begin();
          index!= distributed_rhs.End();
          ++index)
     {

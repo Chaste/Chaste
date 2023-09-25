@@ -79,7 +79,7 @@ public:
         DistributedVector striped_voltage = bidomain_problem.GetSolutionDistributedVector();
         DistributedVector::Stripe voltage(striped_voltage, 0);
 
-        for (DistributedVector::Iterator index = striped_voltage.Begin();
+        for (auto index = striped_voltage.Begin();
              index != striped_voltage.End();
              ++index)
         {

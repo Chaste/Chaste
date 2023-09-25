@@ -275,7 +275,7 @@ void HeartConfigRelatedCellFactory<SPACE_DIM>::SetCellParameters(AbstractCardiac
     {
         double drug_dose = HeartConfig::Instance()->GetDrugDose();
         std::map<std::string, std::pair<double, double> > ic50_values = HeartConfig::Instance()->GetIc50Values();
-        for (std::map<std::string, std::pair<double, double> >::iterator it = ic50_values.begin();
+        for (auto it = ic50_values.begin();
              it != ic50_values.end();
              ++it)
         {
@@ -302,7 +302,7 @@ void HeartConfigRelatedCellFactory<SPACE_DIM>::SetCellParameters(AbstractCardiac
     {
         if (mCellHeterogeneityAreas[ht_index]->DoesContain(this->GetMesh()->GetNode(nodeIndex)->GetPoint()))
         {
-            for (std::map<std::string, double>::iterator param_it = mParameterSettings[ht_index].begin();
+            for (auto param_it = mParameterSettings[ht_index].begin();
                  param_it != mParameterSettings[ht_index].end();
                  ++param_it)
             {

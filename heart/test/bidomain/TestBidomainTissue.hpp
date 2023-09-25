@@ -165,7 +165,7 @@ public:
         DistributedVector bidomain_ic = p_factory->CreateDistributedVector(bidomain_vec);
         DistributedVector::Stripe bidomain_voltage(bidomain_ic,0);
 
-        for (DistributedVector::Iterator index=monodomain_voltage.Begin();
+        for (auto index = monodomain_voltage.Begin();
              index != monodomain_voltage.End();
              ++index)
         {
@@ -392,7 +392,7 @@ public:
         media_types.push_back(cp::media_type::Axisymmetric);
         media_types.push_back(cp::media_type::NoFibreOrientation);
 
-        for (std::vector<cp::media_type>::iterator it = media_types.begin();
+        for (auto it = media_types.begin();
              it != media_types.end();
              ++it)
         {

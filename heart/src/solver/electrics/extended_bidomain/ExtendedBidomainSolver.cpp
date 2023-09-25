@@ -115,7 +115,7 @@ void ExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(
     DistributedVector::Stripe dist_vec_matrix_based_v_second_cell(dist_vec_matrix_based, 1);
     DistributedVector::Stripe dist_vec_matrix_based_phi_e(dist_vec_matrix_based, 2);
 
-    for (DistributedVector::Iterator index = dist_vec_matrix_based.Begin();
+    for (auto index = dist_vec_matrix_based.Begin();
          index!= dist_vec_matrix_based.End();
          ++index)
     {

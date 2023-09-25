@@ -88,7 +88,7 @@ public:
 
             double seq_local_ave_voltage = 0.0;
 
-            for (DistributedVector::Iterator index = dist_nondistributed_voltage.Begin();
+            for (auto index = dist_nondistributed_voltage.Begin();
                  index != dist_nondistributed_voltage.End();
                  ++index)
             {
@@ -132,7 +132,7 @@ public:
 
         double para_local_ave_voltage = 0.0;
 
-        for (DistributedVector::Iterator index = dist_distributed_voltage.Begin();
+        for (auto index = dist_distributed_voltage.Begin();
              index != dist_distributed_voltage.End();
              ++index)
         {
@@ -195,7 +195,7 @@ public:
 
             double seq_local_ave_voltage = 0.0;
 
-            for (DistributedVector::Iterator index = dist_nondistributed_voltage.Begin();
+            for (auto index = dist_nondistributed_voltage.Begin();
                  index != dist_nondistributed_voltage.End();
                  ++index)
             {
@@ -241,7 +241,7 @@ public:
 
         double para_local_ave_voltage = 0.0;
 
-        for (DistributedVector::Iterator index = dist_distributed_voltage.Begin();
+        for (auto index = dist_distributed_voltage.Begin();
              index != dist_distributed_voltage.End();
              ++index)
         {
@@ -309,7 +309,7 @@ public:
 
             double seq_local_ave_voltage = 0.0;
 
-            for (DistributedVector::Iterator index = dist_nondistributed_voltage.Begin();
+            for (auto index = dist_nondistributed_voltage.Begin();
                  index != dist_nondistributed_voltage.End();
                  ++index)
             {
@@ -346,7 +346,7 @@ public:
 
         double para_local_ave_voltage = 0.0;
 
-        for (DistributedVector::Iterator index = dist_distributed_voltage.Begin();
+        for (auto index = dist_distributed_voltage.Begin();
              index != dist_distributed_voltage.End();
              ++index)
         {

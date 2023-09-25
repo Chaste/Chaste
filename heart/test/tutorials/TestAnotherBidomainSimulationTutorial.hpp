@@ -166,7 +166,7 @@ public:
         DistributedVector::Stripe extracellular_potential(dist_bidomain_voltage, 1);
 
         /* A loop over all the components owned by this process.. */
-        for (DistributedVector::Iterator index = dist_bidomain_voltage.Begin();
+        for (auto index = dist_bidomain_voltage.Begin();
              index != dist_bidomain_voltage.End();
              ++index)
         {

@@ -75,7 +75,7 @@ void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Solve(double time, d
 
     // now update state variables, and set lambda at last timestep. Note
     // stretches were set in AssembleOnElement
-    for (std::map<unsigned,DataAtQuadraturePoint>::iterator iter = this->mQuadPointToDataAtQuadPointMap.begin();
+    for (auto iter = this->mQuadPointToDataAtQuadPointMap.begin();
          iter != this->mQuadPointToDataAtQuadPointMap.end();
          iter++)
     {

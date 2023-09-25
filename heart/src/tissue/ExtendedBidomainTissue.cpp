@@ -90,7 +90,7 @@ ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(AbstractCardiacCellFac
         // Should really do this for other processes too, but this is all we need
         // to get memory testing to pass, and leaking when we're about to die isn't
         // that bad! Delete second cells
-        for (std::vector<AbstractCardiacCellInterface*>::iterator cell_iterator = mCellsDistributedSecondCell.begin();
+        for (auto cell_iterator = mCellsDistributedSecondCell.begin();
              cell_iterator != mCellsDistributedSecondCell.end();
              ++cell_iterator)
         {
@@ -438,7 +438,7 @@ template <unsigned SPACE_DIM>
 ExtendedBidomainTissue<SPACE_DIM>::~ExtendedBidomainTissue()
 {
     // Delete (second) cells
-    for (std::vector<AbstractCardiacCellInterface*>::iterator cell_iterator = mCellsDistributedSecondCell.begin();
+    for (auto cell_iterator = mCellsDistributedSecondCell.begin();
          cell_iterator != mCellsDistributedSecondCell.end();
          ++cell_iterator)
     {
@@ -521,7 +521,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::SolveCellSystems(Vec existingSolution, d
     DistributedVector::Stripe V_second_cell(dist_solution, 1);
     DistributedVector::Stripe phi_e(dist_solution, 2);
 
-    for (DistributedVector::Iterator index = dist_solution.Begin();
+    for (auto index = dist_solution.Begin();
          index != dist_solution.End();
          ++index)
     {

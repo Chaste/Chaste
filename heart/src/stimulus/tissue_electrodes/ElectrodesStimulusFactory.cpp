@@ -203,7 +203,7 @@ double ElectrodesStimulusFactory<DIM>::ComputeElectrodeTotalFlux(AbstractChasteR
             assert(node_index < this->mpMesh->GetNumNodes());
             double contribution_of_this_node = 0.0;
             // Loop over the elements where this node is contained
-            for (std::set<unsigned>::iterator iter = this->mpMesh->GetNode(node_index)->rGetContainingElementIndices().begin();
+            for (auto iter = this->mpMesh->GetNode(node_index)->rGetContainingElementIndices().begin();
                  iter != this->mpMesh->GetNode(node_index)->rGetContainingElementIndices().end();
                  ++iter)
             {

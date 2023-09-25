@@ -457,7 +457,7 @@ boost::shared_ptr<cp::chaste_parameters_type> HeartConfig::ReadFile(const std::s
     ::xml_schema::properties props;
     if (mUseFixedSchemaLocation)
     {
-        for (SchemaLocationsMap::iterator it = mSchemaLocations.begin();
+        for (auto it = mSchemaLocations.begin();
              it != mSchemaLocations.end();
              ++it)
         {

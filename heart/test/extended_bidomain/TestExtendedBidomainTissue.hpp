@@ -213,7 +213,7 @@ public:
         DistributedVector::Stripe voltage_second_cell(extended_bidomain_potentials,1);
         DistributedVector::Stripe phi_e(extended_bidomain_potentials,2);
 
-        for (DistributedVector::Iterator index=extended_bidomain_potentials.Begin();
+        for (auto index = extended_bidomain_potentials.Begin();
              index != extended_bidomain_potentials.End();
              ++index)
         {
@@ -462,7 +462,7 @@ public:
 
         Vec vector =  mesh.GetDistributedVectorFactory()->CreateVec();
         DistributedVector dist_solution = mesh.GetDistributedVectorFactory()->CreateDistributedVector(vector);
-        for (DistributedVector::Iterator index = dist_solution.Begin();
+        for (auto index = dist_solution.Begin();
              index != dist_solution.End();
              ++index)
         {

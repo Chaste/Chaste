@@ -287,7 +287,7 @@ private:
 
                 DistributedVector::Stripe mSolution_vm(mSolution_distri,0);
 
-                for (DistributedVector::Iterator index = mSolution_distri.Begin();
+                for (auto index = mSolution_distri.Begin();
                      index != mSolution_distri.End();
                      ++index)
                 {
@@ -306,7 +306,7 @@ private:
                 DistributedVector::Stripe mSolution_vm(mSolution_distri,0);
                 DistributedVector::Stripe mSolution_phie(mSolution_distri,1);
 
-                for (DistributedVector::Iterator index = mSolution_distri.Begin();
+                for (auto index = mSolution_distri.Begin();
                      index != mSolution_distri.End();
                      ++index)
                 {

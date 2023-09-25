@@ -198,7 +198,7 @@ public:
 
         // Reset the voltage vector from ODE systems
         DistributedVector dist_voltage = mesh.GetDistributedVectorFactory()->CreateDistributedVector(voltage);
-        for (DistributedVector::Iterator index = dist_voltage.Begin();
+        for (auto index = dist_voltage.Begin();
              index != dist_voltage.End();
              ++index)
         {

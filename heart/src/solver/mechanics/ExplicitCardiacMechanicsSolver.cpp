@@ -97,7 +97,7 @@ void ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Solve(double time, d
     this->AssembleSystem(true,false);
 
     // integrate contraction models
-    for (std::map<unsigned,DataAtQuadraturePoint>::iterator iter = this->mQuadPointToDataAtQuadPointMap.begin();
+    for (auto iter = this->mQuadPointToDataAtQuadPointMap.begin();
          iter != this->mQuadPointToDataAtQuadPointMap.end();
          iter++)
     {

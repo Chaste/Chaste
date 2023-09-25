@@ -191,7 +191,7 @@ public:
         {
             Vec phase_vec = factory.CreateVec();
             DistributedVector distributed_phase_vector = factory.CreateDistributedVector(phase_vec);
-            for (DistributedVector::Iterator index = distributed_phase_vector.Begin();
+            for (auto index = distributed_phase_vector.Begin();
                  index!= distributed_phase_vector.End();
                  ++index)
             {

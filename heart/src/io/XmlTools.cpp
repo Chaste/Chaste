@@ -324,7 +324,7 @@ xercesc::DOMElement* XmlTools::SetNamespace(xercesc::DOMDocument* pDocument,
     //PrintNode("   after attr fix", p_new_elt, true);
 
     std::vector<DOMElement*> children = GetChildElements(p_new_elt);
-    for (std::vector<DOMElement*>::iterator it = children.begin(); it != children.end(); ++it)
+    for (auto it = children.begin(); it != children.end(); ++it)
     {
         SetNamespace(pDocument, *it, pNamespace);
     }

@@ -104,8 +104,7 @@ private:
         // We have made new smart pointers to dummy modifiers via the constructor, so instead of overwriting
         // these pointers with new pointers (leaving a memory leak), go through and make the existing pointers
         // point to the correct modifiers again!
-        std::map<std::string, boost::shared_ptr<AbstractModifier>* >::iterator iter;
-        for (iter = mModifiersMap.begin(); iter!= mModifiersMap.end(); ++iter)
+        for (auto iter = mModifiersMap.begin(); iter!= mModifiersMap.end(); ++iter)
         {
             boost::shared_ptr<AbstractModifier>* p_to_constructed_smart_pointer = (*iter).second;
             boost::shared_ptr<AbstractModifier> p_loaded;

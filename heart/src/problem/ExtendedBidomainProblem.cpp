@@ -88,7 +88,7 @@ Vec ExtendedBidomainProblem<DIM>::CreateInitialCondition()
     stripe.push_back(DistributedVector::Stripe(ic, 1));
     stripe.push_back(DistributedVector::Stripe(ic, 2));
 
-    for (DistributedVector::Iterator index = ic.Begin();
+    for (auto index = ic.Begin();
          index != ic.End();
          ++index)
     {
@@ -395,7 +395,7 @@ void ExtendedBidomainProblem<DIM>::WriteOneStep(double time, Vec voltageVec)
     DistributedVector::Stripe wrapped_ordered_solution_second_stripe(wrapped_ordered_solution,1);
     DistributedVector::Stripe wrapped_ordered_solution_third_stripe(wrapped_ordered_solution,2);
 
-    for (DistributedVector::Iterator index = wrapped_solution.Begin();
+    for (auto index = wrapped_solution.Begin();
          index != wrapped_solution.End();
          ++index)
     {

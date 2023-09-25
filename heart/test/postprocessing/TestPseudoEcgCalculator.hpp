@@ -107,7 +107,7 @@ public:
         for (unsigned time_step=0; time_step<number_of_time_steps; time_step++)
         {
             // Write some values, the value of V is the same as the x coordinate, i.e. a gradient
-            for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+            for (auto index = distributed_vector_1.Begin();
                  index!= distributed_vector_1.End();
                  ++index)
             {
@@ -218,10 +218,10 @@ public:
 
         //4 time steps
         unsigned number_of_time_steps = 4;
-        for (unsigned time_step=0; time_step<number_of_time_steps; time_step++)
+        for (unsigned time_step = 0; time_step < number_of_time_steps; time_step++)
         {
             // Write some values, the value of V is x^2, i.e. a parabola
-            for (DistributedVector::Iterator index = distributed_vector_1.Begin();
+            for (auto index = distributed_vector_1.Begin();
                  index!= distributed_vector_1.End();
                  ++index)
             {

@@ -565,18 +565,16 @@ public:
             reader.GetVariableOverNodes(data, "UpstrokeTimeMap_0");
             DistributedVector distributed_vector = factory.CreateDistributedVector(data);
 
-            for (DistributedVector::Iterator index = distributed_vector.Begin();
-                                 index!= distributed_vector.End();
-                                 ++index)
+            for (auto index = distributed_vector.Begin();
+                 index != distributed_vector.End();
+                 ++index)
             {
                 TS_ASSERT_DELTA(distributed_vector[index], reference[index.Global], 1e-9);
             }
 
             PetscTools::Destroy(data);
-
         }
     }
 };
-
 
 #endif /*TESTPOSTPROCESSINGWRITER_HPP_*/

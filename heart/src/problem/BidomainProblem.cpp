@@ -106,7 +106,7 @@ Vec BidomainProblem<DIM>::CreateInitialCondition()
         DistributedVector ic = this->mpMesh->GetDistributedVectorFactory()->CreateDistributedVector(init_cond);
         DistributedVector::Stripe voltage_stripe = DistributedVector::Stripe(ic,0);
 
-        for (DistributedVector::Iterator index = ic.Begin();
+        for (auto index = ic.Begin();
              index!= ic.End();
              ++index)
         {

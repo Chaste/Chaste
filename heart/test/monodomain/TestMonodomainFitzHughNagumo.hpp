@@ -116,7 +116,7 @@ public:
         need_initialisation = true;
 
         // Test the RHS of the mesh
-        for (DistributedVector::Iterator node_index = voltage.Begin();
+        for (auto node_index = voltage.Begin();
              node_index != voltage.End();
              ++node_index)
         {

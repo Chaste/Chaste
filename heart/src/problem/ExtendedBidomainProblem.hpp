@@ -216,7 +216,7 @@ class ExtendedBidomainProblem : public AbstractCardiacProblem<DIM,DIM, 3>
             DistributedVector::Stripe mSolution_V_2(mSolution_distri,1);
             DistributedVector::Stripe mSolution_phie(mSolution_distri,2);
 
-            for (DistributedVector::Iterator index = mSolution_distri.Begin();
+            for (auto index = mSolution_distri.Begin();
                  index != mSolution_distri.End();
                  ++index)
             {

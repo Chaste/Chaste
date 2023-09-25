@@ -125,7 +125,7 @@ public:
 
         // The idea is to check that the error stays O(h)
         double tolerance = 100*spatial_step;
-        for (DistributedVector::Iterator index = standard_solution.Begin();
+        for (auto index = standard_solution.Begin();
              index != standard_solution.End();
              ++index)
         {

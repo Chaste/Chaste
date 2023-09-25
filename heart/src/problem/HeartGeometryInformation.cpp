@@ -213,7 +213,7 @@ void HeartGeometryInformation<SPACE_DIM>::GetNodesAtSurface(
     if (mpMesh->rGetNodePermutation().empty())
     {
         // Copy the node indexes from the set to the vector as they are
-        for (std::set<unsigned>::iterator node_index_it=surface_original_node_index_set.begin();
+        for (auto node_index_it = surface_original_node_index_set.begin();
             node_index_it != surface_original_node_index_set.end();
             node_index_it++)
         {
@@ -223,7 +223,7 @@ void HeartGeometryInformation<SPACE_DIM>::GetNodesAtSurface(
     else
     {
         // Copy the original node indices from the set to the vector applying the permutation
-        for (std::set<unsigned>::iterator node_index_it=surface_original_node_index_set.begin();
+        for (auto node_index_it = surface_original_node_index_set.begin();
             node_index_it != surface_original_node_index_set.end();
             node_index_it++)
         {

@@ -94,7 +94,7 @@ public:
 
         // The idea is to check that the error stays O(h)
         double tolerance = 30*spatial_step;
-        for (DistributedVector::Iterator index = standard_solution.Begin();
+        for (auto index = standard_solution.Begin();
              index != standard_solution.End();
              ++index)
         {
@@ -149,7 +149,7 @@ public:
 
         // Solutions should agree closely
         double tolerance = 1e-6;
-        for (DistributedVector::Iterator index = standard_solution.Begin();
+        for (auto index = standard_solution.Begin();
              index != standard_solution.End();
              ++index)
         {

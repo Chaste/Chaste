@@ -95,7 +95,7 @@ Vec AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::GenerateNullBasis() c
     DistributedVector::Stripe null_basis_stripe_0(dist_null_basis,0);
     DistributedVector::Stripe null_basis_stripe_1(dist_null_basis,1);
     DistributedVector::Stripe null_basis_stripe_2(dist_null_basis,2);
-    for (DistributedVector::Iterator index = dist_null_basis.Begin();
+    for (auto index = dist_null_basis.Begin();
          index != dist_null_basis.End();
          ++index)
     {
@@ -175,8 +175,8 @@ void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::CheckCompatibilityCo
     DistributedVector distributed_rhs=this->mpMesh->GetDistributedVectorFactory()->CreateDistributedVector(this->mpLinearSystem->rGetRhsVector());
     DistributedVector::Stripe distributed_rhs_phi_entries(distributed_rhs,2); // stripe number 2 -> phi_e
 
-    double local_sum=0;
-    for (DistributedVector::Iterator index = distributed_rhs.Begin();
+    double local_sum = 0;
+    for (auto index = distributed_rhs.Begin();
          index!= distributed_rhs.End();
          ++index)
     {

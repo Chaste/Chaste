@@ -221,7 +221,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteOutputDataToHdf5(const s
     {
         Vec apd_vec = p_factory->CreateVec();
         DistributedVector distributed_vector = p_factory->CreateDistributedVector(apd_vec);
-        for (DistributedVector::Iterator index = distributed_vector.Begin();
+        for (auto index = distributed_vector.Begin();
              index!= distributed_vector.End();
              ++index)
         {

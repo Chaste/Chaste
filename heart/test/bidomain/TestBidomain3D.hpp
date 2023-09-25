@@ -171,7 +171,7 @@ public:
         DistributedVector bidomain_solution = bidomain_problem.GetSolutionDistributedVector();
         DistributedVector::Stripe bidomain_voltage(bidomain_solution,0);
         DistributedVector::Stripe extracellular_potential(bidomain_solution,1);
-        for (DistributedVector::Iterator index = bidomain_solution.Begin();
+        for (auto index = bidomain_solution.Begin();
              index != bidomain_solution.End();
              ++index)
         {

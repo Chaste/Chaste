@@ -275,7 +275,7 @@ Vec AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::CreateInitialCo
         stripe.push_back(DistributedVector::Stripe(ic, i));
     }
 
-    for (DistributedVector::Iterator index = ic.Begin();
+    for (auto index = ic.Begin();
          index != ic.End();
          ++index)
     {
@@ -784,7 +784,7 @@ void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::WriteExtraVari
         DistributedVector distributed_var_data = this->mpMesh->GetDistributedVectorFactory()->CreateDistributedVector(variable_data);
 
         // Loop over the local nodes and gather the data
-        for (DistributedVector::Iterator index = distributed_var_data.Begin();
+        for (auto index = distributed_var_data.Begin();
              index != distributed_var_data.End();
              ++index)
         {
