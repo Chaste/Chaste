@@ -193,10 +193,11 @@ class ProcessValgrind:
             tuple: branch name, commit SHA
         """
 
-        # Most likely, we're on GitHub actions, and we can get the info we need from environment variables
-        if os.environ.get('GITHUB_ACTIONS') == 'true':
-            branch = os.environ.get('GITHUB_REF_NAME')
-            commit = os.environ.get('GITHUB_SHA')
+        # Most likely, we're on GitHub actions, and we can get the info we need from environment variables that are
+        # set to appropriate values in the memory-testing.yml workflow file
+        branch = os.environ.get('Chaste_GH_WORKFLOW_BRANCH')
+        commit = os.environ.get('Chaste_GH_WORKFLOW_SHA')
+        if branch and commit:
             return branch, commit
 
         # Otherwise, we interrogate the Git repository directly

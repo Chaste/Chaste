@@ -29,6 +29,18 @@ jobs:
         id: get-datetime
         run: echo "datetime=$(date +%Y-%m-%d_%H-%M-%S)" >> $GITHUB_OUTPUT
 
+      - name: set environment for pull request
+        run: |
+          echo "Chaste_GH_WORKFLOW_BRANCH=${{ github.head_ref }}" >> $GITHUB_ENV
+          echo "Chaste_GH_WORKFLOW_SHA=${{ github.sha }}" >> $GITHUB_ENV
+        if: github.event_name == 'pull_request'
+
+      - name: set environment for push or workflow dispatch
+        run: |
+          echo "Chaste_GH_WORKFLOW_BRANCH=${{ github.ref_name }}" >> $GITHUB_ENV
+          echo "Chaste_GH_WORKFLOW_SHA=${{ github.sha }}" >> $GITHUB_ENV
+        if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch')
+
       - name: checkout Chaste
         uses: actions/checkout@v3
         with:
