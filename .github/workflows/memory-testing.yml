@@ -32,7 +32,7 @@ jobs:
       - name: set environment for pull request
         run: |
           echo "Chaste_GH_WORKFLOW_BRANCH=${{ github.head_ref }}" >> $GITHUB_ENV
-          echo "Chaste_GH_WORKFLOW_SHA=${{ github.sha }}" >> $GITHUB_ENV
+          echo "Chaste_GH_WORKFLOW_SHA=${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
         if: github.event_name == 'pull_request'
 
       - name: set environment for push or workflow dispatch
