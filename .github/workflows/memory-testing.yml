@@ -53,15 +53,15 @@ jobs:
           mkdir -p ${CHASTE_TEST_OUTPUT}
 
       - name: cmake configure
-        run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_MEMORY_TESTING_CPUS=6 ..
+        run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_MEMORY_TESTING_CPUS=10 ..
         working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
 #      - name: build continuous test pack
-#        run: cmake --build . --target Continuous --parallel 6
+#        run: cmake --build . --target Continuous --parallel 10
 #        working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
       - name: run memtest
-        run: cmake --build . --target memtest --parallel 6
+        run: cmake --build . --target memtest --parallel 10
         working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
       - name: check if index file successfully created
