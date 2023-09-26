@@ -40,7 +40,7 @@ jobs:
       working-directory: chaste-build-dir
 
     - name: build continuous test pack
-      run: cmake --build . --parallel 2 --target Continuous
+      run: cmake --build . --parallel 10 --target Continuous
       working-directory: chaste-build-dir
 
     - name: run continuous test pack
