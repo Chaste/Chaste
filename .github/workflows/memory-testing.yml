@@ -110,3 +110,8 @@ jobs:
           git push
         working-directory: ${{ env.MEMTEST_DIR }}
         if: always() && steps.index-exists.outputs.index == 'True'
+
+      - name: results URL on chaste.github.io
+        run: |
+          echo https://chaste.github.io/memory-testing/${{ steps.get-datetime.outputs.datetime }}/index.html
+        if: always() && steps.index-exists.outputs.index == 'True'
