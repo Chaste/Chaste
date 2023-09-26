@@ -55,7 +55,7 @@ private:
     std::set< Node<DIM>* > mNodesContained;
 
     /** Elements contained in this box. */
-    std::set< Element<DIM,DIM>* > mElementsContained;
+    std::set< Element<DIM, DIM>* > mElementsContained;
 
 public:
 
@@ -80,13 +80,13 @@ public:
      * An element to this box.
      * @param pElement address of the element to be added
      */
-    void AddElement(Element<DIM,DIM>* pElement);
+    void AddElement(Element<DIM, DIM>* pElement);
 
     /** @return all the nodes in this box. */
     std::set< Node<DIM>* >& rGetNodesContained();
 
     /** @return all the elements in this box. */
-    std::set< Element<DIM,DIM>* >& rGetElementsContained();
+    std::set< Element<DIM, DIM>* >& rGetElementsContained();
 };
 
 #endif /*BOX_HPP_*/

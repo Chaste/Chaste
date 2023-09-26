@@ -43,7 +43,7 @@ Cylindrical2dNodesOnlyMesh::Cylindrical2dNodesOnlyMesh(double width)
     assert(width > 0.0);
 }
 
-void Cylindrical2dNodesOnlyMesh::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*2> domainSize, int numLocalRows, c_vector<bool,2> isDimPeriodic)
+void Cylindrical2dNodesOnlyMesh::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*2> domainSize, int numLocalRows, c_vector<bool, 2> isDimPeriodic)
 {
     // Ensure that the width is a multiple of cut-off length
     if (fmod( mWidth,cutOffLength ) > 1e-14)
@@ -80,7 +80,7 @@ double Cylindrical2dNodesOnlyMesh::GetWidth(const unsigned& rDimension) const
     }
     else
     {
-        width = MutableMesh<2,2>::GetWidth(rDimension);
+        width = MutableMesh<2, 2>::GetWidth(rDimension);
     }
     return width;
 }
@@ -155,7 +155,7 @@ void Cylindrical2dNodesOnlyMesh::RefreshMesh()
 
     // Check if the x values are in the domain, if not, get the fmod and relocate.
     unsigned num_nodes = mNodes.size();
-    for (unsigned i=0; i<num_nodes; ++i)
+    for (unsigned i = 0; i<num_nodes; ++i)
     {
         double& x_location = (mNodes[i]->rGetModifiableLocation())[0];
         if (x_location < 0.0)

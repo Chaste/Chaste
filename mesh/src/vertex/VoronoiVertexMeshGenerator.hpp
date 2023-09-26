@@ -62,7 +62,7 @@ class VoronoiVertexMeshGenerator
 protected:
 
     /** A pointer to the mesh that this class creates. */
-    boost::shared_ptr<MutableVertexMesh<2,2> > mpMesh;
+    boost::shared_ptr<MutableVertexMesh<2, 2> > mpMesh;
 
     /** A pointer to a toroidal vertex mesh (allowing for doubly periodic boundaries), whose creation is optional. */
     boost::shared_ptr<Toroidal2dVertexMesh > mpTorMesh;
@@ -169,7 +169,7 @@ protected:
      * @param width the periodic width of the mesh
      * @param height the periodic height of the mesh
      */
-    bool CheckForCongruentNodes(MutableVertexMesh<2,2>* pMesh, double width, double height);
+    bool CheckForCongruentNodes(MutableVertexMesh<2, 2>* pMesh, double width, double height);
 
 public:
 
@@ -207,12 +207,12 @@ public:
     /**
      * @return A pointer to a 2D mutable vertex mesh
      */
-    virtual boost::shared_ptr<MutableVertexMesh<2,2> > GetMesh();
+    virtual boost::shared_ptr<MutableVertexMesh<2, 2> > GetMesh();
 
     /**
      * @return A pointer to a 2D mutable vertex mesh, after ReMesh() has been called to remove short edges
      */
-    virtual boost::shared_ptr<MutableVertexMesh<2,2> > GetMeshAfterReMesh();
+    virtual boost::shared_ptr<MutableVertexMesh<2, 2> > GetMeshAfterReMesh();
 
     /**
      * @return A pointer to a 2D toroidal vertex mesh with periodic boundaries

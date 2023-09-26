@@ -45,10 +45,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////////
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM>::CmguiMeshWriter(const std::string& rDirectory,
+CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::CmguiMeshWriter(const std::string& rDirectory,
                                                         const std::string& rBaseName,
                                                         bool cleanDirectory)
-        : AbstractTetrahedralMeshWriter<ELEMENT_DIM,SPACE_DIM>(rDirectory, rBaseName, cleanDirectory)
+        : AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory, rBaseName, cleanDirectory)
 {
     this->mIndexFromZero = false;
     mGroupName = this->mBaseName;
@@ -85,14 +85,14 @@ CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM>::CmguiMeshWriter(const std::string& rDire
 
     mNumNodesPerElement = ELEMENT_DIM+1;
     mReordering.resize(mNumNodesPerElement);
-    for (unsigned i=0; i<mNumNodesPerElement; ++i)
+    for (unsigned i = 0; i<mNumNodesPerElement; ++i)
     {
         mReordering[i] = i;
     }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteFiles()
+void CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 {
     //////////////////////////
     // Write the exnode file
@@ -101,12 +101,12 @@ void CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteFiles()
     WriteNodeFileHeader(p_node_file);
 
     // Write each node's data
-    for (unsigned item_num=0; item_num<this->GetNumNodes(); item_num++)
+    for (unsigned item_num = 0; item_num<this->GetNumNodes(); item_num++)
     {
         std::vector<double> current_item = this->GetNextNode();
 
         *p_node_file << "Node:\t" << item_num+1 << "\t";
-        for (unsigned i=0; i<SPACE_DIM; ++i)
+        for (unsigned i = 0; i<SPACE_DIM; ++i)
         {
             *p_node_file << current_item[i] << "\t";
         }
@@ -123,7 +123,7 @@ void CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteFiles()
     WriteElementsFileHeader(elem_files);
 
     // Write each elements's data
-    for (unsigned item_num=0; item_num<this->GetNumElements(); item_num++)
+    for (unsigned item_num = 0; item_num<this->GetNumElements(); item_num++)
     {
         ElementData elem =this->GetNextElement();
         std::vector<unsigned> current_element = elem.NodeIndices;
@@ -132,7 +132,7 @@ void CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteFiles()
         assert(elem.AttributeValue < mRegionNames.size());
 
         *elem_files[elem.AttributeValue] << "Element:\t" << item_num+1 << " 0 0 Nodes:\t";
-        for (unsigned i=0; i<mNumNodesPerElement; ++i)
+        for (unsigned i = 0; i<mNumNodesPerElement; ++i)
         {
             *elem_files[elem.AttributeValue] << current_element[mReordering[i]]+1 << "\t";
         }
@@ -141,20 +141,20 @@ void CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteFiles()
 
     }
 
-    for (unsigned region_index=0; region_index<mRegionNames.size(); region_index++)
+    for (unsigned region_index = 0; region_index<mRegionNames.size(); region_index++)
     {
         elem_files[region_index]->close();
     }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM>::SetAdditionalFieldNames(std::vector<std::string>& rFieldNames)
+void CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::SetAdditionalFieldNames(std::vector<std::string>& rFieldNames)
 {
     mAdditionalFieldNames = rFieldNames;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM>::SetRegionNames(std::vector<std::string>& rRegionNames)
+void CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::SetRegionNames(std::vector<std::string>& rRegionNames)
 {
     mRegionNames = rRegionNames;
 }
@@ -179,7 +179,7 @@ std::vector<boost::shared_ptr<std::ofstream> > CmguiMeshWriter<ELEMENT_DIM, SPAC
     elem_files.resize(mRegionNames.size());
 
     std::string directory = this->mpOutputFileHandler->GetOutputDirectoryFullPath();
-    for (unsigned region_index=0; region_index<mRegionNames.size(); region_index++)
+    for (unsigned region_index = 0; region_index<mRegionNames.size(); region_index++)
     {
         std::string elem_file_name = mRegionNames[region_index] + ".exelem";
 
@@ -203,7 +203,7 @@ std::vector<boost::shared_ptr<std::ofstream> > CmguiMeshWriter<ELEMENT_DIM, SPAC
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteNodeFileHeader(out_stream& rpNodeFile)
+void CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteNodeFileHeader(out_stream& rpNodeFile)
 {
     // Write provenance info
     std::string comment = "! " + ChasteBuildInfo::GetProvenanceString();
@@ -236,10 +236,10 @@ void CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteNodeFileHeader(out_stream& rpN
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteElementsFileHeader(std::vector<boost::shared_ptr<std::ofstream> >& rElemFiles)
+void CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteElementsFileHeader(std::vector<boost::shared_ptr<std::ofstream> >& rElemFiles)
 {
 
-       for (unsigned region_index=0; region_index<mRegionNames.size(); region_index++)
+       for (unsigned region_index = 0; region_index<mRegionNames.size(); region_index++)
        {
            // Write the elem header
 
@@ -303,7 +303,7 @@ void CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
     //Nodes first
     out_stream p_node_file = OpenNodeFile(true);
 
-    typedef typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator NodeIterType;
+    typedef typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator NodeIterType;
 
     for (NodeIterType iter = this->mpDistributedMesh->GetNodeIteratorBegin();
          iter != this->mpDistributedMesh->GetNodeIteratorEnd();
@@ -312,7 +312,7 @@ void CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
         const c_vector<double, SPACE_DIM>& r_current_item = iter->rGetLocation();
         *p_node_file << "Node:\t" << iter->GetIndex()+1 << "\t";
 
-        for (unsigned i=0; i<SPACE_DIM; ++i)
+        for (unsigned i = 0; i<SPACE_DIM; ++i)
         {
             *p_node_file << r_current_item[i] << "\t";
         }
@@ -324,7 +324,7 @@ void CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
     //Now Element files
 
     std::vector<boost::shared_ptr<std::ofstream> > elem_files = OpenElementFiles(true);
-    typedef typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator ElemIterType;
+    typedef typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator ElemIterType;
 
     for (ElemIterType iter = this->mpDistributedMesh->GetElementIteratorBegin();
          iter != this->mpDistributedMesh->GetElementIteratorEnd();
@@ -335,7 +335,7 @@ void CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
             assert(iter->GetUnsignedAttribute() < mRegionNames.size());//segfault guard
 
             *elem_files[iter->GetUnsignedAttribute()] << "Element:\t" << iter->GetIndex()+1 << " 0 0 Nodes:\t";
-            for (unsigned i=0; i<this->mNodesPerElement; ++i)
+            for (unsigned i = 0; i<this->mNodesPerElement; ++i)
             {
                 *elem_files[iter->GetUnsignedAttribute()]  << iter->GetNodeGlobalIndex(i)+1 << "\t";
             }
@@ -344,7 +344,7 @@ void CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
         }
     }
 
-    for (unsigned region_index=0; region_index<mRegionNames.size(); region_index++)
+    for (unsigned region_index = 0; region_index<mRegionNames.size(); region_index++)
     {
         elem_files[region_index]->close();
     }
@@ -373,9 +373,9 @@ std::ios_base::openmode CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetOpenMode(boo
 }
 
 // Explicit instantiation
-template class CmguiMeshWriter<1,1>;
-template class CmguiMeshWriter<1,2>;
-template class CmguiMeshWriter<1,3>;
-template class CmguiMeshWriter<2,2>;
-template class CmguiMeshWriter<2,3>;
-template class CmguiMeshWriter<3,3>;
+template class CmguiMeshWriter<1, 1>;
+template class CmguiMeshWriter<1, 2>;
+template class CmguiMeshWriter<1, 3>;
+template class CmguiMeshWriter<2, 2>;
+template class CmguiMeshWriter<2, 3>;
+template class CmguiMeshWriter<3, 3>;

@@ -289,7 +289,7 @@ public:
                               "You must first call ""CalculateDerivedQuantitiesAndParameters()"" in order to write derived quantities.");
 
         // Check solution and derived quantity for all times
-        for (unsigned i=0; i<solution.rGetSolutions().size(); ++i)
+        for (unsigned i = 0; i<solution.rGetSolutions().size(); ++i)
         {
             TS_ASSERT_DELTA(solution.rGetSolutions()[i][0], 5.0*solution.rGetTimes()[i], 1e-2);
              // (derived quantity = 2a+y)
@@ -307,7 +307,7 @@ public:
                               "No state variable, parameter, or derived quantity named \'sausages\'.");
         TS_ASSERT_THROWS_THIS(solution.GetVariableAtIndex(3),
                               "Invalid index passed to GetVariableAtIndex().");
-        for (unsigned i=0; i<solution.rGetTimes().size(); ++i)
+        for (unsigned i = 0; i<solution.rGetTimes().size(); ++i)
         {
             TS_ASSERT_DELTA(ys[i], 5*solution.rGetTimes()[i], 1e-9);
             TS_ASSERT_DELTA(as[i], 5, 1e-9);

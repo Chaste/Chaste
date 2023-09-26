@@ -145,16 +145,16 @@ public:
     // Test construction, accessors and Iterator
     void TestSmallMeshBasedCellPopulation1d2d3d()
     {
-        TestSmallMeshBasedCellPopulation<1,1>("mesh/test/data/1D_0_to_1_10_elements");
-        TestSmallMeshBasedCellPopulation<2,2>("mesh/test/data/square_4_elements");
-        TestSmallMeshBasedCellPopulation<3,3>("mesh/test/data/cube_136_elements");
+        TestSmallMeshBasedCellPopulation<1, 1>("mesh/test/data/1D_0_to_1_10_elements");
+        TestSmallMeshBasedCellPopulation<2, 2>("mesh/test/data/square_4_elements");
+        TestSmallMeshBasedCellPopulation<3, 3>("mesh/test/data/cube_136_elements");
     }
 
     // Test construction, accessors and Iterator
     void TestSmallMeshBasedCellPopulation2dIn3d()
     {
-        TestSmallMeshBasedCellPopulation<2,3>("cell_based/test/data/Simple2dMeshIn3d/Simple2dMeshIn3d");
-        TestSmallMeshBasedCellPopulation<2,3>("mesh/test/data/disk_in_3d");
+        TestSmallMeshBasedCellPopulation<2, 3>("cell_based/test/data/Simple2dMeshIn3d/Simple2dMeshIn3d");
+        TestSmallMeshBasedCellPopulation<2, 3>("mesh/test/data/disk_in_3d");
     }
 
     // Test get centroid
@@ -166,7 +166,7 @@ public:
         unsigned num_cells_depth = 2;
         unsigned num_cells_width = 2;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Set up cells, one for each node.
         std::vector<CellPtr> cells;
@@ -187,8 +187,8 @@ public:
     void TestValidateMeshBasedCellPopulation()
     {
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Set up cells, one for each node apart from one.
@@ -231,8 +231,8 @@ public:
     void TestCreateCellPair()
     {
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Set up cells, one for each node. Give each a birth time of -node_index,
@@ -264,7 +264,7 @@ public:
         unsigned num_cells_depth = 5;
         unsigned num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -329,7 +329,7 @@ public:
         unsigned num_cells_depth = 5;
         unsigned num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Set up cells, one for each node. Give each a birth time of -node_index,
         // so the age = node_index
@@ -367,8 +367,8 @@ public:
     void TestSetNodeAndAddCell()
     {
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         std::vector<CellPtr> cells;
@@ -380,7 +380,7 @@ public:
 
         // Test SetNode() by moving node 0 by a small amount
         auto cell_iter = cell_population.Begin();
-        c_vector<double,2> new_location = cell_population.GetLocationOfCellCentre(*cell_iter);
+        c_vector<double, 2> new_location = cell_population.GetLocationOfCellCentre(*cell_iter);
         new_location[0] += 1e-2;
         new_location[1] += 1e-2;
         ChastePoint<2> new_location_point(new_location);
@@ -401,11 +401,11 @@ public:
         CellPtr p_cell(new Cell(p_state, p_cell_cycle_model));
         p_cell->SetCellProliferativeType(p_stem_type);
         p_cell->SetBirthTime(-1);
-        c_vector<double,2> new_cell_location;
+        c_vector<double, 2> new_cell_location;
         new_cell_location[0] = 2;
         new_cell_location[1] = 2;
 
-        typedef FixedCentreBasedDivisionRule<2,2> FixedRule;
+        typedef FixedCentreBasedDivisionRule<2, 2> FixedRule;
         MAKE_PTR_ARGS(FixedRule, p_div_rule, (new_cell_location));
         cell_population.SetCentreBasedDivisionRule(p_div_rule);
 
@@ -437,8 +437,8 @@ public:
         EXIT_IF_PARALLEL;    // Cannot read cell populations in parallel.
 
         // Create a simple mesh
-        TrianglesMeshReader<2,3> mesh_reader("mesh/test/data/square_in_3d");
-        MutableMesh<2,3> mesh;
+        TrianglesMeshReader<2, 3> mesh_reader("mesh/test/data/square_in_3d");
+        MutableMesh<2, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         std::vector<CellPtr> cells;
@@ -446,7 +446,7 @@ public:
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         // Create a cell population, with no ghost nodes at the moment
-        MeshBasedCellPopulation<2,3> cell_population(mesh, cells);
+        MeshBasedCellPopulation<2, 3> cell_population(mesh, cells);
 
         // coverage of SetRestLength
         TS_ASSERT_THROWS_THIS(cell_population.SetRestLength(0,1,1.0),
@@ -515,8 +515,8 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
 
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Set up cells
@@ -663,7 +663,7 @@ public:
         nodes2d.push_back(new Node<2>(2, true, 1.0, 1.0));
         nodes2d.push_back(new Node<2>(3, true, 0.0, 1.0));
         nodes2d.push_back(new Node<2>(4, false, 0.5, 0.5));
-        MutableMesh<2,2> mesh2d(nodes2d);
+        MutableMesh<2, 2> mesh2d(nodes2d);
 
         // Create cells
         std::vector<CellPtr> cells2d;
@@ -713,7 +713,7 @@ public:
         nodes3d.push_back(new Node<3>(2, true,  1.0, 0.0, 1.0));
         nodes3d.push_back(new Node<3>(3, true,  0.0, 1.0, 1.0));
         nodes3d.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
-        MutableMesh<3,3> mesh3d(nodes3d);
+        MutableMesh<3, 3> mesh3d(nodes3d);
 
         // Create cells
         std::vector<CellPtr> cells3d;
@@ -744,7 +744,7 @@ public:
         // The faces are not all equal
         for (unsigned face_index = 0; face_index < 4; ++face_index)
         {
-            VertexElement<2,3>* p_face = cell_population3d.GetVoronoiTessellation()->GetFace(face_index);
+            VertexElement<2, 3>* p_face = cell_population3d.GetVoronoiTessellation()->GetFace(face_index);
 
             if (face_index == 1)
             {
@@ -760,12 +760,12 @@ public:
         TS_ASSERT_DELTA(cell_population3d.GetSurfaceAreaOfVoronoiElement(4), 3*1.125 + 1.9485, 1e-4);
 
         // Check that the Voronoi tessellation can be returned successfully as a reference
-        VertexMesh<3,3>* p_tessellation1 = cell_population3d.GetVoronoiTessellation();
+        VertexMesh<3, 3>* p_tessellation1 = cell_population3d.GetVoronoiTessellation();
         TS_ASSERT_EQUALS(p_tessellation1->GetNumNodes(), 4u);
 
         // Move node 0 by a small amount
         auto cell_iter = cell_population3d.Begin();
-        c_vector<double,3> new_location = cell_population3d.GetLocationOfCellCentre(*cell_iter);
+        c_vector<double, 3> new_location = cell_population3d.GetLocationOfCellCentre(*cell_iter);
         new_location[0] += 1e-2;
         new_location[1] += 1e-2;
         new_location[2] += 1e-2;
@@ -775,7 +775,7 @@ public:
         // Re-create Voronoi tessellation
         cell_population3d.CreateVoronoiTessellation();
 
-        VertexMesh<3,3>* p_tessellation2 = cell_population3d.GetVoronoiTessellation();
+        VertexMesh<3, 3>* p_tessellation2 = cell_population3d.GetVoronoiTessellation();
         TS_ASSERT_EQUALS(p_tessellation2->GetNumNodes(), 4u);
 
 //        TS_ASSERT_EQUALS(p_tessellation1->GetNumNodes(), 4u);
@@ -792,8 +792,8 @@ public:
         CellId::ResetMaxCellId();
 
         // Create a simple mesh-based cell population, comprising various cell types in various cell cycle phases
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         boost::shared_ptr<AbstractCellProperty> p_stem(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
@@ -978,8 +978,8 @@ public:
         CellId::ResetMaxCellId();
 
         // Create a simple mesh-based cell population, comprising various cell types in various cell cycle phases
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         boost::shared_ptr<AbstractCellProperty> p_stem(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
@@ -1105,7 +1105,7 @@ public:
         FileComparison(results_dir + "results.pvd", "cell_based/test/data/TestMeshBasedCellPopulationWriteResultsToFile/results.pvd").CompareFiles();
 
         // Read VTK file and check it doesn't cause any problems
-        VtkMeshReader<2,2> vtk_reader(results_dir + "/mesh_results_0.vtu");
+        VtkMeshReader<2, 2> vtk_reader(results_dir + "/mesh_results_0.vtu");
 
         std::vector<double> ages_data;
         vtk_reader.GetPointData("New Ages", ages_data);
@@ -1136,7 +1136,7 @@ public:
         nodes.push_back(new Node<3>(2, true,  1.0, 0.0, 1.0));
         nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 1.0));
         nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
-        MutableMesh<3,3> mesh(nodes);
+        MutableMesh<3, 3> mesh(nodes);
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -1222,8 +1222,8 @@ public:
     void TestGetLocationOfCellCentreAndGetNodeCorrespondingToCellAndGetWidth()
     {
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Set up cells, one for each node. Give each a birth time of -node_index,
@@ -1239,7 +1239,7 @@ public:
         for (auto cell_iter : cell_population)
         {
             // Record node location
-            c_vector<double,2> node_location = cell_population.GetLocationOfCellCentre(cell_iter);
+            c_vector<double, 2> node_location = cell_population.GetLocationOfCellCentre(cell_iter);
 
             // Test GetLocationOfCellCentre()
             TS_ASSERT_DELTA(node_location[0], cell_population.GetLocationOfCellCentre(cell_iter)[0], 1e-9);
@@ -1260,8 +1260,8 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Set up cells, one for each node. Give each a birth time of -node_index, so the age = node_index
@@ -1301,7 +1301,7 @@ public:
         std::string archive_file = "mesh_based_cell_population.arch";
         ArchiveLocationInfo::SetMeshFilename("mesh_based_cell_population_mesh");
 
-        std::vector<c_vector<double,2> > cell_locations;
+        std::vector<c_vector<double, 2> > cell_locations;
 
         // Archive a cell population
         {
@@ -1311,8 +1311,8 @@ public:
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
 
             // Create a simple mesh
-            TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-            MutableMesh<2,2> mesh;
+            TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+            MutableMesh<2, 2> mesh;
             mesh.ConstructFromMeshReader(mesh_reader);
 
             // Set up cells, one for each node. Give each a birth time of -node_index,
@@ -1418,7 +1418,7 @@ public:
         nodes.push_back(new Node<2>(3, false, 2, 0.5));
         nodes.push_back(new Node<2>(4, false, 2, 1.5));
 
-        MutableMesh<2,2> mesh(nodes);
+        MutableMesh<2, 2> mesh(nodes);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -1481,7 +1481,7 @@ public:
         nodes.push_back(new Node<2>(2, false, 1, 1));
         nodes.push_back(new Node<2>(3, false, 2, 0.5));
         nodes.push_back(new Node<2>(4, false, 2, 1.5));
-        MutableMesh<2,2> mesh(nodes);
+        MutableMesh<2, 2> mesh(nodes);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -1523,7 +1523,7 @@ public:
 
         // Create a simple mesh
         HoneycombMeshGenerator generator(4, 4, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -1555,7 +1555,7 @@ public:
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
         HoneycombMeshGenerator generator(2, 2);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -1563,7 +1563,7 @@ public:
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        TetrahedralMesh<2,2>* p_tet_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
+        TetrahedralMesh<2, 2>* p_tet_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
 
         // Check it has the correct number of nodes and elements
         TS_ASSERT_EQUALS(p_tet_mesh->GetNumNodes(), p_mesh->GetNumNodes());

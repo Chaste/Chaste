@@ -80,7 +80,7 @@ public:
     void Test1dCryptWithNoBirthOrDeath()
     {
         // Create a mesh with nodes equally spaced a unit distance apart
-        MutableMesh<1,1> mesh;
+        MutableMesh<1, 1> mesh;
         mesh.ConstructLinearMesh(21);
 
         ChastePoint<1> shifted_point;
@@ -91,7 +91,7 @@ public:
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned node_index=0; node_index<mesh.GetNumNodes(); ++node_index)
+        for (unsigned node_index = 0; node_index<mesh.GetNumNodes(); ++node_index)
         {
             FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
             CellPtr p_cell(new Cell(p_healthy_state, p_model));
@@ -117,7 +117,7 @@ public:
         simulator.Solve();
 
         // Note: converges very slowly so large tolerance of 0.1
-        for (unsigned index=0; index<mesh.GetNumNodes(); index++)
+        for (unsigned index = 0; index<mesh.GetNumNodes(); index++)
         {
             Node<1>* p_node = mesh.GetNode(index);
 
@@ -149,7 +149,7 @@ public:
         double crypt_length = 22.0;
 
         // Create a mesh with nodes equally spaced a unit distance apart
-        MutableMesh<1,1> mesh;
+        MutableMesh<1, 1> mesh;
         mesh.ConstructLinearMesh(24);
 
         // Set up cells
@@ -212,7 +212,7 @@ public:
         RandomNumberGenerator* p_rand_gen = RandomNumberGenerator::Instance();
 
         // Create a mesh with nodes equally spaced a unit distance apart
-        MutableMesh<1,1> mesh;
+        MutableMesh<1, 1> mesh;
         mesh.ConstructLinearMesh(22);
 
         MAKE_PTR(WildTypeCellMutationState, p_healthy_state);
@@ -314,7 +314,7 @@ public:
     void TestCalculateCellDivisionVector()
     {
         // Create a mesh with nodes equally spaced a unit distance apart
-        MutableMesh<1,1> mesh;
+        MutableMesh<1, 1> mesh;
         mesh.ConstructLinearMesh(3);
 
         // Set up cells by iterating through the nodes
@@ -383,7 +383,7 @@ public:
         RandomNumberGenerator* p_rand_gen = RandomNumberGenerator::Instance();
 
         // Create a mesh with nodes equally spaced a unit distance apart
-        MutableMesh<1,1> mesh;
+        MutableMesh<1, 1> mesh;
         mesh.ConstructLinearMesh(22);
 
         // Set up cells by iterating through the nodes
@@ -474,7 +474,7 @@ public:
         RandomNumberGenerator* p_rand_gen = RandomNumberGenerator::Instance();
 
         // Create a mesh with nodes equally spaced a unit distance apart
-        MutableMesh<1,1> mesh;
+        MutableMesh<1, 1> mesh;
         mesh.ConstructLinearMesh(22);
 
         // Set up cells by iterating through the nodes
@@ -565,7 +565,7 @@ public:
         double crypt_length = 5.0;
 
         // Create a mesh with nodes equally spaced a unit distance apart
-        MutableMesh<1,1> mesh;
+        MutableMesh<1, 1> mesh;
         mesh.ConstructLinearMesh(5);
 
         // For coverage, shift a node to a negative position
@@ -674,7 +674,7 @@ public:
         double crypt_length = 5.0;
 
         // Create a mesh with nodes equally spaced a unit distance apart
-        MutableMesh<1,1> mesh;
+        MutableMesh<1, 1> mesh;
         mesh.ConstructLinearMesh(3);
 
         // Set up cells by iterating through the nodes
@@ -773,7 +773,7 @@ public:
         RandomNumberGenerator* p_rand_gen = RandomNumberGenerator::Instance();
 
         // Create a mesh with nodes equally spaced a unit distance apart
-        MutableMesh<1,1> mesh;
+        MutableMesh<1, 1> mesh;
         mesh.ConstructLinearMesh(22);
 
         // Set up cells by iterating through the nodes
@@ -857,11 +857,11 @@ public:
         p_simulator1->Solve();
 
         // Save then reload and run from 0.2 to 0.25
-        MutableMesh<1,1>& r_mesh1 = (static_cast<MeshBasedCellPopulation<1>*>(&(p_simulator1->rGetCellPopulation())))->rGetMesh();
+        MutableMesh<1, 1>& r_mesh1 = (static_cast<MeshBasedCellPopulation<1>*>(&(p_simulator1->rGetCellPopulation())))->rGetMesh();
         CellBasedSimulationArchiver<1, CryptSimulation1d>::Save(p_simulator1);
 
         CryptSimulation1d* p_simulator2 = CellBasedSimulationArchiver<1, CryptSimulation1d>::Load("Crypt1DSaveAndLoad", 0.2);
-        MutableMesh<1,1>& r_mesh2 = (static_cast<MeshBasedCellPopulation<1>*>(&(p_simulator2->rGetCellPopulation())))->rGetMesh();
+        MutableMesh<1, 1>& r_mesh2 = (static_cast<MeshBasedCellPopulation<1>*>(&(p_simulator2->rGetCellPopulation())))->rGetMesh();
 
         TS_ASSERT_EQUALS(r_mesh1.GetNumAllNodes(), r_mesh2.GetNumAllNodes());
         TS_ASSERT_EQUALS(r_mesh1.GetNumNodes(), r_mesh2.GetNumNodes());
@@ -882,8 +882,8 @@ public:
         TS_ASSERT_EQUALS(r_mesh1.GetNumBoundaryElements(), r_mesh2.GetNumBoundaryElements());
         TS_ASSERT_EQUALS(r_mesh1.GetNumAllBoundaryElements(), r_mesh2.GetNumAllBoundaryElements());
 
-        MutableMesh<1,1>::ElementIterator it = r_mesh1.GetElementIteratorBegin();
-        MutableMesh<1,1>::ElementIterator it2 = r_mesh2.GetElementIteratorBegin();
+        MutableMesh<1, 1>::ElementIterator it = r_mesh1.GetElementIteratorBegin();
+        MutableMesh<1, 1>::ElementIterator it2 = r_mesh2.GetElementIteratorBegin();
         for (;
              it != r_mesh1.GetElementIteratorEnd();
              ++it, ++it2)
@@ -922,7 +922,7 @@ public:
         RandomNumberGenerator* p_rand_gen = RandomNumberGenerator::Instance();
 
         // Create a mesh with nodes equally spaced a unit distance apart
-        MutableMesh<1,1> mesh;
+        MutableMesh<1, 1> mesh;
         mesh.ConstructLinearMesh(22);
 
         // Set up cells by iterating through the nodes

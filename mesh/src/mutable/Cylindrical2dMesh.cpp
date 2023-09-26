@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* These lines are very useful for debugging (visualize with 'showme').
 #include "TrianglesMeshWriter.hpp"
-TrianglesMeshWriter<2,2> mesh_writer("Cylindrical2dMeshDebug", "mesh", false);
+TrianglesMeshWriter<2, 2> mesh_writer("Cylindrical2dMeshDebug", "mesh", false);
 mesh_writer.WriteFilesUsingMesh(*this);
 */
 #include "Cylindrical2dMesh.hpp"
@@ -45,7 +45,7 @@ mesh_writer.WriteFilesUsingMesh(*this);
 #include "VtkMeshWriter.hpp"
 
 Cylindrical2dMesh::Cylindrical2dMesh(double width)
-  : MutableMesh<2,2>(),
+  : MutableMesh<2, 2>(),
     mWidth(width),
     mHaloScalingFactor(2.0), // Default value
     mHaloOffset(1.0) // Default value
@@ -58,7 +58,7 @@ Cylindrical2dMesh::~Cylindrical2dMesh()
 }
 
 Cylindrical2dMesh::Cylindrical2dMesh(double width, std::vector<Node<2>* > nodes)
-  : MutableMesh<2,2>(),
+  : MutableMesh<2, 2>(),
     mWidth(width),    
     mHaloScalingFactor(2.0), // Default value
     mHaloOffset(1.0) // Default value
@@ -102,7 +102,7 @@ void Cylindrical2dMesh::CreateMirrorNodes()
     mLeftPeriodicBoundaryElementIndices.clear();
     mRightPeriodicBoundaryElementIndices.clear();
 
-    for (AbstractMesh<2,2>::NodeIterator node_iter = GetNodeIteratorBegin();
+    for (AbstractMesh<2, 2>::NodeIterator node_iter = GetNodeIteratorBegin();
          node_iter != GetNodeIteratorEnd();
          ++node_iter)
     {
@@ -133,7 +133,7 @@ void Cylindrical2dMesh::CreateMirrorNodes()
         location = mNodes[mLeftOriginals[i]]->rGetLocation();
         location[0] = location[0] + mWidth;
 
-        unsigned new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
+        unsigned new_node_index = MutableMesh<2, 2>::AddNode(new Node<2>(0, location));
         mLeftImages.push_back(new_node_index);
         mImageToLeftOriginalNodeMap[new_node_index] = mLeftOriginals[i];
     }
@@ -145,7 +145,7 @@ void Cylindrical2dMesh::CreateMirrorNodes()
         location = mNodes[mRightOriginals[i]]->rGetLocation();
         location[0] = location[0] - mWidth;
 
-        unsigned new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
+        unsigned new_node_index = MutableMesh<2, 2>::AddNode(new Node<2>(0, location));
         mRightImages.push_back(new_node_index);
         mImageToRightOriginalNodeMap[new_node_index] = mRightOriginals[i];
     }
@@ -176,11 +176,11 @@ void Cylindrical2dMesh::CreateHaloNodes()
        // Inserting top halo node in mesh
        location[0] = x_coordinate;
        location[1] = y_top_coordinate;
-       unsigned new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
+       unsigned new_node_index = MutableMesh<2, 2>::AddNode(new Node<2>(0, location));
        mTopHaloNodes.push_back(new_node_index);
 
        location[1] = y_bottom_coordinate;
-       new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
+       new_node_index = MutableMesh<2, 2>::AddNode(new Node<2>(0, location));
        mBottomHaloNodes.push_back(new_node_index);
     }
 }
@@ -215,7 +215,7 @@ void Cylindrical2dMesh::ReMesh(NodeMap& rMap)
      * of extra nodes which will be deleted, hence the name 'big_map'.
      */
     NodeMap big_map(GetNumAllNodes());
-    MutableMesh<2,2>::ReMesh(big_map);
+    MutableMesh<2, 2>::ReMesh(big_map);
 
     /*
      * If the big_map isn't the identity map, the little map ('map') needs to be
@@ -277,14 +277,14 @@ void Cylindrical2dMesh::ReMesh(NodeMap& rMap)
 
     while (elem_index<num_elements && !boundary_element_made)
     {
-        Element<2,2>* p_element = GetElement(elem_index);
+        Element<2, 2>* p_element = GetElement(elem_index);
         if (!p_element->IsDeleted())
         {
             boundary_element_made = true;
             std::vector<Node<2>*> nodes;
             nodes.push_back(p_element->GetNode(0));
             nodes.push_back(p_element->GetNode(1));
-            BoundaryElement<1,2>* p_boundary_element = new BoundaryElement<1,2>(0, nodes);
+            BoundaryElement<1, 2>* p_boundary_element = new BoundaryElement<1, 2>(0, nodes);
             p_boundary_element->RegisterWithNodes();
             mBoundaryElements.push_back(p_boundary_element);
             this->mBoundaryElementWeightedDirections.push_back(zero_vector<double>(2));
@@ -336,7 +336,7 @@ void Cylindrical2dMesh::ReconstructCylindricalMesh()
      * Figure out which elements have real nodes and image nodes in them
      * and replace image nodes with corresponding real ones.
      */
-    for (MutableMesh<2,2>::ElementIterator elem_iter = GetElementIteratorBegin();
+    for (MutableMesh<2, 2>::ElementIterator elem_iter = GetElementIteratorBegin();
          elem_iter != GetElementIteratorEnd();
          ++elem_iter)
     {
@@ -397,7 +397,7 @@ void Cylindrical2dMesh::ReconstructCylindricalMesh()
      */
     for (unsigned elem_index = 0; elem_index<GetNumAllBoundaryElements(); elem_index++)
     {
-        BoundaryElement<1,2>* p_boundary_element = GetBoundaryElement(elem_index);
+        BoundaryElement<1, 2>* p_boundary_element = GetBoundaryElement(elem_index);
         if (!p_boundary_element->IsDeleted())
         {
             unsigned number_of_image_nodes = 0;
@@ -511,7 +511,7 @@ void Cylindrical2dMesh::SetNode(unsigned index, ChastePoint<2> point, bool concr
     }
 
     // Update the node's location
-    MutableMesh<2,2>::SetNode(index, point, concreteMove);
+    MutableMesh<2, 2>::SetNode(index, point, concreteMove);
 }
 
 double Cylindrical2dMesh::GetWidth(const unsigned& rDimension) const
@@ -524,14 +524,14 @@ double Cylindrical2dMesh::GetWidth(const unsigned& rDimension) const
     }
     else
     {
-        width = MutableMesh<2,2>::GetWidth(rDimension);
+        width = MutableMesh<2, 2>::GetWidth(rDimension);
     }
     return width;
 }
 
 unsigned Cylindrical2dMesh::AddNode(Node<2>* pNewNode)
 {
-    unsigned node_index = MutableMesh<2,2>::AddNode(pNewNode);
+    unsigned node_index = MutableMesh<2, 2>::AddNode(pNewNode);
 
     // If necessary move it to be back on the cylinder
     ChastePoint<2> new_node_point = pNewNode->GetPoint();
@@ -562,14 +562,14 @@ void Cylindrical2dMesh::CorrectNonPeriodicMesh()
     // Go through all of the elements on the left periodic boundary
     for (auto left_iter : mLeftPeriodicBoundaryElementIndices)
     {
-        Element<2,2>* p_element = GetElement(left_iter);
+        Element<2, 2>* p_element = GetElement(left_iter);
 
         /*
          * Make lists of the nodes which the elements on the left contain and
          * the nodes which should be in a corresponding element on the right.
          */
-        c_vector<unsigned,3> original_element_node_indices;
-        c_vector<unsigned,3> corresponding_element_node_indices;
+        c_vector<unsigned, 3> original_element_node_indices;
+        c_vector<unsigned, 3> corresponding_element_node_indices;
         for (unsigned i = 0; i<3; ++i)
         {
             original_element_node_indices[i] = p_element->GetNodeGlobalIndex(i);
@@ -579,7 +579,7 @@ void Cylindrical2dMesh::CorrectNonPeriodicMesh()
         // Search the right hand side elements for the corresponding element
         for (auto right_iter : mRightPeriodicBoundaryElementIndices)
         {
-            Element<2,2>* p_corresponding_element = GetElement(right_iter);
+            Element<2, 2>* p_corresponding_element = GetElement(right_iter);
 
             bool is_corresponding_node = true;
 
@@ -650,7 +650,7 @@ void Cylindrical2dMesh::UseTheseElementsToDecideMeshing(std::set<unsigned>& rMai
     std::set<unsigned> main_four_nodes;
     for (auto left_iter : rMainSideElements)
     {
-        Element<2,2>* p_element = GetElement(left_iter);
+        Element<2, 2>* p_element = GetElement(left_iter);
         for (unsigned i = 0; i<3; ++i)
         {
             unsigned index = p_element->GetNodeGlobalIndex(i);
@@ -673,7 +673,7 @@ void Cylindrical2dMesh::UseTheseElementsToDecideMeshing(std::set<unsigned>& rMai
     std::vector<unsigned> corresponding_elements;
 
     // Loop over all elements
-    for (MutableMesh<2,2>::ElementIterator elem_iter = GetElementIteratorBegin();
+    for (MutableMesh<2, 2>::ElementIterator elem_iter = GetElementIteratorBegin();
          elem_iter != GetElementIteratorEnd();
          ++elem_iter)
     {
@@ -693,7 +693,7 @@ void Cylindrical2dMesh::UseTheseElementsToDecideMeshing(std::set<unsigned>& rMai
     unsigned num_elements = GetNumAllElements();
     for (auto iter : rMainSideElements)
     {
-        Element<2,2>* p_main_element = GetElement(iter);
+        Element<2, 2>* p_main_element = GetElement(iter);
         std::vector<Node<2>*> nodes;
 
         // Put corresponding nodes into a std::vector
@@ -704,7 +704,7 @@ void Cylindrical2dMesh::UseTheseElementsToDecideMeshing(std::set<unsigned>& rMai
         }
 
         // Make a new element
-        Element<2,2>* p_new_element = new Element<2,2>(num_elements, nodes);
+        Element<2, 2>* p_new_element = new Element<2, 2>(num_elements, nodes);
         this->mElements.push_back(p_new_element);
         this->mElementJacobians.push_back(zero_matrix<double>(2,2));
         this->mElementInverseJacobians.push_back(zero_matrix<double>(2,2));
@@ -725,7 +725,7 @@ void Cylindrical2dMesh::GenerateVectorsOfElementsStraddlingPeriodicBoundaries()
     unsigned incidences_of_zero_left_image_nodes = 0;
     unsigned incidences_of_zero_right_image_nodes = 0;
 
-    for (MutableMesh<2,2>::ElementIterator elem_iter = GetElementIteratorBegin();
+    for (MutableMesh<2, 2>::ElementIterator elem_iter = GetElementIteratorBegin();
          elem_iter != GetElementIteratorEnd();
          ++elem_iter)
     {

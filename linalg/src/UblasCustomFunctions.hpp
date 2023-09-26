@@ -70,7 +70,7 @@ inline T Determinant(const boost::numeric::ublas::c_matrix<T, 1, 1>& rM)
  * @param rM The matrix of which to find the determinant.
  */
 template<class T>
-T Determinant(const boost::numeric::ublas::c_matrix<T,2,2>& rM)
+T Determinant(const boost::numeric::ublas::c_matrix<T,2, 2>& rM)
 {
     using namespace boost::numeric::ublas;
 
@@ -106,7 +106,7 @@ template<class T>
 T Determinant(const boost::numeric::ublas::c_matrix<T, 3, 2>& rM)
 {
     using namespace boost::numeric::ublas;
-    c_matrix<T,2,2> product = prod(trans(rM), rM);
+    c_matrix<T,2, 2> product = prod(trans(rM), rM);
     return std::sqrt(Determinant(product));
 }
 
@@ -368,7 +368,7 @@ boost::numeric::ublas::c_matrix<T, 1, 1> Inverse(const boost::numeric::ublas::c_
 {
     using namespace boost::numeric::ublas;
 
-    c_matrix<T,1,1> inverse;
+    c_matrix<T,1, 1> inverse;
     T det = Determinant(rM);
     assert(fabs(det) > DBL_EPSILON); // else it is a singular matrix
     inverse(0,0) =  1.0/det;
@@ -601,7 +601,7 @@ T SecondInvariant(const c_matrix<T, 2, 2>& rM)
  * @param rA 3x3 matrix is question.  This should be symmetric and positive definite.
  * @return 3-vector corresponding to right-eigenvector in question
  */
-c_vector<double,3> CalculateEigenvectorForSmallestNonzeroEigenvalue(c_matrix<double, 3, 3>& rA);
+c_vector<double, 3> CalculateEigenvectorForSmallestNonzeroEigenvalue(c_matrix<double, 3, 3>& rA);
 
 /**
  * Helper function to get maximum eigenpair from a 3x3 matrix by the power method

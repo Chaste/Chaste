@@ -81,7 +81,7 @@ std::string AbstractParameterisedSystem<VECTOR>::GetStateMessage(const std::stri
     res << rMessage << std::endl << "State:" << std::endl;
     assert(rGetStateVariableNames().size()==GetVectorSize(Y));
     const std::vector<std::string>& r_units = rGetStateVariableUnits();
-    for (unsigned i=0; i<GetVectorSize(Y); ++i)
+    for (unsigned i = 0; i<GetVectorSize(Y); ++i)
     {
         res << "\t" << rGetStateVariableNames()[i] << ":" << GetVectorComponent(Y, i);
         if (!r_units.empty())
@@ -109,7 +109,7 @@ void AbstractParameterisedSystem<VECTOR>::CheckParametersOnLoad(const std::vecto
     // Check whether the archive specifies parameters that don't appear in this class,
     // and create a map from archive index to local index
     std::vector<unsigned> index_map(rParameterNames.size());
-    for (unsigned i=0; i<rParameterNames.size(); ++i)
+    for (unsigned i = 0; i<rParameterNames.size(); ++i)
     {
         index_map[i] = find(rGetParameterNames().begin(), rGetParameterNames().end(), rParameterNames[i])
                        - rGetParameterNames().begin();
@@ -119,7 +119,7 @@ void AbstractParameterisedSystem<VECTOR>::CheckParametersOnLoad(const std::vecto
         }
     }
 
-    for (unsigned i=0; i<rParameterNames.size(); ++i)
+    for (unsigned i = 0; i<rParameterNames.size(); ++i)
     {
         SetVectorComponent(mParameters,index_map[i],rParameters[i]);
     }
@@ -153,7 +153,7 @@ void AbstractParameterisedSystem<VECTOR>::SetStateVariables(const VECTOR& rState
     }
 
     CreateVectorIfEmpty(mStateVariables, mNumberOfStateVariables);
-    for (unsigned i=0; i<mNumberOfStateVariables; ++i)
+    for (unsigned i = 0; i<mNumberOfStateVariables; ++i)
     {
         SetVectorComponent(mStateVariables, i, GetVectorComponent(rStateVariables, i));
     }

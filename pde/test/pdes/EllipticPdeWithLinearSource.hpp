@@ -41,8 +41,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * The pde Div.(Grad u) + au + b = 0;
  */
-template <int SPACE_DIM>
-class EllipticPdeWithLinearSource : public AbstractLinearEllipticPde<SPACE_DIM,SPACE_DIM>
+template<int SPACE_DIM>
+class EllipticPdeWithLinearSource : public AbstractLinearEllipticPde<SPACE_DIM, SPACE_DIM>
 {
 private:
     double mCoeffOfU;
@@ -55,12 +55,12 @@ public:
         mConstant = constant;
     }
 
-    double ComputeConstantInUSourceTerm(const ChastePoint<SPACE_DIM>&, Element<SPACE_DIM,SPACE_DIM>*)
+    double ComputeConstantInUSourceTerm(const ChastePoint<SPACE_DIM>&, Element<SPACE_DIM, SPACE_DIM>*)
     {
         return mConstant;
     }
 
-    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<SPACE_DIM>&, Element<SPACE_DIM,SPACE_DIM>*)
+    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<SPACE_DIM>&, Element<SPACE_DIM, SPACE_DIM>*)
     {
         return mCoeffOfU;
     }

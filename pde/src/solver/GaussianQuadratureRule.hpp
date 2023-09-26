@@ -43,8 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * associated weights.
  *
  * Data is available for 1d, 2d and 3d quadrature over (canonical) triangles,
- * with appropriate numbers of Gauss points.  Weights sum to 1 and are non-negative.
- * The values are computed when an object is instantiated.
+ * with appropriate numbers of Gauss points.  Weights sum to 1 and are 
+ * non-negative. The values are computed when an object is instantiated.
  */
 template<unsigned ELEMENT_DIM>
 class GaussianQuadratureRule
@@ -68,7 +68,8 @@ public:
      * An exception is thrown if data is not available for the requested
      * parameters.
      *
-     * @param quadratureOrder The minimum polynomial order that the rule can integrate exactly
+     * @param quadratureOrder The minimum polynomial order that the rule can 
+     *     integrate exactly
      */
     explicit GaussianQuadratureRule(unsigned quadratureOrder);
 

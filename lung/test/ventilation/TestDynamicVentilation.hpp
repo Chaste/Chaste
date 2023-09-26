@@ -59,7 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 
 
-template <typename ACINAR_UNIT = SimpleBalloonAcinarUnit> class SimpleAcinarUnitFactory : public AbstractAcinarUnitFactory
+template<typename ACINAR_UNIT = SimpleBalloonAcinarUnit> class SimpleAcinarUnitFactory : public AbstractAcinarUnitFactory
 {
 public:
     SimpleAcinarUnitFactory(double acinarCompliance,

@@ -99,7 +99,7 @@ AbstractCardiacCellInterface* CellMLLoader::LoadCellMLFile(bool makeCvodeCell)
     return p_loaded_cell;
 }
 
-boost::shared_ptr<AbstractCardiacCell> CellMLLoader::LoadCardiacCell(void)
+boost::shared_ptr<AbstractCardiacCell> CellMLLoader::LoadCardiacCell()
 {
     AbstractCardiacCellInterface* p_loaded_cell = LoadCellMLFile(false);
     boost::shared_ptr<AbstractCardiacCell> p_model(dynamic_cast<AbstractCardiacCell*>(p_loaded_cell));
@@ -107,7 +107,7 @@ boost::shared_ptr<AbstractCardiacCell> CellMLLoader::LoadCardiacCell(void)
 }
 
 #ifdef CHASTE_CVODE
-boost::shared_ptr<AbstractCvodeCell> CellMLLoader::LoadCvodeCell(void)
+boost::shared_ptr<AbstractCvodeCell> CellMLLoader::LoadCvodeCell()
 {
     AbstractCardiacCellInterface* p_loaded_cell = LoadCellMLFile(true);
     boost::shared_ptr<AbstractCvodeCell> p_model(dynamic_cast<AbstractCvodeCell*>(p_loaded_cell));

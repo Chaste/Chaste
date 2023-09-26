@@ -84,12 +84,12 @@ void CellRosetteRankWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(
 }
 
 // Explicit instantiation
-template class CellRosetteRankWriter<1,1>;
-template class CellRosetteRankWriter<1,2>;
-template class CellRosetteRankWriter<2,2>;
-template class CellRosetteRankWriter<1,3>;
-template class CellRosetteRankWriter<2,3>;
-template class CellRosetteRankWriter<3,3>;
+template class CellRosetteRankWriter<1, 1>;
+template class CellRosetteRankWriter<1, 2>;
+template class CellRosetteRankWriter<2, 2>;
+template class CellRosetteRankWriter<1, 3>;
+template class CellRosetteRankWriter<2, 3>;
+template class CellRosetteRankWriter<3, 3>;
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer

@@ -212,7 +212,7 @@ void CheckCellModelResults(const std::string& rBaseResultsFilename,
     std::vector<double> valid_voltages = GetVoltages(valid_reader);
 
     TS_ASSERT_EQUALS(times.size(), valid_times.size());
-    for (unsigned i=0; i<valid_times.size(); ++i)
+    for (unsigned i = 0; i<valid_times.size(); ++i)
     {
         TS_ASSERT_DELTA(times[i], valid_times[i], 1e-12);
         TS_ASSERT_DELTA(voltages[i], valid_voltages[i], tolerance);
@@ -247,7 +247,7 @@ void CompareCellModelResults(std::string baseResultsFilename1, std::string baseR
     TS_ASSERT(times1.size() >= times2.size());
     double last_v = voltages2[0];
     double tol = tolerance;
-    for (unsigned i=0, j=0; i<times2.size(); ++i)
+    for (unsigned i=0, j = 0; i<times2.size(); ++i)
     {
         // Find corresponding time index
         while (j<times1.size() && times1[j] < times2[i] - 1e-12)

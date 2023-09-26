@@ -78,7 +78,7 @@ public:
         BidomainWithBathProblem<1> bidomain_problem( &bidomain_cell_factory );
         bidomain_problem.Initialise();
 
-        AbstractTetrahedralMesh<1,1>* p_mesh = &(bidomain_problem.rGetMesh());
+        AbstractTetrahedralMesh<1, 1>* p_mesh = &(bidomain_problem.rGetMesh());
 
         // the middle 4 elements are 'heart' elements (ie region=0),
         // so the middle 5 nodes should be heart nodes
@@ -86,7 +86,7 @@ public:
                        'T', 'T', 'T', 'T', 'T',
                        'B','B','B'};
 
-        for (unsigned i=0; i<11; ++i)
+        for (unsigned i = 0; i<11; ++i)
         {
             if (p_mesh->GetDistributedVectorFactory()->IsGlobalIndexLocal(i))
             {
@@ -131,8 +131,8 @@ public:
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> bidomain_cell_factory;
         BidomainWithBathProblem<1> bidomain_problem( &bidomain_cell_factory );
 
-        TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_100_elements");
-        DistributedTetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> reader("mesh/test/data/1D_0_to_1_100_elements");
+        DistributedTetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(reader);
 
         try
@@ -160,18 +160,18 @@ public:
         HeartConfig::Instance()->SetOutputDirectory("BidomainBath1d");
         HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain_bath_1d");
 
-        c_vector<double,1> centre;
+        c_vector<double, 1> centre;
         centre(0) = 0.5;
         BathCellFactory<1> cell_factory(-1e6, centre); // stimulates x=0.5 node
 
         BidomainWithBathProblem<1> bidomain_problem( &cell_factory );
 
-        TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_100_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> reader("mesh/test/data/1D_0_to_1_100_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(reader);
 
         // set the x<0.25 and x>0.75 regions as the bath region
-        for (unsigned i=0; i<mesh.GetNumElements(); ++i)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             double x = mesh.GetElement(i)->CalculateCentroid()[0];
             if ((x<0.25) || (x>0.75))
@@ -189,7 +189,7 @@ public:
         ReplicatableVector sol_repl(sol);
 
         // test V = 0 for all bath nodes
-        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             if (HeartRegionCode::IsRegionBath( mesh.GetNode(i)->GetRegion() )) // bath
             {
@@ -198,7 +198,7 @@ public:
         }
 
         // test symmetry of V and phi_e
-        for (unsigned i=0; i<=(mesh.GetNumNodes()-1)/2; ++i)
+        for (unsigned i = 0; i<=(mesh.GetNumNodes()-1)/2; ++i)
         {
             unsigned opposite = mesh.GetNumNodes()-i-1;
             TS_ASSERT_DELTA(sol_repl[2*i], sol_repl[2*opposite], 2e-3);      // V
@@ -221,27 +221,27 @@ public:
         HeartConfig::Instance()->SetOutputDirectory("BidomainBathOnlyBath");
         HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain_bath");
 
-        c_vector<double,1> centre;
+        c_vector<double, 1> centre;
         centre(0) = 0.5;
         BathCellFactory<1> cell_factory(-1e6, centre);
 
-        TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_10_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> reader("mesh/test/data/1D_0_to_1_10_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(reader);
 
-        for (unsigned i=0; i<mesh.GetNumElements(); ++i)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             mesh.GetElement(i)->SetAttribute(HeartRegionCode::GetValidBathId());
         }
 
         // create boundary conditions container
         double boundary_val = 1.0;
-        boost::shared_ptr<BoundaryConditionsContainer<1,1,2> > p_bcc(new BoundaryConditionsContainer<1,1,2>);
+        boost::shared_ptr<BoundaryConditionsContainer<1, 1, 2> > p_bcc(new BoundaryConditionsContainer<1, 1, 2>);
         ConstBoundaryCondition<1>* p_bc_stim = new ConstBoundaryCondition<1>(boundary_val);
         ConstBoundaryCondition<1>* p_zero_stim = new ConstBoundaryCondition<1>(0.0);
 
         // loop over boundary elements and set (sigma\gradphi).n = 1.0 on RHS edge
-        for (TetrahedralMesh<1,1>::BoundaryElementIterator iter
+        for (TetrahedralMesh<1, 1>::BoundaryElementIterator iter
               = mesh.GetBoundaryElementIteratorBegin();
            iter != mesh.GetBoundaryElementIteratorEnd();
            iter++)
@@ -271,7 +271,7 @@ public:
         ReplicatableVector sol_repl(sol);
 
         // test phi = x*boundary_val/sigma (solution of phi''=0, phi(0)=0, sigma*phi'(1)=boundary_val
-        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             double bath_cond = HeartConfig::Instance()->GetBathConductivity();
             double x = mesh.GetNode(i)->rGetLocation()[0];
@@ -286,14 +286,14 @@ public:
         HeartConfig::Instance()->SetOutputDirectory("BidomainBath2d");
         HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain_bath_2d");
 
-        c_vector<double,2> centre;
+        c_vector<double, 2> centre;
         centre(0) = 0.05;
         centre(1) = 0.05;
         BathCellFactory<2> cell_factory(-5e6, centre); // stimulates x=0.05 node
 
         BidomainWithBathProblem<2> bidomain_problem( &cell_factory );
 
-        DistributedTetrahedralMesh<2,2>* p_mesh = Load2dMeshAndSetCircularTissue<DistributedTetrahedralMesh<2,2> >(
+        DistributedTetrahedralMesh<2, 2>* p_mesh = Load2dMeshAndSetCircularTissue<DistributedTetrahedralMesh<2, 2> >(
             "mesh/test/data/2D_0_to_1mm_400_elements", 0.05, 0.05, 0.04);
 
         bidomain_problem.SetMesh(p_mesh);
@@ -305,7 +305,7 @@ public:
         ReplicatableVector sol_repl(sol);
 
         // test V = 0 for all bath nodes
-        for (AbstractTetrahedralMesh<2,2>::NodeIterator iter=p_mesh->GetNodeIteratorBegin();
+        for (AbstractTetrahedralMesh<2, 2>::NodeIterator iter=p_mesh->GetNodeIteratorBegin();
              iter != p_mesh->GetNodeIteratorEnd(); ++iter)
         {
             if (HeartRegionCode::IsRegionBath( (*iter).GetRegion() )) // bath
@@ -338,7 +338,7 @@ public:
 
         // need to create a cell factory but don't want any intra stim, so magnitude
         // of stim is zero.
-        c_vector<double,2> centre;
+        c_vector<double, 2> centre;
         centre(0) = 0.05; // cm
         centre(1) = 0.05; // cm
         BathCellFactory<2> cell_factory( 0.0, centre);
@@ -348,7 +348,7 @@ public:
         // Coverage
         TS_ASSERT(bidomain_problem.GetHasBath());
 
-        TetrahedralMesh<2,2>* p_mesh = Load2dMeshAndSetCircularTissue<TetrahedralMesh<2,2> >(
+        TetrahedralMesh<2, 2>* p_mesh = Load2dMeshAndSetCircularTissue<TetrahedralMesh<2, 2> >(
             "mesh/test/data/2D_0_to_1mm_400_elements", 0.05, 0.05, 0.02);
 
         //boundary flux for Phi_e. -10e3 is under threshold, -14e3 crashes the cell model
@@ -373,7 +373,7 @@ public:
          * We ran longer simulation for 350 ms and a nice AP was observed.
          */
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); ++i)
+        for (unsigned i = 0; i<p_mesh->GetNumNodes(); ++i)
         {
             // test V = 0 for all bath nodes and that an AP is triggered in the tissue
             if (HeartRegionCode::IsRegionBath( p_mesh->GetNode(i)->GetRegion() )) // bath
@@ -411,19 +411,19 @@ public:
 
         // need to create a cell factory but don't want any intra stim, so magnitude
         // of stim is zero.
-        c_vector<double,2> centre;
+        c_vector<double, 2> centre;
         centre(0) = 0.05; // cm
         centre(1) = 0.05; // cm
         BathCellFactory<2> cell_factory( 0.0, centre);
 
         BidomainWithBathProblem<2> bidomain_problem( &cell_factory );
 
-        DistributedTetrahedralMesh<2,2> mesh;
+        DistributedTetrahedralMesh<2, 2> mesh;
 
         mesh.ConstructRegularSlabMesh(0.05, 0.9, 0.9);
 
         // set the x<0.25 and x>0.75 regions as the bath region
-        for (AbstractTetrahedralMesh<2,2>::ElementIterator iter = mesh.GetElementIteratorBegin();
+        for (AbstractTetrahedralMesh<2, 2>::ElementIterator iter = mesh.GetElementIteratorBegin();
              iter != mesh.GetElementIteratorEnd();
              ++iter)
         {
@@ -496,8 +496,8 @@ public:
 
     void TestProblemChecksUsingBathWithMultipleBathConductivities()
     {
-        TrianglesMeshReader<2,2> reader("mesh/test/data/2D_0_to_1mm_400_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> reader("mesh/test/data/2D_0_to_1mm_400_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(reader);
 
         std::set<unsigned> tissue_ids;
@@ -525,14 +525,14 @@ public:
 
         // need to create a cell factory but don't want any intra stim, so magnitude
         // of stim is zero.
-        c_vector<double,2> centre;
+        c_vector<double, 2> centre;
         centre(0) = 0.05; // cm
         centre(1) = 0.05; // cm
         BathCellFactory<2> cell_factory( 0.0, centre);
 
         BidomainWithBathProblem<2> bidomain_problem( &cell_factory );
 
-        TetrahedralMesh<2,2>* p_mesh = Load2dMeshAndSetCircularTissue<TetrahedralMesh<2,2> >(
+        TetrahedralMesh<2, 2>* p_mesh = Load2dMeshAndSetCircularTissue<TetrahedralMesh<2, 2> >(
             "mesh/test/data/2D_0_to_1mm_400_elements", 0.05, 0.05, 0.02);
 
         //boundary flux for Phi_e. -10e3 is under threshold, -14e3 crashes the cell model
@@ -557,7 +557,7 @@ public:
             Vec sol = bidomain_problem.GetSolution();
             ReplicatableVector sol_repl(sol);
 
-            for (unsigned i=0; i<p_mesh->GetNumNodes(); ++i)
+            for (unsigned i = 0; i<p_mesh->GetNumNodes(); ++i)
             {
                 // test phi_e close to 0 for all bath nodes since electrodes are off
                 if (HeartRegionCode::IsRegionBath( p_mesh->GetNode(i)->GetRegion() )) // bath
@@ -586,7 +586,7 @@ public:
              * We ran longer simulation for 350 ms and a nice AP was observed.
              */
 
-            for (unsigned i=0; i<p_mesh->GetNumNodes(); ++i)
+            for (unsigned i = 0; i<p_mesh->GetNumNodes(); ++i)
             {
                 // test V = 0 for all bath nodes and that an AP is triggered in the tissue
                 if (HeartRegionCode::IsRegionBath( p_mesh->GetNode(i)->GetRegion() )) // bath
@@ -613,13 +613,13 @@ public:
     }
 
 
-    void TestMatrixBasedAssembledBath(void)
+    void TestMatrixBasedAssembledBath()
     {
         HeartConfig::Instance()->SetSimulationDuration(1.0);  //ms
 
         // need to create a cell factory but don't want any intra stim, so magnitude
         // of stim is zero.
-        c_vector<double,2> centre;
+        c_vector<double, 2> centre;
         centre(0) = 0.05;
         centre(1) = 0.05;
         BathCellFactory<2> cell_factory( 0.0, centre);
@@ -628,7 +628,7 @@ public:
         double boundary_flux = -4e2;
         double duration = 0.2; //ms
 
-        DistributedTetrahedralMesh<2,2>* p_mesh = Load2dMeshAndSetCircularTissue<DistributedTetrahedralMesh<2,2> >(
+        DistributedTetrahedralMesh<2, 2>* p_mesh = Load2dMeshAndSetCircularTissue<DistributedTetrahedralMesh<2, 2> >(
             "mesh/test/data/2D_0_to_1mm_400_elements", 0.05, 0.05, 0.02);
 
         ///////////////////////////////////////////////////////////////////
@@ -693,12 +693,12 @@ public:
         delete p_mesh;
     }
 
-    void TestArchivingBidomainProblemWithElectrodes(void)
+    void TestArchivingBidomainProblemWithElectrodes()
     {
         std::string archive_dir = "BidomainWithElectrodesArchiving";
 
         // Create the mesh outside the save scope, so we can compare with the loaded version.
-        TetrahedralMesh<2,2>* p_mesh = Load2dMeshAndSetCircularTissue<TetrahedralMesh<2,2> >(
+        TetrahedralMesh<2, 2>* p_mesh = Load2dMeshAndSetCircularTissue<TetrahedralMesh<2, 2> >(
             "mesh/test/data/2D_0_to_1mm_400_elements", 0.05, 0.05, 0.02);
 
         { // save
@@ -726,14 +726,14 @@ public:
         }
 
         { // load
-            AbstractCardiacProblem<2,2,2>* p_abstract_problem = CardiacSimulationArchiver<BidomainWithBathProblem<2> >::Load(archive_dir);
+            AbstractCardiacProblem<2, 2, 2>* p_abstract_problem = CardiacSimulationArchiver<BidomainWithBathProblem<2> >::Load(archive_dir);
 
             // get the new mesh
-            AbstractTetrahedralMesh<2,2>& r_mesh = p_abstract_problem->rGetMesh();
+            AbstractTetrahedralMesh<2, 2>& r_mesh = p_abstract_problem->rGetMesh();
             TS_ASSERT_EQUALS(p_mesh->GetNumElements(), r_mesh.GetNumElements());
 
             // Check that the bath is in the right place
-            for (unsigned i=0; i<r_mesh.GetNumElements(); ++i)
+            for (unsigned i = 0; i<r_mesh.GetNumElements(); ++i)
             {
                 double x = r_mesh.GetElement(i)->CalculateCentroid()[0];
                 double y = r_mesh.GetElement(i)->CalculateCentroid()[1];
@@ -777,7 +777,7 @@ public:
              * We are checking the last time step. This test will only make sure that an upstroke is triggered.
              * We ran longer simulation for 350 ms and a nice AP was observed.
              */
-            for (unsigned i=0; i<r_mesh.GetNumNodes(); ++i)
+            for (unsigned i = 0; i<r_mesh.GetNumNodes(); ++i)
             {
                 // test V = 0 for all bath nodes and that an AP is triggered in the tissue
                 if (HeartRegionCode::IsRegionBath(r_mesh.GetNode(i)->GetRegion()))
@@ -802,12 +802,12 @@ public:
         delete p_mesh;
     }
 
-    void TestSettingElectrodesOnResumedSimulation(void)
+    void TestSettingElectrodesOnResumedSimulation()
     {
         std::string archive_dir = "BidomainWithElectrodesArchiving";
 
         // Create the mesh outside the save scope, so we can compare with the loaded version.
-        TetrahedralMesh<2,2>* p_mesh = Load2dMeshAndSetCircularTissue<TetrahedralMesh<2,2> >(
+        TetrahedralMesh<2, 2>* p_mesh = Load2dMeshAndSetCircularTissue<TetrahedralMesh<2, 2> >(
             "mesh/test/data/2D_0_to_1mm_400_elements", 0.05, 0.05, 0.02);
 
         { // save
@@ -829,10 +829,10 @@ public:
         }
 
         { // load
-            AbstractCardiacProblem<2,2,2>* p_abstract_problem = CardiacSimulationArchiver<BidomainWithBathProblem<2> >::Load(archive_dir);
+            AbstractCardiacProblem<2, 2, 2>* p_abstract_problem = CardiacSimulationArchiver<BidomainWithBathProblem<2> >::Load(archive_dir);
 
             // get the new mesh
-            AbstractTetrahedralMesh<2,2>& r_mesh = p_abstract_problem->rGetMesh();
+            AbstractTetrahedralMesh<2, 2>& r_mesh = p_abstract_problem->rGetMesh();
             TS_ASSERT_EQUALS(p_mesh->GetNumElements(), r_mesh.GetNumElements());
 
             //boundary flux for Phi_e. -10e3 is under threshold, -14e3 crashes the cell model
@@ -854,7 +854,7 @@ public:
              * We are checking the last time step. This test will only make sure that an upstroke is triggered.
              * We ran longer simulation for 350 ms and a nice AP was observed.
              */
-            for (unsigned i=0; i<r_mesh.GetNumNodes(); ++i)
+            for (unsigned i = 0; i<r_mesh.GetNumNodes(); ++i)
             {
                 // test V = 0 for all bath nodes and that an AP is triggered in the tissue
                 if (HeartRegionCode::IsRegionBath(r_mesh.GetNode(i)->GetRegion()))
@@ -912,7 +912,7 @@ public:
         HeartConfig::Instance()->Reset(); // Forget these IDs/conductivities, they should be loaded from the archive.
 
         { // load...
-            AbstractCardiacProblem<1,1,2>* p_abstract_problem = CardiacSimulationArchiver<BidomainWithBathProblem<1> >::Load(archive_dir);
+            AbstractCardiacProblem<1, 1, 2>* p_abstract_problem = CardiacSimulationArchiver<BidomainWithBathProblem<1> >::Load(archive_dir);
 
             // Check the identifiers have made it
             std::set<unsigned> tissue_ids = HeartConfig::Instance()->rGetTissueIdentifiers();
@@ -923,12 +923,12 @@ public:
             TS_ASSERT( *bath_ids.begin() == 1u );
             TS_ASSERT( *(++bath_ids.begin()) == 2u );
 
-            AbstractTetrahedralMesh<1,1>* p_mesh = &(p_abstract_problem->rGetMesh());
+            AbstractTetrahedralMesh<1, 1>* p_mesh = &(p_abstract_problem->rGetMesh());
 
             /* Check the element ids have been loaded properly. The middle 4 elements are 'heart' elements
              * (region=0). The edges are different "flavours" of bath... */
             unsigned expected_element_regions[10]={ 2,1,1,0,0,0,0,1,1,2 };
-            for (AbstractTetrahedralMesh<1,1>::ElementIterator iter = p_mesh->GetElementIteratorBegin();
+            for (AbstractTetrahedralMesh<1, 1>::ElementIterator iter = p_mesh->GetElementIteratorBegin();
                  iter != p_mesh->GetElementIteratorEnd();
                  ++iter)
             {
@@ -959,7 +959,7 @@ public:
             char expected_node_regions[11]={ 'B', 'B', 'B',
                        'T', 'T', 'T', 'T', 'T',
                        'B','B','B'};
-            for (unsigned i=0; i<10; ++i)
+            for (unsigned i = 0; i<10; ++i)
             {
                 if (p_mesh->GetDistributedVectorFactory()->IsGlobalIndexLocal(i))
                 {
@@ -982,7 +982,7 @@ public:
     void TestSwitchesOffAtCorrectTime()
     {
         // zero stim cell factory
-        c_vector<double,2> centre;
+        c_vector<double, 2> centre;
         centre(0) = 0.05; // cm
         centre(1) = 0.05; // cm
         BathCellFactory<2> cell_factory( 0.0, centre);
@@ -1005,7 +1005,7 @@ public:
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.001, 0.01, 0.01);  //ms
 
         BidomainWithBathProblem<2> bidomain_problem1( &cell_factory );
-        TetrahedralMesh<2,2>* p_mesh1 = Load2dMeshAndSetCircularTissue<TetrahedralMesh<2,2> >(
+        TetrahedralMesh<2, 2>* p_mesh1 = Load2dMeshAndSetCircularTissue<TetrahedralMesh<2, 2> >(
            "mesh/test/data/2D_0_to_1mm_400_elements", 0.05, 0.05, 0.02);
 
         HeartConfig::Instance()->SetElectrodeParameters(false, 0, boundary_flux, start_time, duration);

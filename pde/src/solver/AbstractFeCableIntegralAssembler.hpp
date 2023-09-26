@@ -47,8 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * in a 2d/3d mesh. Required for cardiac simulations with a Purkinje network. Uses
  * a MixedDimensionMesh, which is composed of the normal mesh plus cables.
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
-class AbstractFeCableIntegralAssembler : public AbstractFeAssemblerCommon<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MATRIX,INTERPOLATION_LEVEL>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
+class AbstractFeCableIntegralAssembler : public AbstractFeAssemblerCommon<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MATRIX,INTERPOLATION_LEVEL>
 {
 protected:
     /** Cable element dimension. */
@@ -114,18 +114,18 @@ protected:
      * @param pElement Pointer to the element.
      */
     // LCOV_EXCL_START
-    virtual c_matrix<double,PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES,PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES> ComputeCableMatrixTerm(
+    virtual c_matrix<double, PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES, PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES> ComputeCableMatrixTerm(
         c_vector<double, NUM_CABLE_ELEMENT_NODES>& rPhi,
         c_matrix<double, SPACE_DIM, NUM_CABLE_ELEMENT_NODES>& rGradPhi,
         ChastePoint<SPACE_DIM>& rX,
-        c_vector<double,PROBLEM_DIM>& rU,
+        c_vector<double, PROBLEM_DIM>& rU,
         c_matrix<double, PROBLEM_DIM, SPACE_DIM>& rGradU,
-        Element<CABLE_ELEMENT_DIM,SPACE_DIM>* pElement)
+        Element<CABLE_ELEMENT_DIM, SPACE_DIM>* pElement)
     {
         // If this line is reached this means this method probably hasn't been over-ridden correctly in
         // the concrete class
         NEVER_REACHED;
-        return zero_matrix<double>(PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES,PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES);
+        return zero_matrix<double>(PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES, PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES);
     }
     // LCOV_EXCL_STOP
 
@@ -150,13 +150,13 @@ protected:
      * @param pElement Pointer to the element
      */
     // LCOV_EXCL_START
-    virtual c_vector<double,PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES> ComputeCableVectorTerm(
+    virtual c_vector<double, PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES> ComputeCableVectorTerm(
         c_vector<double, NUM_CABLE_ELEMENT_NODES>& rPhi,
         c_matrix<double, SPACE_DIM, NUM_CABLE_ELEMENT_NODES>& rGradPhi,
         ChastePoint<SPACE_DIM>& rX,
-        c_vector<double,PROBLEM_DIM>& rU,
+        c_vector<double, PROBLEM_DIM>& rU,
         c_matrix<double, PROBLEM_DIM, SPACE_DIM>& rGradU,
-        Element<CABLE_ELEMENT_DIM,SPACE_DIM>* pElement)
+        Element<CABLE_ELEMENT_DIM, SPACE_DIM>* pElement)
     {
         // If this line is reached this means this method probably hasn't been over-ridden correctly in
         // the concrete class
@@ -179,7 +179,7 @@ protected:
      * Called by AssembleSystem().
      * Calls ComputeCableMatrixTerm() etc.
      */
-    virtual void AssembleOnCableElement(Element<CABLE_ELEMENT_DIM,SPACE_DIM>& rElement,
+    virtual void AssembleOnCableElement(Element<CABLE_ELEMENT_DIM, SPACE_DIM>& rElement,
                                         c_matrix<double, PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES, PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES >& rAElem,
                                         c_vector<double, PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES>& rBElem);
 
@@ -191,7 +191,7 @@ protected:
      *
      * @param rElement the element
      */
-    virtual bool ElementAssemblyCriterion(Element<CABLE_ELEMENT_DIM,SPACE_DIM>& rElement)
+    virtual bool ElementAssemblyCriterion(Element<CABLE_ELEMENT_DIM, SPACE_DIM>& rElement)
     {
         return true;
     }
@@ -203,7 +203,7 @@ public:
      *
      * @param pMesh The mesh
      */
-    explicit AbstractFeCableIntegralAssembler(MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
+    explicit AbstractFeCableIntegralAssembler(MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>* pMesh);
 
     /**
      * Destructor.
@@ -214,9 +214,9 @@ public:
     }
 };
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
 AbstractFeCableIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX, INTERPOLATION_LEVEL>::AbstractFeCableIntegralAssembler(
-            MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
+            MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
     : AbstractFeAssemblerCommon<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX, INTERPOLATION_LEVEL>(),
       mpMesh(pMesh)
 {
@@ -233,7 +233,7 @@ AbstractFeCableIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEMB
 }
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
 void AbstractFeCableIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX, INTERPOLATION_LEVEL>::DoAssemble()
 {
     HeartEventHandler::EventType assemble_event;
@@ -309,7 +309,7 @@ void AbstractFeCableIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_A
 // Implementation - AssembleOnCableElement and smaller
 ///////////////////////////////////////////////////////////////////////////////////
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
 void AbstractFeCableIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX, INTERPOLATION_LEVEL>::ComputeTransformedBasisFunctionDerivatives(
         const ChastePoint<CABLE_ELEMENT_DIM>& rPoint,
         const c_matrix<double, CABLE_ELEMENT_DIM, SPACE_DIM>& rInverseJacobian,
@@ -321,9 +321,9 @@ void AbstractFeCableIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_A
     rReturnValue = prod(trans(rInverseJacobian), grad_phi);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
 void AbstractFeCableIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX, INTERPOLATION_LEVEL>::AssembleOnCableElement(
-    Element<CABLE_ELEMENT_DIM,SPACE_DIM>& rElement,
+    Element<CABLE_ELEMENT_DIM, SPACE_DIM>& rElement,
     c_matrix<double, PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES, PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES >& rAElem,
     c_vector<double, PROBLEM_DIM*NUM_CABLE_ELEMENT_NODES>& rBElem)
 {
@@ -374,8 +374,8 @@ void AbstractFeCableIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_A
         // Where applicable, u will be set to the value of the current solution at x
         ChastePoint<SPACE_DIM> x(0,0,0);
 
-        c_vector<double,PROBLEM_DIM> u = zero_vector<double>(PROBLEM_DIM);
-        c_matrix<double,PROBLEM_DIM,SPACE_DIM> grad_u = zero_matrix<double>(PROBLEM_DIM,SPACE_DIM);
+        c_vector<double, PROBLEM_DIM> u = zero_vector<double>(PROBLEM_DIM);
+        c_matrix<double, PROBLEM_DIM, SPACE_DIM> grad_u = zero_matrix<double>(PROBLEM_DIM, SPACE_DIM);
 
         // Allow the concrete version of the assembler to interpolate any desired quantities
         this->ResetInterpolatedQuantities();

@@ -46,17 +46,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PetscSetupAndFinalize.hpp"
 
-c_vector<double,2> SomeFunction(c_vector<double,2>& rX, double t)
+c_vector<double, 2> SomeFunction(c_vector<double, 2>& rX, double t)
 {
-    c_vector<double,2> body_force;
+    c_vector<double, 2> body_force;
     body_force(0) = rX(0)+t;
     body_force(1) = 2*(rX(1)+t);
     return body_force;
 }
 
-c_vector<double,2> AnotherFunction(c_vector<double,2>& rX, double t)
+c_vector<double, 2> AnotherFunction(c_vector<double, 2>& rX, double t)
 {
-    c_vector<double,2> body_force;
+    c_vector<double, 2> body_force;
     body_force(0) = rX(0)*t;
     body_force(1) = 10*rX(1)*t;
     return body_force;
@@ -124,7 +124,7 @@ public:
 
         problem_defn.SetBodyForce(SomeFunction);
         TS_ASSERT_EQUALS(problem_defn.GetBodyForceType(), FUNCTIONAL_BODY_FORCE);
-        c_vector<double,2> X;
+        c_vector<double, 2> X;
         X(0) = 10.0;
         X(1) = 11.0;
         double t = 0.5;
@@ -134,7 +134,7 @@ public:
         TS_ASSERT_DELTA(problem_defn.GetBodyForce(X,t)(0), 10.5, 1e-12);
         TS_ASSERT_DELTA(problem_defn.GetBodyForce(X,t)(1), 23.0, 1e-12);
 
-        c_vector<double,2> body_force;
+        c_vector<double, 2> body_force;
         body_force(0) = -9.81;
         body_force(1) = 0.01;
         problem_defn.SetBodyForce(body_force);
@@ -150,13 +150,13 @@ public:
         // Traction
         //////////////////////////////////
 
-        std::vector<BoundaryElement<1,2>*> boundary_elements;
-        std::vector<c_vector<double,2> > tractions;
+        std::vector<BoundaryElement<1, 2>*> boundary_elements;
+        std::vector<c_vector<double, 2> > tractions;
 
-        TetrahedralMesh<2,2>::BoundaryElementIterator iter
+        TetrahedralMesh<2, 2>::BoundaryElementIterator iter
            = mesh.GetBoundaryElementIteratorBegin();
 
-        c_vector<double,2> vec = zero_vector<double>(2);
+        c_vector<double, 2> vec = zero_vector<double>(2);
         vec(0)=1.0;
         boundary_elements.push_back(*iter);
         tractions.push_back(vec);
@@ -256,8 +256,8 @@ public:
         fixed_nodes.push_back(10);
 
 
-        std::vector<c_vector<double,2> > locations;
-        c_vector<double,2> location = zero_vector<double>(2);
+        std::vector<c_vector<double, 2> > locations;
+        c_vector<double, 2> location = zero_vector<double>(2);
         // Node 0 is to be placed at (0,0)
         locations.push_back(location);
 
@@ -436,8 +436,8 @@ public:
         fixed_flow_nodes.push_back(9);
         fixed_flow_nodes.push_back(10);
 
-        std::vector<c_vector<double,2> > fixed_flows;
-        c_vector<double,2> flow = zero_vector<double>(2);
+        std::vector<c_vector<double, 2> > fixed_flows;
+        c_vector<double, 2> flow = zero_vector<double>(2);
         fixed_flows.push_back(flow);
         flow(1)=0.1;
         fixed_flows.push_back(flow);

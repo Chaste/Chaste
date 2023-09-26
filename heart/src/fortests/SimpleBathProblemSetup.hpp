@@ -57,7 +57,7 @@ private:
     /** The stimulus to apply */
     boost::shared_ptr<SimpleStimulus> mpStimulus;
     /** and where to apply it */
-    c_vector<double,DIM> mStimulatedPoint;
+    c_vector<double, DIM> mStimulatedPoint;
 
 public:
     /**
@@ -66,7 +66,7 @@ public:
      * @param stimulatedPoint spatial co-ordinates of where to stimulate.
      *    Must correspond to a node location.
      */
-    BathCellFactory(double stimulusMagnitude, c_vector<double,DIM> stimulatedPoint)
+    BathCellFactory(double stimulusMagnitude, c_vector<double, DIM> stimulatedPoint)
         : AbstractCardiacCellFactory<DIM>(),
           mpStimulus(new SimpleStimulus(stimulusMagnitude, 0.5)),
           mStimulatedPoint(stimulatedPoint)
@@ -151,7 +151,7 @@ template<class MeshType>
 MeshType* Load2dMeshAndSetCircularTissue(const std::string& rMeshPath,
                                          double centreX, double centreY, double radius)
 {
-    TrianglesMeshReader<2,2> reader(rMeshPath);
+    TrianglesMeshReader<2, 2> reader(rMeshPath);
     MeshType* p_mesh = new MeshType;
     p_mesh->ConstructFromMeshReader(reader);
 
@@ -170,12 +170,12 @@ MeshType* Load2dMeshAndSetCircularTissue(const std::string& rMeshPath,
  * @return the new mesh
  */
 template<>
-DistributedTetrahedralMesh<2,2>* Load2dMeshAndSetCircularTissue(const std::string& rMeshPath,
+DistributedTetrahedralMesh<2, 2>* Load2dMeshAndSetCircularTissue(const std::string& rMeshPath,
                                                                 double centreX, double centreY, double radius)
 {
-    TrianglesMeshReader<2,2> reader(rMeshPath);
+    TrianglesMeshReader<2, 2> reader(rMeshPath);
     // Force dumb partitioning so migration tests pass!
-    DistributedTetrahedralMesh<2,2>* p_mesh = new DistributedTetrahedralMesh<2,2>(DistributedTetrahedralMeshPartitionType::DUMB);
+    DistributedTetrahedralMesh<2, 2>* p_mesh = new DistributedTetrahedralMesh<2, 2>(DistributedTetrahedralMeshPartitionType::DUMB);
     p_mesh->ConstructFromMeshReader(reader);
 
     SetCircularTissueIn2dMesh(p_mesh, centreX, centreY, radius);

@@ -43,14 +43,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Cylindrical2dMesh.hpp"
 
 /**
- * A subclass of MutableVertexMesh<2,2> for a rectangular mesh with
+ * A subclass of MutableVertexMesh<2, 2> for a rectangular mesh with
  * periodic left and right boundaries, representing a cylindrical geometry.
  *
  * The class works by overriding calls such as ReMesh() and
  * GetVectorFromAtoB() so that simulation classes can treat this
- * class in exactly the same way as a MutableMesh<2,2>.
+ * class in exactly the same way as a MutableMesh<2, 2>.
  */
-class Cylindrical2dVertexMesh : public MutableVertexMesh<2,2>
+class Cylindrical2dVertexMesh : public MutableVertexMesh<2, 2>
 {
     friend class TestCylindrical2dVertexMesh;
 
@@ -63,7 +63,7 @@ private:
      * Auxiliary mesh pointer, created/updated when GetMeshForVtk() is called
      * and stored so that it may be deleted by the destructor.
      */
-    VertexMesh<2,2>* mpMeshForVtk;
+    VertexMesh<2, 2>* mpMeshForVtk;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -80,7 +80,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<MutableVertexMesh<2,2> >(*this);
+        archive & boost::serialization::base_object<MutableVertexMesh<2, 2> >(*this);
         archive & mWidth;
     }
 
@@ -102,7 +102,7 @@ public:
      */
     Cylindrical2dVertexMesh(double width,
                             std::vector<Node<2>*> nodes,
-                            std::vector<VertexElement<2,2>*> vertexElements,
+                            std::vector<VertexElement<2, 2>*> vertexElements,
                             double cellRearrangementThreshold=0.01,
                             double t2Threshold=0.001);
 

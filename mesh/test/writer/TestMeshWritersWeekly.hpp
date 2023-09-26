@@ -66,21 +66,21 @@ private:
         directory_stream << "TestMeshWritersWeekly/steps_" << std::setw(12) << std::setfill('0')<< numStepsInEachDimension;
         std::string directory_name = directory_stream.str();
 
-        DistributedTetrahedralMesh<3,3> cuboid_mesh;
+        DistributedTetrahedralMesh<3, 3> cuboid_mesh;
         cuboid_mesh.ConstructCuboid(numStepsInEachDimension, numStepsInEachDimension, numStepsInEachDimension);
         TS_ASSERT_EQUALS(cuboid_mesh.GetNumNodes(), nodes);
 
 
         MeshEventHandler::BeginEvent(MeshEventHandler::TRIANGLES);
         {
-            TrianglesMeshWriter<3,3> mesh_writer(directory_name,  file_name, false);
+            TrianglesMeshWriter<3, 3> mesh_writer(directory_name,  file_name, false);
             mesh_writer.WriteFilesUsingMesh(cuboid_mesh);
         }
         MeshEventHandler::EndEvent(MeshEventHandler::TRIANGLES);
 
         MeshEventHandler::BeginEvent(MeshEventHandler::BINTRI);
         {
-            TrianglesMeshWriter<3,3> bin_mesh_writer(directory_name,  file_name+"_bin", false);
+            TrianglesMeshWriter<3, 3> bin_mesh_writer(directory_name,  file_name+"_bin", false);
             bin_mesh_writer.SetWriteFilesAsBinary();
             bin_mesh_writer.WriteFilesUsingMesh(cuboid_mesh);
         }
@@ -90,14 +90,14 @@ private:
 #ifdef CHASTE_VTK
         MeshEventHandler::BeginEvent(MeshEventHandler::VTK);
         {
-            VtkMeshWriter<3,3> vtk_writer(directory_name, file_name, false);
+            VtkMeshWriter<3, 3> vtk_writer(directory_name, file_name, false);
             vtk_writer.WriteFilesUsingMesh(cuboid_mesh);
         }
         MeshEventHandler::EndEvent(MeshEventHandler::VTK);
 
         MeshEventHandler::BeginEvent(MeshEventHandler::PVTK);
         {
-            VtkMeshWriter<3,3> parallel_vtk_writer(directory_name, file_name+"par",false);
+            VtkMeshWriter<3, 3> parallel_vtk_writer(directory_name, file_name+"par",false);
             parallel_vtk_writer.SetParallelFiles(cuboid_mesh);
             std::vector<double> dummy_data(cuboid_mesh.GetNumLocalNodes(), PetscTools::GetMyRank());
             parallel_vtk_writer.AddPointData("Process", dummy_data);

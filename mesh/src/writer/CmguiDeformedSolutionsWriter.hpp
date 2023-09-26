@@ -69,7 +69,7 @@ private:
      *  The quadratic mesh used in the mechanics simulation. solution_0.exnode and solution_0.exelem
      *  (the only exelem file written) will be written using this mesh
      */
-    AbstractTetrahedralMesh<DIM,DIM>* mpQuadraticMesh;
+    AbstractTetrahedralMesh<DIM, DIM>* mpQuadraticMesh;
 
     /**
      *  A counter is given whenever WriteDeformationPositions() is called, this variable
@@ -106,7 +106,7 @@ public:
      */
     CmguiDeformedSolutionsWriter(std::string outputDirectory,
                                  std::string baseName,
-                                 AbstractTetrahedralMesh<DIM,DIM>& rQuadraticMesh,
+                                 AbstractTetrahedralMesh<DIM, DIM>& rQuadraticMesh,
                                  CmguiMeshWriteType writeType);
 
     /**
@@ -124,7 +124,7 @@ public:
      *  of nodes in the mesh
      *  @param counter the value "i" in "[basename]_i.exnode" to be used.
      */
-    void WriteDeformationPositions(std::vector<c_vector<double,DIM> >& rDeformedPositions,
+    void WriteDeformationPositions(std::vector<c_vector<double, DIM> >& rDeformedPositions,
                                    unsigned counter);
 
     /**

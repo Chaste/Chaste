@@ -39,35 +39,54 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UblasMatrixInclude.hpp"
 
 /**
- * Quadratic basis functions for the finite element method,
- * computed on a canonical element.
+ * Quadratic basis functions for the finite element method, computed on a 
+ * canonical element.
+ * 
+ * \todo document methods
  */
-template <unsigned ELEMENT_DIM>
+template<unsigned ELEMENT_DIM>
 class QuadraticBasisFunction
 {
 public:
 
-    static double ComputeBasisFunction(const ChastePoint<ELEMENT_DIM>& rPoint, unsigned basisIndex);
-    static c_vector<double, ELEMENT_DIM> ComputeBasisFunctionDerivative(const ChastePoint<ELEMENT_DIM>& rPoint, unsigned basisIndex);
+    static double ComputeBasisFunction(
+        const ChastePoint<ELEMENT_DIM>& rPoint,
+        unsigned basisIndex);
 
-    static void ComputeBasisFunctions(const ChastePoint<ELEMENT_DIM>& rPoint, c_vector<double, (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2>& rReturnValue);
-    static void ComputeBasisFunctionDerivatives(const ChastePoint<ELEMENT_DIM>& rPoint,
-                                                c_matrix<double, ELEMENT_DIM, (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2>& rReturnValue);
+    static c_vector<double, ELEMENT_DIM> ComputeBasisFunctionDerivative(
+        const ChastePoint<ELEMENT_DIM>& rPoint,
+        unsigned basisIndex);
 
-    static void ComputeTransformedBasisFunctionDerivatives(const ChastePoint<ELEMENT_DIM>& rPoint,
-                                                           const c_matrix<double, ELEMENT_DIM, ELEMENT_DIM>& rInverseJacobian,
-                                                           c_matrix<double, ELEMENT_DIM, (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2>& rReturnValue);
+    static void ComputeBasisFunctions(
+        const ChastePoint<ELEMENT_DIM>& rPoint,
+        c_vector<double, (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2>& rReturnValue);
+
+    static void ComputeBasisFunctionDerivatives(
+        const ChastePoint<ELEMENT_DIM>& rPoint,
+        c_matrix<double, ELEMENT_DIM, (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2>& rReturnValue);
+
+    static void ComputeTransformedBasisFunctionDerivatives(
+        const ChastePoint<ELEMENT_DIM>& rPoint,
+        const c_matrix<double, ELEMENT_DIM, ELEMENT_DIM>& rInverseJacobian,
+        c_matrix<double, ELEMENT_DIM, (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2>& rReturnValue);
 };
 
 /**
  * We need to specialise for the 0d case, because 0x0 matrices don't work.
+ * 
+ * \todo document methods
  */
 template<>
 class QuadraticBasisFunction<0>
 {
 public:
-    static double ComputeBasisFunction(const ChastePoint<0>& rPoint, unsigned basisIndex);
-    static void ComputeBasisFunctions(const ChastePoint<0>& rPoint, c_vector<double, 1>& rReturnValue);
+    static double ComputeBasisFunction(
+        const ChastePoint<0>& rPoint,
+        unsigned basisIndex);
+
+    static void ComputeBasisFunctions(
+        const ChastePoint<0>& rPoint,
+        c_vector<double, 1>& rReturnValue);
 };
 
 #endif //_QUADRATICBASISFUNCTION_HPP_

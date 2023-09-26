@@ -67,11 +67,11 @@ private:
     double mLocationGhosts;
     double mLocationWithoutGhosts;
 
-    MutableMesh<3,3>* Make3dMesh(unsigned width=3, unsigned height=3, unsigned depth=3)
+    MutableMesh<3, 3>* Make3dMesh(unsigned width=3, unsigned height=3, unsigned depth=3)
     {
-        MutableMesh<3,3>* p_mesh = new MutableMesh<3,3>;
+        MutableMesh<3, 3>* p_mesh = new MutableMesh<3, 3>;
         p_mesh->ConstructCuboid(width, height, depth);
-        TrianglesMeshWriter<3,3> mesh_writer("", "3dSpringMesh");
+        TrianglesMeshWriter<3, 3> mesh_writer("", "3dSpringMesh");
         mesh_writer.WriteFilesUsingMesh(*p_mesh);
 
         return p_mesh;
@@ -81,8 +81,8 @@ public:
 
     void TestDoCellBirth()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_1626_elements");
-        MutableMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_1626_elements");
+        MutableMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create cells
@@ -108,9 +108,9 @@ public:
 
     void TestBirthOccursDuringSolve()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/3D_Single_tetrahedron_element");
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/3D_Single_tetrahedron_element");
 
-        MutableMesh<3,3> mesh;
+        MutableMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create cells
@@ -132,7 +132,7 @@ public:
 
         OffLatticeSimulation<3> simulator(cell_population);
 
-        TrianglesMeshWriter<3,3> mesh_writer1("Test3DCellBirth", "StartMesh");
+        TrianglesMeshWriter<3, 3> mesh_writer1("Test3DCellBirth", "StartMesh");
         mesh_writer1.WriteFilesUsingMesh(mesh);
 
         simulator.SetOutputDirectory("Test3DCellBirth");
@@ -149,17 +149,17 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 5u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 3u);
 
-        TrianglesMeshWriter<3,3> mesh_writer2("Test3DCellBirth", "EndMesh", false);
+        TrianglesMeshWriter<3, 3> mesh_writer2("Test3DCellBirth", "EndMesh", false);
         mesh_writer2.WriteFilesUsingMesh(mesh);
     }
 
     void TestSolveMethodSpheroidSimulation3D()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-        MutableMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
+        MutableMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        TrianglesMeshWriter<3,3> mesh_writer("TestSolveMethodSpheroidSimulation3DMesh", "StartMesh");
+        TrianglesMeshWriter<3, 3> mesh_writer("TestSolveMethodSpheroidSimulation3DMesh", "StartMesh");
         mesh_writer.WriteFilesUsingMesh(mesh);
 
         // Create cells
@@ -193,7 +193,7 @@ public:
         simulator.SetEndTime(0.1);
         simulator.Solve();
 
-        TrianglesMeshWriter<3,3> mesh_writer2("TestSolveMethodSpheroidSimulation3DMesh", "EndMesh", false);
+        TrianglesMeshWriter<3, 3> mesh_writer2("TestSolveMethodSpheroidSimulation3DMesh", "EndMesh", false);
         mesh_writer2.WriteFilesUsingMesh(mesh);
     }
 
@@ -203,8 +203,8 @@ public:
         unsigned height = 3;
         unsigned depth = 3;
 
-        MutableMesh<3,3>* p_mesh = Make3dMesh(width, height, depth);
-        TrianglesMeshWriter<3,3> mesh_writer("TestGhostNodesSpheroidSimulation3D", "StartMesh");
+        MutableMesh<3, 3>* p_mesh = Make3dMesh(width, height, depth);
+        TrianglesMeshWriter<3, 3> mesh_writer("TestGhostNodesSpheroidSimulation3D", "StartMesh");
         mesh_writer.WriteFilesUsingMesh(*p_mesh);
 
         c_vector<double, 3> spheroid_centre;

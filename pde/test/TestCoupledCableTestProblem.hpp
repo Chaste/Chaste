@@ -65,21 +65,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////
 template<unsigned DIM>
 class CoupledCableTestProblemCableComponentAssembler
-    :  public AbstractFeCableIntegralAssembler<DIM,DIM,2,false,true,NORMAL>
+    :  public AbstractFeCableIntegralAssembler<DIM, DIM,2,false,true,NORMAL>
 {
 private:
     static const unsigned PROBLEM_DIM=2;
     double mBeta;
 
-    c_matrix<double,PROBLEM_DIM*2,PROBLEM_DIM*2> ComputeCableMatrixTerm(
+    c_matrix<double, PROBLEM_DIM*2, PROBLEM_DIM*2> ComputeCableMatrixTerm(
         c_vector<double, 2>& rPhi,
         c_matrix<double, DIM, 2>& rGradPhi,
         ChastePoint<DIM>& rX,
-        c_vector<double,PROBLEM_DIM>& rU,
-        c_matrix<double,PROBLEM_DIM, DIM>& rGradU,
-        Element<1,DIM>* pElement)
+        c_vector<double, PROBLEM_DIM>& rU,
+        c_matrix<double, PROBLEM_DIM, DIM>& rGradU,
+        Element<1, DIM>* pElement)
     {
-        c_matrix<double,PROBLEM_DIM*2, PROBLEM_DIM*2> ret = zero_matrix<double>(PROBLEM_DIM*2, PROBLEM_DIM*2);
+        c_matrix<double, PROBLEM_DIM*2, PROBLEM_DIM*2> ret = zero_matrix<double>(PROBLEM_DIM*2, PROBLEM_DIM*2);
 
         double sigma_i = 1+rX[2] + 0.5*rX[2]*rX[2];
 
@@ -103,8 +103,8 @@ private:
     }
 
 public:
-    CoupledCableTestProblemCableComponentAssembler(MixedDimensionMesh<DIM,DIM>* pMesh, double beta)
-        : AbstractFeCableIntegralAssembler<DIM,DIM,2,false,true,NORMAL>(pMesh),
+    CoupledCableTestProblemCableComponentAssembler(MixedDimensionMesh<DIM, DIM>* pMesh, double beta)
+        : AbstractFeCableIntegralAssembler<DIM, DIM,2,false,true,NORMAL>(pMesh),
           mBeta(beta)
     {
     }
@@ -116,20 +116,20 @@ public:
 /////////////////////////////////////////////////////////
 template<unsigned DIM>
 class CoupledCableTestProblemVolumeComponentAssembler
-    : public AbstractFeVolumeIntegralAssembler<DIM,DIM,2,true,true,NORMAL>
+    : public AbstractFeVolumeIntegralAssembler<DIM, DIM,2,true,true,NORMAL>
 {
 private:
    static const unsigned PROBLEM_DIM=2;
 
-   c_matrix<double,PROBLEM_DIM*(DIM+1),PROBLEM_DIM*(DIM+1)> ComputeMatrixTerm(
+   c_matrix<double, PROBLEM_DIM*(DIM+1), PROBLEM_DIM*(DIM+1)> ComputeMatrixTerm(
         c_vector<double, DIM+1>& rPhi,
         c_matrix<double, DIM, DIM+1>& rGradPhi,
         ChastePoint<DIM>& rX,
-        c_vector<double,PROBLEM_DIM>& rU,
-        c_matrix<double,PROBLEM_DIM, DIM>& rGradU,
-        Element<DIM,DIM>* pElement)
+        c_vector<double, PROBLEM_DIM>& rU,
+        c_matrix<double, PROBLEM_DIM, DIM>& rGradU,
+        Element<DIM, DIM>* pElement)
     {
-        c_matrix<double,PROBLEM_DIM*(DIM+1),PROBLEM_DIM*(DIM+1)> ret = zero_matrix<double>(PROBLEM_DIM*(DIM+1),PROBLEM_DIM*(DIM+1));
+        c_matrix<double, PROBLEM_DIM*(DIM+1), PROBLEM_DIM*(DIM+1)> ret = zero_matrix<double>(PROBLEM_DIM*(DIM+1), PROBLEM_DIM*(DIM+1));
 
         for (unsigned i = 0; i < DIM+1; ++i)
         {
@@ -149,16 +149,16 @@ private:
         c_vector<double, DIM+1>& rPhi,
         c_matrix<double, DIM, DIM+1>& rGradPhi,
         ChastePoint<DIM>& rX,
-        c_vector<double,2>& rU,
-        c_matrix<double,2,DIM>& rGradU,
-        Element<DIM,DIM>* pElement)
+        c_vector<double, 2>& rU,
+        c_matrix<double,2, DIM>& rGradU,
+        Element<DIM, DIM>* pElement)
     {
         return zero_vector<double>(2*(DIM+1));
     }
 
 public:
-    CoupledCableTestProblemVolumeComponentAssembler(AbstractTetrahedralMesh<DIM,DIM>* pMesh)
-        : AbstractFeVolumeIntegralAssembler<DIM,DIM,2,true,true,NORMAL>(pMesh)
+    CoupledCableTestProblemVolumeComponentAssembler(AbstractTetrahedralMesh<DIM, DIM>* pMesh)
+        : AbstractFeVolumeIntegralAssembler<DIM, DIM,2,true,true,NORMAL>(pMesh)
     {
     }
 };
@@ -168,14 +168,14 @@ public:
 //////////////////////////////////////////////////////////////
 
 template<unsigned DIM>
-class CoupledCableTestProblemSolver: public AbstractStaticLinearPdeSolver<DIM,DIM,2>
+class CoupledCableTestProblemSolver: public AbstractStaticLinearPdeSolver<DIM, DIM, 2>
 {
 private:
     CoupledCableTestProblemVolumeComponentAssembler<DIM>* mpVolumeIntegralsAssembler;
     CoupledCableTestProblemCableComponentAssembler<DIM>* mpCableIntegralsAssembler;
-    NaturalNeumannSurfaceTermAssembler<DIM,DIM,2>* mpNeumannSurfaceTermsAssembler;
+    NaturalNeumannSurfaceTermAssembler<DIM, DIM, 2>* mpNeumannSurfaceTermsAssembler;
 
-    BoundaryConditionsContainer<DIM,DIM,2>* mpBoundaryConditions;
+    BoundaryConditionsContainer<DIM, DIM, 2>* mpBoundaryConditions;
 
     void SetupLinearSystem(Vec currentSolution, bool computeMatrix)
     {
@@ -229,15 +229,15 @@ private:
 
 
 public:
-    CoupledCableTestProblemSolver(MixedDimensionMesh<DIM,DIM>* pMesh,
-                                  BoundaryConditionsContainer<DIM,DIM,2>* pBoundaryConditions,
+    CoupledCableTestProblemSolver(MixedDimensionMesh<DIM, DIM>* pMesh,
+                                  BoundaryConditionsContainer<DIM, DIM, 2>* pBoundaryConditions,
                                   double beta)
-         : AbstractStaticLinearPdeSolver<DIM,DIM,2>(pMesh),
+         : AbstractStaticLinearPdeSolver<DIM, DIM, 2>(pMesh),
            mpBoundaryConditions(pBoundaryConditions)
     {
         mpVolumeIntegralsAssembler = new CoupledCableTestProblemVolumeComponentAssembler<DIM>(pMesh);
         mpCableIntegralsAssembler = new CoupledCableTestProblemCableComponentAssembler<DIM>(pMesh,beta);
-        mpNeumannSurfaceTermsAssembler = new NaturalNeumannSurfaceTermAssembler<DIM,DIM,2>(pMesh,pBoundaryConditions);
+        mpNeumannSurfaceTermsAssembler = new NaturalNeumannSurfaceTermAssembler<DIM, DIM, 2>(pMesh,pBoundaryConditions);
     }
 
     ~CoupledCableTestProblemSolver()
@@ -275,11 +275,11 @@ public:
     void TestSolvingTestProblem()
     {
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/cylinder_refined");
-        TrianglesMeshReader<3,3> reader(mesh_base);
-        MixedDimensionMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> reader(mesh_base);
+        MixedDimensionMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(reader);
 
-        BoundaryConditionsContainer<3,3,2> bcc;
+        BoundaryConditionsContainer<3, 3, 2> bcc;
 
         //////////////////////////////////////////
         // Dirichlet BCs to phi_e and phi_i
@@ -324,12 +324,12 @@ public:
         MyBoundaryCondition* p_top_neumann_bc = new MyBoundaryCondition(-1.0/(2*M_PI));
         MyBoundaryCondition* p_bottom_neumann_bc = new MyBoundaryCondition(1.0/(2*M_PI));
 
-        for (MixedDimensionMesh<3,3>::BoundaryElementIterator iter
+        for (MixedDimensionMesh<3, 3>::BoundaryElementIterator iter
              = mesh.GetBoundaryElementIteratorBegin();
             iter != mesh.GetBoundaryElementIteratorEnd();
             ++iter)
         {
-            c_vector<double,3> centroid = (*iter)->CalculateCentroid();
+            c_vector<double, 3> centroid = (*iter)->CalculateCentroid();
             double z = centroid(2);
             if (fabs(z-1.0) < 1e-5)
             {
@@ -351,7 +351,7 @@ public:
         Vec result = cable_solver.Solve();
 
         ReplicatableVector result_repl(result);
-        for (AbstractTetrahedralMesh<3,3>::NodeIterator current_node = mesh.GetNodeIteratorBegin();
+        for (AbstractTetrahedralMesh<3, 3>::NodeIterator current_node = mesh.GetNodeIteratorBegin();
              current_node != mesh.GetNodeIteratorEnd();
              ++current_node)
         {

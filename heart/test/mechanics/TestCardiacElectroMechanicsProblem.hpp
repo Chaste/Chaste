@@ -77,7 +77,7 @@ public:
     {
         EntirelyStimulatedTissueCellFactory cell_factory;
 
-        TetrahedralMesh<2,2> electrics_mesh;
+        TetrahedralMesh<2, 2> electrics_mesh;
         electrics_mesh.ConstructRegularSlabMesh(0.01, 0.05, 0.05);
 
         QuadraticMesh<2> mechanics_mesh;
@@ -95,7 +95,7 @@ public:
         // there are 3 arguments and it is expecting 2
         try
         {
-            CardiacElectroMechanicsProblem<2,2> problem (COMPRESSIBLE,
+            CardiacElectroMechanicsProblem<2, 2> problem (COMPRESSIBLE,
                     MONODOMAIN,
                     &electrics_mesh,
                     &mechanics_mesh,
@@ -110,7 +110,7 @@ public:
 
         try
         {
-            CardiacElectroMechanicsProblem<2,1> problem (COMPRESSIBLE,
+            CardiacElectroMechanicsProblem<2, 1> problem (COMPRESSIBLE,
                     BIDOMAIN,
                     &electrics_mesh,
                     &mechanics_mesh,
@@ -136,14 +136,14 @@ public:
     {
         EntirelyStimulatedTissueCellFactory cell_factory;
 
-        TetrahedralMesh<2,2> electrics_mesh;
+        TetrahedralMesh<2, 2> electrics_mesh;
         electrics_mesh.ConstructRegularSlabMesh(0.01, 0.05, 0.05);
 
         QuadraticMesh<2> mechanics_mesh;
         mechanics_mesh.ConstructRegularSlabMesh(0.025, 0.05, 0.05);
 
         std::vector<unsigned> fixed_nodes;
-        std::vector<c_vector<double,2> > fixed_node_locations;
+        std::vector<c_vector<double, 2> > fixed_node_locations;
 
         // fix the node at the origin so that the solution is well-defined (ie unique)
         fixed_nodes.push_back(0);
@@ -154,7 +154,7 @@ public:
         {
             if (fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
             {
-                c_vector<double,2> new_position;
+                c_vector<double, 2> new_position;
                 new_position(0) = 0.0;
                 new_position(1) = SolidMechanicsProblemDefinition<2>::FREE;
                 fixed_nodes.push_back(i);
@@ -169,13 +169,13 @@ public:
         problem_defn.SetMechanicsSolveTimestep(1.0);
 
         // the following is just for coverage - applying a zero pressure so has no effect on deformation
-        std::vector<BoundaryElement<1,2>*> boundary_elems;
+        std::vector<BoundaryElement<1, 2>*> boundary_elems;
         boundary_elems.push_back(* (mechanics_mesh.GetBoundaryElementIteratorBegin()));
         problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, 0.0);
 
         HeartConfig::Instance()->SetSimulationDuration(10.0);
 
-        CardiacElectroMechanicsProblem<2,1>   problem(COMPRESSIBLE,
+        CardiacElectroMechanicsProblem<2, 1>   problem(COMPRESSIBLE,
                                                       MONODOMAIN,
                                                       &electrics_mesh,
                                                       &mechanics_mesh,
@@ -183,7 +183,7 @@ public:
                                                       &problem_defn,
                                                       "TestCardiacEmHomogeneousEverythingCompressible");
         problem.Solve();
-        std::vector<c_vector<double,2> >& r_deformed_position = problem.rGetDeformedPosition();
+        std::vector<c_vector<double, 2> >& r_deformed_position = problem.rGetDeformedPosition();
 
         // not sure how easy is would be determine what the deformation should be
         // exactly, but it certainly should be constant squash in X direction, constant
@@ -222,14 +222,14 @@ public:
     {
         EntirelyStimulatedTissueCellFactory cell_factory;
 
-        TetrahedralMesh<2,2> electrics_mesh;
+        TetrahedralMesh<2, 2> electrics_mesh;
         electrics_mesh.ConstructRegularSlabMesh(0.01, 0.05, 0.05);
 
         QuadraticMesh<2> mechanics_mesh;
         mechanics_mesh.ConstructRegularSlabMesh(0.025, 0.05, 0.05);
 
         std::vector<unsigned> fixed_nodes;
-        std::vector<c_vector<double,2> > fixed_node_locations;
+        std::vector<c_vector<double, 2> > fixed_node_locations;
 
         // fix the node at the origin so that the solution is well-defined (ie unique)
         fixed_nodes.push_back(0);
@@ -240,7 +240,7 @@ public:
         {
             if (fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
             {
-                c_vector<double,2> new_position;
+                c_vector<double, 2> new_position;
                 new_position(0) = 0.0;
                 new_position(1) = SolidMechanicsProblemDefinition<2>::FREE;
                 fixed_nodes.push_back(i);
@@ -255,14 +255,14 @@ public:
         problem_defn.SetMechanicsSolveTimestep(1.0);
 
         // the following is just for coverage - applying a zero pressure so has no effect on deformation
-        std::vector<BoundaryElement<1,2>*> boundary_elems;
+        std::vector<BoundaryElement<1, 2>*> boundary_elems;
         boundary_elems.push_back(* (mechanics_mesh.GetBoundaryElementIteratorBegin()));
         problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, 0.0);
 
         HeartConfig::Instance()->SetSimulationDuration(10.0);
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(1500,1500,1500));
         //creates the EM problem with ELEC_PROB_DIM=2
-        CardiacElectroMechanicsProblem<2,2> problem(COMPRESSIBLE,
+        CardiacElectroMechanicsProblem<2, 2> problem(COMPRESSIBLE,
                                                     BIDOMAIN,
                                                     &electrics_mesh,
                                                     &mechanics_mesh,
@@ -271,7 +271,7 @@ public:
                                                     "TestCardiacEmHomogeneousEverythingCompressibleBidomain");
 
         problem.Solve();
-        std::vector<c_vector<double,2> >& r_deformed_position = problem.rGetDeformedPosition();
+        std::vector<c_vector<double, 2> >& r_deformed_position = problem.rGetDeformedPosition();
 
         // not sure how easy is would be determine what the deformation should be
         // exactly, but it certainly should be constant squash in X direction, constant
@@ -320,7 +320,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(data_reader.GetVariableOverTime("Phi_e",0u));
     }
 
-    // This test is virtually identical to one of the the above tests (TestWithHomogeneousEverythingCompressible),
+    // This test is virtually identical to one of the above tests (TestWithHomogeneousEverythingCompressible),
     // except it uses incompressible solid mechanics. Since the solution should be
     // x=alpha*X, y=beta*Y for some alpha, beta (see comments for above test),
     // we also test that alpha*beta = 1.0
@@ -328,21 +328,21 @@ public:
     {
         EntirelyStimulatedTissueCellFactory cell_factory;
 
-        TetrahedralMesh<2,2> electrics_mesh;
+        TetrahedralMesh<2, 2> electrics_mesh;
         electrics_mesh.ConstructRegularSlabMesh(0.01, 0.05, 0.05);
 
         QuadraticMesh<2> mechanics_mesh;
         mechanics_mesh.ConstructRegularSlabMesh(0.025, 0.05, 0.05);
 
         std::vector<unsigned> fixed_nodes;
-        std::vector<c_vector<double,2> > fixed_node_locations;
+        std::vector<c_vector<double, 2> > fixed_node_locations;
         fixed_nodes.push_back(0);
         fixed_node_locations.push_back(zero_vector<double>(2));
         for (unsigned i=1 /*not 0*/; i<mechanics_mesh.GetNumNodes(); ++i)
         {
             if (fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
             {
-                c_vector<double,2> new_position;
+                c_vector<double, 2> new_position;
                 new_position(0) = 0.0;
                 new_position(1) = SolidMechanicsProblemDefinition<2>::FREE;
                 fixed_nodes.push_back(i);
@@ -362,7 +362,7 @@ public:
 
         HeartConfig::Instance()->SetSimulationDuration(10.0);
 
-        CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
+        CardiacElectroMechanicsProblem<2, 1> problem(INCOMPRESSIBLE,
                                                     MONODOMAIN,
                                                     &electrics_mesh,
                                                     &mechanics_mesh,
@@ -373,7 +373,7 @@ public:
         problem.Solve();
 
 
-        std::vector<c_vector<double,2> >& r_deformed_position = problem.rGetDeformedPosition();
+        std::vector<c_vector<double, 2> >& r_deformed_position = problem.rGetDeformedPosition();
 
         // not sure how easy is would be determine what the deformation should be
         // exactly, but it certainly should be constant squash in X direction, constant
@@ -409,11 +409,11 @@ public:
     {
         EntirelyStimulatedTissueCellFactory cell_factory;
 
-        TetrahedralMesh<2,2> electrics_mesh;
+        TetrahedralMesh<2, 2> electrics_mesh;
         electrics_mesh.ConstructRegularSlabMesh(0.01, 0.05, 0.05);
 
         //make everything a bath node except for the x=0 line
-        for (TetrahedralMesh<2,2>::ElementIterator iter=electrics_mesh.GetElementIteratorBegin();
+        for (TetrahedralMesh<2, 2>::ElementIterator iter=electrics_mesh.GetElementIteratorBegin();
              iter != electrics_mesh.GetElementIteratorEnd();
             ++iter)
         {
@@ -431,8 +431,8 @@ public:
         mechanics_mesh.ConstructRegularSlabMesh(0.025, 0.05, 0.05);
 
         //store the original node positions
-        std::vector<c_vector<double,2> > original_node_position;
-        c_vector<double,2> pos = zero_vector<double>(2);
+        std::vector<c_vector<double, 2> > original_node_position;
+        c_vector<double, 2> pos = zero_vector<double>(2);
         for (unsigned i = 0; i<mechanics_mesh.GetNumNodes(); ++i)
         {
             pos(0) = mechanics_mesh.GetNode(i)->rGetLocation()[0];
@@ -441,7 +441,7 @@ public:
         }
 
         std::vector<unsigned> fixed_nodes;
-        std::vector<c_vector<double,2> > fixed_node_locations;
+        std::vector<c_vector<double, 2> > fixed_node_locations;
 
         // fix the node at the origin so that the solution is well-defined (ie unique)
         fixed_nodes.push_back(0);
@@ -452,7 +452,7 @@ public:
         {
             if (fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
             {
-                c_vector<double,2> new_position;
+                c_vector<double, 2> new_position;
                 new_position(0) = 0.0;
                 new_position(1) = SolidMechanicsProblemDefinition<2>::FREE;
                 fixed_nodes.push_back(i);
@@ -469,7 +469,7 @@ public:
 
         HeartConfig::Instance()->SetSimulationDuration(10.0);
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(1500,1500,1500));
-        CardiacElectroMechanicsProblem<2,2> problem(COMPRESSIBLE,
+        CardiacElectroMechanicsProblem<2, 2> problem(COMPRESSIBLE,
                                                     BIDOMAIN_WITH_BATH,
                                                     &electrics_mesh,
                                                     &mechanics_mesh,
@@ -478,7 +478,7 @@ public:
                                                     "TestCardiacEmWithBath");
 
         problem.Solve();
-        std::vector<c_vector<double,2> >& r_deformed_position = problem.rGetDeformedPosition();
+        std::vector<c_vector<double, 2> >& r_deformed_position = problem.rGetDeformedPosition();
 
         // first, check node 8 starts is the far corner
         assert(fabs(mechanics_mesh.GetNode(8)->rGetLocation()[0] - 0.05)<1e-8);
@@ -496,11 +496,11 @@ public:
     {
         EntirelyStimulatedTissueCellFactory cell_factory;
 
-        TetrahedralMesh<2,2> electrics_mesh;
+        TetrahedralMesh<2, 2> electrics_mesh;
         electrics_mesh.ConstructRegularSlabMesh(0.01, 0.05, 0.05);
 
         //make everything a bath node except for the x=0 line
-        for (TetrahedralMesh<2,2>::ElementIterator iter=electrics_mesh.GetElementIteratorBegin();
+        for (TetrahedralMesh<2, 2>::ElementIterator iter=electrics_mesh.GetElementIteratorBegin();
              iter != electrics_mesh.GetElementIteratorEnd();
             ++iter)
         {
@@ -518,8 +518,8 @@ public:
         mechanics_mesh.ConstructRegularSlabMesh(0.025, 0.05, 0.05);
 
         //store the original node positions
-        std::vector<c_vector<double,2> > original_node_position;
-        c_vector<double,2> pos = zero_vector<double>(2);
+        std::vector<c_vector<double, 2> > original_node_position;
+        c_vector<double, 2> pos = zero_vector<double>(2);
         for (unsigned i = 0; i<mechanics_mesh.GetNumNodes(); ++i)
         {
             pos(0) = mechanics_mesh.GetNode(i)->rGetLocation()[0];
@@ -528,7 +528,7 @@ public:
         }
 
         std::vector<unsigned> fixed_nodes;
-        std::vector<c_vector<double,2> > fixed_node_locations;
+        std::vector<c_vector<double, 2> > fixed_node_locations;
 
         // fix the node at the origin so that the solution is well-defined (ie unique)
         fixed_nodes.push_back(0);
@@ -539,7 +539,7 @@ public:
         {
             if (fabs(mechanics_mesh.GetNode(i)->rGetLocation()[0])<1e-6)
             {
-                c_vector<double,2> new_position;
+                c_vector<double, 2> new_position;
                 new_position(0) = 0.0;
                 new_position(1) = SolidMechanicsProblemDefinition<2>::FREE;
                 fixed_nodes.push_back(i);
@@ -556,7 +556,7 @@ public:
 
         HeartConfig::Instance()->SetSimulationDuration(10.0);
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(1500,1500,1500));
-        CardiacElectroMechanicsProblem<2,2> problem(INCOMPRESSIBLE,
+        CardiacElectroMechanicsProblem<2, 2> problem(INCOMPRESSIBLE,
                                                     BIDOMAIN_WITH_BATH,
                                                     &electrics_mesh,
                                                     &mechanics_mesh,
@@ -565,7 +565,7 @@ public:
                                                     "TestCardiacEmWithBath");
 
         problem.Solve();
-        std::vector<c_vector<double,2> >& r_deformed_position = problem.rGetDeformedPosition();
+        std::vector<c_vector<double, 2> >& r_deformed_position = problem.rGetDeformedPosition();
 
         // first, check node 8 starts is the far corner
         assert(fabs(mechanics_mesh.GetNode(8)->rGetLocation()[0] - 0.05)<1e-8);
@@ -594,7 +594,7 @@ public:
                                                      1.0,  /* mechanics solve timestep */
                                                      0.01, /* contraction model ode timestep */
                                                      "TestCardiacElectroMechOneElement");
-        c_vector<double,2> pos;
+        c_vector<double, 2> pos;
         pos(0) = 0.05;
         pos(1) = 0.0;
 
@@ -606,7 +606,7 @@ public:
         problem.Solve();
 
         // test by checking the length of the tissue against hardcoded value
-        std::vector<c_vector<double,2> >& r_deformed_position = problem.rGetDeformedPosition();
+        std::vector<c_vector<double, 2> >& r_deformed_position = problem.rGetDeformedPosition();
         TS_ASSERT_DELTA(r_deformed_position[1](0), 0.0497, 1e-4);
 
         OutputFileHandler handler("TestCardiacElectroMechOneElement",false);
@@ -661,7 +661,7 @@ public:
                                                      0.01,  /* Kerchoffs ode timestep */
                                                      "TestCardiacEmWithKerchoffs");
 
-        c_vector<double,2> pos;
+        c_vector<double, 2> pos;
         pos(0) = 0.05;
         pos(1) = 0.0;
 
@@ -707,7 +707,7 @@ public:
                                                      0.01,  /* nash ode timestep */
                                                      "TestExplicitWithNash");
 
-        c_vector<double,2> pos;
+        c_vector<double, 2> pos;
         pos(0) = 0.05;
         pos(1) = 0.0;
 

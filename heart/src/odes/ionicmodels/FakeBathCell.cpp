@@ -70,7 +70,7 @@ double FakeBathCell::GetIntracellularCalciumConcentration()
 }
 
 template<>
-void OdeSystemInformation<FakeBathCell>::Initialise(void)
+void OdeSystemInformation<FakeBathCell>::Initialise()
 {
     // State variables
     this->mVariableNames.push_back("Fake voltage");
@@ -79,7 +79,6 @@ void OdeSystemInformation<FakeBathCell>::Initialise(void)
 
     this->mInitialised = true;
 }
-
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

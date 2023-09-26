@@ -47,7 +47,7 @@ SimpleDataWriter::SimpleDataWriter(const std::string& rDirectory,
         EXCEPTION("Data vector is empty");
     }
 
-    for (unsigned i=0; i<rData.size(); ++i)
+    for (unsigned i = 0; i<rData.size(); ++i)
     {
         if (rData[i].size() != rData[0].size())
         {
@@ -58,9 +58,9 @@ SimpleDataWriter::SimpleDataWriter(const std::string& rDirectory,
     OutputFileHandler output_file_handler(rDirectory, cleanDirectory);
     out_stream p_file = output_file_handler.OpenOutputFile(rFileName);
 
-    for (unsigned j=0; j<rData[0].size(); ++j)
+    for (unsigned j = 0; j<rData[0].size(); ++j)
     {
-        for (unsigned i=0; i<rData.size(); ++i)
+        for (unsigned i = 0; i<rData.size(); ++i)
         {
             (*p_file) << rData[i][j] << "\t";
         }

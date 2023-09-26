@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  The dimensions should be 2 or 3.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
-class AbstractPurkinjeCellFactory : public AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>
+class AbstractPurkinjeCellFactory : public AbstractCardiacCellFactory<ELEMENT_DIM, SPACE_DIM>
 {
 private:
     /**
@@ -60,7 +60,7 @@ private:
 
 protected:
     /** Saved pointer to the mixed dimension mesh */
-    MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* mpMixedDimensionMesh;
+    MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>* mpMixedDimensionMesh;
 
     /** A set of local purkinje node indices */
     std::set<unsigned> mLocalPurkinjeNodes;
@@ -112,7 +112,7 @@ public:
 
     /** Overridden set mesh which must take a MixedDimensionMesh
      *  @param pMesh Pointer to the mesh. */
-    void SetMesh(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
+    void SetMesh(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh);
 
     /**
      * @return a newly created cell object for the given node.
@@ -144,7 +144,7 @@ public:
      *  @return the mixed dimension mesh (for possible use in CreatePurkinjeCellForTissueNode()).
      *  Note: GetMesh() just returns a pointer to an AbstractTetrahedralMesh.
      */
-    MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* GetMixedDimensionMesh();
+    MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>* GetMixedDimensionMesh();
 };
 
 #endif // ABSTRACTPURKINJECELLFACTORY_HPP_

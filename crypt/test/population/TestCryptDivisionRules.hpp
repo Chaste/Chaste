@@ -67,7 +67,7 @@ public:
     void TestCryptCentreBasedDivisionRule1d()
     {
         // Create a 2d cell population
-        MutableMesh<1,1> mesh;
+        MutableMesh<1, 1> mesh;
         mesh.ConstructLinearMesh(21);
 
         ChastePoint<1> shifted_point;
@@ -87,16 +87,16 @@ public:
             cells.push_back(p_cell);
         }
 
-        MeshBasedCellPopulation<1,1> cell_population(mesh, cells);
+        MeshBasedCellPopulation<1, 1> cell_population(mesh, cells);
 
         CellPtr p_cell0 = cell_population.GetCellUsingLocationIndex(0);
 
         // Set the division rule for our population to be the random direction division rule
-        boost::shared_ptr<AbstractCentreBasedDivisionRule<1,1> > p_division_rule_to_set(new CryptCentreBasedDivisionRule<1,1>());
+        boost::shared_ptr<AbstractCentreBasedDivisionRule<1, 1> > p_division_rule_to_set(new CryptCentreBasedDivisionRule<1, 1>());
         cell_population.SetCentreBasedDivisionRule(p_division_rule_to_set);
 
         // Get the division rule back from the population
-        boost::shared_ptr<AbstractCentreBasedDivisionRule<1,1> > p_division_rule = cell_population.GetCentreBasedDivisionRule();
+        boost::shared_ptr<AbstractCentreBasedDivisionRule<1, 1> > p_division_rule = cell_population.GetCentreBasedDivisionRule();
 
         std::pair<c_vector<double, 1>, c_vector<double, 1> > positions = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
 
@@ -110,12 +110,12 @@ public:
     void TestCryptCentreBasedDivisionRule2d()
     {
         // Create a 2d cell population
-        c_vector<double,2> location;
+        c_vector<double, 2> location;
         location[0] = 1.0;
         location[1] = 1.0;
         Node<2>* p_node = new Node<2>(0u,location, false);
 
-        MutableMesh<2,2> conf_mesh;
+        MutableMesh<2, 2> conf_mesh;
         conf_mesh.AddNode(p_node);
 
         // Create cells
@@ -124,17 +124,17 @@ public:
         cells_generator.Generate(conf_cells, &conf_mesh, std::vector<unsigned>(), true);
 
         // Create cell population
-        MeshBasedCellPopulation<2,2> cell_population(conf_mesh, conf_cells);
+        MeshBasedCellPopulation<2, 2> cell_population(conf_mesh, conf_cells);
         cell_population.SetMeinekeDivisionSeparation(0.1);
 
         CellPtr p_cell0 = *(cell_population.Begin());
 
         // Set the division rule for our population to be the random direction division rule
-        boost::shared_ptr<AbstractCentreBasedDivisionRule<2,2> > p_division_rule_to_set(new CryptCentreBasedDivisionRule<2,2>());
+        boost::shared_ptr<AbstractCentreBasedDivisionRule<2, 2> > p_division_rule_to_set(new CryptCentreBasedDivisionRule<2, 2>());
         cell_population.SetCentreBasedDivisionRule(p_division_rule_to_set);
 
         // Get the division rule back from the population
-        boost::shared_ptr<AbstractCentreBasedDivisionRule<2,2> > p_division_rule = cell_population.GetCentreBasedDivisionRule();
+        boost::shared_ptr<AbstractCentreBasedDivisionRule<2, 2> > p_division_rule = cell_population.GetCentreBasedDivisionRule();
 
         std::pair<c_vector<double, 2>, c_vector<double, 2> > positions = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
 
@@ -150,24 +150,24 @@ public:
     void TestCryptCentreBasedDivisionRule3d()
     {
         // Create a 3d cell population
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/3D_Single_tetrahedron_element");
-        MutableMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/3D_Single_tetrahedron_element");
+        MutableMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedG1GenerationalCellCycleModel,3> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
-        MeshBasedCellPopulation<3,3> cell_population(mesh, cells);
+        MeshBasedCellPopulation<3, 3> cell_population(mesh, cells);
 
         CellPtr p_cell0 = *(cell_population.Begin());
 
         // Set the division rule for our population to be the random direction division rule
-        boost::shared_ptr<AbstractCentreBasedDivisionRule<3,3> > p_division_rule_to_set(new CryptCentreBasedDivisionRule<3,3>());
+        boost::shared_ptr<AbstractCentreBasedDivisionRule<3, 3> > p_division_rule_to_set(new CryptCentreBasedDivisionRule<3, 3>());
         cell_population.SetCentreBasedDivisionRule(p_division_rule_to_set);
 
         // Get the division rule back from the population
-        boost::shared_ptr<AbstractCentreBasedDivisionRule<3,3> > p_division_rule = cell_population.GetCentreBasedDivisionRule();
+        boost::shared_ptr<AbstractCentreBasedDivisionRule<3, 3> > p_division_rule = cell_population.GetCentreBasedDivisionRule();
 
         TS_ASSERT_THROWS_THIS(p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population),
             "CryptCentreBasedDivisionRule is not implemented for SPACE_DIM == 3");
@@ -186,9 +186,9 @@ public:
         nodes_elem_1.push_back(nodes[1]);
         nodes_elem_1.push_back(nodes[2]);
         nodes_elem_1.push_back(nodes[3]);
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_1));
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_1));
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 1> cells_generator;
@@ -369,7 +369,7 @@ public:
         std::string archive_file = "CryptCentreBasedDivisionRule.arch";
 
         {
-            boost::shared_ptr<AbstractCentreBasedDivisionRule<2,2> > p_division_rule(new CryptCentreBasedDivisionRule<2,2>());
+            boost::shared_ptr<AbstractCentreBasedDivisionRule<2, 2> > p_division_rule(new CryptCentreBasedDivisionRule<2, 2>());
 
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
@@ -378,14 +378,14 @@ public:
         }
 
         {
-            boost::shared_ptr<AbstractCentreBasedDivisionRule<2,2> > p_division_rule;
+            boost::shared_ptr<AbstractCentreBasedDivisionRule<2, 2> > p_division_rule;
 
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
             (*p_arch) >> p_division_rule;
 
-            typedef CryptCentreBasedDivisionRule<2,2> CryptRule;
+            typedef CryptCentreBasedDivisionRule<2, 2> CryptRule;
             TS_ASSERT(dynamic_cast<CryptRule*>(p_division_rule.get()));
         }
     }

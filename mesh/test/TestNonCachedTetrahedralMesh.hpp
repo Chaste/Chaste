@@ -88,7 +88,7 @@ public:
         // TetrahedralMesh with Jacobian caching
         unsigned cached_mem_usage;
         {
-            TetrahedralMesh<3,3> mesh;
+            TetrahedralMesh<3, 3> mesh;
             mesh.ConstructCuboid(30,30,30);
             cached_mem_usage = GetMemoryUsage();
         }
@@ -96,7 +96,7 @@ public:
         // No caching
         unsigned non_cached_mem_usage;
         {
-            NonCachedTetrahedralMesh<3,3> mesh;
+            NonCachedTetrahedralMesh<3, 3> mesh;
             mesh.ConstructCuboid(30,30,30);
             non_cached_mem_usage = GetMemoryUsage();
         }
@@ -107,10 +107,10 @@ public:
 
     void TestSameJacobianData()
     {
-        TetrahedralMesh<3,3> cached_mesh;
+        TetrahedralMesh<3, 3> cached_mesh;
         cached_mesh.ConstructCuboid(40,40,40);
 
-        NonCachedTetrahedralMesh<3,3> non_cached_mesh;
+        NonCachedTetrahedralMesh<3, 3> non_cached_mesh;
         non_cached_mesh.ConstructCuboid(40,40,40);
 
         TS_ASSERT_EQUALS(cached_mesh.GetNumNodes(), non_cached_mesh.GetNumNodes());
@@ -135,9 +135,9 @@ public:
 
             TS_ASSERT_EQUALS(det_cached, det_non_cached);
 
-            for (unsigned row=0; row<2; row++)
+            for (unsigned row = 0; row<2; row++)
             {
-                for (unsigned col=0; col<2; col++)
+                for (unsigned col = 0; col<2; col++)
                 {
                     TS_ASSERT_EQUALS(j_cached(row,col), j_non_cached(row,col));
                     TS_ASSERT_EQUALS(ij_cached(row,col), ij_non_cached(row,col));
@@ -185,7 +185,7 @@ public:
 
             TS_ASSERT_EQUALS(det_cached, det_non_cached);
 
-            for (unsigned row=0; row<2; row++)
+            for (unsigned row = 0; row<2; row++)
             {
                 TS_ASSERT_EQUALS(wd_cached(row), wd_non_cached(row));
             }
@@ -194,7 +194,7 @@ public:
 
     void TestExceptions()
     {
-        NonCachedTetrahedralMesh<3,3> non_cached_mesh;
+        NonCachedTetrahedralMesh<3, 3> non_cached_mesh;
         non_cached_mesh.ConstructCuboid(1,1,1);
 
         c_matrix<double, 3, 3> jacobian;
@@ -215,9 +215,9 @@ public:
         ArchiveLocationInfo::SetMeshFilename("non_cached_tetrahedral_mesh");
 
         {
-            TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
+            TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/disk_984_elements");
 
-            AbstractTetrahedralMesh<2,2>* const p_mesh = new NonCachedTetrahedralMesh<2,2>;
+            AbstractTetrahedralMesh<2, 2>* const p_mesh = new NonCachedTetrahedralMesh<2, 2>;
             p_mesh->ConstructFromMeshReader(mesh_reader);
 
             // Create output archive
@@ -231,7 +231,7 @@ public:
         {
             // Should archive the most abstract class you can to check boost knows what individual classes are.
             // (but here AbstractMesh doesn't have the methods below).
-            AbstractTetrahedralMesh<2,2>* p_mesh2;
+            AbstractTetrahedralMesh<2, 2>* p_mesh2;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -251,7 +251,7 @@ public:
             TS_ASSERT_DELTA(p_mesh2->GetNode(1)->GetPoint()[1], 0.0, 1e-6);
 
             // Check first element has the right nodes
-            TetrahedralMesh<2,2>::ElementIterator iter = p_mesh2->GetElementIteratorBegin();
+            TetrahedralMesh<2, 2>::ElementIterator iter = p_mesh2->GetElementIteratorBegin();
             TS_ASSERT_EQUALS(iter->GetNodeGlobalIndex(0), 309u);
             TS_ASSERT_EQUALS(iter->GetNodeGlobalIndex(1), 144u);
             TS_ASSERT_EQUALS(iter->GetNodeGlobalIndex(2), 310u);

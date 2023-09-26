@@ -53,7 +53,7 @@ class HoneycombVertexMeshGenerator
 protected:
 
     /** A pointer to the mesh this class creates */
-    boost::shared_ptr<MutableVertexMesh<2,2> > mpMesh;
+    boost::shared_ptr<MutableVertexMesh<2, 2> > mpMesh;
 
 public:
 
@@ -89,7 +89,7 @@ public:
     /**
      * @return a 2D honeycomb mesh
      */
-    virtual boost::shared_ptr<MutableVertexMesh<2,2> > GetMesh();
+    virtual boost::shared_ptr<MutableVertexMesh<2, 2> > GetMesh();
 };
 
 #endif /*HONEYCOMBVERTEXMESHGENERATOR_HPP_*/

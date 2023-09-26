@@ -70,7 +70,7 @@ public:
 
         EXIT_IF_PARALLEL;
 
-        TetrahedralMesh<1,3> airways_mesh;
+        TetrahedralMesh<1, 3> airways_mesh;
 
         MultiLobeAirwayGenerator generator(airways_mesh);
 
@@ -94,8 +94,8 @@ public:
         EXIT_IF_PARALLEL;
 
         //Major airways mesh has 4 end points at (+/-2,0,0) and (0,+/-2,0), one is unused
-        TetrahedralMesh<1,3> airways_mesh;
-        TrianglesMeshReader<1,3> airways_mesh_reader("lung/test/airway_generation/data/test_major_airways_mesh");
+        TetrahedralMesh<1, 3> airways_mesh;
+        TrianglesMeshReader<1, 3> airways_mesh_reader("lung/test/airway_generation/data/test_major_airways_mesh");
         airways_mesh.ConstructFromMeshReader(airways_mesh_reader);
 
         MultiLobeAirwayGenerator generator(airways_mesh);
@@ -141,8 +141,8 @@ public:
         EXIT_IF_PARALLEL;
 
         //Major airways mesh has 4 end points at (+/-2,0,0) and (0,+/-2,0), two are unused
-        TetrahedralMesh<1,3> airways_mesh;
-        TrianglesMeshReader<1,3> airways_mesh_reader("lung/test/airway_generation/data/test_major_airways_mesh");
+        TetrahedralMesh<1, 3> airways_mesh;
+        TrianglesMeshReader<1, 3> airways_mesh_reader("lung/test/airway_generation/data/test_major_airways_mesh");
         airways_mesh.ConstructFromMeshReader(airways_mesh_reader);
 
         MultiLobeAirwayGenerator generator(airways_mesh);
@@ -189,7 +189,7 @@ public:
     unsigned CountIsInsideSurface(vtkSmartPointer<vtkSelectEnclosedPoints> pointSelector, double x, double y, double z)
     {
         unsigned count = 0;
-        for (unsigned i=0; i<sNumTrials; ++i)
+        for (unsigned i = 0; i<sNumTrials; ++i)
         {
             count += pointSelector->IsInsideSurface(x,y,z);
         }
@@ -303,8 +303,8 @@ public:
 
         EXIT_IF_PARALLEL;
 
-        TetrahedralMesh<1,3> airways_mesh;
-        TrianglesMeshReader<1,3> airways_mesh_reader("lung/test/airway_generation/data/test_major_airways_mesh");
+        TetrahedralMesh<1, 3> airways_mesh;
+        TrianglesMeshReader<1, 3> airways_mesh_reader("lung/test/airway_generation/data/test_major_airways_mesh");
         airways_mesh.ConstructFromMeshReader(airways_mesh_reader);
 
         MultiLobeAirwayGenerator generator(airways_mesh);
@@ -331,9 +331,9 @@ public:
         generator.Generate("TestMultiLobeAirwayGenerator", "composite");
 
         // Check the final mesh
-        TetrahedralMesh<1,3> composite_mesh;
+        TetrahedralMesh<1, 3> composite_mesh;
         OutputFileHandler file_handler("TestMultiLobeAirwayGenerator", false);
-        TrianglesMeshReader<1,3> composite_mesh_reader(file_handler.GetOutputDirectoryFullPath() + "composite");
+        TrianglesMeshReader<1, 3> composite_mesh_reader(file_handler.GetOutputDirectoryFullPath() + "composite");
         composite_mesh.ConstructFromMeshReader(composite_mesh_reader);
 
         //Check that the correct number of branches have been created

@@ -77,7 +77,7 @@ public:
         /* We set up exactly the same simulation as in UserTutorials/AnotherBidomainSimulation */
         HeartConfig::Instance()->Reset();
 
-        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML,2> cell_factory(-2000000);
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-2000000);
         HeartConfig::Instance()->SetSimulationDuration(5.0); //ms
         HeartConfig::Instance()->SetOutputDirectory("BidomainCheckpointingTutorial");
         HeartConfig::Instance()->SetOutputFilenamePrefix("results");

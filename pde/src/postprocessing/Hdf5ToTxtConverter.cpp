@@ -43,19 +43,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DistributedTetrahedralMesh.hpp"
 #include "Warnings.hpp"
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 Hdf5ToTxtConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToTxtConverter(
     const FileFinder& rInputDirectory,
     const std::string& rFileBaseName,
     AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
-    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(
+    : AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>(
           rInputDirectory,
           rFileBaseName,
           pMesh,
           "txt_output",
           0u)
 {
-    // Make sure that we are never trying to write from an incomplete data HDF5 file
+    // Make sure that we aren't trying to write from an incomplete data HDF5 file
     assert(this->mpReader->GetNumberOfRows() == pMesh->GetNumNodes());
 
     FileFinder output_directory(this->mRelativeSubdirectory,rInputDirectory);
@@ -102,9 +102,9 @@ Hdf5ToTxtConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToTxtConverter(
 }
 
 // Explicit instantiation
-template class Hdf5ToTxtConverter<1,1>;
-template class Hdf5ToTxtConverter<1,2>;
-template class Hdf5ToTxtConverter<2,2>;
-template class Hdf5ToTxtConverter<1,3>;
-template class Hdf5ToTxtConverter<2,3>;
-template class Hdf5ToTxtConverter<3,3>;
+template class Hdf5ToTxtConverter<1, 1>;
+template class Hdf5ToTxtConverter<1, 2>;
+template class Hdf5ToTxtConverter<2, 2>;
+template class Hdf5ToTxtConverter<1, 3>;
+template class Hdf5ToTxtConverter<2, 3>;
+template class Hdf5ToTxtConverter<3, 3>;

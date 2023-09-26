@@ -295,7 +295,7 @@ public:
         for (auto cell_iter : crypt)
         {
             bool in_section = false;
-            for (unsigned vector_index=0; vector_index<test_section.size(); vector_index++)
+            for (unsigned vector_index = 0; vector_index<test_section.size(); vector_index++)
             {
                 if (test_section[vector_index] == cell_iter)
                 {
@@ -315,7 +315,7 @@ public:
 
         // Test that the vector of booleans corresponds with a visualisation of the data -
         // only the first few cells at the base of the crypt have been labelled
-        for (unsigned vector_index=0; vector_index<labelled.size(); vector_index++)
+        for (unsigned vector_index = 0; vector_index<labelled.size(); vector_index++)
         {
             if (vector_index == 2u || vector_index == 3u || vector_index == 4u)
             {
@@ -372,7 +372,7 @@ public:
         SimulationTime* p_simulation_time;
 
         // Loop over the number of simulations
-        for (unsigned simulation_index=0; simulation_index<num_simulations; simulation_index++)
+        for (unsigned simulation_index = 0; simulation_index<num_simulations; simulation_index++)
         {
             // Create new structures for each simulation
             p_mesh = generator.GetCylindricalMesh();
@@ -434,7 +434,7 @@ public:
             labelled = p_crypt_statistics->AreCryptSectionCellsLabelled(crypt_section);
 
             // Store information from this simulation in a global vector
-            for (unsigned cell_index=0; cell_index < labelled.size(); cell_index++)
+            for (unsigned cell_index = 0; cell_index < labelled.size(); cell_index++)
             {
                 TS_ASSERT(cell_index < labelled_cells_counter.size());
 
@@ -455,7 +455,7 @@ public:
 
         // Calculate percentage of labelled cells at each position in 'labelled_cells_counter'
         std::vector<double> percentage_of_labelled_cells(max_length_of_crypt_section);
-        for (unsigned index=0; index < max_length_of_crypt_section; index ++)
+        for (unsigned index = 0; index < max_length_of_crypt_section; index ++)
         {
             percentage_of_labelled_cells[index] = static_cast<double>(labelled_cells_counter[index]) / num_simulations;
         }

@@ -84,7 +84,7 @@ public:
      * @return a stored quadrature point by element index and quad index in the 
      *     element.
      */
-    c_vector<double,DIM>& rGet(unsigned elementIndex, unsigned quadIndex);
+    c_vector<double, DIM>& rGet(unsigned elementIndex, unsigned quadIndex);
 
     /**
      * @param i the quadrature point index

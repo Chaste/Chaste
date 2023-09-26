@@ -58,13 +58,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #undef REAL
 #undef VOID
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::TetrahedralMesh()
 {
     Clear();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(
     AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader)
 {
@@ -195,7 +195,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(
     rMeshReader.Reset();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ReadNodesPerProcessorFile(
     const std::string& rNodesPerProcessorFile)
 {
@@ -244,7 +244,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ReadNodesPerProcessorFile(
         new DistributedVectorFactory(this->GetNumNodes(), num_owned);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsConforming()
 {
     /*
@@ -295,7 +295,7 @@ bool TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsConforming()
     return (odd_parity_faces.size() == this->GetNumBoundaryElements());
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetVolume()
 {
     double mesh_volume = 0.0;
@@ -311,7 +311,7 @@ double TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetVolume()
     return mesh_volume;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceArea()
 {
     // ELEMENT_DIM-1 is the dimension of the boundary element
@@ -346,7 +346,7 @@ double TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceArea()
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::PermuteNodes()
 {
     // Make a permutation vector of the identity
@@ -358,7 +358,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::PermuteNodes()
     PermuteNodes(perm);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::PermuteNodes(
     const std::vector<unsigned>& perm)
 {
@@ -391,7 +391,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::PermuteNodes(
     this->mNodePermutation = perm;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetContainingElementIndexWithInitialGuess(
     const ChastePoint<SPACE_DIM>& rTestPoint,
     unsigned startingElementGuess,
@@ -439,7 +439,7 @@ unsigned TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetContainingElementIndexWithI
     EXCEPTION(ss.str());
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestElementIndex(const ChastePoint<SPACE_DIM>& rTestPoint)
 {
     EXCEPT_IF_NOT(ELEMENT_DIM == SPACE_DIM); // LCOV_EXCL_LINE // CalculateInterpolationWeights hits an assertion otherwise
@@ -466,7 +466,7 @@ unsigned TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestElementIndex(const C
     return closest_index;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<unsigned> TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetContainingElementIndices(const ChastePoint<SPACE_DIM>& rTestPoint)
 {
     std::vector<unsigned> element_indices;
@@ -481,7 +481,7 @@ std::vector<unsigned> TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetContainingElem
     return element_indices;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
 {
     // Three loops, just like the destructor. note we don't delete boundary nodes.
@@ -504,7 +504,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
     this->mBoundaryNodes.clear();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetAngleBetweenNodes(
     [[maybe_unused]] unsigned indexA,
     [[maybe_unused]] unsigned indexB)
@@ -543,7 +543,7 @@ double TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetAngleBetweenNodes(
 //                          Edge iterator class                             //
 //////////////////////////////////////////////////////////////////////////////
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 Node<SPACE_DIM>* TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator::GetNodeA()
 {
     assert((*this) != mrMesh.EdgesEnd());
@@ -551,7 +551,7 @@ Node<SPACE_DIM>* TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator::GetNodeA
     return p_element->GetNode(mNodeALocalIndex);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 Node<SPACE_DIM>* TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator::GetNodeB()
 {
     assert((*this) != mrMesh.EdgesEnd());
@@ -559,13 +559,13 @@ Node<SPACE_DIM>* TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator::GetNodeB
     return p_element->GetNode(mNodeBLocalIndex);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator::operator!=(const typename TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator& rOther)
 {
     return (mElemIndex != rOther.mElemIndex || mNodeALocalIndex != rOther.mNodeALocalIndex || mNodeBLocalIndex != rOther.mNodeBLocalIndex);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator& TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator::operator++()
 {
     bool already_seen_this_edge;
@@ -623,7 +623,7 @@ typename TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator& TetrahedralMesh<
     return (*this);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator::EdgeIterator(TetrahedralMesh& rMesh, unsigned elemIndex)
         : mrMesh(rMesh),
           mElemIndex(elemIndex),
@@ -653,7 +653,7 @@ TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator::EdgeIterator(TetrahedralM
     mEdgesVisited.insert(current_node_pair);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgesBegin()
 {
     unsigned first_element_index = 0;
@@ -664,40 +664,40 @@ typename TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator TetrahedralMesh<E
     return EdgeIterator(*this, first_element_index);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgeIterator TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::EdgesEnd()
 {
     return EdgeIterator(*this, this->GetNumAllElements());
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::RefreshMesh()
 {
     RefreshJacobianCachedData();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::SolveNodeMapping(unsigned index) const
 {
     assert(index < this->mNodes.size());
     return index;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::SolveElementMapping(unsigned index) const
 {
     assert(index < this->mElements.size());
     return index;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::SolveBoundaryElementMapping(unsigned index) const
 {
     assert(index < this->mBoundaryElements.size());
     return index;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::RefreshJacobianCachedData()
 {
     unsigned num_elements = this->GetNumAllElements();
@@ -746,7 +746,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::RefreshJacobianCachedData()
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetJacobianForElement(unsigned elementIndex, c_matrix<double, SPACE_DIM, SPACE_DIM>& rJacobian, double& rJacobianDeterminant) const
 {
     if constexpr (ELEMENT_DIM <= SPACE_DIM)
@@ -761,7 +761,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetJacobianForElement(unsigned ele
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetInverseJacobianForElement(unsigned elementIndex, c_matrix<double, SPACE_DIM, ELEMENT_DIM>& rJacobian, double& rJacobianDeterminant, c_matrix<double, ELEMENT_DIM, SPACE_DIM>& rInverseJacobian) const
 {
     if constexpr (ELEMENT_DIM <= SPACE_DIM)
@@ -777,7 +777,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetInverseJacobianForElement(unsig
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetWeightedDirectionForElement(unsigned elementIndex, c_vector<double, SPACE_DIM>& rWeightedDirection, double& rJacobianDeterminant) const
 {
     if constexpr (ELEMENT_DIM < SPACE_DIM)
@@ -792,7 +792,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetWeightedDirectionForElement(uns
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetWeightedDirectionForBoundaryElement(unsigned elementIndex, c_vector<double, SPACE_DIM>& rWeightedDirection, double& rJacobianDeterminant) const
 {
     assert(elementIndex < this->mBoundaryElementWeightedDirections.size());
@@ -800,7 +800,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetWeightedDirectionForBoundaryEle
     rJacobianDeterminant = this->mBoundaryElementJacobianDeterminants[elementIndex];
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::InitialiseTriangulateIo(triangulateio& mesherIo)
 {
     mesherIo.numberofpoints = 0;
@@ -818,7 +818,7 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::InitialiseTriangulateIo(triangulat
     mesherIo.edgemarkerlist = (int*)nullptr;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::FreeTriangulateIo(triangulateio& mesherIo)
 {
     if (mesherIo.numberofpoints != 0)
@@ -836,8 +836,8 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::FreeTriangulateIo(triangulateio& m
     free(mesherIo.edgemarkerlist);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-template <class MESHER_IO>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<class MESHER_IO>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ExportToMesher(NodeMap& map, MESHER_IO& mesherInput, int* elementList)
 {
     if (SPACE_DIM == 2)
@@ -886,8 +886,8 @@ void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ExportToMesher(NodeMap& map, MESHE
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-template <class MESHER_IO>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<class MESHER_IO>
 void TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ImportFromMesher(MESHER_IO& mesherOutput, unsigned numberOfElements, int* elementList, unsigned numberOfFaces, int* faceList, int* edgeMarkerList)
 {
     unsigned nodes_per_element = mesherOutput.numberofcorners;
@@ -1043,15 +1043,15 @@ template void TetrahedralMesh<1u, 1u>::ExportToMesher<triangulateio>(NodeMap&, t
 template void TetrahedralMesh<2u, 2u>::ExportToMesher<tetgen::tetgenio>(NodeMap&, tetgen::tetgenio&, int*);
 
 // Intel v11 compilation thinks that it's missing even more bizarre instantiations
-//template void TetrahedralMesh<2,2>::ExportToMesher<tetgen::tetgenio>(NodeMap&, tetgen::tetgenio&, int*);
-//template void TetrahedralMesh<3,3>::ExportToMesher<triangulateio>(NodeMap&, triangulateio&, int*);
-//template void TetrahedralMesh<1,3>::ExportToMesher<triangulateio>(NodeMap&, triangulateio&, int*);
-//template void TetrahedralMesh<1,1>::ExportToMesher<triangulateio>(NodeMap&, triangulateio&, int*);
-//template void TetrahedralMesh<1,2>::ExportToMesher<tetgen::tetgenio>(NodeMap&, tetgen::tetgenio&, int*);
-//template void TetrahedralMesh<2,3>::ExportToMesher<triangulateio>(NodeMap&, triangulateio&, int*);
-//template void TetrahedralMesh<1,3>::ImportFromMesher<triangulateio>(triangulateio&, unsigned, int *, unsigned, int *, int *);
-//template void TetrahedralMesh<2,3>::ImportFromMesher<triangulateio>(triangulateio&, unsigned, int *, unsigned, int *, int *);
-//template void TetrahedralMesh<1,2>::ImportFromMesher<tetgen::tetgenio>(tetgen::tetgenio&, unsigned, int *, unsigned, int *, int *);
+//template void TetrahedralMesh<2, 2>::ExportToMesher<tetgen::tetgenio>(NodeMap&, tetgen::tetgenio&, int*);
+//template void TetrahedralMesh<3, 3>::ExportToMesher<triangulateio>(NodeMap&, triangulateio&, int*);
+//template void TetrahedralMesh<1, 3>::ExportToMesher<triangulateio>(NodeMap&, triangulateio&, int*);
+//template void TetrahedralMesh<1, 1>::ExportToMesher<triangulateio>(NodeMap&, triangulateio&, int*);
+//template void TetrahedralMesh<1, 2>::ExportToMesher<tetgen::tetgenio>(NodeMap&, tetgen::tetgenio&, int*);
+//template void TetrahedralMesh<2, 3>::ExportToMesher<triangulateio>(NodeMap&, triangulateio&, int*);
+//template void TetrahedralMesh<1, 3>::ImportFromMesher<triangulateio>(triangulateio&, unsigned, int *, unsigned, int *, int *);
+//template void TetrahedralMesh<2, 3>::ImportFromMesher<triangulateio>(triangulateio&, unsigned, int *, unsigned, int *, int *);
+//template void TetrahedralMesh<1, 2>::ImportFromMesher<tetgen::tetgenio>(tetgen::tetgenio&, unsigned, int *, unsigned, int *, int *);
 #ifdef _MSC_VER
 //MSVC requires these
 template void TetrahedralMesh<2, 2>::ExportToMesher<tetgen::tetgenio>(NodeMap&, tetgen::tetgenio&, int*);

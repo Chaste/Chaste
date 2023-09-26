@@ -49,7 +49,7 @@ template<unsigned SPACE_DIM> class AbstractCaBasedDivisionRule;
  * A division rule for CA-based cell populations to divide randomly into the available neighbours.
  * If there are no spaces then the move is aborted.
  */
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 class ExclusionCaBasedDivisionRule : public AbstractCaBasedDivisionRule<SPACE_DIM>
 {
 private:

@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AirwayRemesher.hpp"
 
-AirwayRemesher::AirwayRemesher(TetrahedralMesh<1,3>& rMesh, unsigned rootIndex)
+AirwayRemesher::AirwayRemesher(TetrahedralMesh<1, 3>& rMesh, unsigned rootIndex)
     : mrMesh(rMesh),
       mOutletNodeIndex(rootIndex),
       mWalker(mrMesh, mOutletNodeIndex),
@@ -43,13 +43,13 @@ AirwayRemesher::AirwayRemesher(TetrahedralMesh<1,3>& rMesh, unsigned rootIndex)
 {
 }
 
-void AirwayRemesher::Remesh(MutableMesh<1,3>& rOutputMesh)
+void AirwayRemesher::Remesh(MutableMesh<1, 3>& rOutputMesh)
 {
     Remesh(rOutputMesh, DBL_MAX);
 }
 
 void AirwayRemesher::Remesh(
-    MutableMesh<1,3>& rOutputMesh,
+    MutableMesh<1, 3>& rOutputMesh,
     double maximumResistance)
 {
     std::vector<AirwayBranch*> branches = mCalculator.GetBranches();
@@ -89,7 +89,7 @@ void AirwayRemesher::Remesh(
             nodes.push_back(new_start_node);
             nodes.push_back(new_end_node);
 
-            Element<1,3>* elem = new Element<1,3>(0, nodes);
+            Element<1, 3>* elem = new Element<1, 3>(0, nodes);
             elem->SetAttribute(equivalent_radius);
             rOutputMesh.AddElement(elem);
 
@@ -104,7 +104,7 @@ void AirwayRemesher::Remesh(
         nodes.push_back(new_start_node);
         nodes.push_back(new_distal_node);
 
-        Element<1,3>* elem = new Element<1,3>(0, nodes);
+        Element<1, 3>* elem = new Element<1, 3>(0, nodes);
         elem->SetAttribute(equivalent_radius);
         rOutputMesh.AddElement(elem);
     }

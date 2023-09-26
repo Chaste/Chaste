@@ -43,7 +43,7 @@ http://www.CellML.org/
 <title>Model Structure</title>
 
 <para>
-In 1991, Ching-hsing Luo and Yoram Rudy published a mathematical model of the ventricular cardiac action potential.  This original model is the first of the two Luo-Rudy models, and it has subsequently come to be known as the Luo-Rudy I model.  It is a significant update of the Beeler-Reuter mammalian ventricular model (1977) (see the figure below), and like the the Beeler-Reuter model, the Luo-Rudy I model uses Hodgkin-Huxley type equations to calculate ionic currents.
+In 1991, Ching-hsing Luo and Yoram Rudy published a mathematical model of the ventricular cardiac action potential.  This original model is the first of the two Luo-Rudy models, and it has subsequently come to be known as the Luo-Rudy I model.  It is a significant update of the Beeler-Reuter mammalian ventricular model (1977) (see the figure below), and like the Beeler-Reuter model, the Luo-Rudy I model uses Hodgkin-Huxley type equations to calculate ionic currents.
 </para>
 
 <para>

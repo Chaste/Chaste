@@ -61,7 +61,7 @@ public:
      *     edited in place.
      * @param rootIndex The root node index corresponding to the trachea.
      */
-    MajorAirwaysCentreLinesCleaner(MutableMesh<1,3>& rMesh,
+    MajorAirwaysCentreLinesCleaner(MutableMesh<1, 3>& rMesh,
                                    unsigned rootIndex);
 
     /**
@@ -89,7 +89,7 @@ public:
 
 private:
     /** A mesh containing the major airways. */
-    MutableMesh<1,3>& mrMesh;
+    MutableMesh<1, 3>& mrMesh;
 
     /** The index of the root of the airway tree (trachea). */
     unsigned mOutletNodeIndex;
@@ -110,7 +110,7 @@ private:
      * @param deleteMe A flag to determine if this element should be deleted or 
      *     not *after* processing its children
      */
-    void CleanElementUsingHorsfieldOrder(Element<1,3>* pElement, bool deleteMe);
+    void CleanElementUsingHorsfieldOrder(Element<1, 3>* pElement, bool deleteMe);
 };
 
 #endif // MAJOR_AIRWAYS_CENTRE_LINES_CLEANER_HPP_

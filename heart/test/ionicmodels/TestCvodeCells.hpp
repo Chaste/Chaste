@@ -113,7 +113,7 @@ public :
 };
 
 template<>
-void OdeSystemInformation<ExceptionalCell>::Initialise(void)
+void OdeSystemInformation<ExceptionalCell>::Initialise()
 {
     // State variables
     this->mVariableNames.push_back("V");

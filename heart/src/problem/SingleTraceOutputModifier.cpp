@@ -77,7 +77,7 @@ SingleTraceOutputModifier::ProcessSolutionAtTimeStep(double time, Vec solution, 
         double* p_solution;
         VecGetArray(solution, &p_solution);  //This does not need to be collective
         (*mFileStream) << time;
-        for (unsigned i=0; i<problemDim; ++i)
+        for (unsigned i = 0; i<problemDim; ++i)
         {
             (*mFileStream) << "\t" << p_solution[mLocalIndex*problemDim+i];
         }

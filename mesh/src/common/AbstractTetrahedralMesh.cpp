@@ -41,16 +41,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////////
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::SetElementOwnerships()
 {
     unsigned lo=this->GetDistributedVectorFactory()->GetLow();
     unsigned hi=this->GetDistributedVectorFactory()->GetHigh();
-    for (unsigned element_index=0; element_index<mElements.size(); element_index++)
+    for (unsigned element_index = 0; element_index<mElements.size(); element_index++)
     {
         Element<ELEMENT_DIM, SPACE_DIM>* p_element = mElements[element_index];
         p_element->SetOwnership(false);
-        for (unsigned local_node_index=0; local_node_index< p_element->GetNumNodes(); local_node_index++)
+        for (unsigned local_node_index = 0; local_node_index< p_element->GetNumNodes(); local_node_index++)
         {
             unsigned global_node_index = p_element->GetNodeGlobalIndex(local_node_index);
             if (lo<=global_node_index && global_node_index<hi)
@@ -72,12 +72,12 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::~AbstractTetrahedralMesh()
 {
     // Iterate over elements and free the memory
-    for (unsigned i=0; i<mElements.size(); ++i)
+    for (unsigned i = 0; i<mElements.size(); ++i)
     {
         delete mElements[i];
     }
     // Iterate over boundary elements and free the memory
-    for (unsigned i=0; i<mBoundaryElements.size(); ++i)
+    for (unsigned i = 0; i<mBoundaryElements.size(); ++i)
     {
         delete mBoundaryElements[i];
     }
@@ -151,19 +151,19 @@ BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>* AbstractTetrahedralMesh<ELEMENT_DIM, 
     return mBoundaryElements[local_index];
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::BoundaryElementIterator AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetBoundaryElementIteratorBegin() const
 {
     return mBoundaryElements.begin();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::BoundaryElementIterator AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetBoundaryElementIteratorEnd() const
 {
     return mBoundaryElements.end();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetInverseJacobianForElement(
         unsigned elementIndex,
         c_matrix<double, SPACE_DIM, ELEMENT_DIM>& rJacobian,
@@ -173,7 +173,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetInverseJacobianForEleme
     mElements[SolveElementMapping(elementIndex)]->CalculateInverseJacobian(rJacobian, rJacobianDeterminant, rInverseJacobian);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetWeightedDirectionForBoundaryElement(
         unsigned elementIndex,
         c_vector<double, SPACE_DIM>& rWeightedDirection,
@@ -196,7 +196,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckOutwardNormals()
     {
         //Form a set for the boundary element node indices
         std::set<unsigned> boundary_element_node_indices;
-        for (unsigned i=0; i<ELEMENT_DIM; ++i)
+        for (unsigned i = 0; i<ELEMENT_DIM; ++i)
         {
             boundary_element_node_indices.insert( (*face_iter)->GetNodeGlobalIndex(i) );
         }
@@ -210,7 +210,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckOutwardNormals()
             Element<ELEMENT_DIM, SPACE_DIM>* p_element = this->GetElement(*element_iter);
             //Form a set for the element node indices
             std::set<unsigned> element_node_indices;
-            for (unsigned i=0; i<=ELEMENT_DIM; ++i)
+            for (unsigned i = 0; i<=ELEMENT_DIM; ++i)
             {
                 element_node_indices.insert( p_element->GetNodeGlobalIndex(i) );
             }
@@ -242,7 +242,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CheckOutwardNormals()
 }
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(
     unsigned width)
 {
@@ -255,19 +255,19 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(
             if (node_index == 0) // create left boundary node and boundary element
             {
                 this->mBoundaryNodes.push_back(p_node);
-                this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(0, p_node) );
+                this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(0, p_node) );
             }
             if (node_index == width) // create right boundary node and boundary element
             {
                 this->mBoundaryNodes.push_back(p_node);
-                this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(1, p_node) );
+                this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(1, p_node) );
             }
             if (node_index > 0) // create element
             {
                 std::vector<Node<SPACE_DIM>*> nodes;
                 nodes.push_back(this->mNodes[node_index-1]);
                 nodes.push_back(this->mNodes[node_index]);
-                this->mElements.push_back(new Element<ELEMENT_DIM,SPACE_DIM>(node_index-1, nodes) );
+                this->mElements.push_back(new Element<ELEMENT_DIM, SPACE_DIM>(node_index-1, nodes) );
             }
         }
 
@@ -280,16 +280,16 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(
 }
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMesh(unsigned width, unsigned height, bool stagger)
 {
     if constexpr (SPACE_DIM == 2 && ELEMENT_DIM == 2)
     {
         // Construct the nodes
         unsigned node_index=0;
-        for (unsigned j=0; j<height+1; ++j)
+        for (unsigned j = 0; j<height+1; ++j)
         {
-            for (unsigned i=0; i<width+1; ++i)
+            for (unsigned i = 0; i<width+1; ++i)
             {
                 bool is_boundary=false;
                 if (i==0 || j==0 || i==width || j==height)
@@ -310,13 +310,13 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMesh(u
         //Construct the boundary elements
         unsigned belem_index=0;
         //Top
-        for (unsigned i=0; i<width; ++i)
+        for (unsigned i = 0; i<width; ++i)
         {
             std::vector<Node<SPACE_DIM>*> nodes;
             nodes.push_back(this->mNodes[height*(width+1)+i+1]);
             nodes.push_back(this->mNodes[height*(width+1)+i]);
             assert(belem_index==i);
-            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,nodes));
+            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,nodes));
         }
         //Right
         for (unsigned j=1; j<=height; ++j)
@@ -325,32 +325,32 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMesh(u
             nodes.push_back(this->mNodes[(width+1)*j-1]);
             nodes.push_back(this->mNodes[(width+1)*(j+1)-1]);
             assert(belem_index==width+j-1);
-            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,nodes));
+            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,nodes));
         }
         //Bottom
-        for (unsigned i=0; i<width; ++i)
+        for (unsigned i = 0; i<width; ++i)
         {
             std::vector<Node<SPACE_DIM>*> nodes;
             nodes.push_back(this->mNodes[i]);
             nodes.push_back(this->mNodes[i+1]);
             assert(belem_index==width+height+i);
-            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,nodes));
+            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,nodes));
         }
         //Left
-        for (unsigned j=0; j<height; ++j)
+        for (unsigned j = 0; j<height; ++j)
         {
             std::vector<Node<SPACE_DIM>*> nodes;
             nodes.push_back(this->mNodes[(width+1)*(j+1)]);
             nodes.push_back(this->mNodes[(width+1)*(j)]);
             assert(belem_index==2*width+height+j);
-            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,nodes));
+            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,nodes));
         }
 
         //Construct the elements
         unsigned elem_index = 0;
-        for (unsigned j=0; j<height; ++j)
+        for (unsigned j = 0; j<height; ++j)
         {
-            for (unsigned i=0; i<width; ++i)
+            for (unsigned i = 0; i<width; ++i)
             {
                 unsigned parity=(i+(height-j))%2;//Note that parity is measured from the top-left (not bottom left) for historical reasons
                 unsigned nw=(j+1)*(width+1)+i; //ne=nw+1
@@ -367,7 +367,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMesh(u
                     upper_nodes.push_back(this->mNodes[sw]);
                 }
                 assert(elem_index==2*(j*width+i));
-                this->mElements.push_back(new Element<ELEMENT_DIM,SPACE_DIM>(elem_index++,upper_nodes));
+                this->mElements.push_back(new Element<ELEMENT_DIM, SPACE_DIM>(elem_index++,upper_nodes));
                 std::vector<Node<SPACE_DIM>*> lower_nodes;
                 lower_nodes.push_back(this->mNodes[sw+1]);
                 lower_nodes.push_back(this->mNodes[sw]);
@@ -379,7 +379,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMesh(u
                 {
                     lower_nodes.push_back(this->mNodes[nw+1]);
                 }
-                this->mElements.push_back(new Element<ELEMENT_DIM,SPACE_DIM>(elem_index++,lower_nodes));
+                this->mElements.push_back(new Element<ELEMENT_DIM, SPACE_DIM>(elem_index++,lower_nodes));
             }
         }
 
@@ -391,7 +391,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMesh(u
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigned width,
         unsigned height,
         unsigned depth)
@@ -400,11 +400,11 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigned w
     {
         // Construct the nodes
         unsigned node_index = 0;
-        for (unsigned k=0; k<depth+1; ++k)
+        for (unsigned k = 0; k<depth+1; ++k)
         {
-            for (unsigned j=0; j<height+1; ++j)
+            for (unsigned j = 0; j<height+1; ++j)
             {
-                for (unsigned i=0; i<width+1; ++i)
+                for (unsigned i = 0; i<width+1; ++i)
                 {
                     bool is_boundary = false;
                     if (i==0 || j==0 || k==0 || i==width || j==height || k==depth)
@@ -444,16 +444,16 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigned w
     */
         std::vector<Node<SPACE_DIM>*> tetrahedra_nodes;
 
-        for (unsigned k=0; k<depth; ++k)
+        for (unsigned k = 0; k<depth; ++k)
         {
             if (k!=0)
             {
                 // height*width squares on upper face, k layers of 2*height+2*width square aroun
                 assert(belem_index ==   2*(height*width+k*2*(height+width)) );
             }
-            for (unsigned j=0; j<height; ++j)
+            for (unsigned j = 0; j<height; ++j)
             {
-                for (unsigned i=0; i<width; ++i)
+                for (unsigned i = 0; i<width; ++i)
                 {
                     // Compute the nodes' index
                     unsigned global_node_indices[8];
@@ -484,7 +484,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigned w
                         }
 
                         assert(elem_index == 6 * ((k*height+j)*width+i)+m );
-                        this->mElements.push_back(new Element<ELEMENT_DIM,SPACE_DIM>(elem_index++, tetrahedra_nodes));
+                        this->mElements.push_back(new Element<ELEMENT_DIM, SPACE_DIM>(elem_index++, tetrahedra_nodes));
                     }
 
                     // Are we at a boundary?
@@ -496,12 +496,12 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigned w
                         triangle_nodes.push_back(this->mNodes[global_node_indices[0]]);
                         triangle_nodes.push_back(this->mNodes[global_node_indices[2]]);
                         triangle_nodes.push_back(this->mNodes[global_node_indices[6]]);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,triangle_nodes));
                         triangle_nodes.clear();
                         triangle_nodes.push_back(this->mNodes[global_node_indices[0]]);
                         triangle_nodes.push_back(this->mNodes[global_node_indices[6]]);
                         triangle_nodes.push_back(this->mNodes[global_node_indices[4]]);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,triangle_nodes));
                     }
                     if (i == width-1) //high face at x=width
                     {
@@ -509,12 +509,12 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigned w
                         triangle_nodes.push_back(this->mNodes[global_node_indices[1]]);
                         triangle_nodes.push_back(this->mNodes[global_node_indices[5]]);
                         triangle_nodes.push_back(this->mNodes[global_node_indices[7]]);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,triangle_nodes));
                         triangle_nodes.clear();
                         triangle_nodes.push_back(this->mNodes[global_node_indices[1]]);
                         triangle_nodes.push_back(this->mNodes[global_node_indices[7]]);
                         triangle_nodes.push_back(this->mNodes[global_node_indices[3]]);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,triangle_nodes));
                     }
                     if (j == 0) //low face at y==0
                     {
@@ -522,12 +522,12 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigned w
                         triangle_nodes.push_back(this->mNodes[global_node_indices[0]]);
                         triangle_nodes.push_back(this->mNodes[global_node_indices[5]]);
                         triangle_nodes.push_back(this->mNodes[global_node_indices[1]]);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,triangle_nodes));
                         triangle_nodes.clear();
                         triangle_nodes.push_back(this->mNodes[global_node_indices[0]]);
                         triangle_nodes.push_back(this->mNodes[global_node_indices[4]]);
                         triangle_nodes.push_back(this->mNodes[global_node_indices[5]]);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,triangle_nodes));
                     }
                     if (j == height-1) //high face at y=height
                     {
@@ -535,12 +535,12 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigned w
                         triangle_nodes.push_back(this->mNodes[global_node_indices[2]]);
                         triangle_nodes.push_back(this->mNodes[global_node_indices[3]]);
                         triangle_nodes.push_back(this->mNodes[global_node_indices[7]]);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,triangle_nodes));
                         triangle_nodes.clear();
                         triangle_nodes.push_back(this->mNodes[global_node_indices[2]]);
                         triangle_nodes.push_back(this->mNodes[global_node_indices[7]]);
                         triangle_nodes.push_back(this->mNodes[global_node_indices[6]]);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,triangle_nodes));
                     }
                     if (k == 0) //low face at z==0
                     {
@@ -548,12 +548,12 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigned w
                         triangle_nodes.push_back(this->mNodes[global_node_indices[0]]);
                         triangle_nodes.push_back(this->mNodes[global_node_indices[3]]);
                         triangle_nodes.push_back(this->mNodes[global_node_indices[2]]);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,triangle_nodes));
                         triangle_nodes.clear();
                         triangle_nodes.push_back(this->mNodes[global_node_indices[0]]);
                         triangle_nodes.push_back(this->mNodes[global_node_indices[1]]);
                         triangle_nodes.push_back(this->mNodes[global_node_indices[3]]);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,triangle_nodes));
                     }
                     if (k == depth-1) //high face at z=depth
                     {
@@ -561,12 +561,12 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigned w
                         triangle_nodes.push_back(this->mNodes[global_node_indices[4]]);
                         triangle_nodes.push_back(this->mNodes[global_node_indices[7]]);
                         triangle_nodes.push_back(this->mNodes[global_node_indices[5]]);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,triangle_nodes));
                         triangle_nodes.clear();
                         triangle_nodes.push_back(this->mNodes[global_node_indices[4]]);
                         triangle_nodes.push_back(this->mNodes[global_node_indices[6]]);
                         triangle_nodes.push_back(this->mNodes[global_node_indices[7]]);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,triangle_nodes));
                     }
                 }//i
             }//j
@@ -580,7 +580,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigned w
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRegularSlabMesh(double spaceStep, double width, double height, double depth)
 {
     assert(spaceStep>0.0);
@@ -652,7 +652,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRegularSlabMeshWi
         else if (SPACE_DIM == 3)
         {
             unsigned rotate_perm = SPACE_DIM - 1u - dimension; // How many shuffles to get the user's axis to the top
-            for (unsigned i=0; i<rotate_perm; ++i)
+            for (unsigned i = 0; i<rotate_perm; ++i)
             {
                 double temp = depth;
                 depth = height;
@@ -703,7 +703,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRegularSlabMeshWi
 }
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateDesignatedOwnershipOfBoundaryElement( unsigned faceIndex )
 {
     // This may throw in the distributed parallel case
@@ -720,7 +720,7 @@ bool AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateDesignatedOwnersh
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateDesignatedOwnershipOfElement( unsigned elementIndex )
 {
     // This may throw in the distributed parallel case
@@ -737,7 +737,7 @@ bool AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateDesignatedOwnersh
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMaximumNodeConnectivityPerProcess() const
 {
 
@@ -769,7 +769,7 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMaximumNodeCo
          */
         unsigned max_num = 1u; // See note above.
         unsigned boundary_max_num = 0u;
-        for (unsigned local_node_index=0; local_node_index<this->mNodes.size(); local_node_index++)
+        for (unsigned local_node_index = 0; local_node_index<this->mNodes.size(); local_node_index++)
         {
             unsigned num = this->mNodes[local_node_index]->GetNumContainingElements();
             if (this->mNodes[local_node_index]->IsBoundaryNode()==false && num>max_num)
@@ -826,7 +826,7 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMaximumNodeCo
 
     std::set<unsigned> forward_star_nodes; // Used to collect each node's neighbours
     unsigned max_connectivity = 0u;
-    for (unsigned local_node_index=0; local_node_index<this->mNodes.size(); local_node_index++)
+    for (unsigned local_node_index = 0; local_node_index<this->mNodes.size(); local_node_index++)
     {
         forward_star_nodes.clear();
 
@@ -835,7 +835,7 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMaximumNodeCo
              ++it)
         {
             Element<ELEMENT_DIM, SPACE_DIM>* p_elem = this->GetElement(*it);
-            for (unsigned i=0; i<nodes_per_element; ++i)
+            for (unsigned i = 0; i<nodes_per_element; ++i)
             {
                 forward_star_nodes.insert(p_elem->GetNodeGlobalIndex(i));
             }
@@ -858,7 +858,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetHaloNodeIndices(std::ve
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMesh(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rOtherMesh)
 {
-    for (unsigned i=0; i<rOtherMesh.GetNumNodes(); ++i)
+    for (unsigned i = 0; i<rOtherMesh.GetNumNodes(); ++i)
     {
         Node<SPACE_DIM>* p_node =  rOtherMesh.GetNode(i);
         assert(!p_node->IsDeleted());
@@ -873,12 +873,12 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMesh(Abstract
         }
     }
 
-    for (unsigned i=0; i<rOtherMesh.GetNumElements(); ++i)
+    for (unsigned i = 0; i<rOtherMesh.GetNumElements(); ++i)
     {
         Element<ELEMENT_DIM, SPACE_DIM>* p_elem = rOtherMesh.GetElement(i);
         assert(!p_elem->IsDeleted());
         std::vector<Node<SPACE_DIM>*> nodes_for_element;
-        for (unsigned j=0; j<p_elem->GetNumNodes(); ++j)
+        for (unsigned j = 0; j<p_elem->GetNumNodes(); ++j)
         {
             nodes_for_element.push_back(this->mNodes[ p_elem->GetNodeGlobalIndex(j) ]);
         }
@@ -887,12 +887,12 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMesh(Abstract
         this->mElements.push_back(p_elem_copy);
     }
 
-    for (unsigned i=0; i<rOtherMesh.GetNumBoundaryElements(); ++i)
+    for (unsigned i = 0; i<rOtherMesh.GetNumBoundaryElements(); ++i)
     {
         BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>* p_b_elem =  rOtherMesh.GetBoundaryElement(i);
         assert(!p_b_elem->IsDeleted());
         std::vector<Node<SPACE_DIM>*> nodes_for_element;
-        for (unsigned j=0; j<p_b_elem->GetNumNodes(); ++j)
+        for (unsigned j = 0; j<p_b_elem->GetNumNodes(); ++j)
         {
             nodes_for_element.push_back(this->mNodes[ p_b_elem->GetNodeGlobalIndex(j) ]);
         }
@@ -904,7 +904,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMesh(Abstract
 
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateNodeExchange(
                                      std::vector<std::vector<unsigned> >& rNodesToSendPerProcess,
                                      std::vector<std::vector<unsigned> >& rNodesToReceivePerProcess)
@@ -927,7 +927,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateNodeExchange(
         std::vector <unsigned> nodes_on_this_process;
         std::vector <unsigned> nodes_not_on_this_process;
         //Calculate local and non-local node indices
-        for (unsigned i=0; i<ELEMENT_DIM+1; ++i)
+        for (unsigned i = 0; i<ELEMENT_DIM+1; ++i)
         {
             unsigned node_index=iter->GetNodeGlobalIndex(i);
             if (this->GetDistributedVectorFactory()->IsGlobalIndexLocal(node_index))
@@ -951,7 +951,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateNodeExchange(
         // If there are any non-local nodes on this element then we need to add to the data exchange
         if (!nodes_not_on_this_process.empty())
         {
-            for (unsigned i=0; i<nodes_not_on_this_process.size(); ++i)
+            for (unsigned i = 0; i<nodes_not_on_this_process.size(); ++i)
             {
                 // Calculate who owns this remote node
                 unsigned remote_process=global_lows.size()-1;
@@ -963,7 +963,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateNodeExchange(
                 node_sets_to_receive_per_process[remote_process].insert(nodes_not_on_this_process[i]);
 
                 // Add all local nodes to the send set
-                for (unsigned j=0; j<nodes_on_this_process.size(); ++j)
+                for (unsigned j = 0; j<nodes_on_this_process.size(); ++j)
                 {
                     node_sets_to_send_per_process[remote_process].insert(nodes_on_this_process[j]);
                 }
@@ -987,7 +987,7 @@ void AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateNodeExchange(
     }
 
 }
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, 2> AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMinMaxEdgeLengths()
 {
     c_vector<double, 2> min_max;
@@ -1011,7 +1011,7 @@ c_vector<double, 2> AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMi
 }
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetContainingElementIndex(const ChastePoint<SPACE_DIM>& rTestPoint,
                                                                             bool strict,
                                                                             std::set<unsigned> testElements,
@@ -1058,7 +1058,7 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetContainingElementIn
     EXCEPTION(ss.str());
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestElementIndexFromTestElements(const ChastePoint<SPACE_DIM>& rTestPoint,
                                                                                                  std::set<unsigned> testElements)
 {
@@ -1089,9 +1089,9 @@ unsigned AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestElementIndex
 }
 
 // Explicit instantiation
-template class AbstractTetrahedralMesh<1,1>;
-template class AbstractTetrahedralMesh<1,2>;
-template class AbstractTetrahedralMesh<1,3>;
-template class AbstractTetrahedralMesh<2,2>;
-template class AbstractTetrahedralMesh<2,3>;
-template class AbstractTetrahedralMesh<3,3>;
+template class AbstractTetrahedralMesh<1, 1>;
+template class AbstractTetrahedralMesh<1, 2>;
+template class AbstractTetrahedralMesh<1, 3>;
+template class AbstractTetrahedralMesh<2, 2>;
+template class AbstractTetrahedralMesh<2, 3>;
+template class AbstractTetrahedralMesh<3, 3>;

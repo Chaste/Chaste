@@ -92,12 +92,12 @@ void ForwardEulerNumericalMethod<ELEMENT_DIM, SPACE_DIM>::OutputNumericalMethodP
 }
 
 // Explicit instantiation
-template class ForwardEulerNumericalMethod<1,1>;
-template class ForwardEulerNumericalMethod<1,2>;
-template class ForwardEulerNumericalMethod<2,2>;
-template class ForwardEulerNumericalMethod<1,3>;
-template class ForwardEulerNumericalMethod<2,3>;
-template class ForwardEulerNumericalMethod<3,3>;
+template class ForwardEulerNumericalMethod<1, 1>;
+template class ForwardEulerNumericalMethod<1, 2>;
+template class ForwardEulerNumericalMethod<2, 2>;
+template class ForwardEulerNumericalMethod<1, 3>;
+template class ForwardEulerNumericalMethod<2, 3>;
+template class ForwardEulerNumericalMethod<3, 3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

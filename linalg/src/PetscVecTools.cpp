@@ -204,7 +204,7 @@ void PetscVecTools::DoInterleavedVecScatter(Vec interleavedVec, VecScatter first
     VecGetLocalSize(interleavedVec, &vec_local_size);
     assert(vec_local_size%2 == 0);
 
-    for (PetscInt local_index=0; local_index<vec_local_size/2; local_index++)
+    for (PetscInt local_index = 0; local_index<vec_local_size/2; local_index++)
     {
         p_1st_variable_vec[local_index] = p_interleaved_vec[2*local_index];
         p_2nd_variable_vec[local_index] = p_interleaved_vec[2*local_index+1];
@@ -264,7 +264,7 @@ void PetscVecTools::DoInterleavedVecGather(Vec interleavedVec, VecScatter firstV
     VecGetLocalSize(interleavedVec, &vec_local_size);
     assert(vec_local_size%2 == 0);
 
-    for (PetscInt local_index=0; local_index<vec_local_size/2; local_index++)
+    for (PetscInt local_index = 0; local_index<vec_local_size/2; local_index++)
     {
         p_interleaved_vec[2*local_index] = p_1st_variable_vec[local_index];
         p_interleaved_vec[2*local_index+1] = p_2nd_variable_vec[local_index];

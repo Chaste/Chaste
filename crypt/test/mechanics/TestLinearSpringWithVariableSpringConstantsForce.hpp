@@ -205,7 +205,7 @@ public:
         unsigned thickness_of_ghost_layer = 3;
 
         HoneycombMeshGenerator generator(cells_across, cells_up,thickness_of_ghost_layer, crypt_width/cells_across);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         CellPropertyRegistry::Instance()->Clear();
@@ -347,7 +347,7 @@ public:
         TS_ASSERT_DELTA(force[0]*force[0] + force[1]*force[1], 4.34027778, 1e-3);
 
         // Now move node 42 a bit and check that the force calculation changes correctly
-        c_vector<double,2> shift;
+        c_vector<double, 2> shift;
         shift[0] = 0.1;
         shift[1] = 0.0;
         ChastePoint<2> new_point(p_mesh->GetNode(42u)->rGetLocation() + shift);
@@ -507,7 +507,7 @@ public:
         nodes.push_back(new Node<2>(2, false, 2, 2));
         nodes.push_back(new Node<2>(3, false, 2, 0));
 
-        MutableMesh<2,2> mesh(nodes);
+        MutableMesh<2, 2> mesh(nodes);
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -554,11 +554,11 @@ public:
 
         // Set up stretched cell population
         HoneycombMeshGenerator generator(4, 4, 0, 2.0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedG1GenerationalCellCycleModel,2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateGivenLocationIndices(cells, location_indices);
 
         MeshBasedCellPopulationWithGhostNodes<2> stretched_cell_population(*p_mesh, cells, location_indices);
@@ -584,11 +584,11 @@ public:
 
         // Now do similar tests for a squashed cell population
         HoneycombMeshGenerator generator2(4, 4, 0, 0.5);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh2 = generator2.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh2 = generator2.GetMesh();
         std::vector<unsigned> location_indices2 = generator2.GetCellLocationIndices();
 
         std::vector<CellPtr> cells2;
-        CellsGenerator<FixedG1GenerationalCellCycleModel,2> cells_generator2;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator2;
         cells_generator2.GenerateGivenLocationIndices(cells2, location_indices2);
 
         MeshBasedCellPopulationWithGhostNodes<2> squashed_cell_population(*p_mesh2, cells2, location_indices2);
@@ -639,9 +639,9 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "meineke_spring_system.arch";
 
         {
-            TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
+            TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_2_elements");
 
-            MutableMesh<2,2> mesh;
+            MutableMesh<2, 2> mesh;
             mesh.ConstructFromMeshReader(mesh_reader);
 
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
@@ -732,7 +732,7 @@ public:
 
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
-        for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        for (AbstractMesh<2, 2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
                 node_iter != mesh.GetNodeIteratorEnd();
                 ++node_iter)
         {

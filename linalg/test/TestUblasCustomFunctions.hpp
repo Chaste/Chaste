@@ -254,11 +254,11 @@ public:
 
     void TestTraceAndSecondInvariant()
     {
-        c_matrix<double, 1,1> a;
+        c_matrix<double, 1, 1> a;
         a(0,0) = 13.03;
         TS_ASSERT_DELTA(Trace(a),13.03,1e-10);
 
-        c_matrix<double, 2,2> b;
+        c_matrix<double, 2, 2> b;
         b(0,0) = 13.03;
         b(1,0) = 3.03;
         b(0,1) = 3.03;
@@ -268,7 +268,7 @@ public:
         TS_ASSERT_DELTA(SecondInvariant(b), Determinant(b), 1e-12);
 
         // Symmetric 3 by 3 matrix.
-        c_matrix<double, 3,3> c;
+        c_matrix<double, 3, 3> c;
         c(0,0) = 13.03;
         c(1,0) = 1.3;
         c(2,0) = 2.3;
@@ -279,7 +279,7 @@ public:
         c(1,2) = 9.9;
         c(2,2) = 34;
 
-        c_matrix<double,3,3> c_squared = prod(trans(c),c);
+        c_matrix<double,3, 3> c_squared = prod(trans(c),c);
 
         TS_ASSERT_DELTA(Trace(c),13.03+45+34,1e-10);
         TS_ASSERT_DELTA(SecondInvariant(c),0.5*(Trace(c)*Trace(c)-Trace(c_squared)),1e-10);
@@ -296,7 +296,7 @@ public:
     // Get a row from a matrix
     void TestUblasMatrixRow()
     {
-        c_matrix<double,2,3> a;
+        c_matrix<double,2, 3> a;
         a(0,0) = 1;
         a(0,1) = 2;
         a(0,2) = 3;
@@ -304,8 +304,8 @@ public:
         a(1,1) = 5;
         a(1,2) = 6;
 
-        matrix_row< c_matrix<double,2,3> > row0(a, 0);
-        matrix_row< c_matrix<double,2,3> > row1(a, 1);
+        matrix_row< c_matrix<double,2, 3> > row0(a, 0);
+        matrix_row< c_matrix<double,2, 3> > row1(a, 1);
 
         TS_ASSERT_EQUALS(a(0,0), row0(0));
         TS_ASSERT_EQUALS(a(0,1), row0(1));

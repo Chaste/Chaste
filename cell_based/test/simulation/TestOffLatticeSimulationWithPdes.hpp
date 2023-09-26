@@ -75,20 +75,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EllipticGrowingDomainPdeModifier.hpp"
 #include "RadialCellDataDistributionWriter.hpp"
 
-class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
+class SimplePdeForTesting : public AbstractLinearEllipticPde<2, 2>
 {
 public:
-    double ComputeConstantInUSourceTerm(const ChastePoint<2>&, Element<2,2>* pElement)
+    double ComputeConstantInUSourceTerm(const ChastePoint<2>&, Element<2, 2>* pElement)
     {
         return -1.0;
     }
 
-    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<2>&, Element<2,2>*)
+    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<2>&, Element<2, 2>*)
     {
         return 0.0;
     }
 
-    c_matrix<double,2,2> ComputeDiffusionTerm(const ChastePoint<2>& )
+    c_matrix<double,2, 2> ComputeDiffusionTerm(const ChastePoint<2>& )
     {
         return identity_matrix<double>(2);
     }
@@ -124,8 +124,8 @@ public:
         EXIT_IF_PARALLEL;
 
         // Set up mesh
-        MutableMesh<2,2> mesh;
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_522_elements");
+        MutableMesh<2, 2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/disk_522_elements");
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Set up cells
@@ -217,7 +217,7 @@ public:
 
         // Set up mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -313,7 +313,7 @@ public:
 
         // Set up mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -392,7 +392,7 @@ public:
 
         // Set up mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -472,7 +472,7 @@ public:
 
         // Set up mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -505,7 +505,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.AddPopulationWriter<CellPopulationAreaWriter>(); // record the spheroid radius and apoptotic radius
 
-        typedef RadialCellDataDistributionWriter<2,2> RadWriter;
+        typedef RadialCellDataDistributionWriter<2, 2> RadWriter;
         MAKE_PTR(RadWriter, p_radial_writer);
         p_radial_writer->SetVariableName("oxygen");
         p_radial_writer->SetNumRadialBins(5);
@@ -576,7 +576,7 @@ public:
 
         // Set up mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -614,7 +614,7 @@ public:
         MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde2, (cell_population, -0.5));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
-        c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
+        c_vector<double, 2> centroid = cell_population.GetCentroidOfCellPopulation();
         ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
@@ -643,12 +643,12 @@ public:
         simulator.AddCellKiller(p_killer);
 
         // Find centre of cell population
-        c_vector<double,2> centre_of_cell_population = cell_population.GetCentroidOfCellPopulation();
+        c_vector<double, 2> centre_of_cell_population = cell_population.GetCentroidOfCellPopulation();
 
         // Find centre of coarse PDE mesh
-        c_vector<double,2> centre_of_coarse_pde_mesh = zero_vector<double>(2);
+        c_vector<double, 2> centre_of_coarse_pde_mesh = zero_vector<double>(2);
 
-        TetrahedralMesh<2,2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
+        TetrahedralMesh<2, 2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
 
         for (unsigned i = 0; i < p_coarse_mesh->GetNumNodes(); ++i)
         {
@@ -657,7 +657,7 @@ public:
         centre_of_coarse_pde_mesh /= p_coarse_mesh->GetNumNodes();
 
         // Test that the two centres match
-        c_vector<double,2> centre_diff = centre_of_cell_population - centre_of_coarse_pde_mesh;
+        c_vector<double, 2> centre_diff = centre_of_cell_population - centre_of_coarse_pde_mesh;
         TS_ASSERT_DELTA(norm_2(centre_diff), 0.0, 1e-4);
 
         // Run cell-based simulation
@@ -673,10 +673,10 @@ public:
         // Test the nutrient concentration is equal to 1.0 at each coarse mesh node far from the cells
         for (unsigned i = 0; i < pde_solution0.GetSize(); ++i)
         {
-            c_vector<double,2> centre;
+            c_vector<double, 2> centre;
             centre(0) = 2.5; // assuming 5 by 5 honeycomb mesh
             centre(1) = 2.5;
-            c_vector<double,2> posn = p_coarse_mesh->GetNode(i)->rGetLocation();
+            c_vector<double, 2> posn = p_coarse_mesh->GetNode(i)->rGetLocation();
             double dist = norm_2(centre - posn);
             double u0 = pde_solution0[i];
             double u1 = pde_solution1[i];
@@ -696,7 +696,7 @@ public:
         for (auto cell_iter : cell_population)
         {
             unsigned elem_index = p_pde_modifier->GetFeMesh()->GetContainingElementIndex(cell_population.GetLocationOfCellCentre(cell_iter));
-            Element<2,2>* p_element = p_coarse_mesh->GetElement(elem_index);
+            Element<2, 2>* p_element = p_coarse_mesh->GetElement(elem_index);
 
             double max0 = std::max(pde_solution0[p_element->GetNodeGlobalIndex(0)], pde_solution0[p_element->GetNodeGlobalIndex(1)]);
             max0 = std::max(max0, pde_solution0[p_element->GetNodeGlobalIndex(2)]);
@@ -727,7 +727,7 @@ public:
 
         // Set up mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -754,7 +754,7 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
-        c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
+        c_vector<double, 2> centroid = cell_population.GetCentroidOfCellPopulation();
         ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
@@ -788,7 +788,7 @@ public:
 
         // Set up mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -880,7 +880,7 @@ public:
 
         // Set up mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -949,11 +949,11 @@ public:
     {
         EXIT_IF_PARALLEL;
 
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-        MutableMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
+        MutableMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        TrianglesMeshWriter<3,3> mesh_writer("TestSolveMethodSpheroidSimulation3DMesh", "StartMesh");
+        TrianglesMeshWriter<3, 3> mesh_writer("TestSolveMethodSpheroidSimulation3DMesh", "StartMesh");
         mesh_writer.WriteFilesUsingMesh(mesh);
 
         // Set up cells
@@ -1011,8 +1011,8 @@ public:
         EXIT_IF_PARALLEL;
 
         // Set up mesh
-        MutableMesh<2,2> mesh;
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_522_elements");
+        MutableMesh<2, 2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/disk_522_elements");
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Set up cells
@@ -1075,7 +1075,7 @@ public:
 
         // Create a simple mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -1122,8 +1122,8 @@ public:
         EXIT_IF_PARALLEL;
 
         // Create a simple mesh - larger to use coarse graining.
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_522_elements");
-        TetrahedralMesh<2,2> temp_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/disk_522_elements");
+        TetrahedralMesh<2, 2> temp_mesh;
         temp_mesh.ConstructFromMeshReader(mesh_reader);
         temp_mesh.Scale(20.0,20.0);
 
@@ -1160,7 +1160,7 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
-        c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
+        c_vector<double, 2> centroid = cell_population.GetCentroidOfCellPopulation();
         ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
@@ -1188,7 +1188,7 @@ public:
         }
 
         // Find centre of cell population
-        c_vector<double,2> centre_of_cell_population = zero_vector<double>(2);
+        c_vector<double, 2> centre_of_cell_population = zero_vector<double>(2);
 
         for (unsigned i = 0; i < simulator.rGetCellPopulation().GetNumNodes(); ++i)
         {
@@ -1197,8 +1197,8 @@ public:
         centre_of_cell_population /= simulator.rGetCellPopulation().GetNumNodes();
 
         // Find centre of coarse PDE mesh
-        c_vector<double,2> centre_of_coarse_pde_mesh = zero_vector<double>(2);
-        TetrahedralMesh<2,2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
+        c_vector<double, 2> centre_of_coarse_pde_mesh = zero_vector<double>(2);
+        TetrahedralMesh<2, 2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
         for (unsigned i = 0; i < p_coarse_mesh->GetNumNodes(); ++i)
         {
             centre_of_coarse_pde_mesh += p_coarse_mesh->GetNode(i)->rGetLocation();
@@ -1206,7 +1206,7 @@ public:
         centre_of_coarse_pde_mesh /= p_coarse_mesh->GetNumNodes();
 
         // Test that the two centres match
-        c_vector<double,2> centre_diff = centre_of_cell_population - centre_of_coarse_pde_mesh;
+        c_vector<double, 2> centre_diff = centre_of_cell_population - centre_of_coarse_pde_mesh;
         TS_ASSERT_DELTA(norm_2(centre_diff), 0.0, 1e-4);
     }
 
@@ -1216,7 +1216,7 @@ public:
 
         /// Create a simple 2D VertexMesh
         HoneycombVertexMeshGenerator generator(5, 3);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -1236,7 +1236,7 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
-        c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
+        c_vector<double, 2> centroid = cell_population.GetCentroidOfCellPopulation();
         ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
@@ -1256,8 +1256,8 @@ public:
         simulator.AddSimulationModifier(p_growth_modifier);
 
         // Find centre of coarse PDE mesh
-        c_vector<double,2> centre_of_coarse_pde_mesh = zero_vector<double>(2);
-        TetrahedralMesh<2,2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
+        c_vector<double, 2> centre_of_coarse_pde_mesh = zero_vector<double>(2);
+        TetrahedralMesh<2, 2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
         for (unsigned i = 0; i < p_coarse_mesh->GetNumNodes(); ++i)
         {
             centre_of_coarse_pde_mesh += p_coarse_mesh->GetNode(i)->rGetLocation();
@@ -1265,10 +1265,10 @@ public:
         centre_of_coarse_pde_mesh /= p_coarse_mesh->GetNumNodes();
 
         // Find centre of cell population
-        c_vector<double,2> centre_of_cell_population = cell_population.GetCentroidOfCellPopulation();
+        c_vector<double, 2> centre_of_cell_population = cell_population.GetCentroidOfCellPopulation();
 
         // Test that the two centres match
-        c_vector<double,2> centre_diff = centre_of_cell_population - centre_of_coarse_pde_mesh;
+        c_vector<double, 2> centre_diff = centre_of_cell_population - centre_of_coarse_pde_mesh;
         TS_ASSERT_DELTA(norm_2(centre_diff), 0.0, 1e-4);
 
         // Solve the system
@@ -1288,7 +1288,7 @@ public:
         EXIT_IF_PARALLEL;
 
         // Create a simple mesh
-        TetrahedralMesh<2,2> temp_mesh;
+        TetrahedralMesh<2, 2> temp_mesh;
         temp_mesh.ConstructRegularSlabMesh(2.0,2,2);
 
         NodesOnlyMesh<2> mesh;
@@ -1331,7 +1331,7 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
-        c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
+        c_vector<double, 2> centroid = cell_population.GetCentroidOfCellPopulation();
         ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
@@ -1345,7 +1345,7 @@ public:
         // Solve the system
         simulator.Solve();
 
-        TetrahedralMesh<2,2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
+        TetrahedralMesh<2, 2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
 
         // Check the correct cell density is in each element
         unsigned num_elements_in_coarse_mesh = p_coarse_mesh->GetNumElements();
@@ -1442,7 +1442,7 @@ public:
         EXIT_IF_PARALLEL;
 
         // Create a simple mesh
-        TetrahedralMesh<2,2> temp_mesh;
+        TetrahedralMesh<2, 2> temp_mesh;
         temp_mesh.ConstructRectangularMesh(10,10);
 
         NodesOnlyMesh<2> mesh;
@@ -1479,7 +1479,7 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
-        c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
+        c_vector<double, 2> centroid = cell_population.GetCentroidOfCellPopulation();
         ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
@@ -1504,7 +1504,7 @@ public:
         EXIT_IF_PARALLEL;
 
         // Create a simple mesh
-        TetrahedralMesh<3,3> temp_mesh;
+        TetrahedralMesh<3, 3> temp_mesh;
         temp_mesh.ConstructCuboid(5,5,5);
 
         NodesOnlyMesh<3> mesh;
@@ -1541,7 +1541,7 @@ public:
         MAKE_PTR_ARGS(ConstBoundaryCondition<3>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
-        c_vector<double,3> centroid = cell_population.GetCentroidOfCellPopulation();
+        c_vector<double, 3> centroid = cell_population.GetCentroidOfCellPopulation();
         ChastePoint<3> lower(centroid(0)-25.0, centroid(1)-25.0, centroid(2)-25.0);
         ChastePoint<3> upper(centroid(0)+25.0, centroid(1)+25.0, centroid(2)+25.0);
         MAKE_PTR_ARGS(ChasteCuboid<3>, p_cuboid, (lower, upper));

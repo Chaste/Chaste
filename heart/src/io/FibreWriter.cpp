@@ -59,7 +59,7 @@ void FibreWriter<DIM>::WriteAllAxi(const std::vector< c_vector<double, DIM> >& f
     out_stream p_axi_file = OpenFileAndWriteHeader(this->mBaseName + ".axi", fibres.size());
 
     //Now give the fibre directions
-    for (unsigned i=0; i<fibres.size();i++ )
+    for (unsigned i = 0; i<fibres.size();i++ )
     {
         if (this->mFileIsBinary)
         {
@@ -89,7 +89,7 @@ void FibreWriter<DIM>::WriteAllOrtho(const std::vector< c_vector<double, DIM> >&
     out_stream p_file = OpenFileAndWriteHeader(this->mBaseName + ".ortho", fibres.size());
 
     //Now give the fibre directions
-    for (unsigned i=0; i<fibres.size();i++ )
+    for (unsigned i = 0; i<fibres.size();i++ )
     {
         if (this->mFileIsBinary)
         {

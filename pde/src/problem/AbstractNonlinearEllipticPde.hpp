@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  0 = Grad.(DiffusionTerm(x,u)*Grad(u)) + LinearSourceTerm(x)
  *                                        + NonlinearSourceTerm(x, u).
  */
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 class AbstractNonlinearEllipticPde
 {
 public:

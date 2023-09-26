@@ -148,7 +148,7 @@ public:
          * acceleration due to gravity (ie b=(0,-9.81)) or zero if the effect of gravity can be neglected.
          * In this problem we apply a gravity-like downward force.
          */
-        c_vector<double,2> body_force;
+        c_vector<double, 2> body_force;
         body_force(0) =  0.0;
         body_force(1) = -2.0;
 
@@ -210,7 +210,7 @@ public:
          * gets the deformed position (ie the new location, not the displacement). They are both of size
          * num_total_nodes.
          */
-        std::vector<c_vector<double,2> >& r_deformed_positions = solver.rGetDeformedPosition();
+        std::vector<c_vector<double, 2> >& r_deformed_positions = solver.rGetDeformedPosition();
         std::vector<double>& r_pressures = solver.rGetPressures();
         /* Let us obtain the values of the new position, and the pressure, at the bottom right corner node. */
         unsigned node_index = 8;
@@ -271,7 +271,7 @@ public:
 
         MooneyRivlinMaterialLaw<2> law(1.0);
 
-        c_vector<double,2> body_force;
+        c_vector<double, 2> body_force;
         body_force(0) =  0.0;
         body_force(1) = -2.0;
 
@@ -283,14 +283,14 @@ public:
          *
          * First, declare the data structures:
          */
-        std::vector<BoundaryElement<1,2>*> boundary_elems;
-        std::vector<c_vector<double,2> > tractions;
+        std::vector<BoundaryElement<1, 2>*> boundary_elems;
+        std::vector<c_vector<double, 2> > tractions;
         /* Create a constant traction */
-        c_vector<double,2> traction;
+        c_vector<double, 2> traction;
         traction(0) = 0;
         traction(1) = 1.0; // this choice of sign corresponds to an inward force (if applied to the bottom surface)
         /* Loop over boundary elements */
-        for (TetrahedralMesh<2,2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
+        for (TetrahedralMesh<2, 2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
              iter != mesh.GetBoundaryElementIteratorEnd();
              ++iter)
         {
@@ -298,7 +298,7 @@ public:
             if (fabs((*iter)->CalculateCentroid()[1] - 0.0) < 1e-6)
             {
                 /* Put the boundary element and the constant traction into the stores. */
-                BoundaryElement<1,2>* p_element = *iter;
+                BoundaryElement<1, 2>* p_element = *iter;
                 boundary_elems.push_back(p_element);
                 tractions.push_back(traction);
             }

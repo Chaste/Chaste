@@ -110,7 +110,7 @@ public:
         double tol = 1e-5;
 
         // We should expect unchanged tensors for all elements.
-        for (AbstractTetrahedralMesh<2,2>::ElementIterator it = extended_problem.rGetMesh().GetElementIteratorBegin();
+        for (AbstractTetrahedralMesh<2, 2>::ElementIterator it = extended_problem.rGetMesh().GetElementIteratorBegin();
                 it != extended_problem.rGetMesh().GetElementIteratorBegin();
                 ++it)
         {
@@ -163,7 +163,7 @@ public:
         double tol = 1e-5;
 
         // We should expect unchanged tensors for elements with x < 0.5 mm and modified tensors for x > 0.5
-        for (AbstractTetrahedralMesh<2,2>::ElementIterator it = extended_problem.rGetMesh().GetElementIteratorBegin();
+        for (AbstractTetrahedralMesh<2, 2>::ElementIterator it = extended_problem.rGetMesh().GetElementIteratorBegin();
              it != extended_problem.rGetMesh().GetElementIteratorBegin();
              ++it)
         {
@@ -240,7 +240,7 @@ public:
         double tol = 1e-5;
 
         // We should expect modified tensors for the mesh.
-        for (AbstractTetrahedralMesh<3,3>::ElementIterator it = extended_problem.rGetMesh().GetElementIteratorBegin();
+        for (AbstractTetrahedralMesh<3, 3>::ElementIterator it = extended_problem.rGetMesh().GetElementIteratorBegin();
                 it != extended_problem.rGetMesh().GetElementIteratorBegin();
                 ++it)
         {

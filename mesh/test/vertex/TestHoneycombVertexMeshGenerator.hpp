@@ -48,7 +48,7 @@ public:
     void TestSimpleMesh()
     {
         HoneycombVertexMeshGenerator generator(2, 2, false, 0.1, 0.1);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 16u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 4u);
@@ -59,13 +59,13 @@ public:
     void TestBoundaryNodes()
     {
         HoneycombVertexMeshGenerator generator(4, 4);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 48u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u);
 
         unsigned num_non_boundary_nodes = 0;
-        for (unsigned node_index=0; node_index<16u; ++node_index)
+        for (unsigned node_index = 0; node_index<16u; ++node_index)
         {
             if (!p_mesh->GetNode(node_index)->IsBoundaryNode())
             {
@@ -78,7 +78,7 @@ public:
     void TestLargeMesh()
     {
         HoneycombVertexMeshGenerator generator(100, 100);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 20400u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 10000u);
@@ -87,12 +87,12 @@ public:
     void TestElementArea()
     {
         HoneycombVertexMeshGenerator generator(6, 6, false, 0.01, 0.001, 2.456);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 96u);
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 36u);
 
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
             TS_ASSERT_DELTA(p_mesh->GetVolumeOfElement(elem_index), 2.456, 1e-3);
         }
@@ -101,11 +101,11 @@ public:
     void TestFlatBottomMesh()
     {
         HoneycombVertexMeshGenerator generator(4, 4, true);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 44u);
 	 
-        VertexMeshWriter<2,2> vertex_mesh_writer_2("TestHoneycombVertexMesh", "honeycombmeshflat");
+        VertexMeshWriter<2, 2> vertex_mesh_writer_2("TestHoneycombVertexMesh", "honeycombmeshflat");
         vertex_mesh_writer_2.WriteFilesUsingMesh(*p_mesh);
 
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u);
@@ -140,7 +140,7 @@ public:
 
         // There should be 4 elements with 5 nodes
         unsigned num_five_node_elements = 0;
-        for (unsigned element_index=0; element_index<16u; element_index++)
+        for (unsigned element_index = 0; element_index<16u; element_index++)
         {
             unsigned num_nodes = p_mesh->GetElement(element_index)->GetNumNodes();
             if (num_nodes == 5)

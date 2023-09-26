@@ -1117,7 +1117,7 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
                     // Assert(num_location_entries == num_cell_type_entries);
                     
                     // Populate a vector of ghosts then ad in normal cells at the relvent places
-                    for (int i=0; i<numCells[row]; i++)
+                    for (int i = 0; i<numCells[row]; i++)
                     {
                         cell_type[row][i] = canvas.INVISIBLE_COLOUR;
                         
@@ -1127,7 +1127,7 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
                         }
                     }
                     
-                    for (int i=0; i<num_location_entries; i++)
+                    for (int i = 0; i<num_location_entries; i++)
                     {
                         locations[row][i] = Integer.parseInt(st_location.nextToken());
                         cell_type[row][locations[row][i]] = Integer.parseInt(st_cell_type.nextToken());
@@ -1141,7 +1141,7 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
                 }
                 
                 
-                for (int i=0; i<numCells[row]; i++)
+                for (int i = 0; i<numCells[row]; i++)
                 {
                     double d1 = Double.valueOf(st_node.nextToken()).doubleValue();
                     double d2 = Double.valueOf(st_node.nextToken()).doubleValue();
@@ -1237,7 +1237,7 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
                     {
                         scale_factor = 2;
                     }
-                    for (int i=0; i<scale_factor*numElements[row]; i++)
+                    for (int i = 0; i<scale_factor*numElements[row]; i++)
                     {
                         int node = Integer.parseInt(st_element.nextToken());
 
@@ -1323,9 +1323,9 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
             max_y = -1e12;
             min_x =  1e12;
             min_y =  1e12;
-            for (int row=0; row<numSteps; row++)
+            for (int row = 0; row<numSteps; row++)
             {
-                for (int i=0; i < numCells[row]; i++)
+                for (int i = 0; i < numCells[row]; i++)
                 {
                     if (positions[row][i].x > max_x)
                     {
@@ -1357,12 +1357,12 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
         try
         {
             // Scan through each element (through every frame of the movie)
-            for (int time_index=0; time_index<numSteps; time_index++)
+            for (int time_index = 0; time_index<numSteps; time_index++)
             {
                 image_cells[time_index] = new int[memory_factor*numCells[time_index]]; // reserve plenty of memory
 
                 // Fill image_nodes with an identity map (at each time step each node maps to itself)
-                for (int i=0; i<numCells[time_index]; i++)
+                for (int i = 0; i<numCells[time_index]; i++)
                 {
                     image_cells[time_index][i] = i;		// Fill with as many image nodes as are cells in that time frame
                 }
@@ -1370,7 +1370,7 @@ public class Visualize2dCentreCells implements ActionListener, AdjustmentListene
                 if ( (elementFilePresent) && (!isSparseMesh) )
                 {
                     // Draw elements first
-                    for (int i=0; i<numElements[time_index]; i++)
+                    for (int i = 0; i<numElements[time_index]; i++)
                     {
                         // What nodes are we joining up? Go into the element file and get
                     	// the nodes that correspond to each element
@@ -1622,7 +1622,7 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
         	double scaling = 0.4;
         	
             // Draw cell circle interiors
-            for (int i=0; i<vis.numCells[vis.timeStep]; i++ )
+            for (int i = 0; i<vis.numCells[vis.timeStep]; i++ )
             {
                 SetCellColour(i);
                 PlotPoint p = scale(vis.positions[vis.timeStep][i]);
@@ -1636,7 +1636,7 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
             }
 
             // Draw cell circle boundaries
-            for (int i=0; i<vis.numCells[vis.timeStep]; i++ )
+            for (int i = 0; i<vis.numCells[vis.timeStep]; i++ )
             {
                 g2.setColor(Color.black);
                 PlotPoint p=scale(vis.positions[vis.timeStep][i]);
@@ -1654,7 +1654,7 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
         {
             double scaling = 0.4;
             
-            for (int i=0; i<vis.numCells[vis.timeStep]; i++ )
+            for (int i = 0; i<vis.numCells[vis.timeStep]; i++ )
             {
                 // Plot Cell Centres
                 
@@ -1668,7 +1668,7 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
                 
                 int xpoints[] = new int[4];
                 int ypoints[] = new int[4];
-                for (int node=0; node<4; node++)
+                for (int node = 0; node<4; node++)
                 {
                     xpoints[node] = square_vertices[node].x;
                     ypoints[node] = square_vertices[node].y;
@@ -1685,7 +1685,7 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
                 
                 if (vis.cell_type[vis.timeStep][i] != INVISIBLE_COLOUR) // if not ghost
                 {
-                    for (int node=0; node<4; node++)
+                    for (int node = 0; node<4; node++)
                     {
                         g2.drawLine(xpoints[node],
                                     ypoints[node],
@@ -1699,7 +1699,7 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
         if (vis.drawPdeSolution && vis.drawCircles)
         {
             // Draw cell circle interiors
-            for (int i=0; i<vis.numCells[vis.timeStep]; i++ )
+            for (int i = 0; i<vis.numCells[vis.timeStep]; i++ )
             {
                 // Don't draw ghost nodes on labelled cells
                 if ( (vis.cell_type[vis.timeStep][i] != INVISIBLE_COLOUR)
@@ -1714,7 +1714,7 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
             }
 
             // Draw labelled cells now, so they're on top
-            for (int i=0; i<vis.numCells[vis.timeStep]; i++ )
+            for (int i = 0; i<vis.numCells[vis.timeStep]; i++ )
             {
                 if (vis.cell_type[vis.timeStep][i] == LABELLED_COLOUR)
                 {
@@ -1733,7 +1733,7 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
         if (vis.elementFilePresent && !vis.isSparseMesh )
         {
             // Draw elements first
-            for (int i=0; i<vis.numElements[vis.timeStep]; i++)
+            for (int i = 0; i<vis.numElements[vis.timeStep]; i++)
             {
                 // What nodes are we joining up?
                 int index[] = new int[3];
@@ -1765,7 +1765,7 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
                 {
                     int clipx[] = new int[3];
                     int clipy[] = new int[3];
-                    for (int node=0; node<3; node++)
+                    for (int node = 0; node<3; node++)
                     {
                         clipx[node] = vertex[node].x;
                         clipy[node] = vertex[node].y;
@@ -1780,7 +1780,7 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
                         clip_me = true;
                         g2.setClip(clip);
                     }
-                    for (int node=0; node<3; node++)
+                    for (int node = 0; node<3; node++)
                     {
                         SetCellColour(index[node]);
                         int xs[] = new int[4];
@@ -1821,7 +1821,7 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
                 {
                     int clipx[] = new int[3];
                     int clipy[] = new int[3];
-                    for (int node=0; node<3; node++)
+                    for (int node = 0; node<3; node++)
                     {
                         clipx[node] = vertex[node].x;
                         clipy[node] = vertex[node].y;
@@ -1837,7 +1837,7 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
                     }
 
                     PlotPoint cutoff = scale(vis.force_cutoff, 0.0);
-                    for (int node=0; node<3; node++)
+                    for (int node = 0; node<3; node++)
                     {
                         // See #542
                         PlotPoint cutoff_point = new PlotPoint(vertex[node].x + cutoff.x, vertex[node].y + cutoff.y);
@@ -1886,7 +1886,7 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
                     int clipx[] = new int[3];
                     int clipy[] = new int[3];
 
-                    for (int node=0; node<3; node++)
+                    for (int node = 0; node<3; node++)
                     {
                         clipx[node] = vertex[node].x;
                         clipy[node] = vertex[node].y;
@@ -1903,7 +1903,7 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
                     }
 
                     // Plot membrane-bound beta catenin levels
-                    for (int node=0; node<3; node++)
+                    for (int node = 0; node<3; node++)
                     {
                          SetCellBetaCateninColour(vis.beta_catenin_values[vis.timeStep][index[node]][0], index[node]);
                          int xs[] = new int[4];
@@ -1920,7 +1920,7 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
                     }
 
                     // Plot cytoplasmic beta catenin levels
-                    for (int node=0; node<3; node++)
+                    for (int node = 0; node<3; node++)
                     {
                          SetCellBetaCateninColour(vis.beta_catenin_values[vis.timeStep][index[node]][1], index[node]);
                          r1 = vis.positions[vis.timeStep][index[0]];
@@ -2011,7 +2011,7 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
         if (vis.elementFilePresent && vis.isSparseMesh )
         {
             //  1D Elements in 2D space
-            for (int i=0; i<vis.numElements[vis.timeStep]; i++)
+            for (int i = 0; i<vis.numElements[vis.timeStep]; i++)
             {
                 // What nodes are we joining up?
                 int index[] = new int[2];
@@ -2051,7 +2051,7 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
 
         // Draw nodes second so that dots are on top of lines
         double orientation_length = 5*node_radius;
-        for (int i=0; i<vis.numCells[vis.timeStep]; i++)
+        for (int i = 0; i<vis.numCells[vis.timeStep]; i++)
         {
             PlotPoint p = scale(vis.positions[vis.timeStep][i]);
 
@@ -2126,7 +2126,7 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
         String[] labels = new String[num_labels];
         NumberFormat formatter = new DecimalFormat("#0.0");
 
-        for (int i=0; i<num_labels; i++)
+        for (int i = 0; i<num_labels; i++)
         {
             double this_label_as_number = ((double) num_labels-1-i)*(1.0 / (double) (num_labels-1));
             String this_label_as_string = formatter.format(this_label_as_number).toString();
@@ -2135,7 +2135,7 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
 
         // Draw labels next to PDE solution colour bar
         int block_multiple = num_blocks / (num_labels-1);
-        for (int i=0; i<num_labels; i++)
+        for (int i = 0; i<num_labels; i++)
         {
             g2.setColor(Color.black);
             g2.drawString(labels[i], panelWidth + blockWidth + 5, (1 + block_multiple*i)*blockHeight + 5);
@@ -2300,7 +2300,7 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
         PlotPoint end = scale(0, max_y);
         g2.drawLine(start.x, start.y, end.x, end.y);
 
-        for (int i=0; i<=num_ticks; i++)
+        for (int i = 0; i<=num_ticks; i++)
         {
             double y = (double) (min_y + tick_spacing*i);
             DecimalFormat df = new DecimalFormat("0.0");
@@ -2346,7 +2346,7 @@ class CustomCentreCanvas2D extends Canvas implements MouseMotionListener
         RealPoint real_position = unscale(mouse_position);
 
         int nearest_index = -1;
-        for (int i=0; i<vis.numCells[vis.timeStep]; i++)
+        for (int i = 0; i<vis.numCells[vis.timeStep]; i++)
         {
             int sq_dist = SquaredDistance(scale(vis.positions[vis.timeStep][i]), mouse_position);
             if (sq_dist < node_radius*node_radius)

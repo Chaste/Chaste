@@ -741,7 +741,7 @@ cp::ionic_model_selection_type HeartConfig::GetDefaultIonicModel() const
     return mpParameters->Simulation()->IonicModels()->Default();
 }
 
-template <unsigned DIM>
+template<unsigned DIM>
 void HeartConfig::GetIonicModelRegions(std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& definedRegions,
                                        std::vector<cp::ionic_model_selection_type>& ionicModels) const
 {
@@ -977,7 +977,7 @@ cp::media_type HeartConfig::GetConductivityMedia() const
     return mpParameters->Simulation()->Mesh()->LoadMesh()->conductivity_media();
 }
 
-template <unsigned DIM>
+template<unsigned DIM>
 void HeartConfig::GetStimuli(std::vector<boost::shared_ptr<AbstractStimulusFunction> >& rStimuliApplied,
                              std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& rStimulatedAreas) const
 {
@@ -1113,7 +1113,7 @@ void HeartConfig::GetStimuli(std::vector<boost::shared_ptr<AbstractStimulusFunct
     }
 }
 
-template <unsigned DIM>
+template<unsigned DIM>
 void HeartConfig::GetCellHeterogeneities(std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& rCellHeterogeneityRegions,
                                          std::vector<double>& rScaleFactorGks,
                                          std::vector<double>& rScaleFactorIto,
@@ -1291,7 +1291,7 @@ bool HeartConfig::GetConductivityHeterogeneitiesProvided() const
     return mpParameters->Physiological().ConductivityHeterogeneities().present();
 }
 
-template <unsigned DIM>
+template<unsigned DIM>
 void HeartConfig::GetConductivityHeterogeneities(
     std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& rConductivitiesHeterogeneityAreas,
     std::vector<c_vector<double, 3> >& rIntraConductivities,
@@ -1872,7 +1872,7 @@ bool HeartConfig::IsPseudoEcgCalculationRequested() const
     return result;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 void HeartConfig::GetPseudoEcgElectrodePositions(std::vector<ChastePoint<SPACE_DIM> >& rPseudoEcgElectrodePositions) const
 {
     rPseudoEcgElectrodePositions.clear();
@@ -2615,7 +2615,7 @@ void HeartConfig::SetRequestedNodalTimeTraces(std::vector<unsigned>& requestedNo
     }
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 void HeartConfig::SetPseudoEcgElectrodePositions(const std::vector<ChastePoint<SPACE_DIM> >& rPseudoEcgElectrodePositions)
 {
     EnsurePostProcessingSectionPresent();

@@ -93,9 +93,9 @@ std::string AbstractCellBasedWriter<ELEMENT_DIM, SPACE_DIM>::GetFileName()
 }
 
 // Explicit instantiation
-template class AbstractCellBasedWriter<1,1>;
-template class AbstractCellBasedWriter<1,2>;
-template class AbstractCellBasedWriter<2,2>;
-template class AbstractCellBasedWriter<1,3>;
-template class AbstractCellBasedWriter<2,3>;
-template class AbstractCellBasedWriter<3,3>;
+template class AbstractCellBasedWriter<1, 1>;
+template class AbstractCellBasedWriter<1, 2>;
+template class AbstractCellBasedWriter<2, 2>;
+template class AbstractCellBasedWriter<1, 3>;
+template class AbstractCellBasedWriter<2, 3>;
+template class AbstractCellBasedWriter<3, 3>;

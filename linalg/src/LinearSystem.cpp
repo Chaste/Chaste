@@ -419,7 +419,7 @@ void LinearSystem::SetNullBasis(Vec nullBasis[], unsigned numberOfBases)
 {
 #ifndef NDEBUG
     // Check all the vectors of the base are normal
-    for (unsigned vec_index=0; vec_index<numberOfBases; vec_index++)
+    for (unsigned vec_index = 0; vec_index<numberOfBases; vec_index++)
     {
         PetscReal l2_norm;
         VecNorm(nullBasis[vec_index], NORM_2, &l2_norm);
@@ -440,7 +440,7 @@ void LinearSystem::SetNullBasis(Vec nullBasis[], unsigned numberOfBases)
 #else
         VecMDot(nullBasis[vec_index-1], num_vectors_ahead, &nullBasis[vec_index], dot_products.get());
 #endif
-        for (unsigned index=0; index<num_vectors_ahead; index++)
+        for (unsigned index = 0; index<num_vectors_ahead; index++)
         {
             if (fabs(dot_products[index]) > 1e-08 )
             {
@@ -887,7 +887,7 @@ Vec LinearSystem::Solve(Vec lhsGuess)
             if (PetscTools::AmMaster())
             {
                 std::cout << "EIGS: ";
-                for (int index=0; index<eigs_computed; index++)
+                for (int index = 0; index<eigs_computed; index++)
                 {
                     std::cout << r_eig[index] << ", ";
                 }

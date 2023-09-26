@@ -143,9 +143,9 @@ void AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>::WriteDataToVisuali
 }
 
 // Explicit instantiation
-template class AbstractTwoBodyInteractionForce<1,1>;
-template class AbstractTwoBodyInteractionForce<1,2>;
-template class AbstractTwoBodyInteractionForce<2,2>;
-template class AbstractTwoBodyInteractionForce<1,3>;
-template class AbstractTwoBodyInteractionForce<2,3>;
-template class AbstractTwoBodyInteractionForce<3,3>;
+template class AbstractTwoBodyInteractionForce<1, 1>;
+template class AbstractTwoBodyInteractionForce<1, 2>;
+template class AbstractTwoBodyInteractionForce<2, 2>;
+template class AbstractTwoBodyInteractionForce<1, 3>;
+template class AbstractTwoBodyInteractionForce<2, 3>;
+template class AbstractTwoBodyInteractionForce<3, 3>;

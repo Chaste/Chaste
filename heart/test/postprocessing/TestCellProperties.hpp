@@ -76,7 +76,7 @@ private:
     }
 
 public:
-    void TestExceptionalBehaviour(void)
+    void TestExceptionalBehaviour()
     {
         // Check throws an exception if no data given
         std::vector<double> empty;
@@ -193,7 +193,7 @@ public:
                               "Time and Voltage series should be the same length. Time.size() = 108, Voltage.size() = 107");
     }
 
-    void TestCellPhysiologicalPropertiesForRegularLr91(void)
+    void TestCellPhysiologicalPropertiesForRegularLr91()
     {
         EXIT_IF_PARALLEL;
 

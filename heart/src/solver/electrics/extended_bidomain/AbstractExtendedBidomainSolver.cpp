@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractExtendedBidomainSolver.hpp"
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractExtendedBidomainSolver<ELEMENT_DIM, SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
 {
     // The base class method that calls this function will only call it with a null linear system
@@ -77,13 +77,13 @@ void AbstractExtendedBidomainSolver<ELEMENT_DIM, SPACE_DIM>::InitialiseForSolve(
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::PrepareForSetupLinearSystem(Vec existingSolution)
+void AbstractExtendedBidomainSolver<ELEMENT_DIM, SPACE_DIM>::PrepareForSetupLinearSystem(Vec existingSolution)
 {
     mpExtendedBidomainTissue->SolveCellSystems(existingSolution, PdeSimulationTime::GetTime(), PdeSimulationTime::GetNextTime());
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-Vec AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::GenerateNullBasis() const
+Vec AbstractExtendedBidomainSolver<ELEMENT_DIM, SPACE_DIM>::GenerateNullBasis() const
 {
     double sqrrt_num_nodes = sqrt(  this->mpMesh->GetNumNodes());
     double normalised_basis_value = 1.0 / sqrrt_num_nodes;
@@ -108,7 +108,7 @@ Vec AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::GenerateNullBasis() c
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::FinaliseLinearSystem(Vec existingSolution)
+void AbstractExtendedBidomainSolver<ELEMENT_DIM, SPACE_DIM>::FinaliseLinearSystem(Vec existingSolution)
 {
     if (!(this->mpBoundaryConditions->HasDirichletBoundaryConditions()))
     {
@@ -143,7 +143,7 @@ void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::FinaliseLinearSystem
                 std::vector<unsigned> row_for_average;
                 row_for_average.push_back(mRowForAverageOfPhiZeroed);
                 this->mpLinearSystem->ZeroMatrixRowsWithValueOnDiagonal(row_for_average, 0.0);
-                for (unsigned col_index=0; col_index<matrix_size; col_index++)
+                for (unsigned col_index = 0; col_index<matrix_size; col_index++)
                 {
                     if (((col_index-2)%3 == 0) && (col_index>1))//phi_e column indices are 2,5,8,11 etc....
                     {
@@ -163,7 +163,7 @@ void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::FinaliseLinearSystem
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::CheckCompatibilityCondition()
+void AbstractExtendedBidomainSolver<ELEMENT_DIM, SPACE_DIM>::CheckCompatibilityCondition()
 {
     if (this->mpBoundaryConditions->HasDirichletBoundaryConditions() || mRowForAverageOfPhiZeroed!=INT_MAX )
     {
@@ -199,12 +199,12 @@ void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::CheckCompatibilityCo
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::AbstractExtendedBidomainSolver(
+AbstractExtendedBidomainSolver<ELEMENT_DIM, SPACE_DIM>::AbstractExtendedBidomainSolver(
         bool bathSimulation,
-        AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
+        AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
         ExtendedBidomainTissue<SPACE_DIM>* pTissue,
         BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 3>* pBcc)
-    : AbstractDynamicLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,3>(pMesh),
+    : AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 3>(pMesh),
               mBathSimulation(bathSimulation),
               mpExtendedBidomainTissue(pTissue),
               mpBoundaryConditions(pBcc)
@@ -224,15 +224,15 @@ AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::AbstractExtendedBidomainS
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::~AbstractExtendedBidomainSolver()
+AbstractExtendedBidomainSolver<ELEMENT_DIM, SPACE_DIM>::~AbstractExtendedBidomainSolver()
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetFixedExtracellularPotentialNodes(
+void AbstractExtendedBidomainSolver<ELEMENT_DIM, SPACE_DIM>::SetFixedExtracellularPotentialNodes(
             std::vector<unsigned> fixedExtracellularPotentialNodes)
 {
-    for (unsigned i=0; i<fixedExtracellularPotentialNodes.size(); ++i)
+    for (unsigned i = 0; i<fixedExtracellularPotentialNodes.size(); ++i)
     {
         if (fixedExtracellularPotentialNodes[i] >= this->mpMesh->GetNumNodes() )
         {
@@ -245,7 +245,7 @@ void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetFixedExtracellula
     // We will need to recalculate this when HasDirichletBoundaryConditions() is called.
     this->mpBoundaryConditions->ResetDirichletCommunication();
 
-    for (unsigned i=0; i<mFixedExtracellularPotentialNodes.size(); ++i)
+    for (unsigned i = 0; i<mFixedExtracellularPotentialNodes.size(); ++i)
     {
         if (this->mpMesh->GetDistributedVectorFactory()->IsGlobalIndexLocal(mFixedExtracellularPotentialNodes[i]))
         {
@@ -261,7 +261,7 @@ void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetFixedExtracellula
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetRowForAverageOfPhiZeroed(unsigned row)
+void AbstractExtendedBidomainSolver<ELEMENT_DIM, SPACE_DIM>::SetRowForAverageOfPhiZeroed(unsigned row)
 {
     // Row should be every 3 entries, starting from zero...
     if (((row-2)%3 != 0) && row!=INT_MAX)
@@ -273,6 +273,6 @@ void AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetRowForAverageOfPh
 }
 
 // Explicit instantiation
-template class AbstractExtendedBidomainSolver<1,1>;
-template class AbstractExtendedBidomainSolver<2,2>;
-template class AbstractExtendedBidomainSolver<3,3>;
+template class AbstractExtendedBidomainSolver<1, 1>;
+template class AbstractExtendedBidomainSolver<2, 2>;
+template class AbstractExtendedBidomainSolver<3, 3>;

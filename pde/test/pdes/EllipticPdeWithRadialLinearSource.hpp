@@ -40,16 +40,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * The pde u_xx+u_yy - (x^2+y^2)u = 0, just for one particular test. This has the solution
  * exp(xy)
  */
-class EllipticPdeWithRadialLinearSource :public AbstractLinearEllipticPde<2,2>
+class EllipticPdeWithRadialLinearSource :public AbstractLinearEllipticPde<2, 2>
 {
 public:
 
-    double ComputeConstantInUSourceTerm(const ChastePoint<2>&, Element<2,2>*)
+    double ComputeConstantInUSourceTerm(const ChastePoint<2>&, Element<2, 2>*)
     {
         return 0.0;
     }
 
-    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<2>& rX, Element<2,2>*)
+    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<2>& rX, Element<2, 2>*)
     {
         return -(rX[0]*rX[0] + rX[1]*rX[1]);
     }

@@ -53,7 +53,7 @@ private:
      * @param widthOfSection The width of the section
      * @return whether the cell is in the section
      */
-    bool CellIsInSection(double angle, const c_vector<double,2>& rCellPosition, double widthOfSection=0.6);
+    bool CellIsInSection(double angle, const c_vector<double, 2>& rCellPosition, double widthOfSection=0.6);
 
 public:
 

@@ -113,7 +113,7 @@ class TestNiederer2011BenchmarkSimulation : public CxxTest::TestSuite
 private:
     void RunBenchMark(double h, double dt, double endTime, bool useSvi)
     {
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
 
         mesh.ConstructRegularSlabMesh(h, 2.0, 0.7, 0.3);
 
@@ -160,13 +160,13 @@ private:
     // time (defined as the time V becomes positive) for each node.
     void ConvertToActivationMap(double h, double dt, bool useSvi)
     {
-        //TetrahedralMesh<3,3> mesh1;
+        //TetrahedralMesh<3, 3> mesh1;
         //double h1=0.01;    // 0.01, 0.02, 0.05
         //mesh1.ConstructRegularSlabMesh(h1, 2.0, 0.7, 0.3);
-        //MeshalyzerMeshWriter<3,3> writer("Mesh0.01", "mesh01");
+        //MeshalyzerMeshWriter<3, 3> writer("Mesh0.01", "mesh01");
         //writer.WriteFilesUsingMesh(mesh1);
 
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
         double printing_dt=0.1;
         mesh.ConstructRegularSlabMesh(h, 2.0, 0.7, 0.3);
 
@@ -181,12 +181,12 @@ private:
 
         std::vector<double> activation_times(mesh.GetNumNodes(), -1.0);
         std::vector<double> last_negative_voltage(mesh.GetNumNodes(), 1.0);
-        for (unsigned timestep=0; timestep<num_timesteps; timestep++)
+        for (unsigned timestep = 0; timestep<num_timesteps; timestep++)
         {
             reader.GetVariableOverNodes(voltage, "V", timestep);
             ReplicatableVector voltage_repl(voltage);
 
-            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+            for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
             {
                 double V = voltage_repl[i];
                 if (V > 0 && activation_times[i] < 0.0)
@@ -228,7 +228,7 @@ private:
         }
         out_stream p_diag_file = handler.OpenOutputFile(output_file1.str());
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             c_vector<double, 3> position =  mesh.GetNode(i)->rGetLocation();
             c_vector<double, 3>  projected_diagonal = unit_diagonal*inner_prod(unit_diagonal, position);
@@ -251,13 +251,13 @@ private:
         output_file << "activation" << "_h" << h << "_dt" << dt << ".dat";
         out_stream p_file = handler.OpenOutputFile(output_file.str());
 
-        for (unsigned i=0; i<activation_times.size(); ++i)
+        for (unsigned i = 0; i<activation_times.size(); ++i)
         {
             *p_file << activation_times[i] << "\n";
         }
         p_file->close();
 
-        for (unsigned i=0; i<activation_times.size(); ++i)
+        for (unsigned i = 0; i<activation_times.size(); ++i)
         {
             if (activation_times[i] < 0.0)
             {

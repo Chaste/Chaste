@@ -115,9 +115,9 @@ std::vector<CellPtr> CryptStatistics::GetCryptSectionPeriodic(double yTop, doubl
 {
    return GetCryptSection(yTop, xBottom, xTop, true);
 }
-bool CryptStatistics::CellIsInSection(double xBottom, double xTop, double yTop, const c_vector<double,2>& rCellPosition, double widthOfSection)
+bool CryptStatistics::CellIsInSection(double xBottom, double xTop, double yTop, const c_vector<double, 2>& rCellPosition, double widthOfSection)
 {
-    c_vector<double,2> intercept;
+    c_vector<double, 2> intercept;
 
     if (xBottom == xTop)
     {
@@ -132,17 +132,17 @@ bool CryptStatistics::CellIsInSection(double xBottom, double xTop, double yTop, 
         intercept[1] = m*(intercept[0] - xBottom);
     }
 
-    c_vector<double,2> vec_from_A_to_B = mrCrypt.rGetMesh().GetVectorFromAtoB(intercept, rCellPosition);
+    c_vector<double, 2> vec_from_A_to_B = mrCrypt.rGetMesh().GetVectorFromAtoB(intercept, rCellPosition);
     double dist = norm_2(vec_from_A_to_B);
 
     return (dist <= widthOfSection);
 }
 
-bool CryptStatistics::CellIsInSectionPeriodic(double xBottom, double xTop, double yTop, const c_vector<double,2>& rCellPosition, double widthOfSection)
+bool CryptStatistics::CellIsInSectionPeriodic(double xBottom, double xTop, double yTop, const c_vector<double, 2>& rCellPosition, double widthOfSection)
 {
     bool is_in_section = false;
 
-    c_vector<double,2> intercept;
+    c_vector<double, 2> intercept;
     double crypt_width = mrCrypt.rGetMesh().GetWidth(0u);
 
     double m; // gradient of line
@@ -163,7 +163,7 @@ bool CryptStatistics::CellIsInSectionPeriodic(double xBottom, double xTop, doubl
     intercept[0] = (m*m*xBottom + rCellPosition[0] + m*rCellPosition[1])/(1+m*m);
     intercept[1] = m*(intercept[0] - xBottom);
 
-    c_vector<double,2> vec_from_A_to_B = mrCrypt.rGetMesh().GetVectorFromAtoB(intercept, rCellPosition);
+    c_vector<double, 2> vec_from_A_to_B = mrCrypt.rGetMesh().GetVectorFromAtoB(intercept, rCellPosition);
     double dist = norm_2(vec_from_A_to_B);
 
     if (dist < widthOfSection)

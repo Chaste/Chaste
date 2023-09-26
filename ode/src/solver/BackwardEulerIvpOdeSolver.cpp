@@ -59,7 +59,7 @@ void BackwardEulerIvpOdeSolver::ComputeJacobian(AbstractOdeSystem* pAbstractOdeS
 {
     for (unsigned i = 0; i < mSizeOfOdeSystem; ++i)
     {
-        for (unsigned j=0; j<mSizeOfOdeSystem; ++j)
+        for (unsigned j = 0; j<mSizeOfOdeSystem; ++j)
         {
             mJacobian[i][j] = 0.0;
         }
@@ -98,7 +98,7 @@ void BackwardEulerIvpOdeSolver::SolveLinearSystem()
         }
     }
     // This needs to int, since a downloop in unsigned won't terminate properly
-    for (int i=mSizeOfOdeSystem-1; i>=0; i--)
+    for (int i=mSizeOfOdeSystem-1; i>= 0; i--)
     {
         mUpdate[i] = mResidual[i];
         for (unsigned j=i+1; j<mSizeOfOdeSystem; ++j)
@@ -140,7 +140,7 @@ void BackwardEulerIvpOdeSolver::ComputeNumericalJacobian(AbstractOdeSystem* pAbs
         residual[i] = mResidual[i];
     }
 
-    for (unsigned global_column=0; global_column<mSizeOfOdeSystem; global_column++)
+    for (unsigned global_column = 0; global_column<mSizeOfOdeSystem; global_column++)
     {
         for (unsigned i = 0; i < mSizeOfOdeSystem; ++i)
         {

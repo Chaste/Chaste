@@ -327,7 +327,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     }
 
 template<>
-void OdeSystemInformation<CorriasBuistSMCModified>::Initialise(void)
+void OdeSystemInformation<CorriasBuistSMCModified>::Initialise()
 {
     // Time units: time_units
     //

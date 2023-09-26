@@ -58,8 +58,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkVersion.h>
 #endif
 
-typedef Hdf5ToVtkConverter<3,3> VTK_3D;
-typedef Hdf5ToMeshalyzerConverter<3,3> MESHA_3D;
+typedef Hdf5ToVtkConverter<3, 3> VTK_3D;
+typedef Hdf5ToMeshalyzerConverter<3, 3> MESHA_3D;
 
 /* HOW_TO_TAG Cardiac/Post-processing
  * Convert already generated simulation (HDF5) results to text, VTK or Meshalyzer format.
@@ -97,12 +97,12 @@ public:
         CopyToTestOutputDirectory("pde/test/data/cube_2mm_12_elements.h5",
                                   working_directory);
 
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        Hdf5ToVtkConverter<3,3> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
+        Hdf5ToVtkConverter<3, 3> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
                                           "cube_2mm_12_elements", &mesh, false, true);
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
 
@@ -114,7 +114,7 @@ public:
             // Show that trying to write .pvtu files from a TetrahedralMesh gives a warning (but writes anyway)
             CopyToTestOutputDirectory("pde/test/data/cube_2mm_12_elements.h5",
                                   working_directory2);
-            Hdf5ToVtkConverter<3,3> converter2(FileFinder(working_directory2, RelativeTo::ChasteTestOutput),
+            Hdf5ToVtkConverter<3, 3> converter2(FileFinder(working_directory2, RelativeTo::ChasteTestOutput),
                                                "cube_2mm_12_elements", &mesh, true, true);
 
             //The reading part of this test is below
@@ -128,7 +128,7 @@ public:
         PetscTools::Barrier();
 
 
-        VtkMeshReader<3,3> vtk_mesh_reader(test_output_directory + working_directory
+        VtkMeshReader<3, 3> vtk_mesh_reader(test_output_directory + working_directory
                                            + "/vtk_output/cube_2mm_12_elements.vtu");
         TS_ASSERT_EQUALS(vtk_mesh_reader.GetNumNodes(), 12u);
         TS_ASSERT_EQUALS(vtk_mesh_reader.GetNumElements(), 12u);
@@ -157,7 +157,7 @@ public:
         {
             //NOTE: Interleaved test
             //The writing part of this test is above
-            VtkMeshReader<3,3> vtk_mesh_reader2(test_output_directory + working_directory2
+            VtkMeshReader<3, 3> vtk_mesh_reader2(test_output_directory + working_directory2
                                                 + "/vtk_output/cube_2mm_12_elements.vtu");
             TS_ASSERT_EQUALS(vtk_mesh_reader2.GetNumNodes(), 12u);
         }
@@ -184,12 +184,12 @@ public:
         CopyToTestOutputDirectory("pde/test/data/2D_0_to_1mm_400_elements.h5",
                                   working_directory);
 
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
-        DistributedTetrahedralMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
+        DistributedTetrahedralMesh<2, 2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        Hdf5ToVtkConverter<2,2> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
+        Hdf5ToVtkConverter<2, 2> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
                                           "2D_0_to_1mm_400_elements", &mesh, true, false);
 
         /*
@@ -208,7 +208,7 @@ public:
         }
         filepath <<  ".vtu";
 
-        VtkMeshReader<2,2> vtk_mesh_reader(filepath.str());
+        VtkMeshReader<2, 2> vtk_mesh_reader(filepath.str());
         TS_ASSERT_EQUALS(vtk_mesh_reader.GetNumNodes(), mesh.GetNumLocalNodes() + mesh.GetNumHaloNodes()); // 221 in total
         TS_ASSERT_EQUALS(vtk_mesh_reader.GetNumElements(), mesh.GetNumLocalElements()); // 400 in total
 
@@ -236,7 +236,7 @@ public:
         }
 
         // Show that trying to write .pvtu files with original node ordering gives a warning (but writes anyway)
-        Hdf5ToVtkConverter<2,2> converter2(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
+        Hdf5ToVtkConverter<2, 2> converter2(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
                                            "2D_0_to_1mm_400_elements", &mesh, true, true);
 
         /*
@@ -246,7 +246,7 @@ public:
          */
         PetscTools::Barrier();
 
-        VtkMeshReader<2,2> vtk_mesh_reader2(test_output_directory + working_directory
+        VtkMeshReader<2, 2> vtk_mesh_reader2(test_output_directory + working_directory
                                             + "/vtk_output/2D_0_to_1mm_400_elements.vtu");
         TS_ASSERT_EQUALS(vtk_mesh_reader2.GetNumNodes(), 221u);
 #else
@@ -270,12 +270,12 @@ public:
         CopyToTestOutputDirectory("pde/test/data/cube_2mm_12_elements.h5",
                                   working_directory);
 
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        Hdf5ToTxtConverter<3,3> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
+        Hdf5ToTxtConverter<3, 3> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
                                           "cube_2mm_12_elements", &mesh);
 
         std::vector<std::string> files_to_compare;
@@ -301,12 +301,12 @@ public:
         std::string output_folder("TestHdf5Converters_TestMonodomainMeshalyzerConversion");
         CopyToTestOutputDirectory("heart/test/data/Monodomain1d/MonodomainLR91_1d.h5", output_folder);
 
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        Hdf5ToMeshalyzerConverter<1,1> converter(FileFinder(output_folder,RelativeTo::ChasteTestOutput),
+        Hdf5ToMeshalyzerConverter<1, 1> converter(FileFinder(output_folder,RelativeTo::ChasteTestOutput),
                                                  "MonodomainLR91_1d", &mesh, true, 10 /* precision specified for coverage */);
 
         // Compare the voltage file with a correct version
@@ -326,12 +326,12 @@ public:
         std::string output_folder("TestHdf5Converters_TestBidomainMeshalyzerConversion");
         CopyToTestOutputDirectory("heart/test/data/Bidomain1d/bidomain.h5", output_folder);
 
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        Hdf5ToMeshalyzerConverter<1,1> converter(FileFinder(output_folder, RelativeTo::ChasteTestOutput),
+        Hdf5ToMeshalyzerConverter<1, 1> converter(FileFinder(output_folder, RelativeTo::ChasteTestOutput),
                                                  "bidomain", &mesh, true);
 
         // Compare the voltage file
@@ -358,12 +358,12 @@ public:
         std::string output_folder("TestHdf5Converters_TestMeshalyzerConversion3Variables");
         CopyToTestOutputDirectory("heart/test/data/three_variables/3_vars.h5", output_folder);
 
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        Hdf5ToMeshalyzerConverter<1,1> converter(FileFinder(output_folder, RelativeTo::ChasteTestOutput),
+        Hdf5ToMeshalyzerConverter<1, 1> converter(FileFinder(output_folder, RelativeTo::ChasteTestOutput),
                                                  "3_vars", &mesh, true);
 
         // Compare the first voltage file
@@ -395,12 +395,12 @@ public:
          */
         CopyToTestOutputDirectory("heart/test/data/many_variables/many_variables.h5", output_dir);
 
-        TrianglesMeshReader<1,1> mesh_reader("heart/test/data/many_variables/1D_65_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("heart/test/data/many_variables/1D_65_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        Hdf5ToMeshalyzerConverter<1,1> converter(FileFinder(output_dir, RelativeTo::ChasteTestOutput),
+        Hdf5ToMeshalyzerConverter<1, 1> converter(FileFinder(output_dir, RelativeTo::ChasteTestOutput),
                                                  "many_variables", &mesh, true);
 
         std::vector<std::string> variable_names;
@@ -437,12 +437,12 @@ public:
         CopyToTestOutputDirectory("pde/test/data/cube_2mm_12_elements.h5",
                                   working_directory);
 
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        Hdf5ToXdmfConverter<3,3> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
+        Hdf5ToXdmfConverter<3, 3> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
                                            "cube_2mm_12_elements",
                                            &mesh);
 

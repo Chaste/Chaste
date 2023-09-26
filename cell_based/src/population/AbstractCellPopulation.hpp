@@ -814,7 +814,7 @@ public:
      * inferred from the population. The implementation of this function must be 
      * available in the header file.
      */
-    template<template <unsigned, unsigned> class T>
+    template<template<unsigned, unsigned> class T>
     void AddPopulationWriter()
     {
         mCellPopulationWriters.push_back(boost::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
@@ -825,7 +825,7 @@ public:
      * from the population. The implementation of this function must be available 
      * in the header file.
      */
-    template<template <unsigned, unsigned> class T>
+    template<template<unsigned, unsigned> class T>
     void AddCellWriter()
     {
         mCellWriters.push_back(boost::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
@@ -836,7 +836,7 @@ public:
      * are inferred from the population. The implementation of this function must 
      * be available in the header file.
      */
-    template<template <unsigned, unsigned> class T>
+    template<template<unsigned, unsigned> class T>
     void AddCellPopulationCountWriter()
     {
         mCellPopulationCountWriters.push_back(boost::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
@@ -847,7 +847,7 @@ public:
      * are inferred from the population. The implementation of this function must 
      * be available in the header file.
      */
-    template<template <unsigned, unsigned> class T>
+    template<template<unsigned, unsigned> class T>
     void AddCellPopulationEventWriter()
     {
         mCellPopulationEventWriters.push_back(boost::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
@@ -914,7 +914,7 @@ public:
      *
      * @return whether the population has this writer
      */
-    template<template <unsigned, unsigned> class T>
+    template<template<unsigned, unsigned> class T>
     bool HasWriter() const
     {
         typedef AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> population_writer_t;

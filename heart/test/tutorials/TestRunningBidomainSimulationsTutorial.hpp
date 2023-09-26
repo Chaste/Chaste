@@ -206,7 +206,7 @@ public:
 
         /* ..however, instead we show how to set a few more parameters. To set the conductivity values
          *  in the principal fibre, sheet and normal directions do the following.
-         * Note that {{{Create_c_vector}}} is just a helper method for creating a {{{c_vector<double,DIM>}}}
+         * Note that {{{Create_c_vector}}} is just a helper method for creating a {{{c_vector<double, DIM>}}}
          * of the correct size (2, in this case). Make sure these methods are called before
          * {{{Initialise()}}}.
          */
@@ -232,7 +232,7 @@ public:
          * `/tmp/$USER/testoutput/BidomainTutorial` in HDF5 format.  The
          * output will also be converted to selected visualiser formats at the end of the simulation.
          * Note that if you want to view the progress of longer simulations
-         * go to the the output directory and look at the file
+         * go to the output directory and look at the file
          * {{{progress_status.txt}}}, which will say the percentage of the
          * simulation run. */
         bidomain_problem.Solve();
@@ -257,7 +257,7 @@ public:
          * will mention how to do parallel access).
          */
         ReplicatableVector res_repl(bidomain_problem.GetSolution());
-        for (unsigned i=0; i<res_repl.GetSize(); ++i)
+        for (unsigned i = 0; i<res_repl.GetSize(); ++i)
         {
         //    std::cout << res_repl[i] << "\n";
         }

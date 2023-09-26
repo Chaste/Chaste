@@ -55,8 +55,8 @@ public:
 
     void TestRefreshMeshByScaling()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_DELTA(mesh.GetVolume(), 1.0, 1e-6);
@@ -82,8 +82,8 @@ public:
 
     void TestTranslation3DWithUblas()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         double volume = mesh.GetVolume();
@@ -118,8 +118,8 @@ public:
 
     void TestTranslation2DWithUblas()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_200_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/2D_0_to_1mm_200_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         double volume = mesh.GetVolume();
@@ -153,8 +153,8 @@ public:
 
     void TestTranslationMethod()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Pick a random node and store spatial position
@@ -179,13 +179,13 @@ public:
 
     void Test3DMeshTranslationWithUblasMethod()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Translations - add a constant vector to each node
 
-        c_vector<double,3>  displacement;
+        c_vector<double, 3>  displacement;
         displacement(0) = 1;
         displacement(1) = 1;
         displacement(2) = 1;
@@ -193,7 +193,7 @@ public:
         // Translate the mesh along the vector displacement
         mesh.Translate(displacement);
 
-        TetrahedralMesh<3,3> original_mesh;
+        TetrahedralMesh<3, 3> original_mesh;
         original_mesh.ConstructFromMeshReader(mesh_reader);
 
         for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
@@ -222,8 +222,8 @@ public:
 
     void TestXaxisRotation3DWithHomogeneousUblas()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_DELTA(mesh.GetVolume(), 1.0, 1e-6);
@@ -280,8 +280,8 @@ public:
 
     void TestXaxisRotation3DWithMethod()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         ChastePoint<3> corner_before = mesh.GetNode(6)->GetPoint();
@@ -304,8 +304,8 @@ public:
 
     void TestYaxisRotation3DWithMethod()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         double mesh_volume = mesh.GetVolume();
@@ -323,8 +323,8 @@ public:
 
     void TestZaxisRotation3DWithMethod()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         double mesh_volume = mesh.GetVolume();
@@ -342,8 +342,8 @@ public:
 
     void TestGeneralConvolution3DWithHomogeneousUblas()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_DELTA(mesh.GetVolume(), 1.0, 1e-6);
@@ -421,7 +421,7 @@ public:
         TS_ASSERT_DELTA(corner_after[2], 4.65889,  5e-5);
 
         // Write to file
-        TrianglesMeshWriter<3,3> mesh_writer("","TransformedMesh");
+        TrianglesMeshWriter<3, 3> mesh_writer("","TransformedMesh");
         mesh_writer.WriteFilesUsingMesh(mesh);
 
         /*
@@ -432,8 +432,8 @@ public:
 
     void TestGeneralConvolution3DWithMethod()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         double mesh_volume = mesh.GetVolume();
@@ -454,11 +454,11 @@ public:
 
     void Test3DAngleAxisRotation()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        c_vector<double,3> axis;
+        c_vector<double, 3> axis;
         axis(0) = 1;
         axis(1) = 0;
         axis(2) = 0;
@@ -467,7 +467,7 @@ public:
 
         mesh.Rotate(axis, angle);
 
-        TetrahedralMesh<3,3> original_mesh;
+        TetrahedralMesh<3, 3> original_mesh;
         original_mesh.ConstructFromMeshReader(mesh_reader);
 
         for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
@@ -495,15 +495,15 @@ public:
 
     void Test2DMeshRotation()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_200_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/2D_0_to_1mm_200_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         double angle = M_PI;
 
         mesh.Rotate(angle);
 
-        TetrahedralMesh<2,2> original_mesh;
+        TetrahedralMesh<2, 2> original_mesh;
         original_mesh.ConstructFromMeshReader(mesh_reader);
 
         for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
@@ -530,8 +530,8 @@ public:
 
     void TestScalingWithMethod()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         double mesh_volume = mesh.GetVolume();
@@ -558,8 +558,8 @@ public:
     }
     void failsInParallelTestDistributedRigidBodyMethods()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-        DistributedTetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
+        DistributedTetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         c_matrix<double, 3, 3> dummy;
@@ -592,8 +592,8 @@ public:
 
     void TestExceptions()
     {
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_10_100_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_10_100_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_THROWS_THIS(mesh.RotateZ(1.4),"This rotation is not valid in less than 2D");

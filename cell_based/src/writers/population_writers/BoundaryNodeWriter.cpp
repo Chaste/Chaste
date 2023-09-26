@@ -106,12 +106,12 @@ void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
 }
 
 // Explicit instantiation
-template class BoundaryNodeWriter<1,1>;
-template class BoundaryNodeWriter<1,2>;
-template class BoundaryNodeWriter<2,2>;
-template class BoundaryNodeWriter<1,3>;
-template class BoundaryNodeWriter<2,3>;
-template class BoundaryNodeWriter<3,3>;
+template class BoundaryNodeWriter<1, 1>;
+template class BoundaryNodeWriter<1, 2>;
+template class BoundaryNodeWriter<2, 2>;
+template class BoundaryNodeWriter<1, 3>;
+template class BoundaryNodeWriter<2, 3>;
+template class BoundaryNodeWriter<3, 3>;
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer

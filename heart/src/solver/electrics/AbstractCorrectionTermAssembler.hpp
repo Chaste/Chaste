@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 template<unsigned ELEM_DIM,unsigned SPACE_DIM,unsigned PROBLEM_DIM>
 class AbstractCorrectionTermAssembler
-    : public AbstractCardiacFeVolumeIntegralAssembler<ELEM_DIM,SPACE_DIM,PROBLEM_DIM,true,false,CARDIAC>
+    : public AbstractCardiacFeVolumeIntegralAssembler<ELEM_DIM, SPACE_DIM, PROBLEM_DIM,true,false,CARDIAC>
 {
 protected:
     /** Ionic current to be interpolated from cache */
@@ -84,7 +84,7 @@ protected:
      *
      * @param rElement  the element to test
      */
-    bool ElementAssemblyCriterion(Element<ELEM_DIM,SPACE_DIM>& rElement);
+    bool ElementAssemblyCriterion(Element<ELEM_DIM, SPACE_DIM>& rElement);
 
 public:
 
@@ -94,8 +94,8 @@ public:
      * @param pMesh  pointer to the mesh
      * @param pTissue  pointer to the cardiac tissue
      */
-    AbstractCorrectionTermAssembler(AbstractTetrahedralMesh<ELEM_DIM,SPACE_DIM>* pMesh,
-                                    AbstractCardiacTissue<ELEM_DIM,SPACE_DIM>* pTissue);
+    AbstractCorrectionTermAssembler(AbstractTetrahedralMesh<ELEM_DIM, SPACE_DIM>* pMesh,
+                                    AbstractCardiacTissue<ELEM_DIM, SPACE_DIM>* pTissue);
 };
 
 #endif /*ABSTRACTCORRECTIONTERMASSEMBLER_HPP_*/

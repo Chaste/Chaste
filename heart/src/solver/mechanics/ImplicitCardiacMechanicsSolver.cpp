@@ -36,11 +36,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImplicitCardiacMechanicsSolver.hpp"
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
-ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ImplicitCardiacMechanicsSolver(
+ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER, DIM>::ImplicitCardiacMechanicsSolver(
                                   QuadraticMesh<DIM>& rQuadMesh,
                                   ElectroMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                   std::string outputDirectory)
-    : AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>(rQuadMesh,
+    : AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER, DIM>(rQuadMesh,
                                                             rProblemDefinition,
                                                             outputDirectory)
 {
@@ -48,13 +48,13 @@ ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ImplicitCardiacMechanicsS
 }
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
-ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::~ImplicitCardiacMechanicsSolver()
+ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER, DIM>::~ImplicitCardiacMechanicsSolver()
 {
 }
 
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
-void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Solve(double time, double nextTime, double odeTimestep)
+void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER, DIM>::Solve(double time, double nextTime, double odeTimestep)
 {
     // set the times, which are used in AssembleOnElement
     assert(time < nextTime);
@@ -86,7 +86,7 @@ void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Solve(double time, d
 }
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
-void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::GetActiveTensionAndTensionDerivs(double currentFibreStretch,
+void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER, DIM>::GetActiveTensionAndTensionDerivs(double currentFibreStretch,
                                                                                              unsigned currentQuadPointGlobalIndex,
                                                                                              bool assembleJacobian,
                                                                                              double& rActiveTension,
@@ -162,7 +162,7 @@ void ImplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::GetActiveTensionAndT
 }
 
 // Explicit instantiation
-template class ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2>;
-template class ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<3>,3>;
-template class ImplicitCardiacMechanicsSolver<CompressibleNonlinearElasticitySolver<2>,2>;
-template class ImplicitCardiacMechanicsSolver<CompressibleNonlinearElasticitySolver<3>,3>;
+template class ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>, 2>;
+template class ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<3>, 3>;
+template class ImplicitCardiacMechanicsSolver<CompressibleNonlinearElasticitySolver<2>, 2>;
+template class ImplicitCardiacMechanicsSolver<CompressibleNonlinearElasticitySolver<3>, 3>;

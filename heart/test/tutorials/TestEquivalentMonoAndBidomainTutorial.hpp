@@ -182,8 +182,8 @@ public:
         /*
          * == Setting Bidomain Conductivities ==
          */
-        c_vector<double,2> intracellular_conductivities = Create_c_vector(1.75, 0.19);
-        c_vector<double,2> extracellular_conductivities = Create_c_vector(7, 0.76);
+        c_vector<double, 2> intracellular_conductivities = Create_c_vector(1.75, 0.19);
+        c_vector<double, 2> extracellular_conductivities = Create_c_vector(7, 0.76);
 
         ReplicatableVector* p_bidomain_results;
         // Bidomain
@@ -246,14 +246,14 @@ public:
              * sigma_monodomain = sigma_i sigma_e / (sigma_i + sigma_e)
              *
              */
-            c_vector<double,2> monodomain_conductivities;
+            c_vector<double, 2> monodomain_conductivities;
 
             // Just a little check that this reduction is valid in case you copy and paste this code!
             double x_scaling = extracellular_conductivities[0] / intracellular_conductivities[0];
             double y_scaling = extracellular_conductivities[1] / intracellular_conductivities[1];
             TS_ASSERT_DELTA(x_scaling, y_scaling, 1e-12);
 
-            for (unsigned dim=0; dim<2; dim++)
+            for (unsigned dim = 0; dim<2; dim++)
             {
                 monodomain_conductivities[dim] = intracellular_conductivities[dim]*extracellular_conductivities[dim]
                                                / (intracellular_conductivities[dim] + extracellular_conductivities[dim]);
@@ -274,7 +274,7 @@ public:
 
         /* We then check that the voltage at each node at the end of the simulation is the same
          * whether we did a bidomain simulation, or the equivalent monodomain simulation.*/
-        for (unsigned i=0; i<p_monodomain_results->GetSize(); ++i)
+        for (unsigned i = 0; i<p_monodomain_results->GetSize(); ++i)
         {
             TS_ASSERT_DELTA((*p_monodomain_results)[i], (*p_bidomain_results)[2u*i], 1e-6);
         }

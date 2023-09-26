@@ -111,7 +111,7 @@ protected:
     /** Spatial solution:
      *  For solids problems, mSpatialSolution[i](j) = x_j (new position) for node i.
      *  For fluids problems, mSpatialSolution[i](j) = u_j (flow) for node i. */
-    std::vector<c_vector<double,DIM> > mSpatialSolution;
+    std::vector<c_vector<double, DIM> > mSpatialSolution;
 
     /** Pressures solution at each vertex of the mesh. Only valid if mCompressibilityType==INCOMPRESSIBLE. */
     std::vector<double> mPressureSolution;
@@ -356,7 +356,7 @@ public:
      * @return the spatial solution. For solids problems this will be the deformed position,
      * for fluids problems this will be the flow.
      */
-    virtual std::vector<c_vector<double,DIM> >& rGetSpatialSolution()=0;
+    virtual std::vector<c_vector<double, DIM> >& rGetSpatialSolution()=0;
 
     /**
      *  @return the pressure, for each NODE in the mesh. If the node is an internal node of the quadratic mesh
@@ -480,7 +480,7 @@ void AbstractContinuumMechanicsSolver<DIM>::WriteCurrentSpatialSolution(std::str
 
         out_stream p_file = mpOutputFileHandler->OpenOutputFile(file_name.str());
 
-        std::vector<c_vector<double,DIM> >& r_spatial_solution = rGetSpatialSolution();
+        std::vector<c_vector<double, DIM> >& r_spatial_solution = rGetSpatialSolution();
         for (unsigned i = 0; i < r_spatial_solution.size(); ++i)
         {
     //        for (unsigned j = 0; j < DIM; ++j)

@@ -36,63 +36,65 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleLinearEllipticSolver.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_matrix<double, 1*(ELEMENT_DIM+1), 1*(ELEMENT_DIM+1)>SimpleLinearEllipticSolver<ELEMENT_DIM,SPACE_DIM>:: ComputeMatrixTerm(
-        c_vector<double, ELEMENT_DIM+1>& rPhi,
-        c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi,
-        ChastePoint<SPACE_DIM>& rX,
-        c_vector<double,1>& rU,
-        c_matrix<double,1,SPACE_DIM>& rGradU,
-        Element<ELEMENT_DIM,SPACE_DIM>* pElement)
+c_matrix<double, 1*(ELEMENT_DIM+1), 1*(ELEMENT_DIM+1)>SimpleLinearEllipticSolver<ELEMENT_DIM, SPACE_DIM>::ComputeMatrixTerm(
+    c_vector<double, ELEMENT_DIM+1>& rPhi,
+    c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi,
+    ChastePoint<SPACE_DIM>& rX,
+    c_vector<double, 1>& rU,
+    c_matrix<double, 1, SPACE_DIM>& rGradU,
+    Element<ELEMENT_DIM, SPACE_DIM>* pElement)
 {
-    c_matrix<double, SPACE_DIM, SPACE_DIM> pde_diffusion_term = mpEllipticPde->ComputeDiffusionTerm(rX);
+    c_matrix<double, SPACE_DIM, SPACE_DIM> pde_diffusion_term = 
+        mpEllipticPde->ComputeDiffusionTerm(rX);
 
-    // This if statement just saves computing phi*phi^T if it is to be multiplied by zero
-    if (mpEllipticPde->ComputeLinearInUCoeffInSourceTerm(rX,pElement)!=0)
+    // This saves computing phi*phi^T if it is to be multiplied by zero
+    if (mpEllipticPde->ComputeLinearInUCoeffInSourceTerm(rX, pElement) != 0)
     {
-        return   prod( trans(rGradPhi), c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>(prod(pde_diffusion_term, rGradPhi)) )
-               - mpEllipticPde->ComputeLinearInUCoeffInSourceTerm(rX,pElement)*outer_prod(rPhi,rPhi);
+        return prod(trans(rGradPhi), c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>(prod(pde_diffusion_term, rGradPhi)))
+            - mpEllipticPde->ComputeLinearInUCoeffInSourceTerm(rX,pElement)*outer_prod(rPhi, rPhi);
     }
     else
     {
-        return   prod( trans(rGradPhi), c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>(prod(pde_diffusion_term, rGradPhi)) );
+        return prod(trans(rGradPhi), c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>(prod(pde_diffusion_term, rGradPhi)));
     }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double,1*(ELEMENT_DIM+1)> SimpleLinearEllipticSolver<ELEMENT_DIM,SPACE_DIM>::ComputeVectorTerm(
-        c_vector<double, ELEMENT_DIM+1>& rPhi,
-        c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi,
-        ChastePoint<SPACE_DIM>& rX,
-        c_vector<double,1>& rU,
-        c_matrix<double,1,SPACE_DIM>& rGradU,
-        Element<ELEMENT_DIM,SPACE_DIM>* pElement)
+c_vector<double, 1*(ELEMENT_DIM+1)> SimpleLinearEllipticSolver<ELEMENT_DIM, SPACE_DIM>::ComputeVectorTerm(
+    c_vector<double, ELEMENT_DIM+1>& rPhi,
+    c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi,
+    ChastePoint<SPACE_DIM>& rX,
+    c_vector<double, 1>& rU,
+    c_matrix<double, 1, SPACE_DIM>& rGradU,
+    Element<ELEMENT_DIM, SPACE_DIM>* pElement)
 {
     return mpEllipticPde->ComputeConstantInUSourceTerm(rX, pElement) * rPhi;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-SimpleLinearEllipticSolver<ELEMENT_DIM,SPACE_DIM>::SimpleLinearEllipticSolver(
-                                  AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                                  AbstractLinearEllipticPde<ELEMENT_DIM,SPACE_DIM>* pPde,
-                                  BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,1>* pBoundaryConditions)
-        : AbstractAssemblerSolverHybrid<ELEMENT_DIM,SPACE_DIM,1,NORMAL>(pMesh,pBoundaryConditions),
-          AbstractStaticLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,1>(pMesh)
+SimpleLinearEllipticSolver<ELEMENT_DIM, SPACE_DIM>::SimpleLinearEllipticSolver(
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+    AbstractLinearEllipticPde<ELEMENT_DIM, SPACE_DIM>* pPde,
+    BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 1>* pBoundaryConditions)
+    : AbstractAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, 1, NORMAL>(pMesh, pBoundaryConditions),
+      AbstractStaticLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 1>(pMesh)
 {
     mpEllipticPde = pPde;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void SimpleLinearEllipticSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
+void SimpleLinearEllipticSolver<ELEMENT_DIM, SPACE_DIM>::InitialiseForSolve(
+    Vec initialSolution)
 {
-    AbstractLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,1>::InitialiseForSolve(initialSolution);
+    AbstractLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 1>::InitialiseForSolve(initialSolution);
     assert(this->mpLinearSystem);
     this->mpLinearSystem->SetMatrixIsSymmetric(true);
     this->mpLinearSystem->SetKspType("cg");
 }
 
 // Explicit instantiation
-template class SimpleLinearEllipticSolver<1,1>;
-template class SimpleLinearEllipticSolver<1,2>;
-template class SimpleLinearEllipticSolver<1,3>;
-template class SimpleLinearEllipticSolver<2,2>;
-template class SimpleLinearEllipticSolver<3,3>;
+template class SimpleLinearEllipticSolver<1, 1>;
+template class SimpleLinearEllipticSolver<1, 2>;
+template class SimpleLinearEllipticSolver<1, 3>;
+template class SimpleLinearEllipticSolver<2, 2>;
+template class SimpleLinearEllipticSolver<3, 3>;

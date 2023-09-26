@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 CmguiDeformedSolutionsWriter<DIM>::CmguiDeformedSolutionsWriter(std::string outputDirectory,
                                                                 std::string baseName,
-                                                                AbstractTetrahedralMesh<DIM,DIM>& rQuadraticMesh,
+                                                                AbstractTetrahedralMesh<DIM, DIM>& rQuadraticMesh,
                                                                 CmguiMeshWriteType writeType)
     : CmguiMeshWriter<DIM, DIM>(outputDirectory, baseName),
       mpQuadraticMesh(&rQuadraticMesh),
@@ -71,7 +71,7 @@ CmguiDeformedSolutionsWriter<DIM>::CmguiDeformedSolutionsWriter(std::string outp
             //    this->mNumNodesPerElement = 3;
             //    this->mReordering.resize(this->mNumNodesPerElement);
             //    unsigned reordering[6] = {0,2,1};
-            //    for (unsigned i=0; i<3; ++i)
+            //    for (unsigned i = 0; i<3; ++i)
             //    {
             //        this->mReordering[i] = reordering[i];
             //    }
@@ -90,7 +90,7 @@ CmguiDeformedSolutionsWriter<DIM>::CmguiDeformedSolutionsWriter(std::string outp
                 // QuadraticBasisFunction::ComputeBasisFunction() to CMGUI ordering
                 // ("psi1 increasing, then psi1 increasing")
                 unsigned reordering[6] = {0,5,1,4,3,2};
-                for (unsigned i=0; i<6; ++i)
+                for (unsigned i = 0; i<6; ++i)
                 {
                     this->mReordering[i] = reordering[i];
                 }
@@ -108,7 +108,7 @@ CmguiDeformedSolutionsWriter<DIM>::CmguiDeformedSolutionsWriter(std::string outp
                 // QuadraticBasisFunction::ComputeBasisFunction() to CMGUI ordering
                 // ("psi1 increasing, then psi2 increasing, then psi3 increasing")
                 unsigned reordering[10] = {0,4,1,6,5,2,7,8,9,3};
-                for (unsigned i=0; i<10; ++i)
+                for (unsigned i = 0; i<10; ++i)
                 {
                     this->mReordering[i] = reordering[i];
                 }
@@ -139,7 +139,7 @@ void CmguiDeformedSolutionsWriter<DIM>::WriteInitialMesh(std::string fileName)
 }
 
 template<unsigned DIM>
-void CmguiDeformedSolutionsWriter<DIM>::WriteDeformationPositions(std::vector<c_vector<double,DIM> >& rDeformedPositions,
+void CmguiDeformedSolutionsWriter<DIM>::WriteDeformationPositions(std::vector<c_vector<double, DIM> >& rDeformedPositions,
                                                                   unsigned counter)
 {
     if (mpQuadraticMesh->GetNumNodes() != rDeformedPositions.size() )
@@ -156,7 +156,7 @@ void CmguiDeformedSolutionsWriter<DIM>::WriteDeformationPositions(std::vector<c_
     this->WriteNodeFileHeader(p_node_file);
 
     // Write each node's data
-    for (unsigned index=0; index<this->GetNumNodes(); index++)
+    for (unsigned index = 0; index<this->GetNumNodes(); index++)
     {
         *p_node_file << "Node:\t" << index+1 << "\t";
 
@@ -186,14 +186,14 @@ void CmguiDeformedSolutionsWriter<DIM>::WriteCmguiScript(std::string fieldBaseNa
         *p_script_file << "gfx read node " << undeformedBaseName << " time -1\n";
     }
 
-    *p_script_file << "for ($i=0; $i<=" << mFinalCounter << "; $i++) { \n"
+    *p_script_file << "for ($i = 0; $i<=" << mFinalCounter << "; $i++) { \n"
                    << "  gfx read node " << this->mBaseName << "_$i time $i\n"
                    << field_string
                    << "}\n";
 
     if (undeformedBaseName != "")
     {
-        for (unsigned region_index=0; region_index<this->mRegionNames.size(); region_index++)
+        for (unsigned region_index = 0; region_index<this->mRegionNames.size(); region_index++)
         {
             *p_script_file << "gfx read ele " << this->mRegionNames[region_index] << "\n";
         }
@@ -216,7 +216,7 @@ void CmguiDeformedSolutionsWriter<DIM>::ConvertOutput(std::string inputDirectory
     // write the mesh to <inputFileBaseName>_0.exnode and <inputFileBaseName>_0.exelem
     WriteInitialMesh();
 
-    std::vector<c_vector<double,DIM> > deformed_position(mpQuadraticMesh->GetNumNodes(), zero_vector<double>(DIM));
+    std::vector<c_vector<double, DIM> > deformed_position(mpQuadraticMesh->GetNumNodes(), zero_vector<double>(DIM));
 
     for (unsigned i=1; i<=finalCounter; ++i) //not i=0
     {
@@ -231,7 +231,7 @@ void CmguiDeformedSolutionsWriter<DIM>::ConvertOutput(std::string inputDirectory
 
         // the file into deformed_position
         double data;
-        for (unsigned index=0; index<mpQuadraticMesh->GetNumNodes(); index++)
+        for (unsigned index = 0; index<mpQuadraticMesh->GetNumNodes(); index++)
         {
             for (unsigned j = 0; j < DIM; ++j)
             {

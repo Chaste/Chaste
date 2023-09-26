@@ -740,12 +740,12 @@ void AirwayGenerator::WriteDecomposedAirways(std::string rOutputDirectory, std::
         vtu_writer->Write();
 
         // Load the vtu in to a Chaste mesh and serialize out in triangles/tetgen format
-        VtkMeshReader<1,3> combined_mesh_reader(filtered_grid);
-        TetrahedralMesh<1,3> combined_mesh;
+        VtkMeshReader<1, 3> combined_mesh_reader(filtered_grid);
+        TetrahedralMesh<1, 3> combined_mesh;
         combined_mesh.ConstructFromMeshReader(combined_mesh_reader);
 
         // Insert data attributes in the vtu file as node attributes in the mesh
-        for (TetrahedralMesh<1,3>::NodeIterator node_iter = combined_mesh.GetNodeIteratorBegin();
+        for (TetrahedralMesh<1, 3>::NodeIterator node_iter = combined_mesh.GetNodeIteratorBegin();
              node_iter != combined_mesh.GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -756,7 +756,7 @@ void AirwayGenerator::WriteDecomposedAirways(std::string rOutputDirectory, std::
         std::stringstream triangles_file_name;
         triangles_file_name << rOutputFileNameRoot << "_" << connected_region;
 
-        TrianglesMeshWriter<1,3> combined_mesh_writer(rOutputDirectory, triangles_file_name.str(), false);
+        TrianglesMeshWriter<1, 3> combined_mesh_writer(rOutputDirectory, triangles_file_name.str(), false);
         combined_mesh_writer.WriteFilesUsingMesh(combined_mesh);
     }
 }

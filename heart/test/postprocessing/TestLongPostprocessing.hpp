@@ -60,7 +60,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 
 
-template <unsigned DIM>
+template<unsigned DIM>
 class PointStimulusCellFactory : public AbstractCardiacCellFactory<DIM>
 {
 private:
@@ -103,7 +103,7 @@ public:
         double pde_time_step = 0.01; //ms
         unsigned num_stims = 1;
 
-        TetrahedralMesh<2,2> mesh;
+        TetrahedralMesh<2, 2> mesh;
         unsigned num_elem_x = static_cast<unsigned>(0.5/h);  // num elements to make 5mm
         unsigned num_elem_y = static_cast<unsigned>(0.5/h);  // num elements to make 5mm
         //unsigned num_elem_z = static_cast<unsigned>(0.15/h);// Num elements to make 0.3cm
@@ -143,7 +143,7 @@ public:
 //        HeartConfig::Instance()->SetUpstrokeTimeMaps(excitation_threshold);
 //        HeartConfig::Instance()->SetMaxUpstrokeVelocityMaps(excitation_threshold);
 
-        for (unsigned stim_counter=0; stim_counter < num_stims; stim_counter++ )
+        for (unsigned stim_counter = 0; stim_counter < num_stims; stim_counter++ )
         {
             // Load problem
             MonodomainProblem<2> *p_monodomain_problem;
@@ -186,7 +186,7 @@ public:
 //                files.push_back("MaxUpstrokeVelocityMap_-30");
 //                files.push_back("UpstrokeTimeMap_-30");
 
-            for (unsigned i=0; i<files.size(); ++i)
+            for (unsigned i = 0; i<files.size(); ++i)
             {
                 FileFinder file_to_copy(HeartConfig::Instance()->GetOutputDirectory() + "/output/" + files[i] + ".dat", RelativeTo::ChasteTestOutput);
                 TS_ASSERT(file_to_copy.IsFile());

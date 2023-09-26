@@ -901,7 +901,7 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextItemFromStream(std::ifs
             EXCEPTION("Data for item " << expectedItemNumber << " missing");
         }
 
-        for (unsigned i=0; i<rDataPacket.size(); ++i)
+        for (unsigned i = 0; i<rDataPacket.size(); ++i)
         {
             buffer_stream >> rDataPacket[i];
         }
@@ -944,7 +944,7 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetOneDimBoundary()
 
         // Count how many times we see each node
         std::vector<unsigned> node_count(mNumNodes); // Covers the case if it's indexed from 1
-        for (unsigned element_index=0; element_index<mNumElements;element_index++)
+        for (unsigned element_index = 0; element_index<mNumElements;element_index++)
         {
             GetNextItemFromStream(mElementsFile, element_index, node_indices, mNumElementAttributes, dummy_attribute);
             if (!mIndexFromZero)
@@ -958,7 +958,7 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::GetOneDimBoundary()
         }
 
         // Find the ones which are terminals (only one mention)
-        for (unsigned node_index=0; node_index<mNumNodes;node_index++)
+        for (unsigned node_index = 0; node_index<mNumNodes;node_index++)
         {
             if (node_count[node_index] == 1u)
             {
@@ -984,7 +984,7 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::EnsureIndexingFromZero(std::ve
 {
     if (!mIndexFromZero) // If node indices do not start at zero move them all down one so they do
     {
-        for (unsigned i=0; i<rNodeIndices.size(); ++i)
+        for (unsigned i = 0; i<rNodeIndices.size(); ++i)
         {
             rNodeIndices[i]--;
         }
@@ -1027,7 +1027,7 @@ void TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::SetNodePermutation(std::vector
     mNodePermutationDefined = true;
     mPermutationVector = rPermutationVector;
     mInversePermutationVector.resize(mPermutationVector.size());
-    for (unsigned index=0; index<mPermutationVector.size(); index++)
+    for (unsigned index = 0; index<mPermutationVector.size(); index++)
     {
         mInversePermutationVector[mPermutationVector[index]]=index;
     }
@@ -1049,33 +1049,33 @@ const std::vector<unsigned>& TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM>::rGetNo
 }
 
 // Explicit instantiation
-template class TrianglesMeshReader<0,1>;
-template class TrianglesMeshReader<1,1>;
-template class TrianglesMeshReader<1,2>;
-template class TrianglesMeshReader<1,3>;
-template class TrianglesMeshReader<2,2>;
-template class TrianglesMeshReader<2,3>;
-template class TrianglesMeshReader<3,3>;
+template class TrianglesMeshReader<0, 1>;
+template class TrianglesMeshReader<1, 1>;
+template class TrianglesMeshReader<1, 2>;
+template class TrianglesMeshReader<1, 3>;
+template class TrianglesMeshReader<2, 2>;
+template class TrianglesMeshReader<2, 3>;
+template class TrianglesMeshReader<3, 3>;
 
 
 /**
  * \cond
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
  */
-template void TrianglesMeshReader<0,1>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<unsigned>&, const unsigned&, std::vector<double>&);
-template void TrianglesMeshReader<0,1>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<double>  &, const unsigned&, std::vector<double>&);
-template void TrianglesMeshReader<1,1>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<unsigned>&, const unsigned&, std::vector<double>&);
-template void TrianglesMeshReader<1,1>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<double>  &, const unsigned&, std::vector<double>&);
-template void TrianglesMeshReader<1,2>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<unsigned>&, const unsigned&, std::vector<double>&);
-template void TrianglesMeshReader<1,2>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<double>  &, const unsigned&, std::vector<double>&);
-template void TrianglesMeshReader<1,3>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<unsigned>&, const unsigned&, std::vector<double>&);
-template void TrianglesMeshReader<1,3>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<double>  &, const unsigned&, std::vector<double>&);
-template void TrianglesMeshReader<2,2>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<unsigned>&, const unsigned&, std::vector<double>&);
-template void TrianglesMeshReader<2,2>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<double>  &, const unsigned&, std::vector<double>&);
-template void TrianglesMeshReader<2,3>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<unsigned>&, const unsigned&, std::vector<double>&);
-template void TrianglesMeshReader<2,3>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<double>  &, const unsigned&, std::vector<double>&);
-template void TrianglesMeshReader<3,3>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<unsigned>&, const unsigned&, std::vector<double>&);
-template void TrianglesMeshReader<3,3>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<double>  &, const unsigned&, std::vector<double>&);
+template void TrianglesMeshReader<0, 1>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<unsigned>&, const unsigned&, std::vector<double>&);
+template void TrianglesMeshReader<0, 1>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<double>  &, const unsigned&, std::vector<double>&);
+template void TrianglesMeshReader<1, 1>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<unsigned>&, const unsigned&, std::vector<double>&);
+template void TrianglesMeshReader<1, 1>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<double>  &, const unsigned&, std::vector<double>&);
+template void TrianglesMeshReader<1, 2>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<unsigned>&, const unsigned&, std::vector<double>&);
+template void TrianglesMeshReader<1, 2>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<double>  &, const unsigned&, std::vector<double>&);
+template void TrianglesMeshReader<1, 3>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<unsigned>&, const unsigned&, std::vector<double>&);
+template void TrianglesMeshReader<1, 3>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<double>  &, const unsigned&, std::vector<double>&);
+template void TrianglesMeshReader<2, 2>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<unsigned>&, const unsigned&, std::vector<double>&);
+template void TrianglesMeshReader<2, 2>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<double>  &, const unsigned&, std::vector<double>&);
+template void TrianglesMeshReader<2, 3>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<unsigned>&, const unsigned&, std::vector<double>&);
+template void TrianglesMeshReader<2, 3>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<double>  &, const unsigned&, std::vector<double>&);
+template void TrianglesMeshReader<3, 3>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<unsigned>&, const unsigned&, std::vector<double>&);
+template void TrianglesMeshReader<3, 3>::GetNextItemFromStream(std::ifstream&, unsigned, std::vector<double>  &, const unsigned&, std::vector<double>&);
 /**
  * \endcond
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods

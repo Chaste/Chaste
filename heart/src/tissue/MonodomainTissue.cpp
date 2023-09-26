@@ -35,26 +35,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "MonodomainTissue.hpp"
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-MonodomainTissue<ELEMENT_DIM,SPACE_DIM>::MonodomainTissue(
-            AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>* pCellFactory,
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+MonodomainTissue<ELEMENT_DIM, SPACE_DIM>::MonodomainTissue(
+            AbstractCardiacCellFactory<ELEMENT_DIM, SPACE_DIM>* pCellFactory,
             bool exchangeHalos)
     :  AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>(pCellFactory, exchangeHalos)
 {
 }
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-MonodomainTissue<ELEMENT_DIM,SPACE_DIM>::MonodomainTissue(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+MonodomainTissue<ELEMENT_DIM, SPACE_DIM>::MonodomainTissue(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
         :  AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>(pMesh)
 {
 }
 
 // Explicit instantiation
-template class MonodomainTissue<1,1>;
-template class MonodomainTissue<1,2>;
-template class MonodomainTissue<1,3>;
-template class MonodomainTissue<2,2>;
-template class MonodomainTissue<3,3>;
+template class MonodomainTissue<1, 1>;
+template class MonodomainTissue<1, 2>;
+template class MonodomainTissue<1, 3>;
+template class MonodomainTissue<2, 2>;
+template class MonodomainTissue<3, 3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

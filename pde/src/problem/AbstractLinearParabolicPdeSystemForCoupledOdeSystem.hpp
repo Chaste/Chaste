@@ -87,7 +87,7 @@ public:
      */
     virtual double ComputeSourceTerm(
         const ChastePoint<SPACE_DIM>& rX,
-        c_vector<double,PROBLEM_DIM>& rU,
+        c_vector<double, PROBLEM_DIM>& rU,
         std::vector<double>& rOdeSolution,
         unsigned pdeIndex) = 0;
 
@@ -103,7 +103,7 @@ public:
      */
     virtual double ComputeSourceTermAtNode(
         const Node<SPACE_DIM>& rNode,
-        c_vector<double,PROBLEM_DIM>& rU,
+        c_vector<double, PROBLEM_DIM>& rU,
         std::vector<double>& rOdeSolution,
         unsigned pdeIndex);
 
@@ -118,7 +118,7 @@ public:
     virtual c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(
         const ChastePoint<SPACE_DIM>& rX,
         unsigned pdeIndex,
-        Element<ELEMENT_DIM,SPACE_DIM>* pElement = NULL) = 0;
+        Element<ELEMENT_DIM, SPACE_DIM>* pElement = NULL) = 0;
 
     /**
      * Destructor.
@@ -132,7 +132,7 @@ public:
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 double AbstractLinearParabolicPdeSystemForCoupledOdeSystem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::ComputeSourceTermAtNode(
     const Node<SPACE_DIM>& rNode,
-    c_vector<double,PROBLEM_DIM>& rU,
+    c_vector<double, PROBLEM_DIM>& rU,
     std::vector<double>& rOdeSolution,
     unsigned pdeIndex)
 {

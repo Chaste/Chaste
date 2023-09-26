@@ -74,11 +74,11 @@ template<unsigned DIM>
 class ToyCellModel : public AbstractCardiacCell
 {
 private:
-    c_vector<double,DIM> mX;
+    c_vector<double, DIM> mX;
 
 public :
     ToyCellModel(boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus,
-                 c_vector<double,DIM> x)
+                 c_vector<double, DIM> x)
         : AbstractCardiacCell(boost::shared_ptr<AbstractIvpOdeSolver>(),
                               1, 0, pIntracellularStimulus)
     {
@@ -138,10 +138,10 @@ template<unsigned DIM>
 class PositionDependentStimulus : public AbstractStimulusFunction
 {
 private:
-    c_vector<double,DIM> mX;
+    c_vector<double, DIM> mX;
 
 public:
-    PositionDependentStimulus(c_vector<double,DIM> x)
+    PositionDependentStimulus(c_vector<double, DIM> x)
     {
         mX = x;
     }
@@ -178,7 +178,7 @@ public:
 
     AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<DIM>* pNode)
     {
-        c_vector<double,DIM> x = pNode->rGetLocation();
+        c_vector<double, DIM> x = pNode->rGetLocation();
 
         boost::shared_ptr<PositionDependentStimulus<DIM> >
             p_stimulus(new PositionDependentStimulus<DIM>(x));
@@ -193,7 +193,7 @@ class TestMonodomainExactSolution : public CxxTest::TestSuite
 public:
     void TestMonodomainExactSolution1d()
     {
-        TetrahedralMesh<1,1> mesh;
+        TetrahedralMesh<1, 1> mesh;
         double h=0.01; //cm
 
         mesh.ConstructRegularSlabMesh(h, 1.0);
@@ -227,12 +227,12 @@ public:
         DistributedVectorFactory factory(mesh.GetNumNodes());
         Vec voltage = factory.CreateVec();
 
-        for (unsigned timestep=0; timestep<num_timesteps; timestep++)
+        for (unsigned timestep = 0; timestep<num_timesteps; timestep++)
         {
             reader.GetVariableOverNodes(voltage, "V", timestep);
             ReplicatableVector voltage_repl(voltage);
 
-            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+            for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
             {
                 double x = mesh.GetNode(i)->rGetLocation()[0];
 
@@ -256,7 +256,7 @@ public:
 
     void TestMonodomainExactSolution2d()
     {
-        TetrahedralMesh<2,2> mesh;
+        TetrahedralMesh<2, 2> mesh;
         double h=0.02; //cm
 
         mesh.ConstructRegularSlabMesh(h, 1.0, 1.0);
@@ -289,12 +289,12 @@ public:
         DistributedVectorFactory factory(mesh.GetNumNodes());
         Vec voltage = factory.CreateVec();
 
-        for (unsigned timestep=0; timestep<num_timesteps; timestep++)
+        for (unsigned timestep = 0; timestep<num_timesteps; timestep++)
         {
             reader.GetVariableOverNodes(voltage, "V", timestep);
             ReplicatableVector voltage_repl(voltage);
 
-            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+            for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
             {
                 double x=mesh.GetNode(i)->rGetLocation()[0];
                 double y=mesh.GetNode(i)->rGetLocation()[1];
@@ -326,7 +326,7 @@ public:
 
     void TestMonodomainExactSolution3d()
     {
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
         double h=0.05; //cm
 
         mesh.ConstructRegularSlabMesh(h, 1.0, 1.0, 1.0);
@@ -357,12 +357,12 @@ public:
         DistributedVectorFactory factory(mesh.GetNumNodes());
         Vec voltage = factory.CreateVec();
 
-        for (unsigned timestep=0; timestep<num_timesteps; timestep++)
+        for (unsigned timestep = 0; timestep<num_timesteps; timestep++)
         {
             reader.GetVariableOverNodes(voltage, "V", timestep);
             ReplicatableVector voltage_repl(voltage);
 
-            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+            for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
             {
                 double x=mesh.GetNode(i)->rGetLocation()[0];
                 double y=mesh.GetNode(i)->rGetLocation()[1];

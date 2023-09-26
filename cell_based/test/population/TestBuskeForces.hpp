@@ -236,7 +236,7 @@ public:
 
         // Create a simple mesh
         HoneycombMeshGenerator generator(2, 1, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -298,7 +298,7 @@ public:
 
         // Create a simple mesh
         HoneycombMeshGenerator generator(2, 1, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -368,7 +368,7 @@ public:
 
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(nodes, 2.5);
-        for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        for (AbstractMesh<2, 2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
                 node_iter != mesh.GetNodeIteratorEnd();
                 ++node_iter)
         {
@@ -387,7 +387,7 @@ public:
         // Create force
         BuskeCompressionForce<2> buske_compression_force;
 
-        for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        for (AbstractMesh<2, 2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
                 node_iter != mesh.GetNodeIteratorEnd();
                 ++node_iter)
         {

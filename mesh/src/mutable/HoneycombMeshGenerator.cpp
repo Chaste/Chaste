@@ -216,8 +216,8 @@ HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsi
     // Having written the mesh to file, now construct it using TrianglesMeshReader.
     // Nested scope so the reader closes files before we try deleting them below the scope.
     {
-        TrianglesMeshReader<2,2> mesh_reader(output_dir + mMeshFilename);
-        mpMesh = boost::make_shared<MutableMesh<2,2> >();
+        TrianglesMeshReader<2, 2> mesh_reader(output_dir + mMeshFilename);
+        mpMesh = boost::make_shared<MutableMesh<2, 2> >();
         mpMesh->ConstructFromMeshReader(mesh_reader);
     }
 
@@ -228,7 +228,7 @@ HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsi
     mpMesh->SetMeshHasChangedSinceLoading();
 }
 
-boost::shared_ptr<MutableMesh<2,2> > HoneycombMeshGenerator::GetMesh()
+boost::shared_ptr<MutableMesh<2, 2> > HoneycombMeshGenerator::GetMesh()
 {
     return mpMesh;
 }
@@ -247,7 +247,7 @@ std::vector<unsigned> HoneycombMeshGenerator::GetCellLocationIndices()
     return location_indices;
 }
 
-boost::shared_ptr<MutableMesh<2,2> > HoneycombMeshGenerator::GetCircularMesh(double radius)
+boost::shared_ptr<MutableMesh<2, 2> > HoneycombMeshGenerator::GetCircularMesh(double radius)
 {
     if (!mGhostNodeIndices.empty())
     {
@@ -255,7 +255,7 @@ boost::shared_ptr<MutableMesh<2,2> > HoneycombMeshGenerator::GetCircularMesh(dou
     }
 
     // Centre the mesh at (0,0)
-    c_vector<double,2> centre = zero_vector<double>(2);
+    c_vector<double, 2> centre = zero_vector<double>(2);
     for (unsigned i = 0; i<mpMesh->GetNumNodes(); ++i)
     {
         centre += mpMesh->GetNode(i)->rGetLocation();
@@ -274,8 +274,8 @@ boost::shared_ptr<MutableMesh<2,2> > HoneycombMeshGenerator::GetCircularMesh(dou
         else
         {
             // Jiggle the data
-            c_vector<double,2>& r_location = mpMesh->GetNode(i)->rGetModifiableLocation();
-            c_vector<double,2> shift;
+            c_vector<double, 2>& r_location = mpMesh->GetNode(i)->rGetModifiableLocation();
+            c_vector<double, 2> shift;
             RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
             double max_jiggle = radius*5e-6;
             shift[0] = max_jiggle*(p_gen->ranf()-0.5);

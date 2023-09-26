@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(Vec currentSolution, bool computeMatrix)
+void MonodomainSolver<ELEMENT_DIM, SPACE_DIM>::SetupLinearSystem(Vec currentSolution, bool computeMatrix)
 {
     assert(this->mpLinearSystem->rGetLhsMatrix() != NULL);
     assert(this->mpLinearSystem->rGetRhsVector() != NULL);
@@ -53,7 +53,7 @@ void MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(Vec currentSolut
         mpMonodomainAssembler->SetMatrixToAssemble(this->mpLinearSystem->rGetLhsMatrix());
         mpMonodomainAssembler->AssembleMatrix();
 
-        MassMatrixAssembler<ELEMENT_DIM,SPACE_DIM> mass_matrix_assembler(this->mpMesh, HeartConfig::Instance()->GetUseMassLumping());
+        MassMatrixAssembler<ELEMENT_DIM, SPACE_DIM> mass_matrix_assembler(this->mpMesh, HeartConfig::Instance()->GetUseMassLumping());
         mass_matrix_assembler.SetMatrixToAssemble(mMassMatrix);
         mass_matrix_assembler.Assemble();
 
@@ -64,7 +64,7 @@ void MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(Vec currentSolut
         {
             this->mpLinearSystem->SetPrecondMatrixIsDifferentFromLhs();
 
-            MonodomainAssembler<ELEMENT_DIM,SPACE_DIM> lumped_mass_assembler(this->mpMesh,this->mpMonodomainTissue);
+            MonodomainAssembler<ELEMENT_DIM, SPACE_DIM> lumped_mass_assembler(this->mpMesh,this->mpMonodomainTissue);
             lumped_mass_assembler.SetMatrixToAssemble(this->mpLinearSystem->rGetPrecondMatrix());
 
             HeartConfig::Instance()->SetUseMassLumping(true);
@@ -131,7 +131,7 @@ void MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(Vec currentSolut
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
+void MonodomainSolver<ELEMENT_DIM, SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
 {
     if (this->mpLinearSystem != NULL)
     {
@@ -139,7 +139,7 @@ void MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initialSolu
     }
 
     // call base class version...
-    AbstractLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,1>::InitialiseForSolve(initialSolution);
+    AbstractLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 1>::InitialiseForSolve(initialSolution);
 
     //..then do a bit extra
     if (HeartConfig::Instance()->GetUseAbsoluteTolerance())
@@ -170,18 +170,18 @@ void MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initialSolu
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::PrepareForSetupLinearSystem(Vec currentSolution)
+void MonodomainSolver<ELEMENT_DIM, SPACE_DIM>::PrepareForSetupLinearSystem(Vec currentSolution)
 {
     // solve cell models
     mpMonodomainTissue->SolveCellSystems(currentSolution, PdeSimulationTime::GetTime(), PdeSimulationTime::GetNextTime());
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::MonodomainSolver(
-            AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-            MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* pTissue,
-            BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,1>* pBoundaryConditions)
-    : AbstractDynamicLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,1>(pMesh),
+MonodomainSolver<ELEMENT_DIM, SPACE_DIM>::MonodomainSolver(
+            AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+            MonodomainTissue<ELEMENT_DIM, SPACE_DIM>* pTissue,
+            BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 1>* pBoundaryConditions)
+    : AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 1>(pMesh),
       mpMonodomainTissue(pTissue),
       mpBoundaryConditions(pBoundaryConditions)
 {
@@ -189,8 +189,8 @@ MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::MonodomainSolver(
     assert(pBoundaryConditions);
     this->mMatrixIsConstant = true;
 
-    mpMonodomainAssembler = new MonodomainAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpMonodomainTissue);
-    mpNeumannSurfaceTermsAssembler = new NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM,1>(pMesh,pBoundaryConditions);
+    mpMonodomainAssembler = new MonodomainAssembler<ELEMENT_DIM, SPACE_DIM>(this->mpMesh,this->mpMonodomainTissue);
+    mpNeumannSurfaceTermsAssembler = new NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM, SPACE_DIM, 1>(pMesh,pBoundaryConditions);
 
 
     // Tell tissue there's no need to replicate ionic caches
@@ -200,7 +200,7 @@ MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::MonodomainSolver(
     if (HeartConfig::Instance()->GetUseStateVariableInterpolation())
     {
         mpMonodomainCorrectionTermAssembler
-            = new MonodomainCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpMonodomainTissue);
+            = new MonodomainCorrectionTermAssembler<ELEMENT_DIM, SPACE_DIM>(this->mpMesh,this->mpMonodomainTissue);
         //We are going to need those caches after all
         pTissue->SetCacheReplication(true);
     }
@@ -211,7 +211,7 @@ MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::MonodomainSolver(
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::~MonodomainSolver()
+MonodomainSolver<ELEMENT_DIM, SPACE_DIM>::~MonodomainSolver()
 {
     delete mpMonodomainAssembler;
     delete mpNeumannSurfaceTermsAssembler;
@@ -229,8 +229,8 @@ MonodomainSolver<ELEMENT_DIM,SPACE_DIM>::~MonodomainSolver()
 }
 
 // Explicit instantiation
-template class MonodomainSolver<1,1>;
-template class MonodomainSolver<1,2>;
-template class MonodomainSolver<1,3>;
-template class MonodomainSolver<2,2>;
-template class MonodomainSolver<3,3>;
+template class MonodomainSolver<1, 1>;
+template class MonodomainSolver<1, 2>;
+template class MonodomainSolver<1, 3>;
+template class MonodomainSolver<2, 2>;
+template class MonodomainSolver<3, 3>;

@@ -47,9 +47,9 @@ void AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM>::WriteHeader(Abst
 }
 
 // Explicit instantiation
-template class AbstractCellPopulationEventWriter<1,1>;
-template class AbstractCellPopulationEventWriter<1,2>;
-template class AbstractCellPopulationEventWriter<2,2>;
-template class AbstractCellPopulationEventWriter<1,3>;
-template class AbstractCellPopulationEventWriter<2,3>;
-template class AbstractCellPopulationEventWriter<3,3>;
+template class AbstractCellPopulationEventWriter<1, 1>;
+template class AbstractCellPopulationEventWriter<1, 2>;
+template class AbstractCellPopulationEventWriter<2, 2>;
+template class AbstractCellPopulationEventWriter<1, 3>;
+template class AbstractCellPopulationEventWriter<2, 3>;
+template class AbstractCellPopulationEventWriter<3, 3>;

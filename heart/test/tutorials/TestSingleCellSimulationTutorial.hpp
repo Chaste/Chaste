@@ -102,7 +102,7 @@ public:
         boost::shared_ptr<AbstractCvodeCell> p_model(new CellShannon2004FromCellMLCvode(p_solver, p_stimulus));
 
         /*
-         * Once the model is set up we can tell it to use the the default stimulus from CellML,
+         * Once the model is set up we can tell it to use the default stimulus from CellML,
          * (if one has been labelled, you get an exception if not), and return it.
          *
          * NB. You could automatically check whether one is available with:

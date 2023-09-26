@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 
 template<unsigned DIM>
-Electrodes<DIM>::Electrodes(AbstractTetrahedralMesh<DIM,DIM>& rMesh)
+Electrodes<DIM>::Electrodes(AbstractTetrahedralMesh<DIM, DIM>& rMesh)
     : mpMesh(&rMesh),
       mLeftElectrodeArea(0.0),
       mRightElectrodeArea(0.0)
@@ -59,7 +59,7 @@ Electrodes<DIM>::Electrodes(AbstractTetrahedralMesh<DIM,DIM>& rMesh)
     double global_min = bounding_box.rGetLowerCorner()[axis_index];
     double global_max = bounding_box.rGetUpperCorner()[axis_index];
 
-    mpBoundaryConditionsContainer.reset(new BoundaryConditionsContainer<DIM,DIM,2>);
+    mpBoundaryConditionsContainer.reset(new BoundaryConditionsContainer<DIM, DIM, 2>);
 
 
     double input_flux;
@@ -130,7 +130,7 @@ Electrodes<DIM>::Electrodes(AbstractTetrahedralMesh<DIM,DIM>& rMesh)
 }
 
 template<unsigned DIM>
-boost::shared_ptr<BoundaryConditionsContainer<DIM,DIM,2> > Electrodes<DIM>::GetBoundaryConditionsContainer()
+boost::shared_ptr<BoundaryConditionsContainer<DIM, DIM, 2> > Electrodes<DIM>::GetBoundaryConditionsContainer()
 {
     //assert(mAreActive);
     return mpBoundaryConditionsContainer;
@@ -173,7 +173,7 @@ void Electrodes<DIM>::ComputeElectrodesAreasAndCheckEquality(unsigned dimensionI
     double local_left_area = 0.0;
     double local_right_area = 0.0;
 
-    c_vector<double,DIM> weighted_direction;
+    c_vector<double, DIM> weighted_direction;
     double jacobian_determinant;
 
     for (auto iter = mpMesh->GetBoundaryElementIteratorBegin();

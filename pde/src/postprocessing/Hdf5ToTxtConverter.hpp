@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Matlab. There is one output file per variable per timestep, giving the values 
  * of that variable at that time over each of the nodes.
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class Hdf5ToTxtConverter : public AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>
 {
 public:
@@ -58,7 +58,7 @@ public:
      */
     Hdf5ToTxtConverter(const FileFinder& rInputDirectory,
                        const std::string& rFileBaseName,
-                       AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
+                       AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh);
 };
 
 #endif /*HDF5TOTXTCONVERTER_HPP_*/

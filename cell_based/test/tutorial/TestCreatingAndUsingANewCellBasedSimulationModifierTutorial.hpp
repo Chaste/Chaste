@@ -99,13 +99,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Also, while the abstract simulation modifier class is templated over dimensions,
  * for simplicity we hardcode this concrete modifier class to work in 2D only.
  */
-class CellHeightTrackingModifier : public AbstractCellBasedSimulationModifier<2,2>
+class CellHeightTrackingModifier : public AbstractCellBasedSimulationModifier<2, 2>
 {
     friend class boost::serialization::access;
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<2,2> >(*this);
+        archive & boost::serialization::base_object<AbstractCellBasedSimulationModifier<2, 2> >(*this);
     }
 
 /* The first public method is a default constructor, which simply calls the base
@@ -113,7 +113,7 @@ class CellHeightTrackingModifier : public AbstractCellBasedSimulationModifier<2,
 public:
 
     CellHeightTrackingModifier()
-        : AbstractCellBasedSimulationModifier<2,2>()
+        : AbstractCellBasedSimulationModifier<2, 2>()
     {}
 
     /*
@@ -128,7 +128,7 @@ public:
      * call the method {{{UpdateCellData()}}} on the cell population; this method is
      * defined later in the class definition.
      */
-    void UpdateAtEndOfTimeStep(AbstractCellPopulation<2,2>& rCellPopulation)
+    void UpdateAtEndOfTimeStep(AbstractCellPopulation<2, 2>& rCellPopulation)
     {
         UpdateCellData(rCellPopulation);
     }
@@ -141,7 +141,7 @@ public:
      * {{{CellData}}} will not have been fully initialised when we enter
      * the main time loop of the simulation.
      */
-    void SetupSolve(AbstractCellPopulation<2,2>& rCellPopulation, std::string outputDirectory)
+    void SetupSolve(AbstractCellPopulation<2, 2>& rCellPopulation, std::string outputDirectory)
     {
 
         UpdateCellData(rCellPopulation);
@@ -152,7 +152,7 @@ public:
      * method that computes the height (y coordinate) of each cell in the population
      * and stores this in the {{{CellData}}} property.
      */
-    void UpdateCellData(AbstractCellPopulation<2,2>& rCellPopulation)
+    void UpdateCellData(AbstractCellPopulation<2, 2>& rCellPopulation)
     {
         /*
          * We begin by calling {{{Update()}}} on the cell population, which ensures that
@@ -231,7 +231,7 @@ public:
          * to implement some random proliferation in the simulation.
          */
         HoneycombMeshGenerator generator(2, 2, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 

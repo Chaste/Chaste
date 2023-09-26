@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cassert>
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractElement<ELEMENT_DIM, SPACE_DIM>::AbstractElement(
     unsigned index,
     const std::vector<Node<SPACE_DIM>*>& rNodes)
@@ -54,7 +54,7 @@ AbstractElement<ELEMENT_DIM, SPACE_DIM>::AbstractElement(
     assert(ELEMENT_DIM <= SPACE_DIM);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractElement<ELEMENT_DIM, SPACE_DIM>::AbstractElement(unsigned index)
     : mIndex(index),
       mIsDeleted(false),
@@ -63,13 +63,13 @@ AbstractElement<ELEMENT_DIM, SPACE_DIM>::AbstractElement(unsigned index)
 {
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractElement<ELEMENT_DIM, SPACE_DIM>::~AbstractElement()
 {
     delete mpElementAttributes;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractElement<ELEMENT_DIM, SPACE_DIM>::ReplaceNode(
     Node<SPACE_DIM>* pOldNode,
     Node<SPACE_DIM>* pNewNode)
@@ -86,7 +86,7 @@ void AbstractElement<ELEMENT_DIM, SPACE_DIM>::ReplaceNode(
     EXCEPTION("You didn't have that node to start with.");
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNodeLocation(
     unsigned localIndex,
     unsigned dimension) const
@@ -102,7 +102,7 @@ double AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNodeLocation(
  * machines but failed the tests (bad_size errors) on another machine. So be 
  * careful if you think about changing it!
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNodeLocation(
     unsigned localIndex) const
 {
@@ -110,7 +110,7 @@ c_vector<double, SPACE_DIM> AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNodeLoca
     return mNodes[localIndex]->rGetLocation();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNodeGlobalIndex(
     unsigned localIndex) const
 {
@@ -118,7 +118,7 @@ unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNodeGlobalIndex(
     return mNodes[localIndex]->GetIndex();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 Node<SPACE_DIM>* AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNode(
     unsigned localIndex) const
 {
@@ -126,49 +126,49 @@ Node<SPACE_DIM>* AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNode(
     return mNodes[localIndex];
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNumNodes() const
 {
     return mNodes.size();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractElement<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNode)
 {
     mNodes.push_back(pNode);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool AbstractElement<ELEMENT_DIM, SPACE_DIM>::IsDeleted() const
 {
     return mIsDeleted;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetIndex() const
 {
     return mIndex;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractElement<ELEMENT_DIM, SPACE_DIM>::SetIndex(unsigned index)
 {
     mIndex = index;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetOwnership() const
 {
     return mOwnership;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractElement<ELEMENT_DIM, SPACE_DIM>::SetOwnership(bool ownership)
 {
     mOwnership = ownership;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractElement<ELEMENT_DIM, SPACE_DIM>::SetAttribute(double attribute)
 {
     ConstructElementAttributes();
@@ -176,7 +176,7 @@ void AbstractElement<ELEMENT_DIM, SPACE_DIM>::SetAttribute(double attribute)
     mpElementAttributes->SetFirstAttribute(attribute);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetAttribute()
 {
     ConstructElementAttributes();
@@ -184,7 +184,7 @@ double AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetAttribute()
     return mpElementAttributes->GetFirstAttribute();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetUnsignedAttribute()
 {
     double double_attr = GetAttribute();
@@ -198,7 +198,7 @@ unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetUnsignedAttribute()
     return unsigned_attr;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractElement<ELEMENT_DIM, SPACE_DIM>::ConstructElementAttributes()
 {
     if (mpElementAttributes == nullptr)
@@ -207,7 +207,7 @@ void AbstractElement<ELEMENT_DIM, SPACE_DIM>::ConstructElementAttributes()
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractElement<ELEMENT_DIM, SPACE_DIM>::AddElementAttribute(
     double attribute)
 {
@@ -215,7 +215,7 @@ void AbstractElement<ELEMENT_DIM, SPACE_DIM>::AddElementAttribute(
     mpElementAttributes->AddAttribute(attribute);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<double>& AbstractElement<ELEMENT_DIM, SPACE_DIM>::rGetElementAttributes()
 {
     if (mpElementAttributes == nullptr)
@@ -226,19 +226,19 @@ std::vector<double>& AbstractElement<ELEMENT_DIM, SPACE_DIM>::rGetElementAttribu
     return mpElementAttributes->rGetAttributes();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned AbstractElement<ELEMENT_DIM, SPACE_DIM>::GetNumElementAttributes()
 {
     return mpElementAttributes == nullptr ? 0 : mpElementAttributes->rGetAttributes().size();
 }
 
 // Explicit instantiation
-template class AbstractElement<0,1>;
-template class AbstractElement<1,1>;
-template class AbstractElement<0,2>;
-template class AbstractElement<1,2>;
-template class AbstractElement<2,2>;
-template class AbstractElement<0,3>;
-template class AbstractElement<1,3>;
-template class AbstractElement<2,3>;
-template class AbstractElement<3,3>;
+template class AbstractElement<0, 1>;
+template class AbstractElement<1, 1>;
+template class AbstractElement<0, 2>;
+template class AbstractElement<1, 2>;
+template class AbstractElement<2, 2>;
+template class AbstractElement<0, 3>;
+template class AbstractElement<1, 3>;
+template class AbstractElement<2, 3>;
+template class AbstractElement<3, 3>;

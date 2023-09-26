@@ -76,7 +76,7 @@ DynamicallyLoadableLr91::DynamicallyLoadableLr91(
 /**
  * Destructor
  */
-DynamicallyLoadableLr91::~DynamicallyLoadableLr91(void)
+DynamicallyLoadableLr91::~DynamicallyLoadableLr91()
 {
 }
 
@@ -330,7 +330,7 @@ void DynamicallyLoadableLr91::VerifyStateVariables()
 }
 
 template<>
-void OdeSystemInformation<DynamicallyLoadableLr91>::Initialise(void)
+void OdeSystemInformation<DynamicallyLoadableLr91>::Initialise()
 {
     // State variables
     this->mVariableNames.push_back("h");

@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/set.hpp>
 #include <boost/serialization/vector.hpp>
 
-template <unsigned DIM>
+template<unsigned DIM>
 class VertexBasedCellPopulation;
 
 /**
@@ -55,7 +55,7 @@ class VertexBasedCellPopulation;
  * a new SRN must be created that inherits modified model variables.
  * This class deals with Cell SRN update after a topological change occurs to the cell.
  */
-template <unsigned DIM>
+template<unsigned DIM>
 class VertexBasedPopulationSrn
 {
 private:

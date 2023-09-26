@@ -86,15 +86,15 @@ public:
         nodes_elem_1.push_back(basic_nodes[5]);
         nodes_elem_1.push_back(basic_nodes[6]);
 
-        std::vector<VertexElement<2,2>*> basic_vertex_elements;
-        basic_vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        basic_vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+        std::vector<VertexElement<2, 2>*> basic_vertex_elements;
+        basic_vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        basic_vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
 
         // Make a vertex mesh
-        VertexMesh<2,2> basic_vertex_mesh(basic_nodes, basic_vertex_elements);
+        VertexMesh<2, 2> basic_vertex_mesh(basic_nodes, basic_vertex_elements);
 
         // Create a vertex mesh writer
-        VertexMeshWriter<2,2> vertex_mesh_writer("TestVertexMeshWriterIn2d", "vertex_mesh_2d");
+        VertexMeshWriter<2, 2> vertex_mesh_writer("TestVertexMeshWriterIn2d", "vertex_mesh_2d");
 
         // Test files are written correctly
         vertex_mesh_writer.WriteFilesUsingMesh(basic_vertex_mesh);
@@ -117,7 +117,7 @@ public:
         vertex_mesh_writer.AddCellData("Cell IDs", cell_ids);
         // Add distance from origin into the node "point" data
         std::vector<double> distance;
-        for (unsigned i=0; i<basic_vertex_mesh.GetNumNodes(); ++i)
+        for (unsigned i = 0; i<basic_vertex_mesh.GetNumNodes(); ++i)
         {
             distance.push_back(norm_2(basic_vertex_mesh.GetNode(i)->rGetLocation()));
         }
@@ -147,7 +147,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u);
 
         // Create a vertex mesh writer
-        VertexMeshWriter<2,2> vertex_mesh_writer("TestVertexMeshWriterWithCylindricalMesh", "cyl_vertex_mesh_2d");
+        VertexMeshWriter<2, 2> vertex_mesh_writer("TestVertexMeshWriterWithCylindricalMesh", "cyl_vertex_mesh_2d");
 
         // Test files are written correctly
         vertex_mesh_writer.WriteFilesUsingMesh(*p_mesh);
@@ -165,7 +165,7 @@ public:
 #ifdef CHASTE_VTK
         VertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
         std::vector<double> cell_ids;
-        for (unsigned i=0; i<p_mesh_for_vtk->GetNumElements(); ++i)
+        for (unsigned i = 0; i<p_mesh_for_vtk->GetNumElements(); ++i)
         {
             double this_cell_id = static_cast<double>(i);
             cell_ids.push_back(this_cell_id);
@@ -175,7 +175,7 @@ public:
 
         // Add distance from origin into the node "point" data
         std::vector<double> distance;
-        for (unsigned i=0; i<p_mesh_for_vtk->GetNumNodes(); ++i)
+        for (unsigned i = 0; i<p_mesh_for_vtk->GetNumNodes(); ++i)
         {
             distance.push_back(norm_2(p_mesh_for_vtk->GetNode(i)->rGetLocation()));
         }
@@ -205,7 +205,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 16u); // 4*4
 
         // Create a vertex mesh writer
-        VertexMeshWriter<2,2> vertex_mesh_writer("TestVertexMeshWriterWithToroidalMesh", "tor_vertex_mesh_2d");
+        VertexMeshWriter<2, 2> vertex_mesh_writer("TestVertexMeshWriterWithToroidalMesh", "tor_vertex_mesh_2d");
 
         // Test files are written correctly
         vertex_mesh_writer.WriteFilesUsingMesh(*p_mesh);
@@ -223,7 +223,7 @@ public:
 #ifdef CHASTE_VTK
         VertexMesh<2, 2>* p_mesh_for_vtk = p_mesh->GetMeshForVtk();
         std::vector<double> cell_ids;
-        for (unsigned i=0; i<p_mesh_for_vtk->GetNumElements(); ++i)
+        for (unsigned i = 0; i<p_mesh_for_vtk->GetNumElements(); ++i)
         {
             double this_cell_id = static_cast<double>(i);
             cell_ids.push_back(this_cell_id);
@@ -233,7 +233,7 @@ public:
 
         // Add distance from origin into the node "point" data
         std::vector<double> distance;
-        for (unsigned i=0; i<p_mesh_for_vtk->GetNumNodes(); ++i)
+        for (unsigned i = 0; i<p_mesh_for_vtk->GetNumNodes(); ++i)
         {
             distance.push_back(norm_2(p_mesh_for_vtk->GetNode(i)->rGetLocation()));
         }
@@ -267,17 +267,17 @@ public:
         nodes.push_back(new Node<3>(6, true, 1.0, 2.0, 3.0));
         nodes.push_back(new Node<3>(7, true, 0.0, 2.0, 3.0));
 
-        std::vector<VertexElement<3,3>*> elements;
-        elements.push_back(new VertexElement<3,3>(0, nodes));
+        std::vector<VertexElement<3, 3>*> elements;
+        elements.push_back(new VertexElement<3, 3>(0, nodes));
 
         // Make a vertex mesh
-        VertexMesh<3,3> mesh3d(nodes, elements);
+        VertexMesh<3, 3> mesh3d(nodes, elements);
         TS_ASSERT_DELTA(mesh3d.GetWidth(0), 1.0, 1e-4);
         TS_ASSERT_DELTA(mesh3d.GetWidth(1), 2.0, 1e-4);
         TS_ASSERT_DELTA(mesh3d.GetWidth(2), 3.0, 1e-4);
 
         // Create a vertex mesh writer
-        VertexMeshWriter<3,3> vertex_mesh_writer("TestVertexMeshWriterIn3dWithoutFaces", "vertex_mesh_3d", false);
+        VertexMeshWriter<3, 3> vertex_mesh_writer("TestVertexMeshWriterIn3dWithoutFaces", "vertex_mesh_3d", false);
 
         // Test files are written correctly
         vertex_mesh_writer.WriteFilesUsingMesh(mesh3d);
@@ -299,7 +299,7 @@ public:
 
          // Add distance from origin into the node "point" data
         std::vector<double> distance;
-        for (unsigned i=0; i<mesh3d.GetNumNodes(); ++i)
+        for (unsigned i = 0; i<mesh3d.GetNumNodes(); ++i)
         {
             distance.push_back(norm_2(mesh3d.GetNode(i)->rGetLocation()));
         }
@@ -329,11 +329,11 @@ public:
         nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 1.0));
         nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
 
-        MutableMesh<3,3> delaunay_mesh(nodes);
-        VertexMesh<3,3> mesh3d(delaunay_mesh);
+        MutableMesh<3, 3> delaunay_mesh(nodes);
+        VertexMesh<3, 3> mesh3d(delaunay_mesh);
 
         // Create a vertex mesh writer
-        VertexMeshWriter<3,3> vertex_mesh_writer("TestVertexMeshWriterIn3dWithFaces", "vertex_mesh_3d_with_faces", false);
+        VertexMeshWriter<3, 3> vertex_mesh_writer("TestVertexMeshWriterIn3dWithFaces", "vertex_mesh_3d_with_faces", false);
 
         // Test files are written correctly
         vertex_mesh_writer.WriteFilesUsingMesh(mesh3d);
@@ -358,7 +358,7 @@ public:
 
          // Add distance from origin into the node "point" data
         std::vector<double> distance;
-        for (unsigned i=0; i<mesh3d.GetNumNodes(); ++i)
+        for (unsigned i = 0; i<mesh3d.GetNumNodes(); ++i)
         {
             distance.push_back(norm_2(mesh3d.GetNode(i)->rGetLocation()));
         }
@@ -381,8 +381,8 @@ public:
     void TestMeshWriterWithDeletedNode()
     {
         // Create mesh
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
-        MutableVertexMesh<2,2> mesh;
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
+        MutableVertexMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 30u);
@@ -396,12 +396,12 @@ public:
         mesh.DeleteElementPriorToReMesh(0);
 
         // Write mesh to file
-        VertexMeshWriter<2,2> mesh_writer("TestMeshWriterWithDeletedNode", "vertex_mesh");
+        VertexMeshWriter<2, 2> mesh_writer("TestMeshWriterWithDeletedNode", "vertex_mesh");
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(mesh));
 
         // Read mesh back in from file
         std::string output_dir = mesh_writer.GetOutputDirectory();
-        VertexMeshReader<2,2> mesh_reader2(output_dir + "vertex_mesh");
+        VertexMeshReader<2, 2> mesh_reader2(output_dir + "vertex_mesh");
 
         // We should have one less element and three less nodes
         TS_ASSERT_EQUALS(mesh_reader2.GetNumNodes(), 27u);
@@ -411,12 +411,12 @@ public:
     void TestReadingAndWritingElementAttributes()
     {
         // Read in a mesh with element attributes
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshReader2d/vertex_mesh_with_element_attributes");
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMeshReader2d/vertex_mesh_with_element_attributes");
         TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 1u);
 
         // Construct the mesh
-        VertexMesh<2,2> mesh;
+        VertexMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
         TS_ASSERT_EQUALS(mesh.GetElement(0)->GetUnsignedAttribute(), 97u);
         TS_ASSERT_EQUALS(mesh.GetElement(1)->GetUnsignedAttribute(), 152u);
@@ -424,44 +424,44 @@ public:
         // Write the mesh to file
         // Nested scope so the reader is destroyed before we try writing to the folder again
         {
-            VertexMeshWriter<2,2> mesh_writer("TestReadingAndWritingElementAttributes", "vertex_mesh_with_element_attributes");
+            VertexMeshWriter<2, 2> mesh_writer("TestReadingAndWritingElementAttributes", "vertex_mesh_with_element_attributes");
             mesh_writer.WriteFilesUsingMesh(mesh);
 
             // Now read in the mesh that was written
             OutputFileHandler handler("TestReadingAndWritingElementAttributes", false);
-            VertexMeshReader<2,2> mesh_reader2(handler.GetOutputDirectoryFullPath() + "vertex_mesh_with_element_attributes");
+            VertexMeshReader<2, 2> mesh_reader2(handler.GetOutputDirectoryFullPath() + "vertex_mesh_with_element_attributes");
             TS_ASSERT_EQUALS(mesh_reader2.GetNumElements(), 2u);
             TS_ASSERT_EQUALS(mesh_reader2.GetNumElementAttributes(), 1u);
 
             // Construct the mesh again
-            VertexMesh<2,2> mesh2;
+            VertexMesh<2, 2> mesh2;
             mesh2.ConstructFromMeshReader(mesh_reader);
             TS_ASSERT_EQUALS(mesh2.GetElement(0)->GetUnsignedAttribute(), 97u);
             TS_ASSERT_EQUALS(mesh2.GetElement(1)->GetUnsignedAttribute(), 152u);
         }
 
         // For coverage, repeat this test for a vertex mesh whose elements have faces
-        VertexMeshReader<3,3> mesh_reader3d("mesh/test/data/TestVertexMeshWriter/vertex_mesh_3d_with_faces_and_attributes");
+        VertexMeshReader<3, 3> mesh_reader3d("mesh/test/data/TestVertexMeshWriter/vertex_mesh_3d_with_faces_and_attributes");
         TS_ASSERT_EQUALS(mesh_reader3d.GetNumElements(), 1u);
         TS_ASSERT_EQUALS(mesh_reader3d.GetNumElementAttributes(), 1u);
 
         // Construct the mesh
-        VertexMesh<3,3> mesh3d;
+        VertexMesh<3, 3> mesh3d;
         mesh3d.ConstructFromMeshReader(mesh_reader3d);
         TS_ASSERT_EQUALS(mesh3d.GetElement(0)->GetUnsignedAttribute(), 49u);
 
         // Write the mesh to file
-        VertexMeshWriter<3,3> mesh_writer3d("TestReadingAndWritingElementAttributes", "vertex_mesh_3d_with_faces_and_attributes");
+        VertexMeshWriter<3, 3> mesh_writer3d("TestReadingAndWritingElementAttributes", "vertex_mesh_3d_with_faces_and_attributes");
         mesh_writer3d.WriteFilesUsingMesh(mesh3d);
 
         // Now read in the mesh that was written
         OutputFileHandler handler3d("TestReadingAndWritingElementAttributes", false);
-        VertexMeshReader<3,3> mesh_reader3d2(handler3d.GetOutputDirectoryFullPath() + "vertex_mesh_3d_with_faces_and_attributes");
+        VertexMeshReader<3, 3> mesh_reader3d2(handler3d.GetOutputDirectoryFullPath() + "vertex_mesh_3d_with_faces_and_attributes");
         TS_ASSERT_EQUALS(mesh_reader3d2.GetNumElements(), 1u);
         TS_ASSERT_EQUALS(mesh_reader3d2.GetNumElementAttributes(), 1u);
 
         // Construct the mesh again
-        VertexMesh<3,3> mesh3d2;
+        VertexMesh<3, 3> mesh3d2;
         mesh3d2.ConstructFromMeshReader(mesh_reader3d2);
         TS_ASSERT_EQUALS(mesh3d2.GetElement(0)->GetUnsignedAttribute(), 49u);
     }
@@ -469,17 +469,17 @@ public:
     void TestWriteFilesUsingMeshReader()
     {
         // Create a VertexMeshReader and use it to write mesh files
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshReader2d/vertex_mesh_with_element_attributes");
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMeshReader2d/vertex_mesh_with_element_attributes");
         TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 7u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 1u);
 
-        VertexMeshWriter<2,2> mesh_writer("TestWriteFilesUsingMeshReader", "vertex_mesh");
+        VertexMeshWriter<2, 2> mesh_writer("TestWriteFilesUsingMeshReader", "vertex_mesh");
         mesh_writer.WriteFilesUsingMeshReader(mesh_reader);
 
         // Now read in the mesh that was written
         OutputFileHandler handler("TestWriteFilesUsingMeshReader", false);
-        VertexMeshReader<2,2> mesh_reader2(handler.GetOutputDirectoryFullPath() + "vertex_mesh");
+        VertexMeshReader<2, 2> mesh_reader2(handler.GetOutputDirectoryFullPath() + "vertex_mesh");
         TS_ASSERT_EQUALS(mesh_reader2.GetNumNodes(), 7u);
         TS_ASSERT_EQUALS(mesh_reader2.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(mesh_reader2.GetNumElementAttributes(), 1u);
@@ -491,7 +491,7 @@ public:
         // TrapezoidEdgeVertexMeshWriter() only outputs .vtk files for visualisation,
         // where trapezoids represent edges.
         // Here we only test for coverage of an implementation of WriteFiles() method
-        TrapezoidEdgeVertexMeshWriter<2,2> mesh_writer("TestTrapezoidEdgeVertexMeshWriter", "vertex_mesh");
+        TrapezoidEdgeVertexMeshWriter<2, 2> mesh_writer("TestTrapezoidEdgeVertexMeshWriter", "vertex_mesh");
         //For coverage
         mesh_writer.WriteFiles();
     }

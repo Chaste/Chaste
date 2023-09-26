@@ -96,7 +96,7 @@ public:
      * @param rProblemDefinition Problem definition
      * @param outputDirectory the output directory to use
      */
-    StokesFlowSolver(AbstractTetrahedralMesh<DIM,DIM>& rQuadMesh,
+    StokesFlowSolver(AbstractTetrahedralMesh<DIM, DIM>& rQuadMesh,
                      StokesFlowProblemDefinition<DIM>& rProblemDefinition,
                      std::string outputDirectory);
 
@@ -123,13 +123,13 @@ public:
      * @return the flow.
      * Note: return_value[i](j) = u_j for node i.
      */
-    std::vector<c_vector<double,DIM> >& rGetSpatialSolution();
+    std::vector<c_vector<double, DIM> >& rGetSpatialSolution();
 
     /**
      * @return the flow. Note: return_value[i](j) = u_j for node i. Just
      * calls rGetSpatialSolution().
      */
-    std::vector<c_vector<double,DIM> >& rGetVelocities();
+    std::vector<c_vector<double, DIM> >& rGetVelocities();
 };
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -138,7 +138,7 @@ public:
 
 
 template<unsigned DIM>
-StokesFlowSolver<DIM>::StokesFlowSolver(AbstractTetrahedralMesh<DIM,DIM>& rQuadMesh,
+StokesFlowSolver<DIM>::StokesFlowSolver(AbstractTetrahedralMesh<DIM, DIM>& rQuadMesh,
                                         StokesFlowProblemDefinition<DIM>& rProblemDefinition,
                                         std::string outputDirectory)
     : AbstractContinuumMechanicsSolver<DIM>(rQuadMesh, rProblemDefinition, outputDirectory, INCOMPRESSIBLE),
@@ -327,7 +327,7 @@ void StokesFlowSolver<DIM>::SetKspAbsoluteTolerance(double kspAbsoluteTolerance)
 }
 
 template<unsigned DIM>
-std::vector<c_vector<double,DIM> >& StokesFlowSolver<DIM>::rGetSpatialSolution()
+std::vector<c_vector<double, DIM> >& StokesFlowSolver<DIM>::rGetSpatialSolution()
 {
     this->mSpatialSolution.resize(this->mrQuadMesh.GetNumNodes(), zero_vector<double>(DIM));
     for (unsigned i = 0; i < this->mrQuadMesh.GetNumNodes(); ++i)
@@ -342,7 +342,7 @@ std::vector<c_vector<double,DIM> >& StokesFlowSolver<DIM>::rGetSpatialSolution()
 }
 
 template<unsigned DIM>
-std::vector<c_vector<double,DIM> >& StokesFlowSolver<DIM>::rGetVelocities()
+std::vector<c_vector<double, DIM> >& StokesFlowSolver<DIM>::rGetVelocities()
 {
     return rGetSpatialSolution();
 }

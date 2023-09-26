@@ -140,10 +140,10 @@ public:
          * object to return the mesh, which is of type {{{MutableMesh}}}.
          */
         HoneycombMeshGenerator generator(10, 10, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         /*
-         * Next, we need to create some cells. Unlike in the the crypt simulation
+         * Next, we need to create some cells. Unlike in the crypt simulation
          * tutorial, we don't just use a {{{CellsGenerator}}} class, but do it manually,
          * in a loop. First, we define a {{{std::vector}}} of cell pointers.
          */

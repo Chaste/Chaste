@@ -45,9 +45,9 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 struct MeshWriterIterators
 {
     /** Iterator over nodes */
-    typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator* pNodeIter;
+    typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator* pNodeIter;
     /** Iterator over vertex elements */
-    typename VertexMesh<ELEMENT_DIM,SPACE_DIM>::VertexElementIterator* pElemIter;
+    typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator* pElemIter;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -118,7 +118,7 @@ std::vector<double> VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextNode()
     }
     else
     {
-        return AbstractMeshWriter<ELEMENT_DIM,SPACE_DIM>::GetNextNode();
+        return AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextNode();
     }
 }
 
@@ -380,7 +380,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddPointData(std::string dataName
 
 ///\todo Mesh should be const (#1076)
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(VertexMesh<ELEMENT_DIM,SPACE_DIM>& rMesh)
+void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
 {
     this->mpMeshReader = nullptr;
     mpMesh = &rMesh;
@@ -388,10 +388,10 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(VertexMesh<EL
     this->mNumNodes = mpMesh->GetNumNodes();
     this->mNumElements = mpMesh->GetNumElements();
 
-    typedef typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator NodeIterType;
+    typedef typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator NodeIterType;
     mpIters->pNodeIter = new NodeIterType(mpMesh->GetNodeIteratorBegin());
 
-    typedef typename VertexMesh<ELEMENT_DIM,SPACE_DIM>::VertexElementIterator ElemIterType;
+    typedef typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator ElemIterType;
     mpIters->pElemIter = new ElemIterType(mpMesh->GetElementIteratorBegin());
 
     // Set up node map if we might have deleted nodes
@@ -535,9 +535,9 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 
 ///////// Explicit instantiation///////
 
-template class VertexMeshWriter<1,1>;
-template class VertexMeshWriter<1,2>;
-template class VertexMeshWriter<1,3>;
-template class VertexMeshWriter<2,2>;
-template class VertexMeshWriter<2,3>;
-template class VertexMeshWriter<3,3>;
+template class VertexMeshWriter<1, 1>;
+template class VertexMeshWriter<1, 2>;
+template class VertexMeshWriter<1, 3>;
+template class VertexMeshWriter<2, 2>;
+template class VertexMeshWriter<2, 3>;
+template class VertexMeshWriter<3, 3>;

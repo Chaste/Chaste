@@ -53,7 +53,7 @@ private:
     /** The mesh is automatically set in VentilationProblem
      *  This member variable should be accessed through GetMesh(), which will check if it has been set before
      *  and throw an exception otherwise.*/
-    AbstractTetrahedralMesh<1,3>* mpMesh;
+    AbstractTetrahedralMesh<1, 3>* mpMesh;
 
 public:
     /**
@@ -61,7 +61,7 @@ public:
      *
      * @param pNode  Pointer to node object.
      */
-    virtual AbstractAirwayWall* CreateAirwayWallForElement(Element<1,3>* pElement) = 0;
+    virtual AbstractAirwayWall* CreateAirwayWallForElement(Element<1, 3>* pElement) = 0;
 
    /**
      * @return  The number of airways
@@ -77,7 +77,7 @@ public:
      * @param pNode Pointer to node object.
      * @return The pleural pressure at the given node at the given time
      */
-    virtual double GetPleuralPressureForAirway(double time, Element<1,3>* pElement) = 0;
+    virtual double GetPleuralPressureForAirway(double time, Element<1, 3>* pElement) = 0;
 
     /**
      * Default constructor.
@@ -96,7 +96,7 @@ public:
     /**
      * @param pMesh  the mesh for which to create acinar units.
      */
-    virtual void SetMesh(AbstractTetrahedralMesh<1,3>* pMesh)
+    virtual void SetMesh(AbstractTetrahedralMesh<1, 3>* pMesh)
     {
         mpMesh = pMesh;
     }
@@ -104,7 +104,7 @@ public:
     /**
      * @return  the mesh used to create the acinar.
      */
-    AbstractTetrahedralMesh<1,3>* GetMesh()
+    AbstractTetrahedralMesh<1, 3>* GetMesh()
     {
         return mpMesh;
     }

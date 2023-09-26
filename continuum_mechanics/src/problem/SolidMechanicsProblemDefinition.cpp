@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 SolidMechanicsProblemDefinition<DIM>::SolidMechanicsProblemDefinition(
-    AbstractTetrahedralMesh<DIM,DIM>& rMesh)
+    AbstractTetrahedralMesh<DIM, DIM>& rMesh)
     : ContinuumMechanicsProblemDefinition<DIM>(rMesh),
       mSolveUsingSnes(false)
 {
@@ -49,7 +49,7 @@ SolidMechanicsProblemDefinition<DIM>::SolidMechanicsProblemDefinition(
 template<unsigned DIM>
 void SolidMechanicsProblemDefinition<DIM>::SetFixedNodes(
     std::vector<unsigned>& rFixedNodes,
-    std::vector<c_vector<double,DIM> >& rFixedNodeLocations)
+    std::vector<c_vector<double, DIM> >& rFixedNodeLocations)
 {
     assert(rFixedNodes.size() == rFixedNodeLocations.size());
     this->mDirichletNodes = rFixedNodes;
@@ -58,7 +58,7 @@ void SolidMechanicsProblemDefinition<DIM>::SetFixedNodes(
     for (unsigned i = 0; i < this->mDirichletNodes.size(); ++i)
     {
         unsigned index = this->mDirichletNodes[i];
-        c_vector<double,DIM> displacement;
+        c_vector<double, DIM> displacement;
         for (unsigned j = 0; j < DIM; ++j)
         {
             double location = rFixedNodeLocations[i](j);

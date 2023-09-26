@@ -146,7 +146,7 @@ private:
     /**
      * The airway tree mesh
      */
-    TetrahedralMesh<1,3>& mrMesh;
+    TetrahedralMesh<1, 3>& mrMesh;
 
     /**
      * Time step size

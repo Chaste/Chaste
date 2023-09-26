@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::PostProcessingWriter(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,
+PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::PostProcessingWriter(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
                                                                    const FileFinder& rDirectory,
                                                                    const std::string& rHdf5FileName,
                                                                    const std::string& rVoltageName,
@@ -80,7 +80,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
     {
         std::vector<std::pair<double,double> > apd_maps;
         HeartConfig::Instance()->GetApdMaps(apd_maps);
-        for (unsigned i=0; i<apd_maps.size(); ++i)
+        for (unsigned i = 0; i<apd_maps.size(); ++i)
         {
             WriteApdMapFile(apd_maps[i].first, apd_maps[i].second);
         }
@@ -90,7 +90,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
     {
         std::vector<double> upstroke_time_maps;
         HeartConfig::Instance()->GetUpstrokeTimeMaps(upstroke_time_maps);
-        for (unsigned i=0; i<upstroke_time_maps.size(); ++i)
+        for (unsigned i = 0; i<upstroke_time_maps.size(); ++i)
         {
             WriteUpstrokeTimeMap(upstroke_time_maps[i]);
         }
@@ -100,7 +100,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
     {
         std::vector<double> upstroke_velocity_maps;
         HeartConfig::Instance()->GetMaxUpstrokeVelocityMaps(upstroke_velocity_maps);
-        for (unsigned i=0; i<upstroke_velocity_maps.size(); ++i)
+        for (unsigned i = 0; i<upstroke_velocity_maps.size(); ++i)
         {
             WriteMaxUpstrokeVelocityMap(upstroke_velocity_maps[i]);
         }
@@ -114,7 +114,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
         //get the mesh here
         DistanceMapCalculator<ELEMENT_DIM, SPACE_DIM> dist_map_calculator(mrMesh);
 
-        for (unsigned i=0; i<conduction_velocity_maps.size(); ++i)
+        for (unsigned i = 0; i<conduction_velocity_maps.size(); ++i)
         {
             std::vector<double> distance_map;
             std::vector<unsigned> origin_surface;
@@ -140,9 +140,9 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
         /// needed because PseudoEcgCalculator makes its own Hdf5DataReader.
         delete mpDataReader;
 
-        for (unsigned i=0; i<electrodes.size(); ++i)
+        for (unsigned i = 0; i<electrodes.size(); ++i)
         {
-            PseudoEcgCalculator<ELEMENT_DIM,SPACE_DIM,1> calculator(mrMesh,
+            PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, 1> calculator(mrMesh,
                                                                     electrodes[i],
                                                                     mDirectory,
                                                                     mHdf5File,
@@ -421,7 +421,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteVariablesOverTimeAtNodes
     std::vector<std::string> variable_names = mpDataReader->GetVariableNames();
 
     //we will write one file per variable in the hdf5 file
-    for (unsigned name_index=0; name_index < variable_names.size(); name_index++)
+    for (unsigned name_index = 0; name_index < variable_names.size(); name_index++)
     {
         std::vector<std::vector<double> > output_data;
         if (PetscTools::AmMaster())//only master process fills the data structure
@@ -481,7 +481,7 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteGenericFileToMeshalyzer(
             p_file = output_file_handler.OpenOutputFile(rFileName, std::ios::app);
         }
         // Write data
-        for (unsigned line_number=0; line_number<rDataPayload.size(); line_number++)
+        for (unsigned line_number = 0; line_number<rDataPayload.size(); line_number++)
         {
             for (unsigned i = 0; i < rDataPayload[line_number].size(); ++i)
             {
@@ -503,8 +503,8 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WriteGenericFileToMeshalyzer(
 }
 
 // Explicit instantiation
-template class PostProcessingWriter<1,1>;
-template class PostProcessingWriter<1,2>;
-template class PostProcessingWriter<2,2>;
-template class PostProcessingWriter<1,3>;
-template class PostProcessingWriter<3,3>;
+template class PostProcessingWriter<1, 1>;
+template class PostProcessingWriter<1, 2>;
+template class PostProcessingWriter<2, 2>;
+template class PostProcessingWriter<1, 3>;
+template class PostProcessingWriter<3, 3>;

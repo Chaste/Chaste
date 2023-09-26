@@ -269,12 +269,12 @@ void OffLatticeSimulation<ELEMENT_DIM, SPACE_DIM>::OutputSimulationParameters(ou
 }
 
 // Explicit instantiation
-template class OffLatticeSimulation<1,1>;
-template class OffLatticeSimulation<1,2>;
-template class OffLatticeSimulation<2,2>;
-template class OffLatticeSimulation<1,3>;
-template class OffLatticeSimulation<2,3>;
-template class OffLatticeSimulation<3,3>;
+template class OffLatticeSimulation<1, 1>;
+template class OffLatticeSimulation<1, 2>;
+template class OffLatticeSimulation<2, 2>;
+template class OffLatticeSimulation<1, 3>;
+template class OffLatticeSimulation<2, 3>;
+template class OffLatticeSimulation<3, 3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

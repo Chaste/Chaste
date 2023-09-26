@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
-                                                     const std::vector<VertexElement<ELEMENT_DIM-1,SPACE_DIM>*>& rFaces,
+                                                     const std::vector<VertexElement<ELEMENT_DIM-1, SPACE_DIM>*>& rFaces,
                                                      const std::vector<bool>& rOrientations,
                                                      const std::vector<Node<SPACE_DIM>*>& rNodes)
     : MutableElement<ELEMENT_DIM, SPACE_DIM>(index, rNodes),
@@ -65,7 +65,7 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexElement<ELEMENT_DIM, SPACE_DIM>::VertexElement(unsigned index,
-                                                     const std::vector<VertexElement<ELEMENT_DIM-1,SPACE_DIM>*>& rFaces,
+                                                     const std::vector<VertexElement<ELEMENT_DIM-1, SPACE_DIM>*>& rFaces,
                                                      const std::vector<bool>& rOrientations)
     : MutableElement<ELEMENT_DIM, SPACE_DIM>(index),
       mFaces(rFaces),
@@ -112,28 +112,28 @@ VertexElement<ELEMENT_DIM, SPACE_DIM>::~VertexElement()
 {
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned VertexElement<ELEMENT_DIM, SPACE_DIM>::GetNumFaces() const
 {
     return mFaces.size();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VertexElement<ELEMENT_DIM, SPACE_DIM>::AddFace(VertexElement<ELEMENT_DIM-1,SPACE_DIM>* pFace)
+void VertexElement<ELEMENT_DIM, SPACE_DIM>::AddFace(VertexElement<ELEMENT_DIM-1, SPACE_DIM>* pFace)
 {
     // Add pFace to the end of mFaces
     this->mFaces.push_back(pFace);
 
     // Create a set of indices of nodes currently owned by this element
     std::set<unsigned> node_indices;
-    for (unsigned local_index=0; local_index<this->GetNumNodes(); local_index++)
+    for (unsigned local_index = 0; local_index<this->GetNumNodes(); local_index++)
     {
         node_indices.insert(this->GetNodeGlobalIndex(local_index));
     }
 
     // Loop over nodes owned by pFace
     unsigned end_index = this->GetNumNodes()-1;
-    for (unsigned local_index=0; local_index<pFace->GetNumNodes(); local_index++)
+    for (unsigned local_index = 0; local_index<pFace->GetNumNodes(); local_index++)
     {
         // If this node is not already owned by this element...
         unsigned global_index = pFace->GetNodeGlobalIndex(local_index);
@@ -196,9 +196,9 @@ bool VertexElement<1, SPACE_DIM>::FaceIsOrientatedClockwise(unsigned index) cons
 
 
 // Explicit instantiation
-template class VertexElement<1,1>;
-template class VertexElement<1,2>;
-template class VertexElement<1,3>;
-template class VertexElement<2,2>;
-template class VertexElement<2,3>;
-template class VertexElement<3,3>;
+template class VertexElement<1, 1>;
+template class VertexElement<1, 2>;
+template class VertexElement<1, 3>;
+template class VertexElement<2, 2>;
+template class VertexElement<2, 3>;
+template class VertexElement<3, 3>;

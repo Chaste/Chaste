@@ -285,12 +285,12 @@ void GeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters
 }
 
 // Explicit instantiation
-template class GeneralisedLinearSpringForce<1,1>;
-template class GeneralisedLinearSpringForce<1,2>;
-template class GeneralisedLinearSpringForce<2,2>;
-template class GeneralisedLinearSpringForce<1,3>;
-template class GeneralisedLinearSpringForce<2,3>;
-template class GeneralisedLinearSpringForce<3,3>;
+template class GeneralisedLinearSpringForce<1, 1>;
+template class GeneralisedLinearSpringForce<1, 2>;
+template class GeneralisedLinearSpringForce<2, 2>;
+template class GeneralisedLinearSpringForce<1, 3>;
+template class GeneralisedLinearSpringForce<2, 3>;
+template class GeneralisedLinearSpringForce<3, 3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

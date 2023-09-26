@@ -77,7 +77,7 @@ public:
     {
         // Create 1D cell population
         unsigned num_cells = 5;
-        MutableMesh<1,1> mesh;
+        MutableMesh<1, 1> mesh;
         mesh.ConstructLinearMesh(num_cells-1);
 
         std::vector<CellPtr> cells1d;
@@ -164,7 +164,7 @@ public:
     {
         // Create 1D cell population
         unsigned num_cells = 5;
-        MutableMesh<1,1> mesh;
+        MutableMesh<1, 1> mesh;
         mesh.ConstructLinearMesh(num_cells-1);
 
         std::vector<CellPtr> cells;
@@ -325,7 +325,7 @@ public:
     {
         // Create 1D cell population
         unsigned num_cells = 5;
-        MutableMesh<1,1> mesh;
+        MutableMesh<1, 1> mesh;
         mesh.ConstructLinearMesh(num_cells-1);
 
         std::vector<CellPtr> cells;
@@ -423,7 +423,7 @@ public:
     {
         // Create 1D cell population
         unsigned num_cells = 5;
-        MutableMesh<1,1> mesh;
+        MutableMesh<1, 1> mesh;
         mesh.ConstructLinearMesh(num_cells-1);
 
         std::vector<CellPtr> cells;

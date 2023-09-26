@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AirwayPropertiesCalculator.hpp"
 
-AirwayPropertiesCalculator::AirwayPropertiesCalculator(TetrahedralMesh<1,3>& rAirwaysMesh,
+AirwayPropertiesCalculator::AirwayPropertiesCalculator(TetrahedralMesh<1, 3>& rAirwaysMesh,
                                                        unsigned rootIndex,
                                                        bool radiusOnEdge) :
                                                            mAirwaysMesh(rAirwaysMesh),
@@ -46,7 +46,7 @@ AirwayPropertiesCalculator::AirwayPropertiesCalculator(TetrahedralMesh<1,3>& rAi
 {
     // Get the head element & process
     Node<3>* p_node = mAirwaysMesh.GetNode(mOutletNodeIndex);
-    Element<1,3>* p_element = mAirwaysMesh.GetElement(*(p_node->ContainingElementsBegin()));
+    Element<1, 3>* p_element = mAirwaysMesh.GetElement(*(p_node->ContainingElementsBegin()));
 
     AirwayBranch* p_head_branch = new AirwayBranch(mRadiusOnEdge);
 
@@ -67,7 +67,7 @@ AirwayPropertiesCalculator::~AirwayPropertiesCalculator()
     }
 }
 
-void AirwayPropertiesCalculator::SetupBranches(Element<1,3>* pElement, AirwayBranch* pBranch)
+void AirwayPropertiesCalculator::SetupBranches(Element<1, 3>* pElement, AirwayBranch* pBranch)
 {
     pBranch->AddElement(pElement);
 

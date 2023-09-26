@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ShortAxisVertexBasedDivisionRule.hpp"
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> ShortAxisVertexBasedDivisionRule<SPACE_DIM>::CalculateCellDivisionVector(
     CellPtr pParentCell,
     VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation)

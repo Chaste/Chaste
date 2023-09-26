@@ -61,7 +61,7 @@ public:
         HeartConfig::Instance()->SetOutputDirectory("CompareCubeStandard");
         HeartConfig::Instance()->SetOutputFilenamePrefix("CompareCubeStandard");
 
-        PlaneStimulusCellFactory<CellLuoRudy1991FromCellMLBackwardEulerOpt,3> cell_factory(-3e5, 1.0);
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellMLBackwardEulerOpt, 3> cell_factory(-3e5, 1.0);
 
         MonodomainProblem<3> monodomain_problem( &cell_factory );
 
@@ -116,7 +116,7 @@ public:
         HeartConfig::Instance()->SetOutputDirectory("CompareCubeStandard");
         HeartConfig::Instance()->SetOutputFilenamePrefix("CompareCubeStandard");
 
-        PlaneStimulusCellFactory<CellLuoRudy1991FromCellMLBackwardEulerOpt,3> cell_factory(-3e5, 1.0);
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellMLBackwardEulerOpt, 3> cell_factory(-3e5, 1.0);
 
         MonodomainProblem<3> monodomain_problem( &cell_factory );
 

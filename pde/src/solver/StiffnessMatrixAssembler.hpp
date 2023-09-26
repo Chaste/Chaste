@@ -39,7 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractFeVolumeIntegralAssembler.hpp"
 
 /**
- * Simple implementation of AbstractFeVolumeIntegralAssembler which provides the stiffness matrix
+ * Simple implementation of AbstractFeVolumeIntegralAssembler which provides the 
+ * stiffness matrix
  *
  * K_{ij} =  integral_{domain} grad phi_i(x) . grad phi_j(x) dV
  *
@@ -52,27 +53,27 @@ class StiffnessMatrixAssembler
 public:
 
     /**
-     * Implemented ComputeMatrixTerm(), defined in AbstractFeVolumeIntegralAssembler.
-     * See documentation in that class.
+     * Implemented ComputeMatrixTerm(), defined in 
+     * AbstractFeVolumeIntegralAssembler. See documentation in that class.
      *
      * @param rPhi The basis functions, rPhi(i) = phi_i, i=1..numBases.
      * @param rGradPhi Basis gradients, rGradPhi(i,j) = d(phi_j)/d(X_i).
      * @param rX The point in space.
      * @param rU The unknown as a vector, u(i) = u_i.
-     * @param rGradU The gradient of the unknown as a matrix, rGradU(i,j) = d(u_i)/d(X_j).
+     * @param rGradU The gradient of the unknown as a matrix, 
+     *     rGradU(i,j) = d(u_i)/d(X_j).
      * @param pElement Pointer to the element.
      * @return computed stencil matrix
      */
-    c_matrix<double,1*(ELEMENT_DIM+1),1*(ELEMENT_DIM+1)>
-        ComputeMatrixTerm(
-                c_vector<double, ELEMENT_DIM+1> &rPhi,
-                c_matrix<double, SPACE_DIM, ELEMENT_DIM+1> &rGradPhi,
-                ChastePoint<SPACE_DIM> &rX,
-                c_vector<double,1> &rU,
-                c_matrix<double, 1, SPACE_DIM> &rGradU /* not used */,
-                Element<ELEMENT_DIM,SPACE_DIM>* pElement)
+    c_matrix<double, 1*(ELEMENT_DIM+1), 1*(ELEMENT_DIM+1)> ComputeMatrixTerm(
+        c_vector<double, ELEMENT_DIM+1> &rPhi,
+        c_matrix<double, SPACE_DIM, ELEMENT_DIM+1> &rGradPhi,
+        ChastePoint<SPACE_DIM> &rX,
+        c_vector<double, 1> &rU,
+        c_matrix<double, 1, SPACE_DIM> &rGradU /* not used */,
+        Element<ELEMENT_DIM, SPACE_DIM>* pElement)
     {
-        return prod( trans(rGradPhi), rGradPhi );
+        return prod(trans(rGradPhi), rGradPhi);
     }
 
     /**
@@ -80,8 +81,9 @@ public:
      *
      * @param pMesh the mesh
      */
-    explicit StiffnessMatrixAssembler(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
-        : AbstractFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,1,false,true,NORMAL>(pMesh)
+    explicit StiffnessMatrixAssembler(
+        AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
+        : AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, 1, false, true, NORMAL>(pMesh)
     {
     }
 };

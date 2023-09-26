@@ -263,7 +263,7 @@ public:
             NonPurkinjeCellFactory cell_factory_for_just_monodomain;
             HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_200_elements");
             HeartConfig::Instance()->SetOutputDirectory("TestMonodomainPurkinjeProblem_normal");
-            MonodomainProblem<2,2> monodomain_problem(&cell_factory_for_just_monodomain);
+            MonodomainProblem<2, 2> monodomain_problem(&cell_factory_for_just_monodomain);
             monodomain_problem.Initialise();
 
             // Solve
@@ -275,7 +275,7 @@ public:
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
         HeartConfig::Instance()->SetOutputDirectory("TestMonodomainPurkinjeProblem_purkinje");
         PurkinjeCellFactory cell_factory;
-        MonodomainPurkinjeProblem<2,2> purkinje_problem(&cell_factory);
+        MonodomainPurkinjeProblem<2, 2> purkinje_problem(&cell_factory);
         purkinje_problem.Initialise();
 
         MixedDimensionMesh<2, 2>& r_mesh = static_cast<MixedDimensionMesh<2, 2>& >(purkinje_problem.rGetMesh());
@@ -296,7 +296,7 @@ public:
         soln_repl.ReplicatePetscVector(purkinje_problem.GetSolution());
 
         // Compare solutions at final time
-        for (AbstractTetrahedralMesh<2,2>::NodeIterator node_iter = r_mesh.GetNodeIteratorBegin();
+        for (AbstractTetrahedralMesh<2, 2>::NodeIterator node_iter = r_mesh.GetNodeIteratorBegin();
              node_iter != r_mesh.GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -356,8 +356,8 @@ public:
         {
             // Need to load the mesh ourselves at present, as AbstractCardiacProblem::Initialise will assume a DistributedTetrahedralMesh.
             std::string mesh_base("mesh/test/data/mixed_dimension_meshes/branched_cable_2D_0_to_1mm_200_elements");
-            TrianglesMeshReader<2,2> reader(mesh_base);
-            MixedDimensionMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+            TrianglesMeshReader<2, 2> reader(mesh_base);
+            MixedDimensionMesh<2, 2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
             mesh.ConstructFromMeshReader(reader);
 
             //The mixed dimension mesh specifies fibre radii, we override these for the purposes of the
@@ -383,7 +383,7 @@ public:
             // Set up Purkinje problem
             HeartConfig::Instance()->SetOutputDirectory("TestMonodomainPurkinjeProblem_purkinje_branched");
             PurkinjeCellFactory cell_factory;
-            MonodomainPurkinjeProblem<2,2> purkinje_problem(&cell_factory);
+            MonodomainPurkinjeProblem<2, 2> purkinje_problem(&cell_factory);
             purkinje_problem.SetMesh(&mesh);
             purkinje_problem.Initialise();
 
@@ -395,8 +395,8 @@ public:
 
         // Need to load the mesh ourselves at present, as AbstractCardiacProblem::Initialise will assume a DistributedTetrahedralMesh.
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
-        TrianglesMeshReader<2,2> reader(mesh_base);
-        MixedDimensionMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        TrianglesMeshReader<2, 2> reader(mesh_base);
+        MixedDimensionMesh<2, 2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         mesh.ConstructFromMeshReader(reader);
 
         //The mixed dimension mesh specifies fibre radii, we override these for the purposes of the
@@ -419,7 +419,7 @@ public:
             // Set up Purkinje problem
             HeartConfig::Instance()->SetOutputDirectory("TestMonodomainPurkinjeProblem_purkinje_branched_symmetric");
             PurkinjeCellFactory cell_factory;
-            MonodomainPurkinjeProblem<2,2> purkinje_problem(&cell_factory);
+            MonodomainPurkinjeProblem<2, 2> purkinje_problem(&cell_factory);
             purkinje_problem.SetMesh(&mesh);
             purkinje_problem.Initialise();
 
@@ -489,8 +489,8 @@ public:
         {
             // Need to load the mesh ourselves at present, as AbstractCardiacProblem::Initialise will assume a DistributedTetrahedralMesh.
             std::string mesh_base("mesh/test/data/mixed_dimension_meshes/branched_cable_2D_0_to_1mm_200_elements");
-            TrianglesMeshReader<2,2> reader(mesh_base);
-            MixedDimensionMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+            TrianglesMeshReader<2, 2> reader(mesh_base);
+            MixedDimensionMesh<2, 2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
             mesh.ConstructFromMeshReader(reader);
 
             //The mixed dimension mesh specifies fibre radii, we override these for the purposes of the
@@ -522,7 +522,7 @@ public:
             // Set up Purkinje problem
             HeartConfig::Instance()->SetOutputDirectory("TestMonodomainPurkinjeProblemPurkinjeBranched");
             PurkinjeCellFactory cell_factory;
-            MonodomainPurkinjeProblem<2,2> purkinje_problem(&cell_factory);
+            MonodomainPurkinjeProblem<2, 2> purkinje_problem(&cell_factory);
             purkinje_problem.SetMesh(&mesh);
             purkinje_problem.Initialise();
 
@@ -534,8 +534,8 @@ public:
 
         // Need to load the mesh ourselves at present, as AbstractCardiacProblem::Initialise will assume a DistributedTetrahedralMesh.
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/branched_cable_2D_0_to_1mm_200_elements");
-        TrianglesMeshReader<2,2> reader(mesh_base);
-        MixedDimensionMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        TrianglesMeshReader<2, 2> reader(mesh_base);
+        MixedDimensionMesh<2, 2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         mesh.ConstructFromMeshReader(reader);
 
         //The mixed dimension mesh specifies fibre radii, we override these for the purposes of the
@@ -568,7 +568,7 @@ public:
             // Set up Purkinje problem
             HeartConfig::Instance()->SetOutputDirectory("TestMonodomainPurkinjeProblemPurkinjeBranched");
             PurkinjeCellFactory cell_factory;
-            MonodomainPurkinjeProblem<2,2> purkinje_problem(&cell_factory);
+            MonodomainPurkinjeProblem<2, 2> purkinje_problem(&cell_factory);
             purkinje_problem.SetMesh(&mesh);
             purkinje_problem.Initialise();
 
@@ -648,7 +648,7 @@ public:
         purkinje_cell.SetVoltage(rest_voltage);
 
         double time_step = 0.01;
-        for (unsigned i=0; i<500; ++i)
+        for (unsigned i = 0; i<500; ++i)
         {
             double time = i*time_step;
             myocardial_cell.Compute(time, time+time_step, time_step);
@@ -675,7 +675,7 @@ public:
         TS_ASSERT_DELTA(p_myocardial_cell2->GetStimulus(dummy_time), 0.0, 1e-6);
 
         // Now simulate and check the results match those above
-        for (unsigned i=0; i<500; ++i)
+        for (unsigned i = 0; i<500; ++i)
         {
             double time = i*time_step;
             p_myocardial_cell2->Compute(time, time+time_step, time_step);
@@ -709,7 +709,7 @@ public:
                                                         // true: Make a junction at (0.05, 0.05)
 
 
-        MonodomainPurkinjeProblem<2,2> purkinje_problem(&cell_factory);
+        MonodomainPurkinjeProblem<2, 2> purkinje_problem(&cell_factory);
         purkinje_problem.Initialise();
 
         // Solve
@@ -749,7 +749,7 @@ public:
         HeartConfig::Instance()->SetMeshPartitioning("dumb");
         HeartConfig::Instance()->SetVisualizeWithVtk(true);
         PurkinjeStarCellFactory cell_factory(false, true); //no stimulus, junction
-        MonodomainPurkinjeProblem<2,2> purkinje_problem(&cell_factory);
+        MonodomainPurkinjeProblem<2, 2> purkinje_problem(&cell_factory);
         purkinje_problem.Initialise();
 
         //With no stimulus & the same cell model there should be no difference between the Purkinje and the myocardium.
@@ -789,7 +789,7 @@ public:
         HeartConfig::Instance()->SetMeshPartitioning("dumb");
         HeartConfig::Instance()->SetVisualizeWithVtk(true);
         PurkinjeStarCellFactory cell_factory; //Stimulates at the left (only on Purkinje cable) and makes multiple junctions
-        MonodomainPurkinjeProblem<2,2> purkinje_problem(&cell_factory);
+        MonodomainPurkinjeProblem<2, 2> purkinje_problem(&cell_factory);
         purkinje_problem.Initialise();
 
         // Solve to the point where the stimulus enters the PVJ
@@ -838,7 +838,7 @@ public:
         HeartConfig::Instance()->SetVisualizeWithVtk(true);
         PurkinjeStarCellFactoryFromFile cell_factory; //Stimulates at the left (only on Purkinje cable) and makes multiple junctions
 
-        MonodomainPurkinjeProblem<2,2> purkinje_problem(&cell_factory);
+        MonodomainPurkinjeProblem<2, 2> purkinje_problem(&cell_factory);
         purkinje_problem.Initialise();
 
         // Solve to the point where the stimulus enters the PVJ
@@ -883,7 +883,7 @@ public:
         HeartConfig::Instance()->SetVisualizeWithVtk(true);
         PurkinjeStarCellFactoryFromFile cell_factory; //Stimulates at the left (only on Purkinje cable) and makes multiple junctions
 
-        MonodomainPurkinjeProblem<2,2> purkinje_problem(&cell_factory);
+        MonodomainPurkinjeProblem<2, 2> purkinje_problem(&cell_factory);
         purkinje_problem.Initialise();
 
         // Solve to the point where the stimulus enters the PVJ
@@ -922,7 +922,7 @@ public:
 
         //Cover warning that a .pvj file doesn't exist
         PurkinjeStarCellFactoryFromFile cell_factory; //Stimulates at the left (only on Purkinje cable) and makes multiple junctions
-        MonodomainPurkinjeProblem<2,2> purkinje_problem(&cell_factory);
+        MonodomainPurkinjeProblem<2, 2> purkinje_problem(&cell_factory);
         {
             Warnings::QuietDestroy();
             HeartConfig::Instance()->SetMeshFileName("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");

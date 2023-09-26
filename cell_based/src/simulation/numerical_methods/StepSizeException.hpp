@@ -64,8 +64,8 @@ public:
      *
      * @param suggestedNewStep a suggestion for an updated timestep
      * @param message the error message to display
-     * @param isTerminal whether the error is terminal if true the the 
-     *                   simulation stops
+     * @param isTerminal whether the error is terminal; if true. the simulation 
+     *     stops
      */
     StepSizeException(double suggestedNewStep,
                       const std::string message,

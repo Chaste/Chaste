@@ -105,21 +105,21 @@ public:
     void TestNumericalAgainstAnalyticJacobian()
     {
         // Create mesh from mesh reader
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
         NonlinearEquationPde<1> pde;
 
         // Boundary conditions
-        BoundaryConditionsContainer<1,1,1> bcc;
+        BoundaryConditionsContainer<1, 1, 1> bcc;
         ConstBoundaryCondition<1>* p_boundary_condition = new ConstBoundaryCondition<1>(0.0);
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(0), p_boundary_condition);
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(10), p_boundary_condition);
 
         // Solver
-        SimpleNonlinearEllipticSolver<1,1> solver(&mesh, &pde, &bcc);
+        SimpleNonlinearEllipticSolver<1, 1> solver(&mesh, &pde, &bcc);
 
         TS_ASSERT( solver.VerifyJacobian(1e-3) );
     }
@@ -127,20 +127,20 @@ public:
     void TestWithHeatEquation1D()
     {
         // Create mesh from mesh reader
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
         NonlinearEquationPde<1> pde;
 
         // Boundary conditions
-        BoundaryConditionsContainer<1,1,1> bcc;
+        BoundaryConditionsContainer<1, 1, 1> bcc;
         ConstBoundaryCondition<1>* p_boundary_condition = new ConstBoundaryCondition<1>(0.0);
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(0), p_boundary_condition);
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(10), p_boundary_condition);
 
-        SimpleNonlinearEllipticSolver<1,1> solver(&mesh, &pde, &bcc);
+        SimpleNonlinearEllipticSolver<1, 1> solver(&mesh, &pde, &bcc);
 
         // Set up initial guess
         Vec initial_guess = PetscTools::CreateAndSetVec(mesh.GetNumNodes(),1.0);
@@ -163,26 +163,26 @@ public:
     void TestWithHeatEquation1DAndNeumannBCs()
     {
         // Create mesh from mesh reader
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
         NonlinearEquationPde<1> pde;
 
         // Boundary conditions
-        BoundaryConditionsContainer<1,1,1> bcc;
+        BoundaryConditionsContainer<1, 1, 1> bcc;
         // u(0) = 0
         ConstBoundaryCondition<1>* p_boundary_condition = new ConstBoundaryCondition<1>(0.0);
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(0), p_boundary_condition);
         // u(1)*u'(1) = 1
         p_boundary_condition = new ConstBoundaryCondition<1>(1.0);
-        TetrahedralMesh<1,1>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorEnd();
+        TetrahedralMesh<1, 1>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorEnd();
         iter--;
         bcc.AddNeumannBoundaryCondition(*iter, p_boundary_condition);
 
         // Nonlinear solver to use
-        SimpleNonlinearEllipticSolver<1,1> solver(&mesh, &pde, &bcc);
+        SimpleNonlinearEllipticSolver<1, 1> solver(&mesh, &pde, &bcc);
 
         // Set up initial Guess
         Vec initial_guess = PetscTools::CreateAndSetVec(mesh.GetNumNodes(),0.25);
@@ -206,21 +206,21 @@ public:
     void TestWithHeatEquation1D2()
     {
         // Create mesh from mesh reader
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
         NonlinearEquation2Pde<1> pde;
 
         // Boundary conditions
-        BoundaryConditionsContainer<1,1,1> bcc;
+        BoundaryConditionsContainer<1, 1, 1> bcc;
         ConstBoundaryCondition<1>* p_boundary_condition = new ConstBoundaryCondition<1>(1.0);
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(0), p_boundary_condition);
         p_boundary_condition = new ConstBoundaryCondition<1>(exp(1.0));
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(10), p_boundary_condition);
 
-        SimpleNonlinearEllipticSolver<1,1> solver(&mesh, &pde, &bcc);
+        SimpleNonlinearEllipticSolver<1, 1> solver(&mesh, &pde, &bcc);
 
         // Set up initial Guess
         std::vector<double> init_guess(mesh.GetNumNodes());
@@ -248,21 +248,21 @@ public:
     void TestWithHeatEquation1D3()
     {
         // Create mesh from mesh reader
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
         NonlinearEquation3Pde<1> pde;
 
         // Boundary conditions
-        BoundaryConditionsContainer<1,1,1> bcc;
+        BoundaryConditionsContainer<1, 1, 1> bcc;
         ConstBoundaryCondition<1>* p_boundary_condition = new ConstBoundaryCondition<1>(sqrt(2.0));
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(0), p_boundary_condition);
         p_boundary_condition = new ConstBoundaryCondition<1>(0.0);
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(10), p_boundary_condition);
 
-        SimpleNonlinearEllipticSolver<1,1> solver(&mesh, &pde, &bcc);
+        SimpleNonlinearEllipticSolver<1, 1> solver(&mesh, &pde, &bcc);
 
         // Set up initial Guess
         Vec initial_guess = PetscTools::CreateVec(mesh.GetNumNodes());
@@ -296,24 +296,24 @@ public:
     void TestWithHeatEquation1D4()
     {
         // Create mesh from mesh reader
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
         NonlinearEquation4Pde<1> pde;
 
         // Boundary conditions
-        BoundaryConditionsContainer<1,1,1> bcc;
+        BoundaryConditionsContainer<1, 1, 1> bcc;
         // u(1) = exp(1.0)
         ConstBoundaryCondition<1>* p_boundary_condition = new ConstBoundaryCondition<1>(exp(-1.0));
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(10), p_boundary_condition);
         // u(0)^2*u'(0) = 0.0
         p_boundary_condition = new ConstBoundaryCondition<1>(0.0);
-        TetrahedralMesh<1,1>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
+        TetrahedralMesh<1, 1>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
         bcc.AddNeumannBoundaryCondition(*iter, p_boundary_condition);
 
-        SimpleNonlinearEllipticSolver<1,1> solver(&mesh, &pde, &bcc);
+        SimpleNonlinearEllipticSolver<1, 1> solver(&mesh, &pde, &bcc);
 
         // Set up initial Guess
         std::vector<double> init_guess(mesh.GetNumNodes());
@@ -342,15 +342,15 @@ public:
     void TestWithHeatEquation1D5()
     {
         // Create mesh from mesh reader
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
         NonlinearEquation5Pde<1> pde;
 
         // Boundary conditions
-        BoundaryConditionsContainer<1,1,1> bcc;
+        BoundaryConditionsContainer<1, 1, 1> bcc;
         // u(1) = exp(-1.0)
         ConstBoundaryCondition<1>* p_boundary_condition = new ConstBoundaryCondition<1>(exp(-1.0));
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(10), p_boundary_condition);
@@ -358,10 +358,10 @@ public:
         // Note that we specify 1 as the value, since figuring out which direction
         // the normal is in is hard in 1D.
         p_boundary_condition = new ConstBoundaryCondition<1>(1.0);
-        TetrahedralMesh<1,1>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
+        TetrahedralMesh<1, 1>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
         bcc.AddNeumannBoundaryCondition(*iter, p_boundary_condition);
 
-        SimpleNonlinearEllipticSolver<1,1> solver(&mesh, &pde, &bcc);
+        SimpleNonlinearEllipticSolver<1, 1> solver(&mesh, &pde, &bcc);
 
         // Set up initial Guess
         Vec initial_guess = PetscTools::CreateVec(mesh.GetNumNodes());
@@ -393,15 +393,15 @@ public:
     void TestWithHeatEquation1DAndNeumannBCs2()
     {
         // Create mesh from mesh reader
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
         NonlinearEquationPde<1> pde;
 
         // Boundary conditions
-        BoundaryConditionsContainer<1,1,1> bcc;
+        BoundaryConditionsContainer<1, 1, 1> bcc;
         // u(1) = sqrt(3.0)
         ConstBoundaryCondition<1>* p_boundary_condition = new ConstBoundaryCondition<1>(sqrt(3.0));
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(10), p_boundary_condition);
@@ -409,10 +409,10 @@ public:
         // Note that we specify -2 as the value, since figuring out which direction
         // the normal is in is hard in 1D.
         p_boundary_condition = new ConstBoundaryCondition<1>(-2.0);
-        TetrahedralMesh<1,1>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
+        TetrahedralMesh<1, 1>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
         bcc.AddNeumannBoundaryCondition(*iter, p_boundary_condition);
 
-        SimpleNonlinearEllipticSolver<1,1> solver(&mesh, &pde, &bcc);
+        SimpleNonlinearEllipticSolver<1, 1> solver(&mesh, &pde, &bcc);
 
         // cover the bad size exception
         Vec badly_sized_init_guess = PetscTools::CreateAndSetVec(1,1.0); // size=1
@@ -442,17 +442,17 @@ public:
     void TestHeatEquationWithNeumannOnUnitDisc()
     {
         // Create mesh from mesh reader
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_522_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/disk_522_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
         NonlinearLinearEquation<2> pde;
 
         // Boundary conditions
-        BoundaryConditionsContainer<2,2,1> bcc;
+        BoundaryConditionsContainer<2, 2, 1> bcc;
         // du/dn = -0.5 on r=1
-        TetrahedralMesh<2,2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
+        TetrahedralMesh<2, 2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
         ConstBoundaryCondition<2>* p_boundary_condition;
         p_boundary_condition = new ConstBoundaryCondition<2>(-0.5);
         while (iter != mesh.GetBoundaryElementIteratorEnd())
@@ -464,7 +464,7 @@ public:
         p_boundary_condition = new ConstBoundaryCondition<2>(2.0);
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(1), p_boundary_condition);
 
-        SimpleNonlinearEllipticSolver<2,2> solver(&mesh, &pde, &bcc);
+        SimpleNonlinearEllipticSolver<2, 2> solver(&mesh, &pde, &bcc);
 
         // Set up initial Guess
         Vec initial_guess = PetscTools::CreateAndSetVec(mesh.GetNumNodes(),1.0);
@@ -489,18 +489,18 @@ public:
     void TestWithHeatEquation2DAndNeumannBCs()
     {
         // Create mesh from mesh reader
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
         NonlinearEquationPde<2> pde;
 
         // Boundary conditions
-        BoundaryConditionsContainer<2,2,1> bcc;
+        BoundaryConditionsContainer<2, 2, 1> bcc;
         // u(y=0) = 0
         ConstBoundaryCondition<2>* zero_boundary_condition = new ConstBoundaryCondition<2>(0.0);
-        TetrahedralMesh<2,2>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
+        TetrahedralMesh<2, 2>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
         while (node_iter != mesh.GetBoundaryNodeIteratorEnd())
         {
             if (fabs((*node_iter)->GetPoint()[1]) < 1e-12)
@@ -510,7 +510,7 @@ public:
             node_iter++;
         }
 
-        TetrahedralMesh<2,2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
+        TetrahedralMesh<2, 2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
         FunctionalBoundaryCondition<2>* one_boundary_condition = new FunctionalBoundaryCondition<2>(&one_bc);
         AbstractBoundaryCondition<2>* p_boundary_condition;
         while (iter != mesh.GetBoundaryElementIteratorEnd())
@@ -532,7 +532,7 @@ public:
             iter++;
         }
 
-        SimpleNonlinearEllipticSolver<2,2> solver(&mesh, &pde, &bcc);
+        SimpleNonlinearEllipticSolver<2, 2> solver(&mesh, &pde, &bcc);
 
         // Set up initial Guess
         Vec initial_guess = PetscTools::CreateAndSetVec(mesh.GetNumNodes(),0.25);
@@ -556,17 +556,17 @@ public:
     void Test2dOnUnitSquare()
     {
         // Create mesh from mesh reader
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
         Example2DNonlinearEllipticPde pde;
 
         // Boundary conditions
-        BoundaryConditionsContainer<2,2,1> bcc;
+        BoundaryConditionsContainer<2, 2, 1> bcc;
         ConstBoundaryCondition<2>* p_boundary_condition;
-        TetrahedralMesh<2,2>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
+        TetrahedralMesh<2, 2>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
         while (node_iter != mesh.GetBoundaryNodeIteratorEnd())
         {
             double x = (*node_iter)->GetPoint()[0];
@@ -590,7 +590,7 @@ public:
             node_iter++;
         }
         FunctionalBoundaryCondition<2>* p_functional_bc;
-        TetrahedralMesh<2,2>::BoundaryElementIterator elt_iter = mesh.GetBoundaryElementIteratorBegin();
+        TetrahedralMesh<2, 2>::BoundaryElementIterator elt_iter = mesh.GetBoundaryElementIteratorBegin();
         while (elt_iter != mesh.GetBoundaryElementIteratorEnd())
         {
             double x = (*elt_iter)->GetNodeLocation(0,0);
@@ -614,7 +614,7 @@ public:
             elt_iter++;
         }
 
-        SimpleNonlinearEllipticSolver<2,2> solver(&mesh, &pde, &bcc);
+        SimpleNonlinearEllipticSolver<2, 2> solver(&mesh, &pde, &bcc);
 
         // Set up initial Guess
         Vec initial_guess = PetscTools::CreateAndSetVec(mesh.GetNumNodes(),4.0);
@@ -654,17 +654,17 @@ public:
     void TestNasty2dEquationOnUnitSquare()
     {
         // Create mesh from mesh reader
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
         ExampleNasty2dNonlinearEllipticPde pde;
 
         // Boundary conditions
-        BoundaryConditionsContainer<2,2,1> bcc;
+        BoundaryConditionsContainer<2, 2, 1> bcc;
         ConstBoundaryCondition<2>* p_boundary_condition;
-        TetrahedralMesh<2,2>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
+        TetrahedralMesh<2, 2>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
         while (node_iter != mesh.GetBoundaryNodeIteratorEnd())
         {
             double x = (*node_iter)->GetPoint()[0];
@@ -688,7 +688,7 @@ public:
             node_iter++;
         }
         FunctionalBoundaryCondition<2>* p_functional_bc;
-        TetrahedralMesh<2,2>::BoundaryElementIterator elt_iter = mesh.GetBoundaryElementIteratorBegin();
+        TetrahedralMesh<2, 2>::BoundaryElementIterator elt_iter = mesh.GetBoundaryElementIteratorBegin();
         while (elt_iter != mesh.GetBoundaryElementIteratorEnd())
         {
             double x = (*elt_iter)->GetNodeLocation(0,0);
@@ -712,7 +712,7 @@ public:
             elt_iter++;
         }
 
-        SimpleNonlinearEllipticSolver<2,2> solver(&mesh, &pde, &bcc);
+        SimpleNonlinearEllipticSolver<2, 2> solver(&mesh, &pde, &bcc);
 
         // Set up initial Guess
         Vec initial_guess = PetscTools::CreateAndSetVec(mesh.GetNumNodes(),4.0);

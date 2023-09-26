@@ -270,9 +270,9 @@ void AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM>::OutputNumericalMethodParam
 }
 
 // Explicit instantiation
-template class AbstractNumericalMethod<1,1>;
-template class AbstractNumericalMethod<1,2>;
-template class AbstractNumericalMethod<2,2>;
-template class AbstractNumericalMethod<1,3>;
-template class AbstractNumericalMethod<2,3>;
-template class AbstractNumericalMethod<3,3>;
+template class AbstractNumericalMethod<1, 1>;
+template class AbstractNumericalMethod<1, 2>;
+template class AbstractNumericalMethod<2, 2>;
+template class AbstractNumericalMethod<1, 3>;
+template class AbstractNumericalMethod<2, 3>;
+template class AbstractNumericalMethod<3, 3>;

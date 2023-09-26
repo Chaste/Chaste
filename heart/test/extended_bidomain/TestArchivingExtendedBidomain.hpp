@@ -293,7 +293,7 @@ private:
         ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
         boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
-        AbstractCardiacProblem<2,2,3>* const p_extended_problem = &extended_problem;
+        AbstractCardiacProblem<2, 2, 3>* const p_extended_problem = &extended_problem;
         (*p_arch) & p_extended_problem; //archive
     }
 
@@ -302,7 +302,7 @@ private:
         ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
         boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
-        AbstractCardiacProblem<2,2,3> *p_problem;
+        AbstractCardiacProblem<2, 2, 3> *p_problem;
         (*p_arch) >> p_problem;//load
 
         //see if the heartconfig is saved properly
@@ -421,7 +421,7 @@ private:
         ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
         boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
-        AbstractCardiacProblem<2,2,3>* const p_extended_problem = &extended_problem;
+        AbstractCardiacProblem<2, 2, 3>* const p_extended_problem = &extended_problem;
         (*p_arch) & p_extended_problem; //archive
     }
 
@@ -430,7 +430,7 @@ private:
         ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
         boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
-        AbstractCardiacProblem<2,2,3> *p_problem;
+        AbstractCardiacProblem<2, 2, 3> *p_problem;
         (*p_arch) >> p_problem;//load
 
         //see if the heartconfig is saved properly

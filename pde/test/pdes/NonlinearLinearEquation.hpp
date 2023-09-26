@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Linear poisson equation, using the nonlinear class format.
  */
-template <int SPACE_DIM>
+template<int SPACE_DIM>
 class NonlinearLinearEquation : public AbstractNonlinearEllipticPde<SPACE_DIM>
 {
 public:

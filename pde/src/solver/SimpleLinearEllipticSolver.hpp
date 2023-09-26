@@ -53,10 +53,11 @@ class SimpleLinearEllipticSolver
 protected:
 
     /** The PDE to be solved. */
-    AbstractLinearEllipticPde<ELEMENT_DIM,SPACE_DIM>* mpEllipticPde;
+    AbstractLinearEllipticPde<ELEMENT_DIM, SPACE_DIM>* mpEllipticPde;
 
     /**
-     * @return the term to be added to the element stiffness matrix - see AbstractFeVolumeIntegralAssembler
+     * @return the term to be added to the element stiffness matrix - see 
+     *     AbstractFeVolumeIntegralAssembler
      *
      * grad_phi[row] . ( pde_diffusion_term * grad_phi[col])
      *
@@ -64,48 +65,52 @@ protected:
      * @param rGradPhi Basis gradients, rGradPhi(i,j) = d(phi_j)/d(X_i)
      * @param rX The point in space
      * @param rU The unknown as a vector, u(i) = u_i
-     * @param rGradU The gradient of the unknown as a matrix, rGradU(i,j) = d(u_i)/d(X_j)
+     * @param rGradU The gradient of the unknown as a matrix, 
+     *     rGradU(i,j) = d(u_i)/d(X_j)
      * @param pElement Pointer to the element
      */
     virtual c_matrix<double, 1*(ELEMENT_DIM+1), 1*(ELEMENT_DIM+1)> ComputeMatrixTerm(
         c_vector<double, ELEMENT_DIM+1>& rPhi,
         c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi,
         ChastePoint<SPACE_DIM>& rX,
-        c_vector<double,1>& rU,
-        c_matrix<double,1,SPACE_DIM>& rGradU,
-        Element<ELEMENT_DIM,SPACE_DIM>* pElement);
+        c_vector<double, 1>& rU,
+        c_matrix<double, 1, SPACE_DIM>& rGradU,
+        Element<ELEMENT_DIM, SPACE_DIM>* pElement);
 
     /**
-     * @return the term arising from boundary conditions to be added to the element
-     * stiffness vector - see AbstractFeVolumeIntegralAssembler
+     * @return the term arising from boundary conditions to be added to the 
+     * element stiffness vector - see AbstractFeVolumeIntegralAssembler
      *
      * @param rPhi The basis functions, rPhi(i) = phi_i, i=1..numBases
      * @param rGradPhi Basis gradients, rGradPhi(i,j) = d(phi_j)/d(X_i)
      * @param rX The point in space
      * @param rU The unknown as a vector, u(i) = u_i
-     * @param rGradU The gradient of the unknown as a matrix, rGradU(i,j) = d(u_i)/d(X_j)
+     * @param rGradU The gradient of the unknown as a matrix, 
+     *     rGradU(i,j) = d(u_i)/d(X_j)
      * @param pElement Pointer to the element
      */
     virtual c_vector<double,1*(ELEMENT_DIM+1)> ComputeVectorTerm(
         c_vector<double, ELEMENT_DIM+1>& rPhi,
         c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi,
         ChastePoint<SPACE_DIM>& rX,
-        c_vector<double,1>& rU,
-        c_matrix<double,1,SPACE_DIM>& rGradU,
-        Element<ELEMENT_DIM,SPACE_DIM>* pElement);
+        c_vector<double, 1>& rU,
+        c_matrix<double, 1, SPACE_DIM>& rGradU,
+        Element<ELEMENT_DIM, SPACE_DIM>* pElement);
 
-
-    // Note: does not have to provide a ComputeVectorSurfaceTerm for surface integrals,
-    // the parent AbstractAssemblerSolverHybrid assumes natural Neumann BCs and uses a
-    // NaturalNeumannSurfaceTermAssembler for assembling this part of the vector.
+    /*
+     * Note: does not have to provide a ComputeVectorSurfaceTerm for surface 
+     * integrals; the parent AbstractAssemblerSolverHybrid assumes natural 
+     * Neumann BCs and uses a NaturalNeumannSurfaceTermAssembler for assembling 
+     * this part of the vector.
+     */
 
     /**
      * Delegate to AbstractAssemblerSolverHybrid::SetupGivenLinearSystem.
      *
-     * @param currentSolution The current solution which can be used in setting up
-     *   the linear system if needed (NULL if there isn't a current solution)
-     * @param computeMatrix Whether to compute the LHS matrix of the linear system
-     *   (mainly for dynamic solves).
+     * @param currentSolution The current solution which can be used in setting 
+     *     up the linear system if needed (NULL if there isn't a current solution)
+     * @param computeMatrix Whether to compute the LHS matrix of the linear 
+     *     system (mainly for dynamic solves).
      */
     void SetupLinearSystem(Vec currentSolution, bool computeMatrix)
     {
@@ -121,15 +126,17 @@ public:
      * @param pPde pointer to the PDE
      * @param pBoundaryConditions pointer to the boundary conditions
      */
-    SimpleLinearEllipticSolver(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                               AbstractLinearEllipticPde<ELEMENT_DIM,SPACE_DIM>* pPde,
-                               BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,1>* pBoundaryConditions);
+    SimpleLinearEllipticSolver(
+        AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+        AbstractLinearEllipticPde<ELEMENT_DIM, SPACE_DIM>* pPde,
+        BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 1>* pBoundaryConditions);
 
     /**
      * Overloaded InitaliseForSolve() which just calls the base class but also
      * sets the matrix as symmetric and sets Conjugate Gradients as the solver
      *
-     * @param initialSolution initialSolution (used in base class version of this method)
+     * @param initialSolution initialSolution (used in base class version of 
+     *     this method; defaults to nullptr)
      */
     void InitialiseForSolve(Vec initialSolution = nullptr);
 };

@@ -120,7 +120,7 @@ public:
     {}
 };
 
-template <class Derived>
+template<class Derived>
 class StaticBaseclass
 {
 public:

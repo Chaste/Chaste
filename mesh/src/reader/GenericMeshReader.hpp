@@ -64,7 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @param readContainingElementsForBoundaryElements Whether to read in the containing element information
  *    for each boundary element (in the .face file if tetgen was run with '-nn').
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::shared_ptr<AbstractMeshReader<ELEMENT_DIM, SPACE_DIM> > GenericMeshReader(const std::string& rPathBaseName,
                                                                              unsigned orderOfElements=1,
                                                                              unsigned orderOfBoundaryElements=1,

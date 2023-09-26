@@ -102,12 +102,12 @@ void LegacyCellProliferativeTypesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(
 }
 
 // Explicit instantiation
-template class LegacyCellProliferativeTypesWriter<1,1>;
-template class LegacyCellProliferativeTypesWriter<1,2>;
-template class LegacyCellProliferativeTypesWriter<2,2>;
-template class LegacyCellProliferativeTypesWriter<1,3>;
-template class LegacyCellProliferativeTypesWriter<2,3>;
-template class LegacyCellProliferativeTypesWriter<3,3>;
+template class LegacyCellProliferativeTypesWriter<1, 1>;
+template class LegacyCellProliferativeTypesWriter<1, 2>;
+template class LegacyCellProliferativeTypesWriter<2, 2>;
+template class LegacyCellProliferativeTypesWriter<1, 3>;
+template class LegacyCellProliferativeTypesWriter<2, 3>;
+template class LegacyCellProliferativeTypesWriter<3, 3>;
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer

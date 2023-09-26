@@ -49,16 +49,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestPapillaryFibreCalculatorLong : public CxxTest::TestSuite
 {
 public:
-    void TestGetFibreOrientationsOnCylinder(void)
+    void TestGetFibreOrientationsOnCylinder()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cylinder_14748_elem");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cylinder_14748_elem");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         PapillaryFibreCalculator calculator(mesh);
-        std::vector<c_vector<double,3> > fibre_orientations = calculator.CalculateFibreOrientations();
+        std::vector<c_vector<double, 3> > fibre_orientations = calculator.CalculateFibreOrientations();
 
-        for (unsigned i=0; i<fibre_orientations.size(); ++i)
+        for (unsigned i = 0; i<fibre_orientations.size(); ++i)
         {
             TS_ASSERT_DELTA(fibre_orientations[i](0), 0.0, 0.02);
             TS_ASSERT_DELTA(fibre_orientations[i](1), 0.0, 0.02);

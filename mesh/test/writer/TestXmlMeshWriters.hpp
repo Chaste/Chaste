@@ -63,11 +63,11 @@ public:
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
-        TrianglesMeshReader<3,3> reader("mesh/test/data/cube_2mm_12_elements");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> reader("mesh/test/data/cube_2mm_12_elements");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(reader);
 
-        VtkMeshWriter<3,3> writer("TestVtkMeshWriter", "cube_2mm_12_elements");
+        VtkMeshWriter<3, 3> writer("TestVtkMeshWriter", "cube_2mm_12_elements");
 
         TS_ASSERT_THROWS_NOTHING(writer.WriteFilesUsingMesh(mesh));
 
@@ -76,13 +76,13 @@ public:
 
         {
             //Check that the reader can see it
-            VtkMeshReader<3,3> vtk_reader(results_dir+"cube_2mm_12_elements.vtu");
+            VtkMeshReader<3, 3> vtk_reader(results_dir+"cube_2mm_12_elements.vtu");
             TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mesh.GetNumNodes());
             TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mesh.GetNumElements());
             TS_ASSERT_EQUALS(vtk_reader.GetNumFaces(), mesh.GetNumBoundaryElements());
 
             // Check we have the right number of nodes & elements when we re-construct it
-            TetrahedralMesh<3,3> vtk_mesh;
+            TetrahedralMesh<3, 3> vtk_mesh;
             vtk_mesh.ConstructFromMeshReader(vtk_reader);
             TS_ASSERT_EQUALS(mesh.GetNumNodes(), vtk_mesh.GetNumNodes());
             TS_ASSERT_EQUALS(mesh.GetNumElements(), vtk_mesh.GetNumElements());
@@ -98,11 +98,11 @@ public:
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
-        TrianglesMeshReader<3,3> reader("mesh/test/data/cube_2mm_12_elements");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> reader("mesh/test/data/cube_2mm_12_elements");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(reader);
 
-        VtkMeshWriter<3,3> writer("TestVtkMeshWriter", "cube_2mm_12_elements");
+        VtkMeshWriter<3, 3> writer("TestVtkMeshWriter", "cube_2mm_12_elements");
 
         TS_ASSERT_THROWS_THIS( writer.SetParallelFiles(mesh),
                                "Cannot write parallel files using a sequential mesh");
@@ -116,17 +116,17 @@ public:
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
-        TrianglesMeshReader<3,3> reader("mesh/test/data/cube_2mm_12_elements");
-        DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        TrianglesMeshReader<3, 3> reader("mesh/test/data/cube_2mm_12_elements");
+        DistributedTetrahedralMesh<3, 3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         mesh.ConstructFromMeshReader(reader);
 
-        VtkMeshWriter<3,3> writer("TestVtkMeshWriter", "cube_2mm_12_elements_with_data");
+        VtkMeshWriter<3, 3> writer("TestVtkMeshWriter", "cube_2mm_12_elements_with_data");
 
         writer.SetParallelFiles(mesh);
 
         // Add distance from origin into the node "point" data
         std::vector<double> distance;
-        for (DistributedTetrahedralMesh<3,3>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        for (DistributedTetrahedralMesh<3, 3>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
                node_iter != mesh.GetNodeIteratorEnd();
                ++node_iter)
         {
@@ -136,7 +136,7 @@ public:
 
         // Add location (vector) to "point" data
         std::vector< c_vector<double, 3> > location;
-        for (DistributedTetrahedralMesh<3,3>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        for (DistributedTetrahedralMesh<3, 3>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
                node_iter != mesh.GetNodeIteratorEnd();
                ++node_iter)
         {
@@ -146,7 +146,7 @@ public:
 
         // Add element quality into the element "cell" data
         std::vector<double> quality;
-        for (DistributedTetrahedralMesh<3,3>::ElementIterator ele_iter = mesh.GetElementIteratorBegin();
+        for (DistributedTetrahedralMesh<3, 3>::ElementIterator ele_iter = mesh.GetElementIteratorBegin();
                ele_iter != mesh.GetElementIteratorEnd();
                ++ele_iter)
         {
@@ -156,7 +156,7 @@ public:
 
         // Add fibre type to "cell" data
         std::vector< c_vector<double, 3> > centroid;
-        for (DistributedTetrahedralMesh<3,3>::ElementIterator ele_iter = mesh.GetElementIteratorBegin();
+        for (DistributedTetrahedralMesh<3, 3>::ElementIterator ele_iter = mesh.GetElementIteratorBegin();
                ele_iter != mesh.GetElementIteratorEnd();
                ++ele_iter)
         {
@@ -188,7 +188,7 @@ public:
         }
         {
             // Check that the reader can see it
-            VtkMeshReader<3,3> vtk_reader(filepath.str());
+            VtkMeshReader<3, 3> vtk_reader(filepath.str());
             TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mesh.GetNumLocalNodes() + mesh.GetNumHaloNodes());
             TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mesh.GetNumLocalElements());
 
@@ -203,7 +203,7 @@ public:
                 TS_ASSERT_EQUALS(distance[i], distance_read[i]);
             }
 
-            std::vector<c_vector<double,3> > location_read;
+            std::vector<c_vector<double, 3> > location_read;
             vtk_reader.GetPointData("Location", location_read);
             TS_ASSERT_EQUALS(location.size(), mesh.GetNumLocalNodes() );
             TS_ASSERT_EQUALS(location_read.size(), mesh.GetNumLocalNodes()  + mesh.GetNumHaloNodes());
@@ -224,7 +224,7 @@ public:
                 TS_ASSERT_EQUALS(quality[i], quality_read[i]);
             }
 
-            std::vector<c_vector<double,3> > centroid_read;
+            std::vector<c_vector<double, 3> > centroid_read;
             vtk_reader.GetCellData("Centroid", centroid_read);
             TS_ASSERT_EQUALS(centroid.size(), mesh.GetNumLocalElements() );
             TS_ASSERT_EQUALS(centroid_read.size(), mesh.GetNumLocalElements());
@@ -246,11 +246,11 @@ public:
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
-        TrianglesMeshReader<2,2> reader("mesh/test/data/2D_0_to_1mm_200_elements");
-        DistributedTetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> reader("mesh/test/data/2D_0_to_1mm_200_elements");
+        DistributedTetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(reader);
 
-        VtkMeshWriter<2,2> writer("TestVtkMeshWriter", "2D_0_to_1mm_200_elements_parallel_data", false);
+        VtkMeshWriter<2, 2> writer("TestVtkMeshWriter", "2D_0_to_1mm_200_elements_parallel_data", false);
         writer.SetParallelFiles(mesh);
         // Add distance from origin into the node "point" data
         std::vector<double> rank;
@@ -286,7 +286,7 @@ public:
 
         {
             // Check that the reader can see it
-            VtkMeshReader<2,2> vtk_reader(filepath.str());
+            VtkMeshReader<2, 2> vtk_reader(filepath.str());
             TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mesh.GetNumLocalNodes() + mesh.GetNumHaloNodes());
             TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mesh.GetNumLocalElements());
 
@@ -311,11 +311,11 @@ public:
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
-        TrianglesMeshReader<2,2> reader("mesh/test/data/2D_0_to_1mm_200_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> reader("mesh/test/data/2D_0_to_1mm_200_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(reader);
 
-        VtkMeshWriter<2,2> writer("TestVtkMeshWriter", "2D_0_to_1mm_200_elements", false);
+        VtkMeshWriter<2, 2> writer("TestVtkMeshWriter", "2D_0_to_1mm_200_elements", false);
 
         // Add distance from origin into the node "point" data
         std::vector<double> distance;
@@ -388,7 +388,7 @@ public:
 
         {
             // Check that the reader can see it
-            VtkMeshReader<2,2> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + "TestVtkMeshWriter/2D_0_to_1mm_200_elements.vtu");
+            VtkMeshReader<2, 2> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + "TestVtkMeshWriter/2D_0_to_1mm_200_elements.vtu");
             TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mesh.GetNumNodes());
             TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mesh.GetNumElements());
 
@@ -399,7 +399,7 @@ public:
             {
                 TS_ASSERT_EQUALS(distance[i], distance_read[i]);
             }
-            std::vector<c_vector<double,2> > location_read;
+            std::vector<c_vector<double, 2> > location_read;
             vtk_reader.GetPointData("Location", location_read);
             for (unsigned i = 0; i<location_read.size(); ++i)
             {
@@ -414,7 +414,7 @@ public:
             {
                 TS_ASSERT_EQUALS(quality[i], quality_read[i]);
             }
-            std::vector<c_vector<double,2> > centroid_read;
+            std::vector<c_vector<double, 2> > centroid_read;
             vtk_reader.GetCellData("Centroid", centroid_read);
             for (unsigned i = 0; i<centroid_read.size(); ++i)
             {
@@ -436,11 +436,11 @@ public:
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
-        TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_10_elements");
-        DistributedTetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> reader("mesh/test/data/1D_0_to_1_10_elements");
+        DistributedTetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(reader);
 
-        VtkMeshWriter<1,1> writer("TestVtkMeshWriter", "1D_0_to_1_10_elements_parallel_data", false);
+        VtkMeshWriter<1, 1> writer("TestVtkMeshWriter", "1D_0_to_1_10_elements_parallel_data", false);
         writer.SetParallelFiles(mesh);
         // Add distance from origin into the node "point" data
         std::vector<double> rank;
@@ -475,7 +475,7 @@ public:
         }
         {
             // Check that the reader can see it
-            VtkMeshReader<1,1> vtk_reader(filepath.str());
+            VtkMeshReader<1, 1> vtk_reader(filepath.str());
             TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mesh.GetNumLocalNodes() + mesh.GetNumHaloNodes());
             TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mesh.GetNumLocalElements());
 
@@ -500,23 +500,23 @@ public:
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
-        TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_10_elements");
-        DistributedTetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> reader("mesh/test/data/1D_0_to_1_10_elements");
+        DistributedTetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(reader);
 
-        VtkMeshWriter<1,1> writer("TestVtkMeshWriter", "1D_0_to_1_10_elements", false);
+        VtkMeshWriter<1, 1> writer("TestVtkMeshWriter", "1D_0_to_1_10_elements", false);
 
         writer.WriteFilesUsingMesh(mesh);
 
         if (PetscTools::AmMaster())
         {
             // Check that the reader can see it
-            VtkMeshReader<1,1> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + "TestVtkMeshWriter/1D_0_to_1_10_elements.vtu");
+            VtkMeshReader<1, 1> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + "TestVtkMeshWriter/1D_0_to_1_10_elements.vtu");
             TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mesh.GetNumNodes());
             TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mesh.GetNumElements());
 
             //Construct a mesh
-            TetrahedralMesh<1,1> read_mesh;
+            TetrahedralMesh<1, 1> read_mesh;
             read_mesh.ConstructFromMeshReader(vtk_reader);
             TS_ASSERT_DELTA(read_mesh.GetNode(5)->rGetLocation()[0], 0.5, 1e-8);
         }
@@ -531,11 +531,11 @@ public:
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
-        TrianglesMeshReader<3,3> reader("heart/test/data/UCSD_heart_decimated_173nodes");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> reader("heart/test/data/UCSD_heart_decimated_173nodes");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(reader);
 
-        VtkMeshWriter<3,3> writer("TestVtkMeshWriter", "heart_decimation", false);
+        VtkMeshWriter<3, 3> writer("TestVtkMeshWriter", "heart_decimation", false);
 
         // Add element quality into the element "cell" data
         std::vector<double> quality;
@@ -610,7 +610,7 @@ public:
 
         {
             // Check that the reader can see it
-            VtkMeshReader<3,3> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + "TestVtkMeshWriter/heart_decimation.vtu");
+            VtkMeshReader<3, 3> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + "TestVtkMeshWriter/heart_decimation.vtu");
             TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mesh.GetNumNodes());
             TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mesh.GetNumElements());
 
@@ -628,7 +628,7 @@ public:
                 TS_ASSERT_EQUALS(quality[i], quality_read[i]);
             }
 
-            std::vector<c_vector<double,3> > centroid_read;
+            std::vector<c_vector<double, 3> > centroid_read;
             vtk_reader.GetCellData("Centroid", centroid_read);
             TS_ASSERT_EQUALS(centroid_read.size(),centroid.size());
             ///\todo #1731 - need to read the tensors too.
@@ -644,16 +644,16 @@ public:
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/cylinder");
-        TrianglesMeshReader<3,3> reader(mesh_base);
-        MixedDimensionMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        TrianglesMeshReader<3, 3> reader(mesh_base);
+        MixedDimensionMesh<3, 3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         mesh.ConstructFromMeshReader(reader);
 
-        VtkMeshWriter<3,3> writer("TestVtkMeshWriter", "mixed_mesh_3d", false);
+        VtkMeshWriter<3, 3> writer("TestVtkMeshWriter", "mixed_mesh_3d", false);
         writer.SetParallelFiles(mesh);
 
         // Add element quality into the element "cell" data
          std::vector<double> quality;
-         for (DistributedTetrahedralMesh<3,3>::ElementIterator ele_iter = mesh.GetElementIteratorBegin();
+         for (DistributedTetrahedralMesh<3, 3>::ElementIterator ele_iter = mesh.GetElementIteratorBegin();
                 ele_iter != mesh.GetElementIteratorEnd();
                 ++ele_iter)
          {
@@ -663,7 +663,7 @@ public:
 
         // Add fibre type to "cell" data
         std::vector< c_vector<double, 3> > centroid;
-        for (DistributedTetrahedralMesh<3,3>::ElementIterator ele_iter = mesh.GetElementIteratorBegin();
+        for (DistributedTetrahedralMesh<3, 3>::ElementIterator ele_iter = mesh.GetElementIteratorBegin();
                ele_iter != mesh.GetElementIteratorEnd();
                ++ele_iter)
         {
@@ -684,11 +684,11 @@ public:
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
-        TrianglesMeshReader<2,2> reader("mesh/test/data/2D_0_to_1mm_200_elements");
+        TrianglesMeshReader<2, 2> reader("mesh/test/data/2D_0_to_1mm_200_elements");
         QuadraticMesh<2> mesh;
         mesh.ConstructFromLinearMeshReader(reader);
 
-        VtkMeshWriter<2,2> writer("TestVtkMeshWriter", "2D_0_to_1mm_200_elements_quadratic", false);
+        VtkMeshWriter<2, 2> writer("TestVtkMeshWriter", "2D_0_to_1mm_200_elements_quadratic", false);
 
         // Add distance from origin into the node "point" data
         std::vector<double> distance;
@@ -727,7 +727,7 @@ public:
 
         {
             // Check that the reader can see it
-            VtkMeshReader<2,2> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + "TestVtkMeshWriter/2D_0_to_1mm_200_elements_quadratic.vtu");
+            VtkMeshReader<2, 2> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + "TestVtkMeshWriter/2D_0_to_1mm_200_elements_quadratic.vtu");
             TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mesh.GetNumNodes());
             TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mesh.GetNumElements());
 
@@ -738,7 +738,7 @@ public:
             {
                 TS_ASSERT_EQUALS(distance[i], distance_read[i]);
             }
-            std::vector<c_vector<double,2> > location_read;
+            std::vector<c_vector<double, 2> > location_read;
             vtk_reader.GetPointData("Location", location_read);
             for (unsigned i = 0; i<location_read.size(); ++i)
             {
@@ -753,7 +753,7 @@ public:
             {
                 TS_ASSERT_EQUALS(quality[i], quality_read[i]);
             }
-            std::vector<c_vector<double,2> > centroid_read;
+            std::vector<c_vector<double, 2> > centroid_read;
             vtk_reader.GetCellData("Centroid", centroid_read);
             for (unsigned i = 0; i<centroid_read.size(); ++i)
             {
@@ -773,11 +773,11 @@ public:
     {
 #ifdef CHASTE_VTK
 // Requires  "sudo aptitude install libvtk5-dev" or similar
-        TrianglesMeshReader<3,3> reader("mesh/test/data/cube_2mm_12_elements");
+        TrianglesMeshReader<3, 3> reader("mesh/test/data/cube_2mm_12_elements");
         QuadraticMesh<3> mesh;
         mesh.ConstructFromLinearMeshReader(reader);
 
-        VtkMeshWriter<3,3> writer("TestVtkMeshWriter", "cube_2mm_12_elements_quadratic", false);
+        VtkMeshWriter<3, 3> writer("TestVtkMeshWriter", "cube_2mm_12_elements_quadratic", false);
 
         TS_ASSERT_THROWS_NOTHING(writer.WriteFilesUsingMesh(mesh));
 
@@ -786,7 +786,7 @@ public:
 
         {
             //Check that the reader can see it
-            VtkMeshReader<3,3> vtk_reader(results_dir+"cube_2mm_12_elements_quadratic.vtu");
+            VtkMeshReader<3, 3> vtk_reader(results_dir+"cube_2mm_12_elements_quadratic.vtu");
             TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mesh.GetNumNodes());
             TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mesh.GetNumElements());
 
@@ -803,17 +803,17 @@ public:
     void TestVtkMeshWriter1Din3D()
     {
 #ifdef CHASTE_VTK
-        TrianglesMeshReader<1,3> reader("mesh/test/data/branched_1d_in_3d_mesh");
-        TetrahedralMesh<1,3> mesh;
+        TrianglesMeshReader<1, 3> reader("mesh/test/data/branched_1d_in_3d_mesh");
+        TetrahedralMesh<1, 3> mesh;
         mesh.ConstructFromMeshReader(reader);
 
-        VtkMeshWriter<1,3> writer("TestVtkMeshWriter", "branched_1d_in_3d_mesh", false);
+        VtkMeshWriter<1, 3> writer("TestVtkMeshWriter", "branched_1d_in_3d_mesh", false);
 
         TS_ASSERT_THROWS_NOTHING(writer.WriteFilesUsingMesh(mesh));
 
         {
             // Check that the reader can see it
-            VtkMeshReader<1,3> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + "TestVtkMeshWriter/branched_1d_in_3d_mesh.vtu");
+            VtkMeshReader<1, 3> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + "TestVtkMeshWriter/branched_1d_in_3d_mesh.vtu");
             TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mesh.GetNumNodes());
             TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mesh.GetNumElements());
 
@@ -832,17 +832,17 @@ public:
     void TestVtkMeshWriterWithSurfaceMesh()
     {
 #ifdef CHASTE_VTK
-        VtkMeshReader<2,3> mesh_reader("mesh/test/data/cylinder.vtu");
-        TetrahedralMesh<2,3> mesh;
+        VtkMeshReader<2, 3> mesh_reader("mesh/test/data/cylinder.vtu");
+        TetrahedralMesh<2, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        VtkMeshWriter<2,3> writer("TestVtkMeshWriter", "cylinder", false);
+        VtkMeshWriter<2, 3> writer("TestVtkMeshWriter", "cylinder", false);
 
         TS_ASSERT_THROWS_NOTHING(writer.WriteFilesUsingMesh(mesh));
 
         {
             // Check that the reader can see it
-            VtkMeshReader<2,3> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + "TestVtkMeshWriter/cylinder.vtu");
+            VtkMeshReader<2, 3> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + "TestVtkMeshWriter/cylinder.vtu");
             TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mesh.GetNumNodes());
             TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mesh.GetNumElements());
 
@@ -859,9 +859,9 @@ public:
     void TestXdmfWriter()
     {
         /*Read as ascii*/
-        TrianglesMeshReader<3,3> reader("mesh/test/data/simple_cube");
+        TrianglesMeshReader<3, 3> reader("mesh/test/data/simple_cube");
 
-        XdmfMeshWriter<3,3> writer_from_reader("TestXdmfMeshWriter", "simple_cube", false);
+        XdmfMeshWriter<3, 3> writer_from_reader("TestXdmfMeshWriter", "simple_cube", false);
 #ifdef _MSC_VER
         if (PetscTools::AmMaster()) // Only the master does anything when using a mesh reader
         {
@@ -879,9 +879,9 @@ public:
                        "mesh/test/data/TestXdmfMeshWriter/simple_cube_topology_0.xml").CompareFiles();
 #endif // _MSC_VER
 
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(reader);
-        XdmfMeshWriter<3,3> writer_from_mesh("TestXdmfMeshWriter", "simple_cube_from_mesh", false);
+        XdmfMeshWriter<3, 3> writer_from_mesh("TestXdmfMeshWriter", "simple_cube_from_mesh", false);
 #ifdef _MSC_VER
         TS_ASSERT_THROWS_THIS(writer_from_mesh.WriteFilesUsingMesh(mesh), "XDMF is not supported under Windows at present.");
 #else
@@ -901,9 +901,9 @@ public:
     {
 #ifndef _MSC_VER
         /*Read as ascii*/
-        TrianglesMeshReader<2,2> reader("mesh/test/data/disk_522_elements");
+        TrianglesMeshReader<2, 2> reader("mesh/test/data/disk_522_elements");
 
-        XdmfMeshWriter<2,2> writer_from_reader("TestXdmfMeshWriter", "disk", false);
+        XdmfMeshWriter<2, 2> writer_from_reader("TestXdmfMeshWriter", "disk", false);
         writer_from_reader.WriteFilesUsingMeshReader(reader);
 
         //Check that the files are the same as previously
@@ -914,9 +914,9 @@ public:
         FileComparison(OutputFileHandler::GetChasteTestOutputDirectory() + "TestXdmfMeshWriter/disk_topology_0.xml",
                        "mesh/test/data/TestXdmfMeshWriter/disk_topology_0.xml").CompareFiles();
 
-        TetrahedralMesh<2,2> mesh;
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(reader);
-        XdmfMeshWriter<2,2> writer_from_mesh("TestXdmfMeshWriter", "disk_from_mesh", false);
+        XdmfMeshWriter<2, 2> writer_from_mesh("TestXdmfMeshWriter", "disk_from_mesh", false);
         writer_from_mesh.WriteFilesUsingMesh(mesh);
 
         //Just check that the files are there
@@ -932,11 +932,11 @@ public:
     void TestXdmfWriterDistributed()
     {
 #ifndef _MSC_VER
-        TrianglesMeshReader<3,3> reader("mesh/test/data/simple_cube");
-        DistributedTetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> reader("mesh/test/data/simple_cube");
+        DistributedTetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(reader);
 
-        XdmfMeshWriter<3,3> writer_from_mesh("TestXdmfMeshWriter", "simple_cube_dist", false);
+        XdmfMeshWriter<3, 3> writer_from_mesh("TestXdmfMeshWriter", "simple_cube_dist", false);
         writer_from_mesh.WriteFilesUsingMesh(mesh);
 
         if (PetscTools::AmMaster())

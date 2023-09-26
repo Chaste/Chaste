@@ -46,16 +46,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 
 
-class CentroidWriter : public AbstractPerElementWriter<3,3,3>
+class CentroidWriter : public AbstractPerElementWriter<3, 3, 3>
 {
 public:
     CentroidWriter(AbstractTetrahedralMesh<3, 3>* pMesh)
-     : AbstractPerElementWriter<3,3,3>(pMesh)
+     : AbstractPerElementWriter<3, 3, 3>(pMesh)
     {
     }
 
 private:
-    void Visit(Element<3,3>* pElement, unsigned localElementIndex, c_vector<double, 3>& rData)
+    void Visit(Element<3, 3>* pElement, unsigned localElementIndex, c_vector<double, 3>& rData)
     {
         rData = pElement->CalculateCentroid();
         //Check for a data invariant
@@ -63,20 +63,20 @@ private:
     }
 };
 
-class CentroidWithIndexWriter : public AbstractPerElementWriter<3,3,4>
+class CentroidWithIndexWriter : public AbstractPerElementWriter<3, 3,4>
 {
 public:
     CentroidWithIndexWriter(AbstractTetrahedralMesh<3, 3>* pMesh)
-     : AbstractPerElementWriter<3,3,4>(pMesh)
+     : AbstractPerElementWriter<3, 3,4>(pMesh)
     {
     }
 
 private:
-    void Visit(Element<3,3>* pElement, unsigned localElementIndex, c_vector<double, 4>& rData)
+    void Visit(Element<3, 3>* pElement, unsigned localElementIndex, c_vector<double, 4>& rData)
     {
-        c_vector<double,3> centroid = pElement->CalculateCentroid();
+        c_vector<double, 3> centroid = pElement->CalculateCentroid();
         rData[0] = pElement->GetIndex();
-        for (unsigned i=0; i<3; ++i)
+        for (unsigned i = 0; i<3; ++i)
         {
             rData[i+1] = centroid[i];
         }
@@ -106,7 +106,7 @@ public:
 
     void TestPerElement()
     {
-        DistributedTetrahedralMesh<3,3> mesh;
+        DistributedTetrahedralMesh<3, 3> mesh;
         mesh.ConstructCuboid(2, 3, 4);
         OutputFileHandler handler("TestPerElementWriter");
 

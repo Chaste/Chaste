@@ -90,7 +90,7 @@ DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::DistributedTetrahedralMesh(D
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::~DistributedTetrahedralMesh()
 {
-    for (unsigned i=0; i<this->mHaloNodes.size(); ++i)
+    for (unsigned i = 0; i<this->mHaloNodes.size(); ++i)
     {
         delete this->mHaloNodes[i];
     }
@@ -99,7 +99,7 @@ DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::~DistributedTetrahedralMesh(
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::SetDistributedVectorFactory(DistributedVectorFactory* pFactory)
 {
-    AbstractMesh<ELEMENT_DIM,SPACE_DIM>::SetDistributedVectorFactory(pFactory);
+    AbstractMesh<ELEMENT_DIM, SPACE_DIM>::SetDistributedVectorFactory(pFactory);
     mPartitioning = DistributedTetrahedralMeshPartitionType::DUMB;
 }
 
@@ -289,7 +289,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
     {
         // Ascii : Sequentially load all the nodes and store those owned (or halo-owned) by the process
         ///\todo #1930 We should use a reader set iterator for this bit now.
-        for (unsigned node_index=0; node_index < mTotalNumNodes; ++node_index)
+        for (unsigned node_index = 0; node_index < mTotalNumNodes; ++node_index)
         {
             std::vector<double> coords;
             /// \todo #1289 assert the node is not considered both owned and halo-owned.
@@ -327,14 +327,14 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
         unsigned global_element_index = elem_it.GetIndex();
 
         std::vector<Node<SPACE_DIM>*> nodes;
-        for (unsigned j=0; j<ELEMENT_DIM+1; ++j)
+        for (unsigned j = 0; j<ELEMENT_DIM+1; ++j)
         {
             // Because we have populated mNodes and mHaloNodes above, we can now use this method, which should never throw
             nodes.push_back(this->GetNodeOrHaloNode(element_data.NodeIndices[j]));
         }
 
         RegisterElement(global_element_index);
-        Element<ELEMENT_DIM,SPACE_DIM>* p_element = new Element<ELEMENT_DIM,SPACE_DIM>(global_element_index, nodes);
+        Element<ELEMENT_DIM, SPACE_DIM>* p_element = new Element<ELEMENT_DIM, SPACE_DIM>(global_element_index, nodes);
         this->mElements.push_back(p_element);
 
         if (rMeshReader.GetNumElementAttributes() > 0)
@@ -348,14 +348,14 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
     // Boundary nodes and elements
     try
     {
-        for (unsigned face_index=0; face_index<mTotalNumBoundaryElements; face_index++)
+        for (unsigned face_index = 0; face_index<mTotalNumBoundaryElements; face_index++)
         {
             ElementData face_data = rMeshReader.GetNextFaceData();
             std::vector<unsigned> node_indices = face_data.NodeIndices;
 
             bool own = false;
 
-            for (unsigned node_index=0; node_index<node_indices.size(); ++node_index)
+            for (unsigned node_index = 0; node_index<node_indices.size(); ++node_index)
             {
                 // if I own this node
                 if (mNodesMapping.find(node_indices[node_index]) != mNodesMapping.end())
@@ -374,7 +374,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
             //std::set<unsigned> containing_element_indices; // Elements that contain this face
             std::vector<Node<SPACE_DIM>*> nodes;
 
-            for (unsigned node_index=0; node_index<node_indices.size(); ++node_index)
+            for (unsigned node_index = 0; node_index<node_indices.size(); ++node_index)
             {
                 //because we have populated mNodes and mHaloNodes above, we can now use this method,
                 //which SHOULD never throw (but it does).
@@ -390,7 +390,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
 
             // This is a boundary face
             // Ensure all its nodes are marked as boundary nodes
-            for (unsigned j=0; j<nodes.size(); ++j)
+            for (unsigned j = 0; j<nodes.size(); ++j)
             {
                 if (!nodes[j]->IsBoundaryNode())
                 {
@@ -402,7 +402,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader
             }
 
             RegisterBoundaryElement(face_index);
-            BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>* p_boundary_element = new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(face_index, nodes);
+            BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>* p_boundary_element = new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(face_index, nodes);
             this->mBoundaryElements.push_back(p_boundary_element);
 
             if (rMeshReader.GetNumFaceAttributes() > 0)
@@ -516,13 +516,13 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetHaloNodeIndices(std:
 {
     //Make sure the output vector is empty
     rHaloIndices.clear();
-    for (unsigned i=0; i<mHaloNodes.size(); ++i)
+    for (unsigned i = 0; i<mHaloNodes.size(); ++i)
     {
         rHaloIndices.push_back(mHaloNodes[i]->GetIndex());
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ChasteCuboid<SPACE_DIM>*  DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetProcessRegion()
 {
     if (mpSpaceRegion == nullptr)
@@ -532,20 +532,20 @@ ChasteCuboid<SPACE_DIM>*  DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Ge
     return mpSpaceRegion;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::SetElementOwnerships()
 {
     // All the local elements are owned by the processor (obviously...)
     //Does nothing - unlike the non-distributed version
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::SetProcessRegion(ChasteCuboid<SPACE_DIM>* pRegion)
 {
     mpSpaceRegion = pRegion;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateDesignatedOwnershipOfElement( unsigned elementIndex )
 {
     try
@@ -558,7 +558,7 @@ bool DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateDesignatedOwne
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateDesignatedOwnershipOfBoundaryElement( unsigned faceIndex )
 {
     try
@@ -571,31 +571,31 @@ bool DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateDesignatedOwne
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::RegisterNode(unsigned index)
 {
     mNodesMapping[index] = this->mNodes.size();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::RegisterHaloNode(unsigned index)
 {
     mHaloNodesMapping[index] = mHaloNodes.size();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::RegisterElement(unsigned index)
 {
     mElementsMapping[index] = this->mElements.size();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::RegisterBoundaryElement(unsigned index)
 {
     mBoundaryElementsMapping[index] = this->mBoundaryElements.size();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::SolveNodeMapping(unsigned index) const
 {
     std::map<unsigned, unsigned>::const_iterator node_position = mNodesMapping.find(index);
@@ -607,14 +607,14 @@ unsigned DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::SolveNodeMapping(un
     return node_position->second;
 }
 
-//template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+//template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 //unsigned DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::SolveHaloNodeMapping(unsigned index)
 //{
 //    assert(mHaloNodesMapping.find(index) != mHaloNodesMapping.end());
 //    return mHaloNodesMapping[index];
 //}
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::SolveElementMapping(unsigned index) const
 {
     std::map<unsigned, unsigned>::const_iterator element_position = mElementsMapping.find(index);
@@ -627,7 +627,7 @@ unsigned DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::SolveElementMapping
     return element_position->second;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::SolveBoundaryElementMapping(unsigned index) const
 {
     std::map<unsigned, unsigned>::const_iterator boundary_element_position = mBoundaryElementsMapping.find(index);
@@ -640,7 +640,7 @@ unsigned DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::SolveBoundaryElemen
     return boundary_element_position->second;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 Node<SPACE_DIM> * DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNodeOrHaloNode(unsigned index) const
 {
     std::map<unsigned, unsigned>::const_iterator node_position;
@@ -659,7 +659,7 @@ Node<SPACE_DIM> * DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNodeOrH
     EXCEPTION("Requested node/halo " << index << " does not belong to processor " << PetscTools::GetMyRank());
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ReorderNodes()
 {
     assert(PetscTools::IsParallel());
@@ -669,7 +669,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ReorderNodes()
     mHaloNodesMapping.clear();
 
     // Update indices
-    for (unsigned index=0; index<this->mNodes.size(); index++)
+    for (unsigned index = 0; index<this->mNodes.size(); index++)
     {
         unsigned old_index = this->mNodes[index]->GetIndex();
         unsigned new_index = this->mNodePermutation[old_index];
@@ -678,7 +678,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ReorderNodes()
         mNodesMapping[new_index] = index;
     }
 
-    for (unsigned index=0; index<mHaloNodes.size(); index++)
+    for (unsigned index = 0; index<mHaloNodes.size(); index++)
     {
         unsigned old_index = mHaloNodes[index]->GetIndex();
         unsigned new_index = this->mNodePermutation[old_index];
@@ -688,7 +688,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ReorderNodes()
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(unsigned width)
 {
     if constexpr (ELEMENT_DIM == 1)
@@ -710,8 +710,8 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(uns
             // Write a serial file, the load on distributed processors.
             ///\todo probably faster to make mesh from scratch.
             {
-                TrianglesMeshWriter<ELEMENT_DIM,SPACE_DIM> mesh_writer("", "temp_linear_mesh");
-                TetrahedralMesh<ELEMENT_DIM,SPACE_DIM> base_mesh;
+                TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM> mesh_writer("", "temp_linear_mesh");
+                TetrahedralMesh<ELEMENT_DIM, SPACE_DIM> base_mesh;
                 base_mesh.ConstructLinearMesh(width);
                 mesh_writer.WriteFilesUsingMesh(base_mesh);
             }
@@ -720,7 +720,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(uns
             OutputFileHandler output_handler("", false);
 
             std::string output_dir = output_handler.GetOutputDirectoryFullPath();
-            TrianglesMeshReader<ELEMENT_DIM,SPACE_DIM> mesh_reader(output_dir+"temp_linear_mesh");
+            TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM> mesh_reader(output_dir+"temp_linear_mesh");
 
             this->ConstructFromMeshReader(mesh_reader);
         }
@@ -783,13 +783,13 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(uns
                     {
                         this->mBoundaryNodes.push_back(p_node);
                         RegisterBoundaryElement(0);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(0, p_node));
+                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(0, p_node));
                     }
                     if (node_index == width) // create right boundary node and boundary element
                     {
                         this->mBoundaryNodes.push_back(p_node);
                         RegisterBoundaryElement(1);
-                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(1, p_node));
+                        this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(1, p_node));
                     }
                     }
                 if (node_index>lo_node) // create element
@@ -798,7 +798,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(uns
                     nodes.push_back(p_old_node);
                     nodes.push_back(p_node);
                     RegisterElement(node_index-1);
-                    this->mElements.push_back(new Element<ELEMENT_DIM,SPACE_DIM>(node_index-1, nodes));
+                    this->mElements.push_back(new Element<ELEMENT_DIM, SPACE_DIM>(node_index-1, nodes));
                 }
                 // Keep track of the node which we've just created
                 p_old_node = p_node;
@@ -811,7 +811,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructLinearMesh(uns
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMesh(unsigned width, unsigned height, bool stagger)
 {
     if constexpr (SPACE_DIM == 2 && ELEMENT_DIM == 2)
@@ -833,8 +833,8 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMes
             // Write a serial file, the load on distributed processors.
             ///\todo probably faster to make mesh from scratch.
             {
-                TrianglesMeshWriter<ELEMENT_DIM,SPACE_DIM> mesh_writer("", "temp_rectangular_mesh");
-                TetrahedralMesh<ELEMENT_DIM,SPACE_DIM> base_mesh;
+                TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM> mesh_writer("", "temp_rectangular_mesh");
+                TetrahedralMesh<ELEMENT_DIM, SPACE_DIM> base_mesh;
                 base_mesh.ConstructRectangularMesh(width, height);
                 mesh_writer.WriteFilesUsingMesh(base_mesh);
             }
@@ -843,7 +843,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMes
             OutputFileHandler output_handler("", false);
 
             std::string output_dir = output_handler.GetOutputDirectoryFullPath();
-            TrianglesMeshReader<ELEMENT_DIM,SPACE_DIM> mesh_reader(output_dir+"temp_rectangular_mesh");
+            TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM> mesh_reader(output_dir+"temp_rectangular_mesh");
 
             this->ConstructFromMeshReader(mesh_reader);
         }
@@ -891,7 +891,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMes
             //Construct the nodes
             for (unsigned j=lo_y; j<hi_y; ++j)
             {
-                for (unsigned i=0; i<width+1; ++i)
+                for (unsigned i = 0; i<width+1; ++i)
                 {
                     bool is_boundary=false;
                     if (i==0 || j==0 || i==width || j==height)
@@ -923,14 +923,14 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMes
             //Top
             if (am_top_most)
             {
-            for (unsigned i=0; i<width; ++i)
+            for (unsigned i = 0; i<width; ++i)
             {
                     std::vector<Node<SPACE_DIM>*> nodes;
                     nodes.push_back(GetNodeOrHaloNode( height*(width+1)+i+1 ));
                     nodes.push_back(GetNodeOrHaloNode( height*(width+1)+i ));
                     belem_index=i;
                     RegisterBoundaryElement(belem_index);
-                    this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index,nodes));
+                    this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index,nodes));
                 }
             }
 
@@ -942,20 +942,20 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMes
                 nodes.push_back(GetNodeOrHaloNode( (width+1)*(j+1)-1 ));
                 belem_index=width+j-1;
                 RegisterBoundaryElement(belem_index);
-                this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index,nodes));
+                this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index,nodes));
             }
 
             //Bottom
             if (PetscTools::AmMaster())
             {
-                for (unsigned i=0; i<width; ++i)
+                for (unsigned i = 0; i<width; ++i)
                 {
                     std::vector<Node<SPACE_DIM>*> nodes;
                     nodes.push_back(GetNodeOrHaloNode( i ));
                     nodes.push_back(GetNodeOrHaloNode( i+1 ));
                     belem_index=width+height+i;
                     RegisterBoundaryElement(belem_index);
-                    this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index,nodes));
+                    this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index,nodes));
                 }
             }
 
@@ -967,7 +967,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMes
                 nodes.push_back(GetNodeOrHaloNode( (width+1)*(j) ));
                 belem_index=2*width+height+j;
                 RegisterBoundaryElement(belem_index);
-                this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index,nodes));
+                this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index,nodes));
             }
 
 
@@ -975,7 +975,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMes
             unsigned elem_index;
             for (unsigned j=lo_y; j<hi_y-1; ++j)
             {
-                for (unsigned i=0; i<width; ++i)
+                for (unsigned i = 0; i<width; ++i)
                 {
                     unsigned parity=(i+(height-j))%2;//Note that parity is measured from the top-left (not bottom left) for historical reasons
                     unsigned nw=(j+1)*(width+1)+i; //ne=nw+1
@@ -993,7 +993,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMes
                     }
                     elem_index=2*(j*width+i);
                     RegisterElement(elem_index);
-                    this->mElements.push_back(new Element<ELEMENT_DIM,SPACE_DIM>(elem_index,upper_nodes));
+                    this->mElements.push_back(new Element<ELEMENT_DIM, SPACE_DIM>(elem_index,upper_nodes));
                     std::vector<Node<SPACE_DIM>*> lower_nodes;
                     lower_nodes.push_back(GetNodeOrHaloNode( sw+1 ));
                     lower_nodes.push_back(GetNodeOrHaloNode( sw ));
@@ -1007,7 +1007,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMes
                     }
                     elem_index++;
                     RegisterElement(elem_index);
-                    this->mElements.push_back(new Element<ELEMENT_DIM,SPACE_DIM>(elem_index,lower_nodes));
+                    this->mElements.push_back(new Element<ELEMENT_DIM, SPACE_DIM>(elem_index,lower_nodes));
                 }
             }
         }
@@ -1019,7 +1019,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructRectangularMes
 }
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigned width,
         unsigned height,
         unsigned depth)
@@ -1043,8 +1043,8 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
             // Write a serial file, the load on distributed processors.
             ///\todo probably faster to make mesh from scratch.
             {
-                TrianglesMeshWriter<ELEMENT_DIM,SPACE_DIM> mesh_writer("", "temp_cuboid_mesh");
-                TetrahedralMesh<ELEMENT_DIM,SPACE_DIM> base_mesh;
+                TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM> mesh_writer("", "temp_cuboid_mesh");
+                TetrahedralMesh<ELEMENT_DIM, SPACE_DIM> base_mesh;
                 base_mesh.ConstructCuboid(width, height, depth);
                 mesh_writer.WriteFilesUsingMesh(base_mesh);
             }
@@ -1053,7 +1053,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
             OutputFileHandler output_handler("", false);
 
             std::string output_dir = output_handler.GetOutputDirectoryFullPath();
-            TrianglesMeshReader<ELEMENT_DIM,SPACE_DIM> mesh_reader(output_dir+"temp_cuboid_mesh");
+            TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM> mesh_reader(output_dir+"temp_cuboid_mesh");
 
             this->ConstructFromMeshReader(mesh_reader);
         }
@@ -1102,9 +1102,9 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
             unsigned global_node_index;
             for (unsigned k=lo_z; k<hi_z; ++k)
             {
-                for (unsigned j=0; j<height+1; ++j)
+                for (unsigned j = 0; j<height+1; ++j)
                 {
-                    for (unsigned i=0; i<width+1; ++i)
+                    for (unsigned i = 0; i<width+1; ++i)
                     {
                         bool is_boundary = false;
                         if (i==0 || j==0 || k==0 || i==width || j==height || k==depth)
@@ -1151,9 +1151,9 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
                     belem_index =   2*(height*width+k*2*(height+width));
                 }
 
-                for (unsigned j=0; j<height; ++j)
+                for (unsigned j = 0; j<height; ++j)
                 {
-                    for (unsigned i=0; i<width; ++i)
+                    for (unsigned i = 0; i<width; ++i)
                     {
                         // Compute the nodes' index
                         unsigned global_node_indices[8];
@@ -1184,7 +1184,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
                             }
                             unsigned elem_index = 6 * ((k*height+j)*width+i)+m;
                             RegisterElement(elem_index);
-                            this->mElements.push_back(new Element<ELEMENT_DIM,SPACE_DIM>(elem_index, tetrahedra_nodes));
+                            this->mElements.push_back(new Element<ELEMENT_DIM, SPACE_DIM>(elem_index, tetrahedra_nodes));
                         }
 
                         //Are we at a boundary?
@@ -1197,13 +1197,13 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[2] ));
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[6] ));
                             RegisterBoundaryElement(belem_index);
-                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,triangle_nodes));
                             triangle_nodes.clear();
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[0] ));
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[6] ));
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[4] ));
                             RegisterBoundaryElement(belem_index);
-                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,triangle_nodes));
                         }
                         if (i == width-1) //high face at x=width
                         {
@@ -1212,13 +1212,13 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[5] ));
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[7] ));
                             RegisterBoundaryElement(belem_index);
-                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,triangle_nodes));
                             triangle_nodes.clear();
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[1] ));
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[7] ));
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[3] ));
                             RegisterBoundaryElement(belem_index);
-                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,triangle_nodes));
                         }
                         if (j == 0) //low face at y==0
                         {
@@ -1227,13 +1227,13 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[5] ));
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[1] ));
                             RegisterBoundaryElement(belem_index);
-                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,triangle_nodes));
                             triangle_nodes.clear();
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[0] ));
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[4] ));
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[5] ));
                             RegisterBoundaryElement(belem_index);
-                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,triangle_nodes));
                         }
                         if (j == height-1) //high face at y=height
                         {
@@ -1242,13 +1242,13 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[3] ));
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[7] ));
                             RegisterBoundaryElement(belem_index);
-                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,triangle_nodes));
                             triangle_nodes.clear();
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[2] ));
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[7] ));
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[6] ));
                             RegisterBoundaryElement(belem_index);
-                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,triangle_nodes));
                         }
                         if (k == 0) //low face at z==0
                         {
@@ -1257,13 +1257,13 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[3] ));
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[2] ));
                             RegisterBoundaryElement(belem_index);
-                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,triangle_nodes));
                             triangle_nodes.clear();
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[0] ));
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[1] ));
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[3] ));
                             RegisterBoundaryElement(belem_index);
-                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,triangle_nodes));
                         }
                         if (k == depth-1) //high face at z=depth
                         {
@@ -1272,13 +1272,13 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[7] ));
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[5] ));
                             RegisterBoundaryElement(belem_index);
-                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,triangle_nodes));
                             triangle_nodes.clear();
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[4] ));
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[6] ));
                             triangle_nodes.push_back(GetNodeOrHaloNode( global_node_indices[7] ));
                             RegisterBoundaryElement(belem_index);
-                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>(belem_index++,triangle_nodes));
+                            this->mBoundaryElements.push_back(new BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>(belem_index++,triangle_nodes));
                         }
                     }//i
                 }//j
@@ -1291,13 +1291,13 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructCuboid(unsigne
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Scale(const double xFactor, const double yFactor, const double zFactor)
 {
     //Base class scale (scales node positions)
     AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Scale(xFactor, yFactor, zFactor);
     //Scales halos
-    for (unsigned i=0; i<mHaloNodes.size(); ++i)
+    for (unsigned i = 0; i<mHaloNodes.size(); ++i)
     {
         c_vector<double, SPACE_DIM>& r_location = mHaloNodes[i]->rGetModifiableLocation();
         if (SPACE_DIM>=3)
@@ -1314,7 +1314,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Scale(const double xFac
 }
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndElementPartitioning(
         AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
         std::set<unsigned>& rElementsOwned,
@@ -1379,7 +1379,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
             element_data = rMeshReader.GetNextElementData();
 
             eptr[element_index] = counter;
-            for (unsigned i=0; i<ELEMENT_DIM+1; ++i)
+            for (unsigned i = 0; i<ELEMENT_DIM+1; ++i)
             {
                 eind[counter++] = element_data.NodeIndices[i];
             }
@@ -1424,7 +1424,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
         idxtype edgecut;
         boost::scoped_array<real_t> tpwgts(new real_t[n_subdomains]);
         real_t ubvec_value = (real_t)1.05;
-        for (unsigned proc=0; proc<PetscTools::GetNumProcs(); proc++)
+        for (unsigned proc = 0; proc<PetscTools::GetNumProcs(); proc++)
         {
             tpwgts[proc] = ((real_t)1.0)/n_subdomains;
         }
@@ -1459,7 +1459,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
             mpi_idxtype = MPI_INT;
         }
         boost::scoped_array<int> int_element_distribution(new int[num_procs+1]);
-        for (unsigned i=0; i<num_procs+1; ++i)
+        for (unsigned i = 0; i<num_procs+1; ++i)
         {
             int_element_distribution[i] = element_distribution[i];
         }
@@ -1468,7 +1468,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
 
         local_partition.reset();
 
-        for (unsigned elem_index=0; elem_index<num_elements; elem_index++)
+        for (unsigned elem_index = 0; elem_index<num_elements; elem_index++)
         {
             if (static_cast<unsigned>(global_element_partition[elem_index]) == local_proc_index)
             {
@@ -1610,7 +1610,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
 
         this->mNodePermutation.resize(this->GetNumNodes());
 
-        for (unsigned node_index=0; node_index<this->GetNumNodes(); ++node_index)
+        for (unsigned node_index = 0; node_index<this->GetNumNodes(); ++node_index)
         {
             unsigned partition = global_node_partition[node_index];
             assert(partition != UNASSIGNED_NODE);
@@ -1626,7 +1626,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ChasteCuboid<SPACE_DIM> DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingBox() const
 {
     ChastePoint<SPACE_DIM> my_minimum_point;
@@ -1660,7 +1660,7 @@ ChasteCuboid<SPACE_DIM> DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Calc
     return ChasteCuboid<SPACE_DIM>(min, max);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestNodeIndex(const ChastePoint<SPACE_DIM>& rTestPoint)
 {
     // Call base method to find closest on local processor
@@ -1690,7 +1690,7 @@ unsigned DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetNearestNodeIndex
     return minval.node_index;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, 2> DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMinMaxEdgeLengths()
 {
     c_vector<double, 2> local_min_max =  AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMinMaxEdgeLengths();
@@ -1702,7 +1702,7 @@ c_vector<double, 2> DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Calculat
     return global_min_max;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::HaloNodeIterator DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetHaloNodeIteratorBegin() const
 {
     return mHaloNodes.begin();
@@ -1712,13 +1712,13 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Rotate(c_matrix<double, SPACE_DIM, SPACE_DIM> rotationMatrix)
 {
     // First do the extras
-    for (unsigned i=0; i<this->mHaloNodes.size(); ++i)
+    for (unsigned i = 0; i<this->mHaloNodes.size(); ++i)
     {
         c_vector<double, SPACE_DIM>& r_location = this->mHaloNodes[i]->rGetModifiableLocation();
         r_location = prod(rotationMatrix, r_location);
     }
     // Now a copy of the base class implementation
-    for (unsigned i=0; i<this->mNodes.size(); ++i)
+    for (unsigned i = 0; i<this->mNodes.size(); ++i)
     {
         c_vector<double, SPACE_DIM>& r_location = this->mNodes[i]->rGetModifiableLocation();
         r_location = prod(rotationMatrix, r_location);
@@ -1729,32 +1729,32 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Translate(const c_vector<double, SPACE_DIM>& rDisplacement)
 {
     // First do the extras
-    for (unsigned i=0; i<this->mHaloNodes.size(); ++i)
+    for (unsigned i = 0; i<this->mHaloNodes.size(); ++i)
     {
         c_vector<double, SPACE_DIM>& r_location = this->mHaloNodes[i]->rGetModifiableLocation();
         r_location += rDisplacement;
     }
     // Now a copy of the base class implementation
-    for (unsigned i=0; i<this->mNodes.size(); ++i)
+    for (unsigned i = 0; i<this->mNodes.size(); ++i)
     {
         c_vector<double, SPACE_DIM>& r_location = this->mNodes[i]->rGetModifiableLocation();
         r_location += rDisplacement;
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::HaloNodeIterator DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetHaloNodeIteratorEnd() const
 {
     return mHaloNodes.end();
 }
 
 // Explicit instantiation
-template class DistributedTetrahedralMesh<1,1>;
-template class DistributedTetrahedralMesh<1,2>;
-template class DistributedTetrahedralMesh<1,3>;
-template class DistributedTetrahedralMesh<2,2>;
-template class DistributedTetrahedralMesh<2,3>;
-template class DistributedTetrahedralMesh<3,3>;
+template class DistributedTetrahedralMesh<1, 1>;
+template class DistributedTetrahedralMesh<1, 2>;
+template class DistributedTetrahedralMesh<1, 3>;
+template class DistributedTetrahedralMesh<2, 2>;
+template class DistributedTetrahedralMesh<2, 3>;
+template class DistributedTetrahedralMesh<3, 3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

@@ -70,7 +70,7 @@ public:
      *
      * @param rMeshReader the mesh reader
      */
-    void ConstructFromMeshReader(AbstractMeshReader<ELEMENT_DIM,SPACE_DIM>& rMeshReader);
+    void ConstructFromMeshReader(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader);
 
    /**
      * Add the most recently constructed cable element to the global->local cable element mapping

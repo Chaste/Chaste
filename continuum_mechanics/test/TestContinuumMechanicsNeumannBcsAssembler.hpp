@@ -46,7 +46,7 @@ public:
     void TestAssembler2d()
     {
         QuadraticMesh<2> mesh;
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/canonical_triangle_quadratic", 2, 2, false);
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/canonical_triangle_quadratic", 2, 2, false);
         mesh.ConstructFromMeshReader(mesh_reader);
 
         ContinuumMechanicsProblemDefinition<2> problem_defn(mesh);
@@ -55,19 +55,19 @@ public:
         double t2 = 3.2574578;
 
         // for the boundary element on the y=0 surface, create a traction
-        std::vector<BoundaryElement<1,2>*> boundary_elems;
-        std::vector<c_vector<double,2> > tractions;
-        c_vector<double,2> traction;
+        std::vector<BoundaryElement<1, 2>*> boundary_elems;
+        std::vector<c_vector<double, 2> > tractions;
+        c_vector<double, 2> traction;
         traction(0) = t1;
         traction(1) = t2;
-        for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
+        for (TetrahedralMesh<2, 2>::BoundaryElementIterator iter
               = mesh.GetBoundaryElementIteratorBegin();
              iter != mesh.GetBoundaryElementIteratorEnd();
              ++iter)
         {
             if (fabs((*iter)->CalculateCentroid()[1])<1e-4)
             {
-                BoundaryElement<1,2>* p_element = *iter;
+                BoundaryElement<1, 2>* p_element = *iter;
                 boundary_elems.push_back(p_element);
                 tractions.push_back(traction);
             }
@@ -140,21 +140,21 @@ public:
         double t3 = 4.5342308;
 
         // for the boundary element on the z=0 surface, create a traction
-        std::vector<BoundaryElement<2,3>*> boundary_elems;
-        std::vector<c_vector<double,3> > tractions;
-        c_vector<double,3> traction;
+        std::vector<BoundaryElement<2, 3>*> boundary_elems;
+        std::vector<c_vector<double, 3> > tractions;
+        c_vector<double, 3> traction;
         traction(0) = t1;
         traction(1) = t2;
         traction(2) = t3;
 
-        for (TetrahedralMesh<3,3>::BoundaryElementIterator iter
+        for (TetrahedralMesh<3, 3>::BoundaryElementIterator iter
               = mesh.GetBoundaryElementIteratorBegin();
              iter != mesh.GetBoundaryElementIteratorEnd();
              ++iter)
         {
             if (fabs((*iter)->CalculateCentroid()[2])<1e-4)
             {
-                BoundaryElement<2,3>* p_element = *iter;
+                BoundaryElement<2, 3>* p_element = *iter;
                 boundary_elems.push_back(p_element);
                 tractions.push_back(traction);
             }
@@ -221,13 +221,13 @@ public:
 
     void TestAssemblerMeshType()
     {
-        TetrahedralMesh<2,2> mesh;
+        TetrahedralMesh<2, 2> mesh;
         ContinuumMechanicsProblemDefinition<2> problem_defn(mesh);
 
         TS_ASSERT_THROWS_CONTAINS(ContinuumMechanicsNeumannBcsAssembler<2>(&mesh, &problem_defn),
                                   "Continuum mechanics solvers require a quadratic mesh");
 
-        TetrahedralMesh<3,3> mesh3d;
+        TetrahedralMesh<3, 3> mesh3d;
         ContinuumMechanicsProblemDefinition<3> problem_defn3d(mesh3d);
 
         TS_ASSERT_THROWS_CONTAINS(ContinuumMechanicsNeumannBcsAssembler<3>(&mesh3d, &problem_defn3d),

@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VERTEXMESH_HPP_
 
 // Forward declaration prevents circular include chain
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VertexMeshWriter;
 
 #include <algorithm>
@@ -73,7 +73,7 @@ class VertexMeshWriter;
  * member of the VertexBasedCellPopulation class to represent the junctional network of
  * cells that forms the basis of simulations of off-lattice vertex-based models.
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VertexMesh : public AbstractMesh<ELEMENT_DIM, SPACE_DIM>
 {
     friend class TestVertexMesh;
@@ -192,7 +192,7 @@ protected:
      * @param archive the archive
      * @param version the current version of this class
      */
-    template <class Archive>
+    template<class Archive>
     void save(Archive& archive, const unsigned int version) const
     {
         archive& boost::serialization::base_object<AbstractMesh<ELEMENT_DIM, SPACE_DIM> >(*this);
@@ -209,7 +209,7 @@ protected:
      * @param archive the archive
      * @param version the current version of this class
      */
-    template <class Archive>
+    template<class Archive>
     void load(Archive& archive, const unsigned int version)
     {
         archive& boost::serialization::base_object<AbstractMesh<ELEMENT_DIM, SPACE_DIM> >(*this);
@@ -249,7 +249,7 @@ public:
      *
      * @param nodes vector of pointers to nodes
      * @param faces vector of pointer to VertexElements
-     * @param vertexElements vector of pointers to VertexElement<3,3>s
+     * @param vertexElements vector of pointers to VertexElement<3, 3>s
      */
     VertexMesh(std::vector<Node<SPACE_DIM>*> nodes,
                std::vector<VertexElement<ELEMENT_DIM - 1, SPACE_DIM>*> faces,
@@ -711,40 +711,40 @@ EXPORT_TEMPLATE_CLASS_ALL_DIMS(VertexMesh)
 // VertexElementIterator class implementation - most methods are inlined    //
 //////////////////////////////////////////////////////////////////////////////
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetElementIteratorBegin(
     bool skipDeletedElements)
 {
     return VertexElementIterator(*this, mElements.begin(), skipDeletedElements);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetElementIteratorEnd()
 {
     return VertexElementIterator(*this, mElements.end());
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexElement<ELEMENT_DIM, SPACE_DIM>& VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator::operator*()
 {
     assert(!IsAtEnd());
     return **mElementIter;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexElement<ELEMENT_DIM, SPACE_DIM>* VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator::operator->()
 {
     assert(!IsAtEnd());
     return *mElementIter;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator::operator!=(const typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator& rOther)
 {
     return mElementIter != rOther.mElementIter;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator& VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator::operator++()
 {
     do
@@ -755,7 +755,7 @@ typename VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator& VertexMesh<E
     return (*this);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator::VertexElementIterator(
     VertexMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
     typename std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*>::iterator elementIter,
@@ -779,13 +779,13 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator::VertexElementIterator
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator::IsAtEnd()
 {
     return mElementIter == mrMesh.mElements.end();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexElementIterator::IsAllowedElement()
 {
     return !(mSkipDeletedElements && (*this)->IsDeleted());

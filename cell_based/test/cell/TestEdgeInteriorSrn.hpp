@@ -252,7 +252,7 @@ public:
         {
             /* First we create a regular vertex mesh. */
             HoneycombVertexMeshGenerator generator(2, 2);
-            boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+            boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
             std::vector<CellPtr> cells;
             MAKE_PTR(WildTypeCellMutationState, p_state);

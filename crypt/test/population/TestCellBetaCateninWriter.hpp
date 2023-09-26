@@ -84,7 +84,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a CellBetaCateninWriter and test that the correct output is generated
-        CellBetaCateninWriter<2,2> cell_writer;
+        CellBetaCateninWriter<2, 2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (auto cell_iter : cell_population)
@@ -114,7 +114,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellBetaCateninWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellBetaCateninWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_cell_writer = new CellBetaCateninWriter<2, 2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -125,7 +125,7 @@ public:
         }
 
         {
-            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_cell_writer_2;
 
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
@@ -144,8 +144,8 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create a simple mesh-based cell population, comprising various cell types in various cell cycle phases
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         std::vector<CellPtr> cells;

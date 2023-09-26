@@ -91,44 +91,44 @@ public:
         TS_ASSERT_EQUALS(p_mesh->mBottomOriginals.size(), p_mesh->mBottomImages.size());
 
         // Check that the image nodes are where they should be.
-        for (unsigned i=0; i<p_mesh->mLeftOriginals.size(); ++i)
+        for (unsigned i = 0; i<p_mesh->mLeftOriginals.size(); ++i)
         {
-            c_vector<double,2> original_location;
+            c_vector<double, 2> original_location;
             original_location = p_mesh->GetNode(p_mesh->mLeftOriginals[i])->rGetLocation();
-            c_vector<double,2> image_location;
+            c_vector<double, 2> image_location;
             image_location = p_mesh->GetNode(p_mesh->mLeftImages[i])->rGetLocation();
 
             TS_ASSERT_DELTA(original_location[0] + domain_width, image_location[0], 1e-7);
             TS_ASSERT_DELTA(original_location[1], image_location[1], 1e-7);
         }
 
-        for (unsigned i=0; i<p_mesh->mRightOriginals.size(); ++i)
+        for (unsigned i = 0; i<p_mesh->mRightOriginals.size(); ++i)
         {
-            c_vector<double,2> original_location;
+            c_vector<double, 2> original_location;
             original_location = p_mesh->GetNode(p_mesh->mRightOriginals[i])->rGetLocation();
-            c_vector<double,2> image_location;
+            c_vector<double, 2> image_location;
             image_location = p_mesh->GetNode(p_mesh->mRightImages[i])->rGetLocation();
 
             TS_ASSERT_DELTA(original_location[0] - domain_width, image_location[0], 1e-7);
             TS_ASSERT_DELTA(original_location[1], image_location[1], 1e-7);
         }
 
-        for (unsigned i=0; i<p_mesh->mBottomOriginals.size(); ++i)
+        for (unsigned i = 0; i<p_mesh->mBottomOriginals.size(); ++i)
         {
-            c_vector<double,2> original_location;
+            c_vector<double, 2> original_location;
             original_location = p_mesh->GetNode(p_mesh->mBottomOriginals[i])->rGetLocation();
-            c_vector<double,2> image_location;
+            c_vector<double, 2> image_location;
             image_location = p_mesh->GetNode(p_mesh->mBottomImages[i])->rGetLocation();
 
             TS_ASSERT_DELTA(original_location[1] + domain_height, image_location[1], 1e-7);
             TS_ASSERT_DELTA(original_location[0], image_location[0], 1e-7);
         }
 
-        for (unsigned i=0; i<p_mesh->mTopOriginals.size(); ++i)
+        for (unsigned i = 0; i<p_mesh->mTopOriginals.size(); ++i)
         {
-            c_vector<double,2> original_location;
+            c_vector<double, 2> original_location;
             original_location = p_mesh->GetNode(p_mesh->mTopOriginals[i])->rGetLocation();
-            c_vector<double,2> image_location;
+            c_vector<double, 2> image_location;
             image_location = p_mesh->GetNode(p_mesh->mTopImages[i])->rGetLocation();
 
             TS_ASSERT_DELTA(original_location[1] - domain_height, image_location[1], 1e-7);
@@ -157,7 +157,7 @@ public:
 
     //     // Call the normal re-mesh
     //     NodeMap map(p_mesh->GetNumNodes());
-    //     p_mesh->MutableMesh<2,2>::ReMesh(map);
+    //     p_mesh->MutableMesh<2, 2>::ReMesh(map);
 
     //     // Re-Index the vectors regarding left/right nodes with the node map
     //     for (unsigned i = 0; i<p_mesh->mLeftOriginals.size(); ++i)
@@ -187,14 +187,14 @@ public:
     //          elem_iter != p_mesh->GetElementIteratorEnd();
     //          ++elem_iter)
     //     {
-    //         for (unsigned i=0; i<3; ++i)
+    //         for (unsigned i = 0; i<3; ++i)
     //         {
     //             unsigned this_node_index = elem_iter->GetNodeGlobalIndex(i);
 
     //             if (this_node_index==0)
     //             {
     //                 elements_for_node_0++;
-    //                 for (unsigned j=0; j<3; ++j)
+    //                 for (unsigned j = 0; j<3; ++j)
     //                 {
     //                     checksum_for_node_0 += elem_iter->GetNodeGlobalIndex(j);
     //                 }
@@ -202,7 +202,7 @@ public:
     //             if (this_node_index==11)
     //             {
     //                 elements_for_node_11++;
-    //                 for (unsigned j=0; j<3; ++j)
+    //                 for (unsigned j = 0; j<3; ++j)
     //                 {
     //                     checksum_for_node_11 += elem_iter->GetNodeGlobalIndex(j);
     //                 }
@@ -210,7 +210,7 @@ public:
     //             if (this_node_index==12)
     //             {
     //                 elements_for_node_12++;
-    //                 for (unsigned j=0; j<3; ++j)
+    //                 for (unsigned j = 0; j<3; ++j)
     //                 {
     //                     checksum_for_node_12 += elem_iter->GetNodeGlobalIndex(j);
     //                 }
@@ -218,7 +218,7 @@ public:
     //             if (this_node_index==18)
     //             {
     //                 elements_for_node_18++;
-    //                 for (unsigned j=0; j<3; ++j)
+    //                 for (unsigned j = 0; j<3; ++j)
     //                 {
     //                     checksum_for_node_18 += elem_iter->GetNodeGlobalIndex(j);
     //                 }
@@ -302,7 +302,7 @@ public:
         TS_ASSERT_EQUALS(map.GetSize(), num_old_nodes);
         TS_ASSERT_EQUALS(map.IsDeleted(15), true);
 
-        for (unsigned i=0; i<num_old_nodes; ++i)
+        for (unsigned i = 0; i<num_old_nodes; ++i)
         {
             if (i<15)
             {
@@ -444,7 +444,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2*cells_across*cells_up);
         TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 1u); // boundary elements removed so one add to avoid errors
 
-        c_vector<double,2> point;
+        c_vector<double, 2> point;
         point[0] = -0.05;
         point[1] = 1.0;
         Node<2>* p_node = new Node<2>(p_mesh->GetNumNodes(), point);
@@ -482,7 +482,7 @@ public:
         unsigned cells_up = 3;
 
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up, 1, 1);
-        boost::shared_ptr<AbstractTetrahedralMesh<2,2> > const p_mesh = boost::static_pointer_cast<AbstractTetrahedralMesh<2,2> >(generator.GetToroidalMesh());
+        boost::shared_ptr<AbstractTetrahedralMesh<2, 2> > const p_mesh = boost::static_pointer_cast<AbstractTetrahedralMesh<2, 2> >(generator.GetToroidalMesh());
 
         /*
          * You need the const above to stop a BOOST_STATIC_ASSERTION failure.
@@ -511,7 +511,7 @@ public:
 
         {
             // De-serialize and compare
-            boost::shared_ptr<AbstractTetrahedralMesh<2,2> > p_mesh2;
+            boost::shared_ptr<AbstractTetrahedralMesh<2, 2> > p_mesh2;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -530,14 +530,14 @@ public:
             TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), p_mesh2->GetNumNodes());
             TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryNodes(), p_mesh2->GetNumBoundaryNodes());
 
-            for (unsigned i=0; i<p_mesh->GetNumAllNodes(); ++i)
+            for (unsigned i = 0; i<p_mesh->GetNumAllNodes(); ++i)
             {
                 Node<2>* p_node = p_mesh->GetNode(i);
                 Node<2>* p_node2 = p_mesh2->GetNode(i);
                 TS_ASSERT_EQUALS(p_node->IsDeleted(), p_node2->IsDeleted());
                 TS_ASSERT_EQUALS(p_node->GetIndex(), p_node2->GetIndex());
                 TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), p_node2->IsBoundaryNode());
-                for (unsigned j=0; j<2; ++j)
+                for (unsigned j = 0; j<2; ++j)
                 {
                     TS_ASSERT_DELTA(p_node->rGetLocation()[j], p_node2->rGetLocation()[j], 1e-16);
                 }
@@ -548,14 +548,14 @@ public:
             TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), p_mesh2->GetNumBoundaryElements());
             TS_ASSERT_EQUALS(p_mesh->GetNumAllBoundaryElements(), p_mesh2->GetNumAllBoundaryElements());
 
-            AbstractTetrahedralMesh<2,2>::ElementIterator iter2 = p_mesh2->GetElementIteratorBegin();
+            AbstractTetrahedralMesh<2, 2>::ElementIterator iter2 = p_mesh2->GetElementIteratorBegin();
 
-            for (AbstractTetrahedralMesh<2,2>::ElementIterator iter = p_mesh->GetElementIteratorBegin();
+            for (AbstractTetrahedralMesh<2, 2>::ElementIterator iter = p_mesh->GetElementIteratorBegin();
                  iter != p_mesh->GetElementIteratorEnd();
                  ++iter, ++iter2)
             {
                 TS_ASSERT_EQUALS(iter->GetNumNodes(), iter2->GetNumNodes());
-                for (unsigned i=0; i<iter->GetNumNodes(); ++i)
+                for (unsigned i = 0; i<iter->GetNumNodes(); ++i)
                 {
                     TS_ASSERT_EQUALS(iter->GetNodeGlobalIndex(i), iter2->GetNodeGlobalIndex(i));
                 }
@@ -584,14 +584,14 @@ public:
         // Find the element with node indices 2,0,3 (which stradles both periodic boundaries)
         unsigned element_index;
         std::set<unsigned> target_element_node_indices;
-        for (element_index=0; element_index<mesh.GetNumElements(); element_index++)
+        for (element_index = 0; element_index<mesh.GetNumElements(); element_index++)
         {
             target_element_node_indices.clear();
             target_element_node_indices.insert(2);
             target_element_node_indices.insert(0);
             target_element_node_indices.insert(3);
 
-            for (unsigned node_local_index=0; node_local_index<=2; node_local_index++)
+            for (unsigned node_local_index = 0; node_local_index<=2; node_local_index++)
             {
                 target_element_node_indices.erase(mesh.GetElement(element_index)->GetNodeGlobalIndex(node_local_index));
             }

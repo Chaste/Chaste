@@ -49,7 +49,7 @@ void NonCachedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetJacobianForElement(uns
 }
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void NonCachedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetInverseJacobianForElement(
         unsigned elementIndex,
         c_matrix<double, SPACE_DIM, ELEMENT_DIM>& rJacobian,
@@ -66,7 +66,7 @@ void NonCachedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetWeightedDirectionForEl
     EXCEPTION("Probably redundant method.");
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void NonCachedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetWeightedDirectionForBoundaryElement(
         unsigned elementIndex,
         c_vector<double, SPACE_DIM>& rWeightedDirection,
@@ -77,9 +77,9 @@ void NonCachedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::GetWeightedDirectionForBo
 
 
 // Explicit instantiation
-template class NonCachedTetrahedralMesh<3,3>;
-template class NonCachedTetrahedralMesh<2,2>;
-template class NonCachedTetrahedralMesh<1,1>;
+template class NonCachedTetrahedralMesh<3, 3>;
+template class NonCachedTetrahedralMesh<2, 2>;
+template class NonCachedTetrahedralMesh<1, 1>;
 
 
 // Serialization for Boost >= 1.36

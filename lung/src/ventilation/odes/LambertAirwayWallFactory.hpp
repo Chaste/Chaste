@@ -74,7 +74,7 @@ public:
      * @param pNode  Pointer to node object.
      * @return An airway wall object parameterised for this airway
      */
-    virtual LambertAirwayWall* CreateAirwayWallForElement(Element<1,3>* pElement);
+    virtual LambertAirwayWall* CreateAirwayWallForElement(Element<1, 3>* pElement);
 
     double GetAlpha0ForGeneration(unsigned generation);
     double GetAlpha0PrimeForGeneration(unsigned generation);
@@ -86,12 +86,12 @@ public:
      * @param pNode Pointer to node object.
      * @return The pleural pressure at the given node at the given time
      */
-    virtual double GetPleuralPressureForAirway(double time, Element<1,3>* pElement);
+    virtual double GetPleuralPressureForAirway(double time, Element<1, 3>* pElement);
 
     /**
      * @param pMesh  the mesh for which to create acinar units.
      */
-    virtual void SetMesh(AbstractTetrahedralMesh<1,3>* pMesh);
+    virtual void SetMesh(AbstractTetrahedralMesh<1, 3>* pMesh);
 
     /** alpha_0 values by generation dimensionless */
     static const double mAlpha0[17];

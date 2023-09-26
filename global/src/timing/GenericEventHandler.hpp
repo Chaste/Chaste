@@ -55,7 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * not be inline, which could impact performance; we generally want timing 
  * routines to be very lightweight.
  */
-template <unsigned NUM_EVENTS, class CONCRETE>
+template<unsigned NUM_EVENTS, class CONCRETE>
 class GenericEventHandler
 {
     friend class TestGenericEventHandler;

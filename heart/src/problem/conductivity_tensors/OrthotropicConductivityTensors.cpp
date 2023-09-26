@@ -44,9 +44,9 @@ void OrthotropicConductivityTensors<ELEMENT_DIM, SPACE_DIM>::Init(AbstractTetrah
     if (!this->mUseNonConstantConductivities && !this->mUseFibreOrientation)
     {
         // Constant tensor for every element
-        c_matrix<double, SPACE_DIM, SPACE_DIM> conductivity_matrix(zero_matrix<double>(SPACE_DIM,SPACE_DIM));
+        c_matrix<double, SPACE_DIM, SPACE_DIM> conductivity_matrix(zero_matrix<double>(SPACE_DIM, SPACE_DIM));
 
-        for (unsigned dim=0; dim<SPACE_DIM; dim++)
+        for (unsigned dim = 0; dim<SPACE_DIM; dim++)
         {
             assert(this->mConstantConductivities(dim) != DBL_MAX);
             conductivity_matrix(dim,dim) = this->mConstantConductivities(dim);
@@ -56,7 +56,7 @@ void OrthotropicConductivityTensors<ELEMENT_DIM, SPACE_DIM>::Init(AbstractTetrah
     }
     else
     {
-        c_matrix<double,SPACE_DIM,SPACE_DIM> orientation_matrix((identity_matrix<double>(SPACE_DIM)));
+        c_matrix<double, SPACE_DIM, SPACE_DIM> orientation_matrix((identity_matrix<double>(SPACE_DIM)));
 
         if (this->mUseFibreOrientation)
         {
@@ -80,7 +80,7 @@ void OrthotropicConductivityTensors<ELEMENT_DIM, SPACE_DIM>::Init(AbstractTetrah
         // on the automatic reallocation scheme.
         this->mTensors.reserve(this->mpMesh->GetNumLocalElements());
 
-        c_matrix<double, SPACE_DIM, SPACE_DIM> conductivity_matrix(zero_matrix<double>(SPACE_DIM,SPACE_DIM));
+        c_matrix<double, SPACE_DIM, SPACE_DIM> conductivity_matrix(zero_matrix<double>(SPACE_DIM, SPACE_DIM));
 
         unsigned local_element_index = 0;
 
@@ -109,14 +109,14 @@ void OrthotropicConductivityTensors<ELEMENT_DIM, SPACE_DIM>::Init(AbstractTetrah
              */
             if (this->mUseNonConstantConductivities)
             {
-                for (unsigned dim=0; dim<SPACE_DIM; dim++)
+                for (unsigned dim = 0; dim<SPACE_DIM; dim++)
                 {
                     conductivity_matrix(dim,dim) = (*this->mpNonConstantConductivities)[local_element_index][dim];
                 }
             }
             else
             {
-                for (unsigned dim=0; dim<SPACE_DIM; dim++)
+                for (unsigned dim = 0; dim<SPACE_DIM; dim++)
                 {
                     assert(this->mConstantConductivities(dim) != DBL_MAX);
                     conductivity_matrix(dim,dim) = this->mConstantConductivities(dim);
@@ -129,7 +129,7 @@ void OrthotropicConductivityTensors<ELEMENT_DIM, SPACE_DIM>::Init(AbstractTetrah
                 this->mFileReader->GetFibreSheetAndNormalMatrix(current_fibre_global_index, orientation_matrix);
             }
 
-            c_matrix<double,SPACE_DIM,SPACE_DIM> temp;
+            c_matrix<double, SPACE_DIM, SPACE_DIM> temp;
             noalias(temp) = prod(orientation_matrix, conductivity_matrix);
             this->mTensors.push_back( prod(temp, trans(orientation_matrix) ) );
 
@@ -149,9 +149,9 @@ void OrthotropicConductivityTensors<ELEMENT_DIM, SPACE_DIM>::Init(AbstractTetrah
 }
 
 // Explicit instantiation
-template class OrthotropicConductivityTensors<1,1>;
-template class OrthotropicConductivityTensors<1,2>;
-template class OrthotropicConductivityTensors<1,3>;
-template class OrthotropicConductivityTensors<2,2>;
-template class OrthotropicConductivityTensors<2,3>;
-template class OrthotropicConductivityTensors<3,3>;
+template class OrthotropicConductivityTensors<1, 1>;
+template class OrthotropicConductivityTensors<1, 2>;
+template class OrthotropicConductivityTensors<1, 3>;
+template class OrthotropicConductivityTensors<2, 2>;
+template class OrthotropicConductivityTensors<2, 3>;
+template class OrthotropicConductivityTensors<3, 3>;

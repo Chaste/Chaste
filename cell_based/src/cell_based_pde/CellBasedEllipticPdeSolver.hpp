@@ -131,7 +131,7 @@ public:
      */
     CellBasedEllipticPdeSolver(TetrahedralMesh<DIM, DIM>* pMesh,
                        AbstractLinearEllipticPde<DIM, DIM>* pPde,
-                       BoundaryConditionsContainer<DIM, DIM,1>* pBoundaryConditions);
+                       BoundaryConditionsContainer<DIM, DIM, 1>* pBoundaryConditions);
 
     /**
      * Destructor.

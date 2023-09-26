@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 template<unsigned ELEM_DIM,unsigned SPACE_DIM>
 class BidomainCorrectionTermAssembler
-    :  public AbstractCorrectionTermAssembler<ELEM_DIM,SPACE_DIM,2>
+    :  public AbstractCorrectionTermAssembler<ELEM_DIM, SPACE_DIM, 2>
 {
 protected:
     /** Local cache of the configuration singleton instance*/
@@ -73,9 +73,9 @@ protected:
                 c_vector<double, ELEM_DIM+1> &rPhi,
                 c_matrix<double, SPACE_DIM, ELEM_DIM+1> &rGradPhi /* not used */,
                 ChastePoint<SPACE_DIM> &rX /* not used */,
-                c_vector<double,2> &rU,
+                c_vector<double, 2> &rU,
                 c_matrix<double, 2, SPACE_DIM> &rGradU /* not used */,
-                Element<ELEM_DIM,SPACE_DIM>* pElement);
+                Element<ELEM_DIM, SPACE_DIM>* pElement);
 public:
 
     /**
@@ -84,7 +84,7 @@ public:
      * @param pMesh pointer to the mesh
      * @param pTissue pointer to the PDE
      */
-    BidomainCorrectionTermAssembler(AbstractTetrahedralMesh<ELEM_DIM,SPACE_DIM>* pMesh,
+    BidomainCorrectionTermAssembler(AbstractTetrahedralMesh<ELEM_DIM, SPACE_DIM>* pMesh,
                                     BidomainTissue<SPACE_DIM>* pTissue);
 };
 

@@ -124,7 +124,7 @@ public:
         * cells) wide, and 2 elements high.
         */
         HoneycombVertexMeshGenerator generator(2, 2);    // Parameters are: cells across, cells up
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         /* Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
         * To do this, we use the `CellsGenerator` helper class, which is templated over the type
@@ -260,8 +260,8 @@ public:
          *
          * The first step is to define a point on the plane boundary and a normal to the plane.
          */
-        c_vector<double,2> point = zero_vector<double>(2);
-        c_vector<double,2> normal = zero_vector<double>(2);
+        c_vector<double, 2> point = zero_vector<double>(2);
+        c_vector<double, 2> normal = zero_vector<double>(2);
         normal(1) = -1.0;
         /* We can now make a pointer to a {{{PlaneBoundaryCondition}}} (passing the point
          * and normal to the plane) and pass it to the {{{OffLatticeSimulation}}}.*/

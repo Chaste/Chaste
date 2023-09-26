@@ -995,7 +995,7 @@ void MeshBasedCellPopulation<2>::CreateVoronoiTessellation()
  */
 // LCOV_EXCL_START
 template<>
-void MeshBasedCellPopulation<2,3>::CreateVoronoiTessellation()
+void MeshBasedCellPopulation<2, 3>::CreateVoronoiTessellation()
 {
     // We don't allow tessellation yet.
     NEVER_REACHED;
@@ -1320,12 +1320,12 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetRestLength(unsigned ind
 }
 
 // Explicit instantiation
-template class MeshBasedCellPopulation<1,1>;
-template class MeshBasedCellPopulation<1,2>;
-template class MeshBasedCellPopulation<2,2>;
-template class MeshBasedCellPopulation<1,3>;
-template class MeshBasedCellPopulation<2,3>;
-template class MeshBasedCellPopulation<3,3>;
+template class MeshBasedCellPopulation<1, 1>;
+template class MeshBasedCellPopulation<1, 2>;
+template class MeshBasedCellPopulation<2, 2>;
+template class MeshBasedCellPopulation<1, 3>;
+template class MeshBasedCellPopulation<2, 3>;
+template class MeshBasedCellPopulation<3, 3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

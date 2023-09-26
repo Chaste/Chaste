@@ -36,16 +36,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BoundaryConditionsContainerImplementation.hpp"
 
 // Explicit instantiation
-template class BoundaryConditionsContainer<1,1,1>;
-template class BoundaryConditionsContainer<1,2,1>;
-template class BoundaryConditionsContainer<1,3,1>;
-template class BoundaryConditionsContainer<2,2,1>;
-template class BoundaryConditionsContainer<3,3,1>;
+template class BoundaryConditionsContainer<1, 1, 1>;
+template class BoundaryConditionsContainer<1, 2, 1>;
+template class BoundaryConditionsContainer<1, 3, 1>;
+template class BoundaryConditionsContainer<2, 2, 1>;
+template class BoundaryConditionsContainer<3, 3, 1>;
 
-template class BoundaryConditionsContainer<1,1,2>;
-template class BoundaryConditionsContainer<2,2,2>;
-template class BoundaryConditionsContainer<3,3,2>;
+template class BoundaryConditionsContainer<1, 1, 2>;
+template class BoundaryConditionsContainer<2, 2, 2>;
+template class BoundaryConditionsContainer<3, 3, 2>;
 
-template class BoundaryConditionsContainer<1,1,3>;
-template class BoundaryConditionsContainer<2,2,3>;
-template class BoundaryConditionsContainer<3,3,3>;
+template class BoundaryConditionsContainer<1, 1, 3>;
+template class BoundaryConditionsContainer<2, 2, 3>;
+template class BoundaryConditionsContainer<3, 3, 3>;

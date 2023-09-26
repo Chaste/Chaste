@@ -74,14 +74,14 @@ public:
      * and uses the default stimulus from the CellML file (if present).
      * @return a pointer to the cell
      */
-    boost::shared_ptr<AbstractCardiacCell> LoadCardiacCell(void);
+    boost::shared_ptr<AbstractCardiacCell> LoadCardiacCell();
 
 #ifdef CHASTE_CVODE
     /**
      * Make an AbstractCvodeCell, using the default stimulus from the CellML file (if present).
      * @return a pointer to the cell
      */
-    boost::shared_ptr<AbstractCvodeCell> LoadCvodeCell(void);
+    boost::shared_ptr<AbstractCvodeCell> LoadCvodeCell();
 #endif
 
 private:

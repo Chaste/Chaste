@@ -62,7 +62,7 @@ protected:
      *
      *  The change of matrix should have the form P = [a_f a_s a_n], where each a_i is a vector.
      */
-    c_matrix<double,DIM,DIM>* mpChangeOfBasisMatrix;
+    c_matrix<double, DIM, DIM>* mpChangeOfBasisMatrix;
 
     /**
      *  Transform the input (C and inv(C), where C in the deformation tensor) to the local coordinate system
@@ -71,8 +71,8 @@ protected:
      *  @param rCTransformed P^T C P (output)
      *  @param rInvCTransformed P^T inv(C) P (output)
      */
-    void ComputeTransformedDeformationTensor(c_matrix<double,DIM,DIM>& rC, c_matrix<double,DIM,DIM>& rInvC,
-                                             c_matrix<double,DIM,DIM>& rCTransformed, c_matrix<double,DIM,DIM>& rInvCTransformed);
+    void ComputeTransformedDeformationTensor(c_matrix<double, DIM, DIM>& rC, c_matrix<double, DIM, DIM>& rInvC,
+                                             c_matrix<double, DIM, DIM>& rCTransformed, c_matrix<double, DIM, DIM>& rInvCTransformed);
 
     /**
      *  Transform the output (T and dTdE) back to the original coordinate system
@@ -82,8 +82,8 @@ protected:
      *  @param transformDTdE a boolean flag saying whether the stress derivative is
      *    to be transformed or not
      */
-    void TransformStressAndStressDerivative(c_matrix<double,DIM,DIM>& rT,
-                                            FourthOrderTensor<DIM,DIM,DIM,DIM>& rDTdE,
+    void TransformStressAndStressDerivative(c_matrix<double, DIM, DIM>& rT,
+                                            FourthOrderTensor<DIM, DIM, DIM, DIM>& rDTdE,
                                             bool transformDTdE);
 
 public:
@@ -114,11 +114,11 @@ public:
      *  @param computeDTdE a boolean flag saying whether the stress derivative is
      *    required or not.
      */
-    virtual void ComputeStressAndStressDerivative(c_matrix<double,DIM,DIM>& rC,
-                                                  c_matrix<double,DIM,DIM>& rInvC,
+    virtual void ComputeStressAndStressDerivative(c_matrix<double, DIM, DIM>& rC,
+                                                  c_matrix<double, DIM, DIM>& rInvC,
                                                   double                    pressure,
-                                                  c_matrix<double,DIM,DIM>& rT,
-                                                  FourthOrderTensor<DIM,DIM,DIM,DIM>&   rDTdE,
+                                                  c_matrix<double, DIM, DIM>& rT,
+                                                  FourthOrderTensor<DIM, DIM, DIM, DIM>&   rDTdE,
                                                   bool                      computeDTdE)=0;
 
     /**
@@ -136,7 +136,7 @@ public:
      *  Note: the compute the material part of the stress (the pressure-independent
      *  part), just pass in pressure=0.0
      */
-    void ComputeCauchyStress(c_matrix<double,DIM,DIM>& rF, double pressure, c_matrix<double,DIM,DIM>& rSigma);
+    void ComputeCauchyStress(c_matrix<double, DIM, DIM>& rF, double pressure, c_matrix<double, DIM, DIM>& rSigma);
 
     /**
      *  Compute the 1st Piola Kirchoff stress, given the deformation gradient F
@@ -156,7 +156,7 @@ public:
      *  Note: the compute the material part of the stress (the pressure-independent
      *  part), just pass in pressure=0.0
      */
-    void Compute1stPiolaKirchoffStress(c_matrix<double,DIM,DIM>& rF, double pressure, c_matrix<double,DIM,DIM>& rS);
+    void Compute1stPiolaKirchoffStress(c_matrix<double, DIM, DIM>& rF, double pressure, c_matrix<double, DIM, DIM>& rS);
 
     /**
      *  Compute the 2nd Piola Kirchoff stress, given the deformation tensor C
@@ -171,7 +171,7 @@ public:
      *  Note: to compute the material part of the stress (the pressure-independent
      *  part), just pass in pressure=0.0
      */
-    void Compute2ndPiolaKirchoffStress(c_matrix<double,DIM,DIM>& rC, double pressure, c_matrix<double,DIM,DIM>& rT);
+    void Compute2ndPiolaKirchoffStress(c_matrix<double, DIM, DIM>& rC, double pressure, c_matrix<double, DIM, DIM>& rT);
 
 
     /**
@@ -202,7 +202,7 @@ public:
      *
      *  @param rChangeOfBasisMatrix Change of basis matrix.
      */
-    void SetChangeOfBasisMatrix(c_matrix<double,DIM,DIM>& rChangeOfBasisMatrix);
+    void SetChangeOfBasisMatrix(c_matrix<double, DIM, DIM>& rChangeOfBasisMatrix);
 
     /**
      *  Reset back to no change of basis matrix

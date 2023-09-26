@@ -166,7 +166,7 @@ public:
          * but it does demonstrate the principle.
          * */
 
-        AbstractTetrahedralMesh<3,3>* p_mesh = &(monodomain_problem.rGetMesh());
+        AbstractTetrahedralMesh<3, 3>* p_mesh = &(monodomain_problem.rGetMesh());
 
         /** \todo #2739
         double before_init = GetMemoryUsage();
@@ -174,7 +174,7 @@ public:
         double after_init = GetMemoryUsage();
         PRINT_VARIABLE(after_init - before_init);
         */
-        for (AbstractTetrahedralMesh<3,3>::NodeIterator iter = p_mesh->GetNodeIteratorBegin();
+        for (AbstractTetrahedralMesh<3, 3>::NodeIterator iter = p_mesh->GetNodeIteratorBegin();
                          iter != p_mesh->GetNodeIteratorEnd(); ++iter)
         {
             TS_ASSERT_EQUALS(HeartRegionCode::IsRegionBath( iter->GetRegion() ), false);

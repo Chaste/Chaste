@@ -64,10 +64,10 @@ protected:
      * integral is (for a 1-unknown problem) integral(g phi_i dS), where g is 
      * the Neumann boundary condition function.
      */
-    NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM> mNaturalNeumannSurfaceTermAssembler;
+    NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM> mNaturalNeumannSurfaceTermAssembler;
 
     /** Boundary conditions container. */
-    BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>* mpBoundaryConditions;
+    BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* mpBoundaryConditions;
 
 public:
 
@@ -78,8 +78,8 @@ public:
      * @param pBoundaryConditions pointer to the boundary conditions.
      */
     AbstractAssemblerSolverHybrid(
-        AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-        BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>* pBoundaryConditions)
+        AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+        BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* pBoundaryConditions)
         : AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, true, true, INTERPOLATION_LEVEL>(pMesh),
           mNaturalNeumannSurfaceTermAssembler(pMesh,pBoundaryConditions),
           mpBoundaryConditions(pBoundaryConditions)

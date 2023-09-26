@@ -288,7 +288,7 @@ void VentilationProblem::FillInteractionMatrix(bool redoExisting)
         }
         else
         {
-            for (unsigned i=0; i<indices.size(); ++i)
+            for (unsigned i = 0; i<indices.size(); ++i)
             {
                 MatSetValue(mTerminalInteractionMatrix, indices[i], indices[i], parent_resistance, ADD_VALUES);
             }
@@ -563,7 +563,7 @@ void VentilationProblem::SetFluxAtBoundaryNode(const Node<3>& rNode, double flux
     }
     mFluxGivenAtInflow = true;
 
-    // In a <1,3> mesh a boundary node will be associated with exactly one edge.
+    // In a <1, 3> mesh a boundary node will be associated with exactly one edge.
     unsigned edge_index = *( rNode.ContainingElementsBegin() );
 
     // Seed the information for a direct solver

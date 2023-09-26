@@ -65,7 +65,7 @@ class TestT2SwapCellKiller : public AbstractCellBasedTestSuite
 public:
 
     /**
-     * This tests the the killer method CheckAndLabelCellsForApoptosisOrDeath()
+     * This tests the killer method CheckAndLabelCellsForApoptosisOrDeath()
      * method for performing T2 swaps (element removal).
      */
     void TestKillerForT2Swap()
@@ -96,14 +96,14 @@ public:
             nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
-        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
 
         // Make a vertex mesh
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         vertex_mesh.SetT2Threshold(0.01);
 
@@ -230,14 +230,14 @@ public:
             nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
-        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
 
         // Make a vertex mesh
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         vertex_mesh.SetT2Threshold(0.01);
 
@@ -381,15 +381,15 @@ public:
         }
 
         // create a mesh
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
-        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
-        vertex_elements.push_back(new VertexElement<2,2>(4, nodes_elem_4));
-        vertex_elements.push_back(new VertexElement<2,2>(5, nodes_elem_5));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
+        vertex_elements.push_back(new VertexElement<2, 2>(4, nodes_elem_4));
+        vertex_elements.push_back(new VertexElement<2, 2>(5, nodes_elem_5));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Set the remeshing threshold parameter values so that T2 swaps do occur, but T1 swaps do not
         vertex_mesh.SetT2Threshold(0.01);
@@ -530,15 +530,15 @@ public:
             }
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
-        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
-        vertex_elements.push_back(new VertexElement<2,2>(4, nodes_elem_4));
-        vertex_elements.push_back(new VertexElement<2,2>(5, nodes_elem_5));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
+        vertex_elements.push_back(new VertexElement<2, 2>(4, nodes_elem_4));
+        vertex_elements.push_back(new VertexElement<2, 2>(5, nodes_elem_5));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Set the remeshing threshold parameter values so that T2 swaps do occur, but T1 swaps do not
         vertex_mesh.SetT2Threshold(0.01);
@@ -632,11 +632,11 @@ public:
         nodes_elem_0.push_back(nodes[1]);
         nodes_elem_0.push_back(nodes[2]);
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
 
         // Make a vertex mesh
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         vertex_mesh.SetT2Threshold(0.01);
 
@@ -723,11 +723,11 @@ public:
         nodes_elem_0.push_back(nodes[1]);
         nodes_elem_0.push_back(nodes[2]);
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
 
         // Make a vertex mesh
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         vertex_mesh.SetT2Threshold(0.01);
 
@@ -824,14 +824,14 @@ public:
             nodes_elem_4.push_back(nodes[node_indices_elem_4[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
-        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
-        vertex_elements.push_back(new VertexElement<2,2>(4, nodes_elem_4));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
+        vertex_elements.push_back(new VertexElement<2, 2>(4, nodes_elem_4));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Set the threshold distance between nodes for T1 swaps to be longer than the inner edges of the mesh
         vertex_mesh.SetCellRearrangementThreshold(0.25);
@@ -951,7 +951,7 @@ public:
     {
         // Create a cell population whose type should not be used with a T2SwapCellKiller
         HoneycombMeshGenerator generator(4, 4, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -973,7 +973,7 @@ public:
 
         {
             HoneycombVertexMeshGenerator generator(4,4);
-            boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+            boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
             std::vector<CellPtr> cells;
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);

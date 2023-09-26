@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * SimpleLinearParabolicSolver.
  *
- * Solver for solving AbstractLinearParabolicPdes
+ * Solver for solving AbstractLinearParabolicPdes.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class SimpleLinearParabolicSolver
@@ -54,7 +54,7 @@ class SimpleLinearParabolicSolver
 protected:
 
     /** The PDE to be solved. */
-    AbstractLinearParabolicPde<ELEMENT_DIM,SPACE_DIM>* mpParabolicPde;
+    AbstractLinearParabolicPde<ELEMENT_DIM, SPACE_DIM>* mpParabolicPde;
 
     /**
      * @return the term to be added to the element stiffness matrix - see AbstractFeVolumeIntegralAssembler
@@ -73,9 +73,9 @@ protected:
         c_vector<double, ELEMENT_DIM+1>& rPhi,
         c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi,
         ChastePoint<SPACE_DIM>& rX,
-        c_vector<double,1>& rU,
-        c_matrix<double,1,SPACE_DIM>& rGradU,
-        Element<ELEMENT_DIM,SPACE_DIM>* pElement);
+        c_vector<double, 1>& rU,
+        c_matrix<double,1, SPACE_DIM>& rGradU,
+        Element<ELEMENT_DIM, SPACE_DIM>* pElement);
 
     /**
      * @return the term to be added to the element stiffness vector - see AbstractFeVolumeIntegralAssembler
@@ -91,9 +91,9 @@ protected:
         c_vector<double, ELEMENT_DIM+1>& rPhi,
         c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi,
         ChastePoint<SPACE_DIM>& rX,
-        c_vector<double,1>& rU,
-        c_matrix<double,1,SPACE_DIM>& rGradU,
-        Element<ELEMENT_DIM,SPACE_DIM>* pElement);
+        c_vector<double, 1>& rU,
+        c_matrix<double,1, SPACE_DIM>& rGradU,
+        Element<ELEMENT_DIM, SPACE_DIM>* pElement);
 
 
     // Note: does not have to provide a ComputeVectorSurfaceTerm for surface integrals,
@@ -121,9 +121,9 @@ public:
      * @param pPde pointer to the PDE
      * @param pBoundaryConditions pointer to the boundary conditions
      */
-    SimpleLinearParabolicSolver(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                                AbstractLinearParabolicPde<ELEMENT_DIM,SPACE_DIM>* pPde,
-                                BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,1>* pBoundaryConditions);
+    SimpleLinearParabolicSolver(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+                                AbstractLinearParabolicPde<ELEMENT_DIM, SPACE_DIM>* pPde,
+                                BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 1>* pBoundaryConditions);
 };
 
 #endif /*SIMPLELINEARPARABOLICSOLVER_HPP_*/

@@ -57,7 +57,7 @@ public:
     static double b;
     static double c1;
 
-    static c_vector<double,3> GetBodyForce(c_vector<double,3>& rX, double t)
+    static c_vector<double, 3> GetBodyForce(c_vector<double, 3>& rX, double t)
     {
         assert(rX(0)>=0 && rX(0)<=1 && rX(1)>=0 && rX(1)<=1 && rX(2)>=0 && rX(2)<=1);
 
@@ -66,7 +66,7 @@ public:
         double invlam1 = 1.0/lam1;
         double invlam2 = 1.0/lam2;
 
-        c_vector<double,3> body_force;
+        c_vector<double, 3> body_force;
         body_force(0) = a;
         body_force(1) = b;
         body_force(2) = 2*rX(2)*invlam1*invlam2*( a*a*invlam1*invlam1 + b*b*invlam2*invlam2 );
@@ -74,9 +74,9 @@ public:
         return -2*c1*body_force;
     }
 
-    static c_vector<double,3> GetTraction(c_vector<double,3>& rX, double t)
+    static c_vector<double, 3> GetTraction(c_vector<double, 3>& rX, double t)
     {
-        c_vector<double,3> traction = zero_vector<double>(3);
+        c_vector<double, 3> traction = zero_vector<double>(3);
 
         double lam1 = 1+a*rX(0);
         double lam2 = 1+b*rX(1);
@@ -154,9 +154,9 @@ public:
     {
         unsigned num_runs = 4;
         double l2_errors[4];
-        unsigned num_elem_each_dir[4] = {1,2,5,10};
+        unsigned num_elem_each_dir[4] = {1, 2, 5, 10};
 
-        for (unsigned run=0; run<num_runs; run++)
+        for (unsigned run = 0; run < num_runs; ++run)
         {
             QuadraticMesh<3> mesh(1.0/num_elem_each_dir[run], 1.0, 1.0, 1.0);
 
@@ -165,8 +165,8 @@ public:
 
             // Define displacement boundary conditions
             std::vector<unsigned> fixed_nodes;
-            std::vector<c_vector<double,3> > locations;
-            for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+            std::vector<c_vector<double, 3> > locations;
+            for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
             {
                 double X = mesh.GetNode(i)->rGetLocation()[0];
                 double Y = mesh.GetNode(i)->rGetLocation()[1];
@@ -176,28 +176,28 @@ public:
                 if (fabs(X) < 1e-6)
                 {
                     fixed_nodes.push_back(i);
-                    c_vector<double,3> new_position;
+                    c_vector<double, 3> new_position;
                     new_position(0) = 0.0;
                     new_position(1) = Y + Y*Y*ThreeDimensionalModelProblem::b/2.0;
                     new_position(2) = Z/((1+X*ThreeDimensionalModelProblem::a)*(1+Y*ThreeDimensionalModelProblem::b));
                     locations.push_back(new_position);
                 }
             }
-            assert(fixed_nodes.size()==(2*num_elem_each_dir[run]+1)*(2*num_elem_each_dir[run]+1));
+            assert(fixed_nodes.size() == (2*num_elem_each_dir[run]+1)*(2*num_elem_each_dir[run]+1));
 
             // Define traction boundary conditions on all boundary elems that are not on X=0
-            std::vector<BoundaryElement<2,3>*> boundary_elems;
-            for (TetrahedralMesh<3,3>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
+            std::vector<BoundaryElement<2, 3>*> boundary_elems;
+            for (auto iter = mesh.GetBoundaryElementIteratorBegin();
                  iter != mesh.GetBoundaryElementIteratorEnd();
                  ++iter)
             {
                 if (fabs((*iter)->CalculateCentroid()[0]) > 1e-6)
                 {
-                    BoundaryElement<2,3>* p_element = *iter;
+                    BoundaryElement<2, 3>* p_element = *iter;
                     boundary_elems.push_back(p_element);
                 }
             }
-            assert(boundary_elems.size()==10*num_elem_each_dir[run]*num_elem_each_dir[run]);
+            assert(boundary_elems.size() == 10*num_elem_each_dir[run]*num_elem_each_dir[run]);
 
             SolidMechanicsProblemDefinition<3> problem_defn(mesh);
             problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
@@ -217,8 +217,8 @@ public:
 
             l2_errors[run] = 0;
 
-            std::vector<c_vector<double,3> >& r_solution = solver.rGetDeformedPosition();
-            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+            std::vector<c_vector<double, 3> >& r_solution = solver.rGetDeformedPosition();
+            for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
             {
                 double X = mesh.GetNode(i)->rGetLocation()[0];
                 double Y = mesh.GetNode(i)->rGetLocation()[1];
@@ -228,7 +228,7 @@ public:
                 double exact_y = Y + Y*Y*ThreeDimensionalModelProblem::b/2.0;
                 double exact_z = Z/((1+X*ThreeDimensionalModelProblem::a)*(1+Y*ThreeDimensionalModelProblem::b));
 
-                c_vector<double,3> error;
+                c_vector<double, 3> error;
                 error(0) = r_solution[i](0) - exact_x;
                 error(1) = r_solution[i](1) - exact_y;
                 error(2) = r_solution[i](2) - exact_z;
@@ -246,13 +246,13 @@ public:
             l2_errors[run] /= mesh.GetNumNodes();
 
             std::vector<double>& r_pressures = solver.rGetPressures();
-            for (unsigned i=0; i<r_pressures.size(); ++i)
+            for (unsigned i = 0; i < r_pressures.size(); ++i)
             {
                 TS_ASSERT_DELTA(r_pressures[i]/(2*ThreeDimensionalModelProblem::c1), 1.0, 2e-1);
             }
         }
 
-        //for (unsigned run=0; run<num_runs; run++)
+        //for (unsigned run = 0; run < num_runs; ++run)
         //{
         //    std::cout << 1.0/num_elem_each_dir[run] << " " << l2_errors[run] << "\n";
         //}
@@ -262,7 +262,6 @@ public:
         TS_ASSERT_LESS_THAN(l2_errors[2], 2.1e-6);
         TS_ASSERT_LESS_THAN(l2_errors[3], 4e-7);
     }
-
 
     /**
      *  Solve a problem in which the traction boundary condition is a normal pressure
@@ -304,18 +303,17 @@ public:
         MooneyRivlinMaterialLaw<3> law(c1, 0.0);
 
         // anything will do here
-        c_matrix<double,3,3> rotation_matrix = identity_matrix<double>(3);
-        rotation_matrix(0,0)=1.0/sqrt(2.0);
-        rotation_matrix(0,1)=-1.0/sqrt(2.0);
-        rotation_matrix(1,0)=1.0/sqrt(2.0);
-        rotation_matrix(1,1)=1.0/sqrt(2.0);
-
+        c_matrix<double,3, 3> rotation_matrix = identity_matrix<double>(3);
+        rotation_matrix(0,0) = 1.0/sqrt(2.0);
+        rotation_matrix(0,1) = -1.0/sqrt(2.0);
+        rotation_matrix(1,0) = 1.0/sqrt(2.0);
+        rotation_matrix(1,1) = 1.0/sqrt(2.0);
 
         // Define displacement boundary conditions
         std::vector<unsigned> fixed_nodes;
-        std::vector<c_vector<double,3> > locations;
+        std::vector<c_vector<double, 3> > locations;
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double X = mesh.GetNode(i)->rGetLocation()[0];
             double Y = mesh.GetNode(i)->rGetLocation()[1];
@@ -325,7 +323,7 @@ public:
             if (fabs(X) < 1e-6)
             {
                 fixed_nodes.push_back(i);
-                c_vector<double,3> new_position_before_rotation;
+                c_vector<double, 3> new_position_before_rotation;
                 new_position_before_rotation(0) = 0.0;
                 new_position_before_rotation(1) = lambda*Y;
                 new_position_before_rotation(2) = lambda*Z;
@@ -335,28 +333,26 @@ public:
         assert(fixed_nodes.size()==(2*num_elem_each_dir+1)*(2*num_elem_each_dir+1));
 
         // Define pressure boundary conditions X=1 surface
-        std::vector<BoundaryElement<2,3>*> boundary_elems;
+        std::vector<BoundaryElement<2, 3>*> boundary_elems;
 
         double pressure_bc = 2*c1*((pow(lambda,-2.0)-pow(lambda,4.0)))/(lambda*lambda);
 
-        for (TetrahedralMesh<3,3>::BoundaryElementIterator iter
-              = mesh.GetBoundaryElementIteratorBegin();
-            iter != mesh.GetBoundaryElementIteratorEnd();
-            ++iter)
+        for (auto iter = mesh.GetBoundaryElementIteratorBegin();
+             iter != mesh.GetBoundaryElementIteratorEnd();
+             ++iter)
         {
             if (fabs((*iter)->CalculateCentroid()[0]-1)<1e-6)
             {
-                BoundaryElement<2,3>* p_element = *iter;
+                BoundaryElement<2, 3>* p_element = *iter;
                 boundary_elems.push_back(p_element);
             }
         }
-        assert(boundary_elems.size()==2*num_elem_each_dir*num_elem_each_dir);
+        assert(boundary_elems.size() == 2*num_elem_each_dir*num_elem_each_dir);
 
         SolidMechanicsProblemDefinition<3> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetFixedNodes(fixed_nodes, locations);
         problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, pressure_bc);
-
 
         IncompressibleNonlinearElasticitySolver<3> solver(mesh,
                                                           problem_defn,
@@ -365,19 +361,19 @@ public:
         solver.Solve();
 
         // Compare
-        std::vector<c_vector<double,3> >& r_solution = solver.rGetDeformedPosition();
-        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+        std::vector<c_vector<double, 3> >& r_solution = solver.rGetDeformedPosition();
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             double X = mesh.GetNode(i)->rGetLocation()[0];
             double Y = mesh.GetNode(i)->rGetLocation()[1];
             double Z = mesh.GetNode(i)->rGetLocation()[2];
 
-            c_vector<double,3> new_position_before_rotation;
+            c_vector<double, 3> new_position_before_rotation;
             new_position_before_rotation(0) = X/(lambda*lambda);
             new_position_before_rotation(1) = lambda*Y;
             new_position_before_rotation(2) = lambda*Z;
 
-            c_vector<double,3> new_position = prod(rotation_matrix, new_position_before_rotation);
+            c_vector<double, 3> new_position = prod(rotation_matrix, new_position_before_rotation);
 
             TS_ASSERT_DELTA(r_solution[i](0), new_position(0), 1e-2);
             TS_ASSERT_DELTA(r_solution[i](1), new_position(1), 1e-2);
@@ -386,12 +382,11 @@ public:
 
         // test the pressures
         std::vector<double>& r_pressures = solver.rGetPressures();
-        for (unsigned i=0; i<r_pressures.size(); i++)
+        for (unsigned i = 0; i < r_pressures.size(); ++i)
         {
             TS_ASSERT_DELTA(r_pressures[i], 2*c1*lambda*lambda, 0.05);
         }
     }
 };
-
 
 #endif /*TESTINCOMPRESSIBLENONLINEARELASTICITYSOLVERLONG_HPP_*/

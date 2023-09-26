@@ -130,7 +130,7 @@ public:
         TS_ASSERT_DELTA(p_shannon->GetModifier("membrane_rapid_delayed_rectifier_potassium_current_conductance")->Calc(0,0),-90,1e-9);
     }
 
-    void TestDummyModifiers(void)
+    void TestDummyModifiers()
     {
         DummyModifier dummymod;
 
@@ -140,7 +140,7 @@ public:
         TS_ASSERT_DELTA(parameter, returned, 1e-9);
     }
 
-    void TestFactorModifiers(void)
+    void TestFactorModifiers()
     {
         double factor = 2;
         FactorModifier mod(factor);
@@ -151,7 +151,7 @@ public:
         TS_ASSERT_DELTA(parameter*factor, returned, 1e-9);
     }
 
-    void TestFixedModifiers(void)
+    void TestFixedModifiers()
     {
         double fixed = 32;
         FixedModifier mod(fixed);
@@ -162,13 +162,13 @@ public:
         TS_ASSERT_DELTA(fixed, returned, 1e-9);
     }
 
-    void TestTimeModifiers(void)
+    void TestTimeModifiers()
     {
         // This class just provides an example of how to make a time modifier you might want.
         TimeModifier mod;
         double parameter = 2;
 
-        for (unsigned i=0; i<7; ++i)
+        for (unsigned i = 0; i<7; ++i)
         {
             double time = (double)i;
             double returned = mod.Calc(parameter, time);
@@ -176,7 +176,7 @@ public:
         }
     }
 
-    void TestArchivingModifiers(void)
+    void TestArchivingModifiers()
     {
         //Archive
         OutputFileHandler handler("archive", false);

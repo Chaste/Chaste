@@ -92,9 +92,9 @@ CylindricalHoneycombMeshGenerator::CylindricalHoneycombMeshGenerator(unsigned nu
     (*p_node_file) << num_nodes << "\t2\t0\t1" << std::endl;
 
     unsigned node = 0;
-    for (unsigned i=0; i<num_nodes_along_length; ++i)
+    for (unsigned i = 0; i<num_nodes_along_length; ++i)
     {
-        for (unsigned j=0; j<num_nodes_along_width; ++j)
+        for (unsigned j = 0; j<num_nodes_along_width; ++j)
         {
             if (i<ghosts || i>=(ghosts+mNumCellLength))
             {
@@ -136,9 +136,9 @@ CylindricalHoneycombMeshGenerator::CylindricalHoneycombMeshGenerator(unsigned nu
 
     unsigned elem = 0;
     unsigned edge = 0;
-    for (unsigned i=0; i<num_elem_along_length; ++i)
+    for (unsigned i = 0; i<num_elem_along_length; ++i)
     {
-        for (unsigned j=0; j < num_elem_along_width; ++j)
+        for (unsigned j = 0; j < num_elem_along_width; ++j)
         {
             unsigned node0 =     i*num_nodes_along_width + j;
             unsigned node1 =     i*num_nodes_along_width + j+1;
@@ -175,7 +175,7 @@ CylindricalHoneycombMeshGenerator::CylindricalHoneycombMeshGenerator(unsigned nu
         }
     }
 
-    for (unsigned i=0; i<num_elem_along_length; ++i)
+    for (unsigned i = 0; i<num_elem_along_length; ++i)
     {
         unsigned node0, node1;
 
@@ -192,7 +192,7 @@ CylindricalHoneycombMeshGenerator::CylindricalHoneycombMeshGenerator(unsigned nu
         (*p_edge_file) << edge++ << "\t" << node0 << "\t" << node1 << "\t" << 1 << std::endl;
     }
 
-    for (unsigned j=0; j<num_elem_along_width; ++j)
+    for (unsigned j = 0; j<num_elem_along_width; ++j)
     {
         unsigned node0 = num_nodes_along_width*(num_nodes_along_length-1) + j;
         unsigned node1 = num_nodes_along_width*(num_nodes_along_length-1) + j+1;
@@ -205,7 +205,7 @@ CylindricalHoneycombMeshGenerator::CylindricalHoneycombMeshGenerator(unsigned nu
     // Having written the mesh to file, now construct it using TrianglesMeshReader.
     // Nested scope so the reader closes files before we delete them below.
     {
-        TrianglesMeshReader<2,2> mesh_reader(output_file_handler.GetOutputDirectoryFullPath() + mMeshFilename);
+        TrianglesMeshReader<2, 2> mesh_reader(output_file_handler.GetOutputDirectoryFullPath() + mMeshFilename);
         mpMesh = boost::make_shared<Cylindrical2dMesh>(mDomainWidth);
         mpMesh->ConstructFromMeshReader(mesh_reader);
     }
@@ -220,7 +220,7 @@ CylindricalHoneycombMeshGenerator::CylindricalHoneycombMeshGenerator(unsigned nu
     mpMesh->SetMeshHasChangedSinceLoading();
 }
 
-boost::shared_ptr<MutableMesh<2,2> > CylindricalHoneycombMeshGenerator::GetMesh()
+boost::shared_ptr<MutableMesh<2, 2> > CylindricalHoneycombMeshGenerator::GetMesh()
 {
     EXCEPTION("A cylindrical mesh was created but a normal mesh is being requested.");
     return mpMesh; // Not really

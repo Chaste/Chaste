@@ -68,7 +68,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class ExtendedBidomainAssembler
-    : public AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,3,true,true,NORMAL>
+    : public AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM,3,true,true,NORMAL>
 {
 
 protected:
@@ -94,9 +94,9 @@ protected:
         c_vector<double, ELEMENT_DIM+1> &rPhi,
         c_matrix<double, SPACE_DIM, ELEMENT_DIM+1> &rGradPhi,
         ChastePoint<SPACE_DIM> &rX,
-        c_vector<double,3> &rU,
+        c_vector<double, 3> &rU,
         c_matrix<double, 3, SPACE_DIM> &rGradU /* not used */,
-        Element<ELEMENT_DIM,SPACE_DIM>* pElement);
+        Element<ELEMENT_DIM, SPACE_DIM>* pElement);
 
 public:
 
@@ -106,7 +106,7 @@ public:
      * @param pMesh pointer to the mesh
      * @param pTissue pointer to the tissue
      */
-    ExtendedBidomainAssembler(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
+    ExtendedBidomainAssembler(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
                             ExtendedBidomainTissue<SPACE_DIM>* pTissue);
 
     /**

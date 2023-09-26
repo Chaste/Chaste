@@ -64,7 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 // cell factory for creating 2 cells with both intra and extracellular stimuli
-template <unsigned PROBLEM_DIM=1>
+template<unsigned PROBLEM_DIM=1>
 class MyCardiacCellFactory : public AbstractCardiacCellFactory<PROBLEM_DIM>
 {
 private:
@@ -90,37 +90,37 @@ public:
         }
     }
 
-    ~MyCardiacCellFactory(void)
+    ~MyCardiacCellFactory()
     {
     }
 };
 
-class SimpleConductivityModifier : public AbstractConductivityModifier<2,2>
+class SimpleConductivityModifier : public AbstractConductivityModifier<2, 2>
 {
 private:
-    c_matrix<double,2,2> mTensor;
+    c_matrix<double,2, 2> mTensor;
 
 public:
     SimpleConductivityModifier()
-        : AbstractConductivityModifier<2,2>(),
+        : AbstractConductivityModifier<2, 2>(),
           mTensor(zero_matrix<double>(2,2))
           // Conductivity tensors are diagonal, so we can only need to do the diagonal if we initialise our tensor with the above line
     {
     }
 
-    c_matrix<double,2,2>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,2,2>& rOriginalConductivity, unsigned domainIndex)
+    c_matrix<double,2, 2>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,2, 2>& rOriginalConductivity, unsigned domainIndex)
     {
         // Increase by factor of two for element 1
         if (elementIndex == 1)
         {
-            for ( unsigned dim=0; dim<2; dim++)
+            for ( unsigned dim = 0; dim<2; dim++)
             {
                 mTensor(dim,dim) = 2.0*rOriginalConductivity(dim,dim);
             }
         }
         else
         {
-            for ( unsigned dim=0; dim<2; dim++)
+            for ( unsigned dim = 0; dim<2; dim++)
             {
                 mTensor(dim,dim) = rOriginalConductivity(dim,dim);
             }
@@ -144,7 +144,7 @@ public:
         // HeartConfig knows the mesh filename despite we use our own mesh reader.
         HeartConfig::Instance()->SetMeshFileName("linear_mesh", cp::media_type::NoFibreOrientation);
 
-        TetrahedralMesh<1,1> mesh;
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructLinearMesh(1);
 
         double big_time_step = 0.5;
@@ -210,14 +210,14 @@ public:
         // HeartConfig knows the mesh filename despite we use our own mesh reader.
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/cube_2mm_12_elements", cp::media_type::NoFibreOrientation);
 
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
 
-        DistributedTetrahedralMesh<3,3> mesh;
+        DistributedTetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         std::vector<ChasteCuboid<3> > heterogeneity_area;
-        std::vector< c_vector<double,3> > intra_conductivities;
-        std::vector< c_vector<double,3> > extra_conductivities;
+        std::vector< c_vector<double, 3> > intra_conductivities;
+        std::vector< c_vector<double, 3> > extra_conductivities;
 
         //first cuboid include element 0
         ChastePoint<3> cornerA(-1, -1, 0);
@@ -249,7 +249,7 @@ public:
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(isotropic_intra_conductivity, isotropic_intra_conductivity, isotropic_intra_conductivity));
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(isotropic_extra_conductivity, isotropic_extra_conductivity, isotropic_extra_conductivity));
 
-        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML,3> cell_factory_for_het;
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory_for_het;
         cell_factory_for_het.SetMesh(&mesh);
 
         //CreateIntracellularConductivityTensor called in the constructor
@@ -281,8 +281,8 @@ public:
     void TestBidomainTissueConductivityModifier()
     {
         HeartConfig::Instance()->Reset();
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory;
@@ -317,8 +317,8 @@ public:
         // HeartConfig knows the mesh filename despite we use our own mesh reader.
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/cube_2mm_12_elements", cp::media_type::NoFibreOrientation);
 
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         /*
@@ -326,8 +326,8 @@ public:
         * Set discrete '''ellipsoid''' areas to have heterogeneous (intra- and/or extra-cellular) conductivity tensors.
         */
         std::vector<ChasteEllipsoid<3> > heterogeneity_area;
-        std::vector< c_vector<double,3> > intra_conductivities;
-        std::vector< c_vector<double,3> > extra_conductivities;
+        std::vector< c_vector<double, 3> > intra_conductivities;
+        std::vector< c_vector<double, 3> > extra_conductivities;
 
         //first small ellipsoid including element 0 centroid
         ChastePoint<3> centre_1(0.025, 0.075, 0.05);
@@ -359,7 +359,7 @@ public:
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(isotropic_intra_conductivity, isotropic_intra_conductivity, isotropic_intra_conductivity));
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(isotropic_extra_conductivity, isotropic_extra_conductivity, isotropic_extra_conductivity));
 
-        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML,3> cell_factory_for_het;
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory_for_het;
         cell_factory_for_het.SetMesh(&mesh);
 
         //CreateIntracellularConductivityTensor called in the constructor
@@ -403,8 +403,8 @@ public:
                 // knows the mesh filename despite we use our own mesh reader.
                 HeartConfig::Instance()->SetMeshFileName("mesh/test/data/3D_Single_tetrahedron_element", *it);
 
-                TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/3D_Single_tetrahedron_element");
-                TetrahedralMesh<3,3> mesh;
+                TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/3D_Single_tetrahedron_element");
+                TetrahedralMesh<3, 3> mesh;
                 mesh.ConstructFromMeshReader(mesh_reader);
 
                 MyCardiacCellFactory<3> cell_factory;
@@ -444,9 +444,9 @@ public:
                 const c_matrix<double, 3, 3>& intra_tensor_after_archiving = p_bidomain_tissue->rGetIntracellularConductivityTensor(0);
                 const c_matrix<double, 3, 3>& extra_tensor_after_archiving = dynamic_cast<BidomainTissue<3>*>(p_bidomain_tissue)->rGetExtracellularConductivityTensor(0); //Naughty Gary using dynamic cast, but only for testing...
 
-                for (unsigned i=0; i<3; ++i)
+                for (unsigned i = 0; i<3; ++i)
                 {
-                    for (unsigned j=0; j<3; ++j)
+                    for (unsigned j = 0; j<3; ++j)
                     {
                         TS_ASSERT_DELTA(intra_tensor_before_archiving(i,j), intra_tensor_after_archiving(i,j), 1e-9);
                         TS_ASSERT_DELTA(extra_tensor_before_archiving(i,j), extra_tensor_after_archiving(i,j), 1e-9);

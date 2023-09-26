@@ -60,8 +60,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class AbstractMesh : private boost::noncopyable
 {
     friend class TestDistributedTetrahedralMesh;
-    template <unsigned A_DIMENSION> friend class NodesOnlyMesh; //NodesOnlyMesh is able to grab the node information in order to copy
-    template <unsigned A_DIMENSION> friend class QuadraticMeshHelper;
+    template<unsigned A_DIMENSION> friend class NodesOnlyMesh; //NodesOnlyMesh is able to grab the node information in order to copy
+    template<unsigned A_DIMENSION> friend class QuadraticMeshHelper;
 
 private:
     /**
@@ -394,7 +394,7 @@ public:
      * @param axis is the axis of rotation (does not need to be normalised)
      * @param angle is the angle of rotation in radians
      */
-    void Rotate(c_vector<double,3> axis, double angle);
+    void Rotate(c_vector<double, 3> axis, double angle);
 
     /**
      * Rotate the mesh about the x-axis.

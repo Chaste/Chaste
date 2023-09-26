@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PetscSetupAndFinalize.hpp"
 
-typedef BoundaryElement<2,3> BOUNDARY_ELEMENT_2_3;
+typedef BoundaryElement<2, 3> BOUNDARY_ELEMENT_2_3;
 
 class TestElement : public CxxTest::TestSuite
 {
@@ -60,7 +60,7 @@ class TestElement : public CxxTest::TestSuite
      */
     Node<3>* CreateZeroPointNode(int index)
     {
-        c_vector<double,3> zero_point;
+        c_vector<double, 3> zero_point;
         zero_point.clear();
 
         Node<3>* p_node = new Node<3>(index, zero_point, false);
@@ -76,10 +76,10 @@ public:
         corner_nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
         corner_nodes.push_back(new Node<3>(2, false, 0.0, 1.0, 0.0));
         corner_nodes.push_back(new Node<3>(3, false, 0.0, 0.0, 1.0));
-        Element<3,3> element(INDEX_IS_NOT_USED, corner_nodes);
+        Element<3, 3> element(INDEX_IS_NOT_USED, corner_nodes);
 
         // Check nodes on the new element have the right indices
-        for (unsigned i=0; i<4; ++i)
+        for (unsigned i = 0; i<4; ++i)
         {
             TS_ASSERT_EQUALS(element.GetNodeGlobalIndex(i), i);
         }
@@ -92,7 +92,7 @@ public:
         TS_ASSERT_DELTA(det, 1.0, 1e-5);
         TS_ASSERT_DELTA(element.GetVolume(det), 1.0/6.0, 1e-5);
 
-        for (unsigned i=0; i<corner_nodes.size(); ++i)
+        for (unsigned i = 0; i<corner_nodes.size(); ++i)
         {
             delete corner_nodes[i];
         }
@@ -108,21 +108,21 @@ public:
         corner_nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
         corner_nodes.push_back(new Node<3>(2, false, 0.0, 1.0, 0.0));
         corner_nodes.push_back(new Node<3>(3, false, 0.0, 0.0, 1.0));
-        Element<3,3> element(INDEX_IS_NOT_USED, corner_nodes);
+        Element<3, 3> element(INDEX_IS_NOT_USED, corner_nodes);
 
         std::vector<Node<3>*> more_nodes;
         more_nodes.push_back(new Node<3>(0, false, 10.0, 10.0, 10.0));
         more_nodes.push_back(new Node<3>(1, false, 11.0, 10.0, 10.0));
         more_nodes.push_back(new Node<3>(2, false, 10.0, 11.0, 10.0));
         more_nodes.push_back(new Node<3>(3, false, 10.0, 10.0, 11.0));
-        Element<3,3> another_element(INDEX_IS_NOT_USED, more_nodes);
+        Element<3, 3> another_element(INDEX_IS_NOT_USED, more_nodes);
 
         // Test (and cover) equals operator
         another_element = element;
 
-        for (int i=0; i<4; ++i)
+        for (int i = 0; i<4; ++i)
         {
-            for (int j=0; j<3; ++j)
+            for (int j = 0; j<3; ++j)
             {
                 TS_ASSERT_DELTA(another_element.GetNode(i)->GetPoint()[j], element.GetNode(i)->GetPoint()[j], 1e-10);
             }
@@ -132,7 +132,7 @@ public:
         element.MarkAsDeleted();
         TS_ASSERT_DELTA(element.GetVolume(1.0), 0.0, 1e-6);
 
-        for (unsigned i=0; i<corner_nodes.size(); ++i)
+        for (unsigned i = 0; i<corner_nodes.size(); ++i)
         {
             delete corner_nodes[i];
             delete more_nodes[i];
@@ -146,13 +146,13 @@ public:
         corner_nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
         corner_nodes.push_back(new Node<3>(2, false, 0.0, 1.0, 0.0));
         corner_nodes.push_back(new Node<3>(3, false, 0.0, 0.0, 1.0));
-        Element<3,3> element(INDEX_IS_NOT_USED, corner_nodes);
+        Element<3, 3> element(INDEX_IS_NOT_USED, corner_nodes);
 
         element.SetOwnership(true);
 
         TS_ASSERT_EQUALS(element.GetOwnership(), true);
 
-        for (unsigned i=0; i<corner_nodes.size(); ++i)
+        for (unsigned i = 0; i<corner_nodes.size(); ++i)
         {
             delete corner_nodes[i];
         }
@@ -164,7 +164,7 @@ public:
         std::vector<Node<1>*> nodes1d;
         nodes1d.push_back(new Node<1>(0, false, 2.0));
         nodes1d.push_back(new Node<1>(1, false, 2.5));
-        Element<1,1> element1d(INDEX_IS_NOT_USED, nodes1d);
+        Element<1, 1> element1d(INDEX_IS_NOT_USED, nodes1d);
         c_matrix<double, 1, 1> J1d;
         double det_1d;
         c_matrix<double, 1, 1> J1dinv;
@@ -183,7 +183,7 @@ public:
         nodes2d.push_back(new Node<2>(0, false, 0.0, 0.0));
         nodes2d.push_back(new Node<2>(1, false, 1.0, 0.0));
         nodes2d.push_back(new Node<2>(2, false, 0.0, 1.0));
-        Element<2,2> element2d(INDEX_IS_NOT_USED, nodes2d);
+        Element<2, 2> element2d(INDEX_IS_NOT_USED, nodes2d);
         c_matrix<double, 2, 2> J2d;
         double det;
         element2d.CalculateJacobian(J2d, det);
@@ -204,7 +204,7 @@ public:
         nodes2d2.push_back(new Node<2>(0, false, 1.0, -2.0));
         nodes2d2.push_back(new Node<2>(1, false, 4.0, -3.0));
         nodes2d2.push_back(new Node<2>(2, false, 2.0, -1.0));
-        Element<2,2> element2d2(INDEX_IS_NOT_USED, nodes2d2);
+        Element<2, 2> element2d2(INDEX_IS_NOT_USED, nodes2d2);
         c_matrix<double, 2, 2> J2d2;
         c_matrix<double, 2, 2> J2d2inv;
         double det_2d;
@@ -230,7 +230,7 @@ public:
         nodes3d.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
         nodes3d.push_back(new Node<3>(2, false, 0.0, 1.0, 0.0));
         nodes3d.push_back(new Node<3>(3, false, 0.0, 0.0, 1.0));
-        Element<3,3> element3d(INDEX_IS_NOT_USED, nodes3d);
+        Element<3, 3> element3d(INDEX_IS_NOT_USED, nodes3d);
         c_matrix<double, 3, 3> J3d;
         double det_3d;
         element3d.CalculateJacobian(J3d,det_3d);
@@ -256,7 +256,7 @@ public:
         nodes3d2.push_back(new Node<3>(1, false, 2.0, 1.0, 3.0));
         nodes3d2.push_back(new Node<3>(2, false, 5.0, 5.0, 5.0));
         nodes3d2.push_back(new Node<3>(3, false, 0.0, 3.0, 4.0));
-        Element<3,3> element3d2(INDEX_IS_NOT_USED, nodes3d2);
+        Element<3, 3> element3d2(INDEX_IS_NOT_USED, nodes3d2);
         c_matrix<double, 3, 3> J3d2;
         c_matrix<double, 3, 3> J3d2inv;
         element3d2.CalculateInverseJacobian(J3d2,det_3d,J3d2inv);
@@ -299,8 +299,8 @@ public:
         Node<1> node1(0, point1);
         Node<2> node2(0, point2);
 
-        BoundaryElement<0,1> element1(INDEX_IS_NOT_USED, &node1);
-        BoundaryElement<0,2> element2(INDEX_IS_NOT_USED, &node2);
+        BoundaryElement<0, 1> element1(INDEX_IS_NOT_USED, &node1);
+        BoundaryElement<0, 2> element2(INDEX_IS_NOT_USED, &node2);
 
         TS_ASSERT_EQUALS(element1.GetNode(0)->GetPoint()[0], point1[0]);
 
@@ -319,7 +319,7 @@ public:
         element_nodes.push_back(new Node<2>(0, point2));
         element_nodes.push_back(new Node<2>(0, point3));
 
-        Element<2,2> element(INDEX_IS_NOT_USED, element_nodes);
+        Element<2, 2> element(INDEX_IS_NOT_USED, element_nodes);
 
         // Note that nodes 2 and 3 are swapped by the element constructor
         // to ensure that the Jacobian determinant is positive
@@ -356,8 +356,8 @@ public:
         nodes_1d_incorrect.push_back(&na1);
         nodes_1d_incorrect.push_back(&na0);
 
-        Element<1,1> e_1d_correct_orientation(INDEX_IS_NOT_USED, nodes_1d_correct);
-        Element<1,1> e_1d_incorrect_orientation(INDEX_IS_NOT_USED, nodes_1d_incorrect);
+        Element<1, 1> e_1d_correct_orientation(INDEX_IS_NOT_USED, nodes_1d_correct);
+        Element<1, 1> e_1d_incorrect_orientation(INDEX_IS_NOT_USED, nodes_1d_incorrect);
 
         // Index of second node should be 1
         TS_ASSERT_EQUALS( e_1d_correct_orientation.GetNode(1)->GetIndex(), 1u);
@@ -379,8 +379,8 @@ public:
         nodes_2d_incorrect.push_back(&nb0);
         nodes_2d_incorrect.push_back(&nb2);
 
-        Element<2,2>   e_2d_correct_orientation(INDEX_IS_NOT_USED, nodes_2d_correct);
-        Element<2,2> e_2d_incorrect_orientation(INDEX_IS_NOT_USED, nodes_2d_incorrect);
+        Element<2, 2>   e_2d_correct_orientation(INDEX_IS_NOT_USED, nodes_2d_correct);
+        Element<2, 2> e_2d_incorrect_orientation(INDEX_IS_NOT_USED, nodes_2d_incorrect);
 
         // Index of last node should be 2
         TS_ASSERT_EQUALS(e_2d_correct_orientation.GetNode(2)->GetIndex(), 2u);
@@ -404,8 +404,8 @@ public:
         nodes_3d_incorrect.push_back(&nc3);
         nodes_3d_incorrect.push_back(&nc2);
 
-        Element<3,3> e_3d_correct_orientation(INDEX_IS_NOT_USED, nodes_3d_correct);
-        Element<3,3> e_3d_incorrect_orientation(INDEX_IS_NOT_USED, nodes_3d_incorrect);
+        Element<3, 3> e_3d_correct_orientation(INDEX_IS_NOT_USED, nodes_3d_correct);
+        Element<3, 3> e_3d_incorrect_orientation(INDEX_IS_NOT_USED, nodes_3d_incorrect);
 
         // Index of last node should be 3
         TS_ASSERT_EQUALS( e_3d_correct_orientation.GetNode(3)->GetIndex(), 3u);
@@ -422,10 +422,10 @@ public:
         corner_nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 3.0));
         corner_nodes.push_back(new Node<3>(2, false, 0.0, 1.0, 0.0));
         corner_nodes.push_back(new Node<3>(3, false, 0.0, 0.0, 1.0));
-        Element<3,3> element(31415, corner_nodes);
+        Element<3, 3> element(31415, corner_nodes);
 
         // Create a copy of the element and test that it's the same as the original one
-        Element<3,3> copied_element(element);
+        Element<3, 3> copied_element(element);
 
         TS_ASSERT_EQUALS(element.GetNumNodes(), copied_element.GetNumNodes());
 
@@ -433,15 +433,15 @@ public:
         // element the same index number
         TS_ASSERT_EQUALS(copied_element.GetIndex(), 31415u);
 
-        for (int node=0; node<4; node++)
+        for (int node = 0; node<4; node++)
         {
-            for (int dimension=0; dimension<3; dimension++)
+            for (int dimension = 0; dimension<3; dimension++)
             {
                 TS_ASSERT_EQUALS(element.GetNodeLocation(node, dimension), copied_element.GetNodeLocation(node, dimension));
             }
         }
 
-        Element<3,3> another_copied_element(element, 2345);
+        Element<3, 3> another_copied_element(element, 2345);
         TS_ASSERT_EQUALS(another_copied_element.GetIndex(), 2345u);
 
         // Update a node of the element
@@ -449,7 +449,7 @@ public:
         another_copied_element.UpdateNode(1, update_for_node);
         TS_ASSERT_EQUALS(another_copied_element.GetNodeLocation(1, 2), 2.0);
 
-        for (unsigned i=0; i<corner_nodes.size(); ++i)
+        for (unsigned i = 0; i<corner_nodes.size(); ++i)
         {
             delete corner_nodes[i];
         }
@@ -463,7 +463,7 @@ public:
         nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
         nodes.push_back(new Node<3>(2, false, 0.0, 1.0, 0.0));
 
-        BoundaryElement<2,3> element(INDEX_IS_NOT_USED, nodes);
+        BoundaryElement<2, 3> element(INDEX_IS_NOT_USED, nodes);
         c_vector<double, 3> weighted_direction;
         double det;
         element.CalculateWeightedDirection(weighted_direction, det);
@@ -491,7 +491,7 @@ public:
         delete p_fake_node;
         delete p_fake_node2;
 
-        for (unsigned i=0; i<nodes.size(); ++i)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
             delete nodes_the_same[i];
@@ -539,7 +539,7 @@ public:
         nodes.push_back(new Node<1>(0, false, 10.0));
         nodes.push_back(new Node<1>(1, false, 15.0));
 
-        Element<1,1> element(0, nodes);
+        Element<1, 1> element(0, nodes);
 
         c_matrix<double, 1, 1> jacobian, inverse_jacobian;
         double det;
@@ -550,7 +550,7 @@ public:
 
         TS_ASSERT_DELTA(element.CalculateQuality(), 1.0, 1e-7);
 
-        for (unsigned i=0; i<nodes.size(); ++i)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -563,7 +563,7 @@ public:
         equilateral_nodes.push_back(new Node<2>(1, false, -1.0,  sqrt(3.0)));
         equilateral_nodes.push_back(new Node<2>(2, false, -1.0, -sqrt(3.0)));
 
-        Element<2,2> equilateral_element(0, equilateral_nodes);
+        Element<2, 2> equilateral_element(0, equilateral_nodes);
 
         c_matrix<double, 2, 2> jacobian, inverse_jacobian;
         double det;
@@ -580,7 +580,7 @@ public:
         right_angle_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
         right_angle_nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
         right_angle_nodes.push_back(new Node<2>(2, false, 0.0, 1.0));
-        Element<2,2> right_angle_element(0, right_angle_nodes);
+        Element<2, 2> right_angle_element(0, right_angle_nodes);
 
         right_angle_element.CalculateInverseJacobian(jacobian, det, inverse_jacobian);
         c_vector<double, 3> circum2 = right_angle_element.CalculateCircumsphere(jacobian, inverse_jacobian);
@@ -599,11 +599,11 @@ public:
         TS_ASSERT_DELTA(right_angle_min_max[1], sqrt(2.0), 1e-5);
 
 
-        for (unsigned i=0; i<equilateral_nodes.size(); ++i)
+        for (unsigned i = 0; i<equilateral_nodes.size(); ++i)
         {
             delete equilateral_nodes[i];
         }
-        for (unsigned i=0; i<right_angle_nodes.size(); ++i)
+        for (unsigned i = 0; i<right_angle_nodes.size(); ++i)
         {
             delete right_angle_nodes[i];
         }
@@ -617,7 +617,7 @@ public:
         nodes.push_back(new Node<3>(2, false, -1.0,  1.0, -1.0));
         nodes.push_back(new Node<3>(3, false,  1.0, -1.0, -1.0));
 
-        Element<3,3> element(0, nodes);
+        Element<3, 3> element(0, nodes);
 
         c_matrix<double, 3, 3> jacobian, inverse_jacobian;
         double det;
@@ -636,7 +636,7 @@ public:
         right_angle_nodes.push_back(new Node<3>(3, false, 0.0, 1.0, 0.0));
         right_angle_nodes.push_back(new Node<3>(2, false, 0.0, 0.0, 1.0));
 
-        Element<3,3> right_angle_element(0, right_angle_nodes);
+        Element<3, 3> right_angle_element(0, right_angle_nodes);
 
         right_angle_element.CalculateInverseJacobian(jacobian, det, inverse_jacobian);
         c_vector<double, 4> circum2 = right_angle_element.CalculateCircumsphere(jacobian, inverse_jacobian);
@@ -654,11 +654,11 @@ public:
         TS_ASSERT_DELTA(right_angle_min_max[0], 1.0, 1e-5);
         TS_ASSERT_DELTA(right_angle_min_max[1], sqrt(2.0), 1e-5);
 
-        for (unsigned i=0; i<right_angle_nodes.size(); ++i)
+        for (unsigned i = 0; i<right_angle_nodes.size(); ++i)
         {
             delete right_angle_nodes[i];
         }
-        for (unsigned i=0; i<nodes.size(); ++i)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -669,7 +669,7 @@ public:
         std::vector<Node<2>*> nodes;
         nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
         nodes.push_back(new Node<2>(1, false, 0.5, 0.0));
-        BoundaryElement<1,2> element_1d(0, nodes);
+        BoundaryElement<1, 2> element_1d(0, nodes);
 
         c_vector<double, 2> normal = element_1d.CalculateNormal();
 
@@ -682,13 +682,13 @@ public:
 
     void TestCentroidAndDirection()
     {
-        c_vector<double,3> direction;
-        c_vector<double,3> centroid;
+        c_vector<double, 3> direction;
+        c_vector<double, 3> centroid;
 
         std::vector<Node<3>*> nodes;
         nodes.push_back(new Node<3>(0, false, 0.0, 0.0, 0.0));
         nodes.push_back(new Node<3>(1, false, 0.5, 0.0, 0.0));
-        BoundaryElement<1,3> element_1d(0, nodes);
+        BoundaryElement<1, 3> element_1d(0, nodes);
 
         double det;
         element_1d.CalculateWeightedDirection(direction, det);
@@ -709,7 +709,7 @@ public:
         TS_ASSERT_EQUALS(centroid[2], 0.0);
 
         nodes.push_back(new Node<3>(3, false, 0.0, 1.0, 0.0));
-        BoundaryElement<2,3> element_2d(0, nodes);
+        BoundaryElement<2, 3> element_2d(0, nodes);
 
         element_2d.CalculateWeightedDirection(direction, det);
 
@@ -719,7 +719,7 @@ public:
         TS_ASSERT_EQUALS(direction[2], -0.5);
         TS_ASSERT_EQUALS(det, 0.5);
 
-        c_vector<double,3> normal = element_2d.CalculateNormal();
+        c_vector<double, 3> normal = element_2d.CalculateNormal();
         TS_ASSERT_EQUALS(normal[0], 0.0);
         TS_ASSERT_EQUALS(normal[1], 0.0);
         TS_ASSERT_EQUALS(normal[2], -1.0);
@@ -732,7 +732,7 @@ public:
         TS_ASSERT_EQUALS(centroid[2], 0.0);
 
         nodes.push_back(new Node<3>(2, false, 0.0, 0.0, 1.0));
-        Element<3,3> element_3d(0, nodes);
+        Element<3, 3> element_3d(0, nodes);
         // Weighted direction only makes sense in a subspace element
         TS_ASSERT_THROWS_THIS(element_3d.CalculateWeightedDirection(direction, det),
                 "WeightedDirection undefined for fully dimensional element");
@@ -743,7 +743,7 @@ public:
         TS_ASSERT_DELTA(centroid[1], 0.25, 1e-8);
         TS_ASSERT_EQUALS(centroid[2], 0.25 );
 
-        for (unsigned i=0; i<nodes.size(); ++i)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -751,11 +751,11 @@ public:
 
     void Test1DRefineElement()
     {
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        MutableMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        MutableMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        BoundaryElement<0,1>* p_end_boundary = mesh.GetBoundaryElement(0);
+        BoundaryElement<0, 1>* p_end_boundary = mesh.GetBoundaryElement(0);
         c_vector<double, 1> dir;
         double unit_det;
         p_end_boundary->CalculateWeightedDirection(dir, unit_det);
@@ -765,7 +765,7 @@ public:
         TS_ASSERT_EQUALS(dir[0], 0.0);
 
         ChastePoint<1> new_point(0.01);
-        Element<1,1>* p_first_element = mesh.GetElement(0);
+        Element<1, 1>* p_first_element = mesh.GetElement(0);
 
 
         TS_ASSERT_THROWS_NOTHING(mesh.RefineElement(p_first_element, new_point));
@@ -781,7 +781,7 @@ public:
         TS_ASSERT_EQUALS(p_second_node->GetPoint().rGetLocation()(0), 0.01);
 
         // Test second element
-        Element<1,1>* p_second_element = mesh.GetElement(1);
+        Element<1, 1>* p_second_element = mesh.GetElement(1);
         p_first_node = p_second_element->GetNode(0);
         p_second_node = p_second_element->GetNode(1);
 
@@ -789,7 +789,7 @@ public:
         TS_ASSERT_EQUALS(p_second_node->GetPoint().rGetLocation()(0), 0.2);
 
         // Test last element
-        Element<1,1>* p_last_element = mesh.GetElement(10);
+        Element<1, 1>* p_last_element = mesh.GetElement(10);
         p_first_node = p_last_element->GetNode(0);
         p_second_node = p_last_element->GetNode(1);
 
@@ -797,7 +797,7 @@ public:
         TS_ASSERT_EQUALS(p_second_node->GetPoint().rGetLocation()(0), 0.1);
 
         // Test Jacobians
-        c_matrix<double,1,1> jacobian;
+        c_matrix<double,1, 1> jacobian;
         double det;
         p_first_element->CalculateJacobian(jacobian, det);
         TS_ASSERT_EQUALS(det, 0.01);
@@ -813,12 +813,12 @@ public:
 
     void Test1DRefineElementWithPointTooFarRightFails()
     {
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        MutableMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        MutableMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         ChastePoint<1> new_point(0.11);
-        Element<1,1>* p_first_element = mesh.GetElement(0);
+        Element<1, 1>* p_first_element = mesh.GetElement(0);
 
         // Trying to add Point(0.11) to Element(0)
         // This point is contained in Element(1)
@@ -828,12 +828,12 @@ public:
 
     void Test1DRefineElementWithPointTooFarLeftFails()
     {
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        MutableMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        MutableMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         ChastePoint<1> new_point(-0.1);
-        Element<1,1>* p_first_element = mesh.GetElement(0);
+        Element<1, 1>* p_first_element = mesh.GetElement(0);
 
         // Trying to add Point(-0.1) to Element(0)
         // This point is to the left of Element(0)
@@ -843,11 +843,11 @@ public:
 
     void Test1DRefineElementManyNodes()
     {
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        MutableMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        MutableMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        Element<1,1>* p_first_element = mesh.GetElement(0);
+        Element<1, 1>* p_first_element = mesh.GetElement(0);
 
         // There's space on the node vector for 10 new points
         // but more than 10 should still work
@@ -860,17 +860,17 @@ public:
 
     void Test2DRefineElement()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_200_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/2D_0_to_1mm_200_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_DELTA(mesh.GetVolume(), 0.01,1e-6);
         TS_ASSERT_DELTA(mesh.GetSurfaceArea(), 0.4,1e-6);
 
         // Refine an element in the bottom right corner
-        Element<2,2>* p_corner_element = mesh.GetElement(18);
+        Element<2, 2>* p_corner_element = mesh.GetElement(18);
 
-        c_matrix<double,2,2> jacobian;
+        c_matrix<double,2, 2> jacobian;
         double det;
         p_corner_element->CalculateJacobian(jacobian, det);
         TS_ASSERT_DELTA(det, 0.0001, 1e-6);
@@ -890,7 +890,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetSurfaceArea(), 0.4, 1e-6);
 
         // Refine an element in the middle of the mesh
-        Element<2,2>* p_middle_element = mesh.GetElement(108);
+        Element<2, 2>* p_middle_element = mesh.GetElement(108);
 
         p_middle_element->CalculateJacobian(jacobian, det);
         TS_ASSERT_DELTA(det, 0.0001, 1e-6);
@@ -912,12 +912,12 @@ public:
 
     void Test2DRefineElementFails()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_200_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/2D_0_to_1mm_200_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Refine an element in the bottom right corner
-        Element<2,2>* p_corner_element = mesh.GetElement(18);
+        Element<2, 2>* p_corner_element = mesh.GetElement(18);
 
         // Point to be inserted on the edge of the element
         ChastePoint<2> new_point(0.095, 0.005);
@@ -929,16 +929,16 @@ public:
 
     void Test3DRefineElement()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-        MutableMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
+        MutableMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_DELTA(mesh.GetVolume(), 1.0, 1e-6);
         TS_ASSERT_DELTA(mesh.GetSurfaceArea(), 6.0, 1e-6);
 
         // Refine an element in the top corner (1, 1, 1)
-        Element<3,3>* p_corner_element = mesh.GetElement(64);
-        c_matrix<double,3,3> jacobian;
+        Element<3, 3>* p_corner_element = mesh.GetElement(64);
+        c_matrix<double,3, 3> jacobian;
         double det;
         p_corner_element->CalculateJacobian(jacobian, det);
         TS_ASSERT_DELTA(det, 0.03125, 1e-6);
@@ -958,7 +958,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetSurfaceArea(), 6.0, 1e-6);
 
         // Refine an element which includes the middle node
-        Element<3,3>* p_middle_element = mesh.GetElement(49);
+        Element<3, 3>* p_middle_element = mesh.GetElement(49);
         p_middle_element->CalculateJacobian(jacobian, det);
         TS_ASSERT_DELTA(det, 0.0625, 1e-6);
 
@@ -979,16 +979,16 @@ public:
 
     void Test3DRefineElementFails()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-        MutableMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
+        MutableMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_DELTA(mesh.GetVolume(), 1.0, 1e-6);
         TS_ASSERT_DELTA(mesh.GetSurfaceArea(), 6.0, 1e-6);
 
         // Refine an element in the top corner (1, 1, 1)
-        Element<3,3>* p_corner_element = mesh.GetElement(64);
-        c_matrix<double,3,3> jacobian;
+        Element<3, 3>* p_corner_element = mesh.GetElement(64);
+        c_matrix<double,3, 3> jacobian;
         double det;
         p_corner_element->CalculateJacobian(jacobian, det);
         TS_ASSERT_DELTA(det, 0.03125, 1e-6);
@@ -1004,11 +1004,11 @@ public:
     {
         unsigned PROBLEM_DIM = 1;
 
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        Element<2,2>* p_element = mesh.GetElement(2);
+        Element<2, 2>* p_element = mesh.GetElement(2);
 
         unsigned indices_1[3];
 

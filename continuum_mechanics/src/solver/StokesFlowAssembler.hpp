@@ -112,8 +112,8 @@ private:
     c_matrix<double,SPATIAL_BLOCK_SIZE_ELEMENTAL,SPATIAL_BLOCK_SIZE_ELEMENTAL> ComputeSpatialSpatialMatrixTerm(
         c_vector<double, NUM_NODES_PER_ELEMENT>& rQuadPhi,
         c_matrix<double, DIM, NUM_NODES_PER_ELEMENT>& rGradQuadPhi,
-        c_vector<double,DIM>& rX,
-        Element<DIM,DIM>* pElement)
+        c_vector<double, DIM>& rX,
+        Element<DIM, DIM>* pElement)
     {
         c_matrix<double,SPATIAL_BLOCK_SIZE_ELEMENTAL,SPATIAL_BLOCK_SIZE_ELEMENTAL> ret = zero_matrix<double>(SPATIAL_BLOCK_SIZE_ELEMENTAL,SPATIAL_BLOCK_SIZE_ELEMENTAL);
 
@@ -168,8 +168,8 @@ private:
         c_matrix<double, DIM, NUM_NODES_PER_ELEMENT>& rGradQuadPhi,
         c_vector<double, NUM_VERTICES_PER_ELEMENT>& rLinearPhi,
         c_matrix<double, DIM, NUM_VERTICES_PER_ELEMENT>& rGradLinearPhi,
-        c_vector<double,DIM>& rX,
-        Element<DIM,DIM>* pElement)
+        c_vector<double, DIM>& rX,
+        Element<DIM, DIM>* pElement)
     {
         c_matrix<double,SPATIAL_BLOCK_SIZE_ELEMENTAL,PRESSURE_BLOCK_SIZE_ELEMENTAL> ret = zero_matrix<double>(SPATIAL_BLOCK_SIZE_ELEMENTAL,PRESSURE_BLOCK_SIZE_ELEMENTAL);
 
@@ -191,8 +191,8 @@ private:
     //c_matrix<double,PRESSURE_BLOCK_SIZE_ELEMENTAL,PRESSURE_BLOCK_SIZE_ELEMENTAL> ComputePressurePressureMatrixTerm(
     //    c_vector<double, NUM_VERTICES_PER_ELEMENT>& rLinearPhi,
     //    c_matrix<double, DIM, NUM_VERTICES_PER_ELEMENT>& rGradLinearPhi,
-    //    c_vector<double,DIM>& rX,
-    //    Element<DIM,DIM>* pElement)
+    //    c_vector<double, DIM>& rX,
+    //    Element<DIM, DIM>* pElement)
 
     /**
      *  The matrix has the form (except see comments about ordering above)
@@ -214,12 +214,12 @@ private:
     c_vector<double,SPATIAL_BLOCK_SIZE_ELEMENTAL> ComputeSpatialVectorTerm(
         c_vector<double, NUM_NODES_PER_ELEMENT>& rQuadPhi,
         c_matrix<double, DIM, NUM_NODES_PER_ELEMENT>& rGradQuadPhi,
-        c_vector<double,DIM>& rX,
-        Element<DIM,DIM>* pElement)
+        c_vector<double, DIM>& rX,
+        Element<DIM, DIM>* pElement)
     {
         c_vector<double,SPATIAL_BLOCK_SIZE_ELEMENTAL> ret = zero_vector<double>(SPATIAL_BLOCK_SIZE_ELEMENTAL);
 
-        c_vector<double,DIM> body_force = mpProblemDefinition->GetBodyForce(rX, 0.0);
+        c_vector<double, DIM> body_force = mpProblemDefinition->GetBodyForce(rX, 0.0);
 
         for (unsigned index = 0; index<NUM_NODES_PER_ELEMENT*DIM; index++)
         {
@@ -236,8 +236,8 @@ private:
     //c_vector<double,PRESSURE_BLOCK_SIZE_ELEMENTAL> ComputePressureVectorTerm(
     //        c_vector<double, NUM_VERTICES_PER_ELEMENT>& rLinearPhi,
     //        c_matrix<double, DIM, NUM_VERTICES_PER_ELEMENT>& rGradLinearPhi,
-    //        c_vector<double,DIM>& rX,
-    //        Element<DIM,DIM>* pElement)
+    //        c_vector<double, DIM>& rX,
+    //        Element<DIM, DIM>* pElement)
 
 public:
     /**
@@ -246,7 +246,7 @@ public:
      * @param pMesh \todo document this argument 
      * @param pProblemDefinition \todo document this argument
      */
-    StokesFlowAssembler(AbstractTetrahedralMesh<DIM,DIM>* pMesh,
+    StokesFlowAssembler(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
                         StokesFlowProblemDefinition<DIM>* pProblemDefinition)
         : AbstractContinuumMechanicsAssembler<DIM,true,true>(pMesh),
           mpProblemDefinition(pProblemDefinition),

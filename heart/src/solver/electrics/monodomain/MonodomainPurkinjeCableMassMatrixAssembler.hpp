@@ -53,7 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class MonodomainPurkinjeCableMassMatrixAssembler : public AbstractFeCableIntegralAssembler<ELEMENT_DIM,SPACE_DIM,2,false,true,NORMAL>
+class MonodomainPurkinjeCableMassMatrixAssembler : public AbstractFeCableIntegralAssembler<ELEMENT_DIM, SPACE_DIM,2,false,true,NORMAL>
 {
 private:
     /** Cable element dimension. */
@@ -83,9 +83,9 @@ public:
             c_vector<double, NUM_CABLE_ELEMENT_NODES>& rPhi,
             c_matrix<double, SPACE_DIM, NUM_CABLE_ELEMENT_NODES>& rGradPhi,
             ChastePoint<SPACE_DIM>& rX,
-            c_vector<double,2>& rU,
+            c_vector<double, 2>& rU,
             c_matrix<double,2, SPACE_DIM>& rGradU,
-            Element<CABLE_ELEMENT_DIM,SPACE_DIM>* pElement)
+            Element<CABLE_ELEMENT_DIM, SPACE_DIM>* pElement)
     {
         c_matrix<double,4, 4> ret = zero_matrix<double>(4, 4);
 
@@ -121,8 +121,8 @@ public:
     * @param pMesh the mesh
     * @param useMassLumping whether to use mass matrix lumping or not
     */
-    MonodomainPurkinjeCableMassMatrixAssembler(MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* pMesh, bool useMassLumping=false)
-       : AbstractFeCableIntegralAssembler<ELEMENT_DIM,SPACE_DIM,2,false,true,NORMAL>(pMesh),
+    MonodomainPurkinjeCableMassMatrixAssembler(MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>* pMesh, bool useMassLumping=false)
+       : AbstractFeCableIntegralAssembler<ELEMENT_DIM, SPACE_DIM,2,false,true,NORMAL>(pMesh),
          mUseMassLumping(useMassLumping)
     {
     }

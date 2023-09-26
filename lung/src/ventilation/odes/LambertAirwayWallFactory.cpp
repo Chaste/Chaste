@@ -79,7 +79,7 @@ double LambertAirwayWallFactory::GetN2ForGeneration(unsigned generation)
     return mN2[generation];
 }
 
-LambertAirwayWall* LambertAirwayWallFactory::CreateAirwayWallForElement(Element<1,3>* pElement)
+LambertAirwayWall* LambertAirwayWallFactory::CreateAirwayWallForElement(Element<1, 3>* pElement)
 {
     unsigned order = 0;
 
@@ -120,7 +120,7 @@ LambertAirwayWall* LambertAirwayWallFactory::CreateAirwayWallForElement(Element<
     return wall;
 }
 
-double LambertAirwayWallFactory::GetPleuralPressureForAirway(double time, Element<1,3>* pElement)
+double LambertAirwayWallFactory::GetPleuralPressureForAirway(double time, Element<1, 3>* pElement)
 {
     return 0.0;
 }
@@ -128,7 +128,7 @@ double LambertAirwayWallFactory::GetPleuralPressureForAirway(double time, Elemen
 /**
 * @param pMesh  the mesh for which to create acinar units.
 */
-void LambertAirwayWallFactory::SetMesh(AbstractTetrahedralMesh<1,3>* pMesh)
+void LambertAirwayWallFactory::SetMesh(AbstractTetrahedralMesh<1, 3>* pMesh)
 {
     AbstractAirwayWallFactory::SetMesh(pMesh);
 

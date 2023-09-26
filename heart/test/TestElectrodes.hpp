@@ -54,8 +54,8 @@ class TestElectrodes : public CxxTest::TestSuite
 public:
     void TestElectrodeGrounded2dAndSwitchOffSwitchOn()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_100mm_200_elements");
-        DistributedTetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/2D_0_to_100mm_200_elements");
+        DistributedTetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         double magnitude = 543.324;
@@ -69,9 +69,9 @@ public:
         TS_ASSERT_DELTA(electrodes.GetSwitchOnTime(), start_time, 1e-12);
         TS_ASSERT_DELTA(electrodes.GetSwitchOffTime(), start_time+duration, 1e-12);
 
-        boost::shared_ptr<BoundaryConditionsContainer<2,2,2> > p_bcc = electrodes.GetBoundaryConditionsContainer();
+        boost::shared_ptr<BoundaryConditionsContainer<2, 2, 2> > p_bcc = electrodes.GetBoundaryConditionsContainer();
 
-        for (DistributedTetrahedralMesh<2,2>::BoundaryElementIterator iter
+        for (DistributedTetrahedralMesh<2, 2>::BoundaryElementIterator iter
            = mesh.GetBoundaryElementIteratorBegin();
            iter != mesh.GetBoundaryElementIteratorEnd();
            iter++)
@@ -85,7 +85,7 @@ public:
 
         unsigned num_grounded_nodes = 0u;
 
-        for (AbstractTetrahedralMesh<2,2>::NodeIterator iter=mesh.GetNodeIteratorBegin();
+        for (AbstractTetrahedralMesh<2, 2>::NodeIterator iter=mesh.GetNodeIteratorBegin();
              iter != mesh.GetNodeIteratorEnd();
              ++iter)
         {
@@ -129,8 +129,8 @@ public:
 
     void TestElectrodeUngrounded2d()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_100mm_200_elements");
-        DistributedTetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/2D_0_to_100mm_200_elements");
+        DistributedTetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         double magnitude = 543.324;
@@ -141,9 +141,9 @@ public:
 
         TS_ASSERT_EQUALS(electrodes.HasGroundedElectrode(), false);
 
-        boost::shared_ptr<BoundaryConditionsContainer<2,2,2> >  p_bcc = electrodes.GetBoundaryConditionsContainer();
+        boost::shared_ptr<BoundaryConditionsContainer<2, 2, 2> >  p_bcc = electrodes.GetBoundaryConditionsContainer();
 
-        for (DistributedTetrahedralMesh<2,2>::BoundaryElementIterator iter
+        for (DistributedTetrahedralMesh<2, 2>::BoundaryElementIterator iter
                 = mesh.GetBoundaryElementIteratorBegin();
            iter != mesh.GetBoundaryElementIteratorEnd();
            iter++)
@@ -165,8 +165,8 @@ public:
 
     void TestElectrodeUngrounded2dDifferentAreas()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_100mm_200_elements");
-        DistributedTetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/2D_0_to_100mm_200_elements");
+        DistributedTetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         try
@@ -203,9 +203,9 @@ public:
 
         TS_ASSERT_THROWS_ANYTHING(electrodes.ComputeElectrodesAreasAndCheckEquality(0,0,10));
 
-        boost::shared_ptr<BoundaryConditionsContainer<2,2,2> >  p_bcc = electrodes.GetBoundaryConditionsContainer();
+        boost::shared_ptr<BoundaryConditionsContainer<2, 2, 2> >  p_bcc = electrodes.GetBoundaryConditionsContainer();
 
-        for (DistributedTetrahedralMesh<2,2>::BoundaryElementIterator iter
+        for (DistributedTetrahedralMesh<2, 2>::BoundaryElementIterator iter
                 = mesh.GetBoundaryElementIteratorBegin();
            iter != mesh.GetBoundaryElementIteratorEnd();
            iter++)
@@ -227,7 +227,7 @@ public:
 
     void TestElectrodeGrounded3d()
     {
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructCuboid(10,10,10);
 
         double magnitude = 543.324;
@@ -235,9 +235,9 @@ public:
         HeartConfig::Instance()->SetElectrodeParameters(true,1,magnitude,0.0,duration);
         Electrodes<3> electrodes(mesh);
 
-        boost::shared_ptr<BoundaryConditionsContainer<3,3,2> >  p_bcc = electrodes.GetBoundaryConditionsContainer();
+        boost::shared_ptr<BoundaryConditionsContainer<3, 3, 2> >  p_bcc = electrodes.GetBoundaryConditionsContainer();
 
-        for (DistributedTetrahedralMesh<3,3>::BoundaryElementIterator iter
+        for (DistributedTetrahedralMesh<3, 3>::BoundaryElementIterator iter
                 = mesh.GetBoundaryElementIteratorBegin();
            iter != mesh.GetBoundaryElementIteratorEnd();
            iter++)
@@ -251,7 +251,7 @@ public:
         }
 
         unsigned num_grounded_nodes = 0u;
-        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             Node<3>* p_node = mesh.GetNode(i);
             if (p_bcc->HasDirichletBoundaryCondition(p_node, 1))
@@ -267,7 +267,7 @@ public:
 
     void TestElectrodeUngrounded3d()
     {
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructCuboid(10,10,10);
 
         double magnitude = 543.324;
@@ -275,9 +275,9 @@ public:
         HeartConfig::Instance()->SetElectrodeParameters(false,1,magnitude,0.0,duration);
         Electrodes<3> electrodes(mesh);
 
-        boost::shared_ptr<BoundaryConditionsContainer<3,3,2> > p_bcc = electrodes.GetBoundaryConditionsContainer();
+        boost::shared_ptr<BoundaryConditionsContainer<3, 3, 2> > p_bcc = electrodes.GetBoundaryConditionsContainer();
 
-        for (DistributedTetrahedralMesh<3,3>::BoundaryElementIterator iter
+        for (DistributedTetrahedralMesh<3, 3>::BoundaryElementIterator iter
                 = mesh.GetBoundaryElementIteratorBegin();
            iter != mesh.GetBoundaryElementIteratorEnd();
            iter++)

@@ -64,7 +64,7 @@ protected:
     /**
      * The mesh, set by the problem class
      */
-    AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* mpMesh;
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* mpMesh;
 
     /**Vector of regions of nodes to be grounded*/
     std::vector<AbstractChasteRegion<SPACE_DIM>* > mGroundedRegions;
@@ -107,12 +107,12 @@ public:
     /**
      * @param pMesh  the mesh for which to create stimuli.
      */
-    void SetMesh(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
+    void SetMesh(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh);
 
     /**
      * @return  the mesh used to create the stimuli.
      */
-    AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* GetMesh();
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* GetMesh();
 
 //    /*
 //     * Allow specification of a chaste region where nodes have extracellular potential grounded

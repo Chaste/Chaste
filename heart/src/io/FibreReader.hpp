@@ -130,7 +130,7 @@ public:
      * @param checkOrthogonality  if true, checks if the matrix is orthogonal
      *    and throws an exception if not
      */
-    void GetFibreSheetAndNormalMatrix(unsigned fibreIndex, c_matrix<double,DIM,DIM>& rFibreMatrix, bool checkOrthogonality=true);
+    void GetFibreSheetAndNormalMatrix(unsigned fibreIndex, c_matrix<double, DIM, DIM>& rFibreMatrix, bool checkOrthogonality=true);
 
     /**
      * Read a fibre direction vector from the file.  Must only be used when
@@ -146,7 +146,7 @@ public:
      * @param checkNormalised  if true, checks if the read vector is normalised
      *   and throws an exception if not
      */
-    void GetFibreVector(unsigned fibreIndex, c_vector<double,DIM>& rFibreVector, bool checkNormalised=true);
+    void GetFibreVector(unsigned fibreIndex, c_vector<double, DIM>& rFibreVector, bool checkNormalised=true);
 
     /**
      *  @return the number of lines of data in the file - this is the value read from

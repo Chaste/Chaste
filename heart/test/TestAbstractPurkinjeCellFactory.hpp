@@ -86,8 +86,8 @@ class TestAbstractPurkinjeCellFactory : public CxxTest::TestSuite
 public:
     void TestPurkinjeCellFactory()
     {
-        TrianglesMeshReader<2,2> reader("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
-        MixedDimensionMesh<2,2> mixed_mesh;
+        TrianglesMeshReader<2, 2> reader("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
+        MixedDimensionMesh<2, 2> mixed_mesh;
         mixed_mesh.ConstructFromMeshReader(reader);
 
         PurkinjeCellFactory cell_factory;
@@ -95,7 +95,7 @@ public:
                               "The mixed dimension mesh object has not been set in the cell factory");
         cell_factory.SetMesh(&mixed_mesh);
 
-        for (AbstractTetrahedralMesh<2,2>::NodeIterator current_node = mixed_mesh.GetNodeIteratorBegin();
+        for (AbstractTetrahedralMesh<2, 2>::NodeIterator current_node = mixed_mesh.GetNodeIteratorBegin();
              current_node != mixed_mesh.GetNodeIteratorEnd();
              ++current_node)
         {
@@ -115,8 +115,8 @@ public:
         }
 
         TS_ASSERT_EQUALS(cell_factory.GetMixedDimensionMesh(), &mixed_mesh);
-        TrianglesMeshReader<2,2> reader2("mesh/test/data/2D_0_to_1mm_200_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> reader2("mesh/test/data/2D_0_to_1mm_200_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(reader2);
         TS_ASSERT_THROWS_THIS(cell_factory.SetMesh(&mesh),
                               "AbstractPurkinjeCellFactory must take a MixedDimensionMesh");

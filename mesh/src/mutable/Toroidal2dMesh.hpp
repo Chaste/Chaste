@@ -45,14 +45,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshWriter.hpp"
 
 /**
- * A subclass of MutableMesh<2,2> for a rectangular mesh with
+ * A subclass of MutableMesh<2, 2> for a rectangular mesh with
  * periodic left and right boundaries, representing a Toroidal geometry.
  *
  * The class works by overriding calls such as ReMesh() and
  * GetVectorFromAtoB() so that simulation classes can treat this
- * class in exactly the same way as a MutableMesh<2,2>.
+ * class in exactly the same way as a MutableMesh<2, 2>.
  */
-class Toroidal2dMesh : public MutableMesh<2,2>
+class Toroidal2dMesh : public MutableMesh<2, 2>
 {
     friend class TestToroidal2dMesh;
 private:
@@ -235,7 +235,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<MutableMesh<2,2> >(*this);
+        archive & boost::serialization::base_object<MutableMesh<2, 2> >(*this);
         archive & mWidth;
         archive & mHeight;
     }

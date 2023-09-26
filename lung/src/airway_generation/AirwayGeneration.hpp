@@ -84,7 +84,7 @@ public:
     /** The direction of the parent branch of this growth apex. */
     double mParentDirection[3];
 
-    /** The ID of the the point in the airway tree to grow this apex from. */
+    /** The ID of the point in the airway tree to grow this apex from. */
     vtkIdType mStartId;
 
     /** The generation number of this apex. */

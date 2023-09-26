@@ -76,7 +76,7 @@ bool PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::GetUseJiggledNodesOnPlane()
     return mUseJiggledNodesOnPlane;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCondition(
     [[maybe_unused]] const std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldLocations)
 {
@@ -205,12 +205,12 @@ void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationBoundar
 }
 
 // Explicit instantiation
-template class PlaneBoundaryCondition<1,1>;
-template class PlaneBoundaryCondition<1,2>;
-template class PlaneBoundaryCondition<2,2>;
-template class PlaneBoundaryCondition<1,3>;
-template class PlaneBoundaryCondition<2,3>;
-template class PlaneBoundaryCondition<3,3>;
+template class PlaneBoundaryCondition<1, 1>;
+template class PlaneBoundaryCondition<1, 2>;
+template class PlaneBoundaryCondition<2, 2>;
+template class PlaneBoundaryCondition<1, 3>;
+template class PlaneBoundaryCondition<2, 3>;
+template class PlaneBoundaryCondition<3, 3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

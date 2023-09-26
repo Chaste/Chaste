@@ -69,12 +69,12 @@ void CellIdWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(
 }
 
 // Explicit instantiation
-template class CellIdWriter<1,1>;
-template class CellIdWriter<1,2>;
-template class CellIdWriter<2,2>;
-template class CellIdWriter<1,3>;
-template class CellIdWriter<2,3>;
-template class CellIdWriter<3,3>;
+template class CellIdWriter<1, 1>;
+template class CellIdWriter<1, 2>;
+template class CellIdWriter<2, 2>;
+template class CellIdWriter<1, 3>;
+template class CellIdWriter<2, 3>;
+template class CellIdWriter<3, 3>;
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer

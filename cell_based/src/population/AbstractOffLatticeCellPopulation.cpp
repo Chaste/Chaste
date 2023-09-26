@@ -117,9 +117,9 @@ void AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulat
 }
 
 // Explicit instantiation
-template class AbstractOffLatticeCellPopulation<1,1>;
-template class AbstractOffLatticeCellPopulation<1,2>;
-template class AbstractOffLatticeCellPopulation<2,2>;
-template class AbstractOffLatticeCellPopulation<1,3>;
-template class AbstractOffLatticeCellPopulation<2,3>;
-template class AbstractOffLatticeCellPopulation<3,3>;
+template class AbstractOffLatticeCellPopulation<1, 1>;
+template class AbstractOffLatticeCellPopulation<1, 2>;
+template class AbstractOffLatticeCellPopulation<2, 2>;
+template class AbstractOffLatticeCellPopulation<1, 3>;
+template class AbstractOffLatticeCellPopulation<2, 3>;
+template class AbstractOffLatticeCellPopulation<3, 3>;

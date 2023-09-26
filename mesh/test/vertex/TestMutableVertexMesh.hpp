@@ -55,7 +55,7 @@ class TestMutableVertexMesh : public CxxTest::TestSuite
 {
 private:
 
-    MutableVertexMesh<3,3>* ConstructCubeAndPyramidMesh()
+    MutableVertexMesh<3, 3>* ConstructCubeAndPyramidMesh()
     {
         // Make 8 nodes to assign to a cube and a pyramid element
         std::vector<Node<3>*> nodes;
@@ -100,15 +100,15 @@ private:
         }
 
         // Make the faces
-        std::vector<VertexElement<2,3>*> faces;
+        std::vector<VertexElement<2, 3>*> faces;
 
         for (unsigned i = 0; i<10; ++i)
         {
-            faces.push_back(new VertexElement<2,3>(i, nodes_faces[i]));
+            faces.push_back(new VertexElement<2, 3>(i, nodes_faces[i]));
         }
 
         // Make the elements
-        std::vector<VertexElement<2,3>*> faces_element_0, faces_element_1;
+        std::vector<VertexElement<2, 3>*> faces_element_0, faces_element_1;
         std::vector<bool> orientations_0, orientations_1;
 
         // Cube element
@@ -127,11 +127,11 @@ private:
         faces_element_1.push_back(faces[5]);
         orientations_1.push_back(false);
 
-        std::vector<VertexElement<3,3>*> elements;
-        elements.push_back(new VertexElement<3,3>(0, faces_element_0, orientations_0));
-        elements.push_back(new VertexElement<3,3>(1, faces_element_1, orientations_1));
+        std::vector<VertexElement<3, 3>*> elements;
+        elements.push_back(new VertexElement<3, 3>(0, faces_element_0, orientations_0));
+        elements.push_back(new VertexElement<3, 3>(1, faces_element_1, orientations_1));
 
-        return new MutableVertexMesh<3,3>(nodes, elements);
+        return new MutableVertexMesh<3, 3>(nodes, elements);
     }
 
 public:
@@ -139,14 +139,14 @@ public:
     void TestMutableVertexElementIterator()
     {
         // Create mesh
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
-        MutableVertexMesh<2,2> mesh;
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
+        MutableVertexMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 9u);
 
         unsigned counter = 0;
-        for (MutableVertexMesh<2,2>::VertexElementIterator iter = mesh.GetElementIteratorBegin();
+        for (MutableVertexMesh<2, 2>::VertexElementIterator iter = mesh.GetElementIteratorBegin();
              iter != mesh.GetElementIteratorEnd();
              ++iter)
         {
@@ -158,10 +158,10 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), counter);
 
         // For coverage, test with an empty mesh
-        MutableVertexMesh<2,2> empty_mesh;
+        MutableVertexMesh<2, 2> empty_mesh;
 
         // Since the mesh is empty, the iterator should be set to mrMesh.mNodes.end() when constructed
-        MutableVertexMesh<2,2>::VertexElementIterator el_iter = empty_mesh.GetElementIteratorBegin();
+        MutableVertexMesh<2, 2>::VertexElementIterator el_iter = empty_mesh.GetElementIteratorBegin();
 
         // Check that the iterator is now at the end (we need to check this as a double-negative,
         // as we only have a NOT-equals operator defined on the iterator).
@@ -172,7 +172,7 @@ public:
         mesh.DeleteElementPriorToReMesh(0);
 
         counter = 0;
-        for (MutableVertexMesh<2,2>::VertexElementIterator iter = mesh.GetElementIteratorBegin();
+        for (MutableVertexMesh<2, 2>::VertexElementIterator iter = mesh.GetElementIteratorBegin();
              iter != mesh.GetElementIteratorEnd();
              ++iter)
         {
@@ -211,12 +211,12 @@ public:
             }
         }
 
-        std::vector<VertexElement<2,2>*> basic_vertex_elements;
-        basic_vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        basic_vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+        std::vector<VertexElement<2, 2>*> basic_vertex_elements;
+        basic_vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        basic_vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
 
         // Make a vertex mesh
-        MutableVertexMesh<2,2> basic_vertex_mesh(basic_nodes, basic_vertex_elements);
+        MutableVertexMesh<2, 2> basic_vertex_mesh(basic_nodes, basic_vertex_elements);
 
         TS_ASSERT_EQUALS(basic_vertex_mesh.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(basic_vertex_mesh.GetNumNodes(), 7u);
@@ -259,7 +259,7 @@ public:
 
     void TestBasic3dMutableVertexMesh()
     {
-        MutableVertexMesh<3,3>* p_mesh = ConstructCubeAndPyramidMesh();
+        MutableVertexMesh<3, 3>* p_mesh = ConstructCubeAndPyramidMesh();
 
         // Set/get parameter values
         p_mesh->SetCellRearrangementThreshold(0.1);
@@ -282,11 +282,11 @@ public:
         TS_ASSERT_DELTA(p_node_2->rGetLocation()[2], 0.0, 1e-3);
 
         // Test a couple of the elements
-        VertexElement<3,3>* p_element_0 = p_mesh->GetElement(0);
+        VertexElement<3, 3>* p_element_0 = p_mesh->GetElement(0);
         TS_ASSERT_EQUALS(p_element_0->GetNumNodes(), 8u);
         TS_ASSERT_EQUALS(p_element_0->GetNumFaces(), 6u);
 
-        VertexElement<3,3>* p_element_1 = p_mesh->GetElement(1);
+        VertexElement<3, 3>* p_element_1 = p_mesh->GetElement(1);
         TS_ASSERT_EQUALS(p_element_1->GetNumNodes(), 5u);
         TS_ASSERT_EQUALS(p_element_1->GetNumFaces(), 5u);
 
@@ -324,8 +324,8 @@ public:
     void TestMeshConstructionFromMeshReader()
     {
         // Create mesh
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
-        MutableVertexMesh<2,2> mesh;
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
+        MutableVertexMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Test Get methods
@@ -352,8 +352,8 @@ public:
     void TestSetNode()
     {
         // Create mesh
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
-        MutableVertexMesh<2,2> mesh;
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
+        MutableVertexMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         ChastePoint<2> point = mesh.GetNode(3)->GetPoint();
@@ -380,8 +380,8 @@ public:
     void TestAddNodeAndReMesh()
     {
         // Create mesh
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
-        MutableVertexMesh<2,2> mesh;
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
+        MutableVertexMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 7u);
@@ -458,13 +458,13 @@ public:
             }
         }
 
-        std::vector<VertexElement<2,2>*> elements;
-        VertexElement<2,2>* p_replaced_vertex_element = new VertexElement<2,2>(0, nodes_elem_0);
+        std::vector<VertexElement<2, 2>*> elements;
+        VertexElement<2, 2>* p_replaced_vertex_element = new VertexElement<2, 2>(0, nodes_elem_0);
         elements.push_back(p_replaced_vertex_element);
-        elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+        elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
 
         // Make a vertex mesh
-        MutableVertexMesh<2,2> mesh(nodes, elements);
+        MutableVertexMesh<2, 2> mesh(nodes, elements);
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 7u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 2u);
@@ -482,13 +482,13 @@ public:
         nodes_elem_3.push_back(nodes[3]);
 
         // Add a new element to the mesh
-        mesh.AddElement(new VertexElement<2,2>(2, nodes_elem_2));
+        mesh.AddElement(new VertexElement<2, 2>(2, nodes_elem_2));
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 7u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 3u);
 
         // Replace element 0 in the mesh
-        mesh.AddElement(new VertexElement<2,2>(0, nodes_elem_3));
+        mesh.AddElement(new VertexElement<2, 2>(0, nodes_elem_3));
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 7u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 3u);
@@ -522,11 +522,11 @@ public:
             }
         }
 
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
 
-        MutableVertexMesh<2,2> mesh(nodes, elements);
+        MutableVertexMesh<2, 2> mesh(nodes, elements);
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 7u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 2u);
@@ -553,11 +553,11 @@ public:
         nodes_elem.push_back(basic_nodes[0]);
         nodes_elem.push_back(basic_nodes[1]);
 
-        std::vector<VertexElement<2,2>*> basic_vertex_elements;
-        basic_vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem));
+        std::vector<VertexElement<2, 2>*> basic_vertex_elements;
+        basic_vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem));
 
         // Make a vertex mesh
-        MutableVertexMesh<2,2> basic_vertex_mesh(basic_nodes, basic_vertex_elements);
+        MutableVertexMesh<2, 2> basic_vertex_mesh(basic_nodes, basic_vertex_elements);
 
         TS_ASSERT_EQUALS(basic_vertex_mesh.GetNumElements(), 1u);
         TS_ASSERT_EQUALS(basic_vertex_mesh.GetNumNodes(), 4u);
@@ -610,11 +610,11 @@ public:
             nodes_elem.push_back(basic_nodes[i]);
         }
 
-        std::vector<VertexElement<2,2>*> basic_vertex_elements;
-        basic_vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem));
+        std::vector<VertexElement<2, 2>*> basic_vertex_elements;
+        basic_vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem));
 
         // Make a vertex mesh
-        MutableVertexMesh<2,2> basic_vertex_mesh(basic_nodes, basic_vertex_elements);
+        MutableVertexMesh<2, 2> basic_vertex_mesh(basic_nodes, basic_vertex_elements);
 
         TS_ASSERT_EQUALS(basic_vertex_mesh.GetNumElements(), 1u);
         TS_ASSERT_EQUALS(basic_vertex_mesh.GetNumNodes(), 4u);
@@ -661,11 +661,11 @@ public:
         nodes_elem.push_back(basic_nodes[0]);
         nodes_elem.push_back(basic_nodes[1]);
 
-        std::vector<VertexElement<2,2>*> basic_vertex_elements;
-        basic_vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem));
+        std::vector<VertexElement<2, 2>*> basic_vertex_elements;
+        basic_vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem));
 
         // Make a vertex mesh
-        MutableVertexMesh<2,2> basic_vertex_mesh(basic_nodes, basic_vertex_elements);
+        MutableVertexMesh<2, 2> basic_vertex_mesh(basic_nodes, basic_vertex_elements);
 
         TS_ASSERT_EQUALS(basic_vertex_mesh.GetNumElements(), 1u);
         TS_ASSERT_EQUALS(basic_vertex_mesh.GetNumNodes(), 4u);
@@ -712,12 +712,12 @@ public:
         nodes_elem_1.push_back(nodes[4]);
         nodes_elem_1.push_back(nodes[2]);
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
 
         // Make a vertex mesh
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 5u);
@@ -813,7 +813,7 @@ public:
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
 
-            VertexMeshOperationRecorder<2,2> recorder;
+            VertexMeshOperationRecorder<2, 2> recorder;
             input_arch >> recorder;
             std::vector<CellDivisionInfo<2> > all_info = recorder.GetCellDivisionInfo();
             TS_ASSERT_EQUALS(all_info.size(), 1u);
@@ -861,12 +861,12 @@ public:
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
 
         // Make a vertex mesh
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
@@ -967,12 +967,12 @@ public:
             }
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
 
         // Create mesh
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Test mesh has correct numbers of elements and nodes
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
@@ -1030,10 +1030,10 @@ public:
             nodes_elem.push_back(nodes[i]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Provide an axis of division that does not cross two edges of the element (it crosses four)
         c_vector<double, 2> axis_of_division;
@@ -1068,12 +1068,12 @@ public:
             }
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
 
         // Make a vertex mesh
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 5u);
@@ -1139,27 +1139,27 @@ public:
             nodes_elem.push_back(nodes[i]);
         }
 
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes_elem));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes_elem));
 
         // Make a vertex mesh
-        MutableVertexMesh<2,2> mesh(nodes, elements);
+        MutableVertexMesh<2, 2> mesh(nodes, elements);
 
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 1u);
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 5u);
 
         // Test that the centroid, moments and short axis of the element are calculated correctly
         // (i.e. agreee with Matlab and pen-and-paper calculations)
-        c_vector<double,2> centroid = mesh.GetCentroidOfElement(0);
+        c_vector<double, 2> centroid = mesh.GetCentroidOfElement(0);
         TS_ASSERT_DELTA(centroid[0], 2.0000, 1e-4);
         TS_ASSERT_DELTA(centroid[1], 1.8666, 1e-4);
 
-        c_vector<double,3> moments = mesh.CalculateMomentsOfElement(0);
+        c_vector<double, 3> moments = mesh.CalculateMomentsOfElement(0);
         TS_ASSERT_DELTA(moments[0], 0.5388, 1e-4);
         TS_ASSERT_DELTA(moments[1], 0.7500, 1e-4);
         TS_ASSERT_DELTA(moments[2], 0.3750, 1e-4);
 
-        c_vector<double,2> short_axis = mesh.GetShortAxisOfElement(0);
+        c_vector<double, 2> short_axis = mesh.GetShortAxisOfElement(0);
         TS_ASSERT_DELTA(short_axis[0],  0.6037, 1e-4);
         TS_ASSERT_DELTA(short_axis[1], -0.7971, 1e-4);
 
@@ -1209,11 +1209,11 @@ public:
             nodes_elem.push_back(nodes[i]);
         }
 
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes_elem));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes_elem));
 
         // Make a vertex mesh
-        MutableVertexMesh<2,2> mesh(nodes, elements);
+        MutableVertexMesh<2, 2> mesh(nodes, elements);
 
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 1u);
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 6u);
@@ -1262,11 +1262,11 @@ public:
             nodes_elem.push_back(nodes[i]);
         }
 
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes_elem));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes_elem));
 
         // Make a vertex mesh
-        MutableVertexMesh<2,2> mesh(nodes, elements);
+        MutableVertexMesh<2, 2> mesh(nodes, elements);
 
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 1u);
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 6u);
@@ -1316,10 +1316,10 @@ public:
             nodes_elem_0.push_back(nodes[i]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Set the threshold distance between vertices for a T1 swap as follows, to ease calculations
         vertex_mesh.SetCellRearrangementThreshold(0.09);
@@ -1385,8 +1385,8 @@ public:
         ArchiveLocationInfo::SetMeshFilename("mutable_vertex_2d");
 
         // Create mesh
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_5_by_3");
-        MutableVertexMesh<2,2> mesh;
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_5_by_3");
+        MutableVertexMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Set member variables
@@ -1395,7 +1395,7 @@ public:
         mesh.SetCellRearrangementRatio(1.6);
         mesh.SetDistanceForT3SwapChecking(7.3);
 
-        AbstractMesh<2,2>* const p_mesh = &mesh;
+        AbstractMesh<2, 2>* const p_mesh = &mesh;
 
         /*
          * You need the const above to stop a BOOST_STATIC_ASSERTION failure.
@@ -1410,8 +1410,8 @@ public:
 
         // Create an output archive
         {
-            TS_ASSERT_EQUALS((static_cast<MutableVertexMesh<2,2>*>(p_mesh))->GetNumNodes(), 46u);
-            TS_ASSERT_EQUALS((static_cast<MutableVertexMesh<2,2>*>(p_mesh))->GetNumElements(), 15u);
+            TS_ASSERT_EQUALS((static_cast<MutableVertexMesh<2, 2>*>(p_mesh))->GetNumNodes(), 46u);
+            TS_ASSERT_EQUALS((static_cast<MutableVertexMesh<2, 2>*>(p_mesh))->GetNumElements(), 15u);
 
             // Create output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -1423,7 +1423,7 @@ public:
 
         {
             // De-serialize and compare
-            AbstractMesh<2,2>* p_mesh2;
+            AbstractMesh<2, 2>* p_mesh2;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -1432,8 +1432,8 @@ public:
             // Restore from the archive
             (*p_arch) >> p_mesh2;
 
-            MutableVertexMesh<2,2>* p_mesh_original = static_cast<MutableVertexMesh<2,2>*>(p_mesh2);
-            MutableVertexMesh<2,2>* p_mesh_loaded = static_cast<MutableVertexMesh<2,2>*>(p_mesh);
+            MutableVertexMesh<2, 2>* p_mesh_original = static_cast<MutableVertexMesh<2, 2>*>(p_mesh2);
+            MutableVertexMesh<2, 2>* p_mesh_loaded = static_cast<MutableVertexMesh<2, 2>*>(p_mesh);
 
             // Test member variables were archived correctly
             TS_ASSERT_DELTA(p_mesh_original->GetCellRearrangementThreshold(), 0.54, 1e-6);
@@ -1490,14 +1490,14 @@ public:
         ArchiveLocationInfo::SetMeshFilename("mutable_vertex_3d");
 
         // Create mesh
-        MutableVertexMesh<3,3>* p_mutable_mesh = ConstructCubeAndPyramidMesh();
+        MutableVertexMesh<3, 3>* p_mutable_mesh = ConstructCubeAndPyramidMesh();
 
         // Set member variables
         p_mutable_mesh->SetCellRearrangementThreshold(0.54);
         p_mutable_mesh->SetT2Threshold(0.012);
         p_mutable_mesh->SetCellRearrangementRatio(1.6);
 
-        AbstractMesh<3,3>* const p_mesh = p_mutable_mesh;
+        AbstractMesh<3, 3>* const p_mesh = p_mutable_mesh;
 
         /*
          * You need the const above to stop a BOOST_STATIC_ASSERTION failure.
@@ -1512,9 +1512,9 @@ public:
 
         // Create an output archive
         {
-            TS_ASSERT_EQUALS((static_cast<MutableVertexMesh<3,3>*>(p_mesh))->GetNumNodes(), 9u);
-            TS_ASSERT_EQUALS((static_cast<MutableVertexMesh<3,3>*>(p_mesh))->GetNumElements(), 2u);
-            TS_ASSERT_EQUALS((static_cast<MutableVertexMesh<3,3>*>(p_mesh))->GetNumFaces(), 10u);
+            TS_ASSERT_EQUALS((static_cast<MutableVertexMesh<3, 3>*>(p_mesh))->GetNumNodes(), 9u);
+            TS_ASSERT_EQUALS((static_cast<MutableVertexMesh<3, 3>*>(p_mesh))->GetNumElements(), 2u);
+            TS_ASSERT_EQUALS((static_cast<MutableVertexMesh<3, 3>*>(p_mesh))->GetNumFaces(), 10u);
 
             // Create output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -1526,7 +1526,7 @@ public:
 
         {
             // De-serialize and compare
-            AbstractMesh<3,3>* p_mesh2;
+            AbstractMesh<3, 3>* p_mesh2;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -1535,8 +1535,8 @@ public:
             // Restore from the archive
             (*p_arch) >> p_mesh2;
 
-            MutableVertexMesh<3,3>* p_mesh_original = static_cast<MutableVertexMesh<3,3>*>(p_mesh);
-            MutableVertexMesh<3,3>* p_mesh_loaded = static_cast<MutableVertexMesh<3,3>*>(p_mesh2);
+            MutableVertexMesh<3, 3>* p_mesh_original = static_cast<MutableVertexMesh<3, 3>*>(p_mesh);
+            MutableVertexMesh<3, 3>* p_mesh_loaded = static_cast<MutableVertexMesh<3, 3>*>(p_mesh2);
 
             // Compare the loaded mesh against the original
             TS_ASSERT_EQUALS(p_mesh_original->GetNumNodes(), p_mesh_loaded->GetNumNodes());
@@ -1633,21 +1633,21 @@ public:
          *  and elements 1 and 2 share nodes 1 and 2
          */
 
-        VertexElement<2,2>* p_element0 = new VertexElement<2,2>(0, nodes_in_element0);
-        VertexElement<2,2>* p_element1 = new VertexElement<2,2>(1, nodes_in_element1);
-        VertexElement<2,2>* p_element2 = new VertexElement<2,2>(2, nodes_in_element2);
+        VertexElement<2, 2>* p_element0 = new VertexElement<2, 2>(0, nodes_in_element0);
+        VertexElement<2, 2>* p_element1 = new VertexElement<2, 2>(1, nodes_in_element1);
+        VertexElement<2, 2>* p_element2 = new VertexElement<2, 2>(2, nodes_in_element2);
         TS_ASSERT_EQUALS(p_element0->GetNumNodes(), 3u);
         TS_ASSERT_EQUALS(p_element1->GetNumNodes(), 3u);
         TS_ASSERT_EQUALS(p_element2->GetNumNodes(), 4u);
 
         // Create mesh
 
-        std::vector<VertexElement<2,2>* > elements;
+        std::vector<VertexElement<2, 2>* > elements;
         elements.push_back(p_element0);
         elements.push_back(p_element1);
         elements.push_back(p_element2);
 
-        MutableVertexMesh<2,2> mesh(nodes, elements);
+        MutableVertexMesh<2, 2> mesh(nodes, elements);
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 6u);
         TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNumNodes(), 3u);
@@ -1764,10 +1764,10 @@ public:
         nodes.push_back(new Node<2>(2, false, 1.0, 1.0));
         nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
 
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes));
 
-        MutableVertexMesh<2,2> mesh(nodes, elements);
+        MutableVertexMesh<2, 2> mesh(nodes, elements);
 
         // Test a point far outside the element
         c_vector<double, 2> test_point1;
@@ -1843,10 +1843,10 @@ public:
         nodes.push_back(new Node<2>(2, false, 0.1, 0.1));
         nodes.push_back(new Node<2>(3, false, 0.0, 0.1));
 
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes));
 
-        MutableVertexMesh<2,2> mesh(nodes, elements);
+        MutableVertexMesh<2, 2> mesh(nodes, elements);
 
         // Create a point within DBL_EPSILON of node 2
         c_vector<double, 2> test_point1;
@@ -1863,7 +1863,7 @@ public:
     void TestSetAndGetDistanceForT3SwapChecking()
     {
         HoneycombVertexMeshGenerator mesh_generator(10,10); // is_flat_bottom, T1swaptthreshold, T2swapthreshold, elementArea
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = mesh_generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = mesh_generator.GetMesh();
         double standard_distance = p_mesh->GetDistanceForT3SwapChecking();
         TS_ASSERT_EQUALS(standard_distance, 5.0);
 

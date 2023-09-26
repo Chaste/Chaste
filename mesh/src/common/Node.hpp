@@ -604,8 +604,8 @@ inline void load_construct_data(
     Archive & ar, Node<SPACE_DIM> * t, const unsigned int file_version)
 {
     // Retrieve data from archive required to construct new instance of Node
-    c_vector<double,SPACE_DIM> location;
-    for (unsigned i=0; i<SPACE_DIM; ++i)
+    c_vector<double, SPACE_DIM> location;
+    for (unsigned i = 0; i<SPACE_DIM; ++i)
     {
         double coordinate;
         ar & coordinate;//resume coordinates one by one

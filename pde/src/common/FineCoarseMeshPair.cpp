@@ -48,15 +48,15 @@ FineCoarseMeshPair<DIM>::FineCoarseMeshPair(
 }
 
 template<unsigned DIM>
-const AbstractTetrahedralMesh<DIM,DIM>& FineCoarseMeshPair<DIM>::GetFineMesh() const
+const AbstractTetrahedralMesh<DIM, DIM>& FineCoarseMeshPair<DIM>::GetFineMesh() const
 {
-    return  mrFineMesh;
+    return mrFineMesh;
 }
 
 template<unsigned DIM>
-const AbstractTetrahedralMesh<DIM,DIM>& FineCoarseMeshPair<DIM>::GetCoarseMesh() const
+const AbstractTetrahedralMesh<DIM, DIM>& FineCoarseMeshPair<DIM>::GetCoarseMesh() const
 {
-    return  mrCoarseMesh;
+    return mrCoarseMesh;
 }
 
 template<unsigned DIM>
@@ -158,7 +158,7 @@ void FineCoarseMeshPair<DIM>::SetUpBoxes(
      */
     for (unsigned i = 0; i < rMesh.GetNumElements(); ++i)
     {
-        Element<DIM,DIM>* p_element = rMesh.GetElement(i);
+        Element<DIM, DIM>* p_element = rMesh.GetElement(i);
 
         std::set<unsigned> box_indices_each_node_this_elem;
         for (unsigned j = 0; j < DIM + 1; ++j) // num vertices per element
@@ -328,7 +328,7 @@ void FineCoarseMeshPair<DIM>::ComputeFineElementAndWeightForGivenPoint(
     CollectElementsInContainingBox(mpFineMeshBoxCollection, boxForThisPoint, test_element_indices);
 
     unsigned elem_index;
-    c_vector<double,DIM+1> weight;
+    c_vector<double, DIM+1> weight;
 
     try
     {
@@ -475,7 +475,7 @@ void FineCoarseMeshPair<DIM>::ComputeCoarseElementsForFineElementCentroids(
         }
         // LCOV_EXCL_STOP
 
-        c_vector<double,DIM> point_cvec = mrFineMesh.GetElement(i)->CalculateCentroid();
+        c_vector<double, DIM> point_cvec = mrFineMesh.GetElement(i)->CalculateCentroid();
         ChastePoint<DIM> point(point_cvec);
 
         // Get the box this point is in

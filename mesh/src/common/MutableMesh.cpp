@@ -60,7 +60,7 @@ MutableMesh<ELEMENT_DIM, SPACE_DIM>::MutableMesh(std::vector<Node<SPACE_DIM> *> 
 {
     this->mMeshChangesDuringSimulation = true;
     Clear();
-    for (unsigned index=0; index<nodes.size(); index++)
+    for (unsigned index = 0; index<nodes.size(); index++)
     {
         Node<SPACE_DIM>* p_temp_node = nodes[index];
         this->mNodes.push_back(p_temp_node);
@@ -97,7 +97,7 @@ unsigned MutableMesh<ELEMENT_DIM, SPACE_DIM>::AddNode(Node<SPACE_DIM>* pNewNode)
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned MutableMesh<ELEMENT_DIM, SPACE_DIM>::AddElement(Element<ELEMENT_DIM,SPACE_DIM>* pNewElement)
+unsigned MutableMesh<ELEMENT_DIM, SPACE_DIM>::AddElement(Element<ELEMENT_DIM, SPACE_DIM>* pNewElement)
 {
     unsigned new_elt_index;
 
@@ -120,7 +120,7 @@ unsigned MutableMesh<ELEMENT_DIM, SPACE_DIM>::AddElement(Element<ELEMENT_DIM,SPA
 }
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
 {
     mDeletedElementIndices.clear();
@@ -161,7 +161,7 @@ void MutableMesh<1, 1>::RescaleMeshFromBoundaryNode(ChastePoint<1> updatedPoint,
     assert(this->GetNode(boundaryNodeIndex)->IsBoundaryNode());
     double scaleFactor = updatedPoint[0] / this->GetNode(boundaryNodeIndex)->GetPoint()[0];
     double temp;
-    for (unsigned i=0; i < boundaryNodeIndex+1; ++i)
+    for (unsigned i = 0; i < boundaryNodeIndex+1; ++i)
     {
         temp = scaleFactor * this->mNodes[i]->GetPoint()[0];
         ChastePoint<1> newPoint(temp);
@@ -212,7 +212,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::SetNode(unsigned index,
             }
             else
             {
-                c_vector<double,SPACE_DIM> previous_direction = this->mElementWeightedDirections[ (*it) ];
+                c_vector<double, SPACE_DIM> previous_direction = this->mElementWeightedDirections[ (*it) ];
 
                 this->GetElement(*it)->CalculateWeightedDirection(this->mElementWeightedDirections[ (*it) ],
                                                             this->mElementJacobianDeterminants[ (*it) ]);
@@ -240,8 +240,8 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::DeleteNode(unsigned index)
          !found_target && it != this->mNodes[index]->ContainingElementsEnd();
          ++it)
     {
-        Element <ELEMENT_DIM,SPACE_DIM>* p_element = this->GetElement(*it);
-        for (unsigned i=0; i<=ELEMENT_DIM && !found_target; ++i)
+        Element <ELEMENT_DIM, SPACE_DIM>* p_element = this->GetElement(*it);
+        for (unsigned i = 0; i<=ELEMENT_DIM && !found_target; ++i)
         {
             target_index = p_element->GetNodeGlobalIndex(i);
             try
@@ -457,7 +457,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::MoveMergeNode(unsigned index,
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned MutableMesh<ELEMENT_DIM, SPACE_DIM>::RefineElement(
-    Element<ELEMENT_DIM,SPACE_DIM>* pElement,
+    Element<ELEMENT_DIM, SPACE_DIM>* pElement,
     ChastePoint<SPACE_DIM> point)
 {
     //Check that the point is in the element
@@ -487,8 +487,8 @@ unsigned MutableMesh<ELEMENT_DIM, SPACE_DIM>::RefineElement(
             mDeletedElementIndices.pop_back();
         }
 
-        Element<ELEMENT_DIM,SPACE_DIM>* p_new_element=
-            new Element<ELEMENT_DIM,SPACE_DIM>(*pElement, new_elt_index);
+        Element<ELEMENT_DIM, SPACE_DIM>* p_new_element=
+            new Element<ELEMENT_DIM, SPACE_DIM>(*pElement, new_elt_index);
 
         // Second, update the node in the element with the new one
         p_new_element->UpdateNode(ELEMENT_DIM-1-i, this->mNodes[new_node_index]);
@@ -545,7 +545,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::DeleteBoundaryNodeAt(unsigned index)
     while (element_indices_iterator != element_indices.end())
     {
         Element<ELEMENT_DIM, SPACE_DIM>* p_element = this->GetElement(*element_indices_iterator);
-        for (unsigned i=0; i<p_element->GetNumNodes(); ++i)
+        for (unsigned i = 0; i<p_element->GetNumNodes(); ++i)
         {
             Node<SPACE_DIM>* p_node = p_element->GetNode(i);
             if (!p_node->IsDeleted())
@@ -561,7 +561,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::DeleteBoundaryNodeAt(unsigned index)
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReIndex(NodeMap& map)
 {
     assert(!mAddedNodes);
@@ -569,7 +569,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReIndex(NodeMap& map)
 
     std::vector<Element<ELEMENT_DIM, SPACE_DIM> *> live_elements;
 
-    for (unsigned i=0; i<this->mElements.size(); ++i)
+    for (unsigned i = 0; i<this->mElements.size(); ++i)
     {
         assert(i==this->mElements[i]->GetIndex()); // We need this to be true to be able to reindex the Jacobian cache
         if (this->mElements[i]->IsDeleted())
@@ -611,7 +611,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReIndex(NodeMap& map)
     this->mElementJacobianDeterminants.resize(num_elements);
 
     std::vector<Node<SPACE_DIM> *> live_nodes;
-    for (unsigned i=0; i<this->mNodes.size(); ++i)
+    for (unsigned i = 0; i<this->mNodes.size(); ++i)
     {
         if (this->mNodes[i]->IsDeleted())
         {
@@ -632,7 +632,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReIndex(NodeMap& map)
     mDeletedNodeIndices.clear();
 
     std::vector<BoundaryElement<ELEMENT_DIM-1, SPACE_DIM> *> live_boundary_elements;
-    for (unsigned i=0; i<this->mBoundaryElements.size(); ++i)
+    for (unsigned i = 0; i<this->mBoundaryElements.size(); ++i)
     {
         if (this->mBoundaryElements[i]->IsDeleted())
         {
@@ -656,23 +656,23 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReIndex(NodeMap& map)
     this->mBoundaryElementWeightedDirections.resize(num_boundary_elements);
     this->mBoundaryElementJacobianDeterminants.resize(num_boundary_elements);
 
-    for (unsigned i=0; i<this->mNodes.size(); ++i)
+    for (unsigned i = 0; i<this->mNodes.size(); ++i)
     {
         this->mNodes[i]->SetIndex(i);
     }
 
-    for (unsigned i=0; i<this->mElements.size(); ++i)
+    for (unsigned i = 0; i<this->mElements.size(); ++i)
     {
         this->mElements[i]->ResetIndex(i);
     }
 
-    for (unsigned i=0; i<this->mBoundaryElements.size(); ++i)
+    for (unsigned i = 0; i<this->mBoundaryElements.size(); ++i)
     {
         this->mBoundaryElements[i]->ResetIndex(i);
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(NodeMap& map)
 {
     // Make sure that we are in the correct dimension - this code will be eliminated at compile time
@@ -701,7 +701,7 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(NodeMap& map)
         // Store the node locations
         std::vector<c_vector<double, SPACE_DIM> > old_node_locations;
         unsigned new_index = 0;
-        for (unsigned i=0; i<this->GetNumAllNodes(); ++i)
+        for (unsigned i = 0; i<this->GetNumAllNodes(); ++i)
         {
             if (this->mNodes[i]->IsDeleted())
             {
@@ -803,14 +803,14 @@ void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(NodeMap& map)
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh()
 {
     NodeMap map(GetNumNodes());
     ReMesh(map);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<c_vector<unsigned, 5> > MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitLongEdges(double cutoffLength)
 {
     if constexpr (SPACE_DIM == 3 && ELEMENT_DIM == 2)
@@ -831,7 +831,7 @@ std::vector<c_vector<unsigned, 5> > MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitLo
                 unsigned num_nodes = ELEMENT_DIM+1;
 
                 // Loop over element vertices
-                for (unsigned local_index=0; local_index<num_nodes; local_index++)
+                for (unsigned local_index = 0; local_index<num_nodes; local_index++)
                 {
                     // Find locations of current node (node a) and anticlockwise node (node b)
                     Node<SPACE_DIM>* p_node_a = elem_iter->GetNode(local_index);
@@ -910,7 +910,7 @@ std::vector<c_vector<unsigned, 5> > MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitLo
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<unsigned, 3> MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitEdge(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
 {
     c_vector<unsigned, 3> new_node_index_vector;
@@ -938,12 +938,10 @@ c_vector<unsigned, 3> MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitEdge(Node<SPACE_
 
     for (const auto& it : intersection_elements)
     {
-        unsigned element_index = *it;
-
-        Element<ELEMENT_DIM,SPACE_DIM>* p_original_element = this->GetElement(element_index);
+        Element<ELEMENT_DIM, SPACE_DIM>* p_original_element = this->GetElement(it);
 
         // First, make a copy of the current element and assign an unused index
-        Element<ELEMENT_DIM,SPACE_DIM>* p_new_element = new Element<ELEMENT_DIM,SPACE_DIM>(*p_original_element, UINT_MAX);
+        Element<ELEMENT_DIM, SPACE_DIM>* p_new_element = new Element<ELEMENT_DIM, SPACE_DIM>(*p_original_element, UINT_MAX);
 
         // Second, add the new element to the set of existing elements. This method will assign a proper index to the element.
         AddElement(p_new_element);
@@ -991,18 +989,18 @@ c_vector<unsigned, 3> MutableMesh<ELEMENT_DIM, SPACE_DIM>::SplitEdge(Node<SPACE_
     return new_node_index_vector;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MutableMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsVoronoi(Element<ELEMENT_DIM, SPACE_DIM>* pElement, double maxPenetration)
 {
     if constexpr (ELEMENT_DIM == SPACE_DIM)
     {
         unsigned num_nodes = pElement->GetNumNodes();
         std::set<unsigned> neighbouring_elements_indices;
-        std::set< Element<ELEMENT_DIM,SPACE_DIM> *> neighbouring_elements;
+        std::set< Element<ELEMENT_DIM, SPACE_DIM> *> neighbouring_elements;
         std::set<unsigned> neighbouring_nodes_indices;
 
         // Form a set of neighbouring elements via the nodes
-        for (unsigned i=0; i<num_nodes; ++i)
+        for (unsigned i = 0; i<num_nodes; ++i)
         {
             Node<SPACE_DIM>* p_node = pElement->GetNode(i);
             neighbouring_elements_indices = p_node->rGetContainingElementIndices();
@@ -1016,13 +1014,13 @@ bool MutableMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsVoronoi(Element<ELEMENT_DIM, SP
         neighbouring_elements.erase(pElement);
 
         // For each neighbouring element find the supporting nodes
-        typedef typename std::set<Element<ELEMENT_DIM,SPACE_DIM> *>::const_iterator ElementIterator;
+        typedef typename std::set<Element<ELEMENT_DIM, SPACE_DIM> *>::const_iterator ElementIterator;
 
         for (ElementIterator it = neighbouring_elements.begin();
             it != neighbouring_elements.end();
             ++it)
         {
-            for (unsigned i=0; i<num_nodes; ++i)
+            for (unsigned i = 0; i<num_nodes; ++i)
             {
                 neighbouring_nodes_indices.insert((*it)->GetNodeGlobalIndex(i));
             }
@@ -1041,7 +1039,7 @@ bool MutableMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsVoronoi(Element<ELEMENT_DIM, SP
 
         // Copy the actually circumcentre into a smaller vector
         c_vector<double, ELEMENT_DIM> circum_centre;
-        for (unsigned i=0; i<ELEMENT_DIM; ++i)
+        for (unsigned i = 0; i<ELEMENT_DIM; ++i)
         {
             circum_centre[i] = this_circum_centre[i];
         }
@@ -1082,12 +1080,12 @@ bool MutableMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsVoronoi(Element<ELEMENT_DIM, SP
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MutableMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsVoronoi(double maxPenetration)
 {
     // Looping through all the elements in the mesh
     /// \todo use ElementIterator here?
-    for (unsigned i=0; i<this->mElements.size(); ++i)
+    for (unsigned i = 0; i<this->mElements.size(); ++i)
     {
         // Check if the element is not deleted
         if (!this->mElements[i]->IsDeleted())
@@ -1103,12 +1101,12 @@ bool MutableMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsVoronoi(double maxPenetration)
 }
 
 // Explicit instantiation
-template class MutableMesh<1,1>;
-template class MutableMesh<1,2>;
-template class MutableMesh<1,3>;
-template class MutableMesh<2,2>;
-template class MutableMesh<2,3>;
-template class MutableMesh<3,3>;
+template class MutableMesh<1, 1>;
+template class MutableMesh<1, 2>;
+template class MutableMesh<1, 3>;
+template class MutableMesh<2, 2>;
+template class MutableMesh<2, 3>;
+template class MutableMesh<3, 3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

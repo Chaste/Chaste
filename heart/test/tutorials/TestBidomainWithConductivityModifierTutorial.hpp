@@ -73,7 +73,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Here we define our conductivity modifier. It inherits from the abstract class.
  * Make sure to use the right element/space dims.
  */
-class SimpleConductivityModifier : public AbstractConductivityModifier<2,2>
+class SimpleConductivityModifier : public AbstractConductivityModifier<2, 2>
 {
     /*
      * We'll use a c_matrix called mTensor as "working memory" to hold the returned
@@ -84,8 +84,8 @@ class SimpleConductivityModifier : public AbstractConductivityModifier<2,2>
      */
 private:
 
-    c_matrix<double,2,2> mTensor;
-    c_matrix<double,2,2> mSpecialMatrix;
+    c_matrix<double,2, 2> mTensor;
+    c_matrix<double,2, 2> mSpecialMatrix;
 
 public:
      /*
@@ -96,7 +96,7 @@ public:
       * Strange things will happen if the off-diagonal entries aren't zeroed!
       */
     SimpleConductivityModifier()
-        : AbstractConductivityModifier<2,2>(),
+        : AbstractConductivityModifier<2, 2>(),
           mSpecialMatrix( zero_matrix<double>(2,2) )
           {
               mSpecialMatrix(0,0) = 3.14;
@@ -106,7 +106,7 @@ public:
    /*
     * `rCalculateModifiedConductivityTensor` returns a reference to the "processed" conductivity tensor.
     */
-    c_matrix<double,2,2>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,2,2>& rOriginalConductivity, unsigned domainIndex)
+    c_matrix<double,2, 2>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,2, 2>& rOriginalConductivity, unsigned domainIndex)
     {
         if (elementIndex == 0)
         {
@@ -127,7 +127,7 @@ public:
 
         // Modify the current conductivity according to some expression by running along the diagonal,
         // save to the "working memory", and return.
-        for ( unsigned i=0; i<2; i++ )
+        for ( unsigned i = 0; i<2; i++ )
         {
             mTensor(i,i) = domain_scaling*elementIndex*rOriginalConductivity(i,i);
         }
@@ -147,14 +147,14 @@ public:
         /*
          * Generate a mesh.
          */
-        DistributedTetrahedralMesh<2,2> mesh;
+        DistributedTetrahedralMesh<2, 2> mesh;
         mesh.ConstructRegularSlabMesh(0.5, 1.0, 0.5); // Mesh has 4 elements
 
         /*
          * Here we're using a trivial cell factory for simplicity, but usually you'll provide your own one.
          * Set up the problem with the factory as usual.
          */
-        ZeroStimulusCellFactory<CellLuoRudy1991FromCellML,2> cell_factory;
+        ZeroStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory;
         BidomainProblem<2> bidomain_problem( &cell_factory );
         bidomain_problem.SetMesh( &mesh );
 
@@ -201,7 +201,7 @@ public:
          * To confirm that the conductivities have changed, let's iterate over all elements owned by this process
          * and check their conductivity against what we expect.
          */
-        for (AbstractTetrahedralMesh<2,2>::ElementIterator elt_iter=mesh.GetElementIteratorBegin();
+        for (AbstractTetrahedralMesh<2, 2>::ElementIterator elt_iter=mesh.GetElementIteratorBegin();
              elt_iter!=mesh.GetElementIteratorEnd();
              ++elt_iter)
         {

@@ -54,7 +54,7 @@ class TestSteadyStateRunner : public CxxTest::TestSuite
 {
 
 public:
-    void TestSteadyStateRunnerConverges(void)
+    void TestSteadyStateRunnerConverges()
     {
 #ifdef CHASTE_CVODE
         //////////// DEFINE PARAMETERS ///////////////

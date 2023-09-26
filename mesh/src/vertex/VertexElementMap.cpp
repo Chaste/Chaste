@@ -54,7 +54,7 @@ void VertexElementMap::Resize(unsigned size)
 
 void VertexElementMap::ResetToIdentity()
 {
-    for (unsigned oldIndex=0; oldIndex<mMap.size(); oldIndex++)
+    for (unsigned oldIndex = 0; oldIndex<mMap.size(); oldIndex++)
     {
         mMap[oldIndex] = oldIndex;
     }
@@ -86,7 +86,7 @@ unsigned VertexElementMap::GetNewIndex(unsigned oldIndex) const
 
 bool VertexElementMap::IsIdentityMap()
 {
-    for (unsigned i=0; i<mMap.size(); ++i)
+    for (unsigned i = 0; i<mMap.size(); ++i)
     {
         if (mMap[i] != i)
         {

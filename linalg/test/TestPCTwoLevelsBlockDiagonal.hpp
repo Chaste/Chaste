@@ -80,7 +80,7 @@ public:
         Vec one_zeros = factory.CreateVec(2);
         Vec rhs = factory.CreateVec(2);
 
-        for (unsigned node_index=0; node_index<2*num_nodes; node_index+=2)
+        for (unsigned node_index = 0; node_index<2*num_nodes; node_index+=2)
         {
             PetscVecTools::SetElement(one_zeros, node_index, 1);
             PetscVecTools::SetElement(one_zeros, node_index+1, 0);
@@ -279,20 +279,20 @@ public:
 //
 //        // need to create a cell factory but don't want any intra stim, so magnitude
 //        // of stim is zero.
-//        c_vector<double,2> centre;
+//        c_vector<double, 2> centre;
 //        centre(0) = 5; // cm
 //        centre(1) = 5; // cm
 //        BathCellFactory<2,CellLuoRudy1991FromCellMLBackwardEuler> cell_factory( 0.0, centre);
 //
 //        BidomainParaParaProblem<2> para_para_problem( &cell_factory, true );
 //
-//        TetrahedralMesh<2,2> mesh;
+//        TetrahedralMesh<2, 2> mesh;
 //        mesh.ConstructRegularSlabMesh(0.05, 1, 1);
 //
 //        std::cout << "num_nodes: " << mesh.GetNumNodes() << std::endl;
 //
 //        // set the x<0.15 and x>0.85 regions as the bath region
-//        for (unsigned i=0; i<mesh.GetNumElements(); ++i)
+//        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
 //        {
 //            double x = mesh.GetElement(i)->CalculateCentroid()[0];
 //            if ((x<0.1) || (x>0.9))
@@ -314,7 +314,7 @@ public:
 //        // Nodes are not labeled until Initialise() is called.
 //        std::cout << "bath nodes: ";
 //        unsigned num_bath_nodes = 0;
-//        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+//        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
 //        {
 //            if (HeartRegionCode::IsRegionBath( mesh.GetNode(i)->GetRegion() ))
 //            {

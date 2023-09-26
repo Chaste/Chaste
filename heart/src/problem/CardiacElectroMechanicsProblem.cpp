@@ -76,7 +76,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::DetermineWatchedNodes()
 
     // set up watched node, if close enough
     assert(node_index != UNSIGNED_UNSET); // should def have found something
-    c_vector<double,DIM> pos = mpElectricsMesh->GetNode(node_index)->rGetLocation();
+    c_vector<double, DIM> pos = mpElectricsMesh->GetNode(node_index)->rGetLocation();
 
     if (min_dist > 1e-8)
     {
@@ -99,12 +99,11 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::DetermineWatchedNodes()
     // find nearest mechanics mesh
     min_dist = DBL_MAX;
     node_index = UNSIGNED_UNSET;
-    c_vector<double,DIM> pos_at_min;
+    c_vector<double, DIM> pos_at_min;
 
-    for (unsigned i
-    ; i<mpMechanicsMesh->GetNumNodes(); ++i)
+    for (unsigned i = 0; i < mpMechanicsMesh->GetNumNodes(); ++i)
     {
-        c_vector<double,DIM> position = mpMechanicsMesh->GetNode(i)->rGetLocation();
+        c_vector<double, DIM> position = mpMechanicsMesh->GetNode(i)->rGetLocation();
 
         double dist = norm_2(position-mWatchedLocation);
 
@@ -146,7 +145,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::WriteWatchedLocationData
 {
     assert(mIsWatchedLocation);
 
-    std::vector<c_vector<double,DIM> >& deformed_position = mpMechanicsSolver->rGetDeformedPosition();
+    std::vector<c_vector<double, DIM> >& deformed_position = mpMechanicsSolver->rGetDeformedPosition();
 
     ///\todo Improve efficiency of this method?
     ReplicatableVector voltage_replicated(voltage);
@@ -167,15 +166,15 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::WriteWatchedLocationData
 }
 
 template<unsigned DIM, unsigned ELEC_PROB_DIM>
-c_matrix<double,DIM,DIM>& CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,DIM,DIM>& rOriginalConductivity, unsigned domainIndex)
+c_matrix<double, DIM, DIM>& CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double, DIM, DIM>& rOriginalConductivity, unsigned domainIndex)
 {
 
     // first get the deformation gradient for this electrics element
     unsigned containing_mechanics_elem = mpMeshPair->rGetCoarseElementsForFineElementCentroids()[elementIndex];
-    c_matrix<double,DIM,DIM>& r_deformation_gradient = mDeformationGradientsForEachMechanicsElement[containing_mechanics_elem];
+    c_matrix<double, DIM, DIM>& r_deformation_gradient = mDeformationGradientsForEachMechanicsElement[containing_mechanics_elem];
 
     // compute sigma_def = F^{-1} sigma_undef F^{-T}
-    c_matrix<double,DIM,DIM> inv_F = Inverse(r_deformation_gradient);
+    c_matrix<double, DIM, DIM> inv_F = Inverse(r_deformation_gradient);
     mModifiedConductivityTensor = prod(inv_F, rOriginalConductivity);
     mModifiedConductivityTensor = prod(mModifiedConductivityTensor, trans(inv_F));
 
@@ -257,7 +256,7 @@ template<unsigned DIM, unsigned ELEC_PROB_DIM>
 CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsProblem(
             CompressibilityType compressibilityType,
             ElectricsProblemType electricsProblemType,
-            TetrahedralMesh<DIM,DIM>* pElectricsMesh,
+            TetrahedralMesh<DIM, DIM>* pElectricsMesh,
             QuadraticMesh<DIM>* pMechanicsMesh,
             AbstractCardiacCellFactory<DIM>* pCellFactory,
             ElectroMechanicsProblemDefinition<DIM>* pProblemDefinition,
@@ -388,11 +387,11 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
         switch (mpProblemDefinition->GetSolverType())
         {
             case EXPLICIT:
-                mpCardiacMechSolver = new ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<DIM>,DIM>(
+                mpCardiacMechSolver = new ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<DIM>, DIM>(
                                         *mpMechanicsMesh,*mpProblemDefinition,mDeformationOutputDirectory);
                 break;
             case IMPLICIT:
-                mpCardiacMechSolver = new ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<DIM>,DIM>(
+                mpCardiacMechSolver = new ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<DIM>, DIM>(
                                         *mpMechanicsMesh,*mpProblemDefinition,mDeformationOutputDirectory);
                 break;
             default:
@@ -406,11 +405,11 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
         switch (mpProblemDefinition->GetSolverType())
         {
             case EXPLICIT:
-                mpCardiacMechSolver = new ExplicitCardiacMechanicsSolver<CompressibleNonlinearElasticitySolver<DIM>,DIM>(
+                mpCardiacMechSolver = new ExplicitCardiacMechanicsSolver<CompressibleNonlinearElasticitySolver<DIM>, DIM>(
                                         *mpMechanicsMesh,*mpProblemDefinition,mDeformationOutputDirectory);
                 break;
             case IMPLICIT:
-                mpCardiacMechSolver = new ImplicitCardiacMechanicsSolver<CompressibleNonlinearElasticitySolver<DIM>,DIM>(
+                mpCardiacMechSolver = new ImplicitCardiacMechanicsSolver<CompressibleNonlinearElasticitySolver<DIM>, DIM>(
                                         *mpMechanicsMesh,*mpProblemDefinition,mDeformationOutputDirectory);
                 break;
             default:
@@ -480,7 +479,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
 
     if (mWriteOutput)
     {
-        TrianglesMeshWriter<DIM,DIM> mesh_writer(mOutputDirectory,"electrics_mesh",false);
+        TrianglesMeshWriter<DIM, DIM> mesh_writer(mOutputDirectory,"electrics_mesh",false);
         mesh_writer.WriteFilesUsingMesh(*mpElectricsMesh);
     }
 }
@@ -501,13 +500,13 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
     mpProblemDefinition->Validate();
 
-    boost::shared_ptr<BoundaryConditionsContainer<DIM,DIM,ELEC_PROB_DIM> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,ELEC_PROB_DIM>);
+    boost::shared_ptr<BoundaryConditionsContainer<DIM, DIM,ELEC_PROB_DIM> > p_bcc(new BoundaryConditionsContainer<DIM, DIM,ELEC_PROB_DIM>);
     p_bcc->DefineZeroNeumannOnMeshBoundary(mpElectricsMesh, 0);
     mpElectricsProblem->SetBoundaryConditionsContainer(p_bcc);
 
     // get an electrics solver from the problem. Note that we don't call
     // Solve() on the CardiacProblem class, we do the looping here.
-    AbstractDynamicLinearPdeSolver<DIM,DIM,ELEC_PROB_DIM>* p_electrics_solver
+    AbstractDynamicLinearPdeSolver<DIM, DIM,ELEC_PROB_DIM>* p_electrics_solver
        = mpElectricsProblem->CreateSolver();
 
     // set up initial voltage etc
@@ -767,7 +766,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
             double interpolated_CaI = 0;
             double interpolated_voltage = 0;
 
-            Element<DIM,DIM>& element = *(mpElectricsMesh->GetElement(mpMeshPair->rGetElementsAndWeights()[i].ElementNum));
+            Element<DIM, DIM>& element = *(mpElectricsMesh->GetElement(mpMeshPair->rGetElementsAndWeights()[i].ElementNum));
 
             for (unsigned node_index = 0; node_index < element.GetNumNodes(); ++node_index)
             {
@@ -896,20 +895,20 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         std::string config_directory = HeartConfig::Instance()->GetOutputDirectory();
         HeartConfig::Instance()->SetOutputDirectory(input_dir);
 
-//      Hdf5ToMeshalyzerConverter<DIM,DIM> meshalyzer_converter(FileFinder(input_dir, RelativeTo::ChasteTestOutput),
+//      Hdf5ToMeshalyzerConverter<DIM, DIM> meshalyzer_converter(FileFinder(input_dir, RelativeTo::ChasteTestOutput),
 //                                                              "voltage", mpElectricsMesh,
 //                                                                HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering(),
 //                                                                HeartConfig::Instance()->GetVisualizerOutputPrecision() );
 
         // convert output to CMGUI format
-        Hdf5ToCmguiConverter<DIM,DIM> cmgui_converter(FileFinder(input_dir, RelativeTo::ChasteTestOutput),
+        Hdf5ToCmguiConverter<DIM, DIM> cmgui_converter(FileFinder(input_dir, RelativeTo::ChasteTestOutput),
                                                       "voltage", mpElectricsMesh, mHasBath,
                                                       HeartConfig::Instance()->GetVisualizerOutputPrecision());
 
         // Write mesh in a suitable form for meshalyzer
         //std::string output_directory =  mOutputDirectory + "/electrics/output";
         // Write the mesh
-        //MeshalyzerMeshWriter<DIM,DIM> mesh_writer(output_directory, "mesh", false);
+        //MeshalyzerMeshWriter<DIM, DIM> mesh_writer(output_directory, "mesh", false);
         //mesh_writer.WriteFilesUsingMesh(*mpElectricsMesh);
         // Write the parameters out
         //HeartConfig::Instance()->Write();
@@ -961,7 +960,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::SetNoElectricsOutput()
 }
 
 template<unsigned DIM, unsigned ELEC_PROB_DIM>
-void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::SetWatchedPosition(c_vector<double,DIM> watchedLocation)
+void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::SetWatchedPosition(c_vector<double, DIM> watchedLocation)
 {
     mIsWatchedLocation = true;
     mWatchedLocation = watchedLocation;
@@ -978,7 +977,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::SetOutputDeformationGrad
 }
 
 template<unsigned DIM, unsigned ELEC_PROB_DIM>
-std::vector<c_vector<double,DIM> >& CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::rGetDeformedPosition()
+std::vector<c_vector<double, DIM> >& CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::rGetDeformedPosition()
 {
     return mpMechanicsSolver->rGetDeformedPosition();
 }
@@ -986,7 +985,7 @@ std::vector<c_vector<double,DIM> >& CardiacElectroMechanicsProblem<DIM,ELEC_PROB
 // Explicit instantiation
 
 //note: 1d incompressible material doesn't make sense
-template class CardiacElectroMechanicsProblem<2,1>;
-template class CardiacElectroMechanicsProblem<3,1>;
-template class CardiacElectroMechanicsProblem<2,2>;
-template class CardiacElectroMechanicsProblem<3,2>;
+template class CardiacElectroMechanicsProblem<2, 1>;
+template class CardiacElectroMechanicsProblem<3, 1>;
+template class CardiacElectroMechanicsProblem<2, 2>;
+template class CardiacElectroMechanicsProblem<3, 2>;

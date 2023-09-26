@@ -99,11 +99,11 @@ public:
         TS_ASSERT_EQUALS(collection.HasPropertyType<AbstractCellMutationState>(), true);
         //TS_ASSERT_EQUALS(!collection.HasProperty<AbstractCellMutationState>(), false); <-- This won't compile (yet)
         // ..by iteration
-        for (auto it = collection.Begin(); it != collection.End(); ++it)
+        for (const auto& it : collection)
         {
-            TS_ASSERT_EQUALS(collection.HasProperty(*it), true);
-            TS_ASSERT((*it)->IsType<WildTypeCellMutationState>() || (*it)->IsType<ApcOneHitCellMutationState>());
-            TS_ASSERT_EQUALS((*it)->IsSubType<AbstractCellMutationState>(), true);
+            TS_ASSERT_EQUALS(collection.HasProperty(it), true);
+            TS_ASSERT(it->IsType<WildTypeCellMutationState>() || it->IsType<ApcOneHitCellMutationState>());
+            TS_ASSERT_EQUALS(it->IsSubType<AbstractCellMutationState>(), true);
         }
 
         // Remove property
@@ -123,14 +123,14 @@ public:
         collection.AddProperty(p_apc1_mutation);
         CellPropertyCollection mutations = collection.GetPropertiesType<AbstractCellMutationState>();
         TS_ASSERT_EQUALS(mutations.GetSize(), 2u);
-        auto it = mutations.Begin();
+        auto it = mutations.begin();
         TS_ASSERT_EQUALS(collection.HasProperty(*it), true);
         TS_ASSERT_EQUALS((*it)->IsSubType<AbstractCellMutationState>(), true);
         TS_ASSERT( (*it)->IsType<WildTypeCellMutationState>() || (*(++it))->IsType<WildTypeCellMutationState>() );
 
         CellPropertyCollection wild_types = collection.GetProperties<WildTypeCellMutationState>();
         TS_ASSERT_EQUALS(wild_types.GetSize(), 1u);
-        it = wild_types.Begin();
+        it = wild_types.begin();
         TS_ASSERT_EQUALS((*it)->IsType<WildTypeCellMutationState>(), true);
         TS_ASSERT( *it == wild_types.GetProperty() );
         TS_ASSERT_THROWS_THIS(collection.GetProperty(),
@@ -183,11 +183,11 @@ public:
             TS_ASSERT_EQUALS(collection.HasPropertyType<AbstractCellProperty>(), true);
             TS_ASSERT_EQUALS(collection.HasPropertyType<AbstractCellMutationState>(), true);
 
-            for (auto it = collection.Begin(); it != collection.End(); ++it)
+            for (const auto& it : collection)
             {
-                TS_ASSERT_EQUALS(collection.HasProperty(*it), true);
-                TS_ASSERT((*it)->IsType<BetaCateninOneHitCellMutationState>() || (*it)->IsType<ApcOneHitCellMutationState>());
-                TS_ASSERT_EQUALS((*it)->IsSubType<AbstractCellMutationState>(), true);
+                TS_ASSERT_EQUALS(collection.HasProperty(it), true);
+                TS_ASSERT(it->IsType<BetaCateninOneHitCellMutationState>() || it->IsType<ApcOneHitCellMutationState>());
+                TS_ASSERT_EQUALS(it->IsSubType<AbstractCellMutationState>(), true);
             }
         }
     }

@@ -56,7 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  system to be solved using matrix-vector products.
  */
 template<unsigned ELEM_DIM, unsigned SPACE_DIM>
-class ExtendedBidomainSolver : public AbstractExtendedBidomainSolver<ELEM_DIM,SPACE_DIM>
+class ExtendedBidomainSolver : public AbstractExtendedBidomainSolver<ELEM_DIM, SPACE_DIM>
 {
 private:
     /**
@@ -72,10 +72,10 @@ private:
     Vec mVecForConstructingRhs;
 
     /** The bidomain assembler, used to set up the LHS matrix */
-    ExtendedBidomainAssembler<ELEM_DIM,SPACE_DIM>* mpExtendedBidomainAssembler;
+    ExtendedBidomainAssembler<ELEM_DIM, SPACE_DIM>* mpExtendedBidomainAssembler;
 
     /** Assembler for surface integrals coming from any non-zero Neumann boundary conditions */
-    ExtendedBidomainNeumannSurfaceTermAssembler<ELEM_DIM,SPACE_DIM>* mpExtendedBidomainNeumannSurfaceTermAssembler;
+    ExtendedBidomainNeumannSurfaceTermAssembler<ELEM_DIM, SPACE_DIM>* mpExtendedBidomainNeumannSurfaceTermAssembler;
 
 
     /** Overloaded InitialiseForSolve() which calls base version but also
@@ -105,9 +105,9 @@ public:
      * @param pBoundaryConditions pointer to the boundary conditions
      */
     ExtendedBidomainSolver(bool bathSimulation,
-                           AbstractTetrahedralMesh<ELEM_DIM,SPACE_DIM>* pMesh,
+                           AbstractTetrahedralMesh<ELEM_DIM, SPACE_DIM>* pMesh,
                            ExtendedBidomainTissue<SPACE_DIM>* pTissue,
-                           BoundaryConditionsContainer<ELEM_DIM,SPACE_DIM,3>* pBoundaryConditions);
+                           BoundaryConditionsContainer<ELEM_DIM, SPACE_DIM, 3>* pBoundaryConditions);
 
     /**
      * Destructor

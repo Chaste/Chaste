@@ -66,20 +66,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EllipticBoxDomainPdeModifier.hpp"
 #include "EllipticGrowingDomainPdeModifier.hpp"
 
-class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
+class SimplePdeForTesting : public AbstractLinearEllipticPde<2, 2>
 {
 public:
-    double ComputeConstantInUSourceTerm(const ChastePoint<2>&, Element<2,2>* pElement)
+    double ComputeConstantInUSourceTerm(const ChastePoint<2>&, Element<2, 2>* pElement)
     {
         return -1.0;
     }
 
-    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<2>&, Element<2,2>*)
+    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<2>&, Element<2, 2>*)
     {
         return 0.0;
     }
 
-    c_matrix<double,2,2> ComputeDiffusionTerm(const ChastePoint<2>& )
+    c_matrix<double,2, 2> ComputeDiffusionTerm(const ChastePoint<2>& )
     {
         return identity_matrix<double>(2);
     }
@@ -127,7 +127,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
-        c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
+        c_vector<double, 2> centroid = cell_population.GetCentroidOfCellPopulation();
         ChastePoint<2> lower(centroid(0)-25.0, centroid(1)-25.0);
         ChastePoint<2> upper(centroid(0)+25.0, centroid(1)+25.0);
         MAKE_PTR_ARGS(ChasteCuboid<2>, p_cuboid, (lower, upper));
@@ -156,7 +156,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         }
 
         // Find centre of cell population
-        c_vector<double,2> centre_of_cell_population = zero_vector<double>(2);
+        c_vector<double, 2> centre_of_cell_population = zero_vector<double>(2);
 
         for (unsigned i = 0; i < simulator.rGetCellPopulation().GetNumNodes(); ++i)
         {
@@ -165,8 +165,8 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         centre_of_cell_population /= simulator.rGetCellPopulation().GetNumNodes();
 
         // Find centre of coarse PDE mesh
-        c_vector<double,2> centre_of_coarse_pde_mesh = zero_vector<double>(2);
-        TetrahedralMesh<2,2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
+        c_vector<double, 2> centre_of_coarse_pde_mesh = zero_vector<double>(2);
+        TetrahedralMesh<2, 2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
         for (unsigned i = 0; i < p_coarse_mesh->GetNumNodes(); ++i)
         {
             centre_of_coarse_pde_mesh += p_coarse_mesh->GetNode(i)->rGetLocation();
@@ -174,7 +174,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         centre_of_coarse_pde_mesh /= p_coarse_mesh->GetNumNodes();
 
         // Test that the two centres match
-        c_vector<double,2> centre_diff = centre_of_cell_population - centre_of_coarse_pde_mesh;
+        c_vector<double, 2> centre_diff = centre_of_cell_population - centre_of_coarse_pde_mesh;
         TS_ASSERT_DELTA(norm_2(centre_diff), 0.0, 1e-4);
     }
 
@@ -238,7 +238,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         }
 
         // Test coarse mesh has the same nodes as the PottsMesh
-        TetrahedralMesh<2,2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
+        TetrahedralMesh<2, 2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
 
         TS_ASSERT_EQUALS(p_coarse_mesh->GetNumNodes(),p_mesh->GetNumNodes());
         TS_ASSERT_DELTA(p_coarse_mesh->GetWidth(0), p_mesh->GetWidth(0), 1e-8);
@@ -489,7 +489,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
-        c_vector<double,2> centre_of_potts_mesh = zero_vector<double>(2);
+        c_vector<double, 2> centre_of_potts_mesh = zero_vector<double>(2);
         for (unsigned i = 0; i < p_mesh->GetNumNodes(); ++i)
         {
             centre_of_potts_mesh += p_mesh->GetNode(i)->rGetLocation();
@@ -525,14 +525,14 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         }
 
         // Find centre of coarse PDE mesh
-        c_vector<double,2> centre_of_coarse_pde_mesh = zero_vector<double>(2);
-        TetrahedralMesh<2,2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
+        c_vector<double, 2> centre_of_coarse_pde_mesh = zero_vector<double>(2);
+        TetrahedralMesh<2, 2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
         for (unsigned i = 0; i < p_coarse_mesh->GetNumNodes(); ++i)
         {
             centre_of_coarse_pde_mesh += p_coarse_mesh->GetNode(i)->rGetLocation();
         }
         centre_of_coarse_pde_mesh /= p_coarse_mesh->GetNumNodes();
-        c_vector<double,2> centre_diff = centre_of_coarse_pde_mesh - centre_of_potts_mesh;
+        c_vector<double, 2> centre_diff = centre_of_coarse_pde_mesh - centre_of_potts_mesh;
 
         // Test that the two centres match
         TS_ASSERT_DELTA(norm_2(centre_diff), 0.0, 1e-4);
@@ -617,7 +617,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         TS_ASSERT(vtk_file.Exists());
         // Check that the second VTK file for the solution has the dependent quantities
         OutputFileHandler handler("TestPottsBasedCellPopulationWithTwoPdes", false);
-        VtkMeshReader<3,3> vtk_reader(handler.GetOutputDirectoryFullPath()+"results_from_time_0/pde_results_quantity_2_0.vtu");
+        VtkMeshReader<3, 3> vtk_reader(handler.GetOutputDirectoryFullPath()+"results_from_time_0/pde_results_quantity_2_0.vtu");
         std::vector<double> data1;
         // There is no Oxygen
         TS_ASSERT_THROWS_CONTAINS(vtk_reader.GetPointData("Oxygen", data1), "No point data");
@@ -681,7 +681,7 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.Solve();
 
         // Test coarse mesh has the same nodes as the PottsMesh
-        TetrahedralMesh<2,2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
+        TetrahedralMesh<2, 2>* p_coarse_mesh = p_pde_modifier->GetFeMesh();
 
         TS_ASSERT_EQUALS(p_coarse_mesh->GetNumNodes(),p_mesh->GetNumNodes());
         TS_ASSERT_DELTA(p_coarse_mesh->GetWidth(0), p_mesh->GetWidth(0), 1e-8);

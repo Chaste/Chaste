@@ -69,7 +69,7 @@ public:
     /**
      * @return a 2D honeycomb mesh
      */
-    boost::shared_ptr<MutableVertexMesh<2,2> > GetMesh();
+    boost::shared_ptr<MutableVertexMesh<2, 2> > GetMesh();
 
     /**
      * @return a 2D honeycomb mesh with periodic left/right and top/bottom boundaries

@@ -79,7 +79,7 @@ void FibreReader<DIM>::GetAllAxi(std::vector< c_vector<double, DIM> >& direction
         EXCEPTION("Use GetAllOrtho when reading orthotropic fibres");
     }
     direction.reserve(mNumLinesOfData);
-    for (unsigned i=0; i<mNumLinesOfData; ++i)
+    for (unsigned i = 0; i<mNumLinesOfData; ++i)
     {
         c_vector<double, DIM> temp_vector;
         GetFibreVector(i, temp_vector, false);
@@ -99,7 +99,7 @@ void FibreReader<DIM>::GetAllOrtho(std::vector< c_vector<double, DIM> >& first_d
     {
         EXCEPTION("Use GetAllAxi when reading axisymmetric fibres");
     }
-    for (unsigned i=0; i<mNumLinesOfData; ++i)
+    for (unsigned i = 0; i<mNumLinesOfData; ++i)
     {
         c_matrix<double, DIM, DIM> temp_matrix;
         GetFibreSheetAndNormalMatrix(i, temp_matrix, true);
@@ -123,7 +123,7 @@ void FibreReader<DIM>::GetAllOrtho(std::vector< c_vector<double, DIM> >& first_d
 
 template<unsigned DIM>
 void FibreReader<DIM>::GetFibreSheetAndNormalMatrix(unsigned fibreIndex,
-                                                    c_matrix<double,DIM,DIM>& rFibreMatrix,
+                                                    c_matrix<double, DIM, DIM>& rFibreMatrix,
                                                     bool checkOrthogonality)
 {
     if (mNumItemsPerLine != DIM*DIM)
@@ -172,7 +172,7 @@ void FibreReader<DIM>::GetFibreSheetAndNormalMatrix(unsigned fibreIndex,
     if (checkOrthogonality)
     {
         // Note that we define this matrix before setting it as otherwise the profiling build will break (see #2367)
-        c_matrix<double,DIM,DIM> temp = zero_matrix<double>(DIM, DIM);
+        c_matrix<double, DIM, DIM> temp = zero_matrix<double>(DIM, DIM);
         temp = prod(trans(rFibreMatrix), rFibreMatrix);
 
         // Check temp is equal to the identity
@@ -194,7 +194,7 @@ void FibreReader<DIM>::GetFibreSheetAndNormalMatrix(unsigned fibreIndex,
 
 template<unsigned DIM>
 void FibreReader<DIM>::GetFibreVector(unsigned fibreIndex,
-                                      c_vector<double,DIM>& rFibreVector,
+                                      c_vector<double, DIM>& rFibreVector,
                                       bool checkNormalised)
 {
     if (mNumItemsPerLine != DIM)

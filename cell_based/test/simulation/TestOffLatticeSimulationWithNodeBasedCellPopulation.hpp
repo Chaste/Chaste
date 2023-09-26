@@ -248,7 +248,7 @@ public:
         unsigned num_cells_depth = 3;
         unsigned num_cells_width = 3;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 6.0;
@@ -386,10 +386,10 @@ public:
         unsigned num_cells_depth = 3;
         unsigned num_cells_width = 3;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a PeriodicdNodesOnlyMesh
-        c_vector<double,2> periodic_width = zero_vector<double>(2);
+        c_vector<double, 2> periodic_width = zero_vector<double>(2);
         periodic_width[1] = 6.0;
         PeriodicNodesOnlyMesh<2> mesh(periodic_width);
         mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
@@ -526,10 +526,10 @@ public:
         unsigned num_cells_depth = 3;
         unsigned num_cells_width = 3;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a PeriodicdNodesOnlyMesh
-        c_vector<double,2> periodic_width = zero_vector<double>(2);
+        c_vector<double, 2> periodic_width = zero_vector<double>(2);
         periodic_width[0] = 6.0;
         periodic_width[1] = 6.0;
         PeriodicNodesOnlyMesh<2> mesh(periodic_width);
@@ -793,7 +793,7 @@ public:
         int num_cells_depth = 5;
         int num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -849,7 +849,7 @@ public:
         int num_cells_depth = 5;
         int num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -990,7 +990,7 @@ public:
         int num_cells_depth = 5;
         int num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -1015,7 +1015,7 @@ public:
         simulator.AddForce(p_linear_force);
 
         // Create some boundary conditions and pass them to the simulation
-        c_vector<double,2> normal = zero_vector<double>(2);
+        c_vector<double, 2> normal = zero_vector<double>(2);
         normal(1) =-1.0;
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc, (&node_based_cell_population, zero_vector<double>(2), normal)); // y>0
         simulator.AddCellPopulationBoundaryCondition(p_bc);
@@ -1047,7 +1047,7 @@ public:
         unsigned num_cells_depth = 5;
         unsigned num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -1072,7 +1072,7 @@ public:
         simulator.AddForce(p_linear_force);
 
         // Create some boundary conditions and pass them to the simulation
-        c_vector<double,2> normal = zero_vector<double>(2);
+        c_vector<double, 2> normal = zero_vector<double>(2);
         normal(1) =-1.0;
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc, (&node_based_cell_population, zero_vector<double>(2), normal)); // y>0
         simulator.AddCellPopulationBoundaryCondition(p_bc);
@@ -1083,7 +1083,7 @@ public:
          * conditions under which the time step would be adapted are not invoked
          * in this example.
          */
-        boost::shared_ptr<AbstractNumericalMethod<2,2> > p_method(new ForwardEulerNumericalMethod<2,2>());
+        boost::shared_ptr<AbstractNumericalMethod<2, 2> > p_method(new ForwardEulerNumericalMethod<2, 2>());
         p_method->SetUseAdaptiveTimestep(true);
         simulator.SetNumericalMethod(p_method);
 

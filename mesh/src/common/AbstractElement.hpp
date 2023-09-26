@@ -51,7 +51,7 @@ const unsigned INDEX_IS_NOT_USED=0;
 /**
  * An abstract element class for use in finite element meshes.
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class AbstractElement
 {
 protected:

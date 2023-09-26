@@ -464,7 +464,7 @@ bool DistributedBoxCollection<DIM>::GetIsPeriodicAcrossProcs() const
 }
 
 template<unsigned DIM>
-c_vector<bool,DIM> DistributedBoxCollection<DIM>::GetIsPeriodicAllDims() const
+c_vector<bool, DIM> DistributedBoxCollection<DIM>::GetIsPeriodicAllDims() const
 {
     c_vector<bool, DIM> periodic_dims;
     periodic_dims(0) = mIsPeriodicInX;

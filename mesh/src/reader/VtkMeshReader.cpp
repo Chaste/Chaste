@@ -46,8 +46,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VtkMeshReader.hpp"
 #include "Exception.hpp"
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::VtkMeshReader(std::string pathBaseName) :
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+VtkMeshReader<ELEMENT_DIM, SPACE_DIM>::VtkMeshReader(std::string pathBaseName) :
     mIndexFromZero(true),
     mNumNodes(0),
     mNumElements(0),
@@ -85,8 +85,8 @@ VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::VtkMeshReader(std::string pathBaseName) :
     vtk_xml_unstructured_grid_reader->Delete();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VtkMeshReader<ELEMENT_DIM, SPACE_DIM>::CommonConstructor()
 {
 
     mNumNodes = mpVtkUnstructuredGrid->GetNumberOfPoints();
@@ -169,7 +169,7 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
         {
             //The boundary face filter includes the cable elements - get rid of them
             unsigned num_all_cells = mNumFaces;
-            for (unsigned i=0; i<num_all_cells; ++i)
+            for (unsigned i = 0; i<num_all_cells; ++i)
             {
                if (mpVtkGeometryFilter->GetOutput()->GetCellType(i) == VTK_LINE)
                {
@@ -199,8 +199,8 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::VtkMeshReader(vtkUnstructuredGrid* pVtkUnstructuredGrid) :
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+VtkMeshReader<ELEMENT_DIM, SPACE_DIM>::VtkMeshReader(vtkUnstructuredGrid* pVtkUnstructuredGrid) :
     mIndexFromZero(true),
     mNumNodes(0),
     mNumElements(0),
@@ -223,8 +223,8 @@ VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::VtkMeshReader(vtkUnstructuredGrid* pVtkUns
     CommonConstructor();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::~VtkMeshReader()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+VtkMeshReader<ELEMENT_DIM, SPACE_DIM>::~VtkMeshReader()
 {
     if (ELEMENT_DIM == 3u)
     {
@@ -236,56 +236,56 @@ VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::~VtkMeshReader()
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNumElements() const
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned VtkMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumElements() const
 {
     return mNumElements;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNumCableElements() const
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned VtkMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumCableElements() const
 {
     return mNumCableElements;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNumNodes() const
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned VtkMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumNodes() const
 {
     return mNumNodes;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNumFaces() const
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned VtkMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumFaces() const
 {
     return mNumFaces;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNumEdges() const
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned VtkMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumEdges() const
 {
     return mNumFaces;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNumElementAttributes() const
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned VtkMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumElementAttributes() const
 {
     return mNumElementAttributes;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNumCableElementAttributes() const
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned VtkMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumCableElementAttributes() const
 {
     return mNumCableElementAttributes;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNumFaceAttributes() const
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned VtkMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumFaceAttributes() const
 {
     return mNumFaceAttributes;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::Reset()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VtkMeshReader<ELEMENT_DIM, SPACE_DIM>::Reset()
 {
     mNodesRead = 0;
     mElementsRead = 0;
@@ -295,8 +295,8 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::Reset()
     mCableElementsRead = 0;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector<double> VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextNode()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::vector<double> VtkMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextNode()
 {
     if (mNodesRead >= mNumNodes)
     {
@@ -314,8 +314,8 @@ std::vector<double> VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextNode()
     return next_node;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextElementData()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+ElementData VtkMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextElementData()
 {
     if (mElementsRead >= mNumElements)
     {
@@ -341,8 +341,8 @@ ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextElementData()
     return next_element_data;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextCableElementData()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+ElementData VtkMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextCableElementData()
 {
     if (mCableElementsRead >=  mNumCableElements)
     {
@@ -367,8 +367,8 @@ ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextCableElementData()
 }
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextFaceData()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+ElementData VtkMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextFaceData()
 {
     if (mBoundaryFacesRead >= mNumFaces)
     {
@@ -421,8 +421,8 @@ ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextFaceData()
 }
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetCellData(std::string dataName, std::vector<double>& dataPayload)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VtkMeshReader<ELEMENT_DIM, SPACE_DIM>::GetCellData(std::string dataName, std::vector<double>& dataPayload)
 {
     vtkCellData *p_cell_data = mpVtkUnstructuredGrid->GetCellData();
 
@@ -444,8 +444,8 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetCellData(std::string dataName, std
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetCellData(std::string dataName, std::vector<c_vector<double,SPACE_DIM> >& dataPayload)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VtkMeshReader<ELEMENT_DIM, SPACE_DIM>::GetCellData(std::string dataName, std::vector<c_vector<double, SPACE_DIM> >& dataPayload)
 {
     vtkCellData *p_cell_data = mpVtkUnstructuredGrid->GetCellData();
 
@@ -473,8 +473,8 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetCellData(std::string dataName, std
 }
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetPointData(std::string dataName, std::vector<double>& dataPayload)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VtkMeshReader<ELEMENT_DIM, SPACE_DIM>::GetPointData(std::string dataName, std::vector<double>& dataPayload)
 {
     vtkPointData *p_point_data = mpVtkUnstructuredGrid->GetPointData();
 
@@ -497,8 +497,8 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetPointData(std::string dataName, st
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetPointData(std::string dataName, std::vector<c_vector<double,SPACE_DIM> >& dataPayload)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VtkMeshReader<ELEMENT_DIM, SPACE_DIM>::GetPointData(std::string dataName, std::vector<c_vector<double, SPACE_DIM> >& dataPayload)
 {
    vtkPointData *p_point_data = mpVtkUnstructuredGrid->GetPointData();
 
@@ -526,17 +526,17 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetPointData(std::string dataName, st
 }
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-vtkUnstructuredGrid* VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::OutputMeshAsVtkUnstructuredGrid()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+vtkUnstructuredGrid* VtkMeshReader<ELEMENT_DIM, SPACE_DIM>::OutputMeshAsVtkUnstructuredGrid()
 {
     return mpVtkUnstructuredGrid;
 }
 
 // Explicit instantiation
-template class VtkMeshReader<1,1>;
-template class VtkMeshReader<1,2>;
-template class VtkMeshReader<1,3>;
-template class VtkMeshReader<2,2>;
-template class VtkMeshReader<2,3>;
-template class VtkMeshReader<3,3>;
+template class VtkMeshReader<1, 1>;
+template class VtkMeshReader<1, 2>;
+template class VtkMeshReader<1, 3>;
+template class VtkMeshReader<2, 2>;
+template class VtkMeshReader<2, 3>;
+template class VtkMeshReader<3, 3>;
 #endif // CHASTE_VTK

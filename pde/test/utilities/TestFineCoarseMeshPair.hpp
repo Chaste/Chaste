@@ -49,8 +49,8 @@ public:
     // Simple test where the whole of the coarse mesh is in one fine element
     void TestComputeFineElemsAndWeightsForQuadPointsSimple()
     {
-        TetrahedralMesh<2,2> fine_mesh;
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> fine_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
         fine_mesh.ConstructFromMeshReader(mesh_reader);
 
         QuadraticMesh<2> coarse_mesh(0.1, 0.1, 0.1);
@@ -101,7 +101,7 @@ public:
     void TestWithCoarseContainedInFine()
     {
         // Fine mesh is has h=0.1, on unit cube (so 6000 elements)
-        TetrahedralMesh<3,3> fine_mesh;
+        TetrahedralMesh<3, 3> fine_mesh;
         fine_mesh.ConstructRegularSlabMesh(0.1, 1.0, 1.0, 1.0);
 
         // Coarse mesh is has h=1 on unit cube (so 6 elements)
@@ -123,7 +123,7 @@ public:
 
                 for (auto iter : fine_mesh.GetNode(i)->rGetContainingElementIndices())
                 {
-                    Element<3,3>* p_element = fine_mesh.GetElement(iter);
+                    Element<3, 3>* p_element = fine_mesh.GetElement(iter);
                     TS_ASSERT_DIFFERS(mesh_pair.mpFineMeshBoxCollection->rGetBox(box_index).rGetElementsContained().find(p_element), 
                                       mesh_pair.mpFineMeshBoxCollection->rGetBox(box_index).rGetElementsContained().end())
                 }
@@ -175,7 +175,7 @@ public:
     void TestWithCoarseSlightlyOutsideFine()
     {
         // Fine mesh is has h=0.1, on unit cube (so 6000 elements)
-        TetrahedralMesh<3,3> fine_mesh;
+        TetrahedralMesh<3, 3> fine_mesh;
         fine_mesh.ConstructRegularSlabMesh(0.1, 1.0,1.0,1.0);
 
         // Coarse mesh is slightly bigger than in previous test
@@ -240,11 +240,11 @@ public:
 ////Bring back this functionality if needed
 //    void dontTestWithIdenticalMeshes()
 //    {
-//        TrianglesMeshReader<1,1> reader1("mesh/test/data/1D_0_to_1_10_elements");
-//        TetrahedralMesh<1,1> fine_mesh;
+//        TrianglesMeshReader<1, 1> reader1("mesh/test/data/1D_0_to_1_10_elements");
+//        TetrahedralMesh<1, 1> fine_mesh;
 //        fine_mesh.ConstructFromMeshReader(reader1);
 //
-//        TrianglesMeshReader<1,1> reader2("mesh/test/data/1D_0_to_1_10_elements_quadratic",2);
+//        TrianglesMeshReader<1, 1> reader2("mesh/test/data/1D_0_to_1_10_elements_quadratic",2);
 //        QuadraticMesh<1> coarse_mesh;
 //        coarse_mesh.ConstructFromMeshReader(reader2);
 //
@@ -261,7 +261,7 @@ public:
 
     void TestWithDefaultBoxWidth()
     {
-        TetrahedralMesh<2,2> fine_mesh;
+        TetrahedralMesh<2, 2> fine_mesh;
         fine_mesh.ConstructRegularSlabMesh(0.1, 1.0, 1.0);
 
         QuadraticMesh<2> coarse_mesh(1.0, 1.0, 1.0);
@@ -283,7 +283,7 @@ public:
         TS_ASSERT_EQUALS(mesh_pair.mpFineMeshBoxCollection->GetNumBoxes(), 64u);
 
         // Now use a mesh with a smaller edge length
-        TetrahedralMesh<2,2> fine_mesh2;
+        TetrahedralMesh<2, 2> fine_mesh2;
         fine_mesh2.ConstructRegularSlabMesh(0.01, 1.0,1.0);
 
         /*
@@ -308,7 +308,7 @@ public:
     void TestNonSafeMode()
     {
         // Fine mesh is has h=0.1, on unit cube (so 6000 elements)
-        TetrahedralMesh<3,3> fine_mesh;
+        TetrahedralMesh<3, 3> fine_mesh;
         fine_mesh.ConstructRegularSlabMesh(0.1, 1.0, 1.0, 1.0);
 
         QuadraticMesh<3> coarse_mesh(1.0, 1.0, 1.0, 1.0); // xmax > 1.0
@@ -362,7 +362,7 @@ public:
     // Covers some bits that aren't covered in the tests above,
     void TestOtherCoverage()
     {
-        TetrahedralMesh<2,2> fine_mesh;
+        TetrahedralMesh<2, 2> fine_mesh;
         fine_mesh.ConstructRegularSlabMesh(0.1, 1.0, 1.0);
 
         QuadraticMesh<2> coarse_mesh(1.0, 1.0, 1.0);
@@ -373,7 +373,7 @@ public:
          * quad point to be in a *local* box, ie not an element contained
          * in the box containing this point.
          */
-        c_matrix<double,2,2> rotation_mat;
+        c_matrix<double,2, 2> rotation_mat;
         rotation_mat(0,0) = 1.0/sqrt(2.0);
         rotation_mat(1,0) = -1.0/sqrt(2.0);
         rotation_mat(0,1) = 1.0/sqrt(2.0);
@@ -401,7 +401,7 @@ public:
 
     void TestComputeCoarseElementsForFineNodes()
     {
-        TetrahedralMesh<2,2> fine_mesh;
+        TetrahedralMesh<2, 2> fine_mesh;
         fine_mesh.ConstructRegularSlabMesh(0.2, 1.0, 1.0);
 
         QuadraticMesh<2> coarse_mesh(1.0, 1.0, 1.0); // 2 triangular elements
@@ -477,7 +477,7 @@ public:
 
     void TestComputeCoarseElementsForFineElementCentroids()
     {
-        TetrahedralMesh<2,2> fine_mesh;
+        TetrahedralMesh<2, 2> fine_mesh;
         fine_mesh.ConstructRegularSlabMesh(0.2, 1.0, 1.0);
 
         QuadraticMesh<2> coarse_mesh(1.0, 1.0, 1.0); // 2 triangular elements
@@ -543,8 +543,8 @@ public:
 
     void TestComputeFineElemsAndWeightsForCoarseNodes()
     {
-        TetrahedralMesh<2,2> fine_mesh;
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> fine_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
         fine_mesh.ConstructFromMeshReader(mesh_reader);
 
         QuadraticMesh<2> coarse_mesh(0.5, 0.5, 0.5);

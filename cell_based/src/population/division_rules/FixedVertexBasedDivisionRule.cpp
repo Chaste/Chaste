@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "FixedVertexBasedDivisionRule.hpp"
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 FixedVertexBasedDivisionRule<SPACE_DIM>::FixedVertexBasedDivisionRule(c_vector<double, SPACE_DIM>& rDivisionVector)
 {
     if (fabs(norm_2(rDivisionVector) - 1.0) > DBL_EPSILON)
@@ -45,7 +45,7 @@ FixedVertexBasedDivisionRule<SPACE_DIM>::FixedVertexBasedDivisionRule(c_vector<d
     mDivisionVector = rDivisionVector;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> FixedVertexBasedDivisionRule<SPACE_DIM>::CalculateCellDivisionVector(
     CellPtr pParentCell,
     VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation)
@@ -53,7 +53,7 @@ c_vector<double, SPACE_DIM> FixedVertexBasedDivisionRule<SPACE_DIM>::CalculateCe
     return mDivisionVector;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 const c_vector<double, SPACE_DIM>& FixedVertexBasedDivisionRule<SPACE_DIM>::rGetDivisionVector() const
 {
     return mDivisionVector;

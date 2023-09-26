@@ -58,19 +58,19 @@ private :
     }
 public:
 
-    void TestWith1dData(void)
+    void TestWith1dData()
     {
         // firstly, copy ./heart/test/data/MonoDg01d/*.h5 to CHASTE_TEST_OUTPUT/TestVoltageInterpolater1d,
         // as that is where the interpolater reads and writes to
         CopyToTestOutputDirectory("heart/test/data/Monodomain1d/MonodomainLR91_1d.h5",
                                   "TestVoltageInterpolater1d");
 
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         QuadraticMesh<1> mech_mesh;
-        TrianglesMeshReader<1,1> mesh_reader2("mesh/test/data/1D_0_to_1_10_elements_quadratic",2,1,false);
+        TrianglesMeshReader<1, 1> mesh_reader2("mesh/test/data/1D_0_to_1_10_elements_quadratic",2,1,false);
         mech_mesh.ConstructFromMeshReader(mesh_reader2);
 
         // move the node at 0.1 to 0.105, so it is 30% between the electrics nodes
@@ -132,7 +132,7 @@ public:
     }
 
     // the data in this test came from TestCardiacElectroMechanicsProblem::TestImplicitNhs2dOneMechanicsElement()
-    void TestWith2dData(void)
+    void TestWith2dData()
     {
         // firstly, copy .h5 file to CHASTE_TEST_OUTPUT/TestVoltageInterpolater2d,
         // as that is where the interpolater reads and writes to
@@ -140,7 +140,7 @@ public:
                                   "TestVoltageInterpolater2d");
 
 
-        TetrahedralMesh<2,2> mesh;
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructRegularSlabMesh(0.01, 0.05, 0.05);
 
         QuadraticMesh<2> mech_mesh(0.05, 0.05, 0.05);
@@ -185,12 +185,12 @@ public:
                                   "TestWithMultipleVariables1D");
 
 
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         QuadraticMesh<1> mech_mesh;
-        TrianglesMeshReader<1,1> mesh_reader2("mesh/test/data/1D_0_to_1_10_elements_quadratic",2,1,false);
+        TrianglesMeshReader<1, 1> mesh_reader2("mesh/test/data/1D_0_to_1_10_elements_quadratic",2,1,false);
         mech_mesh.ConstructFromMeshReader(mesh_reader2);
 
         std::vector<std::string> variable_names;

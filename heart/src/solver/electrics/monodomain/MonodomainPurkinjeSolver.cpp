@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(Vec currentSolution, bool computeMatrix)
+void MonodomainPurkinjeSolver<ELEMENT_DIM, SPACE_DIM>::SetupLinearSystem(Vec currentSolution, bool computeMatrix)
 {
     assert(this->mpLinearSystem->rGetLhsMatrix() != NULL);
     assert(this->mpLinearSystem->rGetRhsVector() != NULL);
@@ -63,11 +63,11 @@ void MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(Vec curr
         this->mpLinearSystem->FinaliseLhsMatrix();
 
 
-        MonodomainPurkinjeVolumeMassMatrixAssembler<ELEMENT_DIM,SPACE_DIM> volume_mass_matrix_assembler(mpMixedMesh, HeartConfig::Instance()->GetUseMassLumping());
+        MonodomainPurkinjeVolumeMassMatrixAssembler<ELEMENT_DIM, SPACE_DIM> volume_mass_matrix_assembler(mpMixedMesh, HeartConfig::Instance()->GetUseMassLumping());
         volume_mass_matrix_assembler.SetMatrixToAssemble(mMassMatrix);
         volume_mass_matrix_assembler.Assemble();
 
-        MonodomainPurkinjeCableMassMatrixAssembler<ELEMENT_DIM,SPACE_DIM> cable_mass_matrix_assembler(mpMixedMesh, HeartConfig::Instance()->GetUseMassLumping());
+        MonodomainPurkinjeCableMassMatrixAssembler<ELEMENT_DIM, SPACE_DIM> cable_mass_matrix_assembler(mpMixedMesh, HeartConfig::Instance()->GetUseMassLumping());
         cable_mass_matrix_assembler.SetMatrixToAssemble(mMassMatrix,false /* don't zero the matrix*/);
         cable_mass_matrix_assembler.Assemble();
 
@@ -136,7 +136,7 @@ void MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(Vec curr
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>::SetIdentityBlockToLhsMatrix()
+void MonodomainPurkinjeSolver<ELEMENT_DIM, SPACE_DIM>::SetIdentityBlockToLhsMatrix()
 {
     this->mpLinearSystem->FinaliseLhsMatrix();
 
@@ -160,7 +160,7 @@ void MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>::SetIdentityBlockToLhsMatri
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
+void MonodomainPurkinjeSolver<ELEMENT_DIM, SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
 {
     if (this->mpLinearSystem != NULL)
     {
@@ -168,7 +168,7 @@ void MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec ini
     }
 
     // call base class version...
-    AbstractLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,2>::InitialiseForSolve(initialSolution);
+    AbstractLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 2>::InitialiseForSolve(initialSolution);
 
     //..then do a bit extra
     if (HeartConfig::Instance()->GetUseAbsoluteTolerance())
@@ -199,18 +199,18 @@ void MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec ini
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>::PrepareForSetupLinearSystem(Vec currentSolution)
+void MonodomainPurkinjeSolver<ELEMENT_DIM, SPACE_DIM>::PrepareForSetupLinearSystem(Vec currentSolution)
 {
     // solve cell models
     mpMonodomainTissue->SolveCellSystems(currentSolution, PdeSimulationTime::GetTime(), PdeSimulationTime::GetNextTime());
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>::MonodomainPurkinjeSolver(
-            MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-            MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* pTissue,
-            BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,2>* pBoundaryConditions)
-    : AbstractDynamicLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,2>(pMesh),
+MonodomainPurkinjeSolver<ELEMENT_DIM, SPACE_DIM>::MonodomainPurkinjeSolver(
+            MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+            MonodomainTissue<ELEMENT_DIM, SPACE_DIM>* pTissue,
+            BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 2>* pBoundaryConditions)
+    : AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 2>(pMesh),
       mpMixedMesh(pMesh),
       mpMonodomainTissue(pTissue),
       mpBoundaryConditions(pBoundaryConditions)
@@ -223,9 +223,9 @@ MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>::MonodomainPurkinjeSolver(
     }
     this->mMatrixIsConstant = true;
 
-    mpVolumeAssembler = new MonodomainPurkinjeVolumeAssembler<ELEMENT_DIM,SPACE_DIM>(mpMixedMesh,this->mpMonodomainTissue);
-    mpCableAssembler = new MonodomainPurkinjeCableAssembler<ELEMENT_DIM,SPACE_DIM>(mpMixedMesh);
-    mpNeumannSurfaceTermsAssembler = new NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM,2>(pMesh,pBoundaryConditions);
+    mpVolumeAssembler = new MonodomainPurkinjeVolumeAssembler<ELEMENT_DIM, SPACE_DIM>(mpMixedMesh,this->mpMonodomainTissue);
+    mpCableAssembler = new MonodomainPurkinjeCableAssembler<ELEMENT_DIM, SPACE_DIM>(mpMixedMesh);
+    mpNeumannSurfaceTermsAssembler = new NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM, SPACE_DIM, 2>(pMesh,pBoundaryConditions);
 
     // Tell tissue there's no need to replicate ionic caches
     pTissue->SetCacheReplication(false);
@@ -234,7 +234,7 @@ MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>::MonodomainPurkinjeSolver(
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>::~MonodomainPurkinjeSolver()
+MonodomainPurkinjeSolver<ELEMENT_DIM, SPACE_DIM>::~MonodomainPurkinjeSolver()
 {
     delete mpVolumeAssembler;
     delete mpCableAssembler;
@@ -252,5 +252,5 @@ MonodomainPurkinjeSolver<ELEMENT_DIM,SPACE_DIM>::~MonodomainPurkinjeSolver()
 // explicit instantiation
 ///////////////////////////////////////////////////////
 
-template class MonodomainPurkinjeSolver<2,2>;
-template class MonodomainPurkinjeSolver<3,3>;
+template class MonodomainPurkinjeSolver<2, 2>;
+template class MonodomainPurkinjeSolver<3, 3>;

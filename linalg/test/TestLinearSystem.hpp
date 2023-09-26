@@ -74,9 +74,9 @@ public:
 
         ls.SetMatrixIsConstant(true);
 
-        for (int row=0; row<3; row++)
+        for (int row = 0; row<3; row++)
         {
-            for (int col=0; col<3; col++)
+            for (int col = 0; col<3; col++)
             {
                 ls.SetMatrixElement(row, col, (double) row*3+col+1);
             }
@@ -99,7 +99,7 @@ public:
         VecGetOwnershipRange(solution_vector, &lo, &hi);
         PetscScalar* p_solution_elements_array;
         VecGetArray(solution_vector, &p_solution_elements_array);
-        for (int global_index=0; global_index<size; global_index++)
+        for (int global_index = 0; global_index<size; global_index++)
         {
             int local_index = global_index-lo;
             if (lo<=global_index && global_index<hi)
@@ -121,7 +121,7 @@ public:
         VecGetOwnershipRange(solution_vector,&lo,&hi);
         VecGetArray(solution_vector, &p_solution_elements_array);
 
-        for (int global_index=0; global_index<size; global_index++)
+        for (int global_index = 0; global_index<size; global_index++)
         {
             int local_index = global_index-lo;
             if (lo<=global_index && global_index<hi)
@@ -148,7 +148,7 @@ public:
         VecGetOwnershipRange(solution_vector,&lo,&hi);
         VecGetArray(solution_vector, &p_solution_elements_array);
 
-        for (int global_index=0; global_index<size; global_index++)
+        for (int global_index = 0; global_index<size; global_index++)
         {
             int local_index = global_index-lo;
             if (lo<=global_index && global_index<hi)
@@ -163,7 +163,7 @@ public:
     void TestZeroingLinearSystem()
     {
         LinearSystem ls(5);
-        for (int i=0; i<5; ++i)
+        for (int i = 0; i<5; ++i)
         {
             ls.SetMatrixRow(i, (double)i);
             ls.SetRhsVectorElement(i, (double)i);
@@ -175,7 +175,7 @@ public:
         for (int row=lo; row<hi; row++)
         {
             TS_ASSERT_EQUALS(ls.GetRhsVectorElement(row), row);
-            for (int col=0; col<5; col++)
+            for (int col = 0; col<5; col++)
             {
                 TS_ASSERT_EQUALS(ls.GetMatrixElement(row, col), row);
             }
@@ -186,7 +186,7 @@ public:
         for (int row=lo; row<hi; row++)
         {
             TS_ASSERT_EQUALS(ls.GetRhsVectorElement(row), 0.0);
-            for (int col=0; col<5; col++)
+            for (int col = 0; col<5; col++)
             {
                 TS_ASSERT_EQUALS(ls.GetMatrixElement(row, col), 0.0);
             }
@@ -207,7 +207,7 @@ public:
     void TestZeroMatrixRowsWithValueOnDiagonal()
     {
         LinearSystem ls(5);
-        for (int i=0; i<5; ++i)
+        for (int i = 0; i<5; ++i)
         {
             ls.SetMatrixRow(i, (double)i);
             ls.SetRhsVectorElement(i, (double)i);
@@ -227,7 +227,7 @@ public:
         {
             if (lo<=row && row<hi)
             {
-                for (int i=0; i<5; (i+1==row? i+=2 : ++i)) // for i=0,1..,row-1,row+1,..,5
+                for (int i = 0; i<5; (i+1==row? i+=2 : ++i)) // for i=0,1..,row-1,row+1,..,5
                 {
                     TS_ASSERT_EQUALS(ls.GetMatrixElement(row,i), 0.0);
                 }
@@ -240,7 +240,7 @@ public:
     {
         // Make a linear system from which the vector becomes a template to use in a later constructor
         LinearSystem ls_template(5);
-        for (int i=0; i<5; ++i)
+        for (int i = 0; i<5; ++i)
         {
             ls_template.SetMatrixElement(i, i, 3.0);
         }
@@ -249,7 +249,7 @@ public:
 
         // The "false" says that we are allowed to do new mallocs without PETSc 3.3 causing an error
         LinearSystem ls(ls_template.rGetRhsVector(), 1, false);
-        for (int i=0; i<5; ++i)
+        for (int i = 0; i<5; ++i)
         {
             ls.SetMatrixElement(i, i, 3.0);
         }
@@ -264,7 +264,7 @@ public:
     void TestZeroingLinearSystemByColumn()
     {
         LinearSystem ls(5);
-        for (int i=0; i<5; ++i)
+        for (int i = 0; i<5; ++i)
         {
             ls.SetMatrixElement(i, i, 3.0);
         }
@@ -272,7 +272,7 @@ public:
 
         ls.AssembleFinalLinearSystem();
 
-        for (unsigned col=0; col<5; col++)
+        for (unsigned col = 0; col<5; col++)
         {
             ls.ZeroMatrixColumn(col);
         }
@@ -283,7 +283,7 @@ public:
         for (int row=lo; row<hi; row++)
         {
             TS_ASSERT_EQUALS(ls.GetRhsVectorElement(row), 0);
-            for (int col=0; col<5; col++)
+            for (int col = 0; col<5; col++)
             {
                 TS_ASSERT_EQUALS(ls.GetMatrixElement(row, col), 0);
             }
@@ -302,7 +302,7 @@ public:
     void TestZeroMatrixRowsAndColumnsWithValueOnDiagonal()
     {
         LinearSystem ls(5);
-        for (int i=0; i<5; ++i)
+        for (int i = 0; i<5; ++i)
         {
             ls.SetMatrixRow(i, (double)i);
         }
@@ -319,7 +319,7 @@ public:
         ls.GetOwnershipRange(lo, hi);
         for (int row=lo; row<hi; row++)
         {
-            for (int col=0; col<5; col++)
+            for (int col = 0; col<5; col++)
             {
                 if ((col>=2) || (row>=2))
                 {
@@ -345,7 +345,7 @@ public:
     void TestGetMatrixRowDistributed()
     {
         LinearSystem ls(5);
-        for (int i=0; i<5; ++i)
+        for (int i = 0; i<5; ++i)
         {
             ls.SetMatrixRow(i, (double)i);
         }
@@ -407,7 +407,7 @@ public:
         PetscScalar* p_solution_elements_array;
         VecGetArray(solution_vector, &p_solution_elements_array);
 
-        for (int global_index=0; global_index<2; global_index++)
+        for (int global_index = 0; global_index<2; global_index++)
         {
             int local_index = global_index-lo;
             if (lo<=global_index && global_index<hi)
@@ -472,7 +472,7 @@ public:
         PetscScalar* p_solution_elements_array;
         VecGetArray(solution_vector, &p_solution_elements_array);
 
-        for (int global_index=0; global_index<7; global_index++)
+        for (int global_index = 0; global_index<7; global_index++)
         {
             int local_index = global_index-lo;
             if (lo<=global_index && global_index<hi)
@@ -552,7 +552,7 @@ public:
 
         TS_ASSERT_EQUALS(ls.GetSize(), 3U);
 
-        for (int row=0; row<3; row++)
+        for (int row = 0; row<3; row++)
         {
             ls.SetMatrixElement(row, row, (double) row+1);
         }
@@ -671,9 +671,9 @@ public:
     {
         LinearSystem ls(3);
 
-        for (int row=0; row<3; row++)
+        for (int row = 0; row<3; row++)
         {
-            for (int col=0; col<3; col++)
+            for (int col = 0; col<3; col++)
             {
                 ls.SetMatrixElement(row, col, (double) row*3+col+1);
             }
@@ -718,7 +718,7 @@ public:
         PetscScalar* p_solution_elements_array;
         VecGetArray(solution_vector, &p_solution_elements_array);
 
-        for (int global_index=0; global_index<3; global_index++)
+        for (int global_index = 0; global_index<3; global_index++)
         {
             int local_index = global_index-lo;
             if (lo<=global_index && global_index<hi)
@@ -805,9 +805,9 @@ public:
         TS_ASSERT(ls.IsMatrixSymmetric());
 
         // Enter symmetric data
-        for (int row=0; row<3; row++)
+        for (int row = 0; row<3; row++)
         {
-            for (int col=0; col<3; col++)
+            for (int col = 0; col<3; col++)
             {
                 ls.SetMatrixElement(row, col, (double)(abs(row-col)));
             }
@@ -827,7 +827,7 @@ public:
         ls.GetOwnershipRange(lo, hi);
         double* p_solution_elements_array;
         VecGetArray(solution_vector, &p_solution_elements_array);
-        for (int global_index=0; global_index<3; global_index++)
+        for (int global_index = 0; global_index<3; global_index++)
         {
             int local_index = global_index-lo;
             if (lo<=global_index && global_index<hi)
@@ -850,9 +850,9 @@ public:
         LinearSystem ls = LinearSystem(3);
 
         // Enter non-symmetric data
-        for (int row=0; row<3; row++)
+        for (int row = 0; row<3; row++)
         {
-            for (int col=0; col<3; col++)
+            for (int col = 0; col<3; col++)
             {
                 ls.SetMatrixElement(row, col, (double)(10+row-col));
             }
@@ -871,9 +871,9 @@ public:
         LinearSystem ls2 = LinearSystem(3);
         ls2.SetMatrixIsSymmetric();
 
-        for (int row=0; row<3; row++)
+        for (int row = 0; row<3; row++)
         {
-            for (int col=0; col<3; col++)
+            for (int col = 0; col<3; col++)
             {
                 ls2.SetMatrixElement(row, col, (double)(10+row-col));
             }
@@ -891,7 +891,7 @@ public:
         double* p_solution_elements_array,* p_solution_elements_array2;
         VecGetArray(solution_vector, &p_solution_elements_array);
         VecGetArray(solution_vector2, &p_solution_elements_array2);
-        for (int global_index=0; global_index<3; global_index++)
+        for (int global_index = 0; global_index<3; global_index++)
         {
             int local_index = global_index-lo;
             if (lo<=global_index && global_index<hi)
@@ -1025,9 +1025,9 @@ public:
         ls.SetMatrixIsSymmetric();
 
         // Enter symmetric data
-        for (int row=0; row<3; row++)
+        for (int row = 0; row<3; row++)
         {
-            for (int col=0; col<3; col++)
+            for (int col = 0; col<3; col++)
             {
                 ls.SetMatrixElement(row, col, (double)(abs(row-col)));
             }
@@ -1117,14 +1117,14 @@ public:
                 PetscInt row_as_array[1];
                 row_as_array[0] = row;
                 PetscInt col_as_array[3];
-                for (int col=0; col<3; col++)
+                for (int col = 0; col<3; col++)
                 {
                    col_as_array[col] = col;
                 }
                 double ret_array[3];
                 MatGetValues(new_mat, 1, row_as_array, 3, col_as_array, ret_array);
 
-                for (int col=0; col<3; col++)
+                for (int col = 0; col<3; col++)
                 {
                     TS_ASSERT_DELTA(ret_array[col], (double)(abs(row-col)), 1e-9);
                 }
@@ -1168,16 +1168,16 @@ public:
             TS_ASSERT_EQUALS(is_symmetric, PETSC_TRUE);
 
             // Enter symmetric data
-            for (unsigned row=0; row<size; row++)
+            for (unsigned row = 0; row<size; row++)
             {
-                for (unsigned col=0; col<size; col++)
+                for (unsigned col = 0; col<size; col++)
                 {
                     ls.SetMatrixElement(row, col, (row == col)?(row+1.0):0.0);
                 }
             }
             ls.AssembleFinalLinearSystem();
 
-            for (unsigned i=0; i<size; ++i)
+            for (unsigned i = 0; i<size; ++i)
             {
                 ls.SetRhsVectorElement(i, rhs_values[i]);
             }
@@ -1199,7 +1199,7 @@ public:
 
             for (unsigned row = static_cast<unsigned>(lo); row < static_cast<unsigned>(hi); ++row)
             {
-                for (unsigned col=0; col<size; col++)
+                for (unsigned col = 0; col<size; col++)
                 {
                     TS_ASSERT_DELTA(p_linear_system->GetMatrixElement(row, col), (row == col)?(row+1.0):0.0, 1e-9);
                 }
@@ -1238,7 +1238,7 @@ public:
 
             for (unsigned row = static_cast<unsigned>(lo); row < static_cast<unsigned>(hi); ++row)
             {
-                for (unsigned col=0; col<size; col++)
+                for (unsigned col = 0; col<size; col++)
                 {
                     TS_ASSERT_DELTA(p_linear_system->GetMatrixElement(row, col), (row == col)?(row+1.0):0.0, 1e-9);
                 }
@@ -1399,7 +1399,7 @@ public:
             ls_diff_precond.SetPrecondMatrixIsDifferentFromLhs();
             Mat& r_identity_matrix=ls_diff_precond.rGetPrecondMatrix();
 
-            for (unsigned row_col=0; row_col<num_nodes; row_col++)
+            for (unsigned row_col = 0; row_col<num_nodes; row_col++)
             {
                 PetscMatTools::SetElement(r_identity_matrix, row_col, row_col, 1.0);
             }

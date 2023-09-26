@@ -75,10 +75,10 @@ private:
      * If writing from a mesh object, the mesh to write to disk.
      * Otherwise NULL.
      */
-    VertexMesh<ELEMENT_DIM,SPACE_DIM>* mpMesh;
+    VertexMesh<ELEMENT_DIM, SPACE_DIM>* mpMesh;
 
     /** Iterators over the mesh */
-    MeshWriterIterators<ELEMENT_DIM,SPACE_DIM>* mpIters;
+    MeshWriterIterators<ELEMENT_DIM, SPACE_DIM>* mpIters;
 
     /** Track deleted nodes so they don't get written */
     NodeMap* mpNodeMap;

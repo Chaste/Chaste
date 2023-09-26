@@ -50,8 +50,8 @@ public:
 
     void TestGetQuadPointLocations1d()
     {
-        TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_10_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> reader("mesh/test/data/1D_0_to_1_10_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(reader);
 
         GaussianQuadratureRule<1> quad_rule(3);
@@ -65,7 +65,7 @@ public:
         ChastePoint<1> local_quad_point_0 = quad_rule.rGetQuadPoint(0);
         ChastePoint<1> local_quad_point_1 = quad_rule.rGetQuadPoint(1);
 
-        c_vector<double,2> quad_point = group.rGet(0, 0);
+        c_vector<double, 2> quad_point = group.rGet(0, 0);
         TS_ASSERT_DELTA(quad_point(0), local_quad_point_0[0]/10, 1e-9);
 
         quad_point = group.rGet(0, 1);
@@ -83,8 +83,8 @@ public:
 
     void TestGetQuadPointLocations2d()
     {
-        TrianglesMeshReader<2,2> reader("mesh/test/data/square_2_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> reader("mesh/test/data/square_2_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(reader);
 
         GaussianQuadratureRule<2> quad_rule(2);
@@ -100,7 +100,7 @@ public:
              quad_index < quad_rule.GetNumQuadPoints();
              ++quad_index)
         {
-            c_vector<double,2> quad_point = group.rGet(0, quad_index);
+            c_vector<double, 2> quad_point = group.rGet(0, quad_index);
             TS_ASSERT_LESS_THAN(quad_point(0) + quad_point(1), 1.0); // quad point in elem 0, so x+y<1
         }
         // Element 1
@@ -108,7 +108,7 @@ public:
              quad_index < quad_rule.GetNumQuadPoints();
              ++quad_index)
         {
-            c_vector<double,2> quad_point = group.rGet(1, quad_index);
+            c_vector<double, 2> quad_point = group.rGet(1, quad_index);
             TS_ASSERT_LESS_THAN(1.0, quad_point(0) + quad_point(1)); // quad point in elem 1, so x+y>1
         }
 
@@ -122,8 +122,8 @@ public:
 
     void TestGetQuadPointLocations2dDistributed()
     {
-        TrianglesMeshReader<2,2> reader("mesh/test/data/square_2_elements");
-        DistributedTetrahedralMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        TrianglesMeshReader<2, 2> reader("mesh/test/data/square_2_elements");
+        DistributedTetrahedralMesh<2, 2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
 
         mesh.ConstructFromMeshReader(reader);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 2u);
@@ -144,7 +144,7 @@ public:
                  quad_index < quad_rule.GetNumQuadPoints();
                  ++quad_index)
             {
-                c_vector<double,2> quad_point = group.rGet(0, quad_index);
+                c_vector<double, 2> quad_point = group.rGet(0, quad_index);
                 TS_ASSERT_LESS_THAN(quad_point(0)+quad_point(1), 1.0); // quad point in elem 0, so x+y<1
             }
         }
@@ -155,7 +155,7 @@ public:
                  quad_index < quad_rule.GetNumQuadPoints();
                  ++quad_index)
             {
-                c_vector<double,2> quad_point = group.rGet(0, quad_index);
+                c_vector<double, 2> quad_point = group.rGet(0, quad_index);
                 TS_ASSERT_EQUALS(quad_point(0), DOUBLE_UNSET);
                 TS_ASSERT_EQUALS(quad_point(1), DOUBLE_UNSET);
             }
@@ -169,7 +169,7 @@ public:
                  quad_index < quad_rule.GetNumQuadPoints();
                  ++quad_index)
             {
-                c_vector<double,2> quad_point = group.rGet(1, quad_index);
+                c_vector<double, 2> quad_point = group.rGet(1, quad_index);
                 TS_ASSERT_LESS_THAN(1.0, quad_point(0)+quad_point(1)); // quad point in elem 1, so x+y>1
             }
         }
@@ -180,7 +180,7 @@ public:
                  quad_index < quad_rule.GetNumQuadPoints();
                  ++quad_index)
             {
-                c_vector<double,2> quad_point = group.rGet(0, quad_index);
+                c_vector<double, 2> quad_point = group.rGet(0, quad_index);
                 TS_ASSERT_EQUALS(quad_point(0), DOUBLE_UNSET);
                 TS_ASSERT_EQUALS(quad_point(1), DOUBLE_UNSET);
             }

@@ -144,13 +144,13 @@ public:
             boost::archive::text_oarchive output_arch(ofs);
 
             // Serialize via pointer
-            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = &modifier;
+            AbstractCellBasedSimulationModifier<2, 2>* const p_modifier = &modifier;
             output_arch << p_modifier;
         }
 
         // Separate scope to read the archive
         {
-            AbstractCellBasedSimulationModifier<2,2>* p_modifier2;
+            AbstractCellBasedSimulationModifier<2, 2>* p_modifier2;
 
             // Restore the modifier
             std::ifstream ifs(archive_filename.c_str());
@@ -179,7 +179,7 @@ public:
     void TestMeshBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(10,10,0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
@@ -191,7 +191,7 @@ public:
                        cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i = 0; i < cells.size(); ++i)
         {
-            c_vector<double,2> cell_location;
+            c_vector<double, 2> cell_location;
             cell_location = p_mesh->GetNode(i)->rGetLocation();
             if (cell_location(0) < 5.0)
             {
@@ -253,7 +253,7 @@ public:
     void TestMeshBasedSquareMonolayerWithNeumanBcs()
     {
         HoneycombMeshGenerator generator(10,10,0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);
@@ -265,7 +265,7 @@ public:
             cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i = 0; i < cells.size(); ++i)
         {
-            c_vector<double,2> cell_location;
+            c_vector<double, 2> cell_location;
             cell_location = p_mesh->GetNode(i)->rGetLocation();
             if (cell_location(0) < 5.0)
             {
@@ -320,7 +320,7 @@ public:
     void TestNodeBasedSquareMonolayer()
     {
         HoneycombMeshGenerator generator(10,10,0);
-        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2>* p_mesh = new NodesOnlyMesh<2>;
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
 
@@ -334,7 +334,7 @@ public:
                         cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i = 0; i < cells.size(); ++i)
         {
-            c_vector<double,2> cell_location;
+            c_vector<double, 2> cell_location;
             cell_location = p_mesh->GetNode(i)->rGetLocation();
             if (cell_location(0) < 5.0)
             {
@@ -388,7 +388,7 @@ public:
     void TestVertexBasedSquareMonolayer()
     {
         HoneycombVertexMeshGenerator generator(10,10);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         p_mesh->Translate(-0.5,-sqrt(3.0)/3); // Shift so cells are on top of those in the above centre based tests
 
@@ -402,7 +402,7 @@ public:
                         cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i = 0; i < cells.size(); ++i)
         {
-            c_vector<double,2> cell_location;
+            c_vector<double, 2> cell_location;
             cell_location = p_mesh->GetCentroidOfElement(i);
             if (cell_location(0) < 5.0)
             {
@@ -470,7 +470,7 @@ public:
                         cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i = 0; i < cells.size(); ++i)
         {
-            c_vector<double,2> cell_location;
+            c_vector<double, 2> cell_location;
             cell_location = p_mesh->GetCentroidOfElement(i);
             if (cell_location(0) < 5.0)
             {
@@ -547,7 +547,7 @@ public:
             cells[0]->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<ApoptoticCellProperty>();
         for (unsigned i = 0; i < cells.size(); ++i)
         {
-            c_vector<double,2> cell_location;
+            c_vector<double, 2> cell_location;
             cell_location = p_mesh->GetNode(i)->rGetLocation();
             if (cell_location(0) < 5.0)
             {

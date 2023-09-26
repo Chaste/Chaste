@@ -93,16 +93,16 @@ void InterpolateMechanicsSolutionToNewMesh(QuadraticMesh<3>& rCoarseMesh, std::v
 
     c_vector<double, (DIM+1)*(DIM+2)/2> quad_basis;
 
-    for (unsigned i=0; i<rFineMesh.GetNumNodes(); ++i)
+    for (unsigned i = 0; i < rFineMesh.GetNumNodes(); ++i)
     {
         // find containing elements and weights in coarse mesh
         ChastePoint<DIM> point = rFineMesh.GetNode(i)->GetPoint();
         unsigned coarse_element_index = rCoarseMesh.GetContainingElementIndex(point,
                                                                               false);
-        Element<DIM,DIM>* p_coarse_element = rCoarseMesh.GetElement(coarse_element_index);
-        c_vector<double,DIM+1> weight = p_coarse_element->CalculateInterpolationWeights(point);
+        Element<DIM, DIM>* p_coarse_element = rCoarseMesh.GetElement(coarse_element_index);
+        c_vector<double, DIM+1> weight = p_coarse_element->CalculateInterpolationWeights(point);
 
-        c_vector<double,DIM> xi;
+        c_vector<double, DIM> xi;
         xi(0) = weight(1);
         xi(1) = weight(2);
         if (DIM == 3)
@@ -113,12 +113,12 @@ void InterpolateMechanicsSolutionToNewMesh(QuadraticMesh<3>& rCoarseMesh, std::v
         QuadraticBasisFunction<DIM>::ComputeBasisFunctions(xi, quad_basis);
 
         // interpolate (u,p) (don't do anything for p if compressible)
-        c_vector<double,DIM+1> fine_solution = zero_vector<double>(DIM+1);
+        c_vector<double, DIM+1> fine_solution = zero_vector<double>(DIM+1);
 
-        for (unsigned elem_node_index=0; elem_node_index<(DIM+1)*(DIM+2)/2; elem_node_index++)
+        for (unsigned elem_node_index = 0; elem_node_index < (DIM+1)*(DIM+2)/2; ++elem_node_index)
         {
             unsigned coarse_node = p_coarse_element->GetNodeGlobalIndex(elem_node_index);
-            c_vector<double,DIM+1> coarse_solution_at_node;
+            c_vector<double, DIM+1> coarse_solution_at_node;
 
             for (unsigned j = 0; j < DIM; ++j)
             {
@@ -165,16 +165,16 @@ unsigned SolvePressureOnUnderside(QuadraticMesh<3>& rMesh, std::string outputDir
 
     std::vector<unsigned> fixed_nodes = NonlinearElasticityTools<3>::GetNodesByComponentValue(rMesh, 0, 0.0);
 
-    std::vector<BoundaryElement<2,3>*> boundary_elems;
+    std::vector<BoundaryElement<2, 3>*> boundary_elems;
 
     double pressure = 0.001;
 
-    for (TetrahedralMesh<3,3>::BoundaryElementIterator iter
+    for (TetrahedralMesh<3, 3>::BoundaryElementIterator iter
            = rMesh.GetBoundaryElementIteratorBegin();
          iter != rMesh.GetBoundaryElementIteratorEnd();
          ++iter)
     {
-        BoundaryElement<2,3>* p_element = *iter;
+        BoundaryElement<2, 3>* p_element = *iter;
         double Z = p_element->CalculateCentroid()[2];
         if (fabs(Z)<1e-6)
         {
@@ -202,7 +202,7 @@ unsigned SolvePressureOnUnderside(QuadraticMesh<3>& rMesh, std::string outputDir
         {
             EXCEPTION("Badly-sized input");
         }
-        for (unsigned i=0; i<rSolution.size(); ++i)
+        for (unsigned i = 0; i < rSolution.size(); ++i)
         {
             solver.rGetCurrentSolution()[i] = rSolution[i];
         }
@@ -232,7 +232,7 @@ unsigned SolvePressureOnUnderside(QuadraticMesh<3>& rMesh, std::string outputDir
 
     rSolution.clear();
     rSolution.resize(solver.rGetCurrentSolution().size());
-    for (unsigned i=0; i<rSolution.size(); ++i)
+    for (unsigned i = 0; i < rSolution.size(); ++i)
     {
         rSolution[i] = solver.rGetCurrentSolution()[i];
     }
@@ -250,16 +250,16 @@ unsigned SolvePressureOnUndersideCompressible(QuadraticMesh<3>& rMesh, std::stri
     CompressibleExponentialLaw<3> law;
     std::vector<unsigned> fixed_nodes = NonlinearElasticityTools<3>::GetNodesByComponentValue(rMesh, 0, 0.0);
 
-    std::vector<BoundaryElement<2,3>*> boundary_elems;
+    std::vector<BoundaryElement<2, 3>*> boundary_elems;
 
     double pressure = 0.001;
 
-    for (TetrahedralMesh<3,3>::BoundaryElementIterator iter
+    for (TetrahedralMesh<3, 3>::BoundaryElementIterator iter
            = rMesh.GetBoundaryElementIteratorBegin();
          iter != rMesh.GetBoundaryElementIteratorEnd();
          ++iter)
     {
-        BoundaryElement<2,3>* p_element = *iter;
+        BoundaryElement<2, 3>* p_element = *iter;
         double Z = p_element->CalculateCentroid()[2];
         if (fabs(Z)<1e-6)
         {
@@ -289,7 +289,7 @@ unsigned SolvePressureOnUndersideCompressible(QuadraticMesh<3>& rMesh, std::stri
         {
             EXCEPTION("Badly-sized input");
         }
-        for (unsigned i=0; i<rSolution.size(); ++i)
+        for (unsigned i = 0; i < rSolution.size(); ++i)
         {
             solver.rGetCurrentSolution()[i] = rSolution[i];
         }
@@ -319,7 +319,7 @@ unsigned SolvePressureOnUndersideCompressible(QuadraticMesh<3>& rMesh, std::stri
 
     rSolution.clear();
     rSolution.resize(solver.rGetCurrentSolution().size());
-    for (unsigned i=0; i<rSolution.size(); ++i)
+    for (unsigned i = 0; i < rSolution.size(); ++i)
     {
         rSolution[i] = solver.rGetCurrentSolution()[i];
     }

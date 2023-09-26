@@ -90,7 +90,7 @@ public:
     void Solve()
     {
         // Loop over all the values of h requested
-        for (unsigned mesh_index=0; mesh_index<mNumMeshes; mesh_index++)
+        for (unsigned mesh_index = 0; mesh_index<mNumMeshes; mesh_index++)
         {
             // DisplayRun(mesh_index);
 

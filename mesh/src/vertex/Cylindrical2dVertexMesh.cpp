@@ -41,7 +41,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(double width,
                                                  std::vector<VertexElement<2, 2>*> vertexElements,
                                                  double cellRearrangementThreshold,
                                                  double t2Threshold)
-    : MutableVertexMesh<2,2>(nodes, vertexElements, cellRearrangementThreshold, t2Threshold),
+    : MutableVertexMesh<2, 2>(nodes, vertexElements, cellRearrangementThreshold, t2Threshold),
       mWidth(width),
       mpMeshForVtk(nullptr)
 {
@@ -71,7 +71,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
 
         for (unsigned elem_index = 0; elem_index<num_elements; elem_index++)
         {
-            VertexElement<2,2>* p_element = new VertexElement<2,2>(elem_index);
+            VertexElement<2, 2>* p_element = new VertexElement<2, 2>(elem_index);
             mElements.push_back(p_element);
         }
 
@@ -112,7 +112,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
 
         // Add new nodes
         unsigned new_node_index = mpDelaunayMesh->GetNumNodes();
-        for (TetrahedralMesh<2,2>::ElementIterator elem_iter = mpDelaunayMesh->GetElementIteratorBegin();
+        for (TetrahedralMesh<2, 2>::ElementIterator elem_iter = mpDelaunayMesh->GetElementIteratorBegin();
             elem_iter != mpDelaunayMesh->GetElementIteratorEnd();
             ++elem_iter)
         {
@@ -142,8 +142,8 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
 
                 if (shared_elements.size() == 1) // It's a boundary edge
                 {
-                    c_vector<double,2> edge = mpDelaunayMesh->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
-                    c_vector<double,2> normal_vector;
+                    c_vector<double, 2> edge = mpDelaunayMesh->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
+                    c_vector<double, 2> normal_vector;
 
                     normal_vector[0]= edge[1];
                     normal_vector[1]= -edge[0];
@@ -163,7 +163,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
                      */
                     
                     double ratio = 0.5;
-                    c_vector<double,2> new_node_location = normal_vector + p_node_a->rGetLocation() + ratio * edge;
+                    c_vector<double, 2> new_node_location = normal_vector + p_node_a->rGetLocation() + ratio * edge;
                     
                     // Check if near other nodes
                     bool node_clear = true;
@@ -189,7 +189,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
         }
 
         // Add new nodes for voids (note these nodes won't be labeled as boundary nodes here)
-        for (TetrahedralMesh<2,2>::ElementIterator elem_iter = mpDelaunayMesh->GetElementIteratorBegin();
+        for (TetrahedralMesh<2, 2>::ElementIterator elem_iter = mpDelaunayMesh->GetElementIteratorBegin();
             elem_iter != mpDelaunayMesh->GetElementIteratorEnd();
             ++elem_iter)
         {   
@@ -214,7 +214,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
                     Node<2>* p_node_a = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex(j));
                     Node<2>* p_node_b = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex((j+1)%3));
                     
-                    c_vector<double,2> edge = mpDelaunayMesh->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
+                    c_vector<double, 2> edge = mpDelaunayMesh->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
                     double edge_length = norm_2(edge);
                     
                     // The short edges in these elements are the boundaries of the void
@@ -231,7 +231,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
                          */
                     
                         // Short Edge so add new node
-                        c_vector<double,2> normal_vector;
+                        c_vector<double, 2> normal_vector;
 
                         // Outward Normal
                         normal_vector[0]= edge[1];
@@ -242,7 +242,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
                         normal_vector /= dij;
 
                         double bound_offset = 1.0; //TODO Think about makeing this a setable variable!
-                        c_vector<double,2> new_node_location = -bound_offset*normal_vector + p_node_a->rGetLocation() + 0.5 * edge;
+                        c_vector<double, 2> new_node_location = -bound_offset*normal_vector + p_node_a->rGetLocation() + 0.5 * edge;
                 
                         nodes.push_back(new Node<2>(new_node_index, new_node_location));
                         new_node_index++;
@@ -327,7 +327,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
         sort(index_angle_list.begin(), index_angle_list.end());
 
         // Create a new Voronoi element and pass in the appropriate Nodes, ordered anticlockwise
-        VertexElement<2,2>* p_new_element = new VertexElement<2,2>(elem_index);
+        VertexElement<2, 2>* p_new_element = new VertexElement<2, 2>(elem_index);
         for (unsigned count = 0; count < index_angle_list.size(); count++)
         {
             unsigned local_index = count>1 ? count-1 : 0;
@@ -391,7 +391,7 @@ void Cylindrical2dVertexMesh::SetNode(unsigned nodeIndex, ChastePoint<2> point)
     }
 
     // Update the node's location
-    MutableVertexMesh<2,2>::SetNode(nodeIndex, point);
+    MutableVertexMesh<2, 2>::SetNode(nodeIndex, point);
 }
 
 double Cylindrical2dVertexMesh::GetWidth(const unsigned& rDimension) const
@@ -404,7 +404,7 @@ double Cylindrical2dVertexMesh::GetWidth(const unsigned& rDimension) const
     }
     else
     {
-        width = VertexMesh<2,2>::GetWidth(rDimension);
+        width = VertexMesh<2, 2>::GetWidth(rDimension);
     }
     return width;
 }
@@ -413,7 +413,7 @@ unsigned Cylindrical2dVertexMesh::AddNode(Node<2>* pNewNode)
 {
     CheckNodeLocation(pNewNode);
 
-    unsigned node_index = MutableVertexMesh<2,2>::AddNode(pNewNode);
+    unsigned node_index = MutableVertexMesh<2, 2>::AddNode(pNewNode);
 
     return node_index;
 }
@@ -468,7 +468,7 @@ VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
     }
 
     // Iterate over elements
-    for (VertexMesh<2,2>::VertexElementIterator elem_iter = GetElementIteratorBegin();
+    for (VertexMesh<2, 2>::VertexElementIterator elem_iter = GetElementIteratorBegin();
          elem_iter != GetElementIteratorEnd();
          ++elem_iter)
     {
@@ -532,7 +532,7 @@ VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
             elem_nodes.push_back(temp_nodes[this_node_index]);
         }
 
-        VertexElement<2,2>* p_element = new VertexElement<2,2>(elem_index, elem_nodes);
+        VertexElement<2, 2>* p_element = new VertexElement<2, 2>(elem_index, elem_nodes);
         elements.push_back(p_element);
     }
 
@@ -561,7 +561,7 @@ VertexMesh<2, 2>* Cylindrical2dVertexMesh::GetMeshForVtk()
         delete mpMeshForVtk;
     }
 
-    mpMeshForVtk = new VertexMesh<2,2>(nodes, elements);
+    mpMeshForVtk = new VertexMesh<2, 2>(nodes, elements);
     return mpMeshForVtk;
 }
 

@@ -79,7 +79,7 @@ public:
          * case with a Backward Euler solver. We pass the stimulus magnitude as 0.0
          * as we don't want any stimulated cells.
          */
-        PlaneStimulusCellFactory<CellLuoRudy1991FromCellMLBackwardEulerOpt,2> cell_factory(0.0);
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellMLBackwardEulerOpt, 2> cell_factory(0.0);
 
         /*
          * Note that in the previous bath example, a mesh was read in and elements where then set to be

@@ -56,15 +56,15 @@ private:
             p_file->close();
         }
         //Each process may have a small number of the nodes
-        for (unsigned proc_turn=0; proc_turn<PetscTools::GetNumProcs(); proc_turn++)
+        for (unsigned proc_turn = 0; proc_turn<PetscTools::GetNumProcs(); proc_turn++)
         {
             if (PetscTools::GetMyRank()==proc_turn)
             {
                 out_stream p_file = handler.OpenOutputFile(rFilename, std::ios::app);
 
-                for (unsigned i=0; i<rNodeLayers.size(); ++i)
+                for (unsigned i = 0; i<rNodeLayers.size(); ++i)
                 {
-                    for (unsigned j=0; j<spaceDim; ++j)
+                    for (unsigned j = 0; j<spaceDim; ++j)
                     {
                        * p_file << (j == 0 ? "" : "  ") << (1+rNodeLayers[i]);
                     }
@@ -79,7 +79,7 @@ private:
 public:
     void TestCalculateRelativeWallPositionSimple2dMesh()
     {
-        DistributedTetrahedralMesh<2,2> mesh;
+        DistributedTetrahedralMesh<2, 2> mesh;
         //This mesh will have 6 nodes per face, spaced by 1
         mesh.ConstructRectangularMesh(5, 5);
 
@@ -129,7 +129,7 @@ public:
 
     void TestCalculateRelativeWallPositionSimple3dMesh()
     {
-        DistributedTetrahedralMesh<3,3> mesh;
+        DistributedTetrahedralMesh<3, 3> mesh;
         //This mesh will have 6 nodes per face, spaced by 1
         mesh.ConstructCuboid(5, 5, 5);
 
@@ -175,7 +175,7 @@ public:
         }
         ChasteCuboid<3> epi_bounding_box=info.CalculateBoundingBoxOfEpi();
         ChasteCuboid<3> endo_bounding_box=info.CalculateBoundingBoxOfEndo();
-        for (unsigned i=0; i<3; ++i)
+        for (unsigned i = 0; i<3; ++i)
         {
             if (i==0)
             {
@@ -194,7 +194,7 @@ public:
 
     void TestCalculateRelativeWallPositionWithThreeSurfaces()
     {
-        DistributedTetrahedralMesh<3,3> mesh;
+        DistributedTetrahedralMesh<3, 3> mesh;
         //This mesh will have 9 nodes per side, spaced by 1, it is a cube
         mesh.ConstructCuboid(8, 8, 8);
 
@@ -269,7 +269,7 @@ public:
         }
 
         ChasteCuboid<3> epi_bounding_box=info.CalculateBoundingBoxOfEpi();
-        for (unsigned i=0; i<3; ++i)
+        for (unsigned i = 0; i<3; ++i)
         {
             TS_ASSERT_DELTA(epi_bounding_box.rGetUpperCorner()[i], 8.0, 1e-10);
             TS_ASSERT_DELTA(epi_bounding_box.rGetLowerCorner()[i], 0.0, 1e-10);
@@ -285,7 +285,7 @@ public:
 
     void TestDetermineLayerForEachNodeWritingAndReading()
     {
-        DistributedTetrahedralMesh<3,3> mesh;
+        DistributedTetrahedralMesh<3, 3> mesh;
         //This mesh will have 31 nodes per side, spaced by 1, it is a cube
         mesh.ConstructCuboid(30, 30, 30);
 
@@ -395,10 +395,10 @@ public:
 
 
         //read in the mesh
-        TrianglesMeshReader<3,3> mesh_reader("heart/test/data/box_shaped_heart/box_heart");
-        //DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
-        DistributedTetrahedralMesh<3,3> mesh;
-        //TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("heart/test/data/box_shaped_heart/box_heart");
+        //DistributedTetrahedralMesh<3, 3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        DistributedTetrahedralMesh<3, 3> mesh;
+        //TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         //Check the indexing exception
@@ -413,7 +413,7 @@ public:
 
 
         std::vector<double> relative_wall_position;
-        for (unsigned index=0; index<mesh.GetNumNodes(); index++)
+        for (unsigned index = 0; index<mesh.GetNumNodes(); index++)
         {
             relative_wall_position.push_back(info.CalculateRelativeWallPosition(index));
         }
@@ -423,7 +423,7 @@ public:
 //        {
 //            out_stream p_file = results_handler.OpenOutputFile("heart_geometry_layers.dat");
 //
-//            for (unsigned index=0; index<mesh.GetNumNodes(); index++)
+//            for (unsigned index = 0; index<mesh.GetNumNodes(); index++)
 //            {
 //                (*p_file)<<info.rGetLayerForEachNode()[index]<<std::endl;
 //            }
@@ -435,7 +435,7 @@ public:
 //        {
 //            out_stream p_file = results_handler.OpenOutputFile("heart_relative_wall_position.dat");
 //            *p_file << std::setprecision(20);//Slightly more than machine precision...
-//            for (unsigned index=0; index<mesh.GetNumNodes(); index++)
+//            for (unsigned index = 0; index<mesh.GetNumNodes(); index++)
 //            {
 //                (*p_file)<<relative_wall_position[index]<<std::endl;
 //            }
@@ -472,7 +472,7 @@ public:
 //// Requires  "sudo aptitude install libvtk5-dev" or similar
 //        if  (PetscTools::IsParallel())
 //        {
-//            VtkMeshWriter<3,3> writer("", "epi_distance_par", false);
+//            VtkMeshWriter<3, 3> writer("", "epi_distance_par", false);
 //            // Add distance from origin into the node "point" data
 //            writer.AddPointData("Distance from epi", info.rGetDistanceMapEpicardium());
 //            writer.AddPointData("Relative wall distance", relative_wall_position);
@@ -519,8 +519,8 @@ public:
          std::string lv_surface = "heart/test/data/box_shaped_heart/lv.tri";
 
          //read in the mesh
-         TrianglesMeshReader<3,3> mesh_reader("heart/test/data/box_shaped_heart/box_heart");
-         DistributedTetrahedralMesh<3,3> mesh;
+         TrianglesMeshReader<3, 3> mesh_reader("heart/test/data/box_shaped_heart/box_heart");
+         DistributedTetrahedralMesh<3, 3> mesh;
          mesh.ConstructFromMeshReader(mesh_reader);
 
 

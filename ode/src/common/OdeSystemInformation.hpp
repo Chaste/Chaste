@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * This class contains all the machinery to make it a singleton, hence providing
  * exactly one instance per value of the template parameter.
  */
-template <class ODE_SYSTEM>
+template<class ODE_SYSTEM>
 class OdeSystemInformation : public AbstractOdeSystemInformation
 {
 private:

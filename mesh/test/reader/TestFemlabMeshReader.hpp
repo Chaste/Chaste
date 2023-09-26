@@ -42,14 +42,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PetscSetupAndFinalize.hpp"
 
-typedef FemlabMeshReader<2,2> READER_2D;
-typedef FemlabMeshReader<1,1> READER_1D;
+typedef FemlabMeshReader<2, 2> READER_2D;
+typedef FemlabMeshReader<1, 1> READER_1D;
 
 class TestFemlabMeshReaders : public CxxTest::TestSuite
 {
 public:
 
-    AbstractMeshReader<2,2>* mpFemlabMeshReader;
+    AbstractMeshReader<2, 2>* mpFemlabMeshReader;
 
     /**
      * Check that input files are opened correctly.
@@ -80,7 +80,7 @@ public:
      */
     void TestNodesDataRead()
     {
-        mpFemlabMeshReader = new FemlabMeshReader<2,2>("mesh/test/data/",
+        mpFemlabMeshReader = new FemlabMeshReader<2, 2>("mesh/test/data/",
                                                        "femlab_lshape_nodes.dat",
                                                        "femlab_lshape_elements.dat",
                                                        "femlab_lshape_edges.dat");
@@ -98,7 +98,7 @@ public:
      */
     void TestElementsDataRead()
     {
-        mpFemlabMeshReader = new FemlabMeshReader<2,2>("mesh/test/data/",
+        mpFemlabMeshReader = new FemlabMeshReader<2, 2>("mesh/test/data/",
                                                        "femlab_lshape_nodes.dat",
                                                        "femlab_lshape_elements.dat",
                                                        "femlab_lshape_edges.dat");
@@ -117,7 +117,7 @@ public:
      */
     void TestFacesDataRead()
     {
-        mpFemlabMeshReader = new FemlabMeshReader<2,2>("mesh/test/data/",
+        mpFemlabMeshReader = new FemlabMeshReader<2, 2>("mesh/test/data/",
                                                        "femlab_lshape_nodes.dat",
                                                        "femlab_lshape_elements.dat",
                                                        "femlab_lshape_edges.dat");
@@ -139,7 +139,7 @@ public:
      */
     void TestGetNextNode()
     {
-        mpFemlabMeshReader = new FemlabMeshReader<2,2>("mesh/test/data/",
+        mpFemlabMeshReader = new FemlabMeshReader<2, 2>("mesh/test/data/",
                                                        "femlab_lshape_nodes.dat",
                                                        "femlab_lshape_elements.dat",
                                                        "femlab_lshape_edges.dat");
@@ -179,7 +179,7 @@ public:
      */
     void TestGetNextElementData()
     {
-        mpFemlabMeshReader = new FemlabMeshReader<2,2>("mesh/test/data/",
+        mpFemlabMeshReader = new FemlabMeshReader<2, 2>("mesh/test/data/",
                                                        "femlab_lshape_nodes.dat",
                                                        "femlab_lshape_elements.dat",
                                                        "femlab_lshape_edges.dat");
@@ -218,7 +218,7 @@ public:
      */
     void TestGetNextFace()
     {
-        mpFemlabMeshReader = new FemlabMeshReader<2,2>("mesh/test/data/",
+        mpFemlabMeshReader = new FemlabMeshReader<2, 2>("mesh/test/data/",
                                                        "femlab_lshape_nodes.dat",
                                                        "femlab_lshape_elements.dat",
                                                        "femlab_lshape_edges.dat");

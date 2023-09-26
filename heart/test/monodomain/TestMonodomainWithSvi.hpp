@@ -187,11 +187,11 @@ public:
         HeartConfig::Instance()->SetSimulationDuration(4.0); //ms
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
 
-        for (unsigned i=0; i<3; ++i)
+        for (unsigned i = 0; i<3; ++i)
         {
             // ICI - ionic current interpolation - the default
             {
-                DistributedTetrahedralMesh<1,1> mesh;
+                DistributedTetrahedralMesh<1, 1> mesh;
                 mesh.ConstructRegularSlabMesh(h[i], 1.0);
                 TS_ASSERT_EQUALS(mesh.GetNumNodes(), number_of_nodes[i]);
 
@@ -232,7 +232,7 @@ public:
 
             // SVI - state variable interpolation
             {
-                DistributedTetrahedralMesh<1,1> mesh;
+                DistributedTetrahedralMesh<1, 1> mesh;
                 mesh.ConstructRegularSlabMesh(h[i], 1.0);
 
                 //Double check (for later) that the indexing is as expected
@@ -269,7 +269,7 @@ public:
 
             if (i==0) // finest mesh
             {
-                for (unsigned j=0; j<final_voltage_ici.GetSize(); ++j)
+                for (unsigned j = 0; j<final_voltage_ici.GetSize(); ++j)
                 {
                     // visually checked they agree at this mesh resolution, and chosen tolerance from results
                     TS_ASSERT_DELTA(final_voltage_ici[j], final_voltage_svi[j], 0.3);
@@ -321,7 +321,7 @@ public:
         // much lower conductivity in cross-fibre direction - ICI will struggle
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(1.75, 0.17));
 
-        TetrahedralMesh<2,2> mesh;
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructRegularSlabMesh(0.02 /*h*/, 0.5, 0.3);
 
         // ICI - nodal current interpolation - the default
@@ -436,10 +436,10 @@ public:
         HeartConfig::Instance()->SetUseStateVariableInterpolation(true);
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.01, 0.1);
 
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructRegularSlabMesh(0.02, 0.02, 0.02, 0.02);
 
-        ZeroStimulusCellFactory<CellLuoRudy1991FromCellML,3> cell_factory;
+        ZeroStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory;
         MonodomainProblem<3> monodomain_problem( &cell_factory );
         monodomain_problem.SetMesh(&mesh);
         monodomain_problem.Initialise();
@@ -452,7 +452,7 @@ public:
         HeartConfig::Instance()->SetUseStateVariableInterpolation(true);
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.005, 0.01, 1.0);
 
-        TetrahedralMesh<1,1> mesh;
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructRegularSlabMesh(0.01, 1.0);
 
         HeterogeneousCellFactory cell_factory;
@@ -463,9 +463,9 @@ public:
         //// It's really very difficult to get hold of the correction assembler from here.
         //// The following, which requires 2 classes to be friends of this test compiles
         //// but fails asserts in the first line as bcc is not set up.
-        //AbstractDynamicLinearPdeSolver<1,1,1>* p_solver = monodomain_problem.CreateSolver();
-        //MonodomainSolver<1,1>* p_mono_solver = dynamic_cast<MonodomainSolver<1,1>*>(p_solver);
-        //MonodomainCorrectionTermAssembler<1,1>* p_assembler = p_mono_solver->mpMonodomainCorrectionTermAssembler;
+        //AbstractDynamicLinearPdeSolver<1, 1, 1>* p_solver = monodomain_problem.CreateSolver();
+        //MonodomainSolver<1, 1>* p_mono_solver = dynamic_cast<MonodomainSolver<1, 1>*>(p_solver);
+        //MonodomainCorrectionTermAssembler<1, 1>* p_assembler = p_mono_solver->mpMonodomainCorrectionTermAssembler;
         //TS_ASSERT_EQUALS(p_assembler->mElementsCanDoSvi.size(), 10u);
 
         // Therefore, we just test that calling Solve() runs (without the checking that
@@ -490,7 +490,7 @@ public:
             HeartConfig::Instance()->SetOutputFilenamePrefix("results");
             HeartConfig::Instance()->SetUseStateVariableInterpolation();
 
-            DistributedTetrahedralMesh<1,1> mesh;
+            DistributedTetrahedralMesh<1, 1> mesh;
             mesh.ConstructRegularSlabMesh(0.02, 1.0);
 
             BlockCellFactory<1> cell_factory;

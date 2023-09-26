@@ -105,7 +105,7 @@ void DiscreteSystemForceCalculator::WriteResultsToFile(
     double minimum;
     double maximum;
 
-    TetrahedralMesh<2,2>& r_mesh = mrCellPopulation.rGetMesh();
+    TetrahedralMesh<2, 2>& r_mesh = mrCellPopulation.rGetMesh();
 
     std::vector<std::vector<double> > extremal_normal_forces = CalculateExtremalNormalForces();
 
@@ -130,7 +130,7 @@ std::vector<double> DiscreteSystemForceCalculator::CalculateFtAndFn(
     unsigned index,
     double theta)
 {
-    TetrahedralMesh<2,2>& r_mesh = mrCellPopulation.rGetMesh();
+    TetrahedralMesh<2, 2>& r_mesh = mrCellPopulation.rGetMesh();
 
     std::set<unsigned> neighbouring_node_indices = mrCellPopulation.GetNeighbouringNodeIndices(index);
 
@@ -138,7 +138,7 @@ std::vector<double> DiscreteSystemForceCalculator::CalculateFtAndFn(
     double normal_force = 0.0;
     double alpha;
 
-    c_vector<double,2> unit_vec_between_nodes(2);
+    c_vector<double, 2> unit_vec_between_nodes(2);
 
     for (auto iter : neighbouring_node_indices)
     {
@@ -151,7 +151,7 @@ std::vector<double> DiscreteSystemForceCalculator::CalculateFtAndFn(
         if (sin(alpha-theta) > DBL_EPSILON)
         {
             // Initialise a zero force vector between neighbouring nodes
-            c_vector<double,2> force_between_nodes = zero_vector<double>(2);
+            c_vector<double, 2> force_between_nodes = zero_vector<double>(2);
 
             // Iterate over vector of forces present and add up forces between nodes
             for (auto force_iter : mForceCollection)
@@ -178,7 +178,7 @@ std::vector<double> DiscreteSystemForceCalculator::CalculateFtAndFn(
 std::vector<double> DiscreteSystemForceCalculator::GetSamplingAngles(
     unsigned index)
 {
-    TetrahedralMesh<2,2>& r_mesh = mrCellPopulation.rGetMesh();
+    TetrahedralMesh<2, 2>& r_mesh = mrCellPopulation.rGetMesh();
 
     std::set<unsigned> neighbouring_node_indices = mrCellPopulation.GetNeighbouringNodeIndices(index);
 

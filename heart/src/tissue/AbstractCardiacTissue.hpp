@@ -74,7 +74,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * vector of cells, and getting the ionic current and stimuli from these
  * cells and putting them in replicated arrays for the PDE solvers to call.
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
 class AbstractCardiacTissue : private boost::noncopyable
 {
 private:
@@ -226,11 +226,11 @@ private:
 protected:
 
     /** It's handy to keep a pointer to the mesh object*/
-    AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* mpMesh;
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* mpMesh;
 
     /** Intracellular conductivity tensors. Not archived, since it's loaded from the
      *  HeartConfig singleton. */
-    AbstractConductivityTensors<ELEMENT_DIM,SPACE_DIM>* mpIntracellularConductivityTensors;
+    AbstractConductivityTensors<ELEMENT_DIM, SPACE_DIM>* mpIntracellularConductivityTensors;
 
     /** The vector of cells. Distributed. */
     std::vector< AbstractCardiacCellInterface* > mCellsDistributed;
@@ -286,7 +286,7 @@ protected:
      * mpIntracellularConductivityTensors when rGetIntracellularConductivityTensor() is called.
      * For example, it is required when conductivities become deformation dependent.
      */
-    AbstractConductivityModifier<ELEMENT_DIM,SPACE_DIM>* mpConductivityModifier;
+    AbstractConductivityModifier<ELEMENT_DIM, SPACE_DIM>* mpConductivityModifier;
 
     /** Whether this tissue has any Purkinje cells. */
     bool mHasPurkinje;
@@ -348,7 +348,7 @@ protected:
      *
      * @param pCellFactory  cell factory to use to create halo cells
      */
-    void SetUpHaloCells(AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>* pCellFactory);
+    void SetUpHaloCells(AbstractCardiacCellFactory<ELEMENT_DIM, SPACE_DIM>* pCellFactory);
 
 public:
     /**
@@ -361,14 +361,14 @@ public:
      *     If this is actually an AbstractPurkinjeCellFactory it creates purkinje cells.
      * @param exchangeHalos used in state-variable interpolation.  Defaults to false.
      */
-    AbstractCardiacTissue(AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>* pCellFactory, bool exchangeHalos=false);
+    AbstractCardiacTissue(AbstractCardiacCellFactory<ELEMENT_DIM, SPACE_DIM>* pCellFactory, bool exchangeHalos=false);
 
     /**
      * This constructor is called by the archiver only.
      *
      * @param pMesh  a pointer to the AbstractTetrahedral mesh.
      */
-    AbstractCardiacTissue(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
+    AbstractCardiacTissue(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh);
 
     /** Virtual destructor */
     virtual ~AbstractCardiacTissue();
@@ -497,14 +497,14 @@ public:
      *
      *  @return pointer to mesh object
      */
-    const AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pGetMesh() const;
+    const AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pGetMesh() const;
 
     /**
      * Set a modifier class which will be used to modifier a conductivity obtained from mpIntracellularConductivityTensors
      * when rGetIntracellularConductivityTensor() is called. For example, it is required when conductivities become deformation-dependent.
      * @param pModifier Pointer to the concrete modifier class
      */
-    void SetConductivityModifier(AbstractConductivityModifier<ELEMENT_DIM,SPACE_DIM>* pModifier);
+    void SetConductivityModifier(AbstractConductivityModifier<ELEMENT_DIM, SPACE_DIM>* pModifier);
 
     /**
      * Save our tissue to an archive.
@@ -525,7 +525,7 @@ public:
         archive & mpDistributedVectorFactory; // Needed when loading
         const unsigned num_cells = r_cells_distributed.size();
         archive & num_cells;
-        for (unsigned i=0; i<num_cells; ++i)
+        for (unsigned i = 0; i<num_cells; ++i)
         {
             AbstractDynamicallyLoadableEntity* p_entity = dynamic_cast<AbstractDynamicallyLoadableEntity*>(r_cells_distributed[i]);
             bool is_dynamic = (p_entity != NULL);
@@ -577,7 +577,7 @@ public:
             mCellsDistributed.resize(p_mesh_factory->GetLocalOwnership());
 #ifndef NDEBUG
             // Paranoia
-            for (unsigned i=0; i<mCellsDistributed.size(); ++i)
+            for (unsigned i = 0; i<mCellsDistributed.size(); ++i)
             {
                 assert(mCellsDistributed[i] == NULL);
             }
@@ -619,7 +619,7 @@ public:
          * mesh and a single permutation to archive.)
          *
          */
-        for (unsigned local_index=0; local_index<num_cells; local_index++)
+        for (unsigned local_index = 0; local_index<num_cells; local_index++)
         {
             // Figure out where this cell goes
             unsigned global_index = index_low + local_index;
@@ -735,7 +735,7 @@ namespace serialization {
  * This is how to do BOOST_CLASS_VERSION(AbstractCardiacTissue, 1)
  * with a templated class.
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 struct version<AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM> >
 {
     ///Macro to set the version number of templated archive in known versions of Boost

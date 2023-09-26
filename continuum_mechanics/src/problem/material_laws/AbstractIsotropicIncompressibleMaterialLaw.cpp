@@ -42,16 +42,16 @@ AbstractIsotropicIncompressibleMaterialLaw<DIM>::~AbstractIsotropicIncompressibl
 
 template<unsigned DIM>
 void AbstractIsotropicIncompressibleMaterialLaw<DIM>::ComputeStressAndStressDerivative(
-        c_matrix<double,DIM,DIM>& rC,
-        c_matrix<double,DIM,DIM>& rInvC,
-        double                    pressure,
-        c_matrix<double,DIM,DIM>& rT,
-        FourthOrderTensor<DIM,DIM,DIM,DIM>&   rDTdE,
-        bool                      computeDTdE)
+    c_matrix<double, DIM, DIM>& rC,
+    c_matrix<double, DIM, DIM>& rInvC,
+    double pressure,
+    c_matrix<double, DIM, DIM>& rT,
+    FourthOrderTensor<DIM, DIM, DIM, DIM>& rDTdE,
+    bool computeDTdE)
 {
     if constexpr (DIM == 2 || DIM == 3)
     {
-        static c_matrix<double,DIM,DIM> identity = identity_matrix<double>(DIM);
+        static c_matrix<double, DIM, DIM> identity = identity_matrix<double>(DIM);
 
         double I1 = Trace(rC);
         double I2 = SecondInvariant(rC);

@@ -88,10 +88,10 @@ public:
             nodes_elem_0.push_back(nodes[node_indices_elem_0[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Create cell edge SRN with four edges
         auto p_cell_srn_model = new CellSrnModel();
@@ -190,13 +190,13 @@ public:
             nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
-        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
@@ -374,13 +374,13 @@ public:
             nodes_elem_3.push_back(nodes[node_indices_elem_3[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_2));
-        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_3));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_3));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
@@ -417,7 +417,7 @@ public:
         VertexBasedCellPopulation<2> cell_population(vertex_mesh, cells);
 
         // Perform a T2 swap on the central triangle element
-        VertexElement<2,2>* p_element_0 = vertex_mesh.GetElement(0);
+        VertexElement<2, 2>* p_element_0 = vertex_mesh.GetElement(0);
         c_vector<double, 2> centroid_of_element_0_before_swap = vertex_mesh.GetCentroidOfElement(0);
         vertex_mesh.PerformT2Swap(*p_element_0);
 
@@ -519,14 +519,14 @@ public:
             nodes_in_element4.push_back(nodes[node_indices_element_4[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes_in_element0));
-        elements.push_back(new VertexElement<2,2>(1, nodes_in_element1));
-        elements.push_back(new VertexElement<2,2>(2, nodes_in_element2));
-        elements.push_back(new VertexElement<2,2>(3, nodes_in_element3));
-        elements.push_back(new VertexElement<2,2>(4, nodes_in_element4));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes_in_element0));
+        elements.push_back(new VertexElement<2, 2>(1, nodes_in_element1));
+        elements.push_back(new VertexElement<2, 2>(2, nodes_in_element2));
+        elements.push_back(new VertexElement<2, 2>(3, nodes_in_element3));
+        elements.push_back(new VertexElement<2, 2>(4, nodes_in_element4));
 
-        MutableVertexMesh<2,2> mesh(nodes, elements);
+        MutableVertexMesh<2, 2> mesh(nodes, elements);
 
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
@@ -752,12 +752,12 @@ public:
         nodes_elem_2.push_back(nodes[4]);
         nodes_elem_2.push_back(nodes[2]);
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_2));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_2));
 
         // Make a vertex mesh
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Create cells
         MAKE_PTR(WildTypeCellMutationState, p_state);
@@ -966,13 +966,13 @@ public:
             }
         }
 
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes_in_element0));
-        elements.push_back(new VertexElement<2,2>(1, nodes_in_element1));
-        elements.push_back(new VertexElement<2,2>(2, nodes_in_element2));
-        elements.push_back(new VertexElement<2,2>(3, nodes_in_element3));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes_in_element0));
+        elements.push_back(new VertexElement<2, 2>(1, nodes_in_element1));
+        elements.push_back(new VertexElement<2, 2>(2, nodes_in_element2));
+        elements.push_back(new VertexElement<2, 2>(3, nodes_in_element3));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, elements);
 
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);

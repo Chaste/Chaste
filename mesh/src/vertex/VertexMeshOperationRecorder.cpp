@@ -138,7 +138,7 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::ClearEdgeOperations()
     mEdgeOperations.clear();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordNodeMergeOperation(const std::vector<unsigned> oldIds,
                                                                                    VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                                                                                    const std::pair<unsigned, unsigned> merged_nodes_pair,
@@ -287,7 +287,7 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordEdgeSplitOperati
     mEdgeOperations.emplace_back(EDGE_OPERATION_SPLIT, element_index, remap_info, elementIndexIsRemapped);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordCellDivideOperation(const std::vector<unsigned>& rOldIds,
                                                                                     VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement1,
                                                                                     VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement2)
@@ -421,7 +421,7 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordCellDivideOperat
     mEdgeOperations.emplace_back(pElement1->GetIndex(), pElement2->GetIndex(), remap_info_1, remap_info_2);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordNewEdgeOperation(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                                                                                  const unsigned edgeIndex)
 {

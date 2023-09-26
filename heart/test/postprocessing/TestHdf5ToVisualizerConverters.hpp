@@ -56,7 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkVersion.h>
 #endif
 
-typedef Hdf5ToCmguiConverter<3,3> CMGUI_3D;
+typedef Hdf5ToCmguiConverter<3, 3> CMGUI_3D;
 
 /* HOW_TO_TAG Cardiac/Post-processing
  * Convert already generated simulation (HDF5) results to Cmgui format.
@@ -89,12 +89,12 @@ public:
         CopyToTestOutputDirectory("heart/test/data/many_variables/many_variables.h5",
                                   output_dir);
 
-        TrianglesMeshReader<1,1> mesh_reader("heart/test/data/many_variables/1D_65_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("heart/test/data/many_variables/1D_65_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        Hdf5ToCmguiConverter<1,1> converter(FileFinder(output_dir, RelativeTo::ChasteTestOutput),
+        Hdf5ToCmguiConverter<1, 1> converter(FileFinder(output_dir, RelativeTo::ChasteTestOutput),
                                             "many_variables", &mesh, false, HeartConfig::Instance()->GetVisualizerOutputPrecision());
 
         std::string test_output_directory = OutputFileHandler::GetChasteTestOutputDirectory();
@@ -120,12 +120,12 @@ public:
         CopyToTestOutputDirectory("heart/test/data/CmguiData/monodomain/cube_2mm_12_elements.h5",
                                   working_directory);
 
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements"); //Not used in the test for exceptions
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_2mm_12_elements"); //Not used in the test for exceptions
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        Hdf5ToCmguiConverter<3,3> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
+        Hdf5ToCmguiConverter<3, 3> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
                                             "cube_2mm_12_elements", &mesh);
 
         // Compare the voltage file with a correct version
@@ -152,12 +152,12 @@ public:
         CopyToTestOutputDirectory("heart/test/data/CmguiData/bidomain/cube_2mm_12_elements.h5",
                                   working_directory);
 
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements"); //Not used in the test for exceptions
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_2mm_12_elements"); //Not used in the test for exceptions
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
-        Hdf5ToCmguiConverter<3,3> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
+        Hdf5ToCmguiConverter<3, 3> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
                                             "cube_2mm_12_elements", &mesh, false, HeartConfig::Instance()->GetVisualizerOutputPrecision());
 
         // Compare the voltage file with a correct version that is known to visualize correctly in Cmgui
@@ -180,14 +180,14 @@ public:
         CopyToTestOutputDirectory("heart/test/data/CmguiData/bidomain_with_bath/bidomain_with_bath_1d.h5",
                                   working_directory);
 
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements_with_two_attributes"); //Not used in the test for exceptions
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements_with_two_attributes"); //Not used in the test for exceptions
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
         HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain_with_bath_1d");
         HeartConfig::Instance()->SetOutputDirectory(working_directory);
-        Hdf5ToCmguiConverter<1,1> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
+        Hdf5ToCmguiConverter<1, 1> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
                                             "bidomain_with_bath_1d", &mesh, true, HeartConfig::Instance()->GetVisualizerOutputPrecision());
 
         // Compare the voltage file with a correct version that is known to visualize correctly in Cmgui
@@ -223,13 +223,13 @@ public:
         CopyToTestOutputDirectory("heart/test/data/CmguiData/monodomain/2D_0_to_1mm_400_elements.h5",
                                   working_directory);
 
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
         HeartConfig::Instance()->SetOutputDirectory(working_directory);
-        Hdf5ToCmguiConverter<2,2> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
+        Hdf5ToCmguiConverter<2, 2> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
                                             "2D_0_to_1mm_400_elements", &mesh);
 
         // Compare the voltage file with a correct version that visualizes Vm correctly in cmgui
@@ -252,13 +252,13 @@ public:
         CopyToTestOutputDirectory("heart/test/data/CmguiData/bidomain/1D_0_to_1_100_elements.h5",
                                   working_directory);
 
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
         HeartConfig::Instance()->SetOutputDirectory(working_directory);
-        Hdf5ToCmguiConverter<1,1> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
+        Hdf5ToCmguiConverter<1, 1> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
                                             "1D_0_to_1_100_elements", &mesh);
 
         // Compare the voltage file with a correct version that visualizes both Vm and Phie correctly in cmgui
@@ -281,14 +281,14 @@ public:
         CopyToTestOutputDirectory("heart/test/data/three_variables/3_vars.h5",
                                   working_directory);
 
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert
         HeartConfig::Instance()->SetOutputFilenamePrefix("3_vars");
         HeartConfig::Instance()->SetOutputDirectory(working_directory);
-        Hdf5ToCmguiConverter<1,1> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
+        Hdf5ToCmguiConverter<1, 1> converter(FileFinder(working_directory, RelativeTo::ChasteTestOutput),
                                             "3_vars", &mesh);
 
         // Compare the voltage file with a correct version that visualizes both Vs and Phie correctly in cmgui
@@ -309,8 +309,8 @@ public:
         std::string directory = "TestHdf5ConverterExceptions";
 
         // Not used until the number of nodes is checked
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         CopyToTestOutputDirectory("heart/test/data/CmguiData/monodomain/2D_0_to_1mm_400_elements.h5", directory);

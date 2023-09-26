@@ -61,7 +61,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * (with Stream = std::ifstream), or Archive = boost::archive::text_oarchive 
  * (with Stream = std::ofstream).
  */
-template <class Archive, class Stream>
+template<class Archive, class Stream>
 class ArchiveOpener
 {
 private:

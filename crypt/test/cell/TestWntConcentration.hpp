@@ -78,7 +78,7 @@ public:
 
         TS_ASSERT_DELTA(wnt_level, 0.0, 1e-9);
 
-        c_vector<double,2> location;
+        c_vector<double, 2> location;
         location[0] = 1.5;
         location[1] = 2.3;
 
@@ -112,7 +112,7 @@ public:
         TS_ASSERT_DELTA(wnt_level, 1.0-height/crypt_length, 1e-9);
 
         // Test GetWntGradient() method
-        c_vector<double,2> location;
+        c_vector<double, 2> location;
         location[0] = 1.5;
         location[1] = 2.3;
 
@@ -157,7 +157,7 @@ public:
 
         // Test GetWntGradient() method
 
-        c_vector<double,2> location;
+        c_vector<double, 2> location;
         location[0] = 1.5;
         location[1] = 2.3;
 
@@ -238,8 +238,8 @@ public:
         // Test GetWntLevel(CellPtr) method
 
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_2_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Translate mesh so that its centre is at (0,0)
@@ -294,10 +294,10 @@ public:
             TS_ASSERT_DELTA(p_wnt->GetWntLevel(*cell_iter), wnt_at_cell0, 1e-12);
 
             // Test GetWntGradient(CellPtr) method
-            c_vector<double,2> cell_location = crypt.GetLocationOfCellCentre(*cell_iter);
+            c_vector<double, 2> cell_location = crypt.GetLocationOfCellCentre(*cell_iter);
             double r = norm_2(cell_location);
 
-            c_vector<double,2> expected_wnt_gradient;
+            c_vector<double, 2> expected_wnt_gradient;
             expected_wnt_gradient[0] = -cell_location[0]*pow(r,b-1.0)/(a*r);
             expected_wnt_gradient[1] = -cell_location[1]*pow(r,b-1.0)/(a*r);
 
@@ -318,8 +318,8 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Set up cells, one for each node. Give each a birth time of -node_index, so the age = node_index
@@ -423,8 +423,8 @@ public:
     void TestWntInitialisationSetup()
     {
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_2_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         std::vector<WntCellCycleModel*> models;

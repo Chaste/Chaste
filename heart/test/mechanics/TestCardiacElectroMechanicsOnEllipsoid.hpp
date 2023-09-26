@@ -94,14 +94,14 @@ public:
         //
         //
         /////////////////////////////////////////////////////////////
-        TetrahedralMesh<3,3> electrics_mesh;
+        TetrahedralMesh<3, 3> electrics_mesh;
         QuadraticMesh<3> mechanics_mesh;
 
         {
-            TrianglesMeshReader<3,3> reader1("mesh/test/data/ellipsoid_15811_elements");
+            TrianglesMeshReader<3, 3> reader1("mesh/test/data/ellipsoid_15811_elements");
             electrics_mesh.ConstructFromMeshReader(reader1);
 
-            TrianglesMeshReader<3,3> reader2("mesh/test/data/ellipsoid_8225_elements_quad",
+            TrianglesMeshReader<3, 3> reader2("mesh/test/data/ellipsoid_8225_elements_quad",
                                              2 /*quadratic elements*/,
                                              2 /*quadratic boundary elements*/);
             mechanics_mesh.ConstructFromMeshReader(reader2);
@@ -122,10 +122,10 @@ public:
         ////////////////////////////////////////////////////////////////
         double base_threshold = 0.0;
         std::vector<unsigned> fixed_nodes;
-        std::vector<c_vector<double,3> > locations;
+        std::vector<c_vector<double, 3> > locations;
 
         bool first = true;
-        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); ++i)
+        for (unsigned i = 0; i<mechanics_mesh.GetNumNodes(); ++i)
         {
             double x = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
@@ -133,7 +133,7 @@ public:
             if (z >= base_threshold)
             {
                 fixed_nodes.push_back(i);
-                c_vector<double,3> new_location;
+                c_vector<double, 3> new_location;
 
                 if (first)
                 {
@@ -163,8 +163,8 @@ public:
         double b_endo = 0.35;
         double c_endo = 0.85;
 
-        std::vector<BoundaryElement<2,3>*> boundary_elems;
-        for (TetrahedralMesh<3,3>::BoundaryElementIterator iter
+        std::vector<BoundaryElement<2, 3>*> boundary_elems;
+        for (TetrahedralMesh<3, 3>::BoundaryElementIterator iter
                 = mechanics_mesh.GetBoundaryElementIteratorBegin();
               iter != mechanics_mesh.GetBoundaryElementIteratorEnd();
               ++iter)
@@ -181,7 +181,7 @@ public:
 
                 if (fabs(v-1.0)<0.2 && z > -0.9)
                 {
-                    BoundaryElement<2,3>* p_element = *iter;
+                    BoundaryElement<2, 3>* p_element = *iter;
                     boundary_elems.push_back(p_element);
                 }
             }
@@ -221,7 +221,7 @@ public:
         // Solve
         //
         ////////////////////////////////////////////////////////////////////////////////
-        CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
+        CardiacElectroMechanicsProblem<3, 1> problem(COMPRESSIBLE,
                                                   MONODOMAIN,
                                                   &electrics_mesh,
                                                   &mechanics_mesh,

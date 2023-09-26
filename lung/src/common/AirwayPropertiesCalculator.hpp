@@ -59,7 +59,7 @@ public:
      * @param radiusOnEdge Whether airway radii are defined element wise or 
      *     nodally; defaults to false
      */
-    AirwayPropertiesCalculator(TetrahedralMesh<1,3>& rAirwaysMesh,
+    AirwayPropertiesCalculator(TetrahedralMesh<1, 3>& rAirwaysMesh,
                                unsigned rootIndex = 0u,
                                bool radiusOnEdge = false);
 
@@ -239,7 +239,7 @@ public:
 private:
 
     /** A mesh containing the airways tree. */
-    TetrahedralMesh<1,3>& mAirwaysMesh;
+    TetrahedralMesh<1, 3>& mAirwaysMesh;
 
     /** The outlet node is the root of the branching tree structure. */
     unsigned mOutletNodeIndex;
@@ -418,7 +418,7 @@ private:
      *     branch yet)
      * @param pBranch The current branch
      */
-    void SetupBranches(Element<1,3>* pElement, AirwayBranch* pBranch);
+    void SetupBranches(Element<1, 3>* pElement, AirwayBranch* pBranch);
 
     /**
      * Recursively walk airway tree to calculate subtree length.

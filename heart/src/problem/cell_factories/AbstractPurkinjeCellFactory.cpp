@@ -41,14 +41,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::AbstractPurkinjeCellFactory()
-    : AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>(),
+AbstractPurkinjeCellFactory<ELEMENT_DIM, SPACE_DIM>::AbstractPurkinjeCellFactory()
+    : AbstractCardiacCellFactory<ELEMENT_DIM, SPACE_DIM>(),
       mpMixedDimensionMesh(NULL)
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::ReadJunctionsFile()
+void AbstractPurkinjeCellFactory<ELEMENT_DIM, SPACE_DIM>::ReadJunctionsFile()
 {
     std::string pvj_file_name;
     bool file_specified = true;
@@ -116,7 +116,7 @@ void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::ReadJunctionsFile()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateJunction(const Node<SPACE_DIM>* pNode,
+void AbstractPurkinjeCellFactory<ELEMENT_DIM, SPACE_DIM>::CreateJunction(const Node<SPACE_DIM>* pNode,
                                                                         AbstractCardiacCellInterface* pPurkinjeCell,
                                                                         AbstractCardiacCellInterface* pCardiacCell,
                                                                         double resistance)
@@ -125,14 +125,14 @@ void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateJunction(const No
     if (pNode) // Should always be provided apart from low-level tests!
     {
         assert(mpMixedDimensionMesh);
-        typedef typename MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>::CableRangeAtNode CableRangeAtNode;
+        typedef typename MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::CableRangeAtNode CableRangeAtNode;
         CableRangeAtNode cable_range = mpMixedDimensionMesh->GetCablesAtNode(pNode);
         double total_cross_sectional_area = 0.0;
         for (auto iter = cable_range.first;
              iter != cable_range.second;
              ++iter)
         {
-            Element<1u,SPACE_DIM>* p_cable = iter->second;
+            Element<1u, SPACE_DIM>* p_cable = iter->second;
             double cable_radius = p_cable->GetAttribute();
             total_cross_sectional_area += M_PI*cable_radius*cable_radius;
         }
@@ -160,9 +160,9 @@ void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateJunction(const No
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::SetMesh(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
+void AbstractPurkinjeCellFactory<ELEMENT_DIM, SPACE_DIM>::SetMesh(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
 {
-    mpMixedDimensionMesh = dynamic_cast<MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>*>(pMesh);
+    mpMixedDimensionMesh = dynamic_cast<MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>*>(pMesh);
     if (mpMixedDimensionMesh == NULL)
     {
         EXCEPTION("AbstractPurkinjeCellFactory must take a MixedDimensionMesh");
@@ -175,13 +175,13 @@ void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::SetMesh(AbstractTetrahe
         mLocalPurkinjeNodes.insert((*iter)->GetNodeGlobalIndex(0u));
         mLocalPurkinjeNodes.insert((*iter)->GetNodeGlobalIndex(1u));
     }
-    AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>::SetMesh(pMesh);
+    AbstractCardiacCellFactory<ELEMENT_DIM, SPACE_DIM>::SetMesh(pMesh);
 
     ReadJunctionsFile();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractCardiacCellInterface*  AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreatePurkinjeCellForNode(
+AbstractCardiacCellInterface*  AbstractPurkinjeCellFactory<ELEMENT_DIM, SPACE_DIM>::CreatePurkinjeCellForNode(
         Node<SPACE_DIM>* pNode,
         AbstractCardiacCellInterface* pCardiacCell)
 {
@@ -197,7 +197,7 @@ AbstractCardiacCellInterface*  AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::GetMixedDimensionMesh()
+MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>* AbstractPurkinjeCellFactory<ELEMENT_DIM, SPACE_DIM>::GetMixedDimensionMesh()
 {
     if (mpMixedDimensionMesh == NULL)
     {
@@ -207,7 +207,7 @@ MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* AbstractPurkinjeCellFactory<ELEMENT_D
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateJunctionFromFile(const Node<SPACE_DIM>* pNode,
+void AbstractPurkinjeCellFactory<ELEMENT_DIM, SPACE_DIM>::CreateJunctionFromFile(const Node<SPACE_DIM>* pNode,
                                                                                 AbstractCardiacCellInterface* pPurkinjeCell,
                                                                                 AbstractCardiacCellInterface* pCardiacCell)
 {
@@ -219,8 +219,8 @@ void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateJunctionFromFile(
 }
 
 // Explicit instantiation
-template class AbstractPurkinjeCellFactory<1,1>;
-template class AbstractPurkinjeCellFactory<2,2>;
-template class AbstractPurkinjeCellFactory<3,3>;
-template class AbstractPurkinjeCellFactory<1,2>;
-template class AbstractPurkinjeCellFactory<1,3>;
+template class AbstractPurkinjeCellFactory<1, 1>;
+template class AbstractPurkinjeCellFactory<2, 2>;
+template class AbstractPurkinjeCellFactory<3, 3>;
+template class AbstractPurkinjeCellFactory<1, 2>;
+template class AbstractPurkinjeCellFactory<1, 3>;

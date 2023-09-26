@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * This class converts from Hdf5 format to Vtk format. The output will be one 
  * .vtu file with separate vtkPointData for each time step.
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class Hdf5ToVtkConverter : public AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>
 {
 public:
@@ -63,7 +63,7 @@ public:
      */
     Hdf5ToVtkConverter(const FileFinder& rInputDirectory,
                        const std::string& rFileBaseName,
-                       AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
+                       AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
                        bool parallelVtk,
                        bool usingOriginalNodeOrdering);
 };

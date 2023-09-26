@@ -40,13 +40,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscMatTools.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void BidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
+void BidomainSolver<ELEMENT_DIM, SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
 {
     if (this->mpLinearSystem != NULL)
     {
         return;
     }
-    AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(initialSolution);
+    AbstractBidomainSolver<ELEMENT_DIM, SPACE_DIM>::InitialiseForSolve(initialSolution);
 
     // initialise matrix-based RHS vector and matrix, and use the linear
     // system rhs as a template
@@ -62,7 +62,7 @@ void BidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initialSoluti
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void BidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(
+void BidomainSolver<ELEMENT_DIM, SPACE_DIM>::SetupLinearSystem(
         Vec currentSolution,
         bool computeMatrix)
 {
@@ -196,12 +196,12 @@ void BidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-BidomainSolver<ELEMENT_DIM,SPACE_DIM>::BidomainSolver(
+BidomainSolver<ELEMENT_DIM, SPACE_DIM>::BidomainSolver(
         bool bathSimulation,
-        AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
+        AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
         BidomainTissue<SPACE_DIM>* pTissue,
-        BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,2>* pBoundaryConditions)
-    : AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>(bathSimulation,pMesh,pTissue,pBoundaryConditions)
+        BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 2>* pBoundaryConditions)
+    : AbstractBidomainSolver<ELEMENT_DIM, SPACE_DIM>(bathSimulation,pMesh,pTissue,pBoundaryConditions)
 {
     // Tell tissue there's no need to replicate ionic caches
     pTissue->SetCacheReplication(false);
@@ -210,20 +210,20 @@ BidomainSolver<ELEMENT_DIM,SPACE_DIM>::BidomainSolver(
     // create assembler
     if (bathSimulation)
     {
-        mpBidomainAssembler = new BidomainWithBathAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpBidomainTissue);
+        mpBidomainAssembler = new BidomainWithBathAssembler<ELEMENT_DIM, SPACE_DIM>(this->mpMesh,this->mpBidomainTissue);
     }
     else
     {
-        mpBidomainAssembler = new BidomainAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpBidomainTissue);
+        mpBidomainAssembler = new BidomainAssembler<ELEMENT_DIM, SPACE_DIM>(this->mpMesh,this->mpBidomainTissue);
     }
 
 
-    mpBidomainNeumannSurfaceTermAssembler = new BidomainNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM>(pMesh,pBoundaryConditions);
+    mpBidomainNeumannSurfaceTermAssembler = new BidomainNeumannSurfaceTermAssembler<ELEMENT_DIM, SPACE_DIM>(pMesh,pBoundaryConditions);
 
     if (HeartConfig::Instance()->GetUseStateVariableInterpolation())
     {
         mpBidomainCorrectionTermAssembler
-            = new BidomainCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpBidomainTissue);
+            = new BidomainCorrectionTermAssembler<ELEMENT_DIM, SPACE_DIM>(this->mpMesh,this->mpBidomainTissue);
         //We are going to need those caches after all
         pTissue->SetCacheReplication(true);
     }
@@ -234,7 +234,7 @@ BidomainSolver<ELEMENT_DIM,SPACE_DIM>::BidomainSolver(
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-BidomainSolver<ELEMENT_DIM,SPACE_DIM>::~BidomainSolver()
+BidomainSolver<ELEMENT_DIM, SPACE_DIM>::~BidomainSolver()
 {
     delete mpBidomainAssembler;
     delete mpBidomainNeumannSurfaceTermAssembler;
@@ -252,6 +252,6 @@ BidomainSolver<ELEMENT_DIM,SPACE_DIM>::~BidomainSolver()
 }
 
 // Explicit instantiation
-template class BidomainSolver<1,1>;
-template class BidomainSolver<2,2>;
-template class BidomainSolver<3,3>;
+template class BidomainSolver<1, 1>;
+template class BidomainSolver<2, 2>;
+template class BidomainSolver<3, 3>;

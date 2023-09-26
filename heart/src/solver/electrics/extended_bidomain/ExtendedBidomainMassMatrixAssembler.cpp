@@ -42,9 +42,9 @@ c_matrix<double,3*(DIM+1),3*(DIM+1)> ExtendedBidomainMassMatrixAssembler<DIM>::C
             c_vector<double, DIM+1> &rPhi,
             c_matrix<double, DIM, DIM+1> &rGradPhi,
             ChastePoint<DIM> &rX,
-            c_vector<double,3> &rU,
-            c_matrix<double,3,DIM> &rGradU /* not used */,
-            Element<DIM,DIM>* pElement)
+            c_vector<double, 3> &rU,
+            c_matrix<double,3, DIM> &rGradU /* not used */,
+            Element<DIM, DIM>* pElement)
 {
 
     c_matrix<double,3*(DIM+1),3*(DIM+1)> ret = zero_matrix<double>(3*(DIM+1),3*(DIM+1));

@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * This class defines a 3D ellipsoid and provides a method to check
  * if a given point is contained in the volume.
  */
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 class ChasteEllipsoid : public AbstractChasteRegion<SPACE_DIM>
 {
     /** Needed for serialization. */

@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 QuadraturePointsGroup<DIM>::QuadraturePointsGroup(
-    AbstractTetrahedralMesh<DIM,DIM>& rMesh,
+    AbstractTetrahedralMesh<DIM, DIM>& rMesh,
     GaussianQuadratureRule<DIM>& rQuadRule)
 {
     c_vector<double, DIM> unset;
@@ -62,12 +62,13 @@ QuadraturePointsGroup<DIM>::QuadraturePointsGroup(
              quad_index < rQuadRule.GetNumQuadPoints();
              ++quad_index)
         {
-            const ChastePoint<DIM>& quadrature_point = rQuadRule.rGetQuadPoint(quad_index);
+            const ChastePoint<DIM>& quadrature_point = 
+                rQuadRule.rGetQuadPoint(quad_index);
 
             LinearBasisFunction<DIM>::ComputeBasisFunctions(quadrature_point, linear_phi);
 
             // Interpolate to calculate quadrature point
-            c_vector<double,DIM> physical_quad_point = zero_vector<double>(DIM);
+            c_vector<double, DIM> physical_quad_point = zero_vector<double>(DIM);
             for (unsigned node_index = 0; node_index < DIM + 1; ++node_index)
             {
                 physical_quad_point += 
@@ -84,7 +85,7 @@ QuadraturePointsGroup<DIM>::QuadraturePointsGroup(
 }
 
 template<unsigned DIM>
-c_vector<double,DIM>& QuadraturePointsGroup<DIM>::rGet(
+c_vector<double, DIM>& QuadraturePointsGroup<DIM>::rGet(
     unsigned elementIndex,
     unsigned quadIndex)
 {
@@ -94,7 +95,7 @@ c_vector<double,DIM>& QuadraturePointsGroup<DIM>::rGet(
 }
 
 template<unsigned DIM>
-c_vector<double,DIM>& QuadraturePointsGroup<DIM>::rGet(unsigned i)
+c_vector<double, DIM>& QuadraturePointsGroup<DIM>::rGet(unsigned i)
 {
     assert(i < mNumElements * mNumQuadPointsPerElement);
     return data[i];

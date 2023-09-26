@@ -204,7 +204,7 @@ protected:
  */
 
 
-template <unsigned SIZE>
+template<unsigned SIZE>
 AbstractBackwardEulerCardiacCell<SIZE>::AbstractBackwardEulerCardiacCell(
     unsigned numberOfStateVariables,
     unsigned voltageIndex,
@@ -215,11 +215,11 @@ AbstractBackwardEulerCardiacCell<SIZE>::AbstractBackwardEulerCardiacCell(
                               pIntracellularStimulus)
 {}
 
-template <unsigned SIZE>
+template<unsigned SIZE>
 AbstractBackwardEulerCardiacCell<SIZE>::~AbstractBackwardEulerCardiacCell()
 {}
 
-template <unsigned SIZE>
+template<unsigned SIZE>
 OdeSolution AbstractBackwardEulerCardiacCell<SIZE>::Compute(double tStart, double tEnd, double tSamp)
 {
     // In this method, we iterate over timesteps, doing the following for each:
@@ -271,7 +271,7 @@ OdeSolution AbstractBackwardEulerCardiacCell<SIZE>::Compute(double tStart, doubl
     return solutions;
 }
 
-template <unsigned SIZE>
+template<unsigned SIZE>
 void AbstractBackwardEulerCardiacCell<SIZE>::ComputeExceptVoltage(double tStart, double tEnd)
 {
     // This method iterates over timesteps, calling ComputeExceptVoltage(t) at

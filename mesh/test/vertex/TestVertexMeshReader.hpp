@@ -42,10 +42,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*
  * This typedef is just because we can't have lines such as
- * TS_ASSERT_THROWS_NOTHING(p_mesh_reader=new VertexMeshReader<2,2>(name));
+ * TS_ASSERT_THROWS_NOTHING(p_mesh_reader=new VertexMeshReader<2, 2>(name));
  * because the macro thinks the comma separates two arguments
  */
-typedef VertexMeshReader<2,2> READER_2D;
+typedef VertexMeshReader<2, 2> READER_2D;
 
 class TestVertexMeshReader : public CxxTest::TestSuite
 {
@@ -56,7 +56,7 @@ public:
      */
     void TestFilesOpen()
     {
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
     }
 
     /**
@@ -66,11 +66,11 @@ public:
      */
     void TestNodesDataRead()
     {
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
 
         TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 7u);
 
-        VertexMeshReader<2,2> mesh_reader2("mesh/test/data/baddata/vertex_mesh_bad_nodes");
+        VertexMeshReader<2, 2> mesh_reader2("mesh/test/data/baddata/vertex_mesh_bad_nodes");
 
         // Reads node 0 from file
         TS_ASSERT_THROWS_NOTHING(mesh_reader2.GetNextNode());
@@ -86,7 +86,7 @@ public:
      */
     void TestElementsDataRead()
     {
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
 
         TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 2u);
 
@@ -117,7 +117,7 @@ public:
             TS_ASSERT_EQUALS(data.AttributeValue, 0u);
         }
 
-        VertexMeshReader<2,2> mesh_reader2("mesh/test/data/baddata/vertex_mesh_bad_elements");
+        VertexMeshReader<2, 2> mesh_reader2("mesh/test/data/baddata/vertex_mesh_bad_elements");
 
         // Reads element 0 from file
         TS_ASSERT_THROWS_NOTHING(mesh_reader2.GetNextElementData());
@@ -134,8 +134,8 @@ public:
      */
     void TestPermutedNodesFail()
     {
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/baddata/vertex_mesh_permuted_nodes");
-        TS_ASSERT_THROWS_THIS(for (unsigned i=0; i<mesh_reader.GetNumNodes(); ++i) {mesh_reader.GetNextNode();}, "Data for node 3 missing")
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/baddata/vertex_mesh_permuted_nodes");
+        TS_ASSERT_THROWS_THIS(for (unsigned i = 0; i<mesh_reader.GetNumNodes(); ++i) {mesh_reader.GetNextNode();}, "Data for node 3 missing")
     }
 
     /**
@@ -146,7 +146,7 @@ public:
      */
     void TestGetNextNode()
     {
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
 
         std::vector<double> first_node;
         first_node = mesh_reader.GetNextNode();
@@ -160,7 +160,7 @@ public:
         TS_ASSERT_DELTA(next_node[0], 1.0, 1e-6);
         TS_ASSERT_DELTA(next_node[1], 0.0, 1e-6);
 
-        for (unsigned i=0; i<5; ++i)
+        for (unsigned i = 0; i<5; ++i)
         {
             TS_ASSERT_THROWS_NOTHING(next_node = mesh_reader.GetNextNode());
         }
@@ -176,10 +176,10 @@ public:
      */
     void TestGetNextElementData()
     {
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
 
         std::vector<unsigned> next_element;
-        for (unsigned i=0; i<mesh_reader.GetNumElements(); ++i)
+        for (unsigned i = 0; i<mesh_reader.GetNumElements(); ++i)
         {
             TS_ASSERT_THROWS_NOTHING(next_element = mesh_reader.GetNextElementData().NodeIndices);
         }
@@ -196,7 +196,7 @@ public:
     void TestGetNextElementDataWithFaces()
     {
         // First test the case where there aren't actually any faces
-        VertexMeshReader<3,3> mesh_reader1("mesh/test/data/TestVertexMeshWriter/vertex_mesh_3d");
+        VertexMeshReader<3, 3> mesh_reader1("mesh/test/data/TestVertexMeshWriter/vertex_mesh_3d");
 
         // This mesh should consist of a single cubic element with eight nodes and no faces
         TS_ASSERT_EQUALS(mesh_reader1.GetNumElements(), 1u);
@@ -206,7 +206,7 @@ public:
         // Test node indices
         std::vector<unsigned> node_indices = element_0_data.NodeIndices;
         TS_ASSERT_EQUALS(node_indices.size(), 8u);
-        for (unsigned i=0; i<8; ++i)
+        for (unsigned i = 0; i<8; ++i)
         {
             TS_ASSERT_EQUALS(node_indices[i], i);
         }
@@ -220,7 +220,7 @@ public:
                 "Cannot get the next line from node or element file due to incomplete data");
 
         // Now test the case where there are faces
-        VertexMeshReader<3,3> mesh_reader2("mesh/test/data/TestVertexMeshWriter/vertex_mesh_3d_with_faces");
+        VertexMeshReader<3, 3> mesh_reader2("mesh/test/data/TestVertexMeshWriter/vertex_mesh_3d_with_faces");
 
         // This mesh should consist of a single tetrahedral element with four nodes and four faces
         TS_ASSERT_EQUALS(mesh_reader2.GetNumElements(), 1u);
@@ -234,7 +234,7 @@ public:
         // Test the node indices are correct (use a set comparison in case of funny business relating to tetgen versions)
         std::set<unsigned> node_indices_expected;
         std::set<unsigned> node_indices_returned;
-        for (unsigned i=0; i<4; ++i)
+        for (unsigned i = 0; i<4; ++i)
         {
             node_indices_expected.insert(i);
             node_indices_returned.insert(node_indices[i]);
@@ -256,7 +256,7 @@ public:
         TS_ASSERT_THROWS_THIS(node_indices = mesh_reader2.GetNextElementDataWithFaces().NodeIndices,
                 "Cannot get the next line from node or element file due to incomplete data");
 
-        VertexMeshReader<3,3> mesh_reader3("mesh/test/data/baddata/vertex_mesh_3d_with_faces");
+        VertexMeshReader<3, 3> mesh_reader3("mesh/test/data/baddata/vertex_mesh_3d_with_faces");
 
         // Reads element 1 from file when expecting number 0
         TS_ASSERT_THROWS_THIS(mesh_reader3.GetNextElementDataWithFaces(), "Data for element 0 missing");
@@ -264,7 +264,7 @@ public:
 
     void TestReadingWithNoElementAttributes()
     {
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshReader2d/vertex_mesh_with_no_element_attributes");
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMeshReader2d/vertex_mesh_with_no_element_attributes");
 
         TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 2u);
 
@@ -275,7 +275,7 @@ public:
 
     void TestReadingElementAttributes()
     {
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshReader2d/vertex_mesh_with_element_attributes");
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMeshReader2d/vertex_mesh_with_element_attributes");
 
         TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 2u);
 

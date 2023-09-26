@@ -66,7 +66,7 @@ protected:
 
     /** Container for conductivity tensors
      * (single, size=1 [one for all space] or multiple, size=num local elements [one for each local element]) */
-    std::vector< c_matrix<double,SPACE_DIM,SPACE_DIM> > mTensors;
+    std::vector< c_matrix<double, SPACE_DIM, SPACE_DIM> > mTensors;
 
     /** Set by Init() in the base classes*/
     bool mInitialised;
@@ -135,7 +135,7 @@ public:
      *
      *  @param global_index Global index of the element of the mesh
      */
-    c_matrix<double,SPACE_DIM,SPACE_DIM>& operator[](const unsigned global_index);
+    c_matrix<double, SPACE_DIM, SPACE_DIM>& operator[](const unsigned global_index);
 };
 
 #endif /*ABSTRACTCONDUCTIVITYTENSORS_HPP_*/

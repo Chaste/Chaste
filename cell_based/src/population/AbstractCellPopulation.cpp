@@ -139,7 +139,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetDataOnAllCells(
     double dataValue)
 {
     for (auto cell_iter = this->Begin();
-         cell_iter! = this->End();
+         cell_iter != this->End();
          ++cell_iter)
     {
         cell_iter->GetCellData()->SetItem(rDataName, dataValue);
@@ -873,44 +873,44 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::SetOutputResultsForChasteVi
     mOutputResultsForChasteVisualizer = outputResultsForChasteVisualizer;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<std::string> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetDivisionsInformation()
 {
     return mDivisionsInformation;
 }
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddDivisionInformation(
     std::string divisionInformation)
 {
     mDivisionsInformation.push_back(divisionInformation);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::ClearDivisionsInformation()
 {
     mDivisionsInformation.clear();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<std::string> AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetRemovalsInformation()
 {
     return mRemovalsInformation;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddRemovalInformation(
     std::string removalInformation)
 {
     mRemovalsInformation.push_back(removalInformation);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::ClearRemovalsInformation()
 {
     mRemovalsInformation.clear();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateRemovalInformation(
     CellPtr pCell,
     std::string killerInfo)
@@ -931,7 +931,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GenerateRemovalInformation(
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::KillCell(
     CellPtr pCell,
     std::string killerInfo)
@@ -943,7 +943,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::KillCell(
     pCell->Kill();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::StartApoptosisOnCell(
     CellPtr pCell,
     std::string killerInfo)
@@ -955,7 +955,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::StartApoptosisOnCell(
     pCell->StartApoptosis();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsRoomToDivide(
     CellPtr pCell)
 {
@@ -1029,9 +1029,9 @@ bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsPdeNodeAssociatedWithNonA
 
 
 // Explicit instantiation
-template class AbstractCellPopulation<1,1>;
-template class AbstractCellPopulation<1,2>;
-template class AbstractCellPopulation<2,2>;
-template class AbstractCellPopulation<1,3>;
-template class AbstractCellPopulation<2,3>;
-template class AbstractCellPopulation<3,3>;
+template class AbstractCellPopulation<1, 1>;
+template class AbstractCellPopulation<1, 2>;
+template class AbstractCellPopulation<2, 2>;
+template class AbstractCellPopulation<1, 3>;
+template class AbstractCellPopulation<2, 3>;
+template class AbstractCellPopulation<3, 3>;

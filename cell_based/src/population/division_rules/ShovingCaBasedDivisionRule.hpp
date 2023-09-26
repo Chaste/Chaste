@@ -50,7 +50,7 @@ template<unsigned SPACE_DIM> class AbstractCaBasedDivisionRule;
  * Here they can divide in any direction and shove other cells out of the way in
  * that direction.
  */
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 class ShovingCaBasedDivisionRule : public AbstractCaBasedDivisionRule<SPACE_DIM>
 {
 private:

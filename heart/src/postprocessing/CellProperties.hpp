@@ -118,14 +118,14 @@ private:
      * Throw an exception if we are asking for information which is not present, because
      * upstroke was never detected (the voltage trace never exceeded the threshold voltage).
      */
-    void CheckExceededThreshold(void);
+    void CheckExceededThreshold();
 
     /**
      * Throw an exception if we are asking for information which is not present, because
      * an AP was never detected (the voltage trace never exceeded the threshold voltage
      * and then returned past it).
      */
-    void CheckReturnedToThreshold(void);
+    void CheckReturnedToThreshold();
 
 public:
     /**

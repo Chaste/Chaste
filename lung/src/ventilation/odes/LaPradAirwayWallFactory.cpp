@@ -79,7 +79,7 @@ double LaPradAirwayWallFactory::GetAlpha0ForGeneration(unsigned generation)
 }
 
 
-LaPradAirwayWall* LaPradAirwayWallFactory::CreateAirwayWallForElement(Element<1,3>* pElement)
+LaPradAirwayWall* LaPradAirwayWallFactory::CreateAirwayWallForElement(Element<1, 3>* pElement)
 {
     unsigned order = 0;
 
@@ -119,7 +119,7 @@ LaPradAirwayWall* LaPradAirwayWallFactory::CreateAirwayWallForElement(Element<1,
     return wall;
 }
 
-double LaPradAirwayWallFactory::GetPleuralPressureForAirway(double time, Element<1,3>* pElement)
+double LaPradAirwayWallFactory::GetPleuralPressureForAirway(double time, Element<1, 3>* pElement)
 {
     return 0.0;
 }
@@ -127,7 +127,7 @@ double LaPradAirwayWallFactory::GetPleuralPressureForAirway(double time, Element
 /**
 * @param pMesh  the mesh for which to create acinar units.
 */
-void LaPradAirwayWallFactory::SetMesh(AbstractTetrahedralMesh<1,3>* pMesh)
+void LaPradAirwayWallFactory::SetMesh(AbstractTetrahedralMesh<1, 3>* pMesh)
 {
     AbstractAirwayWallFactory::SetMesh(pMesh);
 

@@ -43,15 +43,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Toroidal2dMesh.hpp"
 
 /**
- * A subclass of MutableVertexMesh<2,2> for a rectangular mesh with
+ * A subclass of MutableVertexMesh<2, 2> for a rectangular mesh with
  * periodic left and right boundaries and top and bottom boundaries,
  * representing a toroidal geometry.
  *
  * The class works by overriding calls such as ReMesh() and
  * GetVectorFromAtoB() so that simulation classes can treat this
- * class in exactly the same way as a MutableMesh<2,2>.
+ * class in exactly the same way as a MutableMesh<2, 2>.
  */
-class Toroidal2dVertexMesh : public MutableVertexMesh<2,2>
+class Toroidal2dVertexMesh : public MutableVertexMesh<2, 2>
 {
     friend class TestToroidal2dVertexMesh;
 
@@ -67,7 +67,7 @@ private:
      * Auxiliary mesh pointer, created/updated when GetMeshForVtk() is called
      * and stored so that it may be deleted by the destructor.
      */
-    VertexMesh<2,2>* mpMeshForVtk;
+    VertexMesh<2, 2>* mpMeshForVtk;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -84,7 +84,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<MutableVertexMesh<2,2> >(*this);
+        archive & boost::serialization::base_object<MutableVertexMesh<2, 2> >(*this);
         archive & mWidth;
         archive & mHeight;
         mpMeshForVtk = nullptr;
@@ -105,7 +105,7 @@ public:
     Toroidal2dVertexMesh(double width,
                          double height,
                          std::vector<Node<2>*> nodes,
-                         std::vector<VertexElement<2,2>*> vertexElements,
+                         std::vector<VertexElement<2, 2>*> vertexElements,
                          double cellRearrangementThreshold=0.01,
                          double t2Threshold=0.001);
 
@@ -203,7 +203,7 @@ public:
      *
      * @return a non-periodic vertex mesh
      */
-     VertexMesh<2,2>* GetMeshForVtk();
+     VertexMesh<2, 2>* GetMeshForVtk();
 
      /**
       * Construct the mesh using a MeshReader.
@@ -212,7 +212,7 @@ public:
       * @param width the mesh width
       * @param height the mesh height
       */
-     void ConstructFromMeshReader(AbstractMeshReader<2,2>& rMeshReader, double width, double height);
+     void ConstructFromMeshReader(AbstractMeshReader<2, 2>& rMeshReader, double width, double height);
 };
 
 #include "SerializationExportWrapper.hpp"

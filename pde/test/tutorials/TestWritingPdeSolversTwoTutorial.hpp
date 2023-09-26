@@ -109,7 +109,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 template<unsigned DIM>
 class RhsMatrixAssembler
-    : public AbstractFeVolumeIntegralAssembler<DIM,DIM,1/*problem dim*/,false /*doesn't assemble vectors*/,true/*assembles a matrix*/,NORMAL /*amount of interpolation*/>
+    : public AbstractFeVolumeIntegralAssembler<DIM, DIM,1/*problem dim*/,false /*doesn't assemble vectors*/,true/*assembles a matrix*/,NORMAL /*amount of interpolation*/>
 {
 private:
     /* Even when a class isn't being written for a very general dimensions sometimes it is a good idea
@@ -124,13 +124,13 @@ private:
      * elemental contribution to the RHS matrix. Note that `ELEMENT_DIM+1` is the number of
      * nodes in the element (=number of basis functions).
      */
-    c_matrix<double,PROBLEM_DIM*(ELEMENT_DIM+1),PROBLEM_DIM*(ELEMENT_DIM+1)> ComputeMatrixTerm(
+    c_matrix<double, PROBLEM_DIM*(ELEMENT_DIM+1), PROBLEM_DIM*(ELEMENT_DIM+1)> ComputeMatrixTerm(
                                                                                 c_vector<double, ELEMENT_DIM+1> &rPhi,
                                                                                 c_matrix<double, SPACE_DIM, ELEMENT_DIM+1> &rGradPhi,
                                                                                 ChastePoint<SPACE_DIM> &rX,
-                                                                                c_vector<double,PROBLEM_DIM> &rU,
+                                                                                c_vector<double, PROBLEM_DIM> &rU,
                                                                                 c_matrix<double, PROBLEM_DIM, SPACE_DIM> &rGradU /* not used */,
-                                                                                Element<ELEMENT_DIM,SPACE_DIM>* pElement)
+                                                                                Element<ELEMENT_DIM, SPACE_DIM>* pElement)
     {
         c_matrix<double, ELEMENT_DIM+1, ELEMENT_DIM+1> ret = zero_matrix<double>(ELEMENT_DIM+1,ELEMENT_DIM+1);
 
@@ -159,8 +159,8 @@ private:
      *
      * Now write the constructor. */
 public:
-    RhsMatrixAssembler(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
-        : AbstractFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,1,false,true,NORMAL>(pMesh)
+    RhsMatrixAssembler(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
+        : AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM,1,false,true,NORMAL>(pMesh)
     {
     }
 };
@@ -175,11 +175,11 @@ public:
  * be M, and set the RHS vector to be `rhs_matrix * current_soln`.
  */
 template<unsigned DIM>
-class ExplicitHeatEquationSolver : public AbstractDynamicLinearPdeSolver<DIM,DIM,1>
+class ExplicitHeatEquationSolver : public AbstractDynamicLinearPdeSolver<DIM, DIM, 1>
 {
 private:
     /* The constuctor will take in a mesh and a BCC, the latter will be stored as a member variable */
-    BoundaryConditionsContainer<DIM,DIM,1>* mpBoundaryConditions;
+    BoundaryConditionsContainer<DIM, DIM, 1>* mpBoundaryConditions;
     /* Declare a matrix for the RHS matrix */
     Mat mRhsMatrix;
 
@@ -199,7 +199,7 @@ private:
          */
         if (computeMatrix)
         {
-            MassMatrixAssembler<DIM,DIM> mass_matrix_assembler(this->mpMesh);
+            MassMatrixAssembler<DIM, DIM> mass_matrix_assembler(this->mpMesh);
             RhsMatrixAssembler<DIM> rhs_matrix_assembler(this->mpMesh);
 
             mass_matrix_assembler.SetMatrixToAssemble(this->mpLinearSystem->rGetLhsMatrix());
@@ -221,7 +221,7 @@ private:
          * the vector `c` defined above, using the Neumann BCs stored in the `BoundaryConditionsContainer`
          * which is passed in in the constructor
          */
-        NaturalNeumannSurfaceTermAssembler<DIM,DIM,1> surface_integral_assembler(this->mpMesh, mpBoundaryConditions);
+        NaturalNeumannSurfaceTermAssembler<DIM, DIM, 1> surface_integral_assembler(this->mpMesh, mpBoundaryConditions);
         surface_integral_assembler.SetVectorToAssemble(this->mpLinearSystem->rGetRhsVector(), false /*don't zero vector before assembling!*/);
         surface_integral_assembler.Assemble();
 
@@ -240,9 +240,9 @@ public:
     /* The constructor needs to call the parent constructor, save the BCC, ''say that the (LHS) matrix is constant
      * in time'' (so it is only computed once), and allocate memory for the RHS matrix.
      */
-    ExplicitHeatEquationSolver(TetrahedralMesh<DIM,DIM>* pMesh,
-                               BoundaryConditionsContainer<DIM,DIM,1>* pBoundaryConditions)
-         : AbstractDynamicLinearPdeSolver<DIM,DIM,1>(pMesh),
+    ExplicitHeatEquationSolver(TetrahedralMesh<DIM, DIM>* pMesh,
+                               BoundaryConditionsContainer<DIM, DIM, 1>* pBoundaryConditions)
+         : AbstractDynamicLinearPdeSolver<DIM, DIM, 1>(pMesh),
            mpBoundaryConditions(pBoundaryConditions)
     {
         this->mMatrixIsConstant = true;
@@ -274,18 +274,18 @@ class TestWritingPdeSolversTwoTutorial : public CxxTest::TestSuite
 public:
     void TestExplicitSolver()
     {
-        TetrahedralMesh<2,2> mesh;
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructRegularSlabMesh(0.05 /*h*/, 1.0 /*width*/, 1.0 /*height*/);
 
         // Set up BCs u=0 on entire boundary
-        BoundaryConditionsContainer<2,2,1> bcc;
+        BoundaryConditionsContainer<2, 2, 1> bcc;
         bcc.DefineZeroDirichletOnMeshBoundary(&mesh);
 
         ExplicitHeatEquationSolver<2> solver(&mesh,&bcc);
         //// To use the old solver instead, comment out the above line
         //// and use these instead (also uncomment the appropriate includes).
         //HeatEquation<2> pde;
-        //SimpleLinearParabolicSolver<2,2> solver(&mesh,&pde,&bcc);
+        //SimpleLinearParabolicSolver<2, 2> solver(&mesh,&pde,&bcc);
 
         /* The interface is exactly the same as the `SimpleLinearParabolicSolver`. */
         solver.SetTimeStep(0.0001);

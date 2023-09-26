@@ -41,16 +41,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Linear PDE with zero source term and identity diffusion term.
  */
-template <int SPACE_DIM>
-class LinearPdeWithZeroSource:public AbstractLinearEllipticPde<SPACE_DIM,SPACE_DIM>
+template<int SPACE_DIM>
+class LinearPdeWithZeroSource:public AbstractLinearEllipticPde<SPACE_DIM, SPACE_DIM>
 {
 public:
-    double ComputeConstantInUSourceTerm(const ChastePoint<SPACE_DIM>&, Element<SPACE_DIM,SPACE_DIM>*)
+    double ComputeConstantInUSourceTerm(const ChastePoint<SPACE_DIM>&, Element<SPACE_DIM, SPACE_DIM>*)
     {
         return 0.0;
     }
 
-    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<SPACE_DIM>&, Element<SPACE_DIM,SPACE_DIM>*)
+    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<SPACE_DIM>&, Element<SPACE_DIM, SPACE_DIM>*)
     {
         return 0.0;
     }

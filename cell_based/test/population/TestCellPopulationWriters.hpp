@@ -99,7 +99,7 @@ public:
         nodes.push_back(new Node<3>(2, true,  1.0, 0.0, 1.0));
         nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 1.0));
         nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
-        MutableMesh<3,3> mesh(nodes);
+        MutableMesh<3, 3> mesh(nodes);
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
@@ -111,7 +111,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a BoundaryNodeWriter and test that the correct output is generated
-        BoundaryNodeWriter<3,3> boundary_writer;
+        BoundaryNodeWriter<3, 3> boundary_writer;
         boundary_writer.OpenOutputFile(output_file_handler);
         boundary_writer.WriteTimeStamp();
         boundary_writer.Visit(&cell_population);
@@ -137,7 +137,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "BoundaryNodeWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_population_writer = new BoundaryNodeWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_population_writer = new BoundaryNodeWriter<2, 2>();
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
             output_arch << p_population_writer;
@@ -145,7 +145,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_population_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_population_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
             input_arch >> p_population_writer_2;
@@ -159,7 +159,7 @@ public:
 
         // Test with a MeshBasedCellPopulation
         HoneycombMeshGenerator tet_generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_tet_mesh = tet_generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_tet_mesh = tet_generator.GetMesh();
         std::vector<CellPtr> mesh_based_cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> mesh_based_cells_generator;
         mesh_based_cells_generator.GenerateBasic(mesh_based_cells, p_tet_mesh->GetNumNodes());
@@ -176,7 +176,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a CellPopulationAreaWriter and test that the correct output is generated
-        CellPopulationAdjacencyMatrixWriter<2,2> adjacency_writer;
+        CellPopulationAdjacencyMatrixWriter<2, 2> adjacency_writer;
         adjacency_writer.OpenOutputFile(output_file_handler);
         adjacency_writer.WriteTimeStamp();
         adjacency_writer.Visit(&mesh_based_cell_population);
@@ -246,7 +246,7 @@ public:
         // Coverage of the Visit() method when called on a VertexBasedCellPopulation
         {
             HoneycombVertexMeshGenerator vertex_based_generator(4, 6);
-            boost::shared_ptr<MutableVertexMesh<2,2> > p_vertex_based_mesh = vertex_based_generator.GetMesh();
+            boost::shared_ptr<MutableVertexMesh<2, 2> > p_vertex_based_mesh = vertex_based_generator.GetMesh();
             std::vector<CellPtr> vertex_based_cells;
             boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> vertex_based_cells_generator;
@@ -270,7 +270,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellPopulationAdjacencyMatrixWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_population_writer = new CellPopulationAdjacencyMatrixWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_population_writer = new CellPopulationAdjacencyMatrixWriter<2, 2>();
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
             output_arch << p_population_writer;
@@ -278,7 +278,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_population_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_population_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
             input_arch >> p_population_writer_2;
@@ -297,7 +297,7 @@ public:
         nodes.push_back(new Node<3>(2, true,  1.0, 0.0, 1.0));
         nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 1.0));
         nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
-        MutableMesh<3,3> mesh(nodes);
+        MutableMesh<3, 3> mesh(nodes);
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
@@ -311,7 +311,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a CellPopulationAreaWriter and test that the correct output is generated
-        CellPopulationAreaWriter<3,3> area_writer;
+        CellPopulationAreaWriter<3, 3> area_writer;
         area_writer.OpenOutputFile(output_file_handler);
         area_writer.WriteTimeStamp();
         area_writer.Visit(&cell_population);
@@ -329,7 +329,7 @@ public:
 
         FileComparison(results_dir + "cellpopulationareas.dat", "cell_based/test/data/TestCellPopulationWriters/cellpopulationareas_twice.dat").CompareFiles();
 
-        CellPopulationAreaWriter<2,2> area_writer_2d;
+        CellPopulationAreaWriter<2, 2> area_writer_2d;
 
         // Test the correct exception is thrown if using a NodeBasedCellPopulation
         std::vector<Node<2>* > node_based_nodes;
@@ -380,7 +380,7 @@ public:
 
         // Test the correct exception is thrown if using a PottsBasedCellPopulation
         HoneycombVertexMeshGenerator vertex_based_generator(4, 6);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_vertex_mesh = vertex_based_generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_vertex_mesh = vertex_based_generator.GetMesh();
         std::vector<CellPtr> vertex_based_cells;
         boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> vertex_based_cells_generator;
@@ -398,7 +398,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellPopulationAreaWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_population_writer = new CellPopulationAreaWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_population_writer = new CellPopulationAreaWriter<2, 2>();
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
             output_arch << p_population_writer;
@@ -406,7 +406,7 @@ public:
         }
         PetscTools::Barrier(); // Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_population_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_population_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
             input_arch >> p_population_writer_2;
@@ -420,7 +420,7 @@ public:
 
         // Create a simple 2D VertexBasedCellPopulation
         HoneycombVertexMeshGenerator generator(4, 6);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -433,7 +433,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a CellPopulationElementWriter and test that the correct output is generated
-        CellPopulationElementWriter<2,2> element_writer;
+        CellPopulationElementWriter<2, 2> element_writer;
         element_writer.OpenOutputFile(output_file_handler);
         element_writer.WriteTimeStamp();
         element_writer.Visit(&cell_population);
@@ -494,7 +494,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellPopulationElementWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_population_writer = new CellPopulationElementWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_population_writer = new CellPopulationElementWriter<2, 2>();
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
             output_arch << p_population_writer;
@@ -502,7 +502,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_population_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_population_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
             input_arch >> p_population_writer_2;
@@ -518,10 +518,10 @@ public:
         {
             // Create a simple 2D cell population (use ghost nodes to avoid infinite edge lengths in the Voronoi tessellation)
             HoneycombMeshGenerator generator(5, 3, 2);
-            boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+            boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
             std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
             std::vector<CellPtr> cells;
-            CellsGenerator<FixedG1GenerationalCellCycleModel,2> cells_generator;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
             cells_generator.GenerateGivenLocationIndices(cells, location_indices);
             MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
             cell_population.InitialiseCells();
@@ -557,7 +557,7 @@ public:
             std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
             // Create a BoundaryNodeWriter and test that the correct output is generated
-            HeterotypicBoundaryLengthWriter<2,2> labelled_boundary_writer;
+            HeterotypicBoundaryLengthWriter<2, 2> labelled_boundary_writer;
             labelled_boundary_writer.OpenOutputFile(output_file_handler);
             labelled_boundary_writer.WriteTimeStamp();
             labelled_boundary_writer.Visit(&cell_population);
@@ -631,7 +631,7 @@ public:
             std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
             // Create a BoundaryNodeWriter and test that the correct output is generated
-            HeterotypicBoundaryLengthWriter<2,2> labelled_boundary_writer;
+            HeterotypicBoundaryLengthWriter<2, 2> labelled_boundary_writer;
             labelled_boundary_writer.OpenOutputFile(output_file_handler);
             labelled_boundary_writer.WriteTimeStamp();
             labelled_boundary_writer.Visit(&cell_population);
@@ -691,7 +691,7 @@ public:
             std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
             // Create a BoundaryNodeWriter and test that the correct output is generated
-            HeterotypicBoundaryLengthWriter<2,2> labelled_boundary_writer;
+            HeterotypicBoundaryLengthWriter<2, 2> labelled_boundary_writer;
             labelled_boundary_writer.OpenOutputFile(output_file_handler);
             labelled_boundary_writer.WriteTimeStamp();
             labelled_boundary_writer.Visit(&cell_population);
@@ -748,7 +748,7 @@ public:
             std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
             // Create a BoundaryNodeWriter and test that the correct output is generated
-            HeterotypicBoundaryLengthWriter<2,2> labelled_boundary_writer;
+            HeterotypicBoundaryLengthWriter<2, 2> labelled_boundary_writer;
             labelled_boundary_writer.OpenOutputFile(output_file_handler);
             labelled_boundary_writer.WriteTimeStamp();
             labelled_boundary_writer.Visit(&cell_population);
@@ -762,7 +762,7 @@ public:
         {
             // Create a simple 2D cell population
             HoneycombVertexMeshGenerator generator(4, 4);
-            boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+            boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
             std::vector<CellPtr> cells;
             boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -800,7 +800,7 @@ public:
             std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
             // Create a BoundaryNodeWriter and test that the correct output is generated
-            HeterotypicBoundaryLengthWriter<2,2> labelled_boundary_writer;
+            HeterotypicBoundaryLengthWriter<2, 2> labelled_boundary_writer;
             labelled_boundary_writer.OpenOutputFile(output_file_handler);
             labelled_boundary_writer.WriteTimeStamp();
             labelled_boundary_writer.Visit(&cell_population);
@@ -827,7 +827,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "HeterotypicBoundaryLengthWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_population_writer = new HeterotypicBoundaryLengthWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_population_writer = new HeterotypicBoundaryLengthWriter<2, 2>();
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
             output_arch << p_population_writer;
@@ -835,7 +835,7 @@ public:
         }
         PetscTools::Barrier(); // Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_population_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_population_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
             input_arch >> p_population_writer_2;
@@ -864,7 +864,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a NodeLocationWriter and test that the correct output is generated
-        NodeLocationWriter<3,3> location_writer;
+        NodeLocationWriter<3, 3> location_writer;
         location_writer.OpenOutputFile(output_file_handler);
         location_writer.WriteTimeStamp();
         location_writer.Visit(&cell_population);
@@ -894,7 +894,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "NodeLocationWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_population_writer = new NodeLocationWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_population_writer = new NodeLocationWriter<2, 2>();
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
             output_arch << p_population_writer;
@@ -902,7 +902,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_population_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_population_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
             input_arch >> p_population_writer_2;
@@ -924,14 +924,14 @@ public:
         mesh_based_nodes.push_back(new Node<3>(2, true,  1.0, 0.0, 1.0));
         mesh_based_nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 1.0));
         mesh_based_nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
-        MutableMesh<3,3> mesh_based_mesh(mesh_based_nodes);
+        MutableMesh<3, 3> mesh_based_mesh(mesh_based_nodes);
         std::vector<CellPtr> mesh_based_cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 3> mesh_based_cells_generator;
         mesh_based_cells_generator.GenerateBasic(mesh_based_cells, mesh_based_mesh.GetNumNodes());
         MeshBasedCellPopulation<3> mesh_based_cell_population(mesh_based_mesh, mesh_based_cells);
 
         // Call ClearAppliedForce() on each node (needed to avoid tripping an assertion when accessing node attributes)
-        for (AbstractMesh<3,3>::NodeIterator node_iter = mesh_based_cell_population.rGetMesh().GetNodeIteratorBegin();
+        for (AbstractMesh<3, 3>::NodeIterator node_iter = mesh_based_cell_population.rGetMesh().GetNodeIteratorBegin();
              node_iter != mesh_based_cell_population.rGetMesh().GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -957,7 +957,7 @@ public:
         std::string mesh_based_results_dir = mesh_based_output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a NodeNelocityWriter and test that the correct output is generated
-        NodeVelocityWriter<3,3> mesh_based_writer;
+        NodeVelocityWriter<3, 3> mesh_based_writer;
         mesh_based_writer.OpenOutputFile(mesh_based_output_file_handler);
         mesh_based_writer.WriteTimeStamp();
         mesh_based_writer.Visit(&mesh_based_cell_population);
@@ -986,7 +986,7 @@ public:
         NodeBasedCellPopulation<3> node_based_cell_population(node_based_mesh, node_based_cells);
 
         // Call ClearAppliedForce() on each node (needed to avoid tripping an assertion when accessing node attributes)
-        for (AbstractMesh<3,3>::NodeIterator node_iter = node_based_cell_population.rGetMesh().GetNodeIteratorBegin();
+        for (AbstractMesh<3, 3>::NodeIterator node_iter = node_based_cell_population.rGetMesh().GetNodeIteratorBegin();
              node_iter != node_based_cell_population.rGetMesh().GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -999,7 +999,7 @@ public:
         std::string node_based_results_dir = node_based_output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a NodeNelocityWriter and test that the correct output is generated
-        NodeVelocityWriter<3,3> node_based_writer;
+        NodeVelocityWriter<3, 3> node_based_writer;
         node_based_writer.OpenOutputFile(node_based_output_file_handler);
         node_based_writer.WriteTimeStamp();
         node_based_writer.Visit(&node_based_cell_population);
@@ -1048,7 +1048,7 @@ public:
 
         // Create a simple 2D VertexBasedCellPopulation
         HoneycombVertexMeshGenerator vertex_based_generator(4, 6);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_vertex_based_mesh = vertex_based_generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_vertex_based_mesh = vertex_based_generator.GetMesh();
         std::vector<CellPtr> vertex_based_cells;
         boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> vertex_based_cells_generator;
@@ -1056,7 +1056,7 @@ public:
         VertexBasedCellPopulation<2> vertex_based_cell_population(*p_vertex_based_mesh, vertex_based_cells);
 
         // Call ClearAppliedForce() on each node (needed to avoid tripping an assertion when accessing node attributes)
-        for (AbstractMesh<2,2>::NodeIterator node_iter = vertex_based_cell_population.rGetMesh().GetNodeIteratorBegin();
+        for (AbstractMesh<2, 2>::NodeIterator node_iter = vertex_based_cell_population.rGetMesh().GetNodeIteratorBegin();
              node_iter != vertex_based_cell_population.rGetMesh().GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -1080,7 +1080,7 @@ public:
         std::string vertex_based_results_dir = vertex_based_output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a NodeNelocityWriter and test that the correct output is generated
-        NodeVelocityWriter<2,2> vertex_based_writer;
+        NodeVelocityWriter<2, 2> vertex_based_writer;
         vertex_based_writer.OpenOutputFile(vertex_based_output_file_handler);
         vertex_based_writer.WriteTimeStamp();
         vertex_based_writer.Visit(&vertex_based_cell_population);
@@ -1108,7 +1108,7 @@ public:
         location_indices.push_back(13);
         CaBasedCellPopulation<2> ca_based_cell_population(*p_ca_based_mesh, ca_based_cells, location_indices);
 
-        NodeVelocityWriter<2,2> node_velocity_writer;
+        NodeVelocityWriter<2, 2> node_velocity_writer;
         TS_ASSERT_THROWS_THIS(node_velocity_writer.Visit(&ca_based_cell_population),
             "NodeVelocityWriter cannot be used with a CaBasedCellPopulation");
 
@@ -1131,7 +1131,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "NodeVelocityWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_population_writer = new NodeVelocityWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_population_writer = new NodeVelocityWriter<2, 2>();
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
             output_arch << p_population_writer;
@@ -1139,7 +1139,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_population_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_population_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
             input_arch >> p_population_writer_2;
@@ -1153,7 +1153,7 @@ public:
 
         // Test with a VerexBasedCellPopulation
         HoneycombVertexMeshGenerator generator(4, 4);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -1171,7 +1171,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a RadialCellDataDistributionWriter and test that the correct output is generated
-        RadialCellDataDistributionWriter<2,2> radial_writer;
+        RadialCellDataDistributionWriter<2, 2> radial_writer;
         radial_writer.SetVariableName("this average");
         radial_writer.SetNumRadialBins(3);
         radial_writer.OpenOutputFile(output_file_handler);
@@ -1196,7 +1196,7 @@ public:
         // Test with a MeshBasedCellPopulation
         {
             HoneycombMeshGenerator tet_generator(5, 5, 0);
-            boost::shared_ptr<MutableMesh<2,2> > p_tet_mesh = tet_generator.GetMesh();
+            boost::shared_ptr<MutableMesh<2, 2> > p_tet_mesh = tet_generator.GetMesh();
             std::vector<CellPtr> mesh_based_cells;
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> mesh_based_cells_generator;
             mesh_based_cells_generator.GenerateBasic(mesh_based_cells, p_tet_mesh->GetNumNodes());
@@ -1274,9 +1274,9 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "RadialCellDataDistributionWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new RadialCellDataDistributionWriter<2,2>();
-            static_cast<RadialCellDataDistributionWriter<2,2>*>(p_cell_writer)->SetVariableName("radial average");
-            static_cast<RadialCellDataDistributionWriter<2,2>*>(p_cell_writer)->SetNumRadialBins(5);
+            AbstractCellBasedWriter<2, 2>* const p_cell_writer = new RadialCellDataDistributionWriter<2, 2>();
+            static_cast<RadialCellDataDistributionWriter<2, 2>*>(p_cell_writer)->SetVariableName("radial average");
+            static_cast<RadialCellDataDistributionWriter<2, 2>*>(p_cell_writer)->SetNumRadialBins(5);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -1286,13 +1286,13 @@ public:
         }
         PetscTools::Barrier(); // Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_cell_writer_2;
 
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
             input_arch >> p_cell_writer_2;
 
-            typedef RadialCellDataDistributionWriter<2,2> RadialWriter;
+            typedef RadialCellDataDistributionWriter<2, 2> RadialWriter;
             TS_ASSERT_EQUALS(static_cast<RadialWriter*>(p_cell_writer_2)->GetVariableName(), "radial average");
             TS_ASSERT_EQUALS(static_cast<RadialWriter*>(p_cell_writer_2)->GetNumRadialBins(), 5u);
             delete p_cell_writer_2;
@@ -1305,7 +1305,7 @@ public:
 
         // Create a simple 2D VertexBasedCellPopulation
         HoneycombVertexMeshGenerator generator(4, 6);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -1318,7 +1318,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a VertexT1SwapLocationsWriter and test that the correct output is generated
-        VertexT1SwapLocationsWriter<2,2> t1_swaps_writer;
+        VertexT1SwapLocationsWriter<2, 2> t1_swaps_writer;
         t1_swaps_writer.OpenOutputFile(output_file_handler);
         t1_swaps_writer.WriteTimeStamp();
         t1_swaps_writer.Visit(&cell_population);
@@ -1339,7 +1339,7 @@ public:
         {
             // Coverage of the Visit() method when called on a MeshBasedCellPopulation
             HoneycombMeshGenerator tet_generator(5, 5, 0);
-            boost::shared_ptr<MutableMesh<2,2> > p_tet_mesh = tet_generator.GetMesh();
+            boost::shared_ptr<MutableMesh<2, 2> > p_tet_mesh = tet_generator.GetMesh();
             std::vector<CellPtr> mesh_based_cells;
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> mesh_based_cells_generator;
             mesh_based_cells_generator.GenerateBasic(mesh_based_cells, p_tet_mesh->GetNumNodes());
@@ -1405,7 +1405,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "VertexT1SwapLocationsWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new VertexT1SwapLocationsWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_cell_writer = new VertexT1SwapLocationsWriter<2, 2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -1414,7 +1414,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_cell_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
             input_arch >> p_cell_writer_2;
@@ -1428,7 +1428,7 @@ public:
 
         // Create a simple 2D VertexBasedCellPopulation
         HoneycombVertexMeshGenerator generator(4, 6);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -1441,7 +1441,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a VertexT2SwapLocationsWriter and test that the correct output is generated
-        VertexT2SwapLocationsWriter<2,2> t2_swaps_writer;
+        VertexT2SwapLocationsWriter<2, 2> t2_swaps_writer;
         t2_swaps_writer.OpenOutputFile(output_file_handler);
         t2_swaps_writer.WriteTimeStamp();
         t2_swaps_writer.Visit(&cell_population);
@@ -1462,7 +1462,7 @@ public:
         {
             // Coverage of the Visit() method when called on a MeshBasedCellPopulation
             HoneycombMeshGenerator tet_generator(5, 5, 0);
-            boost::shared_ptr<MutableMesh<2,2> > p_tet_mesh = tet_generator.GetMesh();
+            boost::shared_ptr<MutableMesh<2, 2> > p_tet_mesh = tet_generator.GetMesh();
             std::vector<CellPtr> mesh_based_cells;
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> mesh_based_cells_generator;
             mesh_based_cells_generator.GenerateBasic(mesh_based_cells, p_tet_mesh->GetNumNodes());
@@ -1528,7 +1528,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "VertexT2SwapLocationsWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new VertexT2SwapLocationsWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_cell_writer = new VertexT2SwapLocationsWriter<2, 2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -1537,7 +1537,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_cell_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
             input_arch >> p_cell_writer_2;
@@ -1551,7 +1551,7 @@ public:
 
         // Create a simple 2D VertexBasedCellPopulation
         HoneycombVertexMeshGenerator generator(4, 6);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -1564,7 +1564,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a VertexT1SwapLocationsWriter and test that the correct output is generated
-        VertexT3SwapLocationsWriter<2,2> t3_swaps_writer;
+        VertexT3SwapLocationsWriter<2, 2> t3_swaps_writer;
         t3_swaps_writer.OpenOutputFile(output_file_handler);
         t3_swaps_writer.WriteTimeStamp();
         t3_swaps_writer.Visit(&cell_population);
@@ -1585,7 +1585,7 @@ public:
         {
             // Coverage of the Visit() method when called on a MeshBasedCellPopulation
             HoneycombMeshGenerator tet_generator(5, 5, 0);
-            boost::shared_ptr<MutableMesh<2,2> > p_tet_mesh = tet_generator.GetMesh();
+            boost::shared_ptr<MutableMesh<2, 2> > p_tet_mesh = tet_generator.GetMesh();
             std::vector<CellPtr> mesh_based_cells;
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> mesh_based_cells_generator;
             mesh_based_cells_generator.GenerateBasic(mesh_based_cells, p_tet_mesh->GetNumNodes());
@@ -1651,7 +1651,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "VertexT3SwapLocationsWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new VertexT3SwapLocationsWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_cell_writer = new VertexT3SwapLocationsWriter<2, 2>();
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
             output_arch << p_cell_writer;
@@ -1659,7 +1659,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_cell_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
             input_arch >> p_cell_writer_2;
@@ -1673,7 +1673,7 @@ public:
 
         // Create a simple 2D VertexBasedCellPopulation
         HoneycombVertexMeshGenerator generator(4, 6);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -1686,7 +1686,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a VertexIntersectionSwapLocationsWriter and test that the correct output is generated
-        VertexIntersectionSwapLocationsWriter<2,2> intersection_swaps_writer;
+        VertexIntersectionSwapLocationsWriter<2, 2> intersection_swaps_writer;
         intersection_swaps_writer.OpenOutputFile(output_file_handler);
         intersection_swaps_writer.WriteTimeStamp();
         intersection_swaps_writer.Visit(&cell_population);
@@ -1707,7 +1707,7 @@ public:
         {
             // Coverage of the Visit() method when called on a MeshBasedCellPopulation
             HoneycombMeshGenerator tet_generator(5, 5, 0);
-            boost::shared_ptr<MutableMesh<2,2> > p_tet_mesh = tet_generator.GetMesh();
+            boost::shared_ptr<MutableMesh<2, 2> > p_tet_mesh = tet_generator.GetMesh();
             std::vector<CellPtr> mesh_based_cells;
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> mesh_based_cells_generator;
             mesh_based_cells_generator.GenerateBasic(mesh_based_cells, p_tet_mesh->GetNumNodes());
@@ -1773,7 +1773,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "VertexIntersectionSwapLocationsWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new VertexIntersectionSwapLocationsWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_cell_writer = new VertexIntersectionSwapLocationsWriter<2, 2>();
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
             output_arch << p_cell_writer;
@@ -1781,7 +1781,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_cell_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
             input_arch >> p_cell_writer_2;
@@ -1800,7 +1800,7 @@ public:
         nodes.push_back(new Node<3>(2, true,  1.0, 0.0, 1.0));
         nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 1.0));
         nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
-        MutableMesh<3,3> mesh(nodes);
+        MutableMesh<3, 3> mesh(nodes);
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
@@ -1814,7 +1814,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a VoronoiDataWriter and test that the correct output is generated
-        VoronoiDataWriter<3,3> voronoi_writer;
+        VoronoiDataWriter<3, 3> voronoi_writer;
         voronoi_writer.OpenOutputFile(output_file_handler);
         voronoi_writer.WriteTimeStamp();
         voronoi_writer.Visit(&cell_population);
@@ -1832,7 +1832,7 @@ public:
 
         FileComparison(results_dir + "voronoi.dat", "cell_based/test/data/TestCellPopulationWriters/voronoi_twice.dat").CompareFiles();
 
-        VoronoiDataWriter<2,2> voronoi_writer_2d;
+        VoronoiDataWriter<2, 2> voronoi_writer_2d;
 
         // Test the correct exception is thrown if using a NodeBasedCellPopulation
         std::vector<Node<2>* > node_based_nodes;
@@ -1883,7 +1883,7 @@ public:
 
         // Test the correct exception is thrown if using a PottsBasedCellPopulation
         HoneycombVertexMeshGenerator vertex_based_generator(4, 6);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_vertex_mesh = vertex_based_generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_vertex_mesh = vertex_based_generator.GetMesh();
         std::vector<CellPtr> vertex_based_cells;
         boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> vertex_based_cells_generator;
@@ -1901,7 +1901,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "VoronoiDataWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_population_writer = new VoronoiDataWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_population_writer = new VoronoiDataWriter<2, 2>();
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
             output_arch << p_population_writer;
@@ -1909,7 +1909,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_population_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_population_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
             input_arch >> p_population_writer_2;

@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(Vec currentSolution, bool computeMatrix)
+void OperatorSplittingMonodomainSolver<ELEMENT_DIM, SPACE_DIM>::SetupLinearSystem(Vec currentSolution, bool computeMatrix)
 {
     assert(this->mpLinearSystem->rGetLhsMatrix() != NULL);
     assert(this->mpLinearSystem->rGetRhsVector() != NULL);
@@ -50,7 +50,7 @@ void OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem
         mpMonodomainAssembler->SetMatrixToAssemble(this->mpLinearSystem->rGetLhsMatrix());
         mpMonodomainAssembler->AssembleMatrix();
 
-        MassMatrixAssembler<ELEMENT_DIM,SPACE_DIM> mass_matrix_assembler(this->mpMesh, HeartConfig::Instance()->GetUseMassLumping());
+        MassMatrixAssembler<ELEMENT_DIM, SPACE_DIM> mass_matrix_assembler(this->mpMesh, HeartConfig::Instance()->GetUseMassLumping());
         mass_matrix_assembler.SetMatrixToAssemble(mMassMatrix);
         mass_matrix_assembler.Assemble();
 
@@ -106,7 +106,7 @@ void OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::PrepareForSetupLinearSystem(Vec currentSolution)
+void OperatorSplittingMonodomainSolver<ELEMENT_DIM, SPACE_DIM>::PrepareForSetupLinearSystem(Vec currentSolution)
 {
     double time = PdeSimulationTime::GetTime();
     double dt = PdeSimulationTime::GetPdeTimeStep();
@@ -114,7 +114,7 @@ void OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::PrepareForSetupLi
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::FollowingSolveLinearSystem(Vec currentSolution)
+void OperatorSplittingMonodomainSolver<ELEMENT_DIM, SPACE_DIM>::FollowingSolveLinearSystem(Vec currentSolution)
 {
     // solve cell models for second half timestep
     double time = PdeSimulationTime::GetTime();
@@ -123,7 +123,7 @@ void OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::FollowingSolveLin
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
+void OperatorSplittingMonodomainSolver<ELEMENT_DIM, SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
 {
     if (this->mpLinearSystem != NULL)
     {
@@ -131,7 +131,7 @@ void OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolv
     }
 
     // call base class version...
-    AbstractLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,1>::InitialiseForSolve(initialSolution);
+    AbstractLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 1>::InitialiseForSolve(initialSolution);
 
     //..then do a bit extra
     if (HeartConfig::Instance()->GetUseAbsoluteTolerance())
@@ -164,11 +164,11 @@ void OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolv
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::OperatorSplittingMonodomainSolver(
-            AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-            MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* pTissue,
-            BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,1>* pBoundaryConditions)
-    : AbstractDynamicLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,1>(pMesh),
+OperatorSplittingMonodomainSolver<ELEMENT_DIM, SPACE_DIM>::OperatorSplittingMonodomainSolver(
+            AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+            MonodomainTissue<ELEMENT_DIM, SPACE_DIM>* pTissue,
+            BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 1>* pBoundaryConditions)
+    : AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 1>(pMesh),
       mpBoundaryConditions(pBoundaryConditions),
       mpMonodomainTissue(pTissue)
 {
@@ -176,8 +176,8 @@ OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::OperatorSplittingMonod
     assert(pBoundaryConditions);
     this->mMatrixIsConstant = true;
 
-    mpMonodomainAssembler = new MonodomainAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpMonodomainTissue);
-    mpNeumannSurfaceTermsAssembler = new NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM,1>(pMesh,pBoundaryConditions);
+    mpMonodomainAssembler = new MonodomainAssembler<ELEMENT_DIM, SPACE_DIM>(this->mpMesh,this->mpMonodomainTissue);
+    mpNeumannSurfaceTermsAssembler = new NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM, SPACE_DIM, 1>(pMesh,pBoundaryConditions);
 
     // Tell tissue there's no need to replicate ionic caches
     pTissue->SetCacheReplication(false);
@@ -185,7 +185,7 @@ OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::OperatorSplittingMonod
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::~OperatorSplittingMonodomainSolver()
+OperatorSplittingMonodomainSolver<ELEMENT_DIM, SPACE_DIM>::~OperatorSplittingMonodomainSolver()
 {
     delete mpMonodomainAssembler;
     delete mpNeumannSurfaceTermsAssembler;
@@ -198,8 +198,8 @@ OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>::~OperatorSplittingMono
 }
 
 // Explicit instantiation
-template class OperatorSplittingMonodomainSolver<1,1>;
-template class OperatorSplittingMonodomainSolver<1,2>;
-template class OperatorSplittingMonodomainSolver<1,3>;
-template class OperatorSplittingMonodomainSolver<2,2>;
-template class OperatorSplittingMonodomainSolver<3,3>;
+template class OperatorSplittingMonodomainSolver<1, 1>;
+template class OperatorSplittingMonodomainSolver<1, 2>;
+template class OperatorSplittingMonodomainSolver<1, 3>;
+template class OperatorSplittingMonodomainSolver<2, 2>;
+template class OperatorSplittingMonodomainSolver<3, 3>;

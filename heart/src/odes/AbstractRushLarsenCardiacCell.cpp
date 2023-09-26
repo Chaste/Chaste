@@ -83,10 +83,10 @@ OdeSolution AbstractRushLarsenCardiacCell::Compute(double tStart, double tEnd, d
     std::vector<double> beta(mNumberOfStateVariables, 0);
 
     // Loop over time
-    for (unsigned i=0; i<n_steps; ++i)
+    for (unsigned i = 0; i<n_steps; ++i)
     {
         double curr_time = tStart;
-        for (unsigned j=0; j<n_small_steps; ++j)
+        for (unsigned j = 0; j<n_small_steps; ++j)
         {
             curr_time = tStart + i*tSamp + j*mDt;
             EvaluateEquations(curr_time, dy, alpha, beta);

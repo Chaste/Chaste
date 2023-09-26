@@ -82,10 +82,10 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
     *p_node_file << num_nodes << "\n";
 
     // Write each node's data
-    for (unsigned item_num=0; item_num<num_nodes; item_num++)
+    for (unsigned item_num = 0; item_num<num_nodes; item_num++)
     {
         std::vector<double> current_item = this->GetNextNode(); //this->mNodeData[item_num];
-        for (unsigned i=0; i<SPACE_DIM; ++i)
+        for (unsigned i = 0; i<SPACE_DIM; ++i)
         {
             *p_node_file << current_item[i] << "\t";
         }
@@ -128,12 +128,12 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 
     // Write each element's data
     unsigned nodes_per_element = ELEMENT_DIM+1;
-    for (unsigned item_num=0; item_num<num_elements; item_num++)
+    for (unsigned item_num = 0; item_num<num_elements; item_num++)
     {
         ElementData element_data = this->GetNextElement();
 
         std::vector<unsigned> current_item = element_data.NodeIndices;
-        for (unsigned i=0; i<nodes_per_element; ++i)
+        for (unsigned i = 0; i<nodes_per_element; ++i)
         {
             if (this->mIndexFromZero)
             {
@@ -162,10 +162,10 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 
         // Write each face's data
         double material_property = 0.0;
-        for (unsigned item_num=0; item_num<num_faces; item_num++)
+        for (unsigned item_num = 0; item_num<num_faces; item_num++)
         {
             ElementData current_item = this->GetNextBoundaryElement();
-            for (unsigned i=0; i<ELEMENT_DIM; ++i)
+            for (unsigned i = 0; i<ELEMENT_DIM; ++i)
             {
                 if (this->mIndexFromZero)
                 {
@@ -307,14 +307,14 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
 {
     out_stream p_node_file = OpenNodeFile(true);
 
-    typedef typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator NodeIterType;
+    typedef typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator NodeIterType;
 
     for (NodeIterType iter = this->mpDistributedMesh->GetNodeIteratorBegin();
          iter != this->mpDistributedMesh->GetNodeIteratorEnd();
          ++iter)
     {
         const c_vector<double, SPACE_DIM>& r_current_item = iter->rGetLocation();
-        for (unsigned i=0; i<SPACE_DIM; ++i)
+        for (unsigned i = 0; i<SPACE_DIM; ++i)
         {
             *p_node_file << r_current_item[i] << "\t";
         }
@@ -332,7 +332,7 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
 
     out_stream p_element_file = OpenElementFile(true);
 
-    typedef typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator ElemIterType;
+    typedef typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator ElemIterType;
 
     for (ElemIterType iter = this->mpDistributedMesh->GetElementIteratorBegin();
          iter != this->mpDistributedMesh->GetElementIteratorEnd();
@@ -340,7 +340,7 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
     {
         if (this->mpDistributedMesh->CalculateDesignatedOwnershipOfElement(iter->GetIndex()))
         {
-            for (unsigned i=0; i<this->mNodesPerElement; ++i)
+            for (unsigned i = 0; i<this->mNodesPerElement; ++i)
             {
                 if (this->mIndexFromZero)
                 {
@@ -362,7 +362,7 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
     {
         out_stream p_face_file = OpenFaceFile(true);
 
-        typedef typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::BoundaryElementIterator BoundaryElemIterType;
+        typedef typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::BoundaryElementIterator BoundaryElemIterType;
 
         for (BoundaryElemIterType iter = this->mpDistributedMesh->GetBoundaryElementIteratorBegin();
              iter != this->mpDistributedMesh->GetBoundaryElementIteratorEnd();
@@ -370,7 +370,7 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
         {
             if (this->mpDistributedMesh->CalculateDesignatedOwnershipOfBoundaryElement((*iter)->GetIndex()))
             {
-                for (unsigned i=0; i<ELEMENT_DIM; ++i)
+                for (unsigned i = 0; i<ELEMENT_DIM; ++i)
                 {
                     if (this->mIndexFromZero)
                     {
@@ -412,9 +412,9 @@ void MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesFooter()
 
 
 // Explicit instantiation
-template class MeshalyzerMeshWriter<1,1>;
-template class MeshalyzerMeshWriter<1,2>;
-template class MeshalyzerMeshWriter<1,3>;
-template class MeshalyzerMeshWriter<2,2>;
-template class MeshalyzerMeshWriter<2,3>;
-template class MeshalyzerMeshWriter<3,3>;
+template class MeshalyzerMeshWriter<1, 1>;
+template class MeshalyzerMeshWriter<1, 2>;
+template class MeshalyzerMeshWriter<1, 3>;
+template class MeshalyzerMeshWriter<2, 2>;
+template class MeshalyzerMeshWriter<2, 3>;
+template class MeshalyzerMeshWriter<3, 3>;

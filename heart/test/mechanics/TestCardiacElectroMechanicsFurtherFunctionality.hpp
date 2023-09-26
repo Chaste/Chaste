@@ -68,7 +68,7 @@ public:
                                                      0.01, /* contraction model ode timestep */
                                                      "");
 
-        c_vector<double,2> pos;
+        c_vector<double, 2> pos;
         pos(0) = 1.0;
         pos(1) = 0.0;
         problem.SetWatchedPosition(pos);
@@ -99,7 +99,7 @@ public:
         PlaneStimulusCellFactory<CML_noble_varghese_kohl_noble_1998_basic_with_sac, 2> cell_factory(0.0);
 
         // set up two meshes of 1mm by 1mm by 1mm
-        TetrahedralMesh<2,2> electrics_mesh;
+        TetrahedralMesh<2, 2> electrics_mesh;
         electrics_mesh.ConstructRegularSlabMesh(0.02, 0.1, 0.1);
 
         QuadraticMesh<2> mechanics_mesh(0.1, 0.1, 0.1);
@@ -112,8 +112,8 @@ public:
         problem_defn.SetMechanicsSolveTimestep(1.0);
 
         std::vector<unsigned> fixed_nodes;
-        std::vector<c_vector<double,2> > locations;
-        for ( TetrahedralMesh<2,2>::BoundaryNodeIterator iter = mechanics_mesh.GetBoundaryNodeIteratorBegin();
+        std::vector<c_vector<double, 2> > locations;
+        for ( TetrahedralMesh<2, 2>::BoundaryNodeIterator iter = mechanics_mesh.GetBoundaryNodeIteratorBegin();
               iter != mechanics_mesh.GetBoundaryNodeIteratorEnd();
               ++iter)
         {
@@ -122,7 +122,7 @@ public:
 
             fixed_nodes.push_back((*iter)->GetIndex());
 
-            c_vector<double,2> new_position;
+            c_vector<double, 2> new_position;
             new_position(0) = 1.2*X;
             new_position(1) = Y/1.2;
             locations.push_back(new_position);
@@ -132,7 +132,7 @@ public:
         // Set deformation not affecting conductivity, but affecting cell models.
         problem_defn.SetDeformationAffectsElectrophysiology(false,true);
 
-        CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
+        CardiacElectroMechanicsProblem<2, 1> problem(INCOMPRESSIBLE,
                                                     MONODOMAIN,
                                                     &electrics_mesh,
                                                     &mechanics_mesh,
@@ -166,7 +166,7 @@ public:
         // test directly that the conductivity hasn't been modified
         for (unsigned i = 0; i<electrics_mesh.GetNumElements(); ++i)
         {
-            const c_matrix<double,2,2>& r_tensor = problem.mpElectricsProblem->GetTissue()->rGetIntracellularConductivityTensor(i);
+            const c_matrix<double,2, 2>& r_tensor = problem.mpElectricsProblem->GetTissue()->rGetIntracellularConductivityTensor(i);
             TS_ASSERT_DELTA(r_tensor(0,0), default_conductivity, 1e-9);
             TS_ASSERT_DELTA(r_tensor(0,1), 0.0,                  1e-9);
             TS_ASSERT_DELTA(r_tensor(1,0), 0.0,                  1e-9);
@@ -211,7 +211,7 @@ public:
         PlaneStimulusCellFactory<CML_noble_varghese_kohl_noble_1998_basic_with_sac, 2> cell_factory(0.0);
 
         // set up two meshes of 1mm by 1mm by 1mm
-        TetrahedralMesh<2,2> electrics_mesh;
+        TetrahedralMesh<2, 2> electrics_mesh;
         electrics_mesh.ConstructRegularSlabMesh(0.025, 0.1, 0.1); // the h should be such that there are an even number of elements per dim, so
                                                                   // electrical element centroids don't lie on mechanics element boundaries
                                                                   // (for the below test to not have to worry about boundary cases).
@@ -232,7 +232,7 @@ public:
         problem_defn.SetDeformationAffectsElectrophysiology(true,true);
 
 
-        CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
+        CardiacElectroMechanicsProblem<2, 1> problem(INCOMPRESSIBLE,
                                                     MONODOMAIN,
                                                     &electrics_mesh,
                                                     &mechanics_mesh,
@@ -258,12 +258,12 @@ public:
         // so need to do the following, which is normally done inside the Solve
         problem.mpCardiacMechSolver->ComputeDeformationGradientAndStretchInEachElement(problem.mDeformationGradientsForEachMechanicsElement, problem.mStretchesForEachMechanicsElement);
 
-        c_matrix<double,2,2> F;
+        c_matrix<double,2, 2> F;
         F(0,0) = 1.01;
         F(1,0) = 0.01;
         F(0,1) = 0.01;
         F(1,1) = 1.01;
-        c_matrix<double,2,2> inverse_C = prod(Inverse(F), trans(Inverse(F)));
+        c_matrix<double,2, 2> inverse_C = prod(Inverse(F), trans(Inverse(F)));
 
         // just get the default conductivity so don't to hardcode it (1.75 at the moment)
         c_vector<double, 2> conductivities;
@@ -275,8 +275,8 @@ public:
         for (unsigned i = 0; i<electrics_mesh.GetNumElements(); ++i)
         {
             // sigma = F^{-1} sigma_undef F^{-T},
-            const c_matrix<double,2,2>& r_tensor = problem.mpElectricsProblem->GetTissue()->rGetIntracellularConductivityTensor(i);
-            c_vector<double,2> centroid = electrics_mesh.GetElement(i)->CalculateCentroid();
+            const c_matrix<double,2, 2>& r_tensor = problem.mpElectricsProblem->GetTissue()->rGetIntracellularConductivityTensor(i);
+            c_vector<double, 2> centroid = electrics_mesh.GetElement(i)->CalculateCentroid();
             if (centroid(0)+centroid(1)<0.1)
             {
                 // in mechanics element with corners (0,0),(0,1),(1,0) -- F=I here
@@ -311,7 +311,7 @@ public:
 
             double tissue_init_width = 0.5;
 
-            TetrahedralMesh<2,2> electrics_mesh;
+            TetrahedralMesh<2, 2> electrics_mesh;
             electrics_mesh.ConstructRegularSlabMesh(0.0125, tissue_init_width, 0.025);
 
             QuadraticMesh<2> mechanics_mesh;
@@ -319,14 +319,14 @@ public:
 
             // Fix every single node, to the deformation x=alpha X, y = Y/alpha
             std::vector<unsigned> fixed_nodes;
-            std::vector<c_vector<double,2> > fixed_node_locations;
+            std::vector<c_vector<double, 2> > fixed_node_locations;
 
             for (unsigned i = 0; i<mechanics_mesh.GetNumNodes(); ++i)
             {
                 double X = mechanics_mesh.GetNode(i)->rGetLocation()[0];
                 double Y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
 
-                c_vector<double,2> new_position;
+                c_vector<double, 2> new_position;
                 new_position(0) = 0.8*X;
                 new_position(1) = Y/0.8;
                 fixed_nodes.push_back(i);
@@ -354,7 +354,7 @@ public:
             // Small enough end-time so that the wavefront doesn't reach the other side..
             HeartConfig::Instance()->SetSimulationDuration(5.0);
 
-            CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
+            CardiacElectroMechanicsProblem<2, 1> problem(INCOMPRESSIBLE,
                                                       MONODOMAIN,
                                                       &electrics_mesh,
                                                       &mechanics_mesh,
@@ -408,7 +408,7 @@ public:
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-5000*1000);
 
-        TetrahedralMesh<2,2> electrics_mesh;
+        TetrahedralMesh<2, 2> electrics_mesh;
         electrics_mesh.ConstructRegularSlabMesh(0.02/*stepsize*/, 0.1/*length*/, 0.1/*width*/);
 
         QuadraticMesh<2> mechanics_mesh;
@@ -429,7 +429,7 @@ public:
         std::vector<AbstractMaterialLaw<2>*> laws;
         CompressibleMooneyRivlinMaterialLaw<2> stiff_law(1.0/*effects stiffness*/, 1.0/*affects amount of compressibility*/);
         CompressibleMooneyRivlinMaterialLaw<2> soft_law(1.0/5.0/*effects stiffness*/, 1.0/*affects amount of compressibility*/);
-        for (TetrahedralMesh<2,2>::ElementIterator iter = mechanics_mesh.GetElementIteratorBegin();
+        for (TetrahedralMesh<2, 2>::ElementIterator iter = mechanics_mesh.GetElementIteratorBegin();
              iter != mechanics_mesh.GetElementIteratorEnd();
              ++iter)
         {
@@ -447,7 +447,7 @@ public:
         problem_defn.SetMaterialLaw(COMPRESSIBLE,laws);
 
 
-        CardiacElectroMechanicsProblem<2,1> problem(COMPRESSIBLE,
+        CardiacElectroMechanicsProblem<2, 1> problem(COMPRESSIBLE,
                                                     MONODOMAIN,
                                                     &electrics_mesh,
                                                     &mechanics_mesh,
@@ -459,7 +459,7 @@ public:
         problem.Solve();
 
         // test by checking the length of the tissue against hardcoded value
-        std::vector<c_vector<double,2> >& r_deformed_position = problem.rGetDeformedPosition();
+        std::vector<c_vector<double, 2> >& r_deformed_position = problem.rGetDeformedPosition();
 
         // check node 5 starts at (1,0)
         assert(fabs(mechanics_mesh.GetNode(5)->rGetLocation()[0] - 0.1)<1e-6);

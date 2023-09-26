@@ -130,18 +130,18 @@ public:
             TS_ASSERT_EQUALS(final_collection.HasPropertyType<CellId>(), true);
             TS_ASSERT_EQUALS(p_cell->GetAncestor(), 2u);
 
-            for (auto it = final_collection.Begin(); it != final_collection.End(); ++it)
+            for (const auto& it : final_collection)
             {
-                TS_ASSERT_EQUALS(final_collection.HasProperty(*it), true);
+                TS_ASSERT_EQUALS(final_collection.HasProperty(it), true);
 
-                bool is_wildtype = (*it)->IsType<WildTypeCellMutationState>();
-                bool is_label = (*it)->IsType<CellLabel>();
-                bool is_ancestor = (*it)->IsType<CellAncestor>();
-                bool is_cellid = (*it)->IsType<CellId>();
-                bool is_data = (*it)->IsType<CellData>();
-                bool is_edge_data = (*it)->IsType<CellEdgeData>();
-                bool is_vec_data = (*it)->IsType<CellVecData>();
-                bool is_stem = (*it)->IsType<StemCellProliferativeType>();
+                bool is_wildtype = it->IsType<WildTypeCellMutationState>();
+                bool is_label = it->IsType<CellLabel>();
+                bool is_ancestor = it->IsType<CellAncestor>();
+                bool is_cellid = it->IsType<CellId>();
+                bool is_data = it->IsType<CellData>();
+                bool is_edge_data = it->IsType<CellEdgeData>();
+                bool is_vec_data = it->IsType<CellVecData>();
+                bool is_stem = it->IsType<StemCellProliferativeType>();
 
                 bool is_any_of_above = is_wildtype || is_label || is_ancestor || is_cellid || is_data || is_edge_data || is_vec_data || is_stem;
                 TS_ASSERT_EQUALS(is_any_of_above, true);
@@ -235,18 +235,18 @@ public:
             ReplicatableVector rep_item_1(p_cell_vec_data->GetItem("item 1"));
             TS_ASSERT_DELTA(rep_item_1[0], -17.3, 2e-14);
 
-            for (auto it = collection.Begin(); it != collection.End(); ++it)
+            for (const auto& it : collection)
             {
-                TS_ASSERT_EQUALS(collection.HasProperty(*it), true);
+                TS_ASSERT_EQUALS(collection.HasProperty(it), true);
 
-                bool is_wildtype = (*it)->IsType<WildTypeCellMutationState>();
-                bool is_label = (*it)->IsType<CellLabel>();
-                bool is_ancestor = (*it)->IsType<CellAncestor>();
-                bool is_cellid = (*it)->IsType<CellId>();
-                bool is_data = (*it)->IsType<CellData>();
-                bool is_edge_data = (*it)->IsType<CellEdgeData>();
-                bool is_vec_data = (*it)->IsType<CellVecData>();
-                bool is_stem = (*it)->IsType<StemCellProliferativeType>();
+                bool is_wildtype = it->IsType<WildTypeCellMutationState>();
+                bool is_label = it->IsType<CellLabel>();
+                bool is_ancestor = it->IsType<CellAncestor>();
+                bool is_cellid = it->IsType<CellId>();
+                bool is_data = it->IsType<CellData>();
+                bool is_edge_data = it->IsType<CellEdgeData>();
+                bool is_vec_data = it->IsType<CellVecData>();
+                bool is_stem = it->IsType<StemCellProliferativeType>();
 
                 bool is_any_of_above = is_wildtype || is_label || is_ancestor || is_cellid || is_data || is_edge_data || is_vec_data || is_stem;
                 TS_ASSERT_EQUALS(is_any_of_above, true);

@@ -97,7 +97,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * which have to be implemented. The template variables in the following line are both the dimension
  * of the space.
  */
-class MyPde : public AbstractLinearEllipticPde<2,2>
+class MyPde : public AbstractLinearEllipticPde<2, 2>
 {
 private:
     /* For efficiency, we will save the diffusion tensor that will be returned by one of the
@@ -106,7 +106,7 @@ private:
      * {{{c_matrix<double,SIZE,SIZE>}}}, which is a uBLAS matrix. We use uBLAS vectors
      * and matrices where small vectors and matrices are needed. Note that uBLAS objects
      * are only particularly efficient if optimisation is on (`CMAKE_BUILD_TYPE=Release``).*/
-    c_matrix<double,2,2> mDiffusionTensor;
+    c_matrix<double,2, 2> mDiffusionTensor;
 
 public:
     /* The constructor just sets up the diffusion tensor. We choose a diffusion tensor which
@@ -122,21 +122,21 @@ public:
     /* The first method which has to be implemented returns the constant
      * (not dependent on u) part of the source term, which for our PDE is
      * x^2^ + y^2^. */
-    double ComputeConstantInUSourceTerm(const ChastePoint<2>& rX, Element<2,2>* pElement)
+    double ComputeConstantInUSourceTerm(const ChastePoint<2>& rX, Element<2, 2>* pElement)
     {
         return rX[0]*rX[0] + rX[1]*rX[1];
     }
 
     /* The second method which has to be implemented returns the coefficient in the linear-in-u
      * part of the source term, which for our PDE is just 1.0. */
-    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<2>& rX, Element<2,2>* pElement)
+    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<2>& rX, Element<2, 2>* pElement)
     {
         return 1.0;
     }
 
     /* The third method returns the diffusion tensor D. Note that the diffusion tensor should
      * be symmetric and positive definite for a physical, well-posed problem. */
-    c_matrix<double,2,2> ComputeDiffusionTerm(const ChastePoint<2>& rX)
+    c_matrix<double,2, 2> ComputeDiffusionTerm(const ChastePoint<2>& rX)
     {
         return mDiffusionTensor;
     }
@@ -157,9 +157,9 @@ public:
          * elements in the mesh ({{{ELEMENT_DIM}}}), and the second is the dimension of the nodes,
          * i.e. the dimension of the space the mesh lives in ({{{SPACE_DIM}}}). Usually
          * {{{ELEMENT_DIM}}} and {{{SPACE_DIM}}} will be equal. */
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
         /* Now declare a tetrahedral mesh with the same dimensions... */
-        TetrahedralMesh<2,2> mesh;
+        TetrahedralMesh<2, 2> mesh;
         /* ... and construct the mesh using the mesh reader. */
         mesh.ConstructFromMeshReader(mesh_reader);
 
@@ -170,7 +170,7 @@ public:
          * three template arguments are ELEMENT_DIM, SPACE_DIM and PROBLEM_DIM, the latter being
          * the number of unknowns we are solving for. We have one unknown (ie u is a scalar, not
          * a vector), so in this case {{{PROBLEM_DIM}}}=1. */
-        BoundaryConditionsContainer<2,2,1> bcc;
+        BoundaryConditionsContainer<2, 2, 1> bcc;
 
         /* Defining the boundary conditions is the only particularly fiddly part of solving PDEs,
          * unless they are very simple, such as u=0 on the boundary, which could be done
@@ -189,7 +189,7 @@ public:
          */
         ConstBoundaryCondition<2>* p_zero_boundary_condition = new ConstBoundaryCondition<2>(0.0);
         /* We then get a boundary node iterator from the mesh... */
-        TetrahedralMesh<2,2>::BoundaryNodeIterator iter = mesh.GetBoundaryNodeIteratorBegin();
+        TetrahedralMesh<2, 2>::BoundaryNodeIterator iter = mesh.GetBoundaryNodeIteratorBegin();
         /* ...and loop over the boundary nodes, getting the x and y values. */
         while (iter < mesh.GetBoundaryNodeIteratorEnd())
         {
@@ -220,7 +220,7 @@ public:
          * To define Neumann bcs, we reuse the zero boundary condition object defined above, but apply it
          * at surface elements.  We loop over these using another iterator provided by the mesh class.
          */
-        TetrahedralMesh<2,2>::BoundaryElementIterator surf_iter
+        TetrahedralMesh<2, 2>::BoundaryElementIterator surf_iter
             = mesh.GetBoundaryElementIteratorBegin();
         while (surf_iter != mesh.GetBoundaryElementIteratorEnd())
         {
@@ -246,7 +246,7 @@ public:
          * {{{ELEMENT_DIM}}} and {{{SPACE_DIM}}}, needs to be given (pointers to) the mesh,
          * pde and boundary conditions.
          */
-        SimpleLinearEllipticSolver<2,2> solver(&mesh, &pde, &bcc);
+        SimpleLinearEllipticSolver<2, 2> solver(&mesh, &pde, &bcc);
 
         /* To solve, just call {{{Solve()}}}. A PETSc vector is returned. */
         Vec result = solver.Solve();
@@ -305,7 +305,7 @@ public:
     {
         /* Create a 10 by 10 by 10 mesh in 3D, this time using the {{{ConstructRegularSlabMesh}}} method
          * on the mesh. The first parameter is the cartesian space-step and the other three parameters are the width, height and depth of the mesh.*/
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructRegularSlabMesh(0.1, 1.0, 1.0, 1.0);
 
         /* Our PDE object should be a class that is derived from the {{{AbstractLinearParabolicPde}}}.
@@ -315,12 +315,12 @@ public:
         HeatEquationWithSourceTerm<3> pde;
 
         /* Create a new boundary conditions container and specify u=1.0 on the boundary. */
-        BoundaryConditionsContainer<3,3,1> bcc;
+        BoundaryConditionsContainer<3, 3, 1> bcc;
         bcc.DefineConstantDirichletOnMeshBoundary(&mesh, 1.0);
 
         /* Create an instance of the solver, passing in the mesh, pde and boundary conditions.
          */
-        SimpleLinearParabolicSolver<3,3> solver(&mesh,&pde,&bcc);
+        SimpleLinearParabolicSolver<3, 3> solver(&mesh,&pde,&bcc);
 
         /* For parabolic problems, initial conditions are also needed. The solver will expect
          * a PETSc vector, where the i-th entry is the initial solution at node i, to be passed
@@ -369,8 +369,8 @@ public:
 
         /* Let's also solve the equivalent static PDE, i.e. set du/dt=0, so 0=div(gradu) + u. This
          * is easy, as the PDE class has already been defined. */
-        SimplePoissonEquation<3,3> static_pde;
-        SimpleLinearEllipticSolver<3,3> static_solver(&mesh, &static_pde, &bcc);
+        SimplePoissonEquation<3, 3> static_pde;
+        SimpleLinearEllipticSolver<3, 3> static_solver(&mesh, &static_pde, &bcc);
         Vec static_solution = static_solver.Solve();
         ReplicatableVector static_solution_repl(static_solution);
 

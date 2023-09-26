@@ -114,7 +114,7 @@ private:
      *
      * @return The force exerted on Node A by Node B.
      */
-    c_vector<double,2> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex, unsigned nodeBGlobalIndex, AbstractCellPopulation<2>& rCellPopulation) override;
+    c_vector<double, 2> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex, unsigned nodeBGlobalIndex, AbstractCellPopulation<2>& rCellPopulation) override;
 
 public:
 
@@ -166,7 +166,7 @@ public:
      * @param rNodeLocation
      * @return the z component corresponding to rNodeLocation
      */
-    double CalculateCryptSurfaceHeightAtPoint(const c_vector<double,2>& rNodeLocation);
+    double CalculateCryptSurfaceHeightAtPoint(const c_vector<double, 2>& rNodeLocation);
 
     /**
      * Calculates the derivative df/dr of the crypt surface function z=f(r) at a point
@@ -176,7 +176,7 @@ public:
      * @param rNodeLocation the 2D location of a node
      * @return the gradient
      */
-    double CalculateCryptSurfaceDerivativeAtPoint(const c_vector<double,2>& rNodeLocation);
+    double CalculateCryptSurfaceDerivativeAtPoint(const c_vector<double, 2>& rNodeLocation);
 
     /**
      * Overridden AddForceContribution method.

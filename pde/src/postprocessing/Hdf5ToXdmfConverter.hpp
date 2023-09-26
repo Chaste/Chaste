@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * .xdmf master file with separate geometry/topology files. The HDF5 data is not 
  * converted, but is rather linked to by the .xdmf master file.
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class Hdf5ToXdmfConverter :
     public AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>,
     public XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>
@@ -55,7 +55,7 @@ public:
      * Constructor, which does the conversion and writes the .vtu file.
      *
      * @note This method is collective, and hence must be called by all 
-     * processes.
+     *     processes.
      *
      * @param rInputDirectory The input directory, relative to 
      *     CHASTE_TEST_OUTPUT, where the .h5 file has been written
@@ -64,7 +64,8 @@ public:
      */
     Hdf5ToXdmfConverter(const FileFinder& rInputDirectory,
             const std::string& rFileBaseName,
-            AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
+            AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh);
+
 #ifndef _MSC_VER
     /**
      * Generate Attribute tags and append to the element. Here this is a dummy 

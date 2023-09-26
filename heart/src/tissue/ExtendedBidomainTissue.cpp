@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractChasteRegion.hpp"
 #include "HeartEventHandler.hpp"
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(AbstractCardiacCellFactory<SPACE_DIM>* pCellFactory,
                                                           AbstractCardiacCellFactory<SPACE_DIM>* pCellFactorySecondCell,
                                                           AbstractStimulusFactory<SPACE_DIM>* pExtracellularStimulusFactory)
@@ -113,12 +113,12 @@ ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(AbstractCardiacCellFac
 }
 
 //archiving constructor
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(std::vector<AbstractCardiacCellInterface*> & rCellsDistributed,
                                                           std::vector<AbstractCardiacCellInterface*> & rSecondCellsDistributed,
                                                           std::vector<boost::shared_ptr<AbstractStimulusFunction> > & rExtraStimuliDistributed,
                                                           std::vector<double> & rGgapsDistributed,
-                                                          AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* pMesh,
+                                                          AbstractTetrahedralMesh<SPACE_DIM, SPACE_DIM>* pMesh,
                                                           c_vector<double, SPACE_DIM>  intracellularConductivitiesSecondCell)
         :   AbstractCardiacTissue<SPACE_DIM>(pMesh),
             mpIntracellularConductivityTensorsSecondCell(NULL),
@@ -143,7 +143,7 @@ ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(std::vector<AbstractCa
 }
 
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 void ExtendedBidomainTissue<SPACE_DIM>::SetGgapHeterogeneities(std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > >& rGgapHeterogeneityRegions,
                                                                std::vector<double> rGgapValues)
 {
@@ -152,7 +152,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::SetGgapHeterogeneities(std::vector<boost
     mGgapValues =rGgapValues;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 void ExtendedBidomainTissue<SPACE_DIM>::CreateGGapConductivities()
 {
     assert(mGgapHeterogeneityRegions.size() == mGgapValues.size());
@@ -190,7 +190,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateGGapConductivities()
     PetscTools::ReplicateException(false);
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSecondCell()
 {
     HeartEventHandler::BeginEvent(HeartEventHandler::READ_MESH);
@@ -204,7 +204,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
         {
             case cp::media_type::Orthotropic:
             {
-                mpIntracellularConductivityTensorsSecondCell =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
+                mpIntracellularConductivityTensorsSecondCell =  new OrthotropicConductivityTensors<SPACE_DIM, SPACE_DIM>;
                 FileFinder ortho_file(this->mFibreFilePathNoExtension + ".ortho", RelativeTo::AbsoluteOrCwd);
                 assert(ortho_file.Exists());
                 mpIntracellularConductivityTensorsSecondCell->SetFibreOrientationFile(ortho_file);
@@ -213,7 +213,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
 
             case cp::media_type::Axisymmetric:
             {
-                mpIntracellularConductivityTensorsSecondCell =  new AxisymmetricConductivityTensors<SPACE_DIM,SPACE_DIM>;
+                mpIntracellularConductivityTensorsSecondCell =  new AxisymmetricConductivityTensors<SPACE_DIM, SPACE_DIM>;
                 FileFinder axi_file(this->mFibreFilePathNoExtension + ".axi", RelativeTo::AbsoluteOrCwd);
                 assert(axi_file.Exists());
                 mpIntracellularConductivityTensorsSecondCell->SetFibreOrientationFile(axi_file);
@@ -221,7 +221,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
             }
 
             case cp::media_type::NoFibreOrientation:
-                mpIntracellularConductivityTensorsSecondCell =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
+                mpIntracellularConductivityTensorsSecondCell =  new OrthotropicConductivityTensors<SPACE_DIM, SPACE_DIM>;
                 break;
 
             default:
@@ -230,7 +230,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
     }
     else // Slab defined in config file or SetMesh() called; no fibre orientation assumed
     {
-        mpIntracellularConductivityTensorsSecondCell =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
+        mpIntracellularConductivityTensorsSecondCell =  new OrthotropicConductivityTensors<SPACE_DIM, SPACE_DIM>;
     }
 
     // this definition must be here (and not inside the if statement) because SetNonConstantConductivities() will keep
@@ -261,8 +261,8 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
         PetscTools::ReplicateException(false);
 
         std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > conductivities_heterogeneity_areas;
-        std::vector< c_vector<double,3> > intra_h_conductivities;
-        std::vector< c_vector<double,3> > extra_h_conductivities;
+        std::vector< c_vector<double, 3> > intra_h_conductivities;
+        std::vector< c_vector<double, 3> > extra_h_conductivities;
         HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas,
                                                                 intra_h_conductivities,
                                                                 extra_h_conductivities);
@@ -274,12 +274,12 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
             //unsigned element_index = it->GetIndex();
             // if element centroid is contained in the region
             ChastePoint<SPACE_DIM> element_centroid(it->CalculateCentroid());
-            for (unsigned region_index=0; region_index< conductivities_heterogeneity_areas.size(); region_index++)
+            for (unsigned region_index = 0; region_index< conductivities_heterogeneity_areas.size(); region_index++)
             {
                 if (conductivities_heterogeneity_areas[region_index]->DoesContain(element_centroid))
                 {
                     // We don't use ublas vector assignment here, because we might be getting a subvector of a 3-vector
-                    for (unsigned i=0; i<SPACE_DIM; ++i)
+                    for (unsigned i = 0; i<SPACE_DIM; ++i)
                     {
                         hetero_intra_conductivities[local_element_index][i] = intra_h_conductivities[region_index][i];
                     }
@@ -299,38 +299,38 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
     HeartEventHandler::EndEvent(HeartEventHandler::READ_MESH);
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 bool ExtendedBidomainTissue<SPACE_DIM>::HasTheUserSuppliedExtracellularStimulus()
 {
     return mUserSuppliedExtracellularStimulus;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 void ExtendedBidomainTissue<SPACE_DIM>::SetUserSuppliedExtracellularStimulus(bool flag)
 {
     mUserSuppliedExtracellularStimulus = flag;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 const std::vector<AbstractCardiacCellInterface*>& ExtendedBidomainTissue<SPACE_DIM>::rGetSecondCellsDistributed() const
 {
     return mCellsDistributedSecondCell;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 const std::vector<double>& ExtendedBidomainTissue<SPACE_DIM>::rGetGapsDistributed() const
 {
     return mGgapDistributed;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 const std::vector<boost::shared_ptr<AbstractStimulusFunction> >& ExtendedBidomainTissue<SPACE_DIM>::rGetExtracellularStimulusDistributed() const
 {
     return mExtracellularStimuliDistributed;
 }
 
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 void ExtendedBidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
 {
     if (this->mpConfig->IsMeshProvided() && this->mpConfig->GetLoadMesh())
@@ -340,7 +340,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
         {
             case cp::media_type::Orthotropic:
             {
-                mpExtracellularConductivityTensors =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
+                mpExtracellularConductivityTensors =  new OrthotropicConductivityTensors<SPACE_DIM, SPACE_DIM>;
                 FileFinder ortho_file(this->mFibreFilePathNoExtension + ".ortho", RelativeTo::AbsoluteOrCwd);
                 assert(ortho_file.Exists());
                 mpExtracellularConductivityTensors->SetFibreOrientationFile(ortho_file);
@@ -349,7 +349,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
 
             case cp::media_type::Axisymmetric:
             {
-                mpExtracellularConductivityTensors =  new AxisymmetricConductivityTensors<SPACE_DIM,SPACE_DIM>;
+                mpExtracellularConductivityTensors =  new AxisymmetricConductivityTensors<SPACE_DIM, SPACE_DIM>;
                 FileFinder axi_file(this->mFibreFilePathNoExtension + ".axi", RelativeTo::AbsoluteOrCwd);
                 assert(axi_file.Exists());
                 mpExtracellularConductivityTensors->SetFibreOrientationFile(axi_file);
@@ -357,7 +357,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
             }
 
             case cp::media_type::NoFibreOrientation:
-                mpExtracellularConductivityTensors =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
+                mpExtracellularConductivityTensors =  new OrthotropicConductivityTensors<SPACE_DIM, SPACE_DIM>;
                 break;
 
             default:
@@ -366,7 +366,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
     }
     else // no fibre orientation assumed
     {
-        mpExtracellularConductivityTensors =  new OrthotropicConductivityTensors<SPACE_DIM,SPACE_DIM>;
+        mpExtracellularConductivityTensors =  new OrthotropicConductivityTensors<SPACE_DIM, SPACE_DIM>;
     }
 
     c_vector<double, SPACE_DIM> extra_conductivities;
@@ -397,8 +397,8 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
         PetscTools::ReplicateException(false);
 
         std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > conductivities_heterogeneity_areas;
-        std::vector< c_vector<double,3> > intra_h_conductivities;
-        std::vector< c_vector<double,3> > extra_h_conductivities;
+        std::vector< c_vector<double, 3> > intra_h_conductivities;
+        std::vector< c_vector<double, 3> > extra_h_conductivities;
         HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas,
                                                                 intra_h_conductivities,
                                                                 extra_h_conductivities);
@@ -410,13 +410,13 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
             //unsigned element_index = iter->GetIndex();
             // if element centroid is contained in the region
             ChastePoint<SPACE_DIM> element_centroid(iter->CalculateCentroid());
-            for (unsigned region_index=0; region_index< conductivities_heterogeneity_areas.size(); region_index++)
+            for (unsigned region_index = 0; region_index< conductivities_heterogeneity_areas.size(); region_index++)
             {
                 // If element centroid is contained in the region
                 if (conductivities_heterogeneity_areas[region_index]->DoesContain(element_centroid))
                 {
                     // We don't use ublas vector assignment here, because we might be getting a subvector of a 3-vector
-                    for (unsigned i=0; i<SPACE_DIM; ++i)
+                    for (unsigned i = 0; i<SPACE_DIM; ++i)
                     {
                         hetero_extra_conductivities[local_element_index][i] = extra_h_conductivities[region_index][i];
                     }
@@ -434,7 +434,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
     mpExtracellularConductivityTensors->Init(this->mpMesh);
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 ExtendedBidomainTissue<SPACE_DIM>::~ExtendedBidomainTissue()
 {
     // Delete (second) cells
@@ -456,7 +456,7 @@ ExtendedBidomainTissue<SPACE_DIM>::~ExtendedBidomainTissue()
     }
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 void ExtendedBidomainTissue<SPACE_DIM>::SetIntracellularConductivitiesSecondCell(c_vector<double, SPACE_DIM> conductivities)
 {
     for (unsigned i = 0; i < SPACE_DIM; ++i)
@@ -465,13 +465,13 @@ void ExtendedBidomainTissue<SPACE_DIM>::SetIntracellularConductivitiesSecondCell
     }
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM>  ExtendedBidomainTissue<SPACE_DIM>::GetIntracellularConductivitiesSecondCell() const
 {
     return mIntracellularConductivitiesSecondCell;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 const c_matrix<double, SPACE_DIM, SPACE_DIM>& ExtendedBidomainTissue<SPACE_DIM>::rGetExtracellularConductivityTensor(unsigned elementIndex)
 {
     assert(mpExtracellularConductivityTensors);
@@ -485,7 +485,7 @@ const c_matrix<double, SPACE_DIM, SPACE_DIM>& ExtendedBidomainTissue<SPACE_DIM>:
     }
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 const c_matrix<double, SPACE_DIM, SPACE_DIM>& ExtendedBidomainTissue<SPACE_DIM>::rGetIntracellularConductivityTensorSecondCell(unsigned elementIndex)
 {
     assert(mpIntracellularConductivityTensorsSecondCell);
@@ -499,19 +499,19 @@ const c_matrix<double, SPACE_DIM, SPACE_DIM>& ExtendedBidomainTissue<SPACE_DIM>:
     }
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 AbstractCardiacCellInterface* ExtendedBidomainTissue<SPACE_DIM>::GetCardiacSecondCell( unsigned globalIndex )
 {
     return mCellsDistributedSecondCell[globalIndex - this->mpDistributedVectorFactory->GetLow()];
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 boost::shared_ptr<AbstractStimulusFunction> ExtendedBidomainTissue<SPACE_DIM>::GetExtracellularStimulus( unsigned globalIndex )
 {
     return mExtracellularStimuliDistributed[globalIndex - this->mpDistributedVectorFactory->GetLow()];
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 void ExtendedBidomainTissue<SPACE_DIM>::SolveCellSystems(Vec existingSolution, double time, double nextTime, bool updateVoltage)
 {
     HeartEventHandler::BeginEvent(HeartEventHandler::SOLVE_ODES);
@@ -560,7 +560,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::SolveCellSystems(Vec existingSolution, d
     HeartEventHandler::EndEvent(HeartEventHandler::COMMUNICATION);
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 void ExtendedBidomainTissue<SPACE_DIM>::UpdateAdditionalCaches(unsigned globalIndex, unsigned localIndex, double nextTime)
 {
     mIionicCacheReplicatedSecondCell[globalIndex] = mCellsDistributedSecondCell[localIndex]->GetIIonic();
@@ -569,7 +569,7 @@ void ExtendedBidomainTissue<SPACE_DIM>::UpdateAdditionalCaches(unsigned globalIn
     mGgapCacheReplicated[globalIndex] = mGgapDistributed[localIndex];
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 void ExtendedBidomainTissue<SPACE_DIM>::ReplicateAdditionalCaches()
 {
     mIionicCacheReplicatedSecondCell.Replicate(this->mpDistributedVectorFactory->GetLow(), this->mpDistributedVectorFactory->GetHigh());
@@ -578,97 +578,97 @@ void ExtendedBidomainTissue<SPACE_DIM>::ReplicateAdditionalCaches()
     mGgapCacheReplicated.Replicate(this->mpDistributedVectorFactory->GetLow(), this->mpDistributedVectorFactory->GetHigh());
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 ReplicatableVector& ExtendedBidomainTissue<SPACE_DIM>::rGetIionicCacheReplicatedSecondCell()
 {
     return mIionicCacheReplicatedSecondCell;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 ReplicatableVector& ExtendedBidomainTissue<SPACE_DIM>::rGetIntracellularStimulusCacheReplicatedSecondCell()
 {
     return mIntracellularStimulusCacheReplicatedSecondCell;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 ReplicatableVector& ExtendedBidomainTissue<SPACE_DIM>::rGetExtracellularStimulusCacheReplicated()
 {
     return mExtracellularStimulusCacheReplicated;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 ReplicatableVector& ExtendedBidomainTissue<SPACE_DIM>::rGetGgapCacheReplicated()
 {
     return mGgapCacheReplicated;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 double ExtendedBidomainTissue<SPACE_DIM>::GetAmFirstCell()
 {
     return mAmFirstCell;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 double ExtendedBidomainTissue<SPACE_DIM>::GetAmSecondCell()
 {
     return mAmSecondCell;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 double ExtendedBidomainTissue<SPACE_DIM>::GetAmGap()
 {
     return mAmGap;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 double ExtendedBidomainTissue<SPACE_DIM>::GetCmFirstCell()
 {
     return mCmFirstCell;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 double ExtendedBidomainTissue<SPACE_DIM>::GetCmSecondCell()
 {
     return mCmSecondCell;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 double ExtendedBidomainTissue<SPACE_DIM>::GetGGap()
 {
     return mGGap;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 void ExtendedBidomainTissue<SPACE_DIM>::SetAmFirstCell(double value)
 {
     mAmFirstCell = value;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 void ExtendedBidomainTissue<SPACE_DIM>::SetAmSecondCell(double value)
 {
     mAmSecondCell = value;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 void ExtendedBidomainTissue<SPACE_DIM>::SetAmGap(double value)
 {
     mAmGap = value;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 void ExtendedBidomainTissue<SPACE_DIM>::SetGGap(double value)
 {
     mGGap = value;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 void ExtendedBidomainTissue<SPACE_DIM>::SetCmFirstCell(double value)
 {
     mCmFirstCell = value;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 void ExtendedBidomainTissue<SPACE_DIM>::SetCmSecondCell(double value)
 {
     mCmSecondCell = value;

@@ -45,16 +45,16 @@ MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::MixedDimensionMesh(DistributedTetrah
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::~MixedDimensionMesh()
 {
-    for (unsigned i=0; i<mCableElements.size(); ++i)
+    for (unsigned i = 0; i<mCableElements.size(); ++i)
     {
         delete mCableElements[i];
     }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(AbstractMeshReader<ELEMENT_DIM,SPACE_DIM>& rMeshReader)
+void MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader)
 {
-    DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ConstructFromMeshReader(rMeshReader);
+    DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(rMeshReader);
     //Note that the above method may permute the node (for a parMETIS partition) after construction
     //We have to convert to the permuted form first
 
@@ -62,13 +62,13 @@ void MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(Abstrac
     mNumCableElements = rMeshReader.GetNumCableElements();
     //this->mCableElements.reserve(mNumCableElements);
 
-    for (unsigned element_index=0; element_index < mNumCableElements; element_index++)
+    for (unsigned element_index = 0; element_index < mNumCableElements; element_index++)
     {
         ElementData element_data = rMeshReader.GetNextCableElementData();
         //Convert the node indices from the original to the permuted
         if (!this->mNodePermutation.empty())
         {
-            for (unsigned j=0; j<2; ++j) // cables are always 1d
+            for (unsigned j = 0; j<2; ++j) // cables are always 1d
             {
                 element_data.NodeIndices[j] = this->mNodePermutation[ element_data.NodeIndices[j] ];
             }
@@ -76,7 +76,7 @@ void MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(Abstrac
 
         //Determine if we own any nodes on this cable element
         bool node_owned = false;
-        for (unsigned j=0; j<2; ++j) // cables are always 1d
+        for (unsigned j = 0; j<2; ++j) // cables are always 1d
         {
             try
             {
@@ -96,7 +96,7 @@ void MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(Abstrac
             std::vector<Node<SPACE_DIM>*> nodes;
             nodes.reserve(2u);
 
-            for (unsigned j=0; j<2; ++j) // cables are always 1d
+            for (unsigned j = 0; j<2; ++j) // cables are always 1d
             {
                 //Note that if we own one node on a cable element then we are likely to own the other.
                 //If not, we are likely to have a halo.
@@ -113,10 +113,10 @@ void MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(Abstrac
                 // LCOV_EXCL_STOP
             }
 
-            Element<1u, SPACE_DIM>* p_element = new Element<1u,SPACE_DIM>(element_index, nodes, false);
+            Element<1u, SPACE_DIM>* p_element = new Element<1u, SPACE_DIM>(element_index, nodes, false);
             RegisterCableElement(element_index);
             this->mCableElements.push_back(p_element);
-            for (unsigned node_index=0; node_index<p_element->GetNumNodes(); ++node_index)
+            for (unsigned node_index = 0; node_index<p_element->GetNumNodes(); ++node_index)
             {
                 mNodeToCablesMapping.insert(std::pair<Node<SPACE_DIM>*, Element<1u, SPACE_DIM>*>(
                         p_element->GetNode(node_index), p_element));
@@ -133,7 +133,7 @@ void MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::ConstructFromMeshReader(Abstrac
     rMeshReader.Reset();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::RegisterCableElement(unsigned index)
 {
     mCableElementsMapping[index] = this->mCableElements.size();
@@ -166,7 +166,7 @@ Element<1u, SPACE_DIM>* MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::GetCableElem
     return mCableElements[index];
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::CalculateDesignatedOwnershipOfCableElement( unsigned elementIndex )
 {
     //This should not throw in the distributed parallel case
@@ -192,32 +192,32 @@ bool MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::CalculateDesignatedOwnershipOfC
 }
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::CableRangeAtNode MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::GetCablesAtNode(const Node<SPACE_DIM>* pNode)
 {
     return mNodeToCablesMapping.equal_range(pNode);
 }
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::CableElementIterator MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::GetCableElementIteratorBegin() const
 {
     return mCableElements.begin();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 typename MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::CableElementIterator MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::GetCableElementIteratorEnd() const
 {
     return mCableElements.end();
 }
 
 // Explicit instantiation
-template class MixedDimensionMesh<1,1>;
-template class MixedDimensionMesh<1,2>;
-template class MixedDimensionMesh<1,3>;
-template class MixedDimensionMesh<2,2>;
-template class MixedDimensionMesh<2,3>;
-template class MixedDimensionMesh<3,3>;
+template class MixedDimensionMesh<1, 1>;
+template class MixedDimensionMesh<1, 2>;
+template class MixedDimensionMesh<1, 3>;
+template class MixedDimensionMesh<2, 2>;
+template class MixedDimensionMesh<2, 3>;
+template class MixedDimensionMesh<3, 3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

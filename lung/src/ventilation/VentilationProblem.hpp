@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * proportional to the pressure drop)
  * At graph nodes: the flux is balanced so that mass is conserved.
  *
- * Works in 3D <1,3>
+ * Works in 3D <1, 3>
  * Current functionality: pressure boundary conditions are set on each of the 
  * boundary nodes
  * Solves for pressure at internal nodes and flux on edges

@@ -172,7 +172,7 @@ public:
             return;
         }
         DistributedTetrahedralMesh<1, 1> mesh;
-        //TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_1_element");
+        //TrianglesMeshReader<1, 1> reader("mesh/test/data/1D_0_to_1_1_element");
         mesh.ConstructLinearMesh(1);
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 2u);

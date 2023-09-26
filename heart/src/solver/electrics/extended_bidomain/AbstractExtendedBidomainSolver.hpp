@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class AbstractExtendedBidomainSolver
-    : public AbstractDynamicLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,3>
+    : public AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 3>
 {
 
 protected:
@@ -61,13 +61,13 @@ protected:
     ExtendedBidomainTissue<SPACE_DIM>* mpExtendedBidomainTissue;
 
     /** Boundary conditions */
-    BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,3>* mpBoundaryConditions;
+    BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 3>* mpBoundaryConditions;
 
     /**
      *  The extended bidomain assembler, used to set up the LHS matrix,
      *  (but not used to set uo the RHS)
      */
-    ExtendedBidomainAssembler<ELEMENT_DIM,SPACE_DIM>* mpExtendedBidomainAssembler;
+    ExtendedBidomainAssembler<ELEMENT_DIM, SPACE_DIM>* mpExtendedBidomainAssembler;
 
     /** Local cache of the configuration singleton instance*/
     HeartConfig* mpConfig;
@@ -149,7 +149,7 @@ public:
      * @param pBcc pointer to the boundary conditions container
      */
     AbstractExtendedBidomainSolver(bool bathSimulation,
-                         AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
+                         AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
                          ExtendedBidomainTissue<SPACE_DIM>* pTissue,
                          BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 3>* pBcc);
 
@@ -180,7 +180,7 @@ public:
      /**
       *  @return the boundary conditions being used
       */
-     BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,3>* GetBoundaryConditions()
+     BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 3>* GetBoundaryConditions()
      {
          return mpBoundaryConditions;
      }

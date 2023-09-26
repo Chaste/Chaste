@@ -101,7 +101,7 @@ public:
             CardiacSimulation simulation("heart/test/data/xml/monodomain2d_small.xml", false, true);
             boost::shared_ptr<AbstractUntemplatedCardiacProblem> p_problem = simulation.GetSavedProblem();
             TS_ASSERT(p_problem);
-            MonodomainProblem<2,2>* p_mono_problem = dynamic_cast<MonodomainProblem<2,2>*>(p_problem.get());
+            MonodomainProblem<2, 2>* p_mono_problem = dynamic_cast<MonodomainProblem<2, 2>*>(p_problem.get());
             TS_ASSERT(p_mono_problem != NULL);
             DistributedVectorFactory* p_vector_factory = p_mono_problem->rGetMesh().GetDistributedVectorFactory();
             for (unsigned node_global_index = p_vector_factory->GetLow();
@@ -528,7 +528,7 @@ public:
 
             boost::shared_ptr<AbstractUntemplatedCardiacProblem> p_problem = simulation.GetSavedProblem();
             TS_ASSERT(p_problem);
-            MonodomainProblem<1,1>* p_mono_problem = dynamic_cast<MonodomainProblem<1,1>*>(p_problem.get());
+            MonodomainProblem<1, 1>* p_mono_problem = dynamic_cast<MonodomainProblem<1, 1>*>(p_problem.get());
             TS_ASSERT(p_mono_problem != NULL);
             DistributedVectorFactory* p_vector_factory = p_mono_problem->rGetMesh().GetDistributedVectorFactory();
             for (unsigned node_global_index = p_vector_factory->GetLow();

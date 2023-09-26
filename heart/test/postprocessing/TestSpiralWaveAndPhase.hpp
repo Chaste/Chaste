@@ -55,7 +55,7 @@ private:
      */
     void setUp()
     {
-        mpMesh = new DistributedTetrahedralMesh<2,2>();
+        mpMesh = new DistributedTetrahedralMesh<2, 2>();
         double node_spacing_in_mesh = 0.015;
         mMeshWidth = 3; // cm
         mpMesh->ConstructRegularSlabMesh(node_spacing_in_mesh, mMeshWidth /*length*/, mMeshWidth /*width*/);
@@ -69,7 +69,7 @@ private:
         delete mpMesh;
     }
 
-    DistributedTetrahedralMesh<2,2>* mpMesh; /** The mesh to use for all these tests. */
+    DistributedTetrahedralMesh<2, 2>* mpMesh; /** The mesh to use for all these tests. */
     double mMeshWidth; /** The width of the mesh */
 
 public:
@@ -122,9 +122,9 @@ public:
 
             std::cout << "nodes size = " << voltages.size() << "\n";
             std::cout << "times size = " << voltages[0].size() << "\n";
-            for (unsigned time_idx=0; time_idx<voltages[0].size(); time_idx++)
+            for (unsigned time_idx = 0; time_idx<voltages[0].size(); time_idx++)
             {
-                for (unsigned node_idx=0; node_idx<voltages.size(); node_idx++)
+                for (unsigned node_idx = 0; node_idx<voltages.size(); node_idx++)
                 {
                     *voltage_loops << voltages[node_idx][time_idx];
 
@@ -216,7 +216,7 @@ public:
     void TestMeshalyzerPhasePlot()
     {
         // Write out voltage (just for fun, to compare with phase plot).
-        Hdf5ToMeshalyzerConverter<2,2> converter1(FileFinder("SpiralWaveAndPhase", RelativeTo::ChasteTestOutput),
+        Hdf5ToMeshalyzerConverter<2, 2> converter1(FileFinder("SpiralWaveAndPhase", RelativeTo::ChasteTestOutput),
                                                   "results", mpMesh, true);
 
         // Check the phase file is written correctly.

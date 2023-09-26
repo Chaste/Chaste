@@ -176,7 +176,7 @@ public:
             }
         }
 
-        MutableMesh<3,3> mesh(nodes);
+        MutableMesh<3, 3> mesh(nodes);
 
         unsigned total_nodes_including_ghosts = nodes_up*nodes_across*nodes_depth + (nodes_up-1)*(nodes_across-1)*(nodes_depth-1);
         TS_ASSERT_EQUALS(mesh.GetNumNodes(),total_nodes_including_ghosts);

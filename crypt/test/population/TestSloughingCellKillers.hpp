@@ -62,8 +62,8 @@ public:
     void TestSloughingCellKillerTopAndSides()
     {
         // Create mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
         mesh.Translate(-0.25,-0.25);
 
@@ -113,8 +113,8 @@ public:
     void TestSloughingCellKillerTopOnly()
     {
         // Create mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
         mesh.Translate(-0.25,-0.25);
 
@@ -158,7 +158,7 @@ public:
     {
         // Create 1D mesh
         unsigned num_cells = 14;
-        MutableMesh<1,1> mesh;
+        MutableMesh<1, 1> mesh;
         mesh.ConstructLinearMesh(num_cells-1);
 
         // Create cells
@@ -203,7 +203,7 @@ public:
     void TestSloughingCellKillerIn3d()
     {
         // Create 3D mesh
-        MutableMesh<3,3> mesh;
+        MutableMesh<3, 3> mesh;
         mesh.ConstructCuboid(4, 5, 6);
 
         // Create cells
@@ -265,13 +265,13 @@ public:
     void TestRadialSloughingCellKillerMethods()
     {
         // Create mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
         mesh.Translate(-0.5,-0.5);
 
         // Get centre of mesh (we know it's at the origin, really)
-        c_vector<double,2> centre(2);
+        c_vector<double, 2> centre(2);
         centre[0] = 0.0;
         centre[1] = 0.0;
         for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
@@ -327,7 +327,7 @@ public:
         OutputFileHandler handler("archive", false);    // don't erase contents of folder
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "radial_killer.arch";
 
-        c_vector<double,2> centre(2);
+        c_vector<double, 2> centre(2);
         centre[0] = 0.1;
         centre[1] = 0.2;
 
@@ -390,7 +390,7 @@ public:
        FileComparison( sloughing_cell_killer_results_dir + "sloughing_results.parameters", "crypt/test/data/TestSloughingCellKillers/sloughing_results.parameters").CompareFiles();
 
        // Test with RadialSloughingCellKiller
-       c_vector<double,2> centre(2);
+       c_vector<double, 2> centre(2);
        centre[0] = 0.1;
        centre[1] = 0.2;
        double radius = 0.4;

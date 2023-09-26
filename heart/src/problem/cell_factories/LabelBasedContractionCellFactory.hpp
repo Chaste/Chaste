@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * (from the list in ContractionModelName.hpp) across the whole mechanics
  * mesh.
  */
-template <unsigned DIM>
+template<unsigned DIM>
 class LabelBasedContractionCellFactory : public AbstractContractionCellFactory<DIM>
 {
 private:

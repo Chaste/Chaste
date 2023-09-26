@@ -62,12 +62,12 @@ void CellAncestorWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(
 }
 
 // Explicit instantiation
-template class CellAncestorWriter<1,1>;
-template class CellAncestorWriter<1,2>;
-template class CellAncestorWriter<2,2>;
-template class CellAncestorWriter<1,3>;
-template class CellAncestorWriter<2,3>;
-template class CellAncestorWriter<3,3>;
+template class CellAncestorWriter<1, 1>;
+template class CellAncestorWriter<1, 2>;
+template class CellAncestorWriter<2, 2>;
+template class CellAncestorWriter<1, 3>;
+template class CellAncestorWriter<2, 3>;
+template class CellAncestorWriter<3, 3>;
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer

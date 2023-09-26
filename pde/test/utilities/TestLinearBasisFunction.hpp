@@ -183,7 +183,7 @@ public:
         nodes.push_back(new Node<2>(0, false, 4.0, 3.0));
         nodes.push_back(new Node<2>(1, false, 6.0, 4.0));
         nodes.push_back(new Node<2>(2, false, 3.0, 5.0));
-        Element<2,2> element(INDEX_IS_NOT_USED, nodes);
+        Element<2, 2> element(INDEX_IS_NOT_USED, nodes);
 
         c_matrix<double, 2, 2> jacobian, inverse_jacobian;
         double determinant;

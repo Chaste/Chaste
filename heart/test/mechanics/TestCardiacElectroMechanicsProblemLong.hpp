@@ -73,7 +73,7 @@ public:
         problem.Solve();
 
         // test by checking the length of the tissue against hardcoded value
-        std::vector<c_vector<double,2> >& r_deformed_position = problem.rGetDeformedPosition();
+        std::vector<c_vector<double, 2> >& r_deformed_position = problem.rGetDeformedPosition();
         TS_ASSERT_DELTA(r_deformed_position[5](0), 0.8257, 1e-3);
 
         MechanicsEventHandler::Headings();
@@ -84,7 +84,7 @@ public:
     {
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 
-        TetrahedralMesh<2,2> electrics_mesh;
+        TetrahedralMesh<2, 2> electrics_mesh;
         electrics_mesh.ConstructRegularSlabMesh(1.0/96.0/*stepsize*/, 1.0/*length*/, 1.0/*width*/, 1.0/*depth*/);
 
         QuadraticMesh<2> mechanics_mesh;
@@ -104,7 +104,7 @@ public:
 
         HeartConfig::Instance()->SetSimulationDuration(125.0);
 
-        CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
+        CardiacElectroMechanicsProblem<2, 1> problem(INCOMPRESSIBLE,
                                                   MONODOMAIN,
                                                   &electrics_mesh,
                                                   &mechanics_mesh,
@@ -115,7 +115,7 @@ public:
 
 //        // fibres going from (1,0) at X=0 to (1,1)-direction at X=1
 //        // the fibres file was created with the code (inside a class that owns a mesh)
-//        for (unsigned elem_index=0; elem_index<mechanics_mesh.GetNumElements(); elem_index++)
+//        for (unsigned elem_index = 0; elem_index<mechanics_mesh.GetNumElements(); elem_index++)
 //        {
 //            double X = mechanics_mesh.GetElement(elem_index)->CalculateCentroid()[0];
 //            double theta = M_PI*X/4;
@@ -127,7 +127,7 @@ public:
         problem.Solve();
 
         // test by checking the length of the tissue against hardcoded value
-        std::vector<c_vector<double,2> >& r_deformed_position = problem.rGetDeformedPosition();
+        std::vector<c_vector<double, 2> >& r_deformed_position = problem.rGetDeformedPosition();
         // visualised, looks good - contracts in X-direction near the fixed surface,
         // but on the other side the fibres are in the (1,1) direction, so contraction
         // pulls the tissue downward a bit
@@ -143,7 +143,7 @@ public:
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory(-1000*1000);
 
         // set up two meshes of 1mm by 1mm by 1mm
-        TetrahedralMesh<3,3> electrics_mesh;
+        TetrahedralMesh<3, 3> electrics_mesh;
         electrics_mesh.ConstructRegularSlabMesh(0.01, 0.1, 0.1, 0.1);
 
         QuadraticMesh<3> mechanics_mesh(0.1, 0.1, 0.1, 0.1);
@@ -161,7 +161,7 @@ public:
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
         problem_defn.SetMechanicsSolveTimestep(1.0);
 
-        CardiacElectroMechanicsProblem<3,1> problem(INCOMPRESSIBLE,
+        CardiacElectroMechanicsProblem<3, 1> problem(INCOMPRESSIBLE,
                                                   MONODOMAIN,
                                                   &electrics_mesh,
                                                   &mechanics_mesh,
@@ -173,11 +173,11 @@ public:
         problem.Solve();
 
         // test by checking the length of the tissue against hardcoded value
-        c_vector<double,3> undeformed_node_1 = mechanics_mesh.GetNode(1)->rGetLocation();
+        c_vector<double, 3> undeformed_node_1 = mechanics_mesh.GetNode(1)->rGetLocation();
         TS_ASSERT_DELTA(undeformed_node_1(0), 0.1, 1e-6);
         TS_ASSERT_DELTA(undeformed_node_1(1), 0.0, 1e-6);
         TS_ASSERT_DELTA(undeformed_node_1(2), 0.0, 1e-6);
-        std::vector<c_vector<double,3> >& r_deformed_position = problem.rGetDeformedPosition();
+        std::vector<c_vector<double, 3> >& r_deformed_position = problem.rGetDeformedPosition();
         TS_ASSERT_DELTA(r_deformed_position[1](0), 0.0879, 1e-3);
 
         MechanicsEventHandler::Headings();
@@ -198,7 +198,7 @@ public:
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory(-1000*1000);
 
         // set up two meshes of 1mm by 1mm by 1mm
-        TetrahedralMesh<3,3> electrics_mesh;
+        TetrahedralMesh<3, 3> electrics_mesh;
         electrics_mesh.ConstructRegularSlabMesh(0.01, 0.1, 0.1, 0.1);
 
         QuadraticMesh<3> mechanics_mesh(0.02, 0.1, 0.1, 0.1);
@@ -217,7 +217,7 @@ public:
         FileFinder finder("heart/test/data/fibre_tests/5by5by5_fibres_by_quadpt.orthoquad",RelativeTo::ChasteSourceRoot);
         problem_defn.SetVariableFibreSheetDirectionsFile(finder, true);
 
-        CardiacElectroMechanicsProblem<3,1> problem(INCOMPRESSIBLE,
+        CardiacElectroMechanicsProblem<3, 1> problem(INCOMPRESSIBLE,
                                                   MONODOMAIN,
                                                   &electrics_mesh,
                                                   &mechanics_mesh,
@@ -239,7 +239,7 @@ public:
             TS_ASSERT_DELTA(undeformed_node2(1), 0.1, 1e-6);
             TS_ASSERT_DELTA(undeformed_node2(2), 0.1, 1e-6);
         }
-        std::vector<c_vector<double,3> >& r_deformed_position = problem.rGetDeformedPosition();
+        std::vector<c_vector<double, 3> >& r_deformed_position = problem.rGetDeformedPosition();
         TS_ASSERT_DELTA(r_deformed_position[6*6*5](0),  0.0116, 1e-3);
         TS_ASSERT_DELTA(r_deformed_position[6*6*5](1), -0.0141, 1e-3);
         TS_ASSERT_DELTA(r_deformed_position[6*6*5](2),  0.1007, 1e-3);
@@ -288,10 +288,10 @@ public:
     // other directions)
     void TestFibreRead()
     {
-        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML,3> cell_factory(-5000*1000);
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory(-5000*1000);
 
         double tissue_initial_size = 0.05;
-        TetrahedralMesh<3,3> electrics_mesh;
+        TetrahedralMesh<3, 3> electrics_mesh;
         electrics_mesh.ConstructRegularSlabMesh(0.01/*stepsize*/, tissue_initial_size/*length*/, tissue_initial_size/*width*/, tissue_initial_size);
 
         QuadraticMesh<3> mechanics_mesh;
@@ -328,7 +328,7 @@ public:
         *p_Y1_file << mechanics_mesh.GetNumElements() << "\n";
         *p_Y2_file << mechanics_mesh.GetNumElements() << "\n";
         *p_Z_file  << mechanics_mesh.GetNumElements() << "\n";
-        for (unsigned i=0; i<mechanics_mesh.GetNumElements(); ++i)
+        for (unsigned i = 0; i<mechanics_mesh.GetNumElements(); ++i)
         {
             //double X = mechanics_mesh.GetElement(i)->CalculateCentroid()(0);
             *p_X_file  << "1 0 0 0 1 0 0 0 1\n";
@@ -345,11 +345,11 @@ public:
         //////////////////////////////////////////////////////////////////
         // Solve with no fibres read.
         //////////////////////////////////////////////////////////////////
-        std::vector<c_vector<double,3> > r_deformed_position_no_fibres;
+        std::vector<c_vector<double, 3> > r_deformed_position_no_fibres;
         {
             HeartConfig::Instance()->SetSimulationDuration(20.0);
 
-            CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
+            CardiacElectroMechanicsProblem<3, 1> problem(COMPRESSIBLE,
                                                       MONODOMAIN,
                                                       &electrics_mesh,
                                                       &mechanics_mesh,
@@ -365,13 +365,13 @@ public:
         //////////////////////////////////////////////////////////////////
         // Solve with fibres read: fibres in X-direction
         //////////////////////////////////////////////////////////////////
-        std::vector<c_vector<double,3> > r_deformed_position_fibres_alongX;
+        std::vector<c_vector<double, 3> > r_deformed_position_fibres_alongX;
         {
             HeartConfig::Instance()->SetSimulationDuration(20.0);
             FileFinder finder("heart/test/data/fibre_tests/alongX.ortho", RelativeTo::ChasteSourceRoot);
             problem_defn.SetVariableFibreSheetDirectionsFile(finder, false);
 
-            CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
+            CardiacElectroMechanicsProblem<3, 1> problem(COMPRESSIBLE,
                                                       MONODOMAIN,
                                                       &electrics_mesh,
                                                       &mechanics_mesh,
@@ -385,9 +385,9 @@ public:
         }
 
         // test the two results are identical
-        for (unsigned i=0; i<r_deformed_position_no_fibres.size(); ++i)
+        for (unsigned i = 0; i<r_deformed_position_no_fibres.size(); ++i)
         {
-            for (unsigned j=0; j<3; ++j)
+            for (unsigned j = 0; j<3; ++j)
             {
                 TS_ASSERT_DELTA(r_deformed_position_no_fibres[i](j), r_deformed_position_fibres_alongX[i](j), 1e-8);
             }
@@ -410,13 +410,13 @@ public:
         ////////////////////////////////////////////////////////////////////
         // Solve with fibres read: fibres in Y-direction, sheet in YX plane
         ////////////////////////////////////////////////////////////////////
-        std::vector<c_vector<double,3> > r_deformed_position_fibres_alongY1;
+        std::vector<c_vector<double, 3> > r_deformed_position_fibres_alongY1;
         {
             HeartConfig::Instance()->SetSimulationDuration(20.0);
             FileFinder finder("heart/test/data/fibre_tests/alongY1.ortho", RelativeTo::ChasteSourceRoot);
             problem_defn.SetVariableFibreSheetDirectionsFile(finder, false);
 
-            CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
+            CardiacElectroMechanicsProblem<3, 1> problem(COMPRESSIBLE,
                                                       MONODOMAIN,
                                                       &electrics_mesh,
                                                       &mechanics_mesh,
@@ -433,13 +433,13 @@ public:
         ////////////////////////////////////////////////////////////////////
         // Solve with fibres read: fibres in Y-direction, sheet in YZ plane
         ////////////////////////////////////////////////////////////////////
-        std::vector<c_vector<double,3> > r_deformed_position_fibres_alongY2;
+        std::vector<c_vector<double, 3> > r_deformed_position_fibres_alongY2;
         {
             HeartConfig::Instance()->SetSimulationDuration(20.0);
             FileFinder fibres_file("heart/test/data/fibre_tests/alongY2.ortho", RelativeTo::ChasteSourceRoot);
             problem_defn.SetVariableFibreSheetDirectionsFile(fibres_file, false);
 
-            CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
+            CardiacElectroMechanicsProblem<3, 1> problem(COMPRESSIBLE,
                                                         MONODOMAIN,
                                                         &electrics_mesh,
                                                         &mechanics_mesh,
@@ -453,9 +453,9 @@ public:
 
 
         // test the two results are identical
-        for (unsigned i=0; i<r_deformed_position_no_fibres.size(); ++i)
+        for (unsigned i = 0; i<r_deformed_position_no_fibres.size(); ++i)
         {
-            for (unsigned j=0; j<3; ++j)
+            for (unsigned j = 0; j<3; ++j)
             {
                 TS_ASSERT_DELTA(r_deformed_position_fibres_alongY1[i](j), r_deformed_position_fibres_alongY2[i](j), 1e-8);
             }
@@ -474,13 +474,13 @@ public:
         //////////////////////////////////////////////////////////////////
         // Solve with fibres read: fibres in Z-direction
         //////////////////////////////////////////////////////////////////
-        std::vector<c_vector<double,3> > r_deformed_position_fibres_alongZ;
+        std::vector<c_vector<double, 3> > r_deformed_position_fibres_alongZ;
         {
             HeartConfig::Instance()->SetSimulationDuration(20.0);
             FileFinder finder("heart/test/data/fibre_tests/alongZ.ortho", RelativeTo::ChasteSourceRoot);
             problem_defn.SetVariableFibreSheetDirectionsFile(finder, false);
 
-            CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
+            CardiacElectroMechanicsProblem<3, 1> problem(COMPRESSIBLE,
                                                       MONODOMAIN,
                                                       &electrics_mesh,
                                                       &mechanics_mesh,
@@ -510,7 +510,7 @@ public:
 //        PlaneStimulusCellFactory<CML_noble_varghese_kohl_noble_1998_basic_with_sac, 3> cell_factory(0);
 //
 //        // set up two meshes of 1cm by 1cm by 1cm
-//        TetrahedralMesh<3,3> electrics_mesh;
+//        TetrahedralMesh<3, 3> electrics_mesh;
 //        unsigned num_elem = 10;
 //        electrics_mesh.ConstructCuboid(num_elem,num_elem,num_elem);
 //        electrics_mesh.Scale(1.0/num_elem, 1.0/num_elem, 1.0/num_elem);
@@ -521,18 +521,18 @@ public:
 //        std::vector<unsigned> fixed_nodes
 //          = NonlinearElasticityTools<3>::GetNodesByComponentValue(mechanics_mesh,0,0);
 //
-//        std::vector<BoundaryElement<2,3>*> impact_region;
-//        for (TetrahedralMesh<3,3>::BoundaryElementIterator iter
+//        std::vector<BoundaryElement<2, 3>*> impact_region;
+//        for (TetrahedralMesh<3, 3>::BoundaryElementIterator iter
 //              = mechanics_mesh.GetBoundaryElementIteratorBegin();
 //             iter != mechanics_mesh.GetBoundaryElementIteratorEnd();
 //             ++iter)
 //        {
-//            c_vector<double,3> centroid =(*iter)->CalculateCentroid();
+//            c_vector<double, 3> centroid =(*iter)->CalculateCentroid();
 //            if ((fabs(centroid[1])<1e-4)
 //                 && (centroid[0] < 0.05)
 //                 && (centroid[2] < 0.05))
 //            {
-//                BoundaryElement<2,3>* p_element = *iter;
+//                BoundaryElement<2, 3>* p_element = *iter;
 //                impact_region.push_back(p_element);
 //            }
 //        }
@@ -555,7 +555,7 @@ public:
 //        problem.Solve();
 //
 //        // test by checking the length of the tissue against hardcoded value
-//        std::vector<c_vector<double,3> >& r_deformed_position = problem.rGetDeformedPosition();
+//        std::vector<c_vector<double, 3> >& r_deformed_position = problem.rGetDeformedPosition();
 //        TS_ASSERT_DELTA(r_deformed_position[1](0), 0.0879, 1e-3);
 //
 //        MechanicsEventHandler::Headings();

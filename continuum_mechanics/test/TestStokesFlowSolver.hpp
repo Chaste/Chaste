@@ -62,7 +62,7 @@ public:
      */
     void TestStokesExactSolutionSimple()
     {
-        for (unsigned run=0; run<2; run++)
+        for (unsigned run = 0; run<2; run++)
         {
             // Set up a mesh on [0 1]x[0 1]
             unsigned num_elem = (run==0 ? 1 : 10);
@@ -73,8 +73,8 @@ public:
 
             // Boundary flow
             std::vector<unsigned> dirichlet_nodes;
-            std::vector<c_vector<double,2> > dirichlet_flow;
-            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+            std::vector<c_vector<double, 2> > dirichlet_flow;
+            for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
             {
                 double x = mesh.GetNode(i)->rGetLocation()[0];
                 double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -83,7 +83,7 @@ public:
                 if (x == 0.0 || y == 0.0 || y == 1.0)
                 {
                     dirichlet_nodes.push_back(i);
-                    c_vector<double,2> flow = zero_vector<double>(2);
+                    c_vector<double, 2> flow = zero_vector<double>(2);
 
                     flow(0) = x;
                     flow(1) = -y;
@@ -108,7 +108,7 @@ public:
 
             solver.Solve();
 
-            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+            for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
             {
                 double x = mesh.GetNode(i)->rGetLocation()[0];
                 double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -121,7 +121,7 @@ public:
 
             // test the pressures
             std::vector<double>& r_pressures = solver.rGetPressures();
-            for (unsigned i=0; i<r_pressures.size(); ++i)
+            for (unsigned i = 0; i<r_pressures.size(); ++i)
             {
                 // solution is in finite element space, so FEM solution will be exact,
                 // apart from linear solver errors
@@ -148,8 +148,8 @@ public:
 
         // Boundary flow
         std::vector<unsigned> dirichlet_nodes;
-        std::vector<c_vector<double,2> > dirichlet_flow;
-        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+        std::vector<c_vector<double, 2> > dirichlet_flow;
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -158,7 +158,7 @@ public:
             if (x == 0.0 || y == 0.0)
             {
                 dirichlet_nodes.push_back(i);
-                c_vector<double,2> flow = zero_vector<double>(2);
+                c_vector<double, 2> flow = zero_vector<double>(2);
 
                 flow(0) = y;
                 flow(1) = -x;
@@ -176,7 +176,7 @@ public:
 
         solver.Solve();
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -189,7 +189,7 @@ public:
 
         // test the pressures
         std::vector<double>& r_pressures = solver.rGetPressures();
-        for (unsigned i=0; i<r_pressures.size(); ++i)
+        for (unsigned i = 0; i<r_pressures.size(); ++i)
         {
             // solution is in finite element space, so FEM solution will be exact,
             // apart from linear solver errors
@@ -216,15 +216,15 @@ public:
 
         // Boundary flow
         std::vector<unsigned> dirichlet_nodes;
-        std::vector<c_vector<double,2> > dirichlet_flow;
-        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+        std::vector<c_vector<double, 2> > dirichlet_flow;
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
             if (x == 0.0 || x==1.0 || y == 0.0 || y == 1.0) // should really be using a BoundaryNodeIterator
             {
                 dirichlet_nodes.push_back(i);
-                c_vector<double,2> flow = zero_vector<double>(2);
+                c_vector<double, 2> flow = zero_vector<double>(2);
 
                 flow(0) = y*(1-y);
                 flow(1) = 0.0;
@@ -232,7 +232,7 @@ public:
             }
         }
 
-        c_vector<double,2> body_force = zero_vector<double>(2);
+        c_vector<double, 2> body_force = zero_vector<double>(2);
 
         StokesFlowProblemDefinition<2> problem_defn(mesh);
         problem_defn.SetViscosity(mu);
@@ -245,7 +245,7 @@ public:
 
         solver.Solve();
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             double y = mesh.GetNode(i)->rGetLocation()[1];
             double exact_flow_x = y*(1-y);
@@ -306,8 +306,8 @@ public:
 
         // Boundary flow
         std::vector<unsigned> dirichlet_nodes;
-        std::vector<c_vector<double,2> > dirichlet_flow;
-        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+        std::vector<c_vector<double, 2> > dirichlet_flow;
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -316,7 +316,7 @@ public:
             if (x == 0.0 || y == 0.0)
             {
                 dirichlet_nodes.push_back(i);
-                c_vector<double,2> flow = zero_vector<double>(2);
+                c_vector<double, 2> flow = zero_vector<double>(2);
 
                 flow(0) = y;
                 flow(1) = -x;
@@ -325,28 +325,28 @@ public:
         }
 
         // apply non-zero Neumann BCs on right and top sides
-        std::vector<BoundaryElement<1,2>*> boundary_elems;
-        std::vector<c_vector<double,2> > stresses;
+        std::vector<BoundaryElement<1, 2>*> boundary_elems;
+        std::vector<c_vector<double, 2> > stresses;
 
-        for (TetrahedralMesh<2,2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
+        for (TetrahedralMesh<2, 2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
              iter != mesh.GetBoundaryElementIteratorEnd();
              ++iter)
         {
             if (fabs((*iter)->CalculateCentroid()[0] - 1.0) < 1e-4)
             {
-                BoundaryElement<1,2>* p_element = *iter;
+                BoundaryElement<1, 2>* p_element = *iter;
                 boundary_elems.push_back(p_element);
 
-                c_vector<double,2> stress = zero_vector<double>(2);
+                c_vector<double, 2> stress = zero_vector<double>(2);
                 stress(0) = 3.0; // stress = (3,0) = 3*normal
                 stresses.push_back(stress);
             }
             else if (fabs((*iter)->CalculateCentroid()[1] - 1.0) < 1e-4)
             {
-                BoundaryElement<1,2>* p_element = *iter;
+                BoundaryElement<1, 2>* p_element = *iter;
                 boundary_elems.push_back(p_element);
 
-                c_vector<double,2> stress = zero_vector<double>(2);
+                c_vector<double, 2> stress = zero_vector<double>(2);
                 stress(1) = 3.0; // stress = (0,3) = 3*normal
                 stresses.push_back(stress);
             }
@@ -364,7 +364,7 @@ public:
 
         solver.Solve();
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -377,7 +377,7 @@ public:
 
         // test the pressures
         std::vector<double>& r_pressures = solver.rGetPressures();
-        for (unsigned i=0; i<r_pressures.size(); ++i)
+        for (unsigned i = 0; i<r_pressures.size(); ++i)
         {
             // solution is in finite element space, so FEM solution will be exact,
             // apart from linear solver errors
@@ -397,7 +397,7 @@ public:
         std::vector<unsigned> num_elem(num_runs);
 
         // set up a mesh on [-1 1]x[-1 1]
-        for (unsigned run=0; run<num_runs; run++)
+        for (unsigned run = 0; run<num_runs; run++)
         {
             num_elem[run] = SmallPow(2u, run+1u);
             QuadraticMesh<2> mesh(2.0/num_elem[run], 2.0, 2.0);
@@ -408,15 +408,15 @@ public:
 
             // Boundary flow
             std::vector<unsigned> dirichlet_nodes;
-            std::vector<c_vector<double,2> > dirichlet_flow;
-            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+            std::vector<c_vector<double, 2> > dirichlet_flow;
+            for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
             {
                 double x = mesh.GetNode(i)->rGetLocation()[0];
                 double y = mesh.GetNode(i)->rGetLocation()[1];
                 if (x == -1.0 || x == 1.0 || y == -1.0 || y == 1.0)
                 {
                     dirichlet_nodes.push_back(i);
-                    c_vector<double,2> flow = zero_vector<double>(2);
+                    c_vector<double, 2> flow = zero_vector<double>(2);
 
                     flow(0) = 20.0*x*y*y*y;
                     flow(1) = 5.0*x*x*x*x - 5.0*y*y*y*y;
@@ -426,7 +426,7 @@ public:
 
             assert(dirichlet_flow.size() == 8*num_elem[run]);
 
-            c_vector<double,2> body_force = zero_vector<double>(2);
+            c_vector<double, 2> body_force = zero_vector<double>(2);
 
             StokesFlowProblemDefinition<2> problem_defn(mesh);
             problem_defn.SetViscosity(mu);
@@ -439,7 +439,7 @@ public:
             solver.Solve();
 
 
-            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+            for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
             {
                 double x = mesh.GetNode(i)->rGetLocation()[0];
                 double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -460,7 +460,7 @@ public:
             std::vector<double>& r_pressures = solver.rGetPressures();
 
             double pressure_difference = 0.0;
-            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+            for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
             {
                 double x = mesh.GetNode(i)->rGetLocation()[0];
                 double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -469,7 +469,7 @@ public:
             }
             pressure_difference /= mesh.GetNumVertices();
 
-            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+            for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
             {
                 double x = mesh.GetNode(i)->rGetLocation()[0];
                 double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -479,7 +479,7 @@ public:
         }
 
         std::cout << "Num_elements Linf_error_flow Linf_error_p\n";
-        for (unsigned i=0; i<num_runs; ++i)
+        for (unsigned i = 0; i<num_runs; ++i)
         {
             std::cout << num_elem[i] << " " << L_inf_error_flow[i] << " " << L_inf_error_p[i] << "\n";
         }
@@ -497,7 +497,7 @@ public:
         double res_flow[5] = { 1.51032, 0.250461, 0.0368664, 0.00464591, 0.000625753 };
         double res_p[5] = { 14.3527, 5.12699, 1.95504, 0.576949, 0.155241};
         assert(num_runs <= 5);
-        for (unsigned i=0; i<num_runs; ++i)
+        for (unsigned i = 0; i<num_runs; ++i)
         {
             TS_ASSERT_DELTA( L_inf_error_flow[i], res_flow[i], 1e-3);
             TS_ASSERT_DELTA( L_inf_error_p[i], res_p[i], 1e-3);
@@ -518,8 +518,8 @@ public:
 
         // Boundary flow
         std::vector<unsigned> dirichlet_nodes;
-        std::vector<c_vector<double,2> > dirichlet_flow;
-        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+        std::vector<c_vector<double, 2> > dirichlet_flow;
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -527,7 +527,7 @@ public:
             if (y == 1.0)
             {
                 dirichlet_nodes.push_back(i);
-                c_vector<double,2> flow = zero_vector<double>(2);
+                c_vector<double, 2> flow = zero_vector<double>(2);
 
                 flow(0) = x*(1-x);
                 flow(1) = 0.0;
@@ -536,7 +536,7 @@ public:
             else if (x == 0.0 || x == 1.0 || y == 0.0)
             {
                 dirichlet_nodes.push_back(i);
-                c_vector<double,2> flow = zero_vector<double>(2);
+                c_vector<double, 2> flow = zero_vector<double>(2);
                 flow(0) = 0.0;
                 flow(1) = 0.0;
                 dirichlet_flow.push_back(flow);
@@ -569,10 +569,10 @@ public:
         double min_p = DBL_MAX;
         double max_p = -DBL_MAX;
 
-        std::vector<c_vector<double,2> >& r_flow = solver.rGetVelocities();
+        std::vector<c_vector<double, 2> >& r_flow = solver.rGetVelocities();
         std::vector<double>& r_pressures = solver.rGetPressures();
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             min_u = std::min(min_u, r_flow[i](0));
             max_u = std::max(max_u, r_flow[i](0));
@@ -598,7 +598,7 @@ public:
         TS_ASSERT_DELTA(max_v,  0.075, 5e-3);
 
         // find a node in the interior for which u and v both not small
-        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -626,9 +626,9 @@ public:
 
         // Boundary flow
         std::vector<unsigned> dirichlet_nodes;
-        std::vector<c_vector<double,3> > dirichlet_flow;
+        std::vector<c_vector<double, 3> > dirichlet_flow;
 
-        for ( TetrahedralMesh<3,3>::BoundaryNodeIterator iter = mesh.GetBoundaryNodeIteratorBegin();
+        for ( TetrahedralMesh<3, 3>::BoundaryNodeIterator iter = mesh.GetBoundaryNodeIteratorBegin();
               iter != mesh.GetBoundaryNodeIteratorEnd();
               ++iter)
         {
@@ -636,7 +636,7 @@ public:
             double y = (*iter)->rGetLocation()[1];
             double z = (*iter)->rGetLocation()[2];
 
-            c_vector<double,3> flow = zero_vector<double>(3);
+            c_vector<double, 3> flow = zero_vector<double>(3);
 
             flow(0) = x;
             flow(1) = y;
@@ -655,9 +655,9 @@ public:
         solver.SetKspAbsoluteTolerance(1e-12);
         solver.Solve();
 
-        std::vector<c_vector<double,3> >& r_solution = solver.rGetVelocities();
+        std::vector<c_vector<double, 3> >& r_solution = solver.rGetVelocities();
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -672,7 +672,7 @@ public:
         std::vector<double>& r_pressures = solver.rGetPressures();
         bool first = true;
         double value;
-        for (unsigned i=0; i<r_pressures.size(); ++i)
+        for (unsigned i = 0; i<r_pressures.size(); ++i)
         {
             if (first)
             {
@@ -696,9 +696,9 @@ public:
 
         // Boundary flow
         std::vector<unsigned> dirichlet_nodes;
-        std::vector<c_vector<double,3> > dirichlet_flow;
+        std::vector<c_vector<double, 3> > dirichlet_flow;
 
-        for ( TetrahedralMesh<3,3>::BoundaryNodeIterator iter = mesh.GetBoundaryNodeIteratorBegin();
+        for ( TetrahedralMesh<3, 3>::BoundaryNodeIterator iter = mesh.GetBoundaryNodeIteratorBegin();
               iter != mesh.GetBoundaryNodeIteratorEnd();
               ++iter)
         {
@@ -706,7 +706,7 @@ public:
             double y = (*iter)->rGetLocation()[1];
             double z = (*iter)->rGetLocation()[2];
 
-            c_vector<double,3> flow = zero_vector<double>(3);
+            c_vector<double, 3> flow = zero_vector<double>(3);
 
             if (fabs(z-1.0)<1e-6)
             {
@@ -734,9 +734,9 @@ public:
         TS_ASSERT(vtk_file.Exists());
 #endif
 
-        std::vector<c_vector<double,3> >& r_solution = solver.rGetVelocities();
+        std::vector<c_vector<double, 3> >& r_solution = solver.rGetVelocities();
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];

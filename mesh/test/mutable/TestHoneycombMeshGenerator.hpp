@@ -47,14 +47,14 @@ class TestHoneycombMeshGenerator : public CxxTest::TestSuite
 {
 private:
 
-    void Output2DNodesToFile(MutableMesh<2,2>* pMesh, std::string fileName)
+    void Output2DNodesToFile(MutableMesh<2, 2>* pMesh, std::string fileName)
     {
         OutputFileHandler handler("");
         out_stream file = handler.OpenOutputFile(fileName);
 
         unsigned num_nodes = pMesh->GetNumNodes();
 
-        for (unsigned i=0; i<num_nodes; ++i)
+        for (unsigned i = 0; i<num_nodes; ++i)
         {
             c_vector<double, 2> location;
             location = pMesh->GetNode(i)->rGetLocation();
@@ -75,7 +75,7 @@ public:
 
         HoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
 
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 16u);
 
@@ -97,7 +97,7 @@ public:
         double length = static_cast<double>(num_cells_depth)*(sqrt(3.0)/2)*width/static_cast<double>(num_cells_width);
 
         // Check the mesh
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(static_cast<unsigned>(p_mesh->GetNumNodes()),
             (num_cells_width+2*ghosts)*(num_cells_depth+2*ghosts));
@@ -131,7 +131,7 @@ public:
         TS_ASSERT_EQUALS(location_indices.size(), p_mesh->GetNumNodes() - 2*(ghosts*(num_cells_width + 2*ghosts + num_cells_depth)));
 
         std::set<unsigned> correct_ghost_node_indices;
-        for (unsigned i=0; i<this_many_ghosts_at_start; ++i)
+        for (unsigned i = 0; i<this_many_ghosts_at_start; ++i)
         {
             correct_ghost_node_indices.insert(i);
         }
@@ -142,7 +142,7 @@ public:
         std::set<unsigned> location_indices_set;
         std::set<unsigned> ghost_node_indices;
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); ++i)
+        for (unsigned i = 0; i<p_mesh->GetNumNodes(); ++i)
         {
             node_indices.insert(p_mesh->GetNode(i)->GetIndex());
         }
@@ -175,7 +175,7 @@ public:
         double length = static_cast<double>(num_cells_depth)*(sqrt(3.0)/2)*width/static_cast<double>(num_cells_width);
 
         // Check the mesh
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(static_cast<unsigned>(p_mesh->GetNumNodes()),
             (num_cells_width+2*ghosts)*(num_cells_depth+2*ghosts));
@@ -210,7 +210,7 @@ public:
         TS_ASSERT_EQUALS(location_indices.size(), p_mesh->GetNumNodes() - 2*(ghosts*(num_cells_width + 2*ghosts + num_cells_depth)));
 
         std::set<unsigned> correct_ghost_node_indices;
-        for (unsigned i=0; i<this_many_ghosts_at_start; ++i)
+        for (unsigned i = 0; i<this_many_ghosts_at_start; ++i)
         {
             correct_ghost_node_indices.insert(i);
         }
@@ -221,7 +221,7 @@ public:
         std::set<unsigned> location_indices_set;
         std::set<unsigned> ghost_node_indices;
 
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); ++i)
+        for (unsigned i = 0; i<p_mesh->GetNumNodes(); ++i)
         {
             node_indices.insert(p_mesh->GetNode(i)->GetIndex());
         }
@@ -251,7 +251,7 @@ public:
         unsigned thickness_of_ghost_layer = 0;
 
         HoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 16u);
 
@@ -273,10 +273,10 @@ public:
         double radius = 3.5;
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetCircularMesh(radius);
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetCircularMesh(radius);
 
         double epsilon = 1e-5;
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); ++i)
+        for (unsigned i = 0; i<p_mesh->GetNumNodes(); ++i)
         {
             TS_ASSERT_LESS_THAN_EQUALS(norm_2(p_mesh->GetNode(i)->rGetLocation()), radius+epsilon);
         }
@@ -297,7 +297,7 @@ public:
     void TestCircularMeshIsJacobian()
     {
         HoneycombMeshGenerator generator(20, 20, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetCircularMesh(10);
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetCircularMesh(10);
 
         NodeMap map(p_mesh->GetNumAllNodes());
         p_mesh->ReMesh(map);
@@ -310,7 +310,7 @@ public:
         unsigned thickness_of_ghost_layer = 1;
 
         HoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 10404u);
 

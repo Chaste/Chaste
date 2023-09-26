@@ -56,7 +56,7 @@ void NodeMap::Resize(unsigned size)
 
 void NodeMap::ResetToIdentity()
 {
-    for (unsigned index=0; index<mMap.size(); index++)
+    for (unsigned index = 0; index<mMap.size(); index++)
     {
         mMap[index] = index;  // This is needed if we later diverge from identity (e.g. delete nodes)
     }

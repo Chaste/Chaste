@@ -65,14 +65,14 @@ public:
         ChastePoint<2> zero2(0,0);
         ChastePoint<3> zero3(0,0,0);
 
-        SimplePoissonEquation<1,1> heat_equation1;
-        SimplePoissonEquation<2,2> heat_equation2;
-        SimplePoissonEquation<3,3> heat_equation3;
+        SimplePoissonEquation<1, 1> heat_equation1;
+        SimplePoissonEquation<2, 2> heat_equation2;
+        SimplePoissonEquation<3, 3> heat_equation3;
 
         // Diffusion matrices should be equal to identity
-        c_matrix<double,1,1> diff1 = heat_equation1.ComputeDiffusionTerm(zero1);
-        c_matrix<double,2,2> diff2 = heat_equation2.ComputeDiffusionTerm(zero2);
-        c_matrix<double,3,3> diff3 = heat_equation3.ComputeDiffusionTerm(zero3);
+        c_matrix<double,1, 1> diff1 = heat_equation1.ComputeDiffusionTerm(zero1);
+        c_matrix<double,2, 2> diff2 = heat_equation2.ComputeDiffusionTerm(zero2);
+        c_matrix<double,3, 3> diff3 = heat_equation3.ComputeDiffusionTerm(zero3);
 
         TS_ASSERT_DELTA(diff1(0,0),1,1e-12);
 
@@ -88,7 +88,7 @@ public:
         TS_ASSERT_DELTA(diff3(1,2),0,1e-12);
 
         Node<2> zero(0);
-        SimplePoissonEquation<2,2> heat_equation;
+        SimplePoissonEquation<2, 2> heat_equation;
         TS_ASSERT_DELTA(heat_equation.ComputeConstantInUSourceTermAtNode(zero), 1.0, 1e-12);
     }
 
@@ -175,14 +175,14 @@ public:
         std::vector<Node<1>*> one_d_nodes;
         one_d_nodes.push_back(new Node<1>(0, false, 2.0));
         one_d_nodes.push_back(new Node<1>(1, false, 2.5));
-        Element<1,1> one_d_element(0u, one_d_nodes);
+        Element<1, 1> one_d_element(0u, one_d_nodes);
         ChastePoint<1> zero1(0);
 
         std::vector<Node<2>*> two_d_nodes;
         two_d_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
         two_d_nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
         two_d_nodes.push_back(new Node<2>(2, false, 0.0, 1.0));
-        Element<2,2> two_d_element(0u, two_d_nodes);
+        Element<2, 2> two_d_element(0u, two_d_nodes);
         ChastePoint<2> zero2(0,0);
 
         std::vector<Node<3>*> three_d_nodes;
@@ -190,7 +190,7 @@ public:
         three_d_nodes.push_back(new Node<3>(1, false, 1.0, 0.0, 0.0));
         three_d_nodes.push_back(new Node<3>(2, false, 0.0, 1.0, 0.0));
         three_d_nodes.push_back(new Node<3>(3, false, 0.0, 0.0, 1.0));
-        Element<3,3> three_d_element(0u, three_d_nodes);
+        Element<3, 3> three_d_element(0u, three_d_nodes);
         ChastePoint<3> zero3(0,0,0);
         double u = 2.0;
 
@@ -278,7 +278,7 @@ public:
         ChastePoint<2> point;
         TS_ASSERT_DELTA(pde.ComputeSourceTerm(point,DBL_MAX), 0.1, 1e-6);
         TS_ASSERT_DELTA(pde.ComputeDuDtCoefficientFunction(point), 1.0, 1e-6);
-        c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
+        c_matrix<double,2, 2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
         for (unsigned i = 0; i < 2; ++i)
         {
             for (unsigned j = 0; j < 2; ++j)
@@ -302,7 +302,7 @@ public:
 
         {
             // Create a PDE object
-            AbstractLinearParabolicPde<2,2>* const p_pde = new SimpleUniformSourceParabolicPde<2>(0.1);
+            AbstractLinearParabolicPde<2, 2>* const p_pde = new SimpleUniformSourceParabolicPde<2>(0.1);
 
             // Create output archive and archive PDE object
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -313,7 +313,7 @@ public:
         }
 
         {
-            AbstractLinearParabolicPde<2,2>* p_pde;
+            AbstractLinearParabolicPde<2, 2>* p_pde;
 
             // Create an input archive and restore PDE object from archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);

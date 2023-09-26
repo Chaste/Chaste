@@ -71,9 +71,9 @@ void AbstractForce<ELEMENT_DIM, SPACE_DIM>::WriteDataToVisualizerSetupFile(
 }
 
 // Explicit instantiation
-template class AbstractForce<1,1>;
-template class AbstractForce<1,2>;
-template class AbstractForce<2,2>;
-template class AbstractForce<1,3>;
-template class AbstractForce<2,3>;
-template class AbstractForce<3,3>;
+template class AbstractForce<1, 1>;
+template class AbstractForce<1, 2>;
+template class AbstractForce<2, 2>;
+template class AbstractForce<1, 3>;
+template class AbstractForce<2, 3>;
+template class AbstractForce<3, 3>;

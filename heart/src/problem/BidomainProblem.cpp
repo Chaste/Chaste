@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DistributedVector.hpp"
 #include "ReplicatableVector.hpp"
 
-template <unsigned DIM>
+template<unsigned DIM>
 void BidomainProblem<DIM>::AnalyseMeshForBath()
 {
     // Annotate bath notes with correct region code
@@ -58,7 +58,7 @@ void BidomainProblem<DIM>::AnalyseMeshForBath()
         bool any_bath_element_found = false;
 
         // Set nodes that are part of a heart element to be heart nodes
-        //for (unsigned i=0; i<this->mpMesh->GetNumElements(); ++i)
+        //for (unsigned i = 0; i<this->mpMesh->GetNumElements(); ++i)
         for (auto it = this->mpMesh->GetElementIteratorBegin();
              it != this->mpMesh->GetElementIteratorEnd();
              ++it)
@@ -67,7 +67,7 @@ void BidomainProblem<DIM>::AnalyseMeshForBath()
 
             if (HeartRegionCode::IsRegionTissue( r_element.GetUnsignedAttribute() ))
             {
-                for (unsigned j=0; j<r_element.GetNumNodes(); ++j)
+                for (unsigned j = 0; j<r_element.GetNumNodes(); ++j)
                 {
                     r_element.GetNode(j)->SetRegion(HeartRegionCode::GetValidTissueId());
                 }
@@ -99,7 +99,7 @@ void BidomainProblem<DIM>::AnalyseMeshForBath()
 template<unsigned DIM>
 Vec BidomainProblem<DIM>::CreateInitialCondition()
 {
-    Vec init_cond = AbstractCardiacProblem<DIM,DIM,2>::CreateInitialCondition();
+    Vec init_cond = AbstractCardiacProblem<DIM, DIM, 2>::CreateInitialCondition();
     if (mHasBath)
     {
         // get the voltage stripe
@@ -141,7 +141,7 @@ AbstractDynamicLinearPdeSolver<DIM, DIM, 2>* BidomainProblem<DIM>::CreateSolver(
      * As long as they are kept as member variables here for as long as they are
      * required in the solvers it should all work OK.
      */
-    mpSolver = new BidomainSolver<DIM,DIM>(mHasBath,
+    mpSolver = new BidomainSolver<DIM, DIM>(mHasBath,
                                            this->mpMesh,
                                            mpBidomainTissue,
                                            this->mpBoundaryConditionsContainer.get());
@@ -163,7 +163,7 @@ AbstractDynamicLinearPdeSolver<DIM, DIM, 2>* BidomainProblem<DIM>::CreateSolver(
 template<unsigned DIM>
 BidomainProblem<DIM>::BidomainProblem(
             AbstractCardiacCellFactory<DIM>* pCellFactory, bool hasBath)
-    : AbstractCardiacProblem<DIM,DIM, 2>(pCellFactory),
+    : AbstractCardiacProblem<DIM, DIM, 2>(pCellFactory),
       mpBidomainTissue(NULL),
       mRowForAverageOfPhiZeroed(INT_MAX),
       mHasBath(hasBath)
@@ -184,7 +184,7 @@ template<unsigned DIM>
 void BidomainProblem<DIM>::SetFixedExtracellularPotentialNodes(std::vector<unsigned> nodes)
 {
     mFixedExtracellularPotentialNodes.resize(nodes.size());
-    for (unsigned i=0; i<nodes.size(); ++i)
+    for (unsigned i = 0; i<nodes.size(); ++i)
     {
         // the solver checks that the nodes[i] is less than
         // the number of nodes in the mesh so this is not done here
@@ -232,7 +232,7 @@ void BidomainProblem<DIM>::WriteInfo(double time)
 template<unsigned DIM>
 void BidomainProblem<DIM>::DefineWriterColumns(bool extending)
 {
-    AbstractCardiacProblem<DIM,DIM,2>::DefineWriterColumns(extending);
+    AbstractCardiacProblem<DIM, DIM, 2>::DefineWriterColumns(extending);
     if (extending)
     {
         mExtracelluarColumnId = this->mpWriter->GetVariableByName("Phi_e");
@@ -241,7 +241,7 @@ void BidomainProblem<DIM>::DefineWriterColumns(bool extending)
     {
         mExtracelluarColumnId = this->mpWriter->DefineVariable("Phi_e","mV");
     }
-    AbstractCardiacProblem<DIM,DIM,2>::DefineExtraVariablesWriterColumns(extending);
+    AbstractCardiacProblem<DIM, DIM, 2>::DefineExtraVariablesWriterColumns(extending);
 }
 
 template<unsigned DIM>
@@ -252,13 +252,13 @@ void BidomainProblem<DIM>::WriteOneStep(double time, Vec voltageVec)
     variable_ids.push_back(this->mVoltageColumnId);
     variable_ids.push_back(mExtracelluarColumnId);
     this->mpWriter->PutStripedVector(variable_ids, voltageVec);
-    AbstractCardiacProblem<DIM,DIM,2>::WriteExtraVariablesOneStep();
+    AbstractCardiacProblem<DIM, DIM, 2>::WriteExtraVariablesOneStep();
 }
 
 template<unsigned DIM>
 void BidomainProblem<DIM>::PreSolveChecks()
 {
-    AbstractCardiacProblem<DIM,DIM, 2>::PreSolveChecks();
+    AbstractCardiacProblem<DIM, DIM, 2>::PreSolveChecks();
     if (mFixedExtracellularPotentialNodes.empty())
     {
         // We're not pinning any nodes.
@@ -345,8 +345,8 @@ void BidomainProblem<DIM>::OnEndOfTimestep(double time)
 
         // Set up default boundary conditions container - no Neumann fluxes
         // or Dirichlet fixed nodes
-        this->mpDefaultBoundaryConditionsContainer.reset(new BoundaryConditionsContainer<DIM,DIM,2>);
-        for (unsigned problem_index=0; problem_index<2; problem_index++)
+        this->mpDefaultBoundaryConditionsContainer.reset(new BoundaryConditionsContainer<DIM, DIM, 2>);
+        for (unsigned problem_index = 0; problem_index<2; problem_index++)
         {
             this->mpDefaultBoundaryConditionsContainer->DefineZeroNeumannOnMeshBoundary(this->mpMesh, problem_index);
         }
@@ -356,7 +356,7 @@ void BidomainProblem<DIM>::OnEndOfTimestep(double time)
         if (mpElectrodes->HasGroundedElectrode())
         {
             delete mpSolver;
-            AbstractCardiacProblem<DIM,DIM,2>::mpSolver = CreateSolver();
+            AbstractCardiacProblem<DIM, DIM, 2>::mpSolver = CreateSolver();
             mpSolver->SetTimeStep(HeartConfig::Instance()->GetPdeTimeStep());
         }
 

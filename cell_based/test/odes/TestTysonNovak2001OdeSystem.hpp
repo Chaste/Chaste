@@ -116,7 +116,7 @@ public:
 
 //        OutputFileHandler handler("");
 //        out_stream file=handler.OpenOutputFile("tyson_novak.dat");
-//        for (unsigned i = 0; i < =end; ++i)
+//        for (unsigned i = 0; i <= end; ++i)
 //        {
 //            (*file) << solutions.rGetTimes()[i]<< "\t" << solutions.rGetSolutions()[i][0] << "\t" << solutions.rGetSolutions()[i][1] << "\t" << solutions.rGetSolutions()[i][2] << "\t" << solutions.rGetSolutions()[i][3] << "\t" << solutions.rGetSolutions()[i][4] << "\t" << solutions.rGetSolutions()[i][5] << "\n" << std::flush;
 //        }

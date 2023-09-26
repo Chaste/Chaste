@@ -73,12 +73,12 @@ void CellBetaCateninWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(CellPtr pCell, Abs
 }
 
 // Explicit instantiation
-template class CellBetaCateninWriter<1,1>;
-template class CellBetaCateninWriter<1,2>;
-template class CellBetaCateninWriter<2,2>;
-template class CellBetaCateninWriter<1,3>;
-template class CellBetaCateninWriter<2,3>;
-template class CellBetaCateninWriter<3,3>;
+template class CellBetaCateninWriter<1, 1>;
+template class CellBetaCateninWriter<1, 2>;
+template class CellBetaCateninWriter<2, 2>;
+template class CellBetaCateninWriter<1, 3>;
+template class CellBetaCateninWriter<2, 3>;
+template class CellBetaCateninWriter<3, 3>;
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer

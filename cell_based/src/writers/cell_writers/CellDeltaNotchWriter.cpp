@@ -86,12 +86,12 @@ void CellDeltaNotchWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(
 }
 
 // Explicit instantiation
-template class CellDeltaNotchWriter<1,1>;
-template class CellDeltaNotchWriter<1,2>;
-template class CellDeltaNotchWriter<2,2>;
-template class CellDeltaNotchWriter<1,3>;
-template class CellDeltaNotchWriter<2,3>;
-template class CellDeltaNotchWriter<3,3>;
+template class CellDeltaNotchWriter<1, 1>;
+template class CellDeltaNotchWriter<1, 2>;
+template class CellDeltaNotchWriter<2, 2>;
+template class CellDeltaNotchWriter<1, 3>;
+template class CellDeltaNotchWriter<2, 3>;
+template class CellDeltaNotchWriter<3, 3>;
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer

@@ -45,14 +45,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DistributedTetrahedralMesh.hpp"
 #include "Warnings.hpp"
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToVtkConverter(
     const FileFinder& rInputDirectory,
     const std::string& rFileBaseName,
     AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
     bool parallelVtk,
     bool usingOriginalNodeOrdering)
-    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(
+    : AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>(
           rInputDirectory,
           rFileBaseName,
           pMesh,
@@ -66,15 +66,15 @@ Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToVtkConverter(
     std::string output_directory = 
         rInputDirectory.GetRelativePath(test_output) + "/" + this->mRelativeSubdirectory;
 
-    VtkMeshWriter<ELEMENT_DIM,SPACE_DIM> vtk_writer(output_directory, rFileBaseName, false);
+    VtkMeshWriter<ELEMENT_DIM, SPACE_DIM> vtk_writer(output_directory, rFileBaseName, false);
 
     DistributedVectorFactory* p_factory = pMesh->GetDistributedVectorFactory();
 
     // Make sure that we are never trying to write from an incomplete data HDF5 file
     assert(this->mpReader->GetNumberOfRows() == pMesh->GetNumNodes());
 
-    DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* p_distributed_mesh = 
-        dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>*>(pMesh);
+    DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* p_distributed_mesh = 
+        dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>*>(pMesh);
 
     unsigned num_nodes = pMesh->GetNumNodes();
     if (parallelVtk)
@@ -176,9 +176,9 @@ Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToVtkConverter(
 }
 
 // Explicit instantiation
-template class Hdf5ToVtkConverter<1,1>;
-template class Hdf5ToVtkConverter<1,2>;
-template class Hdf5ToVtkConverter<2,2>;
-template class Hdf5ToVtkConverter<1,3>;
-template class Hdf5ToVtkConverter<2,3>;
-template class Hdf5ToVtkConverter<3,3>;
+template class Hdf5ToVtkConverter<1, 1>;
+template class Hdf5ToVtkConverter<1, 2>;
+template class Hdf5ToVtkConverter<2, 2>;
+template class Hdf5ToVtkConverter<1, 3>;
+template class Hdf5ToVtkConverter<2, 3>;
+template class Hdf5ToVtkConverter<3, 3>;

@@ -89,12 +89,12 @@ private:
 public:
     void TestSimpleOrthotropic()
     {
-        TrianglesMeshReader<3,3> mesh_reader("heart/test/data/point50_heart_mesh/point50_bin");
+        TrianglesMeshReader<3, 3> mesh_reader("heart/test/data/point50_heart_mesh/point50_bin");
         std::string epi_face_file = "heart/test/data/point50_heart_mesh/epi.tri";
         std::string rv_face_file = "heart/test/data/point50_heart_mesh/rv.tri";
         std::string lv_face_file = "heart/test/data/point50_heart_mesh/lv.tri";
 
-        DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        DistributedTetrahedralMesh<3, 3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         mesh.ConstructFromMeshReader(mesh_reader);
 
         StreeterFibreGenerator<3> fibre_generator(mesh);
@@ -116,12 +116,12 @@ public:
 
     void TestSimpleOrthotropicNotDistributed()
     {
-        TrianglesMeshReader<3,3> mesh_reader("heart/test/data/point50_heart_mesh/point50_bin");
+        TrianglesMeshReader<3, 3> mesh_reader("heart/test/data/point50_heart_mesh/point50_bin");
         std::string epi_face_file = "heart/test/data/point50_heart_mesh/epi.tri";
         std::string rv_face_file = "heart/test/data/point50_heart_mesh/rv.tri";
         std::string lv_face_file = "heart/test/data/point50_heart_mesh/lv.tri";
 
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         StreeterFibreGenerator<3> fibre_generator(mesh);
@@ -145,11 +145,11 @@ public:
     void TestDownSampledRabbit()
     {
 
-        TrianglesMeshReader<3,3> mesh_reader("apps/texttest/weekly/Propagation3d/OxfordRabbitHeart_482um");
+        TrianglesMeshReader<3, 3> mesh_reader("apps/texttest/weekly/Propagation3d/OxfordRabbitHeart_482um");
         std::string epi_face_file = "apps/texttest/weekly/Propagation3d/OxfordRabbitHeart_482um.epi";
         std::string rv_face_file = "apps/texttest/weekly/Propagation3d/OxfordRabbitHeart_482um.rv";
         std::string lv_face_file = "apps/texttest/weekly/Propagation3d/OxfordRabbitHeart_482um.lv";
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         StreeterFibreGenerator<3> fibre_generator(mesh);
@@ -189,20 +189,20 @@ public:
 
 #ifdef CHASTE_VTK
         //Output to VTK.
-        VtkMeshWriter<3,3> writer("TestVtkMeshWriter", "downsampled_fibres", false);
+        VtkMeshWriter<3, 3> writer("TestVtkMeshWriter", "downsampled_fibres", false);
         writer.AddCellData("OrthoFibres", fibres);
         writer.AddCellData("OrthoSecond", second);
         writer.AddCellData("OrthoThird", third);
 
         //Add debugging data
         std::string debug_files[3] = {"wall_thickness", "node_regions", "averaged_thickness"};
-        for (unsigned file=0; file<3; file++)
+        for (unsigned file = 0; file<3; file++)
         {
             std::ifstream ifs((handler.GetOutputDirectoryFullPath()+debug_files[file]+".data").c_str());
             TS_ASSERT(ifs.is_open());
             std::vector<double> payload;
             payload.reserve(mesh.GetNumNodes());
-            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+            for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
             {
                 double temp;
                 ifs >> temp;

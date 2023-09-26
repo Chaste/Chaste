@@ -140,7 +140,7 @@ public:
         }
         HeartConfig::Instance()->Reset();
         unsigned num_nodes=2;
-        TetrahedralMesh<1,1> mesh;
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructRegularSlabMesh(1.0, 1.0); // [0,1] with h=1.0, i.e. A mesh with 2 nodes
         assert(mesh.GetNumNodes()==num_nodes);
 
@@ -245,7 +245,7 @@ public:
             return;
         }
         HeartConfig::Instance()->Reset();
-        TetrahedralMesh<1,1> mesh;
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructRegularSlabMesh(1.0, 1.0); // [0,1] with h=1.0, i.e. 2 nodes in the mesh
 
         MyCardiacCellFactory cell_factory;
@@ -275,7 +275,7 @@ public:
             return;
         }
         HeartConfig::Instance()->Reset();
-        TetrahedralMesh<1,1> mesh;
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructRegularSlabMesh(1.0, 1.0); // [0,1] with h=1.0, i.e. a 2 node mesh
 
         MyCardiacCellFactory cell_factory;
@@ -327,7 +327,7 @@ public:
         HeartConfig::Instance()->Reset();
 
         HeartConfig::Instance()->Reset();
-        DistributedTetrahedralMesh<1,1> mesh;
+        DistributedTetrahedralMesh<1, 1> mesh;
         mesh.ConstructRegularSlabMesh(0.1, 1.0); // [0,1] with h=0.1, ie 11 node mesh
 
         MyCardiacCellFactory cell_factory;
@@ -351,7 +351,7 @@ public:
             }
         }
 
-        for (DistributedTetrahedralMesh<1,1>::HaloNodeIterator it=mesh.GetHaloNodeIteratorBegin();
+        for (DistributedTetrahedralMesh<1, 1>::HaloNodeIterator it=mesh.GetHaloNodeIteratorBegin();
              it != mesh.GetHaloNodeIteratorEnd();
              ++it)
         {
@@ -382,7 +382,7 @@ public:
             return;
         }
         HeartConfig::Instance()->Reset();
-        DistributedTetrahedralMesh<1,1> mesh;
+        DistributedTetrahedralMesh<1, 1> mesh;
         mesh.ConstructRegularSlabMesh(1.0, 1.0); // [0,1] with h=1.0, i.e. 2 node mesh
 
         MyCardiacCellFactory cell_factory;
@@ -465,8 +465,8 @@ public:
 
         c_matrix<double, 1, 1> tensor_before_archiving;
         {
-            TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-            TetrahedralMesh<1,1> mesh;
+            TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+            TetrahedralMesh<1, 1> mesh;
             mesh.ConstructFromMeshReader(mesh_reader);
 
             MyCardiacCellFactory cell_factory;
@@ -534,8 +534,8 @@ public:
     {
         HeartConfig::Instance()->Reset();
 
-        TrianglesMeshReader<2,2> reader("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
-        MixedDimensionMesh<2,2> mixed_mesh;
+        TrianglesMeshReader<2, 2> reader("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
+        MixedDimensionMesh<2, 2> mixed_mesh;
         mixed_mesh.ConstructFromMeshReader(reader);
 
         PurkinjeCellFactory cell_factory;
@@ -548,7 +548,7 @@ public:
         TS_ASSERT_EQUALS(tissue.rGetPurkinjeIionicCacheReplicated().GetSize(),
                          tissue.rGetIionicCacheReplicated().GetSize());
 
-        for (AbstractTetrahedralMesh<2,2>::NodeIterator current_node = mixed_mesh.GetNodeIteratorBegin();
+        for (AbstractTetrahedralMesh<2, 2>::NodeIterator current_node = mixed_mesh.GetNodeIteratorBegin();
              current_node != mixed_mesh.GetNodeIteratorEnd();
              ++current_node)
         {
@@ -601,7 +601,7 @@ public:
             TS_ASSERT_EQUALS(p_tissue->rGetPurkinjeCellsDistributed().size(), tissue.rGetPurkinjeCellsDistributed().size());
             TS_ASSERT_EQUALS(p_tissue->rGetPurkinjeIionicCacheReplicated().GetSize(), tissue.rGetPurkinjeIionicCacheReplicated().GetSize());
 
-            for (AbstractTetrahedralMesh<2,2>::NodeIterator current_node = p_tissue->mpMesh->GetNodeIteratorBegin();
+            for (AbstractTetrahedralMesh<2, 2>::NodeIterator current_node = p_tissue->mpMesh->GetNodeIteratorBegin();
                  current_node != p_tissue->mpMesh->GetNodeIteratorEnd();
                  ++current_node)
             {

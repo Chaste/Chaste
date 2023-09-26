@@ -126,7 +126,7 @@ public:
     void TestBoxGeneration1d()
     {
         // Create a mesh
-        TetrahedralMesh<1,1> mesh;
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructLinearMesh(20);
 
         double cut_off_length = 5.0;
@@ -184,14 +184,14 @@ public:
         correct_answer_4.insert(4);
         TS_ASSERT_EQUALS(local_boxes_to_box_4, correct_answer_4);
 
-        c_vector<double,1> miles_away;
+        c_vector<double, 1> miles_away;
         miles_away(0) = 47323854;
         TS_ASSERT_THROWS_CONTAINS(box_collection.CalculateContainingBox(miles_away), "Location in dimension 0 is");
     }
 
     void TestAddElement()
     {
-        TetrahedralMesh<1,1> mesh;
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructRegularSlabMesh(0.5, 1.0);
 
         double width = 0.4;
@@ -509,8 +509,8 @@ public:
     void TestBoxGeneration2d()
     {
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         double cut_off_length = 0.2;

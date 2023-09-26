@@ -42,9 +42,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>* MonodomainProblem<ELEMENT_DIM, SPACE_DIM>::CreateCardiacTissue()
+AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>* MonodomainProblem<ELEMENT_DIM, SPACE_DIM>::CreateCardiacTissue()
 {
-    mpMonodomainTissue = new MonodomainTissue<ELEMENT_DIM,SPACE_DIM>(this->mpCellFactory, HeartConfig::Instance()->GetUseStateVariableInterpolation());
+    mpMonodomainTissue = new MonodomainTissue<ELEMENT_DIM, SPACE_DIM>(this->mpCellFactory, HeartConfig::Instance()->GetUseStateVariableInterpolation());
     return mpMonodomainTissue;
 }
 
@@ -64,20 +64,20 @@ AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 1>* MonodomainProblem<ELE
 
     if (HeartConfig::Instance()->GetUseReactionDiffusionOperatorSplitting())
     {
-        return new OperatorSplittingMonodomainSolver<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,
+        return new OperatorSplittingMonodomainSolver<ELEMENT_DIM, SPACE_DIM>(this->mpMesh,
                                                                             mpMonodomainTissue,
                                                                             this->mpBoundaryConditionsContainer.get());
     }
     else
     {
-        return new MonodomainSolver<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,
+        return new MonodomainSolver<ELEMENT_DIM, SPACE_DIM>(this->mpMesh,
                                                            mpMonodomainTissue,
                                                            this->mpBoundaryConditionsContainer.get());
     }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-MonodomainProblem<ELEMENT_DIM, SPACE_DIM>::MonodomainProblem(AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>* pCellFactory)
+MonodomainProblem<ELEMENT_DIM, SPACE_DIM>::MonodomainProblem(AbstractCardiacCellFactory<ELEMENT_DIM, SPACE_DIM>* pCellFactory)
         : AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, 1>(pCellFactory),
           mpMonodomainTissue(NULL)
 {
@@ -96,7 +96,7 @@ MonodomainProblem<ELEMENT_DIM, SPACE_DIM>::~MonodomainProblem()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-MonodomainTissue<ELEMENT_DIM,SPACE_DIM> * MonodomainProblem<ELEMENT_DIM, SPACE_DIM>::GetMonodomainTissue()
+MonodomainTissue<ELEMENT_DIM, SPACE_DIM> * MonodomainProblem<ELEMENT_DIM, SPACE_DIM>::GetMonodomainTissue()
 {
     assert(mpMonodomainTissue != NULL);
     return mpMonodomainTissue;
@@ -124,8 +124,8 @@ void MonodomainProblem<ELEMENT_DIM, SPACE_DIM>::WriteInfo(double time)
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MonodomainProblem<ELEMENT_DIM, SPACE_DIM>::DefineWriterColumns(bool extending)
 {
-    AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,1>::DefineWriterColumns(extending);
-    AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,1>::DefineExtraVariablesWriterColumns(extending);
+    AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, 1>::DefineWriterColumns(extending);
+    AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, 1>::DefineExtraVariablesWriterColumns(extending);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -133,15 +133,15 @@ void MonodomainProblem<ELEMENT_DIM, SPACE_DIM>::WriteOneStep(double time, Vec vo
 {
     this->mpWriter->PutUnlimitedVariable(time);
     this->mpWriter->PutVector(this->mVoltageColumnId, voltageVec);
-    AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,1>::WriteExtraVariablesOneStep();
+    AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, 1>::WriteExtraVariablesOneStep();
 }
 
 // Explicit instantiation
-template class MonodomainProblem<1,1>;
-template class MonodomainProblem<1,2>;
-template class MonodomainProblem<1,3>;
-template class MonodomainProblem<2,2>;
-template class MonodomainProblem<3,3>;
+template class MonodomainProblem<1, 1>;
+template class MonodomainProblem<1, 2>;
+template class MonodomainProblem<1, 3>;
+template class MonodomainProblem<2, 2>;
+template class MonodomainProblem<3, 3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

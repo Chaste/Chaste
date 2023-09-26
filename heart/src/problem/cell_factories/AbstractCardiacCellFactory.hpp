@@ -66,7 +66,7 @@ private:
     /** The mesh is automatically set in MonodomainProblem and BidomainProblem.
      *  This member variable should be accessed through GetMesh(), which will check if it has been set before
      *  and throw an exception otherwise.*/
-    AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* mpMesh;
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* mpMesh;
 
     /**
      * A pointer to an HeartGeometryInformation information object
@@ -136,12 +136,12 @@ public:
     /**
      * @param pMesh  the mesh for which to create cardiac cells.
      */
-    virtual void SetMesh(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
+    virtual void SetMesh(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh);
 
     /**
      * @return  the mesh used to create the cells.
      */
-    AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* GetMesh();
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* GetMesh();
 
     /**
      * Set the HeartGeometryInformation object

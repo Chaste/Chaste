@@ -101,7 +101,7 @@ private:
      * @param gridIndices the coordinates (i), (i,j), or (i,j,k) depending on DIM
      * @return whether the box is in the penultimate location in each dimension
      */
-    c_vector<bool,DIM> IsIndexPenultimate(c_vector<unsigned, DIM> gridIndices);
+    c_vector<bool, DIM> IsIndexPenultimate(c_vector<unsigned, DIM> gridIndices);
 
     /**
      * Helper function for SetupLocalBoxesHalfOnly() and SetupAllLocalBoxes().

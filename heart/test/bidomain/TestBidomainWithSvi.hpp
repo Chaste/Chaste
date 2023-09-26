@@ -134,11 +134,11 @@ public:
         HeartConfig::Instance()->SetSimulationDuration(4.0); //ms
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
 
-        for (unsigned i=0; i<3; ++i)
+        for (unsigned i = 0; i<3; ++i)
         {
             // ICI - ionic current interpolation - the default
             {
-                TetrahedralMesh<1,1> mesh;
+                TetrahedralMesh<1, 1> mesh;
                 mesh.ConstructRegularSlabMesh(h[i], 1.0);
 
                 std::stringstream output_dir;
@@ -161,7 +161,7 @@ public:
 
             // SVI - state variable interpolation
             {
-                DistributedTetrahedralMesh<1,1> mesh;
+                DistributedTetrahedralMesh<1, 1> mesh;
                 mesh.ConstructRegularSlabMesh(h[i], 1.0);
 
                 std::stringstream output_dir;
@@ -183,7 +183,7 @@ public:
 
             // SVIT - state variable interpolation on straight (not distributed) tetrahedral mesh
             {
-                TetrahedralMesh<1,1> mesh;
+                TetrahedralMesh<1, 1> mesh;
                 mesh.ConstructRegularSlabMesh(h[i], 1.0);
 
                 std::stringstream output_dir;
@@ -205,7 +205,7 @@ public:
             double voltage_at_0_03_finest_mesh;
             if (i==0) // finest mesh
             {
-                for (unsigned j=0; j<final_solution_ici.GetSize(); ++j)
+                for (unsigned j = 0; j<final_solution_ici.GetSize(); ++j)
                 {
                     // visually checked they agree at this mesh resolution, and chosen tolerance from results
                     TS_ASSERT_DELTA(final_solution_ici[j], final_solution_svi[j], 0.35);
@@ -260,7 +260,7 @@ public:
 
         // ICI - nodal current interpolation - the default
         {
-            TetrahedralMesh<2,2> mesh;
+            TetrahedralMesh<2, 2> mesh;
             mesh.ConstructRegularSlabMesh(0.02 /*h*/, 0.5, 0.3);
 
             HeartConfig::Instance()->SetOutputDirectory("BidomainIci2d");
@@ -279,7 +279,7 @@ public:
 
         // SVI - state variable interpolation
         {
-            TetrahedralMesh<2,2> mesh;
+            TetrahedralMesh<2, 2> mesh;
             mesh.ConstructRegularSlabMesh(0.02 /*h*/, 0.5, 0.3);
 
             HeartConfig::Instance()->SetOutputDirectory("BidomainSvi2d");
@@ -312,10 +312,10 @@ public:
     void TestBidomainWithBathWithSvi()
     {
         /* Make a 4x4 node mesh and set two interior elements to be bath elements */
-        DistributedTetrahedralMesh<2,2> mesh;
+        DistributedTetrahedralMesh<2, 2> mesh;
         mesh.ConstructRegularSlabMesh(0.04, 0.12, 0.12);
 
-        for (AbstractTetrahedralMesh<2,2>::ElementIterator iter=mesh.GetElementIteratorBegin();
+        for (AbstractTetrahedralMesh<2, 2>::ElementIterator iter=mesh.GetElementIteratorBegin();
              iter != mesh.GetElementIteratorEnd();
              ++iter)
         {

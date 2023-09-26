@@ -68,7 +68,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestIonicModelsLong : public CxxTest::TestSuite
 {
 public:
-    void TestOdeSolverForFox2002WithRegularStimulus(void)
+    void TestOdeSolverForFox2002WithRegularStimulus()
     {
         clock_t ck_start, ck_end;
         // Set stimulus
@@ -125,7 +125,7 @@ public:
      *  The idea is to set the scale factors for the 3 different cell types (epi, mid and endo)
      *  and check that the rsulting APD makes sense if compared to experiemntal results
      */
-    void TestScaleFactorsForMahajanModel(void)
+    void TestScaleFactorsForMahajanModel()
     {
         double end_time=300;
         double time_step=0.01;
@@ -229,7 +229,7 @@ public:
      * Here we test that the scale factors for the TT model do what they are expected to
      * We check that they modify APD in a way that is expected.
      */
-    void TestScaleFactorsForTT06(void)
+    void TestScaleFactorsForTT06()
     {
         double simulation_end=500;/*end time, in milliseconds for this model*/
 
@@ -310,7 +310,7 @@ public:
         //create the times vector
         std::vector<double> times;
         double k =0;
-        for (unsigned i=0; i<voltages2.size(); ++i)
+        for (unsigned i = 0; i<voltages2.size(); ++i)
         {
           times.push_back(k);
           k=k+0.1;
@@ -332,7 +332,7 @@ public:
         TS_ASSERT_DELTA(LQT_APD , 347.8374, 0.1);
      }
 
-    void TestScaleFactorsMaleckar(void)
+    void TestScaleFactorsMaleckar()
     {
         double end_time =500;
         boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(-5.6,
@@ -457,7 +457,7 @@ public:
         //create the times vector
         std::vector<double> times;
         double k =0;
-        for (unsigned i=0; i<voltages2.size(); ++i)
+        for (unsigned i = 0; i<voltages2.size(); ++i)
         {
           times.push_back(k);
           k=k+0.1;

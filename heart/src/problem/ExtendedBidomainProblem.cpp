@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 ExtendedBidomainProblem<DIM>::ExtendedBidomainProblem(
             AbstractCardiacCellFactory<DIM>* pCellFactory, AbstractCardiacCellFactory<DIM>* pSecondCellFactory, bool hasBath)
-    : AbstractCardiacProblem<DIM,DIM, 3>(pCellFactory),
+    : AbstractCardiacProblem<DIM, DIM, 3>(pCellFactory),
       mpSecondCellFactory(pSecondCellFactory),
       mpExtendedBidomainTissue(NULL),
       mUserSpecifiedSecondCellConductivities(false),
@@ -61,7 +61,7 @@ ExtendedBidomainProblem<DIM>::ExtendedBidomainProblem(
 
 template<unsigned DIM>
 ExtendedBidomainProblem<DIM>::ExtendedBidomainProblem()
-    : AbstractCardiacProblem<DIM,DIM, 3>(),
+    : AbstractCardiacProblem<DIM, DIM, 3>(),
       mpSecondCellFactory(NULL),
       mpExtendedBidomainTissue(NULL),
       mUserSpecifiedSecondCellConductivities(false),
@@ -206,7 +206,7 @@ void ExtendedBidomainProblem<DIM>::SetExtendedBidomainParameters(double Am1, dou
      mUserHasSetBidomainValuesExplicitly = true;
 }
 
-template <unsigned DIM>
+template<unsigned DIM>
 void ExtendedBidomainProblem<DIM>::SetGgapHeterogeneities ( std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& rGgapHeterogeneityRegions, std::vector<double>& rGgapValues)
 {
     if (rGgapHeterogeneityRegions.size() != rGgapValues.size() )
@@ -217,7 +217,7 @@ void ExtendedBidomainProblem<DIM>::SetGgapHeterogeneities ( std::vector<boost::s
     mGgapHeterogenousValues =rGgapValues;
 }
 
-template <unsigned DIM>
+template<unsigned DIM>
 void ExtendedBidomainProblem<DIM>::SetExtracellularStimulusFactory( AbstractStimulusFactory<DIM>* pFactory)
 {
     mpExtracellularStimulusFactory = pFactory;
@@ -237,7 +237,7 @@ AbstractDynamicLinearPdeSolver<DIM, DIM, 3>* ExtendedBidomainProblem<DIM>::Creat
      * required in the assemblers it should all work OK.
      */
 
-    mpSolver = new ExtendedBidomainSolver<DIM,DIM>( mHasBath,
+    mpSolver = new ExtendedBidomainSolver<DIM, DIM>( mHasBath,
                                                     this->mpMesh,
                                                     mpExtendedBidomainTissue,
                                                     this->mpBoundaryConditionsContainer.get());
@@ -280,7 +280,7 @@ void ExtendedBidomainProblem<DIM>::SetFixedExtracellularPotentialNodes(std::vect
 {
     assert(mFixedExtracellularPotentialNodes.size() == 0); ///\todo turn this into an exception if the user calls this twice...
     mFixedExtracellularPotentialNodes.resize(nodes.size());
-    for (unsigned i=0; i<nodes.size(); ++i)
+    for (unsigned i = 0; i<nodes.size(); ++i)
     {
         // the assembler checks that the nodes[i] is less than
         // the number of nodes in the mesh so this is not done here
@@ -361,7 +361,7 @@ void ExtendedBidomainProblem<DIM>::DefineWriterColumns(bool extending)
         mVariablesIDs.push_back(mVoltageColumnId_Phie);
 
         // Only used to get an estimate of the # of timesteps below (copied from Abstract class)
-        TimeStepper stepper(AbstractCardiacProblem<DIM,DIM,3>::mCurrentTime,
+        TimeStepper stepper(AbstractCardiacProblem<DIM, DIM, 3>::mCurrentTime,
                             HeartConfig::Instance()->GetSimulationDuration(),
                             HeartConfig::Instance()->GetPrintingTimeStep());
         this->mpWriter->DefineUnlimitedDimension("Time", "msecs", stepper.EstimateTimeSteps()+1); // +1 for start and end
@@ -373,7 +373,7 @@ void ExtendedBidomainProblem<DIM>::DefineWriterColumns(bool extending)
         mVoltageColumnId_Phie = this->mpWriter->GetVariableByName("Phi_e");
     }
     //define any extra variable. NOTE: it must be in the first cell (not the second)
-    AbstractCardiacProblem<DIM,DIM,3>::DefineExtraVariablesWriterColumns(extending);
+    AbstractCardiacProblem<DIM, DIM, 3>::DefineExtraVariablesWriterColumns(extending);
 
 }
 
@@ -411,13 +411,13 @@ void ExtendedBidomainProblem<DIM>::WriteOneStep(double time, Vec voltageVec)
     //write any extra variable. Note that this method in the parent class will
     //take the extra variable only from the first cell.
     ///\todo write a specific method for this class
-    AbstractCardiacProblem<DIM,DIM,3>::WriteExtraVariablesOneStep();
+    AbstractCardiacProblem<DIM, DIM, 3>::WriteExtraVariablesOneStep();
 }
 
 template<unsigned DIM>
 void ExtendedBidomainProblem<DIM>::PreSolveChecks()
 {
-    AbstractCardiacProblem<DIM,DIM, 3>::PreSolveChecks();
+    AbstractCardiacProblem<DIM, DIM, 3>::PreSolveChecks();
     if (mFixedExtracellularPotentialNodes.empty())
     {
         // We're not pinning any nodes.

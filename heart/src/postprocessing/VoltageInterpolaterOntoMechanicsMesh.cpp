@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
-                                     TetrahedralMesh<DIM,DIM>& rElectricsMesh,
+                                     TetrahedralMesh<DIM, DIM>& rElectricsMesh,
                                      QuadraticMesh<DIM>& rMechanicsMesh,
                                      std::vector<std::string>& rVariableNames,
                                      std::string directory,
@@ -87,7 +87,7 @@ VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
     std::vector<double> interpolated_voltages(rMechanicsMesh.GetNumNodes());
     Vec voltage_coarse = NULL;
 
-    for (unsigned time_step=0; time_step<num_timesteps; time_step++)
+    for (unsigned time_step = 0; time_step<num_timesteps; time_step++)
     {
         for (unsigned var_index = 0; var_index < rVariableNames.size(); var_index++)
         {
@@ -97,11 +97,11 @@ VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
             ReplicatableVector voltage_repl(voltage);
 
             // interpolate
-            for (unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); ++i)
+            for (unsigned i = 0; i<mesh_pair.rGetElementsAndWeights().size(); ++i)
             {
                 double interpolated_voltage = 0;
 
-                Element<DIM,DIM>& element = *(rElectricsMesh.GetElement(mesh_pair.rGetElementsAndWeights()[i].ElementNum));
+                Element<DIM, DIM>& element = *(rElectricsMesh.GetElement(mesh_pair.rGetElementsAndWeights()[i].ElementNum));
                 for (unsigned node_index = 0; node_index < element.GetNumNodes(); ++node_index)
                 {
                     unsigned global_node_index = element.GetNodeGlobalIndex(node_index);
@@ -137,7 +137,7 @@ VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
     // where to output
     std::string config_directory = HeartConfig::Instance()->GetOutputDirectory();
     HeartConfig::Instance()->SetOutputDirectory(directory);
-    Hdf5ToCmguiConverter<DIM,DIM> converter(FileFinder(directory, RelativeTo::ChasteTestOutput),
+    Hdf5ToCmguiConverter<DIM, DIM> converter(FileFinder(directory, RelativeTo::ChasteTestOutput),
                                             "voltage_mechanics_mesh",
                                             &rMechanicsMesh,
                                             false);

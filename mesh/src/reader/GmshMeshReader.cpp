@@ -484,10 +484,10 @@ ElementData GmshMeshReader<ELEMENT_DIM, SPACE_DIM>::GetFaceData(unsigned index)
 // LCOV_EXCL_STOP
 
 // Explicit instantiation
-template class GmshMeshReader<0,1>;
-template class GmshMeshReader<1,1>;
-template class GmshMeshReader<1,2>;
-template class GmshMeshReader<1,3>;
-template class GmshMeshReader<2,2>;
-template class GmshMeshReader<2,3>;
-template class GmshMeshReader<3,3>;
+template class GmshMeshReader<0, 1>;
+template class GmshMeshReader<1, 1>;
+template class GmshMeshReader<1, 2>;
+template class GmshMeshReader<1, 3>;
+template class GmshMeshReader<2, 2>;
+template class GmshMeshReader<2, 3>;
+template class GmshMeshReader<3, 3>;

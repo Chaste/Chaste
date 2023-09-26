@@ -36,24 +36,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexBasedPopulationSrn.hpp"
 #include "CellSrnModel.hpp"
 
-template <unsigned DIM>
+template<unsigned DIM>
 VertexBasedPopulationSrn<DIM>::VertexBasedPopulationSrn()
     : mpCellPopulation(nullptr)
 {
 }
 
-template <unsigned DIM>
+template<unsigned DIM>
 VertexBasedPopulationSrn<DIM>::~VertexBasedPopulationSrn()
 {
 }
 
-template <unsigned DIM>
+template<unsigned DIM>
 void VertexBasedPopulationSrn<DIM>::SetVertexCellPopulation(VertexBasedCellPopulation<DIM>* pCellPopulation)
 {
     mpCellPopulation = pCellPopulation;
 }
 
-template <unsigned DIM>
+template<unsigned DIM>
 void VertexBasedPopulationSrn<DIM>::UpdateSrnAfterBirthOrDeath(VertexElementMap& rElementMap)
 {
     // Get recorded edge operations
@@ -129,7 +129,7 @@ void VertexBasedPopulationSrn<DIM>::UpdateSrnAfterBirthOrDeath(VertexElementMap&
     mpCellPopulation->rGetMesh().GetOperationRecorder()->ClearEdgeOperations();
 }
 
-template <unsigned DIM>
+template<unsigned DIM>
 void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr> parentSrnEdges,
                                                  CellSrnModel* pCellSrn,
                                                  const EdgeRemapInfo& rEdgeChange)

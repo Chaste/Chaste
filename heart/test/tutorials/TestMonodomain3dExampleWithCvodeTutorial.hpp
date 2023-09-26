@@ -164,7 +164,7 @@ public:
     void TestMonodomain3d()
     {
 #ifdef CHASTE_CVODE
-        DistributedTetrahedralMesh<3,3> mesh;
+        DistributedTetrahedralMesh<3, 3> mesh;
         double h=0.02;
         mesh.ConstructRegularSlabMesh(h, 0.8 /*length*/, 0.3 /*width*/, 0.3 /*depth*/);
         HeartConfig::Instance()->SetOutputUsingOriginalNodeOrdering(true);

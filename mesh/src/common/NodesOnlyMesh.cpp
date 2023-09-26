@@ -70,7 +70,7 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<Node<
 
     mLocalInitialNodes.resize(rNodes.size(), false);
 
-    for (unsigned i=0; i<rNodes.size(); ++i)
+    for (unsigned i = 0; i<rNodes.size(); ++i)
     {
         if (mpBoxCollection->IsOwned(rNodes[i]))
         {
@@ -112,7 +112,7 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<boost
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM,SPACE_DIM>& rGeneratingMesh, double maxInteractionDistance)
+void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM, SPACE_DIM>& rGeneratingMesh, double maxInteractionDistance)
 {
     ConstructNodesWithoutMesh(rGeneratingMesh.mNodes, maxInteractionDistance);
 }
@@ -140,7 +140,7 @@ template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::Clear()
 {
     // Call Clear() on the parent class
-    MutableMesh<SPACE_DIM,SPACE_DIM>::Clear();
+    MutableMesh<SPACE_DIM, SPACE_DIM>::Clear();
 
     // Clear the nodes mapping
     mNodesMapping.clear();
@@ -154,7 +154,7 @@ DistributedBoxCollection<SPACE_DIM>* NodesOnlyMesh<SPACE_DIM>::GetBoxCollection(
     return mpBoxCollection;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 Node<SPACE_DIM>* NodesOnlyMesh<SPACE_DIM>::GetNodeOrHaloNode(unsigned index) const
 {
     Node<SPACE_DIM>* p_node;
@@ -280,7 +280,7 @@ template<unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::UpdateNodeIndices()
 {
     mNodesMapping.clear();
-    for (unsigned location_in_vector=0; location_in_vector < this->mNodes.size(); location_in_vector++)
+    for (unsigned location_in_vector = 0; location_in_vector < this->mNodes.size(); location_in_vector++)
     {
         unsigned global_index = this->mNodes[location_in_vector]->GetIndex();
         mNodesMapping[global_index] = location_in_vector;
@@ -440,7 +440,7 @@ void NodesOnlyMesh<SPACE_DIM>::AddMovedNode(boost::shared_ptr<Node<SPACE_DIM> > 
         bool is_particle = pMovedNode->IsParticle();
         p_node->SetIsParticle(is_particle);
 
-        for (unsigned i=0; i<pMovedNode->GetNumNodeAttributes(); ++i)
+        for (unsigned i = 0; i<pMovedNode->GetNumNodeAttributes(); ++i)
         {
             double attribute = pMovedNode->rGetNodeAttributes()[i];
             p_node->AddNodeAttribute(attribute);
@@ -515,7 +515,7 @@ void NodesOnlyMesh<SPACE_DIM>::EnlargeBoxCollection()
 
     double fudge = 1e-14;
     c_vector<bool, SPACE_DIM> is_periodic = mpBoxCollection->GetIsPeriodicAllDims();
-    for (unsigned d=0; d < SPACE_DIM; d++)
+    for (unsigned d = 0; d < SPACE_DIM; d++)
     {
         // We don't enlarge in periodic directions
         if ( !is_periodic(d) )
@@ -544,7 +544,7 @@ bool NodesOnlyMesh<SPACE_DIM>::IsANodeCloseToDomainBoundary()
         location = node_iter->rGetLocation();
         // We need to ignore periodic dimensions
         c_vector<bool, SPACE_DIM> is_periodic = mpBoxCollection->GetIsPeriodicAllDims();
-        for (unsigned d=0; d<SPACE_DIM; d++)
+        for (unsigned d = 0; d<SPACE_DIM; d++)
         {
             if ( !is_periodic(d) &&
                  ( location[d] < (domain_boundary[2*d] + mMinimumNodeDomainBoundarySeparation) ||  location[d] > (domain_boundary[2*d+1] - mMinimumNodeDomainBoundarySeparation) ) )
@@ -597,7 +597,7 @@ void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(const std::vector<Node<SPACE_D
     swell_factor = (1 + swell_factor) * 1e-14; // Make sure that it's non-zero
 
     c_vector<double, 2*SPACE_DIM> domain_size;
-    for (unsigned i=0; i < SPACE_DIM; ++i)
+    for (unsigned i = 0; i < SPACE_DIM; ++i)
     {
         domain_size[2*i] = bounding_box.rGetLowerCorner()[i] - swell_factor;
         domain_size[2*i+1] = bounding_box.rGetUpperCorner()[i] + swell_factor;
@@ -606,7 +606,7 @@ void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(const std::vector<Node<SPACE_D
 }
 
 template<unsigned SPACE_DIM>
-void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows, c_vector<bool,SPACE_DIM> isDimPeriodic)
+void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows, c_vector<bool, SPACE_DIM> isDimPeriodic)
 {
     ClearBoxCollection();
 
@@ -614,7 +614,7 @@ void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<
     bool isPeriodicInY = false;
     bool isPeriodicInZ = false;
 
-    for ( unsigned i=0; i<SPACE_DIM; i++ )
+    for ( unsigned i = 0; i<SPACE_DIM; i++ )
     {
         if ( i==0 )
         {
@@ -704,7 +704,7 @@ void NodesOnlyMesh<SPACE_DIM>::LoadBalanceMesh()
 
     // This ensures the domain will stay the same size.
     double fudge = 1e-14;
-    for (unsigned d=0; d < SPACE_DIM; d++)
+    for (unsigned d = 0; d < SPACE_DIM; d++)
     {
         current_domain_size[2*d] = current_domain_size[2*d] + fudge;
         current_domain_size[2*d+1] = current_domain_size[2*d+1] - fudge;
@@ -718,7 +718,7 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructFromMeshReader(AbstractMeshReader<SPACE_
     TetrahedralMesh<SPACE_DIM, SPACE_DIM>::ConstructFromMeshReader(rMeshReader);
 
     // Set the correct global node indices
-    for (unsigned i=0; i<this->mNodes.size(); ++i)
+    for (unsigned i = 0; i<this->mNodes.size(); ++i)
     {
         this->mNodes[i]->SetIndex(GetNextAvailableIndex());
     }
@@ -729,7 +729,7 @@ std::vector<unsigned> NodesOnlyMesh<SPACE_DIM>::GetAllNodeIndices() const
 {
     std::vector<unsigned> indices(GetNumNodes()); // GetNumNodes = mNodes - mDeletedNodes
     unsigned live_index=0;
-    for (unsigned i=0; i<this->mNodes.size(); ++i)
+    for (unsigned i = 0; i<this->mNodes.size(); ++i)
     {
         // Only use nodes which are not deleted
         if (!this->mNodes[i]->IsDeleted())

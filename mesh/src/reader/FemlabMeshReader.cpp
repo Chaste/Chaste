@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Implementation
 ///////////////////////////////////////////////////////////////////////////////////
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 FemlabMeshReader<ELEMENT_DIM, SPACE_DIM>::FemlabMeshReader(const std::string& rPathBaseName,
                                                            const std::string& rNodeFileName,
                                                            const std::string& rElementFileName,
@@ -82,11 +82,11 @@ FemlabMeshReader<ELEMENT_DIM, SPACE_DIM>::FemlabMeshReader(const std::string& rP
     this->mpFaceIterator = this->mFaceData.begin();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 FemlabMeshReader<ELEMENT_DIM, SPACE_DIM>::~FemlabMeshReader()
 {}
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector < std::vector<double> >
     FemlabMeshReader<ELEMENT_DIM, SPACE_DIM>::TokenizeStringsToDoubles(const std::vector<std::string>& rRawData)
 {
@@ -96,8 +96,7 @@ std::vector < std::vector<double> >
     unsigned dimension_count = 0;
     for (const auto& the_iterator : rRawData)
     {
-        const std::string& r_line_of_data = *the_iterator;
-        std::stringstream line_stream (r_line_of_data);
+        std::stringstream line_stream(the_iterator);
 
         if (dimension_count == 0)
         {
@@ -136,7 +135,7 @@ std::vector < std::vector<double> >
     return (tokenized_data);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector < std::vector < unsigned > >
     FemlabMeshReader<ELEMENT_DIM, SPACE_DIM>::TokenizeStringsToInts(const std::vector<std::string>& rRawData, unsigned dimensionOfObject)
 {
@@ -181,9 +180,9 @@ std::vector < std::vector < unsigned > >
 
 
 // Explicit instantiation
-template class FemlabMeshReader<1,1>;
-template class FemlabMeshReader<1,2>;
-template class FemlabMeshReader<1,3>;
-template class FemlabMeshReader<2,2>;
-template class FemlabMeshReader<2,3>;
-template class FemlabMeshReader<3,3>;
+template class FemlabMeshReader<1, 1>;
+template class FemlabMeshReader<1, 2>;
+template class FemlabMeshReader<1, 3>;
+template class FemlabMeshReader<2, 2>;
+template class FemlabMeshReader<2, 3>;
+template class FemlabMeshReader<3, 3>;

@@ -54,8 +54,8 @@ public:
     void TestReadingSquareMesh()
     {
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
-        TrianglesMeshReader<2,2> reader(mesh_base);
-        MixedDimensionMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        TrianglesMeshReader<2, 2> reader(mesh_base);
+        MixedDimensionMesh<2, 2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         mesh.ConstructFromMeshReader(reader);
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 121u);
@@ -80,8 +80,8 @@ public:
         if (mesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(55u))
         {
             // Should be a single cable; number 0
-            MixedDimensionMesh<2,2>::CableRangeAtNode cable_range = mesh.GetCablesAtNode(mesh.GetNode(55u));
-            MixedDimensionMesh<2,2>::NodeCableIterator iter = cable_range.first;
+            MixedDimensionMesh<2, 2>::CableRangeAtNode cable_range = mesh.GetCablesAtNode(mesh.GetNode(55u));
+            MixedDimensionMesh<2, 2>::NodeCableIterator iter = cable_range.first;
             iter++;
             TS_ASSERT(iter == cable_range.second);
             TS_ASSERT_EQUALS(cable_range.first->second->GetIndex(), 0u);
@@ -89,8 +89,8 @@ public:
         if (mesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(56u))
         {
             // Should be two cables; numbers 0 & 1
-            MixedDimensionMesh<2,2>::CableRangeAtNode cable_range = mesh.GetCablesAtNode(mesh.GetNode(56u));
-            MixedDimensionMesh<2,2>::NodeCableIterator iter = cable_range.first;
+            MixedDimensionMesh<2, 2>::CableRangeAtNode cable_range = mesh.GetCablesAtNode(mesh.GetNode(56u));
+            MixedDimensionMesh<2, 2>::NodeCableIterator iter = cable_range.first;
             iter++;
             iter++;
             TS_ASSERT(iter == cable_range.second);
@@ -108,7 +108,7 @@ public:
 
             for (unsigned i = 0; i<10u; ++i)
             {
-                Element<1,2>* p_cable_elt = mesh.GetCableElement(i);
+                Element<1, 2>* p_cable_elt = mesh.GetCableElement(i);
                 TS_ASSERT_EQUALS(p_cable_elt->GetNumNodes(), 2u);
                 TS_ASSERT_EQUALS(p_cable_elt->GetNodeGlobalIndex(0u), 55u + i);
                 TS_ASSERT_EQUALS(p_cable_elt->GetNodeGlobalIndex(1u), 56u + i);
@@ -120,7 +120,7 @@ public:
 
             for (unsigned i = 0; i<200u; ++i)
             {
-                Element<2,2>* p_elt = mesh.GetElement(i);
+                Element<2, 2>* p_elt = mesh.GetElement(i);
                 TS_ASSERT_EQUALS(p_elt->GetNumNodes(), 3u);
                 TS_ASSERT_EQUALS(p_elt->GetNode(0u), mesh.GetNode(p_elt->GetNodeGlobalIndex(0u)));
                 TS_ASSERT_EQUALS(p_elt->GetNode(1u), mesh.GetNode(p_elt->GetNodeGlobalIndex(1u)));
@@ -136,7 +136,7 @@ public:
 
                 for (unsigned i = 0; i<5u; ++i)
                 {
-                    Element<1,2>* p_cable_elt = mesh.GetCableElement(i);
+                    Element<1, 2>* p_cable_elt = mesh.GetCableElement(i);
                     TS_ASSERT_EQUALS(p_cable_elt->GetNumNodes(), 2u);
                     TS_ASSERT_EQUALS(p_cable_elt->GetNodeGlobalIndex(0u), 55u + i);
                     TS_ASSERT_EQUALS(p_cable_elt->GetNodeGlobalIndex(1u), 56u + i);
@@ -156,7 +156,7 @@ public:
 
                 for (unsigned i=5; i<10u; ++i)
                 {
-                    Element<1,2>* p_cable_elt = mesh.GetCableElement(i);
+                    Element<1, 2>* p_cable_elt = mesh.GetCableElement(i);
                     TS_ASSERT_EQUALS(p_cable_elt->GetNumNodes(), 2u);
                     TS_ASSERT_EQUALS(p_cable_elt->GetNodeGlobalIndex(0u), 55u + i);
                     TS_ASSERT_EQUALS(p_cable_elt->GetNodeGlobalIndex(1u), 56u + i);
@@ -205,8 +205,8 @@ public:
     void TestReadingMeshWithNoCables()
     {
         std::string mesh_base("mesh/test/data/2D_0_to_1mm_200_elements");
-        TrianglesMeshReader<2,2> reader(mesh_base);
-        MixedDimensionMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> reader(mesh_base);
+        MixedDimensionMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(reader);
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 121u);
@@ -217,7 +217,7 @@ public:
     void TestExceptions()
     {
         // Only TrianglesMeshReader supports cables
-        MemfemMeshReader<3,3> memfem_reader("mesh/test/data/Memfem_slab");
+        MemfemMeshReader<3, 3> memfem_reader("mesh/test/data/Memfem_slab");
         TS_ASSERT_EQUALS(memfem_reader.GetNumCableElements(), 0u);
         TS_ASSERT_EQUALS(memfem_reader.GetNumCableElementAttributes(), 0u);
         TS_ASSERT_THROWS_THIS(memfem_reader.GetNextCableElementData(), "Cable elements are not supported by this mesh format.");
@@ -227,11 +227,11 @@ public:
     void TestWritingCableFiles()
     {
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
-        TrianglesMeshReader<2,2> reader(mesh_base);
-        MixedDimensionMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        TrianglesMeshReader<2, 2> reader(mesh_base);
+        MixedDimensionMesh<2, 2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         mesh.ConstructFromMeshReader(reader);
 
-        TrianglesMeshWriter<2,2> mesh_writer("TestMixedDimensionMesh", "CableMesh", true);
+        TrianglesMeshWriter<2, 2> mesh_writer("TestMixedDimensionMesh", "CableMesh", true);
 
         mesh_writer.WriteFilesUsingMesh(mesh);
 
@@ -245,9 +245,9 @@ public:
     void TestWritingCableFilesUsingMeshReader()
     {
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
-        TrianglesMeshReader<2,2> reader(mesh_base);
+        TrianglesMeshReader<2, 2> reader(mesh_base);
 
-        TrianglesMeshWriter<2,2> mesh_writer("TestMixedDimensionMesh", "CableMeshFromReader");
+        TrianglesMeshWriter<2, 2> mesh_writer("TestMixedDimensionMesh", "CableMeshFromReader");
         mesh_writer.WriteFilesUsingMeshReader(reader);
         PetscTools::Barrier("TestWritingCableFilesUsingMeshReader");
 
@@ -260,24 +260,24 @@ public:
     void TestWritingBinaryFormat()
     {
         //Read as ascii
-        TrianglesMeshReader<2,2> reader("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
+        TrianglesMeshReader<2, 2> reader("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
 
         //Write as binary
-        TrianglesMeshWriter<2,2> writer_from_reader("TestMixedDimensionMesh", "CableMeshBinary", false);
+        TrianglesMeshWriter<2, 2> writer_from_reader("TestMixedDimensionMesh", "CableMeshBinary", false);
         writer_from_reader.SetWriteFilesAsBinary();
         writer_from_reader.WriteFilesUsingMeshReader(reader);
 
         PetscTools::Barrier();
         //Read created binary file into a mesh
         std::string results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "TestMixedDimensionMesh/";
-        TrianglesMeshReader<2,2> binary_reader(results_dir + "CableMeshBinary");
-        MixedDimensionMesh<2,2> binary_mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        TrianglesMeshReader<2, 2> binary_reader(results_dir + "CableMeshBinary");
+        MixedDimensionMesh<2, 2> binary_mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         binary_mesh.ConstructFromMeshReader(binary_reader);
 
         //Read original file into a mesh
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
-        TrianglesMeshReader<2,2> original_reader(mesh_base);
-        MixedDimensionMesh<2,2> original_mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        TrianglesMeshReader<2, 2> original_reader(mesh_base);
+        MixedDimensionMesh<2, 2> original_mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         original_mesh.ConstructFromMeshReader(original_reader);
 
         //Compare to original
@@ -286,8 +286,8 @@ public:
 
         TS_ASSERT_EQUALS(binary_mesh.GetNumCableElements(), original_mesh.GetNumCableElements());
 
-        MixedDimensionMesh<2,2>::CableElementIterator original_iter = original_mesh.GetCableElementIteratorBegin();
-        for (MixedDimensionMesh<2,2>::CableElementIterator binary_iter = binary_mesh.GetCableElementIteratorBegin();
+        MixedDimensionMesh<2, 2>::CableElementIterator original_iter = original_mesh.GetCableElementIteratorBegin();
+        for (MixedDimensionMesh<2, 2>::CableElementIterator binary_iter = binary_mesh.GetCableElementIteratorBegin();
              binary_iter != binary_mesh.GetCableElementIteratorEnd();
              ++binary_iter)
         {
@@ -300,7 +300,7 @@ public:
         }
 
         //Write a binary from the original mesh
-        TrianglesMeshWriter<2,2> writer_from_mesh("TestMixedDimensionMesh", "CableMeshBinaryFromMesh", false);
+        TrianglesMeshWriter<2, 2> writer_from_mesh("TestMixedDimensionMesh", "CableMeshBinaryFromMesh", false);
         writer_from_mesh.SetWriteFilesAsBinary();
         writer_from_mesh.WriteFilesUsingMesh(original_mesh);
 
@@ -315,16 +315,16 @@ public:
     void TestGeometryWithMetisPermuation()
     {
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
-        TrianglesMeshReader<2,2> reader(mesh_base);
-        MixedDimensionMesh<2,2> dumb_partition_mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        TrianglesMeshReader<2, 2> reader(mesh_base);
+        MixedDimensionMesh<2, 2> dumb_partition_mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         dumb_partition_mesh.ConstructFromMeshReader(reader);
 
 
-        for (MixedDimensionMesh<1,2>::CableElementIterator iter = dumb_partition_mesh.GetCableElementIteratorBegin();
+        for (MixedDimensionMesh<1, 2>::CableElementIterator iter = dumb_partition_mesh.GetCableElementIteratorBegin();
              iter != dumb_partition_mesh.GetCableElementIteratorEnd();
              ++iter)
         {
-            Element<1,2>& r_element = *(*iter);
+            Element<1, 2>& r_element = *(*iter);
 
             c_matrix<double, 2, 1> jacobian;
             c_matrix<double, 1, 2> inverse_jacobian;
@@ -362,16 +362,16 @@ public:
             TS_ASSERT_EQUALS(total_owned, dumb_partition_mesh.GetNumCableElements());
         }
 
-        TrianglesMeshReader<2,2> reader2(mesh_base);
-        MixedDimensionMesh<2,2> partitioned_mesh;
+        TrianglesMeshReader<2, 2> reader2(mesh_base);
+        MixedDimensionMesh<2, 2> partitioned_mesh;
         partitioned_mesh.ConstructFromMeshReader(reader2);
 
 
-        for (MixedDimensionMesh<1,2>::CableElementIterator iter = partitioned_mesh.GetCableElementIteratorBegin();
+        for (MixedDimensionMesh<1, 2>::CableElementIterator iter = partitioned_mesh.GetCableElementIteratorBegin();
              iter != partitioned_mesh.GetCableElementIteratorEnd();
              ++iter)
         {
-            Element<1,2>& r_element = *(*iter);
+            Element<1, 2>& r_element = *(*iter);
 
             c_matrix<double, 2, 1> jacobian;
             c_matrix<double, 1, 2> inverse_jacobian;
@@ -416,7 +416,7 @@ public:
         std::string archive_file = "mixed_dimension_mesh.arch";
         ArchiveLocationInfo::SetMeshFilename("mixed_dimension_mesh");
 
-        MixedDimensionMesh<2,2>* p_mesh = new MixedDimensionMesh<2,2>(DistributedTetrahedralMeshPartitionType::DUMB);
+        MixedDimensionMesh<2, 2>* p_mesh = new MixedDimensionMesh<2, 2>(DistributedTetrahedralMeshPartitionType::DUMB);
         unsigned num_nodes;
         unsigned local_num_nodes;
         unsigned num_elements;
@@ -424,7 +424,7 @@ public:
         unsigned num_local_cable_elements;
         // archive
         {
-            TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
+            TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
 
             p_mesh->ConstructFromMeshReader(mesh_reader);
             num_nodes = p_mesh->GetNumNodes();
@@ -436,7 +436,7 @@ public:
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(main_archive_dir, archive_file);
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
-            AbstractTetrahedralMesh<2,2>* const p_mesh_abstract = static_cast<AbstractTetrahedralMesh<2,2>* >(p_mesh);
+            AbstractTetrahedralMesh<2, 2>* const p_mesh_abstract = static_cast<AbstractTetrahedralMesh<2, 2>* >(p_mesh);
             (*p_arch) << p_mesh_abstract;
         }
 
@@ -447,7 +447,7 @@ public:
         {
             // Should archive the most abstract class you can to check boost knows what individual classes are.
             // (but here AbstractMesh doesn't have the methods below).
-            AbstractTetrahedralMesh<2,2>* p_mesh_abstract2;
+            AbstractTetrahedralMesh<2, 2>* p_mesh_abstract2;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(main_archive_dir, archive_file);
@@ -456,7 +456,7 @@ public:
             // restore from the archive
             (*p_arch) >> p_mesh_abstract2;
             // Check we have the right number of nodes & elements
-            MixedDimensionMesh<2,2>* p_mesh2 = static_cast<MixedDimensionMesh<2,2>*>(p_mesh_abstract2);
+            MixedDimensionMesh<2, 2>* p_mesh2 = static_cast<MixedDimensionMesh<2, 2>*>(p_mesh_abstract2);
 
             TS_ASSERT_EQUALS(p_mesh2->GetNumNodes(), num_nodes);
             TS_ASSERT_EQUALS(p_mesh2->GetNumLocalNodes(), local_num_nodes);
@@ -469,8 +469,8 @@ public:
             {
                 try
                 {
-                    Element<1,2>* p_element = p_mesh->GetCableElement(i);
-                    Element<1,2>* p_element2 = p_mesh2->GetCableElement(i);
+                    Element<1, 2>* p_element = p_mesh->GetCableElement(i);
+                    Element<1, 2>* p_element2 = p_mesh2->GetCableElement(i);
                     TS_ASSERT_EQUALS(p_element->GetNodeGlobalIndex(0), p_element2->GetNodeGlobalIndex(0));
                 }
                 catch (Exception& e)
@@ -488,12 +488,12 @@ public:
             {
                 ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
                 boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
-                AbstractTetrahedralMesh<2,2>* p_mesh_abstract3 = NULL;
+                AbstractTetrahedralMesh<2, 2>* p_mesh_abstract3 = NULL;
                 (*p_arch) >> p_mesh_abstract3;
 
                 //Double check that the cables are intact
-                MixedDimensionMesh<2,2>* p_mesh3 = static_cast<MixedDimensionMesh<2,2>*>(p_mesh_abstract3);
-                Element<1,2>* p_element = p_mesh3->GetCableElement(9);
+                MixedDimensionMesh<2, 2>* p_mesh3 = static_cast<MixedDimensionMesh<2, 2>*>(p_mesh_abstract3);
+                Element<1, 2>* p_element = p_mesh3->GetCableElement(9);
                 TS_ASSERT_EQUALS(p_element->GetNodeGlobalIndex(0), 64u);
                 TS_ASSERT_EQUALS(p_element->GetNodeGlobalIndex(1), 65u);
                 TS_ASSERT_DELTA(p_element->GetAttribute(), 10.5, 1e-8);
@@ -515,7 +515,7 @@ public:
                     // this archive was written on one process.
                     InputArchiveOpener arch_opener(archive_dir, archive_file);
                     boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
-                    AbstractTetrahedralMesh<2,2>* p_mesh3 = NULL;
+                    AbstractTetrahedralMesh<2, 2>* p_mesh3 = NULL;
                     TS_ASSERT_THROWS_THIS((*p_arch) >> p_mesh3,
                                           "This archive was written for a different number of processors");
 

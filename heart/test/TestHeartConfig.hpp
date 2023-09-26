@@ -250,7 +250,7 @@ public:
         std::vector<ChastePoint<3> > pseudo_ecg_parameters;
         HeartConfig::Instance()->GetPseudoEcgElectrodePositions(pseudo_ecg_parameters);
         TS_ASSERT_EQUALS(pseudo_ecg_parameters.size(), 2u);
-        for (unsigned dim=0; dim<3u; dim++)
+        for (unsigned dim = 0; dim<3u; dim++)
         {
             TS_ASSERT_EQUALS(pseudo_ecg_parameters[0][dim], (double)dim);
             TS_ASSERT_EQUALS(pseudo_ecg_parameters[1][dim], (double)dim - 10.0);
@@ -445,8 +445,8 @@ public:
         // Cuboid
 
         std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > conductivities_heterogeneity_areas;
-        std::vector< c_vector<double,3> > intra_h_conductivities;
-        std::vector< c_vector<double,3> > extra_h_conductivities;
+        std::vector< c_vector<double, 3> > intra_h_conductivities;
+        std::vector< c_vector<double, 3> > extra_h_conductivities;
         HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas,
                                                                 intra_h_conductivities,
                                                                 extra_h_conductivities);
@@ -458,8 +458,8 @@ public:
 
         //cover the 2D case
         std::vector<boost::shared_ptr<AbstractChasteRegion<2> > > conductivities_heterogeneity_areas_2D;
-        std::vector< c_vector<double,3> > intra_h_conductivities_2D;
-        std::vector< c_vector<double,3> > extra_h_conductivities_2D;
+        std::vector< c_vector<double, 3> > intra_h_conductivities_2D;
+        std::vector< c_vector<double, 3> > extra_h_conductivities_2D;
         HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas_2D,
                                                                 intra_h_conductivities_2D,
                                                                 extra_h_conductivities_2D);
@@ -471,8 +471,8 @@ public:
 
         //cover the 1D case
         std::vector<boost::shared_ptr<AbstractChasteRegion<1> > > conductivities_heterogeneity_areas_1D;
-        std::vector< c_vector<double,3> > intra_h_conductivities_1D;
-        std::vector< c_vector<double,3> > extra_h_conductivities_1D;
+        std::vector< c_vector<double, 3> > intra_h_conductivities_1D;
+        std::vector< c_vector<double, 3> > extra_h_conductivities_1D;
         HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas_1D,
                                                                 intra_h_conductivities_1D,
                                                                 extra_h_conductivities_1D);
@@ -485,8 +485,8 @@ public:
         // Ellipsoid
 
         std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > conductivities_heterogeneity_areas_ellipsoid;
-        std::vector< c_vector<double,3> > intra_h_conductivities_ellipsoid;
-        std::vector< c_vector<double,3> > extra_h_conductivities_ellipsoid;
+        std::vector< c_vector<double, 3> > intra_h_conductivities_ellipsoid;
+        std::vector< c_vector<double, 3> > extra_h_conductivities_ellipsoid;
         HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas_ellipsoid,
                 intra_h_conductivities_ellipsoid,
                 extra_h_conductivities_ellipsoid);
@@ -498,8 +498,8 @@ public:
 
         //cover the 2D case
         std::vector<boost::shared_ptr<AbstractChasteRegion<2> > > conductivities_heterogeneity_areas_2D_ellipsoid;
-        std::vector< c_vector<double,3> > intra_h_conductivities_2D_ellipsoid;
-        std::vector< c_vector<double,3> > extra_h_conductivities_2D_ellipsoid;
+        std::vector< c_vector<double, 3> > intra_h_conductivities_2D_ellipsoid;
+        std::vector< c_vector<double, 3> > extra_h_conductivities_2D_ellipsoid;
         HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas_2D_ellipsoid,
                 intra_h_conductivities_2D_ellipsoid,
                 extra_h_conductivities_2D_ellipsoid);
@@ -511,8 +511,8 @@ public:
 
         //cover the 1D case
         std::vector<boost::shared_ptr<AbstractChasteRegion<1> > > conductivities_heterogeneity_areas_1D_ellipsoid;
-        std::vector< c_vector<double,3> > intra_h_conductivities_1D_ellipsoid;
-        std::vector< c_vector<double,3> > extra_h_conductivities_1D_ellipsoid;
+        std::vector< c_vector<double, 3> > intra_h_conductivities_1D_ellipsoid;
+        std::vector< c_vector<double, 3> > extra_h_conductivities_1D_ellipsoid;
         HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas_1D_ellipsoid,
                 intra_h_conductivities_1D_ellipsoid,
                 extra_h_conductivities_1D_ellipsoid);
@@ -589,8 +589,8 @@ public:
 
             //covering the case when the user specify transmural layers for conductivities (not supported and probably not worth considering)...
             std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > conductivities_heterogeneity_areas;
-            std::vector< c_vector<double,3> > intra_h_conductivities;
-            std::vector< c_vector<double,3> > extra_h_conductivities;
+            std::vector< c_vector<double, 3> > intra_h_conductivities;
+            std::vector< c_vector<double, 3> > extra_h_conductivities;
             TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas,
                                                                                           intra_h_conductivities,
                                                                                           extra_h_conductivities),
@@ -615,8 +615,8 @@ public:
             HeartConfig::Instance()->SetParametersFile("heart/test/data/xml/ChasteParameters_unsupported.xml");
             //covering the case when the conductivities regions are not supported
             std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > conductivities_heterogeneity_areas;
-            std::vector< c_vector<double,3> > intra_h_conductivities;
-            std::vector< c_vector<double,3> > extra_h_conductivities;
+            std::vector< c_vector<double, 3> > intra_h_conductivities;
+            std::vector< c_vector<double, 3> > extra_h_conductivities;
             TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas,
                                                             intra_h_conductivities,
                                                             extra_h_conductivities),
@@ -863,8 +863,8 @@ public:
 
         TS_ASSERT(!HeartConfig::Instance()->GetConductivityHeterogeneitiesProvided());
 
-        std::vector< c_vector<double,3> > intraConductivities;
-        std::vector< c_vector<double,3> > extraConductivities;
+        std::vector< c_vector<double, 3> > intraConductivities;
+        std::vector< c_vector<double, 3> > extraConductivities;
 
         std::vector<ChasteCuboid<3> > input_areas;
         ChastePoint<3> lower1(-1.0, -1.0, -1.0);
@@ -884,8 +884,8 @@ public:
         TS_ASSERT(HeartConfig::Instance()->GetConductivityHeterogeneitiesProvided());
 
         std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > conductivities_heterogeneity_areas;
-        std::vector< c_vector<double,3> > intra_h_conductivities;
-        std::vector< c_vector<double,3> > extra_h_conductivities;
+        std::vector< c_vector<double, 3> > intra_h_conductivities;
+        std::vector< c_vector<double, 3> > extra_h_conductivities;
         HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas,
                                                                 intra_h_conductivities,
                                                                 extra_h_conductivities);
@@ -903,8 +903,8 @@ public:
         TS_ASSERT_EQUALS(intra_h_conductivities[1][0], 1.0);
 
         // Test ellipsoid
-        std::vector< c_vector<double,3> > intra_conductivities_ellipsoid;
-        std::vector< c_vector<double,3> > extra_conductivities_ellipsoid;
+        std::vector< c_vector<double, 3> > intra_conductivities_ellipsoid;
+        std::vector< c_vector<double, 3> > extra_conductivities_ellipsoid;
 
         std::vector<ChasteEllipsoid<3> > input_areas_ellipsoid;
         ChastePoint<3> centre_1(-1.0, -1.0, -1.0);
@@ -924,8 +924,8 @@ public:
         TS_ASSERT(HeartConfig::Instance()->GetConductivityHeterogeneitiesProvided());
 
         std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > conductivities_heterogeneity_areas_ellipsoid;
-        std::vector< c_vector<double,3> > intra_h_conductivities_ellipsoid;
-        std::vector< c_vector<double,3> > extra_h_conductivities_ellipsoid;
+        std::vector< c_vector<double, 3> > intra_h_conductivities_ellipsoid;
+        std::vector< c_vector<double, 3> > extra_h_conductivities_ellipsoid;
         HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas_ellipsoid,
                                                                 intra_h_conductivities_ellipsoid,
                                                                 extra_h_conductivities_ellipsoid);
@@ -1352,7 +1352,7 @@ public:
         TS_ASSERT_EQUALS(HeartConfig::Instance()->IsPostProcessingRequested(), true);
         HeartConfig::Instance()->GetPseudoEcgElectrodePositions(pseudo_ecg_parameters_get);
         TS_ASSERT_EQUALS(pseudo_ecg_parameters_get.size(), 1u);
-        for (unsigned dim=0; dim<3u; dim++)
+        for (unsigned dim = 0; dim<3u; dim++)
         {
             TS_ASSERT_EQUALS(pseudo_ecg_parameters_get[0][dim], electrode_point[dim]);
         }
@@ -1467,7 +1467,7 @@ public:
             std::vector<ChastePoint<3> > pseudo_ecg_parameters;
             HeartConfig::Instance()->GetPseudoEcgElectrodePositions(pseudo_ecg_parameters);
             TS_ASSERT_EQUALS(pseudo_ecg_parameters.size(), 1u);
-            for (unsigned dim=0; dim<3u; dim++)
+            for (unsigned dim = 0; dim<3u; dim++)
             {
                 TS_ASSERT_EQUALS(pseudo_ecg_parameters[0][dim], -(double)dim);
             }
@@ -1846,8 +1846,8 @@ public:
                               "ConductivityHeterogeneities information is not available in a resumed simulation.");
 
         std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > conductivitiesHeterogeneityAreas;
-        std::vector< c_vector<double,3> > intraConductivities;
-        std::vector< c_vector<double,3> > extraConductivities;
+        std::vector< c_vector<double, 3> > intraConductivities;
+        std::vector< c_vector<double, 3> > extraConductivities;
         TS_ASSERT_THROWS_THIS(HeartConfig::Instance()->GetConductivityHeterogeneities(conductivitiesHeterogeneityAreas,
                                                                                       intraConductivities, extraConductivities),
                               "ConductivityHeterogeneities information is not available in a resumed simulation.");

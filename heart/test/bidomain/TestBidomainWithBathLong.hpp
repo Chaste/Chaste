@@ -53,10 +53,10 @@ class BathCellFactory : public AbstractCardiacCellFactory<DIM>
 private:
     // define a new stimulus
     boost::shared_ptr<SimpleStimulus> mpStimulus;
-    c_vector<double,DIM> mStimulatedPoint;
+    c_vector<double, DIM> mStimulatedPoint;
 
 public:
-    BathCellFactory(double stimulusMagnitude, c_vector<double,DIM> stimulatedPoint)
+    BathCellFactory(double stimulusMagnitude, c_vector<double, DIM> stimulatedPoint)
         : AbstractCardiacCellFactory<DIM>(),
           mpStimulus(new SimpleStimulus(stimulusMagnitude, 0.5)),
           mStimulatedPoint(stimulatedPoint)
@@ -107,7 +107,7 @@ public:
         HeartConfig::Instance()->SetOutputDirectory("BidomainBath3d");
         HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain_bath_3d");
 
-        c_vector<double,3> centre;
+        c_vector<double, 3> centre;
         centre(0) = 0.05;
         centre(1) = 0.05;
         centre(2) = 0.05;
@@ -115,11 +115,11 @@ public:
 
         BidomainProblem<3> bidomain_problem( &cell_factory, true );
 
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructRegularSlabMesh(0.01, 0.1, 0.1, 0.1);
 
         // Set everything outside a central sphere (radius 0.4) to be bath
-        for (unsigned i=0; i<mesh.GetNumElements(); ++i)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             double x = mesh.GetElement(i)->CalculateCentroid()[0];
             double y = mesh.GetElement(i)->CalculateCentroid()[1];
@@ -139,7 +139,7 @@ public:
         ReplicatableVector sol_repl(sol);
 
         // test V = 0 for all bath nodes
-        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             if (HeartRegionCode::IsRegionBath( mesh.GetNode(i)->GetRegion() )) // bath
             {
@@ -162,19 +162,19 @@ public:
 
         // need to create a cell factory but don't want any intra stim, so magnitude
         // of stim is zero.
-        c_vector<double,2> centre;
+        c_vector<double, 2> centre;
         centre(0) = 0.05;
         centre(1) = 0.05;
         BathCellFactory<2> cell_factory( 0.0, centre);
 
         BidomainProblem<2> bidomain_problem( &cell_factory, true );
 
-        TrianglesMeshReader<2,2> reader("mesh/test/data/2D_0_to_1mm_400_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> reader("mesh/test/data/2D_0_to_1mm_400_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(reader);
 
         // Set everything outside a central circle (radius 0.4) to be bath
-        for (unsigned i=0; i<mesh.GetNumElements(); ++i)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             double x = mesh.GetElement(i)->CalculateCentroid()[0];
             double y = mesh.GetElement(i)->CalculateCentroid()[1];
@@ -203,7 +203,7 @@ public:
          * We are checking the last time step. This test will only make sure that an upstroke is triggered.
          * We ran longer simulation for 350 ms and a nice AP was observed.
          */
-        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             // test V = 0 for all bath nodes
             if (mesh.GetNode(i)->GetRegion()==1) // bath
@@ -229,7 +229,7 @@ public:
 
         // need to create a cell factory but don't want any intra stim, so magnitude
         // of stim is zero.
-        c_vector<double,3> centre;
+        c_vector<double, 3> centre;
         centre(0) = 0.1;
         centre(1) = 0.1;
         centre(2) = 0.1;
@@ -237,12 +237,12 @@ public:
 
         BidomainProblem<3> bidomain_problem( &cell_factory, true );
 
-        TrianglesMeshReader<3,3> reader("mesh/test/data/cube_2mm_1016_elements");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> reader("mesh/test/data/cube_2mm_1016_elements");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(reader);
 
         // Set everything outside a central sphere (radius 0.4) to be bath
-        for (unsigned i=0; i<mesh.GetNumElements(); ++i)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             double x = mesh.GetElement(i)->CalculateCentroid()[0];
             double y = mesh.GetElement(i)->CalculateCentroid()[1];
@@ -268,7 +268,7 @@ public:
 
         bool ap_triggered = false;
 
-        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+        for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             // test V = 0 for all bath nodes
             if (HeartRegionCode::IsRegionBath( mesh.GetNode(i)->GetRegion() )) // bath

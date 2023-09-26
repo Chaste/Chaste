@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *     within a canonical element.
  * @return The value of the basis function.
  */
-template <>
+template<>
 double LinearBasisFunction<3>::ComputeBasisFunction(
     const ChastePoint<3>& rPoint,
     unsigned basisIndex)
@@ -57,19 +57,27 @@ double LinearBasisFunction<3>::ComputeBasisFunction(
     switch (basisIndex)
     {
         case 0:
+        {
             return 1.0 - rPoint[0] - rPoint[1] - rPoint[2];
             break;
+        }
         case 1:
+        {
             return rPoint[0];
             break;
+        }
         case 2:
+        {
             return rPoint[1];
             break;
+        }
         case 3:
+        {
             return rPoint[2];
             break;
+        }
         default:
-            NEVER_REACHED; //not possible to get here because of assertions above
+            NEVER_REACHED; // not possible to get here because of assertions above
     }
 
     return 0.0; // LCOV_EXCL_LINE // Avoid compiler warning
@@ -84,7 +92,7 @@ double LinearBasisFunction<3>::ComputeBasisFunction(
  *     within a canonical element.
  * @return The value of the basis function.
  */
-template <>
+template<>
 double LinearBasisFunction<2>::ComputeBasisFunction(
     const ChastePoint<2>& rPoint,
     unsigned basisIndex)
@@ -94,16 +102,22 @@ double LinearBasisFunction<2>::ComputeBasisFunction(
     switch (basisIndex)
     {
         case 0:
+        {
             return 1.0 - rPoint[0] - rPoint[1];
             break;
+        }
         case 1:
+        {
             return rPoint[0];
             break;
+        }
         case 2:
+        {
             return rPoint[1];
             break;
+        }
         default:
-           NEVER_REACHED; //not possible to get here because of assertions above
+           NEVER_REACHED; // not possible to get here because of assertions above
     }
     return 0.0; // LCOV_EXCL_LINE // Avoid compiler warning
 }
@@ -117,7 +131,7 @@ double LinearBasisFunction<2>::ComputeBasisFunction(
  *     within a canonical element.
  * @return The value of the basis function.
  */
-template <>
+template<>
 double LinearBasisFunction<1>::ComputeBasisFunction(
     const ChastePoint<1>& rPoint,
     unsigned basisIndex)
@@ -127,13 +141,17 @@ double LinearBasisFunction<1>::ComputeBasisFunction(
     switch (basisIndex)
     {
         case 0:
+        {
             return 1.0 - rPoint[0];
             break;
+        }
         case 1:
+        {
             return rPoint[0];
             break;
+        }
         default:
-           NEVER_REACHED; //not possible to get here because of assertions above
+           NEVER_REACHED; // not possible to get here because of assertions above
     }
     return 0.0; // LCOV_EXCL_LINE  // Avoid compiler warning
 }
@@ -147,7 +165,9 @@ double LinearBasisFunction<1>::ComputeBasisFunction(
  *     within a canonical element.
  * @return The value of the basis function.
  */
-double LinearBasisFunction<0>::ComputeBasisFunction(const ChastePoint<0>& rPoint, unsigned basisIndex)
+double LinearBasisFunction<0>::ComputeBasisFunction(
+    const ChastePoint<0>& rPoint,
+    unsigned basisIndex)
 {
     assert(basisIndex == 0);
     return 1.0;
@@ -165,7 +185,7 @@ double LinearBasisFunction<0>::ComputeBasisFunction(const ChastePoint<0>& rPoint
  *     (c_vector<double, ELEMENT_DIM> instance) giving the derivative
  *     along each axis.
  */
-template <>
+template<>
 c_vector<double, 3> LinearBasisFunction<3>::ComputeBasisFunctionDerivative(
     const ChastePoint<3>& rPoint,
     unsigned basisIndex)
@@ -176,27 +196,35 @@ c_vector<double, 3> LinearBasisFunction<3>::ComputeBasisFunctionDerivative(
     switch (basisIndex)
     {
         case 0:
+        {
             gradN(0) = -1;
             gradN(1) = -1;
             gradN(2) = -1;
             break;
+        }
         case 1:
+        {
             gradN(0) =  1;
             gradN(1) =  0;
             gradN(2) =  0;
             break;
+        }
         case 2:
+        {
             gradN(0) =  0;
             gradN(1) =  1;
             gradN(2) =  0;
             break;
+        }
         case 3:
+        {
             gradN(0) =  0;
             gradN(1) =  0;
             gradN(2) =  1;
             break;
+        }
         default:
-           ; //not possible to get here because of assertions above
+           NEVER_REACHED; //not possible to get here because of assertions above
     }
     return gradN;
 }
@@ -213,7 +241,7 @@ c_vector<double, 3> LinearBasisFunction<3>::ComputeBasisFunctionDerivative(
  *     (c_vector<double, ELEMENT_DIM> instance) giving the derivative
  *     along each axis.
  */
-template <>
+template<>
 c_vector<double, 2> LinearBasisFunction<2>::ComputeBasisFunctionDerivative(
     const ChastePoint<2>& rPoint,
     unsigned basisIndex)
@@ -224,19 +252,25 @@ c_vector<double, 2> LinearBasisFunction<2>::ComputeBasisFunctionDerivative(
     switch (basisIndex)
     {
         case 0:
+        {
             gradN(0) = -1;
             gradN(1) = -1;
             break;
+        }
         case 1:
+        {
             gradN(0) =  1;
             gradN(1) =  0;
             break;
+        }
         case 2:
+        {
             gradN(0) =  0;
             gradN(1) =  1;
             break;
+        }
         default:
-           ; //not possible to get here because of assertions above
+           NEVER_REACHED; // not possible to get here because of assertions above
     }
     return gradN;
 }
@@ -253,28 +287,31 @@ c_vector<double, 2> LinearBasisFunction<2>::ComputeBasisFunctionDerivative(
  *     (c_vector<double, ELEMENT_DIM> instance) giving the derivative
  *     along each axis.
  */
-template <>
-c_vector<double,1> LinearBasisFunction<1>::ComputeBasisFunctionDerivative(
+template<>
+c_vector<double, 1> LinearBasisFunction<1>::ComputeBasisFunctionDerivative(
     const ChastePoint<1>& rPoint,
     unsigned basisIndex)
 {
     assert(basisIndex <= 1);
 
-    c_vector<double,1> gradN;
+    c_vector<double, 1> gradN;
     switch (basisIndex)
     {
         case 0:
+        {
             gradN(0) = -1;
             break;
+        }
         case 1:
+        {
             gradN(0) =  1;
             break;
+        }
         default:
-           ; //not possible to get here because of assertions above
+           NEVER_REACHED; //not possible to get here because of assertions above
     }
     return gradN;
 }
-
 
 /**
  * Compute all basis functions at a point within an element.
@@ -283,7 +320,7 @@ c_vector<double,1> LinearBasisFunction<1>::ComputeBasisFunctionDerivative(
  *     results are undefined if this is not within the canonical element.
  * @param rReturnValue A reference to a vector, to be filled in
  */
-template <unsigned ELEMENT_DIM>
+template<unsigned ELEMENT_DIM>
 void LinearBasisFunction<ELEMENT_DIM>::ComputeBasisFunctions(
     const ChastePoint<ELEMENT_DIM>& rPoint,
     c_vector<double, ELEMENT_DIM+1>& rReturnValue)
@@ -304,13 +341,13 @@ void LinearBasisFunction<ELEMENT_DIM>::ComputeBasisFunctions(
 /**
  * Compute all basis functions at a point within an element.
  *
- * @param rPoint The point at which to compute the basis functions. The
- *     results are undefined if this is not within the canonical element.
+ * @param rPoint The point at which to compute the basis functions. The results 
+ *     are undefined if this is not within the canonical element.
  * @param rReturnValue A reference to a vector, to be filled in
- *
  */
-void LinearBasisFunction<0>::ComputeBasisFunctions(const ChastePoint<0>& rPoint,
-                                                   c_vector<double,1>& rReturnValue)
+void LinearBasisFunction<0>::ComputeBasisFunctions(
+    const ChastePoint<0>& rPoint,
+    c_vector<double, 1>& rReturnValue)
 {
     rReturnValue(0) = ComputeBasisFunction(rPoint, 0);
 }
@@ -318,13 +355,13 @@ void LinearBasisFunction<0>::ComputeBasisFunctions(const ChastePoint<0>& rPoint,
 /**
  * Compute the derivatives of all basis functions at a point within an element.
  *
- * @param rPoint The point at which to compute the basis functions. The
- *     results are undefined if this is not within the canonical element.
+ * @param rPoint The point at which to compute the basis functions. The results 
+ *     are undefined if this is not within the canonical element.
  * @param rReturnValue A reference to a vector, to be filled in
- * @return The derivatives of the basis functions as the column vectors of
- *     a matrix in local index order.
+ * @return The derivatives of the basis functions as the column vectors of a 
+ *     matrix in local index order.
  */
-template <unsigned ELEMENT_DIM>
+template<unsigned ELEMENT_DIM>
 void LinearBasisFunction<ELEMENT_DIM>::ComputeBasisFunctionDerivatives(
     const ChastePoint<ELEMENT_DIM>& rPoint,
     c_matrix<double, ELEMENT_DIM, ELEMENT_DIM+1>& rReturnValue)
@@ -348,8 +385,8 @@ void LinearBasisFunction<ELEMENT_DIM>::ComputeBasisFunctionDerivatives(
  * This method will transform the results, for use within gaussian quadrature
  * for example.
  *
- * @param rPoint The point at which to compute the basis functions. The
- *     results are undefined if this is not within the canonical element.
+ * @param rPoint The point at which to compute the basis functions. The results 
+ *     are undefined if this is not within the canonical element.
  * @param rInverseJacobian The inverse of the Jacobian matrix mapping the real
  *     element into the canonical element.
  * @param rReturnValue A reference to a vector, to be filled in
@@ -357,7 +394,7 @@ void LinearBasisFunction<ELEMENT_DIM>::ComputeBasisFunctionDerivatives(
  *     entry is a vector (c_vector<double, SPACE_DIM> instance) giving the
  *     derivative along each axis.
  */
-template <unsigned ELEMENT_DIM>
+template<unsigned ELEMENT_DIM>
 void LinearBasisFunction<ELEMENT_DIM>::ComputeTransformedBasisFunctionDerivatives(
     const ChastePoint<ELEMENT_DIM>& rPoint,
     const c_matrix<double, ELEMENT_DIM, ELEMENT_DIM>& rInverseJacobian,

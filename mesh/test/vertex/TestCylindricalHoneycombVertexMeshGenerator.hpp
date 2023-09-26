@@ -68,7 +68,7 @@ public:
         TS_ASSERT_EQUALS(p_cylindrical_mesh->GetNumNodes(), 40u);
 
         // Create a vertex mesh writer with cylindrical mesh
-        VertexMeshWriter<2,2> vertex_mesh_writer_1("TestCylindrical2dVertexMesh", "cylindrical_vertex_mesh");
+        VertexMeshWriter<2, 2> vertex_mesh_writer_1("TestCylindrical2dVertexMesh", "cylindrical_vertex_mesh");
         vertex_mesh_writer_1.WriteFilesUsingMesh(*p_cylindrical_mesh);
 
         OutputFileHandler handler_1("TestCylindrical2dVertexMesh", false);
@@ -100,7 +100,7 @@ public:
         TS_ASSERT_EQUALS(p_flat_cylindrical_mesh->GetNode(4)->IsBoundaryNode(), false);
 
         // Create a vertex mesh writer with cylindrical mesh
-        VertexMeshWriter<2,2> vertex_mesh_writer_2("TestFlatCylindrical2dVertexMesh", "flat_cylindrical_vertex_mesh");
+        VertexMeshWriter<2, 2> vertex_mesh_writer_2("TestFlatCylindrical2dVertexMesh", "flat_cylindrical_vertex_mesh");
         vertex_mesh_writer_2.WriteFilesUsingMesh(*p_flat_cylindrical_mesh);
 
         OutputFileHandler handler_2("TestFlatCylindrical2dVertexMesh", false);

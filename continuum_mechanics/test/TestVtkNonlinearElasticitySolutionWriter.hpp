@@ -73,7 +73,7 @@ public:
     void TestVtuFile()
     {
 #ifdef CHASTE_VTK
-        for (unsigned run=0; run<3; run++)
+        for (unsigned run = 0; run<3; run++)
         {
             std::stringstream dir;
             dir << "TestVtkNonlinearElasticityWriter_" << run;
@@ -90,7 +90,7 @@ public:
             solver.Solve();
 
             // solution is currently no deformation. Hack into the solution and set it to be something known.
-            for (unsigned i=0; i<bar_mesh.GetNumNodes(); ++i)
+            for (unsigned i = 0; i<bar_mesh.GetNumNodes(); ++i)
             {
                 double X = bar_mesh.GetNode(i)->rGetLocation()[0];
                 double Y = bar_mesh.GetNode(i)->rGetLocation()[1];
@@ -131,7 +131,7 @@ public:
 
             // we can't really test the vtu file easily, but the strain data is stored in a member variable so we can
             // test it was computed correctly.
-            for (unsigned i=0; i<bar_mesh.GetNumElements(); ++i)
+            for (unsigned i = 0; i<bar_mesh.GetNumElements(); ++i)
             {
                 double X = bar_mesh.GetElement(i)->CalculateCentroid()[0];
                 if (X < 5)
@@ -140,9 +140,9 @@ public:
                     double C[3][3] = { {2.25, 0, 0}, {0, 1, 0}, {0, 0, 1} };
                     double E[3][3] = { {0.625, 0, 0}, {0, 0, 0}, {0, 0, 0} };
 
-                    for (unsigned M=0; M<3; M++)
+                    for (unsigned M = 0; M<3; M++)
                     {
-                        for (unsigned N=0; N<3; N++)
+                        for (unsigned N = 0; N<3; N++)
                         {
                             double value = (run==0 ? F[M][N] : (run==1 ? C[M][N] : E[M][N]) );
                             TS_ASSERT_DELTA(vtk_writer.mTensorData[i](M,N), value, 1e-12);
@@ -155,9 +155,9 @@ public:
                     double C[3][3] = { {4.01, 0.1, 0}, {0.1, 1, 0}, {0, 0, 1} };
                     double E[3][3] = { {1.505, 0.05, 0}, {0.05, 0, 0}, {0, 0, 0} };
 
-                    for (unsigned M=0; M<3; M++)
+                    for (unsigned M = 0; M<3; M++)
                     {
-                        for (unsigned N=0; N<3; N++)
+                        for (unsigned N = 0; N<3; N++)
                         {
                             double value = (run==0 ? F[M][N] : (run==1 ? C[M][N] : E[M][N]) );
                             TS_ASSERT_DELTA(vtk_writer.mTensorData[i](M,N), value, 1e-12);

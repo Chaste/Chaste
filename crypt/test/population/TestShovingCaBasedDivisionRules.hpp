@@ -153,7 +153,7 @@ public:
 
         // Create 25 cells, one for each node
         std::vector<unsigned> location_indices;
-        for (unsigned index=0; index<25; index++)
+        for (unsigned index = 0; index<25; index++)
         {
             location_indices.push_back(index);
         }
@@ -238,7 +238,7 @@ public:
 
         // Create 6 cells in the bottom 2 rows
         std::vector<unsigned> location_indices;
-        for (unsigned index=0; index<6; index++)
+        for (unsigned index = 0; index<6; index++)
         {
             location_indices.push_back(index);
         }
@@ -339,7 +339,7 @@ public:
 
         // Create 9 cells, one for each node
         std::vector<unsigned> location_indices;
-        for (unsigned index=0; index<9; index++)
+        for (unsigned index = 0; index<9; index++)
         {
             location_indices.push_back(index);
         }

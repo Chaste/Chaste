@@ -207,7 +207,7 @@ double ElectrodesStimulusFactory<DIM>::ComputeElectrodeTotalFlux(AbstractChasteR
                  iter != this->mpMesh->GetNode(node_index)->rGetContainingElementIndices().end();
                  ++iter)
             {
-                Element<DIM,DIM>* p_element = this->mpMesh->GetElement(*iter);
+                Element<DIM, DIM>* p_element = this->mpMesh->GetElement(*iter);
 
                 /*Determine jacobian for this element*/
                 c_matrix<double, DIM, DIM> jacobian;
@@ -217,7 +217,7 @@ double ElectrodesStimulusFactory<DIM>::ComputeElectrodeTotalFlux(AbstractChasteR
 
                 double contribution_of_this_element = 0.0;//...to this node
                  // loop over Gauss points
-                for (unsigned quad_index=0; quad_index < pQuadRule->GetNumQuadPoints(); quad_index++)
+                for (unsigned quad_index = 0; quad_index < pQuadRule->GetNumQuadPoints(); quad_index++)
                 {
                     const ChastePoint<DIM>& quad_point = pQuadRule->rGetQuadPoint(quad_index);
                     BasisFunction::ComputeBasisFunctions(quad_point, phi);

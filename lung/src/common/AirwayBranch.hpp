@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <list>
 
 /**
- * Represents a single airway made up of multiple <1,3> elements.
+ * Represents a single airway made up of multiple <1, 3> elements.
  */
 class AirwayBranch
 {
@@ -61,14 +61,14 @@ public:
      *
      * @param pElement A pointer to the element to add
      */
-    void AddElement(Element<1,3>* pElement);
+    void AddElement(Element<1, 3>* pElement);
 
     /**
      * Returns the list of elements that make up this branch.
      *
      * @return A list of pointers to elements that make up the branch
      */
-    std::list<Element<1,3>* > GetElements();
+    std::list<Element<1, 3>* > GetElements();
 
     /**
      * @return The true length of the branch (obtained by traversing the 
@@ -219,7 +219,7 @@ private:
      * A list of elements that make up this branch.
      * These are assumed to be in order, from start element to end element!
      */
-    std::list< Element<1,3>* > mElements;
+    std::list< Element<1, 3>* > mElements;
 
     /**
      * A vector of all children of current branch.

@@ -45,8 +45,8 @@ class TestAirwayBranch : public CxxTest::TestSuite
 public:
     void TestMakeBranch()
     {
-        TetrahedralMesh<1,3> mesh;
-        TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/three_generation_branch_mesh_refined");
+        TetrahedralMesh<1, 3> mesh;
+        TrianglesMeshReader<1, 3> mesh_reader("mesh/test/data/three_generation_branch_mesh_refined");
         mesh.ConstructFromMeshReader(mesh_reader);
 
         AirwayBranch branch_one;
@@ -111,8 +111,8 @@ public:
 
     void TestAngleCalculations()
     {
-        TetrahedralMesh<1,3> mesh;
-        TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/branched_1d_in_3d_mesh");
+        TetrahedralMesh<1, 3> mesh;
+        TrianglesMeshReader<1, 3> mesh_reader("mesh/test/data/branched_1d_in_3d_mesh");
         mesh.ConstructFromMeshReader(mesh_reader);
 
         AirwayBranch branch_one;
@@ -168,8 +168,8 @@ public:
     void TestGetProximalAndDistalNodes()
     {
         // Load mesh
-        TetrahedralMesh<1,3> mesh;
-        TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/three_generation_branch_mesh_refined");
+        TetrahedralMesh<1, 3> mesh;
+        TrianglesMeshReader<1, 3> mesh_reader("mesh/test/data/three_generation_branch_mesh_refined");
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Add elements to branch
@@ -270,9 +270,9 @@ public:
         elem_c_nodes.push_back(&node_c);
         elem_c_nodes.push_back(&node_d);
 
-        Element<1,3> element_a(0u, elem_a_nodes, true);
-        Element<1,3> element_b(1u, elem_b_nodes, true);
-        Element<1,3> element_c(2u, elem_c_nodes, true);
+        Element<1, 3> element_a(0u, elem_a_nodes, true);
+        Element<1, 3> element_b(1u, elem_b_nodes, true);
+        Element<1, 3> element_c(2u, elem_c_nodes, true);
 
         AirwayBranch branch;
         branch.AddElement(&element_a);

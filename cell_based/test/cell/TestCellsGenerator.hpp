@@ -59,8 +59,8 @@ public:
     void TestGenerateBasicWithFixedG1GenerationalCellCycleModel()
     {
         // Create mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_2_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create cells
@@ -142,8 +142,8 @@ public:
     void TestGenerateBasicRandomWithNoSpecifiedProliferativeCellType()
     {
         // Create mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_2_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create cells
@@ -168,8 +168,8 @@ public:
     void TestGenerateBasicRandomWithFixedG1GenerationalCellCycleModel()
     {
         // Create mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_2_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create cells
@@ -201,7 +201,7 @@ public:
         EXIT_IF_PARALLEL;
         // Create mesh
         HoneycombVertexMeshGenerator mesh_generator(2, 2);
-        boost::shared_ptr<VertexMesh<2,2> > p_mesh = mesh_generator.GetMesh();
+        boost::shared_ptr<VertexMesh<2, 2> > p_mesh = mesh_generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;

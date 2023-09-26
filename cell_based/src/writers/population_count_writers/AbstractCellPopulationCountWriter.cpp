@@ -51,9 +51,9 @@ void AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM>::WriteHeader(
 }
 
 // Explicit instantiation
-template class AbstractCellPopulationCountWriter<1,1>;
-template class AbstractCellPopulationCountWriter<1,2>;
-template class AbstractCellPopulationCountWriter<2,2>;
-template class AbstractCellPopulationCountWriter<1,3>;
-template class AbstractCellPopulationCountWriter<2,3>;
-template class AbstractCellPopulationCountWriter<3,3>;
+template class AbstractCellPopulationCountWriter<1, 1>;
+template class AbstractCellPopulationCountWriter<1, 2>;
+template class AbstractCellPopulationCountWriter<2, 2>;
+template class AbstractCellPopulationCountWriter<1, 3>;
+template class AbstractCellPopulationCountWriter<2, 3>;
+template class AbstractCellPopulationCountWriter<3, 3>;

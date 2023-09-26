@@ -55,16 +55,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Boundary Conditions Container.
  *
- * This class contains a list of nodes on the Dirichlet boundary and associated Dirichlet
- * boundary conditions, and a list of surface elements on the Neumann boundary and associated
- * Neumann boundary conditions.
+ * This class contains a list of nodes on the Dirichlet boundary and associated 
+ * Dirichlet boundary conditions, and a list of surface elements on the Neumann 
+ * boundary and associated Neumann boundary conditions.
  *
- * \todo #1321
- * Various operations are currently very inefficient - there is certainly scope for
- * optimisation here!
+ * \todo #1321 Various operations are currently very inefficient - there is 
+ * certainly scope for optimisation here!
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-class BoundaryConditionsContainer : public AbstractBoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>
+class BoundaryConditionsContainer
+    : public AbstractBoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>
 {
 public:
 
@@ -73,235 +73,260 @@ public:
         NeumannMapIterator;
 
     /** Base class type. */
-    typedef AbstractBoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM> BaseClassType;
+    typedef AbstractBoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM> BaseClassType;
 
 private:
 
+    /** List (map) of Neumann boundary conditions. */
     std::map< const BoundaryElement<ELEMENT_DIM-1, SPACE_DIM> *, const AbstractBoundaryCondition<SPACE_DIM>* >*
-        mpNeumannMap[PROBLEM_DIM]; /**< List (map) of Neumann boundary conditions. */
+        mpNeumannMap[PROBLEM_DIM];
 
-    /** Nodes to be identified when periodic boundary conditions are applied */
+    /** Nodes to be identified when periodic boundary conditions are applied. */
     std::map< const Node<SPACE_DIM> *, const Node<SPACE_DIM> * >*  mpPeriodicBcMap[PROBLEM_DIM];
 
-    /**
-     * Neumann boundary condition iterator.
-     */
+    /** Neumann boundary condition iterator. */
     NeumannMapIterator mLastNeumannCondition[PROBLEM_DIM];
 
     /**
-     * Array storing whether there are any Neumann boundary conditions for each unknown.
+     * Array storing whether there are any Neumann boundary conditions for each 
+     * unknown.
      */
     bool mAnyNonZeroNeumannConditionsForUnknown[PROBLEM_DIM];
 
-    /** A zero boundary condition, used for other unknowns in ApplyNeumannBoundaryCondition */
+    /**
+     * A zero boundary condition, used for other unknowns in
+     * ApplyNeumannBoundaryCondition.
+     */
     ConstBoundaryCondition<SPACE_DIM>* mpZeroBoundaryCondition;
 
-    /** Whether the contents of this container were originally loaded from an archive. */
+    /**
+     * Whether the contents of this container were originally loaded from an
+     * archive.
+     */
     bool mLoadedFromArchive;
 
 public:
 
     /**
-     * Constructor calls base constuctor and allocates memory for the Neumann boundary
-     * conditions lists.
+     * Constructor calls base constuctor and allocates memory for the Neumann 
+     * boundary conditions lists.
      *
-     * @param deleteConditions whether to delete BCs in destructor (defaults to true)
+     * @param deleteConditions whether to delete BCs in destructor (defaults to 
+     *     true)
      */
-    BoundaryConditionsContainer(bool deleteConditions=true);
+    BoundaryConditionsContainer(bool deleteConditions = true);
 
     /**
-     * Note that the destructor will delete memory for each boundary condition object, as
-     * well as for the internal bookkeeping of this class.
+     * Note that the destructor will delete memory for each boundary condition 
+     * object, as well as for the internal bookkeeping of this class.
      */
     ~BoundaryConditionsContainer();
 
     /**
-     * Add a Dirichlet boundary condition specifying two parameters, a pointer to a node,
-     * and a pointer to a boundary condition object associated with that node.
+     * Add a Dirichlet boundary condition specifying two parameters, a pointer 
+     * to a node, and a pointer to a boundary condition object associated with 
+     * that node.
      *
-     * The destructor for the BoundaryConditionsContainer will destroy the boundary
-     * conditions objects.
+     * The destructor for the BoundaryConditionsContainer will destroy the 
+     * boundary conditions objects.
      *
      * @param pBoundaryNode Pointer to a node on the boundary.
-     * @param pBoundaryCondition Pointer to the Dirichlet boundary condition at that node.
+     * @param pBoundaryCondition Pointer to the Dirichlet boundary condition at 
+     *     that node.
      * @param indexOfUnknown defaults to 0
      * @param checkIfBoundaryNode defaults to true
      */
-    void AddDirichletBoundaryCondition(const Node<SPACE_DIM>* pBoundaryNode,
-                                       const AbstractBoundaryCondition<SPACE_DIM>* pBoundaryCondition,
-                                       unsigned indexOfUnknown = 0,
-                                       bool checkIfBoundaryNode = true);
+    void AddDirichletBoundaryCondition(
+        const Node<SPACE_DIM>* pBoundaryNode,
+        const AbstractBoundaryCondition<SPACE_DIM>* pBoundaryCondition,
+        unsigned indexOfUnknown = 0,
+        bool checkIfBoundaryNode = true);
 
     /**
-     * Add a Neumann boundary condition specifying two parameters, a pointer to a
-     * surface element, and a pointer to a boundary condition object associated with
-     * that element.
+     * Add a Neumann boundary condition specifying two parameters, a pointer to 
+     * a surface element, and a pointer to a boundary condition object 
+     * associated with that element.
      *
-     * The destructor for the BoundaryConditionsContainer will destroy the boundary
-     * conditions objects.
+     * The destructor for the BoundaryConditionsContainer will destroy the 
+     * boundary conditions objects.
      *
      * Note that the value of a Neumann boundary condition should specify
      * D * grad(u).n, not just grad(u).n.
      *
-     * Take care if using non-zero Neumann boundary conditions in 1d. If applied at
-     * the left hand end you need to multiply the value by -1 to get the right answer.
+     * Take care if using non-zero Neumann boundary conditions in 1d. If applied 
+     * at the left hand end you need to multiply the value by -1 to get the 
+     * right answer.
      *
      * @param pBoundaryElement Pointer to an element on the boundary
-     * @param pBoundaryCondition Pointer to the Neumann boundary condition on that element
+     * @param pBoundaryCondition Pointer to the Neumann boundary condition on 
+     *     that element
      * @param indexOfUnknown defaults to 0
      */
-    void AddNeumannBoundaryCondition(const BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>* pBoundaryElement,
-                                     const AbstractBoundaryCondition<SPACE_DIM>* pBoundaryCondition,
-                                     unsigned indexOfUnknown = 0);
-
+    void AddNeumannBoundaryCondition(
+        const BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>* pBoundaryElement,
+        const AbstractBoundaryCondition<SPACE_DIM>* pBoundaryCondition,
+        unsigned indexOfUnknown = 0);
 
     /**
-     *  Add a periodic boundary condition: provide two nodes to be identified when solving
-     *  @param pNode1 node 1
-     *  @param pNode2 node 2
+     * Add a periodic boundary condition: provide two nodes to be identified
+     * when solving.
+     * 
+     * @param pNode1 node 1
+     * @param pNode2 node 2
      *
-     *  This method identifies the nodes for all unknowns, so doesn't have to be called for each unknown.
+     * This method identifies the nodes for all unknowns, so doesn't have to be 
+     * called for each unknown.
      */
     void AddPeriodicBoundaryCondition(const Node<SPACE_DIM>* pNode1,
                                       const Node<SPACE_DIM>* pNode2);
 
-
     /**
-     * This function defines zero Dirichlet boundary conditions on every boundary node
-     * of the mesh.
+     * This function defines zero Dirichlet boundary conditions on every 
+     * boundary node of the mesh.
      *
      * @param pMesh Pointer to a mesh object, from which we extract the boundary
      * @param indexOfUnknown defaults to 0
      */
-    void DefineZeroDirichletOnMeshBoundary(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                                           unsigned indexOfUnknown = 0);
+    void DefineZeroDirichletOnMeshBoundary(
+        AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+        unsigned indexOfUnknown = 0);
 
     /**
-     * This function defines constant Dirichlet boundary conditions on every boundary node
-     * of the mesh.
+     * This function defines constant Dirichlet boundary conditions on every 
+     * boundary node of the mesh.
      *
      * @param pMesh Pointer to a mesh object, from which we extract the boundary
      * @param value the value of the constant Dirichlet boundary condition
      * @param indexOfUnknown defaults to 0
      */
-    void DefineConstantDirichletOnMeshBoundary(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                                               double value,
-                                               unsigned indexOfUnknown = 0);
+    void DefineConstantDirichletOnMeshBoundary(
+        AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+        double value,
+        unsigned indexOfUnknown = 0);
 
     /**
-     * This function defines zero Neumann boundary conditions on every boundary element
-     * of the mesh.
+     * This function defines zero Neumann boundary conditions on every boundary 
+     * element of the mesh.
      *
      * @param pMesh Pointer to a mesh object, from which we extract the boundary
      * @param indexOfUnknown defaults to 0
      */
-    void DefineZeroNeumannOnMeshBoundary(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                                         unsigned indexOfUnknown = 0);
+    void DefineZeroNeumannOnMeshBoundary(
+        AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+        unsigned indexOfUnknown = 0);
 
     /**
-     *  Alter the given linear system to satisfy Dirichlet boundary conditions.
+     * Alter the given linear system to satisfy Dirichlet boundary conditions.
      *
-     *  If the number of unknowns is greater than one, it is assumed the solution vector is
-     *  of the form (in the case of two unknowns u and v, and N nodes):
-     *  solnvec = (U_1, V_1, U_2, V_2, ...., U_N, V_N)
+     * If the number of unknowns is greater than one, it is assumed the solution 
+     * vector is of the form (in the case of two unknowns u and v, and N nodes):
+     * solnvec = (U_1, V_1, U_2, V_2, ...., U_N, V_N)
      *
-     *  @param rLinearSystem Linear system on which to apply boundary conditions
+     * @param rLinearSystem Linear system on which to apply boundary conditions
      *
-     *  @param applyToMatrix This optional parameter can be set as false to
-     *  ensure that the matrix of the linear system is not updated. To
-     *  be used when the matrix does not change between time steps.
-     *  @param applyToRhsVector Similarly, whether to apply the changes to the RHS vector (b in Ax=b).
+     * @param applyToMatrix This optional parameter can be set as false to 
+     *     ensure that the matrix of the linear system is not updated. To be 
+     *     used when the matrix does not change between time steps.
+     * @param applyToRhsVector Similarly, whether to apply the changes to the 
+     *     RHS vector (b in Ax=b).
      */
     void ApplyDirichletToLinearProblem(LinearSystem& rLinearSystem,
                                        bool applyToMatrix = true,
                                        bool applyToRhsVector = true);
 
     /**
-     *  Alter the given linear system to satisfy periodic boundary conditions.
+     * Alter the given linear system to satisfy periodic boundary conditions.
      *
-     *  For one of the two nodes that have been identified, the row corresponding to the
-     *  unknown which has periodic BCs, for one of the nodes, ie replaced with
-     *  [0 0 0 ... -1 0 0 .. 0 1 0 .. 0]
-     *  where the 1 is the diagonal entry and the -1 on the column corresponding to that
-     *  unknown and the other node.
+     * For one of the two nodes that have been identified, the row corresponding 
+     * to the unknown which has periodic BCs, for one of the nodes, i.e. 
+     * replaced with
+     * [0 0 0 ... -1 0 0 .. 0 1 0 .. 0]
+     * where the 1 is the diagonal entry and the -1 on the column corresponding 
+     * to that unknown and the other node.
      *
-     *  The entry in the RHS vector is zeroed.
+     * The entry in the RHS vector is zeroed.
      *
-     *  @param rLinearSystem Linear system on which to apply boundary conditions
-     *
-     *  @param applyToMatrix This optional parameter can be set as false to
-     *  ensure that the matrix of the linear system is not updated. To
-     *  be used when the matrix does not change between time steps.
-     *  @param applyToRhsVector Similarly, whether to apply the changes to the RHS vector (b in Ax=b).
-     *
+     * @param rLinearSystem Linear system on which to apply boundary conditions
+     * @param applyToMatrix This optional parameter can be set as false to 
+     *     ensure that the matrix of the linear system is not updated. To be 
+     *     used when the matrix does not change between time steps.
+     * @param applyToRhsVector Similarly, whether to apply the changes to the 
+     *     RHS vector (b in Ax=b).
      */
     void ApplyPeriodicBcsToLinearProblem(LinearSystem& rLinearSystem,
                                          bool applyToMatrix = true,
                                          bool applyToRhsVector = true);
 
     /**
-     * Alter the residual vector for a nonlinear system to satisfy
-     * Dirichlet boundary conditions.
+     * Alter the residual vector for a nonlinear system to satisfy Dirichlet 
+     * boundary conditions.
      *
-     * If the number of unknowns is greater than one, it is assumed the solution vector is
-     * of the form (in the case of two unknowns u and v, and N nodes):
+     * If the number of unknowns is greater than one, it is assumed the solution 
+     * vector is of the form (in the case of two unknowns u and v, and N nodes):
      * solnvec = (U_1, V_1, U_2, V_2, ...., U_N, V_N)
      *
-     * @param currentSolution
-     * @param residual
+     * @param currentSolution \todo document argument
+     * @param residual \todo document argument
      * @param rFactory  the factory to use to create DistributedVector objects
      */
-    void ApplyDirichletToNonlinearResidual(const Vec currentSolution, Vec residual,
-                                           DistributedVectorFactory& rFactory);
+    void ApplyDirichletToNonlinearResidual(
+        const Vec currentSolution,
+        Vec residual,
+        DistributedVectorFactory& rFactory);
 
     /**
      * Alter the Jacobian matrix vector for a nonlinear system to satisfy
      * Dirichlet boundary conditions.
      *
-     * If the number of unknowns is greater than one, it is assumed the solution vector is
-     * of the form (in the case of two unknowns u and v, and N nodes):
+     * If the number of unknowns is greater than one, it is assumed the solution 
+     * vector is of the form (in the case of two unknowns u and v, and N nodes):
      * solnvec = (U_1, V_1, U_2, V_2, ...., U_N, V_N)
      *
-     * @param jacobian
+     * @param jacobian \todo document argument
      */
     void ApplyDirichletToNonlinearJacobian(Mat jacobian);
 
     /**
-     * Check that we have boundary conditions defined everywhere on mesh boundary.
+     * Check that we have boundary conditions defined everywhere on mesh 
+     * boundary.
      *
      * We iterate over all surface elements, and check either that they have an
      * associated Neumann condition, or that each node in the element has an
      * associated Dirichlet condition.
      *
-     * @param pMesh Pointer to the mesh to check for validity.
+     * @param pMesh Pointer to the mesh to check for validity
+     * 
      * @return true iff all boundaries have boundary conditions defined.
      */
-    bool Validate(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
+    bool Validate(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh);
 
     /**
-     * @return value of Neumann boundary condition at a specified point in a given surface element
-     *
-     * It is up to the user to ensure that the point x is contained in the surface element.
+     * @return value of Neumann boundary condition at a specified point in a 
+     *     given surface element. It is up to the user to ensure that the point 
+     *     x is contained in the surface element.
      *
      * @param pSurfaceElement pointer to a boundary element
      * @param rX a point
      * @param indexOfUnknown defaults to 0
      */
-    double GetNeumannBCValue(const BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>* pSurfaceElement,
-                             const ChastePoint<SPACE_DIM>& rX,
-                             unsigned indexOfUnknown = 0);
+    double GetNeumannBCValue(
+        const BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>* pSurfaceElement,
+        const ChastePoint<SPACE_DIM>& rX,
+        unsigned indexOfUnknown = 0);
 
     /**
-     * @return true if there is a Neumann boundary condition defined on the given element.
+     * @return true if there is a Neumann boundary condition defined on the 
+     * given element.
      *
-     * \todo #1321
-     * This is a horrendously inefficient fix. Perhaps have flag in element object?
+     * \todo #1321 This is a horrendously inefficient fix. Perhaps have flag in 
+     * element object?
      *
      * @param pSurfaceElement pointer to a boundary element
      * @param indexOfUnknown defaults to 0
      */
-    bool HasNeumannBoundaryCondition(const BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>* pSurfaceElement,
-                                     unsigned indexOfUnknown = 0);
+    bool HasNeumannBoundaryCondition(
+        const BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>* pSurfaceElement,
+        unsigned indexOfUnknown = 0);
 
     /**
      * @return whether there are any non-zero Neumann boundary conditions
@@ -321,18 +346,21 @@ public:
     /**
      * Load a collection of boundary conditions from an archive.
      *
-     * @note We assume this collection is empty prior to being called.  If it is not, any boundary
-     * conditions already present may get replaced by conditions loaded from the archive, which may
-     * lead to a memory leak.
+     * @note We assume this collection is empty prior to being called. If it is 
+     * not, any boundary conditions already present may get replaced by 
+     * conditions loaded from the archive, which may lead to a memory leak.
      *
-     * This method only loads data if #mLoadedFromArchive is false, to allow for multiple pointers
-     * to the same container to be handled correctly.  It sets #mLoadedFromArchive when done.
+     * This method only loads data if #mLoadedFromArchive is false, to allow for 
+     * multiple pointers to the same container to be handled correctly. It sets 
+     * #mLoadedFromArchive when done.
      *
      * @param archive  the archive to load from
      * @param pMesh  the mesh to use to resolve Node and BoundaryElement indices
      */
-    template <class Archive>
-    void LoadFromArchive(Archive & archive, AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
+    template<class Archive>
+    void LoadFromArchive(
+        Archive & archive,
+        AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
     {
         if (mLoadedFromArchive)
         {
@@ -345,14 +373,17 @@ public:
     /**
      * Load extra boundary conditions from an archive to add to this collection.
      *
-     * Multiple pointers to the same container need to be handled by the caller - we assume there
-     * will be conditions to load.  Sets #mLoadedFromArchive when done.
+     * Multiple pointers to the same container need to be handled by the caller 
+     * - we assume there will be conditions to load. Sets #mLoadedFromArchive 
+     * when done.
      *
      * @param archive  the archive to load from
      * @param pMesh  the mesh to use to resolve Node and BoundaryElement indices
      */
-    template <class Archive>
-    void MergeFromArchive(Archive & archive, AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
+    template<class Archive>
+    void MergeFromArchive(
+        Archive & archive,
+        AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh);
 
 private:
 
@@ -369,18 +400,19 @@ private:
     void save(Archive & archive, const unsigned int version) const;
 
     /**
-     * Load this container, but not its content.
+     * Load this container, but not its content. Objects loading a boundary 
+     * conditions container should call LoadFromArchive on the new object 
+     * immediately after loading it from the archive.
      *
-     * Objects loading a boundary conditions container should call LoadFromArchive
-     * on the new object immediately after loading it from the archive.
+     * Note that boundary conditions should be saved to the 
+     * ProcessSpecificArchive, since if a DistributedTetrahedralMesh is used 
+     * each process will only know a portion of the mesh, and hence a portion of 
+     * the boundary conditions.
      *
-     * Note that boundary conditions should be saved to the ProcessSpecificArchive,
-     * since if a DistributedTetrahedralMesh is used each process will only know a
-     * portion of the mesh, and hence a portion of the boundary conditions.
-     *
-     * Extra care needs to be taken when migrating to ensure that boundary conditions
-     * are loaded appropriately.  See BidomainProblem::LoadExtraArchiveForBidomain
-     * and AbstractCardiacProblem::LoadExtraArchive for examples.
+     * Extra care needs to be taken when migrating to ensure that boundary 
+     * conditions are loaded appropriately. See 
+     * BidomainProblem::LoadExtraArchiveForBidomain and 
+     * AbstractCardiacProblem::LoadExtraArchive for examples.
      *
      * @param archive
      * @param version
@@ -395,8 +427,9 @@ private:
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 template<class Archive>
-void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::save(
-        Archive & archive, const unsigned int version) const
+void BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::save(
+        Archive & archive,
+        const unsigned int version) const
 {
     typedef typename std::map<unsigned, const AbstractBoundaryCondition<SPACE_DIM> *> archive_map_type;
 
@@ -406,7 +439,8 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::save(
          ++index_of_unknown)
     {
         archive_map_type bc_map;
-        typename BaseClassType::DirichletIteratorType it = this->mpDirichletMap[index_of_unknown]->begin();
+        typename BaseClassType::DirichletIteratorType it = 
+            this->mpDirichletMap[index_of_unknown]->begin();
         while (it != this->mpDirichletMap[index_of_unknown]->end() )
         {
             unsigned node_index = it->first->GetIndex();
@@ -438,8 +472,9 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::save(
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 template<class Archive>
-void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::MergeFromArchive(
-        Archive & archive, AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
+void BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::MergeFromArchive(
+        Archive & archive,
+        AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
 {
     mLoadedFromArchive = true;
 
@@ -478,7 +513,9 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::MergeFromAr
             used_bcs.insert(it.second);
         }
     }
-    this->mCheckedAndCommunicatedIfDirichletBcs=true; // Whether the Dirichlet BCC was empty or not, all processes know the status.
+
+    // Whether the Dirichlet BCC was empty or not, all processes know the status    
+    this->mCheckedAndCommunicatedIfDirichletBcs = true;
 
     // Load Neumann conditions
     for (unsigned index_of_unknown = 0;

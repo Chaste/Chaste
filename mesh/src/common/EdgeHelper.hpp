@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Class for facilitating the creation and management of unique edges in a 
  * vertex mesh.
  */
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 class EdgeHelper
 {
 private:

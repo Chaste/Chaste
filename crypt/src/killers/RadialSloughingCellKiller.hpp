@@ -52,7 +52,7 @@ class RadialSloughingCellKiller : public AbstractCellKiller<2>
 private:
 
     /** Centre of death. */
-    c_vector<double,2> mCentre;
+    c_vector<double, 2> mCentre;
 
     /** Radius of death. */
     double mRadius;
@@ -81,13 +81,13 @@ public:
      * @param radius the radius of death.
      */
     RadialSloughingCellKiller(AbstractCellPopulation<2>* pCellPopulation,
-                              c_vector<double,2> centre,
+                              c_vector<double, 2> centre,
                               double radius);
 
     /**
      * @return mCentre.
      */
-    c_vector<double,2> GetCentre() const;
+    c_vector<double, 2> GetCentre() const;
 
     /**
      * @return mRadius.
@@ -127,7 +127,7 @@ inline void save_construct_data(
     // Save data required to construct instance
     const AbstractCellPopulation<2>* const p_cell_population = t->GetCellPopulation();
     ar & p_cell_population;
-    c_vector<double,2> centre = t->GetCentre();
+    c_vector<double, 2> centre = t->GetCentre();
     ar & centre[0];
     ar & centre[1];
     double radius = t->GetRadius();
@@ -144,7 +144,7 @@ inline void load_construct_data(
     // Retrieve data from archive required to construct new instance
     AbstractCellPopulation<2>* p_cell_population;
     ar & p_cell_population;
-    c_vector<double,2> centre;
+    c_vector<double, 2> centre;
     ar & centre[0];
     ar & centre[1];
     double radius;

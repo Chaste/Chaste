@@ -105,7 +105,7 @@ struct ElementAndWeights
  * To see progression for any of these methods, run test from the command line 
  * with '-mesh_pair_verbose' as a command line parameter.
  */
-template <unsigned DIM>
+template<unsigned DIM>
 class FineCoarseMeshPair
 {
     friend class TestFineCoarseMeshPair;
@@ -113,10 +113,10 @@ class FineCoarseMeshPair
 private:
 
     /** Fine mesh. */
-    AbstractTetrahedralMesh<DIM,DIM>& mrFineMesh;
+    AbstractTetrahedralMesh<DIM, DIM>& mrFineMesh;
 
     /** Coarse mesh (often this will be a quadratic mesh). */
-    AbstractTetrahedralMesh<DIM,DIM>& mrCoarseMesh;
+    AbstractTetrahedralMesh<DIM, DIM>& mrCoarseMesh;
 
     /**
      * Boxes on the fine mesh domain, for easier determination of containing 
@@ -144,7 +144,7 @@ private:
      * The corresponding weights, for the nearest elements, of the points which 
      * were found to be outside the fine mesh.
      */
-    std::vector<c_vector<double,DIM+1> > mNotInMeshNearestElementWeights;
+    std::vector<c_vector<double, DIM+1> > mNotInMeshNearestElementWeights;
 
     /**
      * 2 values,
@@ -215,7 +215,7 @@ private:
      * @param rpBoxCollection reference to either mpFineBoxCollection or 
      *     mpCoarseBoxCollection
      */
-    void SetUpBoxes(AbstractTetrahedralMesh<DIM,DIM>& rMesh,
+    void SetUpBoxes(AbstractTetrahedralMesh<DIM, DIM>& rMesh,
                     double boxWidth,
                     DistributedBoxCollection<DIM>*& rpBoxCollection);
 
@@ -325,7 +325,7 @@ public:
      * points).
      *
      * If calling this DO NOT call ComputeFineElementsAndWeightsForCoarseNodes
-     * until you do done with this data
+     * until you are done with this data
      *
      * @param rQuadRule The quadrature rule, used to determine the number of 
      *     quadrature points per element.
@@ -347,7 +347,7 @@ public:
      * this with the index of the nodes.
      *
      * If calling this DO NOT call 
-     * ComputeFineElementsAndWeightsForCoarseQuadPoints until you do done with 
+     * ComputeFineElementsAndWeightsForCoarseQuadPoints until you are done with 
      * this data.
      *
      * @param safeMode This method uses the elements in the boxes to guess which 

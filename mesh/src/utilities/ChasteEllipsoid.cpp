@@ -36,12 +36,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteEllipsoid.hpp"
 #include "Exception.hpp"
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 ChasteEllipsoid<SPACE_DIM>::ChasteEllipsoid(ChastePoint<SPACE_DIM>& rCentre, ChastePoint<SPACE_DIM>& rRadii)
     : mCentre(rCentre),
       mRadii(rRadii)
 {
-    for (unsigned dim=0; dim<SPACE_DIM; dim++)
+    for (unsigned dim = 0; dim<SPACE_DIM; dim++)
     {
         if (mRadii[dim] < 0.0)
         {
@@ -54,7 +54,7 @@ ChasteEllipsoid<SPACE_DIM>::ChasteEllipsoid(ChastePoint<SPACE_DIM>& rCentre, Cha
  * \cond
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
  */
-template <>
+template<>
 bool ChasteEllipsoid<1>::DoesContain(const ChastePoint<1>& rPointToCheck) const
 {
     if (rPointToCheck[0] < mCentre[0] - mRadii[0] - 100.0 * DBL_EPSILON ||
@@ -76,7 +76,7 @@ bool ChasteEllipsoid<1>::DoesContain(const ChastePoint<1>& rPointToCheck) const
  * \cond
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
  */
-template <>
+template<>
 bool ChasteEllipsoid<2>::DoesContain(const ChastePoint<2>& rPointToCheck) const
 {
     double x_distance = (rPointToCheck[0]-mCentre[0])/mRadii[0];
@@ -100,7 +100,7 @@ bool ChasteEllipsoid<2>::DoesContain(const ChastePoint<2>& rPointToCheck) const
  * \cond
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
  */
-template <>
+template<>
 bool ChasteEllipsoid<3>::DoesContain(const ChastePoint<3>& rPointToCheck) const
 {
     double x_distance = (rPointToCheck[0]-mCentre[0])/mRadii[0];
@@ -121,13 +121,13 @@ bool ChasteEllipsoid<3>::DoesContain(const ChastePoint<3>& rPointToCheck) const
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
  */
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 const ChastePoint<SPACE_DIM>& ChasteEllipsoid<SPACE_DIM>::rGetCentre() const
 {
     return mCentre;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 const ChastePoint<SPACE_DIM>& ChasteEllipsoid<SPACE_DIM>::rGetRadii() const
 {
     return mRadii;

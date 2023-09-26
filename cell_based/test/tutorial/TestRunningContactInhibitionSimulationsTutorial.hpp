@@ -131,7 +131,7 @@ public:
         /* We use the honeycomb mesh generator to create a honeycomb mesh and
          * the associated mutable mesh. */
         HoneycombMeshGenerator generator(3, 3);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         /* We now create a vector of cell pointers. */
         std::vector<CellPtr> cells;
@@ -190,8 +190,8 @@ public:
          */
 
         /* First we impose a wall at x=0: */
-        c_vector<double,2> point = zero_vector<double>(2);
-        c_vector<double,2> normal = zero_vector<double>(2);
+        c_vector<double, 2> point = zero_vector<double>(2);
+        c_vector<double, 2> normal = zero_vector<double>(2);
         normal(0) = -1.0;
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc1, (&cell_population, point, normal));
         simulator.AddCellPopulationBoundaryCondition(p_bc1);
@@ -237,7 +237,7 @@ public:
     {
         /* Just as before we create a simple mesh. */
         HoneycombMeshGenerator generator(3, 3);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         /* We again create the cells. The difference here is that one of the cells is not contact-inhibited, but rather
          * is defined by a {{{UniformCellCycleModel}}}. */
@@ -296,8 +296,8 @@ public:
         simulator.AddForce(p_force);
 
         /* As in the previous test, we trap the cells in the square domain [0,2.5]x[0,2.5]: */
-        c_vector<double,2> point = zero_vector<double>(2);
-        c_vector<double,2> normal = zero_vector<double>(2);
+        c_vector<double, 2> point = zero_vector<double>(2);
+        c_vector<double, 2> normal = zero_vector<double>(2);
         normal(0) = -1.0;
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc1, (&cell_population, point, normal));
         simulator.AddCellPopulationBoundaryCondition(p_bc1);
@@ -345,7 +345,7 @@ public:
     {
         /* First we create a simple 2D MutableVertexMesh.*/
         HoneycombVertexMeshGenerator generator(2, 2);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         /*
          * We then create cells as before, only this time we need one per element. We also create the cell population (a {{{VertexBasedCellPopulation}}}).

@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 SteadyStateRestitutionStimulus::SteadyStateRestitutionStimulus(double magnitude, double stimulusDuration, double startTime, std::vector<double> pacingCycleLengths, unsigned numberOfPulses)
     : MultiStimulus()
 {
-    for (unsigned stim=0; stim < pacingCycleLengths.size() ; stim++)
+    for (unsigned stim = 0; stim < pacingCycleLengths.size() ; stim++)
     {
         boost::shared_ptr<RegularStimulus> p_stim(new RegularStimulus(magnitude, stimulusDuration, pacingCycleLengths[stim], startTime, startTime + numberOfPulses*pacingCycleLengths[stim]));
         this->AddStimulus(p_stim);

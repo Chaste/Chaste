@@ -406,7 +406,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetNode(unsigned nodeIndex, Chas
     this->mNodes[nodeIndex]->SetPoint(point);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
     [[maybe_unused]] VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
     [[maybe_unused]] c_vector<double, SPACE_DIM> axisOfDivision,
@@ -659,7 +659,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAxis(
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongShortAxis(
     [[maybe_unused]] VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
     [[maybe_unused]] bool placeOriginalElementBelow)
@@ -677,7 +677,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongShortAxis(
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(
     [[maybe_unused]] VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
     [[maybe_unused]] unsigned nodeAIndex,
@@ -810,7 +810,7 @@ unsigned MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::DeleteElementPriorToReMesh([[maybe_unused]] unsigned index)
 {
     if constexpr (SPACE_DIM == 2)
@@ -1047,7 +1047,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh()
     ReMesh(map);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForSwapsFromShortEdges()
 {
     if constexpr (ELEMENT_DIM == 2 && SPACE_DIM == 2)
@@ -1140,7 +1140,7 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForT2Swaps(VertexElementMap
     return false;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
 {
     if constexpr (ELEMENT_DIM == 2 && SPACE_DIM == 2)
@@ -1271,7 +1271,7 @@ bool MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForIntersections()
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::IdentifySwapType(
     [[maybe_unused]] Node<SPACE_DIM>* pNodeA, [[maybe_unused]] Node<SPACE_DIM>* pNodeB)
 {
@@ -1765,36 +1765,36 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformNodeMerge(Node<SPACE_DIM>
     for (const auto& it : nodeB_elem_indices)
     {
         // Find the local index of node B in this element
-        unsigned node_B_local_index = this->mElements[*it]->GetNodeLocalIndex(node_B_index);
+        unsigned node_B_local_index = this->mElements[it]->GetNodeLocalIndex(node_B_index);
         assert(node_B_local_index < UINT_MAX); // this element contains node B
 
         /*
          * If this element already contains node A, then just remove node B.
          * Otherwise replace it with node A in the element and remove it from mNodes.
          */
-        if (nodeA_elem_indices.count(*it) != 0)
+        if (nodeA_elem_indices.count(it) != 0)
         {
             std::vector<unsigned> edgeIds;
-            for (unsigned i = 0; i < this->mElements[*it]->GetNumEdges(); ++i)
+            for (unsigned i = 0; i < this->mElements[it]->GetNumEdges(); ++i)
             {
-                edgeIds.push_back(this->mElements[*it]->GetEdge(i)->GetIndex());
+                edgeIds.push_back(this->mElements[it]->GetEdge(i)->GetIndex());
             }
-            const unsigned node_A_local_index = this->mElements[*it]->GetNodeLocalIndex(pNodeA->GetIndex());
-            this->mElements[*it]->DeleteNode(node_B_local_index);
+            const unsigned node_A_local_index = this->mElements[it]->GetNodeLocalIndex(pNodeA->GetIndex());
+            this->mElements[it]->DeleteNode(node_B_local_index);
 
             if (mTrackMeshOperations)
             {
-                mOperationRecorder.RecordNodeMergeOperation(edgeIds, this->mElements[*it],
+                mOperationRecorder.RecordNodeMergeOperation(edgeIds, this->mElements[it],
                                                             std::pair<unsigned, unsigned>(node_A_local_index, node_B_local_index));
             }
         }
         else
         {
             // Replace node B with node A in this element
-            this->mElements[*it]->UpdateNode(node_B_local_index, pNodeA);
+            this->mElements[it]->UpdateNode(node_B_local_index, pNodeA);
         }
-        rebuilt_elements.insert(this->mElements[*it]->GetIndex());
-        this->mElements[*it]->RebuildEdges();
+        rebuilt_elements.insert(this->mElements[it]->GetIndex());
+        this->mElements[it]->RebuildEdges();
     }
 
     assert(!(this->mNodes[node_B_index]->IsDeleted()));
@@ -1804,7 +1804,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformNodeMerge(Node<SPACE_DIM>
         this->GetElement(i)->RebuildEdges();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(
     [[maybe_unused]] Node<SPACE_DIM>* pNodeA,
     [[maybe_unused]] Node<SPACE_DIM>* pNodeB,
@@ -2004,7 +2004,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT1Swap(
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(
     [[maybe_unused]] Node<SPACE_DIM>* pNode, [[maybe_unused]] unsigned elementIndex)
 {
@@ -2373,7 +2373,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformIntersectionSwap(
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap([[maybe_unused]] VertexElement<ELEMENT_DIM, SPACE_DIM>& rElement)
 {
     if constexpr (ELEMENT_DIM == 2 && SPACE_DIM == 2)
@@ -2493,7 +2493,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT2Swap([[maybe_unused]] V
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(
     [[maybe_unused]] Node<SPACE_DIM>* pNode, [[maybe_unused]] unsigned elementIndex)
 {
@@ -3444,7 +3444,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformT3Swap(
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformVoidRemoval(
     [[maybe_unused]] Node<SPACE_DIM>* pNodeA,
     [[maybe_unused]] Node<SPACE_DIM>* pNodeB,
@@ -3507,7 +3507,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::HandleHighOrderJunctions(Node<SP
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformRosetteRankIncrease(
     [[maybe_unused]] Node<SPACE_DIM>* pNodeA, [[maybe_unused]] Node<SPACE_DIM>* pNodeB)
 {
@@ -3628,7 +3628,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformRosetteRankIncrease(
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformProtorosetteResolution(
     [[maybe_unused]] Node<SPACE_DIM>* pProtorosetteNode)
 {
@@ -3826,7 +3826,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformProtorosetteResolution(
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformRosetteRankDecrease(
     [[maybe_unused]] Node<SPACE_DIM>* pRosetteNode)
 {
@@ -4012,7 +4012,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::PerformRosetteRankDecrease(
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::CheckForRosettes()
 {
     if constexpr (ELEMENT_DIM == 2 && SPACE_DIM == 2)
@@ -4162,7 +4162,7 @@ c_vector<double, 2> MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::WidenEdgeOrCorrec
     return intersection;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetMeshOperationTracking(const bool track)
 {
     mTrackMeshOperations = track;
@@ -4172,7 +4172,7 @@ void MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::SetMeshOperationTracking(const b
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>* MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::GetOperationRecorder()
 {
     VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>* p_value(&mOperationRecorder);

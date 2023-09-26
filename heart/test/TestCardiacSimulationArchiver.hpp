@@ -129,7 +129,7 @@ public:
         TS_ASSERT_DELTA(solution_replicated[9], -16.8344, atol);
 
         // Save for checking in the next test
-        for (unsigned index=0; index<solution_replicated.GetSize(); index++)
+        for (unsigned index = 0; index<solution_replicated.GetSize(); index++)
         {
             mSolutionReplicated1d2ms.push_back(solution_replicated[index]);
         }
@@ -174,7 +174,7 @@ public:
             // check some voltages
             ReplicatableVector solution_replicated(p_bidomain_problem->GetSolution());
             TS_ASSERT_EQUALS(solution_replicated.GetSize(), mSolutionReplicated1d2ms.size()); //This in to make sure that the first test in the suite has been run!
-            for (unsigned index=0; index<solution_replicated.GetSize(); index++)
+            for (unsigned index = 0; index<solution_replicated.GetSize(); index++)
             {
                 // Shouldn't differ from the original run at all
                 TS_ASSERT_DELTA(solution_replicated[index], mSolutionReplicated1d2ms[index],  5e-11);
@@ -184,7 +184,7 @@ public:
             // This new file should go from 1.0 to 2.0, in printing time steps of 0.1.
             std::vector<double> times = reader.GetUnlimitedDimensionValues();
             TS_ASSERT_EQUALS(times.size(),11u);
-            for (unsigned i=0; i<times.size(); ++i)
+            for (unsigned i = 0; i<times.size(); ++i)
             {
                 TS_ASSERT_DELTA(times[i], 1.0 + 0.1*(double)(i), 1e-9);
             }
@@ -214,7 +214,7 @@ public:
             // check some voltages
             ReplicatableVector solution_replicated(p_bidomain_problem->GetSolution());
             TS_ASSERT_EQUALS(solution_replicated.GetSize(), mSolutionReplicated1d2ms.size()); //This in to make sure that the first test in the suite has been run!
-            for (unsigned index=0; index<solution_replicated.GetSize(); index++)
+            for (unsigned index = 0; index<solution_replicated.GetSize(); index++)
             {
                 //Shouldn't differ from the original run at all
                 TS_ASSERT_DELTA(solution_replicated[index], mSolutionReplicated1d2ms[index],  5e-11);
@@ -418,7 +418,7 @@ private:
         TS_ASSERT_EQUALS(p_problem->rGetMesh().GetNumNodes(), totalNumCells);
         TS_ASSERT_EQUALS(&(p_problem->rGetMesh()), p_problem->GetTissue()->pGetMesh());
         // Check the mesh is/isn't the parallel variety
-        const DistributedTetrahedralMesh<DIM,DIM>* p_dist_mesh = dynamic_cast<const DistributedTetrahedralMesh<DIM,DIM>*>(p_problem->GetTissue()->pGetMesh());
+        const DistributedTetrahedralMesh<DIM, DIM>* p_dist_mesh = dynamic_cast<const DistributedTetrahedralMesh<DIM, DIM>*>(p_problem->GetTissue()->pGetMesh());
         if (isDistributedMesh)
         {
             TS_ASSERT(p_dist_mesh != NULL);
@@ -444,7 +444,7 @@ private:
                     }
                     std::vector<double> state = p_cell->GetStateVariables();
                     TS_ASSERT_EQUALS(state.size(), inits.size());
-                    for (unsigned j=0; j<state.size(); ++j)
+                    for (unsigned j = 0; j<state.size(); ++j)
                     {
                         TS_ASSERT_DELTA(state[j], inits[j], 1e-10);
                     }
@@ -533,7 +533,7 @@ private:
         p_orig_problem->Solve();
         ReplicatableVector orig_soln(p_orig_problem->GetSolution());
         TS_ASSERT_EQUALS(migrated_soln_1.GetSize(), orig_soln.GetSize());
-        for (unsigned i=0; i<migrated_soln_1.GetSize(); ++i)
+        for (unsigned i = 0; i<migrated_soln_1.GetSize(); ++i)
         {
             double tol;
             if (PetscTools::GetNumProcs() < 4)
@@ -562,7 +562,7 @@ private:
         // and again compare the results
         ReplicatableVector migrated_soln_2(p_problem->GetSolution());
         TS_ASSERT_EQUALS(migrated_soln_1.GetSize(), migrated_soln_2.GetSize());
-        for (unsigned i=0; i<migrated_soln_1.GetSize(); ++i)
+        for (unsigned i = 0; i<migrated_soln_1.GetSize(); ++i)
         {
             TS_ASSERT_DELTA(migrated_soln_2[i], migrated_soln_1[i], ABS_TOL);
         }
@@ -640,7 +640,7 @@ public:
 
         // Do the migration
         const unsigned num_cells = 216u;
-        BidomainProblem<3>* p_problem = DoMigrateAndBasicTests<BidomainProblem<3>,3>(source_directory, ref_archive_dir, new_directory, num_cells, true);
+        BidomainProblem<3>* p_problem = DoMigrateAndBasicTests<BidomainProblem<3>, 3>(source_directory, ref_archive_dir, new_directory, num_cells, true);
 
         // All cells at x=0 should have a SimpleStimulus(-80000, 1).
         DistributedVectorFactory* p_factory = p_problem->rGetMesh().GetDistributedVectorFactory();
@@ -698,7 +698,7 @@ public:
             std::string directory = "TestCreateArchiveForLoadAsSequentialWithBath";
             HeartConfig::Instance()->SetOutputDirectory(directory);
 
-            TetrahedralMesh<2,2>* p_mesh = Load2dMeshAndSetCircularTissue<TetrahedralMesh<2,2> >(
+            TetrahedralMesh<2, 2>* p_mesh = Load2dMeshAndSetCircularTissue<TetrahedralMesh<2, 2> >(
                 "mesh/test/data/2D_0_to_1mm_400_elements", 0.05, 0.05, 0.02);
             ZeroStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory;
 
@@ -717,7 +717,7 @@ public:
             std::string directory = "TestCreateArchiveForLoadAsSequentialWithBathAndDistributedMesh";
             HeartConfig::Instance()->SetOutputDirectory(directory);
 
-            DistributedTetrahedralMesh<2,2>* p_mesh = Load2dMeshAndSetCircularTissue<DistributedTetrahedralMesh<2,2> >(
+            DistributedTetrahedralMesh<2, 2>* p_mesh = Load2dMeshAndSetCircularTissue<DistributedTetrahedralMesh<2, 2> >(
                 "mesh/test/data/2D_0_to_1mm_400_elements", 0.05, 0.05, 0.02);
             ZeroStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory;
 
@@ -741,7 +741,7 @@ public:
         BidomainProblem<2>* p_problem;
         // Do the migration to sequential
         const unsigned num_cells = 221u;
-        p_problem = DoMigrateAndBasicTests<BidomainProblem<2>,2>(source_directory, ref_archive_dir, new_archive_dir, num_cells, false);
+        p_problem = DoMigrateAndBasicTests<BidomainProblem<2>, 2>(source_directory, ref_archive_dir, new_archive_dir, num_cells, false);
 
         // All cells should have no stimulus.
         DistributedVectorFactory* p_factory = p_problem->rGetMesh().GetDistributedVectorFactory();
@@ -760,10 +760,10 @@ public:
         TS_ASSERT( ! p_problem->mpBoundaryConditionsContainer);
         // Problem's BCC will be created first time BidomainProblem::Solve() is called,
         // so check the Electrodes' BCC directly
-        boost::shared_ptr<BoundaryConditionsContainer<2,2,2> > p_bcc = p_problem->mpElectrodes->GetBoundaryConditionsContainer();
+        boost::shared_ptr<BoundaryConditionsContainer<2, 2, 2> > p_bcc = p_problem->mpElectrodes->GetBoundaryConditionsContainer();
         // We have neumann boundary conditions from the electrodes
         TS_ASSERT(p_bcc->AnyNonZeroNeumannConditions());
-        for (BoundaryConditionsContainer<2,2,2>::NeumannMapIterator it = p_bcc->BeginNeumann();
+        for (BoundaryConditionsContainer<2, 2, 2>::NeumannMapIterator it = p_bcc->BeginNeumann();
              it != p_bcc->EndNeumann();
              ++it)
         {
@@ -786,7 +786,7 @@ public:
         // There are no dirichlet BCs.
         TS_ASSERT( ! p_bcc->HasDirichletBoundaryConditions());
         // Now check that all relevant boundary elements have neumann conditions
-        for (AbstractTetrahedralMesh<2,2>::BoundaryElementIterator iter = p_problem->rGetMesh().GetBoundaryElementIteratorBegin();
+        for (AbstractTetrahedralMesh<2, 2>::BoundaryElementIterator iter = p_problem->rGetMesh().GetBoundaryElementIteratorBegin();
              iter != p_problem->rGetMesh().GetBoundaryElementIteratorEnd();
              iter++)
         {
@@ -816,7 +816,7 @@ public:
 
         BidomainProblem<2>* p_problem2;
         // Do the migration to sequential
-        p_problem2 = DoMigrateAndBasicTests<BidomainProblem<2>,2>(source_directory, ref_archive_dir, new_archive_dir, num_cells, true);
+        p_problem2 = DoMigrateAndBasicTests<BidomainProblem<2>, 2>(source_directory, ref_archive_dir, new_archive_dir, num_cells, true);
         delete p_problem2;
     }
 
@@ -848,7 +848,7 @@ private:
         TS_ASSERT_EQUALS(p_problem->rGetMesh().GetNumNodes(), totalNumCells);
         TS_ASSERT_EQUALS(&(p_problem->rGetMesh()), p_problem->GetTissue()->pGetMesh());
         // Check the mesh is/isn't the parallel variety
-        const DistributedTetrahedralMesh<DIM,DIM>* p_dist_mesh = dynamic_cast<const DistributedTetrahedralMesh<DIM,DIM>*>(p_problem->GetTissue()->pGetMesh());
+        const DistributedTetrahedralMesh<DIM, DIM>* p_dist_mesh = dynamic_cast<const DistributedTetrahedralMesh<DIM, DIM>*>(p_problem->GetTissue()->pGetMesh());
         if (isDistributedMesh)
         {
             TS_ASSERT(p_dist_mesh != NULL);
@@ -876,7 +876,7 @@ private:
                         }
                         std::vector<double> state = p_cell->GetStdVecStateVariables();
                         TS_ASSERT_EQUALS(state.size(), inits.size());
-                        for (unsigned j=0; j<state.size(); ++j)
+                        for (unsigned j = 0; j<state.size(); ++j)
                         {
                             TS_ASSERT_DELTA(state[j], inits[j], 1e-10);
                         }
@@ -961,7 +961,7 @@ public:
         // Loading from a sequential archive should work just as well running sequentially as in parallel -
         // if running sequentially it's just the same as a normal load.
         const unsigned num_cells = 216u;
-        MonodomainProblem<3>* p_problem = DoMigrateFromSequentialAndBasicTests<MonodomainProblem<3>,3>(source_directory, ref_archive_dir, new_archive_dir, num_cells, true, true);
+        MonodomainProblem<3>* p_problem = DoMigrateFromSequentialAndBasicTests<MonodomainProblem<3>, 3>(source_directory, ref_archive_dir, new_archive_dir, num_cells, true, true);
 
         // All cells at x=0 should have a SimpleStimulus(-25500, 2).
         DistributedVectorFactory* p_factory = p_problem->rGetMesh().GetDistributedVectorFactory();
@@ -1009,7 +1009,7 @@ public:
         HeartConfig::Instance()->SetOutputFilenamePrefix("simulation");
         HeartConfig::Instance()->SetUseAbsoluteTolerance(ABS_TOL);
 
-        DistributedTetrahedralMesh<2,2>* p_mesh = Load2dMeshAndSetCircularTissue<DistributedTetrahedralMesh<2,2> >(
+        DistributedTetrahedralMesh<2, 2>* p_mesh = Load2dMeshAndSetCircularTissue<DistributedTetrahedralMesh<2, 2> >(
             "mesh/test/data/2D_0_to_1mm_400_elements", 0.05, 0.05, 0.02);
         ZeroStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory;
 
@@ -1045,7 +1045,7 @@ public:
         // Loading from a sequential archive should work just as well running sequentially as in parallel -
         // if running sequentially it's essentially just the same as a normal load.
         const unsigned num_cells = 221u;
-        BidomainProblem<2>* p_problem = DoMigrateFromSequentialAndBasicTests<BidomainProblem<2>,2>(source_directory, ref_archive_dir, new_archive_dir, num_cells, true, false, 0.1);
+        BidomainProblem<2>* p_problem = DoMigrateFromSequentialAndBasicTests<BidomainProblem<2>, 2>(source_directory, ref_archive_dir, new_archive_dir, num_cells, true, false, 0.1);
 
         // All cells should have a ZeroStimulus.
         DistributedVectorFactory* p_factory = p_problem->rGetMesh().GetDistributedVectorFactory();
@@ -1062,14 +1062,14 @@ public:
         // Test bccs
         TS_ASSERT(p_problem->mpDefaultBoundaryConditionsContainer); /// \todo: see todo in BidomainProblem.cpp:344
         TS_ASSERT(p_problem->mpBoundaryConditionsContainer);
-        boost::shared_ptr<BoundaryConditionsContainer<2,2,2> > p_bcc = p_problem->mpBoundaryConditionsContainer;
+        boost::shared_ptr<BoundaryConditionsContainer<2, 2, 2> > p_bcc = p_problem->mpBoundaryConditionsContainer;
         // We have neumann and dirichlet boundary conditions from the electrodes (at least on some processes)
         if (PetscTools::IsSequential())
         {
             TS_ASSERT(p_bcc->AnyNonZeroNeumannConditions());
         }
         TS_ASSERT(p_bcc->HasDirichletBoundaryConditions());
-        for (BoundaryConditionsContainer<2,2,2>::NeumannMapIterator it = p_bcc->BeginNeumann();
+        for (BoundaryConditionsContainer<2, 2, 2>::NeumannMapIterator it = p_bcc->BeginNeumann();
              it != p_bcc->EndNeumann();
              ++it)
         {
@@ -1085,7 +1085,7 @@ public:
             }
         }
         // Now check that all relevant boundary elements have neumann conditions
-        for (DistributedTetrahedralMesh<2,2>::BoundaryElementIterator iter = p_problem->rGetMesh().GetBoundaryElementIteratorBegin();
+        for (DistributedTetrahedralMesh<2, 2>::BoundaryElementIterator iter = p_problem->rGetMesh().GetBoundaryElementIteratorBegin();
              iter != p_problem->rGetMesh().GetBoundaryElementIteratorEnd();
              iter++)
         {
@@ -1102,7 +1102,7 @@ public:
             TS_ASSERT_DELTA(p_bcc->GetNeumannBCValue(*iter,centroid,0), 0, 1e-10);
         }
         // Check dirichlet conditions exist only at x=0.1
-        for (AbstractTetrahedralMesh<2,2>::NodeIterator iter=p_problem->rGetMesh().GetNodeIteratorBegin();
+        for (AbstractTetrahedralMesh<2, 2>::NodeIterator iter=p_problem->rGetMesh().GetNodeIteratorBegin();
              iter != p_problem->rGetMesh().GetNodeIteratorEnd();
              ++iter)
         {
@@ -1193,8 +1193,8 @@ public:
         HeartConfig::Instance()->SetOutputFilenamePrefix("simulation");
         HeartConfig::Instance()->SetUseAbsoluteTolerance(ABS_TOL);
 
-        TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_10_elements");
-        DistributedTetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> reader("mesh/test/data/1D_0_to_1_10_elements");
+        DistributedTetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(reader);
         // Set the whole mesh to be bath
         DistributedVectorFactory* p_factory = mesh.GetDistributedVectorFactory();
@@ -1202,7 +1202,7 @@ public:
         {
             mesh.GetNode(i)->SetRegion(HeartRegionCode::GetValidBathId());
         }
-        for (DistributedTetrahedralMesh<1,1>::ElementIterator it = mesh.GetElementIteratorBegin();
+        for (DistributedTetrahedralMesh<1, 1>::ElementIterator it = mesh.GetElementIteratorBegin();
              it != mesh.GetElementIteratorEnd();
              ++it)
         {
@@ -1219,7 +1219,7 @@ public:
         unsigned rhs_index = 10u;
         if (p_factory->IsGlobalIndexLocal(rhs_index))
         {
-            boost::shared_ptr<BoundaryConditionsContainer<1,1,2> > p_bcc(new BoundaryConditionsContainer<1,1,2>);
+            boost::shared_ptr<BoundaryConditionsContainer<1, 1, 2> > p_bcc(new BoundaryConditionsContainer<1, 1, 2>);
             ConstBoundaryCondition<1>* p_zero_stim = new ConstBoundaryCondition<1>(0.0);
             Node<1>* p_node = mesh.GetNode(rhs_index);
             p_bcc->AddDirichletBoundaryCondition(p_node, p_zero_stim, 1u);
@@ -1239,11 +1239,11 @@ public:
         std::string ref_archive_dir = "TestCreateArchiveForBcsOnNonMasterOnly";
 
         const unsigned num_nodes = 11u;
-        BidomainProblem<1>* p_problem = DoMigrateAndBasicTests<BidomainProblem<1>,1>(source_directory, ref_archive_dir, new_archive_dir, num_nodes, true);
+        BidomainProblem<1>* p_problem = DoMigrateAndBasicTests<BidomainProblem<1>, 1>(source_directory, ref_archive_dir, new_archive_dir, num_nodes, true);
 
         // Test the bccs - zero dirichlet on RHS only
         TS_ASSERT(! p_problem->mpDefaultBoundaryConditionsContainer);
-        boost::shared_ptr<BoundaryConditionsContainer<1,1,2> > p_bcc = p_problem->mpBoundaryConditionsContainer;
+        boost::shared_ptr<BoundaryConditionsContainer<1, 1, 2> > p_bcc = p_problem->mpBoundaryConditionsContainer;
         // If running on 2 procs we now don't migrate, so process 0 doesn't have a BCC.
         if (PetscTools::GetNumProcs() != 2)
         {
@@ -1287,8 +1287,8 @@ public:
         HeartConfig::Instance()->SetOutputFilenamePrefix("simulation");
         HeartConfig::Instance()->SetUseAbsoluteTolerance(ABS_TOL);
 
-        TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_100_elements");
-        DistributedTetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> reader("mesh/test/data/1D_0_to_1_100_elements");
+        DistributedTetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(reader);
 
         // Stimulate at LHS
@@ -1321,17 +1321,17 @@ public:
         std::string ref_archive_dir = "TestCreateArchiveForMigrateAfterSolve/archive";
 
         const unsigned num_nodes = 101u;
-        MonodomainProblem<1>* p_problem = DoMigrateAndBasicTests<MonodomainProblem<1>,1>(source_directory, ref_archive_dir, new_archive_dir, num_nodes, true, 0.1);
+        MonodomainProblem<1>* p_problem = DoMigrateAndBasicTests<MonodomainProblem<1>, 1>(source_directory, ref_archive_dir, new_archive_dir, num_nodes, true, 0.1);
 
         // Test the bccs - zero neumann on the boundary
         TS_ASSERT( p_problem->mpDefaultBoundaryConditionsContainer);
-        boost::shared_ptr<BoundaryConditionsContainer<1,1,1> > p_bcc = p_problem->mpBoundaryConditionsContainer;
+        boost::shared_ptr<BoundaryConditionsContainer<1, 1, 1> > p_bcc = p_problem->mpBoundaryConditionsContainer;
         TS_ASSERT(p_bcc);
         TS_ASSERT_EQUALS(p_bcc, p_problem->mpDefaultBoundaryConditionsContainer);
         TS_ASSERT(! p_bcc->AnyNonZeroNeumannConditions());
         TS_ASSERT(! p_bcc->HasDirichletBoundaryConditions());
         // Check all conditions are on the boundary
-        for (BoundaryConditionsContainer<1,1,1>::NeumannMapIterator it = p_bcc->BeginNeumann();
+        for (BoundaryConditionsContainer<1, 1, 1>::NeumannMapIterator it = p_bcc->BeginNeumann();
              it != p_bcc->EndNeumann();
              ++it)
         {
@@ -1346,7 +1346,7 @@ public:
             }
         }
         // Now check that all relevant boundary elements have neumann conditions
-        for (DistributedTetrahedralMesh<1,1>::BoundaryElementIterator it = p_problem->rGetMesh().GetBoundaryElementIteratorBegin();
+        for (DistributedTetrahedralMesh<1, 1>::BoundaryElementIterator it = p_problem->rGetMesh().GetBoundaryElementIteratorBegin();
              it != p_problem->rGetMesh().GetBoundaryElementIteratorEnd();
              it++)
         {
@@ -1381,10 +1381,10 @@ public:
             // Run permuted simulation and archive it
             OutputFileHandler handler("PermutedBidomain1d",true);
             //In order to apply a permutation, we need to have a binary mesh
-            TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1mm_10_elements_binary");
+            TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1mm_10_elements_binary");
             mesh_reader.SetNodePermutation(permutation);
 
-            DistributedTetrahedralMesh<1,1> permuted_mesh;
+            DistributedTetrahedralMesh<1, 1> permuted_mesh;
             permuted_mesh.ConstructFromMeshReader(mesh_reader);
 
             std::vector<unsigned> stored_perm = permuted_mesh.rGetNodePermutation();
@@ -1428,7 +1428,7 @@ public:
 
             std::vector<unsigned> archived_permutation = p_bidomain_problem->rGetMesh().rGetNodePermutation();
             TS_ASSERT_EQUALS(archived_permutation.size(), 11u);
-            for (unsigned i=0; i<archived_permutation.size(); ++i)  //We use "size" rather than 11 in case the previous test failed
+            for (unsigned i = 0; i<archived_permutation.size(); ++i)  //We use "size" rather than 11 in case the previous test failed
             {
                 TS_ASSERT_EQUALS(archived_permutation[i], permutation[i]);
             }

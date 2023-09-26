@@ -41,24 +41,25 @@ AbstractIsotropicCompressibleMaterialLaw<DIM>::~AbstractIsotropicCompressibleMat
 }
 
 template<unsigned DIM>
-void AbstractIsotropicCompressibleMaterialLaw<DIM>::ComputeStressAndStressDerivative(c_matrix<double,DIM,DIM>& rC,
-                                                                                     c_matrix<double,DIM,DIM>& rInvC,
-                                                                                     double                    pressure,
-                                                                                     c_matrix<double,DIM,DIM>& rT,
-                                                                                     FourthOrderTensor<DIM,DIM,DIM,DIM>&   rDTdE,
-                                                                                     bool                      computeDTdE)
+void AbstractIsotropicCompressibleMaterialLaw<DIM>::ComputeStressAndStressDerivative(
+    c_matrix<double, DIM, DIM>& rC,
+    c_matrix<double, DIM, DIM>& rInvC,
+    double pressure,
+    c_matrix<double, DIM, DIM>& rT,
+    FourthOrderTensor<DIM, DIM, DIM, DIM>& rDTdE,
+    bool computeDTdE)
 {
     if constexpr (DIM == 2 || DIM == 3)
     {
         assert(pressure == 0.0);
 
-        static c_matrix<double,DIM,DIM> identity = identity_matrix<double>(DIM);
+        static c_matrix<double, DIM, DIM> identity = identity_matrix<double>(DIM);
 
         double I1 = Trace(rC);
         double I2 = SecondInvariant(rC);
         double I3 = Determinant(rC);
 
-        static c_matrix<double,DIM,DIM> dI2dC;
+        static c_matrix<double, DIM, DIM> dI2dC;
         dI2dC = I1*identity - rC;              // MUST be on separate line to above!
 
         double w1 = Get_dW_dI1(I1,I2,I3);

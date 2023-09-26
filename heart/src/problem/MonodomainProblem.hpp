@@ -71,7 +71,7 @@ private:
 
 protected:
     /** The monodomain tissue object. */
-    MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* mpMonodomainTissue;
+    MonodomainTissue<ELEMENT_DIM, SPACE_DIM>* mpMonodomainTissue;
 
 public:
     /** @return Created monodomain tissue. */
@@ -85,7 +85,7 @@ public:
      * @param pCellFactory User defined cell factory which shows how the pde should
      *   create cells.
      */
-    explicit MonodomainProblem(AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>* pCellFactory);
+    explicit MonodomainProblem(AbstractCardiacCellFactory<ELEMENT_DIM, SPACE_DIM>* pCellFactory);
 
     /**
      * Constructor just used for archiving
@@ -98,7 +98,7 @@ public:
     virtual ~MonodomainProblem();
 
     /** @return the monodomain PDE */
-    MonodomainTissue<ELEMENT_DIM,SPACE_DIM> * GetMonodomainTissue();
+    MonodomainTissue<ELEMENT_DIM, SPACE_DIM> * GetMonodomainTissue();
 
     /**
      *  Print out time and max/min voltage values at current time.

@@ -53,8 +53,8 @@ class TestMajorAirwaysCentreLinesCleaner : public CxxTest::TestSuite
 public:
     void TestDeleteOrderSimpleMesh()
     {
-        TrianglesMeshReader<1,3> mesh_reader("lung/test/airway_generation/data/test_major_airways_mesh");
-        MutableMesh<1,3> mesh;
+        TrianglesMeshReader<1, 3> mesh_reader("lung/test/airway_generation/data/test_major_airways_mesh");
+        MutableMesh<1, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         //Assign valid radii
@@ -85,9 +85,9 @@ public:
     void TestDeleteFirstOrder()
     {
 #ifdef CHASTE_VTK
-        VtkMeshReader<1,3> mesh_reader("lung/test/data/TestSubject002MajorAirways.vtu");
+        VtkMeshReader<1, 3> mesh_reader("lung/test/data/TestSubject002MajorAirways.vtu");
 
-        MutableMesh<1,3> mesh;
+        MutableMesh<1, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         //Assign valid radii
@@ -110,7 +110,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 3682u);
 
 // Uncomment to visualise
-//        VtkMeshWriter<1,3> mesh_writer("TestMajorAirwaysCentreLinesCleaner", "Novartis002Trimmed");
+//        VtkMeshWriter<1, 3> mesh_writer("TestMajorAirwaysCentreLinesCleaner", "Novartis002Trimmed");
 //        mesh_writer.WriteFilesUsingMesh(mesh);
 #endif //CHASTE_VTK
     }
@@ -118,8 +118,8 @@ public:
     void TestHeuristicCleanSimpleMesh()
     {
         {
-            TrianglesMeshReader<1,3> mesh_reader("lung/test/airway_generation/data/test_major_airways_mesh");
-            MutableMesh<1,3> mesh;
+            TrianglesMeshReader<1, 3> mesh_reader("lung/test/airway_generation/data/test_major_airways_mesh");
+            MutableMesh<1, 3> mesh;
             mesh.ConstructFromMeshReader(mesh_reader);
 
             //Assign valid radii
@@ -148,13 +148,13 @@ public:
 
 
             //Uncomment to visualise
-//            VtkMeshWriter<1,3> mesh_writer("TestMajorAirwaysCentreLinesCleaner", "heuristic_shorten", false);
+//            VtkMeshWriter<1, 3> mesh_writer("TestMajorAirwaysCentreLinesCleaner", "heuristic_shorten", false);
 //            mesh_writer.WriteFilesUsingMesh(mesh);
         }
 
         {
-            TrianglesMeshReader<1,3> mesh_reader("lung/test/airway_generation/data/test_major_airways_mesh_short_terminals");
-            MutableMesh<1,3> mesh;
+            TrianglesMeshReader<1, 3> mesh_reader("lung/test/airway_generation/data/test_major_airways_mesh_short_terminals");
+            MutableMesh<1, 3> mesh;
             mesh.ConstructFromMeshReader(mesh_reader);
 
             //Assign valid radii
@@ -182,15 +182,15 @@ public:
             TS_ASSERT_DELTA(mesh.GetNode(5)->rGetLocation()[1], -1.4, 1e-6);
 
             //Uncomment to visualise
-//            VtkMeshWriter<1,3> mesh_writer("TestMajorAirwaysCentreLinesCleaner", "heuristic_lengthen", false);
+//            VtkMeshWriter<1, 3> mesh_writer("TestMajorAirwaysCentreLinesCleaner", "heuristic_lengthen", false);
 //            mesh_writer.WriteFilesUsingMesh(mesh);
         }
     }
 
     void TestRemoveIsolatedNodesSimpleMesh()
     {
-        TrianglesMeshReader<1,3> mesh_reader("lung/test/airway_generation/data/test_isolated_nodes_major_airways_mesh");
-        MutableMesh<1,3> mesh;
+        TrianglesMeshReader<1, 3> mesh_reader("lung/test/airway_generation/data/test_isolated_nodes_major_airways_mesh");
+        MutableMesh<1, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Assign valid radii

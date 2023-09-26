@@ -85,8 +85,8 @@ public:
         EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
 
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> generating_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
@@ -142,7 +142,7 @@ public:
         unsigned num_cells_depth = 11;
         unsigned num_cells_width = 6;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 2);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -152,7 +152,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedG1GenerationalCellCycleModel,2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateGivenLocationIndices(cells, location_indices);
 
         // Create a cell population
@@ -209,8 +209,8 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
 
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        TetrahedralMesh<2,2> generating_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        TetrahedralMesh<2, 2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
@@ -265,8 +265,8 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
 
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        TetrahedralMesh<2,2> generating_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        TetrahedralMesh<2, 2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
@@ -321,7 +321,7 @@ public:
 
         // Nodes 0-9 should not been renumbered so are still particles.
         // the particle at node 80 is now at 79 as node 27 was deleted..
-        for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        for (AbstractMesh<2, 2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
                 node_iter != mesh.GetNodeIteratorEnd();
                 ++node_iter)
         {
@@ -363,8 +363,8 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
 
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        TetrahedralMesh<2,2> generating_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        TetrahedralMesh<2, 2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
@@ -401,7 +401,7 @@ public:
         p_new_cell->SetCellProliferativeType(p_stem_type);
         p_new_cell->SetBirthTime(0);
 
-        c_vector<double,2> new_location = zero_vector<double>(2);
+        c_vector<double, 2> new_location = zero_vector<double>(2);
         new_location[0] = 0.3433453454443;
         new_location[0] = 0.3435346344234;
         cell_population.AddCell(p_new_cell, cell_population.rGetCells().front()); // random choice of parent
@@ -422,7 +422,7 @@ public:
         p_new_cell2->SetCellProliferativeType(p_stem_type);
         p_new_cell2->SetBirthTime(0);
 
-        c_vector<double,2> new_location2 = zero_vector<double>(2);
+        c_vector<double, 2> new_location2 = zero_vector<double>(2);
         new_location2[0] = 0.6433453454443;
         new_location2[0] = 0.6435346344234;
         cell_population.AddCell(p_new_cell2, cell_population.rGetCells().front()); // random choice of parent
@@ -565,8 +565,8 @@ public:
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
 
             // Create a simple mesh
-            TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-            TetrahedralMesh<2,2> generating_mesh;
+            TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+            TetrahedralMesh<2, 2> generating_mesh;
             generating_mesh.ConstructFromMeshReader(mesh_reader);
 
             // Convert this to a NodesOnlyMesh

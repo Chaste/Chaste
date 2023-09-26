@@ -37,22 +37,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MonodomainCorrectionTermAssembler.hpp"
 
 template<unsigned ELEM_DIM, unsigned SPACE_DIM>
-MonodomainCorrectionTermAssembler<ELEM_DIM,SPACE_DIM>::MonodomainCorrectionTermAssembler(
-        AbstractTetrahedralMesh<ELEM_DIM,SPACE_DIM>* pMesh,
-        MonodomainTissue<ELEM_DIM,SPACE_DIM>* pTissue)
-    : AbstractCorrectionTermAssembler<ELEM_DIM,SPACE_DIM,1>(pMesh,pTissue)
+MonodomainCorrectionTermAssembler<ELEM_DIM, SPACE_DIM>::MonodomainCorrectionTermAssembler(
+        AbstractTetrahedralMesh<ELEM_DIM, SPACE_DIM>* pMesh,
+        MonodomainTissue<ELEM_DIM, SPACE_DIM>* pTissue)
+    : AbstractCorrectionTermAssembler<ELEM_DIM, SPACE_DIM, 1>(pMesh,pTissue)
 {
     assert(this->mpConfig->GetUseStateVariableInterpolation());
 }
 
 template<unsigned ELEM_DIM, unsigned SPACE_DIM>
-c_vector<double,1*(ELEM_DIM+1)> MonodomainCorrectionTermAssembler<ELEM_DIM,SPACE_DIM>::ComputeVectorTerm(
+c_vector<double,1*(ELEM_DIM+1)> MonodomainCorrectionTermAssembler<ELEM_DIM, SPACE_DIM>::ComputeVectorTerm(
     c_vector<double, ELEM_DIM+1> &rPhi,
     c_matrix<double, SPACE_DIM, ELEM_DIM+1> &rGradPhi /* not used */,
     ChastePoint<SPACE_DIM> &rX /* not used */,
-    c_vector<double,1> &rU,
+    c_vector<double, 1> &rU,
     c_matrix<double, 1, SPACE_DIM> &rGradU /* not used */,
-    Element<ELEM_DIM,SPACE_DIM>* pElement)
+    Element<ELEM_DIM, SPACE_DIM>* pElement)
 {
     double Am = this->mpConfig->GetSurfaceAreaToVolumeRatio();
 
@@ -70,8 +70,8 @@ c_vector<double,1*(ELEM_DIM+1)> MonodomainCorrectionTermAssembler<ELEM_DIM,SPACE
 }
 
 // Explicit instantiation
-template class MonodomainCorrectionTermAssembler<1,1>;
-template class MonodomainCorrectionTermAssembler<1,2>;
-template class MonodomainCorrectionTermAssembler<1,3>;
-template class MonodomainCorrectionTermAssembler<2,2>;
-template class MonodomainCorrectionTermAssembler<3,3>;
+template class MonodomainCorrectionTermAssembler<1, 1>;
+template class MonodomainCorrectionTermAssembler<1, 2>;
+template class MonodomainCorrectionTermAssembler<1, 3>;
+template class MonodomainCorrectionTermAssembler<2, 2>;
+template class MonodomainCorrectionTermAssembler<3, 3>;

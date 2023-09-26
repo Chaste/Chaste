@@ -77,7 +77,7 @@ public:
 
         // Create mesh
         HoneycombMeshGenerator generator(2, 2, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -92,16 +92,16 @@ public:
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Set up cell population boundary condition
-        c_vector<double,2> point = zero_vector<double>(2);
+        c_vector<double, 2> point = zero_vector<double>(2);
         point(0) = 2.0;
-        c_vector<double,2> normal = zero_vector<double>(2);
+        c_vector<double, 2> normal = zero_vector<double>(2);
         normal(0) = -1.0;
         PlaneBoundaryCondition<2> boundary_condition(&cell_population, point, normal);
 
         TS_ASSERT_EQUALS(boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-2-2");
 
         // Impose boundary condition
-        std::map<Node<2>*, c_vector<double,2> > old_locations;
+        std::map<Node<2>*, c_vector<double, 2> > old_locations;
         for (auto p_cell : cell_population.rGetCells())
         {
             Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(p_cell);
@@ -138,7 +138,7 @@ public:
 
         // Create mesh
         HoneycombMeshGenerator generator(2, 2, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -153,9 +153,9 @@ public:
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Set up cell population boundary condition
-        c_vector<double,2> point = zero_vector<double>(2);
+        c_vector<double, 2> point = zero_vector<double>(2);
         point(0) = 2.0;
-        c_vector<double,2> normal = zero_vector<double>(2);
+        c_vector<double, 2> normal = zero_vector<double>(2);
         normal(0) = -1.0;
         PlaneBoundaryCondition<2> boundary_condition(&cell_population, point, normal);
 
@@ -165,7 +165,7 @@ public:
         TS_ASSERT(boundary_condition.GetUseJiggledNodesOnPlane());
 
         // Impose boundary condition
-        std::map<Node<2>*, c_vector<double,2> > old_locations;
+        std::map<Node<2>*, c_vector<double, 2> > old_locations;
         for (auto p_cell : cell_population.rGetCells())
         {
             Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(p_cell);
@@ -195,7 +195,7 @@ public:
     {
         // Create mesh
         HoneycombVertexMeshGenerator generator(2, 2);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -209,18 +209,18 @@ public:
         // Imposing x>0.75 will squash two of these cells, but not so much that they degenerate to zero area
         // Set up cell population boundary condition x>0.75
         double x_boundary = 0.75;
-        c_vector<double,2> point = zero_vector<double>(2);
+        c_vector<double, 2> point = zero_vector<double>(2);
         point(0) = x_boundary;
-        c_vector<double,2> normal = zero_vector<double>(2);
+        c_vector<double, 2> normal = zero_vector<double>(2);
         normal(0) = -1.0;
         PlaneBoundaryCondition<2> boundary_condition(&cell_population, point, normal);
 
         TS_ASSERT_EQUALS(boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-2-2");
 
         // Impose boundary condition
-        std::map<Node<2>*, c_vector<double,2> > old_locations;
+        std::map<Node<2>*, c_vector<double, 2> > old_locations;
 
-        for (MutableVertexMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
+        for (MutableVertexMesh<2, 2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
              node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -230,7 +230,7 @@ public:
         boundary_condition.ImposeBoundaryCondition(old_locations);
 
         // Test that all nodes satisfy the boundary condition
-        for (MutableVertexMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
+        for (MutableVertexMesh<2, 2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
              node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -263,7 +263,7 @@ public:
         boundary_condition_2.ImposeBoundaryCondition(old_locations);
 
         // Test that all nodes satisfy the jiggled boundary condition
-        for (MutableVertexMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
+        for (MutableVertexMesh<2, 2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
              node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -298,8 +298,8 @@ public:
         PottsBasedCellPopulation<2> potts_cell_population(*p_mesh, cells);
 
         // Attempt to set up cell population boundary condition
-        c_vector<double,2> point = zero_vector<double>(2);
-        c_vector<double,2> normal = zero_vector<double>(2);
+        c_vector<double, 2> point = zero_vector<double>(2);
+        c_vector<double, 2> normal = zero_vector<double>(2);
         normal(0) = 1.0;
 
         PlaneBoundaryCondition<2> plane_boundary_condition(&potts_cell_population, point, normal);
@@ -318,8 +318,8 @@ public:
         cells_generator_1d.GenerateBasicRandom(node_based_cells, nodes_only_mesh.GetNumNodes(), p_diff_type);
         NodeBasedCellPopulation<1> node_based_cell_population(nodes_only_mesh, node_based_cells);
 
-        c_vector<double,1> point_1d = zero_vector<double>(1);
-        c_vector<double,1> normal_1d = zero_vector<double>(1);
+        c_vector<double, 1> point_1d = zero_vector<double>(1);
+        c_vector<double, 1> normal_1d = zero_vector<double>(1);
         normal_1d(0) = 1.0;
         PlaneBoundaryCondition<1> plane_bc_1d(&node_based_cell_population, point_1d, normal_1d);
         TS_ASSERT_THROWS_THIS(plane_bc_1d.VerifyBoundaryCondition(),
@@ -334,8 +334,8 @@ public:
     void TestSphereGeometryBoundaryCondition()
     {
         // We first test that the correct exception is thrown in 1D
-        TrianglesMeshReader<1,1> mesh_reader_1d("mesh/test/data/1D_0_to_1_10_elements");
-        TetrahedralMesh<1,1> generating_mesh_1d;
+        TrianglesMeshReader<1, 1> mesh_reader_1d("mesh/test/data/1D_0_to_1_10_elements");
+        TetrahedralMesh<1, 1> generating_mesh_1d;
         generating_mesh_1d.ConstructFromMeshReader(mesh_reader_1d);
 
         NodesOnlyMesh<1> mesh_1d;
@@ -347,14 +347,14 @@ public:
 
         NodeBasedCellPopulation<1> population_1d(mesh_1d, cells_1d);
 
-        c_vector<double,1> centre_1d = zero_vector<double>(1);
+        c_vector<double, 1> centre_1d = zero_vector<double>(1);
 
         TS_ASSERT_THROWS_THIS(SphereGeometryBoundaryCondition<1> bc_1d(&population_1d, centre_1d, 1.0),
             "This boundary condition is not implemented in 1D.");
 
         // Next we test that the correct exception is thrown if not using a NodeBasedCellPopulation
-        TrianglesMeshReader<2,2> mesh_reader_2d("mesh/test/data/square_4_elements");
-        MutableMesh<2,2> mesh_2d;
+        TrianglesMeshReader<2, 2> mesh_reader_2d("mesh/test/data/square_4_elements");
+        MutableMesh<2, 2> mesh_2d;
         mesh_2d.ConstructFromMeshReader(mesh_reader_2d);
 
         std::vector<CellPtr> cells_2d;
@@ -363,14 +363,14 @@ public:
 
         MeshBasedCellPopulation<2> population_2d(mesh_2d, cells_2d);
 
-        c_vector<double,2> centre_2d = zero_vector<double>(2);
+        c_vector<double, 2> centre_2d = zero_vector<double>(2);
 
         TS_ASSERT_THROWS_THIS(SphereGeometryBoundaryCondition<2> bc_2d(&population_2d, centre_2d, 1.0),
             "A NodeBasedCellPopulation must be used with this boundary condition object.");
 
         // We now test the methods of this class
-        TrianglesMeshReader<3,3> mesh_reader_3d("mesh/test/data/cube_136_elements");
-        TetrahedralMesh<3,3> generating_mesh_3d;
+        TrianglesMeshReader<3, 3> mesh_reader_3d("mesh/test/data/cube_136_elements");
+        TetrahedralMesh<3, 3> generating_mesh_3d;
         generating_mesh_3d.ConstructFromMeshReader(mesh_reader_3d);
 
         NodesOnlyMesh<3> mesh_3d;
@@ -382,7 +382,7 @@ public:
 
         NodeBasedCellPopulation<3> population_3d(mesh_3d, cells_3d);
 
-        c_vector<double,3> centre_3d = zero_vector<double>(3);
+        c_vector<double, 3> centre_3d = zero_vector<double>(3);
         centre_3d(0) = 0.1; //The centre is at (0.1, 0.0, 0.0).  This is because there is no node at the centre
 
         SphereGeometryBoundaryCondition<3> bc_3d(&population_3d, centre_3d, 0.4, 1e-4);
@@ -399,11 +399,11 @@ public:
         }
 
         // Store the location of each node prior to imposing the boundary condition
-        std::map<Node<3>*, c_vector<double,3> > old_locations;
+        std::map<Node<3>*, c_vector<double, 3> > old_locations;
 
         for (auto p_cell : population_3d.rGetCells())
         {
-            c_vector<double,3> location = population_3d.GetLocationOfCellCentre(p_cell);
+            c_vector<double, 3> location = population_3d.GetLocationOfCellCentre(p_cell);
             unsigned index = population_3d.GetLocationIndexUsingCell(p_cell);
             Node<3>* p_node = mesh_3d.GetNode(index);
             old_locations[p_node] = location;
@@ -413,7 +413,7 @@ public:
 
         for (auto p_cell : population_3d.rGetCells())
         {
-            c_vector<double,3> new_direction = population_3d.GetLocationOfCellCentre(p_cell)- centre_3d;
+            c_vector<double, 3> new_direction = population_3d.GetLocationOfCellCentre(p_cell)- centre_3d;
 
             //Check it's at the right distance from the centre
             double new_distance = norm_2(new_direction);
@@ -423,7 +423,7 @@ public:
             new_direction /= new_distance;
             unsigned index = population_3d.GetLocationIndexUsingCell(p_cell);
             Node<3>* p_node = mesh_3d.GetNode(index);
-            c_vector<double,3> old_direction =  old_locations[p_node] - centre_3d;
+            c_vector<double, 3> old_direction =  old_locations[p_node] - centre_3d;
             old_direction /= norm_2(old_direction);
             TS_ASSERT_DELTA(norm_inf(new_direction-old_direction), 0.0, 1e-10);
         }
@@ -436,7 +436,7 @@ public:
     {
         // Create mesh
         HoneycombVertexMeshGenerator generator(2, 2);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -453,8 +453,8 @@ public:
         TS_ASSERT_DELTA(boundary_condition.GetThreshold(), threshold, 1e-6);
 
         // Impose boundary condition
-        std::map<Node<2>*, c_vector<double,2> > old_locations;
-        for (MutableVertexMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
+        std::map<Node<2>*, c_vector<double, 2> > old_locations;
+        for (MutableVertexMesh<2, 2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
              node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -463,7 +463,7 @@ public:
         boundary_condition.ImposeBoundaryCondition(old_locations);
 
         // Test that all nodes satisfy the boundary condition
-        for (MutableVertexMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
+        for (MutableVertexMesh<2, 2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
              node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -515,8 +515,8 @@ public:
         EXIT_IF_PARALLEL;    // We cannot archive parallel cell based simulations yet.
         // Set up singleton classes
 
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> generating_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         NodesOnlyMesh<2> mesh;
@@ -555,7 +555,7 @@ public:
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
-            AbstractCellPopulationBoundaryCondition<2,2>* p_boundary_condition;
+            AbstractCellPopulationBoundaryCondition<2, 2>* p_boundary_condition;
 
             // Restore from the archive
             (*p_arch) >> p_boundary_condition;
@@ -578,8 +578,8 @@ public:
 
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> generating_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         NodesOnlyMesh<2> mesh;
@@ -591,7 +591,7 @@ public:
 
         NodeBasedCellPopulation<2> population(mesh, cells);
 
-        c_vector<double,2> centre = zero_vector<double>(2);
+        c_vector<double, 2> centre = zero_vector<double>(2);
         centre(0) = 0.5;
         centre(1) = 0.7;
 
@@ -636,8 +636,8 @@ public:
     {
         EXIT_IF_PARALLEL;    // We cannot archive parallel cell based simulations yet.
 
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> generating_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         NodesOnlyMesh<2> mesh;
@@ -673,7 +673,7 @@ public:
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
-            AbstractCellPopulationBoundaryCondition<2,2>* p_boundary_condition;
+            AbstractCellPopulationBoundaryCondition<2, 2>* p_boundary_condition;
 
             // Restore from the archive
             (*p_arch) >> p_boundary_condition;
@@ -693,8 +693,8 @@ public:
         std::string output_directory = "TestCellBoundaryConditionsOutputParameters";
         OutputFileHandler output_file_handler(output_directory, false);
 
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> generating_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(generating_mesh, 1.5);
@@ -723,7 +723,7 @@ public:
         }
 
         // Test with SphereGeometryBoundaryCondition
-        c_vector<double,2> centre = zero_vector<double>(2);
+        c_vector<double, 2> centre = zero_vector<double>(2);
 
         SphereGeometryBoundaryCondition<2> sphere_boundary_condition(&population, centre, 0.56, 1e-3);
         TS_ASSERT_EQUALS(sphere_boundary_condition.GetIdentifier(), "SphereGeometryBoundaryCondition-2");

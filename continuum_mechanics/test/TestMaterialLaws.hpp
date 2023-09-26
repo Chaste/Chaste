@@ -60,11 +60,11 @@ private:
     template<unsigned DIM>
     void CheckZeroStressWhenNoDeformation(AbstractIncompressibleMaterialLaw<DIM>* pLaw)
     {
-        c_matrix<double,DIM,DIM> C = identity_matrix<double>(DIM);
-        c_matrix<double,DIM,DIM> invC = identity_matrix<double>(DIM);
+        c_matrix<double, DIM, DIM> C = identity_matrix<double>(DIM);
+        c_matrix<double, DIM, DIM> invC = identity_matrix<double>(DIM);
 
-        c_matrix<double,DIM,DIM> T;
-        FourthOrderTensor<DIM,DIM,DIM,DIM> dTdE;
+        c_matrix<double, DIM, DIM> T;
+        FourthOrderTensor<DIM, DIM, DIM, DIM> dTdE;
 
         double pressure = pLaw->GetZeroStrainPressure();
 
@@ -83,11 +83,11 @@ private:
     template<unsigned DIM>
     void CheckZeroStressWhenNoDeformation(AbstractCompressibleMaterialLaw<DIM>* pLaw)
     {
-        c_matrix<double,DIM,DIM> C = identity_matrix<double>(DIM);
-        c_matrix<double,DIM,DIM> invC = identity_matrix<double>(DIM);
+        c_matrix<double, DIM, DIM> C = identity_matrix<double>(DIM);
+        c_matrix<double, DIM, DIM> invC = identity_matrix<double>(DIM);
 
-        c_matrix<double,DIM,DIM> T;
-        FourthOrderTensor<DIM,DIM,DIM,DIM> dTdE;
+        c_matrix<double, DIM, DIM> T;
+        FourthOrderTensor<DIM, DIM, DIM, DIM> dTdE;
 
         pLaw->ComputeStressAndStressDerivative(C,invC,0.0,T,dTdE,false);
 
@@ -107,8 +107,8 @@ private:
     template<unsigned DIM>
     void CheckDTdEComputation(AbstractCompressibleMaterialLaw<DIM>* pLaw)
     {
-        c_matrix<double,DIM,DIM> C;
-        c_matrix<double,DIM,DIM> invC;
+        c_matrix<double, DIM, DIM> C;
+        c_matrix<double, DIM, DIM> invC;
         C(0,0) = 1.1;
         C(0,1) = C(1,0) = 0.1;
         C(1,1) = 0.9;
@@ -121,8 +121,8 @@ private:
 
         invC = Inverse(C);
 
-        c_matrix<double,DIM,DIM> T_base;
-        FourthOrderTensor<DIM,DIM,DIM,DIM> dTdE;
+        c_matrix<double, DIM, DIM> T_base;
+        FourthOrderTensor<DIM, DIM, DIM, DIM> dTdE;
 
         pLaw->ComputeStressAndStressDerivative(C,invC,0.0,T_base,dTdE,false);
 
@@ -134,7 +134,7 @@ private:
                              // derivative of wrt C01,C10, given that C is assumed symmetric
             invC = Inverse(C);
 
-            c_matrix<double,DIM,DIM> T;
+            c_matrix<double, DIM, DIM> T;
 
             pLaw->ComputeStressAndStressDerivative(C,invC,0.0,T,dTdE,true);
 
@@ -160,8 +160,8 @@ private:
     template<unsigned DIM>
     void CheckDTdEComputation(AbstractIncompressibleMaterialLaw<DIM>* pLaw)
     {
-        c_matrix<double,DIM,DIM> C;
-        c_matrix<double,DIM,DIM> invC;
+        c_matrix<double, DIM, DIM> C;
+        c_matrix<double, DIM, DIM> invC;
         C(0,0) = 1.06;
         C(0,1) = C(1,0) = 0.106;
         C(1,1) = 0.954;            // overall C satifies det(C) = 1
@@ -174,8 +174,8 @@ private:
 
         invC = Inverse(C);
 
-        c_matrix<double,DIM,DIM> T_base;
-        FourthOrderTensor<DIM,DIM,DIM,DIM> dTdE;
+        c_matrix<double, DIM, DIM> T_base;
+        FourthOrderTensor<DIM, DIM, DIM, DIM> dTdE;
 
         double pressure = 1.0;
 
@@ -189,7 +189,7 @@ private:
                              // derivative of wrt C01,C10, given that C is assumed symmetric
             invC = Inverse(C);
 
-            c_matrix<double,DIM,DIM> T;
+            c_matrix<double, DIM, DIM> T;
 
             pLaw->ComputeStressAndStressDerivative(C,invC,1.0,T,dTdE,true);
 
@@ -211,17 +211,17 @@ private:
     // Helper method for testing change of basis (implemented for 2d only)
     void CheckChangeOfBasis(AbstractMaterialLaw<2>* pLaw)
     {
-        c_matrix<double,2,2> C;
-        c_matrix<double,2,2> invC;
+        c_matrix<double,2, 2> C;
+        c_matrix<double,2, 2> invC;
         C(0,0) = 1.2;
         C(0,1) = C(1,0) = 0.1;
         C(1,1) = 1.1;
         invC = Inverse(C);
 
-        c_matrix<double,2,2> T_Xfibres;
-        c_matrix<double,2,2> T_Yfibres;
-        FourthOrderTensor<2,2,2,2> dTdE_Xfibres;
-        FourthOrderTensor<2,2,2,2> dTdE_Yfibres;
+        c_matrix<double,2, 2> T_Xfibres;
+        c_matrix<double,2, 2> T_Yfibres;
+        FourthOrderTensor<2, 2,2, 2> dTdE_Xfibres;
+        FourthOrderTensor<2, 2,2, 2> dTdE_Yfibres;
 
         double p = 1.0;
         if (dynamic_cast<AbstractCompressibleMaterialLaw<2>*>(pLaw) != NULL)
@@ -237,7 +237,7 @@ private:
         invC = Inverse(C);
 
         // Change of basis matrix
-        c_matrix<double,2,2> P_basis;
+        c_matrix<double,2, 2> P_basis;
         P_basis(0,0) = P_basis(1,1) = 0.0;
         P_basis(1,0) = P_basis(0,1) = 1.0;
 
@@ -305,7 +305,7 @@ public:
         TS_ASSERT_DELTA(law_3d.GetZeroStrainPressure(), 2*c1+4*c2, 1e-12);
 
         // Compute stress given a non-zero deformation
-        c_matrix<double,3,3> F;
+        c_matrix<double,3, 3> F;
         F(0,0) = 3.0;
         F(0,1) = 1.0;
         F(1,0) = -1.0;
@@ -316,30 +316,30 @@ public:
         F(2,1) = 1.5;
         F(2,2) = 0.5;
 
-        c_matrix<double,3,3> C = prod(trans(F),F);
+        c_matrix<double,3, 3> C = prod(trans(F),F);
 
         double I1 =  Trace(C);
 
-        c_matrix<double,3,3> invC = Inverse(C);
+        c_matrix<double,3, 3> invC = Inverse(C);
 
         double pressure = 5.0;
 
-        c_matrix<double,3,3> T;
-        c_matrix<double,3,3> T2;
-        c_matrix<double,3,3> S;
-        c_matrix<double,3,3> sigma;
+        c_matrix<double,3, 3> T;
+        c_matrix<double,3, 3> T2;
+        c_matrix<double,3, 3> S;
+        c_matrix<double,3, 3> sigma;
 
-        FourthOrderTensor<3,3,3,3> dTdE;
+        FourthOrderTensor<3, 3,3, 3> dTdE;
 
         law_3d.ComputeStressAndStressDerivative(C, invC, pressure, T, dTdE, true);
         law_3d.Compute1stPiolaKirchoffStress(F,pressure,S);
         law_3d.Compute2ndPiolaKirchoffStress(C,pressure,T2);
         law_3d.ComputeCauchyStress(F,pressure,sigma);
 
-        c_matrix<double,3,3> FT = prod(F,T);
-        c_matrix<double,3,3> F_T_tranF_over_detF = (1.0/Determinant(F))*prod(FT,trans(F));//F*T_as_unsym_tensor*transpose(F);
+        c_matrix<double,3, 3> FT = prod(F,T);
+        c_matrix<double,3, 3> F_T_tranF_over_detF = (1.0/Determinant(F))*prod(FT,trans(F));//F*T_as_unsym_tensor*transpose(F);
 
-        c_matrix<double,3,3> T_transposeF = prod(T,trans(F));//T_as_unsym_tensor*transpose(F);
+        c_matrix<double,3, 3> T_transposeF = prod(T,trans(F));//T_as_unsym_tensor*transpose(F);
 
         // Check sigma is correct - sigma should be (1/detF) F * T * trans(F)
         for (unsigned i = 0; i<3; ++i)
@@ -484,7 +484,7 @@ public:
 
         PolynomialMaterialLaw3d poly_law(param_n, alpha);
 
-        c_matrix<double,3,3> C;
+        c_matrix<double,3, 3> C;
         C(0,0) = 3.0;
         C(0,1) = 1.0;
         C(1,0) = 1.0;
@@ -510,12 +510,12 @@ public:
         TS_ASSERT_DELTA(true_d2WdI2,   poly_law.Get_d2W_dI2(I1,I2),   1e-12);
         TS_ASSERT_DELTA(true_d2WdI1I2, poly_law.Get_d2W_dI1I2(I1,I2), 1e-12);
 
-        c_matrix<double,3,3> invC = Inverse(C);
+        c_matrix<double,3, 3> invC = Inverse(C);
 
         double pressure = 5.0;
 
-        c_matrix<double,3,3> T;
-        FourthOrderTensor<3,3,3,3> dTdE;
+        c_matrix<double,3, 3> T;
+        FourthOrderTensor<3, 3,3, 3> dTdE;
 
         poly_law.ComputeStressAndStressDerivative(C, invC, pressure, T, dTdE, true);
 
@@ -590,8 +590,8 @@ public:
          * Compute the stress given C=delta_{MN} and p=zero_strain_pressure,
          * obviously it should be zero.
          */
-        c_matrix<double,3,3> identity_strain_3d = identity_matrix<double>(3);
-        c_matrix<double,3,3> T_3d;
+        c_matrix<double,3, 3> identity_strain_3d = identity_matrix<double>(3);
+        c_matrix<double,3, 3> T_3d;
 
         poly_law.Compute2ndPiolaKirchoffStress(identity_strain_3d,
                                                poly_law.GetZeroStrainPressure(),
@@ -634,11 +634,11 @@ public:
 
         CheckChangeOfBasis(&pole_zero_law);
 
-        c_matrix<double,2,2> C;
-        c_matrix<double,2,2> invC;
+        c_matrix<double,2, 2> C;
+        c_matrix<double,2, 2> invC;
 
-        c_matrix<double,2,2> T;
-        FourthOrderTensor<2,2,2,2> dTdE;
+        c_matrix<double,2, 2> T;
+        FourthOrderTensor<2, 2,2, 2> dTdE;
 
 //// currently been changed on that pole-zero law DOESN'T return T=0 if E<0
 
@@ -715,8 +715,8 @@ public:
          * Test the pressure terms in the stress and stress-deriv, by calling with
          * p=0 and p=1 and verifying the difference is what it should be.
          */
-        c_matrix<double,2,2> T2;
-        FourthOrderTensor<2,2,2,2> dTdE2;
+        c_matrix<double,2, 2> T2;
+        FourthOrderTensor<2, 2,2, 2> dTdE2;
         pole_zero_law.ComputeStressAndStressDerivative(C, invC, 0.0, T,  dTdE,  true);
         pole_zero_law.ComputeStressAndStressDerivative(C, invC, 1.0, T2, dTdE2, true);
 
@@ -772,7 +772,7 @@ public:
         CheckZeroStressWhenNoDeformation<3>(&pole_zero_law);
         CheckDTdEComputation<3>(&pole_zero_law);
 
-        c_matrix<double,3,3> C;
+        c_matrix<double,3, 3> C;
         C(0,0) = 2;
         C(0,1) = C(1,0) = 2;
         C(0,2) = C(2,0) = 3;
@@ -780,10 +780,10 @@ public:
         C(1,2) = C(2,1) = 4;
         C(2,2) = 3;
 
-        c_matrix<double,3,3> invC = Inverse(C);
+        c_matrix<double,3, 3> invC = Inverse(C);
 
-        c_matrix<double,3,3> T;
-        FourthOrderTensor<3,3,3,3> dTdE;
+        c_matrix<double,3, 3> T;
+        FourthOrderTensor<3, 3,3, 3> dTdE;
 
         pole_zero_law.ComputeStressAndStressDerivative(C,invC,0.0,T,dTdE,true);
 
@@ -824,8 +824,8 @@ public:
         CheckZeroStressWhenNoDeformation<3>(&law);
         CheckDTdEComputation<3>(&law);
 
-        c_matrix<double,3,3> C;
-        c_matrix<double,3,3> invC;
+        c_matrix<double,3, 3> C;
+        c_matrix<double,3, 3> invC;
         C(0,0) = 1.2;
         C(0,1) = C(1,0) = 0.1;
         C(0,2) = C(2,0) = 0.3;
@@ -834,8 +834,8 @@ public:
         C(2,2) = 1.3;
         invC = Inverse(C);
 
-        c_matrix<double,3,3> T;
-        FourthOrderTensor<3,3,3,3> dTdE;
+        c_matrix<double,3, 3> T;
+        FourthOrderTensor<3, 3,3, 3> dTdE;
 
         law.ComputeStressAndStressDerivative(C,invC,0.0,T,dTdE,true);
 
@@ -847,7 +847,7 @@ public:
         TS_ASSERT_DELTA(T(0,0),2.0902,1e-3);
 
         // Pick a P such that P =/= P^T
-        c_matrix<double,3,3> basis = identity_matrix<double>(3);
+        c_matrix<double,3, 3> basis = identity_matrix<double>(3);
         basis(0,0) = 1/sqrt(2.0);
         basis(1,0) = 1/sqrt(2.0);
         basis(0,1) = -1/sqrt(2.0);
@@ -873,15 +873,15 @@ public:
 
         CheckChangeOfBasis(&law);
 
-        c_matrix<double,2,2> C;
-        c_matrix<double,2,2> invC;
+        c_matrix<double,2, 2> C;
+        c_matrix<double,2, 2> invC;
         C(0,0) = 1.2;
         C(0,1) = C(1,0) = 0.1;
         C(1,1) = 1.1;
         invC = Inverse(C);
 
-        c_matrix<double,2,2> T;
-        FourthOrderTensor<2,2,2,2> dTdE;
+        c_matrix<double,2, 2> T;
+        FourthOrderTensor<2, 2,2, 2> dTdE;
 
         law.ComputeStressAndStressDerivative(C,invC,0.0,T,dTdE,true);
 
@@ -914,15 +914,15 @@ public:
 
         TS_ASSERT(bsf == bfs);
 
-        c_matrix<double,2,2> C;
-        c_matrix<double,2,2> invC;
+        c_matrix<double,2, 2> C;
+        c_matrix<double,2, 2> invC;
         C(0,0) = 1.1;
         C(0,1) = C(1,0) = 0.1;
         C(1,1) = 0.9;
         invC = Inverse(C);
 
-        c_matrix<double,2,2> T_base;
-        FourthOrderTensor<2,2,2,2> dTdE;
+        c_matrix<double,2, 2> T_base;
+        FourthOrderTensor<2, 2,2, 2> dTdE;
 
         law.ComputeStressAndStressDerivative(C,invC,0.0,T_base,dTdE,false);
 
@@ -964,7 +964,7 @@ public:
         TS_ASSERT_DELTA(law_3d.Get_dW_dI3(2.0,2.0,1.0), -c1-2*c2, 1e-12);
 
         // Compute stress given a non-zero deformation
-        c_matrix<double,3,3> F;
+        c_matrix<double,3, 3> F;
         F(0,0) = 3.0;
         F(0,1) = 1.0;
         F(1,0) = -1.0;
@@ -975,30 +975,30 @@ public:
         F(2,1) = 1.5;
         F(2,2) = 0.5;
 
-        c_matrix<double,3,3> C = prod(trans(F),F);
+        c_matrix<double,3, 3> C = prod(trans(F),F);
 
         double I1 =  Trace(C);
 
-        c_matrix<double,3,3> invC = Inverse(C);
+        c_matrix<double,3, 3> invC = Inverse(C);
 
         double I3 = Determinant(C);
 
-        c_matrix<double,3,3> T;
-        c_matrix<double,3,3> T2;
-        c_matrix<double,3,3> S;
-        c_matrix<double,3,3> sigma;
+        c_matrix<double,3, 3> T;
+        c_matrix<double,3, 3> T2;
+        c_matrix<double,3, 3> S;
+        c_matrix<double,3, 3> sigma;
 
-        FourthOrderTensor<3,3,3,3> dTdE;
+        FourthOrderTensor<3, 3,3, 3> dTdE;
 
         law_3d.ComputeStressAndStressDerivative(C, invC, 0.0, T, dTdE, true);
         law_3d.Compute1stPiolaKirchoffStress(F,0.0,S);
         law_3d.Compute2ndPiolaKirchoffStress(C,0.0,T2);
         law_3d.ComputeCauchyStress(F,0.0,sigma);
 
-        c_matrix<double,3,3> FT = prod(F,T);
-        c_matrix<double,3,3> F_T_tranF_over_detF = (1.0/Determinant(F))*prod(FT,trans(F));//F*T_as_unsym_tensor*transpose(F);
+        c_matrix<double,3, 3> FT = prod(F,T);
+        c_matrix<double,3, 3> F_T_tranF_over_detF = (1.0/Determinant(F))*prod(FT,trans(F));//F*T_as_unsym_tensor*transpose(F);
 
-        c_matrix<double,3,3> T_transposeF = prod(T,trans(F));//T_as_unsym_tensor*transpose(F);
+        c_matrix<double,3, 3> T_transposeF = prod(T,trans(F));//T_as_unsym_tensor*transpose(F);
 
         // Check sigma is correct - sigma should be (1/detF) F * T * trans(F)
         for (unsigned i = 0; i<3; ++i)
@@ -1115,8 +1115,8 @@ public:
 
         TS_ASSERT(bsf == bfs);
 
-        c_matrix<double,2,2> C;
-        c_matrix<double,2,2> invC;
+        c_matrix<double,2, 2> C;
+        c_matrix<double,2, 2> invC;
         C(0,0) = 1.1;
         C(0,1) = C(1,0) = 0.1;
         C(1,1) = 0.9;
@@ -1126,8 +1126,8 @@ public:
         double J = sqrt(I3);
         double w3  = c*log(J)/(2*J);
 
-        c_matrix<double,2,2> T_base;
-        FourthOrderTensor<2,2,2,2> dTdE;
+        c_matrix<double,2, 2> T_base;
+        FourthOrderTensor<2, 2,2, 2> dTdE;
 
         law.ComputeStressAndStressDerivative(C,invC,0.0,T_base,dTdE,false);
 
@@ -1169,8 +1169,8 @@ public:
         TS_ASSERT(bfn == bnf);
         TS_ASSERT(bsn == bns);
 
-        c_matrix<double,3,3> C;
-        c_matrix<double,3,3> invC;
+        c_matrix<double,3, 3> C;
+        c_matrix<double,3, 3> invC;
         C(0,0) = 1.1;
         C(0,1) = C(1,0) = 0.1;
         C(1,1) = 0.9;
@@ -1183,8 +1183,8 @@ public:
         double J = sqrt(I3);
         double w3  = c*log(J)/(2*J);
 
-        c_matrix<double,3,3> T_base;
-        FourthOrderTensor<3,3,3,3> dTdE;
+        c_matrix<double,3, 3> T_base;
+        FourthOrderTensor<3, 3,3, 3> dTdE;
 
         law.ComputeStressAndStressDerivative(C,invC,0.0,T_base,dTdE,false);
 

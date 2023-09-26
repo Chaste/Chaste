@@ -233,7 +233,7 @@ public:
 
         if (PetscTools::AmMaster())
         {
-            c_vector<double,3> location = zero_vector<double>(3);
+            c_vector<double, 3> location = zero_vector<double>(3);
             location[2] = 0.1;    // This should be owned by process 0 in any space decomposition.
             TS_ASSERT(mesh.IsOwned(location));
         }
@@ -389,7 +389,7 @@ public:
         TS_ASSERT_EQUALS(mesh.mpBoxCollection->GetNumBoxes(), 16*PetscTools::GetNumProcs());
 
         // Test what happens if nodes move in initial collection.
-        AbstractMesh<3,3>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        AbstractMesh<3, 3>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
         if (node_iter != mesh.GetNodeIteratorEnd())
         {
             c_vector<double, 3> initial_location = node_iter->rGetLocation();
@@ -448,8 +448,8 @@ public:
     void TestConstructNodesWithoutMeshUsingMesh()
     {
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> generating_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         NodesOnlyMesh<2> mesh;
@@ -551,7 +551,7 @@ public:
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         // Note in my version of Paraview, you need data on points before you can view with Glyphs
-        VtkMeshWriter<3,3> writer("TestVtkMeshWriter", "just_nodes", false);
+        VtkMeshWriter<3, 3> writer("TestVtkMeshWriter", "just_nodes", false);
 
         // Add distance from origin into the node "point" data
         std::vector<double> distance;
@@ -606,7 +606,7 @@ public:
         NodesOnlyMesh<3> mesh;
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
-        TrianglesMeshWriter<3,3> writer("TestMeshWriter", "3dNodesOnlyMesh");
+        TrianglesMeshWriter<3, 3> writer("TestMeshWriter", "3dNodesOnlyMesh");
         TS_ASSERT_THROWS_NOTHING(writer.WriteFilesUsingMesh(mesh));
 
         for (unsigned i = 0; i<nodes.size(); ++i)
@@ -699,7 +699,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryNodes(), 0u);
 
         // Set radii of cells from 1 to 8
-        for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        for (AbstractMesh<2, 2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
                 node_iter != mesh.GetNodeIteratorEnd();
                 ++node_iter)
         {
@@ -711,7 +711,7 @@ public:
         unsigned node_index;
         if (mesh.mpBoxCollection->IsOwned(nodes[0]))
         {
-            AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+            AbstractMesh<2, 2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
             node_index = node_iter->GetIndex();
 
             TS_ASSERT_DELTA(mesh.GetNode(node_index)->GetRadius(), static_cast<double>(node_index+1), 1e-4);
@@ -906,8 +906,8 @@ public:
         ArchiveLocationInfo::SetMeshFilename("nodes_only_mesh");
 
         {
-            TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
-            TetrahedralMesh<2,2> generating_mesh;
+            TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/disk_984_elements");
+            TetrahedralMesh<2, 2> generating_mesh;
             generating_mesh.ConstructFromMeshReader(mesh_reader);
 
             // Convert this to a NodesOnlyMesh
@@ -929,7 +929,7 @@ public:
             TS_ASSERT_DELTA(mesh.GetNode(0)->GetRadius(), 1.12, 1e-6);
             TS_ASSERT_DELTA(mesh.GetNode(1)->GetRadius(), 2.34, 1e-6);
 
-            AbstractTetrahedralMesh<2,2>* const p_const_mesh = &mesh;
+            AbstractTetrahedralMesh<2, 2>* const p_const_mesh = &mesh;
 
             // Create output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -944,7 +944,7 @@ public:
              * boost knows what individual classes are (but here AbstractMesh
              * doesn't have the methods below).
              */
-            AbstractTetrahedralMesh<2,2>* p_mesh2;
+            AbstractTetrahedralMesh<2, 2>* p_mesh2;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -1015,7 +1015,7 @@ public:
                 mesh.GetNode(i)->SetIsParticle(true);
             }
 
-            AbstractTetrahedralMesh<3,3>* const p_mesh = &mesh;
+            AbstractTetrahedralMesh<3, 3>* const p_mesh = &mesh;
 
             (*p_arch) << p_mesh;
 
@@ -1026,7 +1026,7 @@ public:
         }
 
         {
-            AbstractTetrahedralMesh<3,3>* p_mesh;
+            AbstractTetrahedralMesh<3, 3>* p_mesh;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);

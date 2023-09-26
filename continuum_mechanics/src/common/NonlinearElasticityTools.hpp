@@ -57,9 +57,10 @@ public:
      * @param component  the component k
      * @param value  the value c
      */
-    static std::vector<unsigned> GetNodesByComponentValue(TetrahedralMesh<DIM,DIM>& rMesh,
-                                                          unsigned component,
-                                                          double value);
+    static std::vector<unsigned> GetNodesByComponentValue(
+        TetrahedralMesh<DIM, DIM>& rMesh,
+        unsigned component,
+        double value);
 };
 
 #endif /*NONLINEARELASTICITYTOOLS_HPP_*/

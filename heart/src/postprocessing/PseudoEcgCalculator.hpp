@@ -77,7 +77,7 @@ private:
     Hdf5DataReader* mpDataReader; /**< An HDF5 reader from which to get the solution*/
     unsigned mNumberOfNodes; /**< Number of nodes in the mesh (got from the data reader)*/
     unsigned mNumTimeSteps;/**< Number of time steps in the simulation (got from the data reader)*/
-    AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& mrMesh;/**< A mesh used by the calculator*/
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& mrMesh;/**< A mesh used by the calculator*/
     ChastePoint<SPACE_DIM> mProbeElectrode; /**<The point from where we want to calculate the pseudoECG*/
     double mDiffusionCoefficient;/**<The diffusion coefficient D*/
     std::string mVariableName;/**< the variable for which we want to calculate the pseudo ecg, defaults to "V"*/
@@ -93,8 +93,8 @@ private:
      * @param rGradU The gradient of the unknown as a matrix, rGradU(i,j) = d(u_i)/d(X_j)
      */
     double GetIntegrand(ChastePoint<SPACE_DIM>& rX,
-                        c_vector<double,PROBLEM_DIM>& rU,
-                        c_matrix<double,PROBLEM_DIM,SPACE_DIM>& rGradU);
+                        c_vector<double, PROBLEM_DIM>& rU,
+                        c_matrix<double, PROBLEM_DIM, SPACE_DIM>& rGradU);
 
 
     /**
@@ -115,7 +115,7 @@ private:
      * @param rElement  the element of interest
      * @return  whether we should skip this element.
      */
-    bool ShouldSkipThisElement(Element<ELEMENT_DIM,SPACE_DIM>& rElement);
+    bool ShouldSkipThisElement(Element<ELEMENT_DIM, SPACE_DIM>& rElement);
 
 public:
 
@@ -131,7 +131,7 @@ public:
      *        have to compute all the ECGs).  This defaults to 1.
      *
      */
-    PseudoEcgCalculator(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,
+    PseudoEcgCalculator(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
                         const ChastePoint<SPACE_DIM>& rProbeElectrode,
                         const FileFinder& rDirectory,
                         const std::string& rHdf5FileName,

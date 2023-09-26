@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 CellBasedParabolicPdeSolver<DIM>::CellBasedParabolicPdeSolver(TetrahedralMesh<DIM, DIM>* pMesh,
                               AbstractLinearParabolicPde<DIM, DIM>* pPde,
-                              BoundaryConditionsContainer<DIM, DIM,1>* pBoundaryConditions)
+                              BoundaryConditionsContainer<DIM, DIM, 1>* pBoundaryConditions)
      : SimpleLinearParabolicSolver<DIM, DIM>(pMesh, pPde, pBoundaryConditions)
 {
 }

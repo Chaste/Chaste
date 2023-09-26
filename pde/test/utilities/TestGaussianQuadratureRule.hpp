@@ -139,7 +139,7 @@ public:
                 std::vector<Node<1>*> nodes2;
                 nodes2.push_back(new Node<1>(0, false, 1.0));
                 nodes2.push_back(new Node<1>(1, false, 3.0));
-                Element<1,1> element(INDEX_IS_NOT_USED, nodes2);
+                Element<1, 1> element(INDEX_IS_NOT_USED, nodes2);
 
                 double integral=0;
                 double jacobian_determinant;

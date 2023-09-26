@@ -62,8 +62,8 @@ public:
     void TestCellwiseDataGradientVerySmallMesh()
     {
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_2_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create a cell population
@@ -95,8 +95,8 @@ public:
     void TestCellwiseDataGradientFineMesh()
     {
         // Create a mesh: [0,2]x[0,2]
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4096_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4096_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create a cell population
@@ -165,8 +165,8 @@ public:
 //    void TestCellwiseDataGradientWithGhostNodes()
 //    {
 //        // Create a mesh: [0,2]x[0,2]
-//        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4096_elements");
-//        MutableMesh<2,2> mesh;
+//        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4096_elements");
+//        MutableMesh<2, 2> mesh;
 //        mesh.ConstructFromMeshReader(mesh_reader);
 //
 //        // Set boundary nodes to be ghost nodes, interior nodes to be cells

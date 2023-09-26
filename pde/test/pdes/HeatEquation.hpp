@@ -43,17 +43,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A simple parabolic PDE used in tests.
  */
-template <int SPACE_DIM>
+template<int SPACE_DIM>
 class HeatEquation : public AbstractLinearParabolicPde<SPACE_DIM>
 {
 
 public:
-    double ComputeSourceTerm(const ChastePoint<SPACE_DIM>& , double, Element<SPACE_DIM,SPACE_DIM>* pElement=NULL)
+    double ComputeSourceTerm(const ChastePoint<SPACE_DIM>& , double, Element<SPACE_DIM, SPACE_DIM>* pElement=NULL)
     {
         return 0.0;
     }
 
-    c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(const ChastePoint<SPACE_DIM>& , Element<SPACE_DIM,SPACE_DIM>* pElement=NULL)
+    c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(const ChastePoint<SPACE_DIM>& , Element<SPACE_DIM, SPACE_DIM>* pElement=NULL)
     {
         return identity_matrix<double>(SPACE_DIM);
     }

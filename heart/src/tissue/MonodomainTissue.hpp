@@ -51,8 +51,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  Essentially identical to AbstractCardiacTissue - see documentation for
  *  AbstractCardiacTissue.
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
-class MonodomainTissue : public virtual AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
+class MonodomainTissue : public virtual AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>
 {
 private:
     friend class TestMonodomainTissue;
@@ -78,14 +78,14 @@ public:
      * @param pCellFactory  Provides the mesh and cells
      * @param exchangeHalos used in state-variable interpolation.  Defaults to false.
      */
-    MonodomainTissue(AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>* pCellFactory, bool exchangeHalos=false);
+    MonodomainTissue(AbstractCardiacCellFactory<ELEMENT_DIM, SPACE_DIM>* pCellFactory, bool exchangeHalos=false);
 
     /**
      * Another constructor (for archiving)
      *
      * @param pMesh the mesh (recovered from archive)
      */
-    MonodomainTissue(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
+    MonodomainTissue(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh);
 };
 
 
@@ -106,7 +106,7 @@ template<class Archive, unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 inline void save_construct_data(
     Archive & ar, const MonodomainTissue<ELEMENT_DIM, SPACE_DIM> * t, const unsigned int file_version)
 {
-    const AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* p_mesh = t->pGetMesh();
+    const AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* p_mesh = t->pGetMesh();
     ar & p_mesh;
 
     // CreateIntracellularConductivityTensor() is called by constructor and uses HeartConfig. So make sure that it is
@@ -124,7 +124,7 @@ template<class Archive, unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 inline void load_construct_data(
     Archive & ar, MonodomainTissue<ELEMENT_DIM, SPACE_DIM> * t, const unsigned int file_version)
 {
-    AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* p_mesh;
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* p_mesh;
     ar & p_mesh;
 
     // CreateIntracellularConductivityTensor() is called by AbstractCardiacTissue constructor and uses HeartConfig.

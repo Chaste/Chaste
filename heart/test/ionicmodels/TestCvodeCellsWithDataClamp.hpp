@@ -163,7 +163,7 @@ private:
 
             unsigned how_many = 10000u;
             Timer::Reset();
-            for (unsigned i=0; i<how_many; ++i)
+            for (unsigned i = 0; i<how_many; ++i)
             {
                 mpModel->GetExperimentalVoltageAtTimeT(time);
             }
@@ -173,7 +173,7 @@ private:
         // Generate some noisier data - more like a real cell.
         out_stream experimental_voltage_results_file = handler.OpenOutputFile("Shannon_noisy_data.dat");
         double experimental_noise_sd = 0.25; // directly from Teun's AP data trace of a stationary-looking bit
-        for (unsigned i=0; i<expt_data.size(); ++i)
+        for (unsigned i = 0; i<expt_data.size(); ++i)
         {
             double random_number = RandomNumberGenerator::Instance()->StandardNormalRandomDeviate();
             expt_data[i] +=  (10+experimental_noise_sd*random_number); // make experimental data very different to see if clamp works
@@ -207,7 +207,7 @@ private:
                 data_clamp_voltage = solution.GetAnyVariable("membrane_voltage");
 
                 out_stream data_clamp_voltage_results_file = handler.OpenOutputFile(output_file.str());
-                for (unsigned j=0; j<data_clamp_voltage.size(); ++j)
+                for (unsigned j = 0; j<data_clamp_voltage.size(); ++j)
                 {
                     *data_clamp_voltage_results_file << data_clamp_times[j] << "\t" << data_clamp_voltage[j] << "\n";
                 }
@@ -318,7 +318,7 @@ public:
             TS_ASSERT_EQUALS(p_data_clamp_cell->mExperimentalTimes.size(), times.size());
             TS_ASSERT_EQUALS(p_data_clamp_cell->mExperimentalVoltages.size(), voltages.size());
 
-            for (unsigned i=0; i<times.size(); ++i)
+            for (unsigned i = 0; i<times.size(); ++i)
             {
                 TS_ASSERT_DELTA(p_data_clamp_cell->mExperimentalTimes[i], times[i], 1e-12);
                 TS_ASSERT_DELTA(p_data_clamp_cell->mExperimentalVoltages[i], voltages[i], 1e-12);

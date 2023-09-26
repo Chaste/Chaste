@@ -67,7 +67,7 @@ public:
     {
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
@@ -85,7 +85,7 @@ public:
         Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*(cell_population.Begin()));
         TS_ASSERT_DELTA(pde.ComputeSourceTermAtNode(*p_node,2.0), 0.6, 1e-6);
         TS_ASSERT_DELTA(pde.ComputeDuDtCoefficientFunction(point), 0.1, 1e-6);
-        c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
+        c_matrix<double,2, 2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
         for (unsigned i = 0; i < 2; ++i)
         {
             for (unsigned j = 0; j < 2; ++j)
@@ -107,7 +107,7 @@ public:
 
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
@@ -119,7 +119,7 @@ public:
 
         {
             // Create a PDE object
-            AbstractLinearParabolicPde<2,2>* const p_pde = new CellwiseSourceParabolicPde<2>(cell_population, 0.1, 0.2, 0.3);
+            AbstractLinearParabolicPde<2, 2>* const p_pde = new CellwiseSourceParabolicPde<2>(cell_population, 0.1, 0.2, 0.3);
 
             // Create output archive and archive PDE object
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -130,7 +130,7 @@ public:
         }
 
         {
-            AbstractLinearParabolicPde<2,2>* p_pde;
+            AbstractLinearParabolicPde<2, 2>* p_pde;
 
             // Create an input archive and restore PDE object from archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -148,7 +148,7 @@ public:
             Node<2>* p_node = cell_population.GetNodeCorrespondingToCell(*(cell_population.Begin()));
             TS_ASSERT_DELTA(p_static_cast_pde->ComputeSourceTermAtNode(*p_node,2.0), 0.6, 1e-6);
             TS_ASSERT_DELTA(p_static_cast_pde->ComputeDuDtCoefficientFunction(point), 0.1, 1e-6);
-            c_matrix<double,2,2> diffusion_matrix = p_static_cast_pde->ComputeDiffusionTerm(point);
+            c_matrix<double,2, 2> diffusion_matrix = p_static_cast_pde->ComputeDiffusionTerm(point);
             for (unsigned i = 0; i < 2; ++i)
             {
                 for (unsigned j = 0; j < 2; ++j)
@@ -180,7 +180,7 @@ public:
         ChastePoint<2> point;
         TS_ASSERT_DELTA(pde.ComputeSourceTerm(point,DBL_MAX), 0.1, 1e-6);
         TS_ASSERT_DELTA(pde.ComputeDuDtCoefficientFunction(point), 1.0, 1e-6);
-        c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
+        c_matrix<double,2, 2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
         for (unsigned i = 0; i < 2; ++i)
         {
             for (unsigned j = 0; j < 2; ++j)
@@ -206,7 +206,7 @@ public:
 
         {
             // Create a PDE object
-            AbstractLinearParabolicPde<2,2>* const p_pde = new UniformSourceParabolicPde<2>(0.1);
+            AbstractLinearParabolicPde<2, 2>* const p_pde = new UniformSourceParabolicPde<2>(0.1);
 
             // Create output archive and archive PDE object
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -217,7 +217,7 @@ public:
         }
 
         {
-            AbstractLinearParabolicPde<2,2>* p_pde;
+            AbstractLinearParabolicPde<2, 2>* p_pde;
 
             // Create an input archive and restore PDE object from archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -239,7 +239,7 @@ public:
     {
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
@@ -253,8 +253,8 @@ public:
         TS_ASSERT_EQUALS(&(pde.rGetCellPopulation()), &cell_population);
 
         // For simplicity we create a very large coarse mesh, so we know that all cells are contained in one element
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
-        TetrahedralMesh<2,2> fe_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_2_elements");
+        TetrahedralMesh<2, 2> fe_mesh;
         fe_mesh.ConstructFromMeshReader(mesh_reader);
         fe_mesh.Scale(10.0, 10.0);
 
@@ -291,7 +291,7 @@ public:
 
         TS_ASSERT_DELTA(pde.ComputeDuDtCoefficientFunction(point), 0.1, 1e-6);
 
-        c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
+        c_matrix<double,2, 2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
         for (unsigned i = 0; i < 2; ++i)
         {
             for (unsigned j = 0; j < 2; ++j)
@@ -313,7 +313,7 @@ public:
 
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
@@ -325,7 +325,7 @@ public:
 
         {
             // Create a PDE object
-            AbstractLinearParabolicPde<2,2>* const p_pde = new AveragedSourceParabolicPde<2>(cell_population, 0.1, 0.2, 0.3);
+            AbstractLinearParabolicPde<2, 2>* const p_pde = new AveragedSourceParabolicPde<2>(cell_population, 0.1, 0.2, 0.3);
 
             // Create output archive and archive PDE object
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -336,7 +336,7 @@ public:
         }
 
         {
-            AbstractLinearParabolicPde<2,2>* p_pde;
+            AbstractLinearParabolicPde<2, 2>* p_pde;
 
             // Create an input archive and restore PDE object from archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -353,7 +353,7 @@ public:
 
             TS_ASSERT_DELTA(p_static_cast_pde->mSourceCoefficient, 0.3 , 1e-6);
             TS_ASSERT_DELTA(p_static_cast_pde->ComputeDuDtCoefficientFunction(point), 0.1, 1e-6);
-            c_matrix<double,2,2> diffusion_matrix = p_static_cast_pde->ComputeDiffusionTerm(point);
+            c_matrix<double,2, 2> diffusion_matrix = p_static_cast_pde->ComputeDiffusionTerm(point);
             for (unsigned i = 0; i < 2; ++i)
             {
                 for (unsigned j = 0; j < 2; ++j)

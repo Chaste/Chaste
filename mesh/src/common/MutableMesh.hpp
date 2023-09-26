@@ -70,7 +70,7 @@ class MutableMesh : public TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>
 
         if (does_have_attributes)
         {
-            for (unsigned i=0; i<this->mNodes.size(); ++i)
+            for (unsigned i = 0; i<this->mNodes.size(); ++i)
             {
                 double radius;
                 radius = this->mNodes[i]->GetRadius();
@@ -100,7 +100,7 @@ class MutableMesh : public TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>
 
         if (does_have_attributes)
         {
-            for (unsigned i=0; i<this->mNodes.size(); ++i)
+            for (unsigned i = 0; i<this->mNodes.size(); ++i)
             {
                 double radius;
                 archive & radius;
@@ -227,7 +227,7 @@ public:
      * @param pNewElement pointer to the new element object. The object will be updated with the index assigned to the element.
      * @return new element index
      */
-    unsigned AddElement(Element<ELEMENT_DIM,SPACE_DIM>* pNewElement);
+    unsigned AddElement(Element<ELEMENT_DIM, SPACE_DIM>* pNewElement);
 
     /**
      * Move the node with a particular index to a new point in space and
@@ -282,7 +282,7 @@ public:
      * @param point  a point located in the element
      * @return index of the new node which has been created at the given location
      */
-    unsigned RefineElement(Element<ELEMENT_DIM,SPACE_DIM>* pElement, ChastePoint<SPACE_DIM> point);
+    unsigned RefineElement(Element<ELEMENT_DIM, SPACE_DIM>* pElement, ChastePoint<SPACE_DIM> point);
 
     /**
      * Remove a boundary node, and update all the appropriate data structures.

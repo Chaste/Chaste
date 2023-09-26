@@ -101,8 +101,8 @@ public: // Tests should be public!
          * associated with it. The first attribute specifies the radius of the airways that node. Thus the mesh defines a series
          * of cylinders that represent the airways. The second attribute specifies whether the node is a terminal node or not.
          */
-        TetrahedralMesh<1,3> airways_mesh;
-        VtkMeshReader<1,3> airways_mesh_reader("lung/test/data/TestSubject002MajorAirways.vtu");
+        TetrahedralMesh<1, 3> airways_mesh;
+        VtkMeshReader<1, 3> airways_mesh_reader("lung/test/data/TestSubject002MajorAirways.vtu");
         airways_mesh.ConstructFromMeshReader(airways_mesh_reader);
 
         /* Note that the central airways mesh used here is defined in VTK unstructured grid format,
@@ -113,7 +113,7 @@ public: // Tests should be public!
         airways_mesh_reader.GetPointData("radius", node_radii);
         std::vector<double> terminal_marker;
         airways_mesh_reader.GetPointData("start_id", terminal_marker);
-        for (TetrahedralMesh<1,3>::NodeIterator iter = airways_mesh.GetNodeIteratorBegin();
+        for (TetrahedralMesh<1, 3>::NodeIterator iter = airways_mesh.GetNodeIteratorBegin();
              iter != airways_mesh.GetNodeIteratorEnd();
              ++iter)
         {

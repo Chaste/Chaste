@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class ExtendedBidomainNeumannSurfaceTermAssembler : public AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM,SPACE_DIM,3>
+class ExtendedBidomainNeumannSurfaceTermAssembler : public AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM, SPACE_DIM, 3>
 {
 protected:
     /**
@@ -69,7 +69,7 @@ protected:
      */
 
     virtual c_vector<double, 3*ELEMENT_DIM> ComputeVectorSurfaceTerm(
-        const BoundaryElement<ELEMENT_DIM-1,SPACE_DIM> &rSurfaceElement,
+        const BoundaryElement<ELEMENT_DIM-1, SPACE_DIM> &rSurfaceElement,
         c_vector<double,ELEMENT_DIM> &rPhi,
         ChastePoint<SPACE_DIM> &rX);
 
@@ -80,9 +80,9 @@ public:
      * @param pMesh The mesh
      * @param pBoundaryConditions The boundary conditions container
      */
-    ExtendedBidomainNeumannSurfaceTermAssembler(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                                        BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,3>* pBoundaryConditions)
-        : AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM,SPACE_DIM,3>(pMesh, pBoundaryConditions)
+    ExtendedBidomainNeumannSurfaceTermAssembler(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+                                        BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 3>* pBoundaryConditions)
+        : AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM, SPACE_DIM, 3>(pMesh, pBoundaryConditions)
     {
     }
 };
@@ -90,8 +90,8 @@ public:
 
 // LCOV_EXCL_START //no non-zero Neumann BC allowed at the moment in extended bidomain problems
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, 3*ELEMENT_DIM> ExtendedBidomainNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM>::ComputeVectorSurfaceTerm(
-    const BoundaryElement<ELEMENT_DIM-1,SPACE_DIM> &rSurfaceElement,
+c_vector<double, 3*ELEMENT_DIM> ExtendedBidomainNeumannSurfaceTermAssembler<ELEMENT_DIM, SPACE_DIM>::ComputeVectorSurfaceTerm(
+    const BoundaryElement<ELEMENT_DIM-1, SPACE_DIM> &rSurfaceElement,
     c_vector<double,ELEMENT_DIM> &rPhi,
     ChastePoint<SPACE_DIM> &rX)
 {
@@ -102,13 +102,13 @@ c_vector<double, 3*ELEMENT_DIM> ExtendedBidomainNeumannSurfaceTermAssembler<ELEM
 
     c_vector<double, 3*ELEMENT_DIM> ret;
 
-//    for (unsigned i=0; i<3*ELEMENT_DIM; i = i + 3)
+//    for (unsigned i = 0; i<3*ELEMENT_DIM; i = i + 3)
 //    {
 //        ret(i) = rPhi(i)*sigma_i_times_grad_phi_i_first_cell_dot_n;
 //        ret(i+1) = rPhi(i)*sigma_i_times_grad_phi_i_second_cell_dot_n;
 //        ret(i+2) = rPhi(i)*(sigma_i_times_grad_phi_i_first_cell_dot_n + sigma_i_times_grad_phi_i_second_cell_dot_n + sigma_e_times_grad_phi_e_dot_n);
 //    }
-    for (unsigned i=0; i<ELEMENT_DIM; ++i)
+    for (unsigned i = 0; i<ELEMENT_DIM; ++i)
     {
         ret(3*i) = rPhi(i)*sigma_i_times_grad_phi_i_first_cell_dot_n;
         ret(3*i+1) = rPhi(i)*sigma_i_times_grad_phi_i_second_cell_dot_n;

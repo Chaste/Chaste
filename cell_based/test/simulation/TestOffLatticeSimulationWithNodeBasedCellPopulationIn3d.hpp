@@ -129,7 +129,7 @@ public:
         simulator.AddForce(p_linear_force);
 
         // Create some boundary conditions and pass them to the simulation
-        c_vector<double,3> centre = zero_vector<double>(3);
+        c_vector<double, 3> centre = zero_vector<double>(3);
         centre(2) = 1.0;
         double radius = 2.0;
         MAKE_PTR_ARGS(SphereGeometryBoundaryCondition<3>, p_boundary_condition, (&node_based_cell_population, centre, radius)); // Circle radius 1 centre (0,0,1)
@@ -145,7 +145,7 @@ public:
         // Check some results
         for (auto cell_iter : simulator.rGetCellPopulation())
         {
-            c_vector<double,3> node_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(cell_iter);
+            c_vector<double, 3> node_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(cell_iter);
             TS_ASSERT_DELTA(norm_2(node_location-centre), radius, 1e-3);
         }
 
@@ -210,8 +210,8 @@ public:
         simulator.AddForce(p_linear_force);
 
         // Create a plane boundary and pass them to the simulation
-        c_vector<double,3> point_on_plane = zero_vector<double>(3);
-        c_vector<double,3> normal_to_plane = zero_vector<double>(3);
+        c_vector<double, 3> point_on_plane = zero_vector<double>(3);
+        c_vector<double, 3> normal_to_plane = zero_vector<double>(3);
         point_on_plane(0) = 0.5;
         normal_to_plane(0) = 1.0;
 
@@ -232,7 +232,7 @@ public:
         // Check some results
         for (auto cell_iter : simulator.rGetCellPopulation())
         {
-            c_vector<double,3> node_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(cell_iter);
+            c_vector<double, 3> node_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(cell_iter);
 
             TS_ASSERT_LESS_THAN_EQUALS(-0.5, node_location[0]);
             TS_ASSERT_LESS_THAN_EQUALS(node_location[0], 0.5);
@@ -252,7 +252,7 @@ public:
         std::vector<Node<3>*> nodes = GenerateMesh(3,3,3);
 
         // Convert this to a PeriodicNodesOnlyMesh
-        c_vector<double,3> periodic_width = zero_vector<double>(3);
+        c_vector<double, 3> periodic_width = zero_vector<double>(3);
         periodic_width[0] = 6.0; //periodic in x with width 6.0
         PeriodicNodesOnlyMesh<3> mesh(periodic_width);
         mesh.ConstructNodesWithoutMesh(nodes,1.5);
@@ -410,7 +410,7 @@ public:
         std::vector<Node<3>*> nodes = GenerateMesh(3,3,3);
 
         // Convert this to a PeriodicNodesOnlyMesh
-        c_vector<double,3> periodic_width = zero_vector<double>(3);
+        c_vector<double, 3> periodic_width = zero_vector<double>(3);
         periodic_width[1] = 6.0; //periodic in y with width 6.0
         PeriodicNodesOnlyMesh<3> mesh(periodic_width);
         mesh.ConstructNodesWithoutMesh(nodes,1.5);
@@ -567,7 +567,7 @@ public:
         std::vector<Node<3>*> nodes = GenerateMesh(3,3,3);
 
         // Convert this to a PeriodicNodesOnlyMesh
-        c_vector<double,3> periodic_width = zero_vector<double>(3);
+        c_vector<double, 3> periodic_width = zero_vector<double>(3);
         periodic_width[2] = 6.0; //periodic in y with width 6.0
         PeriodicNodesOnlyMesh<3> mesh(periodic_width);
         mesh.ConstructNodesWithoutMesh(nodes,1.5);
@@ -725,7 +725,7 @@ public:
         std::vector<Node<3>*> nodes = GenerateMesh(3,3,3);
 
         // Convert this to a PeriodicNodesOnlyMesh
-        c_vector<double,3> periodic_width = zero_vector<double>(3);
+        c_vector<double, 3> periodic_width = zero_vector<double>(3);
         periodic_width[0] = 6.0;//periodic in x with width 6.0
         periodic_width[2] = 6.0;//periodic in z with width 6.0
         PeriodicNodesOnlyMesh<3> mesh(periodic_width);
@@ -760,7 +760,7 @@ public:
         PeriodicNodesOnlyMesh<3>::NodeIterator node_iter_end = mesh.GetNodeIteratorEnd();
         for (PeriodicNodesOnlyMesh<3>::NodeIterator node_iter = node_iter_begin; node_iter != node_iter_end; ++node_iter)
         {
-            const c_vector<double,3>& node_location = (*node_iter).rGetLocation();
+            const c_vector<double, 3>& node_location = (*node_iter).rGetLocation();
             TS_ASSERT_LESS_THAN_EQUALS(0,node_location[0]);
             TS_ASSERT_LESS_THAN_EQUALS(0,node_location[2]);
             TS_ASSERT_LESS_THAN_EQUALS(node_location[0], periodic_width[0]);

@@ -260,7 +260,7 @@ public:
     void TestBoxGeneration1d()
     {
         // Create a mesh
-        TetrahedralMesh<1,1> mesh;
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructLinearMesh(20);
 
         double cut_off_length = 5.0;
@@ -337,7 +337,7 @@ public:
             TS_ASSERT_EQUALS(local_boxes_to_box_4, correct_answer_4);
         }
 
-        c_vector<double,1> miles_away;
+        c_vector<double, 1> miles_away;
         miles_away(0) = 47323854;
         TS_ASSERT_THROWS_CONTAINS(box_collection.CalculateContainingBox(miles_away), "The point provided is outside all of the boxes");
 
@@ -365,7 +365,7 @@ public:
     // very simple test
     void TestAddElement()
     {
-        TetrahedralMesh<1,1> mesh;
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructRegularSlabMesh(0.5, 1.0);
 
         double width = 0.4;
@@ -1536,8 +1536,8 @@ public:
             return;
         }
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         double cut_off_length = 0.2;
@@ -2530,7 +2530,7 @@ public:
     void TestBoxGeneration3d()
 {
         // Create a mesh
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
 
         double cut_off_length = 2.0;
 

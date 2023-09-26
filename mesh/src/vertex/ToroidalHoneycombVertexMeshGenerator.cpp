@@ -52,16 +52,16 @@ ToroidalHoneycombVertexMeshGenerator::ToroidalHoneycombVertexMeshGenerator(unsig
     assert(t2Threshold > 0.0);
 
     std::vector<Node<2>*> nodes;
-    std::vector<VertexElement<2,2>*>  elements;
+    std::vector<VertexElement<2, 2>*>  elements;
 
     unsigned node_index = 0;
     unsigned node_indices[6];
     unsigned element_index;
 
     // Create the nodes
-    for (unsigned j=0; j<2*numElementsUp; ++j)
+    for (unsigned j = 0; j<2*numElementsUp; ++j)
     {
-        for (unsigned i=0; i<numElementsAcross; ++i)
+        for (unsigned i = 0; i<numElementsAcross; ++i)
         {
             double x_coord = ((j%4 == 0)||(j%4 == 3)) ? i+0.5 : i;
             double y_coord = (1.5*j - 0.5*(j%2))*0.5/sqrt(3.0);
@@ -76,9 +76,9 @@ ToroidalHoneycombVertexMeshGenerator::ToroidalHoneycombVertexMeshGenerator(unsig
      * Create the elements. The array node_indices contains the
      * global node indices from bottom, going anticlockwise.
      */
-    for (unsigned j=0; j<numElementsUp; ++j)
+    for (unsigned j = 0; j<numElementsUp; ++j)
     {
-        for (unsigned i=0; i<numElementsAcross; ++i)
+        for (unsigned i = 0; i<numElementsAcross; ++i)
         {
             element_index = j*numElementsAcross + i;
 
@@ -104,11 +104,11 @@ ToroidalHoneycombVertexMeshGenerator::ToroidalHoneycombVertexMeshGenerator(unsig
             }
 
             std::vector<Node<2>*> element_nodes;
-            for (unsigned k=0; k<6; ++k)
+            for (unsigned k = 0; k<6; ++k)
             {
                element_nodes.push_back(nodes[node_indices[k]]);
             }
-            VertexElement<2,2>* p_element = new VertexElement<2,2>(element_index, element_nodes);
+            VertexElement<2, 2>* p_element = new VertexElement<2, 2>(element_index, element_nodes);
             elements.push_back(p_element);
         }
     }
@@ -119,7 +119,7 @@ ToroidalHoneycombVertexMeshGenerator::ToroidalHoneycombVertexMeshGenerator(unsig
     mpMesh = boost::make_shared<Toroidal2dVertexMesh>(mesh_width, mesh_height, nodes, elements, cellRearrangementThreshold, t2Threshold);
 }
 
-boost::shared_ptr<MutableVertexMesh<2,2> > ToroidalHoneycombVertexMeshGenerator::GetMesh()
+boost::shared_ptr<MutableVertexMesh<2, 2> > ToroidalHoneycombVertexMeshGenerator::GetMesh()
 {
     EXCEPTION("A toroidal mesh was created but a normal mesh is being requested.");
     return mpMesh; // Not really

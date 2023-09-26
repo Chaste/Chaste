@@ -96,7 +96,7 @@ public:
      *
      * @param rMeshReader the mesh reader
      */
-    void ConstructFromMeshReader(AbstractMeshReader<DIM,DIM>& rMeshReader);
+    void ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rMeshReader);
 };
 
 #include "SerializationExportWrapper.hpp"

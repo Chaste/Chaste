@@ -82,22 +82,22 @@ public:
         TS_ASSERT_EQUALS(p_mesh->mRightOriginals.size(), p_mesh->mRightImages.size());
 
         // Check that the image nodes are where they should be.
-        for (unsigned i=0; i<p_mesh->mLeftOriginals.size(); ++i)
+        for (unsigned i = 0; i<p_mesh->mLeftOriginals.size(); ++i)
         {
-            c_vector<double,2> original_location;
+            c_vector<double, 2> original_location;
             original_location = p_mesh->GetNode(p_mesh->mLeftOriginals[i])->rGetLocation();
-            c_vector<double,2> image_location;
+            c_vector<double, 2> image_location;
             image_location = p_mesh->GetNode(p_mesh->mLeftImages[i])->rGetLocation();
 
             TS_ASSERT_DELTA(original_location[0] + crypt_width, image_location[0], 1e-7);
             TS_ASSERT_DELTA(original_location[1], image_location[1], 1e-7);
         }
 
-        for (unsigned i=0; i<p_mesh->mRightOriginals.size(); ++i)
+        for (unsigned i = 0; i<p_mesh->mRightOriginals.size(); ++i)
         {
-            c_vector<double,2> original_location;
+            c_vector<double, 2> original_location;
             original_location = p_mesh->GetNode(p_mesh->mRightOriginals[i])->rGetLocation();
-            c_vector<double,2> image_location;
+            c_vector<double, 2> image_location;
             image_location = p_mesh->GetNode(p_mesh->mRightImages[i])->rGetLocation();
 
             TS_ASSERT_DELTA(original_location[0] - crypt_width, image_location[0], 1e-7);
@@ -133,7 +133,7 @@ public:
 
         // Call the normal re-mesh
         NodeMap map(p_mesh->GetNumNodes());
-        p_mesh->MutableMesh<2,2>::ReMesh(map);
+        p_mesh->MutableMesh<2, 2>::ReMesh(map);
 
         // Re-Index the vectors regarding left/right nodes with the node map
         for (unsigned i = 0; i<p_mesh->mLeftOriginals.size(); ++i)
@@ -163,14 +163,14 @@ public:
              elem_iter != p_mesh->GetElementIteratorEnd();
              ++elem_iter)
         {
-            for (unsigned i=0; i<3; ++i)
+            for (unsigned i = 0; i<3; ++i)
             {
                 unsigned this_node_index = elem_iter->GetNodeGlobalIndex(i);
 
                 if (this_node_index==0)
                 {
                     elements_for_node_0++;
-                    for (unsigned j=0; j<3; ++j)
+                    for (unsigned j = 0; j<3; ++j)
                     {
                         checksum_for_node_0 += elem_iter->GetNodeGlobalIndex(j);
                     }
@@ -178,7 +178,7 @@ public:
                 if (this_node_index==11)
                 {
                     elements_for_node_11++;
-                    for (unsigned j=0; j<3; ++j)
+                    for (unsigned j = 0; j<3; ++j)
                     {
                         checksum_for_node_11 += elem_iter->GetNodeGlobalIndex(j);
                     }
@@ -186,7 +186,7 @@ public:
                 if (this_node_index==12)
                 {
                     elements_for_node_12++;
-                    for (unsigned j=0; j<3; ++j)
+                    for (unsigned j = 0; j<3; ++j)
                     {
                         checksum_for_node_12 += elem_iter->GetNodeGlobalIndex(j);
                     }
@@ -194,7 +194,7 @@ public:
                 if (this_node_index==18)
                 {
                     elements_for_node_18++;
-                    for (unsigned j=0; j<3; ++j)
+                    for (unsigned j = 0; j<3; ++j)
                     {
                         checksum_for_node_18 += elem_iter->GetNodeGlobalIndex(j);
                     }
@@ -257,13 +257,13 @@ public:
     void noTestCylindricalReMeshFailingTest()
     {
         // Load a problematic mesh
-        TrianglesMeshReader<2,2> mesh_reader("cell_based/test/data/TestCylindricalMeshBug/mesh");
+        TrianglesMeshReader<2, 2> mesh_reader("cell_based/test/data/TestCylindricalMeshBug/mesh");
         Cylindrical2dMesh mesh(20);
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_DELTA(mesh.GetWidth(0), 20, 1e-3);
 
-        TrianglesMeshWriter<2,2> mesh_writer("TestCylindricalMeshBug", "mesh", false);
+        TrianglesMeshWriter<2, 2> mesh_writer("TestCylindricalMeshBug", "mesh", false);
         mesh_writer.WriteFilesUsingMesh(mesh);
 
         // Use showme to view this mesh
@@ -296,7 +296,7 @@ public:
         TS_ASSERT_EQUALS(map.GetSize(), num_old_nodes);
         TS_ASSERT_EQUALS(map.IsDeleted(15), true);
 
-        for (unsigned i=0; i<num_old_nodes; ++i)
+        for (unsigned i = 0; i<num_old_nodes; ++i)
         {
             if (i<15)
             {
@@ -474,7 +474,7 @@ public:
 //        // We just move one of the bottom boundary nodes and then...
 //        p_mesh->SetNode(0, boundary_point, false);
 //        // check that all the nodes on this boundary have moved down
-//        for (unsigned i=0; i<3; ++i)
+//        for (unsigned i = 0; i<3; ++i)
 //        {
 //            TS_ASSERT_DELTA(p_mesh->GetNode(i)->rGetLocation()[1],-1.76000,1e-6);
 //        }
@@ -531,7 +531,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 2 * cells_across * (cells_up - 1));
         TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 1u); // boundary elements removed now halo nodes are used
 
-        c_vector<double,2> point;
+        c_vector<double, 2> point;
         point[0] = -0.05;
         point[1] = 1.0;
         Node<2>* p_node = new Node<2>(p_mesh->GetNumNodes(), point);
@@ -567,13 +567,13 @@ public:
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
         boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
-        c_vector<double,2>& rLocation1 = p_mesh->GetNode(1)->rGetModifiableLocation();
+        c_vector<double, 2>& rLocation1 = p_mesh->GetNode(1)->rGetModifiableLocation();
         rLocation1[1] -= 0.5;
 
-        c_vector<double,2>& rLocation2 = p_mesh->GetNode(3)->rGetModifiableLocation();
+        c_vector<double, 2>& rLocation2 = p_mesh->GetNode(3)->rGetModifiableLocation();
         rLocation2[1] -= 0.4;
 
-        c_vector<double,2>& rLocation3 = p_mesh->GetNode(12)->rGetModifiableLocation();
+        c_vector<double, 2>& rLocation3 = p_mesh->GetNode(12)->rGetModifiableLocation();
         rLocation3[1] += 0.8;
 
         double original_mesh_height = p_mesh->GetWidth(1);
@@ -593,7 +593,7 @@ public:
         TS_ASSERT_EQUALS(new_num_nodes, original_num_nodes * 2 + 2 * num_original_halo_nodes);
 
         NodeMap map(p_mesh->GetNumNodes());
-        p_mesh->MutableMesh<2,2>::ReMesh(map);   // recreates the boundary elements
+        p_mesh->MutableMesh<2, 2>::ReMesh(map);   // recreates the boundary elements
 
         // Test halo node removal
         p_mesh->GenerateVectorsOfElementsStraddlingPeriodicBoundaries();
@@ -617,13 +617,13 @@ public:
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
         boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
-        c_vector<double,2>& rLocation1 = p_mesh->GetNode(1)->rGetModifiableLocation();
+        c_vector<double, 2>& rLocation1 = p_mesh->GetNode(1)->rGetModifiableLocation();
         rLocation1[1] -= 0.5;
 
-        c_vector<double,2>& rLocation2 = p_mesh->GetNode(3)->rGetModifiableLocation();
+        c_vector<double, 2>& rLocation2 = p_mesh->GetNode(3)->rGetModifiableLocation();
         rLocation2[1] -= 0.4;
 
-        c_vector<double,2>& rLocation3 = p_mesh->GetNode(12)->rGetModifiableLocation();
+        c_vector<double, 2>& rLocation3 = p_mesh->GetNode(12)->rGetModifiableLocation();
         rLocation3[1] += 0.8;
 
         unsigned total_elements = p_mesh->GetNumElements();
@@ -658,7 +658,7 @@ public:
         unsigned thickness_of_ghost_layer = 0;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
-        boost::shared_ptr<AbstractTetrahedralMesh<2,2> > const p_mesh = boost::static_pointer_cast<AbstractTetrahedralMesh<2,2> >(generator.GetCylindricalMesh());
+        boost::shared_ptr<AbstractTetrahedralMesh<2, 2> > const p_mesh = boost::static_pointer_cast<AbstractTetrahedralMesh<2, 2> >(generator.GetCylindricalMesh());
 
         boost::static_pointer_cast<Cylindrical2dMesh>(p_mesh)->SetHaloScalingFactor(0.5);
         boost::static_pointer_cast<Cylindrical2dMesh>(p_mesh)->SetHaloOffset(5.0);
@@ -688,7 +688,7 @@ public:
 
         {
             // De-serialize and compare
-            boost::shared_ptr<AbstractTetrahedralMesh<2,2> > p_mesh2;
+            boost::shared_ptr<AbstractTetrahedralMesh<2, 2> > p_mesh2;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -706,14 +706,14 @@ public:
             TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), p_mesh2->GetNumNodes());
             TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryNodes(), p_mesh2->GetNumBoundaryNodes());
 
-            for (unsigned i=0; i<p_mesh->GetNumAllNodes(); ++i)
+            for (unsigned i = 0; i<p_mesh->GetNumAllNodes(); ++i)
             {
                 Node<2>* p_node = p_mesh->GetNode(i);
                 Node<2>* p_node2 = p_mesh2->GetNode(i);
                 TS_ASSERT_EQUALS(p_node->IsDeleted(), p_node2->IsDeleted());
                 TS_ASSERT_EQUALS(p_node->GetIndex(), p_node2->GetIndex());
                 TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), p_node2->IsBoundaryNode());
-                for (unsigned j=0; j<2; ++j)
+                for (unsigned j = 0; j<2; ++j)
                 {
                     TS_ASSERT_DELTA(p_node->rGetLocation()[j], p_node2->rGetLocation()[j], 1e-16);
                 }
@@ -727,14 +727,14 @@ public:
             TS_ASSERT_EQUALS(boost::static_pointer_cast<Cylindrical2dMesh>(p_mesh2)->GetHaloScalingFactor(),0.5);
             TS_ASSERT_EQUALS(boost::static_pointer_cast<Cylindrical2dMesh>(p_mesh2)->GetHaloOffset(),5.0);
 
-            AbstractTetrahedralMesh<2,2>::ElementIterator iter2 = p_mesh2->GetElementIteratorBegin();
+            AbstractTetrahedralMesh<2, 2>::ElementIterator iter2 = p_mesh2->GetElementIteratorBegin();
 
-            for (AbstractTetrahedralMesh<2,2>::ElementIterator iter = p_mesh->GetElementIteratorBegin();
+            for (AbstractTetrahedralMesh<2, 2>::ElementIterator iter = p_mesh->GetElementIteratorBegin();
                  iter != p_mesh->GetElementIteratorEnd();
                  ++iter, ++iter2)
             {
                 TS_ASSERT_EQUALS(iter->GetNumNodes(), iter2->GetNumNodes());
-                for (unsigned i=0; i<iter->GetNumNodes(); ++i)
+                for (unsigned i = 0; i<iter->GetNumNodes(); ++i)
                 {
                     TS_ASSERT_EQUALS(iter->GetNodeGlobalIndex(i), iter2->GetNodeGlobalIndex(i));
                 }
@@ -761,14 +761,14 @@ public:
         // Find the element with node indices 2,3,5 (which straddles the periodic boundary)
         unsigned element_index;
         std::set<unsigned> target_element_node_indices;
-        for (element_index=0; element_index<mesh.GetNumElements(); element_index++)
+        for (element_index = 0; element_index<mesh.GetNumElements(); element_index++)
         {
             target_element_node_indices.clear();
             target_element_node_indices.insert(2);
             target_element_node_indices.insert(3);
             target_element_node_indices.insert(5);
 
-            for (unsigned node_local_index=0; node_local_index<=2; node_local_index++)
+            for (unsigned node_local_index = 0; node_local_index<=2; node_local_index++)
             {
                 target_element_node_indices.erase(mesh.GetElement(element_index)->GetNodeGlobalIndex(node_local_index));
             }
@@ -801,7 +801,7 @@ public:
 
     void TestGenerateVectorsOfElementsStraddlingPeriodicBoundaries()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/bad_cylindrical_9_1");
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/bad_cylindrical_9_1");
         Cylindrical2dMesh mesh(9.1);
         mesh.ConstructFromMeshReader(mesh_reader);
 
@@ -811,7 +811,7 @@ public:
             mesh.CreateMirrorNodes();
 
             NodeMap big_map(mesh.GetNumAllNodes());
-            mesh.MutableMesh<2,2>::ReMesh(big_map);
+            mesh.MutableMesh<2, 2>::ReMesh(big_map);
         }
 
         mesh.GenerateVectorsOfElementsStraddlingPeriodicBoundaries();
@@ -839,7 +839,7 @@ public:
 
     void TestCorrectNonPeriodicMeshMapLeftToRight()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/bad_cylindrical_9_1");
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/bad_cylindrical_9_1");
         Cylindrical2dMesh mesh(9.1);
         mesh.ConstructFromMeshReader(mesh_reader);
 
@@ -867,8 +867,8 @@ public:
                 it != p_node->ContainingElementsEnd();
                 ++it)
             {
-                Element <2,2>* p_element = mesh.GetElement(*it);
-                for (unsigned j=0; j<3; ++j)
+                Element <2, 2>* p_element = mesh.GetElement(*it);
+                for (unsigned j = 0; j<3; ++j)
                 {
                     unsigned index=p_element->GetNodeGlobalIndex(j);
                     if (index != node_index)
@@ -880,7 +880,7 @@ public:
 
             // Each node in the forward star should appear exactly twice.  Sort and test.
             sort(indices.begin(), indices.end());
-            for (unsigned i=0; i<indices.size(); ++i)
+            for (unsigned i = 0; i<indices.size(); ++i)
             {
                 if (i%2 == 0)
                 {
@@ -908,7 +908,7 @@ public:
 
         // Create elements for the new larger mesh
         NodeMap big_map(mesh.GetNumAllNodes());
-        mesh.MutableMesh<2,2>::ReMesh(big_map);
+        mesh.MutableMesh<2, 2>::ReMesh(big_map);
 
         // We need the mesh in a certain configuration for this test
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 12u);

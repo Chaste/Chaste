@@ -70,9 +70,9 @@ public:
                 c_vector<double, ELEMENT_DIM+1> &rPhi,
                 c_matrix<double, SPACE_DIM, ELEMENT_DIM+1> &rGradPhi,
                 ChastePoint<SPACE_DIM> &rX,
-                c_vector<double,1> &rU,
+                c_vector<double, 1> &rU,
                 c_matrix<double, 1, SPACE_DIM> &rGradU /* not used */,
-                Element<ELEMENT_DIM,SPACE_DIM>* pElement)
+                Element<ELEMENT_DIM, SPACE_DIM>* pElement)
     {
         const c_matrix<double, SPACE_DIM, SPACE_DIM>& sigma_i = this->mpCardiacTissue->rGetIntracellularConductivityTensor(pElement->GetIndex());
 
@@ -88,9 +88,9 @@ public:
      *  @param pMesh the mesh
      *  @param pTissue  pointer to the tissue used for getting conductivity values
      */
-    MonodomainStiffnessMatrixAssembler(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                             AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>* pTissue)
-        : AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,1,false,true,NORMAL>(pMesh,pTissue)
+    MonodomainStiffnessMatrixAssembler(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+                             AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>* pTissue)
+        : AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM,1,false,true,NORMAL>(pMesh,pTissue)
     {
     }
 };

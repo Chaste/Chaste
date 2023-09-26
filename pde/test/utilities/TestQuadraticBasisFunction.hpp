@@ -204,10 +204,10 @@ public:
         nodes.push_back(new Node<1>(0, false, 3.0));
         nodes.push_back(new Node<1>(1, false, 5.0));
 
-        Element<1,1> element(INDEX_IS_NOT_USED, nodes);
+        Element<1, 1> element(INDEX_IS_NOT_USED, nodes);
         QuadraticBasisFunction<1> basis_function;
 
-        c_matrix<double,1,1> jacobian, inverse_jacobian;
+        c_matrix<double,1, 1> jacobian, inverse_jacobian;
         double determinant;
         element.CalculateInverseJacobian(jacobian, determinant, inverse_jacobian);
         ChastePoint<1> evaluation_point(0.2);
@@ -236,10 +236,10 @@ public:
 //        nodes.push_back(new Node<2>(3, false, 5.0, 3.5)); // extra nodes
 //        nodes.push_back(new Node<2>(4, false, 3.5, 4.0));
 //        nodes.push_back(new Node<2>(5, false, 4.5, 4.5));
-        Element<2,2> element(INDEX_IS_NOT_USED, nodes);
+        Element<2, 2> element(INDEX_IS_NOT_USED, nodes);
         QuadraticBasisFunction<2> basis_function;
 
-        c_matrix<double,2,2> jacobian, inverse_jacobian;
+        c_matrix<double,2, 2> jacobian, inverse_jacobian;
         double determinant;
         element.CalculateInverseJacobian(jacobian, determinant, inverse_jacobian);
         ChastePoint<2> evaluation_point(0.3, 0.6);
@@ -281,10 +281,10 @@ public:
 //        nodes.push_back(new Node<3>(7, false, 4.5, 4.5, 1.5));
 //        nodes.push_back(new Node<3>(8, false, 5.5, 4.0, 2.0));
 //        nodes.push_back(new Node<3>(9, false, 4.0, 4.5, 2.5));
-        Element<3,3> element(INDEX_IS_NOT_USED, nodes);
+        Element<3, 3> element(INDEX_IS_NOT_USED, nodes);
         QuadraticBasisFunction<3> basis_function;
 
-        c_matrix<double,3,3> jacobian, inverse_jacobian;
+        c_matrix<double,3, 3> jacobian, inverse_jacobian;
         double determinant;
         element.CalculateInverseJacobian(jacobian, determinant, inverse_jacobian);
         ChastePoint<3> evaluation_point(0.3, 0.1, 0.2);

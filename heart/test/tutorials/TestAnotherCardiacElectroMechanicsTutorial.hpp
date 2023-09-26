@@ -137,7 +137,7 @@ public:
         ZeroStimulusCellFactory<CML_noble_varghese_kohl_noble_1998_basic_with_sac, 2> cell_factory;
 
         /* Construct two meshes are before, in 2D */
-        TetrahedralMesh<2,2> electrics_mesh;
+        TetrahedralMesh<2, 2> electrics_mesh;
         electrics_mesh.ConstructRegularSlabMesh(0.01/*stepsize*/, 0.1/*length*/, 0.1/*width*/, 0.1/*depth*/);
 
         QuadraticMesh<2> mechanics_mesh;
@@ -149,7 +149,7 @@ public:
          * solid mechanics tutorials.
          */
         std::vector<unsigned> fixed_nodes;
-        std::vector<c_vector<double,2> > fixed_node_locations;
+        std::vector<c_vector<double, 2> > fixed_node_locations;
 
         fixed_nodes.push_back(0);
         fixed_node_locations.push_back(zero_vector<double>(2));
@@ -159,7 +159,7 @@ public:
             double X = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             if (fabs(X) < 1e-6) // ie, if X==0
             {
-                c_vector<double,2> new_position;
+                c_vector<double, 2> new_position;
                 new_position(0) = 0.0;
                 new_position(1) = ElectroMechanicsProblemDefinition<2>::FREE;
 
@@ -173,18 +173,18 @@ public:
          * elements on the bottom and top surfaces, and apply inward tractions - this will have the
          * effect of stretching the tissue in the X-direction.
          */
-        std::vector<BoundaryElement<1,2>*> boundary_elems;
-        std::vector<c_vector<double,2> > tractions;
+        std::vector<BoundaryElement<1, 2>*> boundary_elems;
+        std::vector<c_vector<double, 2> > tractions;
 
-        c_vector<double,2> traction;
+        c_vector<double, 2> traction;
 
-        for (TetrahedralMesh<2,2>::BoundaryElementIterator iter = mechanics_mesh.GetBoundaryElementIteratorBegin();
+        for (TetrahedralMesh<2, 2>::BoundaryElementIterator iter = mechanics_mesh.GetBoundaryElementIteratorBegin();
              iter != mechanics_mesh.GetBoundaryElementIteratorEnd();
              ++iter)
         {
             if (fabs((*iter)->CalculateCentroid()[1] - 0.0) < 1e-6) // if Y=0
             {
-                BoundaryElement<1,2>* p_element = *iter;
+                BoundaryElement<1, 2>* p_element = *iter;
                 boundary_elems.push_back(p_element);
 
                 traction(0) =  0.0; // kPa, since the contraction model and material law use kPa for stiffnesses
@@ -193,7 +193,7 @@ public:
             }
             if (fabs((*iter)->CalculateCentroid()[1] - 0.1) < 1e-6) // if Y=0.1
             {
-                BoundaryElement<1,2>* p_element = *iter;
+                BoundaryElement<1, 2>* p_element = *iter;
                 boundary_elems.push_back(p_element);
 
                 traction(0) =  0.0;
@@ -217,7 +217,7 @@ public:
         /* Set the end time, create the problem, and solve */
         HeartConfig::Instance()->SetSimulationDuration(50.0);
 
-        CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
+        CardiacElectroMechanicsProblem<2, 1> problem(INCOMPRESSIBLE,
                                                     MONODOMAIN,
                                                     &electrics_mesh,
                                                     &mechanics_mesh,
@@ -240,7 +240,7 @@ public:
          * to post-process:
          */
         FileFinder test_output_folder("TestCardiacElectroMechanicsWithMef/electrics", RelativeTo::ChasteTestOutput);
-        Hdf5ToMeshalyzerConverter<2,2> converter(test_output_folder, "voltage",
+        Hdf5ToMeshalyzerConverter<2, 2> converter(test_output_folder, "voltage",
                                                  &electrics_mesh, false,
                                                  HeartConfig::Instance()->GetVisualizerOutputPrecision());
 
@@ -262,7 +262,7 @@ public:
         Vec voltage = PetscTools::CreateVec(electrics_mesh.GetNumNodes());
         reader.GetVariableOverNodes(voltage, "V", num_timesteps-1);
         ReplicatableVector voltage_repl(voltage);
-        for (unsigned i=0; i<voltage_repl.GetSize(); ++i)
+        for (unsigned i = 0; i<voltage_repl.GetSize(); ++i)
         {
             TS_ASSERT_DELTA(voltage_repl[i], -81.9080, 1e-3);
         }
@@ -281,21 +281,21 @@ public:
     void TestAnnulusWithInternalPressure()
     {
         /* The following should require little explanation now */
-        TetrahedralMesh<2,2> electrics_mesh;
+        TetrahedralMesh<2, 2> electrics_mesh;
         QuadraticMesh<2> mechanics_mesh;
 
         // could (should?) use finer electrics mesh, but keeping electrics simulation time down
-        TrianglesMeshReader<2,2> reader1("mesh/test/data/annuli/circular_annulus_960_elements");
+        TrianglesMeshReader<2, 2> reader1("mesh/test/data/annuli/circular_annulus_960_elements");
         electrics_mesh.ConstructFromMeshReader(reader1);
 
-        TrianglesMeshReader<2,2> reader2("mesh/test/data/annuli/circular_annulus_960_elements_quad",2 /*quadratic elements*/);
+        TrianglesMeshReader<2, 2> reader2("mesh/test/data/annuli/circular_annulus_960_elements_quad",2 /*quadratic elements*/);
         mechanics_mesh.ConstructFromMeshReader(reader2);
 
         PointStimulus2dCellFactory cell_factory;
 
         std::vector<unsigned> fixed_nodes;
-        std::vector<c_vector<double,2> > fixed_node_locations;
-        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); ++i)
+        std::vector<c_vector<double, 2> > fixed_node_locations;
+        for (unsigned i = 0; i<mechanics_mesh.GetNumNodes(); ++i)
         {
             double x = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
@@ -303,7 +303,7 @@ public:
             if (fabs(x)<1e-6 && fabs(y+0.5)<1e-6)  // fixed point (0.0,-0.5) at bottom of mesh
             {
                 fixed_nodes.push_back(i);
-                c_vector<double,2> new_position;
+                c_vector<double, 2> new_position;
                 new_position(0) = x;
                 new_position(1) = y;
                 fixed_node_locations.push_back(new_position);
@@ -311,7 +311,7 @@ public:
             if (fabs(x)<1e-6 && fabs(y-0.5)<1e-6)  // constrained point (0.0,0.5) at top of mesh
             {
                 fixed_nodes.push_back(i);
-                c_vector<double,2> new_position;
+                c_vector<double, 2> new_position;
                 new_position(0) = x;
                 new_position(1) = ElectroMechanicsProblemDefinition<2>::FREE;
                 fixed_node_locations.push_back(new_position);
@@ -341,8 +341,8 @@ public:
 
         /* Now let us collect all the boundary elements on the inner (endocardial) surface. The following
          * uses knowledge about the geometry - the inner surface is r=0.3, the outer is r=0.5. */
-        std::vector<BoundaryElement<1,2>*> boundary_elems;
-        for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
+        std::vector<BoundaryElement<1, 2>*> boundary_elems;
+        for (TetrahedralMesh<2, 2>::BoundaryElementIterator iter
                = mechanics_mesh.GetBoundaryElementIteratorBegin();
              iter != mechanics_mesh.GetBoundaryElementIteratorEnd();
              ++iter)
@@ -352,7 +352,7 @@ public:
 
             if (r < 0.4)
             {
-                BoundaryElement<1,2>* p_element = *iter;
+                BoundaryElement<1, 2>* p_element = *iter;
                 boundary_elems.push_back(p_element);
             }
         }
@@ -368,7 +368,7 @@ public:
          */
         problem_defn.SetNumIncrementsForInitialDeformation(3);
 
-        CardiacElectroMechanicsProblem<2,1> problem(COMPRESSIBLE,
+        CardiacElectroMechanicsProblem<2, 1> problem(COMPRESSIBLE,
                                                     MONODOMAIN,
                                                     &electrics_mesh,
                                                     &mechanics_mesh,

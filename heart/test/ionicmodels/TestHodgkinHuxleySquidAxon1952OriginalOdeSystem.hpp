@@ -71,7 +71,7 @@ public:
         v_singularity[0]=-65;
         v_singularity[1]=-50;
 
-        for (int i=0; i<2; ++i)
+        for (int i = 0; i<2; ++i)
         {
 
             std::vector<double> yleft;
@@ -139,7 +139,7 @@ public:
             std::vector<double> rhs_at_singularity(y_at_singularity.size());
             hh52_ode_system.EvaluateYDerivatives (0.0, y_at_singularity, rhs_at_singularity);
 
-            for (int j=0; j<4; ++j)
+            for (int j = 0; j<4; ++j)
             {
                 //std::cout << j << "\t" << rhsright[j] << "\t" << rhsleft[j] << "\t" << rhs_at_singularity[j] << std::endl;
                 TS_ASSERT_DELTA((rhsright[j]+rhsleft[j])/2, rhs_at_singularity[j], 0.1);

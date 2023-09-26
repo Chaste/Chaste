@@ -54,7 +54,7 @@ template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
  * The short axis is the eigenvector associated with the largest eigenvalue of 
  * the moment of inertia of the cell's polygon.
  */
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 class ShortAxisVertexBasedDivisionRule : public AbstractVertexBasedDivisionRule<SPACE_DIM>
 {
 private:

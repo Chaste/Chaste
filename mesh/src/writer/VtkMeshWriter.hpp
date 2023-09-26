@@ -67,7 +67,7 @@ class NodesOnlyMesh;
  *  Writes a mesh in VTK .vtu format (that's an XML-based, data compressed unstructured mesh)
  *
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VtkMeshWriter : public AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>
 {
 
@@ -150,7 +150,7 @@ public:
      * The data vector represents the lower half of the tensor
      * Checking cannot be done at this stage since the data is associated with an empty VTK mesh structure.
      */
-    void AddTensorCellData(std::string name, std::vector<c_vector<double,SPACE_DIM*(SPACE_DIM+1)/2> > data);
+    void AddTensorCellData(std::string name, std::vector<c_vector<double, SPACE_DIM*(SPACE_DIM+1)/2> > data);
 
     /**
      * Add a tensor data field to each element (known as "cell" in VTK).
@@ -159,7 +159,7 @@ public:
      * The length of the data vector is assumed to match the number of elements in the mesh.
      * Checking cannot be done at this stage since the data is associated with an empty VTK mesh structure.
      */
-    void AddTensorCellData(std::string name, std::vector<c_matrix<double,SPACE_DIM,SPACE_DIM> > data);
+    void AddTensorCellData(std::string name, std::vector<c_matrix<double, SPACE_DIM, SPACE_DIM> > data);
 
 
     /**
@@ -187,7 +187,7 @@ public:
      * The length of the data vector is assumed to match the number of nodes in the mesh
      * Checking cannot be done at this stage since the data is associated with an empty VTK mesh structure.
      */
-    void AddTensorPointData(std::string name, std::vector<c_matrix<double,SPACE_DIM,SPACE_DIM> > data);
+    void AddTensorPointData(std::string name, std::vector<c_matrix<double, SPACE_DIM, SPACE_DIM> > data);
 
     /**
      * Should be called to enable files to be written in parallel (i.e. a .pvtu file and .vtu files for each
@@ -195,7 +195,7 @@ public:
      *
      * @param rMesh the mesh (must be a DistributedTetrahedralMesh)
      */
-     void SetParallelFiles(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh);
+     void SetParallelFiles(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh);
 
     /**
      * Write files. Overrides the method implemented in AbstractTetrahedralMeshWriter, which concentrates mesh

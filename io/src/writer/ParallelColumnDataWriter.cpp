@@ -90,7 +90,7 @@ void ParallelColumnDataWriter::PutVector(int variableID, Vec petscVector)
     {
         double *concentrated_vector;
         VecGetArray(mConcentrated, &concentrated_vector);
-        for (int i=0; i<size; ++i)
+        for (int i = 0; i<size; ++i)
         {
             ColumnDataWriter::PutVariable(variableID, concentrated_vector[i], i);
         }

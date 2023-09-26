@@ -80,7 +80,7 @@ public:
 
 protected:
     /** The mesh being solved on */
-    AbstractTetrahedralMesh<DIM,DIM>& mrMesh;
+    AbstractTetrahedralMesh<DIM, DIM>& mrMesh;
 
     /** Density of the body (constant throughout body) */
     double mDensity;
@@ -93,10 +93,10 @@ protected:
     BodyForceType mBodyForceType;
 
     /** The constant body force, only used if mBodyForceType is set appropriately */
-    c_vector<double,DIM> mConstantBodyForce;
+    c_vector<double, DIM> mConstantBodyForce;
 
     /** The body force as a function of space and time, only used if mBodyForceType is set appropriately */
-    c_vector<double,DIM> (*mpBodyForceFunction)(c_vector<double,DIM>& rX, double t);
+    c_vector<double, DIM> (*mpBodyForceFunction)(c_vector<double, DIM>& rX, double t);
 
     //////////////////////////////
     // Tractions
@@ -106,10 +106,10 @@ protected:
     TractionBoundaryConditionType mTractionBoundaryConditionType;
 
     /** The surface elements on which tractions are applied */
-    std::vector<BoundaryElement<DIM-1,DIM>*> mTractionBoundaryElements;
+    std::vector<BoundaryElement<DIM-1, DIM>*> mTractionBoundaryElements;
 
     /** The tractions on each surface element (only used if mTractionBoundaryConditionType is set appropriately) */
-    std::vector<c_vector<double,DIM> > mElementwiseTractions;
+    std::vector<c_vector<double, DIM> > mElementwiseTractions;
 
     /** If the tractions are specified to correspond to a pressure acting on the surface: the pressure for the given
      *  boundary elements (only used if mTractionBoundaryConditionType is set appropriately) */
@@ -121,7 +121,7 @@ protected:
     double mOriginalNormalPressure;
 
     /** The tractions as a function of space and time (only used if mTractionBoundaryConditionType is set appropriately) */
-    c_vector<double,DIM> (*mpTractionBoundaryConditionFunction)(c_vector<double,DIM>& rX, double t);
+    c_vector<double, DIM> (*mpTractionBoundaryConditionFunction)(c_vector<double, DIM>& rX, double t);
 
     /** The normal pressure as a function if time (only used if mTractionBoundaryConditionType is set appropriately) */
     double (*mpNormalPressureFunction)(double t);
@@ -136,7 +136,7 @@ protected:
     std::vector<unsigned> mDirichletNodes;
 
     /** The values at the nodes with Dirichlet boundary conditions (displacement  */
-    std::vector<c_vector<double,DIM> > mDirichletNodeValues;
+    std::vector<c_vector<double, DIM> > mDirichletNodeValues;
 
     /** Whether the solver will be verbose or not. See dox for Set method below */
     bool mVerboseDuringSolve;
@@ -146,7 +146,7 @@ public:
      * Constructor initialises the body force to zero and density to 1.0
      * @param rMesh  is the mesh being solved on
      */
-    explicit ContinuumMechanicsProblemDefinition(AbstractTetrahedralMesh<DIM,DIM>& rMesh);
+    explicit ContinuumMechanicsProblemDefinition(AbstractTetrahedralMesh<DIM, DIM>& rMesh);
 
     /** Destructor */
     virtual ~ContinuumMechanicsProblemDefinition()
@@ -180,20 +180,20 @@ public:
     /**
      * @return the Dirichlet node values.
      */
-    std::vector<c_vector<double,DIM> >& rGetDirichletNodeValues();
+    std::vector<c_vector<double, DIM> >& rGetDirichletNodeValues();
 
 
     /**
      * Set the body force to be used - this version sets a constant body force
      * @param bodyForce the constant body force
      */
-    void SetBodyForce(c_vector<double,DIM> bodyForce);
+    void SetBodyForce(c_vector<double, DIM> bodyForce);
 
     /**
      * Set the body force to be used - this version sets a functional body force
      * @param pFunction a function of space and time returning a vector
      */
-    void SetBodyForce(c_vector<double,DIM> (*pFunction)(c_vector<double,DIM>& rX, double t));
+    void SetBodyForce(c_vector<double, DIM> (*pFunction)(c_vector<double, DIM>& rX, double t));
 
     /**
      * @return the body force at a particular point and time.
@@ -203,7 +203,7 @@ public:
      * @param rX spatial location
      * @param t current time
      */
-    c_vector<double,DIM> GetBodyForce(c_vector<double,DIM>& rX, double t = 0.0);
+    c_vector<double, DIM> GetBodyForce(c_vector<double, DIM>& rX, double t = 0.0);
 
     /**
      * @return the body force type
@@ -213,7 +213,7 @@ public:
     /**
      * @return the constant body force (error if GetBodyForceType()!=CONSTANT_BODY_FORCE)
      */
-    c_vector<double,DIM> GetConstantBodyForce();
+    c_vector<double, DIM> GetConstantBodyForce();
 
     /**
      * @return the body force function (error if GetBodyForceType()!=FUNCTIONAL_BODY_FORCE)
@@ -221,7 +221,7 @@ public:
      * @param rX spatial location
      * @param t current time
      */
-    c_vector<double,DIM> EvaluateBodyForceFunction(c_vector<double,DIM>& rX, double t);
+    c_vector<double, DIM> EvaluateBodyForceFunction(c_vector<double, DIM>& rX, double t);
 
     /**
      * @return the traction (Neumann) boundary condition type
@@ -234,8 +234,8 @@ public:
      * @param rTractionBoundaryElements the boundary elements
      * @param rElementwiseTractions corresponding tractions
      */
-    void SetTractionBoundaryConditions(std::vector<BoundaryElement<DIM-1,DIM>*>& rTractionBoundaryElements,
-                                       std::vector<c_vector<double,DIM> >& rElementwiseTractions);
+    void SetTractionBoundaryConditions(std::vector<BoundaryElement<DIM-1, DIM>*>& rTractionBoundaryElements,
+                                       std::vector<c_vector<double, DIM> >& rElementwiseTractions);
 
     /**
      * Set traction (Neumann) boundary conditions. This version takes in a vector of
@@ -244,8 +244,8 @@ public:
      * @param rTractionBoundaryElements the boundary elements
      * @param pFunction the traction function (a function of space and time, returning a vector)
      */
-    void SetTractionBoundaryConditions(std::vector<BoundaryElement<DIM-1,DIM>*>& rTractionBoundaryElements,
-                                       c_vector<double,DIM> (*pFunction)(c_vector<double,DIM>& rX, double t));
+    void SetTractionBoundaryConditions(std::vector<BoundaryElement<DIM-1, DIM>*>& rTractionBoundaryElements,
+                                       c_vector<double, DIM> (*pFunction)(c_vector<double, DIM>& rX, double t));
 
     /**
      * Set traction (Neumann) boundary conditions. This version says that pressures should be applied
@@ -254,7 +254,7 @@ public:
      * @param rTractionBoundaryElements The boundary elements
      * @param normalPressure the corresponding pressure
      */
-    void SetApplyNormalPressureOnDeformedSurface(std::vector<BoundaryElement<DIM-1,DIM>*>& rTractionBoundaryElements,
+    void SetApplyNormalPressureOnDeformedSurface(std::vector<BoundaryElement<DIM-1, DIM>*>& rTractionBoundaryElements,
                                                  double normalPressure);
 
     /**
@@ -265,20 +265,20 @@ public:
      * @param rTractionBoundaryElements The boundary elements
      * @param pFunction the pressure function (a function of time, returning a double)
      */
-    void SetApplyNormalPressureOnDeformedSurface(std::vector<BoundaryElement<DIM-1,DIM>*>& rTractionBoundaryElements,
+    void SetApplyNormalPressureOnDeformedSurface(std::vector<BoundaryElement<DIM-1, DIM>*>& rTractionBoundaryElements,
                                                  double (*pFunction)(double t));
 
     /**
      * @return the vector of traction boundary elements
      */
-    std::vector<BoundaryElement<DIM-1,DIM>*>& rGetTractionBoundaryElements();
+    std::vector<BoundaryElement<DIM-1, DIM>*>& rGetTractionBoundaryElements();
 
     /**
      *  @return the element-wise tractions vector (corresponding to
      *  vector returned by rGetTractionBoundaryElements())
      *  (error if GetTractionBoundaryConditionType()!=ELEMENTWISE_TRACTION)
      */
-    std::vector<c_vector<double,DIM> >& rGetElementwiseTractions();
+    std::vector<c_vector<double, DIM> >& rGetElementwiseTractions();
 
     /**
      *  @return the pressure for the boundary elements (corresponding to
@@ -308,7 +308,7 @@ public:
      * @param rX spatial location
      * @param t current time
      */
-    c_vector<double,DIM> EvaluateTractionFunction(c_vector<double,DIM>& rX, double t);
+    c_vector<double, DIM> EvaluateTractionFunction(c_vector<double, DIM>& rX, double t);
 
     /**
      * @return the pressure boundary condition function (error if GetTractionBoundaryConditionType()!=FUNCTIONAL_PRESSURE_ON_DEFORMED)

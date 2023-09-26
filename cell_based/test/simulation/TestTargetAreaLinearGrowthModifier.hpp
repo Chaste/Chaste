@@ -126,7 +126,7 @@ public:
 
         // Create mesh
         HoneycombVertexMeshGenerator generator(3, 3);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -153,7 +153,7 @@ public:
         cell_population.InitialiseCells(); // this method must be called explicitly as there is no simulation
 
         // Check UpdateTargetAreaOfCell() method
-        for (VertexMesh<2,2>::VertexElementIterator iter = p_mesh->GetElementIteratorBegin();
+        for (VertexMesh<2, 2>::VertexElementIterator iter = p_mesh->GetElementIteratorBegin();
              iter != p_mesh->GetElementIteratorEnd();
              ++iter)
         {
@@ -253,7 +253,7 @@ public:
 
         // Create a simple 2D MutableVertexMesh with only one cell
         HoneycombVertexMeshGenerator generator(1, 1);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Set up cell
         std::vector<CellPtr> cells;
@@ -337,7 +337,7 @@ public:
         // Separate scope to write the archive
         {
             // Initialise a growth modifier and set a non-standard mature target area
-            AbstractCellBasedSimulationModifier<2,2>* const p_modifier = new TargetAreaLinearGrowthModifier<2>();
+            AbstractCellBasedSimulationModifier<2, 2>* const p_modifier = new TargetAreaLinearGrowthModifier<2>();
             (static_cast<TargetAreaLinearGrowthModifier<2>*>(p_modifier))->SetReferenceTargetArea(14.3);
             (static_cast<TargetAreaLinearGrowthModifier<2>*>(p_modifier))->SetAgeToStartGrowing(0.7);
             (static_cast<TargetAreaLinearGrowthModifier<2>*>(p_modifier))->SetGrowthRate(6.8);
@@ -353,7 +353,7 @@ public:
 
         // Separate scope to read the archive
         {
-            AbstractCellBasedSimulationModifier<2,2>* p_modifier2;
+            AbstractCellBasedSimulationModifier<2, 2>* p_modifier2;
 
             // Restore the modifier
             std::ifstream ifs(archive_filename.c_str());

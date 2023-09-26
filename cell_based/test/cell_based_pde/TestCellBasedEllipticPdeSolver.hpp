@@ -57,15 +57,15 @@ public:
     void Test2dHeatEquationOnUnitSquare()
     {
         // Create mesh from mesh reader
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
-        SimplePoissonEquation<2,2> pde;
+        SimplePoissonEquation<2, 2> pde;
 
         // Boundary conditions
-        BoundaryConditionsContainer<2,2,1> bcc;
+        BoundaryConditionsContainer<2, 2, 1> bcc;
         ConstBoundaryCondition<2>* p_boundary_condition = new ConstBoundaryCondition<2>(0.0);
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(0), p_boundary_condition);
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(1), p_boundary_condition);
@@ -73,7 +73,7 @@ public:
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(3), p_boundary_condition);
 
         // Create PDE solvers
-        SimpleLinearEllipticSolver<2,2> simple_solver(&mesh, &pde, &bcc);
+        SimpleLinearEllipticSolver<2, 2> simple_solver(&mesh, &pde, &bcc);
         CellBasedEllipticPdeSolver<2> pde_solver(&mesh, &pde, &bcc);
 
         Vec simple_result = simple_solver.Solve();

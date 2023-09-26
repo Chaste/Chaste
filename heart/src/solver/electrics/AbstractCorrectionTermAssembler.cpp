@@ -37,10 +37,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <typeinfo>
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AbstractCorrectionTermAssembler(
-        AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-        AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>* pTissue)
-    : AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM,true,false,CARDIAC>(pMesh,pTissue)
+AbstractCorrectionTermAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::AbstractCorrectionTermAssembler(
+        AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+        AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>* pTissue)
+    : AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM,true,false,CARDIAC>(pMesh,pTissue)
 {
     // Work out which elements can do SVI
     mElementsCanDoSvi.resize(pMesh->GetNumElements(), true);
@@ -80,18 +80,18 @@ AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::AbstractCorr
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-void AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ResetInterpolatedQuantities()
+void AbstractCorrectionTermAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::ResetInterpolatedQuantities()
 {
     // reset ionic current, and state variables
     mIionicInterp = 0;
-    for (unsigned i=0; i<mStateVariablesAtQuadPoint.size(); ++i)
+    for (unsigned i = 0; i<mStateVariablesAtQuadPoint.size(); ++i)
     {
         mStateVariablesAtQuadPoint[i] = 0;
     }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-void AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::IncrementInterpolatedQuantities(
+void AbstractCorrectionTermAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::IncrementInterpolatedQuantities(
             double phiI, const Node<SPACE_DIM>* pNode)
 {
     // interpolate ionic current
@@ -99,14 +99,14 @@ void AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Increme
     mIionicInterp  += phiI * this->mpCardiacTissue->rGetIionicCacheReplicated()[ node_global_index ];
     // and state variables
     std::vector<double> state_vars = this->mpCardiacTissue->GetCardiacCellOrHaloCell(node_global_index)->GetStdVecStateVariables();
-    for (unsigned i=0; i<mStateVariablesAtQuadPoint.size(); ++i)
+    for (unsigned i = 0; i<mStateVariablesAtQuadPoint.size(); ++i)
     {
         mStateVariablesAtQuadPoint[i] += phiI * state_vars[i];
     }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-bool AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ElementAssemblyCriterion(Element<ELEMENT_DIM,SPACE_DIM>& rElement)
+bool AbstractCorrectionTermAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::ElementAssemblyCriterion(Element<ELEMENT_DIM, SPACE_DIM>& rElement)
 {
     // Check that SVI is allowed on this element
     if (!mElementsCanDoSvi[rElement.GetIndex()])
@@ -146,11 +146,11 @@ bool AbstractCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::Element
 }
 
 // Explicit instantiation
-template class AbstractCorrectionTermAssembler<1,1,1>;
-template class AbstractCorrectionTermAssembler<1,2,1>;
-template class AbstractCorrectionTermAssembler<1,3,1>;
-template class AbstractCorrectionTermAssembler<2,2,1>;
-template class AbstractCorrectionTermAssembler<3,3,1>;
-template class AbstractCorrectionTermAssembler<1,1,2>;
-template class AbstractCorrectionTermAssembler<2,2,2>;
-template class AbstractCorrectionTermAssembler<3,3,2>;
+template class AbstractCorrectionTermAssembler<1, 1, 1>;
+template class AbstractCorrectionTermAssembler<1, 2, 1>;
+template class AbstractCorrectionTermAssembler<1, 3, 1>;
+template class AbstractCorrectionTermAssembler<2, 2, 1>;
+template class AbstractCorrectionTermAssembler<3, 3, 1>;
+template class AbstractCorrectionTermAssembler<1, 1, 2>;
+template class AbstractCorrectionTermAssembler<2, 2, 2>;
+template class AbstractCorrectionTermAssembler<3, 3, 2>;

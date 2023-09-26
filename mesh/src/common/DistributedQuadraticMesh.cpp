@@ -67,7 +67,7 @@ void DistributedQuadraticMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<D
         EXCEPTION("Cannot convert a (linear) tetrahedral mesh directly to a DistributedQuadraticMesh.  Please convert to QuadraticMesh and save in that format first.");
     }
     this->mMeshIsLinear = false;
-    DistributedTetrahedralMesh<DIM,DIM>::ConstructFromMeshReader(*p_mesh_reader);
+    DistributedTetrahedralMesh<DIM, DIM>::ConstructFromMeshReader(*p_mesh_reader);
     assert(this->GetNumBoundaryElements() > 0u);
     QuadraticMeshHelper<DIM>::AddInternalNodesToElements(this, p_mesh_reader);
     QuadraticMeshHelper<DIM>::AddInternalNodesToBoundaryElements(this, p_mesh_reader);

@@ -51,8 +51,8 @@ public:
     void TestLambertAirwayWallAndFactory()
     {
         // Get a simple mesh here
-        TetrahedralMesh<1,3> mesh;
-        TrianglesMeshReader<1,3> reader("lung/test/data/three_bifurcations");
+        TetrahedralMesh<1, 3> mesh;
+        TrianglesMeshReader<1, 3> reader("lung/test/data/three_bifurcations");
         mesh.ConstructFromMeshReader(reader);
 
         {
@@ -225,8 +225,8 @@ public:
     {
 
          //Get a simple mesh here
-        TetrahedralMesh<1,3> mesh;
-        TrianglesMeshReader<1,3> reader("lung/test/data/three_bifurcations");
+        TetrahedralMesh<1, 3> mesh;
+        TrianglesMeshReader<1, 3> reader("lung/test/data/three_bifurcations");
         mesh.ConstructFromMeshReader(reader);
 
         {
@@ -364,8 +364,8 @@ public:
     void TestHiornsAirwayWallAndFactory()
     {
         // Get a simple mesh here
-        TetrahedralMesh<1,3> mesh;
-        TrianglesMeshReader<1,3> reader("lung/test/data/three_bifurcations");
+        TetrahedralMesh<1, 3> mesh;
+        TrianglesMeshReader<1, 3> reader("lung/test/data/three_bifurcations");
         mesh.ConstructFromMeshReader(reader);
 
         {

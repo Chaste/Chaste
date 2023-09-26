@@ -143,7 +143,7 @@ void Hdf5DataReader::CommonConstructor()
     H5Aread(attribute_id, attribute_type, string_array);
 
     // Loop over column names and store them.
-    for (unsigned index=0; index < num_columns; index++)
+    for (unsigned index = 0; index < num_columns; index++)
     {
         // Read the string from the raw vector
         std::string column_name_unit(&string_array[MAX_STRING_SIZE*index]);
@@ -326,10 +326,10 @@ std::vector<std::vector<double> > Hdf5DataReader::GetVariableOverTimeOverMultipl
 
     std::vector<std::vector<double> > ret(num_nodes_read);
 
-    for (unsigned node_num=0; node_num<num_nodes_read; node_num++)
+    for (unsigned node_num = 0; node_num<num_nodes_read; node_num++)
     {
         ret[node_num].resize(num_timesteps);
-        for (unsigned time_num=0; time_num<num_timesteps; time_num++)
+        for (unsigned time_num = 0; time_num<num_timesteps; time_num++)
         {
             ret[node_num][time_num] = data_read[num_nodes_read*time_num + node_num];
         }

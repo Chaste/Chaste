@@ -135,7 +135,7 @@ public:
      *
      * @return the full boundary conditions container
      */
-    virtual std::shared_ptr<BoundaryConditionsContainer<DIM, DIM,1> > ConstructBoundaryConditionsContainer(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
+    virtual std::shared_ptr<BoundaryConditionsContainer<DIM, DIM, 1> > ConstructBoundaryConditionsContainer(AbstractCellPopulation<DIM, DIM>& rCellPopulation);
 
     /**
      * Overridden OutputSimulationModifierParameters() method.

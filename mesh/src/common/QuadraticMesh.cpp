@@ -77,7 +77,7 @@ void QuadraticMesh<DIM>::ConstructLinearMesh(unsigned numElemX)
 {
     if constexpr (DIM == 1)
     {
-        AbstractTetrahedralMesh<DIM,DIM>::ConstructLinearMesh(numElemX);
+        AbstractTetrahedralMesh<DIM, DIM>::ConstructLinearMesh(numElemX);
         assert (this->mNodes.size() == numElemX+1);
         mNumVertices = numElemX+1;
         c_vector<double, DIM> top;
@@ -115,7 +115,7 @@ void QuadraticMesh<DIM>::ConstructRectangularMesh(unsigned numElemX, unsigned nu
     assert(numElemX > 0);
     assert(numElemY > 0);
 
-    AbstractTetrahedralMesh<DIM,DIM>::ConstructRectangularMesh(numElemX, numElemY, stagger);
+    AbstractTetrahedralMesh<DIM, DIM>::ConstructRectangularMesh(numElemX, numElemY, stagger);
 
     this->mMeshIsLinear=false;
     //Make the internal nodes in y-order.  This is important for the distributed case, since we want the top and bottom
@@ -260,7 +260,7 @@ void QuadraticMesh<DIM>::ConstructCuboid(unsigned numElemX, unsigned numElemY, u
     assert(numElemY > 0);
     assert(numElemZ > 0);
 
-    AbstractTetrahedralMesh<DIM,DIM>::ConstructCuboid(numElemX, numElemY, numElemZ);
+    AbstractTetrahedralMesh<DIM, DIM>::ConstructCuboid(numElemX, numElemY, numElemZ);
     c_vector<double, DIM> top;
     top[0]=numElemX;
     top[1]=numElemY;
@@ -424,7 +424,7 @@ void QuadraticMesh<DIM>::ConstructFromLinearMeshReader(AbstractMeshReader<DIM, D
     if constexpr (DIM != 1)
     {
         // Make a linear mesh
-        TetrahedralMesh<DIM,DIM>::ConstructFromMeshReader(rMeshReader);
+        TetrahedralMesh<DIM, DIM>::ConstructFromMeshReader(rMeshReader);
 
         NodeMap unused_map(this->GetNumNodes());
 
@@ -486,7 +486,7 @@ void QuadraticMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& r
         return;
     }
 
-    TetrahedralMesh<DIM,DIM>::ConstructFromMeshReader(rAbsMeshReader);
+    TetrahedralMesh<DIM, DIM>::ConstructFromMeshReader(rAbsMeshReader);
     assert(this->GetNumBoundaryElements() > 0);
 
     QuadraticMeshHelper<DIM>::AddInternalNodesToElements(this, &rAbsMeshReader);

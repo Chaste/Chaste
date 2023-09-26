@@ -84,12 +84,12 @@ void CellAppliedForceWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(
 }
 
 // Explicit instantiation
-template class CellAppliedForceWriter<1,1>;
-template class CellAppliedForceWriter<1,2>;
-template class CellAppliedForceWriter<2,2>;
-template class CellAppliedForceWriter<1,3>;
-template class CellAppliedForceWriter<2,3>;
-template class CellAppliedForceWriter<3,3>;
+template class CellAppliedForceWriter<1, 1>;
+template class CellAppliedForceWriter<1, 2>;
+template class CellAppliedForceWriter<2, 2>;
+template class CellAppliedForceWriter<1, 3>;
+template class CellAppliedForceWriter<2, 3>;
+template class CellAppliedForceWriter<3, 3>;
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer

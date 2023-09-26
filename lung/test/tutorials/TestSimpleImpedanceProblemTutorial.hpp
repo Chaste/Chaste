@@ -83,15 +83,15 @@ public: // Tests should be public!
          * The mesh will typically have been developed using a combination of computed tomography (CT) image segmentation
          * and algorithmic airway generation.
          */
-        TetrahedralMesh<1,3> mesh;
-        TrianglesMeshReader<1,3> mesh_reader("lung/test/data/TestSubject002");
+        TetrahedralMesh<1, 3> mesh;
+        TrianglesMeshReader<1, 3> mesh_reader("lung/test/data/TestSubject002");
         mesh.ConstructFromMeshReader(mesh_reader);
 
         /* Note that the mesh defined above was developed using a CT scan taken at full inspiration. Impedance is more
          * commonly recorded during tidal breathing. Here we use a simple scaling to bring the airway radii down into the
          * tidal breathing range.
          */
-        for (TetrahedralMesh<1,3>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        for (TetrahedralMesh<1, 3>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
              node_iter != mesh.GetNodeIteratorEnd();
              ++node_iter)
         {

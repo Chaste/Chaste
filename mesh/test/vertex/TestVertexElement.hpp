@@ -55,7 +55,7 @@ public:
         nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
         nodes.push_back(new Node<2>(1, false, 1.0, 1.0));
 
-        VertexElement<1,2> element(0, nodes);
+        VertexElement<1, 2> element(0, nodes);
 
         // Test RegisterWithNodes()
         element.RegisterWithNodes();
@@ -75,7 +75,7 @@ public:
 
         // Test Face methods
         TS_ASSERT_EQUALS(element.GetNumFaces(), 0u);
-        VertexElement<0,2>* p_face = element.GetFace(0);
+        VertexElement<0, 2>* p_face = element.GetFace(0);
         TS_ASSERT(!p_face);
         TS_ASSERT_EQUALS(element.FaceIsOrientatedClockwise(0), false);
 
@@ -175,13 +175,13 @@ public:
         nodes_face_5.push_back(nodes[3]);
         nodes_face_5.push_back(nodes[5]);
 
-        std::vector<VertexElement<2,3>*> faces;
-        faces.push_back(new VertexElement<2,3>(0, nodes_face_0));
-        faces.push_back(new VertexElement<2,3>(1, nodes_face_1));
-        faces.push_back(new VertexElement<2,3>(2, nodes_face_2));
-        faces.push_back(new VertexElement<2,3>(3, nodes_face_3));
-        faces.push_back(new VertexElement<2,3>(4, nodes_face_4));
-        faces.push_back(new VertexElement<2,3>(5, nodes_face_5));
+        std::vector<VertexElement<2, 3>*> faces;
+        faces.push_back(new VertexElement<2, 3>(0, nodes_face_0));
+        faces.push_back(new VertexElement<2, 3>(1, nodes_face_1));
+        faces.push_back(new VertexElement<2, 3>(2, nodes_face_2));
+        faces.push_back(new VertexElement<2, 3>(3, nodes_face_3));
+        faces.push_back(new VertexElement<2, 3>(4, nodes_face_4));
+        faces.push_back(new VertexElement<2, 3>(5, nodes_face_5));
 
         std::vector<bool> orientations(faces.size());
         for (unsigned i = 0; i<faces.size(); ++i)
@@ -190,7 +190,7 @@ public:
         }
 
         // Make a cube element out of these faces
-        VertexElement<3,3> element(0, faces, orientations);
+        VertexElement<3, 3> element(0, faces, orientations);
 
         TS_ASSERT_EQUALS(element.GetNumNodes(), 8u);
         TS_ASSERT_EQUALS(element.GetNumFaces(), 6u);
@@ -227,7 +227,7 @@ public:
     {
         // Create a regular hexagon
         std::vector<Node<2>*> nodes;
-        std::vector<VertexElement<1,2>*> faces;
+        std::vector<VertexElement<1, 2>*> faces;
         std::vector<Node<2>*> face_nodes;
         std::vector<bool> orientations;
         unsigned num_nodes = 6;
@@ -243,7 +243,7 @@ public:
             face_nodes.push_back(nodes[i]);
             face_nodes.push_back(nodes[i+1]);
 
-            faces.push_back(new VertexElement<1,2>(i, face_nodes));
+            faces.push_back(new VertexElement<1, 2>(i, face_nodes));
             orientations.push_back(true);
         }
 
@@ -251,11 +251,11 @@ public:
         face_nodes.clear();
         face_nodes.push_back(nodes[0]);
         face_nodes.push_back(nodes[num_nodes-1]);
-        faces.push_back(new VertexElement<1,2>(num_nodes-1, face_nodes));
+        faces.push_back(new VertexElement<1, 2>(num_nodes-1, face_nodes));
         orientations.push_back(false);
 
         // Create element
-        VertexElement<2,2> vertex_element(0, faces, orientations);
+        VertexElement<2, 2> vertex_element(0, faces, orientations);
 
         TS_ASSERT_EQUALS(vertex_element.GetNumNodes(), 6u);
         TS_ASSERT_EQUALS(vertex_element.GetNumFaces(), 6u);
@@ -280,7 +280,7 @@ public:
     void TestAltenativeConstructor()
     {
         // Create element
-        VertexElement<2,2> vertex_element(5);
+        VertexElement<2, 2> vertex_element(5);
 
         // Test member variables
         TS_ASSERT_EQUALS(vertex_element.GetIndex(), 5u);
@@ -300,7 +300,7 @@ public:
         }
 
         // Create element
-        VertexElement<2,2> vertex_element(0, nodes);
+        VertexElement<2, 2> vertex_element(0, nodes);
 
         TS_ASSERT_EQUALS(vertex_element.GetNumNodes(), 6u);
 
@@ -364,7 +364,7 @@ public:
         nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
 
         // Create element
-        VertexElement<2,2> vertex_element(0, nodes);
+        VertexElement<2, 2> vertex_element(0, nodes);
         vertex_element.RegisterWithNodes();
 
         for (unsigned i = 0; i<nodes.size(); ++i)
@@ -396,7 +396,7 @@ public:
         nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
 
         // Create element
-        VertexElement<2,2> vertex_element(0, nodes);
+        VertexElement<2, 2> vertex_element(0, nodes);
         vertex_element.RegisterWithNodes();
 
         TS_ASSERT_DELTA(vertex_element.GetNode(2)->rGetLocation()[0], 1.0, 1e-12);
@@ -429,36 +429,36 @@ public:
         nodes.push_back(new Node<3>(5, true, 2.0, 0.0, 3.0));
 
         // Create faces
-        std::vector<VertexElement<2,3>*> faces;
+        std::vector<VertexElement<2, 3>*> faces;
 
         std::vector<Node<3>*> nodes_face_0;
         nodes_face_0.push_back(nodes[0]);
         nodes_face_0.push_back(nodes[1]);
         nodes_face_0.push_back(nodes[2]);
         nodes_face_0.push_back(nodes[3]);
-        faces.push_back(new VertexElement<2,3>(0, nodes_face_0));
+        faces.push_back(new VertexElement<2, 3>(0, nodes_face_0));
 
         std::vector<Node<3>*> nodes_face_1;
         nodes_face_1.push_back(nodes[0]);
         nodes_face_1.push_back(nodes[3]);
         nodes_face_1.push_back(nodes[4]);
-        faces.push_back(new VertexElement<2,3>(1, nodes_face_1));
+        faces.push_back(new VertexElement<2, 3>(1, nodes_face_1));
 
         std::vector<Node<3>*> nodes_face_2;
         nodes_face_2.push_back(nodes[1]);
         nodes_face_2.push_back(nodes[2]);
         nodes_face_2.push_back(nodes[5]);
-        faces.push_back(new VertexElement<2,3>(2, nodes_face_2));
+        faces.push_back(new VertexElement<2, 3>(2, nodes_face_2));
 
         std::vector<Node<3>*> nodes_face_3;
         nodes_face_3.push_back(nodes[4]);
         nodes_face_3.push_back(nodes[5]);
         nodes_face_3.push_back(nodes[2]);
         nodes_face_3.push_back(nodes[3]);
-        faces.push_back(new VertexElement<2,3>(3, nodes_face_3));
+        faces.push_back(new VertexElement<2, 3>(3, nodes_face_3));
 
         // Create element
-        VertexElement<3,3> element(0);
+        VertexElement<3, 3> element(0);
         TS_ASSERT_EQUALS(element.GetNumNodes(), 0u);
         TS_ASSERT_EQUALS(element.GetNumFaces(), 0u);
 
@@ -505,7 +505,7 @@ public:
         nodes.push_back(new Node<2>(0, false, 0.0, 1.0));
 
         // Create element
-        VertexElement<2,2> vertex_element(INDEX_IS_NOT_USED, nodes);
+        VertexElement<2, 2> vertex_element(INDEX_IS_NOT_USED, nodes);
 
         TS_ASSERT_EQUALS(vertex_element.GetNodeLocalIndex(0), 3u);
         TS_ASSERT_EQUALS(vertex_element.GetNodeLocalIndex(1), 2u);
@@ -533,7 +533,7 @@ public:
         nodes.push_back(new Node<2>(1, false, 1.0, 1.0));
         nodes.push_back(new Node<2>(0, false, 0.0, 1.0));
 
-        VertexElement<2,2> square_vertex_element(INDEX_IS_NOT_USED, nodes);
+        VertexElement<2, 2> square_vertex_element(INDEX_IS_NOT_USED, nodes);
 
         TS_ASSERT_EQUALS(square_vertex_element.IsElementOnBoundary(), false);
 
@@ -553,7 +553,7 @@ public:
         nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
         nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
 
-        VertexElement<1,2> line_vertex_element(INDEX_IS_NOT_USED, nodes);
+        VertexElement<1, 2> line_vertex_element(INDEX_IS_NOT_USED, nodes);
 
         TS_ASSERT_EQUALS(line_vertex_element.IsElementOnBoundary(), false);
 

@@ -80,7 +80,7 @@ bool ClassesAreSame()
  * It is templated over types of cell-cycle model.
  */
 template<class CELL_CYCLE_MODEL>
-class CryptCellsGenerator : public CellsGenerator<CELL_CYCLE_MODEL,2>
+class CryptCellsGenerator : public CellsGenerator<CELL_CYCLE_MODEL, 2>
 {
 public:
 
@@ -102,7 +102,7 @@ public:
      *   cell is created
      */
     void Generate(std::vector<CellPtr>& rCells,
-                  AbstractMesh<2,2>* pMesh,
+                  AbstractMesh<2, 2>* pMesh,
                   const std::vector<unsigned> locationIndices,
                   bool randomBirthTimes,
                   double y0 = 0.3,
@@ -115,7 +115,7 @@ public:
 template<class CELL_CYCLE_MODEL>
 void CryptCellsGenerator<CELL_CYCLE_MODEL>::Generate(
                                       std::vector<CellPtr>& rCells,
-                                      AbstractMesh<2,2>* pMesh,
+                                      AbstractMesh<2, 2>* pMesh,
                                       const std::vector<unsigned> locationIndices,
                                       bool randomBirthTimes,
                                       double y0,
@@ -129,7 +129,7 @@ void CryptCellsGenerator<CELL_CYCLE_MODEL>::Generate(
     RandomNumberGenerator* p_random_num_gen = RandomNumberGenerator::Instance();
 
     unsigned mesh_size;
-    if (dynamic_cast<TetrahedralMesh<2,2>*>(pMesh))
+    if (dynamic_cast<TetrahedralMesh<2, 2>*>(pMesh))
     {
         mesh_size = pMesh->GetNumNodes();
         unsigned num_cells = locationIndices.empty() ? pMesh->GetNumNodes() : locationIndices.size();
@@ -143,8 +143,8 @@ void CryptCellsGenerator<CELL_CYCLE_MODEL>::Generate(
     else
     {
         // Note the double brackets, to stop the macro thinking is has two arguments.
-        assert((dynamic_cast<VertexMesh<2,2>*>(pMesh)));
-        mesh_size = static_cast<VertexMesh<2,2>*>(pMesh)->GetNumElements();
+        assert((dynamic_cast<VertexMesh<2, 2>*>(pMesh)));
+        mesh_size = static_cast<VertexMesh<2, 2>*>(pMesh)->GetNumElements();
         rCells.reserve(mesh_size);
     }
 
@@ -155,7 +155,7 @@ void CryptCellsGenerator<CELL_CYCLE_MODEL>::Generate(
     {
         // Find the location of this cell
         double y = 0.0;
-        if (dynamic_cast<TetrahedralMesh<2,2>*>(pMesh))
+        if (dynamic_cast<TetrahedralMesh<2, 2>*>(pMesh))
         {
             if (locationIndices.empty())
             {
@@ -174,8 +174,8 @@ void CryptCellsGenerator<CELL_CYCLE_MODEL>::Generate(
         else
         {
             // Note the double brackets, to stop the macro thinking is has two arguments.
-            assert((dynamic_cast<VertexMesh<2,2>*>(pMesh)));
-            y = static_cast<VertexMesh<2,2>*>(pMesh)->GetCentroidOfElement(i)[1];
+            assert((dynamic_cast<VertexMesh<2, 2>*>(pMesh)));
+            y = static_cast<VertexMesh<2, 2>*>(pMesh)->GetCentroidOfElement(i)[1];
         }
 
         // Create a cell-cycle model and set the spatial dimension

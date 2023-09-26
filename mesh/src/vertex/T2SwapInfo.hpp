@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Records information about a T2 swap.
  */
-template <unsigned int SPACE_DIM>
+template<unsigned int SPACE_DIM>
 struct T2SwapInfo
 {
     /** Needed for serialization. */
@@ -57,7 +57,7 @@ struct T2SwapInfo
      * @param archive the archive
      * @param version the current version of this class
      */
-    template <class Archive>
+    template<class Archive>
     void serialize(Archive& archive, const unsigned int version)
     {
         archive & mCellId;

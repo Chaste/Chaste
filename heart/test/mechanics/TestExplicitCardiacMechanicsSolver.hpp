@@ -48,9 +48,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ReplicatableVector.hpp"
 
 // some useful typedefs
-typedef ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2> IncompressibleExplicitSolver2d;
-typedef ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<3>,3> IncompressibleExplicitSolver3d;
-typedef ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2> IncompressibleImplicitSolver2d;
+typedef ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>, 2> IncompressibleExplicitSolver2d;
+typedef ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<3>, 3> IncompressibleExplicitSolver3d;
+typedef ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>, 2> IncompressibleImplicitSolver2d;
 
 class TestExplicitCardiacMechanicsSolver : public CxxTest::TestSuite
 {
@@ -73,9 +73,9 @@ public:
         IncompressibleExplicitSolver2d solver(mesh,problem_defn,"TestExplicitCardiacMech");
 
         //The following lines are not relevant to this test but need to be there
-        TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        TetrahedralMesh<2, 2>* p_fine_mesh = new TetrahedralMesh<2, 2>();//unused in this test
         p_fine_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
-        TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        TetrahedralMesh<2, 2>* p_coarse_mesh = new TetrahedralMesh<2, 2>();//unused in this test
         p_coarse_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
         FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
         p_pair->SetUpBoxesOnFineMesh();
@@ -125,9 +125,9 @@ public:
         problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
         //The following lines are not relevant to this test but need to be there
-        TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        TetrahedralMesh<2, 2>* p_fine_mesh = new TetrahedralMesh<2, 2>();//unused in this test
         p_fine_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
-        TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        TetrahedralMesh<2, 2>* p_coarse_mesh = new TetrahedralMesh<2, 2>();//unused in this test
         p_coarse_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
         FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
         p_pair->SetUpBoxesOnFineMesh();
@@ -145,14 +145,14 @@ public:
         impl_solver.Initialise();
 
         double dt = 0.25;
-        for (double t=0; t<3; t+=dt)
+        for (double t = 0; t<3; t+=dt)
         {
             expl_solver.Solve(t,t+dt,dt);
             impl_solver.Solve(t,t+dt,dt);
 
             // computations should be identical
             TS_ASSERT_EQUALS(expl_solver.GetNumNewtonIterations(), impl_solver.GetNumNewtonIterations());
-            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+            for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
             {
                 TS_ASSERT_DELTA(expl_solver.rGetDeformedPosition()[i](0),  impl_solver.rGetDeformedPosition()[i](0), 1e-9);
                 TS_ASSERT_DELTA(expl_solver.rGetDeformedPosition()[i](1),  impl_solver.rGetDeformedPosition()[i](1), 1e-9);
@@ -182,9 +182,9 @@ public:
         problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
         //The following lines are not relevant to this test but need to be there
-        TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        TetrahedralMesh<2, 2>* p_fine_mesh = new TetrahedralMesh<2, 2>();//unused in this test
         p_fine_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
-        TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        TetrahedralMesh<2, 2>* p_coarse_mesh = new TetrahedralMesh<2, 2>();//unused in this test
         p_coarse_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
         FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
         p_pair->SetUpBoxesOnFineMesh();
@@ -225,7 +225,7 @@ public:
             impl_solver.WriteCurrentSpatialSolution("solution","nodes",counter);
 
             // the solutions turn out to be very close to each other
-            for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+            for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
             {
                 TS_ASSERT_DELTA(expl_solver.rGetDeformedPosition()[i](0),  impl_solver.rGetDeformedPosition()[i](0), 2e-3);
                 TS_ASSERT_DELTA(expl_solver.rGetDeformedPosition()[i](1),  impl_solver.rGetDeformedPosition()[i](1), 2e-3);
@@ -272,14 +272,14 @@ public:
         TS_ASSERT_THROWS_THIS(problem_defn.SetApplyAnisotropicCrossFibreTension(true,1.0,1.0),
                               "You can only apply anisotropic cross fibre tensions in a 3D simulation.");
 
-        TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();
+        TetrahedralMesh<2, 2>* p_fine_mesh = new TetrahedralMesh<2, 2>();
         p_fine_mesh->ConstructRegularSlabMesh(1.0, 1.0, 1.0);
-        TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();
+        TetrahedralMesh<2, 2>* p_coarse_mesh = new TetrahedralMesh<2, 2>();
         p_coarse_mesh->ConstructRegularSlabMesh(1.0, 1.0, 1.0);
         FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);
         p_pair->SetUpBoxesOnFineMesh();
 
-        TetrahedralMesh<2,2>* p_coarse_mesh_big = new TetrahedralMesh<2,2>();
+        TetrahedralMesh<2, 2>* p_coarse_mesh_big = new TetrahedralMesh<2, 2>();
         p_coarse_mesh_big->ConstructRegularSlabMesh(1.0, 3.0, 3.0);
         FineCoarseMeshPair<2>* p_pair_wrong = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh_big);
 
@@ -366,7 +366,7 @@ public:
         y[2] = -0.0077;
         y[3] = 0.0;
 
-        for (unsigned i=0; i < tension_fractions.size();++i)
+        for (unsigned i = 0; i < tension_fractions.size();++i)
         {
             problem_defn.SetApplyIsotropicCrossFibreTension(true,tension_fractions[i]);
 
@@ -379,7 +379,7 @@ public:
 
             // The following lines are not relevant to this test but need to be there
             // as the solver is expecting an electrics node to be paired up with each mechanics node.
-            TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//electrics ignored in this test
+            TetrahedralMesh<2, 2>* p_fine_mesh = new TetrahedralMesh<2, 2>();//electrics ignored in this test
             p_fine_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
             FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, mesh);
             p_pair->SetUpBoxesOnFineMesh();
@@ -463,7 +463,7 @@ public:
 
         // The following lines are not relevant to this test but need to be there
         // as the solver is expecting an electrics node to be paired up with each mechanics node.
-        TetrahedralMesh<3,3>* p_fine_mesh = new TetrahedralMesh<3,3>();//electrics ignored in this test
+        TetrahedralMesh<3, 3>* p_fine_mesh = new TetrahedralMesh<3, 3>();//electrics ignored in this test
         p_fine_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0, 1.0);
         FineCoarseMeshPair<3>* p_pair = new FineCoarseMeshPair<3>(*p_fine_mesh, mesh);
         p_pair->SetUpBoxesOnFineMesh();
@@ -493,7 +493,7 @@ public:
         nodes.push_back(104);
         nodes.push_back(124);
 
-        for (unsigned node=0; node<4; node++)
+        for (unsigned node = 0; node<4; node++)
         {
             std::cout << "Node: " << nodes[node] << "\n";
             TS_ASSERT_DELTA(solver.rGetDeformedPosition()[nodes[node]](0), x[node], 1e-4);
@@ -554,7 +554,7 @@ public:
 
         // The following lines are not relevant to this test but need to be there
         // as the solver is expecting an electrics node to be paired up with each mechanics node.
-        TetrahedralMesh<3,3>* p_fine_mesh = new TetrahedralMesh<3,3>();//electrics ignored in this test
+        TetrahedralMesh<3, 3>* p_fine_mesh = new TetrahedralMesh<3, 3>();//electrics ignored in this test
         p_fine_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0, 1.0);
         FineCoarseMeshPair<3>* p_pair = new FineCoarseMeshPair<3>(*p_fine_mesh, mesh);
         p_pair->SetUpBoxesOnFineMesh();
@@ -584,7 +584,7 @@ public:
         nodes.push_back(104);
         nodes.push_back(124);
 
-        for (unsigned node=0; node<4; node++)
+        for (unsigned node = 0; node<4; node++)
         {
             std::cout << "Node: " << nodes[node] << "\n";
             TS_ASSERT_DELTA(solver.rGetDeformedPosition()[nodes[node]](0), x[node], 1e-3);

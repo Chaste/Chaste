@@ -70,15 +70,13 @@ void Warnings::PrintWarnings()
 {
     if (mpInstance)
     {
-        for (auto it = mpInstance->mWarningMessages.begin();
-             it != mpInstance->mWarningMessages.end();
-             ++it)
+        for (auto& it : mpInstance->mWarningMessages)
         {
             /*
              * Look at my warnings please. First in pair is the context. Second 
              * in pair is that actual warning.
              */
-            std::cout << it->first << it->second << std::endl;
+            std::cout << it.first << it.second << std::endl;
         }
     }
 }

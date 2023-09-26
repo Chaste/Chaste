@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TRAPEZOIDEDGEVERTEXMESHWRITER_HPP_
 
 // Forward declaration prevents circular include chain
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VertexMesh;
 
 #ifdef CHASTE_VTK
@@ -60,10 +60,10 @@ class VertexMesh;
 #include "VertexMesh.hpp"
 
 // Forward declaration prevents circular include chain
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VertexMesh;
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 struct MeshWriterIterators;
 
 /**
@@ -79,7 +79,7 @@ struct MeshWriterIterators;
  *  \      /       \      /
  *   \ __ /         \ __ /
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class TrapezoidEdgeVertexMeshWriter : public AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>
 {
 private:

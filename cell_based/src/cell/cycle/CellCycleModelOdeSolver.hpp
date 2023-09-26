@@ -54,7 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * This class contains all the machinery to make it a singleton, hence providing
  * exactly one instance per pair of values of the template parameters.
  */
-template <class CELL_CYCLE_MODEL, class ODE_SOLVER>
+template<class CELL_CYCLE_MODEL, class ODE_SOLVER>
 class CellCycleModelOdeSolver : public AbstractCellCycleModelOdeSolver, private boost::noncopyable
 {
 private:

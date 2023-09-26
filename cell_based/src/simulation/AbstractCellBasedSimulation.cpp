@@ -748,9 +748,9 @@ void AbstractCellBasedSimulation<ELEMENT_DIM, SPACE_DIM>::OutputSimulationParame
 }
 
 // Explicit instantiation
-template class AbstractCellBasedSimulation<1,1>;
-template class AbstractCellBasedSimulation<1,2>;
-template class AbstractCellBasedSimulation<2,2>;
-template class AbstractCellBasedSimulation<1,3>;
-template class AbstractCellBasedSimulation<2,3>;
-template class AbstractCellBasedSimulation<3,3>;
+template class AbstractCellBasedSimulation<1, 1>;
+template class AbstractCellBasedSimulation<1, 2>;
+template class AbstractCellBasedSimulation<2, 2>;
+template class AbstractCellBasedSimulation<1, 3>;
+template class AbstractCellBasedSimulation<2, 3>;
+template class AbstractCellBasedSimulation<3, 3>;

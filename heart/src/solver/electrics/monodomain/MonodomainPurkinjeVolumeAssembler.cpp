@@ -42,16 +42,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PdeSimulationTime.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_matrix<double,2*(ELEMENT_DIM+1),2*(ELEMENT_DIM+1)> MonodomainPurkinjeVolumeAssembler<ELEMENT_DIM,SPACE_DIM>::ComputeMatrixTerm(
+c_matrix<double,2*(ELEMENT_DIM+1),2*(ELEMENT_DIM+1)> MonodomainPurkinjeVolumeAssembler<ELEMENT_DIM, SPACE_DIM>::ComputeMatrixTerm(
                 c_vector<double, ELEMENT_DIM+1> &rPhi,
                 c_matrix<double, SPACE_DIM, ELEMENT_DIM+1> &rGradPhi,
                 ChastePoint<SPACE_DIM> &rX,
-                c_vector<double,2> &rU,
+                c_vector<double, 2> &rU,
                 c_matrix<double, 2, SPACE_DIM> &rGradU /* not used */,
-                Element<ELEMENT_DIM,SPACE_DIM>* pElement)
+                Element<ELEMENT_DIM, SPACE_DIM>* pElement)
 {
-    c_vector<double,1> empty_u; /* should pass in rU(1) here, but it won't be used */
-    c_matrix<double,1,SPACE_DIM> empty_grad_u; /* ditto above */
+    c_vector<double, 1> empty_u; /* should pass in rU(1) here, but it won't be used */
+    c_matrix<double,1, SPACE_DIM> empty_grad_u; /* ditto above */
 
     c_matrix<double,ELEMENT_DIM+1,ELEMENT_DIM+1> normal_monodomain_mat
         = mMonodomainAssembler.ComputeMatrixTerm(rPhi,rGradPhi,rX,empty_u,empty_grad_u,pElement);
@@ -69,10 +69,10 @@ c_matrix<double,2*(ELEMENT_DIM+1),2*(ELEMENT_DIM+1)> MonodomainPurkinjeVolumeAss
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-MonodomainPurkinjeVolumeAssembler<ELEMENT_DIM,SPACE_DIM>::MonodomainPurkinjeVolumeAssembler(
-                        AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                        MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* pTissue)
-    : AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,2,false,true,CARDIAC>(pMesh,pTissue),
+MonodomainPurkinjeVolumeAssembler<ELEMENT_DIM, SPACE_DIM>::MonodomainPurkinjeVolumeAssembler(
+                        AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+                        MonodomainTissue<ELEMENT_DIM, SPACE_DIM>* pTissue)
+    : AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM,2,false,true,CARDIAC>(pMesh,pTissue),
       mMonodomainAssembler(pMesh,pTissue)
 {
 }
@@ -83,7 +83,7 @@ MonodomainPurkinjeVolumeAssembler<ELEMENT_DIM,SPACE_DIM>::MonodomainPurkinjeVolu
 // explicit instantiation
 ///////////////////////////////////////////////////////
 
-template class MonodomainPurkinjeVolumeAssembler<2,2>;
-template class MonodomainPurkinjeVolumeAssembler<3,3>;
+template class MonodomainPurkinjeVolumeAssembler<2, 2>;
+template class MonodomainPurkinjeVolumeAssembler<3, 3>;
 
 #endif /*MONODOMAINPURKINJEVOLUMEASSEMBLER_CPP_*/

@@ -54,8 +54,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MonodomainProblem.hpp"
 #include "MonodomainPurkinjeProblem.hpp"
 
-typedef MonodomainPurkinjeSolver<2,2> MonodomainPurkinjeSolver2d;
-typedef MonodomainPurkinjeCableAssembler<2,2> MonodomainPurkinjeCableAssembler2d;
+typedef MonodomainPurkinjeSolver<2, 2> MonodomainPurkinjeSolver2d;
+typedef MonodomainPurkinjeCableAssembler<2, 2> MonodomainPurkinjeCableAssembler2d;
 
 class NonPurkinjeCellFactory : public AbstractCardiacCellFactory<2>
 {
@@ -144,7 +144,7 @@ public:
         PdeSimulationTime::SetTime(0.0);
         PdeSimulationTime::SetPdeTimeStepAndNextTime(0.01, 0.01);
 
-        DistributedTetrahedralMesh<2,2> mesh;
+        DistributedTetrahedralMesh<2, 2> mesh;
         mesh.ConstructRegularSlabMesh(0.05, 0.1, 0.1);
         unsigned connectivity = mesh.CalculateMaximumNodeConnectivityPerProcess();
         if (PetscTools::IsSequential())
@@ -164,11 +164,11 @@ public:
         Mat normal_mat;
         PetscTools::SetupMat(normal_mat, mesh.GetNumNodes(), mesh.GetNumNodes(), connectivity, num_local_nodes, num_local_nodes);
 
-        MonodomainPurkinjeVolumeAssembler<2,2> purkinje_vol_assembler(&mesh, &tissue);
+        MonodomainPurkinjeVolumeAssembler<2, 2> purkinje_vol_assembler(&mesh, &tissue);
         purkinje_vol_assembler.SetMatrixToAssemble(purkinje_mat, true);
         purkinje_vol_assembler.Assemble();
 
-        MonodomainAssembler<2,2> normal_vol_assembler(&mesh, &tissue);
+        MonodomainAssembler<2, 2> normal_vol_assembler(&mesh, &tissue);
         normal_vol_assembler.SetMatrixToAssemble(normal_mat, true);
         normal_vol_assembler.Assemble();
 
@@ -182,7 +182,7 @@ public:
         TS_ASSERT_EQUALS(static_cast<unsigned>(lo), 2*mesh.GetDistributedVectorFactory()->GetLow());
         TS_ASSERT_EQUALS(static_cast<unsigned>(hi), 2*mesh.GetDistributedVectorFactory()->GetHigh());
 
-        for (AbstractTetrahedralMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        for (AbstractTetrahedralMesh<2, 2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
                 node_iter != mesh.GetNodeIteratorEnd(); ++node_iter)
         {
             unsigned i = node_iter->GetIndex();
@@ -214,17 +214,17 @@ public:
         PdeSimulationTime::SetPdeTimeStepAndNextTime(0.01, 0.01);
 
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
-        TrianglesMeshReader<2,2> reader(mesh_base);
+        TrianglesMeshReader<2, 2> reader(mesh_base);
 
         // There are named indices in the test, so we need predictable numbering...
-        MixedDimensionMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        MixedDimensionMesh<2, 2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         mesh.ConstructFromMeshReader(reader);
 
         Mat purkinje_mat;
         unsigned num_local_nodes = mesh.GetDistributedVectorFactory()->GetLocalOwnership();
         PetscTools::SetupMat(purkinje_mat, 2*mesh.GetNumNodes(), 2*mesh.GetNumNodes(), 9, 2*num_local_nodes, 2*num_local_nodes);
 
-        MonodomainPurkinjeCableAssembler<2,2> purkinje_cable_assembler(&mesh);
+        MonodomainPurkinjeCableAssembler<2, 2> purkinje_cable_assembler(&mesh);
 
         purkinje_cable_assembler.SetMatrixToAssemble(purkinje_mat, true);
         purkinje_cable_assembler.Assemble();
@@ -232,12 +232,12 @@ public:
 
         PetscInt lo, hi;
         PetscMatTools::GetOwnershipRange(purkinje_mat, lo, hi);
-        for (AbstractTetrahedralMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        for (AbstractTetrahedralMesh<2, 2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
              node_iter != mesh.GetNodeIteratorEnd(); ++node_iter)
         {
             unsigned i = node_iter->GetIndex();
             assert(lo <= static_cast<int>(2*i) && static_cast<int>(2*i) < hi);
-            for (unsigned j=0; j<mesh.GetNumNodes(); ++j)
+            for (unsigned j = 0; j<mesh.GetNumNodes(); ++j)
             {
                 TS_ASSERT_DELTA( PetscMatTools::GetElement(purkinje_mat,2*i,2*j), 0 , 1e-8);
                 TS_ASSERT_DELTA( PetscMatTools::GetElement(purkinje_mat,2*i,2*j+1), 0.0, 1e-8);
@@ -273,7 +273,7 @@ public:
         PetscTools::Destroy(purkinje_mat);
 
         // coverage
-        MixedDimensionMesh<2,2>::CableElementIterator iter = mesh.GetCableElementIteratorBegin();
+        MixedDimensionMesh<2, 2>::CableElementIterator iter = mesh.GetCableElementIteratorBegin();
         if (iter != mesh.GetCableElementIteratorEnd())
         {
             (*iter)->SetAttribute(0.0);
@@ -295,8 +295,8 @@ public:
         HeartConfig::Instance()->SetPurkinjeSurfaceAreaToVolumeRatio(HeartConfig::Instance()->GetSurfaceAreaToVolumeRatio());
 
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
-        TrianglesMeshReader<2,2> reader(mesh_base);
-        MixedDimensionMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        TrianglesMeshReader<2, 2> reader(mesh_base);
+        MixedDimensionMesh<2, 2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         mesh.ConstructFromMeshReader(reader);
 
         //The mixed dimension mesh specifies fibre radii, we override these for the purposes of the
@@ -310,8 +310,8 @@ public:
 
 
         std::string mesh_base2("mesh/test/data/2D_0_to_1mm_200_elements");
-        TrianglesMeshReader<2,2> reader2(mesh_base2);
-        TetrahedralMesh<2,2> mesh_just_monodomain;
+        TrianglesMeshReader<2, 2> reader2(mesh_base2);
+        TetrahedralMesh<2, 2> mesh_just_monodomain;
         mesh_just_monodomain.ConstructFromMeshReader(reader2);
 
         PurkinjeCellFactory cell_factory;
@@ -324,12 +324,12 @@ public:
         MonodomainTissue<2> tissue_for_just_monodomain( &cell_factory_for_just_monodomain );
 
         // Create an empty BCC - zero Neumann BCs will be applied everywhere
-        BoundaryConditionsContainer<2,2,2> bcc;
-        BoundaryConditionsContainer<2,2,1> bcc_for_just_monodomain;
+        BoundaryConditionsContainer<2, 2, 2> bcc;
+        BoundaryConditionsContainer<2, 2, 1> bcc_for_just_monodomain;
 
-        MonodomainPurkinjeSolver<2,2> solver(&mesh, &tissue, &bcc);
+        MonodomainPurkinjeSolver<2, 2> solver(&mesh, &tissue, &bcc);
 
-        MonodomainSolver<2,2> solver_just_monodomain(&mesh_just_monodomain, &tissue_for_just_monodomain, &bcc_for_just_monodomain);
+        MonodomainSolver<2, 2> solver_just_monodomain(&mesh_just_monodomain, &tissue_for_just_monodomain, &bcc_for_just_monodomain);
 
 
         //Create an initial condition

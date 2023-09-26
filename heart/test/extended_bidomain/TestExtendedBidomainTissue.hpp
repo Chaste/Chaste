@@ -148,32 +148,32 @@ public:
     }
 };
 
-class SimpleConductivityModifier : public AbstractConductivityModifier<2,2>
+class SimpleConductivityModifier : public AbstractConductivityModifier<2, 2>
 {
 private:
-    c_matrix<double,2,2> mTensor;
+    c_matrix<double,2, 2> mTensor;
 
 public:
     SimpleConductivityModifier()
-        : AbstractConductivityModifier<2,2>(),
+        : AbstractConductivityModifier<2, 2>(),
           mTensor(zero_matrix<double>(2,2))
           // Conductivity tensors are diagonal, so we can only need to do the diagonal if we initialise our tensor with the above line
     {
     }
 
-    c_matrix<double,2,2>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,2,2>& rOriginalConductivity, unsigned domainIndex)
+    c_matrix<double,2, 2>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,2, 2>& rOriginalConductivity, unsigned domainIndex)
     {
         // Increase by factor of two for element 1
         if (elementIndex == 1)
         {
-            for ( unsigned dim=0; dim<2; dim++)
+            for ( unsigned dim = 0; dim<2; dim++)
             {
                 mTensor(dim,dim) = 2.0*rOriginalConductivity(dim,dim);
             }
         }
         else
         {
-            for ( unsigned dim=0; dim<2; dim++)
+            for ( unsigned dim = 0; dim<2; dim++)
             {
                 mTensor(dim,dim) = rOriginalConductivity(dim,dim);
             }
@@ -187,7 +187,7 @@ public:
 
     void TestExtendedBidomainTissueSolveCellSystems( void )
     {
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructCuboid(2,2,2);
 
         StimulatedCellFactory stimulated_cell_factory;
@@ -251,13 +251,13 @@ public:
     void TestExtendedTissueHeterogeneous3D()
     {
         HeartConfig::Instance()->Reset();
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         std::vector<ChasteCuboid<3> > heterogeneity_area;
-        std::vector< c_vector<double,3> > intra_conductivities;
-        std::vector< c_vector<double,3> > extra_conductivities;
+        std::vector< c_vector<double, 3> > intra_conductivities;
+        std::vector< c_vector<double, 3> > extra_conductivities;
 
         //first cuboid include element 0
         ChastePoint<3> cornerA(-1, -1, 0);
@@ -326,14 +326,14 @@ public:
     void TestExtendedTissueHeterogeneousConductivities2D()
     {
         HeartConfig::Instance()->Reset();
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         //HeartConfig setup needs to be in 3D anyway (hardcoded in HeartConfig).
         std::vector<ChasteCuboid<3> > heterogeneity_area;
-        std::vector< c_vector<double,3> > intra_conductivities;
-        std::vector< c_vector<double,3> > extra_conductivities;
+        std::vector< c_vector<double, 3> > intra_conductivities;
+        std::vector< c_vector<double, 3> > extra_conductivities;
 
         //first cuboid includes element 0
         ChastePoint<3> cornerA(-1, -1,-1);
@@ -405,8 +405,8 @@ public:
     void TestExtendedTissueHeterogeneousGgap3D()
     {
         HeartConfig::Instance()->Reset();
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         std::vector<boost::shared_ptr<AbstractChasteRegion<3> > > heterogeneity_areas;
@@ -482,7 +482,7 @@ public:
     {
         HeartConfig::Instance()->Reset();
 
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructCuboid(2,2,2);
 
         StimulatedCellFactory stimulated_cell_factory;
@@ -543,8 +543,8 @@ public:
             // knows the mesh filename despite we use our own mesh reader.
             HeartConfig::Instance()->SetMeshFileName("mesh/test/data/cube_136_elements");
 
-            TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-            DistributedTetrahedralMesh<3,3> mesh;
+            TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
+            DistributedTetrahedralMesh<3, 3> mesh;
             mesh.ConstructFromMeshReader(mesh_reader);
 
             UnStimulatedCellFactory first_cell;
@@ -621,9 +621,9 @@ public:
             const c_matrix<double, 3, 3>& extra_tensor_after_archiving = p_extended_tissue->rGetExtracellularConductivityTensor(0);
 
             //check before archiving = after archiving
-            for (unsigned i=0; i<3; ++i)
+            for (unsigned i = 0; i<3; ++i)
             {
-                for (unsigned j=0; j<3; ++j)
+                for (unsigned j = 0; j<3; ++j)
                 {
                     TS_ASSERT_DELTA(intra_tensor_before_archiving(i,j), intra_tensor_after_archiving(i,j), 1e-9);
                     TS_ASSERT_DELTA(intra_tensor_second_cell_before_archiving(i,j), intra_tensor_second_cell_after_archiving(i,j), 1e-9);
@@ -647,8 +647,8 @@ public:
             // We shouldn't need to re-build the mesh, but we use it to check that the new tissue has the same mesh
             // Also, when testing in parallel, we use it to get the vector factory to loop over the nodes we own.
             // this is because  p_extended_tissue->pGetMesh()->GetDistributedVectorFactory() doesn't compile (discards qualifier stuff caused by use of const).
-            TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-            DistributedTetrahedralMesh<3,3> mesh;
+            TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
+            DistributedTetrahedralMesh<3, 3> mesh;
             mesh.ConstructFromMeshReader(mesh_reader);
 
             TS_ASSERT_EQUALS(mesh.GetNumNodes(), p_extended_tissue->pGetMesh()->GetNumNodes());//note: this is allowed because GetNumNodes has const in the signature

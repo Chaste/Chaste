@@ -119,13 +119,13 @@ protected:
      * The fibre-sheet-normal directions (in a matrix), if constant
      * (defaults to the identity, ie fibres in the X-direction, sheet in the XY plane)
      */
-    c_matrix<double,DIM,DIM> mConstantFibreSheetDirections;
+    c_matrix<double, DIM, DIM> mConstantFibreSheetDirections;
 
     /**
      * The fibre-sheet-normal directions (matrices), one for each element. Only non-NULL if SetVariableFibreSheetDirections()
      * is called, if not mConstantFibreSheetDirections is used instead
      */
-    std::vector<c_matrix<double,DIM,DIM> >* mpVariableFibreSheetDirections;
+    std::vector<c_matrix<double, DIM, DIM> >* mpVariableFibreSheetDirections;
 
     /**
      *  Whether the fibre-sheet directions that where read in where define per element or per quadrature point.
@@ -134,13 +134,13 @@ protected:
     bool mFibreSheetDirectionsDefinedByQuadraturePoint;
 
     /** The fibre direction for the current element being assembled on */
-    c_vector<double,DIM> mCurrentElementFibreDirection;
+    c_vector<double, DIM> mCurrentElementFibreDirection;
 
     /** The sheet direction for the current element being assembled on */
-    c_vector<double,DIM> mCurrentElementSheetDirection;
+    c_vector<double, DIM> mCurrentElementSheetDirection;
 
     /** The sheet normal direction for the current element being assembled on */
-    c_vector<double,DIM> mCurrentElementSheetNormalDirection;
+    c_vector<double, DIM> mCurrentElementSheetNormalDirection;
 
 
     /**
@@ -169,11 +169,11 @@ protected:
      *  @param addToDTdE A boolean flag saying whether the stress derivative is
      *   required or not.
      */
-    void AddActiveStressAndStressDerivative(c_matrix<double,DIM,DIM>& rC,
+    void AddActiveStressAndStressDerivative(c_matrix<double, DIM, DIM>& rC,
                                             unsigned elementIndex,
                                             unsigned currentQuadPointGlobalIndex,
-                                            c_matrix<double,DIM,DIM>& rT,
-                                            FourthOrderTensor<DIM,DIM,DIM,DIM>& rDTdE,
+                                            c_matrix<double, DIM, DIM>& rT,
+                                            FourthOrderTensor<DIM, DIM, DIM, DIM>& rDTdE,
                                             bool addToDTdE);
 
 
@@ -264,7 +264,7 @@ public:
      *  @param rFibreSheetMatrix The fibre-sheet-normal matrix (fibre dir the first column, normal-to-fibre-in sheet in second
      *  column, sheet-normal in third column).
      */
-    void SetConstantFibreSheetDirections(const c_matrix<double,DIM,DIM>& rFibreSheetMatrix);
+    void SetConstantFibreSheetDirections(const c_matrix<double, DIM, DIM>& rFibreSheetMatrix);
 
     /**
      *  Set a variable fibre-sheet-normal direction (matrices), from file.
@@ -322,7 +322,7 @@ public:
      *  @param rStretches A reference of a std::vector in which the stretch in each element will be returned.
      *  Must be allocated prior to being passed in.
      */
-    void ComputeDeformationGradientAndStretchInEachElement(std::vector<c_matrix<double,DIM,DIM> >& rDeformationGradients,
+    void ComputeDeformationGradientAndStretchInEachElement(std::vector<c_matrix<double, DIM, DIM> >& rDeformationGradients,
                                                            std::vector<double>& rStretches);
 };
 

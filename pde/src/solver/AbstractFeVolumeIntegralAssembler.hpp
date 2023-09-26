@@ -43,40 +43,41 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscMatTools.hpp"
 
 /**
- *
- * An abstract class for creating finite element vectors or matrices that are defined
- * by integrals over the computational domain of functions of basis functions (for
- * example, stiffness or mass matrices), that require assembly by looping over
- * each element in the mesh and computing the element-wise integrals and adding it to
- * the full matrix or vector.
+ * An abstract class for creating finite element vectors or matrices that are 
+ * defined by integrals over the computational domain of functions of basis 
+ * functions (for example, stiffness or mass matrices), that require assembly by 
+ * looping over each element in the mesh and computing the element-wise 
+ * integrals and adding it to the full matrix or vector.
  *
  * This class is used for VOLUME integrals. For surface integrals there is a
  * similar class, AbstractFeSurfaceIntegralAssembler.
  *
  * This class can be used to assemble a matrix OR a vector OR one of each. The
- * template booleans CAN_ASSEMBLE_VECTOR and CAN_ASSEMBLE_MATRIX should be chosen
- * accordingly.
+ * template booleans CAN_ASSEMBLE_VECTOR and CAN_ASSEMBLE_MATRIX should be 
+ * chosen accordingly.
  *
- * The class provides the functionality to loop over elements, perform element-wise
- * integration (using Gaussian quadrature and linear basis functions), and add the
- * results to the final matrix or vector. The concrete class which inherits from this
- * must implement either COMPUTE_MATRIX_TERM or COMPUTE_VECTOR_TERM or both, which
- * should return the INTEGRAND, as a function of the basis functions.
+ * The class provides the functionality to loop over elements, perform 
+ * element-wise integration (using Gaussian quadrature and linear basis 
+ * functions), and add the results to the final matrix or vector. The concrete 
+ * class which inherits from this must implement either COMPUTE_MATRIX_TERM or 
+ * COMPUTE_VECTOR_TERM or both, which should return the INTEGRAND, as a function 
+ * of the basis functions.
  *
- * The final template parameter defines how much interpolation (onto quadrature points)
- * is required by the concrete class.
+ * The final template parameter defines how much interpolation (onto quadrature 
+ * points) is required by the concrete class.
  *
- * CARDIAC: only interpolates the first component of the unknown (ie the voltage)
+ * CARDIAC: only interpolates the first component of the unknown (i.e. the 
+ *     voltage)
  * NORMAL: interpolates the position X and all components of the unknown u
  * NONLINEAR: interpolates X, u and grad(u). Also computes the gradient of the
- *  basis functions when assembling vectors.
+ *     basis functions when assembling vectors.
  *
- * This class inherits from AbstractFeAssemblerCommon which is where some member variables
- * (the matrix/vector to be created, for example) are defined.
+ * This class inherits from AbstractFeAssemblerCommon which is where some member 
+ * variables (the matrix/vector to be created, for example) are defined.
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
 class AbstractFeVolumeIntegralAssembler :
-     public AbstractFeAssemblerCommon<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MATRIX,INTERPOLATION_LEVEL>
+     public AbstractFeAssemblerCommon<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX, INTERPOLATION_LEVEL>
 {
 protected:
     /** Mesh to be solved on. */
@@ -89,102 +90,115 @@ protected:
     typedef LinearBasisFunction<ELEMENT_DIM> BasisFunction;
 
     /**
-     * Compute the derivatives of all basis functions at a point within an element.
-     * This method will transform the results, for use within Gaussian quadrature
-     * for example.
+     * Compute the derivatives of all basis functions at a point within an 
+     * element. This method will transform the results, for use within Gaussian 
+     * quadrature for example.
      *
-     * This is almost identical to LinearBasisFunction::ComputeTransformedBasisFunctionDerivatives,
-     * except that it is also templated over SPACE_DIM and can handle cases such as 1d in 3d space.
+     * This is almost identical to 
+     * LinearBasisFunction::ComputeTransformedBasisFunctionDerivatives, except 
+     * that it is also templated over SPACE_DIM and can handle cases such as 1d 
+     * in 3d space.
      *
      * \todo #1319 Template LinearBasisFunction over SPACE_DIM and remove this method?
      *
      * @param rPoint The point at which to compute the basis functions. The
      *     results are undefined if this is not within the canonical element.
-     * @param rInverseJacobian The inverse of the Jacobian matrix mapping the real
-     *     element into the canonical element.
+     * @param rInverseJacobian The inverse of the Jacobian matrix mapping the 
+     *     real element into the canonical element.
      * @param rReturnValue A reference to a vector, to be filled in
-     * @return The derivatives of the basis functions, in local index order. Each
-     *     entry is a vector (c_vector<double, SPACE_DIM> instance) giving the
-     *     derivative along each axis.
+     * @return The derivatives of the basis functions, in local index order. 
+     *     Each entry is a vector (c_vector<double, SPACE_DIM> instance) giving 
+     *     the derivative along each axis.
      */
-    void ComputeTransformedBasisFunctionDerivatives(const ChastePoint<ELEMENT_DIM>& rPoint,
-                                                    const c_matrix<double, ELEMENT_DIM, SPACE_DIM>& rInverseJacobian,
-                                                    c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rReturnValue);
+    void ComputeTransformedBasisFunctionDerivatives(
+        const ChastePoint<ELEMENT_DIM>& rPoint,
+        const c_matrix<double, ELEMENT_DIM, SPACE_DIM>& rInverseJacobian,
+        c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rReturnValue);
 
     /**
      * The main assembly method. Should only be called through Assemble(),
-     * AssembleMatrix() or AssembleVector() which set mAssembleMatrix, mAssembleVector
-     * accordingly.
+     * AssembleMatrix() or AssembleVector() which set mAssembleMatrix, 
+     * mAssembleVector accordingly.
      */
     void DoAssemble();
 
 protected:
 
     /**
-     * @return the matrix to be added to element stiffness matrix
-     * for a given Gauss point, ie, essentially the INTEGRAND in the integral
-     * definition of the matrix. The arguments are the bases, bases gradients,
-     * x and current solution computed at the Gauss point. The returned matrix
-     * will be multiplied by the Gauss weight and Jacobian determinant and
-     * added to the element stiffness matrix (see AssembleOnElement()).
+     * @return the matrix to be added to element stiffness matrix for a given 
+     *     Gauss point, ie, essentially the INTEGRAND in the integral definition 
+     *     of the matrix. The arguments are the bases, bases gradients, x and 
+     *     current solution computed at the Gauss point. The returned matrix 
+     *     will be multiplied by the Gauss weight and Jacobian determinant and 
+     *     added to the  element stiffness matrix (see AssembleOnElement()).
      *
-     *  ** This method has to be implemented in the concrete class if CAN_ASSEMBLE_MATRIX is true. **
+     *  ** This method has to be implemented in the concrete class if 
+     * CAN_ASSEMBLE_MATRIX is true. **
      *
-     * NOTE: When INTERPOLATION_LEVEL==NORMAL, rGradU does not get set up and should not be used.
+     * NOTE: When INTERPOLATION_LEVEL==NORMAL, rGradU does not get set up and 
+     * should not be used.
      *
      * @param rPhi The basis functions, rPhi(i) = phi_i, i=1..numBases.
      * @param rGradPhi Basis gradients, rGradPhi(i,j) = d(phi_j)/d(X_i).
      * @param rX The point in space.
      * @param rU The unknown as a vector, u(i) = u_i.
-     * @param rGradU The gradient of the unknown as a matrix, rGradU(i,j) = d(u_i)/d(X_j).
+     * @param rGradU The gradient of the unknown as a matrix, 
+     *     rGradU(i,j) = d(u_i)/d(X_j).
      * @param pElement Pointer to the element.
      */
     // LCOV_EXCL_START
-    virtual c_matrix<double,PROBLEM_DIM*(ELEMENT_DIM+1),PROBLEM_DIM*(ELEMENT_DIM+1)> ComputeMatrixTerm(
+    virtual c_matrix<double, PROBLEM_DIM*(ELEMENT_DIM+1), PROBLEM_DIM*(ELEMENT_DIM+1)> ComputeMatrixTerm(
         c_vector<double, ELEMENT_DIM+1>& rPhi,
         c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi,
         ChastePoint<SPACE_DIM>& rX,
-        c_vector<double,PROBLEM_DIM>& rU,
+        c_vector<double, PROBLEM_DIM>& rU,
         c_matrix<double, PROBLEM_DIM, SPACE_DIM>& rGradU,
-        Element<ELEMENT_DIM,SPACE_DIM>* pElement)
+        Element<ELEMENT_DIM, SPACE_DIM>* pElement)
     {
-        // If this line is reached this means this method probably hasn't been over-ridden correctly in
-        // the concrete class
+        /*
+         * If this line is reached this means this method probably hasn't been 
+         * over-ridden correctly in the concrete class.
+         */
         NEVER_REACHED;
-        return zero_matrix<double>(PROBLEM_DIM*(ELEMENT_DIM+1),PROBLEM_DIM*(ELEMENT_DIM+1));
+        return zero_matrix<double>(PROBLEM_DIM*(ELEMENT_DIM+1), PROBLEM_DIM*(ELEMENT_DIM+1));
     }
     // LCOV_EXCL_STOP
 
     /**
-     * @return the vector to be added to element stiffness vector
-     * for a given Gauss point, ie, essentially the INTEGRAND in the integral
-     * definition of the vector. The arguments are the bases,
-     * x and current solution computed at the Gauss point. The returned vector
-     * will be multiplied by the Gauss weight and Jacobian determinant and
-     * added to the element stiffness matrix (see AssembleOnElement()).
+     * @return the vector to be added to element stiffness vector for a given 
+     *     Gauss point, ie, essentially the INTEGRAND in the integral definition 
+     *     of the vector. The arguments are the bases, x and current solution 
+     *     computed at the Gauss point. The returned vector will be multiplied 
+     *     by the Gauss weight and Jacobian determinant and added to the element 
+     *     stiffness matrix (see AssembleOnElement()).
      *
-     * ** This method has to be implemented in the concrete class if CAN_ASSEMBLE_VECTOR is true. **
+     * ** This method has to be implemented in the concrete class if 
+     * CAN_ASSEMBLE_VECTOR is true. **
      *
-     * NOTE: When INTERPOLATION_LEVEL==NORMAL, rGradPhi and rGradU do not get set up and should not be used.
+     * NOTE: When INTERPOLATION_LEVEL==NORMAL, rGradPhi and rGradU do not get 
+     * set up and should not be used.
      *
      * @param rPhi The basis functions, rPhi(i) = phi_i, i=1..numBases
      * @param rGradPhi Basis gradients, rGradPhi(i,j) = d(phi_j)/d(X_i)
      * @param rX The point in space
      * @param rU The unknown as a vector, u(i) = u_i
-     * @param rGradU The gradient of the unknown as a matrix, rGradU(i,j) = d(u_i)/d(X_j)
+     * @param rGradU The gradient of the unknown as a matrix, 
+     *     rGradU(i,j) = d(u_i)/d(X_j)
      * @param pElement Pointer to the element
      */
     // LCOV_EXCL_START
-    virtual c_vector<double,PROBLEM_DIM*(ELEMENT_DIM+1)> ComputeVectorTerm(
+    virtual c_vector<double, PROBLEM_DIM*(ELEMENT_DIM+1)> ComputeVectorTerm(
         c_vector<double, ELEMENT_DIM+1>& rPhi,
         c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi,
         ChastePoint<SPACE_DIM>& rX,
-        c_vector<double,PROBLEM_DIM>& rU,
+        c_vector<double, PROBLEM_DIM>& rU,
         c_matrix<double, PROBLEM_DIM, SPACE_DIM>& rGradU,
-        Element<ELEMENT_DIM,SPACE_DIM>* pElement)
+        Element<ELEMENT_DIM, SPACE_DIM>* pElement)
     {
-        // If this line is reached this means this method probably hasn't been over-ridden correctly in
-        // the concrete class
+        /*
+         * If this line is reached this means this method probably hasn't been 
+         * over-ridden correctly in the concrete class.
+         */
         NEVER_REACHED;
         return zero_vector<double>(PROBLEM_DIM*(ELEMENT_DIM+1));
     }
@@ -195,28 +209,29 @@ protected:
      * Calculate the contribution of a single element to the linear system.
      *
      * @param rElement The element to assemble on.
-     * @param rAElem The element's contribution to the LHS matrix is returned in this
-     *    n by n matrix, where n is the no. of nodes in this element. There is no
-     *    need to zero this matrix before calling.
-     * @param rBElem The element's contribution to the RHS vector is returned in this
-     *    vector of length n, the no. of nodes in this element. There is no
-     *    need to zero this vector before calling.
+     * @param rAElem The element's contribution to the LHS matrix is returned in 
+     *     this n by n matrix, where n is the no. of nodes in this element. 
+     *     There is no need to zero this matrix before calling.
+     * @param rBElem The element's contribution to the RHS vector is returned in 
+     *     this vector of length n, the no. of nodes in this element. There is 
+     *     no need to zero this vector before calling.
      *
-     * Called by AssembleSystem().
-     * Calls ComputeMatrixTerm() etc.
+     * Called by AssembleSystem(). Calls ComputeMatrixTerm() etc.
      */
-    virtual void AssembleOnElement(Element<ELEMENT_DIM,SPACE_DIM>& rElement,
-                                   c_matrix<double, PROBLEM_DIM*(ELEMENT_DIM+1), PROBLEM_DIM*(ELEMENT_DIM+1) >& rAElem,
-                                   c_vector<double, PROBLEM_DIM*(ELEMENT_DIM+1)>& rBElem);
+    virtual void AssembleOnElement(
+        Element<ELEMENT_DIM, SPACE_DIM>& rElement,
+        c_matrix<double, PROBLEM_DIM*(ELEMENT_DIM+1), PROBLEM_DIM*(ELEMENT_DIM+1) >& rAElem,
+        c_vector<double, PROBLEM_DIM*(ELEMENT_DIM+1)>& rBElem);
 
     /**
-     * @return true if we should include this (volume) element when assembling. Returns true
-     * here but can be overridden by the concrete assembler if not all
-     * elements should be included.
+     * @return true if we should include this (volume) element when assembling. 
+     *     Returns true here but can be overridden by the concrete assembler if 
+     *     not all elements should be included.
      *
      * @param rElement the element
      */
-    virtual bool ElementAssemblyCriterion(Element<ELEMENT_DIM,SPACE_DIM>& rElement)
+    virtual bool ElementAssemblyCriterion(
+        Element<ELEMENT_DIM, SPACE_DIM>& rElement)
     {
         return true;
     }
@@ -228,7 +243,8 @@ public:
      *
      * @param pMesh The mesh
      */
-    explicit AbstractFeVolumeIntegralAssembler(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
+    explicit AbstractFeVolumeIntegralAssembler(
+        AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh);
 
     /**
      * Destructor.
@@ -239,20 +255,22 @@ public:
     }
 };
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
 AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX, INTERPOLATION_LEVEL>::AbstractFeVolumeIntegralAssembler(
-            AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
+            AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
     : AbstractFeAssemblerCommon<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX, INTERPOLATION_LEVEL>(),
       mpMesh(pMesh)
 {
     assert(pMesh);
-    // Default to 2nd order quadrature.  Our default basis functions are piecewise linear
-    // which means that we are integrating functions which in the worst case (mass matrix)
-    // are quadratic.
+    /*
+     * Default to 2nd order quadrature. Our default basis functions are 
+     * piecewise linear which means that we are integrating functions which in 
+     * the worst case (mass matrix) are quadratic.
+     */
     mpQuadRule = new GaussianQuadratureRule<ELEMENT_DIM>(2);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
 void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX, INTERPOLATION_LEVEL>::DoAssemble()
 {
     assert(this->mAssembleMatrix || this->mAssembleVector);
@@ -299,8 +317,11 @@ void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_
     {
         Element<ELEMENT_DIM, SPACE_DIM>& r_element = *iter;
 
-        // Test for ownership first, since it's pointless to test the criterion on something which we might know nothing about.
-        if (r_element.GetOwnership() == true && ElementAssemblyCriterion(r_element)==true)
+        /*
+         * Test for ownership first, since it's pointless to test the criterion 
+         * on something which we might know nothing about.
+         */
+        if (r_element.GetOwnership() == true && ElementAssemblyCriterion(r_element) == true)
         {
             AssembleOnElement(r_element, a_elem, b_elem);
 
@@ -322,16 +343,15 @@ void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_
     HeartEventHandler::EndEvent(assemble_event);
 }
 
-
-///////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Implementation - AssembleOnElement and smaller
-///////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
 void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX, INTERPOLATION_LEVEL>::ComputeTransformedBasisFunctionDerivatives(
-        const ChastePoint<ELEMENT_DIM>& rPoint,
-        const c_matrix<double, ELEMENT_DIM, SPACE_DIM>& rInverseJacobian,
-        c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rReturnValue)
+    const ChastePoint<ELEMENT_DIM>& rPoint,
+    const c_matrix<double, ELEMENT_DIM, SPACE_DIM>& rInverseJacobian,
+    c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rReturnValue)
 {
     if constexpr (ELEMENT_DIM < 4 && ELEMENT_DIM > 0)
     {
@@ -346,9 +366,9 @@ void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
 void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX, INTERPOLATION_LEVEL>::AssembleOnElement(
-    Element<ELEMENT_DIM,SPACE_DIM>& rElement,
+    Element<ELEMENT_DIM, SPACE_DIM>& rElement,
     c_matrix<double, PROBLEM_DIM*(ELEMENT_DIM+1), PROBLEM_DIM*(ELEMENT_DIM+1) >& rAElem,
     c_vector<double, PROBLEM_DIM*(ELEMENT_DIM+1)>& rBElem)
 {
@@ -361,7 +381,11 @@ void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_
     c_matrix<double, ELEMENT_DIM, SPACE_DIM> inverse_jacobian;
     double jacobian_determinant;
 
-    mpMesh->GetInverseJacobianForElement(rElement.GetIndex(), jacobian, jacobian_determinant, inverse_jacobian);
+    mpMesh->GetInverseJacobianForElement(
+        rElement.GetIndex(),
+        jacobian,
+        jacobian_determinant,
+        inverse_jacobian);
 
     if (this->mAssembleMatrix)
     {
@@ -384,23 +408,34 @@ void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_
          quad_index < mpQuadRule->GetNumQuadPoints();
          ++quad_index)
     {
-        const ChastePoint<ELEMENT_DIM>& quad_point = mpQuadRule->rGetQuadPoint(quad_index);
+        const ChastePoint<ELEMENT_DIM>& quad_point = 
+            mpQuadRule->rGetQuadPoint(quad_index);
 
         BasisFunction::ComputeBasisFunctions(quad_point, phi);
 
         if (this->mAssembleMatrix || INTERPOLATION_LEVEL==NONLINEAR)
         {
-            ComputeTransformedBasisFunctionDerivatives(quad_point, inverse_jacobian, grad_phi);
+            ComputeTransformedBasisFunctionDerivatives(
+                quad_point,
+                inverse_jacobian,
+                grad_phi);
         }
 
-        // Location of the Gauss point in the original element will be stored in x
-        // Where applicable, u will be set to the value of the current solution at x
+        /*
+         * Location of the Gauss point in the original element will be stored in 
+         * x. Where applicable, u will be set to the value of the current 
+         * solution at x.
+         */
         ChastePoint<SPACE_DIM> x(0,0,0);
 
-        c_vector<double,PROBLEM_DIM> u = zero_vector<double>(PROBLEM_DIM);
-        c_matrix<double,PROBLEM_DIM,SPACE_DIM> grad_u = zero_matrix<double>(PROBLEM_DIM,SPACE_DIM);
+        c_vector<double, PROBLEM_DIM> u = zero_vector<double>(PROBLEM_DIM);
+        c_matrix<double, PROBLEM_DIM, SPACE_DIM> grad_u = 
+            zero_matrix<double>(PROBLEM_DIM, SPACE_DIM);
 
-        // Allow the concrete version of the assembler to interpolate any desired quantities
+        /*
+         * Allow the concrete version of the assembler to interpolate any 
+         * desired quantities.
+         */
         this->ResetInterpolatedQuantities();
 
         // Interpolation
@@ -408,11 +443,14 @@ void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_
         {
             const Node<SPACE_DIM>* p_node = rElement.GetNode(i);
 
-            if (INTERPOLATION_LEVEL != CARDIAC) // don't even interpolate X if cardiac problem
+            // Don't even interpolate X if cardiac problem
+            if (INTERPOLATION_LEVEL != CARDIAC)
             {
-                const c_vector<double, SPACE_DIM>& r_node_loc = p_node->rGetLocation();
+                const c_vector<double, SPACE_DIM>& r_node_loc = 
+                    p_node->rGetLocation();
+
                 // interpolate x
-                x.rGetLocation() += phi(i)*r_node_loc;
+                x.rGetLocation() += phi(i) * r_node_loc;
             }
 
             // Interpolate u and grad u if a current solution or guess exists
@@ -424,17 +462,19 @@ void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_
                      ++index_of_unknown)
                 {
                     /*
-                     * If we have a solution (e.g. this is a dynamic problem) then
-                     * interpolate the value at this quadrature point.
+                     * If we have a solution (e.g. this is a dynamic problem) 
+                     * then interpolate the value at this quadrature point.
                      *
-                     * NOTE: the following assumes that if, say, there are two unknowns
-                     * u and v, they are stored in the current solution vector as
-                     * [U1 V1 U2 V2 ... U_n V_n].
+                     * NOTE: the following assumes that if, say, there are two 
+                     * unknowns u and v, they are stored in the current solution 
+                     * vector as [U1 V1 U2 V2 ... U_n V_n].
                      */
-                    double u_at_node = this->GetCurrentSolutionOrGuessValue(node_global_index, index_of_unknown);
-                    u(index_of_unknown) += phi(i)*u_at_node;
+                    double u_at_node = 
+                        this->GetCurrentSolutionOrGuessValue(node_global_index, index_of_unknown);
+                    u(index_of_unknown) += phi(i) * u_at_node;
 
-                    if (INTERPOLATION_LEVEL == NONLINEAR) // don't need to construct grad_phi or grad_u in other cases
+                    // Don't need to construct grad_phi or grad_u in other cases
+                    if (INTERPOLATION_LEVEL == NONLINEAR)
                     {
                         for (unsigned j = 0; j < SPACE_DIM; ++j)
                         {
@@ -444,9 +484,12 @@ void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_
                 }
             }
 
-            // Allow the concrete version of the assembler to interpolate any desired quantities
+            /*
+             * Allow the concrete version of the assembler to interpolate any 
+             * desired quantities.
+             */
             this->IncrementInterpolatedQuantities(phi(i), p_node);
-            if (this->mAssembleMatrix || INTERPOLATION_LEVEL==NONLINEAR)
+            if (this->mAssembleMatrix || INTERPOLATION_LEVEL == NONLINEAR)
             {
                 this->IncrementInterpolatedGradientQuantities(grad_phi, i, p_node);
             }
@@ -466,6 +509,5 @@ void AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_
         }
     }
 }
-
 
 #endif /*ABSTRACTFEVOLUMEINTEGRALASSEMBLER_HPP_*/

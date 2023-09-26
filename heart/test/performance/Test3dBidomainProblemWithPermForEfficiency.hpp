@@ -64,8 +64,8 @@ public:
         BidomainFaceStimulusCellFactory bidomain_cell_factory;
 
         BidomainProblem<3> bidomain_problem( &bidomain_cell_factory );
-        TetrahedralMesh<3,3> mesh;
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/3D_0_to_.5mm_1889_elements_irregular");
+        TetrahedralMesh<3, 3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/3D_0_to_.5mm_1889_elements_irregular");
         mesh.ConstructFromMeshReader(mesh_reader);
         bidomain_problem.SetMesh(&mesh);
 

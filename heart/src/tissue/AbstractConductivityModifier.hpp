@@ -48,7 +48,7 @@ class AbstractConductivityModifier
 {
 private:
     /** Cache recently-seen elementindex-tensor pairs, one per "domain" */
-    std::vector<std::pair<unsigned, c_matrix<double,SPACE_DIM,SPACE_DIM> > > mCache;
+    std::vector<std::pair<unsigned, c_matrix<double, SPACE_DIM, SPACE_DIM> > > mCache;
 
 public:
     /** Destructor */
@@ -62,16 +62,16 @@ public:
      *  @param domainIndex Used to tailor modification to the domain. 0 = intracellular, 1 = extracellular, 2 = second intracellular (tridomain)
      *  @return Reference to a modified conductivity tensor.
      */
-    c_matrix<double,SPACE_DIM,SPACE_DIM>& rGetModifiedConductivityTensor(unsigned elementIndex,
-                                                                         const c_matrix<double,SPACE_DIM,SPACE_DIM>& rOriginalConductivity,
+    c_matrix<double, SPACE_DIM, SPACE_DIM>& rGetModifiedConductivityTensor(unsigned elementIndex,
+                                                                         const c_matrix<double, SPACE_DIM, SPACE_DIM>& rOriginalConductivity,
                                                                          unsigned domainIndex)
     {
         // Have we got space for this domain?
         if (mCache.size() <= domainIndex)
         {
             // Not a pretty line! Initialises every new entry with an UNSIGNED_UNSET and a zero matrix.
-            mCache.resize(domainIndex+1, std::pair<unsigned, c_matrix<double,SPACE_DIM,SPACE_DIM> >
-                                             (UNSIGNED_UNSET, zero_matrix<double>(SPACE_DIM,SPACE_DIM)));
+            mCache.resize(domainIndex+1, std::pair<unsigned, c_matrix<double, SPACE_DIM, SPACE_DIM> >
+                                             (UNSIGNED_UNSET, zero_matrix<double>(SPACE_DIM, SPACE_DIM)));
         }
         // Is this not the same element as last time?
         if (mCache[domainIndex].first != elementIndex)
@@ -94,8 +94,8 @@ public:
      *         and should therefore generally be a member variable of your subclass
      *         (it gets copied/cached appropriately by the calling code, so doesn't have to persist for subsequent calls!).
      */
-    virtual c_matrix<double,SPACE_DIM,SPACE_DIM>& rCalculateModifiedConductivityTensor(unsigned elementIndex,
-                                                                                       const c_matrix<double,SPACE_DIM,SPACE_DIM>& rOriginalConductivity,
+    virtual c_matrix<double, SPACE_DIM, SPACE_DIM>& rCalculateModifiedConductivityTensor(unsigned elementIndex,
+                                                                                       const c_matrix<double, SPACE_DIM, SPACE_DIM>& rOriginalConductivity,
                                                                                        unsigned domainIndex)=0;
 };
 

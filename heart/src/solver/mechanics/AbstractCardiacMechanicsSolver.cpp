@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakeBathContractionModel.hpp"
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
-AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AbstractCardiacMechanicsSolver(QuadraticMesh<DIM>& rQuadMesh,
+AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER, DIM>::AbstractCardiacMechanicsSolver(QuadraticMesh<DIM>& rQuadMesh,
                                                                                       ElectroMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                                                                       std::string outputDirectory)
    : ELASTICITY_SOLVER(rQuadMesh,
@@ -53,7 +53,7 @@ AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AbstractCardiacMechanicsS
 }
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
-void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
+void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER, DIM>::Initialise()
 {
     // compute total num quad points
     unsigned num_quad_pts_per_element = this->mpQuadratureRule->GetNumQuadPoints();
@@ -73,7 +73,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
 
         if (element.GetOwnership() == true)
         {
-            for (unsigned j=0; j<num_quad_pts_per_element; ++j)
+            for (unsigned j = 0; j<num_quad_pts_per_element; ++j)
             {
                 unsigned quad_pt_global_index = element.GetIndex()*num_quad_pts_per_element + j;
 
@@ -104,7 +104,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
     mMapIterator = mQuadPointToDataAtQuadPointMap.begin();
 
     // initialise fibre/sheet direction matrix to be the identity, fibres in X-direction, and sheet in XY-plane
-    mConstantFibreSheetDirections = zero_matrix<double>(DIM,DIM);
+    mConstantFibreSheetDirections = zero_matrix<double>(DIM, DIM);
     for (unsigned i = 0; i < DIM; ++i)
     {
         mConstantFibreSheetDirections(i,i) = 1.0;
@@ -131,7 +131,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Initialise()
 
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
-void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetFineCoarseMeshPair(FineCoarseMeshPair<DIM>* pMeshPair)
+void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER, DIM>::SetFineCoarseMeshPair(FineCoarseMeshPair<DIM>* pMeshPair)
 {
     assert(pMeshPair!=NULL);
     if (pMeshPair->GetCoarseMesh().GetNumElements() != this->mrQuadMesh.GetNumElements())
@@ -142,7 +142,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetFineCoarseMeshPai
 }
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
-AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::~AbstractCardiacMechanicsSolver()
+AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER, DIM>::~AbstractCardiacMechanicsSolver()
 {
     for (mMapIterator = mQuadPointToDataAtQuadPointMap.begin();
         mMapIterator != mQuadPointToDataAtQuadPointMap.end();
@@ -162,7 +162,7 @@ AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::~AbstractCardiacMechanics
 }
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
-void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetCalciumAndVoltage(std::vector<double>& rCalciumConcentrations,
+void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER, DIM>::SetCalciumAndVoltage(std::vector<double>& rCalciumConcentrations,
                                                                                  std::vector<double>& rVoltages)
 
 {
@@ -187,7 +187,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetCalciumAndVoltage
 
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
-void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetupChangeOfBasisMatrix(unsigned elementIndex,
+void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER, DIM>::SetupChangeOfBasisMatrix(unsigned elementIndex,
                                                                                      unsigned currentQuadPointGlobalIndex)
 {
     if (!mpVariableFibreSheetDirections) // constant fibre directions
@@ -205,11 +205,11 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetupChangeOfBasisMa
 }
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
-void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndStressDerivative(c_matrix<double,DIM,DIM>& rC,
+void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER, DIM>::AddActiveStressAndStressDerivative(c_matrix<double, DIM, DIM>& rC,
                                                                                                unsigned elementIndex,
                                                                                                unsigned currentQuadPointGlobalIndex,
-                                                                                               c_matrix<double,DIM,DIM>& rT,
-                                                                                               FourthOrderTensor<DIM,DIM,DIM,DIM>& rDTdE,
+                                                                                               c_matrix<double, DIM, DIM>& rT,
+                                                                                               FourthOrderTensor<DIM, DIM, DIM, DIM>& rDTdE,
                                                                                                bool addToDTdE)
 {
     for (unsigned i = 0; i < DIM; ++i)
@@ -300,7 +300,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
 
     if (addToDTdE)
     {
-        c_matrix<double,DIM,DIM> invC = Inverse(rC);
+        c_matrix<double, DIM, DIM> invC = Inverse(rC);
 
         for (unsigned M = 0; M < DIM; ++M)
         {
@@ -394,7 +394,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
 //               {
 //                   for (unsigned P = 0; P < DIM; ++P)
 //                   {
-//                       for (unsigned Q=0; Q<DIM; Q++)
+//                       for (unsigned Q = 0; Q<DIM; Q++)
 //                       {
 //                           rDTdE(M,N,P,Q) +=  dTdE_coeff_s1 * mCurrentElementSheetDirection(M)
 //                                                            * mCurrentElementSheetDirection(N)
@@ -415,8 +415,8 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::AddActiveStressAndSt
 
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
-void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ComputeDeformationGradientAndStretchInEachElement(
-    std::vector<c_matrix<double,DIM,DIM> >& rDeformationGradients,
+void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER, DIM>::ComputeDeformationGradientAndStretchInEachElement(
+    std::vector<c_matrix<double, DIM, DIM> >& rDeformationGradients,
     std::vector<double>& rStretches)
 {
     assert(rStretches.size()==this->mrQuadMesh.GetNumElements());
@@ -424,19 +424,19 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ComputeDeformationGr
     // this will only work currently if the coarse mesh fibre info is defined per element, not per quad point
     assert(!mpVariableFibreSheetDirections || !mFibreSheetDirectionsDefinedByQuadraturePoint);
 
-    static c_matrix<double,DIM,NUM_VERTICES_PER_ELEMENT> element_current_displacements;
-    static c_matrix<double,DIM,NUM_VERTICES_PER_ELEMENT> grad_lin_phi;
-    static c_matrix<double,DIM,DIM> F;      // the deformation gradient, F = dx/dX, F_{iM} = dx_i/dX_M
+    static c_matrix<double, DIM,NUM_VERTICES_PER_ELEMENT> element_current_displacements;
+    static c_matrix<double, DIM,NUM_VERTICES_PER_ELEMENT> grad_lin_phi;
+    static c_matrix<double, DIM, DIM> F;      // the deformation gradient, F = dx/dX, F_{iM} = dx_i/dX_M
 
-    static c_matrix<double,DIM,DIM> jacobian;
-    static c_matrix<double,DIM,DIM> inverse_jacobian;
+    static c_matrix<double, DIM, DIM> jacobian;
+    static c_matrix<double, DIM, DIM> inverse_jacobian;
     double jacobian_determinant;
     ChastePoint<DIM> quadrature_point; // not needed, but has to be passed in
 
     // loop over all the elements
-    for (unsigned elem_index=0; elem_index<this->mrQuadMesh.GetNumElements(); elem_index++)
+    for (unsigned elem_index = 0; elem_index<this->mrQuadMesh.GetNumElements(); elem_index++)
     {
-        Element<DIM,DIM>* p_elem = this->mrQuadMesh.GetElement(elem_index);
+        Element<DIM, DIM>* p_elem = this->mrQuadMesh.GetElement(elem_index);
 
         // get the fibre direction for this element
         SetupChangeOfBasisMatrix(elem_index, 0); // 0 is quad index, and doesn't matter as checked that fibres not defined by quad pt above.
@@ -446,9 +446,9 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ComputeDeformationGr
         }
 
         // get the displacement at this element
-        for (unsigned II=0; II<NUM_VERTICES_PER_ELEMENT; II++)
+        for (unsigned II = 0; II<NUM_VERTICES_PER_ELEMENT; II++)
         {
-            for (unsigned JJ=0; JJ<DIM; JJ++)
+            for (unsigned JJ = 0; JJ<DIM; JJ++)
             {
                 // mProblemDimension = DIM for compressible elasticity and DIM+1 for incompressible elasticity
                 element_current_displacements(JJ,II) = this->mCurrentSolution[this->mProblemDimension*p_elem->GetNodeGlobalIndex(II) + JJ];
@@ -459,7 +459,7 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ComputeDeformationGr
         this->mrQuadMesh.GetInverseJacobianForElement(elem_index, jacobian, jacobian_determinant, inverse_jacobian);
         LinearBasisFunction<DIM>::ComputeTransformedBasisFunctionDerivatives(quadrature_point, inverse_jacobian, grad_lin_phi);
 
-        F = identity_matrix<double>(DIM,DIM);
+        F = identity_matrix<double>(DIM, DIM);
 
         // loop over the vertices and interpolate F, the deformation gradient
         // (note: could use matrix-mult if this becomes inefficient
@@ -477,14 +477,14 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ComputeDeformationGr
         rDeformationGradients[elem_index] = F;
 
         // compute and save the stretch: m^T C m = ||Fm||
-        c_vector<double,DIM> deformed_fibre = prod(F, mCurrentElementFibreDirection);
+        c_vector<double, DIM> deformed_fibre = prod(F, mCurrentElementFibreDirection);
         rStretches[elem_index] = norm_2(deformed_fibre);
     }
 }
 
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
-void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetVariableFibreSheetDirections(const FileFinder& rOrthoFile, bool definedPerQuadraturePoint)
+void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER, DIM>::SetVariableFibreSheetDirections(const FileFinder& rOrthoFile, bool definedPerQuadraturePoint)
 {
     mFibreSheetDirectionsDefinedByQuadraturePoint = definedPerQuadraturePoint;
 
@@ -506,19 +506,19 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetVariableFibreShee
                   ", expected " << mTotalQuadPoints);
     }
 
-    mpVariableFibreSheetDirections = new std::vector<c_matrix<double,DIM,DIM> >(num_entries, zero_matrix<double>(DIM,DIM));
-    for (unsigned index=0; index<num_entries; index++)
+    mpVariableFibreSheetDirections = new std::vector<c_matrix<double, DIM, DIM> >(num_entries, zero_matrix<double>(DIM, DIM));
+    for (unsigned index = 0; index<num_entries; index++)
     {
         reader.GetFibreSheetAndNormalMatrix(index, (*mpVariableFibreSheetDirections)[index] );
     }
 }
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
-void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetConstantFibreSheetDirections(const c_matrix<double,DIM,DIM>& rFibreSheetMatrix)
+void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER, DIM>::SetConstantFibreSheetDirections(const c_matrix<double, DIM, DIM>& rFibreSheetMatrix)
 {
     mConstantFibreSheetDirections = rFibreSheetMatrix;
     // check orthogonality
-    c_matrix<double,DIM,DIM>  temp = prod(trans(rFibreSheetMatrix),rFibreSheetMatrix);
+    c_matrix<double, DIM, DIM>  temp = prod(trans(rFibreSheetMatrix),rFibreSheetMatrix);
     for (unsigned i = 0; i < DIM; ++i)
     {
         for (unsigned j = 0; j < DIM; ++j)
@@ -532,9 +532,9 @@ void AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::SetConstantFibreShee
     }
 }
 
-template class AbstractCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2>;
-template class AbstractCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<3>,3>;
-template class AbstractCardiacMechanicsSolver<CompressibleNonlinearElasticitySolver<2>,2>;
-template class AbstractCardiacMechanicsSolver<CompressibleNonlinearElasticitySolver<3>,3>;
+template class AbstractCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>, 2>;
+template class AbstractCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<3>, 3>;
+template class AbstractCardiacMechanicsSolver<CompressibleNonlinearElasticitySolver<2>, 2>;
+template class AbstractCardiacMechanicsSolver<CompressibleNonlinearElasticitySolver<3>, 3>;
 
 

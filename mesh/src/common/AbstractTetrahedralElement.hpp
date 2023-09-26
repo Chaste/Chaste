@@ -48,8 +48,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * This abstract class defines a tetrahedral element for use in the Finite Element Method.
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class AbstractTetrahedralElement : public AbstractElement<ELEMENT_DIM,SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+class AbstractTetrahedralElement : public AbstractElement<ELEMENT_DIM, SPACE_DIM>
 {
 protected:
 
@@ -148,7 +148,7 @@ public:
  * compilers.
  */
 template<unsigned SPACE_DIM>
-class AbstractTetrahedralElement<0, SPACE_DIM> : public AbstractElement<0,SPACE_DIM>
+class AbstractTetrahedralElement<0, SPACE_DIM> : public AbstractElement<0, SPACE_DIM>
 {
 public:
 

@@ -55,7 +55,7 @@ void ActivationOutputModifier::FinaliseAtEnd()
     std::stringstream filepath_process_specific;
     filepath_process_specific << mFilename << "." << PetscTools::GetMyRank();
     out_stream file_stream_process_specific = output_handler.OpenOutputFile(filepath_process_specific.str().c_str());
-    for (unsigned i=0; i<mLocalSize; ++i)
+    for (unsigned i = 0; i<mLocalSize; ++i)
     {
         (*file_stream_process_specific) << mFirstActivitationTimes[i] <<",\t"
                 << mFirstRecoveryTimes[i] <<",\t"
@@ -76,7 +76,7 @@ void ActivationOutputModifier::FinaliseAtEnd()
         {
             file_stream = output_handler.OpenOutputFile(mFilename, std::ios::app);
         }
-        for (unsigned i=0; i<mLocalSize; ++i)
+        for (unsigned i = 0; i<mLocalSize; ++i)
         {
             (*file_stream) << mFirstActivitationTimes[i] <<",\t"
                     << mFirstRecoveryTimes[i] <<",\t"
@@ -92,7 +92,7 @@ void ActivationOutputModifier::ProcessSolutionAtTimeStep(double time, Vec soluti
 {
     double* p_solution;
     VecGetArray(solution, &p_solution);
-    for (unsigned local_index=0; local_index < mLocalSize; local_index++)
+    for (unsigned local_index = 0; local_index < mLocalSize; local_index++)
     {
         double v = p_solution[local_index*problemDim];
         if (v > mThreshold && mFirstActivitationTimes[local_index] < 0.0)

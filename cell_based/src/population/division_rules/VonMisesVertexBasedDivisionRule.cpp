@@ -75,7 +75,7 @@ void VonMisesVertexBasedDivisionRule<DIM>::SetConcentrationParameter(
     mConcentrationParameter = concentrationParameter;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> VonMisesVertexBasedDivisionRule<SPACE_DIM>::CalculateCellDivisionVector(
     CellPtr pParentCell,
     VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation)

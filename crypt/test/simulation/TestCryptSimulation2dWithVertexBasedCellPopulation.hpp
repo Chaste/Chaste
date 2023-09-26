@@ -157,7 +157,7 @@ public:
             c_vector<double, 2> node_location;
             node_location = simulator.rGetCellPopulation().GetNode(node_index)->rGetLocation();
 
-            AbstractOffLatticeCellPopulation<2,2>* p_offLattice_pop = dynamic_cast<AbstractOffLatticeCellPopulation<2,2>* >(&(simulator.rGetCellPopulation()));
+            AbstractOffLatticeCellPopulation<2, 2>* p_offLattice_pop = dynamic_cast<AbstractOffLatticeCellPopulation<2, 2>* >(&(simulator.rGetCellPopulation()));
             double damping = p_offLattice_pop->GetDampingConstant(node_index);
             c_vector<double, 2> expected_location = p_force->GetExpectedOneStepLocationFE(node_index, damping, old_node_locations[node_index], dt);
 
@@ -601,7 +601,7 @@ public:
         boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh2 = generator.GetCylindricalMesh();
 
         // Compare meshes
-        VertexMesh<2,2>& r_mesh = (static_cast<VertexBasedCellPopulation<2>*>(&(p_simulator->rGetCellPopulation())))->rGetMesh();
+        VertexMesh<2, 2>& r_mesh = (static_cast<VertexBasedCellPopulation<2>*>(&(p_simulator->rGetCellPopulation())))->rGetMesh();
         CompareMeshes(p_mesh2.get(), &r_mesh);
 
         // Test Warnings
@@ -798,13 +798,13 @@ public:
         p_simulator1->Solve();
 
         // Get mesh
-        MutableVertexMesh<2,2>& r_mesh1 = (static_cast<VertexBasedCellPopulation<2>*>(&(p_simulator1->rGetCellPopulation())))->rGetMesh();
+        MutableVertexMesh<2, 2>& r_mesh1 = (static_cast<VertexBasedCellPopulation<2>*>(&(p_simulator1->rGetCellPopulation())))->rGetMesh();
 
         // Save then reload, compare meshes either side
         CellBasedSimulationArchiver<2, CryptSimulation2d>::Save(p_simulator1);
 
         CryptSimulation2d* p_simulator2 = CellBasedSimulationArchiver<2, CryptSimulation2d>::Load("VertexCrypt2DPeriodicSaveAndLoad", 0.2);
-        MutableVertexMesh<2,2>& r_mesh2 = (static_cast<VertexBasedCellPopulation<2>*>(&(p_simulator2->rGetCellPopulation())))->rGetMesh();
+        MutableVertexMesh<2, 2>& r_mesh2 = (static_cast<VertexBasedCellPopulation<2>*>(&(p_simulator2->rGetCellPopulation())))->rGetMesh();
 
         CompareMeshes(&r_mesh1, &r_mesh2);
 

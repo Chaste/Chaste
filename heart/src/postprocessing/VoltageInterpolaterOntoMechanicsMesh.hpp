@@ -63,7 +63,7 @@ public:
      *  @param inputFileNamePrefix Filename (without ".h5") of the electrics solution HDF5 file
      *
      */
-    VoltageInterpolaterOntoMechanicsMesh(TetrahedralMesh<DIM,DIM>& rElectricsMesh,
+    VoltageInterpolaterOntoMechanicsMesh(TetrahedralMesh<DIM, DIM>& rElectricsMesh,
                                          QuadraticMesh<DIM>& rMechanicsMesh,
                                          std::vector<std::string>& rVariableNames,
                                          std::string directory,

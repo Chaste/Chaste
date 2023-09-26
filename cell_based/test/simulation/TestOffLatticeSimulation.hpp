@@ -92,7 +92,7 @@ public:
 
         // Create a simple 2D MeshBasedCellPopulation
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
@@ -178,7 +178,7 @@ public:
 
         // Create a simple mesh with a surrounding layer of ghost nodes
         HoneycombMeshGenerator generator(3, 3, 1);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -253,7 +253,7 @@ public:
         int num_cells_depth = 5;
         int num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -305,7 +305,7 @@ public:
         int num_cells_depth = 5;
         int num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -352,7 +352,7 @@ public:
         int num_cells_depth = 5;
         int num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
@@ -372,13 +372,13 @@ public:
         simulator.AddForce(p_force);
 
         // Add cell killers
-        c_vector<double,2> y_normal = zero_vector<double>(2);
+        c_vector<double, 2> y_normal = zero_vector<double>(2);
         y_normal[1] = -1.0;
         MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer_1, (&cell_population, zero_vector<double>(2), y_normal) ); // y<0
         simulator.AddCellKiller(p_killer_1);
 
         // Add cell killers
-        c_vector<double,2> x_normal = zero_vector<double>(2);
+        c_vector<double, 2> x_normal = zero_vector<double>(2);
         x_normal[0] = -1.0;
         MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer_2, (&cell_population, zero_vector<double>(2), x_normal) ); // x<0
         simulator.AddCellKiller(p_killer_2);
@@ -412,7 +412,7 @@ public:
         int num_cells_depth = 5;
         int num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -467,8 +467,8 @@ public:
     {
         EXIT_IF_PARALLEL;    // Cell population output doesn't work in parallel
 
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
         mesh.Scale(8,8);
 
@@ -510,8 +510,8 @@ public:
         TS_ASSERT_DELTA(simulator.GetNodeLocation(3)[1], 8.0, 1e-6);
 
         // Create some boundary conditions and pass them to the simulation
-        c_vector<double,2> point = zero_vector<double>(2);
-        c_vector<double,2> normal = zero_vector<double>(2);
+        c_vector<double, 2> point = zero_vector<double>(2);
+        c_vector<double, 2> normal = zero_vector<double>(2);
         normal(1) = -1.0;
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc1, (&cell_population, point, normal)); // y>0
         simulator.AddCellPopulationBoundaryCondition(p_bc1);
@@ -563,8 +563,8 @@ public:
         EXIT_IF_PARALLEL;    // Cell population output doesn't work in parallel
 
         // Load mesh
-        TrianglesMeshReader<2,3> mesh_reader("cell_based/test/data/Square2dMeshIn3d/Square2dMeshIn3d");
-        MutableMesh<2,3> mesh;
+        TrianglesMeshReader<2, 3> mesh_reader("cell_based/test/data/Square2dMeshIn3d/Square2dMeshIn3d");
+        MutableMesh<2, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create cells
@@ -574,16 +574,16 @@ public:
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(),p_diff_type);
 
         // Create a cell population
-        MeshBasedCellPopulation<2,3> cell_population(mesh, cells);
+        MeshBasedCellPopulation<2, 3> cell_population(mesh, cells);
         cell_population.SetWriteVtkAsPoints(true);
 
         // Set up cell-based simulation
-        OffLatticeSimulation<2,3> simulator(cell_population);
+        OffLatticeSimulation<2, 3> simulator(cell_population);
         simulator.SetOutputDirectory("TestOffLatticeSimulationWith2dMeshIn3d");
         simulator.SetEndTime(1.0);
 
         // Create a force law and pass it to the simulation
-        typedef GeneralisedLinearSpringForce<2,3> Force;
+        typedef GeneralisedLinearSpringForce<2, 3> Force;
         MAKE_PTR(Force, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
@@ -607,8 +607,8 @@ public:
         EXIT_IF_PARALLEL;    // Cell population output doesn't work in parallel
 
         // Load mesh
-        TrianglesMeshReader<2,3> mesh_reader("cell_based/test/data/Square2dMeshIn3d/Square2dMeshIn3d");
-        MutableMesh<2,3> mesh;
+        TrianglesMeshReader<2, 3> mesh_reader("cell_based/test/data/Square2dMeshIn3d/Square2dMeshIn3d");
+        MutableMesh<2, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create cells (we use a NoCellCycleModel here for simplicity, since there is no proliferation)
@@ -617,20 +617,20 @@ public:
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
         // Create a cell population
-        MeshBasedCellPopulation<2,3> cell_population(mesh, cells);
+        MeshBasedCellPopulation<2, 3> cell_population(mesh, cells);
         cell_population.SetWriteVtkAsPoints(true);
 
         // Add a writer
         cell_population.AddCellWriter<CellIdWriter>();
 
         // Set up cell-based simulation
-        OffLatticeSimulation<2,3> simulator(cell_population);
+        OffLatticeSimulation<2, 3> simulator(cell_population);
         std::string output_dir = "TestOffLatticeSimulationWith2dMeshIn3dArchive";
         simulator.SetOutputDirectory(output_dir);
         simulator.SetEndTime(1.0);
 
         // Create a force law and pass it to the simulation
-        typedef GeneralisedLinearSpringForce<2,3> Force;
+        typedef GeneralisedLinearSpringForce<2, 3> Force;
         MAKE_PTR(Force, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
@@ -638,10 +638,10 @@ public:
         // Stop remeshing, as this is not possible for 2d in 3d meshes
         simulator.SetUpdateCellPopulationRule(false);
 
-        CellBasedSimulationArchiver<2,OffLatticeSimulation<2,3>, 3>::Save(&simulator);
+        CellBasedSimulationArchiver<2,OffLatticeSimulation<2, 3>, 3>::Save(&simulator);
 
         double start_time = 0.;
-        OffLatticeSimulation<2,3>* p_simulator = CellBasedSimulationArchiver<2, OffLatticeSimulation<2,3>, 3 >::Load(output_dir, start_time);
+        OffLatticeSimulation<2, 3>* p_simulator = CellBasedSimulationArchiver<2, OffLatticeSimulation<2, 3>, 3 >::Load(output_dir, start_time);
 
         p_simulator->Solve();
 
@@ -760,7 +760,7 @@ public:
         int num_cells_depth = 5;
         int num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -780,8 +780,8 @@ public:
         simulator.AddForce(p_linear_force);
 
         // Create some boundary conditions and pass them to the simulation
-        c_vector<double,2> point = zero_vector<double>(2);
-        c_vector<double,2> normal = zero_vector<double>(2);
+        c_vector<double, 2> point = zero_vector<double>(2);
+        c_vector<double, 2> normal = zero_vector<double>(2);
         normal(1) = -1.0;
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc1, (&cell_population, point, normal)); // y>0
         simulator.AddCellPopulationBoundaryCondition(p_bc1);
@@ -813,7 +813,7 @@ public:
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
         HoneycombMeshGenerator generator(2, 2, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         CellPropertyRegistry::Instance()->Clear();
@@ -929,7 +929,7 @@ public:
         unsigned num_cells_width = 2;
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 2);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Create cells
@@ -1019,7 +1019,7 @@ public:
 
         // Create a simple mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -1090,8 +1090,8 @@ public:
     void Test1dOffLatticeSimulation()
     {
         // Create a 1D MeshBasedCellPopulation
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        MutableMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        MutableMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         std::vector<CellPtr> cells;
@@ -1134,7 +1134,7 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(0.1, 1);
 
         HoneycombMeshGenerator generator(2, 2, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create some cells
         std::vector<CellPtr> cells;
@@ -1161,7 +1161,7 @@ public:
 
         // Create a simple 2D MeshBasedCellPopulation
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -1250,7 +1250,7 @@ public:
         int num_cells_depth = 5;
         int num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -1297,7 +1297,7 @@ public:
         EXIT_IF_PARALLEL;
 
         HoneycombMeshGenerator generator(10,10);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetCircularMesh(5);
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetCircularMesh(5);
 
         MAKE_PTR(ApcOneHitCellMutationState, p_mute_state);
         MAKE_PTR(WildTypeCellMutationState, p_wild_state);
@@ -1353,7 +1353,7 @@ public:
 
         // Create a simple 2D MeshBasedCellPopulation
         HoneycombMeshGenerator generator(3, 3, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
@@ -1371,7 +1371,7 @@ public:
         simulator.SetDt(0.1);
 
         // Pass an adaptive numerical method to the simulation
-        boost::shared_ptr<AbstractNumericalMethod<2,2> > p_method(new ForwardEulerNumericalMethod<2,2>());
+        boost::shared_ptr<AbstractNumericalMethod<2, 2> > p_method(new ForwardEulerNumericalMethod<2, 2>());
         p_method->SetUseAdaptiveTimestep(true);
         simulator.SetNumericalMethod(p_method);
 

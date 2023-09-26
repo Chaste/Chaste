@@ -101,15 +101,15 @@ public: // Tests should be public!
          * of Luo-Rudy cells. We pass the stimulus magnitude as 0.0
          * as we don't want any stimulated cells.
          */
-        PlaneStimulusCellFactory<CellLuoRudy1991FromCellMLBackwardEulerOpt,2> cell_factory(0.0);
+        PlaneStimulusCellFactory<CellLuoRudy1991FromCellMLBackwardEulerOpt, 2> cell_factory(0.0);
 
         /*
          * Now, we load up a rectangular mesh (in triangle/tetgen format), done as follows,
          * using {{{TrianglesMeshReader}}}.  Note that we use a distributed mesh, so the data
          * is shared among processes if run in parallel.
          */
-        TrianglesMeshReader<2,2> reader("mesh/test/data/2D_0_to_1mm_400_elements");
-        DistributedTetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> reader("mesh/test/data/2D_0_to_1mm_400_elements");
+        DistributedTetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(reader);
 
         /*
@@ -145,7 +145,7 @@ public: // Tests should be public!
          * by looping over elements and setting those more than 2mm from the centre
          * as bath elements (by default, the others are cardiac elements).
          */
-        for (AbstractTetrahedralMesh<2,2>::ElementIterator iter = mesh.GetElementIteratorBegin();
+        for (AbstractTetrahedralMesh<2, 2>::ElementIterator iter = mesh.GetElementIteratorBegin();
              iter != mesh.GetElementIteratorEnd();
              ++iter)
         {
@@ -247,7 +247,7 @@ public: // Tests should be public!
         ReplicatableVector solution_repl(solution);
 
         bool ap_triggered = false;
-        for (AbstractTetrahedralMesh<2,2>::NodeIterator iter = mesh.GetNodeIteratorBegin();
+        for (AbstractTetrahedralMesh<2, 2>::NodeIterator iter = mesh.GetNodeIteratorBegin();
              iter != mesh.GetNodeIteratorEnd();
              ++iter)
         {

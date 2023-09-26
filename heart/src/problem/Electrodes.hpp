@@ -71,7 +71,7 @@ private:
     /** Whether the second electrode is grounded */
     bool mGroundSecondElectrode;
     /** The created bcc, which BidomainProblem will use */
-    boost::shared_ptr<BoundaryConditionsContainer<DIM,DIM,2> > mpBoundaryConditionsContainer;
+    boost::shared_ptr<BoundaryConditionsContainer<DIM, DIM, 2> > mpBoundaryConditionsContainer;
     /** The time the electrodes are switched on */
     double mStartTime;
     /** The time the electrodes are switched off */
@@ -83,7 +83,7 @@ private:
      * the boundary conditions refer to nodes and/or elements, so need
      * the mesh to be archived, but don't have a pointer to the mesh itself.
      */
-    AbstractTetrahedralMesh<DIM,DIM>* mpMesh;
+    AbstractTetrahedralMesh<DIM, DIM>* mpMesh;
 
     /** Left electrode area*/
     double mLeftElectrodeArea;
@@ -155,14 +155,14 @@ public:
      *
      *  @param rMesh The mesh, assumed to be a cuboid.
      */
-    explicit Electrodes(AbstractTetrahedralMesh<DIM,DIM>& rMesh); // implemented in cpp
+    explicit Electrodes(AbstractTetrahedralMesh<DIM, DIM>& rMesh); // implemented in cpp
 
     /**
      *  @return the boundary conditions container in which is set up the Neumann
      *  fluxes for the first electrode, and the opposite fluxes for the second
-     *  electrode if the the second electrode isn't grounded
+     *  electrode if the second electrode isn't grounded
      */
-    boost::shared_ptr<BoundaryConditionsContainer<DIM,DIM,2> > GetBoundaryConditionsContainer();
+    boost::shared_ptr<BoundaryConditionsContainer<DIM, DIM, 2> > GetBoundaryConditionsContainer();
 
     /**
      *  @return whether it is time to switch off the electrodes yet. THIS ONLY RETURNS

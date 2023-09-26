@@ -184,7 +184,7 @@ public:
  * compilers.
  */
 template<unsigned SPACE_DIM>
-class VertexElement<1, SPACE_DIM> : public MutableElement<1,SPACE_DIM>
+class VertexElement<1, SPACE_DIM> : public MutableElement<1, SPACE_DIM>
 {
 public:
 

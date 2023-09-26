@@ -35,18 +35,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Hdf5ToXdmfConverter.hpp"
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 Hdf5ToXdmfConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToXdmfConverter(
     const FileFinder& rInputDirectory,
     const std::string& rFileBaseName,
     AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
-    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(
+    : AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>(
           rInputDirectory,
           rFileBaseName,
           pMesh,
           "xdmf_output",
           0u),
-      XdmfMeshWriter<ELEMENT_DIM,SPACE_DIM>(
+      XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>(
           rInputDirectory.GetRelativePath(FileFinder("", RelativeTo::ChasteTestOutput)) + "/xdmf_output",
                                           rFileBaseName, false /* Not cleaning directory*/)
 {
@@ -151,9 +151,9 @@ void Hdf5ToXdmfConverter<ELEMENT_DIM, SPACE_DIM>::AddDataOnNodes(
 #endif
 
 // Explicit instantiation
-template class Hdf5ToXdmfConverter<1,1>;
-template class Hdf5ToXdmfConverter<1,2>;
-template class Hdf5ToXdmfConverter<2,2>;
-template class Hdf5ToXdmfConverter<1,3>;
-template class Hdf5ToXdmfConverter<2,3>;
-template class Hdf5ToXdmfConverter<3,3>;
+template class Hdf5ToXdmfConverter<1, 1>;
+template class Hdf5ToXdmfConverter<1, 2>;
+template class Hdf5ToXdmfConverter<2, 2>;
+template class Hdf5ToXdmfConverter<1, 3>;
+template class Hdf5ToXdmfConverter<2, 3>;
+template class Hdf5ToXdmfConverter<3, 3>;

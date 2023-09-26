@@ -77,7 +77,7 @@ void QuadraticBasisFunction<0>::ComputeBasisFunctions(
  *     within a canonical element.
  * @return The value of the basis function.
  */
-template <unsigned ELEMENT_DIM>
+template<unsigned ELEMENT_DIM>
 double QuadraticBasisFunction<ELEMENT_DIM>::ComputeBasisFunction(
     const ChastePoint<ELEMENT_DIM>& rPoint,
     unsigned basisIndex)
@@ -87,99 +87,143 @@ double QuadraticBasisFunction<ELEMENT_DIM>::ComputeBasisFunction(
         double x, y, z;
         switch (ELEMENT_DIM)
         {
-        case 0:
-            assert(basisIndex == 0);
-            return 1.0;
-            break;
-
-        case 1:
-            x = rPoint[0];
-            switch (basisIndex)
+            case 0:
             {
-                case 0:
-                    return 2.0*(x-1.0)*(x-0.5);
-                    break;
-                case 1:
-                    return 2.0*x*(x-0.5);
-                    break;
-                case 2:
-                    return 4.0*x*(1.0-x);
-                    break;
-                default:
-                    NEVER_REACHED;
+                assert(basisIndex == 0);
+                return 1.0;
+                break;
             }
-            break;
-
-        case 2:
-            x = rPoint[0];
-            y = rPoint[1];
-            switch (basisIndex)
+            case 1:
             {
-                case 0: // the node at (0,0)
-                    return 2.0 * (1.0 - x - y) * (0.5 - x - y);
-                    break;
-                case 1: // the node at (1,0)
-                    return 2.0*x*(x-0.5);
-                    break;
-                case 2: // the node at (0,1)
-                    return 2.0*y*(y-0.5);
-                    break;
-                case 3: // the node opposite 0, which is (1/2,1/2)
-                    return 4.0 * y * x;
-                    break;
-                case 4: // the node opposite 1, which is (0,1/2)
-                    return 4.0 * (1.0 - x - y) * y;
-                    break;
-                case 5: // the node opposite 2, which is (1/2,0)
-                    return 4.0 * (1.0 - x - y) * x;
-                    break;
-                default:
-                    NEVER_REACHED;
+                x = rPoint[0];
+                switch (basisIndex)
+                {
+                    case 0:
+                    {
+                        return 2.0 * (x - 1.0) * (x - 0.5);
+                        break;
+                    }
+                    case 1:
+                    {
+                        return 2.0 * x * (x - 0.5);
+                        break;
+                    }
+                    case 2:
+                    {
+                        return 4.0 * x * (1.0 - x);
+                        break;
+                    }
+                    default:
+                        NEVER_REACHED;
+                }
+                break;
             }
-            break;
-
-        case 3:
-            x = rPoint[0];
-            y = rPoint[1];
-            z = rPoint[2];
-            switch (basisIndex)
+            case 2:
             {
-                case 0: // the node at (0,0,0)
-                    return 2.0 * (1.0 - x - y - z) * (0.5 - x - y - z);
-                    break;
-                case 1: // the node at (1,0,0)
-                    return 2.0*x*(x-0.5);
-                    break;
-                case 2: // the node at (0,1,0)
-                    return 2.0*y*(y-0.5);
-                    break;
-                case 3: // the node at (0,0,1)
-                    return 2.0*z*(z-0.5);
-                    break;
-                case 4: // our (tetgen convention), node4 is between nodes 0 and 1, (1/2,0,0)
-                    return 4.0 * (1.0 - x - y - z) * x;
-                    break;
-                case 5: // our (tetgen convention), node5 is between nodes 1 and 2, (1/2,1/2,0)
-                    return 4 * x * y;
-                    break;
-                case 6: // our (tetgen convention), node6 is between nodes 0 and 2, (0,1/2,0)
-                    return 4.0 * (1.0 - x - y - z) * y;
-                    break;
-                case 7: // our (tetgen convention), node7 is between nodes 0 and 3, (0,0,1/2)
-                    return 4.0 * (1.0 - x - y - z) * z;
-                    break;
-                case 8: // our (tetgen convention), node8 is between nodes 1 and 3, (1/2,0,1/2)
-                    return 4.0 * x * z;
-                    break;
-                case 9: // our (tetgen convention), node9 is between nodes 2 and 3, (0,1/2,1/2)
-                    return 4.0 * y * z;
-                    break;
-                default:
-                    NEVER_REACHED;
+                x = rPoint[0];
+                y = rPoint[1];
+                switch (basisIndex)
+                {
+                    case 0: // the node at (0,0)
+                    {
+                        return 2.0 * (1.0 - x - y) * (0.5 - x - y);
+                        break;
+                    }
+                    case 1: // the node at (1,0)
+                    {
+                        return 2.0 * x * (x - 0.5);
+                        break;
+                    }
+                    case 2: // the node at (0,1)
+                    {
+                        return 2.0 * y * (y - 0.5);
+                        break;
+                    }
+                    case 3: // the node opposite 0, which is (1/2,1/2)
+                    {
+                        return 4.0 * y * x;
+                        break;
+                    }
+                    case 4: // the node opposite 1, which is (0,1/2)
+                    {
+                        return 4.0 * (1.0 - x - y) * y;
+                        break;
+                    }
+                    case 5: // the node opposite 2, which is (1/2,0)
+                    {
+                        return 4.0 * (1.0 - x - y) * x;
+                        break;
+                    }
+                    default:
+                        NEVER_REACHED;
+                }
+                break;
             }
-            break;
+            case 3:
+            {
+                x = rPoint[0];
+                y = rPoint[1];
+                z = rPoint[2];
+                switch (basisIndex)
+                {
+                    case 0: // the node at (0,0,0)
+                    {
+                        return 2.0 * (1.0 - x - y - z) * (0.5 - x - y - z);
+                        break;
+                    }
+                    case 1: // the node at (1,0,0)
+                    {
+                        return 2.0 * x * (x - 0.5);
+                        break;
+                    }
+                    case 2: // the node at (0,1,0)
+                    {
+                        return 2.0 * y * (y - 0.5);
+                        break;
+                    }
+                    case 3: // the node at (0,0,1)
+                    {
+                        return 2.0 * z * (z - 0.5);
+                        break;
+                    }
+                    case 4: // our (tetgen convention), node4 is between nodes 0 and 1, (1/2,0,0)
+                    {
+                        return 4.0 * (1.0 - x - y - z) * x;
+                        break;
+                    }
+                    case 5: // our (tetgen convention), node5 is between nodes 1 and 2, (1/2,1/2,0)
+                    {
+                        return 4 * x * y;
+                        break;
+                    }
+                    case 6: // our (tetgen convention), node6 is between nodes 0 and 2, (0,1/2,0)
+                    {
+                        return 4.0 * (1.0 - x - y - z) * y;
+                        break;
+                    }
+                    case 7: // our (tetgen convention), node7 is between nodes 0 and 3, (0,0,1/2)
+                    {
+                        return 4.0 * (1.0 - x - y - z) * z;
+                        break;
+                    }
+                    case 8: // our (tetgen convention), node8 is between nodes 1 and 3, (1/2,0,1/2)
+                    {
+                        return 4.0 * x * z;
+                        break;
+                    }
+                    case 9: // our (tetgen convention), node9 is between nodes 2 and 3, (0,1/2,1/2)
+                    {
+                        return 4.0 * y * z;
+                        break;
+                    }
+                    default:
+                        NEVER_REACHED;
+                }
+                break;
+            }
+            default:
+                NEVER_REACHED;
         }
-        return 0.0; // Avoid compiler warning
     }
     else
     {
@@ -188,7 +232,8 @@ double QuadraticBasisFunction<ELEMENT_DIM>::ComputeBasisFunction(
 }
 
 /**
- * Compute the derivative of a basis function at a point within an canonical element.
+ * Compute the derivative of a basis function at a point within an canonical 
+ * element.
  *
  * @param rPoint The point at which to compute the basis function. The results
  *     are undefined if this is not within the canonical element.
@@ -197,7 +242,7 @@ double QuadraticBasisFunction<ELEMENT_DIM>::ComputeBasisFunction(
  * @return The derivative of the basis function. This is a vector (c_vector
  *     instance) giving the derivative along each axis.
  */
-template <unsigned ELEMENT_DIM>
+template<unsigned ELEMENT_DIM>
 c_vector<double, ELEMENT_DIM> QuadraticBasisFunction<ELEMENT_DIM>::ComputeBasisFunctionDerivative(
     const ChastePoint<ELEMENT_DIM>& rPoint,
     unsigned basisIndex)
@@ -208,118 +253,162 @@ c_vector<double, ELEMENT_DIM> QuadraticBasisFunction<ELEMENT_DIM>::ComputeBasisF
         double x, y, z;
         switch (ELEMENT_DIM)
         {
-        case 1:
-            x = rPoint[0];
-            switch (basisIndex)
+            case 1:
             {
-                case 0:
-                    gradN(0) = 4.0*x-3.0;
-                    break;
-                case 1:
-                    gradN(0) = 4.0*x-1.0;
-                    break;
-                case 2:
-                    gradN(0) = 4.0-8.0*x;
-                    break;
-                default:
-                    NEVER_REACHED;
+                x = rPoint[0];
+                switch (basisIndex)
+                {
+                    case 0:
+                    {
+                        gradN(0) = 4.0 * x - 3.0;
+                        break;
+                    }
+                    case 1:
+                    {
+                        gradN(0) = 4.0 * x - 1.0;
+                        break;
+                    }
+                    case 2:
+                    {
+                        gradN(0) = 4.0 - 8.0*x;
+                        break;
+                    }
+                    default:
+                        NEVER_REACHED;
+                }
+                break;
             }
-            break;
-
-        case 2:
-            x = rPoint[0];
-            y = rPoint[1];
-            switch (basisIndex)
+            case 2:
             {
-                case 0:
-                    gradN(0) = -3.0 + 4.0*x + 4.0*y;
-                    gradN(1) = -3.0 + 4.0*x + 4.0*y;
-                    break;
-                case 1:
-                    gradN(0) = 4.0*x - 1.0;
-                    gradN(1) = 0.0;
-                    break;
-                case 2:
-                    gradN(0) = 0.0;
-                    gradN(1) = 4.0*y - 1.0;
-                    break;
-                case 3:
-                    gradN(0) = 4.0*y;
-                    gradN(1) = 4.0*x;
-                    break;
-                case 4:
-                    gradN(0) = -4.0*y;
-                    gradN(1) = 4.0-4.0*x-8.0*y;
-                    break;
-                case 5:
-                    gradN(0) = 4.0-8.0*x-4.0*y;
-                    gradN(1) = -4.0*x;
-                    break;
-                default:
-                    NEVER_REACHED;
+                x = rPoint[0];
+                y = rPoint[1];
+                switch (basisIndex)
+                {
+                    case 0:
+                    {
+                        gradN(0) = -3.0 + 4.0*x + 4.0*y;
+                        gradN(1) = -3.0 + 4.0*x + 4.0*y;
+                        break;
+                    }
+                    case 1:
+                    {
+                        gradN(0) = 4.0*x - 1.0;
+                        gradN(1) = 0.0;
+                        break;
+                    }
+                    case 2:
+                    {
+                        gradN(0) = 0.0;
+                        gradN(1) = 4.0*y - 1.0;
+                        break;
+                    }
+                    case 3:
+                    {
+                        gradN(0) = 4.0*y;
+                        gradN(1) = 4.0*x;
+                        break;
+                    }
+                    case 4:
+                    {
+                        gradN(0) = -4.0*y;
+                        gradN(1) = 4.0-4.0*x-8.0*y;
+                        break;
+                    }
+                    case 5:
+                    {
+                        gradN(0) = 4.0-8.0*x-4.0*y;
+                        gradN(1) = -4.0*x;
+                        break;
+                    }
+                    default:
+                        NEVER_REACHED;
+                }
+                break;
             }
-            break;
-
-        case 3:
-            x = rPoint[0];
-            y = rPoint[1];
-            z = rPoint[2];
-            switch (basisIndex)
+            case 3:
             {
-                case 0:
-                    gradN(0) = -3.0 + 4.0*(x+y+z);
-                    gradN(1) = -3.0 + 4.0*(x+y+z);
-                    gradN(2) = -3.0 + 4.0*(x+y+z);
-                    break;
-                case 1:
-                    gradN(0) =  4.0*x-1.0;
-                    gradN(1) =  0;
-                    gradN(2) =  0;
-                    break;
-                case 2:
-                    gradN(0) =  0;
-                    gradN(1) =  4.0*y-1.0;
-                    gradN(2) =  0;
-                    break;
-                case 3:
-                    gradN(0) =  0;
-                    gradN(1) =  0;
-                    gradN(2) =  4.0*z-1.0;
-                    break;
-                case 4:
-                    gradN(0) =  4.0-8.0*x-4.0*y-4.0*z;
-                    gradN(1) =  -4.0*x;
-                    gradN(2) =  -4.0*x;
-                    break;
-                case 5:
-                    gradN(0) =  4.0*y;
-                    gradN(1) =  4.0*x;
-                    gradN(2) =  0.0;
-                    break;
-                case 6:
-                    gradN(0) =  -4.0*y;
-                    gradN(1) =  4.0-4.0*x-8.0*y-4.0*z;
-                    gradN(2) =  -4.0*y;
-                    break;
-                case 7:
-                    gradN(0) =  -4.0*z;
-                    gradN(1) =  -4.0*z;
-                    gradN(2) =  4.0-4.0*x-4.0*y-8.0*z;
-                    break;
-                case 8:
-                    gradN(0) =  4.0*z;
-                    gradN(1) =  0;
-                    gradN(2) =  4.0*x;
-                    break;
-                case 9:
-                    gradN(0) =  0;
-                    gradN(1) =  4.0*z;
-                    gradN(2) =  4.0*y;
-                    break;
-                default:
-                    NEVER_REACHED;
+                x = rPoint[0];
+                y = rPoint[1];
+                z = rPoint[2];
+                switch (basisIndex)
+                {
+                    case 0:
+                    {
+                        gradN(0) = -3.0 + 4.0*(x+y+z);
+                        gradN(1) = -3.0 + 4.0*(x+y+z);
+                        gradN(2) = -3.0 + 4.0*(x+y+z);
+                        break;
+                    }
+                    case 1:
+                    {
+                        gradN(0) =  4.0*x-1.0;
+                        gradN(1) =  0;
+                        gradN(2) =  0;
+                        break;
+                    }
+                    case 2:
+                    {
+                        gradN(0) =  0;
+                        gradN(1) =  4.0*y-1.0;
+                        gradN(2) =  0;
+                        break;
+                    }
+                    case 3:
+                    {
+                        gradN(0) =  0;
+                        gradN(1) =  0;
+                        gradN(2) =  4.0*z-1.0;
+                        break;
+                    }
+                    case 4:
+                    {
+                        gradN(0) =  4.0-8.0*x-4.0*y-4.0*z;
+                        gradN(1) =  -4.0*x;
+                        gradN(2) =  -4.0*x;
+                        break;
+                    }
+                    case 5:
+                    {
+                        gradN(0) =  4.0*y;
+                        gradN(1) =  4.0*x;
+                        gradN(2) =  0.0;
+                        break;
+                    }
+                    case 6:
+                    {
+                        gradN(0) =  -4.0*y;
+                        gradN(1) =  4.0-4.0*x-8.0*y-4.0*z;
+                        gradN(2) =  -4.0*y;
+                        break;
+                    }
+                    case 7:
+                    {
+                        gradN(0) =  -4.0*z;
+                        gradN(1) =  -4.0*z;
+                        gradN(2) =  4.0-4.0*x-4.0*y-8.0*z;
+                        break;
+                    }
+                    case 8:
+                    {
+                        gradN(0) =  4.0*z;
+                        gradN(1) =  0;
+                        gradN(2) =  4.0*x;
+                        break;
+                    }
+                    case 9:
+                    {
+                        gradN(0) =  0;
+                        gradN(1) =  4.0*z;
+                        gradN(2) =  4.0*y;
+                        break;
+                    }
+                    default:
+                        NEVER_REACHED;
+                }
+                break;
             }
-            break;
+            default:
+                NEVER_REACHED;
         }
         return gradN;
     }
@@ -336,7 +425,7 @@ c_vector<double, ELEMENT_DIM> QuadraticBasisFunction<ELEMENT_DIM>::ComputeBasisF
  *     are undefined if this is not within the canonical element.
  * @param rReturnValue The values of the basis functions, in local index order.
  */
-template <unsigned ELEMENT_DIM>
+template<unsigned ELEMENT_DIM>
 void QuadraticBasisFunction<ELEMENT_DIM>::ComputeBasisFunctions(
     const ChastePoint<ELEMENT_DIM>& rPoint,
     c_vector<double, (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2>& rReturnValue)
@@ -359,11 +448,10 @@ void QuadraticBasisFunction<ELEMENT_DIM>::ComputeBasisFunctions(
  *
  * @param rPoint The point at which to compute the basis functions. The results
  *     are undefined if this is not within the canonical element.
- * @param rReturnValue The derivatives of the basis functions, in local index order. Each
- *     column of the matrix gives the derivative along
- *     each axis.
+ * @param rReturnValue The derivatives of the basis functions, in local index 
+ *     order. Each column of the matrix gives the derivative along each axis.
  */
-template <unsigned ELEMENT_DIM>
+template<unsigned ELEMENT_DIM>
 void QuadraticBasisFunction<ELEMENT_DIM>::ComputeBasisFunctionDerivatives(
     const ChastePoint<ELEMENT_DIM>& rPoint,
     c_matrix<double, ELEMENT_DIM, (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2>& rReturnValue)
@@ -391,11 +479,11 @@ void QuadraticBasisFunction<ELEMENT_DIM>::ComputeBasisFunctionDerivatives(
  *     are undefined if this is not within the canonical element.
  * @param rInverseJacobian The inverse of the Jacobian matrix mapping the real
  *     element into the canonical element.
- * @param rReturnValue The derivatives of the basis functions, in local index order. Each
- *     entry is a vector (VectorDouble instance) giving the derivative along
- *     each axis.
+ * @param rReturnValue The derivatives of the basis functions, in local index 
+ *     order. Each entry is a vector (VectorDouble instance) giving the 
+ *     derivative along each axis.
  */
-template <unsigned ELEMENT_DIM>
+template<unsigned ELEMENT_DIM>
 void QuadraticBasisFunction<ELEMENT_DIM>::ComputeTransformedBasisFunctionDerivatives(
     const ChastePoint<ELEMENT_DIM>& rPoint,
     const c_matrix<double, ELEMENT_DIM, ELEMENT_DIM>& rInverseJacobian,

@@ -59,7 +59,7 @@ std::set< Node<DIM>* >& Box<DIM>::rGetNodesContained()
 }
 
 template<unsigned DIM>
-void Box<DIM>::AddElement(Element<DIM,DIM>* pElement)
+void Box<DIM>::AddElement(Element<DIM, DIM>* pElement)
 {
     mElementsContained.insert(pElement);
 }
@@ -67,7 +67,7 @@ void Box<DIM>::AddElement(Element<DIM,DIM>* pElement)
 ///\todo #2308 there are no methods to remove or clear elements
 
 template<unsigned DIM>
-std::set< Element<DIM,DIM>* >& Box<DIM>::rGetElementsContained()
+std::set< Element<DIM, DIM>* >& Box<DIM>::rGetElementsContained()
 {
     return mElementsContained;
 }

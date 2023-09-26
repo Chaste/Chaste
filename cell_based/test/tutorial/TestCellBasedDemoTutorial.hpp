@@ -115,10 +115,10 @@ public:
      */
     void TestVertexBasedMonolayer()
     {
-        /* The first thing we define is a 2D (specified by the <2,2>) mesh which holds the spatial information of the simulation. To do this we use one of a
+        /* The first thing we define is a 2D (specified by the <2, 2>) mesh which holds the spatial information of the simulation. To do this we use one of a
          * number of {{{MeshGenerators}}}.*/
         HoneycombVertexMeshGenerator generator(2, 2);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         /* We now generate a collection of cells. We do this by using a {{{CellsGenerator}}} and we specify the proliferative
          * behaviour of the cell by choosing a {{{CellCycleModel}}}, here we choose a {{{UniformG1GenerationalCellCycleModel}}} where
@@ -205,7 +205,7 @@ public:
          * that defines the connectivity in the mesh.
          */
         HoneycombMeshGenerator generator(2, 2); //**Changed**//
-        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh(); //**Changed**//
+        boost::shared_ptr<MutableMesh<2, 2> > p_generating_mesh = generator.GetMesh(); //**Changed**//
         NodesOnlyMesh<2> mesh; //**Changed**//
         mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5); //**Changed**//
 
@@ -269,7 +269,7 @@ public:
     {
         /* This time we just create a {{{MutableMesh}}} and use that to specify the spatial locations of cells.*/
         HoneycombMeshGenerator generator(2, 2);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();  //**Changed**//
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();  //**Changed**//
 
         /* We create the same number of cells as the previous test.*/
         std::vector<CellPtr> cells;
@@ -322,7 +322,7 @@ public:
          * Here we pass an extra argument to the {{{HoneycombMeshGenerator}}} which adds another 2 rows of
          * nodes round the mesh, known as ghost nodes.*/
         HoneycombMeshGenerator generator(2, 2, 2); //**Changed**//
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         /* We only want to create cells for non ghost nodes. To find these we get them from the {{{HoneycombMeshGenerator}}}
          * using the method {{{GetCellLocationIndices}}}. We also use a different {{{CellCycleModel}}}. Here we use a
@@ -440,8 +440,8 @@ public:
 
         /* We now want to impose the condition y>0 on the cells. To do this we create a "shared pointer" to a {{{PlaneBoundaryCondition}}}.
          * Much like the {{{RandomCellKiller}}} earlier we pass arguments to the constructor (a point (0,0) on the plane (line in 2D) and an outward pointing normal to the plane (0,-1) ) using the {{{MAKE_PTR_ARGS}}} macro.*/
-        c_vector<double,2> point = zero_vector<double>(2);
-        c_vector<double,2> normal = zero_vector<double>(2);
+        c_vector<double, 2> point = zero_vector<double>(2);
+        c_vector<double, 2> normal = zero_vector<double>(2);
         normal(1) = -1.0;
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc, (&cell_population, point, normal));
         simulator.AddCellPopulationBoundaryCondition(p_bc);

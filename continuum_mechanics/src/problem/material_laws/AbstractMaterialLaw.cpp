@@ -42,25 +42,26 @@ AbstractMaterialLaw<DIM>::AbstractMaterialLaw()
 }
 
 template<unsigned DIM>
-void AbstractMaterialLaw<DIM>::ComputeCauchyStress(c_matrix<double,DIM,DIM>& rF,
-                                                   double pressure,
-                                                   c_matrix<double,DIM,DIM>& rSigma)
+void AbstractMaterialLaw<DIM>::ComputeCauchyStress(
+    c_matrix<double, DIM, DIM>& rF,
+    double pressure,
+    c_matrix<double, DIM, DIM>& rSigma)
 {
     double detF = Determinant(rF);
 
-    c_matrix<double,DIM,DIM> C = prod(trans(rF), rF);
-    c_matrix<double,DIM,DIM> invC = Inverse(C);
+    c_matrix<double, DIM, DIM> C = prod(trans(rF), rF);
+    c_matrix<double, DIM, DIM> invC = Inverse(C);
 
-    c_matrix<double,DIM,DIM> T;
+    c_matrix<double, DIM, DIM> T;
 
-    static FourthOrderTensor<DIM,DIM,DIM,DIM> dTdE; // not filled in, made static for efficiency
+    static FourthOrderTensor<DIM, DIM, DIM, DIM> dTdE; // not filled in, made static for efficiency
 
     ComputeStressAndStressDerivative(C, invC, pressure, T, dTdE, false);
 
     /*
      * Looping is probably more eficient then doing rSigma = (1/detF)*rF*T*transpose(rF),
-     * which doesn't seem to compile anyway, as rF is a Tensor<2,DIM> and T is a
-     * SymmetricTensor<2,DIM>.
+     * which doesn't seem to compile anyway, as rF is a Tensor<2, DIM> and T is a
+     * SymmetricTensor<2, DIM>.
      */
     for (unsigned i = 0; i < DIM; ++i)
     {
@@ -80,16 +81,17 @@ void AbstractMaterialLaw<DIM>::ComputeCauchyStress(c_matrix<double,DIM,DIM>& rF,
 }
 
 template<unsigned DIM>
-void AbstractMaterialLaw<DIM>::Compute1stPiolaKirchoffStress(c_matrix<double,DIM,DIM>& rF,
-                                                             double pressure,
-                                                             c_matrix<double,DIM,DIM>& rS)
+void AbstractMaterialLaw<DIM>::Compute1stPiolaKirchoffStress(
+    c_matrix<double, DIM, DIM>& rF,
+    double pressure,
+    c_matrix<double, DIM, DIM>& rS)
 {
-    c_matrix<double,DIM,DIM> C = prod(trans(rF), rF);
-    c_matrix<double,DIM,DIM> invC = Inverse(C);
+    c_matrix<double, DIM, DIM> C = prod(trans(rF), rF);
+    c_matrix<double, DIM, DIM> invC = Inverse(C);
 
-    c_matrix<double,DIM,DIM> T;
+    c_matrix<double, DIM, DIM> T;
 
-    static FourthOrderTensor<DIM,DIM,DIM,DIM> dTdE; // not filled in, made static for efficiency
+    static FourthOrderTensor<DIM, DIM, DIM, DIM> dTdE; // not filled in, made static for efficiency
 
     ComputeStressAndStressDerivative(C, invC, pressure, T, dTdE, false);
 
@@ -97,13 +99,14 @@ void AbstractMaterialLaw<DIM>::Compute1stPiolaKirchoffStress(c_matrix<double,DIM
 }
 
 template<unsigned DIM>
-void AbstractMaterialLaw<DIM>::Compute2ndPiolaKirchoffStress(c_matrix<double,DIM,DIM>& rC,
-                                                             double pressure,
-                                                             c_matrix<double,DIM,DIM>& rT)
+void AbstractMaterialLaw<DIM>::Compute2ndPiolaKirchoffStress(
+    c_matrix<double, DIM, DIM>& rC,
+    double pressure,
+    c_matrix<double, DIM, DIM>& rT)
 {
-    c_matrix<double,DIM,DIM> invC = Inverse(rC);
+    c_matrix<double, DIM, DIM> invC = Inverse(rC);
 
-    static FourthOrderTensor<DIM,DIM,DIM,DIM> dTdE; // not filled in, made static for efficiency
+    static FourthOrderTensor<DIM, DIM, DIM, DIM> dTdE; // not filled in, made static for efficiency
 
     ComputeStressAndStressDerivative(rC, invC, pressure, rT, dTdE, false);
 }
@@ -117,7 +120,8 @@ void AbstractMaterialLaw<DIM>::ScaleMaterialParameters(double scaleFactor)
 // LCOV_EXCL_STOP
 
 template<unsigned DIM>
-void AbstractMaterialLaw<DIM>::SetChangeOfBasisMatrix(c_matrix<double,DIM,DIM>& rChangeOfBasisMatrix)
+void AbstractMaterialLaw<DIM>::SetChangeOfBasisMatrix(
+    c_matrix<double, DIM, DIM>& rChangeOfBasisMatrix)
 {
     mpChangeOfBasisMatrix = &rChangeOfBasisMatrix;
 }
@@ -129,8 +133,11 @@ void AbstractMaterialLaw<DIM>::ResetToNoChangeOfBasisMatrix()
 }
 
 template<unsigned DIM>
-void AbstractMaterialLaw<DIM>::ComputeTransformedDeformationTensor(c_matrix<double,DIM,DIM>& rC, c_matrix<double,DIM,DIM>& rInvC,
-                                                                   c_matrix<double,DIM,DIM>& rCTransformed, c_matrix<double,DIM,DIM>& rInvCTransformed)
+void AbstractMaterialLaw<DIM>::ComputeTransformedDeformationTensor(
+    c_matrix<double, DIM, DIM>& rC,
+    c_matrix<double, DIM, DIM>& rInvC,
+    c_matrix<double, DIM, DIM>& rCTransformed,
+    c_matrix<double, DIM, DIM>& rInvCTransformed)
 {
     // Writing the local coordinate system as fibre/sheet/normal, as in cardiac problems..
 
@@ -139,8 +146,8 @@ void AbstractMaterialLaw<DIM>::ComputeTransformedDeformationTensor(c_matrix<doub
     if (mpChangeOfBasisMatrix)
     {
         // C* = P^T C P, and ditto inv(C)
-        rCTransformed = prod(trans(*mpChangeOfBasisMatrix),(c_matrix<double,DIM,DIM>)prod(rC,*mpChangeOfBasisMatrix));         // C*    = P^T C    P
-        rInvCTransformed = prod(trans(*mpChangeOfBasisMatrix),(c_matrix<double,DIM,DIM>)prod(rInvC,*mpChangeOfBasisMatrix));   // invC* = P^T invC P
+        rCTransformed = prod(trans(*mpChangeOfBasisMatrix),(c_matrix<double, DIM, DIM>)prod(rC,*mpChangeOfBasisMatrix));         // C*    = P^T C    P
+        rInvCTransformed = prod(trans(*mpChangeOfBasisMatrix),(c_matrix<double, DIM, DIM>)prod(rInvC,*mpChangeOfBasisMatrix));   // invC* = P^T invC P
     }
     else
     {
@@ -150,14 +157,15 @@ void AbstractMaterialLaw<DIM>::ComputeTransformedDeformationTensor(c_matrix<doub
 }
 
 template<unsigned DIM>
-void AbstractMaterialLaw<DIM>::TransformStressAndStressDerivative(c_matrix<double,DIM,DIM>& rT,
-                                                                  FourthOrderTensor<DIM,DIM,DIM,DIM>& rDTdE,
-                                                                  bool transformDTdE)
+void AbstractMaterialLaw<DIM>::TransformStressAndStressDerivative(
+    c_matrix<double, DIM, DIM>& rT,
+    FourthOrderTensor<DIM, DIM, DIM, DIM>& rDTdE,
+    bool transformDTdE)
 {
     //  T = P T* P^T   and   dTdE_{MNPQ}  =  P_{Mm}P_{Nn}P_{Pp}P_{Qq} dT*dE*_{mnpq}
     if (mpChangeOfBasisMatrix)
     {
-        static c_matrix<double,DIM,DIM> T_transformed_times_Ptrans;
+        static c_matrix<double, DIM, DIM> T_transformed_times_Ptrans;
         T_transformed_times_Ptrans = prod(rT, trans(*mpChangeOfBasisMatrix));
 
         rT = prod(*mpChangeOfBasisMatrix, T_transformed_times_Ptrans);  // T = P T* P^T
@@ -165,7 +173,7 @@ void AbstractMaterialLaw<DIM>::TransformStressAndStressDerivative(c_matrix<doubl
         // dTdE_{MNPQ}  =  P_{Mm}P_{Nn}P_{Pp}P_{Qq} dT*dE*_{mnpq}
         if (transformDTdE)
         {
-            static FourthOrderTensor<DIM,DIM,DIM,DIM> temp;
+            static FourthOrderTensor<DIM, DIM, DIM, DIM> temp;
             temp.template SetAsContractionOnFirstDimension<DIM>(*mpChangeOfBasisMatrix, rDTdE);
             rDTdE.template SetAsContractionOnSecondDimension<DIM>(*mpChangeOfBasisMatrix, temp);
             temp.template SetAsContractionOnThirdDimension<DIM>(*mpChangeOfBasisMatrix, rDTdE);

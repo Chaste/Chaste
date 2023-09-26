@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * The output file is called divisions.dat by default.
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class CellDivisionLocationsWriter : public AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM>
 {
 private:
@@ -58,7 +58,7 @@ private:
      * @param archive the archive
      * @param version the current version of this class
      */
-    template <class Archive>
+    template<class Archive>
     void serialize(Archive& archive, const unsigned int version)
     {
         archive& boost::serialization::base_object<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> >(*this);

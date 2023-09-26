@@ -57,7 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
 template<unsigned DIM>
-class ExtendedBidomainMassMatrixAssembler : public AbstractFeVolumeIntegralAssembler<DIM,DIM,3,false,true,NORMAL>
+class ExtendedBidomainMassMatrixAssembler : public AbstractFeVolumeIntegralAssembler<DIM, DIM,3,false,true,NORMAL>
 {
 protected:
     /**
@@ -79,9 +79,9 @@ protected:
         c_vector<double, DIM+1> &rPhi,
         c_matrix<double, DIM, DIM+1> &rGradPhi,
         ChastePoint<DIM> &rX,
-        c_vector<double,3> &rU,
-        c_matrix<double,3,DIM> &rGradU /* not used */,
-        Element<DIM,DIM>* pElement);
+        c_vector<double, 3> &rU,
+        c_matrix<double,3, DIM> &rGradU /* not used */,
+        Element<DIM, DIM>* pElement);
 
 public:
 
@@ -90,8 +90,8 @@ public:
      *
      * @param pMesh pointer to the mesh
      */
-    explicit ExtendedBidomainMassMatrixAssembler(AbstractTetrahedralMesh<DIM,DIM>* pMesh)
-        : AbstractFeVolumeIntegralAssembler<DIM,DIM,3,false,true,NORMAL>(pMesh)
+    explicit ExtendedBidomainMassMatrixAssembler(AbstractTetrahedralMesh<DIM, DIM>* pMesh)
+        : AbstractFeVolumeIntegralAssembler<DIM, DIM,3,false,true,NORMAL>(pMesh)
     {
     }
 

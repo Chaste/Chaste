@@ -51,7 +51,7 @@ class TestPlaneStimulusCellFactory : public CxxTest::TestSuite
 public:
     void TestBasicContructor()
     {
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructCuboid(2,2,2);
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory1;
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 3> cell_factory2(-100); //  stimulus voltage
@@ -62,7 +62,7 @@ public:
         cell_factory1.SetMesh(&mesh);
         cell_factory2.SetMesh(&mesh);
 
-        for (unsigned node_num=0; node_num<mesh.GetNumNodes(); node_num++)
+        for (unsigned node_num = 0; node_num<mesh.GetNumNodes(); node_num++)
         {
             Node<3>* p_node=mesh.GetNode(node_num);
 
@@ -93,7 +93,7 @@ public:
 
     void TestHeartGeometryIntoCellFactory()
     {
-        TetrahedralMesh<2,2> mesh;
+        TetrahedralMesh<2, 2> mesh;
         //This mesh will have 6 nodes per face, spaced by 1
         mesh.ConstructRectangularMesh(5, 5);
 
@@ -105,7 +105,7 @@ public:
             out_stream p_left_file = handler.OpenOutputFile(left_file);
             out_stream p_right_file = handler.OpenOutputFile(right_file);
 
-            for (unsigned index=0; index<mesh.GetNumNodes(); index++)
+            for (unsigned index = 0; index<mesh.GetNumNodes(); index++)
             {
                 // Get the nodes at the left face of the square
                 if (fabs(mesh.GetNode(index)->rGetLocation()[0]) < 1e-6)
@@ -135,7 +135,7 @@ public:
         p_info_from_cell_factory = cell_factory_1.GetHeartGeometryInformation();
 
         //check that the object obtained from the cell factory is the same as the one created above.
-        for (unsigned index=0; index<mesh.GetNumNodes(); index++)
+        for (unsigned index = 0; index<mesh.GetNumNodes(); index++)
         {
             double x = mesh.GetNode(index)->rGetLocation()[0];
             TS_ASSERT_EQUALS(info.CalculateRelativeWallPosition(index),(5.0-x)/5.0);

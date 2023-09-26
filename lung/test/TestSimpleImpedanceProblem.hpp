@@ -53,8 +53,8 @@ private:
 public:
     void TestAcinarImpedance()
     {
-        TetrahedralMesh<1,3> mesh;
-        TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/y_branch_3d_mesh");
+        TetrahedralMesh<1, 3> mesh;
+        TrianglesMeshReader<1, 3> mesh_reader("mesh/test/data/y_branch_3d_mesh");
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_THROWS_CONTAINS(SimpleImpedanceProblem(mesh, 1u), "Outlet node is not a boundary node");
@@ -73,8 +73,8 @@ public:
 
     void TestElementReactanceAndInertance()
     {
-        TetrahedralMesh<1,3> mesh;
-        TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/y_branch_3d_mesh");
+        TetrahedralMesh<1, 3> mesh;
+        TrianglesMeshReader<1, 3> mesh_reader("mesh/test/data/y_branch_3d_mesh");
         mesh.ConstructFromMeshReader(mesh_reader);
 
         SimpleImpedanceProblem problem(mesh, 0u);
@@ -91,8 +91,8 @@ public:
 
     void TestSolveTreeImpedance()
     {
-        TetrahedralMesh<1,3> mesh;
-        TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/y_branch_3d_mesh");
+        TetrahedralMesh<1, 3> mesh;
+        TrianglesMeshReader<1, 3> mesh_reader("mesh/test/data/y_branch_3d_mesh");
         mesh.ConstructFromMeshReader(mesh_reader);
 
         SimpleImpedanceProblem problem(mesh, 0u);
@@ -159,13 +159,13 @@ public:
 
     void TestMultipleFrequencies()
     {
-        TetrahedralMesh<1,3> mesh;
-        //TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/y_branch_3d_mesh");
-        TrianglesMeshReader<1,3> mesh_reader("lung/test/data/TestSubject002");
+        TetrahedralMesh<1, 3> mesh;
+        //TrianglesMeshReader<1, 3> mesh_reader("mesh/test/data/y_branch_3d_mesh");
+        TrianglesMeshReader<1, 3> mesh_reader("lung/test/data/TestSubject002");
         mesh.ConstructFromMeshReader(mesh_reader);
 
         //Scale all radii by 0.7 to give an FRC equivalent lung
-        for (TetrahedralMesh<1,3>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        for (TetrahedralMesh<1, 3>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
              node_iter != mesh.GetNodeIteratorEnd();
              ++node_iter)
         {

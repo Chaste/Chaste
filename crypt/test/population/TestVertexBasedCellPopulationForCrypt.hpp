@@ -88,12 +88,12 @@ public:
         nodes_elem_2.push_back(nodes[4]);
         nodes_elem_2.push_back(nodes[2]);
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_2));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_2));
 
         // Make a vertex mesh
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Create cells
         std::vector<CellPtr> cells;

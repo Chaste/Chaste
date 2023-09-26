@@ -68,7 +68,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 32u);
 
         // Test that some elements own the correct nodes
-        VertexElement<2,2>* p_element0 = p_mesh->GetElement(0);
+        VertexElement<2, 2>* p_element0 = p_mesh->GetElement(0);
         TS_ASSERT_EQUALS(p_element0->GetNumNodes(), 6u);
         TS_ASSERT_EQUALS(p_element0->GetNodeGlobalIndex(0), 0u);
         TS_ASSERT_EQUALS(p_element0->GetNodeGlobalIndex(1), 5u);
@@ -77,7 +77,7 @@ public:
         TS_ASSERT_EQUALS(p_element0->GetNodeGlobalIndex(4), 8u);
         TS_ASSERT_EQUALS(p_element0->GetNodeGlobalIndex(5), 4u);
 
-        VertexElement<2,2>* p_element5 = p_mesh->GetElement(5);
+        VertexElement<2, 2>* p_element5 = p_mesh->GetElement(5);
         TS_ASSERT_EQUALS(p_element5->GetNumNodes(), 6u);
         TS_ASSERT_EQUALS(p_element5->GetNodeGlobalIndex(0), 10u);
         TS_ASSERT_EQUALS(p_element5->GetNodeGlobalIndex(1), 14u);
@@ -86,7 +86,7 @@ public:
         TS_ASSERT_EQUALS(p_element5->GetNodeGlobalIndex(4), 17u);
         TS_ASSERT_EQUALS(p_element5->GetNodeGlobalIndex(5), 13u);
 
-        VertexElement<2,2>* p_element7 = p_mesh->GetElement(7);
+        VertexElement<2, 2>* p_element7 = p_mesh->GetElement(7);
         TS_ASSERT_EQUALS(p_element7->GetNumNodes(), 6u);
         TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(0), 8u);
         TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(1), 12u);
@@ -95,7 +95,7 @@ public:
         TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(4), 19u);
         TS_ASSERT_EQUALS(p_element7->GetNodeGlobalIndex(5), 15u);
 
-        VertexElement<2,2>* p_element12 = p_mesh->GetElement(12);
+        VertexElement<2, 2>* p_element12 = p_mesh->GetElement(12);
         TS_ASSERT_EQUALS(p_element12->GetNumNodes(), 6u);
         TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(0), 25u);
         TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(1), 29u);
@@ -104,7 +104,7 @@ public:
         TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(4), 0u);
         TS_ASSERT_EQUALS(p_element12->GetNodeGlobalIndex(5), 28u);
 
-        VertexElement<2,2>* p_element15 = p_mesh->GetElement(15);
+        VertexElement<2, 2>* p_element15 = p_mesh->GetElement(15);
         TS_ASSERT_EQUALS(p_element15->GetNumNodes(), 6u);
         TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(0), 24u);
         TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(1), 28u);
@@ -114,7 +114,7 @@ public:
         TS_ASSERT_EQUALS(p_element15->GetNodeGlobalIndex(5), 31u);
 
         // Create a vertex mesh writer with toroidal mesh
-        VertexMeshWriter<2,2> vertex_mesh_writer_1("TestToroidal2dVertexMesh", "toroidal_vertex_mesh");
+        VertexMeshWriter<2, 2> vertex_mesh_writer_1("TestToroidal2dVertexMesh", "toroidal_vertex_mesh");
         vertex_mesh_writer_1.WriteFilesUsingMesh(*p_mesh);
 
         OutputFileHandler handler_1("TestToroidal2dVertexMesh", false);

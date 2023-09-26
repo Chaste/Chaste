@@ -129,9 +129,9 @@ void AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMeshReader(Abstr
 }
 
 // Explicit instantiation
-template class AbstractMeshWriter<1,1>;
-template class AbstractMeshWriter<1,2>;
-template class AbstractMeshWriter<1,3>;
-template class AbstractMeshWriter<2,2>;
-template class AbstractMeshWriter<2,3>;
-template class AbstractMeshWriter<3,3>;
+template class AbstractMeshWriter<1, 1>;
+template class AbstractMeshWriter<1, 2>;
+template class AbstractMeshWriter<1, 3>;
+template class AbstractMeshWriter<2, 2>;
+template class AbstractMeshWriter<2, 3>;
+template class AbstractMeshWriter<3, 3>;

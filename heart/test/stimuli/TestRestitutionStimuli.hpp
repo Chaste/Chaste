@@ -62,7 +62,7 @@ private:
         double time = startTime;
         for (unsigned pacing_length_index = 0; pacing_length_index<pacing_cycle_lengths.size(); pacing_length_index++)
         {
-            for (unsigned pulse_index=0; pulse_index<number_of_pulses; pulse_index++)
+            for (unsigned pulse_index = 0; pulse_index<number_of_pulses; pulse_index++)
             {
                 double pulse_time = time;
                 TS_ASSERT_DELTA(pStimulus->GetStimulus(pulse_time-0.01),0.0, 1e-9);
@@ -116,7 +116,7 @@ private:
 
 public:
 
-    void TestS1S2StimulusSetup(void)
+    void TestS1S2StimulusSetup()
     {
         double magnitude = 50;
         double duration_of_stimulus = 5;
@@ -140,7 +140,7 @@ public:
         TS_ASSERT_EQUALS(stimulus.GetNumS2FrequencyValues(),s2_periods.size());
     }
 
-    void TestSteadyStateRestitutionCellStimulusSetup(void)
+    void TestSteadyStateRestitutionCellStimulusSetup()
     {
         double magnitude = 50;
         double duration_of_stimulus = 5;
@@ -162,7 +162,7 @@ public:
     }
 
 
-    void TestArchivingS1S2Stimulus(void)
+    void TestArchivingS1S2Stimulus()
     {
         OutputFileHandler handler("archive",false);
         std::string archive_filename;
@@ -208,7 +208,7 @@ public:
         }
     }
 
-    void TestArchivingSteadyStateStimulus(void)
+    void TestArchivingSteadyStateStimulus()
     {
         OutputFileHandler handler("archive",false);
         std::string archive_filename;

@@ -110,7 +110,7 @@ MemfemMeshReader<ELEMENT_DIM, SPACE_DIM>::MemfemMeshReader(const std::string& rP
     this->mpFaceIterator = this->mFaceData.begin();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 MemfemMeshReader<ELEMENT_DIM, SPACE_DIM>::~MemfemMeshReader()
 {}
 
@@ -123,15 +123,14 @@ std::vector<std::vector<double> > MemfemMeshReader<ELEMENT_DIM, SPACE_DIM>::Toke
     // Iterate over the lines of input
     for (const auto& the_iterator : rRawData)
     {
-        const std::string& r_line_of_data = *the_iterator;
-        std::stringstream line_stream(r_line_of_data);
+        std::stringstream line_stream(the_iterator);
 
-        if (the_iterator != rRawData.begin()) // Ignore the header string
+        if (the_iterator != *(rRawData.begin())) // Ignore the header string
         {
             std::vector<double> current_coords;
 
             // Form the vector which represents the position of this item
-            for (unsigned i=0; i<SPACE_DIM; ++i)
+            for (unsigned i = 0; i < SPACE_DIM; ++i)
             {
                 double item_coord;
                 line_stream >> item_coord;
@@ -146,7 +145,7 @@ std::vector<std::vector<double> > MemfemMeshReader<ELEMENT_DIM, SPACE_DIM>::Toke
     return tokenized_data;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<std::vector<unsigned> > MemfemMeshReader<ELEMENT_DIM, SPACE_DIM>::TokenizeStringsToInts(
     const std::vector<std::string>& rRawData,
     unsigned dimensionOfObject,
@@ -156,14 +155,13 @@ std::vector<std::vector<unsigned> > MemfemMeshReader<ELEMENT_DIM, SPACE_DIM>::To
 
     for (const auto& the_iterator : rRawData)
     {
-        const std::string& r_line_of_data = *the_iterator;
-        std::stringstream line_stream(r_line_of_data);
+        std::stringstream line_stream(the_iterator);
 
-        if (readHeader == false || the_iterator != rRawData.begin())
+        if (readHeader == false || the_iterator != *(rRawData.begin()))
         {
             std::vector<unsigned> current_indices;
 
-            for (unsigned i=0; i<dimensionOfObject; ++i)
+            for (unsigned i = 0; i<dimensionOfObject; ++i)
             {
                 unsigned item_index;
                 line_stream >> item_index;
@@ -180,9 +178,9 @@ std::vector<std::vector<unsigned> > MemfemMeshReader<ELEMENT_DIM, SPACE_DIM>::To
 }
 
 // Explicit instantiation
-template class MemfemMeshReader<1,1>;
-template class MemfemMeshReader<1,2>;
-template class MemfemMeshReader<1,3>;
-template class MemfemMeshReader<2,2>;
-template class MemfemMeshReader<2,3>;
-template class MemfemMeshReader<3,3>;
+template class MemfemMeshReader<1, 1>;
+template class MemfemMeshReader<1, 2>;
+template class MemfemMeshReader<1, 3>;
+template class MemfemMeshReader<2, 2>;
+template class MemfemMeshReader<2, 3>;
+template class MemfemMeshReader<3, 3>;

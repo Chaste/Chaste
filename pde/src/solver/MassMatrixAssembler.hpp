@@ -78,9 +78,9 @@ public:
                 c_vector<double, ELEMENT_DIM+1> &rPhi,
                 c_matrix<double, SPACE_DIM, ELEMENT_DIM+1> &rGradPhi,
                 ChastePoint<SPACE_DIM> &rX,
-                c_vector<double,1> &rU,
+                c_vector<double, 1> &rU,
                 c_matrix<double, 1, SPACE_DIM> &rGradU /* not used */,
-                Element<ELEMENT_DIM,SPACE_DIM>* pElement)
+                Element<ELEMENT_DIM, SPACE_DIM>* pElement)
     {
         c_matrix<double, ELEMENT_DIM+1, ELEMENT_DIM+1> mass_matrix;
         mass_matrix = outer_prod(rPhi, rPhi);
@@ -110,8 +110,8 @@ public:
      * @param scaleFactor the factor with which the multiply the mass matrix. Defaults to 1.0
      * @param useMassLumping whether to use mass matrix lumping or not
      */
-    MassMatrixAssembler(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh, bool useMassLumping=false, double scaleFactor=1.0)
-        : AbstractFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,1,false,true,NORMAL>(pMesh),
+    MassMatrixAssembler(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh, bool useMassLumping=false, double scaleFactor=1.0)
+        : AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM,1,false,true,NORMAL>(pMesh),
           mScaleFactor(scaleFactor),
           mUseMassLumping(useMassLumping)
     {

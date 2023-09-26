@@ -85,9 +85,9 @@ ToroidalHoneycombMeshGenerator::ToroidalHoneycombMeshGenerator(unsigned numNodes
     (*p_node_file) << num_nodes << "\t2\t0\t1" << std::endl;
 
     unsigned node = 0;
-    for (unsigned i=0; i<num_nodes_along_depth; ++i)
+    for (unsigned i = 0; i<num_nodes_along_depth; ++i)
     {
-        for (unsigned j=0; j<num_nodes_along_width; ++j)
+        for (unsigned j = 0; j<num_nodes_along_width; ++j)
         {
             unsigned boundary = 0;
             if ((i==0) || (i==num_nodes_along_depth-1))
@@ -125,9 +125,9 @@ ToroidalHoneycombMeshGenerator::ToroidalHoneycombMeshGenerator(unsigned numNodes
 
     unsigned elem = 0;
     unsigned edge = 0;
-    for (unsigned i=0; i<num_elem_along_depth; ++i)
+    for (unsigned i = 0; i<num_elem_along_depth; ++i)
     {
-        for (unsigned j=0; j < num_elem_along_width; ++j)
+        for (unsigned j = 0; j < num_elem_along_width; ++j)
         {
             unsigned node0 =     i*num_nodes_along_width + j;
             unsigned node1 =     i*num_nodes_along_width + j+1;
@@ -164,7 +164,7 @@ ToroidalHoneycombMeshGenerator::ToroidalHoneycombMeshGenerator(unsigned numNodes
         }
     }
 
-    for (unsigned i=0; i<num_elem_along_depth; ++i)
+    for (unsigned i = 0; i<num_elem_along_depth; ++i)
     {
         unsigned node0, node1;
 
@@ -181,7 +181,7 @@ ToroidalHoneycombMeshGenerator::ToroidalHoneycombMeshGenerator(unsigned numNodes
         (*p_edge_file) << edge++ << "\t" << node0 << "\t" << node1 << "\t" << 1 << std::endl;
     }
 
-    for (unsigned j=0; j<num_elem_along_width; ++j)
+    for (unsigned j = 0; j<num_elem_along_width; ++j)
     {
         unsigned node0 = num_nodes_along_width*(num_nodes_along_depth-1) + j;
         unsigned node1 = num_nodes_along_width*(num_nodes_along_depth-1) + j+1;
@@ -194,7 +194,7 @@ ToroidalHoneycombMeshGenerator::ToroidalHoneycombMeshGenerator(unsigned numNodes
     // Having written the mesh to file, now construct it using TrianglesMeshReader.
     // Nested scope so the reader closes files before we delete them below.
     {
-        TrianglesMeshReader<2,2> mesh_reader(output_file_handler.GetOutputDirectoryFullPath() + mMeshFilename);
+        TrianglesMeshReader<2, 2> mesh_reader(output_file_handler.GetOutputDirectoryFullPath() + mMeshFilename);
         mpMesh = boost::make_shared<Toroidal2dMesh >(mDomainWidth,mDomainDepth);
         mpMesh->ConstructFromMeshReader(mesh_reader);
     }
@@ -209,7 +209,7 @@ ToroidalHoneycombMeshGenerator::ToroidalHoneycombMeshGenerator(unsigned numNodes
     mpMesh->SetMeshHasChangedSinceLoading();
 }
 
-boost::shared_ptr<MutableMesh<2,2> > ToroidalHoneycombMeshGenerator::GetMesh()
+boost::shared_ptr<MutableMesh<2, 2> > ToroidalHoneycombMeshGenerator::GetMesh()
 {
     EXCEPTION("A Toroidal mesh was created but a normal mesh is being requested.");
     return mpMesh; // Not really

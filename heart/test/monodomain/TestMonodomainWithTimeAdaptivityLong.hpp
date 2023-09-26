@@ -87,7 +87,7 @@ public:
         HeartConfig::Instance()->SetPrintingTimeStep(1.0);
         HeartConfig::Instance()->SetSimulationDuration(400); //ms
 
-        DistributedTetrahedralMesh<1,1> mesh;
+        DistributedTetrahedralMesh<1, 1> mesh;
         mesh.ConstructRegularSlabMesh(0.01, 1.0); // h=0.01cm, width=1cm
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory(-600.0*1000);
@@ -133,7 +133,7 @@ public:
         Vec difference;
         VecDuplicate(voltage_adapt, &difference);
 
-        for (unsigned timestep=0; timestep<num_timesteps; timestep++)
+        for (unsigned timestep = 0; timestep<num_timesteps; timestep++)
         {
             reader_no_adapt.GetVariableOverNodes(voltage_no_adapt, "V", timestep);
             reader_adapt.GetVariableOverNodes(voltage_adapt, "V", timestep);

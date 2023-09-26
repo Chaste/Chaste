@@ -69,8 +69,8 @@ public:
             ///////////////////////////////////////////////////////////////////
             // TetrahedralMesh
             ///////////////////////////////////////////////////////////////////
-            TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
-            TetrahedralMesh<2,2> mesh;
+            TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
+            TetrahedralMesh<2, 2> mesh;
             mesh.ConstructFromMeshReader(mesh_reader);
 
             BidomainProblem<2> nondistributed_problem( &cell_factory );
@@ -110,8 +110,8 @@ public:
         ///////////////////////////////////////////////////////////////////
         HeartConfig::Instance()->SetOutputFilenamePrefix("distributed2d");
 
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
-        DistributedTetrahedralMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
+        DistributedTetrahedralMesh<2, 2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
 
         mesh.ConstructFromMeshReader(mesh_reader);
 
@@ -176,8 +176,8 @@ public:
             ///////////////////////////////////////////////////////////////////
             // TetrahedralMesh
             ///////////////////////////////////////////////////////////////////
-            TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
-            TetrahedralMesh<2,2> mesh;
+            TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
+            TetrahedralMesh<2, 2> mesh;
             mesh.ConstructFromMeshReader(mesh_reader);
 
             BidomainProblem<2> nondistributed_problem( &cell_factory );
@@ -218,8 +218,8 @@ public:
         HeartConfig::Instance()->SetMeshPartitioning("parmetis");
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_400_elements");
 
-//        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
-//        DistributedTetrahedralMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
+//        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
+//        DistributedTetrahedralMesh<2, 2> mesh(DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
 //        mesh.ConstructFromMeshReader(mesh_reader);
 
         BidomainProblem<2> distributed_problem( &cell_factory );
@@ -284,8 +284,8 @@ public:
             ///////////////////////////////////////////////////////////////////
             // TetrahedralMesh from Triangles
             ///////////////////////////////////////////////////////////////////
-            TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/SlabFromMemfem");
-            TetrahedralMesh<3,3> mesh;
+            TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/SlabFromMemfem");
+            TetrahedralMesh<3, 3> mesh;
 
             mesh.ConstructFromMeshReader(mesh_reader);
             TS_ASSERT_DELTA(mesh.GetVolume(), 1.5625, 1e-6);

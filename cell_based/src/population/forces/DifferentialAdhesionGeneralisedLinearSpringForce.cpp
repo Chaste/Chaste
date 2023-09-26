@@ -126,12 +126,12 @@ void DifferentialAdhesionGeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::O
 }
 
 // Explicit instantiation
-template class DifferentialAdhesionGeneralisedLinearSpringForce<1,1>;
-template class DifferentialAdhesionGeneralisedLinearSpringForce<1,2>;
-template class DifferentialAdhesionGeneralisedLinearSpringForce<2,2>;
-template class DifferentialAdhesionGeneralisedLinearSpringForce<1,3>;
-template class DifferentialAdhesionGeneralisedLinearSpringForce<2,3>;
-template class DifferentialAdhesionGeneralisedLinearSpringForce<3,3>;
+template class DifferentialAdhesionGeneralisedLinearSpringForce<1, 1>;
+template class DifferentialAdhesionGeneralisedLinearSpringForce<1, 2>;
+template class DifferentialAdhesionGeneralisedLinearSpringForce<2, 2>;
+template class DifferentialAdhesionGeneralisedLinearSpringForce<1, 3>;
+template class DifferentialAdhesionGeneralisedLinearSpringForce<2, 3>;
+template class DifferentialAdhesionGeneralisedLinearSpringForce<3, 3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

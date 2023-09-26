@@ -10,6 +10,6 @@ gfx modify g_element SimulationResults general clear circle_discretization 6 def
 gfx modify g_element SimulationResults lines select_on material default data V spectrum default selected_material default_selected; 
 gfx modify g_element SimulationResults node_points glyph point general size "1*1*1" centre 0,0,0 font default select_on material default data V spectrum default selected_material default_selected; 
 # Load the data 
-for ($i=0; $i<9; $i++) { 
+for ($i = 0; $i<9; $i++) { 
     gfx read node many_variables_$i.exnode time $i
 }

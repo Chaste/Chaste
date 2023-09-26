@@ -50,7 +50,7 @@ using namespace std;
  * This class defines a list of nodes and provides a method to check
  * whether a point is contained in the list.
  */
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 class ChasteNodesList : public AbstractChasteRegion<SPACE_DIM>
 {
     /** Needed for serialization. */

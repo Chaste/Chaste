@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A concrete element class which inherits from AbstractTetrahedralElement.
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class Element : public AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>
 {
 public:
@@ -108,7 +108,7 @@ public:
      * @param rJacobian  the Jacobian matrix
      * @param rInverseJacobian  the inverse Jacobian matrix
      */
-    c_vector<double,SPACE_DIM+1> CalculateCircumsphere(c_matrix<double, SPACE_DIM, ELEMENT_DIM>& rJacobian,
+    c_vector<double, SPACE_DIM+1> CalculateCircumsphere(c_matrix<double, SPACE_DIM, ELEMENT_DIM>& rJacobian,
                                                        c_matrix<double, ELEMENT_DIM, SPACE_DIM>& rInverseJacobian);
 
     /**

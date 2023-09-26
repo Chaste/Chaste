@@ -112,12 +112,12 @@ public:
 
     void TestSimpleOrthotropic()
     {
-        TrianglesMeshReader<3,3> mesh_reader("heart/test/data/box_shaped_heart/box_heart");
+        TrianglesMeshReader<3, 3> mesh_reader("heart/test/data/box_shaped_heart/box_heart");
         std::string epi_face_file = "heart/test/data/box_shaped_heart/epi.tri";
         std::string rv_face_file = "heart/test/data/box_shaped_heart/rv.tri";
         std::string lv_face_file = "heart/test/data/box_shaped_heart/lv.tri";
 
-        DistributedTetrahedralMesh<3,3> mesh;
+        DistributedTetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         StreeterFibreGenerator<3> fibre_generator(mesh);
@@ -142,12 +142,12 @@ public:
 
     void TestSimpleOrthotropicNotDistributed()
     {
-        TrianglesMeshReader<3,3> mesh_reader("heart/test/data/box_shaped_heart/box_heart");
+        TrianglesMeshReader<3, 3> mesh_reader("heart/test/data/box_shaped_heart/box_heart");
         std::string epi_face_file = "heart/test/data/box_shaped_heart/epi.tri";
         std::string rv_face_file = "heart/test/data/box_shaped_heart/rv.tri";
         std::string lv_face_file = "heart/test/data/box_shaped_heart/lv.tri";
 
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         StreeterFibreGenerator<3> fibre_generator(mesh);
@@ -165,9 +165,9 @@ public:
 
     void TestExceptions()
     {
-        TrianglesMeshReader<3,3> mesh_reader("heart/test/data/box_shaped_heart/box_heart");
+        TrianglesMeshReader<3, 3> mesh_reader("heart/test/data/box_shaped_heart/box_heart");
 
-        DistributedTetrahedralMesh<3,3> mesh;
+        DistributedTetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         StreeterFibreGenerator<3> fibre_generator(mesh);
@@ -205,11 +205,11 @@ public:
 
     void TestConstructStreeterOnLeftWedge()
     {
-        TrianglesMeshReader<3,3> mesh_reader("heart/test/data/human_wedge_mesh/HumanWedgeMesh");
+        TrianglesMeshReader<3, 3> mesh_reader("heart/test/data/human_wedge_mesh/HumanWedgeMesh");
         std::string epi_face_file = "heart/test/data/human_wedge_mesh/epi.tri";
         std::string endo_face_file = "heart/test/data/human_wedge_mesh/endo.tri";
 
-        DistributedTetrahedralMesh<3,3> mesh;
+        DistributedTetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         StreeterFibreGenerator<3> fibre_generator(mesh);
@@ -232,11 +232,11 @@ public:
 
     void TestConstructStreeterOnRightWedge()
     {
-        TrianglesMeshReader<3,3> mesh_reader("heart/test/data/human_wedge_mesh/HumanWedgeMesh");
+        TrianglesMeshReader<3, 3> mesh_reader("heart/test/data/human_wedge_mesh/HumanWedgeMesh");
         std::string epi_face_file = "heart/test/data/human_wedge_mesh/epi.tri";
         std::string endo_face_file = "heart/test/data/human_wedge_mesh/endo.tri";
 
-        DistributedTetrahedralMesh<3,3> mesh;
+        DistributedTetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         StreeterFibreGenerator<3> fibre_generator(mesh);
@@ -259,12 +259,12 @@ public:
 
     void TestSetLogInfo()
     {
-        TrianglesMeshReader<3,3> mesh_reader("heart/test/data/box_shaped_heart/box_heart");
+        TrianglesMeshReader<3, 3> mesh_reader("heart/test/data/box_shaped_heart/box_heart");
         std::string epi_face_file = "heart/test/data/box_shaped_heart/epi.tri";
         std::string rv_face_file = "heart/test/data/box_shaped_heart/rv.tri";
         std::string lv_face_file = "heart/test/data/box_shaped_heart/lv.tri";
 
-        DistributedTetrahedralMesh<3,3> mesh;
+        DistributedTetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         StreeterFibreGenerator<3> fibre_generator(mesh);

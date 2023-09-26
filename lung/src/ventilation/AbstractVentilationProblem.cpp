@@ -49,7 +49,7 @@ AbstractVentilationProblem::AbstractVentilationProblem(const std::string& rMeshD
       mRadiusOnEdge(false),
       mNodesInGraphOrder(true)
 {
-    TrianglesMeshReader<1,3> mesh_reader(rMeshDirFilePath);
+    TrianglesMeshReader<1, 3> mesh_reader(rMeshDirFilePath);
     mMesh.ConstructFromMeshReader(mesh_reader);
 
     if (mMesh.GetNode(mOutletNodeIndex)->IsBoundaryNode() == false)
@@ -67,7 +67,7 @@ AbstractVentilationProblem::Initialise()
 
     // Reset edge attributes
     bool intermediate_nodes = false;
-    for (AbstractTetrahedralMesh<1,3>::ElementIterator iter = mMesh.GetElementIteratorBegin();
+    for (AbstractTetrahedralMesh<1, 3>::ElementIterator iter = mMesh.GetElementIteratorBegin();
          iter != mMesh.GetElementIteratorEnd();
          ++iter)
     {
@@ -102,7 +102,7 @@ AbstractVentilationProblem::Initialise()
         std::vector<AirwayBranch*> branches = properties_calculator.GetBranches();
         for (auto branch_it : branches)
         {
-            std::list<Element<1,3>* > branch_elements = branch_it->GetElements();
+            std::list<Element<1, 3>* > branch_elements = branch_it->GetElements();
             if (branch_elements.size() > 1u)
             {
                 double branch_length = branch_it->GetLength();
@@ -137,7 +137,7 @@ AbstractVentilationProblem::rGetMesh()
     return mMesh;
 }
 
-double AbstractVentilationProblem::CalculateResistance(Element<1,3>& rElement, bool usePedley, double flux)
+double AbstractVentilationProblem::CalculateResistance(Element<1, 3>& rElement, bool usePedley, double flux)
 {
     //Resistance is based on radius, length and viscosity
     double radius = 0.0;
@@ -202,7 +202,7 @@ double AbstractVentilationProblem::CalculateResistance(Element<1,3>& rElement, b
 }
 void AbstractVentilationProblem::SetConstantInflowPressures(double pressure)
 {
-    for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter =mMesh.GetBoundaryNodeIteratorBegin();
+    for (AbstractTetrahedralMesh<1, 3>::BoundaryNodeIterator iter =mMesh.GetBoundaryNodeIteratorBegin();
           iter != mMesh.GetBoundaryNodeIteratorEnd();
           ++iter)
      {
@@ -216,7 +216,7 @@ void AbstractVentilationProblem::SetConstantInflowPressures(double pressure)
 
 void AbstractVentilationProblem::SetConstantInflowFluxes(double flux)
 {
-    for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter =mMesh.GetBoundaryNodeIteratorBegin();
+    for (AbstractTetrahedralMesh<1, 3>::BoundaryNodeIterator iter =mMesh.GetBoundaryNodeIteratorBegin();
           iter != mMesh.GetBoundaryNodeIteratorEnd();
           ++iter)
      {
@@ -257,7 +257,7 @@ void AbstractVentilationProblem::SolveOverTime(TimeStepper& rTimeStepper,
         {
             rTimeStepper.AdvanceOneTimeStep();
         }
-        for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = mMesh.GetBoundaryNodeIteratorBegin();
+        for (AbstractTetrahedralMesh<1, 3>::BoundaryNodeIterator iter = mMesh.GetBoundaryNodeIteratorBegin();
                  iter != mMesh.GetBoundaryNodeIteratorEnd();
                  ++iter )
         {
@@ -367,11 +367,11 @@ void AbstractVentilationProblem::SetPerGenerationDynamicResistance()
             {0.162, 0.239, 0.244, 0.295, 0.175, 0.303, 0.356, 0.566, 0.327};
 
     // Convert from gamma to C
-    for (unsigned i=0; i<9; ++i)
+    for (unsigned i = 0; i<9; ++i)
     {
         per_generation_pedley[i] *= 4.0*sqrt(2.0);
     }
-    for (AbstractTetrahedralMesh<1,3>::ElementIterator iter = mMesh.GetElementIteratorBegin();
+    for (AbstractTetrahedralMesh<1, 3>::ElementIterator iter = mMesh.GetElementIteratorBegin();
          iter != mMesh.GetElementIteratorEnd();
          ++iter)
     {

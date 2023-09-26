@@ -410,7 +410,7 @@ public :
         //  ==> bad things will happen (?) around and above this..
         double stretch[3] = {0.9,1.0,1.1};
 
-        for (unsigned run=0; run<3; run++)
+        for (unsigned run = 0; run<3; run++)
         {
             boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
             CellLuoRudy1991FromCellML electrophys_model(p_solver, p_stimulus);
@@ -527,7 +527,7 @@ public :
         // mentioned above
         double stretch[3] = {1.6/1.9/*=0.842*/, 1.0, 2.2/1.9/*=1.158*/};
 
-        for (unsigned run=0; run<3; run++)
+        for (unsigned run = 0; run<3; run++)
         {
             Kerchoffs2003ContractionModel kerchoffs_model;
             TS_ASSERT_EQUALS(kerchoffs_model.IsStretchDependent(), true);

@@ -456,8 +456,8 @@ void PottsBasedCellPopulation<DIM>::CreateElementTessellation()
 //      Node<2>* p_temp_node = mrMesh.GetNode(node_index);
 //      nodes.push_back(p_temp_node);
 //  }
-//  MutableMesh<2,2> mesh(nodes);
-//    mpElementTessellation = new VertexMesh<2,2>(mesh);
+//  MutableMesh<2, 2> mesh(nodes);
+//    mpElementTessellation = new VertexMesh<2, 2>(mesh);
 }
 
 template<unsigned DIM>
@@ -636,7 +636,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
     if (DIM ==2)
     {
         std::vector<Node<2>*> outline_nodes;
-        std::vector<VertexElement<2,2>*>  outline_elements;
+        std::vector<VertexElement<2, 2>*>  outline_elements;
 
         unsigned outline_node_index = 0;
         unsigned outline_element_index = 0;
@@ -716,7 +716,7 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
                         element_nodes.push_back(outline_nodes[outline_node_index]);
                         outline_node_index++;
 
-                        VertexElement<2,2>* p_element = new VertexElement<2,2>(outline_element_index, element_nodes);
+                        VertexElement<2, 2>* p_element = new VertexElement<2, 2>(outline_element_index, element_nodes);
                         outline_elements.push_back(p_element);
                         outline_element_index++;
 
@@ -750,14 +750,14 @@ void PottsBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDi
                         element_nodes.push_back(outline_nodes[outline_node_index]);
                         outline_node_index++;
 
-                        VertexElement<2,2>* p_element = new VertexElement<2,2>(outline_element_index, element_nodes);
+                        VertexElement<2, 2>* p_element = new VertexElement<2, 2>(outline_element_index, element_nodes);
                         outline_elements.push_back(p_element);
                         outline_element_index++;
                     }
                 }
             }
         }
-        VertexMesh<2,2> cell_outline_mesh(outline_nodes,outline_elements);
+        VertexMesh<2, 2> cell_outline_mesh(outline_nodes,outline_elements);
 
         VertexMeshWriter<2, 2> outline_mesh_writer(rDirectory, "outlines", false);
         outline_mesh_writer.WriteVtkUsingMesh(cell_outline_mesh, time.str());

@@ -183,7 +183,7 @@ public:
      *
      * @param message the message to write to the log file
      */
-    template <class T>
+    template<class T>
     LogFile& operator<<(T message)
     {
         if (mFileSet)

@@ -56,7 +56,7 @@ public:
      * Constructor (initialises viscosity to -1 so can check if it is unset
      * @param rMesh Quadratic mesh
      */
-    explicit StokesFlowProblemDefinition(AbstractTetrahedralMesh<DIM,DIM>& rMesh)
+    explicit StokesFlowProblemDefinition(AbstractTetrahedralMesh<DIM, DIM>& rMesh)
         : ContinuumMechanicsProblemDefinition<DIM>(rMesh),
           mMu(-1.0)
     {
@@ -109,7 +109,7 @@ public:
      * @param rPrescribedFlowNodes vector of node indices.
      * @param rPrescribedFlow vector of prescribed flow values for these nodes.
      */
-    void SetPrescribedFlowNodes(std::vector<unsigned>& rPrescribedFlowNodes, std::vector<c_vector<double,DIM> >& rPrescribedFlow)
+    void SetPrescribedFlowNodes(std::vector<unsigned>& rPrescribedFlowNodes, std::vector<c_vector<double, DIM> >& rPrescribedFlow)
     {
         assert(rPrescribedFlowNodes.size()==rPrescribedFlow.size());
 

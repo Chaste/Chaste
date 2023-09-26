@@ -243,7 +243,7 @@ public:
          * object using the methods {{{rGetTimes()}}} and {{{rGetSolutions()}}}, which
          * return a {{{std::vector}}} and a {{{std::vector}}} of {{{std::vector}}}s
          * respectively. */
-        for (unsigned i=0; i<solutions.rGetTimes().size(); ++i)
+        for (unsigned i = 0; i<solutions.rGetTimes().size(); ++i)
         {
             /* The {{{[0]}}} here is because we are getting the zeroth component of y (a 1-dimensional vector). */
             std::cout << solutions.rGetTimes()[i] << " " << solutions.rGetSolutions()[i][0] << "\n";
@@ -320,7 +320,7 @@ public:
 
         /* Solve, and print the solution as [time, y1, y2]. */
         OdeSolution solutions = euler_solver.Solve(&my_2d_ode, initial_condition, 0, 1, 0.01, 0.1);
-        for (unsigned i=0; i<solutions.rGetTimes().size(); ++i)
+        for (unsigned i = 0; i<solutions.rGetTimes().size(); ++i)
         {
             std::cout << solutions.rGetTimes()[i] << " "
                       << solutions.rGetSolutions()[i][0] << " "

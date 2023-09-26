@@ -45,12 +45,12 @@ AirwayBranch::AirwayBranch(bool radiusOnEdge) : mpChildOne(nullptr),
                                                 mRadiusOnEdge(radiusOnEdge)
 {}
 
-void AirwayBranch::AddElement(Element<1,3>* pElement)
+void AirwayBranch::AddElement(Element<1, 3>* pElement)
 {
     mElements.push_back(pElement);
 }
 
-std::list<Element<1,3>* > AirwayBranch::GetElements()
+std::list<Element<1, 3>* > AirwayBranch::GetElements()
 {
     return mElements;
 }
@@ -262,8 +262,8 @@ Node<3>* AirwayBranch::GetProximalNode()
          */
 
         // Get pointers to both elements
-        Element<1,3>* p_first_element = mElements.front();
-        Element<1,3>* p_second_element = *(++(mElements.begin()));
+        Element<1, 3>* p_first_element = mElements.front();
+        Element<1, 3>* p_second_element = *(++(mElements.begin()));
 
         assert(p_first_element->GetNumNodes()==2);
         assert(p_second_element->GetNumNodes()==2);
@@ -319,8 +319,8 @@ Node<3>* AirwayBranch::GetDistalNode()
          */
 
         // Get pointers to both elements
-        Element<1,3>* p_last_element = mElements.back();
-        Element<1,3>* p_penultimate_element = *(--(--(mElements.end())));
+        Element<1, 3>* p_last_element = mElements.back();
+        Element<1, 3>* p_penultimate_element = *(--(--(mElements.end())));
 
         assert(p_last_element->GetNumNodes()==2);
         assert(p_penultimate_element->GetNumNodes()==2);

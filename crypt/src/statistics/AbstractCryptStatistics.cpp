@@ -84,7 +84,7 @@ std::vector<bool> AbstractCryptStatistics::AreCryptSectionCellsLabelled(std::vec
 {
     std::vector<bool> crypt_section_labelled(rCryptSection.size());
 
-    for (unsigned vector_index=0; vector_index<rCryptSection.size(); vector_index++)
+    for (unsigned vector_index = 0; vector_index<rCryptSection.size(); vector_index++)
     {
         if (rCryptSection[vector_index]->HasCellProperty<CellLabel>())
         {

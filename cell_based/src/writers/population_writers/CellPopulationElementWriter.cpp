@@ -171,12 +171,12 @@ void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
 }
 
 // Explicit instantiation
-template class CellPopulationElementWriter<1,1>;
-template class CellPopulationElementWriter<1,2>;
-template class CellPopulationElementWriter<2,2>;
-template class CellPopulationElementWriter<1,3>;
-template class CellPopulationElementWriter<2,3>;
-template class CellPopulationElementWriter<3,3>;
+template class CellPopulationElementWriter<1, 1>;
+template class CellPopulationElementWriter<1, 2>;
+template class CellPopulationElementWriter<2, 2>;
+template class CellPopulationElementWriter<1, 3>;
+template class CellPopulationElementWriter<2, 3>;
+template class CellPopulationElementWriter<3, 3>;
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer

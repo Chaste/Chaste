@@ -316,7 +316,7 @@ public:
 
         // Create some files to find
         const unsigned N = 5;
-        for (unsigned i=0; i<N; ++i)
+        for (unsigned i = 0; i < N; ++i)
         {
             handler.OpenOutputFile("file", i, ".txt");
         }

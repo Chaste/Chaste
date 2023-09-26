@@ -54,7 +54,7 @@ FitzHughNagumo1961OdeSystem::FitzHughNagumo1961OdeSystem(
     Init();
 }
 
-FitzHughNagumo1961OdeSystem::~FitzHughNagumo1961OdeSystem(void)
+FitzHughNagumo1961OdeSystem::~FitzHughNagumo1961OdeSystem()
 {
 }
 
@@ -90,7 +90,7 @@ double FitzHughNagumo1961OdeSystem::GetIIonic(const std::vector<double>* pStateV
 }
 
 template<>
-void OdeSystemInformation<FitzHughNagumo1961OdeSystem>::Initialise(void)
+void OdeSystemInformation<FitzHughNagumo1961OdeSystem>::Initialise()
 {
     /*
      * State variables

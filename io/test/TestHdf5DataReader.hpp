@@ -249,9 +249,9 @@ public:
          * 5 6 7 8 0 0 0
          * 0 0 0 0 0 0 0
          */
-        for (int row=0; row<NX; row++)
+        for (int row = 0; row<NX; row++)
         {
-            for (int column=0; column<NY; column++)
+            for (int column = 0; column<NY; column++)
             {
                 if (row>2 && row<6 && column<4)
                 {
@@ -299,7 +299,7 @@ private:
         Vec petsc_data_3=factory.CreateVec();
         DistributedVector distributed_vector_3 = factory.CreateDistributedVector(petsc_data_3);
 
-        for (unsigned time_step=0; time_step<10; time_step++)
+        for (unsigned time_step = 0; time_step<10; time_step++)
         {
             // Write some values
             for (auto index = distributed_vector_1.Begin();
@@ -359,7 +359,7 @@ public:
             TS_ASSERT_EQUALS(i_k_values.size(), 10u);
             TS_ASSERT_EQUALS(i_na_values.size(), 10u);
 
-            for (unsigned i=0; i<node_values.size(); ++i)
+            for (unsigned i = 0; i<node_values.size(); ++i)
             {
                 TS_ASSERT_DELTA( node_values[i], node_index, 1e-9);
                 TS_ASSERT_DELTA( i_k_values[i], i*1000 + 100 + node_index, 1e-9);
@@ -378,7 +378,7 @@ public:
 
         TS_ASSERT_EQUALS(i_k_values.size(), i_k_values_over_multiple.size());
 
-        for (unsigned index=0; index< i_k_values.size(); index++)
+        for (unsigned index = 0; index< i_k_values.size(); index++)
         {
             TS_ASSERT_EQUALS(i_k_values[index], i_k_values_over_multiple[index]);
         }
@@ -396,7 +396,7 @@ public:
         DistributedVector distributed_vector_3 = factory.CreateDistributedVector(petsc_data_3);
 
         TS_ASSERT_EQUALS(reader.GetNumberOfRows(), NUMBER_NODES);
-        for (unsigned time_step=0; time_step<10; time_step++)
+        for (unsigned time_step = 0; time_step<10; time_step++)
         {
             reader.GetVariableOverNodes(petsc_data_1, "Node", time_step);
             reader.GetVariableOverNodes(petsc_data_2, "I_K", time_step);
@@ -419,7 +419,7 @@ public:
 
         std::vector<double> unlimited_values = reader.GetUnlimitedDimensionValues();
 
-        for (unsigned i=0; i< unlimited_values.size(); ++i)
+        for (unsigned i = 0; i< unlimited_values.size(); ++i)
         {
             TS_ASSERT_EQUALS(unlimited_values[i], i);
         }
@@ -570,14 +570,14 @@ public:
         // Can read one of the nodes that was written
         std::vector<double> twenty_one = reader.GetVariableOverTime("Node", 21);
         TS_ASSERT_EQUALS(twenty_one.size(), 10u);
-        for (unsigned i=0; i<twenty_one.size(); ++i)
+        for (unsigned i = 0; i<twenty_one.size(); ++i)
         {
             TS_ASSERT_EQUALS(twenty_one[i], 21u);
         }
         // Can read more of the data
         std::vector<double> na_47 = reader.GetVariableOverTime("I_Na", 47);
         TS_ASSERT_EQUALS(na_47.size(), 10u);
-        for (unsigned i=0; i<na_47.size(); ++i)
+        for (unsigned i = 0; i<na_47.size(); ++i)
         {
             TS_ASSERT_EQUALS(na_47[i], i*1000u + 200u + 47u);
         }

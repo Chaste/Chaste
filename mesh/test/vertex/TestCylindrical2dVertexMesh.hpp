@@ -444,7 +444,7 @@ public:
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
         boost::shared_ptr<Cylindrical2dMesh> p_delaunay_mesh = generator.GetCylindricalMesh();
 
-        TrianglesMeshWriter<2,2> mesh_writer("TestBoundedCylindricalVertexMesh", "DelaunayMesh", false);
+        TrianglesMeshWriter<2, 2> mesh_writer("TestBoundedCylindricalVertexMesh", "DelaunayMesh", false);
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(*p_delaunay_mesh));
 
         TS_ASSERT_EQUALS(p_delaunay_mesh->GetWidth(0), 3u);
@@ -456,7 +456,7 @@ public:
         bool is_bounded = true;
         Cylindrical2dVertexMesh voronoi_mesh(*p_delaunay_mesh,is_bounded);
 
-        VertexMeshWriter<2,2> vertexmesh_writer("TestBoundedCylindricalVertexMesh", "CylindricalVertexMesh", false);
+        VertexMeshWriter<2, 2> vertexmesh_writer("TestBoundedCylindricalVertexMesh", "CylindricalVertexMesh", false);
         TS_ASSERT_THROWS_NOTHING(vertexmesh_writer.WriteFilesUsingMesh(voronoi_mesh));
 
         // TODO Check this file !
@@ -484,7 +484,7 @@ public:
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(20)->rGetLocation()[1], 1.1547, 1e-3);
         
         // Test the number of nodes owned by each Voronoi element and their areas
-        for (unsigned elem_index=0; elem_index<8; elem_index++)
+        for (unsigned elem_index = 0; elem_index<8; elem_index++)
         {
             TS_ASSERT_EQUALS(voronoi_mesh.GetElement(elem_index)->GetNumNodes(), 6u);
             if (elem_index>2 && elem_index <6)
@@ -516,7 +516,7 @@ public:
         p_delaunay_mesh->GetNode(11)->rGetModifiableLocation()[1] = 5.0 + sqrt(3.0) / 2.0;
         
 
-        TrianglesMeshWriter<2,2> mesh_writer("TestBoundedCylindricalVertexMeshWithVoid", "DelaunayMesh", false);
+        TrianglesMeshWriter<2, 2> mesh_writer("TestBoundedCylindricalVertexMeshWithVoid", "DelaunayMesh", false);
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(*p_delaunay_mesh));
 
         TS_ASSERT_EQUALS(p_delaunay_mesh->GetWidth(0), 3u);
@@ -528,7 +528,7 @@ public:
         bool is_bounded = true;
         Cylindrical2dVertexMesh voronoi_mesh(*p_delaunay_mesh,is_bounded);
 
-        VertexMeshWriter<2,2> vertexmesh_writer("TestBoundedCylindricalVertexMeshWithVoid", "CylindricalVertexMesh", false);
+        VertexMeshWriter<2, 2> vertexmesh_writer("TestBoundedCylindricalVertexMeshWithVoid", "CylindricalVertexMesh", false);
         TS_ASSERT_THROWS_NOTHING(vertexmesh_writer.WriteFilesUsingMesh(voronoi_mesh));
 
         // TODO Check this file !
@@ -556,7 +556,7 @@ public:
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(20)->rGetLocation()[1], -0.625, 1e-3);
         
         // Test the number of nodes owned by each Voronoi element and their areas
-        for (unsigned elem_index=0; elem_index<12; elem_index++)
+        for (unsigned elem_index = 0; elem_index<12; elem_index++)
         {
             TS_ASSERT_EQUALS(voronoi_mesh.GetElement(elem_index)->GetNumNodes(), 6u);
             TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(elem_index), 0.9330, 1e-4);
@@ -575,7 +575,7 @@ public:
         // Move the top row of nodes up so that two of the image nodes overlap
         p_delaunay_mesh->GetNode(7)->rGetModifiableLocation()[1] = sqrt(3) - 1 / sqrt(3);
         
-        TrianglesMeshWriter<2,2> mesh_writer("TestBoundedCylindricalVertexMeshWithOverlappingImageNode", "DelaunayMesh", false);
+        TrianglesMeshWriter<2, 2> mesh_writer("TestBoundedCylindricalVertexMeshWithOverlappingImageNode", "DelaunayMesh", false);
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(*p_delaunay_mesh));
 
         TS_ASSERT_EQUALS(p_delaunay_mesh->GetWidth(0), 3u);
@@ -587,7 +587,7 @@ public:
         bool is_bounded = true;
         Cylindrical2dVertexMesh voronoi_mesh(*p_delaunay_mesh,is_bounded);
 
-        VertexMeshWriter<2,2> vertexmesh_writer("TestBoundedCylindricalVertexMeshWithOverlappingImageNode", "CylindricalVertexMesh", false);
+        VertexMeshWriter<2, 2> vertexmesh_writer("TestBoundedCylindricalVertexMeshWithOverlappingImageNode", "CylindricalVertexMesh", false);
         TS_ASSERT_THROWS_NOTHING(vertexmesh_writer.WriteFilesUsingMesh(voronoi_mesh));
 
         // TODO Check this file !

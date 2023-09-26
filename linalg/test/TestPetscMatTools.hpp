@@ -59,9 +59,9 @@ public:
         TS_ASSERT_EQUALS(PetscMatTools::GetSize(matrix2), size);
 
         // Note: not efficient, but checks SetElement guards for ownership
-        for (unsigned row=0; row<size; row++)
+        for (unsigned row = 0; row<size; row++)
         {
-            for (unsigned col=0; col<size; col++)
+            for (unsigned col = 0; col<size; col++)
             {
                 PetscMatTools::SetElement(matrix1, row, col, (double) size*row+col+1);
                 PetscMatTools::SetElement(matrix2, row, col, (double) size*row+col+1);
@@ -87,9 +87,9 @@ public:
         const unsigned size = 10u;
         PetscTools::SetupMat(matrix, size, size, size);
         // Note: not efficient, but checks SetElement guards for ownership
-        for (unsigned row=0; row<size; row++)
+        for (unsigned row = 0; row<size; row++)
         {
-            for (unsigned col=0; col<row; col++)
+            for (unsigned col = 0; col<row; col++)
             {
                 PetscMatTools::SetElement(matrix, row, col, (double) size*row+col+1);
                 PetscMatTools::SetElement(matrix, col, row, (double) size*row+col+1);
@@ -111,9 +111,9 @@ public:
         Mat matrix;
         const unsigned size = 5u;
         PetscTools::SetupMat(matrix, size, size, size);
-        for (unsigned row=0; row<size; row++)
+        for (unsigned row = 0; row<size; row++)
         {
-            for (unsigned col=0; col<size; col++)
+            for (unsigned col = 0; col<size; col++)
             {
                 PetscMatTools::SetElement(matrix, row, col, 2.78);
             }
@@ -138,7 +138,7 @@ public:
 
         for (int i=lo; i<hi; ++i)
         {
-            for (unsigned j=0; j<size; ++j)
+            for (unsigned j = 0; j<size; ++j)
             {
                 TS_ASSERT_DELTA( PetscMatTools::GetElement(matrix, i, j), correct_mat[i][j], 1e-12);
             }
@@ -161,9 +161,9 @@ public:
 
         PetscMatTools::TurnOffVariableAllocationError(matrix);
 
-        for (unsigned row=0; row<size; row++)
+        for (unsigned row = 0; row<size; row++)
         {
-            for (unsigned col=0; col<size; col++)
+            for (unsigned col = 0; col<size; col++)
             {
                 PetscMatTools::SetElement(matrix, row, col, 2.78);
             }

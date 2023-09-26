@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * NOTE: This is a badly written test, because it assumes evaluationPoints
  * are the nodes in the canonical element, in the correct order.
  */
-template <unsigned ELEMENT_DIM>
+template<unsigned ELEMENT_DIM>
 class BasisFunctionsCheckers
 {
 public:

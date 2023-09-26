@@ -60,7 +60,7 @@ public:
 
         TS_ASSERT_DELTA(pde.ComputeDuDtCoefficientFunction(x,0), 1.0, 1e-6);
 
-        c_vector<double,1> pde_solution;
+        c_vector<double, 1> pde_solution;
         pde_solution(0) = 4.0;
 
         std::vector<double> ode_solution(1);
@@ -71,7 +71,7 @@ public:
         Node<1> node(0);
         TS_ASSERT_DELTA(pde.ComputeSourceTermAtNode(node, pde_solution, ode_solution, 0), 0.0, 1e-6);
 
-        c_matrix<double,1,1> diffusion_term = pde.ComputeDiffusionTerm(x, 0);
+        c_matrix<double,1, 1> diffusion_term = pde.ComputeDiffusionTerm(x, 0);
         TS_ASSERT_DELTA(diffusion_term(0,0), 1.0, 1e-6);
     }
 
@@ -84,7 +84,7 @@ public:
 
         TS_ASSERT_DELTA(pde.ComputeDuDtCoefficientFunction(x,0), 1.0, 1e-6);
 
-        c_vector<double,2> pde_solution;
+        c_vector<double, 2> pde_solution;
         pde_solution(0) = 2.0;
         pde_solution(1) = 0.75;
 
@@ -96,10 +96,10 @@ public:
         Node<1> node(0);
         TS_ASSERT_DELTA(pde.ComputeSourceTermAtNode(node, pde_solution, ode_solution, 0), 0.0, 1e-6);
 
-        c_matrix<double,1,1> diffusion_term1 = pde.ComputeDiffusionTerm(x, 0);
+        c_matrix<double,1, 1> diffusion_term1 = pde.ComputeDiffusionTerm(x, 0);
         TS_ASSERT_DELTA(diffusion_term1(0,0), 1e-4, 1e-6);
 
-        c_matrix<double,1,1> diffusion_term2 = pde.ComputeDiffusionTerm(x, 1);
+        c_matrix<double,1, 1> diffusion_term2 = pde.ComputeDiffusionTerm(x, 1);
         TS_ASSERT_DELTA(diffusion_term2(0,0), 1e-2, 1e-6);
     }
 };

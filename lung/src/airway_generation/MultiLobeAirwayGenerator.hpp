@@ -75,7 +75,7 @@ public:
      *     generations using a heuristic limit (defaults to false)
      */
     MultiLobeAirwayGenerator(
-        TetrahedralMesh<1,3>& rAirwaysMesh,
+        TetrahedralMesh<1, 3>& rAirwaysMesh,
         bool pointDistanceLimit = false);
 
     /**
@@ -194,7 +194,7 @@ public:
 private:
 
     /** A mesh containing the major airways. */
-    TetrahedralMesh<1,3>& mAirwaysMesh;
+    TetrahedralMesh<1, 3>& mAirwaysMesh;
 
     /** A vector containing the left lobes associated with this generator. */
     std::vector<std::pair<AirwayGenerator*, LungLocation> > mLobeGenerators;

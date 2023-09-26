@@ -92,7 +92,7 @@ typedef enum ElectricsProblemType_
 
 template<unsigned DIM, unsigned ELEC_PROB_DIM=1>
 class CardiacElectroMechanicsProblem
-    : public AbstractConductivityModifier<DIM,DIM> // this only inherits from this class so it can be passed to the tissue to
+    : public AbstractConductivityModifier<DIM, DIM> // this only inherits from this class so it can be passed to the tissue to
                                                    // allow deformation-based altering of the conductivity
 {
 friend class TestAbstractContractionCellFactory;
@@ -105,7 +105,7 @@ protected :
     CompressibilityType mCompressibilityType;
 
     /** The cardiac problem class */
-    AbstractCardiacProblem<DIM,DIM,ELEC_PROB_DIM>* mpElectricsProblem;
+    AbstractCardiacProblem<DIM, DIM,ELEC_PROB_DIM>* mpElectricsProblem;
 
     /** The mechanics solver - a pointer to the part that sees the cardiac mechanics interface bit.
      * (Object pointed to is the same as with mpMechanicsSolver) */
@@ -130,7 +130,7 @@ protected :
     std::vector<double> mInterpolatedVoltages;
 
     /** The mesh for the electrics */
-    TetrahedralMesh<DIM,DIM>* mpElectricsMesh;
+    TetrahedralMesh<DIM, DIM>* mpElectricsMesh;
     /** The mesh for the mechanics */
     QuadraticMesh<DIM>* mpMechanicsMesh;
 
@@ -158,7 +158,7 @@ protected :
     /** Whether any location has been set to be watched (lots of output for that location */
     bool mIsWatchedLocation;
     /** The watched location if there is one */
-    c_vector<double,DIM> mWatchedLocation;
+    c_vector<double, DIM> mWatchedLocation;
     /** The node in the electrics mesh corresponding to the watched location */
     unsigned mWatchedElectricsNodeIndex;
     /** The node in the mechanics mesh corresponding to the watched location */
@@ -172,10 +172,10 @@ protected :
     /** A vector of stretches (in the fibre direction), one for each element in the mechanics mesh */
     std::vector<double> mStretchesForEachMechanicsElement;
     /** A vector of deformation gradients (each entry a matrix), one for each element in the mechanics mesh */
-    std::vector<c_matrix<double,DIM,DIM> > mDeformationGradientsForEachMechanicsElement;
+    std::vector<c_matrix<double, DIM, DIM> > mDeformationGradientsForEachMechanicsElement;
 
     /** Somewhere to store the modified conductivity tensor */
-    c_matrix<double,DIM,DIM> mModifiedConductivityTensor;
+    c_matrix<double, DIM, DIM> mModifiedConductivityTensor;
 
     /**
      *  Determine which node is closest to the watched location
@@ -206,7 +206,7 @@ public :
      */
     CardiacElectroMechanicsProblem(CompressibilityType compressibilityType,
                                    ElectricsProblemType electricsProblemType,
-                                   TetrahedralMesh<DIM,DIM>* pElectricsMesh,
+                                   TetrahedralMesh<DIM, DIM>* pElectricsMesh,
                                    QuadraticMesh<DIM>* pMechanicsMesh,
                                    AbstractCardiacCellFactory<DIM>* pCellFactory,
                                    ElectroMechanicsProblemDefinition<DIM>* pProblemDefinition,
@@ -253,7 +253,7 @@ public :
      *  NOTE: for the Calcium - assumes LUO_RUDY IS USED
      *  @param watchedLocation  location (x,y,z) in space.  Watched node is the closest to this point.
      */
-    void SetWatchedPosition(c_vector<double,DIM> watchedLocation);
+    void SetWatchedPosition(c_vector<double, DIM> watchedLocation);
 
     /**
      *  Call this for a files containing the deformation gradients (F), evaluated at the
@@ -265,7 +265,7 @@ public :
     void SetOutputDeformationGradientsAndStress(double timestep);
 
     /** @return the current deformed position of the nodes */
-    std::vector<c_vector<double,DIM> >& rGetDeformedPosition();
+    std::vector<c_vector<double, DIM> >& rGetDeformedPosition();
 
 
     /**
@@ -276,7 +276,7 @@ public :
      *  @param domainIndex Used to tailor modification to the domain. 0 = intracellular, 1 = extracellular, 2 = second intracellular (tridomain)
      *  @return Reference to a modified conductivity tensor.
      */
-    c_matrix<double,DIM,DIM>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double,DIM,DIM>& rOriginalConductivity, unsigned domainIndex);
+    c_matrix<double, DIM, DIM>& rCalculateModifiedConductivityTensor(unsigned elementIndex, const c_matrix<double, DIM, DIM>& rOriginalConductivity, unsigned domainIndex);
 
 
     /**

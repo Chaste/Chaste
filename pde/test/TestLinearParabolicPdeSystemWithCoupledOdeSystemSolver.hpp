@@ -65,17 +65,17 @@ public:
     void TestHeatEquationWithSourceWithCoupledOdeSystemIn1dWithZeroNeumann()
     {
         // Create mesh of domain [0,1]
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create PDE system object
         HeatEquationWithSourceForCoupledOdeSystem<1> pde;
 
         // Define zero Neumann boundary conditions
-        BoundaryConditionsContainer<1,1,1> bcc;
+        BoundaryConditionsContainer<1, 1, 1> bcc;
         ConstBoundaryCondition<1>* p_boundary_condition = new ConstBoundaryCondition<1>(0.0);
-        TetrahedralMesh<1,1>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
+        TetrahedralMesh<1, 1>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
         bcc.AddNeumannBoundaryCondition(*iter, p_boundary_condition);
         iter = mesh.GetBoundaryElementIteratorEnd();
         iter--;
@@ -90,7 +90,7 @@ public:
         }
 
         // Create PDE system solver
-        LinearParabolicPdeSystemWithCoupledOdeSystemSolver<1,1,1> solver(&mesh, &pde, &bcc, ode_systems);
+        LinearParabolicPdeSystemWithCoupledOdeSystemSolver<1, 1, 1> solver(&mesh, &pde, &bcc, ode_systems);
 
         // Test setting end time and timestep
         TS_ASSERT_THROWS_THIS(solver.SetTimes(1.0, 0.0), "Start time has to be less than end time");
@@ -152,22 +152,22 @@ public:
     void TestHeatEquationWithCoupledOdeSystemIn1dWithMixed()
     {
         // Create mesh of domain [0,1]
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create PDE system object
         HeatEquationForCoupledOdeSystem<1> pde;
 
         // Define non-zero Neumann boundary condition at x=0
-        BoundaryConditionsContainer<1,1,1> bcc;
+        BoundaryConditionsContainer<1, 1, 1> bcc;
         ConstBoundaryCondition<1>* p_boundary_condition = new ConstBoundaryCondition<1>(1.0);
-        TetrahedralMesh<1,1>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
+        TetrahedralMesh<1, 1>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
         bcc.AddNeumannBoundaryCondition(*iter, p_boundary_condition);
 
         // Define zero Dirichlet boundary condition at x=1
         ConstBoundaryCondition<1>* p_boundary_condition2 = new ConstBoundaryCondition<1>(0.0);
-        TetrahedralMesh<1,1>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorEnd();
+        TetrahedralMesh<1, 1>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorEnd();
         --node_iter;
         bcc.AddDirichletBoundaryCondition(*node_iter, p_boundary_condition2);
 
@@ -180,7 +180,7 @@ public:
         }
 
         // Create PDE system solver
-        LinearParabolicPdeSystemWithCoupledOdeSystemSolver<1,1,1> solver(&mesh, &pde, &bcc, ode_systems);
+        LinearParabolicPdeSystemWithCoupledOdeSystemSolver<1, 1, 1> solver(&mesh, &pde, &bcc, ode_systems);
 
         // Set end time and timestep
         double t_end = 0.1;
@@ -227,15 +227,15 @@ public:
     void TestHeatEquationWithCoupledOdeSystemIn2dWithZeroDirichlet()
     {
         // Create mesh of the domain [0,1]x[0,1]
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4096_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4096_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create PDE system object
         HeatEquationForCoupledOdeSystem<2> pde;
 
         // Define zero Dirichlet boundary conditions on entire boundary
-        BoundaryConditionsContainer<2,2,1> bcc;
+        BoundaryConditionsContainer<2, 2, 1> bcc;
         bcc.DefineZeroDirichletOnMeshBoundary(&mesh);
 
         // Create the correct number of ODE systems
@@ -247,7 +247,7 @@ public:
         }
 
         // Create PDE system solver
-        LinearParabolicPdeSystemWithCoupledOdeSystemSolver<2,2,1> solver(&mesh, &pde, &bcc, ode_systems);
+        LinearParabolicPdeSystemWithCoupledOdeSystemSolver<2, 2, 1> solver(&mesh, &pde, &bcc, ode_systems);
 
         // Set end time and timestep
         double t_end = 0.01;
@@ -303,15 +303,15 @@ public:
     void TestSolveAndWriteResultsToFileMethod()
     {
         // Create mesh of the domain [0,1]x[0,1]
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create PDE system object
         HeatEquationForCoupledOdeSystem<2> pde;
 
         // Define zero Dirichlet boundary conditions on entire boundary
-        BoundaryConditionsContainer<2,2,1> bcc;
+        BoundaryConditionsContainer<2, 2, 1> bcc;
         bcc.DefineZeroDirichletOnMeshBoundary(&mesh);
 
         // Create the correct number of ODE systems
@@ -323,7 +323,7 @@ public:
         }
 
         // Create PDE system solver
-        LinearParabolicPdeSystemWithCoupledOdeSystemSolver<2,2,1> solver(&mesh, &pde, &bcc, ode_systems);
+        LinearParabolicPdeSystemWithCoupledOdeSystemSolver<2, 2, 1> solver(&mesh, &pde, &bcc, ode_systems);
 
         // Set end time and timestep (end time is not a multiple of timestep, for coverage)
         double t_end = 0.105;
@@ -377,7 +377,7 @@ public:
         FileComparison(results_dir + "/results.pvd",
                        "pde/test/data/results.pvd").CompareFiles();
         //Final time-step
-        VtkMeshReader<2,2> vtk_reader(results_dir+"results_2.vtu");
+        VtkMeshReader<2, 2> vtk_reader(results_dir+"results_2.vtu");
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 81u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 128u);
         std::vector<double> pde_result, ode_result;
@@ -406,15 +406,15 @@ public:
     void TestSchnackenbergCoupledPdeSystemIn1dWithNonZeroDirichlet()
     {
         // Create mesh of domain [0,1]
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_1000_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_1000_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create PDE system object
         SchnackenbergCoupledPdeSystem<1> pde(1e-4, 1e-2, 0.1, 0.2, 0.3, 0.1);
 
         // Create non-zero Dirichlet boundary conditions for each state variable
-        BoundaryConditionsContainer<1,1,2> bcc;
+        BoundaryConditionsContainer<1, 1, 2> bcc;
         ConstBoundaryCondition<1>* p_bc_for_u = new ConstBoundaryCondition<1>(2.0);
         ConstBoundaryCondition<1>* p_bc_for_v = new ConstBoundaryCondition<1>(0.75);
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(0), p_bc_for_u, 0);
@@ -423,7 +423,7 @@ public:
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(mesh.GetNumNodes()-1), p_bc_for_v, 1);
 
         // Create PDE system solver
-        LinearParabolicPdeSystemWithCoupledOdeSystemSolver<1,1,2> solver(&mesh, &pde, &bcc);
+        LinearParabolicPdeSystemWithCoupledOdeSystemSolver<1, 1, 2> solver(&mesh, &pde, &bcc);
 
         // Set end time and time step
         double t_end = 10;

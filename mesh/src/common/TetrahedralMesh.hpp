@@ -158,7 +158,7 @@ protected:
      *     mesherInput.numberoftetrahedra should be set prior to the call when 
      *     elementList is non-NULL
      */
-    template <class MESHER_IO>
+    template<class MESHER_IO>
     void ExportToMesher(NodeMap& map, MESHER_IO& mesherInput, int *elementList=nullptr);
 
     /**
@@ -183,7 +183,7 @@ protected:
      *     or NULL
      * \todo #1545: (or add arguments ...)
      */
-    template <class MESHER_IO>
+    template<class MESHER_IO>
     void ImportFromMesher(
         MESHER_IO& mesherOutput,
         unsigned numberOfElements,

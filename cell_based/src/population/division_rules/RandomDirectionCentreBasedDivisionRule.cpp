@@ -102,12 +102,12 @@ std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > RandomDirec
 }
 
 // Explicit instantiation
-template class RandomDirectionCentreBasedDivisionRule<1,1>;
-template class RandomDirectionCentreBasedDivisionRule<1,2>;
-template class RandomDirectionCentreBasedDivisionRule<2,2>;
-template class RandomDirectionCentreBasedDivisionRule<1,3>;
-template class RandomDirectionCentreBasedDivisionRule<2,3>;
-template class RandomDirectionCentreBasedDivisionRule<3,3>;
+template class RandomDirectionCentreBasedDivisionRule<1, 1>;
+template class RandomDirectionCentreBasedDivisionRule<1, 2>;
+template class RandomDirectionCentreBasedDivisionRule<2, 2>;
+template class RandomDirectionCentreBasedDivisionRule<1, 3>;
+template class RandomDirectionCentreBasedDivisionRule<2, 3>;
+template class RandomDirectionCentreBasedDivisionRule<3, 3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

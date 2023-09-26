@@ -62,7 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class MonodomainAssembler
-   : public AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,1,false,true,CARDIAC>
+   : public AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM,1,false,true,CARDIAC>
 {
 protected:
     /** This assembler uses another assembler, though just for calling the
@@ -93,9 +93,9 @@ public:
                 c_vector<double, ELEMENT_DIM+1> &rPhi,
                 c_matrix<double, SPACE_DIM, ELEMENT_DIM+1> &rGradPhi,
                 ChastePoint<SPACE_DIM> &rX,
-                c_vector<double,1> &rU,
+                c_vector<double, 1> &rU,
                 c_matrix<double, 1, SPACE_DIM> &rGradU /* not used */,
-                Element<ELEMENT_DIM,SPACE_DIM>* pElement);
+                Element<ELEMENT_DIM, SPACE_DIM>* pElement);
 
 
     /**
@@ -104,8 +104,8 @@ public:
      * @param pMesh pointer to the mesh
      * @param pTissue pointer to the tissue
      */
-    MonodomainAssembler(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                        MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* pTissue);
+    MonodomainAssembler(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+                        MonodomainTissue<ELEMENT_DIM, SPACE_DIM>* pTissue);
 };
 
 #endif /*MONODOMAINASSEMBLER_HPP_*/

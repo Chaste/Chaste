@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A cell factory that provides cells with no stimulus.
  */
-template <class CELL, unsigned DIM>
+template<class CELL, unsigned DIM>
 class ZeroStimulusCellFactory : public AbstractCardiacCellFactory<DIM>
 {
 
@@ -60,7 +60,7 @@ public:
         return new CELL(this->mpSolver, this->mpZeroStimulus);
     }
 
-    ~ZeroStimulusCellFactory(void)
+    ~ZeroStimulusCellFactory()
     {
     }
 };

@@ -89,7 +89,7 @@ public:
      * Constructor. Note body force initialised to zero and density to 1.0
      * @param rMesh Tesh being solved on
      */
-    explicit SolidMechanicsProblemDefinition(AbstractTetrahedralMesh<DIM,DIM>& rMesh);
+    explicit SolidMechanicsProblemDefinition(AbstractTetrahedralMesh<DIM, DIM>& rMesh);
 
     /** Destructor */
     virtual ~SolidMechanicsProblemDefinition()
@@ -162,7 +162,7 @@ public:
      * @param rFixedNodes the fixed node indices
      * @param rFixedNodeLocation corresponding locations
      */
-    void SetFixedNodes(std::vector<unsigned>& rFixedNodes, std::vector<c_vector<double,DIM> >& rFixedNodeLocation);
+    void SetFixedNodes(std::vector<unsigned>& rFixedNodes, std::vector<c_vector<double, DIM> >& rFixedNodeLocation);
 
     /**
      * Check all variables are set appropriately. Exceptions are thrown if any are not.

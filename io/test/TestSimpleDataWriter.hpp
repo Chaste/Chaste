@@ -73,7 +73,7 @@ public:
         std::vector<double> x;
         std::vector<double> y;
 
-        for (unsigned i=0; i<4; ++i)
+        for (unsigned i = 0; i<4; ++i)
         {
             t.push_back(i);
             x.push_back(2*i);

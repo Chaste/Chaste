@@ -62,9 +62,9 @@ void AbstractCentreBasedDivisionRule<ELEMENT_DIM, SPACE_DIM>::OutputCellCentreBa
 }
 
 // Explicit instantiation
-template class AbstractCentreBasedDivisionRule<1,1>;
-template class AbstractCentreBasedDivisionRule<1,2>;
-template class AbstractCentreBasedDivisionRule<2,2>;
-template class AbstractCentreBasedDivisionRule<1,3>;
-template class AbstractCentreBasedDivisionRule<2,3>;
-template class AbstractCentreBasedDivisionRule<3,3>;
+template class AbstractCentreBasedDivisionRule<1, 1>;
+template class AbstractCentreBasedDivisionRule<1, 2>;
+template class AbstractCentreBasedDivisionRule<2, 2>;
+template class AbstractCentreBasedDivisionRule<1, 3>;
+template class AbstractCentreBasedDivisionRule<2, 3>;
+template class AbstractCentreBasedDivisionRule<3, 3>;

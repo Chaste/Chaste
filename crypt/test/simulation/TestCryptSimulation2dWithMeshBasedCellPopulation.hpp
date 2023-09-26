@@ -144,7 +144,7 @@ public:
         int num_cells_depth = 5;
         int num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -183,8 +183,8 @@ public:
     {
         EXIT_IF_PARALLEL;    // Writing mesh based in parallel causes duplicated results.
 
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_100mm_200_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/2D_0_to_100mm_200_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Set up cells
@@ -250,7 +250,7 @@ public:
        unsigned thickness_of_ghost_layer = 4;
 
        HoneycombMeshGenerator generator(cells_across, cells_up,thickness_of_ghost_layer);
-       boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+       boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
        std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
        // Set up cells
@@ -321,7 +321,7 @@ public:
 
         // Create mesh
         HoneycombMeshGenerator generator(3, 3, 1);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -377,7 +377,7 @@ public:
             unsigned index = simulator.rGetCellPopulation().GetLocationIndexUsingCell(cell_iter);
             c_vector<double, 2> cell_location = simulator.rGetCellPopulation().GetLocationOfCellCentre(cell_iter);
 
-            AbstractOffLatticeCellPopulation<2,2>* p_offLattice_pop = dynamic_cast<AbstractOffLatticeCellPopulation<2,2>* >(&(simulator.rGetCellPopulation()));
+            AbstractOffLatticeCellPopulation<2, 2>* p_offLattice_pop = dynamic_cast<AbstractOffLatticeCellPopulation<2, 2>* >(&(simulator.rGetCellPopulation()));
             double damping = p_offLattice_pop->GetDampingConstant(index);
             c_vector<double, 2> expected_location = p_force->GetExpectedOneStepLocationFE(index, damping, old_posns[index], 0.01);
 
@@ -680,7 +680,7 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(0.1, 100);
 
         // And record current state of mesh
-        MutableMesh<2,2>& r_mesh = (static_cast<MeshBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation())))->rGetMesh();
+        MutableMesh<2, 2>& r_mesh = (static_cast<MeshBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation())))->rGetMesh();
 
         // Save
         CellBasedSimulationArchiver<2, CryptSimulation2d>::Save(&simulator);
@@ -690,7 +690,7 @@ public:
         p_simulator = CellBasedSimulationArchiver<2, CryptSimulation2d>::Load("Crypt2DMeshArchive", 0);
 
         // Get the loaded mesh
-        MutableMesh<2,2>& r_mesh2 = (static_cast<MeshBasedCellPopulation<2>*>(&(p_simulator->rGetCellPopulation())))->rGetMesh();
+        MutableMesh<2, 2>& r_mesh2 = (static_cast<MeshBasedCellPopulation<2>*>(&(p_simulator->rGetCellPopulation())))->rGetMesh();
 
         // Compare with mesh before save.
         CompareMeshes(&r_mesh, &r_mesh2);
@@ -909,13 +909,13 @@ public:
         p_simulator1->Solve();
 
         // Get mesh
-        MutableMesh<2,2>& r_mesh1 = (static_cast<MeshBasedCellPopulation<2>*>(&(p_simulator1->rGetCellPopulation())))->rGetMesh();
+        MutableMesh<2, 2>& r_mesh1 = (static_cast<MeshBasedCellPopulation<2>*>(&(p_simulator1->rGetCellPopulation())))->rGetMesh();
 
         // Save then reload, compare meshes either side
         CellBasedSimulationArchiver<2, CryptSimulation2d>::Save(p_simulator1);
 
         CryptSimulation2d* p_simulator2 = CellBasedSimulationArchiver<2, CryptSimulation2d>::Load("Crypt2DPeriodicSaveAndLoad", 0.2);
-        MutableMesh<2,2>& r_mesh2 = (static_cast<MeshBasedCellPopulation<2>*>(&(p_simulator2->rGetCellPopulation())))->rGetMesh();
+        MutableMesh<2, 2>& r_mesh2 = (static_cast<MeshBasedCellPopulation<2>*>(&(p_simulator2->rGetCellPopulation())))->rGetMesh();
 
         CompareMeshes(&r_mesh1, &r_mesh2);
 
@@ -972,7 +972,7 @@ public:
         unsigned thickness_of_ghost_layer = 1;
 
         HoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
@@ -1200,8 +1200,8 @@ public:
         // Create mesh
         double crypt_length = 9.3;
 
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_100mm_200_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/2D_0_to_100mm_200_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create cells
@@ -1237,12 +1237,12 @@ public:
         EXIT_IF_PARALLEL;
 
         // Make a parent node
-        c_vector<double,2> location;
+        c_vector<double, 2> location;
         location[0] = 1.0;
         location[1] = 1.0;
         Node<2>* p_node = new Node<2>(0u,location, false);
 
-        MutableMesh<2,2> conf_mesh;
+        MutableMesh<2, 2> conf_mesh;
         conf_mesh.AddNode(p_node);
 
         // Create cells
@@ -1279,11 +1279,11 @@ public:
         EXIT_IF_PARALLEL;
 
         // Make a parent node
-        c_vector<double,2> location;
+        c_vector<double, 2> location;
         location[0] = 1.0;
         location[1] = 0.0; // <- y=0
         Node<2>* p_node = new Node<2>(0u,location, false);
-        MutableMesh<2,2> conf_mesh;
+        MutableMesh<2, 2> conf_mesh;
         conf_mesh.AddNode(p_node);
 
         // Create cells
@@ -1303,7 +1303,7 @@ public:
         // need vector from parent to daughter to have both +ve and -ve y component
         // different branches will execute to make sure daughter stays in crypt ie. +ve y component
         MeshBasedCellPopulation<2>* p_cast_population = static_cast<MeshBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation()));
-        for (unsigned repetitions=0; repetitions<=1; repetitions++)
+        for (unsigned repetitions = 0; repetitions<=1; repetitions++)
         {
             std::pair<c_vector<double, 2>, c_vector<double, 2> > locations = p_cast_population->GetCentreBasedDivisionRule()->CalculateCellDivisionVector(*conf_iter, *p_cast_population);
             c_vector<double, 2> daughter_location = locations.second;
@@ -1324,7 +1324,7 @@ public:
         EXIT_IF_PARALLEL;
 
         // Make a mesh
-        c_vector<double,2> location;
+        c_vector<double, 2> location;
         location[0] = 1.0;
         location[1] = 1.0;
         Node<2>* p_node = new Node<2>(0u,location, false);
@@ -1359,7 +1359,7 @@ public:
         EXIT_IF_PARALLEL;
 
         // Make a mesh
-        c_vector<double,2> location;
+        c_vector<double, 2> location;
         location[0] = 1.0;
         location[1] = 0.0; // <- y=0
         Node<2>* p_node = new Node<2>(0u,location, false);
@@ -1381,9 +1381,9 @@ public:
 
         MeshBasedCellPopulation<2>* p_cast_population = static_cast<MeshBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation()));
         std::pair<c_vector<double, 2>, c_vector<double, 2> > locations = p_cast_population->GetCentreBasedDivisionRule()->CalculateCellDivisionVector(*cyl_iter, *p_cast_population);
-        c_vector<double,2> daughter_location = locations.second;
-        c_vector<double,2> new_parent_location = cyl_mesh.GetNode(0)->rGetLocation();
-        c_vector<double,2> parent_to_daughter = cyl_mesh.GetVectorFromAtoB(new_parent_location, daughter_location);
+        c_vector<double, 2> daughter_location = locations.second;
+        c_vector<double, 2> new_parent_location = cyl_mesh.GetNode(0)->rGetLocation();
+        c_vector<double, 2> parent_to_daughter = cyl_mesh.GetVectorFromAtoB(new_parent_location, daughter_location);
 
         // The parent stem cell should stay where it is and the daughter be introduced at positive y.
         TS_ASSERT_DELTA(new_parent_location[0], location[0], 1e-7);
@@ -1461,7 +1461,7 @@ public:
         unsigned thickness_of_ghost_layer = 1;
 
         HoneycombMeshGenerator generator(cells_across, cells_up,thickness_of_ghost_layer);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Get location indices corresponding to real cells
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();

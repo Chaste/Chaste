@@ -101,7 +101,7 @@ private:
         // Re-index the nodes according to what we've just read
         assert(GetNumNodes() == indices.size());
         this->mNodesMapping.clear();
-        for (unsigned i=0; i<this->mNodes.size(); ++i)
+        for (unsigned i = 0; i<this->mNodes.size(); ++i)
         {
             unsigned new_index = indices[i];
             this->mNodes[i]->SetIndex(new_index);
@@ -219,7 +219,7 @@ protected:
      * @param numLocalRows the number of rows that should be owned by this process.
      * @param isDimPeriodic whether the DistributedBoxCollection should be periodic.
      */
-     virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows = PETSC_DECIDE,  c_vector<bool,SPACE_DIM> isDimPeriodic  = zero_vector<bool>(SPACE_DIM));
+     virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows = PETSC_DECIDE,  c_vector<bool, SPACE_DIM> isDimPeriodic  = zero_vector<bool>(SPACE_DIM));
 
      /** @return mpBoxCollection */
      DistributedBoxCollection<SPACE_DIM>* GetBoxCollection();
@@ -265,7 +265,7 @@ public:
      * @param rGeneratingMesh any mesh with nodes, used to generate the NodesOnlyMesh.
      * @param maxInteractionDistance the distance that defines node neighbours in CalculateNodePairs.
      */
-    void ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM,SPACE_DIM>& rGeneratingMesh, double maxInteractionDistance);
+    void ConstructNodesWithoutMesh(const AbstractMesh<SPACE_DIM, SPACE_DIM>& rGeneratingMesh, double maxInteractionDistance);
 
     /** @return whether each initial node given to ConstructNodesWithoutMesh is owned by this process. */
     std::vector<bool>& rGetInitiallyOwnedNodes();

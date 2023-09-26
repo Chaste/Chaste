@@ -98,7 +98,7 @@ public:
     {
         // Create a simple 2D VertexMesh
         HoneycombVertexMeshGenerator generator(5, 3);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -170,7 +170,7 @@ public:
     {
         // Create a simple vertex-based mesh
         HoneycombVertexMeshGenerator generator(3, 3);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -208,7 +208,7 @@ public:
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Check correspondence between elements and cells
-        for (VertexMesh<2,2>::VertexElementIterator iter = p_mesh->GetElementIteratorBegin();
+        for (VertexMesh<2, 2>::VertexElementIterator iter = p_mesh->GetElementIteratorBegin();
              iter != p_mesh->GetElementIteratorEnd();
              ++iter)
         {
@@ -223,7 +223,7 @@ public:
             std::set<unsigned> actual_node_indices;
             unsigned elem_index = iter->GetIndex();
             CellPtr p_cell = cell_population.GetCellUsingLocationIndex(elem_index);
-            VertexElement<2,2>* p_actual_element = cell_population.GetElementCorrespondingToCell(p_cell);
+            VertexElement<2, 2>* p_actual_element = cell_population.GetElementCorrespondingToCell(p_cell);
             unsigned actual_index = p_actual_element->GetIndex();
 
             for (unsigned i = 0; i < p_actual_element->GetNumNodes(); ++i)
@@ -237,7 +237,7 @@ public:
 
         // Create anoter simple vertex-based mesh
         HoneycombVertexMeshGenerator generator2(3, 3);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh2 = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh2 = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells2;
@@ -260,7 +260,7 @@ public:
     {
         // Create mesh
         HoneycombVertexMeshGenerator generator(3, 3);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(ApcOneHitCellMutationState, p_apc1);
@@ -337,11 +337,11 @@ public:
         nodes_elem.push_back(nodes[2]);
         nodes_elem.push_back(nodes[3]);
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem));
 
         // Make a vertex mesh
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Create cells
         MAKE_PTR(ApcOneHitCellMutationState, p_apc1);
@@ -370,7 +370,7 @@ public:
 
         // Create a simple vertex-based mesh
         HoneycombVertexMeshGenerator generator(4, 6);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -395,7 +395,7 @@ public:
 
         // Create a simple vertex-based mesh
         HoneycombVertexMeshGenerator generator(4, 6);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -436,12 +436,12 @@ public:
         nodes_elem_2.push_back(nodes[4]);
         nodes_elem_2.push_back(nodes[2]);
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_2));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_2));
 
         // Make a vertex mesh
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
         vertex_mesh.SetMeshOperationTracking(true);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
@@ -584,10 +584,10 @@ public:
         {
             nodes_elem.push_back(nodes[i]);
         }
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem));
 
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         // Create a cell
         std::vector<CellPtr> cells;
@@ -611,7 +611,7 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 1u);
 
         // Add a new cell by dividing element 0 along the axis (1,0)
-        c_vector<double,2> cell_division_axis;
+        c_vector<double, 2> cell_division_axis;
         cell_division_axis[0] = 1.0;
         cell_division_axis[1] = 0.0;
 
@@ -657,7 +657,7 @@ public:
     {
         // Create a mesh with 9 elements
         HoneycombVertexMeshGenerator generator(3, 3);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of -elem_index, so its age is elem_index
@@ -802,7 +802,7 @@ public:
     {
         // Create a simple vertex-based mesh
         HoneycombVertexMeshGenerator generator(4, 6);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
         p_mesh->GetElement(5)->MarkAsDeleted();
 
         // Create cells
@@ -830,7 +830,7 @@ public:
 
         // Create a simple vertex-based mesh
         HoneycombVertexMeshGenerator generator(4, 6);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -911,7 +911,7 @@ public:
 
         // Create a simple vertex-based cell population, comprising various cell types in various cell cycle phases
         HoneycombVertexMeshGenerator generator(4, 6);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         boost::shared_ptr<AbstractCellProperty> p_stem(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
         boost::shared_ptr<AbstractCellProperty> p_transit(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
@@ -1071,8 +1071,8 @@ public:
         ArchiveLocationInfo::SetMeshFilename("vertex_mesh_2d");
 
         // Create mesh
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
-        MutableVertexMesh<2,2> mesh;
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
+        MutableVertexMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Archive cell population
@@ -1152,7 +1152,7 @@ public:
             TS_ASSERT_EQUALS(p_cell_population->rGetMesh().GetNumFaces(), 0u);
 
             // Compare the loaded mesh against the original
-            MutableVertexMesh<2,2>& loaded_mesh = p_cell_population->rGetMesh();
+            MutableVertexMesh<2, 2>& loaded_mesh = p_cell_population->rGetMesh();
 
             TS_ASSERT_EQUALS(mesh.GetNumNodes(), loaded_mesh.GetNumNodes());
 
@@ -1249,13 +1249,13 @@ public:
         nodes_faces[9].push_back(nodes[8]);
         nodes_faces[9].push_back(nodes[7]);
 
-        std::vector<VertexElement<2,3>*> faces;
+        std::vector<VertexElement<2, 3>*> faces;
         for (unsigned i = 0; i < 10; ++i)
         {
-            faces.push_back(new VertexElement<2,3>(i, nodes_faces[i]));
+            faces.push_back(new VertexElement<2, 3>(i, nodes_faces[i]));
         }
 
-        std::vector<VertexElement<2,3>*> faces_element_0, faces_element_1;
+        std::vector<VertexElement<2, 3>*> faces_element_0, faces_element_1;
         std::vector<bool> orientations_0, orientations_1;
         for (unsigned i = 0; i < 6; ++i)
         {
@@ -1270,11 +1270,11 @@ public:
         faces_element_1.push_back(faces[5]);
         orientations_1.push_back(false);
 
-        std::vector<VertexElement<3,3>*> elements;
-        elements.push_back(new VertexElement<3,3>(0, faces_element_0, orientations_0));
-        elements.push_back(new VertexElement<3,3>(1, faces_element_1, orientations_1));
+        std::vector<VertexElement<3, 3>*> elements;
+        elements.push_back(new VertexElement<3, 3>(0, faces_element_0, orientations_0));
+        elements.push_back(new VertexElement<3, 3>(1, faces_element_1, orientations_1));
 
-        MutableVertexMesh<3,3> mesh(nodes, elements);
+        MutableVertexMesh<3, 3> mesh(nodes, elements);
 
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);
         std::string archive_file = "vertex_cell_population_3d.arch";
@@ -1356,7 +1356,7 @@ public:
             TS_ASSERT_EQUALS(p_cell_population->rGetMesh().GetNumFaces(), 10u);
 
             // Compare the loaded mesh against the original
-            MutableVertexMesh<3,3>& loaded_mesh = p_cell_population->rGetMesh();
+            MutableVertexMesh<3, 3>& loaded_mesh = p_cell_population->rGetMesh();
 
             TS_ASSERT_EQUALS(mesh.GetNumNodes(), loaded_mesh.GetNumNodes());
 
@@ -1427,12 +1427,12 @@ public:
         nodes_elements[2].push_back(vertex_nodes[2]);
         nodes_elements[2].push_back(vertex_nodes[3]);
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elements[0]));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elements[1]));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elements[2]));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elements[0]));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elements[1]));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elements[2]));
 
-        MutableVertexMesh<2,2>* p_vertex_mesh = new MutableVertexMesh<2,2>(vertex_nodes, vertex_elements);
+        MutableVertexMesh<2, 2>* p_vertex_mesh = new MutableVertexMesh<2, 2>(vertex_nodes, vertex_elements);
 
         // Create cells to correspond with VertexElements
         std::vector<CellPtr> cells;
@@ -1443,7 +1443,7 @@ public:
         VertexBasedCellPopulation<2> cell_population(*p_vertex_mesh, cells);
 
         // Test TetrahedralMeshForPdeModifier() method
-        TetrahedralMesh<2,2>* p_tetrahedral_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
+        TetrahedralMesh<2, 2>* p_tetrahedral_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
 
         // The VertexMesh has 5 Nodes and 3 VertexElements, so the TetrahedralMesh has 5+3=8 Nodes
         TS_ASSERT_EQUALS(p_tetrahedral_mesh->GetNumNodes(), 8u);
@@ -1471,9 +1471,9 @@ public:
         for (unsigned i = 0; i < 3; ++i)
         {
             Node<2>* p_tetrahedral_node = p_tetrahedral_mesh->GetNode(i+5);
-            c_vector<double,2> tetrahedral_node_location;
+            c_vector<double, 2> tetrahedral_node_location;
             tetrahedral_node_location = p_tetrahedral_node->rGetLocation();
-            c_vector<double,2> vertex_element_centroid = p_vertex_mesh->GetCentroidOfElement(i);
+            c_vector<double, 2> vertex_element_centroid = p_vertex_mesh->GetCentroidOfElement(i);
 
             TS_ASSERT_DELTA(tetrahedral_node_location[0], vertex_element_centroid[0], 1e-3);
             TS_ASSERT_DELTA(tetrahedral_node_location[1], vertex_element_centroid[1], 1e-3);
@@ -1482,14 +1482,14 @@ public:
         }
 
         // The first Element of the TetrahedralMesh should contain the following Nodes
-        Element<2,2>* p_element_0 = p_tetrahedral_mesh->GetElement(0);
+        Element<2, 2>* p_element_0 = p_tetrahedral_mesh->GetElement(0);
 
         TS_ASSERT_EQUALS(p_element_0->GetNodeGlobalIndex(0), 0u);
         TS_ASSERT_EQUALS(p_element_0->GetNodeGlobalIndex(1), 1u);
         TS_ASSERT_EQUALS(p_element_0->GetNodeGlobalIndex(2), 5u);
 
         // The Fifth Element of the TetrahedralMesh should contain the following Nodes
-        Element<2,2>* p_element_4 = p_tetrahedral_mesh->GetElement(4);
+        Element<2, 2>* p_element_4 = p_tetrahedral_mesh->GetElement(4);
 
         TS_ASSERT_EQUALS(p_element_4->GetNodeGlobalIndex(0), 1u);
         TS_ASSERT_EQUALS(p_element_4->GetNodeGlobalIndex(1), 2u);
@@ -1504,7 +1504,7 @@ public:
     {
         // Create a small cell population
         HoneycombVertexMeshGenerator generator(4, 4);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -1549,7 +1549,7 @@ public:
 
         // Create a simple vertex-based cell population, comprising various cell types in various cell cycle phases
         HoneycombVertexMeshGenerator generator(4, 6);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -1619,7 +1619,7 @@ public:
 
         // Create a simple vertex-based cell population, comprising various cell types in various cell cycle phases
         HoneycombVertexMeshGenerator generator(4, 6);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -1688,7 +1688,7 @@ public:
 
         // Create a simple vertex-based cell population, comprising various cell types in various cell cycle phases
         HoneycombVertexMeshGenerator generator(4, 6);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;

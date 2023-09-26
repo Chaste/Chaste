@@ -502,7 +502,7 @@ std::set<unsigned> NodeBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsi
     return neighbouring_node_indices;
 }
 
-template <unsigned DIM>
+template<unsigned DIM>
 double NodeBasedCellPopulation<DIM>::GetVolumeOfCell([[maybe_unused]] CellPtr pCell)
 {
     // Not implemented or tested in 1D
@@ -628,7 +628,7 @@ void NodeBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDir
     }
 
     // Iterate over any cell writers that are present.  This is in a separate loop to below, because the writer loop
-    // needs to the the outer loop.
+    // needs be in the outer loop.
     for (auto&& p_cell_writer : this->mCellWriters)
     {
         // Add any scalar data

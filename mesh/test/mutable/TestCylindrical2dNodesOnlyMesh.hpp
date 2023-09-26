@@ -57,7 +57,7 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2, 2> >(generator.GetMesh());
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
         double periodic_width = 4.0;
@@ -91,7 +91,7 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2, 2> >(generator.GetMesh());
 
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
@@ -113,7 +113,7 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2, 2> >(generator.GetMesh());
 
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
@@ -158,7 +158,7 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2, 2> >(generator.GetMesh());
 
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
@@ -199,7 +199,7 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2, 2> >(generator.GetMesh());
 
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
@@ -256,7 +256,7 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2, 2> >(generator.GetMesh());
 
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
@@ -327,7 +327,7 @@ public:
         TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(p_mesh->GetNode(4)), 5u);
 
 
-        for (unsigned i=0; i<nodes.size(); ++i)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -348,7 +348,7 @@ public:
         unsigned num_cells_across = 4;
         unsigned num_cells_up = 7;
         HoneycombMeshGenerator generator(num_cells_across,num_cells_up);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2, 2> >(generator.GetMesh());
 
 
         // Convert this to a Cylindrical2dNodesOnlyMesh
@@ -356,7 +356,7 @@ public:
         Cylindrical2dNodesOnlyMesh* p_mesh = new Cylindrical2dNodesOnlyMesh(periodic_width);
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.0);
 
-        AbstractMesh<2,2>* const p_saved_mesh = p_mesh;
+        AbstractMesh<2, 2>* const p_saved_mesh = p_mesh;
 
         /*
          * You need the const above to stop a BOOST_STATIC_ASSERTION failure.
@@ -381,7 +381,7 @@ public:
 
         {
             // De-serialize and compare
-            AbstractMesh<2,2>* p_loaded_mesh;
+            AbstractMesh<2, 2>* p_loaded_mesh;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -402,7 +402,7 @@ public:
             TS_ASSERT_EQUALS(p_static_cast_saved_mesh->GetNumNodes(), p_static_cast_loaded_mesh->GetNumNodes());
             TS_ASSERT_EQUALS(p_static_cast_saved_mesh->GetNumNodes(), 28u);
 
-            for (unsigned i=0; i<p_static_cast_saved_mesh->GetNumNodes(); ++i)
+            for (unsigned i = 0; i<p_static_cast_saved_mesh->GetNumNodes(); ++i)
             {
                 Node<2>* p_node = p_static_cast_saved_mesh->GetNode(i);
                 Node<2>* p_node2 = p_static_cast_loaded_mesh->GetNode(i);
@@ -412,7 +412,7 @@ public:
 
                 TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), p_node2->IsBoundaryNode());
 
-                for (unsigned j=0; j<2; ++j)
+                for (unsigned j = 0; j<2; ++j)
                 {
                     TS_ASSERT_DELTA(p_node->rGetLocation()[j], p_node2->rGetLocation()[j], 1e-4);
                 }

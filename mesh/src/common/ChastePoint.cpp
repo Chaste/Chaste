@@ -115,7 +115,7 @@ template<unsigned DIM>
 bool ChastePoint<DIM>::IsSamePoint(const ChastePoint<DIM>& rPoint) const
 {
     bool returned_value = true;
-    for (unsigned dim=0; dim<DIM; dim++)
+    for (unsigned dim = 0; dim<DIM; dim++)
     {
         if (rPoint[dim] != mLocation[dim])
         {

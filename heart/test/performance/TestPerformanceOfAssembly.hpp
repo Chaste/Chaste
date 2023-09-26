@@ -64,7 +64,7 @@ public:
         PerformanceTester<CellLuoRudy1991FromCellMLBackwardEulerOpt, BidomainProblem<2>, 2> tester("TestPerAssembly");
         tester.SimTime=0.0025;
 
-        for (unsigned mesh_num=0; mesh_num<3; mesh_num++)
+        for (unsigned mesh_num = 0; mesh_num<3; mesh_num++)
         {
             tester.MeshNum=mesh_num;
             tester.Run();

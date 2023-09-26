@@ -1789,7 +1789,7 @@ public:
 
         // Create 2D mesh
         PottsMeshGenerator<2> generator(4, 2, 2, 4, 2, 2);
-        boost::shared_ptr<AbstractMesh<2,2> > const p_mesh = generator.GetMesh();
+        boost::shared_ptr<AbstractMesh<2, 2> > const p_mesh = generator.GetMesh();
 
         /*
          * You need the const above to stop a BOOST_STATIC_ASSERTION failure.
@@ -1817,7 +1817,7 @@ public:
 
         {
             // De-serialize and compare
-            boost::shared_ptr<AbstractMesh<2,2> > p_mesh2;
+            boost::shared_ptr<AbstractMesh<2, 2> > p_mesh2;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);

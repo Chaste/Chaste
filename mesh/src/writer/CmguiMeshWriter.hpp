@@ -512,7 +512,7 @@ static const char CmguiAdditionalFieldHeader1DQuadratic[] = " field, rectangular
  *  gfx cr win
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class CmguiMeshWriter : public AbstractTetrahedralMeshWriter<ELEMENT_DIM,SPACE_DIM>
+class CmguiMeshWriter : public AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>
 {
 protected:
 

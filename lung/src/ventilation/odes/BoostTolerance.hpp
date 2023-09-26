@@ -46,9 +46,12 @@ class Tolerance
 public:
 
     /**
+     * Note: we don't use the explict specifier for this constructor, since we 
+     * want to enable implicit type conversion.
+     * 
      * @param eps The tolerance to solve within
      */
-    explicit Tolerance(double eps)
+    Tolerance(double eps)
         : _eps(eps)
     {
     }
@@ -60,7 +63,8 @@ public:
      * @param b Second value
      * @return true if a and b are within tolerance
      */
-    bool operator()(double a, double b) {
+    bool operator()(double a, double b)
+    {
         return (fabs(b - a) <= _eps);
     }
 

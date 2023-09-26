@@ -50,7 +50,7 @@ public:
 
     void TestMonodomainStiffnessMatrixAssembler1d()
     {
-        TetrahedralMesh<1,1> mesh;
+        TetrahedralMesh<1, 1> mesh;
         double h = 0.1;
         mesh.ConstructRegularSlabMesh(h, 0.5);
 
@@ -60,7 +60,7 @@ public:
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> cell_factory;
         cell_factory.SetMesh(&mesh);
         MonodomainTissue<1> monodomain_tissue( &cell_factory );
-        MonodomainStiffnessMatrixAssembler<1,1> assembler(&mesh, &monodomain_tissue);
+        MonodomainStiffnessMatrixAssembler<1, 1> assembler(&mesh, &monodomain_tissue);
 
         assembler.SetMatrixToAssemble(mat);
         assembler.Assemble();
@@ -74,7 +74,7 @@ public:
 
         for (unsigned i = lo; i < static_cast<unsigned>(hi); ++i)
         {
-            for (unsigned j=0; j<mesh.GetNumNodes(); ++j)
+            for (unsigned j = 0; j<mesh.GetNumNodes(); ++j)
             {
                 double value = PetscMatTools::GetElement(mat,i,j);
                 if (i>0 && i<mesh.GetNumNodes()-1)

@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class BidomainNeumannSurfaceTermAssembler : public AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM,SPACE_DIM,2>
+class BidomainNeumannSurfaceTermAssembler : public AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM, SPACE_DIM, 2>
 {
 protected:
     /**
@@ -67,7 +67,7 @@ protected:
      * @return stencil vector
      */
     virtual c_vector<double, 2*ELEMENT_DIM> ComputeVectorSurfaceTerm(
-        const BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>& rSurfaceElement,
+        const BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>& rSurfaceElement,
         c_vector<double, ELEMENT_DIM>& rPhi,
         ChastePoint<SPACE_DIM>& rX);
 
@@ -78,16 +78,16 @@ public:
      * @param pMesh The mesh
      * @param pBoundaryConditions The boundary conditions container
      */
-    BidomainNeumannSurfaceTermAssembler(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                                        BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,2>* pBoundaryConditions)
-        : AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM,SPACE_DIM,2>(pMesh, pBoundaryConditions)
+    BidomainNeumannSurfaceTermAssembler(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+                                        BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 2>* pBoundaryConditions)
+        : AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM, SPACE_DIM, 2>(pMesh, pBoundaryConditions)
     {
     }
 };
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, 2*ELEMENT_DIM> BidomainNeumannSurfaceTermAssembler<ELEMENT_DIM, SPACE_DIM>::ComputeVectorSurfaceTerm(
-        const BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>& rSurfaceElement,
+        const BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>& rSurfaceElement,
         c_vector<double, ELEMENT_DIM>& rPhi,
         ChastePoint<SPACE_DIM>& rX)
 {
@@ -96,7 +96,7 @@ c_vector<double, 2*ELEMENT_DIM> BidomainNeumannSurfaceTermAssembler<ELEMENT_DIM,
     double sigma_e_times_grad_phi_e_dot_n = this->mpBoundaryConditions->GetNeumannBCValue(&rSurfaceElement, rX, 1);
 
     c_vector<double, 2*ELEMENT_DIM> ret;
-    for (unsigned i=0; i<ELEMENT_DIM; ++i)
+    for (unsigned i = 0; i<ELEMENT_DIM; ++i)
     {
         ret(2*i)   = rPhi(i)*sigma_i_times_grad_phi_i_dot_n;
         ret(2*i+1) = rPhi(i)*(sigma_i_times_grad_phi_i_dot_n + sigma_e_times_grad_phi_e_dot_n);

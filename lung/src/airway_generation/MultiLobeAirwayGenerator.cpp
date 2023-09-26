@@ -54,7 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if ((VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 
-MultiLobeAirwayGenerator::MultiLobeAirwayGenerator(TetrahedralMesh<1,3>& rAirwaysMesh, bool pointDistanceLimit) :
+MultiLobeAirwayGenerator::MultiLobeAirwayGenerator(TetrahedralMesh<1, 3>& rAirwaysMesh, bool pointDistanceLimit) :
                                                                                          mAirwaysMesh(rAirwaysMesh),
                                                                                          mNumberOfPointsPerLung(0),
                                                                                          mPointVolume(-1),
@@ -124,7 +124,7 @@ void MultiLobeAirwayGenerator::AssignGrowthApices()
         if (is_terminal == 1 && iter->GetIndex() != 0) // Airway end point
         {
             // Determine branch direction
-            Element<1,3>* p_branch = mAirwaysMesh.GetElement(*(iter->ContainingElementsBegin())); //Assume that there is only one branch attached to this node, should probably add asserts here...
+            Element<1, 3>* p_branch = mAirwaysMesh.GetElement(*(iter->ContainingElementsBegin())); //Assume that there is only one branch attached to this node, should probably add asserts here...
 
             c_vector<double, 3> direction = p_branch->GetNodeLocation(0) - p_branch->GetNodeLocation(1);
 
@@ -267,13 +267,13 @@ void MultiLobeAirwayGenerator::Generate(std::string rOutputDirectory, std::strin
     // Merge in the major airways, the mesh has to be converted to a vtk unstructured grid first
     // We use the Chaste VtkMeshWriter to write the mesh to disk then load it back in as a vtu.
     ///\todo It would be much cleaner to do this in memory - might require a major refactor of VtkMeshWriter
-    VtkMeshWriter<1,3> mesh_writer(rOutputDirectory, "major_airways", false);
+    VtkMeshWriter<1, 3> mesh_writer(rOutputDirectory, "major_airways", false);
 
     std::vector<double> order; //The Horsfield order of nodes in the tree
     std::vector<double> radii; //The radius of nodes in the tree
     std::vector<double> start_ids; //Indication of node type in the tree; imaging: 2, generated start: 1, generated: 0
 
-    for (TetrahedralMesh<1,3>::NodeIterator node_iter = mAirwaysMesh.GetNodeIteratorBegin();
+    for (TetrahedralMesh<1, 3>::NodeIterator node_iter = mAirwaysMesh.GetNodeIteratorBegin();
          node_iter != mAirwaysMesh.GetNodeIteratorEnd();
          ++node_iter)
     {
@@ -383,12 +383,12 @@ void MultiLobeAirwayGenerator::Generate(std::string rOutputDirectory, std::strin
     combined_vtu_writer->Write();
 
     // Load the vtu in to a Chaste mesh and serialize out in triangles/tetgen format
-    VtkMeshReader<1,3> combined_mesh_reader(filtered_grid);
-    TetrahedralMesh<1,3> combined_mesh;
+    VtkMeshReader<1, 3> combined_mesh_reader(filtered_grid);
+    TetrahedralMesh<1, 3> combined_mesh;
     combined_mesh.ConstructFromMeshReader(combined_mesh_reader);
 
     // Insert data attributes in the vtu file as node attributes in the mesh
-    for (TetrahedralMesh<1,3>::NodeIterator node_iter = combined_mesh.GetNodeIteratorBegin();
+    for (TetrahedralMesh<1, 3>::NodeIterator node_iter = combined_mesh.GetNodeIteratorBegin();
          node_iter != combined_mesh.GetNodeIteratorEnd();
          ++node_iter)
     {
@@ -399,10 +399,10 @@ void MultiLobeAirwayGenerator::Generate(std::string rOutputDirectory, std::strin
         node_iter->AddNodeAttribute(start_id);
     }
 
-    TrianglesMeshWriter<1,3> combined_mesh_writer(rOutputDirectory, rBaseName, false);
+    TrianglesMeshWriter<1, 3> combined_mesh_writer(rOutputDirectory, rBaseName, false);
     combined_mesh_writer.WriteFilesUsingMesh(combined_mesh);
 
-    CmguiMeshWriter<1,3> cmgui_writer(rOutputDirectory, rBaseName, false);
+    CmguiMeshWriter<1, 3> cmgui_writer(rOutputDirectory, rBaseName, false);
     cmgui_writer.WriteFilesUsingMesh(combined_mesh);
 }
 

@@ -84,7 +84,7 @@ double StreeterFibreGenerator<SPACE_DIM>::GetAveragedThicknessLocalNode(
          ++element_iterator)
     {
         // Get a pointer to the container element
-        Element<SPACE_DIM,SPACE_DIM>* p_containing_element = this->mpMesh->GetElement(*element_iterator);
+        Element<SPACE_DIM, SPACE_DIM>* p_containing_element = this->mpMesh->GetElement(*element_iterator);
 
        // Loop over the nodes of the element
        for (unsigned node_local_index=0;
@@ -113,7 +113,7 @@ double StreeterFibreGenerator<SPACE_DIM>::GetFibreMaxAngle(
 {
     unsigned lv=0, rv=0;
 
-    for (unsigned index=0; index<SPACE_DIM+1; index++)
+    for (unsigned index = 0; index<SPACE_DIM+1; index++)
     {
         switch (nodesRegionsForElement[index])
         {
@@ -146,8 +146,8 @@ double StreeterFibreGenerator<SPACE_DIM>::GetFibreMaxAngle(
 }
 
 template<unsigned SPACE_DIM>
-StreeterFibreGenerator<SPACE_DIM>::StreeterFibreGenerator(AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>& rMesh)
-    : AbstractPerElementWriter<SPACE_DIM,SPACE_DIM,SPACE_DIM*SPACE_DIM>(&rMesh),
+StreeterFibreGenerator<SPACE_DIM>::StreeterFibreGenerator(AbstractTetrahedralMesh<SPACE_DIM, SPACE_DIM>& rMesh)
+    : AbstractPerElementWriter<SPACE_DIM, SPACE_DIM, SPACE_DIM*SPACE_DIM>(&rMesh),
       mpGeometryInfo(NULL),
       mApexToBase(zero_vector<double>(SPACE_DIM)),
       mLogInfo(false)
@@ -344,7 +344,7 @@ void StreeterFibreGenerator<SPACE_DIM>::Visit(Element<SPACE_DIM, SPACE_DIM>* pEl
     double element_averaged_thickness = 0.0;
     c_vector<HeartRegionType, SPACE_DIM+1> elem_nodes_region;
 
-    for (unsigned local_node_index=0; local_node_index<SPACE_DIM+1; local_node_index++)
+    for (unsigned local_node_index = 0; local_node_index<SPACE_DIM+1; local_node_index++)
     {
         // Get node's global index
         unsigned global_node_index = pElement->GetNode(local_node_index)->GetIndex();

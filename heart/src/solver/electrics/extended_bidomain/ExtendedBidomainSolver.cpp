@@ -39,13 +39,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ExtendedBidomainAssembler.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
+void ExtendedBidomainSolver<ELEMENT_DIM, SPACE_DIM>::InitialiseForSolve(Vec initialSolution)
 {
     if (this->mpLinearSystem != NULL)
     {
         return;
     }
-    AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(initialSolution);
+    AbstractExtendedBidomainSolver<ELEMENT_DIM, SPACE_DIM>::InitialiseForSolve(initialSolution);
 
     // initialise matrix-based RHS vector and matrix, and use the linear
     // system rhs as a template
@@ -61,7 +61,7 @@ void ExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::InitialiseForSolve(Vec initi
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(
+void ExtendedBidomainSolver<ELEMENT_DIM, SPACE_DIM>::SetupLinearSystem(
         Vec currentSolution,
         bool computeMatrix)
 {
@@ -181,12 +181,12 @@ void ExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::SetupLinearSystem(
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-ExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::ExtendedBidomainSolver(
+ExtendedBidomainSolver<ELEMENT_DIM, SPACE_DIM>::ExtendedBidomainSolver(
         bool bathSimulation,
-        AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
+        AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
         ExtendedBidomainTissue<SPACE_DIM>* pTissue,
-        BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,3>* pBoundaryConditions)
-    : AbstractExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>(bathSimulation,pMesh,pTissue,pBoundaryConditions)
+        BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 3>* pBoundaryConditions)
+    : AbstractExtendedBidomainSolver<ELEMENT_DIM, SPACE_DIM>(bathSimulation,pMesh,pTissue,pBoundaryConditions)
 {
     // Tell Tissue there's no need to replicate ionic caches
     pTissue->SetCacheReplication(false);
@@ -195,20 +195,20 @@ ExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::ExtendedBidomainSolver(
     // create assembler
     if (this->mBathSimulation)
     {
-        //this->mpExtendedExtendedBidomainAssembler = new ExtendedExtendedBidomainWithBathAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpExtendedExtendedBidomainTissue,this->mDt);
+        //this->mpExtendedExtendedBidomainAssembler = new ExtendedExtendedBidomainWithBathAssembler<ELEMENT_DIM, SPACE_DIM>(this->mpMesh,this->mpExtendedExtendedBidomainTissue,this->mDt);
         EXCEPTION("Bath simulations are not yet supported for extended bidomain problems");
     }
     else
     {
-        mpExtendedBidomainAssembler = new ExtendedBidomainAssembler<ELEMENT_DIM,SPACE_DIM>(this->mpMesh,this->mpExtendedBidomainTissue);
+        mpExtendedBidomainAssembler = new ExtendedBidomainAssembler<ELEMENT_DIM, SPACE_DIM>(this->mpMesh,this->mpExtendedBidomainTissue);
     }
 
-    mpExtendedBidomainNeumannSurfaceTermAssembler = new ExtendedBidomainNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM>(pMesh,pBoundaryConditions);
+    mpExtendedBidomainNeumannSurfaceTermAssembler = new ExtendedBidomainNeumannSurfaceTermAssembler<ELEMENT_DIM, SPACE_DIM>(pMesh,pBoundaryConditions);
 
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-ExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::~ExtendedBidomainSolver()
+ExtendedBidomainSolver<ELEMENT_DIM, SPACE_DIM>::~ExtendedBidomainSolver()
 {
     delete mpExtendedBidomainAssembler;
     delete mpExtendedBidomainNeumannSurfaceTermAssembler;
@@ -221,6 +221,6 @@ ExtendedBidomainSolver<ELEMENT_DIM,SPACE_DIM>::~ExtendedBidomainSolver()
 }
 
 // Explicit instantiation
-template class ExtendedBidomainSolver<1,1>;
-template class ExtendedBidomainSolver<2,2>;
-template class ExtendedBidomainSolver<3,3>;
+template class ExtendedBidomainSolver<1, 1>;
+template class ExtendedBidomainSolver<2, 2>;
+template class ExtendedBidomainSolver<3, 3>;

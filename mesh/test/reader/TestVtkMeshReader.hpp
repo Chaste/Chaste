@@ -68,7 +68,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UblasVectorInclude.hpp"
 
 #ifdef CHASTE_VTK
-typedef VtkMeshReader<3,3> MESH_READER3;
+typedef VtkMeshReader<3, 3> MESH_READER3;
 #endif //CHASTE_VTK
 
 class TestVtkMeshReader : public CxxTest::TestSuite
@@ -90,7 +90,7 @@ public:
     /**
      * Check that input files are opened correctly and non-existent input files throw an Exception.
      */
-    void TestFilesOpen(void)
+    void TestFilesOpen()
     {
 #ifdef CHASTE_VTK
         TS_ASSERT_THROWS_NOTHING(MESH_READER3 mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu"));
@@ -104,10 +104,10 @@ public:
     /**
      * Check outputting as a in VTKUnstructuredGrid format.
      */
-    void TestOutputVtkUnstructuredGrid(void)
+    void TestOutputVtkUnstructuredGrid()
     {
 #ifdef CHASTE_VTK
-        VtkMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu");
+        VtkMeshReader<3, 3> mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu");
 
         vtkUnstructuredGrid* vtk_unstructed_grid = mesh_reader.OutputMeshAsVtkUnstructuredGrid();
 
@@ -124,10 +124,10 @@ public:
      * for a given input file is the correct length and that if the input file
      * is corrupted (missing nodes) then an exception is thrown.
      */
-    void TestGetNextNode(void)
+    void TestGetNextNode()
     {
 #ifdef CHASTE_VTK
-        VtkMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu");
+        VtkMeshReader<3, 3> mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu");
 
         TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 12u);
 
@@ -154,10 +154,10 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestGetNextElementData(void)
+    void TestGetNextElementData()
     {
 #ifdef CHASTE_VTK
-        VtkMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu");
+        VtkMeshReader<3, 3> mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu");
 
         // Coverage of GetOrderOfBoundaryElements()
         TS_ASSERT_EQUALS(mesh_reader.GetOrderOfBoundaryElements(), 1u);
@@ -192,7 +192,7 @@ public:
                                "Trying to read data for an element that doesn't exist" );
 
         // Test on a .vtu file where the elements are triangles, rather than tetrahedra
-        VtkMeshReader<3,3> invalid_mesh_reader("mesh/test/data/sids.vtu");
+        VtkMeshReader<3, 3> invalid_mesh_reader("mesh/test/data/sids.vtu");
         TS_ASSERT_EQUALS(invalid_mesh_reader.GetNumElements(), 736U);
         TS_ASSERT_EQUALS(invalid_mesh_reader.GetNumElementAttributes(), 0u);
 
@@ -205,10 +205,10 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestGetNextFaceData(void)
+    void TestGetNextFaceData()
     {
 #ifdef CHASTE_VTK
-        VtkMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu");
+        VtkMeshReader<3, 3> mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu");
 
         TS_ASSERT_EQUALS(mesh_reader.GetNumFaces(), 20u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumEdges(), 20u);
@@ -248,10 +248,10 @@ public:
     void TestConstructFromVtkUnstructuredGridObject()
     {
 #ifdef CHASTE_VTK
-        VtkMeshReader<3,3> mesh_reader_1("mesh/test/data/cube_2mm_12_elements.vtu");
+        VtkMeshReader<3, 3> mesh_reader_1("mesh/test/data/cube_2mm_12_elements.vtu");
         vtkUnstructuredGrid* vtk_unstructed_grid = mesh_reader_1.OutputMeshAsVtkUnstructuredGrid();
 
-        VtkMeshReader<3,3> mesh_reader(vtk_unstructed_grid);
+        VtkMeshReader<3, 3> mesh_reader(vtk_unstructed_grid);
 
         TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 12u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 12u);
@@ -275,7 +275,7 @@ public:
     void TestGenericReader()
     {
 #ifdef CHASTE_VTK
-        std::shared_ptr<AbstractMeshReader<3,3> > p_mesh_reader = GenericMeshReader<3,3>("mesh/test/data/cube_2mm_12_elements.vtu");
+        std::shared_ptr<AbstractMeshReader<3, 3> > p_mesh_reader = GenericMeshReader<3, 3>("mesh/test/data/cube_2mm_12_elements.vtu");
 
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumNodes(), 12u);
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumElements(), 12u);
@@ -292,7 +292,7 @@ public:
         TS_ASSERT_DELTA(next_node[2], 0.0, 1e-6);
 
         // Exception coverage
-        TS_ASSERT_THROWS_THIS((GenericMeshReader<3,3>("mesh/test/data/cube_2mm_12_elements.vtu", 2, 2)),
+        TS_ASSERT_THROWS_THIS((GenericMeshReader<3, 3>("mesh/test/data/cube_2mm_12_elements.vtu", 2, 2)),
                               "Quadratic meshes are only supported in Triangles format.");
 #else
         std::cout << "This test was not run, as VTK is not enabled." << std::endl;
@@ -303,12 +303,12 @@ public:
     /**
      * Check that we can build a TetrahedralMesh using the mesh reader.
      */
-    void TestBuildTetrahedralMeshFromMeshReader(void)
+    void TestBuildTetrahedralMeshFromMeshReader()
     {
 #ifdef CHASTE_VTK
-        VtkMeshReader<3,3> mesh_reader("mesh/test/data/heart_decimation.vtu");
+        VtkMeshReader<3, 3> mesh_reader("mesh/test/data/heart_decimation.vtu");
 
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Check we have the right number of nodes & elements
@@ -326,7 +326,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetNode(8)->GetPoint()[2], 0.7250, 1e-4);
 
         // Check first element has the right nodes
-        TetrahedralMesh<3,3>::ElementIterator it = mesh.GetElementIteratorBegin();
+        TetrahedralMesh<3, 3>::ElementIterator it = mesh.GetElementIteratorBegin();
         TS_ASSERT_EQUALS((it)->GetNodeGlobalIndex(0), 47u);
         TS_ASSERT_EQUALS((it)->GetNodeGlobalIndex(1), 31u);
         TS_ASSERT_EQUALS((it)->GetNodeGlobalIndex(2), 131u);
@@ -354,7 +354,7 @@ public:
         for (unsigned i = 0; i < 610; i+=60)
         {
 
-            for (unsigned j=0; j<3; ++j)
+            for (unsigned j = 0; j<3; ++j)
             {
                 TS_ASSERT_DELTA(centroid[i][j], mesh.GetElement(i)->CalculateCentroid()[j], 1e-4);
             }
@@ -376,7 +376,7 @@ public:
         mesh_reader.GetPointData("Location", location);
         for (unsigned i = 0; i < 173; i+=17)
         {
-            for (unsigned j=0; j<3; ++j)
+            for (unsigned j = 0; j<3; ++j)
             {
                 TS_ASSERT_DELTA(location[i][j], mesh.GetNode(i)->rGetLocation()[j], 1e-4);
             }
@@ -398,12 +398,12 @@ public:
     /**
      * Check that we can build a DistributedTetrahedralMesh using the VTK mesh reader.
      */
-    void TestBuildDistributedTetrahedralMeshFromVtkMeshReader(void)
+    void TestBuildDistributedTetrahedralMeshFromVtkMeshReader()
     {
  #ifdef CHASTE_VTK
-        VtkMeshReader<3,3> mesh_reader("mesh/test/data/heart_decimation.vtu");
+        VtkMeshReader<3, 3> mesh_reader("mesh/test/data/heart_decimation.vtu");
 
-        DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        DistributedTetrahedralMesh<3, 3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Check we have the right number of nodes & elements
@@ -437,7 +437,7 @@ public:
         }
 
         // Check first element has the right nodes
-        DistributedTetrahedralMesh<3,3>::ElementIterator it = mesh.GetElementIteratorBegin();
+        DistributedTetrahedralMesh<3, 3>::ElementIterator it = mesh.GetElementIteratorBegin();
         if (mesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(47))
         {
             //Owner of node 47 has to own (or part own) element 0
@@ -461,14 +461,14 @@ public:
     /**
      * Check that we can build a MixedDimensionMesh using the VTK mesh reader.
      */
-    void TestBuild2DFromVtkMeshReader(void)
+    void TestBuild2DFromVtkMeshReader()
     {
 #ifdef CHASTE_VTK
-    VtkMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_200_elements.vtu");
+    VtkMeshReader<2, 2> mesh_reader("mesh/test/data/2D_0_to_1mm_200_elements.vtu");
 
     TS_ASSERT_EQUALS(mesh_reader.GetNumFaces(), 40u);
 
-    TetrahedralMesh<2,2> mesh;
+    TetrahedralMesh<2, 2> mesh;
     mesh.ConstructFromMeshReader(mesh_reader);
 
     TS_ASSERT_EQUALS(mesh.GetNumNodes(), 121u);
@@ -489,14 +489,14 @@ public:
     /**
      * Check that we can build a 2D MixedDimensionMesh using the VTK mesh reader.
      */
-    void TestBuildMixedMesh2DFromVtkMeshReader(void)
+    void TestBuildMixedMesh2DFromVtkMeshReader()
     {
 #ifdef CHASTE_VTK
-        VtkMeshReader<2,2> mesh_reader("mesh/test/data/mixed_dimension_meshes/mixed_mesh_2d.vtu");
+        VtkMeshReader<2, 2> mesh_reader("mesh/test/data/mixed_dimension_meshes/mixed_mesh_2d.vtu");
         TS_ASSERT_EQUALS(mesh_reader.GetNumCableElements(), 10u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumCableElementAttributes(), 1u);
 
-        MixedDimensionMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        MixedDimensionMesh<2, 2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Check we have the right number of nodes & elements
@@ -506,7 +506,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumCableElements(), 10u);
 
         // Cover exception - note that ConstructFromMeshReader has reset the reader
-        for (unsigned i=0; i<10; ++i)
+        for (unsigned i = 0; i<10; ++i)
         {
             ElementData element_data = mesh_reader.GetNextCableElementData();
             TS_ASSERT_EQUALS(element_data.AttributeValue, i + 1.5);
@@ -521,15 +521,15 @@ public:
     /**
      * Check that we can build a 3D MixedDimensionMesh using the VTK mesh reader.
      */
-    void TestBuildMixedMeshTetrahedralMeshFromVtkMeshReader(void)
+    void TestBuildMixedMeshTetrahedralMeshFromVtkMeshReader()
     {
 #ifdef CHASTE_VTK
-        VtkMeshReader<3,3> mesh_reader("mesh/test/data/mixed_dimension_meshes/mixed_mesh_3d.vtu");
+        VtkMeshReader<3, 3> mesh_reader("mesh/test/data/mixed_dimension_meshes/mixed_mesh_3d.vtu");
         TS_ASSERT_EQUALS(mesh_reader.GetNumFaces(), 616u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumCableElements(), 5u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumCableElementAttributes(), 1u);
 
-        MixedDimensionMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        MixedDimensionMesh<3, 3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Check we have the right number of nodes and elements
@@ -538,7 +538,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 616u);
         TS_ASSERT_EQUALS(mesh.GetNumCableElements(), 5u);
 
-        for (MixedDimensionMesh<3,3>::CableElementIterator iter = mesh.GetCableElementIteratorBegin();
+        for (MixedDimensionMesh<3, 3>::CableElementIterator iter = mesh.GetCableElementIteratorBegin();
              iter != mesh.GetCableElementIteratorEnd();
              ++iter)
         {
@@ -553,16 +553,16 @@ public:
     /**
      * Check that we can build a 2D in 3D mesh using the VTK mesh reader.
      */
-    void TestLoadingSurfaceMeshFromVtkMeshReader(void)
+    void TestLoadingSurfaceMeshFromVtkMeshReader()
     {
 #ifdef CHASTE_VTK
-        VtkMeshReader<2,3> mesh_reader("mesh/test/data/cylinder.vtu");
+        VtkMeshReader<2, 3> mesh_reader("mesh/test/data/cylinder.vtu");
         TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 1632u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumFaces(), 32u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumCableElements(), 0u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumCableElementAttributes(), 0u);
 
-        TetrahedralMesh<2,3> mesh;
+        TetrahedralMesh<2, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Check we have the right number of nodes & elements
@@ -580,17 +580,17 @@ public:
     /**
      * Check that we can build a 1D in 3D Mesh using the VTK mesh reader.
      */
-    void TestLoading1Din3DMeshFromVtkMeshReader(void)
+    void TestLoading1Din3DMeshFromVtkMeshReader()
     {
 #ifdef CHASTE_VTK
-        VtkMeshReader<1,3> mesh_reader("mesh/test/data/branched_1d_in_3d_mesh.vtu");
+        VtkMeshReader<1, 3> mesh_reader("mesh/test/data/branched_1d_in_3d_mesh.vtu");
         TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 30u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 31u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumEdges(), 3u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumCableElements(), 0u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumCableElementAttributes(), 0u);
 
-        TetrahedralMesh<1,3> mesh;
+        TetrahedralMesh<1, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Check we have the right number of nodes & elements

@@ -60,10 +60,10 @@ public:
     {
         // Set up a cell population
         HoneycombMeshGenerator mesh_generator(7, 5, 0, 2.0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = mesh_generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = mesh_generator.GetMesh();
         std::vector<unsigned> location_indices = mesh_generator.GetCellLocationIndices();
 
-        CellsGenerator<FixedG1GenerationalCellCycleModel,2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;
         cells_generator.GenerateGivenLocationIndices(cells, location_indices);
 
@@ -150,7 +150,7 @@ public:
     {
         // Set up a cell population
         HoneycombMeshGenerator mesh_generator(7, 5, 0, 2.0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = mesh_generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = mesh_generator.GetMesh();
 
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;
@@ -219,7 +219,7 @@ public:
         // Set up a cell population
 
         HoneycombMeshGenerator mesh_generator(7, 5, 0, 2.0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = mesh_generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = mesh_generator.GetMesh();
 
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;
@@ -259,8 +259,8 @@ public:
 
     void TestAllCases()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_2_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_DELTA(mesh.GetAngleBetweenNodes(2,0), -0.75*M_PI, 1e-12);

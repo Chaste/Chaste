@@ -150,7 +150,7 @@ private:
      * @param archive the archive
      * @param version the current version of this class
      */
-    template <class Archive>
+    template<class Archive>
     void save(Archive& archive, const unsigned int version) const
     {
         // Despite the fact that 3 of these variables actually live in our base class,
@@ -192,7 +192,7 @@ private:
      * @param archive the archive
      * @param version the current version of this class
      */
-    template <class Archive>
+    template<class Archive>
     void load(Archive& archive, const unsigned int version)
     {
         archive& mNumberOfStateVariables;

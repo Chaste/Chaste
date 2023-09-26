@@ -129,12 +129,13 @@ public:
      *  This is the implemtation for an isotropic material law, so the stress etc is
      *  computed by calling methods returning dW/dI1, dW/dI2 etc.
      */
-    void ComputeStressAndStressDerivative(c_matrix<double,DIM,DIM>& rC,
-                                          c_matrix<double,DIM,DIM>& rInvC,
-                                          double                    pressure,
-                                          c_matrix<double,DIM,DIM>& rT,
-                                          FourthOrderTensor<DIM,DIM,DIM,DIM>&   rDTdE,
-                                          bool                      computeDTdE);
+    void ComputeStressAndStressDerivative(
+        c_matrix<double, DIM, DIM>& rC,
+        c_matrix<double, DIM, DIM>& rInvC,
+        double pressure,
+        c_matrix<double, DIM, DIM>& rT,
+        FourthOrderTensor<DIM, DIM, DIM, DIM>& rDTdE,
+        bool computeDTdE);
 
     /**
      * Destructor.

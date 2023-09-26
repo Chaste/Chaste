@@ -35,26 +35,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChasteNodesList.hpp"
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 ChasteNodesList<SPACE_DIM>::ChasteNodesList(const std::vector<Node<SPACE_DIM>*> rNodesList, bool ownNodes)
     : mListOfNodes(rNodesList),
       mOwnNodes(ownNodes)
 {
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 ChasteNodesList<SPACE_DIM>::~ChasteNodesList()
 {
     if (mOwnNodes)
     {
-        for (unsigned i=0; i<mListOfNodes.size(); ++i)
+        for (unsigned i = 0; i<mListOfNodes.size(); ++i)
         {
             delete mListOfNodes[i];
         }
     }
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 bool ChasteNodesList<SPACE_DIM>::DoesContain(const ChastePoint<SPACE_DIM>& rPointToCheck) const
 {
     bool returned_value = false;
@@ -70,13 +70,13 @@ bool ChasteNodesList<SPACE_DIM>::DoesContain(const ChastePoint<SPACE_DIM>& rPoin
     return returned_value;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 const std::vector< Node<SPACE_DIM>*>& ChasteNodesList<SPACE_DIM>::rGetNodesList() const
 {
     return mListOfNodes;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 unsigned ChasteNodesList<SPACE_DIM>::GetSize() const
 {
     return mListOfNodes.size();

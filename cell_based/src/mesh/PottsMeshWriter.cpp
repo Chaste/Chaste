@@ -43,7 +43,7 @@ template<unsigned SPACE_DIM>
 struct MeshPottsWriterIterators
 {
     /** Iterator over nodes */
-    typename AbstractMesh<SPACE_DIM,SPACE_DIM>::NodeIterator* pNodeIter;
+    typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator* pNodeIter;
     /** Iterator over Potts elements */
     typename PottsMesh<SPACE_DIM>::PottsElementIterator* pElemIter;
 };
@@ -102,7 +102,7 @@ std::vector<double> PottsMeshWriter<SPACE_DIM>::GetNextNode()
     }
     else
     {
-        return AbstractMeshWriter<SPACE_DIM,SPACE_DIM>::GetNextNode();
+        return AbstractMeshWriter<SPACE_DIM, SPACE_DIM>::GetNextNode();
     }
 }
 
@@ -143,7 +143,7 @@ void PottsMeshWriter<SPACE_DIM>::WriteFilesUsingMesh(PottsMesh<SPACE_DIM>& rMesh
     this->mNumNodes = mpMesh->GetNumNodes();
     this->mNumElements = mpMesh->GetNumElements();
 
-    typedef typename AbstractMesh<SPACE_DIM,SPACE_DIM>::NodeIterator NodeIterType;
+    typedef typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator NodeIterType;
     mpIters->pNodeIter = new NodeIterType(mpMesh->GetNodeIteratorBegin());
 
     typedef typename PottsMesh<SPACE_DIM>::PottsElementIterator ElemIterType;

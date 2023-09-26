@@ -61,11 +61,11 @@ double ALPHA = 0.2;
 
 // Body force (when active tension is constant and fibres in X-direction)
 // corresponding to the deformation x = X+0.5*alpha*X^2, y=Y/(1+alpha*X), with p=2c
-c_vector<double,2> MyBodyForce(c_vector<double,2>& rX, double t)
+c_vector<double, 2> MyBodyForce(c_vector<double, 2>& rX, double t)
 {
     assert(rX(0)>=0 && rX(0)<=1 && rX(1)>=0 && rX(1)<=1);
 
-    c_vector<double,2> body_force;
+    c_vector<double, 2> body_force;
 
     double lam = 1+ALPHA*rX(0);
     double mu = rX(1)*ALPHA/(lam*lam);
@@ -80,9 +80,9 @@ c_vector<double,2> MyBodyForce(c_vector<double,2>& rX, double t)
 
 // Surface traction (when active tension is constant and fibres in X-direction)
 // on three sides of a cube, corresponding to x = X+0.5*alpha*X^2, y=Y/(1+alpha*X), with p=2c
-c_vector<double,2> MyTraction(c_vector<double,2>& location, double t)
+c_vector<double, 2> MyTraction(c_vector<double, 2>& location, double t)
 {
-    c_vector<double,2> traction = zero_vector<double>(2);
+    c_vector<double, 2> traction = zero_vector<double>(2);
 
     double lam = 1+ALPHA*location(0);
     double mu = location(1)*ALPHA/(lam*lam);
@@ -140,7 +140,7 @@ public:
         HeartConfig::Instance()->SetSimulationDuration(1.0);
 
 
-        TetrahedralMesh<2,2> electrics_mesh;
+        TetrahedralMesh<2, 2> electrics_mesh;
         electrics_mesh.ConstructRegularSlabMesh(0.02, 1.0, 1.0);
 
         QuadraticMesh<2> mechanics_mesh;
@@ -151,8 +151,8 @@ public:
         std::vector<unsigned> fixed_nodes
             = NonlinearElasticityTools<2>::GetNodesByComponentValue(mechanics_mesh,0,0);
 
-        std::vector<BoundaryElement<1,2>*> boundary_elems;
-        for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
+        std::vector<BoundaryElement<1, 2>*> boundary_elems;
+        for (TetrahedralMesh<2, 2>::BoundaryElementIterator iter
               = mechanics_mesh.GetBoundaryElementIteratorBegin();
             iter != mechanics_mesh.GetBoundaryElementIteratorEnd();
             ++iter)
@@ -160,7 +160,7 @@ public:
             // get all boundary elems except those on X=0
             if (fabs((*iter)->CalculateCentroid()[0])>1e-6)
             {
-                BoundaryElement<1,2>* p_element = *iter;
+                BoundaryElement<1, 2>* p_element = *iter;
                 boundary_elems.push_back(p_element);
             }
         }
@@ -175,7 +175,7 @@ public:
         problem_defn.SetMechanicsSolveTimestep(1.0);
 
 
-        CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
+        CardiacElectroMechanicsProblem<2, 1> problem(INCOMPRESSIBLE,
                                                     MONODOMAIN,
                                                     &electrics_mesh,
                                                     &mechanics_mesh,
@@ -192,8 +192,8 @@ public:
         // to something other than 1.0. Difficult to do at the moment
         //
         //////////////////////////////////////////////////////////////////
-        ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2>* p_solver
-            = dynamic_cast<ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2>*>(problem.mpCardiacMechSolver);
+        ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>, 2>* p_solver
+            = dynamic_cast<ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>, 2>*>(problem.mpCardiacMechSolver);
 
         for (auto iter = p_solver->rGetQuadPointToDataAtQuadPointMap().begin();
              iter != p_solver->rGetQuadPointToDataAtQuadPointMap().end();
@@ -211,9 +211,9 @@ public:
         /////////////////////////////////////////////////////////////////
         problem.Solve();
 
-        std::vector<c_vector<double,2> >& r_solution = problem.rGetDeformedPosition();
+        std::vector<c_vector<double, 2> >& r_solution = problem.rGetDeformedPosition();
 
-        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); ++i)
+        for (unsigned i = 0; i<mechanics_mesh.GetNumNodes(); ++i)
         {
             double X = mechanics_mesh.GetNode(i)->rGetLocation()[0];
             double Y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
@@ -226,7 +226,7 @@ public:
         }
 
         std::vector<double>& r_pressures = p_solver->rGetPressures();
-        for (unsigned i=0; i<r_pressures.size(); ++i)
+        for (unsigned i = 0; i<r_pressures.size(); ++i)
         {
             TS_ASSERT_DELTA( r_pressures[i]/(2*MATERIAL_PARAM), 1.0, 5e-3);
         }

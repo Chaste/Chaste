@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractNonlinearEllipticPde.hpp"
 
-template <int SPACE_DIM>
+template<int SPACE_DIM>
 class NonlinearEquation4Pde : public AbstractNonlinearEllipticPde<SPACE_DIM>
 {
 public:

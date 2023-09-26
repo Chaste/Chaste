@@ -40,7 +40,7 @@ S1S2Stimulus::S1S2Stimulus(double magnitude, double stimulusDuration, double s1D
     : MultiStimulus()
 {
     mNumS2FrequencyValues = s2Periods.size();
-    for (unsigned i=0; i<mNumS2FrequencyValues; ++i)
+    for (unsigned i = 0; i<mNumS2FrequencyValues; ++i)
     {
         boost::shared_ptr<MultiStimulus> p_experiment_stimulus(new MultiStimulus());
 

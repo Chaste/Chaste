@@ -117,7 +117,7 @@ public:
         {
             // Coverage of the Visit() method when called on a MeshBasedCellPopulation
             HoneycombMeshGenerator tet_generator(5, 5, 0);
-            boost::shared_ptr<MutableMesh<2,2> > p_tet_mesh = tet_generator.GetMesh();
+            boost::shared_ptr<MutableMesh<2, 2> > p_tet_mesh = tet_generator.GetMesh();
             std::vector<CellPtr> mesh_based_cells;
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> mesh_based_cells_generator;
             mesh_based_cells_generator.GenerateBasic(mesh_based_cells, p_tet_mesh->GetNumNodes());
@@ -240,7 +240,7 @@ public:
         {
             // Coverage of the Visit() method when called on a MeshBasedCellPopulation
             HoneycombMeshGenerator tet_generator(5, 5, 0);
-            boost::shared_ptr<MutableMesh<2,2> > p_tet_mesh = tet_generator.GetMesh();
+            boost::shared_ptr<MutableMesh<2, 2> > p_tet_mesh = tet_generator.GetMesh();
             std::vector<CellPtr> mesh_based_cells;
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> mesh_based_cells_generator;
             mesh_based_cells_generator.GenerateBasic(mesh_based_cells, p_tet_mesh->GetNumNodes());

@@ -82,10 +82,10 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2, 2> >(generator.GetMesh());
 
         // Convert this to a PeriodicNodesOnlyMesh
-        c_vector<double,2> periodic_width = zero_vector<double>(2);
+        c_vector<double, 2> periodic_width = zero_vector<double>(2);
         periodic_width[0] = 4.0;
         periodic_width[1] = 4.0;
         PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width);
@@ -147,7 +147,7 @@ public:
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         // Convert this to a PeriodicNodesOnlyMesh
-        c_vector<double,2> periodic_width = zero_vector<double>(2);
+        c_vector<double, 2> periodic_width = zero_vector<double>(2);
         periodic_width[0] = 4.0;
         PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width);
         TS_ASSERT_THROWS_THIS(p_mesh->ConstructNodesWithoutMesh(nodes, 1.5),
@@ -170,7 +170,7 @@ public:
         delete p_mesh;
 
 
-        for (unsigned i=0; i<nodes.size(); ++i)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -182,10 +182,10 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 5);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2, 2> >(generator.GetMesh());
 
         // Convert this to a PeriodicNodesOnlyMesh
-        c_vector<double,2> periodic_width = zero_vector<double>(2);
+        c_vector<double, 2> periodic_width = zero_vector<double>(2);
         periodic_width[0] = 4.0;
         periodic_width[1] = 4.0;
         PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width);
@@ -219,7 +219,7 @@ public:
         TS_ASSERT_DELTA(vector[1], -0.5*sqrt(3.0), 1e-4);
 
         // Test a periodic calculation in Y
-        c_vector<double,2> node1_location = p_mesh->GetNode(1)->rGetLocation();
+        c_vector<double, 2> node1_location = p_mesh->GetNode(1)->rGetLocation();
         vector = p_mesh->GetVectorFromAtoB(node12_location, node1_location);
 
         TS_ASSERT_DELTA(vector[0], 0.5, 1e-4);
@@ -241,11 +241,11 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2, 2> >(generator.GetMesh());
 
 
         // Convert this to a PeriodicNodesOnlyMesh
-        c_vector<double,2> periodic_width = zero_vector<double>(2);
+        c_vector<double, 2> periodic_width = zero_vector<double>(2);
         periodic_width[0] = 4.0;
         periodic_width[1] = 4.0;
         PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width);
@@ -288,11 +288,11 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2, 2> >(generator.GetMesh());
 
 
         // Convert this to a PeriodicNodesOnlyMesh
-        c_vector<double,2> periodic_width = zero_vector<double>(2);
+        c_vector<double, 2> periodic_width = zero_vector<double>(2);
         periodic_width[0] = 4.0;
         periodic_width[1] = 4.0;
         PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width);
@@ -348,11 +348,11 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2, 2> >(generator.GetMesh());
 
 
         // Convert this to a PeriodicdNodesOnlyMesh
-        c_vector<double,2> periodic_width = zero_vector<double>(2);
+        c_vector<double, 2> periodic_width = zero_vector<double>(2);
         periodic_width[0] = 4.0;
         periodic_width[1] = 4.0;
         PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width);
@@ -403,7 +403,7 @@ public:
         nodes.push_back(new Node<2>(4, false, 2.5, 1.0));
 
         // Convert this to a PeriodicdNodesOnlyMesh
-        c_vector<double,2> periodic_width = zero_vector<double>(2);
+        c_vector<double, 2> periodic_width = zero_vector<double>(2);
         periodic_width[0] = 3.0;
         PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width);
         p_mesh->ConstructNodesWithoutMesh(nodes, cut_off);
@@ -430,7 +430,7 @@ public:
         TS_ASSERT_EQUALS(p_box_collection->CalculateContainingBox(p_mesh->GetNode(4)), 5u);
 
 
-        for (unsigned i=0; i<nodes.size(); ++i)
+        for (unsigned i = 0; i<nodes.size(); ++i)
         {
             delete nodes[i];
         }
@@ -447,7 +447,7 @@ public:
             nodes.push_back(new Node<2>(1, true, 0.0, 1.6));
             nodes.push_back(new Node<2>(2, true, 0.0, 2.5));
 
-            c_vector<double,2> periodic_width = zero_vector<double>(2);
+            c_vector<double, 2> periodic_width = zero_vector<double>(2);
             periodic_width[1] = 3.0;
             PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width);
             p_mesh->ConstructNodesWithoutMesh(nodes, 1.0);
@@ -516,17 +516,17 @@ public:
 
         // Create generating mesh
         HoneycombMeshGenerator generator(4, 4);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2,2> >(generator.GetMesh());
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = boost::static_pointer_cast<TetrahedralMesh<2, 2> >(generator.GetMesh());
 
 
         // Convert this to a PeriodicNodesOnlyMesh
-        c_vector<double,2> periodic_width = zero_vector<double>(2);
+        c_vector<double, 2> periodic_width = zero_vector<double>(2);
         periodic_width[0] = 4.0;
         periodic_width[1] = 6.0;
         PeriodicNodesOnlyMesh<2>* p_mesh = new PeriodicNodesOnlyMesh<2>(periodic_width);
         p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 1.0);
 
-        AbstractMesh<2,2>* const p_saved_mesh = p_mesh;
+        AbstractMesh<2, 2>* const p_saved_mesh = p_mesh;
 
         /*
          * You need the const above to stop a BOOST_STATIC_ASSERTION failure.
@@ -551,7 +551,7 @@ public:
 
         {
             // De-serialize and compare
-            AbstractMesh<2,2>* p_loaded_mesh;
+            AbstractMesh<2, 2>* p_loaded_mesh;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -574,7 +574,7 @@ public:
             TS_ASSERT_EQUALS(p_static_cast_saved_mesh->GetNumNodes(), p_static_cast_loaded_mesh->GetNumNodes());
             TS_ASSERT_EQUALS(p_static_cast_saved_mesh->GetNumNodes(), 16u);
 
-            for (unsigned i=0; i<p_static_cast_saved_mesh->GetNumNodes(); ++i)
+            for (unsigned i = 0; i<p_static_cast_saved_mesh->GetNumNodes(); ++i)
             {
                 Node<2>* p_node = p_static_cast_saved_mesh->GetNode(i);
                 Node<2>* p_node2 = p_static_cast_loaded_mesh->GetNode(i);
@@ -584,7 +584,7 @@ public:
 
                 TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), p_node2->IsBoundaryNode());
 
-                for (unsigned j=0; j<2; j++)                
+                for (unsigned j = 0; j<2; j++)                
                 {
                     TS_ASSERT_DELTA(p_node->rGetLocation()[j], p_node2->rGetLocation()[j], 1e-4);
                 }

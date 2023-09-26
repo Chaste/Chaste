@@ -52,7 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 template<unsigned ELEM_DIM,unsigned SPACE_DIM>
 class MonodomainCorrectionTermAssembler
-    : public AbstractCorrectionTermAssembler<ELEM_DIM,SPACE_DIM,1>
+    : public AbstractCorrectionTermAssembler<ELEM_DIM, SPACE_DIM, 1>
 {
 protected:
     /**
@@ -71,9 +71,9 @@ protected:
                 c_vector<double, ELEM_DIM+1> &rPhi,
                 c_matrix<double, SPACE_DIM, ELEM_DIM+1> &rGradPhi /* not used */,
                 ChastePoint<SPACE_DIM> &rX /* not used */,
-                c_vector<double,1> &rU,
+                c_vector<double, 1> &rU,
                 c_matrix<double, 1, SPACE_DIM> &rGradU /* not used */,
-                Element<ELEM_DIM,SPACE_DIM>* pElement);
+                Element<ELEM_DIM, SPACE_DIM>* pElement);
 public:
 
     /**
@@ -82,8 +82,8 @@ public:
      * @param pMesh  pointer to the mesh
      * @param pTissue  pointer to the cardiac tissue
      */
-    MonodomainCorrectionTermAssembler(AbstractTetrahedralMesh<ELEM_DIM,SPACE_DIM>* pMesh,
-                                      MonodomainTissue<ELEM_DIM,SPACE_DIM>* pTissue);
+    MonodomainCorrectionTermAssembler(AbstractTetrahedralMesh<ELEM_DIM, SPACE_DIM>* pMesh,
+                                      MonodomainTissue<ELEM_DIM, SPACE_DIM>* pTissue);
 };
 
 #endif /*MONODOMAINCORRECTIONTERM_HPP_*/

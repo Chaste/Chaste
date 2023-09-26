@@ -124,7 +124,7 @@ void ColumnDataWriter::CheckVariableName(const std::string& rName)
 
 void ColumnDataWriter::CheckUnitsName(const std::string& rName)
 {
-    for (unsigned i=0; i<rName.length(); ++i)
+    for (unsigned i = 0; i<rName.length(); ++i)
     {
         if (!isalnum(rName[i]) && !(rName[i]=='_'))
         {
@@ -288,7 +288,7 @@ void ColumnDataWriter::EndDefineMode()
              * In this scope the method "CreateFixedDimensionFile" has not been invoked,
              * because there is no mFixedDimensionSize available.
              */
-            for (unsigned i=0; i<mVariables.size(); ++i)
+            for (unsigned i = 0; i<mVariables.size(); ++i)
             {
                 (*mpCurrentOutputFile) << mVariables[i].mVariableName << "(" << mVariables[i].mVariableUnits << ")";
                 if (i < mVariables.size()-1)

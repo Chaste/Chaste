@@ -44,11 +44,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 
 template<unsigned DIM>
-class BasicSurfaceAssembler : public AbstractFeSurfaceIntegralAssembler<DIM,DIM,1>
+class BasicSurfaceAssembler : public AbstractFeSurfaceIntegralAssembler<DIM, DIM, 1>
 {
 private:
     c_vector<double, 1*DIM> ComputeVectorSurfaceTerm(
-        const BoundaryElement<DIM-1,DIM>& rSurfaceElement,
+        const BoundaryElement<DIM-1, DIM>& rSurfaceElement,
         c_vector<double, DIM>& rPhi,
         ChastePoint<DIM>& rX)
     {
@@ -61,8 +61,8 @@ private:
     }
 
 public:
-    BasicSurfaceAssembler(AbstractTetrahedralMesh<DIM,DIM>* pMesh, BoundaryConditionsContainer<DIM,DIM,1>* pBcc)
-        : AbstractFeSurfaceIntegralAssembler<DIM,DIM,1>(pMesh,pBcc)
+    BasicSurfaceAssembler(AbstractTetrahedralMesh<DIM, DIM>* pMesh, BoundaryConditionsContainer<DIM, DIM, 1>* pBcc)
+        : AbstractFeSurfaceIntegralAssembler<DIM, DIM, 1>(pMesh,pBcc)
     {
     }
 };
@@ -73,16 +73,16 @@ public:
     // Test surface element intregral additions in 1d
     void TestSurfaceElementContributions()
     {
-        TetrahedralMesh<1,1> mesh;
+        TetrahedralMesh<1, 1> mesh;
         double h = 0.1;
         mesh.ConstructRegularSlabMesh(h, 1.0);
 
         // create a BCC. We just want to tell the assembler that there is a Neumann
         // bc at each end node, doesn't matter what the bc is as the concrete class
         // doesn't use it
-        BoundaryConditionsContainer<1,1,1> bcc;
+        BoundaryConditionsContainer<1, 1, 1> bcc;
         ConstBoundaryCondition<1>* p_boundary_condition = new ConstBoundaryCondition<1>(1.0);
-        TetrahedralMesh<1,1>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
+        TetrahedralMesh<1, 1>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
         bcc.AddNeumannBoundaryCondition(*iter, p_boundary_condition);
         iter++;
         bcc.AddNeumannBoundaryCondition(*iter, p_boundary_condition);
@@ -118,13 +118,13 @@ public:
     void TestSurfaceElementContributions2d()
     {
         // two element mesh
-        TetrahedralMesh<2,2> mesh;
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructRegularSlabMesh(1.0, 1.0, 1.0);
 
         // create a BCC with ONE neumann bc
-        BoundaryConditionsContainer<2,2,1> bcc;
+        BoundaryConditionsContainer<2, 2, 1> bcc;
         ConstBoundaryCondition<2>* p_boundary_condition = new ConstBoundaryCondition<2>(1.0);
-        TetrahedralMesh<2,2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
+        TetrahedralMesh<2, 2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
         bcc.AddNeumannBoundaryCondition(*iter, p_boundary_condition);
 
         //// The following shows the nodes 2 and 3 make up the boundary element

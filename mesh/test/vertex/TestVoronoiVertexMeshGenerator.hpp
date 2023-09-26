@@ -55,8 +55,8 @@ public:
 
         // Generate a mesh that is 20 cells wide, 12 high, with 4 Lloyd's relaxation steps and target average element area 1.23
         VoronoiVertexMeshGenerator generator(20, 12, 4, 1.23);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh_a = generator.GetMesh();
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh_b = generator.GetMeshAfterReMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh_a = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh_b = generator.GetMeshAfterReMesh();
 
         // Check basic mesh properties are correct
         TS_ASSERT_EQUALS(p_mesh_a->GetNumNodes(), 550u);
@@ -84,7 +84,7 @@ public:
 
         // Generate a mesh that is 3 cells wide, 2 high, with 3 Lloyd's relaxation steps and target average element area 100.0
         VoronoiVertexMeshGenerator generator(3, 2, 3, 100.0);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Check basic mesh properties are correct
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 23u);

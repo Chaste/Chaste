@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 
 template<unsigned DIM>
-class BasicCableAssembler : public AbstractFeCableIntegralAssembler<DIM,DIM,1,true,true,NORMAL>
+class BasicCableAssembler : public AbstractFeCableIntegralAssembler<DIM, DIM,1,true,true,NORMAL>
 {
 private:
     double mCoefficient;
@@ -56,9 +56,9 @@ private:
         c_vector<double, 2>& rPhi,
         c_matrix<double, DIM, 2>& rGradPhi,
         ChastePoint<DIM>& rX,
-        c_vector<double,1>& rU,
+        c_vector<double, 1>& rU,
         c_matrix<double, 1, DIM>& rGradU,
-        Element<1,DIM>* pElement)
+        Element<1, DIM>* pElement)
     {
         return -mCoefficient*rPhi;
     }
@@ -67,61 +67,61 @@ private:
         c_vector<double, 2>& rPhi,
         c_matrix<double, DIM, 2>& rGradPhi,
         ChastePoint<DIM>& rX,
-        c_vector<double,1>& rU,
+        c_vector<double, 1>& rU,
         c_matrix<double, 1, DIM>& rGradU,
-        Element<1,DIM>* pElement)
+        Element<1, DIM>* pElement)
     {
         c_matrix<double, 2, 2> mass_matrix = outer_prod(rPhi, rPhi);
         return mCoefficient*mass_matrix;
     }
 
 public:
-    BasicCableAssembler(MixedDimensionMesh<DIM,DIM>* pMesh, double coefficient)
-        : AbstractFeCableIntegralAssembler<DIM,DIM,1,true,true,NORMAL>(pMesh),
+    BasicCableAssembler(MixedDimensionMesh<DIM, DIM>* pMesh, double coefficient)
+        : AbstractFeCableIntegralAssembler<DIM, DIM,1,true,true,NORMAL>(pMesh),
           mCoefficient(coefficient)
     {
     }
 };
 
 template<unsigned DIM>
-class SimpleVectorAssembler : public AbstractFeCableIntegralAssembler<DIM,DIM,1,true,false,NORMAL>
+class SimpleVectorAssembler : public AbstractFeCableIntegralAssembler<DIM, DIM,1,true,false,NORMAL>
 {
 private:
     c_vector<double,1*2> ComputeCableVectorTerm(
         c_vector<double, 2>& rPhi,
         c_matrix<double, DIM, 2>& rGradPhi,
         ChastePoint<DIM>& rX,
-        c_vector<double,1>& rU,
+        c_vector<double, 1>& rU,
         c_matrix<double, 1, DIM>& rGradU,
-        Element<1,DIM>* pElement)
+        Element<1, DIM>* pElement)
     {
         assert(fabs(rU(0)-10.0)<1e-6); // check u has been passed through correctly as 10 - see TestExceptionsAndSetCurrentSolution() below
         return zero_vector<double>(2);
     }
 public:
-    SimpleVectorAssembler(MixedDimensionMesh<DIM,DIM>* pMesh)
-        : AbstractFeCableIntegralAssembler<DIM,DIM,1,true,false,NORMAL>(pMesh)
+    SimpleVectorAssembler(MixedDimensionMesh<DIM, DIM>* pMesh)
+        : AbstractFeCableIntegralAssembler<DIM, DIM,1,true,false,NORMAL>(pMesh)
     {
     }
 };
 
 template<unsigned DIM>
-class SimpleMatrixAssembler : public AbstractFeCableIntegralAssembler<DIM,DIM,1,false,true,NORMAL>
+class SimpleMatrixAssembler : public AbstractFeCableIntegralAssembler<DIM, DIM,1,false,true,NORMAL>
 {
 private:
     c_matrix<double,1*2,1*2> ComputeCableMatrixTerm(
         c_vector<double, 2>& rPhi,
         c_matrix<double, DIM, 2>& rGradPhi,
         ChastePoint<DIM>& rX,
-        c_vector<double,1>& rU,
+        c_vector<double, 1>& rU,
         c_matrix<double, 1, DIM>& rGradU,
-        Element<1,DIM>* pElement)
+        Element<1, DIM>* pElement)
     {
         return zero_matrix<double>(2,2);
     }
 public:
-    SimpleMatrixAssembler(MixedDimensionMesh<DIM,DIM>* pMesh)
-        : AbstractFeCableIntegralAssembler<DIM,DIM,1,false,true,NORMAL>(pMesh)
+    SimpleMatrixAssembler(MixedDimensionMesh<DIM, DIM>* pMesh)
+        : AbstractFeCableIntegralAssembler<DIM, DIM,1,false,true,NORMAL>(pMesh)
     {
     }
 };
@@ -133,8 +133,8 @@ public:
     void TestBasicCableAssemblers()
     {
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
-        TrianglesMeshReader<2,2> reader(mesh_base);
-        MixedDimensionMesh<2,2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+        TrianglesMeshReader<2, 2> reader(mesh_base);
+        MixedDimensionMesh<2, 2> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         mesh.ConstructFromMeshReader(reader);
 
         double h = 0.01; //All cable elements in the mesh are of this length
@@ -237,8 +237,8 @@ public:
     void TestExceptionsAndSetCurrentSolution()
     {
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/2D_0_to_1mm_200_elements");
-        TrianglesMeshReader<2,2> reader(mesh_base);
-        MixedDimensionMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> reader(mesh_base);
+        MixedDimensionMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(reader);
 
         SimpleMatrixAssembler<2> matrix_assembler(&mesh);

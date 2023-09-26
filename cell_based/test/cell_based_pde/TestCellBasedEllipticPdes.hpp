@@ -90,7 +90,7 @@ public:
 
         // Test ComputeLinearInUCoeffInSourceTerm() method
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_mesh = generator.GetMesh();
         TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point, NULL), 0.05, 1e-6);
         TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point, p_mesh->GetElement(0)), 0.05, 1e-6);
     }
@@ -103,7 +103,7 @@ public:
 
         {
             // Create a PDE object
-            AbstractLinearEllipticPde<2,2>* const p_pde = new UniformSourceEllipticPde<2>(0.05);
+            AbstractLinearEllipticPde<2, 2>* const p_pde = new UniformSourceEllipticPde<2>(0.05);
 
             // Create output archive and archive PDE object
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -114,7 +114,7 @@ public:
         }
 
         {
-            AbstractLinearEllipticPde<2,2>* p_pde;
+            AbstractLinearEllipticPde<2, 2>* p_pde;
 
             // Create an input archive and restore PDE object from archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -135,7 +135,7 @@ public:
     {
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
@@ -155,7 +155,7 @@ public:
 
         // Test ComputeDiffusionTerm() method
         ChastePoint<2> point;
-        c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
+        c_matrix<double,2, 2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
         for (unsigned i = 0; i < 2; ++i)
         {
             for (unsigned j = 0; j < 2; ++j)
@@ -186,7 +186,7 @@ public:
 
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
@@ -198,7 +198,7 @@ public:
 
         {
             // Create a PDE object
-            AbstractLinearEllipticPde<2,2>* const p_pde = new CellwiseSourceEllipticPde<2>(cell_population, 0.05);
+            AbstractLinearEllipticPde<2, 2>* const p_pde = new CellwiseSourceEllipticPde<2>(cell_population, 0.05);
 
             // Create output archive and archive PDE object
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -209,7 +209,7 @@ public:
         }
 
         {
-            AbstractLinearEllipticPde<2,2>* p_pde;
+            AbstractLinearEllipticPde<2, 2>* p_pde;
 
             // Create an input archive and restore PDE object from archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -233,15 +233,15 @@ public:
     {
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // For simplicity we create a very large coarse mesh, so we know that all cells are contained in one element
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
-        TetrahedralMesh<2,2> coarse_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_2_elements");
+        TetrahedralMesh<2, 2> coarse_mesh;
         coarse_mesh.ConstructFromMeshReader(mesh_reader);
         coarse_mesh.Scale(10.0, 10.0);
 
@@ -254,7 +254,7 @@ public:
 
         // Test ComputeDiffusionTerm() method
         ChastePoint<2> point;
-        c_matrix<double,2,2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
+        c_matrix<double,2, 2> diffusion_matrix = pde.ComputeDiffusionTerm(point);
         for (unsigned i = 0; i < 2; ++i)
         {
             for (unsigned j = 0; j < 2; ++j)
@@ -308,7 +308,7 @@ public:
 
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
@@ -320,7 +320,7 @@ public:
 
         {
             // Create a PDE object
-            AbstractLinearEllipticPde<2,2>* const p_pde = new AveragedSourceEllipticPde<2>(cell_population, 0.05);
+            AbstractLinearEllipticPde<2, 2>* const p_pde = new AveragedSourceEllipticPde<2>(cell_population, 0.05);
 
             // Create output archive and archive PDE object
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -331,7 +331,7 @@ public:
         }
 
         {
-            AbstractLinearEllipticPde<2,2>* p_pde;
+            AbstractLinearEllipticPde<2, 2>* p_pde;
 
             // Create an input archive and restore PDE object from archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -355,7 +355,7 @@ public:
     {
         // Create a cell population
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
         std::vector<CellPtr> cells;
@@ -370,8 +370,8 @@ public:
         TS_ASSERT(pde.mpStaticCastCellPopulation != NULL);
 
         // For simplicity we create a very large coarse mesh, so we know that all cells are contained in one element
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
-        TetrahedralMesh<2,2> coarse_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_2_elements");
+        TetrahedralMesh<2, 2> coarse_mesh;
         coarse_mesh.ConstructFromMeshReader(mesh_reader);
         coarse_mesh.Scale(10.0, 10.0);
 
@@ -406,7 +406,7 @@ public:
 
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_generating_mesh = generator.GetMesh();
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
         std::vector<CellPtr> cells;
@@ -420,7 +420,7 @@ public:
 
         {
             // Create a PDE object
-            AbstractLinearEllipticPde<2,2>* const p_pde = new VolumeDependentAveragedSourceEllipticPde<2>(cell_population, 0.05);
+            AbstractLinearEllipticPde<2, 2>* const p_pde = new VolumeDependentAveragedSourceEllipticPde<2>(cell_population, 0.05);
 
             // Create output archive and archive PDE object
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -432,7 +432,7 @@ public:
         }
 
         {
-            AbstractLinearEllipticPde<2,2>* p_pde;
+            AbstractLinearEllipticPde<2, 2>* p_pde;
 
             // Create an input archive and restore PDE object from archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);

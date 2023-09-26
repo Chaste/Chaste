@@ -66,7 +66,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * - Second cell
  * - Extracellular space.
  *
- * The three unkowns are the the intracellular potential of the two cells and the extracellular potential.
+ * The three unkowns are the intracellular potential of the two cells and the extracellular potential.
  * This class allows the user to specify the parameters specific for the these simulations and also different intracellular conductivities for the two cells.
  *
  * The solution vector used for calculations is arranged as a striped vector with this order:
@@ -82,7 +82,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
 template<unsigned DIM>
-class ExtendedBidomainProblem : public AbstractCardiacProblem<DIM,DIM, 3>
+class ExtendedBidomainProblem : public AbstractCardiacProblem<DIM, DIM, 3>
 {
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -237,7 +237,7 @@ class ExtendedBidomainProblem : public AbstractCardiacProblem<DIM,DIM, 3>
 protected:
 
     /** The cell factory creates the cells for each node */
-    AbstractCardiacCellFactory<DIM,DIM>* mpSecondCellFactory;
+    AbstractCardiacCellFactory<DIM, DIM>* mpSecondCellFactory;
 
     /** The bidomain tissue object for the extended problem*/
     ExtendedBidomainTissue<DIM>* mpExtendedBidomainTissue;
@@ -342,13 +342,13 @@ protected:
      * off the electrodes (by adding default boundary conditions to the
      * assembler)
      */
-    AbstractExtendedBidomainSolver<DIM,DIM>* mpSolver;
+    AbstractExtendedBidomainSolver<DIM, DIM>* mpSolver;
 
     /** @return a newly created bidomain PDE object */
     virtual AbstractCardiacTissue<DIM> *CreateCardiacTissue();
 
     /** @return a newly created suitable bidomain solver */
-    virtual AbstractDynamicLinearPdeSolver<DIM,DIM,3>* CreateSolver();
+    virtual AbstractDynamicLinearPdeSolver<DIM, DIM, 3>* CreateSolver();
 
 public:
     /**

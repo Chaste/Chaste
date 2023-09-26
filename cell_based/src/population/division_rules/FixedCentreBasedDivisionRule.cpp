@@ -61,12 +61,12 @@ std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > FixedCentre
 }
 
 // Explicit instantiation
-template class FixedCentreBasedDivisionRule<1,1>;
-template class FixedCentreBasedDivisionRule<1,2>;
-template class FixedCentreBasedDivisionRule<2,2>;
-template class FixedCentreBasedDivisionRule<1,3>;
-template class FixedCentreBasedDivisionRule<2,3>;
-template class FixedCentreBasedDivisionRule<3,3>;
+template class FixedCentreBasedDivisionRule<1, 1>;
+template class FixedCentreBasedDivisionRule<1, 2>;
+template class FixedCentreBasedDivisionRule<2, 2>;
+template class FixedCentreBasedDivisionRule<1, 3>;
+template class FixedCentreBasedDivisionRule<2, 3>;
+template class FixedCentreBasedDivisionRule<3, 3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

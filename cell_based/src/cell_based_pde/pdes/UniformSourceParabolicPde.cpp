@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "UniformSourceParabolicPde.hpp"
 
-template <unsigned DIM>
+template<unsigned DIM>
 UniformSourceParabolicPde<DIM>::UniformSourceParabolicPde(double sourceCoefficient)
     : mSourceCoefficient(sourceCoefficient)
 {

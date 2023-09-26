@@ -57,7 +57,7 @@ public:
      * @param pMeshReader  pointer to the reader for accessing the on-disk mesh data
      */
     static void AddInternalNodesToElements(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
-                                           AbstractMeshReader<DIM,DIM>* pMeshReader);
+                                           AbstractMeshReader<DIM, DIM>* pMeshReader);
 
     /**
      * Top level method for adding internal nodes to the mesh's boundary elements.
@@ -71,7 +71,7 @@ public:
      * @param pMeshReader  pointer to the reader for accessing the on-disk mesh data
      */
     static void AddInternalNodesToBoundaryElements(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
-                                                   AbstractMeshReader<DIM,DIM>* pMeshReader);
+                                                   AbstractMeshReader<DIM, DIM>* pMeshReader);
 
 
     /**
@@ -85,7 +85,7 @@ public:
      * @param pMeshReader  pointer to the reader for accessing the on-disk mesh data, if any; NULL otherwise
      */
     static void AddNodesToBoundaryElements(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
-                                            AbstractMeshReader<DIM,DIM>* pMeshReader);
+                                            AbstractMeshReader<DIM, DIM>* pMeshReader);
 
     /**
      * Check whether all the boundary elements in the given mesh have the expected number of nodes.
@@ -106,8 +106,8 @@ public:
      * @param internalNode  index of a node in the mesh
      */
     static void AddNodeToBoundaryElement(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
-                                         BoundaryElement<DIM-1,DIM>* pBoundaryElement,
-                                         Element<DIM,DIM>* pElement,
+                                         BoundaryElement<DIM-1, DIM>* pBoundaryElement,
+                                         Element<DIM, DIM>* pElement,
                                          unsigned internalNode);
 
     /**
@@ -119,7 +119,7 @@ public:
      * @param pNode  pointer to a node in the mesh
      */
     static void AddNodeToBoundaryElement(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
-                                         BoundaryElement<DIM-1,DIM>* pBoundaryElement,
+                                         BoundaryElement<DIM-1, DIM>* pBoundaryElement,
                                          Node<DIM>* pNode);
 
     /**
@@ -134,8 +134,8 @@ public:
      * @param nodeIndexOppositeToFace  index of a node in the mesh
      */
     static void AddExtraBoundaryNodes(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
-                                      BoundaryElement<DIM-1,DIM>* pBoundaryElement,
-                                      Element<DIM,DIM>* pElement,
+                                      BoundaryElement<DIM-1, DIM>* pBoundaryElement,
+                                      Element<DIM, DIM>* pElement,
                                       unsigned nodeIndexOppositeToFace);
 
     /**
@@ -161,7 +161,7 @@ public:
      * @param rReverse
      */
     static void HelperMethod1(unsigned boundaryElemNode0, unsigned boundaryElemNode1,
-                              Element<DIM,DIM>* pElement,
+                              Element<DIM, DIM>* pElement,
                               unsigned node0, unsigned node1, unsigned node2,
                               unsigned& rOffset,
                               bool& rReverse);
@@ -186,8 +186,8 @@ public:
      * @param reverse
      */
     static void HelperMethod2(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
-                              BoundaryElement<DIM-1,DIM>* pBoundaryElement,
-                              Element<DIM,DIM>* pElement,
+                              BoundaryElement<DIM-1, DIM>* pBoundaryElement,
+                              Element<DIM, DIM>* pElement,
                               unsigned internalNode0, unsigned internalNode1, unsigned internalNode2,
                               unsigned offset,
                               bool reverse);

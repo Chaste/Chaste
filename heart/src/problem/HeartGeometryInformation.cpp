@@ -50,7 +50,7 @@ template<unsigned SPACE_DIM>
 const double HeartGeometryInformation<SPACE_DIM>::RIGHT_SEPTUM_SIZE = 1.0/3.0;
 
 template<unsigned SPACE_DIM>
-HeartGeometryInformation<SPACE_DIM>::HeartGeometryInformation(AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>& rMesh,
+HeartGeometryInformation<SPACE_DIM>::HeartGeometryInformation(AbstractTetrahedralMesh<SPACE_DIM, SPACE_DIM>& rMesh,
                                                               const std::string& rEpiFile,
                                                               const std::string& rEndoFile,
                                                               bool indexFromZero)
@@ -69,7 +69,7 @@ HeartGeometryInformation<SPACE_DIM>::HeartGeometryInformation(AbstractTetrahedra
 }
 
 template<unsigned SPACE_DIM>
-HeartGeometryInformation<SPACE_DIM>::HeartGeometryInformation (AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>& rMesh,
+HeartGeometryInformation<SPACE_DIM>::HeartGeometryInformation (AbstractTetrahedralMesh<SPACE_DIM, SPACE_DIM>& rMesh,
                                                                const std::string& rEpiFile,
                                                                const std::string& rLVFile,
                                                                const std::string& rRVFile,
@@ -356,7 +356,7 @@ void HeartGeometryInformation<SPACE_DIM>::DetermineLayerForEachNode(double epiFr
     }
 
     mLayerForEachNode.resize(mpMesh->GetNumNodes());
-    for (unsigned i=0; i<mpMesh->GetNumNodes(); ++i)
+    for (unsigned i = 0; i<mpMesh->GetNumNodes(); ++i)
     {
         double position = CalculateRelativeWallPosition(i);
         if (position<endoFraction)
@@ -383,7 +383,7 @@ void HeartGeometryInformation<SPACE_DIM>::WriteLayerForEachNode(std::string outp
         out_stream p_file = handler.OpenOutputFile(file);
 
         assert(mLayerForEachNode.size()>0);
-        for (unsigned i=0; i<mpMesh->GetNumNodes(); ++i)
+        for (unsigned i = 0; i<mpMesh->GetNumNodes(); ++i)
         {
             if (mLayerForEachNode[i]==EPI)
             {
@@ -416,14 +416,14 @@ ChasteCuboid<SPACE_DIM> HeartGeometryInformation<SPACE_DIM>::CalculateBoundingBo
     c_vector<double, SPACE_DIM> my_maximum_point=-my_minimum_point;
 
     //Iterate through the set of points on the surface
-    for (unsigned surface_index=0; surface_index<rSurfaceNodes.size(); surface_index++)
+    for (unsigned surface_index = 0; surface_index<rSurfaceNodes.size(); surface_index++)
     {
         unsigned global_index=rSurfaceNodes[surface_index];
         if (mpMesh->GetDistributedVectorFactory()->IsGlobalIndexLocal(global_index) )
         {
             const c_vector<double, SPACE_DIM>& r_position = mpMesh->GetNode(global_index)->rGetLocation();
             //Update max/min
-            for (unsigned i=0; i<SPACE_DIM; ++i)
+            for (unsigned i = 0; i<SPACE_DIM; ++i)
             {
                 if (r_position[i] < my_minimum_point[i])
                 {

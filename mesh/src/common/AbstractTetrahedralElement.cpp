@@ -50,9 +50,9 @@ void AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::RefreshJacobian(c_matri
     {
         EXCEPTION("Attempting to Refresh a deleted element");
     }
-    for (unsigned i=0; i<SPACE_DIM; ++i)
+    for (unsigned i = 0; i<SPACE_DIM; ++i)
     {
-        for (unsigned j=0; j!=ELEMENT_DIM; ++j) // Does a j<ELEMENT_DIM without ever having to test j<0U (#186: pointless comparison of unsigned integer with zero)
+        for (unsigned j = 0; j!=ELEMENT_DIM; ++j) // Does a j<ELEMENT_DIM without ever having to test j<0U (#186: pointless comparison of unsigned integer with zero)
         {
             rJacobian(i,j) = this->GetNodeLocation(j+1,i) - this->GetNodeLocation(0,i);
         }
@@ -102,7 +102,7 @@ AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::AbstractTetrahedralElement(u
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::AbstractTetrahedralElement(unsigned index)
-    : AbstractElement<ELEMENT_DIM,SPACE_DIM>(index)
+    : AbstractElement<ELEMENT_DIM, SPACE_DIM>(index)
 {}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -127,7 +127,7 @@ void AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::CalculateJacobian(c_mat
                     c_vector<double, SPACE_DIM> location = this->GetNodeLocation(local_node_index);
                     message << "Node " << this->GetNodeGlobalIndex(local_node_index) << ":\t";
 
-                    for (unsigned i=0; i<SPACE_DIM; ++i)
+                    for (unsigned i = 0; i<SPACE_DIM; ++i)
                     {
                         message << location[i];
                         if (i==SPACE_DIM - 1u)
@@ -174,7 +174,7 @@ void AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::CalculateWeightedDirect
         case 1:
         {
             // Linear edge in a 2D plane or in 3D
-            rWeightedDirection = matrix_column<c_matrix<double,SPACE_DIM,ELEMENT_DIM> >(jacobian, 0);
+            rWeightedDirection = matrix_column<c_matrix<double, SPACE_DIM, ELEMENT_DIM> >(jacobian, 0);
             break;
         }
         case 2:
@@ -222,7 +222,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::CalculateCentroid() const
 {
     c_vector<double, SPACE_DIM> centroid = zero_vector<double>(SPACE_DIM);
-    for (unsigned i=0; i<=ELEMENT_DIM; ++i)
+    for (unsigned i = 0; i<=ELEMENT_DIM; ++i)
     {
         centroid += this->mNodes[i]->rGetLocation();
     }
@@ -271,11 +271,11 @@ double AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::GetVolume(double dete
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>::GetStiffnessMatrixGlobalIndices(unsigned problemDim, unsigned* pIndices) const
 {
-    for (unsigned local_index=0; local_index<ELEMENT_DIM+1; local_index++)
+    for (unsigned local_index = 0; local_index<ELEMENT_DIM+1; local_index++)
     {
         unsigned node = this->GetNodeGlobalIndex(local_index);
 
-        for (unsigned problem_index=0; problem_index<problemDim; problem_index++)
+        for (unsigned problem_index = 0; problem_index<problemDim; problem_index++)
         {
             //std::cout << local_index*problemDim + problem_index << std::endl;
             pIndices[local_index*problemDim + problem_index] = node*problemDim + problem_index;
@@ -369,11 +369,11 @@ c_vector<double, SPACE_DIM> AbstractTetrahedralElement<0, SPACE_DIM>::CalculateC
 template<unsigned SPACE_DIM>
 void AbstractTetrahedralElement<0, SPACE_DIM>::GetStiffnessMatrixGlobalIndices(unsigned problemDim, unsigned* pIndices) const
 {
-    for (unsigned local_index=0; local_index<1; local_index++)
+    for (unsigned local_index = 0; local_index<1; local_index++)
     {
         unsigned node = this->GetNodeGlobalIndex(local_index);
 
-        for (unsigned problem_index=0; problem_index<problemDim; problem_index++)
+        for (unsigned problem_index = 0; problem_index<problemDim; problem_index++)
         {
             //std::cout << local_index*problemDim + problem_index << std::endl;
             pIndices[local_index*problemDim + problem_index] = node*problemDim + problem_index;
@@ -382,12 +382,12 @@ void AbstractTetrahedralElement<0, SPACE_DIM>::GetStiffnessMatrixGlobalIndices(u
 }
 
 // Explicit instantiation
-template class AbstractTetrahedralElement<0,1>;
-template class AbstractTetrahedralElement<1,1>;
-template class AbstractTetrahedralElement<0,2>;
-template class AbstractTetrahedralElement<1,2>;
-template class AbstractTetrahedralElement<2,2>;
-template class AbstractTetrahedralElement<0,3>;
-template class AbstractTetrahedralElement<1,3>;
-template class AbstractTetrahedralElement<2,3>;
-template class AbstractTetrahedralElement<3,3>;
+template class AbstractTetrahedralElement<0, 1>;
+template class AbstractTetrahedralElement<1, 1>;
+template class AbstractTetrahedralElement<0, 2>;
+template class AbstractTetrahedralElement<1, 2>;
+template class AbstractTetrahedralElement<2, 2>;
+template class AbstractTetrahedralElement<0, 3>;
+template class AbstractTetrahedralElement<1, 3>;
+template class AbstractTetrahedralElement<2, 3>;
+template class AbstractTetrahedralElement<3, 3>;

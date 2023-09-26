@@ -57,8 +57,8 @@ public:
     void TestCalculatorRealistic3D()
     {
         //get the mesh, whole heart mesh
-        TrianglesMeshReader<3,3> reader("apps/texttest/weekly/Propagation3d/OxfordRabbitHeart_482um");
-        DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);  //The partition/numbering has to match that stored in the HDF5 file
+        TrianglesMeshReader<3, 3> reader("apps/texttest/weekly/Propagation3d/OxfordRabbitHeart_482um");
+        DistributedTetrahedralMesh<3, 3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);  //The partition/numbering has to match that stored in the HDF5 file
         mesh.ConstructFromMeshReader(reader);
 
         // Compute the pseudo ECG. We set an electrode at x=2.2, y=6, z=1.85.
@@ -66,7 +66,7 @@ public:
 
         // The file 3D.h5 contains the first 5 time steps of a whole heart simulations known to produce
         // a reasonably-looking ECG trace.
-        PseudoEcgCalculator<3,3,1> calculator (mesh,
+        PseudoEcgCalculator<3, 3, 1> calculator (mesh,
                                                probe_electrode,
                                                FileFinder("heart/test/data/PseudoEcg",RelativeTo::ChasteSourceRoot),
                                                "3D",
@@ -92,8 +92,8 @@ public:
     void TestCalculatorRealistic3DNotDistributed()
     {
          //get the mesh, whole heart mesh
-        TrianglesMeshReader<3,3> reader("apps/texttest/weekly/Propagation3d/OxfordRabbitHeart_482um");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> reader("apps/texttest/weekly/Propagation3d/OxfordRabbitHeart_482um");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(reader);
 
         // Compute the pseudo ECG. We set an electrode at x=2.2, y=6, z=1.85.
@@ -101,7 +101,7 @@ public:
 
         // The file 3D.h5 contains the first 5 time steps of a whole heart simulations known to produce
         // a reasonably-looking ECG trace.
-        PseudoEcgCalculator<3,3,1> calculator  (mesh,
+        PseudoEcgCalculator<3, 3, 1> calculator  (mesh,
                                                 probe_electrode,
                                                 FileFinder("heart/test/data/PseudoEcg",RelativeTo::ChasteSourceRoot),
                                                 "3D",

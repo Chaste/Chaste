@@ -58,7 +58,7 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahe
     EXCEPTION("XDMF is not supported under Windows at present.");
 #else
     assert(keepOriginalElementIndexing);
-    this->mpDistributedMesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
+    this->mpDistributedMesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* >(&rMesh);
     bool mesh_is_distributed = (this->mpDistributedMesh != nullptr) && PetscTools::IsParallel();
 
     if (PetscTools::AmMaster())
@@ -112,7 +112,7 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahe
         index++;
         (*geometry_file) << "\n\t\t";
         c_vector<double, SPACE_DIM> current_item = (iter)->rGetLocation();
-        for (unsigned j=0; j<SPACE_DIM; ++j)
+        for (unsigned j = 0; j<SPACE_DIM; ++j)
         {
             (*geometry_file) << current_item[j] << "\t";
         }
@@ -129,7 +129,7 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahe
             index++;
             (*geometry_file) << "\n\t\t";
             c_vector<double, SPACE_DIM> current_item = (*halo_iter)->rGetLocation();
-            for (unsigned j=0; j<SPACE_DIM; ++j)
+            for (unsigned j = 0; j<SPACE_DIM; ++j)
             {
                 (*geometry_file) << current_item[j] << "\t";
             }
@@ -163,7 +163,7 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahe
          ++elem_iter)
     {
         (*topology_file) << "\n\t\t";
-        for (unsigned j=0; j<ELEMENT_DIM+1; ++j)
+        for (unsigned j = 0; j<ELEMENT_DIM+1; ++j)
         {
             unsigned local_index = global_to_node_index_map[ elem_iter->GetNodeGlobalIndex(j) ];
             (*topology_file) << local_index <<"\t";
@@ -199,11 +199,11 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
         }
         (*geometry_file) << "<Geometry GeometryType=\""<< geom_type <<"\">\n";
         (*geometry_file) << "\t<DataItem Format=\"XML\" Dimensions=\""<< this->GetNumNodes() <<" "<< SPACE_DIM <<"\" DataType=\"Float\">";
-        for (unsigned item_num=0; item_num<this->GetNumNodes(); item_num++)
+        for (unsigned item_num = 0; item_num<this->GetNumNodes(); item_num++)
         {
             (*geometry_file) << "\n\t\t";
             std::vector<double> current_item = this->GetNextNode();
-            for (unsigned j=0; j<SPACE_DIM; ++j)
+            for (unsigned j = 0; j<SPACE_DIM; ++j)
             {
                 (*geometry_file) << current_item[j]<<"\t";
             }
@@ -224,11 +224,11 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
         }
         (*topology_file) << "<Topology TopologyType=\""<< top_type <<"\" NumberOfElements=\""<< this->GetNumElements() <<"\">\n";
         (*topology_file) << "\t<DataItem Format=\"XML\" Dimensions=\""<< this->GetNumElements() <<" "<< ELEMENT_DIM+1 <<"\">";
-        for (unsigned item_num=0; item_num<this->GetNumElements(); item_num++)
+        for (unsigned item_num = 0; item_num<this->GetNumElements(); item_num++)
         {
             (*topology_file) << "\n\t\t";
             std::vector<unsigned> current_item = this->GetNextElement().NodeIndices;
-            for (unsigned j=0; j<ELEMENT_DIM+1; ++j)
+            for (unsigned j = 0; j<ELEMENT_DIM+1; ++j)
             {
                 (*topology_file) << current_item[j]<<"\t";
             }
@@ -287,7 +287,7 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned number
     DOMText* p_time_text = p_DOM_document->createTextNode(X(time_stream.str()));
     p_time_dataitem_element->appendChild(p_time_text);
 
-    for (unsigned t=0; t<mNumberOfTimePoints; ++t)
+    for (unsigned t = 0; t<mNumberOfTimePoints; ++t)
     {
         DOMElement* p_grid_collection_element =  p_DOM_document->createElement(X("Grid"));
         p_grid_collection_element->setAttribute(X("CollectionType"), X("Spatial"));
@@ -297,7 +297,7 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned number
 
         if (t==0)
         {
-            for (unsigned chunk=0; chunk<numberOfChunks; chunk++)
+            for (unsigned chunk = 0; chunk<numberOfChunks; chunk++)
             {
                 std::stringstream chunk_stream;
                 chunk_stream << chunk;
@@ -327,7 +327,7 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned number
         }
         else // t>0
         {
-            for (unsigned chunk=0; chunk<numberOfChunks; chunk++)
+            for (unsigned chunk = 0; chunk<numberOfChunks; chunk++)
             {
                 std::stringstream chunk_stream;
                 chunk_stream << chunk;
@@ -383,9 +383,9 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteXdmfMasterFile(unsigned number
 }
 
 // Explicit instantiation
-template class XdmfMeshWriter<1,1>;
-template class XdmfMeshWriter<1,2>;
-template class XdmfMeshWriter<1,3>;
-template class XdmfMeshWriter<2,2>; // Actually used
-template class XdmfMeshWriter<2,3>;
-template class XdmfMeshWriter<3,3>; // Actually used
+template class XdmfMeshWriter<1, 1>;
+template class XdmfMeshWriter<1, 2>;
+template class XdmfMeshWriter<1, 3>;
+template class XdmfMeshWriter<2, 2>; // Actually used
+template class XdmfMeshWriter<2, 3>;
+template class XdmfMeshWriter<3, 3>; // Actually used

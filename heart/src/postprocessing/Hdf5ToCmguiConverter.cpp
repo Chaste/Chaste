@@ -45,8 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Version.hpp"
 #include "GenericMeshReader.hpp"
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::Write(std::string type)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void Hdf5ToCmguiConverter<ELEMENT_DIM, SPACE_DIM>::Write(std::string type)
 {
     out_stream p_file = out_stream(NULL);
 
@@ -59,7 +59,7 @@ void Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::Write(std::string type)
     Vec data_phie = factory.CreateVec();//for phi_e
     Vec data_second_cell = factory.CreateVec();//for the V of the second cell, used in extended bidomain problems.
 
-    for (unsigned time_step=0; time_step<num_timesteps; time_step++)
+    for (unsigned time_step = 0; time_step<num_timesteps; time_step++)
     {
         // Create the file for this time step
         std::stringstream time_step_string;
@@ -79,7 +79,7 @@ void Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::Write(std::string type)
 
         std::vector<ReplicatableVector*> all_data;
         unsigned num_vars = this->mpReader->GetVariableNames().size();
-        for (unsigned var=0; var<num_vars; var++)
+        for (unsigned var = 0; var<num_vars; var++)
         {
             // Read the data for this time step
             this->mpReader->GetVariableOverNodes(data, this->mpReader->GetVariableNames()[var], time_step);
@@ -96,7 +96,7 @@ void Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::Write(std::string type)
             // The header first
             *p_file << "Group name: " << this->mFileBaseName << "\n";
             *p_file << "#Fields=" << num_vars << "\n";
-            for (unsigned var=0; var<num_vars; var++)
+            for (unsigned var = 0; var<num_vars; var++)
             {
                 *p_file << " " << var+1 << ") " <<this->mpReader->GetVariableNames()[var]<< " , field, rectangular cartesian, #Components=1" << "\n" << "x.  Value index=1, #Derivatives=0, #Versions=1"<<"\n";
                 if (var != num_vars-1)
@@ -106,18 +106,18 @@ void Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::Write(std::string type)
             }
 
             // Write the data
-            for (unsigned i=0; i<num_nodes; ++i)
+            for (unsigned i = 0; i<num_nodes; ++i)
             {
                 // cmgui counts nodes from 1
                 *p_file << "Node: "<< i+1 << "\n";
-                for (unsigned var=0; var<num_vars; var++)
+                for (unsigned var = 0; var<num_vars; var++)
                 {
                     *p_file  << (*(all_data[var]))[i] << "\n";
                 }
             }
         }
 
-        for (unsigned var=0; var<num_vars; var++)
+        for (unsigned var = 0; var<num_vars; var++)
         {
            delete all_data[var];
         }
@@ -132,13 +132,13 @@ void Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::Write(std::string type)
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::Hdf5ToCmguiConverter(const FileFinder& rInputDirectory,
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+Hdf5ToCmguiConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToCmguiConverter(const FileFinder& rInputDirectory,
                                                                   const std::string& rFileBaseName,
-                                                                  AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
+                                                                  AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
                                                                   bool hasBath,
                                                                   unsigned precision)
-    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(rInputDirectory, rFileBaseName, pMesh, "cmgui_output", precision)
+    : AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>(rInputDirectory, rFileBaseName, pMesh, "cmgui_output", precision)
 {
     ///\todo #1660 at present this converter is hardcoded to work with "Data" using the below statement
     while (this->mDatasetNames[this->mOpenDatasetIndex] != "Data")
@@ -154,7 +154,7 @@ Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::Hdf5ToCmguiConverter(const FileFind
     // Write mesh in a suitable form for cmgui
     std::string output_directory =  HeartConfig::Instance()->GetOutputDirectory() + "/cmgui_output";
 
-    CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM> cmgui_mesh_writer(output_directory, HeartConfig::Instance()->GetOutputFilenamePrefix(), false);
+    CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM> cmgui_mesh_writer(output_directory, HeartConfig::Instance()->GetOutputFilenamePrefix(), false);
 
     // Used to inform the mesh of the data names
     std::vector<std::string> field_names = this->mpReader->GetVariableNames();
@@ -187,8 +187,8 @@ Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::Hdf5ToCmguiConverter(const FileFind
     PetscTools::Barrier("Hdf5ToCmguiConverter");
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::WriteCmguiScript()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void Hdf5ToCmguiConverter<ELEMENT_DIM, SPACE_DIM>::WriteCmguiScript()
 {
     unsigned num_timesteps = this->mpReader->GetUnlimitedDimensionValues().size();
     assert(this->mpReader->GetVariableNames().size() > 0); // seg fault guard
@@ -213,7 +213,7 @@ void Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::WriteCmguiScript()
                        << "gfx modify g_element "<< HeartConfig::Instance()->GetOutputFilenamePrefix()<<" lines select_on material default data "<<variable_name<<" spectrum default selected_material default_selected; \n"
                        << "gfx modify g_element "<< HeartConfig::Instance()->GetOutputFilenamePrefix()<<" node_points glyph point general size \"1*1*1\" centre 0,0,0 font default select_on material default data "<<variable_name<<" spectrum default selected_material default_selected; \n"
                        << "# Load the data \n"
-                       << "for ($i=0; $i<" << num_timesteps << "; $i++) { \n"
+                       << "for ($i = 0; $i<" << num_timesteps << "; $i++) { \n"
                        << "    gfx read node " << this->mFileBaseName << "_$i.exnode time $i\n" // ...while the data file from mFileBaseName...
                        << "}\n";
         p_script_file->close();
@@ -221,9 +221,9 @@ void Hdf5ToCmguiConverter<ELEMENT_DIM,SPACE_DIM>::WriteCmguiScript()
 }
 
 // Explicit instantiation
-template class Hdf5ToCmguiConverter<1,1>;
-template class Hdf5ToCmguiConverter<1,2>;
-template class Hdf5ToCmguiConverter<2,2>;
-template class Hdf5ToCmguiConverter<1,3>;
-template class Hdf5ToCmguiConverter<2,3>;
-template class Hdf5ToCmguiConverter<3,3>;
+template class Hdf5ToCmguiConverter<1, 1>;
+template class Hdf5ToCmguiConverter<1, 2>;
+template class Hdf5ToCmguiConverter<2, 2>;
+template class Hdf5ToCmguiConverter<1, 3>;
+template class Hdf5ToCmguiConverter<2, 3>;
+template class Hdf5ToCmguiConverter<3, 3>;

@@ -273,9 +273,9 @@ bool ObsoleteBoxCollection<DIM>::IsBoxInDomain(c_vector<unsigned, DIM> gridIndic
 }
 
 template<unsigned DIM>
-c_vector<bool,DIM> ObsoleteBoxCollection<DIM>::IsIndexPenultimate(c_vector<unsigned, DIM> gridIndices)
+c_vector<bool, DIM> ObsoleteBoxCollection<DIM>::IsIndexPenultimate(c_vector<unsigned, DIM> gridIndices)
 {
-    c_vector<bool,DIM> is_penultimate;
+    c_vector<bool, DIM> is_penultimate;
 
     for (unsigned dim = 0 ; dim < DIM ; dim++)
     {
@@ -289,14 +289,14 @@ template<unsigned DIM>
 void ObsoleteBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
 {
     // Populate a list of half the neighbours in this number of dimensions
-    std::vector<c_vector<int,DIM> > neighbours;
+    std::vector<c_vector<int, DIM> > neighbours;
 
     switch (DIM)
     {
         case 1:
         {
             // Just one neighbour, plus the current box (zero vector)
-            neighbours = std::vector<c_vector<int,DIM> >(2);
+            neighbours = std::vector<c_vector<int, DIM> >(2);
 
             neighbours[0](0) = 0; // current box
             neighbours[1](0) = 1; // right
@@ -306,7 +306,7 @@ void ObsoleteBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
         case 2:
         {
             // Four neighbours, plus the current box (zero vector)
-            neighbours = std::vector<c_vector<int,DIM> >(5);
+            neighbours = std::vector<c_vector<int, DIM> >(5);
 
             neighbours[0](0) = 0; neighbours[0](1) = 1; // up
             neighbours[1](0) = 1; neighbours[1](1) = 1; // up right
@@ -350,7 +350,7 @@ void ObsoleteBoxCollection<DIM>::SetupLocalBoxesHalfOnly()
              * column above.
              */
 
-            neighbours = std::vector<c_vector<int,DIM> >(14);
+            neighbours = std::vector<c_vector<int, DIM> >(14);
 
             neighbours[0](0)  = 1; neighbours[0](1)  = 0; neighbours[0](2)  = 0;
             neighbours[1](0)  = 0; neighbours[1](1)  = 1; neighbours[1](2)  = 0;

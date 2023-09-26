@@ -180,7 +180,7 @@ public:
         files_to_compare.push_back("ColumnWriter_000001.dat");
         files_to_compare.push_back("ColumnWriter_unlimited.dat");
 
-        for (unsigned i=0; i<files_to_compare.size(); ++i)
+        for (unsigned i = 0; i<files_to_compare.size(); ++i)
         {
             FileComparison comparer(output_dir+ "Parallel" + files_to_compare[i],
                                     "io/test/data/" + files_to_compare[i]);
@@ -240,7 +240,7 @@ public:
 
         p_parallel_writer->Close();//ensure files flushed before comparison
 
-        for (unsigned i=0; i<files_to_compare.size(); ++i)
+        for (unsigned i = 0; i<files_to_compare.size(); ++i)
         {
             FileComparison comparer(output_dir+files_to_compare[i], "io/test/data/" + files_to_compare[i]);
             TS_ASSERT(comparer.CompareFiles());

@@ -91,7 +91,7 @@ protected:
         }
         else
         {
-            for (unsigned i=0; i<DATA_SIZE; ++i)
+            for (unsigned i = 0; i<DATA_SIZE; ++i)
             {
                 (*mpMasterFile) << rData[i] << "\t";
             }
@@ -170,13 +170,13 @@ public:
             // (so that all elements are concentrated) and the local element list (so that
             // a local element index can be applied
             unsigned local_element_index=0u; //Data invariant associates iter with local_element_index
-            typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator iter = mpMesh->GetElementIteratorBegin();
+            typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator iter = mpMesh->GetElementIteratorBegin();
 
-            for (unsigned global_element_index=0; global_element_index<mpMesh->GetNumElements(); global_element_index++)
+            for (unsigned global_element_index = 0; global_element_index<mpMesh->GetNumElements(); global_element_index++)
             {
                 if (mpMesh->CalculateDesignatedOwnershipOfElement(global_element_index))
                 {
-                    Element<ELEMENT_DIM,SPACE_DIM>* p_elem = mpMesh->GetElement(global_element_index);
+                    Element<ELEMENT_DIM, SPACE_DIM>* p_elem = mpMesh->GetElement(global_element_index);
                     //Spool forward in the local vector of elements
                     while (&(*iter) != p_elem)
                     {

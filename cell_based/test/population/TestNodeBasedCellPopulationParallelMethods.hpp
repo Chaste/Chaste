@@ -229,7 +229,7 @@ public:
                 TS_ASSERT_EQUALS(mpNodesOnlyMesh->GetNumNodes(), 1u);
                 TS_ASSERT_EQUALS(mpNodeBasedCellPopulation->GetNumRealCells(), 1u);
 
-                AbstractMesh<3,3>::NodeIterator node_iter = mpNodesOnlyMesh->GetNodeIteratorBegin();
+                AbstractMesh<3, 3>::NodeIterator node_iter = mpNodesOnlyMesh->GetNodeIteratorBegin();
                 TS_ASSERT_DELTA(node_iter->rGetLocation()[2], 1.6, 1e-4);
             }
         }

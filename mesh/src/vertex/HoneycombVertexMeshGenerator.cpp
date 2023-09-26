@@ -51,7 +51,7 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
     assert(elementArea > 0.0);
 
     std::vector<Node<2>*> nodes;
-    std::vector<VertexElement<2,2>*>  elements;
+    std::vector<VertexElement<2, 2>*>  elements;
 
     unsigned node_index = 0;
     unsigned node_indices[6];
@@ -155,7 +155,7 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
                 }
 
                 element_index = j*numElementsAcross + i;
-                VertexElement<2,2>* p_element = new VertexElement<2,2>(element_index, element_nodes);
+                VertexElement<2, 2>* p_element = new VertexElement<2, 2>(element_index, element_nodes);
                 elements.push_back(p_element);
             }
         }
@@ -193,20 +193,20 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
                 }
 
                 element_index = j*numElementsAcross + i;
-                VertexElement<2,2>* p_element = new VertexElement<2,2>(element_index, element_nodes);
+                VertexElement<2, 2>* p_element = new VertexElement<2, 2>(element_index, element_nodes);
                 elements.push_back(p_element);
             }
         }
     }
 
-    mpMesh = boost::make_shared<MutableVertexMesh<2,2> >(nodes, elements, cellRearrangementThreshold, t2Threshold);
+    mpMesh = boost::make_shared<MutableVertexMesh<2, 2> >(nodes, elements, cellRearrangementThreshold, t2Threshold);
 
 
     // Scale the mesh so that each element's area takes the value elementArea
     mpMesh->Scale(sqrt(elementArea*2.0/sqrt(3.0)), sqrt(elementArea*2.0/sqrt(3.0)));
 }
 
-boost::shared_ptr<MutableVertexMesh<2,2> > HoneycombVertexMeshGenerator::GetMesh()
+boost::shared_ptr<MutableVertexMesh<2, 2> > HoneycombVertexMeshGenerator::GetMesh()
 {
     return mpMesh;
 }

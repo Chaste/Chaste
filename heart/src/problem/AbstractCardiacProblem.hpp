@@ -350,7 +350,7 @@ private:
      */
     template<class Archive>
     void SaveBoundaryConditions(Archive & archive,
-                                AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
+                                AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
                                 BccType pBcc) const
     {
         (*ProcessSpecificArchive<Archive>::Get()) & pBcc;
@@ -366,7 +366,7 @@ private:
     template<class Archive>
     BccType LoadBoundaryConditions(
             Archive & archive,
-            AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
+            AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
     {
         // Load pointer from archive
         BccType p_bcc;
@@ -406,7 +406,7 @@ protected:
     unsigned mNodeColumnId;
 
     /** The monodomain or bidomain pde */
-    AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>* mpCardiacTissue;
+    AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>* mpCardiacTissue;
 
     /** Boundary conditions container used in the simulation */
     BccType mpBoundaryConditionsContainer;
@@ -415,9 +415,9 @@ protected:
     /** The PDE solver */
     AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* mpSolver;
     /** The cell factory creates the cells for each node */
-    AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>* mpCellFactory;
+    AbstractCardiacCellFactory<ELEMENT_DIM, SPACE_DIM>* mpCellFactory;
     /** The mesh. Can either by passed in, or the mesh filename can be set */
-    AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* mpMesh;
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* mpMesh;
 
     /** The current solution vector, of the form [V_0 .. V_N ] for monodomain and
      *  [V_0 phi_0 .. V_N phi_N] for bidomain */
@@ -441,7 +441,7 @@ protected:
      * This class will take responsibility for freeing the object when it is finished with.
      * @return a pointer to the newly created tissue
      */
-    virtual AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>* CreateCardiacTissue() =0;
+    virtual AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>* CreateCardiacTissue() =0;
 
     /**
      * Subclasses must override this method to create a suitable solver object.
@@ -492,7 +492,7 @@ public:
      * @param pCellFactory User defined cell factory which shows how the pde should
      * create cells.
      */
-    explicit AbstractCardiacProblem(AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>* pCellFactory);
+    explicit AbstractCardiacProblem(AbstractCardiacCellFactory<ELEMENT_DIM, SPACE_DIM>* pCellFactory);
 
     /**
      * Constructor used by archiving.
@@ -555,7 +555,7 @@ public:
      *
      * @param pMesh  the mesh object to use
      */
-    void SetMesh(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
+    void SetMesh(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh);
 
     /**
      *  Set whether the simulation will generate results files.
@@ -598,12 +598,12 @@ public:
     /**
      * @return the mesh used
      */
-    AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM> & rGetMesh();
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM> & rGetMesh();
 
     /**
      * @return the cardiac tissue object used
      */
-    AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>* GetTissue();
+    AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>* GetTissue();
 
     /**
      *  First performs some checks by calling  the PreSolveChecks method.
@@ -810,7 +810,7 @@ class BidomainProblem;
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 template<class Archive>
-void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::LoadExtraArchive(Archive & archive, unsigned version)
+void AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::LoadExtraArchive(Archive & archive, unsigned version)
 {
     // The vector factory must be loaded, but isn't needed for anything.
     DistributedVectorFactory* p_mesh_factory;
@@ -850,7 +850,7 @@ void AbstractCardiacProblem<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::LoadExtraArchive
             // If the mesh which was archived was a TetrahedralMesh then we have all the boundary conditions
             // in every process-specific archive.  We no longer test for this.
 // LCOV_EXCL_START
-            if (!dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>*>(mpMesh) && orig_num_procs > 1)
+            if (!dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>*>(mpMesh) && orig_num_procs > 1)
             {
                 // The correct way to do this should be:
                 // p_bcc->LoadFromArchive(archive, mpMesh);
@@ -885,7 +885,7 @@ namespace serialization {
  * This is how to do BOOST_CLASS_VERSION(AbstractCardiacProblem, 1)
  * with a templated class.
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM,  unsigned PROBLEM_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM,  unsigned PROBLEM_DIM>
 struct version<AbstractCardiacProblem<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM> >
 {
     ///Macro to set the version number of templated archive in known versions of Boost

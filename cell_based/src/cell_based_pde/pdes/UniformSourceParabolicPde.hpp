@@ -56,7 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * terms of the PDE; here, the cell population just defines the spatial domain
  * on which to solve the PDE.
  */
-template <unsigned DIM>
+template<unsigned DIM>
 class UniformSourceParabolicPde : public AbstractLinearParabolicPde<DIM, DIM>
 {
     friend class TestCellBasedParabolicPdes;
@@ -102,7 +102,7 @@ public:
      * @param u the value of the dependent variable at the point
      * @param pElement The element
      *
-     * @return the the source term.
+     * @return the source term.
      */
     double ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM, DIM>* pElement=NULL);
 

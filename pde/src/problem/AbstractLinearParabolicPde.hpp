@@ -107,7 +107,7 @@ public:
     virtual double ComputeSourceTerm(
         const ChastePoint<SPACE_DIM>& rX,
         double u,
-        Element<ELEMENT_DIM,SPACE_DIM>* pElement=nullptr) = 0;
+        Element<ELEMENT_DIM, SPACE_DIM>* pElement=nullptr) = 0;
 
     /**
      * @param rNode the node at which the nonlinear source term is computed
@@ -127,7 +127,7 @@ public:
      */
     virtual c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(
         const ChastePoint<SPACE_DIM>& rX,
-        Element<ELEMENT_DIM,SPACE_DIM>* pElement = NULL) = 0;
+        Element<ELEMENT_DIM, SPACE_DIM>* pElement = NULL) = 0;
 };
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

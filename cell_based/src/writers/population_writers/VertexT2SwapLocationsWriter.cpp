@@ -93,12 +93,12 @@ void VertexT2SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
 }
 
 // Explicit instantiation
-template class VertexT2SwapLocationsWriter<1,1>;
-template class VertexT2SwapLocationsWriter<1,2>;
-template class VertexT2SwapLocationsWriter<2,2>;
-template class VertexT2SwapLocationsWriter<1,3>;
-template class VertexT2SwapLocationsWriter<2,3>;
-template class VertexT2SwapLocationsWriter<3,3>;
+template class VertexT2SwapLocationsWriter<1, 1>;
+template class VertexT2SwapLocationsWriter<1, 2>;
+template class VertexT2SwapLocationsWriter<2, 2>;
+template class VertexT2SwapLocationsWriter<1, 3>;
+template class VertexT2SwapLocationsWriter<2, 3>;
+template class VertexT2SwapLocationsWriter<3, 3>;
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer

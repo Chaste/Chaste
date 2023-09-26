@@ -62,7 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * archives, i.e. Archive = boost::archive::text_iarchive or 
  * Archive = boost::archive::text_oarchive.
  */
-template <class Archive>
+template<class Archive>
 class ProcessSpecificArchive
 {
 private:

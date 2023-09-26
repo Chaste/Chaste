@@ -56,7 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class MonodomainPurkinjeCableAssembler : public AbstractFeCableIntegralAssembler<ELEMENT_DIM,SPACE_DIM,2,false,true,NORMAL>
+class MonodomainPurkinjeCableAssembler : public AbstractFeCableIntegralAssembler<ELEMENT_DIM, SPACE_DIM,2,false,true,NORMAL>
 {
 private:
     /**
@@ -75,15 +75,15 @@ private:
      * @param pElement Pointer to the element.
      * @return the stencil matrix
      */
-    c_matrix<double,PROBLEM_DIM*2,PROBLEM_DIM*2 /*2=number of bases per cable*/> ComputeCableMatrixTerm(
+    c_matrix<double, PROBLEM_DIM*2, PROBLEM_DIM*2 /*2=number of bases per cable*/> ComputeCableMatrixTerm(
         c_vector<double, 2>& rPhi,
         c_matrix<double, ELEMENT_DIM, 2>& rGradPhi,
         ChastePoint<SPACE_DIM>& rX,
-        c_vector<double,PROBLEM_DIM>& rU,
-        c_matrix<double,PROBLEM_DIM, SPACE_DIM>& rGradU,
-        Element<1,SPACE_DIM>* pElement)
+        c_vector<double, PROBLEM_DIM>& rU,
+        c_matrix<double, PROBLEM_DIM, SPACE_DIM>& rGradU,
+        Element<1, SPACE_DIM>* pElement)
     {
-        c_matrix<double,PROBLEM_DIM*2, PROBLEM_DIM*2> ret = zero_matrix<double>(PROBLEM_DIM*2, PROBLEM_DIM*2);
+        c_matrix<double, PROBLEM_DIM*2, PROBLEM_DIM*2> ret = zero_matrix<double>(PROBLEM_DIM*2, PROBLEM_DIM*2);
         double capacitance = HeartConfig::Instance()->GetPurkinjeCapacitance();
         double chi = HeartConfig::Instance()->GetPurkinjeSurfaceAreaToVolumeRatio();
         double conductivity = HeartConfig::Instance()->GetPurkinjeConductivity();
@@ -117,8 +117,8 @@ public:
      * Constructor
      * @param pMesh a pointer to a MixedDimensionMesh
      */
-    explicit MonodomainPurkinjeCableAssembler(MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
-        : AbstractFeCableIntegralAssembler<ELEMENT_DIM,SPACE_DIM,2,false,true,NORMAL>(pMesh)
+    explicit MonodomainPurkinjeCableAssembler(MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
+        : AbstractFeCableIntegralAssembler<ELEMENT_DIM, SPACE_DIM,2,false,true,NORMAL>(pMesh)
     {
         // Check radii have been set on the purkinje elements
         for (auto iter = pMesh->GetCableElementIteratorBegin();

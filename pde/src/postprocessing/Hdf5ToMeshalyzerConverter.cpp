@@ -44,8 +44,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DistributedVectorFactory.hpp"
 #include "Version.hpp"
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void Hdf5ToMeshalyzerConverter<ELEMENT_DIM,SPACE_DIM>::Write(std::string type)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void Hdf5ToMeshalyzerConverter<ELEMENT_DIM, SPACE_DIM>::Write(std::string type)
 {
 
     std::string filename = "";
@@ -102,14 +102,14 @@ void Hdf5ToMeshalyzerConverter<ELEMENT_DIM,SPACE_DIM>::Write(std::string type)
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-Hdf5ToMeshalyzerConverter<ELEMENT_DIM,SPACE_DIM>::Hdf5ToMeshalyzerConverter(
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+Hdf5ToMeshalyzerConverter<ELEMENT_DIM, SPACE_DIM>::Hdf5ToMeshalyzerConverter(
     const FileFinder& rInputDirectory,
     const std::string& rFileBaseName,
-    AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
     bool usingOriginalNodeOrdering,
     unsigned precision)
-    : AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>(
+    : AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>(
           rInputDirectory,
           rFileBaseName,
           pMesh,
@@ -137,7 +137,7 @@ Hdf5ToMeshalyzerConverter<ELEMENT_DIM,SPACE_DIM>::Hdf5ToMeshalyzerConverter(
     if (!mesh_file.IsFile())
     {
         // Write mesh in a suitable form for meshalyzer
-        MeshalyzerMeshWriter<ELEMENT_DIM,SPACE_DIM> mesh_writer(output_directory, 
+        MeshalyzerMeshWriter<ELEMENT_DIM, SPACE_DIM> mesh_writer(output_directory, 
                                                                 rFileBaseName + "_mesh",
                                                                 false);
 
@@ -168,9 +168,9 @@ Hdf5ToMeshalyzerConverter<ELEMENT_DIM,SPACE_DIM>::Hdf5ToMeshalyzerConverter(
 }
 
 // Explicit instantiation
-template class Hdf5ToMeshalyzerConverter<1,1>;
-template class Hdf5ToMeshalyzerConverter<1,2>;
-template class Hdf5ToMeshalyzerConverter<2,2>;
-template class Hdf5ToMeshalyzerConverter<1,3>;
-template class Hdf5ToMeshalyzerConverter<2,3>;
-template class Hdf5ToMeshalyzerConverter<3,3>;
+template class Hdf5ToMeshalyzerConverter<1, 1>;
+template class Hdf5ToMeshalyzerConverter<1, 2>;
+template class Hdf5ToMeshalyzerConverter<2, 2>;
+template class Hdf5ToMeshalyzerConverter<1, 3>;
+template class Hdf5ToMeshalyzerConverter<2, 3>;
+template class Hdf5ToMeshalyzerConverter<3, 3>;

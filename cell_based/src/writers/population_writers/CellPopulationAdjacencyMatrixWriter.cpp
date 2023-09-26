@@ -232,12 +232,12 @@ void CellPopulationAdjacencyMatrixWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBa
 }
 
 // Explicit instantiation
-template class CellPopulationAdjacencyMatrixWriter<1,1>;
-template class CellPopulationAdjacencyMatrixWriter<1,2>;
-template class CellPopulationAdjacencyMatrixWriter<2,2>;
-template class CellPopulationAdjacencyMatrixWriter<1,3>;
-template class CellPopulationAdjacencyMatrixWriter<2,3>;
-template class CellPopulationAdjacencyMatrixWriter<3,3>;
+template class CellPopulationAdjacencyMatrixWriter<1, 1>;
+template class CellPopulationAdjacencyMatrixWriter<1, 2>;
+template class CellPopulationAdjacencyMatrixWriter<2, 2>;
+template class CellPopulationAdjacencyMatrixWriter<1, 3>;
+template class CellPopulationAdjacencyMatrixWriter<2, 3>;
+template class CellPopulationAdjacencyMatrixWriter<3, 3>;
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer

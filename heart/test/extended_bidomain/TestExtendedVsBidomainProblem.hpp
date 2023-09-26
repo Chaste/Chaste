@@ -543,8 +543,8 @@ public:
         HeartConfig::Instance()->SetKSPPreconditioner("jacobi");
         HeartConfig::Instance()->SetSimulationDuration(5.0);
 
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
-        DistributedTetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
+        DistributedTetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 1> unstimulated_cell_factory(0.0);
@@ -630,8 +630,8 @@ public:
         HeartConfig::Instance()->SetKSPPreconditioner("jacobi");
         HeartConfig::Instance()->SetSimulationDuration(0.03);  //ms.
 
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
-        DistributedTetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
+        DistributedTetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         UnStimulatedCellFactory first_cell_factory;
@@ -707,8 +707,8 @@ public:
             "Gap junction heterogeneity areas must be of the same number as the heterogeneity values");
 
         // Coverage of the exception in the solver itself
-        BoundaryConditionsContainer<1,1,3> container;
-        ExtendedBidomainSolver<1,1> bidomain_solver(false,
+        BoundaryConditionsContainer<1, 1, 3> container;
+        ExtendedBidomainSolver<1, 1> bidomain_solver(false,
                                                        &extended_problem.rGetMesh(),
                                                        extended_problem.GetExtendedBidomainTissue(),
                                                        &container);

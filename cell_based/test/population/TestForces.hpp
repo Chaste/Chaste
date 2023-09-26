@@ -85,7 +85,7 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
         HoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Create cells
@@ -143,7 +143,7 @@ public:
         }
 
         // Move a node along the x-axis and calculate the force exerted on a neighbour
-        c_vector<double,2> old_point;
+        c_vector<double, 2> old_point;
         old_point = p_mesh->GetNode(59)->rGetLocation();
         ChastePoint<2> new_point;
         new_point.rGetLocation()[0] = old_point[0]+0.5;
@@ -167,7 +167,7 @@ public:
         TS_ASSERT_DELTA(cell_population.GetNode(58)->rGetAppliedForce()[1], 0.0, 1e-4);
 
         // Test spring force calculation
-        c_vector<double,2> force_on_spring; // between nodes 59 and 60
+        c_vector<double, 2> force_on_spring; // between nodes 59 and 60
 
         // Find one of the elements that nodes 59 and 60 live on
         ChastePoint<2> new_point2;
@@ -175,7 +175,7 @@ public:
         new_point2.rGetLocation()[1] = new_point[1] + 0.01;
 
         unsigned elem_index = p_mesh->GetContainingElementIndex(new_point2, false);
-        Element<2,2>* p_element = p_mesh->GetElement(elem_index);
+        Element<2, 2>* p_element = p_mesh->GetElement(elem_index);
 
         force_on_spring = linear_force.CalculateForceBetweenNodes(p_element->GetNodeGlobalIndex(1),
                                                                   p_element->GetNodeGlobalIndex(0),
@@ -203,7 +203,7 @@ public:
     void TestGeneralisedLinearSpringForceCalculationIn1d()
     {
         // Create a 1D mesh with nodes equally spaced a unit distance apart
-        MutableMesh<1,1> mesh;
+        MutableMesh<1, 1> mesh;
         mesh.ConstructLinearMesh(5);
 
         // Create cells
@@ -238,7 +238,7 @@ public:
         for (unsigned node_index = 0; node_index < mesh.GetNumNodes(); ++node_index)
         {
             // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
-            c_vector<double,1> old_point;
+            c_vector<double, 1> old_point;
             old_point = mesh.GetNode(node_index)->rGetLocation();
 
             ChastePoint<1> new_point;
@@ -272,7 +272,7 @@ public:
         }
 
         // Create another cell population and force law
-        MutableMesh<1,1> mesh2;
+        MutableMesh<1, 1> mesh2;
         mesh2.ConstructLinearMesh(5);
 
         MeshBasedCellPopulation<1> cell_population2(mesh2, cells_copy);
@@ -283,10 +283,10 @@ public:
         shifted_point.rGetLocation()[0] = 2.5;
         mesh2.SetNode(2, shifted_point);
 
-        c_vector<double,1> force_between_1_and_2 = linear_force2.CalculateForceBetweenNodes(1, 2, cell_population2);
+        c_vector<double, 1> force_between_1_and_2 = linear_force2.CalculateForceBetweenNodes(1, 2, cell_population2);
         TS_ASSERT_DELTA(force_between_1_and_2[0], linear_force.GetMeinekeSpringStiffness()*0.5, 1e-6);
 
-        c_vector<double,1> force_between_2_and_3 = linear_force2.CalculateForceBetweenNodes(2, 3, cell_population2);
+        c_vector<double, 1> force_between_2_and_3 = linear_force2.CalculateForceBetweenNodes(2, 3, cell_population2);
         TS_ASSERT_DELTA(force_between_2_and_3[0], -linear_force.GetMeinekeSpringStiffness()*0.5, 1e-6);
 
         for (unsigned i = 0; i < cell_population2.GetNumNodes(); ++i)
@@ -303,8 +303,8 @@ public:
     {
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/3D_Single_tetrahedron_element");
-        MutableMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/3D_Single_tetrahedron_element");
+        MutableMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create cells
@@ -322,7 +322,7 @@ public:
 
         // Test forces on springs
         unsigned nodeA = 0, nodeB = 1;
-        Element<3,3>* p_element = mesh.GetElement(0);
+        Element<3, 3>* p_element = mesh.GetElement(0);
         c_vector<double, 3> force = linear_force.CalculateForceBetweenNodes(p_element->GetNodeGlobalIndex(nodeA),
                                                                             p_element->GetNodeGlobalIndex(nodeB),
                                                                             cell_population);
@@ -351,7 +351,7 @@ public:
 
         for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
-            c_vector<double,3> old_point;
+            c_vector<double, 3> old_point;
             old_point = mesh.GetNode(i)->rGetLocation();
             ChastePoint<3> new_point;
             new_point.rGetLocation()[0] = scale_factor*old_point[0];
@@ -375,13 +375,13 @@ public:
         }
 
         // Move one node and check that forces are correctly calculated
-        MutableMesh<3,3> mesh2;
+        MutableMesh<3, 3> mesh2;
         mesh2.ConstructFromMeshReader(mesh_reader);
 
         MeshBasedCellPopulation<3> cell_population2(mesh2, cells_copy);
         GeneralisedLinearSpringForce<3> linear_force2;
 
-        c_vector<double,3> old_point = mesh2.GetNode(0)->rGetLocation();
+        c_vector<double, 3> old_point = mesh2.GetNode(0)->rGetLocation();
         ChastePoint<3> new_point;
         new_point.rGetLocation()[0] = 0.0;
         new_point.rGetLocation()[1] = 0.0;
@@ -389,8 +389,8 @@ public:
         mesh2.SetNode(0, new_point, false);
 
         unsigned nodeA2 = 0, nodeB2 = 1;
-        Element<3,3>* p_element2 = mesh2.GetElement(0);
-        c_vector<double,3> force2 = linear_force2.CalculateForceBetweenNodes(p_element2->GetNodeGlobalIndex(nodeA2),
+        Element<3, 3>* p_element2 = mesh2.GetElement(0);
+        c_vector<double, 3> force2 = linear_force2.CalculateForceBetweenNodes(p_element2->GetNodeGlobalIndex(nodeA2),
                                                                              p_element2->GetNodeGlobalIndex(nodeB2),
                                                                              cell_population2);
 
@@ -423,7 +423,7 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
         HoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Create cells
@@ -454,7 +454,7 @@ public:
         }
 
         // Move a node along the x-axis and calculate the force exerted on a neighbour
-        c_vector<double,2> old_point;
+        c_vector<double, 2> old_point;
         old_point = p_mesh->GetNode(59)->rGetLocation();
         ChastePoint<2> new_point;
         new_point.rGetLocation()[0] = old_point[0]+0.5;
@@ -787,7 +787,7 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
         HoneycombMeshGenerator generator(cells_across, cells_up);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -892,7 +892,7 @@ public:
 
         RepulsionForce<2> repulsion_force;
 
-        for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        for (AbstractMesh<2, 2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
                 node_iter != mesh.GetNodeIteratorEnd();
                 ++node_iter)
         {
@@ -922,7 +922,7 @@ public:
             mesh.GetNode(two_index)->SetRadius(10);
 
             // Reset the vector of node forces
-            for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+            for (AbstractMesh<2, 2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
                     node_iter != mesh.GetNodeIteratorEnd();
                     ++node_iter)
             {
@@ -945,7 +945,7 @@ public:
             mesh.GetNode(two_index)->SetRadius(0.2);
 
             // Reset the vector of node forces
-            for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+            for (AbstractMesh<2, 2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
                     node_iter != mesh.GetNodeIteratorEnd();
                     ++node_iter)
             {
@@ -1027,12 +1027,12 @@ public:
             nodes.push_back(new Node<2>(i, true, cos(angles[i]), sin(angles[i])));
         }
 
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes));
 
         double cell_swap_threshold = 0.01;
         double edge_division_threshold = 2.0;
-        MutableVertexMesh<2,2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
+        MutableVertexMesh<2, 2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
 
         // Set up the cell
         std::vector<CellPtr> cells;
@@ -1194,7 +1194,7 @@ public:
     {
         // Create a simple 2D VertexMesh
         HoneycombVertexMeshGenerator generator(3, 3);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -1221,7 +1221,7 @@ public:
             cell_population.GetNode(i)->ClearAppliedForce();
         }
 
-        // now we add the the growth modifier and go on
+        // now we add the growth modifier and go on
         // #2488
         MAKE_PTR(SimpleTargetAreaModifier<2>,p_growth_modifier);
         p_growth_modifier->UpdateTargetAreas(cell_population);
@@ -1314,12 +1314,12 @@ public:
             nodes.push_back(new Node<2>(i, true, cos(angles[i]), sin(angles[i])));
         }
 
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes));
 
         double cell_swap_threshold = 0.01;
         double edge_division_threshold = 2.0;
-        MutableVertexMesh<2,2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
+        MutableVertexMesh<2, 2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
 
         // Set up the cell
         std::vector<CellPtr> cells;
@@ -1424,12 +1424,12 @@ public:
             nodes.push_back(new Node<2>(i, true, cos(angles[i]), sin(angles[i])));
         }
 
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes));
 
         double cell_swap_threshold = 0.01;
         double edge_division_threshold = 2.0;
-        MutableVertexMesh<2,2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
+        MutableVertexMesh<2, 2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
 
         // Set up the cell
         std::vector<CellPtr> cells;
@@ -1555,12 +1555,12 @@ public:
             nodes.push_back(new Node<2>(i, true, cos(angles[i]), sin(angles[i])));
         }
 
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes));
 
         double cell_swap_threshold = 0.01;
         double edge_division_threshold = 2.0;
-        MutableVertexMesh<2,2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
+        MutableVertexMesh<2, 2> mesh(nodes, elements, cell_swap_threshold, edge_division_threshold);
 
         // Set up the cell
         std::vector<CellPtr> cells;
@@ -1647,12 +1647,12 @@ public:
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
 
         // Make a vertex mesh
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
@@ -1721,12 +1721,12 @@ public:
             nodes_elem_1.push_back(nodes[node_indices_elem_1[i]]);
         }
 
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_0));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_1));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_0));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_1));
 
         // Make a vertex mesh
-        MutableVertexMesh<2,2> vertex_mesh(nodes, vertex_elements);
+        MutableVertexMesh<2, 2> vertex_mesh(nodes, vertex_elements);
 
         TS_ASSERT_EQUALS(vertex_mesh.GetNumElements(), 2u);
         TS_ASSERT_EQUALS(vertex_mesh.GetNumNodes(), 6u);
@@ -1885,10 +1885,10 @@ public:
             angles[i] = M_PI + 2.0 * M_PI * static_cast<double>(i) / static_cast<double>(num_nodes);
             nodes.push_back(new Node<2>(i, true, cos(angles[i]), sin(angles[i])));
         }
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes));
 
-        MutableVertexMesh<2,2> mesh(nodes, elements, 0.01, 2.0);
+        MutableVertexMesh<2, 2> mesh(nodes, elements, 0.01, 2.0);
 
         // Create cell
         std::vector<CellPtr> cells;
@@ -1965,7 +1965,7 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
         // Create a 1D mesh with nodes equally spaced a unit distance apart
-        MutableMesh<1,1> generating_mesh;
+        MutableMesh<1, 1> generating_mesh;
         generating_mesh.ConstructLinearMesh(5);
 
         NodesOnlyMesh<1> mesh;
@@ -1984,7 +1984,7 @@ public:
         // Create force law object
         DiffusionForce<1> diffusion_force;
 
-        for (AbstractMesh<1,1>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        for (AbstractMesh<1, 1>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
                 node_iter != mesh.GetNodeIteratorEnd();
                 ++node_iter)
         {
@@ -2032,7 +2032,7 @@ public:
         // Create force law object
         DiffusionForce<2> force;
 
-        for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        for (AbstractMesh<2, 2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
                 node_iter != mesh.GetNodeIteratorEnd();
                 ++node_iter)
         {
@@ -2084,8 +2084,8 @@ public:
 
         // Create a simple VertexBasedCellPopulation
         HoneycombVertexMeshGenerator mesh_generator(4, 6);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = mesh_generator.GetMesh();
-        for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = mesh_generator.GetMesh();
+        for (AbstractMesh<2, 2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
              node_iter != p_mesh->GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -2106,7 +2106,7 @@ public:
             "SetRadius() must be called on each Node before calling DiffusionForce::AddForceContribution() to avoid a division by zero error");
 
         // Now set each node radius...
-        for (AbstractMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
+        for (AbstractMesh<2, 2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
              node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -2133,8 +2133,8 @@ public:
 
         // Create a simple MeshBasedCellPopulation
         HoneycombMeshGenerator mesh_generator(4, 6, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = mesh_generator.GetMesh();
-        for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = mesh_generator.GetMesh();
+        for (AbstractMesh<2, 2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
              node_iter != p_mesh->GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -2155,7 +2155,7 @@ public:
             "SetRadius() must be called on each Node before calling DiffusionForce::AddForceContribution() to avoid a division by zero error");
 
         // Now set each node radius...
-        for (AbstractMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
+        for (AbstractMesh<2, 2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
              node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -2168,7 +2168,7 @@ public:
         // Now update the cell population, which in turn calls ReMesh() on the mesh...
         cell_population.Update();
 
-        for (AbstractMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
+        for (AbstractMesh<2, 2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
              node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -2209,7 +2209,7 @@ public:
         // Create force law object
         DiffusionForce<3> force;
 
-        for (AbstractMesh<3,3>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        for (AbstractMesh<3, 3>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
                 node_iter != mesh.GetNodeIteratorEnd();
                 ++node_iter)
         {

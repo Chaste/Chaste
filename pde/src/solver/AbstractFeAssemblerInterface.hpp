@@ -41,14 +41,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 
 /**
- *   A common bass class for AbstractFeVolumeIntegralAssembler (the main abstract assembler class), and other assembler classes
- *   (including continuum mechanics assemblers, which is why this class is separate to AbstractFeAssemblerInterface).
+ * A common bass class for AbstractFeVolumeIntegralAssembler (the main abstract 
+ * assembler class), and other assembler classes (including continuum mechanics 
+ * assemblers, which is why this class is separate to 
+ * AbstractFeAssemblerInterface).
  *
- *   See AbstractFeVolumeIntegralAssembler documentation for info on these assembler classes.
+ * See AbstractFeVolumeIntegralAssembler documentation for info on these 
+ * assembler classes.
  */
-
-template <bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX>
-class AbstractFeAssemblerInterface  : private boost::noncopyable
+template<bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX>
+class AbstractFeAssemblerInterface : private boost::noncopyable
 {
 protected:
     /** The vector to be assembled (only used if CAN_ASSEMBLE_VECTOR == true). */
@@ -58,9 +60,9 @@ protected:
     Mat mMatrixToAssemble;
 
     /**
-     * Whether to assemble the matrix (an assembler may be able to assemble matrices
-     * (CAN_ASSEMBLE_MATRIX==true), but may not want to do so each timestep, hence
-     * this second boolean.
+     * Whether to assemble the matrix (an assembler may be able to assemble 
+     * matrices (CAN_ASSEMBLE_MATRIX==true), but may not want to do so each 
+     * timestep, hence this second boolean.
      */
     bool mAssembleMatrix;
 
@@ -97,20 +99,22 @@ public:
     AbstractFeAssemblerInterface();
 
     /**
-     * Set the matrix that needs to be assembled. Requires CAN_ASSEMBLE_MATRIX==true.
+     * Set the matrix that needs to be assembled. Requires 
+     * CAN_ASSEMBLE_MATRIX==true.
      *
      * @param rMatToAssemble Reference to the matrix
-     * @param zeroMatrixBeforeAssembly Whether to zero the matrix before assembling
-     *  (otherwise it is just added to)
+     * @param zeroMatrixBeforeAssembly Whether to zero the matrix before 
+     *     assembling (otherwise it is just added to); defaults to true
      */
     void SetMatrixToAssemble(Mat& rMatToAssemble, bool zeroMatrixBeforeAssembly=true);
 
     /**
-     * Set the vector that needs to be assembled. Requires CAN_ASSEMBLE_VECTOR==true.
+     * Set the vector that needs to be assembled. Requires 
+     * CAN_ASSEMBLE_VECTOR==true.
      *
      * @param rVecToAssemble Reference to the vector
-     * @param zeroVectorBeforeAssembly Whether to zero the vector before assembling
-     *  (otherwise it is just added to)
+     * @param zeroVectorBeforeAssembly Whether to zero the vector before 
+     *     assembling (otherwise it is just added to)
      */
     void SetVectorToAssemble(Vec& rVecToAssemble, bool zeroVectorBeforeAssembly);
 
@@ -154,7 +158,7 @@ public:
     }
 };
 
-template <bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX>
+template<bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX>
 AbstractFeAssemblerInterface<CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX>::AbstractFeAssemblerInterface()
     : mVectorToAssemble(nullptr),
       mMatrixToAssemble(nullptr),
@@ -164,8 +168,10 @@ AbstractFeAssemblerInterface<CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX>::Abstract
     assert(CAN_ASSEMBLE_VECTOR || CAN_ASSEMBLE_MATRIX);
 }
 
-template <bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX>
-void AbstractFeAssemblerInterface<CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX>::SetMatrixToAssemble(Mat& rMatToAssemble, bool zeroMatrixBeforeAssembly)
+template<bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX>
+void AbstractFeAssemblerInterface<CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX>::SetMatrixToAssemble(
+    Mat& rMatToAssemble,
+    bool zeroMatrixBeforeAssembly)
 {
     assert(rMatToAssemble);
     MatGetOwnershipRange(rMatToAssemble, &mOwnershipRangeLo, &mOwnershipRangeHi);
@@ -174,8 +180,10 @@ void AbstractFeAssemblerInterface<CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX>::Set
     mZeroMatrixBeforeAssembly = zeroMatrixBeforeAssembly;
 }
 
-template <bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX>
-void AbstractFeAssemblerInterface<CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX>::SetVectorToAssemble(Vec& rVecToAssemble, bool zeroVectorBeforeAssembly)
+template<bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX>
+void AbstractFeAssemblerInterface<CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX>::SetVectorToAssemble(
+    Vec& rVecToAssemble,
+    bool zeroVectorBeforeAssembly)
 {
     assert(rVecToAssemble);
     VecGetOwnershipRange(rVecToAssemble, &mOwnershipRangeLo, &mOwnershipRangeHi);

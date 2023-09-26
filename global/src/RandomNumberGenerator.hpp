@@ -112,7 +112,7 @@ private:
      * @param archive the archive
      * @param version the current version of this class
      */
-    template <class Archive>
+    template<class Archive>
     void save(Archive& archive, const unsigned int version) const
     {
         std::stringstream rng_internals;
@@ -140,7 +140,7 @@ private:
      * @param archive the archive
      * @param version the current version of this class
      */
-    template <class Archive>
+    template<class Archive>
     void load(Archive& archive, const unsigned int version)
     {
         std::string rng_internals_string;
@@ -222,7 +222,7 @@ public:
      * @param rValues  the initial values and the output permutation of shuffled 
      *     values. Must be non-empty
      */
-    template <class T>
+    template<class T>
     void Shuffle(std::vector<boost::shared_ptr<T> >& rValues)
     {
         unsigned num = rValues.size();

@@ -55,17 +55,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class CellPropertyCollection
 {
 private:
-    /** The type of container used to store properties */
-    typedef std::set<boost::shared_ptr<AbstractCellProperty> > CollectionType;
-
-    /** Type of a const iterator over the container */
-    typedef CollectionType::const_iterator ConstIteratorType;
-
-    /** Type of an iterator over the container */
-    typedef CollectionType::iterator IteratorType;
-
     /** The properties stored in this collection. */
-    CollectionType mProperties;
+    std::set<boost::shared_ptr<AbstractCellProperty> > mProperties;
 
     /** Cell property registry. */
     CellPropertyRegistry* mpCellPropertyRegistry;
@@ -126,9 +117,9 @@ public:
     template<typename CLASS>
     bool HasProperty() const
     {
-        for (ConstIteratorType it = mProperties.begin(); it != mProperties.end(); ++it)
+        for (const auto& it : mProperties)
         {
-            if ((*it)->IsType<CLASS>())
+            if (it->IsType<CLASS>())
             {
                 return true;
             }
@@ -145,9 +136,9 @@ public:
     template<typename BASECLASS>
     bool HasPropertyType() const
     {
-        for (ConstIteratorType it = mProperties.begin(); it != mProperties.end(); ++it)
+        for (const auto& it : mProperties)
         {
-            if ((*it)->IsSubType<BASECLASS>())
+            if (it->IsSubType<BASECLASS>())
             {
                 return true;
             }
@@ -161,7 +152,9 @@ public:
     template<typename CLASS>
     void RemoveProperty()
     {
-        for (IteratorType it = mProperties.begin(); it != mProperties.end(); ++it)
+        for (std::set<boost::shared_ptr<AbstractCellProperty> >::iterator it = mProperties.begin();
+             it != mProperties.end();
+             ++it)
         {
             if ((*it)->IsType<CLASS>())
             {
@@ -188,17 +181,31 @@ public:
      * An iterator type over this collection.
      * Don't rely on the particular implementation of the iterator.
      */
-    typedef CollectionType::iterator Iterator;
+    typedef std::set<boost::shared_ptr<AbstractCellProperty> >::iterator Iterator;
 
     /**
+     * \todo remove, as duplicate with begin()
+     * 
      * @return an Iterator to the start of this collection.
      */
     Iterator Begin();
 
     /**
+     * \todo remove, as duplicate with end()
+     * 
      * @return an Iterator to one past the end of this collection.
      */
     Iterator End();
+
+    /**
+     * @return an Iterator to the start of this collection.
+     */
+    Iterator begin();
+
+    /**
+     * @return an Iterator to one past the end of this collection.
+     */
+    Iterator end();
 
     /**
      * @return If this collection contains a single property, then return it.
@@ -214,11 +221,12 @@ public:
     CellPropertyCollection GetProperties() const
     {
         CellPropertyCollection result;
-        for (ConstIteratorType it = mProperties.begin(); it != mProperties.end(); ++it)
+        
+        for (const auto& it : mProperties)
         {
-            if ((*it)->IsType<CLASS>())
+            if (it->IsType<CLASS>())
             {
-                result.AddProperty(*it);
+                result.AddProperty(it);
             }
         }
         return result;
@@ -232,11 +240,11 @@ public:
     CellPropertyCollection GetPropertiesType() const
     {
         CellPropertyCollection result;
-        for (ConstIteratorType it = mProperties.begin(); it != mProperties.end(); ++it)
+        for (const auto& it : mProperties)
         {
-            if ((*it)->IsSubType<BASECLASS>())
+            if (it->IsSubType<BASECLASS>())
             {
-                result.AddProperty(*it);
+                result.AddProperty(it);
             }
         }
         return result;

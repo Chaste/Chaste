@@ -92,8 +92,8 @@ public:
     {
         FileFinder test_dir = GetPath("TestPostProcessingWriter_WriterMethods");
 
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        DistributedTetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        DistributedTetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         CopyTestDataHdf5ToCleanTestOutputFolder(test_dir, "PostProcessingWriter/postprocessingapd");
@@ -103,12 +103,12 @@ public:
         {
             // Call post processing writer (output to HDF5)
 
-            PostProcessingWriter<1,1> writer(mesh, test_dir, "postprocessingapd");
+            PostProcessingWriter<1, 1> writer(mesh, test_dir, "postprocessingapd");
             writer.WriteApdMapFile(60.0, -30.0);
             writer.WriteUpstrokeTimeMap(-30.0);
             writer.WriteMaxUpstrokeVelocityMap(-30.0);
 
-            DistanceMapCalculator<1,1> dist_calculator(mesh);
+            DistanceMapCalculator<1, 1> dist_calculator(mesh);
             std::vector<unsigned> origin_node;
             origin_node.push_back(0);
             std::vector<double> distance_map_from_0;
@@ -117,7 +117,7 @@ public:
         }
 
         // Convert from HDF5 to meshalyzer format.
-        Hdf5ToMeshalyzerConverter<1,1> converter(test_dir,
+        Hdf5ToMeshalyzerConverter<1, 1> converter(test_dir,
                                                  "postprocessingapd",
                                                  &mesh,
                                                  HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering());
@@ -151,20 +151,20 @@ public:
     {
         FileFinder output_dir = GetPath("TestPostProcessingWriter_ApdWritingWithNoApdsPresent");
 
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
-        DistributedTetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_100_elements");
+        DistributedTetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         CopyTestDataHdf5ToCleanTestOutputFolder(output_dir, "Monodomain1d/MonodomainLR91_1d");
 
         ///\todo #2359 allow PostProcessingWriter and Hdf5 converters to be in same scope (conflicting Hdf5DataReaders).
         {
-            PostProcessingWriter<1,1> writer(mesh, output_dir, "MonodomainLR91_1d");
+            PostProcessingWriter<1, 1> writer(mesh, output_dir, "MonodomainLR91_1d");
             writer.WriteApdMapFile(90.0, -30.0);
         }
 
         // Now (as part of #1660) call the converter in a separate step.
-        Hdf5ToMeshalyzerConverter<1,1> converter(output_dir,
+        Hdf5ToMeshalyzerConverter<1, 1> converter(output_dir,
                                                  "MonodomainLR91_1d",
                                                  &mesh,
                                                  HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering());
@@ -180,8 +180,8 @@ public:
         FileFinder test_dir = GetPath("TestPostProcessingWriter_PostProcessWriting");
         CopyTestDataHdf5ToCleanTestOutputFolder(test_dir, "Monodomain1d/MonodomainLR91_1d");
 
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_10_100_elements");
-        DistributedTetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_10_100_elements");
+        DistributedTetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         std::vector<std::pair<double,double> > apd_maps;
@@ -218,13 +218,13 @@ public:
 
         ///\todo #2359 allow PostProcessingWriter and Hdf5 converters to be in same scope (conflicting Hdf5DataReaders).
         {
-            PostProcessingWriter<1,1> writer(mesh, test_dir, "MonodomainLR91_1d");
+            PostProcessingWriter<1, 1> writer(mesh, test_dir, "MonodomainLR91_1d");
             writer.WritePostProcessingFiles();
             writer.WriteAboveThresholdDepolarisationFile(-40.0);
         }
 
         // Now (as part of #1660) call the converter in a separate step.
-        Hdf5ToMeshalyzerConverter<1,1> converter(test_dir,
+        Hdf5ToMeshalyzerConverter<1, 1> converter(test_dir,
                                                  "MonodomainLR91_1d",
                                                  &mesh,
                                                  HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering());
@@ -292,8 +292,8 @@ public:
         FileFinder output_dir = GetPath("TestPostProcessingWriter_ExtractNodeTracesWithNodePermutation");
         HeartConfig::Instance()->SetOutputFilenamePrefix("NodalTracesTest");
 
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
-        DistributedTetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
+        DistributedTetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // The point of this test is to check the method handles permutation properly...
@@ -339,13 +339,13 @@ public:
         HeartConfig::Instance()->Reset();
         FileFinder output_dir = GetPath("TestPostProcessingWriter_WritingEads");
 
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_10_100_elements");
-        DistributedTetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_10_100_elements");
+        DistributedTetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         CopyTestDataHdf5ToCleanTestOutputFolder(output_dir, "PostProcessingWriter/Ead");
 
-        PostProcessingWriter<1,1> writer(mesh, output_dir, "Ead");
+        PostProcessingWriter<1, 1> writer(mesh, output_dir, "Ead");
         writer.WriteAboveThresholdDepolarisationFile(-30.0);
 
         std::string file1 = FileFinder("AboveThresholdDepolarisations_minus_30.dat", output_dir).GetAbsolutePath();
@@ -360,15 +360,15 @@ public:
         FileFinder test_dir = GetPath("TestPostProcessingWriter_SwitchingOutputFormat");
         HeartConfig::Instance()->SetVisualizeWithCmgui();
 
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        DistributedTetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        DistributedTetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         CopyTestDataHdf5ToCleanTestOutputFolder(test_dir, "PostProcessingWriter/postprocessingapd");
 
         ///\todo #2359 allow PostProcessingWriter and Hdf5 converters to be in same scope (conflicting Hdf5DataReaders).
         {
-            PostProcessingWriter<1,1> writer(mesh, test_dir, "postprocessingapd");
+            PostProcessingWriter<1, 1> writer(mesh, test_dir, "postprocessingapd");
             double upstroke_threshold = -30.0;
             writer.WriteApdMapFile(60.0, upstroke_threshold);
             writer.WriteApdMapFile(90.0, upstroke_threshold);
@@ -376,18 +376,18 @@ public:
         }
 
         // Now (as part of #1660) call the converter in a separate step.
-        Hdf5ToMeshalyzerConverter<1,1> converter(test_dir,
+        Hdf5ToMeshalyzerConverter<1, 1> converter(test_dir,
                                                  "postprocessingapd",
                                                  &mesh,
                                                  HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering());
 
         // Now (as part of #1660) call the converter in a separate step.
-        Hdf5ToCmguiConverter<1,1> converter2(test_dir,
+        Hdf5ToCmguiConverter<1, 1> converter2(test_dir,
                                             "postprocessingapd",
                                             &mesh);
 
 //        // Now (as part of #1660) call the converter in a separate step.
-//        Hdf5ToVtkConverter<1,1> converter3(test_dir,
+//        Hdf5ToVtkConverter<1, 1> converter3(test_dir,
 //                                           "postprocessingapd",
 //                                           &mesh,
 //                                           false,
@@ -403,7 +403,7 @@ public:
         NumericFileComparison comp2(file1, file2);
         TS_ASSERT(comp2.CompareFiles(1e-12));
 
-        for (unsigned i=0; i<451u; ++i)
+        for (unsigned i = 0; i<451u; ++i)
         {
             std::stringstream filename;
             filename << "postprocessingapd_" << i << ".exnode";
@@ -419,15 +419,15 @@ public:
         HeartConfig::Instance()->Reset();
         FileFinder output_dir("TestPostProcessingWriter_AddingToHdf5", RelativeTo::ChasteTestOutput);
 
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        DistributedTetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        DistributedTetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         CopyTestDataHdf5ToCleanTestOutputFolder(output_dir, "PostProcessingWriter/postprocessingapd");
 
         ///\todo #2359 See comment below for the reason for the block.
         {
-            PostProcessingWriter<1,1> writer(mesh, output_dir, "postprocessingapd");
+            PostProcessingWriter<1, 1> writer(mesh, output_dir, "postprocessingapd");
             writer.WriteApdMapFile(60.0, -30.0);
         }
         // This needs to be after the PostProcessingWriter has disappeared. This could perhaps
@@ -473,8 +473,8 @@ public:
 #ifdef CHASTE_VTK
         HeartConfig::Instance()->Reset();
 
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
-        DistributedTetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
+        DistributedTetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         HeartConfig::Instance()->SetIntracellularConductivities(Create_c_vector(0.0005, 0.0005));
@@ -508,7 +508,7 @@ public:
         TS_ASSERT(vtu_file.IsFile());
 
         // Read VTK file & check it doesn't cause any problems.
-        VtkMeshReader<2,2> vtk_reader(output_dir.GetAbsolutePath() + "/SimulationResults.vtu");
+        VtkMeshReader<2, 2> vtk_reader(output_dir.GetAbsolutePath() + "/SimulationResults.vtu");
 
         // Load up and check APD data.
         std::vector<double> apd_data;
@@ -517,7 +517,7 @@ public:
         // See TestLongPostprocessing for one with some data in it.
         vtk_reader.GetPointData("Apd_90_minus_30_Map_000000", apd_data);
         TS_ASSERT_EQUALS(apd_data.size(), 221u);
-        for (unsigned i=0; i<apd_data.size(); ++i)
+        for (unsigned i = 0; i<apd_data.size(); ++i)
         {
             TS_ASSERT_DELTA(apd_data[i], 0.0, 1e-9);
         }
@@ -525,7 +525,7 @@ public:
         // and APD50 map
         vtk_reader.GetPointData("Apd_50_minus_30_Map_000000", apd_data);
         TS_ASSERT_EQUALS(apd_data.size(), 221u);
-        for (unsigned i=0; i<apd_data.size(); ++i)
+        for (unsigned i = 0; i<apd_data.size(); ++i)
         {
             TS_ASSERT_DELTA(apd_data[i], 0.0, 1e-9);
         }
@@ -539,7 +539,7 @@ public:
         HeartConfig::Instance()->Reset();
         FileFinder output_dir("TestPostProcessingWriter_DifferentNumberOfPaces", RelativeTo::ChasteTestOutput);
         {
-            DistributedTetrahedralMesh<1,1> mesh;
+            DistributedTetrahedralMesh<1, 1> mesh;
             mesh.ConstructRegularSlabMesh(1.0, 1.0);
 
             CopyTestDataHdf5ToCleanTestOutputFolder(output_dir, "PostProcessingWriter/DifferentNumberOfPaces");
@@ -548,7 +548,7 @@ public:
             upstroke_time_map.push_back(0.0);
             HeartConfig::Instance()->SetUpstrokeTimeMaps(upstroke_time_map);
 
-            PostProcessingWriter<1,1> writer(mesh, output_dir, "DifferentNumberOfPaces");
+            PostProcessingWriter<1, 1> writer(mesh, output_dir, "DifferentNumberOfPaces");
             writer.WritePostProcessingFiles();
         }
         {

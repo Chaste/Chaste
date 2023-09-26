@@ -63,9 +63,9 @@ void AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM>::OutputSimulati
 }
 
 // Explicit instantiation
-template class AbstractCellBasedSimulationModifier<1,1>;
-template class AbstractCellBasedSimulationModifier<1,2>;
-template class AbstractCellBasedSimulationModifier<2,2>;
-template class AbstractCellBasedSimulationModifier<1,3>;
-template class AbstractCellBasedSimulationModifier<2,3>;
-template class AbstractCellBasedSimulationModifier<3,3>;
+template class AbstractCellBasedSimulationModifier<1, 1>;
+template class AbstractCellBasedSimulationModifier<1, 2>;
+template class AbstractCellBasedSimulationModifier<2, 2>;
+template class AbstractCellBasedSimulationModifier<1, 3>;
+template class AbstractCellBasedSimulationModifier<2, 3>;
+template class AbstractCellBasedSimulationModifier<3, 3>;

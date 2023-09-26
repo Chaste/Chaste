@@ -91,7 +91,7 @@ public:
 
         // Create a simple tetrahedral mesh
         HoneycombMeshGenerator generator(3, 3, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -242,9 +242,9 @@ public:
         simulator.AddUpdateRule(p_adhesion_update_rule);
 
         // Create cell killer and pass in to simulation
-        c_vector<double,2> point = zero_vector<double>(2);
+        c_vector<double, 2> point = zero_vector<double>(2);
         point(1) = 16.0;
-        c_vector<double,2> normal = zero_vector<double>(2);
+        c_vector<double, 2> normal = zero_vector<double>(2);
         normal(1) = 1.0;
         MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer, (&cell_population, point, normal));
         simulator.AddCellKiller(p_killer);
@@ -641,7 +641,7 @@ public:
         TS_ASSERT(vtk_file2.Exists());
 
         // Check that the second VTK file for Potts specific data (element IDs)
-        VtkMeshReader<3,3> vtk_reader(results_dir + "results_from_time_0/results_10.vtu");
+        VtkMeshReader<3, 3> vtk_reader(results_dir + "results_from_time_0/results_10.vtu");
         std::vector<double> cell_types;
         vtk_reader.GetPointData("Legacy Cell types", cell_types);
         TS_ASSERT_EQUALS(cell_types.size(), 1000u);

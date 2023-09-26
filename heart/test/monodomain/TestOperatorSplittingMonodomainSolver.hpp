@@ -111,7 +111,7 @@ public:
 
         // Normal
         {
-            TetrahedralMesh<1,1> mesh;
+            TetrahedralMesh<1, 1> mesh;
             mesh.ConstructRegularSlabMesh(h, 1.0);
             HeartConfig::Instance()->SetOutputDirectory("MonodomainCompareWithOperatorSplitting_normal");
             BlockCellFactory<1> cell_factory;
@@ -126,7 +126,7 @@ public:
 
         // Operator splitting
         {
-            TetrahedralMesh<1,1> mesh;
+            TetrahedralMesh<1, 1> mesh;
             mesh.ConstructRegularSlabMesh(h, 1.0);
             HeartConfig::Instance()->SetOutputDirectory("MonodomainCompareWithOperatorSplitting_splitting");
             BlockCellFactory<1> cell_factory;
@@ -147,7 +147,7 @@ public:
 
         bool some_node_depolarised = false;
         assert(final_voltage_normal.GetSize()==final_voltage_operator_splitting.GetSize());
-        for (unsigned j=0; j<final_voltage_normal.GetSize(); ++j)
+        for (unsigned j = 0; j<final_voltage_normal.GetSize(); ++j)
         {
             // this tolerance means the wavefronts are not on top of each other, but not too far
             // separated (as otherwise max difference between the voltages across space would be

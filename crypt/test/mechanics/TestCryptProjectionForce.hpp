@@ -80,7 +80,7 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, thickness_of_ghost_layer);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Centre the mesh at (0,0)
         ChasteCuboid<2> bounding_box=p_mesh->CalculateBoundingBox();
@@ -160,7 +160,7 @@ public:
 
         // Test force calculation on a normal spring
 
-        c_vector<double,2> force_on_spring; // between nodes 0 and 1
+        c_vector<double, 2> force_on_spring; // between nodes 0 and 1
 
         // Find one of the elements that nodes 0 and 1 live on
         ChastePoint<2> new_point2;
@@ -168,7 +168,7 @@ public:
         new_point2.rGetLocation()[1] = new_point[1] + 0.01;
 
         unsigned elem_index = p_mesh->GetContainingElementIndex(new_point2, false);
-        Element<2,2>* p_element = p_mesh->GetElement(elem_index);
+        Element<2, 2>* p_element = p_mesh->GetElement(elem_index);
 
         force_on_spring = crypt_projection_force.CalculateForceBetweenNodes(p_element->GetNodeGlobalIndex(1),
                                                                             p_element->GetNodeGlobalIndex(0),
@@ -259,7 +259,7 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, thickness_of_ghost_layer);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Centre the mesh at (0,0)
         ChasteCuboid<2> bounding_box=p_mesh->CalculateBoundingBox();
@@ -306,7 +306,7 @@ public:
         crypt_projection_force.AddForceContribution(cell_population);
 
         // Store the force of a particular node without Wnt-chemotaxis
-        c_vector<double,2> old_force;
+        c_vector<double, 2> old_force;
         old_force[0] = cell_population.GetNode(11)->rGetAppliedForce()[0];
         old_force[1] = cell_population.GetNode(11)->rGetAppliedForce()[1];
 
@@ -322,11 +322,11 @@ public:
         crypt_projection_force.AddForceContribution(cell_population);
 
         // Store the force of the same node, but now with Wnt-chemotaxis
-        c_vector<double,2> new_force = cell_population.GetNode(11)->rGetAppliedForce();
+        c_vector<double, 2> new_force = cell_population.GetNode(11)->rGetAppliedForce();
 
         double wnt_chemotaxis_strength = crypt_projection_force.GetWntChemotaxisStrength();
         CellPtr p_cell = cell_population.GetCellUsingLocationIndex(11u);
-        c_vector<double,2> wnt_component = wnt_chemotaxis_strength*WntConcentration<2>::Instance()->GetWntGradient(p_cell);
+        c_vector<double, 2> wnt_component = wnt_chemotaxis_strength*WntConcentration<2>::Instance()->GetWntGradient(p_cell);
 
         TS_ASSERT_DELTA(new_force[0], old_force[0]+wnt_component[0], 1e-4);
         TS_ASSERT_DELTA(new_force[1], old_force[1]+wnt_component[1], 1e-4);
@@ -342,9 +342,9 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "crypt_projection_spring_system.arch";
 
         {
-            TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
+            TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_2_elements");
 
-            MutableMesh<2,2> mesh;
+            MutableMesh<2, 2> mesh;
             mesh.ConstructFromMeshReader(mesh_reader);
 
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
@@ -470,7 +470,7 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         HoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Set up cells
@@ -494,7 +494,7 @@ public:
 
         // Move a node along the x-axis and calculate the force exerted on a neighbour
         {
-            c_vector<double,2> old_point;
+            c_vector<double, 2> old_point;
             old_point = p_mesh->GetNode(59)->rGetLocation();
             ChastePoint<2> new_point;
             new_point.rGetLocation()[0] = old_point[0]+0.5;
@@ -568,7 +568,7 @@ public:
 
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
-        for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        for (AbstractMesh<2, 2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
                 node_iter != mesh.GetNodeIteratorEnd();
                 ++node_iter)
         {

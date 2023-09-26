@@ -85,7 +85,7 @@ class ContinuumMechanicsNeumannBcsAssembler : public AbstractFeAssemblerInterfac
 
 protected:
     /** The quadratic mesh */
-    AbstractTetrahedralMesh<DIM,DIM>* mpMesh;
+    AbstractTetrahedralMesh<DIM, DIM>* mpMesh;
 
     /** Problem definition, containing the boundary conditions */
     ContinuumMechanicsProblemDefinition<DIM>* mpProblemDefinition;
@@ -109,7 +109,7 @@ protected:
      * @param boundaryConditionIndex into the traction BCs structures in the problem
      *    definition
      */
-    void AssembleOnBoundaryElement(BoundaryElement<DIM-1,DIM>& rElement,
+    void AssembleOnBoundaryElement(BoundaryElement<DIM-1, DIM>& rElement,
                                    c_vector<double, STENCIL_SIZE>& rBElem,
                                    unsigned boundaryConditionIndex);
 
@@ -118,7 +118,7 @@ public:
      *  @param pMesh Pointer to the mesh
      *  @param pProblemDefinition Pointer to the problem definition object
      */
-    ContinuumMechanicsNeumannBcsAssembler(AbstractTetrahedralMesh<DIM,DIM>* pMesh,
+    ContinuumMechanicsNeumannBcsAssembler(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
                                           ContinuumMechanicsProblemDefinition<DIM>* pProblemDefinition)
         : AbstractFeAssemblerInterface<true,false>(),
           mpMesh(pMesh),
@@ -176,7 +176,7 @@ void ContinuumMechanicsNeumannBcsAssembler<DIM>::DoAssemble()
 
         for (unsigned bc_index = 0; bc_index<mpProblemDefinition->rGetTractionBoundaryElements().size(); bc_index++)
         {
-            BoundaryElement<DIM-1,DIM>& r_boundary_element = *(mpProblemDefinition->rGetTractionBoundaryElements()[bc_index]);
+            BoundaryElement<DIM-1, DIM>& r_boundary_element = *(mpProblemDefinition->rGetTractionBoundaryElements()[bc_index]);
             AssembleOnBoundaryElement(r_boundary_element, b_elem, bc_index);
 
             unsigned p_indices[STENCIL_SIZE];
@@ -200,7 +200,7 @@ void ContinuumMechanicsNeumannBcsAssembler<DIM>::DoAssemble()
 }
 
 template<unsigned DIM>
-void ContinuumMechanicsNeumannBcsAssembler<DIM>::AssembleOnBoundaryElement(BoundaryElement<DIM-1,DIM>& rBoundaryElement,
+void ContinuumMechanicsNeumannBcsAssembler<DIM>::AssembleOnBoundaryElement(BoundaryElement<DIM-1, DIM>& rBoundaryElement,
                                                                            c_vector<double,STENCIL_SIZE>& rBelem,
                                                                            unsigned boundaryConditionIndex)
 {
@@ -218,7 +218,7 @@ void ContinuumMechanicsNeumannBcsAssembler<DIM>::AssembleOnBoundaryElement(Bound
         const ChastePoint<DIM-1>& quad_point = mpQuadRule->rGetQuadPoint(quad_index);
         QuadraticBasisFunction<DIM-1>::ComputeBasisFunctions(quad_point, phi);
 
-        c_vector<double,DIM> traction = zero_vector<double>(DIM);
+        c_vector<double, DIM> traction = zero_vector<double>(DIM);
         switch (mpProblemDefinition->GetTractionBoundaryConditionType())
         {
             case ELEMENTWISE_TRACTION:

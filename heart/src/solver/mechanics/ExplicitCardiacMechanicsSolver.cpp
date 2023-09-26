@@ -36,10 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ExplicitCardiacMechanicsSolver.hpp"
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
-ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ExplicitCardiacMechanicsSolver(QuadraticMesh<DIM>& rQuadMesh,
+ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER, DIM>::ExplicitCardiacMechanicsSolver(QuadraticMesh<DIM>& rQuadMesh,
                                                                                       ElectroMechanicsProblemDefinition<DIM>& rProblemDefinition,
                                                                                       std::string outputDirectory)
-    : AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>(rQuadMesh,
+    : AbstractCardiacMechanicsSolver<ELASTICITY_SOLVER, DIM>(rQuadMesh,
                                                             rProblemDefinition,
                                                             outputDirectory)
 {
@@ -47,12 +47,12 @@ ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::ExplicitCardiacMechanicsS
 }
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
-ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::~ExplicitCardiacMechanicsSolver()
+ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER, DIM>::~ExplicitCardiacMechanicsSolver()
 {
 }
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
-void ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::GetActiveTensionAndTensionDerivs(double currentFibreStretch,
+void ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER, DIM>::GetActiveTensionAndTensionDerivs(double currentFibreStretch,
                                                                                              unsigned currentQuadPointGlobalIndex,
                                                                                              bool assembleJacobian,
                                                                                              double& rActiveTension,
@@ -85,7 +85,7 @@ void ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::GetActiveTensionAndT
 }
 
 template<class ELASTICITY_SOLVER,unsigned DIM>
-void ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Solve(double time, double nextTime, double odeTimestep)
+void ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER, DIM>::Solve(double time, double nextTime, double odeTimestep)
 {
     assert(time < nextTime);
     this->mCurrentTime = time;
@@ -111,7 +111,7 @@ void ExplicitCardiacMechanicsSolver<ELASTICITY_SOLVER,DIM>::Solve(double time, d
     ELASTICITY_SOLVER::Solve();
 }
 
-template class ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2>;
-template class ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<3>,3>;
-template class ExplicitCardiacMechanicsSolver<CompressibleNonlinearElasticitySolver<2>,2>;
-template class ExplicitCardiacMechanicsSolver<CompressibleNonlinearElasticitySolver<3>,3>;
+template class ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>, 2>;
+template class ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<3>, 3>;
+template class ExplicitCardiacMechanicsSolver<CompressibleNonlinearElasticitySolver<2>, 2>;
+template class ExplicitCardiacMechanicsSolver<CompressibleNonlinearElasticitySolver<3>, 3>;

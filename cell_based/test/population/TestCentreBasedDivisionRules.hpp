@@ -68,7 +68,7 @@ public:
 
         // Create a simple mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -85,11 +85,11 @@ public:
         CellPtr p_cell0 = cell_population.GetCellUsingLocationIndex(0);
 
         // Set the division rule for our population to be the random direction division rule
-        boost::shared_ptr<AbstractCentreBasedDivisionRule<2,2> > p_division_rule_to_set(new RandomDirectionCentreBasedDivisionRule<2,2>());
+        boost::shared_ptr<AbstractCentreBasedDivisionRule<2, 2> > p_division_rule_to_set(new RandomDirectionCentreBasedDivisionRule<2, 2>());
         cell_population.SetCentreBasedDivisionRule(p_division_rule_to_set);
 
         // Get the division rule back from the population
-        boost::shared_ptr<AbstractCentreBasedDivisionRule<2,2> > p_division_rule = cell_population.GetCentreBasedDivisionRule();
+        boost::shared_ptr<AbstractCentreBasedDivisionRule<2, 2> > p_division_rule = cell_population.GetCentreBasedDivisionRule();
 
         // Get 10000 division vectors, check each length, their mean and their variance
         c_vector<double, 2> average_axis = zero_vector<double>(2);
@@ -132,7 +132,7 @@ public:
     {
         // Create a simple mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -155,7 +155,7 @@ public:
         expected_daughter_location[1] = 3.4;
 
         // Set the division rule for our population to be the random direction division rule
-        typedef FixedCentreBasedDivisionRule<2,2> FixedRule;
+        typedef FixedCentreBasedDivisionRule<2, 2> FixedRule;
         MAKE_PTR_ARGS(FixedRule, p_division_rule_to_set, (expected_daughter_location));
 
         TS_ASSERT_DELTA(p_division_rule_to_set->rGetDaughterLocation()[0], 1.2, 1e-6);
@@ -164,7 +164,7 @@ public:
         cell_population.SetCentreBasedDivisionRule(p_division_rule_to_set);
 
         // Get the division rule back from the population
-        boost::shared_ptr<AbstractCentreBasedDivisionRule<2,2> > p_division_rule = cell_population.GetCentreBasedDivisionRule();
+        boost::shared_ptr<AbstractCentreBasedDivisionRule<2, 2> > p_division_rule = cell_population.GetCentreBasedDivisionRule();
 
         // Check that the division rule returns the correct pair of vectors
         std::pair<c_vector<double, 2>, c_vector<double, 2> > positions = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
@@ -186,7 +186,7 @@ public:
         std::string archive_file = "RandomDirectionCentreBasedDivisionRule.arch";
 
         {
-            boost::shared_ptr<AbstractCentreBasedDivisionRule<2,2> > p_division_rule(new RandomDirectionCentreBasedDivisionRule<2,2>());
+            boost::shared_ptr<AbstractCentreBasedDivisionRule<2, 2> > p_division_rule(new RandomDirectionCentreBasedDivisionRule<2, 2>());
 
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
@@ -195,14 +195,14 @@ public:
         }
 
         {
-            boost::shared_ptr<AbstractCentreBasedDivisionRule<2,2> > p_division_rule;
+            boost::shared_ptr<AbstractCentreBasedDivisionRule<2, 2> > p_division_rule;
 
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
             (*p_arch) >> p_division_rule;
 
-            typedef RandomDirectionCentreBasedDivisionRule<2,2> RandomRule;
+            typedef RandomDirectionCentreBasedDivisionRule<2, 2> RandomRule;
             TS_ASSERT(dynamic_cast<RandomRule*>(p_division_rule.get()));
         }
     }
@@ -217,7 +217,7 @@ public:
             location[0] = -0.73;
             location[1] = 5.82;
 
-            boost::shared_ptr<AbstractCentreBasedDivisionRule<2,2> > p_division_rule(new FixedCentreBasedDivisionRule<2,2>(location));
+            boost::shared_ptr<AbstractCentreBasedDivisionRule<2, 2> > p_division_rule(new FixedCentreBasedDivisionRule<2, 2>(location));
 
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
@@ -226,14 +226,14 @@ public:
         }
 
         {
-            boost::shared_ptr<AbstractCentreBasedDivisionRule<2,2> > p_division_rule;
+            boost::shared_ptr<AbstractCentreBasedDivisionRule<2, 2> > p_division_rule;
 
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
             (*p_arch) >> p_division_rule;
 
-            typedef FixedCentreBasedDivisionRule<2,2> FixedRule;
+            typedef FixedCentreBasedDivisionRule<2, 2> FixedRule;
             TS_ASSERT(dynamic_cast<FixedRule*>(p_division_rule.get()));
 
             c_vector<double, 2> location;

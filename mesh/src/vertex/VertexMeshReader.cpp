@@ -125,7 +125,7 @@ std::vector<double> VertexMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextNode()
     }
 
     double node_value;
-    for (unsigned i=0; i<SPACE_DIM+1; ++i)
+    for (unsigned i = 0; i<SPACE_DIM+1; ++i)
     {
         buffer_stream >> node_value;
         node_data.push_back(node_value);
@@ -160,7 +160,7 @@ ElementData VertexMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextElementData()
 
     // Store node indices owned by this element
     unsigned node_index;
-    for (unsigned i=0; i<num_nodes_in_element; ++i)
+    for (unsigned i = 0; i<num_nodes_in_element; ++i)
     {
         buffer_stream >> node_index;
         element_data.NodeIndices.push_back(node_index - offset);
@@ -206,7 +206,7 @@ VertexElementData VertexMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextElementDataWi
     buffer_stream >> num_nodes_in_element;
 
     // Store node indices owned by this element
-    for (unsigned i=0; i<num_nodes_in_element; ++i)
+    for (unsigned i = 0; i<num_nodes_in_element; ++i)
     {
         unsigned node_index;
         buffer_stream >> node_index;
@@ -218,7 +218,7 @@ VertexElementData VertexMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextElementDataWi
     buffer_stream >> num_faces_in_element;
 
     element_data.Faces.resize(num_faces_in_element);
-    for (unsigned j=0; j<num_faces_in_element; ++j)
+    for (unsigned j = 0; j<num_faces_in_element; ++j)
     {
         // Create data structure for this face
         ElementData face_data;
@@ -233,7 +233,7 @@ VertexElementData VertexMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextElementDataWi
         buffer_stream >> num_nodes_in_face;
 
         // Store node indices owned by this face
-        for (unsigned i=0; i<num_nodes_in_face; ++i)
+        for (unsigned i = 0; i<num_nodes_in_face; ++i)
         {
             unsigned node_index_face;
             buffer_stream >> node_index_face;
@@ -351,9 +351,9 @@ void VertexMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNextLineFromStream(std::ifstre
 
 ///////// Explicit instantiation///////
 
-template class VertexMeshReader<1,1>;
-template class VertexMeshReader<1,2>;
-template class VertexMeshReader<1,3>;
-template class VertexMeshReader<2,2>;
-template class VertexMeshReader<2,3>;
-template class VertexMeshReader<3,3>;
+template class VertexMeshReader<1, 1>;
+template class VertexMeshReader<1, 2>;
+template class VertexMeshReader<1, 3>;
+template class VertexMeshReader<2, 2>;
+template class VertexMeshReader<2, 3>;
+template class VertexMeshReader<3, 3>;

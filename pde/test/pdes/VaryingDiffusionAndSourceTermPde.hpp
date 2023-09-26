@@ -44,8 +44,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * A more complex linear elliptic PDE used in tests. The source and diffusion terms
  * depend on x.
  */
-template <int SPACE_DIM>
-class VaryingDiffusionAndSourceTermPde : public AbstractLinearEllipticPde<SPACE_DIM,SPACE_DIM>
+template<int SPACE_DIM>
+class VaryingDiffusionAndSourceTermPde : public AbstractLinearEllipticPde<SPACE_DIM, SPACE_DIM>
 {
 private:
     double DistanceFromOrigin(const ChastePoint<SPACE_DIM>& x)
@@ -59,12 +59,12 @@ private:
     }
 
 public:
-    double ComputeConstantInUSourceTerm(const ChastePoint<SPACE_DIM>& rX, Element<SPACE_DIM,SPACE_DIM>*)
+    double ComputeConstantInUSourceTerm(const ChastePoint<SPACE_DIM>& rX, Element<SPACE_DIM, SPACE_DIM>*)
     {
         return pow(DistanceFromOrigin(rX), 3.0);
     }
 
-    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<SPACE_DIM>& , Element<SPACE_DIM,SPACE_DIM>*)
+    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<SPACE_DIM>& , Element<SPACE_DIM, SPACE_DIM>*)
     {
         return 0.0;
     }

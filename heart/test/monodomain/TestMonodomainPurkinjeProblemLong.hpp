@@ -148,8 +148,8 @@ public:
 
         // Need to load the mesh ourselves at present, as AbstractCardiacProblem::Initialise will assume a DistributedTetrahedralMesh.
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/cylinder_refined");
-        TrianglesMeshReader<3,3> reader(mesh_base);
-        MixedDimensionMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> reader(mesh_base);
+        MixedDimensionMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(reader);
 
         mesh.Scale(0.1, 0.1, 0.1); // so spatial resolution of mesh is appropriate for cardiac simulation
@@ -160,7 +160,7 @@ public:
             // Set up normal monodomain
             NonPurkinjeCellFactory3d cell_factory_for_just_monodomain;
             HeartConfig::Instance()->SetOutputDirectory("TestMonodomainPurkinje3d_normal");
-            MonodomainProblem<3,3> monodomain_problem(&cell_factory_for_just_monodomain);
+            MonodomainProblem<3, 3> monodomain_problem(&cell_factory_for_just_monodomain);
             monodomain_problem.SetMesh(&mesh);
             monodomain_problem.Initialise();
             monodomain_problem.SetWriteInfo();
@@ -173,7 +173,7 @@ public:
         }
 
         // Set a radius for each purkinje element
-        for (MixedDimensionMesh<3,3>::CableElementIterator iter = mesh.GetCableElementIteratorBegin();
+        for (MixedDimensionMesh<3, 3>::CableElementIterator iter = mesh.GetCableElementIteratorBegin();
              iter != mesh.GetCableElementIteratorEnd();
              ++iter)
         {
@@ -186,7 +186,7 @@ public:
             // Set up Purkinje problem
             HeartConfig::Instance()->SetOutputDirectory("TestMonodomainPurkinje3d_purkinje");
             PurkinjeCellFactory3d cell_factory;
-            MonodomainPurkinjeProblem<3,3> purkinje_problem(&cell_factory);
+            MonodomainPurkinjeProblem<3, 3> purkinje_problem(&cell_factory);
             purkinje_problem.SetMesh(&mesh);
             purkinje_problem.Initialise();
             purkinje_problem.SetWriteInfo();
@@ -204,7 +204,7 @@ public:
         //
         // Note: checked (by looking at SetWriteInfo() output that results are the same at the
         // other times
-        for (AbstractTetrahedralMesh<3,3>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        for (AbstractTetrahedralMesh<3, 3>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
              node_iter != mesh.GetNodeIteratorEnd();
              ++node_iter)
         {

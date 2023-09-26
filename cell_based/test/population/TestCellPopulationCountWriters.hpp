@@ -99,7 +99,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a CellMutationStatesCountWriter and test that the correct output is generated
-        CellMutationStatesCountWriter<2,2> mutation_states_writer;
+        CellMutationStatesCountWriter<2, 2> mutation_states_writer;
         mutation_states_writer.OpenOutputFile(output_file_handler);
         mutation_states_writer.WriteHeader(&cell_population);
         mutation_states_writer.WriteTimeStamp();
@@ -126,7 +126,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellMutationStatesCountWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_population_writer = new CellMutationStatesCountWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_population_writer = new CellMutationStatesCountWriter<2, 2>();
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
             output_arch << p_population_writer;
@@ -134,7 +134,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_population_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_population_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
             input_arch >> p_population_writer_2;
@@ -153,7 +153,7 @@ public:
         nodes.push_back(new Node<3>(2, true,  1.0, 0.0, 1.0));
         nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 1.0));
         nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
-        MutableMesh<3,3> mesh(nodes);
+        MutableMesh<3, 3> mesh(nodes);
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
@@ -167,7 +167,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a CellProliferativePhasesCountWriter and test that the correct output is generated
-        CellProliferativePhasesCountWriter<3,3> phases_count_writer;
+        CellProliferativePhasesCountWriter<3, 3> phases_count_writer;
         phases_count_writer.OpenOutputFile(output_file_handler);
         phases_count_writer.WriteTimeStamp();
         phases_count_writer.Visit(&cell_population);
@@ -193,7 +193,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellProliferativePhasesCountWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_population_writer = new CellProliferativePhasesCountWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_population_writer = new CellProliferativePhasesCountWriter<2, 2>();
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
             output_arch << p_population_writer;
@@ -201,7 +201,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_population_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_population_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
             input_arch >> p_population_writer_2;
@@ -220,7 +220,7 @@ public:
         nodes.push_back(new Node<3>(2, true,  1.0, 0.0, 1.0));
         nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 1.0));
         nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
-        MutableMesh<3,3> mesh(nodes);
+        MutableMesh<3, 3> mesh(nodes);
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
@@ -237,7 +237,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create a CellProliferativeTypesCountWriter and test that the correct output is generated
-        CellProliferativeTypesCountWriter<3,3> types_count_writer;
+        CellProliferativeTypesCountWriter<3, 3> types_count_writer;
         types_count_writer.OpenOutputFile(output_file_handler);
         types_count_writer.WriteTimeStamp();
         types_count_writer.Visit(&cell_population);
@@ -263,7 +263,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellProliferativeTypesCountWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_population_writer = new CellProliferativeTypesCountWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_population_writer = new CellProliferativeTypesCountWriter<2, 2>();
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
             output_arch << p_population_writer;
@@ -271,7 +271,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_population_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_population_writer_2;
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
             input_arch >> p_population_writer_2;

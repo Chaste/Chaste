@@ -58,12 +58,12 @@ AbstractAcinarUnitFactory::~AbstractAcinarUnitFactory()
 {
 }
 
-void AbstractAcinarUnitFactory::SetMesh(AbstractTetrahedralMesh<1,3>* pMesh)
+void AbstractAcinarUnitFactory::SetMesh(AbstractTetrahedralMesh<1, 3>* pMesh)
 {
     mpMesh = pMesh;
 }
 
-AbstractTetrahedralMesh<1,3>* AbstractAcinarUnitFactory::GetMesh()
+AbstractTetrahedralMesh<1, 3>* AbstractAcinarUnitFactory::GetMesh()
 {
     if (mpMesh == nullptr)
     {

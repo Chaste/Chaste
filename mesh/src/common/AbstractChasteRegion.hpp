@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Abstract base class for Chaste regions.
  */
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 class AbstractChasteRegion
 {
     /** Needed for serialization. */
@@ -113,7 +113,7 @@ namespace serialization {
  * This is how to do BOOST_CLASS_VERSION(AbstractChasteRegion, 1) with a 
  * templated class.
  */
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 struct version<AbstractChasteRegion<SPACE_DIM> >
 {
     /** Version number */

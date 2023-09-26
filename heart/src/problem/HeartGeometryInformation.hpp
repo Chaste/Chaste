@@ -125,7 +125,7 @@ private:
     double GetDistanceToEpi(unsigned nodeIndex);
 
     /** The mesh of the problem*/
-    AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* mpMesh;
+    AbstractTetrahedralMesh<SPACE_DIM, SPACE_DIM>* mpMesh;
 
     /** Vector to store the distance map to epicardium*/
     std::vector<double> mDistMapEpicardium;
@@ -178,7 +178,7 @@ public:
      * @param rEndoFile: a file containing a list of global node indices on the endocardial surface
      * @param indexFromZero  true for native triangles files. false for Memfem files which are indexed from 1.
      */
-    HeartGeometryInformation(AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>& rMesh,
+    HeartGeometryInformation(AbstractTetrahedralMesh<SPACE_DIM, SPACE_DIM>& rMesh,
                              const std::string& rEpiFile,
                              const std::string& rEndoFile,
                              bool indexFromZero);
@@ -197,7 +197,7 @@ public:
      * wedge preparation for left or right ventricle, respectively.  That is, the ventricle with a non-empty string.
      * If both are empty strings then throws exception.
      */
-    HeartGeometryInformation (AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>& rMesh,
+    HeartGeometryInformation (AbstractTetrahedralMesh<SPACE_DIM, SPACE_DIM>& rMesh,
                               const std::string& rEpiFile,
                               const std::string& rLVFile,
                               const std::string& rRVFile,

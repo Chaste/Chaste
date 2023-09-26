@@ -56,11 +56,11 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 struct MeshWriterIterators
 {
     /** Iterator over nodes */
-    typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator* pNodeIter;
+    typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator* pNodeIter;
     /** Iterator over elements */
-    typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator* pElemIter;
+    typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator* pElemIter;
     /** Iterator over boundary elements */
-    typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::BoundaryElementIterator* pBoundaryElemIter;
+    typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::BoundaryElementIterator* pBoundaryElemIter;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -78,7 +78,7 @@ AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::AbstractTetrahedralMeshWr
       mpMesh(nullptr),
       mpDistributedMesh(nullptr),
       mpMixedMesh(nullptr),
-      mpIters(new MeshWriterIterators<ELEMENT_DIM,SPACE_DIM>),
+      mpIters(new MeshWriterIterators<ELEMENT_DIM, SPACE_DIM>),
       mNodeCounterForParallelMesh(0),
       mElementCounterForParallelMesh(0),
       mBoundaryElementCounterForParallelMesh(0),
@@ -128,7 +128,7 @@ std::vector<double> AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNe
         {
             // Either this is a sequential mesh (and we own it all)
             // or it's parallel (and the master owns the first chunk)
-            for (unsigned j=0; j<SPACE_DIM; ++j)
+            for (unsigned j = 0; j<SPACE_DIM; ++j)
             {
                 coords[j] = (*(mpIters->pNodeIter))->GetPoint()[j];
             }
@@ -150,7 +150,7 @@ std::vector<double> AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNe
         boost::scoped_array<double> raw_coords(new double[SPACE_DIM]);
         MPI_Recv(raw_coords.get(), SPACE_DIM, MPI_DOUBLE, MPI_ANY_SOURCE, mNodeCounterForParallelMesh, PETSC_COMM_WORLD, &status);
         assert(status.MPI_ERROR == MPI_SUCCESS);
-        for (unsigned j=0; j<coords.size(); ++j)
+        for (unsigned j = 0; j<coords.size(); ++j)
         {
             coords[j] = raw_coords[j];
         }
@@ -160,7 +160,7 @@ std::vector<double> AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNe
     }
     else
     {
-        return AbstractMeshWriter<ELEMENT_DIM,SPACE_DIM>::GetNextNode();
+        return AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextNode();
     }
 }
 
@@ -179,7 +179,7 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElemen
             // Use the iterator
             assert(this->mNumElements == mpMesh->GetNumElements());
 
-            for (unsigned j=0; j<elem_data.NodeIndices.size(); ++j)
+            for (unsigned j = 0; j<elem_data.NodeIndices.size(); ++j)
             {
                 unsigned old_index = (*(mpIters->pElemIter))->GetNodeGlobalIndex(j);
                 elem_data.NodeIndices[j] = mpMesh->IsMeshChanging() ? mpNodeMap->GetNewIndex(old_index) : old_index;
@@ -201,7 +201,7 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElemen
                 assert(elem_data.NodeIndices.size() == mNodesPerElement);
                 assert(!p_element->IsDeleted());
                 // Master can use the local data to recover node indices & attribute
-                for (unsigned j=0; j<mNodesPerElement; ++j)
+                for (unsigned j = 0; j<mNodesPerElement; ++j)
                 {
                     elem_data.NodeIndices[j] = p_element->GetNodeGlobalIndex(j);
                 }
@@ -220,7 +220,7 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElemen
     }
     else // not writing from a mesh
     {
-        return AbstractMeshWriter<ELEMENT_DIM,SPACE_DIM>::GetNextElement();
+        return AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextElement();
     }
 }
 
@@ -239,7 +239,7 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextBounda
             // Use the iterator
             assert(this->mNumBoundaryElements==mpMesh->GetNumBoundaryElements());
 
-            for (unsigned j=0; j<boundary_elem_data.NodeIndices.size(); ++j)
+            for (unsigned j = 0; j<boundary_elem_data.NodeIndices.size(); ++j)
             {
                 unsigned old_index = (*(*(mpIters->pBoundaryElemIter)))->GetNodeGlobalIndex(j);
                 boundary_elem_data.NodeIndices[j] = mpMesh->IsMeshChanging() ? mpNodeMap->GetNewIndex(old_index) : old_index;
@@ -260,7 +260,7 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextBounda
                 assert(!p_boundary_element->IsDeleted());
 
                 // Master can use the local data to recover node indices & attribute
-                for (unsigned j=0; j<ELEMENT_DIM; ++j)
+                for (unsigned j = 0; j<ELEMENT_DIM; ++j)
                 {
                     boundary_elem_data.NodeIndices[j] = p_boundary_element->GetNodeGlobalIndex(j);
                 }
@@ -279,7 +279,7 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextBounda
     }
     else // not writing from a mesh
     {
-        return AbstractMeshWriter<ELEMENT_DIM,SPACE_DIM>::GetNextBoundaryElement();
+        return AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextBoundaryElement();
     }
 }
 
@@ -305,7 +305,7 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextCableE
             assert(!p_element->IsDeleted());
 
             // Master can use the local data to recover node indices & attribute
-            for (unsigned j=0; j<2; ++j)
+            for (unsigned j = 0; j<2; ++j)
             {
                 elem_data.NodeIndices[j] = p_element->GetNodeGlobalIndex(j);
             }
@@ -323,7 +323,7 @@ ElementData AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextCableE
     }
     else // not writing from a mesh
     {
-        return AbstractMeshWriter<ELEMENT_DIM,SPACE_DIM>::GetNextCableElement();
+        return AbstractMeshWriter<ELEMENT_DIM, SPACE_DIM>::GetNextCableElement();
     }
 }
 
@@ -373,7 +373,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteNclFile(
         // Write each node's data
         unsigned default_marker = UINT_MAX;
 
-        typedef typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator NodeIterType;
+        typedef typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator NodeIterType;
         for (NodeIterType iter = rMesh.GetNodeIteratorBegin();
              iter != rMesh.GetNodeIteratorEnd();
              ++iter)
@@ -439,7 +439,7 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteNclFile(
 ///\todo #1322 Mesh should be const
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
-      AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,
+      AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
       bool keepOriginalElementIndexing)
 {
     this->mpMeshReader = nullptr;
@@ -450,13 +450,13 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
     this->mNumBoundaryElements = mpMesh->GetNumBoundaryElements();
     this->mNumCableElements = mpMesh->GetNumCableElements();
 
-    typedef typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator NodeIterType;
+    typedef typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator NodeIterType;
     mpIters->pNodeIter = new NodeIterType(mpMesh->GetNodeIteratorBegin());
 
-    typedef typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator ElemIterType;
+    typedef typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator ElemIterType;
     mpIters->pElemIter = new ElemIterType(mpMesh->GetElementIteratorBegin());
 
-    typedef typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::BoundaryElementIterator BoundaryElemIterType;
+    typedef typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::BoundaryElementIterator BoundaryElemIterType;
     mpIters->pBoundaryElemIter = new BoundaryElemIterType(mpMesh->GetBoundaryElementIteratorBegin());
 
     // Use this process's first element to gauge the size of all the elements
@@ -479,11 +479,11 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
 
     // Have we got a parallel mesh?
     ///\todo #1322 This should be const too
-    mpDistributedMesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
+    mpDistributedMesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* >(&rMesh);
 
     // Have we got a MixedDimensionMesh?
     ///\todo #1322,  This should be const too
-    mpMixedMesh = dynamic_cast<MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* >(this->mpMesh);
+    mpMixedMesh = dynamic_cast<MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>* >(this->mpMesh);
 
     if (mpDistributedMesh != nullptr)
     {
@@ -544,10 +544,10 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
             MeshEventHandler::BeginEvent(MeshEventHandler::NODE);
             boost::scoped_array<double> raw_coords(new double[SPACE_DIM]);
             // Slaves concentrate the Nodes
-            typedef typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator NodeIterType;
+            typedef typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator NodeIterType;
             for (NodeIterType it = mpMesh->GetNodeIteratorBegin(); it != mpMesh->GetNodeIteratorEnd(); ++it)
             {
-                for (unsigned j=0; j<SPACE_DIM; ++j)
+                for (unsigned j = 0; j<SPACE_DIM; ++j)
                 {
                     raw_coords[j] = it->GetPoint()[j];
                 }
@@ -559,13 +559,13 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
             MeshEventHandler::BeginEvent(MeshEventHandler::ELE);
             // Slaves concentrate the Elements for which they are owners
             boost::scoped_array<unsigned> raw_indices(new unsigned[mNodesPerElement]); // Assuming that we don't have parallel quadratic elements
-            typedef typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator ElementIterType;
+            typedef typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ElementIterator ElementIterType;
             for (ElementIterType it = mpMesh->GetElementIteratorBegin(); it != mpMesh->GetElementIteratorEnd(); ++it)
             {
                 unsigned index = it->GetIndex();
                 if (mpDistributedMesh->CalculateDesignatedOwnershipOfElement(index) == true)
                 {
-                    for (unsigned j=0; j<mNodesPerElement; ++j)
+                    for (unsigned j = 0; j<mNodesPerElement; ++j)
                     {
                         raw_indices[j] = it->GetNodeGlobalIndex(j);
                     }
@@ -579,13 +579,13 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
             if (ELEMENT_DIM != 1)  /// \todo #2351 Also exclude VTK writer
             {
                 boost::scoped_array<unsigned> raw_face_indices(new unsigned[ELEMENT_DIM]); // Assuming that we don't have parallel quadratic meshes
-                typedef typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::BoundaryElementIterator BoundaryElementIterType;
+                typedef typename AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::BoundaryElementIterator BoundaryElementIterType;
                 for (BoundaryElementIterType it = mpMesh->GetBoundaryElementIteratorBegin(); it != mpMesh->GetBoundaryElementIteratorEnd(); ++it)
                 {
                     unsigned index = (*it)->GetIndex();
                     if (mpDistributedMesh->CalculateDesignatedOwnershipOfBoundaryElement(index) == true)
                     {
-                        for (unsigned j=0; j<ELEMENT_DIM; ++j)
+                        for (unsigned j = 0; j<ELEMENT_DIM; ++j)
                         {
                             raw_face_indices[j] = (*it)->GetNodeGlobalIndex(j);
                         }
@@ -599,14 +599,14 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingParal
             // Slaves concentrate the cable elements for which they are owners
             if (mpMixedMesh)
             {
-                typedef typename MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>::CableElementIterator CableElementIterType;
+                typedef typename MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>::CableElementIterator CableElementIterType;
                 for (CableElementIterType it = mpMixedMesh->GetCableElementIteratorBegin(); it != mpMixedMesh->GetCableElementIteratorEnd(); ++it)
                 {
                     unsigned index =(*it)->GetIndex();
                     if (mpMixedMesh->CalculateDesignatedOwnershipOfCableElement(index) == true)
                     {
                         unsigned raw_cable_element_indices[2];
-                        for (unsigned j=0; j<2; ++j)
+                        for (unsigned j = 0; j<2; ++j)
                         {
                             raw_cable_element_indices[j] = (*it)->GetNodeGlobalIndex(j);
                         }
@@ -674,9 +674,9 @@ void AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesFooter()
 // LCOV_EXCL_STOP
 
 // Explicit instantiation
-template class AbstractTetrahedralMeshWriter<1,1>;
-template class AbstractTetrahedralMeshWriter<1,2>;
-template class AbstractTetrahedralMeshWriter<1,3>;
-template class AbstractTetrahedralMeshWriter<2,2>;
-template class AbstractTetrahedralMeshWriter<2,3>;
-template class AbstractTetrahedralMeshWriter<3,3>;
+template class AbstractTetrahedralMeshWriter<1, 1>;
+template class AbstractTetrahedralMeshWriter<1, 2>;
+template class AbstractTetrahedralMeshWriter<1, 3>;
+template class AbstractTetrahedralMeshWriter<2, 2>;
+template class AbstractTetrahedralMeshWriter<2, 3>;
+template class AbstractTetrahedralMeshWriter<3, 3>;

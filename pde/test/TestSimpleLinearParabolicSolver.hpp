@@ -92,7 +92,7 @@ public:
 /*
  * Subclass of LinearParabolicSolver used to check that the IncrementInterpolatedQuantities and related methods are called correctly.
  */
-class InterpolatedQuantitiesLinearParabolicSolver2d : public SimpleLinearParabolicSolver<2,2>
+class InterpolatedQuantitiesLinearParabolicSolver2d : public SimpleLinearParabolicSolver<2, 2>
 {
 public:
 
@@ -103,10 +103,10 @@ public:
 
     double totalPhiI;
 
-    InterpolatedQuantitiesLinearParabolicSolver2d(AbstractTetrahedralMesh<2,2>* pMesh,
-                                                AbstractLinearParabolicPde<2,2>* pPde,
-                                                BoundaryConditionsContainer<2,2,1>* pBoundaryConditions)
-        : SimpleLinearParabolicSolver<2,2>(pMesh,
+    InterpolatedQuantitiesLinearParabolicSolver2d(AbstractTetrahedralMesh<2, 2>* pMesh,
+                                                AbstractLinearParabolicPde<2, 2>* pPde,
+                                                BoundaryConditionsContainer<2, 2, 1>* pBoundaryConditions)
+        : SimpleLinearParabolicSolver<2, 2>(pMesh,
                                            pPde,
                                            pBoundaryConditions),
           numResetCalled(0),
@@ -160,21 +160,21 @@ public:
     void TestSimpleLinearParabolicSolver1DZeroDirich()
     {
         // Create mesh from mesh reader
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
         HeatEquation<1> pde;
 
         // Create zero Dirichlet boundary conditions at first and last node
-        BoundaryConditionsContainer<1,1,1> bcc;
+        BoundaryConditionsContainer<1, 1, 1> bcc;
         ConstBoundaryCondition<1>* p_boundary_condition = new ConstBoundaryCondition<1>(0.0);
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(0), p_boundary_condition);
         bcc.AddDirichletBoundaryCondition(mesh.GetNode( mesh.GetNumNodes()-1 ), p_boundary_condition);
 
         // Create PDE solver
-        SimpleLinearParabolicSolver<1,1> solver(&mesh,&pde,&bcc);
+        SimpleLinearParabolicSolver<1, 1> solver(&mesh,&pde,&bcc);
 
         // Set start and end times and timestep
         TS_ASSERT_THROWS_THIS(solver.SetTimes(1.0, 0.0),"Start time has to be less than end time");
@@ -217,22 +217,22 @@ public:
     void TestSimpleLinearParabolicSolver1DZeroDirichWithSourceTerm()
     {
         // Create mesh from mesh reader
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
         HeatEquationWithSourceTerm<1> pde;
 
         // Create zero Dirichlet boundary conditions
-        BoundaryConditionsContainer<1,1,1> bcc;
+        BoundaryConditionsContainer<1, 1, 1> bcc;
         ConstBoundaryCondition<1>* p_boundary_condition = new ConstBoundaryCondition<1>(0.0);
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(0), p_boundary_condition);
         p_boundary_condition = new ConstBoundaryCondition<1>(-0.5);
         bcc.AddDirichletBoundaryCondition(mesh.GetNode( mesh.GetNumNodes()-1 ), p_boundary_condition);
 
         // Create PDE solver
-        SimpleLinearParabolicSolver<1,1> solver(&mesh,&pde,&bcc);
+        SimpleLinearParabolicSolver<1, 1> solver(&mesh,&pde,&bcc);
 
         // Set start and end times and timestep
         double t_end = 0.1;
@@ -269,25 +269,25 @@ public:
     void TestSimpleLinearParabolicSolverNonzeroNeumannCondition()
     {
         // Create mesh from mesh reader
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
         HeatEquation<1> pde;
 
         // Create boundary conditions u(0)=0, u'(1)=1
-        BoundaryConditionsContainer<1,1,1> bcc;
+        BoundaryConditionsContainer<1, 1, 1> bcc;
         ConstBoundaryCondition<1>* p_boundary_condition = new ConstBoundaryCondition<1>(0);
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(0), p_boundary_condition);
 
         ConstBoundaryCondition<1>* p_neumann_boundary_condition = new ConstBoundaryCondition<1>(1.0);
-        TetrahedralMesh<1,1>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorEnd();
+        TetrahedralMesh<1, 1>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorEnd();
         iter--;
         bcc.AddNeumannBoundaryCondition(*iter, p_neumann_boundary_condition);
 
         // Create PDE solver
-        SimpleLinearParabolicSolver<1,1> solver(&mesh,&pde,&bcc);
+        SimpleLinearParabolicSolver<1, 1> solver(&mesh,&pde,&bcc);
 
         // Set start and end times and timestep
         solver.SetTimes(0, 0.5);
@@ -324,15 +324,15 @@ public:
     void TestSimpleLinearParabolicSolver2DZeroDirich()
     {
         // Read mesh on [0,1]x[0,1]
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
         HeatEquation<2> pde;
 
         // Create zero Dirichlet boundary conditions
-        BoundaryConditionsContainer<2,2,1> bcc;
+        BoundaryConditionsContainer<2, 2, 1> bcc;
         bcc.DefineZeroDirichletOnMeshBoundary(&mesh);
 
         // Create PDE solver
@@ -448,16 +448,16 @@ public:
     void TestSimpleLinearParabolicSolver2DNonzeroDirichWithSourceTerm()
     {
         // Create mesh from mesh reader
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
         HeatEquationWithSourceTerm<2> pde;
 
         // Create non-zero Dirichlet boundary conditions
-        BoundaryConditionsContainer<2,2,1> bcc;
-        TetrahedralMesh<2,2>::BoundaryNodeIterator iter = mesh.GetBoundaryNodeIteratorBegin();
+        BoundaryConditionsContainer<2, 2, 1> bcc;
+        TetrahedralMesh<2, 2>::BoundaryNodeIterator iter = mesh.GetBoundaryNodeIteratorBegin();
         while (iter != mesh.GetBoundaryNodeIteratorEnd())
         {
             double x = (*iter)->GetPoint()[0];
@@ -469,7 +469,7 @@ public:
         }
 
         // Create PDE solver
-        SimpleLinearParabolicSolver<2,2> solver(&mesh,&pde,&bcc);
+        SimpleLinearParabolicSolver<2, 2> solver(&mesh,&pde,&bcc);
 
         // Set start and end times and timestep
         double t_end = 0.1;
@@ -509,19 +509,19 @@ public:
     void xTestSimpleLinearParabolicSolver2DNonzeroDirichletWithSourceTermOnFineMeshWithSmallDt()
     {
         // Create mesh from mesh reader
-        FemlabMeshReader<2,2> mesh_reader("mesh/test/data/",
+        FemlabMeshReader<2, 2> mesh_reader("mesh/test/data/",
                                           "femlab_square_nodes.dat",
                                           "femlab_square_elements.dat",
                                           "femlab_square_edges.dat");
-        TetrahedralMesh<2,2> mesh;
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
         HeatEquationWithSourceTerm<2> pde;
 
         // Create non-zero Dirichlet boundary conditions
-        BoundaryConditionsContainer<2,2,1> bcc;
-        TetrahedralMesh<2,2>::BoundaryNodeIterator iter = mesh.GetBoundaryNodeIteratorEnd();
+        BoundaryConditionsContainer<2, 2, 1> bcc;
+        TetrahedralMesh<2, 2>::BoundaryNodeIterator iter = mesh.GetBoundaryNodeIteratorEnd();
         while (iter != mesh.GetBoundaryNodeIteratorEnd())
         {
             double x = (*iter)->GetPoint()[0];
@@ -533,7 +533,7 @@ public:
         }
 
         // Create PDE solver
-        SimpleLinearParabolicSolver<2,2> solver(&mesh,&pde,&bcc);
+        SimpleLinearParabolicSolver<2, 2> solver(&mesh,&pde,&bcc);
 
         // Set start and end times and timestep
         double t_end = 0.1;
@@ -582,16 +582,16 @@ public:
     void TestSimpleLinearParabolicSolver2DMixedOnCoarseMesh()
     {
         // Create mesh from mesh reader
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
         HeatEquation<2> pde;
 
         // Create mixed boundary conditions
-        BoundaryConditionsContainer<2,2,1> bcc;
-        TetrahedralMesh<2,2>::BoundaryNodeIterator iter = mesh.GetBoundaryNodeIteratorBegin();
+        BoundaryConditionsContainer<2, 2, 1> bcc;
+        TetrahedralMesh<2, 2>::BoundaryNodeIterator iter = mesh.GetBoundaryNodeIteratorBegin();
         while (iter != mesh.GetBoundaryNodeIteratorEnd())
         {
             double x = (*iter)->GetPoint()[0];
@@ -606,7 +606,7 @@ public:
             iter++;
         }
 
-        TetrahedralMesh<2,2>::BoundaryElementIterator surf_iter = mesh.GetBoundaryElementIteratorBegin();
+        TetrahedralMesh<2, 2>::BoundaryElementIterator surf_iter = mesh.GetBoundaryElementIteratorBegin();
         ConstBoundaryCondition<2>* p_neumann_boundary_condition =
             new ConstBoundaryCondition<2>(1.0);
 
@@ -623,7 +623,7 @@ public:
         }
 
         // Create PDE solver
-        SimpleLinearParabolicSolver<2,2> solver(&mesh,&pde,&bcc);
+        SimpleLinearParabolicSolver<2, 2> solver(&mesh,&pde,&bcc);
 
         // Set start and end times and timestep
         double t_end = 0.1;
@@ -662,20 +662,20 @@ public:
     void TestSimpleLinearParabolicSolver2DMixed()
     {
         // Create mesh from mesh reader
-        FemlabMeshReader<2,2> mesh_reader("mesh/test/data/",
+        FemlabMeshReader<2, 2> mesh_reader("mesh/test/data/",
                                           "femlab_square_nodes.dat",
                                           "femlab_square_elements.dat",
                                           "femlab_square_edges.dat");
 
-        TetrahedralMesh<2,2> mesh;
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
         HeatEquation<2> pde;
 
         // Create mixed boundary conditions
-        BoundaryConditionsContainer<2,2,1> bcc;
-        TetrahedralMesh<2,2>::BoundaryNodeIterator iter = mesh.GetBoundaryNodeIteratorBegin();
+        BoundaryConditionsContainer<2, 2, 1> bcc;
+        TetrahedralMesh<2, 2>::BoundaryNodeIterator iter = mesh.GetBoundaryNodeIteratorBegin();
 
         while (iter != mesh.GetBoundaryNodeIteratorEnd())
         {
@@ -692,7 +692,7 @@ public:
             iter++;
         }
 
-        TetrahedralMesh<2,2>::BoundaryElementIterator surf_iter = mesh.GetBoundaryElementIteratorBegin();
+        TetrahedralMesh<2, 2>::BoundaryElementIterator surf_iter = mesh.GetBoundaryElementIteratorBegin();
         ConstBoundaryCondition<2>* p_neumann_boundary_condition = new ConstBoundaryCondition<2>(1.0);
         while (surf_iter != mesh.GetBoundaryElementIteratorEnd())
         {
@@ -708,7 +708,7 @@ public:
         }
 
         // Create PDE solver
-        SimpleLinearParabolicSolver<2,2> solver(&mesh,&pde,&bcc);
+        SimpleLinearParabolicSolver<2, 2> solver(&mesh,&pde,&bcc);
 
         // Set start and end times and timestep
         solver.SetTimes(0, 0.1);
@@ -746,16 +746,16 @@ public:
     void TestHeatEquationSolutionDoesntDrift2D()
     {
         // Create mesh from mesh reader
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
         HeatEquation<2> pde;
 
         // Create non-zero constant Dirichlet boundary conditions
-        BoundaryConditionsContainer<2,2,1> bcc;
-        TetrahedralMesh<2,2>::BoundaryNodeIterator iter = mesh.GetBoundaryNodeIteratorBegin();
+        BoundaryConditionsContainer<2, 2, 1> bcc;
+        TetrahedralMesh<2, 2>::BoundaryNodeIterator iter = mesh.GetBoundaryNodeIteratorBegin();
         ConstBoundaryCondition<2>* dirichlet_bc = new ConstBoundaryCondition<2>(-84.5);
         while (iter < mesh.GetBoundaryNodeIteratorEnd())
         {
@@ -764,7 +764,7 @@ public:
         }
 
         // Create PDE solver
-        SimpleLinearParabolicSolver<2,2> solver(&mesh,&pde,&bcc);
+        SimpleLinearParabolicSolver<2, 2> solver(&mesh,&pde,&bcc);
 
         // Set start and end times and timestep
         double t_end = 1.0;
@@ -793,16 +793,16 @@ public:
     void TestHeatEquationSolutionDoesntDrift1D()
     {
         // Create mesh from mesh reader
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
         HeatEquation<1> pde;
 
         // Create non-zero constant Dirichlet boundary conditions
-        BoundaryConditionsContainer<1,1,1> bcc;
-        TetrahedralMesh<1,1>::BoundaryNodeIterator iter = mesh.GetBoundaryNodeIteratorBegin();
+        BoundaryConditionsContainer<1, 1, 1> bcc;
+        TetrahedralMesh<1, 1>::BoundaryNodeIterator iter = mesh.GetBoundaryNodeIteratorBegin();
         ConstBoundaryCondition<1>* dirichlet_bc = new ConstBoundaryCondition<1>(-84.5);
         while (iter < mesh.GetBoundaryNodeIteratorEnd())
         {
@@ -811,7 +811,7 @@ public:
         }
 
         // Create PDE solver
-        SimpleLinearParabolicSolver<1,1> solver(&mesh,&pde,&bcc);
+        SimpleLinearParabolicSolver<1, 1> solver(&mesh,&pde,&bcc);
 
         // Set start and end times and timestep
         double t_end = 1;
@@ -863,16 +863,16 @@ public:
     void DONOT_TestSimpleLinearParabolicSolver2DZeroNeumannNonZeroInCentre()
     {
         // Read mesh on [0,1]x[0,1]
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/2D_0_to_1mm_400_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
         HeatEquation<2> pde;
 
         // Create zero Neumann boundary condition
-        BoundaryConditionsContainer<2,2,1> bcc;
-        TetrahedralMesh<2,2>::BoundaryElementIterator surf_iter = mesh.GetBoundaryElementIteratorBegin();
+        BoundaryConditionsContainer<2, 2, 1> bcc;
+        TetrahedralMesh<2, 2>::BoundaryElementIterator surf_iter = mesh.GetBoundaryElementIteratorBegin();
         ConstBoundaryCondition<2>* p_neumann_boundary_condition = new ConstBoundaryCondition<2>(0.0);
         while (surf_iter < mesh.GetBoundaryElementIteratorEnd())
         {
@@ -881,7 +881,7 @@ public:
         }
 
         // Create PDE solver
-        SimpleLinearParabolicSolver<2,2> solver(&mesh,&pde,&bcc);
+        SimpleLinearParabolicSolver<2, 2> solver(&mesh,&pde,&bcc);
 
         /*
          * Set  initial condition u(0,x,y) = sin(x*pi)*sin(y*pi) as this
@@ -966,21 +966,21 @@ public:
     void Test1DProblemUsingTimeAdaptivityController()
     {
         // Create mesh from mesh reader
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Instantiate PDE object
         HeatEquation<1> pde;
 
         // Create zero Dicihlet boundary conditions
-        BoundaryConditionsContainer<1,1,1> bcc;
+        BoundaryConditionsContainer<1, 1, 1> bcc;
         ConstBoundaryCondition<1>* p_boundary_condition = new ConstBoundaryCondition<1>(0.0);
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(0), p_boundary_condition);
         bcc.AddDirichletBoundaryCondition(mesh.GetNode( mesh.GetNumNodes()-1 ), p_boundary_condition);
 
         // Create PDE solver
-        SimpleLinearParabolicSolver<1,1> solver(&mesh,&pde,&bcc);
+        SimpleLinearParabolicSolver<1, 1> solver(&mesh,&pde,&bcc);
 
         ToyController controller;
 

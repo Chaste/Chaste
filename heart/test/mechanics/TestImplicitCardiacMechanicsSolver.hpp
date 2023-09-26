@@ -48,11 +48,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TetrahedralMesh.hpp"
 
 // useful typedef
-typedef ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2> IncompressibleImplicitSolver2d;
-typedef ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<3>,3> IncompressibleImplicitSolver3d;
+typedef ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>, 2> IncompressibleImplicitSolver2d;
+typedef ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<3>, 3> IncompressibleImplicitSolver3d;
 
 // helper function - the frobenius norm of a matrix (though any norm would have done).
-double MatrixNorm(c_matrix<double,2,2> mat)
+double MatrixNorm(c_matrix<double,2, 2> mat)
 {
     return sqrt(mat(0,0)*mat(0,0)+mat(0,1)*mat(0,1)+mat(1,0)*mat(1,0)+mat(1,1)*mat(1,1));
 }
@@ -88,9 +88,9 @@ public:
             IncompressibleImplicitSolver2d solver(mesh,problem_defn,"");
 
             //The following lines are not relevant to this test but need to be there
-            TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+            TetrahedralMesh<2, 2>* p_fine_mesh = new TetrahedralMesh<2, 2>();//unused in this test
             p_fine_mesh->ConstructRegularSlabMesh(1.0,1.0,1.0);
-            TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+            TetrahedralMesh<2, 2>* p_coarse_mesh = new TetrahedralMesh<2, 2>();//unused in this test
             p_coarse_mesh->ConstructRegularSlabMesh(1.0,1.0,1.0);
             FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
             p_pair->SetUpBoxesOnFineMesh();
@@ -186,9 +186,9 @@ public:
         IncompressibleImplicitSolver2d solver(mesh,problem_defn,"ImplicitCardiacMech/ZeroActiveTension");
 
         //The following lines are not relevant to this test but need to be there
-        TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        TetrahedralMesh<2, 2>* p_fine_mesh = new TetrahedralMesh<2, 2>();//unused in this test
         p_fine_mesh->ConstructRegularSlabMesh(0.125, 1.0, 1.0);
-        TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        TetrahedralMesh<2, 2>* p_coarse_mesh = new TetrahedralMesh<2, 2>();//unused in this test
         p_coarse_mesh->ConstructRegularSlabMesh(0.125, 1.0, 1.0);
         FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
         p_pair->SetUpBoxesOnFineMesh();
@@ -238,9 +238,9 @@ public:
         QuadraturePointsGroup<2> quad_points(mesh, *(solver.GetQuadratureRule()));
 
         //The following lines are not relevant to this test but need to be there
-        TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        TetrahedralMesh<2, 2>* p_fine_mesh = new TetrahedralMesh<2, 2>();//unused in this test
         p_fine_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
-        TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        TetrahedralMesh<2, 2>* p_coarse_mesh = new TetrahedralMesh<2, 2>();//unused in this test
         p_coarse_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
         FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
         p_pair->SetUpBoxesOnFineMesh();
@@ -360,9 +360,9 @@ public:
             IncompressibleImplicitSolver2d solver(mesh,problem_defn,"ImplicitCardiacMech/FibresInYDirection");
 
             //The following lines are not relevant to this test but need to be there
-            TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+            TetrahedralMesh<2, 2>* p_fine_mesh = new TetrahedralMesh<2, 2>();//unused in this test
             p_fine_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
-            TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+            TetrahedralMesh<2, 2>* p_coarse_mesh = new TetrahedralMesh<2, 2>();//unused in this test
             p_coarse_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
             FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
             p_pair->SetUpBoxesOnFineMesh();
@@ -374,12 +374,12 @@ public:
 
             if (run==1)
             {
-                c_matrix<double,2,2> non_orthogonal_mat = zero_matrix<double>(2,2);
+                c_matrix<double,2, 2> non_orthogonal_mat = zero_matrix<double>(2,2);
                 non_orthogonal_mat(0,0) = 1.0;
                 TS_ASSERT_THROWS_CONTAINS(solver.SetConstantFibreSheetDirections(non_orthogonal_mat), "not orthogonal");
 
                 // ortho matrix = [0 1; 1 0], ie fibres in Y direction
-                c_matrix<double,2,2> ortho_matrix = zero_matrix<double>(2,2);
+                c_matrix<double,2, 2> ortho_matrix = zero_matrix<double>(2,2);
                 ortho_matrix(0,1) = 1.0;
                 ortho_matrix(1,0) = 1.0;
                 solver.SetConstantFibreSheetDirections(ortho_matrix);
@@ -451,9 +451,9 @@ public:
         problem_defn.SetMechanicsSolveTimestep(0.01); //This is only set to make ElectroMechanicsProblemDefinition::Validate pass
 
         //The following lines are not relevant to this test but need to be there
-        TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        TetrahedralMesh<2, 2>* p_fine_mesh = new TetrahedralMesh<2, 2>();//unused in this test
         p_fine_mesh->ConstructRegularSlabMesh(1.0, 1.0, 1.0);
-        TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        TetrahedralMesh<2, 2>* p_coarse_mesh = new TetrahedralMesh<2, 2>();//unused in this test
         p_coarse_mesh->ConstructRegularSlabMesh(1.0, 1.0, 1.0);
         FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
         p_pair->SetUpBoxesOnFineMesh();
@@ -501,9 +501,9 @@ public:
         IncompressibleImplicitSolver2d solver(mesh,problem_defn,"");
 
         //The following lines are not relevant to this test but need to be there
-        TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        TetrahedralMesh<2, 2>* p_fine_mesh = new TetrahedralMesh<2, 2>();//unused in this test
         p_fine_mesh->ConstructRegularSlabMesh(1.0, 1.0, 1.0);
-        TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        TetrahedralMesh<2, 2>* p_coarse_mesh = new TetrahedralMesh<2, 2>();//unused in this test
         p_coarse_mesh->ConstructRegularSlabMesh(1.0, 1.0, 1.0);
         FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
         p_pair->SetUpBoxesOnFineMesh();
@@ -515,7 +515,7 @@ public:
 
         // compute the stretches, they should be 1
         std::vector<double> stretches(mesh.GetNumElements());
-        std::vector<c_matrix<double,2,2> > deformation_gradients(mesh.GetNumElements());
+        std::vector<c_matrix<double,2, 2> > deformation_gradients(mesh.GetNumElements());
 
         // initialise to junk
         for (unsigned i = 0; i<stretches.size(); ++i)
@@ -548,7 +548,7 @@ public:
         // stretches should still be 1, F should be equal to [1,0;0,0.9]
         solver.ComputeDeformationGradientAndStretchInEachElement(deformation_gradients, stretches);
 
-        c_matrix<double,2,2> correct_F = identity_matrix<double>(2);
+        c_matrix<double,2, 2> correct_F = identity_matrix<double>(2);
         correct_F(1,1) = 0.9;        //in need of deletion even if all these 3 have no influence at all on this test
 
         for (unsigned i = 0; i<stretches.size(); ++i)
@@ -604,9 +604,9 @@ public:
         IncompressibleImplicitSolver2d solver(mesh, problem_defn, "ImplicitCardiacMech/FibresInYDirectionDefinePerQuadPoint");
 
         //The following lines are not relevant to this test but need to be there
-        TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        TetrahedralMesh<2, 2>* p_fine_mesh = new TetrahedralMesh<2, 2>();//unused in this test
         p_fine_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
-        TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+        TetrahedralMesh<2, 2>* p_coarse_mesh = new TetrahedralMesh<2, 2>();//unused in this test
         p_coarse_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
         FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
         p_pair->SetUpBoxesOnFineMesh();
@@ -705,7 +705,7 @@ public:
 
             // The following lines are not relevant to this test but need to be there
             // as the solver is expecting an electrics node to be paired up with each mechanics node.
-            TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//electrics ignored in this test
+            TetrahedralMesh<2, 2>* p_fine_mesh = new TetrahedralMesh<2, 2>();//electrics ignored in this test
             p_fine_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0);
             FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, mesh);
             p_pair->SetUpBoxesOnFineMesh();
@@ -795,7 +795,7 @@ public:
 
         // The following lines are not relevant to this test but need to be there
         // as the solver is expecting an electrics node to be paired up with each mechanics node.
-        TetrahedralMesh<3,3>* p_fine_mesh = new TetrahedralMesh<3,3>();//electrics ignored in this test
+        TetrahedralMesh<3, 3>* p_fine_mesh = new TetrahedralMesh<3, 3>();//electrics ignored in this test
         p_fine_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0, 1.0);
         FineCoarseMeshPair<3>* p_pair = new FineCoarseMeshPair<3>(*p_fine_mesh, mesh);
         p_pair->SetUpBoxesOnFineMesh();
@@ -886,7 +886,7 @@ public:
 
         // The following lines are not relevant to this test but need to be there
         // as the solver is expecting an electrics node to be paired up with each mechanics node.
-        TetrahedralMesh<3,3>* p_fine_mesh = new TetrahedralMesh<3,3>();//electrics ignored in this test
+        TetrahedralMesh<3, 3>* p_fine_mesh = new TetrahedralMesh<3, 3>();//electrics ignored in this test
         p_fine_mesh->ConstructRegularSlabMesh(0.25, 1.0, 1.0, 1.0);
         FineCoarseMeshPair<3>* p_pair = new FineCoarseMeshPair<3>(*p_fine_mesh, mesh);
         p_pair->SetUpBoxesOnFineMesh();
@@ -970,9 +970,9 @@ public:
 //
 //        IncompressibleImplicitSolver2d solver(NHS, mesh, problem_defn, "ImplicitCardiacMech/CompareWithExplicit",&law);
 //          //The following lines are not relevant to this test but need to be there
-//          TetrahedralMesh<2,2>* p_fine_mesh = new TetrahedralMesh<2,2>();//unused in this test
+//          TetrahedralMesh<2, 2>* p_fine_mesh = new TetrahedralMesh<2, 2>();//unused in this test
 //          p_fine_mesh->ConstructRegularSlabMesh(0.125, 1.0, 1.0);
-//          TetrahedralMesh<2,2>* p_coarse_mesh = new TetrahedralMesh<2,2>();//unused in this test
+//          TetrahedralMesh<2, 2>* p_coarse_mesh = new TetrahedralMesh<2, 2>();//unused in this test
 //          p_coarse_mesh->ConstructRegularSlabMesh(0.125, 1.0, 1.0);
 //          FineCoarseMeshPair<2>* p_pair = new FineCoarseMeshPair<2>(*p_fine_mesh, *p_coarse_mesh);//also unused in this test
 //          p_pair->SetUpBoxesOnFineMesh();

@@ -114,7 +114,7 @@ public:
          * cells) wide, and 2 nodes high.
          */
         HoneycombMeshGenerator generator(2, 2);
-        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_generating_mesh = generator.GetMesh();
         /* Once we have a {{{MutableMesh}}} we can generate a {{{NodesOnlyMesh}}} from it using the
          * following commands. Note you can also generate the {{{NodesOnlyMesh}}} from a collection of
          * nodes, see  [class:NodesOnlyMesh NodesOnlyMesh] for details.
@@ -188,7 +188,7 @@ public:
      * EMPTYLINE
      *
      * In the second test we run a simple node-based simulation in 3D. This is very similar
-     * to the 2D test with the dimension template (<2,2> and <2>) changed from 2 to 3 and instead of using a mesh
+     * to the 2D test with the dimension template (<2, 2> and <2>) changed from 2 to 3 and instead of using a mesh
      * generator we generate the nodes directly.
      */
     void TestSpheroid()
@@ -319,7 +319,7 @@ public:
          *
          * First we set the centre (0,0,1) and radius of the sphere (1).
          */
-        c_vector<double,3> centre = zero_vector<double>(3);
+        c_vector<double, 3> centre = zero_vector<double>(3);
         centre(2) = 1.0;
         double radius = 1.0;
         /* We then make a pointer to the boundary condition using the MAKE_PTR_ARGS macro, and pass

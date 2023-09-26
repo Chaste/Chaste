@@ -107,7 +107,7 @@ protected:
     static const unsigned STENCIL_SIZE = DIM*NUM_NODES_PER_ELEMENT + NUM_VERTICES_PER_ELEMENT;
 
     /** The quadratic mesh */
-    AbstractTetrahedralMesh<DIM,DIM>* mpMesh;
+    AbstractTetrahedralMesh<DIM, DIM>* mpMesh;
 
     /** Quadrature rule for volume integrals */
     GaussianQuadratureRule<DIM>* mpQuadRule;
@@ -143,8 +143,8 @@ protected:
     virtual c_matrix<double,SPATIAL_BLOCK_SIZE_ELEMENTAL,SPATIAL_BLOCK_SIZE_ELEMENTAL> ComputeSpatialSpatialMatrixTerm(
         c_vector<double, NUM_NODES_PER_ELEMENT>& rQuadPhi,
         c_matrix<double, DIM, NUM_NODES_PER_ELEMENT>& rGradQuadPhi,
-        c_vector<double,DIM>& rX,
-        Element<DIM,DIM>* pElement)
+        c_vector<double, DIM>& rX,
+        Element<DIM, DIM>* pElement)
     {
         return zero_matrix<double>(SPATIAL_BLOCK_SIZE_ELEMENTAL,SPATIAL_BLOCK_SIZE_ELEMENTAL);
     }
@@ -176,8 +176,8 @@ protected:
         c_matrix<double, DIM, NUM_NODES_PER_ELEMENT>& rGradQuadPhi,
         c_vector<double, NUM_VERTICES_PER_ELEMENT>& rLinearPhi,
         c_matrix<double, DIM, NUM_VERTICES_PER_ELEMENT>& rGradLinearPhi,
-        c_vector<double,DIM>& rX,
-        Element<DIM,DIM>* pElement)
+        c_vector<double, DIM>& rX,
+        Element<DIM, DIM>* pElement)
     {
         return zero_matrix<double>(SPATIAL_BLOCK_SIZE_ELEMENTAL,PRESSURE_BLOCK_SIZE_ELEMENTAL);
     }
@@ -205,8 +205,8 @@ protected:
     virtual c_matrix<double,PRESSURE_BLOCK_SIZE_ELEMENTAL,PRESSURE_BLOCK_SIZE_ELEMENTAL> ComputePressurePressureMatrixTerm(
         c_vector<double, NUM_VERTICES_PER_ELEMENT>& rLinearPhi,
         c_matrix<double, DIM, NUM_VERTICES_PER_ELEMENT>& rGradLinearPhi,
-        c_vector<double,DIM>& rX,
-        Element<DIM,DIM>* pElement)
+        c_vector<double, DIM>& rX,
+        Element<DIM, DIM>* pElement)
     {
         return zero_matrix<double>(PRESSURE_BLOCK_SIZE_ELEMENTAL,PRESSURE_BLOCK_SIZE_ELEMENTAL);
     }
@@ -237,8 +237,8 @@ protected:
     virtual c_vector<double,SPATIAL_BLOCK_SIZE_ELEMENTAL> ComputeSpatialVectorTerm(
         c_vector<double, NUM_NODES_PER_ELEMENT>& rQuadPhi,
         c_matrix<double, DIM, NUM_NODES_PER_ELEMENT>& rGradQuadPhi,
-        c_vector<double,DIM>& rX,
-        Element<DIM,DIM>* pElement) = 0;
+        c_vector<double, DIM>& rX,
+        Element<DIM, DIM>* pElement) = 0;
 
 
     /**
@@ -266,8 +266,8 @@ protected:
     virtual c_vector<double,PRESSURE_BLOCK_SIZE_ELEMENTAL> ComputePressureVectorTerm(
             c_vector<double, NUM_VERTICES_PER_ELEMENT>& rLinearPhi,
             c_matrix<double, DIM, NUM_VERTICES_PER_ELEMENT>& rGradLinearPhi,
-            c_vector<double,DIM>& rX,
-            Element<DIM,DIM>* pElement)
+            c_vector<double, DIM>& rX,
+            Element<DIM, DIM>* pElement)
     {
         return zero_vector<double>(PRESSURE_BLOCK_SIZE_ELEMENTAL);
     }
@@ -442,8 +442,8 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
                                                                                                          c_matrix<double, STENCIL_SIZE, STENCIL_SIZE >& rAElem,
                                                                                                          c_vector<double, STENCIL_SIZE>& rBElem)
 {
-    static c_matrix<double,DIM,DIM> jacobian;
-    static c_matrix<double,DIM,DIM> inverse_jacobian;
+    static c_matrix<double, DIM, DIM> jacobian;
+    static c_matrix<double, DIM, DIM> inverse_jacobian;
     double jacobian_determinant;
 
     mpMesh->GetInverseJacobianForElement(rElement.GetIndex(), jacobian, jacobian_determinant, inverse_jacobian);
@@ -464,7 +464,7 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
     static c_matrix<double, DIM, NUM_NODES_PER_ELEMENT> grad_quad_phi;
     static c_matrix<double, DIM, NUM_VERTICES_PER_ELEMENT> grad_linear_phi;
 
-    c_vector<double,DIM> body_force;
+    c_vector<double, DIM> body_force;
 
     // Loop over Gauss points
     for (unsigned quadrature_index = 0; quadrature_index < mpQuadRule->GetNumQuadPoints(); quadrature_index++)
@@ -479,7 +479,7 @@ void AbstractContinuumMechanicsAssembler<DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MA
         LinearBasisFunction<DIM>::ComputeTransformedBasisFunctionDerivatives(quadrature_point, inverse_jacobian, grad_linear_phi);
 
         // interpolate X (ie physical location of this quad point).
-        c_vector<double,DIM> X = zero_vector<double>(DIM);
+        c_vector<double, DIM> X = zero_vector<double>(DIM);
         for (unsigned vertex_index = 0; vertex_index<NUM_VERTICES_PER_ELEMENT; vertex_index++)
         {
             for (unsigned j = 0; j < DIM; ++j)

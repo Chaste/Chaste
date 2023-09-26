@@ -421,9 +421,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     }
 
 template<>
-void OdeSystemInformation<CorriasBuistICCModified>::Initialise(void)
+void OdeSystemInformation<CorriasBuistICCModified>::Initialise()
 {
-
     this->mSystemName = "ICC_model_Martincode";
 
     this->mVariableNames.push_back("Vm");

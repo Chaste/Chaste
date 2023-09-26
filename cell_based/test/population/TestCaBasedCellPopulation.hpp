@@ -396,7 +396,7 @@ public:
         cell_population.WriteVtkResultsToFile(output_directory);
 
         // Read VTK file and check it doesn't cause any problems
-        VtkMeshReader<2,2> vtk_reader(results_dir + "/results_0.vtu");
+        VtkMeshReader<2, 2> vtk_reader(results_dir + "/results_0.vtu");
 
         // The first cell is labelled; the remaining cells are wild type
         std::vector<double> mutation_states_data;
@@ -893,7 +893,7 @@ public:
 
         CaBasedCellPopulation<2u> cell_population(*p_mesh, cells, location_indices);
 
-        TetrahedralMesh<2,2>* p_tet_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
+        TetrahedralMesh<2, 2>* p_tet_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
 
         // Check it has the correct number of nodes and elements
         TS_ASSERT_EQUALS(p_tet_mesh->GetNumNodes(), p_mesh->GetNumNodes());

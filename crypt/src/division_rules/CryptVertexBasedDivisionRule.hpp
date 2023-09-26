@@ -51,7 +51,7 @@ template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
  * unless dealing with a 'stem' cell in the absence of a Wnt gradient. For use in
  * CryptSimulation2d.
  */
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 class CryptVertexBasedDivisionRule : public AbstractVertexBasedDivisionRule<SPACE_DIM>
 {
 private:

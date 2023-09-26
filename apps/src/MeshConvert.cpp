@@ -76,9 +76,9 @@ int main(int argc, char *argv[])
 
             ExecutableSupport::Print("Opening "+base+" mesh file(s).");
 
-            std::shared_ptr<AbstractMeshReader<3,3> > p_mesh_reader = GenericMeshReader<3,3>(argv[1]);
+            std::shared_ptr<AbstractMeshReader<3, 3> > p_mesh_reader = GenericMeshReader<3, 3>(argv[1]);
             //We have to make a mesh so that we can get the node connectivity list back
-            DistributedTetrahedralMesh<3,3> mesh;
+            DistributedTetrahedralMesh<3, 3> mesh;
             mesh.ConstructFromMeshReader(*p_mesh_reader);
 
             //Find a dot
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
                 base_for_output.resize(pos);
             }
             base_for_output = base_for_output + "_bin";
-            TrianglesMeshWriter<3,3> mesh_writer("", base_for_output);
+            TrianglesMeshWriter<3, 3> mesh_writer("", base_for_output);
             ExecutableSupport::Print("Writing  " + base_for_output + ".node etc. mesh file in " + mesh_writer.GetOutputDirectory());
             mesh_writer.SetWriteFilesAsBinary();
             mesh_writer.WriteFilesUsingMesh(mesh);

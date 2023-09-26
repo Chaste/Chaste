@@ -636,7 +636,7 @@ public class Visualize2dVertexCells implements ActionListener, AdjustmentListene
                 node_positions[time_step] = new RealPoint[memory_factor*current_num_nodes];
                 is_boundary_nodes[time_step] = new int[memory_factor*current_num_nodes];
 
-                for (int i=0; i<current_num_nodes; i++) 
+                for (int i = 0; i<current_num_nodes; i++) 
                 {
                     double d1 = Double.valueOf(st_node.nextToken()).doubleValue();
                     double d2 = Double.valueOf(st_node.nextToken()).doubleValue();
@@ -681,7 +681,7 @@ public class Visualize2dVertexCells implements ActionListener, AdjustmentListene
                    	double this_element_centroid_position_y = 0.0;
                    	int index[] = new int[num_nodes_in_this_element];
 
-                   	for (int i=0; i<num_nodes_in_this_element; i++)
+                   	for (int i = 0; i<num_nodes_in_this_element; i++)
                    	{
                    		int node_index = Integer.parseInt(st_element.nextToken());
                    		element_nodes[time_step][num_entries_covered + i] = node_index;
@@ -804,9 +804,9 @@ public class Visualize2dVertexCells implements ActionListener, AdjustmentListene
         max_y = -1e12;
         min_x =  1e12;
         min_y =  1e12;
-        for (int row=0; row<numTimeSteps; row++)
+        for (int row = 0; row<numTimeSteps; row++)
         {
-           for (int j=0; j<numNodes[row]; j++) 
+           for (int j = 0; j<numNodes[row]; j++) 
            {
                if (node_positions[row][j].x > max_x) 
                {
@@ -834,12 +834,12 @@ public class Visualize2dVertexCells implements ActionListener, AdjustmentListene
     public static void ConvertCylindricalDataToPlane()
     {
         // Scan through each element
-        for (int time_index=0; time_index<numTimeSteps; time_index++)
+        for (int time_index = 0; time_index<numTimeSteps; time_index++)
     	{
             image_nodes[time_index] = new int[memory_factor*numNodes[time_index]]; // reserve plenty of memory
             
             // Fill image_nodes with an identity map (at each time step each node maps to itself)            
-            for (int i=0; i<numNodes[time_index]; i++) 
+            for (int i = 0; i<numNodes[time_index]; i++) 
             {
                 image_nodes[time_index][i] = i;
             }
@@ -847,13 +847,13 @@ public class Visualize2dVertexCells implements ActionListener, AdjustmentListene
             if (elementFilePresent)
             {
             	int num_entries_covered = 0;
-            	for (int i=0; i<numElements[time_index]; i++)
+            	for (int i = 0; i<numElements[time_index]; i++)
                 {   
                 	int num_nodes_in_this_element = element_num_nodes[time_index][i];	        	
         	       	int index[] = new int[num_nodes_in_this_element];
         	       	
         	       	RealPoint real_points[] = new RealPoint[num_nodes_in_this_element];
-        	       	for (int j=0; j<num_nodes_in_this_element; j++)
+        	       	for (int j = 0; j<num_nodes_in_this_element; j++)
         	        {
         	       		// Global index of each node
         	        	index[j] = element_nodes[time_index][num_entries_covered + j];
@@ -862,7 +862,7 @@ public class Visualize2dVertexCells implements ActionListener, AdjustmentListene
         	        }
         	       	
                     // Identify pairs of nodes that are a long way apart
-        	       	for (int j=0; j<num_nodes_in_this_element; j++)
+        	       	for (int j = 0; j<num_nodes_in_this_element; j++)
         	       	{
         	       		for (int k=j+1; k<num_nodes_in_this_element; k++)
             	       	{
@@ -1059,7 +1059,7 @@ class CustomVertexCanvas2D extends Canvas implements MouseMotionListener
         {
 	        // For a Potts sim Draw All nodes before anything else 
         	// to get nodes that are not in any elements, i.e. medium
-			for (int i=0; i<vis.numNodes[vis.timeStep]; i++)
+			for (int i = 0; i<vis.numNodes[vis.timeStep]; i++)
 			{
 			    PlotPoint p = scale(vis.node_positions[vis.timeStep][i]);
 			
@@ -1072,11 +1072,11 @@ class CustomVertexCanvas2D extends Canvas implements MouseMotionListener
 			
 	        // Calculate the containing elements for each node
 			int num_entries_covered = 0;
-			for (int i=0; i<vis.numElements[vis.timeStep]; i++)
+			for (int i = 0; i<vis.numElements[vis.timeStep]; i++)
 		    {	
 		      	int num_nodes_in_this_element = vis.element_num_nodes[vis.timeStep][i];	        	
 		       	int global_index;
-		       	for (int j=0; j<num_nodes_in_this_element; j++)
+		       	for (int j = 0; j<num_nodes_in_this_element; j++)
 		        {
 		        	global_index = vis.element_nodes[vis.timeStep][num_entries_covered + j];
 		        	containing_elements[global_index] = i;
@@ -1088,14 +1088,14 @@ class CustomVertexCanvas2D extends Canvas implements MouseMotionListener
                 
 	    // Draw elements first
         int num_entries_covered = 0;
-	    for (int i=0; i < vis.numElements[vis.timeStep]; i++)
+	    for (int i = 0; i < vis.numElements[vis.timeStep]; i++)
 	    {	
 	      	int num_nodes_in_this_element = vis.element_num_nodes[vis.timeStep][i];	        	
 	       	int index[] = new int[num_nodes_in_this_element];
 	       	
 	       	PlotPoint vertices[] = new PlotPoint[num_nodes_in_this_element];
 	       	RealPoint real_points[] = new RealPoint[num_nodes_in_this_element];
-	       	for (int j=0; j<num_nodes_in_this_element; j++)
+	       	for (int j = 0; j<num_nodes_in_this_element; j++)
 	        {
 	        	// What nodes are we joining up?
 	        	index[j] = vis.element_nodes[vis.timeStep][num_entries_covered + j];
@@ -1106,7 +1106,7 @@ class CustomVertexCanvas2D extends Canvas implements MouseMotionListener
 	       	num_entries_covered = num_entries_covered + num_nodes_in_this_element;
 	       	
 	        // Where are they? Convert to integer pixels	           
-	        for (int j=0; j<num_nodes_in_this_element; j++)
+	        for (int j = 0; j<num_nodes_in_this_element; j++)
 	        {
 	        	vertices[j] = scale(real_points[j]);
 	        }
@@ -1117,7 +1117,7 @@ class CustomVertexCanvas2D extends Canvas implements MouseMotionListener
 	            {
 	                int xpoints[] = new int[num_nodes_in_this_element];
 	                int ypoints[] = new int[num_nodes_in_this_element];
-	                for (int node=0; node<num_nodes_in_this_element; node++)
+	                for (int node = 0; node<num_nodes_in_this_element; node++)
 	                {
 	                	xpoints[node] = vertices[node].x;
 	                	ypoints[node] = vertices[node].y;
@@ -1129,7 +1129,7 @@ class CustomVertexCanvas2D extends Canvas implements MouseMotionListener
 	                // Plot cell boundary lines
 	                g2.setColor(Color.black);
 	                
-	                for (int node=0; node<num_nodes_in_this_element; node++)
+	                for (int node = 0; node<num_nodes_in_this_element; node++)
 	                {
 	                	g2.drawLine(xpoints[node], 
 	                			    ypoints[node], 
@@ -1142,13 +1142,13 @@ class CustomVertexCanvas2D extends Canvas implements MouseMotionListener
 
         // Draw nodes second so that dots are on top of lines Loop over elements so dont plot image nodes
 	    num_entries_covered = 0;
-	    for (int i=0; i < vis.numElements[vis.timeStep]; i++)
+	    for (int i = 0; i < vis.numElements[vis.timeStep]; i++)
 	    {	
 	      	int num_nodes_in_this_element = vis.element_num_nodes[vis.timeStep][i];	        	
 	       	int global_index;
 	       	PlotPoint point;
 	       	RealPoint real_point;
-	       	for (int j=0; j<num_nodes_in_this_element; j++)
+	       	for (int j = 0; j<num_nodes_in_this_element; j++)
 	        {
 	        	global_index = vis.element_nodes[vis.timeStep][num_entries_covered + j];
 				real_point = vis.node_positions[vis.timeStep][global_index];      	
@@ -1175,7 +1175,7 @@ class CustomVertexCanvas2D extends Canvas implements MouseMotionListener
 	    	        
 	    	        int xpoints[] = new int[4];
 	                int ypoints[] = new int[4];
-	                for (int node=0; node<4; node++)
+	                for (int node = 0; node<4; node++)
 	                {
 	                	xpoints[node] = square_vertices[node].x;
 	                	ypoints[node] = square_vertices[node].y;
@@ -1190,7 +1190,7 @@ class CustomVertexCanvas2D extends Canvas implements MouseMotionListener
 	                Stroke dashed_stroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 1, 0 }, 0);
 	                g2.setStroke(dashed_stroke);
 	                
-	                for (int node=0; node<4; node++)
+	                for (int node = 0; node<4; node++)
 	                {
 	                	g2.drawLine(xpoints[node], 
 	                			    ypoints[node], 
@@ -1427,7 +1427,7 @@ class CustomVertexCanvas2D extends Canvas implements MouseMotionListener
         RealPoint real_position = unscale(mouse_position);
 
         int nearest_node_index = -1;
-        for (int i=0; i<vis.numNodes[vis.timeStep]; i++) 
+        for (int i = 0; i<vis.numNodes[vis.timeStep]; i++) 
         {
             int sq_dist = SquaredDistance(scale(vis.node_positions[vis.timeStep][i]), mouse_position);
             if (sq_dist < node_radius*node_radius)
@@ -1449,7 +1449,7 @@ class CustomVertexCanvas2D extends Canvas implements MouseMotionListener
         }
 
         int nearest_element_centroid_index = -1;
-        for (int i=0; i<vis.numElements[vis.timeStep]; i++) 
+        for (int i = 0; i<vis.numElements[vis.timeStep]; i++) 
         {
             int sq_dist = SquaredDistance(scale(vis.element_centroid_positions[vis.timeStep][i]), mouse_position);
             if (sq_dist < node_radius*node_radius)

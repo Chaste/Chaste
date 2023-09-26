@@ -35,14 +35,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Edge.hpp"
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 Edge<SPACE_DIM>::Edge(unsigned index)
     : mIndex(index),
       mIsDeleted(false)
 {
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 Edge<SPACE_DIM>::Edge(unsigned index,
                       Node<SPACE_DIM>* pNodeA,
                       Node<SPACE_DIM>* pNodeB)
@@ -52,7 +52,7 @@ Edge<SPACE_DIM>::Edge(unsigned index,
     this->SetNodes(pNodeA, pNodeB);
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 std::pair<unsigned, unsigned> Edge<SPACE_DIM>::GenerateMapIndex(unsigned indexA,
                                                                 unsigned indexB)
 {
@@ -216,7 +216,7 @@ bool Edge<SPACE_DIM>::IsBoundaryEdge() const
     return mElementIndices.size()<=1;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 bool Edge<SPACE_DIM>::operator==(const Edge<SPACE_DIM>& rEdge) const
 {
     return this->ContainsNode(rEdge.GetNode(0)) && this->ContainsNode(rEdge.GetNode(1));

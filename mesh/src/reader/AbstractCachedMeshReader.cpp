@@ -224,9 +224,9 @@ unsigned AbstractCachedMeshReader<ELEMENT_DIM, SPACE_DIM>::GetNumFaces() const
 }
 
 // Explicit instantiation
-template class AbstractCachedMeshReader<1,1>;
-template class AbstractCachedMeshReader<1,2>;
-template class AbstractCachedMeshReader<1,3>;
-template class AbstractCachedMeshReader<2,2>;
-template class AbstractCachedMeshReader<2,3>;
-template class AbstractCachedMeshReader<3,3>;
+template class AbstractCachedMeshReader<1, 1>;
+template class AbstractCachedMeshReader<1, 2>;
+template class AbstractCachedMeshReader<1, 3>;
+template class AbstractCachedMeshReader<2, 2>;
+template class AbstractCachedMeshReader<2, 3>;
+template class AbstractCachedMeshReader<3, 3>;

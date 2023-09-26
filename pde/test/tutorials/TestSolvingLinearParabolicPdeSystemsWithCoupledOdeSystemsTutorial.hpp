@@ -117,8 +117,8 @@ public:
     void TestSchnackenbergSystemOnButterflyMesh()
     {
         /* As usual, we first create a mesh. Here we are using a 2d mesh of a butterfly-shaped domain. */
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/butterfly");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/butterfly");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         /* We scale the mesh to an appropriate size. */
@@ -135,10 +135,10 @@ public:
          * given by the spatially uniform steady state solution of the Schnackenberg system,
          * given by u = (k,,1,, + k,,2,,)/k,,-1,,, v = k,,2,,k,,-1,,^2^/k,,3,,(k,,1,, + k,,2,,)^2^.
          */
-        BoundaryConditionsContainer<2,2,2> bcc;
+        BoundaryConditionsContainer<2, 2, 2> bcc;
         ConstBoundaryCondition<2>* p_bc_for_u = new ConstBoundaryCondition<2>(2.0);
         ConstBoundaryCondition<2>* p_bc_for_v = new ConstBoundaryCondition<2>(0.75);
-        for (TetrahedralMesh<2,2>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
+        for (TetrahedralMesh<2, 2>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
              node_iter != mesh.GetBoundaryNodeIteratorEnd();
              ++node_iter)
         {
@@ -150,7 +150,7 @@ public:
          * which takes in the mesh, the PDE system, the boundary conditions and optionally
          * a vector of ODE systems (one for each node in the mesh). Since in this example
          * we are solving a system of coupled PDEs only, we do not supply this last argument. */
-        LinearParabolicPdeSystemWithCoupledOdeSystemSolver<2,2,2> solver(&mesh, &pde, &bcc);
+        LinearParabolicPdeSystemWithCoupledOdeSystemSolver<2, 2, 2> solver(&mesh, &pde, &bcc);
 
         /* Then we set the end time and time step and the output directory to which results will be written. */
         double t_end = 10;

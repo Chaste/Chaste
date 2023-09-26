@@ -89,10 +89,10 @@ OdeSolution AbstractGeneralizedRushLarsenCardiacCell::Compute(double tStart, dou
     // Loop over time
     double v_old, v_new;
     double& r_V = rGetStateVariables()[GetVoltageIndex()];
-    for (unsigned i=0; i<n_steps; ++i)
+    for (unsigned i = 0; i<n_steps; ++i)
     {
         double curr_time = tStart;
-        for (unsigned j=0; j<n_small_steps; ++j)
+        for (unsigned j = 0; j<n_small_steps; ++j)
         {
             curr_time = tStart + i*tSamp + j*mDt;
             v_old = r_V;

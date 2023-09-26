@@ -53,7 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * conductivity tensors.
  *
  */
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 class BidomainTissue : public virtual AbstractCardiacTissue<SPACE_DIM>
 {
 private:
@@ -75,7 +75,7 @@ private:
     }
 
     /** Extracellular conductivity tensors. */
-    AbstractConductivityTensors<SPACE_DIM,SPACE_DIM> *mpExtracellularConductivityTensors;
+    AbstractConductivityTensors<SPACE_DIM, SPACE_DIM> *mpExtracellularConductivityTensors;
 
     /**
      * Convenience method for extracellular conductivity tensors creation
@@ -95,7 +95,7 @@ public:
      *
      * @param pMesh  a pointer to the AbstractTetrahedral mesh (recovered from archive).
      */
-    BidomainTissue(AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* pMesh);
+    BidomainTissue(AbstractTetrahedralMesh<SPACE_DIM, SPACE_DIM>* pMesh);
 
     /**
      * Destructor
@@ -122,7 +122,7 @@ template<class Archive, unsigned SPACE_DIM>
 inline void save_construct_data(
     Archive & ar, const BidomainTissue<SPACE_DIM> * t, const unsigned int file_version)
 {
-    const AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* p_mesh = t->pGetMesh();
+    const AbstractTetrahedralMesh<SPACE_DIM, SPACE_DIM>* p_mesh = t->pGetMesh();
     ar & p_mesh;
 
     // CreateIntracellularConductivityTensor() is called by constructor and uses HeartConfig. So make sure that it is
@@ -140,7 +140,7 @@ template<class Archive, unsigned SPACE_DIM>
 inline void load_construct_data(
     Archive & ar, BidomainTissue<SPACE_DIM> * t, const unsigned int file_version)
 {
-    AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* p_mesh;
+    AbstractTetrahedralMesh<SPACE_DIM, SPACE_DIM>* p_mesh;
     ar & p_mesh;
 
     // CreateIntracellularConductivityTensor() is called by AbstractCardiacTissue constructor and uses HeartConfig.

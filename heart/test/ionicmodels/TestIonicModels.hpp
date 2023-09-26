@@ -99,7 +99,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestIonicModels : public CxxTest::TestSuite
 {
 public:
-    void TestSolveForNoble98WithSimpleStimulus(void)
+    void TestSolveForNoble98WithSimpleStimulus()
     {
         clock_t ck_start, ck_end;
 
@@ -165,7 +165,7 @@ public:
         TS_ASSERT_DELTA(n98_ode_system.GetStateVariable("membrane_voltage"),new_value,1e-9);
     }
 
-    void TestSolveForNoble98WithSacWithSimpleStimulus(void)
+    void TestSolveForNoble98WithSacWithSimpleStimulus()
     {
         clock_t ck_start, ck_end;
 
@@ -218,7 +218,7 @@ public:
     }
 
 
-    void TestSolveForNoble98WithSacStretchActivated(void)
+    void TestSolveForNoble98WithSacStretchActivated()
     {
         clock_t ck_start, ck_end;
 
@@ -245,7 +245,7 @@ public:
         CheckCellModelResults("N98Sac_StretchActivatedResult");
     }
 
-    void TestSolveForOptimisedNoble98WithSimpleStimulus(void)
+    void TestSolveForOptimisedNoble98WithSimpleStimulus()
     {
         clock_t ck_start, ck_end;
 
@@ -302,7 +302,7 @@ public:
     }
 
 
-    void TestSolverForHH52WithSimpleStimulus(void)
+    void TestSolverForHH52WithSimpleStimulus()
     {
         clock_t ck_start, ck_end;
 
@@ -341,14 +341,14 @@ public:
         std::vector<double> state_variables_copy = hh52_be.GetStdVecStateVariables();
         hh52_be.ResetToInitialConditions();
         hh52_be.SolveAndUpdateState(0.0, end_time);
-        for (unsigned i=0; i<hh52_be.GetNumberOfStateVariables(); ++i)
+        for (unsigned i = 0; i<hh52_be.GetNumberOfStateVariables(); ++i)
         {
             TS_ASSERT_DELTA(hh52_be.GetStateVariable(i), state_variables_copy[i], 1e-6);
         }
     }
 
 
-    void TestSolverForFHN61WithSimpleStimulus(void)
+    void TestSolverForFHN61WithSimpleStimulus()
     {
         clock_t ck_start, ck_end;
 
@@ -403,7 +403,7 @@ public:
     }
 
 
-    void TestSolverForLR91WithDelayedSimpleStimulus(void)
+    void TestSolverForLR91WithDelayedSimpleStimulus()
     {
         clock_t ck_start, ck_end;
 
@@ -458,7 +458,7 @@ public:
         // For coverage
         lr91_ode_system.ResetToInitialConditions();
         std::vector<double> inits = lr91_ode_system.GetInitialConditions();
-        for (unsigned i=0; i<inits.size(); ++i)
+        for (unsigned i = 0; i<inits.size(); ++i)
         {
             TS_ASSERT_EQUALS(lr91_ode_system.rGetStateVariables()[i], inits[i]);
         }
@@ -466,7 +466,7 @@ public:
         TS_ASSERT_DELTA(lr91_ode_system.GetParameter(1u),23,1e-12);
     }
 
-    void TestSolverForLR91WithRegularStimulus(void)
+    void TestSolverForLR91WithRegularStimulus()
     {
         // Set stimulus
         double magnitude = -25.5;
@@ -500,7 +500,7 @@ public:
         TS_ASSERT_DELTA(lr91_ode_system.GetVoltage(), v, 1e-10);
     }
 
-    void TestBackwardEulerLr91WithDelayedSimpleStimulus(void)
+    void TestBackwardEulerLr91WithDelayedSimpleStimulus()
     {
         clock_t ck_start, ck_end;
         // Set stimulus
@@ -576,7 +576,7 @@ public:
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.01);
     }
 
-    void TestSolverForFR2000WithDelayedSimpleStimulus(void)
+    void TestSolverForFR2000WithDelayedSimpleStimulus()
     {
         clock_t ck_start, ck_end;
 
@@ -645,7 +645,7 @@ public:
     }
 
 
-    void TestSolverForFR2000WithVariablePotassiumCurrents(void)
+    void TestSolverForFR2000WithVariablePotassiumCurrents()
     {
         // Set stimulus
         double magnitude = -25.5;
@@ -697,7 +697,7 @@ public:
     }
 
 
-    void TestSolverForFox2002WithRegularStimulus(void)
+    void TestSolverForFox2002WithRegularStimulus()
     {
         clock_t ck_start, ck_end;
 
@@ -749,7 +749,7 @@ public:
 
     }
 
-    void TestSolveForBackwardNoble98WithSimpleStimulus(void)
+    void TestSolveForBackwardNoble98WithSimpleStimulus()
     {
         clock_t ck_start, ck_end;
 
@@ -790,7 +790,7 @@ public:
         ///\todo compare with the forward results?
     }
 
-    void TestSolveForTT06WithSimpleStimulus(void)
+    void TestSolveForTT06WithSimpleStimulus()
     {
 
         // This is a shortened test. Longer tests correctly produced AP
@@ -834,7 +834,7 @@ public:
         TS_ASSERT_DELTA(TT_model_initial.GetIIonic(), 0.0012 , 1e-3);
     }
 
-    void TestBackwardEulerTenTusscher06(void)
+    void TestBackwardEulerTenTusscher06()
     {
         clock_t ck_start, ck_end;
         // Set stimulus
@@ -880,7 +880,7 @@ public:
           << backward << std::endl;
     }
 
-    void TestDifrancescoNoble1985(void)
+    void TestDifrancescoNoble1985()
     {
         // Set stimulus (no stimulus in this case because this cell is self excitatory)
         boost::shared_ptr<ZeroStimulus> p_stimulus(new ZeroStimulus);
@@ -907,7 +907,7 @@ public:
         TS_ASSERT_THROWS_THIS(purkinje_ode_system.UseCellMLDefaultStimulus(),"This class has no default stimulus from CellML metadata.");
     }
 
-    void TestMahajan2008(void)
+    void TestMahajan2008()
     {
         // Set stimulus
         double magnitude_stimulus = -1800;
@@ -938,7 +938,7 @@ public:
         CheckCellModelResults("Mahajan2008");
     }
 
-    void TestBackwardEulerMahajan(void)
+    void TestBackwardEulerMahajan()
     {
         clock_t ck_start, ck_end;
         // Set stimulus
@@ -984,7 +984,7 @@ public:
                   << backward << std::endl;
     }
 
-    void TestMaleckar(void)
+    void TestMaleckar()
     {
         boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(-5.6, // Changed because now it is in the right units.
                                                                           6,
@@ -1023,7 +1023,7 @@ public:
     }
 //    Uncomment the includes for the models too
 //
-//    void TestSolverForN98WithSimpleStimulus(void)
+//    void TestSolverForN98WithSimpleStimulus()
 //    {
 //        clock_t ck_start, ck_end;
 //
@@ -1080,7 +1080,7 @@ public:
 //
 //    }
 
-    void TestLR1991AndN98WithSacArchiving(void)
+    void TestLR1991AndN98WithSacArchiving()
     {
         //Archive
         OutputFileHandler handler("archive", false);
@@ -1150,7 +1150,7 @@ public:
         }
     }
 
-    void TestMaleckar2009Archiving(void)
+    void TestMaleckar2009Archiving()
     {
         //Archive
         OutputFileHandler handler("archive", false);
@@ -1206,7 +1206,7 @@ public:
         }
     }
 
-    void TestBackwardCellsArchiving(void)
+    void TestBackwardCellsArchiving()
     {
         //Archive
         OutputFileHandler handler("archive", false);
@@ -1324,7 +1324,7 @@ public:
         }
      }
 
-    void TestCodegenArchiving(void)
+    void TestCodegenArchiving()
     {
         //Archive
         OutputFileHandler handler("archive", false);

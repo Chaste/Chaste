@@ -216,7 +216,7 @@ double NhsContractionModel::GetActiveTension()
 }
 
 template<>
-void OdeSystemInformation<NhsContractionModel>::Initialise(void)
+void OdeSystemInformation<NhsContractionModel>::Initialise()
 {
     this->mVariableNames.push_back("CalciumTroponin");
     this->mVariableUnits.push_back("microMols");

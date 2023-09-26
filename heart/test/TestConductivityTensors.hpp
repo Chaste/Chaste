@@ -44,21 +44,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DistributedTetrahedralMesh.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
-typedef AxisymmetricConductivityTensors<2,2> AXI_2D;
+typedef AxisymmetricConductivityTensors<2, 2> AXI_2D;
 
 class TestConductivityTensors : public CxxTest::TestSuite
 {
 public:
     void TestConstantTensor3D()
     {
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructCuboid(1,1,1);
 
-        OrthotropicConductivityTensors<3,3> ortho_tensors;
+        OrthotropicConductivityTensors<3, 3> ortho_tensors;
         ortho_tensors.SetConstantConductivities(Create_c_vector(2.1, 0.8, 0.135));
         ortho_tensors.Init(&mesh);
 
-        for (unsigned tensor_index=0; tensor_index<4; tensor_index++)
+        for (unsigned tensor_index = 0; tensor_index<4; tensor_index++)
         {
             TS_ASSERT_EQUALS(ortho_tensors[tensor_index](0,0), 2.1);
             TS_ASSERT_EQUALS(ortho_tensors[tensor_index](0,1), 0.0);
@@ -71,11 +71,11 @@ public:
             TS_ASSERT_EQUALS(ortho_tensors[tensor_index](2,2), 0.135);
         }
 
-        AxisymmetricConductivityTensors<3,3> axi_tensors;
+        AxisymmetricConductivityTensors<3, 3> axi_tensors;
         axi_tensors.SetConstantConductivities(Create_c_vector(2.1, 0.8, 0.8));
         axi_tensors.Init(&mesh);
 
-        for (unsigned tensor_index=0; tensor_index<4; tensor_index++)
+        for (unsigned tensor_index = 0; tensor_index<4; tensor_index++)
         {
             TS_ASSERT_EQUALS(axi_tensors[tensor_index](0,0), 2.1);
             TS_ASSERT_EQUALS(axi_tensors[tensor_index](0,1), 0.0);
@@ -95,11 +95,11 @@ public:
         c_vector<double, 2> constant_conductivities_2d(Create_c_vector(2.1, 0.8));
         c_vector<double, 3> constant_conductivities_3d(Create_c_vector(2.1, 0.8, 0.0));
 
-        OrthotropicConductivityTensors<1,1> ortho_1d_tensors;
+        OrthotropicConductivityTensors<1, 1> ortho_1d_tensors;
         TS_ASSERT_THROWS_THIS(ortho_1d_tensors.SetConstantConductivities(constant_conductivities_2d),"Wrong number of conductivities provided");
         TS_ASSERT_THROWS_THIS(ortho_1d_tensors.SetConstantConductivities(constant_conductivities_3d),"Wrong number of conductivities provided");
 
-        OrthotropicConductivityTensors<3,3> ortho_3d_tensors;
+        OrthotropicConductivityTensors<3, 3> ortho_3d_tensors;
         TS_ASSERT_THROWS_THIS(ortho_3d_tensors.SetConstantConductivities(constant_conductivities_1d),"Wrong number of conductivities provided");
         TS_ASSERT_THROWS_THIS(ortho_3d_tensors.SetConstantConductivities(constant_conductivities_2d),"Wrong number of conductivities provided");
 
@@ -107,7 +107,7 @@ public:
         TS_ASSERT_THROWS_THIS(AXI_2D axi_tensor,"Axisymmetric anisotropic conductivity only makes sense in 3D");
 
         // Transversal and longitudinal conductivities should have the same value
-        AxisymmetricConductivityTensors<3,3> axi_3d_tensor;
+        AxisymmetricConductivityTensors<3, 3> axi_3d_tensor;
         TS_ASSERT_THROWS_THIS( axi_3d_tensor.SetConstantConductivities(Create_c_vector(0.5,0.25,0.15)),
                 "Axisymmetric media defined: transversal and normal conductivities should have the same value" );
 
@@ -115,11 +115,11 @@ public:
 
     void TestFibreOrientationFileExceptions()
     {
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructCuboid(1,1,1);
 
         {
-            OrthotropicConductivityTensors<3,3> ortho_tensors;
+            OrthotropicConductivityTensors<3, 3> ortho_tensors;
             ortho_tensors.SetConstantConductivities( Create_c_vector(2.1, 0.8, 0.135) );
             FileFinder file("non_existing_file.ortho", RelativeTo::CWD);
             ortho_tensors.SetFibreOrientationFile(file);
@@ -128,7 +128,7 @@ public:
         }
 
         {
-            OrthotropicConductivityTensors<3,3> ortho_tensors;
+            OrthotropicConductivityTensors<3, 3> ortho_tensors;
             ortho_tensors.SetConstantConductivities( Create_c_vector(2.1, 0.8, 0.135) );
             FileFinder file("heart/test/data/fibre_tests/SimpleOrthotropic2D.ortho", RelativeTo::ChasteSourceRoot);
             ortho_tensors.SetFibreOrientationFile(file);
@@ -137,7 +137,7 @@ public:
         }
 
         {
-            OrthotropicConductivityTensors<3,3> ortho_tensors;
+            OrthotropicConductivityTensors<3, 3> ortho_tensors;
             ortho_tensors.SetConstantConductivities( Create_c_vector(2.1, 0.8, 0.135) );
             FileFinder file("heart/test/data/fibre_tests/SimpleOrthotropic2DWrongFormat.ortho", RelativeTo::ChasteSourceRoot);
             ortho_tensors.SetFibreOrientationFile(file);
@@ -147,7 +147,7 @@ public:
         }
 
         {
-            OrthotropicConductivityTensors<3,3> ortho_tensors;
+            OrthotropicConductivityTensors<3, 3> ortho_tensors;
             ortho_tensors.SetConstantConductivities( Create_c_vector(2.1, 0.8, 0.135) );
             FileFinder file("heart/test/data/fibre_tests/SimpleOrthotropic3DShortFile.ortho", RelativeTo::ChasteSourceRoot);
             ortho_tensors.SetFibreOrientationFile(file);
@@ -158,22 +158,22 @@ public:
             std::vector<c_vector<double, 3> > non_constant_conductivities;
             non_constant_conductivities.push_back(Create_c_vector(0,0,0));
 
-            OrthotropicConductivityTensors<3,3> ortho_tensors;
+            OrthotropicConductivityTensors<3, 3> ortho_tensors;
             ortho_tensors.SetNonConstantConductivities(&non_constant_conductivities); //1 element
             TS_ASSERT_THROWS_THIS(ortho_tensors.Init(&mesh),  "The size of the conductivities vector does not match the number of elements in the mesh"); //Mesh has 6 elements
 
-            AxisymmetricConductivityTensors<3,3> axi_tensors;
+            AxisymmetricConductivityTensors<3, 3> axi_tensors;
             axi_tensors.SetNonConstantConductivities(&non_constant_conductivities); //1 element
             TS_ASSERT_THROWS_THIS(axi_tensors.Init(&mesh),  "The size of the conductivities vector does not match the number of elements in the mesh"); //Mesh has 6 elements
         }
         {
 
-            OrthotropicConductivityTensors<3,3> ortho_tensors;
+            OrthotropicConductivityTensors<3, 3> ortho_tensors;
             FileFinder file("heart/test/data/fibre_tests/SimpleOrthotropic3D4Elements.ortho", RelativeTo::ChasteSourceRoot);
             ortho_tensors.SetFibreOrientationFile(file);
             TS_ASSERT_THROWS_THIS(ortho_tensors.Init(&mesh),  "The size of the fibre file does not match the number of elements in the mesh"); //Mesh has 6 elements
 
-            AxisymmetricConductivityTensors<3,3> axi_tensors;
+            AxisymmetricConductivityTensors<3, 3> axi_tensors;
             axi_tensors.SetFibreOrientationFile(file);
             TS_ASSERT_THROWS_THIS(axi_tensors.Init(&mesh),  "The size of the fibre file does not match the number of elements in the mesh"); //Mesh has 6 elements
         }
@@ -181,12 +181,12 @@ public:
 
     void TestFibreOrientationTensor3D()
     {
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructCuboid(1,1,1);
 
         c_vector<double, 3> constant_conductivities(Create_c_vector(2.1,0.8,0.135));
 
-        OrthotropicConductivityTensors<3,3> ortho_tensors;
+        OrthotropicConductivityTensors<3, 3> ortho_tensors;
         ortho_tensors.SetConstantConductivities(constant_conductivities);
         FileFinder file("heart/test/data/fibre_tests/SimpleOrthotropic3D.ortho", RelativeTo::ChasteSourceRoot);
         ortho_tensors.SetFibreOrientationFile(file);
@@ -196,7 +196,7 @@ public:
          * The first direction x, which looks like the fibre direction, takes the first conductivity value etc.
          *
          */
-        for (unsigned tensor_index=0; tensor_index<4; tensor_index++)
+        for (unsigned tensor_index = 0; tensor_index<4; tensor_index++)
         {
             TS_ASSERT_EQUALS(ortho_tensors[tensor_index](0,0), constant_conductivities[0]);
             TS_ASSERT_EQUALS(ortho_tensors[tensor_index](0,1), 0.0);
@@ -215,23 +215,23 @@ public:
         c_vector<double, 3> constant_conductivities(Create_c_vector(7.0,3.5,3.5));
         // Note that the non-primary conductivities match, so that in-sheet and trans-sheet will
         // be equivalent in the orthotropic case - reducing it to an axisymmetric conductivity
-        TetrahedralMesh<3,3> mesh;
-        TrianglesMeshReader<3,3> mesh_reader("heart/test/data/box_shaped_heart/box_heart");
+        TetrahedralMesh<3, 3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("heart/test/data/box_shaped_heart/box_heart");
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        OrthotropicConductivityTensors<3,3> ortho_tensors;
+        OrthotropicConductivityTensors<3, 3> ortho_tensors;
         ortho_tensors.SetConstantConductivities(constant_conductivities);
         FileFinder ortho_file("heart/test/data/box_shaped_heart/box_heart.ortho", RelativeTo::ChasteSourceRoot);
         ortho_tensors.SetFibreOrientationFile(ortho_file);
         ortho_tensors.Init(&mesh);
 
-        AxisymmetricConductivityTensors<3,3> axi_tensors;
+        AxisymmetricConductivityTensors<3, 3> axi_tensors;
         axi_tensors.SetConstantConductivities(constant_conductivities);
         FileFinder axi_file("heart/test/data/box_shaped_heart/box_heart.axi", RelativeTo::ChasteSourceRoot);
         axi_tensors.SetFibreOrientationFile(axi_file);
         axi_tensors.Init(&mesh);
 
-        for (unsigned tensor_index=0; tensor_index<4; tensor_index++)
+        for (unsigned tensor_index = 0; tensor_index<4; tensor_index++)
         {
             TS_ASSERT_DELTA(ortho_tensors[tensor_index](0,0), axi_tensors[tensor_index](0,0), 1e-5);
             TS_ASSERT_DELTA(ortho_tensors[tensor_index](0,1), axi_tensors[tensor_index](0,1), 1e-5);
@@ -247,23 +247,23 @@ public:
 
     void TestFibreOrientationAxisymmetric3D()
     {
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructCuboid(1,1,1);
 
         c_vector<double, 3> constant_conductivities(Create_c_vector(2.1,0.8,0.8));
 
-        //OrthotropicConductivityTensors<3,3> ortho_tensors;
+        //OrthotropicConductivityTensors<3, 3> ortho_tensors;
         //ortho_tensors.SetConstantConductivities(constant_conductivities);
         //FileFinder file1("heart/test/data/fibre_tests/SimpleAxisymmetric.axi", RelativeTo::ChasteSourceRoot);
         //ortho_tensors.SetFibreOrientationFile(file1);
         //TS_ASSERT_THROWS_CONTAINS(ortho_tensors.Init(&mesh), "Failed to open fibre file");
-        AxisymmetricConductivityTensors<3,3> axi_tensors;
+        AxisymmetricConductivityTensors<3, 3> axi_tensors;
         axi_tensors.SetConstantConductivities(constant_conductivities);
         FileFinder file2("heart/test/data/fibre_tests/SimpleAxisymmetric.axi", RelativeTo::ChasteSourceRoot);
         axi_tensors.SetFibreOrientationFile(file2);
         axi_tensors.Init(&mesh);
 
-        for (unsigned tensor_index=0; tensor_index<4; tensor_index++)
+        for (unsigned tensor_index = 0; tensor_index<4; tensor_index++)
         {
             TS_ASSERT_EQUALS(axi_tensors[tensor_index](0,0), constant_conductivities[0]);
             TS_ASSERT_EQUALS(axi_tensors[tensor_index](0,1), 0.0);
@@ -279,7 +279,7 @@ public:
 
     void TestHeterogeneousConductivitiesTensor3D()
     {
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructCuboid(1,1,1);
 
         std::vector<c_vector<double, 3> > non_constant_conductivities;
@@ -290,11 +290,11 @@ public:
         non_constant_conductivities.push_back(Create_c_vector(400,40,4));
         non_constant_conductivities.push_back(Create_c_vector(500,50,5));
 
-        OrthotropicConductivityTensors<3,3> ortho_tensors;
+        OrthotropicConductivityTensors<3, 3> ortho_tensors;
         ortho_tensors.SetNonConstantConductivities(&non_constant_conductivities);
         ortho_tensors.Init(&mesh);
 
-        for (unsigned tensor_index=0; tensor_index<6; tensor_index++)
+        for (unsigned tensor_index = 0; tensor_index<6; tensor_index++)
         {
             TS_ASSERT_EQUALS(ortho_tensors[tensor_index](0,0), 100*tensor_index);
             TS_ASSERT_EQUALS(ortho_tensors[tensor_index](0,1), 0.0);
@@ -307,11 +307,11 @@ public:
             TS_ASSERT_EQUALS(ortho_tensors[tensor_index](2,2), tensor_index);
         }
 
-        AxisymmetricConductivityTensors<3,3> axi_tensors;
+        AxisymmetricConductivityTensors<3, 3> axi_tensors;
         axi_tensors.SetNonConstantConductivities(&non_constant_conductivities);
         axi_tensors.Init(&mesh);
 
-        for (unsigned tensor_index=0; tensor_index<6; tensor_index++)
+        for (unsigned tensor_index = 0; tensor_index<6; tensor_index++)
         {
             TS_ASSERT_EQUALS(axi_tensors[tensor_index](0,0), 100*tensor_index);
             TS_ASSERT_EQUALS(axi_tensors[tensor_index](0,1), 0.0);
@@ -329,12 +329,12 @@ public:
 
     void TestHeterogeneousConductivitiesTensorDistributed3D()
     {
-        DistributedTetrahedralMesh<3,3> mesh;
+        DistributedTetrahedralMesh<3, 3> mesh;
         mesh.ConstructCuboid(1,1,2);
 
         std::vector<c_vector<double, 3> > non_constant_conductivities;
-        //for (unsigned global_element_index=0; global_element_index<12; global_element_index++)
-        for (DistributedTetrahedralMesh<3,3>::ElementIterator it = mesh.GetElementIteratorBegin();
+        //for (unsigned global_element_index = 0; global_element_index<12; global_element_index++)
+        for (DistributedTetrahedralMesh<3, 3>::ElementIterator it = mesh.GetElementIteratorBegin();
              it != mesh.GetElementIteratorEnd();
              ++it)
         {
@@ -342,11 +342,11 @@ public:
             non_constant_conductivities.push_back(Create_c_vector(global_element_index*100,global_element_index*10,global_element_index));
         }
 
-        OrthotropicConductivityTensors<3,3> ortho_tensors;
+        OrthotropicConductivityTensors<3, 3> ortho_tensors;
         ortho_tensors.SetNonConstantConductivities(&non_constant_conductivities);
         ortho_tensors.Init(&mesh);
 
-        for (DistributedTetrahedralMesh<3,3>::ElementIterator it = mesh.GetElementIteratorBegin();
+        for (DistributedTetrahedralMesh<3, 3>::ElementIterator it = mesh.GetElementIteratorBegin();
              it != mesh.GetElementIteratorEnd();
              ++it)
         {
@@ -362,11 +362,11 @@ public:
             TS_ASSERT_EQUALS(ortho_tensors[tensor_index](2,2), tensor_index);
         }
 
-        AxisymmetricConductivityTensors<3,3> axi_tensors;
+        AxisymmetricConductivityTensors<3, 3> axi_tensors;
         axi_tensors.SetNonConstantConductivities(&non_constant_conductivities);
         axi_tensors.Init(&mesh);
 
-        for (DistributedTetrahedralMesh<3,3>::ElementIterator it = mesh.GetElementIteratorBegin();
+        for (DistributedTetrahedralMesh<3, 3>::ElementIterator it = mesh.GetElementIteratorBegin();
              it != mesh.GetElementIteratorEnd();
              ++it)
         {
@@ -386,7 +386,7 @@ public:
     }
     void TestHeterogeneousCondPlusFibreOrientationTensor1D()
     {
-        TetrahedralMesh<1,1> mesh;
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructLinearMesh(4);
 
         std::vector<c_vector<double, 1> > non_constant_conductivities;
@@ -395,13 +395,13 @@ public:
         non_constant_conductivities.push_back(Create_c_vector(200));
         non_constant_conductivities.push_back(Create_c_vector(300));
 
-        OrthotropicConductivityTensors<1,1> ortho_tensors;
+        OrthotropicConductivityTensors<1, 1> ortho_tensors;
         ortho_tensors.SetNonConstantConductivities(&non_constant_conductivities);
         FileFinder file("heart/test/data/fibre_tests/SimpleOrthotropic1D.ortho", RelativeTo::ChasteSourceRoot);
         ortho_tensors.SetFibreOrientationFile(file);
         ortho_tensors.Init(&mesh);
 
-        for (unsigned tensor_index=0; tensor_index<4; tensor_index++)
+        for (unsigned tensor_index = 0; tensor_index<4; tensor_index++)
         {
             TS_ASSERT_EQUALS(ortho_tensors[tensor_index](0,0), 100*tensor_index);
         }
@@ -409,7 +409,7 @@ public:
 
     void TestHeterogeneousCondPlusFibreOrientationTensor2D()
     {
-        TetrahedralMesh<2,2> mesh;
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructRectangularMesh(1,3);
 
         std::vector<c_vector<double, 2> > non_constant_conductivities;
@@ -420,13 +420,13 @@ public:
         non_constant_conductivities.push_back(Create_c_vector(400,40));
         non_constant_conductivities.push_back(Create_c_vector(500,50));
 
-        OrthotropicConductivityTensors<2,2> ortho_tensors;
+        OrthotropicConductivityTensors<2, 2> ortho_tensors;
         ortho_tensors.SetNonConstantConductivities(&non_constant_conductivities);
         FileFinder file("heart/test/data/fibre_tests/SimpleOrthotropic2D.ortho", RelativeTo::ChasteSourceRoot);
         ortho_tensors.SetFibreOrientationFile(file);
         ortho_tensors.Init(&mesh);
 
-        for (unsigned tensor_index=0; tensor_index<6; tensor_index++)
+        for (unsigned tensor_index = 0; tensor_index<6; tensor_index++)
         {
             TS_ASSERT_EQUALS(ortho_tensors[tensor_index](0,0), 100*tensor_index);
             TS_ASSERT_EQUALS(ortho_tensors[tensor_index](0,1), 0.0);
@@ -437,11 +437,11 @@ public:
 
     void TestHeterogeneousCondPlusFibreOrientationTensor3DDistributedTetrahedralMesh()
     {
-        DistributedTetrahedralMesh<3,3> mesh;
+        DistributedTetrahedralMesh<3, 3> mesh;
         mesh.ConstructCuboid(1,1,5); // This cube shape ensures that there exist elements not own by every processor (at least for p=2,3
         std::vector<c_vector<double, 3> > non_constant_conductivities;
 
-        for (AbstractTetrahedralMesh<3,3>::ElementIterator it = mesh.GetElementIteratorBegin();
+        for (AbstractTetrahedralMesh<3, 3>::ElementIterator it = mesh.GetElementIteratorBegin();
              it != mesh.GetElementIteratorEnd();
              ++it)
         {
@@ -449,13 +449,13 @@ public:
             non_constant_conductivities.push_back(element_index*Create_c_vector(100,10,1));
         }
 
-        OrthotropicConductivityTensors<3,3> ortho_tensors;
+        OrthotropicConductivityTensors<3, 3> ortho_tensors;
         ortho_tensors.SetNonConstantConductivities(&non_constant_conductivities);
         FileFinder file("heart/test/data/fibre_tests/NonTrivialOrthotropic3D.ortho", RelativeTo::ChasteSourceRoot);
         ortho_tensors.SetFibreOrientationFile(file);
         ortho_tensors.Init(&mesh);
 
-        for (AbstractTetrahedralMesh<3,3>::ElementIterator it = mesh.GetElementIteratorBegin();
+        for (AbstractTetrahedralMesh<3, 3>::ElementIterator it = mesh.GetElementIteratorBegin();
              it != mesh.GetElementIteratorEnd();
              ++it)
         {
@@ -493,7 +493,7 @@ public:
             TS_ASSERT_DELTA(ortho_tensors[element_index](2,2), g_n, tol);
         }
 
-        AxisymmetricConductivityTensors<3,3> axi_tensors;
+        AxisymmetricConductivityTensors<3, 3> axi_tensors;
         axi_tensors.SetNonConstantConductivities(&non_constant_conductivities);
 
         axi_tensors.SetFibreOrientationFile(file);
@@ -503,7 +503,7 @@ public:
         axi_tensors.SetFibreOrientationFile(axi_file);
         axi_tensors.Init(&mesh);
 
-        for (AbstractTetrahedralMesh<3,3>::ElementIterator it = mesh.GetElementIteratorBegin();
+        for (AbstractTetrahedralMesh<3, 3>::ElementIterator it = mesh.GetElementIteratorBegin();
              it != mesh.GetElementIteratorEnd();
              ++it)
         {

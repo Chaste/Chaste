@@ -49,10 +49,10 @@ CryptProjectionStatistics::CryptProjectionStatistics(MeshBasedCellPopulation<2>&
 {
 }
 
-bool CryptProjectionStatistics::CellIsInSection(double angle, const c_vector<double,2>& rCellPosition, double widthOfSection)
+bool CryptProjectionStatistics::CellIsInSection(double angle, const c_vector<double, 2>& rCellPosition, double widthOfSection)
 {
     // Get corresponding 3D position of closest point on line
-    c_vector<double,2> line_position;
+    c_vector<double, 2> line_position;
     line_position[0] = norm_2(rCellPosition)*cos(angle);
     line_position[1] = norm_2(rCellPosition)*sin(angle);
 

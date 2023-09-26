@@ -75,7 +75,7 @@ typedef enum StimulusType_
  * RampedQuarterStimulusCellFactory stimulates a quarter of a mesh of width mMeshWidth
  * ie all the cells in 0 < x <= mMeshWidth/4
  */
-template <class CELL, unsigned DIM>
+template<class CELL, unsigned DIM>
 class RampedQuarterStimulusCellFactory : public AbstractCardiacCellFactory<DIM>
 {
 private:
@@ -105,7 +105,7 @@ public:
     {
         assert(numElemAcross%4 == 0); //numElemAcross is supposed to be a multiple of 4
 
-        for (unsigned level=0; level<mLevels; level++)
+        for (unsigned level = 0; level<mLevels; level++)
         {
             double this_stim = fullStim - (level*fullStim)/mLevels;
             //this_stim is full_stim at the zero level and would be zero at level=mLevels
@@ -379,7 +379,7 @@ public:
 
             cardiac_problem.Initialise();
 
-            boost::shared_ptr<BoundaryConditionsContainer<DIM,DIM,PROBLEM_DIM> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,PROBLEM_DIM>);
+            boost::shared_ptr<BoundaryConditionsContainer<DIM, DIM, PROBLEM_DIM> > p_bcc(new BoundaryConditionsContainer<DIM, DIM, PROBLEM_DIM>);
             SimpleStimulus stim(NeumannStimulus, 0.5);
             if (Stimulus==NEUMANN)
             {

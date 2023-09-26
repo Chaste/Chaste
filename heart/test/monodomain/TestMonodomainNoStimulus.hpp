@@ -94,7 +94,7 @@ public:
         double constant_voltage = voltage_replicated[0];
         TS_ASSERT_LESS_THAN(-85.0, constant_voltage);
 
-        for (unsigned index=0; index<voltage_replicated.GetSize(); index++)
+        for (unsigned index = 0; index<voltage_replicated.GetSize(); index++)
         {
             TS_ASSERT_DELTA(voltage_replicated[index] , constant_voltage, 1E-5);
         }

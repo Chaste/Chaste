@@ -58,20 +58,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////////////////////////
 // A simple pde : u_xx + u_yy + x = 0
 //////////////////////////////////////////////////////////////////////////////
-class MySimplePde : public AbstractLinearEllipticPde<2,2>
+class MySimplePde : public AbstractLinearEllipticPde<2, 2>
 {
 public:
-    double ComputeConstantInUSourceTerm(const ChastePoint<2>& rX, Element<2,2>* )
+    double ComputeConstantInUSourceTerm(const ChastePoint<2>& rX, Element<2, 2>* )
     {
         return rX[0];
     }
 
-    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<2>&, Element<2,2>* )
+    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<2>&, Element<2, 2>* )
     {
         return 0.0;
     }
 
-    c_matrix<double,2,2> ComputeDiffusionTerm(const ChastePoint<2>& x)
+    c_matrix<double,2, 2> ComputeDiffusionTerm(const ChastePoint<2>& x)
     {
         return identity_matrix<double>(2);
     }
@@ -85,8 +85,8 @@ public:
 //   \lambda is taken in in the constructor
 //////////////////////////////////////////////////////////////////////////////
 class MySimpleCoupledSolver
-    : public AbstractAssemblerSolverHybrid<2,2,2,NORMAL>,
-      public AbstractStaticLinearPdeSolver<2,2,2>
+    : public AbstractAssemblerSolverHybrid<2, 2,2,NORMAL>,
+      public AbstractStaticLinearPdeSolver<2, 2, 2>
 {
 private:
     double mLambda;
@@ -94,9 +94,9 @@ private:
     virtual c_matrix<double,2*(2+1),2*(2+1)> ComputeMatrixTerm(c_vector<double, 2+1>& rPhi,
                                                                c_matrix<double, 2, 2+1>& rGradPhi,
                                                                ChastePoint<2>& rX,
-                                                               c_vector<double,2>& rU,
-                                                               c_matrix<double,2,2>& rGradU,
-                                                               Element<2,2>* pElement)
+                                                               c_vector<double, 2>& rU,
+                                                               c_matrix<double,2, 2>& rGradU,
+                                                               Element<2, 2>* pElement)
     {
         c_matrix<double,2*(2+1),2*(2+1)> ret = zero_matrix<double>(2*(2+1), 2*(2+1));
 
@@ -122,9 +122,9 @@ private:
     virtual c_vector<double,2*(2+1)> ComputeVectorTerm(c_vector<double, 2+1>& rPhi,
                                                        c_matrix<double, 2, 2+1>& rGradPhi,
                                                        ChastePoint<2>& rX,
-                                                       c_vector<double,2>& rU,
-                                                       c_matrix<double,2,2>& rGradU,
-                                                       Element<2,2>* pElement)
+                                                       c_vector<double, 2>& rU,
+                                                       c_matrix<double,2, 2>& rGradU,
+                                                       Element<2, 2>* pElement)
     {
         c_vector<double,2*(2+1)> ret;
 
@@ -138,7 +138,7 @@ private:
 
     void InitialiseForSolve(Vec initialSolution)
     {
-        AbstractLinearPdeSolver<2,2,2>::InitialiseForSolve(initialSolution);
+        AbstractLinearPdeSolver<2, 2, 2>::InitialiseForSolve(initialSolution);
         assert(this->mpLinearSystem);
         this->mpLinearSystem->SetMatrixIsSymmetric(true);
         this->mpLinearSystem->SetKspType("cg");
@@ -150,11 +150,11 @@ private:
     }
 
 public:
-    MySimpleCoupledSolver(TetrahedralMesh<2,2>* pMesh,
-                          BoundaryConditionsContainer<2,2,2>* pBoundaryConditions,
+    MySimpleCoupledSolver(TetrahedralMesh<2, 2>* pMesh,
+                          BoundaryConditionsContainer<2, 2, 2>* pBoundaryConditions,
                           double lambda)
-        : AbstractAssemblerSolverHybrid<2,2,2,NORMAL>(pMesh,pBoundaryConditions),
-          AbstractStaticLinearPdeSolver<2,2,2>(pMesh)
+        : AbstractAssemblerSolverHybrid<2, 2,2,NORMAL>(pMesh,pBoundaryConditions),
+          AbstractStaticLinearPdeSolver<2, 2, 2>(pMesh)
     {
         this->mpBoundaryConditions = pBoundaryConditions;
         mLambda = lambda;
@@ -185,8 +185,8 @@ public:
  *   matrix and vector written above
  */
 class AnotherCoupledSolver
-    : public AbstractAssemblerSolverHybrid<2,2,2,NORMAL>,
-      public AbstractStaticLinearPdeSolver<2,2,2>
+    : public AbstractAssemblerSolverHybrid<2, 2,2,NORMAL>,
+      public AbstractStaticLinearPdeSolver<2, 2, 2>
 {
 private:
     double f(double x,double y)
@@ -202,9 +202,9 @@ private:
     virtual c_matrix<double,2*(2+1),2*(2+1)> ComputeMatrixTerm(c_vector<double, 2+1>& rPhi,
                                                                c_matrix<double, 2, 2+1>& rGradPhi,
                                                                ChastePoint<2>& rX,
-                                                               c_vector<double,2>& rU,
-                                                               c_matrix<double,2,2>& rGradU,
-                                                               Element<2,2>* pElement)
+                                                               c_vector<double, 2>& rU,
+                                                               c_matrix<double,2, 2>& rGradU,
+                                                               Element<2, 2>* pElement)
     {
         c_matrix<double,2*(2+1),2*(2+1)> ret = zero_matrix<double>(2*(2+1), 2*(2+1));
 
@@ -233,9 +233,9 @@ private:
     virtual c_vector<double,2*(2+1)> ComputeVectorTerm(c_vector<double, 2+1>& rPhi,
                                                        c_matrix<double, 2, 2+1>& rGradPhi,
                                                        ChastePoint<2>& rX,
-                                                       c_vector<double,2>& rU,
-                                                       c_matrix<double,2,2>& rGradU,
-                                                       Element<2,2>* pElement)
+                                                       c_vector<double, 2>& rU,
+                                                       c_matrix<double,2, 2>& rGradU,
+                                                       Element<2, 2>* pElement)
     {
        c_vector<double,2*(2+1)> ret;
 
@@ -253,10 +253,10 @@ private:
     }
 
 public:
-    AnotherCoupledSolver(TetrahedralMesh<2,2>* pMesh,
-                         BoundaryConditionsContainer<2,2,2>* pBoundaryConditions)
-        : AbstractAssemblerSolverHybrid<2,2,2,NORMAL>(pMesh,pBoundaryConditions),
-          AbstractStaticLinearPdeSolver<2,2,2>(pMesh)
+    AnotherCoupledSolver(TetrahedralMesh<2, 2>* pMesh,
+                         BoundaryConditionsContainer<2, 2, 2>* pBoundaryConditions)
+        : AbstractAssemblerSolverHybrid<2, 2,2,NORMAL>(pMesh,pBoundaryConditions),
+          AbstractStaticLinearPdeSolver<2, 2, 2>(pMesh)
     {
     }
 };
@@ -279,8 +279,8 @@ public:
      */
     void TestSimpleCoupledPde()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_522_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/disk_522_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         ////////////////////////////////////////////////////////////////
@@ -288,7 +288,7 @@ public:
         ////////////////////////////////////////////////////////////////
 
         // Boundary conditions for 2-unknown problem
-        BoundaryConditionsContainer<2,2,2> bcc_2unknowns;
+        BoundaryConditionsContainer<2, 2, 2> bcc_2unknowns;
         bcc_2unknowns.DefineZeroDirichletOnMeshBoundary(&mesh,0); // zero dirichlet for u
         bcc_2unknowns.DefineZeroDirichletOnMeshBoundary(&mesh,1); // zero dirichlet for v
 
@@ -305,11 +305,11 @@ public:
         MySimplePde pde;  //defined above
 
         // Boundary conditions for 1-unknown problem
-        BoundaryConditionsContainer<2,2,1> bcc_1unknown;
+        BoundaryConditionsContainer<2, 2, 1> bcc_1unknown;
         bcc_1unknown.DefineZeroDirichletOnMeshBoundary(&mesh);
 
         // Assembler
-        SimpleLinearEllipticSolver<2,2> solver_1unknown(&mesh,&pde,&bcc_1unknown);
+        SimpleLinearEllipticSolver<2, 2> solver_1unknown(&mesh,&pde,&bcc_1unknown);
 
         Vec result_1unknown = solver_1unknown.Solve();
         ReplicatableVector result_1unknown_repl(result_1unknown);
@@ -341,8 +341,8 @@ public:
      */
     void TestSimpleCoupledPdeWithNeumannBoundaryConditions()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_522_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/disk_522_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         ////////////////////////////////////////////////////////////////
@@ -350,10 +350,10 @@ public:
         ////////////////////////////////////////////////////////////////
 
         // Boundary conditions for 2-unknown problem
-        BoundaryConditionsContainer<2,2,2> bcc_2unknowns;
+        BoundaryConditionsContainer<2, 2, 2> bcc_2unknowns;
 
         // du/dn = -0.5 on r=1
-        TetrahedralMesh<2,2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
+        TetrahedralMesh<2, 2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
         ConstBoundaryCondition<2>* p_boundary_condition = new ConstBoundaryCondition<2>(-0.5);
         ConstBoundaryCondition<2>* p_boundary_condition1 = new ConstBoundaryCondition<2>(-0.5);
         while (iter != mesh.GetBoundaryElementIteratorEnd())
@@ -383,7 +383,7 @@ public:
         MySimplePde pde; // defined above
 
         // boundary conditions for 1-unknown problem
-        BoundaryConditionsContainer<2,2,1> bcc_1unknown;
+        BoundaryConditionsContainer<2, 2, 1> bcc_1unknown;
 
         iter = mesh.GetBoundaryElementIteratorBegin();
         p_boundary_condition = new ConstBoundaryCondition<2>(-0.5);
@@ -397,7 +397,7 @@ public:
         bcc_1unknown.AddDirichletBoundaryCondition(mesh.GetNode(1), p_boundary_condition);
 
         // Assembler
-        SimpleLinearEllipticSolver<2,2> solver_1unknown(&mesh,&pde,&bcc_1unknown);
+        SimpleLinearEllipticSolver<2, 2> solver_1unknown(&mesh,&pde,&bcc_1unknown);
 
         Vec result_1unknown = solver_1unknown.Solve();
         ReplicatableVector result_1unknown_repl(result_1unknown);
@@ -431,12 +431,12 @@ public:
      */
     void TestRealCoupledPde()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4096_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4096_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Boundary conditions for 2-unknown problem
-        BoundaryConditionsContainer<2,2,2> bcc;
+        BoundaryConditionsContainer<2, 2, 2> bcc;
         bcc.DefineZeroDirichletOnMeshBoundary(&mesh,0); // zero dirichlet for u
         bcc.DefineZeroDirichletOnMeshBoundary(&mesh,1); // zero dirichlet for v
 

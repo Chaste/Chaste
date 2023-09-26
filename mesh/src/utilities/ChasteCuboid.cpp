@@ -36,12 +36,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteCuboid.hpp"
 #include "Exception.hpp"
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 ChasteCuboid<SPACE_DIM>::ChasteCuboid(ChastePoint<SPACE_DIM>& rLowerPoint, ChastePoint<SPACE_DIM>& rUpperPoint)
     : mLowerCorner(rLowerPoint),
     mUpperCorner(rUpperPoint)
 {
-    for (unsigned dim=0; dim<SPACE_DIM; dim++)
+    for (unsigned dim = 0; dim<SPACE_DIM; dim++)
     {
         if (mLowerCorner[dim] > mUpperCorner[dim])
         {
@@ -50,10 +50,10 @@ ChasteCuboid<SPACE_DIM>::ChasteCuboid(ChastePoint<SPACE_DIM>& rLowerPoint, Chast
     }
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 bool ChasteCuboid<SPACE_DIM>::DoesContain(const ChastePoint<SPACE_DIM>& rPointToCheck) const
 {
-    for (unsigned dim=0; dim<SPACE_DIM; dim++)
+    for (unsigned dim = 0; dim<SPACE_DIM; dim++)
     {
         if (rPointToCheck[dim] < mLowerCorner[dim] - 100*DBL_EPSILON
             || mUpperCorner[dim] + 100* DBL_EPSILON < rPointToCheck[dim])
@@ -64,31 +64,31 @@ bool ChasteCuboid<SPACE_DIM>::DoesContain(const ChastePoint<SPACE_DIM>& rPointTo
     return true;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 const ChastePoint<SPACE_DIM>& ChasteCuboid<SPACE_DIM>::rGetUpperCorner() const
 {
     return mUpperCorner;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 const ChastePoint<SPACE_DIM>& ChasteCuboid<SPACE_DIM>::rGetLowerCorner() const
 {
     return mLowerCorner;
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 double ChasteCuboid<SPACE_DIM>::GetWidth(unsigned rDimension) const
 {
     assert(rDimension<SPACE_DIM);
     return mUpperCorner[rDimension] - mLowerCorner[rDimension];
 }
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 unsigned ChasteCuboid<SPACE_DIM>::GetLongestAxis() const
 {
     unsigned axis = 0;
     double max_dimension = 0.0;
-    for (unsigned i=0; i<SPACE_DIM; ++i)
+    for (unsigned i = 0; i<SPACE_DIM; ++i)
     {
         double dimension =  mUpperCorner[i] - mLowerCorner[i];
         if (dimension > max_dimension)

@@ -147,7 +147,7 @@ public:
      *
      * @param rMeshReader the mesh reader
      */
-    virtual void ConstructFromMeshReader(AbstractMeshReader<ELEMENT_DIM,SPACE_DIM>& rMeshReader);
+    virtual void ConstructFromMeshReader(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader);
 
     /**
      * @return the number of nodes that are entirely owned by the local process.

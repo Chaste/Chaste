@@ -45,14 +45,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshWriter.hpp"
 
 /**
- * A subclass of MutableMesh<2,2> for a rectangular mesh with
+ * A subclass of MutableMesh<2, 2> for a rectangular mesh with
  * periodic left and right boundaries, representing a cylindrical geometry.
  *
  * The class works by overriding calls such as ReMesh() and
  * GetVectorFromAtoB() so that simulation classes can treat this
- * class in exactly the same way as a MutableMesh<2,2>.
+ * class in exactly the same way as a MutableMesh<2, 2>.
  */
-class Cylindrical2dMesh : public MutableMesh<2,2>
+class Cylindrical2dMesh : public MutableMesh<2, 2>
 {
     friend class TestCylindrical2dMesh;
 private:
@@ -106,7 +106,7 @@ private:
     bool mMismatchedBoundaryElements;
 
     /**
-     * Calls AbstractMesh<2,2>::CalculateBoundingBox() to calculate mTop and mBottom
+     * Calls AbstractMesh<2, 2>::CalculateBoundingBox() to calculate mTop and mBottom
      * for the cylindrical mesh.
      *
      * This method should only ever be called by the public ReMesh() method.
@@ -214,7 +214,7 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<MutableMesh<2,2> >(*this);
+        archive & boost::serialization::base_object<MutableMesh<2, 2> >(*this);
         archive & mWidth;
         archive & mTop;
         archive & mBottom;

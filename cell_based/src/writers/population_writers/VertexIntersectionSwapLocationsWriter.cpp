@@ -90,12 +90,12 @@ void VertexIntersectionSwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
 }
 
 // Explicit instantiation
-template class VertexIntersectionSwapLocationsWriter<1,1>;
-template class VertexIntersectionSwapLocationsWriter<1,2>;
-template class VertexIntersectionSwapLocationsWriter<2,2>;
-template class VertexIntersectionSwapLocationsWriter<1,3>;
-template class VertexIntersectionSwapLocationsWriter<2,3>;
-template class VertexIntersectionSwapLocationsWriter<3,3>;
+template class VertexIntersectionSwapLocationsWriter<1, 1>;
+template class VertexIntersectionSwapLocationsWriter<1, 2>;
+template class VertexIntersectionSwapLocationsWriter<2, 2>;
+template class VertexIntersectionSwapLocationsWriter<1, 3>;
+template class VertexIntersectionSwapLocationsWriter<2, 3>;
+template class VertexIntersectionSwapLocationsWriter<3, 3>;
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer

@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AirwayTreeWalker.hpp"
 
-AirwayTreeWalker::AirwayTreeWalker(AbstractTetrahedralMesh<1,3>& rAirwaysMesh,
+AirwayTreeWalker::AirwayTreeWalker(AbstractTetrahedralMesh<1, 3>& rAirwaysMesh,
                                     unsigned rootIndex=0u) :
                                     mMesh(rAirwaysMesh),
                                     mOutletNodeIndex(rootIndex),
@@ -50,13 +50,13 @@ AirwayTreeWalker::AirwayTreeWalker(AbstractTetrahedralMesh<1,3>& rAirwaysMesh,
     assert(p_node->GetNumContainingElements() == 1u);
 
     //Get the head element & process
-    Element<1,3>* p_root_element = mMesh.GetElement(*(p_node->ContainingElementsBegin()));
+    Element<1, 3>* p_root_element = mMesh.GetElement(*(p_node->ContainingElementsBegin()));
     mOutletElementIndex = p_root_element->GetIndex();
     ProcessElement(p_root_element, p_node);
     CalculateElementProperties(p_root_element);
 }
 
-Element<1,3>* AirwayTreeWalker::GetParentElement(Element<1,3>* pElement)
+Element<1, 3>* AirwayTreeWalker::GetParentElement(Element<1, 3>* pElement)
 {
     if (mParentElementMap.count(pElement->GetIndex()) == 0)
     {
@@ -66,12 +66,12 @@ Element<1,3>* AirwayTreeWalker::GetParentElement(Element<1,3>* pElement)
     return mMesh.GetElement(mParentElementMap[pElement->GetIndex()]);
 }
 
-unsigned AirwayTreeWalker::GetParentElementIndex(Element<1,3>* pElement)
+unsigned AirwayTreeWalker::GetParentElementIndex(Element<1, 3>* pElement)
 {
     return mParentElementMap[pElement->GetIndex()];
 }
 
-Element<1,3>* AirwayTreeWalker::GetParentElement(unsigned index)
+Element<1, 3>* AirwayTreeWalker::GetParentElement(unsigned index)
 {
     if (mParentElementMap.count(index) == 0)
     {
@@ -87,7 +87,7 @@ unsigned AirwayTreeWalker::GetParentElementIndex(unsigned index)
 }
 
 
-unsigned AirwayTreeWalker::GetNumberOfChildElements(Element<1,3>* pElement)
+unsigned AirwayTreeWalker::GetNumberOfChildElements(Element<1, 3>* pElement)
 {
     return mChildElementsMap[pElement->GetIndex()].size();
 }
@@ -97,9 +97,9 @@ unsigned AirwayTreeWalker::GetNumberOfChildElements(unsigned index)
     return mChildElementsMap[index].size();
 }
 
-std::vector<Element<1,3>* > AirwayTreeWalker::GetChildElements(Element<1,3>* pElement)
+std::vector<Element<1, 3>* > AirwayTreeWalker::GetChildElements(Element<1, 3>* pElement)
 {
-    std::vector<Element<1,3>* > child_elements;
+    std::vector<Element<1, 3>* > child_elements;
 
     for (unsigned i = 0; i < mChildElementsMap[pElement->GetIndex()].size(); ++i)
     {
@@ -109,23 +109,23 @@ std::vector<Element<1,3>* > AirwayTreeWalker::GetChildElements(Element<1,3>* pEl
     return child_elements;
 }
 
-std::vector<unsigned> AirwayTreeWalker::GetChildElementIndices(Element<1,3>* pElement)
+std::vector<unsigned> AirwayTreeWalker::GetChildElementIndices(Element<1, 3>* pElement)
 {
     return mChildElementsMap[pElement->GetIndex()];
 }
 
 
-Node<3>* AirwayTreeWalker::GetDistalNode(Element<1,3>* pElement)
+Node<3>* AirwayTreeWalker::GetDistalNode(Element<1, 3>* pElement)
 {
     return mMesh.GetNode(mDistalNodeMap[pElement->GetIndex()]);
 }
 
-unsigned AirwayTreeWalker::GetDistalNodeIndex(Element<1,3>* pElement)
+unsigned AirwayTreeWalker::GetDistalNodeIndex(Element<1, 3>* pElement)
 {
     return mDistalNodeMap[pElement->GetIndex()];
 }
 
-void AirwayTreeWalker::ProcessElement(Element<1,3>* pElement, Node<3>* pParentNode)
+void AirwayTreeWalker::ProcessElement(Element<1, 3>* pElement, Node<3>* pParentNode)
 {
     for (unsigned node_index = 0; node_index < pElement->GetNumNodes(); ++node_index)
     {
@@ -142,7 +142,7 @@ void AirwayTreeWalker::ProcessElement(Element<1,3>* pElement, Node<3>* pParentNo
                 ele_iter != p_current_node->ContainingElementsEnd();
                 ++ele_iter)
             {
-                Element<1,3>* p_child_element = mMesh.GetElement(*ele_iter);
+                Element<1, 3>* p_child_element = mMesh.GetElement(*ele_iter);
 
                 if (p_child_element != pElement) //Prevent moving back up the tree
                 {
@@ -157,7 +157,7 @@ void AirwayTreeWalker::ProcessElement(Element<1,3>* pElement, Node<3>* pParentNo
 }
 
 
-unsigned AirwayTreeWalker::GetElementGeneration(Element<1,3>* pElement)
+unsigned AirwayTreeWalker::GetElementGeneration(Element<1, 3>* pElement)
 {
     return mElementGenerations[pElement->GetIndex()];
 }
@@ -180,7 +180,7 @@ unsigned AirwayTreeWalker::GetMaxElementGeneration()
     return std::max_element(mElementGenerations.begin(), mElementGenerations.end(), less_than_predicate)->second;
 }
 
-unsigned AirwayTreeWalker::GetElementHorsfieldOrder(Element<1,3>* pElement)
+unsigned AirwayTreeWalker::GetElementHorsfieldOrder(Element<1, 3>* pElement)
 {
     return mElementHorsfieldOrder[pElement->GetIndex()];
 }
@@ -196,7 +196,7 @@ unsigned AirwayTreeWalker::GetMaxElementHorsfieldOrder()
 }
 
 
-unsigned AirwayTreeWalker::GetElementStrahlerOrder(Element<1,3>* pElement)
+unsigned AirwayTreeWalker::GetElementStrahlerOrder(Element<1, 3>* pElement)
 {
     return mElementStrahlerOrder[pElement->GetIndex()];
 }
@@ -211,9 +211,9 @@ unsigned AirwayTreeWalker::GetMaxElementStrahlerOrder()
     return std::max_element(mElementStrahlerOrder.begin(), mElementStrahlerOrder.end(), less_than_predicate)->second;
 }
 
-void AirwayTreeWalker::CalculateElementProperties(Element<1,3>* pElement)
+void AirwayTreeWalker::CalculateElementProperties(Element<1, 3>* pElement)
 {
-    Element<1,3>* p_parent_element = GetParentElement(pElement);
+    Element<1, 3>* p_parent_element = GetParentElement(pElement);
 
     //pre-order traversal calculations
     if (p_parent_element == nullptr)
@@ -230,7 +230,7 @@ void AirwayTreeWalker::CalculateElementProperties(Element<1,3>* pElement)
     }
 
     //Process children
-    std::vector<Element<1,3>* > child_eles = GetChildElements(pElement);
+    std::vector<Element<1, 3>* > child_eles = GetChildElements(pElement);
     for (unsigned i = 0; i < child_eles.size(); ++i)
     {
         CalculateElementProperties(child_eles[i]);

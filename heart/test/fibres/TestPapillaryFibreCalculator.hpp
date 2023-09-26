@@ -44,10 +44,10 @@ class TestPapillaryFibreCalculator : public CxxTest::TestSuite
 {
 public:
 
-    void TestGetSingleRadiusVector(void)
+    void TestGetSingleRadiusVector()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/simple_cube");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/simple_cube");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_EQUALS(mesh.GetNumElements(),12u);
@@ -64,14 +64,14 @@ public:
         TS_ASSERT_DELTA(radius_vector[2], -0.275, 1e-9);
     }
 
-    void TestGetRadiusVectorsAndConstructStructureTensors(void)
+    void TestGetRadiusVectorsAndConstructStructureTensors()
     {
         // Test in three parts to use the results of one test in the next...
         //
         //
 
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/simple_cube");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/simple_cube");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_EQUALS(mesh.GetNumElements(),12u);
@@ -82,7 +82,7 @@ public:
 
         calculator.GetRadiusVectors();
 
-        std::vector< c_vector<double,3> >& radius_vectors = calculator.mRadiusVectors;
+        std::vector< c_vector<double, 3> >& radius_vectors = calculator.mRadiusVectors;
 
         // Check they are right
         TS_ASSERT_DELTA(radius_vectors[0][0], -0.275, 1e-9);
@@ -99,7 +99,7 @@ public:
         // Test ConstructStructureTensors()
         ///////////////////////////////////////////////////////////
         calculator.ConstructStructureTensors();
-        std::vector< c_matrix<double,3,3> >& tensor_i = calculator.mStructureTensors;
+        std::vector< c_matrix<double,3, 3> >& tensor_i = calculator.mStructureTensors;
 
         // Worked out by hand...
         TS_ASSERT_DELTA(tensor_i[0](0,0),7.5625e-02,1e-9);
@@ -126,21 +126,21 @@ public:
         // Test SmoothStructureTensor()
         //////////////////////////////////////////////////////////////
         calculator.SmoothStructureTensors();
-        std::vector< c_matrix<double,3,3> >& tensor_smooth = calculator.mSmoothedStructureTensors;
+        std::vector< c_matrix<double,3, 3> >& tensor_smooth = calculator.mSmoothedStructureTensors;
 
         // hard-coded (as difficult to test)
         TS_ASSERT_DELTA(tensor_smooth[0](0,0), 0.075625, 1e-5);
     }
 
     // see also TestPapillaryFibreCalculatorLong() for bigger test of the main method on a cylinder.
-    void TestGetFibreOrientationsOnSimpleCube(void)
+    void TestGetFibreOrientationsOnSimpleCube()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/simple_cube");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/simple_cube");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         PapillaryFibreCalculator calculator(mesh);
-        std::vector<c_vector<double,3> > fibre_orientations = calculator.CalculateFibreOrientations();
+        std::vector<c_vector<double, 3> > fibre_orientations = calculator.CalculateFibreOrientations();
 
         // Not very well defined for a cube (since it's so well structured that there are zero
         // eigenvectors in the smoothed tensors) but necessary to test coverage.

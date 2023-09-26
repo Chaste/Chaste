@@ -96,12 +96,12 @@ void VoronoiVertexMeshGenerator::GenerateVoronoiMesh()
     }
 }
 
-boost::shared_ptr<MutableVertexMesh<2,2> > VoronoiVertexMeshGenerator::GetMesh()
+boost::shared_ptr<MutableVertexMesh<2, 2> > VoronoiVertexMeshGenerator::GetMesh()
 {
     return mpMesh;
 }
 
-boost::shared_ptr<MutableVertexMesh<2,2> > VoronoiVertexMeshGenerator::GetMeshAfterReMesh()
+boost::shared_ptr<MutableVertexMesh<2, 2> > VoronoiVertexMeshGenerator::GetMeshAfterReMesh()
 {
     mpMesh->ReMesh();
     return mpMesh;
@@ -129,7 +129,7 @@ boost::shared_ptr<Toroidal2dVertexMesh> VoronoiVertexMeshGenerator::GetToroidalM
 
     // We need to construct new nodes and elements so we don't have mpTorMesh sharing data with mpMesh
     std::vector<Node<2>*> new_nodes(mpMesh->GetNumNodes());
-    std::vector<VertexElement<2,2>*> new_elems(mpMesh->GetNumElements());
+    std::vector<VertexElement<2, 2>*> new_elems(mpMesh->GetNumElements());
 
     // Copy nodes
     for (unsigned node_counter = 0 ; node_counter < mpMesh->GetNumNodes() ; node_counter++)
@@ -151,7 +151,7 @@ boost::shared_ptr<Toroidal2dVertexMesh> VoronoiVertexMeshGenerator::GetToroidalM
     // Copy elements
     for (unsigned elem_counter = 0; elem_counter < mpMesh->GetNumElements(); elem_counter++)
     {
-        VertexElement<2,2>* p_elem_to_copy = mpMesh->GetElement(elem_counter);
+        VertexElement<2, 2>* p_elem_to_copy = mpMesh->GetElement(elem_counter);
 
         // Get the information relating to the element we are copying
         unsigned copy_index     = p_elem_to_copy->GetIndex();
@@ -172,11 +172,11 @@ boost::shared_ptr<Toroidal2dVertexMesh> VoronoiVertexMeshGenerator::GetToroidalM
         }
 
         // Create a new node and place it in index order
-        new_elems[copy_index] = new VertexElement<2,2>(copy_index, nodes_this_elem);
+        new_elems[copy_index] = new VertexElement<2, 2>(copy_index, nodes_this_elem);
     }
 
     // We can now create the mesh with new_elements and the subset of new_nodes
-    MutableVertexMesh<2,2>* p_temp_mesh = new MutableVertexMesh<2,2>(new_nodes, new_elems);
+    MutableVertexMesh<2, 2>* p_temp_mesh = new MutableVertexMesh<2, 2>(new_nodes, new_elems);
 
     /*
      * Recursively associate congruent nodes.
@@ -227,7 +227,7 @@ boost::shared_ptr<Toroidal2dVertexMesh> VoronoiVertexMeshGenerator::GetToroidalM
     // Copy elements
     for (unsigned elem_counter = 0; elem_counter < p_temp_mesh->GetNumElements(); elem_counter++)
     {
-        VertexElement<2,2>* p_elem_to_copy = p_temp_mesh->GetElement(elem_counter);
+        VertexElement<2, 2>* p_elem_to_copy = p_temp_mesh->GetElement(elem_counter);
 
         // Get the information relating to the element we are copying
         unsigned copy_index     = p_elem_to_copy->GetIndex();
@@ -250,7 +250,7 @@ boost::shared_ptr<Toroidal2dVertexMesh> VoronoiVertexMeshGenerator::GetToroidalM
         }
 
         // Create a new node and place it in index order
-        new_elems[copy_index] = new VertexElement<2,2>(copy_index, nodes_this_elem);
+        new_elems[copy_index] = new VertexElement<2, 2>(copy_index, nodes_this_elem);
     }
 
     delete p_temp_mesh;
@@ -305,7 +305,7 @@ boost::shared_ptr<Toroidal2dVertexMesh> VoronoiVertexMeshGenerator::GetToroidalM
     return mpTorMesh;
 }
 
-bool VoronoiVertexMeshGenerator::CheckForCongruentNodes(MutableVertexMesh<2,2>* pMesh, double width, double height)
+bool VoronoiVertexMeshGenerator::CheckForCongruentNodes(MutableVertexMesh<2, 2>* pMesh, double width, double height)
 {
     // First find all the current boundary nodes in pMesh
     std::vector<Node<2>*> boundary_nodes;
@@ -328,7 +328,7 @@ bool VoronoiVertexMeshGenerator::CheckForCongruentNodes(MutableVertexMesh<2,2>* 
     // Otherwise, calculate the eight possible congruent locations for the current node
     Node<2>* p_node_a = *(boundary_nodes.begin());
     c_vector<double, 2> node_a_pos = p_node_a->rGetLocation();
-    std::vector<c_vector<double,2> > congruent_locations(8, node_a_pos);
+    std::vector<c_vector<double, 2> > congruent_locations(8, node_a_pos);
 
     congruent_locations[0][0] += width;
 
@@ -376,7 +376,7 @@ bool VoronoiVertexMeshGenerator::CheckForCongruentNodes(MutableVertexMesh<2,2>* 
 
                 for (auto it : containing_elems)
                 {
-                    VertexElement<2,2>* p_this_elem = pMesh->GetElement(it);
+                    VertexElement<2, 2>* p_this_elem = pMesh->GetElement(it);
                     unsigned local_idx = p_this_elem->GetNodeLocalIndex(p_mesh_node_b->GetIndex());
 
                     assert(local_idx < UINT_MAX);
@@ -605,7 +605,7 @@ void VoronoiVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_vector<
             } while (edge != cell.incident_edge());
 
             // Add a new VertexElement to the mElements vector
-            elements.push_back(new VertexElement<2,2>(elements.size(), nodes_this_elem));
+            elements.push_back(new VertexElement<2, 2>(elements.size(), nodes_this_elem));
         }
     }
 
@@ -674,7 +674,7 @@ void VoronoiVertexMeshGenerator::CreateVoronoiTessellation(std::vector<c_vector<
     {
         mpMesh.reset();
     }
-    mpMesh = boost::make_shared<MutableVertexMesh<2,2> >(nodes, elements);
+    mpMesh = boost::make_shared<MutableVertexMesh<2, 2> >(nodes, elements);
 }
 
 void VoronoiVertexMeshGenerator::ValidateInputAndSetMembers()

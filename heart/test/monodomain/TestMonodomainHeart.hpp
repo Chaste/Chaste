@@ -155,7 +155,7 @@ public:
         bool stimulated_node_was_excited = false;
         bool unstimulated_node_was_excited = false;
 
-        for (unsigned i=0; i<voltage_values_at_node_37483.size(); ++i)
+        for (unsigned i = 0; i<voltage_values_at_node_37483.size(); ++i)
         {
             if (voltage_values_at_node_37483[i] > 0)
             {

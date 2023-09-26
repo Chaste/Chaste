@@ -42,13 +42,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A simple parabolic PDE used in tests.
  */
-template <int SPACE_DIM>
+template<int SPACE_DIM>
 class HeatEquationWithElementDependentSourceTerm : public AbstractLinearParabolicPde<SPACE_DIM>
 {
 public:
     double ComputeSourceTerm(
         const ChastePoint<SPACE_DIM>& rX,
-        double, Element<SPACE_DIM,SPACE_DIM>* pElement)
+        double, Element<SPACE_DIM, SPACE_DIM>* pElement)
     {
         /*
          * This is intended to mock different source terms in different mesh 
@@ -67,7 +67,7 @@ public:
 
     c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(
         const ChastePoint<SPACE_DIM>& rX,
-        Element<SPACE_DIM,SPACE_DIM>* pElement = NULL)
+        Element<SPACE_DIM, SPACE_DIM>* pElement = NULL)
     {
         return identity_matrix<double>(SPACE_DIM);
     }

@@ -129,7 +129,7 @@ void MatrixVentilationProblem::SetFluxAtBoundaryNode(
     }
 
     /*
-     * In a <1,3> mesh a boundary node will be associated with exactly one edge.
+     * In a <1, 3> mesh a boundary node will be associated with exactly one edge.
      * Flux boundary conditions are set in the system matrix using the node 
      * index for the row and the edge index for the column. The row associated 
      * with the leaf node is used so that the edge's row can still be used to 

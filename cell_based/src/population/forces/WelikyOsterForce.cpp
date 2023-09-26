@@ -48,7 +48,7 @@ WelikyOsterForce<DIM>::~WelikyOsterForce()
 {
 }
 
-template <unsigned DIM>
+template<unsigned DIM>
 void WelikyOsterForce<DIM>::AddForceContribution(
     [[maybe_unused]] AbstractCellPopulation<DIM>& rCellPopulation)
 {

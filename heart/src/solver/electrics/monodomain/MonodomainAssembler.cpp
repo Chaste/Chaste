@@ -40,13 +40,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PdeSimulationTime.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_matrix<double,1*(ELEMENT_DIM+1),1*(ELEMENT_DIM+1)> MonodomainAssembler<ELEMENT_DIM,SPACE_DIM>::ComputeMatrixTerm(
+c_matrix<double,1*(ELEMENT_DIM+1),1*(ELEMENT_DIM+1)> MonodomainAssembler<ELEMENT_DIM, SPACE_DIM>::ComputeMatrixTerm(
                 c_vector<double, ELEMENT_DIM+1> &rPhi,
                 c_matrix<double, SPACE_DIM, ELEMENT_DIM+1> &rGradPhi,
                 ChastePoint<SPACE_DIM> &rX,
-                c_vector<double,1> &rU,
+                c_vector<double, 1> &rU,
                 c_matrix<double, 1, SPACE_DIM> &rGradU /* not used */,
-                Element<ELEMENT_DIM,SPACE_DIM>* pElement)
+                Element<ELEMENT_DIM, SPACE_DIM>* pElement)
 {
     /// Am and Cm are set as scaling factors for the mass matrix in its constructor.
     return (PdeSimulationTime::GetPdeTimeStepInverse())*mMassMatrixAssembler.ComputeMatrixTerm(rPhi,rGradPhi,rX,rU,rGradU,pElement)
@@ -54,10 +54,10 @@ c_matrix<double,1*(ELEMENT_DIM+1),1*(ELEMENT_DIM+1)> MonodomainAssembler<ELEMENT
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-MonodomainAssembler<ELEMENT_DIM,SPACE_DIM>::MonodomainAssembler(
-                        AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                        MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* pTissue)
-    : AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,1,false,true,CARDIAC>(pMesh,pTissue),
+MonodomainAssembler<ELEMENT_DIM, SPACE_DIM>::MonodomainAssembler(
+                        AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+                        MonodomainTissue<ELEMENT_DIM, SPACE_DIM>* pTissue)
+    : AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM,1,false,true,CARDIAC>(pMesh,pTissue),
       mMassMatrixAssembler(pMesh, HeartConfig::Instance()->GetUseMassLumping(),
                            HeartConfig::Instance()->GetSurfaceAreaToVolumeRatio()*HeartConfig::Instance()->GetCapacitance()),
       mStiffnessMatrixAssembler(pMesh, pTissue)
@@ -66,10 +66,10 @@ MonodomainAssembler<ELEMENT_DIM,SPACE_DIM>::MonodomainAssembler(
 }
 
 // Explicit instantiation
-template class MonodomainAssembler<1,1>;
-template class MonodomainAssembler<1,2>;
-template class MonodomainAssembler<1,3>;
-template class MonodomainAssembler<2,2>;
-template class MonodomainAssembler<3,3>;
+template class MonodomainAssembler<1, 1>;
+template class MonodomainAssembler<1, 2>;
+template class MonodomainAssembler<1, 3>;
+template class MonodomainAssembler<2, 2>;
+template class MonodomainAssembler<3, 3>;
 
 #endif /*MONODOMAINASSEMBLER_CPP_*/

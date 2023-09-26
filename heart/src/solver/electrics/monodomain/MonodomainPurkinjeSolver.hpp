@@ -87,37 +87,37 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class MonodomainPurkinjeSolver
-  : public AbstractDynamicLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,2>
+  : public AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 2>
 {
 private:
     /** Saved pointer to the mesh in this class, as the pointer saved in the
      *  parent class (AbstractDynamicLinearPdeSolver::mpMesh) is not declared to
      *  be a pointer to a mixed mesh
      */
-    MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* mpMixedMesh;
+    MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>* mpMixedMesh;
 
     /** Monodomain tissue class (collection of cells, and conductivities) */
-    MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* mpMonodomainTissue;
+    MonodomainTissue<ELEMENT_DIM, SPACE_DIM>* mpMonodomainTissue;
 
     /** Boundary conditions */
-    BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,2>* mpBoundaryConditions;
+    BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 2>* mpBoundaryConditions;
 
     /**
      *  The volume assembler, used to set up volume integral parts of the
      *  LHS matrix
      */
-    MonodomainPurkinjeVolumeAssembler<ELEMENT_DIM,SPACE_DIM>* mpVolumeAssembler;
+    MonodomainPurkinjeVolumeAssembler<ELEMENT_DIM, SPACE_DIM>* mpVolumeAssembler;
     /**
      *  The cable element assembler, used to set up cable integral parts of the
      *  LHS matrix
      */
-    MonodomainPurkinjeCableAssembler<ELEMENT_DIM,SPACE_DIM>* mpCableAssembler;
+    MonodomainPurkinjeCableAssembler<ELEMENT_DIM, SPACE_DIM>* mpCableAssembler;
 
     /** Assembler for surface integrals coming from any non-zero Neumann boundary conditions */
-    NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM,2>* mpNeumannSurfaceTermsAssembler;
+    NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM, SPACE_DIM, 2>* mpNeumannSurfaceTermsAssembler;
 
     // SVI and Purkinje not yet implemented:
-    // MonodomainCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM>* mpMonodomainCorrectionTermAssembler;
+    // MonodomainCorrectionTermAssembler<ELEMENT_DIM, SPACE_DIM>* mpMonodomainCorrectionTermAssembler;
 
     /** The mass matrix, used to computing the RHS vector */
     Mat mMassMatrix;
@@ -168,9 +168,9 @@ public:
      * @param pTissue pointer to the tissue
      * @param pBoundaryConditions pointer to the boundary conditions
      */
-    MonodomainPurkinjeSolver(MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                             MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* pTissue,
-                             BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,2>* pBoundaryConditions);
+    MonodomainPurkinjeSolver(MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+                             MonodomainTissue<ELEMENT_DIM, SPACE_DIM>* pTissue,
+                             BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 2>* pBoundaryConditions);
 
     /**
      *  Destructor

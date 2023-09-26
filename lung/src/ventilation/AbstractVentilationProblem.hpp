@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * At graph edges: each pipe models Poiseuille flow (flux is linearly proportional to the pressure drop)
  * At graph nodes: the flux is balanced so that mass is conserved.
  *
- * Works in 3D <1,3>
+ * Works in 3D <1, 3>
  *
  * Current functionality: pressure boundary conditions are set on each of the boundary nodes
  * Solves for pressure at internal nodes and flux on edges
@@ -68,7 +68,7 @@ protected:
         PEDLEY_CORRECTION
     };
 
-    TetrahedralMesh<1,3> mMesh; /**< The 1d in 3d branching tree mesh */
+    TetrahedralMesh<1, 3> mMesh; /**< The 1d in 3d branching tree mesh */
     unsigned mOutletNodeIndex; /**< The outlet node is the root of the branching tree structure */
     /** (Dynamic) viscosity in kg/(mm*second).
      * Default to value from Swan et al. 2012. 10.1016/j.jtbi.2012.01.042 (page 224)
@@ -124,7 +124,7 @@ protected:
      * @param flux  The flux in the edge (used for Pedley correction).
      * @return the resistance of this element/edge
      */
-    double CalculateResistance(Element<1,3>& rElement, bool usePedley=false, double flux=DBL_MAX);
+    double CalculateResistance(Element<1, 3>& rElement, bool usePedley=false, double flux=DBL_MAX);
     /**
      * Common code used in all constructors.  Over-ridden in direct solver
      *
@@ -198,7 +198,7 @@ public:
     /**
      * @return  reference to the mesh
      */
-    TetrahedralMesh<1,3>& rGetMesh();
+    TetrahedralMesh<1, 3>& rGetMesh();
 
     /**
      * @param dynamicResistance

@@ -85,12 +85,12 @@ void CellCycleModelProteinConcentrationsWriter<ELEMENT_DIM, SPACE_DIM>::VisitCel
 }
 
 // Explicit instantiation
-template class CellCycleModelProteinConcentrationsWriter<1,1>;
-template class CellCycleModelProteinConcentrationsWriter<1,2>;
-template class CellCycleModelProteinConcentrationsWriter<2,2>;
-template class CellCycleModelProteinConcentrationsWriter<1,3>;
-template class CellCycleModelProteinConcentrationsWriter<2,3>;
-template class CellCycleModelProteinConcentrationsWriter<3,3>;
+template class CellCycleModelProteinConcentrationsWriter<1, 1>;
+template class CellCycleModelProteinConcentrationsWriter<1, 2>;
+template class CellCycleModelProteinConcentrationsWriter<2, 2>;
+template class CellCycleModelProteinConcentrationsWriter<1, 3>;
+template class CellCycleModelProteinConcentrationsWriter<2, 3>;
+template class CellCycleModelProteinConcentrationsWriter<3, 3>;
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer

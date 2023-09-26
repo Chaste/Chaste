@@ -1371,7 +1371,7 @@ public:
     /**
      * Test the functionality for adding further data to an existing file.
      */
-    void TestFailCreateFile(void)
+    void TestFailCreateFile()
     {
         // This test causes memory leak within MPIO
         int number_nodes = 100;
@@ -1409,7 +1409,7 @@ public:
      * NB And this test must come before TestWriteToExistingFile which test that
      * there is a Postprocessing block!
      */
-    void TestWriteNewDatasetToExistingFile(void)
+    void TestWriteNewDatasetToExistingFile()
     {
         int number_nodes = 100;
         DistributedVectorFactory factory(number_nodes);
@@ -1607,7 +1607,7 @@ public:
      * This test must come after TestHdf5DataWriterFullFormat and TestHdf5DataWriterFullFormatStripedIncomplete,
      * as we extend their files.
      */
-    void TestWriteToExistingFile(void)
+    void TestWriteToExistingFile()
     {
         int number_nodes = 100;
         DistributedVectorFactory factory(number_nodes);
@@ -1700,7 +1700,7 @@ public:
     /**
      * This test must come after TestWriteToExistingFile as it extends even further.
      */
-    void TestWriteToExistingFileWithCache(void)
+    void TestWriteToExistingFileWithCache()
     {
         int number_nodes = 100;
         DistributedVectorFactory factory(number_nodes);

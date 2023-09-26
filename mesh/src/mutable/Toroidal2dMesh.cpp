@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* These lines are very useful for debugging (visualize with 'showme').
 #include "TrianglesMeshWriter.hpp"
-TrianglesMeshWriter<2,2> mesh_writer("Toroidal2dMeshDebug", "mesh", false);
+TrianglesMeshWriter<2, 2> mesh_writer("Toroidal2dMeshDebug", "mesh", false);
 mesh_writer.WriteFilesUsingMesh(*this);
 */
 #include "Toroidal2dMesh.hpp"
@@ -45,7 +45,7 @@ mesh_writer.WriteFilesUsingMesh(*this);
 #include "VtkMeshWriter.hpp"
 
 Toroidal2dMesh::Toroidal2dMesh(double width, double depth)
-  : MutableMesh<2,2>(),
+  : MutableMesh<2, 2>(),
     mWidth(width),
     mHeight(depth)
 {
@@ -58,7 +58,7 @@ Toroidal2dMesh::~Toroidal2dMesh()
 }
 
 Toroidal2dMesh::Toroidal2dMesh(double width, double depth, std::vector<Node<2>* > nodes)
-  : MutableMesh<2,2>(),
+  : MutableMesh<2, 2>(),
     mWidth(width),
     mHeight(depth)
 {
@@ -104,7 +104,7 @@ void Toroidal2dMesh::CreateMirrorNodes()
     mBottomPeriodicBoundaryElementIndices.clear();
 
 
-    for (AbstractMesh<2,2>::NodeIterator node_iter = GetNodeIteratorBegin();
+    for (AbstractMesh<2, 2>::NodeIterator node_iter = GetNodeIteratorBegin();
          node_iter != GetNodeIteratorEnd();
          ++node_iter)
     {
@@ -127,7 +127,7 @@ void Toroidal2dMesh::CreateMirrorNodes()
         location = mNodes[mBottomOriginals[i]]->rGetLocation();
         location[1] = location[1] + mHeight;
 
-        unsigned new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
+        unsigned new_node_index = MutableMesh<2, 2>::AddNode(new Node<2>(0, location));
         mBottomImages.push_back(new_node_index);
         mImageToBottomOriginalNodeMap[new_node_index] = mBottomOriginals[i];
     }
@@ -139,7 +139,7 @@ void Toroidal2dMesh::CreateMirrorNodes()
         location = mNodes[mTopOriginals[i]]->rGetLocation();
         location[1] = location[1] - mHeight;
 
-        unsigned new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
+        unsigned new_node_index = MutableMesh<2, 2>::AddNode(new Node<2>(0, location));
         mTopImages.push_back(new_node_index);
         mImageToTopOriginalNodeMap[new_node_index] = mTopOriginals[i];
     }
@@ -150,7 +150,7 @@ void Toroidal2dMesh::CreateMirrorNodes()
     assert(mImageToTopOriginalNodeMap.size() == mTopOriginals.size());
 
 
-    for (AbstractMesh<2,2>::NodeIterator node_iter = GetNodeIteratorBegin();
+    for (AbstractMesh<2, 2>::NodeIterator node_iter = GetNodeIteratorBegin();
          node_iter != GetNodeIteratorEnd();
          ++node_iter)
     {
@@ -172,7 +172,7 @@ void Toroidal2dMesh::CreateMirrorNodes()
         location = mNodes[mLeftOriginals[i]]->rGetLocation();
         location[0] = location[0] + mWidth;
 
-        unsigned new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
+        unsigned new_node_index = MutableMesh<2, 2>::AddNode(new Node<2>(0, location));
         mLeftImages.push_back(new_node_index);
         mImageToLeftOriginalNodeMap[new_node_index] = mLeftOriginals[i];
     }
@@ -184,7 +184,7 @@ void Toroidal2dMesh::CreateMirrorNodes()
         location = mNodes[mRightOriginals[i]]->rGetLocation();
         location[0] = location[0] - mWidth;
 
-        unsigned new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
+        unsigned new_node_index = MutableMesh<2, 2>::AddNode(new Node<2>(0, location));
         mRightImages.push_back(new_node_index);
         mImageToRightOriginalNodeMap[new_node_index] = mRightOriginals[i];
     }
@@ -224,7 +224,7 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
      * of extra nodes which will be deleted, hence the name 'big_map'.
      */
     NodeMap big_map(GetNumAllNodes());
-    MutableMesh<2,2>::ReMesh(big_map);
+    MutableMesh<2, 2>::ReMesh(big_map);
 
     /*
      * If the big_map isn't the identity map, the little map ('map') needs to be
@@ -244,7 +244,7 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
     double bottom_boundary = -0.5*mHeight;
     double top_boundary = 1.5*mHeight;
 
-    for (TetrahedralMesh<2,2>::ElementIterator elem_iter = this->GetElementIteratorBegin();
+    for (TetrahedralMesh<2, 2>::ElementIterator elem_iter = this->GetElementIteratorBegin();
         elem_iter != this->GetElementIteratorEnd();
         ++elem_iter)
     {
@@ -273,7 +273,7 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
             }
         }
     }
-    for (TetrahedralMesh<2,2>::BoundaryElementIterator elem_iter = this->GetBoundaryElementIteratorBegin();
+    for (TetrahedralMesh<2, 2>::BoundaryElementIterator elem_iter = this->GetBoundaryElementIteratorBegin();
         elem_iter != this->GetBoundaryElementIteratorEnd();
         ++elem_iter)
     {
@@ -394,14 +394,14 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
 
     while (elem_index<num_elements && !boundary_element_made)
     {
-        Element<2,2>* p_element = GetElement(elem_index);
+        Element<2, 2>* p_element = GetElement(elem_index);
         if (!p_element->IsDeleted())
         {
             boundary_element_made = true;
             std::vector<Node<2>*> nodes;
             nodes.push_back(p_element->GetNode(0));
             nodes.push_back(p_element->GetNode(1));
-            BoundaryElement<1,2>* p_boundary_element = new BoundaryElement<1,2>(0, nodes);
+            BoundaryElement<1, 2>* p_boundary_element = new BoundaryElement<1, 2>(0, nodes);
             p_boundary_element->RegisterWithNodes();
             mBoundaryElements.push_back(p_boundary_element);
             this->mBoundaryElementWeightedDirections.push_back(zero_vector<double>(2));
@@ -454,7 +454,7 @@ void Toroidal2dMesh::ReconstructCylindricalMesh()
      * Figure out which elements have real nodes and image nodes in them
      * and replace image nodes with corresponding real ones.
      */
-    for (MutableMesh<2,2>::ElementIterator elem_iter = GetElementIteratorBegin();
+    for (MutableMesh<2, 2>::ElementIterator elem_iter = GetElementIteratorBegin();
          elem_iter != GetElementIteratorEnd();
          ++elem_iter)
     {
@@ -518,7 +518,7 @@ void Toroidal2dMesh::ReconstructCylindricalMesh()
     //  */
     // for (unsigned elem_index = 0; elem_index<GetNumAllBoundaryElements(); elem_index++)
     // {
-    //     BoundaryElement<1,2>* p_boundary_element = GetBoundaryElement(elem_index);
+    //     BoundaryElement<1, 2>* p_boundary_element = GetBoundaryElement(elem_index);
     //     if (!p_boundary_element->IsDeleted())
     //     {
     //         unsigned number_of_image_nodes = 0;
@@ -591,7 +591,7 @@ void Toroidal2dMesh::ReconstructToroidalMesh()
      * Figure out which elements have real nodes and image nodes in them
      * and replace image nodes with corresponding real ones.
      */
-    for (MutableMesh<2,2>::ElementIterator elem_iter = GetElementIteratorBegin();
+    for (MutableMesh<2, 2>::ElementIterator elem_iter = GetElementIteratorBegin();
          elem_iter != GetElementIteratorEnd();
          ++elem_iter)
     {
@@ -653,7 +653,7 @@ void Toroidal2dMesh::ReconstructToroidalMesh()
     //  */
     // for (unsigned elem_index = 0; elem_index<GetNumAllBoundaryElements(); elem_index++)
     // {
-    //     BoundaryElement<1,2>* p_boundary_element = GetBoundaryElement(elem_index);
+    //     BoundaryElement<1, 2>* p_boundary_element = GetBoundaryElement(elem_index);
     //     if (!p_boundary_element->IsDeleted())
     //     {
     //         unsigned number_of_image_nodes = 0;
@@ -779,7 +779,7 @@ void Toroidal2dMesh::SetNode(unsigned index, ChastePoint<2> point, bool concrete
     }
 
     // Update the node's location
-    MutableMesh<2,2>::SetNode(index, point, concreteMove);
+    MutableMesh<2, 2>::SetNode(index, point, concreteMove);
 }
 
 double Toroidal2dMesh::GetWidth(const unsigned& rDimension) const
@@ -799,7 +799,7 @@ double Toroidal2dMesh::GetWidth(const unsigned& rDimension) const
 
 unsigned Toroidal2dMesh::AddNode(Node<2>* pNewNode)
 {
-    unsigned node_index = MutableMesh<2,2>::AddNode(pNewNode);
+    unsigned node_index = MutableMesh<2, 2>::AddNode(pNewNode);
 
     // If necessary move it to be back on the cylinder
     ChastePoint<2> new_node_point = pNewNode->GetPoint();
@@ -830,14 +830,14 @@ void Toroidal2dMesh::CorrectCylindricalNonPeriodicMesh()
     // Go through all of the elements on the left periodic boundary
     for (auto left_iter : mLeftPeriodicBoundaryElementIndices)
     {
-        Element<2,2>* p_element = GetElement(left_iter);
+        Element<2, 2>* p_element = GetElement(left_iter);
 
         /*
          * Make lists of the nodes which the elements on the left contain and
          * the nodes which should be in a corresponding element on the right.
          */
-        c_vector<unsigned,3> original_element_node_indices;
-        c_vector<unsigned,3> corresponding_element_node_indices;
+        c_vector<unsigned, 3> original_element_node_indices;
+        c_vector<unsigned, 3> corresponding_element_node_indices;
         for (unsigned i = 0; i<3; ++i)
         {
             original_element_node_indices[i] = p_element->GetNodeGlobalIndex(i);
@@ -847,7 +847,7 @@ void Toroidal2dMesh::CorrectCylindricalNonPeriodicMesh()
         // Search the right hand side elements for the corresponding element
         for (auto right_iter : mRightPeriodicBoundaryElementIndices)
         {
-            Element<2,2>* p_corresponding_element = GetElement(right_iter);
+            Element<2, 2>* p_corresponding_element = GetElement(right_iter);
 
             bool is_corresponding_node = true;
 
@@ -928,14 +928,14 @@ void Toroidal2dMesh::CorrectToroidalNonPeriodicMesh()
     // Go through all of the elements on the bottom periodic boundary
     for (auto bottom_iter : mBottomPeriodicBoundaryElementIndices)
     {
-        Element<2,2>* p_element = GetElement(bottom_iter);
+        Element<2, 2>* p_element = GetElement(bottom_iter);
 
         /*
          * Make lists of the nodes which the elements on the bottom contain and
          * the nodes which should be in a corresponding element on the top.
          */
-        c_vector<unsigned,3> original_element_node_indices;
-        c_vector<unsigned,3> corresponding_element_node_indices;
+        c_vector<unsigned, 3> original_element_node_indices;
+        c_vector<unsigned, 3> corresponding_element_node_indices;
         for (unsigned i = 0; i<3; ++i)
         {
             original_element_node_indices[i] = p_element->GetNodeGlobalIndex(i);
@@ -945,7 +945,7 @@ void Toroidal2dMesh::CorrectToroidalNonPeriodicMesh()
         // Search the top hand side elements for the corresponding element
         for (auto top_iter : mTopPeriodicBoundaryElementIndices)
         {
-            Element<2,2>* p_corresponding_element = GetElement(top_iter);
+            Element<2, 2>* p_corresponding_element = GetElement(top_iter);
 
             bool is_corresponding_node = true;
 
@@ -1013,7 +1013,7 @@ void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingCylindricalPeriodicBound
     unsigned incidences_of_zero_left_image_nodes = 0;
     unsigned incidences_of_zero_right_image_nodes = 0;
 
-    for (MutableMesh<2,2>::ElementIterator elem_iter = GetElementIteratorBegin();
+    for (MutableMesh<2, 2>::ElementIterator elem_iter = GetElementIteratorBegin();
          elem_iter != GetElementIteratorEnd();
          ++elem_iter)
     {
@@ -1079,7 +1079,7 @@ void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingToroidalPeriodicBoundari
     unsigned incidences_of_zero_bottom_image_nodes = 0;
     unsigned incidences_of_zero_top_image_nodes = 0;
 
-    for (MutableMesh<2,2>::ElementIterator elem_iter = GetElementIteratorBegin();
+    for (MutableMesh<2, 2>::ElementIterator elem_iter = GetElementIteratorBegin();
          elem_iter != GetElementIteratorEnd();
          ++elem_iter)
     {
@@ -1259,7 +1259,7 @@ void Toroidal2dMesh::RefreshMesh()
     }
 
     // Now run the base class method
-    //TetrahedralMesh<2,2>::RefreshMesh();
+    //TetrahedralMesh<2, 2>::RefreshMesh();
 }
 
 // Serialization for Boost >= 1.36

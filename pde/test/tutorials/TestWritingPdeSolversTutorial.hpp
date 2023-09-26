@@ -157,7 +157,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 class MyTwoVariablePdeSolver
     : public AbstractAssemblerSolverHybrid<2/*elem_dim*/,2/*space_dim*/,2/*problem_dim*/,NORMAL/*amount of interpolation*/>,
-      public AbstractStaticLinearPdeSolver<2,2,2>
+      public AbstractStaticLinearPdeSolver<2, 2, 2>
 {
 private:
     /* The function f */
@@ -179,12 +179,12 @@ private:
      *  of nodes as linear bases are being used). The returned matrix is 6 by 6 (problem_dim *
      *  num_bases_per_element = 2*3 = 6).
      */
-    c_matrix<double,2*3,2*3> ComputeMatrixTerm(c_vector<double,3>& rPhi /* the three bases for the current element, evaluated at the current quad pt*/,
-                                               c_matrix<double,2,3>& rGradPhi /* gradients of the three bases */,
+    c_matrix<double,2*3,2*3> ComputeMatrixTerm(c_vector<double, 3>& rPhi /* the three bases for the current element, evaluated at the current quad pt*/,
+                                               c_matrix<double,2, 3>& rGradPhi /* gradients of the three bases */,
                                                ChastePoint<2>& rX           /* physical coordinate of quad point */,
-                                               c_vector<double,2>& rU       /* current solution (unused here as a linear static problem */,
-                                               c_matrix<double,2,2>& rGradU /* current solution gradient (unused here as a linear static problem */,
-                                               Element<2,2>* pElement)
+                                               c_vector<double, 2>& rU       /* current solution (unused here as a linear static problem */,
+                                               c_matrix<double,2, 2>& rGradU /* current solution gradient (unused here as a linear static problem */,
+                                               Element<2, 2>* pElement)
     {
         /*
          * Set up the matrix, which corresponds to the elemental contribution for the matrix
@@ -217,9 +217,9 @@ private:
     c_vector<double,2*3> ComputeVectorTerm(c_vector<double, 3>& rPhi,
                                            c_matrix<double, 2, 2+1>& rGradPhi,
                                            ChastePoint<2>& rX,
-                                           c_vector<double,2>& rU,
-                                           c_matrix<double,2,2>& rGradU,
-                                           Element<2,2>* pElement)
+                                           c_vector<double, 2>& rU,
+                                           c_matrix<double,2, 2>& rGradU,
+                                           Element<2, 2>* pElement)
     {
         c_vector<double,2*3> ret;
 
@@ -243,10 +243,10 @@ public:
     /* The constructor takes in a mesh and boundary conditions container, and passes
      * them to the parent classes.
      */
-    MyTwoVariablePdeSolver(TetrahedralMesh<2,2>* pMesh,
-                           BoundaryConditionsContainer<2,2,2>* pBoundaryConditions)
-        : AbstractAssemblerSolverHybrid<2,2,2,NORMAL>(pMesh,pBoundaryConditions),
-          AbstractStaticLinearPdeSolver<2,2,2>(pMesh)
+    MyTwoVariablePdeSolver(TetrahedralMesh<2, 2>* pMesh,
+                           BoundaryConditionsContainer<2, 2, 2>* pBoundaryConditions)
+        : AbstractAssemblerSolverHybrid<2, 2,2,NORMAL>(pMesh,pBoundaryConditions),
+          AbstractStaticLinearPdeSolver<2, 2, 2>(pMesh)
     {
     }
 };
@@ -300,8 +300,8 @@ public:
  * how to assemble the volume integral part of the RHS vector, and the LHS matrix.
  */
 class ThreeParabolicPdesSolver
-    : public AbstractAssemblerSolverHybrid<2,2,3,NORMAL>,
-      public AbstractDynamicLinearPdeSolver<2,2,3>
+    : public AbstractAssemblerSolverHybrid<2, 2,3,NORMAL>,
+      public AbstractDynamicLinearPdeSolver<2, 2, 3>
 {
 private:
     /* Define the function g(t,x,y) */
@@ -312,12 +312,12 @@ private:
 
     /* Provide the (elemental contribution to the) LHS matrix. The matrix is 9 by 9, where
      * 9 = 3*3 = PROBLEM_DIM * NUM_NODES_PER_ELEMENT */
-    c_matrix<double,3*3,3*3> ComputeMatrixTerm(c_vector<double,3>& rPhi,
-                                               c_matrix<double,2,3>& rGradPhi,
+    c_matrix<double,3*3,3*3> ComputeMatrixTerm(c_vector<double, 3>& rPhi,
+                                               c_matrix<double,2, 3>& rGradPhi,
                                                ChastePoint<2>& rX,
-                                               c_vector<double,3>& rU,
-                                               c_matrix<double,3,2>& rGradU,
-                                               Element<2,2>* pElement)
+                                               c_vector<double, 3>& rU,
+                                               c_matrix<double,3, 2>& rGradU,
+                                               Element<2, 2>* pElement)
     {
         c_matrix<double,9,9> ret = zero_matrix<double>(9,9);
 
@@ -354,9 +354,9 @@ private:
     c_vector<double,3*3> ComputeVectorTerm(c_vector<double, 3>& rPhi,
                                            c_matrix<double, 2, 3>& rGradPhi,
                                            ChastePoint<2>& rX,
-                                           c_vector<double,3>& rU,
-                                           c_matrix<double,3,2>& rGradU,
-                                           Element<2,2>* pElement)
+                                           c_vector<double, 3>& rU,
+                                           c_matrix<double,3, 2>& rGradU,
+                                           Element<2, 2>* pElement)
     {
         c_vector<double,3*3> ret;
 
@@ -391,10 +391,10 @@ public:
      * and only needs to be assembled once. Make sure we tell the solver this, otherwise performance
      * will be destroyed.
      */
-    ThreeParabolicPdesSolver(TetrahedralMesh<2,2>* pMesh,
-                             BoundaryConditionsContainer<2,2,3>* pBoundaryConditions)
-        : AbstractAssemblerSolverHybrid<2,2,3,NORMAL>(pMesh,pBoundaryConditions),
-          AbstractDynamicLinearPdeSolver<2,2,3>(pMesh)
+    ThreeParabolicPdesSolver(TetrahedralMesh<2, 2>* pMesh,
+                             BoundaryConditionsContainer<2, 2, 3>* pBoundaryConditions)
+        : AbstractAssemblerSolverHybrid<2, 2,3,NORMAL>(pMesh,pBoundaryConditions),
+          AbstractDynamicLinearPdeSolver<2, 2, 3>(pMesh)
     {
         this->mMatrixIsConstant = true;
     }
@@ -409,11 +409,11 @@ public:
     */
     void TestMyTwoVariablePdeSolver()
     {
-        TetrahedralMesh<2,2> mesh;
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructRegularSlabMesh(0.01 /*h*/, 1.0 /*width*/, 1.0 /*height*/);
 
         // Boundary conditions for 2-unknown problem
-        BoundaryConditionsContainer<2,2,2> bcc;
+        BoundaryConditionsContainer<2, 2, 2> bcc;
         bcc.DefineZeroDirichletOnMeshBoundary(&mesh,0); // zero dirichlet for u
         bcc.DefineZeroDirichletOnMeshBoundary(&mesh,1); // zero dirichlet for v
 
@@ -447,19 +447,19 @@ public:
     /* Now run a test solving the parabolic-parabolic-parabolic PDE system. */
     void TestMyParaEllipticSetOfPdesSolver()
     {
-        TetrahedralMesh<2,2> mesh;
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructRegularSlabMesh(0.05 /*h*/, 1.0 /*width*/, 1.0 /*height*/);
 
         /* Set up the boundary conditions. v and w are zero on the entire boundary,
          * and du/dn=1 on the LHS and 0 otherwise.
          */
-        BoundaryConditionsContainer<2,2,3> bcc;
+        BoundaryConditionsContainer<2, 2, 3> bcc;
 
         bcc.DefineZeroDirichletOnMeshBoundary(&mesh,1 /*index of unknown, ie v*/);
         bcc.DefineZeroDirichletOnMeshBoundary(&mesh,2 /*index of unknown, ie w*/);
 
         ConstBoundaryCondition<2>* p_neumann_bc = new ConstBoundaryCondition<2>(1.0);
-        TetrahedralMesh<2,2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
+        TetrahedralMesh<2, 2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
         while (iter < mesh.GetBoundaryElementIteratorEnd())
         {
             if (fabs((*iter)->CalculateCentroid()[0])<1e-6)
@@ -504,7 +504,7 @@ public:
          * also need the mesh data - at the very least the nodal locations - so we also write out
          * the mesh
          */
-        TrianglesMeshWriter<2,2> mesh_writer("ThreeVarCoupledProblem", "mesh", false /*don't clean (ie delete everything in) directory!*/);
+        TrianglesMeshWriter<2, 2> mesh_writer("ThreeVarCoupledProblem", "mesh", false /*don't clean (ie delete everything in) directory!*/);
         mesh_writer.WriteFilesUsingMesh(mesh);
 
         /* Note that we need to destroy the initial condition vector as well as the solution. */

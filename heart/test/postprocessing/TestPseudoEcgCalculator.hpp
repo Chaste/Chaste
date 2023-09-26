@@ -68,11 +68,11 @@ public:
     {
 
         //read in the 1D mesh, from 0 to 1
-        TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_100_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> reader("mesh/test/data/1D_0_to_1_100_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(reader);
 
-        for (AbstractTetrahedralMesh<1,1>::ElementIterator it = mesh.GetElementIteratorBegin();
+        for (AbstractTetrahedralMesh<1, 1>::ElementIterator it = mesh.GetElementIteratorBegin();
              it != mesh.GetElementIteratorEnd();
              ++it)
         {
@@ -104,7 +104,7 @@ public:
 
         //4 time steps
         unsigned number_of_time_steps = 4;
-        for (unsigned time_step=0; time_step<number_of_time_steps; time_step++)
+        for (unsigned time_step = 0; time_step<number_of_time_steps; time_step++)
         {
             // Write some values, the value of V is the same as the x coordinate, i.e. a gradient
             for (auto index = distributed_vector_1.Begin();
@@ -134,7 +134,7 @@ public:
         ///////////////////////////////////////////////////
         ChastePoint<1> probe_electrode(15.0);
 
-        PseudoEcgCalculator<1,1,1> calculator (mesh, probe_electrode,
+        PseudoEcgCalculator<1, 1, 1> calculator (mesh, probe_electrode,
                                                FileFinder("hdf5",RelativeTo::ChasteTestOutput),
                                                "gradient_V");
         double pseudo_ecg;
@@ -161,7 +161,7 @@ public:
 
         {
             // Time-step striding
-            PseudoEcgCalculator<1,1,1> course_calculator (mesh, probe_electrode,
+            PseudoEcgCalculator<1, 1, 1> course_calculator (mesh, probe_electrode,
                                                    FileFinder("hdf5",RelativeTo::ChasteTestOutput),
                                                    "gradient_V", "V" /*Voltage name*/, 2 /*Time stride*/);
             course_calculator.WritePseudoEcg();
@@ -171,7 +171,7 @@ public:
         }
 
         ChastePoint<1> bad_probe_electrode(0.0021132486540519);
-        PseudoEcgCalculator<1,1,1> bad_calculator (mesh,
+        PseudoEcgCalculator<1, 1, 1> bad_calculator (mesh,
                                                    bad_probe_electrode,
                                                    FileFinder("hdf5",RelativeTo::ChasteTestOutput),
                                                    "gradient_V");
@@ -181,11 +181,11 @@ public:
 
     void TestCalculator1DParabolic()
     {
-        TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_100_elements");
-        DistributedTetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> reader("mesh/test/data/1D_0_to_1_100_elements");
+        DistributedTetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(reader);
 
-        for (AbstractTetrahedralMesh<1,1>::ElementIterator it = mesh.GetElementIteratorBegin();
+        for (AbstractTetrahedralMesh<1, 1>::ElementIterator it = mesh.GetElementIteratorBegin();
              it != mesh.GetElementIteratorEnd();
              ++it)
         {
@@ -249,7 +249,7 @@ public:
 
         ChastePoint<1> probe_electrode(15.0);
 
-        PseudoEcgCalculator<1,1,1> calculator (mesh, probe_electrode,
+        PseudoEcgCalculator<1, 1, 1> calculator (mesh, probe_electrode,
                 FileFinder("hdf5",RelativeTo::ChasteTestOutput), "parabolic_V", "V");
 
         double pseudo_ecg; //stores the results
@@ -288,18 +288,18 @@ public:
         HeartConfig::Instance()->SetOutputDirectory("BidomainBath1d_PseudoEcg");
         HeartConfig::Instance()->SetOutputFilenamePrefix("bidomain_bath_1d");
 
-        c_vector<double,1> centre;
+        c_vector<double, 1> centre;
         centre(0) = 0.5;
         BathCellFactory<1> cell_factory(-1e6, centre); // stimulates x=0.5 node
 
         BidomainWithBathProblem<1> bidomain_problem( &cell_factory );
 
-        TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1_100_elements");
-        TetrahedralMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> reader("mesh/test/data/1D_0_to_1_100_elements");
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(reader);
 
         // Set the x<0.25 and x>0.75 regions as the bath region
-        for (unsigned i=0; i<mesh.GetNumElements(); ++i)
+        for (unsigned i = 0; i<mesh.GetNumElements(); ++i)
         {
             double x = mesh.GetElement(i)->CalculateCentroid()[0];
             if ((x<0.25) || (x>0.75))
@@ -318,14 +318,14 @@ public:
 
         // Test some Pseudo ECG calculation methods #2107
         ChastePoint<1> point1(0.0); // Point at which to calculate a pseudo-ECG - this is allowed.
-        PseudoEcgCalculator<1,1,1>  ecg_calculator1(mesh, point1, FileFinder("BidomainBath1d_PseudoEcg",RelativeTo::ChasteTestOutput), "bidomain_bath_1d");
+        PseudoEcgCalculator<1, 1, 1>  ecg_calculator1(mesh, point1, FileFinder("BidomainBath1d_PseudoEcg",RelativeTo::ChasteTestOutput), "bidomain_bath_1d");
 
         // At the beginning we should have zero as voltage is uniform (in the tissue, this failed before #2107)
         double pseudo_ecg1_at_t_0 = ecg_calculator1.ComputePseudoEcgAtOneTimeStep(0);
         TS_ASSERT_DELTA(pseudo_ecg1_at_t_0, 0.0, 1e-9);
 
         ChastePoint<1> point2(0.3); // Point at which to calculate a pseudo-ECG - this should look decent
-        PseudoEcgCalculator<1,1,1> ecg_calculator2(mesh, point2, FileFinder("BidomainBath1d_PseudoEcg",RelativeTo::ChasteTestOutput), "bidomain_bath_1d");
+        PseudoEcgCalculator<1, 1, 1> ecg_calculator2(mesh, point2, FileFinder("BidomainBath1d_PseudoEcg",RelativeTo::ChasteTestOutput), "bidomain_bath_1d");
 
         // At the beginning we should have zero as voltage is uniform (in the tissue, this failed before #2107)
         double pseudo_ecg2_at_t_0 = ecg_calculator2.ComputePseudoEcgAtOneTimeStep(0);

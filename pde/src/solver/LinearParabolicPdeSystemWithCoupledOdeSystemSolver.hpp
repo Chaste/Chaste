@@ -117,7 +117,7 @@ private:
         c_vector<double, ELEMENT_DIM+1>& rPhi,
         c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi,
         ChastePoint<SPACE_DIM>& rX,
-        c_vector<double,PROBLEM_DIM>& rU,
+        c_vector<double, PROBLEM_DIM>& rU,
         c_matrix<double, PROBLEM_DIM, SPACE_DIM>& rGradU,
         Element<ELEMENT_DIM, SPACE_DIM>* pElement);
 
@@ -135,8 +135,8 @@ private:
         c_vector<double, ELEMENT_DIM+1>& rPhi,
         c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi,
         ChastePoint<SPACE_DIM>& rX,
-        c_vector<double,PROBLEM_DIM>& rU,
-        c_matrix<double,PROBLEM_DIM,SPACE_DIM>& rGradU,
+        c_vector<double, PROBLEM_DIM>& rU,
+        c_matrix<double, PROBLEM_DIM, SPACE_DIM>& rGradU,
         Element<ELEMENT_DIM, SPACE_DIM>* pElement);
 
     /**
@@ -252,7 +252,7 @@ c_matrix<double, PROBLEM_DIM*(ELEMENT_DIM+1), PROBLEM_DIM*(ELEMENT_DIM+1)> Linea
     c_vector<double, ELEMENT_DIM+1>& rPhi,
     c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi,
     ChastePoint<SPACE_DIM>& rX,
-    c_vector<double,PROBLEM_DIM>& rU,
+    c_vector<double, PROBLEM_DIM>& rU,
     c_matrix<double, PROBLEM_DIM, SPACE_DIM>& rGradU,
     Element<ELEMENT_DIM, SPACE_DIM>* pElement)
 {
@@ -284,8 +284,8 @@ c_vector<double, PROBLEM_DIM*(ELEMENT_DIM+1)> LinearParabolicPdeSystemWithCouple
     c_vector<double, ELEMENT_DIM+1>& rPhi,
     c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi,
     ChastePoint<SPACE_DIM>& rX,
-    c_vector<double,PROBLEM_DIM>& rU,
-    c_matrix<double,PROBLEM_DIM,SPACE_DIM>& rGradU,
+    c_vector<double, PROBLEM_DIM>& rU,
+    c_matrix<double, PROBLEM_DIM, SPACE_DIM>& rGradU,
     Element<ELEMENT_DIM, SPACE_DIM>* pElement)
 {
     double timestep_inverse = PdeSimulationTime::GetPdeTimeStepInverse();

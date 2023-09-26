@@ -50,37 +50,37 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 template<unsigned DIM>
-class CableTestProblemRhsAssembler :  public AbstractFeCableIntegralAssembler<DIM,DIM,1,true,false,NORMAL>
+class CableTestProblemRhsAssembler :  public AbstractFeCableIntegralAssembler<DIM, DIM,1,true,false,NORMAL>
 {
 private:
     c_vector<double,1*2> ComputeCableVectorTerm(
         c_vector<double, 2>& rPhi,
         c_matrix<double, DIM, 2>& rGradPhi,
         ChastePoint<DIM>& rX,
-        c_vector<double,1>& rU,
+        c_vector<double, 1>& rU,
         c_matrix<double, 1, DIM>& rGradU,
-        Element<1,DIM>* pElement)
+        Element<1, DIM>* pElement)
     {
         return -rPhi;
     }
 
 public:
-    CableTestProblemRhsAssembler(MixedDimensionMesh<DIM,DIM>* pMesh)
-        : AbstractFeCableIntegralAssembler<DIM,DIM,1,true,false,NORMAL>(pMesh)
+    CableTestProblemRhsAssembler(MixedDimensionMesh<DIM, DIM>* pMesh)
+        : AbstractFeCableIntegralAssembler<DIM, DIM,1,true,false,NORMAL>(pMesh)
     {
     }
 };
 
 // solver
 template<unsigned DIM>
-class CableTestProblemSolver: public AbstractStaticLinearPdeSolver<DIM,DIM,1>
+class CableTestProblemSolver: public AbstractStaticLinearPdeSolver<DIM, DIM, 1>
 {
 private:
-    StiffnessMatrixAssembler<DIM,DIM>* mpStiffnessMatrixAssembler;
+    StiffnessMatrixAssembler<DIM, DIM>* mpStiffnessMatrixAssembler;
     CableTestProblemRhsAssembler<DIM>* mpRhsAssembler;
 
     /** Boundary conditions */
-    BoundaryConditionsContainer<DIM,DIM,1>* mpBoundaryConditions;
+    BoundaryConditionsContainer<DIM, DIM, 1>* mpBoundaryConditions;
 
     void SetupLinearSystem(Vec currentSolution, bool computeMatrix)
     {
@@ -103,13 +103,13 @@ private:
 
 
 public:
-    CableTestProblemSolver(MixedDimensionMesh<DIM,DIM>* pMesh,
-                           BoundaryConditionsContainer<DIM,DIM,1>* pBoundaryConditions)
-         : AbstractStaticLinearPdeSolver<DIM,DIM,1>(pMesh),
+    CableTestProblemSolver(MixedDimensionMesh<DIM, DIM>* pMesh,
+                           BoundaryConditionsContainer<DIM, DIM, 1>* pBoundaryConditions)
+         : AbstractStaticLinearPdeSolver<DIM, DIM, 1>(pMesh),
            mpBoundaryConditions(pBoundaryConditions)
     {
         // set-up mStiffnessMatrixAssembler and mRhsAssembler
-        mpStiffnessMatrixAssembler = new StiffnessMatrixAssembler<DIM,DIM>(pMesh);
+        mpStiffnessMatrixAssembler = new StiffnessMatrixAssembler<DIM, DIM>(pMesh);
         mpRhsAssembler = new CableTestProblemRhsAssembler<DIM>(pMesh);
     }
 
@@ -131,15 +131,15 @@ public:
     void TestSolvingTestProblem()
     {
         std::string mesh_base("mesh/test/data/mixed_dimension_meshes/cylinder");
-        TrianglesMeshReader<3,3> reader(mesh_base);
-        MixedDimensionMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> reader(mesh_base);
+        MixedDimensionMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(reader);
 
         ConstBoundaryCondition<3>* p_zero_boundary_condition = new ConstBoundaryCondition<3>(0.0);
 
         // apply boundary conditions u=0 on curved surface of cylinder (zero neumann BCs are
         // applied on the bottom and top surface (z=0,1).
-        BoundaryConditionsContainer<3,3,1> bcc;
+        BoundaryConditionsContainer<3, 3, 1> bcc;
 
 //// NOTE: this mesh doesn't have a (valid) face file defined, so the face and boundary node
 //// data isn't set up in the mesh. Therefore, rather than looping over boundary nodes, we

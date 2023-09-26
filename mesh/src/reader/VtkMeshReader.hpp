@@ -76,7 +76,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *  Reads a mesh (and data) from VTK .vtu format (that's an XML-based, data compressed unstructured mesh)
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class VtkMeshReader : public AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>
 {
 private:
@@ -237,7 +237,7 @@ public:
      * @param dataName Name of the cell data
      * @param dataPayload in which to store the result
      */
-     void GetCellData(std::string dataName, std::vector<c_vector<double,SPACE_DIM> >& dataPayload);
+     void GetCellData(std::string dataName, std::vector<c_vector<double, SPACE_DIM> >& dataPayload);
 
     /**
      * @return an std::vector containing the vector-directed vtkPointData with attribute name specified
@@ -246,7 +246,7 @@ public:
      * @param dataName Name of the point data
      * @param dataPayload in which to store the result
      */
-    void GetPointData(std::string dataName, std::vector<c_vector<double,SPACE_DIM> >& dataPayload);
+    void GetPointData(std::string dataName, std::vector<c_vector<double, SPACE_DIM> >& dataPayload);
 
     /**
      * @return a pointer to #mpVtkUnstructuredGrid

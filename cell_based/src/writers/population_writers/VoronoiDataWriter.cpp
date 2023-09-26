@@ -47,7 +47,7 @@ VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::VoronoiDataWriter()
 {
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
     [[maybe_unused]] MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation) // [[maybe_unused]] due to unused-but-set-parameter warning in GCC 7,8,9
 {
@@ -114,12 +114,12 @@ void VoronoiDataWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
 }
 
 // Explicit instantiation
-template class VoronoiDataWriter<1,1>;
-template class VoronoiDataWriter<1,2>;
-template class VoronoiDataWriter<2,2>;
-template class VoronoiDataWriter<1,3>;
-template class VoronoiDataWriter<2,3>;
-template class VoronoiDataWriter<3,3>;
+template class VoronoiDataWriter<1, 1>;
+template class VoronoiDataWriter<1, 2>;
+template class VoronoiDataWriter<2, 2>;
+template class VoronoiDataWriter<1, 3>;
+template class VoronoiDataWriter<2, 3>;
+template class VoronoiDataWriter<3, 3>;
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer

@@ -66,9 +66,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 
 /* This function is used in the first test */
-c_vector<double,2> MyTraction(c_vector<double,2>& rX, double time)
+c_vector<double, 2> MyTraction(c_vector<double, 2>& rX, double time)
 {
-    c_vector<double,2> traction = zero_vector<double>(2);
+    c_vector<double, 2> traction = zero_vector<double>(2);
     traction(0) = rX(0);
     return traction;
 }
@@ -101,9 +101,9 @@ public:
         ExponentialMaterialLaw<2> law(1.0, 0.5); // First parameter is 'a', second 'b', in W=a*exp(b(I1-3))
         /* Now specify the fixed nodes, and their new locations. Create `std::vector`s for each. */
         std::vector<unsigned> fixed_nodes;
-        std::vector<c_vector<double,2> > locations;
+        std::vector<c_vector<double, 2> > locations;
         /* Loop over the mesh nodes */
-        for (unsigned i=0; i<mesh.GetNumNodes(); ++i)
+        for (unsigned i = 0; i < mesh.GetNumNodes(); ++i)
         {
             /* If the node is on the Y=0 surface (the LHS) */
             if (fabs(mesh.GetNode(i)->rGetLocation()[1]) < 1e-6)
@@ -111,7 +111,7 @@ public:
                 /* Add it to the list of fixed nodes */
                 fixed_nodes.push_back(i);
                 /* and define a new position x=(X,0.1*X^2^) */
-                c_vector<double,2> new_location;
+                c_vector<double, 2> new_location;
                 double X = mesh.GetNode(i)->rGetLocation()[0];
                 new_location(0) = X;
                 new_location(1) = 0.1*X*X;
@@ -122,15 +122,15 @@ public:
         /* Now collect all the boundary elements on the top surface, as before, except
          * here we don't create the tractions for each element
          */
-        std::vector<BoundaryElement<1,2>*> boundary_elems;
-        for (TetrahedralMesh<2,2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
+        std::vector<BoundaryElement<1, 2>*> boundary_elems;
+        for (TetrahedralMesh<2, 2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
              iter != mesh.GetBoundaryElementIteratorEnd();
              ++iter)
         {
             /* If Y=1, have found a boundary element */
             if (fabs((*iter)->CalculateCentroid()[1] - 1.0)<1e-6)
             {
-                BoundaryElement<1,2>* p_element = *iter;
+                BoundaryElement<1, 2>* p_element = *iter;
                 boundary_elems.push_back(p_element);
             }
         }
@@ -174,7 +174,7 @@ public:
          * sequence of static problems with time-dependent tractions (say), for which they should allow `MyTraction` to
          * depend on time, and put the solve inside a time-loop, for example:
          */
-        //for (double t=0; t<T; t+=dt)
+        //for (double t = 0; t < T; t += dt)
         //{
         //    solver.SetCurrentTime(t);
         //    solver.Solve();
@@ -210,7 +210,7 @@ public:
 
         /* Create fixed nodes and locations... */
         std::vector<unsigned> fixed_nodes;
-        std::vector<c_vector<double,2> > locations;
+        std::vector<c_vector<double, 2> > locations;
 
         /* Fix node 0 (the node at the origin) */
         fixed_nodes.push_back(0);
@@ -224,7 +224,7 @@ public:
                 /* ..add it to the list of fixed nodes.. */
                 fixed_nodes.push_back(i);
                 /* ..and define y to be 0 but x is fixed */
-                c_vector<double,2> new_location;
+                c_vector<double, 2> new_location;
                 new_location(0) = SolidMechanicsProblemDefinition<2>::FREE;
                 new_location(1) = 0.0;
                 locations.push_back(new_location);
@@ -235,7 +235,7 @@ public:
         SolidMechanicsProblemDefinition<2> problem_defn(mesh);
         problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
         problem_defn.SetFixedNodes(fixed_nodes, locations);
-        c_vector<double,2> gravity = zero_vector<double>(2);
+        c_vector<double, 2> gravity = zero_vector<double>(2);
         gravity(1) = -0.5;
         problem_defn.SetBodyForce(gravity);
 
@@ -269,7 +269,7 @@ public:
          * centred at the origin with radius 1).
          */
         QuadraticMesh<2> mesh;
-        TrianglesMeshReader<2,2> reader("mesh/test/data/disk_522_elements");
+        TrianglesMeshReader<2, 2> reader("mesh/test/data/disk_522_elements");
         mesh.ConstructFromLinearMeshReader(reader);
 
         /* Compressible problems require a compressible material law, ie one that
@@ -280,7 +280,7 @@ public:
 
         /* For this problem, we fix the nodes on the surface for which Y < -0.9 */
         std::vector<unsigned> fixed_nodes;
-        for ( TetrahedralMesh<2,2>::BoundaryNodeIterator iter = mesh.GetBoundaryNodeIteratorBegin();
+        for ( TetrahedralMesh<2, 2>::BoundaryNodeIterator iter = mesh.GetBoundaryNodeIteratorBegin();
               iter != mesh.GetBoundaryNodeIteratorEnd();
               ++iter)
         {
@@ -297,13 +297,13 @@ public:
          * matter as the Dirichlet boundary conditions to the nonlinear system essentially overwrite
          * an Neumann-related effects).
          */
-        std::vector<BoundaryElement<1,2>*> boundary_elems;
-        for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
+        std::vector<BoundaryElement<1, 2>*> boundary_elems;
+        for (TetrahedralMesh<2, 2>::BoundaryElementIterator iter
               = mesh.GetBoundaryElementIteratorBegin();
             iter != mesh.GetBoundaryElementIteratorEnd();
             ++iter)
         {
-           BoundaryElement<1,2>* p_element = *iter;
+           BoundaryElement<1, 2>* p_element = *iter;
            if (p_element->CalculateCentroid()[1]<0.0)
            {
                boundary_elems.push_back(p_element);
@@ -331,7 +331,7 @@ public:
          */
         problem_defn.SetVerboseDuringSolve();
 
-        c_vector<double,2> gravity;
+        c_vector<double, 2> gravity;
         gravity(0) = 0;
         gravity(1) = 0.1;
         problem_defn.SetBodyForce(gravity);

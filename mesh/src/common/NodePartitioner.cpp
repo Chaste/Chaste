@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <parmetis.h>
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::DumbPartitioning(AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
                                                                std::set<unsigned>& rNodesOwned)
 {
@@ -67,7 +67,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::DumbPartitioning(AbstractMesh<ELEM
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
                                               std::vector<unsigned>& rNodePermutation,
                                               std::set<unsigned>& rNodesOwned,
@@ -134,10 +134,10 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
                 element_data = rMeshReader.GetNextElementData();
             }
 
-            for (unsigned i=0; i<element_data.NodeIndices.size(); ++i)
+            for (unsigned i = 0; i<element_data.NodeIndices.size(); ++i)
             {
                 unsigned row = element_data.NodeIndices[i];
-                for (unsigned j=0; j<i; ++j)
+                for (unsigned j = 0; j<i; ++j)
                 {
                     unsigned col = element_data.NodeIndices[j];
                     MatSetValue(connectivity_matrix, row, col, 1.0, INSERT_VALUES);
@@ -195,7 +195,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
 
             unsigned row_local_index = row_global_index - connectivity_matrix_lo;
             xadj[row_local_index+1] = xadj[row_local_index] + row_num_nz;
-            for (PetscInt col_index=0; col_index<row_num_nz; col_index++)
+            for (PetscInt col_index = 0; col_index<row_num_nz; col_index++)
             {
             adjncy[xadj[row_local_index] + col_index] =  column_indices[col_index];
             }
@@ -261,7 +261,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
 
         // The locally owned range under the new numbering
         PetscInt* local_range = new PetscInt[my_num_nodes];
-        for (unsigned i=0; i<my_num_nodes; ++i)
+        for (unsigned i = 0; i<my_num_nodes; ++i)
         {
             local_range[i] = rProcessorsOffset[local_proc_index] + i;
         }
@@ -274,7 +274,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
 
         // Once we know the offsets we can compute the permutation vector
         PetscInt* global_range = new PetscInt[num_nodes];
-        for (unsigned i=0; i<num_nodes; ++i)
+        for (unsigned i = 0; i<num_nodes; ++i)
         {
             global_range[i] = i;
         }
@@ -300,7 +300,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshReader,
                                     std::vector<unsigned>& rNodePermutation,
                                     std::set<unsigned>& rNodesOwned,
@@ -315,7 +315,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(AbstractMesh
     std::vector<unsigned> node_ownership(num_nodes, 0);
     std::vector<unsigned> node_index_ownership(num_nodes, UNSIGNED_UNSET);
 
-    for (unsigned node=0; node < num_nodes; node++)
+    for (unsigned node = 0; node < num_nodes; node++)
     {
         std::vector<double> location = rMeshReader.GetNextNode();
 
@@ -329,7 +329,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(AbstractMesh
 
         bool does_contain = true;
 
-        for (unsigned d=0; d<SPACE_DIM; d++)
+        for (unsigned d = 0; d<SPACE_DIM; d++)
         {
             bool boundary_check;
             boundary_check = ((location[d] > lower[d]) || sqrt((location[d]-lower[d])*(location[d]-lower[d])) < DBL_EPSILON);
@@ -349,7 +349,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(AbstractMesh
     std::vector<unsigned> global_index_ownership(num_nodes, UNSIGNED_UNSET);
 
     MPI_Allreduce(&node_ownership[0], &global_ownership[0], num_nodes, MPI_UNSIGNED, MPI_LXOR, PETSC_COMM_WORLD);
-    for (unsigned i=0; i<num_nodes; ++i)
+    for (unsigned i = 0; i<num_nodes; ++i)
     {
         if (global_ownership[i] == 0)
         {
@@ -360,10 +360,10 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(AbstractMesh
     // Create the permutation and offset vectors.
     MPI_Allreduce(&node_index_ownership[0], &global_index_ownership[0], num_nodes, MPI_UNSIGNED, MPI_MIN, PETSC_COMM_WORLD);
 
-    for (unsigned proc=0; proc<PetscTools::GetNumProcs(); proc++)
+    for (unsigned proc = 0; proc<PetscTools::GetNumProcs(); proc++)
     {
         rProcessorsOffset.push_back(rNodePermutation.size());
-        for (unsigned node=0; node<num_nodes; node++)
+        for (unsigned node = 0; node<num_nodes; node++)
         {
             if (global_index_ownership[node] == proc)
             {
@@ -375,9 +375,9 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::GeometricPartitioning(AbstractMesh
 }
 
 // Explicit instantiation
-template class NodePartitioner<1,1>;
-template class NodePartitioner<1,2>;
-template class NodePartitioner<1,3>;
-template class NodePartitioner<2,2>;
-template class NodePartitioner<2,3>;
-template class NodePartitioner<3,3>;
+template class NodePartitioner<1, 1>;
+template class NodePartitioner<1, 2>;
+template class NodePartitioner<1, 3>;
+template class NodePartitioner<2, 2>;
+template class NodePartitioner<2, 3>;
+template class NodePartitioner<3, 3>;

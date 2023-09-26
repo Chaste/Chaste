@@ -67,7 +67,7 @@ private:
     PropagationPropertiesCalculator* mpCalculator; /**< PropagationPropertiesCalculator based on HDF5 data reader*/
     unsigned mLo; /**< Cache of mLo from the mesh DitributedVectorFactory */
     unsigned mHi; /**< Cache of mHi from the mesh DitributedVectorFactory */
-    AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& mrMesh;/**< A mesh used to calculate the distance map to pass to the conduction velocity calculator*/
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& mrMesh;/**< A mesh used to calculate the distance map to pass to the conduction velocity calculator*/
     hsize_t mHdf5DataWriterChunkSize; /**< Chunk size parameter for Hdf5DataWriter */
 
 public:

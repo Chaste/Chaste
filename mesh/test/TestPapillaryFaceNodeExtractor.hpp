@@ -53,7 +53,7 @@ public:
     void TestExtractor()
     {
 //        TrianglesMeshReader<3, 3> mesh_reader("/home/chaste/heart_data/heartT_renum_i");
-//        TetrahedralMesh<3,3> mesh;
+//        TetrahedralMesh<3, 3> mesh;
 //        mesh.ConstructFromMeshReader(mesh_reader);
 //        TS_ASSERT_EQUALS(mesh.GetNumElements(), 24217344u);
         //TrianglesMeshReader<3, 3> mesh_reader("notforrelease/test/data/mbishop_rabbit_mesh/epi_n_hr.tri");

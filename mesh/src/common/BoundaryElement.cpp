@@ -53,7 +53,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 BoundaryElement<ELEMENT_DIM, SPACE_DIM>::BoundaryElement(
     unsigned index,
     Node<SPACE_DIM>* pNode)
-    : AbstractTetrahedralElement<ELEMENT_DIM,SPACE_DIM>(index)
+    : AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>(index)
 {
     if constexpr (ELEMENT_DIM == 0)
     {
@@ -70,7 +70,7 @@ BoundaryElement<ELEMENT_DIM, SPACE_DIM>::BoundaryElement(
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void BoundaryElement<ELEMENT_DIM, SPACE_DIM>::RegisterWithNodes()
 {
-    for (unsigned i=0; i<this->mNodes.size(); ++i)
+    for (unsigned i = 0; i<this->mNodes.size(); ++i)
     {
         this->mNodes[i]->AddBoundaryElement(this->mIndex);
     }
@@ -79,7 +79,7 @@ void BoundaryElement<ELEMENT_DIM, SPACE_DIM>::RegisterWithNodes()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void BoundaryElement<ELEMENT_DIM, SPACE_DIM>::ResetIndex(unsigned index)
 {
-    for (unsigned i=0; i<this->GetNumNodes(); ++i)
+    for (unsigned i = 0; i<this->GetNumNodes(); ++i)
     {
         this->mNodes[i]->RemoveBoundaryElement(this->mIndex);
     }
@@ -93,7 +93,7 @@ void BoundaryElement<ELEMENT_DIM, SPACE_DIM>::MarkAsDeleted()
     this->mIsDeleted = true;
 //        this->mJacobianDeterminant = 0.0;
     // Update nodes in this element so they know they are not contained by us
-    for (unsigned i=0; i<this->GetNumNodes(); ++i)
+    for (unsigned i = 0; i<this->GetNumNodes(); ++i)
     {
         this->mNodes[i]->RemoveBoundaryElement(this->mIndex);
     }
@@ -115,9 +115,9 @@ void BoundaryElement<ELEMENT_DIM, SPACE_DIM>::UpdateNode(const unsigned& rIndex,
 }
 
 // Explicit instantiation
-template class BoundaryElement<0,1>;
-template class BoundaryElement<0,2>;
-template class BoundaryElement<1,2>;
-template class BoundaryElement<0,3>;
-template class BoundaryElement<1,3>;
-template class BoundaryElement<2,3>;
+template class BoundaryElement<0, 1>;
+template class BoundaryElement<0, 2>;
+template class BoundaryElement<1, 2>;
+template class BoundaryElement<0, 3>;
+template class BoundaryElement<1, 3>;
+template class BoundaryElement<2, 3>;

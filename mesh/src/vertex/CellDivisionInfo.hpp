@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Records information about cell division event
  */
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 struct CellDivisionInfo
 {
     /** Needed for serialization. */
@@ -57,7 +57,7 @@ struct CellDivisionInfo
      * @param archive the archive
      * @param version the current version of this class
      */
-    template <class Archive>
+    template<class Archive>
     void serialize(Archive& archive, const unsigned int version)
     {
         archive & mLocation;

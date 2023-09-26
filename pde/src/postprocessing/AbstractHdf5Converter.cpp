@@ -110,19 +110,19 @@ void AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>::WriteInfoFile()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::~AbstractHdf5Converter()
+AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>::~AbstractHdf5Converter()
 {
     delete mpOutputFileHandler;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::string AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::GetSubdirectory()
+std::string AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>::GetSubdirectory()
 {
     return mRelativeSubdirectory;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::MoveOntoNextDataset()
+bool AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>::MoveOntoNextDataset()
 {
     // If we are already at the end just return false.
     if (mDatasetNames.size() == mOpenDatasetIndex+1u)
@@ -161,19 +161,15 @@ bool AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::MoveOntoNextDataset()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::GenerateListOfDatasets(
+void AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>::GenerateListOfDatasets(
     const FileFinder& rH5Folder,
     const std::string& rFileName)
 {
-    /*
-     * Open file.
-     */
+    // Open file
     std::string file_name = rH5Folder.GetAbsolutePath() + rFileName + ".h5";
     hid_t file = H5Fopen(file_name.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
 
-    /*
-     * Begin HDF5 iteration, calls a method that populates mDatasetNames.
-     */
+    // Begin HDF5 iteration, calls a method that populates mDatasetNames
     H5Literate(file, H5_INDEX_NAME, H5_ITER_NATIVE, nullptr, op_func, &mDatasetNames);
 
     H5Fclose(file);
@@ -215,9 +211,9 @@ void AbstractHdf5Converter<ELEMENT_DIM,SPACE_DIM>::GenerateListOfDatasets(
  *
  * This was based on a couple of HDF5 example files.
  */
-herr_t op_func (hid_t loc_id, const char *name,
-                const H5L_info_t *info,
-                void *operator_data)
+herr_t op_func(hid_t loc_id, const char *name,
+               const H5L_info_t *info,
+               void *operator_data)
 {
     std::vector<std::string>* p_dataset_names = 
         static_cast<std::vector< std::string >*>(operator_data);
@@ -253,9 +249,9 @@ herr_t op_func (hid_t loc_id, const char *name,
 }
 
 // Explicit instantiation
-template class AbstractHdf5Converter<1,1>;
-template class AbstractHdf5Converter<1,2>;
-template class AbstractHdf5Converter<2,2>;
-template class AbstractHdf5Converter<1,3>;
-template class AbstractHdf5Converter<2,3>;
-template class AbstractHdf5Converter<3,3>;
+template class AbstractHdf5Converter<1, 1>;
+template class AbstractHdf5Converter<1, 2>;
+template class AbstractHdf5Converter<2, 2>;
+template class AbstractHdf5Converter<1, 3>;
+template class AbstractHdf5Converter<2, 3>;
+template class AbstractHdf5Converter<3, 3>;

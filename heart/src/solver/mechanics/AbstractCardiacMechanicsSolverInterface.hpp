@@ -93,7 +93,7 @@ public:
      *  @param rFibreSheetMatrix The fibre-sheet-normal matrix (fibre dir the first column, normal-to-fibre-in sheet in second
      *  column, sheet-normal in third column).
      */
-    virtual void SetConstantFibreSheetDirections(const c_matrix<double,DIM,DIM>& rFibreSheetMatrix)=0;
+    virtual void SetConstantFibreSheetDirections(const c_matrix<double, DIM, DIM>& rFibreSheetMatrix)=0;
 
     /**
      *  Set a variable fibre-sheet-normal direction (matrices), from file.
@@ -152,7 +152,7 @@ public:
      *  @param rStretches A reference of a std::vector in which the stretch in each element will be returned.
      *  Must be allocated prior to being passed in.
      */
-    virtual void ComputeDeformationGradientAndStretchInEachElement(std::vector<c_matrix<double,DIM,DIM> >& rDeformationGradients,
+    virtual void ComputeDeformationGradientAndStretchInEachElement(std::vector<c_matrix<double, DIM, DIM> >& rDeformationGradients,
                                                                    std::vector<double>& rStretches)=0;
 };
 

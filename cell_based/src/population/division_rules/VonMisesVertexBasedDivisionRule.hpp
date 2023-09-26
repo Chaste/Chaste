@@ -50,7 +50,7 @@ template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
  * direction randomly sampled from a von Mises distribution parameterised by mu
  * (mean parameter) and kappa (concentration parameter).
  */
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 class VonMisesVertexBasedDivisionRule : public AbstractVertexBasedDivisionRule<SPACE_DIM>
 {
 private:

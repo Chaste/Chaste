@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * All the subdirectories will be created inside a base directory provided in 
  * the constructor. The maximum number of concurrent subdirectories is specified 
- * in the the constructor. Once this number is reached, the next call to 
+ * in the constructor. Once this number is reached, the next call to 
  * CreateNextDir() will delete the oldest directory as a side effect.
  */
 class OutputDirectoryFifoQueue

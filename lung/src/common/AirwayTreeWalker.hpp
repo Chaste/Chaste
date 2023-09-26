@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Utility class to facilitate traversal of airway trees
  *
- * Chaste represents airway trees using TetrahedralMesh<1,3>. This works well for a number of cases, including
+ * Chaste represents airway trees using TetrahedralMesh<1, 3>. This works well for a number of cases, including
  * finite element simulations, however the lack of meta data to allow easy access to parent/children of each
  * branch complicates relatively simple recursive calculations. Note that this class is only valid
  * on a proper tree and doesn't do much sanity checking - results will be undefined on trees with cycles in.
@@ -57,7 +57,7 @@ public:
      * @param rAirwaysMesh A mesh containing the airway tree to analyze
      * @param rootIndex The index of the inlet node (trachea entrance)
      */
-    AirwayTreeWalker(AbstractTetrahedralMesh<1,3>& rAirwaysMesh,
+    AirwayTreeWalker(AbstractTetrahedralMesh<1, 3>& rAirwaysMesh,
                      unsigned rootIndex);
 
     /*
@@ -83,7 +83,7 @@ public:
      * @param pElement The element to find the parent of
      * @return The parent element
      */
-    Element<1,3>* GetParentElement(Element<1,3>* pElement);
+    Element<1, 3>* GetParentElement(Element<1, 3>* pElement);
 
     /**
      * Gets the index of the parent element of a given element.
@@ -93,7 +93,7 @@ public:
      * @param pElement The element to find the parent of
      * @return The index of the parent element
      */
-    unsigned GetParentElementIndex(Element<1,3>* pElement);
+    unsigned GetParentElementIndex(Element<1, 3>* pElement);
 
     /**
      * Gets the index of the parent element of a given element.
@@ -103,7 +103,7 @@ public:
      * @param index The index of the element to find the parent of
      * @return The parent element
      */
-    Element<1,3>* GetParentElement(unsigned index);
+    Element<1, 3>* GetParentElement(unsigned index);
 
     /**
      * Gets the index of the parent element of a given element.
@@ -121,7 +121,7 @@ public:
      * @param pElement The element to find the number of children of
      * @return The number of child elements
      */
-    unsigned GetNumberOfChildElements(Element<1,3>* pElement);
+    unsigned GetNumberOfChildElements(Element<1, 3>* pElement);
 
     /**
      * Returns the number of child elements of a given element
@@ -138,7 +138,7 @@ public:
      * @param pElement The element to find the children of
      * @return A vector of child elements
      */
-    std::vector<Element<1,3>* > GetChildElements(Element<1,3>* pElement);
+    std::vector<Element<1, 3>* > GetChildElements(Element<1, 3>* pElement);
 
     /**
      * Returns a vector of pointers to indices child elements of a given element.
@@ -146,7 +146,7 @@ public:
      * @param pElement The element to find the children of
      * @return A vector of indices of child elements
      */
-    std::vector<unsigned> GetChildElementIndices(Element<1,3>* pElement);
+    std::vector<unsigned> GetChildElementIndices(Element<1, 3>* pElement);
 
     /**
      * Returns the distal most node of an element
@@ -154,7 +154,7 @@ public:
      * @param pElement The element to find the child of
      * @return The distal node of the element
      */
-    Node<3>* GetDistalNode(Element<1,3>* pElement);
+    Node<3>* GetDistalNode(Element<1, 3>* pElement);
 
     /**
      * Returns the distal most node of an element
@@ -170,7 +170,7 @@ public:
      * @param pElement The element to find the child of
      * @return The index of the distal node of the element
      */
-    unsigned GetDistalNodeIndex(Element<1,3>* pElement);
+    unsigned GetDistalNodeIndex(Element<1, 3>* pElement);
 
     /**
      * Returns the index of the distal most node of an element
@@ -187,7 +187,7 @@ public:
      * @param pElement The element to get the generation for
      * @return The generation number of the given element
      */
-    unsigned GetElementGeneration(Element<1,3>* pElement);
+    unsigned GetElementGeneration(Element<1, 3>* pElement);
 
     /**
      * Returns the generation number of a given element
@@ -210,7 +210,7 @@ public:
      * @param pElement The element to get the Horsfield order for
      * @return The element's Horsfield order
      */
-    unsigned GetElementHorsfieldOrder(Element<1,3>* pElement);
+    unsigned GetElementHorsfieldOrder(Element<1, 3>* pElement);
 
     /**
      * Get Element Horsfield Order
@@ -233,7 +233,7 @@ public:
      * @param pElement The element to get the Strahler order for
      * @return The element's Strahler order
      */
-    unsigned GetElementStrahlerOrder(Element<1,3>* pElement);
+    unsigned GetElementStrahlerOrder(Element<1, 3>* pElement);
 
     /**
      * Get Element Strahler Order
@@ -253,7 +253,7 @@ public:
 private:
 
     /** A mesh containing the airways tree.  */
-    AbstractTetrahedralMesh<1,3>& mMesh;
+    AbstractTetrahedralMesh<1, 3>& mMesh;
 
     unsigned mOutletNodeIndex; /**< The outlet node is the root of the branching tree structure */
     unsigned mOutletElementIndex; /**< The outlet element is associated to the outlet node and is at the root */
@@ -286,14 +286,14 @@ private:
      * @param pElement The element to process.
      * @param pParentNode The parent node of the element being processed (prevents backtracking)
      */
-    void ProcessElement(Element<1,3>* pElement, Node<3>* pParentNode);
+    void ProcessElement(Element<1, 3>* pElement, Node<3>* pParentNode);
 
     /**
      * Recursively process elements to calculate their properties
      *
      * @param pElement The element to process
      */
-    void CalculateElementProperties(Element<1,3>* pElement);
+    void CalculateElementProperties(Element<1, 3>* pElement);
 };
 
 #endif // AIRWAY_TREE_WALKER

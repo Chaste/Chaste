@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 
 SimpleImpedanceProblem::SimpleImpedanceProblem(
-    TetrahedralMesh<1,3>& rAirwaysMesh,
+    TetrahedralMesh<1, 3>& rAirwaysMesh,
     unsigned rootIndex)
     : mrMesh(rAirwaysMesh),
       mOutletNodeIndex(rootIndex),
@@ -89,7 +89,7 @@ void SimpleImpedanceProblem::SetElastance(double elastance)
 void SimpleImpedanceProblem::Solve()
 {
     Node<3>* p_node = mrMesh.GetNode(mOutletNodeIndex);
-    Element<1,3>* p_element = 
+    Element<1, 3>* p_element = 
         mrMesh.GetElement(*(p_node->ContainingElementsBegin()));
 
     mImpedances.resize(mFrequencies.size());
@@ -120,7 +120,7 @@ TetrahedralMesh<1, 3>& SimpleImpedanceProblem::rGetMesh()
 }
 
 std::complex<double> SimpleImpedanceProblem::CalculateElementImpedance(
-    Element<1,3>* pElement,
+    Element<1, 3>* pElement,
     double frequency)
 {
     std::complex<double> Z(0, 0);
@@ -134,7 +134,7 @@ std::complex<double> SimpleImpedanceProblem::CalculateElementImpedance(
     {
         std::complex<double> sum_one_over_Z_child(0,0); //Add up impedance of child elements
 
-        std::vector<Element<1,3>* > child_eles = mWalker.GetChildElements(pElement);
+        std::vector<Element<1, 3>* > child_eles = mWalker.GetChildElements(pElement);
 
         assert(child_eles.size() <= 2u);
 

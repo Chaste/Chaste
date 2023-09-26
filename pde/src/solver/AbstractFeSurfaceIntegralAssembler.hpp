@@ -58,7 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  The interface is the same the volume assemblers.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-class AbstractFeSurfaceIntegralAssembler : public AbstractFeAssemblerCommon<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM,true,false,NORMAL>
+class AbstractFeSurfaceIntegralAssembler : public AbstractFeAssemblerCommon<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM,true,false,NORMAL>
 {
 protected:
     /** Mesh to be solved on. */
@@ -88,7 +88,7 @@ protected:
      */
     // LCOV_EXCL_START
     virtual c_vector<double, PROBLEM_DIM*ELEMENT_DIM> ComputeVectorSurfaceTerm(
-        const BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>& rSurfaceElement,
+        const BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>& rSurfaceElement,
         c_vector<double, ELEMENT_DIM>& rPhi,
         ChastePoint<SPACE_DIM>& rX)
     {
@@ -108,7 +108,7 @@ protected:
      *     vector of length n, the no. of nodes in this element. There is no
      *     need to zero this vector before calling.
      */
-    virtual void AssembleOnSurfaceElement(const BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>& rSurfaceElement,
+    virtual void AssembleOnSurfaceElement(const BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>& rSurfaceElement,
                                           c_vector<double, PROBLEM_DIM*ELEMENT_DIM>& rBSurfElem);
 
 
@@ -125,8 +125,8 @@ public:
      * @param pMesh The mesh
      * @param pBoundaryConditions The boundary conditions container
      */
-    AbstractFeSurfaceIntegralAssembler(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                                       BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>* pBoundaryConditions);
+    AbstractFeSurfaceIntegralAssembler(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+                                       BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* pBoundaryConditions);
 
     /**
      * Destructor
@@ -137,7 +137,7 @@ public:
      * Reset the internal boundary conditions container pointer
      * @param pBoundaryConditions
      */
-    void ResetBoundaryConditionsContainer(BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>* pBoundaryConditions)
+    void ResetBoundaryConditionsContainer(BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* pBoundaryConditions)
     {
         assert(pBoundaryConditions);
         this->mpBoundaryConditions = pBoundaryConditions;
@@ -145,11 +145,11 @@ public:
 };
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::AbstractFeSurfaceIntegralAssembler(
-            AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-            BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>* pBoundaryConditions)
-    : AbstractFeAssemblerCommon<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM,true,false,NORMAL>(),
+            AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+            BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* pBoundaryConditions)
+    : AbstractFeAssemblerCommon<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM,true,false,NORMAL>(),
       mpMesh(pMesh),
       mpBoundaryConditions(pBoundaryConditions)
 {
@@ -161,14 +161,14 @@ AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Abstrac
     mpSurfaceQuadRule = new GaussianQuadratureRule<ELEMENT_DIM-1>(2);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::~AbstractFeSurfaceIntegralAssembler()
 {
     delete mpSurfaceQuadRule;
 }
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::DoAssemble()
 {
     assert(this->mAssembleVector);
@@ -178,7 +178,7 @@ void AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Do
     // Loop over surface elements with non-zero Neumann boundary conditions
     if (mpBoundaryConditions->AnyNonZeroNeumannConditions())
     {
-        typename BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::NeumannMapIterator
+        typename BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::NeumannMapIterator
             neumann_iterator = mpBoundaryConditions->BeginNeumann();
 
         c_vector<double, PROBLEM_DIM*ELEMENT_DIM> b_surf_elem;
@@ -186,7 +186,7 @@ void AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Do
         // Iterate over defined conditions
         while (neumann_iterator != mpBoundaryConditions->EndNeumann())
         {
-            const BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>& r_surf_element = *(neumann_iterator->first);
+            const BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>& r_surf_element = *(neumann_iterator->first);
             AssembleOnSurfaceElement(r_surf_element, b_surf_elem);
 
             const size_t STENCIL_SIZE=PROBLEM_DIM*ELEMENT_DIM; // problem_dim*num_nodes_on_surface_element
@@ -201,9 +201,9 @@ void AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Do
 }
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void AbstractFeSurfaceIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::AssembleOnSurfaceElement(
-            const BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>& rSurfaceElement,
+            const BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>& rSurfaceElement,
             c_vector<double, PROBLEM_DIM*ELEMENT_DIM>& rBSurfElem)
 {
     c_vector<double, SPACE_DIM> weighted_direction;

@@ -73,7 +73,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
  */
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 class ExtendedBidomainTissue : public virtual AbstractCardiacTissue<SPACE_DIM>
 {
 private:
@@ -222,13 +222,13 @@ public:
      * @param rExtraStimuliDistributed local extracellular stimuli (recovered from archive)
      * @param rGgapsDistributed distributed Ggaps (recovered from archive)
      * @param pMesh  a pointer to the AbstractTetrahedral mesh (recovered from archive).
-     * @param intracellularConductivitiesSecondCell a vector with the orthotropic conductivities for the second cell (this is needed because the second cell values may not be taken from HeartConfig as the the ones for the first cell are).
+     * @param intracellularConductivitiesSecondCell a vector with the orthotropic conductivities for the second cell (this is needed because the second cell values may not be taken from HeartConfig as the ones for the first cell are).
      */
     ExtendedBidomainTissue(std::vector<AbstractCardiacCellInterface*> & rCellsDistributed,
                            std::vector<AbstractCardiacCellInterface*> & rSecondCellsDistributed,
                            std::vector<boost::shared_ptr<AbstractStimulusFunction> > & rExtraStimuliDistributed,
                            std::vector<double>& rGgapsDistributed,
-                           AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* pMesh,
+                           AbstractTetrahedralMesh<SPACE_DIM, SPACE_DIM>* pMesh,
                            c_vector<double, SPACE_DIM>  intracellularConductivitiesSecondCell);
 
     /**
@@ -432,7 +432,7 @@ public:
          r_archive & this->mpDistributedVectorFactory; // Needed when loading
          const unsigned num_cells = r_cells_distributed.size();
          r_archive & num_cells;
-         for (unsigned i=0; i<num_cells; ++i)
+         for (unsigned i = 0; i<num_cells; ++i)
          {
              AbstractDynamicallyLoadableEntity* p_entity = dynamic_cast<AbstractDynamicallyLoadableEntity*>(r_cells_distributed[i]);
              bool is_dynamic = (p_entity != NULL);
@@ -473,7 +473,7 @@ public:
                                   std::vector<AbstractCardiacCellInterface*>& rCells,
                                   std::vector<AbstractCardiacCellInterface*>& rSecondCells,
                                   std::vector<double>& rGgaps,
-                                  AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* pMesh)
+                                  AbstractTetrahedralMesh<SPACE_DIM, SPACE_DIM>* pMesh)
      {
          assert(pMesh!=NULL);
          DistributedVectorFactory* p_factory;
@@ -486,7 +486,7 @@ public:
  #ifndef NDEBUG
          // Paranoia
          assert(rCells.size() == rSecondCells.size());
-         for (unsigned i=0; i<rCells.size(); ++i)
+         for (unsigned i = 0; i<rCells.size(); ++i)
          {
              assert(rCells[i] == NULL);
              assert(rSecondCells[i] == NULL);
@@ -499,7 +499,7 @@ public:
          // low index.
          unsigned index_low = p_factory->GetOriginalFactory() ? p_factory->GetOriginalFactory()->GetLow() : p_factory->GetLow();
 
-         for (unsigned local_index=0; local_index<num_cells; local_index++)
+         for (unsigned local_index = 0; local_index<num_cells; local_index++)
          {
              unsigned global_index = index_low + local_index;
              unsigned new_local_index = global_index - p_factory->GetLow();
@@ -562,7 +562,7 @@ public:
          r_archive & this->mpDistributedVectorFactory; // Needed when loading
          const unsigned num_cells = r_stimulus_distributed.size();
          r_archive & num_cells;
-         for (unsigned i=0; i<num_cells; ++i)
+         for (unsigned i = 0; i<num_cells; ++i)
          {
              r_archive & r_stimulus_distributed[i];
          }
@@ -579,7 +579,7 @@ public:
      template<class Archive>
      void LoadExtracellularStimulus(Archive & archive, const unsigned int version,
                                                std::vector<boost::shared_ptr<AbstractStimulusFunction> >& rStimuli,
-                                               AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* pMesh)
+                                               AbstractTetrahedralMesh<SPACE_DIM, SPACE_DIM>* pMesh)
      {
 
         DistributedVectorFactory* p_factory;
@@ -589,7 +589,7 @@ public:
         rStimuli.resize(p_factory->GetLocalOwnership());
 #ifndef NDEBUG
           // Paranoia
-          for (unsigned i=0; i<rStimuli.size(); ++i)
+          for (unsigned i = 0; i<rStimuli.size(); ++i)
           {
               assert(rStimuli[i] == NULL);
           }
@@ -603,7 +603,7 @@ public:
 
         assert(pMesh!=NULL);
         //unsigned num_cells = pMesh->GetNumNodes();
-        for (unsigned local_index=0; local_index<num_cells; local_index++)
+        for (unsigned local_index = 0; local_index<num_cells; local_index++)
         {
           unsigned global_index = index_low + local_index;
 
@@ -643,7 +643,7 @@ public:
          ar & intracellular_conductivities_second_cell(i);
      }
 
-     const AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* p_mesh = t->pGetMesh();
+     const AbstractTetrahedralMesh<SPACE_DIM, SPACE_DIM>* p_mesh = t->pGetMesh();
      ar & p_mesh;
 
      // Don't use the std::vector serialization for cardiac cells, so that we can load them
@@ -681,7 +681,7 @@ public:
      std::vector<AbstractCardiacCellInterface*> cells_distributed_second_cell;
      std::vector<boost::shared_ptr<AbstractStimulusFunction> > extra_stim;
      std::vector<double> g_gaps;
-     AbstractTetrahedralMesh<SPACE_DIM,SPACE_DIM>* p_mesh;
+     AbstractTetrahedralMesh<SPACE_DIM, SPACE_DIM>* p_mesh;
      ar & p_mesh;
 
      // Load only the cells we actually own

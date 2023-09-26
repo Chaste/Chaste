@@ -63,12 +63,12 @@ public:
      */
     void TestRemesh3dMoveNodes()
     {
-        TrianglesMeshReader<3,3> mesh_reader2("mesh/test/data/cube_1626_elements");
-        TetrahedralMesh<3,3> old_mesh;
+        TrianglesMeshReader<3, 3> mesh_reader2("mesh/test/data/cube_1626_elements");
+        TetrahedralMesh<3, 3> old_mesh;
         old_mesh.ConstructFromMeshReader(mesh_reader2);
 
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_1626_elements");
-        MutableMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_1626_elements");
+        MutableMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
@@ -97,7 +97,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 1626u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 390u);
 
-        for (MutableMesh<3,3>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
+        for (MutableMesh<3, 3>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
              node_iter != mesh.GetBoundaryNodeIteratorEnd();
              ++node_iter)
         {
@@ -107,7 +107,7 @@ public:
         NodeMap map(mesh.GetNumNodes());
         mesh.ReMesh(map);
 
-        for (MutableMesh<3,3>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
+        for (MutableMesh<3, 3>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
              node_iter != mesh.GetBoundaryNodeIteratorEnd();
              ++node_iter)
         {
@@ -144,7 +144,7 @@ public:
     void TestRemeshWithMethod1D()
     {
         // Create 1D mesh
-        MutableMesh<1,1> mesh;
+        MutableMesh<1, 1> mesh;
         mesh.ConstructLinearMesh(10);
 
         double area = mesh.GetVolume();
@@ -159,7 +159,7 @@ public:
             TS_ASSERT_EQUALS(mesh.GetElement(elem_index)->GetNodeGlobalIndex(1), elem_index+1);
         }
 
-        for (MutableMesh<1,1>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
+        for (MutableMesh<1, 1>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
              node_iter != mesh.GetBoundaryNodeIteratorEnd();
              ++node_iter)
         {
@@ -183,7 +183,7 @@ public:
             }
         }
 
-        for (MutableMesh<1,1>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
+        for (MutableMesh<1, 1>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
              node_iter != mesh.GetBoundaryNodeIteratorEnd();
              ++node_iter)
         {
@@ -229,7 +229,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetVolume(), area, 1e-6);
 
         // Create another mesh
-        MutableMesh<1,1> mesh2;
+        MutableMesh<1, 1> mesh2;
         mesh2.ConstructLinearMesh(10);
 
         TS_ASSERT_EQUALS(mesh2.GetNumElements(), 10u);
@@ -247,7 +247,7 @@ public:
         }
 
         // Add a node
-        c_vector<double,1> point;
+        c_vector<double, 1> point;
         point[0] = 2.5;
         Node<1>* p_node = new Node<1>(10u, point);
         unsigned new_index = mesh2.AddNode(p_node);
@@ -270,7 +270,7 @@ public:
             }
         }
 
-        for (MutableMesh<1,1>::BoundaryNodeIterator node_iter = mesh2.GetBoundaryNodeIteratorBegin();
+        for (MutableMesh<1, 1>::BoundaryNodeIterator node_iter = mesh2.GetBoundaryNodeIteratorBegin();
              node_iter != mesh2.GetBoundaryNodeIteratorEnd();
              ++node_iter)
         {
@@ -322,8 +322,8 @@ public:
 
     void TestRemeshWithMethod2D()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/disk_984_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         double area = mesh.GetVolume();
@@ -341,7 +341,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), mesh.GetNumNodes()+1);
         TS_ASSERT_EQUALS(mesh.GetNumAllBoundaryElements(), mesh.GetNumBoundaryElements());
 
-        for (MutableMesh<2,2>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
+        for (MutableMesh<2, 2>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
              node_iter != mesh.GetBoundaryNodeIteratorEnd();
              ++node_iter)
         {
@@ -351,7 +351,7 @@ public:
         NodeMap map(1);
         mesh.ReMesh(map);
 
-        for (MutableMesh<2,2>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
+        for (MutableMesh<2, 2>::BoundaryNodeIterator node_iter = mesh.GetBoundaryNodeIteratorBegin();
              node_iter != mesh.GetBoundaryNodeIteratorEnd();
              ++node_iter)
         {
@@ -394,7 +394,7 @@ public:
         nodes.push_back(new Node<3>(3, true,  0.0,  1.0,  1.0));
         nodes.push_back(new Node<3>(4, false, 0.5,  0.5,  0.5));
 
-        MutableMesh<3,3> mesh(nodes);
+        MutableMesh<3, 3> mesh(nodes);
         double area = mesh.GetVolume();
 
         unsigned num_nodes_before = mesh.GetNumNodes();
@@ -451,7 +451,7 @@ public:
     void Test1DReMeshFailsAfterEnoughDeletions()
     {
         // Construct mesh
-        MutableMesh<1,1> mesh;
+        MutableMesh<1, 1> mesh;
         mesh.ConstructLinearMesh(2);
         NodeMap map(3);
 
@@ -484,7 +484,7 @@ public:
 
     void Test2DReMeshFailsAfterEnoughDeletions()
     {
-        MutableMesh<2,2> mesh;
+        MutableMesh<2, 2> mesh;
         mesh.ConstructRectangularMesh(1,1);
         NodeMap map(1);
 
@@ -620,7 +620,7 @@ public:
         nodes.push_back(new Node<2>(3, true, 0.0, 10.0));
         nodes.push_back(new Node<2>(4, true, 0.5, 7.0));
 
-        MutableMesh<2,2> mesh(nodes);
+        MutableMesh<2, 2> mesh(nodes);
 
         TS_ASSERT_DELTA(mesh.GetVolume(), 10.0, 1e-6);
         TS_ASSERT_DELTA(mesh.GetSurfaceArea(), 22.0, 1e-6);
@@ -645,8 +645,8 @@ public:
 
     void TestRemeshWithLibraryMethod2D()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/disk_984_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         double area = mesh.GetVolume();
@@ -681,8 +681,8 @@ public:
 
     void TestRemeshWithLibraryMethod3D()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-        MutableMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
+        MutableMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         double volume = mesh.GetVolume();
@@ -718,8 +718,8 @@ public:
     void TestSplitLongEdges()
     {
         {
-            TrianglesMeshReader<2,3> mesh_reader("mesh/test/data/square_in_3d");
-            MutableMesh<2,3> mesh;
+            TrianglesMeshReader<2, 3> mesh_reader("mesh/test/data/square_in_3d");
+            MutableMesh<2, 3> mesh;
             mesh.ConstructFromMeshReader(mesh_reader);
 
             // Check position of nodes
@@ -848,8 +848,8 @@ public:
         {
             // Here we split all sides at once and because of this we get a different resulting mesh
 
-            TrianglesMeshReader<2,3> mesh_reader("mesh/test/data/square_in_3d");
-            MutableMesh<2,3> mesh;
+            TrianglesMeshReader<2, 3> mesh_reader("mesh/test/data/square_in_3d");
+            MutableMesh<2, 3> mesh;
             mesh.ConstructFromMeshReader(mesh_reader);
 
             std::vector<c_vector<unsigned, 5> > changeHistory;

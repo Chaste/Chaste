@@ -42,7 +42,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(double width,
                                            std::vector<VertexElement<2, 2>*> vertexElements,
                                            double cellRearrangementThreshold,
                                            double t2Threshold)
-    : MutableVertexMesh<2,2>(nodes, vertexElements, cellRearrangementThreshold, t2Threshold),
+    : MutableVertexMesh<2, 2>(nodes, vertexElements, cellRearrangementThreshold, t2Threshold),
       mWidth(width),
       mHeight(height),
       mpMeshForVtk(nullptr)
@@ -74,7 +74,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
 
         for (unsigned elem_index = 0; elem_index<num_elements; elem_index++)
         {
-            VertexElement<2,2>* p_element = new VertexElement<2,2>(elem_index);
+            VertexElement<2, 2>* p_element = new VertexElement<2, 2>(elem_index);
             mElements.push_back(p_element);
         }
 
@@ -115,7 +115,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
 
         // Add new nodes
         unsigned new_node_index = mpDelaunayMesh->GetNumNodes();
-        for (TetrahedralMesh<2,2>::ElementIterator elem_iter = mpDelaunayMesh->GetElementIteratorBegin();
+        for (TetrahedralMesh<2, 2>::ElementIterator elem_iter = mpDelaunayMesh->GetElementIteratorBegin();
             elem_iter != mpDelaunayMesh->GetElementIteratorEnd();
             ++elem_iter)
         {
@@ -140,14 +140,14 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
                     Node<2>* p_node_a = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex(j));
                     Node<2>* p_node_b = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex((j+1)%3));
 
-                    c_vector<double,2> edge = mpDelaunayMesh->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
+                    c_vector<double, 2> edge = mpDelaunayMesh->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
                     double edge_length = norm_2(edge);
                     
                     // The short edges in these elements are the boundaries of the void
                     if (edge_length<edge_threshold)
                     {
                         // Short Edge so add new node
-                        c_vector<double,2> normal_vector;
+                        c_vector<double, 2> normal_vector;
 
                         // Outward Normal
                         normal_vector[0]= edge[1];
@@ -158,7 +158,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
                         normal_vector /= dij;
 
                         double bound_offset = 0.5; //TODO Make settable variable!
-                        c_vector<double,2> new_node_location = -bound_offset*normal_vector + p_node_a->rGetLocation() + 0.5*edge;
+                        c_vector<double, 2> new_node_location = -bound_offset*normal_vector + p_node_a->rGetLocation() + 0.5*edge;
 
                         nodes.push_back(new Node<2>(new_node_index, new_node_location));
                         new_node_index++;
@@ -168,7 +168,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
                         for (unsigned section = 0; section <= num_sections; section++)
                         {
                             double ratio = (double)section/(double)num_sections;
-                            c_vector<double,2> new_node_location = -normal_vector + ratio*p_node_a->rGetLocation() + (1-ratio)*p_node_b->rGetLocation();
+                            c_vector<double, 2> new_node_location = -normal_vector + ratio*p_node_a->rGetLocation() + (1-ratio)*p_node_b->rGetLocation();
 
                             //Check if near other nodes (could be inefficient)
                             bool node_clear = true;
@@ -273,7 +273,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
         sort(index_angle_list.begin(), index_angle_list.end());
 
         // Create a new Voronoi element and pass in the appropriate Nodes, ordered anticlockwise
-        VertexElement<2,2>* p_new_element = new VertexElement<2,2>(elem_index);
+        VertexElement<2, 2>* p_new_element = new VertexElement<2, 2>(elem_index);
         for (unsigned count = 0; count < index_angle_list.size(); count++)
         {
             unsigned local_index = count>1 ? count-1 : 0;
@@ -360,7 +360,7 @@ void Toroidal2dVertexMesh::SetNode(unsigned nodeIndex, ChastePoint<2> point)
     }
 
     // Update the node's location
-    MutableVertexMesh<2,2>::SetNode(nodeIndex, point);
+    MutableVertexMesh<2, 2>::SetNode(nodeIndex, point);
 }
 
 double Toroidal2dVertexMesh::GetWidth(const unsigned& rDimension) const
@@ -393,7 +393,7 @@ unsigned Toroidal2dVertexMesh::AddNode(Node<2>* pNewNode)
     // If necessary move it to be back onto the torus
     CheckNodeLocation(pNewNode);
 
-    unsigned node_index = MutableVertexMesh<2,2>::AddNode(pNewNode);
+    unsigned node_index = MutableVertexMesh<2, 2>::AddNode(pNewNode);
 
     return node_index;
 }
@@ -455,7 +455,7 @@ VertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
         }
 
         // Iterate over elements
-        for (VertexMesh<2,2>::VertexElementIterator elem_iter = GetElementIteratorBegin();
+        for (VertexMesh<2, 2>::VertexElementIterator elem_iter = GetElementIteratorBegin();
             elem_iter != GetElementIteratorEnd();
             ++elem_iter)
         {
@@ -517,7 +517,7 @@ VertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
                 elem_nodes.push_back(temp_nodes[this_node_index]);
             }
 
-            VertexElement<2,2>* p_element = new VertexElement<2,2>(elem_index, elem_nodes);
+            VertexElement<2, 2>* p_element = new VertexElement<2, 2>(elem_index, elem_nodes);
             elements.push_back(p_element);
         }
     }
@@ -569,7 +569,7 @@ VertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
         }
 
         // Iterate over elements
-        for (VertexMesh<2,2>::VertexElementIterator elem_iter = GetElementIteratorBegin();
+        for (VertexMesh<2, 2>::VertexElementIterator elem_iter = GetElementIteratorBegin();
             elem_iter != GetElementIteratorEnd();
             ++elem_iter)
         {
@@ -716,7 +716,7 @@ VertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
                 elem_nodes.push_back(temp_nodes[this_node_index]);
             }
 
-            VertexElement<2,2>* p_element = new VertexElement<2,2>(elem_index, elem_nodes);
+            VertexElement<2, 2>* p_element = new VertexElement<2, 2>(elem_index, elem_nodes);
             elements.push_back(p_element);
         }
     }
@@ -746,11 +746,11 @@ VertexMesh<2, 2>* Toroidal2dVertexMesh::GetMeshForVtk()
         delete mpMeshForVtk;
     }
 
-    mpMeshForVtk = new VertexMesh<2,2>(nodes, elements);
+    mpMeshForVtk = new VertexMesh<2, 2>(nodes, elements);
     return mpMeshForVtk;
 }
 
-void Toroidal2dVertexMesh::ConstructFromMeshReader(AbstractMeshReader<2,2>& rMeshReader, double width, double height)
+void Toroidal2dVertexMesh::ConstructFromMeshReader(AbstractMeshReader<2, 2>& rMeshReader, double width, double height)
 {
     assert(rMeshReader.HasNodePermutation() == false);
 
@@ -793,7 +793,7 @@ void Toroidal2dVertexMesh::ConstructFromMeshReader(AbstractMeshReader<2,2>& rMes
         }
 
         // Use nodes and index to construct this element
-        VertexElement<2,2>* p_element = new VertexElement<2,2>(elem_idx, nodes);
+        VertexElement<2, 2>* p_element = new VertexElement<2, 2>(elem_idx, nodes);
         mElements.push_back(p_element);
 
         if (rMeshReader.GetNumElementAttributes() > 0)

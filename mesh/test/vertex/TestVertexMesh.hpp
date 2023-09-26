@@ -53,7 +53,7 @@ class TestVertexMesh : public CxxTest::TestSuite
 {
 private:
 
-    VertexMesh<3,3>* ConstructCubeAndPyramidMesh()
+    VertexMesh<3, 3>* ConstructCubeAndPyramidMesh()
     {
         // Make 8 nodes to assign to a cube and a pyramid element
         std::vector<Node<3>*> nodes;
@@ -97,15 +97,15 @@ private:
         }
 
         // Make the faces
-        std::vector<VertexElement<2,3>*> faces;
+        std::vector<VertexElement<2, 3>*> faces;
 
         for (unsigned i = 0; i<10; ++i)
         {
-            faces.push_back(new VertexElement<2,3>(i, nodes_faces[i]));
+            faces.push_back(new VertexElement<2, 3>(i, nodes_faces[i]));
         }
 
         // Make the elements
-        std::vector<VertexElement<2,3>*> faces_element_0, faces_element_1;
+        std::vector<VertexElement<2, 3>*> faces_element_0, faces_element_1;
         std::vector<bool> orientations_0, orientations_1;
 
         // Cube element
@@ -124,14 +124,14 @@ private:
         faces_element_1.push_back(faces[5]);
         orientations_1.push_back(false);
 
-        std::vector<VertexElement<3,3>*> elements;
-        elements.push_back(new VertexElement<3,3>(0, faces_element_0, orientations_0));
-        elements.push_back(new VertexElement<3,3>(1, faces_element_1, orientations_1));
+        std::vector<VertexElement<3, 3>*> elements;
+        elements.push_back(new VertexElement<3, 3>(0, faces_element_0, orientations_0));
+        elements.push_back(new VertexElement<3, 3>(1, faces_element_1, orientations_1));
 
-        return new VertexMesh<3,3>(nodes, faces, elements);
+        return new VertexMesh<3, 3>(nodes, faces, elements);
     }
 
-    VertexMesh<3,3>* ConstructPrismMesh()
+    VertexMesh<3, 3>* ConstructPrismMesh()
     {
         // Create nodes
         std::vector<Node<3>*> nodes;
@@ -168,20 +168,20 @@ private:
         nodes_faces[4].push_back(nodes[1]);
         nodes_faces[4].push_back(nodes[0]);
 
-        std::vector<VertexElement<2,3>*> faces(5);
+        std::vector<VertexElement<2, 3>*> faces(5);
         std::vector<bool> orientations(5);
         for (unsigned i = 0; i<5; ++i)
         {
-            faces[i] = new VertexElement<2,3>(i, nodes_faces[i]);
+            faces[i] = new VertexElement<2, 3>(i, nodes_faces[i]);
             orientations[i] = true;
         }
 
         // Create cuboidal element
-        std::vector<VertexElement<3,3>*> elements;
-        elements.push_back(new VertexElement<3,3>(0, faces, orientations));
+        std::vector<VertexElement<3, 3>*> elements;
+        elements.push_back(new VertexElement<3, 3>(0, faces, orientations));
 
         // Create mesh
-        return new VertexMesh<3,3>(nodes, elements);
+        return new VertexMesh<3, 3>(nodes, elements);
     }
 
 public:
@@ -189,14 +189,14 @@ public:
     void TestNodeIterator()
     {
         // Create mesh
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
-        VertexMesh<2,2> mesh;
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
+        VertexMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 30u);
 
         unsigned counter = 0;
-        for (VertexMesh<2,2>::NodeIterator iter = mesh.GetNodeIteratorBegin();
+        for (VertexMesh<2, 2>::NodeIterator iter = mesh.GetNodeIteratorBegin();
              iter != mesh.GetNodeIteratorEnd();
              ++iter)
         {
@@ -210,7 +210,7 @@ public:
         mesh.GetNode(0)->MarkAsDeleted();
 
         counter = 0;
-        for (VertexMesh<2,2>::NodeIterator iter = mesh.GetNodeIteratorBegin();
+        for (VertexMesh<2, 2>::NodeIterator iter = mesh.GetNodeIteratorBegin();
              iter != mesh.GetNodeIteratorEnd();
              ++iter)
         {
@@ -222,10 +222,10 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumAllNodes(), counter+1);
 
         // For coverage, test with an empty mesh
-        VertexMesh<2,2> empty_mesh;
+        VertexMesh<2, 2> empty_mesh;
 
         // Since the mesh is empty, the iterator should be set to mrMesh.mNodes.end() when constructed
-        VertexMesh<2,2>::NodeIterator iter = empty_mesh.GetNodeIteratorBegin();
+        VertexMesh<2, 2>::NodeIterator iter = empty_mesh.GetNodeIteratorBegin();
 
         // Check that the iterator is now at the end (we need to check this as a double-negative,
         // as we only have a NOT-equals operator defined on the iterator).
@@ -239,14 +239,14 @@ public:
     void TestVertexElementIterator()
     {
         // Create mesh
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
-        VertexMesh<2,2> mesh;
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
+        VertexMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 9u);
 
         unsigned counter = 0;
-        for (VertexMesh<2,2>::VertexElementIterator iter = mesh.GetElementIteratorBegin();
+        for (VertexMesh<2, 2>::VertexElementIterator iter = mesh.GetElementIteratorBegin();
              iter != mesh.GetElementIteratorEnd();
              ++iter)
         {
@@ -258,10 +258,10 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), counter);
 
         // For coverage, test with an empty mesh
-        VertexMesh<2,2> empty_mesh;
+        VertexMesh<2, 2> empty_mesh;
 
         // Since the mesh is empty, the iterator should be set to mrMesh.mNodes.end() when constructed
-        VertexMesh<2,2>::VertexElementIterator iter = empty_mesh.GetElementIteratorBegin();
+        VertexMesh<2, 2>::VertexElementIterator iter = empty_mesh.GetElementIteratorBegin();
 
         // Check that the iterator is now at the end (we need to check this as a double-negative,
         // as we only have a NOT-equals operator defined on the iterator).
@@ -284,15 +284,15 @@ public:
         }
 
         std::vector<std::vector<Node<1>*> > nodes_elements_1d(3);
-        std::vector<VertexElement<1,1>*> elements_1d;
+        std::vector<VertexElement<1, 1>*> elements_1d;
         for (unsigned i = 0; i<3; ++i)
         {
             nodes_elements_1d[i].push_back(nodes_1d[i]);
             nodes_elements_1d[i].push_back(nodes_1d[i+1]);
-            elements_1d.push_back(new VertexElement<1,1>(i, nodes_elements_1d[i]));
+            elements_1d.push_back(new VertexElement<1, 1>(i, nodes_elements_1d[i]));
         }
 
-        VertexMesh<1,1> mesh_1d(nodes_1d, elements_1d);
+        VertexMesh<1, 1> mesh_1d(nodes_1d, elements_1d);
 
         // Test the mesh has the correct number of nodes and elements
         TS_ASSERT_EQUALS(mesh_1d.GetNumNodes(), 4u);
@@ -333,11 +333,11 @@ public:
         nodes_elements_2d[1].push_back(nodes_2d[5]);
         nodes_elements_2d[1].push_back(nodes_2d[6]);
 
-        std::vector<VertexElement<2,2>*> elements_2d;
-        elements_2d.push_back(new VertexElement<2,2>(0, nodes_elements_2d[0]));
-        elements_2d.push_back(new VertexElement<2,2>(1, nodes_elements_2d[1]));
+        std::vector<VertexElement<2, 2>*> elements_2d;
+        elements_2d.push_back(new VertexElement<2, 2>(0, nodes_elements_2d[0]));
+        elements_2d.push_back(new VertexElement<2, 2>(1, nodes_elements_2d[1]));
 
-        VertexMesh<2,2> mesh_2d(nodes_2d, elements_2d);
+        VertexMesh<2, 2> mesh_2d(nodes_2d, elements_2d);
 
         // Test the mesh has the correct numbers of nodes and elements
         TS_ASSERT_EQUALS(mesh_2d.GetNumElements(), 2u);
@@ -373,7 +373,7 @@ public:
     void TestBasic3dVertexMesh()
     {
         // Create a 3D mesh comprising a cube and pyramid
-        VertexMesh<3,3>* p_mesh = ConstructCubeAndPyramidMesh();
+        VertexMesh<3, 3>* p_mesh = ConstructCubeAndPyramidMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 9u);
         TS_ASSERT_EQUALS(p_mesh->GetNumFaces(), 10u);
@@ -387,11 +387,11 @@ public:
         TS_ASSERT_DELTA(p_node_2->rGetLocation()[2], 0.0, 1e-3);
 
         // Test a couple of the elements
-        VertexElement<3,3>* p_element_0 = p_mesh->GetElement(0);
+        VertexElement<3, 3>* p_element_0 = p_mesh->GetElement(0);
         TS_ASSERT_EQUALS(p_element_0->GetNumNodes(), 8u);
         TS_ASSERT_EQUALS(p_element_0->GetNumFaces(), 6u);
 
-        VertexElement<3,3>* p_element_1 = p_mesh->GetElement(1);
+        VertexElement<3, 3>* p_element_1 = p_mesh->GetElement(1);
         TS_ASSERT_EQUALS(p_element_1->GetNumNodes(), 5u);
         TS_ASSERT_EQUALS(p_element_1->GetNumFaces(), 5u);
 
@@ -429,8 +429,8 @@ public:
     void TestMeshConstructionFromMeshReader()
     {
         // Test construction of a simple 2D mesh
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
-        VertexMesh<2,2> mesh;
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_2d");
+        VertexMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 7u);
@@ -447,8 +447,8 @@ public:
         TS_ASSERT_EQUALS(mesh.GetElement(1)->GetNode(1), mesh.GetNode(5));
 
         // Test construction of a mesh whose elements have attributes
-        VertexMeshReader<2,2> mesh_reader2("mesh/test/data/TestVertexMesh/vertex_mesh_with_attributes");
-        VertexMesh<2,2> mesh2;
+        VertexMeshReader<2, 2> mesh_reader2("mesh/test/data/TestVertexMesh/vertex_mesh_with_attributes");
+        VertexMesh<2, 2> mesh2;
         mesh2.ConstructFromMeshReader(mesh_reader2);
 
         TS_ASSERT_EQUALS(mesh2.GetNumNodes(), 7u);
@@ -468,32 +468,32 @@ public:
         TS_ASSERT_EQUALS(mesh2.GetElement(1)->GetUnsignedAttribute(), 89u);
 
         // Test the correct exception is thrown in other cases
-        VertexMeshReader<1,1> mesh_reader_11("mesh/test/data/TestVertexMesh/vertex_mesh_with_attributes");
-        VertexMesh<1,1> mesh_11;
+        VertexMeshReader<1, 1> mesh_reader_11("mesh/test/data/TestVertexMesh/vertex_mesh_with_attributes");
+        VertexMesh<1, 1> mesh_11;
         TS_ASSERT_THROWS_THIS(mesh_11.ConstructFromMeshReader(mesh_reader_11),
-            "VertexMesh<1,1>::ConstructFromMeshReader() is not implemented");
+            "VertexMesh<1, 1>::ConstructFromMeshReader() is not implemented");
 
-        VertexMeshReader<1,2> mesh_reader_12("mesh/test/data/TestVertexMesh/vertex_mesh_with_attributes");
-        VertexMesh<1,2> mesh_12;
+        VertexMeshReader<1, 2> mesh_reader_12("mesh/test/data/TestVertexMesh/vertex_mesh_with_attributes");
+        VertexMesh<1, 2> mesh_12;
         TS_ASSERT_THROWS_THIS(mesh_12.ConstructFromMeshReader(mesh_reader_12),
-            "VertexMesh<1,2>::ConstructFromMeshReader() is not implemented");
+            "VertexMesh<1, 2>::ConstructFromMeshReader() is not implemented");
 
-        VertexMeshReader<1,3> mesh_reader_13("mesh/test/data/TestVertexMesh/vertex_mesh_with_attributes");
-        VertexMesh<1,3> mesh_13;
+        VertexMeshReader<1, 3> mesh_reader_13("mesh/test/data/TestVertexMesh/vertex_mesh_with_attributes");
+        VertexMesh<1, 3> mesh_13;
         TS_ASSERT_THROWS_THIS(mesh_13.ConstructFromMeshReader(mesh_reader_13),
-            "VertexMesh<1,3>::ConstructFromMeshReader() is not implemented");
+            "VertexMesh<1, 3>::ConstructFromMeshReader() is not implemented");
 
-        VertexMeshReader<2,3> mesh_reader_23("mesh/test/data/TestVertexMesh/vertex_mesh_with_attributes");
-        VertexMesh<2,3> mesh_23;
+        VertexMeshReader<2, 3> mesh_reader_23("mesh/test/data/TestVertexMesh/vertex_mesh_with_attributes");
+        VertexMesh<2, 3> mesh_23;
         TS_ASSERT_THROWS_THIS(mesh_23.ConstructFromMeshReader(mesh_reader_23),
-            "VertexMesh<2,3>::ConstructFromMeshReader() is not implemented");
+            "VertexMesh<2, 3>::ConstructFromMeshReader() is not implemented");
     }
 
     void TestMeshConstructionFromMeshReaderIndexedFromOne()
     {
         // Test construction of a simple 2D mesh
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/vertex_mesh_elements_indexed_from_1");
-        VertexMesh<2,2> mesh;
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMesh/vertex_mesh_elements_indexed_from_1");
+        VertexMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 7u);
@@ -513,8 +513,8 @@ public:
     void TestMeshConstructionFromMeshReaderWithFaces()
     {
         // Test construction of a simple 3D mesh
-        VertexMeshReader<3,3> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_3d_with_faces");
-        VertexMesh<3,3> mesh;
+        VertexMeshReader<3, 3> mesh_reader("mesh/test/data/TestVertexMeshWriter/vertex_mesh_3d_with_faces");
+        VertexMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 4u);
@@ -543,28 +543,28 @@ public:
         TS_ASSERT_DELTA(node_3_location[2], -0.25, 1e-6);
 
         // Check Voronoi faces are correct
-        VertexElement<2,3>* p_face_0 = mesh.GetFace(0);
+        VertexElement<2, 3>* p_face_0 = mesh.GetFace(0);
         TS_ASSERT_EQUALS(p_face_0->GetNumNodes(), 3u);
         TS_ASSERT_EQUALS(p_face_0->GetNodeGlobalIndex(0), 3u);
         TS_ASSERT_EQUALS(p_face_0->GetNodeGlobalIndex(1), 0u);
         TS_ASSERT_EQUALS(p_face_0->GetNodeGlobalIndex(2), 2u);
         TS_ASSERT_DELTA(mesh.CalculateAreaOfFace(p_face_0), 9.0*sqrt(3.0)/8.0, 1e-4);
 
-        VertexElement<2,3>* p_face_1 = mesh.GetFace(1);
+        VertexElement<2, 3>* p_face_1 = mesh.GetFace(1);
         TS_ASSERT_EQUALS(p_face_1->GetNumNodes(), 3u);
         TS_ASSERT_EQUALS(p_face_1->GetNodeGlobalIndex(0), 3u);
         TS_ASSERT_EQUALS(p_face_1->GetNodeGlobalIndex(1), 0u);
         TS_ASSERT_EQUALS(p_face_1->GetNodeGlobalIndex(2), 1u);
         TS_ASSERT_DELTA(mesh.CalculateAreaOfFace(p_face_1), 9.0*sqrt(3.0)/8.0, 1e-4);
 
-        VertexElement<2,3>* p_face_2 = mesh.GetFace(2);
+        VertexElement<2, 3>* p_face_2 = mesh.GetFace(2);
         TS_ASSERT_EQUALS(p_face_2->GetNumNodes(), 3u);
         TS_ASSERT_EQUALS(p_face_2->GetNodeGlobalIndex(0), 1u);
         TS_ASSERT_EQUALS(p_face_2->GetNodeGlobalIndex(1), 0u);
         TS_ASSERT_EQUALS(p_face_2->GetNodeGlobalIndex(2), 2u);
         TS_ASSERT_DELTA(mesh.CalculateAreaOfFace(p_face_2), 9.0*sqrt(3.0)/8.0, 1e-4);
 
-        VertexElement<2,3>* p_face_3 = mesh.GetFace(3);
+        VertexElement<2, 3>* p_face_3 = mesh.GetFace(3);
         TS_ASSERT_EQUALS(p_face_3->GetNumNodes(), 3u);
         TS_ASSERT_EQUALS(p_face_3->GetNodeGlobalIndex(0), 3u);
         TS_ASSERT_EQUALS(p_face_3->GetNodeGlobalIndex(1), 1u);
@@ -578,8 +578,8 @@ public:
         TS_ASSERT_DELTA(mesh.GetSurfaceAreaOfElement(0), 9.0*sqrt(3.0)/2.0, 1e-4);
 
         // Create mesh in which elements have attributes
-        VertexMeshReader<3,3> mesh_reader2("mesh/test/data/TestVertexMeshWriter/vertex_mesh_3d_with_attributes");
-        VertexMesh<3,3> mesh2;
+        VertexMeshReader<3, 3> mesh_reader2("mesh/test/data/TestVertexMeshWriter/vertex_mesh_3d_with_attributes");
+        VertexMesh<3, 3> mesh2;
         mesh2.ConstructFromMeshReader(mesh_reader2);
 
         // Check we have the right number of nodes, elements and faces
@@ -598,11 +598,11 @@ public:
         ArchiveLocationInfo::SetMeshFilename("vertex_mesh");
 
         // Create mesh
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_5_by_3");
-        VertexMesh<2,2> mesh;
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_5_by_3");
+        VertexMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        AbstractMesh<2,2>* const p_mesh = &mesh;
+        AbstractMesh<2, 2>* const p_mesh = &mesh;
 
         /*
          * You need the const above to stop a BOOST_STATIC_ASSERTION failure.
@@ -617,8 +617,8 @@ public:
 
         // Create an output archive
         {
-            TS_ASSERT_EQUALS((static_cast<VertexMesh<2,2>*>(p_mesh))->GetNumNodes(), 46u);
-            TS_ASSERT_EQUALS((static_cast<VertexMesh<2,2>*>(p_mesh))->GetNumElements(), 15u);
+            TS_ASSERT_EQUALS((static_cast<VertexMesh<2, 2>*>(p_mesh))->GetNumNodes(), 46u);
+            TS_ASSERT_EQUALS((static_cast<VertexMesh<2, 2>*>(p_mesh))->GetNumElements(), 15u);
 
             // Create output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -630,7 +630,7 @@ public:
 
         {
             // De-serialize and compare
-            AbstractMesh<2,2>* p_mesh2;
+            AbstractMesh<2, 2>* p_mesh2;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -639,8 +639,8 @@ public:
             // Restore from the archive
             (*p_arch) >> p_mesh2;
 
-            VertexMesh<2,2>* p_mesh_original = static_cast<VertexMesh<2,2>*>(p_mesh);
-            VertexMesh<2,2>* p_mesh_loaded = static_cast<VertexMesh<2,2>*>(p_mesh2);
+            VertexMesh<2, 2>* p_mesh_original = static_cast<VertexMesh<2, 2>*>(p_mesh);
+            VertexMesh<2, 2>* p_mesh_loaded = static_cast<VertexMesh<2, 2>*>(p_mesh2);
 
             // Compare the loaded mesh against the original
             TS_ASSERT_EQUALS(p_mesh_original->GetNumNodes(), p_mesh_loaded->GetNumNodes());
@@ -684,7 +684,7 @@ public:
         std::string archive_file = "vertex_mesh_3d.arch";
         ArchiveLocationInfo::SetMeshFilename("vertex_mesh");
 
-        AbstractMesh<3,3>* const p_mesh = ConstructCubeAndPyramidMesh();
+        AbstractMesh<3, 3>* const p_mesh = ConstructCubeAndPyramidMesh();
 
         /*
          * You need the const above to stop a BOOST_STATIC_ASSERTION failure.
@@ -699,9 +699,9 @@ public:
 
         // Create an output archive
         {
-            TS_ASSERT_EQUALS((static_cast<VertexMesh<3,3>*>(p_mesh))->GetNumNodes(), 9u);
-            TS_ASSERT_EQUALS((static_cast<VertexMesh<3,3>*>(p_mesh))->GetNumElements(), 2u);
-            TS_ASSERT_EQUALS((static_cast<VertexMesh<3,3>*>(p_mesh))->GetNumFaces(), 10u);
+            TS_ASSERT_EQUALS((static_cast<VertexMesh<3, 3>*>(p_mesh))->GetNumNodes(), 9u);
+            TS_ASSERT_EQUALS((static_cast<VertexMesh<3, 3>*>(p_mesh))->GetNumElements(), 2u);
+            TS_ASSERT_EQUALS((static_cast<VertexMesh<3, 3>*>(p_mesh))->GetNumFaces(), 10u);
 
             // Create output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -713,7 +713,7 @@ public:
 
         {
             // De-serialize and compare
-            AbstractMesh<3,3>* p_mesh2;
+            AbstractMesh<3, 3>* p_mesh2;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -722,8 +722,8 @@ public:
             // Restore from the archive
             (*p_arch) >> p_mesh2;
 
-            VertexMesh<3,3>* p_mesh_original = static_cast<VertexMesh<3,3>*>(p_mesh);
-            VertexMesh<3,3>* p_mesh_loaded = static_cast<VertexMesh<3,3>*>(p_mesh2);
+            VertexMesh<3, 3>* p_mesh_original = static_cast<VertexMesh<3, 3>*>(p_mesh);
+            VertexMesh<3, 3>* p_mesh_loaded = static_cast<VertexMesh<3, 3>*>(p_mesh2);
 
             // Compare the loaded mesh against the original
             TS_ASSERT_EQUALS(p_mesh_original->GetNumNodes(), p_mesh_loaded->GetNumNodes());
@@ -795,8 +795,8 @@ public:
     void TestNeighbouringNodeAndElementMethods()
     {
         // Test methods with a small regular mesh comprising hexagonal elements
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_2_by_2");
-        VertexMesh<2,2> mesh;
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_2_by_2");
+        VertexMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 4u);
@@ -851,8 +851,8 @@ public:
     void TestGetRosetteRankOfElement()
     {
         // Test method on a honeycomb mesh
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_4_by_4");
-        VertexMesh<2,2> regular_mesh;
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_4_by_4");
+        VertexMesh<2, 2> regular_mesh;
         regular_mesh.ConstructFromMeshReader(mesh_reader);
 
         // The rosette rank of each element should be 3
@@ -903,14 +903,14 @@ public:
         nodes_elem_5.push_back(nodes[1]);
 
         // Make 5 vertex elements
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_2));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_3));
-        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_4));
-        vertex_elements.push_back(new VertexElement<2,2>(4, nodes_elem_5));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_3));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_4));
+        vertex_elements.push_back(new VertexElement<2, 2>(4, nodes_elem_5));
 
-        VertexMesh<2,2> rosette_mesh(nodes, vertex_elements);
+        VertexMesh<2, 2> rosette_mesh(nodes, vertex_elements);
 
         // The rosette rank of each element should be five
         for (unsigned elem_idx = 0 ; elem_idx < rosette_mesh.GetNumElements() ; elem_idx++)
@@ -928,14 +928,14 @@ public:
             nodes_1d.push_back(new Node<1>(i, false, 0.5*static_cast<double>(i)));
         }
         std::vector<std::vector<Node<1>*> > nodes_elements_1d(3);
-        std::vector<VertexElement<1,1>*> elements_1d;
+        std::vector<VertexElement<1, 1>*> elements_1d;
         for (unsigned i = 0; i<3; ++i)
         {
             nodes_elements_1d[i].push_back(nodes_1d[i]);
             nodes_elements_1d[i].push_back(nodes_1d[i+1]);
-            elements_1d.push_back(new VertexElement<1,1>(i, nodes_elements_1d[i]));
+            elements_1d.push_back(new VertexElement<1, 1>(i, nodes_elements_1d[i]));
         }
-        VertexMesh<1,1> mesh_1d(nodes_1d, elements_1d);
+        VertexMesh<1, 1> mesh_1d(nodes_1d, elements_1d);
 
         TS_ASSERT_DELTA(mesh_1d.GetCentroidOfElement(0)[0], 0.25, 1e-6);
         TS_ASSERT_DELTA(mesh_1d.GetCentroidOfElement(1)[0], 0.75, 1e-6);
@@ -946,9 +946,9 @@ public:
         triangle_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
         triangle_nodes.push_back(new Node<2>(1, false, 2.0, 0.0));
         triangle_nodes.push_back(new Node<2>(2, false, 0.0, 1.0));
-        std::vector<VertexElement<2,2>*> triangle_elements;
-        triangle_elements.push_back(new VertexElement<2,2>(0, triangle_nodes));
-        VertexMesh<2,2> triangle_mesh(triangle_nodes, triangle_elements);
+        std::vector<VertexElement<2, 2>*> triangle_elements;
+        triangle_elements.push_back(new VertexElement<2, 2>(0, triangle_nodes));
+        VertexMesh<2, 2> triangle_mesh(triangle_nodes, triangle_elements);
 
         c_vector<double, 2> triangle_centroid = triangle_mesh.GetCentroidOfElement(0);
         TS_ASSERT_DELTA(triangle_centroid[0], 2.0/3.0, 1e-4);
@@ -960,9 +960,9 @@ public:
         square_nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
         square_nodes.push_back(new Node<2>(2, false, 1.0, 1.0));
         square_nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
-        std::vector<VertexElement<2,2>*> square_elements;
-        square_elements.push_back(new VertexElement<2,2>(0, square_nodes));
-        VertexMesh<2,2> square_mesh(square_nodes, square_elements);
+        std::vector<VertexElement<2, 2>*> square_elements;
+        square_elements.push_back(new VertexElement<2, 2>(0, square_nodes));
+        VertexMesh<2, 2> square_mesh(square_nodes, square_elements);
 
         c_vector<double, 2> square_centroid = square_mesh.GetCentroidOfElement(0);
         TS_ASSERT_DELTA(square_centroid[0], 0.5, 1e-6);
@@ -974,9 +974,9 @@ public:
         far_rectangle_nodes.push_back(new Node<2>(1, false, 11.0, 10.0));
         far_rectangle_nodes.push_back(new Node<2>(2, false, 11.0, 14.0));
         far_rectangle_nodes.push_back(new Node<2>(3, false, 10.0, 14.0));
-        std::vector<VertexElement<2,2>*> far_rectangle_elements;
-        far_rectangle_elements.push_back(new VertexElement<2,2>(0, far_rectangle_nodes));
-        VertexMesh<2,2> far_rectangle_mesh(far_rectangle_nodes, far_rectangle_elements);
+        std::vector<VertexElement<2, 2>*> far_rectangle_elements;
+        far_rectangle_elements.push_back(new VertexElement<2, 2>(0, far_rectangle_nodes));
+        VertexMesh<2, 2> far_rectangle_mesh(far_rectangle_nodes, far_rectangle_elements);
 
         c_vector<double, 2> far_rectangle_centroid = far_rectangle_mesh.GetCentroidOfElement(0);
         TS_ASSERT_DELTA(far_rectangle_centroid[0], 10.5, 1e-4);
@@ -988,9 +988,9 @@ public:
         angled_rectangle_nodes.push_back(new Node<2>(1, false, -2.0*0.5*sqrt(3.0) - 1.0*0.5, -2.0*0.5 + 1.0*0.5*sqrt(3.0)));
         angled_rectangle_nodes.push_back(new Node<2>(2, false, -2.0*0.5*sqrt(3.0) + 1.0*0.5, -2.0*0.5 - 1.0*0.5*sqrt(3.0)));
         angled_rectangle_nodes.push_back(new Node<2>(3, false,  2.0*0.5*sqrt(3.0) + 1.0*0.5,  2.0*0.5 - 1.0*0.5*sqrt(3.0)));
-        std::vector<VertexElement<2,2>*> angled_rectangle_elements;
-        angled_rectangle_elements.push_back(new VertexElement<2,2>(0, angled_rectangle_nodes));
-        VertexMesh<2,2> angled_rectangle_mesh(angled_rectangle_nodes, angled_rectangle_elements);
+        std::vector<VertexElement<2, 2>*> angled_rectangle_elements;
+        angled_rectangle_elements.push_back(new VertexElement<2, 2>(0, angled_rectangle_nodes));
+        VertexMesh<2, 2> angled_rectangle_mesh(angled_rectangle_nodes, angled_rectangle_elements);
 
         c_vector<double, 2> angled_rectangle_centroid = angled_rectangle_mesh.GetCentroidOfElement(0);
         TS_ASSERT_DELTA(angled_rectangle_centroid(0), 0.0, 1e-6);
@@ -1004,9 +1004,9 @@ public:
             double theta = 2.0*M_PI*static_cast<double>(i)/static_cast<double>(num_nodes);
             circle_nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
         }
-        std::vector<VertexElement<2,2>*> circle_elements;
-        circle_elements.push_back(new VertexElement<2,2>(0, circle_nodes));
-        VertexMesh<2,2> circle_mesh(circle_nodes, circle_elements);
+        std::vector<VertexElement<2, 2>*> circle_elements;
+        circle_elements.push_back(new VertexElement<2, 2>(0, circle_nodes));
+        VertexMesh<2, 2> circle_mesh(circle_nodes, circle_elements);
 
         c_vector<double, 2> circle_centroid = circle_mesh.GetCentroidOfElement(0);
         TS_ASSERT_DELTA(circle_centroid[0], 0.0, 1e-4);
@@ -1019,9 +1019,9 @@ public:
             double theta = 2.0 * M_PI * static_cast<double>(i) / 6.0;
             hexagon_nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
         }
-        std::vector<VertexElement<2,2>*> hexagon_elements;
-        hexagon_elements.push_back(new VertexElement<2,2>(0, hexagon_nodes));
-        VertexMesh<2,2> hexagon_mesh(hexagon_nodes, hexagon_elements);
+        std::vector<VertexElement<2, 2>*> hexagon_elements;
+        hexagon_elements.push_back(new VertexElement<2, 2>(0, hexagon_nodes));
+        VertexMesh<2, 2> hexagon_mesh(hexagon_nodes, hexagon_elements);
 
         c_vector<double, 2> hexagon_centroid = hexagon_mesh.GetCentroidOfElement(0);
         TS_ASSERT_DELTA(hexagon_centroid[0], 0.0, 1e-6);
@@ -1034,17 +1034,17 @@ public:
         irregular_nodes.push_back(new Node<2>(2, false, 1.9433,  0.5313));
         irregular_nodes.push_back(new Node<2>(3, false, 2.7425,  1.9461));
         irregular_nodes.push_back(new Node<2>(4, false, 3.3158,  1.5588));
-        std::vector<VertexElement<2,2>*> irregular_elements;
-        irregular_elements.push_back(new VertexElement<2,2>(0, irregular_nodes));
-        VertexMesh<2,2> irregular_mesh(irregular_nodes, irregular_elements);
+        std::vector<VertexElement<2, 2>*> irregular_elements;
+        irregular_elements.push_back(new VertexElement<2, 2>(0, irregular_nodes));
+        VertexMesh<2, 2> irregular_mesh(irregular_nodes, irregular_elements);
 
         c_vector<double, 2> irregular_centroid = irregular_mesh.GetCentroidOfElement(0);
         TS_ASSERT_DELTA(irregular_centroid[0], 2.6269, 1e-4);
         TS_ASSERT_DELTA(irregular_centroid[1], 0.8930, 1e-4);
 
         // Test method with a regular mesh with hexagonal elements of edge length 1/sqrt(3.0)
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_4_by_4");
-        VertexMesh<2,2> regular_mesh;
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_4_by_4");
+        VertexMesh<2, 2> regular_mesh;
         regular_mesh.ConstructFromMeshReader(mesh_reader);
 
         c_vector<double, 2> regular_centroid_5 = regular_mesh.GetCentroidOfElement(5);
@@ -1056,7 +1056,7 @@ public:
         TS_ASSERT_DELTA(regular_centroid_7[1], 2.5/sqrt(3.0), 1e-4);
 
         // Test method with a 3D mesh
-        VertexMesh<3,3>* p_mesh = ConstructPrismMesh();
+        VertexMesh<3, 3>* p_mesh = ConstructPrismMesh();
 
         // By symmetry, the centroid of the prism should lie in the plane x=0.5
         c_vector<double, 3> centroid = p_mesh->GetCentroidOfElement(0);
@@ -1075,9 +1075,9 @@ public:
         triangle_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
         triangle_nodes.push_back(new Node<2>(1, false, 2.0, 0.0));
         triangle_nodes.push_back(new Node<2>(2, false, 0.0, 1.0));
-        std::vector<VertexElement<2,2>*> triangle_elements;
-        triangle_elements.push_back(new VertexElement<2,2>(0, triangle_nodes));
-        VertexMesh<2,2> triangle_mesh(triangle_nodes, triangle_elements);
+        std::vector<VertexElement<2, 2>*> triangle_elements;
+        triangle_elements.push_back(new VertexElement<2, 2>(0, triangle_nodes));
+        VertexMesh<2, 2> triangle_mesh(triangle_nodes, triangle_elements);
 
         TS_ASSERT_DELTA(triangle_mesh.GetVolumeOfElement(0), 1.0, 1e-4);
 
@@ -1087,9 +1087,9 @@ public:
         square_nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
         square_nodes.push_back(new Node<2>(2, false, 1.0, 1.0));
         square_nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
-        std::vector<VertexElement<2,2>*> square_elements;
-        square_elements.push_back(new VertexElement<2,2>(0, square_nodes));
-        VertexMesh<2,2> square_mesh(square_nodes, square_elements);
+        std::vector<VertexElement<2, 2>*> square_elements;
+        square_elements.push_back(new VertexElement<2, 2>(0, square_nodes));
+        VertexMesh<2, 2> square_mesh(square_nodes, square_elements);
 
         TS_ASSERT_DELTA(square_mesh.GetVolumeOfElement(0), 1.0, 1e-6);
 
@@ -1101,9 +1101,9 @@ public:
             double theta = 2.0*M_PI*static_cast<double>(i)/static_cast<double>(num_nodes);
             circle_nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
         }
-        std::vector<VertexElement<2,2>*> circle_elements;
-        circle_elements.push_back(new VertexElement<2,2>(0, circle_nodes));
-        VertexMesh<2,2> circle_mesh(circle_nodes, circle_elements);
+        std::vector<VertexElement<2, 2>*> circle_elements;
+        circle_elements.push_back(new VertexElement<2, 2>(0, circle_nodes));
+        VertexMesh<2, 2> circle_mesh(circle_nodes, circle_elements);
 
         TS_ASSERT_DELTA(circle_mesh.GetVolumeOfElement(0), M_PI, 1e-4);
 
@@ -1114,9 +1114,9 @@ public:
             double theta = 2.0 * M_PI * static_cast<double>(i) / 6.0;
             hexagon_nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
         }
-        std::vector<VertexElement<2,2>*> hexagon_elements;
-        hexagon_elements.push_back(new VertexElement<2,2>(0, hexagon_nodes));
-        VertexMesh<2,2> hexagon_mesh(hexagon_nodes, hexagon_elements);
+        std::vector<VertexElement<2, 2>*> hexagon_elements;
+        hexagon_elements.push_back(new VertexElement<2, 2>(0, hexagon_nodes));
+        VertexMesh<2, 2> hexagon_mesh(hexagon_nodes, hexagon_elements);
 
         TS_ASSERT_DELTA(hexagon_mesh.GetVolumeOfElement(0), 1.5*sqrt(3.0), 1e-6);
 
@@ -1127,18 +1127,18 @@ public:
         irregular_nodes.push_back(new Node<2>(2, false, 1.9433,  0.5313));
         irregular_nodes.push_back(new Node<2>(3, false, 2.7425,  1.9461));
         irregular_nodes.push_back(new Node<2>(4, false, 3.3158,  1.5588));
-        std::vector<VertexElement<2,2>*> irregular_elements;
-        irregular_elements.push_back(new VertexElement<2,2>(0, irregular_nodes));
-        VertexMesh<2,2> irregular_mesh(irregular_nodes, irregular_elements);
+        std::vector<VertexElement<2, 2>*> irregular_elements;
+        irregular_elements.push_back(new VertexElement<2, 2>(0, irregular_nodes));
+        VertexMesh<2, 2> irregular_mesh(irregular_nodes, irregular_elements);
 
         TS_ASSERT_DELTA(irregular_mesh.GetVolumeOfElement(0), 1.4684, 1e-3);
 
         // Test method with a regular mesh with hexagonal elements of edge length 1/sqrt(3.0)
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_4_by_4");
-        VertexMesh<2,2> regular_mesh;
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_4_by_4");
+        VertexMesh<2, 2> regular_mesh;
         regular_mesh.ConstructFromMeshReader(mesh_reader);
 
-        for (VertexMesh<2,2>::VertexElementIterator iter = regular_mesh.GetElementIteratorBegin();
+        for (VertexMesh<2, 2>::VertexElementIterator iter = regular_mesh.GetElementIteratorBegin();
              iter != regular_mesh.GetElementIteratorEnd();
              ++iter)
         {
@@ -1147,7 +1147,7 @@ public:
         }
 
         // Test method with a 3D mesh
-        VertexMesh<3,3>* p_mesh = ConstructPrismMesh();
+        VertexMesh<3, 3>* p_mesh = ConstructPrismMesh();
 
         // The volume of the prism should be 0.5 * 3 * 2 * 1 = 3
         TS_ASSERT_DELTA(p_mesh->GetVolumeOfElement(0), 3.0, 1e-6);
@@ -1165,9 +1165,9 @@ public:
         triangle_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
         triangle_nodes.push_back(new Node<2>(1, false, 2.0, 0.0));
         triangle_nodes.push_back(new Node<2>(2, false, 0.0, 1.0));
-        std::vector<VertexElement<2,2>*> triangle_elements;
-        triangle_elements.push_back(new VertexElement<2,2>(0, triangle_nodes));
-        VertexMesh<2,2> triangle_mesh(triangle_nodes, triangle_elements);
+        std::vector<VertexElement<2, 2>*> triangle_elements;
+        triangle_elements.push_back(new VertexElement<2, 2>(0, triangle_nodes));
+        VertexMesh<2, 2> triangle_mesh(triangle_nodes, triangle_elements);
 
         TS_ASSERT_DELTA(triangle_mesh.GetSurfaceAreaOfElement(0), 3.0 + sqrt(5.0), 1e-4);
 
@@ -1177,9 +1177,9 @@ public:
         square_nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
         square_nodes.push_back(new Node<2>(2, false, 1.0, 1.0));
         square_nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
-        std::vector<VertexElement<2,2>*> square_elements;
-        square_elements.push_back(new VertexElement<2,2>(0, square_nodes));
-        VertexMesh<2,2> square_mesh(square_nodes, square_elements);
+        std::vector<VertexElement<2, 2>*> square_elements;
+        square_elements.push_back(new VertexElement<2, 2>(0, square_nodes));
+        VertexMesh<2, 2> square_mesh(square_nodes, square_elements);
 
         TS_ASSERT_DELTA(square_mesh.GetSurfaceAreaOfElement(0), 4.0, 1e-6);
 
@@ -1191,9 +1191,9 @@ public:
             double theta = 2.0*M_PI*static_cast<double>(i)/static_cast<double>(num_nodes);
             circle_nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
         }
-        std::vector<VertexElement<2,2>*> circle_elements;
-        circle_elements.push_back(new VertexElement<2,2>(0, circle_nodes));
-        VertexMesh<2,2> circle_mesh(circle_nodes, circle_elements);
+        std::vector<VertexElement<2, 2>*> circle_elements;
+        circle_elements.push_back(new VertexElement<2, 2>(0, circle_nodes));
+        VertexMesh<2, 2> circle_mesh(circle_nodes, circle_elements);
 
         TS_ASSERT_DELTA(circle_mesh.GetSurfaceAreaOfElement(0), 2.0*M_PI, 1e-4);
 
@@ -1204,9 +1204,9 @@ public:
             double theta = 2.0 * M_PI * static_cast<double>(i) / 6.0;
             hexagon_nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
         }
-        std::vector<VertexElement<2,2>*> hexagon_elements;
-        hexagon_elements.push_back(new VertexElement<2,2>(0, hexagon_nodes));
-        VertexMesh<2,2> hexagon_mesh(hexagon_nodes, hexagon_elements);
+        std::vector<VertexElement<2, 2>*> hexagon_elements;
+        hexagon_elements.push_back(new VertexElement<2, 2>(0, hexagon_nodes));
+        VertexMesh<2, 2> hexagon_mesh(hexagon_nodes, hexagon_elements);
 
         TS_ASSERT_DELTA(hexagon_mesh.GetSurfaceAreaOfElement(0), 6.0, 1e-6);
 
@@ -1217,18 +1217,18 @@ public:
         irregular_nodes.push_back(new Node<2>(2, false, 1.9433,  0.5313));
         irregular_nodes.push_back(new Node<2>(3, false, 2.7425,  1.9461));
         irregular_nodes.push_back(new Node<2>(4, false, 3.3158,  1.5588));
-        std::vector<VertexElement<2,2>*> irregular_elements;
-        irregular_elements.push_back(new VertexElement<2,2>(0, irregular_nodes));
-        VertexMesh<2,2> irregular_mesh(irregular_nodes, irregular_elements);
+        std::vector<VertexElement<2, 2>*> irregular_elements;
+        irregular_elements.push_back(new VertexElement<2, 2>(0, irregular_nodes));
+        VertexMesh<2, 2> irregular_mesh(irregular_nodes, irregular_elements);
 
         TS_ASSERT_DELTA(irregular_mesh.GetSurfaceAreaOfElement(0), 5.1263, 1e-3);
 
         // Test method with a regular mesh with hexagonal elements of edge length 1/sqrt(3.0)
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_4_by_4");
-        VertexMesh<2,2> regular_mesh;
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_4_by_4");
+        VertexMesh<2, 2> regular_mesh;
         regular_mesh.ConstructFromMeshReader(mesh_reader);
 
-        for (VertexMesh<2,2>::VertexElementIterator iter = regular_mesh.GetElementIteratorBegin();
+        for (VertexMesh<2, 2>::VertexElementIterator iter = regular_mesh.GetElementIteratorBegin();
              iter != regular_mesh.GetElementIteratorEnd();
              ++iter)
         {
@@ -1237,7 +1237,7 @@ public:
         }
 
         // Test method with a 3D mesh
-        VertexMesh<3,3>* p_mesh = ConstructPrismMesh();
+        VertexMesh<3, 3>* p_mesh = ConstructPrismMesh();
 
         // The surface area of the prism should be the sum of the face areas
         TS_ASSERT_DELTA(p_mesh->GetSurfaceAreaOfElement(0), 11 + sqrt(13.0), 1e-6);
@@ -1249,13 +1249,13 @@ public:
     void Test3dMethodsWithPrism()
     {
         // Test method with a 3D mesh
-        VertexMesh<3,3>* p_mesh = ConstructPrismMesh();
+        VertexMesh<3, 3>* p_mesh = ConstructPrismMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetElement(0)->GetNumFaces(), 5u);
         TS_ASSERT_EQUALS(p_mesh->GetNumFaces(), 5u);
 
         // Face 0 has four vertices, is perpendicular to the y axis, and has area 1*3 = 3
-        VertexElement<2,3>* p_face_0 = p_mesh->GetFace(0);
+        VertexElement<2, 3>* p_face_0 = p_mesh->GetFace(0);
         TS_ASSERT_EQUALS(p_face_0->GetNumNodes(), 4u);
         c_vector<double, 3> unit_normal_0;
         p_mesh->CalculateUnitNormalToFaceWithArea(p_face_0, unit_normal_0);
@@ -1265,7 +1265,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->CalculateAreaOfFace(p_face_0), 3.0, 1e-6);
 
         // Face 1 has three vertices, is perpendicular to the x axis, and has area 0.5*2*3 = 3
-        VertexElement<2,3>* p_face_1 = p_mesh->GetFace(1);
+        VertexElement<2, 3>* p_face_1 = p_mesh->GetFace(1);
         TS_ASSERT_EQUALS(p_face_1->GetNumNodes(), 3u);
         c_vector<double, 3> unit_normal_1;
         p_mesh->CalculateUnitNormalToFaceWithArea(p_face_1, unit_normal_1);
@@ -1276,7 +1276,7 @@ public:
 
         // Face 2 has four vertices, is at an angle theta to the y axis where tan(theta) = 2/3,
         // and has area 1*sqrt(2^2 + 3^2) = sqrt(13.0)
-        VertexElement<2,3>* p_face_2 = p_mesh->GetFace(2);
+        VertexElement<2, 3>* p_face_2 = p_mesh->GetFace(2);
         TS_ASSERT_EQUALS(p_face_2->GetNumNodes(), 4u);
         c_vector<double, 3> unit_normal_2;
         p_mesh->CalculateUnitNormalToFaceWithArea(p_face_2, unit_normal_2);
@@ -1286,7 +1286,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->CalculateAreaOfFace(p_face_2), sqrt(13.0), 1e-6);
 
         // Face 1 has three vertices, is perpendicular to the x axis, and has area 0.5*2*3 = 3
-        VertexElement<2,3>* p_face_3 = p_mesh->GetFace(3);
+        VertexElement<2, 3>* p_face_3 = p_mesh->GetFace(3);
         TS_ASSERT_EQUALS(p_face_3->GetNumNodes(), 3u);
         c_vector<double, 3> unit_normal_3;
         p_mesh->CalculateUnitNormalToFaceWithArea(p_face_3, unit_normal_3);
@@ -1296,7 +1296,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->CalculateAreaOfFace(p_face_3), 3.0, 1e-6);
 
         // Face 4 has four vertices, is perpendicular to the z axis, and has area 1*2 = 2
-        VertexElement<2,3>* p_face_4 = p_mesh->GetFace(4);
+        VertexElement<2, 3>* p_face_4 = p_mesh->GetFace(4);
         TS_ASSERT_EQUALS(p_face_4->GetNumNodes(), 4u);
         c_vector<double, 3> unit_normal_4;
         p_mesh->CalculateUnitNormalToFaceWithArea(p_face_4, unit_normal_4);
@@ -1318,12 +1318,12 @@ public:
         square_nodes.push_back(new Node<2>(2, false, 1.0, 1.0));
         square_nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
 
-        std::vector<VertexElement<2,2>*> square_elements;
-        square_elements.push_back(new VertexElement<2,2>(0, square_nodes));
+        std::vector<VertexElement<2, 2>*> square_elements;
+        square_elements.push_back(new VertexElement<2, 2>(0, square_nodes));
 
-        VertexMesh<2,2> square_mesh(square_nodes, square_elements);
+        VertexMesh<2, 2> square_mesh(square_nodes, square_elements);
 
-        VertexElement<2,2>* p_element = square_mesh.GetElement(0);
+        VertexElement<2, 2>* p_element = square_mesh.GetElement(0);
 
         c_vector<double, 2> element_area_gradient = square_mesh.GetAreaGradientOfElementAtNode(p_element, 0);
         TS_ASSERT_DELTA(element_area_gradient[0], -0.5, 1e-6);
@@ -1351,12 +1351,12 @@ public:
         square_nodes.push_back(new Node<2>(2, false, 1.0, 1.0));
         square_nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
 
-        std::vector<VertexElement<2,2>*> square_elements;
-        square_elements.push_back(new VertexElement<2,2>(0, square_nodes));
+        std::vector<VertexElement<2, 2>*> square_elements;
+        square_elements.push_back(new VertexElement<2, 2>(0, square_nodes));
 
-        VertexMesh<2,2> square_mesh(square_nodes, square_elements);
+        VertexMesh<2, 2> square_mesh(square_nodes, square_elements);
 
-        VertexElement<2,2>* p_element = square_mesh.GetElement(0);
+        VertexElement<2, 2>* p_element = square_mesh.GetElement(0);
 
         c_vector<double, 2> element_perimeter_gradient = square_mesh.GetPerimeterGradientOfElementAtNode(p_element, 0);
         TS_ASSERT_DELTA(element_perimeter_gradient[0], -1.0, 1e-6);
@@ -1378,8 +1378,8 @@ public:
     void TestMeshGetWidthAndBoundingBoxMethod()
     {
         // Test method with a regular mesh with hexagonal elements of edge length 1/sqrt(3.0)
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
-        VertexMesh<2,2> regular_mesh;
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
+        VertexMesh<2, 2> regular_mesh;
         regular_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Test CalculateBoundingBox()
@@ -1404,9 +1404,9 @@ public:
         isos_triangle_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
         isos_triangle_nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
         isos_triangle_nodes.push_back(new Node<2>(2, false, 0.0, 1.0));
-        std::vector<VertexElement<2,2>*> isos_triangle_elements;
-        isos_triangle_elements.push_back(new VertexElement<2,2>(0, isos_triangle_nodes));
-        VertexMesh<2,2> isos_triangle_mesh(isos_triangle_nodes, isos_triangle_elements);
+        std::vector<VertexElement<2, 2>*> isos_triangle_elements;
+        isos_triangle_elements.push_back(new VertexElement<2, 2>(0, isos_triangle_nodes));
+        VertexMesh<2, 2> isos_triangle_mesh(isos_triangle_nodes, isos_triangle_elements);
 
         c_vector<double, 3> isos_triangle_moments = isos_triangle_mesh.CalculateMomentsOfElement(0);
         TS_ASSERT_DELTA(isos_triangle_moments[0], 0.0277, 1e-4);
@@ -1418,9 +1418,9 @@ public:
         triangle_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
         triangle_nodes.push_back(new Node<2>(1, false, 2.0, 0.0));
         triangle_nodes.push_back(new Node<2>(2, false, 0.0, 1.0));
-        std::vector<VertexElement<2,2>*> triangle_elements;
-        triangle_elements.push_back(new VertexElement<2,2>(0, triangle_nodes));
-        VertexMesh<2,2> triangle_mesh(triangle_nodes, triangle_elements);
+        std::vector<VertexElement<2, 2>*> triangle_elements;
+        triangle_elements.push_back(new VertexElement<2, 2>(0, triangle_nodes));
+        VertexMesh<2, 2> triangle_mesh(triangle_nodes, triangle_elements);
 
         c_vector<double, 3> triangle_moments = triangle_mesh.CalculateMomentsOfElement(0);
         TS_ASSERT_DELTA(triangle_moments(0), 1.0/18.0, 1e-6);  // Ixx
@@ -1433,9 +1433,9 @@ public:
         horizontal_rectangle_nodes.push_back(new Node<2>(1, false, -2.0,  1.0));
         horizontal_rectangle_nodes.push_back(new Node<2>(2, false, -2.0, -1.0));
         horizontal_rectangle_nodes.push_back(new Node<2>(3, false,  2.0, -1.0));
-        std::vector<VertexElement<2,2>*> horizontal_rectangle_elements;
-        horizontal_rectangle_elements.push_back(new VertexElement<2,2>(0, horizontal_rectangle_nodes));
-        VertexMesh<2,2> horizontal_rectangle_mesh(horizontal_rectangle_nodes, horizontal_rectangle_elements);
+        std::vector<VertexElement<2, 2>*> horizontal_rectangle_elements;
+        horizontal_rectangle_elements.push_back(new VertexElement<2, 2>(0, horizontal_rectangle_nodes));
+        VertexMesh<2, 2> horizontal_rectangle_mesh(horizontal_rectangle_nodes, horizontal_rectangle_elements);
 
         c_vector<double, 3> horizontal_rectangle_moments = horizontal_rectangle_mesh.CalculateMomentsOfElement(0);
         TS_ASSERT_DELTA(horizontal_rectangle_moments(0), 8.0/3.0, 1e-6);  // Ixx
@@ -1448,9 +1448,9 @@ public:
         clockwise_rectangle_nodes.push_back(new Node<2>(1, false, -2.0,  1.0));
         clockwise_rectangle_nodes.push_back(new Node<2>(2, false,  2.0,  1.0));
         clockwise_rectangle_nodes.push_back(new Node<2>(3, false,  2.0, -1.0));
-        std::vector<VertexElement<2,2>*> clockwise_rectangle_elements;
-        clockwise_rectangle_elements.push_back(new VertexElement<2,2>(0, clockwise_rectangle_nodes));
-        VertexMesh<2,2> clockwise_rectangle_mesh(clockwise_rectangle_nodes, clockwise_rectangle_elements);
+        std::vector<VertexElement<2, 2>*> clockwise_rectangle_elements;
+        clockwise_rectangle_elements.push_back(new VertexElement<2, 2>(0, clockwise_rectangle_nodes));
+        VertexMesh<2, 2> clockwise_rectangle_mesh(clockwise_rectangle_nodes, clockwise_rectangle_elements);
 
         c_vector<double, 3> clockwise_rectangle_moments = clockwise_rectangle_mesh.CalculateMomentsOfElement(0);
         TS_ASSERT_DELTA(clockwise_rectangle_moments(0), 8.0/3.0, 1e-6);  // Ixx
@@ -1463,9 +1463,9 @@ public:
         vertical_rectangle_nodes.push_back(new Node<2>(1, false, -1.0,  2.0));
         vertical_rectangle_nodes.push_back(new Node<2>(2, false, -1.0, -2.0));
         vertical_rectangle_nodes.push_back(new Node<2>(3, false,  1.0, -2.0));
-        std::vector<VertexElement<2,2>*> vertical_rectangle_elements;
-        vertical_rectangle_elements.push_back(new VertexElement<2,2>(0, vertical_rectangle_nodes));
-        VertexMesh<2,2> vertical_rectangle_mesh(vertical_rectangle_nodes, vertical_rectangle_elements);
+        std::vector<VertexElement<2, 2>*> vertical_rectangle_elements;
+        vertical_rectangle_elements.push_back(new VertexElement<2, 2>(0, vertical_rectangle_nodes));
+        VertexMesh<2, 2> vertical_rectangle_mesh(vertical_rectangle_nodes, vertical_rectangle_elements);
 
         c_vector<double, 3> vertical_rectangle_moments = vertical_rectangle_mesh.CalculateMomentsOfElement(0);
         TS_ASSERT_DELTA(vertical_rectangle_moments(0), 32.0/3.0, 1e-6); // Ixx
@@ -1478,9 +1478,9 @@ public:
         far_rectangle_nodes.push_back(new Node<2>(1, false, 11.0, 10.0));
         far_rectangle_nodes.push_back(new Node<2>(2, false, 11.0, 14.0));
         far_rectangle_nodes.push_back(new Node<2>(3, false, 10.0, 14.0));
-        std::vector<VertexElement<2,2>*> far_rectangle_elements;
-        far_rectangle_elements.push_back(new VertexElement<2,2>(0, far_rectangle_nodes));
-        VertexMesh<2,2> far_rectangle_mesh(far_rectangle_nodes, far_rectangle_elements);
+        std::vector<VertexElement<2, 2>*> far_rectangle_elements;
+        far_rectangle_elements.push_back(new VertexElement<2, 2>(0, far_rectangle_nodes));
+        VertexMesh<2, 2> far_rectangle_mesh(far_rectangle_nodes, far_rectangle_elements);
 
         c_vector<double, 3> far_rectangle_moments = far_rectangle_mesh.CalculateMomentsOfElement(0);
         TS_ASSERT_DELTA(far_rectangle_moments[0], 16.0/3.0, 1e-4); // Ixx
@@ -1493,9 +1493,9 @@ public:
         angled_rectangle_nodes.push_back(new Node<2>(1, false, -2.0*0.5*sqrt(3.0) - 1.0*0.5, -2.0*0.5 + 1.0*0.5*sqrt(3.0)));
         angled_rectangle_nodes.push_back(new Node<2>(2, false, -2.0*0.5*sqrt(3.0) + 1.0*0.5, -2.0*0.5 - 1.0*0.5*sqrt(3.0)));
         angled_rectangle_nodes.push_back(new Node<2>(3, false,  2.0*0.5*sqrt(3.0) + 1.0*0.5,  2.0*0.5 - 1.0*0.5*sqrt(3.0)));
-        std::vector<VertexElement<2,2>*> angled_rectangle_elements;
-        angled_rectangle_elements.push_back(new VertexElement<2,2>(0, angled_rectangle_nodes));
-        VertexMesh<2,2> angled_rectangle_mesh(angled_rectangle_nodes, angled_rectangle_elements);
+        std::vector<VertexElement<2, 2>*> angled_rectangle_elements;
+        angled_rectangle_elements.push_back(new VertexElement<2, 2>(0, angled_rectangle_nodes));
+        VertexMesh<2, 2> angled_rectangle_mesh(angled_rectangle_nodes, angled_rectangle_elements);
 
         c_vector<double, 3> angled_rectangle_moments = angled_rectangle_mesh.CalculateMomentsOfElement(0);
         TS_ASSERT_DELTA(angled_rectangle_moments[0], 14.0/3.0, 1e-4);    // Ixx
@@ -1509,9 +1509,9 @@ public:
         irregular_nodes.push_back(new Node<2>(2, false, 1.9433,  0.5313));
         irregular_nodes.push_back(new Node<2>(3, false, 2.7425,  1.9461));
         irregular_nodes.push_back(new Node<2>(4, false, 3.3158,  1.5588));
-        std::vector<VertexElement<2,2>*> irregular_elements;
-        irregular_elements.push_back(new VertexElement<2,2>(0, irregular_nodes));
-        VertexMesh<2,2> irregular_mesh(irregular_nodes, irregular_elements);
+        std::vector<VertexElement<2, 2>*> irregular_elements;
+        irregular_elements.push_back(new VertexElement<2, 2>(0, irregular_nodes));
+        VertexMesh<2, 2> irregular_mesh(irregular_nodes, irregular_elements);
 
         c_vector<double, 3> irregular_moments = irregular_mesh.CalculateMomentsOfElement(0);
         TS_ASSERT_DELTA(irregular_moments[0], 0.3521, 1e-4); // Ixx
@@ -1519,8 +1519,8 @@ public:
         TS_ASSERT_DELTA(irregular_moments[2], 0.1162, 1e-4); // Ixy
 
         // Test method with a regular mesh with hexagonal elements of edge length 1/sqrt(3.0)
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_4_by_4");
-        VertexMesh<2,2> regular_mesh;
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_4_by_4");
+        VertexMesh<2, 2> regular_mesh;
         regular_mesh.ConstructFromMeshReader(mesh_reader);
 
         for (unsigned i = 0; i<regular_mesh.GetNumElements(); ++i)
@@ -1539,9 +1539,9 @@ public:
         triangle_nodes.push_back(new Node<2>(0, false, 0.0, 0.0));
         triangle_nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
         triangle_nodes.push_back(new Node<2>(2, false, 0.0, 1.0));
-        std::vector<VertexElement<2,2>*> triangle_elements;
-        triangle_elements.push_back(new VertexElement<2,2>(0, triangle_nodes));
-        VertexMesh<2,2> triangle_mesh(triangle_nodes, triangle_elements);
+        std::vector<VertexElement<2, 2>*> triangle_elements;
+        triangle_elements.push_back(new VertexElement<2, 2>(0, triangle_nodes));
+        VertexMesh<2, 2> triangle_mesh(triangle_nodes, triangle_elements);
 
         c_vector<double, 2> triangle_short_axis = triangle_mesh.GetShortAxisOfElement(0);
         TS_ASSERT_DELTA(triangle_short_axis[0], 1/sqrt(2.0), 1e-4);
@@ -1553,9 +1553,9 @@ public:
         horizontal_rectangle_nodes.push_back(new Node<2>(1, false, -2.0,  1.0));
         horizontal_rectangle_nodes.push_back(new Node<2>(2, false, -2.0, -1.0));
         horizontal_rectangle_nodes.push_back(new Node<2>(3, false,  2.0, -1.0));
-        std::vector<VertexElement<2,2>*> horizontal_rectangle_elements;
-        horizontal_rectangle_elements.push_back(new VertexElement<2,2>(0, horizontal_rectangle_nodes));
-        VertexMesh<2,2> horizontal_rectangle_mesh(horizontal_rectangle_nodes, horizontal_rectangle_elements);
+        std::vector<VertexElement<2, 2>*> horizontal_rectangle_elements;
+        horizontal_rectangle_elements.push_back(new VertexElement<2, 2>(0, horizontal_rectangle_nodes));
+        VertexMesh<2, 2> horizontal_rectangle_mesh(horizontal_rectangle_nodes, horizontal_rectangle_elements);
 
         c_vector<double, 2> horizontal_rectangle_short_axis = horizontal_rectangle_mesh.GetShortAxisOfElement(0);
         TS_ASSERT_DELTA(horizontal_rectangle_short_axis(0), 0.0, 1e-6);
@@ -1567,9 +1567,9 @@ public:
         clockwise_rectangle_nodes.push_back(new Node<2>(1, false, -2.0,  1.0));
         clockwise_rectangle_nodes.push_back(new Node<2>(2, false,  2.0,  1.0));
         clockwise_rectangle_nodes.push_back(new Node<2>(3, false,  2.0, -1.0));
-        std::vector<VertexElement<2,2>*> clockwise_rectangle_elements;
-        clockwise_rectangle_elements.push_back(new VertexElement<2,2>(0, clockwise_rectangle_nodes));
-        VertexMesh<2,2> clockwise_rectangle_mesh(clockwise_rectangle_nodes, clockwise_rectangle_elements);
+        std::vector<VertexElement<2, 2>*> clockwise_rectangle_elements;
+        clockwise_rectangle_elements.push_back(new VertexElement<2, 2>(0, clockwise_rectangle_nodes));
+        VertexMesh<2, 2> clockwise_rectangle_mesh(clockwise_rectangle_nodes, clockwise_rectangle_elements);
 
         c_vector<double, 3> clockwise_rectangle_short_axis = clockwise_rectangle_mesh.GetShortAxisOfElement(0);
         TS_ASSERT_DELTA(clockwise_rectangle_short_axis(0), 0.0, 1e-6);
@@ -1581,9 +1581,9 @@ public:
         vertical_rectangle_nodes.push_back(new Node<2>(1, false, -1.0,  2.0));
         vertical_rectangle_nodes.push_back(new Node<2>(2, false, -1.0, -2.0));
         vertical_rectangle_nodes.push_back(new Node<2>(3, false,  1.0, -2.0));
-        std::vector<VertexElement<2,2>*> vertical_rectangle_elements;
-        vertical_rectangle_elements.push_back(new VertexElement<2,2>(0, vertical_rectangle_nodes));
-        VertexMesh<2,2> vertical_rectangle_mesh(vertical_rectangle_nodes, vertical_rectangle_elements);
+        std::vector<VertexElement<2, 2>*> vertical_rectangle_elements;
+        vertical_rectangle_elements.push_back(new VertexElement<2, 2>(0, vertical_rectangle_nodes));
+        VertexMesh<2, 2> vertical_rectangle_mesh(vertical_rectangle_nodes, vertical_rectangle_elements);
 
         c_vector<double, 2> vertical_rectangle_short_axis = vertical_rectangle_mesh.GetShortAxisOfElement(0);
         TS_ASSERT_DELTA(vertical_rectangle_short_axis(0), 1.0, 1e-6);
@@ -1595,9 +1595,9 @@ public:
         far_rectangle_nodes.push_back(new Node<2>(1, false, 11.0, 10.0));
         far_rectangle_nodes.push_back(new Node<2>(2, false, 11.0, 14.0));
         far_rectangle_nodes.push_back(new Node<2>(3, false, 10.0, 14.0));
-        std::vector<VertexElement<2,2>*> far_rectangle_elements;
-        far_rectangle_elements.push_back(new VertexElement<2,2>(0, far_rectangle_nodes));
-        VertexMesh<2,2> far_rectangle_mesh(far_rectangle_nodes, far_rectangle_elements);
+        std::vector<VertexElement<2, 2>*> far_rectangle_elements;
+        far_rectangle_elements.push_back(new VertexElement<2, 2>(0, far_rectangle_nodes));
+        VertexMesh<2, 2> far_rectangle_mesh(far_rectangle_nodes, far_rectangle_elements);
 
         c_vector<double, 2> far_rectangle_short_axis = far_rectangle_mesh.GetShortAxisOfElement(0);
         TS_ASSERT_DELTA(far_rectangle_short_axis[0], 1.0, 1e-4);
@@ -1609,9 +1609,9 @@ public:
         angled_rectangle_nodes.push_back(new Node<2>(1, false, -2.0*0.5*sqrt(3.0) - 1.0*0.5, -2.0*0.5 + 1.0*0.5*sqrt(3.0)));
         angled_rectangle_nodes.push_back(new Node<2>(2, false, -2.0*0.5*sqrt(3.0) + 1.0*0.5, -2.0*0.5 - 1.0*0.5*sqrt(3.0)));
         angled_rectangle_nodes.push_back(new Node<2>(3, false,  2.0*0.5*sqrt(3.0) + 1.0*0.5,  2.0*0.5 - 1.0*0.5*sqrt(3.0)));
-        std::vector<VertexElement<2,2>*> angled_rectangle_elements;
-        angled_rectangle_elements.push_back(new VertexElement<2,2>(0, angled_rectangle_nodes));
-        VertexMesh<2,2> angled_rectangle_mesh(angled_rectangle_nodes, angled_rectangle_elements);
+        std::vector<VertexElement<2, 2>*> angled_rectangle_elements;
+        angled_rectangle_elements.push_back(new VertexElement<2, 2>(0, angled_rectangle_nodes));
+        VertexMesh<2, 2> angled_rectangle_mesh(angled_rectangle_nodes, angled_rectangle_elements);
 
         c_vector<double, 2> angled_rectangle_short_axis = angled_rectangle_mesh.GetShortAxisOfElement(0);
         TS_ASSERT_DELTA(angled_rectangle_short_axis(0), 0.5, 1e-6);
@@ -1624,9 +1624,9 @@ public:
         irregular_nodes.push_back(new Node<2>(2, false, 1.9433,  0.5313));
         irregular_nodes.push_back(new Node<2>(3, false, 2.7425,  1.9461));
         irregular_nodes.push_back(new Node<2>(4, false, 3.3158,  1.5588));
-        std::vector<VertexElement<2,2>*> irregular_elements;
-        irregular_elements.push_back(new VertexElement<2,2>(0, irregular_nodes));
-        VertexMesh<2,2> irregular_mesh(irregular_nodes, irregular_elements);
+        std::vector<VertexElement<2, 2>*> irregular_elements;
+        irregular_elements.push_back(new VertexElement<2, 2>(0, irregular_nodes));
+        VertexMesh<2, 2> irregular_mesh(irregular_nodes, irregular_elements);
 
         c_vector<double, 2> irregular_short_axis = irregular_mesh.GetShortAxisOfElement(0);
         TS_ASSERT_DELTA(irregular_short_axis[0], 0.9210, 1e-4);
@@ -1638,9 +1638,9 @@ public:
         trapezium_nodes.push_back(new Node<2>(1, false,  2.0, sqrt(3.0)));
         trapezium_nodes.push_back(new Node<2>(2, false, -2.5, -sqrt(3.0)/2.0));
         trapezium_nodes.push_back(new Node<2>(3, false, -0.5, -sqrt(3.0)/2.0));
-        std::vector<VertexElement<2,2>*> trapezium_elements;
-        trapezium_elements.push_back(new VertexElement<2,2>(0, trapezium_nodes));
-        VertexMesh<2,2> trapezium_mesh(trapezium_nodes, trapezium_elements);
+        std::vector<VertexElement<2, 2>*> trapezium_elements;
+        trapezium_elements.push_back(new VertexElement<2, 2>(0, trapezium_nodes));
+        VertexMesh<2, 2> trapezium_mesh(trapezium_nodes, trapezium_elements);
 
         c_vector<double, 2> trapezium_short_axis = trapezium_mesh.GetShortAxisOfElement(0);
         TS_ASSERT_DELTA(trapezium_short_axis(0), 0.5, 1e-6);
@@ -1653,9 +1653,9 @@ public:
             double theta = 2.0 * M_PI * static_cast<double>(i) / 6.0;
             hexagon_nodes.push_back(new Node<2>(i, false, cos(theta), sin(theta)));
         }
-        std::vector<VertexElement<2,2>*> hexagon_elements;
-        hexagon_elements.push_back(new VertexElement<2,2>(0, hexagon_nodes));
-        VertexMesh<2,2> hexagon_mesh(hexagon_nodes, hexagon_elements);
+        std::vector<VertexElement<2, 2>*> hexagon_elements;
+        hexagon_elements.push_back(new VertexElement<2, 2>(0, hexagon_nodes));
+        VertexMesh<2, 2> hexagon_mesh(hexagon_nodes, hexagon_elements);
 
         // Since the element is a regular polygon, the short axis is a random vector, so test the random seed
         c_vector<double, 2> hexagon_short_axis = hexagon_mesh.GetShortAxisOfElement(0);
@@ -1672,9 +1672,9 @@ public:
         square_nodes.push_back(new Node<2>(1, false, -1.0,  1.0));
         square_nodes.push_back(new Node<2>(2, false, -1.0, -1.0));
         square_nodes.push_back(new Node<2>(3, false,  1.0, -1.0));
-        std::vector<VertexElement<2,2>*> square_elements;
-        square_elements.push_back(new VertexElement<2,2>(0, square_nodes));
-        VertexMesh<2,2> square_mesh(square_nodes, square_elements);
+        std::vector<VertexElement<2, 2>*> square_elements;
+        square_elements.push_back(new VertexElement<2, 2>(0, square_nodes));
+        VertexMesh<2, 2> square_mesh(square_nodes, square_elements);
 
         // By symmetry, the two eigenvalues are equal, so the elongation shape factor equals one
         double square_elongation_shape_factor = square_mesh.GetElongationShapeFactorOfElement(0);
@@ -1691,9 +1691,9 @@ public:
         vertical_rectangle_nodes.push_back(new Node<2>(1, false, -1.0,  2.0));
         vertical_rectangle_nodes.push_back(new Node<2>(2, false, -1.0, -2.0));
         vertical_rectangle_nodes.push_back(new Node<2>(3, false,  1.0, -2.0));
-        std::vector<VertexElement<2,2>*> vertical_rectangle_elements;
-        vertical_rectangle_elements.push_back(new VertexElement<2,2>(0, vertical_rectangle_nodes));
-        VertexMesh<2,2> vertical_rectangle_mesh(vertical_rectangle_nodes, vertical_rectangle_elements);
+        std::vector<VertexElement<2, 2>*> vertical_rectangle_elements;
+        vertical_rectangle_elements.push_back(new VertexElement<2, 2>(0, vertical_rectangle_nodes));
+        VertexMesh<2, 2> vertical_rectangle_mesh(vertical_rectangle_nodes, vertical_rectangle_elements);
 
         /*
          * For a rectangle of width a (parallel to the x axis) and height b (parallel to the
@@ -1718,8 +1718,8 @@ public:
     void TestScaleAndTranslate()
     {
         // Create mesh
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
-        VertexMesh<2,2> mesh;
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
+        VertexMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_DELTA(mesh.GetWidth(0), 3.5000, 1e-4);
@@ -1746,10 +1746,10 @@ public:
         nodes.push_back(new Node<3>(6, false, 1.0, 2.0, 3.0));
         nodes.push_back(new Node<3>(7, false, 0.0, 2.0, 3.0));
 
-        std::vector<VertexElement<3,3>*> elements;
-        elements.push_back(new VertexElement<3,3>(0, nodes));
+        std::vector<VertexElement<3, 3>*> elements;
+        elements.push_back(new VertexElement<3, 3>(0, nodes));
 
-        VertexMesh<3,3> mesh3d(nodes, elements);
+        VertexMesh<3, 3> mesh3d(nodes, elements);
 
         TS_ASSERT_DELTA(mesh3d.GetWidth(0), 1.0, 1e-4);
         TS_ASSERT_DELTA(mesh3d.GetWidth(1), 2.0, 1e-4);
@@ -1787,9 +1787,9 @@ public:
         square_nodes.push_back(new Node<2>(1, false, 1.0, 0.0));
         square_nodes.push_back(new Node<2>(2, false, 1.0, 1.0));
         square_nodes.push_back(new Node<2>(3, false, 0.0, 1.0));
-        std::vector<VertexElement<2,2>*> square_elements;
-        square_elements.push_back(new VertexElement<2,2>(0, square_nodes));
-        VertexMesh<2,2> square_mesh(square_nodes, square_elements);
+        std::vector<VertexElement<2, 2>*> square_elements;
+        square_elements.push_back(new VertexElement<2, 2>(0, square_nodes));
+        VertexMesh<2, 2> square_mesh(square_nodes, square_elements);
 
         for (unsigned i = 0; i<square_mesh.GetNumNodes(); ++i)
         {
@@ -1797,8 +1797,8 @@ public:
         }
 
         // Test with a small regular honeycomb mesh with some interior nodes
-        VertexMeshReader<2,2> regular_mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_2_by_2");
-        VertexMesh<2,2> regular_mesh;
+        VertexMeshReader<2, 2> regular_mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_2_by_2");
+        VertexMesh<2, 2> regular_mesh;
         regular_mesh.ConstructFromMeshReader(regular_mesh_reader);
 
         for (unsigned i = 0; i<regular_mesh.GetNumNodes(); ++i)
@@ -1808,8 +1808,8 @@ public:
         }
 
         // Test with a larger regular honeycomb mesh with some interior nodes
-        VertexMeshReader<2,2> larger_regular_mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
-        VertexMesh<2,2> larger_regular_mesh;
+        VertexMeshReader<2, 2> larger_regular_mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
+        VertexMesh<2, 2> larger_regular_mesh;
         larger_regular_mesh.ConstructFromMeshReader(larger_regular_mesh_reader);
 
         for (unsigned i = 0; i<larger_regular_mesh.GetNumNodes(); ++i)
@@ -1827,8 +1827,8 @@ public:
     void TestTranslation2DWithUblas()
     {
         // Create mesh
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
-        VertexMesh<2,2> mesh;
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
+        VertexMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         c_vector<double, 2> old_location1 = mesh.GetNode(4)->rGetLocation();
@@ -1854,8 +1854,8 @@ public:
     void TestTranslation2DMethod()
     {
         // Create mesh
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
-        VertexMesh<2,2> mesh;
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
+        VertexMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Pick a random node and store spatial position
@@ -1881,13 +1881,13 @@ public:
         nodes.push_back(new Node<3>(2, true, -1.0,  1.0, -1.0));
         nodes.push_back(new Node<3>(3, true,  1.0, -1.0, -1.0));
         nodes.push_back(new Node<3>(4, false, 0.0,  0.0,  0.0));
-        MutableMesh<3,3> delaunay_mesh(nodes);
+        MutableMesh<3, 3> delaunay_mesh(nodes);
 
         /*
          * The Voronoi tessellation is not unique for this mesh, since four points are co-spherical.
          * We need to check how the mesher is breaking ties.
          */
-        Element<3,3>* p_element = delaunay_mesh.GetElement(0);
+        Element<3, 3>* p_element = delaunay_mesh.GetElement(0);
 
         TS_ASSERT_EQUALS(p_element->GetNodeGlobalIndex(0), 4u);
         TS_ASSERT_EQUALS(p_element->GetNodeGlobalIndex(1), 1u);
@@ -1895,12 +1895,12 @@ public:
         TS_ASSERT_EQUALS(p_element->GetNodeGlobalIndex(3), 2u);
 
         // Create Voronoi tessellation mesh
-        VertexMesh<3,3> tessellation(delaunay_mesh);
+        VertexMesh<3, 3> tessellation(delaunay_mesh);
         tessellation.GenerateVerticesFromElementCircumcentres(delaunay_mesh);
 
         TS_ASSERT_EQUALS(tessellation.GetNumNodes(), 8u);
 
-        c_vector<double,3> this_vertex = tessellation.GetNode(2)->rGetLocation();
+        c_vector<double, 3> this_vertex = tessellation.GetNode(2)->rGetLocation();
         TS_ASSERT_DELTA(this_vertex[0],  1.5, 1e-7);
         TS_ASSERT_DELTA(this_vertex[1],  1.5, 1e-7);
         TS_ASSERT_DELTA(this_vertex[2], -1.5, 1e-7);
@@ -1930,14 +1930,14 @@ public:
         delaunay_nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
         delaunay_nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
         delaunay_nodes.push_back(new Node<2>(4, false, 0.5, 0.5));
-        MutableMesh<2,2> delaunay_mesh(delaunay_nodes);
+        MutableMesh<2, 2> delaunay_mesh(delaunay_nodes);
 
         TS_ASSERT_EQUALS(delaunay_mesh.CheckIsVoronoi(), true);
         TS_ASSERT_EQUALS(delaunay_mesh.GetNumElements(), 4u);
         TS_ASSERT_EQUALS(delaunay_mesh.GetNumNodes(), 5u);
 
         // Create a vertex mesh, the Voronoi tessellation, using the tetrahedral mesh
-        VertexMesh<2,2> voronoi_mesh(delaunay_mesh);
+        VertexMesh<2, 2> voronoi_mesh(delaunay_mesh);
 
         // Test the Voronoi tessellation has the correct number of nodes and elements
         TS_ASSERT_EQUALS(voronoi_mesh.GetNumElements(), 5u);
@@ -1977,7 +1977,7 @@ public:
         delaunay_nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
         delaunay_nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
         delaunay_nodes.push_back(new Node<2>(4, false, 0.5, 0.5));
-        MutableMesh<2,2> delaunay_mesh(delaunay_nodes);
+        MutableMesh<2, 2> delaunay_mesh(delaunay_nodes);
 
         TS_ASSERT_EQUALS(delaunay_mesh.CheckIsVoronoi(), true);
         TS_ASSERT_EQUALS(delaunay_mesh.GetNumElements(), 4u);
@@ -1985,7 +1985,7 @@ public:
 
         // Create a vertex mesh, the bounded Voronoi tessellation, using the tetrahedral mesh
         bool is_bounded = true;
-        VertexMesh<2,2> voronoi_mesh(delaunay_mesh, false, is_bounded);
+        VertexMesh<2, 2> voronoi_mesh(delaunay_mesh, false, is_bounded);
 
         // Test the Voronoi tessellation has the correct number of nodes and elements
         TS_ASSERT_EQUALS(voronoi_mesh.GetNumElements(), 5u);
@@ -2015,14 +2015,14 @@ public:
         delaunay_nodes.push_back(new Node<2>(2, true, 1.0, 1.0));
         delaunay_nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
         delaunay_nodes.push_back(new Node<2>(4, false, 0.5, 0.5));
-        MutableMesh<2,2> delaunay_mesh(delaunay_nodes);
+        MutableMesh<2, 2> delaunay_mesh(delaunay_nodes);
 
         TS_ASSERT_EQUALS(delaunay_mesh.CheckIsVoronoi(), true);
         TS_ASSERT_EQUALS(delaunay_mesh.GetNumElements(), 4u);
         TS_ASSERT_EQUALS(delaunay_mesh.GetNumNodes(), 5u);
 
         // Create a vertex mesh, the Voronoi tessellation, using the tetrahedral mesh and the 'real' nodes
-        VertexMesh<2,2> voronoi_mesh(delaunay_mesh);
+        VertexMesh<2, 2> voronoi_mesh(delaunay_mesh);
 
         // Test the Voronoi tessellation has the correct number of nodes and elements
         TS_ASSERT_EQUALS(voronoi_mesh.GetNumElements(), 5u);
@@ -2052,12 +2052,12 @@ public:
         nodes.push_back(new Node<2>(0, true,  1.0,  0));
         nodes.push_back(new Node<2>(0, true,  0.5, -0.5*sqrt(3.0)));
         nodes.push_back(new Node<2>(0, true, -0.5, -0.5*sqrt(3.0)));
-        MutableMesh<2,2> delaunay_mesh(nodes);
+        MutableMesh<2, 2> delaunay_mesh(nodes);
 
         TS_ASSERT_EQUALS(delaunay_mesh.CheckIsVoronoi(), true);
 
         // Create Voronoi tessellation
-        VertexMesh<2,2> voronoi_mesh(delaunay_mesh);
+        VertexMesh<2, 2> voronoi_mesh(delaunay_mesh);
 
         TS_ASSERT_EQUALS(voronoi_mesh.GetNumElements(), 6u);
         TS_ASSERT_EQUALS(voronoi_mesh.GetNumNodes(), 5u);
@@ -2085,11 +2085,11 @@ public:
         nodes.push_back(new Node<3>(2, true,  1.0, 0.0, 1.0));
         nodes.push_back(new Node<3>(3, true,  0.0, 1.0, 1.0));
         nodes.push_back(new Node<3>(4, false, 0.5, 0.5, 0.5));
-        MutableMesh<3,3> delaunay_mesh(nodes);
+        MutableMesh<3, 3> delaunay_mesh(nodes);
 
         TS_ASSERT_EQUALS(delaunay_mesh.CheckIsVoronoi(), true);
 
-        VertexMesh<3,3> voronoi_mesh(delaunay_mesh);
+        VertexMesh<3, 3> voronoi_mesh(delaunay_mesh);
 
         // Check there are as many nodes in the Voronoi mesh as there are elements in the Delaunay mesh
         TS_ASSERT_EQUALS(voronoi_mesh.GetNumNodes(), 4u);
@@ -2127,28 +2127,28 @@ public:
          */
 
         // Check Voronoi faces are correct
-        VertexElement<2,3>* p_face_0 = voronoi_mesh.GetFace(0);
+        VertexElement<2, 3>* p_face_0 = voronoi_mesh.GetFace(0);
         TS_ASSERT_EQUALS(p_face_0->GetNumNodes(), 3u);
         TS_ASSERT_EQUALS(p_face_0->GetNodeGlobalIndex(0), 3u);
         TS_ASSERT_EQUALS(p_face_0->GetNodeGlobalIndex(1), 0u);
         TS_ASSERT_EQUALS(p_face_0->GetNodeGlobalIndex(2), 2u);
         TS_ASSERT_DELTA(voronoi_mesh.CalculateAreaOfFace(p_face_0), 9.0*sqrt(3.0)/8.0, 1e-4);
 
-        VertexElement<2,3>* p_face_1 = voronoi_mesh.GetFace(1);
+        VertexElement<2, 3>* p_face_1 = voronoi_mesh.GetFace(1);
         TS_ASSERT_EQUALS(p_face_1->GetNumNodes(), 3u);
         TS_ASSERT_EQUALS(p_face_1->GetNodeGlobalIndex(0), 3u);
         TS_ASSERT_EQUALS(p_face_1->GetNodeGlobalIndex(1), 0u);
         TS_ASSERT_EQUALS(p_face_1->GetNodeGlobalIndex(2), 1u);
         TS_ASSERT_DELTA(voronoi_mesh.CalculateAreaOfFace(p_face_1), 9.0*sqrt(3.0)/8.0, 1e-4);
 
-        VertexElement<2,3>* p_face_2 = voronoi_mesh.GetFace(2);
+        VertexElement<2, 3>* p_face_2 = voronoi_mesh.GetFace(2);
         TS_ASSERT_EQUALS(p_face_2->GetNumNodes(), 3u);
         TS_ASSERT_EQUALS(p_face_2->GetNodeGlobalIndex(0), 1u);
         TS_ASSERT_EQUALS(p_face_2->GetNodeGlobalIndex(1), 0u);
         TS_ASSERT_EQUALS(p_face_2->GetNodeGlobalIndex(2), 2u);
         TS_ASSERT_DELTA(voronoi_mesh.CalculateAreaOfFace(p_face_2), 9.0*sqrt(3.0)/8.0, 1e-4);
 
-        VertexElement<2,3>* p_face_3 = voronoi_mesh.GetFace(3);
+        VertexElement<2, 3>* p_face_3 = voronoi_mesh.GetFace(3);
         TS_ASSERT_EQUALS(p_face_3->GetNumNodes(), 3u);
         TS_ASSERT_EQUALS(p_face_3->GetNodeGlobalIndex(0), 3u);
         TS_ASSERT_EQUALS(p_face_3->GetNodeGlobalIndex(1), 1u);
@@ -2178,7 +2178,7 @@ public:
         nodes.push_back(new Node<3>(10, true,   2.0, -1.0,  2.0));
         nodes.push_back(new Node<3>(11, true,   2.0,  2.0,  2.0));
         nodes.push_back(new Node<3>(12, true,  -1.0,  2.0,  2.0));
-        MutableMesh<3,3> delaunay_mesh(nodes);
+        MutableMesh<3, 3> delaunay_mesh(nodes);
 
         TS_ASSERT_EQUALS(delaunay_mesh.CheckIsVoronoi(), true);
         TS_ASSERT_EQUALS(delaunay_mesh.GetNumElements(), 32u);
@@ -2186,7 +2186,7 @@ public:
         TS_ASSERT_EQUALS(delaunay_mesh.GetNumBoundaryNodes(), 8u);
         TS_ASSERT_EQUALS(delaunay_mesh.GetNumNodes() - delaunay_mesh.GetNumBoundaryNodes(), 5u);
 
-        VertexMesh<3,3> voronoi_mesh(delaunay_mesh);
+        VertexMesh<3, 3> voronoi_mesh(delaunay_mesh);
 
         // Check there are as many nodes in the Voronoi mesh as there are elements in the Delaunay mesh
         TS_ASSERT_EQUALS(voronoi_mesh.GetNumNodes(), 32u);
@@ -2222,8 +2222,8 @@ public:
     void TestGetMeshForVtk()
     {
         // Create mesh
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
-        VertexMesh<2,2> mesh;
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/TestVertexMesh/honeycomb_vertex_mesh_3_by_3");
+        VertexMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Test GetMeshForVtk() method

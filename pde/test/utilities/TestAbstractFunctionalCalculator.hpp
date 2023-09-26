@@ -55,43 +55,43 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * this integrand is just the volume of the mesh. For testing.
  */
 template<unsigned DIM>
-class VolumeCalculator : public AbstractFunctionalCalculator<DIM,DIM,1>
+class VolumeCalculator : public AbstractFunctionalCalculator<DIM, DIM, 1>
 {
     double GetIntegrand(ChastePoint<DIM>& rX,
-                        c_vector<double,1>& rU,
-                        c_matrix<double,1,DIM>& rGradU)
+                        c_vector<double, 1>& rU,
+                        c_matrix<double,1, DIM>& rGradU)
     {
         return 1.0;
     }
 };
 
 // Check x and u are interpolated correctly
-class ExampleFunctionalOne : public AbstractFunctionalCalculator<2,2,2>
+class ExampleFunctionalOne : public AbstractFunctionalCalculator<2, 2, 2>
 {
     double GetIntegrand(ChastePoint<2>& rX,
-                        c_vector<double,2>& rU,
-                        c_matrix<double,2,2>& rGradU)
+                        c_vector<double, 2>& rU,
+                        c_matrix<double,2, 2>& rGradU)
     {
         return rX[0]*rU[0] + rX[1]*rU[1];
     }
 };
 
 // Check grad_u is interpolated correctly
-class ExampleFunctionalTwo : public AbstractFunctionalCalculator<2,2,2>
+class ExampleFunctionalTwo : public AbstractFunctionalCalculator<2, 2, 2>
 {
     double GetIntegrand(ChastePoint<2>& rX,
-                        c_vector<double,2>& rU,
-                        c_matrix<double,2,2>& rGradU)
+                        c_vector<double, 2>& rU,
+                        c_matrix<double,2, 2>& rGradU)
     {
         return rX[0]*rU[0] + rX[1]*rU[1] + 0.5*(rGradU(0,0)+rGradU(0,1)+rGradU(1,0)+rGradU(1,1));
     }
 };
 // Check higher order polynomial are integrated correctly
-class ExampleFunctionalThree : public AbstractFunctionalCalculator<2,2,2>
+class ExampleFunctionalThree : public AbstractFunctionalCalculator<2, 2, 2>
 {
     double GetIntegrand(ChastePoint<2>& rX,
-                        c_vector<double,2>& rU,
-                        c_matrix<double,2,2>& rGradU)
+                        c_vector<double, 2>& rU,
+                        c_matrix<double,2, 2>& rGradU)
     {
         return  rX[0]*rX[1]*rU[1];
     }
@@ -103,10 +103,10 @@ public:
 
     void TestWithVolumeCalculator()
     {
-        TrianglesMeshReader<2,2> reader("mesh/test/data/square_128_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> reader("mesh/test/data/square_128_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(reader);
-        DistributedTetrahedralMesh<2,2> distributed_mesh;
+        DistributedTetrahedralMesh<2, 2> distributed_mesh;
         distributed_mesh.ConstructFromMeshReader(reader);
 
         VolumeCalculator<2> volume_calculator;
@@ -127,8 +127,8 @@ public:
 
     void TestWithExampleFunctionals()
     {
-        TrianglesMeshReader<2,2> reader("mesh/test/data/square_128_elements");
-        DistributedTetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> reader("mesh/test/data/square_128_elements");
+        DistributedTetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(reader);
 
         // Test interpolation of x and u
@@ -184,8 +184,8 @@ public:
 
     void TestWithExampleFunctionalsNonDistributed()
     {
-        TrianglesMeshReader<2,2> reader("mesh/test/data/square_128_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> reader("mesh/test/data/square_128_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(reader);
 
         // Test interpolation of x and u

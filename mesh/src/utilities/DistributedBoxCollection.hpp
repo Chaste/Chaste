@@ -299,7 +299,7 @@ public:
      * A function to get whether each dimension is periodic
      * @return A vector containing booleans of the periodicity
      */
-    c_vector<bool,DIM> GetIsPeriodicAllDims() const;
+    c_vector<bool, DIM> GetIsPeriodicAllDims() const;
 
     /**
      * @return the number of rows in the DIM-1th direction on this process.
@@ -444,7 +444,7 @@ inline void save_construct_data(
         ar << are_boxes_set;
 
         c_vector<double, 2*DIM> domain_size = t->rGetDomainSize();
-        for (unsigned i=0; i<2*DIM; ++i)
+        for (unsigned i = 0; i<2*DIM; ++i)
         {
             ar << domain_size[i];
         }
@@ -471,7 +471,7 @@ inline void load_construct_data(
 
     // Retrieve data from archive required to construct new instance of Node
     c_vector<double,2*DIM> domain_size;
-    for (unsigned i=0; i<2*DIM; ++i)
+    for (unsigned i = 0; i<2*DIM; ++i)
     {
         double coordinate;
         ar & coordinate; //resume coordinates one by one

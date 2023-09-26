@@ -175,7 +175,7 @@ inline void load_construct_data(
 {
     std::vector<double> coords;
     coords.resize(SPACE_DIM);
-    for (unsigned i=0; i<SPACE_DIM; ++i)
+    for (unsigned i = 0; i<SPACE_DIM; ++i)
     {
         double coordinate;
         ar & coordinate;//resume coordinates one by one

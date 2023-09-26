@@ -63,7 +63,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
 template<unsigned DIM>
-class BidomainMassMatrixAssembler : public AbstractFeVolumeIntegralAssembler<DIM,DIM,2,false,true,CARDIAC>
+class BidomainMassMatrixAssembler : public AbstractFeVolumeIntegralAssembler<DIM, DIM,2,false,true,CARDIAC>
 {
 protected:
     /**
@@ -86,9 +86,9 @@ protected:
             c_vector<double, DIM+1> &rPhi,
             c_matrix<double, DIM, DIM+1> &rGradPhi,
             ChastePoint<DIM> &rX,
-            c_vector<double,2> &rU,
-            c_matrix<double,2,DIM> &rGradU /* not used */,
-            Element<DIM,DIM>* pElement);
+            c_vector<double, 2> &rU,
+            c_matrix<double,2, DIM> &rGradU /* not used */,
+            Element<DIM, DIM>* pElement);
 
 public:
 
@@ -97,8 +97,8 @@ public:
      *
      * @param pMesh pointer to the mesh
      */
-    explicit BidomainMassMatrixAssembler(AbstractTetrahedralMesh<DIM,DIM>* pMesh)
-        : AbstractFeVolumeIntegralAssembler<DIM,DIM,2,false,true,CARDIAC>(pMesh)
+    explicit BidomainMassMatrixAssembler(AbstractTetrahedralMesh<DIM, DIM>* pMesh)
+        : AbstractFeVolumeIntegralAssembler<DIM, DIM,2,false,true,CARDIAC>(pMesh)
     {
     }
 

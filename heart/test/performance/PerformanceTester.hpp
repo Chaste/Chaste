@@ -91,9 +91,9 @@ public:
         {
             //Here we temporarily construct a mesh and write files out.
             //This is so that performance metrics include the time to read in the mesh from disk
-            TetrahedralMesh<DIM,DIM> mesh;
+            TetrahedralMesh<DIM, DIM> mesh;
             constructor.Construct(mesh, MeshNum, mMeshWidth);
-            TrianglesMeshWriter<DIM,DIM> writer(mesh_dir, mesh_filename);
+            TrianglesMeshWriter<DIM, DIM> writer(mesh_dir, mesh_filename);
             writer.WriteFilesUsingMesh(mesh);
             mNumElements = constructor.GetNumElements();
             mNumNodes = constructor.GetNumNodes();
@@ -138,7 +138,7 @@ public:
     {
         const unsigned NUM_HEADINGS=7;
         const char* heading[NUM_HEADINGS]={"Dimen", "Elts", "Nodes", "PdeStp", "OdeStp", "PriStp", "SimTim"};
-        for (unsigned i=0; i<NUM_HEADINGS; ++i)
+        for (unsigned i = 0; i<NUM_HEADINGS; ++i)
         {
             printf("%6s\t", heading[i]);
         }

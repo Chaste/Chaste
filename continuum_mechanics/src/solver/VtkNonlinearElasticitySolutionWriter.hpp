@@ -58,7 +58,7 @@ private:
     StrainType mElementWiseStrainType;
 
     /** Tensor data to be written to the .vtu file. This is a member variable only for testing reasons. */
-    std::vector<c_matrix<double,DIM,DIM> > mTensorData;
+    std::vector<c_matrix<double, DIM, DIM> > mTensorData;
 
     //// For future..
     //    bool mWriteNodewiseStresses;

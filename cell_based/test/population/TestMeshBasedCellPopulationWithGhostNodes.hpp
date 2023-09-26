@@ -97,8 +97,8 @@ public:
     void TestValidateMeshBasedCellPopulationWithGhostNodes()
     {
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create cells
@@ -150,12 +150,12 @@ public:
         unsigned num_cells_width = 6;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 2);
 
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedG1GenerationalCellCycleModel,2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateGivenLocationIndices(cells, location_indices);
 
         // Create a cell population
@@ -225,8 +225,8 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
 
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create vector of cell location indices
@@ -387,8 +387,8 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
 
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create vector of cell location indices
@@ -478,8 +478,8 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
 
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create vector of cell location indices
@@ -512,7 +512,7 @@ public:
         p_new_cell->SetCellProliferativeType(p_stem_type);
         p_new_cell->SetBirthTime(0);
 
-        c_vector<double,2> new_location;
+        c_vector<double, 2> new_location;
         new_location[0] = 0.3433453454443;
         new_location[0] = 0.3435346344234;
         cell_population.AddCell(p_new_cell, cell_population.rGetCells().front()); // random choice of parent
@@ -533,7 +533,7 @@ public:
         p_new_cell2->SetCellProliferativeType(p_stem_type);
         p_new_cell2->SetBirthTime(0);
 
-        c_vector<double,2> new_location2;
+        c_vector<double, 2> new_location2;
         new_location2[0] = 0.6433453454443;
         new_location2[0] = 0.6435346344234;
         cell_population.AddCell(p_new_cell2, cell_population.rGetCells().front()); // random choice of parent
@@ -583,12 +583,12 @@ public:
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, thickness_of_ghosts);
 
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedG1GenerationalCellCycleModel,2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateGivenLocationIndices(cells, location_indices);
 
         // Create a cell population
@@ -622,8 +622,8 @@ public:
     void TestSpringIterator3d()
     {
         // Create a simple mesh
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
-        MutableMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_2mm_12_elements");
+        MutableMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create vector of cell location indices
@@ -666,7 +666,7 @@ public:
         std::set< std::set<unsigned> > expected_node_pairs;
         for (unsigned i = 0; i < mesh.GetNumElements(); ++i)
         {
-            Element<3,3>* p_element = mesh.GetElement(i);
+            Element<3, 3>* p_element = mesh.GetElement(i);
             for (unsigned j = 0; j < 4; ++j)
             {
                 for (unsigned k = 0; k < 4; ++k)
@@ -701,8 +701,8 @@ public:
         CellId::ResetMaxCellId();
 
         // Create a simple mesh-based cell population, comprising various cell types in various cell cycle phases
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         boost::shared_ptr<AbstractCellProperty> p_stem(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
@@ -903,7 +903,7 @@ public:
         nodes.push_back(new Node<3>(10, true,   2.0, -1.0,  2.0));
         nodes.push_back(new Node<3>(11, true,   2.0,  2.0,  2.0));
         nodes.push_back(new Node<3>(12, true,  -1.0,  2.0,  2.0));
-        MutableMesh<3,3> mesh(nodes);
+        MutableMesh<3, 3> mesh(nodes);
 
         std::vector<unsigned> location_indices;
         for (unsigned index = 0; index < 5; ++index)
@@ -989,12 +989,12 @@ public:
     {
         // Create a small honeycomb mesh surrounded by a single layer of ghost nodes
         HoneycombMeshGenerator generator(2, 2, 1);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Create some cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedG1GenerationalCellCycleModel,2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateGivenLocationIndices(cells, location_indices);
 
         // Create a cell population
@@ -1021,7 +1021,7 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
         // Create 2D mesh with ghost nodes
-        MutableMesh<2,2> mesh;
+        MutableMesh<2, 2> mesh;
         mesh.ConstructRectangularMesh(6, 6);
 
         c_vector<double, 2> mesh_centre = zero_vector<double>(2);
@@ -1062,7 +1062,7 @@ public:
         cell_population.CreateVoronoiTessellation();
 
         // Check the correspondence between ghost nodes is correct
-        for (VertexMesh<2,2>::VertexElementIterator elem_iter = cell_population.GetVoronoiTessellation()->GetElementIteratorBegin();
+        for (VertexMesh<2, 2>::VertexElementIterator elem_iter = cell_population.GetVoronoiTessellation()->GetElementIteratorBegin();
              elem_iter != cell_population.GetVoronoiTessellation()->GetElementIteratorEnd();
              ++elem_iter)
         {
@@ -1083,7 +1083,7 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
         // Create 3D mesh with ghost nodes
-        MutableMesh<3,3> mesh;
+        MutableMesh<3, 3> mesh;
         mesh.ConstructCuboid(6, 6, 6);
 
         c_vector<double, 3> mesh_centre = zero_vector<double>(3);
@@ -1125,7 +1125,7 @@ public:
         cell_population.CreateVoronoiTessellation();
 
         // Check the correspondence between ghost nodes is correct
-        for (VertexMesh<3,3>::VertexElementIterator elem_iter = cell_population.GetVoronoiTessellation()->GetElementIteratorBegin();
+        for (VertexMesh<3, 3>::VertexElementIterator elem_iter = cell_population.GetVoronoiTessellation()->GetElementIteratorBegin();
              elem_iter != cell_population.GetVoronoiTessellation()->GetElementIteratorEnd();
              ++elem_iter)
         {
@@ -1150,12 +1150,12 @@ public:
         unsigned num_cells_width = 6;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 2);
 
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedG1GenerationalCellCycleModel,2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateGivenLocationIndices(cells, location_indices);
 
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
@@ -1185,11 +1185,11 @@ public:
     void TestGetTetrahedralMeshForPdeModifier()
     {
         HoneycombMeshGenerator generator(2, 2, 2);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedG1GenerationalCellCycleModel,2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateGivenLocationIndices(cells, location_indices);
 
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
@@ -1206,7 +1206,7 @@ public:
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, num_ghost_nodes);
 
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
         p_mesh->Scale(0.9,0.9);
 
         std::vector<unsigned> location_indices;
@@ -1223,7 +1223,7 @@ public:
 
         // Set up cells
         std::vector<CellPtr> cells;
-        CellsGenerator<FixedG1GenerationalCellCycleModel,2> cells_generator;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateGivenLocationIndices(cells, location_indices);
 
         // Create a cell population
@@ -1241,7 +1241,7 @@ public:
         GeneralisedLinearSpringForce<2> linear_force;
 
         //Check all node forces are zero
-        for (MutableMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
+        for (MutableMesh<2, 2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
              node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -1253,7 +1253,7 @@ public:
         linear_force.AddForceContribution(cell_population);
 
         // Check all forces as expected
-        for (MutableMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
+        for (MutableMesh<2, 2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
              node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -1287,7 +1287,7 @@ public:
         // Apply the ghost forces and check they're as expected
         cell_population.ApplyGhostForces();
 
-        for (MutableMesh<2,2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
+        for (MutableMesh<2, 2>::NodeIterator node_iter = cell_population.rGetMesh().GetNodeIteratorBegin();
              node_iter != cell_population.rGetMesh().GetNodeIteratorEnd();
              ++node_iter)
         {

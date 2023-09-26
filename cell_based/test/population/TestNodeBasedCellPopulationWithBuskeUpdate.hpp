@@ -62,8 +62,8 @@ public:
         EXIT_IF_PARALLEL;    // NodeBasedCellPopulationWithBuskeUpdate doesn't work in parallel.
 
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        MutableMesh<2,2> generating_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        MutableMesh<2, 2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
@@ -152,8 +152,8 @@ public:
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
 
             // Create a simple mesh
-            TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-            TetrahedralMesh<2,2> generating_mesh;
+            TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+            TetrahedralMesh<2, 2> generating_mesh;
             generating_mesh.ConstructFromMeshReader(mesh_reader);
 
             // Convert this to a NodesOnlyMesh

@@ -51,7 +51,7 @@ class TestMutableVertexMeshRosetteMethods : public CxxTest::TestSuite
 {
 private:
 
-    MutableVertexMesh<2,2>* ConstructFiveCellRosette()
+    MutableVertexMesh<2, 2>* ConstructFiveCellRosette()
     {
         // Make 11 nodes
         std::vector<Node<2>*> nodes;
@@ -95,17 +95,17 @@ private:
         nodes_elem_5.push_back(nodes[1]);
 
         // Make 5 vertex elements
-        std::vector<VertexElement<2,2>* > vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_2));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_3));
-        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_4));
-        vertex_elements.push_back(new VertexElement<2,2>(4, nodes_elem_5));
+        std::vector<VertexElement<2, 2>* > vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_3));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_4));
+        vertex_elements.push_back(new VertexElement<2, 2>(4, nodes_elem_5));
 
-        return new MutableVertexMesh<2,2>(nodes, vertex_elements);
+        return new MutableVertexMesh<2, 2>(nodes, vertex_elements);
     }
 
-    MutableVertexMesh<2,2>* ConstructProtorosette()
+    MutableVertexMesh<2, 2>* ConstructProtorosette()
     {
         // Make 9 nodes
         std::vector<Node<2>*> nodes;
@@ -142,16 +142,16 @@ private:
         nodes_elem_4.push_back(nodes[1]);
 
         // Make 4 vertex elements
-        std::vector<VertexElement<2,2>*> vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_2));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_3));
-        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_4));
+        std::vector<VertexElement<2, 2>*> vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_3));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_4));
 
-        return new MutableVertexMesh<2,2>(nodes, vertex_elements);
+        return new MutableVertexMesh<2, 2>(nodes, vertex_elements);
     }
 
-    MutableVertexMesh<2,2>* ConstructT1Scenario()
+    MutableVertexMesh<2, 2>* ConstructT1Scenario()
     {
         // Make 16 nodes
         std::vector<Node<2>*> nodes;
@@ -203,20 +203,20 @@ private:
         nodes_elem_4.push_back(nodes[8]);
 
         // Make 5 vertex elements
-        std::vector<VertexElement<2,2>* > vertex_elements;
-        vertex_elements.push_back(new VertexElement<2,2>(0, nodes_elem_1));
-        vertex_elements.push_back(new VertexElement<2,2>(1, nodes_elem_2));
-        vertex_elements.push_back(new VertexElement<2,2>(2, nodes_elem_3));
-        vertex_elements.push_back(new VertexElement<2,2>(3, nodes_elem_4));
+        std::vector<VertexElement<2, 2>* > vertex_elements;
+        vertex_elements.push_back(new VertexElement<2, 2>(0, nodes_elem_1));
+        vertex_elements.push_back(new VertexElement<2, 2>(1, nodes_elem_2));
+        vertex_elements.push_back(new VertexElement<2, 2>(2, nodes_elem_3));
+        vertex_elements.push_back(new VertexElement<2, 2>(3, nodes_elem_4));
 
-        return new MutableVertexMesh<2,2>(nodes, vertex_elements);
+        return new MutableVertexMesh<2, 2>(nodes, vertex_elements);
     }
 
 public:
 
     void TestSetAndGetMethods()
     {
-        MutableVertexMesh<2,2>* p_mesh = ConstructFiveCellRosette();
+        MutableVertexMesh<2, 2>* p_mesh = ConstructFiveCellRosette();
 
         // Use all three set methods
         p_mesh->SetProtorosetteFormationProbability(0.123);
@@ -248,14 +248,14 @@ public:
         ArchiveLocationInfo::SetMeshFilename("mvmwr");
 
         // Create mesh
-        MutableVertexMesh<2,2>* p_mesh = ConstructFiveCellRosette();
+        MutableVertexMesh<2, 2>* p_mesh = ConstructFiveCellRosette();
 
         // Set member variables
         p_mesh->SetProtorosetteFormationProbability(0.123);
         p_mesh->SetProtorosetteResolutionProbabilityPerTimestep(0.234);
         p_mesh->SetRosetteResolutionProbabilityPerTimestep(0.345);
 
-        AbstractMesh<2,2>* const p_abstract_mesh = p_mesh;
+        AbstractMesh<2, 2>* const p_abstract_mesh = p_mesh;
 
         /*
          * You need the const above to stop a BOOST_STATIC_ASSERTION failure.
@@ -270,8 +270,8 @@ public:
 
         // Create an output archive
         {
-            TS_ASSERT_EQUALS((static_cast<MutableVertexMesh<2,2>*>(p_abstract_mesh))->GetNumNodes(), 11u);
-            TS_ASSERT_EQUALS((static_cast<MutableVertexMesh<2,2>*>(p_abstract_mesh))->GetNumElements(), 5u);
+            TS_ASSERT_EQUALS((static_cast<MutableVertexMesh<2, 2>*>(p_abstract_mesh))->GetNumNodes(), 11u);
+            TS_ASSERT_EQUALS((static_cast<MutableVertexMesh<2, 2>*>(p_abstract_mesh))->GetNumElements(), 5u);
 
             // Create output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -283,7 +283,7 @@ public:
 
         {
             // De-serialize and compare
-            AbstractMesh<2,2>* p_abstract_mesh_2;
+            AbstractMesh<2, 2>* p_abstract_mesh_2;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -292,8 +292,8 @@ public:
             // Restore from the archive
             (*p_arch) >> p_abstract_mesh_2;
 
-            MutableVertexMesh<2,2>* p_mesh_original = static_cast<MutableVertexMesh<2,2>*>(p_abstract_mesh);
-            MutableVertexMesh<2,2>* p_mesh_loaded = static_cast<MutableVertexMesh<2,2>*>(p_abstract_mesh_2);
+            MutableVertexMesh<2, 2>* p_mesh_original = static_cast<MutableVertexMesh<2, 2>*>(p_abstract_mesh);
+            MutableVertexMesh<2, 2>* p_mesh_loaded = static_cast<MutableVertexMesh<2, 2>*>(p_abstract_mesh_2);
 
             // Test member variables were archived correctly
             TS_ASSERT_DELTA(p_mesh_original->GetProtorosetteFormationProbability(), 0.123, 1e-10);
@@ -329,7 +329,7 @@ public:
                 TS_ASSERT_EQUALS(p_mesh_original->GetElement(elem_idx)->GetNumNodes(),
                                  p_mesh_loaded->GetElement(elem_idx)->GetNumNodes());
 
-                for (unsigned local_index=0; local_index<p_mesh_original->GetElement(elem_idx)->GetNumNodes(); local_index++)
+                for (unsigned local_index = 0; local_index<p_mesh_original->GetElement(elem_idx)->GetNumNodes(); local_index++)
                 {
                     TS_ASSERT_EQUALS(p_mesh_original->GetElement(elem_idx)->GetNodeGlobalIndex(local_index),
                                      p_mesh_loaded->GetElement(elem_idx)->GetNodeGlobalIndex(local_index));
@@ -350,7 +350,7 @@ public:
          */
 
         // Make an empty mesh
-        MutableVertexMesh<2,2> mesh;
+        MutableVertexMesh<2, 2> mesh;
         mesh.SetMeshOperationTracking(true);//For coverage
         // Add 6 nodes, three each for two triangular elements
         mesh.AddNode(new Node<2>(0, true, 0.0, 0.0));
@@ -372,15 +372,15 @@ public:
         nodes_elem_2.push_back(mesh.GetNode(5));
 
         // Add four copies of each element to the mesh
-        mesh.AddElement(new VertexElement<2,2>(0, nodes_elem_1));
-        mesh.AddElement(new VertexElement<2,2>(1, nodes_elem_1));
-        mesh.AddElement(new VertexElement<2,2>(2, nodes_elem_1));
-        mesh.AddElement(new VertexElement<2,2>(3, nodes_elem_1));
+        mesh.AddElement(new VertexElement<2, 2>(0, nodes_elem_1));
+        mesh.AddElement(new VertexElement<2, 2>(1, nodes_elem_1));
+        mesh.AddElement(new VertexElement<2, 2>(2, nodes_elem_1));
+        mesh.AddElement(new VertexElement<2, 2>(3, nodes_elem_1));
 
-        mesh.AddElement(new VertexElement<2,2>(4, nodes_elem_2));
-        mesh.AddElement(new VertexElement<2,2>(5, nodes_elem_2));
-        mesh.AddElement(new VertexElement<2,2>(6, nodes_elem_2));
-        mesh.AddElement(new VertexElement<2,2>(7, nodes_elem_2));
+        mesh.AddElement(new VertexElement<2, 2>(4, nodes_elem_2));
+        mesh.AddElement(new VertexElement<2, 2>(5, nodes_elem_2));
+        mesh.AddElement(new VertexElement<2, 2>(6, nodes_elem_2));
+        mesh.AddElement(new VertexElement<2, 2>(7, nodes_elem_2));
 
         // Get pointers to our two test-nodes
         Node<2>* p_node_0 = mesh.GetNode(0);
@@ -402,7 +402,7 @@ public:
     void TestPerformRosetteRankIncrease()
     {
         // Create the standard five-cell rosette
-        MutableVertexMesh<2,2>* p_mesh = ConstructFiveCellRosette();
+        MutableVertexMesh<2, 2>* p_mesh = ConstructFiveCellRosette();
         p_mesh->SetMeshOperationTracking(true);//For coverage
         /**
          * Modify the mesh to incorporate an additional element which will go on to increase the rosette rank
@@ -418,13 +418,13 @@ public:
         nodes_new_elem.push_back(p_mesh->GetNode(1));
         nodes_new_elem.push_back(p_mesh->GetNode(2));
 
-        unsigned new_elem_idx = p_mesh->AddElement(new VertexElement<2,2>(5, nodes_new_elem));
+        unsigned new_elem_idx = p_mesh->AddElement(new VertexElement<2, 2>(5, nodes_new_elem));
         p_mesh->GetElement(new_elem_idx)->RegisterWithNodes();
 
         // Add new node in to elements 0 and 4, and remove node with global index 1 from elements 0 and 4
-        VertexElement<2,2>* p_elem_0 = p_mesh->GetElement(0);
-        VertexElement<2,2>* p_elem_4 = p_mesh->GetElement(4);
-        VertexElement<2,2>* p_elem_n = p_mesh->GetElement(new_elem_idx);
+        VertexElement<2, 2>* p_elem_0 = p_mesh->GetElement(0);
+        VertexElement<2, 2>* p_elem_4 = p_mesh->GetElement(4);
+        VertexElement<2, 2>* p_elem_n = p_mesh->GetElement(new_elem_idx);
 
         p_elem_0->AddNode(p_mesh->GetNode(new_node_idx), p_elem_0->GetNodeLocalIndex(0));
         p_elem_4->AddNode(p_mesh->GetNode(new_node_idx), p_elem_4->GetNodeLocalIndex(1));
@@ -475,12 +475,12 @@ public:
     void TestPerformProtorosetteResolution()
     {
         // Let us first create a protorosette
-        MutableVertexMesh<2,2>* p_mesh = ConstructProtorosette();
+        MutableVertexMesh<2, 2>* p_mesh = ConstructProtorosette();
         p_mesh->SetMeshOperationTracking(true);//For coverage
-        VertexElement<2,2>* p_elem_0 = p_mesh->GetElement(0);
-        VertexElement<2,2>* p_elem_1 = p_mesh->GetElement(1);
-        VertexElement<2,2>* p_elem_2 = p_mesh->GetElement(2);
-        VertexElement<2,2>* p_elem_3 = p_mesh->GetElement(3);
+        VertexElement<2, 2>* p_elem_0 = p_mesh->GetElement(0);
+        VertexElement<2, 2>* p_elem_1 = p_mesh->GetElement(1);
+        VertexElement<2, 2>* p_elem_2 = p_mesh->GetElement(2);
+        VertexElement<2, 2>* p_elem_3 = p_mesh->GetElement(3);
 
         Node<2>* p_node_0 = p_mesh->GetNode(0);
 
@@ -560,7 +560,7 @@ public:
     void TestPerformRosetteRankDecrease()
     {
         // Let us first create a protorosette
-        MutableVertexMesh<2,2>* p_mesh = ConstructFiveCellRosette();
+        MutableVertexMesh<2, 2>* p_mesh = ConstructFiveCellRosette();
         p_mesh->SetMeshOperationTracking(true);//For coverage
         Node<2>* p_node_0 = p_mesh->GetNode(0);
 
@@ -576,12 +576,12 @@ public:
         Node<2>* p_node_11 = p_mesh->GetNode(11);
 
         // Two elements should now have five nodes, and the other three should have four
-        std::vector<VertexElement<2,2>* > five_node_elems;
-        std::vector<VertexElement<2,2>* > four_node_elems;
+        std::vector<VertexElement<2, 2>* > five_node_elems;
+        std::vector<VertexElement<2, 2>* > four_node_elems;
 
         for (unsigned elem_idx = 0 ; elem_idx < 5 ; elem_idx++)
         {
-            VertexElement<2,2>* p_current_element = p_mesh->GetElement(elem_idx);
+            VertexElement<2, 2>* p_current_element = p_mesh->GetElement(elem_idx);
 
             if (p_current_element->GetNumNodes() == 4)
             {
@@ -619,12 +619,12 @@ public:
     void TestCheckForRosettes()
     {
         // Let us first create reference meshes for four and five cell rosettes
-        MutableVertexMesh<2,2>* p_ref_rosette = ConstructFiveCellRosette();
-        MutableVertexMesh<2,2>* p_ref_protorosette = ConstructProtorosette();
+        MutableVertexMesh<2, 2>* p_ref_rosette = ConstructFiveCellRosette();
+        MutableVertexMesh<2, 2>* p_ref_protorosette = ConstructProtorosette();
 
         // We also need to create meshes which we will CheckForRosettes
-        MutableVertexMesh<2,2>* p_rosette = ConstructFiveCellRosette();
-        MutableVertexMesh<2,2>* p_protorosette = ConstructProtorosette();
+        MutableVertexMesh<2, 2>* p_rosette = ConstructFiveCellRosette();
+        MutableVertexMesh<2, 2>* p_protorosette = ConstructProtorosette();
 
         /**
          * Initially, set the parameters such that nothing should happen when we check for rosettes

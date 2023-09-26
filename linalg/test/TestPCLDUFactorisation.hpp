@@ -73,7 +73,7 @@ public:
         Vec one_zeros = factory.CreateVec(2);
         Vec rhs = factory.CreateVec(2);
 
-        for (unsigned node_index=0; node_index<2*num_nodes; node_index+=2)
+        for (unsigned node_index = 0; node_index<2*num_nodes; node_index+=2)
         {
             PetscVecTools::SetElement(one_zeros, node_index, 1.0);
             PetscVecTools::SetElement(one_zeros, node_index+1, 0.0);

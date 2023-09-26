@@ -54,7 +54,7 @@ private:
     /** The mesh is automatically set in VentilationProblem
      *  This member variable should be accessed through GetMesh(), which will check if it has been set before
      *  and throw an exception otherwise.*/
-    AbstractTetrahedralMesh<1,3>* mpMesh;
+    AbstractTetrahedralMesh<1, 3>* mpMesh;
 
 public:
     /**
@@ -102,12 +102,12 @@ public:
     /**
      * @param pMesh  the mesh for which to create acinar units.
      */
-    virtual void SetMesh(AbstractTetrahedralMesh<1,3>* pMesh);
+    virtual void SetMesh(AbstractTetrahedralMesh<1, 3>* pMesh);
 
     /**
      * @return  the mesh used to create the acinar.
      */
-    AbstractTetrahedralMesh<1,3>* GetMesh();
+    AbstractTetrahedralMesh<1, 3>* GetMesh();
 };
 
 #endif /*ABSTRACTACINARUNITFACTORY_HPP_*/

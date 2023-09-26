@@ -71,9 +71,9 @@ void AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::OutputCell
 }
 
 // Explicit instantiation
-template class AbstractCellPopulationBoundaryCondition<1,1>;
-template class AbstractCellPopulationBoundaryCondition<1,2>;
-template class AbstractCellPopulationBoundaryCondition<2,2>;
-template class AbstractCellPopulationBoundaryCondition<1,3>;
-template class AbstractCellPopulationBoundaryCondition<2,3>;
-template class AbstractCellPopulationBoundaryCondition<3,3>;
+template class AbstractCellPopulationBoundaryCondition<1, 1>;
+template class AbstractCellPopulationBoundaryCondition<1, 2>;
+template class AbstractCellPopulationBoundaryCondition<2, 2>;
+template class AbstractCellPopulationBoundaryCondition<1, 3>;
+template class AbstractCellPopulationBoundaryCondition<2, 3>;
+template class AbstractCellPopulationBoundaryCondition<3, 3>;

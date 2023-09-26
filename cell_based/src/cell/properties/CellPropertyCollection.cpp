@@ -74,7 +74,7 @@ bool CellPropertyCollection::HasProperty(const boost::shared_ptr<AbstractCellPro
 
 void CellPropertyCollection::RemoveProperty(const boost::shared_ptr<AbstractCellProperty>& rProp)
 {
-    IteratorType it = mProperties.find(rProp);
+    auto it = mProperties.find(rProp);
     if (it == mProperties.end())
     {
         EXCEPTION("Collection does not contain the given property.");
@@ -96,6 +96,16 @@ CellPropertyCollection::Iterator CellPropertyCollection::Begin()
 }
 
 CellPropertyCollection::Iterator CellPropertyCollection::End()
+{
+    return mProperties.end();
+}
+
+CellPropertyCollection::Iterator CellPropertyCollection::begin()
+{
+    return mProperties.begin();
+}
+
+CellPropertyCollection::Iterator CellPropertyCollection::end()
 {
     return mProperties.end();
 }

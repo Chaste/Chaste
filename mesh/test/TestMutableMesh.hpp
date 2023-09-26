@@ -58,8 +58,8 @@ private:
     void EdgeIteratorTest(std::string meshFilename)
     {
         // Create a simple mesh
-        TrianglesMeshReader<DIM,DIM> mesh_reader(meshFilename);
-        MutableMesh<DIM,DIM> mesh;
+        TrianglesMeshReader<DIM, DIM> mesh_reader(meshFilename);
+        MutableMesh<DIM, DIM> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Delete one of the nodes and hence an element
@@ -84,14 +84,14 @@ private:
 
         // Set up expected node pairs
         std::set< std::set<unsigned> > expected_node_pairs;
-        for (unsigned i=0; i<mesh.GetNumAllElements(); ++i)
+        for (unsigned i = 0; i<mesh.GetNumAllElements(); ++i)
         {
-            Element<DIM,DIM>* p_element = mesh.GetElement(i);
+            Element<DIM, DIM>* p_element = mesh.GetElement(i);
             if (!p_element->IsDeleted())
             {
-                for (unsigned j=0; j<DIM+1; ++j)
+                for (unsigned j = 0; j<DIM+1; ++j)
                 {
-                    for (unsigned k=0; k<DIM+1; ++k)
+                    for (unsigned k = 0; k<DIM+1; ++k)
                     {
                         unsigned node_A = p_element->GetNodeGlobalIndex(j);
                         unsigned node_B = p_element->GetNodeGlobalIndex(k);
@@ -116,13 +116,13 @@ public:
 
     void TestNodeIterator()
     {
-        TrianglesMeshReader<2,3> mesh_reader("mesh/test/data/disk_in_3d");
-        MutableMesh<2,3> mesh;
+        TrianglesMeshReader<2, 3> mesh_reader("mesh/test/data/disk_in_3d");
+        MutableMesh<2, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         unsigned counter = 0;
 
-        for (AbstractTetrahedralMesh<2,3>::NodeIterator iter = mesh.GetNodeIteratorBegin();
+        for (AbstractTetrahedralMesh<2, 3>::NodeIterator iter = mesh.GetNodeIteratorBegin();
              iter != mesh.GetNodeIteratorEnd();
              ++iter)
         {
@@ -139,7 +139,7 @@ public:
 
         unsigned another_counter = 0;
 
-        for (AbstractTetrahedralMesh<2,3>::NodeIterator iter = mesh.GetNodeIteratorBegin();
+        for (AbstractTetrahedralMesh<2, 3>::NodeIterator iter = mesh.GetNodeIteratorBegin();
              iter != mesh.GetNodeIteratorEnd();
              ++iter)
         {
@@ -153,13 +153,13 @@ public:
 
     void TestElementIterator()
     {
-        TrianglesMeshReader<2,3> mesh_reader("mesh/test/data/disk_in_3d");
-        MutableMesh<2,3> mesh;
+        TrianglesMeshReader<2, 3> mesh_reader("mesh/test/data/disk_in_3d");
+        MutableMesh<2, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         unsigned counter = 0;
 
-        for (AbstractTetrahedralMesh<2,3>::ElementIterator iter = mesh.GetElementIteratorBegin();
+        for (AbstractTetrahedralMesh<2, 3>::ElementIterator iter = mesh.GetElementIteratorBegin();
              iter != mesh.GetElementIteratorEnd();
              ++iter)
         {
@@ -173,13 +173,13 @@ public:
 
     void TestRescaleMeshFromBoundaryNode()
     {
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        MutableMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        MutableMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         ChastePoint<1> updatedPoint(1.5);
         mesh.RescaleMeshFromBoundaryNode(updatedPoint,10);
-        for (int i=0; i<11; ++i)
+        for (int i = 0; i<11; ++i)
         {
             TS_ASSERT_DELTA(mesh.GetNode(i)->GetPoint()[0], 1.5*(i/10.0), 0.001);
         }
@@ -187,8 +187,8 @@ public:
 
     void Test1DSetPoint()
     {
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        MutableMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        MutableMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         const int node_index = 3;
@@ -197,10 +197,10 @@ public:
         ChastePoint<1> point=p_node->GetPoint();
         TS_ASSERT_DELTA(point[0], 0.3, 1e-6);
 
-        Element<1,1>* p_element;
+        Element<1, 1>* p_element;
         Node<1>::ContainingElementIterator elt_iter = p_node->ContainingElementsBegin();
         p_element = mesh.GetElement(*elt_iter);
-        c_matrix<double,1,1> jacobian;
+        c_matrix<double,1, 1> jacobian;
         double jacobian_det;
         mesh.GetJacobianForElement(p_element->GetIndex(), jacobian, jacobian_det);
         TS_ASSERT_DELTA(jacobian_det, 0.1, 1e-6);
@@ -260,8 +260,8 @@ public:
 
     void Test2DSetPoint()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/disk_984_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         const int node_index = 234;
@@ -269,7 +269,7 @@ public:
         Node<2>* p_node = mesh.GetNode(node_index);
 
         // Just focus on one element
-        Element<2,2>* p_element;
+        Element<2, 2>* p_element;
         Node<2>::ContainingElementIterator elt_iter = p_node->ContainingElementsBegin();
         p_element = mesh.GetElement(*elt_iter);
 
@@ -277,7 +277,7 @@ public:
         TS_ASSERT_DELTA(point[0], 0.063497248392600097, 1e-6);
         TS_ASSERT_DELTA(point[1], -0.45483180039309123, 1e-6);
 
-        c_matrix<double,2,2> jacobian;
+        c_matrix<double,2, 2> jacobian;
         double jacobian_det;
         mesh.GetJacobianForElement(p_element->GetIndex(), jacobian, jacobian_det);
         TS_ASSERT_DELTA(jacobian_det, 0.00907521, 1e-6);
@@ -318,9 +318,9 @@ public:
         TS_ASSERT_DELTA(boundary_point[1], -0.12533323360000001, 1e-6);
 
         Node<2>::ContainingBoundaryElementIterator b_elt_iter = p_node->ContainingBoundaryElementsBegin();
-        const BoundaryElement<1,2>* p_boundary_element = mesh.GetBoundaryElement(*b_elt_iter);
+        const BoundaryElement<1, 2>* p_boundary_element = mesh.GetBoundaryElement(*b_elt_iter);
 
-        c_vector<double,2> weighted_dir;
+        c_vector<double, 2> weighted_dir;
         mesh.GetWeightedDirectionForBoundaryElement(p_boundary_element->GetIndex(), weighted_dir, jacobian_det);
         TS_ASSERT_DELTA(jacobian_det, 0.0628215, 1e-6);
 
@@ -332,8 +332,8 @@ public:
 
     void TestMovingNodesIn3D()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-        MutableMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
+        MutableMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         double reference_volume = mesh.GetVolume();
@@ -342,16 +342,16 @@ public:
         Node<3>* p_node = mesh.GetNode(interior_node_index);
 
         // Just focus on one element
-        Element<3,3>* p_element = mesh.GetElement(*p_node->ContainingElementsBegin());
-        BoundaryElement<2,3>* p_boundary_element = mesh.GetBoundaryElement(*p_node->ContainingBoundaryElementsBegin());
+        Element<3, 3>* p_element = mesh.GetElement(*p_node->ContainingElementsBegin());
+        BoundaryElement<2, 3>* p_boundary_element = mesh.GetBoundaryElement(*p_node->ContainingBoundaryElementsBegin());
 
         ChastePoint<3> point = p_node->GetPoint();
         TS_ASSERT_DELTA(point[0], 1, 1e-6);
         TS_ASSERT_DELTA(point[1], 0.75, 1e-6);
         TS_ASSERT_DELTA(point[2], 0.75, 1e-6);
 
-        c_matrix<double,3,3> jacobian;
-        c_vector<double,3> weighted_dir;
+        c_matrix<double,3, 3> jacobian;
+        c_vector<double, 3> weighted_dir;
         double jacobian_det;
 
         mesh.GetJacobianForElement(p_element->GetIndex(), jacobian, jacobian_det);
@@ -422,22 +422,22 @@ public:
 
     void Test1DMeshIn2DSetPoint()
     {
-        TrianglesMeshReader<1,2> mesh_reader("mesh/test/data/semicircle_outline");
-        MutableMesh<1,2> mesh;
+        TrianglesMeshReader<1, 2> mesh_reader("mesh/test/data/semicircle_outline");
+        MutableMesh<1, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         const int boundary_node_index = 50;
         Node<2>* p_node = mesh.GetNode(boundary_node_index);
 
         // Just focus on one element
-        Element<1,2>* p_element = mesh.GetElement(*p_node->ContainingElementsBegin());
-        BoundaryElement<0,2>* p_boundary_element = mesh.GetBoundaryElement(*p_node->ContainingBoundaryElementsBegin());
+        Element<1, 2>* p_element = mesh.GetElement(*p_node->ContainingElementsBegin());
+        BoundaryElement<0, 2>* p_boundary_element = mesh.GetBoundaryElement(*p_node->ContainingBoundaryElementsBegin());
 
         ChastePoint<2> point = p_node->GetPoint();
         TS_ASSERT_DELTA(point[0], -1.0, 1e-6);
         TS_ASSERT_DELTA(point[1], 0.0, 1e-6);
 
-        c_vector<double,2> weighted_dir;
+        c_vector<double, 2> weighted_dir;
         double jacobian_det;
 
         mesh.GetWeightedDirectionForElement(p_element->GetIndex(), weighted_dir, jacobian_det);
@@ -473,23 +473,23 @@ public:
 
     void Test2DMeshIn3DSetPoint()
     {
-        TrianglesMeshReader<2,3> mesh_reader("mesh/test/data/disk_in_3d");
-        MutableMesh<2,3> mesh;
+        TrianglesMeshReader<2, 3> mesh_reader("mesh/test/data/disk_in_3d");
+        MutableMesh<2, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         const int boundary_node_index = 99;
         Node<3>* p_node = mesh.GetNode(boundary_node_index);
 
         //Just focus on one element
-        Element<2,3>* p_element = mesh.GetElement(*p_node->ContainingElementsBegin());
-        BoundaryElement<1,3>* p_boundary_element = mesh.GetBoundaryElement(*p_node->ContainingBoundaryElementsBegin());
+        Element<2, 3>* p_element = mesh.GetElement(*p_node->ContainingElementsBegin());
+        BoundaryElement<1, 3>* p_boundary_element = mesh.GetBoundaryElement(*p_node->ContainingBoundaryElementsBegin());
 
         ChastePoint<3> point = p_node->GetPoint();
         TS_ASSERT_DELTA(point[0], 0.99211470130000001, 1e-6);
         TS_ASSERT_DELTA(point[1], -0.12533323360000001, 1e-6);
         TS_ASSERT_DELTA(point[2], 0.0, 1e-6);
 
-        c_vector<double,3> weighted_dir;
+        c_vector<double, 3> weighted_dir;
         double jacobian_det;
 
         mesh.GetWeightedDirectionForElement(p_element->GetIndex(), weighted_dir, jacobian_det);
@@ -542,15 +542,15 @@ public:
 
     void TestDeletingNodes()
     {
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        MutableMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        MutableMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         Node<1>* p_old_rhs_node = mesh.GetNode(10);
         Node<1>* p_old_lhs_node = mesh.GetNode(0);
 
-        MutableMesh<1,1>::BoundaryElementIterator b_elt_iter;
-        MutableMesh<1,1>::BoundaryNodeIterator b_node_iter;
+        MutableMesh<1, 1>::BoundaryElementIterator b_elt_iter;
+        MutableMesh<1, 1>::BoundaryNodeIterator b_node_iter;
 
         // Delete the right end node
         mesh.DeleteBoundaryNodeAt(10);
@@ -613,8 +613,8 @@ public:
 
     void TestDeleteNodePriorToReMesh()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/circular_fan");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/circular_fan");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Test it can also delete a boundary node
@@ -632,13 +632,13 @@ public:
 
     void TestAddingAndDeletingNodes()
     {
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        MutableMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        MutableMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Add a node at position 0.01
         ChastePoint<1> new_point(0.01);
-        Element<1,1>* p_first_element = mesh.GetElement(0);
+        Element<1, 1>* p_first_element = mesh.GetElement(0);
 
         TS_ASSERT_THROWS_NOTHING(mesh.RefineElement(p_first_element, new_point));
         TS_ASSERT_EQUALS(p_first_element->GetNode(1)->GetIndex(), 11u);
@@ -651,7 +651,7 @@ public:
 
         // Add a node
         ChastePoint<1> new_point2(0.55);
-        Element<1,1>* p_sixth_element = mesh.GetElement(5);
+        Element<1, 1>* p_sixth_element = mesh.GetElement(5);
 
         mesh.RefineElement(p_sixth_element, new_point2);
 
@@ -663,8 +663,8 @@ public:
 
     void Test1DBoundaryNodeMerger()
     {
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_1_element");
-        MutableMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_1_element");
+        MutableMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_EQUALS(mesh.GetVolume(), 1.0);
@@ -674,8 +674,8 @@ public:
 
     void Test1DNodeMerger()
     {
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
-        MutableMesh<1,1> mesh;
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        MutableMesh<1, 1> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         double length = mesh.GetVolume();
@@ -690,10 +690,10 @@ public:
         // Merge node 3 with node 4
         mesh.MoveMergeNode(node_index, target_index);
 
-        Element<1,1>* p_element;
+        Element<1, 1>* p_element;
         p_element = mesh.GetElement(2);
 
-        c_matrix<double,1,1> jacobian;
+        c_matrix<double,1, 1> jacobian;
         double jacobian_det;
         mesh.GetJacobianForElement(p_element->GetIndex(), jacobian, jacobian_det);
         TS_ASSERT_DELTA(jacobian_det, 0.2, 1e-6);
@@ -707,8 +707,8 @@ public:
 
     void Test2DNodeMerger()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/disk_984_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         double area = mesh.GetVolume();
@@ -725,7 +725,7 @@ public:
         // the non-feasible node (172) - it will vanish
         // Element 762 is shared by the moving node (432), some other node (205)
         // the non-feasible node (172) - it will increase in size
-        c_matrix<double,2,2> jacobian;
+        c_matrix<double,2, 2> jacobian;
         double jacobian_det;
         mesh.GetJacobianForElement(309, jacobian, jacobian_det);
         TS_ASSERT_DELTA(jacobian_det, 0.00753493, 1e-6);
@@ -757,8 +757,8 @@ public:
 
     void Test3DNodeMerger()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_1626_elements");
-        MutableMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_1626_elements");
+        MutableMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         double volume = mesh.GetVolume();
@@ -795,8 +795,8 @@ public:
 
     void Test2DBoundaryNodeMergerChangeArea()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/disk_984_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         double area = mesh.GetVolume();
@@ -820,8 +820,8 @@ public:
 
     void Test2DBoundaryNodeMerger()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_800_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/2D_0_to_1mm_800_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         double area = mesh.GetVolume();
@@ -855,8 +855,8 @@ public:
 
     void Test3DBoundaryNodeMerger()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_1626_elements");
-        MutableMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_1626_elements");
+        MutableMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         double volume = mesh.GetVolume();
@@ -881,8 +881,8 @@ public:
 
     void TestCheckVoronoiDisk()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/disk_984_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_EQUALS(mesh.CheckIsVoronoi(), true);
@@ -890,8 +890,8 @@ public:
 
     void TestCheckVoronoiSquare()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_EQUALS(mesh.CheckIsVoronoi(), true);
@@ -899,8 +899,8 @@ public:
 
     void TestCheckCircularFan()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/circular_fan");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/circular_fan");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_EQUALS(mesh.CheckIsVoronoi(5e-3), true);
@@ -908,7 +908,7 @@ public:
 
     void TestCheckMovingMesh()
     {
-        MutableMesh<2,2> mesh;
+        MutableMesh<2, 2> mesh;
         mesh.ConstructRectangularMesh(1,1,false);
 
         unsigned top_right=3;
@@ -937,7 +937,7 @@ public:
 
     void TestDeleteNodes()
     {
-        MutableMesh<2,2> mesh;
+        MutableMesh<2, 2> mesh;
         mesh.ConstructRectangularMesh(2,3);
 
         TS_ASSERT_EQUALS(mesh.GetVolume(), 6.0);
@@ -967,8 +967,8 @@ public:
 
     void TestDeleteNodeFails()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/HalfSquareWithExtraNode");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/HalfSquareWithExtraNode");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_THROWS_THIS(mesh.DeleteNode(0),"Failure to delete node");
@@ -976,7 +976,7 @@ public:
 
     void TestMeshAddNodeAndReMeshMethod()
     {
-        MutableMesh<2,2> mesh;
+        MutableMesh<2, 2> mesh;
         mesh.ConstructRectangularMesh(1, 1, false);
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 4u);
@@ -991,7 +991,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetNode(1u)->rGetLocation()[1], 0.0, 1e-7);
 
         // Test the add node method
-        c_vector<double,2> point;
+        c_vector<double, 2> point;
         point[0] = 2.0;
         point[1] = 0.0;
         Node<2>* p_node = new Node<2>(4u, point);
@@ -1019,7 +1019,7 @@ public:
 
     void TestReindex()
     {
-        MutableMesh<2,2> mesh;
+        MutableMesh<2, 2> mesh;
         mesh.ConstructRectangularMesh(10, 10);
 
         unsigned num_old_nodes = mesh.GetNumNodes();
@@ -1053,8 +1053,8 @@ public:
 
     void TestReindex2dMeshIn3dSpace()
     {
-        TrianglesMeshReader<2,3> mesh_reader("mesh/test/data/disk_in_3d");
-        MutableMesh<2,3> mesh;
+        TrianglesMeshReader<2, 3> mesh_reader("mesh/test/data/disk_in_3d");
+        MutableMesh<2, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         unsigned num_old_nodes = mesh.GetNumNodes();
@@ -1097,7 +1097,7 @@ public:
         nodes.push_back(new Node<3>(3, true,  0.0,  1.0,  1.0));
         nodes.push_back(new Node<3>(4, false, 0.5,  0.5,  0.5));
 
-        MutableMesh<3,3> mesh(nodes);
+        MutableMesh<3, 3> mesh(nodes);
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 5u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 4u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 4u);
@@ -1114,8 +1114,8 @@ public:
 
     void TestDeleteElement()
     {
-        TrianglesMeshReader<2,3> mesh_reader("mesh/test/data/disk_in_3d");
-        MutableMesh<2,3> mesh;
+        TrianglesMeshReader<2, 3> mesh_reader("mesh/test/data/disk_in_3d");
+        MutableMesh<2, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         unsigned num_old_nodes = mesh.GetNumNodes();
@@ -1154,8 +1154,8 @@ public:
 
     void TestDeleteElement1DIn3D()
     {
-        TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/y_branch_3d_mesh");
-        MutableMesh<1,3> mesh;
+        TrianglesMeshReader<1, 3> mesh_reader("mesh/test/data/y_branch_3d_mesh");
+        MutableMesh<1, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 4u);
@@ -1186,13 +1186,13 @@ public:
         unsigned num_elements;
         unsigned total_num_nodes;
         unsigned total_num_elements;
-        std::vector<c_vector<double,2> > node_locations;
-        std::vector<c_vector<unsigned,3> > element_nodes;
+        std::vector<c_vector<double, 2> > node_locations;
+        std::vector<c_vector<unsigned, 3> > element_nodes;
 
         {
-            TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
+            TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/disk_984_elements");
 
-            AbstractTetrahedralMesh<2,2>* const p_mesh = new MutableMesh<2,2>;
+            AbstractTetrahedralMesh<2, 2>* const p_mesh = new MutableMesh<2, 2>;
             p_mesh->ConstructFromMeshReader(mesh_reader);
 
             // Create output archive
@@ -1200,11 +1200,11 @@ public:
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
             NodeMap map(p_mesh->GetNumNodes());
-            static_cast<MutableMesh<2,2>* >(p_mesh)->ReMesh(map);
+            static_cast<MutableMesh<2, 2>* >(p_mesh)->ReMesh(map);
 
             // Record values to test
-            for (MutableMesh<2,2>::NodeIterator it = static_cast<MutableMesh<2,2>* >(p_mesh)->GetNodeIteratorBegin();
-                it != static_cast<MutableMesh<2,2>* >(p_mesh)->GetNodeIteratorEnd();
+            for (MutableMesh<2, 2>::NodeIterator it = static_cast<MutableMesh<2, 2>* >(p_mesh)->GetNodeIteratorBegin();
+                it != static_cast<MutableMesh<2, 2>* >(p_mesh)->GetNodeIteratorEnd();
                 ++it)
             {
                 // Mess with the locations of the nodes before archiving.
@@ -1214,12 +1214,12 @@ public:
                 node_locations.push_back(it->rGetLocation());
             }
 
-            for (MutableMesh<2,2>::ElementIterator it2 = static_cast<MutableMesh<2,2>* >(p_mesh)->GetElementIteratorBegin();
-                it2 != static_cast<MutableMesh<2,2>* >(p_mesh)->GetElementIteratorEnd();
+            for (MutableMesh<2, 2>::ElementIterator it2 = static_cast<MutableMesh<2, 2>* >(p_mesh)->GetElementIteratorBegin();
+                it2 != static_cast<MutableMesh<2, 2>* >(p_mesh)->GetElementIteratorEnd();
                 ++it2)
             {
                 c_vector<unsigned, 3> nodes;
-                for (unsigned i=0; i<3; ++i)
+                for (unsigned i = 0; i<3; ++i)
                 {
                     nodes[i]=it2->GetNodeGlobalIndex(i);
                 }
@@ -1237,7 +1237,7 @@ public:
         {
             // Should archive the most abstract class you can to check boost knows what individual classes are.
             // (but here AbstractMesh doesn't have the methods below).
-            AbstractTetrahedralMesh<2,2>* p_mesh2;
+            AbstractTetrahedralMesh<2, 2>* p_mesh2;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -1254,8 +1254,8 @@ public:
 
             // Test recorded node locations
             unsigned counter = 0;
-            for (MutableMesh<2,2>::NodeIterator it = static_cast<MutableMesh<2,2>* >(p_mesh2)->GetNodeIteratorBegin();
-                it != static_cast<MutableMesh<2,2>* >(p_mesh2)->GetNodeIteratorEnd();
+            for (MutableMesh<2, 2>::NodeIterator it = static_cast<MutableMesh<2, 2>* >(p_mesh2)->GetNodeIteratorBegin();
+                it != static_cast<MutableMesh<2, 2>* >(p_mesh2)->GetNodeIteratorEnd();
                 ++it)
             {
                 TS_ASSERT_DELTA(node_locations[counter][0], it->rGetLocation()[0], 1e-9);
@@ -1264,11 +1264,11 @@ public:
             }
             counter = 0;
             // Test each element contains the correct nodes.
-            for (MutableMesh<2,2>::ElementIterator it2 = static_cast<MutableMesh<2,2>* >(p_mesh2)->GetElementIteratorBegin();
-                            it2 != static_cast<MutableMesh<2,2>* >(p_mesh2)->GetElementIteratorEnd();
+            for (MutableMesh<2, 2>::ElementIterator it2 = static_cast<MutableMesh<2, 2>* >(p_mesh2)->GetElementIteratorBegin();
+                            it2 != static_cast<MutableMesh<2, 2>* >(p_mesh2)->GetElementIteratorEnd();
                             ++it2)
             {
-                for (unsigned i=0; i<3; ++i)
+                for (unsigned i = 0; i<3; ++i)
                 {
                     TS_ASSERT_EQUALS(element_nodes[counter][i],it2->GetNodeGlobalIndex(i));
                 }

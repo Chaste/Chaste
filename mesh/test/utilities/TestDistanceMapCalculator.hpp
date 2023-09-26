@@ -47,35 +47,35 @@ class TestDistanceMapCalculator : public CxxTest::TestSuite
 public:
     void TestDistances1D()
     {
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements");
 
         std::vector<unsigned> map_origin;
         map_origin.push_back(0u);
         std::vector<double> distances_serial;
         {
             //This is in a block so that we can minimise to scope of the serial mesh (to avoid using it in error)
-            TetrahedralMesh<1,1> serial_mesh;
+            TetrahedralMesh<1, 1> serial_mesh;
             serial_mesh.ConstructFromMeshReader(mesh_reader);
             TS_ASSERT_EQUALS(serial_mesh.GetNumNodes(), 11u);
             TS_ASSERT_EQUALS(serial_mesh.GetNumElements(), 10u);
             TS_ASSERT_EQUALS(serial_mesh.GetNumBoundaryElements(), 2u);
-            DistanceMapCalculator<1,1> distance_calculator_serial(serial_mesh);
+            DistanceMapCalculator<1, 1> distance_calculator_serial(serial_mesh);
             distance_calculator_serial.ComputeDistanceMap(map_origin, distances_serial);
         }
 
-        DistributedTetrahedralMesh<1,1> parallel_mesh;
+        DistributedTetrahedralMesh<1, 1> parallel_mesh;
         parallel_mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_EQUALS(parallel_mesh.GetNumNodes(), 11u);
         TS_ASSERT_EQUALS(parallel_mesh.GetNumElements(), 10u);
         TS_ASSERT_EQUALS(parallel_mesh.GetNumBoundaryElements(), 2u);
 
-        DistanceMapCalculator<1,1> distance_calculator_parallel(parallel_mesh);
+        DistanceMapCalculator<1, 1> distance_calculator_parallel(parallel_mesh);
         std::vector<double> distances_parallel;
         distance_calculator_parallel.ComputeDistanceMap(map_origin, distances_parallel);
 
         TS_ASSERT_EQUALS(distances_serial.size(), distances_parallel.size());
-        for (unsigned index=0; index<distances_parallel.size(); index++)
+        for (unsigned index = 0; index<distances_parallel.size(); index++)
         {
             try
             {
@@ -94,9 +94,9 @@ public:
 
     void TestDistancesToCorner()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_21_nodes_side/Cube21"); // 5x5x5mm cube (internode distance = 0.25mm)
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_21_nodes_side/Cube21"); // 5x5x5mm cube (internode distance = 0.25mm)
 
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         unsigned num_nodes=9261u;
@@ -104,20 +104,20 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 48000u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 4800u);
 
-        DistributedTetrahedralMesh<3,3> parallel_mesh(DistributedTetrahedralMeshPartitionType::DUMB); // No reordering;
+        DistributedTetrahedralMesh<3, 3> parallel_mesh(DistributedTetrahedralMeshPartitionType::DUMB); // No reordering;
         parallel_mesh.ConstructFromMeshReader(mesh_reader);
         TS_ASSERT_EQUALS(parallel_mesh.GetNumNodes(), num_nodes); // 21x21x21 nodes
         TS_ASSERT_EQUALS(parallel_mesh.GetNumElements(), 48000u);
         TS_ASSERT_EQUALS(parallel_mesh.GetNumBoundaryElements(), 4800u);
 
         unsigned far_index=9260u;
-        c_vector<double,3> far_corner=mesh.GetNode(far_index)->rGetLocation();
+        c_vector<double, 3> far_corner=mesh.GetNode(far_index)->rGetLocation();
         TS_ASSERT_DELTA( far_corner[0], 0.25, 1e-11);
         TS_ASSERT_DELTA( far_corner[1], 0.25, 1e-11);
         TS_ASSERT_DELTA( far_corner[2], 0.25, 1e-11);
         try
         {
-            c_vector<double,3> parallel_far_corner=parallel_mesh.GetNode(far_index)->rGetLocation();
+            c_vector<double, 3> parallel_far_corner=parallel_mesh.GetNode(far_index)->rGetLocation();
             TS_ASSERT_DELTA( parallel_far_corner[0], 0.25, 1e-11);
             TS_ASSERT_DELTA( parallel_far_corner[1], 0.25, 1e-11);
             TS_ASSERT_DELTA( parallel_far_corner[2], 0.25, 1e-11);
@@ -129,11 +129,11 @@ public:
         std::vector<unsigned> map_far_corner;
         map_far_corner.push_back(far_index);
 
-        DistanceMapCalculator<3,3> distance_calculator(mesh);
+        DistanceMapCalculator<3, 3> distance_calculator(mesh);
         std::vector<double> distances;
         distance_calculator.ComputeDistanceMap(map_far_corner, distances);
 
-        DistanceMapCalculator<3,3> parallel_distance_calculator(parallel_mesh);
+        DistanceMapCalculator<3, 3> parallel_distance_calculator(parallel_mesh);
         std::vector<double> parallel_distances;
         parallel_distance_calculator.ComputeDistanceMap(map_far_corner, parallel_distances);
 
@@ -143,7 +143,7 @@ public:
         //Note unsigned division is okay here
         TS_ASSERT_DELTA(parallel_distance_calculator.mPopCounter, num_nodes/PetscTools::GetNumProcs(), 1u);
         TS_ASSERT_DELTA(distance_calculator.mPopCounter, num_nodes, 1u);
-        for (unsigned index=0; index<distances.size(); index++)
+        for (unsigned index = 0; index<distances.size(); index++)
         {
             c_vector<double, 3> node = mesh.GetNode(index)->rGetLocation();
 
@@ -170,7 +170,7 @@ public:
         unsigned trials=25;
         unsigned pops=0;
         unsigned sequential_pops=0;
-        for (unsigned i=0; i<trials; ++i)
+        for (unsigned i = 0; i<trials; ++i)
         {
             unsigned index=RandomNumberGenerator::Instance()->randMod(parallel_distances.size());
             TS_ASSERT_DELTA(parallel_distance_calculator.SingleDistance(9260u, index), parallel_distances[index], 1e-15);
@@ -197,7 +197,7 @@ public:
          }
 
         //Reverse - to check that cached information is flushed.
-        for (unsigned i=0; i<3; ++i)
+        for (unsigned i = 0; i<3; ++i)
         {
             unsigned index=RandomNumberGenerator::Instance()->randMod(parallel_distances.size());
             TS_ASSERT_DELTA(parallel_distance_calculator.SingleDistance(index, 9260u), parallel_distances[index], 1e-15);
@@ -206,16 +206,16 @@ public:
 
     void TestDistancesToFaceDumb()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_21_nodes_side/Cube21"); // 5x5x5mm cube (internode distance = 0.25mm)
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_21_nodes_side/Cube21"); // 5x5x5mm cube (internode distance = 0.25mm)
 
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 9261u); // 21x21x21 nodes
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 48000u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 4800u);
 
-        DistributedTetrahedralMesh<3,3> parallel_mesh(DistributedTetrahedralMeshPartitionType::DUMB); // No reordering
+        DistributedTetrahedralMesh<3, 3> parallel_mesh(DistributedTetrahedralMeshPartitionType::DUMB); // No reordering
         parallel_mesh.ConstructFromMeshReader(mesh_reader);
         TS_ASSERT_EQUALS(parallel_mesh.GetNumNodes(), 9261u); // 21x21x21 nodes
         TS_ASSERT_EQUALS(parallel_mesh.GetNumElements(), 48000u);
@@ -223,7 +223,7 @@ public:
 
 
         std::vector<unsigned> map_left;
-        for (unsigned index=0; index<mesh.GetNumNodes(); index++)
+        for (unsigned index = 0; index<mesh.GetNumNodes(); index++)
         {
             // Get the nodes at the left face of the cube
             if (mesh.GetNode(index)->rGetLocation()[0] + 0.25 < 1e-6)
@@ -234,18 +234,18 @@ public:
 
         TS_ASSERT_EQUALS(map_left.size(), 21u*21u);
 
-        DistanceMapCalculator<3,3> distance_calculator(mesh);
+        DistanceMapCalculator<3, 3> distance_calculator(mesh);
         std::vector<double> distances;
         distance_calculator.ComputeDistanceMap(map_left, distances);
 
-        DistanceMapCalculator<3,3> parallel_distance_calculator(parallel_mesh);
+        DistanceMapCalculator<3, 3> parallel_distance_calculator(parallel_mesh);
         std::vector<double> parallel_distances;
         parallel_distance_calculator.ComputeDistanceMap(map_left, parallel_distances);
 
         TS_ASSERT_EQUALS(distance_calculator.mRoundCounter, 1u);
         TS_ASSERT_DELTA(parallel_distance_calculator.mRoundCounter, 2u, 1u);// 1 2 or 3
 
-        for (unsigned index=0; index<distances.size(); index++)
+        for (unsigned index = 0; index<distances.size(); index++)
         {
             // The distance should be equal to the x-coordinate of the point (minus the offset of the left face of the cube)
             c_vector<double, 3> node = mesh.GetNode(index)->rGetLocation();
@@ -255,9 +255,9 @@ public:
     }
     void TestDistancesToFace()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_21_nodes_side/Cube21"); // 5x5x5mm cube (internode distance = 0.25mm)
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_21_nodes_side/Cube21"); // 5x5x5mm cube (internode distance = 0.25mm)
 
-        DistributedTetrahedralMesh<3,3> parallel_mesh;
+        DistributedTetrahedralMesh<3, 3> parallel_mesh;
         parallel_mesh.ConstructFromMeshReader(mesh_reader);
         TS_ASSERT_EQUALS(parallel_mesh.GetNumNodes(), 9261u); // 21x21x21 nodes
         TS_ASSERT_EQUALS(parallel_mesh.GetNumElements(), 48000u);
@@ -265,7 +265,7 @@ public:
 
 
         std::vector<unsigned> map_left;
-        for (unsigned index=0; index<parallel_mesh.GetNumNodes(); index++)
+        for (unsigned index = 0; index<parallel_mesh.GetNumNodes(); index++)
         {
             // Get the *only local* nodes at the left face of the cube
             try
@@ -280,11 +280,11 @@ public:
             }
         }
 
-        DistanceMapCalculator<3,3> parallel_distance_calculator(parallel_mesh);
+        DistanceMapCalculator<3, 3> parallel_distance_calculator(parallel_mesh);
         std::vector<double> parallel_distances;
         parallel_distance_calculator.ComputeDistanceMap(map_left, parallel_distances);
 
-        for (unsigned index=0; index<parallel_distances.size(); index++)
+        for (unsigned index = 0; index<parallel_distances.size(); index++)
         {
             try
             {
@@ -302,21 +302,21 @@ public:
 
     void TestDistancesWithEmptySource()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_21_nodes_side/Cube21"); // 5x5x5mm cube (internode distance = 0.25mm)
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_21_nodes_side/Cube21"); // 5x5x5mm cube (internode distance = 0.25mm)
 
-        DistributedTetrahedralMesh<3,3> parallel_mesh;
+        DistributedTetrahedralMesh<3, 3> parallel_mesh;
         parallel_mesh.ConstructFromMeshReader(mesh_reader);
 
 
         std::vector<unsigned> empty_sources;
         TS_ASSERT_EQUALS(empty_sources.size(), 0U);
 
-        DistanceMapCalculator<3,3> parallel_distance_calculator(parallel_mesh);
+        DistanceMapCalculator<3, 3> parallel_distance_calculator(parallel_mesh);
         std::vector<double> parallel_distances;
         parallel_distance_calculator.ComputeDistanceMap(empty_sources, parallel_distances);
 
         TS_ASSERT_EQUALS(parallel_distances.size(), 9261U);
-        for (unsigned index=0; index<parallel_distances.size(); index++)
+        for (unsigned index = 0; index<parallel_distances.size(); index++)
         {
             TS_ASSERT_EQUALS(parallel_distances[index], DBL_MAX);
         }

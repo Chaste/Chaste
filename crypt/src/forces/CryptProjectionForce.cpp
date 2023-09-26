@@ -103,17 +103,17 @@ void CryptProjectionForce::SetWntChemotaxis(bool includeWntChemotaxis)
     mIncludeWntChemotaxis = includeWntChemotaxis;
 }
 
-double CryptProjectionForce::CalculateCryptSurfaceHeightAtPoint(const c_vector<double,2>& rNodeLocation)
+double CryptProjectionForce::CalculateCryptSurfaceHeightAtPoint(const c_vector<double, 2>& rNodeLocation)
 {
     return mA*pow(norm_2(rNodeLocation), mB); // =z_coord;
 }
 
-double CryptProjectionForce::CalculateCryptSurfaceDerivativeAtPoint(const c_vector<double,2>& rNodeLocation)
+double CryptProjectionForce::CalculateCryptSurfaceDerivativeAtPoint(const c_vector<double, 2>& rNodeLocation)
 {
     return mA*mB*pow(norm_2(rNodeLocation), (mB - 1.0));
 }
 
-c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nodeAGlobalIndex, unsigned nodeBGlobalIndex, AbstractCellPopulation<2>& rCellPopulation)
+c_vector<double, 2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nodeAGlobalIndex, unsigned nodeBGlobalIndex, AbstractCellPopulation<2>& rCellPopulation)
 {
     MeshBasedCellPopulation<2>* p_population = static_cast<MeshBasedCellPopulation<2>*>(&rCellPopulation);
 
@@ -121,13 +121,13 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
     assert(nodeAGlobalIndex != nodeBGlobalIndex);
 
     // Get the node locations in 2D
-    c_vector<double,2> node_a_location_2d = rCellPopulation.GetNode(nodeAGlobalIndex)->rGetLocation();
-    c_vector<double,2> node_b_location_2d = rCellPopulation.GetNode(nodeBGlobalIndex)->rGetLocation();
+    c_vector<double, 2> node_a_location_2d = rCellPopulation.GetNode(nodeAGlobalIndex)->rGetLocation();
+    c_vector<double, 2> node_b_location_2d = rCellPopulation.GetNode(nodeBGlobalIndex)->rGetLocation();
 
     // "Get the unit vector parallel to the line joining the two nodes" [GeneralisedLinearSpringForce]
 
     // Create a unit vector in the direction of the 3D spring
-    c_vector<double,3> unit_difference = mNode3dLocationMap[nodeBGlobalIndex] - mNode3dLocationMap[nodeAGlobalIndex];
+    c_vector<double, 3> unit_difference = mNode3dLocationMap[nodeBGlobalIndex] - mNode3dLocationMap[nodeAGlobalIndex];
 
     // Calculate the distance between the two nodes
     double distance_between_nodes = norm_2(unit_difference);
@@ -221,10 +221,10 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
     multiplication_factor *= VariableSpringConstantMultiplicationFactor(nodeAGlobalIndex, nodeBGlobalIndex, rCellPopulation, is_closer_than_rest_length);
 
     // Calculate the 3D force between the two points
-    c_vector<double,3> force_between_nodes = multiplication_factor * this->GetMeinekeSpringStiffness() * unit_difference * (distance_between_nodes - rest_length);
+    c_vector<double, 3> force_between_nodes = multiplication_factor * this->GetMeinekeSpringStiffness() * unit_difference * (distance_between_nodes - rest_length);
 
     // Calculate an outward normal unit vector to the tangent plane of the crypt surface at the 3D point corresponding to node B
-    c_vector<double,3> outward_normal_unit_vector;
+    c_vector<double, 3> outward_normal_unit_vector;
 
     double dfdr = CalculateCryptSurfaceDerivativeAtPoint(node_b_location_2d);
     double theta_B = atan2(node_b_location_2d[1], node_b_location_2d[0]); // use atan2 to determine the quadrant
@@ -235,7 +235,7 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
     outward_normal_unit_vector[2] = -1.0/normalization_factor;
 
     // Calculate the projection of the force onto the plane z=0
-    c_vector<double,2> projected_force_between_nodes_2d;
+    c_vector<double, 2> projected_force_between_nodes_2d;
     double force_dot_normal = inner_prod(force_between_nodes, outward_normal_unit_vector);
 
     for (unsigned i = 0; i < 2; ++i)

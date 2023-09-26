@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////////
 // Implementation
 ///////////////////////////////////////////////////////////////////////////////////
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::VtkMeshWriter(const std::string& rDirectory,
                      const std::string& rBaseName,
                      const bool& rCleanDirectory)
@@ -60,19 +60,19 @@ VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::VtkMeshWriter(const std::string& rDirecto
     mpVtkUnstructedMesh = vtkUnstructuredGrid::New();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::~VtkMeshWriter()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::~VtkMeshWriter()
 {
     mpVtkUnstructedMesh->Delete(); // Reference counted
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh()
 {
     //Construct nodes aka as Points
     vtkPoints* p_pts = vtkPoints::New(VTK_DOUBLE);
     p_pts->GetData()->SetName("Vertex positions");
-    for (unsigned item_num=0; item_num<this->GetNumNodes(); item_num++)
+    for (unsigned item_num = 0; item_num<this->GetNumNodes(); item_num++)
     {
         std::vector<double> current_item = this->GetNextNode(); //this->mNodeData[item_num];
         // Add zeroes if the dimension is below 3
@@ -87,7 +87,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
     p_pts->Delete(); //Reference counted
 
     //Construct elements aka Cells
-    for (unsigned item_num=0; item_num<this->GetNumElements(); item_num++)
+    for (unsigned item_num = 0; item_num<this->GetNumElements(); item_num++)
     {
         std::vector<unsigned> current_element = this->GetNextElement().NodeIndices; // this->mElementData[item_num];
 
@@ -137,7 +137,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
     if (SPACE_DIM > 1)
     {
         /// \todo #2351 Temporary workaround for parallel writer
-        for (unsigned item_num=0; item_num<this->GetNumBoundaryFaces(); item_num++)
+        for (unsigned item_num = 0; item_num<this->GetNumBoundaryFaces(); item_num++)
         {
             this->GetNextBoundaryElement();
         }
@@ -149,7 +149,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
         AugmentCellData();
         //Make a blank cell radius data for the regular elements
         std::vector<double> radii(this->GetNumElements(), 0.0);
-        for (unsigned item_num=0; item_num<this->GetNumCableElements(); item_num++)
+        for (unsigned item_num = 0; item_num<this->GetNumCableElements(); item_num++)
         {
             ElementData cable_element_data = this->GetNextCableElement();
             std::vector<unsigned> current_element = cable_element_data.NodeIndices;
@@ -169,8 +169,8 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddProvenance(std::string fileName)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddProvenance(std::string fileName)
 {
     std::string comment = "<!-- " + ChasteBuildInfo::GetProvenanceString() + "-->";
 
@@ -180,8 +180,8 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddProvenance(std::string fileName)
     p_vtu_file->close();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteFiles()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 {
     // Using separate scope here to make sure file is properly closed before re-opening it to add provenance info.
     {
@@ -203,12 +203,12 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteFiles()
     AddProvenance(this->mBaseName + ".vtu");
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddCellData(std::string dataName, std::vector<double> dataPayload)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddCellData(std::string dataName, std::vector<double> dataPayload)
 {
     vtkDoubleArray* p_scalars = vtkDoubleArray::New();
     p_scalars->SetName(dataName.c_str());
-    for (unsigned i=0; i<dataPayload.size(); ++i)
+    for (unsigned i = 0; i<dataPayload.size(); ++i)
     {
         p_scalars->InsertNextValue(dataPayload[i]);
     }
@@ -218,8 +218,8 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddCellData(std::string dataName, std
     p_scalars->Delete(); //Reference counted
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AugmentCellData()
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::AugmentCellData()
 {
     unsigned num_cell_arrays = mpVtkUnstructedMesh->GetCellData()->GetNumberOfArrays();
     for (unsigned i = 0; i < num_cell_arrays; ++i)
@@ -251,15 +251,15 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AugmentCellData()
 }
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddCellData(std::string dataName, std::vector<c_vector<double, SPACE_DIM> > dataPayload)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddCellData(std::string dataName, std::vector<c_vector<double, SPACE_DIM> > dataPayload)
 {
     vtkDoubleArray* p_vectors = vtkDoubleArray::New();
     p_vectors->SetName(dataName.c_str());
     p_vectors->SetNumberOfComponents(3);
-    for (unsigned i=0; i<dataPayload.size(); ++i)
+    for (unsigned i = 0; i<dataPayload.size(); ++i)
     {
-        for (unsigned j=0; j<SPACE_DIM; ++j)
+        for (unsigned j = 0; j<SPACE_DIM; ++j)
         {
             p_vectors->InsertNextValue(dataPayload[i][j]);
         }
@@ -275,15 +275,15 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddCellData(std::string dataName, std
     p_vectors->Delete(); //Reference counted
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorCellData(std::string dataName, std::vector<c_vector<double,SPACE_DIM*(SPACE_DIM+1)/2> > dataPayload)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddTensorCellData(std::string dataName, std::vector<c_vector<double, SPACE_DIM*(SPACE_DIM+1)/2> > dataPayload)
 {
     if constexpr (SPACE_DIM != 1)
     {
         vtkDoubleArray* p_vectors = vtkDoubleArray::New();
         p_vectors->SetName(dataName.c_str());
         p_vectors->SetNumberOfComponents(SPACE_DIM*SPACE_DIM);
-        for (unsigned i=0; i<dataPayload.size(); ++i)
+        for (unsigned i = 0; i<dataPayload.size(); ++i)
         {
             if (SPACE_DIM == 2)
             {
@@ -316,15 +316,15 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorCellData(std::string dataNam
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorCellData(std::string dataName, std::vector<c_matrix<double,SPACE_DIM,SPACE_DIM> > dataPayload)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddTensorCellData(std::string dataName, std::vector<c_matrix<double, SPACE_DIM, SPACE_DIM> > dataPayload)
 {
     if constexpr (SPACE_DIM != 1)
     {
         vtkDoubleArray* p_vectors = vtkDoubleArray::New();
         p_vectors->SetName(dataName.c_str());
         p_vectors->SetNumberOfComponents(SPACE_DIM*SPACE_DIM);
-        for (unsigned i=0; i<dataPayload.size(); ++i)
+        for (unsigned i = 0; i<dataPayload.size(); ++i)
         {
             if (SPACE_DIM == 2)
             {
@@ -358,8 +358,8 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorCellData(std::string dataNam
 }
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, std::vector<double> dataPayload)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddPointData(std::string dataName, std::vector<double> dataPayload)
 {
     vtkDoubleArray* p_scalars = vtkDoubleArray::New();
     p_scalars->SetName(dataName.c_str());
@@ -421,7 +421,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
         }
     }
 
-    for (unsigned i=0; i<dataPayload.size(); ++i)
+    for (unsigned i = 0; i<dataPayload.size(); ++i)
     {
         p_scalars->InsertNextValue(dataPayload[i]);
     }
@@ -432,8 +432,8 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
 }
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, std::vector<c_vector<double, SPACE_DIM> > dataPayload)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddPointData(std::string dataName, std::vector<c_vector<double, SPACE_DIM> > dataPayload)
 {
     vtkDoubleArray* p_vectors = vtkDoubleArray::New();
     p_vectors->SetName(dataName.c_str());
@@ -465,7 +465,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
                 unsigned global_node_index = mNodesToSendPerProcess[send_to][node];
                 unsigned local_node_index = global_node_index
                             - this->mpDistributedMesh->GetDistributedVectorFactory()->GetLow();
-                for (unsigned j=0; j<SPACE_DIM; ++j)
+                for (unsigned j = 0; j<SPACE_DIM; ++j)
                 {
                     send_data[ node*SPACE_DIM + j ] = dataPayload[local_node_index][j];
                 }
@@ -489,7 +489,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
                 unsigned global_node_index = mNodesToReceivePerProcess[receive_from][node];
                 unsigned halo_index = mGlobalToNodeIndexMap[global_node_index];
                 assert( halo_index >= this->mpDistributedMesh->GetNumLocalNodes() );
-                for (unsigned j=0; j<SPACE_DIM; ++j)
+                for (unsigned j = 0; j<SPACE_DIM; ++j)
                 {
                     dataPayload[halo_index][j] = receive_data[ node*SPACE_DIM + j ];
                 }
@@ -498,9 +498,9 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
     }
 
     p_vectors->SetNumberOfComponents(3);
-    for (unsigned i=0; i<dataPayload.size(); ++i)
+    for (unsigned i = 0; i<dataPayload.size(); ++i)
     {
-        for (unsigned j=0; j<SPACE_DIM; ++j)
+        for (unsigned j = 0; j<SPACE_DIM; ++j)
         {
             p_vectors->InsertNextValue(dataPayload[i][j]);
         }
@@ -516,15 +516,15 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddPointData(std::string dataName, st
     p_vectors->Delete(); //Reference counted
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorPointData(std::string dataName, std::vector<c_matrix<double,SPACE_DIM,SPACE_DIM> > dataPayload)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddTensorPointData(std::string dataName, std::vector<c_matrix<double, SPACE_DIM, SPACE_DIM> > dataPayload)
 {
     if constexpr (SPACE_DIM != 1)
     {
         vtkDoubleArray* p_vectors = vtkDoubleArray::New();
         p_vectors->SetName(dataName.c_str());
         p_vectors->SetNumberOfComponents(SPACE_DIM*SPACE_DIM);
-        for (unsigned i=0; i<dataPayload.size(); ++i)
+        for (unsigned i = 0; i<dataPayload.size(); ++i)
         {
             if (SPACE_DIM == 2)
             {
@@ -557,11 +557,11 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::AddTensorPointData(std::string dataNa
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::SetParallelFiles( AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh )
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::SetParallelFiles( AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh )
 {
     //Have we got a distributed mesh?
-    this->mpDistributedMesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
+    this->mpDistributedMesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* >(&rMesh);
     mpNodesOnlyMesh = dynamic_cast<NodesOnlyMesh<SPACE_DIM>* >(&rMesh);
 
     if (this->mpDistributedMesh == nullptr && mpNodesOnlyMesh == nullptr)
@@ -609,16 +609,16 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::SetParallelFiles( AbstractTetrahedral
 ///\todo #1322 Mesh should be const
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
-      AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,
+      AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
       bool keepOriginalElementIndexing)
 {
     // Have we got a parallel mesh?
-    this->mpDistributedMesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
-    this->mpMixedMesh = dynamic_cast<MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* >(&rMesh);
+    this->mpDistributedMesh = dynamic_cast<DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* >(&rMesh);
+    this->mpMixedMesh = dynamic_cast<MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>* >(&rMesh);
 
     if (PetscTools::IsSequential() || !mWriteParallelFiles || (this->mpDistributedMesh == nullptr && mpNodesOnlyMesh == nullptr))
     {
-        AbstractTetrahedralMeshWriter<ELEMENT_DIM,SPACE_DIM>::WriteFilesUsingMesh( rMesh,keepOriginalElementIndexing );
+        AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh( rMesh,keepOriginalElementIndexing );
     }
     else
     {
@@ -764,11 +764,11 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
 }
 
 // Explicit instantiation
-template class VtkMeshWriter<1,1>;
-template class VtkMeshWriter<1,2>;
-template class VtkMeshWriter<1,3>;
-template class VtkMeshWriter<2,2>; // Actually used
-template class VtkMeshWriter<2,3>;
-template class VtkMeshWriter<3,3>; // Actually used
+template class VtkMeshWriter<1, 1>;
+template class VtkMeshWriter<1, 2>;
+template class VtkMeshWriter<1, 3>;
+template class VtkMeshWriter<2, 2>; // Actually used
+template class VtkMeshWriter<2, 3>;
+template class VtkMeshWriter<3, 3>; // Actually used
 
 #endif //CHASTE_VTK

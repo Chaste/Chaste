@@ -98,7 +98,7 @@ double HiornsAirwayWallFactory::GetAlpha0ForGeneration(unsigned generation)
     return mAlpha0[generation];
 }
 
-HiornsAirwayWall* HiornsAirwayWallFactory::CreateAirwayWallForElement(Element<1,3>* pElement)
+HiornsAirwayWall* HiornsAirwayWallFactory::CreateAirwayWallForElement(Element<1, 3>* pElement)
 {
     unsigned order = 0;
 
@@ -148,7 +148,7 @@ HiornsAirwayWall* HiornsAirwayWallFactory::CreateBasicAirwayWall()
 }
 
 
-double HiornsAirwayWallFactory::GetPleuralPressureForAirway(double time, Element<1,3>* pElement)
+double HiornsAirwayWallFactory::GetPleuralPressureForAirway(double time, Element<1, 3>* pElement)
 {
     return 0.0;
 }
@@ -156,7 +156,7 @@ double HiornsAirwayWallFactory::GetPleuralPressureForAirway(double time, Element
 /**
 * @param pMesh  the mesh for which to create acinar units.
 */
-void HiornsAirwayWallFactory::SetMesh(AbstractTetrahedralMesh<1,3>* pMesh)
+void HiornsAirwayWallFactory::SetMesh(AbstractTetrahedralMesh<1, 3>* pMesh)
 {
     AbstractAirwayWallFactory::SetMesh(pMesh);
 

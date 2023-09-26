@@ -42,16 +42,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Steady state linear heat equation. Has unit source term and identity
  * diffusion term.
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class SimplePoissonEquation : public AbstractLinearEllipticPde<ELEMENT_DIM,SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+class SimplePoissonEquation : public AbstractLinearEllipticPde<ELEMENT_DIM, SPACE_DIM>
 {
 public:
-    double ComputeConstantInUSourceTerm(const ChastePoint<SPACE_DIM>&, Element<ELEMENT_DIM,SPACE_DIM>* )
+    double ComputeConstantInUSourceTerm(const ChastePoint<SPACE_DIM>&, Element<ELEMENT_DIM, SPACE_DIM>* )
     {
         return 1.0;
     }
 
-    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<SPACE_DIM>&, Element<ELEMENT_DIM,SPACE_DIM>* )
+    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<SPACE_DIM>&, Element<ELEMENT_DIM, SPACE_DIM>* )
     {
         return 0.0;
     }

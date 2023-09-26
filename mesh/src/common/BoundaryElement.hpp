@@ -45,10 +45,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Concrete boundary element class which inherits from AbstractTetrahedralElement.
  *
- * A 'face' in Chaste is shorthand for BoundaryElement<2,3>
+ * A 'face' in Chaste is shorthand for BoundaryElement<2, 3>
  * i.e. a 2D boundary surface element on the edge of a 3D mesh.
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class BoundaryElement : public AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>
 {
 protected:

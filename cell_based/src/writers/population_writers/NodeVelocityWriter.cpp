@@ -187,12 +187,12 @@ void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
 }
 
 // Explicit instantiation
-template class NodeVelocityWriter<1,1>;
-template class NodeVelocityWriter<1,2>;
-template class NodeVelocityWriter<2,2>;
-template class NodeVelocityWriter<1,3>;
-template class NodeVelocityWriter<2,3>;
-template class NodeVelocityWriter<3,3>;
+template class NodeVelocityWriter<1, 1>;
+template class NodeVelocityWriter<1, 2>;
+template class NodeVelocityWriter<2, 2>;
+template class NodeVelocityWriter<1, 3>;
+template class NodeVelocityWriter<2, 3>;
+template class NodeVelocityWriter<3, 3>;
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer

@@ -257,7 +257,7 @@ public:
          * as in previous cell-based Chaste tutorials.
          */
         HoneycombMeshGenerator generator(7, 7);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -275,7 +275,7 @@ public:
         TS_ASSERT_EQUALS(population_satisfies_bc, false);
 
         std::map<Node<2>*, c_vector<double, 2> > old_node_locations;
-        for (AbstractMesh<2,2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
+        for (AbstractMesh<2, 2>::NodeIterator node_iter = p_mesh->GetNodeIteratorBegin();
                 node_iter != p_mesh->GetNodeIteratorEnd();
                 ++node_iter)
         {
@@ -326,7 +326,7 @@ public:
     {
         /* Once again we create a {{{MeshBasedCellPopulation}}}. */
         HoneycombMeshGenerator generator(7, 7, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;

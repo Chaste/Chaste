@@ -68,17 +68,17 @@ private:
 
     LinearSystem* mpLinearSystem;
     QuadraticMesh<DIM>* mpQuadMesh;
-    BoundaryConditionsContainer<DIM,DIM,1>* mpBoundaryConditions;
+    BoundaryConditionsContainer<DIM, DIM, 1>* mpBoundaryConditions;
     GaussianQuadratureRule<DIM>* mpQuadRule;
 
     static const unsigned NUM_BASES_PER_ELEMENT = (DIM+1)*(DIM+2)/2;
     static const unsigned STENCIL_SIZE = NUM_BASES_PER_ELEMENT; // multiplied by PROBLEM_DIM
 
-    virtual void AssembleOnElement( Element<DIM, DIM>& rElement,
-                                    c_matrix<double, STENCIL_SIZE, STENCIL_SIZE >& rAElem,
-                                    c_vector<double, STENCIL_SIZE>& rBElem,
-                                    bool assembleVector,
-                                    bool assembleMatrix)
+    virtual void AssembleOnElement(Element<DIM, DIM>& rElement,
+                                   c_matrix<double, STENCIL_SIZE, STENCIL_SIZE >& rAElem,
+                                   c_vector<double, STENCIL_SIZE>& rBElem,
+                                   bool assembleVector,
+                                   bool assembleMatrix)
     {
         /**
          * \todo This assumes that the Jacobian is constant on an element.
@@ -122,8 +122,8 @@ private:
             // Where applicable, u will be set to the value of the current solution at x
             ChastePoint<DIM> x(0,0,0);
 
-            c_vector<double,1> u = zero_vector<double>(1);
-            c_matrix<double,1,DIM> grad_u = zero_matrix<double>(1,DIM);
+            c_vector<double, 1> u = zero_vector<double>(1);
+            c_matrix<double, 1, DIM> grad_u = zero_matrix<double>(1, DIM);
             double wJ = jacobian_determinant * mpQuadRule->GetWeight(quad_index);
 
             // Create rAElem and rBElem
@@ -142,9 +142,9 @@ private:
         c_vector<double, NUM_BASES_PER_ELEMENT>& rPhi,
         c_matrix<double, DIM, NUM_BASES_PER_ELEMENT>& rGradPhi,
         ChastePoint<DIM>& rX,
-        c_vector<double,1>& rU,
-        c_matrix<double,1,DIM>& rGradU,
-        Element<DIM,DIM>* pElement)
+        c_vector<double, 1>& rU,
+        c_matrix<double, 1, DIM>& rGradU,
+        Element<DIM, DIM>* pElement)
     {
             return   prod( trans(rGradPhi), rGradPhi )
                    - mCoeffOfU*outer_prod(rPhi, rPhi);
@@ -154,9 +154,9 @@ private:
         c_vector<double, NUM_BASES_PER_ELEMENT>& rPhi,
         c_matrix<double, DIM, NUM_BASES_PER_ELEMENT>& rGradPhi,
         ChastePoint<DIM>& rX,
-        c_vector<double,1>& rU,
-        c_matrix<double,1,DIM>& rGradU,
-        Element<DIM,DIM>* pElement)
+        c_vector<double, 1>& rU,
+        c_matrix<double, 1, DIM>& rGradU,
+        Element<DIM, DIM>* pElement)
     {
         return mConstant * rPhi;
     }
@@ -185,7 +185,7 @@ private:
              iter != mpQuadMesh->GetElementIteratorEnd();
              ++iter)
         {
-            Element<DIM,DIM>& element = *iter;
+            Element<DIM, DIM>& element = *iter;
 
             if (element.GetOwnership() == true)
             {
@@ -237,7 +237,7 @@ private:
 
 public:
     QuadraticLaplacianAssemblerSolver(QuadraticMesh<DIM>* pMesh,
-                                      BoundaryConditionsContainer<DIM,DIM,1>* pBcc)
+                                      BoundaryConditionsContainer<DIM, DIM, 1>* pBcc)
         : mpQuadMesh(pMesh),
           mpBoundaryConditions(pBcc)
     {
@@ -280,10 +280,10 @@ public:
     void TestSolveLaplacianWithQuadratics1d()
     {
         QuadraticMesh<1> quad_mesh;
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements_quadratic",2,1,false);
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements_quadratic", 2, 1, false);
         quad_mesh.ConstructFromMeshReader(mesh_reader);
 
-        BoundaryConditionsContainer<1,1,1> bcc;
+        BoundaryConditionsContainer<1, 1, 1> bcc;
         bcc.DefineZeroDirichletOnMeshBoundary(&quad_mesh);
 
         QuadraticLaplacianAssemblerSolver<1> solver(&quad_mesh, &bcc);
@@ -308,10 +308,10 @@ public:
     {
         // Solve using quadratics..
         QuadraticMesh<2> quad_mesh;
-        TrianglesMeshReader<2,2> mesh_reader1("mesh/test/data/square_128_elements_quadratic",2,1,false);
+        TrianglesMeshReader<2, 2> mesh_reader1("mesh/test/data/square_128_elements_quadratic", 2, 1, false);
         quad_mesh.ConstructFromMeshReader(mesh_reader1);
 
-        BoundaryConditionsContainer<2,2,1> bcc_quads;
+        BoundaryConditionsContainer<2, 2, 1> bcc_quads;
         bcc_quads.DefineZeroDirichletOnMeshBoundary(&quad_mesh);
 
         QuadraticLaplacianAssemblerSolver<2> solver_quads(&quad_mesh, &bcc_quads);
@@ -321,17 +321,17 @@ public:
         ReplicatableVector sol_quads_repl(solution_quads);
 
         // Solve using linears
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
 
-        TetrahedralMesh<2,2> mesh;
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         EllipticPdeWithLinearSource<2> pde(1.0, 1.0);
 
-        BoundaryConditionsContainer<2,2,1> bcc_lin;
+        BoundaryConditionsContainer<2, 2, 1> bcc_lin;
         bcc_lin.DefineZeroDirichletOnMeshBoundary(&mesh);
 
-        SimpleLinearEllipticSolver<2,2> solver_lin(&mesh,&pde,&bcc_lin);
+        SimpleLinearEllipticSolver<2, 2> solver_lin(&mesh,&pde,&bcc_lin);
 
         Vec solution_lin = solver_lin.Solve();
         ReplicatableVector sol_lin_repl(solution_lin);
@@ -366,10 +366,10 @@ public:
     {
         // Solve using quadratics..
         QuadraticMesh<2> quad_mesh;
-        TrianglesMeshReader<2,2> mesh_reader1("mesh/test/data/square_128_elements_quadratic_reordered",2,1,false);
+        TrianglesMeshReader<2, 2> mesh_reader1("mesh/test/data/square_128_elements_quadratic_reordered",2,1,false);
         quad_mesh.ConstructFromMeshReader(mesh_reader1);
 
-        BoundaryConditionsContainer<2,2,1> bcc_quads;
+        BoundaryConditionsContainer<2, 2, 1> bcc_quads;
         bcc_quads.DefineZeroDirichletOnMeshBoundary(&quad_mesh);
 
         QuadraticLaplacianAssemblerSolver<2> solver_quads(&quad_mesh, &bcc_quads);
@@ -379,17 +379,17 @@ public:
         ReplicatableVector sol_quads_repl(solution_quads);
 
         // Solve using linears
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
 
-        TetrahedralMesh<2,2> mesh;
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         EllipticPdeWithLinearSource<2> pde(1.0, 1.0);
 
-        BoundaryConditionsContainer<2,2,1> bcc_lin;
+        BoundaryConditionsContainer<2, 2, 1> bcc_lin;
         bcc_lin.DefineZeroDirichletOnMeshBoundary(&mesh);
 
-        SimpleLinearEllipticSolver<2,2> solver_lin(&mesh,&pde,&bcc_lin);
+        SimpleLinearEllipticSolver<2, 2> solver_lin(&mesh,&pde,&bcc_lin);
 
         Vec solution_lin = solver_lin.Solve();
         ReplicatableVector sol_lin_repl(solution_lin);
@@ -432,10 +432,10 @@ public:
     {
         // Solve using quadratics
         QuadraticMesh<3> quad_mesh;
-        TrianglesMeshReader<3,3> mesh_reader1("mesh/test/data/cube_1626_elements_quadratic",2,1,false);
+        TrianglesMeshReader<3, 3> mesh_reader1("mesh/test/data/cube_1626_elements_quadratic", 2, 1, false);
         quad_mesh.ConstructFromMeshReader(mesh_reader1);
 
-        BoundaryConditionsContainer<3,3,1> bcc_quads;
+        BoundaryConditionsContainer<3, 3, 1> bcc_quads;
         bcc_quads.DefineZeroDirichletOnMeshBoundary(&quad_mesh);
 
         QuadraticLaplacianAssemblerSolver<3> solver_quads(&quad_mesh, &bcc_quads);
@@ -445,16 +445,16 @@ public:
         ReplicatableVector sol_quads_repl(solution_quads);
 
         // Solve using linears
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_1626_elements");
-        TetrahedralMesh<3,3> mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_1626_elements");
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         EllipticPdeWithLinearSource<3> pde(1.0, 1.0);
 
-        BoundaryConditionsContainer<3,3,1> bcc_lin;
+        BoundaryConditionsContainer<3, 3, 1> bcc_lin;
         bcc_lin.DefineZeroDirichletOnMeshBoundary(&mesh);
 
-        SimpleLinearEllipticSolver<3,3> solver_lin(&mesh,&pde,&bcc_lin);
+        SimpleLinearEllipticSolver<3, 3> solver_lin(&mesh,&pde,&bcc_lin);
 
         Vec solution_lin = solver_lin.Solve();
         ReplicatableVector sol_lin_repl(solution_lin);

@@ -105,12 +105,12 @@ void CellProliferativePhasesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
 }
 
 // Explicit instantiation
-template class CellProliferativePhasesCountWriter<1,1>;
-template class CellProliferativePhasesCountWriter<1,2>;
-template class CellProliferativePhasesCountWriter<2,2>;
-template class CellProliferativePhasesCountWriter<1,3>;
-template class CellProliferativePhasesCountWriter<2,3>;
-template class CellProliferativePhasesCountWriter<3,3>;
+template class CellProliferativePhasesCountWriter<1, 1>;
+template class CellProliferativePhasesCountWriter<1, 2>;
+template class CellProliferativePhasesCountWriter<2, 2>;
+template class CellProliferativePhasesCountWriter<1, 3>;
+template class CellProliferativePhasesCountWriter<2, 3>;
+template class CellProliferativePhasesCountWriter<3, 3>;
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer

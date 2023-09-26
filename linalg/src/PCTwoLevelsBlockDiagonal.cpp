@@ -125,7 +125,7 @@ void PCTwoLevelsBlockDiagonal::PCTwoLevelsBlockDiagonalCreate(KSP& rKspObject, s
 
     IS A22_bath_rows;
     PetscInt* phi_e_bath_rows = new PetscInt[rBathNodes.size()];
-    for (unsigned index=0; index<rBathNodes.size(); index++)
+    for (unsigned index = 0; index<rBathNodes.size(); index++)
     {
         phi_e_bath_rows[index] = 2*rBathNodes[index] + 1;
     }

@@ -56,7 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Parabolic PDEs are be derived from this (AbstractLinearParabolicPde)
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class AbstractLinearEllipticPde : public AbstractLinearPde<ELEMENT_DIM, SPACE_DIM>
 {
 private:
@@ -99,7 +99,7 @@ public:
      */
     virtual double ComputeConstantInUSourceTerm(
         const ChastePoint<SPACE_DIM>& rX,
-        Element<ELEMENT_DIM,SPACE_DIM>* pElement) = 0;
+        Element<ELEMENT_DIM, SPACE_DIM>* pElement) = 0;
 
     /**
      * @param rX The point in space
@@ -111,7 +111,7 @@ public:
      */
     virtual double ComputeLinearInUCoeffInSourceTerm(
         const ChastePoint<SPACE_DIM>& rX,
-        Element<ELEMENT_DIM,SPACE_DIM>* pElement) = 0;
+        Element<ELEMENT_DIM, SPACE_DIM>* pElement) = 0;
 
     /**
      * @param rX The point in space at which the diffusion term is computed
@@ -141,14 +141,14 @@ public:
         const Node<SPACE_DIM>& rNode);
 };
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double AbstractLinearEllipticPde<ELEMENT_DIM, SPACE_DIM>::ComputeConstantInUSourceTermAtNode(
     const Node<SPACE_DIM>& rNode)
 {
     return ComputeConstantInUSourceTerm(rNode.GetPoint(), nullptr);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double AbstractLinearEllipticPde<ELEMENT_DIM, SPACE_DIM>::ComputeLinearInUCoeffInSourceTermAtNode(
     const Node<SPACE_DIM>& rNode)
 {

@@ -82,7 +82,7 @@ void HeartConfigRelatedCellFactory<SPACE_DIM>::PreconvertCellmlFiles()
     {
         LoadDynamicModel(mDefaultIonicModel, true);
     }
-    for (unsigned i=0; i<mIonicModelsDefined.size(); ++i)
+    for (unsigned i = 0; i<mIonicModelsDefined.size(); ++i)
     {
         if (mIonicModelsDefined[i].Dynamic().present())
         {
@@ -380,7 +380,7 @@ void HeartConfigRelatedCellFactory<3u>::FillInCellularTransmuralAreas()
     info.DetermineLayerForEachNode(epi_fraction,endo_fraction);
     //get the big heterogeneity vector
     std::vector<unsigned> heterogeneity_node_list;
-    for (unsigned index=0; index<this->GetMesh()->GetNumNodes(); index++)
+    for (unsigned index = 0; index<this->GetMesh()->GetNumNodes(); index++)
     {
         heterogeneity_node_list.push_back(info.rGetLayerForEachNode()[index]);
     }
@@ -444,7 +444,7 @@ void HeartConfigRelatedCellFactory<3u>::FillInCellularTransmuralAreas()
     //figure out who goes first
 
     //loop three times
-    for (unsigned layer_index=0; layer_index<3; layer_index++)
+    for (unsigned layer_index = 0; layer_index<3; layer_index++)
     {
         unsigned counter = 0;
         //find the corresponding index

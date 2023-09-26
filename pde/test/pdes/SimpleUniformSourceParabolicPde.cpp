@@ -35,7 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "SimpleUniformSourceParabolicPde.hpp"
 
-template <unsigned DIM>
+template<unsigned DIM>
 SimpleUniformSourceParabolicPde<DIM>::SimpleUniformSourceParabolicPde(double coefficient)
     : mCoefficient(coefficient)
 {
@@ -48,13 +48,13 @@ double SimpleUniformSourceParabolicPde<DIM>::GetCoefficient() const
 }
 
 template<unsigned DIM>
-double SimpleUniformSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM,DIM>* pElement)
+double SimpleUniformSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM, DIM>* pElement)
 {
     return mCoefficient;
 }
 
 template<unsigned DIM>
-c_matrix<double,DIM,DIM> SimpleUniformSourceParabolicPde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
+c_matrix<double, DIM, DIM> SimpleUniformSourceParabolicPde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM, DIM>* pElement)
 {
     return identity_matrix<double>(DIM);
 }

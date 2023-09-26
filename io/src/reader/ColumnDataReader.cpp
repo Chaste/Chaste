@@ -368,7 +368,7 @@ void ColumnDataReader::ReadValueFromFile(const std::string& rFilename, int col, 
         EXCEPTION("Couldn't open data file");
     }
     std::string variable_values;
-    for (int i=0; i<row+1; ++i)
+    for (int i = 0; i<row+1; ++i)
     {
         std::getline(datafile, variable_values);
     }

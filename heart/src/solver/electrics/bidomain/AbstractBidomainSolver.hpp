@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  implement SetupLinearSystem()
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class AbstractBidomainSolver : public AbstractDynamicLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,2>
+class AbstractBidomainSolver : public AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 2>
 {
 protected:
     /** Whether the simulation involves a perfusing bath */
@@ -56,7 +56,7 @@ protected:
     BidomainTissue<SPACE_DIM>* mpBidomainTissue;
 
     /** Boundary conditions */
-    BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,2>* mpBoundaryConditions;
+    BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 2>* mpBoundaryConditions;
 
     /** Used when intialising null-space solver to resolve singularity*/
     bool mNullSpaceCreated;
@@ -157,9 +157,9 @@ public:
      * @param pBoundaryConditions  pointer to the boundary conditions container
      */
     AbstractBidomainSolver(bool bathSimulation,
-                           AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
+                           AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
                            BidomainTissue<SPACE_DIM>* pTissue,
-                           BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,2>* pBoundaryConditions);
+                           BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 2>* pBoundaryConditions);
 
     /**
      *  Destructor
@@ -189,7 +189,7 @@ public:
     /**
      *  @return the boundary conditions being used
      */
-    BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,2>* GetBoundaryConditions()
+    BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 2>* GetBoundaryConditions()
     {
         return mpBoundaryConditions;
     }
@@ -199,7 +199,7 @@ public:
      *  the old bcc pointer.
      *  @param pBcc The new boundary conditions container.
      */
-    void ResetBoundaryConditionsContainer(BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,2>* pBcc)
+    void ResetBoundaryConditionsContainer(BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 2>* pBcc)
     {
         assert(pBcc);
         mpBoundaryConditions = pBcc;

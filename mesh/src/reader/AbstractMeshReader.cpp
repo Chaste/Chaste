@@ -371,10 +371,10 @@ void AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>::NodeIterator::CacheData(unsigne
 }
 
 // Explicit instantiation
-template class AbstractMeshReader<0,1>;
-template class AbstractMeshReader<1,1>;
-template class AbstractMeshReader<1,2>;
-template class AbstractMeshReader<1,3>;
-template class AbstractMeshReader<2,2>;
-template class AbstractMeshReader<2,3>;
-template class AbstractMeshReader<3,3>;
+template class AbstractMeshReader<0, 1>;
+template class AbstractMeshReader<1, 1>;
+template class AbstractMeshReader<1, 2>;
+template class AbstractMeshReader<1, 3>;
+template class AbstractMeshReader<2, 2>;
+template class AbstractMeshReader<2, 3>;
+template class AbstractMeshReader<3, 3>;

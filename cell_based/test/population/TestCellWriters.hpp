@@ -137,7 +137,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create cell writer
-        CellAgesWriter<2,2> cell_writer;
+        CellAgesWriter<2, 2> cell_writer;
 
         // Test get and set methods
         TS_ASSERT_EQUALS(cell_writer.GetFileName(), "cellages.dat");
@@ -183,7 +183,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellAgesWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellAgesWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_cell_writer = new CellAgesWriter<2, 2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -194,7 +194,7 @@ public:
         }
 
         {
-            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_cell_writer_2;
 
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
@@ -244,7 +244,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create cell writer and output data for each cell to file
-        CellAncestorWriter<2,2> cell_writer;
+        CellAncestorWriter<2, 2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (auto cell_iter : cell_population)
@@ -277,7 +277,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellAncestorWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellAncestorWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_cell_writer = new CellAncestorWriter<2, 2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -288,7 +288,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_cell_writer_2;
 
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
@@ -308,7 +308,7 @@ public:
 
         // Create a regular vertex mesh
         HoneycombVertexMeshGenerator generator(2, 2);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create some cells, each with a cell-cycle model that incorporates a delta-notch ODE system
         std::vector<CellPtr> cells;
@@ -343,7 +343,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create cell writer and output data for each cell to file
-        CellDeltaNotchWriter<2,2> cell_writer;
+        CellDeltaNotchWriter<2, 2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (auto cell_iter : cell_population)
@@ -370,7 +370,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellDeltaNotchWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellDeltaNotchWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_cell_writer = new CellDeltaNotchWriter<2, 2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -381,7 +381,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_cell_writer_2;
 
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
@@ -401,7 +401,7 @@ public:
 
         // Create a regular vertex mesh
         HoneycombVertexMeshGenerator generator(2, 2);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         // Create some cells
         boost::shared_ptr<AbstractCellProperty> p_healthy_state(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
@@ -427,7 +427,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create cell writer and output data for each cell to file
-        CellDataItemWriter<2,2> cell_writer("test_variable");
+        CellDataItemWriter<2, 2> cell_writer("test_variable");
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (auto cell_iter : cell_population)
@@ -454,9 +454,9 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellDataItemWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellDataItemWriter<2,2>("test_variable");
+            AbstractCellBasedWriter<2, 2>* const p_cell_writer = new CellDataItemWriter<2, 2>("test_variable");
 
-            CellDataItemWriter<2,2>* p_static_cast_cell_writer = static_cast <CellDataItemWriter<2,2>* >(p_cell_writer);
+            CellDataItemWriter<2, 2>* p_static_cast_cell_writer = static_cast <CellDataItemWriter<2, 2>* >(p_cell_writer);
             TS_ASSERT_EQUALS(p_static_cast_cell_writer->GetVtkCellDataName(), "CellData test_variable");
 
             std::ofstream ofs(archive_filename.c_str());
@@ -468,7 +468,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_cell_writer_2;
 
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
@@ -476,7 +476,7 @@ public:
             input_arch >> p_cell_writer_2;
 
             // Check the member variables have been updated properly
-            CellDataItemWriter<2,2>* p_static_cast_cell_writer = static_cast <CellDataItemWriter<2,2>* >(p_cell_writer_2);
+            CellDataItemWriter<2, 2>* p_static_cast_cell_writer = static_cast <CellDataItemWriter<2, 2>* >(p_cell_writer_2);
             TS_ASSERT_EQUALS(p_static_cast_cell_writer->GetVtkCellDataName(), "CellData test_variable");
 
             delete p_cell_writer_2;
@@ -526,7 +526,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create cell writer and output data for each cell to file
-        CellIdWriter<2,2> cell_writer;
+        CellIdWriter<2, 2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (auto cell_iter : cell_population)
@@ -560,7 +560,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellIdWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellIdWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_cell_writer = new CellIdWriter<2, 2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -571,7 +571,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_cell_writer_2;
 
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
@@ -619,7 +619,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create cell writer and output data for each cell to file
-        CellLabelWriter<2,2> cell_writer;
+        CellLabelWriter<2, 2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (auto cell_iter : cell_population)
@@ -652,7 +652,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellLabelWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellLabelWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_cell_writer = new CellLabelWriter<2, 2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -663,7 +663,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_cell_writer_2;
 
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
@@ -701,7 +701,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create cell writer and output data for each cell to file
-        CellLocationIndexWriter<2,2> cell_writer;
+        CellLocationIndexWriter<2, 2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (auto cell_iter : cell_population)
@@ -729,7 +729,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellLocationIndexWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellLocationIndexWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_cell_writer = new CellLocationIndexWriter<2, 2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -740,7 +740,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_cell_writer_2;
 
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
@@ -793,7 +793,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create cell writer and output data for each cell to file
-        CellMutationStatesWriter<2,2> cell_writer;
+        CellMutationStatesWriter<2, 2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (auto cell_iter : cell_population)
@@ -826,7 +826,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellMutationStatesWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellMutationStatesWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_cell_writer = new CellMutationStatesWriter<2, 2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -837,7 +837,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_cell_writer_2;
 
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
@@ -884,7 +884,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create cell writer and output data for each cell to file
-        CellProliferativePhasesWriter<2,2> cell_writer;
+        CellProliferativePhasesWriter<2, 2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (auto cell_iter : cell_population)
@@ -917,7 +917,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellProliferativePhasesWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellProliferativePhasesWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_cell_writer = new CellProliferativePhasesWriter<2, 2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -928,7 +928,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_cell_writer_2;
 
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
@@ -990,7 +990,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create cell writer and output data for each cell to file
-        CellProliferativeTypesWriter<2,2> cell_writer;
+        CellProliferativeTypesWriter<2, 2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (auto other_cell_iter : cell_population)
@@ -1024,7 +1024,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellProliferativeTypesWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellProliferativeTypesWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_cell_writer = new CellProliferativeTypesWriter<2, 2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -1035,7 +1035,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_cell_writer_2;
 
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
@@ -1098,7 +1098,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create cell writer and output data for each cell to file
-        LegacyCellProliferativeTypesWriter<2,2> cell_writer;
+        LegacyCellProliferativeTypesWriter<2, 2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (auto other_cell_iter : cell_population)
@@ -1132,7 +1132,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "LegacyCellProliferativeTypesWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new LegacyCellProliferativeTypesWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_cell_writer = new LegacyCellProliferativeTypesWriter<2, 2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -1143,7 +1143,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_cell_writer_2;
 
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
@@ -1196,7 +1196,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create cell writer and output data for each cell to file
-        CellCycleModelProteinConcentrationsWriter<2,2> cell_writer;
+        CellCycleModelProteinConcentrationsWriter<2, 2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (auto cell_iter : cell_population)
@@ -1257,7 +1257,7 @@ public:
         OutputFileHandler output_file_handler(output_directory, false);
 
         // Create cell writer and output data for each cell to file
-        CellCycleModelProteinConcentrationsWriter<2,2> cell_writer;
+        CellCycleModelProteinConcentrationsWriter<2, 2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         auto cell_iter = cell_population.Begin();
@@ -1279,7 +1279,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellCycleModelProteinConcentrationsWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellCycleModelProteinConcentrationsWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_cell_writer = new CellCycleModelProteinConcentrationsWriter<2, 2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -1290,7 +1290,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_cell_writer_2;
 
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
@@ -1310,7 +1310,7 @@ public:
 
         // Create a simple vertex-based cell population
         HoneycombVertexMeshGenerator generator(4, 6);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
@@ -1325,7 +1325,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create cell writer and output data for each cell to file
-        CellVolumesWriter<2,2> cell_writer;
+        CellVolumesWriter<2, 2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (auto cell_iter : cell_population)
@@ -1352,7 +1352,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellVolumesWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellVolumesWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_cell_writer = new CellVolumesWriter<2, 2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -1363,7 +1363,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_cell_writer_2;
 
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
@@ -1470,7 +1470,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellRosetteRankWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellRosetteRankWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_cell_writer = new CellRosetteRankWriter<2, 2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -1481,7 +1481,7 @@ public:
         }
         PetscTools::Barrier(); //Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_cell_writer_2;
 
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
@@ -1528,7 +1528,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create cell writer and output data for each cell to file
-        CellRadiusWriter<2,2> cell_writer;
+        CellRadiusWriter<2, 2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (auto cell_iter : cell_population)
@@ -1561,7 +1561,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellRadiusWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellRadiusWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_cell_writer = new CellRadiusWriter<2, 2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -1572,7 +1572,7 @@ public:
         }
         PetscTools::Barrier(); // Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_cell_writer_2;
 
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
@@ -1617,7 +1617,7 @@ public:
         std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
 
         // Create cell writer and output data for each cell to file
-        CellAppliedForceWriter<2,2> cell_writer;
+        CellAppliedForceWriter<2, 2> cell_writer;
         cell_writer.OpenOutputFile(output_file_handler);
         cell_writer.WriteTimeStamp();
         for (auto cell_iter : cell_population)
@@ -1658,7 +1658,7 @@ public:
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "CellRadiusWriter.arch";
 
         {
-            AbstractCellBasedWriter<2,2>* const p_cell_writer = new CellAppliedForceWriter<2,2>();
+            AbstractCellBasedWriter<2, 2>* const p_cell_writer = new CellAppliedForceWriter<2, 2>();
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -1669,7 +1669,7 @@ public:
         }
         PetscTools::Barrier(); // Processes read after last process has (over-)written archive
         {
-            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+            AbstractCellBasedWriter<2, 2>* p_cell_writer_2;
 
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
@@ -1686,7 +1686,7 @@ public:
         // outputting vectors
         EXIT_IF_PARALLEL;
 
-        CellRadiusWriter<2,2> cell_writer;
+        CellRadiusWriter<2, 2> cell_writer;
 
         TS_ASSERT_EQUALS(cell_writer.GetVtkVectorCellDataName(), "DefaultVtkVectorCellDataName");
         TS_ASSERT(cell_writer.GetOutputScalarData());
@@ -1725,7 +1725,7 @@ public:
         // outputting scalars
         EXIT_IF_PARALLEL;
 
-        CellAppliedForceWriter<2,2> cell_writer;
+        CellAppliedForceWriter<2, 2> cell_writer;
 
         TS_ASSERT_EQUALS(cell_writer.GetVtkCellDataName(), "DefaultVtkCellDataName");
         TS_ASSERT(!cell_writer.GetOutputScalarData());

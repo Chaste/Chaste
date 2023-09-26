@@ -330,15 +330,13 @@ public:
     void RemoveCellProperty()
     {
         bool cell_has_property = false;
-
-        for (auto property_iter = mCellPropertyCollection.Begin();
-             property_iter != mCellPropertyCollection.End();
-             ++property_iter)
+        
+        for (const auto& property_iter : mCellPropertyCollection)
         {
-            if ((*property_iter)->IsType<CLASS>())
+            if (property_iter->IsType<CLASS>())
             {
                 cell_has_property = true;
-                (*property_iter)->DecrementCellCount();
+                property_iter->DecrementCellCount();
                 break;
             }
         }

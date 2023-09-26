@@ -104,7 +104,7 @@ public:
      *     collectively.
      */
     double Calculate(
-        AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,
+        AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
         Vec solution);
 
     /**
@@ -152,8 +152,8 @@ double AbstractFunctionalCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Calcul
 
         // Location of the Gauss point in the original element will be stored in x
         ChastePoint<SPACE_DIM> x(0,0,0);
-        c_vector<double,PROBLEM_DIM> u = zero_vector<double>(PROBLEM_DIM);
-        c_matrix<double,PROBLEM_DIM,SPACE_DIM> grad_u = zero_matrix<double>(PROBLEM_DIM,SPACE_DIM);
+        c_vector<double, PROBLEM_DIM> u = zero_vector<double>(PROBLEM_DIM);
+        c_matrix<double, PROBLEM_DIM, SPACE_DIM> grad_u = zero_matrix<double>(PROBLEM_DIM, SPACE_DIM);
 
         for (unsigned i = 0; i < num_nodes; ++i)
         {
@@ -198,7 +198,7 @@ double AbstractFunctionalCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Calcul
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 double AbstractFunctionalCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Calculate(
-    AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh, Vec solution)
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh, Vec solution)
 {
     if constexpr (ELEMENT_DIM == SPACE_DIM)
     {
@@ -248,7 +248,7 @@ double AbstractFunctionalCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Calcul
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 bool AbstractFunctionalCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::ShouldSkipThisElement(
-    Element<ELEMENT_DIM,SPACE_DIM>& rElement)
+    Element<ELEMENT_DIM, SPACE_DIM>& rElement)
 {
     return false;
 }

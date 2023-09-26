@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         if (rMeshReader.IsFileFormatBinary()) {                   \
             rMeshReader.methNameDirect(index - 1u);               \
         } else {                                                  \
-            for (unsigned i=0; i<index-1u; ++i) {                 \
+            for (unsigned i = 0; i<index-1u; ++i) {                 \
                 rMeshReader.methNameIncrement();                  \
     } } }
 
@@ -53,7 +53,7 @@ void SeekToBoundaryElement(AbstractMeshReader<ELEMENT_DIM, SPACE_DIM>& rMeshRead
 
 template<unsigned DIM>
 void QuadraticMeshHelper<DIM>::AddInternalNodesToElements(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
-                                                          AbstractMeshReader<DIM,DIM>* pMeshReader)
+                                                          AbstractMeshReader<DIM, DIM>* pMeshReader)
 {
     assert(pMesh);
     assert(pMeshReader);
@@ -80,7 +80,7 @@ void QuadraticMeshHelper<DIM>::AddInternalNodesToElements(AbstractTetrahedralMes
         {
             std::vector<unsigned> nodes = iter->NodeIndices;
             assert(nodes.size()==(DIM+1)*(DIM+2)/2);
-            Element<DIM,DIM>* p_element = pMesh->GetElement(iter.GetIndex());
+            Element<DIM, DIM>* p_element = pMesh->GetElement(iter.GetIndex());
             assert(p_element->GetNumNodes()==DIM+1); // Element is initially linear
 
             // Add extra nodes to make it a quad element
@@ -102,7 +102,7 @@ void QuadraticMeshHelper<DIM>::AddInternalNodesToElements(AbstractTetrahedralMes
 
 template<unsigned DIM>
 void QuadraticMeshHelper<DIM>::AddInternalNodesToBoundaryElements(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
-                                                                  AbstractMeshReader<DIM,DIM>* pMeshReader)
+                                                                  AbstractMeshReader<DIM, DIM>* pMeshReader)
 {
     assert(pMesh);
     assert(pMeshReader);
@@ -126,7 +126,7 @@ void QuadraticMeshHelper<DIM>::AddInternalNodesToBoundaryElements(AbstractTetrah
 
 template<unsigned DIM>
 void QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
-                                                          AbstractMeshReader<DIM,DIM>* pMeshReader)
+                                                          AbstractMeshReader<DIM, DIM>* pMeshReader)
  {
     // Loop over all boundary elements, find the equivalent face from all
     // the elements, and add the extra nodes to the boundary element
@@ -186,14 +186,14 @@ void QuadraticMeshHelper<DIM>::AddNodesToBoundaryElements(AbstractTetrahedralMes
                     while (face_index >= next_face_on_file);
                 }
 
-                Element<DIM,DIM>* p_element = pMesh->GetElement(elem_index);
+                Element<DIM, DIM>* p_element = pMesh->GetElement(elem_index);
 
                 // For each element, loop over faces (the opposites to a node)
-                for (unsigned face=0; face<DIM+1; face++)
+                for (unsigned face = 0; face<DIM+1; face++)
                 {
                     // Collect the node indices for this face
                     std::set<unsigned> node_indices;
-                    for (unsigned local_node_index=0; local_node_index<DIM+1; local_node_index++)
+                    for (unsigned local_node_index = 0; local_node_index<DIM+1; local_node_index++)
                     {
                         if (local_node_index != face)
                         {
@@ -257,7 +257,7 @@ void QuadraticMeshHelper<DIM>::CheckBoundaryElements(AbstractTetrahedralMesh<DIM
 template<unsigned DIM>
 void QuadraticMeshHelper<DIM>::AddNodeToBoundaryElement(
     [[maybe_unused]] AbstractTetrahedralMesh<DIM, DIM>* pMesh,
-    [[maybe_unused]] BoundaryElement<DIM-1,DIM>* pBoundaryElement,
+    [[maybe_unused]] BoundaryElement<DIM-1, DIM>* pBoundaryElement,
     [[maybe_unused]] Node<DIM>* pNode)
 {
     if constexpr (DIM > 1)
@@ -280,8 +280,8 @@ void QuadraticMeshHelper<DIM>::AddNodeToBoundaryElement(
 template<unsigned DIM>
 void QuadraticMeshHelper<DIM>::AddNodeToBoundaryElement(
     [[maybe_unused]] AbstractTetrahedralMesh<DIM, DIM>* pMesh,
-    [[maybe_unused]] BoundaryElement<DIM-1,DIM>* pBoundaryElement,
-    [[maybe_unused]] Element<DIM,DIM>* pElement,
+    [[maybe_unused]] BoundaryElement<DIM-1, DIM>* pBoundaryElement,
+    [[maybe_unused]] Element<DIM, DIM>* pElement,
     unsigned internalNode)
 {
     if constexpr (DIM > 1)
@@ -300,8 +300,8 @@ void QuadraticMeshHelper<DIM>::AddNodeToBoundaryElement(
 template<unsigned DIM>
 void QuadraticMeshHelper<DIM>::AddExtraBoundaryNodes(
     [[maybe_unused]] AbstractTetrahedralMesh<DIM, DIM>* pMesh,
-    [[maybe_unused]] BoundaryElement<DIM-1,DIM>* pBoundaryElement,
-    [[maybe_unused]] Element<DIM,DIM>* pElement,
+    [[maybe_unused]] BoundaryElement<DIM-1, DIM>* pBoundaryElement,
+    [[maybe_unused]] Element<DIM, DIM>* pElement,
     unsigned nodeIndexOppositeToFace)
 {
     if constexpr (DIM != 1)
@@ -360,7 +360,7 @@ void QuadraticMeshHelper<DIM>::AddExtraBoundaryNodes(
 // LCOV_EXCL_START /// \todo These helper methods aren't properly covered
 template<unsigned DIM>
 void QuadraticMeshHelper<DIM>::HelperMethod1(unsigned boundaryElemNode0, unsigned boundaryElemNode1,
-                                             Element<DIM,DIM>* pElement,
+                                             Element<DIM, DIM>* pElement,
                                              unsigned node0, unsigned node1, unsigned node2,
                                              unsigned& rOffset,
                                              bool& rReverse)
@@ -412,8 +412,8 @@ void QuadraticMeshHelper<DIM>::HelperMethod1(unsigned boundaryElemNode0, unsigne
 // LCOV_EXCL_START /// \todo These helper methods aren't properly covered
 template<unsigned DIM>
 void QuadraticMeshHelper<DIM>::HelperMethod2(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
-                                             BoundaryElement<DIM-1,DIM>* pBoundaryElement,
-                                             Element<DIM,DIM>* pElement,
+                                             BoundaryElement<DIM-1, DIM>* pBoundaryElement,
+                                             Element<DIM, DIM>* pElement,
                                              unsigned internalNode0, unsigned internalNode1, unsigned internalNode2,
                                              unsigned offset,
                                              bool reverse)

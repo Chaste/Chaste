@@ -63,15 +63,15 @@ SchmidCostaExponentialLaw2d::SchmidCostaExponentialLaw2d()
     }
 }
 
-void SchmidCostaExponentialLaw2d::ComputeStressAndStressDerivative(c_matrix<double,2,2>& rC,
-                                                                   c_matrix<double,2,2>& rInvC,
+void SchmidCostaExponentialLaw2d::ComputeStressAndStressDerivative(c_matrix<double,2, 2>& rC,
+                                                                   c_matrix<double,2, 2>& rInvC,
                                                                    double                pressure,
-                                                                   c_matrix<double,2,2>& rT,
-                                                                   FourthOrderTensor<2,2,2,2>& rDTdE,
+                                                                   c_matrix<double,2, 2>& rT,
+                                                                   FourthOrderTensor<2, 2,2, 2>& rDTdE,
                                                                    bool                  computeDTdE)
 {
-    static c_matrix<double,2,2> C_transformed;
-    static c_matrix<double,2,2> invC_transformed;
+    static c_matrix<double,2, 2> C_transformed;
+    static c_matrix<double,2, 2> invC_transformed;
 
     // The material law parameters are set up assuming the fibre direction is (1,0,0)
     // and sheet direction is (0,1,0), so we have to transform C,inv(C),and T.
@@ -83,7 +83,7 @@ void SchmidCostaExponentialLaw2d::ComputeStressAndStressDerivative(c_matrix<doub
 
     // Compute T*
 
-    c_matrix<double,2,2> E = 0.5*(C_transformed - mIdentity);
+    c_matrix<double,2, 2> E = 0.5*(C_transformed - mIdentity);
 
     double QQ = 0;
     for (unsigned M = 0; M < 2; ++M)

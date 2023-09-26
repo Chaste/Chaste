@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ElectroMechanicsProblemDefinition.hpp"
 #include "AbstractContractionCellFactory.hpp"
 
-template <unsigned DIM>
+template<unsigned DIM>
 class ExampleContractionCellFactory : public AbstractContractionCellFactory<DIM>
 {
 public:
@@ -128,7 +128,7 @@ public:
 
         //2D square meshes for electrics and mechanics
         // create electrics mesh
-        TetrahedralMesh<2,2>* p_mesh_e = new TetrahedralMesh<2,2>();
+        TetrahedralMesh<2, 2>* p_mesh_e = new TetrahedralMesh<2, 2>();
         p_mesh_e->ConstructRegularSlabMesh(0.01, 0.1, 0.1);//width/no of ele, width, height
 
         // create mechanics mesh
@@ -165,7 +165,7 @@ public:
         problem_defn.SetDeformationAffectsElectrophysiology(false,true);
         //Solve the problem
         //2 is space dim, 1 is monodomain (2 would be bidomain)
-        CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
+        CardiacElectroMechanicsProblem<2, 1> problem(INCOMPRESSIBLE,
                                                     MONODOMAIN,
                                                     p_mesh_e,
                                                     p_mesh_m,
@@ -178,7 +178,7 @@ public:
         // We get the stretches directly as this test is a friend of CardiacElectroMechanicsProblem.
         std::vector<double> stretches = problem.mStretchesForEachMechanicsElement;
 
-        for (unsigned i=0; i<stretches.size(); ++i)
+        for (unsigned i = 0; i<stretches.size(); ++i)
         {
             c_vector<double, 2> centroid = p_mesh_m->GetElement(i)->CalculateCentroid();
 

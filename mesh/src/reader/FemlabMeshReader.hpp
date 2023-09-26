@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * (std::vector<double> GetNextNode(); etc) can be called to interrogate the
  * data
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class FemlabMeshReader : public AbstractCachedMeshReader<ELEMENT_DIM, SPACE_DIM>
 {
 private:

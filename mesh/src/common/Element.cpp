@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Implementation
 ///////////////////////////////////////////////////////////////////////////////////
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 Element<ELEMENT_DIM, SPACE_DIM>::Element(unsigned index, const std::vector<Node<SPACE_DIM>*>& rNodes, bool registerWithNodes)
     : AbstractTetrahedralElement<ELEMENT_DIM, SPACE_DIM>(index, rNodes)
 {
@@ -52,7 +52,7 @@ Element<ELEMENT_DIM, SPACE_DIM>::Element(unsigned index, const std::vector<Node<
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 Element<ELEMENT_DIM, SPACE_DIM>::Element(const Element& rElement, const unsigned index)
 {
     *this = rElement;
@@ -61,21 +61,21 @@ Element<ELEMENT_DIM, SPACE_DIM>::Element(const Element& rElement, const unsigned
     RegisterWithNodes();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void Element<ELEMENT_DIM, SPACE_DIM>::RegisterWithNodes()
 {
-    for (unsigned i=0; i<this->mNodes.size(); ++i)
+    for (unsigned i = 0; i<this->mNodes.size(); ++i)
     {
         this->mNodes[i]->AddElement(this->mIndex);
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void Element<ELEMENT_DIM, SPACE_DIM>::MarkAsDeleted()
 {
     this->mIsDeleted = true;
     // Update nodes in this element so they know they are not contained by us
-    for (unsigned i=0; i<this->GetNumNodes(); ++i)
+    for (unsigned i = 0; i<this->GetNumNodes(); ++i)
     {
         this->mNodes[i]->RemoveElement(this->mIndex);
     }
@@ -85,7 +85,7 @@ void Element<ELEMENT_DIM, SPACE_DIM>::MarkAsDeleted()
  *  @param rIndex is an local index to which node to change
  *  @param pNode is a pointer to the replacement node
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void Element<ELEMENT_DIM, SPACE_DIM>::UpdateNode(const unsigned& rIndex, Node<SPACE_DIM>* pNode)
 {
     assert(rIndex < this->mNodes.size());
@@ -100,11 +100,11 @@ void Element<ELEMENT_DIM, SPACE_DIM>::UpdateNode(const unsigned& rIndex, Node<SP
     this->mNodes[rIndex]->AddElement(this->mIndex);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void Element<ELEMENT_DIM, SPACE_DIM>::ResetIndex(unsigned index)
 {
     //std::cout << "ResetIndex - removing nodes.\n" << std::flush;
-    for (unsigned i=0; i<this->GetNumNodes(); ++i)
+    for (unsigned i = 0; i<this->GetNumNodes(); ++i)
     {
        //std::cout << "Node " << this->mNodes[i]->GetIndex() << " element "<< this->mIndex << std::flush;
        this->mNodes[i]->RemoveElement(this->mIndex);
@@ -114,8 +114,8 @@ void Element<ELEMENT_DIM, SPACE_DIM>::ResetIndex(unsigned index)
     RegisterWithNodes();
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double,SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateCircumsphere(c_matrix<double, SPACE_DIM, ELEMENT_DIM>& rJacobian, c_matrix<double, ELEMENT_DIM, SPACE_DIM>& rInverseJacobian)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+c_vector<double, SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateCircumsphere(c_matrix<double, SPACE_DIM, ELEMENT_DIM>& rJacobian, c_matrix<double, ELEMENT_DIM, SPACE_DIM>& rInverseJacobian)
 {
     /*Assuming that x0,y0.. is at the origin then we need to solve
      *
@@ -129,10 +129,10 @@ c_vector<double,SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateCircumsph
     {
         c_vector<double, ELEMENT_DIM> rhs;
 
-        for (unsigned j=0; j<ELEMENT_DIM; ++j)
+        for (unsigned j = 0; j<ELEMENT_DIM; ++j)
         {
             double squared_location=0.0;
-            for (unsigned i=0; i<SPACE_DIM; ++i)
+            for (unsigned i = 0; i<SPACE_DIM; ++i)
             {
                 //mJacobian(i,j) is the i-th component of j-th vertex (relative to vertex 0)
                 squared_location += rJacobian(i,j)*rJacobian(i,j);
@@ -144,7 +144,7 @@ c_vector<double,SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateCircumsph
         centre = prod(rhs, rInverseJacobian);
         c_vector<double, SPACE_DIM+1> circum;
         double squared_radius = 0.0;
-        for (unsigned i=0; i<SPACE_DIM; ++i)
+        for (unsigned i = 0; i<SPACE_DIM; ++i)
         {
             circum[i] = centre[i] + this->GetNodeLocation(0,i);
             squared_radius += centre[i]*centre[i];
@@ -164,7 +164,7 @@ c_vector<double,SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateCircumsph
  * volume of the shape and the volume of its circumsphere.
  * This is normalised by dividing through by the Platonic ratio.
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double Element<ELEMENT_DIM, SPACE_DIM>::CalculateQuality()
 {
     if constexpr (SPACE_DIM == ELEMENT_DIM)
@@ -210,13 +210,13 @@ double Element<ELEMENT_DIM, SPACE_DIM>::CalculateQuality()
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector <double, 2> Element<ELEMENT_DIM, SPACE_DIM>::CalculateMinMaxEdgeLengths()
 {
     c_vector <double, 2> min_max;
     min_max[0] = DBL_MAX; //Min initialised to very large
     min_max[1] = 0.0;     //Max initialised to zero
-    for (unsigned i=0; i<=ELEMENT_DIM; ++i)
+    for (unsigned i = 0; i<=ELEMENT_DIM; ++i)
     {
         c_vector<double, SPACE_DIM> loc_i = this->GetNodeLocation(i);
         for (unsigned j=i+1; j<=ELEMENT_DIM; ++j)
@@ -235,7 +235,7 @@ c_vector <double, 2> Element<ELEMENT_DIM, SPACE_DIM>::CalculateMinMaxEdgeLengths
     return min_max;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateInterpolationWeights(const ChastePoint<SPACE_DIM>& rTestPoint)
 {
     // Can only test if it's a tetrahedral mesh in 3d, triangles in 2d...
@@ -260,7 +260,7 @@ c_vector<double, SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateInterpol
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateInterpolationWeightsWithProjection(const ChastePoint<SPACE_DIM>& rTestPoint)
 {
     // Can only test if it's a tetrahedral mesh in 3d, triangles in 2d...
@@ -271,7 +271,7 @@ c_vector<double, SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateInterpol
         // Check for negative weights and set them to zero.
         bool negative_weight = false;
 
-        for (unsigned i=0; i<=SPACE_DIM; ++i)
+        for (unsigned i = 0; i<=SPACE_DIM; ++i)
         {
             if (weights[i] < 0.0)
             {
@@ -307,7 +307,7 @@ c_vector<double, SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateInterpol
     }
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> Element<ELEMENT_DIM, SPACE_DIM>::CalculateXi(const ChastePoint<SPACE_DIM>& rTestPoint)
 {
     // Can only test if it's a tetrahedral mesh in 3d, triangles in 2d...
@@ -335,7 +335,7 @@ c_vector<double, SPACE_DIM> Element<ELEMENT_DIM, SPACE_DIM>::CalculateXi(const C
 }
 
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool Element<ELEMENT_DIM, SPACE_DIM>::IncludesPoint(const ChastePoint<SPACE_DIM>& rTestPoint, bool strict)
 {
     // Can only test if it's a tetrahedral mesh in 3d, triangles in 2d...
@@ -345,7 +345,7 @@ bool Element<ELEMENT_DIM, SPACE_DIM>::IncludesPoint(const ChastePoint<SPACE_DIM>
 
         // If the point is in the simplex then all the weights should be positive.
 
-        for (unsigned i=0; i<=SPACE_DIM; ++i)
+        for (unsigned i = 0; i<=SPACE_DIM; ++i)
         {
             if (strict)
             {
@@ -373,9 +373,9 @@ bool Element<ELEMENT_DIM, SPACE_DIM>::IncludesPoint(const ChastePoint<SPACE_DIM>
 }
 
 // Explicit instantiation
-template class Element<1,1>;
-template class Element<1,2>;
-template class Element<1,3>;
-template class Element<2,2>;
-template class Element<2,3>;
-template class Element<3,3>;
+template class Element<1, 1>;
+template class Element<1, 2>;
+template class Element<1, 3>;
+template class Element<2, 2>;
+template class Element<2, 3>;
+template class Element<3, 3>;

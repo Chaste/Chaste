@@ -48,34 +48,34 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PetscSetupAndFinalize.hpp"
 
-typedef GmshMeshReader<2,2> READER_2D;
-typedef GmshMeshReader<3,3> READER_3D;
-typedef GmshMeshReader<2,3> READER_2D_3D;
+typedef GmshMeshReader<2, 2> READER_2D;
+typedef GmshMeshReader<3, 3> READER_3D;
+typedef GmshMeshReader<2, 3> READER_2D_3D;
 
 class TestGmshMeshReader : public CxxTest::TestSuite
 {
 public:
-    void TestFilesOpen(void)
+    void TestFilesOpen()
     {
         TS_ASSERT_THROWS_NOTHING(READER_2D("mesh/test/data/square_4_elements_gmsh.msh"));
         TS_ASSERT_THROWS_THIS(READER_2D("mesh/test/data/no_file.msh"),
                               "Could not open data file: mesh/test/data/no_file.msh");
     }
 
-    void TestCorrectVersion(void)
+    void TestCorrectVersion()
     {
        TS_ASSERT_THROWS_NOTHING(READER_2D("mesh/test/data/square_4_elements_gmsh.msh"));
        TS_ASSERT_THROWS_THIS(READER_2D("mesh/test/data/square_4_elements_bad_version.msh"),
                              "Only .msh version 2.2 files are supported.");
     }
 
-    void TestErrorIfMeshContainsNodesInWeirdElements(void)
+    void TestErrorIfMeshContainsNodesInWeirdElements()
     {
         TS_ASSERT_THROWS_THIS(READER_3D reader_3d("mesh/test/data/simple_cube_gmsh_bad.msh"),
                               "Unrecognised element types present in the .msh file: check mesh generation settings in gmsh.");
     }
 
-    void TestReadHeaders(void)
+    void TestReadHeaders()
     {
         //Linear meshes
         READER_2D reader("mesh/test/data/square_4_elements_gmsh.msh");
@@ -100,7 +100,7 @@ public:
         TS_ASSERT_EQUALS(quad_reader_3d.GetNumFaces(), 24u);
     }
 
-    void TestGetNextMethods(void)
+    void TestGetNextMethods()
     {
 
         READER_2D reader("mesh/test/data/square_4_elements_gmsh.msh");
@@ -186,10 +186,10 @@ public:
         TS_ASSERT_EQUALS(data.AttributeValue, 2u);
     }
 
-    void TestRead2dMeshes(void)
+    void TestRead2dMeshes()
     {
         READER_2D reader("mesh/test/data/square_4_elements_gmsh.msh");
-        TetrahedralMesh<2,2> mesh;
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(reader);
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 5u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 4u);
@@ -200,10 +200,10 @@ public:
         TS_ASSERT_DELTA(mesh.GetNode(4)->rGetLocation()[1], 0.5, 1e-15);
     }
 
-    void TestRead2d3dMeshes(void)
+    void TestRead2d3dMeshes()
     {
         READER_2D_3D reader("mesh/test/data/square_4_elements_nonplanar_gmsh.msh");  // As previous test, but the central node is elevated
-        TetrahedralMesh<2,3> mesh;
+        TetrahedralMesh<2, 3> mesh;
         mesh.ConstructFromMeshReader(reader);
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 5u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 4u);
@@ -215,7 +215,7 @@ public:
         TS_ASSERT_DELTA(mesh.GetNode(4)->rGetLocation()[2], 0.5, 1e-15);
     }
 
-    void TestRead2dQuadraticMeshes(void)
+    void TestRead2dQuadraticMeshes()
     {
        READER_2D reader("mesh/test/data/quad_square_4_elements_gmsh.msh",2,2);
        QuadraticMesh<2> mesh;
@@ -225,17 +225,17 @@ public:
        TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 4u);
     }
 
-    void TestRead3dMeshes(void)
+    void TestRead3dMeshes()
     {
         READER_3D reader("mesh/test/data/simple_cube_gmsh.msh");
-        TetrahedralMesh<3,3> mesh;
+        TetrahedralMesh<3, 3> mesh;
         mesh.ConstructFromMeshReader(reader);
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 14u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 24u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 24u);
     }
 
-    void TestRead3dQuadraticMeshes(void)
+    void TestRead3dQuadraticMeshes()
     {
        READER_3D reader("mesh/test/data/quad_cube_gmsh.msh",2,2);
        QuadraticMesh<3> mesh;

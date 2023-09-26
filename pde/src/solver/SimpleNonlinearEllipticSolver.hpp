@@ -43,7 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Solver of nonlinear elliptic PDEs.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class SimpleNonlinearEllipticSolver : public AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM,SPACE_DIM,1>
+class SimpleNonlinearEllipticSolver 
+    : public AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, 1>
 {
 private:
 
@@ -51,54 +52,57 @@ private:
     AbstractNonlinearEllipticPde<SPACE_DIM>* mpNonlinearEllipticPde;
 
     /**
-     * @return the matrix to be added to element stiffness matrix
-     * for a given Gauss point. The arguments are the bases, bases gradients,
-     * x and current solution computed at the Gauss point. The returned matrix
-     * will be multiplied by the Gauss weight and Jacobian determinant and
-     * added to the element stiffness matrix (see AssembleOnElement()).
+     * @return the matrix to be added to element stiffness matrix for a given 
+     * Gauss point. The arguments are the bases, bases gradients, x and current 
+     * solution computed at the Gauss point. The returned matrix will be 
+     * multiplied by the Gauss weight and Jacobian determinant and added to the 
+     * element stiffness matrix (see AssembleOnElement()).
      *
      * @param rPhi The basis functions, rPhi(i) = phi_i, i=1..numBases
      * @param rGradPhi Basis gradients, rGradPhi(i,j) = d(phi_j)/d(X_i)
      * @param rX The point in space
      * @param rU The unknown as a vector, u(i) = u_i
-     * @param rGradU The gradient of the unknown as a matrix, rGradU(i,j) = d(u_i)/d(X_j)
+     * @param rGradU The gradient of the unknown as a matrix, 
+     *     rGradU(i,j) = d(u_i)/d(X_j)
      * @param pElement Pointer to the element
      */
-    virtual c_matrix<double,1*(ELEMENT_DIM+1),1*(ELEMENT_DIM+1)> ComputeMatrixTerm(
+    virtual c_matrix<double, 1*(ELEMENT_DIM+1), 1*(ELEMENT_DIM+1)> ComputeMatrixTerm(
         c_vector<double, ELEMENT_DIM+1>& rPhi,
         c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi,
         ChastePoint<SPACE_DIM>& rX,
-        c_vector<double,1>& rU,
-        c_matrix<double,1,SPACE_DIM>& rGradU,
-        Element<ELEMENT_DIM,SPACE_DIM>* pElement);
+        c_vector<double, 1>& rU,
+        c_matrix<double, 1, SPACE_DIM>& rGradU,
+        Element<ELEMENT_DIM, SPACE_DIM>* pElement);
 
     /**
-     * @return the vector to be added to element stiffness vector
-     * for a given Gauss point. The arguments are the bases,
-     * x and current solution computed at the Gauss point. The returned vector
-     * will be multiplied by the Gauss weight and Jacobian determinant and
-     * added to the element stiffness matrix (see AssembleOnElement()).
+     * @return the vector to be added to element stiffness vector for a given 
+     * Gauss point. The arguments are the bases, x and current solution computed 
+     * at the Gauss point. The returned vector will be multiplied by the Gauss 
+     * weight and Jacobian determinant and added to the element stiffness matrix 
+     * (see AssembleOnElement()).
      *
      * @param rPhi The basis functions, rPhi(i) = phi_i, i=1..numBases
      * @param rGradPhi Basis gradients, rGradPhi(i,j) = d(phi_j)/d(X_i)
      * @param rX The point in space
      * @param rU The unknown as a vector, u(i) = u_i
-     * @param rGradU The gradient of the unknown as a matrix, rGradU(i,j) = d(u_i)/d(X_j)
+     * @param rGradU The gradient of the unknown as a matrix, 
+     *     rGradU(i,j) = d(u_i)/d(X_j)
      * @param pElement Pointer to the element
      */
-    virtual c_vector<double,1*(ELEMENT_DIM+1)> ComputeVectorTerm(
+    virtual c_vector<double, 1*(ELEMENT_DIM+1)> ComputeVectorTerm(
         c_vector<double, ELEMENT_DIM+1>& rPhi,
         c_matrix<double, SPACE_DIM, ELEMENT_DIM+1>& rGradPhi,
         ChastePoint<SPACE_DIM>& rX,
-        c_vector<double,1>& rU,
-        c_matrix<double,1,SPACE_DIM>& rGradU,
-        Element<ELEMENT_DIM,SPACE_DIM>* pElement);
+        c_vector<double, 1>& rU,
+        c_matrix<double, 1, SPACE_DIM>& rGradU,
+        Element<ELEMENT_DIM, SPACE_DIM>* pElement);
 
-
-    // Note: does not have to provide a ComputeVectorSurfaceTerm for surface integrals,
-    // the parent AbstractAssemblerSolverHybrid assumes natural Neumann BCs and uses a
-    // NaturalNeumannSurfaceTermAssembler for assembling this part of the vector.
-
+    /*
+     * Note: does not have to provide a ComputeVectorSurfaceTerm for surface 
+     * integrals; the parent AbstractAssemblerSolverHybrid assumes natural 
+     * Neumann BCs and uses a NaturalNeumannSurfaceTermAssembler for assembling 
+     * this part of the vector.
+     */
 
 public:
 
@@ -109,9 +113,10 @@ public:
      * @param pPde pointer to the PDE
      * @param pBoundaryConditions pointer to the boundary conditions
      */
-    SimpleNonlinearEllipticSolver(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
-                                  AbstractNonlinearEllipticPde<SPACE_DIM>* pPde,
-                                  BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 1>* pBoundaryConditions);
+    SimpleNonlinearEllipticSolver(
+        AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+        AbstractNonlinearEllipticPde<SPACE_DIM>* pPde,
+        BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 1>* pBoundaryConditions);
 };
 
 #endif /*SIMPLENONLINEARELLIPTICSOLVER_HPP_*/

@@ -89,9 +89,9 @@ double ComputeDW3dY(double X, double Y)
     return m*C_PARAM*pow(Q_PARAM,2*m-2)*A_PARAM*A_PARAM*2*Y/(lam*lam*lam*lam);
 }
 
-c_matrix<double,2,2> Compute1stPkStress(double X, double Y)
+c_matrix<double,2, 2> Compute1stPkStress(double X, double Y)
 {
-    c_matrix<double,2,2> S;
+    c_matrix<double,2, 2> S;
 
     double w3 = ComputeW3(X,Y);
     double lam = ComputeLambda(X);
@@ -104,7 +104,7 @@ c_matrix<double,2,2> Compute1stPkStress(double X, double Y)
     return S;
 }
 
-c_vector<double,2> MyBodyForce(c_vector<double,2>& rX, double t)
+c_vector<double, 2> MyBodyForce(c_vector<double, 2>& rX, double t)
 {
     assert(rX(0)>=0 && rX(0)<=1 && rX(1)>=0 && rX(1)<=1);
 
@@ -120,17 +120,17 @@ c_vector<double,2> MyBodyForce(c_vector<double,2>& rX, double t)
     double dS10dY = 2*(w3*a*q/(lam*lam) + a*rX(1)*q*dw3dY/(lam*lam));
     double dS11dY = 2*lam*dw3dY*q*q;
 
-    c_vector<double,2> body_force;
+    c_vector<double, 2> body_force;
     body_force(0) = -dS00dX-dS10dY;
     body_force(1) = -dS01dX-dS11dY;
     return body_force;
 }
 
-c_vector<double,2> MyTraction(c_vector<double,2>& rX, double t)
+c_vector<double, 2> MyTraction(c_vector<double, 2>& rX, double t)
 {
-    c_matrix<double,2,2> S = Compute1stPkStress(rX(0), rX(1));
+    c_matrix<double,2, 2> S = Compute1stPkStress(rX(0), rX(1));
 
-    c_vector<double,2> traction = zero_vector<double>(2);
+    c_vector<double, 2> traction = zero_vector<double>(2);
 
     if (fabs(rX(0)-1.0) <= 1e-12) //Right edge
     {
@@ -165,7 +165,7 @@ public:
     void TestAssembleSystem3D()
     {
         QuadraticMesh<3> mesh;
-        TrianglesMeshReader<3,3> mesh_reader1("mesh/test/data/3D_Single_tetrahedron_element_quadratic",2,1,false);
+        TrianglesMeshReader<3, 3> mesh_reader1("mesh/test/data/3D_Single_tetrahedron_element_quadratic",2,1,false);
 
         mesh.ConstructFromMeshReader(mesh_reader1);
 
@@ -339,7 +339,7 @@ public:
     void TestWithZeroDisplacement()
     {
         QuadraticMesh<2> mesh;
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1,false);
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1,false);
         mesh.ConstructFromMeshReader(mesh_reader);
 
         ToyCompressibleMaterialLaw<2> law(1.0, 0.0, -1.0);
@@ -358,7 +358,7 @@ public:
         TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 0u);
 
         // Get deformed position
-        std::vector<c_vector<double,2> >& r_deformed_position
+        std::vector<c_vector<double, 2> >& r_deformed_position
             = solver.rGetDeformedPosition();
 
         for (unsigned i = 0; i<r_deformed_position.size(); ++i)
@@ -411,32 +411,32 @@ public:
         CompressibleMooneyRivlinMaterialLaw<2> law(c, d);
 
         std::vector<unsigned> fixed_nodes;
-        std::vector<c_vector<double,2> > locations;
+        std::vector<c_vector<double, 2> > locations;
         for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
         {
             if (fabs(mesh.GetNode(i)->rGetLocation()[0]) < 1e-6)
             {
                 fixed_nodes.push_back(i);
-                c_vector<double,2> new_position;
+                c_vector<double, 2> new_position;
                 new_position(0) = 0;
                 new_position(1) = beta*mesh.GetNode(i)->rGetLocation()[1];
                 locations.push_back(new_position);
             }
         }
 
-        std::vector<BoundaryElement<1,2>*> boundary_elems;
-        std::vector<c_vector<double,2> > tractions;
-        c_vector<double,2> traction;
+        std::vector<BoundaryElement<1, 2>*> boundary_elems;
+        std::vector<c_vector<double, 2> > tractions;
+        c_vector<double, 2> traction;
         traction(0) = traction_value;
         traction(1) = 0;
-        for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
+        for (TetrahedralMesh<2, 2>::BoundaryElementIterator iter
               = mesh.GetBoundaryElementIteratorBegin();
             iter != mesh.GetBoundaryElementIteratorEnd();
             ++iter)
         {
             if (fabs((*iter)->CalculateCentroid()[0] - 1.0)<1e-4)
             {
-                BoundaryElement<1,2>* p_element = *iter;
+                BoundaryElement<1, 2>* p_element = *iter;
                 boundary_elems.push_back(p_element);
                 tractions.push_back(traction);
             }
@@ -504,7 +504,7 @@ public:
 
         solver.Solve();
 
-        std::vector<c_vector<double,2> >& r_solution = solver.rGetDeformedPosition();
+        std::vector<c_vector<double, 2> >& r_solution = solver.rGetDeformedPosition();
 
         for (unsigned i = 0; i<fixed_nodes.size(); ++i)
         {
@@ -589,8 +589,8 @@ public:
 
             std::vector<unsigned> fixed_nodes = NonlinearElasticityTools<2>::GetNodesByComponentValue(mesh,0,0);
 
-            std::vector<BoundaryElement<1,2>*> boundary_elems;
-            for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
+            std::vector<BoundaryElement<1, 2>*> boundary_elems;
+            for (TetrahedralMesh<2, 2>::BoundaryElementIterator iter
                   = mesh.GetBoundaryElementIteratorBegin();
                 iter != mesh.GetBoundaryElementIteratorEnd();
                 ++iter)
@@ -598,7 +598,7 @@ public:
                 // get all boundary elems except those on X=0
                 if (fabs((*iter)->CalculateCentroid()[0])>1e-6)
                 {
-                    BoundaryElement<1,2>* p_element = *iter;
+                    BoundaryElement<1, 2>* p_element = *iter;
                     boundary_elems.push_back(p_element);
                 }
             }
@@ -623,7 +623,7 @@ public:
 
             solver.Solve();
 
-            std::vector<c_vector<double,2> >& r_solution = solver.rGetDeformedPosition();
+            std::vector<c_vector<double, 2> >& r_solution = solver.rGetDeformedPosition();
 
             for (unsigned i = 0; i<mesh.GetNumNodes(); ++i)
             {
@@ -751,7 +751,7 @@ public:
         problem_defn.SetZeroDisplacementNodes(fixed_nodes);
 
         // works ok with g1 = -1,1,2,3. Doesn't newton converge for g1=-2, and gets worse as num_elem increases..
-        c_vector<double,2> gravity;
+        c_vector<double, 2> gravity;
         gravity(0) = 2.0;
         gravity(1) = 0.0;
         problem_defn.SetBodyForce(gravity);
@@ -774,7 +774,7 @@ public:
         assert( fabs(mesh.GetNode(5)->rGetLocation()[1] - 0.0) < 1e-8 );
 
 
-        std::vector<c_vector<double,2> >& r_solution = solver.rGetDeformedPosition();
+        std::vector<c_vector<double, 2> >& r_solution = solver.rGetDeformedPosition();
 
         TS_ASSERT_DELTA(r_solution[5](0), 1.0360, 1e-4);
         TS_ASSERT_DELTA(r_solution[5](1), 0.0021, 1e-4);
@@ -803,7 +803,7 @@ public:
         CompressibleMooneyRivlinMaterialLaw<2> law(c, d);
 
         std::vector<unsigned> fixed_nodes;
-        std::vector<c_vector<double,2> > locations;
+        std::vector<c_vector<double, 2> > locations;
 
         // fix node 0 (located at the origin) fully
         fixed_nodes.push_back(0);
@@ -815,26 +815,26 @@ public:
             if (fabs(mesh.GetNode(i)->rGetLocation()[0]) < 1e-6)
             {
                 fixed_nodes.push_back(i);
-                c_vector<double,2> new_position;
+                c_vector<double, 2> new_position;
                 new_position(0) = 0;
                 new_position(1) = SolidMechanicsProblemDefinition<2>::FREE;
                 locations.push_back(new_position);
             }
         }
 
-        std::vector<BoundaryElement<1,2>*> boundary_elems;
-        std::vector<c_vector<double,2> > tractions;
-        c_vector<double,2> traction;
+        std::vector<BoundaryElement<1, 2>*> boundary_elems;
+        std::vector<c_vector<double, 2> > tractions;
+        c_vector<double, 2> traction;
         traction(0) = traction_value;
         traction(1) = 0;
-        for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
+        for (TetrahedralMesh<2, 2>::BoundaryElementIterator iter
               = mesh.GetBoundaryElementIteratorBegin();
             iter != mesh.GetBoundaryElementIteratorEnd();
             ++iter)
         {
             if (fabs((*iter)->CalculateCentroid()[0] - 1.0)<1e-4)
             {
-                BoundaryElement<1,2>* p_element = *iter;
+                BoundaryElement<1, 2>* p_element = *iter;
                 boundary_elems.push_back(p_element);
                 tractions.push_back(traction);
             }
@@ -856,7 +856,7 @@ public:
 
         solver.Solve();
 
-        std::vector<c_vector<double,2> >& r_solution = solver.rGetDeformedPosition();
+        std::vector<c_vector<double, 2> >& r_solution = solver.rGetDeformedPosition();
 
         for (unsigned i = 0; i<fixed_nodes.size(); ++i)
         {
@@ -889,7 +889,7 @@ public:
         CompressibleMooneyRivlinMaterialLaw<3> law(1.0,1.0);
 
         std::vector<unsigned> fixed_nodes;
-        std::vector<c_vector<double,3> > locations;
+        std::vector<c_vector<double, 3> > locations;
 
         // fix node 0 (located at the origin) fully
         fixed_nodes.push_back(0);
@@ -901,7 +901,7 @@ public:
             if (fabs(mesh.GetNode(i)->rGetLocation()[1]) < 1e-6)
             {
                 fixed_nodes.push_back(i);
-                c_vector<double,3> new_position;
+                c_vector<double, 3> new_position;
                 new_position(0) = SolidMechanicsProblemDefinition<3>::FREE;
                 new_position(1) = 0;
                 new_position(2) = SolidMechanicsProblemDefinition<3>::FREE;
@@ -914,7 +914,7 @@ public:
         problem_defn.SetFixedNodes(fixed_nodes,locations);
 
         // gravity pushing down against the fixed plane
-        c_vector<double,3> gravity;
+        c_vector<double, 3> gravity;
         gravity(0) = 0.0;
         gravity(1) = -1.0;
         gravity(2) = 0.0;
@@ -927,7 +927,7 @@ public:
 
         solver.Solve();
 
-        std::vector<c_vector<double,3> >& r_solution = solver.rGetDeformedPosition();
+        std::vector<c_vector<double, 3> >& r_solution = solver.rGetDeformedPosition();
 
         // just check the Y=0 nodes still have y=0 but have moved in X and Z (except for node at origin)
         for (unsigned i=1; i<mesh.GetNumNodes(); ++i)
@@ -961,7 +961,7 @@ public:
                                                         problem_defn,
                                                         "TestWritingStrain");
 
-        c_matrix<double,2,2> F;
+        c_matrix<double,2, 2> F;
         solver.GetElementCentroidStrain(DEFORMATION_GRADIENT_F,*(mesh.GetElement(0)), F);
 
         TS_ASSERT_DELTA(F(0,0), 1.0, 1e-8);
@@ -995,14 +995,14 @@ public:
         TS_ASSERT_DELTA(F(1,0), 0.0, 1e-8);
         TS_ASSERT_DELTA(F(1,1), 1.0, 1e-8);
 
-        c_matrix<double,2,2> C;
+        c_matrix<double,2, 2> C;
         solver.GetElementCentroidStrain(DEFORMATION_TENSOR_C,*(mesh.GetElement(1)), C);
         TS_ASSERT_DELTA(C(0,0), 1.0, 1e-8);
         TS_ASSERT_DELTA(C(0,1), alpha, 1e-8);
         TS_ASSERT_DELTA(C(1,0), alpha, 1e-8);
         TS_ASSERT_DELTA(C(1,1), 1.0+alpha*alpha, 1e-8);
 
-        c_matrix<double,2,2> E;
+        c_matrix<double,2, 2> E;
         solver.GetElementCentroidStrain(LAGRANGE_STRAIN_E,*(mesh.GetElement(1)), E);
         TS_ASSERT_DELTA(E(0,0), 0.0, 1e-8);
         TS_ASSERT_DELTA(E(0,1), alpha/2, 1e-8);
@@ -1054,7 +1054,7 @@ public:
         // F = [a  0  0]
         //     [-c b  0]
         //     [0  a  c]
-        c_matrix<double,3,3> F;
+        c_matrix<double,3, 3> F;
 
         for (unsigned i = 0; i<1 /*mesh.GetNumElements()*/; ++i)
         {
@@ -1117,7 +1117,7 @@ public:
             solver.mAverageStressesPerElement[i] = zero_vector<double>(6);
         }
 
-        c_matrix<double,3,3> T;
+        c_matrix<double,3, 3> T;
         T(0,0) = 0.043;
         T(1,1) = 0.564;
         T(2,2) = 0.243;
@@ -1202,7 +1202,7 @@ public:
             solver.mAverageStressesPerElement[i] = zero_vector<double>(3);
         }
 
-        c_matrix<double,2,2> T;
+        c_matrix<double,2, 2> T;
         T(0,0) = 0.043;
         T(1,1) = 0.564;
         T(0,1) = 0.43;
@@ -1222,13 +1222,13 @@ public:
     //Covers exceptions that are thrown in AbstractContinuumMechanicsSolver if used with a non-quadratic mesh
     void TestAbstractContinuumMechanicsSolverMeshType()
     {
-        TetrahedralMesh<2,2> mesh;
+        TetrahedralMesh<2, 2> mesh;
         SolidMechanicsProblemDefinition<2> problem_defn(mesh);
 
         TS_ASSERT_THROWS_CONTAINS(CompressibleNonlinearElasticitySolver<2> solver(mesh, problem_defn, ""),
                                   "Continuum mechanics solvers require a quadratic mesh");
 
-        TetrahedralMesh<3,3> mesh3d;
+        TetrahedralMesh<3, 3> mesh3d;
         SolidMechanicsProblemDefinition<3> problem_defn3d(mesh3d);
 
         TS_ASSERT_THROWS_CONTAINS(CompressibleNonlinearElasticitySolver<3> solver3d(mesh3d, problem_defn3d, ""),

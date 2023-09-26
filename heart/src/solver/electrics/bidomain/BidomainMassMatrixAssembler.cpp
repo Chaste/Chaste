@@ -41,9 +41,9 @@ c_matrix<double,2*(DIM+1),2*(DIM+1)> BidomainMassMatrixAssembler<DIM>::ComputeMa
         c_vector<double, DIM+1> &rPhi,
         c_matrix<double, DIM, DIM+1> &rGradPhi,
         ChastePoint<DIM> &rX,
-        c_vector<double,2> &rU,
-        c_matrix<double,2,DIM> &rGradU /* not used */,
-        Element<DIM,DIM>* pElement)
+        c_vector<double, 2> &rU,
+        c_matrix<double,2, DIM> &rGradU /* not used */,
+        Element<DIM, DIM>* pElement)
 {
     c_matrix<double,2*(DIM+1),2*(DIM+1)> ret = zero_matrix<double>(2*(DIM+1), 2*(DIM+1));
 

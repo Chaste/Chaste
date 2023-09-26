@@ -129,7 +129,7 @@ private:
                  PETSC_COMM_WORLD, &status);
         MeshEventHandler::EndEvent(MeshEventHandler::COMM1);
         // Convert to std::vector
-        for (unsigned j=0; j< rElementData.NodeIndices.size(); ++j)
+        for (unsigned j = 0; j< rElementData.NodeIndices.size(); ++j)
         {
             rElementData.NodeIndices[j] = raw_indices[j];
         }
@@ -186,10 +186,10 @@ protected:
     unsigned mNodesPerElement; /**< Same as (ELEMENT_DIM+1), except when writing a quadratic mesh!*/
     unsigned mNodesPerBoundaryElement; /**< Same as (ELEMENT_DIM), except when writing a quadratic mesh!*/
 
-    AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* mpMesh; /**<Pointer to the mesh (if we are writing from a mesh)*/
-    DistributedTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* mpDistributedMesh; /**< Another pointer to the mesh, produced by dynamic cast*/
-    MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>* mpMixedMesh; /**< Another pointer to the mesh, produced by dynamic cast*/
-    MeshWriterIterators<ELEMENT_DIM,SPACE_DIM>* mpIters; /**< Handy iterators so that we know the next node/element to be written */
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* mpMesh; /**<Pointer to the mesh (if we are writing from a mesh)*/
+    DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* mpDistributedMesh; /**< Another pointer to the mesh, produced by dynamic cast*/
+    MixedDimensionMesh<ELEMENT_DIM, SPACE_DIM>* mpMixedMesh; /**< Another pointer to the mesh, produced by dynamic cast*/
+    MeshWriterIterators<ELEMENT_DIM, SPACE_DIM>* mpIters; /**< Handy iterators so that we know the next node/element to be written */
 
     bool mIndexFromZero; /**< True if input data is numbered from zero, false otherwise */
     bool mWriteMetaFile; /**< Whether to write a metafile (only used by MeshylazerMeshWriter) */

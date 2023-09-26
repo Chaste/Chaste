@@ -90,8 +90,8 @@ public:
     c_matrix<double,SPATIAL_BLOCK_SIZE_ELEMENTAL,SPATIAL_BLOCK_SIZE_ELEMENTAL> ComputeSpatialSpatialMatrixTerm(
         c_vector<double, NUM_NODES_PER_ELEMENT>& rQuadPhi,
         c_matrix<double, DIM, NUM_NODES_PER_ELEMENT>& rGradQuadPhi,
-        c_vector<double,DIM>& rX,
-        Element<DIM,DIM>* pElement)
+        c_vector<double, DIM>& rX,
+        Element<DIM, DIM>* pElement)
     {
         c_matrix<double,SPATIAL_BLOCK_SIZE_ELEMENTAL,SPATIAL_BLOCK_SIZE_ELEMENTAL> ret;
         for (unsigned i = 0; i < SPATIAL_BLOCK_SIZE_ELEMENTAL; ++i)
@@ -109,8 +109,8 @@ public:
         c_matrix<double, DIM, NUM_NODES_PER_ELEMENT>& rGradQuadPhi,
         c_vector<double, NUM_VERTICES_PER_ELEMENT>& rLinearPhi,
         c_matrix<double, DIM, NUM_VERTICES_PER_ELEMENT>& rGradLinearPhi,
-        c_vector<double,DIM>& rX,
-        Element<DIM,DIM>* pElement)
+        c_vector<double, DIM>& rX,
+        Element<DIM, DIM>* pElement)
     {
         c_matrix<double,SPATIAL_BLOCK_SIZE_ELEMENTAL,PRESSURE_BLOCK_SIZE_ELEMENTAL> ret;
         for (unsigned i = 0; i < SPATIAL_BLOCK_SIZE_ELEMENTAL; ++i)
@@ -126,8 +126,8 @@ public:
     c_matrix<double,PRESSURE_BLOCK_SIZE_ELEMENTAL,PRESSURE_BLOCK_SIZE_ELEMENTAL> ComputePressurePressureMatrixTerm(
         c_vector<double, NUM_VERTICES_PER_ELEMENT>& rLinearPhi,
         c_matrix<double, DIM, NUM_VERTICES_PER_ELEMENT>& rGradLinearPhi,
-        c_vector<double,DIM>& rX,
-        Element<DIM,DIM>* pElement)
+        c_vector<double, DIM>& rX,
+        Element<DIM, DIM>* pElement)
     {
         c_matrix<double,PRESSURE_BLOCK_SIZE_ELEMENTAL,PRESSURE_BLOCK_SIZE_ELEMENTAL> ret;
         for (unsigned i = 0; i < PRESSURE_BLOCK_SIZE_ELEMENTAL; ++i)
@@ -144,8 +144,8 @@ public:
     c_vector<double,SPATIAL_BLOCK_SIZE_ELEMENTAL> ComputeSpatialVectorTerm(
         c_vector<double, NUM_NODES_PER_ELEMENT>& rQuadPhi,
         c_matrix<double, DIM, NUM_NODES_PER_ELEMENT>& rGradQuadPhi,
-        c_vector<double,DIM>& rX,
-        Element<DIM,DIM>* pElement)
+        c_vector<double, DIM>& rX,
+        Element<DIM, DIM>* pElement)
     {
         c_vector<double,SPATIAL_BLOCK_SIZE_ELEMENTAL> ret;
         for (unsigned i = 0; i < SPATIAL_BLOCK_SIZE_ELEMENTAL; ++i)
@@ -158,8 +158,8 @@ public:
     c_vector<double,PRESSURE_BLOCK_SIZE_ELEMENTAL> ComputePressureVectorTerm(
             c_vector<double, NUM_VERTICES_PER_ELEMENT>& rLinearPhi,
             c_matrix<double, DIM, NUM_VERTICES_PER_ELEMENT>& rGradLinearPhi,
-            c_vector<double,DIM>& rX,
-            Element<DIM,DIM>* pElement)
+            c_vector<double, DIM>& rX,
+            Element<DIM, DIM>* pElement)
     {
         c_vector<double,PRESSURE_BLOCK_SIZE_ELEMENTAL> ret;
         for (unsigned i = 0; i < PRESSURE_BLOCK_SIZE_ELEMENTAL; ++i)
@@ -181,8 +181,8 @@ public:
     c_vector<double,SPATIAL_BLOCK_SIZE_ELEMENTAL> ComputeSpatialVectorTerm(
         c_vector<double, NUM_NODES_PER_ELEMENT>& rQuadPhi,
         c_matrix<double, 1, NUM_NODES_PER_ELEMENT>& rGradQuadPhi,
-        c_vector<double,1>& rX,
-        Element<1,1>* pElement)
+        c_vector<double, 1>& rX,
+        Element<1, 1>* pElement)
     {
         return zero_vector<double>(SPATIAL_BLOCK_SIZE_ELEMENTAL);
     }
@@ -201,7 +201,7 @@ private:
     static const unsigned PRESSURE_BLOCK_SIZE_ELEMENTAL = NUM_VERTICES_PER_ELEMENT;
 
 public:
-    MyMatrixAssembler(AbstractTetrahedralMesh<DIM,DIM>* pMesh)
+    MyMatrixAssembler(AbstractTetrahedralMesh<DIM, DIM>* pMesh)
         : AbstractContinuumMechanicsAssembler<DIM,false,true>(pMesh)
     {
     }
@@ -209,16 +209,16 @@ public:
     c_matrix<double,PRESSURE_BLOCK_SIZE_ELEMENTAL,PRESSURE_BLOCK_SIZE_ELEMENTAL> ComputePressurePressureMatrixTerm(
         c_vector<double, NUM_VERTICES_PER_ELEMENT>& rLinearPhi,
         c_matrix<double, DIM, NUM_VERTICES_PER_ELEMENT>& rGradLinearPhi,
-        c_vector<double,DIM>& rX,
-        Element<DIM,DIM>* pElement)
+        c_vector<double, DIM>& rX,
+        Element<DIM, DIM>* pElement)
     {
         return outer_prod(rLinearPhi,rLinearPhi);
     }
     c_vector<double,SPATIAL_BLOCK_SIZE_ELEMENTAL> ComputeSpatialVectorTerm(
         c_vector<double, NUM_NODES_PER_ELEMENT>& rQuadPhi,
         c_matrix<double, DIM, NUM_NODES_PER_ELEMENT>& rGradQuadPhi,
-        c_vector<double,DIM>& rX,
-        Element<DIM,DIM>* pElement)
+        c_vector<double, DIM>& rX,
+        Element<DIM, DIM>* pElement)
     {
         return zero_vector<double>(SPATIAL_BLOCK_SIZE_ELEMENTAL);
     }
@@ -312,7 +312,7 @@ public:
     void TestAssemblers2d()
     {
         QuadraticMesh<2> mesh;
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2d_single_triangular_element_quadratic",2,2,false);
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/2d_single_triangular_element_quadratic",2,2,false);
         mesh.ConstructFromMeshReader(mesh_reader);
 
         Vec vec = PetscTools::CreateVec(3*mesh.GetNumNodes());
@@ -386,7 +386,7 @@ public:
     void TestAssemblers3d()
     {
         QuadraticMesh<3> mesh;
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/3D_Single_tetrahedron_element_quadratic",2,1,false);
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/3D_Single_tetrahedron_element_quadratic",2,1,false);
         mesh.ConstructFromMeshReader(mesh_reader);
 
         Vec vec = PetscTools::CreateVec(4*mesh.GetNumNodes());
@@ -470,8 +470,8 @@ public:
 
     void TestWithMassMatrixInPressurePressureBlock()
     {
-        TrianglesMeshReader<2,2> reader("mesh/test/data/square_2_elements");
-        TetrahedralMesh<2,2> linear_mesh;
+        TrianglesMeshReader<2, 2> reader("mesh/test/data/square_2_elements");
+        TetrahedralMesh<2, 2> linear_mesh;
         linear_mesh.ConstructFromMeshReader(reader);
 
         QuadraticMesh<2> quadratic_mesh;
@@ -488,7 +488,7 @@ public:
 
         Mat mat2;
         PetscTools::SetupMat(mat2, linear_mesh.GetNumNodes(), linear_mesh.GetNumNodes(), 4);
-        MassMatrixAssembler<2,2> mass_matrix_assembler_linear(&linear_mesh);
+        MassMatrixAssembler<2, 2> mass_matrix_assembler_linear(&linear_mesh);
         mass_matrix_assembler_linear.SetMatrixToAssemble(mat2, true);
         mass_matrix_assembler_linear.Assemble();
         PetscMatTools::Finalise(mat2);
@@ -534,11 +534,11 @@ public:
 
     void TestAbstractContinuumMechanicsAssemblerMeshType()
     {
-        TetrahedralMesh<2,2> mesh;
+        TetrahedralMesh<2, 2> mesh;
         TS_ASSERT_THROWS_CONTAINS(MyMatrixAssembler<2> assembler2d(&mesh),
                                   "Continuum mechanics assemblers require a quadratic mesh");
 
-        TetrahedralMesh<3,3> mesh3d;
+        TetrahedralMesh<3, 3> mesh3d;
         TS_ASSERT_THROWS_CONTAINS(MyMatrixAssembler<3> assembler3d(&mesh3d),
                                   "Continuum mechanics assemblers require a quadratic mesh");
     }

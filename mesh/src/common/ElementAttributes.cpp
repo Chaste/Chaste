@@ -35,25 +35,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ElementAttributes.hpp"
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ElementAttributes<ELEMENT_DIM, SPACE_DIM>::ElementAttributes()
     :   mAttributes(std::vector<double>())
 {
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<double>& ElementAttributes<ELEMENT_DIM, SPACE_DIM>::rGetAttributes()
 {
     return mAttributes;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ElementAttributes<ELEMENT_DIM, SPACE_DIM>::AddAttribute(double attribute)
 {
     mAttributes.push_back(attribute);
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ElementAttributes<ELEMENT_DIM, SPACE_DIM>::SetFirstAttribute(double attribute)
 {
     // Make sure that the first entry exists
@@ -65,7 +65,7 @@ void ElementAttributes<ELEMENT_DIM, SPACE_DIM>::SetFirstAttribute(double attribu
     mAttributes[0] = attribute;
 }
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 double ElementAttributes<ELEMENT_DIM, SPACE_DIM>::GetFirstAttribute()
 {
     if (mAttributes.empty())
@@ -78,12 +78,12 @@ double ElementAttributes<ELEMENT_DIM, SPACE_DIM>::GetFirstAttribute()
 }
 
 // Explicit instantiation
-template class ElementAttributes<0,1>;
-template class ElementAttributes<1,1>;
-template class ElementAttributes<0,2>;
-template class ElementAttributes<1,2>;
-template class ElementAttributes<2,2>;
-template class ElementAttributes<0,3>;
-template class ElementAttributes<1,3>;
-template class ElementAttributes<2,3>;
-template class ElementAttributes<3,3>;
+template class ElementAttributes<0, 1>;
+template class ElementAttributes<1, 1>;
+template class ElementAttributes<0, 2>;
+template class ElementAttributes<1, 2>;
+template class ElementAttributes<2, 2>;
+template class ElementAttributes<0, 3>;
+template class ElementAttributes<1, 3>;
+template class ElementAttributes<2, 3>;
+template class ElementAttributes<3, 3>;

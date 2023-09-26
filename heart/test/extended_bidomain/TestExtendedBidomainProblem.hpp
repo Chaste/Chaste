@@ -131,7 +131,7 @@ public:
     {
         SetupParameters();
 
-        TetrahedralMesh<1,1> mesh;
+        TetrahedralMesh<1, 1> mesh;
         unsigned number_of_elements = 100;//this is nGrid in Martin's code
         double length = 10.0;//100mm as in Martin's code
         mesh.ConstructRegularSlabMesh(length/number_of_elements, length);
@@ -217,7 +217,7 @@ public:
         HeartConfig::Instance()->SetVisualizeWithCmgui(true);
         HeartConfig::Instance()->SetVisualizeWithMeshalyzer(true);
 
-        TetrahedralMesh<1,1> mesh;
+        TetrahedralMesh<1, 1> mesh;
         unsigned number_of_elements = 100;
         double length = 10.0;
         mesh.ConstructRegularSlabMesh(length/number_of_elements, length);
@@ -263,7 +263,7 @@ public:
         std::vector<double> node_5_phi = data_reader1.GetVariableOverTime("Phi_e", 5);
         TS_ASSERT_EQUALS( node_5_phi.size(), num_steps);
 
-        for (unsigned i=0; i<output_variables.size(); ++i)
+        for (unsigned i = 0; i<output_variables.size(); ++i)
         {
             unsigned global_index = 2+i*2;
             std::vector<double> values = data_reader1.GetVariableOverTime(output_variables[i], global_index);

@@ -59,7 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This gives a shared default solver to all the cells, as standard.
  */
-template <class CELL_MODEL>
+template<class CELL_MODEL>
 class ShannonCardiacCellFactory : public AbstractCardiacCellFactory<1>
 {
 private:

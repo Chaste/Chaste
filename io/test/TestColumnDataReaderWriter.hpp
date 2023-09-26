@@ -94,7 +94,7 @@ private:
     void CompareVectors(std::vector<double> v1, std::vector<double> v2, double precision)
     {
         TS_ASSERT_EQUALS(v1.size(), v2.size());
-        for (unsigned i=0; i<v1.size(); ++i)
+        for (unsigned i = 0; i<v1.size(); ++i)
         {
             TS_ASSERT_DELTA(v1[i], v2[i], precision);
         }
@@ -278,7 +278,7 @@ public:
         TS_ASSERT_THROWS_NOTHING(ica_var_id = mpTestWriter->DefineVariable("I_Ca","milliamperes"));
         TS_ASSERT_THROWS_NOTHING(mpTestWriter->EndDefineMode());
 
-        for (int i=0; i<=10; ++i)
+        for (int i = 0; i<=10; ++i)
         {
             mpTestWriter->PutVariable(time_var_id, (double)(i)/10 - 0.1);
             mpTestWriter->PutVariable(ina_var_id, 12.0);
@@ -293,13 +293,13 @@ public:
 
         std::vector<double> values_ik = mpTestReader->GetValues("I_K");
 
-        for (int i=0; i<11; ++i)
+        for (int i = 0; i<11; ++i)
         {
             TS_ASSERT_DELTA(values_ik[i]/(7124.12355553*((double)(i+1))/12.0), 1.0, 1e-3);
         }
 
         std::vector<double> time_values = mpTestReader->GetUnlimitedDimensionValues();
-        for (int i=0; i < 10; ++i)
+        for (int i = 0; i < 10; ++i)
         {
             TS_ASSERT_DELTA(time_values[i], i*0.1-0.1, 1e-3);
         }
@@ -392,7 +392,7 @@ public:
         TS_ASSERT_THROWS_THIS(mpTestWriter->PutVariable(node_var_id, 0, -1), "Dimension position not supplied");
         TS_ASSERT_THROWS_THIS(mpTestWriter->PutVariable(node_var_id, 0, -2), "Dimension position out of range");
 
-        for (unsigned i=0; i<4; ++i)
+        for (unsigned i = 0; i<4; ++i)
         {
             mpTestWriter->PutVariable(node_var_id, (double)(i+1), i);
             mpTestWriter->PutVariable(ina_var_id, 12.0, i);
@@ -400,7 +400,7 @@ public:
             mpTestWriter->PutVariable(ik_var_id, 7124.12355553*((double)(i+1))/12.0, i);
         }
 
-        for (unsigned i=0; i<2; ++i)
+        for (unsigned i = 0; i<2; ++i)
         {
             mpTestWriter->PutVariable(short_id, (double)(i), i);
         }
@@ -415,13 +415,13 @@ public:
 
         TS_ASSERT_THROWS_THIS(mpTestReader->GetValues("BadVar", 0), "Unknown variable");
 
-        for (int i=0; i<4; ++i)
+        for (int i = 0; i<4; ++i)
         {
             std::vector<double> values_ik = mpTestReader->GetValues("I_K",  i);
             TS_ASSERT_DELTA(values_ik[0]/(7124.12355553*((double)(i+1))/12.0), 1.0, 1e-3);
         }
 
-        for (int i=0; i<4; ++i)
+        for (int i = 0; i<4; ++i)
         {
             std::vector<double> values_short = mpTestReader->GetValues("Short_column", i);
             if (i<2)
@@ -453,7 +453,7 @@ public:
         // Compare with known good data using ColumnDataReader
         ColumnDataReader good_reader("io/test/data", "testfixed_good", false);
         ColumnDataReader our_reader("TestColumnDataReaderWriter", "testfixed");
-        for (int i=0; i<4; ++i)
+        for (int i = 0; i<4; ++i)
         {
             CompareVectors(our_reader.GetValues("I_Na", i), good_reader.GetValues("I_Na", i), 1e-6);
             CompareVectors(our_reader.GetValues("I_K", i), good_reader.GetValues("I_K", i), 1e-6);
@@ -470,7 +470,7 @@ public:
         std::vector<double> oldstyle_v_values = old_data_reader.GetValues("V");
         ColumnDataReader new_data_reader("io/test/data", "Lr91RegularStim", false);
         std::vector<double> newstyle_v_values = new_data_reader.GetValues("membrane_voltage");
-        for (unsigned i=0; i<oldstyle_v_values.size(); ++i)
+        for (unsigned i = 0; i<oldstyle_v_values.size(); ++i)
         {
             TS_ASSERT_DELTA(oldstyle_v_values[i], newstyle_v_values[i], 1e-5);
         }
@@ -519,7 +519,7 @@ public:
         // Compare with known good data using ColumnDataReader
         ColumnDataReader good_reader("io/test/data", "testfixed_negatives_good", false);
         ColumnDataReader our_reader("TestColumnDataReaderWriter", "testfixed_negatives");
-        for (int i=0; i<4; ++i)
+        for (int i = 0; i<4; ++i)
         {
             CompareVectors(our_reader.GetValues("I_Na", i), good_reader.GetValues("I_Na", i), 1e-6);
             CompareVectors(our_reader.GetValues("I_K", i), good_reader.GetValues("I_K", i), 1e-6);
@@ -584,7 +584,7 @@ public:
 
         std::vector<double> time_values = mpTestReader->GetUnlimitedDimensionValues();
         std::vector<double> ica_values = mpTestReader->GetValues("I_Ca", 3);
-        for (int i=0; i<2; ++i)
+        for (int i = 0; i<2; ++i)
         {
             TS_ASSERT_DELTA(time_values[i],(i+1)*0.1,1e-3);
             TS_ASSERT_DELTA(ica_values[i],-33.124 - i * 2,1e-3);
@@ -598,7 +598,7 @@ public:
         // Compare with known good data using ColumnDataReader
         ColumnDataReader good_reader("io/test/data", "testfixedandunlimited", false);
         ColumnDataReader our_reader("TestColumnDataReaderWriter", "testfixedandunlimited");
-        for (int i=0; i<4; ++i)
+        for (int i = 0; i<4; ++i)
         {
             CompareVectors(our_reader.GetValues("I_Na", i), good_reader.GetValues("I_Na", i), 1e-6);
             CompareVectors(our_reader.GetValues("I_K", i), good_reader.GetValues("I_K", i), 1e-6);
@@ -638,7 +638,7 @@ public:
         // Compare with known good data using ColumnDataReader
         ColumnDataReader good_reader("io/test/data", "testunlimitednegative2", false);
         ColumnDataReader our_reader("TestColumnDataReaderWriter", "testunlimitednegative2");
-        for (int i=0; i<4; ++i)
+        for (int i = 0; i<4; ++i)
         {
             CompareVectors(our_reader.GetValues("I_Ca", i), good_reader.GetValues("I_Ca", i), 1e-6);
         }
@@ -771,7 +771,7 @@ public:
          */
         std::vector<double> small_values = reader.GetValues("Small");
         std::vector<double> time_values  = reader.GetValues("Time");
-        for (unsigned i=0; i<6; ++i)
+        for (unsigned i = 0; i<6; ++i)
         {
             TS_ASSERT_DELTA(small_values[i], small_values_check[i], DBL_MIN);
             TS_ASSERT_DELTA(time_values[i], time_values_check[i], 0.1);

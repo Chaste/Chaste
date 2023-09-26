@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PeriodicNodesOnlyMesh.hpp"
 
 template<unsigned SPACE_DIM>
-PeriodicNodesOnlyMesh<SPACE_DIM>::PeriodicNodesOnlyMesh(c_vector<double,SPACE_DIM> width)
+PeriodicNodesOnlyMesh<SPACE_DIM>::PeriodicNodesOnlyMesh(c_vector<double, SPACE_DIM> width)
         : NodesOnlyMesh<SPACE_DIM>(),
           mWidth(width)
 {
@@ -54,7 +54,7 @@ PeriodicNodesOnlyMesh<SPACE_DIM>::PeriodicNodesOnlyMesh(c_vector<double,SPACE_DI
 }
 
 template<unsigned SPACE_DIM>
-void PeriodicNodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows, c_vector<bool,SPACE_DIM> isDimPeriodic)
+void PeriodicNodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows, c_vector<bool, SPACE_DIM> isDimPeriodic)
 {
 
     // Check that we haven't got too many processors; the maximum number of processors is width/cutOffLength in the y (2D)/z (3D) direction
@@ -65,7 +65,7 @@ void PeriodicNodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c
     // Container for converting the periodic dims vector to a true/false input into box collection setup
     // For each periodic dimension:
 
-    for (unsigned i=0; i < SPACE_DIM; ++i)
+    for (unsigned i = 0; i < SPACE_DIM; ++i)
     {
         if (mIsDimPeriodic[i])
         {
@@ -105,7 +105,7 @@ double PeriodicNodesOnlyMesh<SPACE_DIM>::GetWidth(const unsigned& rDimension) co
     if ( !mIsDimPeriodic[rDimension] )
     {
         // If we are not a periodic dimension, we just return the width
-        width = MutableMesh<SPACE_DIM,SPACE_DIM>::GetWidth(rDimension);
+        width = MutableMesh<SPACE_DIM, SPACE_DIM>::GetWidth(rDimension);
     }
     else
     {
@@ -211,7 +211,7 @@ void PeriodicNodesOnlyMesh<SPACE_DIM>::RefreshMesh()
     // outside the domain, get the fmod and relocate
     for (auto iter : this->mNodes)
     {
-        c_vector<double,SPACE_DIM>& r_location = iter->rGetModifiableLocation();
+        c_vector<double, SPACE_DIM>& r_location = iter->rGetModifiableLocation();
 
         for (unsigned i = 0; i < SPACE_DIM; ++i)
         {

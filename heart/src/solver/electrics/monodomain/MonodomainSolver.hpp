@@ -72,27 +72,27 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class MonodomainSolver
-  : public AbstractDynamicLinearPdeSolver<ELEMENT_DIM,SPACE_DIM,1>
+  : public AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 1>
 {
 private:
 
     /** Monodomain tissue class (collection of cells, and conductivities) */
-    MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* mpMonodomainTissue;
+    MonodomainTissue<ELEMENT_DIM, SPACE_DIM>* mpMonodomainTissue;
 
     /** Boundary conditions */
-    BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,1>* mpBoundaryConditions;
+    BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 1>* mpBoundaryConditions;
 
     /** The monodomain assembler, used to set up the LHS matrix */
-    MonodomainAssembler<ELEMENT_DIM,SPACE_DIM>* mpMonodomainAssembler;
+    MonodomainAssembler<ELEMENT_DIM, SPACE_DIM>* mpMonodomainAssembler;
 
     /** Assembler for surface integrals coming from any non-zero Neumann boundary conditions */
-    NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM,1>* mpNeumannSurfaceTermsAssembler;
+    NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM, SPACE_DIM, 1>* mpNeumannSurfaceTermsAssembler;
 
     /**
      * If using state variable interpolation, points to an assembler to use in
      * computing the correction term to apply to the RHS.
      */
-    MonodomainCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM>* mpMonodomainCorrectionTermAssembler;
+    MonodomainCorrectionTermAssembler<ELEMENT_DIM, SPACE_DIM>* mpMonodomainCorrectionTermAssembler;
 
     /** The mass matrix, used to computing the RHS vector */
     Mat mMassMatrix;
@@ -135,9 +135,9 @@ public:
      * @param pTissue pointer to the tissue
      * @param pBoundaryConditions pointer to the boundary conditions
      */
-    MonodomainSolver(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                     MonodomainTissue<ELEMENT_DIM,SPACE_DIM>* pTissue,
-                     BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,1>* pBoundaryConditions);
+    MonodomainSolver(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+                     MonodomainTissue<ELEMENT_DIM, SPACE_DIM>* pTissue,
+                     BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 1>* pBoundaryConditions);
 
     /**
      *  Destructor

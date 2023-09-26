@@ -146,8 +146,8 @@ public:
     void TestOtherNodeBasedCellPopulationConstructor()
     {
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> generating_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
@@ -185,8 +185,8 @@ public:
     void TestValidateNodeBasedCellPopulation()
     {
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> generating_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
@@ -338,7 +338,7 @@ public:
         NodeBasedCellPopulation<2> node_based_cell_population(mesh, cells);
 
         // For coverage
-        for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        for (AbstractMesh<2, 2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
              node_iter != mesh.GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -356,14 +356,14 @@ public:
             p_cell2->SetCellProliferativeType(p_stem_type);
             p_cell2->SetBirthTime(-1);
 
-            c_vector<double,2> cell2_location;
+            c_vector<double, 2> cell2_location;
             cell2_location[0] = 0.9;
             cell2_location[1] = 1.4;
 
             node_based_cell_population.AddCell(p_cell2, node_based_cell_population.GetCellUsingLocationIndex(0));
 
             // Check the radius and node attributes associated with cell 0 are correct
-            AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+            AbstractMesh<2, 2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
             TS_ASSERT_DELTA(node_iter->GetRadius(), 0.1, 1e-6);
             TS_ASSERT_EQUALS(node_iter->HasNodeAttributes(), true);
             TS_ASSERT_EQUALS(node_iter->rGetNodeAttributes().size(), 2u);
@@ -400,8 +400,8 @@ public:
     void TestSetNodeAndAddCell()
     {
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> generating_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
@@ -420,7 +420,7 @@ public:
         if (PetscTools::AmMaster())
         {
             auto cell_iter = node_based_cell_population.Begin();
-            c_vector<double,2> new_location = node_based_cell_population.GetLocationOfCellCentre(*cell_iter);
+            c_vector<double, 2> new_location = node_based_cell_population.GetLocationOfCellCentre(*cell_iter);
             new_location[0] += 1e-2;
             new_location[1] += 1e-2;
             ChastePoint<2> new_location_point(new_location);
@@ -458,11 +458,11 @@ public:
             p_cell->SetCellProliferativeType(p_stem_type);
             p_cell->SetBirthTime(-1);
 
-            c_vector<double,2> new_cell_location;
+            c_vector<double, 2> new_cell_location;
             new_cell_location[0] = 1.4;
             new_cell_location[1] = 1.4;
 
-            typedef FixedCentreBasedDivisionRule<2,2> FixedRule;
+            typedef FixedCentreBasedDivisionRule<2, 2> FixedRule;
             MAKE_PTR_ARGS(FixedRule, p_div_rule, (new_cell_location));
             node_based_cell_population.SetCentreBasedDivisionRule(p_div_rule);
 
@@ -492,8 +492,8 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
 
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        TetrahedralMesh<2,2> generating_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        TetrahedralMesh<2, 2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
@@ -556,14 +556,14 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
 
         // Create a simple mesh of the domain [0,1]x[0,1]
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        TetrahedralMesh<2,2> generating_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        TetrahedralMesh<2, 2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(generating_mesh, 1e-1);
-        for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        for (AbstractMesh<2, 2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
              node_iter != mesh.GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -609,15 +609,15 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
 
         // Create a simple mesh of the domain [0,1]x[0,1]
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        TetrahedralMesh<2,2> generating_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        TetrahedralMesh<2, 2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(generating_mesh, 1.2);
 
-        for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        for (AbstractMesh<2, 2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
              node_iter != mesh.GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -684,7 +684,7 @@ public:
             CellPtr p_new_cell(new Cell(p_state, p_model));
             p_new_cell->SetCellProliferativeType(p_stem_type);
             p_new_cell->SetBirthTime(0);
-            c_vector<double,2> new_location;
+            c_vector<double, 2> new_location;
             new_location[0] = 0.3433453454443;
             new_location[1] = 0.3435346344234;
 
@@ -716,7 +716,7 @@ public:
             p_new_cell2->SetCellProliferativeType(p_stem_type);
             p_new_cell2->SetBirthTime(0);
 
-            c_vector<double,2> new_location2;
+            c_vector<double, 2> new_location2;
             new_location2[0] = 0.6433453454443;
             new_location2[1] = 0.6435346344234;
 
@@ -738,14 +738,14 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
 
         // Create a small node-based cell population
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> generating_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(generating_mesh, 0.1);
 
-        for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        for (AbstractMesh<2, 2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
              node_iter != mesh.GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -789,7 +789,7 @@ public:
         mesh.ConstructNodesWithoutMesh(generating_mesh, 0.5);
 
         // Re set the radii
-        for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        for (AbstractMesh<2, 2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
              node_iter != mesh.GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -809,7 +809,7 @@ public:
         mesh.ConstructNodesWithoutMesh(generating_mesh, 1.1);
 
         // Re set the radii
-        for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+        for (AbstractMesh<2, 2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
              node_iter != mesh.GetNodeIteratorEnd();
              ++node_iter)
         {
@@ -865,8 +865,8 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(10.0, 1);
 
         // Create a small node-based cell population
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> generating_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         NodesOnlyMesh<2> mesh;
@@ -982,8 +982,8 @@ public:
     void TestSettingCellAncestors()
     {
         // Create a small node-based cell population
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> generating_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(generating_mesh, 1.5);
@@ -1025,8 +1025,8 @@ public:
     void TestGetLocationOfCellCentreAndGetWidth()
     {
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> generating_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
@@ -1072,8 +1072,8 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
-        TetrahedralMesh<2,2> generating_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_2_elements");
+        TetrahedralMesh<2, 2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
@@ -1203,7 +1203,7 @@ public:
         node_based_cell_population.WriteVtkResultsToFile(output_directory);
 
         // Read VTK file and check it doesn't cause any problems
-        VtkMeshReader<2,2> vtk_reader(results_dir + "/results_0.vtu");
+        VtkMeshReader<2, 2> vtk_reader(results_dir + "/results_0.vtu");
 
         // Test that the correct mutation states were recorded
         std::vector<double> mutation_states_data;
@@ -1275,8 +1275,8 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create a simple mesh
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-        TetrahedralMesh<3,3> generating_mesh;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_136_elements");
+        TetrahedralMesh<3, 3> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
@@ -1341,7 +1341,7 @@ public:
         cell_population.WriteVtkResultsToFile(output_directory);
 
         // Read VTK file and check it doesn't cause any problems
-        VtkMeshReader<3,3> vtk_reader(results_dir + "/results_0.vtu");
+        VtkMeshReader<3, 3> vtk_reader(results_dir + "/results_0.vtu");
 
         // All cells are wild type
         std::vector<double> mutation_states_data;
@@ -1389,8 +1389,8 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 1);
 
         // Create a simple mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> generating_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         // Convert this to a NodesOnlyMesh
@@ -1468,8 +1468,8 @@ public:
             p_simulation_time->SetEndTimeAndNumberOfTimeSteps(1.0, num_steps+1);
 
             // Create a simple mesh
-            TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-            TetrahedralMesh<2,2> generating_mesh;
+            TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+            TetrahedralMesh<2, 2> generating_mesh;
             generating_mesh.ConstructFromMeshReader(mesh_reader);
 
             // Convert this to a NodesOnlyMesh
@@ -1613,8 +1613,8 @@ public:
     {
         EXIT_IF_PARALLEL;  // The population.GetTetrahedralMeshForPdeModifier() method does not yet work in parallel.
 
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> generating_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         NodesOnlyMesh<2> mesh;
@@ -1627,7 +1627,7 @@ public:
 
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
-        TetrahedralMesh<2,2>* p_tet_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
+        TetrahedralMesh<2, 2>* p_tet_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
 
         // Check it has the correct number of nodes and elements
         TS_ASSERT_EQUALS(p_tet_mesh->GetNumNodes(), cell_population.GetNumNodes());
@@ -1647,8 +1647,8 @@ public:
 
     void TestGetCellDataItemAtPdeNode()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> generating_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> generating_mesh;
         generating_mesh.ConstructFromMeshReader(mesh_reader);
 
         NodesOnlyMesh<2> mesh;

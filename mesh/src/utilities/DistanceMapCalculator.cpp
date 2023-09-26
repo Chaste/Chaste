@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 DistanceMapCalculator<ELEMENT_DIM, SPACE_DIM>::DistanceMapCalculator(
-            AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh)
+            AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh)
     : mrMesh(rMesh),
       mWorkOnEntireMesh(true),
       mNumHalosPerProcess(nullptr),
@@ -79,7 +79,7 @@ void DistanceMapCalculator<ELEMENT_DIM, SPACE_DIM>::ComputeDistanceMap(
         std::vector<double>& rNodeDistances)
 {
     rNodeDistances.resize(mNumNodes);
-    for (unsigned index=0; index<mNumNodes; index++)
+    for (unsigned index = 0; index<mNumNodes; index++)
     {
         rNodeDistances[index] = DBL_MAX;
     }
@@ -100,7 +100,7 @@ void DistanceMapCalculator<ELEMENT_DIM, SPACE_DIM>::ComputeDistanceMap(
      }
     else
     {
-        for (unsigned source_index=0; source_index<rSourceNodeIndices.size(); source_index++)
+        for (unsigned source_index = 0; source_index<rSourceNodeIndices.size(); source_index++)
         {
             unsigned source_node_index = rSourceNodeIndices[source_index];
             PushLocal(0.0, source_node_index);
@@ -148,7 +148,7 @@ bool DistanceMapCalculator<ELEMENT_DIM, SPACE_DIM>::UpdateQueueFromRemote(std::v
         // This update does nowt
         return !mActivePriorityNodeIndexQueue.empty();
     }
-    for (unsigned bcast_process=0; bcast_process<PetscTools::GetNumProcs(); bcast_process++)
+    for (unsigned bcast_process = 0; bcast_process<PetscTools::GetNumProcs(); bcast_process++)
     {
         // Process packs cart0/cart1/...euclid/index into a 1-d array
         double* dist_exchange = new double[ mNumHalosPerProcess[bcast_process] ];
@@ -156,7 +156,7 @@ bool DistanceMapCalculator<ELEMENT_DIM, SPACE_DIM>::UpdateQueueFromRemote(std::v
         if (PetscTools::GetMyRank() == bcast_process)
         {
             // Broadcaster fills the array
-            for (unsigned index=0; index<mHaloNodeIndices.size();index++)
+            for (unsigned index = 0; index<mHaloNodeIndices.size();index++)
             {
                 dist_exchange[index] = rNodeDistances[mHaloNodeIndices[index]];
                 index_exchange[index] = mHaloNodeIndices[index];
@@ -175,7 +175,7 @@ bool DistanceMapCalculator<ELEMENT_DIM, SPACE_DIM>::UpdateQueueFromRemote(std::v
         if (PetscTools::GetMyRank() != bcast_process)
         {
             // Receiving process take updates
-            for (unsigned index=0; index<mNumHalosPerProcess[bcast_process];index++)
+            for (unsigned index = 0; index<mNumHalosPerProcess[bcast_process];index++)
             {
                 unsigned global_index=index_exchange[index];
                 // Is it a better answer?

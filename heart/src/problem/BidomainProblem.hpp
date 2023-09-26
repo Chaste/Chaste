@@ -62,7 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * extracellular potential at node j.
  */
 template<unsigned DIM>
-class BidomainProblem : public AbstractCardiacProblem<DIM,DIM, 2>
+class BidomainProblem : public AbstractCardiacProblem<DIM, DIM, 2>
 {
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -152,13 +152,13 @@ protected:
      * off the electrodes (by adding default boundary conditions to the
      * solver)
      */
-    AbstractBidomainSolver<DIM,DIM>* mpSolver;
+    AbstractBidomainSolver<DIM, DIM>* mpSolver;
 
     /** @return a newly created bidomain PDE object */
     virtual AbstractCardiacTissue<DIM> *CreateCardiacTissue();
 
     /** @return a newly created suitable bidomain solver */
-    virtual AbstractDynamicLinearPdeSolver<DIM,DIM,2>* CreateSolver();
+    virtual AbstractDynamicLinearPdeSolver<DIM, DIM, 2>* CreateSolver();
 
 public:
     /**
@@ -311,7 +311,7 @@ void BidomainProblem<DIM>::LoadExtraArchiveForBidomain(Archive & archive, unsign
         if (mpElectrodes->GetBoundaryConditionsContainer() != this->mpBoundaryConditionsContainer)
         {
             // The BCs will only actually be different if using a distributed tetrahedral mesh
-            DistributedTetrahedralMesh<DIM,DIM>* p_dist_mesh = dynamic_cast<DistributedTetrahedralMesh<DIM,DIM>*>(this->mpMesh);
+            DistributedTetrahedralMesh<DIM, DIM>* p_dist_mesh = dynamic_cast<DistributedTetrahedralMesh<DIM, DIM>*>(this->mpMesh);
             if (p_dist_mesh)
             {
                 mpElectrodes->GetBoundaryConditionsContainer()->MergeFromArchive(archive, this->mpMesh);

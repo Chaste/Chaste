@@ -659,7 +659,7 @@ void AbstractCvodeSystem::ForceUseOfNumericalJacobian(bool useNumericalJacobian)
 //    realtype min_nudge = (fnorm != 0.0) ?
 //            (1000.0 * fabs(h) * DBL_EPSILON * size * fnorm) : 1.0;
 //
-//    for (unsigned j=0; j<size; ++j)
+//    for (unsigned j = 0; j<size; ++j)
 //    {
 //        // Check the j'th column of the Jacobian
 //        realtype yjsaved = p_y[j];
@@ -671,7 +671,7 @@ void AbstractCvodeSystem::ForceUseOfNumericalJacobian(bool useNumericalJacobian)
 //        N_VLinearSum(nudge_inv, nudge_ydot, -nudge_inv, ydot, numeric_jth_col);
 //        realtype* p_analytic_jth_col = DENSE_COL(jacobian, j);
 //
-//        for (unsigned i=0; i<size; ++i)
+//        for (unsigned i = 0; i<size; ++i)
 //        {
 //            if (!CompareDoubles::WithinAnyTolerance(p_numeric_jth_col[i], p_analytic_jth_col[i], rel_tol, abs_tol))
 //            {

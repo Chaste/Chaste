@@ -68,7 +68,7 @@ public:
         const double space_step = width/num_elem_x;
 
         /* Make the mesh*/
-        DistributedTetrahedralMesh<3,3> mesh;
+        DistributedTetrahedralMesh<3, 3> mesh;
         mesh.ConstructRegularSlabMesh(space_step, width, height, depth);
 
         /*Create a cell factory of the type we defined above. */
@@ -83,8 +83,8 @@ public:
         * Set discrete '''cuboid''' areas to have heterogeneous (intra- and/or extra-cellular) conductivity tensors.
         */
         std::vector<ChasteCuboid<3> > input_areas;
-        std::vector< c_vector<double,3> > intra_conductivities;
-        std::vector< c_vector<double,3> > extra_conductivities;
+        std::vector< c_vector<double, 3> > intra_conductivities;
+        std::vector< c_vector<double, 3> > extra_conductivities;
         ChastePoint<3> corner_a(width/2, 0, 0);
         ChastePoint<3> corner_b(width, height, depth);
 

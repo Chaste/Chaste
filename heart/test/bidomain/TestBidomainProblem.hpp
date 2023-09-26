@@ -119,7 +119,7 @@ public:
  * Used for testing exception handling in TestBidomain3dErrorHandling
  */
 template<class CELL, unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
-class ExceptionStimulusCellFactory : public AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>
+class ExceptionStimulusCellFactory : public AbstractCardiacCellFactory<ELEMENT_DIM, SPACE_DIM>
 {
 protected:
     /** The stimulus to apply at stimulated nodes */
@@ -132,7 +132,7 @@ public:
      * @param startTime When the exception should be introduced (defaults to 0.0).
      */
     ExceptionStimulusCellFactory(double stimulusDuration=1, double startTime = 0.0)
-        : AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>()
+        : AbstractCardiacCellFactory<ELEMENT_DIM, SPACE_DIM>()
     {
         mpStimulus.reset(new ExceptionStimulus(stimulusDuration, startTime));
     }
@@ -293,7 +293,7 @@ public:
             TS_ASSERT_LESS_THAN_EQUALS(-voltage[index] + (Ek-30), 0);
 
             std::vector<double> r_ode_vars = bidomain_problem.GetBidomainTissue()->GetCardiacCell(index.Global)->GetStdVecStateVariables();
-            for (int j=0; j<8; ++j)
+            for (int j = 0; j<8; ++j)
             {
                 // if not voltage or calcium ion conc, test whether between 0 and 1
                 if ((j!=0) && (j!=7))
@@ -314,7 +314,7 @@ public:
             // final voltages for nodes 0 to 5 produced with ksp_rtol=1e-9
             double test_values[6]={31.0335, 28.9214, 20.0279, -3.92649, -57.9395, -79.7754};
 
-            for (unsigned node=0; node<=5; node++)
+            for (unsigned node = 0; node<=5; node++)
             {
                 if (index.Global == node)
                 {
@@ -360,7 +360,7 @@ public:
 
 
         // Apply the constraint 'Average phi = 0' to nodes 0, 50, 100.
-        for (unsigned node=0; node<bidomain_problem.rGetMesh().GetNumNodes(); node+=50)
+        for (unsigned node = 0; node<bidomain_problem.rGetMesh().GetNumNodes(); node+=50)
         {
             bidomain_problem.SetNodeForAverageOfPhiZeroed(node);
 
@@ -389,7 +389,7 @@ public:
                 TS_ASSERT_LESS_THAN_EQUALS(-voltage[index] + (Ek-30), 0);
 
                 std::vector<double> r_ode_vars = bidomain_problem.GetBidomainTissue()->GetCardiacCell(index.Global)->GetStdVecStateVariables();
-                for (int j=0; j<8; ++j)
+                for (int j = 0; j<8; ++j)
                 {
                     // if not voltage or calcium ion conc, test whether between 0 and 1
                     if ((j!=0) && (j!=7))
@@ -446,9 +446,9 @@ public:
         }
 
         // Coverage of the exception in the solver itself
-        BoundaryConditionsContainer<1,1,2> container;
+        BoundaryConditionsContainer<1, 1, 2> container;
 
-        BidomainSolver<1,1> bidomain_solver(false,
+        BidomainSolver<1, 1> bidomain_solver(false,
                                             &bidomain_problem.rGetMesh(),
                                             bidomain_problem.GetBidomainTissue(),
                                             &container);
@@ -701,7 +701,7 @@ public:
         std::string files[6] = {"res_mesh.pts","res_mesh.cnnx","ChasteParameters.xml",
                                 "res_Phi_e.dat","res_V.dat","res_times.info"};
 
-        for (unsigned i=0; i<6; ++i)
+        for (unsigned i = 0; i<6; ++i)
         {
             TS_ASSERT(handler.FindFile(files[i]).Exists());
         }
@@ -852,7 +852,7 @@ public:
 // Requires  "sudo aptitude install libvtk5-dev" or similar
         results_dir = OutputFileHandler::GetChasteTestOutputDirectory() + "AxisymmetricBidomain/vtk_output/";
 
-        VtkMeshReader<3,3> mesh_reader(results_dir + "axi3d.vtu");
+        VtkMeshReader<3, 3> mesh_reader(results_dir + "axi3d.vtu");
         TS_ASSERT_EQUALS( mesh_reader.GetNumNodes(), 50U);
         TS_ASSERT_EQUALS( mesh_reader.GetNumElements(), 139U);
 
@@ -932,7 +932,7 @@ public:
         std::vector<double> node_5_phi = data_reader1.GetVariableOverTime("Phi_e", 5);
         TS_ASSERT_EQUALS( node_5_phi.size(), num_steps);
 
-        for (unsigned i=0; i<output_variables.size(); ++i)
+        for (unsigned i = 0; i<output_variables.size(); ++i)
         {
             unsigned global_index = 2+i*2;
             std::vector<double> values = data_reader1.GetVariableOverTime(output_variables[i], global_index);
@@ -989,7 +989,7 @@ public:
         // Get an obscure state variable
         std::vector<double> obscure_at_5 = data_reader1.GetVariableOverTime("slow_delayed_rectifier_potassium_current_xs2_gate__xs2", 5);
         TS_ASSERT_EQUALS( obscure_at_5.size(), 11u);
-        for (unsigned time_step=0; time_step<11; time_step++)
+        for (unsigned time_step = 0; time_step<11; time_step++)
         {
             TS_ASSERT_DELTA( obscure_at_5[time_step], 0.0044, 1e-3); //Does not change over time at this node
         }
@@ -1035,7 +1035,7 @@ public:
         TS_ASSERT_DELTA(solution_replicated[10], 25.3148, atol);
 
         // Save solution for later comparison
-        for (unsigned index=0; index<solution_replicated.GetSize(); index++)
+        for (unsigned index = 0; index<solution_replicated.GetSize(); index++)
         {
             mSolutionReplicated1d2ms.push_back(solution_replicated[index]);
         }
@@ -1052,8 +1052,8 @@ public:
     void TestPermutedBidomain1D()
     {
 
-        TetrahedralMesh<1,1> mesh;
-        TrianglesMeshReader<1,1> reader("mesh/test/data/1D_0_to_1mm_10_elements");
+        TetrahedralMesh<1, 1> mesh;
+        TrianglesMeshReader<1, 1> reader("mesh/test/data/1D_0_to_1mm_10_elements");
         mesh.ConstructFromMeshReader(reader);
 
         std::vector<unsigned> rotation_perm;
@@ -1157,7 +1157,7 @@ public:
         TS_ASSERT_DELTA(solution_replicated[10], 25.3148, atol);
 
         // Compare against saved solution
-        for (unsigned index=0; index<solution_replicated.GetSize(); index++)
+        for (unsigned index = 0; index<solution_replicated.GetSize(); index++)
         {
             TS_ASSERT_DELTA(solution_replicated[index], mSolutionReplicated1d2ms[index], 5e-11);
         }
@@ -1280,7 +1280,7 @@ public:
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
-            AbstractCardiacProblem<1,1,2>* const p_bidomain_problem = &bidomain_problem;
+            AbstractCardiacProblem<1, 1, 2>* const p_bidomain_problem = &bidomain_problem;
             (*p_arch) & p_bidomain_problem;
         }
 
@@ -1289,7 +1289,7 @@ public:
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
-            AbstractCardiacProblem<1,1,2> *p_bidomain_problem;
+            AbstractCardiacProblem<1, 1, 2> *p_bidomain_problem;
             (*p_arch) >> p_bidomain_problem;
 
             // Check values
@@ -1310,7 +1310,7 @@ public:
             TS_ASSERT_DELTA(solution_replicated[9], -16.8344, atol);
             TS_ASSERT_DELTA(solution_replicated[10], 25.3148, atol);
 
-            for (unsigned index=0; index<solution_replicated.GetSize(); index++)
+            for (unsigned index = 0; index<solution_replicated.GetSize(); index++)
             {
                 //Shouldn't differ from the original run at all
                 TS_ASSERT_DELTA(solution_replicated[index], mSolutionReplicated1d2ms[index],  5e-11);

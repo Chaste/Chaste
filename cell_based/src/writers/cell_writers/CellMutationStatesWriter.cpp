@@ -85,12 +85,12 @@ void CellMutationStatesWriter<ELEMENT_DIM, SPACE_DIM>::VisitCell(
 }
 
 // Explicit instantiation
-template class CellMutationStatesWriter<1,1>;
-template class CellMutationStatesWriter<1,2>;
-template class CellMutationStatesWriter<2,2>;
-template class CellMutationStatesWriter<1,3>;
-template class CellMutationStatesWriter<2,3>;
-template class CellMutationStatesWriter<3,3>;
+template class CellMutationStatesWriter<1, 1>;
+template class CellMutationStatesWriter<1, 2>;
+template class CellMutationStatesWriter<2, 2>;
+template class CellMutationStatesWriter<1, 3>;
+template class CellMutationStatesWriter<2, 3>;
+template class CellMutationStatesWriter<3, 3>;
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer

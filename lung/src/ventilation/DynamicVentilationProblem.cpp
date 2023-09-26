@@ -51,7 +51,7 @@ DynamicVentilationProblem::DynamicVentilationProblem(AbstractAcinarUnitFactory* 
 
     mpAcinarFactory->SetMesh(&mrMesh);
 
-    for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = mrMesh.GetBoundaryNodeIteratorBegin();
+    for (AbstractTetrahedralMesh<1, 3>::BoundaryNodeIterator iter = mrMesh.GetBoundaryNodeIteratorBegin();
                         iter != mrMesh.GetBoundaryNodeIteratorEnd();
                         ++iter )
     {
@@ -129,7 +129,7 @@ void DynamicVentilationProblem::Solve()
     while (!time_stepper.IsTimeAtEnd())
     {
         //Solve coupled problem
-        for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = mrMesh.GetBoundaryNodeIteratorBegin();
+        for (AbstractTetrahedralMesh<1, 3>::BoundaryNodeIterator iter = mrMesh.GetBoundaryNodeIteratorBegin();
                  iter != mrMesh.GetBoundaryNodeIteratorEnd();
                  ++iter )
         {
@@ -146,7 +146,7 @@ void DynamicVentilationProblem::Solve()
         mVentilationProblem.Solve();
         mVentilationProblem.GetSolutionAsFluxesAndPressures(fluxes, pressures);
 
-        for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = mrMesh.GetBoundaryNodeIteratorBegin();
+        for (AbstractTetrahedralMesh<1, 3>::BoundaryNodeIterator iter = mrMesh.GetBoundaryNodeIteratorBegin();
                             iter != mrMesh.GetBoundaryNodeIteratorEnd();
                             ++iter )
         {
@@ -180,7 +180,7 @@ void DynamicVentilationProblem::Solve()
                 vtk_writer.AddPointData("Pressure"+suffix_name.str(), pressures);
 
 
-                for (AbstractTetrahedralMesh<1,3>::BoundaryNodeIterator iter = mrMesh.GetBoundaryNodeIteratorBegin();
+                for (AbstractTetrahedralMesh<1, 3>::BoundaryNodeIterator iter = mrMesh.GetBoundaryNodeIteratorBegin();
                                                 iter != mrMesh.GetBoundaryNodeIteratorEnd();
                                                 ++iter )
                 {

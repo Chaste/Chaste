@@ -454,8 +454,8 @@ public:
      */
     template<unsigned DIM>
     void GetConductivityHeterogeneities(std::vector<boost::shared_ptr<AbstractChasteRegion<DIM> > >& conductivitiesHeterogeneityAreas,
-                                        std::vector< c_vector<double,3> >& intraConductivities,
-                                        std::vector< c_vector<double,3> >& extraConductivities) const;
+                                        std::vector< c_vector<double, 3> >& intraConductivities,
+                                        std::vector< c_vector<double, 3> >& extraConductivities) const;
     std::string GetOutputDirectory() const; /**< @return output directory path name*/
 
     /**
@@ -835,8 +835,8 @@ public:
      * @param rExtraConductivities  extraConductivities[0] is conductivity vector for the first region
      */
     void SetConductivityHeterogeneities(std::vector<ChasteCuboid<3> >& rConductivityAreas,
-                                        std::vector< c_vector<double,3> >& rIntraConductivities,
-                                        std::vector< c_vector<double,3> >& rExtraConductivities);
+                                        std::vector< c_vector<double, 3> >& rIntraConductivities,
+                                        std::vector< c_vector<double, 3> >& rExtraConductivities);
     /**
      * Set a number of heterogeneous regions (Axis-aligned ellipsoids)
      * It is assumed that the std::vectors are all of the same length
@@ -845,8 +845,8 @@ public:
      * @param rExtraConductivities  extraConductivities[0] is conductivity vector for the first region
      */
     void SetConductivityHeterogeneitiesEllipsoid(std::vector<ChasteEllipsoid<3> >& rConductivityAreas,
-                                                 std::vector< c_vector<double,3> >& rIntraConductivities,
-                                                 std::vector< c_vector<double,3> >& rExtraConductivities);
+                                                 std::vector< c_vector<double, 3> >& rIntraConductivities,
+                                                 std::vector< c_vector<double, 3> >& rExtraConductivities);
     /**
      * @param rOutputDirectory  Full path to output directory (will be created if necessary)
      */
@@ -1102,7 +1102,7 @@ public:
     // Output visualization
 
     /** Create the OutputVisualizer element if it doesn't exist */
-    void EnsureOutputVisualizerExists(void);
+    void EnsureOutputVisualizerExists();
 
     /** Set whether to convert the output from HDF5 to meshalyzer readable format
      *

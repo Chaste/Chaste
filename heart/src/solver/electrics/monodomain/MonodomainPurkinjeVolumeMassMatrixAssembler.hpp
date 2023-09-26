@@ -82,9 +82,9 @@ public:
                 c_vector<double, ELEMENT_DIM+1> &rPhi,
                 c_matrix<double, SPACE_DIM, ELEMENT_DIM+1> &rGradPhi,
                 ChastePoint<SPACE_DIM> &rX,
-                c_vector<double,2> &rU,
-                c_matrix<double,2,SPACE_DIM> &rGradU /* not used */,
-                Element<ELEMENT_DIM,SPACE_DIM>* pElement)
+                c_vector<double, 2> &rU,
+                c_matrix<double,2, SPACE_DIM> &rGradU /* not used */,
+                Element<ELEMENT_DIM, SPACE_DIM>* pElement)
     {
         c_matrix<double, ELEMENT_DIM+1, ELEMENT_DIM+1> mass_matrix = outer_prod(rPhi, rPhi);
 
@@ -92,9 +92,9 @@ public:
         {
             // not implemented yet (and also not implemented yet in MonodomainPurkinjeCableMassMatrixAssembler)
             NEVER_REACHED;
-//            for (unsigned row=0; row<ELEMENT_DIM+1; row++)
+//            for (unsigned row = 0; row<ELEMENT_DIM+1; row++)
 //            {
-//                for (unsigned column=0; column<ELEMENT_DIM+1; column++)
+//                for (unsigned column = 0; column<ELEMENT_DIM+1; column++)
 //                {
 //                    if (row != column)
 //                    {
@@ -121,8 +121,8 @@ public:
     * @param scaleFactor the factor with which the multiply the mass matrix. Defaults to 1.0
     * @param useMassLumping whether to use mass matrix lumping or not
     */
-    MonodomainPurkinjeVolumeMassMatrixAssembler(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh, bool useMassLumping=false, double scaleFactor=1.0)
-        : AbstractFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,2,false,true,NORMAL>(pMesh),
+    MonodomainPurkinjeVolumeMassMatrixAssembler(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh, bool useMassLumping=false, double scaleFactor=1.0)
+        : AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM,2,false,true,NORMAL>(pMesh),
           mScaleFactor(scaleFactor),
           mUseMassLumping(useMassLumping)
     {

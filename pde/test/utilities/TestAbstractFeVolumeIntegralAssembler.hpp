@@ -51,16 +51,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // simple assembler which just returns a c_vector of ones for each quad point
 //  => final 'b' vector for each element will be equal to elem_vol*(1,..,1)
 template<unsigned DIM>
-class BasicVectorAssembler : public AbstractFeVolumeIntegralAssembler<DIM,DIM,1,true,false,NORMAL>
+class BasicVectorAssembler : public AbstractFeVolumeIntegralAssembler<DIM, DIM,1,true,false,NORMAL>
 {
 private:
     c_vector<double,1*(DIM+1)> ComputeVectorTerm(
         c_vector<double, DIM+1>& rPhi,
         c_matrix<double, DIM, DIM+1>& rGradPhi,
         ChastePoint<DIM>& rX,
-        c_vector<double,1>& rU,
+        c_vector<double, 1>& rU,
         c_matrix<double, 1, DIM>& rGradU,
-        Element<DIM,DIM>* pElement)
+        Element<DIM, DIM>* pElement)
     {
         c_vector<double,1*(DIM+1)> vec;
         for (unsigned i = 0; i < DIM + 1; ++i)
@@ -71,8 +71,8 @@ private:
     }
 
 public:
-    BasicVectorAssembler(AbstractTetrahedralMesh<DIM,DIM>* pMesh)
-        : AbstractFeVolumeIntegralAssembler<DIM,DIM,1,true,false,NORMAL>(pMesh)
+    BasicVectorAssembler(AbstractTetrahedralMesh<DIM, DIM>* pMesh)
+        : AbstractFeVolumeIntegralAssembler<DIM, DIM,1,true,false,NORMAL>(pMesh)
     {
     }
 };
@@ -81,16 +81,16 @@ public:
 // simple assembler which just returns a c_matrix of ones for each quad point
 //  => final 'A' matrix for each element will be equal to elem_vol*(1,..,1)
 template<unsigned DIM>
-class BasicMatrixAssembler : public AbstractFeVolumeIntegralAssembler<DIM,DIM,1,false,true,NORMAL>
+class BasicMatrixAssembler : public AbstractFeVolumeIntegralAssembler<DIM, DIM,1,false,true,NORMAL>
 {
 private:
     c_matrix<double,1*(DIM+1),1*(DIM+1)> ComputeMatrixTerm(
         c_vector<double, DIM+1>& rPhi,
         c_matrix<double, DIM, DIM+1>& rGradPhi,
         ChastePoint<DIM>& rX,
-        c_vector<double,1>& rU,
+        c_vector<double, 1>& rU,
         c_matrix<double, 1, DIM>& rGradU,
-        Element<DIM,DIM>* pElement)
+        Element<DIM, DIM>* pElement)
     {
         c_matrix<double,1*(DIM+1),1*(DIM+1)> mat;
         for (unsigned i = 0; i < DIM+1; ++i)
@@ -103,24 +103,24 @@ private:
         return mat;
     }
 public:
-    BasicMatrixAssembler(AbstractTetrahedralMesh<DIM,DIM>* pMesh)
-        : AbstractFeVolumeIntegralAssembler<DIM,DIM,1,false,true,NORMAL>(pMesh)
+    BasicMatrixAssembler(AbstractTetrahedralMesh<DIM, DIM>* pMesh)
+        : AbstractFeVolumeIntegralAssembler<DIM, DIM,1,false,true,NORMAL>(pMesh)
     {
     }
 };
 
 // Assembler which does both of the above
 template<unsigned DIM>
-class BasicVectorAndMatrixAssembler : public AbstractFeVolumeIntegralAssembler<DIM,DIM,1,true,true,NORMAL>
+class BasicVectorAndMatrixAssembler : public AbstractFeVolumeIntegralAssembler<DIM, DIM,1,true,true,NORMAL>
 {
 private:
     c_matrix<double,1*(DIM+1),1*(DIM+1)> ComputeMatrixTerm(
         c_vector<double, DIM+1>& rPhi,
         c_matrix<double, DIM, DIM+1>& rGradPhi,
         ChastePoint<DIM>& rX,
-        c_vector<double,1>& rU,
+        c_vector<double, 1>& rU,
         c_matrix<double, 1, DIM>& rGradU,
-        Element<DIM,DIM>* pElement)
+        Element<DIM, DIM>* pElement)
     {
         c_matrix<double,1*(DIM+1),1*(DIM+1)> mat;
         for (unsigned i = 0; i < DIM+1; ++i)
@@ -137,9 +137,9 @@ private:
         c_vector<double, DIM+1>& rPhi,
         c_matrix<double, DIM, DIM+1>& rGradPhi,
         ChastePoint<DIM>& rX,
-        c_vector<double,1>& rU,
+        c_vector<double, 1>& rU,
         c_matrix<double, 1, DIM>& rGradU,
-        Element<DIM,DIM>* pElement)
+        Element<DIM, DIM>* pElement)
     {
         c_vector<double,1*(DIM+1)> vec;
         for (unsigned i = 0; i < DIM+1; ++i)
@@ -149,32 +149,32 @@ private:
         return vec;
     }
 public:
-    BasicVectorAndMatrixAssembler(AbstractTetrahedralMesh<DIM,DIM>* pMesh)
-        : AbstractFeVolumeIntegralAssembler<DIM,DIM,1,true,true,NORMAL>(pMesh)
+    BasicVectorAndMatrixAssembler(AbstractTetrahedralMesh<DIM, DIM>* pMesh)
+        : AbstractFeVolumeIntegralAssembler<DIM, DIM,1,true,true,NORMAL>(pMesh)
     {
     }
 };
 
 
 // Assembler for checking the current solution is interpolated and passed up into here
-class TestingAssembler : public AbstractFeVolumeIntegralAssembler<1,1,1,true,false,NORMAL>
+class TestingAssembler : public AbstractFeVolumeIntegralAssembler<1, 1,1,true,false,NORMAL>
 {
 private:
     c_vector<double,1*(1+1)> ComputeVectorTerm(
         c_vector<double, 1+1>& rPhi,
         c_matrix<double, 1, 1+1>& rGradPhi,
         ChastePoint<1>& rX,
-        c_vector<double,1>& rU,
+        c_vector<double, 1>& rU,
         c_matrix<double, 1, 1>& rGradU,
-        Element<1,1>* pElement)
+        Element<1, 1>* pElement)
     {
         TS_ASSERT_LESS_THAN(0.0, rX[0]);             // check x is not 0.0
         TS_ASSERT_DELTA(rU(0), 10 + 10*rX[0], 1e-6); // check u,x interpolated properly
         return zero_vector<double>(1+1);
     }
 public:
-    TestingAssembler(AbstractTetrahedralMesh<1,1>* pMesh)
-        : AbstractFeVolumeIntegralAssembler<1,1,1,true,false,NORMAL>(pMesh)
+    TestingAssembler(AbstractTetrahedralMesh<1, 1>* pMesh)
+        : AbstractFeVolumeIntegralAssembler<1, 1,1,true,false,NORMAL>(pMesh)
     {
     }
 };
@@ -187,7 +187,7 @@ private:
     template<unsigned DIM>
     void DoTestBasicVectorAssemblers()
     {
-        TetrahedralMesh<DIM,DIM> mesh;
+        TetrahedralMesh<DIM, DIM> mesh;
         double h = 0.1;
         if (DIM == 1)
         {
@@ -237,7 +237,7 @@ public:
     // Tested better with 2d mass matrix below
     void TestBasicMatrixAssemblers()
     {
-        TetrahedralMesh<1,1> mesh;
+        TetrahedralMesh<1, 1> mesh;
         double h = 0.1;
         mesh.ConstructRegularSlabMesh(h, h); // must be one element for this test to work
 
@@ -268,7 +268,7 @@ public:
     // Test the ability to assemble both a vector and a matrix
     void TestBasicVectorAndMatrixAssembler()
     {
-        TetrahedralMesh<1,1> mesh;
+        TetrahedralMesh<1, 1> mesh;
         double h = 0.1;
         mesh.ConstructRegularSlabMesh(h, h); // must be one element for this test to work
 
@@ -371,14 +371,14 @@ public:
 
     void TestMassMatrixAssembler1d()
     {
-        TetrahedralMesh<1,1> mesh;
+        TetrahedralMesh<1, 1> mesh;
         double h = 0.1;
         mesh.ConstructRegularSlabMesh(h, 0.5);
 
         Mat mat;
         PetscTools::SetupMat(mat, mesh.GetNumNodes(), mesh.GetNumNodes(), 3);
 
-        MassMatrixAssembler<1,1> assembler(&mesh);
+        MassMatrixAssembler<1, 1> assembler(&mesh);
 
         assembler.SetMatrixToAssemble(mat);
         assembler.Assemble();
@@ -452,15 +452,15 @@ public:
 
     void TestMassMatrixAssembler2dIncludingScaleFactor()
     {
-        TetrahedralMesh<2,2> mesh;
-        TrianglesMeshReader<2,2> reader("mesh/test/data/square_2_elements"); // so we know the exact connectivity
+        TetrahedralMesh<2, 2> mesh;
+        TrianglesMeshReader<2, 2> reader("mesh/test/data/square_2_elements"); // so we know the exact connectivity
         mesh.ConstructFromMeshReader(reader);
 
         Mat mat;
         PetscTools::SetupMat(mat, mesh.GetNumNodes(), mesh.GetNumNodes(), 4);
 
         double scale_factor = 2.464525345;
-        MassMatrixAssembler<2,2> assembler(&mesh, false, scale_factor);
+        MassMatrixAssembler<2, 2> assembler(&mesh, false, scale_factor);
 
         assembler.SetMatrixToAssemble(mat);
         assembler.Assemble();
@@ -509,14 +509,14 @@ public:
 
     void TestStiffnessMatrixAssembler1d()
     {
-        TetrahedralMesh<1,1> mesh;
+        TetrahedralMesh<1, 1> mesh;
         double h = 0.1;
         mesh.ConstructRegularSlabMesh(h, 0.5);
 
         Mat mat;
         PetscTools::SetupMat(mat, mesh.GetNumNodes(), mesh.GetNumNodes(), 3);
 
-        StiffnessMatrixAssembler<1,1> assembler(&mesh);
+        StiffnessMatrixAssembler<1, 1> assembler(&mesh);
 
         assembler.SetMatrixToAssemble(mat);
         assembler.Assemble();
@@ -589,7 +589,7 @@ public:
 
     void TestInterpolationOfPositionAndCurrentSolution()
     {
-        TetrahedralMesh<1,1> mesh;
+        TetrahedralMesh<1, 1> mesh;
         mesh.ConstructRegularSlabMesh(1.0, 1.0);
 
         std::vector<double> u(2);

@@ -42,16 +42,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 double PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM> ::GetIntegrand(ChastePoint<SPACE_DIM>& rX,
-                                c_vector<double,PROBLEM_DIM>& rU,
-                                c_matrix<double,PROBLEM_DIM,SPACE_DIM>& rGradU)
+                                c_vector<double, PROBLEM_DIM>& rU,
+                                c_matrix<double, PROBLEM_DIM, SPACE_DIM>& rGradU)
 {
-    c_vector<double,SPACE_DIM> r_vector = rX.rGetLocation()- mProbeElectrode.rGetLocation();
+    c_vector<double, SPACE_DIM> r_vector = rX.rGetLocation()- mProbeElectrode.rGetLocation();
     double norm_r = norm_2(r_vector);
     if (norm_r <= DBL_EPSILON)
     {
         EXCEPTION("Probe is on a mesh Gauss point.");
     }
-    c_vector<double,SPACE_DIM> grad_one_over_r = - (r_vector)*SmallPow( (1/norm_r) , 3);
+    c_vector<double, SPACE_DIM> grad_one_over_r = - (r_vector)*SmallPow( (1/norm_r) , 3);
     matrix_row<c_matrix<double, PROBLEM_DIM, SPACE_DIM> > grad_u_row(rGradU, 0);
     double integrand = inner_prod(grad_u_row, grad_one_over_r);
 
@@ -59,7 +59,7 @@ double PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM> ::GetIntegrand(C
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::PseudoEcgCalculator(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,
+PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::PseudoEcgCalculator(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
                                                                               const ChastePoint<SPACE_DIM>& rProbeElectrode,
                                                                               const FileFinder& rDirectory,
                                                                               const std::string& rHdf5FileName,
@@ -79,7 +79,7 @@ PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::PseudoEcgCalculator(Ab
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-bool PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::ShouldSkipThisElement(Element<ELEMENT_DIM,SPACE_DIM>& rElement)
+bool PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::ShouldSkipThisElement(Element<ELEMENT_DIM, SPACE_DIM>& rElement)
 {
     bool result = false; // Don't skip usually
     if (mVariableName=="V")
@@ -158,9 +158,9 @@ void PseudoEcgCalculator<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::WritePseudoEcg ()
 }
 
 // Explicit instantiation
-template class PseudoEcgCalculator<1,1,1>;
-template class PseudoEcgCalculator<1,2,1>;
-template class PseudoEcgCalculator<1,3,1>;
-template class PseudoEcgCalculator<2,2,1>;
-//template class PseudoEcgCalculator<2,3,1>;
-template class PseudoEcgCalculator<3,3,1>;
+template class PseudoEcgCalculator<1, 1, 1>;
+template class PseudoEcgCalculator<1, 2, 1>;
+template class PseudoEcgCalculator<1, 3, 1>;
+template class PseudoEcgCalculator<2, 2, 1>;
+//template class PseudoEcgCalculator<2, 3, 1>;
+template class PseudoEcgCalculator<3, 3, 1>;

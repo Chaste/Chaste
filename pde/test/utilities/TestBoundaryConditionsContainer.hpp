@@ -56,7 +56,7 @@ public:
         // Test in 1d
 
         int num_nodes = 10;
-        BoundaryConditionsContainer<1,1,1> bcc1;
+        BoundaryConditionsContainer<1, 1, 1> bcc1;
 
         TS_ASSERT(!bcc1.HasDirichletBoundaryConditions());
 
@@ -85,7 +85,7 @@ public:
             }
         }
         int num_elem = 10;
-        std::vector<BoundaryElement<0,1> > elements;
+        std::vector<BoundaryElement<0, 1> > elements;
         for (unsigned element_index = 0;
              element_index < static_cast<unsigned>(num_elem);
              ++element_index)
@@ -94,7 +94,7 @@ public:
             Node<1>* node = new Node<1>(element_index,true,0);
             nodes.push_back(node);
 
-            BoundaryElement<0,1> element(element_index, nodes);
+            BoundaryElement<0, 1> element(element_index, nodes);
             elements.push_back(element);
         }
         for (int i = 0; i < num_elem; ++i)
@@ -114,7 +114,7 @@ public:
         // Test in 2d
 
         num_nodes = 10;
-        BoundaryConditionsContainer<2,2,1> bcc2;
+        BoundaryConditionsContainer<2, 2, 1> bcc2;
 
         std::vector<Node<2>*> nodes2(num_nodes);
         for (int i = 0; i < num_nodes; ++i)
@@ -137,7 +137,7 @@ public:
         }
 
         num_elem = 10;
-        std::vector<BoundaryElement<1,2> > elements2;
+        std::vector<BoundaryElement<1, 2> > elements2;
         for (unsigned element_index = 0;
              element_index < static_cast<unsigned>(num_elem);
              ++element_index)
@@ -148,7 +148,7 @@ public:
 
             nodes.push_back(node0);
             nodes.push_back(node1);
-            BoundaryElement<1,2> element(element_index, nodes);
+            BoundaryElement<1, 2> element(element_index, nodes);
 
             elements2.push_back(element);
         }
@@ -170,7 +170,7 @@ public:
         // Test in 3d
 
         num_nodes = 10;
-        BoundaryConditionsContainer<3,3,1> bcc3;
+        BoundaryConditionsContainer<3, 3, 1> bcc3;
 
         std::vector<Node<3>*> nodes3(num_nodes);
         for (int i = 0; i < num_nodes; ++i)
@@ -192,7 +192,7 @@ public:
         }
 
         num_elem = 10;
-        std::vector<BoundaryElement<2,3> > elements3;
+        std::vector<BoundaryElement<2, 3> > elements3;
         for (int element_index = 0; element_index < num_elem; ++element_index)
         {
             std::vector<Node<3>* > nodes;
@@ -202,7 +202,7 @@ public:
             nodes.push_back(node0);
             nodes.push_back(node1);
             nodes.push_back(node2);
-            BoundaryElement<2,3> element(element_index, nodes);
+            BoundaryElement<2, 3> element(element_index, nodes);
 
             elements3.push_back(element);
         }
@@ -241,7 +241,7 @@ public:
         linear_system.AssembleIntermediateLinearSystem();
 
         Node<3>* nodes_array[SIZE];
-        BoundaryConditionsContainer<3,3,1> bcc3;
+        BoundaryConditionsContainer<3, 3, 1> bcc3;
 
         // Apply dirichlet boundary conditions to all but last node
         for (int i = 0; i < SIZE-1; ++i)
@@ -352,7 +352,7 @@ public:
         linear_system.AssembleIntermediateLinearSystem();
 
         Node<3>* nodes_array[SIZE];
-        BoundaryConditionsContainer<3,3,1> bcc3;
+        BoundaryConditionsContainer<3, 3, 1> bcc3;
 
         // Apply dirichlet boundary conditions to all but last node
         for (int i = 0; i < SIZE-1; ++i)
@@ -437,7 +437,7 @@ public:
         d_residual.Restore();
 
         Node<3>* nodes_array[SIZE];
-        BoundaryConditionsContainer<3,3,1> bcc3;
+        BoundaryConditionsContainer<3, 3, 1> bcc3;
 
         for (int i = 0; i < SIZE-1; ++i)
         {
@@ -465,7 +465,7 @@ public:
             }
         }
 
-        for (int i=0; i < SIZE-1; ++i)
+        for (int i = 0; i < SIZE-1; ++i)
         {
             delete nodes_array[i];
         }
@@ -477,11 +477,11 @@ public:
     void TestDefineZeroDirichletOnMeshBoundary()
     {
         // Load a 2D square mesh with 1 central non-boundary node
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        BoundaryConditionsContainer<2,2,1> bcc;
+        BoundaryConditionsContainer<2, 2, 1> bcc;
 
         bcc.DefineZeroDirichletOnMeshBoundary(&mesh);
 
@@ -499,18 +499,18 @@ public:
     void TestAnyNonZeroNeumannConditionsAndApplyNeumannToMeshBoundary()
     {
         // Load a 2D square mesh with 1 central non-boundary node
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        BoundaryConditionsContainer<2,2,1> bcc;
-        BoundaryConditionsContainer<2,2,2> bcc_2unknowns;
+        BoundaryConditionsContainer<2, 2, 1> bcc;
+        BoundaryConditionsContainer<2, 2, 2> bcc_2unknowns;
 
         TS_ASSERT_EQUALS(bcc.AnyNonZeroNeumannConditions(), false);
 
         bcc.DefineZeroNeumannOnMeshBoundary(&mesh);
 
-        TetrahedralMesh<2,2>::BoundaryElementIterator iter;
+        TetrahedralMesh<2, 2>::BoundaryElementIterator iter;
         iter = mesh.GetBoundaryElementIteratorBegin();
         while (iter != mesh.GetBoundaryElementIteratorEnd())
         {
@@ -533,11 +533,11 @@ public:
     void TestValidate()
     {
         // Load a 2D square mesh with 1 central non-boundary node
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        BoundaryConditionsContainer<2,2,1> bcc;
+        BoundaryConditionsContainer<2, 2, 1> bcc;
 
         // No BCs yet, so shouldn't validate
         TS_ASSERT(!bcc.Validate(&mesh));
@@ -547,7 +547,7 @@ public:
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(0), bc);
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(1), bc);
         bcc.AddDirichletBoundaryCondition(mesh.GetNode(3), bc);
-        TetrahedralMesh<2,2>::BoundaryElementIterator iter
+        TetrahedralMesh<2, 2>::BoundaryElementIterator iter
         = mesh.GetBoundaryElementIteratorEnd();
         iter--;
         bcc.AddNeumannBoundaryCondition(*iter, bc); // 2 to 3
@@ -560,11 +560,11 @@ public:
     void TestAddNeumannBoundaryConditions()
     {
           // Load a 2D square mesh with 1 central non-boundary node
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
-        BoundaryConditionsContainer<2,2,2> bcc;
+        BoundaryConditionsContainer<2, 2, 2> bcc;
 
         // No BCs yet, so shouldn't validate
         TS_ASSERT(!bcc.Validate(&mesh));
@@ -573,7 +573,7 @@ public:
         ConstBoundaryCondition<2> *bc1 = new ConstBoundaryCondition<2>(2.0);
         ConstBoundaryCondition<2> *bc2 = new ConstBoundaryCondition<2>(-3.0);
 
-        TetrahedralMesh<2,2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorEnd();
+        TetrahedralMesh<2, 2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorEnd();
         iter--;
         bcc.AddNeumannBoundaryCondition(*iter, bc1, 0);
         bcc.AddNeumannBoundaryCondition(*iter, bc2, 1);
@@ -619,7 +619,7 @@ public:
         linear_system.AssembleIntermediateLinearSystem();
 
         Node<3>* nodes_array[SIZE];
-        BoundaryConditionsContainer<3,3,2> bcc32;
+        BoundaryConditionsContainer<3, 3, 2> bcc32;
 
         // Apply dirichlet boundary conditions to all but last node
         for (int i = 0; i < SIZE-1; ++i)
@@ -697,7 +697,7 @@ public:
         linear_system.AssembleIntermediateLinearSystem();
 
         Node<3>* nodes_array[SIZE];
-        BoundaryConditionsContainer<3,3,3> bcc33;
+        BoundaryConditionsContainer<3, 3, 3> bcc33;
 
         // Apply dirichlet boundary conditions to all but last node
         for (int i = 0; i < SIZE-1; ++i)
@@ -775,7 +775,7 @@ public:
         VecRestoreArray(residual, &p_residual);
 
         Node<3>* nodes_array[SIZE];
-        BoundaryConditionsContainer<3,3,3> bcc33;
+        BoundaryConditionsContainer<3, 3, 3> bcc33;
 
         for (int i = 0; i < SIZE; ++i)
         {
@@ -850,7 +850,7 @@ public:
         linear_system.AssembleIntermediateLinearSystem();
 
         Node<3>* nodes[SIZE];
-        BoundaryConditionsContainer<3,3,2> bcc;
+        BoundaryConditionsContainer<3, 3, 2> bcc;
 
         for (unsigned i = 0; i < SIZE-1; ++i)
         {
@@ -933,12 +933,12 @@ public:
         std::string archive_filename = ArchiveLocationInfo::GetProcessUniqueFilePath("bcc.arch");
 
         // Load a 2D square mesh with 1 central non-boundary node
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_4_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         {
-            BoundaryConditionsContainer<2,2,2>* p_bcc = new BoundaryConditionsContainer<2,2,2>;
+            BoundaryConditionsContainer<2, 2, 2>* p_bcc = new BoundaryConditionsContainer<2, 2, 2>;
 
             // No BCs yet, so shouldn't validate
             TS_ASSERT_EQUALS(p_bcc->Validate(&mesh), false);
@@ -947,7 +947,7 @@ public:
             ConstBoundaryCondition<2> *bc1 = new ConstBoundaryCondition<2>(2.0);
             ConstBoundaryCondition<2> *bc2 = new ConstBoundaryCondition<2>(-3.0);
 
-            TetrahedralMesh<2,2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorEnd();
+            TetrahedralMesh<2, 2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorEnd();
             iter--;
             p_bcc->AddNeumannBoundaryCondition(*iter, bc1, 0);
             p_bcc->AddNeumannBoundaryCondition(*iter, bc2, 1);
@@ -973,12 +973,12 @@ public:
             boost::archive::text_iarchive input_arch(ifs);
 
             // Load container...
-            BoundaryConditionsContainer<2,2,2>* p_bcc;
+            BoundaryConditionsContainer<2, 2, 2>* p_bcc;
             input_arch >> p_bcc;
             // ...and fill it
             p_bcc->LoadFromArchive( input_arch, &mesh );
 
-            TetrahedralMesh<2,2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorEnd();
+            TetrahedralMesh<2, 2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorEnd();
             iter--;
             TS_ASSERT_DELTA(p_bcc->GetNeumannBCValue(*iter, ChastePoint<2>(), 0), 2.0, 1e-9);
             TS_ASSERT_DELTA(p_bcc->GetNeumannBCValue(*iter, ChastePoint<2>(), 1), -3.0, 1e-9);

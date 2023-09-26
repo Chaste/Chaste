@@ -43,8 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PetscSetupAndFinalize.hpp"
 
-typedef MemfemMeshReader<3,3> READER_3D;
-typedef MemfemMeshReader<2,2> READER_2D; // For exception coverage
+typedef MemfemMeshReader<3, 3> READER_3D;
+typedef MemfemMeshReader<2, 2> READER_2D; // For exception coverage
 
 class TestMemfemMeshReaders : public CxxTest::TestSuite
 {
@@ -56,7 +56,7 @@ public:
      */
     void TestFilesOpen()
     {
-        MemfemMeshReader<3,3>* pMeshReader;
+        MemfemMeshReader<3, 3>* pMeshReader;
         pMeshReader = new READER_3D("mesh/test/data/Memfem_slab");
 
         TS_ASSERT_EQUALS(pMeshReader->GetNumNodes(), 381u);
@@ -84,7 +84,7 @@ public:
 
     void TestGenericReader()
     {
-        std::shared_ptr<AbstractMeshReader<3, 3> > p_mesh_reader = GenericMeshReader<3,3>("mesh/test/data/Memfem_slab");
+        std::shared_ptr<AbstractMeshReader<3, 3> > p_mesh_reader = GenericMeshReader<3, 3>("mesh/test/data/Memfem_slab");
 
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumNodes(), 381u);
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumElements(), 1030u);
@@ -93,7 +93,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumFaceAttributes(), 0u);
 
         // The file does not exist
-        TS_ASSERT_THROWS_CONTAINS((GenericMeshReader<3,3>("no_file")),
+        TS_ASSERT_THROWS_CONTAINS((GenericMeshReader<3, 3>("no_file")),
                                   "Could not open appropriate mesh files for no_file");
     }
 
@@ -106,7 +106,7 @@ public:
         TS_ASSERT_THROWS_THIS( READER_2D reader("mesh/test/data/Memfem_slab"),
                 "You have asked to read non-3D data. All Memfem data is in 3D.");
 
-        MemfemMeshReader<3,3> mesh_reader2("mesh/test/data/Memfem_slab");
+        MemfemMeshReader<3, 3> mesh_reader2("mesh/test/data/Memfem_slab");
         TS_ASSERT_EQUALS(mesh_reader2.HasNodePermutation(), false);
         TS_ASSERT_THROWS_THIS(mesh_reader2.rGetNodePermutation(), "Node permutations aren't supported by this reader");
         TS_ASSERT_THROWS_THIS(mesh_reader2.GetNode(0), "Random access is only implemented in mesh readers for binary mesh files.");

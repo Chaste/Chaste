@@ -55,7 +55,7 @@ public:
     void TestQuadraticMesh1d()
     {
         QuadraticMesh<1> mesh;
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements_quadratic",2,1,false);
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements_quadratic",2,1,false);
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 21u);
@@ -114,7 +114,7 @@ public:
     void TestQuadraticMesh2d()
     {
         QuadraticMesh<2> mesh;
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1, false);
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1, false);
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 289u);
@@ -148,7 +148,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetElement(0)->GetNodeGlobalIndex(5), 81u);
 
         // Each boundary element should have three nodes
-        for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
+        for (TetrahedralMesh<2, 2>::BoundaryElementIterator iter
               = mesh.GetBoundaryElementIteratorBegin();
             iter != mesh.GetBoundaryElementIteratorEnd();
             ++iter)
@@ -156,7 +156,7 @@ public:
             TS_ASSERT_EQUALS((*iter)->GetNumNodes(), 3u);
         }
 
-        TetrahedralMesh<2,2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
+        TetrahedralMesh<2, 2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
 
         // The first edge has nodes 53 and 0, according to the edge file...
         TS_ASSERT_EQUALS( (*iter)->GetNodeGlobalIndex(0), 53u);
@@ -176,7 +176,7 @@ public:
     void TestQuadraticMesh3d()
     {
         QuadraticMesh<3> mesh;
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/3D_Single_tetrahedron_element_quadratic",2,1, false);
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/3D_Single_tetrahedron_element_quadratic",2,1, false);
         mesh.ConstructFromMeshReader(mesh_reader);
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), 10u);
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 1u);
@@ -197,7 +197,7 @@ public:
 
         // Lots of internal and boundary nodes in this mesh..
         QuadraticMesh<3> mesh2;
-        TrianglesMeshReader<3,3> mesh_reader2("mesh/test/data/cube_1626_elements_quadratic",2,1, false);
+        TrianglesMeshReader<3, 3> mesh_reader2("mesh/test/data/cube_1626_elements_quadratic",2,1, false);
         mesh2.ConstructFromMeshReader(mesh_reader2);
 
         TS_ASSERT_EQUALS(mesh2.GetNumNodes(), 2570u);
@@ -219,14 +219,14 @@ public:
         }
 
         // Each boundary element should have 6 nodes
-        for (TetrahedralMesh<3,3>::BoundaryElementIterator iter= mesh2.GetBoundaryElementIteratorBegin();
+        for (TetrahedralMesh<3, 3>::BoundaryElementIterator iter= mesh2.GetBoundaryElementIteratorBegin();
              iter != mesh2.GetBoundaryElementIteratorEnd();
              ++iter)
         {
             TS_ASSERT_EQUALS((*iter)->GetNumNodes(), 6u);
         }
 
-        TetrahedralMesh<3,3>::BoundaryElementIterator iter = mesh2.GetBoundaryElementIteratorBegin();
+        TetrahedralMesh<3, 3>::BoundaryElementIterator iter = mesh2.GetBoundaryElementIteratorBegin();
 
         // The first boundary elem has these nodes, according to the edge file..
         TS_ASSERT_EQUALS( (*iter)->GetNodeGlobalIndex(0), 177u);
@@ -235,7 +235,7 @@ public:
         // .. the internal nodes have to be computed (found) by the QuadraticMesh.
         // The nodes 177,43,85 are all in the third element in the ele file, and
         // they are nodes 1,3,2 respectively. Therefore, the internals are the local
-        // nodes 9,5,8 respectively (look the the ordering picture), so..
+        // nodes 9,5,8 respectively (look at the ordering picture), so..
         TS_ASSERT_EQUALS( (*iter)->GetNodeGlobalIndex(3), 392u);
         TS_ASSERT_EQUALS( (*iter)->GetNodeGlobalIndex(4), 388u);
         TS_ASSERT_EQUALS( (*iter)->GetNodeGlobalIndex(5), 391u);
@@ -291,7 +291,7 @@ public:
 
         // Test boundary elements
         unsigned num_boundary_elements=0;
-        for (TetrahedralMesh<2,2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
+        for (TetrahedralMesh<2, 2>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
              iter != mesh.GetBoundaryElementIteratorEnd();
              ++iter)
         {
@@ -361,7 +361,7 @@ public:
 
         for (unsigned i=1; i<mesh.GetNumNodes(); ++i)
         {
-            c_vector<double,3> x = mesh.GetNode(i)->rGetLocation();
+            c_vector<double, 3> x = mesh.GetNode(i)->rGetLocation();
 
             // Check the extra nodes aren't (0,0,0).
             // This fails with 32bit outdated binary.
@@ -418,7 +418,7 @@ public:
     {
         // This mesh has quadratic node and ele files, a linear face file that has containing element info
         QuadraticMesh<3> mesh;
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_152_elements_v3",2,1,true);
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_2mm_152_elements_v3",2,1,true);
         mesh.ConstructFromMeshReader(mesh_reader);
 
         for (QuadraticMesh<3>::BoundaryElementIterator iter = mesh.GetBoundaryElementIteratorBegin();
@@ -435,8 +435,8 @@ public:
         std::string archive_file = "quadratic_mesh.arch";
         ArchiveLocationInfo::SetMeshFilename("quadratic_mesh");
 
-        AbstractTetrahedralMesh<3,3>* const p_mesh = new QuadraticMesh<3>;
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_1626_elements_fully_quadratic", 2, 2, false);
+        AbstractTetrahedralMesh<3, 3>* const p_mesh = new QuadraticMesh<3>;
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_1626_elements_fully_quadratic", 2, 2, false);
         static_cast<QuadraticMesh<3>*>(p_mesh)->ConstructFromMeshReader(mesh_reader);
 
         {
@@ -449,7 +449,7 @@ public:
         {
             // Should archive the most abstract class you can to check boost knows what individual classes are.
             // (but here AbstractMesh doesn't have the methods below).
-            AbstractTetrahedralMesh<3,3>* p_mesh2;
+            AbstractTetrahedralMesh<3, 3>* p_mesh2;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -509,11 +509,11 @@ public:
             TS_ASSERT_EQUALS(containing_elems.size(), 1u);
         }
 
-        TrianglesMeshWriter<1,1> mesh_writer("TestQuadraticMesh", "QuadraticSlab1D", false);
+        TrianglesMeshWriter<1, 1> mesh_writer("TestQuadraticMesh", "QuadraticSlab1D", false);
         mesh_writer.WriteFilesUsingMesh(mesh);
 
         std::string output_dir = mesh_writer.GetOutputDirectory();
-        TrianglesMeshReader<1,1> quadratic_mesh_reader(output_dir + "QuadraticSlab1D", 2, 2);
+        TrianglesMeshReader<1, 1> quadratic_mesh_reader(output_dir + "QuadraticSlab1D", 2, 2);
 
         QuadraticMesh<1> quad_mesh_read_back;
         quad_mesh_read_back.ConstructFromMeshReader(quadratic_mesh_reader);
@@ -535,11 +535,11 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryNodes(), 120u);
 
 
-        TrianglesMeshWriter<2,2> mesh_writer("TestQuadraticMesh", "QuadraticSlab2D", false);
+        TrianglesMeshWriter<2, 2> mesh_writer("TestQuadraticMesh", "QuadraticSlab2D", false);
         mesh_writer.WriteFilesUsingMesh(mesh);
 
         std::string output_dir = mesh_writer.GetOutputDirectory();
-        TrianglesMeshReader<2,2> quadratic_mesh_reader(output_dir + "QuadraticSlab2D", 2, 2);
+        TrianglesMeshReader<2, 2> quadratic_mesh_reader(output_dir + "QuadraticSlab2D", 2, 2);
 
         QuadraticMesh<2> quad_mesh_read_back;
         quad_mesh_read_back.ConstructFromMeshReader(quadratic_mesh_reader);
@@ -558,11 +558,11 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 6*1*2*3u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryNodes(), 90u);
 
-        TrianglesMeshWriter<3,3> mesh_writer("TestQuadraticMesh", "QuadraticSlab3D", false);
+        TrianglesMeshWriter<3, 3> mesh_writer("TestQuadraticMesh", "QuadraticSlab3D", false);
         mesh_writer.WriteFilesUsingMesh(mesh);
 
         std::string output_dir = mesh_writer.GetOutputDirectory();
-        TrianglesMeshReader<3,3> quadratic_mesh_reader(output_dir + "QuadraticSlab3D", 2, 2);
+        TrianglesMeshReader<3, 3> quadratic_mesh_reader(output_dir + "QuadraticSlab3D", 2, 2);
 
         QuadraticMesh<3> quad_mesh_read_back;
         quad_mesh_read_back.ConstructFromMeshReader(quadratic_mesh_reader);
@@ -581,15 +581,15 @@ public:
         unsigned height = 2.0;
         {
             //Two-dimensional two squares
-            TetrahedralMesh<2,2> mesh;
+            TetrahedralMesh<2, 2> mesh;
             bool stagger=false;
             mesh.ConstructRectangularMesh(width, height, stagger);
-            TrianglesMeshWriter<2,2> mesh_writer("TestQuadraticMesh", "TempGrid2d", false);
+            TrianglesMeshWriter<2, 2> mesh_writer("TestQuadraticMesh", "TempGrid2d", false);
             mesh_writer.WriteFilesUsingMesh(mesh);
 
             //Convert to quadratic
             std::string output_dir = mesh_writer.GetOutputDirectory();
-            TrianglesMeshReader<2,2> quadratic_mesh_reader(output_dir + "TempGrid2d");
+            TrianglesMeshReader<2, 2> quadratic_mesh_reader(output_dir + "TempGrid2d");
             quad_mesh_read_back.ConstructFromLinearMeshReader(quadratic_mesh_reader);
 
             quad_mesh_constructed.ConstructRectangularMesh(width, height, stagger);
@@ -600,8 +600,8 @@ public:
 
         for (unsigned elem = 0; elem<quad_mesh_constructed.GetNumElements(); elem++)
         {
-            Element<2,2>* p_elem_constructed =  quad_mesh_constructed.GetElement(elem);
-            Element<2,2>* p_elem_read_back =  quad_mesh_read_back.GetElement(elem);
+            Element<2, 2>* p_elem_constructed =  quad_mesh_constructed.GetElement(elem);
+            Element<2, 2>* p_elem_read_back =  quad_mesh_read_back.GetElement(elem);
             TS_ASSERT_EQUALS(p_elem_constructed->GetNumNodes(), p_elem_read_back->GetNumNodes());
             for (unsigned i = 0; i < p_elem_constructed->GetNumNodes(); ++i)
             {
@@ -621,8 +621,8 @@ public:
         // external mesher.  (So the edges come back in a different order.)
         for (unsigned b_elem = 0; b_elem<quad_mesh_constructed.GetNumBoundaryElements(); b_elem++)
         {
-            BoundaryElement<1,2>* p_b_elem_constructed =  quad_mesh_constructed.GetBoundaryElement(b_elem);
-            BoundaryElement<1,2>* p_b_elem_read_back =  quad_mesh_read_back.GetBoundaryElement(b_elem);
+            BoundaryElement<1, 2>* p_b_elem_constructed =  quad_mesh_constructed.GetBoundaryElement(b_elem);
+            BoundaryElement<1, 2>* p_b_elem_read_back =  quad_mesh_read_back.GetBoundaryElement(b_elem);
             TS_ASSERT_EQUALS(p_b_elem_constructed->GetNumNodes(), p_b_elem_read_back->GetNumNodes());
         }
     }
@@ -635,14 +635,14 @@ public:
         double height = 2.0;
         {
             //Two-dimensional two squares
-            TetrahedralMesh<2,2> mesh;
+            TetrahedralMesh<2, 2> mesh;
             mesh.ConstructRegularSlabMesh(1.0, width, height);
-            TrianglesMeshWriter<2,2> mesh_writer("TestQuadraticMesh", "TempGrid2d", false);
+            TrianglesMeshWriter<2, 2> mesh_writer("TestQuadraticMesh", "TempGrid2d", false);
             mesh_writer.WriteFilesUsingMesh(mesh);
 
             //Convert to quadratic
             std::string output_dir = mesh_writer.GetOutputDirectory();
-            TrianglesMeshReader<2,2> quadratic_mesh_reader(output_dir + "TempGrid2d");
+            TrianglesMeshReader<2, 2> quadratic_mesh_reader(output_dir + "TempGrid2d");
             quad_mesh_read_back.ConstructFromLinearMeshReader(quadratic_mesh_reader);
 
             quad_mesh_constructed.ConstructRegularSlabMesh(1.0, width, height);
@@ -653,8 +653,8 @@ public:
 
         for (unsigned elem = 0; elem<quad_mesh_constructed.GetNumElements(); elem++)
         {
-            Element<2,2>* p_elem_constructed =  quad_mesh_constructed.GetElement(elem);
-            Element<2,2>* p_elem_read_back =  quad_mesh_read_back.GetElement(elem);
+            Element<2, 2>* p_elem_constructed =  quad_mesh_constructed.GetElement(elem);
+            Element<2, 2>* p_elem_read_back =  quad_mesh_read_back.GetElement(elem);
             TS_ASSERT_EQUALS(p_elem_constructed->GetNumNodes(), p_elem_read_back->GetNumNodes());
             for (unsigned i = 0; i < p_elem_constructed->GetNumNodes(); ++i)
             {
@@ -672,8 +672,8 @@ public:
         // external mesher.  (So the edges come back in a different order.)
         for (unsigned b_elem = 0; b_elem<quad_mesh_constructed.GetNumBoundaryElements(); b_elem++)
         {
-            BoundaryElement<1,2>* p_b_elem_constructed =  quad_mesh_constructed.GetBoundaryElement(b_elem);
-            BoundaryElement<1,2>* p_b_elem_read_back =  quad_mesh_read_back.GetBoundaryElement(b_elem);
+            BoundaryElement<1, 2>* p_b_elem_constructed =  quad_mesh_constructed.GetBoundaryElement(b_elem);
+            BoundaryElement<1, 2>* p_b_elem_read_back =  quad_mesh_read_back.GetBoundaryElement(b_elem);
             TS_ASSERT_EQUALS(p_b_elem_constructed->GetNumNodes(), p_b_elem_read_back->GetNumNodes());
         }
     }
@@ -687,14 +687,14 @@ public:
         double depth  = 3.0;
         {
             //Three-dimensional cubes
-            TetrahedralMesh<3,3> mesh;
+            TetrahedralMesh<3, 3> mesh;
             mesh.ConstructRegularSlabMesh(1.0, width, height, depth);
-            TrianglesMeshWriter<3,3> mesh_writer("TestQuadraticMesh", "TempGrid3d", false);
+            TrianglesMeshWriter<3, 3> mesh_writer("TestQuadraticMesh", "TempGrid3d", false);
             mesh_writer.WriteFilesUsingMesh(mesh);
 
             //Convert to quadratic
             std::string output_dir = mesh_writer.GetOutputDirectory();
-            TrianglesMeshReader<3,3> quadratic_mesh_reader(output_dir + "TempGrid3d");
+            TrianglesMeshReader<3, 3> quadratic_mesh_reader(output_dir + "TempGrid3d");
             quad_mesh_read_back.ConstructFromLinearMeshReader(quadratic_mesh_reader);
 
             quad_mesh_constructed.ConstructRegularSlabMesh(1.0, width, height, depth);
@@ -708,8 +708,8 @@ public:
 
         for (unsigned elem = 0; elem<quad_mesh_constructed.GetNumElements(); elem++)
         {
-            Element<3,3>* p_elem_constructed =  quad_mesh_constructed.GetElement(elem);
-            Element<3,3>* p_elem_read_back =  quad_mesh_read_back.GetElement(elem);
+            Element<3, 3>* p_elem_constructed =  quad_mesh_constructed.GetElement(elem);
+            Element<3, 3>* p_elem_read_back =  quad_mesh_read_back.GetElement(elem);
             TS_ASSERT_EQUALS(p_elem_constructed->GetNumNodes(), p_elem_read_back->GetNumNodes());
             for (unsigned i = 0; i < p_elem_constructed->GetNumNodes(); ++i)
             {
@@ -729,8 +729,8 @@ public:
 
         for (unsigned b_elem = 0; b_elem<quad_mesh_constructed.GetNumBoundaryElements(); b_elem++)
         {
-            BoundaryElement<2,3>* p_b_elem_constructed =  quad_mesh_constructed.GetBoundaryElement(b_elem);
-            BoundaryElement<2,3>* p_b_elem_read_back =  quad_mesh_read_back.GetBoundaryElement(b_elem);
+            BoundaryElement<2, 3>* p_b_elem_constructed =  quad_mesh_constructed.GetBoundaryElement(b_elem);
+            BoundaryElement<2, 3>* p_b_elem_read_back =  quad_mesh_read_back.GetBoundaryElement(b_elem);
             TS_ASSERT_EQUALS(p_b_elem_constructed->GetNumNodes(), p_b_elem_read_back->GetNumNodes());
         }
     }
@@ -738,7 +738,7 @@ public:
     void TestLinearToQuadraticMeshConversion2d()
     {
         QuadraticMesh<2> quad_mesh;
-        TrianglesMeshReader<2,2> reader("mesh/test/data/square_128_elements");
+        TrianglesMeshReader<2, 2> reader("mesh/test/data/square_128_elements");
         quad_mesh.ConstructFromLinearMeshReader(reader);
 
         TS_ASSERT_EQUALS(quad_mesh.GetNumNodes(), 289u);
@@ -747,7 +747,7 @@ public:
         TS_ASSERT_EQUALS(quad_mesh.GetNumBoundaryNodes(), 64u);
 
         // Output
-        TrianglesMeshWriter<2,2> mesh_writer("TestQuadraticMesh", "converted_square", false);
+        TrianglesMeshWriter<2, 2> mesh_writer("TestQuadraticMesh", "converted_square", false);
         mesh_writer.WriteFilesUsingMesh(quad_mesh);  //Compare with
 
         // Read in the new mesh to check it worked
@@ -756,7 +756,7 @@ public:
 
         // Input again
         QuadraticMesh<2> quad_mesh_after_conversion;
-        TrianglesMeshReader<2,2> quad_reader(full_new_mesh, 2, 2);
+        TrianglesMeshReader<2, 2> quad_reader(full_new_mesh, 2, 2);
         quad_mesh_after_conversion.ConstructFromMeshReader(quad_reader);
 
         TS_ASSERT_EQUALS(quad_mesh_after_conversion.GetNumNodes(), 17*17u);
@@ -767,9 +767,9 @@ public:
 
     void TestLinearToQuadraticMeshConversion2dNonconvex()
     {
-        TrianglesMeshReader<2,2> reader("mesh/test/data/l_shape");
+        TrianglesMeshReader<2, 2> reader("mesh/test/data/l_shape");
 
-        TetrahedralMesh<2,2> linear_mesh;
+        TetrahedralMesh<2, 2> linear_mesh;
         linear_mesh.ConstructFromMeshReader(reader);
 
         TS_ASSERT_EQUALS(linear_mesh.GetNumNodes(), 8u);
@@ -793,7 +793,7 @@ public:
     void TestLinearToQuadraticMeshConversion3d()
     {
         QuadraticMesh<3> quad_mesh;
-        TrianglesMeshReader<3,3> reader("mesh/test/data/cube_136_elements");
+        TrianglesMeshReader<3, 3> reader("mesh/test/data/cube_136_elements");
         quad_mesh.ConstructFromLinearMeshReader(reader);
 
 
@@ -803,7 +803,7 @@ public:
         TS_ASSERT_EQUALS(quad_mesh.GetNumBoundaryNodes(), 194u);
 
         //Output
-        TrianglesMeshWriter<3,3> mesh_writer("TestQuadraticMesh", "converted_cube", false);
+        TrianglesMeshWriter<3, 3> mesh_writer("TestQuadraticMesh", "converted_cube", false);
         mesh_writer.WriteFilesUsingMesh(quad_mesh);
 
         // read in the new mesh to check it worked
@@ -812,7 +812,7 @@ public:
 
         //Input again
         QuadraticMesh<3> quad_mesh_after_conversion;
-        TrianglesMeshReader<3,3> quad_reader(full_new_mesh, 2, 2);
+        TrianglesMeshReader<3, 3> quad_reader(full_new_mesh, 2, 2);
         quad_mesh_after_conversion.ConstructFromMeshReader(quad_reader);
 
         TS_ASSERT_EQUALS(quad_mesh_after_conversion.GetNumNodes(), 285u);
@@ -823,9 +823,9 @@ public:
 
     void TestLinearToQuadraticMeshConversion3dNonconvex()
     {
-        TrianglesMeshReader<3,3> reader("mesh/test/data/l_shape3d");
+        TrianglesMeshReader<3, 3> reader("mesh/test/data/l_shape3d");
 
-        TetrahedralMesh<3,3> linear_mesh;
+        TetrahedralMesh<3, 3> linear_mesh;
         linear_mesh.ConstructFromMeshReader(reader);
 
         TS_ASSERT_EQUALS(linear_mesh.GetNumNodes(), 16u);
@@ -849,13 +849,13 @@ public:
     {
         // Quadratics mesh - with different ordering
         QuadraticMesh<2> quad_mesh;
-        TrianglesMeshReader<2,2> mesh_reader1("mesh/test/data/square_128_elements_quadratic_reordered",2,1,false);
+        TrianglesMeshReader<2, 2> mesh_reader1("mesh/test/data/square_128_elements_quadratic_reordered",2,1,false);
         quad_mesh.ConstructFromMeshReader(mesh_reader1);
 
 
         // Linear mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         TS_ASSERT_EQUALS(mesh.GetNumNodes(), quad_mesh.GetNumVertices());
@@ -881,12 +881,12 @@ public:
     /**
      * Check that we can build a QuadraticMesh using the VTK mesh reader.
      */
-    void TestBuildQuadraticMeshFromVtkMeshReader(void)
+    void TestBuildQuadraticMeshFromVtkMeshReader()
     {
 #ifdef CHASTE_VTK
-        VtkMeshReader<3,3> mesh_reader("mesh/test/data/heart_decimation.vtu");
+        VtkMeshReader<3, 3> mesh_reader("mesh/test/data/heart_decimation.vtu");
 
-        TetrahedralMesh<3,3> tet_mesh;
+        TetrahedralMesh<3, 3> tet_mesh;
         tet_mesh.ConstructFromMeshReader(mesh_reader);
         mesh_reader.Reset();
 
@@ -940,10 +940,10 @@ public:
     }
 
 
-    void CalculateConnectivityMatrix(Mat& matrix, AbstractTetrahedralMesh<2,2>& rMesh)
+    void CalculateConnectivityMatrix(Mat& matrix, AbstractTetrahedralMesh<2, 2>& rMesh)
     {
         PetscTools::SetupMat(matrix, rMesh.GetNumNodes(), rMesh.GetNumNodes(), 17);
-        for (TetrahedralMesh<2,2>::ElementIterator iter
+        for (TetrahedralMesh<2, 2>::ElementIterator iter
                     = rMesh.GetElementIteratorBegin();
                     iter != rMesh.GetElementIteratorEnd();
                     ++iter)
@@ -962,7 +962,7 @@ public:
         PetscMatTools::Finalise(matrix);
     }
 
-    std::vector<unsigned> CalculateMatrixFill(AbstractTetrahedralMesh<2,2>& rMesh)
+    std::vector<unsigned> CalculateMatrixFill(AbstractTetrahedralMesh<2, 2>& rMesh)
     {
         //Get some statistics about matrix fill
         Mat matrix;
@@ -1012,7 +1012,7 @@ public:
             std::set<unsigned> elements = mesh.GetNode(node_index)->rGetContainingElementIndices();
             for (auto iter : elements)
             {
-                Element<3,3>* p_element = mesh.GetElement(iter);
+                Element<3, 3>* p_element = mesh.GetElement(iter);
                 bool found_node = false;
                 for (unsigned i = 0; i<p_element->GetNumNodes(); ++i)
                 {
@@ -1028,7 +1028,7 @@ public:
             std::set<unsigned> boundary_elements = mesh.GetNode(node_index)->rGetContainingBoundaryElementIndices();
             for (auto iter : boundary_elements)
             {
-                BoundaryElement<2,3>* p_element = mesh.GetBoundaryElement(iter);
+                BoundaryElement<2, 3>* p_element = mesh.GetBoundaryElement(iter);
                 bool found_node = false;
                 for (unsigned i = 0; i<p_element->GetNumNodes(); ++i)
                 {

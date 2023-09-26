@@ -135,11 +135,9 @@ Cell::Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
     if (!archiving)
     {
         // Increment cell count for each cell property in mCellPropertyCollection
-        for (auto property_iter = mCellPropertyCollection.Begin();
-             property_iter != mCellPropertyCollection.End();
-             ++property_iter)
+        for (const auto& property_iter : mCellPropertyCollection)
         {
-            (*property_iter)->IncrementCellCount();
+            property_iter->IncrementCellCount();
         }
     }
 }
@@ -413,11 +411,9 @@ bool Cell::IsDead()
 void Cell::Kill()
 {
     // Decrement cell count for each cell property in mCellPropertyCollection
-    for (auto property_iter = mCellPropertyCollection.Begin();
-         property_iter != mCellPropertyCollection.End();
-         ++property_iter)
+    for (const auto& property_iter : mCellPropertyCollection)
     {
-        (*property_iter)->DecrementCellCount();
+        property_iter->DecrementCellCount();
     }
     mIsDead = true;
 }

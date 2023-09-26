@@ -76,7 +76,7 @@ private:
     std::vector<std::vector<double> > mB;
 
     /** Identity matrix. */
-    c_matrix<double,DIM,DIM> mIdentity;
+    c_matrix<double, DIM, DIM> mIdentity;
 
 protected:
 
@@ -132,11 +132,11 @@ public:
      *  @param computeDTdE a boolean flag saying whether the stress derivative is
      *    required or not.
      */
-    void ComputeStressAndStressDerivative(c_matrix<double,DIM,DIM>& rC,
-                                          c_matrix<double,DIM,DIM>& rInvC,
+    void ComputeStressAndStressDerivative(c_matrix<double, DIM, DIM>& rC,
+                                          c_matrix<double, DIM, DIM>& rInvC,
                                           double                    pressure,
-                                          c_matrix<double,DIM,DIM>& rT,
-                                          FourthOrderTensor<DIM,DIM,DIM,DIM>&   rDTdE,
+                                          c_matrix<double, DIM, DIM>& rT,
+                                          FourthOrderTensor<DIM, DIM, DIM, DIM>&   rDTdE,
                                           bool                      computeDTdE);
 
     /**

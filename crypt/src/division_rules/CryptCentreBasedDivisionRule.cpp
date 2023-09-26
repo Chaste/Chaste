@@ -148,12 +148,12 @@ std::pair<c_vector<double, SPACE_DIM>, c_vector<double, SPACE_DIM> > CryptCentre
 }
 
 // Explicit instantiation
-template class CryptCentreBasedDivisionRule<1,1>;
-template class CryptCentreBasedDivisionRule<1,2>;
-template class CryptCentreBasedDivisionRule<2,2>;
-template class CryptCentreBasedDivisionRule<1,3>;
-template class CryptCentreBasedDivisionRule<2,3>;
-template class CryptCentreBasedDivisionRule<3,3>;
+template class CryptCentreBasedDivisionRule<1, 1>;
+template class CryptCentreBasedDivisionRule<1, 2>;
+template class CryptCentreBasedDivisionRule<2, 2>;
+template class CryptCentreBasedDivisionRule<1, 3>;
+template class CryptCentreBasedDivisionRule<2, 3>;
+template class CryptCentreBasedDivisionRule<3, 3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

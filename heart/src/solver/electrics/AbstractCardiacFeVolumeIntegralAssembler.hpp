@@ -44,13 +44,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  *  Simple implementation of AbstractFeVolumeIntegralAssembler which provides access to a cardiac tissue
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM, bool CAN_ASSEMBLE_VECTOR, bool CAN_ASSEMBLE_MATRIX, InterpolationLevel INTERPOLATION_LEVEL>
 class AbstractCardiacFeVolumeIntegralAssembler
    : public AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM, CAN_ASSEMBLE_VECTOR, CAN_ASSEMBLE_MATRIX, INTERPOLATION_LEVEL>
 {
 protected:
     /** The Cardiac tissue on which to solve. */
-    AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>* mpCardiacTissue;
+    AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>* mpCardiacTissue;
 
     /** Local cache of the configuration singleton pointer*/
     HeartConfig* mpConfig;
@@ -62,9 +62,9 @@ public:
      *  @param pMesh the mesh
      *  @param pTissue  pointer to the tissue used for getting conductivity values
      */
-    AbstractCardiacFeVolumeIntegralAssembler(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
-                                             AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>* pTissue)
-        : AbstractFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MATRIX,INTERPOLATION_LEVEL>(pMesh),
+    AbstractCardiacFeVolumeIntegralAssembler(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
+                                             AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>* pTissue)
+        : AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM,CAN_ASSEMBLE_VECTOR,CAN_ASSEMBLE_MATRIX,INTERPOLATION_LEVEL>(pMesh),
           mpCardiacTissue(pTissue),
           mpConfig(HeartConfig::Instance())
     {

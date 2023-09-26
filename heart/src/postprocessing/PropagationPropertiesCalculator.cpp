@@ -158,7 +158,7 @@ double PropagationPropertiesCalculator::CalculatePeakMembranePotential(unsigned 
 {
     std::vector<double>& r_voltages = rGetCachedVoltages(globalNodeIndex);
     double max = -DBL_MAX;
-    for (unsigned i=0; i<r_voltages.size(); ++i)
+    for (unsigned i = 0; i<r_voltages.size(); ++i)
     {
         if (r_voltages[i]>max)
         {

@@ -302,7 +302,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 32u); // 2*4*4
 
         // Test area and perimeter calculations for all elements
-        for (unsigned i=0; i<p_mesh->GetNumElements(); ++i)
+        for (unsigned i = 0; i<p_mesh->GetNumElements(); ++i)
         {
             TS_ASSERT_DELTA(p_mesh->GetVolumeOfElement(i), 0.8660, 1e-4);
             TS_ASSERT_DELTA(p_mesh->GetSurfaceAreaOfElement(i), 3.4641, 1e-4);
@@ -326,7 +326,7 @@ public:
         // Test CalculateMomentOfElement() for all elements;
         // all elements are regular hexagons with edge length 1/sqrt(3.0)
         c_vector<double, 3> moments;
-        for (unsigned i=0; i<p_mesh->GetNumElements(); ++i)
+        for (unsigned i = 0; i<p_mesh->GetNumElements(); ++i)
         {
             moments = p_mesh->CalculateMomentsOfElement(i);
 
@@ -341,8 +341,8 @@ public:
         rectangle_nodes.push_back(new Node<2>(1, false, 8.0, 0.0));
         rectangle_nodes.push_back(new Node<2>(2, false, 2.0, 0.0));
         rectangle_nodes.push_back(new Node<2>(3, false, 2.0, 2.0));
-        std::vector<VertexElement<2,2>*> rectangle_elements;
-        rectangle_elements.push_back(new VertexElement<2,2>(0, rectangle_nodes));
+        std::vector<VertexElement<2, 2>*> rectangle_elements;
+        rectangle_elements.push_back(new VertexElement<2, 2>(0, rectangle_nodes));
 
         Toroidal2dVertexMesh rectangle_mesh(10.0, 3.0, rectangle_nodes, rectangle_elements);
 
@@ -466,7 +466,7 @@ public:
         ToroidalHoneycombMeshGenerator generator(cells_across, cells_up);
         boost::shared_ptr<Toroidal2dMesh> p_delaunay_mesh = generator.GetToroidalMesh();
 
-        TrianglesMeshWriter<2,2> mesh_writer("TestToroidalVertexMesh", "DelaunayMesh", false);
+        TrianglesMeshWriter<2, 2> mesh_writer("TestToroidalVertexMesh", "DelaunayMesh", false);
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(*p_delaunay_mesh));
 
         TS_ASSERT_EQUALS(p_delaunay_mesh->GetWidth(0), 3);
@@ -478,7 +478,7 @@ public:
         // Create a vertex mesh, the Voronoi tessellation, using the tetrahedral mesh
         Toroidal2dVertexMesh voronoi_mesh(*p_delaunay_mesh);
 
-        VertexMeshWriter<2,2> vertexmesh_writer("TestToroidalVertexMesh", "ToroidalVertexMesh", false);
+        VertexMeshWriter<2, 2> vertexmesh_writer("TestToroidalVertexMesh", "ToroidalVertexMesh", false);
         TS_ASSERT_THROWS_NOTHING(vertexmesh_writer.WriteFilesUsingMesh(voronoi_mesh));
 
         // TODO Check this file !
@@ -531,7 +531,7 @@ public:
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(9)->rGetLocation()[1], 2.0*sqrt(3.0)/6.0, 1e-6);
 
         // Test element areas and number of nodes
-        for (unsigned i=0; i<12; ++i)
+        for (unsigned i = 0; i<12; ++i)
         {
             TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(i), sqrt(3.0)/2.0, 1e-6);
             TS_ASSERT_EQUALS(voronoi_mesh.GetElement(i)->GetNumNodes(), 6u);
@@ -584,7 +584,7 @@ public:
         NodeMap map(p_delaunay_mesh->GetNumAllNodes());
         p_delaunay_mesh->ReMesh(map);
 
-        TrianglesMeshWriter<2,2> mesh_writer("TestBoundedToroidalVertexMesh", "ToroidalDelaunayMesh", false);
+        TrianglesMeshWriter<2, 2> mesh_writer("TestBoundedToroidalVertexMesh", "ToroidalDelaunayMesh", false);
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(*p_delaunay_mesh));
 
         TS_ASSERT_EQUALS(p_delaunay_mesh->GetWidth(0), 5);
@@ -597,7 +597,7 @@ public:
         bool is_bounded = true;
         Toroidal2dVertexMesh voronoi_mesh(*p_delaunay_mesh,is_bounded);
 
-        VertexMeshWriter<2,2> vertexmesh_writer("TestBoundedToroidalVertexMesh", "ToroidalVertexMesh", false);
+        VertexMeshWriter<2, 2> vertexmesh_writer("TestBoundedToroidalVertexMesh", "ToroidalVertexMesh", false);
         TS_ASSERT_THROWS_NOTHING(vertexmesh_writer.WriteFilesUsingMesh(voronoi_mesh));
 
         // TODO Check this file !
@@ -619,7 +619,7 @@ public:
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(34)->rGetLocation()[1], 0.5*sqrt(3.0)/3.0, 1e-6);
 
         // Test element areas and number of nodes
-        for (unsigned i=0; i<24; ++i)
+        for (unsigned i = 0; i<24; ++i)
         {
             if (i!=6 && i!=7 && i!=11 && i!=12 && i!=15 && i!=16)
             {
@@ -681,7 +681,7 @@ public:
         unsigned num_cells_across = 4;
         unsigned num_cells_up = 6;
         ToroidalHoneycombVertexMeshGenerator generator(num_cells_across, num_cells_up);
-        boost::shared_ptr<AbstractMesh<2,2> > const p_saved_mesh = boost::static_pointer_cast<AbstractMesh<2, 2> >(generator.GetToroidalMesh());
+        boost::shared_ptr<AbstractMesh<2, 2> > const p_saved_mesh = boost::static_pointer_cast<AbstractMesh<2, 2> >(generator.GetToroidalMesh());
 
         double mesh_width = num_cells_across;
         double mesh_height = num_cells_up*1.5/sqrt(3.0);
@@ -709,7 +709,7 @@ public:
 
         {
             // De-serialize and compare
-            boost::shared_ptr<AbstractMesh<2,2> > p_loaded_mesh;
+            boost::shared_ptr<AbstractMesh<2, 2> > p_loaded_mesh;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -731,7 +731,7 @@ public:
             // Compare nodes
             TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), p_mesh2->GetNumNodes());
 
-            for (unsigned i=0; i<p_mesh->GetNumNodes(); ++i)
+            for (unsigned i = 0; i<p_mesh->GetNumNodes(); ++i)
             {
                 Node<2>* p_node = p_mesh->GetNode(i);
                 Node<2>* p_node2 = p_mesh2->GetNode(i);
@@ -739,7 +739,7 @@ public:
                 TS_ASSERT_EQUALS(p_node->GetIndex(), p_node2->GetIndex());
 
                 TS_ASSERT_EQUALS(p_node->IsBoundaryNode(), p_node2->IsBoundaryNode());
-                for (unsigned j=0; j<2; ++j)
+                for (unsigned j = 0; j<2; ++j)
                 {
                     TS_ASSERT_DELTA(p_node->rGetLocation()[j], p_node2->rGetLocation()[j], 1e-4);
                 }
@@ -749,12 +749,12 @@ public:
             TS_ASSERT_EQUALS(p_mesh->GetNumElements(), p_mesh2->GetNumElements());
             TS_ASSERT_EQUALS(p_mesh->GetNumAllElements(), p_mesh2->GetNumAllElements());
 
-            for (unsigned i=0; i<p_mesh->GetNumElements(); ++i)
+            for (unsigned i = 0; i<p_mesh->GetNumElements(); ++i)
             {
-                VertexElement<2,2>* p_elt = p_mesh->GetElement(i);
-                VertexElement<2,2>* p_elt2 = p_mesh2->GetElement(i);
+                VertexElement<2, 2>* p_elt = p_mesh->GetElement(i);
+                VertexElement<2, 2>* p_elt2 = p_mesh2->GetElement(i);
                 TS_ASSERT_EQUALS(p_elt->GetNumNodes(), p_elt2->GetNumNodes());
-                for (unsigned j=0; j<p_elt->GetNumNodes(); ++j)
+                for (unsigned j = 0; j<p_elt->GetNumNodes(); ++j)
                 {
                     TS_ASSERT_EQUALS(p_elt->GetNodeGlobalIndex(j), p_elt2->GetNodeGlobalIndex(j));
                 }
@@ -819,8 +819,8 @@ public:
         nodes.push_back(new Node<2>(3, false, 1.0, 2.0));
 
         // Make element
-        std::vector<VertexElement<2,2>*> elements;
-        elements.push_back(new VertexElement<2,2>(0, nodes));
+        std::vector<VertexElement<2, 2>*> elements;
+        elements.push_back(new VertexElement<2, 2>(0, nodes));
 
         // Make mesh
         Toroidal2dVertexMesh mesh(10.0, 3.0, nodes, elements);
@@ -884,7 +884,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumNodes(), 48u);
 
         // Every element in the mesh for VTK should have 6 nodes
-        for (unsigned elem_index=0; elem_index<p_mesh_for_vtk->GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index<p_mesh_for_vtk->GetNumElements(); elem_index++)
         {
             TS_ASSERT_EQUALS(p_mesh_for_vtk->GetElement(elem_index)->GetNumNodes(), 6u);
         }
@@ -951,7 +951,7 @@ public:
         TS_ASSERT_EQUALS(p_mesh_for_vtk->GetNumNodes(), 48u);
 
         // Every element in the mesh for VTK should have 6 nodes
-        for (unsigned elem_index=0; elem_index<p_mesh_for_vtk->GetNumElements(); elem_index++)
+        for (unsigned elem_index = 0; elem_index<p_mesh_for_vtk->GetNumElements(); elem_index++)
         {
             TS_ASSERT_EQUALS(p_mesh_for_vtk->GetElement(elem_index)->GetNumNodes(), 6u);        }
 
@@ -1011,7 +1011,7 @@ public:
     void TestConstructFromMeshReader()
     {
         // Create mesh reader and mesh
-        VertexMeshReader<2,2> mesh_reader("mesh/test/data/toroidal_2d_mesh");
+        VertexMeshReader<2, 2> mesh_reader("mesh/test/data/toroidal_2d_mesh");
         Toroidal2dVertexMesh mesh;
 
         // Check nothing is thrown when width and height are input correctly

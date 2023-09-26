@@ -91,7 +91,7 @@ public:
         need_initialisation = true;
 
         // Test the RHF of the mesh
-        for (AbstractTetrahedralMesh<3,3>::NodeIterator it = bidomain_problem.rGetMesh().GetNodeIteratorBegin();
+        for (AbstractTetrahedralMesh<3, 3>::NodeIterator it = bidomain_problem.rGetMesh().GetNodeIteratorBegin();
              it != bidomain_problem.rGetMesh().GetNodeIteratorEnd();
              ++it)
         {

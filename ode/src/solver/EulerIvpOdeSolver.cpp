@@ -49,7 +49,7 @@ void EulerIvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstractOdeSyste
     // Yes, this looks weird, but it makes good use of memory!
     pAbstractOdeSystem->EvaluateYDerivatives(time, rCurrentYValues, rNextYValues /*dydt is stored here*/);
 
-    for (unsigned i=0; i<num_equations; ++i)
+    for (unsigned i = 0; i<num_equations; ++i)
     {
         // rNextYValues contains dY/dt until here
         rNextYValues[i] = rCurrentYValues[i] + timeStep*rNextYValues[i];

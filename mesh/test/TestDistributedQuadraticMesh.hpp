@@ -58,7 +58,7 @@ class TestDistributedQuadraticMesh : public CxxTest::TestSuite
 public:
     void TestDumbMeshPartitioning()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1, false);
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1, false);
         QuadraticMesh<2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
         std::set<unsigned> nodes_owned;
@@ -112,11 +112,11 @@ public:
         //// very coarse - if the following is used to create a finer mesh, the partition looks
         //// fine for num_procs up to 6 (at least).
         //QuadraticMesh<2> mesh0(0.01,1.0,1.0);
-        //TrianglesMeshWriter<2,2> writer("", "quad_mesh");
+        //TrianglesMeshWriter<2, 2> writer("", "quad_mesh");
         //writer.WriteFilesUsingMesh(mesh0);
-        //TrianglesMeshReader<2,2> mesh_reader("../../../../tmp/rafb/testoutput/quad_mesh",2,1,false);
+        //TrianglesMeshReader<2, 2> mesh_reader("../../../../tmp/rafb/testoutput/quad_mesh",2,1,false);
 
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1, false);
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1, false);
 
         std::vector<unsigned> nodes_permutation;
         std::set<unsigned> nodes_owned;
@@ -135,7 +135,7 @@ public:
 
         // Compute the centre of mass (average position of all the nodes) for each processor,
         // and check that all the nodes are within a certain distance of the centre of mass.
-        c_vector<double,2> centre_of_mass = zero_vector<double>(2);
+        c_vector<double, 2> centre_of_mass = zero_vector<double>(2);
         unsigned counter = 0;
         for (auto iter : nodes_owned)
         {
@@ -193,7 +193,7 @@ public:
          *  - linear edges
          *  - edge file doesn't say which element the edge belongs too
          */
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic", 2, 1, false);
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements_quadratic", 2, 1, false);
         DistributedQuadraticMesh<2> mesh; //PARMETIS_LIBRARY
         mesh.ConstructFromMeshReader(mesh_reader);
         TS_ASSERT_EQUALS(mesh.mMeshIsLinear, false);
@@ -227,7 +227,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetDistributedVectorFactory()->GetProblemSize(), 289u);
         TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), 32u);
 
-        for (AbstractTetrahedralMesh<2,2>::ElementIterator iter = mesh.GetElementIteratorBegin();
+        for (AbstractTetrahedralMesh<2, 2>::ElementIterator iter = mesh.GetElementIteratorBegin();
              iter != mesh.GetElementIteratorEnd();
              ++iter)
         {
@@ -239,17 +239,17 @@ public:
         QuadraticMesh<2> seq_mesh;
         seq_mesh.ConstructFromMeshReader(mesh_reader);
 
-        for (AbstractTetrahedralMesh<2,2>::ElementIterator iter = mesh.GetElementIteratorBegin();
+        for (AbstractTetrahedralMesh<2, 2>::ElementIterator iter = mesh.GetElementIteratorBegin();
             iter != mesh.GetElementIteratorEnd();
             ++iter)
         {
             unsigned element_index = iter->GetIndex();
 
-            Element<2,2>* p_sequ_element = seq_mesh.GetElement(element_index);
+            Element<2, 2>* p_sequ_element = seq_mesh.GetElement(element_index);
             TS_ASSERT_EQUALS(element_index, p_sequ_element->GetIndex());
             TS_ASSERT_EQUALS(iter->GetNumNodes(), p_sequ_element->GetNumNodes());
 
-            for (unsigned node_local_index=0; node_local_index < iter->GetNumNodes(); node_local_index++)
+            for (unsigned node_local_index = 0; node_local_index < iter->GetNumNodes(); node_local_index++)
             {
                 unsigned node_global_index = p_sequ_element->GetNodeGlobalIndex(node_local_index);
                 if (!r_node_perm.empty())
@@ -263,19 +263,19 @@ public:
             }
         }
 
-        for (AbstractTetrahedralMesh<2,2>::BoundaryElementIterator it=mesh.GetBoundaryElementIteratorBegin();
+        for (AbstractTetrahedralMesh<2, 2>::BoundaryElementIterator it=mesh.GetBoundaryElementIteratorBegin();
             it!=mesh.GetBoundaryElementIteratorEnd();
             ++it)
         {
-            BoundaryElement<1,2>* p_para_boundary_element = *it;
+            BoundaryElement<1, 2>* p_para_boundary_element = *it;
             unsigned boundary_element_index = p_para_boundary_element->GetIndex();
 
-            BoundaryElement<1,2>* p_sequ_boundary_element = seq_mesh.GetBoundaryElement(boundary_element_index);
+            BoundaryElement<1, 2>* p_sequ_boundary_element = seq_mesh.GetBoundaryElement(boundary_element_index);
             TS_ASSERT_EQUALS(boundary_element_index, p_sequ_boundary_element->GetIndex());
             TS_ASSERT_EQUALS(p_para_boundary_element->GetNumNodes(), p_sequ_boundary_element->GetNumNodes());
             TS_ASSERT_EQUALS(p_para_boundary_element->GetNumNodes(), 3u); //Quadratic edge
 
-            for (unsigned node_local_index=0; node_local_index < p_para_boundary_element->GetNumNodes(); node_local_index++)
+            for (unsigned node_local_index = 0; node_local_index < p_para_boundary_element->GetNumNodes(); node_local_index++)
             {
                 unsigned node_global_index = p_sequ_boundary_element->GetNodeGlobalIndex(node_local_index);
                 if (!r_node_perm.empty())
@@ -298,7 +298,7 @@ public:
             return;
         }
 
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic", 2, 1, false);
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements_quadratic", 2, 1, false);
         DistributedQuadraticMesh<2> mesh(DistributedTetrahedralMeshPartitionType::PETSC_MAT_PARTITION);
 
         mesh.ConstructFromMeshReader(mesh_reader);
@@ -324,7 +324,7 @@ public:
          *  - linear edges
          *  - face file does say which element the face belongs too
          */
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_152_elements_v3", 2, 1, true);
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_2mm_152_elements_v3", 2, 1, true);
         DistributedQuadraticMesh<3> mesh;// PARMETIS_LIBRARY
         mesh.ConstructFromMeshReader(mesh_reader);
 
@@ -342,7 +342,7 @@ public:
         // Guard here because if it's massively parallel then a process may have no boundary
         if (mesh.GetNumLocalBoundaryElements() > 0u)
         {
-            BoundaryElement<2,3>* p_face = *(mesh.GetBoundaryElementIteratorBegin());
+            BoundaryElement<2, 3>* p_face = *(mesh.GetBoundaryElementIteratorBegin());
             TS_ASSERT_EQUALS(p_face->GetNumNodes(), 6u);
         }
     }
@@ -351,7 +351,7 @@ public:
     {
         // Read in the same quadratic mesh with /quadratic/ boundary elements
         DistributedQuadraticMesh<3> mesh; // PARMETIS_LIBRARY
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_1626_elements_fully_quadratic",2,2,false);
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_1626_elements_fully_quadratic",2,2,false);
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Check we have the right number of nodes & elements
@@ -366,7 +366,7 @@ public:
            TS_ASSERT_LESS_THAN(mesh.GetNumLocalElements(), mesh.GetNumElements());
         }
 
-        BoundaryElement<2,3>* p_face = *(mesh.GetBoundaryElementIteratorBegin());
+        BoundaryElement<2, 3>* p_face = *(mesh.GetBoundaryElementIteratorBegin());
         TS_ASSERT_EQUALS(p_face->GetNumNodes(), 6u);
     }
 
@@ -374,7 +374,7 @@ public:
     {
         // Read in the same quadratic mesh with /quadratic/ boundary elements
         DistributedQuadraticMesh<3> mesh; // PARMETIS_LIBRARY
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/l_shape3d");
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/l_shape3d");
         TS_ASSERT_THROWS_THIS(mesh.ConstructFromMeshReader(mesh_reader),
                               "Cannot convert a (linear) tetrahedral mesh directly to a DistributedQuadraticMesh.  Please convert to QuadraticMesh and save in that format first.");
 
@@ -399,7 +399,7 @@ public:
 
         // Archive
         {
-            TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_fully_quadratic", 2, 1, false);
+            TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements_fully_quadratic", 2, 1, false);
             p_mesh->ConstructFromMeshReader(mesh_reader);
             num_nodes = p_mesh->GetNumNodes();
             local_num_nodes = p_mesh->GetNumLocalNodes();
@@ -412,7 +412,7 @@ public:
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
-            AbstractTetrahedralMesh<2,2>* const p_mesh_abstract = static_cast<AbstractTetrahedralMesh<2,2>* >(p_mesh);
+            AbstractTetrahedralMesh<2, 2>* const p_mesh_abstract = static_cast<AbstractTetrahedralMesh<2, 2>* >(p_mesh);
             (*p_arch) << p_mesh_abstract;
         }
 
@@ -420,7 +420,7 @@ public:
         {
             // Should archive the most abstract class you can to check boost knows what individual classes are.
             // (but here AbstractMesh doesn't have the methods below).
-            AbstractTetrahedralMesh<2,2>* p_mesh_abstract2;
+            AbstractTetrahedralMesh<2, 2>* p_mesh_abstract2;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);

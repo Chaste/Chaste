@@ -337,7 +337,7 @@ double CellProperties::GetLastActionPotentialAmplitude()
     return GetActionPotentialAmplitudes().back();
 }
 
-void CellProperties::CheckExceededThreshold(void)
+void CellProperties::CheckExceededThreshold()
 {
     // mOnsets and mRestingValues are all
     // set at the same time, so checking one should suffice.
@@ -348,7 +348,7 @@ void CellProperties::CheckExceededThreshold(void)
     }
 }
 
-void CellProperties::CheckReturnedToThreshold(void)
+void CellProperties::CheckReturnedToThreshold()
 {
     // mPeakValues, mMaxUpstrokeVelocities and mTimesAtMaxUpstrokeVelocity are all
     // set at the same time so checking one should suffice.

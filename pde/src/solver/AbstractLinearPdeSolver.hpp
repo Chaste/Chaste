@@ -54,7 +54,7 @@ protected:
     LinearSystem* mpLinearSystem;
 
     /** Pointer to the mesh. */
-    AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* mpMesh;
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* mpMesh;
 
 public:
 
@@ -63,7 +63,7 @@ public:
      *
      * @param pMesh the mesh
      */
-    explicit AbstractLinearPdeSolver(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
+    explicit AbstractLinearPdeSolver(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
         : mpLinearSystem(nullptr),
           mpMesh(pMesh)
     {
@@ -128,7 +128,7 @@ public:
 
     /**
      * The main Solve() methods in the child classes use this method. The concrete
-     * solver classes must implement it, depending on the the choice of numerical
+     * solver classes must implement it, depending on the choice of numerical
      * approach. The method should completely set up the linear system that has to
      * be solved (that timestep, if dynamic PDEs).
      *
@@ -148,7 +148,7 @@ public:
     }
 };
 
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 void AbstractLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::InitialiseForSolve(Vec initialSolution)
 {
     if (this->mpLinearSystem == nullptr)

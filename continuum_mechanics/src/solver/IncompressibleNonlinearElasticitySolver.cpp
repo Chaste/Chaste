@@ -150,7 +150,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleSystem(bool assembleR
     {
         for (unsigned bc_index = 0; bc_index<this->mrProblemDefinition.rGetTractionBoundaryElements().size(); bc_index++)
         {
-            BoundaryElement<DIM-1,DIM>& r_boundary_element = *(this->mrProblemDefinition.rGetTractionBoundaryElements()[bc_index]);
+            BoundaryElement<DIM-1, DIM>& r_boundary_element = *(this->mrProblemDefinition.rGetTractionBoundaryElements()[bc_index]);
 
             // If the BCs are tractions applied on a given surface, the boundary integral is independent of u,
             // so a_boundary_elem will be zero (no contribution to jacobian).
@@ -215,8 +215,8 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
             bool assembleResidual,
             bool assembleJacobian)
 {
-    static c_matrix<double,DIM,DIM> jacobian;
-    static c_matrix<double,DIM,DIM> inverse_jacobian;
+    static c_matrix<double, DIM, DIM> jacobian;
+    static c_matrix<double, DIM, DIM> inverse_jacobian;
     double jacobian_determinant;
 
     this->mrQuadMesh.GetInverseJacobianForElement(rElement.GetIndex(), jacobian, jacobian_determinant, inverse_jacobian);
@@ -233,7 +233,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
     }
 
     // Get the current displacement at the nodes
-    static c_matrix<double,DIM,NUM_NODES_PER_ELEMENT> element_current_displacements;
+    static c_matrix<double, DIM,NUM_NODES_PER_ELEMENT> element_current_displacements;
     static c_vector<double,NUM_VERTICES_PER_ELEMENT> element_current_pressures;
     for (unsigned II = 0; II<NUM_NODES_PER_ELEMENT; II++)
     {
@@ -265,27 +265,27 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
     AbstractIncompressibleMaterialLaw<DIM>* p_material_law
         = this->mrProblemDefinition.GetIncompressibleMaterialLaw(rElement.GetIndex());
 
-    static c_matrix<double,DIM,DIM> grad_u; // grad_u = (du_i/dX_M)
+    static c_matrix<double, DIM, DIM> grad_u; // grad_u = (du_i/dX_M)
 
-    static c_matrix<double,DIM,DIM> F;      // the deformation gradient, F = dx/dX, F_{iM} = dx_i/dX_M
-    static c_matrix<double,DIM,DIM> C;      // Green deformation tensor, C = F^T F
-    static c_matrix<double,DIM,DIM> inv_C;  // inverse(C)
-    static c_matrix<double,DIM,DIM> inv_F;  // inverse(F)
-    static c_matrix<double,DIM,DIM> T;      // Second Piola-Kirchoff stress tensor (= dW/dE = 2dW/dC)
+    static c_matrix<double, DIM, DIM> F;      // the deformation gradient, F = dx/dX, F_{iM} = dx_i/dX_M
+    static c_matrix<double, DIM, DIM> C;      // Green deformation tensor, C = F^T F
+    static c_matrix<double, DIM, DIM> inv_C;  // inverse(C)
+    static c_matrix<double, DIM, DIM> inv_F;  // inverse(F)
+    static c_matrix<double, DIM, DIM> T;      // Second Piola-Kirchoff stress tensor (= dW/dE = 2dW/dC)
 
-    static c_matrix<double,DIM,DIM> F_T;    // F*T
-    static c_matrix<double,DIM,NUM_NODES_PER_ELEMENT> F_T_grad_quad_phi; // F*T*grad_quad_phi
+    static c_matrix<double, DIM, DIM> F_T;    // F*T
+    static c_matrix<double, DIM,NUM_NODES_PER_ELEMENT> F_T_grad_quad_phi; // F*T*grad_quad_phi
 
-    c_vector<double,DIM> body_force;
+    c_vector<double, DIM> body_force;
 
-    static FourthOrderTensor<DIM,DIM,DIM,DIM> dTdE;    // dTdE(M,N,P,Q) = dT_{MN}/dE_{PQ}
-    static FourthOrderTensor<DIM,DIM,DIM,DIM> dSdF;    // dSdF(M,i,N,j) = dS_{Mi}/dF_{jN}
+    static FourthOrderTensor<DIM, DIM, DIM, DIM> dTdE;    // dTdE(M,N,P,Q) = dT_{MN}/dE_{PQ}
+    static FourthOrderTensor<DIM, DIM, DIM, DIM> dSdF;    // dSdF(M,i,N,j) = dS_{Mi}/dF_{jN}
 
-    static FourthOrderTensor<NUM_NODES_PER_ELEMENT,DIM,DIM,DIM> temp_tensor;
-    static FourthOrderTensor<NUM_NODES_PER_ELEMENT,DIM,NUM_NODES_PER_ELEMENT,DIM> dSdF_quad_quad;
+    static FourthOrderTensor<NUM_NODES_PER_ELEMENT, DIM, DIM, DIM> temp_tensor;
+    static FourthOrderTensor<NUM_NODES_PER_ELEMENT, DIM,NUM_NODES_PER_ELEMENT, DIM> dSdF_quad_quad;
 
     static c_matrix<double, DIM, NUM_NODES_PER_ELEMENT> temp_matrix;
-    static c_matrix<double,NUM_NODES_PER_ELEMENT,DIM> grad_quad_phi_times_invF;
+    static c_matrix<double,NUM_NODES_PER_ELEMENT, DIM> grad_quad_phi_times_invF;
 
 
     if (this->mSetComputeAverageStressPerElement)
@@ -317,7 +317,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
             {
                 case FUNCTIONAL_BODY_FORCE:
                 {
-                    c_vector<double,DIM> X = zero_vector<double>(DIM);
+                    c_vector<double, DIM> X = zero_vector<double>(DIM);
                     // interpolate X (using the vertices and the /linear/ bases, as no curvilinear elements
                     for (unsigned node_index = 0; node_index < NUM_VERTICES_PER_ELEMENT; ++node_index)
                     {
@@ -337,7 +337,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::AssembleOnElement(
         }
 
         // Interpolate grad_u and p
-        grad_u = zero_matrix<double>(DIM,DIM);
+        grad_u = zero_matrix<double>(DIM, DIM);
 
         for (unsigned node_index = 0; node_index<NUM_NODES_PER_ELEMENT; ++node_index)
         {
@@ -613,7 +613,7 @@ void IncompressibleNonlinearElasticitySolver<DIM>::FormInitialGuess()
 
 template<size_t DIM>
 IncompressibleNonlinearElasticitySolver<DIM>::IncompressibleNonlinearElasticitySolver(
-        AbstractTetrahedralMesh<DIM,DIM>& rQuadMesh,
+        AbstractTetrahedralMesh<DIM, DIM>& rQuadMesh,
         SolidMechanicsProblemDefinition<DIM>& rProblemDefinition,
         std::string outputDirectory)
     : AbstractNonlinearElasticitySolver<DIM>(rQuadMesh,

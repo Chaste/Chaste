@@ -212,12 +212,12 @@ unsigned RadialCellDataDistributionWriter<ELEMENT_DIM, SPACE_DIM>::GetNumRadialB
 }
 
 // Explicit instantiation
-template class RadialCellDataDistributionWriter<1,1>;
-template class RadialCellDataDistributionWriter<1,2>;
-template class RadialCellDataDistributionWriter<2,2>;
-template class RadialCellDataDistributionWriter<1,3>;
-template class RadialCellDataDistributionWriter<2,3>;
-template class RadialCellDataDistributionWriter<3,3>;
+template class RadialCellDataDistributionWriter<1, 1>;
+template class RadialCellDataDistributionWriter<1, 2>;
+template class RadialCellDataDistributionWriter<2, 2>;
+template class RadialCellDataDistributionWriter<1, 3>;
+template class RadialCellDataDistributionWriter<2, 3>;
+template class RadialCellDataDistributionWriter<3, 3>;
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer

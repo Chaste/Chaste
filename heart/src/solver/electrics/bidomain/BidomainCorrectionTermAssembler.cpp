@@ -39,23 +39,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/numeric/ublas/vector_proxy.hpp>
 
 template<unsigned ELEM_DIM, unsigned SPACE_DIM>
-BidomainCorrectionTermAssembler<ELEM_DIM,SPACE_DIM>::BidomainCorrectionTermAssembler(
-     AbstractTetrahedralMesh<ELEM_DIM,SPACE_DIM>* pMesh,
+BidomainCorrectionTermAssembler<ELEM_DIM, SPACE_DIM>::BidomainCorrectionTermAssembler(
+     AbstractTetrahedralMesh<ELEM_DIM, SPACE_DIM>* pMesh,
      BidomainTissue<SPACE_DIM>* pTissue)
-        : AbstractCorrectionTermAssembler<ELEM_DIM,SPACE_DIM,2>(pMesh,pTissue)
+        : AbstractCorrectionTermAssembler<ELEM_DIM, SPACE_DIM, 2>(pMesh,pTissue)
 {
     mpConfig = HeartConfig::Instance();
     assert(mpConfig->GetUseStateVariableInterpolation());
 }
 
 template<unsigned ELEM_DIM, unsigned SPACE_DIM>
-c_vector<double,2*(ELEM_DIM+1)> BidomainCorrectionTermAssembler<ELEM_DIM,SPACE_DIM>::ComputeVectorTerm(
+c_vector<double,2*(ELEM_DIM+1)> BidomainCorrectionTermAssembler<ELEM_DIM, SPACE_DIM>::ComputeVectorTerm(
     c_vector<double, ELEM_DIM+1> &rPhi,
     c_matrix<double, SPACE_DIM, ELEM_DIM+1> &rGradPhi /* not used */,
     ChastePoint<SPACE_DIM> &rX /* not used */,
-    c_vector<double,2> &rU,
+    c_vector<double, 2> &rU,
     c_matrix<double, 2, SPACE_DIM> &rGradU /* not used */,
-    Element<ELEM_DIM,SPACE_DIM>* pElement /* not used */)
+    Element<ELEM_DIM, SPACE_DIM>* pElement /* not used */)
 {
     double Am = mpConfig->GetSurfaceAreaToVolumeRatio();
 
@@ -82,6 +82,6 @@ c_vector<double,2*(ELEM_DIM+1)> BidomainCorrectionTermAssembler<ELEM_DIM,SPACE_D
 }
 
 // Explicit instantiation
-template class BidomainCorrectionTermAssembler<1,1>;
-template class BidomainCorrectionTermAssembler<2,2>;
-template class BidomainCorrectionTermAssembler<3,3>;
+template class BidomainCorrectionTermAssembler<1, 1>;
+template class BidomainCorrectionTermAssembler<2, 2>;
+template class BidomainCorrectionTermAssembler<3, 3>;

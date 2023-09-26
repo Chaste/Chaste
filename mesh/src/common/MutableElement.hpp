@@ -250,7 +250,7 @@ public:
  * compilers.
  */
 template<unsigned SPACE_DIM>
-class MutableElement<1, SPACE_DIM> : public AbstractElement<1,SPACE_DIM>
+class MutableElement<1, SPACE_DIM> : public AbstractElement<1, SPACE_DIM>
 {
 protected:
 

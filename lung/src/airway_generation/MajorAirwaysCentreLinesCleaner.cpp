@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 MajorAirwaysCentreLinesCleaner::MajorAirwaysCentreLinesCleaner(
-    MutableMesh<1,3>& rMesh,
+    MutableMesh<1, 3>& rMesh,
     unsigned rootIndex)
     : mrMesh(rMesh),
       mOutletNodeIndex(rootIndex),
@@ -50,15 +50,15 @@ void MajorAirwaysCentreLinesCleaner::CleanUsingHorsfieldOrder(unsigned order)
 {
     mMaxOrder = order;
     Node<3>* p_node = mrMesh.GetNode(mOutletNodeIndex);
-    Element<1,3>* p_element = mrMesh.GetElement(*(p_node->ContainingElementsBegin()));
+    Element<1, 3>* p_element = mrMesh.GetElement(*(p_node->ContainingElementsBegin()));
     CleanElementUsingHorsfieldOrder(p_element, false);
 }
 
 void  MajorAirwaysCentreLinesCleaner::CleanElementUsingHorsfieldOrder(
-    Element<1,3>* pElement,
+    Element<1, 3>* pElement,
     bool deleteMe)
 {
-    std::vector<Element<1,3>* > child_eles = mWalker.GetChildElements(pElement);
+    std::vector<Element<1, 3>* > child_eles = mWalker.GetChildElements(pElement);
 
     // If either of the children of this element are below the order limit delete BOTH of them.
     bool delete_children = deleteMe; //Always delete children if this element is to be deleted.
@@ -89,7 +89,7 @@ void MajorAirwaysCentreLinesCleaner::CleanTerminalsHueristic()
 
     for (auto branch_iter : p_branches)
     {
-         std::list<Element<1,3>* > eles = branch_iter->GetElements();
+         std::list<Element<1, 3>* > eles = branch_iter->GetElements();
 
          if (mWalker.GetElementHorsfieldOrder(eles.front()) == 1u) //Only clean terminals
          {
@@ -115,7 +115,7 @@ void MajorAirwaysCentreLinesCleaner::CleanTerminalsHueristic()
                      mrMesh.DeleteElement(ele_iter->GetIndex());
                  }
 
-                 c_vector<double,3> new_terminal_point = start_location + 0.8*parent_length*branch_direction;
+                 c_vector<double, 3> new_terminal_point = start_location + 0.8*parent_length*branch_direction;
                  Node<3>* p_new_node = new Node<3>(0u, new_terminal_point);
                  mrMesh.AddNode(p_new_node);
 
@@ -125,7 +125,7 @@ void MajorAirwaysCentreLinesCleaner::CleanTerminalsHueristic()
                  nodes.push_back(p_start_node);
                  nodes.push_back(p_new_node);
 
-                 Element<1,3>* p_element = new Element<1,3>(UINT_MAX, nodes);
+                 Element<1, 3>* p_element = new Element<1, 3>(UINT_MAX, nodes);
                  mrMesh.AddElement(p_element);
              }
              else if ((length / parent_length) < 0.6) // If it's too short then lengthen it
@@ -139,7 +139,7 @@ void MajorAirwaysCentreLinesCleaner::CleanTerminalsHueristic()
                      mrMesh.DeleteElement(ele_iter->GetIndex());
                  }
 
-                 c_vector<double,3> new_terminal_point = start_location + 0.7*parent_length*branch_direction;
+                 c_vector<double, 3> new_terminal_point = start_location + 0.7*parent_length*branch_direction;
                  Node<3>* p_new_node = new Node<3>(0u, new_terminal_point);
                  mrMesh.AddNode(p_new_node);
 
@@ -149,7 +149,7 @@ void MajorAirwaysCentreLinesCleaner::CleanTerminalsHueristic()
                  nodes.push_back(p_start_node);
                  nodes.push_back(p_new_node);
 
-                 Element<1,3>* p_element = new Element<1,3>(UINT_MAX, nodes);
+                 Element<1, 3>* p_element = new Element<1, 3>(UINT_MAX, nodes);
                  mrMesh.AddElement(p_element);
              }
          }

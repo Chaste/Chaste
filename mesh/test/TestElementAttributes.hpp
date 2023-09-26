@@ -55,7 +55,7 @@ public:
 
     void TestAttributesContainer()
     {
-        ElementAttributes<2,2> element_attributes;
+        ElementAttributes<2, 2> element_attributes;
 
         element_attributes.AddAttribute(1.23);
         TS_ASSERT_EQUALS(element_attributes.rGetAttributes().size(), 1u);
@@ -71,7 +71,7 @@ public:
         TS_ASSERT_DELTA(element_attributes.rGetAttributes()[0], 42.0, 1e-10);
 
         // Now make a fresh attribute class with a size zero vector in it
-        ElementAttributes<2,2> element_attributes2;
+        ElementAttributes<2, 2> element_attributes2;
         // TS_ASSERT_THROWS_THIS(element_attributes2.GetFirstAttribute(), "Attempting to get element attribute when there are none defined");
         TS_ASSERT_DELTA(element_attributes2.GetFirstAttribute(), 0.0, 1e-10); ///\todo #2739 Currently defaults to zero
         element_attributes2.SetFirstAttribute(42.0);
@@ -90,12 +90,12 @@ public:
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            ElementAttributes<2,2>* p_element_attributes = new ElementAttributes<2,2>();
+            ElementAttributes<2, 2>* p_element_attributes = new ElementAttributes<2, 2>();
 
             p_element_attributes->AddAttribute(2.34);
             p_element_attributes->AddAttribute(5.67);
 
-            ElementAttributes<2,2>* const p_const_element_attributes = p_element_attributes;
+            ElementAttributes<2, 2>* const p_const_element_attributes = p_element_attributes;
 
             output_arch << p_const_element_attributes;
 
@@ -106,7 +106,7 @@ public:
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
 
-            ElementAttributes<2,2>* p_element_attributes;
+            ElementAttributes<2, 2>* p_element_attributes;
             input_arch >> p_element_attributes;
 
             TS_ASSERT_EQUALS(p_element_attributes->rGetAttributes().size(), 2u);
@@ -128,7 +128,7 @@ public:
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
-            ElementAttributes<2,2>* const p_element_attributes = nullptr;
+            ElementAttributes<2, 2>* const p_element_attributes = nullptr;
 
             output_arch << p_element_attributes;
 
@@ -140,7 +140,7 @@ public:
             std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
 
-            ElementAttributes<2,2>* p_element_attributes;
+            ElementAttributes<2, 2>* p_element_attributes;
             input_arch >> p_element_attributes;
 
             TS_ASSERT(!p_element_attributes);
@@ -152,7 +152,7 @@ public:
     void TestElementWithAttributes()
     {
         // Create an element
-        MutableElement<2,2> this_element(0);
+        MutableElement<2, 2> this_element(0);
 
         // Check no attributes and exception thrown if accessed
         TS_ASSERT_EQUALS(this_element.GetNumElementAttributes(), 0u);

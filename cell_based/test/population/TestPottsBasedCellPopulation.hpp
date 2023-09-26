@@ -435,7 +435,7 @@ public:
 //        // Create element tessellation
 //        cell_population.CreateElementTessellation();
 //
-//        VertexMesh<2,2>* p_tessellation = cell_population.GetElementTessellation();
+//        VertexMesh<2, 2>* p_tessellation = cell_population.GetElementTessellation();
 //
 //        TS_ASSERT(p_tessellation != NULL);
 //
@@ -735,7 +735,7 @@ public:
 
         cell_population.CreateMutableMesh();
 
-        MutableMesh<2,2>* p_mutable_mesh = cell_population.GetMutableMesh();
+        MutableMesh<2, 2>* p_mutable_mesh = cell_population.GetMutableMesh();
 
         // Check it has the correct number of nodes and elements
         TS_ASSERT_EQUALS(p_mutable_mesh->GetNumNodes(), p_mesh->GetNumNodes());
@@ -756,7 +756,7 @@ public:
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        TetrahedralMesh<2,2>* p_tet_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
+        TetrahedralMesh<2, 2>* p_tet_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
 
         // Check it has the correct number of nodes and elements
         TS_ASSERT_EQUALS(p_tet_mesh->GetNumNodes(), 4u);

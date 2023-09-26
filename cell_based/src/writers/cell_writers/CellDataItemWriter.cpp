@@ -86,12 +86,12 @@ std::string CellDataItemWriter<ELEMENT_DIM, SPACE_DIM>::GetCellDataVariableName(
 }
 
 // Explicit instantiation
-template class CellDataItemWriter<1,1>;
-template class CellDataItemWriter<1,2>;
-template class CellDataItemWriter<2,2>;
-template class CellDataItemWriter<1,3>;
-template class CellDataItemWriter<2,3>;
-template class CellDataItemWriter<3,3>;
+template class CellDataItemWriter<1, 1>;
+template class CellDataItemWriter<1, 2>;
+template class CellDataItemWriter<2, 2>;
+template class CellDataItemWriter<1, 3>;
+template class CellDataItemWriter<2, 3>;
+template class CellDataItemWriter<3, 3>;
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer

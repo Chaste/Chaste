@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * if a given point is contained in the volume.
  */
 
-template <unsigned SPACE_DIM>
+template<unsigned SPACE_DIM>
 class ChasteCuboid : public AbstractChasteRegion<SPACE_DIM>
 {
     /** Needed for serialization. */

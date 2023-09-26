@@ -85,7 +85,7 @@ public:
         unsigned thickness_of_ghost_layer = 4;
 
         HoneycombMeshGenerator generator(cells_across, cells_up,thickness_of_ghost_layer);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Set up cells
@@ -180,7 +180,7 @@ public:
         //double crypt_length = num_cells_depth - 1.0;
 
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         // Set up cells
@@ -249,7 +249,7 @@ public:
         cell_generator.Generate(cells, p_mesh.get(), location_indices, true);
 
         // Set some model parameters for the cell-cycle model
-        for (unsigned index=0; index < cells.size(); index++)
+        for (unsigned index = 0; index < cells.size(); index++)
         {
            static_cast<SimpleWntCellCycleModel*>(cells[index]->GetCellCycleModel())->SetSDuration(7.4);
            static_cast<SimpleWntCellCycleModel*>(cells[index]->GetCellCycleModel())->SetG2Duration(1.4);

@@ -79,8 +79,8 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(32.0, 32);
 
         // Create mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_100mm_200_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/2D_0_to_100mm_200_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create cells
@@ -152,8 +152,8 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(32.0, 32);
 
         // Create mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_100mm_200_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/2D_0_to_100mm_200_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create cells
@@ -254,8 +254,8 @@ public:
         p_simulation_time->SetEndTimeAndNumberOfTimeSteps(end_time, num_timesteps);
 
         // Create mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_100mm_200_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/2D_0_to_100mm_200_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         // Create cells
@@ -335,7 +335,7 @@ public:
     {
         // Create 1D mesh
         unsigned num_cells = 14;
-        MutableMesh<1,1> mesh;
+        MutableMesh<1, 1> mesh;
         mesh.ConstructLinearMesh(num_cells-1);
 
         // Create cells
@@ -379,8 +379,8 @@ public:
     void TestPlaneBasedCellKillerIn2d()
     {
         // Create mesh
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        MutableMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        MutableMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
         mesh.Translate(-0.25,-0.25);
 
@@ -422,7 +422,7 @@ public:
     void TestPlaneBasedCellKillerIn3d()
     {
         // Create 3D mesh
-        MutableMesh<3,3> mesh;
+        MutableMesh<3, 3> mesh;
         mesh.ConstructCuboid(4, 5, 6);
         mesh.Translate(-2.0,-2.0, -2.0);
 
@@ -464,8 +464,8 @@ public:
     void TestIsolatedLabelledCellKiller()
     {
         // Create a non-vertex based cell population
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        MutableMesh<2,2> non_vertex_mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        MutableMesh<2, 2> non_vertex_mesh;
         non_vertex_mesh.ConstructFromMeshReader(mesh_reader);
 
         std::vector<CellPtr> non_vertex_cells;
@@ -480,7 +480,7 @@ public:
 
         // Create a vertex-based cell population
         HoneycombVertexMeshGenerator generator(4, 3);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -693,7 +693,7 @@ public:
 
         {
             HoneycombVertexMeshGenerator generator(4,4);
-            boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+            boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
             std::vector<CellPtr> cells;
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -805,7 +805,7 @@ public:
 
         // Test with IsolatedLabelledCellKiller
         HoneycombVertexMeshGenerator generator(4,4);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;

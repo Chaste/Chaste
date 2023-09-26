@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A simple nonlinear elliptic PDE used by tests; Grad.(u Grad u) - exp(-x) = 0
  */
-template <int SPACE_DIM>
+template<int SPACE_DIM>
 class NonlinearEquation3Pde : public AbstractNonlinearEllipticPde<SPACE_DIM>
 {
 public:

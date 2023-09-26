@@ -53,7 +53,7 @@ public:
      * @param rMesh The centrelines mesh to remesh.
      * @param rootIndex The root node index corresponding to the trachea.
      */
-    AirwayRemesher(TetrahedralMesh<1,3>& rMesh,
+    AirwayRemesher(TetrahedralMesh<1, 3>& rMesh,
                    unsigned rootIndex);
 
     /**
@@ -66,7 +66,7 @@ public:
      * @param rOutputMesh The mesh object to be written to.
      * @param maximumResistance The maximum allowed resistance of an element
      */
-    void Remesh(MutableMesh<1,3>& rOutputMesh, double maximumResistance);
+    void Remesh(MutableMesh<1, 3>& rOutputMesh, double maximumResistance);
 
     /**
      * Creates a remeshed version of the underlying mesh.
@@ -76,11 +76,11 @@ public:
      * @param rOutputMesh The mesh object to be written to.
      * @param maximumResistance The maximum allowed resistance of an element
      */
-    void Remesh(MutableMesh<1,3>& rOutputMesh);
+    void Remesh(MutableMesh<1, 3>& rOutputMesh);
 
 private:
     /** A mesh containing the major airways. */
-    TetrahedralMesh<1,3>& mrMesh;
+    TetrahedralMesh<1, 3>& mrMesh;
 
     /** The index of the root of the airway tree (trachea). */
     unsigned mOutletNodeIndex;

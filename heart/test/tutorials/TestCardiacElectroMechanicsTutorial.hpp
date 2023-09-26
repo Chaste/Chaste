@@ -235,7 +235,7 @@ public:
          * (as used in monodomain/bidomain), the second should be a `QuadraticMesh` (as used
          * in mechanics problems).
          */
-        TetrahedralMesh<2,2> electrics_mesh;
+        TetrahedralMesh<2, 2> electrics_mesh;
         electrics_mesh.ConstructRegularSlabMesh(0.01/*stepsize*/, 0.1/*length*/, 0.1/*width*/, 0.1/*depth*/);
 
         QuadraticMesh<2> mechanics_mesh;
@@ -276,7 +276,7 @@ public:
          * the type of electrics propagation equation (MONODOMAIN in this case),the meshes, the cell factory, and the problem_definition class,
          * and call solve. The first template parameter (2) is the dimension of the space, the second one is the number of unknowns
          * in the electrics problem (1 for MONODOMAIN, 2 for BIDOMAIN)*/
-        CardiacElectroMechanicsProblem<2,1> problem(INCOMPRESSIBLE,
+        CardiacElectroMechanicsProblem<2, 1> problem(INCOMPRESSIBLE,
                                                     MONODOMAIN,
                                                     &electrics_mesh,
                                                     &mechanics_mesh,
@@ -344,7 +344,7 @@ public:
         /* Set up two meshes of 1mm by 1mm by 1mm, one a `TetrahedralMesh`
          * for the electrics solve, one a (coarser) `QuadraticMesh` for the mechanics
          * solve. */
-        TetrahedralMesh<3,3> electrics_mesh;
+        TetrahedralMesh<3, 3> electrics_mesh;
         electrics_mesh.ConstructRegularSlabMesh(0.01/*stepsize*/, 0.1/*length*/, 0.1/*width*/, 0.1/*depth*/);
 
         QuadraticMesh<3> mechanics_mesh;
@@ -381,7 +381,7 @@ public:
         out_stream p_file = handler.OpenOutputFile("5by5by5_fibres.ortho");
 
         *p_file << mechanics_mesh.GetNumElements() << "\n"; // first line is number of entries
-        for (unsigned i=0; i<mechanics_mesh.GetNumElements(); ++i)
+        for (unsigned i = 0; i<mechanics_mesh.GetNumElements(); ++i)
         {
             double X = mechanics_mesh.GetElement(i)->CalculateCentroid()(0);
             double theta = M_PI/3 - 10*X*2*M_PI/3; // 60 degrees when X=0, -60 when X=0.1;
@@ -404,7 +404,7 @@ public:
         QuadraturePointsGroup<3> quad_points(mechanics_mesh, quad_rule);
 
         *p_file2 << quad_points.Size() << "\n";
-        for (unsigned i=0; i<quad_points.Size(); ++i)
+        for (unsigned i = 0; i<quad_points.Size(); ++i)
         {
             double X = quad_points.rGet(i)(0);
             double theta = M_PI/3 - 10*X*2*M_PI/3;
@@ -422,7 +422,7 @@ public:
         problem_defn.SetVariableFibreSheetDirectionsFile(finder, true);
 
         /* Create the problem object */
-        CardiacElectroMechanicsProblem<3,1> problem(COMPRESSIBLE,
+        CardiacElectroMechanicsProblem<3, 1> problem(COMPRESSIBLE,
                                                     MONODOMAIN,
                                                     &electrics_mesh,
                                                     &mechanics_mesh,

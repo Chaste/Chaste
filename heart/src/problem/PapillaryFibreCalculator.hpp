@@ -50,13 +50,13 @@ friend class TestPapillaryFibreCalculator;
 
 private:
     /** Reference to the ventricular/papillary mesh*/
-    TetrahedralMesh<3,3>& mrMesh;
+    TetrahedralMesh<3, 3>& mrMesh;
     /** vectors from the centre of each element to the nearest boundary node */
     std::vector< c_vector<double, 3> > mRadiusVectors;
     /** Tensors created from mRadiusVectors */
-    std::vector< c_matrix<double,3,3> > mStructureTensors;
+    std::vector< c_matrix<double,3, 3> > mStructureTensors;
     /** Smoothed tensors created from mStructureTensors */
-    std::vector< c_matrix<double,3,3> > mSmoothedStructureTensors;
+    std::vector< c_matrix<double,3, 3> > mSmoothedStructureTensors;
 
    /**
      * This method calculates the vector from the centroid of an element to all of
@@ -65,7 +65,7 @@ private:
      * @param elementIndex  The index of the element we are calculating radial vectors for
      * @return The shortest radial vector
      */
-    c_vector<double,3> GetRadiusVectorForOneElement(unsigned elementIndex);
+    c_vector<double, 3> GetRadiusVectorForOneElement(unsigned elementIndex);
 
     /**
      * This method calls GetRadiusVectorForOneElement() for each of the elements sets
@@ -98,18 +98,18 @@ public:
      *
      * @param rMesh  The mesh to calculate fibres on
      */
-    explicit PapillaryFibreCalculator(TetrahedralMesh<3,3>& rMesh);
+    explicit PapillaryFibreCalculator(TetrahedralMesh<3, 3>& rMesh);
 
     /**
      *  Main method - calculate the fibre orientations
      *
      *  @return A fibre vector for each element
      */
-     std::vector<c_vector<double,3> > CalculateFibreOrientations();
+     std::vector<c_vector<double, 3> > CalculateFibreOrientations();
 };
 
 // PUBLIC METHODS
-PapillaryFibreCalculator::PapillaryFibreCalculator(TetrahedralMesh<3,3>& rMesh)
+PapillaryFibreCalculator::PapillaryFibreCalculator(TetrahedralMesh<3, 3>& rMesh)
     : mrMesh(rMesh)
 {
     mRadiusVectors.resize(mrMesh.GetNumElements());
@@ -117,7 +117,7 @@ PapillaryFibreCalculator::PapillaryFibreCalculator(TetrahedralMesh<3,3>& rMesh)
     mSmoothedStructureTensors.resize(mrMesh.GetNumElements());
 }
 
-std::vector<c_vector<double,3> > PapillaryFibreCalculator::CalculateFibreOrientations()
+std::vector<c_vector<double, 3> > PapillaryFibreCalculator::CalculateFibreOrientations()
 {
    GetRadiusVectors();
 
@@ -126,8 +126,8 @@ std::vector<c_vector<double,3> > PapillaryFibreCalculator::CalculateFibreOrienta
    SmoothStructureTensors();
 
    // Calculate eigenvalues
-   std::vector<c_vector<double,3> > fibre_orientations(mrMesh.GetNumElements());
-   for (unsigned i=0; i<fibre_orientations.size(); ++i)
+   std::vector<c_vector<double, 3> > fibre_orientations(mrMesh.GetNumElements());
+   for (unsigned i = 0; i<fibre_orientations.size(); ++i)
    {
        fibre_orientations[i] = CalculateEigenvectorForSmallestNonzeroEigenvalue(mSmoothedStructureTensors[i]);
    }
@@ -136,16 +136,16 @@ std::vector<c_vector<double,3> > PapillaryFibreCalculator::CalculateFibreOrienta
 }
 
 // PRIVATE METHODS
-c_vector<double,3> PapillaryFibreCalculator::GetRadiusVectorForOneElement(unsigned elementIndex)
+c_vector<double, 3> PapillaryFibreCalculator::GetRadiusVectorForOneElement(unsigned elementIndex)
 {
     c_vector<double, 3> centroid = (mrMesh.GetElement(elementIndex))->CalculateCentroid();
     // Loops over all papillary face nodes
-    c_vector<double,3> coordinates;
+    c_vector<double, 3> coordinates;
 
     double nearest_r_squared=DBL_MAX;
     unsigned nearest_face_node = 0;
 
-    TetrahedralMesh<3,3>::BoundaryNodeIterator bound_node_iter = mrMesh.GetBoundaryNodeIteratorBegin();
+    TetrahedralMesh<3, 3>::BoundaryNodeIterator bound_node_iter = mrMesh.GetBoundaryNodeIteratorBegin();
     while (bound_node_iter != mrMesh.GetBoundaryNodeIteratorEnd())
     {
         unsigned bound_node_index =  (*bound_node_iter)->GetIndex();
@@ -163,14 +163,14 @@ c_vector<double,3> PapillaryFibreCalculator::GetRadiusVectorForOneElement(unsign
     }
 
     coordinates = mrMesh.GetNode(nearest_face_node)->rGetLocation();
-    c_vector<double,3> radial_vector = coordinates-centroid;
+    c_vector<double, 3> radial_vector = coordinates-centroid;
     return radial_vector;
 }
 
 void PapillaryFibreCalculator::GetRadiusVectors()
 {
     // Loops over all elements finding radius vector
-    for (AbstractTetrahedralMesh<3,3>::ElementIterator iter = mrMesh.GetElementIteratorBegin();
+    for (AbstractTetrahedralMesh<3, 3>::ElementIterator iter = mrMesh.GetElementIteratorBegin();
          iter != mrMesh.GetElementIteratorEnd();
          ++iter)
     {
@@ -194,7 +194,7 @@ void PapillaryFibreCalculator::SmoothStructureTensors()
     double g_factor_sum = 0;
     double g_factor = 0;
 
-    for (AbstractTetrahedralMesh<3,3>::ElementIterator elem_iter = mrMesh.GetElementIteratorBegin();
+    for (AbstractTetrahedralMesh<3, 3>::ElementIterator elem_iter = mrMesh.GetElementIteratorBegin();
          elem_iter != mrMesh.GetElementIteratorEnd();
          ++elem_iter)
     {
@@ -203,7 +203,7 @@ void PapillaryFibreCalculator::SmoothStructureTensors()
         c_vector<double, 3> centroid = elem_iter->CalculateCentroid();
         g_factor_sum = 0;
 
-        for (AbstractTetrahedralMesh<3,3>::ElementIterator iter_2 = mrMesh.GetElementIteratorBegin();
+        for (AbstractTetrahedralMesh<3, 3>::ElementIterator iter_2 = mrMesh.GetElementIteratorBegin();
              iter_2 != mrMesh.GetElementIteratorEnd();
              ++iter_2)
         {

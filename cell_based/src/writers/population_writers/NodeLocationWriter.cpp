@@ -116,12 +116,12 @@ void NodeLocationWriter<ELEMENT_DIM, SPACE_DIM>::Visit(
 }
 
 // Explicit instantiation
-template class NodeLocationWriter<1,1>;
-template class NodeLocationWriter<1,2>;
-template class NodeLocationWriter<2,2>;
-template class NodeLocationWriter<1,3>;
-template class NodeLocationWriter<2,3>;
-template class NodeLocationWriter<3,3>;
+template class NodeLocationWriter<1, 1>;
+template class NodeLocationWriter<1, 2>;
+template class NodeLocationWriter<2, 2>;
+template class NodeLocationWriter<1, 3>;
+template class NodeLocationWriter<2, 3>;
+template class NodeLocationWriter<3, 3>;
 
 #include "SerializationExportWrapperForCpp.hpp"
 // Declare identifier for the serializer

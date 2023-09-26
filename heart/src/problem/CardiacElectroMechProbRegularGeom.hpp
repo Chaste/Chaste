@@ -76,7 +76,7 @@ public:
                                       double mechanicsSolveTimestep,
                                       double contractionModelOdeTimeStep,
                                       std::string outputDirectory = "")
-        : CardiacElectroMechanicsProblem<DIM,1>(compressibilityType,
+        : CardiacElectroMechanicsProblem<DIM, 1>(compressibilityType,
                                               MONODOMAIN,
                                               NULL, NULL,
                                               pCellFactory,
@@ -90,7 +90,7 @@ public:
             assert(numElectricsElementsEachDir > 0);
 
             // create electrics mesh
-            this->mpElectricsMesh = new TetrahedralMesh<DIM,DIM>();
+            this->mpElectricsMesh = new TetrahedralMesh<DIM, DIM>();
 
             this->mpElectricsMesh->ConstructRegularSlabMesh(width/numElectricsElementsEachDir, width, width);
 
@@ -103,7 +103,7 @@ public:
 
             // Fix the nodes on x=0
             std::vector<unsigned> fixed_nodes;
-            for (unsigned i=0; i<this->mpMechanicsMesh->GetNumNodes(); ++i)
+            for (unsigned i = 0; i<this->mpMechanicsMesh->GetNumNodes(); ++i)
             {
                 if (fabs(this->mpMechanicsMesh->GetNode(i)->rGetLocation()[0])<1e-6)
                 {

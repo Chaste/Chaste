@@ -58,7 +58,7 @@ private:
      *
      * @return whether the cell is in the section
      */
-    bool CellIsInSection(double xBottom, double xTop, double yTop, const c_vector<double,2>& rCellPosition, double widthOfSection=0.5);
+    bool CellIsInSection(double xBottom, double xTop, double yTop, const c_vector<double, 2>& rCellPosition, double widthOfSection=0.5);
 
     /**
      * Method computing the perpendicular distance from the cell to the line from (xBottom, 0) to
@@ -74,7 +74,7 @@ private:
      *
      * @return whether the cell is in the section
      */
-    bool CellIsInSectionPeriodic(double xBottom, double xTop, double yTop, const c_vector<double,2>& rCellPosition, double widthOfSection=1.0);
+    bool CellIsInSectionPeriodic(double xBottom, double xTop, double yTop, const c_vector<double, 2>& rCellPosition, double widthOfSection=1.0);
 
 public:
 

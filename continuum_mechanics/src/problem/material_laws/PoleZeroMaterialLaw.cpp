@@ -90,15 +90,15 @@ PoleZeroMaterialLaw<DIM>::PoleZeroMaterialLaw(std::vector<std::vector<double> > 
 }
 
 template<unsigned DIM>
-void PoleZeroMaterialLaw<DIM>::ComputeStressAndStressDerivative(c_matrix<double,DIM,DIM>& rC,
-                                                                c_matrix<double,DIM,DIM>& rInvC,
+void PoleZeroMaterialLaw<DIM>::ComputeStressAndStressDerivative(c_matrix<double, DIM, DIM>& rC,
+                                                                c_matrix<double, DIM, DIM>& rInvC,
                                                                 double                    pressure,
-                                                                c_matrix<double,DIM,DIM>& rT,
-                                                                FourthOrderTensor<DIM,DIM,DIM,DIM>&   rDTdE,
+                                                                c_matrix<double, DIM, DIM>& rT,
+                                                                FourthOrderTensor<DIM, DIM, DIM, DIM>&   rDTdE,
                                                                 bool                      computeDTdE)
 {
-    static c_matrix<double,DIM,DIM> C_transformed;
-    static c_matrix<double,DIM,DIM> invC_transformed;
+    static c_matrix<double, DIM, DIM> C_transformed;
+    static c_matrix<double, DIM, DIM> invC_transformed;
 
     // The material law parameters are set up assuming the fibre direction is (1,0,0)
     // and sheet direction is (0,1,0), so we have to transform C,inv(C),and T.
@@ -110,7 +110,7 @@ void PoleZeroMaterialLaw<DIM>::ComputeStressAndStressDerivative(c_matrix<double,
 
     // compute T*
 
-    c_matrix<double,DIM,DIM> E = 0.5*(C_transformed - mIdentity);
+    c_matrix<double, DIM, DIM> E = 0.5*(C_transformed - mIdentity);
 
     for (unsigned M = 0; M < DIM; ++M)
     {

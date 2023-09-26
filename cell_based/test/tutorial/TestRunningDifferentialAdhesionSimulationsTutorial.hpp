@@ -106,7 +106,7 @@ public:
     {
         /* First we create a regular vertex mesh. Here we choose to set the value of the cell rearrangement threshold. */
         HoneycombVertexMeshGenerator generator(5, 5);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
         p_mesh->SetCellRearrangementThreshold(0.1);
 
         /* We then create some cells using the helper class {{{CellsGenerator}}}. Note that in this simulation

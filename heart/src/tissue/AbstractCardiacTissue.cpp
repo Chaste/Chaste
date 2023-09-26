@@ -49,9 +49,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCvodeCell.hpp"
 #include "Warnings.hpp"
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
-            AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>* pCellFactory,
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::AbstractCardiacTissue(
+            AbstractCardiacCellFactory<ELEMENT_DIM, SPACE_DIM>* pCellFactory,
             bool exchangeHalos)
     : mpMesh(pCellFactory->GetMesh()),
       mpDistributedVectorFactory(mpMesh->GetDistributedVectorFactory()),
@@ -89,8 +89,8 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
     mCellsDistributed.resize(num_local_nodes);
 
     // Figure out if we're dealing with Purkinje
-    AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>* p_purkinje_cell_factory
-       = dynamic_cast<AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>*>(pCellFactory);
+    AbstractPurkinjeCellFactory<ELEMENT_DIM, SPACE_DIM>* p_purkinje_cell_factory
+       = dynamic_cast<AbstractPurkinjeCellFactory<ELEMENT_DIM, SPACE_DIM>*>(pCellFactory);
     if (p_purkinje_cell_factory)
     {
         mHasPurkinje = true;
@@ -177,8 +177,8 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(
 }
 
 // Constructor used for archiving
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::AbstractCardiacTissue(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
     : mpMesh(pMesh),
       mpDistributedVectorFactory(mpMesh->GetDistributedVectorFactory()),
       mHasPurkinje(false),
@@ -193,8 +193,8 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::AbstractCardiacTissue(AbstractTetr
     CreateIntracellularConductivityTensor();
 }
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::~AbstractCardiacTissue()
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::~AbstractCardiacTissue()
 {
     // Delete cells
     for (auto iter = mCellsDistributed.begin();
@@ -230,14 +230,14 @@ AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::~AbstractCardiacTissue()
 }
 
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-bool AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::HasPurkinje()
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+bool AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::HasPurkinje()
 {
     return mHasPurkinje;
 }
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::CreateIntracellularConductivityTensor()
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+void AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::CreateIntracellularConductivityTensor()
 {
     HeartEventHandler::BeginEvent(HeartEventHandler::READ_MESH);
     mpConfig = HeartConfig::Instance();
@@ -250,7 +250,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::CreateIntracellularConductivi
         {
             case cp::media_type::Orthotropic:
             {
-                mpIntracellularConductivityTensors = new OrthotropicConductivityTensors<ELEMENT_DIM,SPACE_DIM>;
+                mpIntracellularConductivityTensors = new OrthotropicConductivityTensors<ELEMENT_DIM, SPACE_DIM>;
                 FileFinder ortho_file(mFibreFilePathNoExtension + ".ortho", RelativeTo::AbsoluteOrCwd);
                 assert(ortho_file.Exists());
                 mpIntracellularConductivityTensors->SetFibreOrientationFile(ortho_file);
@@ -259,7 +259,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::CreateIntracellularConductivi
 
             case cp::media_type::Axisymmetric:
             {
-                mpIntracellularConductivityTensors = new AxisymmetricConductivityTensors<ELEMENT_DIM,SPACE_DIM>;
+                mpIntracellularConductivityTensors = new AxisymmetricConductivityTensors<ELEMENT_DIM, SPACE_DIM>;
                 FileFinder axi_file(mFibreFilePathNoExtension + ".axi", RelativeTo::AbsoluteOrCwd);
                 assert(axi_file.Exists());
                 mpIntracellularConductivityTensors->SetFibreOrientationFile(axi_file);
@@ -268,7 +268,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::CreateIntracellularConductivi
 
             case cp::media_type::NoFibreOrientation:
                 /// \todo #1316 Create a class defining constant tensors to be used when no fibre orientation is provided.
-                mpIntracellularConductivityTensors = new OrthotropicConductivityTensors<ELEMENT_DIM,SPACE_DIM>;
+                mpIntracellularConductivityTensors = new OrthotropicConductivityTensors<ELEMENT_DIM, SPACE_DIM>;
                 break;
 
             default:
@@ -278,7 +278,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::CreateIntracellularConductivi
     else // Slab defined in config file or SetMesh() called; no fibre orientation assumed
     {
         /// \todo #1316 Create a class defining constant tensors to be used when no fibre orientation is provided.
-        mpIntracellularConductivityTensors = new OrthotropicConductivityTensors<ELEMENT_DIM,SPACE_DIM>;
+        mpIntracellularConductivityTensors = new OrthotropicConductivityTensors<ELEMENT_DIM, SPACE_DIM>;
     }
 
     c_vector<double, SPACE_DIM> intra_conductivities;
@@ -308,8 +308,8 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::CreateIntracellularConductivi
         PetscTools::ReplicateException(false);
 
         std::vector<boost::shared_ptr<AbstractChasteRegion<SPACE_DIM> > > conductivities_heterogeneity_areas;
-        std::vector< c_vector<double,3> > intra_h_conductivities;
-        std::vector< c_vector<double,3> > extra_h_conductivities;
+        std::vector< c_vector<double, 3> > intra_h_conductivities;
+        std::vector< c_vector<double, 3> > extra_h_conductivities;
         HeartConfig::Instance()->GetConductivityHeterogeneities(conductivities_heterogeneity_areas,
                                                                 intra_h_conductivities,
                                                                 extra_h_conductivities);
@@ -323,12 +323,12 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::CreateIntracellularConductivi
 //            unsigned element_index = it->GetIndex();
             // if element centroid is contained in the region
             ChastePoint<SPACE_DIM> element_centroid(it->CalculateCentroid());
-            for (unsigned region_index=0; region_index< conductivities_heterogeneity_areas.size(); region_index++)
+            for (unsigned region_index = 0; region_index< conductivities_heterogeneity_areas.size(); region_index++)
             {
                 if (conductivities_heterogeneity_areas[region_index]->DoesContain(element_centroid))
                 {
                     //We don't use ublas vector assignment here, because we might be getting a subvector of a 3-vector
-                    for (unsigned i=0; i<SPACE_DIM; ++i)
+                    for (unsigned i = 0; i<SPACE_DIM; ++i)
                     {
                         hetero_intra_conductivities[local_element_index][i] = intra_h_conductivities[region_index][i];
                     }
@@ -349,20 +349,20 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::CreateIntracellularConductivi
 }
 
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetCacheReplication(bool doCacheReplication)
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+void AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::SetCacheReplication(bool doCacheReplication)
 {
     mDoCacheReplication = doCacheReplication;
 }
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-bool AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::GetDoCacheReplication()
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+bool AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::GetDoCacheReplication()
 {
     return mDoCacheReplication;
 }
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-const c_matrix<double, SPACE_DIM, SPACE_DIM>& AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::rGetIntracellularConductivityTensor(unsigned elementIndex)
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+const c_matrix<double, SPACE_DIM, SPACE_DIM>& AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::rGetIntracellularConductivityTensor(unsigned elementIndex)
 {
     assert( mpIntracellularConductivityTensors);
     if (mpConductivityModifier==NULL)
@@ -375,22 +375,22 @@ const c_matrix<double, SPACE_DIM, SPACE_DIM>& AbstractCardiacTissue<ELEMENT_DIM,
     }
 }
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-const c_matrix<double, SPACE_DIM, SPACE_DIM>& AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::rGetExtracellularConductivityTensor(unsigned elementIndex)
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+const c_matrix<double, SPACE_DIM, SPACE_DIM>& AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::rGetExtracellularConductivityTensor(unsigned elementIndex)
 {
      EXCEPTION("Monodomain tissues do not have extracellular conductivity tensors.");
 }
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-AbstractCardiacCellInterface* AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::GetCardiacCell( unsigned globalIndex )
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+AbstractCardiacCellInterface* AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::GetCardiacCell( unsigned globalIndex )
 {
     assert(mpDistributedVectorFactory->GetLow() <= globalIndex &&
            globalIndex < mpDistributedVectorFactory->GetHigh());
     return mCellsDistributed[globalIndex - mpDistributedVectorFactory->GetLow()];
 }
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-AbstractCardiacCellInterface* AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::GetPurkinjeCell( unsigned globalIndex )
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+AbstractCardiacCellInterface* AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::GetPurkinjeCell( unsigned globalIndex )
 {
     assert(mpDistributedVectorFactory->GetLow() <= globalIndex &&
            globalIndex < mpDistributedVectorFactory->GetHigh());
@@ -398,8 +398,8 @@ AbstractCardiacCellInterface* AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::GetP
     return mPurkinjeCellsDistributed[globalIndex - mpDistributedVectorFactory->GetLow()];
 }
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-AbstractCardiacCellInterface* AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::GetCardiacCellOrHaloCell( unsigned globalIndex )
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+AbstractCardiacCellInterface* AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::GetCardiacCellOrHaloCell( unsigned globalIndex )
 {
     std::map<unsigned, unsigned>::const_iterator node_position;
     // First search the halo
@@ -419,11 +419,11 @@ AbstractCardiacCellInterface* AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::GetC
 }
 
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::CalculateHaloNodesFromNodeExchange()
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+void AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::CalculateHaloNodesFromNodeExchange()
 {
     std::set<unsigned> halos_as_set;
-    for (unsigned proc=0; proc<PetscTools::GetNumProcs(); proc++)
+    for (unsigned proc = 0; proc<PetscTools::GetNumProcs(); proc++)
     {
         halos_as_set.insert(mNodesToReceivePerProcess[proc].begin(), mNodesToReceivePerProcess[proc].end());
     }
@@ -432,8 +432,8 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::CalculateHaloNodesFromNodeExc
 }
 
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetUpHaloCells(AbstractCardiacCellFactory<ELEMENT_DIM,SPACE_DIM>* pCellFactory)
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+void AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::SetUpHaloCells(AbstractCardiacCellFactory<ELEMENT_DIM, SPACE_DIM>* pCellFactory)
 {
     if (mExchangeHalos)
     {
@@ -460,8 +460,8 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetUpHaloCells(AbstractCardia
 }
 
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existingSolution, double time, double nextTime, bool updateVoltage)
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+void AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::SolveCellSystems(Vec existingSolution, double time, double nextTime, bool updateVoltage)
 {
     if (mHasPurkinje)
     {
@@ -554,7 +554,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
                 std::cout << "All state variables are now:\n";
                 std::vector<double> state_vars = mCellsDistributed[index.Local]->GetStdVecStateVariables();
                 std::vector<std::string> state_var_names = mCellsDistributed[index.Local]->rGetStateVariableNames();
-                for (unsigned i=0; i<state_vars.size(); ++i)
+                for (unsigned i = 0; i<state_vars.size(); ++i)
                 {
                     std::cout << "\t" << state_var_names[i] << "\t:\t" << state_vars[i] << "\n";
                 }
@@ -632,7 +632,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
 
             // Pack send buffer
             unsigned send_size = 0;
-            for (unsigned i=0; i<number_of_cells_to_send; ++i)
+            for (unsigned i = 0; i<number_of_cells_to_send; ++i)
             {
                 unsigned global_cell_index = mNodesToSendPerProcess[send_to][i];
                 send_size += mCellsDistributed[global_cell_index - mpDistributedVectorFactory->GetLow()]->GetNumberOfStateVariables();
@@ -654,7 +654,7 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
             }
             // Receive buffer
             unsigned receive_size = 0;
-            for (unsigned i=0; i<number_of_cells_to_receive; ++i)
+            for (unsigned i = 0; i<number_of_cells_to_receive; ++i)
             {
                 unsigned halo_cell_index = mHaloGlobalToLocalIndexMap[mNodesToReceivePerProcess[receive_from][i]];
                 receive_size += mHaloCellsDistributed[halo_cell_index]->GetNumberOfStateVariables();
@@ -700,49 +700,49 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SolveCellSystems(Vec existing
     HeartEventHandler::EndEvent(HeartEventHandler::COMMUNICATION);
 }
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-ReplicatableVector& AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::rGetIionicCacheReplicated()
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+ReplicatableVector& AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::rGetIionicCacheReplicated()
 {
     return mIionicCacheReplicated;
 }
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-ReplicatableVector& AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::rGetIntracellularStimulusCacheReplicated()
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+ReplicatableVector& AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::rGetIntracellularStimulusCacheReplicated()
 {
     return mIntracellularStimulusCacheReplicated;
 }
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-ReplicatableVector& AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::rGetPurkinjeIionicCacheReplicated()
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+ReplicatableVector& AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::rGetPurkinjeIionicCacheReplicated()
 {
     EXCEPT_IF_NOT(mHasPurkinje);
     return mPurkinjeIionicCacheReplicated;
 }
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-ReplicatableVector& AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::rGetPurkinjeIntracellularStimulusCacheReplicated()
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+ReplicatableVector& AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::rGetPurkinjeIntracellularStimulusCacheReplicated()
 {
     EXCEPT_IF_NOT(mHasPurkinje);
     return mPurkinjeIntracellularStimulusCacheReplicated;
 }
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::UpdateCaches(unsigned globalIndex, unsigned localIndex, double nextTime)
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+void AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::UpdateCaches(unsigned globalIndex, unsigned localIndex, double nextTime)
 {
     mIionicCacheReplicated[globalIndex] = mCellsDistributed[localIndex]->GetIIonic();
     mIntracellularStimulusCacheReplicated[globalIndex] = mCellsDistributed[localIndex]->GetIntracellularStimulus(nextTime);
 }
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::UpdatePurkinjeCaches(unsigned globalIndex, unsigned localIndex, double nextTime)
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+void AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::UpdatePurkinjeCaches(unsigned globalIndex, unsigned localIndex, double nextTime)
 {
     assert(mHasPurkinje);
     mPurkinjeIionicCacheReplicated[globalIndex] = mPurkinjeCellsDistributed[localIndex]->GetIIonic();
     mPurkinjeIntracellularStimulusCacheReplicated[globalIndex] = mPurkinjeCellsDistributed[localIndex]->GetIntracellularStimulus(nextTime);
 }
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::ReplicateCaches()
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+void AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::ReplicateCaches()
 {
     // ReplicateCaches only needed for SVI (and non-matrix based assembly which is no longer in code)
     // which is not implemented with Purkinje. See commented code below if introducing this.
@@ -758,27 +758,27 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::ReplicateCaches()
     //}
 }
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-const std::vector<AbstractCardiacCellInterface*>& AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::rGetCellsDistributed() const
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+const std::vector<AbstractCardiacCellInterface*>& AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::rGetCellsDistributed() const
 {
     return mCellsDistributed;
 }
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-const std::vector<AbstractCardiacCellInterface*>& AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::rGetPurkinjeCellsDistributed() const
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+const std::vector<AbstractCardiacCellInterface*>& AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::rGetPurkinjeCellsDistributed() const
 {
     EXCEPT_IF_NOT(mHasPurkinje);
     return mPurkinjeCellsDistributed;
 }
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-const AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::pGetMesh() const
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+const AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::pGetMesh() const
 {
     return mpMesh;
 }
 
-template <unsigned ELEMENT_DIM,unsigned SPACE_DIM>
-void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetConductivityModifier(AbstractConductivityModifier<ELEMENT_DIM,SPACE_DIM>* pModifier)
+template<unsigned ELEMENT_DIM,unsigned SPACE_DIM>
+void AbstractCardiacTissue<ELEMENT_DIM, SPACE_DIM>::SetConductivityModifier(AbstractConductivityModifier<ELEMENT_DIM, SPACE_DIM>* pModifier)
 {
     assert(pModifier!=NULL);
     assert(mpConductivityModifier==NULL); // shouldn't be called twice for example, or with two different modifiers (remove this assert
@@ -787,8 +787,8 @@ void AbstractCardiacTissue<ELEMENT_DIM,SPACE_DIM>::SetConductivityModifier(Abstr
 }
 
 // Explicit instantiation
-template class AbstractCardiacTissue<1,1>;
-template class AbstractCardiacTissue<1,2>;
-template class AbstractCardiacTissue<1,3>;
-template class AbstractCardiacTissue<2,2>;
-template class AbstractCardiacTissue<3,3>;
+template class AbstractCardiacTissue<1, 1>;
+template class AbstractCardiacTissue<1, 2>;
+template class AbstractCardiacTissue<1, 3>;
+template class AbstractCardiacTissue<2, 2>;
+template class AbstractCardiacTissue<3, 3>;

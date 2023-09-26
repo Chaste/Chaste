@@ -41,13 +41,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_matrix<double,2*(ELEMENT_DIM+1),2*(ELEMENT_DIM+1)>
-    BidomainAssembler<ELEMENT_DIM,SPACE_DIM>::ComputeMatrixTerm(
+    BidomainAssembler<ELEMENT_DIM, SPACE_DIM>::ComputeMatrixTerm(
             c_vector<double, ELEMENT_DIM+1> &rPhi,
             c_matrix<double, SPACE_DIM, ELEMENT_DIM+1> &rGradPhi,
             ChastePoint<SPACE_DIM> &rX,
-            c_vector<double,2> &rU,
+            c_vector<double, 2> &rU,
             c_matrix<double, 2, SPACE_DIM> &rGradU /* not used */,
-            Element<ELEMENT_DIM,SPACE_DIM>* pElement)
+            Element<ELEMENT_DIM, SPACE_DIM>* pElement)
 {
     // get bidomain parameters
     double Am = this->mpConfig->GetSurfaceAreaToVolumeRatio();
@@ -95,15 +95,15 @@ c_matrix<double,2*(ELEMENT_DIM+1),2*(ELEMENT_DIM+1)>
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-BidomainAssembler<ELEMENT_DIM,SPACE_DIM>::BidomainAssembler(
-            AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
+BidomainAssembler<ELEMENT_DIM, SPACE_DIM>::BidomainAssembler(
+            AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
             BidomainTissue<SPACE_DIM>* pTissue)
-    : AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,2,false,true,CARDIAC>(pMesh,pTissue)
+    : AbstractCardiacFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM,2,false,true,CARDIAC>(pMesh,pTissue)
 {
     assert(pTissue != NULL);
 }
 
 // Explicit instantiation
-template class BidomainAssembler<1,1>;
-template class BidomainAssembler<2,2>;
-template class BidomainAssembler<3,3>;
+template class BidomainAssembler<1, 1>;
+template class BidomainAssembler<2, 2>;
+template class BidomainAssembler<3, 3>;

@@ -54,12 +54,12 @@ public:
     void TestRemeshSingleBranch()
     {
         //Load a single branch mesh file
-        TrianglesMeshReader<1,3> reader("mesh/test/data/1D_in_3D_0_to_1mm_10_elements");
-        TetrahedralMesh<1,3> mesh;
+        TrianglesMeshReader<1, 3> reader("mesh/test/data/1D_in_3D_0_to_1mm_10_elements");
+        TetrahedralMesh<1, 3> mesh;
         mesh.ConstructFromMeshReader(reader);
 
         //We need to add some attributes to the mesh
-        for (TetrahedralMesh<1,3>::NodeIterator iter = mesh.GetNodeIteratorBegin();
+        for (TetrahedralMesh<1, 3>::NodeIterator iter = mesh.GetNodeIteratorBegin();
              iter != mesh.GetNodeIteratorEnd();
              ++iter)
         {
@@ -72,21 +72,21 @@ public:
         //Check intermediate elements are removed. Poiseuille resistance of the branch is
         // C*0.1/((0.05^4) = C*1.6 * 10^4
 
-        MutableMesh<1,3> output_mesh_one;
+        MutableMesh<1, 3> output_mesh_one;
         remesher.Remesh(output_mesh_one, 1e5); //With this tolerance all intermediate nodes should be removed.
 
         TS_ASSERT_EQUALS(output_mesh_one.GetNumNodes(), 2u);
         TS_ASSERT_EQUALS(output_mesh_one.GetNumElements(), 1u);
         TS_ASSERT_DELTA(output_mesh_one.GetElement(0)->GetAttribute(), 0.05, 1e-6);
 
-        MutableMesh<1,3> output_mesh_two;
+        MutableMesh<1, 3> output_mesh_two;
         remesher.Remesh(output_mesh_two, 0.8e4); //With this tolerance there should be one intermediate node.
 
         TS_ASSERT_EQUALS(output_mesh_two.GetNumNodes(), 3u);
         TS_ASSERT_EQUALS(output_mesh_two.GetNumElements(), 2u);
         TS_ASSERT_DELTA(output_mesh_two.GetElement(0)->GetAttribute(), 0.05, 1e-6);
 
-        MutableMesh<1,3> output_mesh_three;
+        MutableMesh<1, 3> output_mesh_three;
         remesher.Remesh(output_mesh_three, 1.6e3); //With this tolerance there should be ten elements.
 
         TS_ASSERT_EQUALS(output_mesh_three.GetNumNodes(), 11u);
@@ -94,7 +94,7 @@ public:
         TS_ASSERT_DELTA(output_mesh_three.GetElement(0)->GetAttribute(), 0.05, 1e-6);
         TS_ASSERT_DELTA(output_mesh_three.GetElement(5)->GetAttribute(), 0.05, 1e-6);
 
-        MutableMesh<1,3> output_mesh_four;
+        MutableMesh<1, 3> output_mesh_four;
         remesher.Remesh(output_mesh_four); //Utility method to remove all intermediate nodes
 
         TS_ASSERT_EQUALS(output_mesh_one.GetNumNodes(), 2u);
@@ -102,15 +102,15 @@ public:
         TS_ASSERT_DELTA(output_mesh_one.GetElement(0)->GetAttribute(), 0.05, 1e-6);
 
         //To visualise
-        //VtkMeshWriter<1,3> writer("TestAirwayRemesher", "1D_remeshed");
+        //VtkMeshWriter<1, 3> writer("TestAirwayRemesher", "1D_remeshed");
         //writer.WriteFilesUsingMesh(output_mesh_three);
     }
 
     void TestRemeshFullTree()
     {
-        TrianglesMeshReader<1,3> reader("lung/test/data/TestSubject002");
+        TrianglesMeshReader<1, 3> reader("lung/test/data/TestSubject002");
 
-        TetrahedralMesh<1,3> mesh;
+        TetrahedralMesh<1, 3> mesh;
         mesh.ConstructFromMeshReader(reader);
 
         AirwayPropertiesCalculator calculator(mesh, 0);
@@ -121,7 +121,7 @@ public:
         //Create remesher object
         AirwayRemesher remesher(mesh, 0u);
 
-        MutableMesh<1,3> output_mesh_one;
+        MutableMesh<1, 3> output_mesh_one;
         remesher.Remesh(output_mesh_one, calculator.GetBranches()[0]->GetPoiseuilleResistance()*1e7); //Key the tolerance relative to the trachea
 
         TS_ASSERT_EQUALS( output_mesh_one.GetNumNodes(), 168045u);
@@ -129,10 +129,10 @@ public:
 
 //        //To visualise
 //
-//        VtkMeshWriter<1,3> writer("TestAirwayRemesher", "Novartis002_remeshed");
+//        VtkMeshWriter<1, 3> writer("TestAirwayRemesher", "Novartis002_remeshed");
 //        std::vector<double> radii(output_mesh_one.GetNumElements());
 //
-//        for (TetrahedralMesh<1,3>::ElementIterator iter = output_mesh_one.GetElementIteratorBegin();
+//        for (TetrahedralMesh<1, 3>::ElementIterator iter = output_mesh_one.GetElementIteratorBegin();
 //            iter != output_mesh_one.GetElementIteratorEnd();
 //            ++iter)
 //        {
@@ -142,7 +142,7 @@ public:
 //        writer.AddCellData("radii", radii);
 //        writer.WriteFilesUsingMesh(output_mesh_one);
 //
-//        TrianglesMeshWriter<1,3> writer2("TestAirwayRemesher", "Novartis002_remeshed", false);
+//        TrianglesMeshWriter<1, 3> writer2("TestAirwayRemesher", "Novartis002_remeshed", false);
 //        writer2.WriteFilesUsingMesh(output_mesh_one);
     }
 };

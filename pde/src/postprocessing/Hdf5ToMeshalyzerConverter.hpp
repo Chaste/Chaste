@@ -58,7 +58,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * the CHASTE_TEST_OUTPUT directory.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class Hdf5ToMeshalyzerConverter : public AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>
+class Hdf5ToMeshalyzerConverter
+    : public AbstractHdf5Converter<ELEMENT_DIM, SPACE_DIM>
 {
 private:
 
@@ -90,7 +91,7 @@ public:
      */
     Hdf5ToMeshalyzerConverter(const FileFinder& rInputDirectory,
                               const std::string& rFileBaseName,
-                              AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
+                              AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
                               bool usingOriginalNodeOrdering,
                               unsigned precision = 0);
 };

@@ -117,10 +117,10 @@ private:
     template<class Archive>
     void save(Archive & archive, const unsigned int version) const
     {
-        archive & boost::serialization::base_object<AbstractMesh<ELEMENT_DIM,SPACE_DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractMesh<ELEMENT_DIM, SPACE_DIM> >(*this);
         archive & mMeshIsLinear;
         // Create a mesh writer pointing to the correct file and directory
-        TrianglesMeshWriter<ELEMENT_DIM,SPACE_DIM> mesh_writer(ArchiveLocationInfo::GetArchiveRelativePath(),
+        TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM> mesh_writer(ArchiveLocationInfo::GetArchiveRelativePath(),
                                                                ArchiveLocationInfo::GetMeshFilename(),
                                                                false);
         // Binary meshes have similar content to the original Triangle/Tetgen format, but take up less space on disk
@@ -189,7 +189,7 @@ private:
     template<class Archive>
     void load(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractMesh<ELEMENT_DIM,SPACE_DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractMesh<ELEMENT_DIM, SPACE_DIM> >(*this);
         archive & mMeshIsLinear;
 
         bool permutation_available=false;
@@ -230,7 +230,7 @@ private:
         if (mMeshIsLinear)
         {
             // I am a linear mesh
-            TrianglesMeshReader<ELEMENT_DIM,SPACE_DIM> mesh_reader(ArchiveLocationInfo::GetArchiveDirectory() + ArchiveLocationInfo::GetMeshFilename());
+            TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM> mesh_reader(ArchiveLocationInfo::GetArchiveDirectory() + ArchiveLocationInfo::GetMeshFilename());
 
             if (permutation_available)
             {
@@ -242,7 +242,7 @@ private:
         else
         {
             // I am a quadratic mesh and need quadratic information from the reader
-            TrianglesMeshReader<ELEMENT_DIM,SPACE_DIM> mesh_reader(ArchiveLocationInfo::GetArchiveDirectory() + ArchiveLocationInfo::GetMeshFilename(), 2, 2);
+            TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM> mesh_reader(ArchiveLocationInfo::GetArchiveDirectory() + ArchiveLocationInfo::GetMeshFilename(), 2, 2);
             this->ConstructFromMeshReader(mesh_reader);
         }
 
@@ -707,7 +707,7 @@ namespace serialization {
  * This is how to do BOOST_CLASS_VERSION(AbstractCardiacTissue, 1)
  * with a templated class.
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 struct version<AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM> >
 {
     ///Macro to set the version number of templated archive in known versions of Boost

@@ -147,12 +147,12 @@ void PopulationTestingForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(
 }
 
 // Explicit instantiation
-template class PopulationTestingForce<1,1>;
-template class PopulationTestingForce<1,2>;
-template class PopulationTestingForce<2,2>;
-template class PopulationTestingForce<1,3>;
-template class PopulationTestingForce<2,3>;
-template class PopulationTestingForce<3,3>;
+template class PopulationTestingForce<1, 1>;
+template class PopulationTestingForce<1, 2>;
+template class PopulationTestingForce<2, 2>;
+template class PopulationTestingForce<1, 3>;
+template class PopulationTestingForce<2, 3>;
+template class PopulationTestingForce<3, 3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

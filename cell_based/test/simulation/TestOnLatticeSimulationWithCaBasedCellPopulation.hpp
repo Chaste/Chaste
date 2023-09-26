@@ -90,7 +90,7 @@ public:
 
         // Create a simple tetrahedral mesh
         HoneycombMeshGenerator generator(3, 3, 0);
-        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+        boost::shared_ptr<TetrahedralMesh<2, 2> > p_generating_mesh = generator.GetMesh();
 
         // Convert this to a NodesOnlyMesh
         NodesOnlyMesh<2> mesh;
@@ -301,9 +301,9 @@ public:
         // No movement rule as only care about cell death
 
         // Add a cell killer that will kill all cells in the top half of the domain
-        c_vector<double,2> point = zero_vector<double>(2);
+        c_vector<double, 2> point = zero_vector<double>(2);
         point[1] = 4.5;
-        c_vector<double,2> normal = unit_vector<double>(2,1);
+        c_vector<double, 2> normal = unit_vector<double>(2,1);
         MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer, (&cell_population, point, normal)); // v>4.5
         simulator.AddCellKiller(p_killer);
 
@@ -771,9 +771,9 @@ public:
         // No movement rule, as we only care about cell death
 
         // Add a cell killer that will kill all cells in the top half of the domain
-        c_vector<double,2> point = zero_vector<double>(2);
+        c_vector<double, 2> point = zero_vector<double>(2);
         point[1] = 4.5;
-        c_vector<double,2> normal = unit_vector<double>(2,1);
+        c_vector<double, 2> normal = unit_vector<double>(2,1);
         MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer, (&cell_population, point, normal)); // v>4.5
         simulator.AddCellKiller(p_killer);
 

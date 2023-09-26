@@ -77,10 +77,8 @@ protected:
     std::string mFileBaseName;
 
     /**
-     * The datasets that we are working with.
-     *
-     * 'Data' is a special case and handled slightly differently as all 
-     * variables use the same 'time'.
+     * The datasets that we are working with. 'Data' is a special case and 
+     * handled slightly differently as all variables use the same 'time'.
      */
     std::vector<std::string> mDatasetNames;
 
@@ -88,7 +86,7 @@ protected:
     unsigned mOpenDatasetIndex;
 
     /** Pointer to a mesh. */
-    AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* mpMesh;
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* mpMesh;
 
     /** Initialised as the directory in which to store the results. */
     OutputFileHandler* mpOutputFileHandler;
@@ -130,7 +128,7 @@ public:
      */
     AbstractHdf5Converter(const FileFinder& rInputDirectory,
                           const std::string& rFileBaseName,
-                          AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
+                          AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
                           const std::string& rSubdirectoryName,
                           unsigned precision);
 

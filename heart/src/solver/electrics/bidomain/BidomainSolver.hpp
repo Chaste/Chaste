@@ -77,7 +77,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class BidomainSolver : public AbstractBidomainSolver<ELEMENT_DIM,SPACE_DIM>
+class BidomainSolver : public AbstractBidomainSolver<ELEMENT_DIM, SPACE_DIM>
 {
 private:
     /** Mass matrix, used to computing the RHS vector (actually: mass-matrix in
@@ -92,16 +92,16 @@ private:
     Vec mVecForConstructingRhs;
 
     /** The bidomain assembler, used to set up the LHS matrix */
-    BidomainAssembler<ELEMENT_DIM,SPACE_DIM>* mpBidomainAssembler;
+    BidomainAssembler<ELEMENT_DIM, SPACE_DIM>* mpBidomainAssembler;
 
     /** Assembler for surface integrals coming from any non-zero Neumann boundary conditions */
-    BidomainNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM>* mpBidomainNeumannSurfaceTermAssembler;
+    BidomainNeumannSurfaceTermAssembler<ELEMENT_DIM, SPACE_DIM>* mpBidomainNeumannSurfaceTermAssembler;
 
     /**
      * If using state variable interpolation, points to an assembler to use in
      * computing the correction term to apply to the RHS.
      */
-    BidomainCorrectionTermAssembler<ELEMENT_DIM,SPACE_DIM>* mpBidomainCorrectionTermAssembler;
+    BidomainCorrectionTermAssembler<ELEMENT_DIM, SPACE_DIM>* mpBidomainCorrectionTermAssembler;
 
 
 
@@ -126,9 +126,9 @@ public:
      * @param pBoundaryConditions pointer to the boundary conditions
      */
     BidomainSolver(bool bathSimulation,
-                   AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
+                   AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
                    BidomainTissue<SPACE_DIM>* pTissue,
-                   BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,2>* pBoundaryConditions);
+                   BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, 2>* pBoundaryConditions);
 
     ~BidomainSolver();
 

@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-class BidomainWithBathAssembler : public BidomainAssembler<ELEMENT_DIM,SPACE_DIM>
+class BidomainWithBathAssembler : public BidomainAssembler<ELEMENT_DIM, SPACE_DIM>
 {
 protected:
     /**
@@ -66,9 +66,9 @@ protected:
         c_vector<double, ELEMENT_DIM+1> &rPhi,
         c_matrix<double, SPACE_DIM, ELEMENT_DIM+1> &rGradPhi,
         ChastePoint<SPACE_DIM> &rX,
-        c_vector<double,2> &rU,
+        c_vector<double, 2> &rU,
         c_matrix<double, 2, SPACE_DIM> &rGradU /* not used */,
-        Element<ELEMENT_DIM,SPACE_DIM>* pElement);
+        Element<ELEMENT_DIM, SPACE_DIM>* pElement);
 
 public:
     /**
@@ -77,9 +77,9 @@ public:
      * @param pMesh pointer to the mesh
      * @param pTissue pointer to the tissue
      */
-    BidomainWithBathAssembler(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh,
+    BidomainWithBathAssembler(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
                               BidomainTissue<SPACE_DIM>* pTissue)
-      : BidomainAssembler<ELEMENT_DIM,SPACE_DIM>(pMesh,pTissue)
+      : BidomainAssembler<ELEMENT_DIM, SPACE_DIM>(pMesh,pTissue)
     {
     }
 

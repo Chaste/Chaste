@@ -120,7 +120,7 @@ public:
      */
     CellBasedParabolicPdeSolver(TetrahedralMesh<DIM, DIM>* pMesh,
                                 AbstractLinearParabolicPde<DIM, DIM>* pPde,
-                                BoundaryConditionsContainer<DIM, DIM,1>* pBoundaryConditions);
+                                BoundaryConditionsContainer<DIM, DIM, 1>* pBoundaryConditions);
 
     /**
      * Destructor.

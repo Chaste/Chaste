@@ -161,7 +161,7 @@ PROBLEM_CLASS* CardiacSimulationArchiver<PROBLEM_CLASS>::Migrate(const FileFinde
         assert(original_num_procs == num_procs); // Paranoia
 
         // Merge in the extra data
-        for (unsigned archive_num=0; archive_num<original_num_procs; archive_num++)
+        for (unsigned archive_num = 0; archive_num<original_num_procs; archive_num++)
         {
             if (archive_num != initial_archive)
             {

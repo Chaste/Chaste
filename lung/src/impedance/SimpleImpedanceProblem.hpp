@@ -77,7 +77,7 @@ public:
      * @param rAirwaysMesh  The mesh to calculate on
      * @param rootIndex  the global index of the root/outlet node in the mesh (defaults to node zero).
      */
-    SimpleImpedanceProblem(TetrahedralMesh<1,3>& rAirwaysMesh, unsigned rootIndex=0u);
+    SimpleImpedanceProblem(TetrahedralMesh<1, 3>& rAirwaysMesh, unsigned rootIndex=0u);
 
     /**
      * Destructor
@@ -136,7 +136,7 @@ public:
     /**
      * @return  reference to the mesh
      */
-    TetrahedralMesh<1,3>& rGetMesh();
+    TetrahedralMesh<1, 3>& rGetMesh();
 
     /**
      * Recursively calculates the impedance of an element (and all its children)
@@ -145,7 +145,7 @@ public:
      * @param frequency The input frequency in Hz
      * @return The impedance
      */
-    std::complex<double> CalculateElementImpedance(Element<1,3>* pElement, double frequency);
+    std::complex<double> CalculateElementImpedance(Element<1, 3>* pElement, double frequency);
 
     /**
      * Calculates the impedance of a single acinar unit.
@@ -197,7 +197,7 @@ public:
     void SetMeshInMilliMetres();
 
 private:
-     TetrahedralMesh<1,3>& mrMesh; /**<The 1d in 3d branching tree mesh */
+     TetrahedralMesh<1, 3>& mrMesh; /**<The 1d in 3d branching tree mesh */
      unsigned mOutletNodeIndex; /**< The outlet node is the root of the branching tree structure */
 
      /** Allows easy traversal of the airway tree */

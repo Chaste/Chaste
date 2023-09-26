@@ -48,8 +48,8 @@ void VtkNonlinearElasticitySolutionWriter<DIM>::Write()
     VtkMeshWriter<DIM, DIM> mesh_writer(mpSolver->mOutputDirectory + "/vtk", "solution", true);
 
     // write the displacement
-    std::vector<c_vector<double,DIM> > displacement(mpSolver->mrQuadMesh.GetNumNodes());
-    std::vector<c_vector<double,DIM> >& r_spatial_solution = mpSolver->rGetSpatialSolution();
+    std::vector<c_vector<double, DIM> > displacement(mpSolver->mrQuadMesh.GetNumNodes());
+    std::vector<c_vector<double, DIM> >& r_spatial_solution = mpSolver->rGetSpatialSolution();
     for (unsigned i = 0; i < mpSolver->mrQuadMesh.GetNumNodes(); ++i)
     {
         for (unsigned j = 0; j < DIM; ++j)
@@ -117,7 +117,7 @@ void VtkNonlinearElasticitySolutionWriter<DIM>::Write()
 //// Future..
 //        if (mWriteNodeWiseStresses)
 //        {
-//            std::vector<c_matrix<double,DIM,DIM> > tensor_data;
+//            std::vector<c_matrix<double, DIM, DIM> > tensor_data;
 //            // use recoverer
 //            mesh_writer.AddTensorCellData("Stress_NAME_ME", tensor_data);
 //        }

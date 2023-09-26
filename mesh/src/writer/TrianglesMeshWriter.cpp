@@ -101,7 +101,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
     *p_node_file << std::setprecision(20);
 
     // Write each node's data
-    for (unsigned item_num=0; item_num<num_nodes; item_num++)
+    for (unsigned item_num = 0; item_num<num_nodes; item_num++)
     {
         if (this->mpMesh && !this->mFilesAreBinary && num_attr!=0) ///\todo #1949 Readers do not currently support reading of node attributes, so we cannot yet write them from a reader
         {
@@ -176,7 +176,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 
         // Write each element's data
         std::vector<double> attribute_values(1);
-        for (unsigned item_num=0; item_num<num_elements; item_num++)
+        for (unsigned item_num = 0; item_num<num_elements; item_num++)
         {
             /*
              * If item_num==0 we will already have got the element above (in order to
@@ -232,7 +232,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 
         // Write each face's data
         std::vector<double> default_marker(0);
-        for (unsigned item_num=0; item_num<num_faces; item_num++)
+        for (unsigned item_num = 0; item_num<num_faces; item_num++)
         {
             ElementData face_data = this->GetNextBoundaryElement();
             WriteItem(p_face_file, item_num, face_data.NodeIndices, default_marker);
@@ -265,7 +265,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 
             // Write each element's data
             std::vector<double> attribute_values(1);
-            for (unsigned item_num=0; item_num<num_cable_elements; item_num++)
+            for (unsigned item_num = 0; item_num<num_cable_elements; item_num++)
             {
                 ElementData cable_element_data = this->GetNextCableElement();
                 attribute_values[0] = cable_element_data.AttributeValue;
@@ -316,7 +316,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteElementsAsFaces()
 
         // Write each element's data
         std::vector<double> attribute_values(1);
-        for (unsigned item_num=0; item_num<num_elements; item_num++)
+        for (unsigned item_num = 0; item_num<num_elements; item_num++)
         {
             ElementData element_data = this->GetNextElement();
             attribute_values[0] =  element_data.AttributeValue;
@@ -367,7 +367,7 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFacesAsEdges()
         }
 
         // Write each face's data
-        for (unsigned item_num=0; item_num<num_faces; item_num++)
+        for (unsigned item_num = 0; item_num<num_faces; item_num++)
         {
             ElementData face_data = this->GetNextBoundaryElement();
             WriteItem(p_face_file, item_num, face_data.NodeIndices, default_marker);
@@ -414,11 +414,11 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteItem(out_stream &pFile, u
     else
     {
         *pFile << itemNumber;
-        for (unsigned i=0; i<dataPacket.size(); ++i)
+        for (unsigned i = 0; i<dataPacket.size(); ++i)
         {
             *pFile << "\t" << dataPacket[i];
         }
-        for (unsigned i=0; i<rAttributes.size(); ++i)
+        for (unsigned i = 0; i<rAttributes.size(); ++i)
         {
             *pFile << "\t" << rAttributes[i];
         }
@@ -427,12 +427,12 @@ void TrianglesMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteItem(out_stream &pFile, u
 }
 
 // Explicit instantiation
-template class TrianglesMeshWriter<1,1>;
-template class TrianglesMeshWriter<1,2>;
-template class TrianglesMeshWriter<1,3>;
-template class TrianglesMeshWriter<2,2>;
-template class TrianglesMeshWriter<2,3>;
-template class TrianglesMeshWriter<3,3>;
+template class TrianglesMeshWriter<1, 1>;
+template class TrianglesMeshWriter<1, 2>;
+template class TrianglesMeshWriter<1, 3>;
+template class TrianglesMeshWriter<2, 2>;
+template class TrianglesMeshWriter<2, 3>;
+template class TrianglesMeshWriter<3, 3>;
 
 /**
  * \cond

@@ -102,9 +102,9 @@ std::string AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>::GetVtkVectorCellDataName
 }
 
 // Explicit instantiation
-template class AbstractCellWriter<1,1>;
-template class AbstractCellWriter<1,2>;
-template class AbstractCellWriter<2,2>;
-template class AbstractCellWriter<1,3>;
-template class AbstractCellWriter<2,3>;
-template class AbstractCellWriter<3,3>;
+template class AbstractCellWriter<1, 1>;
+template class AbstractCellWriter<1, 2>;
+template class AbstractCellWriter<2, 2>;
+template class AbstractCellWriter<1, 3>;
+template class AbstractCellWriter<2, 3>;
+template class AbstractCellWriter<3, 3>;

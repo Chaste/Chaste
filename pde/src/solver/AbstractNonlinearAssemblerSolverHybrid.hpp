@@ -129,15 +129,15 @@ PetscErrorCode AbstractNonlinearAssemblerSolverHybrid_ComputeResidual(SNES snes,
  * An abstract solver for solving nonlinear elliptic PDEs.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-class AbstractNonlinearAssemblerSolverHybrid : public AbstractFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM,true,true,NONLINEAR>
+class AbstractNonlinearAssemblerSolverHybrid : public AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM,true,true,NONLINEAR>
 {
 protected:
 
     /** The mesh. */
-    AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* mpMesh;
+    AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* mpMesh;
 
     /** Boundary conditions container. */
-    BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>* mpBoundaryConditions;
+    BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* mpBoundaryConditions;
 
     /** The nonlinear solver. */
     AbstractNonlinearSolver* mpSolver;
@@ -149,7 +149,7 @@ protected:
     bool mUseAnalyticalJacobian;
 
     /** An assembler for the surface integral terms in the residual */
-    NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>* mpNeumannSurfaceTermsAssembler;
+    NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* mpNeumannSurfaceTermsAssembler;
 
     /**
      * Apply Dirichlet boundary conditions to either the residual or Jacobian.
@@ -251,7 +251,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
 AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::AbstractNonlinearAssemblerSolverHybrid(
             AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh,
             BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>* pBoundaryConditions)
-    :  AbstractFeVolumeIntegralAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM,true,true,NONLINEAR>(pMesh),
+    :  AbstractFeVolumeIntegralAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM,true,true,NONLINEAR>(pMesh),
        mpMesh(pMesh),
        mpBoundaryConditions(pBoundaryConditions)
 {
@@ -270,7 +270,7 @@ AbstractNonlinearAssemblerSolverHybrid<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Abs
 
         assert(mpMesh->GetNumNodes() == mpMesh->GetDistributedVectorFactory()->GetProblemSize());
 
-        mpNeumannSurfaceTermsAssembler = new NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>(pMesh,pBoundaryConditions);
+        mpNeumannSurfaceTermsAssembler = new NaturalNeumannSurfaceTermAssembler<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>(pMesh,pBoundaryConditions);
     }
     else
     {

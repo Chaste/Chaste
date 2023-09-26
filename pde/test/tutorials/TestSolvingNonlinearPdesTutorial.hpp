@@ -112,7 +112,7 @@ public:
 
     /* The third is the diffusion tensor, which unlike in the linear case can be
      * dependent on u. The diffusion tensor should be symmetric and positive definite. */
-    c_matrix<double,2,2> ComputeDiffusionTerm(const ChastePoint<2>& rX, double u)
+    c_matrix<double,2, 2> ComputeDiffusionTerm(const ChastePoint<2>& rX, double u)
     {
         return identity_matrix<double>(2)*u;
     }
@@ -127,7 +127,7 @@ public:
     }
 
     /* And the derivative of the diffusion tensor is just the identity matrix. */
-    c_matrix<double,2,2> ComputeDiffusionTermPrime(const ChastePoint<2>& rX, double u)
+    c_matrix<double,2, 2> ComputeDiffusionTermPrime(const ChastePoint<2>& rX, double u)
     {
         return identity_matrix<double>(2);
     }
@@ -153,8 +153,8 @@ public:
     void TestSolvingNonlinearEllipticPde()
     {
         /* As usual, first create a mesh. */
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
-        TetrahedralMesh<2,2> mesh;
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements");
+        TetrahedralMesh<2, 2> mesh;
         mesh.ConstructFromMeshReader(mesh_reader);
 
         /* Next, instantiate the PDE to be solved. */
@@ -164,7 +164,7 @@ public:
          * Then we have to define the boundary conditions. First, the Dirichlet boundary
          * condition, u=0 on x=0, using the boundary node iterator.
          */
-        BoundaryConditionsContainer<2,2,1> bcc;
+        BoundaryConditionsContainer<2, 2, 1> bcc;
         ConstBoundaryCondition<2>* p_zero_bc = new ConstBoundaryCondition<2>(0.0);
         for (auto node_iter = mesh.GetBoundaryNodeIteratorBegin();
              node_iter != mesh.GetBoundaryNodeIteratorEnd();
@@ -212,7 +212,7 @@ public:
          *
          * This is the solver for solving nonlinear problems, which, as usual,
          * takes in the mesh, the PDE, and the boundary conditions. */
-        SimpleNonlinearEllipticSolver<2,2> solver(&mesh, &pde, &bcc);
+        SimpleNonlinearEllipticSolver<2, 2> solver(&mesh, &pde, &bcc);
 
         /* The solver also needs to be given an initial guess, which will be
          * a PETSc vector. We can make use of a helper method to create it.

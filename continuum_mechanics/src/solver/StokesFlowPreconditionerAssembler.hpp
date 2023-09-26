@@ -91,8 +91,8 @@ private:
     c_matrix<double,PRESSURE_BLOCK_SIZE_ELEMENTAL,PRESSURE_BLOCK_SIZE_ELEMENTAL> ComputePressurePressureMatrixTerm(
         c_vector<double, NUM_VERTICES_PER_ELEMENT>& rLinearPhi,
         c_matrix<double, DIM, NUM_VERTICES_PER_ELEMENT>& rGradLinearPhi,
-        c_vector<double,DIM>& rX,
-        Element<DIM,DIM>* pElement)
+        c_vector<double, DIM>& rX,
+        Element<DIM, DIM>* pElement)
     {
         return outer_prod(rLinearPhi,rLinearPhi);
     }
@@ -103,7 +103,7 @@ public:
      * @param pMesh mesh
      * @param pProblemDefinition problem definition
      */
-    StokesFlowPreconditionerAssembler(AbstractTetrahedralMesh<DIM,DIM>* pMesh,
+    StokesFlowPreconditionerAssembler(AbstractTetrahedralMesh<DIM, DIM>* pMesh,
                                       StokesFlowProblemDefinition<DIM>* pProblemDefinition)
         : StokesFlowAssembler<DIM>(pMesh,pProblemDefinition)
     {

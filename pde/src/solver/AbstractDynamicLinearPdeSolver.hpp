@@ -149,7 +149,7 @@ public:
      *
      * @param pMesh the mesh
      */
-    explicit AbstractDynamicLinearPdeSolver(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh);
+    explicit AbstractDynamicLinearPdeSolver(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh);
 
     /**
      * Set the times to solve between.
@@ -259,7 +259,7 @@ void AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Initia
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM, unsigned PROBLEM_DIM>
-AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::AbstractDynamicLinearPdeSolver(AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>* pMesh)
+AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::AbstractDynamicLinearPdeSolver(AbstractTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* pMesh)
     : AbstractLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>(pMesh),
       mTimesSet(false),
       mInitialCondition(nullptr),
@@ -479,17 +479,17 @@ Vec AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM>::Solve()
 
     if (mOutputToVtk)
     {
-        Hdf5ToVtkConverter<ELEMENT_DIM,SPACE_DIM> converter(FileFinder(mOutputDirectory, RelativeTo::ChasteTestOutput),
+        Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM> converter(FileFinder(mOutputDirectory, RelativeTo::ChasteTestOutput),
                                                             mFilenamePrefix, this->mpMesh, false, false);
     }
     if (mOutputToParallelVtk)
     {
-        Hdf5ToVtkConverter<ELEMENT_DIM,SPACE_DIM> converter(FileFinder(mOutputDirectory, RelativeTo::ChasteTestOutput),
+        Hdf5ToVtkConverter<ELEMENT_DIM, SPACE_DIM> converter(FileFinder(mOutputDirectory, RelativeTo::ChasteTestOutput),
                                                             mFilenamePrefix, this->mpMesh, true, false);
     }
     if (mOutputToTxt)
     {
-        Hdf5ToTxtConverter<ELEMENT_DIM,SPACE_DIM> converter(FileFinder(mOutputDirectory, RelativeTo::ChasteTestOutput),
+        Hdf5ToTxtConverter<ELEMENT_DIM, SPACE_DIM> converter(FileFinder(mOutputDirectory, RelativeTo::ChasteTestOutput),
                                                             mFilenamePrefix, this->mpMesh);
     }
 

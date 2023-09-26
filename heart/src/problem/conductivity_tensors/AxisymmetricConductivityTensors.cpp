@@ -73,9 +73,9 @@ void AxisymmetricConductivityTensors<ELEMENT_DIM, SPACE_DIM>::Init(AbstractTetra
     if (!this->mUseNonConstantConductivities && !this->mUseFibreOrientation)
     {
         // Constant tensor for every element
-        c_matrix<double, SPACE_DIM, SPACE_DIM> conductivity_matrix(zero_matrix<double>(SPACE_DIM,SPACE_DIM));
+        c_matrix<double, SPACE_DIM, SPACE_DIM> conductivity_matrix(zero_matrix<double>(SPACE_DIM, SPACE_DIM));
 
-        for (unsigned dim=0; dim<SPACE_DIM; dim++)
+        for (unsigned dim = 0; dim<SPACE_DIM; dim++)
         {
             assert(this->mConstantConductivities(dim) != DBL_MAX);
             conductivity_matrix(dim,dim) = this->mConstantConductivities(dim);
@@ -84,7 +84,7 @@ void AxisymmetricConductivityTensors<ELEMENT_DIM, SPACE_DIM>::Init(AbstractTetra
     }
     else
     {
-        c_vector<double,SPACE_DIM> fibre_vector((zero_vector<double>(SPACE_DIM)));
+        c_vector<double, SPACE_DIM> fibre_vector((zero_vector<double>(SPACE_DIM)));
         fibre_vector[0]=1.0;
 
         if (this->mUseFibreOrientation)
@@ -109,7 +109,7 @@ void AxisymmetricConductivityTensors<ELEMENT_DIM, SPACE_DIM>::Init(AbstractTetra
         // on the automatic reallocation scheme.
         this->mTensors.reserve(this->mpMesh->GetNumLocalElements());
 
-        c_matrix<double, SPACE_DIM, SPACE_DIM> conductivity_matrix(zero_matrix<double>(SPACE_DIM,SPACE_DIM));
+        c_matrix<double, SPACE_DIM, SPACE_DIM> conductivity_matrix(zero_matrix<double>(SPACE_DIM, SPACE_DIM));
 
         unsigned local_element_index = 0;
 
@@ -144,14 +144,14 @@ void AxisymmetricConductivityTensors<ELEMENT_DIM, SPACE_DIM>::Init(AbstractTetra
 
             if (this->mUseNonConstantConductivities)
             {
-                for (unsigned dim=0; dim<SPACE_DIM; dim++)
+                for (unsigned dim = 0; dim<SPACE_DIM; dim++)
                 {
                     conductivity_matrix(dim,dim) = (*this->mpNonConstantConductivities)[local_element_index][dim];
                 }
             }
             else
             {
-                for (unsigned dim=0; dim<SPACE_DIM; dim++)
+                for (unsigned dim = 0; dim<SPACE_DIM; dim++)
                 {
                     assert(this->mConstantConductivities(dim) != DBL_MAX);
                     conductivity_matrix(dim,dim) = this->mConstantConductivities(dim);
@@ -187,9 +187,9 @@ void AxisymmetricConductivityTensors<ELEMENT_DIM, SPACE_DIM>::Init(AbstractTetra
 
 // only makes sense for 3d elements in 3d, but we need the other to compile
 // AbstractCardiacTissue and BidomainTissue.
-template class AxisymmetricConductivityTensors<1,1>;
-template class AxisymmetricConductivityTensors<1,2>;
-template class AxisymmetricConductivityTensors<1,3>;
-template class AxisymmetricConductivityTensors<2,2>;
-template class AxisymmetricConductivityTensors<2,3>;
-template class AxisymmetricConductivityTensors<3,3>;
+template class AxisymmetricConductivityTensors<1, 1>;
+template class AxisymmetricConductivityTensors<1, 2>;
+template class AxisymmetricConductivityTensors<1, 3>;
+template class AxisymmetricConductivityTensors<2, 2>;
+template class AxisymmetricConductivityTensors<2, 3>;
+template class AxisymmetricConductivityTensors<3, 3>;

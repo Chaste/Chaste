@@ -49,7 +49,7 @@ CML_noble_varghese_kohl_noble_1998_basic_with_sac::CML_noble_varghese_kohl_noble
 
 }
 
-CML_noble_varghese_kohl_noble_1998_basic_with_sac::~CML_noble_varghese_kohl_noble_1998_basic_with_sac(void)
+CML_noble_varghese_kohl_noble_1998_basic_with_sac::~CML_noble_varghese_kohl_noble_1998_basic_with_sac()
 {
 }
 
@@ -616,7 +616,7 @@ void CML_noble_varghese_kohl_noble_1998_basic_with_sac::EvaluateYDerivatives (
 
 
 template<>
-void OdeSystemInformation<CML_noble_varghese_kohl_noble_1998_basic_with_sac>::Initialise(void)
+void OdeSystemInformation<CML_noble_varghese_kohl_noble_1998_basic_with_sac>::Initialise()
 {
     // Time units: second
     //

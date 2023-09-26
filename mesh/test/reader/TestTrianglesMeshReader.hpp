@@ -51,12 +51,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakePetscSetup.hpp"
 
 // these typedefs are just because can't have lines such as
-//  TS_ASSERT_THROWS_NOTHING(p_mesh_reader=new TrianglesMeshReader<2,2>(name));
+//  TS_ASSERT_THROWS_NOTHING(p_mesh_reader=new TrianglesMeshReader<2, 2>(name));
 // because the macro thinks the comma separates two arguments
-typedef TrianglesMeshReader<1,1> READER_1D;
-typedef TrianglesMeshReader<2,2> READER_2D;
-typedef TrianglesMeshReader<3,3> READER_3D;
-typedef TrianglesMeshReader<0,1> READER_0D_IN_1D;
+typedef TrianglesMeshReader<1, 1> READER_1D;
+typedef TrianglesMeshReader<2, 2> READER_2D;
+typedef TrianglesMeshReader<3, 3> READER_3D;
+typedef TrianglesMeshReader<0, 1> READER_0D_IN_1D;
 
 
 class TestTrianglesMeshReader : public CxxTest::TestSuite
@@ -75,7 +75,7 @@ public:
         TS_ASSERT_THROWS_THIS(READER_2D mesh_reader1("mesh/test/data/square_no_edge_file"),
                            "Could not open data file: mesh/test/data/square_no_edge_file.edge");
 
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_522_elements");
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/disk_522_elements");
         // For coverage purposes, not sure how to test this functionality...
         mesh_reader.SetReadBufferSize(2*1024*1024); //2MB
     }
@@ -87,11 +87,11 @@ public:
      */
     void TestNodesDataRead()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements_indexed_from_1");
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/disk_984_elements_indexed_from_1");
 
         TS_ASSERT_EQUALS( mesh_reader.GetNumNodes(), 543u);
 
-        TrianglesMeshReader<2,2> mesh_reader2("mesh/test/data/baddata/bad_nodes_disk_522_elements");
+        TrianglesMeshReader<2, 2> mesh_reader2("mesh/test/data/baddata/bad_nodes_disk_522_elements");
 
         // Reads node 0 from file
         TS_ASSERT_THROWS_NOTHING(mesh_reader2.GetNextNode());
@@ -106,7 +106,7 @@ public:
      */
     void TestElementsDataRead()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements_indexed_from_1");
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/disk_984_elements_indexed_from_1");
 
         TS_ASSERT_EQUALS( mesh_reader.GetNumElements(), 984u);
 
@@ -123,7 +123,7 @@ public:
             TS_ASSERT_EQUALS(data.AttributeValue, 0u);
         }
 
-        TrianglesMeshReader<2,2> mesh_reader2("mesh/test/data/baddata/bad_elements_disk_522_elements");
+        TrianglesMeshReader<2, 2> mesh_reader2("mesh/test/data/baddata/bad_elements_disk_522_elements");
 
         // Reads element 0 from file
         TS_ASSERT_THROWS_NOTHING(mesh_reader2.GetNextElementData());
@@ -138,7 +138,7 @@ public:
      */
     void TestFacesDataRead()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements_indexed_from_1");
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/disk_984_elements_indexed_from_1");
 
         // TS_ASSERT_EQUALS( mesh_reader.GetNumFaces(), 1526u); // when all faces were read
         TS_ASSERT_EQUALS( mesh_reader.GetNumFaces(), 100u); // just boundary faces are read
@@ -162,13 +162,13 @@ public:
      */
     void TestFacesDataReadWithAttributes()
     {
-        TrianglesMeshReader<3,3> mesh_reader("heart/test/data/box_shaped_heart/box_heart_nonnegative_flags");
+        TrianglesMeshReader<3, 3> mesh_reader("heart/test/data/box_shaped_heart/box_heart_nonnegative_flags");
 
         TS_ASSERT_EQUALS( mesh_reader.GetNumFaces(), 92u); // just boundary faces are read
         TS_ASSERT_EQUALS( mesh_reader.GetNumFaceAttributes(), 1u);
 
         bool read_zero_attribute = false;
-        for (unsigned i=0; i<mesh_reader.GetNumFaces(); ++i)
+        for (unsigned i = 0; i<mesh_reader.GetNumFaces(); ++i)
         {
             ElementData data = mesh_reader.GetNextFaceData();
             // Attributes are 0, 1, 2, or 3.
@@ -188,7 +188,7 @@ public:
      */
     void Test3dDataRead()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/slab_138_elements");
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/slab_138_elements");
         TS_ASSERT_EQUALS(mesh_reader.GetNodeAttributes().size(), 0u);//no nodal attributes in this mesh
         TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 138u);
     }
@@ -224,7 +224,7 @@ public:
      */
     void TestGetNextNode()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/disk_984_elements");
 
         std::vector<double> first_node;
         first_node = mesh_reader.GetNextNode();
@@ -243,7 +243,7 @@ public:
         TS_ASSERT_DELTA(next_node[0], 1.0, 1e-6);
         TS_ASSERT_DELTA(next_node[1], 0.0, 1e-6);
 
-        for (int i=0; i<541; ++i)
+        for (int i = 0; i<541; ++i)
         {
             TS_ASSERT_THROWS_NOTHING(next_node = mesh_reader.GetNextNode());
         }
@@ -256,7 +256,7 @@ public:
 
     void TestGetNextNodeWithNodeAttributes()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements_with_node_attributes");
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_2mm_12_elements_with_node_attributes");
 
         TS_ASSERT_EQUALS(mesh_reader.GetNodeAttributes().size(), 0u); // Check vector is empty at the beginning
 
@@ -309,11 +309,11 @@ public:
      */
     void TestGetNextElementData()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/disk_984_elements");
 
         std::vector<unsigned> next_element;
 
-        for (unsigned i=0; i<mesh_reader.GetNumElements(); ++i)
+        for (unsigned i = 0; i<mesh_reader.GetNumElements(); ++i)
         {
             TS_ASSERT_THROWS_NOTHING(next_element = mesh_reader.GetNextElementData().NodeIndices);
         }
@@ -329,7 +329,7 @@ public:
      */
     void TestGetNextEdgeData()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/disk_984_elements");
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/disk_984_elements");
 
         std::vector<unsigned> next_edge;
 
@@ -351,7 +351,7 @@ public:
      */
     void Test1DMeshRead()
     {
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/trivial_1d_mesh");
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/trivial_1d_mesh");
 
         TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 11u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 10u);
@@ -366,31 +366,31 @@ public:
 
     void Test1DMeshIn2DSpace()
     {
-        TrianglesMeshReader<1,2> mesh_reader("mesh/test/data/circle_outline");
+        TrianglesMeshReader<1, 2> mesh_reader("mesh/test/data/circle_outline");
         TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 100u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 100u);
 
         // Note: don't test faces (end nodes), since they are culled later
-        TrianglesMeshReader<1,2> mesh_reader2("mesh/test/data/semicircle_outline");
+        TrianglesMeshReader<1, 2> mesh_reader2("mesh/test/data/semicircle_outline");
         TS_ASSERT_EQUALS(mesh_reader2.GetNumNodes(), 51u);
         TS_ASSERT_EQUALS(mesh_reader2.GetNumElements(), 50u);
     }
 
     void Test1DMeshIn3DSpace()
     {
-        TrianglesMeshReader<1,3> mesh_reader("mesh/test/data/trivial_1d_in_3d_mesh");
+        TrianglesMeshReader<1, 3> mesh_reader("mesh/test/data/trivial_1d_in_3d_mesh");
         TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 11u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 10u);
     }
 
     void Test2DMeshIn3DSpace()
     {
-        TrianglesMeshReader<2,3> mesh_reader("mesh/test/data/slab_395_elements");
+        TrianglesMeshReader<2, 3> mesh_reader("mesh/test/data/slab_395_elements");
         TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 132u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 224u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumFaces(), 0u);
 
-        TrianglesMeshReader<2,3> mesh_reader2("mesh/test/data/disk_in_3d");
+        TrianglesMeshReader<2, 3> mesh_reader2("mesh/test/data/disk_in_3d");
         TS_ASSERT_EQUALS(mesh_reader2.GetNumNodes(), 312u);
         TS_ASSERT_EQUALS(mesh_reader2.GetNumElements(), 522u);
         // TS_ASSERT_EQUALS(mesh_reader2.GetNumFaces(), 833u); // when all faces were read
@@ -407,7 +407,7 @@ public:
                 "Boundary element file should not have containing element info if it is quadratic");
 
         //Exceptions due to unimplemented code
-        TrianglesMeshReader<3,3> mesh_reader3("mesh/test/data/simple_cube");
+        TrianglesMeshReader<3, 3> mesh_reader3("mesh/test/data/simple_cube");
         TS_ASSERT_THROWS_THIS(mesh_reader3.GetNode(0), "Random access is only implemented in mesh readers for binary mesh files.");
         TS_ASSERT_THROWS_THIS(mesh_reader3.GetElementData(0), "Random access is only implemented in mesh readers for binary mesh files.");
         TS_ASSERT_THROWS_THIS(mesh_reader3.GetFaceData(0), "Random access is only implemented in mesh readers for binary mesh files.");
@@ -424,7 +424,7 @@ public:
         TS_ASSERT_THROWS_THIS( READER_1D wrong_reader("mesh/test/data/1D_0_to_1_10_elements_quadratics", 1),
                 "Could not open data file: mesh/test/data/1D_0_to_1_10_elements_quadratics.node");
 
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements_quadratic", 2);
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements_quadratic", 2);
         TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 21u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 10u);
 
@@ -445,7 +445,7 @@ public:
 
     void TestReadingQuadraticMesh2d()
     {
-        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic", 2);
+        TrianglesMeshReader<2, 2> mesh_reader("mesh/test/data/square_128_elements_quadratic", 2);
         TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 17u*17u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 128u);
 
@@ -469,7 +469,7 @@ public:
 
     void TestReadingQuadraticMesh3d()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/3D_Single_tetrahedron_element_quadratic", 2);
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/3D_Single_tetrahedron_element_quadratic", 2);
         TS_ASSERT_EQUALS(mesh_reader.GetNumNodes(), 10u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 1u);
 
@@ -477,7 +477,7 @@ public:
 
         TS_ASSERT_EQUALS(next_element.size(), 10u);
 
-        for (unsigned i=0; i<10; ++i)
+        for (unsigned i = 0; i<10; ++i)
         {
             TS_ASSERT_EQUALS(next_element[i], i);
         }
@@ -485,12 +485,12 @@ public:
 
     void TestReadingElementAttributes()
     {
-        TrianglesMeshReader<1,1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements_with_attributes");
+        TrianglesMeshReader<1, 1> mesh_reader("mesh/test/data/1D_0_to_1_10_elements_with_attributes");
 
         TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 10u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumElementAttributes(), 1u);
 
-        for (unsigned i=0; i<10; ++i)
+        for (unsigned i = 0; i<10; ++i)
         {
             ElementData next_element_info = mesh_reader.GetNextElementData();
             std::vector<unsigned> nodes = next_element_info.NodeIndices;
@@ -510,7 +510,7 @@ public:
 
     void TestReadingContainingElementsOfBoundaryElements()
     {
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_152_elements_v2", 1, 1, true);
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/cube_2mm_152_elements_v2", 1, 1, true);
 
         TS_ASSERT_EQUALS(mesh_reader.GetNumFaces(), 116u);
         TS_ASSERT_EQUALS(mesh_reader.GetNextFaceData().NodeIndices[0], 3u);     //face 0
@@ -523,15 +523,15 @@ public:
 
     void TestReadingBinary1D()
     {
-        TrianglesMeshReader<1,1> mesh_reader_ascii("mesh/test/data/trivial_1d_mesh");
-        //TrianglesMeshWriter<1,1> writer("","trivial_1d_mesh_binary");
+        TrianglesMeshReader<1, 1> mesh_reader_ascii("mesh/test/data/trivial_1d_mesh");
+        //TrianglesMeshWriter<1, 1> writer("","trivial_1d_mesh_binary");
         //writer.SetWriteFilesAsBinary();
         //writer.WriteFilesUsingMeshReader(mesh_reader_ascii);
         TS_ASSERT_EQUALS(mesh_reader_ascii.GetNumFaces(), 2u);
         TS_ASSERT_EQUALS(mesh_reader_ascii.GetNumElements(), 10u);
         TS_ASSERT_EQUALS(mesh_reader_ascii.GetNumNodes(), 11u);
 
-        TrianglesMeshReader<1,1> mesh_reader_bin("mesh/test/data/trivial_1d_mesh_binary");
+        TrianglesMeshReader<1, 1> mesh_reader_bin("mesh/test/data/trivial_1d_mesh_binary");
         TS_ASSERT_EQUALS(mesh_reader_bin.GetNumFaces(), 2u);
         TS_ASSERT_EQUALS(mesh_reader_bin.GetNumElements(), 10u);
         TS_ASSERT_EQUALS(mesh_reader_bin.GetNumNodes(), 11u);
@@ -539,8 +539,8 @@ public:
 
     void TestReadingBinary()
     {
-        TrianglesMeshReader<3,3> mesh_reader_ascii("mesh/test/data/squashed_cube");
-        TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/squashed_cube_binary");
+        TrianglesMeshReader<3, 3> mesh_reader_ascii("mesh/test/data/squashed_cube");
+        TrianglesMeshReader<3, 3> mesh_reader("mesh/test/data/squashed_cube_binary");
 
         TS_ASSERT_EQUALS(mesh_reader.GetNumFaces(), 12u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumElements(), 12u);
@@ -558,7 +558,7 @@ public:
         {
             std::vector<double> ascii_location(3u);
             std::vector<double> binary_location(3u);
-            for (unsigned i=0; i<mesh_reader.GetNumNodes(); ++i)
+            for (unsigned i = 0; i<mesh_reader.GetNumNodes(); ++i)
             {
                 // Sequential reading in
                 ascii_location = mesh_reader_ascii.GetNextNode();
@@ -568,7 +568,7 @@ public:
                 TS_ASSERT_DELTA(ascii_location[2],binary_location[2],1e-12);
             }
             mesh_reader_ascii.Reset(); // You wouldn't believe how important this line is.
-            for (unsigned i=0; i<mesh_reader.GetNumNodes(); ++i)
+            for (unsigned i = 0; i<mesh_reader.GetNumNodes(); ++i)
             {
                 // Random access
                 ascii_location = mesh_reader_ascii.GetNextNode();
@@ -582,7 +582,7 @@ public:
             unsigned count = 0u;
             mesh_reader_ascii.Reset();
             mesh_reader.Reset();
-            for (AbstractMeshReader<3,3>::NodeIterator node_it = mesh_reader_ascii.GetNodeIteratorBegin();
+            for (AbstractMeshReader<3, 3>::NodeIterator node_it = mesh_reader_ascii.GetNodeIteratorBegin();
                     node_it != mesh_reader_ascii.GetNodeIteratorEnd();
                     ++node_it)
             {
@@ -599,7 +599,7 @@ public:
             count = 0u;
             mesh_reader_ascii.Reset();
             mesh_reader.Reset();
-            for (AbstractMeshReader<3,3>::NodeIterator node_it = mesh_reader.GetNodeIteratorBegin();
+            for (AbstractMeshReader<3, 3>::NodeIterator node_it = mesh_reader.GetNodeIteratorBegin();
                     node_it != mesh_reader.GetNodeIteratorEnd();
                     ++node_it)
             {
@@ -615,13 +615,13 @@ public:
 
             // Now we test iterating the binary mesh reader over a subset of nodes only
             std::set<unsigned> even_indices;
-            for (unsigned i=0; i<mesh_reader.GetNumNodes(); i += 2)
+            for (unsigned i = 0; i<mesh_reader.GetNumNodes(); i += 2)
             {
                 even_indices.insert(i);
             }
             mesh_reader_ascii.Reset();
             count = 0u;
-            for (AbstractMeshReader<3,3>::NodeIterator node_it = mesh_reader.GetNodeIteratorBegin(even_indices);
+            for (AbstractMeshReader<3, 3>::NodeIterator node_it = mesh_reader.GetNodeIteratorBegin(even_indices);
                     node_it != mesh_reader.GetNodeIteratorEnd();
                     ++node_it)
             {
@@ -649,7 +649,7 @@ public:
             mesh_reader_ascii.Reset();
             mesh_reader.Reset();  //Because we aren't going to do random access for this part of the test
             count = 0u;
-            for (AbstractMeshReader<3,3>::NodeIterator node_it = mesh_reader_ascii.GetNodeIteratorBegin(odd_indices);
+            for (AbstractMeshReader<3, 3>::NodeIterator node_it = mesh_reader_ascii.GetNodeIteratorBegin(odd_indices);
                     node_it != mesh_reader_ascii.GetNodeIteratorEnd();
                     ++node_it)
             {
@@ -670,7 +670,7 @@ public:
             mesh_reader_ascii.Reset();
             mesh_reader.Reset();  //Because we aren't going to do random access for this part of the test
             count = 0u;
-            for (AbstractMeshReader<3,3>::NodeIterator node_it = mesh_reader_ascii.GetNodeIteratorBegin(no_indices);
+            for (AbstractMeshReader<3, 3>::NodeIterator node_it = mesh_reader_ascii.GetNodeIteratorBegin(no_indices);
                     node_it != mesh_reader_ascii.GetNodeIteratorEnd();
                     ++node_it)
             {
@@ -688,7 +688,7 @@ public:
         {
             ElementData ascii_node_indices;
             ElementData binary_node_indices;
-            for (unsigned i=0; i<mesh_reader.GetNumElements(); ++i)
+            for (unsigned i = 0; i<mesh_reader.GetNumElements(); ++i)
             {
                 // Sequential reading in
                 ascii_node_indices = mesh_reader_ascii.GetNextElementData();
@@ -700,7 +700,7 @@ public:
                 TS_ASSERT_DELTA(ascii_node_indices.AttributeValue,binary_node_indices.AttributeValue,1e-12);
             }
             mesh_reader_ascii.Reset(); // You wouldn't believe how important this line is.
-            for (unsigned i=0; i<mesh_reader.GetNumElements(); ++i)
+            for (unsigned i = 0; i<mesh_reader.GetNumElements(); ++i)
             {
                 // Random access for binary mesh
                 ascii_node_indices = mesh_reader_ascii.GetNextElementData();
@@ -716,7 +716,7 @@ public:
             mesh_reader_ascii.Reset();
             mesh_reader.Reset();
             unsigned count = 0u;
-            for (AbstractMeshReader<3,3>::ElementIterator elt_it = mesh_reader_ascii.GetElementIteratorBegin();
+            for (AbstractMeshReader<3, 3>::ElementIterator elt_it = mesh_reader_ascii.GetElementIteratorBegin();
                     elt_it != mesh_reader_ascii.GetElementIteratorEnd();
                     ++elt_it)
             {
@@ -735,7 +735,7 @@ public:
             // Now test using the iterator for the binary mesh
             mesh_reader_ascii.Reset();
             count = 0u;
-            for (AbstractMeshReader<3,3>::ElementIterator elt_it = mesh_reader.GetElementIteratorBegin();
+            for (AbstractMeshReader<3, 3>::ElementIterator elt_it = mesh_reader.GetElementIteratorBegin();
                     elt_it != mesh_reader.GetElementIteratorEnd();
                     ++elt_it)
             {
@@ -753,13 +753,13 @@ public:
 
             // Now we test iterating the binary mesh reader over a subset of elements only
             std::set<unsigned> even_indices;
-            for (unsigned i=0; i<mesh_reader.GetNumElements(); i += 2)
+            for (unsigned i = 0; i<mesh_reader.GetNumElements(); i += 2)
             {
                 even_indices.insert(i);
             }
             mesh_reader_ascii.Reset();
             count = 0u;
-            for (AbstractMeshReader<3,3>::ElementIterator elt_it = mesh_reader.GetElementIteratorBegin(even_indices);
+            for (AbstractMeshReader<3, 3>::ElementIterator elt_it = mesh_reader.GetElementIteratorBegin(even_indices);
                     elt_it != mesh_reader.GetElementIteratorEnd();
                     ++elt_it)
             {
@@ -786,7 +786,7 @@ public:
             mesh_reader_ascii.Reset();
             mesh_reader.Reset();  //Because we aren't going to do random access for this part of the test
             count = 0u;
-            for (AbstractMeshReader<3,3>::ElementIterator elt_it = mesh_reader_ascii.GetElementIteratorBegin(odd_indices);
+            for (AbstractMeshReader<3, 3>::ElementIterator elt_it = mesh_reader_ascii.GetElementIteratorBegin(odd_indices);
                     elt_it != mesh_reader_ascii.GetElementIteratorEnd();
                     ++elt_it)
             {
@@ -809,7 +809,7 @@ public:
             mesh_reader_ascii.Reset();
             mesh_reader.Reset();  //Because we aren't going to do random access for this part of the test
             count = 0u;
-            for (AbstractMeshReader<3,3>::ElementIterator elt_it = mesh_reader_ascii.GetElementIteratorBegin(no_indices);
+            for (AbstractMeshReader<3, 3>::ElementIterator elt_it = mesh_reader_ascii.GetElementIteratorBegin(no_indices);
                     elt_it != mesh_reader_ascii.GetElementIteratorEnd();
                     ++elt_it)
             {
@@ -827,7 +827,7 @@ public:
         {
             ElementData ascii_node_indices;
             ElementData binary_node_indices;
-            for (unsigned i=0; i<mesh_reader.GetNumFaces(); ++i)
+            for (unsigned i = 0; i<mesh_reader.GetNumFaces(); ++i)
             {
                 // Sequential reading in
                 ascii_node_indices = mesh_reader_ascii.GetNextFaceData();
@@ -838,7 +838,7 @@ public:
                 TS_ASSERT_DELTA(ascii_node_indices.AttributeValue,binary_node_indices.AttributeValue,1e-12);
             }
             mesh_reader_ascii.Reset(); // You wouldn't believe how important this line is.
-            for (unsigned i=0; i<mesh_reader.GetNumFaces(); ++i)
+            for (unsigned i = 0; i<mesh_reader.GetNumFaces(); ++i)
             {
                 // Sequential reading in
                 ascii_node_indices = mesh_reader_ascii.GetNextFaceData();
@@ -859,13 +859,13 @@ public:
 
     void TestReadingHexMesh()
     {
-        TrianglesMeshReader<2,2> mesh_reader_2d("mesh/test/data/rectangle_608_hexa_elements");
+        TrianglesMeshReader<2, 2> mesh_reader_2d("mesh/test/data/rectangle_608_hexa_elements");
 
         TS_ASSERT_EQUALS(mesh_reader_2d.GetNumNodes(), 663u);
         TS_ASSERT_EQUALS(mesh_reader_2d.GetNumElements(), 608u);
         TS_ASSERT_EQUALS(mesh_reader_2d.GetNumFaces(), 108u);
 
-        TrianglesMeshReader<3,3> mesh_reader_3d("mesh/test/data/cuboid_140_hexa_elements");
+        TrianglesMeshReader<3, 3> mesh_reader_3d("mesh/test/data/cuboid_140_hexa_elements");
 
         TS_ASSERT_EQUALS(mesh_reader_3d.GetNumNodes(), 240u);
         TS_ASSERT_EQUALS(mesh_reader_3d.GetNumElements(), 140u);
@@ -874,19 +874,19 @@ public:
 
     void TestReadingWithGenericReader()
     {
-        std::shared_ptr<AbstractMeshReader<2,2> > p_mesh_reader = GenericMeshReader<2,2>("mesh/test/data/disk_522_elements");
+        std::shared_ptr<AbstractMeshReader<2, 2> > p_mesh_reader = GenericMeshReader<2, 2>("mesh/test/data/disk_522_elements");
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumNodes(), 312u);
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumElements(), 522u);
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumFaceAttributes(), 1u);
         TS_ASSERT_EQUALS(p_mesh_reader->GetNumElementAttributes(), 0u);
 
-        TS_ASSERT_THROWS_CONTAINS((GenericMeshReader<2,2>("mesh/test/data/no_such_file")),
+        TS_ASSERT_THROWS_CONTAINS((GenericMeshReader<2, 2>("mesh/test/data/no_such_file")),
                                   "Could not open appropriate mesh files for mesh/test/data/no_such_file");
     }
 
     void TestReadingNclInformation()
     {
-        TrianglesMeshReader<3,3> mesh_reader_3d("mesh/test/data/simple_cube_binary");
+        TrianglesMeshReader<3, 3> mesh_reader_3d("mesh/test/data/simple_cube_binary");
 
         TS_ASSERT(mesh_reader_3d.HasNclFile());
 
@@ -920,13 +920,13 @@ public:
         const unsigned ELEMENT_DIM = 3;
         const unsigned SPACE_DIM = 3;
 
-        TrianglesMeshReader<ELEMENT_DIM,SPACE_DIM> mesh_reader_3d_ascii("mesh/test/data/simple_cube");
-        TrianglesMeshReader<ELEMENT_DIM,SPACE_DIM> mesh_reader_3d("mesh/test/data/simple_cube_binary");
-        TrianglesMeshReader<ELEMENT_DIM,SPACE_DIM> mesh_reader_3d_permuted("mesh/test/data/simple_cube_binary");
+        TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM> mesh_reader_3d_ascii("mesh/test/data/simple_cube");
+        TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM> mesh_reader_3d("mesh/test/data/simple_cube_binary");
+        TrianglesMeshReader<ELEMENT_DIM, SPACE_DIM> mesh_reader_3d_permuted("mesh/test/data/simple_cube_binary");
 
         unsigned num_nodes = mesh_reader_3d.GetNumNodes();
         std::vector<unsigned> permutation(num_nodes);
-        for (unsigned node_index=0; node_index < num_nodes; ++node_index)
+        for (unsigned node_index = 0; node_index < num_nodes; ++node_index)
         {
             permutation[node_index] = num_nodes-node_index-1;
         }
@@ -944,16 +944,16 @@ public:
         TS_ASSERT_EQUALS(mesh_reader_3d_permuted.rGetNodePermutation()[8], 0u);
         TS_ASSERT_EQUALS(mesh_reader_3d_permuted.rGetNodePermutation()[0], 8u);
 
-        for (unsigned node_index=0; node_index < num_nodes; ++node_index)
+        for (unsigned node_index = 0; node_index < num_nodes; ++node_index)
         {
-            for (unsigned dimension=0; dimension<SPACE_DIM; dimension++)
+            for (unsigned dimension = 0; dimension<SPACE_DIM; dimension++)
             {
                 TS_ASSERT_EQUALS( mesh_reader_3d.GetNode(permutation[node_index])[dimension],
                                   mesh_reader_3d_permuted.GetNode(node_index)[dimension]);
             }
         }
 
-        for (unsigned element_index=0; element_index < mesh_reader_3d.GetNumElements(); element_index++)
+        for (unsigned element_index = 0; element_index < mesh_reader_3d.GetNumElements(); element_index++)
         {
             for (unsigned local_node_index = 0; local_node_index < ELEMENT_DIM+1; local_node_index++)
             {
@@ -963,7 +963,7 @@ public:
             }
         }
 
-        for (unsigned boundary_ele_index=0; boundary_ele_index < mesh_reader_3d.GetNumElements(); boundary_ele_index++)
+        for (unsigned boundary_ele_index = 0; boundary_ele_index < mesh_reader_3d.GetNumElements(); boundary_ele_index++)
         {
             for (unsigned local_node_index = 0; local_node_index < ELEMENT_DIM; local_node_index++)
             {
