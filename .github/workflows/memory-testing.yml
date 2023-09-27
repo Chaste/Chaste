@@ -29,6 +29,18 @@ jobs:
         id: get-datetime
         run: echo "datetime=$(date +%Y-%m-%d_%H-%M-%S)" >> $GITHUB_OUTPUT
 
+      - name: set environment for pull request
+        run: |
+          echo "Chaste_GH_WORKFLOW_BRANCH=${{ github.head_ref }}" >> $GITHUB_ENV
+          echo "Chaste_GH_WORKFLOW_SHA=${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
+        if: github.event_name == 'pull_request'
+
+      - name: set environment for push or workflow dispatch
+        run: |
+          echo "Chaste_GH_WORKFLOW_BRANCH=${{ github.ref_name }}" >> $GITHUB_ENV
+          echo "Chaste_GH_WORKFLOW_SHA=${{ github.sha }}" >> $GITHUB_ENV
+        if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch')
+
       - name: checkout Chaste
         uses: actions/checkout@v3
         with:
@@ -41,15 +53,15 @@ jobs:
           mkdir -p ${CHASTE_TEST_OUTPUT}
 
       - name: cmake configure
-        run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_MEMORY_TESTING_CPUS=6 ..
+        run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_MEMORY_TESTING_CPUS=10 ..
         working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
       - name: build continuous test pack
-        run: cmake --build . --target Continuous --parallel 6
+        run: cmake --build . --target Continuous --parallel 10
         working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
       - name: run memtest
-        run: cmake --build . --target memtest --parallel 6
+        run: cmake --build . --target memtest --parallel 10
         working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
       - name: check if index file successfully created
@@ -97,4 +109,9 @@ jobs:
           git commit -m "upload memtest results" || echo "No changes to commit"
           git push
         working-directory: ${{ env.MEMTEST_DIR }}
+        if: always() && steps.index-exists.outputs.index == 'True'
+
+      - name: results URL on chaste.github.io
+        run: |
+          echo https://chaste.github.io/memory-testing/${{ steps.get-datetime.outputs.datetime }}/index.html
         if: always() && steps.index-exists.outputs.index == 'True'
