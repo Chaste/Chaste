@@ -230,7 +230,25 @@ if __name__ == "__main__":
     files = glob.glob(sys.argv[1] + '/*_valgrind.txt')
     procVal = ProcessValgrind()
 
-    ok = True
+    green_lines = []
+    orange_lines = []
+    red_lines = []
+
+    for file in files:
+        filename = os.path.basename(file)
+        testname = re.match('(.*)_valgrind.txt', filename).group(1)
+        status = procVal.encode_status(open(file, 'r'))
+        colour = procVal.status_colour(status)
+        disp_status = procVal.display_status(status)
+
+        if colour == 'green':
+            green_lines.append(f'  <p class="test-green">{testname}: {disp_status} <a href="{filename}">(test output)</a></p>')
+        elif colour == 'orange':
+            orange_lines.append(f'  <p class="test-orange">{testname}: {disp_status} <a href="{filename}">(test output)</a></p>')
+        else:  # colour == 'red'
+            red_lines.append(f'  <p class="test-red">{testname}: {disp_status} <a href="{filename}">(test output)</a></p>')
+
+    num_tests = len(green_lines) + len(orange_lines) + len(red_lines)
 
     with open(sys.argv[1] + '/index.html', 'w') as index_file:
 
@@ -238,23 +256,38 @@ if __name__ == "__main__":
         index_file.write('<html lang="en">\n')
         index_file.write(ProcessValgrind.get_html_head())
         index_file.write('<body>\n')
+
+        # Write heading
         index_file.write(f'  <h2>{ProcessValgrind.get_index_heading()}</h2>\n')
-        for file in files:
-            filename = os.path.basename(file)
-            testname = re.match('(.*)_valgrind.txt', filename).group(1)
-            status = procVal.encode_status(open(file, 'r'))
-            colour = procVal.status_colour(status)
-            disp_status = procVal.display_status(status)
-            index_file.write(f'  <p class="test-{colour}">{testname}: {disp_status} <a href="{filename}">(test output)</a></p>\n')
-            if colour == 'red':
-                ok = False
+        index_file.write(f'  <br>\n')
+
+        # Write summary
+        index_file.write(f'  <p><strong>Summary of {num_tests} tests:</strong></p>\n')
+        index_file.write(f'  <p class="test-green"><strong>green: {len(green_lines)}</strong></p>\n')
+        index_file.write(f'  <p class="test-orange"><strong>orange: {len(orange_lines)}</strong></p>\n')
+        index_file.write(f'  <p class="test-red"><strong>red: {len(red_lines)}</strong></p>\n')
+        index_file.write(f'  <br>\n')
+
+        # Write red lines
+        if len(red_lines) > 0:
+            index_file.write('\n'.join(sorted(red_lines)))
+            index_file.write(f'  <br>\n')
+
+        # Write orange lines
+        if len(orange_lines) > 0:
+            index_file.write('\n'.join(sorted(orange_lines)))
+            index_file.write(f'  <br>\n')
+
+        # Write green lines
+        if len(green_lines) > 0:
+            index_file.write('\n'.join(sorted(green_lines)))
+            index_file.write(f'  <br>\n')
+
         index_file.write('</body>\n')
         index_file.write('</html>\n')
 
-    if not ok:
+    if len(red_lines) > 0:
         print('Memory testing not 100% pass rate - failing memory testing.')
         sys.exit(1)
     else:
         print('Memory testing 100% - test passed.')
-
-
