@@ -126,6 +126,8 @@ public:
 
     /**
      * Override of std::runtime_error - returns the error message
+     *
+     * @return A pointer to a null-terminated character sequence.
      */
     virtual const char* what() const noexcept override;
 
