@@ -73,3 +73,5 @@ Release
 chaste-build*
 
 **/.uuid
+
+venv
