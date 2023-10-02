@@ -68,11 +68,11 @@ public:
         // Test SetFluidSource() and GetFluidSource() work correctly
         TS_ASSERT(element.GetFluidSource() == NULL);
 
-        FluidSource<2> source(0, 0.5, 0.5);
-        source.SetStrength(57.0);
-        element.SetFluidSource(&source);
+        FluidSource<2>* source = new FluidSource<2>(0, 0.5, 0.5);
+        source->SetStrength(57.0);
+        element.SetFluidSource(source);
 
-        TS_ASSERT_EQUALS(element.GetFluidSource(), &source);
+        TS_ASSERT_EQUALS(element.GetFluidSource(), source);
         TS_ASSERT_EQUALS(element.GetFluidSource()->GetIndex(), 0u);
         TS_ASSERT_DELTA(element.GetFluidSource()->GetStrength(), 57.0, 1e-6);
         TS_ASSERT_DELTA(element.GetAverageNodeSpacing(), DOUBLE_UNSET, 1e-6);

@@ -583,6 +583,7 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
         delete mElements[i];
     }
     mElements.clear();
+    mElementFluidSources.clear();
 
     // Delete laminas
     for (auto lamina : mLaminas)
@@ -598,17 +599,13 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
     }
     this->mNodes.clear();
 
-    // Delete element sources
-    for (unsigned i = 0; i < mElementFluidSources.size(); ++i)
-    {
-        delete mElementFluidSources[i];
-    }
-    mElementFluidSources.clear();
-
     // Delete balancing sources
-    for (auto source : mBalancingFluidSources)
+    for (auto& source : mBalancingFluidSources)
     {
-        delete(source);
+        if (source != nullptr) {
+            delete(source);
+            source = nullptr;
+        }
     }
     this->mBalancingFluidSources.clear();
 }

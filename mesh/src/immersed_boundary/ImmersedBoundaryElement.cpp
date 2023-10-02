@@ -61,6 +61,7 @@ ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::~ImmersedBoundaryElement()
     if (mpFluidSource != nullptr)
     {
         delete mpFluidSource;
+        mpFluidSource = nullptr;
     }
 }
 
