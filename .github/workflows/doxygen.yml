@@ -85,16 +85,19 @@ jobs:
           path: doxygen-latest
           fetch-depth: 0
 #          token: ${{ secrets.DOXYGEN_LATEST_ACCESS }}
+        if: always()
 
       - name: copy results
         run: |
           cp doxygen/html/* doxygen-latest/site/
+        if: always()
 
       - name: check git status
         run: |
           git status
           git diff
         working-directory: doxygen-latest
+        if: always()
 
   on_workflow_dispatch:
     runs-on: ubuntu-latest
