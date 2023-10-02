@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - develop
+      - doxygen
   workflow_dispatch:
     inputs:
       doxygen_name:
@@ -77,6 +77,24 @@ jobs:
           cat "$FILE"
           echo "------------------------"
           done
+
+      - name: checkout doxygen-latest
+        uses: actions/checkout@v4
+        with:
+          repository: Chaste/doxygen-latest
+          path: doxygen-latest
+          fetch-depth: 0
+#          token: ${{ secrets.DOXYGEN_LATEST_ACCESS }}
+
+      - name: copy results
+        run: |
+          cp doxygen/html/* doxygen-latest/site/
+
+      - name: check git status
+        run: |
+          git status
+          git diff
+        working-directory: doxygen-latest
 
   on_workflow_dispatch:
     runs-on: ubuntu-latest
