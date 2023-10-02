@@ -169,10 +169,10 @@ public:
      * @param validate whether to validate the cell population
      */
     MeshBasedCellPopulation(MutableMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-                    std::vector<CellPtr>& rCells,
-                    const std::vector<unsigned> locationIndices=std::vector<unsigned>(),
-                    bool deleteMesh=false,
-                    bool validate=true);
+                            std::vector<CellPtr>& rCells,
+                            const std::vector<unsigned> locationIndices = {},
+                            bool deleteMesh = false,
+                            bool validate = true);
 
     /**
      * Constructor for use by the de-serializer.

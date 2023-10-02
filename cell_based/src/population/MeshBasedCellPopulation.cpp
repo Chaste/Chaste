@@ -48,20 +48,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeVelocityWriter.hpp"
 #include "CellPopulationAreaWriter.hpp"
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::MeshBasedCellPopulation(MutableMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,
-                                      std::vector<CellPtr>& rCells,
-                                      const std::vector<unsigned> locationIndices,
-                                      bool deleteMesh,
-                                      bool validate)
-    : AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>(rMesh, rCells, locationIndices),
-      mpVoronoiTessellation(nullptr),
-      mDeleteMesh(deleteMesh),
-      mUseAreaBasedDampingConstant(false),
-      mAreaBasedDampingConstantParameter(0.1),
-      mWriteVtkAsPoints(false),
-      mBoundVoronoiTessellation(false),
-      mHasVariableRestLength(false)
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::MeshBasedCellPopulation(MutableMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
+                                                                         std::vector<CellPtr>& rCells,
+                                                                         const std::vector<unsigned> locationIndices,
+                                                                         bool deleteMesh,
+                                                                         bool validate)
+        : AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>(rMesh, rCells, locationIndices),
+          mpVoronoiTessellation(nullptr),
+          mDeleteMesh(deleteMesh),
+          mUseAreaBasedDampingConstant(false),
+          mAreaBasedDampingConstantParameter(0.1),
+          mWriteVtkAsPoints(false),
+          mBoundVoronoiTessellation(false),
+          mHasVariableRestLength(false)
 {
     mpMutableMesh = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>* >(&(this->mrMesh));
 

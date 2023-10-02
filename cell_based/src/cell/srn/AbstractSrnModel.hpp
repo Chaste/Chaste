@@ -269,12 +269,16 @@ public:
 
     /**
      * Sets this model to be part of an edge based SRN
+     *
+     * @param indicator whether this model is part of an edge based SRN
      */
     void SetEdgeModelIndicator(const bool indicator);
 
     /**
      * Scales SRN variables by factor theta.
      * Method overriden in AbstractOdeSrnModel.
+     *
+     * @param theta scale factor
      */
     virtual void ScaleSrnVariables(const double theta);
 

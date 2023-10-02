@@ -118,7 +118,7 @@ protected:
 
     /**
      * Helper method to apply boundary conditions. Used in higher order methods like RK4.
-     * @param rOldLocations the node locations prior to being updated.
+     * @param rOldNodeLocations the node locations prior to being updated.
      */
     void ImposeBoundaryConditions(std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldNodeLocations);
 
