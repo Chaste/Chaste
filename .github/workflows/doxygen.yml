@@ -10,7 +10,6 @@ on:
       doxygen_name:
         description: 'Name (e.g. Release::2021.1)'
         required: true
-        default: ${{ github.event.inputs.branch }}
 
 jobs:
   on_pull_request:
