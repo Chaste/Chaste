@@ -119,7 +119,7 @@ public:
     void SetShape(double shape);
 
     /**
-     * @return mScale.
+     * Set mScale.
      *
      * @param scale the value of the scale parameter
      */

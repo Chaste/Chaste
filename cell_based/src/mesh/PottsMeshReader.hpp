@@ -119,7 +119,7 @@ private:
     void CloseFiles();
 
     /**
-     * @return the next line from a given file stream.
+     * Get the next line from a given file stream.
      *
      * @param fileStream the file stream
      * @param rawLine the raw line (may contain comments)
