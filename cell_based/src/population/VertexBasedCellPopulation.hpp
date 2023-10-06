@@ -203,6 +203,7 @@ public:
      * Constructor for use by boost serialization ONLY!
      *
      * @param rMesh a vertex mesh.
+     * @param rPopSrn reference to SRN remapping helper class
      */
     VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh,
                               VertexBasedPopulationSrn<DIM>& rPopSrn);

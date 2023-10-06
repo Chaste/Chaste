@@ -666,7 +666,7 @@ public:
      * As this method is pure virtual, it must be overridden
      * in subclasses.
      *
-     * @param pPopulationCountWriter the population count writer.
+     * @param pPopulationEventWriter the population event writer.
      */
     virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationEventWriter)=0;
 
