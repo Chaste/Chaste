@@ -129,13 +129,15 @@ bool AbstractSrnModel::HasEdgeModel() const
     return this->mIsEdgeBasedModel;
 }
 
-void AbstractSrnModel::SetEdgeModelIndicator(const bool indicator)
+void AbstractSrnModel::SetEdgeModelIndicator(const bool isEdgeModel)
 {
-    this->mIsEdgeBasedModel = indicator;
+    this->mIsEdgeBasedModel = isEdgeModel;
 }
 
 /*
  * We exclude the following from coverage, as these methods are implemented elsewhere and tested accordingly
+ * \todo These should have been declared abstract/virtual with void ScaleSrnVariables(const double theta) = 0; or similar
+ * ALERT: not all concrete class implement these methods!
  */
 // LCOV_EXCL_START
 void AbstractSrnModel::ScaleSrnVariables(const double theta)

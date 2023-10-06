@@ -269,12 +269,14 @@ public:
 
     /**
      * Sets this model to be part of an edge based SRN
+     * @param isEdgeModel - indicates whether there are SRN models on the cell edges (class default is false)
      */
-    void SetEdgeModelIndicator(const bool indicator);
+    void SetEdgeModelIndicator(const bool isEdgeModel);
 
     /**
      * Scales SRN variables by factor theta.
-     * Method overriden in AbstractOdeSrnModel.
+     * Abstract method overriden in AbstractOdeSrnModel.
+     * @param theta factor by which to scale all ODE variables.
      */
     virtual void ScaleSrnVariables(const double theta);
 
