@@ -79,6 +79,10 @@ def parse_doxygen(log_file_name, error_log_file_name, output_dir):
 
     # Get a list of source files
     source_files = set()
+<<<<<<< HEAD
+=======
+    #for line in open(log_file_name, 'U'): # Was for uniform newline (which is now the default)
+>>>>>>> issue_179_doxygen
     for line in open(log_file_name, 'r'):
         if line.startswith('Parsing file '):
             source_files.add(line[13:-4])  # NB: line ends with a newline
@@ -116,6 +120,12 @@ def parse_doxygen(log_file_name, error_log_file_name, output_dir):
     if len(problem_files) > 0:
         sys.exit(1)
 
+<<<<<<< HEAD
+=======
+    # This last bit used a script which was deleted when we removed SCons dependencies
+    # And generate a summary page
+    #os.system(sys.executable + ' python python/DisplayTests.py '+output_dir+' DoxygenCoverage')
+>>>>>>> issue_179_doxygen
 
 if __name__ == '__main__':
     if len(sys.argv) != 4:
