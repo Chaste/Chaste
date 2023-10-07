@@ -232,7 +232,7 @@ private:
     /**
      * Remove any bias in field sums.
      * 
-     * \todo document input argument
+     * @param rField a reference to the field over which the field sums will be zeroed
      */
     void ZeroFieldSums(multi_array<double, 3>& rField);
 

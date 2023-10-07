@@ -982,10 +982,8 @@ bool ImmersedBoundaryCellPopulation<DIM>::IsPdeNodeAssociatedWithNonApoptoticCel
     {
         /*
          * This node of the tetrahedral finite element mesh is in the centre of 
-         * the element of the vertex-based cell population, so we can use an 
+         * the element of the immersed boundary-based cell population, so we can use an 
          * offset to compute which cell to interrogate.
-         * 
-         * \todo update comment - this is an immersed boundary cell population
          */
         non_apoptotic_cell_present = !(this->GetCellUsingLocationIndex(pdeNodeIndex - this->GetNumNodes())->template HasCellProperty<ApoptoticCellProperty>());
     }

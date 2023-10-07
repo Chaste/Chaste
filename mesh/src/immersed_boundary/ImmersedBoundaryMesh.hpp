@@ -382,12 +382,6 @@ public:
     multi_array<double, 3>& rGetModifiable2dVelocityGrids();
 
     /**
-     * @return reference to modifiable 3d fluid velocity grids.
-     */
-    //multi_array<double, 4>& rGetModifiable3dVelocityGrids();
-    ///\todo why is this method commented out?
-
-    /**
      * @param meshPointsX the new number of fluid mesh points in the x direction.
      */
     void SetNumGridPtsX(unsigned meshPointsX);
@@ -409,8 +403,7 @@ public:
     
     /**
      * Add a node to the mesh
-     * 
-     * \todo document input argument
+     * @param pNewNode a pointer to the node to be added to the mesh.
      */
     unsigned AddNode(Node<SPACE_DIM>* pNewNode);
 

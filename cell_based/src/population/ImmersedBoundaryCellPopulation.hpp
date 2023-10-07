@@ -171,7 +171,8 @@ public:
      * There must be precisely one CellPtr for each ImmersedBoundaryElement in
      * the mesh.
      *
-     * @param rMesh reference to a \todo complete documentation
+     * @param rMesh reference to an immersed boundary mesh. Each element in the mesh
+     * will correspond to a cell.
      * @param rCells reference to a vector of CellPtrs
      * @param deleteMesh set to true if you want the cell population to free the 
      *     mesh memory on destruction (defaults to false)
@@ -226,8 +227,9 @@ public:
     ImmersedBoundaryElement<DIM, DIM>* GetElement(unsigned elementIndex);
 
     /**
-     * Get a particular ImmersedBoundaryElement representing a lamina. 
-     * \todo explain what a "lamina" is
+     * Get a particular ImmersedBoundaryElement representing a lamina. A lamina
+     * is a reduced-dimension element. For a 2d simulation, a lamina element is a 
+     * line. For a 3d simulation, a lamina element is a surface.
      *
      * @param laminaIndex the global index of the lamina
      *
@@ -253,7 +255,7 @@ public:
     unsigned GetNumNodes();
 
     /**
-     * \todo document method
+     * Sets the maximum distance over which cell boundary nodes will interact via forces.
      * 
      * @param newDistance the new cell-cell interaction distance.
      */
@@ -265,7 +267,8 @@ public:
     double GetInteractionDistance() const;
 
     /**
-     * \todo document method
+     * Sets the number of timesteps between each remesh. Remeshing can improve solution quality
+     * and prevent divergence, but is an expensive operation.
      * 
      * @param newFrequency the new ReMesh frequency.
      */
@@ -277,7 +280,8 @@ public:
     unsigned GetReMeshFrequency() const;
 
     /**
-     * \todo document method
+     * Sets whether an exception will be thrown if nodes move too far within
+     * a single timestep.
      * 
      * @param throws whether an exception should be thrown
      */
@@ -294,7 +298,8 @@ public:
     double GetIntrinsicSpacing() const;
 
     /**
-     * \todo document method
+     * Set the maximum distance two nodes should be allowed to move apart from each other
+     * in a single step.
      * 
      * @param newThreshold the new cell rearrangement threshold
      */

@@ -687,25 +687,11 @@ const multi_array<double, 3>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGet
     return m2dVelocityGrids;
 }
 
-/*template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-const multi_array<double, 4>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGet3dVelocityGrids() const
-{
-    return m3dVelocityGrids;
-}
-*/
-
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 multi_array<double, 3>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetModifiable2dVelocityGrids()
 {
     return m2dVelocityGrids;
 }
-
-/*template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-multi_array<double, 4>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetModifiable3dVelocityGrids()
-{
-    return m3dVelocityGrids;
-}
-*/
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::AddNode(
