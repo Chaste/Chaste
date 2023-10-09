@@ -33,15 +33,27 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """
 Check that there's enough disk space for regular Chaste building.
+
+GitHub actions runners do something clever with their containerised disk
+partitions, so we skip this test in that context.
 """
 
 import os
 import unittest
 
+
+def IsRunningOnGitHubActions():
+    return os.environ.get('GITHUB_ACTIONS') == 'true'
+
+
 class TestDiskSpace(unittest.TestCase):
     """Test that there is plenty of disk available for Chaste."""
     def TestDiskSpace(self):
         """Test that there is plenty of disk available for Chaste."""
+
+        if IsRunningOnGitHubActions():
+            self.skipTest('Skipping disk space test on GitHub Actions environment')
+
         try:
             import psutil
             du = psutil.disk_usage
