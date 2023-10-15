@@ -58,21 +58,16 @@ ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryElement(unsigne
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::~ImmersedBoundaryElement()
 {
-    if (mpFluidSource != nullptr)
-    {
-        delete mpFluidSource;
-        mpFluidSource = nullptr;
-    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::SetFluidSource(FluidSource<SPACE_DIM>* fluidSource)
+void ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::SetFluidSource(std::shared_ptr<FluidSource<SPACE_DIM>> fluidSource)
 {
     mpFluidSource = fluidSource;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-FluidSource<SPACE_DIM>* ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::GetFluidSource()
+std::shared_ptr<FluidSource<SPACE_DIM>> ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::GetFluidSource()
 {
     return mpFluidSource;
 }
@@ -133,13 +128,13 @@ ImmersedBoundaryElement<1, SPACE_DIM>::ImmersedBoundaryElement(unsigned index, c
 }
 
 template<unsigned SPACE_DIM>
-void ImmersedBoundaryElement<1, SPACE_DIM>::SetFluidSource(FluidSource<SPACE_DIM>* fluidSource)
+void ImmersedBoundaryElement<1, SPACE_DIM>::SetFluidSource(std::shared_ptr<FluidSource<SPACE_DIM>> fluidSource)
 {
     EXCEPTION("SetFluidSource not implemented for 1D");
 }
 
 template<unsigned SPACE_DIM>
-FluidSource<SPACE_DIM>* ImmersedBoundaryElement<1, SPACE_DIM>::GetFluidSource()
+std::shared_ptr<FluidSource<SPACE_DIM>> ImmersedBoundaryElement<1, SPACE_DIM>::GetFluidSource()
 {
     EXCEPTION("GetFluidSource not implemented for 1D");
     return nullptr;

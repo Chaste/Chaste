@@ -363,8 +363,8 @@ public:
 
             std::vector<ImmersedBoundaryElement<2, 2>*> elems;
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
-            FluidSource<2> source(0, 0.01, 0.01);
-            elems.back()->SetFluidSource(&source);
+            auto source = std::make_shared<FluidSource<2>>(0, 0.01, 0.01);
+            elems.back()->SetFluidSource(source);
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
 
@@ -406,8 +406,8 @@ public:
             std::vector<ImmersedBoundaryElement<2, 2>*> elems;
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
             // Position fluid source in bottom left corner
-            FluidSource<2> source(0, 0.01, 0.01);
-            elems.back()->SetFluidSource(&source);
+            auto source = std::make_shared<FluidSource<2>>(0, 0.01, 0.01);
+            elems.back()->SetFluidSource(source);
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
 

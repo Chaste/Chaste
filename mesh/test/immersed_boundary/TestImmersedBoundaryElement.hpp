@@ -68,7 +68,7 @@ public:
         // Test SetFluidSource() and GetFluidSource() work correctly
         TS_ASSERT(element.GetFluidSource() == NULL);
 
-        FluidSource<2>* source = new FluidSource<2>(0, 0.5, 0.5);
+        auto source = std::make_shared<FluidSource<2>>(0, 0.5, 0.5);
         source->SetStrength(57.0);
         element.SetFluidSource(source);
 
@@ -95,10 +95,10 @@ public:
 
         // Fluid source
         ImmersedBoundaryElement<1, 1> element(0, nodes);
-        FluidSource<1> source(0, 0.5, 0.5);
-        source.SetStrength(57.0);
+        auto source = std::make_shared<FluidSource<1>>(0, 0.5, 0.5);
+        source->SetStrength(57.0);
 
-        TS_ASSERT_THROWS_ANYTHING(element.SetFluidSource(&source));
+        TS_ASSERT_THROWS_ANYTHING(element.SetFluidSource(source));
         TS_ASSERT_THROWS_ANYTHING(element.GetFluidSource());
         
         // Boundary methods

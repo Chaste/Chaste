@@ -355,7 +355,7 @@ public:
             auto& r_balancing_fluid_sources = mesh.rGetBalancingFluidSources();
             r_balancing_fluid_sources.clear();
             
-            FluidSource<2>* p_fluid_source = new FluidSource<2>(0, 0.55, 0.55);
+            auto p_fluid_source = std::make_shared<FluidSource<2>>(0, 0.55, 0.55);
             p_fluid_source->SetStrength(0.1);
             elems.back()->SetFluidSource(p_fluid_source);
             
@@ -426,7 +426,7 @@ public:
             auto& r_balancing_fluid_sources = mesh.rGetBalancingFluidSources();
             r_balancing_fluid_sources.clear();
             
-            FluidSource<2>* p_fluid_source = new FluidSource<2>(0, 0.55, 0.55);
+            auto p_fluid_source = std::make_shared<FluidSource<2>>(0, 0.55, 0.55);
             p_fluid_source->SetStrength(0.1);
             elems.back()->SetFluidSource(p_fluid_source);
             

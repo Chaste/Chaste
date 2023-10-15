@@ -118,10 +118,10 @@ protected:
     std::vector<ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>*> mLaminas;
 
     /** Vector of fluid sources related to elements. */
-    std::vector<FluidSource<SPACE_DIM>*> mElementFluidSources;
+    std::vector<std::shared_ptr<FluidSource<SPACE_DIM>>> mElementFluidSources;
 
     /** Vector of fluid sources used to balance those of the elements. */
-    std::vector<FluidSource<SPACE_DIM>*> mBalancingFluidSources;
+    std::vector<std::shared_ptr<FluidSource<SPACE_DIM>>> mBalancingFluidSources;
 
     /** A voronoi diagram of the node locations, used to determine the element neighbours */
     boost::polygon::voronoi_diagram<double> mNodeLocationsVoronoiDiagram;
@@ -410,12 +410,12 @@ public:
     /**
      * @return reference to vector of element-associated fluid sources
      */
-    std::vector<FluidSource<SPACE_DIM>*>& rGetElementFluidSources();
+    std::vector<std::shared_ptr<FluidSource<SPACE_DIM>>>& rGetElementFluidSources();
 
     /**
      * @return reference to vector of balancing fluid sources
      */
-    std::vector<FluidSource<SPACE_DIM>*>& rGetBalancingFluidSources();
+    std::vector<std::shared_ptr<FluidSource<SPACE_DIM>>>& rGetBalancingFluidSources();
 
     /**
      * Given a node, find a set containing the indices of its neighbouring nodes.

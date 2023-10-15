@@ -55,7 +55,7 @@ class ImmersedBoundaryElement : public MutableElement<ELEMENT_DIM, SPACE_DIM>
 private:
 
     /** Fluid source associated with this element. */
-    FluidSource<SPACE_DIM>* mpFluidSource;
+    std::shared_ptr<FluidSource<SPACE_DIM>> mpFluidSource;
 
     /** Corner nodes associated with this element. */
     std::vector<Node<SPACE_DIM>*> mCornerNodes;
@@ -108,14 +108,14 @@ public:
      *
      * @param fluidSource  the fluid source associated with this element
      */
-    void SetFluidSource(FluidSource<SPACE_DIM>* fluidSource);
+    void SetFluidSource(std::shared_ptr<FluidSource<SPACE_DIM>> fluidSource);
 
     /**
      * Get the fluid source associated with this element
      *
      * @return pointer to the fluid source
      */
-    FluidSource<SPACE_DIM>* GetFluidSource();
+    std::shared_ptr<FluidSource<SPACE_DIM>> GetFluidSource();
 
     /**
      * @return the vector of corner nodes.
@@ -166,7 +166,7 @@ class ImmersedBoundaryElement<1, SPACE_DIM> : public MutableElement<1,SPACE_DIM>
 private:
 
     /** Fluid source associated with this element. */
-    FluidSource<SPACE_DIM>* mpFluidSource;
+    std::shared_ptr<FluidSource<SPACE_DIM>> mpFluidSource;
 
     /** Corner nodes associated with this element. */
     std::vector<Node<SPACE_DIM>*> mCornerNodes;
@@ -192,14 +192,14 @@ public:
      *
      * @param the fluid source associated with this element
      */
-    void SetFluidSource(FluidSource<SPACE_DIM>* fluidSource);
+    void SetFluidSource(std::shared_ptr<FluidSource<SPACE_DIM>> fluidSource);
 
     /**
      * Get the fluid source associated with this element
      *
      * @return pointer to the fluiod source
      */
-    FluidSource<SPACE_DIM>* GetFluidSource(void);
+    std::shared_ptr<FluidSource<SPACE_DIM>> GetFluidSource(void);
 
     /**
      * @return the vector of corner nodes.

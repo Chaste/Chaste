@@ -131,7 +131,7 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
         // Create a new fluid source at the correct location for each element
         unsigned source_idx = static_cast<unsigned>(mElementFluidSources.size());
         c_vector<double, SPACE_DIM> source_location = this->GetCentroidOfElement(elem_idx);
-        mElementFluidSources.push_back(new FluidSource<SPACE_DIM>(source_idx, source_location));
+        mElementFluidSources.push_back(std::make_shared<FluidSource<SPACE_DIM>>(source_idx, source_location));
 
         // Set source parameters
         mElementFluidSources.back()->SetAssociatedElementIndex(elem_idx);
@@ -151,7 +151,7 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
     {
         // Create a new fluid source at the current x-location and zero y-location
         unsigned source_idx = static_cast<unsigned>(mBalancingFluidSources.size());
-        mBalancingFluidSources.push_back(new FluidSource<SPACE_DIM>(source_idx, current_location));
+        mBalancingFluidSources.push_back(std::make_shared<FluidSource<SPACE_DIM>>(source_idx, current_location));
 
         mBalancingFluidSources.back()->SetStrength(0.0);
 
@@ -583,7 +583,6 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
         delete mElements[i];
     }
     mElements.clear();
-    mElementFluidSources.clear();
 
     // Delete laminas
     for (auto lamina : mLaminas)
@@ -599,15 +598,8 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::Clear()
     }
     this->mNodes.clear();
 
-    // Delete balancing sources
-    for (auto& source : mBalancingFluidSources)
-    {
-        if (source != nullptr) {
-            delete(source);
-            source = nullptr;
-        }
-    }
-    this->mBalancingFluidSources.clear();
+    mBalancingFluidSources.clear();
+    mElementFluidSources.clear();
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -664,7 +656,7 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::SetCharacteristicNodeSpacing(
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector<FluidSource<SPACE_DIM>*>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetElementFluidSources()
+std::vector<std::shared_ptr<FluidSource<SPACE_DIM>>>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetElementFluidSources()
 {
     mElementFluidSources.clear();
     for (const auto& element : mElements) {
@@ -676,7 +668,7 @@ std::vector<FluidSource<SPACE_DIM>*>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DI
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector<FluidSource<SPACE_DIM>*>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetBalancingFluidSources()
+std::vector<std::shared_ptr<FluidSource<SPACE_DIM>>>& ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::rGetBalancingFluidSources()
 {
     return mBalancingFluidSources;
 }
@@ -1643,7 +1635,7 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBou
 
         // Add a fluid source for the new element
         c_vector<double, SPACE_DIM> new_centroid = this->GetCentroidOfElement(new_elem_idx);
-        mElementFluidSources.push_back(new FluidSource<SPACE_DIM>(new_elem_idx, new_centroid));
+        mElementFluidSources.push_back(std::make_shared<FluidSource<SPACE_DIM>>(new_elem_idx, new_centroid));
 
         // Set source parameters
         mElementFluidSources.back()->SetAssociatedElementIndex(new_elem_idx);

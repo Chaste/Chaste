@@ -454,11 +454,11 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateFluidSourcesToGrid()
         // contiguous helps improve the Fourier transform performance.
         multi_array<double, 3>& r_rhs_grids = mpArrays->rGetModifiableRightHandSideGrids();
 
-        std::vector<FluidSource<DIM>*>& r_element_sources = mpMesh->rGetElementFluidSources();
-        std::vector<FluidSource<DIM>*>& r_balance_sources = mpMesh->rGetBalancingFluidSources();
+        std::vector<std::shared_ptr<FluidSource<DIM>>>& r_element_sources = mpMesh->rGetElementFluidSources();
+        std::vector<std::shared_ptr<FluidSource<DIM>>>& r_balance_sources = mpMesh->rGetBalancingFluidSources();
 
         // Construct a vector of all sources combined
-        std::vector<FluidSource<DIM>*> combined_sources;
+        std::vector<std::shared_ptr<FluidSource<DIM>>> combined_sources;
         combined_sources.insert(combined_sources.end(), r_element_sources.begin(), r_element_sources.end());
         combined_sources.insert(combined_sources.end(), r_balance_sources.begin(), r_balance_sources.end());
 
@@ -479,7 +479,7 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateFluidSourcesToGrid()
         // Iterate over all sources and propagate their effects to the source grid
         for (unsigned source_idx = 0; source_idx < combined_sources.size(); source_idx++)
         {
-            FluidSource<DIM>* this_source = combined_sources[source_idx];
+            std::shared_ptr<FluidSource<DIM>> this_source = combined_sources[source_idx];
 
             // Get location and strength of this source
             c_vector<double, DIM> source_location = this_source->rGetLocation();

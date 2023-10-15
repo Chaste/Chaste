@@ -406,11 +406,11 @@ void ImmersedBoundaryCellPopulation<DIM>::UpdateNodeLocations(
         // If active sources, we need to update those location as well
         if (this->DoesPopulationHaveActiveSources())
         {
-            std::vector<FluidSource<DIM>*>& r_element_sources = this->rGetMesh().rGetElementFluidSources();
-            std::vector<FluidSource<DIM>*>& r_balance_sources = this->rGetMesh().rGetBalancingFluidSources();
+            std::vector<std::shared_ptr<FluidSource<DIM>>>& r_element_sources = this->rGetMesh().rGetElementFluidSources();
+            std::vector<std::shared_ptr<FluidSource<DIM>>>& r_balance_sources = this->rGetMesh().rGetBalancingFluidSources();
 
             // Construct a vector of all sources combined
-            std::vector<FluidSource<DIM>*> combined_sources;
+            std::vector<std::shared_ptr<FluidSource<DIM>>> combined_sources;
             combined_sources.insert(combined_sources.end(), r_element_sources.begin(), r_element_sources.end());
             combined_sources.insert(combined_sources.end(), r_balance_sources.begin(), r_balance_sources.end());
 
