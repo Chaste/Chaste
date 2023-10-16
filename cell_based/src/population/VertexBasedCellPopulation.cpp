@@ -456,25 +456,25 @@ double VertexBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
+    // We avoid writing out CellData if the population is empty (i.e. no cells)
     unsigned num_cells = this->GetNumAllCells();
-    if (num_cells>0)
+    if (num_cells != 0)
     {
-        auto cells = this->rGetCells();
-        boost::shared_ptr<CellEdgeData> p_cell_edge_data = (*cells.begin())->GetCellEdgeData();
-        //If edge SRNs are specified, then write vtk results into a mesh where quantities
-        //associated with each edge are taken into account. We assume that the first cell is
-        //representative of all cells.
-        //Edge VTKs are also written if cells contain CellEdgeData
-
-        //If cells contain edge data
-        if (p_cell_edge_data->GetNumItems() != 0&&mWriteEdgeVtkResults)
+        /*
+         * If edge SRNs are specified, then write VTK results into a mesh where 
+         * quantities associated with each edge are taken into account. Assume 
+         * that the first cell is representative of all cells. Edge VTK results 
+         * are also written if cells contain CellEdgeData.
+         */
+        auto p_cell_edge_data = this->Begin()->GetCellEdgeData();
+        if (p_cell_edge_data->GetNumItems() != 0 && mWriteEdgeVtkResults)
         {
             this->WriteCellEdgeVtkResultsToFile(rDirectory);
             return;
         }
 
-        //If cells don't contain edge data, output CellData only
-        if (p_cell_edge_data->GetNumItems() == 0&&mWriteCellVtkResults)
+        // If cells don't contain edge data, then output CellData only
+        if (p_cell_edge_data->GetNumItems() == 0 && mWriteCellVtkResults)
         {
             this->WriteCellVtkResultsToFile(rDirectory);
         }
@@ -489,70 +489,145 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
     // Create mesh writer for VTK output
     VertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
 
-    // We avoid writing out CellData if the population is empty (i.e. no cells).
+    /*
+     * Note: we can assume the population isn't empty, since this method is only 
+     * called by WriteVtkResultsToFile() in that case.
+     */
     unsigned num_cells = this->GetNumAllCells();
 
-    if (num_cells > 0)
+    // Iterate over any cell writers that are present
+    for (auto&& p_cell_writer : this->mCellWriters)
     {
-        // Iterate over any cell writers that are present
-        for (auto cell_writer_iter = this->mCellWriters.begin();
-             cell_writer_iter != this->mCellWriters.end();
-             ++cell_writer_iter)
+        // Add any scalar data
+        if (p_cell_writer->GetOutputScalarData())
         {
-            // Create vector to store VTK cell data
+            /*
+             * Create a vector to store scalar data per cell for VTK output from 
+             * this writer. Note: the term "CellData" in 
+             * "GetCellDataForVtkOutput()" should not be confused with the 
+             * CellData class; an example of what might be stored here is each 
+             * cell's age. Any CellData item(s) per cell are output to VTK in 
+             * the code block further down.
+             */
             std::vector<double> vtk_cell_data(num_cells);
 
-            // Iterate over vertex elements ///\todo #2512 - replace with loop over cells
-            for (auto elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
-                 elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
-                 ++elem_iter)
+            // Iterate over cells and populate this vector
+            for (auto cell_iter = this->Begin();
+                cell_iter != this->End();
+                ++cell_iter)
             {
                 // Get index of this element in the vertex mesh
-                unsigned elem_index = elem_iter->GetIndex();
-
-                // Get the cell corresponding to this element
-                CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
-                assert(p_cell);
+                unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
 
                 // Populate the vector of VTK cell data
-                vtk_cell_data[elem_index] = (*cell_writer_iter)->GetCellDataForVtkOutput(p_cell, this);
+                vtk_cell_data[elem_index] = p_cell_writer->GetCellDataForVtkOutput(*cell_iter, this);
             }
 
-            mesh_writer.AddCellData((*cell_writer_iter)->GetVtkCellDataName(), vtk_cell_data);
+            // Add data to the VertexMeshWriter to be output to VTK
+            mesh_writer.AddCellData(p_cell_writer->GetVtkCellDataName(), vtk_cell_data);
         }
 
-        // When outputting any CellData, we assume that the first cell is representative of all cells
-        unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
-        std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
+        ///\todo fix compilation error when code block below is uncommented
+    //     // Add any vector data
+    //     if (p_cell_writer->GetOutputVectorData())
+    //     {
+    //         /*
+    //          * Create a vector to store vector data per cell for VTK output from 
+    //          * this writer. Note: the term "CellData" in 
+    //          * "GetCellDataForVtkOutput()" should not be confused with the 
+    //          * CellData class; an example of what might be stored here is each 
+    //          * cell's age. Any CellData item(s) per cell are output to VTK in 
+    //          * the code block further down.
+    //          */
+    //         std::vector<c_vector<double, DIM>> vtk_cell_vec_data(num_cells);
 
-        std::vector<std::vector<double> > cell_data;
-        for (unsigned var=0; var<num_cell_data_items; var++)
+    //         // Iterate over cells and populate this vector
+    //         for (auto cell_iter = this->Begin();
+    //             cell_iter != this->End();
+    //             ++cell_iter)
+    //         {
+    //             // Get index of this element in the vertex mesh
+    //             unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
+
+    //             // Populate the vector of VTK cell data
+    //             vtk_cell_vec_data[elem_index] = p_cell_writer->GetVectorCellDataForVtkOutput(*cell_iter, this);
+    //         }
+
+    //         // Add data to the VertexMeshWriter to be output to VTK
+    //         mesh_writer.AddCellData(p_cell_writer->GetVtkVectorCellDataName(), vtk_cell_vec_data);
+    //     }
+    }
+
+    /*
+     * Prepare a vector of vectors of the correct size to store each cell's 
+     * CellData item(s). Note: when outputting any CellData, we assume that the 
+     * first cell is representative of all cells.
+     */
+    unsigned num_cell_data_items = this->Begin()->GetCellData()->GetNumItems();
+    std::vector<std::string> cell_data_names = this->Begin()->GetCellData()->GetKeys();
+    std::vector<std::vector<double> > cell_data;
+    for (unsigned var = 0; var < num_cell_data_items; ++var)
+    {
+        std::vector<double> cell_data_var(num_cells);
+        cell_data.push_back(cell_data_var);
+    }
+
+    // Iterate over cells and populate cell_data
+    for (auto cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
+    {
+        // Get index of this element in the vertex mesh
+        unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
+
+        for (unsigned var = 0; var < num_cell_data_items; ++var)
         {
-            std::vector<double> cell_data_var(num_cells);
-            cell_data.push_back(cell_data_var);
+            cell_data[var][elem_index] = cell_iter->GetCellData()->GetItem(cell_data_names[var]);
         }
+    }
 
-        // Loop over vertex elements ///\todo #2512 - replace with loop over cells
-        for (auto elem_iter = mpMutableVertexMesh->GetElementIteratorBegin();
-                elem_iter != mpMutableVertexMesh->GetElementIteratorEnd();
-                ++elem_iter)
+    // Add cell_data to the VertexMeshWriter to be output to VTK 
+    for (unsigned var = 0; var < num_cell_data_items; ++var)
+    {
+        mesh_writer.AddCellData(cell_data_names[var], cell_data[var]);
+    }
+
+    /*
+     * Prepare a vector of vectors of the correct size to store each cell's 
+     * CellVecData item(s). Note: when outputting any CellVecData, we assume 
+     * that the first cell is representative of all cells.
+     */
+    unsigned num_cell_vec_data_items = this->Begin()->GetCellVecData()->GetNumItems();
+    std::vector<std::string> cell_vec_data_names = this->Begin()->GetCellVecData()->GetKeys();
+    std::vector<std::vector<Vec> > cell_vec_data;
+    for (unsigned var = 0; var < num_cell_vec_data_items; ++var)
+    {
+        std::vector<Vec> cell_vec_data_var(num_cells);
+        cell_vec_data.push_back(cell_vec_data_var);
+    }
+
+    // Iterate over cells and populate cell_data
+    for (auto cell_iter = this->Begin();
+         cell_iter != this->End();
+         ++cell_iter)
+    {
+        // Get index of this element in the vertex mesh
+        unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
+
+        for (unsigned var = 0; var < num_cell_vec_data_items; ++var)
         {
-            // Get index of this element in the vertex mesh
-            unsigned elem_index = elem_iter->GetIndex();
-
-            // Get the cell corresponding to this element
-            CellPtr p_cell = this->GetCellUsingLocationIndex(elem_index);
-            assert(p_cell);
-
-            for (unsigned var=0; var<num_cell_data_items; var++)
-            {
-                cell_data[var][elem_index] = p_cell->GetCellData()->GetItem(cell_data_names[var]);
-            }
+            /**
+             * \todo Convert this CellVecData item from a Vec to a std::vector, 
+             * or else change the type of cell_vec_data above.
+             */
+            cell_vec_data[var][elem_index] = cell_iter->GetCellVecData()->GetItem(cell_vec_data_names[var]);
         }
-        for (unsigned var=0; var<num_cell_data_items; var++)
-        {
-            mesh_writer.AddCellData(cell_data_names[var], cell_data[var]);
-        }
+    }
+
+    // Add cell_data to the VertexMeshWriter to be output to VTK 
+    for (unsigned var = 0; var < num_cell_data_items; ++var)
+    {
+        mesh_writer.AddCellData(cell_data_names[var], cell_data[var]);
     }
 
     unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
@@ -566,7 +641,6 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
     *(this->mpVtkMetaFile) << "\" group=\"\" part=\"0\" file=\"results_";
     *(this->mpVtkMetaFile) << num_timesteps;
     *(this->mpVtkMetaFile) << ".vtu\"/>\n";
-
 #endif //CHASTE_VTK
 }
 
