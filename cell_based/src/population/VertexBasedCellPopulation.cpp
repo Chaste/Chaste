@@ -528,34 +528,35 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
         }
 
         ///\todo fix compilation error when code block below is uncommented
-    //     // Add any vector data
-    //     if (p_cell_writer->GetOutputVectorData())
-    //     {
-    //         /*
-    //          * Create a vector to store vector data per cell for VTK output from 
-    //          * this writer. Note: the term "CellData" in 
-    //          * "GetCellDataForVtkOutput()" should not be confused with the 
-    //          * CellData class; an example of what might be stored here is each 
-    //          * cell's age. Any CellData item(s) per cell are output to VTK in 
-    //          * the code block further down.
-    //          */
-    //         std::vector<c_vector<double, DIM>> vtk_cell_vec_data(num_cells);
+        // Add any vector data
+        if (p_cell_writer->GetOutputVectorData())
+        {
+            /*
+             * Create a vector to store vector data per cell for VTK output from 
+             * this writer. Note: the term "CellData" in 
+             * "GetCellDataForVtkOutput()" should not be confused with the 
+             * CellData class; an example of what might be stored here is each 
+             * cell's age. Any CellData item(s) per cell are output to VTK in 
+             * the code block further down.
+             */
+            //std::vector<c_vector<double, DIM>> vtk_cell_vec_data(num_cells);
+            std::vector<c_vector<double, DIM>> vtk_cell_vec_data(num_cells);
 
-    //         // Iterate over cells and populate this vector
-    //         for (auto cell_iter = this->Begin();
-    //             cell_iter != this->End();
-    //             ++cell_iter)
-    //         {
-    //             // Get index of this element in the vertex mesh
-    //             unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
+            // Iterate over cells and populate this vector
+            for (auto cell_iter = this->Begin();
+                cell_iter != this->End();
+                ++cell_iter)
+            {
+                // Get index of this element in the vertex mesh
+                unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
 
-    //             // Populate the vector of VTK cell data
-    //             vtk_cell_vec_data[elem_index] = p_cell_writer->GetVectorCellDataForVtkOutput(*cell_iter, this);
-    //         }
+                // Populate the vector of VTK cell data
+                vtk_cell_vec_data[elem_index] = p_cell_writer->GetVectorCellDataForVtkOutput(*cell_iter, this);
+            }
 
-    //         // Add data to the VertexMeshWriter to be output to VTK
-    //         mesh_writer.AddCellData(p_cell_writer->GetVtkVectorCellDataName(), vtk_cell_vec_data);
-    //     }
+            // Add data to the VertexMeshWriter to be output to VTK
+            mesh_writer.AddCellData(p_cell_writer->GetVtkVectorCellDataName(), vtk_cell_vec_data);
+        }
     }
 
     /*

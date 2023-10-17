@@ -351,6 +351,28 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddCellData(std::string dataName,
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddCellData(std::string dataName, std::vector<c_vector<double, SPACE_DIM> > dataPayload)
+{
+#ifdef CHASTE_VTK
+    vtkDoubleArray* p_scalars = vtkDoubleArray::New();
+    p_scalars->SetName(dataName.c_str());
+    for (unsigned i=0; i<dataPayload.size(); i++)
+    {
+        for (unsigned j=0; j<dataPayload.size(); j++){
+        p_scalars->InsertNextValue(dataPayload[i][j]);
+        }
+        for (unsigned j= SPACE_DIM; j<3; j++){
+        p_scalars->InsertNextValue(0.0);
+        }
+    }
+
+    vtkCellData* p_cell_data = mpVtkUnstructedMesh->GetCellData();
+    p_cell_data->AddArray(p_scalars);
+    p_scalars->Delete(); // Reference counted
+#endif //CHASTE_VTK
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddPointData(std::string dataName, std::vector<double> dataPayload)
 {
 #ifdef CHASTE_VTK
