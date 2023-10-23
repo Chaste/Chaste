@@ -234,7 +234,7 @@ def ConvertTutorialToHugoMd(test_file_path, test_file, other_files, revision='')
             revision = 'at revision r{}'.format(revision)
         else:
             assert len(revision) == 40,  'Expected 40-digit git commit hash'
-            revision = 'at revision [changeset:{}/git_repo]'.format(revision[0:12])  # abbreviate to consistent length
+            revision = f'at revision [{revision[0:12]}](https://github.com/Chaste/Chaste/commit/{revision})'
 
     output = []
 
@@ -244,14 +244,11 @@ def ConvertTutorialToHugoMd(test_file_path, test_file, other_files, revision='')
         f'\nThis tutorial is automatically generated from the file {test_file_path} {revision}.\n'
         'Note that the code is given in full at the bottom of the page.\n'
     )
-    date = str(datetime.now())
-    lastmod = str(datetime.now())
+    # date = str(datetime.now())
     header = f"""
 ---
 title : "{title}"
 description: "{description}"
-date: {date} 
-lastmod: {lastmod}
 draft: false
 images: []
 toc: true
