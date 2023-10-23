@@ -240,10 +240,7 @@ def ConvertTutorialToHugoMd(test_file_path, test_file, other_files, revision='')
 
     # Header
     title = os.path.basename(test_file_path)
-    description = (
-        f'\nThis tutorial is automatically generated from the file {test_file_path} {revision}.\n'
-        'Note that the code is given in full at the bottom of the page.\n'
-    )
+    description = f'This tutorial is automatically generated from the file {test_file_path} {revision}. Note that the code is given in full at the bottom of the page.'
     # date = str(datetime.now())
     header = f"""
 ---
