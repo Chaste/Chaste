@@ -1,0 +1,70 @@
+name: Tutorials
+
+on:
+  push:
+    branches:
+      - i55-tutorial
+
+jobs:
+  
+  build-and-test:
+
+#    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+
+    runs-on: ubuntu-22.04
+
+    env:
+      CHASTE_DIR: ${{ github.workspace }}/Chaste
+      WEBSITE_DIR: ${{ github.workspace }}/Chaste.github.io
+      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
+      CHASTE_BUILD_DIR: ${{ github.workspace }}/Chaste/chaste-build-dir
+
+    steps:
+
+      - name: checkout Chaste
+        uses: actions/checkout@v3
+        with:
+          repository: Chaste/Chaste
+          path: Chaste
+
+      - name: install dependencies
+        run: |
+          echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+          sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
+          sudo apt update
+          sudo apt install chaste-dependencies
+
+      - name: make build and test directories
+        run: |
+          mkdir -p ${CHASTE_BUILD_DIR}
+          mkdir -p ${CHASTE_TEST_OUTPUT}
+
+      - name: cmake configure
+        run: cmake -DCMAKE_BUILD_TYPE=Debug ..
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+      - name: build profiling test pack
+        run: cmake --build . --target tutorials
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
+      - name: checkout profiling-gprof
+        uses: actions/checkout@v3
+        with:
+          repository: Chaste/Chaste.github.io
+          path: Chaste.github.io
+          fetch-depth: 0
+          token: ${{ secrets.TUTORIALS_ACCESS }}
+
+      - name: copy results
+        run: |
+          cp ${CHASTE_BUILD_DIR}/tutorials/UserTutorials/* ${WEBSITE_DIR}/site/content/en/docs/user-tutorials/
+
+      - name: commit and push results
+        run: |
+          git config user.name "github-action"
+          git config user.email "github-action"
+          git status
+#          git add --all
+#          git commit -m "upload gprof profiling results" || echo "No changes to commit"
+#          git push
+        working-directory: ${{ env.WEBSITE_DIR }}
