@@ -63,8 +63,7 @@ jobs:
         run: |
           git config user.name "github-action"
           git config user.email "github-action"
-          git status
-#          git add --all
-#          git commit -m "upload gprof profiling results" || echo "No changes to commit"
-#          git push
+          git add --all
+          git commit -m "upload tutorials" || echo "No changes to commit"
+          git push
         working-directory: ${{ env.WEBSITE_DIR }}
