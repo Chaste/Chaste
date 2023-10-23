@@ -112,7 +112,7 @@ def ConvertFileToWikiText(fileobj, filepath):
             if ifdefs_seen == 0:
                 if status is ST_CODE:
                     # close code block
-                    output.append('~~~\n')
+                    output.append('```\n')
                 parsing = False
     
         # If in Parsing mode
@@ -129,7 +129,7 @@ def ConvertFileToWikiText(fileobj, filepath):
                 stripped_line = line = stripped_line[2:].strip()
                 # if the last line was code, close the output code block
                 if status is ST_CODE:
-                    output.append('~~~\n')
+                    output.append('```\n')
                 # set the status as text
                 status = ST_TEXT
             elif status in [ST_TEXT, ST_HOWTO] and IsStillComment(stripped_line):
@@ -209,13 +209,13 @@ def Hightlight(file_name):
 def CodeBlockOpener(file_name):
     """Return the opener string for a Trac wiki code block with syntax highlighting based on file extension."""
     highlight_code = Hightlight(file_name)
-    return '~~~' + highlight_code + '\n'
+    return '```' + highlight_code + '\n'
 
 def AddCodeOutput(file_name, code, output):
     output.append('\n\n## File name `%s` \n\n' % file_name)
     output.append(CodeBlockOpener(file_name))
     output.append('\n'.join(code))
-    output.append('\n~~~\n\n')
+    output.append('\n```\n\n')
 
 def ConvertTutorialToHugoMd(test_file_path, test_file, other_files, revision=''):
     """Convert a tutorial, possibly comprised of multiple files, to hugo markdown.
