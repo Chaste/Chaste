@@ -80,6 +80,13 @@ public:
             TS_TRACE(e.GetMessage());
         }
     }
+    
+    void TestCorrectNumberCellsGenerated()
+    {
+        ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 0.2);
+        auto mesh = gen.GetMesh();
+        TS_ASSERT_EQUALS(mesh->GetNumElements(), 5);
+    }
 
     void TestCellGenerationExceptions()
     {

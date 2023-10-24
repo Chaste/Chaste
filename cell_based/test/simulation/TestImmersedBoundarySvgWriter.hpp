@@ -62,22 +62,22 @@ public:
 
     void TestContructor()
     {
-      ImmersedBoundarySvgWriter<2> svgWriter;
-      TS_ASSERT_EQUALS(svgWriter.GetSamplingMultiple(), 100u);
-      TS_ASSERT_EQUALS(svgWriter.GetSvgSize(), 1600.0);
+      ImmersedBoundarySvgWriter<2> svg_writer;
+      TS_ASSERT_EQUALS(svg_writer.GetSamplingMultiple(), 100u);
+      TS_ASSERT_EQUALS(svg_writer.GetSvgSize(), 1600.0);
     }
 
     void TestGetSetMethods()
     {
-      ImmersedBoundarySvgWriter<2> svgWriter;
-      TS_ASSERT_EQUALS(svgWriter.GetSamplingMultiple(), 100u);
-      TS_ASSERT_EQUALS(svgWriter.GetSvgSize(), 1600.0);
+      ImmersedBoundarySvgWriter<2> svg_writer;
+      TS_ASSERT_EQUALS(svg_writer.GetSamplingMultiple(), 100u);
+      TS_ASSERT_EQUALS(svg_writer.GetSvgSize(), 1600.0);
       
-      svgWriter.SetSamplingMultiple(10u);
-      TS_ASSERT_EQUALS(svgWriter.GetSamplingMultiple(), 10u);
+      svg_writer.SetSamplingMultiple(10u);
+      TS_ASSERT_EQUALS(svg_writer.GetSamplingMultiple(), 10u);
       
-      svgWriter.SetSvgSize(1200.0);
-      TS_ASSERT_EQUALS(svgWriter.GetSvgSize(), 1200.0);
+      svg_writer.SetSvgSize(1200.0);
+      TS_ASSERT_EQUALS(svg_writer.GetSvgSize(), 1200.0);
     }
     
     void TestOutputParametersWithImmersedBoundarySimulationModifier()

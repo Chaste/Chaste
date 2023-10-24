@@ -131,13 +131,10 @@ public:
                 nodes[node_idx] = new Node<1>(node_idx, Create_c_vector(10.0 * p_gen->ranf()));
             }
             
-            auto randomField = gen.SampleRandomField(nodes);
-            for (auto val : randomField) {
-                std::cout << val << "\n";
-            }
+            auto random_field = gen.SampleRandomField(nodes);
             
-            std::transform(randomField.begin(), randomField.end(), randomField.begin(), [] (const double& v) { return std::abs(v); });
-            auto sum = std::accumulate(randomField.begin(), randomField.end(), 0.0);
+            std::transform(random_field.begin(), random_field.end(), random_field.begin(), [] (const double& v) { return std::abs(v); });
+            auto sum = std::accumulate(random_field.begin(), random_field.end(), 0.0);
 
             for (auto& p_node : nodes)
             {
@@ -169,10 +166,10 @@ public:
                 nodes[node_idx] = new Node<1>(node_idx, Create_c_vector(10.0 * p_gen->ranf()));
             }
             
-            auto randomField = gen.SampleRandomFieldAtTime(nodes, 0.0);
+            auto random_field = gen.SampleRandomFieldAtTime(nodes, 0.0);
             
-            std::transform(randomField.begin(), randomField.end(), randomField.begin(), [] (const double& v) { return std::abs(v); });
-            auto sum = std::accumulate(randomField.begin(), randomField.end(), 0.0);
+            std::transform(random_field.begin(), random_field.end(), random_field.begin(), [] (const double& v) { return std::abs(v); });
+            auto sum = std::accumulate(random_field.begin(), random_field.end(), 0.0);
             for (auto& p_node : nodes)
             {
                 delete p_node;
@@ -203,10 +200,10 @@ public:
                 nodes[node_idx] = new Node<2>(node_idx, Create_c_vector(10.0 * p_gen->ranf(), 10.0 * p_gen->ranf()));
             }
             
-            auto randomField = gen.SampleRandomFieldAtTime(nodes, 0.0);
+            auto random_field = gen.SampleRandomFieldAtTime(nodes, 0.0);
 
-            std::transform(randomField.begin(), randomField.end(), randomField.begin(), [] (const double& v) { return std::abs(v); });
-            auto sum = std::accumulate(randomField.begin(), randomField.end(), 0.0);
+            std::transform(random_field.begin(), random_field.end(), random_field.begin(), [] (const double& v) { return std::abs(v); });
+            auto sum = std::accumulate(random_field.begin(), random_field.end(), 0.0);
             for (auto& p_node : nodes)
             {
                 delete p_node;
@@ -237,10 +234,10 @@ public:
                 nodes[node_idx] = new Node<3>(node_idx, Create_c_vector(10.0 * p_gen->ranf(), 10.0 * p_gen->ranf(), 10.0 * p_gen->ranf()));
             }
             
-            auto randomField = gen.SampleRandomFieldAtTime(nodes, 0.0);
+            auto random_field = gen.SampleRandomFieldAtTime(nodes, 0.0);
 
-            std::transform(randomField.begin(), randomField.end(), randomField.begin(), [] (const double& v) { return std::abs(v); });
-            auto sum = std::accumulate(randomField.begin(), randomField.end(), 0.0);
+            std::transform(random_field.begin(), random_field.end(), random_field.begin(), [] (const double& v) { return std::abs(v); });
+            auto sum = std::accumulate(random_field.begin(), random_field.end(), 0.0);
             for (auto& p_node : nodes)
             {
                 delete p_node;

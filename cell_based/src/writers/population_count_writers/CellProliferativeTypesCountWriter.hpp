@@ -162,7 +162,7 @@ public:
      *
      * Just passes through to VisitAnyPopulation
      *
-     * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
+     * @param pCellPopulation a pointer to the ImmersedBoundaryCellPopulation to visit.
      */
     virtual void Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation);
 };

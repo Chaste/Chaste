@@ -156,7 +156,7 @@ public:
      * This line is appended to the output written by AbstractCellBasedWriter, which is a single
      * value [present simulation time], followed by a tab.
      *
-     * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
+     * @param pCellPopulation a pointer to the ImmersedBoundaryCellPopulation to visit.
      */
     virtual void Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation);
 };

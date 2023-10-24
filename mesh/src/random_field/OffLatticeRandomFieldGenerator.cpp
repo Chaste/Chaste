@@ -60,8 +60,8 @@ OffLatticeRandomFieldGenerator<SPACE_DIM>::OffLatticeRandomFieldGenerator(
     // Reset the box width if the default value is being used
     if (boxWidth == DOUBLE_UNSET)
     {
-        const double maxBoxWidth = 4.0 * lengthScale; 
-        boxWidth = std::min(maxBoxWidth, upperCorner[0] - lowerCorner[0]);
+        const double max_box_width = 4.0 * lengthScale; 
+        boxWidth = std::min(max_box_width, upperCorner[0] - lowerCorner[0]);
     }
 
     // Set up the box collection

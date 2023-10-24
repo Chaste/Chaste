@@ -42,7 +42,6 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Mo
 include (EnsureOutOfSourceBuild)
 ensure_out_of_source_build ()
 include (CheckIncludeFile)
-include (FetchContent)
 
 include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/overrides.cmake)
 
@@ -137,7 +136,7 @@ option (Chaste_UPDATE_PROVENANCE "Update build timestamp. Disable to prevent re-
 
 option(RUN_TESTS "This option simply runs Chaste tests. You should also set the test family." OFF)
 set(TEST_FAMILY "Continuous" CACHE STRING "The name of the test family, e.g, Continuous, Failing, Nightly, Parallel etc.")
-set(TestPackTypes "Continuous;Failing;Nightly;Parallel;Production;Weekly;Profile;ProfileAssembly;ExtraSimulations;ImmersedBoundary;NeverRun;Codegen")
+set(TestPackTypes "Continuous;Failing;Nightly;Parallel;Production;Weekly;Profile;ProfileAssembly;ExtraSimulations;Codegen")
 
 if (RUN_TESTS)
     list (FIND TestPackTypes ${TEST_FAMILY} found)

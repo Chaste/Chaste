@@ -39,10 +39,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <array>
 #include <vector>
 
-// Eigen includes
-#include <eigen3/Eigen/Dense>
-#include <eigen3/Eigen/Sparse>
-
 #include "ChasteSerialization.hpp"
 #include "UblasVectorInclude.hpp"
 
@@ -84,9 +80,6 @@ private:
 
     /** Length scale over which the noise is to be correlated. */
     double mLengthScale;
-
-    /** Matrix storing the eigenvectors of the covariance matrix. */
-    Eigen::MatrixXd mScaledEigenvecs;
 
     /**
      * The product of mNumGridPts; the total number of grid points in the 

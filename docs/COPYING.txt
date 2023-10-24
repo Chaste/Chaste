@@ -1,4 +1,0 @@
-This variant of Chaste is licenced under the GPL (see gpl-3.0.txt for full text)
-due to dependence on fftw (http://fftw.org/).
-
-Alternative licence arrangements are being investigated.

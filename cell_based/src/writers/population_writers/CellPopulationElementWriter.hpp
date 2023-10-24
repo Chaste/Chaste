@@ -135,7 +135,7 @@ public:
 
 
     /**
-     * Visit the VertexBasedCellPopulation and write data for each Element.
+     * Visit the ImmersedBoundaryCellPopulation and write data for each Element.
      *
      * Outputs a line of space-separated values of the form:
      * ...[num nodes in element] [node 0 index] [node 1 index] [node 2 index]...

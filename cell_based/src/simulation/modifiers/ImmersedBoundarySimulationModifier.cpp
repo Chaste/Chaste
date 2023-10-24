@@ -138,12 +138,12 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(
     mpMesh = &(mpCellPopulation->rGetMesh());
 
     // Get the size of the mesh
-    unsigned numGridPtsX = mpMesh->GetNumGridPtsX();
-    unsigned numGridPtsY = mpMesh->GetNumGridPtsY();
+    unsigned num_grid_ptsX = mpMesh->GetNumGridPtsX();
+    unsigned num_grid_ptsY = mpMesh->GetNumGridPtsY();
 
     // Get the grid spacing
-    mGridSpacingX = 1.0 / (double) numGridPtsX;
-    mGridSpacingY = 1.0 / (double) numGridPtsY;
+    mGridSpacingX = 1.0 / (double) num_grid_ptsX;
+    mGridSpacingY = 1.0 / (double) num_grid_ptsY;
 
     // Set up the box collection
     c_vector<double, 2 * 2> domain_size;
@@ -181,7 +181,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(
                     mpCellPopulation->DoesPopulationHaveActiveSources()
             );
 
-            mFftNorm = (double) numGridPtsX * (double) numGridPtsY;
+            mFftNorm = (double) num_grid_ptsX * (double) num_grid_ptsY;
             break;
         }
         default:
@@ -198,7 +198,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(
         upper_corner.fill(1.0);
 
         std::array<unsigned, DIM> num_grid_pts;
-        num_grid_pts.fill(numGridPtsX / mNoiseSkip);
+        num_grid_pts.fill(num_grid_ptsX / mNoiseSkip);
 
         std::array<bool, DIM> periodicity;
         periodicity.fill(true);
@@ -209,9 +209,9 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(
                                                      std::multiplies<double>());
 
         // Warn at this point if parameters are not sensible
-        if (numGridPtsX % mNoiseSkip != 0)
+        if (num_grid_ptsX % mNoiseSkip != 0)
         {
-            WARNING("mNoiseSkip should perfectly divide numGridPtsX or adding forces will likely not work as expected.");
+            WARNING("mNoiseSkip should perfectly divide num_grid_ptsX or adding forces will likely not work as expected.");
         }
         if (total_gridpts > 100.0 * 100.0)  // This is about the maximum that can be handled
         {
@@ -233,8 +233,8 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupConstantMemberVariables(
 template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::ClearForcesAndSources()
 {
-    unsigned numGridPtsX = mpMesh->GetNumGridPtsX();
-    unsigned numGridPtsY = mpMesh->GetNumGridPtsY();
+    unsigned num_grid_ptsX = mpMesh->GetNumGridPtsX();
+    unsigned num_grid_ptsY = mpMesh->GetNumGridPtsY();
 
     // Clear applied forces on each node
     for (auto node_iter = mpMesh->GetNodeIteratorBegin(false);
@@ -249,9 +249,9 @@ void ImmersedBoundarySimulationModifier<DIM>::ClearForcesAndSources()
 
     for (unsigned dim = 0; dim < 2; dim++)
     {
-        for (unsigned x = 0; x < numGridPtsX; x++)
+        for (unsigned x = 0; x < num_grid_ptsX; x++)
         {
-            for (unsigned y = 0; y < numGridPtsY; y++)
+            for (unsigned y = 0; y < num_grid_ptsY; y++)
             {
                 r_force_grids[dim][x][y] = 0.0;
             }
@@ -263,9 +263,9 @@ void ImmersedBoundarySimulationModifier<DIM>::ClearForcesAndSources()
     {
         multi_array<double, 3> &r_rhs_grid = mpArrays->rGetModifiableRightHandSideGrids();
 
-        for (unsigned x = 0; x < numGridPtsX; x++)
+        for (unsigned x = 0; x < num_grid_ptsX; x++)
         {
-            for (unsigned y = 0; y < numGridPtsY; y++)
+            for (unsigned y = 0; y < num_grid_ptsY; y++)
             {
                 r_rhs_grid[2][x][y] = 0.0;
             }
@@ -308,8 +308,8 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateForcesToFluidGrid()
 {
     if constexpr (DIM == 2)
     {
-        unsigned numGridPtsX = mpMesh->GetNumGridPtsX();
-        unsigned numGridPtsY = mpMesh->GetNumGridPtsY();
+        unsigned num_grid_ptsX = mpMesh->GetNumGridPtsX();
+        unsigned num_grid_ptsY = mpMesh->GetNumGridPtsY();
 
         // Helper variables, pre-defined for efficiency
         double dl;
@@ -346,14 +346,14 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateForcesToFluidGrid()
                 applied_force = p_node->rGetAppliedForce();
 
                 // Get first grid index in each dimension, taking account of possible wrap-around
-                first_idx_x = unsigned(floor(node_location[0] / mGridSpacingX)) + numGridPtsX - 1;
-                first_idx_y = unsigned(floor(node_location[1] / mGridSpacingY)) + numGridPtsY - 1;
+                first_idx_x = unsigned(floor(node_location[0] / mGridSpacingX)) + num_grid_ptsX - 1;
+                first_idx_y = unsigned(floor(node_location[1] / mGridSpacingY)) + num_grid_ptsY - 1;
 
                 // Calculate all four indices and deltas in each dimension
                 for (unsigned i = 0; i < 4; i++)
                 {
-                    x_indices[i] = (first_idx_x + i) % numGridPtsX;
-                    y_indices[i] = (first_idx_y + i) % numGridPtsY;
+                    x_indices[i] = (first_idx_x + i) % num_grid_ptsX;
+                    y_indices[i] = (first_idx_y + i) % num_grid_ptsY;
 
                     x_deltas[i] = Delta1D(fabs(x_indices[i] * mGridSpacingX - node_location[0]), mGridSpacingX);
                     y_deltas[i] = Delta1D(fabs(y_indices[i] * mGridSpacingY - node_location[1]), mGridSpacingY);
@@ -390,14 +390,14 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateForcesToFluidGrid()
                 applied_force = p_node->rGetAppliedForce();
 
                 // Get first grid index in each dimension, taking account of possible wrap-around
-                first_idx_x = unsigned(floor(node_location[0] / mGridSpacingX)) + numGridPtsX - 1;
-                first_idx_y = unsigned(floor(node_location[1] / mGridSpacingY)) + numGridPtsY - 1;
+                first_idx_x = unsigned(floor(node_location[0] / mGridSpacingX)) + num_grid_ptsX - 1;
+                first_idx_y = unsigned(floor(node_location[1] / mGridSpacingY)) + num_grid_ptsY - 1;
 
                 // Calculate all four indices and deltas in each dimension
                 for (unsigned i = 0; i < 4; i++)
                 {
-                    x_indices[i] = (first_idx_x + i) % numGridPtsX;
-                    y_indices[i] = (first_idx_y + i) % numGridPtsY;
+                    x_indices[i] = (first_idx_x + i) % num_grid_ptsX;
+                    y_indices[i] = (first_idx_y + i) % num_grid_ptsY;
 
                     x_deltas[i] = Delta1D(fabs(x_indices[i] * mGridSpacingX - node_location[0]), mGridSpacingX);
                     y_deltas[i] = Delta1D(fabs(y_indices[i] * mGridSpacingY - node_location[1]), mGridSpacingY);
@@ -435,8 +435,8 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateFluidSourcesToGrid()
 {
     if constexpr (DIM == 2)
     {
-        unsigned numGridPtsX = mpMesh->GetNumGridPtsX();
-        unsigned numGridPtsY = mpMesh->GetNumGridPtsY();
+        unsigned num_grid_ptsX = mpMesh->GetNumGridPtsX();
+        unsigned num_grid_ptsY = mpMesh->GetNumGridPtsY();
 
         // Helper variables, pre-defined for efficiency
         double weight;
@@ -486,14 +486,14 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateFluidSourcesToGrid()
             double source_strength = this_source->GetStrength();
             
             // Get first grid index in each dimension, taking account of possible wrap-around
-            first_idx_x = unsigned(floor(source_location[0] / mGridSpacingX)) + numGridPtsX - 1;
-            first_idx_y = unsigned(floor(source_location[1] / mGridSpacingY)) + numGridPtsY - 1;
+            first_idx_x = unsigned(floor(source_location[0] / mGridSpacingX)) + num_grid_ptsX - 1;
+            first_idx_y = unsigned(floor(source_location[1] / mGridSpacingY)) + num_grid_ptsY - 1;
 
             // Calculate all four indices and deltas in each dimension
             for (unsigned i = 0; i < 4; i ++)
             {
-                x_indices[i] = (first_idx_x + i) % numGridPtsX;
-                y_indices[i] = (first_idx_y + i) % numGridPtsY;
+                x_indices[i] = (first_idx_x + i) % num_grid_ptsX;
+                y_indices[i] = (first_idx_y + i) % num_grid_ptsY;
 
                 x_deltas[i] = Delta1D(fabs(x_indices[i] * mGridSpacingX - source_location[0]), mGridSpacingX);
                 y_deltas[i] = Delta1D(fabs(y_indices[i] * mGridSpacingY - source_location[1]), mGridSpacingY);
@@ -521,11 +521,11 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateFluidSourcesToGrid()
 template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
 {
-    unsigned numGridPtsX = mpMesh->GetNumGridPtsX();
-    unsigned numGridPtsY = mpMesh->GetNumGridPtsY();
+    unsigned num_grid_ptsX = mpMesh->GetNumGridPtsX();
+    unsigned num_grid_ptsY = mpMesh->GetNumGridPtsY();
 
     double dt = SimulationTime::Instance()->GetTimeStep();
-    unsigned reduced_size = 1 + (numGridPtsY/2);
+    unsigned reduced_size = 1 + (num_grid_ptsY/2);
 
     // Get references to all the necessary grids
     multi_array<double, 3>& r_vel_grids = mpMesh->rGetModifiable2dVelocityGrids();
@@ -553,9 +553,9 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
 
         for (unsigned dim = 0; dim < 2; ++dim)
         {
-            for (unsigned x = 0; x < numGridPtsX; ++x)
+            for (unsigned x = 0; x < num_grid_ptsX; ++x)
             {
-                for (unsigned y = 0; y < numGridPtsY; ++y)
+                for (unsigned y = 0; y < num_grid_ptsY; ++y)
                 {
                     r_rhs_grids[dim][x][y] = r_vel_grids[dim][x][y] + dt * (r_force_grids[dim][x][y] + factor * r_source_gradient_grids[dim][x][y] - r_rhs_grids[dim][x][y]);
                 }
@@ -566,9 +566,9 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     {
         for (unsigned dim = 0; dim < 2; ++dim)
         {
-            for (unsigned x = 0; x < numGridPtsX; ++x)
+            for (unsigned x = 0; x < num_grid_ptsX; ++x)
             {
-                for (unsigned y = 0; y < numGridPtsY; ++y)
+                for (unsigned y = 0; y < num_grid_ptsY; ++y)
                 {
                     r_rhs_grids[dim][x][y] = (r_vel_grids[dim][x][y] + dt * (r_force_grids[dim][x][y] - r_rhs_grids[dim][x][y]));
                 }
@@ -590,7 +590,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     // If the population has active fluid sources, the computation is slightly more complicated
     if (mpCellPopulation->DoesPopulationHaveActiveSources())
     {
-        for (unsigned x = 0; x < numGridPtsX; ++x)
+        for (unsigned x = 0; x < num_grid_ptsX; ++x)
         {
             for (unsigned y = 0; y < reduced_size; ++y)
             {
@@ -601,7 +601,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     }
     else // no active fluid sources
     {
-        for (unsigned x = 0; x < numGridPtsX; ++x)
+        for (unsigned x = 0; x < num_grid_ptsX; ++x)
         {
             for (unsigned y = 0; y < reduced_size; ++y)
             {
@@ -613,15 +613,15 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
 
     // Set some values to zero
     r_pressure_grid[0][0] = 0.0;
-    r_pressure_grid[numGridPtsX/2][0] = 0.0;
-    r_pressure_grid[numGridPtsX/2][numGridPtsY/2] = 0.0;
-    r_pressure_grid[0][numGridPtsY/2] = 0.0;
+    r_pressure_grid[num_grid_ptsX/2][0] = 0.0;
+    r_pressure_grid[num_grid_ptsX/2][num_grid_ptsY/2] = 0.0;
+    r_pressure_grid[0][num_grid_ptsY/2] = 0.0;
 
     /*
      * Do final stage of computation before inverse FFT. We do the necessary DFT 
      * scaling at this stage so the output from the inverse DFT is correct.
      */
-    for (unsigned x = 0; x < numGridPtsX; ++x)
+    for (unsigned x = 0; x < num_grid_ptsX; ++x)
     {
         for (unsigned y = 0; y < reduced_size; ++y)
         {
@@ -634,9 +634,9 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     mpFftInterface->FftExecuteInverse();
     for (unsigned dim = 0; dim < 2; ++dim)
     {
-        for (unsigned x = 0; x < numGridPtsX; ++x)
+        for (unsigned x = 0; x < num_grid_ptsX; ++x)
         {
-            for (unsigned y = 0; y < numGridPtsY; ++y)
+            for (unsigned y = 0; y < num_grid_ptsY; ++y)
             {
                 r_vel_grids[dim][x][y] /= mFftNorm;
             }
@@ -657,17 +657,17 @@ template<unsigned DIM>
 void ImmersedBoundarySimulationModifier<DIM>::ZeroFieldSums(
     multi_array<double, 3>& rField)
 {
-    unsigned numGridPtsX = mpMesh->GetNumGridPtsX();
-    unsigned numGridPtsY = mpMesh->GetNumGridPtsY();
+    unsigned num_grid_ptsX = mpMesh->GetNumGridPtsX();
+    unsigned num_grid_ptsY = mpMesh->GetNumGridPtsY();
 
     for (unsigned dim = 0; dim < 2; ++dim)
     {
         double total_field_val = 0.0;
         long count = 0;
 
-        for (unsigned x = 0; x < numGridPtsX; ++x)
+        for (unsigned x = 0; x < num_grid_ptsX; ++x)
         {
-            for (unsigned y = 0; y < numGridPtsY; ++y)
+            for (unsigned y = 0; y < num_grid_ptsY; ++y)
             {
                 if (rField[dim][x][y] != 0.0)
                 {
@@ -679,9 +679,9 @@ void ImmersedBoundarySimulationModifier<DIM>::ZeroFieldSums(
 
         const double average_field_val = (total_field_val / count);
 
-        for (unsigned x = 0; x < numGridPtsX; ++x)
+        for (unsigned x = 0; x < num_grid_ptsX; ++x)
         {
-            for (unsigned y = 0; y < numGridPtsY; ++y)
+            for (unsigned y = 0; y < num_grid_ptsY; ++y)
             {
                 if (rField[dim][x][y] != 0.0)
                 {
@@ -705,18 +705,18 @@ void ImmersedBoundarySimulationModifier<DIM>::Upwind2d(
     const multi_array<double, 3>& rInput,
     multi_array<double, 3>& rOutput)
 {
-    unsigned numGridPtsX = mpMesh->GetNumGridPtsX();
-    unsigned numGridPtsY = mpMesh->GetNumGridPtsX();
+    unsigned num_grid_ptsX = mpMesh->GetNumGridPtsX();
+    unsigned num_grid_ptsY = mpMesh->GetNumGridPtsX();
 
-    unsigned prev_x = numGridPtsX - 1;
-    unsigned prev_y = numGridPtsY - 1;
+    unsigned prev_x = num_grid_ptsX - 1;
+    unsigned prev_y = num_grid_ptsY - 1;
 
     unsigned next_x = 1;
     unsigned next_y = 1;
 
-    for (unsigned x = 0; x < numGridPtsX; x++)
+    for (unsigned x = 0; x < num_grid_ptsX; x++)
     {
-        for (unsigned y = 0; y < numGridPtsY; y++)
+        for (unsigned y = 0; y < num_grid_ptsY; y++)
         {
             // Set values for rOutput from conditional on x grid
             if (rInput[0][x][y] > 0)
@@ -742,12 +742,12 @@ void ImmersedBoundarySimulationModifier<DIM>::Upwind2d(
                 rOutput[1][x][y] += rInput[1][x][y] * (rInput[1][x][next_y] - rInput[1][x][y]) / mGridSpacingY;
             }
 
-            prev_y = (prev_y + 1) % numGridPtsY;
-            next_y = (next_y + 1) % numGridPtsY;
+            prev_y = (prev_y + 1) % num_grid_ptsY;
+            next_y = (next_y + 1) % num_grid_ptsY;
         }
 
-        prev_x = (prev_x + 1) % numGridPtsX;
-        next_x = (next_x + 1) % numGridPtsX;
+        prev_x = (prev_x + 1) % num_grid_ptsX;
+        next_x = (next_x + 1) % num_grid_ptsX;
     }
 }
 
@@ -756,22 +756,22 @@ void ImmersedBoundarySimulationModifier<DIM>::CalculateSourceGradients(
     const multi_array<double, 3>& rRhs,
     multi_array<double, 3>& rGradients)
 {
-    unsigned numGridPtsX = mpMesh->GetNumGridPtsX();
-    unsigned numGridPtsY = mpMesh->GetNumGridPtsY();
+    unsigned num_grid_ptsX = mpMesh->GetNumGridPtsX();
+    unsigned num_grid_ptsY = mpMesh->GetNumGridPtsY();
 
     ///\todo: this assumes mGridSpacingX = mGridSpacingY (fine for the foreseeable future)
     double factor = 1.0 / (2.0 * mGridSpacingX);
 
     // The fluid sources are stored in the third slice of the rRhs grids
-    for (unsigned x = 0; x < numGridPtsX; ++x)
+    for (unsigned x = 0; x < num_grid_ptsX; ++x)
     {
-        unsigned next_x = (x + 1) % numGridPtsX;
-        unsigned prev_x = (x + numGridPtsX - 1) % numGridPtsX;
+        unsigned next_x = (x + 1) % num_grid_ptsX;
+        unsigned prev_x = (x + num_grid_ptsX - 1) % num_grid_ptsX;
 
-        for (unsigned y = 0; y < numGridPtsY; ++y)
+        for (unsigned y = 0; y < num_grid_ptsY; ++y)
         {
-            unsigned next_y = (y + 1) % numGridPtsY;
-            unsigned prev_y = (y + numGridPtsY - 1) % numGridPtsY;
+            unsigned next_y = (y + 1) % num_grid_ptsY;
+            unsigned prev_y = (y + num_grid_ptsY - 1) % num_grid_ptsY;
 
             rGradients[0][x][y] = factor * (rRhs[2][next_x][y] - rRhs[2][prev_x][y]);
             rGradients[1][x][y] = factor * (rRhs[2][x][next_y] - rRhs[2][x][prev_y]);

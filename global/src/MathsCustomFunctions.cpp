@@ -169,9 +169,9 @@ double SafeDivide(double numerator, double divisor)
     return numerator/divisor;
 }
 
-unsigned AdvanceMod(const unsigned current_location, const int increment, const std::size_t range) noexcept
+unsigned AdvanceMod(const unsigned currentLocation, const int increment, const std::size_t range) noexcept
 {
-    int new_pos = current_location + increment;
+    int new_pos = currentLocation + increment;
 
     while (new_pos < 0)
     {

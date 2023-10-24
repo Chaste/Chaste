@@ -102,7 +102,7 @@ public:
      *
      * This is an empty dummy function, since this class is defined for use with a VertexBasedCellPopulation only.
      *
-     * @param pCellPopulation a pointer to the NodeBasedCellPopulation to visit.
+     * @param pCellPopulation a pointer to the ImmersedBoundaryCellPopulation to visit.
      */
     virtual void Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation);
 
