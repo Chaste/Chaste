@@ -217,6 +217,21 @@ def AddCodeOutput(file_name, code, output):
     output.append('\n'.join(code))
     output.append('\n```\n\n')
 
+def get_title_from_file_name(file_name):
+    # Remove "Test" from the start of the string, if it exists
+    if file_name.startswith("Test"):
+        file_name = file_name.replace("Test", "")
+
+    # Remove "Tutorial" from the end of the string, if it exists
+    if file_name.endswith("Tutorial"):
+        file_name = file_name.replace("Tutorial", "")
+
+    # Split CamelCase string into list of words
+    words = re.findall(r'[A-Z](?:[a-z]+|[A-Z]*(?=[A-Z]|$))', file_name)
+
+    # Join words with space and return the result
+    return ' '.join(words)
+
 def ConvertTutorialToHugoMd(test_file_path, test_file, other_files, revision=''):
     """Convert a tutorial, possibly comprised of multiple files, to hugo markdown.
     
@@ -239,13 +254,13 @@ def ConvertTutorialToHugoMd(test_file_path, test_file, other_files, revision='')
     output = []
 
     # Header
-    title = os.path.basename(test_file_path)
+    title = get_title_from_file_name(os.path.basename(test_file_path))
     description = f'This tutorial is automatically generated from the file {test_file_path} {revision}. Note that the code is given in full at the bottom of the page.'
     # date = str(datetime.now())
     header = f"""
 ---
 title : "{title}"
-description: "{description}"
+summary: "{description}"
 draft: false
 images: []
 toc: true
