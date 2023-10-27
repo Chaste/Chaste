@@ -454,7 +454,7 @@ public:
      *
      * This throws a suitable exception if an inward facing normal is found.
      *
-     * @return nothing
+     * (Returns nothing)
      */
     void CheckOutwardNormals();
 

@@ -61,7 +61,6 @@ private:
 
 public:
     /**
-     * @return a newly created cell factory.
      * @param stimulusMagnitude
      * @param stimulatedPoint spatial co-ordinates of where to stimulate.
      *    Must correspond to a node location.

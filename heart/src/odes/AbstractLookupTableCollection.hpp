@@ -67,12 +67,12 @@ public:
     unsigned GetNumberOfTables(const std::string& rKeyingVariableName) const;
 
     /**
-     * @return the properties of lookup tables keyed by the given variable.
+     * Returns the properties of lookup tables keyed by the given variable (via arguments).
      *
      * @param rKeyingVariableName  the table key name
-     * @param rMin  will be filled with the lower table bound
-     * @param rStep  will be filled with the table spacing
-     * @param rMax  will be filled with the upper table bound
+     * @param rMin  will be filled with the lower table bound (returned)
+     * @param rStep  will be filled with the table spacing (returned)
+     * @param rMax  will be filled with the upper table bound (returned)
      */
     void GetTableProperties(const std::string& rKeyingVariableName, double& rMin, double& rStep, double& rMax) const;
 

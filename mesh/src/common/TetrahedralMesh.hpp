@@ -286,39 +286,39 @@ public:
     virtual void RefreshJacobianCachedData();
 
     /**
-     * @return the Jacobian matrix and its determinant for a given element.
+     * Returns the Jacobian matrix and its determinant for a given element (via arguments).
      *
      * @param elementIndex index of the element in the mesh
-     * @param rJacobian the Jacobian matrix
-     * @param rJacobianDeterminant the determinant of the Jacobian matrix
+     * @param rJacobian the Jacobian matrix (returned)
+     * @param rJacobianDeterminant the determinant of the Jacobian matrix (returned)
      */
     virtual void GetJacobianForElement(unsigned elementIndex, c_matrix<double, SPACE_DIM, SPACE_DIM>& rJacobian, double& rJacobianDeterminant) const;
 
     /**
-     * @return the Jacobian matrix, its inverse and its determinant for a given element.
+     * Returns the Jacobian matrix, its inverse and its determinant for a given element (via arguments).
      *
      * @param elementIndex index of the element in the mesh
-     * @param rJacobian the Jacobian matrix
-     * @param rJacobianDeterminant the determinant of the Jacobian matrix
-     * @param rInverseJacobian the inverse Jacobian matrix
+     * @param rJacobian the Jacobian matrix (returned)
+     * @param rJacobianDeterminant the determinant of the Jacobian matrix (returned)
+     * @param rInverseJacobian the inverse Jacobian matrix (returned)
      */
     virtual void GetInverseJacobianForElement(unsigned elementIndex, c_matrix<double, SPACE_DIM, ELEMENT_DIM>& rJacobian, double& rJacobianDeterminant, c_matrix<double, ELEMENT_DIM, SPACE_DIM>& rInverseJacobian) const;
 
     /**
-     * @return the weighted direction and the determinant of the Jacobian for a given element.
+     * Returns the weighted direction and the determinant of the Jacobian for a given element (via arguments).
      *
      * @param elementIndex index of the element in the mesh
-     * @param rWeightedDirection the weighted direction
-     * @param rJacobianDeterminant the determinant of the Jacobian matrix
+     * @param rWeightedDirection the weighted direction (returned)
+     * @param rJacobianDeterminant the determinant of the Jacobian matrix (returned)
      */
     virtual void GetWeightedDirectionForElement(unsigned elementIndex, c_vector<double, SPACE_DIM>& rWeightedDirection, double& rJacobianDeterminant) const;
 
     /**
-     * @return the weighted direction and the determinant of the Jacobian for a given boundary element.
+     * Returns the weighted direction and the determinant of the Jacobian for a given boundary element (via arguments).
      *
      * @param elementIndex index of the element in the mesh
-     * @param rWeightedDirection the weighted direction
-     * @param rJacobianDeterminant the determinant of the Jacobian matrix
+     * @param rWeightedDirection the weighted direction (returned)
+     * @param rJacobianDeterminant the determinant of the Jacobian matrix (returned)
      */
     virtual void GetWeightedDirectionForBoundaryElement(unsigned elementIndex, c_vector<double, SPACE_DIM>& rWeightedDirection, double& rJacobianDeterminant) const;
 
