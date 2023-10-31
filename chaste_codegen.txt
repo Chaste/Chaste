@@ -1,1 +1,2 @@
 chaste_codegen>=0.10.0, <0.11.0
+chaste_codegen_sbml>=0.0.1, <0.1.0
