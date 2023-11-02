@@ -870,19 +870,6 @@ public:
         }
     }
 
-    void TestUpdateAtEndOfTimeStep()
-    {
-        ///\todo Test this method
-        // This method calls mpBoxCollection->CalculateNodePairs then UpdateFluidVelocityGrids
-    }
-
-    void TestSetupSolve()
-    {
-        ///\todo Test this method
-        // This just calls SetupConstantMemberVariables (already tested) and then UpdateFluidVelocityGrids 
-        // is it redundant to test this if both are tested?
-    }
-
     void TestAddImmersedBoundaryForce()
     {
         // Set up SimulationTime - needed by SetupConstantMemberVariables()

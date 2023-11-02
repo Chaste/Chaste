@@ -66,7 +66,6 @@ class ImmersedBoundarySimulationModifier : public AbstractCellBasedSimulationMod
 private:
 
     /** To allow tests to directly access solver methods */
-    friend class TestImmersedBoundaryPdeSolveMethods;
     friend class TestImmersedBoundarySimulationModifier;
 
     /** Needed for serialization. */

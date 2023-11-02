@@ -61,8 +61,6 @@ private:
     friend class TestImmersedBoundaryDivisionRules;
 
     /** To allow tests to directly access UpdateNodeLocation(). */
-    friend class TestImmersedBoundaryPdeSolveMethods;
-    
     friend class TestImmersedBoundaryCellPopulation;
 
     /**
