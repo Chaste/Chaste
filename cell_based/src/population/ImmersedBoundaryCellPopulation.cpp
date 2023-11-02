@@ -301,8 +301,31 @@ CellPtr ImmersedBoundaryCellPopulation<DIM>::AddCell(
 template <unsigned DIM>
 unsigned ImmersedBoundaryCellPopulation<DIM>::RemoveDeadCells()
 {
-    ///\todo - What constitutes a cell in immersed boundary
-    return 0;
+    unsigned num_removed = 0;
+
+    for (std::list<CellPtr>::iterator it = this->mCells.begin();
+         it != this->mCells.end();
+         )
+    {
+        if ((*it)->IsDead())
+        {
+            // Count the cell as dead
+            num_removed++;
+
+            if (!(this->GetElement(this->GetLocationIndexUsingCell((*it)))->IsDeleted()))
+            {
+                this->GetElement(this->GetLocationIndexUsingCell(*it))->MarkAsDeleted();
+            }
+
+            // Delete the cell
+            it = this->mCells.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+    return num_removed;
 }
 
 template <unsigned DIM>

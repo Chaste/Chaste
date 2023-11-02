@@ -669,6 +669,27 @@ public:
             delete p_cell_population;
         }
     }
+    
+    void TestRemoveDeadCells()
+    {
+        // Create an immersed boundary cell population object
+        ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
+        ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+
+        std::vector<CellPtr> cells;
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+        CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+
+        ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+
+        TS_ASSERT_EQUALS(cell_population.GetNumAllCells(), 5);
+        auto cell = cell_population.GetCellUsingLocationIndex(2);
+        cell->Kill();
+        cell_population.RemoveDeadCells();
+        cell_population.rGetMesh().ReMesh();
+        TS_ASSERT_EQUALS(cell_population.GetNumAllCells(), 4);
+    }
 
     void TestGetCellDataItemAtPdeNode()
     {
