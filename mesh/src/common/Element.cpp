@@ -81,10 +81,6 @@ void Element<ELEMENT_DIM, SPACE_DIM>::MarkAsDeleted()
     }
 }
 
-/** Update node at the given index
- *  @param rIndex is an local index to which node to change
- *  @param pNode is a pointer to the replacement node
- */
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void Element<ELEMENT_DIM, SPACE_DIM>::UpdateNode(const unsigned& rIndex, Node<SPACE_DIM>* pNode)
 {

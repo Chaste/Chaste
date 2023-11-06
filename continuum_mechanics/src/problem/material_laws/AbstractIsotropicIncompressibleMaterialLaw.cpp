@@ -133,12 +133,20 @@ void AbstractIsotropicIncompressibleMaterialLaw<DIM>::ComputeStressAndStressDeri
     }
 }
 
+/**
+ * @return the pressure corresponding to E=0, ie corresponding to C=identitytemplate<>
+ * Specialised to 2D
+ */
 template<>
 double AbstractIsotropicIncompressibleMaterialLaw<2>::GetZeroStrainPressure()
 {
     return 2*Get_dW_dI1(2,0);
 }
 
+/**
+ * @return the pressure corresponding to E=0, ie corresponding to C=identitytemplate<>
+ * Specialised to 3D
+ */
 template<>
 double AbstractIsotropicIncompressibleMaterialLaw<3>::GetZeroStrainPressure()
 {

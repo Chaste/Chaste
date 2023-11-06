@@ -94,10 +94,7 @@ INPUT                  =    heart/src \
                             pde/src \
                             continuum_mechanics/src \
                             cell_based/src \
-                            crypt/src \
-                            notforrelease/src \
-                            notforrelease_cell_based/src \
-                            notforrelease_lung/src
+                            crypt/src
 
 FILE_PATTERNS          = *.cpp \
                          *.hpp
@@ -248,3 +245,8 @@ DOT_CLEANUP            = YES
 # Configuration::additions related to the search engine   
 #---------------------------------------------------------------------------
 SEARCHENGINE           = NO
+
+
+BUILTIN_STL_SUPPORT    = YES
+
+
