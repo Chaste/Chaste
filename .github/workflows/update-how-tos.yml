@@ -2,6 +2,8 @@ name: Update how-tos
 
 on:
   pull_request:
+    branches:
+      - '**'
   push:
     branches:
       - howto
@@ -10,7 +12,7 @@ on:
 jobs:
   generate-how-to-markdown:
     runs-on: ubuntu-latest
-    if: !contains(github.event.pull_request.labels.*.name, 'ci:off')
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
     steps:
       - name: checkout code
         uses: actions/checkout@v4
