@@ -1,0 +1,31 @@
+name: Update how-tos
+
+on:
+  pull_request:
+  push:
+    branches:
+      - howto
+  workflow_dispatch:
+
+jobs:
+  generate-how-to-markdown:
+    runs-on: ubuntu-latest
+    if: !contains(github.event.pull_request.labels.*.name, 'ci:off')
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: setup python
+        uses: actions/setup-python@v4
+
+      - name: generate how-to markdown
+        run: |
+          python GenerateHowTos.py
+        working-directory: python/infra
+
+      - name: Upload archive files
+        uses: actions/upload-artifact@v3
+        with:
+          name: how-to-markdown
+          path: |
+            chaste_howto_webpage.md
