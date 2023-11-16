@@ -47,7 +47,6 @@ HOW_TO_FILE = CHASTE_SRC_DIR / 'chaste_howto_webpage.md'
 PAGE_HEADER = """---
 title: "How-to index"
 description: "Chaste how-tos, automatically generated from the test files"
-date: 2020-08-27T19:23:18+02:00
 draft: false
 images: []
 toc: true
@@ -113,7 +112,7 @@ def process_line(line_to_process: str) -> str:
     :param line_to_process: The line of text to be processed.
     :return: The processed line with leading space.
     """
-    return ' ' + line_to_process.replace('*', '').replace('/', '').strip()
+    return ' ' + line_to_process.strip().lstrip('*/').lstrip()
 
 
 def parse_how_to_line(line_to_parse: str) -> tuple[str, str]:
