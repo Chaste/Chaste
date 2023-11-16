@@ -255,7 +255,7 @@ public:
     /*
      * EMPTYLINE
      *
-     * Note that you '''cannot view the results of a 3D simulation using the Java visualiser''' but
+     * Note that you **cannot view the results of a 3D simulation using the Java visualiser** but
      * to visualize the results, use Paraview. See the UserTutorials/VisualizingWithParaview tutorial for more information.
      *
      * Load the file {{{/tmp/$USER/testoutput/NodeBasedSpheroid/results_from_time_0/results.pvd}}},

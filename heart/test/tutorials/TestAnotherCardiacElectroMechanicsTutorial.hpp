@@ -248,7 +248,7 @@ public:
          * specifying the traction in functional form - see solid mechanics tutorials. Similarly, more natural
          * 'pressure acting on the deformed body' boundary conditions are possible - see below tutorial.
          *
-         * '''Robustness:''' Sometimes the nonlinear solver doesn't converge, and will give an error. This can be due to either
+         * **Robustness:** Sometimes the nonlinear solver doesn't converge, and will give an error. This can be due to either
          * a non-physical (or not very physical) situation, or just because the current guess is quite far
          * from the solution and the solver can't find the solution (this can occur in nonlinear elasticity
          * problems if the loading is large, for example). Current work in progress is on making the solver
@@ -395,7 +395,7 @@ public:
 
     }
     /*
-     * '''More examples:''' For a 3d ellipsoid geometry test, see heart/test/mechanics/TestCardiacElectroMechanicsOnEllipsoid.hpp
+     * **More examples:** For a 3d ellipsoid geometry test, see heart/test/mechanics/TestCardiacElectroMechanicsOnEllipsoid.hpp
      */
 };
 

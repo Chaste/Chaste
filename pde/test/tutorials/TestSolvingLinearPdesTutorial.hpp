@@ -146,7 +146,7 @@ public:
  * as the filename. The class should inherit from {{{CxxTest::TestSuite}}}. */
 class TestSolvingLinearPdesTutorial : public CxxTest::TestSuite
 {
-/* All individual test defined in this test suite '''must''' be declared as public. */
+/* All individual test defined in this test suite **must** be declared as public. */
 public:
     void TestSolvingEllipticPde()
     {
@@ -213,7 +213,7 @@ public:
          * function, ''not'' something like du/dn=g(x). Hence the boundary condition we are specifying is
          * (D grad u).n = 0.
          *
-         * '''Important note for 1D:''' This means that if we were solving 2u,,xx,,=f(x) in 1D, and
+         * **Important note for 1D:** This means that if we were solving 2u,,xx,,=f(x) in 1D, and
          * wanted to specify du/dx=1 on the LHS boundary, the Neumann boundary value we have to specify is
          * -2, as n=-1 (outward facing normal) so (D gradu).n = -2 when du/dx=1.
          *

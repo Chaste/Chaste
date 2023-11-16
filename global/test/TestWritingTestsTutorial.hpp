@@ -63,7 +63,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestWritingTestsTutorial: public CxxTest::TestSuite
 {
 /*
- * Now we define some tests, which must be '''public''', begin with the word 'Test', return {{{void}}}, and take in no parameters.
+ * Now we define some tests, which must be **public**, begin with the word 'Test', return {{{void}}}, and take in no parameters.
  */
 public:
     void TestOnePlusOneEqualsTwo()

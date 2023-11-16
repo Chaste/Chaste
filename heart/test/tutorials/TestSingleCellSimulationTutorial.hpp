@@ -139,7 +139,7 @@ public:
          * accurate enough to meet your tolerances.
          *
          *
-         * A common error from CVODE is '''TOO_MUCH_WORK''', this means CVODE tried to exceed the maximum number of
+         * A common error from CVODE is **TOO_MUCH_WORK**, this means CVODE tried to exceed the maximum number of
          * internal time steps it is allowed to do. You can try using the method `SetMaxSteps` to change
          * the default (500) to a larger value, with a command like:
          *
@@ -149,7 +149,7 @@ public:
          * but if you were running for a long time (e.g. 1000 paces in one Solve call) you would need to increase this.
          *
          * Another common error from CVODE is:
-         * '''the error test failed repeatedly or with |h| = hmin.'''
+         * **the error test failed repeatedly or with |h| = hmin.**
          *
          * Since we don't change hmin (and it defaults to a very small value), this generally means the
          * ODE system has got to a situation where refining the timestep is not helping the convergence.

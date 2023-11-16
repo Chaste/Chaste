@@ -108,7 +108,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestSolvingLinearParabolicPdeSystemsWithCoupledOdeSystemsTutorial : public CxxTest::TestSuite
 {
 /*
- * All individual tests defined in this test suite '''must''' be declared as public.
+ * All individual tests defined in this test suite **must** be declared as public.
  */
 public:
     /*
