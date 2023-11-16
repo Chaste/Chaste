@@ -192,7 +192,8 @@ public:
      * We may have to do: {{{javac Visualize2dCentreCells.java}}} beforehand to create the
      * java executable.
      *
-     * For further details on visualization, see [wiki:ChasteGuides/RunningCellBasedVisualization].
+     * For further details on visualization, see
+     * [ChasteGuides/RunningCellBasedVisualization](https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/RunningCellBasedVisualization).
      *
      * You will notice that half of each cell cell around the edge is missing.
      * This is because the Voronoi region for nodes on the edge of the mesh can be

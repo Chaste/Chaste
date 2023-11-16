@@ -184,7 +184,8 @@ public:
          *
          * You can also change any parameters that are labelled in the cell model.
          *
-         * Instructions for annotating parameters can be found at [wiki:ChasteGuides/CodeGenerationFromCellML]
+         * Instructions for annotating parameters can be found at
+         * [ChasteGuides/CodeGenerationFromCellML](https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CodeGenerationFromCellML)
          *
          * Here we show how to change the parameter dictating the maximal conductance of the IKs current.
          * Note this call actually leaves it unchanged from the default,
@@ -242,7 +243,8 @@ public:
          * This call will add to the solution object the ODE system's labelled "derived quantities"
          * these are things that are not state variables, but are calculated from state variables
          * (e.g. currents), and have been tagged in the CellML file with metadata.
-         * See [wiki:ChasteGuides/CodeGenerationFromCellML] for annotation instructions.
+         * See [CodeGenerationFromCellML](https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CodeGenerationFromCellML)
+         * for annotation instructions.
          */
         solution.CalculateDerivedQuantitiesAndParameters(p_model.get());
 

@@ -122,7 +122,7 @@ public:
          * To add a SAC current to (or otherwise alter) your favourite cell model, you have to do the following.
          * Auto-generate the C++ code, by running the following on the cellml file:
          * `./python/ConvertCellModel.py heart/src/odes/cellml/LuoRudy1991.cellml`
-         * (see [wiki:ChasteGuides/CodeGenerationFromCellML#Usingthehelperscript ChasteGuides/CodeGenerationFromCellML#Usingthehelperscript]
+         * (see [ChasteGuides/CodeGenerationFromCellML#Usingthehelperscript](https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CodeGenerationFromCellML#Usingthehelperscript)
          *  if you want further documentation on this script).
          *
          * Copy and rename the resultant .hpp and .cpp files (which can be found in the same folder as the

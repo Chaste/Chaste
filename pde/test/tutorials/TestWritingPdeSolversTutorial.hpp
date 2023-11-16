@@ -72,8 +72,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * we explain how to do this.
  *
  * For this tutorial the user needs to have read the solving-PDEs tutorials. It may also be
- * helpful to read the associated [wiki:ChasteGuides/NmoodLectureNotes lectures notes], in
- * particular the slides on solving equations using finite elements if you are not familiar
+ * helpful to read the associated [lectures notes](https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/NmoodLectureNotes),
+ * in particular the slides on solving equations using finite elements if you are not familiar
  * with this (lecture 2), the slides on the general design of the Chaste finite element solvers
  * (lecture 3), and the first part of lecture 4.
  *
