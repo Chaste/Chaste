@@ -139,7 +139,7 @@ def form_github_link(file_path: Path, line_num: int) -> str:
     :param line_num: The line number to link to.
     :return: A string containing the complete GitHub URL to the file and line number.
     """
-    return f'https://github.com/Chaste/Chaste/blob/develop/{file_path.relative_to(CHASTE_SRC_DIR)}#{line_num}'
+    return f'https://github.com/Chaste/Chaste/blob/develop/{file_path.relative_to(CHASTE_SRC_DIR)}#L{line_num}'
 
 
 def get_all_how_tos() -> list[HowTo]:
