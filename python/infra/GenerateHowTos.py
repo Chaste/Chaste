@@ -127,7 +127,7 @@ def parse_how_to_line(line_to_parse: str) -> tuple[str, str]:
     """
     _, _, after = line_to_parse.partition(HOW_TO_TAG)
     _component, _, _category = after.strip().partition('/')
-    return _component, _category or 'Uncategorised'
+    return _component, _category
 
 
 def form_github_link(file_path: Path, line_num: int) -> str:
