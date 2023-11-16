@@ -75,8 +75,9 @@ public:
         TS_ASSERT_EQUALS(some_number, 2);
 /*
  * To test whether two numbers are equal to within a certain (absolute) tolerance we can use {{{TS_ASSERT_DELTA}}}.
- * This should almost always be used when comparing two {{{double}}}s.  (See also class:CompareDoubles for more
- * advanced comparisons.)
+ * This should almost always be used when comparing two {{{double}}}s.  (See also
+ * [CompareDoubles](https://chaste.github.io/doxygen-latest/classCompareDoubles.html)
+ * for more advanced comparisons.)
  */
         double another_number = 1.000001 + 1.0001;
         TS_ASSERT_DELTA(another_number, 2.0, 1e-2);

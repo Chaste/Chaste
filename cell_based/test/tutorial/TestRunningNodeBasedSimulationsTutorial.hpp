@@ -117,7 +117,7 @@ public:
         boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
         /* Once we have a {{{MutableMesh}}} we can generate a {{{NodesOnlyMesh}}} from it using the
          * following commands. Note you can also generate the {{{NodesOnlyMesh}}} from a collection of
-         * nodes, see  [class:NodesOnlyMesh NodesOnlyMesh] for details.
+         * nodes, see  [NodesOnlyMesh](https://chaste.github.io/doxygen-latest/classNodesOnlyMesh.html) for details.
          */
         NodesOnlyMesh<2> mesh;
         /* To run node-based simulations you need to define a cut off length (second argument in
@@ -313,7 +313,8 @@ public:
          * which restricts cells to lie on a sphere (in 3D) or circle (in 2D).
          *
          * For a list of possible boundary conditions see subclasses of {{{AbstractCellPopulationBoundaryCondition}}}.
-         * These can be found in the inheritance diagram, here, [class:AbstractCellPopulationBoundaryCondition AbstractCellPopulationBoundaryCondition].
+         * These can be found in the inheritance diagram, here,
+         * [AbstractCellPopulationBoundaryCondition](https://chaste.github.io/doxygen-latest/classAbstractCellPopulationBoundaryCondition.html).
          * Note that some of these boundary conditions are not compatible with node-based simulations see the specific class documentation for details,
          * if you try to use an incompatible class then you will receive a warning.
          *
