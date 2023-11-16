@@ -246,7 +246,8 @@ def generate_markdown_file(how_tos: list[HowTo]) -> None:
 
             # Iterate over sorted secondary categories within each primary category
             for secondary in sorted(how_to_dict[primary]):
-                f.write(f'\n### {secondary}\n')
+                if secondary != "":
+                    f.write(f'\n### {secondary}\n')
 
                 # Write each how-to markdown snippet
                 for how_to in how_to_dict[primary][secondary]:
