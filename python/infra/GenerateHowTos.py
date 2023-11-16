@@ -218,7 +218,7 @@ def howto_to_markdown_snippet(how_to: HowTo) -> str:
     :param how_to: A HowTo namedtuple containing the how-to text, line number, test file name, and GitHub link.
     :return: A string formatted in markdown, with the how-to text and a link to the corresponding line in the GitHub repository.
     """
-    return f'- {how_to.how_to_text}\n  > [line {how_to.line_number} of {how_to.test_name}]({how_to.github_link})'
+    return f'- {how_to.how_to_text}\n  - [line {how_to.line_number} of {how_to.test_name}]({how_to.github_link})'
 
 
 def generate_markdown_file(how_tos: list[HowTo]) -> None:
