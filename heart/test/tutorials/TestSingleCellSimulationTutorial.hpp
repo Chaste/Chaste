@@ -139,7 +139,7 @@ public:
          * accurate enough to meet your tolerances.
          *
          *
-         * A common error from CVODE is '''TOO_MUCH_WORK''', this means CVODE tried to exceed the maximum number of
+         * A common error from CVODE is **TOO_MUCH_WORK**, this means CVODE tried to exceed the maximum number of
          * internal time steps it is allowed to do. You can try using the method `SetMaxSteps` to change
          * the default (500) to a larger value, with a command like:
          *
@@ -149,7 +149,7 @@ public:
          * but if you were running for a long time (e.g. 1000 paces in one Solve call) you would need to increase this.
          *
          * Another common error from CVODE is:
-         * '''the error test failed repeatedly or with |h| = hmin.'''
+         * **the error test failed repeatedly or with |h| = hmin.**
          *
          * Since we don't change hmin (and it defaults to a very small value), this generally means the
          * ODE system has got to a situation where refining the timestep is not helping the convergence.
@@ -184,7 +184,8 @@ public:
          *
          * You can also change any parameters that are labelled in the cell model.
          *
-         * Instructions for annotating parameters can be found at [wiki:ChasteGuides/CodeGenerationFromCellML]
+         * Instructions for annotating parameters can be found at
+         * [ChasteGuides/CodeGenerationFromCellML](https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CodeGenerationFromCellML)
          *
          * Here we show how to change the parameter dictating the maximal conductance of the IKs current.
          * Note this call actually leaves it unchanged from the default,
@@ -242,7 +243,8 @@ public:
          * This call will add to the solution object the ODE system's labelled "derived quantities"
          * these are things that are not state variables, but are calculated from state variables
          * (e.g. currents), and have been tagged in the CellML file with metadata.
-         * See [wiki:ChasteGuides/CodeGenerationFromCellML] for annotation instructions.
+         * See [CodeGenerationFromCellML](https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CodeGenerationFromCellML)
+         * for annotation instructions.
          */
         solution.CalculateDerivedQuantitiesAndParameters(p_model.get());
 

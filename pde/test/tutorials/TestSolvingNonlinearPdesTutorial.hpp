@@ -219,12 +219,12 @@ public:
          */
         Vec initial_guess = PetscTools::CreateAndSetVec(mesh.GetNumNodes(), 0.25);
 
-        /* '''Optional:''' To use Chaste's Newton solver to solve nonlinear vector equations that are
+        /* **Optional:** To use Chaste's Newton solver to solve nonlinear vector equations that are
          * assembled, rather than the default PETSc nonlinear solvers, we can
          * do the following: */
         SimpleNewtonNonlinearSolver newton_solver;
         solver.SetNonlinearSolver(&newton_solver);
-        /* '''Optional:''' We can also manually set tolerances, and whether to print statistics, with
+        /* **Optional:** We can also manually set tolerances, and whether to print statistics, with
          * this nonlinear vector equation solver */
         newton_solver.SetTolerance(1e-10);
         newton_solver.SetWriteStats();

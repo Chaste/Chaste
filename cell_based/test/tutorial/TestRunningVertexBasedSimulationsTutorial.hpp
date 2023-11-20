@@ -164,7 +164,8 @@ public:
         * of each cell in a cell population. For this test, we use one force law, based on the
         * Nagai-Honda mechanics, and pass it to the {{{OffLatticeSimulation}}}.
         * For a list of possible forces see subclasses of {{{AbstractForce}}}.
-        * These can be found in the inheritance diagram, here, [class:AbstractForce AbstractForce].
+        * These can be found in the inheritance diagram, here,
+        * [AbstractForce](https://chaste.github.io/doxygen-latest/classAbstractForce).
         * Note that some of these forces are not compatible with vertex-based simulations see the specific class documentation for details,
         * if you try to use an incompatible class then you will receive a warning.
         */
@@ -253,7 +254,7 @@ public:
          * we use a {{{PlaneBoundaryCondition}}}, and pass it to the {{{OffLatticeSimulation}}}.
          * For a list of possible boundary condition see subclasses of {{{AbstractCellPopulationBoundaryCondition}}}.
          * These can be found in the inheritance diagram, here,
-         * [class:AbstractCellPopulationBoundaryCondition AbstractCellPopulationBoundaryCondition].
+         * [AbstractCellPopulationBoundaryCondition](https://chaste.github.io/doxygen-latest/classAbstractCellPopulationBoundaryCondition.html).
          * Note that some of these boundary conditions are not compatible with vertex-based
          * simulations see the specific class documentation for details, if you try to use an
          * incompatible class then you will receive a warning.
@@ -272,7 +273,7 @@ public:
          * from the simulation. For this test, we use a {{{PlaneBasedCellKiller}}}, and pass
          * it to the {{{OffLatticeSimulation}}}. For a list of possible cell killers see subclasses
          * of {{{AbstractCellKiller}}}. These can be found in the inheritance diagram, here,
-         * [class:AbstractCellKiller AbstractCellKiller].
+         * [AbstractCellKiller](https://chaste.github.io/doxygen-latest/classAbstractCellKiller.html).
          *
          * The first step is to define a point on the plane boundary and a normal to the plane.
          * We reuse the point and normal from the {{{PlaneBoundaryCondition}}}.

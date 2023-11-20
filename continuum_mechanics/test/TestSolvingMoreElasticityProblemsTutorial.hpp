@@ -169,7 +169,7 @@ public:
         TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 6u);
         /* Visualise as before.
          *
-         * '''Advanced:''' Note that the function `MyTraction` takes in time, which it didn't use. In the above it would have been called
+         * **Advanced:** Note that the function `MyTraction` takes in time, which it didn't use. In the above it would have been called
          * with t=0. The current time can be set using `SetCurrentTime()`. The idea is that the user may want to solve a
          * sequence of static problems with time-dependent tractions (say), for which they should allow `MyTraction` to
          * depend on time, and put the solve inside a time-loop, for example:

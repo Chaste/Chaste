@@ -234,7 +234,7 @@ public: // Tests should be public!
         bidomain_problem.Initialise();
         bidomain_problem.Solve();
 
-        /* The results can be visualised as before. '''Note:''' The voltage is only
+        /* The results can be visualised as before. **Note:** The voltage is only
          * defined at cardiac nodes (a node contained in ''any'' cardiac element), but
          * for visualisation and computation a 'fake' value of ZERO is given for the
          * voltage at bath nodes.

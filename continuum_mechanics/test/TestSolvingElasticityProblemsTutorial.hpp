@@ -75,10 +75,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  * Specify TRACTION BOUNDARY CONDITIONS (if non-zero) on the rest of the boundary -- tractions are forces per unit area applied
  *  the rest of the surface of the deformable object.
  *
- *  '''VERY IMPORTANT NOTE:''' For incompressible problems, make sure you read the comment about HYPRE below before going to
+ *  **VERY IMPORTANT NOTE:** For incompressible problems, make sure you read the comment about HYPRE below before going to
  *  3D or refining meshes in these tests.
  *
- * '''Another note:''' mechanics problems are not currently implemented to scale in parallel yet.
+ * **Another note:** mechanics problems are not currently implemented to scale in parallel yet.
  *
  * As always we include this first class as a test suite */
 #include <cxxtest/TestSuite.h>
@@ -201,7 +201,7 @@ public:
         solver.Solve();
 
 
-        /* '''Visualisation'''. Go to the folder `SimpleIncompressibleElasticityTutorial` in your test-output directory.
+        /* **Visualisation**. Go to the folder `SimpleIncompressibleElasticityTutorial` in your test-output directory.
          * There should be 2 files, initial.nodes and solution.nodes. These are the original nodal positions and the deformed
          * positions. Each file has two columns, the x and y locations of each node. To visualise the solution in say
          * Matlab or Octave, you could do: `x=load('solution.nodes'); plot(x(:,1),x(:,2),'k*')`. For Cmgui output, see below.
@@ -372,7 +372,7 @@ public:
      * Mechanics solves being nonlinear are expensive, so it is recommended you also use `CMAKE_BUILD_TYPE=Release` when running with CMake
      * on larger problems.
      *
-     * When running '''incompressible''' problems in 3D, or with more elements, it is vital to also change the linear solver to use HYPRE, an algebraic multigrid
+     * When running **incompressible** problems in 3D, or with more elements, it is vital to also change the linear solver to use HYPRE, an algebraic multigrid
      * solver. Without HYRPE, the linear solve (i) may become very very slow; or (ii) may not converge, in which case the nonlinear
      * solve will (probably) not converge. HYPRE is (currently) not a pre-requisite for installing Chaste, hence this is not (currently)
      * the default linear solver for incompressible mechanics problems, although this will change in the future.
