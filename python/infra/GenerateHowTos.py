@@ -249,7 +249,7 @@ def generate_markdown_file(how_tos: list[HowTo]) -> None:
                     f.write(f'\n### {secondary}\n')
 
                 # Write each how-to markdown snippet
-                for how_to in how_to_dict[primary][secondary]:
+                for how_to in sorted(how_to_dict[primary][secondary], key=lambda x: (x.test_name, x.line_number)):
                     f.write(howto_to_markdown_snippet(how_to) + '\n')
 
         f.write(PAGE_FOOTER)
