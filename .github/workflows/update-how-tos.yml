@@ -65,7 +65,6 @@ jobs:
 #        working-directory: chaste-website
 
       - name: Commit and push if changed
-        if: steps.file_check.outputs.changed == 'true'
         run: |
           git config user.name "github-action"
           git config user.email "github-action"
