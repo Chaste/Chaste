@@ -262,7 +262,7 @@ public:
          * stopping event defined, using the same solver as before. */
         MyOdeWithStoppingEvent my_ode_stopping;
 
-        /* '''Note:''' ''when a {{{std::vector}}} is passed in as an initial condition
+        /* **Note:** ''when a {{{std::vector}}} is passed in as an initial condition
          * to a {{{Solve}}} call, it gets updated as the solve takes place''. Therefore, if
          * we want to use the same initial condition again, we have to reset it back to 1.0. */
         initial_condition[0] = 1.0;

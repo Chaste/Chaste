@@ -131,11 +131,11 @@ public:
         EXIT_IF_PARALLEL;
 
         /*
-         * First we want to create a '''non-periodic''' 'honeycomb' mesh.
+         * First we want to create a **non-periodic** 'honeycomb' mesh.
          * We use the honeycomb mesh generator, as before, saying 10 cells wide
          * and 10 cells high. Note that the thickness of the ghost nodes layer is
          * 0, i.e. there are no ghost nodes, and the {{{false}}} indicates that the
-         * returned mesh is '''not''' cylindrical. In contrast to the crypt simulation
+         * returned mesh is **not** cylindrical. In contrast to the crypt simulation
          * tutorial, here we call {{{GetMesh()}}} on the {{{HoneycombMeshGenerator}}}
          * object to return the mesh, which is of type {{{MutableMesh}}}.
          */

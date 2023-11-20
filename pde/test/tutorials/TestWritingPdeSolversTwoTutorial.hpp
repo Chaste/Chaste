@@ -63,7 +63,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  We will take as the test problem the heat equation, `u_t = u_{xx}`, with Dirichlet
  *  BCs `u = u*` on `Gamma1` and `du/dn = g` on `Gamma2`.
  *
- *  We write a solver which uses an '''explicit''' time-discretisation (as opposed to the implicit
+ *  We write a solver which uses an **explicit** time-discretisation (as opposed to the implicit
  *  discretisations used throughout the rest of the code). The FEM linear system that needs to be set up is
  *  {{{
  *  M U^{n+1} = (M + dt K) U^{n}  +  c
@@ -193,7 +193,7 @@ private:
          * one of our purpose-built `RhsMatrixAssemblers`, pass it the matrix `mRhsMatrix`, and
          * tell it to assemble.
          *
-         * '''Important note''': if any of the assemblers will require the current solution (ie solution
+         * **Important note**: if any of the assemblers will require the current solution (ie solution
          * at the current timestep), this needs to be passed to the assembler, as in the commented
          * line below.
          */

@@ -323,7 +323,7 @@ public:
 
         /*
         * HOW_TO_TAG Cardiac/Problem definition
-        * Set discrete '''ellipsoid''' areas to have heterogeneous (intra- and/or extra-cellular) conductivity tensors.
+        * Set discrete **ellipsoid** areas to have heterogeneous (intra- and/or extra-cellular) conductivity tensors.
         */
         std::vector<ChasteEllipsoid<3> > heterogeneity_area;
         std::vector< c_vector<double,3> > intra_conductivities;

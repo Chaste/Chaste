@@ -123,7 +123,8 @@ public:
          * of cell cycle model required (here {{{UniformCellCycleModel}}})
          * and the dimension.
          * For a list of possible cell cycle models see subclasses of {{{AbstractCellCycleModel}}}.
-         * These can be found in the inheritance diagram, here, [class:AbstractCellCycleModel AbstractCellCycleModel].
+         * These can be found in the inheritance diagram, here,
+         * [AbstractCellCycleModel](https://chaste.github.io/doxygen-latest/classAbstractCellCycleModel.html).
          * Note that some of these models will require information on the surrounding medium such as Oxygen concentration to work,
          * see specific class documentation for details. Some of these will be covered in later tutorials (UserTutorials/RunningContactInhibitionSimulations,
          * UserTutorials/RunningDeltaNotchSimulations, and UserTutorials/RunningTumourSpheroidSimulations).
@@ -169,7 +170,8 @@ public:
          * of each cell in a cell population. For this test, we use one force law, based on the
          * spring based model, and pass it to the {{{OffLatticeSimulation}}}.
          * For a list of possible forces see subclasses of {{{AbstractForce}}}.
-         * These can be found in the inheritance diagram, here, [class:AbstractForce AbstractForce].
+         * These can be found in the inheritance diagram, here,
+         * [AbstractForce](https://chaste.github.io/doxygen-latest/classAbstractForce.html).
          * Note that some of these forces are not compatible with mesh-based simulations,
          * see the specific class documentation for details.  If you try to use an incompatible class
          * then you will receive a warning.
@@ -192,7 +194,8 @@ public:
      * We may have to do: {{{javac Visualize2dCentreCells.java}}} beforehand to create the
      * java executable.
      *
-     * For further details on visualization, see [wiki:ChasteGuides/RunningCellBasedVisualization].
+     * For further details on visualization, see
+     * [ChasteGuides/RunningCellBasedVisualization](https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/RunningCellBasedVisualization).
      *
      * You will notice that half of each cell cell around the edge is missing.
      * This is because the Voronoi region for nodes on the edge of the mesh can be

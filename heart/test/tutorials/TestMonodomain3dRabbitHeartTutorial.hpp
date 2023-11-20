@@ -183,7 +183,7 @@ public:
 };
 
 /*
- * '''Note''' if you were doing a 'real' scientific simulation you would want to use a higher
+ * **Note** if you were doing a 'real' scientific simulation you would want to use a higher
  * resolution mesh. A version of this can be found on the [http://www.cs.ox.ac.uk/chaste/download.html Chaste download website]
  *
  * Navigate to the "Data" tab, and download either
