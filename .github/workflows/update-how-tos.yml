@@ -31,3 +31,44 @@ jobs:
           name: how-to-markdown
           path: |
             chaste_howto_webpage.md
+
+  upload-to-website:
+    needs: generate-how-to-markdown
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Download how-to markdown
+        uses: actions/download-artifact@v3
+        with:
+          name: how-to-markdown
+
+      - name: Checkout website repository
+        uses: actions/checkout@v4
+        with:
+          repository: Chaste/Chaste.github.io
+          token: ${{ secrets.WEBSITE_ACCESS }}
+          path: chaste-website
+          fetch-depth: 0  # Fetch all history for all tags and branches
+
+      - name: Copy markdown to website repository
+        run: |
+          cp chaste_howto_webpage.md chaste-website/site/content/en/docs/how-tos/_index.md
+
+#      - name: Commit and push if changed
+#        if: steps.file_check.outputs.changed == 'true'
+#        run: |
+#          git config user.name "github-action"
+#          git config user.email "github-action"
+#          git add --all
+#          git commit -m "update how-tos page" || echo "No changes to commit"
+#          git push
+#        working-directory: chaste-website
+
+      - name: Commit and push if changed
+        if: steps.file_check.outputs.changed == 'true'
+        run: |
+          git config user.name "github-action"
+          git config user.email "github-action"
+          git status
+          git diff
+        working-directory: chaste-website
