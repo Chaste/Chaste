@@ -6,7 +6,7 @@ on:
       - '**'
   push:
     branches:
-      - howto
+      - develop
   workflow_dispatch:
 
 jobs:
