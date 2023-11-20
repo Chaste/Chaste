@@ -52,7 +52,7 @@ jobs:
 
       - name: Copy markdown to website repository
         run: |
-          cp chaste_howto_webpage.md chaste-website/site/content/en/docs/how-tos/_index.md
+          cp chaste_howto_webpage.md chaste-website/site/content/docs/how-tos/_index.md
 
       - name: Commit and push if changed
         run: |
