@@ -172,8 +172,11 @@ public:
 
     /**
      * Constructor which takes in a vector of nodes.
+     * 
+     * The full tetrahedral mesh is internally constructed automatically via a call to ReMesh().
+     * The nodes you have supplied will eventually be deleted by the mesh destructor, you don't need to delete them yourself.
      *
-     * @param nodes  a vector of nodes
+     * @param nodes  a vector of pointers to nodes
      */
     MutableMesh(std::vector<Node<SPACE_DIM> *> nodes);
 
