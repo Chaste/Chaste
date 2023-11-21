@@ -46,11 +46,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTRUNNINGDELTANOTCHSIMULATIONSTUTORIAL_HPP_
 
 /*
- * = An example showing how to run Delta/Notch simulations =
+ * ## An example showing how to run Delta/Notch simulations
  *
  * EMPTYLINE
  *
- * == Introduction ==
+ * ### Introduction
  *
  * EMPTYLINE
  *
@@ -67,7 +67,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * EMPTYLINE
  *
- * == The test ==
+ * ### The test
  *
  * EMPTYLINE
  *
@@ -119,7 +119,7 @@ public:
     /*
      * EMPTYLINE
      *
-     * == Test 1: a vertex-based monolayer with Delta/Notch signalling ==
+     * ### Test 1: a vertex-based monolayer with Delta/Notch signalling
      *
      * EMPTYLINE
      *
@@ -203,7 +203,7 @@ public:
      *
      * EMPTYLINE
      *
-     * == Test 2 - a node-based monolayer with Delta/Notch signalling ==
+     * ### Test 2 - a node-based monolayer with Delta/Notch signalling
      *
      * EMPTYLINE
      *

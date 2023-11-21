@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /*
- * = An example showing how to run a bidomain simulation for tissue contained in a perfusing bath =
+ * ## An example showing how to run a bidomain simulation for tissue contained in a perfusing bath
  *
  * In this tutorial we show how the changes the need to be made when running a simulation of
  * cardiac tissue contained in a bath.

@@ -45,15 +45,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTRUNNINGPOTTSBASEDSIMULATIONSTUTORIAL_HPP_
 
 /*
- * = Examples showing how to create, run and visualize Potts-based simulations =
+ * ## Examples showing how to create, run and visualize Potts-based simulations
  *
- * == Introduction ==
+ * ### Introduction
  *
  * In this tutorial we show how Chaste can be used to create, run and visualize Potts-based simulations.
  * Full details of the mathematical model can be found in Graner, F. and Glazier, J. A. (1992). Simulation
  * of biological cell sorting using a two-dimensional extended Potts model. Phys. Rev. Lett., 69(13):2015–2016.
  *
- * == The test ==
+ * ### The test
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary header files.
  */
@@ -93,7 +93,7 @@ class TestRunningPottsBasedSimulationsTutorial : public AbstractCellBasedWithTim
 public:
     /* EMPTYLINE
      *
-     * == Test 1 - a basic Potts-based simulation ==
+     * ### Test 1 - a basic Potts-based simulation
      *
      * EMPTYLINE
      *
@@ -230,7 +230,7 @@ public:
      *
      * EMPTYLINE
      *
-     * == Test 2 - Cell Sorting ==
+     * ### Test 2 - Cell Sorting
      *
      * EMPTYLINE
      *
@@ -329,7 +329,7 @@ public:
      *
      * EMPTYLINE
      *
-     * == Test 3 - 3D Cell Sorting ==
+     * ### Test 3 - 3D Cell Sorting
      *
      * EMPTYLINE
      *

@@ -50,9 +50,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /*
- * = An example showing how to run bidomain simulations =
+ * ## An example showing how to run bidomain simulations
  *
- * == Introduction ==
+ * ### Introduction
  *
  * In this tutorial we show how Chaste is used to run a standard bidomain simulation.
  * Note that monodomain simulations are run very similarly.
@@ -89,7 +89,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /*
- * == Defining a cell factory ==
+ * ### Defining a cell factory
  *
  * All mono/bidomain simulations need a ''cell factory'' as input. This is a class
  * which tells the problem class what type of cardiac cells to create. The cell-factory
@@ -156,7 +156,7 @@ public:
 };
 
 /*
- * == Running the bidomain simulation ==
+ * ### Running the bidomain simulation
  *
  * Now we can define the test class, which must inherit from {{{CxxTest::TestSuite}}}
  * as described in the writing basic tests tutorial. */
@@ -238,7 +238,7 @@ public:
         bidomain_problem.Solve();
 
         /*
-         * == Examining the output ==
+         * ### Examining the output
          * In order to visualise the results, go to one of the sub-folders
          *  * `/tmp/$USER/testoutput/BidomainTutorial/output` for Meshalyzer
          *  * `/tmp/$USER/testoutput/BidomainTutorial/cmgui_output` for Cmgui

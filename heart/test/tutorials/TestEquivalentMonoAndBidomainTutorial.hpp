@@ -46,9 +46,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* [[PageOutline]]
  *
- * = How to run a Bidomain simulation and its equivalent Monodomain reduction =
+ * ## How to run a Bidomain simulation and its equivalent Monodomain reduction
  *
- * == Introduction ==
+ * ### Introduction
  *
  * In this tutorial we show how Chaste is used to run a standard mono and a standard bidomain simulation.
  * With equivalent parameters so that the bidomain could be reduced to the monodomain case.
@@ -79,7 +79,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LuoRudy1991.hpp"
 
 
-// * == Defining a cell factory ==
+// * ### Defining a cell factory
 // *
 // * All mono/bidomain simulations need a ''cell factory'' as input. This is a class
 // * which tells the problem class what type of cardiac cells to create. The cell-factory
@@ -144,7 +144,7 @@ public:
 };
 
 ///*
-// * == Running the mono- and bi-domain simulations ==
+// * ### Running the mono- and bi-domain simulations
 // *
 // * Now we can define the test class, which must inherit from {{{CxxTest::TestSuite}}}
 // * as described in the writing basic tests tutorial. */
@@ -180,7 +180,7 @@ public:
         PointStimulus2dCellFactory cell_factory;
 
         /*
-         * == Setting Bidomain Conductivities ==
+         * ### Setting Bidomain Conductivities
          */
         c_vector<double,2> intracellular_conductivities = Create_c_vector(1.75, 0.19);
         c_vector<double,2> extracellular_conductivities = Create_c_vector(7, 0.76);
@@ -235,7 +235,7 @@ public:
              */
 
             /*
-             * == Reduction to Monodomain  ==
+             * ### Reduction to Monodomain
              *
              * We now work out the equivalent conductivity to use in the monodomain. Note that
              * we set this with the `SetIntracellularConductivities()` method. Which is perhaps

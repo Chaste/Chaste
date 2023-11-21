@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTMONODOMAIN3DEXAMPLEWITHCVODETUTORIAL_HPP_
 
 /*
- * = 3D monodomain example using CVODE for ODE solution =
+ * ## 3D monodomain example using CVODE for ODE solution
  *
  * This tutorial is based on [wiki:UserTutorials/Monodomain3dExample Monodomain3dExample] except this time we will
  * use CVODE solvers. To highlight the changes needed to run with CVODE we omit the usual

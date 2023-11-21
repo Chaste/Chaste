@@ -45,15 +45,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTRUNNINGVERTEXBASEDCRYPTSIMULATIONSTUTORIAL_HPP_
 
 /*
- * = Examples showing how to create, run and visualize vertex-based simulations on periodic meshes with different cell-cycle models =
+ * ## Examples showing how to create, run and visualize vertex-based simulations on periodic meshes with different cell-cycle models
  *
- * == Introduction ==
+ * ### Introduction
  *
  * In this tutorial we show how Chaste can be used to create, run and visualize vertex-based simulations.
  * This mechanical model was originally proposed by T. Nagai and H. Honda ("A dynamic cell model for
  * the formation of epithelial tissues", Philosophical Magazine Part B 81:699-719).
  *
- * == The test ==
+ * ### The test
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary header files.
  */
@@ -105,7 +105,7 @@ public:
     /* EMPTYLINE
      *
      *
-     * == Test 1 - create a vertex-based crypt simulation ==
+     * ### Test 1 - create a vertex-based crypt simulation
      *
      * EMPTYLINE
      *
@@ -188,7 +188,7 @@ public:
      *
      * EMPTYLINE
      *
-     * == Test 2 - create a vertex-based crypt simulation with a simple wnt dependent cell-cycle model ==
+     * ### Test 2 - create a vertex-based crypt simulation with a simple wnt dependent cell-cycle model
      *
      * EMPTYLINE
      *

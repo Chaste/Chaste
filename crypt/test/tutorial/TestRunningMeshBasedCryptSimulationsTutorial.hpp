@@ -45,11 +45,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTRUNNINGMESHBASEDCRYPTSIMULATIONSTUTORIAL_HPP_
 
 /*
- * = Examples showing how to run crypt simulations on periodic meshes with different cell-cycle models =
+ * ## Examples showing how to run crypt simulations on periodic meshes with different cell-cycle models
  *
  * EMPTYLINE
  *
- * == Introduction ==
+ * ### Introduction
  *
  * EMPTYLINE
  *
@@ -119,7 +119,7 @@ class TestRunningMeshBasedCryptSimulationsTutorial : public AbstractCellBasedTes
 public:
     /* EMPTYLINE
      *
-     * == Test 1: a basic crypt simulation ==
+     * ### Test 1: a basic crypt simulation
      *
      * EMPTYLINE
      *
@@ -223,7 +223,7 @@ public:
      *
      * EMPTYLINE
      *
-     * == Test 2: a Wnt-dependent crypt simulation ==
+     * ### Test 2: a Wnt-dependent crypt simulation
      *
      * EMPTYLINE
      *

@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /*
- * = An example showing how generate a complete conducting airway model given segmentations of CT airways and lobes =
+ * ## An example showing how generate a complete conducting airway model given segmentations of CT airways and lobes
  *
  * In this tutorial we demonstrate using Chaste's airway generation algorithm to create a complete model of
  * the conducting airways (mean generation ~16) from computed tomography segmentations. Note that the execution

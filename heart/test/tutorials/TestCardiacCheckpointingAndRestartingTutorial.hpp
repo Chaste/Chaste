@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /*
- * = Checkpointing and restarting cardiac simulations =
+ * ## Checkpointing and restarting cardiac simulations
  *
  * In this tutorial we show how to save and reload cardiac simulations
  *
@@ -129,7 +129,7 @@ public:
     }
 };
 
-/* == Notes ==
+/* ### Notes
  *
  * * Making a checkpoint does add a significant overhead at present, in particular because the mesh is
  *   written out to disk at each checkpoint. This is to ensure that each checkpoint directory contains everything

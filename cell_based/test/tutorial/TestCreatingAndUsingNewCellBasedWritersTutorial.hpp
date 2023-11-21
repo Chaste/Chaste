@@ -46,9 +46,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCREATINGANDUSINGNEWCELLBASEDWRITERSTUTORIAL_HPP_
 
 /*
- * = An example showing how to create a new cell writer and use it in a cell-based simulation =
+ * ## An example showing how to create a new cell writer and use it in a cell-based simulation
  *
- * == Introduction ==
+ * ### Introduction
  *
  * EMPTYLINE
  *
@@ -62,7 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * different data from a cell-based simulation. Our example will be a writer class for outputting
  * information about those cells in a simulation that have the {{{MotileCellProperty}}}.
  *
- * == 1. Including header files ==
+ * ### 1. Including header files
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary header file and
  * archiving headers. For simplicity, we duplicate the code presented in [wiki:UserTutorials/CreatingAndUsingANewCellProperty]
@@ -121,7 +121,7 @@ public:
 /*
  * EMPTYLINE
  *
- * == Defining a cell writer class ==
+ * ### Defining a cell writer class
  *
  * We next define a class that writes information about each cell in the population, using
  * the public methods of the population class.

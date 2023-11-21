@@ -46,9 +46,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTRUNNIGCONTACTINHIBITIONSIMULATIONSTUTORIAL_HPP_
 
 /*
- * = An example showing how to use a contact inhibition cell cycle model and volume tracking simulation modifier =
+ * ## An example showing how to use a contact inhibition cell cycle model and volume tracking simulation modifier
  *
- * == Introduction ==
+ * ### Introduction
  *
  * In this tutorial, we will show how to use a simple implementation of the contact inhibition cell-cycle model,
  * which prevents a cell from undergoing division when its volume is smaller than a critical value.
@@ -60,7 +60,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * We then go on to consider the behaviour of a vertex-based population in a box that experiences contact inhibition.
  *
- * == Including header files ==
+ * ### Including header files
  *
  * We begin by including the necessary header files. */
 #include <cxxtest/TestSuite.h>
@@ -121,7 +121,7 @@ class TestRunningContactInhibitionSimulationsTutorial : public AbstractCellBased
 {
 public:
     /*
-     * == Testing healthy cell contact inhibition with mesh-based population ==
+     * ### Testing healthy cell contact inhibition with mesh-based population
      *
      * In this first test we show how to simulate the behaviour of cells healthy cells trapped in a box.
      * Each cell will only divide if there is sufficient room.
@@ -228,7 +228,7 @@ public:
      *
      * EMPTYLINE
      *
-     * == Testing normal and tumour cells with mesh-based population ==
+     * ### Testing normal and tumour cells with mesh-based population
      *
      * We now test the behaviour of a mixture of healthy and tumour cells in a Box. In this test healthy cells will only
      * divide if there is sufficient room whereas tumour cells will divide regardless.
@@ -335,7 +335,7 @@ public:
      *
      * EMPTYLINE
      *
-     * == Testing contact inhibition in vertex-based monolayer ==
+     * ### Testing contact inhibition in vertex-based monolayer
      *
      * We now test the behaviour of normal contact inhibited cells for a vertex-based population.
      * The example we use is a growing monolayer.

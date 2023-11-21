@@ -46,11 +46,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCREATINGANDUSINGANEWCELLPOPULATIONBOUNDARYCONDITIONTUTORIAL_HPP_
 
 /*
- * = An example showing how to create and use a new cell population boundary condition =
+ * ## An example showing how to create and use a new cell population boundary condition
  *
  * EMPTYLINE
  *
- * == Introduction ==
+ * ### Introduction
  *
  * EMPTYLINE
  *
@@ -60,7 +60,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * EMPTYLINE
  *
- * == 1. Including header files ==
+ * ### 1. Including header files
  *
  * EMPTYLINE
  *
@@ -89,7 +89,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * EMPTYLINE
  *
- * == Defining the cell population boundary condition class ==
+ * ### Defining the cell population boundary condition class
  *
  * As an example, let us consider a boundary condition for a two-dimensional cell-based
  * simulation, in which all cells are constrained to lie within the domain given in
@@ -235,7 +235,7 @@ namespace boost
  *
  * EMPTYLINE
  *
- * === The Tests ===
+ * #### The Tests
  *
  * EMPTYLINE
  *
@@ -248,7 +248,7 @@ public:
     /*
      * EMPTYLINE
      *
-     * == Testing the cell population boundary condition ==
+     * ### Testing the cell population boundary condition
      *
      * EMPTYLINE
      *
@@ -321,7 +321,7 @@ public:
     }
 
     /*
-     * == Using the boundary condition in a cell-based simulation ==
+     * ### Using the boundary condition in a cell-based simulation
      *
      * We now provide a test demonstrating how {{{MyBoundaryCondition}}} can be used
      * in a cell-based simulation.

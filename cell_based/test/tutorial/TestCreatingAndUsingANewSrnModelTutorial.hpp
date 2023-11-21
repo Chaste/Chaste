@@ -46,15 +46,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCREATINGANDUSINGANEWSRNMODELTUTORIAL_HPP_
 
 /*
- * = An example showing how to create a new subcellular reaction network (SRN) model and use it in a cell-based simulation. =
+ * ## An example showing how to create a new subcellular reaction network (SRN) model and use it in a cell-based simulation.
  *
- * == Introduction ==
+ * ### Introduction
  *
  * In the previous cell-based Chaste tutorials, we used existing cell-cycle and SRN models to define how cells
  * proliferate and update and subcellular model. In this tutorial, we show how to create a new SRN model class, and how this
  * can be used in a cell-based simulation.
  *
- * == Including header files ==
+ * ### Including header files
  *
  * We begin by including the necessary header files. */
 #include <cxxtest/TestSuite.h>
@@ -102,7 +102,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakePetscSetup.hpp"
 
 /*
- * == Defining the SRN model and ODE system classes ==
+ * ### Defining the SRN model and ODE system classes
  *
  * As an example, let us consider a SRN model in which we solve a simple ODE
  * dx/dt = -0.25*y
@@ -290,7 +290,7 @@ EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(MySrnModel)
  * This completes the code for {{{MySrnModel}}}. Note that usually this code would
  * be separated out into a separate declaration in a .hpp file and definition in a .cpp file.
  *
- * === The Tests ===
+ * #### The Tests
  *
  * We now define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}.
  */
@@ -299,7 +299,7 @@ class TestCreatingAndUsingANewSrnModelTutorial : public AbstractCellBasedTestSui
 public:
 
     /*
-     * == Testing the SRN model ==
+     * ### Testing the SRN model
      *
      * We begin by testing that our new cell-cycle model is implemented correctly.
      */
@@ -416,7 +416,7 @@ public:
     }
 
     /*
-     * == Using the SRN model in a cell-based simulation ==
+     * ### Using the SRN model in a cell-based simulation
      *
      * We conclude with a brief test demonstrating how {{{MySrnModel}}} can be used
      * in a cell-based simulation.

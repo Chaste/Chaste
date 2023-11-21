@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTANOTHERBIDOMAINSIMULATIONTUTORIAL_HPP_
 #define TESTANOTHERBIDOMAINSIMULATIONTUTORIAL_HPP_
 /*
- * = Another example showing how to run a bidomain simulation =
+ * ## Another example showing how to run a bidomain simulation
  *
  * In this tutorial we run another bidomain simulation,
  * showing (i) an example using one of the source cell factories, (ii) how to define

@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /*
- * = An example showing how to calculate transfer impedance of an airway tree using a simple impedance model =
+ * ## An example showing how to calculate transfer impedance of an airway tree using a simple impedance model
  *
  * In this tutorial we demonstrate the use of !SimpleImpedanceProblem to calculate transfer impedance on an
  * airway tree model. We further demonstrate post-processing of the output using !ImpedancePostProcessor to

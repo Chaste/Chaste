@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTBIDOMAINWITHBATHANDFIBRESTUTORIAL_HPP_
 #define TESTBIDOMAINWITHBATHANDFIBRESTUTORIAL_HPP_
 /*
- * = Running a bidomain simulation with a bath and fibres =
+ * ## Running a bidomain simulation with a bath and fibres
  *
  * In this tutorial we run a bidomain simulation with both a bath and fibres
  *

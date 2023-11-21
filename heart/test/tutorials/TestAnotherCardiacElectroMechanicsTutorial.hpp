@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTANOTHERCARDIACELECTROMECHANICSTUTORIAL_HPP_
 
 /*
- * = Cardiac Electro-mechanical Problems (cont.) =
+ * ## Cardiac Electro-mechanical Problems (cont.)
  *
  * It is worth running this test suite with `build=GccOpt_ndebug`
  *
@@ -101,7 +101,7 @@ public:
      * Run electro-mechanics with mechano-electric feedback
      */
 
-    /* == Mechano-electric feedback, and alternative boundary conditions ==
+    /* ### Mechano-electric feedback, and alternative boundary conditions
      *
      * Let us now run a simulation with mechano-electric feedback (MEF), and with different boundary conditions.
      */
@@ -274,7 +274,7 @@ public:
      * Run electro-mechanics with inflation pressures
      */
 
-    /* == Internal pressures ==
+    /* ### Internal pressures
      *
      * Next, we run a simulation on a 2d annulus, with an internal pressure applied.
      */

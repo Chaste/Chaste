@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTWRITINGTESTTUTORIAL_HPP_
 
 /*
- * = Writing tests =
+ * ## Writing tests
  * We do not use `int main()` methods in Chaste. Instead, we write ''tests'', which are run using !CxxTest.
  * Tests are used both as:
  * (i) part of the testing environment - every class in the source code has an equivalent test file which tests each aspect of its functionality, making use of the `TS_ASSERT`s as described below; and

@@ -46,9 +46,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCREATINGANDUSINGANEWCELLPROPERTYTUTORIAL_HPP_
 
 /*
- * = An example showing how to create a new cell property and use it in a cell-based simulation =
+ * ## An example showing how to create a new cell property and use it in a cell-based simulation
  *
- * == Introduction ==
+ * ### Introduction
  *
  * EMPTYLINE
  *
@@ -63,7 +63,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * class, and how this can be used in a cell-based simulation. We will also use a simple
  * new force to illustrate what you can do with cell properties (and also mutations).
  *
- * == 1. Including header files ==
+ * ### 1. Including header files
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary
  * header file and archiving headers.
@@ -93,7 +93,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakePetscSetup.hpp"
 
 /*
- * == Defining the cell property class ==
+ * ### Defining the cell property class
  *
  * As an example, let us consider a cell property class that is used to label
  * those cells that are "motile". This cell property could then be used when
@@ -152,7 +152,7 @@ public:
 /*
  * EMPTYLINE
  *
- * == Defining the motive force class ==
+ * ### Defining the motive force class
  *
  * In order to illustrate the use of cell properties we make a simple force law which
  * causes all cells with the {{{MotileCellProperty}}} to move towards the origin. To do this we
@@ -259,7 +259,7 @@ CHASTE_CLASS_EXPORT(MyMotiveForce)
  *
  * EMPTYLINE
  *
- * == The Tests ==
+ * ### The Tests
  *
  * We now define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}.
  */
@@ -268,7 +268,7 @@ class TestCreatingAndUsingANewCellPropertyTutorial : public AbstractCellBasedTes
 public:
 
     /*
-     * === Testing the cell property ===
+     * #### Testing the cell property
      *
      * We begin by testing that our new cell property is implemented correctly.
      */
@@ -338,7 +338,7 @@ public:
     }
 
     /*
-     * === Using the cell property in a cell-based simulation ===
+     * #### Using the cell property in a cell-based simulation
      *
      * We conclude with a brief test demonstrating how {{{MotileCellProperty}}} can be used
      * in a cell-based simulation.

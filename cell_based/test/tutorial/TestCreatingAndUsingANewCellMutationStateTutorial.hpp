@@ -46,11 +46,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCREATINGANDUSINGANEWCELLMUTATIONSTATETUTORIAL_HPP_
 
 /*
- * = An example showing how to create a new cell mutation state and use it in a cell-based simulation =
+ * ## An example showing how to create a new cell mutation state and use it in a cell-based simulation
  *
  * EMPTYLINE
  *
- * == Introduction ==
+ * ### Introduction
  *
  * EMPTYLINE
  *
@@ -60,7 +60,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * EMPTYLINE
  *
- * == 1. Including header files ==
+ * ### 1. Including header files
  *
  * EMPTYLINE
  *
@@ -90,7 +90,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * EMPTYLINE
  *
- * == Defining the cell mutation state class ==
+ * ### Defining the cell mutation state class
  *
  * As an example, let us consider a cell mutation state representing the p53
  * 172R-H gain-of-function mutant, which is equivalent to the common 175R-H
@@ -148,7 +148,7 @@ CHASTE_CLASS_EXPORT(P53GainOfFunctionCellMutationState)
  *
  * EMPTYLINE
  *
- * === The Tests ===
+ * #### The Tests
  *
  * EMPTYLINE
  *
@@ -161,7 +161,7 @@ public:
     /*
      * EMPTYLINE
      *
-     * == Testing the cell mutation state ==
+     * ### Testing the cell mutation state
      *
      * EMPTYLINE
      *
@@ -239,7 +239,7 @@ public:
     /*
      * EMPTYLINE
      *
-     * == Using the cell mutation state in a cell-based simulation ==
+     * ### Using the cell mutation state in a cell-based simulation
      *
      * EMPTYLINE
      *

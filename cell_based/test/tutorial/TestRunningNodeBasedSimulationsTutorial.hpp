@@ -45,11 +45,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTRUNNINGNODEBASEDSIMULATIONSTUTORIAL_HPP_
 
 /*
- * = Examples showing how to create, run and visualize node-based simulations =
+ * ## Examples showing how to create, run and visualize node-based simulations
  *
  * EMPTYLINE
  *
- * == Introduction ==
+ * ### Introduction
  *
  * EMPTYLINE
  *
@@ -59,7 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * EMPTYLINE
  *
- * == The test ==
+ * ### The test
  *
  * EMPTYLINE
  *
@@ -94,7 +94,7 @@ class TestRunningNodeBasedSimulationsTutorial : public AbstractCellBasedTestSuit
 public:
     /* EMPTYLINE
      *
-     * == Test 1 - a basic node-based simulation ==
+     * ### Test 1 - a basic node-based simulation
      *
      * EMPTYLINE
      *
@@ -183,7 +183,7 @@ public:
      *
      * EMPTYLINE
      *
-     * == Test 2 - a basic node-based simulation in 3D ==
+     * ### Test 2 - a basic node-based simulation in 3D
      *
      * EMPTYLINE
      *
@@ -263,7 +263,7 @@ public:
      *
      * EMPTYLINE
      *
-     * == Test 3 - a node-based simulation on a restricted geometry ==
+     * ### Test 3 - a node-based simulation on a restricted geometry
      *
      * EMPTYLINE
      *

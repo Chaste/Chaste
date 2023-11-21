@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTSOLVINGMOREELASTICITYPROBLEMSTUTORIAL_HPP_
 #define TESTSOLVINGMOREELASTICITYPROBLEMSTUTORIAL_HPP_
 
-/* == Introduction ==
+/* ### Introduction
  *
  * In this second solid mechanics tutorial, we illustrate some other possibilities: using tractions
  * that are defined with a function, or tractions that depend on the deformed body (eg normal pressure
@@ -83,7 +83,7 @@ class TestSolvingMoreElasticityProblemsTutorial : public CxxTest::TestSuite
 {
 public:
 
-    /* == Incompressible deformation: non-zero displacement boundary conditions, functional tractions ==
+    /* ### Incompressible deformation: non-zero displacement boundary conditions, functional tractions
      *
      * We now consider a more complicated example. We prescribe particular new locations for the nodes
      * on the Dirichlet boundary, and also show how to prescribe a traction that is given in functional form
@@ -190,7 +190,7 @@ public:
         TS_ASSERT_DELTA(solver.rGetDeformedPosition()[98](1), 0.5638, 1e-3);
     }
 
-    /* == Sliding boundary conditions ==
+    /* ### Sliding boundary conditions
      *
      * It is common to require a Dirichlet boundary condition where the displacement/position in one dimension
      * is fixed, but the displacement/position in the others are free. This can be easily done when
@@ -250,7 +250,7 @@ public:
         TS_ASSERT_DELTA(solver.rGetDeformedPosition()[10](1), 0.0, 1e-3);
     }
 
-    /* == Compressible deformation, and other bits and pieces ==
+    /* ### Compressible deformation, and other bits and pieces
      *
      * In this test, we will show the (very minor) changes required to solve a compressible nonlinear
      * elasticity problem, we will describe and show how to specify 'pressure on deformed body'

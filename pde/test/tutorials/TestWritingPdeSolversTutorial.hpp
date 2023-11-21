@@ -55,7 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /*
- * == Introduction ==
+ * ### Introduction
  *
  * Chaste can be used to set up solvers for more general (coupled) PDEs. To do this the
  * user just needs to code up the integrands of any finite element (FE) matrices or vectors,
@@ -95,7 +95,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * case described above (in which both A and b in Ax=b are assembled), we can use the design
  * where the solver IS AN assembler. We illustrate how to do this in the first tutorial.
  *
- * == Writing solvers ==
+ * ### Writing solvers
  *
  * Let us write a solver for the coupled 2-unknown problem
  * {{{
@@ -254,7 +254,7 @@ public:
  *  That is the solver written. The usage is the same as see the PDE solvers described in the
  *  previous tutorials - have a look at the first test below.
  *
- *  == A solver of 3 parabolic equations ==
+ *  ### A solver of 3 parabolic equations
  *
  *  Let us also write a solver for the following problem, which is composed of 3 parabolic PDEs
  *  {{{

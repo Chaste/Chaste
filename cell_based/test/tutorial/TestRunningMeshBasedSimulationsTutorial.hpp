@@ -45,14 +45,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTRUNNINGMESHBASEDSIMULATIONSTUTORIAL_HPP_
 
 /*
- * = Examples showing how to create, run and visualize mesh-based simulations =
+ * ## Examples showing how to create, run and visualize mesh-based simulations
  *
- * == Introduction ==
+ * ### Introduction
  *
  * In this tutorial we show how Chaste can be used to create, run and visualize mesh-based simulations.
  * Full details of the mathematical model can be found in van Leeuwen ''et al.'' (2009) [doi:10.1111/j.1365-2184.2009.00627.x].
  *
- * == The test ==
+ * ### The test
  *
  * We begin by including the necessary header files. The first thing to do is include the
  * following header file, which allows us to use certain methods in our test. This header
@@ -102,7 +102,7 @@ class TestRunningMeshBasedSimulationsTutorial : public AbstractCellBasedTestSuit
 {
 public:
     /*
-     * == Test 1 - a basic mesh-based simulation ==
+     * ### Test 1 - a basic mesh-based simulation
      *
      * In the first test, we run a simple mesh-based simulation, in which we create a monolayer
      * of cells, using a mutable mesh. Each cell is assigned a stochastic cell-cycle model.
@@ -216,7 +216,7 @@ public:
      * real nodes). In addition real nodes exert forces on ghost nodes so the ghost nodes
      * remain surrounding the cell population.
      *
-     * == Test 2 - a basic mesh-based simulation with ghost nodes ==
+     * ### Test 2 - a basic mesh-based simulation with ghost nodes
      *
      * In the second test, we run a simple mesh-based simulation with ghost nodes, in which we
      * create a monolayer of cells, using a mutable mesh.

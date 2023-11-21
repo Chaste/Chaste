@@ -45,11 +45,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTRUNNINGVERTEXBASEDSIMULATIONSTUTORIAL_HPP_
 
 /*
- * = Examples showing how to create, run and visualize vertex-based simulations =
+ * ## Examples showing how to create, run and visualize vertex-based simulations
  *
  * EMPTYLINE
  *
- * == Introduction ==
+ * ### Introduction
  *
  * EMPTYLINE
  *
@@ -59,7 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * EMPTYLINE
  *
- * == The test ==
+ * ### The test
  *
  * EMPTYLINE
  *
@@ -108,7 +108,7 @@ class TestRunningVertexBasedSimulationsTutorial : public AbstractCellBasedTestSu
 public:
     /* EMPTYLINE
     *
-    * == Test 1 - a basic vertex-based simulation ==
+    * ### Test 1 - a basic vertex-based simulation
     *
     * EMPTYLINE
     *
@@ -199,7 +199,7 @@ public:
     *
     * EMPTYLINE
     *
-    * == Test 2 - introducing periodicity, boundaries and cell killers ==
+    * ### Test 2 - introducing periodicity, boundaries and cell killers
     *
     * EMPTYLINE
     *

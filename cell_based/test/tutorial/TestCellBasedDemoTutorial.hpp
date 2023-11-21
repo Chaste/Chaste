@@ -45,9 +45,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCELLBASEDDEMOTUTORIAL_HPP_
 
 /*
- * = Examples showing how to create, run and cell-based simulations in Chaste =
+ * ## Examples showing how to create, run and cell-based simulations in Chaste
  *
- * == Introduction ==
+ * ### Introduction
  *
  * This tutorial is designed to give you a quick introduction to running cell-based
  * simulations in Chaste. Full details are postponed until later tutorials.
@@ -59,7 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *   * how to specify how to remove cells; and
  *   * how to change cell-cycle models.
  *
- * == The test ==
+ * ### The test
  *
  * We begin by including the necessary header files. These will be described in detail in
  * subsequent cell-based tutorials.
@@ -108,7 +108,7 @@ class TestCellBasedDemoTutorial : public AbstractCellBasedTestSuite
 {
 public:
     /*
-     * == Test 1 - a basic vertex-based simulation ==
+     * ### Test 1 - a basic vertex-based simulation
      *
      * In the first test, we run a simple vertex-based simulation of an epithelial monolayer.
      * Each cell in the simulation is assigned a simple stochastic cell-cycle model, the cells will divide randomly and never stop proliferating.
@@ -192,7 +192,7 @@ public:
      *
      * EMPTYLINE
      *
-     * == Test 2 - basic node-based simulation ==
+     * ### Test 2 - basic node-based simulation
      *
      * We next show how to modify the previous test to implement a 'node-based' simulation,
      * in which cells are represented by overlapping spheres (actually circles, since we're
@@ -259,7 +259,7 @@ public:
      *
      * As described above, the {{{make_a_movie}}} script can be used to generate a video based on the results of your simulation.
      *
-     * == Test 3 - basic mesh-based simulation ==
+     * ### Test 3 - basic mesh-based simulation
      *
      * We next show how to modify the previous test to implement a 'mesh-based' simulation,
      * in which cells are represented by their centres and a Voronoi tessellation is used to
@@ -310,7 +310,7 @@ public:
      * The results may be visualized using {{{Visualize2dCentreCells}}} as described in the
      * previous test, with the results directory changed from {{{CellBasedDemo2}}} to {{{CellBasedDemo3}}}.
      *
-     * == Test 4 - basic mesh-based simulation with ghost nodes ==
+     * ### Test 4 - basic mesh-based simulation with ghost nodes
      *
      * We next show how to modify the previous test to include 'ghost nodes', which do not
      * correspond to cells but are sometimes needed when using a Voronoi tessellation. We
@@ -364,7 +364,7 @@ public:
      * The results may be visualized using {{{Visualize2dCentreCells}}} as described in the
      * previous test, with the results directory changed from {{{CellBasedDemo3}}} to {{{CellBasedDemo4}}}.
      *
-     * == Test 5 - basic periodic mesh-based simulation ==
+     * ### Test 5 - basic periodic mesh-based simulation
      *
      * We next show how to modify the previous test to implement a periodic boundary to the
      * left and right of the domain.
@@ -409,7 +409,7 @@ public:
      * The results may be visualized using {{{Visualize2dCentreCells}}} as described in the
      * previous test, with the results directory changed from {{{CellBasedDemo4}}} to {{{CellBasedDemo5}}}.
      *
-     * == Test 6 - basic periodic mesh-based simulation with obstructions ==
+     * ### Test 6 - basic periodic mesh-based simulation with obstructions
      *
      * We next show how to modify the previous test to include one
      * or more 'obstructions' within the domain.
@@ -458,7 +458,7 @@ public:
      * The results may be visualized using {{{Visualize2dCentreCells}}} as described in the
      * previous test, with the results directory changed from {{{CellBasedDemo5}}} to {{{CellBasedDemo6}}}.
      *
-     * == Test 7 - basic Potts-based simulation ==
+     * ### Test 7 - basic Potts-based simulation
      *
      * In the final test we show how to modify the earlier tests (using off lattice models) to implement a 'Potts-based' simulation,
      * in which cells are represented by collections of sites on a fixed lattice.

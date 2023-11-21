@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /*
- * = Examples showing how to solve a system of coupled linear parabolic PDEs and ODEs =
+ * ## Examples showing how to solve a system of coupled linear parabolic PDEs and ODEs
  *
  * In this tutorial we show how Chaste can be used to solve a system of coupled linear
  * parabolic PDEs and ODEs. This test uses the `LinearParabolicPdeSystemWithCoupledOdeSystemSolver`.
@@ -90,7 +90,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TrianglesMeshReader.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
-/* == Test 1: Solving the Schnackenberg system ==
+/* ### Test 1: Solving the Schnackenberg system
  *
  * Here, we solve the Schnackenberg system of PDEs, given by
  *

@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /*
- *  == Introduction ==
+ *  ### Introduction
  *
  *  In the previous tutorial we showed how a PDE solver could be written for the
  *  'simple' case in which the FEM discretisation leads to a linear system Ax=b where
@@ -95,7 +95,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "HeatEquation.hpp"
 //#include "SimpleLinearParabolicSolver.hpp"
 
-/* == Writing assemblers ==
+/* ### Writing assemblers
  *
  * We need to write an assembler for setting up the matrix `M + dt K`.
  *
@@ -166,7 +166,7 @@ public:
 };
 /* That's the assembler written. The following solver class will show how to use it.
  *
- * == Writing the solver class ==
+ * ### Writing the solver class
  *
  * The parent class here is `AbstractDynamicLinearPdeSolver`, which contains a linear system
  * (`this->mpLinearSystem`), and will deal with allocating memory and solving the linear system.
@@ -257,7 +257,7 @@ public:
 };
 /* That's all that needs to be written to write your own solver using the solver hierarchy
  *
- * = A test using the solver =
+ * ## A test using the solver
  *
  * The following test uses the new solver. Since the interface is exactly the same as the
  * other solvers, except for not taking in a PDE (the fact that it solves a parameterless

@@ -47,9 +47,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /*
- * = An example showing how to create a new cell-based simulation modifier and use it in a simulation =
+ * ## An example showing how to create a new cell-based simulation modifier and use it in a simulation
  *
- * == Introduction ==
+ * ### Introduction
  *
  * EMPTYLINE
  *
@@ -58,7 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * hierarchy is used to implement setup, update and finalise methods in cell-based
  * simulations.
  *
- * == 1. Including header files ==
+ * ### 1. Including header files
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary
  * header file and archiving headers.
@@ -86,7 +86,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakePetscSetup.hpp"
 
 /*
- * == Defining the cell-based simulation modifier class ==
+ * ### Defining the cell-based simulation modifier class
  *
  * As an example, let us consider a simulation modifier that, at each simulation
  * time step, calculates each cell's height (y coordinate) in a two-dimensional
@@ -210,7 +210,7 @@ CHASTE_CLASS_EXPORT(CellHeightTrackingModifier)
 /*
  * EMPTYLINE
  *
- * == The Tests ==
+ * ### The Tests
  *
  * We now define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}.
  */
@@ -219,7 +219,7 @@ class TestCreatingAndUsingANewCellBasedSimulationModifierTutorial : public Abstr
 public:
 
     /*
-     * === Using the modifier in a cell-based simulation ===
+     * #### Using the modifier in a cell-based simulation
      *
      * We conclude with a brief test demonstrating how {{{CellHeightTrackingModifier}}} can be used
      * in a cell-based simulation.

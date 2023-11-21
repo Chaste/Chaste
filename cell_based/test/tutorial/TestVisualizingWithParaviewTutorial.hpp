@@ -45,11 +45,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTVISUALIZINGWITHPARAVIEWTUTORIAL_HPP_
 
 /*
- * = Examples showing how to visualize simulations in Paraview =
+ * ## Examples showing how to visualize simulations in Paraview
  *
  * EMPTYLINE
  *
- * == Introduction ==
+ * ### Introduction
  *
  * EMPTYLINE
  *
@@ -66,7 +66,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * EMPTYLINE
  *
- * == The test ==
+ * ### The test
  *
  * EMPTYLINE
  *
@@ -106,7 +106,7 @@ class TestVisualizingWithParaviewTutorial : public AbstractCellBasedTestSuite
 public:
     /* EMPTYLINE
      *
-     * == Test 1 - a mesh-based cell centre monolayer simulation ==
+     * ### Test 1 - a mesh-based cell centre monolayer simulation
      *
      * EMPTYLINE
      *
@@ -194,7 +194,7 @@ public:
     *
     * EMPTYLINE
     *
-    * == Test 2 - a periodic mesh-based cell centre monolayer simulation ==
+    * ### Test 2 - a periodic mesh-based cell centre monolayer simulation
      *
      * EMPTYLINE
      *
@@ -262,7 +262,7 @@ public:
     *
     * EMPTYLINE
     *
-    * == Test 3 - a node-based simulation ==
+    * ### Test 3 - a node-based simulation
     *
      * EMPTYLINE
      *
@@ -319,7 +319,7 @@ public:
     *
     * EMPTYLINE
     *
-    * == Test 4 - a basic vertex-based simulation ==
+    * ### Test 4 - a basic vertex-based simulation
     *
      * EMPTYLINE
      *

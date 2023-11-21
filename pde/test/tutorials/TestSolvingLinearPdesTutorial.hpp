@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /*
- * = Examples showing how to solve linear elliptic and parabolic PDEs =
+ * ## Examples showing how to solve linear elliptic and parabolic PDEs
  *
  * In this tutorial we show how Chaste can be used to solve linear PDEs. The first test
  * uses the `SimpleLinearEllipticSolver` to solve a linear elliptic PDE, and the
@@ -84,7 +84,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * cannot be included in the source code. */
 #include "PetscSetupAndFinalize.hpp"
 
-/* == Test 1: Solving a linear elliptic PDE ==
+/* ### Test 1: Solving a linear elliptic PDE
  *
  * Here, we solve the PDE: div(D grad u) + u + x^2^+y^2^ = 0, in 2D, where
  * D is the diffusion tensor (2 0; 0 1) (ie D11=2, D12=D21=0, D22=1), on a square
@@ -293,7 +293,7 @@ public:
     }
 
     /*
-     * == Test 2: Solving a linear parabolic PDE ==
+     * ### Test 2: Solving a linear parabolic PDE
      *
      * Now we solve a parabolic PDE. We choose a simple problem so that the code changes
      * needed from the elliptic case are clearer. We will solve

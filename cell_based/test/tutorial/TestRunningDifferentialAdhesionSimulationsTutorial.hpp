@@ -46,16 +46,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTRUNNINGDIFFERENTIALADHESIONSIMULATIONSTUTORIAL_HPP_
 
 /*
- * = An example showing how to simulate cell sorting due to differential adhesion in a vertex-based model =
+ * ## An example showing how to simulate cell sorting due to differential adhesion in a vertex-based model
  *
- * == Introduction ==
+ * ### Introduction
  *
  * In this tutorial we show how Chaste can be used to simulate a growing cell monolayer culture
  * comprising two distinct cell types, which exhibit differential adhesion. We encountered a
  * similar implementation in the second test in the TestRunningPottsBasedSimulationsTutorial,
  * which used a cellular Potts model of cell interactions; here we use a vertex-based model.
  *
- * == The test ==
+ * ### The test
  *
  * As in previous tutorials, we begin by including the necessary header files. We have
  * encountered these files already. Recall that often, either {{{CheckpointArchiveTypes.hpp}}}

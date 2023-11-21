@@ -46,11 +46,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTRUNNINGTUMOURSPHEROIDSIMULATIONSTUTORIAL_HPP_
 
 /*
- * = An example showing how to run tumour spheroid simulations =
+ * ## An example showing how to run tumour spheroid simulations
  *
  * EMPTYLINE
  *
- * == Introduction ==
+ * ### Introduction
  *
  * EMPTYLINE
  *
@@ -68,7 +68,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * EMPTYLINE
  *
- * == The test ==
+ * ### The test
  *
  * EMPTYLINE
  *

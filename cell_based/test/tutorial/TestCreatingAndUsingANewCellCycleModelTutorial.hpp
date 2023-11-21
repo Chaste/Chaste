@@ -46,15 +46,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCREATINGANDUSINGANEWCELLCYCLEMODELTUTORIAL_HPP_
 
 /*
- * = An example showing how to create a new cell-cycle model and use it in a cell-based simulation =
+ * ## An example showing how to create a new cell-cycle model and use it in a cell-based simulation
  *
- * == Introduction ==
+ * ### Introduction
  *
  * In the previous cell-based Chaste tutorials, we used existing cell-cycle models to define how cells
  * proliferate. In this tutorial, we show how to create a new cell-cycle model class, and how this
  * can be used in a cell-based simulation.
  *
- * == Including header files ==
+ * ### Including header files
  *
  * We begin by including the necessary header files. */
 #include <cxxtest/TestSuite.h>
@@ -93,7 +93,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakePetscSetup.hpp"
 
 /*
- * == Defining the cell-cycle model class ==
+ * ### Defining the cell-cycle model class
  *
  * As an example, let us consider a cell-cycle model in which the durations
  * of S, G2 and M phases are fixed, but the duration of G1 phase is an exponential
@@ -231,7 +231,7 @@ CHASTE_CLASS_EXPORT(MyCellCycleModel)
  * This completes the code for {{{MyCellCycleModel}}}. Note that usually this code would
  * be separated out into a separate declaration in a .hpp file and definition in a .cpp file.
  *
- * === The Tests ===
+ * #### The Tests
  *
  * We now define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}.
  */
@@ -240,7 +240,7 @@ class TestCreatingAndUsingANewCellCycleModelTutorial : public AbstractCellBasedT
 public:
 
     /*
-     * == Testing the cell-cycle model ==
+     * ### Testing the cell-cycle model
      *
      * We begin by testing that our new cell-cycle model is implemented correctly.
      */
@@ -374,7 +374,7 @@ public:
     }
 
     /*
-     * == Using the cell-cycle model in a cell-based simulation ==
+     * ### Using the cell-cycle model in a cell-based simulation
      *
      * We conclude with a brief test demonstrating how {{{MyCellCycleModel}}} can be used
      * in a cell-based simulation.

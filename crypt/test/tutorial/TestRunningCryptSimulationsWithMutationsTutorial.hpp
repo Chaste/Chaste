@@ -45,9 +45,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTRUNNINGCRYPTSIMULATIONSWITHMUTATIONSTUTORIAL_HPP_
 
 /*
- * = Examples showing how to run crypt simulations with various mutations =
+ * ## Examples showing how to run crypt simulations with various mutations
  *
- * == Introduction ==
+ * ### Introduction
  *
  * This tutorial assumes you have already read UserTutorials/RunningMeshBasedCryptSimulations.
  *
@@ -115,7 +115,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestRunningCryptSimulationsWithMutationsTutorial : public AbstractCellBasedTestSuite
 {
 public:
-    /* == Test 1: a mesh-based crypt simulation with mutations ==
+    /* ### Test 1: a mesh-based crypt simulation with mutations
      *
      * In the first test, we demonstrate how to introduce mutations into a simulation of a crypt.
      */

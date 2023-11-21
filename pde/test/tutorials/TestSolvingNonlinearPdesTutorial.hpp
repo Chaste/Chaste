@@ -55,7 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /*
- * = An example showing how to solve a nonlinear elliptic PDE. Also includes function-based boundary conditions. =
+ * ## An example showing how to solve a nonlinear elliptic PDE. Also includes function-based boundary conditions.
  *
  * In this tutorial we show how Chaste can be used to solve nonlinear elliptic PDEs.
  * We will solve the PDE div.(u grad u) + 1 = 0, on a square domain, with boundary

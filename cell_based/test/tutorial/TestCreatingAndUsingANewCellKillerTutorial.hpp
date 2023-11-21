@@ -46,16 +46,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCREATINGANDUSINGANEWCELLKILLERTUTORIAL_HPP_
 
 /*
- * = An example showing how to create a new cell killer and use it in a cell-based simulation =
+ * ## An example showing how to create a new cell killer and use it in a cell-based simulation
  *
- * == Introduction ==
+ * ### Introduction
  *
  * In the crypt tutorial, we used an existing cell killer class to define
  * how cells were sloughed off the top of a crypt. In this tutorial we show
  * how to create a new cell killer class, and how this can be used in a cell-based
  * simulation.
  *
- * == 1. Including header files ==
+ * ### 1. Including header files
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary
  * header file and archiving headers.
@@ -88,7 +88,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakePetscSetup.hpp"
 
 /*
- * == Defining the cell killer class ==
+ * ### Defining the cell killer class
  *
  * As an example, let us consider a cell killer that labels any cells in a
  * two-dimensional cell population which lie outside the elliptical domain given in
@@ -196,7 +196,7 @@ namespace boost
  * would be separated out into a separate declaration in a .hpp file and definition
  * in a .cpp file.
  *
- * === The Tests ===
+ * #### The Tests
  *
  * We now define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}.
  */
@@ -205,7 +205,7 @@ class TestCreatingAndUsingANewCellKillerTutorial : public AbstractCellBasedTestS
 public:
 
     /*
-     * == Testing the cell killer ==
+     * ### Testing the cell killer
      *
      * We begin by testing that our new cell-cycle model is implemented correctly.
      */
@@ -300,7 +300,7 @@ public:
     }
 
     /*
-     * == Using the cell killer in a cell-based simulation ==
+     * ### Using the cell killer in a cell-based simulation
      *
      * We now provide a test demonstrating how {{{MyCellKiller}}} can be used
      * in a cell-based simulation.

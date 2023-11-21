@@ -45,9 +45,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * [[PageOutline]]
  *
- * = An example showing how to run a single cell simulation =
+ * ## An example showing how to run a single cell simulation
  *
- * == Introduction ==
+ * ### Introduction
  *
  * In this tutorial we run a single cell simulation,
  * showing:
@@ -85,7 +85,7 @@ public:
  * (see InstallCvode and ChasteGuides/CmakeBuildGuide). */
 #ifdef CHASTE_CVODE
         /*
-         * == Defining a CVODE model ==
+         * ### Defining a CVODE model
          *
          * Setup a CVODE model that has empty solver and stimulus
          * This is necessary to initialise the cell model.
@@ -118,7 +118,7 @@ public:
         p_regular_stim->SetPeriod(1000.0);
 
         /*
-         * == Numerical Considerations ==
+         * ### Numerical Considerations
          *
          * Cardiac cell models can be pretty tricky to deal with, as they are very stiff and sometimes full
          * of singularities.
@@ -180,7 +180,7 @@ public:
          */
 
         /*
-         * == Changing Parameters in the Cell Model ==
+         * ### Changing Parameters in the Cell Model
          *
          * You can also change any parameters that are labelled in the cell model.
          *
@@ -194,7 +194,7 @@ public:
         p_model->SetParameter("membrane_slow_delayed_rectifier_potassium_current_conductance", 0.07);
 
         /*
-         * == Running model to steady state ==
+         * ### Running model to steady state
          *
          * Now we run the model to steady state.
          * You can detect for steady state alternans by giving it true as a second parameter
@@ -215,7 +215,7 @@ public:
         TS_ASSERT_EQUALS(result, false);
 
         /*
-         * == Getting detail for paces of interest ==
+         * ### Getting detail for paces of interest
          *
          * Now we solve for the number of paces we are interested in.
          *
@@ -261,7 +261,7 @@ public:
         solution.WriteToFile("TestCvodeCells", "Shannon2004Cvode", "ms", steps_per_row, clean_dir, precision, include_derived_quantities);
 
         /*
-         * == Calculating APD and Upstroke Velocity ==
+         * ### Calculating APD and Upstroke Velocity
          *
          * Calculate APD and upstroke velocity using {{{CellProperties}}}
          */

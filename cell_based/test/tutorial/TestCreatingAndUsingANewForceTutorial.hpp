@@ -46,11 +46,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCREATINGANDUSINGANEWFORCETUTORIAL_HPP_
 
 /*
- * = An example showing how to create and use a new force =
+ * ## An example showing how to create and use a new force
  *
  * EMPTYLINE
  *
- * == Introduction ==
+ * ### Introduction
  *
  * EMPTYLINE
  *
@@ -61,7 +61,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * EMPTYLINE
  *
- * == 1. Including header files ==
+ * ### 1. Including header files
  *
  * EMPTYLINE
  *
@@ -90,7 +90,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * EMPTYLINE
  *
- * == Defining the force class ==
+ * ### Defining the force class
  *
  * As an example, let us consider a force for a two-dimensional cell-based
  * simulation, that mimics gravity. To implement this we define a force
@@ -189,7 +189,7 @@ CHASTE_CLASS_EXPORT(MyForce)
  *
  * EMPTYLINE
  *
- * === The Tests ===
+ * #### The Tests
  *
  * EMPTYLINE
  *
@@ -202,7 +202,7 @@ public:
     /*
      * EMPTYLINE
      *
-     * == Testing the force ==
+     * ### Testing the force
      *
      * EMPTYLINE
      *
@@ -274,7 +274,7 @@ public:
     }
 
     /*
-     * == Using the force in a cell-based simulation ==
+     * ### Using the force in a cell-based simulation
      *
      * We now provide a test demonstrating how {{{MyForce}}} can be used
      * in a cell-based simulation.

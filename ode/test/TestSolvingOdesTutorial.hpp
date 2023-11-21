@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTSOLVINGODESTUTORIAL_HPP_
 #define TESTSOLVINGODESTUTORIAL_HPP_
 /*
- * = In this tutorial we show how Chaste can be used to solve an ODE system =
+ * ## In this tutorial we show how Chaste can be used to solve an ODE system
  *
  * The following header files need to be included.
  * First we include the header needed to define this class as a test suite. */
@@ -76,7 +76,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakePetscSetup.hpp"
 
 /*
- * == Defining the ODE classes ==
+ * ### Defining the ODE classes
  *
  * Let us solve the ODE dy/dt = y^2^+t^2^, with y(0) = 1. To do so, we have to define
  * our own ODE class, inheriting from {{{AbstractOdeSystem}}}, which implements the
@@ -213,9 +213,9 @@ void OdeSystemInformation<My2dOde>::Initialise()
 }
 
 /*
- * == The Tests ==
+ * ### The Tests
  *
- * === Standard ODE solving ===
+ * #### Standard ODE solving
  *
  * Now we can define the test, in which the ODEs are solved. */
 class TestSolvingOdesTutorial: public CxxTest::TestSuite
@@ -275,7 +275,7 @@ public:
     }
 
     /*
-     * === ODE solving using state variables ===
+     * #### ODE solving using state variables
      *
      * In this second test, we show how to do an alternative version of ODE solving, which
      * does not involve passing in initial conditions and returning an {{{OdeSolution}}}.
@@ -302,7 +302,7 @@ public:
     }
 
     /*
-     * === Solving n-dimensional ODEs ===
+     * #### Solving n-dimensional ODEs
      *
      * Finally, here's a simple test showing how to solve a 2d ODE using the first method.
      * All that is different is the initial condition has be a vector of length 2, and returned
