@@ -46,6 +46,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: user-tutorial-markdown
+          path: tutorials/UserTutorials
 
       - name: Checkout website repository
         uses: actions/checkout@v4
@@ -58,15 +59,17 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R
 
-#      - name: Copy markdown to website repository
-#        run: |
-#          cp chaste_howto_webpage.md chaste-website/site/content/docs/how-tos/_index.md
-#
-#      - name: Commit and push if changed
-#        run: |
-#          git config user.name "github-action"
-#          git config user.email "github-action"
+      - name: Copy markdown to website repository
+        run: |
+          cp tutorials/UserTutorials/*.md chaste-website/site/content/docs/user-tutorials/
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-action"
+          git config user.email "github-action"
+          git status
+          git diff
 #          git add --all
 #          git commit -m "update how-tos page" || echo "No changes to commit"
 #          git push
-#        working-directory: chaste-website
+        working-directory: chaste-website
