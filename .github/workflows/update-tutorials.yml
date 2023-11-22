@@ -1,17 +1,19 @@
-name: Tutorials
+name: Update tutorials
 
 on:
+  pull_request:
+    branches:
+      - '**'
   push:
     branches:
       - i55-tutorial
+  workflow_dispatch:
 
 jobs:
   
-  build-and-test:
-
-#    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
-
-    runs-on: ubuntu-22.04
+  generate-tutorial-markdown:
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
 
     env:
       CHASTE_DIR: ${{ github.workspace }}/Chaste
@@ -53,7 +55,7 @@ jobs:
           repository: Chaste/Chaste.github.io
           path: Chaste.github.io
           fetch-depth: 0
-          token: ${{ secrets.TUTORIALS_ACCESS }}
+          token: ${{ secrets.WEBSITE_ACCESS }}
 
       - name: copy results
         run: |
