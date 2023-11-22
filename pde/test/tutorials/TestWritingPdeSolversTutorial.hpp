@@ -98,24 +98,28 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * ### Writing solvers
  *
  * Let us write a solver for the coupled 2-unknown problem
- * {{{
- *    Laplacian(u) + v = f(x,y)
- *    Laplacian(v) + u = g(x,y)
- * }}}
- * where `Laplacian(u)` of course represents u,,xx,,+u,,yy,, and where f and g are chosen so that,
+ *
+ * ```
+ * Laplacian(u) + v = f(x,y)
+ * Laplacian(v) + u = g(x,y)
+ * ```
+ *
+ * where `Laplacian(u)` of course represents u_xx + u_yy and where f and g are chosen so that,
  * with zero-dirichlet boundary conditions, the solution is given by u = sin(pi*x)sin(pi*x),
  * v = sin(2*pi*x)sin(2*pi*x).
  *
- *( As a brief aside, note that the solver we write will in fact work with general Dirichlet-Neumann
+ * (As a brief aside, note that the solver we write will in fact work with general Dirichlet-Neumann
  * boundary conditions, though the test will only provide all-Dirichlet boundary conditions. We
  * save a discussion on general Dirichlet-Neumann boundary conditions for the second example.)
  *
  * Using linear basis functions, and a mesh with N nodes, the linear system that needs to be set up is
  * of size 2N by 2N, and in block form is:
- * {{{
- *   [ K   -M  ] [U]  =  [b1]
- *   [ -M   K  ] [V]     [b2]
- * }}}
+ *
+ * ```
+ * [ K   -M  ] [U]  =  [b1]
+ * [ -M   K  ] [V]     [b2]
+ * ```
+ *
  * where `K` is the stiffness matrix, `M` the mass matrix, `U` the vector of nodal values
  * of u, `V` the vector of nodal values of v, `b1` the vector with entries `integral(f\phi_i dV)` (i=1,..,N)
  * and `b2` has entries `integral(g\phi_i dV)` (here `phi_i` are the linear basis functions).
@@ -257,11 +261,13 @@ public:
  *  ### A solver of 3 parabolic equations
  *
  *  Let us also write a solver for the following problem, which is composed of 3 parabolic PDEs
- *  {{{
- *    u_t = Laplacian(u) + v
- *    v_t = Laplacian(v) + u + 2w
- *    w_t = Laplacian(w) + g(t,x,y)
- *  }}}
+ *
+ *  ```
+ *  u_t = Laplacian(u) + v
+ *  v_t = Laplacian(v) + u + 2w
+ *  w_t = Laplacian(w) + g(t,x,y)
+ *  ```
+ *
  *  where g(t,x,y) = t if x>0.5 and 0 otherwise. This time we assume general
  *  Dirichlet-Neumann boundary conditions will be specified.
  *
@@ -273,19 +279,22 @@ public:
  *  `du/dn = s1, dv/dn = s2, dw/dn + (Dgradu).n = s3`.
  *
  *  We need to choose a time-discretisation. Let us choose an implicit discretisation, ie
- *  {{{
+ *
+ *  ```
  *  (u^{n+1} - u^{n})/dt = Laplacian(u^{n+1}) + v^{n+1}
  *  (v^{n+1} - v^{n})/dt = Laplacian(v^{n+1}) + u^{n+1} + 2w^{n+1}
  *  (w^{n+1} - w^{n})/dt = Laplacian(w^{n+1}) + g(t^{n+1},x)
- *  }}}
+ *  ```
  *
  *  Using linear basis functions, and a mesh with N nodes, the linear system that needs to be set up is
  *  of size 3N by 3N, and in block form is:
- *  {{{
- *    [ M/dt+K     -M       0    ] [U^{n+1}]  =  [b1]  +  [c1]
- *    [   -M     M/dt+K    -2M   ] [V^{n+1}]     [b2]  +  [c2]
- *    [    0        0     M/dt+K ] [W^{n+1}]     [b3]  +  [c3]
- *  }}}
+ *
+ *  ```
+ *  [ M/dt+K     -M       0    ] [U^{n+1}]  =  [b1]  +  [c1]
+ *  [   -M     M/dt+K    -2M   ] [V^{n+1}]     [b2]  +  [c2]
+ *  [    0        0     M/dt+K ] [W^{n+1}]     [b3]  +  [c3]
+ *  ```
+ *
  * where `K` is the stiffness matrix, `M` the mass matrix, `U^n` the vector of nodal values
  * of u at time t_n, etc, `b1` has entries `integral( (u^n/dt)phi_i dV )`, and similarly for
  * `b2` and `b3`. Writing the Neumann boundary conditions for
@@ -519,7 +528,8 @@ public:
          * can be used to do this, though it is not claimed to be very robust). As an
          * example matlab visualisation script, the following, if run from the output
          * directory, plots w:
-         * {{{
+         *
+         * ```matlab
          * pos = read_chaste_node_file('mesh.node');
          * for i=0:200
          *   file = ['txt_output/results_Variable_2_',num2str(i),'.txt'];
@@ -527,7 +537,7 @@ public:
          *   plot3(pos(:,1),pos(:,2),w,'*');
          *   pause;
          * end;
-         * }}}
+         * ```
          *
          */
     }

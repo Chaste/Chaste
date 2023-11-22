@@ -146,10 +146,7 @@ double MyNeummanFunction(const ChastePoint<2>& rX)
 class TestSolvingNonlinearPdesTutorial : public CxxTest::TestSuite
 {
 public:
-    /* Define a particular test. Note the {{{}}} at the end of the
-     * declaration. This causes `Exception` messages to be printed out if an
-     * `Exception` is thrown, rather than just getting the message "terminate
-     * called after throwing an instance of 'Exception' " */
+    /* Define a particular test. */
     void TestSolvingNonlinearEllipticPde()
     {
         /* As usual, first create a mesh. */

@@ -84,8 +84,6 @@ public:
     }
 /*
  * This second test shows some of the other `TS_ASSERT` macros that are available.
- * The {{{}} part of the signature is there to make sure that full details of any
- * uncaught exceptions are reported.
  */
     void TestSomeOtherStuff()
     {
@@ -120,16 +118,17 @@ public:
  * To run this code, first copy it into a file, say, called `TestWritingTests.hpp` in the directory `global/test/`.
  * Second, add the full name of your new file to the relevant continuous test pack, say `[path/to/Chaste]/global/test/ContinuousTestPack.txt`.
  * Third, from the command line, run
-{{{
-#!sh
-cd [path/to/ChasteBuild]
-ccmake [path/to/Chaste]
-}}}
+ *
+ * ```bash
+ * cd [path/to/ChasteBuild]
+ * ccmake [path/to/Chaste]
+ * ```
+ *
  * Then press `c` to configure, `e` to exit, and `g` to generate. Finally, run
-{{{
-#!sh
-make global
-ctest -V -R TestWritingTests
-}}}
+ *
+ * ```bash
+ * make global
+ * ctest -V -R TestWritingTests
+ * ```
  */
 #endif /*TESTWRITINGTESTTUTORIAL_HPP_*/

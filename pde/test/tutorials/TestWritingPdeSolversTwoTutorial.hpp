@@ -65,9 +65,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *  We write a solver which uses an **explicit** time-discretisation (as opposed to the implicit
  *  discretisations used throughout the rest of the code). The FEM linear system that needs to be set up is
- *  {{{
+ *
+ *  ```
  *  M U^{n+1} = (M + dt K) U^{n}  +  c
- *  }}}
+ *  ```
+ *
  *  where `M` is the mass matrix, `K` the stiffness matrix, and `U^{n}` the vector of nodal
  *  values of u at timestep n. c is the surface integral term coming from the Neumann BCs,
  *  ie `c_i = integral_over_Gamma2 (g * phi_i dS)`. (This can be compared with an
