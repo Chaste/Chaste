@@ -17,7 +17,8 @@ jobs:
     steps:
       - name: checkout Chaste
         uses: actions/checkout@v4
-        fetch-depth: 0  # Fetch all history in order to get revision info for tutorial files
+        with:
+          fetch-depth: 0  # Fetch all history in order to get revision info for tutorial files
 
       - name: setup python
         uses: actions/setup-python@v4
