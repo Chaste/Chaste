@@ -6,7 +6,7 @@ on:
       - '**'
   push:
     branches:
-      - i55-tutorial
+      - develop
   workflow_dispatch:
 
 jobs:
@@ -67,9 +67,7 @@ jobs:
         run: |
           git config user.name "github-action"
           git config user.email "github-action"
-          git status
-          git diff
-#          git add --all
-#          git commit -m "update how-tos page" || echo "No changes to commit"
-#          git push
+          git add --all
+          git commit -m "update user tutorials" || echo "No changes to commit"
+          git push
         working-directory: chaste-website
