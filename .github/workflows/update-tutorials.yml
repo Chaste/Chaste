@@ -14,58 +14,58 @@ jobs:
   generate-tutorial-markdown:
     runs-on: ubuntu-latest
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
-
-    env:
-      CHASTE_DIR: ${{ github.workspace }}/Chaste
-      WEBSITE_DIR: ${{ github.workspace }}/Chaste.github.io
-      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
-      CHASTE_BUILD_DIR: ${{ github.workspace }}/Chaste/chaste-build-dir
-
     steps:
-
       - name: checkout Chaste
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        fetch-depth: 0  # Fetch all history in order to get revision info for tutorial files
+
+      - name: setup python
+        uses: actions/setup-python@v4
         with:
-          repository: Chaste/Chaste
-          path: Chaste
+          python-version: '3.x'
 
-      - name: install dependencies
+      - name: generate user-tutorial markdown
         run: |
-          echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
-          sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
-          sudo apt update
-          sudo apt install chaste-dependencies
+          python GenerateUserTutorials.py
+        working-directory: python/infra
 
-      - name: make build and test directories
-        run: |
-          mkdir -p ${CHASTE_BUILD_DIR}
-          mkdir -p ${CHASTE_TEST_OUTPUT}
+      - name: Upload archive files
+        uses: actions/upload-artifact@v3
+        with:
+          name: user-tutorial-markdown
+          path: |
+            tutorials/UserTutorials/*.md
 
-      - name: cmake configure
-        run: cmake -DCMAKE_BUILD_TYPE=Debug ..
-        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+  upload-to-website:
+    needs: generate-tutorial-markdown
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Download user-tutorial-to markdown
+        uses: actions/download-artifact@v3
+        with:
+          name: user-tutorial-markdown
 
-      - name: create tutorial markdown files
-        run: cmake --build . --target tutorials
-        working-directory: ${{ env.CHASTE_BUILD_DIR }}
-
-      - name: checkout profiling-gprof
-        uses: actions/checkout@v3
+      - name: Checkout website repository
+        uses: actions/checkout@v4
         with:
           repository: Chaste/Chaste.github.io
-          path: Chaste.github.io
-          fetch-depth: 0
           token: ${{ secrets.WEBSITE_ACCESS }}
+          path: chaste-website
+          fetch-depth: 0  # Fetch all history for all tags and branches
 
-      - name: copy results
-        run: |
-          cp ${CHASTE_BUILD_DIR}/tutorials/UserTutorials/* ${WEBSITE_DIR}/site/content/en/docs/user-tutorials/
+      - name: Display structure of downloaded files
+        run: ls -R
 
-      - name: commit and push results
-        run: |
-          git config user.name "github-action"
-          git config user.email "github-action"
-          git add --all
-          git commit -m "upload tutorials" || echo "No changes to commit"
-          git push
-        working-directory: ${{ env.WEBSITE_DIR }}
+#      - name: Copy markdown to website repository
+#        run: |
+#          cp chaste_howto_webpage.md chaste-website/site/content/docs/how-tos/_index.md
+#
+#      - name: Commit and push if changed
+#        run: |
+#          git config user.name "github-action"
+#          git config user.email "github-action"
+#          git add --all
+#          git commit -m "update how-tos page" || echo "No changes to commit"
+#          git push
+#        working-directory: chaste-website

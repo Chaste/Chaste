@@ -19,6 +19,8 @@ jobs:
 
       - name: setup python
         uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
 
       - name: generate how-to markdown
         run: |
