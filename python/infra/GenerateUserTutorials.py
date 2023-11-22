@@ -181,7 +181,7 @@ toc: true
     full_markdown_content = full_markdown_content.replace('\n\n\n', '\n\n')
 
     with open(get_output_file_path(abs_file_path), 'w', encoding='utf-8') as file:
-        file.write(full_markdown_content)
+        file.write(full_markdown_content + '\n')
 
 
 def format_code_lines(code_lines: list[str]) -> str:
