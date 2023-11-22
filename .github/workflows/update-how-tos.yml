@@ -64,4 +64,3 @@ jobs:
           git commit -m "update how-tos page" || echo "No changes to commit"
           git push
         working-directory: chaste-website
-
