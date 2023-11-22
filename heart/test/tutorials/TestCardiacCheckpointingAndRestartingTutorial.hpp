@@ -107,9 +107,9 @@ public:
 
         /* The simulation duration has to be amended.
          * Note that the duration is always given with respect to the origin of the first solve.
-         * This means that we are running from {{{t=5 ms}}} (the end of the previous simulation) to {{{t=10 ms}}}.
+         * This means that we are running from `t=5 ms` (the end of the previous simulation) to `t=10 ms`.
          * The output files are concatenated so that they appear to be made by a single simulation running from
-         * {{{t=0 ms}}} to {{{t=10 ms}}}.
+         * `t=0 ms` to `t=10 ms`.
          * Note: loading an archive also loads `HeartConfig` options, so `HeartConfig` calls such as this one must appear
          * ''after'' CardiacSimulationArchiver::Load().
          */

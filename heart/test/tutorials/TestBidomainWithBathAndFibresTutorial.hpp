@@ -75,7 +75,7 @@ public:
          */
         HeartConfig::Instance()->SetOdeTimeStep(0.01);  //ms
 
-        /* Use the {{{PlaneStimulusCellFactory}}} to define a set of Luo-Rudy cells, in this
+        /* Use the `PlaneStimulusCellFactory` to define a set of Luo-Rudy cells, in this
          * case with a Backward Euler solver. We pass the stimulus magnitude as 0.0
          * as we don't want any stimulated cells.
          */

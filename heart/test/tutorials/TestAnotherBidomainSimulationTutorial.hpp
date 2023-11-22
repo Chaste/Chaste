@@ -56,10 +56,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LuoRudy1991.hpp"
 #include "PetscSetupAndFinalize.hpp"
 /* Rather than write our own cell factory this time, we will use
- * the {{{PlaneStimulusCellFactory}}}. */
+ * the `PlaneStimulusCellFactory`. */
 #include "PlaneStimulusCellFactory.hpp"
 
-/* Now we define the test class, which must inherit from {{{CxxTest::TestSuite}}}
+/* Now we define the test class, which must inherit from `CxxTest::TestSuite`
  * as usual, and the (public) test method
  */
 class TestAnotherBidomainTutorial : public CxxTest::TestSuite
@@ -158,7 +158,7 @@ public:
          *
          * We described in the previous tutorial how to access the latest voltage vector using
          * `ReplicatableVector`, here we illustrate how to access the voltage values using the
-         * {{{DistributedVector}}} class, which can be used to only iterate over the values
+         * `DistributedVector` class, which can be used to only iterate over the values
          * of the voltage owned by that process (for parallel simulations).
          */
         DistributedVector dist_bidomain_voltage = bidomain_problem.GetSolutionDistributedVector();

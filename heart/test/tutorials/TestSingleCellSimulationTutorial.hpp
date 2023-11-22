@@ -53,10 +53,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * showing:
  *  * how to load a cardiac cell (using CVODE - best solver to use for single cell simulations).
  *  * how to define the stimulus (using the default from CellML).
- *  * run the model to steady state using the {{{SteadyStateRunner}}}.
+ *  * run the model to steady state using the `SteadyStateRunner`.
  *  * solve the model for the number of paces of interest.
  *  * Write to voltage data to a file.
- *  * Use {{{CellProperties}}} to output information such as APD and upstroke velocity.
+ *  * Use `CellProperties` to output information such as APD and upstroke velocity.
  *
  *
  *
@@ -72,7 +72,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* This test is always run sequentially (never in parallel)*/
 #include "FakePetscSetup.hpp"
 
-/* Now we define the test class, which must inherit from {{{CxxTest::TestSuite}}}
+/* Now we define the test class, which must inherit from `CxxTest::TestSuite`
  * as usual, and the (public) test method
  */
 class TestSingleCellSimulationTutorial : public CxxTest::TestSuite
@@ -93,7 +93,7 @@ public:
          * If you want to define your own stimulus without using the default one,
          * you can define it here instead of giving it an empty stimulus:
          *
-         * {{{boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(-25.5,2.0,50.0,500));}}}
+         * `boost::shared_ptr<RegularStimulus> p_stimulus(new RegularStimulus(-25.5,2.0,50.0,500));`
          *
          * the parameters are magnitude, duration, period, and start time of stimulus.
          */
@@ -107,7 +107,7 @@ public:
          *
          * NB. You could automatically check whether one is available with:
          *
-         * {{{p_model->HasCellMLDefaultStimulus()}}}
+         * `p_model->HasCellMLDefaultStimulus()`
          *
          */
         boost::shared_ptr<RegularStimulus> p_regular_stim = p_model->UseCellMLDefaultStimulus();
@@ -128,7 +128,7 @@ public:
          * before and after the stimulus, and never see it (giving you a cell that never does anything).
          * This can be done using something like:
          *
-         * {{{double max_timestep = p_regular_stim->GetDuration();}}}
+         * `double max_timestep = p_regular_stim->GetDuration();`
          *
          * instead of the declaration of `max_timestep` below. In this tutorial we want an answer that is
          * refined in time to give an accurate upstroke velocity. So we make the maximum timestep even
@@ -143,7 +143,7 @@ public:
          * internal time steps it is allowed to do. You can try using the method `SetMaxSteps` to change
          * the default (500) to a larger value, with a command like:
          *
-         * {{{p_model->SetMaxSteps(1e5);}}}
+         * `p_model->SetMaxSteps(1e5);`
          *
          * We have found that 1e5 should be enough for a single pace of all models we've tried so far,
          * but if you were running for a long time (e.g. 1000 paces in one Solve call) you would need to increase this.
@@ -175,7 +175,7 @@ public:
          * CVODE errors when trying to run simulations, it can be worth switching off the analytic Jacobian and resorting
          * to a numerical approximation. This can be done with the following command:
          *
-         * {{{p_model->ForceUseOfNumericalJacobian();}}}
+         * `p_model->ForceUseOfNumericalJacobian();`
          *
          */
 
@@ -198,7 +198,7 @@ public:
          *
          * Now we run the model to steady state.
          * You can detect for steady state alternans by giving it true as a second parameter
-         * {{{SteadyStateRunner steady_runner(p_model, true);}}}
+         * `SteadyStateRunner steady_runner(p_model, true);`
          *
          * You may change the number of maximum paces the runner takes. The default is 1e5.
          */
@@ -263,7 +263,7 @@ public:
         /*
          * ### Calculating APD and Upstroke Velocity
          *
-         * Calculate APD and upstroke velocity using {{{CellProperties}}}
+         * Calculate APD and upstroke velocity using `CellProperties`
          */
         unsigned voltage_index = p_model->GetSystemInformation()->GetStateVariableIndex("membrane_voltage");
         std::vector<double> voltages = solution.GetVariableAtIndex(voltage_index);

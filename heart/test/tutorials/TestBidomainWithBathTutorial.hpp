@@ -97,7 +97,7 @@ public: // Tests should be public!
          */
         HeartConfig::Instance()->SetOdeTimeStep(0.001);  //ms
 
-        /* Use the {{{PlaneStimulusCellFactory}}} to define a set
+        /* Use the `PlaneStimulusCellFactory` to define a set
          * of Luo-Rudy cells. We pass the stimulus magnitude as 0.0
          * as we don't want any stimulated cells.
          */
@@ -105,7 +105,7 @@ public: // Tests should be public!
 
         /*
          * Now, we load up a rectangular mesh (in triangle/tetgen format), done as follows,
-         * using {{{TrianglesMeshReader}}}.  Note that we use a distributed mesh, so the data
+         * using `TrianglesMeshReader`.  Note that we use a distributed mesh, so the data
          * is shared among processes if run in parallel.
          */
         TrianglesMeshReader<2,2> reader("mesh/test/data/2D_0_to_1mm_400_elements");
@@ -116,8 +116,8 @@ public: // Tests should be public!
          * In most simulations there is one valid tissue identifier and one valid bath identifier
          * (for elements).
          * One of these can be assigned to an element with
-         *  * {{{mesh.GetElement(i)->SetAttribute(HeartRegionCode::GetValidTissueId());}}}
-         *  * {{{mesh.GetElement(i)->SetAttribute(HeartRegionCode::GetValidBathId());}}}
+         *  * `mesh.GetElement(i)->SetAttribute(HeartRegionCode::GetValidTissueId());`
+         *  * `mesh.GetElement(i)->SetAttribute(HeartRegionCode::GetValidBathId());`
          *
          * If we want heterogeneous conductivities outside the heart (for example for torso and blood)
          * then we will need different identifiers:
@@ -187,8 +187,8 @@ public: // Tests should be public!
 
         /*
          * The external conductivity can set two ways:
-         *  * the default conductivity in the bath is set with {{{SetBathConductivity(double)}}}
-         *  * heterogeneous overides can be set with {{{SetBathMultipleConductivities(std::map<unsigned, double> )}}}
+         *  * the default conductivity in the bath is set with `SetBathConductivity(double)`
+         *  * heterogeneous overides can be set with `SetBathMultipleConductivities(std::map<unsigned, double> )`
          */
 
         HeartConfig::Instance()->SetBathConductivity(7.0);  //bath_id1 tags will take the default value (actually 7.0 is the default)

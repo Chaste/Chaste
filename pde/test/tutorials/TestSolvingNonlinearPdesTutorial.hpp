@@ -90,7 +90,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* As in the linear PDEs tutorial, we have to define the PDE class we want to
  * solve (assuming one has not already been created). Nonlinear elliptic PDEs
- * should inherit from {{{AbstractNonlinearEllipticPde}}}, which has five pure
+ * should inherit from `AbstractNonlinearEllipticPde`, which has five pure
  * methods which have to be implemented in this concrete class. Here, we define
  * the PDE div.(u grad u) + 1 = 0.
  */
@@ -134,7 +134,7 @@ public:
 };
 
 /* We also need to define a (global) function that will become the Neumman boundary
- * conditions, via the {{{FunctionalBoundaryCondition}}} class (see below). This
+ * conditions, via the `FunctionalBoundaryCondition` class (see below). This
  * function is f(x,y) = y.
  */
 double MyNeummanFunction(const ChastePoint<2>& rX)
@@ -147,8 +147,8 @@ class TestSolvingNonlinearPdesTutorial : public CxxTest::TestSuite
 {
 public:
     /* Define a particular test. Note the {{{}}} at the end of the
-     * declaration. This causes {{{Exception}}} messages to be printed out if an
-     * {{{Exception}}} is thrown, rather than just getting the message "terminate
+     * declaration. This causes `Exception` messages to be printed out if an
+     * `Exception` is thrown, rather than just getting the message "terminate
      * called after throwing an instance of 'Exception' " */
     void TestSolvingNonlinearEllipticPde()
     {
@@ -178,9 +178,9 @@ public:
 
         /* And then the Neumman conditions. Neumann boundary condition are defined on
          * surface elements, and for this problem, the Neumman boundary value depends
-         * on the position in space, so we make use of the {{{FunctionalBoundaryCondition}}}
+         * on the position in space, so we make use of the `FunctionalBoundaryCondition`
          * object, which contains a pointer to a function, and just returns the value
-         * of that function for the required point when the {{{GetValue}}} method is called.
+         * of that function for the required point when the `GetValue` method is called.
          */
         FunctionalBoundaryCondition<2>* p_functional_bc = new FunctionalBoundaryCondition<2>(&MyNeummanFunction);
         /* Loop over surface elements. */
@@ -229,7 +229,7 @@ public:
         newton_solver.SetTolerance(1e-10);
         newton_solver.SetWriteStats();
 
-        /* Now call {{{Solve}}}, passing in the initial guess */
+        /* Now call `Solve`, passing in the initial guess */
         Vec answer = solver.Solve(initial_guess);
 
         /* Note that we could have got the solver to not use an analytical Jacobian
@@ -248,7 +248,7 @@ public:
             TS_ASSERT_DELTA(answer_repl[i], exact_u, 0.15);
         }
 
-        /* Finally, we have to remember to destroy the PETSc {{{Vec}}}s. */
+        /* Finally, we have to remember to destroy the PETSc `Vec`s. */
         PetscTools::Destroy(initial_guess);
         PetscTools::Destroy(answer);
     }

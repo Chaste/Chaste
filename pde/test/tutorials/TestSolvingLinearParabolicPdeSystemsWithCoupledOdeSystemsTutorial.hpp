@@ -103,7 +103,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * system.
  *
  * To do this we define the test suite (a class). It is sensible to name it the same
- * as the filename. The class should inherit from {{{CxxTest::TestSuite}}}.
+ * as the filename. The class should inherit from `CxxTest::TestSuite`.
  */
 class TestSolvingLinearParabolicPdeSystemsWithCoupledOdeSystemsTutorial : public CxxTest::TestSuite
 {
@@ -129,9 +129,9 @@ public:
         SchnackenbergCoupledPdeSystem<2> pde(1e-4, 1e-2, 0.1, 0.2, 0.3, 0.1);
 
         /*
-         * Then we have to define the boundary conditions. As we are in 2d, {{{SPACE_DIM}}}=2 and
-         * {{{ELEMENT_DIM}}}=2. We also have two unknowns u and v,
-         * so in this case {{{PROBLEM_DIM}}}=2. The value of each boundary condition is
+         * Then we have to define the boundary conditions. As we are in 2d, `SPACE_DIM`=2 and
+         * `ELEMENT_DIM`=2. We also have two unknowns u and v,
+         * so in this case `PROBLEM_DIM`=2. The value of each boundary condition is
          * given by the spatially uniform steady state solution of the Schnackenberg system,
          * given by u = (k,,1,, + k,,2,,)/k,,-1,,, v = k,,2,,k,,-1,,^2^/k,,3,,(k,,1,, + k,,2,,)^2^.
          */
@@ -178,7 +178,7 @@ public:
         solver.SolveAndWriteResultsToFile();
 
         /*
-         * All PETSc {{{Vec}}}s should be destroyed when they are no longer needed.
+         * All PETSc `Vec`s should be destroyed when they are no longer needed.
          */
         PetscTools::Destroy(initial_condition);
     }

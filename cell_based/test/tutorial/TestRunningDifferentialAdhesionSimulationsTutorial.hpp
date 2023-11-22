@@ -58,8 +58,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * ### The test
  *
  * As in previous tutorials, we begin by including the necessary header files. We have
- * encountered these files already. Recall that often, either {{{CheckpointArchiveTypes.hpp}}}
- * or {{{CellBasedSimulationArchiver.hpp}}} must be included the first Chaste header.
+ * encountered these files already. Recall that often, either `CheckpointArchiveTypes.hpp`
+ * or `CellBasedSimulationArchiver.hpp` must be included the first Chaste header.
  */
 #include <cxxtest/TestSuite.h>
 #include "CheckpointArchiveTypes.hpp"
@@ -83,7 +83,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * The next header file defines a force law for describing the mechanical interactions
  * between neighbouring cells in the cell population, subject to each vertex. This force
- * law is a subclass of {{{NagaiHondaForce}}}, which we encountered in the {{{TestRunningVertexBasedSimulationsTutorial}}},
+ * law is a subclass of `NagaiHondaForce`, which we encountered in the `TestRunningVertexBasedSimulationsTutorial`,
  * that allows for different adhesion energy parameter values depending on the types of
  * interacting cells.
  */
@@ -109,7 +109,7 @@ public:
         boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
         p_mesh->SetCellRearrangementThreshold(0.1);
 
-        /* We then create some cells using the helper class {{{CellsGenerator}}}. Note that in this simulation
+        /* We then create some cells using the helper class `CellsGenerator`. Note that in this simulation
          * the cells are all differentiated, and thus no cell division occurs; if we wished, we could modify
          * the three lines below in a straightforward manner to incorporate cell proliferation and investigate
          * the effect of this on the cell sorting process. */
@@ -128,11 +128,11 @@ public:
         cell_population.AddCellWriter<CellAgesWriter>();
         cell_population.AddCellWriter<CellVolumesWriter>();
 
-        /* We randomly label some cells using the cell property {{{CellLabel}}}. We begin by creating a shared pointer to
-         * this cell property using the helper singleton {{{CellPropertyRegistry}}}. We then loop over the cells and label
+        /* We randomly label some cells using the cell property `CellLabel`. We begin by creating a shared pointer to
+         * this cell property using the helper singleton `CellPropertyRegistry`. We then loop over the cells and label
          * each cell independently with probability 0.5. Note that since the cells have been passed to the
-         * {{{VertexBasedCellPopulation}}} object, the vector {{{cells}}} above is now empty, so we must use the
-         * {{{Iterator}}} to loop over cells. */
+         * `VertexBasedCellPopulation` object, the vector `cells` above is now empty, so we must use the
+         * `Iterator` to loop over cells. */
          boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
@@ -154,7 +154,7 @@ public:
         /* Next we create the differential adhesion force law. This builds upon the model of Nagai, Honda and co-workers
          * encounted in the TestRunningVertexBasedSimulationsTutorial by allowing different values of the adhesion
          * energy parameters depending on the types of two neighbouring cells. Here we interpret the 'type' of a cell
-         * as whether or not it has the cell property {{{CellLabel}}}; it would be straightforward to create a similar
+         * as whether or not it has the cell property `CellLabel`; it would be straightforward to create a similar
          * force law that took account of a cell's mutation state, for example. Having created the force law, we set the
          * values of the parameters. If the adhesion energy for two neighbouring homotypic cells is less than that of two
          * heterotypic cells, then we may expect cell sorting to occur, in which the cells of each type will tend to locally
@@ -178,7 +178,7 @@ public:
      *
      * To visualize the results, use Paraview. See the UserTutorials/VisualizingWithParaview tutorial for more information.
      *
-     * Load the file {{{/tmp/$USER/testoutput/TestVertexBasedDifferentialAdhesionSimulation/results_from_time_0/results.pvd}}}.
+     * Load the file `/tmp/$USER/testoutput/TestVertexBasedDifferentialAdhesionSimulation/results_from_time_0/results.pvd`.
      */
 };
 

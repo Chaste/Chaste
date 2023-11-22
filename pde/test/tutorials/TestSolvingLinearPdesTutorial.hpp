@@ -93,7 +93,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * We need to create a class representing the PDE we want to solve, which will be
  * passed into the solver. The PDE we are solving is of the type
- * {{{AbstractLinearEllipticPde}}}, which is an abstract class with 3 pure methods
+ * `AbstractLinearEllipticPde`, which is an abstract class with 3 pure methods
  * which have to be implemented. The template variables in the following line are both the dimension
  * of the space.
  */
@@ -102,8 +102,8 @@ class MyPde : public AbstractLinearEllipticPde<2,2>
 private:
     /* For efficiency, we will save the diffusion tensor that will be returned by one of the
      * class' methods as a member variable. The diffusion tensor which has to be returned
-     * by the {{{GetDiffusionTensor}}} method in PDE classes is of the type
-     * {{{c_matrix<double,SIZE,SIZE>}}}, which is a uBLAS matrix. We use uBLAS vectors
+     * by the `GetDiffusionTensor` method in PDE classes is of the type
+     * `c_matrix<double,SIZE,SIZE>`, which is a uBLAS matrix. We use uBLAS vectors
      * and matrices where small vectors and matrices are needed. Note that uBLAS objects
      * are only particularly efficient if optimisation is on (`CMAKE_BUILD_TYPE=Release``).*/
     c_matrix<double,2,2> mDiffusionTensor;
@@ -143,7 +143,7 @@ public:
 };
 
 /* Next, we define the test suite (a class). It is sensible to name it the same
- * as the filename. The class should inherit from {{{CxxTest::TestSuite}}}. */
+ * as the filename. The class should inherit from `CxxTest::TestSuite`. */
 class TestSolvingLinearPdesTutorial : public CxxTest::TestSuite
 {
 /* All individual test defined in this test suite **must** be declared as public. */
@@ -154,9 +154,9 @@ public:
          * format. The path given is relative to the main Chaste directory. As we are in 2d,
          * the reader will look for three datafiles, [name].nodes, [name].ele and [name].edge.
          * Note that the first template argument here is the spatial dimension of the
-         * elements in the mesh ({{{ELEMENT_DIM}}}), and the second is the dimension of the nodes,
-         * i.e. the dimension of the space the mesh lives in ({{{SPACE_DIM}}}). Usually
-         * {{{ELEMENT_DIM}}} and {{{SPACE_DIM}}} will be equal. */
+         * elements in the mesh (`ELEMENT_DIM`), and the second is the dimension of the nodes,
+         * i.e. the dimension of the space the mesh lives in (`SPACE_DIM`). Usually
+         * `ELEMENT_DIM` and `SPACE_DIM` will be equal. */
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements");
         /* Now declare a tetrahedral mesh with the same dimensions... */
         TetrahedralMesh<2,2> mesh;
@@ -166,10 +166,10 @@ public:
         /* Next we instantiate an instance of our PDE we wish to solve. */
         MyPde pde;
 
-        /* A set of boundary conditions are stored in a {{{BoundaryConditionsContainer}}}. The
+        /* A set of boundary conditions are stored in a `BoundaryConditionsContainer`. The
          * three template arguments are ELEMENT_DIM, SPACE_DIM and PROBLEM_DIM, the latter being
          * the number of unknowns we are solving for. We have one unknown (ie u is a scalar, not
-         * a vector), so in this case {{{PROBLEM_DIM}}}=1. */
+         * a vector), so in this case `PROBLEM_DIM`=1. */
         BoundaryConditionsContainer<2,2,1> bcc;
 
         /* Defining the boundary conditions is the only particularly fiddly part of solving PDEs,
@@ -199,7 +199,7 @@ public:
             if ((x==0) || (y==0))
             {
                 /* ...associate the zero boundary condition created above with this boundary node
-                 * ({{{*iter}}} being a pointer to a {{{Node<2>}}}).
+                 * (`*iter` being a pointer to a `Node<2>`).
                  */
                 bcc.AddDirichletBoundaryCondition(*iter, p_zero_boundary_condition);
             }
@@ -241,33 +241,33 @@ public:
         }
 
         /* Next we define the solver of the PDE.
-         * To solve an {{{AbstractLinearEllipticPde}}} (which is the type of PDE {{{MyPde}}} is),
-         * we use a {{{SimpleLinearEllipticSolver}}}. The solver, again templated over
-         * {{{ELEMENT_DIM}}} and {{{SPACE_DIM}}}, needs to be given (pointers to) the mesh,
+         * To solve an `AbstractLinearEllipticPde` (which is the type of PDE `MyPde` is),
+         * we use a `SimpleLinearEllipticSolver`. The solver, again templated over
+         * `ELEMENT_DIM` and `SPACE_DIM`, needs to be given (pointers to) the mesh,
          * pde and boundary conditions.
          */
         SimpleLinearEllipticSolver<2,2> solver(&mesh, &pde, &bcc);
 
-        /* To solve, just call {{{Solve()}}}. A PETSc vector is returned. */
+        /* To solve, just call `Solve()`. A PETSc vector is returned. */
         Vec result = solver.Solve();
 
         /* It is a pain to access the individual components of a PETSc vector, even when running only on
-         * one process. A helper class called {{{ReplicatableVector}}} has been created. Create
-         * an instance of one of these, using the PETSc {{{Vec}}} as the data. The ''i''th
-         * component of {{{result}}} can now be obtained by simply doing {{{result_repl[i]}}}.
+         * one process. A helper class called `ReplicatableVector` has been created. Create
+         * an instance of one of these, using the PETSc `Vec` as the data. The ''i''th
+         * component of `result` can now be obtained by simply doing `result_repl[i]`.
          */
         ReplicatableVector result_repl(result);
 
         /* Let us write out the solution to a file. To do this, create an
-         * {{{OutputFileHandler}}}, passing in the directory we want files written to.
+         * `OutputFileHandler`, passing in the directory we want files written to.
          * This is relative to the directory defined by the CHASTE_TEST_OUTPUT environment
          * variable - usually `/tmp/$USER/testoutput`. Note by default the output directory
-         * passed in is emptied by this command. To avoid this, {{{false}}} can be passed in as a second
+         * passed in is emptied by this command. To avoid this, `false` can be passed in as a second
          * parameter.
          */
         OutputFileHandler output_file_handler("TestSolvingLinearPdeTutorial");
 
-        /* Create an {{{out_stream}}}, which is a stream to a particular file. An {{{out_stream}}}
+        /* Create an `out_stream`, which is a stream to a particular file. An `out_stream`
          * is a smart pointer to a `std::ofstream`. */
         out_stream p_file = output_file_handler.OpenOutputFile("linear_solution.txt");
 
@@ -275,20 +275,20 @@ public:
         for (unsigned i=0; i<result_repl.GetSize(); i++)
         {
             /* Get the x and y-values of the node corresponding to this entry. The method
-             * {{{GetNode}}} on the mesh class returns a pointer to a {{{Node}}}. */
+             * `GetNode` on the mesh class returns a pointer to a `Node`. */
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
 
-            /* Get the computed solution at this node from the {{{ReplicatableVector}}}. */
+            /* Get the computed solution at this node from the `ReplicatableVector`. */
             double u = result_repl[i];
 
             /* Finally, write x, y and u to the output file. The solution could then be
              * visualised in (eg) matlab, using the commands:
-             * {{{sol=load('linear_solution.txt'); plot3(sol(:,1),sol(:,2),sol(:,3),'.');}}}*/
+             * `sol=load('linear_solution.txt'); plot3(sol(:,1),sol(:,2),sol(:,3),'.');`*/
             (*p_file) << x << " " << y << " " << u << "\n";
         }
 
-        /* All PETSc {{{Vec}}}s should be destroyed when they are no longer needed, or you will have a memory leak. */
+        /* All PETSc `Vec`s should be destroyed when they are no longer needed, or you will have a memory leak. */
         PetscTools::Destroy(result);
     }
 
@@ -303,12 +303,12 @@ public:
      */
     void TestSolvingParabolicPde()
     {
-        /* Create a 10 by 10 by 10 mesh in 3D, this time using the {{{ConstructRegularSlabMesh}}} method
+        /* Create a 10 by 10 by 10 mesh in 3D, this time using the `ConstructRegularSlabMesh` method
          * on the mesh. The first parameter is the cartesian space-step and the other three parameters are the width, height and depth of the mesh.*/
         TetrahedralMesh<3,3> mesh;
         mesh.ConstructRegularSlabMesh(0.1, 1.0, 1.0, 1.0);
 
-        /* Our PDE object should be a class that is derived from the {{{AbstractLinearParabolicPde}}}.
+        /* Our PDE object should be a class that is derived from the `AbstractLinearParabolicPde`.
          * We could write it ourselves as in the previous test, but since the PDE we want to solve is
          * so simple, it has already been defined (look it up! - it is located in pde/test/pdes).
          */
@@ -324,8 +324,8 @@ public:
 
         /* For parabolic problems, initial conditions are also needed. The solver will expect
          * a PETSc vector, where the i-th entry is the initial solution at node i, to be passed
-         * in. To create this PETSc {{{Vec}}}, we will use a helper function in the {{{PetscTools}}}
-         * class to create a {{{Vec}}} of size num_nodes, with each entry set to 1.0. Then we
+         * in. To create this PETSc `Vec`, we will use a helper function in the `PetscTools`
+         * class to create a `Vec` of size num_nodes, with each entry set to 1.0. Then we
          * set the initial condition on the solver. */
         Vec initial_condition = PetscTools::CreateAndSetVec(mesh.GetNumNodes(), 1.0);
         solver.SetInitialCondition(initial_condition);
@@ -361,8 +361,8 @@ public:
         solver.SetOutputToTxt(true);
         solver.SetPrintingTimestepMultiple(10);
 
-        /* Now we can solve the problem. The {{{Vec}}} that is returned can be passed into a
-         * {{{ReplicatableVector}}} as before.
+        /* Now we can solve the problem. The `Vec` that is returned can be passed into a
+         * `ReplicatableVector` as before.
          */
         Vec solution = solver.Solve();
         ReplicatableVector solution_repl(solution);

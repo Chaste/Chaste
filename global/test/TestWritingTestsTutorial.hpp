@@ -58,24 +58,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxxtest/TestSuite.h>
 
 /*
- * Now we have to define a class containing the tests. It is sensible to name the class with the same name as the file name. The class should inherit from {{{CxxTest::TestSuite}}}.
+ * Now we have to define a class containing the tests. It is sensible to name the class with the same name as the file name. The class should inherit from `CxxTest::TestSuite`.
  */
 class TestWritingTestsTutorial: public CxxTest::TestSuite
 {
 /*
- * Now we define some tests, which must be **public**, begin with the word 'Test', return {{{void}}}, and take in no parameters.
+ * Now we define some tests, which must be **public**, begin with the word 'Test', return `void`, and take in no parameters.
  */
 public:
     void TestOnePlusOneEqualsTwo()
     {
 /*
- * To test whether two integers are equal, we can use the macro {{{TS_ASSERT_EQUALS}}}.
+ * To test whether two integers are equal, we can use the macro `TS_ASSERT_EQUALS`.
  */
         int some_number = 1 + 1;
         TS_ASSERT_EQUALS(some_number, 2);
 /*
- * To test whether two numbers are equal to within a certain (absolute) tolerance we can use {{{TS_ASSERT_DELTA}}}.
- * This should almost always be used when comparing two {{{double}}}s.  (See also
+ * To test whether two numbers are equal to within a certain (absolute) tolerance we can use `TS_ASSERT_DELTA`.
+ * This should almost always be used when comparing two `double`s.  (See also
  * [CompareDoubles](https://chaste.github.io/doxygen-latest/classCompareDoubles.html)
  * for more advanced comparisons.)
  */
@@ -83,7 +83,7 @@ public:
         TS_ASSERT_DELTA(another_number, 2.0, 1e-2);
     }
 /*
- * This second test shows some of the other {{{TS_ASSERT}}} macros that are available.
+ * This second test shows some of the other `TS_ASSERT` macros that are available.
  * The {{{}} part of the signature is there to make sure that full details of any
  * uncaught exceptions are reported.
  */

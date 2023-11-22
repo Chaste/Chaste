@@ -110,9 +110,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * This has exact solution x = A cos 0.5t + B sin 0.5t
  * where A and B are determined by the initial condions.
  *
- * To implement this model we define a new SRN model, {{{MySrnModel}}},
- * which inherits from {{{AbstractOdeSrnModel}}} and
- * contains a {{{MyOdeSystem}}}.
+ * To implement this model we define a new SRN model, `MySrnModel`,
+ * which inherits from `AbstractOdeSrnModel` and
+ * contains a `MyOdeSystem`.
  *
  * Note that usually this code would be separated out into a separate declaration in
  * a .hpp file and definition in a .cpp file.
@@ -125,7 +125,7 @@ private:
      * to archive (save or load) the ODE system (and therefore the SRN model) object in a cell-based simulation.
      * The code consists of a serialize method, in which we archive the ODE system
      * using the serialization code defined in the base class
-     * {{{AbstractOdeSystem}}}.
+     * `AbstractOdeSystem`.
      */
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
@@ -177,7 +177,7 @@ private:
      * to archive (save or load) the SRN model object in a cell-based simulation.
      * The code consists of a serialize method, in which we archive the SRN
      * model using the serialization code defined in the base class
-     * {{{AbstractOdeSrnModel}}}.
+     * `AbstractOdeSrnModel`.
      */
     friend class boost::serialization::access;
     template<class Archive>
@@ -223,7 +223,7 @@ public:
         assert(mpOdeSolver->IsSetUp());
     }
 
-    /* The second public method overrides {{{CreateSrnModel()}}}. This is a
+    /* The second public method overrides `CreateSrnModel()`. This is a
      * builder method to create new copies of the SRN model. We call
      * the (protected) copy constructor which creates a copy of the cell cycle model.
      *
@@ -233,19 +233,19 @@ public:
         return new MySrnModel(*this);
     }
 
-    /* The third public method overrides {{{Initialise()}}}. */
+    /* The third public method overrides `Initialise()`. */
     void Initialise()
     {
         AbstractOdeSrnModel::Initialise(new MyOdeSystem);
     }
 
-    /* The fourth public method runs the ODEs at each timestep and saves some results to {{{CellData}}}. */
+    /* The fourth public method runs the ODEs at each timestep and saves some results to `CellData`. */
     void SimulateToCurrentTime()
     {
         // run the ODE simulation as needed
         AbstractOdeSrnModel::SimulateToCurrentTime();
 
-        /* this line outputs the ODE system variable to {{{CellData}}}. */
+        /* this line outputs the ODE system variable to `CellData`. */
         mpCell->GetCellData()->SetItem("x",mpOdeSystem->rGetStateVariables()[0]);
     }
 
@@ -280,19 +280,19 @@ CHASTE_CLASS_EXPORT(MyOdeSystem)
 CHASTE_CLASS_EXPORT(MySrnModel)
 
 /*
- * Need to re-include this after {{{SerializationExportWrapperForCpp.hpp}}}. This is to export the
+ * Need to re-include this after `SerializationExportWrapperForCpp.hpp`. This is to export the
  * components that would normally be in a seperate cpp file.
  */
 #include "CellCycleModelOdeSolverExportWrapper.hpp"
 EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(MySrnModel)
 
 /*
- * This completes the code for {{{MySrnModel}}}. Note that usually this code would
+ * This completes the code for `MySrnModel`. Note that usually this code would
  * be separated out into a separate declaration in a .hpp file and definition in a .cpp file.
  *
  * #### The Tests
  *
- * We now define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}.
+ * We now define the test class, which inherits from `AbstractCellBasedTestSuite`.
  */
 class TestCreatingAndUsingANewSrnModelTutorial : public AbstractCellBasedTestSuite
 {
@@ -305,10 +305,10 @@ public:
      */
     void TestMySrnModel()
     {
-        /* Test that we can construct a {{{MySrnModel}}} object: */
+        /* Test that we can construct a `MySrnModel` object: */
         TS_ASSERT_THROWS_NOTHING(MySrnModel srn_model);
 
-        /* Now we construct and initialise a cell with a {{{MySrnModel}}}.*/
+        /* Now we construct and initialise a cell with a `MySrnModel`.*/
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         UniformG1GenerationalCellCycleModel* p_cell_cycle_model = new UniformG1GenerationalCellCycleModel();
@@ -318,7 +318,7 @@ public:
         p_cell->InitialiseCellCycleModel();
         p_cell->InitialiseSrnModel();
 
-        /* Now increment time and check the ODE in {{{MySrnModel}}} is solved correctly. */
+        /* Now increment time and check the ODE in `MySrnModel` is solved correctly. */
         double end_time = 10;
         unsigned num_steps = 1000;
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(end_time, num_steps);
@@ -336,8 +336,8 @@ public:
             TS_ASSERT_DELTA(p_cell->GetCellData()->GetItem("x"), cos(0.5*current_time), 1e-4);
         }
 
-        /* Lastly, we briefly test that archiving of {{{MySrnModel}}} has
-         * been implemented correctly. Create an {{{OutputFileHandler}}} and use
+        /* Lastly, we briefly test that archiving of `MySrnModel` has
+         * been implemented correctly. Create an `OutputFileHandler` and use
          * this to define a filename for the archive.
          */
         OutputFileHandler handler("archive", false);
@@ -345,7 +345,7 @@ public:
 
         /* Create an output archive. */
         {
-            /* Destroy the current instance of {{{SimulationTime}}} and create another instance.
+            /* Destroy the current instance of `SimulationTime` and create another instance.
              * Set the start time, end time and number of time steps. */
             SimulationTime::Destroy();
             SimulationTime::Instance()->SetStartTime(0.0);
@@ -378,7 +378,7 @@ public:
         }
 
         /* Now create an input archive. Begin by again destroying the current
-         * instance of {{{SimulationTime}}} and creating another instance. Set
+         * instance of `SimulationTime` and creating another instance. Set
          * the start time, end time and number of time steps. note that this is
          * overwritten when you load the archive.
          */
@@ -418,7 +418,7 @@ public:
     /*
      * ### Using the SRN model in a cell-based simulation
      *
-     * We conclude with a brief test demonstrating how {{{MySrnModel}}} can be used
+     * We conclude with a brief test demonstrating how `MySrnModel` can be used
      * in a cell-based simulation.
      */
     void TestOffLatticeSimulationWithMySrnModel()
@@ -430,7 +430,7 @@ public:
 
         /* Next, we create some cells. First, define the cells vector. */
         std::vector<CellPtr> cells;
-        /* We must create a shared_ptr to a {{{CellMutationState}}} with which to bestow the cells.
+        /* We must create a shared_ptr to a `CellMutationState` with which to bestow the cells.
          * We make use of the macro MAKE_PTR to do this: the first argument is the class and
          * the second argument is the name of the shared_ptr. */
         MAKE_PTR(WildTypeCellMutationState, p_state);
@@ -476,14 +476,14 @@ public:
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
-        /* Finally to run the simulation, we call {{{Solve()}}}. */
+        /* Finally to run the simulation, we call `Solve()`. */
         simulator.Solve();
     }
     /*
      * To visualize the results, use Paraview. See the UserTutorials/VisualizingWithParaview tutorial for more information
      *
-     * Load the file {{{/tmp/$USER/testoutput/TestOffLatticeSimulationWithMySrnModel/results_from_time_0/results.pvd}}},
-     * and color by {{{x}}}.
+     * Load the file `/tmp/$USER/testoutput/TestOffLatticeSimulationWithMySrnModel/results_from_time_0/results.pvd`,
+     * and color by `x`.
      */
 };
 
