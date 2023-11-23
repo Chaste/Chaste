@@ -43,8 +43,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTSINGLECELLSIMULATIONTUTORIAL_HPP_
 #define TESTSINGLECELLSIMULATIONTUTORIAL_HPP_
 /*
- * [[PageOutline]]
- *
  * ## An example showing how to run a single cell simulation
  *
  * ### Introduction
