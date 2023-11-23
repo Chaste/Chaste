@@ -153,8 +153,10 @@ public:
          * ODE system has got to a situation where refining the timestep is not helping the convergence.
          *
          * This generally indicates that you are hitting some sort of singularity, or divide by zero, in
-         * the model. Unfortunately cardiac models are full of these, they can sometimes be manually edited out
-         * by changing the cellML file, for instance using [http://en.wikipedia.org/wiki/L%27H%C3%B4pital%27s_rule L'Hopital's rule].
+         * the model. Unfortunately cardiac models are full of these due to [GHK-style ion flux equations](https://en.wikipedia.org/wiki/Goldman%E2%80%93Hodgkin%E2%80%93Katz_flux_equation)! 
+         * They were sometimes manually edited out by changing the cellML file, for instance using [L'Hopital's rule](http://en.wikipedia.org/wiki/L%27H%C3%B4pital%27s_rule)
+         * close to the voltages that caused singularities. But since Chaste v2021.1 [a feature in chaste_codegen](https://wellcomeopenresearch.org/articles/6-261/v2), 
+         * now applies a fix like that automatically to remove most singularities in cardiac models during CellML to C++ conversion.
          *
          * In this case, one other thing you can try is to change the absolute and relative
          * tolerances of the CVODE solver, the default being (1e-5,1e-7), although it isn't clear whether
