@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTSOLVINGELASTICITYPROBLEMSTUTORIAL_HPP_
 
 /*
- * = Solving solid mechanics problems =
+ * ## Solving solid mechanics problems
  *
  * In this tutorial we show how Chaste can be used to solve solid mechanics problems.
  * We assume the reader has some familiarity with solid mechanics problems (the
@@ -110,7 +110,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*
  *
- * == Simple incompressible deformation: 2D shape hanging under gravity ==
+ * ### Simple incompressible deformation: 2D shape hanging under gravity
  *
  */
 class TestSolvingElasticityProblemsTutorial : public CxxTest::TestSuite
@@ -257,7 +257,7 @@ public:
      * when the solver is an `CompressibleNonlinearElasticitySolver`.
      */
 
-    /* == Incompressible deformation: 2D shape hanging under gravity with a balancing traction ==
+    /* ### Incompressible deformation: 2D shape hanging under gravity with a balancing traction
      *
      * We now repeat the above test but include a traction on the bottom surface (Y=0). We apply this
      * in the inward direction so that is counters (somewhat) the effect of gravity. We also show how stresses
@@ -367,7 +367,7 @@ public:
 };
     /* More examples are given in the next tutorial
      *
-     * == IMPORTANT: Using HYPRE ==
+     * ### IMPORTANT: Using HYPRE
      *
      * Mechanics solves being nonlinear are expensive, so it is recommended you also use `CMAKE_BUILD_TYPE=Release` when running with CMake
      * on larger problems.

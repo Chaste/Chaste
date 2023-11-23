@@ -45,11 +45,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTVISUALIZINGWITHPARAVIEWTUTORIAL_HPP_
 
 /*
- * = Examples showing how to visualize simulations in Paraview =
+ * ## Examples showing how to visualize simulations in Paraview
  *
  * EMPTYLINE
  *
- * == Introduction ==
+ * ### Introduction
  *
  * EMPTYLINE
  *
@@ -66,7 +66,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * EMPTYLINE
  *
- * == The test ==
+ * ### The test
  *
  * EMPTYLINE
  *
@@ -98,7 +98,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "FakePetscSetup.hpp"
 
-/* Next, we define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}
+/* Next, we define the test class, which inherits from `AbstractCellBasedTestSuite`
  * and defines some test methods.
  */
 class TestVisualizingWithParaviewTutorial : public AbstractCellBasedTestSuite
@@ -106,7 +106,7 @@ class TestVisualizingWithParaviewTutorial : public AbstractCellBasedTestSuite
 public:
     /* EMPTYLINE
      *
-     * == Test 1 - a mesh-based cell centre monolayer simulation ==
+     * ### Test 1 - a mesh-based cell centre monolayer simulation
      *
      * EMPTYLINE
      *
@@ -151,18 +151,18 @@ public:
          */
         cell_population.SetBoundVoronoiTessellation(true);
 
-        /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
+        /* We then pass in the cell population into an `OffLatticeSimulation`,
          * and set the output directory and end time. */
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("Test2DMeshBasedMonolayerSimulationForVisualizing");
         simulator.SetEndTime(1.0);
 
-        /* We create a force law and pass it to the {{{OffLatticeSimulation}}}. */
+        /* We create a force law and pass it to the `OffLatticeSimulation`. */
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
-        /* To run the simulation, we call {{{Solve()}}}. */
+        /* To run the simulation, we call `Solve()`. */
         simulator.Solve();
 
         /* The next two lines are for test purposes only and are not part of this tutorial.
@@ -178,13 +178,13 @@ public:
     * EMPTYLINE
     *
     * To visualize the results, we must first open Paraview. We open the folder containing our test output using the 'file' menu at
-    * the top. The output will be located in {{{/tmp/$USER/testoutput/Test2DMeshBasedMonolayerSimulationForVisualizing/results_from_time_0}}}.
+    * the top. The output will be located in `/tmp/$USER/testoutput/Test2DMeshBasedMonolayerSimulationForVisualizing/results_from_time_0`.
     * There will be a .vtu file generated for every timestep, which must all be opened at once to view the simulation. To do this,
-    * simply select {{{voronoi_results_..vtu}}}. We should now see {{{voronoi_results*}}}  in the pipeline browser. We click {{{Apply}}} in the properties tab
+    * simply select `voronoi_results_..vtu`. We should now see `voronoi_results*`  in the pipeline browser. We click `Apply` in the properties tab
     * of the object inspector, and we should now see a visualization in the right hand window.
     *
     * At this stage, it will be necessary to refine how we wish to view this particular visualisation. The viewing styles can be edited using
-    * the display tab of the object inspector. In particular, under {{{Style}}}, the representation drop down menu allows us to view
+    * the display tab of the object inspector. In particular, under `Style`, the representation drop down menu allows us to view
     * the cells as a surface with edges, or as simply a wireframe. It is advisable at this point to familiarize ourselves with the different
     * viewing options, colour and size settings.
     *
@@ -194,7 +194,7 @@ public:
     *
     * EMPTYLINE
     *
-    * == Test 2 - a periodic mesh-based cell centre monolayer simulation ==
+    * ### Test 2 - a periodic mesh-based cell centre monolayer simulation
      *
      * EMPTYLINE
      *
@@ -248,7 +248,7 @@ public:
     * EMPTYLINE
     *
     * To visualize the results, we follow the instructions above for the first simulation, ensuring that we open the
-    * test output from the new folder, {{{Test2DPeriodicMeshBasedMonolayerSimulationForVisualizing}}}. You will see that the left an right sides
+    * test output from the new folder, `Test2DPeriodicMeshBasedMonolayerSimulationForVisualizing`. You will see that the left an right sides
     * of the monolayer are the same.
     *
     * At this stage, the viewer is showing all cells in the simulation, including the ghost nodes. In order to view only real cells, we must
@@ -262,7 +262,7 @@ public:
     *
     * EMPTYLINE
     *
-    * == Test 3 - a node-based simulation ==
+    * ### Test 3 - a node-based simulation
     *
      * EMPTYLINE
      *
@@ -309,8 +309,8 @@ public:
     * EMPTYLINE
     *
     * To visualize the results, we follow the instructions above for the first simulation, ensuring that we open the
-    * test output from the new folder, {{{Test2DNodeBasedMonolayerSimulationForVisualizing}}}.
-    * After opening Paraview, load the file {{{results.pvd}}}, then click "Apply" in the object inspector panel.
+    * test output from the new folder, `Test2DNodeBasedMonolayerSimulationForVisualizing`.
+    * After opening Paraview, load the file `results.pvd`, then click "Apply" in the object inspector panel.
     * As this simulation uses a `NodeBasedCellPopulation`, you must use glyphs to visualize cells: click the button
     * marked "Glyph" in the toolbar of common filters; specify cells to be displayed as spheres; then click "Apply".
     *
@@ -319,7 +319,7 @@ public:
     *
     * EMPTYLINE
     *
-    * == Test 4 - a basic vertex-based simulation ==
+    * ### Test 4 - a basic vertex-based simulation
     *
      * EMPTYLINE
      *
@@ -341,13 +341,13 @@ public:
 
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
+        /* We then pass in the cell population into an `OffLatticeSimulation`,
          * and set the output directory and end time. */
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("Test2DVertexMonolayerSimulationForVisualizing");
         simulator.SetEndTime(0.1);
 
-        /* We create a force law and pass it to the {{{OffLatticeSimulation}}}. */
+        /* We create a force law and pass it to the `OffLatticeSimulation`. */
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
@@ -357,7 +357,7 @@ public:
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
-        /* To run the simulation, we call {{{Solve()}}}. */
+        /* To run the simulation, we call `Solve()`. */
         simulator.Solve();
 
         /* The next two lines are for test purposes only and are not part of this tutorial.
@@ -370,7 +370,7 @@ public:
     * EMPTYLINE
     *
     * To visualize the results, we follow the instructions above for the first simulation, ensuring that we open the
-    * test output from the new folder, {{{Test2DVertexMonolayerSimulationForVisualizing}}}.
+    * test output from the new folder, `Test2DVertexMonolayerSimulationForVisualizing`.
     *
     */
 };

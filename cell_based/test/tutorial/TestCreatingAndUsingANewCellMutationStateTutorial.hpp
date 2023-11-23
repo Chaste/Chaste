@@ -46,11 +46,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCREATINGANDUSINGANEWCELLMUTATIONSTATETUTORIAL_HPP_
 
 /*
- * = An example showing how to create a new cell mutation state and use it in a cell-based simulation =
+ * ## An example showing how to create a new cell mutation state and use it in a cell-based simulation
  *
  * EMPTYLINE
  *
- * == Introduction ==
+ * ### Introduction
  *
  * EMPTYLINE
  *
@@ -60,7 +60,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * EMPTYLINE
  *
- * == 1. Including header files ==
+ * ### 1. Including header files
  *
  * EMPTYLINE
  *
@@ -90,7 +90,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * EMPTYLINE
  *
- * == Defining the cell mutation state class ==
+ * ### Defining the cell mutation state class
  *
  * As an example, let us consider a cell mutation state representing the p53
  * 172R-H gain-of-function mutant, which is equivalent to the common 175R-H
@@ -124,7 +124,7 @@ private:
 public:
     /* The only public method is a default constructor, which just calls the base
      * constructor with a single unsigned parameter. This sets the value of the
-     * base class member variable {{{mColour}}}, which can be used by visualization tools
+     * base class member variable `mColour`, which can be used by visualization tools
      * to paint cells with this mutation state a distinct colour if required. */
     P53GainOfFunctionCellMutationState()
         : AbstractCellMutationState(5)
@@ -143,16 +143,16 @@ CHASTE_CLASS_EXPORT(P53GainOfFunctionCellMutationState)
 CHASTE_CLASS_EXPORT(P53GainOfFunctionCellMutationState)
 
 /*
- * This completes the code for {{{P53GainOfFunctionCellMutationState}}}. Note that usually this code would
+ * This completes the code for `P53GainOfFunctionCellMutationState`. Note that usually this code would
  * be separated out into a separate declaration in a .hpp file and definition in a .cpp file.
  *
  * EMPTYLINE
  *
- * === The Tests ===
+ * #### The Tests
  *
  * EMPTYLINE
  *
- * We now define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}.
+ * We now define the test class, which inherits from `AbstractCellBasedTestSuite`.
  */
 class TestCreatingAndUsingANewCellMutationStateTutorial : public AbstractCellBasedTestSuite
 {
@@ -161,7 +161,7 @@ public:
     /*
      * EMPTYLINE
      *
-     * == Testing the cell mutation state ==
+     * ### Testing the cell mutation state
      *
      * EMPTYLINE
      *
@@ -176,11 +176,11 @@ public:
          * they are not required to).*/
         MAKE_PTR(P53GainOfFunctionCellMutationState, p_state);
 
-        /* Each cell mutation state has a member variable, {{{mCellCount}}}, which
-         * stores the number of cells with this mutation state. In fact, {{{mCellCount}}}
-         * is defined in the class {{{AbstractCellProperty}}}, from which
-         * {{{AbstractCellMutationState}}} inherits, as well as other cell properties
-         * such as {{{CellLabel}}}. We can test whether {{{mCellCount}}} is being
+        /* Each cell mutation state has a member variable, `mCellCount`, which
+         * stores the number of cells with this mutation state. In fact, `mCellCount`
+         * is defined in the class `AbstractCellProperty`, from which
+         * `AbstractCellMutationState` inherits, as well as other cell properties
+         * such as `CellLabel`. We can test whether `mCellCount` is being
          * updated correctly by our cell mutation state, as follows. */
         TS_ASSERT_EQUALS(p_state->GetCellCount(), 0u);
         p_state->IncrementCellCount();
@@ -190,7 +190,7 @@ public:
         TS_ASSERT_THROWS_THIS(p_state->DecrementCellCount(),
                 "Cannot decrement cell count: no cells have this cell property");
 
-        /* We can also test that {{{mColour}}} has been set correctly by our constructor, as follows. */
+        /* We can also test that `mColour` has been set correctly by our constructor, as follows. */
         TS_ASSERT_EQUALS(p_state->GetColour(), 5u);
 
         /* We can also test whether our cell mutation state is of a given type, as follows. */
@@ -239,16 +239,16 @@ public:
     /*
      * EMPTYLINE
      *
-     * == Using the cell mutation state in a cell-based simulation ==
+     * ### Using the cell mutation state in a cell-based simulation
      *
      * EMPTYLINE
      *
-     * We conclude with a brief test demonstrating how {{{P53GainOfFunctionCellMutationState}}} can be used
+     * We conclude with a brief test demonstrating how `P53GainOfFunctionCellMutationState` can be used
      * in a cell-based simulation.
      */
     void TestOffLatticeSimulationWithP53GainOfFunctionCellMutationState()
     {
-        /* We use the {{{HoneycombMeshGenerator}}} to create a honeycomb mesh covering a
+        /* We use the `HoneycombMeshGenerator` to create a honeycomb mesh covering a
          * circular domain of given radius, as follows. */
         HoneycombMeshGenerator generator(10, 10);
         boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetCircularMesh(5);
@@ -272,28 +272,28 @@ public:
         /* In order to visualize labelled cells we need to use the following command.*/
         cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
 
-        /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
+        /* We then pass in the cell population into an `OffLatticeSimulation`,
          * and set the output directory, output multiple, and end time. */
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestOffLatticeSimulationWithNewMutationState");
         simulator.SetSamplingTimestepMultiple(12);
         simulator.SetEndTime(10.0);
 
-        /* We create a force law and pass it to the {{{OffLatticeSimulation}}}. */
+        /* We create a force law and pass it to the `OffLatticeSimulation`. */
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(3);
         simulator.AddForce(p_linear_force);
 
-        /* To run the simulation, we call {{{Solve()}}}. */
+        /* To run the simulation, we call `Solve()`. */
         simulator.Solve();
     }
     /*
      * When you visualize the results with
      *
-     * {{{java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithNewMutationState/results_from_time_0}}}
+     * `java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithNewMutationState/results_from_time_0`
      *
      * you should see two cells in black which are the cells with the new mutation. If we want these cells to behave differently we
-     * would need to write an new {{{CellCycleModel}}}, {{{CellKiller}}}, {{{Force}}}, or {{{CellPopulationBoundaryCondition}}}
+     * would need to write an new `CellCycleModel`, `CellKiller`, `Force`, or `CellPopulationBoundaryCondition`
      * which checks for the new mutation.
      *
      */

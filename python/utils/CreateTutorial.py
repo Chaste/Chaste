@@ -58,10 +58,15 @@ Notes:
 
 import optparse
 import os
+import re
 import sys
+from datetime import datetime
 
 # This had better match GenerateHowTo.py!
 HOWTO_TAG = "HOW_TO_TAG"
+
+HEADING_REGEX = re.compile('([=]+)([^=]*)[=]+')
+INLINE_CODE_REGEX = re.compile('{{{([^}]*)}}}')
 
 def ConvertFileToWikiText(fileobj, filepath):
     """Convert a single tutorial source file to wiki markup, returning the page source."""
@@ -98,6 +103,8 @@ def ConvertFileToWikiText(fileobj, filepath):
         # We don't remove the initial whitespace as it will be needed for code lines.
         stripped_line = line.strip()
         
+        
+        
         # We stop processing input after an #endif matching the initial include guard
         if stripped_line.startswith('#endif'):
             assert ifdefs_seen > 0, "#endif seen before #if"
@@ -105,7 +112,7 @@ def ConvertFileToWikiText(fileobj, filepath):
             if ifdefs_seen == 0:
                 if status is ST_CODE:
                     # close code block
-                    output.append('}}}\n')
+                    output.append('```\n')
                 parsing = False
     
         # If in Parsing mode
@@ -122,7 +129,7 @@ def ConvertFileToWikiText(fileobj, filepath):
                 stripped_line = line = stripped_line[2:].strip()
                 # if the last line was code, close the output code block
                 if status is ST_CODE:
-                    output.append('}}}\n')
+                    output.append('```\n')
                 # set the status as text
                 status = ST_TEXT
             elif status in [ST_TEXT, ST_HOWTO] and IsStillComment(stripped_line):
@@ -132,6 +139,16 @@ def ConvertFileToWikiText(fileobj, filepath):
                 # Line has content and isn't a comment => it's code
                 output.append(code_block_opener)
                 status = ST_CODE
+                
+            # convert trac wiki style header
+            heading = HEADING_REGEX.match(stripped_line)
+            if heading:
+                lead = heading.group(1)
+                body = heading.group(2)
+                stripped_line = line = len(lead) * '#' + body
+                
+            # convert trac wiki inline code
+            line, _ = INLINE_CODE_REGEX.subn(f'`\\1`{{.{Hightlight(filepath)}}}', line)
             
             # Check if comment ends
             if EndsComment(stripped_line) and (not comment_started or end_can_be_start):
@@ -184,20 +201,39 @@ def ConvertFileToWikiText(fileobj, filepath):
 
     return ''.join(output), code_store
 
+def Hightlight(file_name):
+    ext = os.path.splitext(file_name)[1]
+    highlight_code = {'.hpp': 'cpp', '.cpp': 'cpp', '.py': 'python', '.sh': 'bash'}.get(ext, '')
+    return highlight_code
+
 def CodeBlockOpener(file_name):
     """Return the opener string for a Trac wiki code block with syntax highlighting based on file extension."""
-    ext = os.path.splitext(file_name)[1]
-    highlight_code = {'.hpp': '#!cpp\n', '.cpp': '#!cpp\n', '.py': '#!python\n', '.sh': '#!sh\n'}.get(ext, '')
-    return '{{{\n' + highlight_code
+    highlight_code = Hightlight(file_name)
+    return '```' + highlight_code + '\n'
 
 def AddCodeOutput(file_name, code, output):
-    output.append('\n\n== File name `%s` ==\n\n' % file_name)
+    output.append('\n\n## File name `%s` \n\n' % file_name)
     output.append(CodeBlockOpener(file_name))
     output.append('\n'.join(code))
-    output.append('\n}}}\n\n')
+    output.append('\n```\n\n')
 
-def ConvertTutorialToWikiText(test_file_path, test_file, other_files, revision=''):
-    """Convert a tutorial, possibly comprised of multiple files, to wiki markup.
+def get_title_from_file_name(file_name):
+    # Remove "Test" from the start of the string, if it exists
+    if file_name.startswith("Test"):
+        file_name = file_name.replace("Test", "")
+
+    # Remove "Tutorial" from the end of the string, if it exists
+    if file_name.endswith("Tutorial"):
+        file_name = file_name.replace("Tutorial", "")
+
+    # Split CamelCase string into list of words
+    words = re.findall(r'[A-Z](?:[a-z]+|[A-Z]*(?=[A-Z]|$))', file_name)
+
+    # Join words with space and return the result
+    return ' '.join(words)
+
+def ConvertTutorialToHugoMd(test_file_path, test_file, other_files, revision=''):
+    """Convert a tutorial, possibly comprised of multiple files, to hugo markdown.
     
     test_file is the content of the tutorial test .hpp file, as an object which will
     return each line in turn when iterated.
@@ -213,13 +249,24 @@ def ConvertTutorialToWikiText(test_file_path, test_file, other_files, revision='
             revision = 'at revision r{}'.format(revision)
         else:
             assert len(revision) == 40,  'Expected 40-digit git commit hash'
-            revision = 'at revision [changeset:{}/git_repo]'.format(revision[0:12])  # abbreviate to consistent length
+            revision = f'at revision [{revision[0:12]}](https://github.com/Chaste/Chaste/commit/{revision})'
 
     output = []
 
     # Header
-    output.append('This tutorial is automatically generated from the file {} {}.\n'.format(test_file_path, revision))
-    output.append('Note that the code is given in full at the bottom of the page.\n\n\n')
+    title = get_title_from_file_name(os.path.basename(test_file_path))
+    description = f'This tutorial is automatically generated from the file {test_file_path} {revision}. Note that the code is given in full at the bottom of the page.'
+    # date = str(datetime.now())
+    header = f"""
+---
+title : "{title}"
+summary: "{description}"
+draft: false
+images: []
+toc: true
+---
+"""
+    output.append(header)
 
     # Convert each file in turn
     test_output, test_code = ConvertFileToWikiText(test_file, test_file_path)
@@ -228,12 +275,12 @@ def ConvertTutorialToWikiText(test_file_path, test_file, other_files, revision='
     for other_file in other_files:
         file_output, file_code = ConvertFileToWikiText(other_file[1], other_file[0])
         if file_output:
-            output.append('\n\n= Extra file %s =\n' % other_file[0])
+            output.append('\n\n# Extra file %s\n' % other_file[0])
             output.append(file_output)
         if file_code:
             other_code[other_file[0]] = file_code
     # Now output the C++ code for all files
-    output.append('\n\n= Code =\nThe full code is given below\n')
+    output.append('\n\n# Code\nThe full code is given below\n')
     AddCodeOutput(os.path.basename(test_file_path), test_code, output)
     for filename, code in other_code.items():
         AddCodeOutput(filename, code, output)
@@ -286,7 +333,7 @@ if __name__ == '__main__':
         out_file = open(out_file_name, 'w')
     
     # Do the conversion
-    out_file.write(ConvertTutorialToWikiText(real_file_path, in_file, [], options.revision))
+    out_file.write(ConvertTutorialToHugoMd(real_file_path, in_file, [], options.revision))
     
     # Close files
     if in_file is not sys.stdin:
