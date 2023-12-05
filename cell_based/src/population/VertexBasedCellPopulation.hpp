@@ -437,6 +437,14 @@ public:
     double GetVolumeOfCell(CellPtr pCell);
 
     /**
+     * Converter which takes in Petscs vectors and converts them to a c_vector
+     *
+     * @param petscVec the PetSc vector to be converted
+     * @return c_vector variation of the PetSc vector
+     */
+    std::vector<double> ConvertPetscVecToVector(Vec petscVec);
+
+    /**
      * Return all locations of T2 swaps since the last sampling time step.
      *
      * @return mLocationsOfT2Swaps
