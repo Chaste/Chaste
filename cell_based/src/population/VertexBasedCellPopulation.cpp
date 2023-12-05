@@ -454,6 +454,25 @@ double VertexBasedCellPopulation<DIM>::GetVolumeOfCell(CellPtr pCell)
 }
 
 template<unsigned DIM>
+std::vector<double> VertexBasedCellPopulation<DIM>::ConvertPetscVecToVector(Vec petscVec) {
+    PetscInt size;
+    VecGetSize(petscVec, &size);
+
+    std::vector<double> converted_vector(size);
+
+    PetscScalar *array;
+    VecGetArray(petscVec, &array);
+
+    for (PetscInt i = 0; i < size; ++i) {
+        converted_vector[i] = PetscRealPart(array[i]);
+    }
+
+    VecRestoreArray(petscVec, &array);
+
+    return converted_vector;
+}
+
+template<unsigned DIM>
 void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
     // We avoid writing out CellData if the population is empty (i.e. no cells)
@@ -546,12 +565,23 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
             for (auto cell_iter = this->Begin();
                 cell_iter != this->End();
                 ++cell_iter)
-            {
+            {   
+                if(cell_iter->HasCellVecData()){
+
+                // Get index of this element in the vertex mesh
+                unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
+
+                // Populate the vector of VTK cell data
+                vtk_cell_vec_data[elem_index] = p_cell_writer->GetVectorCellDataForVtkOutput(*cell_iter, this);    
+
+                }else{
+
                 // Get index of this element in the vertex mesh
                 unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
 
                 // Populate the vector of VTK cell data
                 vtk_cell_vec_data[elem_index] = p_cell_writer->GetVectorCellDataForVtkOutput(*cell_iter, this);
+                }
             }
 
             // Add data to the VertexMeshWriter to be output to VTK
@@ -600,10 +630,10 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
      */
     unsigned num_cell_vec_data_items = this->Begin()->GetCellVecData()->GetNumItems();
     std::vector<std::string> cell_vec_data_names = this->Begin()->GetCellVecData()->GetKeys();
-    std::vector<std::vector<Vec> > cell_vec_data;
+    std::vector<std::vector<std::vector<double>>> cell_vec_data;
     for (unsigned var = 0; var < num_cell_vec_data_items; ++var)
     {
-        std::vector<Vec> cell_vec_data_var(num_cells);
+        std::vector<std::vector<double>> cell_vec_data_var(num_cells);
         cell_vec_data.push_back(cell_vec_data_var);
     }
 
@@ -621,7 +651,9 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
              * \todo Convert this CellVecData item from a Vec to a std::vector, 
              * or else change the type of cell_vec_data above.
              */
-            cell_vec_data[var][elem_index] = cell_iter->GetCellVecData()->GetItem(cell_vec_data_names[var]);
+
+            std::vector<double> converted = ConvertPetscVecToVector(cell_iter->GetCellVecData()->GetItem(cell_vec_data_names[var]));
+            cell_vec_data[var][elem_index] = converted;
         }
     }
 
