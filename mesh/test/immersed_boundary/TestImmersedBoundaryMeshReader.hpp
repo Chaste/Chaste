@@ -108,7 +108,7 @@ public:
         TS_ASSERT_EQUALS(element_data.AttributeValue, expected_element_data.AttributeValue);
     
         ImmersedBoundaryElementData lamina_data = reader.GetNextImmersedBoundaryLaminaData();
-        ImmersedBoundaryElementData expected_lamina_data {{15, 16, 17, 18, 19}, 0, false, 0, {}, 0.0, false};
+        ImmersedBoundaryElementData expected_lamina_data {{15, 16, 17, 18, 19}, 1, false, 0, {}, 0.0, false};
         TS_ASSERT_EQUALS(lamina_data.NodeIndices, expected_lamina_data.NodeIndices);
         TS_ASSERT_EQUALS(lamina_data.AttributeValue, expected_lamina_data.AttributeValue);
     }
