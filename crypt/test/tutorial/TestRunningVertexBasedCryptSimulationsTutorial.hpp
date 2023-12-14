@@ -45,15 +45,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTRUNNINGVERTEXBASEDCRYPTSIMULATIONSTUTORIAL_HPP_
 
 /*
- * = Examples showing how to create, run and visualize vertex-based simulations on periodic meshes with different cell-cycle models =
+ * ## Examples showing how to create, run and visualize vertex-based simulations on periodic meshes with different cell-cycle models
  *
- * == Introduction ==
+ * ### Introduction
  *
  * In this tutorial we show how Chaste can be used to create, run and visualize vertex-based simulations.
  * This mechanical model was originally proposed by T. Nagai and H. Honda ("A dynamic cell model for
  * the formation of epithelial tissues", Philosophical Magazine Part B 81:699-719).
  *
- * == The test ==
+ * ### The test
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary header files.
  */
@@ -82,18 +82,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombVertexMeshGenerator.hpp"
 /* The next header file defines a helper class for generating a periodic vertex mesh. */
 #include "CylindricalHoneycombVertexMeshGenerator.hpp"
-/* The next header file defines the class that simulates the evolution of a crypt {{{CellPopulation}}}
+/* The next header file defines the class that simulates the evolution of a crypt `CellPopulation`
  * for a vertex mesh. */
 #include "CryptSimulation2d.hpp"
-/* The next header file defines a vertex-based {{{CellPopulation}}} class.*/
+/* The next header file defines a vertex-based `CellPopulation` class.*/
 #include "VertexBasedCellPopulation.hpp"
 /* The next header file defines a force law for describing the mechanical interactions
  * between neighbouring cells in the cell population, subject to each vertex.
  */
 #include "NagaiHondaForce.hpp"
-/* In conjunction with the {{{NagaiHondaForce}}}, we choose to use a child class 
- * of {{{AbstractTargetAreaModifier}}} to model cell growth between divisions.
- * Here, we use the {{{SimpleTargetAreaModifier}}}.
+/* In conjunction with the `NagaiHondaForce`, we choose to use a child class 
+ * of `AbstractTargetAreaModifier` to model cell growth between divisions.
+ * Here, we use the `SimpleTargetAreaModifier`.
  */
 #include "SimpleTargetAreaModifier.hpp"
 
@@ -105,7 +105,7 @@ public:
     /* EMPTYLINE
      *
      *
-     * == Test 1 - create a vertex-based crypt simulation ==
+     * ### Test 1 - create a vertex-based crypt simulation
      *
      * EMPTYLINE
      *
@@ -117,19 +117,19 @@ public:
     {
         /* Create a cylindrical mesh, and get the cell location indices. To enforce
          * periodicity at the left and right hand sides of the mesh, we use a subclass
-         * called {{{Cylindrical2dMesh}}}, which has extra methods for maintaining
+         * called `Cylindrical2dMesh`, which has extra methods for maintaining
          * periodicity.
          */
          CylindricalHoneycombVertexMeshGenerator generator(6, 9);
          boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
-        /* Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
+        /* Having created a mesh, we now create a `std::vector` of `CellPtr`s.
          * To do this, we the `CryptCellsGenerator` helper class, which is templated over the type
-         * of cell model required (here {{{FixedG1GenerationalCellCycleModel}}})
+         * of cell model required (here `FixedG1GenerationalCellCycleModel`)
          * and the dimension. We create an empty vector of cells and pass this into the
          * method along with the mesh. The third argument 'true' indicates that the cells
          * should be assigned random birth times, to avoid synchronous division. The
-         * {{{cells}}} vector is populated once the method {{{Generate}}} is
+         * `cells` vector is populated once the method `Generate` is
          * called.
          * The last four arguments represent the height below which cells belong to generations 0,
          * 1, 2, 3 and 4, respectively.
@@ -147,12 +147,12 @@ public:
         simulator.SetEndTime(0.1);
 
         /* Before running the simulation, we add a one or more force laws, which determine the mechanics of
-         * the cell population.  For this test, we use a {{{NagaiHondaForce}}}.
+         * the cell population.  For this test, we use a `NagaiHondaForce`.
          */
         MAKE_PTR(NagaiHondaForce<2>, p_force);
         simulator.AddForce(p_force);
 
-        /* We next add a child class of {{{AbstractTargetAreaModifier}}} to the 
+        /* We next add a child class of `AbstractTargetAreaModifier` to the 
          * simulation. This modifier assigns and updates target areas to each 
          * cell throughout the simulation, modelling cell growth between 
          * divisions. The target areas are in turn used by the force law to 
@@ -163,22 +163,22 @@ public:
 
         /* Before running the simulation, we add a cell killer. This object
          * dictates conditions under which cells die. For this test, we use
-         * a {{{SloughingCellKiller}}}, which kills cells above a certain height.
+         * a `SloughingCellKiller`, which kills cells above a certain height.
          */
         double crypt_length = 6.0;
         MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&crypt, crypt_length));
         simulator.AddCellKiller(p_killer);
 
-        /* To run the simulation, we call {{{Solve()}}}. */
+        /* To run the simulation, we call `Solve()`. */
         simulator.Solve();
     }
 
     /*
      * EMPTYLINE
      *
-     * To visualize the results, open a new terminal, {{{cd}}} to the Chaste directory,
-     * then {{{cd}}} to {{{anim}}}. Then do: {{{java Visualize2dVertexCells /tmp/$USER/testoutput/VertexCrypt/results_from_time_0}}}.
-     * You may have to do: {{{javac Visualize2dVertexCells.java}}} beforehand to create the
+     * To visualize the results, open a new terminal, `cd` to the Chaste directory,
+     * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/VertexCrypt/results_from_time_0`.
+     * You may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
      * java executable.
      *
      * EMPTYLINE
@@ -188,7 +188,7 @@ public:
      *
      * EMPTYLINE
      *
-     * == Test 2 - create a vertex-based crypt simulation with a simple wnt dependent cell-cycle model ==
+     * ### Test 2 - create a vertex-based crypt simulation with a simple wnt dependent cell-cycle model
      *
      * EMPTYLINE
      *
@@ -204,9 +204,9 @@ public:
         CylindricalHoneycombVertexMeshGenerator generator(6, 9);
         boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
-        /* Create a {{{std::vector}}} of {{{CellPtr}}}s.
-         * Generate cells, which are assigned a {{{SimpleWntCellCycleModel}}} using
-         * the {{{CryptCellsGenerator}}}. The final boolean argument 'true' indicates
+        /* Create a `std::vector` of `CellPtr`s.
+         * Generate cells, which are assigned a `SimpleWntCellCycleModel` using
+         * the `CryptCellsGenerator`. The final boolean argument 'true' indicates
          * to assign randomly chosen birth times.
          */
         std::vector<CellPtr> cells;
@@ -219,7 +219,7 @@ public:
         /* Define the crypt length; this will be used for sloughing and calculating the Wnt gradient. */
         double crypt_length = 6.0;
 
-        /* Set up a {{{WntConcentration}}} object, as in UserTutorials/RunningMeshBasedCryptSimulations. */
+        /* Set up a `WntConcentration` object, as in UserTutorials/RunningMeshBasedCryptSimulations. */
         WntConcentration<2>::Instance()->SetType(LINEAR);
         WntConcentration<2>::Instance()->SetCellPopulation(crypt);
         WntConcentration<2>::Instance()->SetCryptLength(crypt_length);
@@ -242,15 +242,15 @@ public:
         * at the bottom of the crypt are repelled if they move past 0.*/
         simulator.UseJiggledBottomCells();
 
-        /* Run the simulation, by calling {{{Solve()}}}. */
+        /* Run the simulation, by calling `Solve()`. */
         simulator.Solve();
     }
     /*
     * EMPTYLINE
     *
-    * To visualize the results, open a new terminal, {{{cd}}} to the Chaste directory,
-    * then {{{cd}}} to {{{anim}}}. Then do: {{{java Visualize2dVertexCells /tmp/$USER/testoutput/VertexCryptWithSimpleWntCellCycleModel/results_from_time_0}}}.
-    * You may have to do: {{{javac Visualize2dVertexCells.java}}} beforehand to create the
+    * To visualize the results, open a new terminal, `cd` to the Chaste directory,
+    * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/VertexCryptWithSimpleWntCellCycleModel/results_from_time_0`.
+    * You may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
     * java executable.
     *
     * EMPTYLINE

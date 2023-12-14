@@ -45,11 +45,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTRUNNINGVERTEXBASEDSIMULATIONSTUTORIAL_HPP_
 
 /*
- * = Examples showing how to create, run and visualize vertex-based simulations =
+ * ## Examples showing how to create, run and visualize vertex-based simulations
  *
  * EMPTYLINE
  *
- * == Introduction ==
+ * ### Introduction
  *
  * EMPTYLINE
  *
@@ -59,7 +59,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * EMPTYLINE
  *
- * == The test ==
+ * ### The test
  *
  * EMPTYLINE
  *
@@ -81,7 +81,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* The next two header files define a helper class for generating suitable meshes: one planar and one periodic. */
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "CylindricalHoneycombVertexMeshGenerator.hpp"
-/* The next header file defines a vertex-based {{{CellPopulation}}} class.*/
+/* The next header file defines a vertex-based `CellPopulation` class.*/
 #include "VertexBasedCellPopulation.hpp"
 /* The next header file defines a force law for describing the mechanical interactions
  * between neighbouring cells in the cell population, subject to each vertex.
@@ -100,7 +100,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* Finally, we include a header that enforces running this test only on one process. */
 #include "FakePetscSetup.hpp"
 
-/* Next, we define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}
+/* Next, we define the test class, which inherits from `AbstractCellBasedTestSuite`
  * and defines some test methods.
  */
 class TestRunningVertexBasedSimulationsTutorial : public AbstractCellBasedTestSuite
@@ -108,7 +108,7 @@ class TestRunningVertexBasedSimulationsTutorial : public AbstractCellBasedTestSu
 public:
     /* EMPTYLINE
     *
-    * == Test 1 - a basic vertex-based simulation ==
+    * ### Test 1 - a basic vertex-based simulation
     *
     * EMPTYLINE
     *
@@ -117,8 +117,8 @@ public:
     */
     void TestMonolayer()
     {
-        /* First, we generate a vertex mesh. To create a {{{MutableVertexMesh}}}, we can use
-        * the {{{HoneycombVertexMeshGenerator}}}. This generates a honeycomb-shaped mesh,
+        /* First, we generate a vertex mesh. To create a `MutableVertexMesh`, we can use
+        * the `HoneycombVertexMeshGenerator`. This generates a honeycomb-shaped mesh,
         * in which all nodes are equidistant. Here the first and second arguments
         * define the size of the mesh - we have chosen a mesh that is 2 elements (i.e.
         * cells) wide, and 2 elements high.
@@ -126,26 +126,26 @@ public:
         HoneycombVertexMeshGenerator generator(2, 2);    // Parameters are: cells across, cells up
         boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
-        /* Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
+        /* Having created a mesh, we now create a `std::vector` of `CellPtr`s.
         * To do this, we use the `CellsGenerator` helper class, which is templated over the type
-        * of cell model required (here {{{UniformG1GenerationalCellCycleModel}}})
+        * of cell model required (here `UniformG1GenerationalCellCycleModel`)
         * and the dimension. We create an empty vector of cells and pass this into the
         * method along with the mesh. The second argument represents the size of that the vector
-        * {{{cells}}} should become - one cell for each element, the third argument specifies
+        * `cells` should become - one cell for each element, the third argument specifies
         * the proliferative type of the cell. */
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
 
-        /* Now we have a mesh and a set of cells to go with it, we can create a {{{CellPopulation}}}.
+        /* Now we have a mesh and a set of cells to go with it, we can create a `CellPopulation`.
         * In general, this class associates a collection of cells with a mesh.
-        * For this test, because we have a {{{MutableVertexMesh}}}, we use a particular type of
-        * cell population called a {{{VertexBasedCellPopulation}}}.
+        * For this test, because we have a `MutableVertexMesh`, we use a particular type of
+        * cell population called a `VertexBasedCellPopulation`.
         */
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        /* We then pass the cell population into an {{{OffLatticeSimulation}}},
+        /* We then pass the cell population into an `OffLatticeSimulation`,
          * and set the output directory and end time. */
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("VertexBasedMonolayer");
@@ -162,24 +162,25 @@ public:
 
         /* We must now create one or more force laws, which determine the mechanics of the vertices
         * of each cell in a cell population. For this test, we use one force law, based on the
-        * Nagai-Honda mechanics, and pass it to the {{{OffLatticeSimulation}}}.
-        * For a list of possible forces see subclasses of {{{AbstractForce}}}.
-        * These can be found in the inheritance diagram, here, [class:AbstractForce AbstractForce].
+        * Nagai-Honda mechanics, and pass it to the `OffLatticeSimulation`.
+        * For a list of possible forces see subclasses of `AbstractForce`.
+        * These can be found in the inheritance diagram, here,
+        * [AbstractForce](https://chaste.github.io/doxygen-latest/classAbstractForce).
         * Note that some of these forces are not compatible with vertex-based simulations see the specific class documentation for details,
         * if you try to use an incompatible class then you will receive a warning.
         */
         MAKE_PTR(NagaiHondaForce<2>, p_force);
         simulator.AddForce(p_force);
 
-        /* A {{{NagaiHondaForce}}} assumes that each cell has a target area. The target areas of cells are used to determine pressure
+        /* A `NagaiHondaForce` assumes that each cell has a target area. The target areas of cells are used to determine pressure
          * forces on each vertex and eventually determine the size of each cell in the simulation. In order to assign target areas to cells
-         * and update them in each time step to model growth, we add a {{{SimpleTargetAreaModifier}}} to the simulation, which inherits from
-         *  {{{AbstractTargetAreaModifier}}}.
+         * and update them in each time step to model growth, we add a `SimpleTargetAreaModifier` to the simulation, which inherits from
+         *  `AbstractTargetAreaModifier`.
          */
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
-        /* To run the simulation, we call {{{Solve()}}}. */
+        /* To run the simulation, we call `Solve()`. */
         simulator.Solve();
 
         /* The next two lines are for test purposes only and are not part of this tutorial. If different simulation input parameters are being explored
@@ -191,14 +192,14 @@ public:
     /*
     * EMPTYLINE
     *
-    * To visualize the results, open a new terminal, {{{cd}}} to the Chaste directory,
-    * then {{{cd}}} to {{{anim}}}. Then do: {{{java Visualize2dVertexCells /tmp/$USER/testoutput/VertexBasedMonolayer/results_from_time_0}}}.
-    * We may have to do: {{{javac Visualize2dVertexCells.java}}} beforehand to create the
+    * To visualize the results, open a new terminal, `cd` to the Chaste directory,
+    * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/VertexBasedMonolayer/results_from_time_0`.
+    * We may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
     * java executable.
     *
     * EMPTYLINE
     *
-    * == Test 2 - introducing periodicity, boundaries and cell killers ==
+    * ### Test 2 - introducing periodicity, boundaries and cell killers
     *
     * EMPTYLINE
     *
@@ -209,8 +210,8 @@ public:
     */
     void TestPeriodicMonolayer()
     {
-        /* First, we generate a periodic vertex mesh. To create a {{{Cylindrical2dVertexMesh}}}, we can use
-         * the {{{CylindricalHoneycombVertexMeshGenerator}}}. This generates a honeycomb-shaped mesh,
+        /* First, we generate a periodic vertex mesh. To create a `Cylindrical2dVertexMesh`, we can use
+         * the `CylindricalHoneycombVertexMeshGenerator`. This generates a honeycomb-shaped mesh,
          * in which all nodes are equidistant and the right hand side is associated with the left hand side.
          * Here the first and second arguments define the size of the mesh - we have chosen a mesh that
          * is 4 elements (i.e. cells) wide, and 4 elements high.
@@ -218,19 +219,19 @@ public:
         CylindricalHoneycombVertexMeshGenerator generator(4, 4);    // Parameters are: cells across, cells up
         boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
-        /* Having created a mesh, we now create a {{{std::vector}}} of {{{CellPtr}}}s.
+        /* Having created a mesh, we now create a `std::vector` of `CellPtr`s.
         * This is exactly the same as the above test. */
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
         CellsGenerator<UniformG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
 
-        /* Now we have a mesh and a set of cells to go with it, we can create a {{{CellPopulation}}}.
+        /* Now we have a mesh and a set of cells to go with it, we can create a `CellPopulation`.
          * This is also the same as in the above test.
          */
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        /* As always we then pass the cell population into an {{{OffLatticeSimulation}}},
+        /* As always we then pass the cell population into an `OffLatticeSimulation`,
          * and set the output directory, output multiple and end time. */
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("VertexBasedPeriodicMonolayer");
@@ -238,7 +239,7 @@ public:
         simulator.SetEndTime(1.0);
 
         /* We now make a pointer to an appropriate force and pass it to the
-         * {{{OffLatticeSimulation}}}.
+         * `OffLatticeSimulation`.
          */
         MAKE_PTR(NagaiHondaForce<2>, p_force);
         simulator.AddForce(p_force);
@@ -248,12 +249,12 @@ public:
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
-        /* We now create one or more {{{CellPopulationBoundaryCondition}}}s, which determine
+        /* We now create one or more `CellPopulationBoundaryCondition`s, which determine
          * any conditions which each cell in a cell population must satisfy. For this test,
-         * we use a {{{PlaneBoundaryCondition}}}, and pass it to the {{{OffLatticeSimulation}}}.
-         * For a list of possible boundary condition see subclasses of {{{AbstractCellPopulationBoundaryCondition}}}.
+         * we use a `PlaneBoundaryCondition`, and pass it to the `OffLatticeSimulation`.
+         * For a list of possible boundary condition see subclasses of `AbstractCellPopulationBoundaryCondition`.
          * These can be found in the inheritance diagram, here,
-         * [class:AbstractCellPopulationBoundaryCondition AbstractCellPopulationBoundaryCondition].
+         * [AbstractCellPopulationBoundaryCondition](https://chaste.github.io/doxygen-latest/classAbstractCellPopulationBoundaryCondition.html).
          * Note that some of these boundary conditions are not compatible with vertex-based
          * simulations see the specific class documentation for details, if you try to use an
          * incompatible class then you will receive a warning.
@@ -263,28 +264,28 @@ public:
         c_vector<double,2> point = zero_vector<double>(2);
         c_vector<double,2> normal = zero_vector<double>(2);
         normal(1) = -1.0;
-        /* We can now make a pointer to a {{{PlaneBoundaryCondition}}} (passing the point
-         * and normal to the plane) and pass it to the {{{OffLatticeSimulation}}}.*/
+        /* We can now make a pointer to a `PlaneBoundaryCondition` (passing the point
+         * and normal to the plane) and pass it to the `OffLatticeSimulation`.*/
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc, (&cell_population, point, normal));
         simulator.AddCellPopulationBoundaryCondition(p_bc);
 
-        /* We now create one or more {{{CellKiller}}}s, which determine how cells are removed
-         * from the simulation. For this test, we use a {{{PlaneBasedCellKiller}}}, and pass
-         * it to the {{{OffLatticeSimulation}}}. For a list of possible cell killers see subclasses
-         * of {{{AbstractCellKiller}}}. These can be found in the inheritance diagram, here,
-         * [class:AbstractCellKiller AbstractCellKiller].
+        /* We now create one or more `CellKiller`s, which determine how cells are removed
+         * from the simulation. For this test, we use a `PlaneBasedCellKiller`, and pass
+         * it to the `OffLatticeSimulation`. For a list of possible cell killers see subclasses
+         * of `AbstractCellKiller`. These can be found in the inheritance diagram, here,
+         * [AbstractCellKiller](https://chaste.github.io/doxygen-latest/classAbstractCellKiller.html).
          *
          * The first step is to define a point on the plane boundary and a normal to the plane.
-         * We reuse the point and normal from the {{{PlaneBoundaryCondition}}}.
+         * We reuse the point and normal from the `PlaneBoundaryCondition`.
          */
         point(1) = 3.0;
         normal(1) = 1.0;
-        /* Finally we now make a pointer to a {{{PlaneBasedCellKiller}}} (passing the point
-         * and normal to the plane) and pass it to the {{{OffLatticeSimulation}}}.*/
+        /* Finally we now make a pointer to a `PlaneBasedCellKiller` (passing the point
+         * and normal to the plane) and pass it to the `OffLatticeSimulation`.*/
         MAKE_PTR_ARGS(PlaneBasedCellKiller<2>, p_killer, (&cell_population, point, normal));
         simulator.AddCellKiller(p_killer);
 
-        /* To run the simulation, we call {{{Solve()}}}. */
+        /* To run the simulation, we call `Solve()`. */
         simulator.Solve();
 
         /* The next two lines are for test purposes only and are not part of this tutorial.
@@ -295,8 +296,8 @@ public:
     /*
      * EMPTYLINE
      *
-     * To visualize the results, open a new terminal, {{{cd}}} to the Chaste directory,
-     * then {{{cd}}} to {{{anim}}}. Then do: {{{java Visualize2dVertexCells /tmp/$USER/testoutput/VertexBasedPeriodicMonolayer/results_from_time_0}}}.
+     * To visualize the results, open a new terminal, `cd` to the Chaste directory,
+     * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/VertexBasedPeriodicMonolayer/results_from_time_0`.
      *
      * You should see that the edges of the mesh are identical on both sides; cells no
      * longer pass through the line y=0; and cells are removed at y=3.

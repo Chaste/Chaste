@@ -47,9 +47,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /*
- * = An example showing how to create a new cell-based simulation modifier and use it in a simulation =
+ * ## An example showing how to create a new cell-based simulation modifier and use it in a simulation
  *
- * == Introduction ==
+ * ### Introduction
  *
  * EMPTYLINE
  *
@@ -58,7 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * hierarchy is used to implement setup, update and finalise methods in cell-based
  * simulations.
  *
- * == 1. Including header files ==
+ * ### 1. Including header files
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary
  * header file and archiving headers.
@@ -86,7 +86,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakePetscSetup.hpp"
 
 /*
- * == Defining the cell-based simulation modifier class ==
+ * ### Defining the cell-based simulation modifier class
  *
  * As an example, let us consider a simulation modifier that, at each simulation
  * time step, calculates each cell's height (y coordinate) in a two-dimensional
@@ -123,9 +123,9 @@ public:
     {}
 
     /*
-     * Next, we override the {{{UpdateAtEndOfTimeStep()}}} method, which specifies what
+     * Next, we override the `UpdateAtEndOfTimeStep()` method, which specifies what
      * to do to the simulation at the end of each time step. In this class, we simply
-     * call the method {{{UpdateCellData()}}} on the cell population; this method is
+     * call the method `UpdateCellData()` on the cell population; this method is
      * defined later in the class definition.
      */
     void UpdateAtEndOfTimeStep(AbstractCellPopulation<2,2>& rCellPopulation)
@@ -134,11 +134,11 @@ public:
     }
 
     /*
-     * The next overridden method, {{{SetupSolve()}}}, specifies what to do to the
+     * The next overridden method, `SetupSolve()`, specifies what to do to the
      * simulation before the start of the time loop. In this class, we call
-     * {{{UpdateCellData()}}} on the cell population, just as in
-     * {{{UpdateAtEndOfTimeStep()}}}. This is needed because otherwise
-     * {{{CellData}}} will not have been fully initialised when we enter
+     * `UpdateCellData()` on the cell population, just as in
+     * `UpdateAtEndOfTimeStep()`. This is needed because otherwise
+     * `CellData` will not have been fully initialised when we enter
      * the main time loop of the simulation.
      */
     void SetupSolve(AbstractCellPopulation<2,2>& rCellPopulation, std::string outputDirectory)
@@ -148,14 +148,14 @@ public:
     }
 
     /*
-     * Next, we define the {{{UpdateCellData()}}} method itself. This is a helper
+     * Next, we define the `UpdateCellData()` method itself. This is a helper
      * method that computes the height (y coordinate) of each cell in the population
-     * and stores this in the {{{CellData}}} property.
+     * and stores this in the `CellData` property.
      */
     void UpdateCellData(AbstractCellPopulation<2,2>& rCellPopulation)
     {
         /*
-         * We begin by calling {{{Update()}}} on the cell population, which ensures that
+         * We begin by calling `Update()` on the cell population, which ensures that
          * it is in a coherent state.
          */
         rCellPopulation.Update();
@@ -173,14 +173,14 @@ public:
             double cell_height = rCellPopulation.GetLocationOfCellCentre(*cell_iter)[1];
 
             /*
-             * ...and store this in the {{{CellData}}} item "height".
+             * ...and store this in the `CellData` item "height".
              */
             cell_iter->GetCellData()->SetItem("height", cell_height);
         }
     }
 
     /*
-     * Finally, we must override the {{{OutputSimulationModifierParameters()}}} method, which
+     * Finally, we must override the `OutputSimulationModifierParameters()` method, which
      * outputs to file any parameters that are defined in the class. In this class, there are
      * no such parameters to output, so we simply call the method defined on the direct
      * parent class (in this case, the abstract class).
@@ -192,7 +192,7 @@ public:
 };
 
 /*
- * This concludes the definition of the {{{CellHeightTrackingModifier}}} class.
+ * This concludes the definition of the `CellHeightTrackingModifier` class.
  *
  * As mentioned in previous cell-based Chaste tutorials, we need to include the next block
  * of code to be able to archive the simulation modifier object in a cell-based simulation,
@@ -210,26 +210,26 @@ CHASTE_CLASS_EXPORT(CellHeightTrackingModifier)
 /*
  * EMPTYLINE
  *
- * == The Tests ==
+ * ### The Tests
  *
- * We now define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}.
+ * We now define the test class, which inherits from `AbstractCellBasedTestSuite`.
  */
 class TestCreatingAndUsingANewCellBasedSimulationModifierTutorial : public AbstractCellBasedTestSuite
 {
 public:
 
     /*
-     * === Using the modifier in a cell-based simulation ===
+     * #### Using the modifier in a cell-based simulation
      *
-     * We conclude with a brief test demonstrating how {{{CellHeightTrackingModifier}}} can be used
+     * We conclude with a brief test demonstrating how `CellHeightTrackingModifier` can be used
      * in a cell-based simulation.
      */
     void TestOffLatticeSimulationWithCellHeightTrackingModifier()
     {
         /*
-         * In this case, we choose to create a small {{{NodeBasedCellPopulation}}} comprising 25 cells.
+         * In this case, we choose to create a small `NodeBasedCellPopulation` comprising 25 cells.
          * We choose a cut-off for mechanical interactions between cells of 1.5 units and add a
-         * simple {{{ReplusionForce}}} to the simulation. We use a {{{UniformCellCycleModel}}}
+         * simple `ReplusionForce` to the simulation. We use a `UniformCellCycleModel`
          * to implement some random proliferation in the simulation.
          */
         HoneycombMeshGenerator generator(2, 2, 0);
@@ -253,18 +253,18 @@ public:
         simulator.AddForce(p_force);
 
         /*
-         * Finally, we add a {{{CellHeightTrackingModifier}}} to the simulation.
+         * Finally, we add a `CellHeightTrackingModifier` to the simulation.
          */
         MAKE_PTR(CellHeightTrackingModifier, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
-        /* To run the simulation, we call {{{Solve()}}}. */
+        /* To run the simulation, we call `Solve()`. */
         simulator.Solve();
     }
 };
 /*
  * It is most straightforward to visualize the results of this simulation in Paraview.
- * Load the file {{{/tmp/$USER/testoutput/TestOffLatticeSimulationWithCellHeightTrackingModifier/results_from_time_0/results.pvd}}},
+ * Load the file `/tmp/$USER/testoutput/TestOffLatticeSimulationWithCellHeightTrackingModifier/results_from_time_0/results.pvd`,
  * and add glyphs to represent cells.
  */
 

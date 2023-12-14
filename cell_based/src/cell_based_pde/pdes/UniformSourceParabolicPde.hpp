@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractLinearParabolicPde.hpp"
 
 /**
- * An elliptic PDE to be solved numerically using the finite element method, for
+ * A parabolic PDE to be solved numerically using the finite element method, for
  * coupling to a cell-based simulation.
  *
  * The PDE takes the form

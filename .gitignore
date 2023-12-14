@@ -73,3 +73,7 @@ Release
 chaste-build*
 
 **/.uuid
+
+venv
+
+tutorials

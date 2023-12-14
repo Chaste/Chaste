@@ -46,11 +46,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCREATINGANDUSINGANEWCELLPOPULATIONBOUNDARYCONDITIONTUTORIAL_HPP_
 
 /*
- * = An example showing how to create and use a new cell population boundary condition =
+ * ## An example showing how to create and use a new cell population boundary condition
  *
  * EMPTYLINE
  *
- * == Introduction ==
+ * ### Introduction
  *
  * EMPTYLINE
  *
@@ -60,7 +60,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * EMPTYLINE
  *
- * == 1. Including header files ==
+ * ### 1. Including header files
  *
  * EMPTYLINE
  *
@@ -89,15 +89,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * EMPTYLINE
  *
- * == Defining the cell population boundary condition class ==
+ * ### Defining the cell population boundary condition class
  *
  * As an example, let us consider a boundary condition for a two-dimensional cell-based
  * simulation, in which all cells are constrained to lie within the domain given in
  * Cartesian coordinates by 0 <= y <= 5. To implement this we define a cell population
- * boundary condition class, {{{MyBoundaryCondition}}}, which inherits from
- * {{{AbstractCellPopulationBoundaryCondition}}} and overrides the methods
- * {{{ImposeBoundaryCondition()}}}, {{{VerifyBoundaryCondition()}}} and
- * {{{OutputCellPopulationBoundaryConditionParameters()}}}.
+ * boundary condition class, `MyBoundaryCondition`, which inherits from
+ * `AbstractCellPopulationBoundaryCondition` and overrides the methods
+ * `ImposeBoundaryCondition()`, `VerifyBoundaryCondition()` and
+ * `OutputCellPopulationBoundaryConditionParameters()`.
  */
 class MyBoundaryCondition : public AbstractCellPopulationBoundaryCondition<2>
 {
@@ -119,8 +119,8 @@ public:
     {
     }
 
-    /* The second public method overrides {{{ImposeBoundaryCondition()}}}.
-     * This method is called during the {{{Solve()}}} method in {{{OffLatticeSimulation}}}
+    /* The second public method overrides `ImposeBoundaryCondition()`.
+     * This method is called during the `Solve()` method in `OffLatticeSimulation`
      * at the end of each timestep, just after the position of each node
      * in the cell population has been updated according to its equation of motion.
      * The method iterates over all cells in the population, and moves any cell whose
@@ -157,10 +157,10 @@ public:
         }
     }
 
-    /* The third public method overrides {{{VerifyBoundaryCondition()}}}.
-     * This method is called during the {{{Solve()}}} method in {{{OffLatticeSimulation}}}
-     * at the end of each timestep, just after {{{ImposeBoundaryCondition()}}}, and checks
-     * that each cell in the population now satisfies {{{MyBoundaryCondition}}}.
+    /* The third public method overrides `VerifyBoundaryCondition()`.
+     * This method is called during the `Solve()` method in `OffLatticeSimulation`
+     * at the end of each timestep, just after `ImposeBoundaryCondition()`, and checks
+     * that each cell in the population now satisfies `MyBoundaryCondition`.
      */
     bool VerifyBoundaryCondition()
     {
@@ -183,7 +183,7 @@ public:
     }
 
     /* Just as we encountered in [wiki:UserTutorials/CreatingAndUsingANewCellKiller], here we must override
-     * a method that outputs any member variables to a specified results file {{{rParamsFile}}}.
+     * a method that outputs any member variables to a specified results file `rParamsFile`.
      * In our case, there are no parameters, so we simply call the method on the base class.
      * Nonetheless, we still need to override the method, since it is pure virtual in the base
      * class.
@@ -229,17 +229,17 @@ namespace boost
 }
 
 /*
- * This completes the code for {{{MyBoundaryCondition}}}. Note that usually this code
+ * This completes the code for `MyBoundaryCondition`. Note that usually this code
  * would be separated out into a separate declaration in a .hpp file and definition
  * in a .cpp file.
  *
  * EMPTYLINE
  *
- * === The Tests ===
+ * #### The Tests
  *
  * EMPTYLINE
  *
- * We now define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}.
+ * We now define the test class, which inherits from `AbstractCellBasedTestSuite`.
  */
 class TestCreatingAndUsingANewCellPopulationBoundaryConditionTutorial : public AbstractCellBasedTestSuite
 {
@@ -248,7 +248,7 @@ public:
     /*
      * EMPTYLINE
      *
-     * == Testing the cell population boundary condition ==
+     * ### Testing the cell population boundary condition
      *
      * EMPTYLINE
      *
@@ -256,8 +256,8 @@ public:
      */
     void TestMyBoundaryCondition()
     {
-        /* We first create a {{{MeshBasedCellPopulation}}} using the helper
-         * classes {{{HoneycombMeshGenerator}}} and {{{CellsGenerator}}},
+        /* We first create a `MeshBasedCellPopulation` using the helper
+         * classes `HoneycombMeshGenerator` and `CellsGenerator`,
          * as in previous cell-based Chaste tutorials.
          */
         HoneycombMeshGenerator generator(7, 7);
@@ -287,7 +287,7 @@ public:
         }
 
         /* To test that we have implemented the cell population boundary condition correctly,
-         * we call the overridden method {{{ImposeBoundaryCondition()}}}...
+         * we call the overridden method `ImposeBoundaryCondition()`...
          */
         bc.ImposeBoundaryCondition(old_node_locations);
 
@@ -321,14 +321,14 @@ public:
     }
 
     /*
-     * == Using the boundary condition in a cell-based simulation ==
+     * ### Using the boundary condition in a cell-based simulation
      *
-     * We now provide a test demonstrating how {{{MyBoundaryCondition}}} can be used
+     * We now provide a test demonstrating how `MyBoundaryCondition` can be used
      * in a cell-based simulation.
      */
     void TestOffLatticeSimulationWithMyBoundaryCondition()
     {
-        /* Once again we create a {{{MeshBasedCellPopulation}}}. */
+        /* Once again we create a `MeshBasedCellPopulation`. */
         HoneycombMeshGenerator generator(7, 7, 0);
         boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
@@ -341,14 +341,14 @@ public:
         /* We use the cell population to construct a cell population boundary condition object. */
         MAKE_PTR_ARGS(MyBoundaryCondition, p_bc, (&cell_population));
 
-        /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
+        /* We then pass in the cell population into an `OffLatticeSimulation`,
          * and set the output directory, output multiple, and end time. */
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestOffLatticeSimulationWithMyBoundaryCondition");
         simulator.SetSamplingTimestepMultiple(12);
         simulator.SetEndTime(1.0);
 
-        /* We create a force law and pass it to the {{{OffLatticeSimulation}}}. */
+        /* We create a force law and pass it to the `OffLatticeSimulation`. */
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(3);
         simulator.AddForce(p_linear_force);
@@ -356,13 +356,13 @@ public:
         /* We now pass the cell population boundary condition into the cell-based simulation. */
         simulator.AddCellPopulationBoundaryCondition(p_bc);
 
-        /* To run the simulation, we call {{{Solve()}}}. */
+        /* To run the simulation, we call `Solve()`. */
         simulator.Solve();
     }
     /*
      * When you visualize the results with
      *
-     * {{{java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMyBoundaryCondition/results_from_time_0}}}
+     * `java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMyBoundaryCondition/results_from_time_0`
      *
      * you should see that cells are restricted to the domain 0 <= y <= 5.
      *

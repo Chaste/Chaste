@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTMONODOMAIN3DEXAMPLEWITHCVODETUTORIAL_HPP_
 
 /*
- * = 3D monodomain example using CVODE for ODE solution =
+ * ## 3D monodomain example using CVODE for ODE solution
  *
  * This tutorial is based on [wiki:UserTutorials/Monodomain3dExample Monodomain3dExample] except this time we will
  * use CVODE solvers. To highlight the changes needed to run with CVODE we omit the usual
@@ -61,9 +61,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *  2. via an `AbstractCvodeCell` instead of an `AbstractCardiacCell` - this class uses native CVODE vectors and is preferred.
  *
- * In order to generate CVODE cells please see [wiki:ChasteGuides/CodeGenerationFromCellML CodeGenerationFromCellML].
+ * In order to generate CVODE cells please see [CodeGenerationFromCellML](https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CodeGenerationFromCellML).
  *
- * '''NB:''' recent improvements (available from release 2021.1) mean that
+ * **NB:** recent improvements (available from release 2021.1) mean that
  * an ''analytic jacobian'' is automatically made available to CVODE via the
  * native `AbstractCvodeCell`, and this will provide a speed up of between 5-30% (depending on the size of
  * the ODE system).
@@ -127,7 +127,7 @@ public:
          * Each cell needs its own solver because CVODE saves information about the solver state
          * between runs to perform its adaptive scheme.
          *
-         * '''NB:''' this will use more memory than the standard approach of sharing one solver
+         * **NB:** this will use more memory than the standard approach of sharing one solver
          * object between all of the action potential models on a processor.
          */
         if ((x<0.1+1e-6) && (y<0.1+1e-6) && (z<0.1+1e-6))
@@ -181,7 +181,7 @@ public:
          * it is called, so we should just call it once per PDE timestep - i.e. set the
          * ODE and PDE timesteps to be the same.
          *
-         * '''NB''': CVODE will only give you a big speedup when the ODE/PDE timestep is larger than
+         * **NB**: CVODE will only give you a big speedup when the ODE/PDE timestep is larger than
          * a typical Forward Euler timestep would be for that model. But it doesn't
          * seem to be any slower than Forward Euler, even at this PDE resolution.
          *
@@ -214,7 +214,7 @@ public:
         ReplicatableVector voltage(monodomain_problem.GetSolution());
 
         /*
-         * '''NB''': CVODE almost certainly gives a more accurate ODE solution than
+         * **NB**: CVODE almost certainly gives a more accurate ODE solution than
          * Forward Euler, so this result has been tweaked from previous tutorial (34.9032mV previously).
          */
         TS_ASSERT_DELTA(voltage[0], 34.7740, 1e-1); // Slack tolerance for different CVODE versions.

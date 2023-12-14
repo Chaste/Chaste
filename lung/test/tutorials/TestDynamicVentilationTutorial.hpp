@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /*
- * = An example showing how to simulate ventilation over a full breathing cycle. =
+ * ## An example showing how to simulate ventilation over a full breathing cycle.
  *
  * In this tutorial we demonstrate the use of !DynamicVentilationProblem to simulate breathing over a
  * single breathing cycle. Acini are represented by linear balloon models and the simulation is driven
@@ -77,7 +77,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 
 /*
- * == Acinar Unit Factory ==
+ * ### Acinar Unit Factory
  *
  * !DynamicVentilationProblem couples a ventilation model on an airway tree to acinar dynamics models. The
  * distal ends of the airway tree have an acinar model associated with them. These models are specified
@@ -147,7 +147,7 @@ public: // Tests should be public!
         EXIT_IF_PARALLEL;
 
         /*
-         * == IMPORTANT ==
+         * ### IMPORTANT
          * See the note below about use of direct solvers. This tutorial cannot be run without a direct solver.
          */
 #if defined(LUNG_USE_UMFPACK) || defined(LUNG_USE_KLU)
@@ -229,7 +229,7 @@ public: // Tests should be public!
 
     /*
      *
-     * == IMPORTANT: Using UMFPACK/KLU ==
+     * ### IMPORTANT: Using UMFPACK/KLU
      *
      * Ventilation problems lead to very badly conditioned matrices. Iterative solvers such as GMRES can stall on these
      * matrices. When running problems on large airway trees it is vital that to change the linear solver to a direct

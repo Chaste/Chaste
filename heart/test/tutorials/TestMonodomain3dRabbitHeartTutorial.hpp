@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTMONODOMAIN3DRABBITHEARTTUTORIAL_HPP_
 
 /*
- * = 3D monodomain rabbit heart example =
+ * ## 3D monodomain rabbit heart example
  *
  * This tutorial runs a simulation on a whole rabbit heart mesh. Note that this
  * mesh is far too coarse for converged simulations, but provides a useful example.
@@ -183,7 +183,7 @@ public:
 };
 
 /*
- * '''Note''' if you were doing a 'real' scientific simulation you would want to use a higher
+ * **Note** if you were doing a 'real' scientific simulation you would want to use a higher
  * resolution mesh. A version of this can be found on the [http://www.cs.ox.ac.uk/chaste/download.html Chaste download website]
  *
  * Navigate to the "Data" tab, and download either

@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTBIDOMAINWITHCONDUCTIVITYMODIFIERTUTORIAL_HPP_
 #define TESTBIDOMAINWITHCONDUCTIVITYMODIFIERTUTORIAL_HPP_
 /*
- * = A bidomain simulation with spatially varying conductivities. =
+ * ## A bidomain simulation with spatially varying conductivities.
  *
  * Tissue conductivity can be altered in simple (cuboid and ellipsoid) regions using
  * the `HeartConfig` `SetConductivityHeterogeneities` methods. This tutorial describes a
