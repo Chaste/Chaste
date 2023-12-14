@@ -42,6 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "AbstractCardiacCellFactory.hpp"
+#include "DistributedTetrahedralMesh.hpp"
+#include "DistributedTetrahedralMeshPartitionType.hpp"
 #include "SimpleStimulus.hpp"
 #include "LuoRudy1991.hpp"
 #include "HeartRegionCodes.hpp"
