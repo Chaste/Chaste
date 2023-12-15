@@ -45,7 +45,11 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCentreBasedDivi
  * An abstract facade class encapsulating a centre-based cell population, in which
  * each cell corresponds to a Node.
  */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+#ifdef DOXYGEN_CHASTE_ISSUE_199 // See https://github.com/Chaste/Chaste/issues/199
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+#else
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
+#endif
 class AbstractCentreBasedCellPopulation : public AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>
 {
 private:

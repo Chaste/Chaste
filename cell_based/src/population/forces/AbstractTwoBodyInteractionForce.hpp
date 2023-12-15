@@ -42,7 +42,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * An abstract class for two-body force laws.
  */
-template<unsigned  ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+#ifdef DOXYGEN_CHASTE_ISSUE_199 // See https://github.com/Chaste/Chaste/issues/199
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+#else
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
+#endif
 class AbstractTwoBodyInteractionForce : public AbstractForce<ELEMENT_DIM, SPACE_DIM>
 {
 private:

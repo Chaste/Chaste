@@ -53,7 +53,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Contains a group of cells and maintains the associations between cells and
  * nodes in the mesh.
  */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+#ifdef DOXYGEN_CHASTE_ISSUE_199 // See https://github.com/Chaste/Chaste/issues/199
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+#else
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
+#endif
 class MeshBasedCellPopulation : public AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>
 {
     friend class TestMeshBasedCellPopulation;

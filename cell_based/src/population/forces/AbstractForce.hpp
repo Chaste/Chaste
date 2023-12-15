@@ -44,7 +44,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * An abstract force class, for use in cell-based simulations.
  */
-template<unsigned  ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+#ifdef DOXYGEN_CHASTE_ISSUE_199 // See https://github.com/Chaste/Chaste/issues/199
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+#else
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
+#endif
 class AbstractForce : public Identifiable
 {
     /** Needed for serialization. */

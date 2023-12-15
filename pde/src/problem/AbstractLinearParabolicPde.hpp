@@ -52,7 +52,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * c(x) du/dt = Grad.(DiffusionTerm(x)*Grad(u))+LinearSourceTerm(x)+NonlinearSourceTerm(x, u)
  *
  */
+#ifdef DOXYGEN_CHASTE_ISSUE_199 // See https://github.com/Chaste/Chaste/issues/199
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+#else
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
+#endif
 class AbstractLinearParabolicPde : public AbstractLinearPde<ELEMENT_DIM, SPACE_DIM>
 {
 private:

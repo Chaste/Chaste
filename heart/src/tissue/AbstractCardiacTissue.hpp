@@ -74,7 +74,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * vector of cells, and getting the ionic current and stimuli from these
  * cells and putting them in replicated arrays for the PDE solvers to call.
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
+#ifdef DOXYGEN_CHASTE_ISSUE_199 // See https://github.com/Chaste/Chaste/issues/199
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+#else
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
+#endif
 class AbstractCardiacTissue : private boost::noncopyable
 {
 private:
