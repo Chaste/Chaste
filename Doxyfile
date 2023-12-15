@@ -2393,7 +2393,8 @@ INCLUDE_FILE_PATTERNS  =
 
 PREDEFINED             = CHASTE_CVODE \
                          CHASTE_VTK \
-                         CHASTE_ADAPTIVITY
+                         CHASTE_ADAPTIVITY \
+                         DOXYGEN_CHASTE_ISSUE_199
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
