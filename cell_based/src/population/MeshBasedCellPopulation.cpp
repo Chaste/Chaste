@@ -865,48 +865,41 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateVoronoiTessellation(
 {
     if constexpr (ELEMENT_DIM == 1)
     {
-        /*
-         * The VoronoiTessellation class is only defined in 2D or 3D
-         */
+        // The VoronoiTessellation class is only defined in 2D or 3D
         NEVER_REACHED;
     }
-    else if constexpr (ELEMENT_DIM == 2)
+    else if constexpr (ELEMENT_DIM == 2 && SPACE_DIM == 2)
     {
-        if constexpr (SPACE_DIM == 2)
-        {
-            delete mpVoronoiTessellation;
+        delete mpVoronoiTessellation;
 
-            // Check if the mesh associated with this cell population is periodic
-            bool is_mesh_periodic = false;
-            if (dynamic_cast<Cylindrical2dMesh*>(&(this->mrMesh)))
-            {
-                is_mesh_periodic = true;
-                mpVoronoiTessellation = new Cylindrical2dVertexMesh(static_cast<Cylindrical2dMesh&>(this->mrMesh), mBoundVoronoiTessellation);
-            }
-            else if (dynamic_cast<Toroidal2dMesh*>(&(this->mrMesh)))
-            {
-                is_mesh_periodic = true;
-                mpVoronoiTessellation = new Toroidal2dVertexMesh(static_cast<Toroidal2dMesh&>(this->mrMesh), mBoundVoronoiTessellation);
-            }
-            else
-            {
-                mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2>&>((this->mrMesh)), is_mesh_periodic, mBoundVoronoiTessellation);
-            }
-        }
-        else // SPACE_DIM == 3
+        // Check if the mesh associated with this cell population is periodic
+        bool is_mesh_periodic = false;
+        if (dynamic_cast<Cylindrical2dMesh*>(&(this->mrMesh)))
         {
-            NEVER_REACHED;
+            is_mesh_periodic = true;
+            mpVoronoiTessellation = new Cylindrical2dVertexMesh(static_cast<Cylindrical2dMesh&>(this->mrMesh), mBoundVoronoiTessellation);
+        }
+        else if (dynamic_cast<Toroidal2dMesh*>(&(this->mrMesh)))
+        {
+            is_mesh_periodic = true;
+            mpVoronoiTessellation = new Toroidal2dVertexMesh(static_cast<Toroidal2dMesh&>(this->mrMesh), mBoundVoronoiTessellation);
+        }
+        else
+        {
+            mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2>&>((this->mrMesh)), is_mesh_periodic, mBoundVoronoiTessellation);
         }
     }
-    else // ELEMENT_DIM == 3
+    else if constexpr (ELEMENT_DIM == 3)
     {
-        /*
-         * The cylindrical mesh is only defined in 2D, hence there is
-         * a separate definition for this method in 3D, which doesn't have the capability
-         * of dealing with periodic boundaries in 3D. This is \todo #1374.
-         */
+         // The cylindrical mesh is only defined in 2D, hence there is
+         // a separate definition for this method in 3D, which doesn't have the capability
+         // of dealing with periodic boundaries in 3D. This is \todo #1374.
         delete mpVoronoiTessellation;
         mpVoronoiTessellation = new VertexMesh<3, 3>(static_cast<MutableMesh<3, 3>&>(this->mrMesh));
+    }
+    else // ELEMENT_DIM == 2 && SPACE_DIM != 2
+    {
+        NEVER_REACHED;
     }
 }
 
