@@ -148,7 +148,7 @@ public:
      *  this is equal to 2*Get_dW_dI1(3,3) + 4*Get_dW_dI2(3,3) in 3D
      *  and 2*Get_dW_dI1(2,0) in 2D.
      */
-    double GetZeroStrainPressure() override;
+    double GetZeroStrainPressure();
 };
 
 #endif /*ABSTRACTISOTROPICINCOMPRESSIBLEMATERIALLAW_HPP_*/
