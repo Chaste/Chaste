@@ -617,7 +617,7 @@ macro(Chaste_DO_TEST_COMMON component)
                         else()
                             set(revision_string "")
                         endif()
-                        set(out_filename  ${CMAKE_BINARY_DIR}/tutorials/UserTutorials/${CMAKE_MATCH_1})
+                        set(out_filename  ${CMAKE_BINARY_DIR}/tutorials/UserTutorials/${CMAKE_MATCH_1}.md)
                         add_custom_command(OUTPUT ${out_filename}
                             COMMAND ${PYTHON_EXECUTABLE} ARGS ${Chaste_BINARY_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename} ${revision_string}
                             DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${filename}
@@ -628,7 +628,7 @@ macro(Chaste_DO_TEST_COMMON component)
 
                     # filename is a paper tutorial
                     if(filename MATCHES "Test(.*)LiteratePaper.(hpp|py)") 
-                        set(out_filename  ${CMAKE_BINARY_DIR}/tutorials/PaperTutorials/${CMAKE_MATCH_1})
+                        set(out_filename  ${CMAKE_BINARY_DIR}/tutorials/PaperTutorials/${CMAKE_MATCH_1}.md)
                         add_custom_command(OUTPUT ${out_filename}
                             COMMAND ${PYTHON_EXECUTABLE} ARGS ${Chaste_BINARY_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename} 
                             DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${filename}

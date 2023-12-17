@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTANOTHERCARDIACELECTROMECHANICSTUTORIAL_HPP_
 
 /*
- * = Cardiac Electro-mechanical Problems (cont.) =
+ * ## Cardiac Electro-mechanical Problems (cont.)
  *
  * It is worth running this test suite with `build=GccOpt_ndebug`
  *
@@ -101,7 +101,7 @@ public:
      * Run electro-mechanics with mechano-electric feedback
      */
 
-    /* == Mechano-electric feedback, and alternative boundary conditions ==
+    /* ### Mechano-electric feedback, and alternative boundary conditions
      *
      * Let us now run a simulation with mechano-electric feedback (MEF), and with different boundary conditions.
      */
@@ -122,7 +122,7 @@ public:
          * To add a SAC current to (or otherwise alter) your favourite cell model, you have to do the following.
          * Auto-generate the C++ code, by running the following on the cellml file:
          * `./python/ConvertCellModel.py heart/src/odes/cellml/LuoRudy1991.cellml`
-         * (see [wiki:ChasteGuides/CodeGenerationFromCellML#Usingthehelperscript ChasteGuides/CodeGenerationFromCellML#Usingthehelperscript]
+         * (see [ChasteGuides/CodeGenerationFromCellML#Usingthehelperscript](https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CodeGenerationFromCellML#Usingthehelperscript)
          *  if you want further documentation on this script).
          *
          * Copy and rename the resultant .hpp and .cpp files (which can be found in the same folder as the
@@ -248,7 +248,7 @@ public:
          * specifying the traction in functional form - see solid mechanics tutorials. Similarly, more natural
          * 'pressure acting on the deformed body' boundary conditions are possible - see below tutorial.
          *
-         * '''Robustness:''' Sometimes the nonlinear solver doesn't converge, and will give an error. This can be due to either
+         * **Robustness:** Sometimes the nonlinear solver doesn't converge, and will give an error. This can be due to either
          * a non-physical (or not very physical) situation, or just because the current guess is quite far
          * from the solution and the solver can't find the solution (this can occur in nonlinear elasticity
          * problems if the loading is large, for example). Current work in progress is on making the solver
@@ -274,7 +274,7 @@ public:
      * Run electro-mechanics with inflation pressures
      */
 
-    /* == Internal pressures ==
+    /* ### Internal pressures
      *
      * Next, we run a simulation on a 2d annulus, with an internal pressure applied.
      */
@@ -395,7 +395,7 @@ public:
 
     }
     /*
-     * '''More examples:''' For a 3d ellipsoid geometry test, see heart/test/mechanics/TestCardiacElectroMechanicsOnEllipsoid.hpp
+     * **More examples:** For a 3d ellipsoid geometry test, see heart/test/mechanics/TestCardiacElectroMechanicsOnEllipsoid.hpp
      */
 };
 

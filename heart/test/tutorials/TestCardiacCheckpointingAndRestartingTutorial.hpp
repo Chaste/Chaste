@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /*
- * = Checkpointing and restarting cardiac simulations =
+ * ## Checkpointing and restarting cardiac simulations
  *
  * In this tutorial we show how to save and reload cardiac simulations
  *
@@ -107,9 +107,9 @@ public:
 
         /* The simulation duration has to be amended.
          * Note that the duration is always given with respect to the origin of the first solve.
-         * This means that we are running from {{{t=5 ms}}} (the end of the previous simulation) to {{{t=10 ms}}}.
+         * This means that we are running from `t=5 ms` (the end of the previous simulation) to `t=10 ms`.
          * The output files are concatenated so that they appear to be made by a single simulation running from
-         * {{{t=0 ms}}} to {{{t=10 ms}}}.
+         * `t=0 ms` to `t=10 ms`.
          * Note: loading an archive also loads `HeartConfig` options, so `HeartConfig` calls such as this one must appear
          * ''after'' CardiacSimulationArchiver::Load().
          */
@@ -129,7 +129,7 @@ public:
     }
 };
 
-/* == Notes ==
+/* ### Notes
  *
  * * Making a checkpoint does add a significant overhead at present, in particular because the mesh is
  *   written out to disk at each checkpoint. This is to ensure that each checkpoint directory contains everything

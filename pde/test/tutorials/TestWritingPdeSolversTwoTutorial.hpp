@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /*
- *  == Introduction ==
+ *  ### Introduction
  *
  *  In the previous tutorial we showed how a PDE solver could be written for the
  *  'simple' case in which the FEM discretisation leads to a linear system Ax=b where
@@ -63,11 +63,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  We will take as the test problem the heat equation, `u_t = u_{xx}`, with Dirichlet
  *  BCs `u = u*` on `Gamma1` and `du/dn = g` on `Gamma2`.
  *
- *  We write a solver which uses an '''explicit''' time-discretisation (as opposed to the implicit
+ *  We write a solver which uses an **explicit** time-discretisation (as opposed to the implicit
  *  discretisations used throughout the rest of the code). The FEM linear system that needs to be set up is
- *  {{{
+ *
+ *  ```
  *  M U^{n+1} = (M + dt K) U^{n}  +  c
- *  }}}
+ *  ```
+ *
  *  where `M` is the mass matrix, `K` the stiffness matrix, and `U^{n}` the vector of nodal
  *  values of u at timestep n. c is the surface integral term coming from the Neumann BCs,
  *  ie `c_i = integral_over_Gamma2 (g * phi_i dS)`. (This can be compared with an
@@ -95,7 +97,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "HeatEquation.hpp"
 //#include "SimpleLinearParabolicSolver.hpp"
 
-/* == Writing assemblers ==
+/* ### Writing assemblers
  *
  * We need to write an assembler for setting up the matrix `M + dt K`.
  *
@@ -166,7 +168,7 @@ public:
 };
 /* That's the assembler written. The following solver class will show how to use it.
  *
- * == Writing the solver class ==
+ * ### Writing the solver class
  *
  * The parent class here is `AbstractDynamicLinearPdeSolver`, which contains a linear system
  * (`this->mpLinearSystem`), and will deal with allocating memory and solving the linear system.
@@ -193,7 +195,7 @@ private:
          * one of our purpose-built `RhsMatrixAssemblers`, pass it the matrix `mRhsMatrix`, and
          * tell it to assemble.
          *
-         * '''Important note''': if any of the assemblers will require the current solution (ie solution
+         * **Important note**: if any of the assemblers will require the current solution (ie solution
          * at the current timestep), this needs to be passed to the assembler, as in the commented
          * line below.
          */
@@ -257,7 +259,7 @@ public:
 };
 /* That's all that needs to be written to write your own solver using the solver hierarchy
  *
- * = A test using the solver =
+ * ## A test using the solver
  *
  * The following test uses the new solver. Since the interface is exactly the same as the
  * other solvers, except for not taking in a PDE (the fact that it solves a parameterless
