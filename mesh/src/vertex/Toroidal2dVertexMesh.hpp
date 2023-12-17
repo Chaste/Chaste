@@ -190,7 +190,7 @@ public:
      * Helper method to check if a node is within [0,mWidth]x[0,mHeight]
      * and move back into the domain if needed.
      *
-     * @param pNewNode the node to be checked
+     * @param pNode the node to be checked
      */
     void CheckNodeLocation(Node<2>* pNode);
 
