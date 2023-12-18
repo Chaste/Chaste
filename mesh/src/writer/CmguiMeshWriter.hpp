@@ -566,7 +566,6 @@ protected:
      *  String which is set to either CmguiCoordinatesFileHeader2D or
      *  CmguiCoordinatesFileHeader2DQuadratic as appropriate
      */
-
     std::string mCoordinatesFileHeader;
 
     /**
