@@ -32,23 +32,23 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-#include "Exception.hpp"
+
 #include "CmguiMeshWriter.hpp"
-#include "Version.hpp"
+
+#include <string>
+
 #include <boost/shared_ptr.hpp>
 
 #include "AbstractTetrahedralMesh.hpp"
 #include "DistributedTetrahedralMesh.hpp"
+#include "Exception.hpp"
+#include "Version.hpp"
 
-///////////////////////////////////////////////////////////////////////////////////
-// Implementation
-///////////////////////////////////////////////////////////////////////////////////
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-CmguiMeshWriter<ELEMENT_DIM,SPACE_DIM>::CmguiMeshWriter(const std::string& rDirectory,
-                                                        const std::string& rBaseName,
-                                                        bool cleanDirectory)
-        : AbstractTetrahedralMeshWriter<ELEMENT_DIM,SPACE_DIM>(rDirectory, rBaseName, cleanDirectory)
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::CmguiMeshWriter(const std::string& rDirectory,
+                                                         const std::string& rBaseName,
+                                                         bool cleanDirectory)
+        : AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory, rBaseName, cleanDirectory)
 {
     this->mIndexFromZero = false;
     mGroupName = this->mBaseName;
