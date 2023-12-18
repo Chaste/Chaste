@@ -60,7 +60,7 @@ unsigned GaussianQuadratureRule<ELEMENT_DIM>::GetNumQuadPoints() const
 }
 
 template <unsigned ELEMENT_DIM>
-GaussianQuadratureRule<ELEMENT_DIM>::GaussianQuadratureRule(unsigned quadratureOrder)
+GaussianQuadratureRule<ELEMENT_DIM>::GaussianQuadratureRule([[maybe_unused]] unsigned quadratureOrder)
 {
     if constexpr (ELEMENT_DIM == 0)
     {
