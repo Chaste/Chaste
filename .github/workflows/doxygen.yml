@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - doxygen
+      - develop
   workflow_dispatch:
     inputs:
       doxygen_name:
