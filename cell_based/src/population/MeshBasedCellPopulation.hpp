@@ -52,8 +52,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Contains a group of cells and maintains the associations between cells and
  * nodes in the mesh.
+ *
+ * @tparam ELEMENT_DIM Dimension of the elements.
+ * @tparam SPACE_DIM Dimension of the space. If not specified, it defaults to ELEMENT_DIM.
  */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+#ifdef DOXYGEN_CHASTE_ISSUE_199 // See https://github.com/Chaste/Chaste/issues/199
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+#else
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
+#endif
 class MeshBasedCellPopulation : public AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>
 {
     friend class TestMeshBasedCellPopulation;
@@ -169,10 +176,10 @@ public:
      * @param validate whether to validate the cell population
      */
     MeshBasedCellPopulation(MutableMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-                    std::vector<CellPtr>& rCells,
-                    const std::vector<unsigned> locationIndices=std::vector<unsigned>(),
-                    bool deleteMesh=false,
-                    bool validate=true);
+                            std::vector<CellPtr>& rCells,
+                            const std::vector<unsigned> locationIndices = {},
+                            bool deleteMesh = false,
+                            bool validate = true);
 
     /**
      * Constructor for use by the de-serializer.

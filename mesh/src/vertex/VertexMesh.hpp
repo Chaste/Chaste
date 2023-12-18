@@ -307,10 +307,7 @@ public:
 
     /**
      * Fetches EdgeHelper.
-     * 
-     * @param Global index of the edge
-     * 
-     * @return Pointer to the edge at the index
+     * @return Const reference to the edge helper
      */
     const EdgeHelper<SPACE_DIM>& rGetEdgeHelper() const;
 

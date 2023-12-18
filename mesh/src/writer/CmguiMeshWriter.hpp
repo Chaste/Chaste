@@ -42,347 +42,363 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Header for node base file in 3D (.exnode)
  */
-static const char CmguiNodeFileHeader3D[] = " #Fields=1\n\
- 1) coordinates, coordinate, rectangular cartesian, #Components=3\n\
-   x.  Value index= 1, #Derivatives= 0\n\
-   y.  Value index= 2, #Derivatives= 0\n\
-   z.  Value index= 3, #Derivatives= 0\n";
+static constexpr char CmguiNodeFileHeader3D[] = R"( #Fields=1
+ 1) coordinates, coordinate, rectangular cartesian, #Components=3
+   x.  Value index= 1, #Derivatives= 0
+   y.  Value index= 2, #Derivatives= 0
+   z.  Value index= 3, #Derivatives= 0
+)";
 
 /**
  * Header for node base file in 2D (.exnode)
  */
-static const char CmguiNodeFileHeader2D[] = " #Fields=1\n\
- 1) coordinates, coordinate, rectangular cartesian, #Components=2\n\
-   x.  Value index= 1, #Derivatives= 0\n\
-   y.  Value index= 2, #Derivatives= 0\n";
+static  constexpr char CmguiNodeFileHeader2D[] = R"( #Fields=1
+ 1) coordinates, coordinate, rectangular cartesian, #Components=2
+   x.  Value index= 1, #Derivatives= 0
+   y.  Value index= 2, #Derivatives= 0
+)";
 
 
 /**
  * Header for node base file in 1D (.exnode)
  */
-static const char CmguiNodeFileHeader1D[] = " #Fields=1\n\
- 1) coordinates, coordinate, rectangular cartesian, #Components=1\n\
-   x.  Value index= 1, #Derivatives= 0\n";
+static constexpr char CmguiNodeFileHeader1D[] = R"( #Fields=1
+ 1) coordinates, coordinate, rectangular cartesian, #Components=1
+   x.  Value index= 1, #Derivatives= 0
+)";
 
 /**
  * Header for element base file in 3D (.exelem)
  */
-static const char CmguiElementFileHeader3D[] = "Shape.  Dimension=3, simplex(2;3)*simplex*simplex\n\
- #Scale factor sets= 0\n\
- #Nodes= 4\n";
+static constexpr char CmguiElementFileHeader3D[] = R"(Shape.  Dimension=3, simplex(2;3)*simplex*simplex
+ #Scale factor sets= 0
+ #Nodes= 4
+)";
 
 /**
  * Header for element base file in 3D (.exelem) for quadratic visualisation
  */
-static const char CmguiElementFileHeader3DQuadratic[] = "Shape.  Dimension=3, simplex(2;3)*simplex*simplex\n\
- #Scale factor sets= 0\n\
- #Nodes= 10\n";
+static constexpr char CmguiElementFileHeader3DQuadratic[] = R"(Shape.  Dimension=3, simplex(2;3)*simplex*simplex
+ #Scale factor sets= 0
+ #Nodes= 10
+)";
 
 
 /**
  * Header for element base file in 2D (.exelem)
  */
-static const char CmguiElementFileHeader2D[] = "Shape.  Dimension=2, simplex(2)*simplex\n\
- #Scale factor sets= 0\n\
- #Nodes= 3\n";
+static constexpr char CmguiElementFileHeader2D[] = R"(Shape.  Dimension=2, simplex(2)*simplex
+ #Scale factor sets= 0
+ #Nodes= 3
+)";
 
 /**
  * Header for element base file in 2D (.exelem) for quadratic visualisation
  */
-static const char CmguiElementFileHeader2DQuadratic[] = "Shape.  Dimension=2, simplex(2)*simplex\n\
- #Scale factor sets= 0\n\
- #Nodes= 6\n";
+static constexpr char CmguiElementFileHeader2DQuadratic[] = R"(Shape.  Dimension=2, simplex(2)*simplex
+ #Scale factor sets= 0
+ #Nodes= 6
+)";
 
 /**
  * Header for element base file in 1D (.exelem)
  */
-static const char CmguiElementFileHeader1D[] = "Shape.  Dimension=1, line\n\
- #Scale factor sets= 0\n\
- #Nodes= 2\n";
+static constexpr char CmguiElementFileHeader1D[] = R"(Shape.  Dimension=1, line
+ #Scale factor sets= 0
+ #Nodes= 2
+)";
 
 /**
  * Header for element base file in 1D (.exelem)
  */
-static const char CmguiElementFileHeader1DQuadratic[] = "Shape.  Dimension=1, line\n\
- #Scale factor sets= 0\n\
- #Nodes= 3\n";
+static constexpr char CmguiElementFileHeader1DQuadratic[] = R"(Shape.  Dimension=1, line
+ #Scale factor sets= 0
+ #Nodes= 3
+)";
 
 
 /**
  * Header for element base file in 3D (.exelem), this comes after the definition of the number of fields
  */
-static const char CmguiCoordinatesFileHeader3D[] = " 1) coordinates, coordinate, rectangular cartesian, #Components=3\n\
-   x.  l.simplex(2;3)*l.simplex*l.simplex, no modify, standard node based.\n\
-     #Nodes= 4\n\
-      1.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   1\n\
-      2.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   2\n\
-      3.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   3\n\
-      4.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   4\n\
-   y.  l.simplex(2;3)*l.simplex*l.simplex, no modify, standard node based.\n\
-     #Nodes= 4\n\
-      1.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   1\n\
-      2.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   2\n\
-      3.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   3\n\
-      4.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   4\n\
-   z.  l.simplex(2;3)*l.simplex*l.simplex, no modify, standard node based.\n\
-     #Nodes= 4\n\
-      1.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   1\n\
-      2.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   2\n\
-      3.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   3\n\
-      4.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   4\n";
+static constexpr char CmguiCoordinatesFileHeader3D[] = R"( 1) coordinates, coordinate, rectangular cartesian, #Components=3
+   x.  l.simplex(2;3)*l.simplex*l.simplex, no modify, standard node based.
+     #Nodes= 4
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+   y.  l.simplex(2;3)*l.simplex*l.simplex, no modify, standard node based.
+     #Nodes= 4
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+   z.  l.simplex(2;3)*l.simplex*l.simplex, no modify, standard node based.
+     #Nodes= 4
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+)";
 
 
 /**
  * Header for element base file in 3D (.exelem) (quadratic), this comes after the definition of the number of fields
  */
-static const char CmguiCoordinatesFileHeader3DQuadratic[] = " 1) coordinates, coordinate, rectangular cartesian, #Components=3\n\
-   x.  q.simplex(2;3)*q.simplex*q.simplex, no modify, standard node based.\n\
-     #Nodes= 10\n\
-      1.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   1\n\
-      2.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   2\n\
-      3.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   3\n\
-      4.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   4\n\
-      5.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   5\n\
-      6.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   6\n\
-      7.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   7\n\
-      8.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   8\n\
-      9.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   9\n\
-      10.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   10\n\
-   y.  q.simplex(2;3)*q.simplex*q.simplex, no modify, standard node based.\n\
-     #Nodes= 10\n\
-      1.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   1\n\
-      2.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   2\n\
-      3.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   3\n\
-      4.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   4\n\
-      5.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   5\n\
-      6.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   6\n\
-      7.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   7\n\
-      8.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   8\n\
-      9.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   9\n\
-      10.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   10\n\
-   z.  q.simplex(2;3)*q.simplex*q.simplex, no modify, standard node based.\n\
-     #Nodes= 10\n\
-      1.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   1\n\
-      2.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   2\n\
-      3.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   3\n\
-      4.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   4\n\
-      5.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   5\n\
-      6.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   6\n\
-      7.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   7\n\
-      8.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   8\n\
-      9.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   9\n\
-      10.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   10\n";
+static constexpr char CmguiCoordinatesFileHeader3DQuadratic[] = R"( 1) coordinates, coordinate, rectangular cartesian, #Components=3
+   x.  q.simplex(2;3)*q.simplex*q.simplex, no modify, standard node based.
+     #Nodes= 10
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+      5.  #Values=1
+       Value indices:     1
+       Scale factor indices:   5
+      6.  #Values=1
+       Value indices:     1
+       Scale factor indices:   6
+      7.  #Values=1
+       Value indices:     1
+       Scale factor indices:   7
+      8.  #Values=1
+       Value indices:     1
+       Scale factor indices:   8
+      9.  #Values=1
+       Value indices:     1
+       Scale factor indices:   9
+      10.  #Values=1
+       Value indices:     1
+       Scale factor indices:   10
+   y.  q.simplex(2;3)*q.simplex*q.simplex, no modify, standard node based.
+     #Nodes= 10
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+      5.  #Values=1
+       Value indices:     1
+       Scale factor indices:   5
+      6.  #Values=1
+       Value indices:     1
+       Scale factor indices:   6
+      7.  #Values=1
+       Value indices:     1
+       Scale factor indices:   7
+      8.  #Values=1
+       Value indices:     1
+       Scale factor indices:   8
+      9.  #Values=1
+       Value indices:     1
+       Scale factor indices:   9
+      10.  #Values=1
+       Value indices:     1
+       Scale factor indices:   10
+   z.  q.simplex(2;3)*q.simplex*q.simplex, no modify, standard node based.
+     #Nodes= 10
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+      5.  #Values=1
+       Value indices:     1
+       Scale factor indices:   5
+      6.  #Values=1
+       Value indices:     1
+       Scale factor indices:   6
+      7.  #Values=1
+       Value indices:     1
+       Scale factor indices:   7
+      8.  #Values=1
+       Value indices:     1
+       Scale factor indices:   8
+      9.  #Values=1
+       Value indices:     1
+       Scale factor indices:   9
+      10.  #Values=1
+       Value indices:     1
+       Scale factor indices:   10
+)";
 
 
 /**
  * Header for element base file in 2D (.exelem), this comes after the definition of the number of fields
  */
-static const char CmguiCoordinatesFileHeader2D[] = " 1) coordinates, coordinate, rectangular cartesian, #Components=2\n\
-   x.  l.simplex(2)*l.simplex, no modify, standard node based.\n\
-     #Nodes= 3\n\
-      1.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   1\n\
-      2.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   2\n\
-      3.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   3\n\
-   y.  l.simplex(2)*l.simplex, no modify, standard node based.\n\
-     #Nodes= 3\n\
-      1.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   1\n\
-      2.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   2\n\
-      3.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   3\n";
+static constexpr char CmguiCoordinatesFileHeader2D[] = R"( 1) coordinates, coordinate, rectangular cartesian, #Components=2
+   x.  l.simplex(2)*l.simplex, no modify, standard node based.
+     #Nodes= 3
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+   y.  l.simplex(2)*l.simplex, no modify, standard node based.
+     #Nodes= 3
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+)";
 
 
 /**
  * Header for element base file in 2D (.exelem) (quadratic version), this comes after
  * the definition of the number of fields
  */
-static const char CmguiCoordinatesFileHeader2DQuadratic[] = " 1) coordinates, coordinate, rectangular cartesian, #Components=2\n\
-   x.  q.simplex(2)*q.simplex, no modify, standard node based.\n\
-     #Nodes= 6\n\
-      1.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   1\n\
-      2.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   2\n\
-      3.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   3\n\
-      4.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   4\n\
-      5.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   5\n\
-      6.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   6\n\
-   y.  q.simplex(2)*q.simplex, no modify, standard node based.\n\
-     #Nodes= 6\n\
-      1.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   1\n\
-      2.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   2\n\
-      3.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   3\n\
-      4.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   4\n\
-      5.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   5\n\
-      6.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   6\n";
+static constexpr char CmguiCoordinatesFileHeader2DQuadratic[] = R"( 1) coordinates, coordinate, rectangular cartesian, #Components=2
+   x.  q.simplex(2)*q.simplex, no modify, standard node based.
+     #Nodes= 6
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+      5.  #Values=1
+       Value indices:     1
+       Scale factor indices:   5
+      6.  #Values=1
+       Value indices:     1
+       Scale factor indices:   6
+   y.  q.simplex(2)*q.simplex, no modify, standard node based.
+     #Nodes= 6
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+      5.  #Values=1
+       Value indices:     1
+       Scale factor indices:   5
+      6.  #Values=1
+       Value indices:     1
+       Scale factor indices:   6
+)";
 
 /**
  * Header for element base file in 1D (.exelem), this comes after the definition of the number of fields
  * Note that in 1D the simplex doesn't seem to work, we use Lagrange instead
  */
-static const char CmguiCoordinatesFileHeader1D[] = " 1) coordinates, coordinate, rectangular cartesian, #Components=1\n\
-   x.  l.Lagrange, no modify, standard node based.\n\
-     #Nodes= 2\n\
-      1.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   1\n\
-      2.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   2\n";
+static constexpr char CmguiCoordinatesFileHeader1D[] = R"( 1) coordinates, coordinate, rectangular cartesian, #Components=1
+   x.  l.Lagrange, no modify, standard node based.
+     #Nodes= 2
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+)";
 
 
 /**
  * Header for element base file in 1D (.exelem) (quadratic visualisation), this comes after the definition of the number of fields
  * Note that in 1D the simplex doesn't seem to work, we use Lagrange instead
  */
-static const char CmguiCoordinatesFileHeader1DQuadratic[] = " 1) coordinates, coordinate, rectangular cartesian, #Components=1\n\
-   x.  q.Lagrange, no modify, standard node based.\n\
-     #Nodes= 3\n\
-      1.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   1\n\
-      2.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   2\n\
-      3.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   3\n";
+static constexpr char CmguiCoordinatesFileHeader1DQuadratic[] = R"( 1) coordinates, coordinate, rectangular cartesian, #Components=1
+   x.  q.Lagrange, no modify, standard node based.
+     #Nodes= 3
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+)";
 
 /**
  * Header for additional fields in the element base file in 3D (.exelem),
  * Here we assume all additional fields will be interpolated by cmgui in the same way
  */
-static const char CmguiAdditionalFieldHeader3D[] = " field, rectangular cartesian, #Components=1\n\
-   x.  l.simplex(2;3)*l.simplex*l.simplex, no modify, standard node based.\n\
-     #Nodes= 4\n\
-      1.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   1\n\
-      2.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   2\n\
-      3.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   3\n\
-      4.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   4\n";
+static constexpr char CmguiAdditionalFieldHeader3D[] = R"( field, rectangular cartesian, #Components=1
+   x.  l.simplex(2;3)*l.simplex*l.simplex, no modify, standard node based.
+     #Nodes= 4
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+)";
 
 
 /**
@@ -390,115 +406,119 @@ static const char CmguiAdditionalFieldHeader3D[] = " field, rectangular cartesia
  * visualisation). Here we assume all additional fields will be interpolated by cmgui
  * in the same way
  */
-static const char CmguiAdditionalFieldHeader3DQuadratic[] = " field, rectangular cartesian, #Components=1\n\
-   x.  q.simplex(2;3)*q.simplex*q.simplex, no modify, standard node based.\n\
-     #Nodes= 10\n\
-      1.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   1\n\
-      2.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   2\n\
-      3.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   3\n\
-      4.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   4\n\
-      5.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   5\n\
-      6.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   6\n\
-      7.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   7\n\
-      8.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   8\n\
-      9.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   9\n\
-      10.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   10\n";
+static constexpr char CmguiAdditionalFieldHeader3DQuadratic[] = R"( field, rectangular cartesian, #Components=1
+   x.  q.simplex(2;3)*q.simplex*q.simplex, no modify, standard node based.
+     #Nodes= 10
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+      5.  #Values=1
+       Value indices:     1
+       Scale factor indices:   5
+      6.  #Values=1
+       Value indices:     1
+       Scale factor indices:   6
+      7.  #Values=1
+       Value indices:     1
+       Scale factor indices:   7
+      8.  #Values=1
+       Value indices:     1
+       Scale factor indices:   8
+      9.  #Values=1
+       Value indices:     1
+       Scale factor indices:   9
+      10.  #Values=1
+       Value indices:     1
+       Scale factor indices:   10
+)";
 
 /**
  * Header for additional fields in the element base file in 2D (.exelem),
  * Here we assume all additional fields will be interpolated by cmgui in the same way
  */
-static const char CmguiAdditionalFieldHeader2D[] = " field, rectangular cartesian, #Components=1\n\
-   x.  l.simplex(2)*l.simplex, no modify, standard node based.\n\
-     #Nodes= 3\n\
-      1.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   1\n\
-      2.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   2\n\
-      3.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   3\n";
+static constexpr char CmguiAdditionalFieldHeader2D[] = R"( field, rectangular cartesian, #Components=1
+   x.  l.simplex(2)*l.simplex, no modify, standard node based.
+     #Nodes= 3
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+)";
 
 /**
  * Header for additional fields in the element base file in 2D (.exelem)  (quadratic version),
  * Here we assume all additional fields will be interpolated by cmgui in the same way
  */
-static const char CmguiAdditionalFieldHeader2DQuadratic[] = " field, rectangular cartesian, #Components=1\n\
-   x.  q.simplex(2)*q.simplex, no modify, standard node based.\n\
-     #Nodes= 6\n\
-      1.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   1\n\
-      2.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   2\n\
-      3.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   3\n\
-      4.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   4\n\
-      5.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   5\n\
-      6.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   6\n";
+static constexpr char CmguiAdditionalFieldHeader2DQuadratic[] = R"( field, rectangular cartesian, #Components=1
+   x.  q.simplex(2)*q.simplex, no modify, standard node based.
+     #Nodes= 6
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+      4.  #Values=1
+       Value indices:     1
+       Scale factor indices:   4
+      5.  #Values=1
+       Value indices:     1
+       Scale factor indices:   5
+      6.  #Values=1
+       Value indices:     1
+       Scale factor indices:   6
+)";
 
 
 /**
  * Header for additional fields in the element base file in 1D (.exelem),
  * Here we assume all additional fields will be interpolated by cmgui in the same way
  */
-static const char CmguiAdditionalFieldHeader1D[] = " field, rectangular cartesian, #Components=1\n\
-   x.  l.Lagrange, no modify, standard node based.\n\
-     #Nodes= 2\n\
-      1.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   1\n\
-      2.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   2\n";
+static constexpr char CmguiAdditionalFieldHeader1D[] = R"( field, rectangular cartesian, #Components=1
+   x.  l.Lagrange, no modify, standard node based.
+     #Nodes= 2
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+)";
 
 /**
  * Header for additional fields in the element base file in 1D (.exelem) (quadratic visualisation),
  * Here we assume all additional fields will be interpolated by cmgui in the same way
  */
-static const char CmguiAdditionalFieldHeader1DQuadratic[] = " field, rectangular cartesian, #Components=1\n\
-   x.  q.Lagrange, no modify, standard node based.\n\
-     #Nodes= 2\n\
-      1.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   1\n\
-      2.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   2\n\
-      3.  #Values=1\n\
-       Value indices:     1\n\
-       Scale factor indices:   3\n";
-
+static constexpr char CmguiAdditionalFieldHeader1DQuadratic[] = R"( field, rectangular cartesian, #Components=1
+   x.  q.Lagrange, no modify, standard node based.
+     #Nodes= 2
+      1.  #Values=1
+       Value indices:     1
+       Scale factor indices:   1
+      2.  #Values=1
+       Value indices:     1
+       Scale factor indices:   2
+      3.  #Values=1
+       Value indices:     1
+       Scale factor indices:   3
+)";
 
 /**
  *  CmguiMeshWriter
@@ -546,7 +566,6 @@ protected:
      *  String which is set to either CmguiCoordinatesFileHeader2D or
      *  CmguiCoordinatesFileHeader2DQuadratic as appropriate
      */
-
     std::string mCoordinatesFileHeader;
 
     /**

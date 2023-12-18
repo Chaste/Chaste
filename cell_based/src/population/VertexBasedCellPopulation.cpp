@@ -189,13 +189,13 @@ std::set<unsigned> VertexBasedCellPopulation<DIM>::GetNeighbouringLocationIndice
 
 template<unsigned DIM>
 std::set<std::pair<unsigned, unsigned>>
-VertexBasedCellPopulation<DIM>::GetNeighbouringEdgeIndices(CellPtr pCell, unsigned EdgeLocalIndex)
+VertexBasedCellPopulation<DIM>::GetNeighbouringEdgeIndices(CellPtr pCell, unsigned edgeLocalIndex)
 {
     std::set<std::pair<unsigned, unsigned>> neighbours;
     auto cellLocationIndex = this->GetLocationIndexUsingCell(pCell);
     auto p_element = this->GetElement(cellLocationIndex);
-    auto global_edge_index = p_element->GetEdgeGlobalIndex(EdgeLocalIndex);
-    auto neighbour_element_indices = p_element->GetNeighbouringElementAtEdgeIndex(EdgeLocalIndex);
+    auto global_edge_index = p_element->GetEdgeGlobalIndex(edgeLocalIndex);
+    auto neighbour_element_indices = p_element->GetNeighbouringElementAtEdgeIndex(edgeLocalIndex);
 
     // Normally there is only one neighbouring element
     for (auto neighbour_element_index : neighbour_element_indices)

@@ -37,9 +37,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ABSTRACTFILECOMPARISON_HPP_
 
 #include <string>
+#include "Exception.hpp"
 #include "FileFinder.hpp"
 #include "OutputFileHandler.hpp"
 #include "PetscTools.hpp"
+
+#include <cxxtest/TestSuite.h>
 
 /**
  * Abstract class for comparing two files, looking for differences in tests.

@@ -39,6 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <boost/foreach.hpp>
 
+#include <cxxtest/TestSuite.h>
+
 /**
  * Compare files to check for any differences (in numeric and/or string values).
  *

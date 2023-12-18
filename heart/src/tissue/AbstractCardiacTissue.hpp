@@ -73,8 +73,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * distributed vector factory. This class deals with created a distributed
  * vector of cells, and getting the ionic current and stimuli from these
  * cells and putting them in replicated arrays for the PDE solvers to call.
+ *
+ * @tparam ELEMENT_DIM Dimension of the elements.
+ * @tparam SPACE_DIM Dimension of the space. If not specified, it defaults to ELEMENT_DIM.
  */
-template <unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
+#ifdef DOXYGEN_CHASTE_ISSUE_199 // See https://github.com/Chaste/Chaste/issues/199
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+#else
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
+#endif
 class AbstractCardiacTissue : private boost::noncopyable
 {
 private:

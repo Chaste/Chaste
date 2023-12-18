@@ -48,6 +48,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCardiacCell.hpp"
 #include "HeartConfig.hpp"
 
+#include <cxxtest/TestSuite.h>
+
 void RunOdeSolverWithIonicModel(AbstractCardiacCellInterface* pOdeSystem,
                                 double endTime,
                                 std::string filename,

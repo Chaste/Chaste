@@ -42,6 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "AbstractCardiacCellFactory.hpp"
+#include "DistributedTetrahedralMesh.hpp"
+#include "DistributedTetrahedralMeshPartitionType.hpp"
 #include "SimpleStimulus.hpp"
 #include "LuoRudy1991.hpp"
 #include "HeartRegionCodes.hpp"
@@ -61,7 +63,6 @@ private:
 
 public:
     /**
-     * @return a newly created cell factory.
      * @param stimulusMagnitude
      * @param stimulatedPoint spatial co-ordinates of where to stimulate.
      *    Must correspond to a node location.

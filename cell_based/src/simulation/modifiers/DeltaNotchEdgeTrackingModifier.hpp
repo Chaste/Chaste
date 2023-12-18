@@ -42,6 +42,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractCellBasedSimulationModifier.hpp"
 
+/**
+ * A modifier class in which the mean levels of Delta in neighbouring cells
+ * are computed and stored in CellData. To be used in conjunction with Delta
+ * Notch cell cycle models.
+ */
 template<unsigned DIM>
 class DeltaNotchEdgeTrackingModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
 {

@@ -119,10 +119,10 @@ private:
     void CloseFiles();
 
     /**
-     * @return the next line from a given file stream.
+     * Returns (via rawLine) the next line from a given file stream.
      *
      * @param fileStream the file stream
-     * @param rawLine the raw line (may contain comments)
+     * @param rawLine the raw line which may contain comments (returned)
      */
     void GetNextLineFromStream(std::ifstream& fileStream, std::string& rawLine);
 

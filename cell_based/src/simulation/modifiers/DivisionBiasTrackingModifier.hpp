@@ -79,7 +79,7 @@ public:
     /**
      * Constructor.
      * 
-     * @param centre the specified axis along which division probability is biased
+     * @param divisionBiasVector the specified axis along which division probability is biased
      */
     DivisionBiasTrackingModifier(c_vector<double, DIM> divisionBiasVector);
 

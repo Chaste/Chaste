@@ -94,11 +94,11 @@ public:
     static unsigned GetSize(Vec vector);
 
     /**
-     * @return this process's ownership range of the contents of the vector.
-     *
+     * Returns this process's ownership range of the contents of the vector via arguments.
+   
      * @param vector  the vector
-     * @param lo  lowest index owned by this process
-     * @param hi  highest index owned by this process
+     * @param lo  lowest index owned by this process (returned)
+     * @param hi  highest index owned by this process (returned)
      */
     static void GetOwnershipRange(Vec vector, PetscInt& lo, PetscInt& hi);
 

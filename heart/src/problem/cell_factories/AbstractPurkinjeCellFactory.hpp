@@ -78,7 +78,7 @@ protected:
                                                                           AbstractCardiacCellInterface* pCardiacCell)=0;
 
     /**
-     * @return a newly created purkinje-ventricular junction between the two cells provided.
+     * Create purkinje-ventricular junction between the two cells provided.
      *
      * @param pNode  the node in the mesh at which this junction is located
      * @param pPurkinjeCell  the Purkinje cell
@@ -92,7 +92,7 @@ protected:
 
 
     /**
-     * @return a newly created purkinje-ventricular junction between the two cells provided if the junction is defined in the corresponding .pvj file.
+     * Create purkinje-ventricular junction between the two cells provided if the junction is defined in the corresponding .pvj file.
      *
      * ReadJunctionsFile() must be called before calling this method
      *
