@@ -84,7 +84,7 @@ jobs:
           repository: Chaste/doxygen-latest
           path: doxygen-latest
           fetch-depth: 0
-#          token: ${{ secrets.DOXYGEN_LATEST_ACCESS }}
+          token: ${{ secrets.DOXYGEN_LATEST_ACCESS }}
         if: always()
 
       - name: copy results
@@ -92,10 +92,13 @@ jobs:
           cp doxygen/html/* doxygen-latest/site/
         if: always()
 
-      - name: check git status
+      - name: commit and push if changed
         run: |
-          git status
-          git diff
+          git config user.name "github-action"
+          git config user.email "github-action"
+          git add --all
+          git commit -m "update doxygen-latest" || echo "No changes to commit"
+          git push
         working-directory: doxygen-latest
         if: always()
 
