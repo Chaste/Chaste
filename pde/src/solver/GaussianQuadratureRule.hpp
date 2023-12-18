@@ -70,7 +70,7 @@ public:
      *
      * @param quadratureOrder The minimum polynomial order that the rule can integrate exactly
      */
-    GaussianQuadratureRule(unsigned quadratureOrder);
+    explicit GaussianQuadratureRule(unsigned quadratureOrder);
 
     /**
      * Get a quadrature point.
