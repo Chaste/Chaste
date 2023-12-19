@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "Warnings.hpp"
+#include "RandomFieldUtilityFunctions.hpp"
 
 template <unsigned SPACE_DIM>
 UniformGridRandomFieldGenerator<SPACE_DIM>::UniformGridRandomFieldGenerator(
@@ -99,13 +100,6 @@ std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFiel
 template <unsigned SPACE_DIM>
 std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFieldAtTime(double time)
 { 
-    auto reshape = [](const double val)
-    {
-        double distFromHalf = 2.0 * (0.5 - std::abs(0.5 - std::abs(val)));
-        double strength = (1.0 - std::abs(val)) + distFromHalf * 0.2;
-        return val * (1.0 - 0.18 * strength);
-    };
-
     std::vector<double> samples(mNumTotalGridPts);
     
     switch(SPACE_DIM)
@@ -114,7 +108,7 @@ std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFiel
         {
             for (unsigned x = 0; x < mNumGridPts[0]; x++)
             {
-                samples[x] = reshape(reshape(mOpenSimplex.noise2_XBeforeY(x * mLengthScale, time)));
+                samples[x] = random_field::reshape(mOpenSimplex.noise2_XBeforeY(x * mLengthScale, time));
             }
             break;
         }        
@@ -124,7 +118,7 @@ std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFiel
             {
                 for (unsigned y = 0; y < mNumGridPts[1]; y++)
                 {
-                    samples[mNumGridPts[1] * y + x] = reshape(reshape(mOpenSimplex.noise3_XYBeforeZ(x * mLengthScale, y * mLengthScale, time)));
+                    samples[mNumGridPts[1] * y + x] = random_field::reshape(mOpenSimplex.noise3_XYBeforeZ(x * mLengthScale, y * mLengthScale, time));
                 }
             }
             break;
@@ -137,7 +131,7 @@ std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFiel
                 {
                     for (unsigned z = 0; z < mNumGridPts[2]; z++)
                     {
-                        samples[mNumGridPts[2] * z * y + mNumGridPts[1] * y + x] = reshape(reshape(mOpenSimplex.noise4_XYBeforeZW(x * mLengthScale, y * mLengthScale, z * mLengthScale, time)));
+                        samples[mNumGridPts[2] * z * y + mNumGridPts[1] * y + x] = random_field::reshape(mOpenSimplex.noise4_XYBeforeZW(x * mLengthScale, y * mLengthScale, z * mLengthScale, time));
                     }
                 }
             }

@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Exception.hpp"
 #include "RandomNumberGenerator.hpp"
+#include "RandomFieldUtilityFunctions.hpp"
 
 template <unsigned SPACE_DIM>
 OffLatticeRandomFieldGenerator<SPACE_DIM>::OffLatticeRandomFieldGenerator(
@@ -108,12 +109,6 @@ std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField
     const std::vector<Node<SPACE_DIM>*>& rNodes,
     const double time)
 {
-    auto reshape = [](const double val)
-    {
-        double dist_from_half = 2.0 * (0.5 - std::abs(0.5 - std::abs(val)));
-        double strength = (1.0 - std::abs(val)) + dist_from_half * 0.2;
-        return val * (1.0 - 0.18 * strength);
-    };
 
     std::vector<double> samples(rNodes.size());
     c_vector<double, SPACE_DIM> node_location;
@@ -124,17 +119,17 @@ std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField
         {
             case 1:
             {
-                samples[i] = reshape(reshape(mOpenSimplex.noise2_XBeforeY(node_location[0] * mLengthScale, time + 0.5)));
+                samples[i] = random_field::reshape(mOpenSimplex.noise2_XBeforeY(node_location[0] * mLengthScale, time + 0.5));
                 break;
             }            
             case 2:
             {
-                samples[i] = reshape(reshape(mOpenSimplex.noise3_XYBeforeZ(node_location[0] * mLengthScale, node_location[1] * mLengthScale, time)));
+                samples[i] = random_field::reshape(mOpenSimplex.noise3_XYBeforeZ(node_location[0] * mLengthScale, node_location[1] * mLengthScale, time));
                 break;
             }
             case 3:
             {
-                samples[i] = reshape(reshape(mOpenSimplex.noise4_XYBeforeZW(node_location[0] * mLengthScale, node_location[1] * mLengthScale, node_location[2] * mLengthScale, time)));
+                samples[i] = random_field::reshape(mOpenSimplex.noise4_XYBeforeZW(node_location[0] * mLengthScale, node_location[1] * mLengthScale, node_location[2] * mLengthScale, time));
                 break;
             }                
             default:

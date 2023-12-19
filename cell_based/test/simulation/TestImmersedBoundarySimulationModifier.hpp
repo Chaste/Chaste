@@ -556,16 +556,16 @@ public:
             SimulationTime::Instance()->SetStartTime(0.0);
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
             
-            // Create a single node, single element mesh
+            // Create a single element mesh
             std::vector<Node<2>*> nodes;
-            nodes.push_back(new Node<2>(0, true, 0.55, 0.55));
+            nodes.push_back(new Node<2>(0, true, 0.1, 0.1));
             nodes.push_back(new Node<2>(1, true, 0.2, 0.2));
             nodes.push_back(new Node<2>(2, true, 0.1, 0.2));
 
             std::vector<ImmersedBoundaryElement<2, 2>*> elems;
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
             
-            ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 150, 150);
+            ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 4, 4);
             
             // Set up a cell population
             std::vector<CellPtr> cells;
@@ -581,6 +581,24 @@ public:
             modifier.SetupConstantMemberVariables(cell_population);
             modifier.SolveNavierStokesSpectral();
             
+            const unsigned int num_grid_pts = 4;
+            
+            std::vector<double> expected_vals = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.126346, 2.42092e-322, 6.92683e-310, 4.68206e-310, 0,
+              4.68206e-310, 1.89721e-321, 2.42092e-322, 6.92683e-310, 4.68206e-310, 0, 0, 4.68197e-310, 
+              2.42092e-322, 6.92683e-310, 4.68206e-310 };
+
+            // Check values of m_
+            multi_array<double, 3>& r_vel_grids = mesh.rGetModifiable2dVelocityGrids();
+            unsigned int counter = 0;
+            for (unsigned int dim = 0; dim < 3; dim++) {
+                for (unsigned x = 0; x < num_grid_pts; ++x) {
+                    for (unsigned y = 0; y < num_grid_pts; ++y) {
+                        TS_ASSERT_DELTA(r_vel_grids[dim][x][y], expected_vals[counter], 0.00001);
+                        counter++;
+                    }
+                }
+            }
             SimulationTime::Instance()->Destroy();
             
         }
@@ -620,6 +638,24 @@ public:
             modifier.SetupConstantMemberVariables(cell_population);
             modifier.UpdateAtEndOfTimeStep(cell_population);
             
+            
+            const unsigned int num_grid_pts = 4;
+            
+            std::vector<double> expected_vals = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 4.66857e-310, 2.42092e-322, 6.94402e-310, 4.66956e-310, 4.66945e-310, 2.42092e-322, 6.94402e-310, 
+             4.66956e-310, 4.66945e-310, 2.42092e-322, 6.94402e-310, 4.66956e-310, 4.66945e-310, 2.42092e-322, 6.94402e-310, 4.66956e-310 };
+
+            // Check values of m_
+            multi_array<double, 3>& r_vel_grids = mesh.rGetModifiable2dVelocityGrids();
+            unsigned int counter = 0;
+            for (unsigned int dim = 0; dim < 3; dim++) {
+                for (unsigned x = 0; x < num_grid_pts; ++x) {
+                    for (unsigned y = 0; y < num_grid_pts; ++y) {
+                        TS_ASSERT_DELTA(r_vel_grids[dim][x][y], expected_vals[counter], 0.00001);
+                        counter++;
+                    }
+                }
+            }
             SimulationTime::Instance()->Destroy();
             
         }

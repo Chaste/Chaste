@@ -79,36 +79,94 @@ public:
 
     void TestFftExecuteForward()
     {
-        // Create a square test mesh
-        std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
-        nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
-        nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
-        nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
-
-        std::vector<ImmersedBoundaryElement<2, 2>*> elems;
-        elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
-        elems.push_back(new ImmersedBoundaryElement<2, 2>(1, nodes));
-        elems.push_back(new ImmersedBoundaryElement<2, 2>(2, nodes));
-
-        ImmersedBoundaryMesh<2,2>* p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems);
-
-        std::vector<double> in;
-        for (unsigned i = 0; i < 49152; ++i)
         {
-            in.push_back(0.0);
-        }
-        std::vector<std::complex<double>> comp(in.size());
-        std::vector<double> out(in.size() * 2);
-        ImmersedBoundaryFftInterface<2> fft(p_mesh, in.data(), comp.data(), out.data(), true);
-        
-        fft.FftExecuteForward();
-        for (auto i : out)
-        {
-            TS_ASSERT_DELTA(i, 0.0, 1e-6);
-        }
+            // Create a square test mesh
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+            nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
+            nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
+            nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
 
-        delete p_mesh;
+            std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(1, nodes));
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(2, nodes));
+
+            ImmersedBoundaryMesh<2,2>* p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems);
+
+            std::vector<double> in;
+            for (unsigned i = 0; i < 49152; ++i)
+            {
+                in.push_back(0.0);
+            }
+            std::vector<std::complex<double>> comp(in.size());
+            std::vector<double> out(in.size() * 2);
+            ImmersedBoundaryFftInterface<2> fft(p_mesh, in.data(), comp.data(), out.data(), true);
+            
+            TS_ASSERT_EQUALS(fft.mRealDims[0], 128);
+            TS_ASSERT_EQUALS(fft.mRealDims[1], 128);
+            TS_ASSERT_EQUALS(fft.mCompDims[0], 128);
+            TS_ASSERT_EQUALS(fft.mCompDims[1], 65);
+            TS_ASSERT_EQUALS(fft.mRealSep, 16384);
+            TS_ASSERT_EQUALS(fft.mCompSep, 8320);
+            TS_ASSERT_EQUALS(fft.mRealStride, 8);
+            TS_ASSERT_EQUALS(fft.mCompStride, 16);
+
+            
+            fft.FftExecuteForward();
+            for (auto i : out)
+            {
+                TS_ASSERT_DELTA(i, 0.0, 1e-6);
+            }
+
+            delete p_mesh;
+        }
+        {
+            // Create a square test mesh
+            std::vector<Node<2>*> nodes;
+            nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+            nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
+            nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
+            nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
+
+            std::vector<ImmersedBoundaryElement<2, 2>*> elems;
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(1, nodes));
+            elems.push_back(new ImmersedBoundaryElement<2, 2>(2, nodes));
+
+            ImmersedBoundaryMesh<2,2>* p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems, {}, 4, 4);
+
+            std::vector<double> in;
+            for (unsigned i = 0; i < 48; ++i)
+            {
+                in.push_back(i);
+            }
+            for (unsigned i = 0; i < 48; i += 3)
+            {
+                in[i] = 0.5;
+            }
+            std::vector<std::complex<double>> comp(in.size());
+            std::vector<double> out(in.size() * 2);
+            ImmersedBoundaryFftInterface<2> fft(p_mesh, in.data(), comp.data(), out.data(), true);
+            
+            TS_ASSERT_EQUALS(fft.mRealDims[0], 4);
+            TS_ASSERT_EQUALS(fft.mRealDims[1], 4);
+            TS_ASSERT_EQUALS(fft.mCompDims[0], 4);
+            TS_ASSERT_EQUALS(fft.mCompDims[1], 3);
+            TS_ASSERT_EQUALS(fft.mRealSep, 16);
+            TS_ASSERT_EQUALS(fft.mCompSep, 12);
+            TS_ASSERT_EQUALS(fft.mRealStride, 8);
+            TS_ASSERT_EQUALS(fft.mCompStride, 16);
+
+            
+            fft.FftExecuteForward();
+            for (auto i : out)
+            {
+                TS_ASSERT_DELTA(i, 0.0, 1e-6);
+            }
+
+            delete p_mesh;
+        }
     }
 
     void TestFftExecuteInverse()
