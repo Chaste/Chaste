@@ -255,8 +255,6 @@ double UniformGridRandomFieldGenerator<SPACE_DIM>::Interpolate(const std::vector
             const double field_yz_upper = rRandomField[GetLinearIndex(yz_upper)];
             const double field_xyz_upper = rRandomField[GetLinearIndex(xyz_upper)];
 
-            std::cout << "xyz upper: " << field_xyz_upper << "\n";
-
             // Perform a trilinear interpolation
             const std::array<double, SPACE_DIM> lower_location = GetPositionUsingGridIndex(lower_left);
             const double dist_x_lower = rLocation[0] - lower_location[0];

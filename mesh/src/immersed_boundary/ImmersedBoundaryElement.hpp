@@ -190,7 +190,7 @@ public:
     /**
      * Set mpFluidSource
      *
-     * @param the fluid source associated with this element
+     * @param fluidSource a shared pointer to the fluid source associated with this element
      */
     void SetFluidSource(std::shared_ptr<FluidSource<SPACE_DIM>> fluidSource);
 

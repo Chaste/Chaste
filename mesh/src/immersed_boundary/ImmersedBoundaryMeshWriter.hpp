@@ -92,7 +92,10 @@ private:
     std::vector<std::vector<unsigned>> mElementParts;
 
     // Node that this assumes SPACE_DIM == 2
+    /** Shorthand for a 2d cartesian point */
     using geom_point = boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian>;
+
+    /** Shorthand for a segment of geom_points */
     using geom_segment = boost::geometry::model::segment<geom_point>;
 
     /** Array of geom_segments; a helper array, filled by the constructor, for GetIntersectionOfEdgeWithBoundary */

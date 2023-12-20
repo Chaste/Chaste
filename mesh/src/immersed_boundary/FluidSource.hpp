@@ -64,6 +64,9 @@ private:
     
     friend class boost::serialization::access;
 
+    /**
+     * Serialize information required to construct a FluidSource.
+     */
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
@@ -152,7 +155,7 @@ public:
     /**
      * Set whether the fluid source is associated with an element.
      *
-     * @param whether there is an association
+     * @param associated whether there is an association
      */
     void SetIfSourceIsAssociatedWithElement(bool associated);
 
@@ -169,7 +172,7 @@ public:
     /**
      * Set the index of the element associated to this fluid source.
      *
-     * @param index of the element associated to this fluid source.
+     * @param associatedElementIndex of the element associated to this fluid source.
      */
     void SetAssociatedElementIndex(unsigned associatedElementIndex);
 };

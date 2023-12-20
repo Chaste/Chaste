@@ -1100,6 +1100,9 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetVoronoiSurfaceAreaOfElem
 
 // Excluded from coverage as it is impossible to construct a 1 dimensional element currently
 //LCOV_EXCL_START
+/**
+ * Template specialisation for impossible to reach code path
+ */
 template <>
 double ImmersedBoundaryMesh<1, 1>::GetVoronoiSurfaceAreaOfElement(const unsigned elemIdx)
 {

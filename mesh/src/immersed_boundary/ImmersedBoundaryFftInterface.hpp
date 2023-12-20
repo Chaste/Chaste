@@ -62,15 +62,28 @@ protected:
     /** Pointer to the start output array. */
     double* mpOutputArray;
 
+    /** Dimensions of the real arrays */
     pocketfft::shape_t mRealDims;
+
+    /** Dimensions of the complex arrays */
     pocketfft::shape_t mCompDims;
 
-    int mNumGridPointsForward;
+    /** How many forward transforms to execute */
     unsigned mHowManyForward;
+
+    /** How many inverse transofrms to execute */
     unsigned mHowManyInverse;
+
+    /** Number of elements in each real array */
     int mRealSep;
+
+    /** Number of elements in each complex array */
     int mCompSep;
+
+    /** Distance between each element in the real arrays in bytes */
     long int mRealStride;
+
+    /** Distance between each element in the complex arrays in bytes */
     long int mCompStride;
 
 public:

@@ -61,7 +61,7 @@ public:
      *
      * @param numElementsX  the number of cells from left to right along the domain
      * @param numElementsY  the number of cells from top to bottom up the domain
-     * @param numNodesPerCell  the number of nodes per cell (defaults to 100)
+     * @param numNodesPerEdge  the number of nodes per cell (defaults to 100)
      * @param proportionalGap  the proportion of space between elements
      * @param padding  the minimum padding around the edge of the generated mesh
      */

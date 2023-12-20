@@ -146,13 +146,16 @@ private:
      * Helper method. Calculate the discrete delta approximation based on 
      * distance and grid spacing.
      * 
-     * \todo document input arguments
+     * @param dist distance between the two points
+     * @param spacing the grid spacing
+     * @return computed Delta1D value
      */
     double Delta1D(double dist, double spacing);
 
     /**
      * Helper method for the constructor. Calculate an intrinsic length scale 
      * based on the size of elements in the mesh.
+     * @return computed intrinsic length scale
      */
     double CalculateIntrinsicCellSize();
 
@@ -442,7 +445,7 @@ public:
     /**
      * Overridden AcceptPopulationWriter() method.
      *
-     * @param pPopulationWriter the population writer.
+     * @param pPopulationEventWriter the population event writer.
      */
 
     virtual void AcceptPopulationEventWriter(

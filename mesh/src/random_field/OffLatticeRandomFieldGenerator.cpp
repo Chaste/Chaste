@@ -101,7 +101,7 @@ template <unsigned SPACE_DIM>
 std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField(
     const std::vector<Node<SPACE_DIM>*>& rNodes)
 {
-    return this->SampleRandomFieldAtTime(rNodes, 0.0);
+    return this->SampleRandomFieldAtTime(rNodes, rand());
 }
 
 template <unsigned SPACE_DIM>

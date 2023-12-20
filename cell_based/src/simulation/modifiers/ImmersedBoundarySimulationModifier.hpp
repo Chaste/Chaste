@@ -209,6 +209,7 @@ private:
      *
      * @param dist absolute 1-D distance between boundary-node and fluid-node
      * @param spacing the grid spacing
+     * @return computed Delta1D value
      */
     double Delta1D(double dist, double spacing);
 

@@ -108,7 +108,6 @@ public:
      * @param lowerCorner the lower corner of the rectangular grid
      * @param upperCorner the upper corner of the rectangular grid
      * @param periodicity whether the grid is periodic in each dimension
-     * @param numEigenvals the number of eigenvalues to calculate
      * @param lengthScale the length scale of the correlation when calculating 
      *                    the covariance matrix
      * @param boxWidth the box size for the box collection. Defaults to 

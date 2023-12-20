@@ -115,6 +115,7 @@ protected:
     /** Vector of pointers to ImmersedBoundaryElements. */
     std::vector<ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>*> mElements;
 
+    /** Vector of pointers to lamina ImmersedBoundaryElements. */
     std::vector<ImmersedBoundaryElement<ELEMENT_DIM - 1, SPACE_DIM>*> mLaminas;
 
     /** Vector of fluid sources related to elements. */
@@ -263,6 +264,7 @@ public:
      *
      * @param nodes vector of pointers to nodes
      * @param elements vector of pointers to ImmersedBoundaryElements
+     * @param laminas vector of pointers to lamina ImmersedBoundaryElements
      * @param numGridPtsX the number of grid points in the x direction
      * @param numGridPtsY the number of grid points in the y direction
      */
@@ -397,13 +399,14 @@ public:
     void SetNumGridPtsXAndY(unsigned numGridPts);
 
     /**
-     * @param the new characteristic node spacing.
+     * @param nodeSpacing the new characteristic node spacing.
      */
     void SetCharacteristicNodeSpacing(double nodeSpacing);
     
     /**
      * Add a node to the mesh
      * @param pNewNode a pointer to the node to be added to the mesh.
+     * @return the index of the new node
      */
     unsigned AddNode(Node<SPACE_DIM>* pNewNode);
 
@@ -495,7 +498,7 @@ public:
      * The voronoi cell of an element is the union of the voronoi cells of all nodes
      * in the element.
      *
-     * @param index  the global index of a specified immersed boundary element
+     * @param elemIdx the global index of a specified immersed boundary element
      * @return the voronoi surface area of the element
      */
     double GetVoronoiSurfaceAreaOfElement(unsigned elemIdx);
@@ -650,7 +653,7 @@ public:
     double GetElementDivisionSpacing();
 
     /**
-     * @param the new value of mElementDivisionSpacing
+     * @param elementDivisonSpacing the new value of mElementDivisionSpacing
      */
     void SetElementDivisionSpacing(double elementDivisionSpacing);
 
@@ -660,7 +663,7 @@ public:
     double GetNeighbourDist() const;
 
     /**
-     * @param the new value of mCellRearrangementThreshold
+     * @param cellRearrangementThreshold the new value of mCellRearrangementThreshold
      */
     void SetCellRearrangementThreshold(double cellRearrangementThreshold); 
 
@@ -670,7 +673,7 @@ public:
     double GetCellRearrangementThreshold();
 
     /**
-     * @param the new value of mNeighbourDist
+     * @param neighbourDist the new value of mNeighbourDist
      */
     void SetNeighbourDist(double neighbourDist);
 

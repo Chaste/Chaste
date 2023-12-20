@@ -109,6 +109,7 @@ private:
      *     element or a lamina
      * @param rElement the element or lamina add forces to
      * @param rCellPopulation the immersed boundary cell population
+     * @param intrinsicSpacingSquared the square of the intrinsic spacing
      */
     template <unsigned ELEMENT_DIM>
     void CalculateForcesOnElement(ImmersedBoundaryElement<ELEMENT_DIM, DIM>& rElement,
