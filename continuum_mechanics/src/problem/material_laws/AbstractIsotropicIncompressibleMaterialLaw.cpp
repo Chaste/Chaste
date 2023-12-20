@@ -133,16 +133,21 @@ void AbstractIsotropicIncompressibleMaterialLaw<DIM>::ComputeStressAndStressDeri
     }
 }
 
-template<>
-double AbstractIsotropicIncompressibleMaterialLaw<2>::GetZeroStrainPressure()
+template <unsigned DIM>
+double AbstractIsotropicIncompressibleMaterialLaw<DIM>::GetZeroStrainPressure()
 {
-    return 2*Get_dW_dI1(2,0);
-}
-
-template<>
-double AbstractIsotropicIncompressibleMaterialLaw<3>::GetZeroStrainPressure()
-{
-    return 2*Get_dW_dI1(3,3) + 4*Get_dW_dI2(3,3);
+    if constexpr (DIM == 2)
+    {
+        return 2 * Get_dW_dI1(2, 0);
+    }
+    else if constexpr (DIM == 3)
+    {
+        return 2 * Get_dW_dI1(3, 3) + 4 * Get_dW_dI2(3, 3);
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 // Explicit instantiation

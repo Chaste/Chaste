@@ -476,10 +476,10 @@ public:
     bool GetOutputVariablesProvided() const;
 
     /**
-     * @return the extra output variables from the xml file.
+     * Returns (via rOutputVariables) the extra output variables from the xml file.
      *
      * @param rOutputVariables reference to std::vector to contain the output variables requested.
-     *    Note: will be cleared before being filled.
+     *    Note: will be cleared before being filled (returned).
      */
     void GetOutputVariables(std::vector<std::string>& rOutputVariables) const;
 

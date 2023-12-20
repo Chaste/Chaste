@@ -163,7 +163,7 @@ public:
      * if there are more than 3 processes the domain will be swollen to [(0,0,0), (3,3,num_procs)].  The
      * user is warned when this happens.
      */
-    DistributedBoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX = false, bool mIsPeriodicInY=false, bool mIsPeriodicInZ=false, int localRows = PETSC_DECIDE);
+    DistributedBoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX = false, bool isPeriodicInY=false, bool isPeriodicInZ=false, int localRows = PETSC_DECIDE);
 
     /**
      * Destructor - frees memory allocated to distributed vector.

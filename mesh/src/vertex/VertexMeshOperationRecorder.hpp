@@ -185,7 +185,7 @@ public:
      */
     std::vector<CellDivisionInfo<SPACE_DIM> > GetCellDivisionInfo() const;
 
-    /*
+    /**
      * Clear information about T3 swaps.
      */
     void ClearCellDivisionInfo();

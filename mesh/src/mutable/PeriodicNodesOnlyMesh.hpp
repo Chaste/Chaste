@@ -58,7 +58,7 @@ private:
      */
     c_vector<double,SPACE_DIM> mWidth;
 
-    /*
+    /**
      * Whether a dimension is periodic
      */
     c_vector<bool,SPACE_DIM> mIsDimPeriodic;
@@ -129,13 +129,13 @@ public:
      */
     double GetWidth(const unsigned& rDimension) const;
 
-    /*
+    /**
      * Method to get the width of the periodic dimensions
      * @return The value of the mWidth vector
-    */
+     */
     c_vector<double,SPACE_DIM> GetPeriodicWidths() const;
 
-    /*
+    /**
      * Overridden SetNode() method.
      *
      * If the location should be set outside a cylindrical boundary
@@ -145,7 +145,6 @@ public:
      * @param point is the new target location of the node
      * @param concreteMove is set to false if we want to skip the signed area tests in the parent Class Note this should always be false here
      */
-
     void SetNode(unsigned nodeIndex, ChastePoint<SPACE_DIM> point, bool concreteMove = false);
 
     /**
