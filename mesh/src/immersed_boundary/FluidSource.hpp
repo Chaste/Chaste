@@ -66,6 +66,8 @@ private:
 
     /**
      * Serialize information required to construct a FluidSource.
+     * @param archive The archive
+     * @param version version information
      */
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)

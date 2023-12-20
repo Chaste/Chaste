@@ -1102,6 +1102,8 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetVoronoiSurfaceAreaOfElem
 //LCOV_EXCL_START
 /**
  * Template specialisation for impossible to reach code path
+ * @param elemIdx the element index
+ * @returns 0.0
  */
 template <>
 double ImmersedBoundaryMesh<1, 1>::GetVoronoiSurfaceAreaOfElement(const unsigned elemIdx)

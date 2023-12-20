@@ -469,7 +469,10 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
 }
 
 //LCOV_EXCL_START
-/** Template instnantiation for unused code path */
+/** 
+ * Template instnantiation for unused code path
+ * @param rMesh the mesh
+ */
 template <>
 void ImmersedBoundaryMeshWriter<1, 1>::MakeVtkMesh(ImmersedBoundaryMesh<1, 1>& rMesh)
 {

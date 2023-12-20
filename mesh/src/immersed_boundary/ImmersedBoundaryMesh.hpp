@@ -653,7 +653,7 @@ public:
     double GetElementDivisionSpacing();
 
     /**
-     * @param elementDivisonSpacing the new value of mElementDivisionSpacing
+     * @param elementDivisionSpacing the new value of mElementDivisionSpacing
      */
     void SetElementDivisionSpacing(double elementDivisionSpacing);
 
