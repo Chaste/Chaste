@@ -229,7 +229,7 @@ public:
             // Set up simulation modifier
             ImmersedBoundarySimulationModifier<2> modifier;
             modifier.SetupConstantMemberVariables(cell_population);
-            
+
             // Check that force grids are zero before force propagation
             auto& r_force_grids = modifier.mpArrays->rGetModifiableForceGrids(); 
             for (unsigned grid = 0; grid <= 1; ++grid)
@@ -566,6 +566,17 @@ public:
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
             
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 4, 4);
+
+            const unsigned int num_grid_pts = 4;
+            multi_array<double, 3>& r_vel_grids = mesh.rGetModifiable2dVelocityGrids();
+
+            for (unsigned int dim = 0; dim < 2; dim++) {
+                for (unsigned x = 0; x < num_grid_pts; ++x) {
+                    for (unsigned y = 0; y < num_grid_pts; ++y) {
+                        TS_ASSERT_DELTA(r_vel_grids[dim][x][y], 0.0, 0.00001);
+                    }
+                }
+            }
             
             // Set up a cell population
             std::vector<CellPtr> cells;
@@ -579,19 +590,24 @@ public:
             modifier.SetAdditiveNormalNoise(true);
             modifier.SetZeroFieldSums(true);
             modifier.SetupConstantMemberVariables(cell_population);
+
+            for (unsigned int dim = 0; dim < 2; dim++) {
+                for (unsigned x = 0; x < num_grid_pts; ++x) {
+                    for (unsigned y = 0; y < num_grid_pts; ++y) {
+                        TS_ASSERT_DELTA(r_vel_grids[dim][x][y], 0.0, 0.00001);
+                    }
+                }
+            }
+
             modifier.SolveNavierStokesSpectral();
             
-            const unsigned int num_grid_pts = 4;
             
             std::vector<double> expected_vals = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.126346, 2.42092e-322, 6.92683e-310, 4.68206e-310, 0,
-              4.68206e-310, 1.89721e-321, 2.42092e-322, 6.92683e-310, 4.68206e-310, 0, 0, 4.68197e-310, 
-              2.42092e-322, 6.92683e-310, 4.68206e-310 };
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
             // Check values of m_
-            multi_array<double, 3>& r_vel_grids = mesh.rGetModifiable2dVelocityGrids();
             unsigned int counter = 0;
-            for (unsigned int dim = 0; dim < 3; dim++) {
+            for (unsigned int dim = 0; dim < 2; dim++) {
                 for (unsigned x = 0; x < num_grid_pts; ++x) {
                     for (unsigned y = 0; y < num_grid_pts; ++y) {
                         TS_ASSERT_DELTA(r_vel_grids[dim][x][y], expected_vals[counter], 0.00001);
@@ -642,13 +658,12 @@ public:
             const unsigned int num_grid_pts = 4;
             
             std::vector<double> expected_vals = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 4.66857e-310, 2.42092e-322, 6.94402e-310, 4.66956e-310, 4.66945e-310, 2.42092e-322, 6.94402e-310, 
-             4.66956e-310, 4.66945e-310, 2.42092e-322, 6.94402e-310, 4.66956e-310, 4.66945e-310, 2.42092e-322, 6.94402e-310, 4.66956e-310 };
+             0, 0, 0, 0, 0, 0 };
 
             // Check values of m_
             multi_array<double, 3>& r_vel_grids = mesh.rGetModifiable2dVelocityGrids();
             unsigned int counter = 0;
-            for (unsigned int dim = 0; dim < 3; dim++) {
+            for (unsigned int dim = 0; dim < 2; dim++) {
                 for (unsigned x = 0; x < num_grid_pts; ++x) {
                     for (unsigned y = 0; y < num_grid_pts; ++y) {
                         TS_ASSERT_DELTA(r_vel_grids[dim][x][y], expected_vals[counter], 0.00001);
@@ -758,7 +773,7 @@ public:
             }
 
             modifier.Upwind2d(vel_grids, rhs_grids);
-            
+
             for (unsigned dim = 0; dim < 2; ++dim)
             {
                 for (unsigned x = 0; x < 10; ++x)
@@ -804,7 +819,7 @@ public:
 
             multi_array<double, 3>& vel_grids   = mesh.rGetModifiable2dVelocityGrids();
             multi_array<double, 3>& rhs_grids   = modifier.mpArrays->rGetModifiableRightHandSideGrids();
-            
+
             for (unsigned dim = 0; dim < 2; ++dim)
             {
                 for (unsigned x = 0; x < 10; ++x)
@@ -828,7 +843,7 @@ public:
             }
 
             modifier.Upwind2d(vel_grids, rhs_grids);
-            
+
             for (unsigned dim = 0; dim < 2; ++dim)
             {
                 for (unsigned x = 0; x < 10; ++x)
