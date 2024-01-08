@@ -131,7 +131,7 @@ public:
                 nodes[node_idx] = new Node<1>(node_idx, Create_c_vector(10.0 * p_gen->ranf()));
             }
             
-            auto random_field = gen.SampleRandomField(nodes);
+            auto random_field = gen.SampleRandomFieldAtTime(nodes, 0.5);
             
             std::transform(random_field.begin(), random_field.end(), random_field.begin(), [] (const double& v) { return std::abs(v); });
             auto sum = std::accumulate(random_field.begin(), random_field.end(), 0.0);
