@@ -295,7 +295,7 @@ def ignore_dir(dir_to_check):
 
     dir_ignore_contains = ['Debug_', 'chaste-build', 'cmake-build', 'venv']
 
-    startchar_ignores = ['_', '.']
+    startchar_ignores = ['_']
 
     if dir_to_check in dir_ignores:
         return True
@@ -343,9 +343,9 @@ if __name__ == '__main__':
         for file in files:
             relative_path = os.path.join(relative_root, file)
             name, ext = os.path.splitext(file)
-            if ((ext in exts or file in named_files) and
+            file_name = os.path.join(root, file)
+            if ((ext in exts or file in named_files or file_name in named_files) and
                     relative_path not in exclusions):
-                file_name = os.path.join(root, file)
                 if InspectFile(file_name) == False:
                     num_no_copyrights += 1
                 else:
@@ -357,11 +357,13 @@ if __name__ == '__main__':
     else:
         dir = chaste_dir
 
-    print("Copyright test run over %s (%s%s) files" % (dir, num_no_copyrights , num_copyrights))
+    print("Copyright test run over %s (%s) files" %
+          (dir, num_no_copyrights + num_copyrights))
     if num_no_copyrights > 0:
         print()
         print("The next line is for the benefit of the test summary scripts.")
-        print("Failed %s of %s%s tests" % (num_no_copyrights, num_no_copyrights, num_copyrights))
+        print("Failed %s of %s tests" %
+              (num_no_copyrights, num_no_copyrights + num_copyrights))
 
         # Return a non-zero exit code if orphans were found
         sys.exit(num_no_copyrights)
