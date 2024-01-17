@@ -1031,12 +1031,12 @@ bool MutableMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsVoronoi(Element<ELEMENT_DIM, SP
     }
 
     // Get the circumsphere information
-    c_vector<double, SPACE_DIM+1> this_circum_centre;
+    c_vector<double, SPACE_DIM+1> this_circum_centre = zero_vector<double>(SPACE_DIM+1);
 
     this_circum_centre = pElement->CalculateCircumsphere(this->mElementJacobians[pElement->GetIndex()], this->mElementInverseJacobians[pElement->GetIndex()]);
 
     // Copy the actually circumcentre into a smaller vector
-    c_vector<double, ELEMENT_DIM> circum_centre;
+    c_vector<double, ELEMENT_DIM> circum_centre = zero_vector<double>(ELEMENT_DIM);
     for (unsigned i=0; i<ELEMENT_DIM; i++)
     {
         circum_centre[i] = this_circum_centre[i];
