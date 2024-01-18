@@ -54,7 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * In this tutorial we show how Chaste can be used to simulate a cylindrical model of an
  * intestinal crypt with mutations using both mesh and vertex-based simulations.
  * Full details of the computational model can be found in the paper by
- * Osborne ''et al.'' (2010) [10.1098/rsta.2010.0173](https://doi.org/10.1098/rsta.2010.0173).
+ * Osborne et al. (2010) [10.1098/rsta.2010.0173](https://doi.org/10.1098/rsta.2010.0173).
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary header files.
  */
@@ -138,8 +138,8 @@ public:
          * We need to do this using the `CellPropertyRegistry`, otherwise
          * the numbers of each type of mutation aren't correctly tracked. For
          * a list of possible mutations, see subclasses of `AbstractCellMutationState`.
-         * These can be found in the inheritance diagram, here,
-         * [AbstractCellMutationState](https://chaste.github.io/doxygen-latest/classAbstractCellMutationState.html).
+         * These can be found in the 
+         * [inheritance diagram for AbstractCellMutationState](https://chaste.github.io/doxygen-latest/classAbstractCellMutationState.html).
          * Each mutation has a different effect on the cell cycle models; see the class
          * documentation for details.
          */
@@ -187,7 +187,7 @@ public:
 
         /*
          * Now we have run the simulation to a steady state (where the initial regular configuration is lost) we select a cell to become mutant.
-         * We select one of the cells and set the mutation state to `ApcTwoHitCellMutationState` (i.e. p_state).
+         * We select one of the cells and set the mutation state to `ApcTwoHitCellMutationState` (i.e. `p_state`).
          */
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
