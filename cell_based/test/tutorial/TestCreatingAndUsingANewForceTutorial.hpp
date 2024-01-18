@@ -113,7 +113,7 @@ private:
 
     /* We only need to include the next block of code if we wish to be able
      * to archive (save or load) the force model object in a cell-based simulation.
-     * The code consists of a serialize method, in which we first archive the force
+     * The code consists of a `serialize()` method, in which we first archive the force
      * using the serialization code defined in the base class `AbstractForce`,
      * then archive the member variable. */
     friend class boost::serialization::access;
@@ -144,7 +144,7 @@ public:
     void AddForceContribution(AbstractCellPopulation<2>& rCellPopulation)
     {
         /* Inside the method, we loop over nodes, and add a constant vector to
-         * each node, in the negative ''y''-direction and of magnitude `mStrength`.
+         * each node, in the negative y-direction and of magnitude `mStrength`.
          */
         c_vector<double, 2> force = zero_vector<double>(2);
         force(1) = -mStrength;
@@ -248,7 +248,7 @@ public:
          * Note that it is important to test archiving by using an abstract
          * pointer, so that you check that boost can identify and record which
          * concrete class it should be dealing with.
-         * This tests the CHASTE_CLASS_EXPORT(MyForce) lines are implemented correctly.
+         * This tests the `CHASTE_CLASS_EXPORT(MyForce)` lines are implemented correctly.
          */
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "my_force.arch";

@@ -148,7 +148,7 @@ public:
         simulator.SetEndTime(20.0);
 
         /* To specify how cells move around, we create a "shared pointer" to a
-         * `Force` object and pass it to the `OffLatticeSimulation`. This is done using the MAKE_PTR macro as follows.
+         * `Force` object and pass it to the `OffLatticeSimulation`. This is done using the `MAKE_PTR` macro as follows.
          */
         MAKE_PTR(NagaiHondaForce<2>, p_force);
         simulator.AddForce(p_force);

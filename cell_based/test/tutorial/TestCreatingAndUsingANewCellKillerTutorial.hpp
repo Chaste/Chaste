@@ -319,7 +319,7 @@ public:
 
         /* We now use the cell population to construct a cell killer object. This object
          * must be added to the cell-based simulation as a boost::shared_ptr, so we make
-         * use of the macro MAKR_PTR_ARGS (defined in the header `SmartPointers.hpp`).*/
+         * use of the macro `MAKE_PTR_ARG` (defined in the header `SmartPointers.hpp`).*/
         MAKE_PTR_ARGS(MyCellKiller, p_killer, (&cell_population));
 
         /* We then pass in the cell population into an `OffLatticeSimulation`,

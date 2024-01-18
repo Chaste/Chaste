@@ -101,8 +101,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * implementing some form of chemotaxis down an imposed chemoattractant gradient,
  * as occurs for example when macrophages migrate within a tumour towards high
  * concentrations of the vascular endothelial growth factor VEGF; for further
- * details, see for example Owen ''et al.'', J. Theor. Biol.
- * 226: 377-391 (2004).
+ * details, see for example 
+ * [Owen ''et al.'', J. Theor. Biol. 226: 377-391 (2004).](https://doi.org/10.1016/j.jtbi.2003.09.004)
  *
  * Note that usually this code would be separated out into a separate declaration
  * in a .hpp file and definition in a .cpp file.
@@ -116,7 +116,7 @@ private:
     unsigned mColour;
 
     /* The next block of code allows us to archive (save or load) the cell property object
-     * in a cell-based simulation. The code consists of a serialize() method, in which we first
+     * in a cell-based simulation. The code consists of a `serialize()` method, in which we first
      * archive the cell property using the serialization code defined in the base class
      * `AbstractCellProperty`, then archive the member variable `mColour`. */
     friend class boost::serialization::access;
@@ -346,7 +346,7 @@ public:
      */
     void TestOffLatticeSimulationWithMotileCellProperty()
     {
-        /* Note that HoneycombMeshGenerator, used in this test, is not
+        /* Note that `HoneycombMeshGenerator`, used in this test, is not
          *  yet implemented in parallel. */
 
         /* We use the `HoneycombMeshGenerator` to create a honeycomb mesh covering a
