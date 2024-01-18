@@ -52,12 +52,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * EMPTYLINE
  *
- * This tutorial assumes you have already read [wiki:UserTutorials/CreatingAndUsingANewForce].
+ * This tutorial assumes you have already read [Creating And Using A New Force](docs/user-tutorials/creatingandusinganewforce).
  *
  * EMPTYLINE
  *
- * In the  [wiki:UserTutorials/CreatingAndUsingANewCellMutationState] we showed how to create a new cell mutation
- * state class, and how this can be used in a cell-based simulation. As well as
+ * In the [Creating And Using A New Cell Mutation State](docs/user-tutorials/creatingandusinganewcellmutationstate/) 
+ * tutorial we showed how to create a new cell mutation state class, 
+ * and how this can be used in a cell-based simulation. As well as
  * mutation states, cells may be given much more general properties, using the cell
  * property class hierarchy. In this tutorial, we show how to create a new cell property
  * class, and how this can be used in a cell-based simulation. We will also use a simple
@@ -226,7 +227,7 @@ public:
         }
     }
 
-    /* Just as we encountered in [wiki:UserTutorials/CreatingAndUsingANewCellKiller], here we must override
+    /* Just as we encountered in [Creating And Using A New Cell Killer](docs/user-tutorials/creatingandusinganewcellkiller), here we must override
      * a method that outputs any member variables to a specified results file `rParamsFile`.
      * In our case, we output the member variable `mStrength`, then call the method on the base class.
      */

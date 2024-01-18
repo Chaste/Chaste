@@ -197,7 +197,7 @@ public:
     /*
      * EMPTYLINE
      *
-     * To visualize the results, use Paraview. See the UserTutorials/VisualizingWithParaview tutorial for more information.
+     * To visualize the results, use Paraview. See the [Visualizing With Paraview](docs/user-tutorials/visualizingwithparaview) tutorial for more information.
      *
      * Load the file `/tmp/$USER/testoutput/TestVertexBasedMonolayerWithDeltaNotch/results_from_time_0/results.pvd`.
      *
@@ -276,7 +276,7 @@ public:
     /*
      * EMPTYLINE
      *
-     * To visualize the results, use Paraview. See the UserTutorials/VisualizingWithParaview tutorial for more information.
+     * To visualize the results, use Paraview. See the [Visualizing With Paraview](docs/user-tutorials/visualizingwithparaview) tutorial for more information.
      *
      * Load the file `/tmp/$USER/testoutput/TestNodeBasedMonolayerWithDeltaNotch/results_from_time_0/results.pvd`,
      * and add a spherical glyph.

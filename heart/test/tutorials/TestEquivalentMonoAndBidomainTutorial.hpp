@@ -52,7 +52,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * In this tutorial we show how Chaste is used to run a standard mono and a standard bidomain simulation.
  * With equivalent parameters so that the bidomain could be reduced to the monodomain case.
  *
- * The bulk of this tutorial is the same as UserTutorials/RunningBidomainSimulations, so for details of each line see that page.
+ * The bulk of this tutorial is the same as the tutorial [Running Bidomain Simulations](docs/user-tutorials/runningbidomainsimulations), 
+ * so for details of each line see that page.
  */
 
 #include <cxxtest/TestSuite.h>
@@ -71,7 +72,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // * is called `<CELLMODEL>.cellml`, a file `<CELLMODEL>.hpp` will be automatically generated, which will define
 // * a class called `Cell<CELLMODEL>FromCellML`. So to use a particular cell model in a tissue simulation,
 // * given the cellml, you just have to do two things: include this `.hpp` file, and then use the class.
-// * For example, we will use the !LuoRudy1991 model, so we have to include the following, and
+// * For example, we will use the LuoRudy1991 model, so we have to include the following, and
 // * later on use `CellLuoRudy1991FromCellML` as the cell model class.
 // * See ["ChasteGuides/CodeGenerationFromCellML"] for more information on this process.
 // */
@@ -157,7 +158,7 @@ public:
         /* The `HeartConfig` class is used to set various parameters (see the main ChasteGuides page
          * for information on default parameter values.
          *
-         * See UserTutorials/RunningBidomainSimulations for more details.
+         * See the [Running Bidomain Simulations](docs/user-tutorials/runningbidomainsimulations) tutorial for more details.
          */
         HeartConfig::Instance()->SetSimulationDuration(5.0); //ms
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_800_elements");

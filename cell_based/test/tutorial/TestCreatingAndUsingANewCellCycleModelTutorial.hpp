@@ -139,7 +139,7 @@ private:
         assert(mpCell != NULL);
 
         /* We now set the G1 duration based on cell type. For stem and transit cells, we use the `RandomNumberGenerator`
-         * singleton class to generate a random number U drawn from U![0,1], and
+         * singleton class to generate a random number U drawn from U[0,1], and
          * transform this into a random number T drawn from Exp(λ) using
          * the transformation T = -log(U)/λ. For differentiated cells, which do not progress through the
          * cell cycle, we set the G1 duration to `DBL_MAX`. */

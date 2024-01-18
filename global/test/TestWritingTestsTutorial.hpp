@@ -46,12 +46,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*
  * ## Writing tests
- * We do not use `int main()` methods in Chaste. Instead, we write ''tests'', which are run using !CxxTest.
+ * We do not use `int main()` methods in Chaste. Instead, we write ''tests'', which are run using CxxTest.
  * Tests are used both as:
  * (i) part of the testing environment - every class in the source code has an equivalent test file which tests each aspect of its functionality, making use of the `TS_ASSERT`s as described below; and
  * (ii) for experimental work, which involve writing a 'test' as below but generally without `TS_ASSERT`s.
  *
- * This tutorial shows how to write a test using !CxxTest. Note that the full code is given at the bottom of the page.
+ * This tutorial shows how to write a test using CxxTest. Note that the full code is given at the bottom of the page.
  */
 
 /* First, the following header file needs to be included.*/

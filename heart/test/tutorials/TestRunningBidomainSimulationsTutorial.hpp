@@ -81,7 +81,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * is called `<CELLMODEL>.cellml`, a file `<CELLMODEL>.hpp` will be automatically generated, which will define
  * a class called `Cell<CELLMODEL>FromCellML`. So to use a particular cell model in a tissue simulation,
  * given the CellML, you just have to do two things: include this `.hpp` file, and then use the class.
- * For example, we will use the !LuoRudy1991 model, so we have to include the following, and
+ * For example, we will use the Luo-Rudy 1991 model, so we have to include the following, and
  * later on use `CellLuoRudy1991FromCellML` as the cell model class.
  * See ["ChasteGuides/CodeGenerationFromCellML"] for more information on this process.
  */
@@ -180,8 +180,8 @@ public:
         HeartConfig::Instance()->SetOutputDirectory("BidomainTutorial");
         HeartConfig::Instance()->SetOutputFilenamePrefix("results");
 
-        /* There is an alternate method of loading a mesh that can be seen in [wiki:UserTutorials/Monodomain3dExample Monodomain3dExample],
-         *  using `DistributedTetrahedralMesh`.
+        /* There is an alternate method of loading a mesh that can be seen in [Monodomain 3d Example](docs/user-tutorials/monodomain3dexample),
+         * using `DistributedTetrahedralMesh`.
          *
          * It is possible to over-ride the default visualisation output (which is done during simulation
          * post-processing).
@@ -244,7 +244,7 @@ public:
          *  * `/tmp/$USER/testoutput/BidomainTutorial/vtk_output` for Paraview (VTK)
          * where you should find the geometric mesh data and simulation output.
          *
-         * Please see ChasteGuides/VisualisationGuides for details of using !Meshalyzer/Cmgui/Paraview.
+         * Please see ChasteGuides/VisualisationGuides for details of using Meshalyzer/Cmgui/Paraview.
          *
          * Note: the easiest way to look at the resultant voltage values from the code
          * (for the last timestep - the data for the previous timesteps is written to file

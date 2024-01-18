@@ -219,7 +219,7 @@ public:
         /* Define the crypt length; this will be used for sloughing and calculating the Wnt gradient. */
         double crypt_length = 6.0;
 
-        /* Set up a `WntConcentration` object, as in UserTutorials/RunningMeshBasedCryptSimulations. */
+        /* Set up a `WntConcentration` object, as in the tutorial [Running Mesh Based Simulations](docs/user-tutorials/runningmeshbasedsimulations).*/
         WntConcentration<2>::Instance()->SetType(LINEAR);
         WntConcentration<2>::Instance()->SetCellPopulation(crypt);
         WntConcentration<2>::Instance()->SetCryptLength(crypt_length);

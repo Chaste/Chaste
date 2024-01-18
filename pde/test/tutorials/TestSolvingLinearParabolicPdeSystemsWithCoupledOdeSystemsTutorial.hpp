@@ -81,7 +81,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 /*
  * We then include header files that allow us to specify boundary conditions for the PDEs,
- * deal with meshes and output files, and use PETSc. As noted before, !PetscSetupAndFinalize.hpp
+ * deal with meshes and output files, and use PETSc. As noted before, `PetscSetupAndFinalize.hpp`
  * must be included in every test that uses PETSc.
  */
 #include "BoundaryConditionsContainer.hpp"

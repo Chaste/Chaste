@@ -49,12 +49,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * ### Introduction
  *
- * This tutorial assumes you have already read UserTutorials/RunningMeshBasedCryptSimulations.
+ * This tutorial assumes you have already read the tutorial [Running Mesh Based Simulations](docs/user-tutorials/runningmeshbasedsimulations).
  *
  * In this tutorial we show how Chaste can be used to simulate a cylindrical model of an
  * intestinal crypt with mutations using both mesh and vertex-based simulations.
  * Full details of the computational model can be found in the paper by
- * Osborne ''et al.'' (2010) [10.1098/rsta.2010.0173].
+ * Osborne ''et al.'' (2010) [10.1098/rsta.2010.0173](https://doi.org/10.1098/rsta.2010.0173).
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary header files.
  */

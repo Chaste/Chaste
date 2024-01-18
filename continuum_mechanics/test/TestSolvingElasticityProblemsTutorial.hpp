@@ -98,7 +98,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NonlinearElasticityTools.hpp"
 /* For visualising results in Paraview */
 #include "VtkNonlinearElasticitySolutionWriter.hpp"
-/* As before: !PetscSetupAndFinalize.hpp must be included in every test that uses PETSc. Note that it
+/* As before: `PetscSetupAndFinalize.hpp` must be included in every test that uses PETSc. Note that it
  * cannot be included in the source code. */
 #include "PetscSetupAndFinalize.hpp"
 
