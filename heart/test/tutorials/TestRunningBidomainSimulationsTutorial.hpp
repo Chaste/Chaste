@@ -249,9 +249,9 @@ public:
          * Note: the easiest way to look at the resultant voltage values from the code
          * (for the last timestep - the data for the previous timesteps is written to file
          * but not retained) is to use a `ReplicatableVector`.
-         * `bidomain_problem.GetSolution())` returns a !PetSc vector
+         * `bidomain_problem.GetSolution())` returns a PETSc vector
          * of the form (V_0, phi_0, V_1, phi_e_1, ... V_n, phi_e_n), and we can create a
-         * `ReplicatableVector` for easy access to this !PetSc vector's data.
+         * `ReplicatableVector` for easy access to this PETSc vector's data.
          * (This won't be very efficient with huge problems in parallel - the next tutorial
          * will mention how to do parallel access).
          */
