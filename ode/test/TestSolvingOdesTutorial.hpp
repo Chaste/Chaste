@@ -78,7 +78,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * ### Defining the ODE classes
  *
- * Let us solve the ODE dy/dt = y^2^+t^2^, with y(0) = 1. To do so, we have to define
+ * Let us solve the ODE $\frac{dy}{dt} = y^2 +t^2$, with $y(0) = 1$. To do so, we have to define
  * our own ODE class, inheriting from `AbstractOdeSystem`, which implements the
  * `EvaluateYDerivatives()` method.
  */
@@ -103,7 +103,7 @@ public:
     void EvaluateYDerivatives(double time, const std::vector<double>& rY,
                               std::vector<double>& rDY)
     {
-        /*...so we set `rDY[0]` to be y^2^ + t^2^. */
+        /*...so we set `rDY[0]` to be $y^2 + t^2$. */
         rDY[0] = rY[0]*rY[0] + time*time;
     }
 };
@@ -138,7 +138,7 @@ class MyOdeWithStoppingEvent : public MyOde
 public:
     /* All we have to do is implement the following function. This is defined in
      * the base class (`AbstractOdeSystem`), where it always returns false, and here we override it
-     * to return true if y>=2.5
+     * to return true if $y \geq 2.5$
      */
     bool CalculateStoppingEvent(double time, const std::vector<double>& rY)
     {
@@ -178,7 +178,7 @@ void OdeSystemInformation<MyOdeUsingStateVariables>::Initialise()
 }
 
 /* This class is another simple ODE class, just as an example of how a 2d ODE is solved. Here
- * we solve the ODE dy,,1,,/dt = y,,2,,, dy,,2,,/dt = (y,,1,,)^2^ (which represents the second-order ODE d^2^y/dt^2^ = y^2^).
+ * we solve the ODE $\frac{dy_1}{dt} = y_2, \frac{dy_2}{dt} = (y_1)^2$ (which represents the second-order ODE $\frac{d^2y}{dt^2} = y^2$).
  */
 class My2dOde : public AbstractOdeSystem
 {
