@@ -108,7 +108,7 @@ public:
     }
 };
 
-/* The following ''template specialisation'' defines the information for this
+/* The following *template specialisation* defines the information for this
  * ODE system.  Note that we use the ODE system class that we have just defined
  * as a template parameter
  */
@@ -234,8 +234,8 @@ public:
         /* Then, just call `Solve`, passing in a pointer to the ODE, the
          * initial condition, the start time, end time, the solving timestep,
          * and sampling timestep (how often we want the solution stored in the returned `OdeSolution` object).
-         * Here we solve from 0 to 1, with a timestep of 0.01 but a ''sampling
-         * timestep'' of 0.1. The return value is an object of type `OdeSolution`
+         * Here we solve from 0 to 1, with a timestep of 0.01 but a *sampling
+         * timestep* of 0.1. The return value is an object of type `OdeSolution`
          * (which is basically just a list of times and solutions).
          */
         OdeSolution solutions = euler_solver.Solve(&my_ode, initial_condition, 0, 1, 0.01, 0.1);
@@ -262,8 +262,8 @@ public:
          * stopping event defined, using the same solver as before. */
         MyOdeWithStoppingEvent my_ode_stopping;
 
-        /* **Note:** ''when a `std::vector` is passed in as an initial condition
-         * to a `Solve` call, it gets updated as the solve takes place''. Therefore, if
+        /* **Note:** *when a `std::vector` is passed in as an initial condition
+         * to a `Solve` call, it gets updated as the solve takes place*. Therefore, if
          * we want to use the same initial condition again, we have to reset it back to 1.0. */
         initial_condition[0] = 1.0;
         solutions = euler_solver.Solve(&my_ode_stopping, initial_condition, 0, 1, 0.01, 0.1);
@@ -279,7 +279,7 @@ public:
      *
      * In this second test, we show how to do an alternative version of ODE solving, which
      * does not involve passing in initial conditions and returning an `OdeSolution`.
-     * The `AbstractOdeSystem` class has a member variable called the ''state variable vector'', which can
+     * The `AbstractOdeSystem` class has a member variable called the *state variable vector*, which can
      * be used to hold the solution, and will be updated if a particular version of `Solve`
      * is called. This can be useful for embedding ODE models in a bigger system, since
      * the ODE models will then always contain their current solution state.
