@@ -53,106 +53,46 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * With equivalent parameters so that the bidomain could be reduced to the monodomain case.
  *
  * The bulk of this tutorial is the same as the tutorial [Running Bidomain Simulations](docs/user-tutorials/runningbidomainsimulations), 
- * so for details of each line see that page.
+ * so for details of the following code block see that page.
  */
 
 #include <cxxtest/TestSuite.h>
-// The main classes to be used for running simulations.
 #include "BidomainProblem.hpp"
 #include "MonodomainProblem.hpp"
 #include "SimpleStimulus.hpp"
-///* All tests which run cardiac simulations (which use Petsc) should include
-// * `PetscSetupAndFinalize.hpp`.  This class ensures that `PetscInitialise()`
-// * is called with the appropriate arguments before any tests in the suite are run. */
 #include "PetscSetupAndFinalize.hpp"
-
-///* The above files are contained in the source release and can be located and studied. Cardiac cell
-// * models are different: the C++ code is automatically generated from cellml files. To use a particular
-// * cellml file, place it in `heart/src/odes/cellml` (there are several in here already). If the cellml
-// * is called `<CELLMODEL>.cellml`, a file `<CELLMODEL>.hpp` will be automatically generated, which will define
-// * a class called `Cell<CELLMODEL>FromCellML`. So to use a particular cell model in a tissue simulation,
-// * given the cellml, you just have to do two things: include this `.hpp` file, and then use the class.
-// * For example, we will use the LuoRudy1991 model, so we have to include the following, and
-// * later on use `CellLuoRudy1991FromCellML` as the cell model class.
-// * See ["ChasteGuides/CodeGenerationFromCellML"] for more information on this process.
-// */
 #include "LuoRudy1991.hpp"
 
-
-// * ### Defining a cell factory
-// *
-// * All mono/bidomain simulations need a ''cell factory'' as input. This is a class
-// * which tells the problem class what type of cardiac cells to create. The cell-factory
-// * class has to inherit from `AbstractCardiacCellFactory<DIM>`, which means it must
-// * implement the method `CreateCardiacCellForTissueNode(Node<DIM>*)`, which returns
-// * a pointer to an `AbstractCardiacCell`. Note, some concrete cell factories have
-// * been defined, such as the `PlaneStimulusCellFactory` (see later tutorials), which
-// * could be used in the simulation, but for completeness we create our own cell factory in
-// * this test. For complicated problems with, say, heterogeneous cell types or particular stimuli,
-// * a new cell factory will have to be defined by the user for their particular problem.
-// *
-// * This cell factory is a simple cell factory where every cell is a Luo-Rudy 91 cell,
-// * and only the cell at position (0) is given a non-zero stimulus.
-// */
 class PointStimulus2dCellFactory : public AbstractCardiacCellFactory<2>
 {
-///* Declare (smart) pointer to a `SimpleStimulus` for the cell which is stimulated.
-// * Note that `AbstractCardiacCellFactory` also has as protected members: `mpZeroStimulus`
-// * of type `boost::shared_ptr<ZeroStimulus>`; `mpMesh`, a pointer to the mesh used (the problem
-// * class will set this before it calls `CreateCardiacCellForTissueNode`, so it can be used
-// * in that method); `mTimestep`, a double (see below); and `boost::shared_ptr<mpSolver>`
-// * a forward euler ode solver (see below). */
 private:
     boost::shared_ptr<SimpleStimulus> mpStimulus;
 
 public:
-    // Our contructor takes in nothing. It calls the constructor of `AbstractCardiacCellFactory`
-    // and we also initialise the stimulus to have magnitude -500000 uA/cm^3 and duration 0.5 ms.
     PointStimulus2dCellFactory()
         : AbstractCardiacCellFactory<2>(),
           mpStimulus(new SimpleStimulus(-5e5, 0.5))
     {
     }
 
-//     * Now we implement the pure method which needs to be implemented. We return
-//     * a LR91 cell for each node, with the nodes in a 0.2mm block given the non-zero stimulus,
-//     * and all other nodes given the zero stimulus. Note that we use `mpMesh`,
-//     * `mTimestep`, `mpZeroStimulus` and `mpSolver` which are all
-//     * members of the base class. The timestep and solver are defined in the base
-//     * class just so that the user doesn't have to create them here.
     AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<2>* pNode)
     {
         double x = pNode->rGetLocation()[0];
         double y = pNode->rGetLocation()[1];
         if (x<0.02+1e-6 && y<0.02+1e-6)
         {
-//            * Create a LR91 cell with the non-zero stimulus. This is a volume stimulus, ie
-//            * the function on the right-hand side of the first of the two bidomain equations.
-//            * An equal and opposite extra-cellular stimulus is implicitly enforced by the code,
-//            * which corresponds to having zero on the right-hand side of the second of the
-//            * bidomain equations.
-//            *
             return new CellLuoRudy1991FromCellML(mpSolver, mpStimulus);
         }
         else
         {
-            // The other cells have zero stimuli.
             return new CellLuoRudy1991FromCellML(mpSolver, mpZeroStimulus);
         }
     }
-    // We have no need for a destructor, since the problem class deals with deleting the cells.
 };
 
-///*
-// * ### Running the mono- and bi-domain simulations
-// *
-// * Now we can define the test class, which must inherit from `CxxTest::TestSuite`
-// * as described in the writing basic tests tutorial. */
 class TestEquivalentMonoAndBidomainTutorial : public CxxTest::TestSuite
 {
-// Tests should be public...
 public:
-    // Define the test.
     void TestCompareMonoAndBidomain()
     {
         /* The `HeartConfig` class is used to set various parameters (see the main ChasteGuides page
