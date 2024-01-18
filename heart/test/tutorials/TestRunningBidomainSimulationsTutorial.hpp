@@ -91,7 +91,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * ### Defining a cell factory
  *
- * All mono/bidomain simulations need a ''cell factory'' as input. This is a class
+ * All mono/bidomain simulations need a *cell factory* as input. This is a class
  * which tells the problem class what type of cardiac cells to create. The cell-factory
  * class has to inherit from `AbstractCardiacCellFactory<DIM>`, which means it must
  * implement the method `CreateCardiacCellForTissueNode(Node<DIM>*)`, which returns
