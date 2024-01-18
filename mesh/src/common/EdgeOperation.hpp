@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -133,8 +133,8 @@ public:
       * 
       * @param elementIndex an element index
       * @param elementIndex2 another element index
-      * @param pRemapInfo edge remap info
-      * @param pRemapInfo2 edge remap info after cell division
+      * @param remapInfo edge remap info
+      * @param remapInfo2 edge remap info after cell division
       */
     EdgeOperation(unsigned elementIndex,
                   unsigned elementIndex2,
@@ -155,7 +155,7 @@ public:
     /**
      * Modify element index on which edge operation has been performed.
      * 
-     * @paran index an element index 
+     * @param index an element index 
      */
     void SetElementIndex(const unsigned index);
 
@@ -167,7 +167,7 @@ public:
     /**
      * Modify element index of the second daughter cell.
      * 
-     * @paran index an element index 
+     * @param index an element index 
      */
     void SetElementIndex2(const unsigned index);
 

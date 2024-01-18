@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -76,6 +76,11 @@ private:
 
     /** Vector of pointers to edge SRN models. */
     std::vector<boost::shared_ptr<AbstractSrnModel>> mEdgeSrnModels;
+
+    /**
+     * @typedef abstractsrnmodel_t
+     * Type alias for a vector storing pointers to AbstractSrnModel.
+     */
     using abstractsrnmodel_t = std::vector<AbstractSrnModelPtr>;
 
     /** Pointer to interior SRN model. */
@@ -91,14 +96,52 @@ protected:
 
 public:
 
-    /* Makes the class iterable which returns the individual edge SRN models. */
+    /**
+     * @typedef iterator
+     * Type alias for non-constant iterator in the SRN model.
+     */
     using iterator = abstractsrnmodel_t::iterator;
+
+    /**
+     * @typedef const_iterator
+     * Type alias for constant iterator in the SRN model.
+     */
     using const_iterator = abstractsrnmodel_t::const_iterator;
+
+    /**
+     * Returns an iterator pointing to the first element.
+     * @return Iterator to the beginning.
+     */
     iterator begin() { return mEdgeSrnModels.begin(); }
+
+    /**
+     * Returns an iterator pointing one past the last element.
+     * @return Iterator to the end.
+     */
     iterator end() { return mEdgeSrnModels.end(); }
+
+    /**
+     * Returns a constant iterator pointing to the first element.
+     * @return Constant iterator to the beginning.
+     */
     const_iterator begin() const { return mEdgeSrnModels.begin(); }
+
+    /**
+     * Returns a constant iterator pointing one past the last element.
+     * @return Constant iterator to the end.
+     */
     const_iterator end() const { return mEdgeSrnModels.end(); }
+
+    /**
+     * Returns a constant iterator pointing to the first element.
+     * @return Constant iterator to the beginning.
+     */
     const_iterator cbegin() const { return mEdgeSrnModels.cbegin(); }
+
+    /**
+     * Returns a constant iterator pointing one past the last element.
+     * @return Constant iterator to the end.
+     */
     const_iterator cend() const { return mEdgeSrnModels.cend(); }
 
     /**
@@ -150,6 +193,8 @@ public:
 
     /**
      * Get number of edge SRNs.
+     *
+     * @return the number of edge SRNs
      */
     unsigned GetNumEdgeSrn() const;
 

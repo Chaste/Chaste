@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -203,6 +203,7 @@ public:
      * Constructor for use by boost serialization ONLY!
      *
      * @param rMesh a vertex mesh.
+     * @param rPopSrn a population SRN remapping helper class
      */
     VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh,
                               VertexBasedPopulationSrn<DIM>& rPopSrn);
@@ -290,11 +291,11 @@ public:
      * index.
      * 
      * @param pCell  Cell pointer
-     * @param pEdgeIndex Local edge index
+     * @param edgeLocalIndex Local edge index
      * 
      * @return set of pairs consisting of element index neighbouring pCell and local edge index
      */
-    std::set<std::pair<unsigned, unsigned>> GetNeighbouringEdgeIndices(CellPtr pCell, unsigned EdgeLocalIndex);
+    std::set<std::pair<unsigned, unsigned>> GetNeighbouringEdgeIndices(CellPtr pCell, unsigned edgeLocalIndex);
 
     /**
      * Overridden AddNode() method.

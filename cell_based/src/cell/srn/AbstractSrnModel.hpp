@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -269,12 +269,16 @@ public:
 
     /**
      * Sets this model to be part of an edge based SRN
+     *
+     * @param isEdgeModel whether this model is part of an edge based SRN
      */
-    void SetEdgeModelIndicator(const bool indicator);
+    void SetEdgeModelIndicator(const bool isEdgeModel);
 
     /**
      * Scales SRN variables by factor theta.
      * Method overriden in AbstractOdeSrnModel.
+     *
+     * @param theta factor by which to scale all ODE variables.
      */
     virtual void ScaleSrnVariables(const double theta);
 

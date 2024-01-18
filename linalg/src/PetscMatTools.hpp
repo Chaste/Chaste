@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -149,11 +149,11 @@ public:
     static unsigned GetSize(Mat matrix);
 
     /**
-     * @return this process's ownership range of the contents of the system.
+     * Returns this process's ownership range of the contents of the matrix via arguments.
      *
      * @param matrix  the matrix
-     * @param lo  lowest index owned by this process
-     * @param hi  highest index owned by this process
+     * @param lo  lowest index owned by this process (returned)
+     * @param hi  highest index owned by this process (returned)
      */
     static void GetOwnershipRange(Mat matrix, PetscInt& lo, PetscInt& hi);
 

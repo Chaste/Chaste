@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -185,7 +185,7 @@ public:
      */
     std::vector<CellDivisionInfo<SPACE_DIM> > GetCellDivisionInfo() const;
 
-    /*
+    /**
      * Clear information about T3 swaps.
      */
     void ClearCellDivisionInfo();

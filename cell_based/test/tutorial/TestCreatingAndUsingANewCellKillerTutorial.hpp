@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -92,8 +92,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * As an example, let us consider a cell killer that labels any cells in a
  * two-dimensional cell population which lie outside the elliptical domain given in
- * Cartesian coordinates by the equation (''x''/20)^2^ + (''y''/10)^2^ < 1. To
- * implement this we define a new cell killer class, `MyCellKiller`,
+ * Cartesian coordinates by the equation $\left(\frac{x}{20}\right)^2 + \left(\frac{y}{10}\right)^2 < 1$.
+ * To implement this we define a new cell killer class, `MyCellKiller`,
  * which inherits from `AbstractCellKiller` and overrides the
  * `CheckAndLabelCellsForApoptosisOrDeath()` method.
  *

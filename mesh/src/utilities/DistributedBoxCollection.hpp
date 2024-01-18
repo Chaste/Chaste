@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -163,7 +163,7 @@ public:
      * if there are more than 3 processes the domain will be swollen to [(0,0,0), (3,3,num_procs)].  The
      * user is warned when this happens.
      */
-    DistributedBoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX = false, bool mIsPeriodicInY=false, bool mIsPeriodicInZ=false, int localRows = PETSC_DECIDE);
+    DistributedBoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX = false, bool isPeriodicInY=false, bool isPeriodicInZ=false, int localRows = PETSC_DECIDE);
 
     /**
      * Destructor - frees memory allocated to distributed vector.
