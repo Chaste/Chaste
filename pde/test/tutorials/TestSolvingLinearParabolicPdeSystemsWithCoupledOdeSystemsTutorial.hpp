@@ -173,7 +173,8 @@ public:
         /* We now solve the PDE system and write results to VTK files, for
          * visualization using Paraview.  Results will be written to CHASTE_TEST_OUTPUT/TestSchnackenbergSystemOnButterflyMesh
          * as a results.pvd file and several results_[time].vtu files.
-         * You should see something like [[Image(u.png, 350px)]] for u and [[Image(v.png, 350px)]] for v.
+         * You should see something like ![u](schnackenberg_u.png) for u 
+         * and ![v](schnackenberg_v.png, 350px) for v.
          */
         solver.SolveAndWriteResultsToFile();
 
