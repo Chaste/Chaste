@@ -22,7 +22,7 @@ However the top level apps directory (and indeed the apps directory in any user 
 to compile these as an executable:
 
 `cmake .. where .. is the source folder for Chaste` followed by
-`make <target name> -DCMAKE_BUILD_TYPE=Release` where is your build tareget e.g. Chaste, or a user project such as ApPredict
+`make <target name> -DCMAKE_BUILD_TYPE=Release` where is your build target e.g. Chaste, or a user project such as ApPredict
 
 === Running the converter ===
 
