@@ -31,6 +31,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 from pathlib import Path
+from typing import List, Tuple
 from subprocess import check_output, CalledProcessError
 
 import re
@@ -39,10 +40,11 @@ CHASTE_SRC_DIR = Path(__file__).resolve().parent.parent.parent
 HEART_DIR = CHASTE_SRC_DIR / 'heart'
 USER_TUTORIAL_DIR = CHASTE_SRC_DIR / 'tutorials' / 'UserTutorials'
 HOWTO_TAG = "HOW_TO_TAG"
-ST_NONE, ST_TEXT, ST_CODE, ST_HOWTO = 0, 1, 2, 3  # Status codes for use during parsing
+# Status codes for use during parsing
+ST_NONE, ST_TEXT, ST_CODE, ST_HOWTO = 0, 1, 2, 3
 
 
-def get_list_of_user_tutorial_files() -> 'list[Path]':
+def get_list_of_user_tutorial_files() -> List[Path]:
     """
     Scans the CHASTE_SRC_DIR directory recursively to find all files with a name starting with 'Test'
     and ending with 'Tutorial.hpp', and returns a list of their resolved paths.
@@ -62,7 +64,8 @@ def get_last_revision_hash(abs_file_path: Path) -> str:
     try:
         rel_file_path = abs_file_path.relative_to(CHASTE_SRC_DIR)
         rev_hash = check_output(
-            ['git', '-C', str(CHASTE_SRC_DIR), 'log', '-n', '1', '--pretty=format:%H', '--', str(rel_file_path)],
+            ['git', '-C', str(CHASTE_SRC_DIR), 'log', '-n', '1',
+             '--pretty=format:%H', '--', str(rel_file_path)],
             encoding='utf-8'
         ).strip()
         return rev_hash
@@ -83,13 +86,15 @@ def get_output_file_path(abs_file_path: Path) -> Path:
     :raises AssertionError: If the filename doesn't match the expected pattern.
     """
     file_name = abs_file_path.stem
-    assert file_name.startswith('Test') and file_name.endswith('Tutorial'), 'File does not appear to be a tutorial'
+    assert file_name.startswith('Test') and file_name.endswith(
+        'Tutorial'), 'File does not appear to be a tutorial'
     return USER_TUTORIAL_DIR / f'{file_name[len("Test"):-(len("Tutorial"))]}.md'
 
 
 def get_title_from_file(abs_file_path: Path) -> str:
     file_name = abs_file_path.stem
-    assert file_name.startswith('Test') and file_name.endswith('Tutorial'), 'File does not appear to be a tutorial'
+    assert file_name.startswith('Test') and file_name.endswith(
+        'Tutorial'), 'File does not appear to be a tutorial'
     reduced_file_name = file_name[len("Test"):-(len("Tutorial"))]
 
     # Split CamelCase string into list of words
@@ -169,10 +174,12 @@ toc: true
     full_markdown_content = ''.join(output)
 
     # Postprocess to remove empty lines at the end of code blocks
-    full_markdown_content = full_markdown_content.replace('\n\n```\n', '\n```\n')
+    full_markdown_content = full_markdown_content.replace(
+        '\n\n```\n', '\n```\n')
 
     # Postprocess to remove more than one empty line above a code block
-    full_markdown_content = full_markdown_content.replace('\n\n\n```cpp\n', '\n\n```cpp\n')
+    full_markdown_content = full_markdown_content.replace(
+        '\n\n\n```cpp\n', '\n\n```cpp\n')
 
     # Postprocess to remove any cases of 3 blank lines
     full_markdown_content = full_markdown_content.replace('\n\n\n\n', '\n\n')
@@ -184,7 +191,7 @@ toc: true
         file.write(full_markdown_content)
 
 
-def format_code_lines(code_lines: 'list[str]') -> str:
+def format_code_lines(code_lines: List[str]) -> str:
     """
     Formats a list of code lines into a Markdown code block with C++ syntax highlighting.
 
@@ -236,7 +243,7 @@ def clean_end_comment(_stripped_line):
     return _stripped_line[:-2].strip()
 
 
-def convert_file_to_markdown(abs_file_path: Path) -> 'tuple[str, list[str]]':
+def convert_file_to_markdown(abs_file_path: Path) -> Tuple[str, List[str]]:
     """
     Convert a single tutorial source file to wiki markup, returning the page source.
 
