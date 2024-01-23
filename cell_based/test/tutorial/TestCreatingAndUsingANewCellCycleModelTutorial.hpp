@@ -61,10 +61,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 
-/* The next header includes the Boost shared_ptr smart pointer, and defines some useful
+/* The next header includes the Boost `shared_ptr` smart pointer, and defines some useful
  * macros to save typing when using it. */
 #include "SmartPointers.hpp"
-/* The next header includes the NEVER_REACHED macro, used in one of the methods below. */
+/* The next header includes the `NEVER_REACHED` macro, used in one of the methods below. */
 #include "Exception.hpp"
 
 /* The next header defines a base class for simple generation-based cell-cycle models.
@@ -79,7 +79,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* The remaining header files define classes that will be used in the cell-based
  * simulation test. We have encountered each of these header files in previous cell-based Chaste
- * tutorials, except for `CheckReadyToDivideAndPhaseIsUpdated`, which defines a helper
+ * tutorials, except for `CheckReadyToDivideAndPhaseIsUpdated()`, which defines a helper
  * class for testing a cell-cycle model. */
 #include "CheckReadyToDivideAndPhaseIsUpdated.hpp"
 #include "HoneycombMeshGenerator.hpp"
@@ -139,7 +139,7 @@ private:
         assert(mpCell != NULL);
 
         /* We now set the G1 duration based on cell type. For stem and transit cells, we use the `RandomNumberGenerator`
-         * singleton class to generate a random number U drawn from U![0,1], and
+         * singleton class to generate a random number U drawn from U[0,1], and
          * transform this into a random number T drawn from Exp(λ) using
          * the transformation T = -log(U)/λ. For differentiated cells, which do not progress through the
          * cell cycle, we set the G1 duration to `DBL_MAX`. */
@@ -266,7 +266,7 @@ public:
         }
 
         /* To check the CCM has been set up correctly we get a pointer to the one stored on the first cell.
-         * We use a static_cast so we can access all the member variables in the concrete class MyCellCycleModel.
+         * We use a static_cast so we can access all the member variables in the concrete class `MyCellCycleModel`.
          *
          * Find the mean G1 duration and test that it is within some tolerance of
          * the expected value: */

@@ -63,7 +63,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * EMPTYLINE
  *
- * As in previous cell-based Chaste tutorials (UserTutorials/RunningMeshBasedSimulations), we begin by including the necessary header files.
+ * As in previous cell-based Chaste tutorials ([Running Mesh Based Simulations](docs/user-tutorials/runningmeshbasedsimulations)), we begin by including the necessary header files.
  */
 #include <cxxtest/TestSuite.h>
 #include "CheckpointArchiveTypes.hpp"
@@ -73,7 +73,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 /* The remaining header files define classes that will be used in the cell population
  * simulation test. We encountered some of these header files in
- * UserTutorials/RunningMeshBasedSimulations. */
+ * [Running Mesh Based Simulations](docs/user-tutorials/runningmeshbasedsimulations). */
 #include "CellsGenerator.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "UniformCellCycleModel.hpp"
@@ -256,7 +256,7 @@ public:
      * EMPTYLINE
      *
      * Note that you **cannot view the results of a 3D simulation using the Java visualiser** but
-     * to visualize the results, use Paraview. See the UserTutorials/VisualizingWithParaview tutorial for more information.
+     * to visualize the results, use Paraview. See the [Visualizing With Paraview](docs/user-tutorials/visualizingwithparaview) tutorial for more information.
      *
      * Load the file `/tmp/$USER/testoutput/NodeBasedSpheroid/results_from_time_0/results.pvd`,
      * and add spherical glyphs to represent cells.
@@ -345,7 +345,7 @@ public:
     /*
      * EMPTYLINE
      *
-     * To visualize the results, use Paraview. See the UserTutorials/VisualizingWithParaview tutorial for more information.
+     * To visualize the results, use Paraview. See the [Visualizing With Paraview](docs/user-tutorials/visualizingwithparaview) tutorial for more information.
      *
      * Load the file `/tmp/$USER/testoutput/NodeBasedOnSphere/results_from_time_0/results.pvd`,
      * and add spherical glyphs to represent cells.

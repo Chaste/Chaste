@@ -43,8 +43,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTSINGLECELLSIMULATIONTUTORIAL_HPP_
 #define TESTSINGLECELLSIMULATIONTUTORIAL_HPP_
 /*
- * [[PageOutline]]
- *
  * ## An example showing how to run a single cell simulation
  *
  * ### Introduction
@@ -148,20 +146,18 @@ public:
          * We have found that 1e5 should be enough for a single pace of all models we've tried so far,
          * but if you were running for a long time (e.g. 1000 paces in one Solve call) you would need to increase this.
          *
-         * Another common error from CVODE is:
-         * **the error test failed repeatedly or with |h| = hmin.**
+         * Another potential error from CVODE is:
+         * `**the error test failed repeatedly or with |h| = hmin.**`
          *
          * Since we don't change hmin (and it defaults to a very small value), this generally means the
          * ODE system has got to a situation where refining the timestep is not helping the convergence.
          *
          * This generally indicates that you are hitting some sort of singularity, or divide by zero, in
-         * the model. Unfortunately cardiac models are full of these, they can sometimes be manually edited out
-         * by changing the cellML file, for instance using [http://en.wikipedia.org/wiki/L%27H%C3%B4pital%27s_rule L'Hopital's rule].
-         *
-         * In this case, one other thing you can try is to change the absolute and relative
-         * tolerances of the CVODE solver, the default being (1e-5,1e-7), although it isn't clear whether
-         * refining sometimes makes things worse for models with singularities,
-         * as CVODE goes to look for trouble in areas with steep gradients.
+         * the model. Unfortunately cardiac models are full of these due to [GHK-style ion flux equations](https://en.wikipedia.org/wiki/Goldman%E2%80%93Hodgkin%E2%80%93Katz_flux_equation)! 
+         * They were sometimes manually edited out by changing the cellML file, for instance using [L'Hopital's rule](http://en.wikipedia.org/wiki/L%27H%C3%B4pital%27s_rule)
+         * close to the voltages that caused singularities. But since Chaste v2021.1 [a feature in chaste_codegen](https://wellcomeopenresearch.org/articles/6-261/v2), 
+         * now applies a fix like that automatically to remove all known singularities in cardiac models during CellML to C++ conversion, so these errors should be unusual 
+         * and please open a ticket if you run into these problems.
          *
          * For this particular test, we are going to specify quite strict tolerances, so that the test gets the same results
          * on different versions of CVODE and different compilers.
@@ -223,7 +219,7 @@ public:
          * nothing else on the right-hand side of the equations uses time directly.
          *
          * i.e. if you have a `RegularStimulus` of period 1000ms then you would get exactly the same results
-         * calling Solve(0,1000,...) twice, as you would calling Solve(0,1000,...) and Solve(1000,2000,...).
+         * calling `Solve(0,1000,...)` twice, as you would calling `Solve(0,1000,...)` and `Solve(1000,2000,...)`.
          *
          * Single cell results can be very sensitive to the sampling time step, because of the steepness of the upstroke.
          *

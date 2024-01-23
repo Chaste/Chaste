@@ -90,7 +90,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * As an example, let us consider a simulation modifier that, at each simulation
  * time step, calculates each cell's height (y coordinate) in a two-dimensional
- * domain and stores it in in the CellData property as "height". This might be
+ * domain and stores it in in the `CellData` property as "height". This might be
  * used, for example in cell-based simulations where cell behaviour is dictated
  * through some form of positional information along a tissue axis.
  *

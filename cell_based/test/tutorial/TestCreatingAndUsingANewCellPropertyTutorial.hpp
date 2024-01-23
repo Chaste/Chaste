@@ -52,12 +52,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * EMPTYLINE
  *
- * This tutorial assumes you have already read [wiki:UserTutorials/CreatingAndUsingANewForce].
+ * This tutorial assumes you have already read [Creating And Using A New Force](docs/user-tutorials/creatingandusinganewforce).
  *
  * EMPTYLINE
  *
- * In the  [wiki:UserTutorials/CreatingAndUsingANewCellMutationState] we showed how to create a new cell mutation
- * state class, and how this can be used in a cell-based simulation. As well as
+ * In the [Creating And Using A New Cell Mutation State](docs/user-tutorials/creatingandusinganewcellmutationstate/) 
+ * tutorial we showed how to create a new cell mutation state class, 
+ * and how this can be used in a cell-based simulation. As well as
  * mutation states, cells may be given much more general properties, using the cell
  * property class hierarchy. In this tutorial, we show how to create a new cell property
  * class, and how this can be used in a cell-based simulation. We will also use a simple
@@ -100,8 +101,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * implementing some form of chemotaxis down an imposed chemoattractant gradient,
  * as occurs for example when macrophages migrate within a tumour towards high
  * concentrations of the vascular endothelial growth factor VEGF; for further
- * details, see for example Owen ''et al.'', J. Theor. Biol.
- * 226: 377-391 (2004).
+ * details, see for example 
+ * [Owen ''et al.'', J. Theor. Biol. 226: 377-391 (2004).](https://doi.org/10.1016/j.jtbi.2003.09.004)
  *
  * Note that usually this code would be separated out into a separate declaration
  * in a .hpp file and definition in a .cpp file.
@@ -115,7 +116,7 @@ private:
     unsigned mColour;
 
     /* The next block of code allows us to archive (save or load) the cell property object
-     * in a cell-based simulation. The code consists of a serialize() method, in which we first
+     * in a cell-based simulation. The code consists of a `serialize()` method, in which we first
      * archive the cell property using the serialization code defined in the base class
      * `AbstractCellProperty`, then archive the member variable `mColour`. */
     friend class boost::serialization::access;
@@ -226,7 +227,7 @@ public:
         }
     }
 
-    /* Just as we encountered in [wiki:UserTutorials/CreatingAndUsingANewCellKiller], here we must override
+    /* Just as we encountered in [Creating And Using A New Cell Killer](docs/user-tutorials/creatingandusinganewcellkiller), here we must override
      * a method that outputs any member variables to a specified results file `rParamsFile`.
      * In our case, we output the member variable `mStrength`, then call the method on the base class.
      */
@@ -345,7 +346,7 @@ public:
      */
     void TestOffLatticeSimulationWithMotileCellProperty()
     {
-        /* Note that HoneycombMeshGenerator, used in this test, is not
+        /* Note that `HoneycombMeshGenerator`, used in this test, is not
          *  yet implemented in parallel. */
 
         /* We use the `HoneycombMeshGenerator` to create a honeycomb mesh covering a

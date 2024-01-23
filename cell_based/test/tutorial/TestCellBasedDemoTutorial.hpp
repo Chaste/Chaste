@@ -101,7 +101,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Since we are using `AbstractCellBasedTestSuite` the singleton `SimulationTime` is initialised to zero at the beginning of the test and destroyed at the end
  * of the test; `RandomNumberGenerator` is re-seeded with zero at the beginning and destroyed at the end of the test;
  * and `CellPropertyRegistry` (which stores `CellProperties`, you learn about these in a later tutorial
- * [wiki:UserTutorials/CreatingAndUsingANewCellProperty]) is cleared at the beginning of the test.
+ * [CreatingAndUsingANewCellProperty](docs/user-tutorials/creatingandusinganewcellproperty)) is cleared at the beginning of the test.
  * This makes for cleaner code.
  */
 class TestCellBasedDemoTutorial : public AbstractCellBasedTestSuite
@@ -148,7 +148,7 @@ public:
         simulator.SetEndTime(20.0);
 
         /* To specify how cells move around, we create a "shared pointer" to a
-         * `Force` object and pass it to the `OffLatticeSimulation`. This is done using the MAKE_PTR macro as follows.
+         * `Force` object and pass it to the `OffLatticeSimulation`. This is done using the `MAKE_PTR` macro as follows.
          */
         MAKE_PTR(NagaiHondaForce<2>, p_force);
         simulator.AddForce(p_force);
@@ -188,7 +188,7 @@ public:
      *
      * EMPTYLINE
      *
-     * Results can also be visualized using Paraview. See the UserTutorials/VisualizingWithParaview tutorial for more information.
+     * Results can also be visualized using Paraview. See the [Visualizing With Paraview](docs/user-tutorials/visualizingwithparaview) tutorial for more information.
      *
      * EMPTYLINE
      *
@@ -281,7 +281,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells); //**Changed**//
 
         /* To view the results of this and the subsequent mesh based tutorials in Paraview it is necessary to explicitly
-        * generate the required .vtu files. This is detailed in the [wiki:UserTutorials/VisualizingWithParaview] tutorial.
+        * generate the required .vtu files. This is detailed in the [VisualizingWithParaview](docs/user-tutorials/visualizingwithparaview) tutorial.
         * Note that the results in Paraview may appear different to those in the java based visualizer. This is related
         * to the different methods used to generate voronoi tesselations in each and is resolved through the use of
         * 'ghost nodes', as shown in the next test. */

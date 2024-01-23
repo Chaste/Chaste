@@ -95,7 +95,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * As an example, let us consider a cell mutation state representing the p53
  * 172R-H gain-of-function mutant, which is equivalent to the common 175R-H
  * human breast cancer mutant; for further details on this mutant, see for
- * example Murphy et al, FASEB J. 14:2291-2302 (2000).
+ * example [Murphy et al, FASEB J. 14:2291-2302 (2000)](https://doi.org/10.1096/fj.00-0128com).
  *
  * Wild-type p53 has been referred to as the "guardian of the genome",
  * responding to DNA damage or checkpoint failure by either arresting cell
@@ -103,7 +103,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * pathway to remove damaged cells. Approximately 40% of human breast cancers
  * contain alterations in p53.
  *
- * As we can see, apart from a serialize() method and a constructor, this class
+ * As we can see, apart from a `serialize()` method and a constructor, this class
  * does not contain any member variables or methods. This is because generally
  * a cell's mutation state is used, much like a flag, by other classes when
  * determining a cell's behaviour (whether a cell should undergo

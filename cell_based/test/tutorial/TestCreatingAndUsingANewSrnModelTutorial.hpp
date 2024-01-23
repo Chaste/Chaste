@@ -64,7 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* The next header includes the Boost shared_ptr smart pointer, and defines some useful
  * macros to save typing when using it. */
 #include "SmartPointers.hpp"
-/* The next header includes the NEVER_REACHED macro, used in one of the methods below. */
+/* The next header includes the `NEVER_REACHED` macro, used in one of the methods below. */
 #include "Exception.hpp"
 
 /* The next header defines a base class for ode-based SRN models.
@@ -105,9 +105,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * ### Defining the SRN model and ODE system classes
  *
  * As an example, let us consider a SRN model in which we solve a simple ODE
- * dx/dt = -0.25*y
- * dy/dt = x
- * This has exact solution x = A cos 0.5t + B sin 0.5t
+ * dx/dt = -0.25*y,
+ * dy/dt = x.
+ * This has exact solution x = A cos 0.5t + B sin 0.5t.
  * where A and B are determined by the initial condions.
  *
  * To implement this model we define a new SRN model, `MySrnModel`,
@@ -123,7 +123,7 @@ private:
     friend class boost::serialization::access;
     /* We only need to include the next block of code if we wish to be able
      * to archive (save or load) the ODE system (and therefore the SRN model) object in a cell-based simulation.
-     * The code consists of a serialize method, in which we archive the ODE system
+     * The code consists of a `serialize()` method, in which we archive the ODE system
      * using the serialization code defined in the base class
      * `AbstractOdeSystem`.
      */
@@ -329,7 +329,7 @@ public:
 
             double current_time = SimulationTime::Instance()->GetTime();
 
-            /* Check that the ODE system is solved correctly */
+            /* Check that the ODE system is solved correctly. */
             p_srn_model->SimulateToCurrentTime();
 
             // Test converged to steady state
@@ -397,7 +397,7 @@ public:
             boost::archive::text_iarchive input_arch(ifs);
             input_arch >> p_cell;
 
-            /* Test that the state of the ODES has been restored correctly. */
+            /* Test that the state of the ODEs has been restored correctly. */
             double current_time = 1.5;
             TS_ASSERT_DELTA(p_simulation_time->GetTime(), current_time, 1e-4);
             TS_ASSERT_DELTA(p_cell->GetCellData()->GetItem("x"), cos(0.5*current_time), 1e-4);
@@ -430,15 +430,15 @@ public:
 
         /* Next, we create some cells. First, define the cells vector. */
         std::vector<CellPtr> cells;
-        /* We must create a shared_ptr to a `CellMutationState` with which to bestow the cells.
-         * We make use of the macro MAKE_PTR to do this: the first argument is the class and
-         * the second argument is the name of the shared_ptr. */
+        /* We must create a `shared_ptr` to a `CellMutationState` with which to bestow the cells.
+         * We make use of the macro `MAKE_PTR` to do this: the first argument is the class and
+         * the second argument is the name of the `shared_ptr`. */
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
         /* Then we loop over the nodes. */
         for (unsigned i=0; i<p_mesh->GetNumElements(); i++)
         {
-            /* For each node we create a cell with our SRN model and simple Stochastic cell cycle model. */
+            /* For each node we create a cell with our SRN model and simple stochastic uniformly distributed cell cycle model. */
             UniformG1GenerationalCellCycleModel* p_cell_cycle_model = new UniformG1GenerationalCellCycleModel();
             MySrnModel* p_srn_model = new MySrnModel;
 
@@ -480,7 +480,7 @@ public:
         simulator.Solve();
     }
     /*
-     * To visualize the results, use Paraview. See the UserTutorials/VisualizingWithParaview tutorial for more information
+     * To visualize the results, use Paraview. See the [Visualizing With Paraview](docs/user-tutorials/visualizingwithparaview) tutorial for more information.
      *
      * Load the file `/tmp/$USER/testoutput/TestOffLatticeSimulationWithMySrnModel/results_from_time_0/results.pvd`,
      * and color by `x`.
