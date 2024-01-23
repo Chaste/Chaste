@@ -54,6 +54,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
  *
+ *  For example:
+ * `cmake ..` where .. is the Chaste source dir follwoed by 
+ * make <target> -D<option=value> where target is the build target you are building (e.g. Cmake, Heart, or user project such as ApPredict,) and option and value are the designed build options.
  *
  * Note: error messages such as
  *   WARNING! There are options you set that were not used!
