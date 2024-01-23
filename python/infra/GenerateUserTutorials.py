@@ -42,7 +42,7 @@ HOWTO_TAG = "HOW_TO_TAG"
 ST_NONE, ST_TEXT, ST_CODE, ST_HOWTO = 0, 1, 2, 3  # Status codes for use during parsing
 
 
-def get_list_of_user_tutorial_files() -> list[Path]:
+def get_list_of_user_tutorial_files() -> 'list[Path]':
     """
     Scans the CHASTE_SRC_DIR directory recursively to find all files with a name starting with 'Test'
     and ending with 'Tutorial.hpp', and returns a list of their resolved paths.
@@ -184,7 +184,7 @@ toc: true
         file.write(full_markdown_content)
 
 
-def format_code_lines(code_lines: list[str]) -> str:
+def format_code_lines(code_lines: 'list[str]') -> str:
     """
     Formats a list of code lines into a Markdown code block with C++ syntax highlighting.
 
@@ -236,7 +236,7 @@ def clean_end_comment(_stripped_line):
     return _stripped_line[:-2].strip()
 
 
-def convert_file_to_markdown(abs_file_path: Path) -> tuple[str, list[str]]:
+def convert_file_to_markdown(abs_file_path: Path) -> 'tuple[str, list[str]]':
     """
     Convert a single tutorial source file to wiki markup, returning the page source.
 
