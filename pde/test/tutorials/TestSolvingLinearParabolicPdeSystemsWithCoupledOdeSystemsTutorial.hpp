@@ -94,10 +94,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Here, we solve the Schnackenberg system of PDEs, given by
  *
- * $\begin{align*}
- * u_t &= \nabla. (D_1 \nabla u) + k_1 - k_{-1}u + k_3 u^2 v\\
- * v_t &= \nabla. (D_2 \nabla v) + k_2 -k_3 u^2 v
- * \end{align*}$
+ * $$
+ * \begin{align*}
+ * u_t &= \nabla. (D_1 \nabla u) + k_1 - k_{-1}u + k_3 u^2 v,\\\\\\
+ * v_t &= \nabla. (D_2 \nabla v) + k_2 -k_3 u^2 v,
+ * \end{align*}
+ * $$
  *
  * on a 2d butterfly-shaped domain. We impose non-zero Dirichlet
  * boundary conditions and an initial condition that is a random
@@ -127,7 +129,7 @@ public:
         mesh.Scale(0.2, 0.2);
 
         /* Next, we instantiate the PDE system to be solved. We pass the parameter values into the
-         * constructor.  (The order is $D_1  D_2  k_1  k_{-1}  k_2  k_3$) */
+         * constructor.  (The order is $D_1, D_2, k_1, k_{-1}, k_2, k_3$) */
         SchnackenbergCoupledPdeSystem<2> pde(1e-4, 1e-2, 0.1, 0.2, 0.3, 0.1);
 
         /*
@@ -173,8 +175,8 @@ public:
         solver.SetInitialCondition(initial_condition);
 
         /* We now solve the PDE system and write results to VTK files, for
-         * visualization using Paraview.  Results will be written to CHASTE_TEST_OUTPUT/TestSchnackenbergSystemOnButterflyMesh
-         * as a results.pvd file and several results_[time].vtu files.
+         * visualization using Paraview.  Results will be written to `$CHASTE_TEST_OUTPUT/TestSchnackenbergSystemOnButterflyMesh`
+         * as a `results.pvd` file and several `results_[time].vtu` files.
          * You should see something like {{< img src="/fig/schnackenberg_u.png" alt="Schnackenberg u" h="200px" >}} for
          * u and {{< img src="/fig/schnackenberg_v.png" alt="Schnackenberg v" h="200px" >}} for v.
          */
