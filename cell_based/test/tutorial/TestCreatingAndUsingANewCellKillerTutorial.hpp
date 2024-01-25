@@ -121,7 +121,7 @@ public:
 
     /* The second public method overrides `CheckAndLabelCellsForApoptosisOrDeath()`.
      * This method iterates over all cells in the population, and calls `KillCell()` on
-     * any cell whose centre is located outside the ellipse (''x''/20)^2^ + (''y''/10)^2^ < 1. */
+     * any cell whose centre is located outside the ellipse $(\frac{x}{20})^2 + (\frac{y}{10})^2 < 1$. */
     void CheckAndLabelCellsForApoptosisOrDeath()
     {
         for (AbstractCellPopulation<2>::Iterator cell_iter = this->mpCellPopulation->Begin();
@@ -238,7 +238,7 @@ public:
         my_cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         /* ... and check that any cell whose centre is located outside the ellipse
-         * (''x''/20)^2^ + (''y''/10)^2^ < 1 has indeed been labelled as dead. */
+         * $(\frac{x}{20})^2 + (\frac{y}{10})^2 < 1$ has indeed been labelled as dead. */
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
