@@ -220,18 +220,18 @@ public:
         */
        WntConcentration<2>::Destroy();
     }
-    /* To visualize the results, open a new terminal, `cd` to the Chaste directory,
-     * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/MeshBasedCryptWithMutations/results_from_time_0`.
-     *
-     * These are the results before we add the mutations do: `java Visualize2dCentreCells /tmp/$USER/testoutput/MeshBasedCryptWithMutations/results_from_time_10`
-     * to see the results from after the mutation has been added.
-     *
-     * We may have to do: `javac Visualize2dCentreCells.java` beforehand to create the
-     * java executable.
-     *
-     * In the results folder there is also a file `cellmutationstates.dat` which tracks the numbers of each mutation type in the simulation.
-     * These results are just tab separated columns so may be visualized by using gnuplot, Matlab or similar.
-     */
 };
+/* To visualize the results, open a new terminal, `cd` to the Chaste directory,
+ * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/MeshBasedCryptWithMutations/results_from_time_0`.
+ *
+ * These are the results before we add the mutations do: `java Visualize2dCentreCells /tmp/$USER/testoutput/MeshBasedCryptWithMutations/results_from_time_10`
+ * to see the results from after the mutation has been added.
+ *
+ * We may have to do: `javac Visualize2dCentreCells.java` beforehand to create the
+ * java executable.
+ *
+ * In the results folder there is also a file `cellmutationstates.dat` which tracks the numbers of each mutation type in the simulation.
+ * These results are just tab separated columns so may be visualized by using gnuplot, Matlab or similar.
+ */
 
 #endif /*TESTRUNNINGCRYPTSIMULATIONSWITHMUTATIONSTUTORIAL_HPP_*/

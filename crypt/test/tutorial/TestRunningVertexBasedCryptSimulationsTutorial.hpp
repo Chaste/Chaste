@@ -101,7 +101,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestRunningVertexBasedCryptSimulationsTutorial : public AbstractCellBasedTestSuite
 {
 public:
-
     /* EMPTYLINE
      *
      *
@@ -246,14 +245,11 @@ public:
         simulator.Solve();
     }
     /*
-    * EMPTYLINE
     *
     * To visualize the results, open a new terminal, `cd` to the Chaste directory,
     * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/VertexCryptWithSimpleWntCellCycleModel/results_from_time_0`.
     * You may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
     * java executable.
-    *
-    * EMPTYLINE
     *
     * When we visualize the results, we should see two colours of cells: yellow transit
     * cells and pink differentiated cells. Cells above 6.0 will be sloughed off immediately.

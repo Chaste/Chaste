@@ -286,9 +286,7 @@ public:
         WntConcentration<2>::Destroy();
     }
 };
-    /*
-     * EMPTYLINE
-     *
-     * The results of this test can be visualized as in Test 1, with the correct output directory.
-     */
+/*
+ * The results of this test can be visualized as in Test 1, with the correct output directory.
+ */
 #endif /*TESTRUNNINGMESHBASEDCRYPTSIMULATIONSTUTORIAL_HPP_*/
