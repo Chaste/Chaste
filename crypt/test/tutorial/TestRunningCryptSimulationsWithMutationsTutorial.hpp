@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * ### Introduction
  *
- * This tutorial assumes you have already read the tutorial [Running Mesh Based Simulations](docs/user-tutorials/runningmeshbasedsimulations).
+ * This tutorial assumes you have already read the tutorial [Running Mesh Based Simulations](/docs/user-tutorials/runningmeshbasedsimulations).
  *
  * In this tutorial we show how Chaste can be used to simulate a cylindrical model of an
  * intestinal crypt with mutations using both mesh and vertex-based simulations.

@@ -93,7 +93,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * As an example, let us consider a boundary condition for a two-dimensional cell-based
  * simulation, in which all cells are constrained to lie within the domain given in
- * Cartesian coordinates by 0 <= y <= 5. To implement this we define a cell population
+ * Cartesian coordinates by $0 \leqslant y \leqslant 5$. To implement this we define a cell population
  * boundary condition class, `MyBoundaryCondition`, which inherits from
  * `AbstractCellPopulationBoundaryCondition` and overrides the methods
  * `ImposeBoundaryCondition()`, `VerifyBoundaryCondition()` and
@@ -128,7 +128,7 @@ public:
      *
      * Implicit in this method is the assumption that, when a node hits the
      * boundary of the domain, it does so inelastically. This means, for example,
-     * that a node hitting the boundary at y=0 has its location moved to y=0. A
+     * that a node hitting the boundary at $y=0$ has its location moved to $y=0$. A
      * more physically realistic modelling assumption might be to assume that
      * momentum is conserved in the collision.
      *
@@ -182,7 +182,7 @@ public:
         return condition_satisfied;
     }
 
-    /* Just as we encountered in the tutorial [Creating And Using A New Cell Killer](docs/user-tutorials/creatingandusinganewcellkiller), here we must override
+    /* Just as we encountered in the tutorial [Creating And Using A New Cell Killer](/docs/user-tutorials/creatingandusinganewcellkiller), here we must override
      * a method that outputs any member variables to a specified results file `rParamsFile`.
      * In our case, there are no parameters, so we simply call the method on the base class.
      * Nonetheless, we still need to override the method, since it is pure virtual in the base
@@ -364,7 +364,7 @@ public:
      *
      * `java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMyBoundaryCondition/results_from_time_0`
      *
-     * you should see that cells are restricted to the domain 0 <= y <= 5.
+     * you should see that cells are restricted to the domain $0 \leqslant y \leqslant 5$.
      *
      */
 };

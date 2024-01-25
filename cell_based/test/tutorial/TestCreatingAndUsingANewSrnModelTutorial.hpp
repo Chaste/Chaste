@@ -480,7 +480,7 @@ public:
         simulator.Solve();
     }
     /*
-     * To visualize the results, use Paraview. See the [Visualizing With Paraview](docs/user-tutorials/visualizingwithparaview) tutorial for more information.
+     * To visualize the results, use Paraview. See the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview) tutorial for more information.
      *
      * Load the file `/tmp/$USER/testoutput/TestOffLatticeSimulationWithMySrnModel/results_from_time_0/results.pvd`,
      * and color by `x`.

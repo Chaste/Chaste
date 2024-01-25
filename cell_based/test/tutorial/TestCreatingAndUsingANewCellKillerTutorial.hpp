@@ -152,7 +152,7 @@ public:
     }
 };
 
-/* As mentioned in [Creating And Using A New Cell Cycle Model](docs/user-tutorials/creatingandusinganewcellcyclemodel), we need to include the next block
+/* As mentioned in [Creating And Using A New Cell Cycle Model](/docs/user-tutorials/creatingandusinganewcellcyclemodel), we need to include the next block
  * of code to be able to archive the cell killer object in a cell-based
  * simulation, and to obtain a unique identifier for our new cell killer for writing
  * results to file.

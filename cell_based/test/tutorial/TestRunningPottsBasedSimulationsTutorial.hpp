@@ -207,7 +207,7 @@ public:
      *
      * We could also visualize the results using paraview.
      *
-     * See the [Visualizing With Paraview](docs/user-tutorials/visualizingwithparaview) tutorial for more information.
+     * See the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview) tutorial for more information.
      *
      * Load the file `/tmp/$USER/testoutput/PottsBasedMonolayer/results_from_time_0/results.pvd`, and click apply.
      *
@@ -425,7 +425,7 @@ public:
      * EMPTYLINE
      *
      * To visualize the results, we need to use Paraview. Note that we don't output the cell boundaries (outlines) in 3D.
-     * See the [Visualizing With Paraview](docs/user-tutorials/visualizingwithparaview) tutorial for more information.
+     * See the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview) tutorial for more information.
      *
      * Load the file `/tmp/$USER/testoutput/PottsCellSorting3D/results_from_time_0/results.pvd`, and click apply.
      *
