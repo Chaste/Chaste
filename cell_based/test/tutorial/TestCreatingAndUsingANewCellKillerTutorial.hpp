@@ -339,14 +339,14 @@ public:
         /* To run the simulation, we call `Solve()`. */
         simulator.Solve();
     }
-    /*
-     * When you visualize the results with
-     *
-     * `java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMyCellKiller/results_from_time_0`
-     *
-     * you should see that once cells move out of the ellipse they are removed from the simulation.
-     *
-     */
 };
+/*
+ * When you visualize the results with
+ *
+ * `java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMyCellKiller/results_from_time_0`
+ *
+ * you should see that once cells move out of the ellipse they are removed from the simulation.
+ *
+ */
 
 #endif /*TESTCREATINGANDUSINGANEWCELLKILLERTUTORIAL_HPP_*/

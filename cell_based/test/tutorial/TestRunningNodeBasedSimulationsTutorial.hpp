@@ -342,16 +342,12 @@ public:
             delete nodes[i];
         }
     }
-    /*
-     * EMPTYLINE
-     *
-     * To visualize the results, use Paraview. See the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview) tutorial for more information.
-     *
-     * Load the file `/tmp/$USER/testoutput/NodeBasedOnSphere/results_from_time_0/results.pvd`,
-     * and add spherical glyphs to represent cells.
-     *
-     * EMPTYLINE
-     */
 };
+/*
+ * To visualize the results, use Paraview. See the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview) tutorial for more information.
+ *
+ * Load the file `/tmp/$USER/testoutput/NodeBasedOnSphere/results_from_time_0/results.pvd`,
+ * and add spherical glyphs to represent cells.
+ */
 
 #endif /* TESTRUNNINGNODEBASEDSIMULATIONSTUTORIAL_HPP_ */

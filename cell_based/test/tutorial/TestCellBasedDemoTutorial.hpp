@@ -515,13 +515,13 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 16u);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
     }
-    /*
-     * To visualize the results, open a new terminal, `cd` to the Chaste directory,
-     * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/CellBasedDemo7/results_from_time_0`.
-     * We may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
-     * java executable.
-     *
-     */
 };
+/*
+ * To visualize the results, open a new terminal, `cd` to the Chaste directory,
+ * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/CellBasedDemo7/results_from_time_0`.
+ * We may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
+ * java executable.
+ *
+ */
 
 #endif /*TESTCELLBASEDDEMOTUTORIAL_HPP_*/

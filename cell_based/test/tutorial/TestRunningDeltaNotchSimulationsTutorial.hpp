@@ -273,17 +273,17 @@ public:
 
         simulator.Solve();
     }
-    /*
-     * EMPTYLINE
-     *
-     * To visualize the results, use Paraview. See the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview) tutorial for more information.
-     *
-     * Load the file `/tmp/$USER/testoutput/TestNodeBasedMonolayerWithDeltaNotch/results_from_time_0/results.pvd`,
-     * and add a spherical glyph.
-     *
-     * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
-     * displayed by Paraview.
-     */
 };
+/*
+ * EMPTYLINE
+ *
+ * To visualize the results, use Paraview. See the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview) tutorial for more information.
+ *
+ * Load the file `/tmp/$USER/testoutput/TestNodeBasedMonolayerWithDeltaNotch/results_from_time_0/results.pvd`,
+ * and add a spherical glyph.
+ *
+ * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
+ * displayed by Paraview.
+ */
 
 #endif /*TESTRUNNINGDELTANOTCHSIMULATIONSTUTORIAL_HPP_*/

@@ -311,13 +311,13 @@ public:
         /* To run the simulation, we call `Solve()`. */
         simulator.Solve();
     }
-    /*
-     * When you visualize the results with
-     *
-     * `java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMyForce/results_from_time_0`
-     *
-     * you should see a collection of cells moving downwards and proliferating.
-     */
 };
+/* 
+ * When you visualize the results with
+ *
+ * `java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMyForce/results_from_time_0`
+ *
+ * you should see a collection of cells moving downwards and proliferating.
+ */
 
 #endif /*TESTCREATINGANDUSINGANEWFORCETUTORIAL_HPP_*/

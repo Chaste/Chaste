@@ -278,16 +278,12 @@ public:
          */
         simulator.Solve();
     }
-    /*
-     * EMPTYLINE
-     *
-     * To visualize the results, open a new terminal, `cd` to the Chaste directory,
-     * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/SpheroidTutorial/results_from_time_0`.
-     *
-     * Or use Paraview, see the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview) tutorial for details.
-     *
-     * EMPTYLINE
-     */
 };
+/*
+ * To visualize the results, open a new terminal, `cd` to the Chaste directory,
+ * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/SpheroidTutorial/results_from_time_0`.
+ *
+ * Or use Paraview, see the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview) tutorial for details.
+ */
 
 #endif /*TESTRUNNINGTUMOURSPHEROIDSIMULATIONSTUTORIAL_HPP_*/

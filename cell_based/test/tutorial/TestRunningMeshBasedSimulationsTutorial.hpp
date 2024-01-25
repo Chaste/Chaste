@@ -283,10 +283,10 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 8u);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 10.0, 1e-10);
     }
-    /*
-     * To visualize the results, open a new terminal, `cd` to the Chaste directory,
-     * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/MeshBasedMonolayerWithGhostNodes/results_from_time_0`.
-     */
 };
+/*
+ * To visualize the results, open a new terminal, `cd` to the Chaste directory,
+ * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/MeshBasedMonolayerWithGhostNodes/results_from_time_0`.
+ */
 
 #endif /* TESTRUNNINGMESHBASEDSIMULATIONSTUTORIAL_HPP_ */

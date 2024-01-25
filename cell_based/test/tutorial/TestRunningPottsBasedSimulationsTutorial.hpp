@@ -421,29 +421,26 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 64u);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
     }
-    /*
-     * EMPTYLINE
-     *
-     * To visualize the results, we need to use Paraview. Note that we don't output the cell boundaries (outlines) in 3D.
-     * See the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview) tutorial for more information.
-     *
-     * Load the file `/tmp/$USER/testoutput/PottsCellSorting3D/results_from_time_0/results.pvd`, and click apply.
-     *
-     * Add box "Glyphs" to represent lattice sites. You will need to adjust the size so they don't overlap.
-     *
-     * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
-     * displayed by Paraview.
-     *
-     * Select the "Display" tab and select "color by" cell label (you can also "color by" cell index to see individual cells).
-     *
-     * Add a "Threshold" filter, filter by cell type and make the lower threshold 0 or greater (unoccupied lattice sites are labelled with -1). This will allow you to view only the cells.
-     *
-     * Click play to see the evolution of the simulation.
-     *
-     * You should see that the cells sort into ones of the same type.
-     *
-     * EMPTYLINE
-     */
 };
+/*
+ *
+ * To visualize the results, we need to use Paraview. Note that we don't output the cell boundaries (outlines) in 3D.
+ * See the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview) tutorial for more information.
+ *
+ * Load the file `/tmp/$USER/testoutput/PottsCellSorting3D/results_from_time_0/results.pvd`, and click apply.
+ *
+ * Add box "Glyphs" to represent lattice sites. You will need to adjust the size so they don't overlap.
+ *
+ * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
+ * displayed by Paraview.
+ *
+ * Select the "Display" tab and select "color by" cell label (you can also "color by" cell index to see individual cells).
+ *
+ * Add a "Threshold" filter, filter by cell type and make the lower threshold 0 or greater (unoccupied lattice sites are labelled with -1). This will allow you to view only the cells.
+ *
+ * Click play to see the evolution of the simulation.
+ *
+ * You should see that the cells sort into ones of the same type.
+ */
 
 #endif /* TESTRUNNINGPOTTSBASEDSIMULATIONSTUTORIAL_HPP_ */

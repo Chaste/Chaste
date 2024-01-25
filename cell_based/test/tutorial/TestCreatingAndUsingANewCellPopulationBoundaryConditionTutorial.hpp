@@ -359,14 +359,14 @@ public:
         /* To run the simulation, we call `Solve()`. */
         simulator.Solve();
     }
-    /*
-     * When you visualize the results with
-     *
-     * `java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMyBoundaryCondition/results_from_time_0`
-     *
-     * you should see that cells are restricted to the domain $0 \leqslant y \leqslant 5$.
-     *
-     */
 };
+/*
+ * When you visualize the results with
+ *
+ * `java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMyBoundaryCondition/results_from_time_0`
+ *
+ * you should see that cells are restricted to the domain $0 \leqslant y \leqslant 5$.
+ *
+ */
 
 #endif /*TESTCREATINGANDUSINGANEWCELLPOPULATIONBOUNDARYCONDITIONTUTORIAL_HPP_*/

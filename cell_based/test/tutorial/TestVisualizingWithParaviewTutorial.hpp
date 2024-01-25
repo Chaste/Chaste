@@ -366,13 +366,12 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 84u);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.1, 1e-10);
     }
-    /*
-    * EMPTYLINE
-    *
-    * To visualize the results, we follow the instructions above for the first simulation, ensuring that we open the
-    * test output from the new folder, `Test2DVertexMonolayerSimulationForVisualizing`.
-    *
-    */
 };
+/*
+ *
+ * To visualize the results, we follow the instructions above for the first simulation, ensuring that we open the
+ * test output from the new folder, `Test2DVertexMonolayerSimulationForVisualizing`.
+ *
+ */
 
 #endif /* TESTVISUALIZINGWITHPARAVIEWTUTORIAL_HPP_ */
