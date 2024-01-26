@@ -47,11 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * ## Examples showing how to run crypt simulations on periodic meshes with different cell-cycle models
  *
- * EMPTYLINE
- *
  * ### Introduction
- *
- * EMPTYLINE
  *
  * In this tutorial we show how Chaste can be used to simulate a cylindrical model of an
  * intestinal crypt. Full details of the computational model can be found in the paper by
@@ -116,11 +112,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestRunningMeshBasedCryptSimulationsTutorial : public AbstractCellBasedTestSuite
 {
 public:
-    /* EMPTYLINE
-     *
+    /* 
      * ### Test 1: a basic crypt simulation
-     *
-     * EMPTYLINE
      *
      * In the first test, we demonstrate how to create a crypt simulation using a
      * cylindrical mesh, with each cell progressing through a fixed cell-cycle model,
@@ -212,19 +205,13 @@ public:
     }
 
     /*
-     * EMPTYLINE
-     *
      * Finally, to visualize the results, we open a new terminal, `cd` to the Chaste directory,
      * then `cd` to `anim`. Then we do: `java Visualize2dCentreCells /tmp/$USER/testoutput/CryptTutorialFixedCellCycle/results_from_time_0`.
      * It may be necessary to do: `javac Visualize2dCentreCells.java` beforehand to create the
      * java executable. Further details on visualization can be found on the Chaste wiki page
      * For further details on visualization, see ChasteGuides/RunningCellBasedVisualization.
      *
-     * EMPTYLINE
-     *
      * ### Test 2: a Wnt-dependent crypt simulation
-     *
-     * EMPTYLINE
      *
      * The next test is very similar to Test 1, except that instead of
      * using a fixed cell-cycle model, we use a Wnt-dependent cell-cycle model,

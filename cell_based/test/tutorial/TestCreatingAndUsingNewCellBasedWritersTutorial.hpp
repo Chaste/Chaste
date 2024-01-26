@@ -50,11 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * ### Introduction
  *
- * EMPTYLINE
- *
  * This tutorial assumes you have already read the tutorial [Creating And Using A New Cell Property](/docs/user-tutorials/creatingandusinganewcellproperty).
- *
- * EMPTYLINE
  *
  * In [Creating And Using A New Cell Property](/docs/user-tutorials/creatingandusinganewcellproperty) we showed how to create a new cell
  * property class, `MotileCellProperty`, and how this can be used in a cell-based simulation.
@@ -119,8 +115,6 @@ public:
 };
 
 /*
- * EMPTYLINE
- *
  * ### Defining a cell writer class
  *
  * We next define a class that writes information about each cell in the population, using
@@ -212,8 +206,6 @@ EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellMotilityWriter)
 
 /*
  * This completes the code for `MotileCellProperty` and  `CellMotilityWriter`.
- *
- * EMPTYLINE
  *
  * We now define the test class, which inherits from `AbstractCellBasedTestSuite` and
  * demonstrates how `MotileCellProperty` and `CellMotilityWriter` can be used in

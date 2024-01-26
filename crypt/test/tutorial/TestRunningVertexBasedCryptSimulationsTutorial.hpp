@@ -101,12 +101,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestRunningVertexBasedCryptSimulationsTutorial : public AbstractCellBasedTestSuite
 {
 public:
-    /* EMPTYLINE
-     *
-     *
+    /* 
      * ### Test 1 - create a vertex-based crypt simulation
-     *
-     * EMPTYLINE
      *
      * The first test generates a crypt, in which we use a cylindrical vertex mesh,
      * give each cell a fixed cell-cycle model, and enforce sloughing at the top of
@@ -173,23 +169,15 @@ public:
     }
 
     /*
-     * EMPTYLINE
-     *
      * To visualize the results, open a new terminal, `cd` to the Chaste directory,
      * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/VertexCrypt/results_from_time_0`.
      * You may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
      * java executable.
      *
-     * EMPTYLINE
-     *
      * When we visualize the results, we should see three colours of cells: a row of blue stem cells, 3 rows of yellow transit
      * cells, and 5 rows of pink differentiated cells. Cells above 6.0 will be sloughed off immediately.
      *
-     * EMPTYLINE
-     *
      * ### Test 2 - create a vertex-based crypt simulation with a simple wnt dependent cell-cycle model
-     *
-     * EMPTYLINE
      *
      * The next test generates a crypt, in which we use a cylindrical vertex mesh, and
      * impose a linearly decreasing concentration gradient of Wnt. Cells detect the level of Wnt

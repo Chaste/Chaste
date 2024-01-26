@@ -48,21 +48,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * ## An example showing how to create a new cell mutation state and use it in a cell-based simulation
  *
- * EMPTYLINE
- *
  * ### Introduction
- *
- * EMPTYLINE
  *
  * In the tumour spheroid tutorial we noted that a cell mutation state is always required
  * when constructing a cell. In this tutorial, we show how to create a new cell mutation
  * state class, and how this can be used in a cell-based simulation.
  *
- * EMPTYLINE
- *
  * ### 1. Including header files
- *
- * EMPTYLINE
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary
  * header file and archiving headers.
@@ -88,8 +80,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakePetscSetup.hpp"
 
 /*
- * EMPTYLINE
- *
  * ### Defining the cell mutation state class
  *
  * As an example, let us consider a cell mutation state representing the p53
@@ -146,11 +136,7 @@ CHASTE_CLASS_EXPORT(P53GainOfFunctionCellMutationState)
  * This completes the code for `P53GainOfFunctionCellMutationState`. Note that usually this code would
  * be separated out into a separate declaration in a .hpp file and definition in a .cpp file.
  *
- * EMPTYLINE
- *
  * #### The Tests
- *
- * EMPTYLINE
  *
  * We now define the test class, which inherits from `AbstractCellBasedTestSuite`.
  */
@@ -159,11 +145,7 @@ class TestCreatingAndUsingANewCellMutationStateTutorial : public AbstractCellBas
 public:
 
     /*
-     * EMPTYLINE
-     *
      * ### Testing the cell mutation state
-     *
-     * EMPTYLINE
      *
      * We begin by testing that our new cell mutation state is implemented correctly.
      */
@@ -237,11 +219,7 @@ public:
     }
 
     /*
-     * EMPTYLINE
-     *
      * ### Using the cell mutation state in a cell-based simulation
-     *
-     * EMPTYLINE
      *
      * We conclude with a brief test demonstrating how `P53GainOfFunctionCellMutationState` can be used
      * in a cell-based simulation.

@@ -95,8 +95,6 @@ class TestRunningDifferentialAdhesionSimulationsTutorial : public AbstractCellBa
 public:
 
     /*
-     * EMPTYLINE
-     *
      * In this test, we demonstrate how to simulate a heterotypic monolayer that incorporates
      * differential adhesion, using a vertex-based approach. This may be compared with the
      * second test in the TestRunningPottsBasedSimulationsTutorial, which implements a similar

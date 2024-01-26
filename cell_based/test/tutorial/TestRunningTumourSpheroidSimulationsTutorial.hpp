@@ -48,11 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * ## An example showing how to run tumour spheroid simulations
  *
- * EMPTYLINE
- *
  * ### Introduction
- *
- * EMPTYLINE
  *
  * In this tutorial we show how Chaste can be used to simulate a growing cell monolayer culture or
  * multicellular tumour spheroid. Like the crypt simulations, tumour spheroid simulations
@@ -66,11 +62,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * In summary, the main difference between this tutorial and the other cell-based simulation
  * tutorials is that a PDE is defined, which is used in the simulation.
  *
- * EMPTYLINE
- *
  * ### The test
- *
- * EMPTYLINE
  *
  * As in the other cell-based simulation tutorials, we begin by including the necessary header files. We have
  * encountered some of these files already. Recall that often `CheckpointArchiveTypes.hpp`

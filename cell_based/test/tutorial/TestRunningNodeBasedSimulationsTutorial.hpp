@@ -47,21 +47,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * ## Examples showing how to create, run and visualize node-based simulations
  *
- * EMPTYLINE
- *
  * ### Introduction
- *
- * EMPTYLINE
  *
  * In this tutorial we show how Chaste can be used to create, run and visualize node-based simulations.
  * Full details of the mechanical model can be found in Pathamathan et al "A computational study of
  * discrete mechanical tissue models", Physical Biology. Vol. 6. No. 3. 2009.. DOI (10.1088/1478-3975/6/3/036001).
  *
- * EMPTYLINE
- *
  * ### The test
- *
- * EMPTYLINE
  *
  * As in previous cell-based Chaste tutorials ([Running Mesh Based Simulations](/docs/user-tutorials/runningmeshbasedsimulations)), we begin by including the necessary header files.
  */
@@ -92,11 +84,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestRunningNodeBasedSimulationsTutorial : public AbstractCellBasedTestSuite
 {
 public:
-    /* EMPTYLINE
-     *
+    /* 
      * ### Test 1 - a basic node-based simulation
-     *
-     * EMPTYLINE
      *
      * In the first test, we run a simple node-based simulation, in which we create a monolayer
      * of cells, using a nodes only mesh. Each cell is assigned a stochastic cell-cycle model.
@@ -165,8 +154,6 @@ public:
     }
 
     /*
-     * EMPTYLINE
-     *
      * To visualize the results, open a new terminal, `cd` to the Chaste directory,
      * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/NodeBasedMonolayer/results_from_time_0`.
      * we need to select the 'Cells as circles` option to be able to visualize the cells, as opposed
@@ -181,11 +168,7 @@ public:
      *
      *
      *
-     * EMPTYLINE
-     *
      * ### Test 2 - a basic node-based simulation in 3D
-     *
-     * EMPTYLINE
      *
      * In the second test we run a simple node-based simulation in 3D. This is very similar
      * to the 2D test with the dimension template (<2,2> and <2>) changed from 2 to 3 and instead of using a mesh
@@ -253,19 +236,13 @@ public:
     }
 
     /*
-     * EMPTYLINE
-     *
      * Note that you **cannot view the results of a 3D simulation using the Java visualiser** but
      * to visualize the results, use Paraview. See the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview) tutorial for more information.
      *
      * Load the file `/tmp/$USER/testoutput/NodeBasedSpheroid/results_from_time_0/results.pvd`,
      * and add spherical glyphs to represent cells.
      *
-     * EMPTYLINE
-     *
      * ### Test 3 - a node-based simulation on a restricted geometry
-     *
-     * EMPTYLINE
      *
      * In the third test we run a node-based simulation restricted to the surface of a sphere.
      */

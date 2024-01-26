@@ -48,21 +48,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * ## An example showing how to create and use a new cell population boundary condition
  *
- * EMPTYLINE
- *
  * ### Introduction
- *
- * EMPTYLINE
  *
  * In this tutorial we show how to create a new cell population boundary condition
  * class to specify a fixed domain within which cells are constrained to lie, and
  * how to use this in a cell-based simulation.
  *
- * EMPTYLINE
- *
  * ### 1. Including header files
- *
- * EMPTYLINE
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary header files.
  */
@@ -87,8 +79,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakePetscSetup.hpp"
 
 /*
- * EMPTYLINE
- *
  * ### Defining the cell population boundary condition class
  *
  * As an example, let us consider a boundary condition for a two-dimensional cell-based
@@ -233,11 +223,7 @@ namespace boost
  * would be separated out into a separate declaration in a .hpp file and definition
  * in a .cpp file.
  *
- * EMPTYLINE
- *
  * #### The Tests
- *
- * EMPTYLINE
  *
  * We now define the test class, which inherits from `AbstractCellBasedTestSuite`.
  */
@@ -246,11 +232,7 @@ class TestCreatingAndUsingANewCellPopulationBoundaryConditionTutorial : public A
 public:
 
     /*
-     * EMPTYLINE
-     *
      * ### Testing the cell population boundary condition
-     *
-     * EMPTYLINE
      *
      * We now test that our new cell population boundary condition is implemented correctly.
      */

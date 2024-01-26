@@ -178,19 +178,13 @@ public:
      * We may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
      * java executable.
      *
-     * EMPTYLINE
-     *
      * The `make_a_movie` script can be used to generate a video based on the results of your simulation.
      * To do this, first visualize the results using `Visualize2dVertexCells` as described above. Click
      * on the box marked "Output" and play through the whole simulation to generate a sequence of `.png`
      * images, one for each time step. Next, still in the `anim` folder, do: `./make_a_movie`.
      * This reads in the `.png` files and creates a video file called `simulation.mpeg`.
      *
-     * EMPTYLINE
-     *
      * Results can also be visualized using Paraview. See the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview) tutorial for more information.
-     *
-     * EMPTYLINE
      *
      * ### Test 2 - basic node-based simulation
      *
@@ -254,8 +248,6 @@ public:
      * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/CellBasedDemo2/results_from_time_0`.
      * We may have to do: `javac Visualize2dCentreCells.java` beforehand to create the
      * java executable.
-     *
-     * EMPTYLINE
      *
      * As described above, the `make_a_movie` script can be used to generate a video based on the results of your simulation.
      *

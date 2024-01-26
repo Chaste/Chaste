@@ -91,11 +91,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestRunningPottsBasedSimulationsTutorial : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
-    /* EMPTYLINE
-     *
+    /* 
      * ### Test 1 - a basic Potts-based simulation
-     *
-     * EMPTYLINE
      *
      * In the first test, we run a simple Potts-based simulation, in which we create a monolayer
      * of cells, using a Potts mesh. Each cell is assigned a stochastic cell-cycle model.
@@ -198,8 +195,6 @@ public:
     }
 
     /*
-     * EMPTYLINE
-     *
      * To visualize the results, open a new terminal, `cd` to the Chaste directory,
      * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/PottsBasedMonolayer/results_from_time_0`.
      * We may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
@@ -228,11 +223,7 @@ public:
      *
      * You should see that the cells sort into ones of the same type.
      *
-     * EMPTYLINE
-     *
      * ### Test 2 - Cell Sorting
-     *
-     * EMPTYLINE
      *
      * The next test generates a collection of cells, there are two types of cells, labelled ones
      * and non labelled ones, there is differential adhesion between the cell types. For the
@@ -318,8 +309,6 @@ public:
     }
 
     /*
-     * EMPTYLINE
-     *
      * To visualize the results, open a new terminal, `cd` to the Chaste directory,
      * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/PottsMonolayerCellSorting/results_from_time_0`.
      * We may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
@@ -327,11 +316,7 @@ public:
      *
      *  You could also visualize in paraview as above.
      *
-     * EMPTYLINE
-     *
      * ### Test 3 - 3D Cell Sorting
-     *
-     * EMPTYLINE
      *
      * The next test extends the previous example to three dimensions.
      *

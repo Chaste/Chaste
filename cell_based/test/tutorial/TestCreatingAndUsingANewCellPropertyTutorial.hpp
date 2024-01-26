@@ -50,11 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * ### Introduction
  *
- * EMPTYLINE
- *
  * This tutorial assumes you have already read [Creating And Using A New Force](/docs/user-tutorials/creatingandusinganewforce).
- *
- * EMPTYLINE
  *
  * In the [Creating And Using A New Cell Mutation State](/docs/user-tutorials/creatingandusinganewcellmutationstate/) 
  * tutorial we showed how to create a new cell mutation state class, 
@@ -151,8 +147,6 @@ public:
  */
 
 /*
- * EMPTYLINE
- *
  * ### Defining the motive force class
  *
  * In order to illustrate the use of cell properties we make a simple force law which
@@ -257,8 +251,6 @@ CHASTE_CLASS_EXPORT(MyMotiveForce)
  * This completes the code for `MyMotiveForce`. Note that usually this code
  * would be separated out into a separate declaration in a .hpp file and definition
  * in a .cpp file.
- *
- * EMPTYLINE
  *
  * ### The Tests
  *
