@@ -172,7 +172,7 @@ public:
         return condition_satisfied;
     }
 
-    /* Just as we encountered in the tutorial [Creating And Using A New Cell Killer](/docs/user-tutorials/creatingandusinganewcellkiller), here we must override
+    /* Just as we encountered in the tutorial [Creating And Using A New Cell Killer](/docs/user-tutorials/creatingandusinganewcellkiller/), here we must override
      * a method that outputs any member variables to a specified results file `rParamsFile`.
      * In our case, there are no parameters, so we simply call the method on the base class.
      * Nonetheless, we still need to override the method, since it is pure virtual in the base
