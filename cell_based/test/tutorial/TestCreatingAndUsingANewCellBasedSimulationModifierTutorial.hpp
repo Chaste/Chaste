@@ -51,8 +51,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * ### Introduction
  *
- * EMPTYLINE
- *
  * In this tutorial, we show how to create a new cell-based simulation modifier
  * and use this in a cell-based simulation. The simulation modifier class
  * hierarchy is used to implement setup, update and finalise methods in cell-based
@@ -208,8 +206,6 @@ CHASTE_CLASS_EXPORT(CellHeightTrackingModifier)
 CHASTE_CLASS_EXPORT(CellHeightTrackingModifier)
 
 /*
- * EMPTYLINE
- *
  * ### The Tests
  *
  * We now define the test class, which inherits from `AbstractCellBasedTestSuite`.

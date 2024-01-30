@@ -48,11 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * ## An example showing how to run Delta/Notch simulations
  *
- * EMPTYLINE
- *
  * ### Introduction
- *
- * EMPTYLINE
  *
  * In this tutorial we show how Chaste can be used to simulate a growing cell monolayer culture
  * into which a simple model of Delta/Notch signalling is incorporated. This model was developed
@@ -65,11 +61,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * of `OffLatticeSimulation` called `DeltaNotchOffLatticeSimulation` to handle the updating
  * of `CellData` at each time step as cell neighbours change.
  *
- * EMPTYLINE
- *
  * ### The test
- *
- * EMPTYLINE
  *
  * As in previous tutorials, we begin by including the necessary header files. We have
  * encountered these files already. Recall that often, either `CheckpointArchiveTypes.hpp`
@@ -117,11 +109,7 @@ class TestRunningDeltaNotchSimulationsTutorial : public AbstractCellBasedTestSui
 public:
 
     /*
-     * EMPTYLINE
-     *
      * ### Test 1: a vertex-based monolayer with Delta/Notch signalling
-     *
-     * EMPTYLINE
      *
      * In the first test, we demonstrate how to simulate a monolayer that incorporates
      * Delta/Notch signalling, using a vertex-based approach.
@@ -195,17 +183,11 @@ public:
     }
 
     /*
-     * EMPTYLINE
-     *
-     * To visualize the results, use Paraview. See the [Visualizing With Paraview](docs/user-tutorials/visualizingwithparaview) tutorial for more information.
+     * To visualize the results, use Paraview. See the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview) tutorial for more information.
      *
      * Load the file `/tmp/$USER/testoutput/TestVertexBasedMonolayerWithDeltaNotch/results_from_time_0/results.pvd`.
      *
-     * EMPTYLINE
-     *
      * ### Test 2 - a node-based monolayer with Delta/Notch signalling
-     *
-     * EMPTYLINE
      *
      * In the next test we run a similar simulation as before, but this time with node-based
      * 'overlapping spheres' model.
@@ -273,17 +255,15 @@ public:
 
         simulator.Solve();
     }
-    /*
-     * EMPTYLINE
-     *
-     * To visualize the results, use Paraview. See the [Visualizing With Paraview](docs/user-tutorials/visualizingwithparaview) tutorial for more information.
-     *
-     * Load the file `/tmp/$USER/testoutput/TestNodeBasedMonolayerWithDeltaNotch/results_from_time_0/results.pvd`,
-     * and add a spherical glyph.
-     *
-     * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
-     * displayed by Paraview.
-     */
 };
+/*
+ * To visualize the results, use Paraview. See the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview) tutorial for more information.
+ *
+ * Load the file `/tmp/$USER/testoutput/TestNodeBasedMonolayerWithDeltaNotch/results_from_time_0/results.pvd`,
+ * and add a spherical glyph.
+ *
+ * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
+ * displayed by Paraview.
+ */
 
 #endif /*TESTRUNNINGDELTANOTCHSIMULATIONSTUTORIAL_HPP_*/

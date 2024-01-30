@@ -50,13 +50,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * ### Introduction
  *
- * EMPTYLINE
+ * This tutorial assumes you have already read [Creating And Using A New Force](/docs/user-tutorials/creatingandusinganewforce).
  *
- * This tutorial assumes you have already read [Creating And Using A New Force](docs/user-tutorials/creatingandusinganewforce).
- *
- * EMPTYLINE
- *
- * In the [Creating And Using A New Cell Mutation State](docs/user-tutorials/creatingandusinganewcellmutationstate/) 
+ * In the [Creating And Using A New Cell Mutation State](/docs/user-tutorials/creatingandusinganewcellmutationstate/) 
  * tutorial we showed how to create a new cell mutation state class, 
  * and how this can be used in a cell-based simulation. As well as
  * mutation states, cells may be given much more general properties, using the cell
@@ -151,8 +147,6 @@ public:
  */
 
 /*
- * EMPTYLINE
- *
  * ### Defining the motive force class
  *
  * In order to illustrate the use of cell properties we make a simple force law which
@@ -227,7 +221,7 @@ public:
         }
     }
 
-    /* Just as we encountered in [Creating And Using A New Cell Killer](docs/user-tutorials/creatingandusinganewcellkiller), here we must override
+    /* Just as we encountered in [Creating And Using A New Cell Killer](/docs/user-tutorials/creatingandusinganewcellkiller), here we must override
      * a method that outputs any member variables to a specified results file `rParamsFile`.
      * In our case, we output the member variable `mStrength`, then call the method on the base class.
      */
@@ -257,8 +251,6 @@ CHASTE_CLASS_EXPORT(MyMotiveForce)
  * This completes the code for `MyMotiveForce`. Note that usually this code
  * would be separated out into a separate declaration in a .hpp file and definition
  * in a .cpp file.
- *
- * EMPTYLINE
  *
  * ### The Tests
  *

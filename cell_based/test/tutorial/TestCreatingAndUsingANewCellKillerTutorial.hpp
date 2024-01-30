@@ -121,7 +121,7 @@ public:
 
     /* The second public method overrides `CheckAndLabelCellsForApoptosisOrDeath()`.
      * This method iterates over all cells in the population, and calls `KillCell()` on
-     * any cell whose centre is located outside the ellipse (''x''/20)^2^ + (''y''/10)^2^ < 1. */
+     * any cell whose centre is located outside the ellipse $(\frac{x}{20})^2 + (\frac{y}{10})^2 < 1$. */
     void CheckAndLabelCellsForApoptosisOrDeath()
     {
         for (AbstractCellPopulation<2>::Iterator cell_iter = this->mpCellPopulation->Begin();
@@ -152,7 +152,7 @@ public:
     }
 };
 
-/* As mentioned in [Creating And Using A New Cell Cycle Model](docs/user-tutorials/creatingandusinganewcellcyclemodel), we need to include the next block
+/* As mentioned in [Creating And Using A New Cell Cycle Model](/docs/user-tutorials/creatingandusinganewcellcyclemodel), we need to include the next block
  * of code to be able to archive the cell killer object in a cell-based
  * simulation, and to obtain a unique identifier for our new cell killer for writing
  * results to file.
@@ -238,7 +238,7 @@ public:
         my_cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
         /* ... and check that any cell whose centre is located outside the ellipse
-         * (''x''/20)^2^ + (''y''/10)^2^ < 1 has indeed been labelled as dead. */
+         * $(\frac{x}{20})^2 + (\frac{y}{10})^2 < 1$ has indeed been labelled as dead. */
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
              ++cell_iter)
@@ -339,14 +339,14 @@ public:
         /* To run the simulation, we call `Solve()`. */
         simulator.Solve();
     }
-    /*
-     * When you visualize the results with
-     *
-     * `java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMyCellKiller/results_from_time_0`
-     *
-     * you should see that once cells move out of the ellipse they are removed from the simulation.
-     *
-     */
 };
+/*
+ * When you visualize the results with
+ *
+ * `java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMyCellKiller/results_from_time_0`
+ *
+ * you should see that once cells move out of the ellipse they are removed from the simulation.
+ *
+ */
 
 #endif /*TESTCREATINGANDUSINGANEWCELLKILLERTUTORIAL_HPP_*/

@@ -94,8 +94,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Here, we solve the Schnackenberg system of PDEs, given by
  *
- * u,,t,, = div(D1 grad u) + k,,1,, - k,,-1,,*u + k,,3,,u^2^v,
- * v,,t,, = div(D2 grad v) + k,,2,, - k,,3,,u^2^v,
+ * $$
+ * \begin{align*}
+ * u_t &= \nabla. (D_1 \nabla u) + k_1 - k_{-1}u + k_3 u^2 v,\\\\\\
+ * v_t &= \nabla. (D_2 \nabla v) + k_2 -k_3 u^2 v,
+ * \end{align*}
+ * $$
  *
  * on a 2d butterfly-shaped domain. We impose non-zero Dirichlet
  * boundary conditions and an initial condition that is a random
@@ -125,7 +129,7 @@ public:
         mesh.Scale(0.2, 0.2);
 
         /* Next, we instantiate the PDE system to be solved. We pass the parameter values into the
-         * constructor.  (The order is D,,1,,  D,,2,,  k,,1,,  k,,-1,,  k,,2,,  k,,3,,) */
+         * constructor.  (The order is $D_1, D_2, k_1, k_{-1}, k_2, k_3$) */
         SchnackenbergCoupledPdeSystem<2> pde(1e-4, 1e-2, 0.1, 0.2, 0.3, 0.1);
 
         /*
@@ -133,7 +137,7 @@ public:
          * `ELEMENT_DIM`=2. We also have two unknowns u and v,
          * so in this case `PROBLEM_DIM`=2. The value of each boundary condition is
          * given by the spatially uniform steady state solution of the Schnackenberg system,
-         * given by u = (k,,1,, + k,,2,,)/k,,-1,,, v = k,,2,,k,,-1,,^2^/k,,3,,(k,,1,, + k,,2,,)^2^.
+         * given by $u = (k_1 + k_2)/k_{-1}$, $v = k_2 k_{-1}^2 / k_3(k_1 + k_2)^2$.
          */
         BoundaryConditionsContainer<2,2,2> bcc;
         ConstBoundaryCondition<2>* p_bc_for_u = new ConstBoundaryCondition<2>(2.0);
@@ -171,8 +175,8 @@ public:
         solver.SetInitialCondition(initial_condition);
 
         /* We now solve the PDE system and write results to VTK files, for
-         * visualization using Paraview.  Results will be written to CHASTE_TEST_OUTPUT/TestSchnackenbergSystemOnButterflyMesh
-         * as a results.pvd file and several results_[time].vtu files.
+         * visualization using Paraview.  Results will be written to `$CHASTE_TEST_OUTPUT/TestSchnackenbergSystemOnButterflyMesh`
+         * as a `results.pvd` file and several `results_[time].vtu` files.
          * You should see something like {{< img src="/fig/schnackenberg_u.png" alt="Schnackenberg u" h="200px" >}} for
          * u and {{< img src="/fig/schnackenberg_v.png" alt="Schnackenberg v" h="200px" >}} for v.
          */

@@ -47,11 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * ## Examples showing how to visualize simulations in Paraview
  *
- * EMPTYLINE
- *
  * ### Introduction
- *
- * EMPTYLINE
  *
  * In this tutorial we show how Chaste can be used to generate simulations
  * that can be viewed in Paraview, and how to use Paraview itself. Four examples
@@ -64,11 +60,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * downloaded and installed VTK and Paraview, and updated our hostconfig file
  * to ensure that it knows to use VTK.
  *
- * EMPTYLINE
- *
  * ### The test
- *
- * EMPTYLINE
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary header files.
  */
@@ -104,11 +96,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestVisualizingWithParaviewTutorial : public AbstractCellBasedTestSuite
 {
 public:
-    /* EMPTYLINE
-     *
+    /* 
      * ### Test 1 - a mesh-based cell centre monolayer simulation
-     *
-     * EMPTYLINE
      *
      * In the first test, we run a simple cell-based simulation using a `MeshBasedCellPopulation`,
      * in which we use
@@ -175,28 +164,22 @@ public:
     }
 
     /*
-    * EMPTYLINE
-    *
-    * To visualize the results, we must first open Paraview. We open the folder containing our test output using the 'file' menu at
-    * the top. The output will be located in `/tmp/$USER/testoutput/Test2DMeshBasedMonolayerSimulationForVisualizing/results_from_time_0`.
-    * There will be a .vtu file generated for every timestep, which must all be opened at once to view the simulation. To do this,
-    * simply select `voronoi_results_..vtu`. We should now see `voronoi_results*`  in the pipeline browser. We click `Apply` in the properties tab
-    * of the object inspector, and we should now see a visualization in the right hand window.
-    *
-    * At this stage, it will be necessary to refine how we wish to view this particular visualisation. The viewing styles can be edited using
-    * the display tab of the object inspector. In particular, under `Style`, the representation drop down menu allows us to view
-    * the cells as a surface with edges, or as simply a wireframe. It is advisable at this point to familiarize ourselves with the different
-    * viewing options, colour and size settings.
-    *
-    * To view the simulation, simply use the animation buttons located on the top toolbar. We can also save a screenshot, or an animation, using
-    * the appropriate options from the file menu. Next to the threshold button are two other useful options, 'slice' and 'clip', but these will
-    * only be applicable for 3D visualisations.
-    *
-    * EMPTYLINE
-    *
-    * ### Test 2 - a periodic mesh-based cell centre monolayer simulation
+     * To visualize the results, we must first open Paraview. We open the folder containing our test output using the 'file' menu at
+     * the top. The output will be located in `$CHASTE_TEST_OUTPUT/Test2DMeshBasedMonolayerSimulationForVisualizing/results_from_time_0`.
+     * There will be a .vtu file generated for every timestep, which must all be opened at once to view the simulation. To do this,
+     * simply select `voronoi_results_..vtu`. We should now see `voronoi_results*`  in the pipeline browser. We click `Apply` in the properties tab
+     * of the object inspector, and we should now see a visualization in the right hand window.
      *
-     * EMPTYLINE
+     * At this stage, it will be necessary to refine how we wish to view this particular visualisation. The viewing styles can be edited using
+     * the display tab of the object inspector. In particular, under `Style`, the representation drop down menu allows us to view
+     * the cells as a surface with edges, or as simply a wireframe. It is advisable at this point to familiarize ourselves with the different
+     * viewing options, colour and size settings.
+     *
+     * To view the simulation, simply use the animation buttons located on the top toolbar. We can also save a screenshot, or an animation, using
+     * the appropriate options from the file menu. Next to the threshold button are two other useful options, 'slice' and 'clip', but these will
+     * only be applicable for 3D visualisations.
+     *
+     * ### Test 2 - a periodic mesh-based cell centre monolayer simulation
      *
      * In the second test, similar to the first test, we run a simple cell-based simulation using a `MeshBasedCellPopulation`,
      * in which we use
@@ -245,35 +228,29 @@ public:
     }
 
     /*
-    * EMPTYLINE
-    *
-    * To visualize the results, we follow the instructions above for the first simulation, ensuring that we open the
-    * test output from the new folder, `Test2DPeriodicMeshBasedMonolayerSimulationForVisualizing`. You will see that the left an right sides
-    * of the monolayer are the same.
-    *
-    * At this stage, the viewer is showing all cells in the simulation, including the ghost nodes. In order to view only real cells, we must
-    * apply a threshold. This is achieved using the threshold button on the third toolbar (the icon is a cube with a green 'T' inside). Once you
-    * click the threshold button, you will see a new threshold appear below your results in the pipeline browser. Go to the properties tab and
-    * reset the lower threshold to be less than 0, and the upper threshold to be between 0 and 1, ensuring that the 'Non-ghosts' option is
-    * selected in the 'Scalars' drop down menu. Once we have edited this, we click apply (we may need to click it twice), and the visualisation on the
-    * right window will have changed to eliminate ghost nodes.
-    *
-    * Note that you cant currently output the mesh when using ghost nodes.
-    *
-    * EMPTYLINE
-    *
-    * ### Test 3 - a node-based simulation
-    *
-     * EMPTYLINE
+     * To visualize the results, we follow the instructions above for the first simulation, ensuring that we open the
+     * test output from the new folder, `Test2DPeriodicMeshBasedMonolayerSimulationForVisualizing`. You will see that the left an right sides
+     * of the monolayer are the same.
      *
-    * We next run a similar simulation to the first two examples, but now use a `NodeBasedCellPopulation`,
-    * in which cells are represented as 'overlapping spheres'.
-    */
+     * At this stage, the viewer is showing all cells in the simulation, including the ghost nodes. In order to view only real cells, we must
+     * apply a threshold. This is achieved using the threshold button on the third toolbar (the icon is a cube with a green 'T' inside). Once you
+     * click the threshold button, you will see a new threshold appear below your results in the pipeline browser. Go to the properties tab and
+     * reset the lower threshold to be less than 0, and the upper threshold to be between 0 and 1, ensuring that the 'Non-ghosts' option is
+     * selected in the 'Scalars' drop down menu. Once we have edited this, we click apply (we may need to click it twice), and the visualisation on the
+     * right window will have changed to eliminate ghost nodes.
+     *
+     * Note that you cant currently output the mesh when using ghost nodes.
+     *
+     * ### Test 3 - a node-based simulation
+     *
+     * We next run a similar simulation to the first two examples, but now use a `NodeBasedCellPopulation`,
+     * in which cells are represented as 'overlapping spheres'.
+     */
     void Test2DNodeBasedMonolayerSimulationForVisualizing()
     {
         /* We set up the simulation in much the same way as above, except now using a `NodesOnlyMesh` and
          * `NodeBasedCellPopulation`. Further details on how to set up a node-based simulation can be found in
-         * [Running Node Based Simulations](docs/user-tutorials/runningnodebasedsimulations).
+         * [Running Node Based Simulations](/docs/user-tutorials/runningnodebasedsimulations).
          */
         HoneycombMeshGenerator generator(10, 10, 0);
         boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
@@ -306,26 +283,20 @@ public:
     }
 
     /*
-    * EMPTYLINE
-    *
-    * To visualize the results, we follow the instructions above for the first simulation, ensuring that we open the
-    * test output from the new folder, `Test2DNodeBasedMonolayerSimulationForVisualizing`.
-    * After opening Paraview, load the file `results.pvd`, then click "Apply" in the object inspector panel.
-    * As this simulation uses a `NodeBasedCellPopulation`, you must use glyphs to visualize cells: click the button
-    * marked "Glyph" in the toolbar of common filters; specify cells to be displayed as spheres; then click "Apply".
-    *
+     * To visualize the results, we follow the instructions above for the first simulation, ensuring that we open the
+     * test output from the new folder, `Test2DNodeBasedMonolayerSimulationForVisualizing`.
+     * After opening Paraview, load the file `results.pvd`, then click "Apply" in the object inspector panel.
+     * As this simulation uses a `NodeBasedCellPopulation`, you must use glyphs to visualize cells: click the button
+     * marked "Glyph" in the toolbar of common filters; specify cells to be displayed as spheres; then click "Apply".
+     *
      * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
      * displayed by Paraview.
-    *
-    * EMPTYLINE
-    *
-    * ### Test 4 - a basic vertex-based simulation
-    *
-     * EMPTYLINE
      *
-    * Here, we run a simple vertex-based simulation, in which we create a monolayer
-    * of cells using a mutable vertex mesh. Each cell is assigned a fixed cell-cycle model.
-    */
+     * ### Test 4 - a basic vertex-based simulation
+     *
+     * Here, we run a simple vertex-based simulation, in which we create a monolayer
+     * of cells using a mutable vertex mesh. Each cell is assigned a fixed cell-cycle model.
+     */
     void Test2DVertexBasedMonolayerSimulationForVisualizing()
     {
         /* In this test, we create a vertex-based cell population in which cells are defined
@@ -366,13 +337,12 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 84u);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.1, 1e-10);
     }
-    /*
-    * EMPTYLINE
-    *
-    * To visualize the results, we follow the instructions above for the first simulation, ensuring that we open the
-    * test output from the new folder, `Test2DVertexMonolayerSimulationForVisualizing`.
-    *
-    */
 };
+/*
+ *
+ * To visualize the results, we follow the instructions above for the first simulation, ensuring that we open the
+ * test output from the new folder, `Test2DVertexMonolayerSimulationForVisualizing`.
+ *
+ */
 
 #endif /* TESTVISUALIZINGWITHPARAVIEWTUTORIAL_HPP_ */

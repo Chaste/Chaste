@@ -48,22 +48,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * ## An example showing how to create and use a new force
  *
- * EMPTYLINE
- *
  * ### Introduction
- *
- * EMPTYLINE
  *
  * In previous cell-based Chaste tutorials, we used existing force classes to define
  * how cells interact mechanically. In this tutorial we show
  * how to create a new force class, and how this can be used in a cell-based
  * simulation.
  *
- * EMPTYLINE
- *
  * ### 1. Including header files
- *
- * EMPTYLINE
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary header files.
  */
@@ -88,8 +80,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakePetscSetup.hpp"
 
 /*
- * EMPTYLINE
- *
  * ### Defining the force class
  *
  * As an example, let us consider a force for a two-dimensional cell-based
@@ -161,7 +151,7 @@ public:
         return mStrength;
     }
 
-    /* Just as we encountered in [Creating And Using A New Cell Killer](docs/user-tutorials/creatingandusinganewcellkiller), here we must override
+    /* Just as we encountered in [Creating And Using A New Cell Killer](/docs/user-tutorials/creatingandusinganewcellkiller), here we must override
      * a method that outputs any member variables to a specified results file `rParamsFile`.
      * In our case, we output the member variable `mStrength`, then call the method on the base class.
      */
@@ -187,11 +177,7 @@ CHASTE_CLASS_EXPORT(MyForce)
  * would be separated out into a separate declaration in a .hpp file and definition
  * in a .cpp file.
  *
- * EMPTYLINE
- *
  * #### The Tests
- *
- * EMPTYLINE
  *
  * We now define the test class, which inherits from `AbstractCellBasedTestSuite`.
  */
@@ -200,11 +186,7 @@ class TestCreatingAndUsingANewForceTutorial : public AbstractCellBasedTestSuite
 public:
 
     /*
-     * EMPTYLINE
-     *
      * ### Testing the force
-     *
-     * EMPTYLINE
      *
      * We now test that our new force is implemented correctly.
      */
@@ -311,13 +293,13 @@ public:
         /* To run the simulation, we call `Solve()`. */
         simulator.Solve();
     }
-    /*
-     * When you visualize the results with
-     *
-     * `java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMyForce/results_from_time_0`
-     *
-     * you should see a collection of cells moving downwards and proliferating.
-     */
 };
+/* 
+ * When you visualize the results with
+ *
+ * `java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMyForce/results_from_time_0`
+ *
+ * you should see a collection of cells moving downwards and proliferating.
+ */
 
 #endif /*TESTCREATINGANDUSINGANEWFORCETUTORIAL_HPP_*/

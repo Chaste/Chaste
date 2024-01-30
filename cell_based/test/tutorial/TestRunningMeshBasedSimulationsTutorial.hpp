@@ -128,7 +128,7 @@ public:
          * Note that some of these models will require information on the surrounding medium such as Oxygen concentration to work,
          * see specific class documentation for details. Some of these will be covered in later tutorials 
          * ([Running Contact Inhibition Simulations](user-tutorials/runningcontactinhibitionsimulations),
-         * [Running Delta Notch Simulations](docs/user-tutorials/runningdeltanotchsimulations), and [Running Tumour Spheroid Simulations](docs/user-tutorials/runningtumourspheroidsimulations).
+         * [Running Delta Notch Simulations](/docs/user-tutorials/runningdeltanotchsimulations), and [Running Tumour Spheroid Simulations](/docs/user-tutorials/runningtumourspheroidsimulations).
          * We create an empty vector of cells and pass this into the
          * method along with the mesh. The second argument represents the size of that the vector
          * `cells` should become - one cell for each node, the third argument specifies
@@ -146,7 +146,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         /* To view the results of this and the next test in Paraview it is necessary to explicitly
-        * generate the required .vtu files. This is detailed in the [Visualizing With Paraview](docs/user-tutorials/visualizingwithparaview) tutorial.
+        * generate the required .vtu files. This is detailed in the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview) tutorial.
         * Note that the results in Paraview may appear different to those in the java based visualizer. This is related
         * to the different methods used to generate voronoi tesselations in each and is resolved through the use of
         * 'ghost nodes', as shown in the next test. */
@@ -283,10 +283,10 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 8u);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 10.0, 1e-10);
     }
-    /*
-     * To visualize the results, open a new terminal, `cd` to the Chaste directory,
-     * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/MeshBasedMonolayerWithGhostNodes/results_from_time_0`.
-     */
 };
+/*
+ * To visualize the results, open a new terminal, `cd` to the Chaste directory,
+ * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/MeshBasedMonolayerWithGhostNodes/results_from_time_0`.
+ */
 
 #endif /* TESTRUNNINGMESHBASEDSIMULATIONSTUTORIAL_HPP_ */

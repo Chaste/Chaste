@@ -217,16 +217,12 @@ public:
         simulator.Solve();
     }
     /*
-     * EMPTYLINE
-     *
      * To visualize the results, open a new terminal, `cd` to the Chaste directory,
      * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/TestContactInhibitionInBox/results_from_time_0`.
      * We may have to do: `javac Visualize2dCentreCells.java` beforehand to create the
      * java executable.
      *
      * You will notice that once the cells are below a certain size they no longer proliferate and turn dark blue in the visualisation.
-     *
-     * EMPTYLINE
      *
      * ### Testing normal and tumour cells with mesh-based population
      *
@@ -323,8 +319,6 @@ public:
         simulator.Solve();
     }
     /*
-     * EMPTYLINE
-     *
      * To visualize the results, open a new terminal, `cd` to the Chaste directory,
      * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/TestContactInhibitionTumourInBox/results_from_time_0`.
      * We may have to do: `javac Visualize2dCentreCells.java` beforehand to create the
@@ -332,8 +326,6 @@ public:
      *
      * You will notice that once the healthy cells (yellow) are below a certain size they no longer proliferate and turn dark blue in the visualisation.
      * Whereas Tumour cells (light blue) on the other hand will continue to proliferate. You may want to run the simulation for longer to see this more clearly.
-     *
-     * EMPTYLINE
      *
      * ### Testing contact inhibition in vertex-based monolayer
      *
@@ -394,19 +386,15 @@ public:
         /* To run the simulation, we call `Solve()`. */
         simulator.Solve();
     }
-    /*
-     * EMPTYLINE
-     *
-     * To visualize the results, open a new terminal, `cd` to the Chaste directory,
-     * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/TestVertexContactInhibition/results_from_time_0`.
-     * We may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
-     * java executable.
-     *
-     * You will notice that once the healthy cells (yellow) are below a certain size they no longer proliferate and turn dark blue in the visualisation.
-     * If you run the simulation for a long time these cells occur primarily towards the centre of the monolayer.
-     *
-     * EMPTYLINE
-     */
 };
+/*
+ * To visualize the results, open a new terminal, `cd` to the Chaste directory,
+ * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/TestVertexContactInhibition/results_from_time_0`.
+ * We may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
+ * java executable.
+ *
+ * You will notice that once the healthy cells (yellow) are below a certain size they no longer proliferate and turn dark blue in the visualisation.
+ * If you run the simulation for a long time these cells occur primarily towards the centre of the monolayer.
+ */
 
 #endif /*TESTRUNNIGCONTACTINHIBITIONSIMULATIONSTUTORIAL_HPP_*/
