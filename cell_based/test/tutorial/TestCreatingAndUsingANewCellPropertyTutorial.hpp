@@ -382,9 +382,9 @@ public:
             CellPtr p_cell(new Cell(p_state, p_model, NULL, false, collection));
             p_cell->SetCellProliferativeType(p_diff_type);
 
-            /* Now, we define a random birth time, chosen from [-T,0], where
-             * T = t,,1,, + t,,2,,, where t,,1,, is a parameter representing the G,,1,, duration
-             * of a stem cell, and t,,2,, is the basic S+G,,2,,+M phases duration.
+            /* Now, we define a random birth time, chosen from $[-T,0]$, where
+             * $T = t_1 + t_2$, where $t_1$ is a parameter representing the $G_1$ duration
+             * of a stem cell, and $t_2=S+G_2+M$ phases duration.
              */
             double birth_time = - RandomNumberGenerator::Instance()->ranf() *
                                     (p_model->GetStemCellG1Duration()

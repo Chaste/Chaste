@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * In this tutorial we show how Chaste can be used to simulate a cylindrical model of an
  * intestinal crypt. Full details of the computational model can be found in the paper by
- * van Leeuwen ''et al.'' (2009) [doi:10.1111/j.1365-2184.2009.00627.x].
+ * van Leeuwen *et al.* (2009) [doi:10.1111/j.1365-2184.2009.00627.x](https://doi.org/10.1111/j.1365-2184.2009.00627.x).
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary header files.
  */
@@ -168,7 +168,7 @@ public:
         CryptSimulation2d simulator(cell_population);
         /*
          * We must set the output directory on the simulator (relative to
-         * "/tmp/<USER_NAME>/testoutput") and the end time (in hours).
+         * "`$CHASTE_TEST_OUTPUT`") and the end time (in hours).
          */
         simulator.SetOutputDirectory("CryptTutorialFixedCellCycle");
         simulator.SetEndTime(1);
@@ -259,7 +259,7 @@ public:
         simulator.SetEndTime(1);
 
         /* As before, we create a force law and cell killer and pass these objects to the simulator, then call
-         * Solve(). */
+         * `Solve()`. */
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
         MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&cell_population, crypt_height));
