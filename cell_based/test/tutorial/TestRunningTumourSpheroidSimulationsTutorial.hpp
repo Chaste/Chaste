@@ -169,9 +169,9 @@ public:
             p_model->SetTransitCellG1Duration(8.0);
 
             /*
-             * We now define a random birth time, chosen from [-T,0], where
-             * T = t,,1,, + t,,2,,, where t,,1,, is a parameter representing the G,,1,, duration
-             * of a 'stem' cell, and t,,2,, is the basic S+G,,2,,+M phases duration...
+             * We now define a random birth time, chosen from $[-T,0]$, where
+             * $T = t_1 + t_2$, where $t_1$ is a parameter representing the $G_1$ duration
+             * of a 'stem' cell, and $t_2$ is the basic $S+G_2+M$ phases duration...
              */
             double birth_time = - RandomNumberGenerator::Instance()->ranf() *
                                  (  p_model->GetStemCellG1Duration()
@@ -196,11 +196,11 @@ public:
          * This will be passed into the `OffLatticeSimulationWithPdes` object. The
          * `CellwiseSourceEllipticPde` is a `PDE` class which inherits from
          * `AbstractLinearEllipticPde` and represents
-         * the PDE ''u_xx'' + ''u_yy'' = ''k''(''x'',''y'') ''u'', where ''u''(''x'',''y'') denotes
+         * the PDE $u_{xx}$ + u_{yy} = k(x,y)u$, where $u(x,y)$ denotes
          * the oxygen concentration at
-         * position (''x'',''y'') and the function ''k''(''x'',''y'') specifies the rate of consumption by live cells
-         * there. Here ''k''(''x'',''y'') takes the value -0.03 (the coefficient below) if
-         * the cell located at (''x'',''y'') is a live cell, and zero if the cell has died due
+         * position $(x,y)$ and the function $k(x,y)$ specifies the rate of consumption by live cells
+         * there. Here $k(x,y)$ takes the value $-0.03$ (the coefficient below) if
+         * the cell located at $(x,y)$ is a live cell, and zero if the cell has died due
          * to oxygen deprivation.
          */
         MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, -0.03));
