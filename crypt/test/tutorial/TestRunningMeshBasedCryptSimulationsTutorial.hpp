@@ -205,11 +205,7 @@ public:
     }
 
     /*
-     * Finally, to visualize the results, we open a new terminal, `cd` to the Chaste directory,
-     * then `cd` to `anim`. Then we do: `java Visualize2dCentreCells /tmp/$USER/testoutput/CryptTutorialFixedCellCycle/results_from_time_0`.
-     * It may be necessary to do: `javac Visualize2dCentreCells.java` beforehand to create the
-     * java executable. Further details on visualization can be found on the Chaste wiki page
-     * For further details on visualization, see ChasteGuides/RunningCellBasedVisualization.
+     * Finally, to visualize the results, see [Visualizing with Paraview](/docs/user-tutorials/visualizingwithparaview/)
      *
      * ### Test 2: a Wnt-dependent crypt simulation
      *

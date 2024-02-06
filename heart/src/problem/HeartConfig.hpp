@@ -1151,7 +1151,7 @@ public:
 
    /**
      * Set the use of State Variable Interpolation in the computation of ionic currents.
-     * See documentation page ChasteGuides/StateVariableInterpolation.
+     * See documentation page https://chaste.github.io/docs/user-guides/state-variable-interpolation/
      *
      * @param  useStateVariableInterpolation Whether to use it.
      */
