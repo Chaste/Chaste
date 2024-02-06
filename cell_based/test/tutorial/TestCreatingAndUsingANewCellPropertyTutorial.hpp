@@ -293,7 +293,7 @@ public:
 
         /* We can also test that archiving is implemented correctly for our cell
          * property, as follows (further details on how to implement and
-         * test archiving can be found at ChasteGuides/BoostSerialization).  */
+         * test archiving can be found at [Boost Serialization Guide](/docs/user-guides/boost-serialization/)).  */
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "property.arch";
 

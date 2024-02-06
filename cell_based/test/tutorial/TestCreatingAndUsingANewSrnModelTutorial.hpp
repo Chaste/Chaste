@@ -272,7 +272,7 @@ EXPORT_CELL_CYCLE_MODEL_ODE_SOLVER(MySrnModel)
 /* Since we're defining the new SRN model and ODEs within the test file, we need to include the
  * following stanza as well, to make the code work with newer versions of the Boost libraries.
  * Normally the above export declaration would occur in the SRN model's .hpp file, and
- * the following lines would appear in the .cpp file.  See ChasteGuides/BoostSerialization for
+ * the following lines would appear in the .cpp file.  See [Boost Serialization Guide](/docs/user-guides/boost-serialization/) for
  * more information.
  */
 #include "SerializationExportWrapperForCpp.hpp"
