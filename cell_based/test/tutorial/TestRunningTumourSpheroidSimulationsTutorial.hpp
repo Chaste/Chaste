@@ -81,7 +81,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * to the local oxygen concentration. We also include the `WildTypeCellMutationState`
  * header file, which defines a wild type cell mutation state that we will use to construct
  * cells. A cell mutation state is always required when constructing a cell, however
- * in earlier simulation tutorial we used a helper classes ((`CellsGenerator` and `CryptCellsGenerator`) that
+ * in earlier simulation tutorials we used helper classes (`CellsGenerator` and `CryptCellsGenerator`) that
  * allowed us to avoid having to construct cells directly.
  */
 #include "SimpleOxygenBasedCellCycleModel.hpp"
@@ -228,7 +228,7 @@ public:
          * the boundary condition itself can be made spatially varying or time-dependent.
          *
          * The PDE is tagged to show that the quantity to be solved for (the quantity of interest in
-         * the cells' data is "oxygen".
+         * the cells' data is `"oxygen"`).
          *
          * The `CellData` class, is used to stores the value of the current nutrient concentration for each cell.
          */

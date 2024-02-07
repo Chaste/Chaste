@@ -50,8 +50,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * ### Introduction
  *
  * In this tutorial we show how Chaste can be used to create, run and visualize vertex-based simulations.
- * Full details of the mechanical model proposed by T. Nagai and H. Honda ("A dynamic cell model for
- * the formation of epithelial tissues", Philosophical Magazine Part B 81:699-719).
+ * Full details of the mechanical model proposed by T. Nagai and H. Honda, 2000, "A dynamic cell model for
+ * the formation of epithelial tissues", Philosophical Magazine Part B 81:699-719, doi:[10.1103/PhysRevLett.69.2013](https://doi.org/10.1103/PhysRevLett.69.2013).
  *
  * ### The test
  *
