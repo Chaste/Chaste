@@ -68,11 +68,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 /* The next header defines a base class for simple generation-based cell-cycle models.
- * A cell-cycle model is defined as ''simple'' if the duration of each phase of the cell
+ * A cell-cycle model is defined as *simple* if the duration of each phase of the cell
  * cycle is determined when the cell-cycle model is created, rather than
  * evaluated on the fly (e.g. by solving a system of ordinary differential
  * equations for the concentrations of key cell cycle proteins), and may
- * depend on the cell type. A simple cell-cycle model is defined as ''generation-based'' if it keeps track of the
+ * depend on the cell type. A simple cell-cycle model is defined as *generation-based* if it keeps track of the
  * generation of the corresponding cell, and sets the cell type according
  * to this. Our new cell-cycle model will inherit from this abstract class. */
 #include "AbstractSimpleGenerationalCellCycleModel.hpp"

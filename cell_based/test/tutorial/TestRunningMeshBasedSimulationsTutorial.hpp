@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * ### Introduction
  *
  * In this tutorial we show how Chaste can be used to create, run and visualize mesh-based simulations.
- * Full details of the mathematical model can be found in van Leeuwen ''et al.'' (2009) [doi:10.1111/j.1365-2184.2009.00627.x].
+ * Full details of the mathematical model can be found in van Leeuwen *et al.* (2009) [doi:10.1111/j.1365-2184.2009.00627.x].
  *
  * ### The test
  *

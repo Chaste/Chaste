@@ -98,7 +98,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * as occurs for example when macrophages migrate within a tumour towards high
  * concentrations of the vascular endothelial growth factor VEGF; for further
  * details, see for example 
- * [Owen ''et al.'', J. Theor. Biol. 226: 377-391 (2004).](https://doi.org/10.1016/j.jtbi.2003.09.004)
+ * [Owen *et al.*, J. Theor. Biol. 226: 377-391 (2004).](https://doi.org/10.1016/j.jtbi.2003.09.004)
  *
  * Note that usually this code would be separated out into a separate declaration
  * in a .hpp file and definition in a .cpp file.
