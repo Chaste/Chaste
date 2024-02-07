@@ -155,11 +155,11 @@ public:
 
     /*
      * To visualize the results, open a new terminal, `cd` to the Chaste directory,
-     * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/NodeBasedMonolayer/results_from_time_0`.
-     * we need to select the 'Cells as circles` option to be able to visualize the cells, as opposed
+     * then `cd anim`. Then do `java Visualize2dCentreCells /tmp/$USER/testoutput/NodeBasedMonolayer/results_from_time_0`.
+     * We need to select the `Cells as circles` option to be able to visualize the cells, as opposed
      * to just the centres.
-     * We may have to do: `javac Visualize2dCentreCells.java` beforehand to create the
-     * java executable.
+     * You may have to do: `javac Visualize2dCentreCells.java` beforehand to create the
+     * java executable if you haven't done that before.
      *
      * Alternatively, to view in Paraview, load the file `/tmp/$USER/testoutput/NodeBasedMonolayer/results_from_time_0/results.pvd`
      * and add glyphs to represent cells. An option is to use 3D spherical glyphs and then make a planar cut.
@@ -291,8 +291,7 @@ public:
          * which restricts cells to lie on a sphere (in 3D) or circle (in 2D).
          *
          * For a list of possible boundary conditions see subclasses of `AbstractCellPopulationBoundaryCondition`.
-         * These can be found in the inheritance diagram, here,
-         * [AbstractCellPopulationBoundaryCondition](https://chaste.github.io/doxygen-latest/classAbstractCellPopulationBoundaryCondition.html).
+         * These can be found in the inheritance diagram, [here for AbstractCellPopulationBoundaryCondition](/doxygen-latest/classAbstractCellPopulationBoundaryCondition.html).
          * Note that some of these boundary conditions are not compatible with node-based simulations see the specific class documentation for details,
          * if you try to use an incompatible class then you will receive a warning.
          *
@@ -301,7 +300,7 @@ public:
         c_vector<double,3> centre = zero_vector<double>(3);
         centre(2) = 1.0;
         double radius = 1.0;
-        /* We then make a pointer to the boundary condition using the MAKE_PTR_ARGS macro, and pass
+        /* We then make a pointer to the boundary condition using the `MAKE_PTR_ARGS` macro, and pass
          * it to the `OffLatticeSimulation`. */
         MAKE_PTR_ARGS(SphereGeometryBoundaryCondition<3>, p_boundary_condition, (&cell_population, centre, radius));
         simulator.AddCellPopulationBoundaryCondition(p_boundary_condition);
