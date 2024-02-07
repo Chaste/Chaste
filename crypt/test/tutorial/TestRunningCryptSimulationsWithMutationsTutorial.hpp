@@ -139,7 +139,7 @@ public:
          * the numbers of each type of mutation aren't correctly tracked. For
          * a list of possible mutations, see subclasses of `AbstractCellMutationState`.
          * These can be found in the 
-         * [inheritance diagram for AbstractCellMutationState](https://chaste.github.io/doxygen-latest/classAbstractCellMutationState.html).
+         * [inheritance diagram for AbstractCellMutationState](/doxygen-latest/classAbstractCellMutationState.html).
          * Each mutation has a different effect on the cell cycle models; see the class
          * documentation for details.
          */

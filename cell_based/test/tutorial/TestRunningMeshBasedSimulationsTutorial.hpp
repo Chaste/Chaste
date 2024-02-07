@@ -124,7 +124,7 @@ public:
          * and the dimension.
          * For a list of possible cell cycle models see subclasses of `AbstractCellCycleModel`.
          * These can be found in the inheritance diagram, here,
-         * [AbstractCellCycleModel](https://chaste.github.io/doxygen-latest/classAbstractCellCycleModel.html).
+         * [AbstractCellCycleModel](/doxygen-latest/classAbstractCellCycleModel.html).
          * Note that some of these models will require information on the surrounding medium such as Oxygen concentration to work,
          * see specific class documentation for details. Some of these will be covered in later tutorials 
          * ([Running Contact Inhibition Simulations](/docs/user-tutorials/runningcontactinhibitionsimulations/),
@@ -172,7 +172,7 @@ public:
          * spring based model, and pass it to the `OffLatticeSimulation`.
          * For a list of possible forces see subclasses of `AbstractForce`.
          * These can be found in the inheritance diagram, here,
-         * [AbstractForce](https://chaste.github.io/doxygen-latest/classAbstractForce.html).
+         * [AbstractForce](/doxygen-latest/classAbstractForce.html).
          * Note that some of these forces are not compatible with mesh-based simulations,
          * see the specific class documentation for details.  If you try to use an incompatible class
          * then you will receive a warning.

@@ -106,7 +106,7 @@ public:
         boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
         /* Once we have a `MutableMesh` we can generate a `NodesOnlyMesh` from it using the
          * following commands. Note you can also generate the `NodesOnlyMesh` from a collection of
-         * nodes, see  [NodesOnlyMesh](https://chaste.github.io/doxygen-latest/classNodesOnlyMesh.html) for details.
+         * nodes, see  [NodesOnlyMesh](/doxygen-latest/classNodesOnlyMesh.html) for details.
          */
         NodesOnlyMesh<2> mesh;
         /* To run node-based simulations you need to define a cut off length (second argument in

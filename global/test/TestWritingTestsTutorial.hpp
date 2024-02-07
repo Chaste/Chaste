@@ -80,7 +80,7 @@ public:
 /*
  * To test whether two numbers are equal to within a certain (absolute) tolerance we can use `TS_ASSERT_DELTA`.
  * This should almost always be used when comparing two `double`s.  (See also
- * [CompareDoubles](https://chaste.github.io/doxygen-latest/classCompareDoubles.html)
+ * [CompareDoubles](/doxygen-latest/classCompareDoubles.html)
  * for more advanced comparisons.)
  */
         double another_number = 1.000001 + 1.0001;

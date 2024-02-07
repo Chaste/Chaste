@@ -160,7 +160,7 @@ public:
          * in the Potts simulation. For this test, we use two update rules based upon
          * a volume constraint (`VolumeConstraintPottsUpdateRule`) and adhesion between cells (`AdhesionPottsUpdateRule`) and pass them to the `OnLatticeSimulation`.
          * For a list of possible update rules see subclasses of `AbstractPottsUpdateRule`.
-         * These can be found in the inheritance diagram, here, [AbstractPottsUpdateRule](https://chaste.github.io/doxygen-latest/classAbstractPottsUpdateRule.html).
+         * These can be found in the inheritance diagram, here, [AbstractPottsUpdateRule](/doxygen-latest/classAbstractPottsUpdateRule.html).
          *
          * Similarly to specifying forces for off lattice simulations we use the `MAKE_PTR` macro
          * to make a boost shared pointer to our required update rule before specifying parameters and passing to the simulation as follows
