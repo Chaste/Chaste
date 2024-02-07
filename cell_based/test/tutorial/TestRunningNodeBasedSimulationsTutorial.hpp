@@ -50,8 +50,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * ### Introduction
  *
  * In this tutorial we show how Chaste can be used to create, run and visualize node-based simulations.
- * Full details of the mechanical model can be found in Pathamathan et al "A computational study of
- * discrete mechanical tissue models", Physical Biology. Vol. 6. No. 3. 2009.. DOI (10.1088/1478-3975/6/3/036001).
+ * Full details of the mechanical model can be found in Pathamathan *et al.* "A computational study of
+ * discrete mechanical tissue models", Physical Biology. Vol. 6. No. 3. 2009. doi:[10.1088/1478-3975/6/3/036001](https://doi.org/10.1088/1478-3975/6/3/036001).
  *
  * ### The test
  *
@@ -237,7 +237,8 @@ public:
 
     /*
      * Note that you **cannot view the results of a 3D simulation using the Java visualiser** but
-     * to visualize the results, use Paraview. See the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview/) tutorial for more information.
+     * to visualize the results, use Paraview. 
+     * See the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview/) tutorial for more information.
      *
      * Load the file `/tmp/$USER/testoutput/NodeBasedSpheroid/results_from_time_0/results.pvd`,
      * and add spherical glyphs to represent cells.
