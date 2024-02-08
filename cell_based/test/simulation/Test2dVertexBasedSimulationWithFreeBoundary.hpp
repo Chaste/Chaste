@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -67,7 +67,7 @@ public:
         // make the simulation
         std::vector<CellPtr> cells;
 
-        MutableVertexMesh<2,2>* p_mesh;
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh;
         VoronoiVertexMeshGenerator mesh_generator = VoronoiVertexMeshGenerator(35,35,1,1.0);
         p_mesh = mesh_generator.GetMesh();
         MAKE_PTR(DifferentiatedCellProliferativeType, p_differentiated_type);

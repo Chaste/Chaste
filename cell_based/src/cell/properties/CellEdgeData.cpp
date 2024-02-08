@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -39,12 +39,12 @@ CellEdgeData::~CellEdgeData()
 {
 }
 
-void CellEdgeData::SetItem(const std::string &rVariableName, const std::vector<double> &data)
+void CellEdgeData::SetItem(const std::string& rVariableName, const std::vector<double>& rData)
 {
-    this->mCellEdgeData[rVariableName] = data;
+    this->mCellEdgeData[rVariableName] = rData;
 }
 
-std::vector<double> CellEdgeData::GetItem(const std::string &rVariableName) const
+std::vector<double> CellEdgeData::GetItem(const std::string& rVariableName) const
 {
     /*
      * Note that mCellData[rVariableName] is not const. If rVariableName is not
@@ -60,7 +60,7 @@ std::vector<double> CellEdgeData::GetItem(const std::string &rVariableName) cons
     return(it->second);
 }
 
-double CellEdgeData::GetItemAtIndex(const std::string &rVariableName, const unsigned int index)
+double CellEdgeData::GetItemAtIndex(const std::string& rVariableName, const unsigned int index)
 {
     /*
      * Note that mCellData[rVariableName] is not const. If rVariableName is not
@@ -81,13 +81,15 @@ double CellEdgeData::GetItemAtIndex(const std::string &rVariableName, const unsi
     return(it->second[index]);
 }
 
-unsigned CellEdgeData::GetNumItems() const {
+unsigned CellEdgeData::GetNumItems() const
+{
     return mCellEdgeData.size();
 }
 
-std::vector<std::string> CellEdgeData::GetKeys() const {
+std::vector<std::string> CellEdgeData::GetKeys() const
+{
     std::vector<std::string> keys;
-    for (auto& kv: mCellEdgeData)
+    for (auto& kv : mCellEdgeData)
     {
         keys.push_back(kv.first);
     }

@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2023, University of Oxford.
+# Copyright (c) 2005-2024, University of Oxford.
 # All rights reserved.
 # 
 # University of Oxford means the Chancellor, Masters and Scholars of the
@@ -194,6 +194,20 @@ if (WIN32 OR CYGWIN)
 endif (WIN32 OR CYGWIN)
 
 
+###############################################
+####  Create interface library for dependencies
+###############################################
+
+# See https://github.com/Chaste/Chaste/issues/36 re supporting VTK 9.x.
+#
+# Approach is to create a interface library (with no source files) that all Chaste dependencies are linked to. This
+# library is then linked against all Chaste libraries and executables.
+#
+# This allows modern CMake imported targets to be used for our dependencies, rather than populating lists of libaries
+# and include directories as we currently to. For now, this will only affect VTK 9.x, but should be expanded to all
+# dependencies in the future.
+add_library(Chaste_COMMON_DEPS INTERFACE)
+
 ################################
 #  FIND THIRD PARTY LIBRARIES  #
 ################################
@@ -322,33 +336,40 @@ if (Chaste_AUTO_INSTALL_DEPS)
     endforeach ()
 endif ()
 
-
 ################################
 ####  Find VTK
 ################################
 if (Chaste_USE_VTK)
-    # First pass will identify the version number
-    find_package (VTK REQUIRED)
-    message (STATUS "VTK version: ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}")
+    # The complexity here is for two reasons:
+    #   1. VTK has renamed its components several times
+    #   2. From VTK 9, a simple call to find_package(VTK) will try to find QT, which is not a Chaste dependency
+    #
+    # We first find the VTK common library, which can have one of two names: this will populate the VTK version
+    # number. This is then used to find the specific list of required VTK components.
 
-    # Depending on the VTK version, we need different components. 5.x require the following
-    if (VTK_MAJOR_VERSION EQUAL 5)
-        find_package(VTK COMPONENTS vtkIO vtkCommon vtkGraphics z REQUIRED)
-        # 6.0 and 6.1 require the following
-    elseif ((VTK_MAJOR_VERSION EQUAL 6) AND (VTK_MINOR_VERSION LESS 2))
-        find_package(
-                VTK COMPONENTS vtkCommonCore vtkCommonDataModel vtkFiltersCore vtkFiltersGeneral vtkFiltersGeneric
-                vtkFiltersGeometry vtkFiltersModeling vtkFiltersSources vtkIOCore vtkIOGeometry vtkIOLegacy vtkIOXML
-                REQUIRED
-        )
-        # 6.2 and up, up to and including 8.x, require the following
-    elseif (VTK_MAJOR_VERSION LESS 9)
+    # List of possible base modules across different VTK versions
+    set(POSSIBLE_VTK_BASE_MODULES vtkCommonCore CommonCore)
+
+    foreach (BASE_MODULE ${POSSIBLE_VTK_BASE_MODULES})
+        find_package(VTK COMPONENTS ${BASE_MODULE} QUIET)
+        if (VTK_FOUND)
+            message (STATUS "VTK version: ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}")
+            break()
+        endif ()
+    endforeach ()
+
+    if (NOT ${VTK_FOUND})
+        message(FATAL_ERROR "Did not find VTK")
+    endif ()
+
+    # Depending on the VTK version, we need different components.
+    if (VTK_MAJOR_VERSION LESS 9)
         find_package(
                 VTK COMPONENTS vtkCommonCore vtkCommonDataModel vtkFiltersCore vtkFiltersGeneral vtkFiltersGeneric
                 vtkFiltersGeometry vtkFiltersModeling vtkFiltersSources vtkIOCore vtkIOGeometry vtkIOLegacy
                 vtkIOParallelXML vtkIOXML REQUIRED
         )
-        # VTK 9.0 and above require the following
+    # VTK 9.0 and above require the following
     else ()
         find_package(
                 VTK COMPONENTS CommonCore CommonDataModel FiltersCore FiltersGeneral FiltersGeneric FiltersGeometry
@@ -503,8 +524,12 @@ list (APPEND Chaste_LINK_LIBRARIES "${MPI_CXX_LIBRARIES}")
 
 # make sure VTK libraries added after HDF5 so VTK's link with HDF5 isn't used
 if (Chaste_USE_VTK)
-    list (APPEND Chaste_INCLUDES "${VTK_INCLUDE_DIRS}")
-    list (APPEND Chaste_LINK_LIBRARIES "${VTK_LIBRARIES}")
+    if (VTK_MAJOR_VERSION LESS 9)
+        list(APPEND Chaste_INCLUDES "${VTK_INCLUDE_DIRS}")
+        list(APPEND Chaste_LINK_LIBRARIES "${VTK_LIBRARIES}")
+    else ()
+        target_link_libraries(Chaste_COMMON_DEPS INTERFACE ${VTK_LIBRARIES})
+    endif ()
 endif ()
 
 

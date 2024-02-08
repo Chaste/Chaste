@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,11 +44,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EdgeRemapInfo.hpp"
 
 /**
- * Class for facilitating the creation and management of unique edges in a vertex mesh
+ * Class for facilitating the creation and management of unique edges in a 
+ * vertex mesh.
  */
 template <unsigned SPACE_DIM>
-class EdgeHelper {
-
+class EdgeHelper
+{
 private:
 
     /**
@@ -57,49 +58,56 @@ private:
     std::vector<std::unique_ptr<Edge<SPACE_DIM>>> mEdges;
 
     /**
-     * Explicit map between the two node global indices and the edge they represent
+     * Explicit map between the two node global indices and the edge they represent.
      */
     std::map<std::pair<unsigned, unsigned>, Edge<SPACE_DIM>*> mEdgesMap;
 
     /**
-     * Rebuilds node-node to edge map, which is required after removing deleted edges
+     * Rebuilds node-node to edge map, which is required after removing deleted edges.
      */
     void UpdateEdgesMapKey();
 
 public:
 
     /**
-     * Default constructor
+     * Default constructor.
      */
-    EdgeHelper() = default;
+    EdgeHelper();
 
     /**
      * Get edge from the node pairs. Construct the edge if it has not been created
-     * @param node0
-     * @param node1
-     * @return the (newly) edge
+     * @param pNodeA pointer to first Node
+     * @param pNodeB pointer to second Node
+     * 
+     * @return the (new) Edge
      */
-    Edge<SPACE_DIM>* GetEdgeFromNodes(Node<SPACE_DIM>* node0, Node<SPACE_DIM>* node1);
+    Edge<SPACE_DIM>* GetEdgeFromNodes(Node<SPACE_DIM>* pNodeA,
+                                      Node<SPACE_DIM>* pNodeB);
 
     /**
      * Get the edge from the node pairs and add it to element with index elementIndex
      * @param elementIndex the index of an element to which the edge belongs
-     * @param node0
-     * @param node1
-     * @return
+     * @param pNodeA pointer to first Node
+     * @param pNodeB pointer to second Node
+     * 
+     * @return the Edge
      */
-    Edge<SPACE_DIM>* GetEdgeFromNodes(unsigned elementIndex, Node<SPACE_DIM>* node0, Node<SPACE_DIM>* node1);
+    Edge<SPACE_DIM>* GetEdgeFromNodes(unsigned elementIndex,
+                                      Node<SPACE_DIM>* pNodeA,
+                                      Node<SPACE_DIM>* pNodeB);
 
     /**
-     * Get edge given its global index
-     * @param index
-     * @return
+     * @param index a global Edge index
+     * 
+     * @return pointer the Edge with this global index
      */
     Edge<SPACE_DIM>* GetEdge(unsigned index) const;
 
     /**
      * Access operator.
-     * @param index
+     * 
+     * @param index Index of mEdges
+     * 
      * @return mEdges[index]
      */
     Edge<SPACE_DIM>* operator[](unsigned index) const;
@@ -110,9 +118,9 @@ public:
     void RemoveDeletedEdges();
 
     /**
-     * returns total number of edges
+     * @return total number of edges
      */
     unsigned GetNumEdges() const;
 };
 
-#endif //CHASTE_EDGEHELPER_HPP
+#endif /* CHASTE_EDGEHELPER_HPP_ */

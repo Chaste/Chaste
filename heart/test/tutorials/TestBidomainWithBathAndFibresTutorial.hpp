@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTBIDOMAINWITHBATHANDFIBRESTUTORIAL_HPP_
 #define TESTBIDOMAINWITHBATHANDFIBRESTUTORIAL_HPP_
 /*
- * = Running a bidomain simulation with a bath and fibres =
+ * ## Running a bidomain simulation with a bath and fibres
  *
  * In this tutorial we run a bidomain simulation with both a bath and fibres
  *
@@ -75,7 +75,7 @@ public:
          */
         HeartConfig::Instance()->SetOdeTimeStep(0.01);  //ms
 
-        /* Use the {{{PlaneStimulusCellFactory}}} to define a set of Luo-Rudy cells, in this
+        /* Use the `PlaneStimulusCellFactory` to define a set of Luo-Rudy cells, in this
          * case with a Backward Euler solver. We pass the stimulus magnitude as 0.0
          * as we don't want any stimulated cells.
          */

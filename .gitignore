@@ -44,6 +44,7 @@ _local/
 /gmon.out
 /Chaste
 /doxygen
+/doxygen-*
 /.externalToolBuilders
 /testoutput
 
@@ -73,3 +74,7 @@ Release
 chaste-build*
 
 **/.uuid
+
+venv
+
+tutorials

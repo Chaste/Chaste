@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,20 +48,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeVelocityWriter.hpp"
 #include "CellPopulationAreaWriter.hpp"
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::MeshBasedCellPopulation(MutableMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,
-                                      std::vector<CellPtr>& rCells,
-                                      const std::vector<unsigned> locationIndices,
-                                      bool deleteMesh,
-                                      bool validate)
-    : AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>(rMesh, rCells, locationIndices),
-      mpVoronoiTessellation(nullptr),
-      mDeleteMesh(deleteMesh),
-      mUseAreaBasedDampingConstant(false),
-      mAreaBasedDampingConstantParameter(0.1),
-      mWriteVtkAsPoints(false),
-      mBoundVoronoiTessellation(false),
-      mHasVariableRestLength(false)
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::MeshBasedCellPopulation(MutableMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
+                                                                         std::vector<CellPtr>& rCells,
+                                                                         const std::vector<unsigned> locationIndices,
+                                                                         bool deleteMesh,
+                                                                         bool validate)
+        : AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>(rMesh, rCells, locationIndices),
+          mpVoronoiTessellation(nullptr),
+          mDeleteMesh(deleteMesh),
+          mUseAreaBasedDampingConstant(false),
+          mAreaBasedDampingConstantParameter(0.1),
+          mWriteVtkAsPoints(false),
+          mBoundVoronoiTessellation(false),
+          mHasVariableRestLength(false)
 {
     mpMutableMesh = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>* >(&(this->mrMesh));
 
@@ -860,6 +860,49 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteDataToVisualizerSetupF
     }
 }
 
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateVoronoiTessellation()
+{
+    if constexpr (ELEMENT_DIM == 1)
+    {
+        // The VoronoiTessellation class is only defined in 2D or 3D
+        NEVER_REACHED;
+    }
+    else if constexpr (ELEMENT_DIM == 2 && SPACE_DIM == 2)
+    {
+        delete mpVoronoiTessellation;
+
+        // Check if the mesh associated with this cell population is periodic
+        bool is_mesh_periodic = false;
+        if (dynamic_cast<Cylindrical2dMesh*>(&(this->mrMesh)))
+        {
+            is_mesh_periodic = true;
+            mpVoronoiTessellation = new Cylindrical2dVertexMesh(static_cast<Cylindrical2dMesh&>(this->mrMesh), mBoundVoronoiTessellation);
+        }
+        else if (dynamic_cast<Toroidal2dMesh*>(&(this->mrMesh)))
+        {
+            is_mesh_periodic = true;
+            mpVoronoiTessellation = new Toroidal2dVertexMesh(static_cast<Toroidal2dMesh&>(this->mrMesh), mBoundVoronoiTessellation);
+        }
+        else
+        {
+            mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2>&>((this->mrMesh)), is_mesh_periodic, mBoundVoronoiTessellation);
+        }
+    }
+    else if constexpr (ELEMENT_DIM == 3)
+    {
+         // The cylindrical mesh is only defined in 2D, hence there is
+         // a separate definition for this method in 3D, which doesn't have the capability
+         // of dealing with periodic boundaries in 3D. This is \todo #1374.
+        delete mpVoronoiTessellation;
+        mpVoronoiTessellation = new VertexMesh<3, 3>(static_cast<MutableMesh<3, 3>&>(this->mrMesh));
+    }
+    else // ELEMENT_DIM == 2 && SPACE_DIM != 2
+    {
+        NEVER_REACHED;
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////////
 //                          Spring iterator class                           //
 //////////////////////////////////////////////////////////////////////////////
@@ -947,96 +990,6 @@ typename MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SpringIterator MeshBase
 {
     return SpringIterator(*this, static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>&>((this->mrMesh)).EdgesEnd());
 }
-
-/**
- *
- */
-template<>
-void MeshBasedCellPopulation<2>::CreateVoronoiTessellation()
-{
-    delete mpVoronoiTessellation;
-
-    // Check if the mesh associated with this cell population is periodic
-    bool is_mesh_periodic = false;
-    if (bool(dynamic_cast<Cylindrical2dMesh*>(&mrMesh)))
-    {
-        is_mesh_periodic = true;
-        mpVoronoiTessellation = new Cylindrical2dVertexMesh(static_cast<Cylindrical2dMesh &>(this->mrMesh), mBoundVoronoiTessellation);
-    }
-    else if (bool(dynamic_cast<Toroidal2dMesh*>(&(this->mrMesh))))
-    {
-        is_mesh_periodic = true;
-        mpVoronoiTessellation = new Toroidal2dVertexMesh(static_cast<Toroidal2dMesh &>(this->mrMesh), mBoundVoronoiTessellation);
-    }
-    else
-    {
-        mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2> &>((this->mrMesh)), is_mesh_periodic, mBoundVoronoiTessellation);
-    }
-}
-
-/**
- * Can't tessellate 2d meshes in 3d space yet.
- */
-// LCOV_EXCL_START
-template<>
-void MeshBasedCellPopulation<2,3>::CreateVoronoiTessellation()
-{
-    // We don't allow tessellation yet.
-    NEVER_REACHED;
-}
-// LCOV_EXCL_STOP
-
-/**
- * The cylindrical mesh is only defined in 2D, hence there is
- * a separate definition for this method in 3D, which doesn't have the capability
- * of dealing with periodic boundaries in 3D. This is \todo #1374.
- */
-template<>
-void MeshBasedCellPopulation<3>::CreateVoronoiTessellation()
-{
-    delete mpVoronoiTessellation;
-    mpVoronoiTessellation = new VertexMesh<3, 3>(static_cast<MutableMesh<3, 3> &>((this->mrMesh)));
-}
-
-/**
- * The VoronoiTessellation class is only defined in 2D or 3D, hence there
- * are two definitions to this method (one templated and one not).
- */
-// LCOV_EXCL_START
-template<>
-void MeshBasedCellPopulation<1, 1>::CreateVoronoiTessellation()
-{
-    // No 1D Voronoi tessellation
-    NEVER_REACHED;
-}
-// LCOV_EXCL_STOP
-
-
-/**
- * The VoronoiTessellation class is only defined in 2D or 3D, hence there
- * are two definitions to this method (one templated and one not).
- */
-// LCOV_EXCL_START
-template<>
-void MeshBasedCellPopulation<1, 2>::CreateVoronoiTessellation()
-{
-    // No 1D Voronoi tessellation
-    NEVER_REACHED;
-}
-// LCOV_EXCL_STOP
-
-/**
- * The VoronoiTessellation class is only defined in 2D or 3D, hence there
- * are two definitions to this method (one templated and one not).
- */
-// LCOV_EXCL_START
-template<>
-void MeshBasedCellPopulation<1, 3>::CreateVoronoiTessellation()
-{
-    // No 1D Voronoi tessellation
-    NEVER_REACHED;
-}
-// LCOV_EXCL_STOP
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM,SPACE_DIM>* MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetVoronoiTessellation()

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,7 +36,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractSrnModel.hpp"
 
 AbstractSrnModel::AbstractSrnModel()
-    : mSimulatedToTime(SimulationTime::Instance()->GetTime())
+    : mSimulatedToTime(SimulationTime::Instance()->GetTime()),
+      mEdgeLocalIndex(UNSIGNED_UNSET), 
+      mIsEdgeBasedModel(false)
+{
+}
+
+AbstractSrnModel::~AbstractSrnModel()
 {
 }
 
@@ -95,15 +101,6 @@ double AbstractSrnModel::GetSimulatedToTime() const
     return mSimulatedToTime;
 }
 
-/*
-///\todo - make abstract? (#2752)
-void AbstractSrnModel::SimulateToCurrentTime()
-{
-    // This should be overridden
-    SetSimulatedToTime(SimulationTime::Instance()->GetTime());
-}
-*/
-
 void AbstractSrnModel::OutputSrnModelInfo(out_stream& rParamsFile)
 {
     std::string srn_model_type = GetIdentifier();
@@ -132,35 +129,37 @@ bool AbstractSrnModel::HasEdgeModel() const
     return this->mIsEdgeBasedModel;
 }
 
-void AbstractSrnModel::SetEdgeModelIndicator(const bool indicator)
+void AbstractSrnModel::SetEdgeModelIndicator(const bool isEdgeModel)
 {
-    this->mIsEdgeBasedModel = indicator;
+    this->mIsEdgeBasedModel = isEdgeModel;
 }
 
 /*
- * We exclude the following from coverage, as these method are implemented elsewhere and tested accordingly
+ * We exclude the following from coverage, as these methods are implemented elsewhere and tested accordingly
+ * \todo These should have been declared abstract/virtual with void ScaleSrnVariables(const double theta) = 0; or similar
+ * ALERT: not all concrete class implement these methods!
  */
 // LCOV_EXCL_START
 void AbstractSrnModel::ScaleSrnVariables(const double theta)
 {
 }
 
-void AbstractSrnModel::AddSrnQuantities(AbstractSrnModel* p_other_srn,
+void AbstractSrnModel::AddSrnQuantities(AbstractSrnModel* pOtherSrn,
                                         const double scale)
 {
 }
 
-void AbstractSrnModel::AddShrunkEdgeSrn(AbstractSrnModel *p_shrunk_edge_srn)
+void AbstractSrnModel::AddShrunkEdgeSrn(AbstractSrnModel* pShrunkEdgeSrn)
 {
 }
 
-void AbstractSrnModel::AddMergedEdgeSrn(AbstractSrnModel* p_merged_edge_srn)
+void AbstractSrnModel::AddMergedEdgeSrn(AbstractSrnModel* pMergedEdgeSrn)
 {}
 
-void AbstractSrnModel::AddShrunkEdgeToInterior(AbstractSrnModel* p_shrunk_edge_srn)
+void AbstractSrnModel::AddShrunkEdgeToInterior(AbstractSrnModel* pShrunkEdgeSrn)
 {}
 
-void AbstractSrnModel::SplitEdgeSrn(const double relative_position)
+void AbstractSrnModel::SplitEdgeSrn(const double relativePosition)
 {}
 // LCOV_EXCL_STOP
 

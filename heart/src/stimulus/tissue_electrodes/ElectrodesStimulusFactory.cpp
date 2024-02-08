@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -62,7 +62,7 @@ ElectrodesStimulusFactory<DIM>::ElectrodesStimulusFactory(std::vector<std::pair<
         (rElectrodePairs.size() != rStarts.size()) ||
         (rElectrodePairs.size() != rEnds.size()))
     {
-        EXCEPTION ("Vector of electrode pairs and vector of stimulation paremeters must have the same size");
+        EXCEPTION ("Vector of electrode pairs and vector of stimulation parameters must have the same size");
     }
 
     mMagnitudesElectrode1 = mrMagnitudes;

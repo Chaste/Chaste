@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -80,7 +80,7 @@ protected:
     /** @return newly created suitable solver for monodomain problems with Purkinje. */
     AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 2>* CreateSolver();
 
-    /** @return newly created suitable (MixedDimensionMesh) mesh for monodomain problems with Purkinje. */
+    /** Create suitable (MixedDimensionMesh) mesh for monodomain problems with Purkinje. */
     virtual void CreateMeshFromHeartConfig();
 
     /**

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,22 +37,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template <unsigned SPACE_DIM>
 Edge<SPACE_DIM>::Edge(unsigned index)
-        : mIndex(index),
-          mIsDeleted(false)
+    : mIndex(index),
+      mIsDeleted(false)
 {
-    this->mIndex = index;
 }
 
 template <unsigned SPACE_DIM>
-Edge<SPACE_DIM>::Edge(unsigned index, Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
-        : mIndex(index),
-          mIsDeleted(false)
+Edge<SPACE_DIM>::Edge(unsigned index,
+                      Node<SPACE_DIM>* pNodeA,
+                      Node<SPACE_DIM>* pNodeB)
+    : mIndex(index),
+      mIsDeleted(false)
 {
     this->SetNodes(pNodeA, pNodeB);
 }
 
-template <unsigned int SPACE_DIM>
-std::pair<unsigned, unsigned> Edge<SPACE_DIM>::GenerateMapIndex(unsigned int indexA, unsigned int indexB)
+template <unsigned SPACE_DIM>
+std::pair<unsigned, unsigned> Edge<SPACE_DIM>::GenerateMapIndex(unsigned indexA,
+                                                                unsigned indexB)
 {
     return std::make_pair(std::min(indexA, indexB), std::max(indexA, indexB));
 }
@@ -87,7 +89,6 @@ std::pair<unsigned ,unsigned> Edge<SPACE_DIM>::GetMapIndex()
     assert(mNodes.size() == 2);
     const unsigned index0 = mNodes[0]->GetIndex();
     const unsigned index1 = mNodes[1]->GetIndex();
-
     return Edge<SPACE_DIM>::GenerateMapIndex(index0, index1);
 }
 
@@ -98,7 +99,8 @@ void Edge<SPACE_DIM>::RemoveNodes()
 }
 
 template<unsigned SPACE_DIM>
-void Edge<SPACE_DIM>::SetNodes(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
+void Edge<SPACE_DIM>::SetNodes(Node<SPACE_DIM>* pNodeA,
+                               Node<SPACE_DIM>* pNodeB)
 {
     // Clear the nodes first
     this->RemoveNodes();
@@ -109,7 +111,8 @@ void Edge<SPACE_DIM>::SetNodes(Node<SPACE_DIM>* pNodeA, Node<SPACE_DIM>* pNodeB)
 }
 
 template<unsigned SPACE_DIM>
-void Edge<SPACE_DIM>::ReplaceNode(Node<SPACE_DIM>* pOldNode, Node<SPACE_DIM>* pNewNode)
+void Edge<SPACE_DIM>::ReplaceNode(Node<SPACE_DIM>* pOldNode,
+                                  Node<SPACE_DIM>* pNewNode)
 {
     for (unsigned i = 0; i < 2; i++)
     {
@@ -136,9 +139,9 @@ unsigned Edge<SPACE_DIM>::GetNumNodes()
 template<unsigned SPACE_DIM>
 bool Edge<SPACE_DIM>::ContainsNode(Node<SPACE_DIM>* pNode) const
 {
-    for (auto node : mNodes)
+    for (auto p_node : mNodes)
     {
-        if (node->GetIndex() == pNode->GetIndex())
+        if (p_node->GetIndex() == pNode->GetIndex())
         {
             return true;
         }
@@ -165,8 +168,12 @@ std::set<unsigned> Edge<SPACE_DIM>::GetOtherElements(unsigned elementIndex)
 {
     std::set<unsigned> otherElements;
     for (unsigned elem: mElementIndices)
+    {
         if (elem != elementIndex)
+        {
             otherElements.insert(elem);
+        }
+    }
     return otherElements;
 }
 
@@ -191,8 +198,8 @@ std::set<unsigned> Edge<SPACE_DIM>::GetNeighbouringElementIndices()
     auto elem_indices1 = mNodes[1]->rGetContainingElementIndices();
 
     std::set_intersection(elem_indices0.begin(), elem_indices0.end(),
-            elem_indices1.begin(), elem_indices1.end(),
-            std::inserter(neighbouring_element_indices, neighbouring_element_indices.begin()));
+                          elem_indices1.begin(), elem_indices1.end(),
+                          std::inserter(neighbouring_element_indices, neighbouring_element_indices.begin()));
 
     return neighbouring_element_indices;
 }
@@ -210,9 +217,9 @@ bool Edge<SPACE_DIM>::IsBoundaryEdge() const
 }
 
 template <unsigned SPACE_DIM>
-bool Edge<SPACE_DIM>::operator==(const Edge<SPACE_DIM>& edge) const
+bool Edge<SPACE_DIM>::operator==(const Edge<SPACE_DIM>& rEdge) const
 {
-    return this->ContainsNode(edge.GetNode(0)) && this->ContainsNode(edge.GetNode(1));
+    return this->ContainsNode(rEdge.GetNode(0)) && this->ContainsNode(rEdge.GetNode(1));
 }
 
 // Explicit instantiation

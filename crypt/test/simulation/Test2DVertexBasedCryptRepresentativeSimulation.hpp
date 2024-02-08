@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -74,7 +74,7 @@ public:
         unsigned crypt_width = 18;
         unsigned crypt_height = 25;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Make crypt shorter for sloughing
         double crypt_length = 20.0;

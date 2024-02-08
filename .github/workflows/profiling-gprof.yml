@@ -37,8 +37,8 @@ jobs:
 
       - name: install dependencies
         run: |
-          echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://www.cs.ox.ac.uk/chaste/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
-          sudo wget -O /usr/share/keyrings/chaste.asc https://www.cs.ox.ac.uk/chaste/ubuntu/ChasteTeam.asc
+          echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+          sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
           sudo apt update
           sudo apt install chaste-dependencies
 
@@ -86,10 +86,13 @@ jobs:
           cp ${CHASTE_BUILD_DIR}/profile/* ${GPROF_DIR}/log-files/${{ steps.get-datetime.outputs.datetime }}/
         if: always() && steps.index-exists.outputs.index == 'True'
 
+      - name: setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
       - name: generate index file
         run: |
-          python -m venv venv
-          source venv/bin/activate
           python -m pip install --upgrade pip setuptools wheel
           python -m pip install dominate
           python write_index.py

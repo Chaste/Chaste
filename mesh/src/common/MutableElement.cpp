@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -266,13 +266,13 @@ bool MutableElement<ELEMENT_DIM, SPACE_DIM>::IsElementOnBoundary() const
     return is_element_on_boundary;
 }
 
-template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-void MutableElement<ELEMENT_DIM, SPACE_DIM>::SetEdgeHelper(EdgeHelper<SPACE_DIM> *edgeHelper)
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MutableElement<ELEMENT_DIM, SPACE_DIM>::SetEdgeHelper(EdgeHelper<SPACE_DIM>* pEdgeHelper)
 {
-    this->mEdgeHelper = edgeHelper;
+    this->mEdgeHelper = pEdgeHelper;
 }
 
-template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableElement<ELEMENT_DIM, SPACE_DIM>::ClearEdges()
 {
     for (auto edge: mEdges)
@@ -282,7 +282,7 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::ClearEdges()
     mEdges.clear();
 }
 
-template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MutableElement<ELEMENT_DIM, SPACE_DIM>::BuildEdges()
 {
     assert(mEdgeHelper != nullptr);
@@ -301,7 +301,7 @@ void MutableElement<ELEMENT_DIM, SPACE_DIM>::BuildEdges()
     }
 }
 
-template<unsigned ELEMENT_DIM, unsigned int SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 unsigned MutableElement<ELEMENT_DIM, SPACE_DIM>::GetEdgeGlobalIndex(unsigned localIndex) const
 {
     assert(localIndex < mEdges.size());
@@ -328,23 +328,25 @@ std::set<unsigned> MutableElement<ELEMENT_DIM, SPACE_DIM>::GetNeighbouringElemen
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool MutableElement<ELEMENT_DIM, SPACE_DIM>::ContainsEdge(const Edge<SPACE_DIM> *edge) const
+bool MutableElement<ELEMENT_DIM, SPACE_DIM>::ContainsEdge(const Edge<SPACE_DIM>* pEdge) const
 {
-    for (unsigned int i=0; i<mEdges.size(); ++i)
+    for (unsigned i=0; i<mEdges.size(); ++i)
     {
-        if ((*mEdges[i])==(*edge))
+        if ((*mEdges[i]) == (*pEdge))
+        {
             return true;
+        }
     }
     return false;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-long MutableElement<ELEMENT_DIM, SPACE_DIM>::GetLocalEdgeIndex(const Edge<SPACE_DIM> *edge) const
+long MutableElement<ELEMENT_DIM, SPACE_DIM>::GetLocalEdgeIndex(const Edge<SPACE_DIM>* pEdge) const
 {
     long result = -1;
-    for (unsigned int i=0; i<mEdges.size(); ++i)
+    for (unsigned i=0; i<mEdges.size(); ++i)
     {
-        if ((*mEdges[i])==(*edge))
+        if ((*mEdges[i]) == (*pEdge))
         {
             result = i;
         }
@@ -425,23 +427,25 @@ Edge<SPACE_DIM> *MutableElement<1, SPACE_DIM>::GetEdge(unsigned localIndex) cons
 }
 
 template <unsigned SPACE_DIM>
-bool MutableElement<1, SPACE_DIM>::ContainsEdge(const Edge<SPACE_DIM> *edge) const
+bool MutableElement<1, SPACE_DIM>::ContainsEdge(const Edge<SPACE_DIM>* pEdge) const
 {
-    for (unsigned int i=0; i<mEdges.size(); ++i)
+    for (unsigned i=0; i<mEdges.size(); ++i)
     {
-        if ((*mEdges[i])==(*edge))
+        if ((*mEdges[i]) == (*pEdge))
+        {
             return true;
+        }
     }
     return false;
 }
 
-template<unsigned int SPACE_DIM>
-void MutableElement<1, SPACE_DIM>::SetEdgeHelper(EdgeHelper<SPACE_DIM> *edgeHelper)
+template<unsigned SPACE_DIM>
+void MutableElement<1, SPACE_DIM>::SetEdgeHelper(EdgeHelper<SPACE_DIM>* pEdgeHelper)
 {
-    this->mEdgeHelper = edgeHelper;
+    this->mEdgeHelper = pEdgeHelper;
 }
 
-template<unsigned int SPACE_DIM>
+template<unsigned SPACE_DIM>
 void MutableElement<1, SPACE_DIM>::BuildEdges()
 {
     assert(mEdgeHelper != nullptr);
@@ -460,23 +464,23 @@ void MutableElement<1, SPACE_DIM>::BuildEdges()
     }
 }
 
-template<unsigned int SPACE_DIM>
+template<unsigned SPACE_DIM>
 void MutableElement<1, SPACE_DIM>::ClearEdges()
 {
-    for (auto edge: mEdges)
+    for (auto p_edge : mEdges)
     {
-        edge->RemoveElement(this->mIndex);
+        p_edge->RemoveElement(this->mIndex);
     }
     mEdges.clear();
 }
 
 template <unsigned SPACE_DIM>
-long MutableElement<1, SPACE_DIM>::GetLocalEdgeIndex(const Edge<SPACE_DIM> *edge) const
+long MutableElement<1, SPACE_DIM>::GetLocalEdgeIndex(const Edge<SPACE_DIM>* pEdge) const
 {
     long result = -1;
-    for (unsigned int i=0; i<mEdges.size(); ++i)
+    for (unsigned i=0; i<mEdges.size(); ++i)
     {
-        if ((*mEdges[i])==(*edge))
+        if ((*mEdges[i]) == (*pEdge))
         {
             result = i;
         }
@@ -484,7 +488,7 @@ long MutableElement<1, SPACE_DIM>::GetLocalEdgeIndex(const Edge<SPACE_DIM> *edge
     return result;
 }
 
-template<unsigned int SPACE_DIM>
+template<unsigned SPACE_DIM>
 unsigned MutableElement<1, SPACE_DIM>::GetEdgeGlobalIndex(unsigned localIndex) const
 {
     assert(localIndex < mEdges.size());

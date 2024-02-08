@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2023, University of Oxford.
+# Copyright (c) 2005-2024, University of Oxford.
 # All rights reserved.
 # 
 # University of Oxford means the Chancellor, Masters and Scholars of the
@@ -57,6 +57,7 @@ int main( )
 ")
 
 add_executable(timekeeper "${generate_dir}/timekeeper.cpp")
+target_link_libraries(timekeeper PRIVATE Chaste_COMMON_DEPS)
 
 ###################################################################
 #  Setup command to generate Version and BuildInfo at build-time  #

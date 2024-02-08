@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -498,10 +498,10 @@ public:
 
     // DEBUGGING CODE:
     /**
-     * @return this process's ownership range of the contents of the system.
+     * Return this process's ownership range of the contents of the system via arguments.
      *
-     * @param lo  lowest index owned by this process
-     * @param hi  highest index owned by this process
+     * @param lo  lowest index owned by this process (returned)
+     * @param hi  highest index owned by this process (returned)
      */
     void GetOwnershipRange(PetscInt& lo, PetscInt& hi);
 

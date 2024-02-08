@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -126,7 +126,7 @@ public:
      * Takes units of uA/cm^2 in single cell simulations
      * or uA/cm^3 in tissue simulations
      *
-     * See https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/ChasteUnits for a full discussion of this.
+     * See https://chaste.github.io/docs/user-guides/chaste-units/ for a full discussion of this.
      *
      * @param magnitude  The magnitude of stimulus to apply.
      */

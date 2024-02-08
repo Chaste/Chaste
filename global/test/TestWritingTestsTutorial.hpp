@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,46 +45,49 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTWRITINGTESTTUTORIAL_HPP_
 
 /*
- * = Writing tests =
- * We do not use `int main()` methods in Chaste. Instead, we write ''tests'', which are run using !CxxTest.
+ * ## Writing tests
+ * We do not use `int main()` methods in Chaste. Instead, we write *tests*, which are run using CxxTest.
  * Tests are used both as:
- * (i) part of the testing environment - every class in the source code has an equivalent test file which tests each aspect of its functionality, making use of the `TS_ASSERT`s as described below; and
- * (ii) for experimental work, which involve writing a 'test' as below but generally without `TS_ASSERT`s.
  *
- * This tutorial shows how to write a test using !CxxTest. Note that the full code is given at the bottom of the page.
+ * * (i) part of the testing environment - every class in the source code has an equivalent test file 
+ * which tests each aspect of its functionality, making use of the `TS_ASSERT`s as described below; and
+ * * (ii) for experimental/simulation work, which involve writing a 'test' as below but generally without `TS_ASSERT`s, 
+ * just to hijack the testing framework as a convenient way to run things without linking to Chaste as an external library 
+ * (which is also possible but a little bit more fuss to set up)
+ *
+ * This tutorial shows how to write a test using CxxTest. Note that the full code is given at the bottom of the page.
  */
 
 /* First, the following header file needs to be included.*/
 #include <cxxtest/TestSuite.h>
 
 /*
- * Now we have to define a class containing the tests. It is sensible to name the class with the same name as the file name. The class should inherit from {{{CxxTest::TestSuite}}}.
+ * Now we have to define a class containing the tests. It is sensible to name the class with the same name as the file name. The class should inherit from `CxxTest::TestSuite`.
  */
 class TestWritingTestsTutorial: public CxxTest::TestSuite
 {
 /*
- * Now we define some tests, which must be '''public''', begin with the word 'Test', return {{{void}}}, and take in no parameters.
+ * Now we define some tests, which must be **public**, begin with the word 'Test', return `void`, and take in no parameters.
  */
 public:
     void TestOnePlusOneEqualsTwo()
     {
 /*
- * To test whether two integers are equal, we can use the macro {{{TS_ASSERT_EQUALS}}}.
+ * To test whether two integers are equal, we can use the macro `TS_ASSERT_EQUALS`.
  */
         int some_number = 1 + 1;
         TS_ASSERT_EQUALS(some_number, 2);
 /*
- * To test whether two numbers are equal to within a certain (absolute) tolerance we can use {{{TS_ASSERT_DELTA}}}.
- * This should almost always be used when comparing two {{{double}}}s.  (See also class:CompareDoubles for more
- * advanced comparisons.)
+ * To test whether two numbers are equal to within a certain (absolute) tolerance we can use `TS_ASSERT_DELTA`.
+ * This should almost always be used when comparing two `double`s.  (See also
+ * [CompareDoubles](/doxygen-latest/classCompareDoubles.html)
+ * for more advanced comparisons.)
  */
         double another_number = 1.000001 + 1.0001;
         TS_ASSERT_DELTA(another_number, 2.0, 1e-2);
     }
 /*
- * This second test shows some of the other {{{TS_ASSERT}}} macros that are available.
- * The {{{}} part of the signature is there to make sure that full details of any
- * uncaught exceptions are reported.
+ * This second test shows some of the other `TS_ASSERT` macros that are available.
  */
     void TestSomeOtherStuff()
     {
@@ -119,16 +122,17 @@ public:
  * To run this code, first copy it into a file, say, called `TestWritingTests.hpp` in the directory `global/test/`.
  * Second, add the full name of your new file to the relevant continuous test pack, say `[path/to/Chaste]/global/test/ContinuousTestPack.txt`.
  * Third, from the command line, run
-{{{
-#!sh
-cd [path/to/ChasteBuild]
-ccmake [path/to/Chaste]
-}}}
+ *
+ * ```bash
+ * cd [path/to/ChasteBuild]
+ * ccmake [path/to/Chaste]
+ * ```
+ *
  * Then press `c` to configure, `e` to exit, and `g` to generate. Finally, run
-{{{
-#!sh
-make global
-ctest -V -R TestWritingTests
-}}}
+ *
+ * ```bash
+ * make global
+ * ctest -V -R TestWritingTests
+ * ```
  */
 #endif /*TESTWRITINGTESTTUTORIAL_HPP_*/

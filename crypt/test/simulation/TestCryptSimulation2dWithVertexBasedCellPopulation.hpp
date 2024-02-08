@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -117,7 +117,7 @@ public:
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Impose a larger cell rearrangement threshold so that motion is uninhibited (see #1376)
         p_mesh->SetCellRearrangementThreshold(0.1);
@@ -125,7 +125,7 @@ public:
         // Set up cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
@@ -184,12 +184,12 @@ public:
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -242,12 +242,12 @@ public:
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells, all differentiated
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 0.0, 0.0, 0.0, 0.0);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true, 0.0, 0.0, 0.0, 0.0);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -287,12 +287,12 @@ public:
 
         // Create mesh
         CylindricalHoneycombVertexMeshGenerator generator(4, 6);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells: the bottom row have StemCellProliferativeType and the rest have DifferentiatedCellProliferativeType
         std::vector<CellPtr> cells;
         CryptCellsGenerator<FixedG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 0.8, 0.8, 0.8, 0.8);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true, 0.8, 0.8, 0.8, 0.8);
 
         // Cell 1 should divide at time t=0.05
         cells[0]->SetBirthTime(-23.95);
@@ -345,12 +345,12 @@ public:
         unsigned crypt_width = 10;
         unsigned crypt_height = 20;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -395,12 +395,12 @@ public:
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<SimpleWntCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -450,12 +450,12 @@ public:
         unsigned crypt_width = 10;
         unsigned crypt_height = 20;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height, true);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<SimpleWntCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -504,12 +504,12 @@ public:
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells: the bottom row have StemCellProliferativeType and the rest have DifferentiatedCellProliferativeType
         std::vector<CellPtr> cells;
         CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true, 0.8, 0.8, 0.8, 0.8);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true, 0.8, 0.8, 0.8, 0.8);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -559,12 +559,12 @@ public:
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -598,11 +598,11 @@ public:
         p_simulator = CellBasedSimulationArchiver<2, CryptSimulation2d>::Load("VertexCrypt2DArchive", 0.0);
 
         // Create an identical mesh for comparison purposes
-        Cylindrical2dVertexMesh* p_mesh2 = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh2 = generator.GetCylindricalMesh();
 
         // Compare meshes
         VertexMesh<2,2>& r_mesh = (static_cast<VertexBasedCellPopulation<2>*>(&(p_simulator->rGetCellPopulation())))->rGetMesh();
-        CompareMeshes(p_mesh2, &r_mesh);
+        CompareMeshes(p_mesh2.get(), &r_mesh);
 
         // Test Warnings
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
@@ -620,12 +620,12 @@ public:
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -687,12 +687,12 @@ public:
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -734,12 +734,12 @@ public:
         unsigned crypt_width = 4;
         unsigned crypt_height = 6;
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<UniformG1GenerationalCellCycleModel> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create cell population
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);
@@ -849,12 +849,12 @@ public:
         unsigned crypt_height = 4;
         double crypt_length = crypt_height*(sqrt(3.0)/2);
         CylindricalHoneycombVertexMeshGenerator generator(crypt_width, crypt_height);
-        Cylindrical2dVertexMesh* p_mesh = generator.GetCylindricalMesh();
+        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
         CryptCellsGenerator<VanLeeuwen2009WntSwatCellCycleModelHypothesisOne> cells_generator;
-        cells_generator.Generate(cells, p_mesh, std::vector<unsigned>(), true);
+        cells_generator.Generate(cells, p_mesh.get(), std::vector<unsigned>(), true);
 
         // Create crypt
         VertexBasedCellPopulation<2> crypt(*p_mesh, cells);

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,6 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ToroidalHoneycombMeshGenerator.hpp"
 
 #include <boost/foreach.hpp>
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 #include "RandomNumberGenerator.hpp"
 #include "MathsCustomFunctions.hpp"
 #include "ChasteSyscalls.hpp"
@@ -193,7 +195,7 @@ ToroidalHoneycombMeshGenerator::ToroidalHoneycombMeshGenerator(unsigned numNodes
     // Nested scope so the reader closes files before we delete them below.
     {
         TrianglesMeshReader<2,2> mesh_reader(output_file_handler.GetOutputDirectoryFullPath() + mMeshFilename);
-        mpMesh = new Toroidal2dMesh(mDomainWidth,mDomainDepth);
+        mpMesh = boost::make_shared<Toroidal2dMesh >(mDomainWidth,mDomainDepth);
         mpMesh->ConstructFromMeshReader(mesh_reader);
     }
 
@@ -207,13 +209,13 @@ ToroidalHoneycombMeshGenerator::ToroidalHoneycombMeshGenerator(unsigned numNodes
     mpMesh->SetMeshHasChangedSinceLoading();
 }
 
-MutableMesh<2,2>* ToroidalHoneycombMeshGenerator::GetMesh()
+boost::shared_ptr<MutableMesh<2,2> > ToroidalHoneycombMeshGenerator::GetMesh()
 {
     EXCEPTION("A Toroidal mesh was created but a normal mesh is being requested.");
     return mpMesh; // Not really
 }
 
-Toroidal2dMesh* ToroidalHoneycombMeshGenerator::GetToroidalMesh()
+boost::shared_ptr<Toroidal2dMesh> ToroidalHoneycombMeshGenerator::GetToroidalMesh()
 {
-    return (Toroidal2dMesh*) mpMesh;
+    return boost::static_pointer_cast<Toroidal2dMesh>(mpMesh);
 }

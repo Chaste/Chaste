@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -201,7 +201,7 @@ public:
         EXIT_IF_PARALLEL;
         // Create mesh
         HoneycombVertexMeshGenerator mesh_generator(2, 2);
-        VertexMesh<2,2>* p_mesh = mesh_generator.GetMesh();
+        boost::shared_ptr<VertexMesh<2,2> > p_mesh = mesh_generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;

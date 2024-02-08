@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -98,7 +98,7 @@ public:
     {
         // Create a simple 2D VertexMesh
         HoneycombVertexMeshGenerator generator(5, 3);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -176,7 +176,7 @@ public:
     {
         // Create a simple vertex-based mesh
         HoneycombVertexMeshGenerator generator(3, 3);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -243,7 +243,7 @@ public:
 
         // Create anoter simple vertex-based mesh
         HoneycombVertexMeshGenerator generator2(3, 3);
-        MutableVertexMesh<2,2>* p_mesh2 = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh2 = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells2;
@@ -266,7 +266,7 @@ public:
     {
         // Create mesh
         HoneycombVertexMeshGenerator generator(3, 3);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(ApcOneHitCellMutationState, p_apc1);
@@ -376,7 +376,7 @@ public:
 
         // Create a simple vertex-based mesh
         HoneycombVertexMeshGenerator generator(4, 6);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -401,7 +401,7 @@ public:
 
         // Create a simple vertex-based mesh
         HoneycombVertexMeshGenerator generator(4, 6);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -533,23 +533,30 @@ public:
         // Test if the swap has been recorded properly
         auto operation_recorder = vertex_mesh.GetOperationRecorder();
         const std::vector<EdgeOperation>& edge_operations = operation_recorder->GetEdgeOperations();
-        const unsigned int n_operations = edge_operations.size();
+        const unsigned num_operations = edge_operations.size();
+
         // Two node merging operations in two elements and two new edge operations in the other two elements
-        TS_ASSERT_EQUALS(n_operations, 2u);
-        unsigned n_edge_splits= 0, n_divisions= 0;
-        std::vector<std::vector<unsigned int> > element_to_operations(5);
-        for (unsigned int i=0; i<n_operations; ++i)
+        TS_ASSERT_EQUALS(num_operations, 2u);
+        unsigned num_edge_splits = 0;
+        unsigned num_divisions = 0;
+        std::vector<std::vector<unsigned> > element_to_operations(5);
+        for (unsigned i=0; i<num_operations; ++i)
         {
             if (edge_operations[i].GetOperation() == EDGE_OPERATION_DIVIDE)
-                n_divisions++;
+            {
+                num_divisions++;
+            }
             if (edge_operations[i].GetOperation() == EDGE_OPERATION_SPLIT)
-                n_edge_splits++;
-            //Determine operations that an element underwent
-            const unsigned int elem_index = edge_operations[i].GetElementIndex();
+            {
+                num_edge_splits++;
+            }
+            
+            // Determine operations that an element underwent
+            const unsigned elem_index = edge_operations[i].GetElementIndex();
             element_to_operations[elem_index].push_back(edge_operations[i].GetOperation());
         }
-        TS_ASSERT_EQUALS(n_divisions, 1u);
-        TS_ASSERT_EQUALS(n_edge_splits, 1u);
+        TS_ASSERT_EQUALS(num_divisions, 1u);
+        TS_ASSERT_EQUALS(num_edge_splits, 1u);
 
         // Test ownership of the new nodes
         std::set<unsigned> expected_elements_containing_node_5;
@@ -656,7 +663,7 @@ public:
     {
         // Create a mesh with 9 elements
         HoneycombVertexMeshGenerator generator(3, 3);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Set up cells, one for each VertexElement. Give each cell
         // a birth time of -elem_index, so its age is elem_index
@@ -801,7 +808,7 @@ public:
     {
         // Create a simple vertex-based mesh
         HoneycombVertexMeshGenerator generator(4, 6);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
         p_mesh->GetElement(5)->MarkAsDeleted();
 
         // Create cells
@@ -831,7 +838,7 @@ public:
 
         // Create a simple vertex-based mesh
         HoneycombVertexMeshGenerator generator(4, 6);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -914,7 +921,7 @@ public:
 
         // Create a simple vertex-based cell population, comprising various cell types in various cell cycle phases
         HoneycombVertexMeshGenerator generator(4, 6);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         boost::shared_ptr<AbstractCellProperty> p_stem(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
         boost::shared_ptr<AbstractCellProperty> p_transit(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
@@ -1517,7 +1524,7 @@ public:
     {
         // Create a small cell population
         HoneycombVertexMeshGenerator generator(4, 4);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -1562,7 +1569,7 @@ public:
 
         // Create a simple vertex-based cell population, comprising various cell types in various cell cycle phases
         HoneycombVertexMeshGenerator generator(4, 6);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -1572,8 +1579,8 @@ public:
         for (unsigned elem_index=0; elem_index < p_mesh->GetNumElements(); elem_index++)
         {
             auto p_element = p_mesh->GetElement(elem_index);
-            const unsigned int n_edges = p_element->GetNumEdges();
-            cells[elem_index]->GetCellEdgeData()->SetItem("data", std::vector<double>(n_edges, 1.0));
+            const unsigned num_edges = p_element->GetNumEdges();
+            cells[elem_index]->GetCellEdgeData()->SetItem("data", std::vector<double>(num_edges, 1.0));
         }
 
         // Create cell population
@@ -1600,7 +1607,7 @@ public:
         TS_ASSERT(vtk_file.Exists());
 
         // Check that we have 144 (6*4*6) edges and 68 cells
-        ifstream vtk_file_stream;
+        std::ifstream vtk_file_stream;
         vtk_file_stream.open (vtk_file.GetAbsolutePath());
         std::stringstream vtk_file_string_buffer;
         vtk_file_string_buffer << vtk_file_stream.rdbuf();
@@ -1632,7 +1639,7 @@ public:
 
         // Create a simple vertex-based cell population, comprising various cell types in various cell cycle phases
         HoneycombVertexMeshGenerator generator(4, 6);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -1642,8 +1649,8 @@ public:
         for (unsigned elem_index=0; elem_index < p_mesh->GetNumElements(); elem_index++)
         {
             auto p_element = p_mesh->GetElement(elem_index);
-            const unsigned int n_edges = p_element->GetNumEdges();
-            cells[elem_index]->GetCellEdgeData()->SetItem("data", std::vector<double>(n_edges, 1.0));
+            const unsigned num_edges = p_element->GetNumEdges();
+            cells[elem_index]->GetCellEdgeData()->SetItem("data", std::vector<double>(num_edges, 1.0));
             cells[elem_index]->GetCellData()->SetItem("Cell data", 1.0);
         }
 
@@ -1671,7 +1678,7 @@ public:
         TS_ASSERT(vtk_file.Exists());
 
         // Check that we have 144 (6*4*6) edges and 68 cells
-        ifstream vtk_file_stream;
+        std::ifstream vtk_file_stream;
         vtk_file_stream.open (vtk_file.GetAbsolutePath());
         std::stringstream vtk_file_string_buffer;
         vtk_file_string_buffer << vtk_file_stream.rdbuf();
@@ -1701,7 +1708,7 @@ public:
 
         // Create a simple vertex-based cell population, comprising various cell types in various cell cycle phases
         HoneycombVertexMeshGenerator generator(4, 6);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;

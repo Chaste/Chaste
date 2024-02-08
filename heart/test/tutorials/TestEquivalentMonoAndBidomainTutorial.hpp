@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,122 +44,61 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTEQUIVALENTMONOANDBIDOMAINTUTORIAL_HPP_
 #define TESTEQUIVALENTMONOANDBIDOMAINTUTORIAL_HPP_
 
-/* [[PageOutline]]
+/* 
+ * ## How to run a Bidomain simulation and its equivalent Monodomain reduction
  *
- * = How to run a Bidomain simulation and its equivalent Monodomain reduction =
- *
- * == Introduction ==
+ * ### Introduction
  *
  * In this tutorial we show how Chaste is used to run a standard mono and a standard bidomain simulation.
  * With equivalent parameters so that the bidomain could be reduced to the monodomain case.
  *
- * The bulk of this tutorial is the same as UserTutorials/RunningBidomainSimulations, so for details of each line see that page.
+ * The bulk of this tutorial is the same as the tutorial [Running Bidomain Simulations](/docs/user-tutorials/runningbidomainsimulations/), 
+ * so for details of the following code block see that page.
  */
 
 #include <cxxtest/TestSuite.h>
-// The main classes to be used for running simulations.
 #include "BidomainProblem.hpp"
 #include "MonodomainProblem.hpp"
 #include "SimpleStimulus.hpp"
-///* All tests which run cardiac simulations (which use Petsc) should include
-// * {{{PetscSetupAndFinalize.hpp}}}.  This class ensures that {{{PetscInitialise()}}}
-// * is called with the appropriate arguments before any tests in the suite are run. */
 #include "PetscSetupAndFinalize.hpp"
-
-///* The above files are contained in the source release and can be located and studied. Cardiac cell
-// * models are different: the C++ code is automatically generated from cellml files. To use a particular
-// * cellml file, place it in `heart/src/odes/cellml` (there are several in here already). If the cellml
-// * is called `<CELLMODEL>.cellml`, a file `<CELLMODEL>.hpp` will be automatically generated, which will define
-// * a class called `Cell<CELLMODEL>FromCellML`. So to use a particular cell model in a tissue simulation,
-// * given the cellml, you just have to do two things: include this `.hpp` file, and then use the class.
-// * For example, we will use the !LuoRudy1991 model, so we have to include the following, and
-// * later on use {{{CellLuoRudy1991FromCellML}}} as the cell model class.
-// * See ["ChasteGuides/CodeGenerationFromCellML"] for more information on this process.
-// */
 #include "LuoRudy1991.hpp"
 
-
-// * == Defining a cell factory ==
-// *
-// * All mono/bidomain simulations need a ''cell factory'' as input. This is a class
-// * which tells the problem class what type of cardiac cells to create. The cell-factory
-// * class has to inherit from {{{AbstractCardiacCellFactory<DIM>}}}, which means it must
-// * implement the method {{{CreateCardiacCellForTissueNode(Node<DIM>*)}}}, which returns
-// * a pointer to an {{{AbstractCardiacCell}}}. Note, some concrete cell factories have
-// * been defined, such as the {{{PlaneStimulusCellFactory}}} (see later tutorials), which
-// * could be used in the simulation, but for completeness we create our own cell factory in
-// * this test. For complicated problems with, say, heterogeneous cell types or particular stimuli,
-// * a new cell factory will have to be defined by the user for their particular problem.
-// *
-// * This cell factory is a simple cell factory where every cell is a Luo-Rudy 91 cell,
-// * and only the cell at position (0) is given a non-zero stimulus.
-// */
 class PointStimulus2dCellFactory : public AbstractCardiacCellFactory<2>
 {
-///* Declare (smart) pointer to a {{{SimpleStimulus}}} for the cell which is stimulated.
-// * Note that {{{AbstractCardiacCellFactory}}} also has as protected members: {{{mpZeroStimulus}}}
-// * of type {{{boost::shared_ptr<ZeroStimulus>}}}; {{{mpMesh}}}, a pointer to the mesh used (the problem
-// * class will set this before it calls {{{CreateCardiacCellForTissueNode}}}, so it can be used
-// * in that method); {{{mTimestep}}}, a double (see below); and {{{boost::shared_ptr<mpSolver>}}}
-// * a forward euler ode solver (see below). */
 private:
     boost::shared_ptr<SimpleStimulus> mpStimulus;
 
 public:
-    // Our contructor takes in nothing. It calls the constructor of {{{AbstractCardiacCellFactory}}}
-    // and we also initialise the stimulus to have magnitude -500000 uA/cm^3 and duration 0.5 ms.
     PointStimulus2dCellFactory()
         : AbstractCardiacCellFactory<2>(),
           mpStimulus(new SimpleStimulus(-5e5, 0.5))
     {
     }
 
-//     * Now we implement the pure method which needs to be implemented. We return
-//     * a LR91 cell for each node, with the nodes in a 0.2mm block given the non-zero stimulus,
-//     * and all other nodes given the zero stimulus. Note that we use {{{mpMesh}}},
-//     * {{{mTimestep}}}, {{{mpZeroStimulus}}} and {{{mpSolver}}} which are all
-//     * members of the base class. The timestep and solver are defined in the base
-//     * class just so that the user doesn't have to create them here.
     AbstractCardiacCell* CreateCardiacCellForTissueNode(Node<2>* pNode)
     {
         double x = pNode->rGetLocation()[0];
         double y = pNode->rGetLocation()[1];
         if (x<0.02+1e-6 && y<0.02+1e-6)
         {
-//            * Create a LR91 cell with the non-zero stimulus. This is a volume stimulus, ie
-//            * the function on the right-hand side of the first of the two bidomain equations.
-//            * An equal and opposite extra-cellular stimulus is implicitly enforced by the code,
-//            * which corresponds to having zero on the right-hand side of the second of the
-//            * bidomain equations.
-//            *
             return new CellLuoRudy1991FromCellML(mpSolver, mpStimulus);
         }
         else
         {
-            // The other cells have zero stimuli.
             return new CellLuoRudy1991FromCellML(mpSolver, mpZeroStimulus);
         }
     }
-    // We have no need for a destructor, since the problem class deals with deleting the cells.
 };
 
-///*
-// * == Running the mono- and bi-domain simulations ==
-// *
-// * Now we can define the test class, which must inherit from {{{CxxTest::TestSuite}}}
-// * as described in the writing basic tests tutorial. */
 class TestEquivalentMonoAndBidomainTutorial : public CxxTest::TestSuite
 {
-// Tests should be public...
 public:
-    // Define the test. Note the {{{}}} - without this exception messages
-    // might not get printed out.
     void TestCompareMonoAndBidomain()
     {
-        /* The {{{HeartConfig}}} class is used to set various parameters (see the main ChasteGuides page
+        /* The `HeartConfig` class is used to set various parameters (see the main ChasteGuides page
          * for information on default parameter values.
          *
-         * See UserTutorials/RunningBidomainSimulations for more details.
+         * See the [Running Bidomain Simulations](/docs/user-tutorials/runningbidomainsimulations/) tutorial for more details.
          */
         HeartConfig::Instance()->SetSimulationDuration(5.0); //ms
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_800_elements");
@@ -180,7 +119,7 @@ public:
         PointStimulus2dCellFactory cell_factory;
 
         /*
-         * == Setting Bidomain Conductivities ==
+         * ### Setting Bidomain Conductivities
          */
         c_vector<double,2> intracellular_conductivities = Create_c_vector(1.75, 0.19);
         c_vector<double,2> extracellular_conductivities = Create_c_vector(7, 0.76);
@@ -217,10 +156,10 @@ public:
             /*
              * NB: the easiest way to look at the resultant voltage values from the code
              * (for the last timestep - the data for the previous timesteps is written to file
-             * but not retained) is to use a {{{ReplicatableVector}}}.
-             * {{{bidomain_problem.GetSolution())}}} returns a !PetSc vector
+             * but not retained) is to use a `ReplicatableVector`.
+             * `bidomain_problem.GetSolution())` returns a PETSc vector
              * of the form (V_0, phi_0, V_1, phi_e_1, ... V_n, phi_e_n), and we can create a
-             * {{{ReplicatableVector}}} for easy access to this !PetSc vector's data.
+             * `ReplicatableVector` for easy access to this PETSc vector's data.
              * (This won't be very efficient with huge problems in parallel - the next tutorial
              * will mention how to do parallel access).
              */
@@ -235,7 +174,7 @@ public:
              */
 
             /*
-             * == Reduction to Monodomain  ==
+             * ### Reduction to Monodomain
              *
              * We now work out the equivalent conductivity to use in the monodomain. Note that
              * we set this with the `SetIntracellularConductivities()` method. Which is perhaps

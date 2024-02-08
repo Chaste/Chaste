@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -43,12 +43,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractOdeSrnModel.hpp"
 
 /**
- * A subclass of AbstractOdeSrnModel that includes a Delta-Notch ODE system in the sub-cellular reaction network.
- * This SRN model represents a membrane/cortex of a single junction of a cell. This class of models can be used together
- * with DeltaNotchInteriorSrn models. The ODE model used here is an attempt to use previous work (see DeltaNotchSrnModel class)
- * for more detailed description of Delta-Notch interactions involving edge quantities (this or neighbour edge information) and
- * potentially coupling with cytoplasmic concentrations (DeltaNotchInteriorSrn class).
- * \todo #2987 document this class more thoroughly here
+ * A subclass of AbstractOdeSrnModel that includes a Delta-Notch ODE system in 
+ * the sub-cellular reaction network. This SRN model represents a membrane/
+ * cortex of a single junction of a cell. This class of models can be used 
+ * together with DeltaNotchInteriorSrn models. The ODE model used here is an 
+ * attempt to use previous work (see DeltaNotchSrnModel class) for more detailed 
+ * description of Delta-Notch interactions involving edge quantities (this or 
+ * neighbour edge information) and potentially coupling with cytoplasmic 
+ * concentrations (DeltaNotchInteriorSrn class).
  */
 class DeltaNotchEdgeSrnModel : public AbstractOdeSrnModel
 {
@@ -71,14 +73,19 @@ private:
 protected:
 
     /**
-     * Protected copy-constructor for use by CreateSrnModel().  The only way for external code to create a copy of a SRN model
-     * is by calling that method, to ensure that a model of the correct subclass is created.
-     * This copy-constructor helps subclasses to ensure that all member variables are correctly copied when this happens.
+     * Protected copy-constructor for use by CreateSrnModel(). The only way for 
+     * external code to create a copy of a SRN model is by calling that method, 
+     * to ensure that a model of the correct subclass is created. 
+     * 
+     * This copy-constructor helps subclasses to ensure that all member 
+     * variables are correctly copied when this happens.
      *
-     * This method is called by child classes to set member variables for a daughter cell upon cell division.
-     * Note that the parent SRN model will have had ResetForDivision() called just before CreateSrnModel() is called,
-     * so performing an exact copy of the parent is suitable behaviour. Any daughter-cell-specific initialisation
-     * can be done in InitialiseDaughterCell().
+     * This method is called by child classes to set member variables for a 
+     * daughter cell upon cell division. Note that the parent SRN model will 
+     * have had ResetForDivision() called just before CreateSrnModel() is 
+     * called, so performing an exact copy of the parent is suitable behaviour. 
+     * Any daughter-cell-specific initialisation can be done in 
+     * InitialiseDaughterCell().
      *
      * @param rModel  the SRN model to copy.
      */
@@ -98,26 +105,26 @@ public:
      *
      * @return a copy of the current SRN model.
      */
-    virtual AbstractSrnModel* CreateSrnModel() override;
+    virtual AbstractSrnModel* CreateSrnModel();
 
     /**
      * Initialise the SRN model at the start of a simulation.
      *
      * This overridden method sets up a new Delta-Notch ODE system.
      */
-    virtual void Initialise() override;
+    virtual void Initialise();
 
     /**
      * This method is called when a new edge is created (e.g. after cell division or T1 swap)
      */
-    virtual void InitialiseDaughterCell() override;
+    virtual void InitialiseDaughterCell();
 
     /**
      * Overridden SimulateToTime() method for custom behaviour.
      * Updates parameters (such as neighbour or interior Delta/Notch) and
      * runs the simulation to current time
      */
-    virtual void SimulateToCurrentTime() override;
+    virtual void SimulateToCurrentTime();
 
     /**
      * Update the levels of Delta and Notch of neighbouring edge sensed by this edge
@@ -127,13 +134,14 @@ public:
     void UpdateDeltaNotch();
 
     /**
-     * @return the current Notch level in this edge
+     * @return the current Notch level in this edge.
      */
     double GetNotch();
 
     /**
-     * Set the notch level in this edge
-     * @param value
+     * Set the Notch level in this edge.
+     * 
+     * @param value the new Notch level in this edge
      */
     void SetNotch(double value);
 
@@ -143,8 +151,9 @@ public:
     double GetDelta();
 
     /**
-     * Set the delta level in this edge
-     * @param value
+     * Set the Delta level in this edge.
+     * 
+     * @param value the new Delta level in this edge
      */
     void SetDelta(double value);
 
@@ -156,6 +165,7 @@ public:
     /**
      * The value of interior Delta is stored as parameters in this model, which is
      * retrieved by this method
+     * 
      * @return the level of Delta in cell interior
      */
     double GetInteriorDelta() const;
@@ -163,6 +173,7 @@ public:
     /**
      * The value of interior Notch is stored as parameters in this model, which is
      * retrieved by this method
+     * 
      * @return the level of Notch in cell interior
      */
     double GetInteriorNotch() const;
@@ -172,40 +183,43 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputSrnModelParameters(out_stream& rParamsFile) override;
+    virtual void OutputSrnModelParameters(out_stream& rParamsFile);
 
     /**
-     * Adds Delta/Notch from the input srn model to this model.
+     * Adds Delta/Notch from the input SRN model to this model.
      * Override the method declared in AbstractSrnModel class
-     * @param p_other_srn
-     * @param scale
+     * 
+     * @param pOtherSrn Pointer to an SRN
+     * @param scale scale factor
      */
-    virtual void AddSrnQuantities(AbstractSrnModel *p_other_srn,
-                                  const double scale = 1.0) override;
+    virtual void AddSrnQuantities(AbstractSrnModel* pOtherSrn,
+                                  const double scale = 1.0);
 
     /**
      * Here we assume that when a neighbouring junctions shrinks, 25% of its Delta/Notch
      * concentration is added to this edge
      * Override the method declared in AbstractSrnModel class
-     * @param p_shrunk_edge_srn
+     * 
+     * @param pShrunkEdgeSrn Pointer to an SRN
      */
-    virtual void AddShrunkEdgeSrn(AbstractSrnModel *p_shrunk_edge_srn) override;
-
-    // adding comment for testing only, to be removed.
+    virtual void AddShrunkEdgeSrn(AbstractSrnModel* pShrunkEdgeSrn);
 
     /**
      * Here we add Delta/Notch when junctions merge via common vertex deletion
      * Override the method declared in AbstractSrnModel class
-     * @param p_merged_edge_srn
+     * 
+     * @param pMergedEdgeSrn Pointer to an SRN
      */
-    virtual void AddMergedEdgeSrn(AbstractSrnModel* p_merged_edge_srn) override;
+    virtual void AddMergedEdgeSrn(AbstractSrnModel* pMergedEdgeSrn);
 
     /**
-     * By default, Edge concentrations are split according to relative lengths, when an edge is split.
+     * By default, Edge concentrations are split according to the lengths of two new edges , when an edge is split, 
+     * relative to the original edge they are created from.
      * Override the method declared in AbstractSrnModel class
-     * @param relative_position
+     * 
+     * @param relativePosition position of the node splitting the two new edges relative to the original edge, used when splitting Edge concentrations
      */
-    virtual void SplitEdgeSrn(const double relative_position) override;
+    virtual void SplitEdgeSrn(const double relativePosition);
 };
 
 typedef boost::shared_ptr<DeltaNotchEdgeSrnModel> DeltaNotchEdgeSrnModelPtr;

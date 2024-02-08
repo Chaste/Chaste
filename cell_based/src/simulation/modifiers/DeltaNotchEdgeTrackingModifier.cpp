@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -99,18 +99,18 @@ void DeltaNotchEdgeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<
         cell_iter->GetCellData()->SetItem("interior notch", 0);
     }
 
-    //After the edge data is filled, fill the edge neighbour data
+    // After the edge data is filled, fill the edge neighbour data
     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
-            cell_iter != rCellPopulation.End();
-            ++cell_iter)
+         cell_iter != rCellPopulation.End();
+         ++cell_iter)
     {
         auto p_cell_edge_model = static_cast<CellSrnModel*>(cell_iter->GetSrnModel());
-        const unsigned int n_cell_edges = p_cell_edge_model->GetNumEdgeSrn();
-        std::vector<double> neigh_mean_delta(n_cell_edges);
+        const unsigned num_cell_edges = p_cell_edge_model->GetNumEdgeSrn();
+        std::vector<double> neigh_mean_delta(num_cell_edges);
 
-        for (unsigned int i=0; i<n_cell_edges; ++i)
+        for (unsigned i=0; i<num_cell_edges; ++i)
         {
-            //Get neighbouring cell's values of delta on this
+            // Get neighbouring cell's values of delta on this
             auto elemNeighbours = rCellPopulation.GetNeighbouringEdgeIndices(*cell_iter, i);
             double mean_delta = 0;
             for (auto neighbourIndex: elemNeighbours)
@@ -119,8 +119,10 @@ void DeltaNotchEdgeTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<
                 std::vector<double> neighbour_delta_vec = neighbourCell->GetCellEdgeData()->GetItem("edge delta");
                 mean_delta += neighbour_delta_vec[neighbourIndex.second];
             }
-            if (elemNeighbours.size()>0)
+            if (elemNeighbours.size() > 0)
+            {
                 mean_delta = mean_delta/elemNeighbours.size();
+            }
             neigh_mean_delta[i] = mean_delta;
         }
         cell_iter->GetCellEdgeData()->SetItem("neighbour delta", neigh_mean_delta);

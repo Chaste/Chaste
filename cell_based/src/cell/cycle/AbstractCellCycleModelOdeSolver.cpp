@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -87,7 +87,7 @@ void AbstractCellCycleModelOdeSolver::CheckForStoppingEvents()
 #endif //CHASTE_CVODE
 }
 
-void AbstractCellCycleModelOdeSolver::SetMaxSteps(long int numSteps)
+void AbstractCellCycleModelOdeSolver::SetMaxSteps(long numSteps)
 {
 #ifdef CHASTE_CVODE
     assert(IsSetUp());

@@ -4,7 +4,7 @@
 
 	// To start from a bare environment with no pre-built Chaste libraries, uncomment the following line:
 	// "image": "chaste/base",
-	// If you prefer to start with a contianer with the latest Chaste release pre-built, use the following line:
+	// If you prefer to start with a container with the latest Chaste release pre-built, use the following line:
 	// "image": "chaste/release",
 	// Otherwise, to start from an image with pre-built Chaste libraries from the develop branch, use the following line:
 	"image": "chaste/develop",
@@ -15,13 +15,17 @@
 		{
 			"source": "chaste_data",
 			"target": "/home/chaste",
+			// "target": "${containerEnv:CHASTE_DIR}",
 			"type": "volume"
 		},
 		{
-			// Warning: This assumes that a directory called `testoutput' exists at the same level as the Chaste folder
-			// "source": "${localWorkspaceFolder}/../testoutput",
+			// Warning: This mounts the source folder on the host into the target path in the container.
+			// It therefore needs the source directory to already exist on the host.
+			// "test_summary" is a known (but disused folder) in the repo but this choice should be revised.
+			// "source": "${localWorkspaceFolder}/../test_summary",
 			"source": "${localWorkspaceFolder}/test_summary",
-			"target": "/home/testoutput",
+			"target": "/home/chaste/testoutput",
+			// "target": "${containerEnv:CHASTE_TEST_OUTPUT}",
 			"type": "bind"
 		}
 	],
@@ -37,12 +41,14 @@
 	// Supports the same values as the Docker CLI --mount flag. Environment and pre-defined variables may be referenced in the value. 
 	// For example: "workspaceMount": "source=${localWorkspaceFolder}/sub-folder,target=/workspace,type=bind,consistency=cached", "workspaceFolder": "/workspace"
 	"workspaceMount": "source=${localWorkspaceFolder},target=/home/chaste/src,type=bind,consistency=cached",
+	// "workspaceMount": "source=${localWorkspaceFolder},target=${containerEnv:CHASTE_SOURCE_DIR},type=bind,consistency=cached",
 	// "workspaceMount": "source=${localWorkspaceFolder},target=/home/chaste/src,type=volume",
 
 	// Requires workspaceMount be set. Sets the default path that devcontainer.json supporting services / tools should open when connecting to the container. 
 	// Defaults to the automatic source code mount location.
 	// "workspaceFolder": "/home/chaste/src",
 	"workspaceFolder": "/home/chaste",
+	// "workspaceFolder": "${containerEnv:CHASTE_DIR}",
 
 	// This allows ptrace based debuggers like C++ to work in the container
 	"runArgs": [
@@ -53,7 +59,10 @@
 
 	// If you want to reference an existing container variable while setting this one (like updating the PATH), use remoteEnv instead.
 	"containerEnv": {
-		// "MY_VARIABLE": "${localEnv:MY_VARIABLE}"
+		// "MY_VARIABLE": "${localEnv:MY_VARIABLE:default_value}"
+		// "CMAKE_BUILD_TYPE": "${remoteEnv:CMAKE_BUILD_TYPE:Debug}",
+		// "Chaste_ERROR_ON_WARNING": "${remoteEnv:Chaste_ERROR_ON_WARNING:ON}",
+		// "Chaste_UPDATE_PROVENANCE": "${remoteEnv:Chaste_UPDATE_PROVENANCE:OFF}"
 		"CMAKE_BUILD_TYPE": "Debug",
 		"Chaste_ERROR_ON_WARNING": "ON",
 		"Chaste_UPDATE_PROVENANCE": "OFF"

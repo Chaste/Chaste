@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -167,7 +167,7 @@ public:
      *
      * @param numSteps the new maximum number of steps
      */
-    void SetMaxSteps(long int numSteps);
+    void SetMaxSteps(long numSteps);
 
     /**
      * If using CVODE, set relative and absolute tolerances; both scalars.

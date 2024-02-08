@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -495,30 +495,33 @@ VertexMesh<3, 3>::VertexMesh(TetrahedralMesh<3, 3>& rMesh)
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
  */
 
-template <unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexMesh<ELEMENT_DIM, SPACE_DIM>::GenerateEdgesFromElements(
-    std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*>& elements)
+    std::vector<VertexElement<ELEMENT_DIM, SPACE_DIM>*>& rElements)
 {
     // Build a list of unique edges from nodes within all the elements
-    for (auto elem : elements)
+    for (auto elem : rElements)
     {
         elem->SetEdgeHelper(&mEdgeHelper);
         elem->BuildEdges();
     }
 }
 
-template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNumEdges() const {
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetNumEdges() const
+{
     return mEdgeHelper.GetNumEdges();
 }
 
-template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-Edge<SPACE_DIM> * VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEdge(unsigned index) const {
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+Edge<SPACE_DIM>* VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEdge(unsigned index) const
+{
     return mEdgeHelper.GetEdge(index);
 }
 
-template<unsigned int ELEMENT_DIM, unsigned int SPACE_DIM>
-const EdgeHelper<SPACE_DIM>& VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEdgeHelper() const{
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+const EdgeHelper<SPACE_DIM>& VertexMesh<ELEMENT_DIM, SPACE_DIM>::rGetEdgeHelper() const
+{
     return mEdgeHelper;
 }
 

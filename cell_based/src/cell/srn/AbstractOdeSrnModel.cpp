@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -134,7 +134,7 @@ void AbstractOdeSrnModel::OutputSrnModelParameters(out_stream& rParamsFile)
 void AbstractOdeSrnModel::ScaleSrnVariables(const double theta)
 {
     assert(mpOdeSystem != nullptr);
-    for (unsigned int i=0; i<mpOdeSystem->GetNumberOfStateVariables(); ++i)
+    for (unsigned i=0; i<mpOdeSystem->GetNumberOfStateVariables(); ++i)
     {
         const double old_value = mpOdeSystem->GetStateVariable(i);
         const double new_value = theta*old_value;

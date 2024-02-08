@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -65,7 +65,7 @@ struct T2SwapInfo
     }
 
     /** The ID of the cell associated with the element undergoing a T2 swap */
-    unsigned int mCellId;
+    unsigned mCellId;
 
     /** The centroid the element undergoing a T2 swap */
     c_vector<double, SPACE_DIM> mLocation;

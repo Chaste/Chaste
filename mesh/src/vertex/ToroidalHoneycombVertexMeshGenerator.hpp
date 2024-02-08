@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -39,6 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 #include <vector>
 
+#include <boost/shared_ptr.hpp>
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "Toroidal2dVertexMesh.hpp"
 
@@ -68,12 +69,12 @@ public:
     /**
      * @return a 2D honeycomb mesh
      */
-    MutableVertexMesh<2,2>* GetMesh();
+    boost::shared_ptr<MutableVertexMesh<2,2> > GetMesh();
 
     /**
      * @return a 2D honeycomb mesh with periodic left/right and top/bottom boundaries
      */
-    Toroidal2dVertexMesh* GetToroidalMesh();
+    boost::shared_ptr<Toroidal2dVertexMesh> GetToroidalMesh();
 };
 
 #endif /*TOROIDALHONEYCOMBVERTEXMESHGENERATOR_HPP_*/

@@ -147,6 +147,7 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
             set_source_files_properties("${_test_real_output_filename}" PROPERTIES GENERATED true)
 
             add_executable(${exeTargetName} "${_test_real_output_filename}" ${_filename} ${ARGN})
+            target_link_libraries(${exeTargetName} PRIVATE Chaste_COMMON_DEPS)
         endif()
 
         set(test_exe $<TARGET_FILE:${exeTargetName}>)
@@ -318,6 +319,7 @@ macro(Chaste_DO_COMMON component)
     # Make component library, if component contains any source files
     if (NOT Chaste_${component}_SOURCES STREQUAL "")
         add_library(chaste_${component} ${Chaste_${component}_SOURCES} ${ARGN})
+        target_link_libraries(chaste_${component} PRIVATE Chaste_COMMON_DEPS)
         if (BUILD_SHARED_LIBS)
             target_link_libraries(chaste_${component} LINK_PUBLIC ${Chaste_LIBRARIES})
             set(static_extension "a")
@@ -429,6 +431,7 @@ macro(Chaste_DO_APPS_COMMON component)
             set(component_library )
         endif()
         add_executable(${appName} ${app})
+        target_link_libraries(${appName} PRIVATE Chaste_COMMON_DEPS)
         #set_target_properties(${appName} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src)
 
         if (NOT ${component} STREQUAL "")
@@ -528,6 +531,7 @@ macro(Chaste_DO_TEST_COMMON component)
     file(GLOB_RECURSE test_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
     if(test_sources)
         add_library(test${component} STATIC ${test_sources})
+        target_link_libraries(test${component} PRIVATE Chaste_COMMON_DEPS)
         set(COMPONENT_LIBRARIES ${COMPONENT_LIBRARIES} test${component})
     endif()
 
@@ -613,7 +617,7 @@ macro(Chaste_DO_TEST_COMMON component)
                         else()
                             set(revision_string "")
                         endif()
-                        set(out_filename  ${CMAKE_BINARY_DIR}/tutorials/UserTutorials/${CMAKE_MATCH_1})
+                        set(out_filename  ${CMAKE_BINARY_DIR}/tutorials/UserTutorials/${CMAKE_MATCH_1}.md)
                         add_custom_command(OUTPUT ${out_filename}
                             COMMAND ${PYTHON_EXECUTABLE} ARGS ${Chaste_BINARY_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename} ${revision_string}
                             DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${filename}
@@ -624,7 +628,7 @@ macro(Chaste_DO_TEST_COMMON component)
 
                     # filename is a paper tutorial
                     if(filename MATCHES "Test(.*)LiteratePaper.(hpp|py)") 
-                        set(out_filename  ${CMAKE_BINARY_DIR}/tutorials/PaperTutorials/${CMAKE_MATCH_1})
+                        set(out_filename  ${CMAKE_BINARY_DIR}/tutorials/PaperTutorials/${CMAKE_MATCH_1}.md)
                         add_custom_command(OUTPUT ${out_filename}
                             COMMAND ${PYTHON_EXECUTABLE} ARGS ${Chaste_BINARY_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename} 
                             DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${filename}

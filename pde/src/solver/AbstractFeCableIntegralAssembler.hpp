@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -75,8 +75,8 @@ protected:
      *     results are undefined if this is not within the canonical element.
      * @param rInverseJacobian The inverse of the Jacobian matrix mapping the real
      *     element into the canonical element.
-     * @param rReturnValue A reference to a vector, to be filled in
-     * @return The derivatives of the basis functions, in local index order. Each
+     * @param rReturnValue A reference to a vector, to be filled in (returned)
+     * Returns (via rReturnValue) the derivatives of the basis functions, in local index order. Each
      *     entry is a vector (c_vector<double, SPACE_DIM> instance) giving the
      *     derivative along each axis.
      */

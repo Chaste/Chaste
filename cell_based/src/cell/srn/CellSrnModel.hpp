@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,10 +48,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 typedef boost::shared_ptr<AbstractSrnModel> AbstractSrnModelPtr;
 
 /**
- * SRN model at the cell level, has representation for edges internally.
- * Also contains cell interior (cytoplasmic) SRN.
- * Mostly serves to coordinate between interior/edge SRNs, in case these are specified. Functionality of SRNs is defined in AbstractSrnModel class
- * and user-defined SRN models.
+ * SRN model at the cell level, has representation for edges internally. Also 
+ * contains cell interior (cytoplasmic) SRN. Mostly serves to coordinate between 
+ * interior/edge SRNs, in case these are specified. Functionality of SRNs is 
+ * defined in AbstractSrnModel class and user-defined SRN models.
  */
 class CellSrnModel : public AbstractSrnModel
 {
@@ -71,13 +71,21 @@ private:
     {
         archive & boost::serialization::base_object<AbstractSrnModel>(*this);
         archive & mEdgeSrnModels;
-        archive & mInteriorSrnModel;
+        archive & mpInteriorSrnModel;
     }
 
+    /** Vector of pointers to edge SRN models. */
     std::vector<boost::shared_ptr<AbstractSrnModel>> mEdgeSrnModels;
+
+    /**
+     * @typedef abstractsrnmodel_t
+     * Type alias for a vector storing pointers to AbstractSrnModel.
+     */
     using abstractsrnmodel_t = std::vector<AbstractSrnModelPtr>;
 
-    boost::shared_ptr<AbstractSrnModel> mInteriorSrnModel;
+    /** Pointer to interior SRN model. */
+    boost::shared_ptr<AbstractSrnModel> mpInteriorSrnModel;
+
 protected:
 
     /**
@@ -88,14 +96,52 @@ protected:
 
 public:
 
-    /* Makes the class iterable which returns the individual edge SRN models */
+    /**
+     * @typedef iterator
+     * Type alias for non-constant iterator in the SRN model.
+     */
     using iterator = abstractsrnmodel_t::iterator;
+
+    /**
+     * @typedef const_iterator
+     * Type alias for constant iterator in the SRN model.
+     */
     using const_iterator = abstractsrnmodel_t::const_iterator;
+
+    /**
+     * Returns an iterator pointing to the first element.
+     * @return Iterator to the beginning.
+     */
     iterator begin() { return mEdgeSrnModels.begin(); }
+
+    /**
+     * Returns an iterator pointing one past the last element.
+     * @return Iterator to the end.
+     */
     iterator end() { return mEdgeSrnModels.end(); }
+
+    /**
+     * Returns a constant iterator pointing to the first element.
+     * @return Constant iterator to the beginning.
+     */
     const_iterator begin() const { return mEdgeSrnModels.begin(); }
+
+    /**
+     * Returns a constant iterator pointing one past the last element.
+     * @return Constant iterator to the end.
+     */
     const_iterator end() const { return mEdgeSrnModels.end(); }
+
+    /**
+     * Returns a constant iterator pointing to the first element.
+     * @return Constant iterator to the beginning.
+     */
     const_iterator cbegin() const { return mEdgeSrnModels.cbegin(); }
+
+    /**
+     * Returns a constant iterator pointing one past the last element.
+     * @return Constant iterator to the end.
+     */
     const_iterator cend() const { return mEdgeSrnModels.cend(); }
 
     /**
@@ -109,75 +155,84 @@ public:
     ~CellSrnModel();
 
     /**
-     * Initialize constituent SRN models
+     * Initialize constituent SRN models.
      */
-    virtual void Initialise() override;
+    virtual void Initialise();
 
     /**
-     * Calls SRN model specific behaviour at the time of cell division
+     * Calls SRN model specific behaviour at the time of cell division.
      * All constituent SRNs models (edge and/or interior, if there are any) call their
-     * implementation of this method
+     * implementation of this method.
      */
-    virtual void ResetForDivision() override;
+    virtual void ResetForDivision();
 
     /**
-     * Simulate SRN models
+     * Simulate SRN models.
      */
-    virtual void SimulateToCurrentTime() override;
+    virtual void SimulateToCurrentTime();
 
     /**
      * Called in Cell::Divide()
      * @return
      */
-    virtual AbstractSrnModel* CreateSrnModel() override;
+    virtual AbstractSrnModel* CreateSrnModel();
 
     /**
      * Adds a vector of SRN models to this cell.
-     * @param edgeSrn vector of SRN models. Index of each SRN corresponds to the local edge index
+     * 
+     * @param edgeSrns vector of SRN models. Index of each SRN corresponds to the local edge index
      */
-    void AddEdgeSrn(std::vector<AbstractSrnModelPtr> edgeSrn);
+    void AddEdgeSrn(std::vector<AbstractSrnModelPtr> edgeSrns);
 
     /**
      * Inserts edge SRN at the end of the list.
-     * @param edgeSrn to be inserted
+     * 
+     * @param pEdgeSrn the edge SRN to be inserted
      */
-    void AddEdgeSrnModel(AbstractSrnModelPtr edgeSrn);
+    void AddEdgeSrnModel(AbstractSrnModelPtr pEdgeSrn);
 
     /**
-     * Get number of edge SRNs
+     * Get number of edge SRNs.
+     *
+     * @return the number of edge SRNs
      */
     unsigned GetNumEdgeSrn() const;
 
     /**
-     * Get edge srn at an index
+     * Get edge SRN at an index.
+     * 
      * @param index of the SRN to return
      * @return SRN to be returned
      */
     AbstractSrnModelPtr GetEdgeSrn(unsigned index) const;
 
     /**
-     * Return all Edge SRNs
+     * Return all edge SRNs.
+     * 
      * @return vector of SRNs associated to this cell
      */
     const std::vector<AbstractSrnModelPtr>& GetEdges() const;
 
     /**
-     * Set interior SRN
-     * @param interiorSrn cytoplasmic SRN
+     * Set interior SRN.
+     * 
+     * @param pInteriorSrn poiner to an interior SRN model
      */
-    void SetInteriorSrnModel(AbstractSrnModelPtr interiorSrn);
+    void SetInteriorSrnModel(AbstractSrnModelPtr pInteriorSrn);
 
     /**
-     * Returns cytoplasmic SRN
+     * Returns interior SRN.
+     * 
      * @return interior SRN
      */
     AbstractSrnModelPtr GetInteriorSrn() const;
 
     /**
-     * Overriden method. We Set Cell for each SRN contained in this cell
-     * @param pCell
+     * Overriden method. We Set mpCell for each SRN contained in this cell.
+     * 
+     * @param pCell pointer to a Cell
      */
-    virtual void SetCell(CellPtr pCell) override;
+    virtual void SetCell(CellPtr pCell);
 };
 
 // Declare identifier for the serializer

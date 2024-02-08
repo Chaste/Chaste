@@ -30,6 +30,8 @@ jobs:
             extra-build-args: ""
           - image: chaste/runner:jammy.portability-05
             extra-build-args: ""
+          - image: chaste/runner:jammy.portability-06
+            extra-build-args: ""
           - image: chaste/runner:jammy.portability-03
             extra-build-args: "-DChaste_USE_CVODE=OFF -DChaste_USE_VTK=OFF"
 

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,9 +46,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTRUNNIGCONTACTINHIBITIONSIMULATIONSTUTORIAL_HPP_
 
 /*
- * = An example showing how to use a contact inhibition cell cycle model and volume tracking simulation modifier =
+ * ## An example showing how to use a contact inhibition cell cycle model and volume tracking simulation modifier
  *
- * == Introduction ==
+ * ### Introduction
  *
  * In this tutorial, we will show how to use a simple implementation of the contact inhibition cell-cycle model,
  * which prevents a cell from undergoing division when its volume is smaller than a critical value.
@@ -60,22 +60,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * We then go on to consider the behaviour of a vertex-based population in a box that experiences contact inhibition.
  *
- * == Including header files ==
+ * ### Including header files
  *
  * We begin by including the necessary header files. */
 #include <cxxtest/TestSuite.h>
-/* This header needs to be included here to ensure archiving of {{{CelwiseData}}} works on all Boost versions. */
+/* This header needs to be included here to ensure archiving of `CelwiseData` works on all Boost versions. */
 #include "CheckpointArchiveTypes.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 
-/* The next header includes the Boost {{{shared_ptr}}} smart pointer, and defines some useful
+/* The next header includes the Boost `shared_ptr` smart pointer, and defines some useful
  * macros to save typing when using it. */
 #include "SmartPointers.hpp"
-/* The next header include the {{{NEVER_REACHED}}} macro, which is used in one of the methods below. */
+/* The next header include the `NEVER_REACHED` macro, which is used in one of the methods below. */
 #include "Exception.hpp"
 
 /*
- * The next header file defines the contact inhibition cell-cycle model that inherits from {{{AbstractCellCycleModel}}}.
+ * The next header file defines the contact inhibition cell-cycle model that inherits from `AbstractCellCycleModel`.
  * The duration of the G1 phase depends on the deviation from a 'target' volume (or area/length in 2D/1D): if a cell's volume is
  * lower than a given fraction of its target volume, the G1 phase continues.
  * This model of cell-cycle progression allows for quiescence imposed by transient periods of high stress, followed by relaxation. Note that
@@ -83,15 +83,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * is compressed during G2 or S phases then it will still divide, and thus cells whose volumes are smaller
  * than the given threshold may still divide.
  *
- * The target volume and the critical fraction are specified using the methods {{{SetEquilibriumVolume()}}} and {{{SetQuiescentVolumeFraction()}}} respectively.
- * Within the {{{ContactInhibitionCellCycleModel}}}'s {{{UpdateCellCyclePhase()}}} method these parameters are compared to the actual cell volumes, which are stored
- * using the cell property {{{CellData}}}.
+ * The target volume and the critical fraction are specified using the methods `SetEquilibriumVolume()` and `SetQuiescentVolumeFraction()` respectively.
+ * Within the `ContactInhibitionCellCycleModel`'s `UpdateCellCyclePhase()` method these parameters are compared to the actual cell volumes, which are stored
+ * using the cell property `CellData`.
  */
 #include "ContactInhibitionCellCycleModel.hpp"
 
 /*
  * The next header defines the simulation class modifier corresponding to the contact inhibition cell-cycle model.
- * This modifier updates the {{{CellData}}} cell property at each timestep with the volume of each cell.
+ * This modifier updates the `CellData` cell property at each timestep with the volume of each cell.
  */
 #include "VolumeTrackingModifier.hpp"
 
@@ -116,12 +116,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PlaneBoundaryCondition.hpp"
 #include "FakePetscSetup.hpp"
 
-/* We first define the global test class that inherits from {{{AbstractCellBasedTestSuite}}}. */
+/* We first define the global test class that inherits from `AbstractCellBasedTestSuite`. */
 class TestRunningContactInhibitionSimulationsTutorial : public AbstractCellBasedTestSuite
 {
 public:
     /*
-     * == Testing healthy cell contact inhibition with mesh-based population ==
+     * ### Testing healthy cell contact inhibition with mesh-based population
      *
      * In this first test we show how to simulate the behaviour of cells healthy cells trapped in a box.
      * Each cell will only divide if there is sufficient room.
@@ -131,7 +131,7 @@ public:
         /* We use the honeycomb mesh generator to create a honeycomb mesh and
          * the associated mutable mesh. */
         HoneycombMeshGenerator generator(3, 3);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         /* We now create a vector of cell pointers. */
         std::vector<CellPtr> cells;
@@ -172,20 +172,20 @@ public:
         simulator.SetSamplingTimestepMultiple(12);
         simulator.SetEndTime(20.0);
 
-        /* Then, we define the modifier class, which automatically updates the volumes of the cells in {{{CellData}}} and passes it to the simulation.*/
+        /* Then, we define the modifier class, which automatically updates the volumes of the cells in `CellData` and passes it to the simulation.*/
         MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
         /* Next, we create a force law (springs) to be applied between cell centres and set up a
-         * cut-off length beyond which cells stop interacting. We then pass this to the {{{VolumeTrackedOffLatticeSimulation}}}. */
+         * cut-off length beyond which cells stop interacting. We then pass this to the `VolumeTrackedOffLatticeSimulation`. */
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 
         /*
          * To study the behaviour of the cells with varying volume, we trap them in the square domain [0,2.5]x[0,2.5].
-         * This is implemented using four {{{PlaneBoundaryCondition}}} objects.
-         * These planes are indicated by a point and a normal and then passed to the {{{VolumeTrackedOffLatticeSimulation}}}.
+         * This is implemented using four `PlaneBoundaryCondition` objects.
+         * These planes are indicated by a point and a normal and then passed to the `VolumeTrackedOffLatticeSimulation`.
          * The domain is chosen to be quite small so as to make the test run in a short amount of time.
          */
 
@@ -213,22 +213,18 @@ public:
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc4, (&cell_population, point, normal));
         simulator.AddCellPopulationBoundaryCondition(p_bc4);
 
-        /* To run the simulation, we call {{{Solve()}}}. */
+        /* To run the simulation, we call `Solve()`. */
         simulator.Solve();
     }
     /*
-     * EMPTYLINE
-     *
-     * To visualize the results, open a new terminal, {{{cd}}} to the Chaste directory,
-     * then {{{cd}}} to {{{anim}}}. Then do: {{{java Visualize2dCentreCells /tmp/$USER/testoutput/TestContactInhibitionInBox/results_from_time_0}}}.
-     * We may have to do: {{{javac Visualize2dCentreCells.java}}} beforehand to create the
+     * To visualize the results, open a new terminal, `cd` to the Chaste directory,
+     * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/TestContactInhibitionInBox/results_from_time_0`.
+     * We may have to do: `javac Visualize2dCentreCells.java` beforehand to create the
      * java executable.
      *
      * You will notice that once the cells are below a certain size they no longer proliferate and turn dark blue in the visualisation.
      *
-     * EMPTYLINE
-     *
-     * == Testing normal and tumour cells with mesh-based population ==
+     * ### Testing normal and tumour cells with mesh-based population
      *
      * We now test the behaviour of a mixture of healthy and tumour cells in a Box. In this test healthy cells will only
      * divide if there is sufficient room whereas tumour cells will divide regardless.
@@ -237,10 +233,10 @@ public:
     {
         /* Just as before we create a simple mesh. */
         HoneycombMeshGenerator generator(3, 3);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         /* We again create the cells. The difference here is that one of the cells is not contact-inhibited, but rather
-         * is defined by a {{{UniformCellCycleModel}}}. */
+         * is defined by a `UniformCellCycleModel`. */
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(StemCellProliferativeType, p_stem_type);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
@@ -285,12 +281,12 @@ public:
         simulator.SetSamplingTimestepMultiple(12);
         simulator.SetEndTime(20.0);
 
-        /* Then, we define the modifier class, which automatically updates the volumes of the cells in {{{CellData}}} and passes it to the simulation.*/
+        /* Then, we define the modifier class, which automatically updates the volumes of the cells in `CellData` and passes it to the simulation.*/
         MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
         /* Next, we create a force law (springs) to be applied between cell centres and set up a
-         * cut-off length beyond which cells stop interacting. We then pass this to the {{{VolumeTrackedOffLatticeSimulation}}} */
+         * cut-off length beyond which cells stop interacting. We then pass this to the `VolumeTrackedOffLatticeSimulation` */
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
@@ -319,23 +315,19 @@ public:
         MAKE_PTR_ARGS(PlaneBoundaryCondition<2>, p_bc4, (&cell_population, point, normal));
         simulator.AddCellPopulationBoundaryCondition(p_bc4);
 
-        /* Finally, to run the simulation, we call {{{Solve()}}}. */
+        /* Finally, to run the simulation, we call `Solve()`. */
         simulator.Solve();
     }
     /*
-     * EMPTYLINE
-     *
-     * To visualize the results, open a new terminal, {{{cd}}} to the Chaste directory,
-     * then {{{cd}}} to {{{anim}}}. Then do: {{{java Visualize2dCentreCells /tmp/$USER/testoutput/TestContactInhibitionTumourInBox/results_from_time_0}}}.
-     * We may have to do: {{{javac Visualize2dCentreCells.java}}} beforehand to create the
+     * To visualize the results, open a new terminal, `cd` to the Chaste directory,
+     * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/TestContactInhibitionTumourInBox/results_from_time_0`.
+     * We may have to do: `javac Visualize2dCentreCells.java` beforehand to create the
      * java executable.
      *
      * You will notice that once the healthy cells (yellow) are below a certain size they no longer proliferate and turn dark blue in the visualisation.
      * Whereas Tumour cells (light blue) on the other hand will continue to proliferate. You may want to run the simulation for longer to see this more clearly.
      *
-     * EMPTYLINE
-     *
-     * == Testing contact inhibition in vertex-based monolayer ==
+     * ### Testing contact inhibition in vertex-based monolayer
      *
      * We now test the behaviour of normal contact inhibited cells for a vertex-based population.
      * The example we use is a growing monolayer.
@@ -345,10 +337,10 @@ public:
     {
         /* First we create a simple 2D MutableVertexMesh.*/
         HoneycombVertexMeshGenerator generator(2, 2);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         /*
-         * We then create cells as before, only this time we need one per element. We also create the cell population (a {{{VertexBasedCellPopulation}}}).
+         * We then create cells as before, only this time we need one per element. We also create the cell population (a `VertexBasedCellPopulation`).
          */
         MAKE_PTR(WildTypeCellMutationState, p_state);
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
@@ -376,37 +368,33 @@ public:
         simulator.SetSamplingTimestepMultiple(50);
         simulator.SetEndTime(10.0);
 
-        /* Then, we define the modifier class, which automatically updates the volumes of the cells in {{{CellData}}} and passes it to the simulation.*/
+        /* Then, we define the modifier class, which automatically updates the volumes of the cells in `CellData` and passes it to the simulation.*/
         MAKE_PTR(VolumeTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
-        /* Next, we create a force law, {{{NagaiHondaForce}}}, to be applied to vertices.
-         * We then pass this to the {{{VolumeTrackedOffLatticeSimulation}}}. */
+        /* Next, we create a force law, `NagaiHondaForce`, to be applied to vertices.
+         * We then pass this to the `VolumeTrackedOffLatticeSimulation`. */
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        /* In order to model cell growth between divisions, we add a {{{SimpleTargetAreaModifier}}}
+        /* In order to model cell growth between divisions, we add a `SimpleTargetAreaModifier`
          * to the simulator.
          */
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
-        /* To run the simulation, we call {{{Solve()}}}. */
+        /* To run the simulation, we call `Solve()`. */
         simulator.Solve();
     }
-    /*
-     * EMPTYLINE
-     *
-     * To visualize the results, open a new terminal, {{{cd}}} to the Chaste directory,
-     * then {{{cd}}} to {{{anim}}}. Then do: {{{java Visualize2dVertexCells /tmp/$USER/testoutput/TestVertexContactInhibition/results_from_time_0}}}.
-     * We may have to do: {{{javac Visualize2dVertexCells.java}}} beforehand to create the
-     * java executable.
-     *
-     * You will notice that once the healthy cells (yellow) are below a certain size they no longer proliferate and turn dark blue in the visualisation.
-     * If you run the simulation for a long time these cells occur primarily towards the centre of the monolayer.
-     *
-     * EMPTYLINE
-     */
 };
+/*
+ * To visualize the results, open a new terminal, `cd` to the Chaste directory,
+ * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/TestVertexContactInhibition/results_from_time_0`.
+ * We may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
+ * java executable.
+ *
+ * You will notice that once the healthy cells (yellow) are below a certain size they no longer proliferate and turn dark blue in the visualisation.
+ * If you run the simulation for a long time these cells occur primarily towards the centre of the monolayer.
+ */
 
 #endif /*TESTRUNNIGCONTACTINHIBITIONSIMULATIONSTUTORIAL_HPP_*/

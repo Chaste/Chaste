@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,27 +46,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCREATINGANDUSINGNEWCELLBASEDWRITERSTUTORIAL_HPP_
 
 /*
- * = An example showing how to create a new cell writer and use it in a cell-based simulation =
+ * ## An example showing how to create a new cell writer and use it in a cell-based simulation
  *
- * == Introduction ==
+ * ### Introduction
  *
- * EMPTYLINE
+ * This tutorial assumes you have already read the tutorial [Creating And Using A New Cell Property](/docs/user-tutorials/creatingandusinganewcellproperty/).
  *
- * This tutorial assumes you have already read [wiki:UserTutorials/CreatingAndUsingANewCellProperty].
- *
- * EMPTYLINE
- *
- * In [wiki:UserTutorials/CreatingAndUsingANewCellProperty] we showed how to create a new cell
- * property class, {{{MotileCellProperty}}}, and how this can be used in a cell-based simulation.
+ * In [Creating And Using A New Cell Property](/docs/user-tutorials/creatingandusinganewcellproperty/) we showed how to create a new cell
+ * property class, `MotileCellProperty`, and how this can be used in a cell-based simulation.
  * In this tutorial, we show how to create a new cell writer class, which can be used to output
  * different data from a cell-based simulation. Our example will be a writer class for outputting
- * information about those cells in a simulation that have the {{{MotileCellProperty}}}.
+ * information about those cells in a simulation that have the `MotileCellProperty`.
  *
- * == 1. Including header files ==
+ * ### 1. Including header files
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary header file and
- * archiving headers. For simplicity, we duplicate the code presented in [wiki:UserTutorials/CreatingAndUsingANewCellProperty]
- * that defines the {{{MotileCellProperty}}} class. As before, note that usually this code would be
+ * archiving headers. For simplicity, we duplicate the code presented in [Creating And Using A New Cell Property](/docs/user-tutorials/creatingandusinganewcellproperty/)
+ * that defines the `MotileCellProperty` class. As before, note that usually this code would be
  * separated out into a declaration in a .hpp file and a definition in a .cpp file.
  * We also include some header files defining classes to be used in the cell-based
  * simulation test. We have encountered each of these header files in previous cell-based
@@ -119,16 +115,14 @@ public:
 };
 
 /*
- * EMPTYLINE
- *
- * == Defining a cell writer class ==
+ * ### Defining a cell writer class
  *
  * We next define a class that writes information about each cell in the population, using
  * the public methods of the population class.
  * Note that usually this code would be separated out into a declaration in a .hpp file and
  * definition in a .cpp file.
  *
- * We inherit from the base class, {{{AbstractCellWriter}}}, whose header we must include.
+ * We inherit from the base class, `AbstractCellWriter`, whose header we must include.
  * This abstract class encapsulates how files are written.
  * To specify how this writer should act on each cell, we implement the `VisitCell()` method.
  */
@@ -139,7 +133,7 @@ class CellMotilityWriter : public AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>
 {
 private:
     /*
-     * The {{{serialize()}}} method defines how a cell writer object itself can be written to file.
+     * The `serialize()` method defines how a cell writer object itself can be written to file.
      * In almost all cases it should just call the base class serializer, using the code below.
      * If the new cell writer class has any data members, they should be serialized in this method
      * after calling the base class serializer.
@@ -171,10 +165,10 @@ public:
     }
 
     /*
-     * The implementation of the {{{VisitCell()}}} method defines the data this writer commits to the file.
-     * Data can be streamed into the member variable {{{mpOutputStream}}} using the {{{<<}}} operator.
+     * The implementation of the `VisitCell()` method defines the data this writer commits to the file.
+     * Data can be streamed into the member variable `mpOutputStream` using the `<<` operator.
      * These data are then written to file.
-     * In this example, for each cell {{{pCell}}} in {{{pCellPopulation}}}, we write its
+     * In this example, for each cell `pCell` in `pCellPopulation`, we write its
      * location index, followed by a space, followed by its location coordinates (space separated)
      * followed by a 0 or 1 indicating whether the cell has the motile property.
      * The base class handles writing the timestamp and newline for each simulation timestep, so we
@@ -211,12 +205,10 @@ CHASTE_CLASS_EXPORT(MotileCellProperty)
 EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellMotilityWriter)
 
 /*
- * This completes the code for {{{MotileCellProperty}}} and  {{{CellMotilityWriter}}}.
+ * This completes the code for `MotileCellProperty` and  `CellMotilityWriter`.
  *
- * EMPTYLINE
- *
- * We now define the test class, which inherits from {{{AbstractCellBasedTestSuite}}} and
- * demonstrates how {{{MotileCellProperty}}} and {{{CellMotilityWriter}}} can be used in
+ * We now define the test class, which inherits from `AbstractCellBasedTestSuite` and
+ * demonstrates how `MotileCellProperty` and `CellMotilityWriter` can be used in
  * a cell-based simulation.
  */
 class TestCreatingAndUsingNewCellBasedWritersTutorial : public AbstractCellBasedTestSuite
@@ -226,14 +218,14 @@ public:
     void TestOffLatticeSimulationWithMotileCellPropertyAndWriters()
     {
         /*
-         * We begin by creating a {{{NodeBasedCellPopulation}}}, just as in [wiki:UserTutorials/CreatingAndUsingANewCellProperty].
-         * We add the {{{MotileCellProperty}}} to a random selection of cells.
-         * We also add the {{{CellLabel}}} to these cells so that we can easily visualize the different cell types.
+         * We begin by creating a `NodeBasedCellPopulation`, just as in [Creating And Using A New Cell Property](/docs/user-tutorials/creatingandusinganewcellproperty/).
+         * We add the `MotileCellProperty` to a random selection of cells.
+         * We also add the `CellLabel` to these cells so that we can easily visualize the different cell types.
          */
         EXIT_IF_PARALLEL;
 
         HoneycombMeshGenerator generator(10, 10);
-        MutableMesh<2,2>* p_generating_mesh = generator.GetCircularMesh(5);
+        boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetCircularMesh(5);
 
         NodesOnlyMesh<2> mesh;
         mesh.ConstructNodesWithoutMesh(*p_generating_mesh, 1.5);
@@ -268,18 +260,18 @@ public:
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
         /* In order to write cell motility data using our writer, we must add it to the list of writers
-         * used by the population. This is achieved using the {{{AddCellWriter()}}} method,
+         * used by the population. This is achieved using the `AddCellWriter()` method,
          * which is templated. */
         cell_population.AddCellWriter<CellMotilityWriter>();
 
-        /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
+        /* We then pass in the cell population into an `OffLatticeSimulation`,
          * and set the output directory, output multiple, and end time. */
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestOffLatticeSimulationWithMotileCellPropertyAndWriters");
         simulator.SetSamplingTimestepMultiple(12);
         simulator.SetEndTime(10.0);
 
-        /* Next we create a force law and pass it to the {{{OffLatticeSimulation}}}, and call {{{Solve()}}} to run the simulation. */
+        /* Next we create a force law and pass it to the `OffLatticeSimulation`, and call `Solve()` to run the simulation. */
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
@@ -288,13 +280,13 @@ public:
     }
 };
 /*
- * As in [wiki:UserTutorials/CreatingAndUsingANewCellProperty], when you visualize the results with
+ * As in [Creating And Using A New Cell Property](/docs/user-tutorials/creatingandusinganewcellproperty/), when you visualize the results with
  *
- * {{{java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMotileCellPropertyAndWriters/results_from_time_0}}}
+ * `java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMotileCellPropertyAndWriters/results_from_time_0`
  *
- * you should see a collection of cells with the {{{MotileCellProperty}}} (labelled dark blue) moving towards the origin.
+ * you should see a collection of cells with the `MotileCellProperty` (labelled dark blue) moving towards the origin.
  *
- * Upon running this test, the output file {{{cellmotilityresults.dat}}} should be created in the folder
- * {{{tmp/$USER/testoutput/TestOffLatticeSimulationWithMotileCellPropertyAndWriters/results_from_time_0}}}.
+ * Upon running this test, the output file `cellmotilityresults.dat` should be created in the folder
+ * `tmp/$USER/testoutput/TestOffLatticeSimulationWithMotileCellPropertyAndWriters/results_from_time_0`.
  */
 #endif /*TESTCREATINGANDUSINGNEWCELLBASEDWRITERSTUTORIAL_HPP_*/

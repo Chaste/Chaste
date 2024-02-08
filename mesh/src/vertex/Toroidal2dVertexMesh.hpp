@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -190,7 +190,7 @@ public:
      * Helper method to check if a node is within [0,mWidth]x[0,mHeight]
      * and move back into the domain if needed.
      *
-     * @param pNewNode the node to be checked
+     * @param pNode the node to be checked
      */
     void CheckNodeLocation(Node<2>* pNode);
 

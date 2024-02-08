@@ -1,7 +1,7 @@
 
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,6 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 
 #include <boost/foreach.hpp>
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 #include "TrianglesMeshReader.hpp"
 #include "OutputFileHandler.hpp"
 #include "RandomNumberGenerator.hpp"
@@ -215,7 +217,7 @@ HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsi
     // Nested scope so the reader closes files before we try deleting them below the scope.
     {
         TrianglesMeshReader<2,2> mesh_reader(output_dir + mMeshFilename);
-        mpMesh = new MutableMesh<2,2>;
+        mpMesh = boost::make_shared<MutableMesh<2,2> >();
         mpMesh->ConstructFromMeshReader(mesh_reader);
     }
 
@@ -226,12 +228,7 @@ HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsi
     mpMesh->SetMeshHasChangedSinceLoading();
 }
 
-HoneycombMeshGenerator::~HoneycombMeshGenerator()
-{
-    delete mpMesh;
-}
-
-MutableMesh<2,2>* HoneycombMeshGenerator::GetMesh()
+boost::shared_ptr<MutableMesh<2,2> > HoneycombMeshGenerator::GetMesh()
 {
     return mpMesh;
 }
@@ -250,7 +247,7 @@ std::vector<unsigned> HoneycombMeshGenerator::GetCellLocationIndices()
     return location_indices;
 }
 
-MutableMesh<2,2>* HoneycombMeshGenerator::GetCircularMesh(double radius)
+boost::shared_ptr<MutableMesh<2,2> > HoneycombMeshGenerator::GetCircularMesh(double radius)
 {
     if (!mGhostNodeIndices.empty())
     {

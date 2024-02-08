@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /*
- * = An example showing how to calculate transfer impedance of an airway tree using a simple impedance model =
+ * ## An example showing how to calculate transfer impedance of an airway tree using a simple impedance model
  *
  * In this tutorial we demonstrate the use of !SimpleImpedanceProblem to calculate transfer impedance on an
  * airway tree model. We further demonstrate post-processing of the output using !ImpedancePostProcessor to

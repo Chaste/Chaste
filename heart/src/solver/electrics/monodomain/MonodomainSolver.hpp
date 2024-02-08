@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -65,7 +65,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *  Also allows state variable interpolation (SVI) to be used on elements for which it
  *  will be needed, if the appropriate HeartConfig boolean is set.
- *  See wiki page ChasteGuides/StateVariableInterpolation for more details on this.
+ *  See https://chaste.github.io/docs/user-guides/state-variable-interpolation/ for more details on this.
  *  In this case the equation is
  *  ( (chi*C/dt) M  + K ) V^{n+1} = (chi*C/dt) M V^{n} + M F^{n} + c_surf + c_correction
  *  and another assembler is used to create the c_correction.

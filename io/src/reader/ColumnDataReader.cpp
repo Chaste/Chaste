@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -308,7 +308,7 @@ std::vector<double> ColumnDataReader::GetValues(const std::string& rVariableName
             {
                 ReadValueFromFile(datafile, column, fixedDimension);
             }
-            catch (Exception)
+            catch (const Exception&)
             {
                 break;
             }

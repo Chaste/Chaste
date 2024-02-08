@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -125,7 +125,7 @@ public:
         {
             cardiac_problem.Solve();
         }
-        catch (Exception e)
+        catch (const Exception& e)
         {
             std::cout<<"Warning - this run threw an exception.  Check performance results\n";
             throw(e);
