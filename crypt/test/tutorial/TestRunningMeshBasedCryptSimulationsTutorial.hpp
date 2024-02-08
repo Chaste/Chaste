@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * In this tutorial we show how Chaste can be used to simulate a cylindrical model of an
  * intestinal crypt. Full details of the computational model can be found in the paper by
- * van Leeuwen ''et al.'' (2009) [doi:10.1111/j.1365-2184.2009.00627.x].
+ * van Leeuwen *et al.* (2009) [doi:10.1111/j.1365-2184.2009.00627.x](https://doi.org/10.1111/j.1365-2184.2009.00627.x).
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary header files.
  */
@@ -79,7 +79,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * in mechanical equilibrium with its neighours and periodic boundary conditions are applied
  * at the left- and right-hand sides of the mesh (hence the "cylindrical"). */
 #include "CylindricalHoneycombMeshGenerator.hpp"
-/* The next two header files were encountered in the tutorial [Running Mesh Based Simulations](/docs/user-tutorials/runningmeshbasedsimulations).
+/* The next two header files were encountered in the tutorial [Running Mesh Based Simulations](/docs/user-tutorials/runningmeshbasedsimulations/).
  * The first header defines a `CellPopulation` class that uses a triangular mesh, and allows
  * for the inclusion of 'ghost nodes': these are nodes in the mesh that do not correspond
  * to cells, but help ensure that a sensible Delaunay triangulation is generated
@@ -168,7 +168,7 @@ public:
         CryptSimulation2d simulator(cell_population);
         /*
          * We must set the output directory on the simulator (relative to
-         * "/tmp/<USER_NAME>/testoutput") and the end time (in hours).
+         * "`$CHASTE_TEST_OUTPUT`") and the end time (in hours).
          */
         simulator.SetOutputDirectory("CryptTutorialFixedCellCycle");
         simulator.SetEndTime(1);
@@ -205,11 +205,7 @@ public:
     }
 
     /*
-     * Finally, to visualize the results, we open a new terminal, `cd` to the Chaste directory,
-     * then `cd` to `anim`. Then we do: `java Visualize2dCentreCells /tmp/$USER/testoutput/CryptTutorialFixedCellCycle/results_from_time_0`.
-     * It may be necessary to do: `javac Visualize2dCentreCells.java` beforehand to create the
-     * java executable. Further details on visualization can be found on the Chaste wiki page
-     * For further details on visualization, see ChasteGuides/RunningCellBasedVisualization.
+     * Finally, to visualize the results, see [Visualizing with Paraview](/docs/user-tutorials/visualizingwithparaview/)
      *
      * ### Test 2: a Wnt-dependent crypt simulation
      *
@@ -259,7 +255,7 @@ public:
         simulator.SetEndTime(1);
 
         /* As before, we create a force law and cell killer and pass these objects to the simulator, then call
-         * Solve(). */
+         * `Solve()`. */
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
         MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&cell_population, crypt_height));

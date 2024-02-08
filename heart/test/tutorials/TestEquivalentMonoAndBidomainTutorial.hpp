@@ -52,7 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * In this tutorial we show how Chaste is used to run a standard mono and a standard bidomain simulation.
  * With equivalent parameters so that the bidomain could be reduced to the monodomain case.
  *
- * The bulk of this tutorial is the same as the tutorial [Running Bidomain Simulations](docs/user-tutorials/runningbidomainsimulations), 
+ * The bulk of this tutorial is the same as the tutorial [Running Bidomain Simulations](/docs/user-tutorials/runningbidomainsimulations/), 
  * so for details of the following code block see that page.
  */
 
@@ -98,7 +98,7 @@ public:
         /* The `HeartConfig` class is used to set various parameters (see the main ChasteGuides page
          * for information on default parameter values.
          *
-         * See the [Running Bidomain Simulations](docs/user-tutorials/runningbidomainsimulations) tutorial for more details.
+         * See the [Running Bidomain Simulations](/docs/user-tutorials/runningbidomainsimulations/) tutorial for more details.
          */
         HeartConfig::Instance()->SetSimulationDuration(5.0); //ms
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_800_elements");

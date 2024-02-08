@@ -50,8 +50,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * ### Introduction
  *
  * In this tutorial we show how Chaste can be used to create, run and visualize vertex-based simulations.
- * Full details of the mechanical model proposed by T. Nagai and H. Honda ("A dynamic cell model for
- * the formation of epithelial tissues", Philosophical Magazine Part B 81:699-719).
+ * Full details of the mechanical model proposed by T. Nagai and H. Honda, 2000, "A dynamic cell model for
+ * the formation of epithelial tissues", Philosophical Magazine Part B 81:699-719, doi:[10.1103/PhysRevLett.69.2013](https://doi.org/10.1103/PhysRevLett.69.2013).
  *
  * ### The test
  *
@@ -154,7 +154,7 @@ public:
         * Nagai-Honda mechanics, and pass it to the `OffLatticeSimulation`.
         * For a list of possible forces see subclasses of `AbstractForce`.
         * These can be found in the inheritance diagram, here,
-        * [AbstractForce](https://chaste.github.io/doxygen-latest/classAbstractForce).
+        * [AbstractForce](/doxygen-latest/classAbstractForce).
         * Note that some of these forces are not compatible with vertex-based simulations see the specific class documentation for details,
         * if you try to use an incompatible class then you will receive a warning.
         */
@@ -238,7 +238,7 @@ public:
          * we use a `PlaneBoundaryCondition`, and pass it to the `OffLatticeSimulation`.
          * For a list of possible boundary condition see subclasses of `AbstractCellPopulationBoundaryCondition`.
          * These can be found in the inheritance diagram, here,
-         * [AbstractCellPopulationBoundaryCondition](https://chaste.github.io/doxygen-latest/classAbstractCellPopulationBoundaryCondition.html).
+         * [AbstractCellPopulationBoundaryCondition](/doxygen-latest/classAbstractCellPopulationBoundaryCondition.html).
          * Note that some of these boundary conditions are not compatible with vertex-based
          * simulations see the specific class documentation for details, if you try to use an
          * incompatible class then you will receive a warning.
@@ -257,7 +257,7 @@ public:
          * from the simulation. For this test, we use a `PlaneBasedCellKiller`, and pass
          * it to the `OffLatticeSimulation`. For a list of possible cell killers see subclasses
          * of `AbstractCellKiller`. These can be found in the inheritance diagram, here,
-         * [AbstractCellKiller](https://chaste.github.io/doxygen-latest/classAbstractCellKiller.html).
+         * [AbstractCellKiller](/doxygen-latest/classAbstractCellKiller.html).
          *
          * The first step is to define a point on the plane boundary and a normal to the plane.
          * We reuse the point and normal from the `PlaneBoundaryCondition`.

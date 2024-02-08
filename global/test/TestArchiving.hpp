@@ -56,8 +56,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * Contains some good examples of how to checkpoint things.
+ *
  * Most of these would need changing to work in parallel, we have some easy ways of doing this:
- * see https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/BoostSerialization for details.
+ * see https://chaste.github.io/docs/user-guides/boost-serialization/ for details.
  */
 class TestArchiving : public CxxTest::TestSuite
 {

@@ -116,7 +116,7 @@ public:
 };
 
 /* HOW_TO_TAG Cardiac/Solver
- * Use [ChasteGuides/StateVariableInterpolation state-variable interpolation] to improve accuracy
+ * Use [state-variable interpolation](/docs/user-guides/state-variable-interpolation/) to improve accuracy
  */
 class TestBidomainWithSvi : public CxxTest::TestSuite
 {

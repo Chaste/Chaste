@@ -153,7 +153,7 @@ public:
         /*
          * Here we create an instance of our cell factory, which will tell the `MonodomainProblem`
          * class which action potential models to use at which nodes. The rest of the problem is set up
-         * identically to the tutorial [Monodomain 3D Example](docs/user-tutorials/monodomain3dexample).
+         * identically to the tutorial [Monodomain 3D Example](/docs/user-tutorials/monodomain3dexample/).
          */
         RabbitHeartCellFactory cell_factory;
         MonodomainProblem<3> monodomain_problem( &cell_factory );

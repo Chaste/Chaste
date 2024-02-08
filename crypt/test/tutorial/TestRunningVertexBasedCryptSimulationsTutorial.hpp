@@ -50,8 +50,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * ### Introduction
  *
  * In this tutorial we show how Chaste can be used to create, run and visualize vertex-based simulations.
- * This mechanical model was originally proposed by T. Nagai and H. Honda ("A dynamic cell model for
- * the formation of epithelial tissues", Philosophical Magazine Part B 81:699-719).
+ * This mechanical model was originally proposed by T. Nagai and H. Honda, 2000, "A dynamic cell model for
+ * the formation of epithelial tissues", Philosophical Magazine Part B 81:699-719, doi:[10.1103/PhysRevLett.69.2013](https://doi.org/10.1103/PhysRevLett.69.2013).
  *
  * ### The test
  *
@@ -206,7 +206,7 @@ public:
         /* Define the crypt length; this will be used for sloughing and calculating the Wnt gradient. */
         double crypt_length = 6.0;
 
-        /* Set up a `WntConcentration` object, as in the tutorial [Running Mesh Based Simulations](/docs/user-tutorials/runningmeshbasedsimulations).*/
+        /* Set up a `WntConcentration` object, as in the tutorial [Running Mesh Based Simulations](/docs/user-tutorials/runningmeshbasedsimulations/).*/
         WntConcentration<2>::Instance()->SetType(LINEAR);
         WntConcentration<2>::Instance()->SetCellPopulation(crypt);
         WntConcentration<2>::Instance()->SetCryptLength(crypt_length);

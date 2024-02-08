@@ -81,7 +81,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * to the local oxygen concentration. We also include the `WildTypeCellMutationState`
  * header file, which defines a wild type cell mutation state that we will use to construct
  * cells. A cell mutation state is always required when constructing a cell, however
- * in earlier simulation tutorial we used a helper classes ((`CellsGenerator` and `CryptCellsGenerator`) that
+ * in earlier simulation tutorials we used helper classes (`CellsGenerator` and `CryptCellsGenerator`) that
  * allowed us to avoid having to construct cells directly.
  */
 #include "SimpleOxygenBasedCellCycleModel.hpp"
@@ -169,9 +169,9 @@ public:
             p_model->SetTransitCellG1Duration(8.0);
 
             /*
-             * We now define a random birth time, chosen from [-T,0], where
-             * T = t,,1,, + t,,2,,, where t,,1,, is a parameter representing the G,,1,, duration
-             * of a 'stem' cell, and t,,2,, is the basic S+G,,2,,+M phases duration...
+             * We now define a random birth time, chosen from $[-T,0]$, where
+             * $T = t_1 + t_2$, where $t_1$ is a parameter representing the $G_1$ duration
+             * of a 'stem' cell, and $t_2$ is the basic $S+G_2+M$ phases duration...
              */
             double birth_time = - RandomNumberGenerator::Instance()->ranf() *
                                  (  p_model->GetStemCellG1Duration()
@@ -196,11 +196,11 @@ public:
          * This will be passed into the `OffLatticeSimulationWithPdes` object. The
          * `CellwiseSourceEllipticPde` is a `PDE` class which inherits from
          * `AbstractLinearEllipticPde` and represents
-         * the PDE ''u_xx'' + ''u_yy'' = ''k''(''x'',''y'') ''u'', where ''u''(''x'',''y'') denotes
+         * the PDE $u_{xx}$ + u_{yy} = k(x,y)u$, where $u(x,y)$ denotes
          * the oxygen concentration at
-         * position (''x'',''y'') and the function ''k''(''x'',''y'') specifies the rate of consumption by live cells
-         * there. Here ''k''(''x'',''y'') takes the value -0.03 (the coefficient below) if
-         * the cell located at (''x'',''y'') is a live cell, and zero if the cell has died due
+         * position $(x,y)$ and the function $k(x,y)$ specifies the rate of consumption by live cells
+         * there. Here $k(x,y)$ takes the value $-0.03$ (the coefficient below) if
+         * the cell located at $(x,y)$ is a live cell, and zero if the cell has died due
          * to oxygen deprivation.
          */
         MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, -0.03));
@@ -228,7 +228,7 @@ public:
          * the boundary condition itself can be made spatially varying or time-dependent.
          *
          * The PDE is tagged to show that the quantity to be solved for (the quantity of interest in
-         * the cells' data is "oxygen".
+         * the cells' data is `"oxygen"`).
          *
          * The `CellData` class, is used to stores the value of the current nutrient concentration for each cell.
          */
@@ -275,7 +275,7 @@ public:
  * To visualize the results, open a new terminal, `cd` to the Chaste directory,
  * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/SpheroidTutorial/results_from_time_0`.
  *
- * Or use Paraview, see the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview) tutorial for details.
+ * Or use Paraview, see the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview/) tutorial for details.
  */
 
 #endif /*TESTRUNNINGTUMOURSPHEROIDSIMULATIONSTUTORIAL_HPP_*/
