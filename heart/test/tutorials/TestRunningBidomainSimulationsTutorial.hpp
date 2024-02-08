@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -81,7 +81,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * is called `<CELLMODEL>.cellml`, a file `<CELLMODEL>.hpp` will be automatically generated, which will define
  * a class called `Cell<CELLMODEL>FromCellML`. So to use a particular cell model in a tissue simulation,
  * given the CellML, you just have to do two things: include this `.hpp` file, and then use the class.
- * For example, we will use the !LuoRudy1991 model, so we have to include the following, and
+ * For example, we will use the Luo-Rudy 1991 model, so we have to include the following, and
  * later on use `CellLuoRudy1991FromCellML` as the cell model class.
  * See ["ChasteGuides/CodeGenerationFromCellML"] for more information on this process.
  */
@@ -91,7 +91,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * ### Defining a cell factory
  *
- * All mono/bidomain simulations need a ''cell factory'' as input. This is a class
+ * All mono/bidomain simulations need a *cell factory* as input. This is a class
  * which tells the problem class what type of cardiac cells to create. The cell-factory
  * class has to inherit from `AbstractCardiacCellFactory<DIM>`, which means it must
  * implement the method `CreateCardiacCellForTissueNode(Node<DIM>*)`, which returns
@@ -180,8 +180,8 @@ public:
         HeartConfig::Instance()->SetOutputDirectory("BidomainTutorial");
         HeartConfig::Instance()->SetOutputFilenamePrefix("results");
 
-        /* There is an alternate method of loading a mesh that can be seen in [wiki:UserTutorials/Monodomain3dExample Monodomain3dExample],
-         *  using `DistributedTetrahedralMesh`.
+        /* There is an alternate method of loading a mesh that can be seen in [Monodomain 3d Example](docs/user-tutorials/monodomain3dexample),
+         * using `DistributedTetrahedralMesh`.
          *
          * It is possible to over-ride the default visualisation output (which is done during simulation
          * post-processing).
@@ -244,14 +244,14 @@ public:
          *  * `/tmp/$USER/testoutput/BidomainTutorial/vtk_output` for Paraview (VTK)
          * where you should find the geometric mesh data and simulation output.
          *
-         * Please see ChasteGuides/VisualisationGuides for details of using !Meshalyzer/Cmgui/Paraview.
+         * Please see ChasteGuides/VisualisationGuides for details of using Meshalyzer/Cmgui/Paraview.
          *
          * Note: the easiest way to look at the resultant voltage values from the code
          * (for the last timestep - the data for the previous timesteps is written to file
          * but not retained) is to use a `ReplicatableVector`.
-         * `bidomain_problem.GetSolution())` returns a !PetSc vector
+         * `bidomain_problem.GetSolution())` returns a PETSc vector
          * of the form (V_0, phi_0, V_1, phi_e_1, ... V_n, phi_e_n), and we can create a
-         * `ReplicatableVector` for easy access to this !PetSc vector's data.
+         * `ReplicatableVector` for easy access to this PETSc vector's data.
          * (This won't be very efficient with huge problems in parallel - the next tutorial
          * will mention how to do parallel access).
          */

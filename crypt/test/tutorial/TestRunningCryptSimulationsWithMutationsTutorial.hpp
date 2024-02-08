@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -49,12 +49,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * ### Introduction
  *
- * This tutorial assumes you have already read UserTutorials/RunningMeshBasedCryptSimulations.
+ * This tutorial assumes you have already read the tutorial [Running Mesh Based Simulations](/docs/user-tutorials/runningmeshbasedsimulations).
  *
  * In this tutorial we show how Chaste can be used to simulate a cylindrical model of an
  * intestinal crypt with mutations using both mesh and vertex-based simulations.
  * Full details of the computational model can be found in the paper by
- * Osborne ''et al.'' (2010) [10.1098/rsta.2010.0173].
+ * Osborne et al. (2010) [10.1098/rsta.2010.0173](https://doi.org/10.1098/rsta.2010.0173).
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary header files.
  */
@@ -138,8 +138,8 @@ public:
          * We need to do this using the `CellPropertyRegistry`, otherwise
          * the numbers of each type of mutation aren't correctly tracked. For
          * a list of possible mutations, see subclasses of `AbstractCellMutationState`.
-         * These can be found in the inheritance diagram, here,
-         * [AbstractCellMutationState](https://chaste.github.io/doxygen-latest/classAbstractCellMutationState.html).
+         * These can be found in the 
+         * [inheritance diagram for AbstractCellMutationState](https://chaste.github.io/doxygen-latest/classAbstractCellMutationState.html).
          * Each mutation has a different effect on the cell cycle models; see the class
          * documentation for details.
          */
@@ -187,7 +187,7 @@ public:
 
         /*
          * Now we have run the simulation to a steady state (where the initial regular configuration is lost) we select a cell to become mutant.
-         * We select one of the cells and set the mutation state to `ApcTwoHitCellMutationState` (i.e. p_state).
+         * We select one of the cells and set the mutation state to `ApcTwoHitCellMutationState` (i.e. `p_state`).
          */
         for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
              cell_iter != cell_population.End();
@@ -220,18 +220,18 @@ public:
         */
        WntConcentration<2>::Destroy();
     }
-    /* To visualize the results, open a new terminal, `cd` to the Chaste directory,
-     * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/MeshBasedCryptWithMutations/results_from_time_0`.
-     *
-     * These are the results before we add the mutations do: `java Visualize2dCentreCells /tmp/$USER/testoutput/MeshBasedCryptWithMutations/results_from_time_10`
-     * to see the results from after the mutation has been added.
-     *
-     * We may have to do: `javac Visualize2dCentreCells.java` beforehand to create the
-     * java executable.
-     *
-     * In the results folder there is also a file `cellmutationstates.dat` which tracks the numbers of each mutation type in the simulation.
-     * These results are just tab separated columns so may be visualized by using gnuplot, Matlab or similar.
-     */
 };
+/* To visualize the results, open a new terminal, `cd` to the Chaste directory,
+ * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/MeshBasedCryptWithMutations/results_from_time_0`.
+ *
+ * These are the results before we add the mutations do: `java Visualize2dCentreCells /tmp/$USER/testoutput/MeshBasedCryptWithMutations/results_from_time_10`
+ * to see the results from after the mutation has been added.
+ *
+ * We may have to do: `javac Visualize2dCentreCells.java` beforehand to create the
+ * java executable.
+ *
+ * In the results folder there is also a file `cellmutationstates.dat` which tracks the numbers of each mutation type in the simulation.
+ * These results are just tab separated columns so may be visualized by using gnuplot, Matlab or similar.
+ */
 
 #endif /*TESTRUNNINGCRYPTSIMULATIONSWITHMUTATIONSTUTORIAL_HPP_*/

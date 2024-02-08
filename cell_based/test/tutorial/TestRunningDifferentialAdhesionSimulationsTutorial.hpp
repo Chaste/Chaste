@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -95,8 +95,6 @@ class TestRunningDifferentialAdhesionSimulationsTutorial : public AbstractCellBa
 public:
 
     /*
-     * EMPTYLINE
-     *
      * In this test, we demonstrate how to simulate a heterotypic monolayer that incorporates
      * differential adhesion, using a vertex-based approach. This may be compared with the
      * second test in the TestRunningPottsBasedSimulationsTutorial, which implements a similar
@@ -172,14 +170,11 @@ public:
         /* Finally, we run the simulation. */
         simulator.Solve();
     }
-
-    /*
-     * EMPTYLINE
-     *
-     * To visualize the results, use Paraview. See the UserTutorials/VisualizingWithParaview tutorial for more information.
-     *
-     * Load the file `/tmp/$USER/testoutput/TestVertexBasedDifferentialAdhesionSimulation/results_from_time_0/results.pvd`.
-     */
 };
+/*
+ * To visualize the results, use Paraview. See the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview) tutorial for more information.
+ *
+ * Load the file `/tmp/$USER/testoutput/TestVertexBasedDifferentialAdhesionSimulation/results_from_time_0/results.pvd`.
+ */
 
 #endif /*TESTRUNNINGDIFFERENTIALADHESIONSIMULATIONSTUTORIAL_HPP_*/

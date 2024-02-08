@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -105,7 +105,7 @@ private:
      * by the `GetDiffusionTensor` method in PDE classes is of the type
      * `c_matrix<double,SIZE,SIZE>`, which is a uBLAS matrix. We use uBLAS vectors
      * and matrices where small vectors and matrices are needed. Note that uBLAS objects
-     * are only particularly efficient if optimisation is on (`CMAKE_BUILD_TYPE=Release``).*/
+     * are only particularly efficient if optimisation is on (`CMAKE_BUILD_TYPE=Release`).*/
     c_matrix<double,2,2> mDiffusionTensor;
 
 public:

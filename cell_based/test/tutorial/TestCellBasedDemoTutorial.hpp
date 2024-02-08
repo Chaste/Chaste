@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -101,7 +101,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Since we are using `AbstractCellBasedTestSuite` the singleton `SimulationTime` is initialised to zero at the beginning of the test and destroyed at the end
  * of the test; `RandomNumberGenerator` is re-seeded with zero at the beginning and destroyed at the end of the test;
  * and `CellPropertyRegistry` (which stores `CellProperties`, you learn about these in a later tutorial
- * [wiki:UserTutorials/CreatingAndUsingANewCellProperty]) is cleared at the beginning of the test.
+ * [CreatingAndUsingANewCellProperty](/docs/user-tutorials/creatingandusinganewcellproperty)) is cleared at the beginning of the test.
  * This makes for cleaner code.
  */
 class TestCellBasedDemoTutorial : public AbstractCellBasedTestSuite
@@ -148,7 +148,7 @@ public:
         simulator.SetEndTime(20.0);
 
         /* To specify how cells move around, we create a "shared pointer" to a
-         * `Force` object and pass it to the `OffLatticeSimulation`. This is done using the MAKE_PTR macro as follows.
+         * `Force` object and pass it to the `OffLatticeSimulation`. This is done using the `MAKE_PTR` macro as follows.
          */
         MAKE_PTR(NagaiHondaForce<2>, p_force);
         simulator.AddForce(p_force);
@@ -178,19 +178,13 @@ public:
      * We may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
      * java executable.
      *
-     * EMPTYLINE
-     *
      * The `make_a_movie` script can be used to generate a video based on the results of your simulation.
      * To do this, first visualize the results using `Visualize2dVertexCells` as described above. Click
      * on the box marked "Output" and play through the whole simulation to generate a sequence of `.png`
      * images, one for each time step. Next, still in the `anim` folder, do: `./make_a_movie`.
      * This reads in the `.png` files and creates a video file called `simulation.mpeg`.
      *
-     * EMPTYLINE
-     *
-     * Results can also be visualized using Paraview. See the UserTutorials/VisualizingWithParaview tutorial for more information.
-     *
-     * EMPTYLINE
+     * Results can also be visualized using Paraview. See the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview) tutorial for more information.
      *
      * ### Test 2 - basic node-based simulation
      *
@@ -255,8 +249,6 @@ public:
      * We may have to do: `javac Visualize2dCentreCells.java` beforehand to create the
      * java executable.
      *
-     * EMPTYLINE
-     *
      * As described above, the `make_a_movie` script can be used to generate a video based on the results of your simulation.
      *
      * ### Test 3 - basic mesh-based simulation
@@ -281,7 +273,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells); //**Changed**//
 
         /* To view the results of this and the subsequent mesh based tutorials in Paraview it is necessary to explicitly
-        * generate the required .vtu files. This is detailed in the [wiki:UserTutorials/VisualizingWithParaview] tutorial.
+        * generate the required .vtu files. This is detailed in the [VisualizingWithParaview](/docs/user-tutorials/visualizingwithparaview) tutorial.
         * Note that the results in Paraview may appear different to those in the java based visualizer. This is related
         * to the different methods used to generate voronoi tesselations in each and is resolved through the use of
         * 'ghost nodes', as shown in the next test. */
@@ -515,13 +507,13 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 16u);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
     }
-    /*
-     * To visualize the results, open a new terminal, `cd` to the Chaste directory,
-     * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/CellBasedDemo7/results_from_time_0`.
-     * We may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
-     * java executable.
-     *
-     */
 };
+/*
+ * To visualize the results, open a new terminal, `cd` to the Chaste directory,
+ * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/CellBasedDemo7/results_from_time_0`.
+ * We may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
+ * java executable.
+ *
+ */
 
 #endif /*TESTCELLBASEDDEMOTUTORIAL_HPP_*/

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,13 +50,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * ### Introduction
  *
- * EMPTYLINE
+ * This tutorial assumes you have already read the tutorial [Creating And Using A New Cell Property](/docs/user-tutorials/creatingandusinganewcellproperty).
  *
- * This tutorial assumes you have already read [wiki:UserTutorials/CreatingAndUsingANewCellProperty].
- *
- * EMPTYLINE
- *
- * In [wiki:UserTutorials/CreatingAndUsingANewCellProperty] we showed how to create a new cell
+ * In [Creating And Using A New Cell Property](/docs/user-tutorials/creatingandusinganewcellproperty) we showed how to create a new cell
  * property class, `MotileCellProperty`, and how this can be used in a cell-based simulation.
  * In this tutorial, we show how to create a new cell writer class, which can be used to output
  * different data from a cell-based simulation. Our example will be a writer class for outputting
@@ -65,7 +61,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * ### 1. Including header files
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary header file and
- * archiving headers. For simplicity, we duplicate the code presented in [wiki:UserTutorials/CreatingAndUsingANewCellProperty]
+ * archiving headers. For simplicity, we duplicate the code presented in [Creating And Using A New Cell Property](/docs/user-tutorials/creatingandusinganewcellproperty)
  * that defines the `MotileCellProperty` class. As before, note that usually this code would be
  * separated out into a declaration in a .hpp file and a definition in a .cpp file.
  * We also include some header files defining classes to be used in the cell-based
@@ -119,8 +115,6 @@ public:
 };
 
 /*
- * EMPTYLINE
- *
  * ### Defining a cell writer class
  *
  * We next define a class that writes information about each cell in the population, using
@@ -213,8 +207,6 @@ EXPORT_TEMPLATE_CLASS_ALL_DIMS(CellMotilityWriter)
 /*
  * This completes the code for `MotileCellProperty` and  `CellMotilityWriter`.
  *
- * EMPTYLINE
- *
  * We now define the test class, which inherits from `AbstractCellBasedTestSuite` and
  * demonstrates how `MotileCellProperty` and `CellMotilityWriter` can be used in
  * a cell-based simulation.
@@ -226,7 +218,7 @@ public:
     void TestOffLatticeSimulationWithMotileCellPropertyAndWriters()
     {
         /*
-         * We begin by creating a `NodeBasedCellPopulation`, just as in [wiki:UserTutorials/CreatingAndUsingANewCellProperty].
+         * We begin by creating a `NodeBasedCellPopulation`, just as in [Creating And Using A New Cell Property](/docs/user-tutorials/creatingandusinganewcellproperty).
          * We add the `MotileCellProperty` to a random selection of cells.
          * We also add the `CellLabel` to these cells so that we can easily visualize the different cell types.
          */
@@ -288,7 +280,7 @@ public:
     }
 };
 /*
- * As in [wiki:UserTutorials/CreatingAndUsingANewCellProperty], when you visualize the results with
+ * As in [Creating And Using A New Cell Property](/docs/user-tutorials/creatingandusinganewcellproperty), when you visualize the results with
  *
  * `java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMotileCellPropertyAndWriters/results_from_time_0`
  *

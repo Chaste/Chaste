@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -98,7 +98,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NonlinearElasticityTools.hpp"
 /* For visualising results in Paraview */
 #include "VtkNonlinearElasticitySolutionWriter.hpp"
-/* As before: !PetscSetupAndFinalize.hpp must be included in every test that uses PETSc. Note that it
+/* As before: `PetscSetupAndFinalize.hpp` must be included in every test that uses PETSc. Note that it
  * cannot be included in the source code. */
 #include "PetscSetupAndFinalize.hpp"
 
@@ -123,7 +123,7 @@ public:
      * All the mechanics solvers solve for the deformation using the finite element method with QUADRATIC
      * basis functions for the deformation. This necessitates the use of a `QuadraticMesh` - such meshes have
      * extra nodes that aren't vertices of elements, in this case midway along each edge. (The displacement
-     * is solved for at ''each node'' in the mesh (including internal [non-vertex] nodes), whereas the pressure
+     * is solved for at *each node* in the mesh (including internal [non-vertex] nodes), whereas the pressure
      * is only solved for at each vertex - in FEM terms, quadratic interpolation for displacement, linear
      * interpolation for pressure, which is required for stability. The pressure at internal nodes is computed
      * by linear interpolation).
@@ -248,7 +248,7 @@ public:
         TS_ASSERT_DELTA(r_deformed_positions[node_index](1), -0.1129, 1e-3);
         TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 4u);
     }
-    /* ''Exercise'': convert to a compressible solver and compare the resultant deformations.
+    /* ***Exercise***: convert to a compressible solver and compare the resultant deformations.
      * The next tutorial describes how to solve for a compressible deformation,
      * but the changes are essentially trivial: `IncompressibleNonlinearElasticitySolver` needs to be changed to
      * `CompressibleNonlinearElasticitySolver`, the line `problem_defn.SetMaterialLaw(..)` needs changing, and
@@ -377,7 +377,7 @@ public:
      * solve will (probably) not converge. HYPRE is (currently) not a pre-requisite for installing Chaste, hence this is not (currently)
      * the default linear solver for incompressible mechanics problems, although this will change in the future.
      *
-     * ''HYPRE should be considered a pre-requisite for large incompressible mechanics problems.''
+     * ***HYPRE should be considered a pre-requisite for large incompressible mechanics problems.***
      *
      * To use HYPRE, you need to have PETSc installed with HYPRE. However, if you followed installation
      * instructions for Chaste 2.1 or later, you probably do already have PETSc installed with HYPRE.

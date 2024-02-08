@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -153,7 +153,7 @@ public:
         /*
          * Here we create an instance of our cell factory, which will tell the `MonodomainProblem`
          * class which action potential models to use at which nodes. The rest of the problem is set up
-         * identically to [wiki:UserTutorials/Monodomain3dExample Monodomain3dExample].
+         * identically to the tutorial [Monodomain 3D Example](docs/user-tutorials/monodomain3dexample).
          */
         RabbitHeartCellFactory cell_factory;
         MonodomainProblem<3> monodomain_problem( &cell_factory );

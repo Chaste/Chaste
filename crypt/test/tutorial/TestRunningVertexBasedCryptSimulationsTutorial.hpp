@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -101,13 +101,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestRunningVertexBasedCryptSimulationsTutorial : public AbstractCellBasedTestSuite
 {
 public:
-
-    /* EMPTYLINE
-     *
-     *
+    /* 
      * ### Test 1 - create a vertex-based crypt simulation
-     *
-     * EMPTYLINE
      *
      * The first test generates a crypt, in which we use a cylindrical vertex mesh,
      * give each cell a fixed cell-cycle model, and enforce sloughing at the top of
@@ -174,23 +169,15 @@ public:
     }
 
     /*
-     * EMPTYLINE
-     *
      * To visualize the results, open a new terminal, `cd` to the Chaste directory,
      * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/VertexCrypt/results_from_time_0`.
      * You may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
      * java executable.
      *
-     * EMPTYLINE
-     *
      * When we visualize the results, we should see three colours of cells: a row of blue stem cells, 3 rows of yellow transit
      * cells, and 5 rows of pink differentiated cells. Cells above 6.0 will be sloughed off immediately.
      *
-     * EMPTYLINE
-     *
      * ### Test 2 - create a vertex-based crypt simulation with a simple wnt dependent cell-cycle model
-     *
-     * EMPTYLINE
      *
      * The next test generates a crypt, in which we use a cylindrical vertex mesh, and
      * impose a linearly decreasing concentration gradient of Wnt. Cells detect the level of Wnt
@@ -219,7 +206,7 @@ public:
         /* Define the crypt length; this will be used for sloughing and calculating the Wnt gradient. */
         double crypt_length = 6.0;
 
-        /* Set up a `WntConcentration` object, as in UserTutorials/RunningMeshBasedCryptSimulations. */
+        /* Set up a `WntConcentration` object, as in the tutorial [Running Mesh Based Simulations](/docs/user-tutorials/runningmeshbasedsimulations).*/
         WntConcentration<2>::Instance()->SetType(LINEAR);
         WntConcentration<2>::Instance()->SetCellPopulation(crypt);
         WntConcentration<2>::Instance()->SetCryptLength(crypt_length);
@@ -246,14 +233,11 @@ public:
         simulator.Solve();
     }
     /*
-    * EMPTYLINE
     *
     * To visualize the results, open a new terminal, `cd` to the Chaste directory,
     * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/VertexCryptWithSimpleWntCellCycleModel/results_from_time_0`.
     * You may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
     * java executable.
-    *
-    * EMPTYLINE
     *
     * When we visualize the results, we should see two colours of cells: yellow transit
     * cells and pink differentiated cells. Cells above 6.0 will be sloughed off immediately.
