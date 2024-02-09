@@ -450,6 +450,7 @@ public:
 
     virtual void AcceptPopulationEventWriter(
         boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter);
+
     /**
      * Overridden AcceptPopulationCountWriter() method.
      *
