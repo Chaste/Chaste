@@ -52,7 +52,10 @@ jobs:
         context: .
         file: docker/Dockerfile
         build-args: |
-            "GIT_TAG=."
+            'GIT_TAG=.'
+            'CMAKE_BUILD_TYPE="Debug"'
+            'Chaste_ERROR_ON_WARNING="ON"'
+            'Chaste_UPDATE_PROVENANCE="OFF"'
         platforms: 'amd64,arm64'
         push: true
         tags: ${{ steps.meta.outputs.tags }}
