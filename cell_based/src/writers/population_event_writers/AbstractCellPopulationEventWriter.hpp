@@ -47,6 +47,7 @@ template<unsigned SPACE_DIM> class CaBasedCellPopulation;
 template<unsigned SPACE_DIM> class NodeBasedCellPopulation;
 template<unsigned SPACE_DIM> class PottsBasedCellPopulation;
 template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
+template<unsigned SPACE_DIM> class SemBasedCellPopulation;
 
 /**
  * Abstract class for a writer that takes information from an AbstractCellPopulation and writes it to file.
@@ -141,6 +142,16 @@ public:
      * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */
     virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)=0;
+
+    /**
+     * Visit the population and write the data.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
+     */
+    virtual void Visit(SemBasedCellPopulation<SPACE_DIM>* pCellPopulation)=0;
 };
 
 #endif /*ABSTRACTCELLPOPULATIONEVENTWRITER_HPP_*/

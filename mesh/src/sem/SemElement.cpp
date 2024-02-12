@@ -53,6 +53,46 @@ SemElement<DIM>::~SemElement()
 {
 }
 
+template<unsigned DIM>
+void SemElement<DIM>::SetCellId(unsigned int cellId)
+{
+  this->mCellId = cellId;
+}
+
+template<unsigned DIM>
+void SemElement<DIM>::AddInteractionLayer(const std::string layerName, std::vector<unsigned int>& nodeIndices)
+{
+  mInteractionLayers[layerName] = nodeIndices;
+}
+
+template<unsigned DIM>
+const std::map<std::string, std::vector<unsigned int>>& SemElement<DIM>::rGetInteractionLayers() 
+{
+  return mInteractionLayers;
+}
+
+template<unsigned DIM>    
+void SemElement<DIM>::UpdateNode(const unsigned& rIndex, Node<DIM>* pNode)
+{
+
+}
+
+template<unsigned DIM>
+std::vector<Node<DIM>*>& SemElement<DIM>::rGetNodes()
+{
+  return this->mNodes;
+}
+
+template<unsigned DIM>    
+void SemElement<DIM>::MarkAsDeleted()
+{
+}
+template<unsigned DIM>    
+void SemElement<DIM>::RegisterWithNodes()
+{
+
+}
+
 // Explicit instantiation
 template class SemElement<1>;
 template class SemElement<2>;

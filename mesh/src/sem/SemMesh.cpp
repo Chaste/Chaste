@@ -76,6 +76,14 @@ unsigned SemMesh<DIM>::GetNumNodes() const
 }
 
 template<unsigned DIM>
+unsigned SemMesh<DIM>::AddNode(Node<DIM>* pNewNode)
+{
+    unsigned node_index = this->mNodes.size();
+    this->mNodes.push_back(pNewNode);
+    return node_index;
+}
+
+template<unsigned DIM>
 unsigned SemMesh<DIM>::GetNumElements() const
 {
     return mElements.size();
@@ -111,7 +119,109 @@ SemMesh<DIM>* SemMesh<DIM>::GetMeshForVtk()
 template<unsigned DIM>
 void SemMesh<DIM>::ConstructFromMeshReader(AbstractMeshReader<DIM, DIM>& rMeshReader)
 {
-    ///\todo
+    assert(rMeshReader.HasNodePermutation() == false);
+    this->mMeshFileBaseName = rMeshReader.GetMeshFileBaseName();
+
+    // Record number of corner nodes
+    unsigned num_nodes = rMeshReader.GetNumNodes();
+
+    /*
+     * Reserve memory for nodes, so we don't have problems with
+     * pointers stored in elements becoming invalid.
+     */
+    this->mNodes.reserve(num_nodes);
+
+    rMeshReader.Reset();
+
+    //typename std::map<std::pair<unsigned,unsigned>,unsigned>::const_iterator iterator;
+    //std::map<std::pair<unsigned,unsigned>,unsigned> internal_nodes_map;
+
+    // Add nodes
+    std::vector<double> coords;
+    for (unsigned node_index = 0; node_index < num_nodes; node_index++)
+    {
+        coords = rMeshReader.GetNextNode();
+        Node<DIM>* p_node = new Node<DIM>(node_index, coords, false);
+
+        for (unsigned i = 0; i < rMeshReader.GetNodeAttributes().size(); i++)
+        {
+            double attribute = rMeshReader.GetNodeAttributes()[i];
+            p_node->AddNodeAttribute(attribute);
+        }
+        this->mNodes.push_back(p_node);
+    }
+
+    //unsigned new_node_index = mNumCornerNodes;
+
+    rMeshReader.Reset();
+    // Add elements
+    //new_node_index = mNumCornerNodes;
+    this->mElements.reserve(rMeshReader.GetNumElements());
+
+    for (unsigned element_index = 0; element_index < (unsigned)rMeshReader.GetNumElements(); element_index++)
+    {
+        ElementData element_data = rMeshReader.GetNextElementData();
+        std::vector<Node<DIM>*> nodes;
+
+        /*
+         * NOTE: currently just reading element vertices from mesh reader - even if it
+         * does contain information about internal nodes (ie for quadratics) this is
+         * ignored here and used elsewhere: ie don't do this:
+         *   unsigned nodes_size = node_indices.size();
+         */
+        for (unsigned j = 0; j < DIM + 1; j++) // num vertices=DIM+1, may not be equal to nodes_size.
+        {
+            assert(element_data.NodeIndices[j] < this->mNodes.size());
+            nodes.push_back(this->mNodes[element_data.NodeIndices[j]]);
+        }
+
+        SemElement<DIM>* p_element = new SemElement<DIM>(element_index, nodes);
+
+        this->mElements.push_back(p_element);
+
+        if (rMeshReader.GetNumElementAttributes() > 0)
+        {
+            assert(rMeshReader.GetNumElementAttributes() == 1);
+            double attribute_value = element_data.AttributeValue;
+            p_element->SetAttribute(attribute_value);
+        }
+    }
+
+    // Add boundary elements and nodes
+    for (unsigned face_index = 0; face_index < (unsigned)rMeshReader.GetNumFaces(); face_index++)
+    {
+        ElementData face_data = rMeshReader.GetNextFaceData();
+        std::vector<unsigned> node_indices = face_data.NodeIndices;
+
+        /*
+         * NOTE: unlike the above where we just read element *vertices* from mesh reader, here we are
+         * going to read a quadratic mesh with internal elements.
+         * (There are only a few meshes with internals in the face file that we might as well use them.)
+         *
+         */
+        std::vector<Node<DIM>*> nodes;
+        for (unsigned node_index = 0; node_index < node_indices.size(); node_index++)
+        {
+            assert(node_indices[node_index] < this->mNodes.size());
+            // Add Node pointer to list for creating an element
+            nodes.push_back(this->mNodes[node_indices[node_index]]);
+        }
+
+        // This is a boundary face, so ensure all its nodes are marked as boundary nodes
+        for (unsigned j = 0; j < nodes.size(); j++)
+        {
+            if (!nodes[j]->IsBoundaryNode())
+            {
+                nodes[j]->SetAsBoundaryNode();
+                this->mBoundaryNodes.push_back(nodes[j]);
+            }
+
+            // Register the index that this bounday element will have with the node
+            nodes[j]->AddBoundaryElement(face_index);
+        }
+    }
+
+    rMeshReader.Reset();
 }
 
 template<unsigned DIM>
@@ -158,3 +268,33 @@ unsigned SemMesh<DIM>::SolveBoundaryElementMapping(unsigned index) const
 {
     return index;
 }
+
+
+template<unsigned DIM>
+unsigned SemMesh<DIM>::AddElement(SemElement<DIM>* pNewElement) 
+{
+    unsigned int new_element_index = mElements.size();
+    mElements.push_back(pNewElement);
+    return new_element_index;
+}
+
+
+template<unsigned DIM>
+void SemMesh<DIM>::DeleteNodePriorToReMesh(unsigned int node)
+{
+
+}
+template<unsigned DIM>
+void SemMesh<DIM>::ReMesh(NodeMap map)
+{
+
+}
+
+// Explicit instantiation
+template class SemMesh<1>;
+template class SemMesh<2>;
+template class SemMesh<3>;
+
+// Serialization for Boost >= 1.36
+#include "SerializationExportWrapperForCpp.hpp"
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(SemMesh)

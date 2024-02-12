@@ -384,6 +384,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::AddCellUsingLocationIndex(u
 {
     mLocationCellMap[index].insert(pCell);
     mCellLocationMap[pCell.get()] = index;
+    std::cout << "Added ptr to map" << std::endl;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "SemBasedCellPopulation.hpp"
+#include "VtkMeshWriter.hpp"
 
 template<unsigned DIM>
 SemBasedCellPopulation<DIM>::SemBasedCellPopulation(SemMesh<DIM>& rMesh,
@@ -45,6 +46,12 @@ SemBasedCellPopulation<DIM>::SemBasedCellPopulation(SemMesh<DIM>& rMesh,
       mDeleteMesh(deleteMesh)
 {
     mpSemMesh = static_cast<SemMesh<DIM>*>(&(this->mrMesh));
+    
+    unsigned index = 0;
+    for (auto cell_ptr : this->mCells) {
+        this->AddCellUsingLocationIndex(index, cell_ptr);
+        index++;
+    }
 
     if (validate)
     {
@@ -63,10 +70,6 @@ SemBasedCellPopulation<DIM>::SemBasedCellPopulation(SemMesh<DIM>& rMesh)
 template<unsigned DIM>
 SemBasedCellPopulation<DIM>::~SemBasedCellPopulation()
 {
-    if (mDeleteMesh)
-    {
-        delete &this->mrMesh;
-    }
 }
 
 template<unsigned DIM>
@@ -94,6 +97,13 @@ unsigned SemBasedCellPopulation<DIM>::GetNumNodes()
 }
 
 template<unsigned DIM>
+unsigned SemBasedCellPopulation<DIM>::GetNumElements()
+{
+    return mpSemMesh->GetNumElements();
+}
+
+
+template<unsigned DIM>
 c_vector<double, DIM> SemBasedCellPopulation<DIM>::GetLocationOfCellCentre(CellPtr pCell)
 {
     return mpSemMesh->GetCentroidOfElement(this->mCellLocationMap[pCell.get()]);
@@ -108,8 +118,8 @@ Node<DIM>* SemBasedCellPopulation<DIM>::GetNode(unsigned index)
 template<unsigned DIM>
 std::set<unsigned> SemBasedCellPopulation<DIM>::GetNeighbouringLocationIndices(CellPtr pCell)
 {
-    unsigned elem_index = this->GetLocationIndexUsingCell(pCell);
-    return this->rGetMesh().GetNeighbouringElementIndices(elem_index);
+    //unsigned elem_index = this->GetLocationIndexUsingCell(pCell);
+    return {}; //this->rGetMesh().GetNeighbouringElementIndices(elem_index);
 }
 
 template<unsigned DIM>
@@ -121,7 +131,7 @@ unsigned SemBasedCellPopulation<DIM>::AddNode(Node<DIM>* pNewNode)
 template<unsigned DIM>
 void SemBasedCellPopulation<DIM>::SetNode(unsigned nodeIndex, ChastePoint<DIM>& rNewLocation)
 {
-    mpSemMesh->SetNode(nodeIndex, rNewLocation);
+    this->GetNode(nodeIndex)->SetPoint(rNewLocation);
 }
 
 template<unsigned DIM>
@@ -175,6 +185,103 @@ void SemBasedCellPopulation<DIM>::Validate()
             EXCEPTION("At time " << SimulationTime::Instance()->GetTime() <<", Element " << i << " appears to have " << validated_element[i] << " cells associated with it");
         }
     }
+}
+
+template<unsigned DIM>
+void SemBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
+{
+    SemMeshWriter<DIM> mesh_writer(rDirectory, "results", false);
+    unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
+    std::stringstream time;
+    time << num_timesteps;
+    mesh_writer.WriteVtkUsingMesh(*mpSemMesh, time.str());
+}
+
+template<unsigned DIM>
+TetrahedralMesh<DIM, DIM>* SemBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier() 
+{
+    return nullptr;
+}
+
+template<unsigned DIM>
+double SemBasedCellPopulation<DIM>::GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,std::string& item, bool, double)
+{
+    return 0.0;
+}
+
+template<unsigned DIM>
+bool SemBasedCellPopulation<DIM>::IsCellAssociatedWithADeletedLocation(CellPtr pCell)
+{
+    return false;
+}
+template<unsigned DIM>
+CellPtr SemBasedCellPopulation<DIM>::AddCell(CellPtr pNewCell, CellPtr pParentCell)
+{
+    auto node_index = this->mCells.size();
+
+    // Associate the new cell with the neighbouring node
+    this->mCells.push_back(pNewCell);
+
+    // Update location cell map
+    CellPtr p_created_cell = this->mCells.back();
+    this->AddCellUsingLocationIndex(node_index,p_created_cell);
+
+    return p_created_cell;
+}
+template<unsigned DIM>
+double SemBasedCellPopulation<DIM>::GetDefaultTimeStep()
+{
+    return 0.0;
+}
+template<unsigned DIM>
+unsigned SemBasedCellPopulation<DIM>::RemoveDeadCells()
+{
+    return 0;
+}
+template<unsigned DIM>
+void SemBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
+{
+}
+template<unsigned DIM>
+double SemBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
+{
+    return 0.0;
+}
+template<unsigned DIM>
+std::set<unsigned> SemBasedCellPopulation<DIM>::GetNeighbouringNodeIndices(unsigned index)
+{
+    return {};
+}
+template<unsigned DIM>
+void SemBasedCellPopulation<DIM>::AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
+{
+    pPopulationWriter->Visit(this);
+}
+template<unsigned DIM>
+void SemBasedCellPopulation<DIM>::AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
+{
+    pPopulationCountWriter->Visit(this);
+}
+template<unsigned DIM>
+void SemBasedCellPopulation<DIM>::AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter)
+{
+    pPopulationEventWriter->Visit(this);
+}
+template<unsigned DIM>
+void SemBasedCellPopulation<DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell) 
+{
+    pCellWriter->VisitCell(pCell, this);
+}
+template<unsigned DIM>
+void SemBasedCellPopulation<DIM>::CheckForStepSizeException(unsigned nodeIndex, c_vector<double,DIM>& rDisplacement, double dt)
+{
+    
+}
+
+template<unsigned DIM>
+double SemBasedCellPopulation<DIM>::GetDampingConstant(unsigned nodeIndex)
+{
+    return 1.0;
 }
 
 // Explicit instantiation

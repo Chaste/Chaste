@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/vector.hpp>
+#include <map>
 
 /**
  * An element class for use in the SemMesh class.
@@ -48,6 +49,18 @@ template<unsigned DIM>
 class SemElement : public AbstractElement<DIM, DIM>
 {
 private:
+
+    /**
+     * The id of the cell
+    */
+    unsigned mCellId;
+  
+    /**
+     * A collection of interaction layers. Each layer is identified by a name.
+     * The map stores a vector containing the indices of the nodes which make up the layer.
+     * SemForces produce interactions between or within named layers.
+    */
+    std::map<std::string, std::vector<unsigned int>> mInteractionLayers;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -85,11 +98,40 @@ public:
      */
     SemElement(unsigned index,
                const std::vector<Node<DIM>*>& rNodes);
+    
 
     /**
      * Destructor.
      */
     ~SemElement();
+    
+    /**
+     * Sets the cell id of the element
+     * 
+     * @param id the new id
+    */
+    void SetCellId(unsigned int id);
+    
+    /**
+     * Adds a new interaction layer
+     * 
+     * @param layerName the name of the layer
+     * @param nodes indices of the nodes which make up the layer
+    */
+    void AddInteractionLayer(const std::string layerName, std::vector<unsigned int>& nodeIndices);
+    
+    /**
+     * Gets a const reference to the interaction layers
+     * 
+     * @return a const reference to the interaction layers
+    */
+    const std::map<std::string, std::vector<unsigned int>>& rGetInteractionLayers();
+    
+    std::vector<Node<DIM>*>& rGetNodes();
+    
+    void UpdateNode(const unsigned& rIndex, Node<DIM>* pNode) override;
+    void MarkAsDeleted() override;
+    void RegisterWithNodes() override;
 };
 
 #endif /*SEMELEMENT_HPP_*/

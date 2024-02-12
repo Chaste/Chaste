@@ -84,6 +84,11 @@ void VertexIntersectionSwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(Vertex
     pCellPopulation->rGetMesh().ClearLocationsOfIntersectionSwaps();
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexIntersectionSwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(SemBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+}
+
 // Explicit instantiation
 template class VertexIntersectionSwapLocationsWriter<1,1>;
 template class VertexIntersectionSwapLocationsWriter<1,2>;

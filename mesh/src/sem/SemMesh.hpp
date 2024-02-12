@@ -51,8 +51,10 @@ class SemMeshWriter;
 #include "AbstractMesh.hpp"
 #include "ArchiveLocationInfo.hpp"
 #include "SemElement.hpp"
+#include "Element.hpp"
 #include "SemMeshReader.hpp"
 #include "SemMeshWriter.hpp"
+#include "NodeMap.hpp"
 
 /**
  * \todo Document class
@@ -162,6 +164,7 @@ public:
      * Default constructor for use by serializer.
      */
     SemMesh();
+    
 
     /**
      * Destructor.
@@ -172,6 +175,13 @@ public:
      * @return the number of Nodes in the mesh.
      */
     virtual unsigned GetNumNodes() const;
+    
+    /**
+     * Adds a node to the mesh
+     * 
+     * @param pNewNode a pointer to the node to add
+    */
+   virtual unsigned AddNode(Node<DIM>* pNewNode);
 
     /**
      * @return the number of SemElements in the mesh.
@@ -188,8 +198,17 @@ public:
      *
      * @return a pointer to the SemElement.
      */
-    SemElement<DIM>* GetElement(unsigned index) const;
+    virtual SemElement<DIM>* GetElement(unsigned index) const;
 
+    /**
+     * Add a node to the mesh
+     * 
+     * @param pNewNode a pointer to the node to add to the mesh
+     * 
+     * @return the id of the node within the mesh
+    */
+    virtual unsigned AddElement(SemElement<DIM>* pNewElement);
+    
     /**
      * Compute the centroid of an element.
      *
@@ -233,6 +252,9 @@ public:
      * @return a pointer to the vertex mesh
      */
     virtual SemMesh<DIM>* GetMeshForVtk();
+    
+    void DeleteNodePriorToReMesh(unsigned int node);
+    void ReMesh(NodeMap map);
 
     /**
      * A smart iterator over the SemElements in the SemMesh.

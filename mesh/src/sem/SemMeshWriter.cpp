@@ -39,14 +39,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Convenience collection of iterators, primarily to get compilation to happen.
  */
-template<unsigned DIM>
+template<unsigned SPACE_DIM, unsigned ELEMENT_DIM>
 struct MeshWriterIterators
 {
     /** Iterator over nodes. */
-    typename AbstractMesh<DIM, DIM>::NodeIterator* pNodeIter;
+    typename AbstractMesh<SPACE_DIM, ELEMENT_DIM>::NodeIterator* pNodeIter;
 
     /** Iterator over SemElements. */
-    typename SemMesh<DIM>::SemElementIterator* pElemIter;
+    typename SemMesh<SPACE_DIM>::SemElementIterator* pElemIter;
 };
 
 // Implementation
@@ -57,7 +57,7 @@ SemMeshWriter<DIM>::SemMeshWriter(const std::string& rDirectory,
                                   const bool clearOutputDir)
     : AbstractMeshWriter<DIM, DIM>(rDirectory, rBaseName, clearOutputDir),
       mpMesh(nullptr),
-      mpIters(new MeshWriterIterators<DIM>),
+      mpIters(new MeshWriterIterators<DIM, DIM>),
       mpNodeMap(nullptr),
       mNodeMapCurrentIndex(0)
 {
@@ -385,7 +385,7 @@ void SemMeshWriter<DIM>::WriteFiles()
     for (unsigned item_num=0; item_num<num_elements; item_num++)
     {
         // Get data for this element
-        SemElementData elem_data = this->GetNextElement();
+        ElementData elem_data = this->GetNextElement();
 
         // Get the node indices owned by this element
         std::vector<unsigned> node_indices = elem_data.NodeIndices;
@@ -410,6 +410,6 @@ void SemMeshWriter<DIM>::WriteFiles()
 }
 
 // Explicit instantiation
-template class SemMeshReader<1>;
-template class SemMeshReader<2>;
-template class SemMeshReader<3>;
+template class SemMeshWriter<1>;
+template class SemMeshWriter<2>;
+template class SemMeshWriter<3>;

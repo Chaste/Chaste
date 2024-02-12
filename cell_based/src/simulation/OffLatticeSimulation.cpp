@@ -219,6 +219,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetupSolve()
         mpNumericalMethod = boost::make_shared<ForwardEulerNumericalMethod<ELEMENT_DIM, SPACE_DIM> >();
     }
     mpNumericalMethod->SetCellPopulation(dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&(this->mrCellPopulation)));
+    std::cout << "OffLattice setup: " << this->mrCellPopulation.GetNumRealCells();
     mpNumericalMethod->SetForceCollection(&mForceCollection);
     mpNumericalMethod->SetBoundaryConditions(&mBoundaryConditions);
 }

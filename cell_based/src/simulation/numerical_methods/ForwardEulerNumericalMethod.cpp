@@ -61,6 +61,7 @@ void ForwardEulerNumericalMethod<ELEMENT_DIM,SPACE_DIM>::UpdateAllNodePositions(
         {
             // Get the current node location and calculate the new location according to the forward Euler method
             const c_vector<double, SPACE_DIM>& r_old_location = node_iter->rGetLocation();
+            std::cout << "Old location: " << r_old_location[0] << ", " << r_old_location[1] << std::endl;
             c_vector<double, SPACE_DIM> displacement = dt * forces[index];
 
             // In the vertex-based case, the displacement may be scaled if the cell rearrangement threshold is exceeded
@@ -68,6 +69,7 @@ void ForwardEulerNumericalMethod<ELEMENT_DIM,SPACE_DIM>::UpdateAllNodePositions(
 
             c_vector<double, SPACE_DIM> new_location = r_old_location + displacement;
             this->SafeNodePositionUpdate(node_iter->GetIndex(), new_location);
+            std::cout << "New location: " << node_iter->rGetLocation()[0] << ", " << node_iter->rGetLocation()[1] << std::endl;
         }
     }
     else

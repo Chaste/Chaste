@@ -62,8 +62,8 @@ class SemMesh;
 template<unsigned DIM>
 class SemMesh;
 
-template<unsigned DIM>
-struct MeshWriterIterators;
+template<unsigned SPACE_DIM, unsigned ELEMENT_DIM>
+class MeshWriterIterators;
 
 /**
  * A mesh writer class for the SemMesh class.
@@ -79,7 +79,7 @@ private:
     SemMesh<DIM>* mpMesh;
 
     /** Iterators over the mesh. */
-    MeshWriterIterators<DIM>* mpIters;
+    MeshWriterIterators<DIM, DIM>* mpIters;
 
     /** Track deleted nodes so they don't get written. */
     NodeMap* mpNodeMap;

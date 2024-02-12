@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractOffLatticeCellPopulation.hpp"
 #include "SemMesh.hpp"
+#include <string>
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -65,7 +66,7 @@ private:
      * this class.
      */
     SemMesh<DIM>* mpSemMesh;
-
+    
     friend class boost::serialization::access;
     /**
      * Serialize the object and its member variables.
@@ -151,6 +152,13 @@ public:
      * @return the number of nodes in the cell population.
      */
     unsigned GetNumNodes() override;
+    
+    /**
+     * GetNumElements() method.
+     *
+     * @return the number of nodes in the cell population.
+     */
+    unsigned GetNumElements();
 
     /**
      * Overridden GetLocationOfCellCentre() method.
@@ -230,6 +238,23 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputCellPopulationParameters(out_stream& rParamsFile) override;
+    
+    void WriteVtkResultsToFile(const std::string& rDirectory) override;
+    TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier() override;
+    double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,std::string& item, bool, double) override;
+    bool IsCellAssociatedWithADeletedLocation(CellPtr pCell) override;
+    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell) override;
+    double GetDefaultTimeStep() override;
+    unsigned RemoveDeadCells() override;
+    void Update(bool hasHadBirthsOrDeaths) override;
+    double GetWidth(const unsigned& rDimension) override;
+    std::set<unsigned> GetNeighbouringNodeIndices(unsigned index) override;
+    void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter) override;
+    void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter) override;
+    void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter) override;
+    void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell) override;
+    void CheckForStepSizeException(unsigned nodeIndex, c_vector<double,DIM>& rDisplacement, double dt) override;
+    double GetDampingConstant(unsigned nodeIndex) override;
 };
 
 #include "SerializationExportWrapper.hpp"

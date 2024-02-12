@@ -173,6 +173,9 @@ public:
      *         there is any) in turn.
      */
     ElementData GetNextElementData();
+    
+    unsigned int GetNumFaces() const override;
+    ElementData GetNextFaceData() override;
 };
 
 #endif /*SEMMESHREADER_HPP_*/

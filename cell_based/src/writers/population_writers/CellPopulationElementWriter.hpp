@@ -132,6 +132,22 @@ public:
      * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */
     virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+
+    /**
+     * Visit the VertexBasedCellPopulation and write data for each Element.
+     *
+     * Outputs a line of space-separated values of the form:
+     * ...[num nodes in element] [node 0 index] [node 1 index] [node 2 index]...
+     *
+     * where [node 0 index] denotes the global index of the Node that is contained
+     * in the Element with local index 0, and so on.
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [present simulation time], followed by a tab.
+     *
+     * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
+     */
+    virtual void Visit(SemBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 };
 
 #include "SerializationExportWrapper.hpp"

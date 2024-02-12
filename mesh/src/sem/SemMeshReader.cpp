@@ -248,6 +248,19 @@ void SemMeshReader<DIM>::GetNextLineFromStream(std::ifstream& fileStream, std::s
     while (line_is_blank);
 }
 
+template<unsigned DIM>
+unsigned int SemMeshReader<DIM>::GetNumFaces() const
+{
+   return 0; 
+}
+
+template<unsigned DIM>
+ElementData SemMeshReader<DIM>::GetNextFaceData()
+{
+    ElementData default_data;
+    return default_data;
+}
+
 // Explicit instantiation
 template class SemMeshReader<1>;
 template class SemMeshReader<2>;
