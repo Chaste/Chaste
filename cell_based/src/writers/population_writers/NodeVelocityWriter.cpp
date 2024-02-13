@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
+#include "SemBasedCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::NodeVelocityWriter()
@@ -161,6 +162,39 @@ void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation
 
         // Write this node's index to file
         unsigned node_index = node_iter->GetIndex();
+        *this->mpOutStream << node_index  << " ";
+
+        // Write this node's position to file
+        const c_vector<double, SPACE_DIM>& position = node_iter->rGetLocation();
+        for (unsigned i=0; i<SPACE_DIM; i++)
+        {
+            *this->mpOutStream << position[i] << " ";
+        }
+
+        // Write this node's velocity to file
+        double time_step = SimulationTime::Instance()->GetTimeStep(); ///\todo correct time step? (#2404)
+        double damping_constant = pCellPopulation->GetDampingConstant(node_index);
+        c_vector<double, SPACE_DIM> velocity = time_step * node_iter->rGetAppliedForce() / damping_constant;
+        for (unsigned i=0; i<SPACE_DIM; i++)
+        {
+            *this->mpOutStream << velocity[i] << " ";
+        }
+    }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(SemBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+    for (typename AbstractMesh<SPACE_DIM, SPACE_DIM>::NodeIterator node_iter = pCellPopulation->rGetMesh().GetNodeIteratorBegin();
+         node_iter != pCellPopulation->rGetMesh().GetNodeIteratorEnd();
+         ++node_iter)
+    {
+        // We should never encounter deleted nodes when calling this method
+        assert(!node_iter->IsDeleted());
+
+        unsigned node_index = node_iter->GetIndex();
+
+        // Write this node's index to file
         *this->mpOutStream << node_index  << " ";
 
         // Write this node's position to file

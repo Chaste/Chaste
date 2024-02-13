@@ -99,6 +99,12 @@ void CellProliferativePhasesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBas
     VisitAnyPopulation(pCellPopulation);
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void CellProliferativePhasesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(SemBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+    //VisitAnyPopulation(pCellPopulation);
+}
+
 // Explicit instantiation
 template class CellProliferativePhasesCountWriter<1,1>;
 template class CellProliferativePhasesCountWriter<1,2>;

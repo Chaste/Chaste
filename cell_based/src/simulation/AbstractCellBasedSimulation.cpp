@@ -72,6 +72,8 @@ AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::AbstractCellBasedSimulation(
     {
         mrCellPopulation.InitialiseCells();
     }
+    std::cout << "Constructor: " << rCellPopulation.GetNumRealCells() << std::endl;
+    std::cout << "Constructor: " << mrCellPopulation.GetNumRealCells() << std::endl;
 
     /*
      * Specify a default time step to use, which may depend on the cell population type.

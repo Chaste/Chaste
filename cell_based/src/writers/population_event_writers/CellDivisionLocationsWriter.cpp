@@ -99,6 +99,12 @@ void CellDivisionLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellP
     VisitAnyPopulation(pCellPopulation);
 }
 
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void CellDivisionLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(SemBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+    //VisitAnyPopulation(pCellPopulation);
+}
+
 // Explicit instantiation
 template class CellDivisionLocationsWriter<1, 1>;
 template class CellDivisionLocationsWriter<1, 2>;

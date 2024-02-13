@@ -85,6 +85,11 @@ void VertexT3SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellP
     pCellPopulation->rGetMesh().GetOperationRecorder()->ClearT3SwapsInfo();
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexT3SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(SemBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+}
+
 // Explicit instantiation
 template class VertexT3SwapLocationsWriter<1,1>;
 template class VertexT3SwapLocationsWriter<1,2>;

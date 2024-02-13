@@ -175,6 +175,24 @@ public:
      * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */
     virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+
+    /**
+     * Visit the population and write the number of cells in the population that have each mutation state.
+     *
+     * Outputs a line of tab-separated values of the form:
+     * [num mutation state 0] [num mutation state 1] [num mutation state 2] ...
+     *
+     * where [num mutation state 0] denotes the number of cells in the population that have the mutation state
+     * with index 0 in the registry of cell properties, and so on. These counts are computed through the cell
+     * population method GetCellMutationStateCount(). The ordering of mutation states is usually specified
+     * by the cell population method SetDefaultCellMutationStateAndProliferativeTypeOrdering().
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [present simulation time], followed by a tab.
+     *
+     * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
+     */
+    virtual void Visit(SemBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 };
 
 #include "SerializationExportWrapper.hpp"

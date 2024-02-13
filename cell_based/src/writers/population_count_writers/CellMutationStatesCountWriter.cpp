@@ -123,6 +123,12 @@ void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCel
     VisitAnyPopulation(pCellPopulation);
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void CellMutationStatesCountWriter<ELEMENT_DIM, SPACE_DIM>::Visit(SemBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+    //VisitAnyPopulation(pCellPopulation);
+}
+
 // Explicit instantiation
 template class CellMutationStatesCountWriter<1,1>;
 template class CellMutationStatesCountWriter<1,2>;

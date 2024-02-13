@@ -99,6 +99,12 @@ void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation
     VisitAnyPopulation(pCellPopulation);
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void BoundaryNodeWriter<ELEMENT_DIM, SPACE_DIM>::Visit(SemBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+    //VisitAnyPopulation(pCellPopulation);
+}
+
 // Explicit instantiation
 template class BoundaryNodeWriter<1,1>;
 template class BoundaryNodeWriter<1,2>;

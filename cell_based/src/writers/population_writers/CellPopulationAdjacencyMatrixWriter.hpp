@@ -197,6 +197,30 @@ public:
      * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */
     virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+
+    /**
+     * Visit the population and write the adjacency matrix (as a long vector).
+     *
+     * Outputs a line of tab-separated values of the form:
+     * [number of cells] [adjacency 1 1] [adjacency 1 2] [adjacency 1 3]...
+     *
+     * where, in the case of N cells, the (i,j)th entry of the adjacency matrix corresponds to the
+     * (1 + i + N*j)th entry in the line (the additional 1 is for the initial entry, which gives N).
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [present simulation time], followed by a tab.
+     *
+     * If cells i and j are adjacent and neither are labelled (as determined by the CellLabel property),
+     * then we have [adjacency i j] = 1; if they are adjacent and both are labelled, then we have
+     * [adjacency i j] = 2; if they are adjacent and exactly one is labelled, then we have
+     * [adjacency i j] = 3; otherwise, if they are no adjacent, then we have [adjacency i i] = 0.
+     *
+     * By default we have [adjacency i i] = 0, i.e. cells are not considered to be adjacent to
+     * themselves.
+     *
+     * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
+     */
+    virtual void Visit(SemBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 };
 
 #include "SerializationExportWrapper.hpp"

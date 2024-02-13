@@ -60,6 +60,7 @@ population/TestNodeBasedCellPopulationWithParticles.hpp
 population/TestPeriodicNodeBasedCellPopulationParallelMethods.hpp
 population/TestPottsBasedCellPopulation.hpp
 population/TestPottsUpdateRules.hpp
+population/TestSemBasedCellPopulation.hpp
 population/TestT2SwapCellKiller.hpp
 population/TestVertexBasedCellPopulation.hpp
 population/TestVertexBasedDivisionRules.hpp
@@ -78,6 +79,7 @@ simulation/TestOffLatticeSimulationWithVertexBasedCellPopulation.hpp
 simulation/TestOnLatticeSimulationWithCaBasedCellPopulation.hpp
 simulation/TestOnLatticeSimulationWithPdes.hpp
 simulation/TestOnLatticeSimulationWithPottsBasedCellPopulation.hpp
+simulation/TestSemBasedSimulation.hpp
 simulation/TestSimpleTargetAreaModifier.hpp
 simulation/TestStepSizeException.hpp
 simulation/TestTargetAreaLinearGrowthModifier.hpp
