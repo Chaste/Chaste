@@ -447,7 +447,6 @@ public:
      *
      * @param pPopulationEventWriter the population event writer.
      */
-
     virtual void AcceptPopulationEventWriter(
         boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter);
 
