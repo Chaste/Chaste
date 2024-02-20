@@ -513,7 +513,6 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddPointData(std::strin
 #endif //CHASTE_VTK
 }
 
-///\todo Mesh should be const (#1076)
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(ImmersedBoundaryMesh<ELEMENT_DIM,SPACE_DIM>& rMesh)
 {

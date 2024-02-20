@@ -100,7 +100,6 @@ void AbstractImmersedBoundaryForce<DIM>::AddNormalNoiseToNodes(
     }
 
     // Do the same for laminas
-    ///\todo do we want different lamina behaviour?
     for (unsigned lam_idx = 0; lam_idx < rCellPopulation.GetNumLaminas(); ++lam_idx)
     {
         unsigned num_nodes_this_elem = rCellPopulation.GetLamina(lam_idx)->GetNumNodes();

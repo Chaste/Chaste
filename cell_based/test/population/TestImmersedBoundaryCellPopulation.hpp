@@ -747,8 +747,6 @@ public:
                 p_cell->GetCellData()->SetItem("cell data", 0.2);
             }
 
-            // Node contained in 1 element
-            ///\todo What does the comment on the line above refer to? Is this a copy/paste error?
             std::string str = "cell data";
             TS_ASSERT_DELTA(cell_population.GetCellDataItemAtPdeNode(0, str, false, 0.1), 0.2, 0.0001);
         }
@@ -801,8 +799,6 @@ public:
         
         std::string str = "cell data";
 
-        // Node contained in 1 element
-        ///\todo What does the comment on the line above refer to? Is this a copy/paste error?
         TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(0), false);
         TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(4), false);
     }

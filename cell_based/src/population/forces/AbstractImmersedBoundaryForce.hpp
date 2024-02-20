@@ -47,9 +47,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  * NOTE: while this class shares similarities with AbstractForce, it is not 
  * passed to a simulation object, but instead to an 
- * ImmersedBoundarySimulationModifier.
+ * ImmersedBoundarySimulationModifier as all actual immersed boundary logic
+ * is handled by the modifer, rather than the typical simulation
+ * infrastructure.
  * 
- * \todo explain why it's not passed directly to the simulation object
  */
 template<unsigned DIM>
 class AbstractImmersedBoundaryForce : public Identifiable
@@ -90,17 +91,13 @@ protected:
 
     /**
      * The mean of the Normal distribution from which random noise variations 
-     * are drawn.
-     * 
-     * \todo Initialised to default value in constructor?
+     * are drawn. Default value is 1.0
      */
     double mNormalNoiseMean;
 
     /**
      * The standard deviation of the Normal distribution from which random noise 
-     * variations are drawn.
-     * 
-     * \todo Initialised to default value in constructor?
+     * variations are drawn. Default value is 0.0
      */
     double mNormalNoiseStdDev;
 
@@ -140,17 +137,20 @@ public:
     bool GetAdditiveNormalNoise() const;
 
     /**
-     * \todo document method
+     * Enable or disable additive normal noise
      * 
      * @param additiveNormalNoise whether to include multiplicative normal noise
      */
     void SetAdditiveNormalNoise(bool additiveNormalNoise);
 
-    /** @return mNormalNoiseMean */
+    /** 
+     *
+     * @return mNormalNoiseMean 
+     * */
     double GetNormalNoiseMean() const;
 
     /**
-     * \todo document method
+     * Set the mean value of the normal noise
      * 
      * @param normalNoiseMean the new value of mNormalNoiseMean 
      */
@@ -160,7 +160,7 @@ public:
     double GetNormalNoiseStdDev() const;
 
     /**
-     * \todo document method
+     * Set the standard deviation of the normal noise
      * 
      * @param normalNoiseStdDev the new value of mNormalNoiseStdDev
      */

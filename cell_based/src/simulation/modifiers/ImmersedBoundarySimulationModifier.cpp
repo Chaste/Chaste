@@ -759,7 +759,7 @@ void ImmersedBoundarySimulationModifier<DIM>::CalculateSourceGradients(
     unsigned num_grid_ptsX = mpMesh->GetNumGridPtsX();
     unsigned num_grid_ptsY = mpMesh->GetNumGridPtsY();
 
-    ///\todo: this assumes mGridSpacingX = mGridSpacingY (fine for the foreseeable future)
+    // Assumes 1.0 x 1.0 square domain
     double factor = 1.0 / (2.0 * mGridSpacingX);
 
     // The fluid sources are stored in the third slice of the rRhs grids

@@ -509,12 +509,6 @@ void AbstractMesh<ELEMENT_DIM, SPACE_DIM>::SetMeshHasChangedSinceLoading()
     mMeshFileBaseName = "";
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-const std::vector<Node<SPACE_DIM>*>& AbstractMesh<ELEMENT_DIM, SPACE_DIM>::rGetNodes() const
-{
-    return mNodes;
-}
-
 // Explicit instantiation
 template class AbstractMesh<1, 1>;
 template class AbstractMesh<1, 2>;

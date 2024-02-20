@@ -550,7 +550,6 @@ public:
 
     void TestSolveNavierStokesSpectral()
     {
-        ///\todo Test this method
         { // Coverage for zero field sums
             SimulationTime::Instance()->Destroy();
             SimulationTime::Instance()->SetStartTime(0.0);
@@ -622,7 +621,6 @@ public:
 
     void TestUpdateFluidVelocityGrids()
     {
-        ///\todo Test this method
         // This calls all other untested methods
         
         { // Coverage for normal noise

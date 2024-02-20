@@ -234,6 +234,11 @@ public:
 
     /** Forward declaration of lamina iterator. */
     class ImmersedBoundaryLaminaIterator;
+    
+    /**
+     * @return a reference to the const collection of nodes
+    */
+    const std::vector<Node<SPACE_DIM>*>& rGetNodes() const;
 
     /**
      * @return an iterator to the first element in the mesh.

@@ -418,10 +418,7 @@ public:
      * correspondence with CellPtrs.
      *
      * @param hasHadBirthsOrDeaths - a bool saying whether cell population has 
-     *     had Births Or Deaths not needed in this cell population class
-     * 
-     * \todo why not needed? Cells should be able to divide and/or die in 
-     *     immersed boundary model simulations
+     *     had Births Or Deaths
      */
     void Update(bool hasHadBirthsOrDeaths = true);
 

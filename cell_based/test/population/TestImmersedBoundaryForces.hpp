@@ -128,10 +128,9 @@ public:
 
             ImmersedBoundaryLinearInteractionForce<2> force;
             force.SetAdditiveNormalNoise(true);
-            auto& nodes = cell_population.rGetMesh().rGetNodes();
-            for (auto& p_node : nodes)
+            for (auto iter = p_mesh->GetNodeIteratorBegin(); iter != p_mesh->GetNodeIteratorEnd(); ++iter)
             {
-                p_node->ClearAppliedForce();
+                iter->ClearAppliedForce();
             }
             force.AddImmersedBoundaryForceContribution(pairs, cell_population);
         }
@@ -408,7 +407,6 @@ public:
 
     void TestImmersedBoundaryLinearMembraneForce()
     {
-        ///\todo Test this class
         {
             // Create a small 3x3 mesh
             ImmersedBoundaryHoneycombMeshGenerator gen(3, 3, 3, 0.1, 0.3);
@@ -523,7 +521,6 @@ public:
 
     void TestImmersedBoundaryMorseMembraneForce()
     {
-        ///\todo Test this class
         {
             // Create a small 3x3 mesh
             ImmersedBoundaryHoneycombMeshGenerator gen(3, 3, 3, 0.1, 0.3);

@@ -76,8 +76,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakePetscSetup.hpp"
 
 /* In Chaste, every simulation is run as a 'test', and here we define a test class which inherits from
- * {{{AbstractCellBasedTestSuite}}}. The class {{{AbstractCellBasedTestSuite}}} sets up various parameters for us.  Of
- * particular use is that {{{RandomNumberGenerator}}} is re-seeded with zero.  This means any random numbers generated
+ * `AbstractCellBasedTestSuite`. The class `AbstractCellBasedTestSuite` sets up various parameters for us.  Of
+ * particular use is that `RandomNumberGenerator` is re-seeded with zero.  This means any random numbers generated
  * (for instance, random variation in cell size) is reproducible from one simulation to the next.
  */
 class TestRunningImmersedBoundarySimulationsTutorial : public AbstractCellBasedTestSuite
@@ -94,7 +94,7 @@ public:
     {
         /* The first thing we define is a 2D (specified by the <2,2>) mesh. This holds spatial information of the
          * simulation, including that of the underlying fluid grid as well as the location of cell boundary-points. To
-         * create this we use an {{{ImmersedBoundaryPalisadeMeshGenerator}}}. The parameters are, in order:
+         * create this we use an `ImmersedBoundaryPalisadeMeshGenerator`. The parameters are, in order:
          *   * 5: number of cells in the palisade
          *   * 100: number of boundary points in each cell
          *   * 0.2: 'superellipse' exponent which determines initial cell shape; 1.0 is an ellipse, 0.0 a rectangle
@@ -106,20 +106,20 @@ public:
         ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
         ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
 
-        /* We now generate a collection of cells. We do this by using a {{{CellsGenerator}}} and we specify the
-         * proliferative behaviour of the cell by choosing a {{{CellCycleModel}}}. Here we choose an
-         * {{{UniformCellCycleModel}}} which does not allow proliferation. For an immersed boundary
+        /* We now generate a collection of cells. We do this by using a `CellsGenerator` and we specify the
+         * proliferative behaviour of the cell by choosing a `CellCycleModel`. Here we choose an
+         * `UniformCellCycleModel` which does not allow proliferation. For an immersed boundary
          * simulation we need as may cells as elements in the mesh. */
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
-        /* We now create a {{{CellPopulation}}} object (passing in the mesh and cells) to connect the mesh and the cells
-         * together. Here we use an {{{ImmersedBoundaryCellPopulation}}} and the dimension is <2>.*/
+        /* We now create a `CellPopulation` object (passing in the mesh and cells) to connect the mesh and the cells
+         * together. Here we use an `ImmersedBoundaryCellPopulation` and the dimension is <2>.*/
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
 
-        /* We now create an {{{OffLatticeSimulation}}} object and pass in the {{{CellPopulation}}}. We also set some
+        /* We now create an `OffLatticeSimulation` object and pass in the `CellPopulation`. We also set some
          * options for the simulation like output directory, output multiple (so we don't visualize every timestep),
          * and end time.
          * Additionally, we tell the numerical method that we want the cell population to update node locations.*/
@@ -133,14 +133,14 @@ public:
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(100.0 * dt);
 
-        /* All of the machinery for the immersed boundary method is handled in the following {{{SimulationModifier}}}.
-         * Here, we create a 'shared pointer' to an {{{ImmersedBoundarySimulationModifier}}} object and pass it to the
-         * {{{OffLatticeSimulation}}}.*/
+        /* All of the machinery for the immersed boundary method is handled in the following `SimulationModifier`.
+         * Here, we create a 'shared pointer' to an `ImmersedBoundarySimulationModifier` object and pass it to the
+         * `OffLatticeSimulation`.*/
         MAKE_PTR(ImmersedBoundarySimulationModifier<2>, p_main_modifier);
         simulator.AddSimulationModifier(p_main_modifier);
 
-        /* We now associate an {{{ImmersedBoundaryLinearMembraneForce}}} and
-         * {{{ImmersedBoundaryLinearInteractionForce}}} to the {{{SimulationModifier}}} which
+        /* We now associate an `ImmersedBoundaryLinearMembraneForce` and
+         * `ImmersedBoundaryLinearInteractionForce` to the `SimulationModifier` which
          * handles the membrane elasticity forces.  These are created in a similar manner as above.*/
         MAKE_PTR(ImmersedBoundaryLinearMembraneForce<2>, p_boundary_force);
         p_main_modifier->AddImmersedBoundaryForce(p_boundary_force);
@@ -151,7 +151,7 @@ public:
         p_main_modifier->AddImmersedBoundaryForce(p_cell_cell_force);
         p_cell_cell_force->SetSpringConst(1.0 * 1e6);
 
-        /* Finally we call the {{{Solve}}} method on the simulation to run the simulation.*/
+        /* Finally we call the `Solve` method on the simulation to run the simulation.*/
         simulator.Solve();
     }
 };
