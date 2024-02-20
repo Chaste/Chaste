@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractMesh.hpp"
 #include "Exception.hpp"
+#include "UblasCustomFunctions.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Implementation
@@ -247,9 +248,8 @@ ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingB
         {
             if (!rNodes[index]->IsDeleted())
             {
-                // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
-                c_vector<double, SPACE_DIM> position = zero_vector<double>(SPACE_DIM);
-                position = rNodes[index]->rGetLocation();
+                // Using ExplicitVectorCopy to avoid compiler warnings about potentially uninitialized c_vectors.
+                c_vector<double, SPACE_DIM> position = ExplicitVectorCopy<SPACE_DIM>(rNodes[index]->rGetLocation());
 
                 // Update max/min
                 for (unsigned i = 0; i < SPACE_DIM; i++)
