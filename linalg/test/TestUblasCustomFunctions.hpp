@@ -398,6 +398,40 @@ public:
                               "Matrix should be symmetric");
 
     }
+
+    void TestExplicitCopy()
+    {
+        // 1-d case
+        {
+            c_vector<double, 1> v1_old;
+            v1_old[0] = 0.1;
+
+            c_vector<double, 1> v1_new = ExplicitVectorCopy<1>(v1_old);
+            TS_ASSERT_EQUALS(v1_new[0], v1_old[0]);
+        }
+        // 2-d case
+        {
+            c_vector<double, 2> v2_old;
+            v2_old[0] = 0.1;
+            v2_old[1] = 0.2;
+
+            c_vector<double, 2> v2_new = ExplicitVectorCopy<2>(v2_old);
+            TS_ASSERT_EQUALS(v2_new[0], v2_old[0]);
+            TS_ASSERT_EQUALS(v2_new[1], v2_old[1]);
+        }
+        // 3-d case
+        {
+            c_vector<double, 3> v3_old;
+            v3_old[0] = 0.1;
+            v3_old[1] = 0.2;
+            v3_old[2] = 0.3;
+
+            c_vector<double, 3> v3_new = ExplicitVectorCopy<3>(v3_old);
+            TS_ASSERT_EQUALS(v3_new[0], v3_old[0]);
+            TS_ASSERT_EQUALS(v3_new[1], v3_old[1]);
+            TS_ASSERT_EQUALS(v3_new[2], v3_old[2]);
+        }
+    }
 };
 
 #endif /*TESTUBLASCUSTOMFUNCTIONS_HPP_*/
