@@ -84,8 +84,12 @@ class TestRunningImmersedBoundarySimulationsTutorial : public AbstractCellBasedT
 {
 public:
     /*
-     * == Simulation - a basic immersed boundary simulation ==
+     * ## Simulation - a basic immersed boundary simulation
      *
+     * Immersed boundary methods simulate two-way coupled cell-fluid interactions. They can be used to model
+     * cells within fluids, and fluids within cells. The chaste implementation supports multiple fluid sources,
+     * cell wall shape changes, laminas, leaky laminas and biological noise.
+     * 
      * In this simulation, we create an immersed boundary framework with a palisade of cells. The cells have a slight
      * variation in size, and a basement membrane is included. Each cell in the simulation is assigned a basic
      * cell-cycle model; no proliferation occurs.
