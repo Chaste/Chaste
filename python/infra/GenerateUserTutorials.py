@@ -93,7 +93,7 @@ def get_title_from_file(abs_file_path: Path) -> str:
     reduced_file_name = file_name[len("Test"):-(len("Tutorial"))]
 
     # Split CamelCase string into list of words
-    words = re.findall(r'[A-Z](?:[a-z]+|[A-Z]*(?=[A-Z]|$))', reduced_file_name)
+    words = re.findall(r'(\d+[A-Za-z]?|[A-Z][a-z]*|[A-Z]+(?=[A-Z]|$))', reduced_file_name)
 
     # Join words with space and return the result
     return ' '.join(words)
