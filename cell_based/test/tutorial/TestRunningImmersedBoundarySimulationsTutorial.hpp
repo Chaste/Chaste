@@ -37,13 +37,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTIMMERSEDBOUNDARYDEMOTUTORIAL_HPP_
 
 /*
- * = Example showing how to create and run an immersed boundary simulation in Chaste =
+ * ## Example showing how to create and run an immersed boundary simulation in Chaste
  *
  * We create a simple palisade of cells with a basement membrane, and see how to:
  *   * set the initial conditions;
  *   * change the cell-level properties.
  *
- * == The test ==
+ * ### The test
  *
  * We begin by including the necessary header files.
  */
