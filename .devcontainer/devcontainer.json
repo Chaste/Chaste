@@ -2,14 +2,14 @@
 {
 	"name": "Chaste",
 
-	// To start from a bare environment with no pre-built Chaste libraries, uncomment the following line:
-	// "image": "chaste/base",
+	// To start from an image with pre-built Chaste libraries from the develop branch, use the following line:
+	"image": "chaste/develop",
 	// If you prefer to start with a container with the latest Chaste release pre-built, use the following line:
 	// "image": "chaste/release",
-	// Otherwise, to start from an image with pre-built Chaste libraries from the develop branch, use the following line:
-	"image": "chaste/develop",
 	// Note: specific versions can be selected by adding one of the the tags listed on Docker Hub e.g.:
 	// "image": "chaste/release:2021.1",
+	// Otherwise, to start from a bare environment with no pre-built Chaste libraries, uncomment the following line:
+	// "image": "chaste/base",
 
 	"mounts": [
 		{
@@ -21,9 +21,9 @@
 		{
 			// Warning: This mounts the source folder on the host into the target path in the container.
 			// It therefore needs the source directory to already exist on the host.
-			// "test_summary" is a known (but disused folder) in the repo but this choice should be revised.
+			// "output" is a known folder in the repo but this choice could be revised.
 			// "source": "${localWorkspaceFolder}/../test_summary",
-			"source": "${localWorkspaceFolder}/test_summary",
+			"source": "${localWorkspaceFolder}/output",
 			"target": "/home/chaste/testoutput",
 			// "target": "${containerEnv:CHASTE_TEST_OUTPUT}",
 			"type": "bind"
@@ -72,11 +72,8 @@
 	// "forwardPorts": [],
 
 	"onCreateCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
-	// "onCreateCommand": "apt update && apt install -y git && git config --global --add safe.directory /example"
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "build_chaste.sh develop",
-	// "postCreateCommand": "cmake -DCMAKE_BUILD_TYPE:STRING=Debug -DChaste_ERROR_ON_WARNING:BOOL=ON -DChaste_UPDATE_PROVENANCE:BOOL=OFF -H$CHASTE_SOURCE_DIR -B$CHASTE_BUILD_DIR", // && make --no-print-directory -j$(nproc) -C $CHASTE_BUILD_DIR",
-	// "postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
 	// "postStartCommand": "zsh"
 	"postAttachCommand": "bash",
 
@@ -85,18 +82,10 @@
 		"vscode":{
 			"extensions": [
 				"ms-vscode.cpptools-extension-pack",
-				"ms-vscode.cmake-tools"
+				"ms-vscode.cpptools-themes",
+				"ms-vscode.cmake-tools",
+				"josetr.cmake-language-support-vscode"
 			]
-			// TODO
-			// "settings": {
-			// 	// "terminal.integrated.shell.linux": "/bin/zsh"
-			// 	"terminal.integrated.defaultProfile.linux": "zsh",
-			// 	"terminal.integrated.profiles.linux": {
-			// 		"zsh": {
-			// 			"path": "/usr/bin/zsh"
-			// 		}
-			// 	}
-			// }
 		}
 	},
 
