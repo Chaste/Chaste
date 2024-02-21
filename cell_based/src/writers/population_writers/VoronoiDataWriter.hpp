@@ -120,6 +120,15 @@ public:
      * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */
     virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+
+    /**
+     * Visit the population and write the data.
+     *
+     * This is an empty dummy function, since this class is defined for use with a MeshBasedCellPopulation only.
+     *
+     * @param pCellPopulation a pointer to the ImmersedBoundaryCellPopulation to visit.
+     */
+    virtual void Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation);
 };
 
 #include "SerializationExportWrapper.hpp"

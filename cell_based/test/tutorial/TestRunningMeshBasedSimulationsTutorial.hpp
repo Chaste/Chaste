@@ -127,8 +127,8 @@ public:
          * [AbstractCellCycleModel](/doxygen-latest/classAbstractCellCycleModel.html).
          * Note that some of these models will require information on the surrounding medium such as Oxygen concentration to work,
          * see specific class documentation for details. Some of these will be covered in later tutorials 
-         * ([Running Contact Inhibition Simulations](/docs/user-tutorials/runningcontactinhibitionsimulations/),
-         * [Running Delta Notch Simulations](/docs/user-tutorials/runningdeltanotchsimulations/), and [Running Tumour Spheroid Simulations](/docs/user-tutorials/runningtumourspheroidsimulations).
+         * ([Running Contact Inhibition Simulations](../runningcontactinhibitionsimulations/),
+         * [Running Delta Notch Simulations](../runningdeltanotchsimulations/), and [Running Tumour Spheroid Simulations](../runningtumourspheroidsimulations).
          * We create an empty vector of cells and pass this into the
          * method along with the mesh. The second argument represents the size of that the vector
          * `cells` should become - one cell for each node, the third argument specifies
@@ -146,7 +146,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         /* To view the results of this and the next test in Paraview it is necessary to explicitly
-        * generate the required .vtu files. This is detailed in the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview/) tutorial.
+        * generate the required .vtu files. This is detailed in the [Visualizing With Paraview](../visualizingwithparaview/) tutorial.
         * Note that the results in Paraview may appear different to those in the java based visualizer. This is related
         * to the different methods used to generate voronoi tesselations in each and is resolved through the use of
         * 'ghost nodes', as shown in the next test. */

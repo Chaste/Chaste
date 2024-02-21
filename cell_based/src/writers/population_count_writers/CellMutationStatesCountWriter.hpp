@@ -175,6 +175,15 @@ public:
      * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */
     virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+
+    /**
+     * Visit the population and write the data.
+     *
+     * Just passes through to VisitAnyPopulation
+     *
+     * @param pCellPopulation a pointer to the ImmersedBoundaryBasedCellPopulation to visit.
+     */
+    virtual void Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation);
 };
 
 #include "SerializationExportWrapper.hpp"

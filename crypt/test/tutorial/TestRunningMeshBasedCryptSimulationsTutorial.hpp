@@ -79,7 +79,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * in mechanical equilibrium with its neighours and periodic boundary conditions are applied
  * at the left- and right-hand sides of the mesh (hence the "cylindrical"). */
 #include "CylindricalHoneycombMeshGenerator.hpp"
-/* The next two header files were encountered in the tutorial [Running Mesh Based Simulations](/docs/user-tutorials/runningmeshbasedsimulations/).
+/* The next two header files were encountered in the tutorial [Running Mesh Based Simulations](../runningmeshbasedsimulations/).
  * The first header defines a `CellPopulation` class that uses a triangular mesh, and allows
  * for the inclusion of 'ghost nodes': these are nodes in the mesh that do not correspond
  * to cells, but help ensure that a sensible Delaunay triangulation is generated
@@ -205,7 +205,7 @@ public:
     }
 
     /*
-     * Finally, to visualize the results, see [Visualizing with Paraview](/docs/user-tutorials/visualizingwithparaview/)
+     * Finally, to visualize the results, see [Visualizing with Paraview](../visualizingwithparaview/)
      *
      * ### Test 2: a Wnt-dependent crypt simulation
      *

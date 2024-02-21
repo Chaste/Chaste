@@ -134,9 +134,9 @@ option (Chaste_USE_PETSC_HDF5 "Prefer to compile Chaste with HDF5 library used b
 
 option (Chaste_UPDATE_PROVENANCE "Update build timestamp. Disable to prevent re-linking of all Chaste libraries" ON)
 
-option (RUN_TESTS "This option simply runs Chaste tests. You should also set the test family." OFF)
-set (TEST_FAMILY "Continuous" CACHE STRING "The name of the test family, e.g, Continuous, Failing, Nightly, Parallel etc.")
-set (TestPackTypes "Continuous;Failing;Nightly;Parallel;Production;Weekly;Profile;ProfileAssembly;ExtraSimulations;Codegen")
+option(RUN_TESTS "This option simply runs Chaste tests. You should also set the test family." OFF)
+set(TEST_FAMILY "Continuous" CACHE STRING "The name of the test family, e.g, Continuous, Failing, Nightly, Parallel etc.")
+set(TestPackTypes "Continuous;Failing;Nightly;Parallel;Production;Weekly;Profile;ProfileAssembly;ExtraSimulations;Codegen")
 
 if (RUN_TESTS)
     list (FIND TestPackTypes ${TEST_FAMILY} found)
@@ -392,9 +392,10 @@ else ()
     set(Boost_USE_STATIC_LIBS ON)
     set(Boost_USE_STATIC_RUNTIME ON)
 endif ()
-find_package(Boost COMPONENTS filesystem system serialization program_options REQUIRED)
-list(APPEND Chaste_INCLUDES "${Boost_INCLUDE_DIR}")
-list(APPEND Chaste_LINK_LIBRARIES "${Boost_LIBRARIES}")
+find_package (Boost COMPONENTS filesystem system serialization program_options REQUIRED)
+list (APPEND Chaste_INCLUDES "${Boost_INCLUDE_DIR}")
+list (APPEND Chaste_LINK_LIBRARIES "${Boost_LIBRARIES}")
+
 
 
 ################################
@@ -543,6 +544,7 @@ if (Chaste_USE_XERCES)
     list (APPEND Chaste_LINK_LIBRARIES "${XERCESC_LIBRARY}")
     add_definitions (-DCHASTE_XERCES)
 endif ()
+
 
 add_definitions (-DTRILIBRARY -DTETLIBRARY -DANSI_DECLARATORS)
 
