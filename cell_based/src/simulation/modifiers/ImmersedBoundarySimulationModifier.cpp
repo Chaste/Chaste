@@ -83,8 +83,8 @@ void ImmersedBoundarySimulationModifier<DIM>::SetupSolve(
     AbstractCellPopulation<DIM,DIM>& rCellPopulation,
     std::string outputDirectory)
 {
-    /* 
-     * We can set up some helper variables here which need only be set up once 
+    /*
+     * We can set up some helper variables here which need only be set up once
      * for the entire simulation.
      */
     this->SetupConstantMemberVariables(rCellPopulation);
@@ -484,7 +484,7 @@ void ImmersedBoundarySimulationModifier<DIM>::PropagateFluidSourcesToGrid()
             // Get location and strength of this source
             c_vector<double, DIM> source_location = this_source->rGetLocation();
             double source_strength = this_source->GetStrength();
-            
+
             // Get first grid index in each dimension, taking account of possible wrap-around
             first_idx_x = unsigned(floor(source_location[0] / mGridSpacingX)) + num_grid_ptsX - 1;
             first_idx_y = unsigned(floor(source_location[1] / mGridSpacingY)) + num_grid_ptsY - 1;
@@ -580,10 +580,10 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     mpFftInterface->FftExecuteForward();
 
     /*
-     * The result of a DFT of n real datapoints is n/2 + 1 complex values, due 
-     * to redundancy: element n-1 is conj(2), etc. A similar pattern of 
-     * redundancy occurs in a 2D transform. Calculations in the Fourier domain 
-     * preserve this redundancy, and so all calculations need only be done on 
+     * The result of a DFT of n real datapoints is n/2 + 1 complex values, due
+     * to redundancy: element n-1 is conj(2), etc. A similar pattern of
+     * redundancy occurs in a 2D transform. Calculations in the Fourier domain
+     * preserve this redundancy, and so all calculations need only be done on
      * reduced-size arrays, saving memory and computation.
      */
 
@@ -618,7 +618,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     r_pressure_grid[0][num_grid_ptsY/2] = 0.0;
 
     /*
-     * Do final stage of computation before inverse FFT. We do the necessary DFT 
+     * Do final stage of computation before inverse FFT. We do the necessary DFT
      * scaling at this stage so the output from the inverse DFT is correct.
      */
     for (unsigned x = 0; x < num_grid_ptsX; ++x)
@@ -644,7 +644,7 @@ void ImmersedBoundarySimulationModifier<DIM>::SolveNavierStokesSpectral()
     }
 
     /*
-     * Finally, zero out any systematic small errors on the velocity grids that 
+     * Finally, zero out any systematic small errors on the velocity grids that
      * may lead to a drift, if required.
      */
     if (mZeroFieldSums)

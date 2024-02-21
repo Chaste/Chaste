@@ -69,8 +69,8 @@ private:
 
 protected:
     /**
-     * Output any parameters associated with the division rule. Currently empty 
-     * since this class has no member variables. Should be overridden by any 
+     * Output any parameters associated with the division rule. Currently empty
+     * since this class has no member variables. Should be overridden by any
      * child classes that have parameters.
      *
      * @param rParamsFile  The stream of the parameter file
@@ -96,7 +96,7 @@ public:
      *
      * @param pParentCell  The cell to divide
      * @param rCellPopulation  The immersed boundary cell population
-     * 
+     *
      * @return the division vector.
      */
     virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(
@@ -104,7 +104,7 @@ public:
         ImmersedBoundaryCellPopulation<SPACE_DIM>& rCellPopulation) = 0;
 
     /**
-     * Output the name of the concrete class and call 
+     * Output the name of the concrete class and call
      * OutputCellImmersedBoundaryDivisionRuleParameters().
      *
      * @param rParamsFile  The stream of the parameter file

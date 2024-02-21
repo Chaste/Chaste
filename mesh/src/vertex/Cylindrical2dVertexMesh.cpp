@@ -136,7 +136,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
                  * Note using boundary nodes to identify the boundary edges won't work with
                  * triangles which have 3 boundary nodes
                  * if ((p_node_a->IsBoundaryNode() && p_node_b->IsBoundaryNode()))
-                 * wont work with triangles which have 3 boundary nodes so we use a more 
+                 * wont work with triangles which have 3 boundary nodes so we use a more
                  * general method.
                  */
 
@@ -152,33 +152,33 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
                     assert(dij>1e-5); //Sanity check
                     normal_vector /= dij;
 
-                    /*  
+                    /*
                      * Here we only add one extra node.
-                     *  
-                     *  ____  one extra image node 
-                     *   /\  
-                     *  /__\ edge of mesh 
-                     * 
+                     *
+                     *  ____  one extra image node
+                     *   /\
+                     *  /__\ edge of mesh
+                     *
                      * Changing this can cause issues with stitching the left and right back together.
                      */
-                    
+
                     double ratio = 0.5;
                     c_vector<double,2> new_node_location = normal_vector + p_node_a->rGetLocation() + ratio * edge;
-                    
+
                     // Check if near other nodes
                     bool node_clear = true;
-                    double node_clearance = 0.01; 
+                    double node_clearance = 0.01;
 
                     for (unsigned i=0; i<nodes.size(); i++)
-                    {   
+                    {
                         double distance = norm_2(mpDelaunayMesh->GetVectorFromAtoB(nodes[i]->rGetLocation(), new_node_location));
                         if (distance < node_clearance)
-                        {   
+                        {
                             node_clear = false;
                             break;
                         }
                     }
-                
+
                     if (node_clear)
                     {
                         nodes.push_back(new Node<2>(new_node_index, new_node_location));
@@ -192,7 +192,7 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
         for (TetrahedralMesh<2,2>::ElementIterator elem_iter = mpDelaunayMesh->GetElementIteratorBegin();
             elem_iter != mpDelaunayMesh->GetElementIteratorEnd();
             ++elem_iter)
-        {   
+        {
             bool bad_element = false;
             double edge_threshold = 1.5; //TODO think about making this a setable variable!
 
@@ -213,37 +213,37 @@ Cylindrical2dVertexMesh::Cylindrical2dVertexMesh(Cylindrical2dMesh& rMesh, bool 
                 {
                     Node<2>* p_node_a = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex(j));
                     Node<2>* p_node_b = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex((j+1)%3));
-                    
+
                     c_vector<double,2> edge = mpDelaunayMesh->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
                     double edge_length = norm_2(edge);
-                    
+
                     // The short edges in these elements are the boundaries of the void
                     if (edge_length<edge_threshold)
-                    {           
-                        /*  
+                    {
+                        /*
                          * Here we only add one extra node.
-                         *   
-                         *  ____  one extra image node 
-                         *   /\  
-                         *  /__\ edge of mesh 
-                         * 
+                         *
+                         *  ____  one extra image node
+                         *   /\
+                         *  /__\ edge of mesh
+                         *
                          * Changing this can cause issues with stitching the left and right back together.
                          */
-                    
+
                         // Short Edge so add new node
                         c_vector<double,2> normal_vector;
 
                         // Outward Normal
                         normal_vector[0]= edge[1];
                         normal_vector[1]= -edge[0];
-                        
+
                         double dij = norm_2(normal_vector);
                         assert(dij>1e-5); //Sanity check
                         normal_vector /= dij;
 
                         double bound_offset = 1.0; //TODO Think about makeing this a setable variable!
                         c_vector<double,2> new_node_location = -bound_offset*normal_vector + p_node_a->rGetLocation() + 0.5 * edge;
-                
+
                         nodes.push_back(new Node<2>(new_node_index, new_node_location));
                         new_node_index++;
                     }

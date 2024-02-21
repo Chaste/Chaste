@@ -103,7 +103,7 @@ public:
         // Tidy up
         results_file->close();
     }
-    
+
     void TestSampleRandomField()
     {
         // Correct sample numbers
@@ -134,7 +134,7 @@ public:
         }
 
         // Length scale
-        {            
+        {
             const unsigned n = 4;
             UniformGridRandomFieldGenerator<1> gen1({{0.0}}, {{1.0}}, {{n}}, {{true}}, 1.00);
             gen1.SetRandomSeed(123);
@@ -143,8 +143,8 @@ public:
             gen2.SetRandomSeed(123);
             auto samples2 = gen2.SampleRandomFieldAtTime(0.0);
 
-            TS_ASSERT_EQUALS(samples1[0], samples2[0]);           
-            TS_ASSERT_EQUALS(samples1[2], samples2[1]);           
+            TS_ASSERT_EQUALS(samples1[0], samples2[0]);
+            TS_ASSERT_EQUALS(samples1[2], samples2[1]);
         }
     }
 

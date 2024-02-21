@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryCellPopulation.hpp"
 
 /**
- * A force class for use in immersed boundary simulations. This force implements 
+ * A force class for use in immersed boundary simulations. This force implements
  * elastic links between adjacent nodes in each immersed boundary.
  */
 template <unsigned DIM>
@@ -69,25 +69,25 @@ private:
     }
 
     /**
-     * The spring constant associated with each element. Initialised to 1e6 in 
+     * The spring constant associated with each element. Initialised to 1e6 in
      * constructor.
      */
     double mElementSpringConst;
 
     /**
-     * The rest length associated with each element as a fraction of the average 
+     * The rest length associated with each element as a fraction of the average
      * node spacing. Initialised to 0.5 in constructor.
      */
     double mElementRestLength;
 
     /**
-     * The spring constant associated with each lamina. Initialised to 1e6 in 
+     * The spring constant associated with each lamina. Initialised to 1e6 in
      * constructor.
      */
     double mLaminaSpringConst;
 
     /**
-     * The rest length associated with each lamina as a fraction of the average 
+     * The rest length associated with each lamina as a fraction of the average
      * node spacing. Initialised to 0.5 in constructor.
      */
     double mLaminaRestLength;
@@ -96,7 +96,7 @@ private:
      * Helper method for AddImmersedBoundaryForceContribution.
      * Calculates forces, and can accept either an element or a lamina
      *
-     * @tparam ELEMENT_DIM either DIM or DIM-1 depending on whether receiving an 
+     * @tparam ELEMENT_DIM either DIM or DIM-1 depending on whether receiving an
      *         element or a lamina
      * @param rElement the element or lamina add forces to
      * @param rCellPopulation the immersed boundary cell population
@@ -117,10 +117,10 @@ public:
 
     /**
      * Overridden AddImmersedBoundaryForceContribution() method.
-     * Calculates basic elasticity in the membrane of each immersed boundary as 
+     * Calculates basic elasticity in the membrane of each immersed boundary as
      * a result of interactions.
      *
-     * @param rNodePairs reference to a vector set of node pairs between which 
+     * @param rNodePairs reference to a vector set of node pairs between which
      *                   to contribute the force
      * @param rCellPopulation reference to the cell population
      */
@@ -139,7 +139,7 @@ public:
 
     /**
      * Set mElementSpringConst.
-     * 
+     *
      * @param elementSpringConst the new value of mElementSpringConst
      */
     void SetElementSpringConst(double elementSpringConst);
@@ -149,7 +149,7 @@ public:
 
     /**
      * Set mElementRestLength
-     * 
+     *
      * @param elementRestLength the new value of mElementRestLength
      */
     void SetElementRestLength(double elementRestLength);
@@ -159,7 +159,7 @@ public:
 
     /**
      * Set mLaminaSpringConst.
-     * 
+     *
      * @param laminaSpringConst the new value of mLaminaSpringConst
      */
     void SetLaminaSpringConst(double laminaSpringConst);
@@ -169,7 +169,7 @@ public:
 
     /**
      * Set mLaminaRestLength.
-     * 
+     *
      * @param laminaRestLength the new value of mLaminaRestLength
      */
     void SetLaminaRestLength(double laminaRestLength);

@@ -550,7 +550,7 @@ public:
             {
                 num_edge_splits++;
             }
-            
+
             // Determine operations that an element underwent
             const unsigned elem_index = edge_operations[i].GetElementIndex();
             element_to_operations[elem_index].push_back(edge_operations[i].GetOperation());

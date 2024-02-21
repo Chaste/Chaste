@@ -119,9 +119,9 @@ public:
          * It is found in the file [NobleVargheseKohlNoble1998WithSac.hpp](https://github.com/Chaste/Chaste/blob/develop/heart/src/odes/ionicmodels/NobleVargheseKohlNoble1998WithSac.hpp), and defines a class called
          * `CML_noble_varghese_kohl_noble_1998_basic_with_sac`.
          *
-         * To add a SAC current to (or otherwise alter) your favourite cell model, you have to 
+         * To add a SAC current to (or otherwise alter) your favourite cell model, you have to
          * auto-generate the non-SAC C++ code at the command line, following the guide [Code Generation From CellML](../../user-guides/code-generation-from-cell-ml/#chaste_codegen-command-line-arguments).
-         * 
+         *
          * Copy and rename the resultant `.hpp` and `.cpp` files (which can be found in the same folder as the
          * input cellml). For example, rename everything to `LuoRudy1991WithSac`. Then alter the class
          * to overload the method `AbstractCardiacCell::SetStretch(double stretch)` to store the stretch,

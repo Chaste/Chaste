@@ -151,7 +151,7 @@ public:
         std::string results_file1 = handler.GetOutputDirectoryFullPath() + "ib_mesh_2d.node";
         std::string results_file2 = handler.GetOutputDirectoryFullPath() + "ib_mesh_2d.elem";
         std::string results_file3 = handler.GetOutputDirectoryFullPath() + "ib_mesh_2d.lam";
-        
+
         // Test adding point data
         ib_mesh_writer.AddPointData("test", {1.0, 1.0});
 
@@ -164,7 +164,7 @@ public:
         FileComparison comparer3(results_file3,"mesh/test/data/TestIbMeshWriter/ib_mesh_2d.lam");
         TS_ASSERT(comparer3.CompareFiles());
     }
-    
+
     void TestImmersedBoundaryMeshWriterVTKCornerOverlap()
     {
 #ifdef CHASTE_VTK
@@ -180,7 +180,7 @@ public:
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
-            
+
             ImmersedBoundaryMeshWriter<2, 2> ib_mesh_writer("TestIbMeshWriterVTKCornerOverlap", "ib_mesh_vtk_corner_overlap");
             ib_mesh_writer.WriteVtkUsingMesh(mesh);
 
@@ -189,7 +189,7 @@ public:
             FileFinder vtk_file(results_file, RelativeTo::Absolute);
             TS_ASSERT(vtk_file.Exists());
         }
-        // Overlap everything 
+        // Overlap everything
         {
             // Generate nodes
             std::vector<Node<2>*> nodes;
@@ -202,7 +202,7 @@ public:
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
-            
+
             ImmersedBoundaryMeshWriter<2, 2> ib_mesh_writer("TestIbMeshWriterVTKCornerOverlap", "ib_mesh_vtk_corner_overlap");
             ib_mesh_writer.WriteVtkUsingMesh(mesh);
 

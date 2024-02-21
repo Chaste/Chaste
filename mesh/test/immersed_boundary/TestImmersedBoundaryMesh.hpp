@@ -72,7 +72,7 @@ public:
         elems.push_back(new ImmersedBoundaryElement<2, 2>(2, nodes));
 
         ImmersedBoundaryMesh<2,2>* p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems);
-        
+
         TS_ASSERT_EQUALS(p_mesh->SolveElementMapping(1), 1u);
         TS_ASSERT_EQUALS(p_mesh->SolveBoundaryElementMapping(1), 1u);
 
@@ -86,15 +86,15 @@ public:
 
         ImmersedBoundaryMesh<2, 2>* p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems);
         TS_ASSERT(&(p_mesh->rGet2dVelocityGrids()));
-        TS_ASSERT(&(p_mesh->rGetModifiable2dVelocityGrids()));      
+        TS_ASSERT(&(p_mesh->rGetModifiable2dVelocityGrids()));
 
         delete p_mesh;
     }
-    
+
     void TestArchiving()
     {
         EXIT_IF_PARALLEL;
-        
+
         FileFinder archive_dir("archive_immersed_boundary_mesh", RelativeTo::ChasteTestOutput);
         std::string archive_file = "ib_mesh.arch";
 
@@ -134,7 +134,7 @@ public:
             delete p_mesh;
         }
     }
-    
+
     void Test3DNotYetImplementedException()
     {
         // Type alias avoids comma between template params causing issue with macro expansion
@@ -195,14 +195,14 @@ public:
                 TS_ASSERT_EQUALS(lam_it->GetIndex(), lam_count);
                 lam_count++;
             }
-            
+
             // Test skipping deleted elements
             elements[0]->MarkAsDeleted();
             TS_ASSERT_EQUALS(&(*ib_mesh.GetElementIteratorBegin(true)), elements[1]);
-                
+
             lams[0]->MarkAsDeleted();
-            TS_ASSERT_EQUALS(&(*ib_mesh.GetLaminaIteratorBegin(true)), lams[1]); 
-            
+            TS_ASSERT_EQUALS(&(*ib_mesh.GetLaminaIteratorBegin(true)), lams[1]);
+
             for (unsigned i = 1; i < 6; ++i)
             {
                 for (auto& p_node : nodes[i])
@@ -234,7 +234,7 @@ public:
         ib_mesh.SetNumGridPtsY(567u);
         TS_ASSERT_EQUALS(ib_mesh.GetNumGridPtsX(), 456u);
         TS_ASSERT_EQUALS(ib_mesh.GetNumGridPtsY(), 567u);
-        
+
         TS_ASSERT_EQUALS(ib_mesh.GetCellRearrangementThreshold(), 0.05);
     }
 
@@ -375,7 +375,7 @@ public:
          *
          * The specific ReMeshElements and ReMeshLaminas methods are tested separately.
          */
-        
+
         std::vector<Node<2>*> nodes;
 
         std::vector<Node<2>*> nodes_elem1;
@@ -452,7 +452,7 @@ public:
         std::vector<ImmersedBoundaryElement<1, 2>*> lams;
         lams.push_back(new ImmersedBoundaryElement<1, 2>(0, nodes_lam1));
         lams.push_back(new ImmersedBoundaryElement<1, 2>(1, nodes_lam2));
-        
+
         ImmersedBoundaryMesh<2,2> mesh(nodes, elems, lams);
 
         // Make a copy of the node locations prior to ReMesh
@@ -1085,7 +1085,7 @@ public:
             }
         }
     }
-    
+
     void TestUnsupportedDimensions()
     {
       {
@@ -1114,7 +1114,7 @@ public:
           TS_ASSERT_THROWS_ANYTHING(mesh.ConstructFromMeshReader(meshReader));
       }
     }
-    
+
     void TestBoundingBoxCalculation()
     {
         // Top right
@@ -1129,14 +1129,14 @@ public:
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
-            
+
             ChasteCuboid<2> bounding_box = mesh.CalculateBoundingBoxOfElement(0);
             auto p1 = bounding_box.rGetLowerCorner();
             auto p2 = bounding_box.rGetUpperCorner();
 
             ChastePoint<2> expected_p1 = {0.0, 0.0};
             ChastePoint<2> expected_p2 = {0.1, 0.1};
-            
+
             TS_ASSERT_EQUALS(p1[0], expected_p1[0]);
             TS_ASSERT_EQUALS(p1[1], expected_p1[1]);
             TS_ASSERT_EQUALS(p2[0], expected_p2[0]);
@@ -1144,7 +1144,7 @@ public:
         }
 
         // Top right
-        { 
+        {
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.1, 0.1));
             nodes.push_back(new Node<2>(1, true, 0.0, 0.1));
@@ -1155,21 +1155,21 @@ public:
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
-            
+
             ChasteCuboid<2> bounding_box = mesh.CalculateBoundingBoxOfElement(0);
             auto p1 = bounding_box.rGetLowerCorner();
             auto p2 = bounding_box.rGetUpperCorner();
 
             ChastePoint<2> expected_p1 = {0.0, 0.0};
             ChastePoint<2> expected_p2 = {0.1, 0.1};
-            
+
             TS_ASSERT_EQUALS(p1[0], expected_p1[0]);
             TS_ASSERT_EQUALS(p1[1], expected_p1[1]);
             TS_ASSERT_EQUALS(p2[0], expected_p2[0]);
             TS_ASSERT_EQUALS(p2[1], expected_p2[1]);
         }
     }
-    
+
     void TestVoronoiSurfaceArea()
     {
         // Single element should return 0
@@ -1201,7 +1201,7 @@ public:
 
             std::vector<ImmersedBoundaryElement<2, 2>*> elems;
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
-            
+
             // Make four laminas
             std::vector<ImmersedBoundaryElement<1,2>*> lams;
             lams.push_back(new ImmersedBoundaryElement<1,2>(0, nodes));
@@ -1221,7 +1221,7 @@ public:
 
             std::vector<ImmersedBoundaryElement<2, 2>*> elems;
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
-            
+
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
 
             // 8 ghost cells will be created, one for each side & corner of the square
@@ -1237,7 +1237,7 @@ public:
         }
 
         // Single element
-        {  
+        {
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
             nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
@@ -1252,11 +1252,11 @@ public:
             TS_ASSERT_EQUALS(mesh.GetVoronoiSurfaceAreaOfElement(0), 0.0);
         }
     }
-    
+
     void TestElongationShapeFactor()
     {
         std::vector<Node<2>*> nodes;
-        
+
         // Generate nodes
         const unsigned nodes_to_generate = 40;
         unsigned node_index = 0;
@@ -1278,7 +1278,7 @@ public:
         // Circle - should have no tortuosity
         {
             std::vector<Node<2>*> nodes;
-            
+
             // Generate nodes
             const unsigned nodes_to_generate = 40;
             unsigned node_index = 0;
@@ -1294,7 +1294,7 @@ public:
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
             TS_ASSERT_EQUALS(mesh.GetTortuosityOfMesh(), 0.0);
-        } 
+        }
 
         // Circle scaled by 0.5 in x axis
         // Should return 1 for 2 element mesh as this represents a straight line between element centroids
@@ -1302,7 +1302,7 @@ public:
             std::vector<Node<2>*> left_nodes;
             std::vector<Node<2>*> right_nodes;
             std::vector<Node<2>*> all_nodes;
-            
+
             // Construct nodes for two elements - left of y axis and right of y axis
             const unsigned nodes_to_generate = 40;
             unsigned node_index = 0;
@@ -1326,7 +1326,7 @@ public:
 
             ImmersedBoundaryMesh<2,2> mesh(all_nodes, elems);
             TS_ASSERT_DELTA(mesh.GetTortuosityOfMesh(), 1.0, 1e-6);
-        } 
+        }
     }
 
     void TestDividingElements()
@@ -1334,7 +1334,7 @@ public:
         // Successful division
         {
             std::vector<Node<2>*> nodes;
-            
+
             // Generate nodes
             const unsigned nodes_to_generate = 40;
             unsigned node_index = 0;
@@ -1352,14 +1352,14 @@ public:
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
             mesh.SetElementDivisionSpacing(0.01);
 
-            mesh.DivideElementAlongShortAxis(elems[0], true); 
+            mesh.DivideElementAlongShortAxis(elems[0], true);
             TS_ASSERT_EQUALS(mesh.GetNumElements(), 2u);
         }
 
         // Successful division - find start_a
         {
             std::vector<Node<2>*> nodes;
-            
+
             // Generate nodes
             const unsigned nodes_to_generate = 40;
             unsigned node_index = 0;
@@ -1376,7 +1376,7 @@ public:
 
             c_vector<double, 2> axis;
             axis[0] = 1.0;
-            axis[1] = 1.0; 
+            axis[1] = 1.0;
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
             mesh.SetElementDivisionSpacing(0.2);
@@ -1384,11 +1384,11 @@ public:
             mesh.DivideElement(elems[0], 20, 25, mesh.GetCentroidOfElement(0), axis);
             TS_ASSERT_EQUALS(mesh.GetNumElements(), 2u);
         }
-        
+
         // ElementDivisonSpacing not set
         {
             std::vector<Node<2>*> nodes;
-            
+
             // Generate nodes
             const unsigned nodes_to_generate = 40;
             unsigned node_index = 0;
@@ -1409,7 +1409,7 @@ public:
         // No intersection with axis
         {
             std::vector<Node<2>*> nodes;
-            
+
             // Generate nodes
             const unsigned nodes_to_generate = 40;
             unsigned node_index = 0;
@@ -1431,7 +1431,7 @@ public:
         // No intersection with axis - should be impossible to have two intersections with three coindident nodes
         {
             std::vector<Node<2>*> nodes;
-            
+
             // Generate nodes
             nodes.push_back(new Node<2>(0, true, 0.0, 0.000));
             nodes.push_back(new Node<2>(1, true, 0.0, 0.001));
@@ -1442,10 +1442,10 @@ public:
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
             mesh.SetElementDivisionSpacing(0.01);
-            
+
             c_vector<double, 2> axis;
             axis[0] = 1.0;
-            axis[1] = 1.0; 
+            axis[1] = 1.0;
 
             TS_ASSERT_THROWS_ANYTHING(mesh.DivideElementAlongGivenAxis(elems[0], axis, true));
         }
@@ -1453,7 +1453,7 @@ public:
         // Divide element with corner nodes
         {
             std::vector<Node<2>*> nodes;
-            
+
             // Generate nodes
             const unsigned nodes_to_generate = 40;
             unsigned node_index = 0;
@@ -1472,19 +1472,19 @@ public:
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
             mesh.SetElementDivisionSpacing(0.01);
 
-            mesh.DivideElementAlongShortAxis(elems[0], true); 
+            mesh.DivideElementAlongShortAxis(elems[0], true);
             TS_ASSERT_EQUALS(mesh.GetNumElements(), 2);
         }
     }
-    
+
     void TestElementIteratorEmptyMesh()
     {
         std::vector<Node<2>*> nodes;
         std::vector<ImmersedBoundaryElement<2, 2>*> elems;
         ImmersedBoundaryMesh<2, 2> mesh(nodes, elems);
-        TS_ASSERT_EQUALS(false, (mesh.GetElementIteratorBegin() != mesh.GetElementIteratorEnd())); 
+        TS_ASSERT_EQUALS(false, (mesh.GetElementIteratorBegin() != mesh.GetElementIteratorEnd()));
     }
-    
+
     void TestElementIteratorElementNotAllowed()
     {
         // Three elements
@@ -1498,15 +1498,15 @@ public:
         elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
         elems.push_back(new ImmersedBoundaryElement<2, 2>(1, nodes));
         elems.push_back(new ImmersedBoundaryElement<2, 2>(2, nodes));
-        
+
         elems[0]->MarkAsDeleted();
-        
+
         ImmersedBoundaryMesh<2,2> mesh(nodes, elems);
 
         auto iter = mesh.GetElementIteratorBegin(true);
         TS_ASSERT_EQUALS(&(*iter), elems[1]);
     }
-    
+
     void TestLaminaIteratorLaminaNotAllowed()
     {
         // Three elements
@@ -1520,14 +1520,14 @@ public:
         elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
         elems.push_back(new ImmersedBoundaryElement<2, 2>(1, nodes));
         elems.push_back(new ImmersedBoundaryElement<2, 2>(2, nodes));
-        
+
         std::vector<ImmersedBoundaryElement<1, 2>*> lams;
         lams.push_back(new ImmersedBoundaryElement<1, 2>(0, nodes));
         lams.push_back(new ImmersedBoundaryElement<1, 2>(1, nodes));
         lams.push_back(new ImmersedBoundaryElement<1, 2>(2, nodes));
-        
+
         lams[0]->MarkAsDeleted();
-        
+
         ImmersedBoundaryMesh<2,2> mesh(nodes, elems, lams);
 
         auto iter = mesh.GetLaminaIteratorBegin(true);
@@ -1546,14 +1546,14 @@ public:
         elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
         elems.push_back(new ImmersedBoundaryElement<2, 2>(1, nodes));
         elems.push_back(new ImmersedBoundaryElement<2, 2>(2, nodes));
-        
+
         std::vector<ImmersedBoundaryElement<1, 2>*> lams;
         lams.push_back(new ImmersedBoundaryElement<1, 2>(0, nodes));
         lams.push_back(new ImmersedBoundaryElement<1, 2>(1, nodes));
         lams.push_back(new ImmersedBoundaryElement<1, 2>(2, nodes));
-        
+
         ImmersedBoundaryMesh<2,2> mesh(nodes, elems, lams);
-        
+
         TS_ASSERT_THROWS_ANYTHING(mesh.GetNeighbouringElementIndices(1));
     }
 };

@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 AbstractSrnModel::AbstractSrnModel()
     : mSimulatedToTime(SimulationTime::Instance()->GetTime()),
-      mEdgeLocalIndex(UNSIGNED_UNSET), 
+      mEdgeLocalIndex(UNSIGNED_UNSET),
       mIsEdgeBasedModel(false)
 {
 }

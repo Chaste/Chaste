@@ -234,7 +234,7 @@ public:
 
     /** Forward declaration of lamina iterator. */
     class ImmersedBoundaryLaminaIterator;
-    
+
     /**
      * @return a reference to the const collection of nodes
     */
@@ -407,7 +407,7 @@ public:
      * @param nodeSpacing the new characteristic node spacing.
      */
     void SetCharacteristicNodeSpacing(double nodeSpacing);
-    
+
     /**
      * Add a node to the mesh
      * @param pNewNode a pointer to the node to be added to the mesh.
@@ -670,7 +670,7 @@ public:
     /**
      * @param cellRearrangementThreshold the new value of mCellRearrangementThreshold
      */
-    void SetCellRearrangementThreshold(double cellRearrangementThreshold); 
+    void SetCellRearrangementThreshold(double cellRearrangementThreshold);
 
     /**
      * @return the maximum distance a cell vertex can move without triggering a step size exception

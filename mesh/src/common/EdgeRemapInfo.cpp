@@ -36,11 +36,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EdgeRemapInfo.hpp"
 
 EdgeRemapInfo::EdgeRemapInfo()
-{  
+{
 }
 
 EdgeRemapInfo::~EdgeRemapInfo()
-{  
+{
 }
 
 EdgeRemapInfo::EdgeRemapInfo(const std::vector<long>& rEdgesMapping,

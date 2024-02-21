@@ -205,21 +205,21 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::
     {
         element_data.AttributeValue = 0;
     }
-    
+
     // Immersed boundary specific data
     buffer_stream >> element_data.hasFluidSource;
 
     if (element_data.hasFluidSource) {
         buffer_stream >> element_data.fluidSourceIndex;
     }
-    
+
     unsigned num_corner_nodes;
     buffer_stream >> num_corner_nodes;
     for (unsigned i = 0; i < num_corner_nodes; i++) {
         buffer_stream >> node_index;
         element_data.cornerNodeIndices.push_back(node_index);
     }
-    
+
     buffer_stream >> element_data.averageNodeSpacing;
 
     buffer_stream >> element_data.isBoundaryElement;
@@ -276,14 +276,14 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshReader<ELEMENT_DIM, SPACE_DIM>::
     if (lamina_data.hasFluidSource) {
         buffer_stream >> lamina_data.fluidSourceIndex; //LCOV_EXCL_LINE
     }
-    
+
     unsigned num_corner_nodes;
     buffer_stream >> num_corner_nodes;
     for (unsigned i = 0; i < num_corner_nodes; i++) {
         buffer_stream >> node_index;
         lamina_data.cornerNodeIndices.push_back(node_index);
     }
-    
+
     buffer_stream >> lamina_data.averageNodeSpacing;
 
     buffer_stream >> lamina_data.isBoundaryElement;

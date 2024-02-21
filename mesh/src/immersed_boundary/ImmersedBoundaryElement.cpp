@@ -103,7 +103,7 @@ void ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::SetIsBoundaryElement(bool 
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::AddCornerNode(Node<SPACE_DIM>* node) 
+void ImmersedBoundaryElement<ELEMENT_DIM, SPACE_DIM>::AddCornerNode(Node<SPACE_DIM>* node)
 {
     mCornerNodes.push_back(node);
 }

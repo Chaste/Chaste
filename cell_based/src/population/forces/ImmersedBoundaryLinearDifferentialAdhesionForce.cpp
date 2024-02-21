@@ -60,7 +60,7 @@ void ImmersedBoundaryLinearDifferentialAdhesionForce<DIM>::AddImmersedBoundaryFo
     for (unsigned pair = 0; pair < rNodePairs.size(); ++pair)
     {
         /*
-         * Interactions only exist between pairs of nodes that are not in the 
+         * Interactions only exist between pairs of nodes that are not in the
          * same boundary / lamina.
          */
         if (rCellPopulation.rGetMesh().NodesInDifferentElementOrLamina(rNodePairs[pair].first, rNodePairs[pair].second))

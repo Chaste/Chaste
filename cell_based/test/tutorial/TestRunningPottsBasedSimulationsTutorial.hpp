@@ -91,7 +91,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestRunningPottsBasedSimulationsTutorial : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
-    /* 
+    /*
      * ### Test 1 - a basic Potts-based simulation
      *
      * In the first test, we run a simple Potts-based simulation, in which we create a monolayer

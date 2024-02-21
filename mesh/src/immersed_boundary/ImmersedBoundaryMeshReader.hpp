@@ -51,14 +51,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 struct ImmersedBoundaryElementData
 {
     /**< Vector of Node indices owned by the element. */
-    std::vector<unsigned> NodeIndices {}; 
+    std::vector<unsigned> NodeIndices {};
 
     /** Attribute value associated with the element. */
-    unsigned AttributeValue {}; 
+    unsigned AttributeValue {};
 
     /** Whether the element has an associatd fluid source*/
     bool hasFluidSource {};
-    
+
     /** The index of the associated fluid source */
     unsigned fluidSourceIndex {};
 
@@ -67,9 +67,9 @@ struct ImmersedBoundaryElementData
 
     /** The element's average node spacing */
     double averageNodeSpacing {};
-    
+
     /** Whether the element is a boundary element */
-    bool isBoundaryElement {}; 
+    bool isBoundaryElement {};
 };
 
 /**

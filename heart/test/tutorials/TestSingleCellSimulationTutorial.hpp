@@ -153,10 +153,10 @@ public:
          * ODE system has got to a situation where refining the timestep is not helping the convergence.
          *
          * This generally indicates that you are hitting some sort of singularity, or divide by zero, in
-         * the model. Unfortunately cardiac models are full of these due to [GHK-style ion flux equations](https://en.wikipedia.org/wiki/Goldman%E2%80%93Hodgkin%E2%80%93Katz_flux_equation)! 
+         * the model. Unfortunately cardiac models are full of these due to [GHK-style ion flux equations](https://en.wikipedia.org/wiki/Goldman%E2%80%93Hodgkin%E2%80%93Katz_flux_equation)!
          * They were sometimes manually edited out by changing the cellML file, for instance using [L'Hopital's rule](http://en.wikipedia.org/wiki/L%27H%C3%B4pital%27s_rule)
-         * close to the voltages that caused singularities. But since Chaste v2021.1 [a feature in chaste_codegen](https://wellcomeopenresearch.org/articles/6-261/v2), 
-         * now applies a fix like that automatically to remove all known singularities in cardiac models during CellML to C++ conversion, so these errors should be unusual 
+         * close to the voltages that caused singularities. But since Chaste v2021.1 [a feature in chaste_codegen](https://wellcomeopenresearch.org/articles/6-261/v2),
+         * now applies a fix like that automatically to remove all known singularities in cardiac models during CellML to C++ conversion, so these errors should be unusual
          * and please open a ticket if you run into these problems.
          *
          * For this particular test, we are going to specify quite strict tolerances, so that the test gets the same results

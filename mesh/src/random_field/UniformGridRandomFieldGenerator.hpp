@@ -72,31 +72,31 @@ private:
     double mLengthScale;
 
     /**
-     * The product of mNumGridPts; the total number of grid points in the 
+     * The product of mNumGridPts; the total number of grid points in the
      * cuboid.
      */
     unsigned mNumTotalGridPts;
 
     /**
-     * Store the calculated grid spacings to avoid recalculation during 
+     * Store the calculated grid spacings to avoid recalculation during
      * interpolation.
      */
     std::array<double, SPACE_DIM> mGridSpacing;
 
     /**
-     * Store the calculated one over grid spacings to avoid recalculation during 
+     * Store the calculated one over grid spacings to avoid recalculation during
      * interpolation.
      */
     std::array<double, SPACE_DIM> mOneOverGridSpacing;
 
     /**
-     * The directory name, relative to $CHASTE_TEST_OUTPUT, in which cached 
+     * The directory name, relative to $CHASTE_TEST_OUTPUT, in which cached
      * random fields will be saved.
      */
     const std::string mCacheDir;
 
     /**
-     * Number of eigenvalues calculated, such that their sum minimally exceeds 
+     * Number of eigenvalues calculated, such that their sum minimally exceeds
      * mTraceProportion * mNumTotalGridPts.
      */
     unsigned mNumEigenvals;
@@ -118,23 +118,23 @@ private:
     }
 
     /**
-     * Helper method for Interpolate(). Get the linear index (along the flat 
+     * Helper method for Interpolate(). Get the linear index (along the flat
      * vector representing a random field instance) given the grid index
      * (x,y,z).
-     * 
+     *
      * @param gridIndex the (x,y,z) coordinate to translate into a linear index
-     * 
-     * @return the linear index along the flat vector representing the (x,y,z) 
+     *
+     * @return the linear index along the flat vector representing the (x,y,z)
      *         grid coordinate
      */
     long GetLinearIndex(std::array<long, SPACE_DIM> gridIndex) const;
 
     /**
-     * Helper method for Interpolate(). Get the position in space of the grid 
+     * Helper method for Interpolate(). Get the position in space of the grid
      * point with (x,y,z) grid index gridIndex.
-     * 
+     *
      * @param gridIndex the (x,y,z) coordinate to calculate the position of
-     * 
+     *
      * @return the position in space of the (x,y,z) coordinate
      */
     std::array<double, SPACE_DIM> GetPositionUsingGridIndex(std::array<long, SPACE_DIM> gridIndex) const;
@@ -162,15 +162,15 @@ public:
                                     double lengthScale);
 
     /**
-     * Sample an instance of the random field. 
-     * 
-     * Calls SampleRandomFieldAtTime() at a time chosen uniformly at random from 
+     * Sample an instance of the random field.
+     *
+     * Calls SampleRandomFieldAtTime() at a time chosen uniformly at random from
      * 0 to 1.
      *
      * @return A vector representing an instance of the random field.
      */
     std::vector<double> SampleRandomField();
-    
+
     /**
      * Sample an instance of the random field at a given time.
      *
@@ -181,16 +181,16 @@ public:
     std::vector<double> SampleRandomFieldAtTime(double time);
 
     /**
-     * Interpolate from the random field by returning the value at the node of 
+     * Interpolate from the random field by returning the value at the node of
      * the random field closest to the given location.
      *
-     * @param rRandomField the random field, assumed obtained from 
+     * @param rRandomField the random field, assumed obtained from
      *                     SampleRandomField()
-     * @param rLocation the location to which we identify the value at the 
+     * @param rLocation the location to which we identify the value at the
      *                  closest node in the random field
      * @return the value of the random field closest to rLocation
      */
-    double Interpolate(const std::vector<double>& rRandomField, 
+    double Interpolate(const std::vector<double>& rRandomField,
                        const c_vector<double, SPACE_DIM>& rLocation) const;
 
     /**

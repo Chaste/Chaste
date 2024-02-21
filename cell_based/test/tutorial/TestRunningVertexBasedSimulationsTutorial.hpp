@@ -98,7 +98,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestRunningVertexBasedSimulationsTutorial : public AbstractCellBasedTestSuite
 {
 public:
-    /* 
+    /*
     * ### Test 1 - a basic vertex-based simulation
     *
     * In the first test, we run a simple vertex-based simulation, in which we create a monolayer
@@ -279,7 +279,7 @@ public:
     }
 };
 /*
- * 
+ *
  * To visualize the results, open a new terminal, `cd` to the Chaste directory,
  * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/VertexBasedPeriodicMonolayer/results_from_time_0`.
  *

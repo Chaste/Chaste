@@ -90,14 +90,14 @@ public:
         {
             nodes[node_idx] = new Node<1>(node_idx, Create_c_vector(10.0 * p_gen->ranf()));
         }
-        
+
         gen.SetRandomSeed(10);
         auto res1 = gen.SampleRandomFieldAtTime(nodes, 0.0);
         gen.SetRandomSeed(11);
         auto res2 = gen.SampleRandomFieldAtTime(nodes, 0.0);
 
         TS_ASSERT_DIFFERS(res1[0], res2[0]);
-        
+
         for (auto& p_node : nodes)
         {
             delete p_node;
@@ -130,9 +130,9 @@ public:
             {
                 nodes[node_idx] = new Node<1>(node_idx, Create_c_vector(10.0 * p_gen->ranf()));
             }
-            
+
             auto random_field = gen.SampleRandomFieldAtTime(nodes, 0.5);
-            
+
             std::transform(random_field.begin(), random_field.end(), random_field.begin(), [] (const double& v) { return std::abs(v); });
             auto sum = std::accumulate(random_field.begin(), random_field.end(), 0.0);
 
@@ -165,9 +165,9 @@ public:
             {
                 nodes[node_idx] = new Node<1>(node_idx, Create_c_vector(10.0 * p_gen->ranf()));
             }
-            
+
             auto random_field = gen.SampleRandomFieldAtTime(nodes, 0.0);
-            
+
             std::transform(random_field.begin(), random_field.end(), random_field.begin(), [] (const double& v) { return std::abs(v); });
             auto sum = std::accumulate(random_field.begin(), random_field.end(), 0.0);
             for (auto& p_node : nodes)
@@ -200,7 +200,7 @@ public:
             {
                 nodes[node_idx] = new Node<2>(node_idx, Create_c_vector(10.0 * p_gen->ranf(), 10.0 * p_gen->ranf()));
             }
-            
+
             auto random_field = gen.SampleRandomFieldAtTime(nodes, 0.0);
 
             std::transform(random_field.begin(), random_field.end(), random_field.begin(), [] (const double& v) { return std::abs(v); });
@@ -235,7 +235,7 @@ public:
             {
                 nodes[node_idx] = new Node<3>(node_idx, Create_c_vector(10.0 * p_gen->ranf(), 10.0 * p_gen->ranf(), 10.0 * p_gen->ranf()));
             }
-            
+
             auto random_field = gen.SampleRandomFieldAtTime(nodes, 0.0);
 
             std::transform(random_field.begin(), random_field.end(), random_field.begin(), [] (const double& v) { return std::abs(v); });

@@ -143,7 +143,7 @@ public:
 
     /** @param isBoundaryElement whether the element is on the boundary */
     void SetIsBoundaryElement(bool isBoundaryElement);
-    
+
     /**
      * @param node the node to add as a corner node
      */

@@ -212,26 +212,26 @@ public:
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
-            
+
             // Set up a cell population
             std::vector<CellPtr> cells;
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
             CellsGenerator<UniformCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
             ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
-            
+
             // Set up and apply a force to the node
             c_vector<double, 2> force;
             force[0] = 0.01;
             force[1] = 0.01;
             nodes[0]->AddAppliedForceContribution(force);
-            
+
             // Set up simulation modifier
             ImmersedBoundarySimulationModifier<2> modifier;
             modifier.SetupConstantMemberVariables(cell_population);
 
             // Check that force grids are zero before force propagation
-            auto& r_force_grids = modifier.mpArrays->rGetModifiableForceGrids(); 
+            auto& r_force_grids = modifier.mpArrays->rGetModifiableForceGrids();
             for (unsigned grid = 0; grid <= 1; ++grid)
             {
                 for (unsigned x = 0; x < modifier.mpMesh->GetNumGridPtsX(); ++x)
@@ -242,9 +242,9 @@ public:
                     }
                 }
             }
-            
+
             modifier.PropagateForcesToFluidGrid();
-            
+
             // Check that there are only 16 non-zero entries per grid
             unsigned non_zero_entries_count = 0;
             for (unsigned grid = 0; grid <= 1; ++grid)
@@ -261,41 +261,41 @@ public:
                 }
             }
             TS_ASSERT_EQUALS(non_zero_entries_count, 32u);
-            
-            // Check the non-zero entries' values
-            TS_ASSERT_DELTA(r_force_grids[0][4][4], 0.0020, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[0][4][5], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[0][4][6], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[0][4][7], 0.0020, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[0][5][4], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[0][5][5], 0.0707, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[0][5][6], 0.0707, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[0][5][7], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[0][6][4], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[0][6][5], 0.0707, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[0][6][6], 0.0707, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[0][6][7], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[0][7][4], 0.0020, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[0][7][5], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[0][7][6], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[0][7][7], 0.0020, 0.0001); 
 
-            TS_ASSERT_DELTA(r_force_grids[1][4][4], 0.0020, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[1][4][5], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[1][4][6], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[1][4][7], 0.0020, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[1][5][4], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[1][5][5], 0.0707, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[1][5][6], 0.0707, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[1][5][7], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[1][6][4], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[1][6][5], 0.0707, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[1][6][6], 0.0707, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[1][6][7], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[1][7][4], 0.0020, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[1][7][5], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[1][7][6], 0.0121, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[1][7][7], 0.0020, 0.0001); 
+            // Check the non-zero entries' values
+            TS_ASSERT_DELTA(r_force_grids[0][4][4], 0.0020, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[0][4][5], 0.0121, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[0][4][6], 0.0121, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[0][4][7], 0.0020, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[0][5][4], 0.0121, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[0][5][5], 0.0707, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[0][5][6], 0.0707, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[0][5][7], 0.0121, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[0][6][4], 0.0121, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[0][6][5], 0.0707, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[0][6][6], 0.0707, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[0][6][7], 0.0121, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[0][7][4], 0.0020, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[0][7][5], 0.0121, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[0][7][6], 0.0121, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[0][7][7], 0.0020, 0.0001);
+
+            TS_ASSERT_DELTA(r_force_grids[1][4][4], 0.0020, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[1][4][5], 0.0121, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[1][4][6], 0.0121, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[1][4][7], 0.0020, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[1][5][4], 0.0121, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[1][5][5], 0.0707, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[1][5][6], 0.0707, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[1][5][7], 0.0121, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[1][6][4], 0.0121, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[1][6][5], 0.0707, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[1][6][6], 0.0707, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[1][6][7], 0.0121, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[1][7][4], 0.0020, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[1][7][5], 0.0121, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[1][7][6], 0.0121, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[1][7][7], 0.0020, 0.0001);
 
             SimulationTime::Instance()->Destroy();
         }
@@ -315,20 +315,20 @@ public:
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
-            
+
             // Set up a cell population
             std::vector<CellPtr> cells;
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
             CellsGenerator<UniformCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
             ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
-            
+
             // Set up and apply a force to the node
             c_vector<double, 2> force;
             force[0] = 0.01;
             force[1] = 0.01;
             nodes[0]->AddAppliedForceContribution(force);
-            
+
             // Set up simulation modifier
             ImmersedBoundarySimulationModifier<2> modifier;
             modifier.SetupConstantMemberVariables(cell_population);
@@ -341,7 +341,7 @@ public:
     {
         {
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
-            
+
             // Create a single node, single element mesh
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.55, 0.55));
@@ -354,26 +354,26 @@ public:
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
             auto& r_balancing_fluid_sources = mesh.rGetBalancingFluidSources();
             r_balancing_fluid_sources.clear();
-            
+
             auto p_fluid_source = std::make_shared<FluidSource<2>>(0, 0.55, 0.55);
             p_fluid_source->SetStrength(0.1);
             elems.back()->SetFluidSource(p_fluid_source);
-            
+
             // Set up a cell population
             std::vector<CellPtr> cells;
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
             CellsGenerator<UniformCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
             ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
-            
+
             // Set up simulation modifier
             ImmersedBoundarySimulationModifier<2> modifier;
             modifier.SetupConstantMemberVariables(cell_population);
-            
+
             modifier.PropagateFluidSourcesToGrid();
-            
+
             // Check that there are only 16 non-zero entries per grid
-            auto& r_force_grids = modifier.mpArrays->rGetModifiableRightHandSideGrids(); 
+            auto& r_force_grids = modifier.mpArrays->rGetModifiableRightHandSideGrids();
 
             unsigned non_zero_entries_count = 0;
             for (unsigned x = 0; x < modifier.mpMesh->GetNumGridPtsX(); ++x)
@@ -387,24 +387,24 @@ public:
                 }
             }
             TS_ASSERT_EQUALS(non_zero_entries_count, 16u);
-            
+
             // Check the non-zero entries' values
-            TS_ASSERT_DELTA(r_force_grids[2][4][4], 0.0536, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][4][5], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][4][6], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][4][7], 0.0536, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][5][4], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][5][5], 1.8213, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][5][6], 1.8213, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][5][7], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][6][4], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][6][5], 1.8213, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][6][6], 1.8213, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][6][7], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][7][4], 0.0536, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][7][5], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][7][6], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][7][7], 0.0536, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][4][4], 0.0536, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][4][5], 0.3124, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][4][6], 0.3124, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][4][7], 0.0536, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][5][4], 0.3124, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][5][5], 1.8213, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][5][6], 1.8213, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][5][7], 0.3124, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][6][4], 0.3124, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][6][5], 1.8213, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][6][6], 1.8213, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][6][7], 0.3124, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][7][4], 0.0536, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][7][5], 0.3124, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][7][6], 0.3124, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][7][7], 0.0536, 0.0001);
 
             SimulationTime::Instance()->Destroy();
 
@@ -412,7 +412,7 @@ public:
         { // With zero field sums
             SimulationTime::Instance()->SetStartTime(0.0);
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
-            
+
             // Create a single node, single element mesh
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.55, 0.55));
@@ -425,27 +425,27 @@ public:
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
             auto& r_balancing_fluid_sources = mesh.rGetBalancingFluidSources();
             r_balancing_fluid_sources.clear();
-            
+
             auto p_fluid_source = std::make_shared<FluidSource<2>>(0, 0.55, 0.55);
             p_fluid_source->SetStrength(0.1);
             elems.back()->SetFluidSource(p_fluid_source);
-            
+
             // Set up a cell population
             std::vector<CellPtr> cells;
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
             CellsGenerator<UniformCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
             ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
-            
+
             // Set up simulation modifier
             ImmersedBoundarySimulationModifier<2> modifier;
             modifier.SetZeroFieldSums(true);
             modifier.SetupConstantMemberVariables(cell_population);
-            
+
             modifier.PropagateFluidSourcesToGrid();
-            
+
             // Check that there are only 16 non-zero entries per grid
-            auto& r_force_grids = modifier.mpArrays->rGetModifiableRightHandSideGrids(); 
+            auto& r_force_grids = modifier.mpArrays->rGetModifiableRightHandSideGrids();
 
             unsigned non_zero_entries_count = 0;
             for (unsigned x = 0; x < modifier.mpMesh->GetNumGridPtsX(); ++x)
@@ -459,36 +459,36 @@ public:
                 }
             }
             TS_ASSERT_EQUALS(non_zero_entries_count, 16u);
-            
+
             // Check the non-zero entries' values
-            TS_ASSERT_DELTA(r_force_grids[2][4][4], 0.0536, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][4][5], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][4][6], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][4][7], 0.0536, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][5][4], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][5][5], 1.8213, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][5][6], 1.8213, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][5][7], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][6][4], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][6][5], 1.8213, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][6][6], 1.8213, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][6][7], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][7][4], 0.0536, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][7][5], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][7][6], 0.3124, 0.0001); 
-            TS_ASSERT_DELTA(r_force_grids[2][7][7], 0.0536, 0.0001); 
+            TS_ASSERT_DELTA(r_force_grids[2][4][4], 0.0536, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][4][5], 0.3124, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][4][6], 0.3124, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][4][7], 0.0536, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][5][4], 0.3124, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][5][5], 1.8213, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][5][6], 1.8213, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][5][7], 0.3124, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][6][4], 0.3124, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][6][5], 1.8213, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][6][6], 1.8213, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][6][7], 0.3124, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][7][4], 0.0536, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][7][5], 0.3124, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][7][6], 0.3124, 0.0001);
+            TS_ASSERT_DELTA(r_force_grids[2][7][7], 0.0536, 0.0001);
 
             SimulationTime::Instance()->Destroy();
 
         }
     }
-    
+
     void TestWarnings()
     {
         // For coverage
         { // Grid point / noise skip
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
-            
+
             // Create a single node, single element mesh
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.55, 0.55));
@@ -497,16 +497,16 @@ public:
 
             std::vector<ImmersedBoundaryElement<2, 2>*> elems;
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
-            
+
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
-            
+
             // Set up a cell population
             std::vector<CellPtr> cells;
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
             CellsGenerator<UniformCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
             ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
-            
+
             // Set up simulation modifier
             ImmersedBoundarySimulationModifier<2> modifier;
             modifier.SetAdditiveNormalNoise(true);
@@ -515,11 +515,11 @@ public:
 
             SimulationTime::Instance()->Destroy();
 
-        } 
+        }
         { // Too many grid points
             SimulationTime::Instance()->SetStartTime(0.0);
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
-            
+
             // Create a single node, single element mesh
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.55, 0.55));
@@ -528,23 +528,23 @@ public:
 
             std::vector<ImmersedBoundaryElement<2, 2>*> elems;
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
-            
+
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 150, 150);
-            
+
             // Set up a cell population
             std::vector<CellPtr> cells;
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
             CellsGenerator<UniformCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
             ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
-            
+
             // Set up simulation modifier
             ImmersedBoundarySimulationModifier<2> modifier;
             modifier.SetAdditiveNormalNoise(true);
             modifier.SetupConstantMemberVariables(cell_population);
 
             SimulationTime::Instance()->Destroy();
-            
+
         }
     }
 
@@ -554,7 +554,7 @@ public:
             SimulationTime::Instance()->Destroy();
             SimulationTime::Instance()->SetStartTime(0.0);
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
-            
+
             // Create a single element mesh
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.1, 0.1));
@@ -563,7 +563,7 @@ public:
 
             std::vector<ImmersedBoundaryElement<2, 2>*> elems;
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
-            
+
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 4, 4);
 
             const unsigned int num_grid_pts = 4;
@@ -576,14 +576,14 @@ public:
                     }
                 }
             }
-            
+
             // Set up a cell population
             std::vector<CellPtr> cells;
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
             CellsGenerator<UniformCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
             ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
-            
+
             // Set up simulation modifier
             ImmersedBoundarySimulationModifier<2> modifier;
             modifier.SetAdditiveNormalNoise(true);
@@ -599,8 +599,8 @@ public:
             }
 
             modifier.SolveNavierStokesSpectral();
-            
-            
+
+
             std::vector<double> expected_vals = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -615,19 +615,19 @@ public:
                 }
             }
             SimulationTime::Instance()->Destroy();
-            
+
         }
     }
 
     void TestUpdateFluidVelocityGrids()
     {
         // This calls all other untested methods
-        
+
         { // Coverage for normal noise
             SimulationTime::Instance()->Destroy();
             SimulationTime::Instance()->SetStartTime(0.0);
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
-            
+
             // Create a single node, single element mesh
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.55, 0.55));
@@ -636,25 +636,25 @@ public:
 
             std::vector<ImmersedBoundaryElement<2, 2>*> elems;
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
-            
+
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 150, 150);
-            
+
             // Set up a cell population
             std::vector<CellPtr> cells;
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
             CellsGenerator<UniformCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
             ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
-            
+
             // Set up simulation modifier
             ImmersedBoundarySimulationModifier<2> modifier;
             modifier.SetAdditiveNormalNoise(true);
             modifier.SetupConstantMemberVariables(cell_population);
             modifier.UpdateAtEndOfTimeStep(cell_population);
-            
-            
+
+
             const unsigned int num_grid_pts = 4;
-            
+
             std::vector<double> expected_vals = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
              0, 0, 0, 0, 0, 0 };
 
@@ -670,10 +670,10 @@ public:
                 }
             }
             SimulationTime::Instance()->Destroy();
-            
+
         }
     }
-    
+
     void TestArchiving()
     {
         // Create a file for archiving
@@ -732,7 +732,7 @@ public:
         {
             // Set up SimulationTime - needed by SetupConstantMemberVariables()
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
-            
+
             // Create a single node, single element mesh
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.55, 0.55));
@@ -743,14 +743,14 @@ public:
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
-            
+
             // Set up a cell population
             std::vector<CellPtr> cells;
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
             CellsGenerator<UniformCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
             ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
-            
+
             // Set up simulation modifier
             ImmersedBoundarySimulationModifier<2> modifier;
             modifier.SetupConstantMemberVariables(cell_population);
@@ -783,16 +783,16 @@ public:
                     }
                 }
             }
-            
+
             SimulationTime::Instance()->Destroy();
         }
-        
+
         // Input field = constant 1.0 everywhere
         {
             // Set up SimulationTime - needed by SetupConstantMemberVariables()
             SimulationTime::Instance()->SetStartTime(0.0);
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
-            
+
             // Create a single node, single element mesh
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.55, 0.55));
@@ -803,14 +803,14 @@ public:
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
-            
+
             // Set up a cell population
             std::vector<CellPtr> cells;
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
             CellsGenerator<UniformCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
             ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
-            
+
             // Set up simulation modifier
             ImmersedBoundarySimulationModifier<2> modifier;
             modifier.SetupConstantMemberVariables(cell_population);
@@ -860,7 +860,7 @@ public:
             // Set up SimulationTime - needed by SetupConstantMemberVariables()
             SimulationTime::Instance()->SetStartTime(0.0);
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
-            
+
             // Create a single node, single element mesh
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.55, 0.55));
@@ -871,14 +871,14 @@ public:
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
-            
+
             // Set up a cell population
             std::vector<CellPtr> cells;
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
             CellsGenerator<UniformCellCycleModel, 2> cells_generator;
             cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
             ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
-            
+
             // Set up simulation modifier
             ImmersedBoundarySimulationModifier<2> modifier;
             modifier.SetupConstantMemberVariables(cell_population);
@@ -897,23 +897,23 @@ public:
                     }
                 }
             }
-            
+
             vel_grids[0][1][1] = 0.1;
             vel_grids[0][1][5] = -0.1;
             vel_grids[1][5][1] = 0.1;
             vel_grids[1][5][5] = -0.1;
 
             modifier.Upwind2d(vel_grids, rhs_grids);
-            
-            TS_ASSERT_DELTA(rhs_grids[0][1][1], 0.1, 0.001); 
-            TS_ASSERT_DELTA(rhs_grids[0][1][5], -0.1, 0.001); 
-            TS_ASSERT_DELTA(rhs_grids[0][5][1], 0.0, 0.001); 
-            TS_ASSERT_DELTA(rhs_grids[0][5][5], -0.0, 0.001); 
 
-            TS_ASSERT_DELTA(rhs_grids[1][1][1], 0.0, 0.001); 
-            TS_ASSERT_DELTA(rhs_grids[1][1][5], -0.0, 0.001); 
-            TS_ASSERT_DELTA(rhs_grids[1][5][1], 0.1, 0.001); 
-            TS_ASSERT_DELTA(rhs_grids[1][5][5], -0.1, 0.001); 
+            TS_ASSERT_DELTA(rhs_grids[0][1][1], 0.1, 0.001);
+            TS_ASSERT_DELTA(rhs_grids[0][1][5], -0.1, 0.001);
+            TS_ASSERT_DELTA(rhs_grids[0][5][1], 0.0, 0.001);
+            TS_ASSERT_DELTA(rhs_grids[0][5][5], -0.0, 0.001);
+
+            TS_ASSERT_DELTA(rhs_grids[1][1][1], 0.0, 0.001);
+            TS_ASSERT_DELTA(rhs_grids[1][1][5], -0.0, 0.001);
+            TS_ASSERT_DELTA(rhs_grids[1][5][1], 0.1, 0.001);
+            TS_ASSERT_DELTA(rhs_grids[1][5][5], -0.1, 0.001);
 
             SimulationTime::Instance()->Destroy();
         }
@@ -956,7 +956,7 @@ public:
         TS_ASSERT_DELTA(p_mesh->GetNode(5)->rGetAppliedForce()[0], -2.32831e-10, 1e-3);
         TS_ASSERT_DELTA(p_mesh->GetNode(5)->rGetAppliedForce()[1], 0.0, 1e-3);
     }
-    
+
     void TestAdditiveNormalNoiseGettersAndSetters()
     {
         ImmersedBoundarySimulationModifier<2> modifier;
@@ -965,17 +965,17 @@ public:
         TS_ASSERT_EQUALS(modifier.GetAdditiveNormalNoise(), false);
         modifier.SetAdditiveNormalNoise(true);
         TS_ASSERT_EQUALS(modifier.GetAdditiveNormalNoise(), true);
-        
+
         // Noise strength
         TS_ASSERT_EQUALS(modifier.GetNoiseStrength(), 0.0);
         modifier.SetNoiseStrength(1.0);
         TS_ASSERT_EQUALS(modifier.GetNoiseStrength(), 1.0);
-        
+
         // Noise skip
         TS_ASSERT_EQUALS(modifier.GetNoiseSkip(), 1u);
         modifier.SetNoiseSkip(4);
         TS_ASSERT_EQUALS(modifier.GetNoiseSkip(), 4u);
-        
+
         // Noise length scale
         TS_ASSERT_DELTA(modifier.GetNoiseLengthScale(), 0.1, 1e-6);
         modifier.SetNoiseLengthScale(4);
@@ -986,7 +986,7 @@ public:
         modifier.SetZeroFieldSums(true);
         TS_ASSERT_EQUALS(modifier.GetZeroFieldSums(), true);
     }
-    
+
     void TestAddNormalNoise()
     {
         // Set up SimulationTime - needed by SetupConstantMemberVariables()
@@ -1024,7 +1024,7 @@ public:
             }
             return total;
         };
-        
+
         // Test total forces pre and post noise
         double totalForcePreNoise = sum_force_grid_abs_values(r_force_grids);
         modifier.AddNormalNoise();
@@ -1032,9 +1032,9 @@ public:
 
         TS_ASSERT_DIFFERS(totalForcePreNoise, totalForcePostNoise);
     }
-    
+
     void TestZeroFieldSums()
-    {        
+    {
         // Set up SimulationTime - needed by SetupConstantMemberVariables()
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
 
@@ -1066,7 +1066,7 @@ public:
                 }
             }
         };
-        
+
         auto checkWholeGridEquals = [](multi_array<double, 3>& grid, double value)
         {
             bool all_equal = true;
@@ -1086,7 +1086,7 @@ public:
             }
             return all_equal;
         };
-        
+
         // Test total forces pre and post noise
         initialise_force_grid(r_force_grids);
         TS_ASSERT(checkWholeGridEquals(r_force_grids, 1.0));

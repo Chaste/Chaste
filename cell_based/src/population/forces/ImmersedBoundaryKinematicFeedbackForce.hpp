@@ -86,25 +86,25 @@ private:
     /**
      * Helper function for AddImmersedBoundaryForceContribution().
      * Repopulate mPreviousLocations with new values.
-     * 
+     *
      * @param rCellPopulation the cell population
      */
     void UpdatePreviousLocations(ImmersedBoundaryCellPopulation<DIM>& rCellPopulation);
 
     /**
-     * Helper function for AddImmersedBoundaryForceContribution(). Calculates 
-     * the component of their relative velocity in the direction perpendicular 
+     * Helper function for AddImmersedBoundaryForceContribution(). Calculates
+     * the component of their relative velocity in the direction perpendicular
      * to the line joining the two nodes at the previous time step.
      *
-     * This relative velocity is a measure of shear between two boundaries, 
+     * This relative velocity is a measure of shear between two boundaries,
      * which this force class amplifies.
      *
-     * @param rPreviousDisp displacement between a pair of interacting nodes at 
+     * @param rPreviousDisp displacement between a pair of interacting nodes at
      *                     the previous time step
-     * @param rCurrentDisp displacement between the same pair of interacting 
+     * @param rCurrentDisp displacement between the same pair of interacting
      *                    nodes at the current time step
      * @param rUnitPerp filled in as a unit vector perpendicular to previousDisp
-     * @return the component of the relative velocity of the nodes in the 
+     * @return the component of the relative velocity of the nodes in the
      *         direction of unitPerp
      */
     double CalculateRelativeVelocityComponent(const c_vector<double, DIM>& rPreviousDisp,
@@ -125,10 +125,10 @@ public:
 
     /**
      * Overridden AddImmersedBoundaryForceContribution() method.
-     * Calculates the force on each node in the immersed boundary cell 
+     * Calculates the force on each node in the immersed boundary cell
      * population as a result of kinematic feedback.
      *
-     * @param rNodePairs reference to a vector set of node pairs between which 
+     * @param rNodePairs reference to a vector set of node pairs between which
      *                   to contribute the force
      * @param rCellPopulation reference to the cell population
      */
@@ -138,7 +138,7 @@ public:
 
     /**
      * Overridden OutputImmersedBoundaryForceParameters() method.
-     * 
+     *
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputImmersedBoundaryForceParameters(out_stream& rParamsFile);
@@ -148,7 +148,7 @@ public:
 
     /**
      * Set mSpringConst.
-     *  
+     *
      * @param springConst the new value of mSpringConst
      */
     void SetSpringConst(double springConst);

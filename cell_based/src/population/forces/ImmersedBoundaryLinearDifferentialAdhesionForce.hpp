@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 /**
- * A force class for use in immersed boundary simulations. This force implements 
+ * A force class for use in immersed boundary simulations. This force implements
  * elastic links between nodes in adjacent immersed boundaries.
  */
 template<unsigned DIM>
@@ -74,13 +74,13 @@ private:
     }
 
     /**
-     * The cell-cell spring constant between nodes in two labelled cells. 
+     * The cell-cell spring constant between nodes in two labelled cells.
      * Initialised to 1e3 in constructor.
      */
     double mLabelledCellToLabelledCellSpringConst;
 
     /**
-     * The cell-cell spring constant between nodes in a labelled cell - regular 
+     * The cell-cell spring constant between nodes in a labelled cell - regular
      * cell pair. Initialised to 1e3 in constructor.
      */
     double mLabelledCellToCellSpringConst;
@@ -92,7 +92,7 @@ private:
     double mCellToCellSpringConst;
 
     /**
-     * The basic rest length associated with interactions, as a fraction of cell 
+     * The basic rest length associated with interactions, as a fraction of cell
      * population's interaction distance Initialised to 0.25 in constructor.
      */
     double mRestLength;
@@ -111,10 +111,10 @@ public:
 
     /**
      * Overridden AddImmersedBoundaryForceContribution() method.
-     * Calculates the force on each node in the immersed boundary cell 
+     * Calculates the force on each node in the immersed boundary cell
      * population as a result of cell-cell interactions.
      *
-     * @param rNodePairs reference to a vector set of node pairs between which 
+     * @param rNodePairs reference to a vector set of node pairs between which
      *                   to contribute the force
      * @param rCellPopulation reference to the cell population
      */
@@ -124,7 +124,7 @@ public:
 
     /**
      * Overridden OutputImmersedBoundaryForceParameters() method.
-     * 
+     *
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputImmersedBoundaryForceParameters(out_stream& rParamsFile);
@@ -134,8 +134,8 @@ public:
 
     /**
      * Set mLabelledCellToLabelledCellSpringConst.
-     * 
-     * @param labelledCellToLabelledCellSpringConst the new value of 
+     *
+     * @param labelledCellToLabelledCellSpringConst the new value of
      *            mLabelledCellToLabelledCellSpringConst
      */
     void SetLabelledCellToLabelledCellSpringConst(double labelledCellToLabelledCellSpringConst);
@@ -145,8 +145,8 @@ public:
 
     /**
      * Set mLabelledCellToCellSpringConst.
-     * 
-     * @param labelledCellToCellSpringConst the new value of 
+     *
+     * @param labelledCellToCellSpringConst the new value of
      *     mLabelledCellToCellSpringConst
      */
     void SetLabelledCellToCellSpringConst(double labelledCellToCellSpringConst);
@@ -156,7 +156,7 @@ public:
 
     /**
      * Set mCellToCellSpringConst.
-     * 
+     *
      * @param cellToCellSpringConst the new value of mCellToCellSpringConst
      */
     void SetCellToCellSpringConst(double cellToCellSpringConst);
@@ -166,7 +166,7 @@ public:
 
     /**
      * Set mRestLength.
-     * 
+     *
      * @param restLength the new value of mRestLength
      */
     void SetRestLength(double restLength);

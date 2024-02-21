@@ -58,8 +58,8 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
     unsigned element_index;
 
     /*
-     * Create the nodes, row by row, from the bottom up. On the first row we 
-     * have numElementsAcross nodes, all of which are boundary nodes. This row 
+     * Create the nodes, row by row, from the bottom up. On the first row we
+     * have numElementsAcross nodes, all of which are boundary nodes. This row
      * only exists if isFlatBottom is false.
      */
     if (!isFlatBottom)
@@ -72,9 +72,9 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
         }
     }
     /*
-     * On each interior row, and the first row if isFlatBottom is true, we have 
-     * numElementsAcross+1 nodes. On the penultimate row, all nodes are boundary 
-     * nodes. The same is true for the second row, if isFlatBottom is false. On 
+     * On each interior row, and the first row if isFlatBottom is true, we have
+     * numElementsAcross+1 nodes. On the penultimate row, all nodes are boundary
+     * nodes. The same is true for the second row, if isFlatBottom is false. On
      * other rows, the first and last nodes only are boundary nodes.
      */
     for (unsigned j = 1; j < 2*numElementsUp + 1; j++)

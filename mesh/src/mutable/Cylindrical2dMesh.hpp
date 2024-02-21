@@ -71,7 +71,7 @@ private:
 
     /** Scaling factor for offset of halo nodes */
     double mHaloOffset;
-    
+
     /** The left nodes which have been mirrored during the remesh. */
     std::vector<unsigned> mLeftOriginals;
 
@@ -291,7 +291,7 @@ public:
      * @return The maximum distance between any nodes in this dimension.
      */
     double GetWidth(const unsigned& rDimension) const;
- 
+
     /**
      * Set mHaloScalingFactor
      *
@@ -316,7 +316,7 @@ public:
      */
     double GetHaloOffset() const;
 
-    
+
     /**
      * Overridden AddNode() method.
      *

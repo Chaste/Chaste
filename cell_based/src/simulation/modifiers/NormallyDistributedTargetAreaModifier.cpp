@@ -71,24 +71,24 @@ void NormallyDistributedTargetAreaModifier<DIM>::UpdateTargetAreaOfCell(CellPtr 
     // Get target area A of a healthy cell in S, G2 or M phase
     double cell_target_area = this->mReferenceTargetArea;
 
-	double growth_duration = mGrowthDuration;
-	if (growth_duration == DOUBLE_UNSET)
-	{
-		if (dynamic_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel()) == NULL)
-		{
-			EXCEPTION("If SetGrowthDuration() has not been called, a subclass of AbstractPhaseBasedCellCycleModel must be used");
-		}
-	    AbstractPhaseBasedCellCycleModel* p_model = static_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel());
+    double growth_duration = mGrowthDuration;
+    if (growth_duration == DOUBLE_UNSET)
+    {
+        if (dynamic_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel()) == NULL)
+        {
+            EXCEPTION("If SetGrowthDuration() has not been called, a subclass of AbstractPhaseBasedCellCycleModel must be used");
+        }
+        AbstractPhaseBasedCellCycleModel* p_model = static_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel());
 
-	    growth_duration = p_model->GetG1Duration();
+        growth_duration = p_model->GetG1Duration();
 
-	    // If the cell is differentiated then its G1 duration is infinite
-	    if (growth_duration == DBL_MAX)
-	    {
-	        // This is just for fixed cell-cycle models, need to work out how to find the g1 duration
-	    	growth_duration = p_model->GetTransitCellG1Duration();
-	    }
-	}
+        // If the cell is differentiated then its G1 duration is infinite
+        if (growth_duration == DBL_MAX)
+        {
+            // This is just for fixed cell-cycle models, need to work out how to find the g1 duration
+            growth_duration = p_model->GetTransitCellG1Duration();
+        }
+    }
 
     if (pCell->HasCellProperty<ApoptoticCellProperty>())
     {

@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 /**
- * A force class for use in immersed boundary simulations. This force implements 
+ * A force class for use in immersed boundary simulations. This force implements
  * elastic links between nodes in adjacent immersed boundaries.
  */
 template<unsigned DIM>
@@ -74,25 +74,25 @@ private:
     }
 
     /**
-     * The basic spring constant associated with interactions. Initialised to 
+     * The basic spring constant associated with interactions. Initialised to
      * 1e3 in constructor.
      */
     double mSpringConst;
 
     /**
-     * The basic rest length associated with interactions, as a fraction of cell 
+     * The basic rest length associated with interactions, as a fraction of cell
      * population's interaction distance. Initialised to 0.25 in constructor.
      */
     double mRestLength;
 
     /**
-     * Multiplicative factor to change strength of interactions involving a 
+     * Multiplicative factor to change strength of interactions involving a
      * lamina node. Initialised to 1.0 in constructor.
      */
     double mLaminaSpringConstMult;
 
     /**
-     * Multiplicative factor to change equilibrium length of interactions 
+     * Multiplicative factor to change equilibrium length of interactions
      * involving a lamina node. Initialised to 1.0 in constructor.
      */
     double mLaminaRestLengthMult;
@@ -111,10 +111,10 @@ public:
 
     /**
      * Overridden AddImmersedBoundaryForceContribution() method.
-     * Calculates the force on each node in the immersed boundary cell 
+     * Calculates the force on each node in the immersed boundary cell
      * population as a result of cell-cell interactions.
      *
-     * @param rNodePairs reference to a vector set of node pairs between which 
+     * @param rNodePairs reference to a vector set of node pairs between which
      *                   to contribute the force
      * @param rCellPopulation reference to the cell population
      */
@@ -124,7 +124,7 @@ public:
 
     /**
      * Overridden OutputImmersedBoundaryForceParameters() method.
-     * 
+     *
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputImmersedBoundaryForceParameters(out_stream& rParamsFile);
@@ -134,7 +134,7 @@ public:
 
     /**
      * Set mSpringConst.
-     * 
+     *
      * @param springConst the new value of mSpringConst
      */
     void SetSpringConst(double springConst);
@@ -144,7 +144,7 @@ public:
 
     /**
      * Set mRestLength.
-     * 
+     *
      * @param restLength the new value of mRestLength
      */
     void SetRestLength(double restLength);
@@ -154,7 +154,7 @@ public:
 
     /**
      * Set mLaminaSpringConstMult.
-     * 
+     *
      * @param laminaSpringConstMult the new value of mLaminaSpringConstMult
      */
     void SetLaminaSpringConstMult(double laminaSpringConstMult);
@@ -164,7 +164,7 @@ public:
 
     /**
      * Set mLaminaRestLengthMult.
-     * 
+     *
      * @param laminaRestLengthMult the new value of mLaminaRestLengthMult
      */
     void SetLaminaRestLengthMult(double laminaRestLengthMult);

@@ -126,7 +126,7 @@ public:
          * These can be found in the inheritance diagram, here,
          * [AbstractCellCycleModel](/doxygen-latest/classAbstractCellCycleModel.html).
          * Note that some of these models will require information on the surrounding medium such as Oxygen concentration to work,
-         * see specific class documentation for details. Some of these will be covered in later tutorials 
+         * see specific class documentation for details. Some of these will be covered in later tutorials
          * ([Running Contact Inhibition Simulations](../runningcontactinhibitionsimulations/),
          * [Running Delta Notch Simulations](../runningdeltanotchsimulations/), and [Running Tumour Spheroid Simulations](../runningtumourspheroidsimulations).
          * We create an empty vector of cells and pass this into the

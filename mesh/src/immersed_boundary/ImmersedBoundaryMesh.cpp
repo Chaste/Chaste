@@ -71,7 +71,7 @@ ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ImmersedBoundaryMesh(std::vector<N
         case 3:
             EXCEPTION("Not implemented yet in 3D");
             break;
-        
+
         //LCOV_EXCL_START
         default:
             NEVER_REACHED;
@@ -188,7 +188,7 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetElongationShapeFactorOfE
         double elongation_shape_factor = sqrt(largest_eigenvalue / smallest_eigenvalue);
         return elongation_shape_factor;
     }
-    else        
+    else
     {
         NEVER_REACHED;
     }
@@ -232,10 +232,10 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetTortuosityOfMesh()
 
         return total_length / straight_line_length;
     }
-    else        
+    else
     {
         NEVER_REACHED;
-    }    
+    }
 }
 
 bool CustomComparisonForSkewnessMeasure(std::pair<unsigned, c_vector<double, 2> > pairA, std::pair<unsigned, c_vector<double, 2> > pairB)
@@ -263,7 +263,7 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSkewnessOfElementMassDis
      *
      * By integrating the pdf directly, we can calculate exactly the necessary moments of the distribution needed for
      * the skewness.
-     * 
+     *
      * This method does not work for concave shapes, and emits a warning but continues anyway. Results will be close
      * to correct for mildly concave shapes or may be correct depending on the alignment of the element.
      */
@@ -842,7 +842,7 @@ c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetCen
 
         return centroid;
     }
-    else        
+    else
     {
         NEVER_REACHED;
     }
@@ -1027,7 +1027,7 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetVolumeOfElement(unsigned
         // We take the absolute value just in case the nodes were really oriented clockwise
         return fabs(element_volume);
     }
-    else        
+    else
     {
         NEVER_REACHED;
     }
@@ -1053,7 +1053,7 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSurfaceAreaOfElement(uns
 
         return surface_area;
     }
-    else        
+    else
     {
         NEVER_REACHED;
     }
@@ -1097,7 +1097,7 @@ double ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetVoronoiSurfaceAreaOfElem
 
         return surface_area;
     }
-    else        
+    else
     {
         NEVER_REACHED;
     }
@@ -1229,7 +1229,7 @@ c_vector<double, 3> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::CalculateMomen
         }
         return moments;
     }
-    else        
+    else
     {
         NEVER_REACHED;
     }
@@ -1287,7 +1287,7 @@ c_vector<double, SPACE_DIM> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetSho
 
         return short_axis;
     }
-    else        
+    else
     {
         NEVER_REACHED;
     }
@@ -1313,7 +1313,7 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAx
         * that lies on the opposite side of the axis of division to its next
         * neighbour.
         */
-        
+
         unsigned num_nodes = pElement->GetNumNodes();
         std::vector<unsigned> intersecting_nodes;
         bool is_current_node_on_left = (inner_prod(this->GetVectorFromAtoB(pElement->GetNodeLocation(0), centroid), perp_axis) >= 0);
@@ -1343,7 +1343,7 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongGivenAx
 
         return new_element_index;
     }
-    else        
+    else
     {
         NEVER_REACHED;
     }
@@ -1359,7 +1359,7 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElementAlongShortAx
         unsigned new_element_index = DivideElementAlongGivenAxis(pElement, short_axis, placeOriginalElementBelow);
         return new_element_index;
     }
-    else        
+    else
     {
         NEVER_REACHED;
     }
@@ -1656,7 +1656,7 @@ unsigned ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::DivideElement(ImmersedBou
 
         return new_elem_idx;
     }
-    else        
+    else
     {
         NEVER_REACHED;
     }
@@ -1743,7 +1743,7 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshElement(ImmersedBoundar
             pElement->GetNode(this_idx)->rGetModifiableLocation() = evenly_spaced_locations[node_idx];
         }
     }
-    else        
+    else
     {
         NEVER_REACHED;
     }
@@ -1809,7 +1809,7 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMeshLamina(ImmersedBoundary
             pLamina->GetNode(this_idx)->rGetModifiableLocation() = evenly_spaced_locations[node_idx];
         }
     }
-    else        
+    else
     {
         NEVER_REACHED;
     }
@@ -1923,7 +1923,7 @@ std::array<unsigned, 13> ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::GetPolygo
 
         return polygon_dist;
     }
-    else        
+    else
     {
         NEVER_REACHED;
     }
@@ -2134,7 +2134,7 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocationsVoronoiDia
                                     this->mNodes.front()->rGetLocation()[1] +
                                     this->mNodes.back()->rGetLocation()[0] +
                                     this->mNodes.back()->rGetLocation()[1];
-        
+
         bool voronoi_needs_updating = std::fabs(mSummaryOfNodeLocations - new_location_summary) > DBL_EPSILON;
 
         /*

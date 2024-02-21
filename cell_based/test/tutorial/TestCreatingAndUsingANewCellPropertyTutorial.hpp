@@ -52,8 +52,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This tutorial assumes you have already read [Creating And Using A New Force](../creatingandusinganewforce/).
  *
- * In the [Creating And Using A New Cell Mutation State](../creatingandusinganewcellmutationstate/) 
- * tutorial we showed how to create a new cell mutation state class, 
+ * In the [Creating And Using A New Cell Mutation State](../creatingandusinganewcellmutationstate/)
+ * tutorial we showed how to create a new cell mutation state class,
  * and how this can be used in a cell-based simulation. As well as
  * mutation states, cells may be given much more general properties, using the cell
  * property class hierarchy. In this tutorial, we show how to create a new cell property
@@ -97,7 +97,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * implementing some form of chemotaxis down an imposed chemoattractant gradient,
  * as occurs for example when macrophages migrate within a tumour towards high
  * concentrations of the vascular endothelial growth factor VEGF; for further
- * details, see for example 
+ * details, see for example
  * [Owen *et al.*, J. Theor. Biol. 226: 377-391 (2004).](https://doi.org/10.1016/j.jtbi.2003.09.004)
  *
  * Note that usually this code would be separated out into a separate declaration

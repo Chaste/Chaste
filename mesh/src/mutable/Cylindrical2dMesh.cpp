@@ -59,7 +59,7 @@ Cylindrical2dMesh::~Cylindrical2dMesh()
 
 Cylindrical2dMesh::Cylindrical2dMesh(double width, std::vector<Node<2>* > nodes)
   : MutableMesh<2,2>(),
-    mWidth(width),    
+    mWidth(width),
     mHaloScalingFactor(2.0), // Default value
     mHaloOffset(1.0) // Default value
 {

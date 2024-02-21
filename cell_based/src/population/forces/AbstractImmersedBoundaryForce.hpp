@@ -42,15 +42,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RandomNumberGenerator.hpp"
 
 /**
- * An abstract immersed boundary force class, for use in  immersed boundary 
+ * An abstract immersed boundary force class, for use in  immersed boundary
  * cell-based simulations.
- * 
- * NOTE: while this class shares similarities with AbstractForce, it is not 
- * passed to a simulation object, but instead to an 
+ *
+ * NOTE: while this class shares similarities with AbstractForce, it is not
+ * passed to a simulation object, but instead to an
  * ImmersedBoundarySimulationModifier as all actual immersed boundary logic
  * is handled by the modifer, rather than the typical simulation
  * infrastructure.
- * 
+ *
  */
 template<unsigned DIM>
 class AbstractImmersedBoundaryForce : public Identifiable
@@ -77,8 +77,8 @@ private:
 protected:
 
     /**
-     * Add the random noise to nodes, if mAdditiveNormalNoise is set. This 
-     * method handles randomization of the forces in such a way as to ensure no 
+     * Add the random noise to nodes, if mAdditiveNormalNoise is set. This
+     * method handles randomization of the forces in such a way as to ensure no
      * net change to forces across the whole domain.
      *
      * @param rCellPopulation an immersed boundary cell population
@@ -90,13 +90,13 @@ protected:
     bool mAdditiveNormalNoise;
 
     /**
-     * The mean of the Normal distribution from which random noise variations 
+     * The mean of the Normal distribution from which random noise variations
      * are drawn. Default value is 1.0
      */
     double mNormalNoiseMean;
 
     /**
-     * The standard deviation of the Normal distribution from which random noise 
+     * The standard deviation of the Normal distribution from which random noise
      * variations are drawn. Default value is 0.0
      */
     double mNormalNoiseStdDev;
@@ -114,10 +114,10 @@ public:
     virtual ~AbstractImmersedBoundaryForce();
 
     /**
-     * Calculates the force on each immersed boundary node. As this method is 
+     * Calculates the force on each immersed boundary node. As this method is
      * pure virtual, it must be overridden in subclasses.
      *
-     * @param rNodePairs reference to a vector set of node pairs between which 
+     * @param rNodePairs reference to a vector set of node pairs between which
      *     to contribute the force
      * @param rCellPopulation an immersed boundary cell population
      */
@@ -126,7 +126,7 @@ public:
         ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)=0;
 
     /**
-     * Outputs force parameters to file. As this method is pure virtual, it must 
+     * Outputs force parameters to file. As this method is pure virtual, it must
      * be overridden in subclasses.
      *
      * @param rParamsFile the file stream to which the parameters are output
@@ -138,21 +138,21 @@ public:
 
     /**
      * Enable or disable additive normal noise
-     * 
+     *
      * @param additiveNormalNoise whether to include multiplicative normal noise
      */
     void SetAdditiveNormalNoise(bool additiveNormalNoise);
 
-    /** 
+    /**
      *
-     * @return mNormalNoiseMean 
+     * @return mNormalNoiseMean
      * */
     double GetNormalNoiseMean() const;
 
     /**
      * Set the mean value of the normal noise
-     * 
-     * @param normalNoiseMean the new value of mNormalNoiseMean 
+     *
+     * @param normalNoiseMean the new value of mNormalNoiseMean
      */
     void SetNormalNoiseMean(double normalNoiseMean);
 
@@ -161,7 +161,7 @@ public:
 
     /**
      * Set the standard deviation of the normal noise
-     * 
+     *
      * @param normalNoiseStdDev the new value of mNormalNoiseStdDev
      */
     void SetNormalNoiseStdDev(double normalNoiseStdDev);

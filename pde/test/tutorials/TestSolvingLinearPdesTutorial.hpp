@@ -213,7 +213,7 @@ public:
          * function, *not* something like $\partial u/ \partial n=g(x)$. Hence the boundary condition we are specifying is
          * $(D \nabla u).\mathbf{n} = 0$.
          *
-         * {{< callout context="note" title="Note for 1D" icon="info-circle" >}} 
+         * {{< callout context="note" title="Note for 1D" icon="info-circle" >}}
          * If we were solving $2u_{xx}=f(x)$ in 1D, and
          * wanted to specify $\partial u/ \partial x=1$ on the LHS boundary, the Neumann boundary value we have to specify is
          * $-2$, as $n=-1$ (outward facing normal) so $(D \nabla u).n = -2$ when $\partial u/ \partial x=1$.

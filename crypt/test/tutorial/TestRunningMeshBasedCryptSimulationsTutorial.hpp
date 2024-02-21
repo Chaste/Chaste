@@ -112,7 +112,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestRunningMeshBasedCryptSimulationsTutorial : public AbstractCellBasedTestSuite
 {
 public:
-    /* 
+    /*
      * ### Test 1: a basic crypt simulation
      *
      * In the first test, we demonstrate how to create a crypt simulation using a

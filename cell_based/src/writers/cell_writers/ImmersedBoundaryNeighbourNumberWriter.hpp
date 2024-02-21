@@ -41,11 +41,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellWriter.hpp"
 
 /**
- * A class written using the visitor pattern for writing whether a cell is on 
+ * A class written using the visitor pattern for writing whether a cell is on
  * the boundary of an immersed boundary cell population.
  *
- * The output file is called ib_neighbournumber.dat by default. If VTK is 
- * switched on, then the writer also specifies the VTK output for each cell, 
+ * The output file is called ib_neighbournumber.dat by default. If VTK is
+ * switched on, then the writer also specifies the VTK output for each cell,
  * which is stored in the VTK cell data "Boundary cell" by default.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -76,7 +76,7 @@ public:
     /**
      * Overridden GetCellDataForVtkOutput() method.
      *
-     * Get an unsigned integer associated with a cell. This method reduces 
+     * Get an unsigned integer associated with a cell. This method reduces
      * duplication of code between the methods VisitCell() and AddVtkData().
      *
      * @param pCell a cell
@@ -95,10 +95,10 @@ public:
      *
      * Outputs a line of space-separated values of the form:
      * ...[location index] [cell id] [x-pos] [y-pos] [z-pos] [num neighbours] ...
-     * with [y-pos] and [z-pos] included for 2 and 3 dimensional simulations, 
+     * with [y-pos] and [z-pos] included for 2 and 3 dimensional simulations,
      * respectively.
      *
-     * This is appended to the output written by AbstractCellBasedWriter, which 
+     * This is appended to the output written by AbstractCellBasedWriter, which
      * is a single value [present simulation time], followed by a tab.
      *
      * @param pCell a cell

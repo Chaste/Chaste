@@ -97,7 +97,7 @@ void DivisionBiasTrackingModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
 
     /**
      * Iterate over cell population and store each cell's signed distance along mDivisionBiasVector
-     * through the centroid of the cell population, where zero corresponds to a cell located at the 
+     * through the centroid of the cell population, where zero corresponds to a cell located at the
      * centroid of the cell population.
      */
     std::vector<double> biases;

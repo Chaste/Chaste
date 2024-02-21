@@ -77,7 +77,7 @@ class NormallyDistributedTargetAreaModifier : public AbstractTargetAreaModifier<
         archive & boost::serialization::base_object<AbstractTargetAreaModifier<DIM> >(*this);
         archive & mGrowthDuration;
     }
-    
+
     friend class TestNormallyDistributedTargetAreaModifier;
 
     /**

@@ -71,7 +71,7 @@ private:
     double mLengthScale;
 
     /**
-     * An owning pointer to a box collection for efficiently keeping track of 
+     * An owning pointer to a box collection for efficiently keeping track of
      * nearby nodes.
      */
     std::unique_ptr<ObsoleteBoxCollection<SPACE_DIM>> mpBoxCollection;
@@ -102,15 +102,15 @@ private:
 public:
 
     /**
-     * Constructor that takes all parameters as arguments, and sets up an 
+     * Constructor that takes all parameters as arguments, and sets up an
      * appropriate box collection.
      *
      * @param lowerCorner the lower corner of the rectangular grid
      * @param upperCorner the upper corner of the rectangular grid
      * @param periodicity whether the grid is periodic in each dimension
-     * @param lengthScale the length scale of the correlation when calculating 
+     * @param lengthScale the length scale of the correlation when calculating
      *                    the covariance matrix
-     * @param boxWidth the box size for the box collection. Defaults to 
+     * @param boxWidth the box size for the box collection. Defaults to
      *                 DOUBLE_UNSET in which case it is reset appropriately.
      */
     OffLatticeRandomFieldGenerator(std::array<double, SPACE_DIM> lowerCorner,
@@ -125,11 +125,11 @@ public:
     virtual ~OffLatticeRandomFieldGenerator() = default;
 
     /**
-     * Sample an instance of the random field. 
-     * 
-     * Calls SampleRandomFieldAtTime() at a time chosen uniformly at random from 
+     * Sample an instance of the random field.
+     *
+     * Calls SampleRandomFieldAtTime() at a time chosen uniformly at random from
      * 0 to 1.
-     * 
+     *
      * @param rNodes a vector nodes at which to sample the random field
      *
      * @return A vector representing an instance of the random field.
@@ -137,13 +137,13 @@ public:
     std::vector<double> SampleRandomField(const std::vector<Node<SPACE_DIM>*>& rNodes);
 
     /**
-     * Sample an instance of the random field at a given time. First, draw 
-     * mNumTotalGridPts random numbers from N(0,1), and then create an 
+     * Sample an instance of the random field at a given time. First, draw
+     * mNumTotalGridPts random numbers from N(0,1), and then create an
      * appropriate linear combination of the eigenvectors.
      *
      * @param rNodes a vector nodes at which to sample the random field
      * @param time time at which to sample the random field
-     * 
+     *
      * @return A vector representing an instance of the random field.
      */
     std::vector<double> SampleRandomFieldAtTime(const std::vector<Node<SPACE_DIM>*>& rNodes, const double time);

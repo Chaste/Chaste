@@ -124,11 +124,11 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetReMeshFrequency(), UINT_MAX);
         cell_population.SetReMeshFrequency(5u);
         TS_ASSERT_EQUALS(cell_population.GetReMeshFrequency(), 5u);
-        
+
         TS_ASSERT_EQUALS(cell_population.mOutputNodeRegionToVtk, false);
         cell_population.SetOutputNodeRegionToVtk(true);
         TS_ASSERT_EQUALS(cell_population.mOutputNodeRegionToVtk, true);
-        
+
         auto division_rule = boost::shared_ptr<ShortAxisImmersedBoundaryDivisionRule<2>>(new ShortAxisImmersedBoundaryDivisionRule<2>());
         cell_population.SetImmersedBoundaryDivisionRule(division_rule);
         TS_ASSERT_EQUALS(cell_population.GetImmersedBoundaryDivisionRule().get(), division_rule.get());
@@ -204,16 +204,16 @@ public:
 
         TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetLocation()[0], new_location[0], 1e-12);
         TS_ASSERT_DELTA(cell_population.GetNode(0)->rGetLocation()[1], new_location[1], 1e-12);
-        
+
         // Test GetNumLaminas
         TS_ASSERT_EQUALS(cell_population.GetNumLaminas(), 1);
-        
+
         // Test adding ndoe from population - doesn't do anything
         TS_ASSERT_EQUALS(cell_population.AddNode(nullptr), 0);
-        
+
         TetrahedralMesh<2, 2>* p_tet_mesh = cell_population.GetTetrahedralMeshForPdeModifier();
         TS_ASSERT_DIFFERS(p_tet_mesh, nullptr);
-        
+
         ImmersedBoundaryMesh<3, 3> ib_mesh_3d;
         std::vector<CellPtr> cells_3d;
         ImmersedBoundaryCellPopulation<3> cell_population_3d(ib_mesh_3d, cells_3d);
@@ -224,14 +224,14 @@ public:
         UniformCellCycleModel* p_model = new UniformCellCycleModel();
         CellPtr p_cell(new Cell(p_wildtype, p_model));
         TS_ASSERT_THROWS_NOTHING(cell_population.AddCell(p_cell, *(cell_population.rGetCells().begin())));
-        
+
         TS_ASSERT(cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(0));
         TS_ASSERT(!cell_population.IsCellOnBoundary(p_cell));
-       
+
         // Tidy up
         delete p_tet_mesh;
     }
-    
+
     void TestStepSizeException()
     {
         // Create an immersed boundary cell population object
@@ -245,13 +245,13 @@ public:
 
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetThrowsStepSizeException(true);
-        
+
         c_vector<double, 2> displacement;
         displacement[0] = 0.8;
         displacement[1] = 0.8;
         TS_ASSERT_THROWS_ANYTHING(cell_population.CheckForStepSizeException(0, displacement, 0.1));
     }
-    
+
     void TestValidateException()
     {
         // Create an immersed boundary cell population object
@@ -265,13 +265,13 @@ public:
 
         TS_ASSERT_THROWS_CONTAINS(ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells), "does not appear to have a cell associated");
     }
-    
+
     void TestOverlyLargeDisplacements()
     {
         { // UpdateNodeLocations() coverage > 10x
 
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
-            
+
             // Create a single node, single element mesh
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.55, 0.55));
@@ -301,18 +301,18 @@ public:
                     }
                 }
             }
-            
+
             mesh.SetCharacteristicNodeSpacing(0.000001);
             cell_population.SetReMeshFrequency(1);
             TS_ASSERT_THROWS_CONTAINS(cell_population.UpdateNodeLocations(0.1), "10x Characteristic");
         }
 
-        { // UpdateNodeLocations() coverage 
+        { // UpdateNodeLocations() coverage
 
             SimulationTime::Instance()->Destroy();
             SimulationTime::Instance()->SetStartTime(0.0);
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
-            
+
             // Create a single node, single element mesh
             std::vector<Node<2>*> nodes;
             nodes.push_back(new Node<2>(0, true, 0.55, 0.55));
@@ -342,7 +342,7 @@ public:
                     }
                 }
             }
-            
+
             mesh.SetCharacteristicNodeSpacing(0.01);
             cell_population.SetReMeshFrequency(1);
             TS_ASSERT_THROWS_NOTHING(cell_population.UpdateNodeLocations(0.1));
@@ -353,7 +353,7 @@ public:
             SimulationTime::Instance()->Destroy();
             SimulationTime::Instance()->SetStartTime(0.0);
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
-            
+
             // Create a single node, single element mesh
             std::vector<Node<2>*> nodes;
             // Position all nodes near the middle
@@ -384,7 +384,7 @@ public:
                 r_velocity_field[dim][1][0] = 0.1;
                 r_velocity_field[dim][1][1] = 0.1;
             }
-            
+
             mesh.SetCharacteristicNodeSpacing(0.000001);
             cell_population.SetReMeshFrequency(1);
             TS_ASSERT_THROWS_CONTAINS(cell_population.UpdateNodeLocations(0.1), "Sources are moving more than 10x Characteristic");
@@ -395,7 +395,7 @@ public:
             SimulationTime::Instance()->Destroy();
             SimulationTime::Instance()->SetStartTime(0.0);
             SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(2.0, 2);
-            
+
             // Create a single node, single element mesh
             std::vector<Node<2>*> nodes;
             // Position all nodes in top right corner
@@ -427,7 +427,7 @@ public:
                 r_velocity_field[dim][1][0] = 0.1;
                 r_velocity_field[dim][1][1] = 0.1;
             }
-            
+
             mesh.SetCharacteristicNodeSpacing(0.01);
             cell_population.SetReMeshFrequency(1);
             TS_ASSERT_THROWS_NOTHING(cell_population.UpdateNodeLocations(0.1));
@@ -498,7 +498,7 @@ public:
 
         cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
         cell_population.AddCellPopulationCountWriter<CellProliferativeTypesCountWriter>();
-        
+
         using WriterType = CellDivisionLocationsWriter<2, 2>;
         MAKE_PTR(WriterType, cdlw);
         cell_population.AddCellPopulationEventWriter(cdlw);
@@ -522,7 +522,7 @@ public:
             cell_iter->GetCellData()->SetItem("var1", 3.0);
             cell_iter->GetCellData()->SetItem("target area", 0.1);
         }
-        
+
         // Set up node regions
         for (auto iter = p_mesh->GetNodeIteratorBegin();
              iter != p_mesh->GetNodeIteratorEnd();
@@ -669,7 +669,7 @@ public:
             delete p_cell_population;
         }
     }
-    
+
     void TestRemoveDeadCells()
     {
         // Create an immersed boundary cell population object
@@ -704,7 +704,7 @@ public:
             cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
             ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
-            
+
             for (auto& p_cell : cell_population.rGetCells())
             {
                 p_cell->GetCellData()->SetItem("cell data", 0.2);
@@ -714,7 +714,7 @@ public:
             TS_ASSERT_DELTA(cell_population.GetCellDataItemAtPdeNode(0, str, true, 0.1), 0.1, 1e-9);
             TS_ASSERT_DELTA(cell_population.GetCellDataItemAtPdeNode(p_mesh->GetNumNodes() + 1, str, true, 0.1), 0.2, 1e-9);
         }
-        
+
         {
             // Create a small mesh
             std::vector<Node<2>*> nodes;
@@ -727,12 +727,12 @@ public:
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
             elems.push_back(new ImmersedBoundaryElement<2, 2>(1, nodes));
             elems.push_back(new ImmersedBoundaryElement<2, 2>(2, nodes));
-            
+
             std::vector<ImmersedBoundaryElement<1, 2>*> lams;
             lams.push_back(new ImmersedBoundaryElement<1, 2>(0, nodes));
             lams.push_back(new ImmersedBoundaryElement<1, 2>(1, nodes));
             lams.push_back(new ImmersedBoundaryElement<1, 2>(2, nodes));
-            
+
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems, lams);
             auto p_mesh = &mesh;
             p_mesh->SetNumGridPtsXAndY(32);
@@ -751,16 +751,16 @@ public:
             TS_ASSERT_DELTA(cell_population.GetCellDataItemAtPdeNode(0, str, false, 0.1), 0.2, 0.0001);
         }
     }
-    
+
     void TestPdeNonApoptoticCell()
     {
         /*
-         * Test overridden IsPdeNodeAssociatedWithNonApoptoticCell() method, 
-         * which returns whether a node, specified by its index in a tetrahedral 
-         * mesh for use with a PDE modifier, is associated with a non-apoptotic 
+         * Test overridden IsPdeNodeAssociatedWithNonApoptoticCell() method,
+         * which returns whether a node, specified by its index in a tetrahedral
+         * mesh for use with a PDE modifier, is associated with a non-apoptotic
          * cell.
-         * 
-         * \todo this seems an odd test, since there is not actually a PDE 
+         *
+         * \todo this seems an odd test, since there is not actually a PDE
          * modifier present.
          */
 
@@ -775,12 +775,12 @@ public:
         elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
         elems.push_back(new ImmersedBoundaryElement<2, 2>(1, nodes));
         elems.push_back(new ImmersedBoundaryElement<2, 2>(2, nodes));
-        
+
         std::vector<ImmersedBoundaryElement<1, 2>*> lams;
         lams.push_back(new ImmersedBoundaryElement<1, 2>(0, nodes));
         lams.push_back(new ImmersedBoundaryElement<1, 2>(1, nodes));
         lams.push_back(new ImmersedBoundaryElement<1, 2>(2, nodes));
-        
+
         ImmersedBoundaryMesh<2,2> mesh(nodes, elems, lams);
         auto p_mesh = &mesh;
         p_mesh->SetNumGridPtsXAndY(32);
@@ -796,7 +796,7 @@ public:
         }
         MAKE_PTR(ApoptoticCellProperty, cellProperty);
         cell_population.rGetCells().front()->AddCellProperty(cellProperty);
-        
+
         std::string str = "cell data";
 
         TS_ASSERT_EQUALS(cell_population.IsPdeNodeAssociatedWithNonApoptoticCell(0), false);

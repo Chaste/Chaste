@@ -415,7 +415,7 @@ public:
         simulator.AddSimulationModifier(p_modifier);
 
         // Pass a target area modifier to the simulation
-        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);      
+        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
         // Testing addition of topology update simulation modifier
