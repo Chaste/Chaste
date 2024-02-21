@@ -61,7 +61,7 @@ private:
 
     /** Index of the immersed boundary element associated with this fluid source. */
     unsigned mAssociatedElementIndex;
-    
+
     friend class boost::serialization::access;
 
     /**

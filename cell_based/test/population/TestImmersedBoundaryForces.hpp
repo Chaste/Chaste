@@ -106,7 +106,7 @@ public:
             ImmersedBoundaryLinearInteractionForce<2> force;
             force.AddImmersedBoundaryForceContribution(node_pair, cell_population);
         }
-        
+
         // With additive noise
         {
             // Create a small mesh
@@ -148,12 +148,12 @@ public:
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
             elems.push_back(new ImmersedBoundaryElement<2, 2>(1, nodes));
             elems.push_back(new ImmersedBoundaryElement<2, 2>(2, nodes));
-            
+
             std::vector<ImmersedBoundaryElement<1, 2>*> lams;
             lams.push_back(new ImmersedBoundaryElement<1, 2>(0, nodes));
             lams.push_back(new ImmersedBoundaryElement<1, 2>(1, nodes));
             lams.push_back(new ImmersedBoundaryElement<1, 2>(2, nodes));
-            
+
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems, lams);
             auto p_mesh = &mesh;
             p_mesh->SetNumGridPtsXAndY(32);
@@ -262,7 +262,7 @@ public:
             ImmersedBoundaryMorseInteractionForce<2> force;
             force.AddImmersedBoundaryForceContribution(node_pair, cell_population);
         }
-        
+
         { // Test with laminas
             // Create a small mesh
             std::vector<Node<2>*> nodes;
@@ -270,7 +270,7 @@ public:
             nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
             nodes.push_back(new Node<2>(2, true, 0.1, 0.1));
             nodes.push_back(new Node<2>(3, true, 0.0, 0.1));
-            
+
             for (auto p_node : nodes)
             {
                 p_node->ClearAppliedForce();
@@ -280,15 +280,15 @@ public:
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
             elems.push_back(new ImmersedBoundaryElement<2, 2>(1, nodes));
             elems.push_back(new ImmersedBoundaryElement<2, 2>(2, nodes));
-            
+
             std::vector<ImmersedBoundaryElement<1, 2>*> lams;
             lams.push_back(new ImmersedBoundaryElement<1, 2>(3, nodes));
             lams.push_back(new ImmersedBoundaryElement<1, 2>(4, nodes));
             lams.push_back(new ImmersedBoundaryElement<1, 2>(5, nodes));
-            
+
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems, lams);
             auto p_mesh = &mesh;
-            
+
             // Create a minimal cell population
             std::vector<CellPtr> cells;
             CellsGenerator<NoCellCycleModel, 2> cells_generator;
@@ -326,7 +326,7 @@ public:
             cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
             ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
             cell_population.SetInteractionDistance(0.01);
-            
+
             auto nodes = p_mesh->rGetNodes();
             for (auto& p_node : nodes)
             {
@@ -595,12 +595,12 @@ public:
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
             elems.push_back(new ImmersedBoundaryElement<2, 2>(1, nodes));
             elems.push_back(new ImmersedBoundaryElement<2, 2>(2, nodes));
-            
+
             std::vector<ImmersedBoundaryElement<1, 2>*> lams;
             lams.push_back(new ImmersedBoundaryElement<1, 2>(0, nodes));
             lams.push_back(new ImmersedBoundaryElement<1, 2>(1, nodes));
             lams.push_back(new ImmersedBoundaryElement<1, 2>(2, nodes));
-            
+
             ImmersedBoundaryMesh<2,2> mesh(nodes, elems, lams);
             auto p_mesh = &mesh;
 
@@ -785,7 +785,7 @@ public:
             std::vector<std::pair<Node<2>*, Node<2>*>> node_pairs = {std::make_pair(nodes[0], nodes[3]),
                                                                      std::make_pair(nodes[1], nodes[4]),
                                                                      std::make_pair(nodes[2], nodes[5])};
-            
+
             for (auto&& p_node : mesh.rGetNodes())
             {
                 p_node->ClearAppliedForce();
@@ -1271,7 +1271,7 @@ public:
             TS_ASSERT_DELTA(mesh.GetNode(1u)->rGetAppliedForce()[0], -0.0, 1e-6);
             TS_ASSERT_DELTA(mesh.GetNode(1u)->rGetAppliedForce()[1], 0.0, 1e-6);
 
-            TS_ASSERT_DELTA(mesh.GetNode(2u)->rGetAppliedForce()[0], 0.6291, 1e-4); 
+            TS_ASSERT_DELTA(mesh.GetNode(2u)->rGetAppliedForce()[0], 0.6291, 1e-4);
             TS_ASSERT_DELTA(mesh.GetNode(2u)->rGetAppliedForce()[1], 1.2582, 1e-4);
 
             TS_ASSERT_DELTA(mesh.GetNode(3u)->rGetAppliedForce()[0], -0.333333, 1e-6); //opposite to node 0
@@ -1328,7 +1328,7 @@ public:
             std::vector<ImmersedBoundaryElement<2, 2>*> elements;
             elements.push_back(new ImmersedBoundaryElement<2, 2>(0u, {nodes[0], nodes[1], nodes[2]}));
             elements.push_back(new ImmersedBoundaryElement<2, 2>(1u, {nodes[3], nodes[4], nodes[5]}));
-            
+
             std::vector<ImmersedBoundaryElement<1, 2>*> lams;
             lams.push_back(new ImmersedBoundaryElement<1, 2>(0, nodes));
             lams.push_back(new ImmersedBoundaryElement<1, 2>(1, nodes));

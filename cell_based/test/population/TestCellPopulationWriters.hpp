@@ -265,7 +265,7 @@ public:
 
             TS_ASSERT_THROWS_NOTHING(adjacency_writer.Visit(&vertex_based_cell_population));
         }
-        
+
         // Coverage of the Visit() method when called with an ImmersedBoundaryCellPopulation
         {
             // Create an immersed boundary cell population object
@@ -278,7 +278,7 @@ public:
             cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
             ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
-            
+
             TS_ASSERT_THROWS_CONTAINS(adjacency_writer.Visit(&cell_population), "presence of laminas");
         }
     }
@@ -422,7 +422,7 @@ public:
             cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
             ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
-            
+
             TS_ASSERT_THROWS_CONTAINS(area_writer_2d.Visit(&cell_population), "cannot be used with a ImmersedBoundaryCellPopulation");
         }
     }
@@ -869,7 +869,7 @@ public:
             // Label a subset of the cells
             boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
             cell_population.GetCellUsingLocationIndex(12)->AddCellProperty(p_label);
-            
+
             // Create an output directory for the writer
             std::string output_directory = "TestHeterotypicBoundaryLengthWriterImmersedBoundary";
             OutputFileHandler output_file_handler(output_directory, false);
@@ -1189,8 +1189,8 @@ public:
 
         TS_ASSERT_THROWS_THIS(node_velocity_writer.Visit(&potts_based_cell_population),
             "NodeVelocityWriter cannot be used with a PottsBasedCellPopulation");
-        
-        
+
+
         // Create an immersed boundary cell population object
         ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
         ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
@@ -1201,9 +1201,9 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         ImmersedBoundaryCellPopulation<2> ib_cell_population(*p_mesh, cells);
-        
+
         TS_ASSERT_THROWS_CONTAINS(node_velocity_writer.Visit(&ib_cell_population), "NodeVelocityWriter cannot be used with a ImmersedBoundaryCellPopulation");
-        
+
     }
 
     void TestNodeVelocityWriterArchiving()
@@ -1357,7 +1357,7 @@ public:
             }
             TS_ASSERT_THROWS_NOTHING(radial_writer.Visit(&potts_based_cell_population));
         }
-        
+
         { // Test with an immersed boundary population
             // Create an immersed boundary cell population object
             ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
@@ -1376,7 +1376,7 @@ public:
             {
                  cell_iter->GetCellData()->SetItem("this average", 1.0);
             }
-            
+
             TS_ASSERT_THROWS_NOTHING(radial_writer.Visit(&ib_cell_population));
         }
     }
@@ -1523,7 +1523,7 @@ public:
             cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
             ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
-            
+
             TS_ASSERT_THROWS_NOTHING(t1_swaps_writer.Visit(&cell_population));
         }
     }
@@ -1662,7 +1662,7 @@ public:
             cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
             ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
-            
+
             TS_ASSERT_THROWS_NOTHING(t2_swaps_writer.Visit(&cell_population));
         }
     }
@@ -1801,7 +1801,7 @@ public:
             cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
             ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
-            
+
             TS_ASSERT_THROWS_NOTHING(t3_swaps_writer.Visit(&cell_population));
         }
     }
@@ -1939,7 +1939,7 @@ public:
             cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
             ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
-            
+
             TS_ASSERT_THROWS_NOTHING(intersection_swaps_writer.Visit(&cell_population));
         }
     }
@@ -2070,7 +2070,7 @@ public:
 
         TS_ASSERT_THROWS_THIS(voronoi_writer_2d.Visit(&vertex_cell_population),
             "VoronoiDataWriter cannot be used with a VertexBasedCellPopulation");
-        
+
         // Test the correct exception is thrown if using an ImmersedBoundaryCellPopulation
         ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
         ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
@@ -2080,7 +2080,7 @@ public:
         ib_cells_generator.GenerateBasicRandom(ib_cells, p_mesh->GetNumElements(), p_diff_type);
 
         ImmersedBoundaryCellPopulation<2> ib_cell_population(*p_mesh, ib_cells);
-        
+
         TS_ASSERT_THROWS_CONTAINS(voronoi_writer_2d.Visit(&ib_cell_population), "VoronoiDataWriter cannot be used with a ImmersedBoundaryCellPopulation");
     }
 

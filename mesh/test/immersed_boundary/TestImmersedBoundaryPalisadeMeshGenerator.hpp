@@ -66,7 +66,7 @@ public:
             TS_TRACE(e.GetMessage());
         }
     }
-    
+
     void TestLeakyLaminasWithOverideNodesPerCell()
     {
         try
@@ -80,7 +80,7 @@ public:
             TS_TRACE(e.GetMessage());
         }
     }
-    
+
     void TestCorrectNumberCellsGenerated()
     {
         ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 0.2);

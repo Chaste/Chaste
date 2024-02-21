@@ -217,12 +217,12 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 {
     /*
-     * Blank as we're only using the class for VTK at the moment, i.e. we don't 
-     * write mesh information for the case when we have trapezoid edge elements, 
-     * since trapezoids associated with each edge are only there for 
-     * visualisation purposes and do not represent the actual mesh. The actual 
-     * mesh can be written by VertexMeshWriter class and reconstructed by 
-     * VertexMeshReader class. This method needs to be overriden here, as it is 
+     * Blank as we're only using the class for VTK at the moment, i.e. we don't
+     * write mesh information for the case when we have trapezoid edge elements,
+     * since trapezoids associated with each edge are only there for
+     * visualisation purposes and do not represent the actual mesh. The actual
+     * mesh can be written by VertexMeshWriter class and reconstructed by
+     * VertexMeshReader class. This method needs to be overriden here, as it is
      * declared as a pure virtual function in the parent class.
      */
 }

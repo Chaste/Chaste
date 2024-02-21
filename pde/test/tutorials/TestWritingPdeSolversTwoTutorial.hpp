@@ -69,10 +69,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  implicit time-discretisation, for which we solve `(M - dt K) U^{n+1} = M U^{n} + c`).
  *
  *  Let us call `M + dt*K` the 'RHS matrix'. We will write a solver, inheriting from
- *  `AbstractDynamicLinearPdeSolver`, which is going to *use* three assemblers: 
+ *  `AbstractDynamicLinearPdeSolver`, which is going to *use* three assemblers:
  *
- *  * (i) an assembler of the mass matrix (already written); 
- *  * (ii) an assembler of the RHS matrix (we have to write this ourselves); and 
+ *  * (i) an assembler of the mass matrix (already written);
+ *  * (ii) an assembler of the RHS matrix (we have to write this ourselves); and
  *  * (iii) an assembler of surface term, `c` (already written).
  *
  *  Firstly, include `AbstractFeVolumeIntegralAssembler` which the assembler we write will inherit from,

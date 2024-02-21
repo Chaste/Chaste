@@ -299,7 +299,7 @@ public:
 
     /**
      * Fetches an edge.
-     * 
+     *
      * @param index global index of the edge
      * @return Pointer to the edge at the index
      */

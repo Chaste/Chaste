@@ -63,7 +63,7 @@ class ImmersedBoundarySvgWriter : public AbstractCellBasedSimulationModifier<DIM
 
     /** The svg file footer, which will be constant for a given simulation */
     std::string mSvgFooter;
-    
+
     friend class TestImmersedBoundarySvgWriter;
 
     /** Needed for serialization. */

@@ -62,19 +62,19 @@ public:
         TS_ASSERT_THROWS_ANYTHING(Reader2D missing_node("mesh/test/data/ib_mesh/missing_node"));
         TS_ASSERT_THROWS_ANYTHING(Reader2D missing_grid("mesh/test/data/ib_mesh/missing_grid"));
         TS_ASSERT_THROWS_ANYTHING(Reader2D missing_lam("mesh/test/data/ib_mesh/missing_lam"));
-        
+
         Reader2D missing_elem("mesh/test/data/ib_mesh/missing_elem_data");
-        TS_ASSERT_THROWS_ANYTHING(missing_elem.GetNextImmersedBoundaryElementData()); 
+        TS_ASSERT_THROWS_ANYTHING(missing_elem.GetNextImmersedBoundaryElementData());
 
         TS_ASSERT_THROWS_ANYTHING(Reader2D missing_node("mesh/test/data/ib_mesh/missing_node_data"));
 
         Reader2D missing_grid("mesh/test/data/ib_mesh/missing_grid_data");
-        TS_ASSERT_THROWS_ANYTHING(missing_grid.GetNextGridRow()); 
+        TS_ASSERT_THROWS_ANYTHING(missing_grid.GetNextGridRow());
 
         Reader2D missing_lam("mesh/test/data/ib_mesh/missing_lam_data");
         TS_ASSERT_THROWS_ANYTHING(missing_lam.GetNextImmersedBoundaryLaminaData());
     }
-    
+
     void TestReadingFileHeaders2D()
     {
         Reader2D reader("mesh/test/data/ib_mesh_2d");
@@ -87,36 +87,36 @@ public:
         TS_ASSERT_EQUALS(reader.GetNumLaminaAttributes(), 1u);
         TS_ASSERT_DELTA(reader.GetCharacteristicNodeSpacing(), 0.0874862, 1e-6);
     }
-    
+
     void TestReadingData2D()
     {
         Reader2D reader("mesh/test/data/ib_mesh_2d");
-        
+
         // Reading node data
         std::vector<double> node_data = reader.GetNextNode();
         std::vector<double> expected_node_data {0, 0, 1};
         TS_ASSERT_EQUALS(node_data, expected_node_data);
-        
+
         // Reading grid row
         std::vector<double> grid_row_data = reader.GetNextGridRow();
         std::vector<double> expected_grid_row_data {0, 0, 0, 0, 0, 0, 0, 0};
         TS_ASSERT_EQUALS(grid_row_data, expected_grid_row_data);
-        
+
         ImmersedBoundaryElementData element_data = reader.GetNextImmersedBoundaryElementData();
         ImmersedBoundaryElementData expected_element_data {{0, 1, 2}, 0, false, 0, {}, 0.0, false};
         TS_ASSERT_EQUALS(element_data.NodeIndices, expected_element_data.NodeIndices);
         TS_ASSERT_EQUALS(element_data.AttributeValue, expected_element_data.AttributeValue);
-    
+
         ImmersedBoundaryElementData lamina_data = reader.GetNextImmersedBoundaryLaminaData();
         ImmersedBoundaryElementData expected_lamina_data {{15, 16, 17, 18, 19}, 1, false, 0, {}, 0.0, false};
         TS_ASSERT_EQUALS(lamina_data.NodeIndices, expected_lamina_data.NodeIndices);
         TS_ASSERT_EQUALS(lamina_data.AttributeValue, expected_lamina_data.AttributeValue);
     }
-    
+
     void TestReset()
     {
         Reader2D reader("mesh/test/data/ib_mesh_2d");
-        
+
         // Reading node data
         std::vector<double> node_data = reader.GetNextNode();
         std::vector<double> expected_result {0, 0, 1};
@@ -127,7 +127,7 @@ public:
         node_data = reader.GetNextNode();
         TS_ASSERT_EQUALS(node_data, expected_result);
     }
-    
+
     void TestConstructingMeshFromReader()
     {
         Reader2D reader("mesh/test/data/ib_mesh_2d");
@@ -139,7 +139,7 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 3u);
         TS_ASSERT_EQUALS(mesh.GetNumLaminas(), 2u);
     }
-    
+
     void TestNoAttributes()
     {
         Reader2D reader("mesh/test/data/ib_mesh_2d_no_attributes");
@@ -151,37 +151,37 @@ public:
         TS_ASSERT_EQUALS(mesh.GetNumElements(), 3u);
         TS_ASSERT_EQUALS(mesh.GetNumLaminas(), 2u);
     }
-    
+
     void TestMissingData()
     {
         {
             Reader2D reader("mesh/test/data/ib_mesh_2d_missing_elem");
             ImmersedBoundaryMesh<2, 2> mesh;
             TS_ASSERT_THROWS_ANYTHING(mesh.ConstructFromMeshReader(reader));
-        }      
+        }
         {
             Reader2D reader("mesh/test/data/ib_mesh_2d_missing_lam");
             ImmersedBoundaryMesh<2, 2> mesh;
             TS_ASSERT_THROWS_ANYTHING(mesh.ConstructFromMeshReader(reader));
-        }      
+        }
         {
             Reader2D reader("mesh/test/data/ib_mesh_2d_missing_node");
             ImmersedBoundaryMesh<2, 2> mesh;
             TS_ASSERT_THROWS_ANYTHING(mesh.ConstructFromMeshReader(reader));
-        }      
+        }
     }
-    
+
     void TestOtherMethods()
     {
         Reader2D reader("mesh/test/data/ib_mesh_2d");
-        
+
         // Seems to be set to return 0 by design
         TS_ASSERT_EQUALS(reader.GetNumFaces(), 0);
-        
+
         auto element = reader.GetNextElementData();
         TS_ASSERT_EQUALS(element.NodeIndices.size(), 0);
         TS_ASSERT_EQUALS(element.AttributeValue, 0);
-        
+
         auto face = reader.GetNextFaceData();
         TS_ASSERT_EQUALS(face.NodeIndices.size(), 0);
         TS_ASSERT_EQUALS(face.AttributeValue, 0);

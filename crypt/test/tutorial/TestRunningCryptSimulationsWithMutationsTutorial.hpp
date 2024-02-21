@@ -138,7 +138,7 @@ public:
          * We need to do this using the `CellPropertyRegistry`, otherwise
          * the numbers of each type of mutation aren't correctly tracked. For
          * a list of possible mutations, see subclasses of `AbstractCellMutationState`.
-         * These can be found in the 
+         * These can be found in the
          * [inheritance diagram for AbstractCellMutationState](/doxygen-latest/classAbstractCellMutationState.html).
          * Each mutation has a different effect on the cell cycle models; see the class
          * documentation for details.

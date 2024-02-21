@@ -49,11 +49,11 @@ template <unsigned SPACE_DIM>
 class AbstractImmersedBoundaryDivisionRule;
 
 /**
- * A class to generate the short axis of a cell for immersed boundary cell 
- * populations, to be used in cell division. This is the default rule that is 
+ * A class to generate the short axis of a cell for immersed boundary cell
+ * populations, to be used in cell division. This is the default rule that is
  * used in most immersed boundary simulations.
  *
- * The short axis is the eigenvector associated with the largest eigenvalue of 
+ * The short axis is the eigenvector associated with the largest eigenvalue of
  * the matrix of second moments of the cell's polygon.
  */
 template <unsigned SPACE_DIM>
@@ -89,13 +89,13 @@ public:
     }
 
     /**
-     * Overridden CalculateCellDivisionVector() method. Return the short axis of 
-     * the existing cell, which will be used to form the boundary between the 
+     * Overridden CalculateCellDivisionVector() method. Return the short axis of
+     * the existing cell, which will be used to form the boundary between the
      * daughter cells.
      *
      * @param pParentCell  The cell to divide
      * @param rCellPopulation  The immersed boundary cell population
-     * 
+     *
      * @return the division vector.
      */
     virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(

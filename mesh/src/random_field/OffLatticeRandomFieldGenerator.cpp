@@ -61,7 +61,7 @@ OffLatticeRandomFieldGenerator<SPACE_DIM>::OffLatticeRandomFieldGenerator(
     // Reset the box width if the default value is being used
     if (boxWidth == DOUBLE_UNSET)
     {
-        const double max_box_width = 4.0 * lengthScale; 
+        const double max_box_width = 4.0 * lengthScale;
         boxWidth = std::min(max_box_width, upperCorner[0] - lowerCorner[0]);
     }
 
@@ -86,7 +86,7 @@ OffLatticeRandomFieldGenerator<SPACE_DIM>::OffLatticeRandomFieldGenerator(
         periodic_z
     );
 
-    mpBoxCollection->SetupLocalBoxesHalfOnly();    
+    mpBoxCollection->SetupLocalBoxesHalfOnly();
     mOpenSimplex = OpenSimplex2S();
 }
 
@@ -120,7 +120,7 @@ std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField
             {
                 samples[i] = random_field::Reshape(mOpenSimplex.noise2_XBeforeY(node_location[0] * mLengthScale, time + 0.5));
                 break;
-            }            
+            }
             case 2:
             {
                 samples[i] = random_field::Reshape(mOpenSimplex.noise3_XYBeforeZ(node_location[0] * mLengthScale, node_location[1] * mLengthScale, time));
@@ -130,7 +130,7 @@ std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField
             {
                 samples[i] = random_field::Reshape(mOpenSimplex.noise4_XYBeforeZW(node_location[0] * mLengthScale, node_location[1] * mLengthScale, node_location[2] * mLengthScale, time));
                 break;
-            }                
+            }
             default:
                 // This can't happen
                 NEVER_REACHED;

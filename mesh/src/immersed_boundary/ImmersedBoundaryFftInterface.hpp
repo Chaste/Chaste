@@ -118,8 +118,8 @@ public:
 
     /** Performs inverse fourier transforms */
     void FftExecuteInverse();
-    
-    friend class TestImmersedBoundaryFftInterface; 
+
+    friend class TestImmersedBoundaryFftInterface;
 };
 
 #endif /*IMMERSEDBOUNDARYFFTINTERFACE_HPP_*/

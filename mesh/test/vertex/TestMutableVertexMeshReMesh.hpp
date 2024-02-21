@@ -259,7 +259,7 @@ public:
         auto operation_recorder = vertex_mesh.GetOperationRecorder();
         const std::vector<EdgeOperation>& edge_operations = operation_recorder->GetEdgeOperations();
         const unsigned num_operations = edge_operations.size();
-    
+
         // Two node merging operations in two elements and two new edge operations in the other two elements
         TS_ASSERT_EQUALS(num_operations, 4u);
         unsigned num_node_merges = 0;

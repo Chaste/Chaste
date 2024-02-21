@@ -33,9 +33,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-/* 
-CellMl files are found using cmake_fetch in /heart/test/CMakeLists.txt 
-the CellML files will be downloaded on the cmake step into _deps/cellml_repo-src/cellml/ 
+/*
+CellMl files are found using cmake_fetch in /heart/test/CMakeLists.txt
+the CellML files will be downloaded on the cmake step into _deps/cellml_repo-src/cellml/
 */
 
 

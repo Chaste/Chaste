@@ -7,7 +7,7 @@
     <!--
         Note: all unit attributes must be included, but their content cannot be changed.
         They exist for documentary purposes only.
-        See https://chaste.cs.ox.ac.uk/trac/wiki/ChasteUnits for details
+        See https://chaste.github.io/docs/user-guides/chaste-units/ for details
         on the units used by Chaste.
     -->
 

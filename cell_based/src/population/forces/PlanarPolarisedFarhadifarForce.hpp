@@ -44,8 +44,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * A force class for use in vertex-based simulations. This force is based on the
- * energy function proposed by Farhadifar et al in  Curr. Biol., 2007, 17, 2095-2104, 
- * but with a planar polarised line tension parameter, similar to that proposed by 
+ * energy function proposed by Farhadifar et al in  Curr. Biol., 2007, 17, 2095-2104,
+ * but with a planar polarised line tension parameter, similar to that proposed by
  * Rauzi et al in Nat. Cell Biol., 2008, 10, 1401-1410.
  */
 template<unsigned DIM>
@@ -73,7 +73,7 @@ private:
 protected:
 
     /**
-     * A scalar that multiplies the strength of the line tension term in the model for edges 
+     * A scalar that multiplies the strength of the line tension term in the model for edges
      * whose angle relative to the x axis are between 45 degrees and 135 degrees.
      */
     double mPlanarPolarisedLineTensionMultiplier;
@@ -93,7 +93,7 @@ public:
 
     /**
      * Overridden GetLineTensionParameter() method.
-     * 
+     *
      * Get the line tension parameter for the edge between two given nodes.
      *
      * @param pNodeA one node

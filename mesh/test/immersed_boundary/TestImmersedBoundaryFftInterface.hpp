@@ -66,7 +66,7 @@ public:
         elems.push_back(new ImmersedBoundaryElement<2, 2>(2, nodes));
 
         ImmersedBoundaryMesh<2,2>* p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems);
-        
+
         std::vector<double> in = {1.0, 0.5, 0.0, 0.5};
         std::vector<std::complex<double>> comp(in.size());
         std::vector<double> out(in.size());
@@ -102,7 +102,7 @@ public:
             std::vector<std::complex<double>> comp(in.size());
             std::vector<double> out(in.size() * 2);
             ImmersedBoundaryFftInterface<2> fft(p_mesh, in.data(), comp.data(), out.data(), true);
-            
+
             TS_ASSERT_EQUALS(fft.mRealDims[0], 128);
             TS_ASSERT_EQUALS(fft.mRealDims[1], 128);
             TS_ASSERT_EQUALS(fft.mCompDims[0], 128);
@@ -112,7 +112,7 @@ public:
             TS_ASSERT_EQUALS(fft.mRealStride, 8);
             TS_ASSERT_EQUALS(fft.mCompStride, 16);
 
-            
+
             fft.FftExecuteForward();
             for (auto i : out)
             {
@@ -148,7 +148,7 @@ public:
             std::vector<std::complex<double>> comp(in.size());
             std::vector<double> out(in.size() * 2);
             ImmersedBoundaryFftInterface<2> fft(p_mesh, in.data(), comp.data(), out.data(), true);
-            
+
             TS_ASSERT_EQUALS(fft.mRealDims[0], 4);
             TS_ASSERT_EQUALS(fft.mRealDims[1], 4);
             TS_ASSERT_EQUALS(fft.mCompDims[0], 4);
@@ -158,7 +158,7 @@ public:
             TS_ASSERT_EQUALS(fft.mRealStride, 8);
             TS_ASSERT_EQUALS(fft.mCompStride, 16);
 
-            
+
             fft.FftExecuteForward();
             for (auto i : out)
             {
@@ -193,7 +193,7 @@ public:
         std::vector<std::complex<double>> comp(in.size());
         std::vector<double> out(in.size() * 2);
         ImmersedBoundaryFftInterface<2> fft(p_mesh, in.data(), comp.data(), out.data(), true);
-        
+
         fft.FftExecuteForward();
         fft.FftExecuteInverse();
         for (auto i : out)

@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 
 /**
- * Storage class contains a mapping to the old local edge indices and status of 
+ * Storage class contains a mapping to the old local edge indices and status of
  * the new edges.
  */
 class EdgeRemapInfo
@@ -52,13 +52,13 @@ class EdgeRemapInfo
 private:
 
     /**
-     * Whether the EdgeMapInfor is unused. 
+     * Whether the EdgeMapInfor is unused.
      * Initialised to false in the constructor.
      */
     bool mUnused = true;
 
     /**
-     * Contains a mapping to the old local edge indices. 
+     * Contains a mapping to the old local edge indices.
      * Negative value means a new edge.
      */
     std::vector<long> mEdgesMapping;
@@ -74,9 +74,9 @@ private:
     std::vector<unsigned> mEdgeStatus;
 
     /**
-     * Determines how close the new node on the split edges is to the previous 
-     * (lower) node. Value of 0 means the new node is at the same position as 
-     * the lower node, and value of 1 means that its at the upper node of the 
+     * Determines how close the new node on the split edges is to the previous
+     * (lower) node. Value of 0 means the new node is at the same position as
+     * the lower node, and value of 1 means that its at the upper node of the
      * edge to be split.
      */
     std::vector<double> mSplitProportions;
@@ -111,8 +111,8 @@ public:
 
     /**
      * Constructor for edge remapping.
-     * 
-     * @param rEdgesMapping the map between the new edge indices and their local 
+     *
+     * @param rEdgesMapping the map between the new edge indices and their local
      *                      index in the element prior to rearrangement
      * @param rEdgesStatus status of the edges in the element
      */
@@ -120,9 +120,9 @@ public:
                   const std::vector<unsigned>& rEdgesStatus);
 
     /**
-     * Contains a mapping to the old local edges index. 
+     * Contains a mapping to the old local edges index.
      * Negative value means a new edge
-     * 
+     *
      * @return edge map
      */
     std::vector<long> GetEdgesMapping() const;
@@ -139,7 +139,7 @@ public:
 
     /**
      * Set split proportions. Used in VertexMeshOperationRecorder class.
-     * 
+     *
      * @param proportions new split proportions
      */
     void SetSplitProportions(const std::vector<double> proportions);

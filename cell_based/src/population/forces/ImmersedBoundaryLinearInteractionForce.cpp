@@ -59,7 +59,7 @@ void ImmersedBoundaryLinearInteractionForce<DIM>::AddImmersedBoundaryForceContri
     for (unsigned pair = 0; pair < rNodePairs.size(); ++pair)
     {
         /*
-         * Interactions only exist between pairs of nodes that are not in the 
+         * Interactions only exist between pairs of nodes that are not in the
          * same boundary / lamina.
          */
         if (rCellPopulation.rGetMesh().NodesInDifferentElementOrLamina(rNodePairs[pair].first, rNodePairs[pair].second))
@@ -99,9 +99,9 @@ void ImmersedBoundaryLinearInteractionForce<DIM>::AddImmersedBoundaryForceContri
                 }
 
                 /*
-                 * We must scale each applied force by a factor of elem_spacing 
-                 * / local spacing, so that forces balance when spread to the 
-                 * grid later (where the multiplicative factor is the local 
+                 * We must scale each applied force by a factor of elem_spacing
+                 * / local spacing, so that forces balance when spread to the
+                 * grid later (where the multiplicative factor is the local
                  * spacing).
                  */
                 vec_a2b *= eff_spring_const * (normed_dist - eff_rest_length) / normed_dist;

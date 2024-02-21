@@ -164,10 +164,10 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::
 
     // Set attribute
     elem_data.AttributeValue = (*(mpIters->pElemIter))->GetAttribute();
-    
+
     // Immersed boundary specific data
     auto& element = *(*mpIters->pElemIter);
-    
+
     if (element.GetFluidSource() != nullptr) {
         elem_data.hasFluidSource = true;
         elem_data.fluidSourceIndex = element.GetFluidSource()->GetIndex();
@@ -180,7 +180,7 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::
     }
 
     elem_data.averageNodeSpacing = element.GetAverageNodeSpacing();
-    
+
     elem_data.isBoundaryElement = element.IsElementOnBoundary();
 
     ++(*(mpIters->pElemIter));
@@ -226,13 +226,13 @@ ImmersedBoundaryElementData ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::
     } catch(Exception& e) {
         lamina_data.hasFluidSource = false;
     }
-    
+
     for (auto cornerNode : lamina.rGetCornerNodes()) {
         lamina_data.cornerNodeIndices.push_back(cornerNode->GetIndex()); // LCOV_EXCL_LINE
     }
 
     lamina_data.averageNodeSpacing = lamina.GetAverageNodeSpacing();
-    
+
     lamina_data.isBoundaryElement = lamina.IsElementOnBoundary();
 
     ++(*(mpIters->pLamIter));
@@ -272,10 +272,10 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(Immer
         p_writer->Write();
         p_writer->Delete(); // Reference counted
     }
-    else        
+    else
     {
         NEVER_REACHED;
-    }  
+    }
 #endif //CHASTE_VTK
 }
 
@@ -351,7 +351,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
 
                     // Identify the extra points that need to be added
                     std::vector<c_vector<double, SPACE_DIM>> extra_locations;
-                    
+
                     // Start of the part
                     {
                         const auto& r_start_pos = iter->GetNode(this_start)->rGetLocation();
@@ -461,7 +461,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
         mpVtkUnstructedMesh->SetPoints(p_pts);
         p_pts->Delete(); // Reference counted
     }
-    else        
+    else
     {
         NEVER_REACHED;
     }
@@ -469,7 +469,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
 }
 
 //LCOV_EXCL_START
-/** 
+/**
  * Template instnantiation for unused code path
  * @param rMesh the mesh
  */
@@ -611,16 +611,16 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 
             // Corner node indices
             *p_element_file << "\t" << elem_data.cornerNodeIndices.size();
-            
+
             for (auto nodeIndex : elem_data.cornerNodeIndices) {
                 *p_element_file << "\t" << nodeIndex;
             }
-            
+
             // Average node spacing
             *p_element_file << "\t" << elem_data.averageNodeSpacing;
-            
+
             // Is boundary element
-            *p_element_file << "\t" << elem_data.isBoundaryElement; 
+            *p_element_file << "\t" << elem_data.isBoundaryElement;
 
             // New line
             *p_element_file << "\n";
@@ -673,16 +673,16 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFiles()
 
             // Corner node indices
             *p_lamina_file << "\t" << lamina_data.cornerNodeIndices.size();
-            
+
             for (auto nodeIndex : lamina_data.cornerNodeIndices) {
                 *p_lamina_file << "\t" << nodeIndex; //LCOV_EXCL_LINE
             }
-            
+
             // Average node spacing
             *p_lamina_file << "\t" << lamina_data.averageNodeSpacing;
-            
+
             // Is boundary lamina
-            *p_lamina_file << "\t" << lamina_data.isBoundaryElement; 
+            *p_lamina_file << "\t" << lamina_data.isBoundaryElement;
 
 
             // New line
@@ -741,7 +741,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::FindElementOverlaps(Imm
         {
             parts.clear();
         }
-        
+
         // We loop over each element and the node index at each discontinuity due to periodic boundaries
         for (auto iter = rMesh.GetElementIteratorBegin(); iter != rMesh.GetElementIteratorEnd(); ++iter)
         {
@@ -759,7 +759,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::FindElementOverlaps(Imm
             }
         }
     }
-    else        
+    else
     {
         NEVER_REACHED;
     }

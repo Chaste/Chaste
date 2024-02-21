@@ -43,10 +43,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryCellPopulation.hpp"
 
 /**
- * A force class for use in immersed boundary simulations. This force implements 
- * Morse-potential-like links between adjacent nodes in each immersed boundary 
- * (https://en.wikipedia.org/wiki/Morse_potential). The well width is a constant 
- * interaction strength, the rest length is an equilibrium bond distance, and 
+ * A force class for use in immersed boundary simulations. This force implements
+ * Morse-potential-like links between adjacent nodes in each immersed boundary
+ * (https://en.wikipedia.org/wiki/Morse_potential). The well width is a constant
+ * interaction strength, the rest length is an equilibrium bond distance, and
  * the well width is a parameter governing the profile of the curve.
  */
 template <unsigned DIM>
@@ -78,25 +78,25 @@ private:
     double mElementWellDepth;
 
     /**
-     * The rest length associated with each element as a fraction of the average 
+     * The rest length associated with each element as a fraction of the average
      * node spacing. Initialised to 0.5 in constructor.
      */
     double mElementRestLength;
 
     /**
-     * The spring constant associated with each lamina. Initialised to 1e6 in 
+     * The spring constant associated with each lamina. Initialised to 1e6 in
      * constructor.
      */
     double mLaminaWellDepth;
 
     /**
-     * The rest length associated with each lamina as a fraction of the average 
+     * The rest length associated with each lamina as a fraction of the average
      * node spacing. Initialised to 0.5 in constructor.
      */
     double mLaminaRestLength;
 
     /**
-     * The well width as a fraction of the average node spacing in either an 
+     * The well width as a fraction of the average node spacing in either an
      * element or lamina. Initialised to 0.25 in constructor.
      */
     double mWellWidth;
@@ -105,7 +105,7 @@ private:
      * Helper method for AddImmersedBoundaryForceContribution.
      * Calculates forces, and can accept either an element or a lamina
      *
-     * @tparam ELEMENT_DIM either DIM or DIM-1 depending on whether receiving an 
+     * @tparam ELEMENT_DIM either DIM or DIM-1 depending on whether receiving an
      *     element or a lamina
      * @param rElement the element or lamina add forces to
      * @param rCellPopulation the immersed boundary cell population
@@ -125,10 +125,10 @@ public:
 
     /**
      * Overridden AddImmersedBoundaryForceContribution() method.
-     * Calculates basic elasticity in the membrane of each immersed boundary as 
+     * Calculates basic elasticity in the membrane of each immersed boundary as
      * a result of interactions.
      *
-     * @param rNodePairs reference to a vector set of node pairs between which to 
+     * @param rNodePairs reference to a vector set of node pairs between which to
      *     contribute the force
      * @param rCellPopulation reference to the cell population
      */
@@ -138,7 +138,7 @@ public:
 
     /**
      * Overridden OutputImmersedBoundaryForceParameters() method.
-     * 
+     *
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputImmersedBoundaryForceParameters(out_stream& rParamsFile);
@@ -148,7 +148,7 @@ public:
 
     /**
      * Set mElementWellDepth.
-     * 
+     *
      * @param elementWellDepth the new value of mElementWellDepth
      */
     void SetElementWellDepth(double elementWellDepth);
@@ -158,7 +158,7 @@ public:
 
     /**
      * Set mElementRestLength/
-     * 
+     *
      * @param elementRestLength the new value of mElementRestLength
      */
     void SetElementRestLength(double elementRestLength);
@@ -168,7 +168,7 @@ public:
 
     /**
      * Set mLaminaWellDepth.
-     * 
+     *
      * @param laminaWellDepth the new value of mLaminaWellDepth
      */
     void SetLaminaWellDepth(double laminaWellDepth);
@@ -178,7 +178,7 @@ public:
 
     /**
      * Set mLaminaRestLength/
-     * 
+     *
      * @param laminaRestLength the new value of mLaminaRestLength
      */
     void SetLaminaRestLength(double laminaRestLength);
@@ -188,7 +188,7 @@ public:
 
     /**
      * Set mWellWidth.
-     * 
+     *
      * @param wellWidth the new value of mWellWidth
      */
     void SetWellWidth(double wellWidth);

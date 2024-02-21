@@ -86,7 +86,7 @@ public:
             delete p_node;
         }
     }
-    
+
     void Test1DMethods()
     {
         std::vector<Node<1>*> nodes;
@@ -100,14 +100,14 @@ public:
 
         TS_ASSERT_THROWS_ANYTHING(element.SetFluidSource(source));
         TS_ASSERT_THROWS_ANYTHING(element.GetFluidSource());
-        
+
         // Boundary methods
         element.SetIsBoundaryElement(false);
         TS_ASSERT_EQUALS(element.IsElementOnBoundary(), false);
         element.SetIsBoundaryElement(true);
         TS_ASSERT_EQUALS(element.IsElementOnBoundary(), true);
         TS_ASSERT_DIFFERS(&(element.rGetCornerNodes()), nullptr);
-        
+
         for (auto& p_node : nodes)
         {
             delete p_node;

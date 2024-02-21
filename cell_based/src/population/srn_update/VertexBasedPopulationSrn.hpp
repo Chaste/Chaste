@@ -79,10 +79,10 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         /*
-         * DO NOT archive & mpCellPopulation: the VertexBasedPopulationSrn is 
-         * only ever archived from the VertexBasedCellPopulation, which knows 
+         * DO NOT archive & mpCellPopulation: the VertexBasedPopulationSrn is
+         * only ever archived from the VertexBasedCellPopulation, which knows
          * this, and it is handled in the load_construct of VertexBasedCellPopulation.
-         */ 
+         */
     }
 
 public:
@@ -99,7 +99,7 @@ public:
 
     /**
      * Set the cell population.
-     * 
+     *
      * @param pCellPopulation pointer to a VertexBasedCellPopulation
      */
     void SetVertexCellPopulation(VertexBasedCellPopulation<DIM>* pCellPopulation);
@@ -107,8 +107,8 @@ public:
     /**
      * This method iterates over edge operations performed on the mesh and
      * calls on RemapCellSrn() with appropriate arguments
-     * 
-     * @param rElementMap the element map to take into account that some 
+     *
+     * @param rElementMap the element map to take into account that some
      *                    elements are deleted after an edge operation is recorded
      */
     void UpdateSrnAfterBirthOrDeath(VertexElementMap& rElementMap);
@@ -116,7 +116,7 @@ public:
     /**
      * Remaps cell SRN. If an edge has not been modified, the old edge SRN is mapped to its junction.
      * Otherwise, edge SRNs are updated according to the operation performed.
-     * 
+     *
      * @param parentSrnEdges Edge SRNs before topology is changed
      * @param pCellSrn pointer to CellSrnModel
      * @param rEdgeChange Contains information about which edge changes occurred

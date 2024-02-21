@@ -84,7 +84,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestRunningNodeBasedSimulationsTutorial : public AbstractCellBasedTestSuite
 {
 public:
-    /* 
+    /*
      * ### Test 1 - a basic node-based simulation
      *
      * In the first test, we run a simple node-based simulation, in which we create a monolayer
@@ -237,7 +237,7 @@ public:
 
     /*
      * Note that you **cannot view the results of a 3D simulation using the Java visualiser** but
-     * to visualize the results, use Paraview. 
+     * to visualize the results, use Paraview.
      * See the [Visualizing With Paraview](../visualizingwithparaview/) tutorial for more information.
      *
      * Load the file `/tmp/$USER/testoutput/NodeBasedSpheroid/results_from_time_0/results.pvd`,

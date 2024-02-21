@@ -126,12 +126,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * of u, `V` the vector of nodal values of v, `b1` the vector with entries $\int f\phi_i dV$ ($i=1,\dots,N$)
  * and `b2` has entries $\int g\phi_i dV$ (here $\phi_i$ are the linear basis functions).
  *
- * This is the linear system which we now write a solver to set up. 
- * {{< callout context="note" title="Note" icon="info-circle" >}} 
+ * This is the linear system which we now write a solver to set up.
+ * {{< callout context="note" title="Note" icon="info-circle" >}}
  * The main Chaste solvers assume a **STRIPED** data format, i.e. that the unknown vector
  * is:
  *
- * `[U_1 V_1 U_2 V_2 .. U_n V_n]`, not `[U_1 U_2 .. U_n V_1 V_2 .. V_n]`. 
+ * `[U_1 V_1 U_2 V_2 .. U_n V_n]`, not `[U_1 U_2 .. U_n V_1 V_2 .. V_n]`.
  *
  * *We write down equations in block form as it makes things clearer, but have to remember that the code
  * deals with STRIPED data structures.* Striping is used in the code for parallelisation reasons.
@@ -283,8 +283,8 @@ public:
  *  The `AbstractAssemblerSolverHybrid` deals with the Dirichlet and Neumann boundary parts of the implementation,
  *  so, we, the writer of the solver, don't have to worry about this. The user has to realise though that they are
  *  specifying NATURAL Neumann BCs, which are whatever appears naturally in the weak form of the problem. In this case, natural
- *  Neumann BCs are specification of: $\partial u/\partial n = s_1, \partial v/\partial n = s_2, \partial w/ \partial n = s_3$, 
- *  which coincide with usual Neumann BCs. However, suppose the last equation was $w_t = \nabla^2 w + \nabla . (D \nabla u)$, 
+ *  Neumann BCs are specification of: $\partial u/\partial n = s_1, \partial v/\partial n = s_2, \partial w/ \partial n = s_3$,
+ *  which coincide with usual Neumann BCs. However, suppose the last equation was $w_t = \nabla^2 w + \nabla . (D \nabla u)$,
  *  then the natural BCs would be:
  *  $\partial u/\partial n = s_1, \partial v/\partial n = s_2, \partial w/\partial n + (D\nabla u).n = s_3$.
  *

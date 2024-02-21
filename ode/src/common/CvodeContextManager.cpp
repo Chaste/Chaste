@@ -47,7 +47,7 @@ CvodeContextManager::CvodeContextManager() : mSundialsContext() {}
 CvodeContextManager* CvodeContextManager::Instance()
 {
     // Single instance per thread
-    static thread_local std::unique_ptr<CvodeContextManager> instance = std::unique_ptr<CvodeContextManager>(new CvodeContextManager()); 
+    static thread_local std::unique_ptr<CvodeContextManager> instance = std::unique_ptr<CvodeContextManager>(new CvodeContextManager());
     return instance.get();
 }
 

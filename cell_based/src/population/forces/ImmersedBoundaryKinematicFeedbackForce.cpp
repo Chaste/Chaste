@@ -58,7 +58,7 @@ void ImmersedBoundaryKinematicFeedbackForce<DIM>::AddImmersedBoundaryForceContri
     }
 
     /*
-     * Calculate force only if neither node is in a lamina, and if nodes are in 
+     * Calculate force only if neither node is in a lamina, and if nodes are in
      * different elements.
      */
     auto condition_satisfied = [&rCellPopulation](const std::pair<Node<DIM>*, Node<DIM>*>& pair) -> bool
@@ -147,7 +147,7 @@ void ImmersedBoundaryKinematicFeedbackForce<DIM>::UpdatePreviousLocations(
     ImmersedBoundaryCellPopulation<DIM>& rCellPopulation)
 {
     /*
-     * Populate the mPreviousLocations vector with the current location of 
+     * Populate the mPreviousLocations vector with the current location of
      * nodes, so it's ready for next time step.
      */
     for (const auto& p_node : rCellPopulation.rGetMesh().rGetNodes())

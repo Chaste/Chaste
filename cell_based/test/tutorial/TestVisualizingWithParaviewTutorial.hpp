@@ -96,7 +96,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestVisualizingWithParaviewTutorial : public AbstractCellBasedTestSuite
 {
 public:
-    /* 
+    /*
      * ### Test 1 - a mesh-based cell centre monolayer simulation
      *
      * In the first test, we run a simple cell-based simulation using a `MeshBasedCellPopulation`,

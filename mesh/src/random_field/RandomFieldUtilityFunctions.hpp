@@ -55,4 +55,4 @@ namespace random_field {
     }
 }
 
-#endif /* RANDOMFIELDUTILITYFUNCTIONS_HPP */ 
+#endif /* RANDOMFIELDUTILITYFUNCTIONS_HPP */

@@ -1791,12 +1791,12 @@ public:
             delete p_node;
         }
     }
-    
+
     void TestImmersedBoundaryCellWriter()
     {
         EXIT_IF_PARALLEL;
         ImmersedBoundaryBoundaryCellWriter<2, 2> writer;
-        
+
         // Create an immersed boundary cell population object
         ImmersedBoundaryHoneycombMeshGenerator gen(3, 3, 5, 0.05, 0.15);
         ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
@@ -1806,7 +1806,7 @@ public:
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
         ImmersedBoundaryCellPopulation<2> ib_cell_population(*p_mesh, cells);
-        
+
         // Create an output directory for the writer
         std::string output_directory = "TestCellWriters";
         OutputFileHandler output_file_handler(output_directory, false);
@@ -1849,12 +1849,12 @@ public:
             delete p_cell_writer_2;
         }
     }
-    
+
     void TestImmersedBoundaryNeighbourNumberWriter()
     {
         EXIT_IF_PARALLEL;
-        ImmersedBoundaryNeighbourNumberWriter<2, 2> writer; 
-        
+        ImmersedBoundaryNeighbourNumberWriter<2, 2> writer;
+
         // Create an immersed boundary cell population object
         ImmersedBoundaryHoneycombMeshGenerator gen(3, 3, 5, 0.05, 0.15);
         ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
@@ -1864,7 +1864,7 @@ public:
         cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
 
         ImmersedBoundaryCellPopulation<2> ib_cell_population(*p_mesh, cells);
-        
+
         // Create an output directory for the writer
         std::string output_directory = "TestCellWriters";
         OutputFileHandler output_file_handler(output_directory, false);

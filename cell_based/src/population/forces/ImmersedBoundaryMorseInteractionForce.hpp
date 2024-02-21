@@ -47,10 +47,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 /**
- * A force class for use in immersed boundary simulations. This force implements 
- * Morse-potential-like links between nodes in adjacent immersed boundaries 
- * (https://en.wikipedia.org/wiki/Morse_potential). The well width is a constant 
- * interaction strength, the rest length is an equilibrium bond distance, and 
+ * A force class for use in immersed boundary simulations. This force implements
+ * Morse-potential-like links between nodes in adjacent immersed boundaries
+ * (https://en.wikipedia.org/wiki/Morse_potential). The well width is a constant
+ * interaction strength, the rest length is an equilibrium bond distance, and
  * the well width is a parameter governing the profile of the curve.
  */
 template <unsigned DIM>
@@ -82,25 +82,25 @@ private:
     double mWellDepth;
 
     /**
-     * The basic rest length associated with interactions, as a fraction of cell 
+     * The basic rest length associated with interactions, as a fraction of cell
      * population's interaction distance. Initialised to 0.25 in constructor.
      */
     double mRestLength;
 
     /**
-     * Multiplicative factor to change strength of interactions involving a 
+     * Multiplicative factor to change strength of interactions involving a
      * lamina node. Initialised to 1.0 in constructor.
      */
     double mLaminaWellDepthMult;
 
     /**
-     * Multiplicative factor to change equilibrium length of interactions 
+     * Multiplicative factor to change equilibrium length of interactions
      * involving a lamina node. Initialised to 1.0 in constructor.
      */
     double mLaminaRestLengthMult;
 
     /**
-     * The well width as a fraction of the cell population's interaction 
+     * The well width as a fraction of the cell population's interaction
      * distance. Initialised to 0.25 in constructor.
      */
     double mWellWidth;
@@ -119,10 +119,10 @@ public:
     /**
      * Overridden AddImmersedBoundaryForceContribution() method.
      *
-     * Calculates the force on each node in the immersed boundary cell 
+     * Calculates the force on each node in the immersed boundary cell
      * population as a result of cell-cell interactions.
      *
-     * @param rNodePairs reference to a vector set of node pairs between which 
+     * @param rNodePairs reference to a vector set of node pairs between which
      *                   to contribute the force
      * @param rCellPopulation reference to the cell population
      */
@@ -142,7 +142,7 @@ public:
 
     /**
      * Set mWellDepth.
-     * 
+     *
      * @param wellDepth the new value of mWellDepth
      */
     void SetWellDepth(double wellDepth);
@@ -152,7 +152,7 @@ public:
 
     /**
      * Set mRestLength.
-     * 
+     *
      * @param restLength the new value of mRestLength
      */
     void SetRestLength(double restLength);
@@ -162,7 +162,7 @@ public:
 
     /**
      * Set mLaminaWellDepthMult.
-     * 
+     *
      * @param laminaWellDepthMult the new value of mLaminaWellDepthMult
      */
     void SetLaminaWellDepthMult(double laminaWellDepthMult);
@@ -171,7 +171,7 @@ public:
     double GetLaminaRestLengthMult() const;
 
     /**Set mLaminaRestLengthMult.
-     * 
+     *
      * @param laminaRestLengthMult the new value of mLaminaRestLengthMult
      */
     void SetLaminaRestLengthMult(double laminaRestLengthMult);
@@ -181,7 +181,7 @@ public:
 
     /**
      * Set mWellWidth.
-     * 
+     *
      * @param wellWidth the new value of mWellWidth
      */
     void SetWellWidth(double wellWidth);

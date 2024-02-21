@@ -189,7 +189,7 @@ public:
             cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
             ImmersedBoundaryCellPopulation<2> ib_cell_population(*p_mesh, cells);
-            
+
             CellProliferativePhasesCountWriter<2,2> ib_phases_count_writer;
 
             ib_phases_count_writer.OpenOutputFile(output_file_handler);

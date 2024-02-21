@@ -190,7 +190,7 @@ public:
             cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
             ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
-            
+
             TS_ASSERT_THROWS_NOTHING(division_writer.Visit(&cell_population));
         }
     }
@@ -329,7 +329,7 @@ public:
             cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
             ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
-            
+
             TS_ASSERT_THROWS_NOTHING(removal_writer.Visit(&cell_population));
         }
 

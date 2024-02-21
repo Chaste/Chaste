@@ -72,14 +72,14 @@ public:
       ImmersedBoundarySvgWriter<2> svg_writer;
       TS_ASSERT_EQUALS(svg_writer.GetSamplingMultiple(), 100u);
       TS_ASSERT_EQUALS(svg_writer.GetSvgSize(), 1600.0);
-      
+
       svg_writer.SetSamplingMultiple(10u);
       TS_ASSERT_EQUALS(svg_writer.GetSamplingMultiple(), 10u);
-      
+
       svg_writer.SetSvgSize(1200.0);
       TS_ASSERT_EQUALS(svg_writer.GetSvgSize(), 1200.0);
     }
-    
+
     void TestOutputParametersWithImmersedBoundarySimulationModifier()
     {
         std::string output_directory = "TestOutputParametersWithImmersedBoundarySvgWriter";
@@ -112,26 +112,26 @@ public:
 
         std::vector<ImmersedBoundaryElement<2, 2>*> elems;
         elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
-        
+
         ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
-        
+
         // Set up a cell population
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
         ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
-        
+
         OutputFileHandler handler("TestImmersedBoundarySvgWriter", false);
         std::string svg_directory = handler.GetOutputDirectoryFullPath();
 
         ImmersedBoundarySvgWriter<2> modifier;
         modifier.SetupSolve(cell_population, svg_directory);
-        
+
         TS_ASSERT_EQUALS(modifier.mOutputDirectory, svg_directory);
         TS_ASSERT_DIFFERS(modifier.mSvgHeader, "");
         TS_ASSERT_EQUALS(modifier.mSvgFooter, "</svg>\n");
-      
+
         SimulationTime::Instance()->Destroy();
     }
 
@@ -151,27 +151,27 @@ public:
 
         std::vector<ImmersedBoundaryElement<2, 2>*> elems;
         elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
-        
+
         ImmersedBoundaryMesh<2,2> mesh(nodes, elems, {}, 10, 10);
-        
+
         // Set up a cell population
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<UniformCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasicRandom(cells, mesh.GetNumElements(), p_diff_type);
         ImmersedBoundaryCellPopulation<2> cell_population(mesh, cells);
-        
+
         OutputFileHandler handler("TestImmersedBoundarySvgWriter", false);
 
         ImmersedBoundarySvgWriter<2> modifier;
         modifier.SetupSolve(cell_population, handler.GetRelativePath());
         modifier.SetSamplingMultiple(1);
-        
+
         modifier.UpdateAtEndOfTimeStep(cell_population);
-        
+
         FileComparison comparer(handler.GetOutputDirectoryFullPath() + "results_000000.svg", "cell_based/test/data/TestImmersedBoundarySvgWriter/results_000000.svg");
         comparer.CompareFiles();
-      
+
     }
 
     void TestArchiving()
@@ -204,7 +204,7 @@ public:
             boost::archive::text_iarchive input_arch(ifs);
 
             input_arch >> writer;
-            
+
             TS_ASSERT_EQUALS(writer.GetSamplingMultiple(), 10u);
             TS_ASSERT_EQUALS(writer.GetSvgSize(), 1200.0);
 

@@ -57,7 +57,7 @@ ImmersedBoundary2dArrays<DIM>::ImmersedBoundary2dArrays(ImmersedBoundaryMesh<DIM
 
     // Resize real arrays to be num X by num Y
     mForceGrids.resize(extents[2][num_gridpts_x][num_gridpts_y]);
-    
+
     mRightHandSideGrids.resize(extents[3][num_gridpts_x][num_gridpts_y]);
 
     // The source gradient grids are only needed when fluid sources are present.  Otherwise, we need do nothing

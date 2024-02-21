@@ -464,7 +464,7 @@ void HeterotypicBoundaryLengthWriter<ELEMENT_DIM, SPACE_DIM>::Visit(ImmersedBoun
         auto p_edge = voronoi_cell.incident_edge();
         do
         {
-            if (p_edge->is_finite()) 
+            if (p_edge->is_finite())
             {
                 // The global node index corresponding to a voronoi cell cell is encoded in its 'color' variable
                 const unsigned twin_node_idx = p_edge->twin()->cell()->color();
