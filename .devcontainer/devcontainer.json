@@ -24,7 +24,7 @@
 			// "output" is a known folder in the repo but this choice could be revised.
 			// "source": "${localWorkspaceFolder}/../test_summary",
 			"source": "${localWorkspaceFolder}/output",
-			"target": "/home/chaste/testoutput",
+			"target": "/home/chaste/output",
 			// "target": "${containerEnv:CHASTE_TEST_OUTPUT}",
 			"type": "bind"
 		}
