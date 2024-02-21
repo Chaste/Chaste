@@ -71,8 +71,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ForwardEulerNumericalMethod.hpp"
 #include <boost/make_shared.hpp>
 
-/*
-// This test is never run in parallel */
+/* This test is never run in parallel */
 #include "FakePetscSetup.hpp"
 
 /* In Chaste, every simulation is run as a 'test', and here we define a test class which inherits from
