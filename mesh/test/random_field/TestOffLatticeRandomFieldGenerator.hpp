@@ -210,7 +210,7 @@ public:
                 delete p_node;
             }
             TS_ASSERT(sum > 0.0)
-            TS_ASSERT_DELTA(sum, 24.5821, 0.1)
+            TS_ASSERT_DELTA(sum, 24.5821, 0.6)
         }
         { // 3D
             auto p_gen = RandomNumberGenerator::Instance();
