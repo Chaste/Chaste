@@ -22,9 +22,9 @@
 			// Warning: This mounts the source folder on the host into the target path in the container.
 			// It therefore needs the source directory to already exist on the host.
 			// "output" is a known folder in the repo but this choice could be revised.
-			// "source": "${localWorkspaceFolder}/../test_summary",
+			// "source": "${localWorkspaceFolder}/../output",
 			"source": "${localWorkspaceFolder}/output",
-			"target": "/home/chaste/testoutput",
+			"target": "/home/chaste/output",
 			// "target": "${containerEnv:CHASTE_TEST_OUTPUT}",
 			"type": "bind"
 		}
