@@ -172,7 +172,7 @@ public:
     }
 };
 /*
- * To visualize the results, use Paraview. See the [Visualizing With Paraview](visualizingwithparaview/) tutorial for more information.
+ * To visualize the results, use Paraview. See the [Visualizing With Paraview](../visualizingwithparaview/) tutorial for more information.
  *
  * Load the file `/tmp/$USER/testoutput/TestVertexBasedDifferentialAdhesionSimulation/results_from_time_0/results.pvd`.
  */

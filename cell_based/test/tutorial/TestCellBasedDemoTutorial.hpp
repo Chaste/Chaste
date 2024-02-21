@@ -101,7 +101,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Since we are using `AbstractCellBasedTestSuite` the singleton `SimulationTime` is initialised to zero at the beginning of the test and destroyed at the end
  * of the test; `RandomNumberGenerator` is re-seeded with zero at the beginning and destroyed at the end of the test;
  * and `CellPropertyRegistry` (which stores `CellProperties`, you learn about these in a later tutorial
- * [CreatingAndUsingANewCellProperty](creatingandusinganewcellproperty/)) is cleared at the beginning of the test.
+ * [CreatingAndUsingANewCellProperty](../creatingandusinganewcellproperty/)) is cleared at the beginning of the test.
  * This makes for cleaner code.
  */
 class TestCellBasedDemoTutorial : public AbstractCellBasedTestSuite
@@ -184,7 +184,7 @@ public:
      * images, one for each time step. Next, still in the `anim` folder, do: `./make_a_movie`.
      * This reads in the `.png` files and creates a video file called `simulation.mpeg`.
      *
-     * Results can also be visualized using Paraview. See the [Visualizing With Paraview](visualizingwithparaview/) tutorial for more information.
+     * Results can also be visualized using Paraview. See the [Visualizing With Paraview](../visualizingwithparaview/) tutorial for more information.
      *
      * ### Test 2 - basic node-based simulation
      *
@@ -273,7 +273,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells); //**Changed**//
 
         /* To view the results of this and the subsequent mesh based tutorials in Paraview it is necessary to explicitly
-        * generate the required .vtu files. This is detailed in the [VisualizingWithParaview](visualizingwithparaview/) tutorial.
+        * generate the required .vtu files. This is detailed in the [VisualizingWithParaview](../visualizingwithparaview/) tutorial.
         * Note that the results in Paraview may appear different to those in the java based visualizer. This is related
         * to the different methods used to generate voronoi tesselations in each and is resolved through the use of
         * 'ghost nodes', as shown in the next test. */
