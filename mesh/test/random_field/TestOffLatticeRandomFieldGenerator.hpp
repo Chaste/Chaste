@@ -140,7 +140,7 @@ public:
             {
                 delete p_node;
             }
-            TS_ASSERT(sum > 0.0)
+            TS_ASSERT_DELTA(sum, 28.0820, 0.1)
         }
         { // 1D
             auto p_gen = RandomNumberGenerator::Instance();
@@ -175,6 +175,7 @@ public:
                 delete p_node;
             }
             TS_ASSERT(sum > 0.0)
+            TS_ASSERT_DELTA(sum, 30.6619, 0.1)
         }
         { // 2D
             auto p_gen = RandomNumberGenerator::Instance();
@@ -209,6 +210,7 @@ public:
                 delete p_node;
             }
             TS_ASSERT(sum > 0.0)
+            TS_ASSERT_DELTA(sum, 24.5821, 0.1)
         }
         { // 3D
             auto p_gen = RandomNumberGenerator::Instance();
@@ -243,6 +245,7 @@ public:
                 delete p_node;
             }
             TS_ASSERT(sum > 0.0)
+            TS_ASSERT_DELTA(sum, 16.1120, 0.1)
         }
     }
 

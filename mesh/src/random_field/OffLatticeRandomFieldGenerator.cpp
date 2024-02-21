@@ -118,17 +118,17 @@ std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField
         {
             case 1:
             {
-                samples[i] = random_field::reshape(mOpenSimplex.noise2_XBeforeY(node_location[0] * mLengthScale, time + 0.5));
+                samples[i] = random_field::Reshape(mOpenSimplex.noise2_XBeforeY(node_location[0] * mLengthScale, time + 0.5));
                 break;
             }            
             case 2:
             {
-                samples[i] = random_field::reshape(mOpenSimplex.noise3_XYBeforeZ(node_location[0] * mLengthScale, node_location[1] * mLengthScale, time));
+                samples[i] = random_field::Reshape(mOpenSimplex.noise3_XYBeforeZ(node_location[0] * mLengthScale, node_location[1] * mLengthScale, time));
                 break;
             }
             case 3:
             {
-                samples[i] = random_field::reshape(mOpenSimplex.noise4_XYBeforeZW(node_location[0] * mLengthScale, node_location[1] * mLengthScale, node_location[2] * mLengthScale, time));
+                samples[i] = random_field::Reshape(mOpenSimplex.noise4_XYBeforeZW(node_location[0] * mLengthScale, node_location[1] * mLengthScale, node_location[2] * mLengthScale, time));
                 break;
             }                
             default:

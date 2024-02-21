@@ -108,7 +108,7 @@ std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFiel
         {
             for (unsigned x = 0; x < mNumGridPts[0]; x++)
             {
-                samples[x] = random_field::reshape(mOpenSimplex.noise2_XBeforeY(x * mLengthScale, time));
+                samples[x] = random_field::Reshape(mOpenSimplex.noise2_XBeforeY(x * mLengthScale, time));
             }
             break;
         }        
@@ -118,7 +118,7 @@ std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFiel
             {
                 for (unsigned y = 0; y < mNumGridPts[1]; y++)
                 {
-                    samples[mNumGridPts[1] * y + x] = random_field::reshape(mOpenSimplex.noise3_XYBeforeZ(x * mLengthScale, y * mLengthScale, time));
+                    samples[mNumGridPts[1] * y + x] = random_field::Reshape(mOpenSimplex.noise3_XYBeforeZ(x * mLengthScale, y * mLengthScale, time));
                 }
             }
             break;
@@ -131,7 +131,7 @@ std::vector<double> UniformGridRandomFieldGenerator<SPACE_DIM>::SampleRandomFiel
                 {
                     for (unsigned z = 0; z < mNumGridPts[2]; z++)
                     {
-                        samples[mNumGridPts[2] * z * y + mNumGridPts[1] * y + x] = random_field::reshape(mOpenSimplex.noise4_XYBeforeZW(x * mLengthScale, y * mLengthScale, z * mLengthScale, time));
+                        samples[mNumGridPts[2] * z * y + mNumGridPts[1] * y + x] = random_field::Reshape(mOpenSimplex.noise4_XYBeforeZW(x * mLengthScale, y * mLengthScale, z * mLengthScale, time));
                     }
                 }
             }

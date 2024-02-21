@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace random_field {
 
     namespace detail {
-        inline double reshape_aux(const double val)
+        inline double ReshapeAux(const double val)
         {
             double dist_from_half = 2.0 * (0.5 - std::abs(0.5 - std::abs(val)));
             double strength = (1.0 - std::abs(val)) + dist_from_half * 0.2;
@@ -49,9 +49,9 @@ namespace random_field {
         };
     }
 
-    inline double reshape(const double val) {
+    inline double Reshape(const double val) {
         using namespace detail;
-        return reshape_aux(reshape_aux(val));
+        return ReshapeAux(ReshapeAux(val));
     }
 }
 
