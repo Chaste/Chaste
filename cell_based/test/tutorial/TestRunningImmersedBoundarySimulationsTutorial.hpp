@@ -37,13 +37,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTIMMERSEDBOUNDARYDEMOTUTORIAL_HPP_
 
 /*
- * = Example showing how to create and run an immersed boundary simulation in Chaste =
+ * ## Example showing how to create and run an immersed boundary simulation in Chaste
  *
  * We create a simple palisade of cells with a basement membrane, and see how to:
  *   * set the initial conditions;
  *   * change the cell-level properties.
  *
- * == The test ==
+ * ### The test
  *
  * We begin by including the necessary header files.
  */
@@ -71,8 +71,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ForwardEulerNumericalMethod.hpp"
 #include <boost/make_shared.hpp>
 
-/*
-// This test is never run in parallel */
+/* This test is never run in parallel */
 #include "FakePetscSetup.hpp"
 
 /* In Chaste, every simulation is run as a 'test', and here we define a test class which inherits from
