@@ -2,7 +2,7 @@
 
 # Welcome to Chaste
 
-If you are new to Chaste please see [our Getting Started wiki page](https://chaste.cs.ox.ac.uk/trac/wiki/GettingStarted).
+If you are new to Chaste please see [our Getting Started wiki page](https://chaste.github.io/docs/).
 
 The files you have downloaded contain the source code for all Chaste functionality. 
 Chaste makes use of a variety of external libraries and packages that need to be installed on your machine. 
