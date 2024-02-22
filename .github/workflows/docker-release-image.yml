@@ -1,4 +1,4 @@
-name: Docker Multi-Arch Release Image CI
+name: Build chaste/release
 
 on:
   release:
@@ -13,7 +13,7 @@ on:
 
 jobs:
   build:
-    runs-on: docker
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -28,9 +28,9 @@ jobs:
         flavor: latest=true
         tags: |
           type=schedule,pattern={{date 'YYYYMMDD'}}
-          type=semver,pattern={{raw}}
+          # type=semver,pattern={{raw}}
           type=semver,pattern={{version}}
-          type=match,pattern=release_(\d.\d)
+          # type=match,pattern=release_(\d.\d)
           type=ref,event=tag
         labels: |
           org.opencontainers.image.title=Chaste Release Image
