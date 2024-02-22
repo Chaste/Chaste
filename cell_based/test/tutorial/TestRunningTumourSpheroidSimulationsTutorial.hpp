@@ -273,7 +273,7 @@ public:
 };
 /*
  * To visualize the results, open a new terminal, `cd` to the Chaste directory,
- * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/SpheroidTutorial/results_from_time_0`.
+ * then `cd` to `anim`. Then do: `java Visualize2dCentreCells $CHASTE_TEST_OUTPUT/SpheroidTutorial/results_from_time_0`.
  *
  * Or use Paraview, see the [Visualizing With Paraview](../visualizingwithparaview/) tutorial for details.
  */
