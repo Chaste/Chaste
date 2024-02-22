@@ -1,4 +1,4 @@
-[![DOI](https://joss.theoj.org/papers/10.21105/joss.01848/status.svg)](https://doi.org/10.21105/joss.01848)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.01848/status.svg)](https://doi.org/10.21105/joss.01848)[![Build chaste/develop](https://github.com/Chaste/Chaste/actions/workflows/docker-develop-image.yml/badge.svg)](https://github.com/Chaste/Chaste/actions/workflows/docker-develop-image.yml)
 
 # Welcome to Chaste
 
