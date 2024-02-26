@@ -236,7 +236,7 @@ public:
          * HOW_TO_TAG Cardiac/Output
          * Calculating and outputting ionic currents ('derived quantities') in a tissue simulation using
          * [HeartConfig](/doxygen-latest/classHeartConfig.html) - see also
-         * [chaste_codegen documentation](/docs/user-guides/code-generation-from-cell-ml/#derived-quantities).
+         * [chaste_codegen documentation](/docs/user-guides/code-generation-from-cellml/#derived-quantities).
          */
         // This is how to output an additional state variable
         output_variables.push_back("cytosolic_calcium_concentration");
