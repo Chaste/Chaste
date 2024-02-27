@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
+#include "ImmersedBoundaryCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexT1SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::VertexT1SwapLocationsWriter()
@@ -82,6 +83,11 @@ void VertexT1SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellP
     }
 
     pCellPopulation->rGetMesh().GetOperationRecorder()->ClearT1SwapsInfo();
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexT1SwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation)
+{
 }
 
 // Explicit instantiation

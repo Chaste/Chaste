@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -1599,7 +1599,7 @@ public:
         {
             cell_population.GetNode(i)->ClearAppliedForce();
         }
-        
+
         // Test GetLineTensionParameter()
         c_vector<double, 2> applied_force_0;
         applied_force_0 = cell_population.rGetMesh().GetNode(0)->rGetAppliedForce();
@@ -1610,7 +1610,7 @@ public:
         {
             Node<2>* p_node_A = cell_population.GetNode(node_idx);
             Node<2>* p_node_B = cell_population.GetNode((node_idx + 1) % cell_population.GetNumNodes());
-            
+
             double line_tension = force.GetLineTensionParameter(p_node_A, p_node_B, cell_population);
             if ((node_idx == 1) || (node_idx == 2) || (node_idx == 6) || (node_idx == 7))
             {

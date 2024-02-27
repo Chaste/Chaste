@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -252,7 +252,7 @@ public:
     {
         /**
          * This tests the VonMisesVertexBasedDivisionRule. We first create a vertex based cell population and check whether we can
-         * give the division rule to the population and get it back. Then we create 10000 division vectors and check that they have 
+         * give the division rule to the population and get it back. Then we create 10000 division vectors and check that they have
          * approximately the right mean and variance, given the specified mean and concentration parameters.
          */
 
@@ -410,7 +410,7 @@ public:
             TS_ASSERT(dynamic_cast<ShortAxisVertexBasedDivisionRule<2>*>(p_division_rule.get()));
         }
     }
-    
+
     void TestArchiveVonMisesVertexBasedDivisionRule()
     {
         FileFinder archive_dir("archive", RelativeTo::ChasteTestOutput);

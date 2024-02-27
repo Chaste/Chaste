@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -41,12 +41,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
  * Simple cell-cycle model where mature non-differentiated cells have a probability of
- * dividing per hour that is biased so that it varies linearly across an axis of the 
+ * dividing per hour that is biased so that it varies linearly across an axis of the
  * population through its centre, from zero up to a specified upper value.
  *
- * The class includes two parameters: the first, mMaxDivisionProbability, defines the 
- * maximum probability of dividing per hour; the second, mMinimumDivisionAge, defines a 
- * minimum age at which cells may divide. The axis along which cell division probability 
+ * The class includes two parameters: the first, mMaxDivisionProbability, defines the
+ * maximum probability of dividing per hour; the second, mMinimumDivisionAge, defines a
+ * minimum age at which cells may divide. The axis along which cell division probability
  * is biased must be specified in the separate class DivisionBiasTrackingModifier.
  */
 class BiasedBernoulliTrialCellCycleModel : public AbstractCellCycleModel
@@ -116,9 +116,9 @@ public:
      * Overridden ReadyToDivide() method.
      *
      * If the cell's age is greater than mMinimumDivisionAge, then we draw a uniform
-     * random number r ~ U[0,1]. If r < p*dt, where p varies linearly from zero up to 
-     * mMaxDivisionProbability dependent on the cell's location within the population, 
-     * and dt is the simulation time step, then the cell is ready to divide and we 
+     * random number r ~ U[0,1]. If r < p*dt, where p varies linearly from zero up to
+     * mMaxDivisionProbability dependent on the cell's location within the population,
+     * and dt is the simulation time step, then the cell is ready to divide and we
      * return true. Otherwise, the cell is not yet ready to divide and we return false.
      *
      * @return whether the cell is ready to divide.

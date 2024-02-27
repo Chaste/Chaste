@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,21 +48,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * ## An example showing how to create a new cell mutation state and use it in a cell-based simulation
  *
- * EMPTYLINE
- *
  * ### Introduction
- *
- * EMPTYLINE
  *
  * In the tumour spheroid tutorial we noted that a cell mutation state is always required
  * when constructing a cell. In this tutorial, we show how to create a new cell mutation
  * state class, and how this can be used in a cell-based simulation.
  *
- * EMPTYLINE
- *
  * ### 1. Including header files
- *
- * EMPTYLINE
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary
  * header file and archiving headers.
@@ -88,14 +80,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakePetscSetup.hpp"
 
 /*
- * EMPTYLINE
- *
  * ### Defining the cell mutation state class
  *
  * As an example, let us consider a cell mutation state representing the p53
  * 172R-H gain-of-function mutant, which is equivalent to the common 175R-H
  * human breast cancer mutant; for further details on this mutant, see for
- * example Murphy et al, FASEB J. 14:2291-2302 (2000).
+ * example [Murphy et al, FASEB J. 14:2291-2302 (2000)](https://doi.org/10.1096/fj.00-0128com).
  *
  * Wild-type p53 has been referred to as the "guardian of the genome",
  * responding to DNA damage or checkpoint failure by either arresting cell
@@ -103,7 +93,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * pathway to remove damaged cells. Approximately 40% of human breast cancers
  * contain alterations in p53.
  *
- * As we can see, apart from a serialize() method and a constructor, this class
+ * As we can see, apart from a `serialize()` method and a constructor, this class
  * does not contain any member variables or methods. This is because generally
  * a cell's mutation state is used, much like a flag, by other classes when
  * determining a cell's behaviour (whether a cell should undergo
@@ -146,11 +136,7 @@ CHASTE_CLASS_EXPORT(P53GainOfFunctionCellMutationState)
  * This completes the code for `P53GainOfFunctionCellMutationState`. Note that usually this code would
  * be separated out into a separate declaration in a .hpp file and definition in a .cpp file.
  *
- * EMPTYLINE
- *
  * #### The Tests
- *
- * EMPTYLINE
  *
  * We now define the test class, which inherits from `AbstractCellBasedTestSuite`.
  */
@@ -159,11 +145,7 @@ class TestCreatingAndUsingANewCellMutationStateTutorial : public AbstractCellBas
 public:
 
     /*
-     * EMPTYLINE
-     *
      * ### Testing the cell mutation state
-     *
-     * EMPTYLINE
      *
      * We begin by testing that our new cell mutation state is implemented correctly.
      */
@@ -199,7 +181,7 @@ public:
 
         /* We can also test that archiving is implemented correctly for our cell
          * mutation state, as follows (further details on how to implement and
-         * test archiving can be found at ChasteGuides/BoostSerialization).  */
+         * test archiving can be found at [Boost Serialization Guide](/docs/user-guides/boost-serialization/)).  */
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "p53_mutation.arch";
 
@@ -237,11 +219,7 @@ public:
     }
 
     /*
-     * EMPTYLINE
-     *
      * ### Using the cell mutation state in a cell-based simulation
-     *
-     * EMPTYLINE
      *
      * We conclude with a brief test demonstrating how `P53GainOfFunctionCellMutationState` can be used
      * in a cell-based simulation.
@@ -287,16 +265,16 @@ public:
         /* To run the simulation, we call `Solve()`. */
         simulator.Solve();
     }
-    /*
-     * When you visualize the results with
-     *
-     * `java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithNewMutationState/results_from_time_0`
-     *
-     * you should see two cells in black which are the cells with the new mutation. If we want these cells to behave differently we
-     * would need to write an new `CellCycleModel`, `CellKiller`, `Force`, or `CellPopulationBoundaryCondition`
-     * which checks for the new mutation.
-     *
-     */
 };
+/*
+ * When you visualize the results with
+ *
+ * `java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithNewMutationState/results_from_time_0`
+ *
+ * you should see two cells in black which are the cells with the new mutation. If we want these cells to behave differently we
+ * would need to write an new `CellCycleModel`, `CellKiller`, `Force`, or `CellPopulationBoundaryCondition`
+ * which checks for the new mutation.
+ *
+ */
 
 #endif /*TESTCREATINGANDUSINGANEWCELLMUTATIONSTATETUTORIAL_HPP_*/

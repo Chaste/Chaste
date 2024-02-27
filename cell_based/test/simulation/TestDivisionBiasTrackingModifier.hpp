@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -128,12 +128,12 @@ public:
         {
             double bias = cell_iter->GetCellData()->GetItem("bias");
             double estimated_bias = (cell_population.GetLocationOfCellCentre(*cell_iter)[1] - y_min)/(y_max - y_min);
-            
+
             TS_ASSERT_LESS_THAN_EQUALS(0.0, bias);
             TS_ASSERT_LESS_THAN_EQUALS(bias, 1.0);
             TS_ASSERT_DELTA(estimated_bias, bias, 1e-3);
         }
-    
+
         simulator.SetEndTime(2.0);
         simulator.Solve();
 
@@ -146,7 +146,7 @@ public:
         {
             double bias = cell_iter->GetCellData()->GetItem("bias");
             double estimated_bias = (cell_population.GetLocationOfCellCentre(*cell_iter)[1] - y_min)/(y_max - y_min);
-            
+
             TS_ASSERT_LESS_THAN_EQUALS(0.0, bias);
             TS_ASSERT_LESS_THAN_EQUALS(bias, 1.0);
             TS_ASSERT_DELTA(estimated_bias, bias, 1e-3);
@@ -207,12 +207,12 @@ public:
         {
             double bias = cell_iter->GetCellData()->GetItem("bias");
             double estimated_bias = (cell_population.GetLocationOfCellCentre(*cell_iter)[0] - x_min)/(x_max - x_min);
-            
+
             TS_ASSERT_LESS_THAN_EQUALS(0.0, bias);
             TS_ASSERT_LESS_THAN_EQUALS(bias, 1.0);
             TS_ASSERT_DELTA(estimated_bias, bias, 1e-3);
         }
-        
+
         simulator.SetEndTime(2.0);
         simulator.Solve();
 
@@ -225,7 +225,7 @@ public:
         {
             double bias = cell_iter->GetCellData()->GetItem("bias");
             double estimated_bias = (cell_population.GetLocationOfCellCentre(*cell_iter)[0] - x_min)/(x_max - x_min);
-            
+
             TS_ASSERT_LESS_THAN_EQUALS(0.0, bias);
             TS_ASSERT_LESS_THAN_EQUALS(bias, 1.0);
             TS_ASSERT_DELTA(estimated_bias, bias, 1e-3);
@@ -287,7 +287,7 @@ public:
             TS_ASSERT_LESS_THAN_EQUALS(0.0, bias);
             TS_ASSERT_LESS_THAN_EQUALS(bias, 1.0);
         }
-        
+
         simulator.SetEndTime(2.0);
         simulator.Solve();
 
@@ -375,12 +375,12 @@ public:
         {
             double bias = cell_iter->GetCellData()->GetItem("bias");
             double estimated_bias = (cell_population.GetLocationOfCellCentre(*cell_iter)[1] - y_min)/(y_max - y_min);
-            
+
             TS_ASSERT_LESS_THAN_EQUALS(0.0, bias);
             TS_ASSERT_LESS_THAN_EQUALS(bias, 1.0);
             TS_ASSERT_DELTA(estimated_bias, bias, 1e-3);
         }
-    
+
         simulator.SetEndTime(2.0);
         simulator.Solve();
 
@@ -407,7 +407,7 @@ public:
         {
             double bias = cell_iter->GetCellData()->GetItem("bias");
             double estimated_bias = (cell_population.GetLocationOfCellCentre(*cell_iter)[1] - y_min)/(y_max - y_min);
-            
+
             TS_ASSERT_LESS_THAN_EQUALS(0.0, bias);
             TS_ASSERT_LESS_THAN_EQUALS(bias, 1.0);
             TS_ASSERT_DELTA(estimated_bias, bias, 1e-3);

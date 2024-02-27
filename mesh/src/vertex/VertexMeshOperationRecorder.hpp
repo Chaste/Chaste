@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -51,13 +51,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VertexElement.hpp"
 
 /**
- * This class records operations performed on the mesh. In particular, this 
- * class records operations on edges and nodes during e.g. T1 transition or 
+ * This class records operations performed on the mesh. In particular, this
+ * class records operations on edges and nodes during e.g. T1 transition or
  * cell division.
  *
- * The sequence of operations as well as their nature are needed for remapping 
- * of old (prior to an operation) edge based quantities into new state. For 
- * example, when an edge is split into two or, shrinks, the edge quantities may 
+ * The sequence of operations as well as their nature are needed for remapping
+ * of old (prior to an operation) edge based quantities into new state. For
+ * example, when an edge is split into two or, shrinks, the edge quantities may
  * change according to the kind of operation.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -114,17 +114,17 @@ public:
      * Destructor.
      */
     ~VertexMeshOperationRecorder();
-    
+
     /**
      * Sets edge helper associated with the vertex mesh.
-     * 
+     *
      * @param pEdgeHelper pointer to an edge helper
      */
     void SetEdgeHelper(EdgeHelper<SPACE_DIM>* pEdgeHelper);
 
     /**
      * Record T1 swap info.
-     * 
+     *
      * @param rSwapInfo information about a T1 swap
      */
     void RecordT1Swap(T1SwapInfo<SPACE_DIM>& rSwapInfo);
@@ -141,7 +141,7 @@ public:
 
     /**
      * Record T2 swap info.
-     * 
+     *
      * @param rSwapInfo information about a T2 swap
      */
     void RecordT2Swap(T2SwapInfo<SPACE_DIM>& rSwapInfo);
@@ -158,7 +158,7 @@ public:
 
     /**
      * Record T3 swap info.
-     * 
+     *
      * @param rSwapInfo information about a T3 swap
      */
     void RecordT3Swap(T3SwapInfo<SPACE_DIM>& rSwapInfo);
@@ -175,7 +175,7 @@ public:
 
     /**
      * Record cell division event.
-     * 
+     *
      * @param rDivisionInfo information about a cell division event.
      */
     void RecordCellDivisionInfo(CellDivisionInfo<SPACE_DIM>& rDivisionInfo);
@@ -185,7 +185,7 @@ public:
      */
     std::vector<CellDivisionInfo<SPACE_DIM> > GetCellDivisionInfo() const;
 
-    /*
+    /**
      * Clear information about T3 swaps.
      */
     void ClearCellDivisionInfo();
@@ -202,14 +202,14 @@ public:
 
     /**
      * Record node merging (or edge shrinkage) event.
-     * 
+     *
      * @param oldIds Global Edge IDs prior to node merge
      * @param pElement Pointer to element associated with node merge
-     * @param mergedNodesPair the index of the deleted node is stored in the 
+     * @param mergedNodesPair the index of the deleted node is stored in the
      *                        second position
-     * @param elementIndexIsRemapped indicates whether the operation has been 
-     *                               recorded before element indices have been 
-     *                               remapped, e.g. before elements are deleted 
+     * @param elementIndexIsRemapped indicates whether the operation has been
+     *                               recorded before element indices have been
+     *                               remapped, e.g. before elements are deleted
      *                               (defaults to false)
      */
     void RecordNodeMergeOperation(const std::vector<unsigned> oldIds,
@@ -219,14 +219,14 @@ public:
 
     /**
      * Record edge split operation in element pElement.
-     * 
+     *
      * @param pElement Pointer to element associated with edge split
      * @param edgeIndex index of the edge being split
-     * @param insertedNodeRelPosition position of the inserted node relative to 
+     * @param insertedNodeRelPosition position of the inserted node relative to
      *                                the lower index node of the edge
-     * @param elementIndexIsRemapped indicates whether the operation has been 
-     *                               recorded before element indices have been 
-     *                               remapped, e.g. before elements are deleted 
+     * @param elementIndexIsRemapped indicates whether the operation has been
+     *                               recorded before element indices have been
+     *                               remapped, e.g. before elements are deleted
      *                               (defaults to false)
      */
     void RecordEdgeSplitOperation(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
@@ -236,7 +236,7 @@ public:
 
     /**
      * Record cell divisions for VertexBasedPopulationSrn class to remap SRNs.
-     * 
+     *
      * @param rOldIds Global Edge IDs of parent cell prior cell division
      * @param pElement1 Daughter element
      * @param pElement2 Daughter element
@@ -253,9 +253,9 @@ public:
     void RecordNewEdgeOperation(VertexElement<ELEMENT_DIM, SPACE_DIM>* pElement,
                                 const unsigned edgeIndex);
     /**
-     * Record merging of adjacent edges due to deletion of the shared node 
+     * Record merging of adjacent edges due to deletion of the shared node
      * nodeIndex in element pElement
-     * 
+     *
      * @param pElement Pointer to element associated with edge merge
      * @param nodeIndex Global index of node
      */

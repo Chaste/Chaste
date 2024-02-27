@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -61,9 +61,9 @@ void VertexBasedPopulationSrn<DIM>::UpdateSrnAfterBirthOrDeath(VertexElementMap&
     for (auto operation : r_operations)
     {
         /*
-         * An operation with deleted element may be recorded, e.g. following a 
-         * T2 swap, neighbouring element may become triangular due to node 
-         * merging and may subsequently be marked for deletion, despite being 
+         * An operation with deleted element may be recorded, e.g. following a
+         * T2 swap, neighbouring element may become triangular due to node
+         * merging and may subsequently be marked for deletion, despite being
          * marked to perform edge operations (e.g. node merging).
          */
         switch (operation.GetOperation())
@@ -78,7 +78,7 @@ void VertexBasedPopulationSrn<DIM>::UpdateSrnAfterBirthOrDeath(VertexElementMap&
                 unsigned location_index = stored_index;
 
                 /*
-                 * If operation is recorded before element indices are changed. 
+                 * If operation is recorded before element indices are changed.
                  * For example, if the operations recorded during T2 swap.
                  */
                 if (operation.IsElementIndexRemapped())
@@ -139,9 +139,9 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
     const std::vector<double> split_proportions = rEdgeChange.GetSplitProportions();
     const unsigned num_edges = edge_mapping.size();
     std::vector<unsigned> shrunk_edges;
-  
+
     /*
-     * Go through the edges, check its status and the index corresponding to the 
+     * Go through the edges, check its status and the index corresponding to the
      * edge status before rearrangement. Go through the SRN model.
      */
     for (unsigned i = 0; i < num_edges; i++)
@@ -151,10 +151,10 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
 
         /*
          * remap_status can be the following:
-         * 0 - Direct remapping, the edge SRN of the oldModel can be transferred 
+         * 0 - Direct remapping, the edge SRN of the oldModel can be transferred
          *         directly to the new model
          * 1 - The edge is a split point between the dividing cells
-         * 2 - This is a new edge i.e. the dividing line in the middle of the 
+         * 2 - This is a new edge i.e. the dividing line in the middle of the
          *         old and new cells
          * 3 - Edge below or above the edge that was deleted due to node merging
          * 4 - Edge above was merged into this edge
@@ -173,9 +173,9 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
             }
             case 1:
             {
-                /* 
-                 * Edge split depends on the relative splitting node position 
-                 * because currently we assume that edge concentrations are 
+                /*
+                 * Edge split depends on the relative splitting node position
+                 * because currently we assume that edge concentrations are
                  * uniform on the edge.
                  */
                 new_edge_srn[i] = boost::shared_ptr<AbstractSrnModel>(parentSrnEdges[remap_index]->CreateSrnModel());
@@ -227,7 +227,7 @@ void VertexBasedPopulationSrn<DIM>::RemapCellSrn(std::vector<AbstractSrnModelPtr
         new_edge_srn[i]->SetEdgeLocalIndex(i);
         new_edge_srn[i]->SetCell(pCellSrn->GetCell());
     }
-  
+
     // For the case when edge quantities are returned into interior when edge shrinks due to node merging
     auto p_interior_srn = boost::shared_ptr<AbstractSrnModel>(pCellSrn->GetInteriorSrn());
     if (p_interior_srn != nullptr)

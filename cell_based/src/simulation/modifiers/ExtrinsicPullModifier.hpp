@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,8 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedSimulationModifier.hpp"
 
 /**
- * A modifier class which at each simulation time step applies an extrinsic 
- * pull to the right at a specified speed, optionally applying this to all 
+ * A modifier class which at each simulation time step applies an extrinsic
+ * pull to the right at a specified speed, optionally applying this to all
  * nodes or else just the right-most nodes.
  */
 template<unsigned DIM>
@@ -118,7 +118,7 @@ public:
      * @param speed the speed of the extrinsic pull
      */
     void SetSpeed(double speed);
-    
+
     /**
      * @return #mApplyExtrinsicPullToAllNodes
      */

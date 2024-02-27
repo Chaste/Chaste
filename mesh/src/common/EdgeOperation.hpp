@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -75,11 +75,11 @@ private:
     /** Edge remap info. */
     EdgeRemapInfo mRemapInfo;
 
-    /** Edge remap info after cell division. */    
+    /** Edge remap info after cell division. */
     EdgeRemapInfo mRemapInfo2;
 
     /**
-     * If operation is recorded before element indices are changed. For example, 
+     * If operation is recorded before element indices are changed. For example,
      * if the operations recorded during T2 swap.
      */
     bool mIsElementIndexRemapped;
@@ -102,7 +102,7 @@ private:
         archive & mRemapInfo;
         archive & mRemapInfo2;
     }
-  
+
 public:
 
     /**
@@ -112,29 +112,29 @@ public:
 
     /**
      * Constructor for add, split, node and edge merge operations.
-     * 
+     *
      * @param operation which operation was performed
      * @param elementIndex index of the element
      * @param remapInfo remapping info
-     * @param isIndexRemapped indicates whether the operation has been recorded 
-     *                        before elements changed their indices (defaults to 
-     *                        false); e.g. when T2 swap occurs, node merging 
-     *                        operation is recorded with element index that will 
-     *                        be modified in RemoveDeletedNodesAndELements(). 
+     * @param isIndexRemapped indicates whether the operation has been recorded
+     *                        before elements changed their indices (defaults to
+     *                        false); e.g. when T2 swap occurs, node merging
+     *                        operation is recorded with element index that will
+     *                        be modified in RemoveDeletedNodesAndELements().
      *                        See also VertexBasedCellPopulation::Update().
      */
-    EdgeOperation(EDGE_OPERATION operation, 
+    EdgeOperation(EDGE_OPERATION operation,
                   unsigned elementIndex,
-                  EdgeRemapInfo remapInfo, 
+                  EdgeRemapInfo remapInfo,
                   const bool isIndexRemapped = false);
 
      /**
       * Constructor for the DIVIDE operation.
-      * 
+      *
       * @param elementIndex an element index
       * @param elementIndex2 another element index
-      * @param pRemapInfo edge remap info
-      * @param pRemapInfo2 edge remap info after cell division
+      * @param remapInfo edge remap info
+      * @param remapInfo2 edge remap info after cell division
       */
     EdgeOperation(unsigned elementIndex,
                   unsigned elementIndex2,
@@ -154,8 +154,8 @@ public:
 
     /**
      * Modify element index on which edge operation has been performed.
-     * 
-     * @paran index an element index 
+     *
+     * @param index an element index
      */
     void SetElementIndex(const unsigned index);
 
@@ -166,8 +166,8 @@ public:
 
     /**
      * Modify element index of the second daughter cell.
-     * 
-     * @paran index an element index 
+     *
+     * @param index an element index
      */
     void SetElementIndex2(const unsigned index);
 

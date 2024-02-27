@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimulationTime.hpp"
 
 /**
- * This class contains the abstract code for an ODE sub-cellular reaction 
+ * This class contains the abstract code for an ODE sub-cellular reaction
  * network (SRN) model, similar in structure to AbstractOdeBasedCellCycleModel.
  */
 class AbstractOdeSrnModel : public AbstractSrnModel, public CellCycleModelOdeHandler
@@ -86,7 +86,7 @@ protected:
     /**
      * Overridden Initialise() method, which here sets up the ODE system.
      *
-     * Note we bring virtual functions from AbstractSrnModel into derived 
+     * Note we bring virtual functions from AbstractSrnModel into derived
      * namespace so overloading virtual works.
      *
      * @param pOdeSystem pointer to an ODE system
@@ -94,18 +94,18 @@ protected:
     void Initialise(AbstractOdeSystem* pOdeSystem);
 
     /**
-     * Protected copy-constructor for use by CreateSrnModel(). The only way for 
-     * external code to create a copy of a SRN model is by calling that method, 
-     * to ensure that a model of the correct subclass is created. 
-     * 
-     * This copy-constructor helps subclasses to ensure that all member 
+     * Protected copy-constructor for use by CreateSrnModel(). The only way for
+     * external code to create a copy of a SRN model is by calling that method,
+     * to ensure that a model of the correct subclass is created.
+     *
+     * This copy-constructor helps subclasses to ensure that all member
      * variables are correctly copied when this happens.
      *
-     * This method is called by child classes to set member variables for a 
-     * daughter cell upon cell division. Note that the parent SRN model will 
-     * have had ResetForDivision() called just before CreateSrnModel() is 
-     * called, so performing an exact copy of the parent is suitable behaviour. 
-     * Any daughter-cell-specific initialisation can be done in 
+     * This method is called by child classes to set member variables for a
+     * daughter cell upon cell division. Note that the parent SRN model will
+     * have had ResetForDivision() called just before CreateSrnModel() is
+     * called, so performing an exact copy of the parent is suitable behaviour.
+     * Any daughter-cell-specific initialisation can be done in
      * InitialiseDaughterCell().
      *
      * @param rModel  the SRN model to copy.
@@ -117,7 +117,7 @@ public:
      * Create an AbstractOdeSrnModel.
      *
      * @param stateSize The number of state variables in the ODE system.
-     * @param pOdeSolver An optional pointer to a cell-cycle model ODE solver 
+     * @param pOdeSolver An optional pointer to a cell-cycle model ODE solver
      *                   object (allows the use of different ODE solvers).
      */
     AbstractOdeSrnModel(unsigned stateSize,
@@ -148,7 +148,7 @@ public:
     void SetInitialConditions(std::vector<double> initialConditions);
 
     /**
-     * Outputs SRN model parameters to file. Virtual void so needs to be 
+     * Outputs SRN model parameters to file. Virtual void so needs to be
      * specified in child classes.
      *
      * @param rParamsFile the file stream to which the parameters are output
@@ -156,9 +156,9 @@ public:
     virtual void OutputSrnModelParameters(out_stream& rParamsFile);
 
     /**
-     * Scales all ODE variables by factor theta. Used for example to scale model 
+     * Scales all ODE variables by factor theta. Used for example to scale model
      * variables after cell division.
-     * 
+     *
      * @param theta factor by which to scale all ODE variables.
      */
     virtual void ScaleSrnVariables(const double theta);

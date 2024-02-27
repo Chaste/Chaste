@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -59,6 +59,11 @@ void VertexIntersectionSwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(CaBase
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void VertexIntersectionSwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(NodeBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexIntersectionSwapLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation)
 {
 }
 

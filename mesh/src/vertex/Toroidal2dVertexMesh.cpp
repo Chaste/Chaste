@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -142,7 +142,7 @@ Toroidal2dVertexMesh::Toroidal2dVertexMesh(Toroidal2dMesh& rMesh, bool isBounded
 
                     c_vector<double,2> edge = mpDelaunayMesh->GetVectorFromAtoB(p_node_a->rGetLocation(), p_node_b->rGetLocation());
                     double edge_length = norm_2(edge);
-                    
+
                     // The short edges in these elements are the boundaries of the void
                     if (edge_length<edge_threshold)
                     {

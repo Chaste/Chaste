@@ -2,7 +2,7 @@
 
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -53,9 +53,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * ## Checkpointing and restarting cardiac simulations
  *
- * In this tutorial we show how to save and reload cardiac simulations
- *
- * EMPTYLINE
+ * In this tutorial we show how to save and reload cardiac simulations.
  *
  * `CardiacSimulationArchiver` is the main class that takes care of checkpointing
  * cardiac simulations.
@@ -74,7 +72,7 @@ public:
     /* First, the checkpointing test. */
     void TestCheckpointing()
     {
-        /* We set up exactly the same simulation as in UserTutorials/AnotherBidomainSimulation */
+        /* We set up exactly the same simulation as in the [Another Bidomain Simulation](/docs/user-tutorials/anotherbidomainsimulation/) tutorial. */
         HeartConfig::Instance()->Reset();
 
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML,2> cell_factory(-2000000);
@@ -111,7 +109,7 @@ public:
          * The output files are concatenated so that they appear to be made by a single simulation running from
          * `t=0 ms` to `t=10 ms`.
          * Note: loading an archive also loads `HeartConfig` options, so `HeartConfig` calls such as this one must appear
-         * ''after'' CardiacSimulationArchiver::Load().
+         * **after** `CardiacSimulationArchiver::Load()`.
          */
         HeartConfig::Instance()->SetSimulationDuration(10); //ms
 
@@ -122,7 +120,7 @@ public:
         p_bidomain_problem->Solve();
 
         /* Note that the pointer p_bidomain_problem exists in the scope of this test and that the object
-         * which was unarchived was created on the CardiacSimulationArchiver::Load() line above.  We are therefore
+         * which was unarchived was created on the `CardiacSimulationArchiver::Load()` line above.  We are therefore
          * responsible for deleting the memory.
          */
         delete p_bidomain_problem;
@@ -137,9 +135,9 @@ public:
  *   partitioned for a parallel simulation.
  * * To make this process slightly more efficient, Chaste will copy the original mesh files if the mesh was loaded
  *   from disk and hasn't been modified (e.g. by permuting).  Because of this, if you modify the mesh in memory,
- *   e.g. by setting element attributes in [UserTutorials/BidomainWithBath bidomain-with-bath simulations], then
+ *   e.g. by setting element attributes as in the [bidomain-with-bath](/docs/user-tutorials/bidomainwithbath/) tutorial, then
  *   you need to inform Chaste by calling `mesh.SetMeshHasChangedSinceLoading()`, so your modifications aren't lost.
- * * Meshes written in checkpoints use a binary form of the !Triangle/Tetgen mesh format. This makes checkpoints
+ * * Meshes written in checkpoints use a binary form of the Triangle/Tetgen mesh format. This makes checkpoints
  *   significantly smaller but will cause portability problems if checkpoints are moved between little-endian systems
  *   (e.g. x86) and big-endian systems (e.g. PowerPC).
  * * Checkpoints may be resumed on any number of processes — you are not restricted to the number on which it was
@@ -154,16 +152,9 @@ public:
  *   go until the ''next'' checkpoint, not until the end of the simulation.  This makes it slightly less
  *   useful; however, the presence of the checkpoint directories (`1ms`, `2ms`, etc.) provides overall
  *   progress information instead.
- * * On older versions of Boost (before 1.37) there are some restrictions on what may be successfully checkpointed.
- *   Firstly, checkpointing a simulation that uses a dynamically loaded cell model is impossible.
- *   Secondly, if you are using a "non-standard" cell model, i.e. one that is hard-coded but not one of those available
- *   via the XML configuration file, then you may get an error "terminate called after throwing an instance of
- *   'boost::archive::archive_exception' what():  unregistered class".  To resolve this you unfortunately have to
- *   include the header for the relevant cell model in `CardiacSimulationArchiver.cpp`; after the inclusion of
- *   `HeartConfigRelatedCellFactory.hpp` is a sensible location.
- * * Related to the above point, on all Boost versions if you are saving and loading a simulation in different
+ * * On all Boost versions if you are saving and loading a simulation in different
  *   source or test files, ensure that you have the same list of includes in both cases, or the serialization code
- *   may not know about all classes when loading, and give the "unregistered class" error.
+ *   may not know about all classes when loading, and give an `unregistered class` error.
  *
  */
 

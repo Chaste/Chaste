@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -86,10 +86,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* ### Test 1: Solving a linear elliptic PDE
  *
- * Here, we solve the PDE: div(D grad u) + u + x^2^+y^2^ = 0, in 2D, where
- * D is the diffusion tensor (2 0; 0 1) (ie D11=2, D12=D21=0, D22=1), on a square
- * domain, with boundary conditions u=0 on x=0 or y=0, and (D grad u).n = 0 on x=1 and y=1,
- * where n is the surface normal.
+ * Here, we solve the PDE: $\nabla. (D \nabla u) + u + x^2+y^2 = 0$, in 2D, where
+ * D is the diffusion tensor (2 0; 0 1) (ie $D_{11}=2$, $D_{12}=D_{21}=0$, $D_{22}=1$), on a square
+ * domain, with boundary conditions $u=0$ on $x=0$ or $y=0$, and $(D \nabla u).\mathbf{n} = 0$ on $x=1$ and $y=1$,
+ * where $\mathbf{n}$ is the surface normal.
  *
  * We need to create a class representing the PDE we want to solve, which will be
  * passed into the solver. The PDE we are solving is of the type
@@ -105,7 +105,7 @@ private:
      * by the `GetDiffusionTensor` method in PDE classes is of the type
      * `c_matrix<double,SIZE,SIZE>`, which is a uBLAS matrix. We use uBLAS vectors
      * and matrices where small vectors and matrices are needed. Note that uBLAS objects
-     * are only particularly efficient if optimisation is on (`CMAKE_BUILD_TYPE=Release``).*/
+     * are only particularly efficient if optimisation is on (`CMAKE_BUILD_TYPE=Release`).*/
     c_matrix<double,2,2> mDiffusionTensor;
 
 public:
@@ -121,7 +121,7 @@ public:
 
     /* The first method which has to be implemented returns the constant
      * (not dependent on u) part of the source term, which for our PDE is
-     * x^2^ + y^2^. */
+     * $x^2 + y^2$. */
     double ComputeConstantInUSourceTerm(const ChastePoint<2>& rX, Element<2,2>* pElement)
     {
         return rX[0]*rX[0] + rX[1]*rX[1];
@@ -134,7 +134,7 @@ public:
         return 1.0;
     }
 
-    /* The third method returns the diffusion tensor D. Note that the diffusion tensor should
+    /* The third method returns the diffusion tensor $D$. Note that the diffusion tensor should
      * be symmetric and positive definite for a physical, well-posed problem. */
     c_matrix<double,2,2> ComputeDiffusionTerm(const ChastePoint<2>& rX)
     {
@@ -168,16 +168,16 @@ public:
 
         /* A set of boundary conditions are stored in a `BoundaryConditionsContainer`. The
          * three template arguments are ELEMENT_DIM, SPACE_DIM and PROBLEM_DIM, the latter being
-         * the number of unknowns we are solving for. We have one unknown (ie u is a scalar, not
+         * the number of unknowns we are solving for. We have one unknown (ie $u$ is a scalar, not
          * a vector), so in this case `PROBLEM_DIM`=1. */
         BoundaryConditionsContainer<2,2,1> bcc;
 
         /* Defining the boundary conditions is the only particularly fiddly part of solving PDEs,
-         * unless they are very simple, such as u=0 on the boundary, which could be done
+         * unless they are very simple, such as $u=0$ on the boundary, which could be done
          * as follows: */
         //bcc.DefineZeroDirichletOnMeshBoundary(&mesh);
 
-        /* We want to specify u=0 on x=0 and y=0.  To do this, we first create the boundary condition
+        /* We want to specify $u=0$ on $x=0$ and $y=0$.  To do this, we first create the boundary condition
          * object saying what the value of the condition is at any particular point in space.  Here
          * we use the class `ConstBoundaryCondition`, a subclass of `AbstractBoundaryCondition` that
          * yields the same constant value (0.0 here) everywhere it is used.
@@ -206,16 +206,18 @@ public:
             iter++;
         }
 
-        /* Now we create Neumann boundary conditions for the ''surface elements'' on x=1 and y=1. Note that
+        /* Now we create Neumann boundary conditions for the *surface elements* on x=1 and y=1. Note that
          * Dirichlet boundary conditions are defined on nodes, whereas Neumann boundary conditions are
          * defined on surface elements. Note also that the natural boundary condition statement for this
-         * PDE is (D grad u).n = g(x) (where n is the outward-facing surface normal), and g(x) is a prescribed
-         * function, ''not'' something like du/dn=g(x). Hence the boundary condition we are specifying is
-         * (D grad u).n = 0.
+         * PDE is $(D \nabla u).\mathbf{n} = g(x)$ (where $\mathbf{n}$ is the outward-facing surface normal), and $g(x)$ is a prescribed
+         * function, *not* something like $\partial u/ \partial n=g(x)$. Hence the boundary condition we are specifying is
+         * $(D \nabla u).\mathbf{n} = 0$.
          *
-         * **Important note for 1D:** This means that if we were solving 2u,,xx,,=f(x) in 1D, and
-         * wanted to specify du/dx=1 on the LHS boundary, the Neumann boundary value we have to specify is
-         * -2, as n=-1 (outward facing normal) so (D gradu).n = -2 when du/dx=1.
+         * {{< callout context="note" title="Note for 1D" icon="info-circle" >}}
+         * If we were solving $2u_{xx}=f(x)$ in 1D, and
+         * wanted to specify $\partial u/ \partial x=1$ on the LHS boundary, the Neumann boundary value we have to specify is
+         * $-2$, as $n=-1$ (outward facing normal) so $(D \nabla u).n = -2$ when $\partial u/ \partial x=1$.
+         * {{< /callout >}}
          *
          * To define Neumann bcs, we reuse the zero boundary condition object defined above, but apply it
          * at surface elements.  We loop over these using another iterator provided by the mesh class.
@@ -253,14 +255,14 @@ public:
 
         /* It is a pain to access the individual components of a PETSc vector, even when running only on
          * one process. A helper class called `ReplicatableVector` has been created. Create
-         * an instance of one of these, using the PETSc `Vec` as the data. The ''i''th
+         * an instance of one of these, using the PETSc `Vec` as the data. The $i$th
          * component of `result` can now be obtained by simply doing `result_repl[i]`.
          */
         ReplicatableVector result_repl(result);
 
         /* Let us write out the solution to a file. To do this, create an
          * `OutputFileHandler`, passing in the directory we want files written to.
-         * This is relative to the directory defined by the CHASTE_TEST_OUTPUT environment
+         * This is relative to the directory defined by the `CHASTE_TEST_OUTPUT` environment
          * variable - usually `/tmp/$USER/testoutput`. Note by default the output directory
          * passed in is emptied by this command. To avoid this, `false` can be passed in as a second
          * parameter.
@@ -274,7 +276,7 @@ public:
         /* Loop over the entries of the solution. */
         for (unsigned i=0; i<result_repl.GetSize(); i++)
         {
-            /* Get the x and y-values of the node corresponding to this entry. The method
+            /* Get the $x$ and $y$-values of the node corresponding to this entry. The method
              * `GetNode` on the mesh class returns a pointer to a `Node`. */
             double x = mesh.GetNode(i)->rGetLocation()[0];
             double y = mesh.GetNode(i)->rGetLocation()[1];
@@ -282,7 +284,7 @@ public:
             /* Get the computed solution at this node from the `ReplicatableVector`. */
             double u = result_repl[i];
 
-            /* Finally, write x, y and u to the output file. The solution could then be
+            /* Finally, write $x$, $y$ and $u$ to the output file. The solution could then be
              * visualised in (eg) matlab, using the commands:
              * `sol=load('linear_solution.txt'); plot3(sol(:,1),sol(:,2),sol(:,3),'.');`*/
             (*p_file) << x << " " << y << " " << u << "\n";
@@ -297,8 +299,8 @@ public:
      *
      * Now we solve a parabolic PDE. We choose a simple problem so that the code changes
      * needed from the elliptic case are clearer. We will solve
-     * du/dt = div(grad u) + u, in 3d, with boundary conditions u=1 on the boundary, and initial
-     * conditions u=1.
+     * $\frac{\partial u}{\partial t} = \nabla . (\nabla u) + u$, in 3d, with boundary conditions $u=1$ on the boundary, and initial
+     * conditions $u=1$.
      *
      */
     void TestSolvingParabolicPde()
@@ -310,11 +312,11 @@ public:
 
         /* Our PDE object should be a class that is derived from the `AbstractLinearParabolicPde`.
          * We could write it ourselves as in the previous test, but since the PDE we want to solve is
-         * so simple, it has already been defined (look it up! - it is located in pde/test/pdes).
+         * so simple, it has already been defined (look it up! - it is located in [pde/test/pdes](https://github.com/Chaste/Chaste/blob/develop/pde/test/pdes/HeatEquationWithSourceTerm.hpp)).
          */
         HeatEquationWithSourceTerm<3> pde;
 
-        /* Create a new boundary conditions container and specify u=1.0 on the boundary. */
+        /* Create a new boundary conditions container and specify $u=1.0$ on the boundary. */
         BoundaryConditionsContainer<3,3,1> bcc;
         bcc.DefineConstantDirichletOnMeshBoundary(&mesh, 1.0);
 
@@ -323,9 +325,9 @@ public:
         SimpleLinearParabolicSolver<3,3> solver(&mesh,&pde,&bcc);
 
         /* For parabolic problems, initial conditions are also needed. The solver will expect
-         * a PETSc vector, where the i-th entry is the initial solution at node i, to be passed
+         * a PETSc vector, where the $i$-th entry is the initial solution at node $i$, to be passed
          * in. To create this PETSc `Vec`, we will use a helper function in the `PetscTools`
-         * class to create a `Vec` of size num_nodes, with each entry set to 1.0. Then we
+         * class to create a `Vec` of size num_nodes, with each entry set to `1.0`. Then we
          * set the initial condition on the solver. */
         Vec initial_condition = PetscTools::CreateAndSetVec(mesh.GetNumNodes(), 1.0);
         solver.SetInitialCondition(initial_condition);
@@ -337,13 +339,11 @@ public:
         solver.SetTimes(t_start, t_end);
         solver.SetTimeStep(dt);
 
-
         /* HOW_TO_TAG PDE
          * Output results to file for time-dependent PDE solvers
          */
 
-
-        /* When we call Solve() below we will just get the solution at the final time. If we want
+        /* When we call `Solve()` below we will just get the solution at the final time. If we want
          * to have intermediate solutions written to file, we do the following. We start by
          * specifying an output directory and filename prefix for our results file:
          */
@@ -367,14 +367,14 @@ public:
         Vec solution = solver.Solve();
         ReplicatableVector solution_repl(solution);
 
-        /* Let's also solve the equivalent static PDE, i.e. set du/dt=0, so 0=div(gradu) + u. This
+        /* Let's also solve the equivalent static PDE, i.e. set $\partial u/ \partial t=0$, so $0=\nabla . (\nabla u) + u$. This
          * is easy, as the PDE class has already been defined. */
         SimplePoissonEquation<3,3> static_pde;
         SimpleLinearEllipticSolver<3,3> static_solver(&mesh, &static_pde, &bcc);
         Vec static_solution = static_solver.Solve();
         ReplicatableVector static_solution_repl(static_solution);
 
-        /* We can now compare the solution of the parabolic PDE at t=1 with the static solution,
+        /* We can now compare the solution of the parabolic PDE at $t=1$ with the static solution,
          * to see if the static equilibrium solution was reached in the former. (Ideally we should
          * compute some relative error, but we just compute an absolute error for simplicity.) */
         for (unsigned i=0; i<static_solution_repl.GetSize(); i++)

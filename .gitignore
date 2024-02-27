@@ -32,9 +32,6 @@ _local/
 /python/hostconfig/local.py
 /python/hostconfig/machines/local.py
 
-# Test summary results
-/test_summary/*
-
 # Misc. in /
 /.settings
 /.cdtproject
@@ -44,8 +41,10 @@ _local/
 /gmon.out
 /Chaste
 /doxygen
+/doxygen-*
 /.externalToolBuilders
 /testoutput
+/output/*
 
 # Misc in /anim/
 /anim/*.mpeg

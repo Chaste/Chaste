@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -132,7 +132,7 @@ public:
 
         // Test set/get methods
         std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<2> > >::iterator iter = simulator.GetSimulationModifiers()->begin();
-        TS_ASSERT(boost::static_pointer_cast<ExtrinsicPullModifier<2> >(*iter));        
+        TS_ASSERT(boost::static_pointer_cast<ExtrinsicPullModifier<2> >(*iter));
         boost::static_pointer_cast<ExtrinsicPullModifier<2> >(*iter)->SetApplyExtrinsicPullToAllNodes(true);
         boost::static_pointer_cast<ExtrinsicPullModifier<2> >(*iter)->SetSpeed(2.0);
 

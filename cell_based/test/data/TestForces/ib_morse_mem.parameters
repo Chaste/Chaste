@@ -1,0 +1,8 @@
+			<ElementWellDepth>1.23</ElementWellDepth>
+			<ElementRestLength>2.34</ElementRestLength>
+			<LaminaWellDepth>3.45</LaminaWellDepth>
+			<LaminaRestLength>4.56</LaminaRestLength>
+			<WellWidth>5.67</WellWidth>
+			<AdditiveNormalNoise>1</AdditiveNormalNoise>
+			<NormalNoiseMean>6.78</NormalNoiseMean>
+			<NormalNoiseStdDev>7.89</NormalNoiseStdDev>

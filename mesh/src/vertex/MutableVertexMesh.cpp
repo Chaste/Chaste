@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -4154,18 +4154,18 @@ c_vector<double, 2> MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::WidenEdgeOrCorrec
     c_vector<double, 2> edge_ab_unit_vector = vector_a_to_b/norm_2(vector_a_to_b);
 
     /**
-     * Reset the intersection away from vertices A and B to allow enough room 
+     * Reset the intersection away from vertices A and B to allow enough room
      * for new nodes.
-     * 
-     * If the intersection is within 
-     * mCellRearrangementRatio^2*mCellRearrangementThreshold of vertexA or 
-     * vertexB move it mCellRearrangementRatio^2*mCellRearrangementThreshold 
+     *
+     * If the intersection is within
+     * mCellRearrangementRatio^2*mCellRearrangementThreshold of vertexA or
+     * vertexB move it mCellRearrangementRatio^2*mCellRearrangementThreshold
      * away.
      *
-     * Note: this distance so that there is always enough room for new nodes 
+     * Note: this distance so that there is always enough room for new nodes
      * (if necessary).
-     * 
-     * \todo currently this assumes a worst case scenario of 3 nodes between A 
+     *
+     * \todo currently this assumes a worst case scenario of 3 nodes between A
      *       and B; could be less movement for other cases (see #2401)
      */
     if (norm_2(intersection - vertexA) < 2.0*mCellRearrangementRatio*mCellRearrangementThreshold)

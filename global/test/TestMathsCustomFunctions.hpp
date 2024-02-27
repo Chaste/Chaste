@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -101,6 +101,24 @@ public:
         TS_ASSERT_EQUALS(Signum(DBL_MAX), 1.0);
         TS_ASSERT_EQUALS(Signum(-DBL_MAX), -1.0);
         TS_ASSERT_EQUALS(Signum(DBL_EPSILON), 1.0);
+    }
+
+    void TestAdvanceMod()
+    {
+        TS_ASSERT_EQUALS(AdvanceMod(0u, 1, 2u), 1u);
+        TS_ASSERT_EQUALS(AdvanceMod(0u, -1, 2u), 1u);
+        TS_ASSERT_EQUALS(AdvanceMod(3u, 157, 23u), (3 + 157) % 23);
+        TS_ASSERT_EQUALS(AdvanceMod(3u, -1572, 27u), (3 + 100 * 27 - 1572) % 27);
+    }
+
+    void TestSmallDifferenceMod()
+    {
+        TS_ASSERT_EQUALS(SmallDifferenceMod(0u, 0u, 2u), 0u);
+        TS_ASSERT_EQUALS(SmallDifferenceMod(123u, 123u, 125u), 0u);
+        TS_ASSERT_EQUALS(SmallDifferenceMod(1u, 3u, 125u), 2u);
+        TS_ASSERT_EQUALS(SmallDifferenceMod(3u, 1u, 125u), 2u);
+        TS_ASSERT_EQUALS(SmallDifferenceMod(0u, 124u, 125u), 1u);
+        TS_ASSERT_EQUALS(SmallDifferenceMod(124u, 0u, 125u), 1u);
     }
 
     void TestCompareDoubles()

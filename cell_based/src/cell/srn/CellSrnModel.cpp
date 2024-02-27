@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,14 +36,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellSrnModel.hpp"
 
 CellSrnModel::CellSrnModel(const CellSrnModel &rModel)
-    : AbstractSrnModel(rModel), 
+    : AbstractSrnModel(rModel),
       mpInteriorSrnModel(nullptr)
 {
     /*
      * Edge SRN vector should be empty in the newly created cell. They are added in
      * VertexBasedPopulation::UpdateSrnAfterBirthOrDeath().
-     * 
-     * Copy interior SRN to the new cell. Interior SRN should have custom implementation 
+     *
+     * Copy interior SRN to the new cell. Interior SRN should have custom implementation
      * of a new interior SRN creation after cell division.
      */
     if (rModel.mpInteriorSrnModel != nullptr)
@@ -90,7 +90,7 @@ void CellSrnModel::ResetForDivision()
 
     /*
      * Note that edge models follow different rules since the number and the state of edge SRNs
-     * after cell divisions depends on local topology. That is custom behavior of edge SRN models 
+     * after cell divisions depends on local topology. That is custom behavior of edge SRN models
      * is important to implement correctly.
      */
     for (auto iter : mEdgeSrnModels)

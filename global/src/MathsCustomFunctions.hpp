@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MATHSCUSTOMFUNCTIONS_HPP_
 
 #include <cfloat>
+#include <cstddef>
 
 /**
  * @file
@@ -96,6 +97,31 @@ double Signum(double value);
  * @param divisor  the number to divide by
  */
 double SafeDivide(double numerator, double divisor);
+
+/**
+ * Advance index by increment and return the result modulo range taking into account negative decrements. It is assumed
+ * that index + range does not overflow the int type, and that 0 < range < INT_MAX.
+ *
+ * Note that this function is designed to avoid integer division and is very efficient when (index + increment) is
+ * in [-range, 2*range).
+ *
+ * @param index the current index to increment
+ * @param increment the amount to increment the index by
+ * @param range the top of the range; [0, range)
+ * @return (current_location + increment) % range, accounting for negative values
+ */
+unsigned AdvanceMod(unsigned index, int increment, std::size_t range) noexcept;
+
+/**
+ * Calculate the smaller of the two differences between two indices, modulo N.  I.e. the smallest number of increments
+ * from idxA required to get to idxB, modulo range.
+ *
+ * @param idxA first index, in [0, range)
+ * @param idxB second index, in [0, range)
+ * @param range the top of the range; [0, range)
+ * @return the smallest difference between idxA and idxB
+ */
+unsigned SmallDifferenceMod(unsigned idxA, unsigned idxB, std::size_t range) noexcept;
 
 /**
  * Utility static methods for comparing floating point numbers, based on

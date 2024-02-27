@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2023, University of Oxford.
+# Copyright (c) 2005-2024, University of Oxford.
 # All rights reserved.
 # 
 # University of Oxford means the Chancellor, Masters and Scholars of the
@@ -52,8 +52,8 @@ message ("####################################\n")
 message(STATUS "CMake version: ${CMAKE_VERSION}")
 
 # Since CMake 3.0, version can be supplied to the project() command.  We set it directly, for users on older CMake
-project (Chaste VERSION 2021.1)
-set (Chaste_VERSION_MAJOR 2021 CACHE STRING "Chaste major version number")
+project (Chaste VERSION 2024.1)
+set (Chaste_VERSION_MAJOR 2024 CACHE STRING "Chaste major version number")
 set (Chaste_VERSION_MINOR 1 CACHE STRING "Chaste minor version number")
 
 include (ChasteHostOperatingSystem)
@@ -134,9 +134,9 @@ option (Chaste_USE_PETSC_HDF5 "Prefer to compile Chaste with HDF5 library used b
 
 option (Chaste_UPDATE_PROVENANCE "Update build timestamp. Disable to prevent re-linking of all Chaste libraries" ON)
 
-option (RUN_TESTS "This option simply runs Chaste tests. You should also set the test family." OFF)
-set (TEST_FAMILY "Continuous" CACHE STRING "The name of the test family, e.g, Continuous, Failing, Nightly, Parallel etc.")
-set (TestPackTypes "Continuous;Failing;Nightly;Parallel;Production;Weekly;Profile;ProfileAssembly;ExtraSimulations;Codegen")
+option(RUN_TESTS "This option simply runs Chaste tests. You should also set the test family." OFF)
+set(TEST_FAMILY "Continuous" CACHE STRING "The name of the test family, e.g, Continuous, Failing, Nightly, Parallel etc.")
+set(TestPackTypes "Continuous;Failing;Nightly;Parallel;Production;Weekly;Profile;ProfileAssembly;ExtraSimulations;Codegen")
 
 if (RUN_TESTS)
     list (FIND TestPackTypes ${TEST_FAMILY} found)
@@ -392,9 +392,10 @@ else ()
     set(Boost_USE_STATIC_LIBS ON)
     set(Boost_USE_STATIC_RUNTIME ON)
 endif ()
-find_package(Boost COMPONENTS filesystem system serialization program_options REQUIRED)
-list(APPEND Chaste_INCLUDES "${Boost_INCLUDE_DIR}")
-list(APPEND Chaste_LINK_LIBRARIES "${Boost_LIBRARIES}")
+find_package (Boost COMPONENTS filesystem system serialization program_options REQUIRED)
+list (APPEND Chaste_INCLUDES "${Boost_INCLUDE_DIR}")
+list (APPEND Chaste_LINK_LIBRARIES "${Boost_LIBRARIES}")
+
 
 
 ################################
@@ -543,6 +544,7 @@ if (Chaste_USE_XERCES)
     list (APPEND Chaste_LINK_LIBRARIES "${XERCESC_LIBRARY}")
     add_definitions (-DCHASTE_XERCES)
 endif ()
+
 
 add_definitions (-DTRILIBRARY -DTETLIBRARY -DANSI_DECLARATORS)
 

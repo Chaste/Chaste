@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -235,8 +235,8 @@ public:
         /*
          * HOW_TO_TAG Cardiac/Output
          * Calculating and outputting ionic currents ('derived quantities') in a tissue simulation using
-         * [HeartConfig](https://chaste.github.io/doxygen-latest/classHeartConfig.html) - see also
-         * [this page](https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CodeGenerationFromCellML#Derivedquantities).
+         * [HeartConfig](/doxygen-latest/classHeartConfig.html) - see also
+         * [chaste_codegen documentation](/docs/user-guides/code-generation-from-cellml/#derived-quantities).
          */
         // This is how to output an additional state variable
         output_variables.push_back("cytosolic_calcium_concentration");

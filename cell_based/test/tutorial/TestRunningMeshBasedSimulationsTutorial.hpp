@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * ### Introduction
  *
  * In this tutorial we show how Chaste can be used to create, run and visualize mesh-based simulations.
- * Full details of the mathematical model can be found in van Leeuwen ''et al.'' (2009) [doi:10.1111/j.1365-2184.2009.00627.x].
+ * Full details of the mathematical model can be found in van Leeuwen *et al.* (2009) [doi:10.1111/j.1365-2184.2009.00627.x].
  *
  * ### The test
  *
@@ -124,10 +124,11 @@ public:
          * and the dimension.
          * For a list of possible cell cycle models see subclasses of `AbstractCellCycleModel`.
          * These can be found in the inheritance diagram, here,
-         * [AbstractCellCycleModel](https://chaste.github.io/doxygen-latest/classAbstractCellCycleModel.html).
+         * [AbstractCellCycleModel](/doxygen-latest/classAbstractCellCycleModel.html).
          * Note that some of these models will require information on the surrounding medium such as Oxygen concentration to work,
-         * see specific class documentation for details. Some of these will be covered in later tutorials (UserTutorials/RunningContactInhibitionSimulations,
-         * UserTutorials/RunningDeltaNotchSimulations, and UserTutorials/RunningTumourSpheroidSimulations).
+         * see specific class documentation for details. Some of these will be covered in later tutorials
+         * ([Running Contact Inhibition Simulations](../runningcontactinhibitionsimulations/),
+         * [Running Delta Notch Simulations](../runningdeltanotchsimulations/), and [Running Tumour Spheroid Simulations](../runningtumourspheroidsimulations).
          * We create an empty vector of cells and pass this into the
          * method along with the mesh. The second argument represents the size of that the vector
          * `cells` should become - one cell for each node, the third argument specifies
@@ -145,7 +146,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         /* To view the results of this and the next test in Paraview it is necessary to explicitly
-        * generate the required .vtu files. This is detailed in the [wiki:UserTutorials/VisualizingWithParaview] tutorial.
+        * generate the required .vtu files. This is detailed in the [Visualizing With Paraview](../visualizingwithparaview/) tutorial.
         * Note that the results in Paraview may appear different to those in the java based visualizer. This is related
         * to the different methods used to generate voronoi tesselations in each and is resolved through the use of
         * 'ghost nodes', as shown in the next test. */
@@ -171,7 +172,7 @@ public:
          * spring based model, and pass it to the `OffLatticeSimulation`.
          * For a list of possible forces see subclasses of `AbstractForce`.
          * These can be found in the inheritance diagram, here,
-         * [AbstractForce](https://chaste.github.io/doxygen-latest/classAbstractForce.html).
+         * [AbstractForce](/doxygen-latest/classAbstractForce.html).
          * Note that some of these forces are not compatible with mesh-based simulations,
          * see the specific class documentation for details.  If you try to use an incompatible class
          * then you will receive a warning.
@@ -282,10 +283,10 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 8u);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 10.0, 1e-10);
     }
-    /*
-     * To visualize the results, open a new terminal, `cd` to the Chaste directory,
-     * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/MeshBasedMonolayerWithGhostNodes/results_from_time_0`.
-     */
 };
+/*
+ * To visualize the results, open a new terminal, `cd` to the Chaste directory,
+ * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/MeshBasedMonolayerWithGhostNodes/results_from_time_0`.
+ */
 
 #endif /* TESTRUNNINGMESHBASEDSIMULATIONSTUTORIAL_HPP_ */

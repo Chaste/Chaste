@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,8 +50,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * ### Introduction
  *
  * In this tutorial we show how Chaste can be used to create, run and visualize Potts-based simulations.
- * Full details of the mathematical model can be found in Graner, F. and Glazier, J. A. (1992). Simulation
- * of biological cell sorting using a two-dimensional extended Potts model. Phys. Rev. Lett., 69(13):2015–2016.
+ * Full details of the mathematical model can be found in Graner, F. and Glazier, J. A. (1992). "Simulation
+ * of biological cell sorting using a two-dimensional extended Potts model". Phys. Rev. Lett., 69(13):2015–2016, doi:[10.1103/PhysRevLett.69.2013](https://doi.org/10.1103/PhysRevLett.69.2013).
  *
  * ### The test
  *
@@ -91,11 +91,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestRunningPottsBasedSimulationsTutorial : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
-    /* EMPTYLINE
-     *
+    /*
      * ### Test 1 - a basic Potts-based simulation
-     *
-     * EMPTYLINE
      *
      * In the first test, we run a simple Potts-based simulation, in which we create a monolayer
      * of cells, using a Potts mesh. Each cell is assigned a stochastic cell-cycle model.
@@ -136,7 +133,7 @@ public:
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         /*
-         * We can set the "Temperature" to be used in the Potts Simulation using the optional command below.
+         * We can set the "Temperature" to be used in the Potts simulation using the optional command below.
          * The default value is 0.1.
          */
         cell_population.SetTemperature(0.1);
@@ -163,7 +160,7 @@ public:
          * in the Potts simulation. For this test, we use two update rules based upon
          * a volume constraint (`VolumeConstraintPottsUpdateRule`) and adhesion between cells (`AdhesionPottsUpdateRule`) and pass them to the `OnLatticeSimulation`.
          * For a list of possible update rules see subclasses of `AbstractPottsUpdateRule`.
-         * These can be found in the inheritance diagram, here, [AbstractPottsUpdateRule](https://chaste.github.io/doxygen-latest/classAbstractPottsUpdateRule.html).
+         * These can be found in the inheritance diagram, here, [AbstractPottsUpdateRule](/doxygen-latest/classAbstractPottsUpdateRule.html).
          *
          * Similarly to specifying forces for off lattice simulations we use the `MAKE_PTR` macro
          * to make a boost shared pointer to our required update rule before specifying parameters and passing to the simulation as follows
@@ -198,16 +195,14 @@ public:
     }
 
     /*
-     * EMPTYLINE
-     *
      * To visualize the results, open a new terminal, `cd` to the Chaste directory,
      * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/PottsBasedMonolayer/results_from_time_0`.
      * We may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
      * java executable.
      *
-     * We could also visualize the results using paraview.
+     * We could also visualize the results using Paraview.
      *
-     * See UserTutorials/VisualizingWithParaview for more information.
+     * See the [Visualizing With Paraview](../visualizingwithparaview/) tutorial for more information.
      *
      * Load the file `/tmp/$USER/testoutput/PottsBasedMonolayer/results_from_time_0/results.pvd`, and click apply.
      *
@@ -228,11 +223,7 @@ public:
      *
      * You should see that the cells sort into ones of the same type.
      *
-     * EMPTYLINE
-     *
      * ### Test 2 - Cell Sorting
-     *
-     * EMPTYLINE
      *
      * The next test generates a collection of cells, there are two types of cells, labelled ones
      * and non labelled ones, there is differential adhesion between the cell types. For the
@@ -318,20 +309,14 @@ public:
     }
 
     /*
-     * EMPTYLINE
-     *
      * To visualize the results, open a new terminal, `cd` to the Chaste directory,
      * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/PottsMonolayerCellSorting/results_from_time_0`.
      * We may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
      * java executable.
      *
-     *  You could also visualize in paraview as above.
-     *
-     * EMPTYLINE
+     *  You could also visualize in Paraview as above.
      *
      * ### Test 3 - 3D Cell Sorting
-     *
-     * EMPTYLINE
      *
      * The next test extends the previous example to three dimensions.
      *
@@ -421,29 +406,26 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 64u);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 20.0, 1e-10);
     }
-    /*
-     * EMPTYLINE
-     *
-     * To visualize the results, we need to use Paraview. Note that we don't output the cell boundaries (outlines) in 3D.
-     * See UserTutorials/VisualizingWithParaview for more information.
-     *
-     * Load the file `/tmp/$USER/testoutput/PottsCellSorting3D/results_from_time_0/results.pvd`, and click apply.
-     *
-     * Add box "Glyphs" to represent lattice sites. You will need to adjust the size so they don't overlap.
-     *
-     * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
-     * displayed by Paraview.
-     *
-     * Select the "Display" tab and select "color by" cell label (you can also "color by" cell index to see individual cells).
-     *
-     * Add a "Threshold" filter, filter by cell type and make the lower threshold 0 or greater (unoccupied lattice sites are labelled with -1). This will allow you to view only the cells.
-     *
-     * Click play to see the evolution of the simulation.
-     *
-     * You should see that the cells sort into ones of the same type.
-     *
-     * EMPTYLINE
-     */
 };
+/*
+ *
+ * To visualize the results, we need to use Paraview. Note that we don't output the cell boundaries (outlines) in 3D.
+ * See the [Visualizing With Paraview](../visualizingwithparaview/) tutorial for more information.
+ *
+ * Load the file `/tmp/$USER/testoutput/PottsCellSorting3D/results_from_time_0/results.pvd`, and click apply.
+ *
+ * Add box "Glyphs" to represent lattice sites. You will need to adjust the size so they don't overlap.
+ *
+ * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
+ * displayed by Paraview.
+ *
+ * Select the "Display" tab and select "color by" cell label (you can also "color by" cell index to see individual cells).
+ *
+ * Add a "Threshold" filter, filter by cell type and make the lower threshold 0 or greater (unoccupied lattice sites are labelled with -1). This will allow you to view only the cells.
+ *
+ * Click play to see the evolution of the simulation.
+ *
+ * You should see that the cells sort into ones of the same type.
+ */
 
 #endif /* TESTRUNNINGPOTTSBASEDSIMULATIONSTUTORIAL_HPP_ */

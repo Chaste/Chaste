@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -51,8 +51,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * ### Introduction
  *
- * EMPTYLINE
- *
  * In this tutorial, we show how to create a new cell-based simulation modifier
  * and use this in a cell-based simulation. The simulation modifier class
  * hierarchy is used to implement setup, update and finalise methods in cell-based
@@ -90,7 +88,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * As an example, let us consider a simulation modifier that, at each simulation
  * time step, calculates each cell's height (y coordinate) in a two-dimensional
- * domain and stores it in in the CellData property as "height". This might be
+ * domain and stores it in in the `CellData` property as "height". This might be
  * used, for example in cell-based simulations where cell behaviour is dictated
  * through some form of positional information along a tissue axis.
  *
@@ -208,8 +206,6 @@ CHASTE_CLASS_EXPORT(CellHeightTrackingModifier)
 CHASTE_CLASS_EXPORT(CellHeightTrackingModifier)
 
 /*
- * EMPTYLINE
- *
  * ### The Tests
  *
  * We now define the test class, which inherits from `AbstractCellBasedTestSuite`.

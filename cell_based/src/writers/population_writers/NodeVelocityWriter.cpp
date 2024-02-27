@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
+#include "ImmersedBoundaryCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::NodeVelocityWriter()
@@ -179,6 +180,12 @@ void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation
             *this->mpOutStream << velocity[i] << " ";
         }
     }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void NodeVelocityWriter<ELEMENT_DIM, SPACE_DIM>::Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+    EXCEPTION("NodeVelocityWriter cannot be used with a ImmersedBoundaryCellPopulation");
 }
 
 // Explicit instantiation

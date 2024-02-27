@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -119,8 +119,6 @@ public:
     void SetShape(double shape);
 
     /**
-     * @return mScale.
-     *
      * @param scale the value of the scale parameter
      */
     void SetScale(double scale);

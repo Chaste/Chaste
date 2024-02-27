@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -203,6 +203,7 @@ public:
      * Constructor for use by boost serialization ONLY!
      *
      * @param rMesh a vertex mesh.
+     * @param rPopSrn a population SRN remapping helper class
      */
     VertexBasedCellPopulation(MutableVertexMesh<DIM, DIM>& rMesh,
                               VertexBasedPopulationSrn<DIM>& rPopSrn);
@@ -275,26 +276,26 @@ public:
 
     /**
      * Overridden GetNeighbouringLocationIndices() method.
-     * Given a cell, returns the set of location indices corresponding to 
+     * Given a cell, returns the set of location indices corresponding to
      * neighbouring cells.
      *
      * @param pCell a cell
-     * 
+     *
      * @return the set of neighbouring location indices.
      */
     std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
 
     /**
      * Overridden GetNeighbouringEdgeIndices() method.
-     * Gets the local edge index of the neighbouring element and the element 
+     * Gets the local edge index of the neighbouring element and the element
      * index.
-     * 
+     *
      * @param pCell  Cell pointer
-     * @param pEdgeIndex Local edge index
-     * 
+     * @param edgeLocalIndex Local edge index
+     *
      * @return set of pairs consisting of element index neighbouring pCell and local edge index
      */
-    std::set<std::pair<unsigned, unsigned>> GetNeighbouringEdgeIndices(CellPtr pCell, unsigned EdgeLocalIndex);
+    std::set<std::pair<unsigned, unsigned>> GetNeighbouringEdgeIndices(CellPtr pCell, unsigned edgeLocalIndex);
 
     /**
      * Overridden AddNode() method.

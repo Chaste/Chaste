@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -59,7 +59,7 @@ Cylindrical2dMesh::~Cylindrical2dMesh()
 
 Cylindrical2dMesh::Cylindrical2dMesh(double width, std::vector<Node<2>* > nodes)
   : MutableMesh<2,2>(),
-    mWidth(width),    
+    mWidth(width),
     mHaloScalingFactor(2.0), // Default value
     mHaloOffset(1.0) // Default value
 {

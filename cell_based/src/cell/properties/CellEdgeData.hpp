@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,8 +50,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 
 /**
- * Data associated with the cell's edges, for use when cells are physically 
- * represented as a VertexMesh. Each data item is an array that has the same 
+ * Data associated with the cell's edges, for use when cells are physically
+ * represented as a VertexMesh. Each data item is an array that has the same
  * size and in the same order as edges in cell's associated VertexElement.
  */
 class CellEdgeData : public AbstractCellProperty
@@ -97,7 +97,7 @@ public:
      * Throws if rVariableName has not been stored.
      *
      * @param rVariableName the name of the data to get.
-     * 
+     *
      * @return An array of cell edge data
      */
     std::vector<double> GetItem(const std::string& rVariableName) const;
@@ -107,7 +107,7 @@ public:
      *
      * @param rVariableName the name of the data to get.
      * @param index the index of the data of rVariableName
-     * 
+     *
      * @return A single value in the data array.
      */
     double GetItemAtIndex(const std::string& rVariableName, const unsigned index);

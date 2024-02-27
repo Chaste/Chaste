@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -146,6 +146,19 @@ public:
      * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */
     virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
+
+    /**
+     * Visit the population and write the labelled boundary length data.
+     *
+     * Outputs a line of tab-separated values of the form:
+     * [fractional_length] [total_length] [fractional_neighbours] [total_neighbours]
+     *
+     * This line is appended to the output written by AbstractCellBasedWriter, which is a single
+     * value [present simulation time], followed by a tab.
+     *
+     * @param pCellPopulation a pointer to the ImmersedBoundaryCellPopulation to visit.
+     */
+    virtual void Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation);
 };
 
 #include "SerializationExportWrapper.hpp"

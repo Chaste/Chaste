@@ -1,15 +1,19 @@
-name: Docker Multi-Arch Develop Image CI
+name: Build chaste/release
 
 on:
+  release:
+    types: [ published ]
   push:
-    branches: [ "develop" ]
-  # Schedule a weekly build on Sunday at 1am after rebuilding the base image
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - '*' # 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+  # Schedule a weekly build on Sunday at 3am after rebuilding the base image
   schedule:
-    - cron: '0 1 * * 0'
+    - cron: '0 3 * * 0'
 
 jobs:
   build:
-    runs-on: docker
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -20,16 +24,18 @@ jobs:
       # https://github.com/docker/metadata-action
       with:
         images: |
-          chaste/develop
+          chaste/release
         flavor: latest=true
         tags: |
           type=schedule,pattern={{date 'YYYYMMDD'}}
-          type=ref,event=pr
-          type=sha
+          # type=semver,pattern={{raw}}
+          type=semver,pattern={{version}}
+          # type=match,pattern=release_(\d.\d)
+          type=ref,event=tag
         labels: |
-          org.opencontainers.image.title=Chaste Develop Image
-          org.opencontainers.image.description=Docker Develop Image for Chaste: Cancer, Heart and Soft Tissue Environment
-          org.opencontainers.image.url=https://hub.docker.com/repository/docker/chaste/develop/general
+          org.opencontainers.image.title=Chaste Release Image
+          org.opencontainers.image.description=Docker Release Image for Chaste: Cancer, Heart and Soft Tissue Environment
+          org.opencontainers.image.url=https://hub.docker.com/repository/docker/chaste/releases
           org.opencontainers.image.source=https://github.com/Chaste/chaste-docker
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
@@ -52,7 +58,10 @@ jobs:
         context: .
         file: docker/Dockerfile
         build-args: |
-            "GIT_TAG=."
+            'GIT_TAG=.'
+            'CMAKE_BUILD_TYPE="Release"'
+            'Chaste_ERROR_ON_WARNING="OFF"'
+            'Chaste_UPDATE_PROVENANCE="ON"'
         platforms: 'amd64,arm64'
         push: true
         tags: ${{ steps.meta.outputs.tags }}

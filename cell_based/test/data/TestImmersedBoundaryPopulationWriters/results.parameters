@@ -1,0 +1,7 @@
+		<ImmersedBoundaryDivisionRule>
+			<ShortAxisImmersedBoundaryDivisionRule-2>
+			</ShortAxisImmersedBoundaryDivisionRule-2>
+		</ImmersedBoundaryDivisionRule>
+		<DampingConstantNormal>1</DampingConstantNormal>
+		<DampingConstantMutant>1</DampingConstantMutant>
+		<OutputResultsForChasteVisualizer>1</OutputResultsForChasteVisualizer>

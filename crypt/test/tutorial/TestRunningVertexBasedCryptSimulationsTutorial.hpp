@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,8 +50,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * ### Introduction
  *
  * In this tutorial we show how Chaste can be used to create, run and visualize vertex-based simulations.
- * This mechanical model was originally proposed by T. Nagai and H. Honda ("A dynamic cell model for
- * the formation of epithelial tissues", Philosophical Magazine Part B 81:699-719).
+ * This mechanical model was originally proposed by T. Nagai and H. Honda, 2000, "A dynamic cell model for
+ * the formation of epithelial tissues", Philosophical Magazine Part B 81:699-719, doi:[10.1103/PhysRevLett.69.2013](https://doi.org/10.1103/PhysRevLett.69.2013).
  *
  * ### The test
  *
@@ -91,7 +91,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * between neighbouring cells in the cell population, subject to each vertex.
  */
 #include "NagaiHondaForce.hpp"
-/* In conjunction with the `NagaiHondaForce`, we choose to use a child class 
+/* In conjunction with the `NagaiHondaForce`, we choose to use a child class
  * of `AbstractTargetAreaModifier` to model cell growth between divisions.
  * Here, we use the `SimpleTargetAreaModifier`.
  */
@@ -101,13 +101,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestRunningVertexBasedCryptSimulationsTutorial : public AbstractCellBasedTestSuite
 {
 public:
-
-    /* EMPTYLINE
-     *
-     *
+    /*
      * ### Test 1 - create a vertex-based crypt simulation
-     *
-     * EMPTYLINE
      *
      * The first test generates a crypt, in which we use a cylindrical vertex mesh,
      * give each cell a fixed cell-cycle model, and enforce sloughing at the top of
@@ -152,10 +147,10 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_force);
         simulator.AddForce(p_force);
 
-        /* We next add a child class of `AbstractTargetAreaModifier` to the 
-         * simulation. This modifier assigns and updates target areas to each 
-         * cell throughout the simulation, modelling cell growth between 
-         * divisions. The target areas are in turn used by the force law to 
+        /* We next add a child class of `AbstractTargetAreaModifier` to the
+         * simulation. This modifier assigns and updates target areas to each
+         * cell throughout the simulation, modelling cell growth between
+         * divisions. The target areas are in turn used by the force law to
          * determine the pressure forces on each vertex.
          */
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
@@ -174,23 +169,15 @@ public:
     }
 
     /*
-     * EMPTYLINE
-     *
      * To visualize the results, open a new terminal, `cd` to the Chaste directory,
      * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/VertexCrypt/results_from_time_0`.
      * You may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
      * java executable.
      *
-     * EMPTYLINE
-     *
      * When we visualize the results, we should see three colours of cells: a row of blue stem cells, 3 rows of yellow transit
      * cells, and 5 rows of pink differentiated cells. Cells above 6.0 will be sloughed off immediately.
      *
-     * EMPTYLINE
-     *
      * ### Test 2 - create a vertex-based crypt simulation with a simple wnt dependent cell-cycle model
-     *
-     * EMPTYLINE
      *
      * The next test generates a crypt, in which we use a cylindrical vertex mesh, and
      * impose a linearly decreasing concentration gradient of Wnt. Cells detect the level of Wnt
@@ -219,7 +206,7 @@ public:
         /* Define the crypt length; this will be used for sloughing and calculating the Wnt gradient. */
         double crypt_length = 6.0;
 
-        /* Set up a `WntConcentration` object, as in UserTutorials/RunningMeshBasedCryptSimulations. */
+        /* Set up a `WntConcentration` object, as in the tutorial [Running Mesh Based Simulations](../runningmeshbasedsimulations/).*/
         WntConcentration<2>::Instance()->SetType(LINEAR);
         WntConcentration<2>::Instance()->SetCellPopulation(crypt);
         WntConcentration<2>::Instance()->SetCryptLength(crypt_length);
@@ -246,14 +233,11 @@ public:
         simulator.Solve();
     }
     /*
-    * EMPTYLINE
     *
     * To visualize the results, open a new terminal, `cd` to the Chaste directory,
     * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/VertexCryptWithSimpleWntCellCycleModel/results_from_time_0`.
     * You may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
     * java executable.
-    *
-    * EMPTYLINE
     *
     * When we visualize the results, we should see two colours of cells: yellow transit
     * cells and pink differentiated cells. Cells above 6.0 will be sloughed off immediately.

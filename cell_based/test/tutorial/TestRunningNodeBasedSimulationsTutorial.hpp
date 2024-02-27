@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,23 +47,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * ## Examples showing how to create, run and visualize node-based simulations
  *
- * EMPTYLINE
- *
  * ### Introduction
  *
- * EMPTYLINE
- *
  * In this tutorial we show how Chaste can be used to create, run and visualize node-based simulations.
- * Full details of the mechanical model can be found in Pathamathan et al "A computational study of
- * discrete mechanical tissue models", Physical Biology. Vol. 6. No. 3. 2009.. DOI (10.1088/1478-3975/6/3/036001).
- *
- * EMPTYLINE
+ * Full details of the mechanical model can be found in Pathamathan *et al.* "A computational study of
+ * discrete mechanical tissue models", Physical Biology. Vol. 6. No. 3. 2009. doi:[10.1088/1478-3975/6/3/036001](https://doi.org/10.1088/1478-3975/6/3/036001).
  *
  * ### The test
  *
- * EMPTYLINE
- *
- * As in previous cell-based Chaste tutorials (UserTutorials/RunningMeshBasedSimulations), we begin by including the necessary header files.
+ * As in previous cell-based Chaste tutorials ([Running Mesh Based Simulations](../runningmeshbasedsimulations/)), we begin by including the necessary header files.
  */
 #include <cxxtest/TestSuite.h>
 #include "CheckpointArchiveTypes.hpp"
@@ -73,7 +65,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 /* The remaining header files define classes that will be used in the cell population
  * simulation test. We encountered some of these header files in
- * UserTutorials/RunningMeshBasedSimulations. */
+ * [Running Mesh Based Simulations](../runningmeshbasedsimulations/). */
 #include "CellsGenerator.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "UniformCellCycleModel.hpp"
@@ -92,11 +84,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestRunningNodeBasedSimulationsTutorial : public AbstractCellBasedTestSuite
 {
 public:
-    /* EMPTYLINE
-     *
+    /*
      * ### Test 1 - a basic node-based simulation
-     *
-     * EMPTYLINE
      *
      * In the first test, we run a simple node-based simulation, in which we create a monolayer
      * of cells, using a nodes only mesh. Each cell is assigned a stochastic cell-cycle model.
@@ -117,7 +106,7 @@ public:
         boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
         /* Once we have a `MutableMesh` we can generate a `NodesOnlyMesh` from it using the
          * following commands. Note you can also generate the `NodesOnlyMesh` from a collection of
-         * nodes, see  [NodesOnlyMesh](https://chaste.github.io/doxygen-latest/classNodesOnlyMesh.html) for details.
+         * nodes, see  [NodesOnlyMesh](/doxygen-latest/classNodesOnlyMesh.html) for details.
          */
         NodesOnlyMesh<2> mesh;
         /* To run node-based simulations you need to define a cut off length (second argument in
@@ -165,14 +154,12 @@ public:
     }
 
     /*
-     * EMPTYLINE
-     *
      * To visualize the results, open a new terminal, `cd` to the Chaste directory,
-     * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/NodeBasedMonolayer/results_from_time_0`.
-     * we need to select the 'Cells as circles` option to be able to visualize the cells, as opposed
+     * then `cd anim`. Then do `java Visualize2dCentreCells /tmp/$USER/testoutput/NodeBasedMonolayer/results_from_time_0`.
+     * We need to select the `Cells as circles` option to be able to visualize the cells, as opposed
      * to just the centres.
-     * We may have to do: `javac Visualize2dCentreCells.java` beforehand to create the
-     * java executable.
+     * You may have to do: `javac Visualize2dCentreCells.java` beforehand to create the
+     * java executable if you haven't done that before.
      *
      * Alternatively, to view in Paraview, load the file `/tmp/$USER/testoutput/NodeBasedMonolayer/results_from_time_0/results.pvd`
      * and add glyphs to represent cells. An option is to use 3D spherical glyphs and then make a planar cut.
@@ -181,11 +168,7 @@ public:
      *
      *
      *
-     * EMPTYLINE
-     *
      * ### Test 2 - a basic node-based simulation in 3D
-     *
-     * EMPTYLINE
      *
      * In the second test we run a simple node-based simulation in 3D. This is very similar
      * to the 2D test with the dimension template (<2,2> and <2>) changed from 2 to 3 and instead of using a mesh
@@ -253,19 +236,14 @@ public:
     }
 
     /*
-     * EMPTYLINE
-     *
      * Note that you **cannot view the results of a 3D simulation using the Java visualiser** but
-     * to visualize the results, use Paraview. See the UserTutorials/VisualizingWithParaview tutorial for more information.
+     * to visualize the results, use Paraview.
+     * See the [Visualizing With Paraview](../visualizingwithparaview/) tutorial for more information.
      *
      * Load the file `/tmp/$USER/testoutput/NodeBasedSpheroid/results_from_time_0/results.pvd`,
      * and add spherical glyphs to represent cells.
      *
-     * EMPTYLINE
-     *
      * ### Test 3 - a node-based simulation on a restricted geometry
-     *
-     * EMPTYLINE
      *
      * In the third test we run a node-based simulation restricted to the surface of a sphere.
      */
@@ -313,8 +291,7 @@ public:
          * which restricts cells to lie on a sphere (in 3D) or circle (in 2D).
          *
          * For a list of possible boundary conditions see subclasses of `AbstractCellPopulationBoundaryCondition`.
-         * These can be found in the inheritance diagram, here,
-         * [AbstractCellPopulationBoundaryCondition](https://chaste.github.io/doxygen-latest/classAbstractCellPopulationBoundaryCondition.html).
+         * These can be found in the inheritance diagram, [here for AbstractCellPopulationBoundaryCondition](/doxygen-latest/classAbstractCellPopulationBoundaryCondition.html).
          * Note that some of these boundary conditions are not compatible with node-based simulations see the specific class documentation for details,
          * if you try to use an incompatible class then you will receive a warning.
          *
@@ -323,7 +300,7 @@ public:
         c_vector<double,3> centre = zero_vector<double>(3);
         centre(2) = 1.0;
         double radius = 1.0;
-        /* We then make a pointer to the boundary condition using the MAKE_PTR_ARGS macro, and pass
+        /* We then make a pointer to the boundary condition using the `MAKE_PTR_ARGS` macro, and pass
          * it to the `OffLatticeSimulation`. */
         MAKE_PTR_ARGS(SphereGeometryBoundaryCondition<3>, p_boundary_condition, (&cell_population, centre, radius));
         simulator.AddCellPopulationBoundaryCondition(p_boundary_condition);
@@ -342,16 +319,12 @@ public:
             delete nodes[i];
         }
     }
-    /*
-     * EMPTYLINE
-     *
-     * To visualize the results, use Paraview. See the UserTutorials/VisualizingWithParaview tutorial for more information.
-     *
-     * Load the file `/tmp/$USER/testoutput/NodeBasedOnSphere/results_from_time_0/results.pvd`,
-     * and add spherical glyphs to represent cells.
-     *
-     * EMPTYLINE
-     */
 };
+/*
+ * To visualize the results, use Paraview. See the [Visualizing With Paraview](../visualizingwithparaview/) tutorial for more information.
+ *
+ * Load the file `/tmp/$USER/testoutput/NodeBasedOnSphere/results_from_time_0/results.pvd`,
+ * and add spherical glyphs to represent cells.
+ */
 
 #endif /* TESTRUNNINGNODEBASEDSIMULATIONSTUTORIAL_HPP_ */

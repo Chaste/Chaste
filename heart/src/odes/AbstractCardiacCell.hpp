@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -369,11 +369,11 @@ public:
     virtual void SetSlowValues(const std::vector<double> &rSlowValues);
 
     /**
-     * @return the current values of the slow variables. Should only be valid in slow mode.
+     * Returns the current values of the slow variables (via rSlowValues). Should only be valid in slow mode.
      *
      * \note  This \e must be implemented by fast/slow cardiac cell subclasses.
      *
-     * @param rSlowValues  will be filled in with the values of the slow variables on return.
+     * @param rSlowValues  will be filled in with the values of the slow variables (returned).
      */
     virtual void GetSlowValues(std::vector<double>& rSlowValues);
 

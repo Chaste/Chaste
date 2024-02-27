@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,8 +44,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * dividing per hour, which depends on whether they are laballed.
  *
  * The class includes three parameters: the first, mDivisionProbability, defines the probability
- * of dividing per hour for unlabelled cells; the second, mLabelledDivisonProbability, defines the 
- * probability of dividing per hour for labelled cells; and the third, mMinimumDivisionAge, defines 
+ * of dividing per hour for unlabelled cells; the second, mLabelledDivisonProbability, defines the
+ * probability of dividing per hour for labelled cells; and the third, mMinimumDivisionAge, defines
  * a minimum age at which any cells may divide.
  */
 class LabelDependentBernoulliTrialCellCycleModel : public AbstractCellCycleModel
@@ -164,7 +164,7 @@ public:
      * @return mDivisionProbability
      */
     double GetDivisionProbability();
-  
+
     /**
      * Set the value of mMinimumDivisionAge.
      *

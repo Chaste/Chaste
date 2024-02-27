@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -61,25 +61,25 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 
-/* The next header includes the Boost shared_ptr smart pointer, and defines some useful
+/* The next header includes the Boost `shared_ptr` smart pointer, and defines some useful
  * macros to save typing when using it. */
 #include "SmartPointers.hpp"
-/* The next header includes the NEVER_REACHED macro, used in one of the methods below. */
+/* The next header includes the `NEVER_REACHED` macro, used in one of the methods below. */
 #include "Exception.hpp"
 
 /* The next header defines a base class for simple generation-based cell-cycle models.
- * A cell-cycle model is defined as ''simple'' if the duration of each phase of the cell
+ * A cell-cycle model is defined as *simple* if the duration of each phase of the cell
  * cycle is determined when the cell-cycle model is created, rather than
  * evaluated on the fly (e.g. by solving a system of ordinary differential
  * equations for the concentrations of key cell cycle proteins), and may
- * depend on the cell type. A simple cell-cycle model is defined as ''generation-based'' if it keeps track of the
+ * depend on the cell type. A simple cell-cycle model is defined as *generation-based* if it keeps track of the
  * generation of the corresponding cell, and sets the cell type according
  * to this. Our new cell-cycle model will inherit from this abstract class. */
 #include "AbstractSimpleGenerationalCellCycleModel.hpp"
 
 /* The remaining header files define classes that will be used in the cell-based
  * simulation test. We have encountered each of these header files in previous cell-based Chaste
- * tutorials, except for `CheckReadyToDivideAndPhaseIsUpdated`, which defines a helper
+ * tutorials, except for `CheckReadyToDivideAndPhaseIsUpdated()`, which defines a helper
  * class for testing a cell-cycle model. */
 #include "CheckReadyToDivideAndPhaseIsUpdated.hpp"
 #include "HoneycombMeshGenerator.hpp"
@@ -139,7 +139,7 @@ private:
         assert(mpCell != NULL);
 
         /* We now set the G1 duration based on cell type. For stem and transit cells, we use the `RandomNumberGenerator`
-         * singleton class to generate a random number U drawn from U![0,1], and
+         * singleton class to generate a random number U drawn from U[0,1], and
          * transform this into a random number T drawn from Exp(λ) using
          * the transformation T = -log(U)/λ. For differentiated cells, which do not progress through the
          * cell cycle, we set the G1 duration to `DBL_MAX`. */
@@ -221,7 +221,7 @@ CHASTE_CLASS_EXPORT(MyCellCycleModel)
 /* Since we're defining the new cell-cycle model within the test file, we need to include the
  * following stanza as well, to make the code work with newer versions of the Boost libraries.
  * Normally the above export declaration would occur in the cell-cycle model's .hpp file, and
- * the following lines would appear in the .cpp file.  See ChasteGuides/BoostSerialization for
+ * the following lines would appear in the .cpp file.  See [Boost Serialization Guide](/docs/user-guides/boost-serialization/) for
  * more information.
  */
 #include "SerializationExportWrapperForCpp.hpp"
@@ -266,7 +266,7 @@ public:
         }
 
         /* To check the CCM has been set up correctly we get a pointer to the one stored on the first cell.
-         * We use a static_cast so we can access all the member variables in the concrete class MyCellCycleModel.
+         * We use a static_cast so we can access all the member variables in the concrete class `MyCellCycleModel`.
          *
          * Find the mean G1 duration and test that it is within some tolerance of
          * the expected value: */

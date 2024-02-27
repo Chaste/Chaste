@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,21 +47,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * ## Examples showing how to create, run and visualize vertex-based simulations
  *
- * EMPTYLINE
- *
  * ### Introduction
  *
- * EMPTYLINE
- *
  * In this tutorial we show how Chaste can be used to create, run and visualize vertex-based simulations.
- * Full details of the mechanical model proposed by T. Nagai and H. Honda ("A dynamic cell model for
- * the formation of epithelial tissues", Philosophical Magazine Part B 81:699-719).
- *
- * EMPTYLINE
+ * Full details of the mechanical model proposed by T. Nagai and H. Honda, 2000, "A dynamic cell model for
+ * the formation of epithelial tissues", Philosophical Magazine Part B 81:699-719, doi:[10.1103/PhysRevLett.69.2013](https://doi.org/10.1103/PhysRevLett.69.2013).
  *
  * ### The test
- *
- * EMPTYLINE
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary header files.
  */
@@ -106,11 +98,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestRunningVertexBasedSimulationsTutorial : public AbstractCellBasedTestSuite
 {
 public:
-    /* EMPTYLINE
-    *
+    /*
     * ### Test 1 - a basic vertex-based simulation
-    *
-    * EMPTYLINE
     *
     * In the first test, we run a simple vertex-based simulation, in which we create a monolayer
     * of cells, using a mutable vertex mesh. Each cell is assigned a stochastic cell-cycle model.
@@ -165,7 +154,7 @@ public:
         * Nagai-Honda mechanics, and pass it to the `OffLatticeSimulation`.
         * For a list of possible forces see subclasses of `AbstractForce`.
         * These can be found in the inheritance diagram, here,
-        * [AbstractForce](https://chaste.github.io/doxygen-latest/classAbstractForce).
+        * [AbstractForce](/doxygen-latest/classAbstractForce).
         * Note that some of these forces are not compatible with vertex-based simulations see the specific class documentation for details,
         * if you try to use an incompatible class then you will receive a warning.
         */
@@ -190,18 +179,13 @@ public:
     }
 
     /*
-    * EMPTYLINE
     *
     * To visualize the results, open a new terminal, `cd` to the Chaste directory,
     * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/VertexBasedMonolayer/results_from_time_0`.
     * We may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
     * java executable.
     *
-    * EMPTYLINE
-    *
     * ### Test 2 - introducing periodicity, boundaries and cell killers
-    *
-    * EMPTYLINE
     *
     * In the second test, we run a simple vertex-based simulation, in which we create a monolayer
     * of cells in a periodic geometry, using a cylindrical vertex mesh. We also include a fixed
@@ -254,7 +238,7 @@ public:
          * we use a `PlaneBoundaryCondition`, and pass it to the `OffLatticeSimulation`.
          * For a list of possible boundary condition see subclasses of `AbstractCellPopulationBoundaryCondition`.
          * These can be found in the inheritance diagram, here,
-         * [AbstractCellPopulationBoundaryCondition](https://chaste.github.io/doxygen-latest/classAbstractCellPopulationBoundaryCondition.html).
+         * [AbstractCellPopulationBoundaryCondition](/doxygen-latest/classAbstractCellPopulationBoundaryCondition.html).
          * Note that some of these boundary conditions are not compatible with vertex-based
          * simulations see the specific class documentation for details, if you try to use an
          * incompatible class then you will receive a warning.
@@ -273,7 +257,7 @@ public:
          * from the simulation. For this test, we use a `PlaneBasedCellKiller`, and pass
          * it to the `OffLatticeSimulation`. For a list of possible cell killers see subclasses
          * of `AbstractCellKiller`. These can be found in the inheritance diagram, here,
-         * [AbstractCellKiller](https://chaste.github.io/doxygen-latest/classAbstractCellKiller.html).
+         * [AbstractCellKiller](/doxygen-latest/classAbstractCellKiller.html).
          *
          * The first step is to define a point on the plane boundary and a normal to the plane.
          * We reuse the point and normal from the `PlaneBoundaryCondition`.
@@ -293,17 +277,15 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 12u);
         TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 1.0, 1e-10);
     }
-    /*
-     * EMPTYLINE
-     *
-     * To visualize the results, open a new terminal, `cd` to the Chaste directory,
-     * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/VertexBasedPeriodicMonolayer/results_from_time_0`.
-     *
-     * You should see that the edges of the mesh are identical on both sides; cells no
-     * longer pass through the line y=0; and cells are removed at y=3.
-     *
-     * EMPTYLINE
-     */
 };
+/*
+ *
+ * To visualize the results, open a new terminal, `cd` to the Chaste directory,
+ * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/VertexBasedPeriodicMonolayer/results_from_time_0`.
+ *
+ * You should see that the edges of the mesh are identical on both sides; cells no
+ * longer pass through the line y=0; and cells are removed at y=3.
+ *
+ */
 
 #endif /* TESTRUNNINGVERTEXBASEDSIMULATIONSTUTORIAL_HPP_ */

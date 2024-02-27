@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -57,6 +57,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileComparison.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
+#include "ImmersedBoundaryCellPopulation.hpp"
+#include "ImmersedBoundaryMesh.hpp"
+#include "ImmersedBoundaryHoneycombMeshGenerator.hpp"
 #include "MutableVertexMesh.hpp"
 #include "NoCellCycleModel.hpp"
 #include "NodeBasedCellPopulation.hpp"
@@ -87,6 +90,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellRadiusWriter.hpp"
 #include "CellRosetteRankWriter.hpp"
 #include "CellVolumesWriter.hpp"
+#include "ImmersedBoundaryNeighbourNumberWriter.hpp"
+#include "ImmersedBoundaryBoundaryCellWriter.hpp"
 
 // Boost
 #include <boost/make_shared.hpp>
@@ -1784,6 +1789,122 @@ public:
         for (auto& p_node : nodes)
         {
             delete p_node;
+        }
+    }
+
+    void TestImmersedBoundaryCellWriter()
+    {
+        EXIT_IF_PARALLEL;
+        ImmersedBoundaryBoundaryCellWriter<2, 2> writer;
+
+        // Create an immersed boundary cell population object
+        ImmersedBoundaryHoneycombMeshGenerator gen(3, 3, 5, 0.05, 0.15);
+        ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        ImmersedBoundaryCellPopulation<2> ib_cell_population(*p_mesh, cells);
+
+        // Create an output directory for the writer
+        std::string output_directory = "TestCellWriters";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        writer.OpenOutputFile(output_file_handler);
+        writer.WriteTimeStamp();
+        writer.VisitCell(ib_cell_population.rGetCells().front(), &ib_cell_population);
+        writer.WriteNewline();
+        writer.CloseFile();
+
+        FileComparison(results_dir + "ib_boundarycell.dat", "cell_based/test/data/TestCellWriters/ib_boundarycell.dat").CompareFiles();
+    }
+
+    void TestImmersedBoundaryCellWriterArchiving()
+    {
+        // The purpose of this test is to check that archiving can be done for this class
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ImmersedBoundaryCellWriterArchive.arch";
+
+        {
+            AbstractCellBasedWriter<2,2>* const p_cell_writer = new ImmersedBoundaryBoundaryCellWriter<2,2>();
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_cell_writer;
+
+            delete p_cell_writer;
+        }
+
+        {
+            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_cell_writer_2;
+
+            delete p_cell_writer_2;
+        }
+    }
+
+    void TestImmersedBoundaryNeighbourNumberWriter()
+    {
+        EXIT_IF_PARALLEL;
+        ImmersedBoundaryNeighbourNumberWriter<2, 2> writer;
+
+        // Create an immersed boundary cell population object
+        ImmersedBoundaryHoneycombMeshGenerator gen(3, 3, 5, 0.05, 0.15);
+        ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumElements());
+
+        ImmersedBoundaryCellPopulation<2> ib_cell_population(*p_mesh, cells);
+
+        // Create an output directory for the writer
+        std::string output_directory = "TestCellWriters";
+        OutputFileHandler output_file_handler(output_directory, false);
+        std::string results_dir = output_file_handler.GetOutputDirectoryFullPath();
+
+        writer.OpenOutputFile(output_file_handler);
+        writer.WriteTimeStamp();
+        writer.VisitCell(ib_cell_population.rGetCells().front(), &ib_cell_population);
+        writer.WriteNewline();
+        writer.CloseFile();
+
+        FileComparison(results_dir + "ib_neighbournumber.dat", "cell_based/test/data/TestCellWriters/ib_neighbournumber.dat").CompareFiles();
+    }
+
+    void TestImmersedBoundaryNeighbourNumberWriterArchiving()
+    {
+        // The purpose of this test is to check that archiving can be done for this class
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ImmersedBoundaryNeighbourNumberWriterArchive.arch";
+
+        {
+            AbstractCellBasedWriter<2,2>* const p_cell_writer = new ImmersedBoundaryNeighbourNumberWriter<2,2>();
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << p_cell_writer;
+
+            delete p_cell_writer;
+        }
+
+        {
+            AbstractCellBasedWriter<2,2>* p_cell_writer_2;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> p_cell_writer_2;
+
+            delete p_cell_writer_2;
         }
     }
 };
