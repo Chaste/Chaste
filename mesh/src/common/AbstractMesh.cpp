@@ -248,8 +248,9 @@ ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingB
         {
             if (!rNodes[index]->IsDeleted())
             {
-                // Using ExplicitVectorCopy to avoid compiler warnings about potentially uninitialized c_vectors.
-                c_vector<double, SPACE_DIM> position = ExplicitVectorCopy<SPACE_DIM>(rNodes[index]->rGetLocation());
+                DISABLE_C_VECTOR_WARNING_BEGIN
+                c_vector<double, SPACE_DIM> position = rNodes[index]->rGetLocation();
+                DISABLE_C_VECTOR_WARNING_END
 
                 // Update max/min
                 for (unsigned i = 0; i < SPACE_DIM; i++)

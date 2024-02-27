@@ -688,22 +688,4 @@ c_vector<double, 2> Create_c_vector(double x, double y);
  */
 c_vector<double, 3> Create_c_vector(double x, double y, double z);
 
-/**
- * An explicit copy function when we run into compiler warnings about potentially uninitialised c_vectors.
- * This method should only be used when the ublas copy construction/assignment is emitting warnings.
- *
- * @param other the vector that we want to explicitly copy
- * @return an explicit deep copy
- */
-template<unsigned DIM>
-c_vector<double, DIM> ExplicitVectorCopy(const c_vector<double, DIM>& other)
-{
-    c_vector<double, DIM> explicit_copy;
-    for(unsigned i = 0; i < DIM; ++i)
-    {
-        explicit_copy[i] = other[i];
-    }
-    return explicit_copy;
-}
-
 #endif /*UBLASCUSTOMFUNCTIONS_HPP_*/
