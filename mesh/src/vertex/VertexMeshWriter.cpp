@@ -290,13 +290,14 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DI
     p_pts->GetData()->SetName("Vertex positions");
     for (unsigned node_num = 0; node_num < rMesh.GetNumNodes(); node_num++)
     {
+        DISABLE_C_VECTOR_WARNING_BEGIN
         c_vector<double, SPACE_DIM> position;
         position = rMesh.GetNode(node_num)->rGetLocation();
-        if (SPACE_DIM == 2)
+        if constexpr (SPACE_DIM == 2)
         {
             p_pts->InsertPoint(node_num, position[0], position[1], 0.0);
         }
-        else if (SPACE_DIM == 3)
+        else if constexpr (SPACE_DIM == 3)
         {
             p_pts->InsertPoint(node_num, position[0], position[1], position[2]);
         }
@@ -304,6 +305,7 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DI
         {
             NEVER_REACHED;
         }
+        DISABLE_C_VECTOR_WARNING_END
     }
 
     mpVtkUnstructedMesh->SetPoints(p_pts);

@@ -233,12 +233,14 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool
 
                 if (shared_elements.size() == 1) // It's a boundary edge
                 {
+                    DISABLE_C_VECTOR_WARNING_BEGIN
                     c_vector<double,2> edge = p_node_b->rGetLocation() - p_node_a->rGetLocation();
                     double edge_length = norm_2(edge);
-                    c_vector<double,2> normal_vector;
+                    c_vector<double,2> normal_vector {};
 
                     normal_vector[0]= edge[1];
                     normal_vector[1]= -edge[0];
+                    DISABLE_C_VECTOR_WARNING_END
 
                     double dij = norm_2(normal_vector);
                     assert(dij>1e-5); //Sanity check
@@ -1170,7 +1172,8 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVectorFromAtoB(
     const c_vector<double, SPACE_DIM>& rLocationA, const c_vector<double, SPACE_DIM>& rLocationB)
 {
-    c_vector<double, SPACE_DIM> vector;
+    DISABLE_C_VECTOR_WARNING_BEGIN
+    c_vector<double, SPACE_DIM> vector {};
     if (mpDelaunayMesh)
     {
         vector = mpDelaunayMesh->GetVectorFromAtoB(rLocationA, rLocationB);
@@ -1179,6 +1182,7 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVectorFromAto
     {
         vector = AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetVectorFromAtoB(rLocationA, rLocationB);
     }
+    DISABLE_C_VECTOR_WARNING_END
     return vector;
 }
 

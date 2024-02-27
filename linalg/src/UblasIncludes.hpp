@@ -41,7 +41,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "UblasVectorInclude.hpp"
+
+DISABLE_C_VECTOR_WARNING_BEGIN
 #include "UblasMatrixInclude.hpp"
+DISABLE_C_VECTOR_WARNING_END
 
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <boost/numeric/ublas/matrix_expression.hpp>

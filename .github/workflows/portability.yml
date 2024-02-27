@@ -34,6 +34,10 @@ jobs:
             extra-build-args: ""
           - image: chaste/runner:jammy.portability-03
             extra-build-args: "-DChaste_USE_CVODE=OFF -DChaste_USE_VTK=OFF"
+          - image: chaste/runner:lunar.portability-system
+            extra-build-args: ""
+          - image: chaste/runner:mantic.portability-system
+            extra-build-args: ""
 
     runs-on: ubuntu-latest
 
@@ -90,8 +94,8 @@ jobs:
           export CMAKE_PREFIX_PATH="${XERCESC_ROOT}:${XSD_ROOT}:${SUNDIALS_ROOT}:${VTK_ROOT}"
           echo "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" >> ${GITHUB_ENV}
           su -m runner -c "cmake \
-            -DBoost_NO_BOOST_CMAKE=ON \
-            -DBoost_NO_SYSTEM_PATHS=ON \
+            -DBoost_NO_BOOST_CMAKE=${Boost_NO_BOOST_CMAKE} \
+            -DBoost_NO_SYSTEM_PATHS=${Boost_NO_SYSTEM_PATHS} \
             -DBOOST_ROOT=${BOOST_ROOT} \
             -DCMAKE_BUILD_TYPE=Release \
             ${{ matrix.extra-build-args }} .."

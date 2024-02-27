@@ -110,10 +110,10 @@ std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField
     const double time)
 {
     std::vector<double> samples(rNodes.size());
-    c_vector<double, SPACE_DIM> node_location;
     for (unsigned i = 0; i < samples.size(); ++i)
     {
-        node_location = rNodes[i]->rGetLocation();
+        DISABLE_C_VECTOR_WARNING_BEGIN
+        const c_vector<double, SPACE_DIM> node_location = rNodes[i]->rGetLocation();
         switch (SPACE_DIM)
         {
             case 1:
@@ -135,6 +135,7 @@ std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField
                 // This can't happen
                 NEVER_REACHED;
         }
+        DISABLE_C_VECTOR_WARNING_END
     }
 
     return samples;

@@ -78,7 +78,7 @@ private:
     std::map<unsigned, unsigned> mHaloBoxesMapping;
 
     /** The domain being partitioned. */
-    c_vector<double, 2*DIM> mDomainSize;
+    c_vector<double, 2*DIM> mDomainSize = {};
 
     /** The width of each box. */
     double mBoxWidth;
@@ -87,7 +87,7 @@ private:
     unsigned mNumBoxes;
 
     /** Number of boxes in each direction. */
-    c_vector<unsigned, DIM> mNumBoxesEachDirection;
+    c_vector<unsigned, DIM> mNumBoxesEachDirection = {};
 
     /** Number of boxes in a face (1 in 1d, mNumBoxesEachDirection(0) in 2d, mNumBoxesEachDirection(0)*mNumBoxesEachDirection(1) in 3d */
     unsigned mNumBoxesInAFace;

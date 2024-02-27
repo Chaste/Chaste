@@ -111,11 +111,13 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahe
         global_to_node_index_map[iter->GetIndex()] = index;
         index++;
         (*geometry_file) << "\n\t\t";
+        DISABLE_C_VECTOR_WARNING_BEGIN
         c_vector<double, SPACE_DIM> current_item = (iter)->rGetLocation();
         for (unsigned j=0; j<SPACE_DIM; j++)
         {
             (*geometry_file) << current_item[j] << "\t";
         }
+        DISABLE_C_VECTOR_WARNING_END
     }
 
     // Halo nodes
@@ -128,11 +130,13 @@ void XdmfMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(AbstractTetrahe
             global_to_node_index_map[(*halo_iter)->GetIndex()] = index;
             index++;
             (*geometry_file) << "\n\t\t";
+            DISABLE_C_VECTOR_WARNING_BEGIN
             c_vector<double, SPACE_DIM> current_item = (*halo_iter)->rGetLocation();
             for (unsigned j=0; j<SPACE_DIM; j++)
             {
                 (*geometry_file) << current_item[j] << "\t";
             }
+            DISABLE_C_VECTOR_WARNING_END
         }
     }
     (*geometry_file) << "\n";

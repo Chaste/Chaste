@@ -1613,8 +1613,9 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ChasteCuboid<SPACE_DIM> DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingBox() const
 {
-    ChastePoint<SPACE_DIM> my_minimum_point;
-    ChastePoint<SPACE_DIM> my_maximum_point;
+    DISABLE_C_VECTOR_WARNING_BEGIN
+    ChastePoint<SPACE_DIM> my_minimum_point {};
+    ChastePoint<SPACE_DIM> my_maximum_point {};
 
     try
     {
@@ -1640,6 +1641,7 @@ ChasteCuboid<SPACE_DIM> DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::Calc
 
     ChastePoint<SPACE_DIM> min(global_minimum_point);
     ChastePoint<SPACE_DIM> max(global_maximum_point);
+    DISABLE_C_VECTOR_WARNING_END
 
     return ChasteCuboid<SPACE_DIM>(min, max);
 }

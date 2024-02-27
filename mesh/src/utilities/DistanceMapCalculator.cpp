@@ -284,6 +284,7 @@ double DistanceMapCalculator<ELEMENT_DIM, SPACE_DIM>::SingleDistance(unsigned so
     mSingleTarget = true;
 
     // Set up information on target (for A* guidance)
+    DISABLE_C_VECTOR_WARNING_BEGIN
     c_vector<double, SPACE_DIM> target_point = zero_vector<double>(SPACE_DIM);
     if (mrMesh.GetDistributedVectorFactory()->IsGlobalIndexLocal(mTargetNodeIndex))
     {
@@ -293,6 +294,7 @@ double DistanceMapCalculator<ELEMENT_DIM, SPACE_DIM>::SingleDistance(unsigned so
 
     // Communicate for wherever to everyone
     MPI_Allreduce(&target_point[0], &mTargetNodePoint[0], SPACE_DIM, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+    DISABLE_C_VECTOR_WARNING_END
 
     //mTargetNodePoint;
     std::vector<double> distances;

@@ -84,9 +84,11 @@ public:
 
             for (unsigned i = 0 ; i < box_collection.GetNumBoxes() ; i++)
             {
+                DISABLE_C_VECTOR_WARNING_BEGIN
                 c_vector<int, 1u> grid_indices = box_collection.GetGridIndices(i);
                 TS_ASSERT_EQUALS(grid_indices(0), (int)i);
                 TS_ASSERT_EQUALS(box_collection.GetLinearIndex(grid_indices), i);
+                DISABLE_C_VECTOR_WARNING_END
             }
         }
 

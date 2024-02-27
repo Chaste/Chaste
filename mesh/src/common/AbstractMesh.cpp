@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractMesh.hpp"
 #include "Exception.hpp"
+#include "UblasCustomFunctions.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Implementation
@@ -227,8 +228,8 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingBox(const std::vector<Node<SPACE_DIM>*>& rNodes) const
 {
     // Work out the max and min location in each co-ordinate direction.
-    c_vector<double, SPACE_DIM> minimum_point;
-    c_vector<double, SPACE_DIM> maximum_point;
+    c_vector<double, SPACE_DIM> minimum_point = zero_vector<double>(SPACE_DIM);
+    c_vector<double, SPACE_DIM> maximum_point = zero_vector<double>(SPACE_DIM);
 
     // Deal with the special case of no nodes by returning a cuboid with zero volume.
     if (rNodes.empty())
@@ -247,9 +248,8 @@ ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingB
         {
             if (!rNodes[index]->IsDeleted())
             {
-                // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
-                c_vector<double, SPACE_DIM> position;
-                position = rNodes[index]->rGetLocation();
+                DISABLE_C_VECTOR_WARNING_BEGIN
+                c_vector<double, SPACE_DIM> position = rNodes[index]->rGetLocation();
 
                 // Update max/min
                 for (unsigned i = 0; i < SPACE_DIM; i++)
@@ -263,6 +263,7 @@ ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingB
                         maximum_point[i] = position[i];
                     }
                 }
+                DISABLE_C_VECTOR_WARNING_END
             }
         }
     }

@@ -63,7 +63,7 @@ private:
     unsigned mIndex;
 
     /** The location of this node within the mesh. */
-    c_vector<double, SPACE_DIM> mLocation;
+    c_vector<double, SPACE_DIM> mLocation = {};
 
     /** A pointer to a NodeAttributes object associated with this node. */
     NodeAttributes<SPACE_DIM>* mpNodeAttributes;
