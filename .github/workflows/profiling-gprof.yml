@@ -48,11 +48,11 @@ jobs:
           mkdir -p ${CHASTE_TEST_OUTPUT}
 
       - name: cmake configure
-        run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_PROFILE_GPROF_CPUS=2 ..
+        run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_PROFILE_GPROF_CPUS=4 ..
         working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
       - name: build profiling test pack
-        run: cmake --build . --target Profile --parallel 2
+        run: cmake --build . --target Profile --parallel 4
         working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
       - name: run profiling tests

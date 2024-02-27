@@ -15,7 +15,7 @@ jobs:
 
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
 
-    runs-on: self-hosted
+    runs-on: ubuntu-22.04
 
     env:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
@@ -25,6 +25,13 @@ jobs:
     steps:
     - name: checkout repository
       uses: actions/checkout@v3
+
+    - name: install dependencies
+      run: |
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
+        sudo apt update
+        sudo apt install chaste-dependencies
 
     - name: compiler version
       run: |
@@ -40,7 +47,7 @@ jobs:
       working-directory: chaste-build-dir
 
     - name: build continuous test pack
-      run: cmake --build . --parallel 10 --target Continuous
+      run: cmake --build . --parallel 4 --target Continuous
       working-directory: chaste-build-dir
 
     - name: run continuous test pack

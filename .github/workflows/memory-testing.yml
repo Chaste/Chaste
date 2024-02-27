@@ -15,7 +15,7 @@ jobs:
 
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
 
-    runs-on: self-hosted
+    runs-on: ubuntu-22.04
 
     env:
       CHASTE_DIR: ${{ github.workspace }}/Chaste
@@ -47,21 +47,28 @@ jobs:
           repository: Chaste/Chaste
           path: Chaste
 
+      - name: install dependencies
+        run: |
+          echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+          sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
+          sudo apt update
+          sudo apt install chaste-dependencies
+
       - name: make build and test directories
         run: |
           mkdir -p ${CHASTE_BUILD_DIR}
           mkdir -p ${CHASTE_TEST_OUTPUT}
 
       - name: cmake configure
-        run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_MEMORY_TESTING_CPUS=10 ..
+        run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_MEMORY_TESTING_CPUS=4 ..
         working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
       - name: build continuous test pack
-        run: cmake --build . --target Continuous --parallel 10
+        run: cmake --build . --target Continuous --parallel 4
         working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
       - name: run memtest
-        run: cmake --build . --target memtest --parallel 10
+        run: cmake --build . --target memtest --parallel 4
         working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
       - name: check if index file successfully created
