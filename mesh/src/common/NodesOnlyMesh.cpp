@@ -540,9 +540,8 @@ bool NodesOnlyMesh<SPACE_DIM>::IsANodeCloseToDomainBoundary()
          node_iter != this->GetNodeIteratorEnd();
          ++node_iter)
     {
-        // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
-        c_vector<double, SPACE_DIM> location;
-        location = node_iter->rGetLocation();
+        c_vector<double, SPACE_DIM> location = node_iter->rGetLocation();
+
         // We need to ignore periodic dimensions
         c_vector<bool, SPACE_DIM> is_periodic = mpBoxCollection->GetIsPeriodicAllDims();
         for (unsigned d=0; d<SPACE_DIM; d++)
