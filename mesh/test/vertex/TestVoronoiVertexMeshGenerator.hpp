@@ -241,12 +241,14 @@ public:
         // Verify that all node locations have been moved to be >= 0 and <= width & height
         for (unsigned node_idx = 0 ; node_idx < p_tor_mesh->GetNumNodes() ; node_idx++ )
         {
+            DISABLE_C_VECTOR_WARNING_BEGIN
             c_vector<double, 2> this_location = p_tor_mesh->GetNode(node_idx)->rGetLocation();
 
             TS_ASSERT(this_location[0] >= 0.0);
             TS_ASSERT(this_location[1] >= 0.0);
             TS_ASSERT(this_location[0] < width);
             TS_ASSERT(this_location[1] < height);
+            DISABLE_C_VECTOR_WARNING_END
         }
 
 #endif // BOOST_VERSION >= 105200

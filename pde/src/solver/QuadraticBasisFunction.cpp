@@ -344,12 +344,13 @@ void QuadraticBasisFunction<ELEMENT_DIM>::ComputeBasisFunctionDerivatives(const 
                                                                           c_matrix<double, ELEMENT_DIM, (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2>& rReturnValue)
 {
     assert(ELEMENT_DIM < 4 && ELEMENT_DIM > 0);
-
+    DISABLE_C_VECTOR_WARNING_BEGIN
     for (unsigned j=0; j<(ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2; j++)
     {
         matrix_column<c_matrix<double, ELEMENT_DIM, (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2> > column(rReturnValue, j);
         column = ComputeBasisFunctionDerivative(rPoint, j);
     }
+    DISABLE_C_VECTOR_WARNING_END
 }
 
 /**

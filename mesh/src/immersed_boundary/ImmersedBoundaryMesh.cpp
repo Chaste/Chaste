@@ -1680,7 +1680,9 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(bool randomOrder)
     // Reposition fluid sources to the centroid of cells
     for (auto& p_source : mElementFluidSources)
     {
+        DISABLE_C_VECTOR_WARNING_BEGIN
         p_source->rGetModifiableLocation() = this->GetCentroidOfElement(p_source->GetAssociatedElementIndex());
+        DISABLE_C_VECTOR_WARNING_END
     }
 }
 
@@ -2225,8 +2227,7 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocationsVoronoiDia
             for (const auto& pair : halo_ids_and_locations)
             {
                 const unsigned node_idx = pair.first;
-                c_vector<double, SPACE_DIM> location;
-                location = pair.second;
+                c_vector<double, SPACE_DIM> location = pair.second;
 
                 const int x_coord = ScaleUpToVoronoiCoordinate(location[0]);
                 const int y_coord = ScaleUpToVoronoiCoordinate(location[1]);

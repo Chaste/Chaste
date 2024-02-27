@@ -4128,6 +4128,7 @@ c_vector<double, 2> MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::WidenEdgeOrCorrec
      * \todo currently this assumes a worst case scenario of 3 nodes between A and B could be less movement for other cases
      *       (see #1399 and #2401)
      */
+    DISABLE_C_VECTOR_WARNING_BEGIN
     c_vector<double, SPACE_DIM> vertexA = this->GetNode(indexA)->rGetLocation();
     c_vector<double, SPACE_DIM> vertexB = this->GetNode(indexB)->rGetLocation();
     c_vector<double, SPACE_DIM> vector_a_to_b = this->GetVectorFromAtoB(vertexA, vertexB);
@@ -4152,6 +4153,7 @@ c_vector<double, 2> MutableVertexMesh<ELEMENT_DIM, SPACE_DIM>::WidenEdgeOrCorrec
     // Reset distances
     vector_a_to_b = this->GetVectorFromAtoB(vertexA, vertexB);
     c_vector<double, 2> edge_ab_unit_vector = vector_a_to_b/norm_2(vector_a_to_b);
+    DISABLE_C_VECTOR_WARNING_END
 
     /**
      * Reset the intersection away from vertices A and B to allow enough room
