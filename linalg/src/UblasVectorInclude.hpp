@@ -47,4 +47,18 @@ using boost::numeric::ublas::zero_vector;
 using boost::numeric::ublas::scalar_vector;
 using boost::numeric::ublas::unit_vector;
 
+/*
+ * The following macros allow us to ignore (in a judicious and targeted manner) some spurious GCC warnings about
+ * potentially uninitialised c_vectors. See https://github.com/Chaste/Chaste/issues/231 for full details.
+ */
+#ifdef __GNUC__ // Check if the compiler is GCC or compatible
+#define DISABLE_C_VECTOR_WARNING_BEGIN \
+    _Pragma("GCC diagnostic push") \
+    _Pragma("GCC diagnostic ignored \"-Wmaybe-uninitialized\"")
+#define DISABLE_C_VECTOR_WARNING_END _Pragma("GCC diagnostic pop")
+#else // Define empty macros for other compilers
+#define DISABLE_C_VECTOR_WARNING_BEGIN
+#define DISABLE_C_VECTOR_WARNING_END
+#endif
+
 #endif /*UBLASVECTORINCLUDE_HPP_*/
