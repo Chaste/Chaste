@@ -52,6 +52,7 @@ using boost::numeric::ublas::unit_vector;
  * potentially uninitialised c_vectors. See https://github.com/Chaste/Chaste/issues/231 for full details.
  */
 #ifdef __GNUC__ // Check if the compiler is GCC or compatible
+#if __GNUC__ > 10 || (__GNUC__ == 10 && __GNUC_MINOR__ >= 1)
 #define DISABLE_C_VECTOR_WARNING_BEGIN \
     _Pragma("GCC diagnostic push") \
     _Pragma("GCC diagnostic ignored \"-Wmaybe-uninitialized\"") \
@@ -59,6 +60,14 @@ using boost::numeric::ublas::unit_vector;
     _Pragma("GCC diagnostic ignored \"-Wstringop-overread\"") \
     _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
 #define DISABLE_C_VECTOR_WARNING_END _Pragma("GCC diagnostic pop")
+#else // Macros not including stringop-overread for __GNUC__ < 10.1
+#define DISABLE_C_VECTOR_WARNING_BEGIN \
+    _Pragma("GCC diagnostic push") \
+    _Pragma("GCC diagnostic ignored \"-Wmaybe-uninitialized\"") \
+    _Pragma("GCC diagnostic ignored \"-Wstringop-overflow\"") \
+    _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
+#define DISABLE_C_VECTOR_WARNING_END _Pragma("GCC diagnostic pop")
+#endif
 #else // Define empty macros for other compilers
 #define DISABLE_C_VECTOR_WARNING_BEGIN
 #define DISABLE_C_VECTOR_WARNING_END
