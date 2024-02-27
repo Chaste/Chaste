@@ -54,7 +54,9 @@ using boost::numeric::ublas::unit_vector;
 #ifdef __GNUC__ // Check if the compiler is GCC or compatible
 #define DISABLE_C_VECTOR_WARNING_BEGIN \
     _Pragma("GCC diagnostic push") \
-    _Pragma("GCC diagnostic ignored \"-Wmaybe-uninitialized\"")
+    _Pragma("GCC diagnostic ignored \"-Wmaybe-uninitialized\"") \
+    _Pragma("GCC diagnostic ignored \"-Wstringop-overflow\"") \
+    _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
 #define DISABLE_C_VECTOR_WARNING_END _Pragma("GCC diagnostic pop")
 #else // Define empty macros for other compilers
 #define DISABLE_C_VECTOR_WARNING_BEGIN

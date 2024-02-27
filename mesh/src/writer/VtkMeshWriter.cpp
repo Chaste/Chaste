@@ -616,6 +616,7 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
              node_iter != rMesh.GetNodeIteratorEnd();
              ++node_iter)
         {
+            DISABLE_C_VECTOR_WARNING_BEGIN
             c_vector<double, SPACE_DIM> current_item = node_iter->rGetLocation();
             if (SPACE_DIM == 3)
             {
@@ -629,6 +630,7 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
             {
                 p_pts->InsertNextPoint(current_item[0], 0.0, 0.0);
             }
+            DISABLE_C_VECTOR_WARNING_END
         }
 
         // Halo nodes
@@ -638,6 +640,7 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
                     halo_iter != this->mpDistributedMesh->GetHaloNodeIteratorEnd();
                     ++halo_iter)
             {
+                DISABLE_C_VECTOR_WARNING_BEGIN
                 c_vector<double, SPACE_DIM> current_item = (*halo_iter)->rGetLocation();
                 if (SPACE_DIM == 3)
                 {
@@ -651,6 +654,7 @@ void VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(
                 {
                     p_pts->InsertNextPoint(current_item[0], 0.0, 0.0);
                 }
+                DISABLE_C_VECTOR_WARNING_END
             }
         }
 
