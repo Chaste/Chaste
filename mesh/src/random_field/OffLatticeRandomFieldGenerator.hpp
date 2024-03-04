@@ -146,7 +146,7 @@ public:
      *
      * @return A vector representing an instance of the random field.
      */
-    std::vector<double> SampleRandomFieldAtTime(const std::vector<Node<SPACE_DIM>*>& rNodes, const double time);
+    std::vector<double> SampleRandomFieldAtTime(const std::vector<Node<SPACE_DIM>*>& rNodes, double time);
 
     /**
      * Set the random seed used for the generator.

@@ -131,7 +131,7 @@ public:
                 nodes[node_idx] = new Node<1>(node_idx, Create_c_vector(10.0 * p_gen->ranf()));
             }
 
-            auto random_field = gen.SampleRandomFieldAtTime(nodes, 0.5);
+            auto random_field = gen.SampleRandomField(nodes);
 
             std::transform(random_field.begin(), random_field.end(), random_field.begin(), [] (const double& v) { return std::abs(v); });
             auto sum = std::accumulate(random_field.begin(), random_field.end(), 0.0);
@@ -140,7 +140,7 @@ public:
             {
                 delete p_node;
             }
-            TS_ASSERT_DELTA(sum, 28.0820, 0.1)
+            TS_ASSERT_DELTA(sum, 23.1313, 0.1)
         }
         { // 1D
             auto p_gen = RandomNumberGenerator::Instance();
@@ -175,7 +175,7 @@ public:
                 delete p_node;
             }
             TS_ASSERT(sum > 0.0)
-            TS_ASSERT_DELTA(sum, 30.6619, 0.1)
+            TS_ASSERT_DELTA(sum, 31.0708, 0.1)
         }
         { // 2D
             auto p_gen = RandomNumberGenerator::Instance();
@@ -245,7 +245,7 @@ public:
                 delete p_node;
             }
             TS_ASSERT(sum > 0.0)
-            TS_ASSERT_DELTA(sum, 16.1120, 0.1)
+            TS_ASSERT_DELTA(sum, 16.3562, 0.1)
         }
     }
 
