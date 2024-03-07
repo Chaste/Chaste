@@ -60,9 +60,9 @@ jobs:
       working-directory: chaste-build-dir
 
     - name: build targets
-      run: cmake --build . --parallel 2 --target ${{ matrix.build_target }}
+      run: cmake --build . --parallel 4 --target ${{ matrix.build_target }}
       working-directory: chaste-build-dir
 
     - name: run Nightly test pack
-      run: ctest -j2 -L ${{ matrix.test_target }}
+      run: ctest -j4 -L ${{ matrix.test_target }}
       working-directory: chaste-build-dir
