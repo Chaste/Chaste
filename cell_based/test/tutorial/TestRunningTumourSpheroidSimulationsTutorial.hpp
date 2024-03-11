@@ -195,22 +195,20 @@ public:
          * Next we instantiate an instance of the PDE class which we defined above.
          * This will be passed into the `OffLatticeSimulationWithPdes` object. The
          * `CellwiseSourceEllipticPde` is a `PDE` class which inherits from
-         * `AbstractLinearEllipticPde` and represents
-         * the PDE $u_{xx}$ + u_{yy} = k(x,y)u$, where $u(x,y)$ denotes
-         * the oxygen concentration at
-         * position $(x,y)$ and the function $k(x,y)$ specifies the rate of consumption by live cells
-         * there. Here $k(x,y)$ takes the value $-0.03$ (the coefficient below) if
-         * the cell located at $(x,y)$ is a live cell, and zero if the cell has died due
-         * to oxygen deprivation.
+         * `AbstractLinearEllipticPde` and represents the PDE $u_{xx} + u_{yy} = k(x,y)u$,
+         * where $u(x,y)$ denotes the oxygen concentration at position $(x,y)$ and the function
+         * $k(x,y)$ specifies the rate of consumption by live cells there. Here $k(x,y)$
+         * takes the value $-0.03$ (the coefficient below) if the cell located at $(x,y)$ is a
+         * live cell, and zero if the cell has died due to oxygen deprivation.
          */
         MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, -0.03));
 
         /*
          * We also create a constant-valued boundary condition to associate with the PDE.
          * This boundary condition object takes in a single argument in its constructor,
-         * the value at the boundary. We also introduce a boolean to specify whether this value is the flux at the boundary
-         * (a Neumann boundary condition) or the value of the state variable at the boundary
-         * (a Dirichlet boundary condition) below.
+         * the value at the boundary. We also introduce a boolean to specify whether this value
+         * is the flux at the boundary (a Neumann boundary condition) or the value of the state
+         * variable at the boundary (a Dirichlet boundary condition) below.
          */
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
         bool is_neumann_bc = false;
@@ -230,7 +228,7 @@ public:
          * The PDE is tagged to show that the quantity to be solved for (the quantity of interest in
          * the cells' data is `"oxygen"`).
          *
-         * The `CellData` class, is used to stores the value of the current nutrient concentration for each cell.
+         * The `CellData` class is used to store the value of the current nutrient concentration for each cell.
          */
         MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, is_neumann_bc));
         p_pde_modifier->SetDependentVariableName("oxygen");
@@ -272,10 +270,17 @@ public:
     }
 };
 /*
- * To visualize the results, open a new terminal, `cd` to the Chaste directory,
- * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/SpheroidTutorial/results_from_time_0`.
+ * To visualize the results, use Paraview.
+ * - [Visualizing With Paraview tutorial](../visualizingwithparaview/)
+ * - [Where's my file output?](../#wheres-my-file-output)
  *
- * Or use Paraview, see the [Visualizing With Paraview](../visualizingwithparaview/) tutorial for details.
+ * Open `SpheroidTutorial/results_from_time_0/pde_results_oxygen_..vtu`.
+ *
+ * 1. Click the green `Apply` button.
+ * 2. Select `oxygen` from the `Active Variable Controls` (default is: `Solid Color`)
+ * 3. Select `Surface With Edges` from the `Representation Toolbar` (default is: `Surface`)
+ * 4. Press `Play` to visualize the simulation
+ *
  */
 
 #endif /*TESTRUNNINGTUMOURSPHEROIDSIMULATIONSTUTORIAL_HPP_*/
