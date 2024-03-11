@@ -185,8 +185,9 @@ public:
 
         /*
          * Now that we have defined the cells, we can define the `CellPopulation`. We use a
-         * `MeshBasedCellPopulation` since although the cell population is mesh-based, it does
-         * not include any ghost nodes. The constructor takes in the mesh and the cells vector.
+         * `MeshBasedCellPopulation`, rather than a `MeshBasedCellPopulationWithGhostNodes`
+         * since this particular cell population does not include any ghost nodes. The
+         * constructor takes in the mesh and the cells vector.
          */
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
