@@ -47,131 +47,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "MathsCustomFunctions.hpp"
 
-// COMMON DETERMINANTS - SQUARE
-
-/**
- * 1x1 Determinant.
- * @return the determinant of a ublas matrix.
- *
- * @param rM The matrix of which to find the determinant.
- */
-template<class T>
-inline T Determinant(const boost::numeric::ublas::c_matrix<T, 1, 1>& rM)
-{
-    using namespace boost::numeric::ublas;
-
-    return rM(0,0);
-}
-
-/**
- * 2x2 Determinant.
- * @return the determinant of a ublas matrix.
- *
- * @param rM The matrix of which to find the determinant.
- */
-template<class T>
-T Determinant(const boost::numeric::ublas::c_matrix<T,2,2>& rM)
-{
-    using namespace boost::numeric::ublas;
-
-    return rM(0,0)*rM(1,1) - rM(1,0)*rM(0,1);
-}
-
-/**
- * 3x3 Determinant.
- * @return the determinant of a ublas matrix.
- *
- * @param rM The matrix of which to find the determinant.
- */
-template<class T>
-T Determinant(const boost::numeric::ublas::c_matrix<T, 3, 3>& rM)
-{
-    using namespace boost::numeric::ublas;
-
-    return    rM(0,0) * (rM(1,1)*rM(2,2) - rM(1,2)*rM(2,1))
-            - rM(0,1) * (rM(1,0)*rM(2,2) - rM(1,2)*rM(2,0))
-            + rM(0,2) * (rM(1,0)*rM(2,1) - rM(1,1)*rM(2,0));
-}
-
 // COMMON GENERALIZED DETERMINANTS - NOT SQUARE
 
 /**
- * 3x2 (Generalized determinant).
- * @return calculated generalized determinant of a 3x2 matrix.
+ * Generalized determinant.
+ * @return calculated generalized determinant of a matrix.
  * The generalized determinant is given by det(T) = sqrt(det(T'T));
  *
  * @param rM The matrix of which to find the generalized determinant.
  */
-template<class T>
-T Determinant(const boost::numeric::ublas::c_matrix<T, 3, 2>& rM)
+template<typename Derived>
+typename Derived::Scalar Determinant(const Eigen::MatrixBase<Derived>& rM)
 {
-    using namespace boost::numeric::ublas;
-    c_matrix<T,2,2> product = prod(trans(rM), rM);
-    return std::sqrt(Determinant(product));
-}
-
-/**
- * 3x1 (Generalized determinant).
- * @return calculated generalized determinant of a 3x1 matrix.
- * The generalized determinant is given by det(T) = sqrt(det(T'T));
- *
- * @param rM The matrix of which to find the generalized determinant.
- */
-template<class T>
-T Determinant(const boost::numeric::ublas::c_matrix<T, 3, 1>& rM)
-{
-    using namespace boost::numeric::ublas;
-    return std::sqrt(rM(0,0)*rM(0,0) + rM(1,0)*rM(1,0) + rM(2,0)*rM(2,0));
-}
-
-/**
- * 2x1 (Generalized determinant).
- * @return calculated generalized determinant of a 2x1 matrix.
- * The generalized determinant is given by det(T) = sqrt(det(T'T));
- *
- * @param rM The matrix of which to find the generalized determinant.
- */
-template<class T>
-T Determinant(const boost::numeric::ublas::c_matrix<T, 2, 1>& rM)
-{
-    using namespace boost::numeric::ublas;
-    return   std::sqrt(rM(0,0) * rM(0,0) + rM(1,0) * rM(1,0));
-}
-
-/**
- * @return (nothing)
- * 3x0 (Generalized determinant) - not implement, but needed by some compilers.
- *
- * @param rM The matrix of which to find the generalized determinant.
- */
-template<class T>
-T Determinant(const boost::numeric::ublas::c_matrix<T, 3, 0>& rM)
-{
-    NEVER_REACHED;
-}
-
-/**
- * @return (nothing)
- * 2x0 (Generalized determinant) - not implement, but needed by some compilers.
- *
- * @param rM The matrix of which to find the generalized determinant.
- */
-template<class T>
-T Determinant(const boost::numeric::ublas::c_matrix<T, 2, 0>& rM)
-{
-    NEVER_REACHED;
-}
-
-/**
- * @return (nothing)
- * 1x0 (Generalized determinant) - not implement, but needed by some compilers.
- *
- * @param rM The matrix of which to find the generalized determinant.
- */
-template<class T>
-T Determinant(const boost::numeric::ublas::c_matrix<T, 1, 0>& rM)
-{
-    NEVER_REACHED;
+    return std::sqrt((rM.transpose() * rM).determinant());
 }
 
 // COMMON SUBDETERMINANTS - SQUARE

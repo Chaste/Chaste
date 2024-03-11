@@ -397,6 +397,13 @@ list (APPEND Chaste_INCLUDES "${Boost_INCLUDE_DIR}")
 list (APPEND Chaste_LINK_LIBRARIES "${Boost_LIBRARIES}")
 
 
+################################
+####  Find Eigen
+################################
+find_package(Eigen3 3.4 REQUIRED NO_MODULE)
+message(STATUS "Found Eigen version: ${Eigen3_VERSION}")
+target_link_libraries(Chaste_COMMON_DEPS INTERFACE Eigen3::Eigen)
+
 
 ################################
 ####  Find PETSc

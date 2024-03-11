@@ -61,4 +61,15 @@ using boost::numeric::ublas::trans;
 using boost::numeric::ublas::norm_2;
 using boost::numeric::ublas::slice;
 
+
+#include <Eigen/Core>
+#include <Eigen/Dense>
+
+// Define a template alias for fixed-size Eigen vectors
+template<typename Scalar, int Size>
+using ColVec = Eigen::Matrix<Scalar, Size, 1>;
+
+
+
+
 #endif /*UBLASINCLUDES_HPP_*/
