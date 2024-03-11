@@ -88,7 +88,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "StemCellProliferativeType.hpp"
 /*
- * The next three header files define: a PDE that describes how oxygen is transported via through the
+ * The next three header files define: a PDE that describes how oxygen is transported through the
  * domain via diffusion and is consumed by live cells; a constant-valued boundary condition to
  * associate with the PDE; and a PDE modifier class, which is passed to the simulation object and
  * handles the numerical solution of any PDEs.
