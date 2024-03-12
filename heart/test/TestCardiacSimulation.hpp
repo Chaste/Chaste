@@ -81,7 +81,7 @@ public:
 
         /* If the above fails, and you are happy the new results are correct, uncomment the following line,
          * run the test, and then do
-         cp /tmp/$USER/testoutput/SaveMono1D/SimulationResults.h5 heart/test/data/cardiac_simulations/mono_1d_small.h5
+         cp $CHASTE_TEST_OUTPUT/SaveMono1D/SimulationResults.h5 heart/test/data/cardiac_simulations/mono_1d_small.h5
          */
         //assert(0);
 

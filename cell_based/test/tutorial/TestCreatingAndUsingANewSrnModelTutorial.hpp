@@ -483,7 +483,7 @@ public:
 /*
  * To visualize the results, use Paraview. See the [Visualizing With Paraview](../visualizingwithparaview/) tutorial for more information.
  *
- * Load the file `/tmp/$USER/testoutput/TestOffLatticeSimulationWithMySrnModel/results_from_time_0/results.pvd`,
+ * Load the file `$CHASTE_TEST_OUTPUT/TestOffLatticeSimulationWithMySrnModel/results_from_time_0/results.pvd`,
  * and color by `x`.
  */
 

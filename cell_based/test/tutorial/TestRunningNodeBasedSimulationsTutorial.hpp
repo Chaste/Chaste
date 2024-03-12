@@ -155,13 +155,13 @@ public:
 
     /*
      * To visualize the results, open a new terminal, `cd` to the Chaste directory,
-     * then `cd anim`. Then do `java Visualize2dCentreCells /tmp/$USER/testoutput/NodeBasedMonolayer/results_from_time_0`.
+     * then `cd anim`. Then do `java Visualize2dCentreCells $CHASTE_TEST_OUTPUT/NodeBasedMonolayer/results_from_time_0`.
      * We need to select the `Cells as circles` option to be able to visualize the cells, as opposed
      * to just the centres.
      * You may have to do: `javac Visualize2dCentreCells.java` beforehand to create the
      * java executable if you haven't done that before.
      *
-     * Alternatively, to view in Paraview, load the file `/tmp/$USER/testoutput/NodeBasedMonolayer/results_from_time_0/results.pvd`
+     * Alternatively, to view in Paraview, load the file `$CHASTE_TEST_OUTPUT/NodeBasedMonolayer/results_from_time_0/results.pvd`
      * and add glyphs to represent cells. An option is to use 3D spherical glyphs and then make a planar cut.
      * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
      * displayed by Paraview.
@@ -240,7 +240,7 @@ public:
      * to visualize the results, use Paraview.
      * See the [Visualizing With Paraview](../visualizingwithparaview/) tutorial for more information.
      *
-     * Load the file `/tmp/$USER/testoutput/NodeBasedSpheroid/results_from_time_0/results.pvd`,
+     * Load the file `$CHASTE_TEST_OUTPUT/NodeBasedSpheroid/results_from_time_0/results.pvd`,
      * and add spherical glyphs to represent cells.
      *
      * ### Test 3 - a node-based simulation on a restricted geometry
@@ -323,7 +323,7 @@ public:
 /*
  * To visualize the results, use Paraview. See the [Visualizing With Paraview](../visualizingwithparaview/) tutorial for more information.
  *
- * Load the file `/tmp/$USER/testoutput/NodeBasedOnSphere/results_from_time_0/results.pvd`,
+ * Load the file `$CHASTE_TEST_OUTPUT/NodeBasedOnSphere/results_from_time_0/results.pvd`,
  * and add spherical glyphs to represent cells.
  */
 

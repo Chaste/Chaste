@@ -218,7 +218,7 @@ public:
     }
     /*
      * To visualize the results, open a new terminal, `cd` to the Chaste directory,
-     * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/TestContactInhibitionInBox/results_from_time_0`.
+     * then `cd` to `anim`. Then do: `java Visualize2dCentreCells $CHASTE_TEST_OUTPUT/TestContactInhibitionInBox/results_from_time_0`.
      * We may have to do: `javac Visualize2dCentreCells.java` beforehand to create the
      * java executable.
      *
@@ -320,7 +320,7 @@ public:
     }
     /*
      * To visualize the results, open a new terminal, `cd` to the Chaste directory,
-     * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/TestContactInhibitionTumourInBox/results_from_time_0`.
+     * then `cd` to `anim`. Then do: `java Visualize2dCentreCells $CHASTE_TEST_OUTPUT/TestContactInhibitionTumourInBox/results_from_time_0`.
      * We may have to do: `javac Visualize2dCentreCells.java` beforehand to create the
      * java executable.
      *
@@ -389,7 +389,7 @@ public:
 };
 /*
  * To visualize the results, open a new terminal, `cd` to the Chaste directory,
- * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/TestVertexContactInhibition/results_from_time_0`.
+ * then `cd` to `anim`. Then do: `java Visualize2dVertexCells $CHASTE_TEST_OUTPUT/TestVertexContactInhibition/results_from_time_0`.
  * We may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
  * java executable.
  *

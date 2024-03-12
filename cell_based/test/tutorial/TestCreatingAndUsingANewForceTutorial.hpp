@@ -297,7 +297,7 @@ public:
 /*
  * When you visualize the results with
  *
- * `java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMyForce/results_from_time_0`
+ * `java Visualize2dCentreCells $CHASTE_TEST_OUTPUT/TestOffLatticeSimulationWithMyForce/results_from_time_0`
  *
  * you should see a collection of cells moving downwards and proliferating.
  */

@@ -260,7 +260,7 @@ public:
 };
 /*
  * It is most straightforward to visualize the results of this simulation in Paraview.
- * Load the file `/tmp/$USER/testoutput/TestOffLatticeSimulationWithCellHeightTrackingModifier/results_from_time_0/results.pvd`,
+ * Load the file `$CHASTE_TEST_OUTPUT/TestOffLatticeSimulationWithCellHeightTrackingModifier/results_from_time_0/results.pvd`,
  * and add glyphs to represent cells.
  */
 

@@ -269,7 +269,7 @@ public:
 /*
  * When you visualize the results with
  *
- * `java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithNewMutationState/results_from_time_0`
+ * `java Visualize2dCentreCells $CHASTE_TEST_OUTPUT/TestOffLatticeSimulationWithNewMutationState/results_from_time_0`
  *
  * you should see two cells in black which are the cells with the new mutation. If we want these cells to behave differently we
  * would need to write an new `CellCycleModel`, `CellKiller`, `Force`, or `CellPopulationBoundaryCondition`

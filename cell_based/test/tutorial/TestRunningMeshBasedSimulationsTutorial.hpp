@@ -191,7 +191,7 @@ public:
 
     /*
      * To visualize the results, open a new terminal, `cd` to the Chaste directory,
-     * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/MeshBasedMonolayer/results_from_time_0`.
+     * then `cd` to `anim`. Then do: `java Visualize2dCentreCells $CHASTE_TEST_OUTPUT/MeshBasedMonolayer/results_from_time_0`.
      * We may have to do: `javac Visualize2dCentreCells.java` beforehand to create the
      * java executable.
      *
@@ -286,7 +286,7 @@ public:
 };
 /*
  * To visualize the results, open a new terminal, `cd` to the Chaste directory,
- * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/MeshBasedMonolayerWithGhostNodes/results_from_time_0`.
+ * then `cd` to `anim`. Then do: `java Visualize2dCentreCells $CHASTE_TEST_OUTPUT/MeshBasedMonolayerWithGhostNodes/results_from_time_0`.
  */
 
 #endif /* TESTRUNNINGMESHBASEDSIMULATIONSTUTORIAL_HPP_ */
