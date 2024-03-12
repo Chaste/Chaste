@@ -50,7 +50,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BackwardEulerIvpOdeSolver.hpp"
 
 #include <boost/math/tools/roots.hpp>
-#include <boost/bind.hpp>
 #include <iomanip>
 
 //#include "PetscSetupAndFinalize.hpp"
