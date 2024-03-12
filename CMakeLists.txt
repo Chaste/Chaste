@@ -395,7 +395,10 @@ endif ()
 find_package (Boost COMPONENTS filesystem system serialization program_options REQUIRED)
 list (APPEND Chaste_INCLUDES "${Boost_INCLUDE_DIR}")
 list (APPEND Chaste_LINK_LIBRARIES "${Boost_LIBRARIES}")
-
+# Suppress boost deprecation notices in Boost 1.74.0 (shipped with Ubuntu 22.04), fixed in 1.75
+if (Boost_VERSION VERSION_GREATER_EQUAL 1.74.0 AND Boost_VERSION VERSION_LESS 1.75.0)
+    add_definitions(-DBOOST_ALLOW_DEPRECATED_HEADERS)
+endif ()
 
 
 ################################
