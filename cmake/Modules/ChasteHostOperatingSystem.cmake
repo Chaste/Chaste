@@ -1,7 +1,7 @@
 # Determine the OS infomration and print it
 
 execute_process(
-        COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/Modules/ChasteHostOperatingSystem.py"
+        COMMAND ${Python3_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/Modules/ChasteHostOperatingSystem.py"
         OUTPUT_VARIABLE DIST_NAME
 )
 
