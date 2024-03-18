@@ -7,9 +7,8 @@ assignees: '@jmpf'
 
 ---
 
-### Redirection Recommendation
-
-Please fill out the following template to recommend a new URL redirection. This will help us ensure that users are directed to the correct new location of the content they are seeking.
+Please fill out this issue template if you have encountered a link that has redirected you to [https://chaste.github.io/redirect](https://chaste.github.io/redirect) rather than to the specific Chaste resource you were expecting.
+This will help us ensure that users are directed to the correct new location of the content they are seeking.
 
 #### Current URL
 
