@@ -378,6 +378,34 @@ if (Chaste_USE_VTK)
     endif ()
 
     add_definitions (-DCHASTE_VTK)
+
+    # Test if a vtu file containing binary data can be opened or not, due to libexpat1 bugfixes breaking vtu parsing.
+    # See https://github.com/Chaste/Chaste/issues/249 
+    try_run(
+        VTU_PARSE_RUN_RESULT
+        VTU_PARSE_COMPILE_RESULT
+        ${CMAKE_CURRENT_BINARY_DIR}/todo_vtu_parse_bindir
+        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/vtu_parse_check.cpp
+        
+        LINK_LIBRARIES ${VTK_LIBRARIES}
+        CMAKE_FLAGS 
+            "-DINCLUDE_DIRECTORIES=${VTK_INCLUDE_DIRS}"
+            "-DLINK_DIRECTORIES=${VTK_LIBRARY_DIRS}"
+        COMPILE_OUTPUT_VARIABLE VTU_PARSE_COMPILE_OUTPUT
+        RUN_OUTPUT_VARIABLE VTU_PARSE_RUN_OUTPUT
+        ARGS ${CMAKE_CURRENT_SOURCE_DIR}/mesh/test/data/heart_decimation.vtu
+    )
+    if (NOT VTU_PARSE_COMPILE_RESULT)
+        message(FATAL_ERROR "@todo .vtu parsing test compilation failed. ${VTU_PARSE_COMPILE_OUTPUT}")
+    endif()
+    # message("${VTU_PARSE_RUN_OUTPUT}")
+    if (NOT VTU_PARSE_RUN_RESULT EQUAL 0)
+        message(FATAL_ERROR ".vtu parsing runtime error. probably bad libexpat1? @todo - helpful message ${VTU_PARSE_RUN_OUTPUT}")
+    endif()
+    unset(VTU_PARSE_RUN_RESULT)
+    unset(VTU_PARSE_COMPILE_RESULT)
+    unset(VTU_PARSE_COMPILE_OUTPUT)
+    unset(VTU_PARSE_RUN_OUTPUT)
 endif ()
 
 
