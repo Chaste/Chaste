@@ -74,37 +74,37 @@ jobs:
       working-directory: chaste-build-dir
 
     - name: build core libraries
-      run: cmake --build . --parallel 2 --target chaste_core
+      run: cmake --build . --parallel 4 --target chaste_core
       working-directory: chaste-build-dir
 
     - name: build cell_based
-      run: cmake --build . --parallel 2 --target chaste_cell_based
+      run: cmake --build . --parallel 4 --target chaste_cell_based
       working-directory: chaste-build-dir
 
     - name: build crypt
-      run: cmake --build . --parallel 2 --target chaste_crypt
+      run: cmake --build . --parallel 4 --target chaste_crypt
       working-directory: chaste-build-dir
 
     - name: build heart
-      run: cmake --build . --parallel 2 --target chaste_heart
+      run: cmake --build . --parallel 4 --target chaste_heart
       working-directory: chaste-build-dir
 
     - name: build lung
-      run: cmake --build . --parallel 2 --target chaste_lung
+      run: cmake --build . --parallel 4 --target chaste_lung
       working-directory: chaste-build-dir
 
     - name: build continuous test pack
-      run: cmake --build . --parallel 2 --target Continuous
+      run: cmake --build . --parallel 4 --target Continuous
       working-directory: chaste-build-dir
 
     - name: build nightly test pack
-      run: cmake --build . --parallel 2 --target Nightly
+      run: cmake --build . --parallel 4 --target Nightly
       working-directory: chaste-build-dir
 
     - name: run Continuous test pack
-      run: ctest -j2 -L Continuous --output-on-failure
+      run: ctest -j4 -L Continuous --output-on-failure
       working-directory: chaste-build-dir
 
     - name: run Nightly test pack
-      run: ctest -j2 -L Nightly --output-on-failure
+      run: ctest -j4 -L Nightly --output-on-failure
       working-directory: chaste-build-dir

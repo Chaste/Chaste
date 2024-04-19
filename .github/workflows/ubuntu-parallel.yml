@@ -15,7 +15,7 @@ jobs:
 
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     strategy:
       fail-fast: false
@@ -37,7 +37,7 @@ jobs:
 
     - name: install dependencies
       run: |
-        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu focal/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
         sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
         sudo apt update
         sudo apt install chaste-dependencies
@@ -66,9 +66,9 @@ jobs:
       working-directory: chaste-build-dir
 
     - name: build parallel test pack
-      run: cmake --build . --parallel 2 --target Parallel
+      run: cmake --build . --parallel 4 --target Parallel
       working-directory: chaste-build-dir
 
     - name: run parallel test pack
-      run: ctest -j2 -L Parallel --output-on-failure
+      run: ctest -j4 -L Parallel --output-on-failure
       working-directory: chaste-build-dir

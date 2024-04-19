@@ -1,4 +1,4 @@
-name: Docker Multi-Arch Develop Image CI
+name: Build chaste/develop
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: docker
+    runs-on: self-hosted-docker
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
