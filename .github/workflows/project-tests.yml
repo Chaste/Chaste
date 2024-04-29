@@ -31,7 +31,7 @@ jobs:
 
     steps:
     - name: checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: install dependencies
       run: |
@@ -41,7 +41,7 @@ jobs:
         sudo apt install chaste-dependencies
     
     - name: checkout project
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: ${{ matrix.project_org }}/${{ matrix.project_repo }}
         path: projects/${{ matrix.project_repo }}
