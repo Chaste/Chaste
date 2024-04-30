@@ -243,7 +243,7 @@ public:
        double pleural_pressure = 0.0;
 
        double ode_volume = 0.0;
-       double flow_integral = 0.0;
+       [[maybe_unused]] double flow_integral = 0.0;
 
        while (!time_stepper.IsTimeAtEnd())
        {
