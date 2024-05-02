@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -1190,7 +1190,7 @@ public:
         for (unsigned i = 0; i < num_steps; i++)
         {
             p_simulation_time->IncrementTimeOneStep();
-            
+
             // The division time below is taken from the first random number generated
             if (i < 16)
             {
@@ -2100,7 +2100,7 @@ public:
             FileComparison comparer(generated_file, reference_file);
             TS_ASSERT(comparer.CompareFiles());
         }
-    
+
         // Test with LabelDependentBernoulliTrialCellCycleModel
         LabelDependentBernoulliTrialCellCycleModel label_random_division_cell_cycle_model;
         TS_ASSERT_EQUALS(label_random_division_cell_cycle_model.GetIdentifier(), "LabelDependentBernoulliTrialCellCycleModel");
@@ -2116,7 +2116,7 @@ public:
             FileComparison comparer(generated_file, reference_file);
             TS_ASSERT(comparer.CompareFiles());
         }
-    
+
         // Test with FixedG1GenerationalCellCycleModel
         FixedG1GenerationalCellCycleModel fixed_duration_generation_based_cell_cycle_model;
         TS_ASSERT_EQUALS(fixed_duration_generation_based_cell_cycle_model.GetIdentifier(), "FixedG1GenerationalCellCycleModel");

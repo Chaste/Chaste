@@ -6,7 +6,7 @@ Copyright (C) Fujitsu Laboratories of Europe, 2009
 
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -215,36 +215,36 @@ public:
 
 
     /**
-     * @return an std::vector containing the vtkCellData with attribute name specified
+     * Returns an std::vector (dataPayload) containing the vtkCellData with attribute name specified
      * Throws if the attribute name does not exist
      * @param dataName Name of the cell data
-     * @param dataPayload in which to store the result
+     * @param dataPayload in which to store the result (returned)
      */
      void GetCellData(std::string dataName, std::vector<double>& dataPayload);
 
     /**
-     * @return an std::vector containing the vtkPointData with attribute name specified
+     * Returns an std::vector (dataPayload) containing the vtkPointData with attribute name specified
      * Throws if the attribute name does not exist
      *
      * @param dataName Name of the point data
-     * @param dataPayload in which to store the result
+     * @param dataPayload in which to store the result (returned)
      */
     void GetPointData(std::string dataName, std::vector<double>& dataPayload);
 
     /**
-     * @return an std::vector containing the vector-directed vtkCellData with attribute name specified
+     * Returns an std::vector (dataPayload) containing the vector-directed vtkCellData with attribute name specified
      * Throws if the attribute name does not exist
      * @param dataName Name of the cell data
-     * @param dataPayload in which to store the result
+     * @param dataPayload in which to store the result (returned)
      */
      void GetCellData(std::string dataName, std::vector<c_vector<double,SPACE_DIM> >& dataPayload);
 
     /**
-     * @return an std::vector containing the vector-directed vtkPointData with attribute name specified
+     * Returns an std::vector (dataPayload) containing the vector-directed vtkPointData with attribute name specified
      * Throws if the attribute name does not exist
      *
      * @param dataName Name of the point data
-     * @param dataPayload in which to store the result
+     * @param dataPayload in which to store the result (returned)
      */
     void GetPointData(std::string dataName, std::vector<c_vector<double,SPACE_DIM> >& dataPayload);
 

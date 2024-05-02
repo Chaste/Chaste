@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -631,8 +631,8 @@ const c_vector<double, 2 * DIM>& ObsoleteBoxCollection<DIM>::rGetDomainSize() co
 }
 
 template<unsigned DIM>
-void ObsoleteBoxCollection<DIM>::CalculateNodePairs(std::vector<Node<DIM>*>& rNodes,
-                                            std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
+void ObsoleteBoxCollection<DIM>::CalculateNodePairs(const std::vector<Node<DIM>*>& rNodes,
+                                                    std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
 {
     rNodePairs.clear();
 

@@ -1,0 +1,143 @@
+name: Doxygen
+
+on:
+  pull_request:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+    inputs:
+      doxygen_name:
+        description: 'Name (e.g. Release::2021.1)'
+        required: true
+
+jobs:
+  on_pull_request:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'ci:off')
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: install dependencies
+        run: |
+          sudo apt-get install graphviz
+          wget https://github.com/doxygen/doxygen/releases/download/Release_1_9_8/doxygen-1.9.8.linux.bin.tar.gz
+          tar -xzvf doxygen-1.9.8.linux.bin.tar.gz
+
+      - name: build doxygen
+        run: |
+          ( cat Doxyfile ; echo "PROJECT_NUMBER=PR_branch::${{ github.head_ref }}" ) | doxygen-1.9.8/bin/doxygen - 2>doxygen-error.log 1>doxygen-output.log
+
+      - name: check doxygen coverage
+        run: |
+          mkdir doxygen/coverage
+          python python/infra/ParseDoxygen.py doxygen-output.log doxygen-error.log doxygen/coverage
+
+      - name: print doxygen coverage errors
+        if: failure()
+        run: |
+          echo "Printing file contents:"
+          for FILE in doxygen/coverage/*; do
+          echo "------------------------"
+          echo "Contents of $FILE:"
+          cat "$FILE"
+          echo "------------------------"
+          done
+
+  on_push_to_develop:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: install dependencies
+        run: |
+          sudo apt-get install graphviz
+          wget https://github.com/doxygen/doxygen/releases/download/Release_1_9_8/doxygen-1.9.8.linux.bin.tar.gz
+          tar -xzvf doxygen-1.9.8.linux.bin.tar.gz
+
+      - name: build doxygen
+        run: |
+          ( cat Doxyfile ; echo "PROJECT_NUMBER=Commit::$GITHUB_SHA" ) | doxygen-1.9.8/bin/doxygen - 2>doxygen-error.log 1>doxygen-output.log
+
+      - name: check doxygen coverage
+        run: |
+          mkdir doxygen/coverage
+          python python/infra/ParseDoxygen.py doxygen-output.log doxygen-error.log doxygen/coverage
+
+      - name: print doxygen coverage errors
+        if: failure()
+        run: |
+          echo "Printing file contents:"
+          for FILE in doxygen/coverage/*; do
+          echo "------------------------"
+          echo "Contents of $FILE:"
+          cat "$FILE"
+          echo "------------------------"
+          done
+
+      - name: checkout doxygen-latest
+        uses: actions/checkout@v4
+        with:
+          repository: Chaste/doxygen-latest
+          path: doxygen-latest
+          fetch-depth: 0
+          token: ${{ secrets.DOXYGEN_LATEST_ACCESS }}
+        if: always()
+
+      - name: copy results
+        run: |
+          cp doxygen/html/* doxygen-latest/site/
+        if: always()
+
+      - name: commit and push if changed
+        run: |
+          git config user.name "github-action"
+          git config user.email "github-action"
+          git add --all
+          git commit -m "update doxygen-latest" || echo "No changes to commit"
+          git push
+        working-directory: doxygen-latest
+        if: always()
+
+  on_workflow_dispatch:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: install dependencies
+        run: |
+          sudo apt-get install graphviz
+          wget https://github.com/doxygen/doxygen/releases/download/Release_1_9_8/doxygen-1.9.8.linux.bin.tar.gz
+          tar -xzvf doxygen-1.9.8.linux.bin.tar.gz
+
+      - name: build doxygen
+        run: |
+          ( cat Doxyfile ; echo "PROJECT_NUMBER=${{ github.event.inputs.doxygen_name }}" ) | doxygen-1.9.8/bin/doxygen - 2>doxygen-error.log 1>doxygen-output.log
+
+      - name: check doxygen coverage
+        run: |
+          mkdir doxygen/coverage
+          python python/infra/ParseDoxygen.py doxygen-output.log doxygen-error.log doxygen/coverage
+
+      - name: print doxygen coverage errors
+        if: failure()
+        run: |
+          echo "Printing file contents:"
+          for FILE in doxygen/coverage/*; do
+          echo "------------------------"
+          echo "Contents of $FILE:"
+          cat "$FILE"
+          echo "------------------------"
+          done
+
+      - name: Upload Documentation as Artifact
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: doxygen-html
+          path: doxygen/html/

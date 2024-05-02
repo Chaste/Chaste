@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -42,10 +42,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractCellBasedSimulationModifier.hpp"
 
 /**
- * A modifier class which at each simulation time step calculates a real number between 
- * zero and 1 for each cell, which represents the normalised distance of the cell along 
- * a given axis of the cell population through its centroid, and stores this number in 
- * the CellData property as "bias". To be used in conjunction with the 
+ * A modifier class which at each simulation time step calculates a real number between
+ * zero and 1 for each cell, which represents the normalised distance of the cell along
+ * a given axis of the cell population through its centroid, and stores this number in
+ * the CellData property as "bias". To be used in conjunction with the
  * BiasedBernoulliTrialCellCycleModel class.
  */
 template<unsigned DIM>
@@ -78,8 +78,8 @@ public:
 
     /**
      * Constructor.
-     * 
-     * @param centre the specified axis along which division probability is biased
+     *
+     * @param divisionBiasVector the specified axis along which division probability is biased
      */
     DivisionBiasTrackingModifier(c_vector<double, DIM> divisionBiasVector);
 
@@ -87,12 +87,12 @@ public:
      * Destructor.
      */
     virtual ~DivisionBiasTrackingModifier();
-  
+
     /**
      * @return #mDivisionBiasVector.
      */
     const c_vector<double, DIM>& rGetDivisionBiasVector() const;
-    
+
     /**
      * Overridden UpdateAtEndOfTimeStep() method.
      *
@@ -113,7 +113,7 @@ public:
     virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
 
     /**
-     * Helper method to calculate the normalised distance of each cell in the population 
+     * Helper method to calculate the normalised distance of each cell in the population
      * along the division bias axis and store these in the CellData.
      *
      * @param rCellPopulation reference to the cell population

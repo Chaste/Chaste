@@ -132,7 +132,7 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
 
 
     if (python)
-        set(test_exe ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/python/infra/TestPythonCode.py ${_filename})
+        set(test_exe ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/python/infra/TestPythonCode.py ${_filename})
     else()
         set(_exeTargetName ${_testname})
 
@@ -141,7 +141,7 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
             add_custom_command(
                 OUTPUT "${_test_real_output_filename}"
                 DEPENDS ${_filename} ${ARGN}
-                COMMAND ${PYTHON_EXECUTABLE} ${CXXTEST_PYTHON_TESTGEN_EXECUTABLE} --error-printer -o "${_test_real_output_filename}" ${_filename} ${ARGN}
+                COMMAND ${Python3_EXECUTABLE} ${CXXTEST_PYTHON_TESTGEN_EXECUTABLE} --error-printer -o "${_test_real_output_filename}" ${_filename} ${ARGN}
                 )
 
             set_source_files_properties("${_test_real_output_filename}" PROPERTIES GENERATED true)
@@ -463,9 +463,9 @@ macro(Chaste_DO_APPS_COMMON component)
                 file(REMOVE_RECURSE ${texttest_output_dir})
                 file(MAKE_DIRECTORY ${texttest_report_dir})
                 file(MAKE_DIRECTORY ${texttest_output_dir})
-                execute_process(COMMAND  ${PYTHON_EXECUTABLE} ${TEXTTEST_PY} -d ${tests_dir} -b default -c ${CMAKE_BINARY_DIR} 
+                execute_process(COMMAND  ${Python3_EXECUTABLE} ${TEXTTEST_PY} -d ${tests_dir} -b default -c ${CMAKE_BINARY_DIR} 
                     RESULT_VARIABLE result)
-                execute_process(COMMAND  ${PYTHON_EXECUTABLE} ${TEXTTEST_PY} -d ${tests_dir} -b default -c ${CMAKE_BINARY_DIR} -coll web)
+                execute_process(COMMAND  ${Python3_EXECUTABLE} ${TEXTTEST_PY} -d ${tests_dir} -b default -c ${CMAKE_BINARY_DIR} -coll web)
                 if (result)
                     message(SEND_ERROR \"Error running acceptance test\")
                 endif()
@@ -617,9 +617,9 @@ macro(Chaste_DO_TEST_COMMON component)
                         else()
                             set(revision_string "")
                         endif()
-                        set(out_filename  ${CMAKE_BINARY_DIR}/tutorials/UserTutorials/${CMAKE_MATCH_1})
+                        set(out_filename  ${CMAKE_BINARY_DIR}/tutorials/UserTutorials/${CMAKE_MATCH_1}.md)
                         add_custom_command(OUTPUT ${out_filename}
-                            COMMAND ${PYTHON_EXECUTABLE} ARGS ${Chaste_BINARY_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename} ${revision_string}
+                            COMMAND ${Python3_EXECUTABLE} ARGS ${Chaste_BINARY_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename} ${revision_string}
                             DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${filename}
                             COMMENT "Generating user tutorial ${out_filename}" VERBATIM)
                         add_custom_target(${CMAKE_MATCH_1} DEPENDS ${out_filename})
@@ -628,9 +628,9 @@ macro(Chaste_DO_TEST_COMMON component)
 
                     # filename is a paper tutorial
                     if(filename MATCHES "Test(.*)LiteratePaper.(hpp|py)") 
-                        set(out_filename  ${CMAKE_BINARY_DIR}/tutorials/PaperTutorials/${CMAKE_MATCH_1})
+                        set(out_filename  ${CMAKE_BINARY_DIR}/tutorials/PaperTutorials/${CMAKE_MATCH_1}.md)
                         add_custom_command(OUTPUT ${out_filename}
-                            COMMAND ${PYTHON_EXECUTABLE} ARGS ${Chaste_BINARY_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename} 
+                            COMMAND ${Python3_EXECUTABLE} ARGS ${Chaste_BINARY_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename} 
                             DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${filename}
                             COMMENT "Generating paper tutorial ${out_filename}" VERBATIM)
                         add_custom_target(${CMAKE_MATCH_1} DEPENDS ${out_filename})

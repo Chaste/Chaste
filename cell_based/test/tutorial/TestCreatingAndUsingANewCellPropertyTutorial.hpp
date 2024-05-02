@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,24 +46,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCREATINGANDUSINGANEWCELLPROPERTYTUTORIAL_HPP_
 
 /*
- * = An example showing how to create a new cell property and use it in a cell-based simulation =
+ * ## An example showing how to create a new cell property and use it in a cell-based simulation
  *
- * == Introduction ==
+ * ### Introduction
  *
- * EMPTYLINE
+ * This tutorial assumes you have already read [Creating And Using A New Force](../creatingandusinganewforce/).
  *
- * This tutorial assumes you have already read [wiki:UserTutorials/CreatingAndUsingANewForce].
- *
- * EMPTYLINE
- *
- * In the  [wiki:UserTutorials/CreatingAndUsingANewCellMutationState] we showed how to create a new cell mutation
- * state class, and how this can be used in a cell-based simulation. As well as
+ * In the [Creating And Using A New Cell Mutation State](../creatingandusinganewcellmutationstate/)
+ * tutorial we showed how to create a new cell mutation state class,
+ * and how this can be used in a cell-based simulation. As well as
  * mutation states, cells may be given much more general properties, using the cell
  * property class hierarchy. In this tutorial, we show how to create a new cell property
  * class, and how this can be used in a cell-based simulation. We will also use a simple
  * new force to illustrate what you can do with cell properties (and also mutations).
  *
- * == 1. Including header files ==
+ * ### 1. Including header files
  *
  * As in previous cell-based Chaste tutorials, we begin by including the necessary
  * header file and archiving headers.
@@ -93,15 +90,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FakePetscSetup.hpp"
 
 /*
- * == Defining the cell property class ==
+ * ### Defining the cell property class
  *
  * As an example, let us consider a cell property class that is used to label
  * those cells that are "motile". This cell property could then be used when
  * implementing some form of chemotaxis down an imposed chemoattractant gradient,
  * as occurs for example when macrophages migrate within a tumour towards high
  * concentrations of the vascular endothelial growth factor VEGF; for further
- * details, see for example Owen ''et al.'', J. Theor. Biol.
- * 226: 377-391 (2004).
+ * details, see for example
+ * [Owen *et al.*, J. Theor. Biol. 226: 377-391 (2004).](https://doi.org/10.1016/j.jtbi.2003.09.004)
  *
  * Note that usually this code would be separated out into a separate declaration
  * in a .hpp file and definition in a .cpp file.
@@ -110,14 +107,14 @@ class MotileCellProperty : public AbstractCellProperty
 {
 private:
 
-    /* We define a member variable {{{mColour}}}, which can be used by visualization tools
+    /* We define a member variable `mColour`, which can be used by visualization tools
      * to paint cells with this mutation state a distinct colour if required. */
     unsigned mColour;
 
     /* The next block of code allows us to archive (save or load) the cell property object
-     * in a cell-based simulation. The code consists of a serialize() method, in which we first
+     * in a cell-based simulation. The code consists of a `serialize()` method, in which we first
      * archive the cell property using the serialization code defined in the base class
-     * {{{AbstractCellProperty}}}, then archive the member variable {{{mColour}}}. */
+     * `AbstractCellProperty`, then archive the member variable `mColour`. */
     friend class boost::serialization::access;
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
@@ -128,7 +125,7 @@ private:
 
 public:
 
-    /* The default constructor allows us to specify a value for the member variable {{{mColour}}},
+    /* The default constructor allows us to specify a value for the member variable `mColour`,
      * or leave it with a default value. */
     MotileCellProperty(unsigned colour=5)
         : AbstractCellProperty(),
@@ -136,7 +133,7 @@ public:
     {
     }
 
-    /* We then define a destructor and a get method for the member variable {{{mColour}}}. */
+    /* We then define a destructor and a get method for the member variable `mColour`. */
     ~MotileCellProperty()
     {}
 
@@ -145,20 +142,18 @@ public:
         return mColour;
     }
 };
-/* This completes the code for {{{MotileCellProperty}}}.  Note that usually this code would
+/* This completes the code for `MotileCellProperty`.  Note that usually this code would
  * be separated out into a separate declaration in a .hpp file and definition in a .cpp file.
  */
 
 /*
- * EMPTYLINE
- *
- * == Defining the motive force class ==
+ * ### Defining the motive force class
  *
  * In order to illustrate the use of cell properties we make a simple force law which
- * causes all cells with the {{{MotileCellProperty}}} to move towards the origin. To do this we
- * create a new force class, {{{MyMotiveForce}}}, which inherits from
- * {{{AbstractForce}}} and overrides the methods {{{AddForceContribution()}}} and
- * {{{OutputForceParameters()}}}.
+ * causes all cells with the `MotileCellProperty` to move towards the origin. To do this we
+ * create a new force class, `MyMotiveForce`, which inherits from
+ * `AbstractForce` and overrides the methods `AddForceContribution()` and
+ * `OutputForceParameters()`.
  *
  * Note that usually this code would be separated out into a separate declaration
  * in a .hpp file and definition in a .cpp file.
@@ -167,7 +162,7 @@ class MyMotiveForce : public AbstractForce<2>
 {
 private:
 
-    /* This force class includes a member variable, {{{mStrength}}}, which
+    /* This force class includes a member variable, `mStrength`, which
      * defines the strength of the force. This member variable will be set
      * in the constructor.
      */
@@ -176,7 +171,7 @@ private:
     /* We only need to include the next block of code if we wish to be able
      * to archive (save or load) the force model object in a cell-based simulation.
      * The code consists of a serialize method, in which we first archive the force
-     * using the serialization code defined in the base class {{{AbstractForce}}},
+     * using the serialization code defined in the base class `AbstractForce`,
      * then archive the member variable. */
     friend class boost::serialization::access;
     template<class Archive>
@@ -200,15 +195,15 @@ public:
         assert(mStrength > 0.0);
     }
 
-    /* The second public method overrides {{{AddForceContribution()}}}.
+    /* The second public method overrides `AddForceContribution()`.
      * This method takes in one argument, a reference to the cell population itself.
      */
     void AddForceContribution(AbstractCellPopulation<2>& rCellPopulation)
     {
         /* Inside the method, we loop over cells, and add a vector to
-         * each node associated with cells with the {{{MotileCellProperty}}}, which is proportional (with constant {{{mStrength}}}) to the negative of the position. Causing
-         * cells to move inwards towards the origin. Note that this will currently only work with subclasses of {{{AbstractCentreBasedCellPopulation}}}s as
-         * we associate cells with nodes in the force calculation. However, this could easily be modified to make it work for {{{VertexBasedCellPopulation}}}s.
+         * each node associated with cells with the `MotileCellProperty`, which is proportional (with constant `mStrength`) to the negative of the position. Causing
+         * cells to move inwards towards the origin. Note that this will currently only work with subclasses of `AbstractCentreBasedCellPopulation`s as
+         * we associate cells with nodes in the force calculation. However, this could easily be modified to make it work for `VertexBasedCellPopulation`s.
          */
         for (AbstractCellPopulation<2>::Iterator cell_iter = rCellPopulation.Begin();
              cell_iter != rCellPopulation.End();
@@ -226,9 +221,9 @@ public:
         }
     }
 
-    /* Just as we encountered in [wiki:UserTutorials/CreatingAndUsingANewCellKiller], here we must override
-     * a method that outputs any member variables to a specified results file {{{rParamsFile}}}.
-     * In our case, we output the member variable {{{mStrength}}}, then call the method on the base class.
+    /* Just as we encountered in [Creating And Using A New Cell Killer](../creatingandusinganewcellkiller/), here we must override
+     * a method that outputs any member variables to a specified results file `rParamsFile`.
+     * In our case, we output the member variable `mStrength`, then call the method on the base class.
      */
     void OutputForceParameters(out_stream& rParamsFile)
     {
@@ -253,22 +248,20 @@ CHASTE_CLASS_EXPORT(MotileCellProperty)
 CHASTE_CLASS_EXPORT(MyMotiveForce)
 
 /*
- * This completes the code for {{{MyMotiveForce}}}. Note that usually this code
+ * This completes the code for `MyMotiveForce`. Note that usually this code
  * would be separated out into a separate declaration in a .hpp file and definition
  * in a .cpp file.
  *
- * EMPTYLINE
+ * ### The Tests
  *
- * == The Tests ==
- *
- * We now define the test class, which inherits from {{{AbstractCellBasedTestSuite}}}.
+ * We now define the test class, which inherits from `AbstractCellBasedTestSuite`.
  */
 class TestCreatingAndUsingANewCellPropertyTutorial : public AbstractCellBasedTestSuite
 {
 public:
 
     /*
-     * === Testing the cell property ===
+     * #### Testing the cell property
      *
      * We begin by testing that our new cell property is implemented correctly.
      */
@@ -276,16 +269,16 @@ public:
     {
         /* We begin by testing that some of the base class methods work correctly.
          * We typically use shared pointers to create and access a cell property
-         * like {{{MotileCellProperty}}}, for which it makes sense for all cells
+         * like `MotileCellProperty`, for which it makes sense for all cells
          * that have the same mutation to share a pointer to the same cell property
          * object (although strictly speaking, they are not required to). Observe that
-         * in this case we have provided a value for the member variable {{{mColour}}}
-         * in the {{{MotileCellProperty}}} constructor.*/
+         * in this case we have provided a value for the member variable `mColour`
+         * in the `MotileCellProperty` constructor.*/
         MAKE_PTR_ARGS(MotileCellProperty, p_property, (8));
 
-        /* Each cell property has a member variable, {{{mCellCount}}}, which
+        /* Each cell property has a member variable, `mCellCount`, which
          * stores the number of cells with this cell property. We can test whether
-         * {{{mCellCount}}} is being updated correctly by our cell property, as follows. */
+         * `mCellCount` is being updated correctly by our cell property, as follows. */
         TS_ASSERT_EQUALS(p_property->GetCellCount(), 0u);
         p_property->IncrementCellCount();
         TS_ASSERT_EQUALS(p_property->GetCellCount(), 1u);
@@ -300,7 +293,7 @@ public:
 
         /* We can also test that archiving is implemented correctly for our cell
          * property, as follows (further details on how to implement and
-         * test archiving can be found at ChasteGuides/BoostSerialization).  */
+         * test archiving can be found at [Boost Serialization Guide](/docs/user-guides/boost-serialization/)).  */
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "property.arch";
 
@@ -338,18 +331,18 @@ public:
     }
 
     /*
-     * === Using the cell property in a cell-based simulation ===
+     * #### Using the cell property in a cell-based simulation
      *
-     * We conclude with a brief test demonstrating how {{{MotileCellProperty}}} can be used
+     * We conclude with a brief test demonstrating how `MotileCellProperty` can be used
      * in a cell-based simulation.
      */
     void TestOffLatticeSimulationWithMotileCellProperty()
     {
-        /* Note that HoneycombMeshGenerator, used in this test, is not
+        /* Note that `HoneycombMeshGenerator`, used in this test, is not
          *  yet implemented in parallel. */
 
-        /* We use the {{{HoneycombMeshGenerator}}} to create a honeycomb mesh covering a
-         * circular domain of given radius, and use this to generate a {{{NodesOnlyMesh}}}
+        /* We use the `HoneycombMeshGenerator` to create a honeycomb mesh covering a
+         * circular domain of given radius, and use this to generate a `NodesOnlyMesh`
          * as follows. */
         HoneycombMeshGenerator generator(10, 10);
         boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetCircularMesh(5);
@@ -364,7 +357,7 @@ public:
         MAKE_PTR(MotileCellProperty, p_motile);
         /*
          * Also create a shared pointer to a cell label so we can visualize the
-         * different cell types. Note that this is also a {{{CellProperty}}}.
+         * different cell types. Note that this is also a `CellProperty`.
          */
         MAKE_PTR(CellLabel, p_label);
 
@@ -376,7 +369,7 @@ public:
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             /* For each node we create a cell with our cell-cycle model and the wild-type cell mutation state.
-             * We then add the property {{{MotileCellProperty}}} to a random selection of the cells, as follows. */
+             * We then add the property `MotileCellProperty` to a random selection of the cells, as follows. */
             FixedG1GenerationalCellCycleModel* p_model = new FixedG1GenerationalCellCycleModel();
 
             CellPropertyCollection collection;
@@ -389,9 +382,9 @@ public:
             CellPtr p_cell(new Cell(p_state, p_model, NULL, false, collection));
             p_cell->SetCellProliferativeType(p_diff_type);
 
-            /* Now, we define a random birth time, chosen from [-T,0], where
-             * T = t,,1,, + t,,2,,, where t,,1,, is a parameter representing the G,,1,, duration
-             * of a stem cell, and t,,2,, is the basic S+G,,2,,+M phases duration.
+            /* Now, we define a random birth time, chosen from $[-T,0]$, where
+             * $T = t_1 + t_2$, where $t_1$ is a parameter representing the $G_1$ duration
+             * of a stem cell, and $t_2=S+G_2+M$ phases duration.
              */
             double birth_time = - RandomNumberGenerator::Instance()->ranf() *
                                     (p_model->GetStemCellG1Duration()
@@ -409,32 +402,32 @@ public:
         /* In order to visualize labelled cells we need to use the following command.*/
         cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
 
-        /* We then pass in the cell population into an {{{OffLatticeSimulation}}},
+        /* We then pass in the cell population into an `OffLatticeSimulation`,
          * and set the output directory, output multiple, and end time. */
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestOffLatticeSimulationWithMotileCellProperty");
         simulator.SetSamplingTimestepMultiple(12);
         simulator.SetEndTime(10.0);
 
-        /* We create a force law and pass it to the {{{OffLatticeSimulation}}}. */
+        /* We create a force law and pass it to the `OffLatticeSimulation`. */
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
-        /* Now create a {{{MotlieForce}}} and pass it to the {{{OffLatticeSimulation}}}. */
+        /* Now create a `MotlieForce` and pass it to the `OffLatticeSimulation`. */
         MAKE_PTR(MyMotiveForce, p_motive_force);
         simulator.AddForce(p_motive_force);
 
-        /* To run the simulation, we call {{{Solve()}}}. */
+        /* To run the simulation, we call `Solve()`. */
         simulator.Solve();
     }
 };
 /*
  * When you visualize the results with
  *
- * {{{java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMotileCellProperty/results_from_time_0}}}
+ * `java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMotileCellProperty/results_from_time_0`
  *
- * you should see a collection of cells with the {{{MotileCellProperty}}} (labelled dark blue) moving towards the origin.
+ * you should see a collection of cells with the `MotileCellProperty` (labelled dark blue) moving towards the origin.
  */
 
 #endif /*TESTCREATINGANDUSINGANEWCELLPROPERTYTUTORIAL_HPP_*/

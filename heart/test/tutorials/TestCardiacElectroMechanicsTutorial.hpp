@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,16 +45,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCARDIACELECTROMECHANICSTUTORIAL_HPP_
 
 /*
- * = Cardiac Electro-mechanical Problems =
+ * ## Cardiac Electro-mechanical Problems
  *
- * == Introduction ==
+ * ### Introduction
  *
  * The tutorial explains how electro-mechanics problems can be solved in Chaste. The reader should certainly read
  * the electro-physiological tutorials before this tutorial, and really they should have also had a look at
  * the tutorial(s) on solving general solid mechanics problems.
  *
  * The equations of cardiac electro-mechanics are written down in Section 4.2 of the PDF on equations and
- * finite element implementations in ChasteGuides -> Miscellaneous information. '''Note:''' By default we do
+ * finite element implementations in ChasteGuides -> Miscellaneous information. **Note:** By default we do
  * not solve these full equations: the mechanics information is not coupled back to electrics, ie by default
  * the conductivities do not depend on deformation, and cell models do not get affected by stretch.
  * This has to be switched on if required, as will be described further below.
@@ -94,7 +94,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  * ''Timesteps:'' Should-divide rules are: (a) ode_timestep should-divide pde_timestep should-divide
  *  mechanics_update_timestep and (b) contraction_model_ode_timestep should-divide mechanics_update_timestep.
  *
- * '''Another important note:''' mechanics problems are not currently implemented to scale in parallel yet. This
+ * **Another important note:** mechanics problems are not currently implemented to scale in parallel yet. This
  * is work in progress.
  *
  * The basic includes are */
@@ -119,19 +119,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /*
- * == IMPORTANT: using HYPRE ==
+ * ### IMPORTANT: using HYPRE
  *
  * Mechanics solves being nonlinear are expensive, so it is recommended you also use a `Release` build type for `cmake`
   * on larger problems. Also:
  *
  * Mechanics solves involve solving a nonlinear system, which is broken down into a sequence of linear solves.
- * When running '''incompressible''' problems '''in 3D, or with more elements than in the first test below''',
+ * When running **incompressible** problems **in 3D, or with more elements than in the first test below**,
  * it is vital to change the linear solver to use HYPRE, an algebraic multigrid solver.
  * Without HYRPE, the linear solve (i) may become very very slow; or
  * (ii) may not converge, in which case the nonlinear solve will (probably) not converge. See the comments on using
  * HYPRE in the first solid mechanics tutorial.
  *
- * == Simple 2d test ==
+ * ### Simple 2d test
  *
  * This test shows how to use the `CardiacElectroMechProbRegularGeom` class, which
  * inherits from a more general class, `CardiacElectroMechanicsProblem`, and
@@ -222,7 +222,7 @@ public:
          */
     }
 
-    /* == Same simulation, this time using `CardiacElectroMechanicsProblem` ==
+    /* ### Same simulation, this time using `CardiacElectroMechanicsProblem`
      *
      * Let us repeat the above test using `CardiacElectroMechanicsProblem`. */
     void TestCardiacElectroMechanicsExampleAgain()
@@ -300,7 +300,7 @@ public:
          */
         CompressibleMooneyRivlinMaterialLaw<2> law(2.0,1.0); // random (non-cardiac) material law
         problem_defn.SetMaterialLaw(COMPRESSIBLE,&law);
-        /* As mentioned above, by default the deformation does '''not''' couple back to the electrics.
+        /* As mentioned above, by default the deformation does **not** couple back to the electrics.
          * The stretch is not passed to the cell model to allow for stretch-activated channels (M.E.F.),
          * and the deformation is not used in altering the conductivity tensor (the latter simplifications has
          * little effect in
@@ -326,7 +326,7 @@ public:
         TS_ASSERT(comparer.CompareFiles());
     }
 
-    /* == Twisting cube: 3d example with varying fibre directions ==
+    /* ### Twisting cube: 3d example with varying fibre directions
      *
      * The third test is a longer running 3d test - the 'dont' in the name of the test
      * means it isn't run automatically. To run, remove the 'dont'. It is worth running

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -52,7 +52,7 @@ public:
 
     void Run()
     {
-        int total = 0;
+        [[maybe_unused]] int total = 0;
         for (int i=0; i<1e8; i++)
         {
             total += Method(i);
@@ -73,7 +73,7 @@ public:
 
     void Run()
     {
-        int total = 0;
+        [[maybe_unused]] int total = 0;
         for (int i=0; i<1e8; i++)
         {
             total += Method(i);

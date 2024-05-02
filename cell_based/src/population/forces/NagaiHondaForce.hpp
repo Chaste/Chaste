@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -110,9 +110,9 @@ protected:
 
     /**
      * Target area parameter. Has units of (cell size at equilibrium rest length)^2.
-     * 
-     * Note: If a subclass of AbstractTargetAreaModifier is present in the 
-     * cell-based simulation, then we use the CellData item "target area" stored 
+     *
+     * Note: If a subclass of AbstractTargetAreaModifier is present in the
+     * cell-based simulation, then we use the CellData item "target area" stored
      * in each Cell in the force calculation instead of this parameter value.
      */
     double mNagaiHondaTargetAreaParameter;

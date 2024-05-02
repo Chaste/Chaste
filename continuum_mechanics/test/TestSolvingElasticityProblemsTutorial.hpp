@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTSOLVINGELASTICITYPROBLEMSTUTORIAL_HPP_
 
 /*
- * = Solving solid mechanics problems =
+ * ## Solving solid mechanics problems
  *
  * In this tutorial we show how Chaste can be used to solve solid mechanics problems.
  * We assume the reader has some familiarity with solid mechanics problems (the
@@ -75,10 +75,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  * Specify TRACTION BOUNDARY CONDITIONS (if non-zero) on the rest of the boundary -- tractions are forces per unit area applied
  *  the rest of the surface of the deformable object.
  *
- *  '''VERY IMPORTANT NOTE:''' For incompressible problems, make sure you read the comment about HYPRE below before going to
+ *  **VERY IMPORTANT NOTE:** For incompressible problems, make sure you read the comment about HYPRE below before going to
  *  3D or refining meshes in these tests.
  *
- * '''Another note:''' mechanics problems are not currently implemented to scale in parallel yet.
+ * **Another note:** mechanics problems are not currently implemented to scale in parallel yet.
  *
  * As always we include this first class as a test suite */
 #include <cxxtest/TestSuite.h>
@@ -98,7 +98,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NonlinearElasticityTools.hpp"
 /* For visualising results in Paraview */
 #include "VtkNonlinearElasticitySolutionWriter.hpp"
-/* As before: !PetscSetupAndFinalize.hpp must be included in every test that uses PETSc. Note that it
+/* As before: `PetscSetupAndFinalize.hpp` must be included in every test that uses PETSc. Note that it
  * cannot be included in the source code. */
 #include "PetscSetupAndFinalize.hpp"
 
@@ -110,7 +110,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*
  *
- * == Simple incompressible deformation: 2D shape hanging under gravity ==
+ * ### Simple incompressible deformation: 2D shape hanging under gravity
  *
  */
 class TestSolvingElasticityProblemsTutorial : public CxxTest::TestSuite
@@ -123,7 +123,7 @@ public:
      * All the mechanics solvers solve for the deformation using the finite element method with QUADRATIC
      * basis functions for the deformation. This necessitates the use of a `QuadraticMesh` - such meshes have
      * extra nodes that aren't vertices of elements, in this case midway along each edge. (The displacement
-     * is solved for at ''each node'' in the mesh (including internal [non-vertex] nodes), whereas the pressure
+     * is solved for at *each node* in the mesh (including internal [non-vertex] nodes), whereas the pressure
      * is only solved for at each vertex - in FEM terms, quadratic interpolation for displacement, linear
      * interpolation for pressure, which is required for stability. The pressure at internal nodes is computed
      * by linear interpolation).
@@ -201,7 +201,7 @@ public:
         solver.Solve();
 
 
-        /* '''Visualisation'''. Go to the folder `SimpleIncompressibleElasticityTutorial` in your test-output directory.
+        /* **Visualisation**. Go to the folder `SimpleIncompressibleElasticityTutorial` in your test-output directory.
          * There should be 2 files, initial.nodes and solution.nodes. These are the original nodal positions and the deformed
          * positions. Each file has two columns, the x and y locations of each node. To visualise the solution in say
          * Matlab or Octave, you could do: `x=load('solution.nodes'); plot(x(:,1),x(:,2),'k*')`. For Cmgui output, see below.
@@ -248,7 +248,7 @@ public:
         TS_ASSERT_DELTA(r_deformed_positions[node_index](1), -0.1129, 1e-3);
         TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 4u);
     }
-    /* ''Exercise'': convert to a compressible solver and compare the resultant deformations.
+    /* ***Exercise***: convert to a compressible solver and compare the resultant deformations.
      * The next tutorial describes how to solve for a compressible deformation,
      * but the changes are essentially trivial: `IncompressibleNonlinearElasticitySolver` needs to be changed to
      * `CompressibleNonlinearElasticitySolver`, the line `problem_defn.SetMaterialLaw(..)` needs changing, and
@@ -257,7 +257,7 @@ public:
      * when the solver is an `CompressibleNonlinearElasticitySolver`.
      */
 
-    /* == Incompressible deformation: 2D shape hanging under gravity with a balancing traction ==
+    /* ### Incompressible deformation: 2D shape hanging under gravity with a balancing traction
      *
      * We now repeat the above test but include a traction on the bottom surface (Y=0). We apply this
      * in the inward direction so that is counters (somewhat) the effect of gravity. We also show how stresses
@@ -367,17 +367,17 @@ public:
 };
     /* More examples are given in the next tutorial
      *
-     * == IMPORTANT: Using HYPRE ==
+     * ### IMPORTANT: Using HYPRE
      *
      * Mechanics solves being nonlinear are expensive, so it is recommended you also use `CMAKE_BUILD_TYPE=Release` when running with CMake
      * on larger problems.
      *
-     * When running '''incompressible''' problems in 3D, or with more elements, it is vital to also change the linear solver to use HYPRE, an algebraic multigrid
+     * When running **incompressible** problems in 3D, or with more elements, it is vital to also change the linear solver to use HYPRE, an algebraic multigrid
      * solver. Without HYRPE, the linear solve (i) may become very very slow; or (ii) may not converge, in which case the nonlinear
      * solve will (probably) not converge. HYPRE is (currently) not a pre-requisite for installing Chaste, hence this is not (currently)
      * the default linear solver for incompressible mechanics problems, although this will change in the future.
      *
-     * ''HYPRE should be considered a pre-requisite for large incompressible mechanics problems.''
+     * ***HYPRE should be considered a pre-requisite for large incompressible mechanics problems.***
      *
      * To use HYPRE, you need to have PETSc installed with HYPRE. However, if you followed installation
      * instructions for Chaste 2.1 or later, you probably do already have PETSc installed with HYPRE.

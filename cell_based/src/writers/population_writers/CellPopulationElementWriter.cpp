@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
+#include "ImmersedBoundaryCellPopulation.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::CellPopulationElementWriter()
@@ -156,6 +157,40 @@ void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellP
         {
             VertexElement<SPACE_DIM, SPACE_DIM>* p_element = pCellPopulation->rGetMesh().GetElement(elem_index);
             unsigned num_nodes_in_element = p_element->GetNumNodes();
+
+            // First write the number of Nodes belonging to this VertexElement
+            *this->mpOutStream << num_nodes_in_element << " ";
+
+            // Then write the global index of each Node in this element
+            for (unsigned i=0; i<num_nodes_in_element; i++)
+            {
+                *this->mpOutStream << p_element->GetNodeGlobalIndex(i) << " ";
+            }
+        }
+    }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void CellPopulationElementWriter<ELEMENT_DIM, SPACE_DIM>::Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+    // Loop over cells and find associated elements so in the same order as the cells in output files
+    for (auto cell_iter = pCellPopulation->Begin(); cell_iter != pCellPopulation->End(); ++cell_iter)
+    {
+        const unsigned elem_index = pCellPopulation->GetLocationIndexUsingCell(*cell_iter);
+
+        // Hack that covers the case where the element is associated with a cell that has just been killed (#1129)
+        bool elem_corresponds_to_dead_cell = false;
+
+        if (pCellPopulation->IsCellAttachedToLocationIndex(elem_index))
+        {
+            elem_corresponds_to_dead_cell = pCellPopulation->GetCellUsingLocationIndex(elem_index)->IsDead();
+        }
+
+        // Write element data to file
+        if (!(pCellPopulation->GetElement(elem_index)->IsDeleted()) && !elem_corresponds_to_dead_cell)
+        {
+            ImmersedBoundaryElement<SPACE_DIM, SPACE_DIM>* const p_element = pCellPopulation->rGetMesh().GetElement(elem_index);
+            const unsigned num_nodes_in_element = p_element->GetNumNodes();
 
             // First write the number of Nodes belonging to this VertexElement
             *this->mpOutStream << num_nodes_in_element << " ";

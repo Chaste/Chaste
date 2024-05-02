@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -71,7 +71,7 @@ private:
 
     /** Scaling factor for offset of halo nodes */
     double mHaloOffset;
-    
+
     /** The left nodes which have been mirrored during the remesh. */
     std::vector<unsigned> mLeftOriginals;
 
@@ -291,7 +291,7 @@ public:
      * @return The maximum distance between any nodes in this dimension.
      */
     double GetWidth(const unsigned& rDimension) const;
- 
+
     /**
      * Set mHaloScalingFactor
      *
@@ -316,7 +316,7 @@ public:
      */
     double GetHaloOffset() const;
 
-    
+
     /**
      * Overridden AddNode() method.
      *

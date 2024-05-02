@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -70,7 +70,7 @@ public:
      *
      * @param quadratureOrder The minimum polynomial order that the rule can integrate exactly
      */
-    GaussianQuadratureRule(unsigned quadratureOrder);
+    explicit GaussianQuadratureRule(unsigned quadratureOrder);
 
     /**
      * Get a quadrature point.

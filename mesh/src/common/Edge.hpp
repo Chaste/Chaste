@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -98,10 +98,10 @@ public:
 
     /**
      * Generate an ordered pair from two node indices.
-     * 
+     *
      * @param index1 Index of first node
      * @param index2 Index of second node
-     * 
+     *
      * @return (index1, index2) if index1 < index2, else (index2, index1)
      */
     static std::pair<unsigned, unsigned> GenerateMapIndex(unsigned index1, unsigned index2);
@@ -118,7 +118,7 @@ public:
 
     /**
      * Set the index of this edge within the mesh.
-     * 
+     *
      * @param index The index of this edge within the mesh
      */
     void SetIndex(unsigned index);
@@ -140,7 +140,7 @@ public:
 
     /**
      * Set the Edge's associated nodes.
-     * 
+     *
      * @param pNodeA A Node that forms one point of the edge
      * @param pNodeB A different Node that forms the other point of the edge
      */
@@ -148,7 +148,7 @@ public:
 
     /**
      * Replace a Node in this Edge with another.
-     * 
+     *
      * @param pOldNode The old Node to be replaced
      * @param pNewNode New Node to replace the old Node
      */
@@ -156,7 +156,7 @@ public:
 
     /**
      * @param index local index of the Node
-     * 
+     *
      * @return pointer to the Node with given local index.
      */
     Node<SPACE_DIM>* GetNode(unsigned index) const;
@@ -168,7 +168,7 @@ public:
 
     /**
      * @param pNode pointer to a Node
-     * 
+     *
      * @return true if pNode is containd in Edge, otherwise false
      */
     bool ContainsNode(Node<SPACE_DIM>* pNode) const;
@@ -185,29 +185,29 @@ public:
 
     /**
      * Gets other Element indices that the edge is associated to.
-     * 
+     *
      * @param elementIndex The Element index to exclude
-     * 
+     *
      * @return A set of Element indices or an empty set if there's no association.
      */
     std::set<unsigned> GetOtherElements(unsigned elementIndex);
 
     /**
      * Add an Element index that the Edge is associated to.
-     * 
+     *
      * @param elementIndex an element index
      */
     void AddElement(unsigned elementIndex);
 
     /**
      * Remove an Element index association from the Edge.
-     * 
+     *
      * @param elementIndex an element index
      */
     void RemoveElement(unsigned elementIndex);
 
     /**
-    * Get all Element indices that the edge is associated to. 
+    * Get all Element indices that the edge is associated to.
     * Used for testing the accounting of Add and Remove element.
     *
     * @return A set of Element indices or an empty set if there's no association.
@@ -226,9 +226,9 @@ public:
 
     /**
      * Comparison operator.
-     * 
+     *
      * @param rEdge another Edge
-     * 
+     *
      * @return true if the edges are equal
      */
     bool operator==(const Edge<SPACE_DIM>& rEdge) const;

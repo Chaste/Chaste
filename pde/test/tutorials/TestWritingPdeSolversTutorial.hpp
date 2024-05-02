@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -55,7 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /*
- * == Introduction ==
+ * ### Introduction
  *
  * Chaste can be used to set up solvers for more general (coupled) PDEs. To do this the
  * user just needs to code up the integrands of any finite element (FE) matrices or vectors,
@@ -72,8 +72,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * we explain how to do this.
  *
  * For this tutorial the user needs to have read the solving-PDEs tutorials. It may also be
- * helpful to read the associated [wiki:ChasteGuides/NmoodLectureNotes lectures notes], in
- * particular the slides on solving equations using finite elements if you are not familiar
+ * helpful to read the associated [lectures notes](https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/NmoodLectureNotes),
+ * in particular the slides on solving equations using finite elements if you are not familiar
  * with this (lecture 2), the slides on the general design of the Chaste finite element solvers
  * (lecture 3), and the first part of lecture 4.
  *
@@ -95,36 +95,47 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * case described above (in which both A and b in Ax=b are assembled), we can use the design
  * where the solver IS AN assembler. We illustrate how to do this in the first tutorial.
  *
- * == Writing solvers ==
+ * ### Writing solvers
  *
  * Let us write a solver for the coupled 2-unknown problem
- * {{{
- *    Laplacian(u) + v = f(x,y)
- *    Laplacian(v) + u = g(x,y)
- * }}}
- * where `Laplacian(u)` of course represents u,,xx,,+u,,yy,, and where f and g are chosen so that,
- * with zero-dirichlet boundary conditions, the solution is given by u = sin(pi*x)sin(pi*x),
- * v = sin(2*pi*x)sin(2*pi*x).
  *
- *( As a brief aside, note that the solver we write will in fact work with general Dirichlet-Neumann
+ * $$
+ * \begin{align*}
+ * \nabla^2 u + v &= f(x,y),\\\\\\
+ * \nabla^2 u + u &= g(x,y),
+ * \end{align*}
+ * $$
+ *
+ * where $f$ and $g$ are chosen so that,
+ * with zero-dirichlet boundary conditions, the solution is given by $u = \sin(\pi x)\sin(\pi x)$,
+ * $v = \sin(2\pi x)\sin(2\pi x)$.
+ *
+ * (As a brief aside, note that the solver we write will in fact work with general Dirichlet-Neumann
  * boundary conditions, though the test will only provide all-Dirichlet boundary conditions. We
  * save a discussion on general Dirichlet-Neumann boundary conditions for the second example.)
  *
  * Using linear basis functions, and a mesh with N nodes, the linear system that needs to be set up is
  * of size 2N by 2N, and in block form is:
- * {{{
- *   [ K   -M  ] [U]  =  [b1]
- *   [ -M   K  ] [V]     [b2]
- * }}}
- * where `K` is the stiffness matrix, `M` the mass matrix, `U` the vector of nodal values
- * of u, `V` the vector of nodal values of v, `b1` the vector with entries `integral(f\phi_i dV)` (i=1,..,N)
- * and `b2` has entries `integral(g\phi_i dV)` (here `phi_i` are the linear basis functions).
  *
- * This is the linear system which we now write a solver to set up. '''Note''', however, that
- * the main Chaste solvers assume a STRIPED data format, ie that the unknown vector
- * is `[U_1 V_1 U_2 V_2 .. U_n V_n]`, not `[ U_1 U_2 .. U_n V_1 V_2 .. V_n]`. ''We write down
- * equations in block form as it makes things clearer, but have to remember that the code
- * deals with STRIPED data structures.'' Striping is used in the code for parallelisation reasons.
+ * ```
+ * [ K   -M  ] [U]  =  [b1]
+ * [ -M   K  ] [V]     [b2]
+ * ```
+ *
+ * where `K` is the stiffness matrix, `M` the mass matrix, `U` the vector of nodal values
+ * of u, `V` the vector of nodal values of v, `b1` the vector with entries $\int f\phi_i dV$ ($i=1,\dots,N$)
+ * and `b2` has entries $\int g\phi_i dV$ (here $\phi_i$ are the linear basis functions).
+ *
+ * This is the linear system which we now write a solver to set up.
+ * {{< callout context="note" title="Note" icon="info-circle" >}}
+ * The main Chaste solvers assume a **STRIPED** data format, i.e. that the unknown vector
+ * is:
+ *
+ * `[U_1 V_1 U_2 V_2 .. U_n V_n]`, not `[U_1 U_2 .. U_n V_1 V_2 .. V_n]`.
+ *
+ * *We write down equations in block form as it makes things clearer, but have to remember that the code
+ * deals with STRIPED data structures.* Striping is used in the code for parallelisation reasons.
+ * {{< /callout >}}
  *
  * These are some basic includes as in the solving-PDEs tutorials
  */
@@ -176,8 +187,8 @@ private:
      *  class needs to provide the integrand of the elemental contribution to A and b. This first
      *  method returns the elemental contribution of the matrix A, given the provided bases
      *  (`rPhi`, `rGradPhi`). The '3's here represent the number of bases per element (ie the number
-     *  of nodes as linear bases are being used). The returned matrix is 6 by 6 (problem_dim *
-     *  num_bases_per_element = 2*3 = 6).
+     *  of nodes as linear bases are being used). The returned matrix is 6 by 6 (`problem_dim *
+     *  num_bases_per_element = 2*3 = 6`).
      */
     c_matrix<double,2*3,2*3> ComputeMatrixTerm(c_vector<double,3>& rPhi /* the three bases for the current element, evaluated at the current quad pt*/,
                                                c_matrix<double,2,3>& rGradPhi /* gradients of the three bases */,
@@ -254,38 +265,46 @@ public:
  *  That is the solver written. The usage is the same as see the PDE solvers described in the
  *  previous tutorials - have a look at the first test below.
  *
- *  == A solver of 3 parabolic equations ==
+ *  ### A solver of 3 parabolic equations
  *
  *  Let us also write a solver for the following problem, which is composed of 3 parabolic PDEs
- *  {{{
- *    u_t = Laplacian(u) + v
- *    v_t = Laplacian(v) + u + 2w
- *    w_t = Laplacian(w) + g(t,x,y)
- *  }}}
- *  where g(t,x,y) = t if x>0.5 and 0 otherwise. This time we assume general
+ *
+ * $$
+ * \begin{align*}
+ * u_t &= \nabla^2 u + v,\\\\\\
+ * v_t &= \nabla^2 v + u + 2w,\\\\\\
+ * w_t &= \nabla^2 w + g(t,x,y),
+ * \end{align*}
+ * $$
+ *
+ *  where $g(t,x,y) = t$ if $x>0.5$ and $0$ otherwise. This time we assume general
  *  Dirichlet-Neumann boundary conditions will be specified.
  *
  *  The `AbstractAssemblerSolverHybrid` deals with the Dirichlet and Neumann boundary parts of the implementation,
  *  so, we, the writer of the solver, don't have to worry about this. The user has to realise though that they are
  *  specifying NATURAL Neumann BCs, which are whatever appears naturally in the weak form of the problem. In this case, natural
- *  Neumann BCs are specification of: `du/dn = s1, dv/dn = s2, dw/dn = s3`, which coincide with usual Neumann BCs. However,
- *  suppose the last equation was `w_t = Laplacian(w) + Div(D grad(u))`, then the natural BCs would be:
- *  `du/dn = s1, dv/dn = s2, dw/dn + (Dgradu).n = s3`.
+ *  Neumann BCs are specification of: $\partial u/\partial n = s_1, \partial v/\partial n = s_2, \partial w/ \partial n = s_3$,
+ *  which coincide with usual Neumann BCs. However, suppose the last equation was $w_t = \nabla^2 w + \nabla . (D \nabla u)$,
+ *  then the natural BCs would be:
+ *  $\partial u/\partial n = s_1, \partial v/\partial n = s_2, \partial w/\partial n + (D\nabla u).n = s_3$.
  *
  *  We need to choose a time-discretisation. Let us choose an implicit discretisation, ie
- *  {{{
+ *
+ *  ```
  *  (u^{n+1} - u^{n})/dt = Laplacian(u^{n+1}) + v^{n+1}
  *  (v^{n+1} - v^{n})/dt = Laplacian(v^{n+1}) + u^{n+1} + 2w^{n+1}
  *  (w^{n+1} - w^{n})/dt = Laplacian(w^{n+1}) + g(t^{n+1},x)
- *  }}}
+ *  ```
  *
  *  Using linear basis functions, and a mesh with N nodes, the linear system that needs to be set up is
  *  of size 3N by 3N, and in block form is:
- *  {{{
- *    [ M/dt+K     -M       0    ] [U^{n+1}]  =  [b1]  +  [c1]
- *    [   -M     M/dt+K    -2M   ] [V^{n+1}]     [b2]  +  [c2]
- *    [    0        0     M/dt+K ] [W^{n+1}]     [b3]  +  [c3]
- *  }}}
+ *
+ *  ```
+ *  [ M/dt+K     -M       0    ] [U^{n+1}]  =  [b1]  +  [c1]
+ *  [   -M     M/dt+K    -2M   ] [V^{n+1}]     [b2]  +  [c2]
+ *  [    0        0     M/dt+K ] [W^{n+1}]     [b3]  +  [c3]
+ *  ```
+ *
  * where `K` is the stiffness matrix, `M` the mass matrix, `U^n` the vector of nodal values
  * of u at time t_n, etc, `b1` has entries `integral( (u^n/dt)phi_i dV )`, and similarly for
  * `b2` and `b3`. Writing the Neumann boundary conditions for
@@ -386,7 +405,7 @@ private:
     }
 
 public:
-    /* The constructor is similar to before. However: '''important''' - by default the dynamic solvers
+    /* The constructor is similar to before. However: **important** - by default the dynamic solvers
      * will reassemble the matrix each timestep. In this (and most other) problems the matrix is constant
      * and only needs to be assembled once. Make sure we tell the solver this, otherwise performance
      * will be destroyed.
@@ -451,7 +470,7 @@ public:
         mesh.ConstructRegularSlabMesh(0.05 /*h*/, 1.0 /*width*/, 1.0 /*height*/);
 
         /* Set up the boundary conditions. v and w are zero on the entire boundary,
-         * and du/dn=1 on the LHS and 0 otherwise.
+         * and $\partial u/\partial n=1$ on the LHS and 0 otherwise.
          */
         BoundaryConditionsContainer<2,2,3> bcc;
 
@@ -489,7 +508,7 @@ public:
          * the output to plain txt files. We also say how often to write the data, telling the
          * solver to output results to file every tenth timestep. The solver will create
          * one file for each variable and for each time, so for example, the file
-         * results_Variable_0_10 is the results for u, over all nodes, at the 11th printed time.
+         * `results_Variable_0_10` is the results for $u$, over all nodes, at the 11th printed time.
          * Have a look in the output directory after running the test. (Note: the HDF5 data can also be
          * converted to VTK or cmgui formats).
          */
@@ -510,27 +529,29 @@ public:
         /* Note that we need to destroy the initial condition vector as well as the solution. */
         PetscTools::Destroy(initial_condition);
         PetscTools::Destroy(result);
-        /*
-         *
-         * '''Visualisation:''' To visualise in matlab/octave, you can load the node file,
-         * and then the data files. However, the node file needs to be edited to remove any
-         * comment lines (lines starting with '#') and the header line (which says how
-         * many nodes there are). (The little matlab script 'anim/matlab/read_chaste_node_file.m'
-         * can be used to do this, though it is not claimed to be very robust). As an
-         * example matlab visualisation script, the following, if run from the output
-         * directory, plots w:
-         * {{{
-         * pos = read_chaste_node_file('mesh.node');
-         * for i=0:200
-         *   file = ['txt_output/results_Variable_2_',num2str(i),'.txt'];
-         *   w = load(file);
-         *   plot3(pos(:,1),pos(:,2),w,'*');
-         *   pause;
-         * end;
-         * }}}
-         *
-         */
     }
 };
+/*
+ *
+ * **Visualisation:** To visualise in matlab/octave, you can load the node file,
+ * and then the data files. However, the node file needs to be edited to remove any
+ * comment lines (lines starting with `#`) and the header line (which says how
+ * many nodes there are). (The little matlab script [`anim/matlab/read_chaste_node_file.m`](https://github.com/Chaste/Chaste/blob/develop/anim/matlab/read_chaste_node_file.m)
+ * can be used to do this, though it is not claimed to be very robust). As an
+ * example matlab visualisation script, the following, if run from the output
+ * directory, plots w:
+ *
+ * ```matlab
+ * pos = read_chaste_node_file('mesh.node');
+ * for i=0:200
+ *   file = ['txt_output/results_Variable_2_',num2str(i),'.txt'];
+ *   w = load(file);
+ *   plot3(pos(:,1),pos(:,2),w,'*');
+ *   pause;
+ * end;
+ * ```
+ *
+ */
+
 
 #endif // TESTWRITINGPDESOLVERSTUTORIAL_HPP_

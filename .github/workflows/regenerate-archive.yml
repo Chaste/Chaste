@@ -14,7 +14,7 @@ jobs:
         RUNNER_OFF: 1
       volumes:
         - runner_volume:/home/runner
-      options: --user 0 --cpus 2
+      options: --user 0 --cpus 4
       
     env:
       CC: gcc
@@ -72,20 +72,20 @@ jobs:
       - name: run TestChasteBuildInfo
         run: |
           source init.sh
-          su -m runner -c "cmake --build . --target TestChasteBuildInfo --parallel 2"
+          su -m runner -c "cmake --build . --target TestChasteBuildInfo --parallel 4"
           su -m runner -c "ctest -V -R TestChasteBuildInfo --output-on-failure"
         working-directory: chaste-build-dir
 
       - name: build TestGenerateSteadyStateCrypt
         run: |
           source init.sh
-          su -m runner -c "cmake --build . --target TestGenerateSteadyStateCrypt --parallel 2"
+          su -m runner -c "cmake --build . --target TestGenerateSteadyStateCrypt --parallel 4"
         working-directory: chaste-build-dir
 
       - name: run TestGenerateSteadyStateCrypt
         run: |
           source init.sh
-          su -m runner -c "ctest -j2 -R TestGenerateSteadyStateCrypt"
+          su -m runner -c "ctest -j4 -R TestGenerateSteadyStateCrypt"
         working-directory: chaste-build-dir
 
       - name: Upload archive files

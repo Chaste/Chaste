@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 #include <iostream>
 #include <boost/math/tools/roots.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 #include "BoostTolerance.hpp"
 #include "HiornsAirwayWall.hpp"
@@ -130,7 +130,7 @@ void HiornsAirwayWall::SolveAndUpdateState(double tStart, double tEnd)
     Tolerance tol = 0.000001;
     boost::uintmax_t maxIterations = 500u;
 
-    std::pair<double, double> found = boost::math::tools::bracket_and_solve_root(boost::bind(&HiornsAirwayWall::CalculatePressureRadiusResidual, this, _1), guess, factor, false, tol, maxIterations);
+    std::pair<double, double> found = boost::math::tools::bracket_and_solve_root(boost::bind(&HiornsAirwayWall::CalculatePressureRadiusResidual, this, boost::placeholders::_1), guess, factor, false, tol, maxIterations);
     mDeformedAirwayRadius = found.first;
 }
 

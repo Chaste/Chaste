@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2023, University of Oxford.
+# Copyright (c) 2005-2024, University of Oxford.
 # All rights reserved.
 # 
 # University of Oxford means the Chancellor, Masters and Scholars of the
@@ -31,7 +31,7 @@
 
 
 #This CMake build file automatically builds Chaste and its third party library dependencies as external projects.
-cmake_minimum_required (VERSION 2.8.10)
+cmake_minimum_required (VERSION 3.16.3)
 
 include(${CMAKE_CURRENT_LIST_DIR}/overrides.cmake)
 

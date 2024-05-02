@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,34 +46,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTRUNNINGDELTANOTCHSIMULATIONSTUTORIAL_HPP_
 
 /*
- * = An example showing how to run Delta/Notch simulations =
+ * ## An example showing how to run Delta/Notch simulations
  *
- * EMPTYLINE
- *
- * == Introduction ==
- *
- * EMPTYLINE
+ * ### Introduction
  *
  * In this tutorial we show how Chaste can be used to simulate a growing cell monolayer culture
  * into which a simple model of Delta/Notch signalling is incorporated. This model was developed
  * by Collier et al. ("Pattern formation by lateral inhibition with feedback: a mathematical
- * model of delta-notch intercellular signalling", J. Theor. Biol. 183:429-446) and comprises
+ * model of delta-notch intercellular signalling", [J. Theor. Biol. 183:429-446](https://doi.org/10.1006/jtbi.1996.0233)) and comprises
  * two ODEs to describe the evolution in concentrations of Delta and Notch in each cell. The ODE
  * for Notch includes a reaction term that depends on the mean Delta concentration among neighbouring
  * cells. Thus in this simulation each cell needs to be able to access information about its
- * neighbours. We use the {{{CellData}}} class to facilitate this, and introduce a subclass
- * of {{{OffLatticeSimulation}}} called {{{DeltaNotchOffLatticeSimulation}}} to handle the updating
- * of {{{CellData}}} at each time step as cell neighbours change.
+ * neighbours. We use the `CellData` class to facilitate this, and introduce a subclass
+ * of `OffLatticeSimulation` called `DeltaNotchOffLatticeSimulation` to handle the updating
+ * of `CellData` at each time step as cell neighbours change.
  *
- * EMPTYLINE
- *
- * == The test ==
- *
- * EMPTYLINE
+ * ### The test
  *
  * As in previous tutorials, we begin by including the necessary header files. We have
- * encountered these files already. Recall that often, either {{{CheckpointArchiveTypes.hpp}}}
- * or {{{CellBasedSimulationArchiver.hpp}}} must be included the first Chaste header.
+ * encountered these files already. Recall that often, either `CheckpointArchiveTypes.hpp`
+ * or `CellBasedSimulationArchiver.hpp` must be included the first Chaste header.
  */
 #include <cxxtest/TestSuite.h>
 #include "CheckpointArchiveTypes.hpp"
@@ -101,12 +93,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * The next header file defines a simple subcellular reaction network model that includes the functionality
  * for solving each cell's Delta/Notch signalling ODE system at each time step, using information about neighbouring
- * cells through the {{{CellData}}} class.
+ * cells through the `CellData` class.
  */
 #include "DeltaNotchSrnModel.hpp"
 /*
  * The next header defines the simulation class modifier corresponding to the Delta-Notch SRN model.
- * This modifier leads to the {{{CellData}}} cell property being updated at each timestep to deal with Delta-Notch signalling.
+ * This modifier leads to the `CellData` cell property being updated at each timestep to deal with Delta-Notch signalling.
  */
 #include "DeltaNotchTrackingModifier.hpp"
 
@@ -117,26 +109,22 @@ class TestRunningDeltaNotchSimulationsTutorial : public AbstractCellBasedTestSui
 public:
 
     /*
-     * EMPTYLINE
-     *
-     * == Test 1: a vertex-based monolayer with Delta/Notch signalling ==
-     *
-     * EMPTYLINE
+     * ### Test 1: a vertex-based monolayer with Delta/Notch signalling
      *
      * In the first test, we demonstrate how to simulate a monolayer that incorporates
      * Delta/Notch signalling, using a vertex-based approach.
      */
     void TestVertexBasedMonolayerWithDeltaNotch()
     {
-        /* We include the next line because Vertex simulations cannot be run in parallel */
+        /* We include the next line because vertex simulations cannot be run in parallel */
         EXIT_IF_PARALLEL;
 
         /* First we create a regular vertex mesh. */
         HoneycombVertexMeshGenerator generator(5, 5);
         boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
-        /* We then create some cells, each with a cell-cycle model, {{{UniformG1GenerationalCellCycleModel}}} and a subcellular reaction network model
-         * {{{DeltaNotchSrnModel}}}, which
+        /* We then create some cells, each with a cell-cycle model, `UniformG1GenerationalCellCycleModel` and a subcellular reaction network model
+         * `DeltaNotchSrnModel`, which
          * incorporates a Delta/Notch ODE system, here we use the hard coded initial conditions of 1.0 and 1.0.
          * In this example we choose to make each cell differentiated,
          * so that no cell division occurs. */
@@ -180,7 +168,7 @@ public:
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(1.0);
 
-        /* Then, we define the modifier class, which automatically updates the values of Delta and Notch within the cells in {{{CellData}}} and passes it to the simulation.*/
+        /* Then, we define the modifier class, which automatically updates the values of Delta and Notch within the cells in `CellData` and passes it to the simulation.*/
         MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
@@ -195,30 +183,24 @@ public:
     }
 
     /*
-     * EMPTYLINE
+     * To visualize the results, use Paraview. See the [Visualizing With Paraview](../visualizingwithparaview/) tutorial for more information.
      *
-     * To visualize the results, use Paraview. See the UserTutorials/VisualizingWithParaview tutorial for more information.
+     * Load the file `/tmp/$USER/testoutput/TestVertexBasedMonolayerWithDeltaNotch/results_from_time_0/results.pvd`.
      *
-     * Load the file {{{/tmp/$USER/testoutput/TestVertexBasedMonolayerWithDeltaNotch/results_from_time_0/results.pvd}}}.
-     *
-     * EMPTYLINE
-     *
-     * == Test 2 - a node-based monolayer with Delta/Notch signalling ==
-     *
-     * EMPTYLINE
+     * ### Test 2 - a node-based monolayer with Delta/Notch signalling
      *
      * In the next test we run a similar simulation as before, but this time with node-based
      * 'overlapping spheres' model.
      */
     void TestNodeBasedMonolayerWithDeltaNotch()
     {
-        /* We include the next line because HoneycombMeshGenerator, used in this test, is not
+        /* We include the next line because `HoneycombMeshGenerator`, used in this test, is not
          *  yet implemented in parallel. */
         EXIT_IF_PARALLEL;
 
         /*
          * Most of the code in this test is the same as in the previous test,
-         * except we now create a 'nodes-only mesh' and {{{NodeBasedCellPopulation}}}.
+         * except we now create a 'nodes-only mesh' and `NodeBasedCellPopulation`.
          */
         HoneycombMeshGenerator generator(5, 5);
         boost::shared_ptr<MutableMesh<2,2> > p_generating_mesh = generator.GetMesh();
@@ -262,7 +244,7 @@ public:
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(5.0);
 
-        /* Again we define the modifier class, which automatically updates the values of Delta and Notch within the cells in {{{CellData}}} and passes it to the simulation.*/
+        /* Again we define the modifier class, which automatically updates the values of Delta and Notch within the cells in `CellData` and passes it to the simulation.*/
         MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
         simulator.AddSimulationModifier(p_modifier);
 
@@ -273,17 +255,15 @@ public:
 
         simulator.Solve();
     }
-    /*
-     * EMPTYLINE
-     *
-     * To visualize the results, use Paraview. See the UserTutorials/VisualizingWithParaview tutorial for more information.
-     *
-     * Load the file {{{/tmp/$USER/testoutput/TestNodeBasedMonolayerWithDeltaNotch/results_from_time_0/results.pvd}}},
-     * and add a spherical glyph.
-     *
-     * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
-     * displayed by Paraview.
-     */
 };
+/*
+ * To visualize the results, use Paraview. See the [Visualizing With Paraview](../visualizingwithparaview/) tutorial for more information.
+ *
+ * Load the file `/tmp/$USER/testoutput/TestNodeBasedMonolayerWithDeltaNotch/results_from_time_0/results.pvd`,
+ * and add a spherical glyph.
+ *
+ * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
+ * displayed by Paraview.
+ */
 
 #endif /*TESTRUNNINGDELTANOTCHSIMULATIONSTUTORIAL_HPP_*/

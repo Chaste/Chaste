@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -370,7 +370,6 @@ MutableElement<1, SPACE_DIM>::MutableElement(unsigned index, const std::vector<N
     mEdgeHelper(nullptr)
 {
     // Sanity checking
-    assert(this->mNodes.size() == 2);
     assert(SPACE_DIM > 0);
 }
 

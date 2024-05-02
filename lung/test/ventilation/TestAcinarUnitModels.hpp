@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,7 +50,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BackwardEulerIvpOdeSolver.hpp"
 
 #include <boost/math/tools/roots.hpp>
-#include <boost/bind.hpp>
 #include <iomanip>
 
 //#include "PetscSetupAndFinalize.hpp"
@@ -244,7 +243,7 @@ public:
        double pleural_pressure = 0.0;
 
        double ode_volume = 0.0;
-       double flow_integral = 0.0;
+       [[maybe_unused]] double flow_integral = 0.0;
 
        while (!time_stepper.IsTimeAtEnd())
        {

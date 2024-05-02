@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,8 +46,8 @@ template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
 template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
 
 /**
- * A class to generate a division vector of unit length that points in a direction 
- * randomly sampled from a von Mises distribution parameterised by mu (mean parameter) 
+ * A class to generate a division vector of unit length that points in a direction
+ * randomly sampled from a von Mises distribution parameterised by mu (mean parameter)
  * and kappa (concentration parameter).
  */
 template <unsigned SPACE_DIM>

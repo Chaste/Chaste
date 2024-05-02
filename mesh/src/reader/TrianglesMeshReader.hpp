@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -320,13 +320,14 @@ private:
     void GetNextLineFromStream(std::ifstream& rFileStream, std::string& rRawLine);
 
     /**
-     * @return the Item details from the next line via a call to GetNextLineFromStream()
+     * Returns the Item details (via arguments) from the next line via a call to GetNextLineFromStream()
      *
      * @param rFileStream  The file to read from
      * @param expectedItemNumber  To check file syntax, what item is expected to be on the next line.
-     * @param rDataPacket  Assumed to be of the right size but is allowed to contain dirty data on entry.
+     * @param rDataPacket  Assumed to be of the right size but is allowed to contain dirty data on entry (returned).
      * @param rNumAttributes  The number of attributes per item that we expect to read. Either #mNumFaceAttributes or #mNumElementAttributes.
-     * @param rAttributes  Will be filled with the attribute values if rNumAttributes > 0, otherwise empty.  Note that floating point attributes are now standard
+     * @param rAttributes  Will be filled with the attribute values if rNumAttributes > 0, otherwise empty.  Note that floating point
+     *                     attributes are now standard (returned)
      */
     template<class T_DATA>
     void GetNextItemFromStream(std::ifstream& rFileStream, unsigned expectedItemNumber,

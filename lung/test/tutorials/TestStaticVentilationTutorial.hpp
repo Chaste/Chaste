@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /*
- * = An example showing how to calculate ventilation distribution in an airway tree for a given flow rate at the trachea =
+ * ## An example showing how to calculate ventilation distribution in an airway tree for a given flow rate at the trachea
  *
  * In this tutorial we demonstrate the use of !MatrixVentilationProblem to calculate airflow distribution in an airway
  * tree model. Homogeneous pressure boundary conditions are used at the terminals of the tree and a flow boundary condition
@@ -85,7 +85,7 @@ public: // Tests should be public!
          * Typically intermediate nodes are found in imaging derived airways centerlines. These can be removed
          * using the !AirwayRemesher class.
          *
-         * == IMPORTANT ==
+         * ### IMPORTANT
          * See the note below about use of UMFPACK or KLU. If UMFPACK or KLU are not available we use a different (not realistic) airways
          * mesh.
          */
@@ -151,7 +151,7 @@ public: // Tests should be public!
 
     /*
      *
-     * == IMPORTANT: Using UMFPACK/KLU ==
+     * ### IMPORTANT: Using UMFPACK/KLU
      *
      * Ventilation problems lead to very badly conditioned matrices. Iterative solvers such as GMRES can stall on these
      * matrices. When running problems on large airway trees it is vital that to change the linear solver to a direct

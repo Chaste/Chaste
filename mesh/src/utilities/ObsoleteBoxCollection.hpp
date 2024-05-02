@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -196,7 +196,7 @@ public:
      * @param rNodes all the nodes to be considered
      * @param rNodePairs the return value, a set of pairs of nodes
      */
-    void CalculateNodePairs(std::vector<Node<DIM>*>& rNodes,
+    void CalculateNodePairs(const std::vector<Node<DIM>*>& rNodes,
                             std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
 
     /**

@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2023, University of Oxford.
+# Copyright (c) 2005-2024, University of Oxford.
 # All rights reserved.
 # 
 # University of Oxford means the Chancellor, Masters and Scholars of the
@@ -52,8 +52,8 @@ message ("####################################\n")
 message(STATUS "CMake version: ${CMAKE_VERSION}")
 
 # Since CMake 3.0, version can be supplied to the project() command.  We set it directly, for users on older CMake
-project (Chaste VERSION 2021.1)
-set (Chaste_VERSION_MAJOR 2021 CACHE STRING "Chaste major version number")
+project (Chaste VERSION 2024.1)
+set (Chaste_VERSION_MAJOR 2024 CACHE STRING "Chaste major version number")
 set (Chaste_VERSION_MINOR 1 CACHE STRING "Chaste minor version number")
 
 include (ChasteHostOperatingSystem)
@@ -134,9 +134,9 @@ option (Chaste_USE_PETSC_HDF5 "Prefer to compile Chaste with HDF5 library used b
 
 option (Chaste_UPDATE_PROVENANCE "Update build timestamp. Disable to prevent re-linking of all Chaste libraries" ON)
 
-option (RUN_TESTS "This option simply runs Chaste tests. You should also set the test family." OFF)
-set (TEST_FAMILY "Continuous" CACHE STRING "The name of the test family, e.g, Continuous, Failing, Nightly, Parallel etc.")
-set (TestPackTypes "Continuous;Failing;Nightly;Parallel;Production;Weekly;Profile;ProfileAssembly;ExtraSimulations;Codegen")
+option(RUN_TESTS "This option simply runs Chaste tests. You should also set the test family." OFF)
+set(TEST_FAMILY "Continuous" CACHE STRING "The name of the test family, e.g, Continuous, Failing, Nightly, Parallel etc.")
+set(TestPackTypes "Continuous;Failing;Nightly;Parallel;Production;Weekly;Profile;ProfileAssembly;ExtraSimulations;Codegen")
 
 if (RUN_TESTS)
     list (FIND TestPackTypes ${TEST_FAMILY} found)
@@ -273,9 +273,9 @@ endif ()
 ################################
 ####  Find Python
 ################################
-find_package(PythonInterp 3.5)
-if (PYTHON_VERSION_STRING VERSION_LESS 3.5.0)
-    message(FATAL_ERROR "Python 3.5 or higher is required; found v${PYTHON_VERSION_STRING} instead. Specify interpreter with -DPYTHON_EXECUTABLE=/path/to/python3")
+find_package(Python3 3.5)
+if (Python3_VERSION VERSION_LESS 3.5.0)
+    message(FATAL_ERROR "Python 3.5 or higher is required; found v${Python3_VERSION} instead. Specify interpreter with -DPython_EXECUTABLE=/path/to/python3")
 endif ()
 
 # Install chaste_codegen in virtual environment
@@ -284,14 +284,14 @@ set(codegen_python3_venv ${PROJECT_BINARY_DIR}/codegen_python3_venv/bin)
 if (NOT EXISTS ${codegen_python3_venv})
     message (STATUS "Creating virtual environment for chaste_codegen in ${PROJECT_BINARY_DIR}/codegen_python3_venv")
     execute_process(
-        COMMAND ${PYTHON_EXECUTABLE} -m venv codegen_python3_venv
+        COMMAND ${Python3_EXECUTABLE} -m venv codegen_python3_venv
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
     )
 endif ()
 
 # Update pip setuptools and wheel
 message (STATUS "Updating pip setuptools and wheel")
-if (${PYTHON_VERSION_STRING} VERSION_LESS 3.6.0)
+if (${Python3_VERSION} VERSION_LESS 3.6.0)
     execute_process(COMMAND ${codegen_python3_venv}/pip install --no-cache-dir "pip>=20.0, <21.0")
     execute_process(COMMAND ${codegen_python3_venv}/pip install --no-cache-dir --upgrade setuptools wheel)
 else()
@@ -395,9 +395,13 @@ else ()
     set(Boost_USE_STATIC_LIBS ON)
     set(Boost_USE_STATIC_RUNTIME ON)
 endif ()
-find_package(Boost COMPONENTS filesystem system serialization program_options REQUIRED)
-list(APPEND Chaste_INCLUDES "${Boost_INCLUDE_DIR}")
-list(APPEND Chaste_LINK_LIBRARIES "${Boost_LIBRARIES}")
+find_package (Boost COMPONENTS filesystem system serialization program_options REQUIRED)
+list (APPEND Chaste_INCLUDES "${Boost_INCLUDE_DIR}")
+list (APPEND Chaste_LINK_LIBRARIES "${Boost_LIBRARIES}")
+# Suppress boost deprecation notices in Boost 1.74.0 (shipped with Ubuntu 22.04), fixed in 1.75
+if (Boost_VERSION VERSION_GREATER_EQUAL 1.74.0 AND Boost_VERSION VERSION_LESS 1.75.0)
+    add_definitions(-DBOOST_ALLOW_DEPRECATED_HEADERS)
+endif ()
 
 
 ################################
@@ -546,6 +550,7 @@ if (Chaste_USE_XERCES)
     list (APPEND Chaste_LINK_LIBRARIES "${XERCESC_LIBRARY}")
     add_definitions (-DCHASTE_XERCES)
 endif ()
+
 
 add_definitions (-DTRILIBRARY -DTETLIBRARY -DANSI_DECLARATORS)
 
@@ -880,7 +885,7 @@ if (Chaste_COVERAGE)
                        set (_page_title "\"Chaste Coverage Results for commit ${Chaste_REVISION}\"")
                        COMMAND ${GENHTML_PATH} --title "${_page_title}" --config-file ${Chaste_SOURCE_DIR}/cmake/Config/lcovrc --no-function-coverage -o ${_outputname} ${_outputname}.info.cleaned
                        COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned
-                       COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_coverage_output.py" "${_outputname}"
+                       COMMAND ${Python3_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_coverage_output.py" "${_outputname}"
 
                        DEPENDS Continuous Parallel
                        WORKING_DIRECTORY ${Chaste_BINARY_DIR}
@@ -956,14 +961,14 @@ endif ()
 ####################
 
 add_custom_target (doxygen
-                   COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/run-doxygen.py" "${Chaste_SOURCE_DIR}"
+                   COMMAND ${Python3_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/run-doxygen.py" "${Chaste_SOURCE_DIR}"
                    "${Chaste_BINARY_DIR}/doxygen" "${Chaste_REVISION}"
                    WORKING_DIRECTORY ${Chaste_BINARY_DIR}
                    COMMENT "Generating Doxygen documentation"
                    VERBATIM)
 
 add_custom_target (doxygen_coverage
-                   COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/run-doxygen.py" "${Chaste_SOURCE_DIR}"
+                   COMMAND ${Python3_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/run-doxygen.py" "${Chaste_SOURCE_DIR}"
                    "${Chaste_BINARY_DIR}/doxygen_coverage" "${Chaste_REVISION}" "True"
                    WORKING_DIRECTORY ${Chaste_BINARY_DIR}
                    COMMENT "Checking Doxygen coverage"
@@ -980,7 +985,7 @@ if (Chaste_MEMORY_TESTING)
     set (CTEST_COMMAND ctest)
     add_custom_target (memtest
                        COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-j${Chaste_MEMORY_TESTING_CPUS}" "-L" Continuous "--output-on-failure"
-                       COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_valgrind_output.py" "${Chaste_MEMORY_TESTING_OUTPUT_DIR}"
+                       COMMAND ${Python3_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_valgrind_output.py" "${Chaste_MEMORY_TESTING_OUTPUT_DIR}"
                        DEPENDS Continuous
                        WORKING_DIRECTORY ${Chaste_BINARY_DIR}
                        VERBATIM)
@@ -1005,7 +1010,7 @@ if (Chaste_PROFILE_GPROF OR Chaste_PROFILE_GPERFTOOLS)
     set (CTEST_COMMAND ctest)
     add_custom_target (profile
                        COMMAND ${NICE_COMMAND} ${NICENESS} ${CTEST_COMMAND} "-j${NUM_CPUS}" "-L" "^Profile_" "--output-on-failure"
-                       COMMAND ${PYTHON_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_profile.py" "${Chaste_PROFILE_OUTPUT_DIR}" ${extension}
+                       COMMAND ${Python3_EXECUTABLE} "${Chaste_SOURCE_DIR}/cmake/process_profile.py" "${Chaste_PROFILE_OUTPUT_DIR}" ${extension}
                        DEPENDS Profile
                        WORKING_DIRECTORY ${Chaste_BINARY_DIR}
                        VERBATIM)
@@ -1017,10 +1022,10 @@ endif ()
 
 
 add_custom_target (infrastructure
-                   COMMAND ${PYTHON_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckForCopyrights.py
-                   COMMAND ${PYTHON_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckForDuplicateFileNames.py
-                   COMMAND ${PYTHON_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckForOrphanedTests.py
-                   COMMAND ${PYTHON_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckSchemas.py
+                   COMMAND ${Python3_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckForCopyrights.py
+                   COMMAND ${Python3_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckForDuplicateFileNames.py
+                   COMMAND ${Python3_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckForOrphanedTests.py
+                   COMMAND ${Python3_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckSchemas.py
 
                    WORKING_DIRECTORY ${Chaste_SOURCE_DIR}
                    VERBATIM)

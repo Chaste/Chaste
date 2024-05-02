@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -328,8 +328,8 @@ public:
         TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 1u); // boundary elements removed now halo nodes are used
     }
 
-    /* 
-     * This test aims to approximate not having halo nodes by making less of them and 
+    /*
+     * This test aims to approximate not having halo nodes by making less of them and
      * Moving them further away from the top and bottom of the mesh
      */
     void TestCylindricalReMeshOnSmallMeshWithoutHaloNodes()
@@ -342,7 +342,7 @@ public:
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
         boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
-        // Change the halo parameters so still get longer edges.  
+        // Change the halo parameters so still get longer edges.
         TS_ASSERT_EQUALS(p_mesh->GetHaloScalingFactor(),2.0);
         TS_ASSERT_EQUALS(p_mesh->GetHaloOffset(),1.0);
 
@@ -371,7 +371,7 @@ public:
             {
                 node_location(1)+=0.2;
             }
-            
+
             node_iter->rGetModifiableLocation() = node_location;
         }
 
@@ -380,7 +380,7 @@ public:
 
         // Check that there are the correct number of everything
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), cells_across * cells_up);
-        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 30); // Diferent from previous test (24) as get some long edges due to distant halo nodes 
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 30); // Diferent from previous test (24) as get some long edges due to distant halo nodes
         TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), 1u); // boundary elements removed now halo nodes are used
     }
 

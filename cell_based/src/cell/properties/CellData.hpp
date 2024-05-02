@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -119,9 +119,9 @@ public:
 
     /**
      * Check if data with given name is stored.
-     * 
+     *
      * @param rVariableName rVariableName the index of the data required.
-     * 
+     *
      * @return if rVariableName has been stored
      */
     bool HasItem(const std::string& rVariableName) const;

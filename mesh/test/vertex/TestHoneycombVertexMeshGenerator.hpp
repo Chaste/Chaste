@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -104,7 +104,7 @@ public:
         boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 44u);
-	 
+
         VertexMeshWriter<2,2> vertex_mesh_writer_2("TestHoneycombVertexMesh", "honeycombmeshflat");
         vertex_mesh_writer_2.WriteFilesUsingMesh(*p_mesh);
 
@@ -120,7 +120,7 @@ public:
                 min_y_position = this_y_position;
             }
         }
-	
+
         // Loop over all nodes again, find all nodes with that y position
         unsigned num_bottom_nodes = 0;
         for (unsigned node_index = 0; node_index < 44; node_index++)
@@ -130,7 +130,7 @@ public:
             {
                 num_bottom_nodes++;
 
-		        // This node should be a boundary node
+                // This node should be a boundary node
                 TS_ASSERT(p_mesh->GetNode(node_index)->IsBoundaryNode())
             }
         }

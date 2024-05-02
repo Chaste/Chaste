@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -52,8 +52,8 @@ const AbstractCellPopulation<SPACE_DIM>* AbstractCellKiller<SPACE_DIM>::GetCellP
     return mpCellPopulation;
 }
 
-template<unsigned DIM>
-void AbstractCellKiller<DIM>::OutputCellKillerInfo(out_stream& rParamsFile)
+template<unsigned SPACE_DIM>
+void AbstractCellKiller<SPACE_DIM>::OutputCellKillerInfo(out_stream& rParamsFile)
 {
     std::string cell_killer_type = GetIdentifier();
 
@@ -62,8 +62,8 @@ void AbstractCellKiller<DIM>::OutputCellKillerInfo(out_stream& rParamsFile)
     *rParamsFile << "\t\t</" << cell_killer_type << ">\n";
 }
 
-template<unsigned DIM>
-void AbstractCellKiller<DIM>::OutputCellKillerParameters(out_stream& rParamsFile)
+template<unsigned SPACE_DIM>
+void AbstractCellKiller<SPACE_DIM>::OutputCellKillerParameters(out_stream& rParamsFile)
 {
     // No parameters to output
 }

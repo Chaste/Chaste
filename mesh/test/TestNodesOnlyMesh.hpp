@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -258,17 +258,17 @@ public:
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
 
         c_vector<double,4> swollen_box = mesh.GetBoxCollection()->rGetDomainSize();
-        
+
         TS_ASSERT_DELTA(swollen_box(0), 2, 1e-11);
         TS_ASSERT_DELTA(swollen_box(1),  201.5, 1e-11);
         TS_ASSERT_DELTA(swollen_box(2), 2, 1e-11);
         TS_ASSERT_DELTA(swollen_box(3), 201.5,1e-11);
-        
+
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];
         }
-        
+
     }
     void TestConstuctingAndEnlargingInitialBoxCollection()
     {

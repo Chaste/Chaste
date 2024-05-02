@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,7 +47,7 @@ CvodeContextManager::CvodeContextManager() : mSundialsContext() {}
 CvodeContextManager* CvodeContextManager::Instance()
 {
     // Single instance per thread
-    static thread_local std::unique_ptr<CvodeContextManager> instance = std::unique_ptr<CvodeContextManager>(new CvodeContextManager()); 
+    static thread_local std::unique_ptr<CvodeContextManager> instance = std::unique_ptr<CvodeContextManager>(new CvodeContextManager());
     return instance.get();
 }
 

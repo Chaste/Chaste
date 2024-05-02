@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -34,16 +34,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /*
- *
- *
- *
  *  Chaste tutorial - this page gets automatically changed to a wiki page
  *  DO NOT remove the comments below, and if the code has to be changed in
  *  order to run, please check the comments are still accurate
- *
- *
- *
- *
  *
  */
 #ifndef TESTWRITINGPDESOLVERSTWOTUTORIAL_HPP_
@@ -51,32 +44,36 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /*
- *  == Introduction ==
+ *  ### Introduction
  *
  *  In the previous tutorial we showed how a PDE solver could be written for the
- *  'simple' case in which the FEM discretisation leads to a linear system Ax=b where
- *  both A and b are 'assembled'. In this tutorial, we consider the more general case,
+ *  'simple' case in which the FEM discretisation leads to a linear system `Ax=b` where
+ *  both `A` and `b` are 'assembled'. In this tutorial, we consider the more general case,
  *  and show to write assembler classes which assemble one particular matrix or vector,
- *  and how to write solver classes which ''use'' assemblers to create and solve the FEM
+ *  and how to write solver classes which *use* assemblers to create and solve the FEM
  *  linear system.
  *
- *  We will take as the test problem the heat equation, `u_t = u_{xx}`, with Dirichlet
- *  BCs `u = u*` on `Gamma1` and `du/dn = g` on `Gamma2`.
+ *  We will take as the test problem the heat equation, $u_t = u_{xx}$, with Dirichlet
+ *  BCs $u = u^*$ on $\Gamma_1$ and $\partial u/\partial n = g$ on $\Gamma_2$.
  *
- *  We write a solver which uses an '''explicit''' time-discretisation (as opposed to the implicit
+ *  We write a solver which uses an **explicit** time-discretisation (as opposed to the implicit
  *  discretisations used throughout the rest of the code). The FEM linear system that needs to be set up is
- *  {{{
+ *
+ *  ```
  *  M U^{n+1} = (M + dt K) U^{n}  +  c
- *  }}}
+ *  ```
+ *
  *  where `M` is the mass matrix, `K` the stiffness matrix, and `U^{n}` the vector of nodal
- *  values of u at timestep n. c is the surface integral term coming from the Neumann BCs,
- *  ie `c_i = integral_over_Gamma2 (g * phi_i dS)`. (This can be compared with an
+ *  values of $u$ at timestep `n`. `c` is the surface integral term coming from the Neumann BCs,
+ *  i.e. $c_i = \int_{\Gamma_2} g \phi_i dS$. (This can be compared with an
  *  implicit time-discretisation, for which we solve `(M - dt K) U^{n+1} = M U^{n} + c`).
  *
  *  Let us call `M + dt*K` the 'RHS matrix'. We will write a solver, inheriting from
- *  `AbstractDynamicLinearPdeSolver`, which is going to ''use'' three assemblers: (i) an assembler of
- *  the mass matrix (already written); (ii) an assembler of the RHS matrix (we have to write this ourselves);
- *  and (iii) an assembler of surface term, c (already written).
+ *  `AbstractDynamicLinearPdeSolver`, which is going to *use* three assemblers:
+ *
+ *  * (i) an assembler of the mass matrix (already written);
+ *  * (ii) an assembler of the RHS matrix (we have to write this ourselves); and
+ *  * (iii) an assembler of surface term, `c` (already written).
  *
  *  Firstly, include `AbstractFeVolumeIntegralAssembler` which the assembler we write will inherit from,
  *  and `AbstractDynamicLinearPdeSolver`, which the solver we write will inherit from.
@@ -95,7 +92,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "HeatEquation.hpp"
 //#include "SimpleLinearParabolicSolver.hpp"
 
-/* == Writing assemblers ==
+/* ### Writing assemblers
  *
  * We need to write an assembler for setting up the matrix `M + dt K`.
  *
@@ -166,7 +163,7 @@ public:
 };
 /* That's the assembler written. The following solver class will show how to use it.
  *
- * == Writing the solver class ==
+ * ### Writing the solver class
  *
  * The parent class here is `AbstractDynamicLinearPdeSolver`, which contains a linear system
  * (`this->mpLinearSystem`), and will deal with allocating memory and solving the linear system.
@@ -184,7 +181,7 @@ private:
     Mat mRhsMatrix;
 
     /* This is the main method which needs to be implemented. It takes in the current solution, and a
-     * boolean saying whether the matrix (ie A in Ax=b) is being computed or not.
+     * boolean saying whether the matrix (ie $A$ in $Ax=b$) is being computed or not.
      */
     void SetupLinearSystem(Vec currentSolution, bool computeMatrix)
     {
@@ -193,7 +190,7 @@ private:
          * one of our purpose-built `RhsMatrixAssemblers`, pass it the matrix `mRhsMatrix`, and
          * tell it to assemble.
          *
-         * '''Important note''': if any of the assemblers will require the current solution (ie solution
+         * **Important note**: if any of the assemblers will require the current solution (ie solution
          * at the current timestep), this needs to be passed to the assembler, as in the commented
          * line below.
          */
@@ -257,7 +254,7 @@ public:
 };
 /* That's all that needs to be written to write your own solver using the solver hierarchy
  *
- * = A test using the solver =
+ * ## A test using the solver
  *
  * The following test uses the new solver. Since the interface is exactly the same as the
  * other solvers, except for not taking in a PDE (the fact that it solves a parameterless
@@ -265,7 +262,7 @@ public:
  * Note however the tiny timestep - this is needed for stability as this is an explicit scheme.
  * Also, to compare with the implicit solver, comment out the appropriate lines below. Note that
  * the implicit solver may seem quite slow in comparison - this is because the linear system is
- * much harder to solve (linear system is Ax=b, for explicit A=M, for implicit A=M-dt*K), but
+ * much harder to solve (linear system is `Ax=b`, for explicit then `A=M`, for implicit `A=M-dt*K`, but
  * remember that the implicit solver can use much larger timesteps.
  */
 
@@ -277,7 +274,7 @@ public:
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructRegularSlabMesh(0.05 /*h*/, 1.0 /*width*/, 1.0 /*height*/);
 
-        // Set up BCs u=0 on entire boundary
+        // Set up BCs $u=0$ on entire boundary
         BoundaryConditionsContainer<2,2,1> bcc;
         bcc.DefineZeroDirichletOnMeshBoundary(&mesh);
 
@@ -310,7 +307,7 @@ public:
         solver.SetOutputToTxt(true);
 
         solver.SetPrintingTimestepMultiple(100);
-        /* We are now ready to solve the system. */
+        /* We are now ready to solve the system. We check with `TS_ASSERT_DELTA()` that our new solver gets the same result as the old one.*/
         Vec result = solver.Solve();
         ReplicatableVector result_repl(result);
 

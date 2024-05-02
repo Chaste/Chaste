@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * which elements should be corrected on. The formula to determine which
  * elements SVI is used is delta Iionic > TOL, where delta Iionic is the max
  * difference between nodal ionic values, and TOL is chosen conservatively
- * to be 1uA/cm^2^. See wiki page ChasteGuides/StateVariableInterpolation
+ * to be 1uA/cm^2^. See https://chaste.github.io/docs/user-guides/state-variable-interpolation/
  * for more details.
  */
 template<unsigned ELEM_DIM,unsigned SPACE_DIM>

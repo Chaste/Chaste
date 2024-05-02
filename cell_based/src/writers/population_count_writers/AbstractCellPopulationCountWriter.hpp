@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -47,6 +47,7 @@ template<unsigned SPACE_DIM> class CaBasedCellPopulation;
 template<unsigned SPACE_DIM> class NodeBasedCellPopulation;
 template<unsigned SPACE_DIM> class PottsBasedCellPopulation;
 template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
+template<unsigned SPACE_DIM> class ImmersedBoundaryCellPopulation;
 
 /**
  * Abstract class for a writer that takes information from an AbstractCellPopulation and writes it to file.
@@ -139,6 +140,16 @@ public:
      * @param pCellPopulation a pointer to the VertexBasedCellPopulation to visit.
      */
     virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)=0;
+
+    /**
+     * Visit the population and write the data.
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
+     *
+     * @param pCellPopulation a pointer to the ImmersedBoundaryCellPopulation to visit.
+     */
+    virtual void Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation)=0;
 };
 
 #endif /*ABSTRACTCELLPOPULATIONCOUNTWRITER_HPP_*/

@@ -22,7 +22,7 @@ jobs:
         RUNNER_OFF: 1
       volumes:
         - runner_volume:/home/runner
-      options: --user 0 --cpus 2
+      options: --user 0 --cpus 4
       
     env:
       CC: gcc
@@ -63,19 +63,19 @@ jobs:
       - name: cmake configure
         run: |
           source init.sh
-          su -m runner -c "cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_COVERAGE_CPUS=2 .."
+          su -m runner -c "cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_COVERAGE_CPUS=4 .."
         working-directory: chaste-build-dir
 
       - name: build test suites
         run: |
           source init.sh
-          su -m runner -c "cmake --build . --target Continuous Parallel --parallel 2"
+          su -m runner -c "cmake --build . --target Continuous Parallel --parallel 4"
         working-directory: chaste-build-dir
 
       - name: run test suites
         run: |
           source init.sh
-          su -m runner -c "ctest -j2 -L Continuous --output-on-failure"
+          su -m runner -c "ctest -j4 -L Continuous --output-on-failure"
           su -m runner -c "ctest -L Parallel  --output-on-failure"
         working-directory: chaste-build-dir
 

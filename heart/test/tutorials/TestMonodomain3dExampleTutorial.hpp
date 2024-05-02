@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTMONODOMAIN3DEXAMPLETUTORIAL_HPP_
 
 /*
- * = 3D monodomain example =
+ * ## 3D monodomain example
  *
  * In this tutorial we show how to run a 3D simulation using the monodomain equation.
  * To go from monodomain to bidomain or vice versa is trivial, and for 2d to 3d is

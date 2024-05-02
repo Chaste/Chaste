@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTSOLVINGMOREELASTICITYPROBLEMSTUTORIAL_HPP_
 #define TESTSOLVINGMOREELASTICITYPROBLEMSTUTORIAL_HPP_
 
-/* == Introduction ==
+/* ### Introduction
  *
  * In this second solid mechanics tutorial, we illustrate some other possibilities: using tractions
  * that are defined with a function, or tractions that depend on the deformed body (eg normal pressure
@@ -83,7 +83,7 @@ class TestSolvingMoreElasticityProblemsTutorial : public CxxTest::TestSuite
 {
 public:
 
-    /* == Incompressible deformation: non-zero displacement boundary conditions, functional tractions ==
+    /* ### Incompressible deformation: non-zero displacement boundary conditions, functional tractions
      *
      * We now consider a more complicated example. We prescribe particular new locations for the nodes
      * on the Dirichlet boundary, and also show how to prescribe a traction that is given in functional form
@@ -143,7 +143,7 @@ public:
         problem_defn.SetFixedNodes(fixed_nodes, locations);
         /* Now call `SetTractionBoundaryConditions`, which takes in a vector of
          * boundary elements as in the previous test. However this time the second argument
-         * is a ''function pointer'' (just the name of the function) to a
+         * is a *function pointer* (just the name of the function) to a
          * function returning traction in terms of position (and time [see below]).
          * This function is defined above, before the tests. It has to take in a `c_vector` (position)
          *  and a double (time), and returns a `c_vector` (traction), and will only be called
@@ -169,7 +169,7 @@ public:
         TS_ASSERT_EQUALS(solver.GetNumNewtonIterations(), 6u);
         /* Visualise as before.
          *
-         * '''Advanced:''' Note that the function `MyTraction` takes in time, which it didn't use. In the above it would have been called
+         * **Advanced:** Note that the function `MyTraction` takes in time, which it didn't use. In the above it would have been called
          * with t=0. The current time can be set using `SetCurrentTime()`. The idea is that the user may want to solve a
          * sequence of static problems with time-dependent tractions (say), for which they should allow `MyTraction` to
          * depend on time, and put the solve inside a time-loop, for example:
@@ -190,7 +190,7 @@ public:
         TS_ASSERT_DELTA(solver.rGetDeformedPosition()[98](1), 0.5638, 1e-3);
     }
 
-    /* == Sliding boundary conditions ==
+    /* ### Sliding boundary conditions
      *
      * It is common to require a Dirichlet boundary condition where the displacement/position in one dimension
      * is fixed, but the displacement/position in the others are free. This can be easily done when
@@ -250,7 +250,7 @@ public:
         TS_ASSERT_DELTA(solver.rGetDeformedPosition()[10](1), 0.0, 1e-3);
     }
 
-    /* == Compressible deformation, and other bits and pieces ==
+    /* ### Compressible deformation, and other bits and pieces
      *
      * In this test, we will show the (very minor) changes required to solve a compressible nonlinear
      * elasticity problem, we will describe and show how to specify 'pressure on deformed body'
@@ -323,7 +323,8 @@ public:
         /* The elasticity solvers have two nonlinear solvers implemented, one hand-coded and one which uses PETSc's SNES
          * solver. The latter is not the default but can be more robust (and will probably be the default in later
          * versions). This is how it can be used. (This option can also be called if the compiled binary is run from
-         * the command line (see ChasteGuides/RunningBinariesFromCommandLine) using the option "-mech_use_snes").
+         * the command line (see [Running Binaries From Command Line](/docs/user-guides/running-binaries-from-command-line/))
+         * using the option "-mech_use_snes").
          */
         problem_defn.SetSolveUsingSnes();
         /* This line tells the solver to output info about the nonlinear solve as it progresses, and can be used with
@@ -347,7 +348,7 @@ public:
         /* Now we call add additional boundary conditions, and call `Solve() again. Firstly: these
          * Neumann conditions here are not specified traction boundary conditions (such BCs are specified
          * on the undeformed body), but instead, the (more natural) specification of a pressure
-         * exactly in the ''normal direction on the deformed body''. We have to provide a set of boundary
+         * exactly in the *normal direction on the deformed body*. We have to provide a set of boundary
          * elements of the mesh, and a pressure to act on those elements. The solver will automatically
          * compute the deformed normal directions on which the pressure acts. Note: with this type of
          * BC, the ordering of the nodes on the boundary elements needs to be consistent, otherwise some
@@ -363,7 +364,7 @@ public:
          * the previous solve will be used as the initial guess. Although at the moment the solution from the
          * previous call to `Solve()` will be over-written, calling `Solve()` repeatedly may be useful for
          * some problems: sometimes, Newton's method will fail to converge for given force/pressures etc, and it can
-         * be (very) helpful to ''increment'' the loading. For example, set the gravity to be (0,-9.81/3), solve,
+         * be (very) helpful to *increment* the loading. For example, set the gravity to be (0,-9.81/3), solve,
          * then set it to be (0,-2*9.81/3), solve again, and finally set it to be (0,-9.81) and solve for a
          * final time
          */
