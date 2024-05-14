@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <petsc.h>
 
+#include "ChasteBuildRoot.hpp"
 #include "FileFinder.hpp"
 #include "OutputFileHandler.hpp"
 #include "PetscTools.hpp"
@@ -126,21 +127,12 @@ public:
 
         // Test that the environment variable actually influences the location of files
         {
-
             setenv("CHASTE_TEST_OUTPUT", "", 1/*Overwrite*/);
             // Predict where Chaste puts output when CHASTE_TEST_OUTPUT is not set
-            std::stringstream  tmp_directory;
-            if (getenv("USER")!=NULL)
-             {
-                 tmp_directory << "/tmp/" << getenv("USER") << "/testoutput/NoEnvironmentForTestoutput";
-             }
-             else
-             {
-                 // No $USER in environment (which may be the case in Docker)
-                 tmp_directory << "/tmp/chaste/testoutput/NoEnvironmentForTestoutput";
-             }
+            std::string default_location = DefaultChasteTestOutput();
+
             // Check this folder is not present
-            FileFinder test_folder(tmp_directory.str(), RelativeTo::Absolute);
+            FileFinder test_folder(default_location + "NoEnvironmentForTestoutput", RelativeTo::Absolute);
             TS_ASSERT(!test_folder.Exists());
 
             PetscTools::Barrier("TestOutputFileHandler-2");

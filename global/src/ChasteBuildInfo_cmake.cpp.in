@@ -20,6 +20,11 @@ std::string ChasteBuildDirName()
     return "${Chaste_BUILD_DIR_NAME}";
 }
 
+std::string DefaultChasteTestOutput()
+{
+    return "${Chaste_DEAFAULT_TEST_OUTPUT}";
+}
+
 std::string ChasteBuildType()
 {
     return "${Chaste_BUILD_TYPE}";
