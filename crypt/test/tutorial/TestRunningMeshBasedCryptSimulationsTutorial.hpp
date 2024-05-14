@@ -168,7 +168,7 @@ public:
         CryptSimulation2d simulator(cell_population);
         /*
          * We must set the output directory on the simulator (relative to
-         * "`$CHASTE_TEST_OUTPUT`") and the end time (in hours).
+         * `cd $CHASTE_TEST_OUTPUT`) and the end time (in hours).
          */
         simulator.SetOutputDirectory("CryptTutorialFixedCellCycle");
         simulator.SetEndTime(1);
