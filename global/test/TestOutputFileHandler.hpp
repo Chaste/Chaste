@@ -132,7 +132,7 @@ public:
             std::string default_location = DefaultChasteTestOutput();
 
             // Check this folder is not present
-            FileFinder test_folder(default_location + "NoEnvironmentForTestoutput", RelativeTo::Absolute);
+            FileFinder test_folder(default_location + "/NoEnvironmentForTestoutput", RelativeTo::Absolute);
             TS_ASSERT(!test_folder.Exists());
 
             PetscTools::Barrier("TestOutputFileHandler-2");
