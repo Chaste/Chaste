@@ -76,7 +76,7 @@ add_custom_command(OUTPUT
         "-DChaste_SOURCE_DIR=${Chaste_SOURCE_DIR}"
         "-DChaste_BINARY_DIR=${Chaste_BINARY_DIR}"
         "-DChaste_BUILD_DIR_NAME=${CMAKE_CFG_INTDIR}"
-        "-DChaste_DEAFAULT_TEST_OUTPUT=${Chaste_BINARY_DIR}/testoutput"
+        "-DChaste_DEFAULT_TEST_OUTPUT=${Chaste_BINARY_DIR}/testoutput"
         "-DChaste_BUILD_TYPE=$<CONFIGURATION>"
         "-Dtimekeeper_exe=$<TARGET_FILE:timekeeper>"
         "-Dxsd_version=${xsd_version}"
