@@ -1,11 +1,12 @@
-#ifndef TESTCOMMANDLINETUTORIAL_HPP_
-#define TESTCOMMANDLINETUTORIAL_HPP_
+#ifndef TESTCOMMANDLINEARGUMENTSTUTORIAL_HPP_
+#define TESTCOMMANDLINEARGUMENTSTUTORIAL_HPP_
 
 #include <cxxtest/TestSuite.h>
 /* Most Chaste code uses PETSc to solve linear algebra problems.  This involves starting PETSc at the beginning of a test-suite
  * and closing it at the end.  (If you never run code in parallel then it is safe to replace PetscSetupAndFinalize.hpp with FakePetscSetup.hpp)
  */
 #include "PetscSetupAndFinalize.hpp"
+#include "CommandLineArguments.hpp"
 
 /**
  * @file
@@ -16,7 +17,7 @@
  */
 
  // NOTE: This test will not work if directlly executed from terminal due to requiring command line arguements.
-class TestCommandLineArguementsTutorial : public CxxTest::TestSuite
+class TestCommandLineArgumentsTutorial : public CxxTest::TestSuite
 {
 public:
     void TestCommandLineTutorial()

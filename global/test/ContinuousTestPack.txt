@@ -34,3 +34,4 @@ TestTimer.hpp
 TestTimeStepper.hpp
 TestWarnings.hpp
 TestWritingTestsTutorial.hpp
+TestCommandLineArgumentsTutorial.hpp
