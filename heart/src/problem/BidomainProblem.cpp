@@ -215,11 +215,11 @@ void BidomainProblem<DIM>::WriteInfo(double time)
 
     double v_max, v_min, phi_max, phi_min;
 
-    VecStrideMax( this->mSolution, 0, PETSC_NULL, &v_max );
-    VecStrideMin( this->mSolution, 0, PETSC_NULL, &v_min );
+    VecStrideMax( this->mSolution, 0, CHASTE_PETSC_NULLPTR, &v_max );
+    VecStrideMin( this->mSolution, 0, CHASTE_PETSC_NULLPTR, &v_min );
 
-    VecStrideMax( this->mSolution, 1, PETSC_NULL, &phi_max );
-    VecStrideMin( this->mSolution, 1, PETSC_NULL, &phi_min );
+    VecStrideMax( this->mSolution, 1, CHASTE_PETSC_NULLPTR, &phi_max );
+    VecStrideMin( this->mSolution, 1, CHASTE_PETSC_NULLPTR, &phi_min );
 
     if (PetscTools::AmMaster())
     {

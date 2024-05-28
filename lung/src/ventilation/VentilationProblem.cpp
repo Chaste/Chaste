@@ -378,7 +378,7 @@ void VentilationProblem::SolveFromPressureWithSnes()
 #if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
     SNESSolve(snes, mTerminalFluxChangeVector);
 #else
-    SNESSolve(snes, PETSC_NULL, mTerminalFluxChangeVector);
+    SNESSolve(snes, CHASTE_PETSC_NULLPTR, mTerminalFluxChangeVector);
 #endif
 
     ///\todo #2300 If used with time-stepping we should maintain a permanent SNES object
