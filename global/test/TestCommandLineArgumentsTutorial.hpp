@@ -17,6 +17,7 @@
  */
 
  // NOTE: This test will not work if directlly executed from terminal due to requiring command line arguements.
+ // Investiagte the accompanying runcommandlinetutorial.sh bash script to see how this tutorial should be executed.
 class TestCommandLineArgumentsTutorial : public CxxTest::TestSuite
 {
 public:
@@ -28,7 +29,7 @@ public:
         int outp3 = CommandLineArguments::Instance()->GetUnsignedCorrespondingToOption("-opt3");
 
         int sum = outp1 + outp2 + outp3;
-
+        
         std::cout << "When we add "<< outp1 << " ,"<<  outp2 << " and "<< outp3 <<" we get " << sum <<"\n";
     }
 };
