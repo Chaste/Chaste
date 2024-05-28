@@ -15,7 +15,7 @@ jobs:
 
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
 
-    runs-on: self-hosted
+    runs-on: ubuntu-22.04
 
     env:
       CHASTE_DIR: ${{ github.workspace }}/Chaste
@@ -42,10 +42,24 @@ jobs:
         if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch')
 
       - name: checkout Chaste
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: Chaste/Chaste
           path: Chaste
+
+      - name: install dependencies
+        run: |
+          echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+          sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
+          sudo apt update
+          sudo apt install chaste-dependencies
+
+      - name: Downgrade libexpat1 (native ubuntu-22.04 only)
+        # if: ${{ matrix.os == 'ubuntu-22.04' }}
+        run: |
+          if dpkg -l | grep libexpat1-dev | grep 2.4.7-1ubuntu0.3; then
+            sudo apt-get install -y --allow-downgrades libexpat1=2.4.7-1 libexpat1-dev=2.4.7-1
+          fi
 
       - name: make build and test directories
         run: |
@@ -53,15 +67,15 @@ jobs:
           mkdir -p ${CHASTE_TEST_OUTPUT}
 
       - name: cmake configure
-        run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_MEMORY_TESTING_CPUS=10 ..
+        run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_MEMORY_TESTING_CPUS=4 ..
         working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
       - name: build continuous test pack
-        run: cmake --build . --target Continuous --parallel 10
+        run: cmake --build . --target Continuous --parallel 4
         working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
       - name: run memtest
-        run: cmake --build . --target memtest --parallel 10
+        run: cmake --build . --target memtest --parallel 4
         working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
       - name: check if index file successfully created
@@ -77,7 +91,7 @@ jobs:
         if: always()
         
       - name: checkout memory-testing
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: Chaste/memory-testing
           path: memory-testing
@@ -92,7 +106,7 @@ jobs:
         if: always() && steps.index-exists.outputs.index == 'True'
 
       - name: setup python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 

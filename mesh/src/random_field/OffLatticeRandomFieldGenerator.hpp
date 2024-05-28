@@ -128,9 +128,9 @@ public:
      * Sample an instance of the random field.
      *
      * Calls SampleRandomFieldAtTime() at a time chosen uniformly at random from
-     * 0 to 1.
+     * 0 to 100 * lengthScale.
      *
-     * @param rNodes a vector nodes at which to sample the random field
+     * @param rNodes a vector of nodes at which to sample the random field
      *
      * @return A vector representing an instance of the random field.
      */
@@ -146,7 +146,7 @@ public:
      *
      * @return A vector representing an instance of the random field.
      */
-    std::vector<double> SampleRandomFieldAtTime(const std::vector<Node<SPACE_DIM>*>& rNodes, const double time);
+    std::vector<double> SampleRandomFieldAtTime(const std::vector<Node<SPACE_DIM>*>& rNodes, double time);
 
     /**
      * Set the random seed used for the generator.

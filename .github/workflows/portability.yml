@@ -47,7 +47,7 @@ jobs:
         RUNNER_OFF: 1
       volumes:
         - runner_volume:/home/runner
-      options: --user 0 --cpus 2
+      options: --user 0 --cpus 4
       
     env:
       CC: gcc
@@ -59,7 +59,7 @@ jobs:
       
     steps:
       - name: checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
           
       - name: compiler version
         run: |
@@ -104,30 +104,30 @@ jobs:
       - name: run TestChasteBuildInfo
         run: |
           source init.sh
-          su -m runner -c "cmake --build . --target TestChasteBuildInfo --parallel 2"
+          su -m runner -c "cmake --build . --target TestChasteBuildInfo --parallel 4"
           su -m runner -c "ctest -V -R TestChasteBuildInfo --output-on-failure"
         working-directory: chaste-build-dir
 
       - name: build Continuous
         run: |
           source init.sh
-          su -m runner -c "cmake --build . --target Continuous --parallel 2"
+          su -m runner -c "cmake --build . --target Continuous --parallel 4"
         working-directory: chaste-build-dir
 
       - name: build Nightly
         run: |
           source init.sh
-          su -m runner -c "cmake --build . --target Nightly --parallel 2"
+          su -m runner -c "cmake --build . --target Nightly --parallel 4"
         working-directory: chaste-build-dir
 
       - name: run Continuous
         run: |
           source init.sh
-          su -m runner -c "ctest -j2 -L Continuous --output-on-failure"
+          su -m runner -c "ctest -j4 -L Continuous --output-on-failure"
         working-directory: chaste-build-dir
 
       - name: run Nightly
         run: |
           source init.sh
-          su -m runner -c "ctest -j2 -L Nightly --output-on-failure"
+          su -m runner -c "ctest -j4 -L Nightly --output-on-failure"
         working-directory: chaste-build-dir
