@@ -55,6 +55,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /** For use in tests that should ONLY be run in parallel. */
 #define EXIT_IF_SEQUENTIAL if(PetscTools::IsSequential()){TS_TRACE("This test is not meant to be executed in sequential.");return;}
 
+// Use PETSC_NULLPTR for PETSc 3.19 and later, and PETSC_NULL for older versions
+// See https://github.com/Chaste/Chaste/issues/263
+#if PETSC_VERSION_GE(3, 19, 0)
+#define CHASTE_PETSC_NULLPTR PETSC_NULLPTR
+#else
+#define CHASTE_PETSC_NULLPTR PETSC_NULL
+#endif
+
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR < 2 || PETSC_VERSION_MAJOR<3 ) // Before PETSc 3.2
 /**
  * Older versions of PETSc used PetscTruth in place of PetscBool, so we define an alias for those installations.
