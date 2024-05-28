@@ -129,7 +129,7 @@ public:
         // We also need to make sure that our outp variable has taken in a value from the command line.
         // Additionally, as this arguement will be defining our tissue height and width it needs to be a positive number 
         // greater than 1.
-        assert(outp != NULL && outp >= 2 );
+        TS_ASSERT_LESS_THAN(1, outp);
 
         // We define our mesh width and height based on the provided command line argument.
         HoneycombVertexMeshGenerator generator(outp, outp);    // Parameters are: cells across, cells up
