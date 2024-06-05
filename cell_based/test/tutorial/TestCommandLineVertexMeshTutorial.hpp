@@ -201,7 +201,7 @@ public:
 };
 /*
  *
- * To visualize the results, open paraview and click File->Open, navigate to /tmp/$YOURUSER$/testoutput/CommandLineMeshTutorial/,
+ * To visualize the results, open paraview and click File->Open, navigate to /build/testoutput/CommandLineMeshTutorial/,
  * you should now see several "tissue_height_and_width_" folders. Open one of these folders and select the vtu file to open.
  *
  * You should now see a mesh of cells of height and width equal to the number after tissue_height_and_width_. To make visualisation
