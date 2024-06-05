@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * be used to run multiple tests with varying parameter inputs.
  */
 
- // NOTE: This test will not work if directlly executed from terminal due to requiring command line arguements.
+ // NOTE: This test will not work if directly executed from terminal due to requiring command line arguments.
  // Investiagte the accompanying runcommandlinetutorial.sh bash script to see how this tutorial should be executed.
 class TestCommandLineArgumentsTutorial : public CxxTest::TestSuite
 {
