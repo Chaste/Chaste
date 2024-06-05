@@ -112,8 +112,8 @@ void MonodomainProblem<ELEMENT_DIM, SPACE_DIM>::WriteInfo(double time)
 
     double v_max, v_min;
 
-    VecMax( this->mSolution, PETSC_NULL, &v_max );
-    VecMin( this->mSolution, PETSC_NULL, &v_min );
+    VecMax( this->mSolution, CHASTE_PETSC_NULLPTR, &v_max );
+    VecMin( this->mSolution, CHASTE_PETSC_NULLPTR, &v_min );
 
     if (PetscTools::AmMaster())
     {
