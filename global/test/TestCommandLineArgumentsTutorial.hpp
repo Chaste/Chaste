@@ -63,7 +63,7 @@ public:
     /* The Default test should be ran with the following bash script starting from line 16.
     runcommandlinetutorial.sh by default has this script already. However, if you have changed
     the bash script for another text simply copy and paste between START and END back into the file
-    **START**
+    ```sh
       # Here we will declare some values we wish to later pass to a for loop.  
       N=2
       L=3
