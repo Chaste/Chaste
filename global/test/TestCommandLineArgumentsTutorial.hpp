@@ -151,7 +151,7 @@ public:
            }
            // We will finally cout our result for the summed vector components.
            // Here we have chosen to set our precision to 4 to ensure the correct number of significant figures.
-           std::cout << std::setprecision(5) << "When we add "<< vector_of_doubles[0] << ", " << vector_of_doubles[1] << " and " << vector_of_doubles[2] << " together from our vector we get " << sum  <<"\n"; 
+           std::cout << std::setprecision(5) << "When we add "<< vector_of_doubles[0] << ", " << vector_of_doubles[1] << " and " << vector_of_doubles[2] << " together from our vector we get " << sum  <<std::endl; 
 
         } else {
            // In the case that no command line arguements are detetcted the test will default to this case.
