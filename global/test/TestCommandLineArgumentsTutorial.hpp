@@ -133,7 +133,7 @@ public:
         done
        done
       done
-      **END**
+      ```
     */
     void TestCommandLineDoubleTutorial()
     {  
