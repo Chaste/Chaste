@@ -37,6 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TESTCOMMANDLINEARGUMENTSTUTORIAL_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include <iostream>
+#include <iomanip>
 /* Most Chaste code uses PETSc to solve linear algebra problems.  This involves starting PETSc at the beginning of a test-suite
  * and closing it at the end.  (If you never run code in parallel then it is safe to replace PetscSetupAndFinalize.hpp with FakePetscSetup.hpp)
  */
@@ -51,21 +53,120 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * be used to run multiple tests with varying parameter inputs.
  */
 
- // NOTE: This test will not work if directly executed from terminal due to requiring command line arguments.
+ // NOTE: These tests will run if executed from terminal directly with their default varaible values. However, these
+ // tutorial tests are intended to be executed with the accompanying runcommandlinetutorial.sh bash script.
  // Investiagte the accompanying runcommandlinetutorial.sh bash script to see how this tutorial should be executed.
 class TestCommandLineArgumentsTutorial : public CxxTest::TestSuite
 {
 public:
-    void TestCommandLineTutorial()
-    {
-        // Here we utilise CommandLineArguments::Instance()->GetUnsignedCorrespondingToOption() to take in our command line arguements.
-        int outp1 = CommandLineArguments::Instance()->GetUnsignedCorrespondingToOption("-opt1");
-        int outp2 = CommandLineArguments::Instance()->GetUnsignedCorrespondingToOption("-opt2");
-        int outp3 = CommandLineArguments::Instance()->GetUnsignedCorrespondingToOption("-opt3");
 
-        int sum = outp1 + outp2 + outp3;
+    /* The Default test should be ran with the following bash script starting from line 16.
+    runcommandlinetutorial.sh by default has this script already. However, if you have changed
+    the bash script for another text simply copy and paste between START and END back into the file
+    **START**
+      # Here we will declare some values we wish to later pass to a for loop.  
+      N=2
+      L=3
+      M=4
+
+      # Here we set up a simple for loop over variables i,j and k based on the values of N,L and M.
+      for ((i = 0; i <= N; i += 1)); do
+        for ((j = 1; j <= L; j += 1)); do
+          for ((k = 2; k <= M; k += 1)); do
+          # Each loop runs an instance of the TestCommandLineArgumentsTutorial with opt1,opt2 and opt3 taking on the 
+          # values of i,j and k resepctivley.      
+          ~/build/global/test/TestCommandLineArgumentsTutorial -opt1 $i -opt2 $j -opt3 $k &
+          done
+        done
+      done
+    **END**
+    */
+    void TestCommandLineDefaultTutorial()
+    {   
+        // First, we set up some variables. These variables should later be assigned our command line argument values.
+        // However we will give them default values to ensure that this test can always run.
+        unsigned outp1 = 1;
+        unsigned outp2 = 2;
+        unsigned outp3 = 3;
+
+        // Here an if statement is utilised to check that we have passed some command line arguments to our test.
+        if (CommandLineArguments::Instance()->OptionExists("-opt1") && CommandLineArguments::Instance()->OptionExists("-opt2") && CommandLineArguments::Instance()->OptionExists("-opt3"))
+        { 
+           // If command line arguments have been passed to our test, we utilise CommandLineArguments::Instance()->GetUnsignedCorrespondingToOption() 
+           // to take in our command line arguements.
+           outp1 = CommandLineArguments::Instance()->GetUnsignedCorrespondingToOption("-opt1");
+           outp2 = CommandLineArguments::Instance()->GetUnsignedCorrespondingToOption("-opt2");
+           outp3 = CommandLineArguments::Instance()->GetUnsignedCorrespondingToOption("-opt3");
+        }
+
+        unsigned sum = outp1 + outp2 + outp3;
         
         std::cout << "When we add "<< outp1 << " ,"<<  outp2 << " and "<< outp3 <<" we get " << sum <<"\n";
+    }
+    
+    /*
+      In addition to using unsigned integers as command line arguments we can also pass in both doubles and a vector of arguments.
+      This could be very useful for several reasons, such as having a large list of parameters one may wish to pass into a test. 
+
+      For this test change the runcommandlinetutorial.sh bash script from line 16 onwards as follow by copy and pasting between START and END.
+      **START**
+      # Here we will declare some values we wish to later pass to a for loop.
+      # As bash script cannot directly handle double arithmetic we will First
+      # declare these as larger variables to be handled by another programme later.
+      N=2000
+      L=3000
+      M=4000
+
+      # Here we set up a simple for loop over variables i,j and k based on the values of N,L and M.
+      for ((i = 1; i <= N; i += 1000)); do
+       for ((j = 1001; j <= L; j += 1000)); do
+        for ((k = 2001; k <= M; k += 1000)); do
+          # As bash cannot directly handle double floating point arithmetic we will utilise
+          # awk to divide our varaibles and convert them to doubles.
+           idouble=$(awk "BEGIN {printf \"%.2f\",$i/120}")
+           jdouble=$(awk "BEGIN {printf \"%.2f\",$j/150}")
+           kdouble=$(awk "BEGIN {printf \"%.2f\",$k/180}")
+
+           # Each loop runs an instance of the TestCommandLineArgumentsTutorial with a vector
+           # containing the double corrected version of our varaibles.
+           ~/build/global/test/TestCommandLineArgumentsTutorial --my-vector-of-arguments $idouble $jdouble $kdouble &
+        done
+       done
+      done
+      **END**
+    */
+    void TestCommandLineDoubleTutorial()
+    {  
+        // Here an if statement is utilised to check that we have passed some command line arguments to our test.
+        // To ensure the test can still run in the absence of command line arguments we will initialise the vector 
+        // with some default values if no command line option exists.
+        if (CommandLineArguments::Instance()->OptionExists("--my-vector-of-arguments"))
+        { 
+           // First, we need to setup our vector based on the vector passed in as our command line arguement. 
+           std::vector<double> vector_of_doubles = CommandLineArguments::Instance()->GetDoublesCorrespondingToOption("--my-vector-of-arguments");
+           double sum = 0.0;
+           // Now summing over our vector.
+           for(double i = 0; i < vector_of_doubles.size(); i++){
+            sum += vector_of_doubles[i]; 
+           }
+           // We will finally cout our result for the summed vector components.
+           // Here we have chosen to set our precision to 4 to ensure the correct number of significant figures.
+           std::cout << std::setprecision(5) << "When we add "<< vector_of_doubles[0] << ", " << vector_of_doubles[1] << " and " << vector_of_doubles[2] << " together from our vector we get " << sum  <<"\n"; 
+
+        } else {
+           // In the case that no command line arguements are detetcted the test will default to this case.
+           // Again we need to setup our vector of doubles.
+           std::vector<double> vector_of_doubles{1.001, 2.002, 3.003};
+           double sum;
+           // Again summing over our vector.
+           for(double i = 0; i < vector_of_doubles.size(); i++){
+            sum += vector_of_doubles[i]; 
+           }
+           // We will finally cout our result for the summed vector components.
+           // Here we have chosen to set our precision to 4 to ensure the correct number of significant figures.
+           std::cout << std::setprecision(4) << "When we add all variables in our vector together we get " << sum  <<"\n"; 
+           
+        }
     }
 };
 

@@ -108,5 +108,4 @@ tutorial/TestRunningPottsBasedSimulationsTutorial.hpp
 tutorial/TestRunningTumourSpheroidSimulationsTutorial.hpp
 tutorial/TestRunningVertexBasedSimulationsTutorial.hpp
 tutorial/TestVisualizingWithParaviewTutorial.hpp
-tutorial/TestCommandLineVertexMeshTutorial.hpp
 
