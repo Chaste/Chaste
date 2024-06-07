@@ -79,7 +79,7 @@ public:
           done
         done
       done
-    **END**
+    ```
     */
     void TestCommandLineDefaultTutorial()
     {   
