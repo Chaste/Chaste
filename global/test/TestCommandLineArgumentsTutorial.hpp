@@ -157,7 +157,7 @@ public:
            // In the case that no command line arguements are detetcted the test will default to this case.
            // Again we need to setup our vector of doubles.
            std::vector<double> vector_of_doubles{1.001, 2.002, 3.003};
-           double sum;
+           double sum= 0.0;
            // Again summing over our vector.
            for(double i = 0; i < vector_of_doubles.size(); i++){
             sum += vector_of_doubles[i]; 
