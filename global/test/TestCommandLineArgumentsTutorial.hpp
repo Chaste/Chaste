@@ -164,7 +164,7 @@ public:
            }
            // We will finally cout our result for the summed vector components.
            // Here we have chosen to set our precision to 4 to ensure the correct number of significant figures.
-           std::cout << std::setprecision(4) << "When we add all variables in our vector together we get " << sum  <<"\n"; 
+           std::cout << std::setprecision(4) << "When we add all variables in our vector together we get " << sum  <<std::endl; 
            
         }
     }
