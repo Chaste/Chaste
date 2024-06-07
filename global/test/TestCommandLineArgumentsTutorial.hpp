@@ -54,16 +54,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
  // NOTE: These tests will run if executed from terminal directly with their default varaible values. However, these
- // tutorial tests are intended to be executed with the accompanying runcommandlinetutorial.sh bash script.
- // Investiagte the accompanying runcommandlinetutorial.sh bash script to see how this tutorial should be executed.
+ // tutorial tests are intended to be executed through the use of bash/shell scripts (.sh files).
 class TestCommandLineArgumentsTutorial : public CxxTest::TestSuite
 {
 public:
 
-    /* The Default test should be ran with the following bash script starting from line 16.
-    runcommandlinetutorial.sh by default has this script already. However, if you have changed
-    the bash script for another text simply copy and paste between START and END back into the file
+    /* To script the running of this test with lots of different arguments, copy and paste the following code into a bash script (`.sh`) file.
+       This bash script file will need to be saved in your chaste build folder. 
     ```sh
+      #!/bin/bash
+
+      # This bash script accompanies that TestCommandLineArgumentsTutorial. This script will execute the test TestCommandLineArgumentsTutorial
+      # multiple times with several command line arguments as test variables.
+      # Here we will declare some values we wish to later pass to a for loop.
+
       # Here we will declare some values we wish to later pass to a for loop.  
       N=2
       L=3
@@ -75,7 +79,7 @@ public:
           for ((k = 2; k <= M; k += 1)); do
           # Each loop runs an instance of the TestCommandLineArgumentsTutorial with opt1,opt2 and opt3 taking on the 
           # values of i,j and k resepctivley.      
-          ~/build/global/test/TestCommandLineArgumentsTutorial -opt1 $i -opt2 $j -opt3 $k &
+          ./global/test/TestCommandLineArgumentsTutorial -opt1 $i -opt2 $j -opt3 $k &
           done
         done
       done
@@ -129,7 +133,7 @@ public:
 
            # Each loop runs an instance of the TestCommandLineArgumentsTutorial with a vector
            # containing the double corrected version of our varaibles.
-           ~/build/global/test/TestCommandLineArgumentsTutorial --my-vector-of-arguments $idouble $jdouble $kdouble &
+           ./global/test/TestCommandLineArgumentsTutorial --my-vector-of-arguments $idouble $jdouble $kdouble &
         done
        done
       done
@@ -153,19 +157,6 @@ public:
            // Here we have chosen to set our precision to 4 to ensure the correct number of significant figures.
            std::cout << std::setprecision(5) << "When we add "<< vector_of_doubles[0] << ", " << vector_of_doubles[1] << " and " << vector_of_doubles[2] << " together from our vector we get " << sum  <<std::endl; 
 
-        } else {
-           // In the case that no command line arguements are detetcted the test will default to this case.
-           // Again we need to setup our vector of doubles.
-           std::vector<double> vector_of_doubles{1.001, 2.002, 3.003};
-           double sum= 0.0;
-           // Again summing over our vector.
-           for(double i = 0; i < vector_of_doubles.size(); i++){
-            sum += vector_of_doubles[i]; 
-           }
-           // We will finally cout our result for the summed vector components.
-           // Here we have chosen to set our precision to 4 to ensure the correct number of significant figures.
-           std::cout << std::setprecision(4) << "When we add all variables in our vector together we get " << sum  <<std::endl; 
-           
         }
     }
 };
