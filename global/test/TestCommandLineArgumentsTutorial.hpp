@@ -108,7 +108,7 @@ public:
       In addition to using unsigned integers as command line arguments we can also pass in both doubles and a vector of arguments.
       This could be very useful for several reasons, such as having a large list of parameters one may wish to pass into a test. 
 
-      For this test change the runcommandlinetutorial.sh bash script from line 16 onwards as follow by copy and pasting between START and END.
+      To script the running of this test with lots of different arguments, copy and paste the following code into a bash script (`.sh`) file.
       ```sh
       # Here we will declare some values we wish to later pass to a for loop.
       # As bash script cannot directly handle double arithmetic we will First
