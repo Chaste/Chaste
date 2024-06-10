@@ -1,0 +1,798 @@
+name: chaste_project_PyChaste
+
+smart_ptr_type: boost::shared_ptr
+pointer_call_policy: reference
+reference_call_policy: reference_internal
+
+common_include_file: OFF
+
+source_includes:
+  - <set>
+  - <vector>
+  - <string>
+  - <map>
+  - SmartPointers.hpp
+  - UblasIncludes.hpp
+
+template_substitutions:
+  - signature: <unsigned DIM>
+    replacement: [[2], [3]]
+  - signature: <unsigned SPACE_DIM>
+    replacement: [[2], [3]]
+  - signature: <unsigned DIM, unsigned DIM>
+    replacement: [[2, 2], [3, 3]]
+  - signature: <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+    replacement: [[2, 2], [3, 3]]
+  - signature: <unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+    replacement: [[2, 2], [3, 3]]
+
+modules:
+  #=== core
+  - name: core
+    source_locations:
+      - global/src
+      - io/src
+      - linalg/src
+
+    classes:
+      ##=== core: chaste/global/checkpointing/
+      - name: Identifiable
+
+      ##=== core: chaste/global/parallel/
+      - name: PetscTools
+        excluded_methods:
+          - GetWorld # MPI not wrapped here
+          - Destroy # No non-const ref to PETSc types
+          - ReadPetscObject
+          - SetupMat
+        excluded_variables:
+          - MASTER_RANK # MPI not wrapped here
+        source_includes: &petsc_includes
+          - <petsc/private/vecimpl.h> # forward decl
+          - <petsc/private/matimpl.h> # forward decl
+          - "PythonPetscObjectConverters.hpp"
+      - name: ReplicatableVector
+        source_includes: *petsc_includes
+
+      ##=== core: chaste/global/timing/
+      - name: Timer
+
+      ##=== core: chaste/global/
+      - name: RelativeTo # enum
+        source_file: FileFinder.hpp
+      - name: FileFinder
+      - name: OutputFileHandler
+        source_includes:
+          - FileFinder.hpp # forward decl
+        excluded_methods:
+          - OpenOutputFile # std io not wrapped
+      - name: ProgressReporter
+      - name: RandomNumberGenerator
+      - name: TimeStepper
+      - name: ChasteBuildInfo
+        source_file: Version.hpp
+
+  #=== ode
+  - name: ode
+    source_locations:
+      - ode/src
+
+    classes:
+      ##=== ode: chaste/ode/common/
+      - name: AbstractOdeSystemInformation
+      - name: AbstractOdeSystem
+
+      ##=== ode: chaste/cell_based/ode/
+      - name: DeltaNotchOdeSystem
+      - name: DeltaNotchEdgeOdeSystem
+      - name: DeltaNotchInteriorOdeSystem
+      - name: Alarcon2004OxygenBasedCellCycleOdeSystem
+      - name: Goldbeter1991OdeSystem
+      - name: TysonNovak2001OdeSystem
+        excluded_methods:
+          - AnalyticJacobian # double ** jacobian
+      # - name: CellwiseOdeSystemInformation
+
+      ##=== ode: pychaste/ode/
+      - name: AbstractPythonOdeSystemInformation
+
+  #=== pde
+  - name: pde
+    source_locations:
+      - pde/src
+
+    classes:
+      #=== pde: chaste/pde/common/
+      - name: AbstractBoundaryCondition
+      - name: ConstBoundaryCondition
+      - name: PdeSimulationTime
+
+      #=== pde: chaste/pde/problem/
+      - name: AbstractLinearPde
+      - name: AbstractLinearParabolicPde
+      - name: AbstractLinearEllipticPde
+      - name: AbstractLinearParabolicPdeSystemForCoupledOdeSystem
+        template_substitutions:
+          - signature: <unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM, unsigned PROBLEM_DIM=1>
+            replacement: [[2, 2, 1], [3, 3, 1]]
+      - name: AbstractNonlinearEllipticPde
+
+      #=== pde: chaste/cell_based/cell_based_pde/pdes/
+      - name: CellwiseSourceEllipticPde
+      - name: AveragedSourceEllipticPde
+      - name: VolumeDependentAveragedSourceEllipticPde
+      - name: UniformSourceEllipticPde
+      - name: CellwiseSourceParabolicPde
+      - name: UniformSourceParabolicPde
+      - name: AveragedSourceParabolicPde
+
+      #=== pde: chaste/cell_based/cell_based_pde/
+      - name: CellBasedEllipticPdeSolver
+        source_includes: *petsc_includes
+      - name: CellBasedParabolicPdeSolver
+      - name: AbstractPdeModifier
+        excluded_methods:
+          - GetSolution
+          - GetFeMesh
+        source_includes: *petsc_includes
+      - name: AbstractBoxDomainPdeModifier
+        source_includes: *petsc_includes
+      - name: AbstractGrowingDomainPdeModifier
+        source_includes: *petsc_includes
+      - name: EllipticGrowingDomainPdeModifier
+        source_includes: *petsc_includes
+        excluded_methods:
+          - ConstructBoundaryConditionsContainer
+      - name: ParabolicGrowingDomainPdeModifier
+        source_includes: *petsc_includes
+        excluded_methods:
+          - ConstructBoundaryConditionsContainer
+      - name: EllipticBoxDomainPdeModifier
+        source_includes: *petsc_includes
+        excluded_methods:
+          - ConstructBoundaryConditionsContainer
+      - name: ParabolicBoxDomainPdeModifier
+        source_includes: *petsc_includes
+        excluded_methods:
+          - ConstructBoundaryConditionsContainer
+
+  #=== mesh
+  - name: mesh
+    source_locations:
+      - mesh/src
+
+    classes:
+      #=== mesh: chaste/mesh/common/
+      - name: ChastePoint
+      - name: AbstractChasteRegion
+
+      - name: ChasteCuboid # chaste/mesh/utilities
+      - name: ChasteEllipsoid # chaste/mesh/utilities
+
+      - name: AbstractElement
+        template_substitutions:
+          - signature: <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+            replacement: [[1, 2], [2, 2], [2, 3], [3, 3]]
+      - name: AbstractMesh
+
+      - name: NodeAttributes
+      - name: Node
+
+      - name: Edge
+      - name: EdgeHelper
+      - name: EdgeOperation
+
+      - name: Element
+        excluded_methods:
+          - CalculateCircumsphereVolume #  method not found!
+      - name: MutableElement
+        template_substitutions:
+          - signature: <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+            replacement: [[1, 2], [2, 2], [2, 3], [3, 3]]
+
+      - name: AbstractTetrahedralMesh
+      - name: TetrahedralMesh
+        excluded_methods:
+          - FreeTriangulateIo
+          - InitialiseTriangulateIo
+      - name: MutableMesh
+        excluded_methods:
+          - SplitLongEdges # can't work with vec<c_vec>
+          - RescaleMeshFromBoundaryNode # method not found!
+      - name: NodesOnlyMesh
+
+      #=== mesh: chaste/mesh/mutable/
+      - name: Cylindrical2dMesh
+        excluded_methods:
+          - GetInstanceOfMismatchedBoundaryNodes
+      - name: Cylindrical2dNodesOnlyMesh
+        excluded_methods:
+          - SetUpBoxCollection # boost::numeric::ublas::unit_vector
+      - name: PeriodicNodesOnlyMesh
+        excluded_methods:
+          - SetUpBoxCollection # boost::numeric::ublas::zero_vector
+      - name: Toroidal2dMesh
+        excluded_methods:
+          - GetInstanceOfMismatchedBoundaryNodes
+
+      - name: HoneycombMeshGenerator
+      - name: CylindricalHoneycombMeshGenerator
+      - name: ToroidalHoneycombMeshGenerator
+
+      #=== mesh: chaste/mesh/vertex/
+      - name: VertexMesh
+        excluded_methods:
+          - GetFace # dont have mixed dim elements
+          - GetEdgeHelper
+        constructor_arg_type_excludes:
+          - TetrahedralMesh<3, 3>
+          - TetrahedralMesh<2, 2>
+      - name: MutableVertexMesh
+      - name: Cylindrical2dVertexMesh
+      - name: Toroidal2dVertexMesh
+
+      - name: HoneycombVertexMeshGenerator
+      - name: CylindricalHoneycombVertexMeshGenerator
+      - name: ToroidalHoneycombVertexMeshGenerator
+      - name: VoronoiVertexMeshGenerator
+
+      #=== mesh: chaste/mesh/immersed_boundary/
+      - name: FluidSource
+
+      - name: ImmersedBoundaryElement
+        template_substitutions:
+          - signature: <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+            replacement: [[1, 2], [2, 2], [2, 3], [3, 3]]
+        excluded_methods: AddCornerNode # not implemented in 1D
+
+      - name: ImmersedBoundaryMesh
+
+      - name: ImmersedBoundaryHoneycombMeshGenerator
+      - name: ImmersedBoundaryPalisadeMeshGenerator
+
+      #=== mesh: chaste/cell_based/mesh/
+      - name: PottsElement
+      - name: PottsMesh
+      - name: PottsMeshGenerator
+      - name: PottsMeshWriter
+      # - name: PottsMeshReader
+
+  #=== cell_based
+  - name: cell_based
+    source_locations:
+      - cell_based/src
+
+    classes:
+      ##=== cell_based: chaste/cell_based/cell_based/properties/
+      - name: AbstractCellProperty
+        excluded_methods:
+          - IsType # exclude templated method
+      - name: ApoptoticCellProperty
+      - name: CellPropertyCollection
+        excluded_methods:
+          - GetCellPropertyRegistry
+      - name: CellData
+      - name: CellLabel
+      - name: CellAncestor
+      - name: CellId
+      - name: CellEdgeData
+      - name: CellPropertyRegistry
+        excluded_methods:
+          - rGetAllCellProperties
+          - TakeOwnership
+          - Get
+      # - name: CellVecData
+
+      ##=== cell_based: chaste/cell_based/properties/proliferative_types/
+      - name: AbstractCellProliferativeType
+      - name: StemCellProliferativeType
+      - name: DefaultCellProliferativeType
+      - name: TransitCellProliferativeType
+      - name: DifferentiatedCellProliferativeType
+
+      ##=== cell_based: chaste/cell_based/properties/mutations/
+      - name: AbstractCellMutationState
+      - name: ApcOneHitCellMutationState
+      - name: ApcTwoHitCellMutationState
+      - name: BetaCateninOneHitCellMutationState
+      - name: WildTypeCellMutationState
+
+      ##=== cell_based: chaste/cell_based/cycle/
+      - name: AbstractCellCycleModel
+      - name: AbstractPhaseBasedCellCycleModel
+      - name: AbstractSimpleCellCycleModel
+      - name: AbstractSimplePhaseBasedCellCycleModel
+      - name: AbstractSimpleGenerationalCellCycleModel
+      - name: AbstractCellCycleModelOdeSolver
+      - name: AbstractOdeBasedCellCycleModel
+      - name: AbstractOdeBasedPhaseBasedCellCycleModel
+      - name: NoCellCycleModel
+      - name: UniformCellCycleModel
+      - name: UniformG1GenerationalCellCycleModel
+      - name: StochasticOxygenBasedCellCycleModel
+      - name: SimpleOxygenBasedCellCycleModel
+      - name: BiasedBernoulliTrialCellCycleModel
+      - name: LabelDependentBernoulliTrialCellCycleModel
+      - name: AlwaysDivideCellCycleModel
+      - name: ContactInhibitionCellCycleModel
+      - name: GammaG1CellCycleModel
+      - name: ExponentialG1GenerationalCellCycleModel
+      - name: TysonNovakCellCycleModel
+      - name: Alarcon2004OxygenBasedCellCycleModel
+      - name: FixedSequenceCellCycleModel
+      - name: BernoulliTrialCellCycleModel
+      - name: FixedG1GenerationalCellCycleModel
+      # - name: CellCycleModelOdeSolver
+
+      ##=== cell_based: chaste/cell_based/srn/
+      - name: AbstractSrnModel
+      - name: AbstractOdeSrnModel
+      - name: NullSrnModel
+      - name: CellSrnModel
+      - name: DeltaNotchSrnModel
+      - name: DeltaNotchEdgeSrnModel
+      - name: DeltaNotchInteriorSrnModel
+      - name: Goldbeter1991SrnModel
+
+      ##=== cell_based: chaste/cell_based/cell/
+      - name: Cell
+        excluded_methods:
+          - rGetCellPropertyCollection
+          - GetSrnModel
+      - name: CellsGenerator
+        template_substitutions: &cells_generator_substitutions
+          - signature: <class CELL_CYCLE_MODEL, unsigned DIM>
+            replacement:
+              - [NoCellCycleModel, 2]
+              - [NoCellCycleModel, 3]
+              - [UniformCellCycleModel, 2]
+              - [UniformCellCycleModel, 3]
+              - [SimpleOxygenBasedCellCycleModel, 2]
+              - [SimpleOxygenBasedCellCycleModel, 3]
+              - [UniformG1GenerationalCellCycleModel, 2]
+              - [UniformG1GenerationalCellCycleModel, 3]
+              - [BiasedBernoulliTrialCellCycleModel, 2]
+              - [BiasedBernoulliTrialCellCycleModel, 3]
+              - [LabelDependentBernoulliTrialCellCycleModel, 2]
+              - [LabelDependentBernoulliTrialCellCycleModel, 3]
+              - [AlwaysDivideCellCycleModel, 2]
+              - [AlwaysDivideCellCycleModel, 3]
+              - [ContactInhibitionCellCycleModel, 2]
+              - [ContactInhibitionCellCycleModel, 3]
+              - [StochasticOxygenBasedCellCycleModel, 2]
+              - [StochasticOxygenBasedCellCycleModel, 3]
+              - [GammaG1CellCycleModel, 2]
+              - [GammaG1CellCycleModel, 3]
+              - [ExponentialG1GenerationalCellCycleModel, 2]
+              - [ExponentialG1GenerationalCellCycleModel, 3]
+              - [TysonNovakCellCycleModel, 2]
+              - [TysonNovakCellCycleModel, 3]
+              - [Alarcon2004OxygenBasedCellCycleModel, 2]
+              - [Alarcon2004OxygenBasedCellCycleModel, 3]
+              - [FixedSequenceCellCycleModel, 2]
+              - [FixedSequenceCellCycleModel, 3]
+              - [BernoulliTrialCellCycleModel, 2]
+              - [BernoulliTrialCellCycleModel, 3]
+              - [FixedG1GenerationalCellCycleModel, 2]
+              - [FixedG1GenerationalCellCycleModel, 3]
+        custom_generator: &cells_generator "CPPWG_SOURCEROOT/pychaste/dynamic/custom_generators/CellsGenerator_custom.py"
+        source_includes:
+          - NoCellCycleModel.hpp
+          - UniformCellCycleModel.hpp
+          - SimpleOxygenBasedCellCycleModel.hpp
+          - UniformG1GenerationalCellCycleModel.hpp
+          - BiasedBernoulliTrialCellCycleModel.hpp
+          - LabelDependentBernoulliTrialCellCycleModel.hpp
+          - AlwaysDivideCellCycleModel.hpp
+          - ContactInhibitionCellCycleModel.hpp
+          - StochasticOxygenBasedCellCycleModel.hpp
+          - GammaG1CellCycleModel.hpp
+          - ExponentialG1GenerationalCellCycleModel.hpp
+          - TysonNovakCellCycleModel.hpp
+          - Alarcon2004OxygenBasedCellCycleModel.hpp
+          - FixedSequenceCellCycleModel.hpp
+          - BernoulliTrialCellCycleModel.hpp
+          - FixedG1GenerationalCellCycleModel.hpp
+      # - name: ParallelCellsGenerator
+
+      ##=== cell_based: chaste/cell_based/population/srn_update/
+      - name: VertexBasedPopulationSrn
+
+      ##=== cell_based: chaste/cell_based/writers/
+      - name: AbstractCellBasedWriter
+
+      ##=== cell_based: chaste/cell_based/writers/cell_writers/
+      - name: AbstractCellWriter
+        source_includes:
+          - AbstractCellPopulation.hpp
+      - name: CellAgesWriter
+        source_includes:
+          - AbstractCellPopulation.hpp
+      - name: CellAncestorWriter
+        source_includes:
+          - AbstractCellPopulation.hpp
+      - name: CellAppliedForceWriter
+        source_includes:
+          - AbstractCellPopulation.hpp
+      - name: CellCycleModelProteinConcentrationsWriter
+        source_includes:
+          - AbstractCellPopulation.hpp
+      - name: CellDataItemWriter
+        source_includes:
+          - AbstractCellPopulation.hpp
+      - name: CellDeltaNotchWriter
+        source_includes:
+          - AbstractCellPopulation.hpp
+      - name: CellIdWriter
+        source_includes:
+          - AbstractCellPopulation.hpp
+      - name: CellLabelWriter
+        source_includes:
+          - AbstractCellPopulation.hpp
+      - name: CellLocationIndexWriter
+        source_includes:
+          - AbstractCellPopulation.hpp
+      - name: CellMutationStatesWriter
+        source_includes:
+          - AbstractCellPopulation.hpp
+      - name: CellProliferativePhasesWriter
+        source_includes:
+          - AbstractCellPopulation.hpp
+      - name: CellProliferativeTypesWriter
+        source_includes:
+          - AbstractCellPopulation.hpp
+      - name: CellRadiusWriter
+        source_includes:
+          - AbstractCellPopulation.hpp
+      - name: CellRosetteRankWriter
+        source_includes:
+          - AbstractCellPopulation.hpp
+      - name: CellVolumesWriter
+        source_includes:
+          - AbstractCellPopulation.hpp
+      - name: ImmersedBoundaryBoundaryCellWriter
+        source_includes:
+          - AbstractCellPopulation.hpp
+          - ImmersedBoundaryCellPopulation.hpp
+      - name: ImmersedBoundaryNeighbourNumberWriter
+        source_includes:
+          - AbstractCellPopulation.hpp
+          - ImmersedBoundaryCellPopulation.hpp
+      - name: LegacyCellProliferativeTypesWriter
+        source_includes:
+          - AbstractCellPopulation.hpp
+
+      ##=== cell_based: chaste/cell_based/writers/population_writers/
+      - name: AbstractCellPopulationWriter
+        source_includes: &population_writer_includes
+          - AbstractCellPopulation.hpp
+          - MeshBasedCellPopulation.hpp
+          - PottsBasedCellPopulation.hpp
+          - CaBasedCellPopulation.hpp
+          - ImmersedBoundaryCellPopulation.hpp
+          - NodeBasedCellPopulation.hpp
+          - VertexBasedCellPopulation.hpp
+      - name: BoundaryNodeWriter
+        source_includes: *population_writer_includes
+      - name: CellPopulationAdjacencyMatrixWriter
+        source_includes: *population_writer_includes
+      - name: CellPopulationAreaWriter
+        source_includes: *population_writer_includes
+      - name: CellPopulationElementWriter
+        source_includes: *population_writer_includes
+      - name: HeterotypicBoundaryLengthWriter
+        source_includes: *population_writer_includes
+      - name: NodeLocationWriter
+        source_includes: *population_writer_includes
+      - name: NodeVelocityWriter
+        source_includes: *population_writer_includes
+      - name: RadialCellDataDistributionWriter
+        source_includes: *population_writer_includes
+      - name: VertexIntersectionSwapLocationsWriter
+        source_includes: *population_writer_includes
+      - name: VertexT1SwapLocationsWriter
+        source_includes: *population_writer_includes
+      - name: VertexT2SwapLocationsWriter
+        source_includes: *population_writer_includes
+      - name: VertexT3SwapLocationsWriter
+        source_includes: *population_writer_includes
+      - name: VoronoiDataWriter
+        source_includes: *population_writer_includes
+
+      ##=== cell_based: chaste/cell_based/writers/population_count_writers/
+      - name: AbstractCellPopulationCountWriter
+        source_includes: *population_writer_includes
+      - name: CellMutationStatesCountWriter
+        source_includes: *population_writer_includes
+      - name: CellProliferativePhasesCountWriter
+        source_includes: *population_writer_includes
+      - name: CellProliferativeTypesCountWriter
+        source_includes: *population_writer_includes
+
+      ##=== cell_based: chaste/cell_based/writers/population_event_writers/
+      - name: AbstractCellPopulationEventWriter
+        source_includes: *population_writer_includes
+      - name: CellDivisionLocationsWriter
+        source_includes: *population_writer_includes
+      - name: CellRemovalLocationsWriter
+        source_includes: *population_writer_includes
+
+      ##=== cell_based: chaste/cell_based/population/update_rules/
+      - name: AbstractUpdateRule
+      - name: AbstractCaUpdateRule
+      - name: AbstractPottsUpdateRule
+      - name: AbstractCaSwitchingUpdateRule
+
+      - name: AdhesionPottsUpdateRule
+      - name: ChemotaxisPottsUpdateRule
+      - name: DifferentialAdhesionPottsUpdateRule
+      - name: DiffusionCaUpdateRule
+      - name: RandomCaSwitchingUpdateRule
+      - name: SurfaceAreaConstraintPottsUpdateRule
+      - name: VolumeConstraintPottsUpdateRule
+
+      ##=== cell_based: chaste/cell_based/population/division_rules/
+      - name: AbstractCentreBasedDivisionRule
+      - name: AbstractCaBasedDivisionRule
+      - name: AbstractImmersedBoundaryDivisionRule
+      - name: AbstractVertexBasedDivisionRule
+
+      - name: ExclusionCaBasedDivisionRule
+      - name: FixedCentreBasedDivisionRule
+      - name: FixedVertexBasedDivisionRule
+      - name: RandomDirectionCentreBasedDivisionRule
+      - name: RandomDirectionVertexBasedDivisionRule
+      - name: ShortAxisImmersedBoundaryDivisionRule
+      - name: ShortAxisVertexBasedDivisionRule
+      - name: ShovingCaBasedDivisionRule
+      - name: VonMisesVertexBasedDivisionRule
+
+      ##=== cell_based: chaste/cell_based/population/forces/
+      - name: AbstractForce
+      - name: AbstractTwoBodyInteractionForce
+      - name: AbstractImmersedBoundaryForce
+
+      - name: BuskeAdhesiveForce
+      - name: BuskeCompressionForce
+      - name: BuskeElasticForce
+      - name: ChemotacticForce
+      - name: DiffusionForce
+      - name: FarhadifarForce
+      - name: GeneralisedLinearSpringForce
+      - name: ImmersedBoundaryKinematicFeedbackForce
+      - name: ImmersedBoundaryLinearDifferentialAdhesionForce
+      - name: ImmersedBoundaryLinearInteractionForce
+      - name: ImmersedBoundaryLinearMembraneForce
+      - name: ImmersedBoundaryMorseInteractionForce
+      - name: ImmersedBoundaryMorseMembraneForce
+      - name: NagaiHondaForce
+      - name: RepulsionForce
+      - name: WelikyOsterForce
+        excluded_methods:
+          - GetLineTensionParameter
+
+      - name: DifferentialAdhesionGeneralisedLinearSpringForce
+      - name: NagaiHondaDifferentialAdhesionForce
+        excluded_methods:
+          - GetAdhesionParameter
+      - name: PlanarPolarisedFarhadifarForce
+        excluded_methods:
+          - GetLineTensionParameter
+      # - name: DiscreteSystemForceCalculator
+
+      ##=== cell_based: chaste/cell_based/population/killers/
+      - name: AbstractCellKiller
+
+      - name: ApoptoticCellKiller
+      - name: IsolatedLabelledCellKiller
+      - name: PlaneBasedCellKiller
+      - name: RandomCellKiller
+      - name: T2SwapCellKiller
+      - name: TargetedCellKiller
+
+      ##=== cell_based: chaste/cell_based/population/boundary_conditions/
+      - name: AbstractCellPopulationBoundaryCondition
+
+      - name: PlaneBoundaryCondition
+        source_includes:
+          - PythonUblasObjectConverters.hpp
+
+      - name: SlidingBoundaryCondition
+        source_includes:
+          - PythonUblasObjectConverters.hpp
+
+      - name: SphereGeometryBoundaryCondition
+        source_includes:
+          - PythonUblasObjectConverters.hpp
+
+      ##=== cell_based: chaste/cell_based/population/
+      - name: AbstractCellPopulation
+        excluded_methods:
+          - rGetCells
+        source_includes:
+          - AbstractCellBasedSimulation.hpp
+
+      - name: AbstractOffLatticeCellPopulation
+
+      - name: AbstractCentreBasedCellPopulation
+        template_substitutions:
+          - signature: <unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+            replacement: [[2, 2], [3, 3]]
+        excluded_methods:
+          - MarkSpring
+          - UnmarkSpring
+
+      - name: AbstractOnLatticeCellPopulation
+        excluded_methods:
+          - GetNodeCorrespondingToCell
+          - MarkSpring
+          - UnmarkSpring
+
+      - name: CaBasedCellPopulation
+        excluded_methods:
+          - rGetMesh
+          - GetTetrahedralMeshForPdeModifier
+          - GetNodeCorrespondingToCell
+          - rGetAvailableSpaces
+        custom_generator: &population_generator "CPPWG_SOURCEROOT/pychaste/dynamic/custom_generators/PopulationWriter_custom.py"
+        source_includes: &population_includes
+          - AbstractCellBasedSimulation.hpp
+          - AbstractImmersedBoundaryDivisionRule.hpp
+          - AbstractVertexBasedDivisionRule.hpp
+          - BoundaryNodeWriter.hpp
+          - CellAgesWriter.hpp
+          - CellAncestorWriter.hpp
+          - CellAppliedForceWriter.hpp
+          - CellCycleModelProteinConcentrationsWriter.hpp
+          - CellDataItemWriter.hpp
+          - CellDeltaNotchWriter.hpp
+          - CellDivisionLocationsWriter.hpp
+          - CellIdWriter.hpp
+          - CellLabelWriter.hpp
+          - CellLocationIndexWriter.hpp
+          - CellMutationStatesCountWriter.hpp
+          - CellMutationStatesWriter.hpp
+          - CellPopulationAdjacencyMatrixWriter.hpp
+          - CellPopulationAreaWriter.hpp
+          - CellPopulationElementWriter.hpp
+          - CellProliferativePhasesCountWriter.hpp
+          - CellProliferativePhasesWriter.hpp
+          - CellProliferativeTypesCountWriter.hpp
+          - CellProliferativeTypesWriter.hpp
+          - CellRadiusWriter.hpp
+          - CellRemovalLocationsWriter.hpp
+          - CellRosetteRankWriter.hpp
+          - CellVolumesWriter.hpp
+          - HeterotypicBoundaryLengthWriter.hpp
+          - LegacyCellProliferativeTypesWriter.hpp
+          - NodeLocationWriter.hpp
+          - NodeVelocityWriter.hpp
+          - PottsMeshWriter.hpp
+          - RadialCellDataDistributionWriter.hpp
+          - VertexIntersectionSwapLocationsWriter.hpp
+          - VertexT1SwapLocationsWriter.hpp
+          - VertexT2SwapLocationsWriter.hpp
+          - VertexT3SwapLocationsWriter.hpp
+          - VoronoiDataWriter.hpp
+
+      - name: ImmersedBoundaryCellPopulation
+        excluded_methods:
+          - rGetMesh
+          - GetTetrahedralMeshForPdeModifier
+        custom_generator: *population_generator
+        source_includes: *population_includes
+
+      - name: MeshBasedCellPopulation
+        excluded_methods:
+          - GetVoronoiTessellation
+          - rGetNodePairs
+          - GetTetrahedralMeshForPdeModifier
+          - rGetMesh
+        custom_generator: *population_generator
+        source_includes: *population_includes
+
+      - name: MeshBasedCellPopulationWithGhostNodes
+        custom_generator: *population_generator
+        source_includes: *population_includes
+
+      - name: NodeBasedCellPopulation
+        excluded_methods:
+          - rGetNodePairs
+          - GetTetrahedralMeshForPdeModifier
+          - rGetMesh
+        custom_generator: *population_generator
+        source_includes: *population_includes
+
+      - name: NodeBasedCellPopulationWithBuskeUpdate
+        excluded_methods:
+          - rGetMesh
+        custom_generator: *population_generator
+        source_includes: *population_includes
+
+      - name: NodeBasedCellPopulationWithParticles
+        excluded_methods:
+          - rGetMesh
+        custom_generator: *population_generator
+        source_includes: *population_includes
+
+      - name: VertexBasedCellPopulation
+        excluded_methods:
+          - GetElementCorrespondingToCell
+          - GetElement
+          - GetTetrahedralMeshForPdeModifier
+          - rGetMesh
+        custom_generator: *population_generator
+        source_includes: *population_includes
+
+      - name: PottsBasedCellPopulation
+        excluded_methods:
+          - GetElementCorrespondingToCell
+          - GetElement
+          - GetTetrahedralMeshForPdeModifier
+          - rGetMesh
+          - GetElementTessellation
+          - GetMutableMesh
+        custom_generator: *population_generator
+        source_includes: *population_includes
+
+      # - name: CellwiseDataGradient
+
+      ##=== cell_based: chaste/cell_based/simulation/modifiers/
+      - name: AbstractCellBasedSimulationModifier
+      - name: AbstractTargetAreaModifier
+
+      - name: DeltaNotchTrackingModifier
+      - name: DeltaNotchEdgeTrackingModifier
+      - name: DeltaNotchEdgeInteriorTrackingModifier
+      - name: DivisionBiasTrackingModifier
+      - name: ExtrinsicPullModifier
+      - name: ImmersedBoundarySimulationModifier
+      - name: ImmersedBoundarySvgWriter
+      - name: NormallyDistributedTargetAreaModifier
+      - name: SimpleTargetAreaModifier
+      - name: TargetAreaLinearGrowthModifier
+      - name: VolumeTrackingModifier
+
+      ##=== cell_based: chaste/cell_based/simulation/numerical_methods/
+      - name: AbstractNumericalMethod
+      - name: ForwardEulerNumericalMethod
+      # - name: StepSizeException
+
+      ##=== cell_based: chaste/cell_based/common/
+      - name: SimulationTime
+      # - name: OdeLinearSystemSolver
+
+      ##=== cell_based: chaste/cell_based/simulation/
+      - name: AbstractCellBasedSimulation
+        template_substitutions:
+          - signature: <unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
+            replacement: [[2, 2], [3, 3]]
+        excluded_methods:
+          - GetSimulationModifiers
+
+      - name: OffLatticeSimulation
+      - name: OnLatticeSimulation
+      # - name: CellBasedSimulationArchiver
+
+      ##=== cell_based: pychaste/cell_based/
+      - name: AttractingPlaneBoundaryCondition
+        source_includes:
+          - PythonUblasObjectConverters.hpp
+      - name: VtkSceneModifier
+      - name: PythonSimulationModifier
+
+  #=== tutorial
+  - name: tutorial
+    source_locations:
+      - projects/PyChaste/tutorial/src
+    classes:
+      - name: Hello
+
+  #=== visualization
+  - name: visualization
+    source_locations:
+      - projects/PyChaste/visualization/src
+    classes:
+      - name: VtkScene
+      - name: AbstractPyChasteActorGenerator
+      - name: CellPopulationPyChasteActorGenerator

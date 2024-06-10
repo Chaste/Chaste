@@ -184,6 +184,8 @@ option (Chaste_INSTALL_TESTS "Install Chaste Testing infrastructure" OFF)
 
 set (Chaste_CODEGEN_EXTRA_ARGS "" CACHE STRING "Add any extra arguments for chaste_codegen here")
 
+option (Chaste_ENABLE_PYCHASTE "Enable Building PyChaste" OFF)
+
 #Some Chaste-specific #defines
 add_definitions (-DCHASTE_CMAKE)
 
@@ -307,6 +309,25 @@ execute_process(COMMAND ${codegen_python3_venv}/chaste_codegen --version
         OUTPUT_STRIP_TRAILING_WHITESPACE)
 message("Codegen version: ${Chaste_CODEGEN_VERSION}")
 
+# Install C++ wrapper generator (cppwg) in virtual environment
+if (Chaste_ENABLE_PYCHASTE)
+    message (STATUS "Installing cppwg")
+
+    include(FetchContent)
+    FetchContent_Declare(
+        cppwg
+        GIT_REPOSITORY https://github.com/Chaste/cppwg.git
+        GIT_TAG stable
+        GIT_SHALLOW 1
+    )
+    FetchContent_MakeAvailable(cppwg)
+
+    execute_process(COMMAND ${codegen_python3_venv}/pip install ${cppwg_SOURCE_DIR})
+    execute_process( COMMAND ${codegen_python3_venv}/cppwg --version
+        OUTPUT_VARIABLE Chaste_CPPWG_VERSION
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+    message("CPPWG version: ${Chaste_CPPWG_VERSION}")
+endif ()
 
 if (Chaste_ENABLE_TESTING AND Chaste_ACCEPTANCE)
     find_package (TextTest)
@@ -589,7 +610,7 @@ message ("# Configuring components")
 message ("####################################\n")
 
 # List the available Chaste components
-set (Chaste_COMPONENTS global io linalg mesh ode pde continuum_mechanics cell_based crypt)
+set (Chaste_COMPONENTS global io linalg mesh ode pde continuum_mechanics cell_based crypt pychaste)
 if (NOT (WIN32 OR CYGWIN))
     set (Chaste_COMPONENTS ${Chaste_COMPONENTS} lung heart)
 endif ()
@@ -673,6 +694,7 @@ set (Chaste_DEPENDS_crypt cell_based pde ode mesh linalg io global)
 set (Chaste_DEPENDS_continuum_mechanics pde ode mesh linalg io global)
 set (Chaste_DEPENDS_heart ${Chaste_DEPENDS_continuum_mechanics} continuum_mechanics)
 set (Chaste_DEPENDS_lung ${Chaste_DEPENDS_continuum_mechanics} continuum_mechanics)
+set (Chaste_DEPENDS_pychaste cell_based)
 
 # These custom targets depend on other components but are not components themselves
 set (Chaste_DEPENDS_core global io linalg mesh ode pde continuum_mechanics)
