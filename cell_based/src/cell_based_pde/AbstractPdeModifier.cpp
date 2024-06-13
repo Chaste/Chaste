@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractPdeModifier.hpp"
 #include "VtkMeshWriter.hpp"
 #include "ReplicatableVector.hpp"
+#include "UniformSourceEllipticPde.hpp"
 #include "AveragedSourceEllipticPde.hpp"
 #include "AveragedSourceParabolicPde.hpp"
 
@@ -107,7 +108,8 @@ template<unsigned DIM>
 bool AbstractPdeModifier<DIM>::HasAveragedSourcePde()
 {
     return ((boost::dynamic_pointer_cast<AveragedSourceEllipticPde<DIM> >(mpPde) != nullptr) ||
-            (boost::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPde) != nullptr));
+            (boost::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPde) != nullptr)||
+            (boost::dynamic_pointer_cast<UniformSourceEllipticPde<DIM> >(mpPde) != nullptr));
 }
 
 template<unsigned DIM>
@@ -121,6 +123,10 @@ void AbstractPdeModifier<DIM>::SetUpSourceTermsForAveragedSourcePde(TetrahedralM
     else if (boost::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPde) != nullptr)
     {
         boost::static_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPde)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
+    }
+    else if (boost::dynamic_pointer_cast<UniformSourceEllipticPde<DIM> >(mpPde) != nullptr)
+    {
+        //Don't do anything as dont need to setup source terms as just constant.
     }
 }
 
