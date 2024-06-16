@@ -64,10 +64,11 @@ public:
     void TestUniformSourceEllipticPde()
     {
         // Create PDE object
-        UniformSourceEllipticPde<2> pde(0.05);
+        UniformSourceEllipticPde<2> pde(0.01, 0.05);
 
-        // Test that the member variable has been initialised correctly
-        TS_ASSERT_DELTA(pde.GetCoefficient(), 0.05, 1e-6);
+        // Test that the member variables have been initialised correctly
+        TS_ASSERT_DELTA(pde.GetConstantCoefficient(), 0.01, 1e-6);
+        TS_ASSERT_DELTA(pde.GetLinearCoefficient(), 0.05, 1e-6);
 
         // Test ComputeDiffusionTerm() method
         ChastePoint<2> point;
@@ -103,7 +104,7 @@ public:
 
         {
             // Create a PDE object
-            AbstractLinearEllipticPde<2,2>* const p_pde = new UniformSourceEllipticPde<2>(0.05);
+            AbstractLinearEllipticPde<2,2>* const p_pde = new UniformSourceEllipticPde<2>(0.01, 0.05);
 
             // Create output archive and archive PDE object
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -125,7 +126,8 @@ public:
             TS_ASSERT(dynamic_cast<UniformSourceEllipticPde<2>*>(p_pde) != NULL);
 
             UniformSourceEllipticPde<2>* p_static_cast_pde = static_cast<UniformSourceEllipticPde<2>*>(p_pde);
-            TS_ASSERT_DELTA(p_static_cast_pde->GetCoefficient(), 0.05, 1e-6);
+            TS_ASSERT_DELTA(p_static_cast_pde->GetConstantCoefficient(), 0.01, 1e-6);
+            TS_ASSERT_DELTA(p_static_cast_pde->GetLinearCoefficient(), 0.05, 1e-6);
 
             delete p_pde;
         }

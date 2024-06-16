@@ -47,10 +47,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * The PDE takes the form
  *
- * Grad.(Grad(u)) + k = 0,
+ * Grad.(Grad(u)) + a*u + b = 0,
  *
- * where the scalar k is specified by the member mSourceCoefficient, whose value
- * must be set in the constructor.
+ * where the scalars a and b are specified by the members mConstantSourceCoefficient 
+ * and mLinearSourceCoefficient respectively whose values must be set in the constructor.
  *
  * Thus, there is no direct coupling between the cell-based simulation and the
  * terms of the PDE; here, the cell population just defines the spatial domain
@@ -75,25 +75,35 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
        archive & boost::serialization::base_object<AbstractLinearEllipticPde<DIM, DIM> >(*this);
-       archive & mSourceCoefficient;
+       archive & mConstantSourceCoefficient;
+       archive & mLinearSourceCoefficient;
     }
 
-    /** Coefficient of source term. */
-    double mSourceCoefficient;
+    /** Coefficient of constant source term. */
+    double mConstantSourceCoefficient;
+
+    /** Coefficient of linear source term. */
+    double mLinearSourceCoefficient;
 
 public:
 
     /**
      * Constructor.
      *
-     * @param sourceCoefficient the source term coefficient (defaults to 0.0)
+     * @param constantSourceCoefficient the constant source term coefficient (defaults to 0.0)
+     * @param linearSourceCoefficient the linear source term coefficient (defaults to 0.0)
      */
-    UniformSourceEllipticPde(double sourceCoefficient=0.0);
+    UniformSourceEllipticPde(double constantSourceCoefficient=0.0, double linearSourceCoefficient=0.0);
 
     /**
-     * @return mSourceCoefficient
+     * @return mConatantSourceCoefficient
      */
-    double GetCoefficient() const;
+    double GetConstantCoefficient() const;
+
+    /**
+     * @return mLinearSourceCoefficient
+     */
+    double GetLinearCoefficient() const;
 
     /**
      * Overridden ComputeConstantInUSourceTerm() method.

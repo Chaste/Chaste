@@ -131,6 +131,50 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeMod
             }
         }
 
+        // Also remove nodes that are within the average cell radius from a cell center.
+        // Apply boundary condition to the nodes in the set coarse_mesh_boundary_node_indices
+        
+        std::set<unsigned> nearby_node_indices;
+        for (std::set<unsigned>::iterator node_iter = coarse_mesh_boundary_node_indices.begin();
+             node_iter != coarse_mesh_boundary_node_indices.end();
+             ++node_iter)
+        {
+            bool remove_node = false;
+
+             c_vector<double,DIM> node_location = this->mpFeMesh->GetNode(*node_iter)->rGetLocation();
+
+            for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+             cell_iter != rCellPopulation.End();
+             ++cell_iter)
+            {
+                const ChastePoint<DIM>& r_position_of_cell = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
+
+                double separation = norm_2(node_location - r_position_of_cell.rGetLocation());
+                double cell_radius = 0.5;
+
+                if (separation < cell_radius)
+                {
+                    remove_node = true;
+                    break;
+                }                
+            }
+
+            if (remove_node)
+            {
+                // Node near cell so set it to be removed from boundary set
+                nearby_node_indices.insert(*node_iter);
+            }
+        }
+
+        // Remove nodes that are near cells from boundary set
+        for (std::set<unsigned>::iterator node_iter = nearby_node_indices.begin();
+             node_iter != nearby_node_indices.end();
+             ++node_iter)
+        {
+            coarse_mesh_boundary_node_indices.erase(*node_iter);
+        }
+
+
         // Apply boundary condition to the nodes in the set coarse_mesh_boundary_node_indices
         for (std::set<unsigned>::iterator iter = coarse_mesh_boundary_node_indices.begin();
              iter != coarse_mesh_boundary_node_indices.end();

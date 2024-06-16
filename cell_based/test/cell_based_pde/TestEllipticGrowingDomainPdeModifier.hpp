@@ -83,7 +83,7 @@ public:
     void TestEllipticConstructor()
     {
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (0.0, -0.1));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -97,7 +97,7 @@ public:
     void TestMeshGeneration()
     {
         // Create PDE and boundary condition objects to be used by all cell populations
-        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (0.0, ,-0.1));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a CellsGenerator to be used by all cell populations
@@ -296,7 +296,7 @@ public:
         // Separate scope to write the archive
         {
             // Create PDE and boundary condition objects
-            MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
+            MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (0.0, -0.1));
             MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
             // Create a PDE modifier and set the name of the dependent variable in the PDE

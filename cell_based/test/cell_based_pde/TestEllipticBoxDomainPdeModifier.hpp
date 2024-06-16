@@ -77,7 +77,7 @@ public:
     void TestEllipticConstructor()
     {
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (0.0, -0.1));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE

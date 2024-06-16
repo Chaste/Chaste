@@ -251,7 +251,7 @@ public:
         TS_ASSERT_EQUALS(simulator.GetIdentifier(), "OffLatticeSimulation-2-2");
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (0.0, -0.1));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -519,7 +519,7 @@ public:
         simulator.SetEndTime(1.0/120.0);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (0.0, -0.1));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -828,7 +828,7 @@ public:
         simulator.SetEndTime(0.2);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (0.0, -0.1));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -986,7 +986,7 @@ public:
         simulator.SetEndTime(0.1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(UniformSourceEllipticPde<3>, p_pde, (-0.03));
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<3>, p_pde, (0.0, -0.03));
         MAKE_PTR_ARGS(ConstBoundaryCondition<3>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
