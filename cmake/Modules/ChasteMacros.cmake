@@ -75,7 +75,7 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
     endif()
     set(depends ${cellml_dir}/${cellml_file_name}.cellml)
     
-    execute_process(COMMAND "${codegen_python3_venv}/chaste_codegen" ${codegen_args} ${Chaste_CODEGEN_EXTRA_ARGS} --show-outputs ${cellml_file}
+    execute_process(COMMAND "${chaste_python3_venv}/chaste_codegen" ${codegen_args} ${Chaste_CODEGEN_EXTRA_ARGS} --show-outputs ${cellml_file}
         OUTPUT_VARIABLE ConvertCellModelDepends
         OUTPUT_STRIP_TRAILING_WHITESPACE
         )
@@ -88,7 +88,7 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
     endif()
 
     add_custom_command(OUTPUT ${output_files_hpp} ${output_files_cpp}
-        COMMAND "${codegen_python3_venv}/chaste_codegen" ${codegen_args} ${Chaste_CODEGEN_EXTRA_ARGS} ${cellml_file}
+        COMMAND "${chaste_python3_venv}/chaste_codegen" ${codegen_args} ${Chaste_CODEGEN_EXTRA_ARGS} ${cellml_file}
         DEPENDS ${depends}
         COMMENT "Processing CellML file ${cellml_file_rel}"
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}

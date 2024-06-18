@@ -25,7 +25,7 @@ _local/
 # Temporary build folders for dynamically loaded models
 /heart/dynamic/tmp_*_*
 /heart/dynamic/luo_rudy_1991_dyn.*
-/codegen_python3_venv
+/chaste_python3_venv
 **/__pycache__/
 
 # Local hostconfig

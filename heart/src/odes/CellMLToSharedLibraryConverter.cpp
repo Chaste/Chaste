@@ -204,7 +204,7 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
                                       "set(CMAKE_CXX_EXTENSIONS OFF)\n" <<
                                       "project (ChasteCellMLToSharedLibraryConverter)\n" <<
                                       "find_package(Python3 3.5 REQUIRED)\n" <<
-                                      "set(codegen_python3_venv " + chaste_root.GetAbsolutePath() + "/codegen_python3_venv/bin)\n" <<
+                                      "set(chaste_python3_venv " + chaste_root.GetAbsolutePath() + "/chaste_python3_venv/bin)\n" <<
                                       "find_package(Chaste COMPONENTS " << mComponentName << ")\n" <<
                                       "chaste_do_cellml(sources " << cellml_file.GetAbsolutePath() << " " << "ON " << codegen_args << ")\n" <<
                                       "set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})\n" <<
