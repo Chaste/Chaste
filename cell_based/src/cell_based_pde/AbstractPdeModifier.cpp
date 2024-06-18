@@ -162,6 +162,9 @@ void AbstractPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCell
             mpVizPdeSolutionResultsFile = output_file_handler.OpenOutputFile("results.vizpdesolution");
         }
     }
+
+    // To make sure cell volume can be calculated
+    rCellPopulation.Update();
 }
 
 template<unsigned DIM>

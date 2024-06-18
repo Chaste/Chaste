@@ -91,9 +91,6 @@ private:
        archive & boost::serialization::base_object<AveragedSourceEllipticPde<DIM> >(*this);
     }
 
-    /** Static cast of the NodeBasedCellPopulation. */
-    NodeBasedCellPopulation<DIM>* mpStaticCastCellPopulation;
-
 public:
 
     /**

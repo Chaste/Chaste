@@ -40,8 +40,6 @@ template<unsigned DIM>
 VolumeDependentAveragedSourceEllipticPde<DIM>::VolumeDependentAveragedSourceEllipticPde(AbstractCellPopulation<DIM>& rCellPopulation, double coefficient)
     : AveragedSourceEllipticPde<DIM>(rCellPopulation, coefficient)
 {
-    assert(bool(dynamic_cast<NodeBasedCellPopulation<DIM>*>(&(this->mrCellPopulation))));
-    mpStaticCastCellPopulation = static_cast<NodeBasedCellPopulation<DIM>*>(&(this->mrCellPopulation));
 }
 
 template<unsigned DIM>
@@ -71,13 +69,8 @@ void VolumeDependentAveragedSourceEllipticPde<DIM>::SetupSourceTerms(Tetrahedral
             elem_index = rCoarseMesh.GetContainingElementIndex(r_position_of_cell);
         }
 
-        unsigned node_index = this->mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
-
-        Node<DIM>* p_node = this->mrCellPopulation.GetNode(node_index);
-        double radius = p_node->GetRadius();
-
-        // Uptake normalised to 1 for unit cell
-        double cell_weight = radius*radius;
+        // scale by volume        
+        double cell_weight = this->mrCellPopulation.GetVolumeOfCell(*cell_iter);
 
         bool cell_is_apoptotic = cell_iter->template HasCellProperty<ApoptoticCellProperty>();
         if (!cell_is_apoptotic)
