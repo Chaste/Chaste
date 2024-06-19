@@ -82,6 +82,7 @@ private:
        archive & boost::serialization::base_object<AbstractLinearEllipticPde<DIM, DIM> >(*this);
        archive & mConstantSourceCoefficient;
        archive & mLinearSourceCoefficient;
+       archive & mDiffusionCoefficient;
        archive & mScaleByCellVolume;
     }
 
@@ -96,6 +97,9 @@ protected:
     /** Coefficient of linear source term. */
     double mLinearSourceCoefficient;
 
+    /** Diffusion coefficient. */
+    double mDiffusionCoefficient;
+
     /** Whether to scale tems by cell volume*/
     bool mScaleByCellVolume;
 
@@ -108,9 +112,14 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param constantSourceCoefficient the constant source term coefficient (defaults to 0.0)
      * @param linearSourceCoefficient the linear source term coefficient (defaults to 0.0)
+     * @param diffusionCoefficient the rate of diffusion (defaults to 1.0)
      * @param scaleByCellVolume whether to scale by cell volume (defaults to)
      */
-    CellwiseSourceEllipticPde(AbstractCellPopulation<DIM, DIM>& rCellPopulation, double constantSourceCoefficient=0.0, double linearSourceCoefficient=0.0, bool scaleByCellVolume=false);
+    CellwiseSourceEllipticPde(AbstractCellPopulation<DIM, DIM>& rCellPopulation, 
+                              double constantSourceCoefficient=0.0, 
+                              double linearSourceCoefficient=0.0,
+                              double diffusionCoefficient=1.0, 
+                              bool scaleByCellVolume=false);
 
     /**
      * @return const reference to the cell population (used in archiving).
@@ -127,6 +136,11 @@ public:
      */
     double GetLinearCoefficient() const;
         
+    /**
+     * @return mDiffusionCoefficient
+     */
+    double GetDiffusionCoefficient() const;
+
     /**
      * @return mScaleByCellVolume
      */

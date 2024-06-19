@@ -39,16 +39,18 @@ template<unsigned DIM>
 CellwiseSourceEllipticPde<DIM>::CellwiseSourceEllipticPde(AbstractCellPopulation<DIM,DIM>& rCellPopulation, 
                                                           double constantSourceCoefficient, 
                                                           double linearSourceCoefficient, 
+                                                          double diffusionCoefficient,
                                                           bool scaleByCellVolume)
     : mrCellPopulation(rCellPopulation),
       mConstantSourceCoefficient(constantSourceCoefficient),
       mLinearSourceCoefficient(linearSourceCoefficient),
+      mDiffusionCoefficient(diffusionCoefficient),
       mScaleByCellVolume(scaleByCellVolume)
 {
 }
 
 template<unsigned DIM>
-const AbstractCellPopulation<DIM,DIM>& CellwiseSourceEllipticPde<DIM>::rGetCellPopulation() const
+const AbstractCellPopulation<DIM>& CellwiseSourceEllipticPde<DIM>::rGetCellPopulation() const
 {
     return mrCellPopulation;
 }
@@ -63,6 +65,12 @@ template<unsigned DIM>
 double CellwiseSourceEllipticPde<DIM>::GetLinearCoefficient() const
 {
     return mLinearSourceCoefficient;
+}
+
+template<unsigned DIM>
+double CellwiseSourceEllipticPde<DIM>::GetDiffusionCoefficient() const
+{
+    return mDiffusionCoefficient;
 }
 
 template<unsigned DIM>
@@ -107,7 +115,7 @@ double CellwiseSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTermAtNode(c
                 if (cell_volume <1e-6)
                 {
                     EXCEPTION("The volume of one of the cells is " << cell_volume << 
-                              " and you are scaling by cell volume. Either turn scaling off or use "  
+                              " and you are scaling by cell volume. Either turn scaling off or use"  
                               " a cell model with non zero areas (i.e. a Bounded Voronoi Tesselation model).");
                 }
             }
@@ -137,8 +145,8 @@ double CellwiseSourceEllipticPde<DIM>::ComputeConstantInUSourceTermAtNode(const 
                 if (cell_volume <1e-6)
                 {
                     EXCEPTION("The volume of one of the cells is " << cell_volume << 
-                              " and you are scaling by cell volume. Either turn scaling off or use "
-                              "a cell model with non zero areas (i.e. a Bounded Voronoi Tesselation model).");
+                              " and you are scaling by cell volume. Either turn scaling off or use"
+                              " a cell model with non zero areas (i.e. a Bounded Voronoi Tesselation model).");
                 }
             }
             constant_source_coefficient = mConstantSourceCoefficient/cell_volume;
@@ -151,7 +159,7 @@ double CellwiseSourceEllipticPde<DIM>::ComputeConstantInUSourceTermAtNode(const 
 template<unsigned DIM>
 c_matrix<double,DIM,DIM> CellwiseSourceEllipticPde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX)
 {
-    return identity_matrix<double>(DIM);
+    return mDiffusionCoefficient*identity_matrix<double>(DIM);
 }
 
 // Explicit instantiation

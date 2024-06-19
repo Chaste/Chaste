@@ -60,7 +60,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * class.
  *
  * Examples of PDEs in the source folder that can be solved using this class are
- * AveragedSourceEllipticPde, VolumeDependentAveragedSourceEllipticPde and UniformSourceEllipticPde.
+ * AveragedSourceEllipticPde and UniformSourceEllipticPde.
  */
 template<unsigned DIM>
 class EllipticBoxDomainPdeModifier : public AbstractBoxDomainPdeModifier<DIM>
