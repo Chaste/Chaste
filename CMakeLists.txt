@@ -275,18 +275,23 @@ endif ()
 ################################
 ####  Find Python
 ################################
-find_package(Python3 3.5)
+if (Chaste_ENABLE_PYCHASTE)
+    find_package(Python3 3.5 COMPONENTS Interpreter Development)
+else ()
+    find_package(Python3 3.5)
+endif ()
+
 if (Python3_VERSION VERSION_LESS 3.5.0)
     message(FATAL_ERROR "Python 3.5 or higher is required; found v${Python3_VERSION} instead. Specify interpreter with -DPython_EXECUTABLE=/path/to/python3")
 endif ()
 
 # Install chaste_codegen in virtual environment
-set(codegen_python3_venv ${PROJECT_BINARY_DIR}/codegen_python3_venv/bin)
+set(chaste_python3_venv ${PROJECT_BINARY_DIR}/chaste_python3_venv/bin)
 
-if (NOT EXISTS ${codegen_python3_venv})
-    message (STATUS "Creating virtual environment for chaste_codegen in ${PROJECT_BINARY_DIR}/codegen_python3_venv")
+if (NOT EXISTS ${chaste_python3_venv})
+    message (STATUS "Creating virtual environment for chaste_codegen in ${PROJECT_BINARY_DIR}/chaste_python3_venv")
     execute_process(
-        COMMAND ${Python3_EXECUTABLE} -m venv codegen_python3_venv
+        COMMAND ${Python3_EXECUTABLE} -m venv chaste_python3_venv
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
     )
 endif ()
@@ -294,26 +299,37 @@ endif ()
 # Update pip setuptools and wheel
 message (STATUS "Updating pip setuptools and wheel")
 if (${Python3_VERSION} VERSION_LESS 3.6.0)
-    execute_process(COMMAND ${codegen_python3_venv}/pip install --no-cache-dir "pip>=20.0, <21.0")
-    execute_process(COMMAND ${codegen_python3_venv}/pip install --no-cache-dir --upgrade setuptools wheel)
+    execute_process(COMMAND ${chaste_python3_venv}/pip install --no-cache-dir "pip>=20.0, <21.0")
+    execute_process(COMMAND ${chaste_python3_venv}/pip install --no-cache-dir --upgrade setuptools wheel)
 else()
-    execute_process(COMMAND ${codegen_python3_venv}/pip install --no-cache-dir --upgrade pip setuptools wheel)
+    execute_process(COMMAND ${chaste_python3_venv}/pip install --no-cache-dir --upgrade pip setuptools wheel)
 endif()
 
 
 # Install chaste_codegen in virtual environment
 message (STATUS "Installing chaste_codegen")
-execute_process(COMMAND ${codegen_python3_venv}/pip install --no-cache-dir --upgrade -r ${CMAKE_SOURCE_DIR}/chaste_codegen.txt)
-execute_process(COMMAND ${codegen_python3_venv}/chaste_codegen --version
+execute_process(COMMAND ${chaste_python3_venv}/pip install --no-cache-dir --upgrade -r ${CMAKE_SOURCE_DIR}/chaste_codegen.txt)
+execute_process(COMMAND ${chaste_python3_venv}/chaste_codegen --version
         OUTPUT_VARIABLE Chaste_CODEGEN_VERSION
         OUTPUT_STRIP_TRAILING_WHITESPACE)
 message("Codegen version: ${Chaste_CODEGEN_VERSION}")
 
-# Install C++ wrapper generator (cppwg) in virtual environment
+# Get pychaste dependencies
 if (Chaste_ENABLE_PYCHASTE)
-    message (STATUS "Installing cppwg")
+    set(Chaste_USE_VTK ON)
 
+    # Get pybind11
     include(FetchContent)
+    FetchContent_Declare(
+        pybind11
+        GIT_REPOSITORY https://github.com/pybind/pybind11
+        GIT_TAG stable
+        GIT_SHALLOW 1
+    )
+    FetchContent_MakeAvailable(pybind11)
+
+    # Install C++ wrapper generator (cppwg) in venv
+    message (STATUS "Installing C++ wrapper generator")
     FetchContent_Declare(
         cppwg
         GIT_REPOSITORY https://github.com/Chaste/cppwg.git
@@ -322,8 +338,8 @@ if (Chaste_ENABLE_PYCHASTE)
     )
     FetchContent_MakeAvailable(cppwg)
 
-    execute_process(COMMAND ${codegen_python3_venv}/pip install ${cppwg_SOURCE_DIR})
-    execute_process( COMMAND ${codegen_python3_venv}/cppwg --version
+    execute_process(COMMAND ${chaste_python3_venv}/pip install -e ${cppwg_SOURCE_DIR})
+    execute_process( COMMAND ${chaste_python3_venv}/cppwg --version
         OUTPUT_VARIABLE Chaste_CPPWG_VERSION
         OUTPUT_STRIP_TRAILING_WHITESPACE)
     message("CPPWG version: ${Chaste_CPPWG_VERSION}")
@@ -385,17 +401,60 @@ if (Chaste_USE_VTK)
 
     # Depending on the VTK version, we need different components.
     if (VTK_MAJOR_VERSION LESS 9)
-        find_package(
-                VTK COMPONENTS vtkCommonCore vtkCommonDataModel vtkFiltersCore vtkFiltersGeneral vtkFiltersGeneric
-                vtkFiltersGeometry vtkFiltersModeling vtkFiltersSources vtkIOCore vtkIOGeometry vtkIOLegacy
-                vtkIOParallelXML vtkIOXML REQUIRED
-        )
+        if (Chaste_ENABLE_PYCHASTE)
+            if (VTK_MAJOR_VERSION LESS 7)
+                find_package(VTK COMPONENTS
+                    vtkCommonCore vtkCommonDataModel vtkFiltersCore
+                    vtkFiltersGeneral vtkFiltersGeneric vtkFiltersGeometry
+                    vtkFiltersModeling vtkFiltersSources vtkIOCore
+                    vtkIOGeometry vtkIOLegacy vtkIOParallelXML vtkIOXML
+                    # PyChaste specific
+                    vtkInteractionStyle vtkIOImage vtkIOMovie 
+                    vtkRenderingAnnotation vtkRenderingCore vtkRenderingFreeType
+                    vtkRenderingOpenGL vtkWrappingPythonCore REQUIRED
+                )
+            else ()
+                find_package(VTK COMPONENTS
+                    vtkCommonCore vtkCommonDataModel vtkFiltersCore
+                    vtkFiltersGeneral vtkFiltersGeneric vtkFiltersGeometry
+                    vtkFiltersModeling vtkFiltersSources vtkIOCore
+                    vtkIOGeometry vtkIOLegacy vtkIOParallelXML vtkIOXML
+                    # PyChaste specific
+                    vtkFiltersProgrammable vtkFiltersVerdict vtkInteractionStyle
+                    vtkIOImage vtkIOMovie vtkRenderingAnnotation
+                    vtkRenderingCore vtkRenderingFreeType vtkRenderingOpenGL2
+                    vtkWrappingPythonCore REQUIRED
+                )
+            endif ()
+        else ()
+            find_package(VTK COMPONENTS 
+                vtkCommonCore vtkCommonDataModel vtkFiltersCore 
+                vtkFiltersGeneral vtkFiltersGeneric vtkFiltersGeometry 
+                vtkFiltersModeling vtkFiltersSources vtkIOCore vtkIOGeometry 
+                vtkIOLegacy vtkIOParallelXML vtkIOXML REQUIRED
+            )
+        endif ()
     # VTK 9.0 and above require the following
     else ()
-        find_package(
-                VTK COMPONENTS CommonCore CommonDataModel FiltersCore FiltersGeneral FiltersGeneric FiltersGeometry
-                FiltersModeling FiltersSources IOCore IOGeometry IOLegacy IOParallelXML IOXML REQUIRED
+    if (Chaste_ENABLE_PYCHASTE)
+        find_package(VTK COMPONENTS 
+            CommonCore CommonDataModel FiltersCore 
+            FiltersGeneral FiltersGeneric FiltersGeometry
+            FiltersModeling FiltersSources IOCore IOGeometry IOLegacy 
+            IOParallelXML IOXML 
+            # PyChaste specific
+            FiltersProgrammable FiltersVerdict InteractionStyle IOImage IOMovie
+            IOOggTheora RenderingAnnotation RenderingCore RenderingFreeType
+            RenderingOpenGL2 WrappingPythonCore REQUIRED
         )
+    else ()
+        find_package(VTK COMPONENTS 
+            CommonCore CommonDataModel FiltersCore 
+            FiltersGeneral FiltersGeneric FiltersGeometry
+            FiltersModeling FiltersSources IOCore IOGeometry IOLegacy 
+            IOParallelXML IOXML REQUIRED
+        )
+        endif ()
     endif ()
 
     add_definitions (-DCHASTE_VTK)

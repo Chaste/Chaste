@@ -223,7 +223,7 @@ modules:
       - name: VertexMesh
         excluded_methods:
           - GetFace # dont have mixed dim elements
-          - GetEdgeHelper
+          - rGetEdgeHelper
         constructor_arg_type_excludes:
           - TetrahedralMesh<3, 3>
           - TetrahedralMesh<2, 2>
@@ -780,13 +780,6 @@ modules:
           - PythonUblasObjectConverters.hpp
       - name: VtkSceneModifier
       - name: PythonSimulationModifier
-
-  #=== tutorial
-  - name: tutorial
-    source_locations:
-      - projects/PyChaste/tutorial/src
-    classes:
-      - name: Hello
 
   #=== visualization
   - name: visualization
