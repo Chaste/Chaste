@@ -326,7 +326,8 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddPottsBasedCellPopulationActor
         auto p_threshold = vtkSmartPointer<vtkThreshold>::New();
         p_threshold->SetInputConnection(p_geometry_filter_pre->GetOutputPort());
 
-#if VTK_MAJOR_VERSION < 9
+
+#if (VTK_MAJOR_VERSION < 9 || (VTK_MAJOR_VERSION == 9 && VTK_MINOR_VERSION < 1)) // VTK < 9.1
         p_threshold->ThresholdByUpper(0.0);
 #else
         p_threshold->SetUpperThreshold(0.0);
@@ -364,7 +365,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddPottsBasedCellPopulationActor
                 auto p_local_threshold = vtkSmartPointer<vtkThreshold>::New();
                 p_local_threshold->SetInputData(p_geom_filter->GetOutput());
 
-#if VTK_MAJOR_VERSION < 9
+#if (VTK_MAJOR_VERSION < 9 || (VTK_MAJOR_VERSION == 9 && VTK_MINOR_VERSION < 1)) // VTK < 9.1
                 p_local_threshold->ThresholdBetween(p_element_base_ids->GetTuple1(idx),
                                                     p_element_base_ids->GetTuple1(idx));
 #else
@@ -1085,7 +1086,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddMeshBasedCellPopulationActor(
 
         auto p_threshold = vtkSmartPointer<vtkThreshold>::New();
         p_threshold->SetInputData(p_voronoi_grid);
-#if VTK_MAJOR_VERSION < 9
+#if (VTK_MAJOR_VERSION < 9 || (VTK_MAJOR_VERSION == 9 && VTK_MINOR_VERSION < 1)) // VTK < 9.1
         p_threshold->ThresholdByUpper(0.0);
 #else
         p_threshold->SetUpperThreshold(0.0);
