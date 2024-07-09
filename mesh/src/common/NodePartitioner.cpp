@@ -191,7 +191,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
     xadj[0]=0;
     for (PetscInt row_global_index=connectivity_matrix_lo; row_global_index<connectivity_matrix_hi; row_global_index++)
     {
-        MatGetRow(connectivity_matrix, row_global_index, &row_num_nz, &column_indices, PETSC_NULL);
+        MatGetRow(connectivity_matrix, row_global_index, &row_num_nz, &column_indices, CHASTE_PETSC_NULLPTR);
 
         unsigned row_local_index = row_global_index - connectivity_matrix_lo;
         xadj[row_local_index+1] = xadj[row_local_index] + row_num_nz;
@@ -200,14 +200,14 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
            adjncy[xadj[row_local_index] + col_index] =  column_indices[col_index];
         }
 
-        MatRestoreRow(connectivity_matrix, row_global_index, &row_num_nz,&column_indices, PETSC_NULL);
+        MatRestoreRow(connectivity_matrix, row_global_index, &row_num_nz,&column_indices, CHASTE_PETSC_NULLPTR);
     }
 
     PetscTools::Destroy(connectivity_matrix);
 
     // Convert to an adjacency matrix
     Mat adj_matrix;
-    MatCreateMPIAdj(PETSC_COMM_WORLD, num_local_nodes, num_nodes, xadj, adjncy, PETSC_NULL, &adj_matrix);
+    MatCreateMPIAdj(PETSC_COMM_WORLD, num_local_nodes, num_nodes, xadj, adjncy, CHASTE_PETSC_NULLPTR, &adj_matrix);
 
     PetscTools::Barrier();
     if (PetscTools::AmMaster())
@@ -257,7 +257,7 @@ void NodePartitioner<ELEMENT_DIM, SPACE_DIM>::PetscMatrixPartitioning(AbstractMe
 
     // Index sets only give local information, we want global
     AO ordering;
-    AOCreateBasicIS(new_global_node_indices, PETSC_NULL /* natural ordering */, &ordering);
+    AOCreateBasicIS(new_global_node_indices, CHASTE_PETSC_NULLPTR /* natural ordering */, &ordering);
 
     // The locally owned range under the new numbering
     PetscInt* local_range = new PetscInt[my_num_nodes];
