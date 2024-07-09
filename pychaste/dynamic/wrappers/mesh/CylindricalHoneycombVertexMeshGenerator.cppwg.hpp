@@ -1,0 +1,7 @@
+#ifndef CylindricalHoneycombVertexMeshGenerator_hpp__cppwg_wrapper
+#define CylindricalHoneycombVertexMeshGenerator_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_CylindricalHoneycombVertexMeshGenerator_class(pybind11::module &m);
+#endif // CylindricalHoneycombVertexMeshGenerator_hpp__cppwg_wrapper

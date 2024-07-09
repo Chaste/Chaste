@@ -1,0 +1,7 @@
+#ifndef AbstractTwoBodyInteractionForce3_3_hpp__cppwg_wrapper
+#define AbstractTwoBodyInteractionForce3_3_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_AbstractTwoBodyInteractionForce3_3_class(pybind11::module &m);
+#endif // AbstractTwoBodyInteractionForce3_3_hpp__cppwg_wrapper

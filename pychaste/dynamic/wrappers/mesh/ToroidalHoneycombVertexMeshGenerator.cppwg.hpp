@@ -1,0 +1,7 @@
+#ifndef ToroidalHoneycombVertexMeshGenerator_hpp__cppwg_wrapper
+#define ToroidalHoneycombVertexMeshGenerator_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_ToroidalHoneycombVertexMeshGenerator_class(pybind11::module &m);
+#endif // ToroidalHoneycombVertexMeshGenerator_hpp__cppwg_wrapper

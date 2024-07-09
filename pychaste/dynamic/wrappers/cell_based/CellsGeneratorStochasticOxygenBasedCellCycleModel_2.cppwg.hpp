@@ -1,0 +1,7 @@
+#ifndef CellsGeneratorStochasticOxygenBasedCellCycleModel_2_hpp__cppwg_wrapper
+#define CellsGeneratorStochasticOxygenBasedCellCycleModel_2_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_CellsGeneratorStochasticOxygenBasedCellCycleModel_2_class(pybind11::module &m);
+#endif // CellsGeneratorStochasticOxygenBasedCellCycleModel_2_hpp__cppwg_wrapper

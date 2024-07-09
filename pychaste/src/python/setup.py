@@ -45,14 +45,14 @@ setup(
     packages = find_packages(),
     
     package_data={
-        'chaste': ['_chaste_project_PyChaste_preload.so', 
-                   'cell_based/_chaste_project_PyChaste_cell_based.so',
-                   'core/_chaste_project_PyChaste_core.so', 
-                   'mesh/_chaste_project_PyChaste_mesh.so', 
-                   'ode/_chaste_project_PyChaste_ode.so', 
-                   'pde/_chaste_project_PyChaste_pde.so', 
-                   'visualization/_chaste_project_PyChaste_visualization.so', 
-                   'tutorial/_chaste_project_PyChaste_tutorial.so',],},
+        'chaste': ['_pychaste_preload.so', 
+                   'cell_based/_pychaste_cell_based.so',
+                   'core/_pychaste_core.so', 
+                   'mesh/_pychaste_mesh.so', 
+                   'ode/_pychaste_ode.so', 
+                   'pde/_pychaste_pde.so', 
+                   'visualization/_pychaste_visualization.so', 
+                   'tutorial/_pychaste_tutorial.so',],},
 
     data_files = [('tutorials', ['doc/tutorials/TestMeshBasedCellSimulationsPythonTutorial.ipynb', 
                                 'doc/tutorials/TestNodeBasedCellSimulationsPythonTutorial.ipynb',

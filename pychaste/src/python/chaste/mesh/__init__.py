@@ -40,4 +40,4 @@ import warnings
 # way to avoid duplicate registration during wrapper building is found.
 warnings.filterwarnings("ignore")
 
-from chaste.mesh._chaste_project_PyChaste_mesh import *
+from chaste.mesh._pychaste_mesh import *

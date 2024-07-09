@@ -1,0 +1,7 @@
+#ifndef ImmersedBoundaryMorseInteractionForce2_hpp__cppwg_wrapper
+#define ImmersedBoundaryMorseInteractionForce2_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_ImmersedBoundaryMorseInteractionForce2_class(pybind11::module &m);
+#endif // ImmersedBoundaryMorseInteractionForce2_hpp__cppwg_wrapper

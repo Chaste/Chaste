@@ -1,0 +1,7 @@
+#ifndef DeltaNotchEdgeInteriorTrackingModifier3_hpp__cppwg_wrapper
+#define DeltaNotchEdgeInteriorTrackingModifier3_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_DeltaNotchEdgeInteriorTrackingModifier3_class(pybind11::module &m);
+#endif // DeltaNotchEdgeInteriorTrackingModifier3_hpp__cppwg_wrapper

@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os, sys
 
-from chaste._chaste_project_PyChaste_preload import *
+from chaste._pychaste_preload import *
 import chaste.core
   
 def init(master_output_directory = os.getcwd(), comm=None):

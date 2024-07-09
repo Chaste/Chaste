@@ -1,0 +1,7 @@
+#ifndef AbstractOdeBasedPhaseBasedCellCycleModel_hpp__cppwg_wrapper
+#define AbstractOdeBasedPhaseBasedCellCycleModel_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_AbstractOdeBasedPhaseBasedCellCycleModel_class(pybind11::module &m);
+#endif // AbstractOdeBasedPhaseBasedCellCycleModel_hpp__cppwg_wrapper

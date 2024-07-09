@@ -1,0 +1,7 @@
+#ifndef LabelDependentBernoulliTrialCellCycleModel_hpp__cppwg_wrapper
+#define LabelDependentBernoulliTrialCellCycleModel_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_LabelDependentBernoulliTrialCellCycleModel_class(pybind11::module &m);
+#endif // LabelDependentBernoulliTrialCellCycleModel_hpp__cppwg_wrapper

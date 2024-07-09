@@ -1,0 +1,7 @@
+#ifndef RandomDirectionCentreBasedDivisionRule2_2_hpp__cppwg_wrapper
+#define RandomDirectionCentreBasedDivisionRule2_2_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_RandomDirectionCentreBasedDivisionRule2_2_class(pybind11::module &m);
+#endif // RandomDirectionCentreBasedDivisionRule2_2_hpp__cppwg_wrapper

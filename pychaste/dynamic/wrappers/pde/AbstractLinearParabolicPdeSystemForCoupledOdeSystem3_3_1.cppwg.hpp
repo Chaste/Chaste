@@ -1,0 +1,7 @@
+#ifndef AbstractLinearParabolicPdeSystemForCoupledOdeSystem3_3_1_hpp__cppwg_wrapper
+#define AbstractLinearParabolicPdeSystemForCoupledOdeSystem3_3_1_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_AbstractLinearParabolicPdeSystemForCoupledOdeSystem3_3_1_class(pybind11::module &m);
+#endif // AbstractLinearParabolicPdeSystemForCoupledOdeSystem3_3_1_hpp__cppwg_wrapper

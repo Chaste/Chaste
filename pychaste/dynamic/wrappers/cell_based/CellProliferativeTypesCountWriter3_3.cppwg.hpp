@@ -1,0 +1,7 @@
+#ifndef CellProliferativeTypesCountWriter3_3_hpp__cppwg_wrapper
+#define CellProliferativeTypesCountWriter3_3_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_CellProliferativeTypesCountWriter3_3_class(pybind11::module &m);
+#endif // CellProliferativeTypesCountWriter3_3_hpp__cppwg_wrapper

@@ -34,5 +34,5 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from chaste.visualization._chaste_project_PyChaste_visualization import *
+from chaste.visualization._pychaste_visualization import *
 from chaste.visualization.fortests import *

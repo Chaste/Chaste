@@ -39,5 +39,5 @@ import warnings
 # way to avoid duplicate registration during wrapper building is found.
 warnings.filterwarnings("ignore")
 
-from chaste.tutorial._chaste_project_PyChaste_tutorial import *
-from chaste.tutorial._chaste_project_PyChaste_tutorial_manual import *
+from chaste.tutorial._pychaste_tutorial import *
+from chaste.tutorial._pychaste_tutorial_manual import *

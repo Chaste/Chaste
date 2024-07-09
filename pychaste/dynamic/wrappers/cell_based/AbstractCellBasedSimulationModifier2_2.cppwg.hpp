@@ -1,0 +1,7 @@
+#ifndef AbstractCellBasedSimulationModifier2_2_hpp__cppwg_wrapper
+#define AbstractCellBasedSimulationModifier2_2_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_AbstractCellBasedSimulationModifier2_2_class(pybind11::module &m);
+#endif // AbstractCellBasedSimulationModifier2_2_hpp__cppwg_wrapper

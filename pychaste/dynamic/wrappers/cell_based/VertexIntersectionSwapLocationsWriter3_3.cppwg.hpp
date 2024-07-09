@@ -1,0 +1,7 @@
+#ifndef VertexIntersectionSwapLocationsWriter3_3_hpp__cppwg_wrapper
+#define VertexIntersectionSwapLocationsWriter3_3_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_VertexIntersectionSwapLocationsWriter3_3_class(pybind11::module &m);
+#endif // VertexIntersectionSwapLocationsWriter3_3_hpp__cppwg_wrapper

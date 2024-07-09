@@ -1,0 +1,7 @@
+#ifndef CellsGeneratorSimpleOxygenBasedCellCycleModel_2_hpp__cppwg_wrapper
+#define CellsGeneratorSimpleOxygenBasedCellCycleModel_2_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_CellsGeneratorSimpleOxygenBasedCellCycleModel_2_class(pybind11::module &m);
+#endif // CellsGeneratorSimpleOxygenBasedCellCycleModel_2_hpp__cppwg_wrapper

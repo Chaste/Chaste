@@ -72,11 +72,9 @@ add_custom_command(TARGET generate_pychaste_wrappers
 ################################
 # Build python modules from wrappers
 ################################
-include_directories(${PYCHASTE_INCLUDE_DIRS})
+include_directories(${PYCHASTE_NON_WRAPPER_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dynamic/wrappers)
 include_directories(${PYTHON3_INCLUDE_DIRS})
-
-# add_subdirectory(${pybind11_SOURCE_DIR} ${pybind11_BINARY_DIR})
 
 # Copy python package structure to build directory, ignoring existing shared libraries
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/python/
@@ -89,7 +87,7 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/test/python/
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/doc/
      DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/python/doc/)
 
-# List of modules to build into shared libraries
+# List of pychaste modules to build into shared libraries
 set (PYCHASTE_PYTHON_MODULES
         core
         ode
@@ -106,6 +104,9 @@ set (PYCHASTE_PYTHON_MODULE_LOCATIONS
         ${CMAKE_CURRENT_BINARY_DIR}/python/chaste/mesh/
         ${CMAKE_CURRENT_BINARY_DIR}/python/chaste/cell_based/
         ${CMAKE_CURRENT_BINARY_DIR}/python/chaste/visualization/)
+
+# Target for building all module shared libraries
+add_custom_target(chaste_pychaste_modules)
 
 # The module library name must be the same as the pybind11 module name
 # defined in the main wrapper e.g. `dynamic/wrappers/ode/ode.main.cpp`
@@ -140,13 +141,7 @@ foreach(idx RANGE ${max_idx})
         ${Chaste_THIRD_PARTY_LIBRARIES}
         Chaste_COMMON_DEPS
         ${Chaste_LIBRARIES}
-        ${pychaste_SHARED_LIB})
+        chaste_pychaste)
 
-    add_dependencies(${module_library_name} pychaste)
-endforeach()
-
-# Target for building all module shared libraries
-add_custom_target(pychaste_python)
-foreach(module IN LISTS PYCHASTE_PYTHON_MODULES)
-    add_dependencies(pychaste_python ${PYCHASTE_PYTHON_MODULE_PREFIX}${module})
+    add_dependencies(chaste_pychaste_modules ${module_library_name})
 endforeach()

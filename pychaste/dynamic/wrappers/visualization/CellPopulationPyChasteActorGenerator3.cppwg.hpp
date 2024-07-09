@@ -1,0 +1,7 @@
+#ifndef CellPopulationPyChasteActorGenerator3_hpp__cppwg_wrapper
+#define CellPopulationPyChasteActorGenerator3_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_CellPopulationPyChasteActorGenerator3_class(pybind11::module &m);
+#endif // CellPopulationPyChasteActorGenerator3_hpp__cppwg_wrapper

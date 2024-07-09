@@ -1,0 +1,7 @@
+#ifndef CellsGeneratorFixedG1GenerationalCellCycleModel_2_hpp__cppwg_wrapper
+#define CellsGeneratorFixedG1GenerationalCellCycleModel_2_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_CellsGeneratorFixedG1GenerationalCellCycleModel_2_class(pybind11::module &m);
+#endif // CellsGeneratorFixedG1GenerationalCellCycleModel_2_hpp__cppwg_wrapper

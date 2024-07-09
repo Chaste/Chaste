@@ -1,0 +1,7 @@
+#ifndef AbstractCellPopulationEventWriter2_2_hpp__cppwg_wrapper
+#define AbstractCellPopulationEventWriter2_2_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_AbstractCellPopulationEventWriter2_2_class(pybind11::module &m);
+#endif // AbstractCellPopulationEventWriter2_2_hpp__cppwg_wrapper

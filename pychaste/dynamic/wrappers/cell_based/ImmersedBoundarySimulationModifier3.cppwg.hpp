@@ -1,0 +1,7 @@
+#ifndef ImmersedBoundarySimulationModifier3_hpp__cppwg_wrapper
+#define ImmersedBoundarySimulationModifier3_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_ImmersedBoundarySimulationModifier3_class(pybind11::module &m);
+#endif // ImmersedBoundarySimulationModifier3_hpp__cppwg_wrapper

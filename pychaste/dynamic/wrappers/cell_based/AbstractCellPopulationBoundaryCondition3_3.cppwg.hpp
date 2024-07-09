@@ -1,0 +1,7 @@
+#ifndef AbstractCellPopulationBoundaryCondition3_3_hpp__cppwg_wrapper
+#define AbstractCellPopulationBoundaryCondition3_3_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_AbstractCellPopulationBoundaryCondition3_3_class(pybind11::module &m);
+#endif // AbstractCellPopulationBoundaryCondition3_3_hpp__cppwg_wrapper

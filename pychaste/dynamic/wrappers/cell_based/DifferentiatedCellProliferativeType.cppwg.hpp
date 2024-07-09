@@ -1,0 +1,7 @@
+#ifndef DifferentiatedCellProliferativeType_hpp__cppwg_wrapper
+#define DifferentiatedCellProliferativeType_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_DifferentiatedCellProliferativeType_class(pybind11::module &m);
+#endif // DifferentiatedCellProliferativeType_hpp__cppwg_wrapper

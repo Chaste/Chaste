@@ -1,0 +1,7 @@
+#ifndef VolumeDependentAveragedSourceEllipticPde3_hpp__cppwg_wrapper
+#define VolumeDependentAveragedSourceEllipticPde3_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_VolumeDependentAveragedSourceEllipticPde3_class(pybind11::module &m);
+#endif // VolumeDependentAveragedSourceEllipticPde3_hpp__cppwg_wrapper

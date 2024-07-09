@@ -1,0 +1,7 @@
+#ifndef ImmersedBoundaryBoundaryCellWriter2_2_hpp__cppwg_wrapper
+#define ImmersedBoundaryBoundaryCellWriter2_2_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_ImmersedBoundaryBoundaryCellWriter2_2_class(pybind11::module &m);
+#endif // ImmersedBoundaryBoundaryCellWriter2_2_hpp__cppwg_wrapper

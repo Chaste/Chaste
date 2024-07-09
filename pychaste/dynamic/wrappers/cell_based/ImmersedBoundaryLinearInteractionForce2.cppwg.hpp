@@ -1,0 +1,7 @@
+#ifndef ImmersedBoundaryLinearInteractionForce2_hpp__cppwg_wrapper
+#define ImmersedBoundaryLinearInteractionForce2_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_ImmersedBoundaryLinearInteractionForce2_class(pybind11::module &m);
+#endif // ImmersedBoundaryLinearInteractionForce2_hpp__cppwg_wrapper

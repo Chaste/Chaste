@@ -1,0 +1,7 @@
+#ifndef CellsGeneratorTysonNovakCellCycleModel_3_hpp__cppwg_wrapper
+#define CellsGeneratorTysonNovakCellCycleModel_3_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_CellsGeneratorTysonNovakCellCycleModel_3_class(pybind11::module &m);
+#endif // CellsGeneratorTysonNovakCellCycleModel_3_hpp__cppwg_wrapper

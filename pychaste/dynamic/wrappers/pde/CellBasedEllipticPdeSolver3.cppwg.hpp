@@ -1,0 +1,7 @@
+#ifndef CellBasedEllipticPdeSolver3_hpp__cppwg_wrapper
+#define CellBasedEllipticPdeSolver3_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_CellBasedEllipticPdeSolver3_class(pybind11::module &m);
+#endif // CellBasedEllipticPdeSolver3_hpp__cppwg_wrapper

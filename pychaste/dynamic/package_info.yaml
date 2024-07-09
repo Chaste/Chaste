@@ -254,6 +254,8 @@ modules:
       - name: PottsElement
       - name: PottsMesh
       - name: PottsMeshGenerator
+        excluded_methods:
+          - CaclulateNeighbouringNodeIndices # not implemented
       - name: PottsMeshWriter
       # - name: PottsMeshReader
 

@@ -1,0 +1,7 @@
+#ifndef AbstractImmersedBoundaryDivisionRule2_hpp__cppwg_wrapper
+#define AbstractImmersedBoundaryDivisionRule2_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_AbstractImmersedBoundaryDivisionRule2_class(pybind11::module &m);
+#endif // AbstractImmersedBoundaryDivisionRule2_hpp__cppwg_wrapper

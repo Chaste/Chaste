@@ -1,0 +1,7 @@
+#ifndef ExponentialG1GenerationalCellCycleModel_hpp__cppwg_wrapper
+#define ExponentialG1GenerationalCellCycleModel_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_ExponentialG1GenerationalCellCycleModel_class(pybind11::module &m);
+#endif // ExponentialG1GenerationalCellCycleModel_hpp__cppwg_wrapper

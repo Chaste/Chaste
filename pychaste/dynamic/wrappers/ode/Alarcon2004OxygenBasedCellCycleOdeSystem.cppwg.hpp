@@ -1,0 +1,7 @@
+#ifndef Alarcon2004OxygenBasedCellCycleOdeSystem_hpp__cppwg_wrapper
+#define Alarcon2004OxygenBasedCellCycleOdeSystem_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_Alarcon2004OxygenBasedCellCycleOdeSystem_class(pybind11::module &m);
+#endif // Alarcon2004OxygenBasedCellCycleOdeSystem_hpp__cppwg_wrapper

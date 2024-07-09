@@ -1,0 +1,7 @@
+#ifndef CellPopulationAdjacencyMatrixWriter2_2_hpp__cppwg_wrapper
+#define CellPopulationAdjacencyMatrixWriter2_2_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_CellPopulationAdjacencyMatrixWriter2_2_class(pybind11::module &m);
+#endif // CellPopulationAdjacencyMatrixWriter2_2_hpp__cppwg_wrapper

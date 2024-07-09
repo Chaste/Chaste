@@ -1,0 +1,7 @@
+#ifndef RadialCellDataDistributionWriter2_2_hpp__cppwg_wrapper
+#define RadialCellDataDistributionWriter2_2_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_RadialCellDataDistributionWriter2_2_class(pybind11::module &m);
+#endif // RadialCellDataDistributionWriter2_2_hpp__cppwg_wrapper

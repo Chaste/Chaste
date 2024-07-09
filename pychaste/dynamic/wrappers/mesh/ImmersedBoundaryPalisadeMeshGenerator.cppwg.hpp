@@ -1,0 +1,7 @@
+#ifndef ImmersedBoundaryPalisadeMeshGenerator_hpp__cppwg_wrapper
+#define ImmersedBoundaryPalisadeMeshGenerator_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_ImmersedBoundaryPalisadeMeshGenerator_class(pybind11::module &m);
+#endif // ImmersedBoundaryPalisadeMeshGenerator_hpp__cppwg_wrapper

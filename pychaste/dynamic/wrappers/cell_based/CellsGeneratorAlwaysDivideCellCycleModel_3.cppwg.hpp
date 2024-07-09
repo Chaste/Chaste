@@ -1,0 +1,7 @@
+#ifndef CellsGeneratorAlwaysDivideCellCycleModel_3_hpp__cppwg_wrapper
+#define CellsGeneratorAlwaysDivideCellCycleModel_3_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_CellsGeneratorAlwaysDivideCellCycleModel_3_class(pybind11::module &m);
+#endif // CellsGeneratorAlwaysDivideCellCycleModel_3_hpp__cppwg_wrapper

@@ -40,4 +40,4 @@ import warnings
 # way to avoid duplicate registration during wrapper building is found.
 warnings.filterwarnings("ignore")
 
-from chaste.ode._chaste_project_PyChaste_ode import *
+from chaste.ode._pychaste_ode import *

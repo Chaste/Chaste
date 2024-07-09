@@ -1,0 +1,7 @@
+#ifndef CellsGeneratorContactInhibitionCellCycleModel_3_hpp__cppwg_wrapper
+#define CellsGeneratorContactInhibitionCellCycleModel_3_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_CellsGeneratorContactInhibitionCellCycleModel_3_class(pybind11::module &m);
+#endif // CellsGeneratorContactInhibitionCellCycleModel_3_hpp__cppwg_wrapper

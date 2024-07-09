@@ -1,0 +1,7 @@
+#ifndef CellsGeneratorBiasedBernoulliTrialCellCycleModel_3_hpp__cppwg_wrapper
+#define CellsGeneratorBiasedBernoulliTrialCellCycleModel_3_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_CellsGeneratorBiasedBernoulliTrialCellCycleModel_3_class(pybind11::module &m);
+#endif // CellsGeneratorBiasedBernoulliTrialCellCycleModel_3_hpp__cppwg_wrapper

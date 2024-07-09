@@ -1,0 +1,7 @@
+#ifndef ImmersedBoundaryLinearMembraneForce3_hpp__cppwg_wrapper
+#define ImmersedBoundaryLinearMembraneForce3_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_ImmersedBoundaryLinearMembraneForce3_class(pybind11::module &m);
+#endif // ImmersedBoundaryLinearMembraneForce3_hpp__cppwg_wrapper

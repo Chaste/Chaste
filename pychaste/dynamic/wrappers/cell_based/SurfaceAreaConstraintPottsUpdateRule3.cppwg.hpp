@@ -1,0 +1,7 @@
+#ifndef SurfaceAreaConstraintPottsUpdateRule3_hpp__cppwg_wrapper
+#define SurfaceAreaConstraintPottsUpdateRule3_hpp__cppwg_wrapper
+
+#include <pybind11/pybind11.h>
+
+void register_SurfaceAreaConstraintPottsUpdateRule3_class(pybind11::module &m);
+#endif // SurfaceAreaConstraintPottsUpdateRule3_hpp__cppwg_wrapper
