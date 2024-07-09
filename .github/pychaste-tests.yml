@@ -85,6 +85,15 @@ jobs:
           cd build
           cmake -DCMAKE_BUILD_TYPE=Release ..
 
+      - name: Generate wrappers for comparison
+        run: |
+          cd build
+          make generate_pychaste_wrappers_diff
+
+      - name: Compare wrappers
+        run: |
+          python -m unittest pychaste/test/python/TestWrapperDiff.py
+
       - name: Build
         run: |
           cd build
@@ -95,7 +104,7 @@ jobs:
           cd build/pychaste/python
           pip install --user .
 
-      - name: run tests
+      - name: Run tests
         run: |
           cd build
           xvfb-run --server-args="-screen 0 1024x768x24" \

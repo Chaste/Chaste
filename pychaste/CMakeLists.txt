@@ -54,13 +54,26 @@ set(PYCHASTE_NON_WRAPPER_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/visualization/)
 
 ################################
-# Wrapper generation target
+# Wrapper generation targets
 ################################
 add_custom_target(generate_pychaste_wrappers)
 add_custom_command(TARGET generate_pychaste_wrappers
     COMMAND . ${chaste_python3_venv}/activate && 
         ${chaste_python3_venv}/cppwg ${CMAKE_SOURCE_DIR}
             -w ${CMAKE_CURRENT_SOURCE_DIR}/dynamic/wrappers
+            -p ${CMAKE_CURRENT_SOURCE_DIR}/dynamic/package_info.yaml
+            -i ${PYCHASTE_NON_WRAPPER_INCLUDE_DIRS}
+               ${Chaste_INCLUDE_DIRS}
+               ${Chaste_THIRD_PARTY_INCLUDE_DIRS}
+            --std c++17 &&
+        deactivate
+)
+
+add_custom_target(generate_pychaste_wrappers_diff)
+add_custom_command(TARGET generate_pychaste_wrappers_diff
+    COMMAND . ${chaste_python3_venv}/activate && 
+        ${chaste_python3_venv}/cppwg ${CMAKE_SOURCE_DIR}
+            -w ${CMAKE_CURRENT_SOURCE_DIR}/dynamic/wrappers_diff
             -p ${CMAKE_CURRENT_SOURCE_DIR}/dynamic/package_info.yaml
             -i ${PYCHASTE_NON_WRAPPER_INCLUDE_DIRS}
                ${Chaste_INCLUDE_DIRS}
