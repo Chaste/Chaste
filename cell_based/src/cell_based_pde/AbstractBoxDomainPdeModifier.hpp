@@ -71,6 +71,7 @@ private:
         archive & mpMeshCuboid;
         archive & mStepSize;
         archive & mSetBcsOnBoxBoundary;
+        archive & mSetBcsOnBoundingSphere;
     }
 
 protected:
@@ -95,6 +96,13 @@ protected:
      * Default to true.
      */
     bool mSetBcsOnBoxBoundary;
+    
+    /**
+     * Whether to set the boundary condition on a sphere which bounds the cell centres of the tissue. 
+     * Only used if mSetBcsOnBoxBoundary is false.
+     * Default to false.
+     */
+    bool mSetBcsOnBoundingSphere;
 
 public:
 
@@ -137,6 +145,18 @@ public:
      * @return mSetBcsOnCoarseBoundary.
      */
     bool AreBcsSetOnBoxBoundary();
+
+    /**
+     * Set mSetBcsOnBoundingSphere.
+     *
+     * @param setBcsOnBoxBoundary whether to set the boundary condition on the edge of the box domain rather than the cell population
+     */
+    void SetBcsOnBoundingSphere(bool setBcsOnBoxBoundary);
+
+    /**
+     * @return mSetBcsOnBoundingSphere.
+     */
+    bool AreBcsSetOnBoundingSphere();
 
     /**
      * Overridden SetupSolve() method.
