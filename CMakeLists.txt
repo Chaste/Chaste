@@ -184,7 +184,7 @@ option (Chaste_INSTALL_TESTS "Install Chaste Testing infrastructure" OFF)
 
 set (Chaste_CODEGEN_EXTRA_ARGS "" CACHE STRING "Add any extra arguments for chaste_codegen here")
 
-option (Chaste_ENABLE_PYCHASTE "Enable Building PyChaste" OFF)
+option (Chaste_ENABLE_PYCHASTE "Enable PyChaste" OFF)
 
 #Some Chaste-specific #defines
 add_definitions (-DCHASTE_CMAKE)
@@ -669,7 +669,11 @@ message ("# Configuring components")
 message ("####################################\n")
 
 # List the available Chaste components
-set (Chaste_COMPONENTS global io linalg mesh ode pde continuum_mechanics cell_based crypt pychaste)
+set (Chaste_COMPONENTS global io linalg mesh ode pde continuum_mechanics cell_based crypt)
+if (Chaste_ENABLE_PYCHASTE)
+    list (APPEND Chaste_COMPONENTS pychaste)
+endif ()
+
 if (NOT (WIN32 OR CYGWIN))
     set (Chaste_COMPONENTS ${Chaste_COMPONENTS} lung heart)
 endif ()
