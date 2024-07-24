@@ -757,7 +757,9 @@ set (Chaste_DEPENDS_crypt cell_based pde ode mesh linalg io global)
 set (Chaste_DEPENDS_continuum_mechanics pde ode mesh linalg io global)
 set (Chaste_DEPENDS_heart ${Chaste_DEPENDS_continuum_mechanics} continuum_mechanics)
 set (Chaste_DEPENDS_lung ${Chaste_DEPENDS_continuum_mechanics} continuum_mechanics)
-set (Chaste_DEPENDS_pychaste cell_based)
+if (Chaste_ENABLE_PYCHASTE)
+    set (Chaste_DEPENDS_pychaste cell_based)
+endif ()
 
 # These custom targets depend on other components but are not components themselves
 set (Chaste_DEPENDS_core global io linalg mesh ode pde continuum_mechanics)
