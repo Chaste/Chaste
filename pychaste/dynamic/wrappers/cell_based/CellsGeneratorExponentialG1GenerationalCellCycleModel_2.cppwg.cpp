@@ -30,7 +30,7 @@ namespace py = pybind11;
 typedef CellsGenerator<ExponentialG1GenerationalCellCycleModel,2 > CellsGeneratorExponentialG1GenerationalCellCycleModel_2;
 PYBIND11_DECLARE_HOLDER_TYPE(T, boost::shared_ptr<T>);
 
-class CellsGeneratorExponentialG1GenerationalCellCycleModel_2_Overloads : CellsGeneratorExponentialG1GenerationalCellCycleModel_2{
+class CellsGeneratorExponentialG1GenerationalCellCycleModel_2_Overrides : CellsGeneratorExponentialG1GenerationalCellCycleModel_2{
     public:
     using CellsGeneratorExponentialG1GenerationalCellCycleModel_2::CellsGeneratorExponentialG1GenerationalCellCycleModel_2;
     std::vector<CellPtr> GenerateBasic(unsigned numCells, const std::vector<unsigned> locationIndices=std::vector<unsigned>(), boost::shared_ptr<AbstractCellProperty> pCellProliferativeType=boost::shared_ptr<AbstractCellProperty>())
@@ -69,14 +69,15 @@ py::class_<CellsGeneratorExponentialG1GenerationalCellCycleModel_2  , boost::sha
             "GenerateGivenLocationIndices",
             (void(CellsGeneratorExponentialG1GenerationalCellCycleModel_2::*)(::std::vector<boost::shared_ptr<Cell>> &, ::std::vector<unsigned int> const, ::boost::shared_ptr<AbstractCellProperty>)) &CellsGeneratorExponentialG1GenerationalCellCycleModel_2::GenerateGivenLocationIndices,
             " " , py::arg("rCells"), py::arg("locationIndices"), py::arg("pCellProliferativeType") = boost::shared_ptr<AbstractCellProperty>() )
+
         .def("GenerateBasic",
             (std::vector<CellPtr>(CellsGeneratorExponentialG1GenerationalCellCycleModel_2::*)(unsigned int, const std::vector<unsigned>, boost::shared_ptr<AbstractCellProperty>)) 
-            &CellsGeneratorExponentialG1GenerationalCellCycleModel_2_Overloads::GenerateBasic, " " , py::arg("numCells"),  py::arg("locationIndices") = std::vector<unsigned int>(), py::arg("pCellProliferativeType") = boost::shared_ptr<AbstractCellProperty>())
+            &CellsGeneratorExponentialG1GenerationalCellCycleModel_2_Overrides::GenerateBasic, " " , py::arg("numCells"),  py::arg("locationIndices") = std::vector<unsigned int>(), py::arg("pCellProliferativeType") = boost::shared_ptr<AbstractCellProperty>())
         .def("GenerateBasicRandom",
             (std::vector<CellPtr>(CellsGeneratorExponentialG1GenerationalCellCycleModel_2::*)(unsigned int, boost::shared_ptr<AbstractCellProperty>)) 
-            &CellsGeneratorExponentialG1GenerationalCellCycleModel_2_Overloads::GenerateBasicRandom, " " , py::arg("numCells"), py::arg("pCellProliferativeType") = boost::shared_ptr<AbstractCellProperty>())
+            &CellsGeneratorExponentialG1GenerationalCellCycleModel_2_Overrides::GenerateBasicRandom, " " , py::arg("numCells"), py::arg("pCellProliferativeType") = boost::shared_ptr<AbstractCellProperty>())
         .def("GenerateGivenLocationIndices",
             (std::vector<CellPtr>(CellsGeneratorExponentialG1GenerationalCellCycleModel_2::*)(const std::vector<unsigned> locationIndices, boost::shared_ptr<AbstractCellProperty>)) 
-            &CellsGeneratorExponentialG1GenerationalCellCycleModel_2_Overloads::GenerateGivenLocationIndices, " " , py::arg("locationIndices"), py::arg("pCellProliferativeType") = boost::shared_ptr<AbstractCellProperty>())
+            &CellsGeneratorExponentialG1GenerationalCellCycleModel_2_Overrides::GenerateGivenLocationIndices, " " , py::arg("locationIndices"), py::arg("pCellProliferativeType") = boost::shared_ptr<AbstractCellProperty>())
     ;
 }

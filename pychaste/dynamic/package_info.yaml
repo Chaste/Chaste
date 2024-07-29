@@ -1,4 +1,4 @@
-name: chaste_project_PyChaste
+name: pychaste
 
 smart_ptr_type: boost::shared_ptr
 pointer_call_policy: reference
@@ -189,6 +189,9 @@ modules:
         template_substitutions:
           - signature: <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
             replacement: [[1, 2], [2, 2], [2, 3], [3, 3]]
+        custom_generator: "CPPWG_SOURCEROOT/pychaste/dynamic/custom_templates/MutableElementCustomTemplate.py"
+        constructor_signature_excludes:
+          - [unsigned]
 
       - name: AbstractTetrahedralMesh
       - name: TetrahedralMesh
@@ -377,7 +380,7 @@ modules:
               - [BernoulliTrialCellCycleModel, 3]
               - [FixedG1GenerationalCellCycleModel, 2]
               - [FixedG1GenerationalCellCycleModel, 3]
-        custom_generator: &cells_generator "CPPWG_SOURCEROOT/pychaste/dynamic/custom_generators/CellsGenerator_custom.py"
+        custom_generator: "CPPWG_SOURCEROOT/pychaste/dynamic/custom_templates/CellsGeneratorCustomTemplate.py"
         source_includes:
           - NoCellCycleModel.hpp
           - UniformCellCycleModel.hpp
@@ -636,7 +639,7 @@ modules:
           - GetTetrahedralMeshForPdeModifier
           - GetNodeCorrespondingToCell
           - rGetAvailableSpaces
-        custom_generator: &population_generator "CPPWG_SOURCEROOT/pychaste/dynamic/custom_generators/PopulationWriter_custom.py"
+        custom_generator: &population_template "CPPWG_SOURCEROOT/pychaste/dynamic/custom_templates/PopulationWriterCustomTemplate.py"
         source_includes: &population_includes
           - AbstractCellBasedSimulation.hpp
           - AbstractImmersedBoundaryDivisionRule.hpp
@@ -681,7 +684,7 @@ modules:
         excluded_methods:
           - rGetMesh
           - GetTetrahedralMeshForPdeModifier
-        custom_generator: *population_generator
+        custom_generator: *population_template
         source_includes: *population_includes
 
       - name: MeshBasedCellPopulation
@@ -690,11 +693,11 @@ modules:
           - rGetNodePairs
           - GetTetrahedralMeshForPdeModifier
           - rGetMesh
-        custom_generator: *population_generator
+        custom_generator: *population_template
         source_includes: *population_includes
 
       - name: MeshBasedCellPopulationWithGhostNodes
-        custom_generator: *population_generator
+        custom_generator: *population_template
         source_includes: *population_includes
 
       - name: NodeBasedCellPopulation
@@ -702,19 +705,19 @@ modules:
           - rGetNodePairs
           - GetTetrahedralMeshForPdeModifier
           - rGetMesh
-        custom_generator: *population_generator
+        custom_generator: *population_template
         source_includes: *population_includes
 
       - name: NodeBasedCellPopulationWithBuskeUpdate
         excluded_methods:
           - rGetMesh
-        custom_generator: *population_generator
+        custom_generator: *population_template
         source_includes: *population_includes
 
       - name: NodeBasedCellPopulationWithParticles
         excluded_methods:
           - rGetMesh
-        custom_generator: *population_generator
+        custom_generator: *population_template
         source_includes: *population_includes
 
       - name: VertexBasedCellPopulation
@@ -723,7 +726,7 @@ modules:
           - GetElement
           - GetTetrahedralMeshForPdeModifier
           - rGetMesh
-        custom_generator: *population_generator
+        custom_generator: *population_template
         source_includes: *population_includes
 
       - name: PottsBasedCellPopulation
@@ -734,7 +737,7 @@ modules:
           - rGetMesh
           - GetElementTessellation
           - GetMutableMesh
-        custom_generator: *population_generator
+        custom_generator: *population_template
         source_includes: *population_includes
 
       # - name: CellwiseDataGradient

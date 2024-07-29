@@ -1,5 +1,5 @@
-#ifndef chaste_project_PyChaste_HEADERS_HPP_
-#define chaste_project_PyChaste_HEADERS_HPP_
+#ifndef pychaste_HEADERS_HPP_
+#define pychaste_HEADERS_HPP_
 
 // Includes
 #include "Identifiable.hpp"
@@ -1100,4 +1100,4 @@ typedef CellPopulationPyChasteActorGenerator<2> CellPopulationPyChasteActorGener
 typedef CellPopulationPyChasteActorGenerator<3> CellPopulationPyChasteActorGenerator3;
 } // namespace cppwg
 
-#endif // chaste_project_PyChaste_HEADERS_HPP_
+#endif // pychaste_HEADERS_HPP_

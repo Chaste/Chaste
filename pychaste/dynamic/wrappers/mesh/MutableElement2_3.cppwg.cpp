@@ -50,7 +50,6 @@ class MutableElement2_3_Overrides : public MutableElement2_3{
 };
 void register_MutableElement2_3_class(py::module &m){
 py::class_<MutableElement2_3 , MutableElement2_3_Overrides , boost::shared_ptr<MutableElement2_3 >  , AbstractElement<2, 3>  >(m, "MutableElement2_3")
-        .def(py::init<unsigned int >(), py::arg("index"))
         .def(py::init<unsigned int, ::std::vector<Node<3> *> const & >(), py::arg("index"), py::arg("rNodes"))
         .def(
             "RegisterWithNodes",
@@ -128,5 +127,6 @@ py::class_<MutableElement2_3 , MutableElement2_3_Overrides , boost::shared_ptr<M
             "GetLocalEdgeIndex",
             (long int(MutableElement2_3::*)(::Edge<3> const *) const ) &MutableElement2_3::GetLocalEdgeIndex,
             " " , py::arg("pEdge") )
+        .def(py::init<unsigned int, ::std::vector<Node<3> *> const & >(), py::arg("index"), py::arg("rNodes"))
     ;
 }
