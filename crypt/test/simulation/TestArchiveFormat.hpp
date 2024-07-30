@@ -85,7 +85,7 @@ public:
      *  cmake -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT=/home/jmpf/boost_1_58 -DBoost_NO_SYSTEM_PATHS=ON -DBoost_NO_BOOST_CMAKE=ON -DChaste_USE_CVODE=FALSE ..
      *  make TestGenerateSteadyStateCrypt
      *  ctest -R TestGenerateSteadyStateCrypt
-     *  cp /tmp/$USER/testoutput/SteadyStateCrypt/archive/?*_150.* ../crypt/test/data/SteadyStateCrypt/archive/
+     *  cp $CHASTE_TEST_OUTPUT/SteadyStateCrypt/archive/?*_150.* ../crypt/test/data/SteadyStateCrypt/archive/
      *
      *
      */

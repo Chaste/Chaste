@@ -30,7 +30,7 @@ jobs:
         run: echo "datetime=$(date +%Y-%m-%d_%H-%M-%S)" >> $GITHUB_OUTPUT
 
       - name: checkout Chaste
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: Chaste/Chaste
           path: Chaste
@@ -72,7 +72,7 @@ jobs:
         if: always()
         
       - name: checkout profiling-gprof
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: Chaste/profiling-gprof
           path: profiling-gprof
@@ -87,7 +87,7 @@ jobs:
         if: always() && steps.index-exists.outputs.index == 'True'
 
       - name: setup python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 

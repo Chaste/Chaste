@@ -34,7 +34,7 @@ jobs:
       
     steps:
       - name: checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           
@@ -93,7 +93,7 @@ jobs:
         working-directory: chaste-build-dir
 
       - name: upload as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-info
           path: chaste-build-dir/coverage.info

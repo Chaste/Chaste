@@ -142,7 +142,7 @@ void PetscTools::Barrier(const std::string callerId)
                   << "Barrier " << mNumBarriers << " \"" << callerId << "\"." << std::endl
                   << std::flush;
 #endif
-        PetscBarrier(PETSC_NULL);
+        PetscBarrier(CHASTE_PETSC_NULLPTR);
 #ifdef DEBUG_BARRIERS
         std::cout << "DEBUG: proc " << PetscTools::GetMyRank() << ": Post "
                   << "Barrier " << mNumBarriers++ << " \"" << callerId << "\"." << std::endl
@@ -296,7 +296,7 @@ void PetscTools::SetupMat(Mat& rMat, int numRows, int numColumns,
         MatSetType(rMat, MATSEQAIJ);
         if (rowPreallocation > 0)
         {
-            MatSeqAIJSetPreallocation(rMat, rowPreallocation, PETSC_NULL);
+            MatSeqAIJSetPreallocation(rMat, rowPreallocation, CHASTE_PETSC_NULLPTR);
         }
     }
     else
@@ -304,7 +304,7 @@ void PetscTools::SetupMat(Mat& rMat, int numRows, int numColumns,
         MatSetType(rMat, MATMPIAIJ);
         if (rowPreallocation > 0)
         {
-            MatMPIAIJSetPreallocation(rMat, rowPreallocation, PETSC_NULL, rowPreallocation, PETSC_NULL);
+            MatMPIAIJSetPreallocation(rMat, rowPreallocation, CHASTE_PETSC_NULLPTR, rowPreallocation, CHASTE_PETSC_NULLPTR);
         }
     }
 
