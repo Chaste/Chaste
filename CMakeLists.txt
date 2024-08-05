@@ -338,7 +338,7 @@ if (Chaste_ENABLE_PYCHASTE)
     )
     FetchContent_MakeAvailable(cppwg)
 
-    execute_process(COMMAND ${chaste_python3_venv}/pip install -e ${cppwg_SOURCE_DIR})
+    execute_process(COMMAND ${chaste_python3_venv}/pip install ${cppwg_SOURCE_DIR})
     execute_process( COMMAND ${chaste_python3_venv}/cppwg --version
         OUTPUT_VARIABLE Chaste_CPPWG_VERSION
         OUTPUT_STRIP_TRAILING_WHITESPACE)
