@@ -1,0 +1,11 @@
+python/TestImports.py
+python/TestWrapperDiff.py
+python/core/TestFileFinderPython.py
+python/core/TestOutputFileHandlerPython.py
+python/core/TestPetscToolsPython.py
+python/core/TestRandomNumberGeneratorPython.py
+python/core/TestTimerPython.py
+python/core/TestVersionPython.py
+python/mesh/TestChastePointPython.py
+python/mesh/TestPottsMeshPython.py
+python/ode/TestOdeSystemPython.py
