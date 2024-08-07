@@ -36,33 +36,57 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UniformSourceParabolicPde.hpp"
 
 template <unsigned DIM>
-UniformSourceParabolicPde<DIM>::UniformSourceParabolicPde(double sourceCoefficient)
-    : mSourceCoefficient(sourceCoefficient)
+UniformSourceParabolicPde<DIM>::UniformSourceParabolicPde(double constantSourceCoefficient, 
+                                                          double linearSourceCoefficient, 
+                                                          double diffusionCoefficient,
+                                                          double duDtCoefficient)
+    : mConstantSourceCoefficient(constantSourceCoefficient),
+      mLinearSourceCoefficient(linearSourceCoefficient),
+      mDiffusionCoefficient(diffusionCoefficient),
+      mDuDtCoefficient(duDtCoefficient)
 {
 }
 
 template<unsigned DIM>
-double UniformSourceParabolicPde<DIM>::GetCoefficient() const
+double UniformSourceParabolicPde<DIM>::GetConstantCoefficient() const
 {
-    return mSourceCoefficient;
+    return mConstantSourceCoefficient;
+}
+
+template<unsigned DIM>
+double UniformSourceParabolicPde<DIM>::GetLinearCoefficient() const
+{
+    return mLinearSourceCoefficient;
+}
+
+template<unsigned DIM>
+double UniformSourceParabolicPde<DIM>::GetDiffusionCoefficient() const
+{
+    return mDiffusionCoefficient;
+}
+
+template<unsigned DIM>
+double UniformSourceParabolicPde<DIM>::GetDuDtCoefficient() const
+{
+    return mDuDtCoefficient;
 }
 
 template<unsigned DIM>
 double UniformSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM,DIM>* pElement)
 {
-    return mSourceCoefficient;
+    return mConstantSourceCoefficient + mLinearSourceCoefficient * u;
 }
 
 template<unsigned DIM>
 c_matrix<double,DIM,DIM> UniformSourceParabolicPde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
 {
-    return identity_matrix<double>(DIM);
+    return mDiffusionCoefficient * identity_matrix<double>(DIM);
 }
 
 template<unsigned DIM>
 double UniformSourceParabolicPde<DIM>::ComputeDuDtCoefficientFunction(const ChastePoint<DIM>& rX)
 {
-    return 1.0;
+    return mDuDtCoefficient;
 }
 
 // Explicit instantiation

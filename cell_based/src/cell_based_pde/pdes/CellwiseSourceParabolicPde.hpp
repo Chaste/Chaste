@@ -48,11 +48,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * The PDE takes the form
  *
- * c*du/dt = Grad.(D*Grad(u)) + k*u*rho(x),
+ * c*du/dt = Grad.(D*Grad(u)) + a*u*rho(x) + b*rho(x),
  *
- * where the scalars c, D and k are specified by the members mDuDtCoefficient,
- * mDiffusionCoefficient and mSourceCoefficient, respectively. Their values must
- * be set in the constructor.
+ * where the scalars c, D, a and b are specified by the members mDuDtCoefficient,
+ * mDiffusionCoefficient, mLinearSourceCoefficient and mConstantSourceCoefficient, 
+ * respectively. Their values must be set in the constructor.
  *
  * For a node of the finite element mesh with location x, the function rho(x)
  * equals one if there is a non-apoptotic cell associated with x, and
@@ -78,9 +78,11 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
        archive & boost::serialization::base_object<AbstractLinearParabolicPde<DIM, DIM> >(*this);
-       archive & mDuDtCoefficient;
+       archive & mConstantSourceCoefficient;
+       archive & mLinearSourceCoefficient;
        archive & mDiffusionCoefficient;
-       archive & mSourceCoefficient;
+       archive & mDuDtCoefficient;
+       archive & mScaleByCellVolume;
     }
 
 protected:
@@ -88,14 +90,21 @@ protected:
     /** The cell population member. */
     AbstractCellPopulation<DIM, DIM>& mrCellPopulation;
 
-    /** Coefficient of rate of change term.  */
-    double mDuDtCoefficient;
+    /** Coefficient of constant source term. */
+    double mConstantSourceCoefficient;
+
+    /** Coefficient of linear source term. */
+    double mLinearSourceCoefficient;
 
     /** Diffusion coefficient. */
     double mDiffusionCoefficient;
 
-    /** Coefficient of the rate of uptake of the dependent variable by non-apoptotic cells. */
-    double mSourceCoefficient;
+    /** Coefficient of rate of change term.  */
+    double mDuDtCoefficient;
+    
+    /** Whether to scale tems by cell volume*/
+    bool mScaleByCellVolume;
+
 
 public:
 
@@ -103,19 +112,48 @@ public:
      * Constructor.
      *
      * @param rCellPopulation reference to the cell population
+     * @param constantSourceCoefficient the constant source term coefficient (defaults to 0.0)
+     * @param linearSourceCoefficient the linear source term coefficient (defaults to 0.0)
+     * @param diffusionCoefficient the rate of diffusion (defaults to 1.0)
      * @param duDtCoefficient rate of reaction (defaults to 1.0)
-     * @param diffusionCoefficient rate of diffusion (defaults to 1.0)
-     * @param sourceCoefficient the source term coefficient (defaults to 0.0)
+     * @param scaleByCellVolume whether to scale by cell volume (defaults to false)
      */
     CellwiseSourceParabolicPde(AbstractCellPopulation<DIM, DIM>& rCellPopulation,
-                               double duDtCoefficient=1.0,
+                               double constantSourceCoefficient=0.0, 
+                               double linearSourceCoefficient=0.0,
                                double diffusionCoefficient=1.0,
-                               double sourceCoefficient=0.0);
+                               double duDtCoefficient=1.0,
+                               bool scaleByCellVolume=false);
 
     /**
      * @return const reference to the cell population (used in archiving).
      */
     const AbstractCellPopulation<DIM>& rGetCellPopulation() const;
+
+    /**
+     * @return mConatantSourceCoefficient
+     */
+    double GetConstantCoefficient() const;
+
+    /**
+     * @return mLinearSourceCoefficient
+     */
+    double GetLinearCoefficient() const;
+        
+    /**
+     * @return mDiffusionCoefficient
+     */
+    double GetDiffusionCoefficient() const;
+
+    /**
+     * @return mDuDtCoefficient
+     */
+    double GetDuDtCoefficient() const;
+
+    /**
+     * @return mScaleByCellVolume
+     */
+    bool GetScaleByCellVolume() const;
 
     /**
      * Overridden ComputeDuDtCoefficientFunction() method.

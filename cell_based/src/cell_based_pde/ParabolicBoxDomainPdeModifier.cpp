@@ -109,34 +109,8 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicBoxDomainPdeMo
 {
     std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc(new BoundaryConditionsContainer<DIM,DIM,1>(false));
 
-    if (!this->mSetBcsOnBoxBoundary)
-    {
-        EXCEPTION("Boundary conditions cannot yet be set on the cell population boundary for a ParabolicBoxDomainPdeModifier");
-    }
-    else // Apply BC at boundary nodes of box domain FE mesh
-    {
-        if (this->IsNeumannBoundaryCondition())
-        {
-            // Impose any Neumann boundary conditions
-            for (typename TetrahedralMesh<DIM,DIM>::BoundaryElementIterator elem_iter = this->mpFeMesh->GetBoundaryElementIteratorBegin();
-                 elem_iter != this->mpFeMesh->GetBoundaryElementIteratorEnd();
-                 ++elem_iter)
-            {
-                p_bcc->AddNeumannBoundaryCondition(*elem_iter, this->mpBoundaryCondition.get());
-            }
-        }
-        else
-        {
-            // Impose any Dirichlet boundary conditions
-            for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = this->mpFeMesh->GetBoundaryNodeIteratorBegin();
-                 node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
-                 ++node_iter)
-            {
-                p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpBoundaryCondition.get());
-            }
-        }
-    }
-
+    this->ConstructBoundaryConditionsContainerHelper(rCellPopulation,p_bcc);
+   
     return p_bcc;
 }
 

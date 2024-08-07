@@ -37,13 +37,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 CellwiseSourceParabolicPde<DIM>::CellwiseSourceParabolicPde(AbstractCellPopulation<DIM,DIM>& rCellPopulation,
-                                                            double duDtCoefficient,
+                                                            double constantSourceCoefficient, 
+                                                            double linearSourceCoefficient, 
                                                             double diffusionCoefficient,
-                                                            double sourceCoefficient)
+                                                            double duDtCoefficient,
+                                                            bool scaleByCellVolume)
     : mrCellPopulation(rCellPopulation),
-      mDuDtCoefficient(duDtCoefficient),
+      mConstantSourceCoefficient(constantSourceCoefficient),
+      mLinearSourceCoefficient(linearSourceCoefficient),
       mDiffusionCoefficient(diffusionCoefficient),
-      mSourceCoefficient(sourceCoefficient)
+      mDuDtCoefficient(duDtCoefficient),
+      mScaleByCellVolume(scaleByCellVolume)
 {
 }
 
@@ -51,6 +55,36 @@ template<unsigned DIM>
 const AbstractCellPopulation<DIM,DIM>& CellwiseSourceParabolicPde<DIM>::rGetCellPopulation() const
 {
     return mrCellPopulation;
+}
+
+template<unsigned DIM>
+double CellwiseSourceParabolicPde<DIM>::GetConstantCoefficient() const
+{
+    return mConstantSourceCoefficient;
+}
+
+template<unsigned DIM>
+double CellwiseSourceParabolicPde<DIM>::GetLinearCoefficient() const
+{
+    return mLinearSourceCoefficient;
+}
+
+template<unsigned DIM>
+double CellwiseSourceParabolicPde<DIM>::GetDiffusionCoefficient() const
+{
+    return mDiffusionCoefficient;
+}
+
+template<unsigned DIM>
+double CellwiseSourceParabolicPde<DIM>::GetDuDtCoefficient() const
+{
+    return mDuDtCoefficient;
+}
+
+template<unsigned DIM>
+bool CellwiseSourceParabolicPde<DIM>::GetScaleByCellVolume() const
+{
+    return mScaleByCellVolume;
 }
 
 template<unsigned DIM>
@@ -71,15 +105,36 @@ double CellwiseSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>
 template<unsigned DIM>
 double CellwiseSourceParabolicPde<DIM>::ComputeSourceTermAtNode(const Node<DIM>& rNode, double u)
 {
-    double source_coefficient = 0.0;
+    double source_term = 0.0;
 
-    if (mrCellPopulation.IsPdeNodeAssociatedWithNonApoptoticCell(rNode.GetIndex()))
+    if (mConstantSourceCoefficient != 0.0 || mLinearSourceCoefficient != 0.0)
     {
-        source_coefficient = mSourceCoefficient;
+        if (mrCellPopulation.IsPdeNodeAssociatedWithNonApoptoticCell(rNode.GetIndex()))
+        {
+        
+            double cell_volume = 1.0;
+
+            // Scale by volume if wanted
+            if (mScaleByCellVolume)
+            {   
+                CellPtr p_cell = mrCellPopulation.GetCellUsingLocationIndex(rNode.GetIndex());
+                cell_volume = mrCellPopulation.GetVolumeOfCell(p_cell);
+                  
+                if (cell_volume <1e-6)
+                {
+                    EXCEPTION("The volume of one of the cells is " << cell_volume << 
+                              " and you are scaling by cell volume. Either turn scaling off or use"  
+                              " a cell model with non zero areas (i.e. a Bounded Voronoi Tesselation model).");
+                }
+            }
+
+            // At cells the source term is a*u + b
+            source_term = (mLinearSourceCoefficient * u + mConstantSourceCoefficient)/cell_volume;
+        }
     }
 
-    // The source term is C*u
-    return source_coefficient*u;
+
+    return source_term;
 }
 
 template<unsigned DIM>

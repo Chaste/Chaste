@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * The PDE takes the form
  *
- * Grad.(Grad(u)) + a*u*rho(x) + b*rho(x) = 0,
+ * Grad.(D Grad(u)) + a*u*rho(x) + b*rho(x) = 0,
  *
  * where the scalars a and b are specified by the members mLinearSourceCoefficient, 
  * and mConstantSourceCoefficient respectively, whose value must

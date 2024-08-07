@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractPdeModifier.hpp"
+#include "BoundaryConditionsContainer.hpp"
 
 /**
  * An abstract modifier class containing functionality common to EllipticBoxDomainPdeModifier
@@ -157,6 +158,15 @@ public:
      * @return mSetBcsOnBoundingSphere.
      */
     bool AreBcsSetOnBoundingSphere();
+
+    /**
+     * Helper method to construct the boundary conditions container for the PDE.
+     *
+     * @param rCellPopulation reference to the cell population
+     * @param pBcc the boundary conditions container to fill 
+     */
+    void ConstructBoundaryConditionsContainerHelper(AbstractCellPopulation<DIM,DIM>& rCellPopulation, 
+                                                    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > pBcc);
 
     /**
      * Overridden SetupSolve() method.
