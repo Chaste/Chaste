@@ -107,17 +107,48 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeMod
 
     if (!this->mSetBcsOnBoxBoundary)
     {
+        // Here we approximate the cell population by the bounding spehere and apply the boundary conditions outside the sphere.
         if (this->mSetBcsOnBoundingSphere)
         {
-            double tissue_radius = 0.0;
+            // First find the centre of the tissue by choosing the mid point of the extrema.
+            c_vector<double, DIM> tissue_maxima = zero_vector<double>(DIM);
+            c_vector<double, DIM> tissue_minima = zero_vector<double>(DIM);
+            for (unsigned i = 0; i < DIM; i++)
+            {
+                tissue_maxima[i] = -DBL_MAX;
+                tissue_minima[i] = DBL_MAX;
+            }
+            
             
             for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
                 cell_iter != rCellPopulation.End();
                 ++cell_iter)
             {
                 const ChastePoint<DIM>& r_position_of_cell = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
+                
+                for (unsigned i = 0; i < DIM; i++)
+                {
+                    if (r_position_of_cell[i] > tissue_maxima[i])
+                    {
+                        tissue_maxima[i] = r_position_of_cell[i];
+                    }
+                    if (r_position_of_cell[i] < tissue_minima[i])
+                    {
+                        tissue_minima[i] = r_position_of_cell[i];
+                    }
+                }               
+            }
 
-                double radius = norm_2(r_position_of_cell.rGetLocation());
+            c_vector<double, DIM> tissue_centre = 0.5*(tissue_maxima + tissue_minima);
+
+            double tissue_radius = 0.0;
+            for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+                cell_iter != rCellPopulation.End();
+                ++cell_iter)
+            {
+                const ChastePoint<DIM>& r_position_of_cell = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
+
+                double radius = norm_2(tissue_centre - r_position_of_cell.rGetLocation());
                 
                 if (tissue_radius < radius)
                 {
@@ -128,7 +159,7 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeMod
             // Apply boundary condition to the nodes outside the tissue_radius
             for (unsigned i=0; i<this->mpFeMesh->GetNumNodes(); i++)
             {
-                double radius = norm_2(this->mpFeMesh->GetNode(i)->rGetLocation());
+                double radius = norm_2(tissue_centre - this->mpFeMesh->GetNode(i)->rGetLocation());
                 
                 if (radius >= tissue_radius)
                 {
@@ -136,7 +167,8 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeMod
                 }
             }
         }
-        else // Set pde nodes as boundary node if elements done contain cells or cells are within 0.5CD of a cell centre
+
+        else // Set pde nodes as boundary node if elements dont contain cells or nodes aren't within 0.5CD of a cell centre
         {
             // Get the set of coarse element indices that contain cells
             std::set<unsigned> coarse_element_indices_in_map;
@@ -162,9 +194,7 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticBoxDomainPdeMod
                 }
             }
 
-            // Also remove nodes that are within the average cell radius from a cell center.
-            // Apply boundary condition to the nodes in the set coarse_mesh_boundary_node_indices
-            
+            // Also remove nodes that are within the average cell radius from the centre of a cell.
             std::set<unsigned> nearby_node_indices;
             for (std::set<unsigned>::iterator node_iter = coarse_mesh_boundary_node_indices.begin();
                 node_iter != coarse_mesh_boundary_node_indices.end();

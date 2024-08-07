@@ -77,6 +77,7 @@ private:
        archive & boost::serialization::base_object<AbstractLinearEllipticPde<DIM, DIM> >(*this);
        archive & mConstantSourceCoefficient;
        archive & mLinearSourceCoefficient;
+       archive & mDiffusionCoefficient;
     }
 
     /** Coefficient of constant source term. */
@@ -85,6 +86,9 @@ private:
     /** Coefficient of linear source term. */
     double mLinearSourceCoefficient;
 
+    /** Diffusion coefficient. */
+    double mDiffusionCoefficient;
+
 public:
 
     /**
@@ -92,8 +96,12 @@ public:
      *
      * @param constantSourceCoefficient the constant source term coefficient (defaults to 0.0)
      * @param linearSourceCoefficient the linear source term coefficient (defaults to 0.0)
+     * @param diffusionCoefficient the rate of diffusion (defaults to 1.0)
+     * 
      */
-    UniformSourceEllipticPde(double constantSourceCoefficient=0.0, double linearSourceCoefficient=0.0);
+    UniformSourceEllipticPde(double constantSourceCoefficient=0.0, 
+                             double linearSourceCoefficient=0.0,
+                             double diffusionCoefficient=1.0);
 
     /**
      * @return mConatantSourceCoefficient
@@ -104,6 +112,11 @@ public:
      * @return mLinearSourceCoefficient
      */
     double GetLinearCoefficient() const;
+
+    /**
+     * @return mDiffusionCoefficient
+     */
+    double GetDiffusionCoefficient() const;
 
     /**
      * Overridden ComputeConstantInUSourceTerm() method.
