@@ -63,14 +63,15 @@ class TestCellBasedEllipticPdes : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestUniformSourceEllipticPde()
+    void TestUniformSourceEllipticPdeMethods()
     {
         // Create PDE object
-        UniformSourceEllipticPde<2> pde(0.01, 0.05);
+        UniformSourceEllipticPde<2> pde(0.01, 0.05, 0.02);
 
         // Test that the member variables have been initialised correctly
         TS_ASSERT_DELTA(pde.GetConstantCoefficient(), 0.01, 1e-6);
         TS_ASSERT_DELTA(pde.GetLinearCoefficient(), 0.05, 1e-6);
+        TS_ASSERT_DELTA(pde.GetDiffusionCoefficient(), 0.02, 1e-6);
 
         // Test ComputeDiffusionTerm() method
         ChastePoint<2> point;
@@ -82,7 +83,7 @@ public:
                 double value = 0.0;
                 if (i == j)
                 {
-                    value = 1.0;
+                    value = 0.02;
                 }
                 TS_ASSERT_DELTA(diffusion_matrix(i,j), value, 1e-6);
             }
@@ -109,7 +110,7 @@ public:
 
         {
             // Create a PDE object
-            AbstractLinearEllipticPde<2,2>* const p_pde = new UniformSourceEllipticPde<2>(0.01, 0.05);
+            AbstractLinearEllipticPde<2,2>* const p_pde = new UniformSourceEllipticPde<2>(0.01, 0.05, 0.02);
 
             // Create output archive and archive PDE object
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -133,12 +134,12 @@ public:
             UniformSourceEllipticPde<2>* p_static_cast_pde = static_cast<UniformSourceEllipticPde<2>*>(p_pde);
             TS_ASSERT_DELTA(p_static_cast_pde->GetConstantCoefficient(), 0.01, 1e-6);
             TS_ASSERT_DELTA(p_static_cast_pde->GetLinearCoefficient(), 0.05, 1e-6);
-
+            TS_ASSERT_DELTA(p_static_cast_pde->GetDiffusionCoefficient(), 0.02, 1e-6);
             delete p_pde;
         }
     }
 
-    void TestCellwiseSourceEllipticPde()
+    void TestCellwiseSourceEllipticPdeMethods()
     {
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
@@ -269,7 +270,7 @@ public:
         }
     }
 
-    void TestAveragedSourceEllipticPde()
+    void TestAveragedSourceEllipticPdeMethods()
     {
         // Set up cell population
         HoneycombMeshGenerator generator(5, 5, 0);
@@ -281,9 +282,9 @@ public:
 
         // For simplicity we create a very large coarse mesh, so we know that all cells are contained in one element
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_2_elements");
-        TetrahedralMesh<2,2> coarse_mesh;
-        coarse_mesh.ConstructFromMeshReader(mesh_reader);
-        coarse_mesh.Scale(10.0, 10.0);
+        TetrahedralMesh<2,2> fe_mesh;
+        fe_mesh.ConstructFromMeshReader(mesh_reader);
+        fe_mesh.Scale(10.0, 10.0);
 
         // Create a PDE object
         AveragedSourceEllipticPde<2> pde(cell_population, 0.01, 0.05, 2.0);
@@ -312,7 +313,7 @@ public:
         }
 
         // Test SetupSourceTerms() when no map between cells and coarse mesh elements is supplied
-        pde.SetupSourceTerms(coarse_mesh);
+        pde.SetupSourceTerms(fe_mesh);
 
         TS_ASSERT_EQUALS(pde.mCellDensityOnCoarseElements.size(), 2u);
 
@@ -331,15 +332,15 @@ public:
             cell_pde_element_map[*cell_iter] = 0;
         }
 
-        pde.SetupSourceTerms(coarse_mesh, &cell_pde_element_map);
+        pde.SetupSourceTerms(fe_mesh, &cell_pde_element_map);
         TS_ASSERT_DELTA(pde.mCellDensityOnCoarseElements[0], 0.5, 1e-6);
         TS_ASSERT_DELTA(pde.mCellDensityOnCoarseElements[1], 0.0, 1e-6);
 
         // Test ComputeLinearInUCoeffInSourceTerm() method
-        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point,coarse_mesh.GetElement(0)), 0.05*0.5, 1e-6);
+        TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTerm(point,fe_mesh.GetElement(0)), 0.05*0.5, 1e-6);
 
         // Test ComputeConstantInUSourceTerm() method
-        TS_ASSERT_DELTA(pde.ComputeConstantInUSourceTerm(point, coarse_mesh.GetElement(0)), 0.01*0.5, 1e-6);
+        TS_ASSERT_DELTA(pde.ComputeConstantInUSourceTerm(point, fe_mesh.GetElement(0)), 0.01*0.5, 1e-6);
 
         // Test GetUptakeRateForElement()
         TS_ASSERT_DELTA(pde.GetUptakeRateForElement(0), 0.5, 1e-6);
@@ -358,7 +359,7 @@ public:
         TS_ASSERT(scaled_pde.GetScaleByCellVolume());
 
         // Test SetupSourceTerms() when no map between cells and coarse mesh elements is supplied
-        scaled_pde.SetupSourceTerms(coarse_mesh);
+        scaled_pde.SetupSourceTerms(fe_mesh);
 
         TS_ASSERT_EQUALS(scaled_pde.mCellDensityOnCoarseElements.size(), 2u);
 
@@ -380,8 +381,8 @@ public:
         TS_ASSERT_DELTA(scaled_pde.mCellDensityOnCoarseElements[1], 0.0, 1e-6);
 
         // Test ComputeLinearInUCoeffInSourceTerm() and ComputeConstantInUSourceTerm() methods
-        TS_ASSERT_DELTA(scaled_pde.ComputeLinearInUCoeffInSourceTerm(point,coarse_mesh.GetElement(0)), 0.05*tissue_area/50.0, 1e-6);
-        TS_ASSERT_DELTA(scaled_pde.ComputeConstantInUSourceTerm(point, coarse_mesh.GetElement(0)), 0.01*tissue_area/50.0, 1e-6);
+        TS_ASSERT_DELTA(scaled_pde.ComputeLinearInUCoeffInSourceTerm(point,fe_mesh.GetElement(0)), 0.05*tissue_area/50.0, 1e-6);
+        TS_ASSERT_DELTA(scaled_pde.ComputeConstantInUSourceTerm(point, fe_mesh.GetElement(0)), 0.01*tissue_area/50.0, 1e-6);
 
 
         // Now unbound the voronoi mesh to allow zero cell volumes to catch exception
@@ -400,7 +401,7 @@ public:
         TS_ASSERT_DELTA(tissue_area, 9.9592, 1e-4);
 
         AveragedSourceEllipticPde<2> scaled_pde_2(cell_population, 0.01, 0.05, 2.0, true);
-        TS_ASSERT_THROWS_THIS(scaled_pde_2.SetupSourceTerms(coarse_mesh), "The volume of one of the cells is 0 and you are scaling by cell volume. Either turn scaling off or use a cell model with non zero areas (i.e. a Bounded Voronoi Tesselation model).");
+        TS_ASSERT_THROWS_THIS(scaled_pde_2.SetupSourceTerms(fe_mesh), "The volume of one of the cells is 0 and you are scaling by cell volume. Either turn scaling off or use a cell model with non zero areas (i.e. a Bounded Voronoi Tesselation model).");
     }
 
     void TestAveragedSourceEllipticPdeArchiving()
@@ -448,7 +449,7 @@ public:
             TS_ASSERT_DELTA(p_static_cast_pde->GetConstantCoefficient(), 0.01, 1e-6);
             TS_ASSERT_DELTA(p_static_cast_pde->GetLinearCoefficient(), 0.05, 1e-6);
             TS_ASSERT_DELTA(p_static_cast_pde->GetDiffusionCoefficient(), 2.0, 1e-6);
-            TS_ASSERT(p_static_cast_pde->GetScaleByCellVolume()); // Defaults to false
+            TS_ASSERT(p_static_cast_pde->GetScaleByCellVolume());
 
             // Avoid memory leaks
             delete &(p_static_cast_pde->rGetCellPopulation());

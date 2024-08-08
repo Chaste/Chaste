@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * The PDE takes the form
  *
- * c*du/dt = Grad.(D*Grad(u)) + a*u*rho(x) + b*rho(x),
+ * c*du/dt = Grad.(D*Grad(u)) + (a*u + b) * rho(x),
  *
  * where the scalars c, D, a and b are specified by the members mDuDtCoefficient,
  * mDiffusionCoefficient, mLinearSourceCoefficient and mConstantSourceCoefficient, 
