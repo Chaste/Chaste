@@ -1,0 +1,107 @@
+name: Ubuntu tests
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - '**'
+  push:
+    branches:
+      - develop
+
+jobs:
+  
+  build-and-test:
+
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: "ubuntu-24.04"
+            codename: "noble"
+            cc: "gcc"
+            cxx: "g++"
+
+    env:
+      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
+      CC: ${{ matrix.cc }}
+      CXX: ${{ matrix.cxx }}
+
+    steps:
+    - name: checkout repository
+      uses: actions/checkout@v4
+
+    - name: Ensure python < 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: install dependencies
+      run: |
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu ${{ matrix.codename }}/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
+        sudo apt update
+        sudo apt install chaste-dependencies
+
+    - name: install patched vtk
+      run: |
+        ${VCPKG_INSTALLATION_ROOT}/vcpkg install vtk
+
+    - name: compiler version
+      run: |
+        ${CXX} --version
+
+    - name: make build and test directories
+      run: |
+        mkdir -p chaste-build-dir
+        mkdir -p ${CHASTE_TEST_OUTPUT}
+
+    - name: cmake configure
+      run: cmake -DCMAKE_TOOLCHAIN_FILE=${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release ..
+      working-directory: chaste-build-dir
+
+    - name: build core libraries
+      run: |
+        cmake --build . --parallel 4 --target TestChasteBuildInfo
+        ctest -V -R TestChasteBuildInfo
+      working-directory: chaste-build-dir
+
+#    - name: build core libraries
+#      run: cmake --build . --parallel 4 --target chaste_core
+#      working-directory: chaste-build-dir
+#
+#    - name: build cell_based
+#      run: cmake --build . --parallel 4 --target chaste_cell_based
+#      working-directory: chaste-build-dir
+#
+#    - name: build crypt
+#      run: cmake --build . --parallel 4 --target chaste_crypt
+#      working-directory: chaste-build-dir
+#
+#    - name: build heart
+#      run: cmake --build . --parallel 4 --target chaste_heart
+#      working-directory: chaste-build-dir
+#
+#    - name: build lung
+#      run: cmake --build . --parallel 4 --target chaste_lung
+#      working-directory: chaste-build-dir
+#
+#    - name: build continuous test pack
+#      run: cmake --build . --parallel 4 --target Continuous
+#      working-directory: chaste-build-dir
+#
+#    - name: build nightly test pack
+#      run: cmake --build . --parallel 4 --target Nightly
+#      working-directory: chaste-build-dir
+#
+#    - name: run Continuous test pack
+#      run: ctest -j4 -L Continuous --output-on-failure
+#      working-directory: chaste-build-dir
+#
+#    - name: run Nightly test pack
+#      run: ctest -j4 -L Nightly --output-on-failure
+#      working-directory: chaste-build-dir
