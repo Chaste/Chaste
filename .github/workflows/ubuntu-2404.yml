@@ -49,7 +49,7 @@ jobs:
 
     - name: install patched vtk
       run: |
-        ${VCPKG_INSTALLATION_ROOT}/vcpkg install vtk
+        ${VCPKG_INSTALLATION_ROOT}/vcpkg install vtk hdf5[parallel] --triplet=x64-linux-release
 
     - name: compiler version
       run: |
@@ -61,7 +61,7 @@ jobs:
         mkdir -p ${CHASTE_TEST_OUTPUT}
 
     - name: cmake configure
-      run: cmake -DCMAKE_TOOLCHAIN_FILE=${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release ..
+      run: cmake -DCMAKE_TOOLCHAIN_FILE=${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Debug ..
       working-directory: chaste-build-dir
 
     - name: build core libraries
