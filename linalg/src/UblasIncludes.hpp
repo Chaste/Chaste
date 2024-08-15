@@ -43,9 +43,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UblasVectorInclude.hpp"
 #include "UblasMatrixInclude.hpp"
 
+// See https://github.com/Chaste/Chaste/issues/293
+// LLVM compilers warn about deprecated declarations in UBLAS
+#if (defined(__INTEL_LLVM__) || defined(__clang__)) && BOOST_VERSION < 108600
+// LCOV_EXCL_START
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <boost/numeric/ublas/matrix_expression.hpp>
 #include <boost/numeric/ublas/io.hpp>
+#pragma clang diagnostic pop
+// LCOV_EXCL_STOP
+#else
+#include <boost/numeric/ublas/matrix_proxy.hpp>
+#include <boost/numeric/ublas/matrix_expression.hpp>
+#include <boost/numeric/ublas/io.hpp>
+#endif
 
 namespace ublas = boost::numeric::ublas;
 
