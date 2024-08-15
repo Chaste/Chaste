@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractBoxDomainPdeModifier.hpp"
 #include "ReplicatableVector.hpp"
 #include "LinearBasisFunction.hpp"
+#include "Debug.hpp"
 
 template<unsigned DIM>
 AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
@@ -51,7 +52,8 @@ AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(boost::shared_pt
       mpMeshCuboid(pMeshCuboid),
       mStepSize(stepSize),
       mSetBcsOnBoxBoundary(true),
-      mSetBcsOnBoundingSphere(false)
+      mSetBcsOnBoundingSphere(false),
+      mSolutionMovingWithCells(false)
 {
     if (pMeshCuboid)
     {
@@ -95,6 +97,19 @@ bool AbstractBoxDomainPdeModifier<DIM>::AreBcsSetOnBoundingSphere()
 {
     return mSetBcsOnBoundingSphere;
 }
+
+template<unsigned DIM>
+void AbstractBoxDomainPdeModifier<DIM>::SetSolutionMovingWithCells(bool solutionMovingWithCells)
+{
+    mSolutionMovingWithCells = solutionMovingWithCells;
+}
+
+template<unsigned DIM>
+bool AbstractBoxDomainPdeModifier<DIM>::GetSolutionMovingWithCells()
+{
+    return mSolutionMovingWithCells;
+}
+
 
 template<unsigned DIM>
 void AbstractBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainerHelper(AbstractCellPopulation<DIM,DIM>& rCellPopulation,
@@ -335,71 +350,159 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
     // Store the PDE solution in an accessible form
     ReplicatableVector solution_repl(this->mSolution);
 
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
-         cell_iter != rCellPopulation.End();
-         ++cell_iter)
+    if (!mSolutionMovingWithCells) // Interpolate solutions 
     {
-        // The cells are not nodes of the mesh, so we must interpolate
-        double solution_at_cell = 0.0;
-
-        // Find the element in the FE mesh that contains this cell. CellElementMap has been updated so use this.
-        unsigned elem_index = mCellPdeElementMap[*cell_iter];
-        Element<DIM,DIM>* p_element = this->mpFeMesh->GetElement(elem_index);
-
-        const ChastePoint<DIM>& node_location = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
-
-        c_vector<double,DIM+1> weights = p_element->CalculateInterpolationWeights(node_location);
-
-        for (unsigned i=0; i<DIM+1; i++)
+        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+            cell_iter != rCellPopulation.End();
+            ++cell_iter)
         {
-            double nodal_value = solution_repl[p_element->GetNodeGlobalIndex(i)];
-            solution_at_cell += nodal_value * weights(i);
-        }
+            // The cells are not nodes of the mesh, so we must interpolate
+            double solution_at_cell = 0.0;
 
-        cell_iter->GetCellData()->SetItem(this->mDependentVariableName, solution_at_cell);
+            // Find the element in the FE mesh that contains this cell. CellElementMap has been updated so use this.
+            unsigned elem_index = mCellPdeElementMap[*cell_iter];
+            Element<DIM,DIM>* p_element = this->mpFeMesh->GetElement(elem_index);
 
-        if (this->mOutputGradient)
-        {
-            // Now calculate the gradient of the solution and store this in CellVecData
-            c_vector<double, DIM> solution_gradient = zero_vector<double>(DIM);
+            const ChastePoint<DIM>& node_location = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
 
-            // Calculate the basis functions at any point (e.g. zero) in the element
-            c_matrix<double, DIM, DIM> jacobian, inverse_jacobian;
-            double jacobian_det;
-            this->mpFeMesh->GetInverseJacobianForElement(elem_index, jacobian, jacobian_det, inverse_jacobian);
-            const ChastePoint<DIM> zero_point;
-            c_matrix<double, DIM, DIM+1> grad_phi;
-            LinearBasisFunction<DIM>::ComputeTransformedBasisFunctionDerivatives(zero_point, inverse_jacobian, grad_phi);
+            c_vector<double,DIM+1> weights = p_element->CalculateInterpolationWeights(node_location);
 
-            for (unsigned node_index=0; node_index<DIM+1; node_index++)
+            for (unsigned i=0; i<DIM+1; i++)
             {
-                double nodal_value = solution_repl[p_element->GetNodeGlobalIndex(node_index)];
-
-                for (unsigned j=0; j<DIM; j++)
-                {
-                    solution_gradient(j) += nodal_value* grad_phi(j, node_index);
-                }
+                double nodal_value = solution_repl[p_element->GetNodeGlobalIndex(i)];
+                solution_at_cell += nodal_value * weights(i);
             }
 
-            switch (DIM)
+            cell_iter->GetCellData()->SetItem(this->mDependentVariableName, solution_at_cell);
+
+            if (this->mOutputGradient)
             {
-                case 1:
-                    cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_x", solution_gradient(0));
-                    break;
-                case 2:
-                    cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_x", solution_gradient(0));
-                    cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_y", solution_gradient(1));
-                    break;
-                case 3:
-                    cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_x", solution_gradient(0));
-                    cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_y", solution_gradient(1));
-                    cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_z", solution_gradient(2));
-                    break;
-                default:
-                    NEVER_REACHED;
+                // Now calculate the gradient of the solution and store this in CellVecData
+                c_vector<double, DIM> solution_gradient = zero_vector<double>(DIM);
+
+                // Calculate the basis functions at any point (e.g. zero) in the element
+                c_matrix<double, DIM, DIM> jacobian, inverse_jacobian;
+                double jacobian_det;
+                this->mpFeMesh->GetInverseJacobianForElement(elem_index, jacobian, jacobian_det, inverse_jacobian);
+                const ChastePoint<DIM> zero_point;
+                c_matrix<double, DIM, DIM+1> grad_phi;
+                LinearBasisFunction<DIM>::ComputeTransformedBasisFunctionDerivatives(zero_point, inverse_jacobian, grad_phi);
+
+                for (unsigned node_index=0; node_index<DIM+1; node_index++)
+                {
+                    double nodal_value = solution_repl[p_element->GetNodeGlobalIndex(node_index)];
+
+                    for (unsigned j=0; j<DIM; j++)
+                    {
+                        solution_gradient(j) += nodal_value* grad_phi(j, node_index);
+                    }
+                }
+
+                switch (DIM)
+                {
+                    case 1:
+                        cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_x", solution_gradient(0));
+                        break;
+                    case 2:
+                        cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_x", solution_gradient(0));
+                        cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_y", solution_gradient(1));
+                        break;
+                    case 3:
+                        cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_x", solution_gradient(0));
+                        cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_y", solution_gradient(1));
+                        cell_iter->GetCellData()->SetItem(this->mDependentVariableName+"_grad_z", solution_gradient(2));
+                        break;
+                    default:
+                        NEVER_REACHED;
+                }
             }
         }
     }
+    else // Solution moving with cells so do voroni region update
+    {
+        unsigned num_nodes = rCellPopulation.GetNumNodes();
+
+        std::vector<double> cell_data(num_nodes, -1);
+        std::vector<unsigned> num_cells(num_nodes, -1);
+        std::vector<unsigned> max_data(num_nodes, -1);
+        
+
+        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+            cell_iter != rCellPopulation.End();
+            ++cell_iter)
+        {
+            unsigned cell_location_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+            cell_data[cell_location_index]=0.0;
+            num_cells[cell_location_index]=0;    
+        }
+
+        // Loop over nodes of the finite element mesh and work out which voronoi region the node is in.
+        for (typename TetrahedralMesh<DIM,DIM>::NodeIterator node_iter = this->mpFeMesh->GetNodeIteratorBegin();
+                node_iter != this->mpFeMesh->GetNodeIteratorEnd();
+                ++node_iter)
+        {
+            unsigned node_index = node_iter->GetIndex();
+
+            c_vector<double,DIM> node_location = node_iter->rGetLocation();
+
+            double closest_separation = DBL_MAX;
+            unsigned nearest_cell = UNSIGNED_UNSET;
+
+            for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+                cell_iter != rCellPopulation.End();
+                ++cell_iter)
+            {
+                c_vector<double, DIM> cell_location = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
+
+                double separation = norm_2(node_location - cell_location);
+
+                if (separation < closest_separation)
+                {
+                    closest_separation = separation;
+                    nearest_cell = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+                }                
+            }
+            assert(closest_separation<DBL_MAX);
+
+
+            if(solution_repl[node_index] > max_data[nearest_cell])
+            {
+                max_data[nearest_cell] = solution_repl[node_index];
+            }
+//PRINT_VARIABLE(solution_repl[node_index]);
+            cell_data[nearest_cell] = cell_data[nearest_cell] + solution_repl[node_index];
+            num_cells[nearest_cell] = num_cells[nearest_cell] + 1;
+
+        }   
+        
+        // Now calculate the solution in the cell by averaging over all nodes in the voronoi region.
+        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+        cell_iter != rCellPopulation.End();
+        ++cell_iter)
+        {
+            unsigned cell_location_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);   
+
+            assert(cell_data[cell_location_index]>-1);
+            assert(num_cells[cell_location_index]>0);
+
+            double solution_at_cell = 0.0;
+            
+            //solution_at_cell = max_data[cell_location_index];
+
+            if (cell_data[cell_location_index] >1e-12)
+            {
+                solution_at_cell = cell_data[cell_location_index]/num_cells[cell_location_index];
+            }
+//PRINT_3_VARIABLES(cell_data[cell_location_index],num_cells[cell_location_index],solution_at_cell);
+            
+            cell_iter->GetCellData()->SetItem(this->mDependentVariableName, solution_at_cell);
+        }
+
+        if (this->mOutputGradient)
+        {
+            NEVER_REACHED;
+        }
+    }    
 }
 
 template<unsigned DIM>

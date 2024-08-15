@@ -73,6 +73,7 @@ private:
         archive & mStepSize;
         archive & mSetBcsOnBoxBoundary;
         archive & mSetBcsOnBoundingSphere;
+        archive & mSolutionMovingWithCells;
     }
 
 protected:
@@ -104,6 +105,12 @@ protected:
      * Default to false.
      */
     bool mSetBcsOnBoundingSphere;
+
+    /**
+     * Whether to move the solution along with the cells in the cell population.
+     * Default to true.
+     */
+    bool mSolutionMovingWithCells;
 
 public:
 
@@ -158,6 +165,19 @@ public:
      * @return mSetBcsOnBoundingSphere.
      */
     bool AreBcsSetOnBoundingSphere();
+
+    /**
+     * Set mSolutionMovingWithCells.
+     *
+     * @param solutionMovingWithCells whether to move the solution with cells (means interpoalation from cells to mesh and mesh to cells at each timestep)
+     */
+    void SetSolutionMovingWithCells(bool solutionMovingWithCells);
+
+    /**
+     * @return mSolutionMovingWithCells.
+     */
+    bool GetSolutionMovingWithCells();
+
 
     /**
      * Helper method to construct the boundary conditions container for the PDE.

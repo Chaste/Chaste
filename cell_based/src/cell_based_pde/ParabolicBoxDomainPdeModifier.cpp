@@ -81,8 +81,16 @@ void ParabolicBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopul
     solver.SetTimes(current_time,current_time + dt);
     solver.SetTimeStep(dt);
 
-    // Use previous solution as the initial condition
     Vec previous_solution = this->mSolution;
+
+    if (this->mSolutionMovingWithCells)
+    {
+        // interpolate solution from cells (as they have now moved) onto fe mesh
+        previous_solution = SetupSolutionVectorFromCells(rCellPopulation);
+        
+    }
+
+    // Use previous solution as the initial condition
     solver.SetInitialCondition(previous_solution);
 
     // Note that the linear solver creates a vector, so we have to keep a handle on the old one
@@ -133,6 +141,49 @@ void ParabolicBoxDomainPdeModifier<DIM>::SetupInitialSolutionVector(AbstractCell
 
     // Initialise mSolution
     this->mSolution = PetscTools::CreateAndSetVec(this->mpFeMesh->GetNumNodes(), initial_condition);
+}
+
+template<unsigned DIM>
+Vec ParabolicBoxDomainPdeModifier<DIM>::SetupSolutionVectorFromCells(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
+{
+    Vec interpolated_solution = PetscTools::CreateAndSetVec(this->mpFeMesh->GetNumNodes(), 0.0);
+
+    // Loop over nodes of the finite element mesh and get solution values from CellData
+    // Get it from the cell nearest to the node
+    for (typename TetrahedralMesh<DIM,DIM>::NodeIterator node_iter = this->mpFeMesh->GetNodeIteratorBegin();
+            node_iter != this->mpFeMesh->GetNodeIteratorEnd();
+            ++node_iter)
+    {
+        unsigned node_index = node_iter->GetIndex();
+
+        c_vector<double,DIM> node_location = node_iter->rGetLocation();
+
+        double closest_separation = DBL_MAX;
+        unsigned nearest_cell = UNSIGNED_UNSET;
+
+        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+             cell_iter != rCellPopulation.End();
+             ++cell_iter)
+        {
+            c_vector<double, DIM> cell_location = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
+
+            double separation = norm_2(node_location - cell_location);
+
+            if (separation < closest_separation)
+            {
+                closest_separation = separation;
+                nearest_cell = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+            }                
+        }
+        
+        assert(closest_separation<DBL_MAX);
+
+        double solution_at_node = rCellPopulation.GetCellUsingLocationIndex(nearest_cell)->GetCellData()->GetItem(this->mDependentVariableName);
+
+        PetscVecTools::SetElement(interpolated_solution, node_index, solution_at_node);
+    }   
+
+    return interpolated_solution;
 }
 
 template<unsigned DIM>

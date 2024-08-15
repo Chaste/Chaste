@@ -154,7 +154,7 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool
         : mpDelaunayMesh(&rMesh)
 {
     //Note  !isPeriodic is not used except through polymorphic calls in rMesh
-
+    
     // Reset member variables and clear mNodes, mFaces and mElements
     Clear();
 
@@ -247,16 +247,44 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool
                     double extra_node_scaling = 1.0;  // increase to add more points per external edge (makes rounder cells)
 
                     int num_sections = ceil(edge_length*extra_node_scaling);
+                    num_sections = 1;
                     for (int section=0; section<=num_sections; section++)
                     {
-                        double ratio = (double)section/(double)num_sections;
+                        //double ratio = (double)section/(double)num_sections;
+                        double ratio = ((double)section+0.5)/((double)num_sections+1);
                         c_vector<double,2> new_node_location = normal_vector + ratio*p_node_a->rGetLocation() + (1-ratio)*p_node_b->rGetLocation();
-                        nodes.push_back(new Node<2>(new_node_index, new_node_location));
-                        new_node_index++;
+                        
+                        //Check if near other nodes (could be inefficient)
+                        bool node_clear = true;
+                        double node_clearance = 0.1; // Make settable variable??
+
+                        for (unsigned i=0; i<nodes.size(); i++)
+                        {
+                            double distance = norm_2(mpDelaunayMesh->GetVectorFromAtoB(nodes[i]->rGetLocation(), new_node_location));
+                            if (distance < node_clearance)
+                            {
+                                node_clear = false;
+                                break;
+                            }
+                        }
+
+                        if (node_clear)
+                        {
+                            nodes.push_back(new Node<2>(new_node_index, new_node_location));
+                            new_node_index++;
+                        }
                     }
                 }
             }
         }
+
+// // output nodes 
+// for (unsigned node_index=0; node_index<nodes.size(); node_index++)
+// {
+//     Node<2>* p_temp_node = nodes[node_index];
+//     std::cout << node_index << "\t" << p_temp_node->rGetLocation()[0] << "\t" << p_temp_node->rGetLocation()[1] << std::endl << std::flush;
+// }
+
         MutableMesh<2,2> extended_mesh(nodes);
 
         unsigned num_elements = mpDelaunayMesh->GetNumAllNodes();

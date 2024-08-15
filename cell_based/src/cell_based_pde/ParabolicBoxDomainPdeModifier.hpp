@@ -138,11 +138,24 @@ public:
     /**
      * Helper method to initialise the PDE solution using the CellData.
      *
-     * Here we assume a homogeneous initial consition.
+     * Here we assume a homogeneous initial consition. 
+     * 
+     * TODO use SetupSolutionVectorFromCells instead!
      *
      * @param rCellPopulation reference to the cell population
      */
     void SetupInitialSolutionVector(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+
+    /**
+     * Helper method to interpolate the PDE solution from cells using the CellData.
+     * Use the cells voronoi region as all fe nodes in a cell centre voronoi region are given the 
+     * value from cell data.
+     *
+     * @param rCellPopulation reference to the cell population
+     * 
+     * @return the solution interpolated onto the FE Mesh
+     */
+    Vec SetupSolutionVectorFromCells(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
 
     /**
      * Overridden OutputSimulationModifierParameters() method.
