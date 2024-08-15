@@ -47,6 +47,13 @@ jobs:
         sudo apt update
         sudo apt install chaste-dependencies
 
+    - name: cache vtk 9.3
+      id: cache-vtk
+      uses: actions/cache@v4
+      with:
+        path: vtk/vtk-9.3
+        key: ${{ runner.os }}-vtk93
+
     - name: compile patched vtk
       run: |
         mkdir vtk && cd vtk
@@ -54,6 +61,7 @@ jobs:
         tar -zxf v9.3.1.tar.gz
         mkdir vtk-build && cd vtk-build
         cmake -DCMAKE_INSTALL_PREFIX=../vtk-9.3 -DCMAKE_INSTALL_RPATH=../vtk-9.3/lib ../VTK-9.3.1 && make -j4 && make install
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
 
     - name: compiler version
       run: |
