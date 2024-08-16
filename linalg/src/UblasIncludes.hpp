@@ -35,6 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef UBLASINCLUDES_HPP_
 #define UBLASINCLUDES_HPP_
 
+#include "ChastePragmas.hpp"
+
 /**
  * @file
  * Convenience header for including ublas types in default namespace
@@ -43,22 +45,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UblasVectorInclude.hpp"
 #include "UblasMatrixInclude.hpp"
 
-// See https://github.com/Chaste/Chaste/issues/293
-// LLVM compilers warn about deprecated declarations in UBLAS
-#if (defined(__INTEL_LLVM__) || defined(__clang__)) && BOOST_VERSION < 108600
-// LCOV_EXCL_START
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+CHASTE_DISABLE_BOOST_DEPRECATION_WARNING_BEGIN
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <boost/numeric/ublas/matrix_expression.hpp>
 #include <boost/numeric/ublas/io.hpp>
-#pragma clang diagnostic pop
-// LCOV_EXCL_STOP
-#else
-#include <boost/numeric/ublas/matrix_proxy.hpp>
-#include <boost/numeric/ublas/matrix_expression.hpp>
-#include <boost/numeric/ublas/io.hpp>
-#endif
+CHASTE_DISABLE_BOOST_DEPRECATION_WARNING_END
 
 namespace ublas = boost::numeric::ublas;
 
