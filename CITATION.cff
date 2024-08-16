@@ -1,0 +1,85 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the following work."
+title: Chaste
+type: software
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.1035418
+    description: Latest version of Chaste on Zenodo
+repository-code: 'https://github.com/Chaste/Chaste'
+url: 'https://chaste.github.io/'
+abstract: >-
+  Chaste - a C++ library for computational physiology and biology simulations
+license: BSD-3-Clause
+commit: '69d202ca83a99895c17fb090d347fc19e1cc2515'
+version: '2024.1'
+date-released: '2024-02-21'
+preferred-citation:
+  type: article
+  authors:
+    - family-names: Cooper
+      given-names: Fergus R.
+    - family-names: Baker
+      given-names: Ruth E.
+    - family-names: Bernabeu
+      given-names: Miguel O.
+    - family-names: Bordas
+      given-names: Rafel
+    - family-names: Bowler
+      given-names: Louise
+    - family-names: Bueno-Orovio
+      given-names: Alfonso
+    - family-names: Byrne
+      given-names: Helen M.
+    - family-names: Carapella
+      given-names: Valentina
+    - family-names: Cardone-Noott
+      given-names: Louie
+    - family-names: Cooper
+      given-names: Jonathan
+    - family-names: Dutta
+      given-names: Sara
+    - family-names: Evans
+      given-names: Benjamin D.
+    - family-names: Fletcher
+      given-names: Alexander G.
+    - family-names: Grogan
+      given-names: James A.
+    - family-names: Guo
+      given-names: Wenxian
+    - family-names: Harvey
+      given-names: Daniel G.
+    - family-names: Hendrix
+      given-names: Maurice
+    - family-names: Kay
+      given-names: David
+    - family-names: Kursawe
+      given-names: Jochen
+    - family-names: Maini
+      given-names: Philip K.
+    - family-names: McMillan
+      given-names: Beth
+    - family-names: Mirams
+      given-names: Gary R.
+    - family-names: Osborne
+      given-names: James M.
+    - family-names: Pathmanathan
+      given-names: Pras
+    - family-names: Pitt-Francis
+      given-names: Joe M.
+    - family-names: Robinson
+      given-names: Martin
+    - family-names: Rodriguez
+      given-names: Blanca
+    - family-names: Spiteri
+      given-names: Raymond J.
+    - family-names: Gavaghan
+      given-names: David J.
+  title: "Chaste: Cancer, Heart and Soft Tissue Environment"
+  year: 2020
+  doi: 10.21105/joss.01848
+  url: https://doi.org/10.21105/joss.01848
+  journal: "Journal of Open Source Software"
+  volume: 5
+  number: 47
+  start: 1848
