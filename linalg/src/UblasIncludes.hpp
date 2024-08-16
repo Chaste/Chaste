@@ -35,12 +35,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef UBLASINCLUDES_HPP_
 #define UBLASINCLUDES_HPP_
 
-#include "ChastePragmas.hpp"
-
 /**
  * @file
  * Convenience header for including ublas types in default namespace
  */
+
+#include "ChastePragmas.hpp"
 
 #include "UblasVectorInclude.hpp"
 #include "UblasMatrixInclude.hpp"

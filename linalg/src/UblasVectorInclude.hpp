@@ -40,6 +40,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Convenience header for including ublas vector in default namespace
  */
 
+#include "ChastePragmas.hpp"
+
 CHASTE_DISABLE_BOOST_DEPRECATION_WARNING_BEGIN
 #include <boost/numeric/ublas/vector.hpp>
 CHASTE_DISABLE_BOOST_DEPRECATION_WARNING_END
