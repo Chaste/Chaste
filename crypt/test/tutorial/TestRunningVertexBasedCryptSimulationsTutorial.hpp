@@ -170,7 +170,7 @@ public:
 
     /*
      * To visualize the results, open a new terminal, `cd` to the Chaste directory,
-     * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/VertexCrypt/results_from_time_0`.
+     * then `cd` to `anim`. Then do: `java Visualize2dVertexCells $CHASTE_TEST_OUTPUT/VertexCrypt/results_from_time_0`.
      * You may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
      * java executable.
      *
@@ -235,7 +235,7 @@ public:
     /*
     *
     * To visualize the results, open a new terminal, `cd` to the Chaste directory,
-    * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/VertexCryptWithSimpleWntCellCycleModel/results_from_time_0`.
+    * then `cd` to `anim`. Then do: `java Visualize2dVertexCells $CHASTE_TEST_OUTPUT/VertexCryptWithSimpleWntCellCycleModel/results_from_time_0`.
     * You may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
     * java executable.
     *

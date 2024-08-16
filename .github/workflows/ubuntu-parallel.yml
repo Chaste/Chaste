@@ -33,7 +33,7 @@ jobs:
 
     steps:
     - name: checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: install dependencies
       run: |
@@ -41,6 +41,13 @@ jobs:
         sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
         sudo apt update
         sudo apt install chaste-dependencies
+
+    - name: Downgrade libexpat1 (native ubuntu-22.04 only)
+      # if: ${{ matrix.os == 'ubuntu-22.04' }}
+      run: |
+        if dpkg -l | grep libexpat1-dev | grep 2.4.7-1ubuntu0.3; then
+          sudo apt-get install -y --allow-downgrades libexpat1=2.4.7-1 libexpat1-dev=2.4.7-1
+        fi
 
     - name: install and set up Intel LLVM compiler
       run: |

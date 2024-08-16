@@ -185,7 +185,7 @@ public:
     /*
      * To visualize the results, use Paraview. See the [Visualizing With Paraview](../visualizingwithparaview/) tutorial for more information.
      *
-     * Load the file `/tmp/$USER/testoutput/TestVertexBasedMonolayerWithDeltaNotch/results_from_time_0/results.pvd`.
+     * Load the file `$CHASTE_TEST_OUTPUT/TestVertexBasedMonolayerWithDeltaNotch/results_from_time_0/results.pvd`.
      *
      * ### Test 2 - a node-based monolayer with Delta/Notch signalling
      *
@@ -259,7 +259,7 @@ public:
 /*
  * To visualize the results, use Paraview. See the [Visualizing With Paraview](../visualizingwithparaview/) tutorial for more information.
  *
- * Load the file `/tmp/$USER/testoutput/TestNodeBasedMonolayerWithDeltaNotch/results_from_time_0/results.pvd`,
+ * Load the file `$CHASTE_TEST_OUTPUT/TestNodeBasedMonolayerWithDeltaNotch/results_from_time_0/results.pvd`,
  * and add a spherical glyph.
  *
  * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs

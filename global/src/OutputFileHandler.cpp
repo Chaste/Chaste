@@ -41,6 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 
 #include "ArchiveLocationInfo.hpp"
+#include "ChasteBuildRoot.hpp"
 #include "Exception.hpp"
 #include "FileFinder.hpp"
 #include "GetCurrentWorkingDirectory.hpp"
@@ -160,24 +161,13 @@ void OutputFileHandler::CommonConstructor(const std::string& rDirectory,
 
 std::string OutputFileHandler::GetChasteTestOutputDirectory()
 {
-    char* chaste_test_output = getenv("CHASTE_TEST_OUTPUT");
+    char* chaste_test_output = std::getenv("CHASTE_TEST_OUTPUT");
     FileFinder directory_root;
+
+    // If CHASTE_TEST_OUTPUT is not set, we use the default (which is ${Chaste_BINARY_DIR}/testoutput)
     if (chaste_test_output == nullptr || *chaste_test_output == 0)
     {
-        // Mimic the old behaviour of setting CHASTE_TEST_OUTPUT: /tmp/'+os.environ['USER']+'/testoutput/
-        std::stringstream  tmp_directory;
-        if (getenv("USER")!=NULL)
-        {
-            tmp_directory << "/tmp/" << getenv("USER") << "/testoutput/"; // LCOV_EXCL_LINE
-        }
-        else
-        {
-            // No $USER in environment (which may be the case in Docker)
-            tmp_directory << "/tmp/chaste/testoutput/";
-        }
-        directory_root.SetPath(tmp_directory.str(), RelativeTo::AbsoluteOrCwd);
-        /* // Former behaviour: default to 'testoutput' folder within the current directory
-         * directory_root.SetPath("testoutput", RelativeTo::CWD); */
+        directory_root.SetPath(DefaultChasteTestOutput(), RelativeTo::AbsoluteOrCwd);
     }
     else
     {

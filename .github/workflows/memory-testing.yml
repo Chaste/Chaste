@@ -42,7 +42,7 @@ jobs:
         if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch')
 
       - name: checkout Chaste
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: Chaste/Chaste
           path: Chaste
@@ -53,6 +53,13 @@ jobs:
           sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
           sudo apt update
           sudo apt install chaste-dependencies
+
+      - name: Downgrade libexpat1 (native ubuntu-22.04 only)
+        # if: ${{ matrix.os == 'ubuntu-22.04' }}
+        run: |
+          if dpkg -l | grep libexpat1-dev | grep 2.4.7-1ubuntu0.3; then
+            sudo apt-get install -y --allow-downgrades libexpat1=2.4.7-1 libexpat1-dev=2.4.7-1
+          fi
 
       - name: make build and test directories
         run: |
@@ -84,7 +91,7 @@ jobs:
         if: always()
         
       - name: checkout memory-testing
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: Chaste/memory-testing
           path: memory-testing
@@ -99,7 +106,7 @@ jobs:
         if: always() && steps.index-exists.outputs.index == 'True'
 
       - name: setup python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 

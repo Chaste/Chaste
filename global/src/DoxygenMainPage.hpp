@@ -42,12 +42,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * \mainpage
  *
- * <a href="http://www.cs.ox.ac.uk/chaste/">Chaste</a>
+ * <a href="https://chaste.github.io/">Chaste</a>
  * (<b>C</b>ancer, <b>H</b>eart <b>a</b>nd <b>S</b>oft <b>T</b>issue <b>E</b>nvironment) is a general
  * purpose simulation package aimed at multi-scale, computationally demanding problems arising in biology and
  * physiology. Current functionality includes tissue and cell level electrophysiology, discrete tissue modelling,
- * and soft tissue modelling. The package is being developed by a team mainly based in the Computational Biology
- * Group at the Department of Computer Science, University of Oxford, and development draws on expertise from
+ * and soft tissue modelling. The package was originally created in the
+ * the Department of Computer Science, University of Oxford, and is developed and maintained by active researchers,
+ * academics and software engineers.  Development draws on expertise from
  * software engineering, high performance computing, mathematical modelling and scientific computing.
  *
  * These pages contain documentation automatically generated from the Chaste source code, describing the
@@ -55,10 +56,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * available.
  *
  * For higher-level documentation, including
- * <a href="https://chaste.cs.ox.ac.uk/trac/wiki/DeveloperInstallGuide">installation guides</a>,
- * <a href="https://chaste.cs.ox.ac.uk/trac/wiki/UserTutorials">tutorials</a> and more,
+ * <a href="https://chaste.github.io/docs/installguides/">installation guides</a>,
+ * <a href="https://chaste.github.io/docs/user-tutorials/">tutorials</a> and more,
  * see the main Chaste website at
- * <a href="http://www.cs.ox.ac.uk/chaste/documentation.html">http://www.cs.ox.ac.uk/chaste/documentation.html</a>.
+ * <a href="https://chaste.github.io/docs/">https://chaste.github.io/docs/</a>.
  */
 
 #endif // DOXYGENMAINPAGE_HPP_
