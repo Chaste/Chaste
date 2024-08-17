@@ -29,135 +29,107 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 # OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-if (Chaste_ENABLE_PYCHASTE)
+if(NOT Chaste_ENABLE_PYCHASTE)
+    return()
+endif()
 
-    find_package(Chaste COMPONENTS ${Chaste_DEPENDS_pychaste})
+find_package(Chaste COMPONENTS ${Chaste_DEPENDS_pychaste})
+chaste_do_component(pychaste)
 
-    chaste_do_component(pychaste)
+set(PYCHASTE_MODULES cell_based core mesh ode pde visualization)
 
-    ################################
-    # Compiler options
-    ################################
-    add_compile_options(-Wno-unused-local-typedefs)
+##################################################
+# Python wrapper generation
+##################################################
+set(PYCHASTE_WRAPPER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dynamic/wrappers)
 
-    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        # https://stackoverflow.com/questions/25365160/boostmultiprecisionfloat128-and-c11
-        add_compile_options(-fext-numeric-literals)
+# Add a target for re-generating wrappers manually
+set(PYCHASTE_CPPWG_COMMAND
+    . ${chaste_python3_venv}/activate &&
+    ${chaste_python3_venv}/cppwg ${CMAKE_SOURCE_DIR}
+        -w ${PYCHASTE_WRAPPER_DIR}
+        -p ${CMAKE_CURRENT_SOURCE_DIR}/dynamic/config.yaml
+        -i ${Chaste_INCLUDE_DIRS}
+           ${Chaste_pychaste_INCLUDE_DIRS}
+           ${Chaste_THIRD_PARTY_INCLUDE_DIRS}
+        --std c++17 &&
+    deactivate
+)
+add_custom_target(pychaste_wrappers)
+add_custom_command(TARGET pychaste_wrappers COMMAND ${PYCHASTE_CPPWG_COMMAND})
+
+# Generate wrappers if they are missing
+foreach(module ${PYCHASTE_MODULES})
+    if(NOT EXISTS ${PYCHASTE_WRAPPER_DIR}/${module}/${module}.main.cpp)
+        message(STATUS "Generating PyChaste wrappers")
+        string(JOIN " " PYCHASTE_CPPWG_CMDSTR ${PYCHASTE_CPPWG_COMMAND})
+        execute_process(COMMAND sh -c "${PYCHASTE_CPPWG_CMDSTR}")
+        break()
     endif()
+endforeach()
 
-    ################################
-    # PyChaste non-wrapper C++ code
-    ################################
-    set(PYCHASTE_NON_WRAPPER_INCLUDE_DIRS
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/cell_based/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/ode/
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/visualization/)
+header_dirs(${PYCHASTE_WRAPPER_DIR} PYCHASTE_WRAPPER_INCLUDE_DIRS)
 
-    ################################
-    # Wrapper generation targets
-    ################################
-    add_custom_target(generate_pychaste_wrappers)
-    add_custom_command(TARGET generate_pychaste_wrappers
-        COMMAND . ${chaste_python3_venv}/activate && 
-            ${chaste_python3_venv}/cppwg ${CMAKE_SOURCE_DIR}
-                -w ${CMAKE_CURRENT_SOURCE_DIR}/dynamic/wrappers
-                -p ${CMAKE_CURRENT_SOURCE_DIR}/dynamic/package_info.yaml
-                -i ${PYCHASTE_NON_WRAPPER_INCLUDE_DIRS}
-                ${Chaste_INCLUDE_DIRS}
-                ${Chaste_THIRD_PARTY_INCLUDE_DIRS}
-                --std c++17 &&
-            deactivate
+##################################################
+# Copy Python package structure to build directory
+##################################################
+file(
+    COPY ${CMAKE_CURRENT_SOURCE_DIR}/package/
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/package/
+    PATTERN "*${CMAKE_SHARED_LIBRARY_SUFFIX}" EXCLUDE # Skip shared libraries
+)
+
+##################################################
+# Build Python modules from wrappers
+##################################################
+
+# Create a shared library for each pychaste module. The library name is 
+# the same as the module name in the main wrapper (e.g. in `ode.main.cpp`).
+
+foreach(module ${PYCHASTE_MODULES})
+    file(
+        GLOB_RECURSE
+        module_SOURCES
+        RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+        ${PYCHASTE_WRAPPER_DIR}/${module}/*.cpp
+        ${PYCHASTE_WRAPPER_DIR}/${module}/*.hpp
     )
 
-    add_custom_target(generate_pychaste_wrappers_diff)
-    add_custom_command(TARGET generate_pychaste_wrappers_diff
-        COMMAND . ${chaste_python3_venv}/activate && 
-            ${chaste_python3_venv}/cppwg ${CMAKE_SOURCE_DIR}
-                -w ${CMAKE_CURRENT_SOURCE_DIR}/dynamic/wrappers_diff
-                -p ${CMAKE_CURRENT_SOURCE_DIR}/dynamic/package_info.yaml
-                -i ${PYCHASTE_NON_WRAPPER_INCLUDE_DIRS}
-                ${Chaste_INCLUDE_DIRS}
-                ${Chaste_THIRD_PARTY_INCLUDE_DIRS}
-                --std c++17 &&
-            deactivate
+    set(lib_name _chaste_pychaste_${module})
+
+    add_library(
+        ${lib_name}
+        SHARED
+        ${module_SOURCES}
+        ${PYCHASTE_WRAPPER_DIR}/${module}/${module}.main.cpp
     )
 
-    ################################
-    # Build python modules from wrappers
-    ################################
-    include_directories(${PYCHASTE_NON_WRAPPER_INCLUDE_DIRS})
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dynamic/wrappers)
-    include_directories(${PYTHON3_INCLUDE_DIRS})
+    set_target_properties(
+        ${lib_name}
+        PROPERTIES
+            LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/package/chaste/${module}
+            PREFIX "${PYTHON_MODULE_PREFIX}"
+            SUFFIX "${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    )
 
-    # Copy python package structure to build directory, ignoring existing shared libraries
-    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/python/
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/python/
-        PATTERN "*${CMAKE_SHARED_LIBRARY_SUFFIX}" EXCLUDE)
+    target_link_libraries(
+        ${lib_name}
+        PRIVATE
+        ${Python3_LIBRARIES}  # Python and pybind11 come first
+        pybind11::module
+        Chaste_COMMON_DEPS
+        chaste_pychaste  # Library built from non-wrapper code in src/
+    )
 
-    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/test/python/
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/python/test/)
+    target_include_directories(
+        ${lib_name}
+        PRIVATE
+        ${PYTHON3_INCLUDE_DIRS}
+        ${Chaste_pychaste_INCLUDE_DIRS}  # Non-wrapper code in src/
+        ${PYCHASTE_WRAPPER_INCLUDE_DIRS}
+    )
 
-    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/doc/
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/python/doc/)
+    target_compile_options(${lib_name} PRIVATE -Wno-unused-local-typedefs)
 
-    # List of pychaste modules to build into shared libraries
-    set (PYCHASTE_PYTHON_MODULES
-            core
-            ode
-            pde
-            mesh
-            cell_based
-            visualization)
-
-    # Locations to put each module library
-    set (PYCHASTE_PYTHON_MODULE_LOCATIONS
-            ${CMAKE_CURRENT_BINARY_DIR}/python/chaste/core/
-            ${CMAKE_CURRENT_BINARY_DIR}/python/chaste/ode/
-            ${CMAKE_CURRENT_BINARY_DIR}/python/chaste/pde/
-            ${CMAKE_CURRENT_BINARY_DIR}/python/chaste/mesh/
-            ${CMAKE_CURRENT_BINARY_DIR}/python/chaste/cell_based/
-            ${CMAKE_CURRENT_BINARY_DIR}/python/chaste/visualization/)
-
-    # Target for building all module shared libraries
-    add_custom_target(chaste_pychaste_modules)
-
-    # The module library name must be the same as the pybind11 module name
-    # defined in the main wrapper e.g. `dynamic/wrappers/ode/ode.main.cpp`
-    # defines a pybind11 module `_pychaste_ode`. By convention,
-    # the name starts with an underscore. The usual 'lib' prefix is disabled.
-    set(PYCHASTE_PYTHON_MODULE_PREFIX "_pychaste_")
-
-    # Create a shared library target for each module
-    list(LENGTH PYCHASTE_PYTHON_MODULES max_idx)
-    math(EXPR max_idx "${max_idx} - 1")
-
-    foreach(idx RANGE ${max_idx})
-        list(GET PYCHASTE_PYTHON_MODULES ${idx} module)
-        list(GET PYCHASTE_PYTHON_MODULE_LOCATIONS ${idx} module_dir)
-
-        # Glob the module's wrapper code from the `dynamic` directory
-        file(GLOB module_sources ${CMAKE_CURRENT_SOURCE_DIR}/dynamic/wrappers/${module}/*.cpp)
-
-        set(module_library_name ${PYCHASTE_PYTHON_MODULE_PREFIX}${module})
-        add_library(${module_library_name} SHARED ${module_sources})
-
-        set_target_properties(${module_library_name}
-            PROPERTIES
-                LIBRARY_OUTPUT_DIRECTORY ${module_dir}
-                PREFIX "${PYTHON_MODULE_PREFIX}"
-                SUFFIX "${CMAKE_SHARED_LIBRARY_SUFFIX}")
-
-        # The order here is important - pybind11 and python come first
-        target_link_libraries(${module_library_name} 
-            pybind11::module
-            ${Python3_LIBRARIES}
-            ${Chaste_THIRD_PARTY_LIBRARIES}
-            Chaste_COMMON_DEPS
-            ${Chaste_LIBRARIES}
-            chaste_pychaste)
-
-        add_dependencies(chaste_pychaste_modules ${module_library_name})
-    endforeach()
-
-endif ()
+    add_dependencies(pychaste ${lib_name})
+endforeach()
