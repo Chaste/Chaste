@@ -32,23 +32,25 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-#ifndef UBLASVECTORINCLUDE_HPP_
-#define UBLASVECTORINCLUDE_HPP_
 
-/**
- * @file
- * Convenience header for including ublas vector in default namespace
- */
+#ifndef CHASTE_PRAGMAS_HPP_
+#define CHASTE_PRAGMAS_HPP_
 
-#include "ChastePragmas.hpp"
+#include <boost/version.hpp>
 
-CHASTE_DISABLE_BOOST_DEPRECATION_WARNING_BEGIN
-#include <boost/numeric/ublas/vector.hpp>
-CHASTE_DISABLE_BOOST_DEPRECATION_WARNING_END
+// This header contains macros that use compiler pragmas to ignore specific
+// warnings in a very targeted manner.
 
-using boost::numeric::ublas::c_vector;
-using boost::numeric::ublas::zero_vector;
-using boost::numeric::ublas::scalar_vector;
-using boost::numeric::ublas::unit_vector;
+// See https://github.com/Chaste/Chaste/issues/293
+// LLVM compilers warn about various deprecated declarations
+#if (defined(Chaste_COMPILER_IS_Clang) || defined(Chaste_COMPILER_IS_IntelLLVM)) && BOOST_VERSION < 108600
+#define CHASTE_DISABLE_BOOST_DEPRECATION_WARNING_BEGIN \
+    _Pragma("GCC diagnostic push") \
+    _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+#define CHASTE_DISABLE_BOOST_DEPRECATION_WARNING_END _Pragma("GCC diagnostic pop")
+#else // Define empty macros for other scenarios
+#define CHASTE_DISABLE_BOOST_DEPRECATION_WARNING_BEGIN
+#define CHASTE_DISABLE_BOOST_DEPRECATION_WARNING_END
+#endif
 
-#endif /*UBLASVECTORINCLUDE_HPP_*/
+#endif // CHASTE_PRAGMAS_HPP_
