@@ -75,7 +75,7 @@ header_dirs(${PYCHASTE_WRAPPER_DIR} PYCHASTE_WRAPPER_INCLUDE_DIRS)
 ##################################################
 set(PYCHASTE_PACKAGE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/package)
 file(
-    COPY ${CMAKE_CURRENT_SOURCE_DIR}/py_src/
+    COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/py/
     DESTINATION ${PYCHASTE_PACKAGE_BINARY_DIR}/
     PATTERN "*${CMAKE_SHARED_LIBRARY_SUFFIX}" EXCLUDE # Skip shared libraries
 )
@@ -83,30 +83,26 @@ file(
 ##################################################
 # Build Python modules from wrappers
 ##################################################
-
-# Create a shared library for each pychaste module. The library name is 
-# the same as the module name in the main wrapper (e.g. in `ode.main.cpp`).
+# Create a shared library for each pychaste module. The library name is
+# the same as the module name in the main wrapper e.g. in `ode.main.cpp`,
+# the module name is `_pychaste_ode`, which is imported in Python code as
+# `from chaste.ode._pychaste_ode import *`.
 
 foreach(module ${PYCHASTE_MODULES})
     file(
         GLOB_RECURSE
-        module_SOURCES
+        module_sources
         RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         ${PYCHASTE_WRAPPER_DIR}/${module}/*.cpp
         ${PYCHASTE_WRAPPER_DIR}/${module}/*.hpp
     )
 
-    set(lib_name _pychaste_${module})
+    set(module_lib _pychaste_${module})
 
-    add_library(
-        ${lib_name}
-        SHARED
-        ${module_SOURCES}
-        ${PYCHASTE_WRAPPER_DIR}/${module}/${module}.main.cpp
-    )
+    add_library(${module_lib} SHARED ${module_sources})
 
     set_target_properties(
-        ${lib_name}
+        ${module_lib}
         PROPERTIES
             LIBRARY_OUTPUT_DIRECTORY ${PYCHASTE_PACKAGE_BINARY_DIR}/chaste/${module}
             PREFIX "${PYTHON_MODULE_PREFIX}"
@@ -114,7 +110,7 @@ foreach(module ${PYCHASTE_MODULES})
     )
 
     target_link_libraries(
-        ${lib_name}
+        ${module_lib}
         PRIVATE
         ${Python3_LIBRARIES}  # Python and pybind11 come first
         pybind11::module
@@ -123,14 +119,14 @@ foreach(module ${PYCHASTE_MODULES})
     )
 
     target_include_directories(
-        ${lib_name}
+        ${module_lib}
         PRIVATE
         ${PYTHON3_INCLUDE_DIRS}
         ${Chaste_pychaste_INCLUDE_DIRS}  # Non-wrapper code in src/
         ${PYCHASTE_WRAPPER_INCLUDE_DIRS}
     )
 
-    target_compile_options(${lib_name} PRIVATE -Wno-unused-local-typedefs)
+    target_compile_options(${module_lib} PRIVATE -Wno-unused-local-typedefs)
 
-    add_dependencies(pychaste ${lib_name})
+    add_dependencies(pychaste ${module_lib})
 endforeach()
