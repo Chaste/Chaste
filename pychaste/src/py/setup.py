@@ -30,7 +30,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from setuptools import setup, Distribution, find_packages
+from setuptools import setup, Distribution
 
 
 class BinaryDistribution(Distribution):
@@ -41,55 +41,4 @@ class BinaryDistribution(Distribution):
         return True
 
 
-setup(
-    name="chaste",
-    version="2024.1",
-    packages=find_packages(),
-    package_data={
-        "chaste": [
-            "cell_based/_chaste_pychaste_cell_based.so",
-            "core/_chaste_pychaste_core.so",
-            "mesh/_chaste_pychaste_mesh.so",
-            "ode/_chaste_pychaste_ode.so",
-            "pde/_chaste_pychaste_pde.so",
-            "visualization/_chaste_pychaste_visualization.so",
-        ],
-    },
-    data_files=[
-        (
-            "tutorials",
-            [
-                "doc/tutorials/TestCellSortingTutorial.ipynb",
-                "doc/tutorials/TestImmersedBoundaryTutorial.ipynb",
-                "doc/tutorials/TestMeshBasedCellSimulationsPythonTutorial.ipynb",
-                "doc/tutorials/TestNodeBasedCellSimulationsPythonTutorial.ipynb",
-                "doc/tutorials/TestPottsBasedCellSimulationsPythonTutorial.ipynb",
-                "doc/tutorials/TestScratchAssayTutorial.ipynb",
-                "doc/tutorials/TestSpheroidTutorial.ipynb",
-                "doc/tutorials/TestTensileTestTutorial.ipynb",
-                "doc/tutorials/TestVertexBasedCellSimulationsPythonTutorial.ipynb",
-            ],
-        )
-    ],
-    include_package_data=True,
-    zip_safe=False,
-    # Project Metadata
-    author="Chaste Developers",
-    author_email="chaste-users@maillist.ox.ac.uk",
-    description="Python bindings for Chaste, a general purpose simulation package for computational biology.",
-    license="BSD-3-Clause",
-    keywords="cancer developmental biology electrophysiology scientific",
-    classifiers=[
-        "Development Status :: 4 - Beta",
-        "Intended Audience :: Science/Research",
-        "Topic :: Scientific/Engineering",
-        "Operating System :: POSIX",
-        "License :: OSI Approved :: BSD License",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
-        "Programming Language :: Python :: 3.11",
-        "Programming Language :: Python :: Implementation :: CPython",
-    ],
-    distclass=BinaryDistribution,
-)
+setup(distclass=BinaryDistribution)
