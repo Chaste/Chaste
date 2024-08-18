@@ -64,8 +64,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NoCellCycleModel.cppwg.hpp"
 #include "UniformCellCycleModel.cppwg.hpp"
 #include "UniformG1GenerationalCellCycleModel.cppwg.hpp"
-#include "StochasticOxygenBasedCellCycleModel.cppwg.hpp"
 #include "SimpleOxygenBasedCellCycleModel.cppwg.hpp"
+#include "StochasticOxygenBasedCellCycleModel.cppwg.hpp"
 #include "BiasedBernoulliTrialCellCycleModel.cppwg.hpp"
 #include "LabelDependentBernoulliTrialCellCycleModel.cppwg.hpp"
 #include "AlwaysDivideCellCycleModel.cppwg.hpp"
@@ -420,8 +420,8 @@ PYBIND11_MODULE(_pychaste_cell_based, m)
     register_NoCellCycleModel_class(m);
     register_UniformCellCycleModel_class(m);
     register_UniformG1GenerationalCellCycleModel_class(m);
-    register_StochasticOxygenBasedCellCycleModel_class(m);
     register_SimpleOxygenBasedCellCycleModel_class(m);
+    register_StochasticOxygenBasedCellCycleModel_class(m);
     register_BiasedBernoulliTrialCellCycleModel_class(m);
     register_LabelDependentBernoulliTrialCellCycleModel_class(m);
     register_AlwaysDivideCellCycleModel_class(m);

@@ -35,5 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import chaste
 import chaste.mesh
 import chaste.pde
+
 from chaste.cell_based._pychaste_cell_based import *
 from chaste.cell_based.fortests import *

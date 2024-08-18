@@ -32,15 +32,21 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
+import os.path
+
+from io import StringIO
+from pkg_resources import resource_filename
+
+import chaste.cell_based
+
+PYCHASTE_CAN_IMPORT_XVFB = True
 PYCHASTE_CAN_IMPORT_IPYTHON = True
 PYCHASTE_CAN_IMPORT_VTK = True
 
-from six.moves import StringIO
-import os.path
-from pkg_resources import resource_filename
-from xvfbwrapper import Xvfb
-
-import chaste.cell_based
+try:
+    from xvfbwrapper import Xvfb
+except ImportError:
+    PYCHASTE_CAN_IMPORT_XVFB = False
 
 try:
     import IPython                    
@@ -84,11 +90,13 @@ if PYCHASTE_CAN_IMPORT_IPYTHON:
                 return it
 
             def init(self, *args, **kwds):
-                try:
-                    self.vdisplay = Xvfb()
-                    self.vdisplay.start()
-                except OSError:
-                    self.vdisplay = None
+                self.vdisplay = None
+                if PYCHASTE_CAN_IMPORT_XVFB:
+                    try:
+                        self.vdisplay = Xvfb()
+                        self.vdisplay.start()
+                    except OSError:
+                        self.vdisplay = None
 
                 self.renderWindow = vtk.vtkRenderWindow()
             

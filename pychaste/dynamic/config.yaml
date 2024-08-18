@@ -314,8 +314,8 @@ modules:
       - name: NoCellCycleModel
       - name: UniformCellCycleModel
       - name: UniformG1GenerationalCellCycleModel
-      - name: StochasticOxygenBasedCellCycleModel
       - name: SimpleOxygenBasedCellCycleModel
+      - name: StochasticOxygenBasedCellCycleModel
       - name: BiasedBernoulliTrialCellCycleModel
       - name: LabelDependentBernoulliTrialCellCycleModel
       - name: AlwaysDivideCellCycleModel
