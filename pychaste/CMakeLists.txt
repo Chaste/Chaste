@@ -75,7 +75,7 @@ header_dirs(${PYCHASTE_WRAPPER_DIR} PYCHASTE_WRAPPER_INCLUDE_DIRS)
 ##################################################
 set(PYCHASTE_PACKAGE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/package)
 file(
-    COPY ${CMAKE_CURRENT_SOURCE_DIR}/package/
+    COPY ${CMAKE_CURRENT_SOURCE_DIR}/py-src/
     DESTINATION ${PYCHASTE_PACKAGE_BINARY_DIR}/
     PATTERN "*${CMAKE_SHARED_LIBRARY_SUFFIX}" EXCLUDE # Skip shared libraries
 )
