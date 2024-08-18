@@ -73,9 +73,10 @@ header_dirs(${PYCHASTE_WRAPPER_DIR} PYCHASTE_WRAPPER_INCLUDE_DIRS)
 ##################################################
 # Copy Python package structure to build directory
 ##################################################
+set(PYCHASTE_PACKAGE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/package)
 file(
     COPY ${CMAKE_CURRENT_SOURCE_DIR}/package/
-    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/package/
+    DESTINATION ${PYCHASTE_PACKAGE_BINARY_DIR}/
     PATTERN "*${CMAKE_SHARED_LIBRARY_SUFFIX}" EXCLUDE # Skip shared libraries
 )
 
@@ -95,7 +96,7 @@ foreach(module ${PYCHASTE_MODULES})
         ${PYCHASTE_WRAPPER_DIR}/${module}/*.hpp
     )
 
-    set(lib_name _chaste_pychaste_${module})
+    set(lib_name _pychaste_${module})
 
     add_library(
         ${lib_name}
@@ -107,7 +108,7 @@ foreach(module ${PYCHASTE_MODULES})
     set_target_properties(
         ${lib_name}
         PROPERTIES
-            LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/package/chaste/${module}
+            LIBRARY_OUTPUT_DIRECTORY ${PYCHASTE_PACKAGE_BINARY_DIR}/chaste/${module}
             PREFIX "${PYTHON_MODULE_PREFIX}"
             SUFFIX "${CMAKE_SHARED_LIBRARY_SUFFIX}"
     )

@@ -82,30 +82,34 @@ jobs:
 
       - name: Configure
         run: |
-          cd build
-          cmake -DCMAKE_BUILD_TYPE=Release ..
+          cmake -DCMAKE_BUILD_TYPE=Release -DChaste_ENABLE_PYCHASTE=ON ..
+        working-directory: build
 
-      - name: Generate wrappers for comparison
+      - name: Re-generate PyChaste wrappers
         run: |
-          cd build
-          make generate_pychaste_wrappers_diff
+          mv ../pychaste/dynamic/wrappers ../pychaste/dynamic/wrappers.bak
+          make pychaste_wrappers
+          mv ../pychaste/dynamic/wrappers ../pychaste/dynamic/wrappers.gen
+          mv ../pychaste/dynamic/wrappers.bak ../pychaste/dynamic/wrappers
+        working-directory: build
 
-      - name: Compare wrappers
+      - name: Compare existing and generated wrappers
         run: |
-          python -m unittest pychaste/test/python/TestWrapperDiff.py
+          ctest -V -R TestWrapperDiff$
+        working-directory: build
 
       - name: Build
         run: |
-          cd build
-          make -j $(nproc) chaste_pychaste_modules
+          make -j $(nproc) pychaste
+        working-directory: build
 
-      - name: Install
+      - name: Install PyChaste
         run: |
-          cd build/pychaste/python
           pip install --user .
+        working-directory: build/pychaste/package
 
       - name: Run tests
         run: |
-          cd build
           xvfb-run --server-args="-screen 0 1024x768x24" \
             ctest -j $(nproc) -L PyChaste --output-on-failure
+        working-directory: build
