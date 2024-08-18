@@ -1,5 +1,0 @@
-recursive-include doc/tutorials/ *
-include test/cell_based/*.py
-include test/core/*.py
-include test/mesh/*.py
-include test/ode/*.py
