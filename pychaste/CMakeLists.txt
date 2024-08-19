@@ -71,14 +71,33 @@ endforeach()
 header_dirs(${PYCHASTE_WRAPPER_DIR} PYCHASTE_WRAPPER_INCLUDE_DIRS)
 
 ##################################################
-# Copy Python package structure to build directory
+# Copy Python package to build directory
 ##################################################
 set(PYCHASTE_PACKAGE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/package)
+
+set(file_paths "")
 file(
-    COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/py/
-    DESTINATION ${PYCHASTE_PACKAGE_BINARY_DIR}/
-    PATTERN "*${CMAKE_SHARED_LIBRARY_SUFFIX}" EXCLUDE # Skip shared libraries
+    GLOB_RECURSE
+    file_paths
+    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/src/py
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/py/*
 )
+list(FILTER file_paths EXCLUDE REGEX ".*\\.(dll|dylib|so)$") # Remove shared libs
+
+foreach(file_path ${file_paths})
+    if(file_path MATCHES ".*\\.(cfg|in|js|py|toml)$") # Files to track changes on
+        configure_file(
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/py/${file_path}
+            ${PYCHASTE_PACKAGE_BINARY_DIR}/${file_path}
+            COPYONLY
+        )
+    else()
+        file(
+            COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/py/${file_path}
+            DESTINATION ${PYCHASTE_PACKAGE_BINARY_DIR}/
+        )
+    endif()
+endforeach()
 
 ##################################################
 # Build Python modules from wrappers
