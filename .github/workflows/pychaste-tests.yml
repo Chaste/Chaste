@@ -67,18 +67,15 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            castxml \
             python3-matplotlib \
             python3-notebook \
             python3-numpy \
             python3-petsc4py \
             python3-pytest \
-            python3-six \
             python3-vtk7 \
             python3-xvfbwrapper \
             xvfb
           sudo python3 -m pip install --upgrade pip
-          sudo pip install pygccxml pyyaml
 
       - name: Configure
         run: |
@@ -111,5 +108,5 @@ jobs:
       - name: Run tests
         run: |
           xvfb-run --server-args="-screen 0 1024x768x24" \
-            ctest -j $(nproc) -L PyChaste --output-on-failure
+            ctest -j $(nproc) -L pychaste --output-on-failure
         working-directory: build
