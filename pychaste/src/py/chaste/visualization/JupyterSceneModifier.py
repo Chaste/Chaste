@@ -1,4 +1,4 @@
-"""Visualization Module"""
+"""Helper classes for running visualization tests"""
 
 __copyright__ = """Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
@@ -32,17 +32,44 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-import warnings
-
-from chaste.visualization._pychaste_visualization import *
+from chaste.cell_based import VtkSceneModifier2, VtkSceneModifier3
 
 try:
     import IPython
-except ImportError:
-    warnings.warn("Jupyter not found... skipping Jupyter visualization imports.")
-else:
-    from chaste.visualization.JupyterNotebookManager import JupyterNotebookManager
-    from chaste.visualization.JupyterSceneModifier import (
-        JupyterSceneModifier2,
-        JupyterSceneModifier3,
-    )
+except ImportError as e:
+    raise ImportError("Cannot use JupyterSceneModifier without Jupyter.") from e
+
+
+def JupyterSceneModifierFactory(VtkSceneModifier):
+
+    class JupyterSceneModifier(VtkSceneModifier):
+        """Class for real time plotting of output"""
+
+        def __init__(self, plotting_manager):
+            self.output_format = "png"
+            self.plotting_manager = plotting_manager
+            super().__init__()
+
+        def UpdateAtEndOfTimeStep(self, cell_population):
+            """Update the Jupyter notebook plot with the new scene"""
+
+            super().UpdateAtEndOfTimeStep(cell_population)
+
+            IPython.display.clear_output(wait=True)
+
+            if self.output_format == "png":
+                IPython.display.display(
+                    self.plotting_manager.vtk_show(
+                        self.GetVtkScene(), output_format=self.output_format
+                    )
+                )
+            else:
+                self.plotting_manager.vtk_show(
+                    self.GetVtkScene(), output_format=self.output_format
+                )
+
+    return JupyterSceneModifier
+
+
+JupyterSceneModifier2 = JupyterSceneModifierFactory(VtkSceneModifier2)
+JupyterSceneModifier3 = JupyterSceneModifierFactory(VtkSceneModifier3)
