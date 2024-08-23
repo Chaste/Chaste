@@ -242,7 +242,7 @@ public:
          }
 
         /*
-         * Test the solution against the exact solution,
+         * Test the solution against the exact equilibrium solution,
          *
          * u(r,t) = J0(r)/J0(1),
          *

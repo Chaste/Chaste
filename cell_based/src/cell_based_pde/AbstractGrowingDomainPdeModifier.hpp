@@ -106,7 +106,6 @@ public:
      */
     void UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
 
-
     /**
      * Overridden OutputSimulationModifierParameters() method.
      * Output any simulation modifier parameters to file.

@@ -73,7 +73,7 @@ private:
         archive & mStepSize;
         archive & mSetBcsOnBoxBoundary;
         archive & mSetBcsOnBoundingSphere;
-        archive & mSolutionMovingWithCells;
+        archive & mUseVoronoiCellsForInterpolation;
     }
 
 protected:
@@ -107,10 +107,9 @@ protected:
     bool mSetBcsOnBoundingSphere;
 
     /**
-     * Whether to move the solution along with the cells in the cell population.
-     * Default to true.
+     * Whether to use a cell centres voroni region to interpolate the pde solution onto cells.
      */
-    bool mSolutionMovingWithCells;
+    bool mUseVoronoiCellsForInterpolation;
 
 public:
 
@@ -167,16 +166,17 @@ public:
     bool AreBcsSetOnBoundingSphere();
 
     /**
-     * Set mSolutionMovingWithCells.
+     * Set mUseVoronoiCellsForInterpolation.
      *
-     * @param solutionMovingWithCells whether to move the solution with cells (means interpoalation from cells to mesh and mesh to cells at each timestep)
+     * @param useVoronoiCellsForInterpolation whether to use th voronio region of cells for interpolation 
+     * of the solution from the FE mesh to the cells.
      */
-    void SetSolutionMovingWithCells(bool solutionMovingWithCells);
+    void SetUseVoronoiCellsForInterpolation(bool useVoronoiCellsForInterpolation);
 
     /**
-     * @return mSolutionMovingWithCells.
+     * @return mUseVoronoiCellsForInterpolation.
      */
-    bool GetSolutionMovingWithCells();
+    bool GetUseVoronoiCellsForInterpolation();
 
 
     /**
@@ -201,12 +201,21 @@ public:
     virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
 
     /**
-     * Helper method to generate the mesh.
+     * Helper method to generate the pde mesh for the first time.
      *
      * @param pMeshCuboid the outer boundary for the FE mesh.
      * @param stepSize the step size to be used in the FE mesh.
      */
     void GenerateFeMesh(boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid, double stepSize);
+
+    /**
+     * Helper method to generate a pde mesh.
+     *
+     * @param pMeshCuboid the outer boundary for the FE mesh.
+     * @param stepSize the step size to be used in the FE mesh.
+     * @param pMesh a pointer to the mesh to be created
+     */
+    void GenerateAndReturnFeMesh(boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid, double stepSize, TetrahedralMesh<DIM,DIM>* pMesh);
 
     /**
      * Helper method to copy the PDE solution to CellData

@@ -53,7 +53,7 @@ AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(boost::shared_pt
       mStepSize(stepSize),
       mSetBcsOnBoxBoundary(true),
       mSetBcsOnBoundingSphere(false),
-      mSolutionMovingWithCells(false)
+      mUseVoronoiCellsForInterpolation(false)
 {
     if (pMeshCuboid)
     {
@@ -99,15 +99,15 @@ bool AbstractBoxDomainPdeModifier<DIM>::AreBcsSetOnBoundingSphere()
 }
 
 template<unsigned DIM>
-void AbstractBoxDomainPdeModifier<DIM>::SetSolutionMovingWithCells(bool solutionMovingWithCells)
+void AbstractBoxDomainPdeModifier<DIM>::SetUseVoronoiCellsForInterpolation(bool useVoronoiCellsForInterpolation)
 {
-    mSolutionMovingWithCells = solutionMovingWithCells;
+    mUseVoronoiCellsForInterpolation = useVoronoiCellsForInterpolation;
 }
 
 template<unsigned DIM>
-bool AbstractBoxDomainPdeModifier<DIM>::GetSolutionMovingWithCells()
+bool AbstractBoxDomainPdeModifier<DIM>::GetUseVoronoiCellsForInterpolation()
 {
-    return mSolutionMovingWithCells;
+    return mUseVoronoiCellsForInterpolation;
 }
 
 
@@ -312,16 +312,24 @@ void AbstractBoxDomainPdeModifier<DIM>::GenerateFeMesh(boost::shared_ptr<ChasteC
 {
     // Create a regular coarse tetrahedral mesh
     this->mpFeMesh = new TetrahedralMesh<DIM,DIM>();
+    
+    GenerateAndReturnFeMesh(pMeshCuboid, stepSize, this->mpFeMesh);
+}
+
+template<unsigned DIM>
+void AbstractBoxDomainPdeModifier<DIM>::GenerateAndReturnFeMesh(boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid, double stepSize, TetrahedralMesh<DIM,DIM>* pMesh)
+{
+    // Create a regular coarse tetrahedral mesh
     switch (DIM)
     {
         case 1:
-            this->mpFeMesh->ConstructRegularSlabMesh(stepSize, pMeshCuboid->GetWidth(0));
+            pMesh->ConstructRegularSlabMesh(stepSize, pMeshCuboid->GetWidth(0));
             break;
         case 2:
-            this->mpFeMesh->ConstructRegularSlabMesh(stepSize, pMeshCuboid->GetWidth(0), pMeshCuboid->GetWidth(1));
+            pMesh->ConstructRegularSlabMesh(stepSize, pMeshCuboid->GetWidth(0), pMeshCuboid->GetWidth(1));
             break;
         case 3:
-            this->mpFeMesh->ConstructRegularSlabMesh(stepSize, pMeshCuboid->GetWidth(0), pMeshCuboid->GetWidth(1), pMeshCuboid->GetWidth(2));
+            pMesh->ConstructRegularSlabMesh(stepSize, pMeshCuboid->GetWidth(0), pMeshCuboid->GetWidth(1), pMeshCuboid->GetWidth(2));
             break;
         default:
             NEVER_REACHED;
@@ -334,14 +342,14 @@ void AbstractBoxDomainPdeModifier<DIM>::GenerateFeMesh(boost::shared_ptr<ChasteC
 
     // Find the centre of the PDE mesh
     c_vector<double,DIM> centre_of_coarse_mesh = zero_vector<double>(DIM);
-    for (unsigned i=0; i<this->mpFeMesh->GetNumNodes(); i++)
+    for (unsigned i=0; i<pMesh->GetNumNodes(); i++)
     {
-        centre_of_coarse_mesh += this->mpFeMesh->GetNode(i)->rGetLocation();
+        centre_of_coarse_mesh += pMesh->GetNode(i)->rGetLocation();
     }
-    centre_of_coarse_mesh /= this->mpFeMesh->GetNumNodes();
+    centre_of_coarse_mesh /= pMesh->GetNumNodes();
 
     // Now move the mesh to the correct location
-    this->mpFeMesh->Translate(centre_of_cuboid - centre_of_coarse_mesh);
+    pMesh->Translate(centre_of_cuboid - centre_of_coarse_mesh);
 }
 
 template<unsigned DIM>
@@ -350,7 +358,7 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
     // Store the PDE solution in an accessible form
     ReplicatableVector solution_repl(this->mSolution);
 
-    if (!mSolutionMovingWithCells) // Interpolate solutions 
+    if (!mUseVoronoiCellsForInterpolation) // Interpolate solutions 
     {
         for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
             cell_iter != rCellPopulation.End();

@@ -80,7 +80,21 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractBoxDomainPdeModifier<DIM> >(*this);
+        archive & mMoveSolutionWithCells;
+        archive & mOldCellLocations;
     }
+
+    /**
+     * Whether to move the solution along with the cells in the cell population.
+     * Default to true.
+     */
+    bool mMoveSolutionWithCells;
+
+    /**
+     * Map used to calculate displacement of cells if moving pde solution with cells
+     */
+    std::map<CellPtr, c_vector<double, DIM> > mOldCellLocations;
+    
 
 public:
 
@@ -140,7 +154,7 @@ public:
      *
      * Here we assume a homogeneous initial consition. 
      * 
-     * TODO use SetupSolutionVectorFromCells instead!
+     * TODO use InterpolateSolutionFromCellMovement instead!
      *
      * @param rCellPopulation reference to the cell population
      */
@@ -155,7 +169,19 @@ public:
      * 
      * @return the solution interpolated onto the FE Mesh
      */
-    Vec SetupSolutionVectorFromCells(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    Vec InterpolateSolutionFromCellMovement(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+
+    /**
+     * Set mMoveSolutionWithCells.
+     *
+     * @param moveSolutionWithCells whether to move the solution with cells. 
+     */
+    void SetMoveSolutionWithCells(bool moveSolutionWithCells);
+
+    /**
+     * @return mMoveSolutionWithCells.
+     */
+    bool GetMoveSolutionWithCells();
 
     /**
      * Overridden OutputSimulationModifierParameters() method.
