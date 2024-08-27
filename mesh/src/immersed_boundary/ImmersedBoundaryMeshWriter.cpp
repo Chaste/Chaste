@@ -35,11 +35,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ImmersedBoundaryMeshWriter.hpp"
 
+#include "ImmersedBoundaryArray.hpp"
 #include "MathsCustomFunctions.hpp"
 #include "UblasCustomFunctions.hpp"
 #include "Version.hpp"
-
-#include <boost/multi_array.hpp>
 
 /**
  * Convenience collection of iterators, primarily to get compilation to happen.

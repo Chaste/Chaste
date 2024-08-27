@@ -38,6 +38,10 @@ if (Chaste_PROFILE_GPERFTOOLS)
     set(default_flags "${default_flags} -O3")
 endif()
 
+# Allow easier checks in source files for specific compilers. See here for possible
+# values: https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER_ID.html
+add_compile_definitions(Chaste_COMPILER_IS_${CMAKE_CXX_COMPILER_ID})
+
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Cray")
     message(STATUS "\t...for Cray compiler, version ${CMAKE_CXX_COMPILER_VERSION}")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${default_flags} -Wnon-virtual-dtor -Woverloaded-virtual -Wextra -Wno-unused-parameter -Wvla")
