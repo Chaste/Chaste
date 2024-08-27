@@ -67,8 +67,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 #include "UblasVectorInclude.hpp"
 
-#include "Debug.hpp"
-
 
 #ifdef CHASTE_VTK
 typedef VtkMeshReader<3,3> MESH_READER3;
@@ -93,7 +91,7 @@ public:
     /**
      * Check that input files are opened correctly and non-existent input files throw an Exception.
      */
-    void xTestFilesOpen(void)
+    void TestFilesOpen(void)
     {
 #ifdef CHASTE_VTK
         TS_ASSERT_THROWS_NOTHING(MESH_READER3 mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu"));
@@ -107,7 +105,7 @@ public:
     /**
      * Check outputting as a in VTKUnstructuredGrid format.
      */
-    void xTestOutputVtkUnstructuredGrid(void)
+    void TestOutputVtkUnstructuredGrid(void)
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu");
@@ -127,7 +125,7 @@ public:
      * for a given input file is the correct length and that if the input file
      * is corrupted (missing nodes) then an exception is thrown.
      */
-    void xTestGetNextNode(void)
+    void TestGetNextNode(void)
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu");
@@ -157,7 +155,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void xTestGetNextElementData(void)
+    void TestGetNextElementData(void)
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu");
@@ -297,7 +295,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void xTestConstructFromVtkUnstructuredGridObject()
+    void TestConstructFromVtkUnstructuredGridObject()
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader_1("mesh/test/data/cube_2mm_12_elements.vtu");
@@ -324,7 +322,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void xTestGenericReader()
+    void TestGenericReader()
     {
 #ifdef CHASTE_VTK
         std::shared_ptr<AbstractMeshReader<3,3> > p_mesh_reader = GenericMeshReader<3,3>("mesh/test/data/cube_2mm_12_elements.vtu");
@@ -355,7 +353,7 @@ public:
     /**
      * Check that we can build a TetrahedralMesh using the mesh reader.
      */
-    void xTestBuildTetrahedralMeshFromMeshReader(void)
+    void TestBuildTetrahedralMeshFromMeshReader(void)
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/heart_decimation.vtu");
@@ -450,7 +448,7 @@ public:
     /**
      * Check that we can build a DistributedTetrahedralMesh using the VTK mesh reader.
      */
-    void xTestBuildDistributedTetrahedralMeshFromVtkMeshReader(void)
+    void TestBuildDistributedTetrahedralMeshFromVtkMeshReader(void)
     {
  #ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/heart_decimation.vtu");
@@ -513,7 +511,7 @@ public:
     /**
      * Check that we can build a MixedDimensionMesh using the VTK mesh reader.
      */
-    void xTestBuild2DFromVtkMeshReader(void)
+    void TestBuild2DFromVtkMeshReader(void)
     {
 #ifdef CHASTE_VTK
     VtkMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_200_elements.vtu");
@@ -541,7 +539,7 @@ public:
     /**
      * Check that we can build a 2D MixedDimensionMesh using the VTK mesh reader.
      */
-    void xTestBuildMixedMesh2DFromVtkMeshReader(void)
+    void TestBuildMixedMesh2DFromVtkMeshReader(void)
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<2,2> mesh_reader("mesh/test/data/mixed_dimension_meshes/mixed_mesh_2d.vtu");
@@ -573,7 +571,7 @@ public:
     /**
      * Check that we can build a 3D MixedDimensionMesh using the VTK mesh reader.
      */
-    void xTestBuildMixedMeshTetrahedralMeshFromVtkMeshReader(void)
+    void TestBuildMixedMeshTetrahedralMeshFromVtkMeshReader(void)
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/mixed_dimension_meshes/mixed_mesh_3d.vtu");
@@ -605,7 +603,7 @@ public:
     /**
      * Check that we can build a 2D in 3D mesh using the VTK mesh reader.
      */
-    void xTestLoadingSurfaceMeshFromVtkMeshReader(void)
+    void TestLoadingSurfaceMeshFromVtkMeshReader(void)
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<2,3> mesh_reader("mesh/test/data/cylinder.vtu");
@@ -632,7 +630,7 @@ public:
     /**
      * Check that we can build a 1D in 3D Mesh using the VTK mesh reader.
      */
-    void xTestLoading1Din3DMeshFromVtkMeshReader(void)
+    void TestLoading1Din3DMeshFromVtkMeshReader(void)
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<1,3> mesh_reader("mesh/test/data/branched_1d_in_3d_mesh.vtu");
