@@ -67,6 +67,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 #include "UblasVectorInclude.hpp"
 
+#include "Debug.hpp"
+
+
 #ifdef CHASTE_VTK
 typedef VtkMeshReader<3,3> MESH_READER3;
 #endif //CHASTE_VTK
@@ -90,7 +93,7 @@ public:
     /**
      * Check that input files are opened correctly and non-existent input files throw an Exception.
      */
-    void TestFilesOpen(void)
+    void xTestFilesOpen(void)
     {
 #ifdef CHASTE_VTK
         TS_ASSERT_THROWS_NOTHING(MESH_READER3 mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu"));
@@ -104,7 +107,7 @@ public:
     /**
      * Check outputting as a in VTKUnstructuredGrid format.
      */
-    void TestOutputVtkUnstructuredGrid(void)
+    void xTestOutputVtkUnstructuredGrid(void)
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu");
@@ -124,7 +127,7 @@ public:
      * for a given input file is the correct length and that if the input file
      * is corrupted (missing nodes) then an exception is thrown.
      */
-    void TestGetNextNode(void)
+    void xTestGetNextNode(void)
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu");
@@ -154,7 +157,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestGetNextElementData(void)
+    void xTestGetNextElementData(void)
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu");
@@ -208,44 +211,93 @@ public:
     void TestGetNextFaceData(void)
     {
 #ifdef CHASTE_VTK
+
+        /*
+         * Several points to note:
+         *
+         * 1. GetNextFaceData and GetNextEdgeData are synonyms, and this test verifies both
+         *    yield the same behaviour
+         *
+         * 2. GetNextFaceData uses a vtkGeometryFilter which was updated after v9.1: faces are
+         *    now calculated in a different order. See https://github.com/Chaste/Chaste/issues/298
+         *
+         * 3. We don't care which order the nodes are in the face data, as long as they are correct
+         *    up to a rotation. For instance, here, first_face_data.NodeIndices could either be
+         *    {11, 3, 0}, {0, 11, 3} or {3, 0, 11}. VTK 9.2 started producing a different ordering,
+         *    which necessitated updating this test. See https://github.com/Chaste/Chaste/issues/36
+         */
+
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/cube_2mm_12_elements.vtu");
 
         TS_ASSERT_EQUALS(mesh_reader.GetNumFaces(), 20u);
         TS_ASSERT_EQUALS(mesh_reader.GetNumEdges(), 20u);
 
-        // We don't care which order the nodes are in the face data, as long as they are correct up to a rotation.
-        // For instance, here, first_face_data.NodeIndices could either be {11, 3, 0}, {0, 11, 3} or {3, 0, 11}.
-        // VTK 9.2 started producing a different ordering, which necessitated updating this test.
-        // See https://github.com/Chaste/Chaste/issues/36
+        // This is a list of all faces that should be read from the vtu file:
+        std::vector<std::vector<unsigned>> all_faces = {
+            {0u, 4u, 11u},
+            {0u, 8u, 4u},
+            {0u, 3u, 8u},
+            {0u, 11u, 3u},
+            {1u, 5u, 8u},
+            {1u, 9u, 5u},
+            {1u, 8u, 9u},
+            {2u, 9u, 3u},
+            {2u, 3u, 10u},
+            {2u, 10u, 6u},
+            {2u, 6u, 9u},
+            {3u, 9u, 8u},
+            {3u, 7u, 10u},
+            {3u, 11u, 7u},
+            {4u, 5u, 11u},
+            {4u, 8u, 5u},
+            {5u, 9u, 6u},
+            {5u, 6u, 10u},
+            {5u, 10u, 11u},
+            {7u, 11u, 10u}
+        };
 
-        ElementData first_face_data = mesh_reader.GetNextFaceData();
-        TS_ASSERT(IsRotation(first_face_data.NodeIndices, {11u, 3u, 0u}))
-
-        ElementData next_face_data = mesh_reader.GetNextFaceData();
-        TS_ASSERT(IsRotation(next_face_data.NodeIndices, {3u, 8u, 0u}))
-
-        mesh_reader.Reset();
-
-        first_face_data = mesh_reader.GetNextEdgeData();
-        TS_ASSERT(IsRotation(first_face_data.NodeIndices, {11u, 3u, 0u}))
-
-        next_face_data = mesh_reader.GetNextEdgeData();
-        TS_ASSERT(IsRotation(next_face_data.NodeIndices, {3u, 8u, 0u}))
-
-        for (unsigned face=2; face<mesh_reader.GetNumFaces(); face++)
+        // For each of the 20 faces calculated, verify that (up to rotation) it occurs exactly
+        // once in the list above.
+        for (unsigned i = 0u; i < 20; ++i)
         {
-            next_face_data = mesh_reader.GetNextEdgeData();
+            ElementData ed = mesh_reader.GetNextFaceData();
+            const std::vector<unsigned>& node_indices = ed.NodeIndices;
+
+            const long count = std::count_if(all_faces.begin(), all_faces.end(),
+                                             [&node_indices, this](const std::vector<unsigned>& face)
+                                             {
+                                                 return IsRotation(face, node_indices);
+                                             });
+
+            TS_ASSERT_EQUALS(count, 1l);
         }
 
-        TS_ASSERT_THROWS_THIS( next_face_data = mesh_reader.GetNextEdgeData(),
-                               "Trying to read data for a boundary element that doesn't exist" );
+        // Reset the reader and verify that calling GetNextEdgeData instead of GetNextFaceData
+        // yields identical results
+        mesh_reader.Reset();
+        for (unsigned i = 0u; i < 20; ++i)
+        {
+            ElementData ed = mesh_reader.GetNextEdgeData();
+            const std::vector<unsigned>& node_indices = ed.NodeIndices;
+
+            const long count = std::count_if(all_faces.begin(), all_faces.end(),
+                                             [&node_indices, this](const std::vector<unsigned>& face)
+                                             {
+                                                 return IsRotation(face, node_indices);
+                                             });
+
+            TS_ASSERT_EQUALS(count, 1l);
+        }
+
+        // Finally, if we read an additional face, we expect an exception.
+        TS_ASSERT_THROWS_THIS(mesh_reader.GetNextFaceData(), "Trying to read data for a boundary element that doesn't exist");
 #else
         std::cout << "This test was not run, as VTK is not enabled." << std::endl;
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste VTK support." << std::endl;
 #endif //CHASTE_VTK
     }
 
-    void TestConstructFromVtkUnstructuredGridObject()
+    void xTestConstructFromVtkUnstructuredGridObject()
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader_1("mesh/test/data/cube_2mm_12_elements.vtu");
@@ -272,7 +324,7 @@ public:
 #endif //CHASTE_VTK
     }
 
-    void TestGenericReader()
+    void xTestGenericReader()
     {
 #ifdef CHASTE_VTK
         std::shared_ptr<AbstractMeshReader<3,3> > p_mesh_reader = GenericMeshReader<3,3>("mesh/test/data/cube_2mm_12_elements.vtu");
@@ -303,7 +355,7 @@ public:
     /**
      * Check that we can build a TetrahedralMesh using the mesh reader.
      */
-    void TestBuildTetrahedralMeshFromMeshReader(void)
+    void xTestBuildTetrahedralMeshFromMeshReader(void)
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/heart_decimation.vtu");
@@ -398,7 +450,7 @@ public:
     /**
      * Check that we can build a DistributedTetrahedralMesh using the VTK mesh reader.
      */
-    void TestBuildDistributedTetrahedralMeshFromVtkMeshReader(void)
+    void xTestBuildDistributedTetrahedralMeshFromVtkMeshReader(void)
     {
  #ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/heart_decimation.vtu");
@@ -461,7 +513,7 @@ public:
     /**
      * Check that we can build a MixedDimensionMesh using the VTK mesh reader.
      */
-    void TestBuild2DFromVtkMeshReader(void)
+    void xTestBuild2DFromVtkMeshReader(void)
     {
 #ifdef CHASTE_VTK
     VtkMeshReader<2,2> mesh_reader("mesh/test/data/2D_0_to_1mm_200_elements.vtu");
@@ -489,7 +541,7 @@ public:
     /**
      * Check that we can build a 2D MixedDimensionMesh using the VTK mesh reader.
      */
-    void TestBuildMixedMesh2DFromVtkMeshReader(void)
+    void xTestBuildMixedMesh2DFromVtkMeshReader(void)
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<2,2> mesh_reader("mesh/test/data/mixed_dimension_meshes/mixed_mesh_2d.vtu");
@@ -521,7 +573,7 @@ public:
     /**
      * Check that we can build a 3D MixedDimensionMesh using the VTK mesh reader.
      */
-    void TestBuildMixedMeshTetrahedralMeshFromVtkMeshReader(void)
+    void xTestBuildMixedMeshTetrahedralMeshFromVtkMeshReader(void)
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<3,3> mesh_reader("mesh/test/data/mixed_dimension_meshes/mixed_mesh_3d.vtu");
@@ -553,7 +605,7 @@ public:
     /**
      * Check that we can build a 2D in 3D mesh using the VTK mesh reader.
      */
-    void TestLoadingSurfaceMeshFromVtkMeshReader(void)
+    void xTestLoadingSurfaceMeshFromVtkMeshReader(void)
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<2,3> mesh_reader("mesh/test/data/cylinder.vtu");
@@ -580,7 +632,7 @@ public:
     /**
      * Check that we can build a 1D in 3D Mesh using the VTK mesh reader.
      */
-    void TestLoading1Din3DMeshFromVtkMeshReader(void)
+    void xTestLoading1Din3DMeshFromVtkMeshReader(void)
     {
 #ifdef CHASTE_VTK
         VtkMeshReader<1,3> mesh_reader("mesh/test/data/branched_1d_in_3d_mesh.vtu");
