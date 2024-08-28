@@ -250,7 +250,10 @@ public:
         TS_ASSERT_EQUALS(simulator.GetIdentifier(), "OffLatticeSimulation-2-2");
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (0.0, -0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -359,7 +362,10 @@ public:
         simulator.SetEndTime(0.5);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, 0.0, -0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -438,7 +444,10 @@ public:
         simulator.SetEndTime(0.5);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, 0.0, -0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -518,7 +527,10 @@ public:
         simulator.SetEndTime(1.0/120.0);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (0.0, -0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -611,10 +623,16 @@ public:
         simulator.SetEndTime(0.05);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0, -0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
+        
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde2, (cell_population, 0.0, -0.5));
+        linear_coefficient = -0.5;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde2, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
+        
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
         c_vector<double,2> centroid = cell_population.GetCentroidOfCellPopulation();
@@ -755,7 +773,10 @@ public:
         simulator.SetEndTime(0.05);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0, 0.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = 0.0;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -827,7 +848,10 @@ public:
         simulator.SetEndTime(0.2);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (0.0, -0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -919,7 +943,10 @@ public:
         simulator.SetEndTime(end_time);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, 0.0, -0.03));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.03;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -985,7 +1012,10 @@ public:
         simulator.SetEndTime(0.1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(UniformSourceEllipticPde<3>, p_pde, (0.0, -0.03));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.03;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(UniformSourceEllipticPde<3>, p_pde, (constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<3>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -1100,7 +1130,10 @@ public:
         TS_ASSERT_EQUALS(simulator.GetIdentifier(), "OffLatticeSimulation-2-2");
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, 0.0, -0.03));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.03;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -1165,7 +1198,10 @@ public:
         simulator.SetEndTime(0.01);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0, 0.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = 0.0;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -1243,7 +1279,11 @@ public:
         simulator.SetEndTime(0.01);
 
         // Create PDE and boundary condition objects (zero uptake to check analytic solution)
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0, 0.0));
+        
+        double constant_coefficient = 0.0;
+        double linear_coefficient = 0.0;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -1340,7 +1380,11 @@ public:
         simulator.SetEndTime(0.01);
 
         // Create PDE and boundary condition objects (uniform uptake at each cell)
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0, -0.01, 1.0, true));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.01;
+        double diffusion_coefficient = 1.0;
+        bool is_volume_scaled = true;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, is_volume_scaled));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -1426,7 +1470,11 @@ public:
         simulator.SetEndTime(0.01);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<1>, p_pde, (cell_population, 0.0, -1.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -1.0;
+        double diffusion_coefficient = 1.0;
+        bool is_volume_scaled = false;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<1>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, is_volume_scaled));
         MAKE_PTR_ARGS(ConstBoundaryCondition<1>, p_bc, (0.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -1490,7 +1538,11 @@ public:
         simulator.SetEndTime(0.01);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0, -0.01));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.01;
+        double diffusion_coefficient = 1.0;
+        bool is_volume_scaled = false;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, is_volume_scaled));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -1552,7 +1604,11 @@ public:
         simulator.SetEndTime(0.01);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<3>, p_pde, (cell_population, 0.0, -0.01));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.01;
+        double diffusion_coefficient = 1.0;
+        bool is_volume_scaled = false;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<3>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, is_volume_scaled));
         MAKE_PTR_ARGS(ConstBoundaryCondition<3>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE

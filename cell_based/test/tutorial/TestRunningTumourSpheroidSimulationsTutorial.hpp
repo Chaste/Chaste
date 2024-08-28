@@ -201,8 +201,11 @@ public:
          * takes the value $-0.03$ (the coefficient below) and $b(x,y)$ takes the value $0$ (the coefficient below) if the cell located at $(x,y)$ is a
          * live cell, and zero if the cell has died due to oxygen deprivation.
          */
-        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, 0.0, -0.03));
-
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.03;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
+       
         /*
          * We also create a constant-valued boundary condition to associate with the PDE.
          * This boundary condition object takes in a single argument in its constructor,

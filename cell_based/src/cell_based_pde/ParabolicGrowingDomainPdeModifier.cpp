@@ -131,6 +131,7 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainP
              ++node_iter)
         {
             p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpBoundaryCondition.get());
+            this->mIsDirichletBoundaryNode[(*node_iter)->GetIndex()] = 1.0;
         }
     }
 

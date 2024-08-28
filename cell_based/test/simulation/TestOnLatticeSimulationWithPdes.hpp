@@ -123,7 +123,11 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetEndTime(0.1);
 
         // Create PDE and boundary condition objects (zero uptake to check analytic solution)
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0, 0.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.0;
+        double diffusion_coefficient = 1.0;
+        bool is_volume_scaled = false;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, is_volume_scaled));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -209,7 +213,11 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetEndTime(1);
 
         // Create PDE and boundary condition objects (zero uptake to check analytic solution)
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0, 0.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.0;
+        double diffusion_coefficient = 1.0;
+        bool is_volume_scaled = false;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, is_volume_scaled));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -287,7 +295,11 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetEndTime(1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, 0.0, 0.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = 0.0;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
+        
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -343,7 +355,10 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetEndTime(1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, 0.0, 0.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = 0.0;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -394,7 +409,11 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetEndTime(1);
 
         // Create PDE and boundary condition objects (use zero uptake to check analytic solution)
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0, 0.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.0;
+        double diffusion_coefficient = 1.0;
+        bool is_volume_scaled = false;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, is_volume_scaled));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -452,7 +471,11 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetEndTime(1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0, 0.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.0;
+        double diffusion_coefficient = 1.0;
+        bool is_volume_scaled = false;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, is_volume_scaled));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -495,7 +518,11 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetEndTime(0.1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0, 0.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.0;
+        double diffusion_coefficient = 1.0;
+        bool is_volume_scaled = false;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, is_volume_scaled));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -584,10 +611,14 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetEndTime(0.1);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde_1, (cell_population, 0.0, 0.0));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.0;
+        double diffusion_coefficient = 1.0;
+        bool is_volume_scaled = false;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde_1, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, is_volume_scaled));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc_1, (1.0));
 
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde_2, (cell_population, 0.0, 0.0));
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde_2, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, is_volume_scaled));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc_2, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -672,8 +703,11 @@ class TestOnLatticeSimulationWithPdes : public AbstractCellBasedWithTimingsTestS
         simulator.SetEndTime(10);
 
         // Create PDE and boundary condition objects
-        double nutrient_uptake_rate = -0.1;
-        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, 0.0, nutrient_uptake_rate));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        bool is_volume_scaled = false;
+        MAKE_PTR_ARGS(AveragedSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, is_volume_scaled));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE

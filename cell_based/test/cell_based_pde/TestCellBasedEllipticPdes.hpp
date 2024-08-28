@@ -66,7 +66,10 @@ public:
     void TestUniformSourceEllipticPdeMethods()
     {
         // Create PDE object
-        UniformSourceEllipticPde<2> pde(0.01, 0.05, 0.02);
+        double constant_coefficient = 0.01;
+        double linear_coefficient = 0.05;
+        double diffusion_coefficient = 0.02;
+        UniformSourceEllipticPde<2> pde(constant_coefficient, linear_coefficient, diffusion_coefficient);
 
         // Test that the member variables have been initialised correctly
         TS_ASSERT_DELTA(pde.GetConstantCoefficient(), 0.01, 1e-6);
@@ -110,7 +113,10 @@ public:
 
         {
             // Create a PDE object
-            AbstractLinearEllipticPde<2,2>* const p_pde = new UniformSourceEllipticPde<2>(0.01, 0.05, 0.02);
+            double constant_coefficient = 0.01;
+            double linear_coefficient = 0.05;
+            double diffusion_coefficient = 0.02;
+            AbstractLinearEllipticPde<2,2>* const p_pde = new UniformSourceEllipticPde<2>(constant_coefficient, linear_coefficient, diffusion_coefficient);
 
             // Create output archive and archive PDE object
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -155,7 +161,10 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create a PDE object
-        CellwiseSourceEllipticPde<2> pde(cell_population, 0.01, 0.05, 2.0);
+        double constant_coefficient = 0.01;
+        double linear_coefficient = 0.05;
+        double diffusion_coefficient = 2.0;
+        CellwiseSourceEllipticPde<2> pde(cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient);
 
         // Test that the member variables have been initialised correctly
         TS_ASSERT_EQUALS(&(pde.rGetCellPopulation()), &cell_population);
@@ -190,7 +199,11 @@ public:
         TS_ASSERT_DELTA(pde.ComputeLinearInUCoeffInSourceTermAtNode(*p_node_1), 0.05, 1e-6);
 
         // Create a scaled PDE object
-        CellwiseSourceEllipticPde<2> scaled_pde(cell_population, 0.01, 0.05, 2.0, true);
+        constant_coefficient = 0.01;
+        linear_coefficient = 0.05;
+        diffusion_coefficient = 2.0;
+        double is_scaled_by_volume = true;
+        CellwiseSourceEllipticPde<2> scaled_pde(cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, is_scaled_by_volume);
 
         // Test that the member variables have been initialised correctly
         TS_ASSERT_EQUALS(&(scaled_pde.rGetCellPopulation()), &cell_population);
@@ -236,7 +249,11 @@ public:
 
         {
             // Create a PDE object
-            AbstractLinearEllipticPde<2,2>* const p_pde = new CellwiseSourceEllipticPde<2>(cell_population, 0.01, 0.05, 2.0, true);
+            double constant_coefficient = 0.01;
+            double linear_coefficient = 0.05;
+            double diffusion_coefficient = 2.0;
+            bool scale_by_volume = true;
+            AbstractLinearEllipticPde<2,2>* const p_pde = new CellwiseSourceEllipticPde<2>(cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, scale_by_volume);
 
             // Create output archive and archive PDE object
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -287,7 +304,11 @@ public:
         fe_mesh.Scale(10.0, 10.0);
 
         // Create a PDE object
-        AveragedSourceEllipticPde<2> pde(cell_population, 0.01, 0.05, 2.0);
+        double constant_coefficient = 0.01;
+        double linear_coefficient = 0.05;
+        double diffusion_coefficient = 2.0;
+        bool scale_by_volume = false;
+        AveragedSourceEllipticPde<2> pde(cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, scale_by_volume);
 
         // Test that the member variables have been initialised correctly
         TS_ASSERT_EQUALS(&(pde.rGetCellPopulation()), &cell_population);
@@ -349,7 +370,11 @@ public:
         // Bound the voronoi tesselation so no zero cell areas and 
         // create a scaled PDE object
         cell_population.SetBoundVoronoiTessellation(true);
-        AveragedSourceEllipticPde<2> scaled_pde(cell_population, 0.01, 0.05, 2.0, true);
+        constant_coefficient = 0.01;
+        linear_coefficient = 0.05;
+        diffusion_coefficient = 2.0;
+        scale_by_volume = true;
+        AveragedSourceEllipticPde<2> scaled_pde(cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, scale_by_volume);
 
         // Test that the member variables have been initialised correctly
         TS_ASSERT_EQUALS(&(scaled_pde.rGetCellPopulation()), &cell_population);
@@ -400,7 +425,12 @@ public:
         // Note some cells have zero volume as Voronoi rtesselation isn't bounded
         TS_ASSERT_DELTA(tissue_area, 9.9592, 1e-4);
 
-        AveragedSourceEllipticPde<2> scaled_pde_2(cell_population, 0.01, 0.05, 2.0, true);
+        constant_coefficient = 0.01;
+        linear_coefficient = 0.05;
+        diffusion_coefficient = 2.0;
+        scale_by_volume = true;
+        AveragedSourceEllipticPde<2> scaled_pde_2(cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, scale_by_volume);
+
         TS_ASSERT_THROWS_THIS(scaled_pde_2.SetupSourceTerms(fe_mesh), "The volume of one of the cells is 0 and you are scaling by cell volume. Either turn scaling off or use a cell model with non zero areas (i.e. a Bounded Voronoi Tesselation model).");
     }
 
