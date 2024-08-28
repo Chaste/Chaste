@@ -59,6 +59,7 @@ void PetscVecTools::SetElement(Vec vector, PetscInt row, double value)
     if (row >= lo && row < hi)
     {
         VecSetValues(vector, 1, &row, &value, INSERT_VALUES);
+        Finalise(vector);
     }
 }
 
@@ -70,6 +71,7 @@ void PetscVecTools::AddToElement(Vec vector, PetscInt row, double value)
     if (row >= lo && row < hi)
     {
         VecSetValues(vector, 1, &row, &value, ADD_VALUES);
+        Finalise(vector);
     }
 }
 

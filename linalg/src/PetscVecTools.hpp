@@ -172,6 +172,7 @@ public:
                          indices_owned,
                          smallVector.data(),
                          ADD_VALUES);
+            Finalise(vector);
         }
         else
         {
@@ -196,6 +197,7 @@ public:
                          indices_owned,
                          values,
                          ADD_VALUES);
+            Finalise(vector);
         }
     }
 
