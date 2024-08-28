@@ -85,8 +85,12 @@ public:
 
     void TestParabolicConstructor()
     {
-        // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(UniformSourceParabolicPde<2>, p_pde, (-0.1));
+        // Create PDE and boundary condition objects 
+        double constant_coefficient = -0.1;
+        double linear_coefficient = -0.2;
+        double diffusion_coefficient = 0.1;
+        double rate_coefficient = 0.1;
+        MAKE_PTR_ARGS(UniformSourceParabolicPde<2>, p_pde, (constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -152,7 +156,11 @@ public:
         // Separate scope to write the archive
         {
             // Create PDE and boundary condition objects
-            MAKE_PTR_ARGS(UniformSourceParabolicPde<2>, p_pde, (-0.1));
+            double constant_coefficient = -0.1;
+            double linear_coefficient = -0.2;
+            double diffusion_coefficient = 0.1;
+            double rate_coefficient = 0.1;
+            MAKE_PTR_ARGS(UniformSourceParabolicPde<2>, p_pde, (constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient));
             MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
             // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -221,10 +229,14 @@ public:
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
         // Set up simulation time for file output
-        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(100.0, 4);
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(100.0, 10);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, 1, 1, 1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = 1.0;
+        double diffusion_coefficient = 1.0;
+        double rate_coefficient = 1.0;
+        MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -234,7 +246,7 @@ public:
         p_pde_modifier->SetupSolve(cell_population,"TestCellwiseParabolicPdeWithMeshOnDisk");
 
         // Run for 4 time steps
-        for (unsigned i=0; i<4; i++)
+        for (unsigned i=0; i<10; i++)
         {
             SimulationTime::Instance()->IncrementTimeOneStep();
             p_pde_modifier->UpdateAtEndOfTimeStep(cell_population);
@@ -295,7 +307,11 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(100.0, 2);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, 1, 1, 1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = 1.0;
+        double diffusion_coefficient = 1.0;
+        double rate_coefficient = 1.0;
+        MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -367,7 +383,11 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0, 10);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, 1, 1, 1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = 1.0;
+        double diffusion_coefficient = 1.0;
+        double rate_coefficient = 1.0;
+        MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -427,7 +447,11 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(10.0, 10);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, 0.1, 1, -0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        double rate_coefficient = 0.1;
+        MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -448,7 +472,7 @@ public:
         CellPtr p_cell_14 = cell_population.GetCellUsingLocationIndex(14);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_14)[0], 2.0, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_14)[1], sqrt(3.0), 1e-4);
-        TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9604, 1e-4);
+        TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9550, 1e-4);
     }
 
     void TestNodeBasedSquareMonolayer()
@@ -485,7 +509,11 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(10.0, 10);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, 0.1, 1, -0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        double rate_coefficient = 0.1;
+        MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -507,9 +535,6 @@ public:
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_14)[0], 2.0, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_14)[1], sqrt(3.0), 1e-4);
         TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9550, 1e-4);
-
-        // Compare with the mesh-based cell population result
-        TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9604, 1e-1);
 
         // Clear memory
         delete p_mesh;
@@ -550,7 +575,11 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(10.0, 10);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, 0.1, 1, -0.1));
+        double constant_coefficient = -0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        double rate_coefficient = 0.1;
+        MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -573,8 +602,8 @@ public:
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_14)[1], sqrt(3.0), 1e-4);
         TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9567, 1e-4);
 
-        // Compare with the mesh-based cell population result
-        TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9604, 1e-1);
+        // Compare with the mesh-based and node basedcell population result
+        TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9550, 1e-2);
     }
 
     void TestPottsBasedSquareMonolayer()
@@ -613,7 +642,11 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(10.0, 10);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, 0.1, 1, -0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        double rate_coefficient = 0.1;
+        MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -636,8 +669,8 @@ public:
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_14)[1], sqrt(3.0), 1e-4);
         TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9503, 1.2e-3); // Intel optimised build has a slightly different result here
 
-        // Compare with the mesh-based cell population result
-        TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9604, 1e-1);
+        // Compare with the mesh-based and node based cell population result
+        TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9550, 1e-2);
     }
 
     void TestCaBasedSquareMonolayer()
@@ -682,7 +715,11 @@ public:
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(10.0, 10);
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, 0.1, 1, -0.1));
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.1;
+        double diffusion_coefficient = 1.0;
+        double rate_coefficient = 0.1;
+        MAKE_PTR_ARGS(CellwiseSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a PDE modifier and set the name of the dependent variable in the PDE
@@ -705,8 +742,8 @@ public:
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_14)[1], sqrt(3.0), 1e-4);
         TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9503, 4e-3); // Low threshold as slightly different on Intel
 
-        // Compare with the mesh-based cell population result (low error as mesh is slightly larger than for centre-based models)
-        TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9604, 1e-1);
+        // Compare with the mesh-based and node based cell population result (low error as mesh is slightly larger than for centre-based models)
+        TS_ASSERT_DELTA(p_cell_14->GetCellData()->GetItem("variable"), 0.9550, 1e-2);
     }
 };
 

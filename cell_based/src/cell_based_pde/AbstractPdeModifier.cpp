@@ -212,6 +212,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
         }
 
         p_vtk_mesh_writer->AddPointData(mDependentVariableName, pde_solution);
+        p_vtk_mesh_writer->AddPointData("IsDirichletBoundaryNode", mIsDirichletBoundaryNode);
 
         p_vtk_mesh_writer->WriteFilesUsingMesh(*mpFeMesh);
         delete p_vtk_mesh_writer;

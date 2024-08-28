@@ -68,7 +68,12 @@ public:
     void TestUniformSourceParabolicPdeMethods()
     {
         // Create a PDE object
-        UniformSourceParabolicPde<2> pde(0.01, 0.05, 0.02, 0.1);
+        // Create PDE and boundary condition objects
+        double constant_coefficient = 0.01;
+        double linear_coefficient = 0.05;
+        double diffusion_coefficient = 0.02;
+        double rate_coefficient = 0.1;
+        UniformSourceParabolicPde<2> pde(constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient);
 
         // Test that the member variables have been initialised correctly
         TS_ASSERT_DELTA(pde.GetConstantCoefficient(), 0.01, 1e-6);
@@ -106,7 +111,11 @@ public:
 
         {
             // Create a PDE object
-            AbstractLinearParabolicPde<2,2>* const p_pde = new UniformSourceParabolicPde<2>(0.01, 0.05, 0.02, 0.1);
+            double constant_coefficient = 0.01;
+            double linear_coefficient = 0.05;
+            double diffusion_coefficient = 0.02;
+            double rate_coefficient = 0.1;
+            AbstractLinearParabolicPde<2,2>* const p_pde = new UniformSourceParabolicPde<2>(constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient);
 
             // Create output archive and archive PDE object
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -309,7 +318,11 @@ public:
         fe_mesh.Scale(10.0, 10.0);
 
         // Create a PDE object
-        AveragedSourceParabolicPde<2> pde(cell_population, 0.01, 0.05, 2.0, 0.001);
+        double constant_coefficient = 0.01;
+        double linear_coefficient = 0.05;
+        double diffusion_coefficient = 2.0;
+        double rate_coefficient = 0.001;
+        AveragedSourceParabolicPde<2> pde(cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient);
 
         // Test that the member variables have been initialised correctly
         TS_ASSERT_EQUALS(&(pde.rGetCellPopulation()), &cell_population);
@@ -369,13 +382,19 @@ public:
         // Bound the voronoi tesselation so no zero cell areas and 
         // create a scaled PDE object
         cell_population.SetBoundVoronoiTessellation(true);
-        AveragedSourceParabolicPde<2> scaled_pde(cell_population, 0.01, 0.05, 2.0, 0.001, true);
+        constant_coefficient = 0.01;
+        linear_coefficient = 0.05;
+        diffusion_coefficient = 2.0;
+        rate_coefficient = 0.001;
+        bool scale_by_cell_volume = true;
+        AveragedSourceParabolicPde<2> scaled_pde(cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient, scale_by_cell_volume);
 
         // Test that the member variables have been initialised correctly
         TS_ASSERT_EQUALS(&(scaled_pde.rGetCellPopulation()), &cell_population);
         TS_ASSERT_DELTA(scaled_pde.GetConstantCoefficient(), 0.01, 1e-6);
         TS_ASSERT_DELTA(scaled_pde.GetLinearCoefficient(), 0.05, 1e-6);
         TS_ASSERT_DELTA(scaled_pde.GetDiffusionCoefficient(), 2.0, 1e-6);
+        TS_ASSERT_DELTA(scaled_pde.GetDuDtCoefficient(), 0.001, 1e-6);
         TS_ASSERT(scaled_pde.GetScaleByCellVolume());
 
         // Test SetupSourceTerms() when no map between cells and coarse mesh elements is supplied
@@ -441,7 +460,12 @@ public:
 
         {
             // Create a PDE object
-            AbstractLinearParabolicPde<2,2>* const p_pde = new AveragedSourceParabolicPde<2>(cell_population, 0.01, 0.05, 2.0, 0.001, true);
+            double constant_coefficient = 0.01;
+            double linear_coefficient = 0.05;
+            double diffusion_coefficient = 2.0;
+            double rate_coefficient = 0.001;
+            bool scale_by_cell_volume = true;  
+            AbstractLinearParabolicPde<2,2>* const p_pde = new AveragedSourceParabolicPde<2>(cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient, scale_by_cell_volume);
 
             // Create output archive and archive PDE object
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);

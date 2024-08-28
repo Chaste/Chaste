@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractBoxDomainPdeModifier.hpp"
 #include "ReplicatableVector.hpp"
 #include "LinearBasisFunction.hpp"
-#include "Debug.hpp"
 
 template<unsigned DIM>
 AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
@@ -53,13 +52,16 @@ AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(boost::shared_pt
       mStepSize(stepSize),
       mSetBcsOnBoxBoundary(true),
       mSetBcsOnBoundingSphere(false),
-      mUseVoronoiCellsForInterpolation(false)
+      mUseVoronoiCellsForInterpolation(false),
+      mTypicalCellRadius(0.5) // defaults to 0.5
 {
     if (pMeshCuboid)
     {
         // We only need to generate mpFeMesh once, as it does not vary with time
         this->GenerateFeMesh(mpMeshCuboid, mStepSize);
         this->mDeleteFeMesh = true;
+        //initialise the boundary nodes
+        this->mIsDirichletBoundaryNode = std::vector<double>(this->mpFeMesh->GetNumNodes(), 0.0);
     }
 }
 
@@ -110,6 +112,18 @@ bool AbstractBoxDomainPdeModifier<DIM>::GetUseVoronoiCellsForInterpolation()
     return mUseVoronoiCellsForInterpolation;
 }
 
+template<unsigned DIM>
+void AbstractBoxDomainPdeModifier<DIM>::SetTypicalCellRadius(double typicalCellRadius)
+{
+    assert(mTypicalCellRadius>=0.0);
+    mTypicalCellRadius = typicalCellRadius;
+}
+
+template<unsigned DIM>
+double AbstractBoxDomainPdeModifier<DIM>::GetTypicalCellRadius()
+{
+    return mTypicalCellRadius;
+}
 
 template<unsigned DIM>
 void AbstractBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainerHelper(AbstractCellPopulation<DIM,DIM>& rCellPopulation,
@@ -179,14 +193,14 @@ void AbstractBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainerHelp
                 {
                     double radius = norm_2(tissue_centre - this->mpFeMesh->GetNode(i)->rGetLocation());
                     
-                    if (radius >= tissue_radius)
+                    if (radius > tissue_radius)
                     {
                         pBcc->AddDirichletBoundaryCondition(this->mpFeMesh->GetNode(i), this->mpBoundaryCondition.get(), 0, false);
+                        this->mIsDirichletBoundaryNode[i] = 1.0;
                     }
                 }
             }
         }
-
         else // Set pde nodes as boundary node if elements dont contain cells or nodes aren't within 0.5CD of a cell centre
         {
             // Get the set of coarse element indices that contain cells
@@ -213,7 +227,7 @@ void AbstractBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainerHelp
                 }
             }
 
-            // Also remove nodes that are within the average cell radius from the centre of a cell.
+            // Also remove nodes that are within the typical cell radius from the centre of a cell.
             std::set<unsigned> nearby_node_indices;
             for (std::set<unsigned>::iterator node_iter = coarse_mesh_boundary_node_indices.begin();
                 node_iter != coarse_mesh_boundary_node_indices.end();
@@ -230,9 +244,8 @@ void AbstractBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainerHelp
                     const ChastePoint<DIM>& r_position_of_cell = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
 
                     double separation = norm_2(node_location - r_position_of_cell.rGetLocation());
-                    double cell_radius = 0.5;
 
-                    if (separation < cell_radius)
+                    if (separation <= mTypicalCellRadius)
                     {
                         remove_node = true;
                         break;
@@ -268,11 +281,12 @@ void AbstractBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainerHelp
                     ++iter)
                 {
                     pBcc->AddDirichletBoundaryCondition(this->mpFeMesh->GetNode(*iter), this->mpBoundaryCondition.get(), 0, false);
+                    this->mIsDirichletBoundaryNode[*iter] = 1.0;
                 }
             }
         }
     }
-    else // Apply BC at boundary nodes of box domain FE mesh
+    else // Apply BC at boundary of box domain FE mesh
     {
         if (this->IsNeumannBoundaryCondition())
         {
@@ -292,6 +306,7 @@ void AbstractBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainerHelp
                  ++node_iter)
             {
                 pBcc->AddDirichletBoundaryCondition(*node_iter, this->mpBoundaryCondition.get());
+                this->mIsDirichletBoundaryNode[(*node_iter)->GetIndex()] = 1.0;
             }
         }
     }
@@ -358,7 +373,79 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
     // Store the PDE solution in an accessible form
     ReplicatableVector solution_repl(this->mSolution);
 
-    if (!mUseVoronoiCellsForInterpolation) // Interpolate solutions 
+    if (mUseVoronoiCellsForInterpolation) 
+    {
+        unsigned num_nodes = rCellPopulation.GetNumNodes();
+
+        std::vector<double> cell_data(num_nodes, -1);
+        std::vector<unsigned> num_cells(num_nodes, -1);
+        
+        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+            cell_iter != rCellPopulation.End();
+            ++cell_iter)
+        {
+            unsigned cell_location_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+            cell_data[cell_location_index]=0.0;
+            num_cells[cell_location_index]=0;    
+        }
+
+        // Loop over nodes of the finite element mesh and work out which voronoi region the node is in.
+        for (typename TetrahedralMesh<DIM,DIM>::NodeIterator node_iter = this->mpFeMesh->GetNodeIteratorBegin();
+                node_iter != this->mpFeMesh->GetNodeIteratorEnd();
+                ++node_iter)
+        {
+            unsigned node_index = node_iter->GetIndex();
+
+            c_vector<double,DIM> node_location = node_iter->rGetLocation();
+
+            double closest_separation = DBL_MAX;
+            unsigned nearest_cell = UNSIGNED_UNSET;
+
+            for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+                cell_iter != rCellPopulation.End();
+                ++cell_iter)
+            {
+                c_vector<double, DIM> cell_location = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
+
+                double separation = norm_2(node_location - cell_location);
+
+                if (separation < closest_separation)
+                {
+                    closest_separation = separation;
+                    nearest_cell = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+                }                
+            }
+            assert(closest_separation<DBL_MAX);
+
+            cell_data[nearest_cell] = cell_data[nearest_cell] + solution_repl[node_index];
+            num_cells[nearest_cell] = num_cells[nearest_cell] + 1;
+        }   
+        
+        // Now calculate the solution in the cell by averaging over all nodes in the voronoi region.
+        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
+        cell_iter != rCellPopulation.End();
+        ++cell_iter)
+        {
+            unsigned cell_location_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);   
+
+            
+            if (num_cells[cell_location_index]==0)
+            {
+                EXCEPTION("One or more of the cells doesnt contain any pde nodes so cant use voroni CellData calculation in the ");
+            }
+
+            double  solution_at_cell = cell_data[cell_location_index]/num_cells[cell_location_index];
+            
+            cell_iter->GetCellData()->SetItem(this->mDependentVariableName, solution_at_cell);
+        }
+
+        if (this->mOutputGradient)
+        {
+            // This isnt implemented yet
+            NEVER_REACHED;
+        }
+    }  
+    else // Interpolate solutions 
     {
         for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
             cell_iter != rCellPopulation.End();
@@ -425,92 +512,7 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
                 }
             }
         }
-    }
-    else // Solution moving with cells so do voroni region update
-    {
-        unsigned num_nodes = rCellPopulation.GetNumNodes();
-
-        std::vector<double> cell_data(num_nodes, -1);
-        std::vector<unsigned> num_cells(num_nodes, -1);
-        std::vector<unsigned> max_data(num_nodes, -1);
-        
-
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
-            cell_iter != rCellPopulation.End();
-            ++cell_iter)
-        {
-            unsigned cell_location_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
-            cell_data[cell_location_index]=0.0;
-            num_cells[cell_location_index]=0;    
-        }
-
-        // Loop over nodes of the finite element mesh and work out which voronoi region the node is in.
-        for (typename TetrahedralMesh<DIM,DIM>::NodeIterator node_iter = this->mpFeMesh->GetNodeIteratorBegin();
-                node_iter != this->mpFeMesh->GetNodeIteratorEnd();
-                ++node_iter)
-        {
-            unsigned node_index = node_iter->GetIndex();
-
-            c_vector<double,DIM> node_location = node_iter->rGetLocation();
-
-            double closest_separation = DBL_MAX;
-            unsigned nearest_cell = UNSIGNED_UNSET;
-
-            for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
-                cell_iter != rCellPopulation.End();
-                ++cell_iter)
-            {
-                c_vector<double, DIM> cell_location = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
-
-                double separation = norm_2(node_location - cell_location);
-
-                if (separation < closest_separation)
-                {
-                    closest_separation = separation;
-                    nearest_cell = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
-                }                
-            }
-            assert(closest_separation<DBL_MAX);
-
-
-            if(solution_repl[node_index] > max_data[nearest_cell])
-            {
-                max_data[nearest_cell] = solution_repl[node_index];
-            }
-//PRINT_VARIABLE(solution_repl[node_index]);
-            cell_data[nearest_cell] = cell_data[nearest_cell] + solution_repl[node_index];
-            num_cells[nearest_cell] = num_cells[nearest_cell] + 1;
-
-        }   
-        
-        // Now calculate the solution in the cell by averaging over all nodes in the voronoi region.
-        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
-        cell_iter != rCellPopulation.End();
-        ++cell_iter)
-        {
-            unsigned cell_location_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);   
-
-            assert(cell_data[cell_location_index]>-1);
-            assert(num_cells[cell_location_index]>0);
-
-            double solution_at_cell = 0.0;
-            
-            //solution_at_cell = max_data[cell_location_index];
-
-            if (cell_data[cell_location_index] >1e-12)
-            {
-                solution_at_cell = cell_data[cell_location_index]/num_cells[cell_location_index];
-            }
-//PRINT_3_VARIABLES(cell_data[cell_location_index],num_cells[cell_location_index],solution_at_cell);
-            
-            cell_iter->GetCellData()->SetItem(this->mDependentVariableName, solution_at_cell);
-        }
-
-        if (this->mOutputGradient)
-        {
-            NEVER_REACHED;
-        }
-    }    
+    }     
 }
 
 template<unsigned DIM>

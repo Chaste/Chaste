@@ -74,6 +74,7 @@ private:
         archive & mSetBcsOnBoxBoundary;
         archive & mSetBcsOnBoundingSphere;
         archive & mUseVoronoiCellsForInterpolation;
+        archive & mTypicalCellRadius;
     }
 
 protected:
@@ -110,6 +111,14 @@ protected:
      * Whether to use a cell centres voroni region to interpolate the pde solution onto cells.
      */
     bool mUseVoronoiCellsForInterpolation;
+
+    /** 
+     * Used to define if a FE node is within a certain radius of a cell centre to help define
+     * boundary conditions when mSetBcsOnBoxBoundary and mSetBcsOnBoundingSphere are false 
+     * 
+     * defaults to 0.5 CD
+     */
+    double mTypicalCellRadius;
 
 public:
 
@@ -168,7 +177,7 @@ public:
     /**
      * Set mUseVoronoiCellsForInterpolation.
      *
-     * @param useVoronoiCellsForInterpolation whether to use th voronio region of cells for interpolation 
+     * @param useVoronoiCellsForInterpolation whether to use the voroni region of cells for interpolation 
      * of the solution from the FE mesh to the cells.
      */
     void SetUseVoronoiCellsForInterpolation(bool useVoronoiCellsForInterpolation);
@@ -177,6 +186,18 @@ public:
      * @return mUseVoronoiCellsForInterpolation.
      */
     bool GetUseVoronoiCellsForInterpolation();
+
+    /**
+     * Set mTypicalCellRadius.
+     *
+     * @param typicalCellRadius the radius to use for deining if FE nodes are near cells or not.
+     */
+    void SetTypicalCellRadius(double typicalCellRadius);
+
+    /**
+     * @return mTypicalCellRadius.
+     */
+    double GetTypicalCellRadius();
 
 
     /**
