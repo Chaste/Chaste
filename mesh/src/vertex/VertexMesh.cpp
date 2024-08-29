@@ -251,8 +251,14 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool
                     {
                         double ratio = (double)section/(double)num_sections;
                         c_vector<double,2> new_node_location = normal_vector + ratio*p_node_a->rGetLocation() + (1-ratio)*p_node_b->rGetLocation();
-                        nodes.push_back(new Node<2>(new_node_index, new_node_location));
-                        new_node_index++;
+                        
+                        //Check if near other nodes (could be inefficient)
+                        double node_clearance = 0.1;
+                        if (!IsNearExistingNodes(new_node_location,nodes,node_clearance))
+                        {
+                            nodes.push_back(new Node<2>(new_node_index, new_node_location));
+                            new_node_index++;
+                        }
                     }
                 }
             }
@@ -957,6 +963,24 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM, SPACE_DIM>* VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetMeshForVtk()
 {
     return this;
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool VertexMesh<ELEMENT_DIM, SPACE_DIM>::IsNearExistingNodes(c_vector<double,SPACE_DIM> newNodeLocation, std::vector<Node<SPACE_DIM> *> nodesToCheck, double minClearance)
+{
+    bool node_near = false;
+
+    for (unsigned i=0; i<nodesToCheck.size(); i++)
+    {
+        double distance = norm_2(mpDelaunayMesh->GetVectorFromAtoB(nodesToCheck[i]->rGetLocation(), newNodeLocation));
+        if (distance < minClearance)
+        {
+            node_near = true;
+            break;
+        }
+    }
+
+    return node_near;
 }
 
 /// \cond Get Doxygen to ignore, since it's confused by these templates

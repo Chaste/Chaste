@@ -630,6 +630,18 @@ public:
     virtual VertexMesh<ELEMENT_DIM, SPACE_DIM>* GetMeshForVtk();
 
     /**
+     * Helper method to determine if a point in space is near to any existing nodes. Used when making bounded Voronoi Tesselations
+     * 
+     * @param newNodeLocation the location of the proposed node
+     * @param nodesToCheck the nodes to check for proximity to the proposed node
+     * @param minClearance the minimum clearance
+     * 
+     * @return if the new node is near to any existing node
+     * 
+     */
+    bool IsNearExistingNodes(c_vector<double,SPACE_DIM> newNodeLocation, std::vector<Node<SPACE_DIM> *> nodesToCheck, double minClearance);
+
+    /**
      * A smart iterator over the elements in the mesh.
      *
      * \todo This is the same as in AbstractTetrahedralMesh and PottsMesh - merge? (#1379)
