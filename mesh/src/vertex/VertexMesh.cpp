@@ -247,11 +247,9 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic, bool
                     double extra_node_scaling = 1.0;  // increase to add more points per external edge (makes rounder cells)
 
                     int num_sections = ceil(edge_length*extra_node_scaling);
-                    num_sections = 1;
                     for (int section=0; section<=num_sections; section++)
                     {
-                        //double ratio = (double)section/(double)num_sections;
-                        double ratio = ((double)section+0.5)/((double)num_sections+1);
+                        double ratio = (double)section/(double)num_sections;
                         c_vector<double,2> new_node_location = normal_vector + ratio*p_node_a->rGetLocation() + (1-ratio)*p_node_b->rGetLocation();
                         
                         //Check if near other nodes (could be inefficient)
