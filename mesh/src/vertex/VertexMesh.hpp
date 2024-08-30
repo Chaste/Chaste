@@ -268,8 +268,14 @@ public:
      * @param rMesh a tetrahedral mesh
      * @param isPeriodic a boolean that indicates whether the mesh is periodic or not. Defaults to false.
      * @param isBounded a boolean to indicate whether to bound the voronoi tesselation. Defaults to false.
+     * @param scaleBoundByEdgeLength whether to scale the distance bounding nodes are placed from the mesh. Defaults to true.
+     * @param maxDelaunayEdgeLength the maximum edge length in the mesh. Edges longer than this are ignored in boundary calculation. Defaults to DBL_MAX so there ia no max length.
      */
-    VertexMesh(TetrahedralMesh<2, 2>& rMesh, bool isPeriodic = false, bool isBounded = false);
+    VertexMesh(TetrahedralMesh<2, 2>& rMesh, 
+               bool isPeriodic = false, 
+               bool isBounded = false,
+               bool scaleBoundByEdgeLength = true,
+               double maxDelaunayEdgeLength = DBL_MAX);
 
     /**
      * Alternative 3D 'Voronoi' constructor. Creates a Voronoi tessellation of a given tetrahedral mesh,
