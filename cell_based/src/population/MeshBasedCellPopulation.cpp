@@ -63,6 +63,7 @@ MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::MeshBasedCellPopulation(Mutable
           mBoundVoronoiTessellation(false),
           mScaleBoundByEdgeLength(false), 
           mBoundedVoroniTesselationLengthCutoff(DBL_MAX),
+          mOffsetNewBoundaryNodes(false),
           mHasVariableRestLength(false)
 {
     mpMutableMesh = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>* >(&(this->mrMesh));
@@ -873,6 +874,17 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetBoundedVoroniTesselati
     return mBoundedVoroniTesselationLengthCutoff;
 }
 
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetOffsetNewBoundaryNodes(bool offsetNewBoundaryNodes)
+{
+    mOffsetNewBoundaryNodes = offsetNewBoundaryNodes;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetOffsetNewBoundaryNodes()
+{
+    return mOffsetNewBoundaryNodes;
+}
 
 
 
@@ -906,7 +918,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateVoronoiTessellation(
         bool is_mesh_periodic = false;
         if (dynamic_cast<Cylindrical2dMesh*>(&(this->mrMesh)))
         {
-            if(mScaleBoundByEdgeLength || mBoundedVoroniTesselationLengthCutoff<DBL_MAX)
+            if(mScaleBoundByEdgeLength || mBoundedVoroniTesselationLengthCutoff<DBL_MAX || mOffsetNewBoundaryNodes)
             {
                 // Not implemented for Cylindrical meshes yet see Issue 305
                 NEVER_REACHED;
@@ -916,7 +928,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateVoronoiTessellation(
         }
         else if (dynamic_cast<Toroidal2dMesh*>(&(this->mrMesh)))
         {
-            if(mScaleBoundByEdgeLength || mBoundedVoroniTesselationLengthCutoff<DBL_MAX)
+            if(mScaleBoundByEdgeLength || mBoundedVoroniTesselationLengthCutoff<DBL_MAX || mOffsetNewBoundaryNodes)
             {
                 // Not implemented for Toroidal meshes yet see Issue 305
                 NEVER_REACHED;
@@ -926,7 +938,7 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateVoronoiTessellation(
         }
         else
         {
-            mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2>&>((this->mrMesh)), is_mesh_periodic, mBoundVoronoiTessellation, mScaleBoundByEdgeLength, mBoundedVoroniTesselationLengthCutoff);
+            mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2>&>((this->mrMesh)), is_mesh_periodic, mBoundVoronoiTessellation, mScaleBoundByEdgeLength, mBoundedVoroniTesselationLengthCutoff, mOffsetNewBoundaryNodes);
         }
     }
     else if constexpr (ELEMENT_DIM == 3)

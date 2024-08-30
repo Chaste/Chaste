@@ -95,8 +95,9 @@ private:
         archive & mAreaBasedDampingConstantParameter;
         archive & mWriteVtkAsPoints;
         archive & mBoundVoronoiTessellation;
-        archive & mScaleBoundByEdgeLength, 
+        archive & mScaleBoundByEdgeLength; 
         archive & mBoundedVoroniTesselationLengthCutoff;
+        archive & mOffsetNewBoundaryNodes;
         archive & mHasVariableRestLength;
         this->Validate();
     }
@@ -148,8 +149,11 @@ protected:
     /** Whether to scale the bound by edge lenght when using the bounded voronoi tesselation. */
     bool mScaleBoundByEdgeLength;
 
-    /** Edges longer than this are ignored in boundary calculation for bounded voronio tesselations */
+    /** Edges longer than this are ignored in boundary calculation for the bounded voronio tesselation. */
     double mBoundedVoroniTesselationLengthCutoff;
+
+    /** whether to add new nodes towards the centre of the boundary edges for the bounded voronoi tesselation. */
+    bool mOffsetNewBoundaryNodes;
 
     /** Whether springs have variable rest lengths. */
     bool mHasVariableRestLength;
@@ -609,6 +613,18 @@ public:
      * @return mScaleBoundByEdgeLength.
      */
     double GetBoundedVoroniTesselationLengthCutoff();
+
+  /**
+     * Set mOffsetNewBoundaryNodes.
+     *
+     * @param offsetNewBoundaryNodes whether to add new nodes towards the centre of the boundary edges for the bounded voronoi tesselation.
+     */
+    void SetOffsetNewBoundaryNodes(bool offsetNewBoundaryNodes);
+
+    /**
+     * @return mOffsetNewBoundaryNodes.
+     */
+    bool GetOffsetNewBoundaryNodes();
 
     /**
      * Overridden GetNeighbouringNodeIndices() method.

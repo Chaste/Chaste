@@ -850,20 +850,21 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetBoundVoronoiTessellation(), false); //Default
         TS_ASSERT_EQUALS(cell_population.GetScaleBoundByEdgeLength(), false); //Default
         TS_ASSERT_EQUALS(cell_population.GetBoundedVoroniTesselationLengthCutoff(), DBL_MAX); //Default
+        TS_ASSERT_EQUALS(cell_population.GetOffsetNewBoundaryNodes(), false); //Default
 
         cell_population.AddPopulationWriter<VoronoiDataWriter>();
         cell_population.AddCellWriter<CellIdWriter>();
         cell_population.SetWriteVtkAsPoints(true);
         cell_population.SetBoundVoronoiTessellation(true);
         cell_population.SetScaleBoundByEdgeLength(true);
-        cell_population.SetBoundedVoroniTesselationLengthCutoff(true);
-
+        cell_population.SetBoundedVoroniTesselationLengthCutoff(1.0);
+        cell_population.SetOffsetNewBoundaryNodes(true);
         
         TS_ASSERT_EQUALS(cell_population.GetWriteVtkAsPoints(), true);
         TS_ASSERT_EQUALS(cell_population.GetBoundVoronoiTessellation(), true);
         TS_ASSERT_EQUALS(cell_population.GetScaleBoundByEdgeLength(), true);
         TS_ASSERT_EQUALS(cell_population.GetBoundedVoroniTesselationLengthCutoff(), 1.0);
-
+        TS_ASSERT_EQUALS(cell_population.GetOffsetNewBoundaryNodes(), true);
 
         // All presaved data uses infinite VT
         cell_population.SetBoundVoronoiTessellation(false);

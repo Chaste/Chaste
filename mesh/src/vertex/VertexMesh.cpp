@@ -157,7 +157,8 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh,
                              bool isPeriodic, 
                              bool isBounded, 
                              bool scaleBoundByEdgeLength, 
-                             double maxDelaunayEdgeLength)
+                             double maxDelaunayEdgeLength,
+                             bool offsetNewBoundaryNodes)
         : mpDelaunayMesh(&rMesh)
 {
     //Note  !isPeriodic is not used except through polymorphic calls in rMesh
@@ -293,7 +294,16 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh,
                     int num_sections = 1;
                     for (int section=0; section<=num_sections; section++)
                     {
-                        double ratio = ((double)section)/((double)num_sections);
+                        double ratio;
+                        if (offsetNewBoundaryNodes)
+                        {
+                            ratio = ((double)section+0.5)/((double)num_sections+1);
+                        }
+                        else 
+                        {
+                            ratio = ((double)section)/((double)num_sections);
+                        }
+                        
                         assert(ratio>=0.0);
                         assert(ratio<=1.0);
                         c_vector<double,2> new_node_location = direction_of_normal * new_node_distance * normal_vector + ratio*p_node_a->rGetLocation() + (1-ratio)*p_node_b->rGetLocation();
