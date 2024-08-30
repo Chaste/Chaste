@@ -61,6 +61,8 @@ MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::MeshBasedCellPopulation(Mutable
           mAreaBasedDampingConstantParameter(0.1),
           mWriteVtkAsPoints(false),
           mBoundVoronoiTessellation(false),
+          mScaleBoundByEdgeLength(false), 
+          mBoundedVoroniTesselationLengthCutoff(DBL_MAX),
           mHasVariableRestLength(false)
 {
     mpMutableMesh = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>* >(&(this->mrMesh));
@@ -847,6 +849,34 @@ bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetBoundVoronoiTessellation
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetScaleBoundByEdgeLength(bool scaleBoundByEdgeLength)
+{
+    mScaleBoundByEdgeLength = scaleBoundByEdgeLength;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetScaleBoundByEdgeLength()
+{
+    return mScaleBoundByEdgeLength;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetBoundedVoroniTesselationLengthCutoff(double boundedVoroniTesselationLengthCutoff)
+{
+    assert(boundedVoroniTesselationLengthCutoff>0);
+    mBoundedVoroniTesselationLengthCutoff = boundedVoroniTesselationLengthCutoff;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetBoundedVoroniTesselationLengthCutoff()
+{
+    return mBoundedVoroniTesselationLengthCutoff;
+}
+
+
+
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile)
 {
     if (bool(dynamic_cast<Cylindrical2dMesh*>(&(this->mrMesh))))
@@ -876,17 +906,27 @@ void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateVoronoiTessellation(
         bool is_mesh_periodic = false;
         if (dynamic_cast<Cylindrical2dMesh*>(&(this->mrMesh)))
         {
+            if(mScaleBoundByEdgeLength || mBoundedVoroniTesselationLengthCutoff<DBL_MAX)
+            {
+                // Not implemented for Cylindrical meshes yet see Issue 305
+                NEVER_REACHED;
+            }
             is_mesh_periodic = true;
             mpVoronoiTessellation = new Cylindrical2dVertexMesh(static_cast<Cylindrical2dMesh&>(this->mrMesh), mBoundVoronoiTessellation);
         }
         else if (dynamic_cast<Toroidal2dMesh*>(&(this->mrMesh)))
         {
+            if(mScaleBoundByEdgeLength || mBoundedVoroniTesselationLengthCutoff<DBL_MAX)
+            {
+                // Not implemented for Toroidal meshes yet see Issue 305
+                NEVER_REACHED;
+            }
             is_mesh_periodic = true;
             mpVoronoiTessellation = new Toroidal2dVertexMesh(static_cast<Toroidal2dMesh&>(this->mrMesh), mBoundVoronoiTessellation);
         }
         else
         {
-            mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2>&>((this->mrMesh)), is_mesh_periodic, mBoundVoronoiTessellation);
+            mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2>&>((this->mrMesh)), is_mesh_periodic, mBoundVoronoiTessellation, mScaleBoundByEdgeLength, mBoundedVoroniTesselationLengthCutoff);
         }
     }
     else if constexpr (ELEMENT_DIM == 3)

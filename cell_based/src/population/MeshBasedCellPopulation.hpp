@@ -95,8 +95,9 @@ private:
         archive & mAreaBasedDampingConstantParameter;
         archive & mWriteVtkAsPoints;
         archive & mBoundVoronoiTessellation;
+        archive & mScaleBoundByEdgeLength, 
+        archive & mBoundedVoroniTesselationLengthCutoff;
         archive & mHasVariableRestLength;
-
         this->Validate();
     }
 
@@ -143,6 +144,12 @@ protected:
 
     /** Whether to bound the voronoi tesselation to avoid infinite cells on boundary. */
     bool mBoundVoronoiTessellation;
+
+    /** Whether to scale the bound by edge lenght when using the bounded voronoi tesselation. */
+    bool mScaleBoundByEdgeLength;
+
+    /** Edges longer than this are ignored in boundary calculation for bounded voronio tesselations */
+    double mBoundedVoroniTesselationLengthCutoff;
 
     /** Whether springs have variable rest lengths. */
     bool mHasVariableRestLength;
@@ -578,6 +585,30 @@ public:
      * @return mBoundVoronoiTessellation.
      */
     bool GetBoundVoronoiTessellation();
+
+    /**
+     * Set mScaleBoundByEdgeLength.
+     *
+     * @param scaleBoundByEdgeLength whether to scale the bound with edge lenght in the Voronoi Tesselation.
+     */
+    void SetScaleBoundByEdgeLength(bool scaleBoundByEdgeLength);
+
+    /**
+     * @return mScaleBoundByEdgeLength.
+     */
+    bool GetScaleBoundByEdgeLength();
+
+    /**
+     * Set mBoundedVoroniTesselationLengthCutoff.
+     *
+     * @param boundedVoroniTesselationLengthCutoff whether to scale the bound with edge lenght in the Voronoi Tesselation.
+     */
+    void SetBoundedVoroniTesselationLengthCutoff(double boundedVoroniTesselationLengthCutoff);
+
+    /**
+     * @return mScaleBoundByEdgeLength.
+     */
+    double GetBoundedVoroniTesselationLengthCutoff();
 
     /**
      * Overridden GetNeighbouringNodeIndices() method.
