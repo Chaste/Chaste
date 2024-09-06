@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_iarchive.hpp>
 
 #include "VertexMeshReader.hpp"
-#include "VertexMeshWriter.hpp"
+
 #include "VertexMesh.hpp"
 #include "ArchiveOpener.hpp"
 #include "MutableMesh.hpp"
@@ -1968,6 +1968,14 @@ public:
         TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(4), 0.5, 1e-6);
     }
 
+    /*
+     * Calculate bounded voronoi for this mesh
+     *   ____
+     *  |\  /|
+     *  | \/ |
+     *  | /\ |
+     *  |/__\|
+     */
     void TestTessellationConstructor2dWithBoundedTesselation()
     {
         // Create a simple 2D tetrahedral mesh, the Delaunay triangulation
@@ -1983,27 +1991,183 @@ public:
         TS_ASSERT_EQUALS(delaunay_mesh.GetNumElements(), 4u);
         TS_ASSERT_EQUALS(delaunay_mesh.GetNumNodes(), 5u);
 
-        // Create a vertex mesh, the bounded Voronoi tessellation, using the tetrahedral mesh
-        bool is_bounded = true;
-        VertexMesh<2,2> voronoi_mesh(delaunay_mesh, false, is_bounded);
+        {
+            // Create a vertex mesh, the bounded Voronoi tessellation, using the tetrahedral mesh        
+            bool is_bounded = true;
+            VertexMesh<2,2> voronoi_mesh(delaunay_mesh, false, is_bounded);
 
-        // Test the Voronoi tessellation has the correct number of nodes and elements
-        TS_ASSERT_EQUALS(voronoi_mesh.GetNumElements(), 5u);
-        TS_ASSERT_EQUALS(voronoi_mesh.GetNumNodes(), 16u);
+            // Test the Voronoi tessellation has the correct number of nodes and elements
+            TS_ASSERT_EQUALS(voronoi_mesh.GetNumElements(), 5u);
+            TS_ASSERT_EQUALS(voronoi_mesh.GetNumNodes(), 16u);
 
-        // Test the number of nodes owned by each Voronoi element
-        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(0)->GetNumNodes(), 6u); // note one node is stuck ontop ofother node
-        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(1)->GetNumNodes(), 6u);
-        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(2)->GetNumNodes(), 6u);
-        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(3)->GetNumNodes(), 6u);
-        TS_ASSERT_EQUALS(voronoi_mesh.GetElement(4)->GetNumNodes(), 4u);
+            // Test the number of nodes owned by each Voronoi element
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(0)->GetNumNodes(), 6u); // note one node is stuck ontop ofother node
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(1)->GetNumNodes(), 6u);
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(2)->GetNumNodes(), 6u);
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(3)->GetNumNodes(), 6u);
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(4)->GetNumNodes(), 4u);
 
-        // Test element areas
-        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(0), 0.875, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(1), 0.875, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(2), 0.875, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(3), 0.875, 1e-6);
-        TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(4), 0.5, 1e-6);
+            // Test element areas
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(0), 0.875, 1e-6);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(1), 0.875, 1e-6);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(2), 0.875, 1e-6);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(3), 0.875, 1e-6);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(4), 0.5, 1e-6);
+        }
+
+        // Now calculate the Voronoi tessellation using offset node to give more realistic shape.
+        {
+            // Create a vertex mesh, the bounded Voronoi tessellation, using the tetrahedral mesh        
+            bool is_bounded = true;
+            bool scale_bound_by_length = false; //default
+            double max_delaunay_length = DBL_MAX; //default
+            bool offset_new_boundary_nodes = true; 
+            VertexMesh<2,2> voronoi_mesh(delaunay_mesh, false, is_bounded, scale_bound_by_length, max_delaunay_length, offset_new_boundary_nodes);
+
+            // Test the Voronoi tessellation has the correct number of nodes and elements
+            TS_ASSERT_EQUALS(voronoi_mesh.GetNumElements(), 5u);
+            TS_ASSERT_EQUALS(voronoi_mesh.GetNumNodes(), 16u);
+
+            // Test the number of nodes owned by each Voronoi element
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(0)->GetNumNodes(), 6u); // note one node is stuck ontop ofother node
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(1)->GetNumNodes(), 6u);
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(2)->GetNumNodes(), 6u);
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(3)->GetNumNodes(), 6u);
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(4)->GetNumNodes(), 4u);
+
+            // Test element areas
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(0), 0.9700, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(1), 0.9700, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(2), 0.9700, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(3), 0.9700, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(4), 0.5, 1e-6);
+        }
+    }
+
+    /*
+     * Calculate bounded voronoi for this mesh where * node is slightly lower to make mesh convex
+     *   ____*____
+     *  |\  /|\  /|
+     *  | \/ | \/ |
+     *  | /\ | /\ |
+     *  |/__\|/__\|
+     */
+    void TestTessellationConstructor2dWithConvexBoundedTesselation()
+    {
+        // Create a simple 2D tetrahedral mesh, the Delaunay triangulation
+        std::vector<Node<2> *> delaunay_nodes;
+        delaunay_nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        delaunay_nodes.push_back(new Node<2>(1, true, 1.0, 0.0));
+        delaunay_nodes.push_back(new Node<2>(2, true, 1.0, 0.9));
+        delaunay_nodes.push_back(new Node<2>(3, true, 0.0, 1.0));
+        delaunay_nodes.push_back(new Node<2>(4, false, 0.5, 0.5));
+        delaunay_nodes.push_back(new Node<2>(5, true, 2.0, 0.0));
+        delaunay_nodes.push_back(new Node<2>(6, true, 2.0, 1.0));
+        delaunay_nodes.push_back(new Node<2>(7, false, 1.5, 0.5));
+        MutableMesh<2,2> delaunay_mesh(delaunay_nodes);
+
+        TS_ASSERT_EQUALS(delaunay_mesh.CheckIsVoronoi(), true);
+        TS_ASSERT_EQUALS(delaunay_mesh.GetNumElements(), 9u);
+        TS_ASSERT_EQUALS(delaunay_mesh.GetNumNodes(), 8u);
+
+        {
+            // Create a vertex mesh, the bounded Voronoi tessellation, using the tetrahedral mesh
+            bool is_bounded = true;
+            bool scale_bound_by_length = true;
+            double max_delaunay_length = 1.5; // shorter than the longest edge
+            VertexMesh<2,2> voronoi_mesh(delaunay_mesh, false, is_bounded, scale_bound_by_length, max_delaunay_length);
+
+            // Test the Voronoi tessellation has the correct number of nodes and elements
+            TS_ASSERT_EQUALS(voronoi_mesh.GetNumElements(), 8u);
+            TS_ASSERT_EQUALS(voronoi_mesh.GetNumNodes(), 27u);
+
+            // Test the number of nodes owned by each Voronoi element
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(0)->GetNumNodes(), 6u); // note one node is stuck ontop of other node
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(1)->GetNumNodes(), 7u); // note one node is stuck ontop of other node
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(2)->GetNumNodes(), 7u); // note one node is stuck ontop of other node
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(3)->GetNumNodes(), 7u); // note one node is stuck ontop of other node
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(4)->GetNumNodes(), 4u);
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(5)->GetNumNodes(), 6u); // note one node is stuck ontop of other node
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(6)->GetNumNodes(), 6u); // note one node is stuck ontop of other node
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(7)->GetNumNodes(), 4u);
+
+            // Test element areas
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(0), 0.875, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(1), 0.7475, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(2), 0.6606, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(3), 0.8873, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(4), 0.4777, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(5), 0.875, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(6), 0.8873, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(7), 0.4777, 1e-4);
+        }
+
+        // Now make a new Voronoi Tesselation using the convex hull
+        {
+            // Create a vertex mesh, the bounded Voronoi tessellation, using the tetrahedral mesh
+            bool is_bounded = true;
+            bool scale_bound_by_length = false;
+            double max_delaunay_length = 5.0; // Larger than the longest edge
+            VertexMesh<2,2> voronoi_mesh(delaunay_mesh, false, is_bounded, scale_bound_by_length, max_delaunay_length);
+
+            // Test the Voronoi tessellation has the correct number of nodes and elements
+            TS_ASSERT_EQUALS(voronoi_mesh.GetNumElements(), 8u);
+            TS_ASSERT_EQUALS(voronoi_mesh.GetNumNodes(), 23u);
+
+            // Test the number of nodes owned by each Voronoi element
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(0)->GetNumNodes(), 6u); // note one node is stuck ontop of other node
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(1)->GetNumNodes(), 7u); // note one node is stuck ontop of other node
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(2)->GetNumNodes(), 7u); // note one node is stuck ontop of other node
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(3)->GetNumNodes(), 6u); // note one node is stuck ontop of other node
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(4)->GetNumNodes(), 4u);
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(5)->GetNumNodes(), 6u); // note one node is stuck ontop of other node
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(6)->GetNumNodes(), 5u); // note one node is stuck ontop of other node
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(7)->GetNumNodes(), 4u); 
+
+            // Test element areas
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(0), 0.875, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(1), 0.7475, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(2), 0.9469, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(3), 0.8899, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(4), 0.4777, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(5), 0.875, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(6), 0.8899, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(7), 0.4777, 1e-4);
+        }
+
+        // Finally make a new Voronoi Tesselation using the convex hull with edgle length dependent bound (so top elements larger)
+        {
+            // Create a vertex mesh, the bounded Voronoi tessellation, using the tetrahedral mesh
+            bool is_bounded = true;
+            bool scale_bound_by_length = true;
+            double max_delaunay_length = 5.0; // Larger than the longest edge
+            VertexMesh<2,2> voronoi_mesh(delaunay_mesh, false, is_bounded, scale_bound_by_length, max_delaunay_length);
+
+            // Test the Voronoi tessellation has the correct number of nodes and elements
+            TS_ASSERT_EQUALS(voronoi_mesh.GetNumElements(), 8u);
+            TS_ASSERT_EQUALS(voronoi_mesh.GetNumNodes(), 23u);
+
+            // Test the number of nodes owned by each Voronoi element
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(0)->GetNumNodes(), 6u); // note one node is stuck ontop of other node
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(1)->GetNumNodes(), 7u); // note one node is stuck ontop of other node
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(2)->GetNumNodes(), 7u); // note one node is stuck ontop of other node
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(3)->GetNumNodes(), 6u); // note one node is stuck ontop of other node
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(4)->GetNumNodes(), 4u);
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(5)->GetNumNodes(), 6u); // note one node is stuck ontop of other node
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(6)->GetNumNodes(), 5u); // note one node is stuck ontop of other node
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(7)->GetNumNodes(), 4u); 
+
+            // Test element areas
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(0), 0.875, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(1), 0.7475, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(2), 1.2612, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(3), 1.4299, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(4), 0.4777, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(5), 0.875, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(6), 1.4299, 1e-4);
+            TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(7), 0.4777, 1e-4);
+        }
+
     }
 
     void TestTessellationConstructor2dWithGhostNodes()
