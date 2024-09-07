@@ -25,6 +25,7 @@ To cite Chaste in publications, please use one of these:
 
 BibTeX entries for LaTeX users are:
 
+```
 @article{ChasteFRC2020,  
   doi = {10.21105/joss.01848},  
   url = {https://doi.org/10.21105/joss.01848},  
@@ -37,7 +38,9 @@ BibTeX entries for LaTeX users are:
   title = {Chaste: Cancer, Heart and Soft Tissue Environment},  
   journal = {Journal of Open Source Software}  
 }
+```
 
+```
 @article{ChasteGRM2013,  
   title = "Chaste: an open source C++ library for computational physiology and biology",  
   author = "G.R. Mirams and C.J. Arthurs and M.O. Bernabeu and R. Bordas and J. Cooper and A. Corrias and Y. Davit and S-J. Dunn and A.G. Fletcher and D.G. Harvey and M.E. Marsh and J. M. Osborne and P. Pathmanathan and J. Pitt-Francis and J. Southern and N. Zemzemi and D.J. Gavaghan",  
@@ -49,7 +52,9 @@ BibTeX entries for LaTeX users are:
   volume = "9",  
   doi = "10.1371/journal.pcbi.1002970",  
 }
+```
 
+```
 @article{ChasteJPF2009,  
   title = "Chaste: a test-driven approach to software development for biological modelling",  
   author = "J. Pitt-Francis, P. Pathmanathan, M.O. Bernabeu, R. Bordas, J. Cooper, A.G. Fletcher, G.R. Mirams, P. Murray, J.M. Osborne, A. Walter, S.J. Chapman, A. Garny, I.M.M. van Leeuwen, P.K. Maini, B. Rodriguez, S.L. Waters, J.P. Whiteley, H.M. Byrne, D.J. Gavaghan",  
@@ -61,3 +66,4 @@ BibTeX entries for LaTeX users are:
   volume = "180",  
   doi = "10.1016/j.cpc.2009.07.019",  
 }
+```
