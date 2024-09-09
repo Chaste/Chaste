@@ -137,7 +137,7 @@ public:
     const AbstractCellPopulation<DIM>& rGetCellPopulation() const;
 
     /**
-     * @return mConatantSourceCoefficient
+     * @return mConstantSourceCoefficient
      */
     double GetConstantCoefficient() const;
 

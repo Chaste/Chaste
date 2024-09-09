@@ -110,7 +110,7 @@ public:
                               double duDtCoefficient=1.0);
 
     /**
-     * @return mConatantSourceCoefficient
+     * @return mConstantSourceCoefficient
      */
     double GetConstantCoefficient() const;
 

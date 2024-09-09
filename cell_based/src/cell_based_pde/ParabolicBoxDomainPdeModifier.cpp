@@ -305,22 +305,22 @@ Vec ParabolicBoxDomainPdeModifier<DIM>::InterpolateSolutionFromCellMovement(Abst
         {
             // Handy debug code to work out why the node is not in any element
 
-            // output the cell mesh
-            std::ostringstream time_string1;
-            time_string1 << SimulationTime::Instance()->GetTimeStepsElapsed();
-            std::string results_file1 = "cell_mesh_" + this->mDependentVariableName + "_" + time_string1.str();
-            VtkMeshWriter<DIM, DIM>* p_vtk_mesh_writer1 = new VtkMeshWriter<DIM, DIM>(this->mOutputDirectory, results_file1, false);
-            p_vtk_mesh_writer1->AddPointData(this->mDependentVariableName, cell_displacements);
-            p_vtk_mesh_writer1->WriteFilesUsingMesh(cell_mesh);
-            delete p_vtk_mesh_writer1; 
+            // // output the cell mesh
+            // std::ostringstream time_string1;
+            // time_string1 << SimulationTime::Instance()->GetTimeStepsElapsed();
+            // std::string results_file1 = "cell_mesh_" + this->mDependentVariableName + "_" + time_string1.str();
+            // VtkMeshWriter<DIM, DIM>* p_vtk_mesh_writer1 = new VtkMeshWriter<DIM, DIM>(this->mOutputDirectory, results_file1, false);
+            // p_vtk_mesh_writer1->AddPointData(this->mDependentVariableName, cell_displacements);
+            // p_vtk_mesh_writer1->WriteFilesUsingMesh(cell_mesh);
+            // delete p_vtk_mesh_writer1; 
 
-            // output the deformed mesh
-            std::ostringstream time_string;
-            time_string << SimulationTime::Instance()->GetTimeStepsElapsed();
-            std::string results_file = "deformed_mesh_" + this->mDependentVariableName + "_" + time_string.str();
-            VtkMeshWriter<DIM, DIM>* p_vtk_mesh_writer = new VtkMeshWriter<DIM, DIM>(this->mOutputDirectory, results_file, false);
-            p_vtk_mesh_writer->WriteFilesUsingMesh(*p_deformed_mesh);
-            delete p_vtk_mesh_writer;  
+            // // output the deformed mesh
+            // std::ostringstream time_string;
+            // time_string << SimulationTime::Instance()->GetTimeStepsElapsed();
+            // std::string results_file = "deformed_mesh_" + this->mDependentVariableName + "_" + time_string.str();
+            // VtkMeshWriter<DIM, DIM>* p_vtk_mesh_writer = new VtkMeshWriter<DIM, DIM>(this->mOutputDirectory, results_file, false);
+            // p_vtk_mesh_writer->WriteFilesUsingMesh(*p_deformed_mesh);
+            // delete p_vtk_mesh_writer;  
 
             assert(0);
         }
