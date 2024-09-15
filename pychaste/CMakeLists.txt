@@ -52,6 +52,7 @@ set(PYCHASTE_CPPWG_COMMAND
         -i ${Chaste_INCLUDE_DIRS}
            ${Chaste_pychaste_INCLUDE_DIRS}
            ${Chaste_THIRD_PARTY_INCLUDE_DIRS}
+        -l cppwg.log
         --std c++17 &&
     deactivate
 )
@@ -82,7 +83,7 @@ file(
     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/src/py
     ${CMAKE_CURRENT_SOURCE_DIR}/src/py/*
 )
-list(FILTER file_paths EXCLUDE REGEX ".*\\.(dll|dylib|so)$") # Remove shared libs
+list(FILTER file_paths EXCLUDE REGEX ".*\\.(dll|dylib|pyc|so)$") # Remove compiled files
 
 foreach(file_path ${file_paths})
     if(file_path MATCHES ".*\\.(cfg|in|js|py|toml)$") # Files to track changes on
@@ -134,14 +135,14 @@ foreach(module ${PYCHASTE_MODULES})
         ${Python3_LIBRARIES}  # Python and pybind11 come first
         pybind11::module
         Chaste_COMMON_DEPS
-        chaste_pychaste  # Library built from non-wrapper code in src/
+        chaste_pychaste  # Library built from non-wrapper cpp code in src/
     )
 
     target_include_directories(
         ${module_lib}
         PRIVATE
         ${PYTHON3_INCLUDE_DIRS}
-        ${Chaste_pychaste_INCLUDE_DIRS}  # Non-wrapper code in src/
+        ${Chaste_pychaste_INCLUDE_DIRS}  # Non-wrapper cpp code in src/
         ${PYCHASTE_WRAPPER_INCLUDE_DIRS}
     )
 
