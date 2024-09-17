@@ -88,6 +88,9 @@ modules:
       - name: ReplicatableVector
         source_includes: *petsc_includes
 
+      ##=== core: Chaste/global/src/fortests
+      - name: PetscSetupUtils
+
       ##=== core: Chaste/global/src/timing/
       - name: Timer
 
