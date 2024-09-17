@@ -31,13 +31,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 import unittest
+import chaste
 import chaste.mesh
+import chaste.cell_based
 chaste.init()
 
-class TestPottsMesh(unittest.TestCase):
+class TestPyPottsMesh(unittest.TestCase):
     
     def test_construct(self):
-        generator = chaste.mesh.PottsMeshGenerator3(10, 0, 0, 10, 0, 0, 10, 0, 0)
+        generator = chaste.cell_based.PottsMeshGenerator3(10, 0, 0, 10, 0, 0, 10, 0, 0)
         mesh = generator.GetMesh()
         self.assertEqual(mesh.GetNumNodes(), 1000)
 

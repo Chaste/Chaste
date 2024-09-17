@@ -66,7 +66,7 @@ def compare_files(file_path_a: str, file_path_b: str) -> bool:
     return file_lines_a == file_lines_b
 
 
-class TestWrapperDiff(unittest.TestCase):
+class TestPyWrapperChanges(unittest.TestCase):
 
     def test_wrapper_diff(self) -> None:
         """Compare generated wrappers with existing wrappers."""
@@ -87,16 +87,6 @@ class TestWrapperDiff(unittest.TestCase):
                     self.assertTrue(os.path.isfile(new_file))
 
                     self.assertTrue(compare_files(old_file, new_file))
-
-# TODO: 
-# Test For
-
-# - Changed classes
-#     - New methods
-#     - Removed methods
-#     - Changed method signatures
-# - Removed Classes  - will fail during build - make it fail during testing to make it clear what needs to be done i.e. remove the wrapper
-# - New Classes
 
 if __name__ == "__main__":
     unittest.main()

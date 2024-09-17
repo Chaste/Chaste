@@ -74,7 +74,7 @@ class TestScratchAssayTutorial(chaste.cell_based.AbstractCellBasedTestSuite):
         
         num_points_in_x = 100
         num_points_in_y = 12
-        generator = chaste.mesh.PottsMeshGenerator2(num_points_in_x, 0, 0, num_points_in_y, 0, 0)
+        generator = chaste.cell_based.PottsMeshGenerator2(num_points_in_x, 0, 0, num_points_in_y, 0, 0)
         mesh = generator.GetMesh()
           
         ## Note that we are using a `PottsMeshGenerator2` to set up the grid and we are setting some terms to 0. Chaste

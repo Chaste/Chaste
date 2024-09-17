@@ -62,8 +62,8 @@ class TestRunningPottsBasedSimulationsTutorial(chaste.cell_based.AbstractCellBas
         ## We have chosen a 2 by 2 block of elements, each consisting of 4 by 4 ( = 16) lattice sites.
 
         chaste.core.OutputFileHandler("Python/TestPottsBasedCellSimulationsTutorial")
-        generator = chaste.mesh.PottsMeshGenerator2(50, 2, 4,
-                                                    50, 2, 4)
+        generator = chaste.cell_based.PottsMeshGenerator2(50, 2, 4,
+                                                          50, 2, 4)
         mesh = generator.GetMesh()
 
         ## Having created a mesh, we now create a vector of CellPtrs. To do this, we the CellsGenerator helper class, 
@@ -252,9 +252,9 @@ class TestRunningPottsBasedSimulationsTutorial(chaste.cell_based.AbstractCellBas
         ## The third set of three arguments specify the domain depth; the number of elements deep; and the depth of individual elements. 
         ## We have chosen an 4 by 4 by 4 ( = 64) block of elements each consisting of 2 by 2 by 2 ( = 8) lattice sites.
 
-        generator = chaste.mesh.PottsMeshGenerator3(10, 4, 2,
-                                                    10, 4, 2,
-                                                    10, 4, 2)
+        generator = chaste.cell_based.PottsMeshGenerator3(10, 4, 2,
+                                                          10, 4, 2,
+                                                          10, 4, 2)
         mesh = generator.GetMesh()
 
         ## Having created a mesh, we now create a VectorSharedPtrCells. To do this, we the CellsGenerator helper class, 

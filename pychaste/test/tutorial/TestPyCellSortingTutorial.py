@@ -63,7 +63,7 @@ class TestCellSortingTutorial(chaste.cell_based.AbstractCellBasedTestSuite):
         ## This generates a regular square-shaped mesh, in which all elements are the same size. 
         ## We have chosen an 8 by 8 block of elements each consisting of 4 by 4 ( = 16) lattice sites.
         
-        generator = chaste.mesh.PottsMeshGenerator2(50, 8, 4, 50, 8, 4)
+        generator = chaste.cell_based.PottsMeshGenerator2(50, 8, 4, 50, 8, 4)
         mesh = generator.GetMesh()
           
         ## Having created a mesh, we now create some cells. To do this, we the `CellsGenerator` helper class, 
