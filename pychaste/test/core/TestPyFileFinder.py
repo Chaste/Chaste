@@ -32,15 +32,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import unittest
 import chaste.core
+
 chaste.init()
 
-class TestFileFinder(unittest.TestCase):
-    
+
+class TestPyFileFinder(unittest.TestCase):
+
     def test_find_file(self):
-        
-        file_finder = chaste.core.FileFinder("/projects/PyChaste/test/data/find_me.txt", chaste.core.RelativeTo.ChasteSourceRoot)
-        self.assertEqual(file_finder.GetLeafName() , "find_me.txt")
+
+        file_finder = chaste.core.FileFinder(
+            "pychaste/test/data/find_me.txt",
+            chaste.core.RelativeTo.ChasteSourceRoot,
+        )
+        self.assertEqual(file_finder.GetLeafName(), "find_me.txt")
         self.assertTrue(file_finder.IsFile())
+
 
 if __name__ == '__main__':
     unittest.main()

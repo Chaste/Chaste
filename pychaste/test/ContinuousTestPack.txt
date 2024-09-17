@@ -1,11 +1,11 @@
-core/TestPyImports.py
-core/TestPyWrappers.py
 core/TestPyFileFinder.py
+core/TestPyImports.py
 core/TestPyOutputFileHandler.py
 core/TestPyPetscTools.py
 core/TestPyRandomNumberGenerator.py
 core/TestPyTimer.py
 core/TestPyVersion.py
+core/TestPyWrapperChanges.py
 mesh/TestPyChastePoint.py
 mesh/TestPyPottsMesh.py
 ode/TestPyOdeSystem.py
