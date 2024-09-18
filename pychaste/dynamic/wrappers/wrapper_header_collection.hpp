@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Identifiable.hpp"
 #include "PetscTools.hpp"
 #include "ReplicatableVector.hpp"
+#include "PetscSetupUtils.hpp"
 #include "Timer.hpp"
 #include "FileFinder.hpp"
 #include "OutputFileHandler.hpp"
