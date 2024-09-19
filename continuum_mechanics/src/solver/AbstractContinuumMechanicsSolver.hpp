@@ -766,6 +766,8 @@ void AbstractContinuumMechanicsSolver<DIM>::ApplyDirichletBoundaryConditions(App
             PetscMatTools::ZeroRowsAndColumnsWithValueOnDiagonal(mPreconditionMatrix, rows, 1.0);
 
             // Apply the RHS boundary conditions modification if required.
+            // (AddScaledVector now needs assembly to be finalised.)
+            PetscVecTools::Finalise(mLinearSystemRhsVector);
             PetscVecTools::AddScaledVector(mLinearSystemRhsVector, mDirichletBoundaryConditionsVector, 1.0);
         }
         else
