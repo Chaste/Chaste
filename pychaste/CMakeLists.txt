@@ -34,41 +34,55 @@ if(NOT Chaste_ENABLE_PYCHASTE)
 endif()
 
 find_package(Chaste COMPONENTS ${Chaste_DEPENDS_pychaste})
+
+# ```
+# cppwg_command(<output_directory>)
+# ```
+# Create the command for generating wrappers to <output_directory>.
+# The result is stored as a list in CPPWG_COMMAND_LST and 
+# as a string in CPPWG_COMMAND_STR.
+function(cppwg_command OUTPUT_DIR)
+    set(COMMAND_LST
+        . ${chaste_python3_venv}/activate &&
+        ${chaste_python3_venv}/cppwg ${CMAKE_SOURCE_DIR}
+            -w ${OUTPUT_DIR}
+            -p ${CMAKE_SOURCE_DIR}/pychaste/dynamic/config.yaml
+            -i ${Chaste_INCLUDE_DIRS}
+                ${Chaste_pychaste_INCLUDE_DIRS}
+                ${Chaste_THIRD_PARTY_INCLUDE_DIRS}
+            -l ${CMAKE_CURRENT_BINARY_DIR}/cppwg.log
+            -q --std c++17 &&
+        deactivate
+    )
+    string(JOIN " " COMMAND_STR ${COMMAND_LST})
+    set(CPPWG_COMMAND_LST "${COMMAND_LST}" PARENT_SCOPE)
+    set(CPPWG_COMMAND_STR "${COMMAND_STR}" PARENT_SCOPE)
+endfunction()
+
 chaste_do_component(pychaste)
 
+set(PYCHASTE_WRAPPER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dynamic/wrappers")
 set(PYCHASTE_MODULES cell_based core mesh ode pde visualization)
 
 ##################################################
 # Python wrapper generation
 ##################################################
-set(PYCHASTE_WRAPPER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dynamic/wrappers)
-
 # Add a target for re-generating wrappers manually
-set(PYCHASTE_CPPWG_COMMAND
-    . ${chaste_python3_venv}/activate &&
-    ${chaste_python3_venv}/cppwg ${CMAKE_SOURCE_DIR}
-        -w ${PYCHASTE_WRAPPER_DIR}
-        -p ${CMAKE_CURRENT_SOURCE_DIR}/dynamic/config.yaml
-        -i ${Chaste_INCLUDE_DIRS}
-           ${Chaste_pychaste_INCLUDE_DIRS}
-           ${Chaste_THIRD_PARTY_INCLUDE_DIRS}
-        -l cppwg.log
-        --std c++17 &&
-    deactivate
-)
 add_custom_target(pychaste_wrappers)
-add_custom_command(TARGET pychaste_wrappers COMMAND ${PYCHASTE_CPPWG_COMMAND})
+cppwg_command("${PYCHASTE_WRAPPER_DIR}")
+add_custom_command(TARGET pychaste_wrappers COMMAND ${CPPWG_COMMAND_LST})
 
 # Generate wrappers if they are missing
 foreach(module ${PYCHASTE_MODULES})
     if(NOT EXISTS ${PYCHASTE_WRAPPER_DIR}/${module}/${module}.main.cpp)
         message(STATUS "Generating PyChaste wrappers")
-        string(JOIN " " PYCHASTE_CPPWG_CMDSTR ${PYCHASTE_CPPWG_COMMAND})
-        execute_process(COMMAND sh -c "${PYCHASTE_CPPWG_CMDSTR}")
+        cppwg_command("${PYCHASTE_WRAPPER_DIR}")
+        execute_process(COMMAND sh -c "${CPPWG_COMMAND_STR}")
         break()
     endif()
 endforeach()
 
+# Find wrapper header directories
 header_dirs(${PYCHASTE_WRAPPER_DIR} PYCHASTE_WRAPPER_INCLUDE_DIRS)
 
 ##################################################
