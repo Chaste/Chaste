@@ -81,34 +81,7 @@ jobs:
           cmake -DCMAKE_BUILD_TYPE=Release -DChaste_ENABLE_PYCHASTE=ON ..
         working-directory: build
 
-      - name: Re-generate PyChaste wrappers
-        run: |
-          mv pychaste/dynamic/wrappers pychaste/dynamic/wrappers.bak
-          cd build
-          make pychaste_wrappers
-          cd ..
-          mv pychaste/dynamic/wrappers pychaste/dynamic/wrappers.gen
-          mv pychaste/dynamic/wrappers.bak pychaste/dynamic/wrappers
-
-      - name: Find unknown classes
-        run: |
-          CPPWG_LOG="$(pwd)/build/pychaste/cppwg.log"
-          test -f $CPPWG_LOG || exit 1
-
-          CELL_BASED_SRC="$(pwd)/cell_based/src"
-          test -d $CELL_BASED_SRC || exit 2
-
-          CELL_BASED_FORTESTS="$CELL_BASED_SRC/fortests"
-          test -d $CELL_BASED_FORTESTS || exit 3
-
-          ! grep "Unknown class" "$CPPWG_LOG" |\
-            grep "$CELL_BASED_SRC" |\
-            grep -v "$CELL_BASED_FORTESTS" |\
-            grep -v -e "Unknown class guid_defined<.*>\B" |\
-            grep -v -e "Unknown class .*Iterator\b" \
-          || exit 4
-
-      - name: Compare existing and generated wrappers
+      - name: Test wrapper changes
         run: |
           ctest -V -R TestPyWrapperChanges$
         working-directory: build

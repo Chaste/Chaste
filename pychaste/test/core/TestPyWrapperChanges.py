@@ -31,62 +31,114 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 import os
+import re
 import unittest
 
-from typing import List
+from difflib import context_diff
 
 
-def get_file_lines(file_path: str) -> List[str]:
-    """ Load a file into a list of lines.
-
-    :param file_path: The path to the file to load
-    :return: File lines with excess whitespace and empty lines removed
-    """
-
-    with open(file_path, "r") as in_file:
-        # remove excess whitespace
-        lines = [line.rstrip().lstrip() for line in in_file]
-        # remove empty lines
-        lines = [line for line in lines if line]
-
-    return lines
-
-
-def compare_files(file_path_a: str, file_path_b: str) -> bool:
+def file_diff(file_a: str, file_b: str) -> bool:
     """Check if two files have the same content.
 
-    :param file_path_a: The path to the first file
-    :param file_path_b: The path to the second file
-    :return: True if the files have the same content else False
+    :param file_a: The path to the first file
+    :param file_b: The path to the second file
+    :return: A diff of the two files
     """
-    
-    file_lines_a = get_file_lines(file_path_a)
-    file_lines_b = get_file_lines(file_path_b)
+    # Read files and remove excess whitespace
+    with open(file_a, "r") as fa:
+        a = "\n".join(line.strip() for line in fa if line.strip())
 
-    return file_lines_a == file_lines_b
+    with open(file_b, "r") as fb:
+        b = "\n".join(line.strip() for line in fb if line.strip())
+
+    return "\n".join(context_diff(a, b))
 
 
 class TestPyWrapperChanges(unittest.TestCase):
+    """Test that the generated wrappers are up to date."""
 
     def test_wrapper_diff(self) -> None:
-        """Compare generated wrappers with existing wrappers."""
+        """Check for changed wrappers."""
+        src_wrapper_dir = os.path.abspath("wrappers")
+        gen_wrapper_dir = os.path.abspath("wrappers.gen")
 
-        old_wrappers = os.path.abspath("pychaste/dynamic/wrappers")
-        new_wrappers = os.path.abspath("pychaste/dynamic/wrappers.gen")
+        self.assertTrue(
+            os.path.isdir(src_wrapper_dir),
+            "Cannot find original wrappers: " + src_wrapper_dir,
+        )
 
-        self.assertTrue(os.path.isdir(old_wrappers))
-        self.assertTrue(os.path.isdir(new_wrappers))
+        self.assertTrue(
+            os.path.isdir(gen_wrapper_dir),
+            "Cannot find generated wrappers: " + gen_wrapper_dir,
+        )
 
-        for dirpath, _, filenames in os.walk(old_wrappers):
+        for dirpath, _, filenames in os.walk(src_wrapper_dir):
             for filename in filenames:
-                if filename.endswith(".cppwg.cpp") or filename.endswith(".cppwg.hpp"):
-                    old_file = os.path.join(dirpath, filename)
-                    new_file = old_file.replace(old_wrappers, new_wrappers, 1)
+                if filename.endswith(".cppwg.cpp") or filename.endswith(
+                    ".cppwg.hpp"
+                ):
+                    src_file = os.path.join(dirpath, filename)
+                    gen_file = os.path.join(gen_wrapper_dir, filename)
+                    self.assertTrue(
+                        os.path.isfile(gen_file),
+                        f"Found wrapper {filename} not present in config.yaml. "
+                        + "To remove, delete the wrapper file. "
+                        + "To keep, add relevant entry in config.yaml.",
+                    )
 
-                    self.assertTrue(os.path.isfile(old_file))
-                    self.assertTrue(os.path.isfile(new_file))
+                    diff = file_diff(src_file, gen_file)
+                    self.assertEqual(
+                        diff,
+                        "",
+                        "Changed wrapper found. To update, run `make pychaste_wrappers`\n"
+                        + filename
+                        + "\n"
+                        + diff,
+                    )
 
-                    self.assertTrue(compare_files(old_file, new_file))
+        for dirpath, _, filenames in os.walk(gen_wrapper_dir):
+            for filename in filenames:
+                if filename.endswith(".cppwg.cpp") or filename.endswith(
+                    ".cppwg.hpp"
+                ):
+                    gen_file = os.path.join(dirpath, filename)
+                    src_file = os.path.join(src_wrapper_dir, filename)
+                    self.assertTrue(
+                        os.path.isfile(src_file),
+                        f"New wrapper {filename} generated from config.yaml. "
+                        + "To add to src, run `make pychaste_wrappers`. "
+                        + "To remove, delete the entry from config.yaml."
+                        + filename,
+                    )
+
+    def test_unknown_classes(self) -> None:
+        """Find unknown classes that may need wrapping."""
+
+        log_file = os.path.abspath("cppwg.log")
+        self.assertTrue(
+            os.path.isfile(log_file),
+            "Cannot find wrapper generator logs: " + log_file,
+        )
+
+        unknown_classes = []
+        with open(log_file, "r") as lf:
+            for line in lf:
+                if (
+                    "Unknown class" in line
+                    and "/cell_based/src/" in line
+                    and not "/cell_based/src/fortests/" in line
+                    and not re.search(r"Unknown class guid_defined<.*>\B", line)
+                    and not re.search(r"Unknown class .*Iterator\b", line)
+                ):
+                    unknown_classes.append(line)
+        self.assertEqual(
+            len(unknown_classes),
+            0,
+            "Found unknown classes. To wrap, add relevant entry to config.yaml. "
+            + "To exclude from wrapping, add to config.yaml with `exclude` option\n:"
+            + "\n".join(unknown_classes),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
