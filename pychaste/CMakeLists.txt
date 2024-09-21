@@ -36,7 +36,7 @@ endif()
 find_package(Chaste COMPONENTS ${Chaste_DEPENDS_pychaste})
 
 # Create the command for generating wrappers.
-# The resulting command will put generated wrappers in OUTPUT_DIR.
+# The resulting command will generate wrappers to OUTPUT_DIR.
 # The command will be stored as a list in CPPWG_COMMAND_LST.
 # It will also be stored as a string in CPPWG_COMMAND_STR.
 function(cppwg_command OUTPUT_DIR)
@@ -46,8 +46,8 @@ function(cppwg_command OUTPUT_DIR)
             -w ${OUTPUT_DIR}
             -p ${CMAKE_SOURCE_DIR}/pychaste/dynamic/config.yaml
             -i ${Chaste_INCLUDE_DIRS}
-                ${Chaste_pychaste_INCLUDE_DIRS}
-                ${Chaste_THIRD_PARTY_INCLUDE_DIRS}
+               ${Chaste_pychaste_INCLUDE_DIRS}
+               ${Chaste_THIRD_PARTY_INCLUDE_DIRS}
             -l ${CMAKE_CURRENT_BINARY_DIR}/cppwg.log
             -q --std c++17 &&
         deactivate
@@ -65,7 +65,7 @@ set(PYCHASTE_MODULES cell_based core mesh ode pde visualization)
 ##################################################
 # Python wrapper generation
 ##################################################
-# Add a target for re-generating wrappers manually
+# Add `pychaste_wrappers` target for re-generating wrappers manually
 add_custom_target(pychaste_wrappers)
 cppwg_command("${PYCHASTE_WRAPPER_DIR}")
 add_custom_command(TARGET pychaste_wrappers COMMAND ${CPPWG_COMMAND_LST})
