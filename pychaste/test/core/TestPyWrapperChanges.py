@@ -46,10 +46,12 @@ def file_diff(file_a: str, file_b: str) -> bool:
     """
     # Read files and remove excess whitespace
     with open(file_a, "r") as fa:
-        a = "\n".join(line.strip() for line in fa if line.strip())
+        a = [line.strip() for line in fa]
+        a = [line for line in a if line]
 
     with open(file_b, "r") as fb:
-        b = "\n".join(line.strip() for line in fb if line.strip())
+        b = [line.strip() for line in fb]
+        b = [line for line in b if line]
 
     return "\n".join(context_diff(a, b))
 
@@ -57,8 +59,8 @@ def file_diff(file_a: str, file_b: str) -> bool:
 class TestPyWrapperChanges(unittest.TestCase):
     """Test that the generated wrappers are up to date."""
 
-    def test_wrapper_diff(self) -> None:
-        """Check for changed wrappers."""
+    def test_wrapper_changes(self) -> None:
+        """Check for wrapper changes."""
         src_wrapper_dir = os.path.abspath("wrappers")
         gen_wrapper_dir = os.path.abspath("wrappers.gen")
 
@@ -78,22 +80,28 @@ class TestPyWrapperChanges(unittest.TestCase):
                     ".cppwg.hpp"
                 ):
                     src_file = os.path.join(dirpath, filename)
-                    gen_file = os.path.join(gen_wrapper_dir, filename)
+                    gen_file = os.path.join(
+                        gen_wrapper_dir,
+                        os.path.relpath(src_file, src_wrapper_dir),
+                    )
+
                     self.assertTrue(
                         os.path.isfile(gen_file),
-                        f"Found wrapper {filename} not present in config.yaml. "
-                        + "To remove, delete the wrapper file. "
-                        + "To keep, add relevant entry in config.yaml.",
+                        f"\n[{os.path.relpath(src_file, src_wrapper_dir)}]"
+                        "\n-- Found ungenerated wrapper in src"
+                        "\n-- if it has been deliberately removed from"
+                        " config.yaml, the wrapper file should be removed as well"
+                        "\n-- if it is not to be removed, the relevant class"
+                        " entry should be added in config.yaml.",
                     )
 
                     diff = file_diff(src_file, gen_file)
                     self.assertEqual(
                         diff,
                         "",
-                        "Changed wrapper found. To update, run `make pychaste_wrappers`\n"
-                        + filename
-                        + "\n"
-                        + diff,
+                        f"\n[{os.path.relpath(src_file, src_wrapper_dir)}]"
+                        "\n-- Generated wrapper differs from existing"
+                        "\n-- to update, run `make pychaste_wrappers`.",
                     )
 
         for dirpath, _, filenames in os.walk(gen_wrapper_dir):
@@ -102,17 +110,20 @@ class TestPyWrapperChanges(unittest.TestCase):
                     ".cppwg.hpp"
                 ):
                     gen_file = os.path.join(dirpath, filename)
-                    src_file = os.path.join(src_wrapper_dir, filename)
+                    src_file = os.path.join(
+                        src_wrapper_dir,
+                        os.path.relpath(gen_file, gen_wrapper_dir),
+                    )
                     self.assertTrue(
                         os.path.isfile(src_file),
-                        f"New wrapper {filename} generated from config.yaml. "
-                        + "To add to src, run `make pychaste_wrappers`. "
-                        + "To remove, delete the entry from config.yaml."
-                        + filename,
+                        f"\n[{os.path.relpath(gen_file, gen_wrapper_dir)}]"
+                        "\n-- New wrapper generated"
+                        "\n-- to add to src, run `make pychaste_wrappers`"
+                        "\n-- to exclude, add `exclude` option in config.yaml.",
                     )
 
-    def test_unknown_classes(self) -> None:
-        """Find unknown classes that may need wrapping."""
+    def test_unwrapped_classes(self) -> None:
+        """Find unwrapped classes."""
 
         log_file = os.path.abspath("cppwg.log")
         self.assertTrue(
@@ -128,15 +139,15 @@ class TestPyWrapperChanges(unittest.TestCase):
                     and "/cell_based/src/" in line
                     and not "/cell_based/src/fortests/" in line
                     and not re.search(r"Unknown class guid_defined<.*>\B", line)
-                    and not re.search(r"Unknown class .*Iterator\b", line)
+                    # and not re.search(r"Unknown class .*Iterator\b", line)
                 ):
                     unknown_classes.append(line)
         self.assertEqual(
             len(unknown_classes),
             0,
-            "Found unknown classes. To wrap, add relevant entry to config.yaml. "
-            + "To exclude from wrapping, add to config.yaml with `exclude` option\n:"
-            + "\n".join(unknown_classes),
+            "\n" + "".join(unknown_classes) + "Found unknown classes"
+            "\n-- to wrap, add relevant entry to config.yaml. "
+            "\n-- to exclude from wrapping, add to config.yaml with `exclude` option.",
         )
 
 

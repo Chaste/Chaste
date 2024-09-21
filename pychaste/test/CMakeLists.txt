@@ -39,7 +39,7 @@ chaste_do_test_component(pychaste)
 # Setup tasks for TestPyWrapperChanges
 cppwg_command("${CMAKE_CURRENT_BINARY_DIR}/wrappers.gen")
 add_test(
-    NAME SetupTestPyWrapperChanges
+    NAME TestPyWrapperGeneration
     COMMAND sh -c
         "${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/wrappers &&
          ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/wrappers.gen &&
@@ -48,7 +48,7 @@ add_test(
              ${CMAKE_CURRENT_BINARY_DIR}/wrappers &&
          ${CPPWG_COMMAND_STR}"
 )
-set_tests_properties(SetupTestPyWrapperChanges PROPERTIES FIXTURES_SETUP GEN_WRAPPERS)
+set_tests_properties(TestPyWrapperGeneration PROPERTIES FIXTURES_SETUP GEN_WRAPPERS)
 
 set_tests_properties(TestPyWrapperChanges PROPERTIES FIXTURES_REQUIRED GEN_WRAPPERS)
 set_tests_properties(TestPyWrapperChanges PROPERTIES WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")

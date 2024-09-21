@@ -35,12 +35,10 @@ endif()
 
 find_package(Chaste COMPONENTS ${Chaste_DEPENDS_pychaste})
 
-# ```
-# cppwg_command(<output_directory>)
-# ```
-# Create the command for generating wrappers to <output_directory>.
-# The result is stored as a list in CPPWG_COMMAND_LST and 
-# as a string in CPPWG_COMMAND_STR.
+# Create the command for generating wrappers.
+# The resulting command will put generated wrappers in OUTPUT_DIR.
+# The command will be stored as a list in CPPWG_COMMAND_LST.
+# It will also be stored as a string in CPPWG_COMMAND_STR.
 function(cppwg_command OUTPUT_DIR)
     set(COMMAND_LST
         . ${chaste_python3_venv}/activate &&
