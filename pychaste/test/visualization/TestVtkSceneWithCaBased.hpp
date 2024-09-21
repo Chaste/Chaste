@@ -77,6 +77,7 @@ public:
 
     void Test2dCaBasedPopulation()
     {
+        vtkObject::GlobalWarningDisplayOff();
         OutputFileHandler file_handler = OutputFileHandler("TestVtkSceneWithCaBasedPopulation/2d");
 
         PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
