@@ -37,7 +37,7 @@ project(testpychaste)
 chaste_do_test_component(pychaste)
 
 # Add TestWrapperGeneration
-cppwg_command("${CMAKE_CURRENT_BINARY_DIR}/wrappers.gen")
+cppwg_command("${CMAKE_CURRENT_BINARY_DIR}/wrappers.gen" QUIET)
 add_test(
     NAME TestPyWrapperGeneration
     COMMAND sh -c

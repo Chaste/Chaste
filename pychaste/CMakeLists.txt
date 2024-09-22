@@ -37,9 +37,16 @@ find_package(Chaste COMPONENTS ${Chaste_DEPENDS_pychaste})
 
 # Create the command for generating wrappers.
 # The resulting command will generate wrappers to OUTPUT_DIR.
+# If QUIET is set, wrapper generation will run in quiet mode.
 # The command will be stored as a list in CPPWG_COMMAND_LST.
 # It will also be stored as a string in CPPWG_COMMAND_STR.
 function(cppwg_command OUTPUT_DIR)
+    cmake_parse_arguments(ARG "QUIET" "" "" ${ARGN})
+    if(ARG_QUIET)
+        set(QUIET_FLAG "-q")
+    else()
+        set(QUIET_FLAG "")
+    endif()
     set(COMMAND_LST
         . ${chaste_python3_venv}/activate &&
         ${chaste_python3_venv}/cppwg ${CMAKE_SOURCE_DIR}
@@ -49,7 +56,7 @@ function(cppwg_command OUTPUT_DIR)
                ${Chaste_pychaste_INCLUDE_DIRS}
                ${Chaste_THIRD_PARTY_INCLUDE_DIRS}
             -l ${CMAKE_CURRENT_BINARY_DIR}/cppwg.log
-            -q --std c++17 &&
+            --std c++17 ${QUIET_FLAG} &&
         deactivate
     )
     string(JOIN " " COMMAND_STR ${COMMAND_LST})

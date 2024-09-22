@@ -138,8 +138,8 @@ class TestPyWrapperChanges(unittest.TestCase):
                     "Unknown class" in line
                     and "/cell_based/src/" in line
                     and not "/cell_based/src/fortests/" in line
-                    and not re.search(r"Unknown class guid_defined<.*>\B", line)
-                    and not re.search(r"Unknown class .*Iterator\b", line)
+                    and not re.search(r"Unknown class guid_defined<.*>", line)
+                    and not re.search(r"Unknown class [\w]*Iterator\b", line)
                 ):
                     unknown_classes.append(line)
         self.assertEqual(
