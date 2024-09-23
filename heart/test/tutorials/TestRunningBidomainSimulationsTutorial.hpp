@@ -105,12 +105,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 class PointStimulus2dCellFactory : public AbstractCardiacCellFactory<2>
 {
-/* Declare (smart) pointer to a `SimpleStimulus` for the cell which is stimulated.
- * Note that `AbstractCardiacCellFactory` also has as protected members: `mpZeroStimulus`
- * of type `boost::shared_ptr<ZeroStimulus>`; `mpMesh`, a pointer to the mesh used (the problem
- * class will set this before it calls `CreateCardiacCellForTissueNode`, so it can be used
- * in that method); `mTimestep`, a double (see below); and `boost::shared_ptr<mpSolver>`
- * a forward euler ode solver (see below). */
+    /* Declare (smart) pointer to a `SimpleStimulus` for the cell which is stimulated.
+     * Note that `AbstractCardiacCellFactory` also has as protected members: `mpZeroStimulus`
+     * of type `boost::shared_ptr<ZeroStimulus>`; `mpMesh`, a pointer to the mesh used (the problem
+     * class will set this before it calls `CreateCardiacCellForTissueNode`, so it can be used
+     * in that method); `mTimestep`, a double (see below); and `boost::shared_ptr<mpSolver>`
+     * a forward euler ode solver (see below). */
 private:
     boost::shared_ptr<SimpleStimulus> mpStimulus;
 
@@ -119,8 +119,8 @@ public:
      * and we also initialise the stimulus to have magnitude -500000 uA/cm^3 and duration 0.5 ms.
      */
     PointStimulus2dCellFactory()
-        : AbstractCardiacCellFactory<2>(),
-          mpStimulus(new SimpleStimulus(-5e5, 0.5))
+            : AbstractCardiacCellFactory<2>(),
+              mpStimulus(new SimpleStimulus(-5e5, 0.5))
     {
     }
 
@@ -134,7 +134,7 @@ public:
     {
         double x = pNode->rGetLocation()[0];
         double y = pNode->rGetLocation()[1];
-        if (x<0.02+1e-6 && y<0.02+1e-6) // ie if x<=0.02 and y<=0.02 (and we are assuming here x,y>=0).
+        if (x < 0.02 + 1e-6 && y < 0.02 + 1e-6) // ie if x<=0.02 and y<=0.02 (and we are assuming here x,y>=0).
         {
             /* Create a LR91 cell with the non-zero stimulus. This is a volume stimulus, ie
              * the function on the right-hand side of the first of the two bidomain equations.
@@ -161,7 +161,7 @@ public:
  * as described in the writing basic tests tutorial. */
 class TestRunningBidomainSimulationsTutorial : public CxxTest::TestSuite
 {
-/* Tests should be public... */
+    /* Tests should be public... */
 public:
     /* Define the test.
      */
@@ -174,7 +174,7 @@ public:
          * output directory and filename-prefix. Note that the spatial units in cardiac Chaste is CENTIMETRES,
          * so that mesh 2D_0_to_1mm_800_elements is a mesh over [0,0.1]x[0,0.1].
          */
-        HeartConfig::Instance()->SetSimulationDuration(5.0); //ms
+        HeartConfig::Instance()->SetSimulationDuration(5.0); // ms
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/2D_0_to_1mm_800_elements");
         HeartConfig::Instance()->SetOutputDirectory("BidomainTutorial");
         HeartConfig::Instance()->SetOutputFilenamePrefix("results");
@@ -189,13 +189,13 @@ public:
         HeartConfig::Instance()->SetVisualizeWithCmgui(true);
         HeartConfig::Instance()->SetVisualizeWithVtk(true);
         /* If the mesh is a DistributedTetrahedralMesh then we can use parallel VTK files (.pvtu)*/
-        //HeartConfig::Instance()->SetVisualizeWithParallelVtk(true);
+        // HeartConfig::Instance()->SetVisualizeWithParallelVtk(true);
 
         /* Next, we have to create a cell factory of the type we defined above. */
         PointStimulus2dCellFactory cell_factory;
 
         /* Now we create a problem class using (a pointer to) the cell factory. */
-        BidomainProblem<2> bidomain_problem( &cell_factory );
+        BidomainProblem<2> bidomain_problem(&cell_factory);
 
         /* This is enough setup to run a simulation: we could now call `Initialise()`
          * and `Solve()` to run... */
@@ -255,9 +255,9 @@ public:
          * will mention how to do parallel access).
          */
         ReplicatableVector res_repl(bidomain_problem.GetSolution());
-        for (unsigned i=0; i<res_repl.GetSize(); i++)
+        for (unsigned i = 0; i < res_repl.GetSize(); i++)
         {
-        //    std::cout << res_repl[i] << "\n";
+            //    std::cout << res_repl[i] << "\n";
         }
 
         /* Behind the scenes there are some logging routines which find out how much time
