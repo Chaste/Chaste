@@ -83,10 +83,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * given the CellML, you just have to do two things: include this `.hpp` file, and then use the class.
  * For example, we will use the Luo-Rudy 1991 model, so we have to include the following, and
  * later on use `CellLuoRudy1991FromCellML` as the cell model class.
- * See ["ChasteGuides/CodeGenerationFromCellML"] for more information on this process.
+ * See [CodeGenerationFromCellML](/docs/user-guides/code-generation-from-cellml/) for more information on this process.
  */
 #include "LuoRudy1991.hpp"
-
 
 /*
  * ### Defining a cell factory
