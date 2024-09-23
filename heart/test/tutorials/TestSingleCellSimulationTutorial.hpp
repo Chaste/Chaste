@@ -80,7 +80,8 @@ public:
     {
 /* CVODE is still an optional Chaste dependency, but it is highly recommended for
  * working with single cell simulations. This tutorial code will only run if CVODE is installed and enabled
- * (see InstallCvode and ChasteGuides/CmakeBuildGuide). */
+ * (see [InstallSundials](/docs/dev-guides/developer-install-guide/#sundials) for a manual installation if needed,
+ * and [CmakeBuildGuide](/docs/dev-guides/cmake-build-guide/)). */
 #ifdef CHASTE_CVODE
         /*
          * ### Defining a CVODE model
