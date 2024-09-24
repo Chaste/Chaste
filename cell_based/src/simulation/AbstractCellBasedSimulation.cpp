@@ -457,10 +457,13 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
             UpdateCellPopulation();
         }
 
-        // Store whether we are sampling results at the current timestep
+        /*
+        * Store whether we are sampling results at the current timestep note we have +1 here as we caculate this
+        * before the timestep is increaced.
+        */
         SimulationTime* p_time = SimulationTime::Instance();
-        bool at_sampling_timestep = (p_time->GetTimeStepsElapsed()%this->mSamplingTimestepMultiple == 0);
-
+        bool at_sampling_timestep = ((p_time->GetTimeStepsElapsed()+1)%this->mSamplingTimestepMultiple == 0);
+       
         /*
          * If required, store the current locations of cell centres. Note that we need to
          * use a std::map between cells and locations, rather than (say) a std::vector with

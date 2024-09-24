@@ -95,8 +95,10 @@ private:
         archive & mAreaBasedDampingConstantParameter;
         archive & mWriteVtkAsPoints;
         archive & mBoundVoronoiTessellation;
+        archive & mScaleBoundByEdgeLength; 
+        archive & mBoundedVoroniTesselationLengthCutoff;
+        archive & mOffsetNewBoundaryNodes;
         archive & mHasVariableRestLength;
-
         this->Validate();
     }
 
@@ -143,6 +145,15 @@ protected:
 
     /** Whether to bound the voronoi tesselation to avoid infinite cells on boundary. */
     bool mBoundVoronoiTessellation;
+
+    /** Whether to scale the bound by edge lenght when using the bounded voronoi tesselation. */
+    bool mScaleBoundByEdgeLength;
+
+    /** Edges longer than this are ignored in boundary calculation for the bounded voronio tesselation. */
+    double mBoundedVoroniTesselationLengthCutoff;
+
+    /** whether to add new nodes towards the centre of the boundary edges for the bounded voronoi tesselation. */
+    bool mOffsetNewBoundaryNodes;
 
     /** Whether springs have variable rest lengths. */
     bool mHasVariableRestLength;
@@ -578,6 +589,42 @@ public:
      * @return mBoundVoronoiTessellation.
      */
     bool GetBoundVoronoiTessellation();
+
+    /**
+     * Set mScaleBoundByEdgeLength.
+     *
+     * @param scaleBoundByEdgeLength whether to scale the bound with edge lenght in the Voronoi Tesselation.
+     */
+    void SetScaleBoundByEdgeLength(bool scaleBoundByEdgeLength);
+
+    /**
+     * @return mScaleBoundByEdgeLength.
+     */
+    bool GetScaleBoundByEdgeLength();
+
+    /**
+     * Set mBoundedVoroniTesselationLengthCutoff.
+     *
+     * @param boundedVoroniTesselationLengthCutoff whether to scale the bound with edge lenght in the Voronoi Tesselation.
+     */
+    void SetBoundedVoroniTesselationLengthCutoff(double boundedVoroniTesselationLengthCutoff);
+
+    /**
+     * @return mScaleBoundByEdgeLength.
+     */
+    double GetBoundedVoroniTesselationLengthCutoff();
+
+  /**
+     * Set mOffsetNewBoundaryNodes.
+     *
+     * @param offsetNewBoundaryNodes whether to add new nodes towards the centre of the boundary edges for the bounded voronoi tesselation.
+     */
+    void SetOffsetNewBoundaryNodes(bool offsetNewBoundaryNodes);
+
+    /**
+     * @return mOffsetNewBoundaryNodes.
+     */
+    bool GetOffsetNewBoundaryNodes();
 
     /**
      * Overridden GetNeighbouringNodeIndices() method.
