@@ -33,7 +33,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 from chaste._pychaste_lib import (
-    AbstractOdeSystem,
-    AbstractOdeSystemInformation,
     AbstractPythonOdeSystemInformation,
+    Alarcon2004OxygenBasedCellCycleOdeSystem,
+    DeltaNotchEdgeOdeSystem,
+    DeltaNotchInteriorOdeSystem,
+    DeltaNotchOdeSystem,
+    Goldbeter1991OdeSystem,
+    TysonNovak2001OdeSystem,
 )

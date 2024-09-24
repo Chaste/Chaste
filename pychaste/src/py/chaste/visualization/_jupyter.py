@@ -1,4 +1,4 @@
-"""Helper classes for running visualization tests"""
+"""Helper classes for visualization in Jupyter notebooks."""
 
 __copyright__ = """Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
@@ -32,21 +32,28 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-import os.path
+try:
+    import IPython
+except ImportError as e:
+    raise ImportError("Cannot use Jupyter imports without Jupyter.") from e
+
+import os
+import warnings
 from io import StringIO
 
 import vtk
 import xvfbwrapper
 from pkg_resources import resource_filename
 
-try:
-    import IPython
-except ImportError as e:
-    raise ImportError("Cannot use JupyterNotebookManager without Jupyter.") from e
+from chaste.cell_based import VtkSceneModifier_2, VtkSceneModifier_3
+
+# TODO: pkg_resources is deprecated in Python 3.12.
 
 
 class JupyterNotebookManager:
-    """Singleton class for managing plotting in a Jupyter notebook"""
+    """
+    Singleton class for managing plotting in a Jupyter notebook
+    """
 
     def __new__(cls, *args, **kwds):
         """Singleton pattern"""
@@ -56,21 +63,22 @@ class JupyterNotebookManager:
             return it
         it = object.__new__(cls)
         cls.__it__ = it
-        it.init(*args, **kwds)
+        it._init(*args, **kwds)
         return it
 
-    def init(self, *args, **kwds):
-        self.interactive_plotting_loaded = False
-        self.three_js_dir = resource_filename("chaste", os.path.join("external"))
-        self.container_id = 0
-
+    def _init(self, *args, **kwds):
         try:
             self.vdisplay = xvfbwrapper.Xvfb()
             self.vdisplay.start()
         except OSError:
             self.vdisplay = None
+            warnings.warn("Could not start Xvfb.")
 
         self.renderWindow = vtk.vtkRenderWindow()
+
+        self.interactive_plotting_loaded = False
+        self.three_js_dir = resource_filename("chaste", os.path.join("external"))
+        self.container_id = 0
 
     def _interactive_plot_init(self):
         if not self.interactive_plotting_loaded:
@@ -160,3 +168,42 @@ class JupyterNotebookManager:
             self.renderWindow.RemoveRenderer(renderer)
 
             return IPython.Image(data)
+
+
+def JupyterSceneModifierFactory(VtkSceneModifier):
+
+    class JupyterSceneModifier(VtkSceneModifier):
+        """
+        Class for real time plotting of output
+        """
+
+        def __init__(self, plotting_manager):
+            self.output_format = "png"
+            self.plotting_manager = plotting_manager
+            super().__init__()
+
+        def UpdateAtEndOfTimeStep(self, cell_population):
+            """
+            Update the Jupyter notebook plot with the new scene
+            """
+
+            super().UpdateAtEndOfTimeStep(cell_population)
+
+            IPython.display.clear_output(wait=True)
+
+            if self.output_format == "png":
+                IPython.display.display(
+                    self.plotting_manager.vtk_show(
+                        self.GetVtkScene(), output_format=self.output_format
+                    )
+                )
+            else:
+                self.plotting_manager.vtk_show(
+                    self.GetVtkScene(), output_format=self.output_format
+                )
+
+    return JupyterSceneModifier
+
+
+JupyterSceneModifier_2 = JupyterSceneModifierFactory(VtkSceneModifier_2)
+JupyterSceneModifier_3 = JupyterSceneModifierFactory(VtkSceneModifier_3)

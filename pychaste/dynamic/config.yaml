@@ -63,16 +63,22 @@ template_substitutions:
 modules:
   - name: lib
     source_locations:
+      ##=== cell_based
+      - cell_based/src
+      - pychaste/src/cpp/cell_based
+      ##=== core
       - global/src
+      ##=== mesh
+      - mesh/src
+      - cell_based/src/mesh
+      ##=== ode
       - ode/src
       - cell_based/src/ode
       - pychaste/src/cpp/ode
+      ##=== pde
       - pde/src
       - cell_based/src/cell_based_pde
-      - mesh/src
-      - cell_based/src/mesh
-      - cell_based/src
-      - pychaste/src/cpp/cell_based
+      ##=== visualization
       - pychaste/src/cpp/visualization
 
     classes:

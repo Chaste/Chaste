@@ -1,4 +1,4 @@
-"""Helper classes for running visualization tests"""
+"""Syntax Module"""
 
 __copyright__ = """Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
@@ -32,44 +32,24 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from chaste.cell_based import VtkSceneModifier_2, VtkSceneModifier_3
-
-try:
-    import IPython
-except ImportError as e:
-    raise ImportError("Cannot use JupyterSceneModifier without Jupyter.") from e
+from typing import Dict, Tuple, Type
 
 
-def JupyterSceneModifierFactory(VtkSceneModifier):
+class TemplatedClass:
+    """
+    Allows calling class syntax like Foo["2", "2"](...) in place of Foo_2_2(...)
 
-    class JupyterSceneModifier(VtkSceneModifier):
-        """Class for real time plotting of output"""
+    Usage:
+    >>> Foo = TemplatedClass({ ("2", "2"): Foo_2_2, ("3", "3"): Foo_3_3 })
+    """
 
-        def __init__(self, plotting_manager):
-            self.output_format = "png"
-            self.plotting_manager = plotting_manager
-            super().__init__()
+    def __init__(self, template_dict: Dict[Tuple[str, ...], Type]):
+        """
+        :param template_dict: A dictionary mapping template arg tuples to classes
+        """
+        self._dict = template_dict
 
-        def UpdateAtEndOfTimeStep(self, cell_population):
-            """Update the Jupyter notebook plot with the new scene"""
-
-            super().UpdateAtEndOfTimeStep(cell_population)
-
-            IPython.display.clear_output(wait=True)
-
-            if self.output_format == "png":
-                IPython.display.display(
-                    self.plotting_manager.vtk_show(
-                        self.GetVtkScene(), output_format=self.output_format
-                    )
-                )
-            else:
-                self.plotting_manager.vtk_show(
-                    self.GetVtkScene(), output_format=self.output_format
-                )
-
-    return JupyterSceneModifier
-
-
-JupyterSceneModifier_2 = JupyterSceneModifierFactory(VtkSceneModifier_2)
-JupyterSceneModifier_3 = JupyterSceneModifierFactory(VtkSceneModifier_3)
+    def __getitem__(self, key):
+        if not isinstance(key, tuple):
+            key = (key,)
+        return self._dict[tuple(map(str, key))]

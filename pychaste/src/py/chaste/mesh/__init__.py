@@ -33,16 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 from chaste._pychaste_lib import (
-    AbstractChasteRegion_2,
-    AbstractChasteRegion_3,
-    AbstractElement_1_2,
-    AbstractElement_2_2,
-    AbstractElement_2_3,
-    AbstractElement_3_3,
-    AbstractMesh_2_2,
-    AbstractMesh_3_3,
-    AbstractTetrahedralMesh_2_2,
-    AbstractTetrahedralMesh_3_3,
     ChasteCuboid_2,
     ChasteCuboid_3,
     ChasteEllipsoid_2,
@@ -89,6 +79,8 @@ from chaste._pychaste_lib import (
     NodesOnlyMesh_3,
     PeriodicNodesOnlyMesh_2,
     PeriodicNodesOnlyMesh_3,
+    PottsElement_2,
+    PottsElement_3,
     PottsMesh_2,
     PottsMesh_3,
     PottsMeshGenerator_2,
@@ -104,4 +96,179 @@ from chaste._pychaste_lib import (
     VertexMesh_2_2,
     VertexMesh_3_3,
     VoronoiVertexMeshGenerator,
+)
+from chaste._syntax import TemplatedClass
+
+ChasteCuboid = TemplatedClass(
+    {
+        ("2",): ChasteCuboid_2,
+        ("3",): ChasteCuboid_3,
+    }
+)
+
+ChasteEllipsoid = TemplatedClass(
+    {
+        ("2",): ChasteEllipsoid_2,
+        ("3",): ChasteEllipsoid_3,
+    }
+)
+
+ChastePoint = TemplatedClass(
+    {
+        ("2",): ChastePoint_2,
+        ("3",): ChastePoint_3,
+    }
+)
+
+Edge = TemplatedClass(
+    {
+        ("2",): Edge_2,
+        ("3",): Edge_3,
+    }
+)
+
+EdgeHelper = TemplatedClass(
+    {
+        ("2",): EdgeHelper_2,
+        ("3",): EdgeHelper_3,
+    }
+)
+
+Element = TemplatedClass(
+    {
+        ("2",): Element_2_2,
+        ("2", "2"): Element_2_2,
+        ("3",): Element_3_3,
+        ("3", "3"): Element_3_3,
+    }
+)
+
+FluidSource = TemplatedClass(
+    {
+        ("2",): FluidSource_2,
+        ("3",): FluidSource_3,
+    }
+)
+
+ImmersedBoundaryElement = TemplatedClass(
+    {
+        ("1", "2"): ImmersedBoundaryElement_1_2,
+        ("2",): ImmersedBoundaryElement_2_2,
+        ("2", "2"): ImmersedBoundaryElement_2_2,
+        ("2", "3"): ImmersedBoundaryElement_2_3,
+        ("3",): ImmersedBoundaryElement_3_3,
+        ("3", "3"): ImmersedBoundaryElement_3_3,
+    }
+)
+
+ImmersedBoundaryMesh = TemplatedClass(
+    {
+        ("2",): ImmersedBoundaryMesh_2_2,
+        ("2", "2"): ImmersedBoundaryMesh_2_2,
+        ("3",): ImmersedBoundaryMesh_3_3,
+        ("3", "3"): ImmersedBoundaryMesh_3_3,
+    }
+)
+
+MutableElement = TemplatedClass(
+    {
+        ("1", "2"): MutableElement_1_2,
+        ("2",): MutableElement_2_2,
+        ("2", "2"): MutableElement_2_2,
+        ("2", "3"): MutableElement_2_3,
+        ("3",): MutableElement_3_3,
+        ("3", "3"): MutableElement_3_3,
+    }
+)
+
+MutableMesh = TemplatedClass(
+    {
+        ("2",): MutableMesh_2_2,
+        ("2", "2"): MutableMesh_2_2,
+        ("3",): MutableMesh_3_3,
+        ("3", "3"): MutableMesh_3_3,
+    }
+)
+
+MutableVertexMesh = TemplatedClass(
+    {
+        ("2",): MutableVertexMesh_2_2,
+        ("2", "2"): MutableVertexMesh_2_2,
+        ("3",): MutableVertexMesh_3_3,
+        ("3", "3"): MutableVertexMesh_3_3,
+    }
+)
+
+Node = TemplatedClass(
+    {
+        ("2",): Node_2,
+        ("3",): Node_3,
+    }
+)
+
+NodeAttributes = TemplatedClass(
+    {
+        ("2",): NodeAttributes_2,
+        ("3",): NodeAttributes_3,
+    }
+)
+
+NodesOnlyMesh = TemplatedClass(
+    {
+        ("2",): NodesOnlyMesh_2,
+        ("3",): NodesOnlyMesh_3,
+    }
+)
+
+PeriodicNodesOnlyMesh = TemplatedClass(
+    {
+        ("2",): PeriodicNodesOnlyMesh_2,
+        ("3",): PeriodicNodesOnlyMesh_3,
+    }
+)
+
+PottsElement = TemplatedClass(
+    {
+        ("2",): PottsElement_2,
+        ("3",): PottsElement_3,
+    }
+)
+
+PottsMesh = TemplatedClass(
+    {
+        ("2",): PottsMesh_2,
+        ("3",): PottsMesh_3,
+    }
+)
+
+PottsMeshGenerator = TemplatedClass(
+    {
+        ("2",): PottsMeshGenerator_2,
+        ("3",): PottsMeshGenerator_3,
+    }
+)
+
+PottsMeshWriter = TemplatedClass(
+    {
+        ("2",): PottsMeshWriter_2,
+        ("3",): PottsMeshWriter_3,
+    }
+)
+
+TetrahedralMesh = TemplatedClass(
+    {
+        ("2",): TetrahedralMesh_2_2,
+        ("2", "2"): TetrahedralMesh_2_2,
+        ("3",): TetrahedralMesh_3_3,
+        ("3", "3"): TetrahedralMesh_3_3,
+    }
+)
+
+VertexMesh = TemplatedClass(
+    {
+        ("2",): VertexMesh_2_2,
+        ("2", "2"): VertexMesh_2_2,
+        ("3",): VertexMesh_3_3,
+        ("3", "3"): VertexMesh_3_3,
+    }
 )
