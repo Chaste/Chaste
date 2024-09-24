@@ -265,5 +265,8 @@ void register_VertexMesh_3_3_class(py::module &m)
         .def("GetMeshForVtk",
             (::VertexMesh<3, 3> *(VertexMesh_3_3::*)()) &VertexMesh_3_3::GetMeshForVtk,
             " ", py::return_value_policy::reference)
+        .def("IsNearExistingNodes",
+            (bool(VertexMesh_3_3::*)(::boost::numeric::ublas::c_vector<double, 3>, ::std::vector<Node<3> *>, double)) &VertexMesh_3_3::IsNearExistingNodes,
+            " ", py::arg("newNodeLocation"), py::arg("nodesToCheck"), py::arg("minClearance"))
     ;
 }

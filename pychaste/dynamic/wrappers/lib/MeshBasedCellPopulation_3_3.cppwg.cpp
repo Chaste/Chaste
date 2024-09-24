@@ -396,6 +396,24 @@ void register_MeshBasedCellPopulation_3_3_class(py::module &m)
         .def("GetBoundVoronoiTessellation",
             (bool(MeshBasedCellPopulation_3_3::*)()) &MeshBasedCellPopulation_3_3::GetBoundVoronoiTessellation,
             " ")
+        .def("SetScaleBoundByEdgeLength",
+            (void(MeshBasedCellPopulation_3_3::*)(bool)) &MeshBasedCellPopulation_3_3::SetScaleBoundByEdgeLength,
+            " ", py::arg("scaleBoundByEdgeLength"))
+        .def("GetScaleBoundByEdgeLength",
+            (bool(MeshBasedCellPopulation_3_3::*)()) &MeshBasedCellPopulation_3_3::GetScaleBoundByEdgeLength,
+            " ")
+        .def("SetBoundedVoroniTesselationLengthCutoff",
+            (void(MeshBasedCellPopulation_3_3::*)(double)) &MeshBasedCellPopulation_3_3::SetBoundedVoroniTesselationLengthCutoff,
+            " ", py::arg("boundedVoroniTesselationLengthCutoff"))
+        .def("GetBoundedVoroniTesselationLengthCutoff",
+            (double(MeshBasedCellPopulation_3_3::*)()) &MeshBasedCellPopulation_3_3::GetBoundedVoroniTesselationLengthCutoff,
+            " ")
+        .def("SetOffsetNewBoundaryNodes",
+            (void(MeshBasedCellPopulation_3_3::*)(bool)) &MeshBasedCellPopulation_3_3::SetOffsetNewBoundaryNodes,
+            " ", py::arg("offsetNewBoundaryNodes"))
+        .def("GetOffsetNewBoundaryNodes",
+            (bool(MeshBasedCellPopulation_3_3::*)()) &MeshBasedCellPopulation_3_3::GetOffsetNewBoundaryNodes,
+            " ")
         .def("GetNeighbouringNodeIndices",
             (::std::set<unsigned int>(MeshBasedCellPopulation_3_3::*)(unsigned int)) &MeshBasedCellPopulation_3_3::GetNeighbouringNodeIndices,
             " ", py::arg("index"))
