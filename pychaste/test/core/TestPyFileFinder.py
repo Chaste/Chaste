@@ -31,9 +31,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 import unittest
-import chaste.core
 
-chaste.init()
+import chaste.core
 
 
 class TestPyFileFinder(unittest.TestCase):
@@ -48,5 +47,5 @@ class TestPyFileFinder(unittest.TestCase):
         self.assertTrue(file_finder.IsFile())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

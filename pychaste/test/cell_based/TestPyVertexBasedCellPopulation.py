@@ -1,4 +1,3 @@
-
 """Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
@@ -32,10 +31,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 import unittest
+
 import chaste
-chaste.init()
-import chaste.mesh
 import chaste.cell_based
+import chaste.mesh
 import chaste.visualization
 
 
@@ -43,7 +42,9 @@ class TestCell(chaste.cell_based.AbstractCellBasedTestSuite):
 
     def test_construct(self):
 
-        file_handler = chaste.core.OutputFileHandler("Python/TestVertexBasedCellPopulation")
+        file_handler = chaste.core.OutputFileHandler(
+            "Python/TestVertexBasedCellPopulation"
+        )
 
         # Set up the mesh
         mesh_generator = chaste.mesh.HoneycombVertexMeshGenerator(2, 2)
@@ -51,30 +52,31 @@ class TestCell(chaste.cell_based.AbstractCellBasedTestSuite):
 
         # Make the cells
         proliferative_type = chaste.cell_based.DefaultCellProliferativeType()
-        cell_generator = chaste.cell_based.CellsGeneratorUniformCellCycleModel_2()
-        cells = cell_generator.GenerateBasicRandom(mesh.GetNumElements(),
-                                                   proliferative_type)
+        cell_generator = chaste.cell_based.CellsGenerator_UniformCellCycleModel_2()
+        cells = cell_generator.GenerateBasicRandom(
+            mesh.GetNumElements(), proliferative_type
+        )
 
         # Make the cell population
-        cell_population = chaste.cell_based.VertexBasedCellPopulation2(mesh,
-                                                                       cells)
+        cell_population = chaste.cell_based.VertexBasedCellPopulation_2(mesh, cells)
 
         # Set up the visualizer
-        scene = chaste.visualization.VtkScene2()
+        scene = chaste.visualization.VtkScene_2()
         scene.SetCellPopulation(cell_population)
         scene.SetSaveAsAnimation(True)
-        scene.SetOutputFilePath(file_handler.GetOutputDirectoryFullPath() +
-                                "/cell_population")
+        scene.SetOutputFilePath(
+            file_handler.GetOutputDirectoryFullPath() + "/cell_population"
+        )
 
-        modifier = chaste.cell_based.VtkSceneModifier2()
+        modifier = chaste.cell_based.VtkSceneModifier_2()
         modifier.SetVtkScene(scene)
 
-        force = chaste.cell_based.NagaiHondaForce2()
-        target_area_modifier = chaste.cell_based.SimpleTargetAreaModifier2()
+        force = chaste.cell_based.NagaiHondaForce_2()
+        target_area_modifier = chaste.cell_based.SimpleTargetAreaModifier_2()
         target_area_modifier.SetGrowthDuration(1.0)
 
         # Set up the simulation
-        simulator = chaste.cell_based.OffLatticeSimulation2_2(cell_population)
+        simulator = chaste.cell_based.OffLatticeSimulation_2_2(cell_population)
         simulator.SetOutputDirectory("Python/TestVertexBasedCellPopulation")
         simulator.SetEndTime(0.2)
         simulator.AddForce(force)
@@ -85,5 +87,5 @@ class TestCell(chaste.cell_based.AbstractCellBasedTestSuite):
         simulator.Solve()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

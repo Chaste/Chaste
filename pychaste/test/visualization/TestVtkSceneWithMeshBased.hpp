@@ -77,7 +77,6 @@ public:
 
     void TestRenderingMeshBasedPopulation()
     {
-        vtkObject::GlobalWarningDisplayOff();
         OutputFileHandler file_handler1 = OutputFileHandler("TestVtkSceneWithMeshBasedPopulation/2d/");
 
         HoneycombMeshGenerator generator(2, 2, 2);    // Parameters are: cells across, cells up

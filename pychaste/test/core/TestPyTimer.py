@@ -31,15 +31,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 import unittest
+
 import chaste.core
-chaste.init()
+
 
 class TestTimer(unittest.TestCase):
-    
+
     def test_start_stop(self):
-        
+
         chaste.core.Timer.Reset()
         chaste.core.Timer.Print("This Happened At: ")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

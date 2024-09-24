@@ -31,16 +31,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 import unittest
+
 import chaste.core
-chaste.init()
+
 
 class TestVersion(unittest.TestCase):
-    
+
     def test_output_version_info(self):
-        
+
         print(chaste.core.ChasteBuildInfo.GetLicenceText())
-        
+
         print(chaste.core.ChasteBuildInfo.GetRootDir())
-        
-if __name__ == '__main__':
+
+
+if __name__ == "__main__":
     unittest.main()

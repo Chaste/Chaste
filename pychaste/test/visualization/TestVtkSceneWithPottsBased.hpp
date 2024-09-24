@@ -77,7 +77,6 @@ public:
 
     void TestRenderingPottsBasedPopulation()
     {
-        vtkObject::GlobalWarningDisplayOff();
         OutputFileHandler file_handler1 = OutputFileHandler("TestVtkSceneWithMeshBasedPopulation/2d/");
 
         PottsMeshGenerator<2> generator(50, 2, 4, 50, 2, 4);

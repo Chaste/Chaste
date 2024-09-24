@@ -33,7 +33,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import os
 import re
 import unittest
-
 from difflib import context_diff
 
 
@@ -76,9 +75,7 @@ class TestPyWrapperChanges(unittest.TestCase):
 
         for dirpath, _, filenames in os.walk(src_wrapper_dir):
             for filename in filenames:
-                if filename.endswith(".cppwg.cpp") or filename.endswith(
-                    ".cppwg.hpp"
-                ):
+                if filename.endswith(".cppwg.cpp") or filename.endswith(".cppwg.hpp"):
                     src_file = os.path.join(dirpath, filename)
                     gen_file = os.path.join(
                         gen_wrapper_dir,
@@ -106,9 +103,7 @@ class TestPyWrapperChanges(unittest.TestCase):
 
         for dirpath, _, filenames in os.walk(gen_wrapper_dir):
             for filename in filenames:
-                if filename.endswith(".cppwg.cpp") or filename.endswith(
-                    ".cppwg.hpp"
-                ):
+                if filename.endswith(".cppwg.cpp") or filename.endswith(".cppwg.hpp"):
                     gen_file = os.path.join(dirpath, filename)
                     src_file = os.path.join(
                         src_wrapper_dir,

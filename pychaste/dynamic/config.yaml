@@ -832,5 +832,5 @@ prefix_text: |
 
   */
 
-  // This file is auto-generated. Manual changes will be overwritten. For changes
-  // to persist, update the configuration in pychaste/dynamic/config.yaml.
+  // This file is auto-generated; manual changes will be overwritten.
+  // To make enduring changes, see pychaste/dynamic/config.yaml.

@@ -31,20 +31,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 import unittest
+
 import chaste.ode
-chaste.init()
+
 
 class MyOdeSystem(chaste.ode.AbstractOdeSystem):
 
     def __init__(self, OdeSystemInfo):
         super(MyOdeSystem, self).__init__(1)
-        #self.SetSystemInfo(OdeSystemInfo)
+        # self.SetSystemInfo(OdeSystemInfo)
 
     def EvaluateYDerivatives(self, time, rY, rDy):
-        rDy[0] = rY[0]*rY[0] + time*time
-        
+        rDy[0] = rY[0] * rY[0] + time * time
+
+
 class MyOdeSystemInformation(chaste.ode.AbstractPythonOdeSystemInformation):
-    
+
     def __init__(self):
         super(MyOdeSystemInformation, self).__init__()
 
@@ -54,12 +56,14 @@ class MyOdeSystemInformation(chaste.ode.AbstractPythonOdeSystemInformation):
         self.AddVariableUnit("dimensionless")
         self.SetDefaultInitialConditions([1.0])
 
+
 class DontTestOdeSystem(unittest.TestCase):
-    
+
     def donttest_create_system(self):
         my_ode_system_information = MyOdeSystemInformation()
         my_ode_system_information.Initialise()
         my_ode_system = MyOdeSystem(my_ode_system_information)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

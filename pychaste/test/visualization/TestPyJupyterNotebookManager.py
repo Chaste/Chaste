@@ -31,17 +31,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 import unittest
-import chaste
 
-chaste.init()
-import chaste.mesh
+import chaste
 import chaste.cell_based
+import chaste.mesh
 import chaste.visualization
 
 
 class TestJupyterNotebookManager(chaste.cell_based.AbstractCellBasedTestSuite):
     def test_vtk_show(self):
-        file_handler = chaste.core.OutputFileHandler("Python/TestVertexBasedCellPopulation")
+        file_handler = chaste.core.OutputFileHandler(
+            "Python/TestVertexBasedCellPopulation"
+        )
 
         # Set up the mesh
         mesh_generator = chaste.mesh.HoneycombVertexMeshGenerator(2, 2)
@@ -49,21 +50,26 @@ class TestJupyterNotebookManager(chaste.cell_based.AbstractCellBasedTestSuite):
 
         # Make the cells
         proliferative_type = chaste.cell_based.DefaultCellProliferativeType()
-        cell_generator = chaste.cell_based.CellsGeneratorUniformCellCycleModel_2()
-        cells = cell_generator.GenerateBasicRandom(mesh.GetNumElements(), proliferative_type)
+        cell_generator = chaste.cell_based.CellsGenerator_UniformCellCycleModel_2()
+        cells = cell_generator.GenerateBasicRandom(
+            mesh.GetNumElements(), proliferative_type
+        )
 
         # Make the cell population
-        cell_population = chaste.cell_based.VertexBasedCellPopulation2(mesh, cells)
+        cell_population = chaste.cell_based.VertexBasedCellPopulation_2(mesh, cells)
 
         # Test multiple calls to the visualizer
         for _ in range(10):
-          scene = chaste.visualization.VtkScene2()
-          scene.SetCellPopulation(cell_population)
-          scene.SetSaveAsAnimation(True)
-          scene.SetOutputFilePath(file_handler.GetOutputDirectoryFullPath() + "/cell_population")
+            scene = chaste.visualization.VtkScene_2()
+            scene.SetCellPopulation(cell_population)
+            scene.SetSaveAsAnimation(True)
+            scene.SetOutputFilePath(
+                file_handler.GetOutputDirectoryFullPath() + "/cell_population"
+            )
 
-          nb_manager = chaste.visualization.JupyterNotebookManager()
-          nb_manager.vtk_show(scene, height=300)
+            nb_manager = chaste.visualization.JupyterNotebookManager()
+            nb_manager.vtk_show(scene, height=300)
+
 
 if __name__ == "__main__":
     unittest.main()

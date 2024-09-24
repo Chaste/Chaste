@@ -37,6 +37,7 @@ from chaste._pychaste_pychaste import (
     FileFinder,
     Identifiable,
     OutputFileHandler,
+    PetscSetupUtils,
     PetscTools,
     ProgressReporter,
     RandomNumberGenerator,
