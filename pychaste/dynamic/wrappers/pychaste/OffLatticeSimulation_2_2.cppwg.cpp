@@ -1,0 +1,133 @@
+/*
+
+Copyright (c) 2005-2024, University of Oxford.
+All rights reserved.
+
+University of Oxford means the Chancellor, Masters and Scholars of the
+University of Oxford, having an administrative office at Wellington
+Square, Oxford OX1 2JD, UK.
+
+This file is part of Chaste.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+ * Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+ * Neither the name of the University of Oxford nor the names of its
+   contributors may be used to endorse or promote products derived from this
+   software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+*/
+
+// This file is auto-generated. Manual changes will be overwritten. For changes
+// to persist, update the configuration in pychaste/dynamic/config.yaml.
+
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include <set>
+#include <vector>
+#include <string>
+#include <map>
+#include "SmartPointers.hpp"
+#include "UblasIncludes.hpp"
+#include "OffLatticeSimulation.hpp"
+
+#include "OffLatticeSimulation_2_2.cppwg.hpp"
+
+namespace py = pybind11;
+typedef OffLatticeSimulation<2, 2> OffLatticeSimulation_2_2;
+PYBIND11_DECLARE_HOLDER_TYPE(T, boost::shared_ptr<T>);
+
+class OffLatticeSimulation_2_2_Overrides : public OffLatticeSimulation_2_2
+{
+public:
+    using OffLatticeSimulation_2_2::OffLatticeSimulation;
+    void OutputAdditionalSimulationSetup(::out_stream & rParamsFile) override
+    {
+        PYBIND11_OVERRIDE(
+            void,
+            OffLatticeSimulation_2_2,
+            OutputAdditionalSimulationSetup,
+            rParamsFile);
+    }
+    void OutputSimulationParameters(::out_stream & rParamsFile) override
+    {
+        PYBIND11_OVERRIDE(
+            void,
+            OffLatticeSimulation_2_2,
+            OutputSimulationParameters,
+            rParamsFile);
+    }
+    void UpdateCellLocationsAndTopology() override
+    {
+        PYBIND11_OVERRIDE(
+            void,
+            OffLatticeSimulation_2_2,
+            UpdateCellLocationsAndTopology,
+            );
+    }
+    void SetupSolve() override
+    {
+        PYBIND11_OVERRIDE(
+            void,
+            OffLatticeSimulation_2_2,
+            SetupSolve,
+            );
+    }
+    void WriteVisualizerSetupFile() override
+    {
+        PYBIND11_OVERRIDE(
+            void,
+            OffLatticeSimulation_2_2,
+            WriteVisualizerSetupFile,
+            );
+    }
+};
+
+void register_OffLatticeSimulation_2_2_class(py::module &m)
+{
+    py::class_<OffLatticeSimulation_2_2, OffLatticeSimulation_2_2_Overrides, boost::shared_ptr<OffLatticeSimulation_2_2>, AbstractCellBasedSimulation<2, 2>>(m, "OffLatticeSimulation_2_2")
+        .def(py::init<::AbstractCellPopulation<2> &, bool, bool>(), py::arg("rCellPopulation"), py::arg("deleteCellPopulationInDestructor") = false, py::arg("initialiseCells") = true)
+        .def("AddForce",
+            (void(OffLatticeSimulation_2_2::*)(::boost::shared_ptr<AbstractForce<2, 2>>)) &OffLatticeSimulation_2_2::AddForce,
+            " ", py::arg("pForce"))
+        .def("RemoveAllForces",
+            (void(OffLatticeSimulation_2_2::*)()) &OffLatticeSimulation_2_2::RemoveAllForces,
+            " ")
+        .def("AddCellPopulationBoundaryCondition",
+            (void(OffLatticeSimulation_2_2::*)(::boost::shared_ptr<AbstractCellPopulationBoundaryCondition<2, 2>>)) &OffLatticeSimulation_2_2::AddCellPopulationBoundaryCondition,
+            " ", py::arg("pBoundaryCondition"))
+        .def("RemoveAllCellPopulationBoundaryConditions",
+            (void(OffLatticeSimulation_2_2::*)()) &OffLatticeSimulation_2_2::RemoveAllCellPopulationBoundaryConditions,
+            " ")
+        .def("SetNumericalMethod",
+            (void(OffLatticeSimulation_2_2::*)(::boost::shared_ptr<AbstractNumericalMethod<2, 2>>)) &OffLatticeSimulation_2_2::SetNumericalMethod,
+            " ", py::arg("pNumericalMethod"))
+        .def("GetNumericalMethod",
+            (::boost::shared_ptr<AbstractNumericalMethod<2, 2>> const(OffLatticeSimulation_2_2::*)() const) &OffLatticeSimulation_2_2::GetNumericalMethod,
+            " ")
+        .def("OutputAdditionalSimulationSetup",
+            (void(OffLatticeSimulation_2_2::*)(::out_stream &)) &OffLatticeSimulation_2_2::OutputAdditionalSimulationSetup,
+            " ", py::arg("rParamsFile"))
+        .def("OutputSimulationParameters",
+            (void(OffLatticeSimulation_2_2::*)(::out_stream &)) &OffLatticeSimulation_2_2::OutputSimulationParameters,
+            " ", py::arg("rParamsFile"))
+        .def("rGetForceCollection",
+            (::std::vector<boost::shared_ptr<AbstractForce<2, 2>>> const &(OffLatticeSimulation_2_2::*)() const) &OffLatticeSimulation_2_2::rGetForceCollection,
+            " ", py::return_value_policy::reference_internal)
+    ;
+}

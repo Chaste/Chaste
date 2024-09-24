@@ -67,7 +67,6 @@ endfunction()
 chaste_do_component(pychaste)
 
 set(PYCHASTE_WRAPPER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/dynamic/wrappers")
-set(PYCHASTE_MODULES cell_based core mesh ode pde visualization)
 
 ##################################################
 # Python wrapper generation
@@ -78,14 +77,11 @@ cppwg_command("${PYCHASTE_WRAPPER_DIR}")
 add_custom_command(TARGET pychaste_wrappers COMMAND ${CPPWG_COMMAND_LST})
 
 # Generate wrappers if they are missing
-foreach(module ${PYCHASTE_MODULES})
-    if(NOT EXISTS ${PYCHASTE_WRAPPER_DIR}/${module}/${module}.main.cpp)
-        message(STATUS "Generating PyChaste wrappers")
-        cppwg_command("${PYCHASTE_WRAPPER_DIR}")
-        execute_process(COMMAND sh -c "${CPPWG_COMMAND_STR}")
-        break()
-    endif()
-endforeach()
+if(NOT EXISTS ${PYCHASTE_WRAPPER_DIR}/pychaste/pychaste.main.cpp)
+    message(STATUS "Generating PyChaste wrappers")
+    cppwg_command("${PYCHASTE_WRAPPER_DIR}")
+    execute_process(COMMAND sh -c "${CPPWG_COMMAND_STR}")
+endif()
 
 # Find wrapper header directories
 header_dirs(${PYCHASTE_WRAPPER_DIR} PYCHASTE_WRAPPER_INCLUDE_DIRS)
@@ -122,50 +118,45 @@ endforeach()
 ##################################################
 # Build Python modules from wrappers
 ##################################################
-# Create a shared library for each pychaste module. The library name is
-# the same as the module name in the main wrapper e.g. in `ode.main.cpp`,
-# the module name is `_pychaste_ode`, which is imported in Python code as
-# `from chaste.ode._pychaste_ode import *`.
+# Create a `_pychaste_pychaste` shared library. The library name is
+# the same as the module name in the main wrapper `pychaste.main.cpp`.
+# It is imported in Python code as `from chaste._pychaste_pychaste import *`.
 
-foreach(module ${PYCHASTE_MODULES})
-    file(
-        GLOB_RECURSE
-        module_sources
-        RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-        ${PYCHASTE_WRAPPER_DIR}/${module}/*.cpp
-        ${PYCHASTE_WRAPPER_DIR}/${module}/*.hpp
-    )
+file(
+    GLOB_RECURSE
+    PYCHASTE_WRAPPER_SOURCES
+    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+    ${PYCHASTE_WRAPPER_DIR}/pychaste/*.cpp
+    ${PYCHASTE_WRAPPER_DIR}/pychaste/*.hpp
+)
 
-    set(module_lib _pychaste_${module})
+add_library(_pychaste_pychaste SHARED ${PYCHASTE_WRAPPER_SOURCES})
 
-    add_library(${module_lib} SHARED ${module_sources})
+set_target_properties(
+    _pychaste_pychaste
+    PROPERTIES
+        LIBRARY_OUTPUT_DIRECTORY ${PYCHASTE_PACKAGE_BINARY_DIR}/chaste
+        PREFIX "${PYTHON_MODULE_PREFIX}"
+        SUFFIX "${CMAKE_SHARED_LIBRARY_SUFFIX}"
+)
 
-    set_target_properties(
-        ${module_lib}
-        PROPERTIES
-            LIBRARY_OUTPUT_DIRECTORY ${PYCHASTE_PACKAGE_BINARY_DIR}/chaste/${module}
-            PREFIX "${PYTHON_MODULE_PREFIX}"
-            SUFFIX "${CMAKE_SHARED_LIBRARY_SUFFIX}"
-    )
+target_link_libraries(
+    _pychaste_pychaste
+    PRIVATE
+    ${Python3_LIBRARIES}  # Python and pybind11 come first
+    pybind11::module
+    Chaste_COMMON_DEPS
+    chaste_pychaste  # Library built from non-wrapper code in src/cpp/
+)
 
-    target_link_libraries(
-        ${module_lib}
-        PRIVATE
-        ${Python3_LIBRARIES}  # Python and pybind11 come first
-        pybind11::module
-        Chaste_COMMON_DEPS
-        chaste_pychaste  # Library built from non-wrapper cpp code in src/
-    )
+target_include_directories(
+    _pychaste_pychaste
+    PRIVATE
+    ${PYTHON3_INCLUDE_DIRS}
+    ${Chaste_pychaste_INCLUDE_DIRS}  # Non-wrapper code in src/cpp/
+    ${PYCHASTE_WRAPPER_INCLUDE_DIRS}
+)
 
-    target_include_directories(
-        ${module_lib}
-        PRIVATE
-        ${PYTHON3_INCLUDE_DIRS}
-        ${Chaste_pychaste_INCLUDE_DIRS}  # Non-wrapper cpp code in src/
-        ${PYCHASTE_WRAPPER_INCLUDE_DIRS}
-    )
+target_compile_options(_pychaste_pychaste PRIVATE -Wno-unused-local-typedefs)
 
-    target_compile_options(${module_lib} PRIVATE -Wno-unused-local-typedefs)
-
-    add_dependencies(pychaste ${module_lib})
-endforeach()
+add_dependencies(pychaste _pychaste_pychaste)

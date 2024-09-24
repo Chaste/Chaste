@@ -32,17 +32,25 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
+import importlib.util
 import warnings
 
-from chaste.visualization._pychaste_visualization import *
+from chaste._pychaste_pychaste import (
+    AbstractPyChasteActorGenerator_2,
+    AbstractPyChasteActorGenerator_3,
+    CellPopulationPyChasteActorGenerator_2,
+    CellPopulationPyChasteActorGenerator_3,
+    VtkScene_2,
+    VtkScene_3,
+)
 
-try:
-    import IPython
-except ImportError:
-    warnings.warn("Jupyter not found... skipping Jupyter visualization imports.")
+ipython_spec = importlib.util.find_spec("IPython")
+if ipython_spec is None:
+    warnings.warn("IPython not found... skipping Jupyter visualization imports.")
 else:
     from chaste.visualization.JupyterNotebookManager import JupyterNotebookManager
     from chaste.visualization.JupyterSceneModifier import (
-        JupyterSceneModifier2,
-        JupyterSceneModifier3,
+        JupyterSceneModifier_2,
+        JupyterSceneModifier_3,
     )
+del ipython_spec

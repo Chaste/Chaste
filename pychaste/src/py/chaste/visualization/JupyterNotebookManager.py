@@ -33,12 +33,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 import os.path
-
 from io import StringIO
-from pkg_resources import resource_filename
 
 import vtk
 import xvfbwrapper
+from pkg_resources import resource_filename
 
 try:
     import IPython

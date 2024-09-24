@@ -32,7 +32,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from chaste.cell_based import VtkSceneModifier2, VtkSceneModifier3
+from chaste.cell_based import VtkSceneModifier_2, VtkSceneModifier_3
 
 try:
     import IPython
@@ -71,5 +71,5 @@ def JupyterSceneModifierFactory(VtkSceneModifier):
     return JupyterSceneModifier
 
 
-JupyterSceneModifier2 = JupyterSceneModifierFactory(VtkSceneModifier2)
-JupyterSceneModifier3 = JupyterSceneModifierFactory(VtkSceneModifier3)
+JupyterSceneModifier_2 = JupyterSceneModifierFactory(VtkSceneModifier_2)
+JupyterSceneModifier_3 = JupyterSceneModifierFactory(VtkSceneModifier_3)

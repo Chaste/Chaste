@@ -32,4 +32,16 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from chaste.core._pychaste_core import *
+from chaste._pychaste_pychaste import (
+    ChasteBuildInfo,
+    FileFinder,
+    Identifiable,
+    OutputFileHandler,
+    PetscTools,
+    ProgressReporter,
+    RandomNumberGenerator,
+    RelativeTo,
+    ReplicatableVector,
+    Timer,
+    TimeStepper,
+)

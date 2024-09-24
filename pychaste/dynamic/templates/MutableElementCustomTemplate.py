@@ -43,12 +43,12 @@ class MutableElementCustomTemplate(cppwg.templates.custom.Custom):
         Adds MutableElement constructor not implemented in 1D template.
         """
 
-        ELEMENT_DIM, SPACE_DIM = class_name.replace("MutableElement", "").split("_")
+        _, ELEMENT_DIM, SPACE_DIM = class_name.split("_")
 
         if ELEMENT_DIM == "1":
             return ""
 
         code = f"""\
-        .def(py::init<unsigned int, ::std::vector<Node<{SPACE_DIM}> *> const & >(), py::arg("index"), py::arg("rNodes"))
+        .def(py::init<unsigned int, ::std::vector<Node<{SPACE_DIM}>*> const &>(), py::arg("index"), py::arg("rNodes"))
 """
         return code

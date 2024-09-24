@@ -32,19 +32,30 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-import os, sys
+import os
+import sys
 
-import chaste.core
-  
-def init(master_output_directory = os.getcwd(), comm=None):
-    import petsc4py
-      
-    # If CHASTE_TEST_OUTPUT is not set give it a user specified value, or CWD if there is none
-    if os.environ.get('CHASTE_TEST_OUTPUT') is None:
-        os.environ["CHASTE_TEST_OUTPUT"] = master_output_directory
-  
+import petsc4py
+
+from chaste._pychaste_pychaste import *
+
+
+def init(test_output=None, comm=None):
+    # Set CHASTE_TEST_OUTPUT
+    if test_output:
+        # Set to user specified value if provided
+        os.environ["CHASTE_TEST_OUTPUT"] = test_output
+    elif os.environ.get("CHASTE_TEST_OUTPUT") is None:
+        # Set to the current working directory if not already set
+        os.environ["CHASTE_TEST_OUTPUT"] = os.getcwd()
+
+    # Init petsc
     if comm is None:
         petsc4py.init(sys.argv)
     else:
         petsc4py.init(comm=comm)
-    return chaste.core.OutputFileHandler("", False)
+
+    return OutputFileHandler("", False)
+
+
+init()

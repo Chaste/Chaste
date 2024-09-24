@@ -32,4 +32,20 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from chaste.pde._pychaste_pde import *
+from chaste._pychaste_pychaste import (
+    AbstractBoundaryCondition_2,
+    AbstractBoundaryCondition_3,
+    AbstractLinearEllipticPde_2_2,
+    AbstractLinearEllipticPde_3_3,
+    AbstractLinearParabolicPde_2_2,
+    AbstractLinearParabolicPde_3_3,
+    AbstractLinearParabolicPdeSystemForCoupledOdeSystem_2_2_1,
+    AbstractLinearParabolicPdeSystemForCoupledOdeSystem_3_3_1,
+    AbstractLinearPde_2_2,
+    AbstractLinearPde_3_3,
+    AbstractNonlinearEllipticPde_2,
+    AbstractNonlinearEllipticPde_3,
+    ConstBoundaryCondition_2,
+    ConstBoundaryCondition_3,
+    PdeSimulationTime,
+)

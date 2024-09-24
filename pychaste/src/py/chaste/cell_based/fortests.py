@@ -33,44 +33,48 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 import unittest
-import chaste.core
+
 import chaste.cell_based
+import chaste.core
+
 
 def SetupNotebookTest():
     simulation_time = chaste.cell_based.SimulationTime.Instance()
     simulation_time.SetStartTime(0.0)
     chaste.core.RandomNumberGenerator.Instance().Reseed(0)
     chaste.cell_based.CellId.ResetMaxCellId()
-    
+
+
 def TearDownNotebookTest():
     simulation_time = chaste.cell_based.SimulationTime.Instance()
     simulation_time.Destroy()
-    
+
     chaste.core.RandomNumberGenerator.Instance().Destroy()
-    #chaste.cell_based.CellPropertyRegistry.Instance().Clear()    
+    # chaste.cell_based.CellPropertyRegistry.Instance().Clear()
+
 
 class AbstractCellBasedTestSuite(unittest.TestCase):
-    
+
     def setUp(self):
         simulation_time = chaste.cell_based.SimulationTime.Instance()
         simulation_time.SetStartTime(0.0)
         chaste.core.RandomNumberGenerator.Instance().Reseed(0)
         chaste.cell_based.CellId.ResetMaxCellId()
-        
+
     def tearDown(self):
         simulation_time = chaste.cell_based.SimulationTime.Instance()
         simulation_time.Destroy()
-        
+
         chaste.core.RandomNumberGenerator.Instance().Destroy()
-        #chaste.cell_based.CellPropertyRegistry.Instance().Clear()
-        
+        # chaste.cell_based.CellPropertyRegistry.Instance().Clear()
+
+
 class AbstractCellBasedWithTimingsTestSuite(AbstractCellBasedTestSuite):
-    
+
     def setUp(self):
         chaste.core.Timer().Reset()
         super(AbstractCellBasedWithTimingsTestSuite, self).setUp()
-        
-        
+
     def tearDown(self):
         super(AbstractCellBasedWithTimingsTestSuite, self).tearDown()
-        chaste.core.Timer().Print("Test elapsed");
+        chaste.core.Timer().Print("Test elapsed")
