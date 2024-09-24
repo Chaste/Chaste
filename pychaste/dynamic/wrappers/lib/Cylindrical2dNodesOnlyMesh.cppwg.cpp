@@ -1,0 +1,126 @@
+/*
+
+Copyright (c) 2005-2024, University of Oxford.
+All rights reserved.
+
+University of Oxford means the Chancellor, Masters and Scholars of the
+University of Oxford, having an administrative office at Wellington
+Square, Oxford OX1 2JD, UK.
+
+This file is part of Chaste.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+ * Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+ * Neither the name of the University of Oxford nor the names of its
+   contributors may be used to endorse or promote products derived from this
+   software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+*/
+
+// This file is auto-generated; manual changes will be overwritten.
+// To make enduring changes, see pychaste/dynamic/config.yaml.
+
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include <set>
+#include <vector>
+#include <string>
+#include <map>
+#include "SmartPointers.hpp"
+#include "UblasIncludes.hpp"
+#include "Cylindrical2dNodesOnlyMesh.hpp"
+
+#include "Cylindrical2dNodesOnlyMesh.cppwg.hpp"
+
+namespace py = pybind11;
+typedef Cylindrical2dNodesOnlyMesh Cylindrical2dNodesOnlyMesh;
+PYBIND11_DECLARE_HOLDER_TYPE(T, boost::shared_ptr<T>);
+typedef ::boost::numeric::ublas::c_vector<double, 2> _boost_numeric_ublas_c_vector_lt_double_2_gt_;
+typedef unsigned int unsignedint;
+
+class Cylindrical2dNodesOnlyMesh_Overrides : public Cylindrical2dNodesOnlyMesh
+{
+public:
+    using Cylindrical2dNodesOnlyMesh::Cylindrical2dNodesOnlyMesh;
+    ::boost::numeric::ublas::c_vector<double, 2> GetVectorFromAtoB(::boost::numeric::ublas::c_vector<double, 2> const & rLocation1, ::boost::numeric::ublas::c_vector<double, 2> const & rLocation2) override
+    {
+        PYBIND11_OVERRIDE(
+            _boost_numeric_ublas_c_vector_lt_double_2_gt_,
+            Cylindrical2dNodesOnlyMesh,
+            GetVectorFromAtoB,
+            rLocation1,
+            rLocation2);
+    }
+    double GetWidth(unsigned int const & rDimension) const override
+    {
+        PYBIND11_OVERRIDE(
+            double,
+            Cylindrical2dNodesOnlyMesh,
+            GetWidth,
+            rDimension);
+    }
+    void SetNode(unsigned int nodeIndex, ::ChastePoint<2> point, bool concreteMove) override
+    {
+        PYBIND11_OVERRIDE(
+            void,
+            Cylindrical2dNodesOnlyMesh,
+            SetNode,
+            nodeIndex,
+            point,
+            concreteMove);
+    }
+    unsigned int AddNode(::Node<2> * pNewNode) override
+    {
+        PYBIND11_OVERRIDE(
+            unsignedint,
+            Cylindrical2dNodesOnlyMesh,
+            AddNode,
+            pNewNode);
+    }
+    void RefreshMesh() override
+    {
+        PYBIND11_OVERRIDE(
+            void,
+            Cylindrical2dNodesOnlyMesh,
+            RefreshMesh,
+            );
+    }
+};
+
+void register_Cylindrical2dNodesOnlyMesh_class(py::module &m)
+{
+    py::class_<Cylindrical2dNodesOnlyMesh, Cylindrical2dNodesOnlyMesh_Overrides, boost::shared_ptr<Cylindrical2dNodesOnlyMesh>, NodesOnlyMesh<2>>(m, "Cylindrical2dNodesOnlyMesh")
+        .def(py::init<double>(), py::arg("width"))
+        .def("GetVectorFromAtoB",
+            (::boost::numeric::ublas::c_vector<double, 2>(Cylindrical2dNodesOnlyMesh::*)(::boost::numeric::ublas::c_vector<double, 2> const &, ::boost::numeric::ublas::c_vector<double, 2> const &)) &Cylindrical2dNodesOnlyMesh::GetVectorFromAtoB,
+            " ", py::arg("rLocation1"), py::arg("rLocation2"))
+        .def("GetWidth",
+            (double(Cylindrical2dNodesOnlyMesh::*)(unsigned int const &) const) &Cylindrical2dNodesOnlyMesh::GetWidth,
+            " ", py::arg("rDimension"))
+        .def("SetNode",
+            (void(Cylindrical2dNodesOnlyMesh::*)(unsigned int, ::ChastePoint<2>, bool)) &Cylindrical2dNodesOnlyMesh::SetNode,
+            " ", py::arg("nodeIndex"), py::arg("point"), py::arg("concreteMove") = false)
+        .def("AddNode",
+            (unsigned int(Cylindrical2dNodesOnlyMesh::*)(::Node<2> *)) &Cylindrical2dNodesOnlyMesh::AddNode,
+            " ", py::arg("pNewNode"))
+        .def("RefreshMesh",
+            (void(Cylindrical2dNodesOnlyMesh::*)()) &Cylindrical2dNodesOnlyMesh::RefreshMesh,
+            " ")
+    ;
+}

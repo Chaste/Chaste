@@ -61,7 +61,7 @@ template_substitutions:
       - [UniformG1GenerationalCellCycleModel, 3]
 
 modules:
-  - name: pychaste
+  - name: lib
     source_locations:
       - global/src
       - ode/src

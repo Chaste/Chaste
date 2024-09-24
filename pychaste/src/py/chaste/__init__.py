@@ -37,10 +37,21 @@ import sys
 
 import petsc4py
 
-from chaste._pychaste_pychaste import *
+import chaste.core
+import chaste.mesh
+import chaste.ode
+import chaste.pde
+import chaste.cell_based
+import chaste.visualization
 
 
 def init(test_output=None, comm=None):
+    """
+     Initialize PETSc and set the CHASTE_TEST_OUTPUT environment variable.
+
+    :param test_output: The CHASTE_TEST_OUTPUT directory.
+    :param comm: MPI communicator.
+    """
     # Set CHASTE_TEST_OUTPUT
     if test_output:
         # Set to user specified value if provided
@@ -49,13 +60,16 @@ def init(test_output=None, comm=None):
         # Set to the current working directory if not already set
         os.environ["CHASTE_TEST_OUTPUT"] = os.getcwd()
 
-    # Init petsc
+    # Initialize PETSc
     if comm is None:
         petsc4py.init(sys.argv)
     else:
         petsc4py.init(comm=comm)
 
-    return OutputFileHandler("", False)
+    # Do Chaste Petsc setup
+    chaste.core.PetscSetupUtils.CommonSetup()
+
+    return chaste.core.OutputFileHandler("", False)
 
 
 init()

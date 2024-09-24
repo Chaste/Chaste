@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-// This file is auto-generated. Manual changes will be overwritten. For changes
-// to persist, update the configuration in pychaste/dynamic/config.yaml.
+// This file is auto-generated; manual changes will be overwritten.
+// To make enduring changes, see pychaste/dynamic/config.yaml.
 
 #ifndef pychaste_HEADERS_HPP_
 #define pychaste_HEADERS_HPP_

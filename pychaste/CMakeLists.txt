@@ -77,7 +77,7 @@ cppwg_command("${PYCHASTE_WRAPPER_DIR}")
 add_custom_command(TARGET pychaste_wrappers COMMAND ${CPPWG_COMMAND_LST})
 
 # Generate wrappers if they are missing
-if(NOT EXISTS ${PYCHASTE_WRAPPER_DIR}/pychaste/pychaste.main.cpp)
+if(NOT EXISTS ${PYCHASTE_WRAPPER_DIR}/lib/lib.main.cpp)
     message(STATUS "Generating PyChaste wrappers")
     cppwg_command("${PYCHASTE_WRAPPER_DIR}")
     execute_process(COMMAND sh -c "${CPPWG_COMMAND_STR}")
@@ -118,22 +118,22 @@ endforeach()
 ##################################################
 # Build Python modules from wrappers
 ##################################################
-# Create a `_pychaste_pychaste` shared library. The library name is
-# the same as the module name in the main wrapper `pychaste.main.cpp`.
-# It is imported in Python code as `from chaste._pychaste_pychaste import *`.
+# Create a `_pychaste_lib` shared library. The library name is
+# the same as the module name in the main wrapper `lib.main.cpp`.
+# It is imported in Python code as `from chaste._pychaste_lib import *`.
 
 file(
     GLOB_RECURSE
     PYCHASTE_WRAPPER_SOURCES
     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-    ${PYCHASTE_WRAPPER_DIR}/pychaste/*.cpp
-    ${PYCHASTE_WRAPPER_DIR}/pychaste/*.hpp
+    ${PYCHASTE_WRAPPER_DIR}/lib/*.cpp
+    ${PYCHASTE_WRAPPER_DIR}/lib/*.hpp
 )
 
-add_library(_pychaste_pychaste SHARED ${PYCHASTE_WRAPPER_SOURCES})
+add_library(_pychaste_lib SHARED ${PYCHASTE_WRAPPER_SOURCES})
 
 set_target_properties(
-    _pychaste_pychaste
+    _pychaste_lib
     PROPERTIES
         LIBRARY_OUTPUT_DIRECTORY ${PYCHASTE_PACKAGE_BINARY_DIR}/chaste
         PREFIX "${PYTHON_MODULE_PREFIX}"
@@ -141,7 +141,7 @@ set_target_properties(
 )
 
 target_link_libraries(
-    _pychaste_pychaste
+    _pychaste_lib
     PRIVATE
     ${Python3_LIBRARIES}  # Python and pybind11 come first
     pybind11::module
@@ -150,13 +150,13 @@ target_link_libraries(
 )
 
 target_include_directories(
-    _pychaste_pychaste
+    _pychaste_lib
     PRIVATE
     ${PYTHON3_INCLUDE_DIRS}
     ${Chaste_pychaste_INCLUDE_DIRS}  # Non-wrapper code in src/cpp/
     ${PYCHASTE_WRAPPER_INCLUDE_DIRS}
 )
 
-target_compile_options(_pychaste_pychaste PRIVATE -Wno-unused-local-typedefs)
+target_compile_options(_pychaste_lib PRIVATE -Wno-unused-local-typedefs)
 
-add_dependencies(pychaste _pychaste_pychaste)
+add_dependencies(pychaste _pychaste_lib)

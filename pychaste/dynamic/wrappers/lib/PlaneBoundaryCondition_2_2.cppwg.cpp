@@ -1,0 +1,112 @@
+/*
+
+Copyright (c) 2005-2024, University of Oxford.
+All rights reserved.
+
+University of Oxford means the Chancellor, Masters and Scholars of the
+University of Oxford, having an administrative office at Wellington
+Square, Oxford OX1 2JD, UK.
+
+This file is part of Chaste.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+ * Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+ * Neither the name of the University of Oxford nor the names of its
+   contributors may be used to endorse or promote products derived from this
+   software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+*/
+
+// This file is auto-generated; manual changes will be overwritten.
+// To make enduring changes, see pychaste/dynamic/config.yaml.
+
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include "PythonUblasObjectConverters.hpp"
+#include <set>
+#include <vector>
+#include <string>
+#include <map>
+#include "SmartPointers.hpp"
+#include "UblasIncludes.hpp"
+#include "PlaneBoundaryCondition.hpp"
+
+#include "PlaneBoundaryCondition_2_2.cppwg.hpp"
+
+namespace py = pybind11;
+typedef PlaneBoundaryCondition<2, 2> PlaneBoundaryCondition_2_2;
+PYBIND11_DECLARE_HOLDER_TYPE(T, boost::shared_ptr<T>);
+
+class PlaneBoundaryCondition_2_2_Overrides : public PlaneBoundaryCondition_2_2
+{
+public:
+    using PlaneBoundaryCondition_2_2::PlaneBoundaryCondition;
+    void ImposeBoundaryCondition(::std::map<Node<2> *, boost::numeric::ublas::c_vector<double, 2>> const & rOldLocations) override
+    {
+        PYBIND11_OVERRIDE(
+            void,
+            PlaneBoundaryCondition_2_2,
+            ImposeBoundaryCondition,
+            rOldLocations);
+    }
+    bool VerifyBoundaryCondition() override
+    {
+        PYBIND11_OVERRIDE(
+            bool,
+            PlaneBoundaryCondition_2_2,
+            VerifyBoundaryCondition,
+            );
+    }
+    void OutputCellPopulationBoundaryConditionParameters(::out_stream & rParamsFile) override
+    {
+        PYBIND11_OVERRIDE(
+            void,
+            PlaneBoundaryCondition_2_2,
+            OutputCellPopulationBoundaryConditionParameters,
+            rParamsFile);
+    }
+};
+
+void register_PlaneBoundaryCondition_2_2_class(py::module &m)
+{
+    py::class_<PlaneBoundaryCondition_2_2, PlaneBoundaryCondition_2_2_Overrides, boost::shared_ptr<PlaneBoundaryCondition_2_2>, AbstractCellPopulationBoundaryCondition<2>>(m, "PlaneBoundaryCondition_2_2")
+        .def(py::init<::AbstractCellPopulation<2> *, ::boost::numeric::ublas::c_vector<double, 2>, ::boost::numeric::ublas::c_vector<double, 2>>(), py::arg("pCellPopulation"), py::arg("point"), py::arg("normal"))
+        .def("rGetPointOnPlane",
+            (::boost::numeric::ublas::c_vector<double, 2> const &(PlaneBoundaryCondition_2_2::*)() const) &PlaneBoundaryCondition_2_2::rGetPointOnPlane,
+            " ", py::return_value_policy::reference_internal)
+        .def("rGetNormalToPlane",
+            (::boost::numeric::ublas::c_vector<double, 2> const &(PlaneBoundaryCondition_2_2::*)() const) &PlaneBoundaryCondition_2_2::rGetNormalToPlane,
+            " ", py::return_value_policy::reference_internal)
+        .def("SetUseJiggledNodesOnPlane",
+            (void(PlaneBoundaryCondition_2_2::*)(bool)) &PlaneBoundaryCondition_2_2::SetUseJiggledNodesOnPlane,
+            " ", py::arg("useJiggledNodesOnPlane"))
+        .def("GetUseJiggledNodesOnPlane",
+            (bool(PlaneBoundaryCondition_2_2::*)()) &PlaneBoundaryCondition_2_2::GetUseJiggledNodesOnPlane,
+            " ")
+        .def("ImposeBoundaryCondition",
+            (void(PlaneBoundaryCondition_2_2::*)(::std::map<Node<2> *, boost::numeric::ublas::c_vector<double, 2>> const &)) &PlaneBoundaryCondition_2_2::ImposeBoundaryCondition,
+            " ", py::arg("rOldLocations"))
+        .def("VerifyBoundaryCondition",
+            (bool(PlaneBoundaryCondition_2_2::*)()) &PlaneBoundaryCondition_2_2::VerifyBoundaryCondition,
+            " ")
+        .def("OutputCellPopulationBoundaryConditionParameters",
+            (void(PlaneBoundaryCondition_2_2::*)(::out_stream &)) &PlaneBoundaryCondition_2_2::OutputCellPopulationBoundaryConditionParameters,
+            " ", py::arg("rParamsFile"))
+    ;
+}

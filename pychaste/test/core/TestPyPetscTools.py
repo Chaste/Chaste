@@ -32,15 +32,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import unittest
 
-import chaste.core
+import chaste
 
 
 class TestPetscTools(unittest.TestCase):
 
     def test_some_vecs(self):
-
-        # Setup Petsc
-        chaste.core.PetscSetupUtils.CommonSetup()
 
         # Make a Petsc Vec
         local = [1.0, 2.0, 3.0]
