@@ -153,6 +153,8 @@ from chaste._pychaste_lib import (
     DeltaNotchEdgeInteriorTrackingModifier_2,
     DeltaNotchEdgeInteriorTrackingModifier_3,
     DeltaNotchEdgeSrnModel,
+    DeltaNotchEdgeTrackingModifier_2,
+    DeltaNotchEdgeTrackingModifier_3,
     DeltaNotchInteriorSrnModel,
     DeltaNotchSrnModel,
     DeltaNotchTrackingModifier_2,
@@ -733,6 +735,13 @@ DeltaNotchTrackingModifier = TemplatedClass(
     {
         ("2",): DeltaNotchTrackingModifier_2,
         ("3",): DeltaNotchTrackingModifier_3,
+    }
+)
+
+DeltaNotchEdgeTrackingModifier = TemplatedClass(
+    {
+        ("2",): DeltaNotchEdgeTrackingModifier_2,
+        ("3",): DeltaNotchEdgeTrackingModifier_3,
     }
 )
 

@@ -37,11 +37,11 @@ import sys
 
 import petsc4py
 
+import chaste.cell_based
 import chaste.core
 import chaste.mesh
 import chaste.ode
 import chaste.pde
-import chaste.cell_based
 import chaste.visualization
 
 
