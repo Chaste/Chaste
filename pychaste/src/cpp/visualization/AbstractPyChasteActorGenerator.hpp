@@ -37,23 +37,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ABSTRACTPYCHASTEACTORGENERATOR_HPP_
 
 #include <vector>
-#include "SmartPointers.hpp"
-#include <vtkSmartPointer.h>
-#include <vtkRenderer.h>
 #include <vtkColorTransferFunction.h>
+#include <vtkRenderer.h>
 #include <vtkScalarBarActor.h>
+#include <vtkSmartPointer.h>
 #include <vtkTextProperty.h>
+#include "SmartPointers.hpp"
 #include "UblasVectorInclude.hpp"
 
 /**
  * This class generates VTK actors for geometric features.
  */
-template<unsigned DIM>
+template <unsigned DIM>
 class AbstractPyChasteActorGenerator
 {
 
 protected:
-
     /**
      * The color lookup for continuous entities
      */
@@ -125,7 +124,6 @@ protected:
     bool mShowScaleBar;
 
 public:
-
     /**
      * Constructor
      */
@@ -222,7 +220,6 @@ public:
      * @param show show scale bar
      */
     void SetShowScaleBar(double show);
-
 };
 
-#endif /* ABSTRACTPYCHASTEACTORGENERATOR_HPP_*/
+#endif // ABSTRACTPYCHASTEACTORGENERATOR_HPP_

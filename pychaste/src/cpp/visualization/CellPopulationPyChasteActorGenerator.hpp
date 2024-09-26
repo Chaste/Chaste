@@ -72,19 +72,19 @@ Copyright (c) 2005-2024, University of Oxford.
 #define CELLPOPULATIONPYCHASTEACTORGENERATOR_HPP_
 
 #include <vector>
-#include "SmartPointers.hpp"
-#include <vtkSmartPointer.h>
-#include <vtkRenderer.h>
 #include <vtkLookupTable.h>
+#include <vtkRenderer.h>
+#include <vtkSmartPointer.h>
 #include "AbstractCellPopulation.hpp"
-#include "VertexBasedCellPopulation.hpp"
-#include "MeshBasedCellPopulation.hpp"
 #include "AbstractPyChasteActorGenerator.hpp"
+#include "MeshBasedCellPopulation.hpp"
+#include "SmartPointers.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
 /**
  * This class generates VTK actors for CellPopulations
  */
-template<unsigned DIM>
+template <unsigned DIM>
 class CellPopulationPyChasteActorGenerator : public AbstractPyChasteActorGenerator<DIM>
 {
     /**
@@ -143,7 +143,6 @@ class CellPopulationPyChasteActorGenerator : public AbstractPyChasteActorGenerat
     bool mColorCellByUserDefined;
 
 public:
-
     /**
      * Constructor
      */
@@ -247,4 +246,4 @@ public:
     void SetShowCellCentres(bool showCentres);
 };
 
-#endif /* CELLPOPULATIONPYCHASTEACTORGENERATOR_HPP_*/
+#endif // CELLPOPULATIONPYCHASTEACTORGENERATOR_HPP_

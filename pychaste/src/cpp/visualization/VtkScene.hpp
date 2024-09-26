@@ -214,4 +214,4 @@ public:
     void StartInteractiveEventHandler();
 };
 
-#endif /* VTKSCENE_HPP_*/
+#endif // VTKSCENE_HPP_

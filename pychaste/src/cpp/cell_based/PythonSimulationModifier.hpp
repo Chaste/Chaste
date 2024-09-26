@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef PythonSimulationModifier_HPP_
-#define PythonSimulationModifier_HPP_
+#ifndef PYTHONSIMULATIONMODIFIER_HPP_
+#define PYTHONSIMULATIONMODIFIER_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -118,4 +118,4 @@ public:
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(PythonSimulationModifier)
 
-#endif /*PythonSimulationModifier_HPP_*/
+#endif // PYTHONSIMULATIONMODIFIER_HPP_

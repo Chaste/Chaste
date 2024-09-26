@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef VtkSceneModifier_HPP_
-#define VtkSceneModifier_HPP_
+#ifndef VTKSCENEMODIFIER_HPP_
+#define VTKSCENEMODIFIER_HPP_
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -145,4 +145,4 @@ public:
 #include "SerializationExportWrapper.hpp"
 EXPORT_TEMPLATE_CLASS_SAME_DIMS(VtkSceneModifier)
 
-#endif /*VtkSceneModifier_HPP_*/
+#endif // VTKSCENEMODIFIER_HPP_

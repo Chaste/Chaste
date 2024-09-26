@@ -33,70 +33,69 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "AbstractCentreBasedCellPopulation.hpp"
 #include "AttractingPlaneBoundaryCondition.hpp"
-#include "VertexBasedCellPopulation.hpp"
+#include "AbstractCentreBasedCellPopulation.hpp"
 #include "UblasIncludes.hpp"
+#include "VertexBasedCellPopulation.hpp"
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-AttractingPlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::AttractingPlaneBoundaryCondition(
-        AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>* pCellPopulation,
-                                                    c_vector<double, SPACE_DIM> point,
-                                                    c_vector<double, SPACE_DIM> normal)
-        : AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM>(pCellPopulation),
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+AttractingPlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::AttractingPlaneBoundaryCondition(
+    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation,
+    c_vector<double, SPACE_DIM> point,
+    c_vector<double, SPACE_DIM> normal)
+        : AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM>(pCellPopulation),
           mPointOnPlane(normal),
           mUseJiggledNodesOnPlane(false),
           mAttractionThreshold(0.1)
 {
     assert(norm_2(normal) > 0.0);
-    mNormalToPlane = normal/norm_2(normal);
+    mNormalToPlane = normal / norm_2(normal);
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-const c_vector<double, SPACE_DIM>& AttractingPlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::rGetPointOnPlane() const
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+const c_vector<double, SPACE_DIM>& AttractingPlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::rGetPointOnPlane() const
 {
     return mPointOnPlane;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-const c_vector<double, SPACE_DIM>& AttractingPlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::rGetNormalToPlane() const
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+const c_vector<double, SPACE_DIM>& AttractingPlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::rGetNormalToPlane() const
 {
     return mNormalToPlane;
 }
 
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AttractingPlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::SetUseJiggledNodesOnPlane(bool useJiggledNodesOnPlane)
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AttractingPlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::SetUseJiggledNodesOnPlane(bool useJiggledNodesOnPlane)
 {
     mUseJiggledNodesOnPlane = useJiggledNodesOnPlane;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool AttractingPlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::GetUseJiggledNodesOnPlane()
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AttractingPlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::GetUseJiggledNodesOnPlane()
 {
     return mUseJiggledNodesOnPlane;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AttractingPlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::ImposeBoundaryCondition(const std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldLocations)
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AttractingPlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCondition(const std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> >& rOldLocations)
 {
     ///\todo Move this to constructor. If this is in the constructor then Exception always throws.
-    if (dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation)==NULL)
+    if (dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>*>(this->mpCellPopulation) == NULL)
     {
         EXCEPTION("AttractingPlaneBoundaryCondition requires a subclass of AbstractOffLatticeCellPopulation.");
     }
 
-    assert((dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation))
-            || (SPACE_DIM==ELEMENT_DIM && (dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(this->mpCellPopulation))) );
+    assert((dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>*>(this->mpCellPopulation))
+           || (SPACE_DIM == ELEMENT_DIM && (dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(this->mpCellPopulation))));
 
     // This is a magic number
     double max_jiggle = 1e-4;
 
     if (SPACE_DIM != 1)
     {
-        if (dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation))
+        if (dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>*>(this->mpCellPopulation))
         {
-            for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
+            for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
                  cell_iter != this->mpCellPopulation->End();
                  ++cell_iter)
             {
@@ -112,11 +111,11 @@ void AttractingPlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::ImposeBoundaryCond
                     c_vector<double, SPACE_DIM> nearest_point;
                     if (mUseJiggledNodesOnPlane)
                     {
-                        nearest_point = node_location - (signed_distance+max_jiggle*RandomNumberGenerator::Instance()->ranf())*mNormalToPlane;
+                        nearest_point = node_location - (signed_distance + max_jiggle * RandomNumberGenerator::Instance()->ranf()) * mNormalToPlane;
                     }
                     else
                     {
-                        nearest_point = node_location - signed_distance*mNormalToPlane;
+                        nearest_point = node_location - signed_distance * mNormalToPlane;
                     }
                     p_node->rGetModifiableLocation() = nearest_point;
                 }
@@ -129,7 +128,7 @@ void AttractingPlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::ImposeBoundaryCond
 
             // Iterate over all nodes and update their positions according to the boundary conditions
             unsigned num_nodes = this->mpCellPopulation->GetNumNodes();
-            for (unsigned node_index=0; node_index<num_nodes; node_index++)
+            for (unsigned node_index = 0; node_index < num_nodes; node_index++)
             {
                 Node<SPACE_DIM>* p_node = this->mpCellPopulation->GetNode(node_index);
                 c_vector<double, SPACE_DIM> node_location = p_node->rGetLocation();
@@ -141,11 +140,11 @@ void AttractingPlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::ImposeBoundaryCond
                     c_vector<double, SPACE_DIM> nearest_point;
                     if (mUseJiggledNodesOnPlane)
                     {
-                        nearest_point = node_location - (signed_distance+max_jiggle*RandomNumberGenerator::Instance()->ranf())*mNormalToPlane;
+                        nearest_point = node_location - (signed_distance + max_jiggle * RandomNumberGenerator::Instance()->ranf()) * mNormalToPlane;
                     }
                     else
                     {
-                        nearest_point = node_location - signed_distance*mNormalToPlane;
+                        nearest_point = node_location - signed_distance * mNormalToPlane;
                     }
                     p_node->rGetModifiableLocation() = nearest_point;
                 }
@@ -156,12 +155,12 @@ void AttractingPlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::ImposeBoundaryCond
     {
         // DIM == 1
         NEVER_REACHED;
-        //AttractingPlaneBoundaryCondition::ImposeBoundaryCondition is not implemented in 1D
+        // AttractingPlaneBoundaryCondition::ImposeBoundaryCondition is not implemented in 1D
     }
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool AttractingPlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::VerifyBoundaryCondition()
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool AttractingPlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::VerifyBoundaryCondition()
 {
     bool condition_satisfied = true;
 
@@ -188,47 +187,47 @@ bool AttractingPlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::VerifyBoundaryCond
     return condition_satisfied;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AttractingPlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::SetPointOnPlane(const c_vector<double, SPACE_DIM>& rPoint)
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AttractingPlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::SetPointOnPlane(const c_vector<double, SPACE_DIM>& rPoint)
 {
     mPointOnPlane = rPoint;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AttractingPlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::SetAttractionThreshold(double attractionThreshold)
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AttractingPlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::SetAttractionThreshold(double attractionThreshold)
 {
     mAttractionThreshold = attractionThreshold;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AttractingPlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::OutputCellPopulationBoundaryConditionParameters(out_stream& rParamsFile)
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AttractingPlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationBoundaryConditionParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<PointOnPlane>";
-    for (unsigned index=0; index != SPACE_DIM-1U; index++) // Note: inequality avoids testing index < 0U when DIM=1
+    for (unsigned index = 0; index != SPACE_DIM - 1U; index++) // Note: inequality avoids testing index < 0U when DIM=1
     {
         *rParamsFile << mPointOnPlane[index] << ",";
     }
-    *rParamsFile << mPointOnPlane[SPACE_DIM-1] << "</PointOnPlane>\n";
+    *rParamsFile << mPointOnPlane[SPACE_DIM - 1] << "</PointOnPlane>\n";
 
     *rParamsFile << "\t\t\t<NormalToPlane>";
-    for (unsigned index=0; index != SPACE_DIM-1U; index++) // Note: inequality avoids testing index < 0U when DIM=1
+    for (unsigned index = 0; index != SPACE_DIM - 1U; index++) // Note: inequality avoids testing index < 0U when DIM=1
     {
         *rParamsFile << mNormalToPlane[index] << ",";
     }
-    *rParamsFile << mNormalToPlane[SPACE_DIM-1] << "</NormalToPlane>\n";
+    *rParamsFile << mNormalToPlane[SPACE_DIM - 1] << "</NormalToPlane>\n";
     *rParamsFile << "\t\t\t<UseJiggledNodesOnPlane>" << mUseJiggledNodesOnPlane << "</UseJiggledNodesOnPlane>\n";
 
     // Call method on direct parent class
-    AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::OutputCellPopulationBoundaryConditionParameters(rParamsFile);
+    AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationBoundaryConditionParameters(rParamsFile);
 }
 
 // Explicit instantiation
-template class AttractingPlaneBoundaryCondition<1,1>;
-template class AttractingPlaneBoundaryCondition<1,2>;
-template class AttractingPlaneBoundaryCondition<2,2>;
-template class AttractingPlaneBoundaryCondition<1,3>;
-template class AttractingPlaneBoundaryCondition<2,3>;
-template class AttractingPlaneBoundaryCondition<3,3>;
+template class AttractingPlaneBoundaryCondition<1, 1>;
+template class AttractingPlaneBoundaryCondition<1, 2>;
+template class AttractingPlaneBoundaryCondition<2, 2>;
+template class AttractingPlaneBoundaryCondition<1, 3>;
+template class AttractingPlaneBoundaryCondition<2, 3>;
+template class AttractingPlaneBoundaryCondition<3, 3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"

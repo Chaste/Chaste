@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef AttractingPlaneBoundaryCondition_HPP_
-#define AttractingPlaneBoundaryCondition_HPP_
+#ifndef ATTRACTINGPLANEBOUNDARYCONDITION_HPP_
+#define ATTRACTINGPLANEBOUNDARYCONDITION_HPP_
 
 #include "AbstractCellPopulationBoundaryCondition.hpp"
 
@@ -48,11 +48,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Although the name of this class suggests it is specific to 3D, it is actually also implemented in 2D, for which it is
  * really a 'line' boundary condition. It's not currently implemented in 1D
  */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
-class AttractingPlaneBoundaryCondition : public AbstractCellPopulationBoundaryCondition<ELEMENT_DIM,SPACE_DIM>
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
+class AttractingPlaneBoundaryCondition : public AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM>
 {
 private:
-
     /**
      * A point on the boundary plane.
      */
@@ -82,15 +81,14 @@ private:
      * @param archive the archive
      * @param version the current version of this class
      */
-    template<class Archive>
-    void serialize(Archive & archive, const unsigned int version)
+    template <class Archive>
+    void serialize(Archive& archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM> >(*this);
-        //archive & mUseJiggledNodesOnPlane;
+        archive& boost::serialization::base_object<AbstractCellPopulationBoundaryCondition<ELEMENT_DIM, SPACE_DIM> >(*this);
+        // archive & mUseJiggledNodesOnPlane;
     }
 
 public:
-
     /**
      * Constructor.
      *
@@ -99,7 +97,7 @@ public:
      * @param normal the outward-facing unit normal vector to the boundary plane
      */
     AttractingPlaneBoundaryCondition(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation,
-            c_vector<double, SPACE_DIM> point, c_vector<double, SPACE_DIM> normal);
+                                     c_vector<double, SPACE_DIM> point, c_vector<double, SPACE_DIM> normal);
 
     /**
      * @return #mPointOnPlane.
@@ -169,57 +167,57 @@ namespace boost
 {
 namespace serialization
 {
-/**
- * Serialize information required to construct a AttractingPlaneBoundaryCondition.
- */
-template<class Archive, unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-inline void save_construct_data(
-    Archive & ar, const AttractingPlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>* t, const unsigned int file_version)
-{
-    // Save data required to construct instance
-    const AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* const p_cell_population = t->GetCellPopulation();
-    ar << p_cell_population;
+    /**
+     * Serialize information required to construct a AttractingPlaneBoundaryCondition.
+     */
+    template <class Archive, unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+    inline void save_construct_data(
+        Archive& ar, const AttractingPlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>* t, const unsigned int file_version)
+    {
+        // Save data required to construct instance
+        const AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* const p_cell_population = t->GetCellPopulation();
+        ar << p_cell_population;
 
-    // Archive c_vectors one component at a time
-    c_vector<double, SPACE_DIM> point = t->rGetPointOnPlane();
-    for (unsigned i=0; i<SPACE_DIM; i++)
-    {
-        ar << point[i];
-    }
-    c_vector<double, SPACE_DIM> normal = t->rGetNormalToPlane();
-    for (unsigned i=0; i<SPACE_DIM; i++)
-    {
-        ar << normal[i];
-    }
-}
-
-/**
- * De-serialize constructor parameters and initialize a AttractingPlaneBoundaryCondition.
- */
-template<class Archive, unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-inline void load_construct_data(
-    Archive & ar, AttractingPlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>* t, const unsigned int file_version)
-{
-    // Retrieve data from archive required to construct new instance
-    AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* p_cell_population;
-    ar >> p_cell_population;
-
-    // Archive c_vectors one component at a time
-    c_vector<double, SPACE_DIM> point;
-    for (unsigned i=0; i<SPACE_DIM; i++)
-    {
-        ar >> point[i];
-    }
-    c_vector<double, SPACE_DIM> normal;
-    for (unsigned i=0; i<SPACE_DIM; i++)
-    {
-        ar >> normal[i];
+        // Archive c_vectors one component at a time
+        c_vector<double, SPACE_DIM> point = t->rGetPointOnPlane();
+        for (unsigned i = 0; i < SPACE_DIM; i++)
+        {
+            ar << point[i];
+        }
+        c_vector<double, SPACE_DIM> normal = t->rGetNormalToPlane();
+        for (unsigned i = 0; i < SPACE_DIM; i++)
+        {
+            ar << normal[i];
+        }
     }
 
-    // Invoke inplace constructor to initialise instance
-    ::new(t)AttractingPlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>(p_cell_population, point, normal);
-}
-}
-} // namespace ...
+    /**
+     * De-serialize constructor parameters and initialize a AttractingPlaneBoundaryCondition.
+     */
+    template <class Archive, unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+    inline void load_construct_data(
+        Archive& ar, AttractingPlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>* t, const unsigned int file_version)
+    {
+        // Retrieve data from archive required to construct new instance
+        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* p_cell_population;
+        ar >> p_cell_population;
 
-#endif /*AttractingPlaneBoundaryCondition_HPP_*/
+        // Archive c_vectors one component at a time
+        c_vector<double, SPACE_DIM> point;
+        for (unsigned i = 0; i < SPACE_DIM; i++)
+        {
+            ar >> point[i];
+        }
+        c_vector<double, SPACE_DIM> normal;
+        for (unsigned i = 0; i < SPACE_DIM; i++)
+        {
+            ar >> normal[i];
+        }
+
+        // Invoke inplace constructor to initialise instance
+        ::new (t) AttractingPlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>(p_cell_population, point, normal);
+    }
+} // namespace serialization
+} // namespace boost
+
+#endif // ATTRACTINGPLANEBOUNDARYCONDITION_HPP_
