@@ -74,7 +74,6 @@ modules:
       ##=== ode
       - ode/src
       - cell_based/src/ode
-      - pychaste/src/cpp/ode
       ##=== pde
       - pde/src
       - cell_based/src/cell_based_pde
@@ -137,9 +136,6 @@ modules:
           - AnalyticJacobian # double ** jacobian
       - name: CellwiseOdeSystemInformation
         excluded: True
-
-      ##=== ode: Chaste/pychaste/src/cpp/ode/
-      - name: AbstractPythonOdeSystemInformation
 
       #=== pde: Chaste/pde/src/common/
       - name: AbstractBoundaryCondition

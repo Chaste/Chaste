@@ -77,7 +77,7 @@ cppwg_command("${PYCHASTE_WRAPPER_DIR}")
 add_custom_command(TARGET pychaste_wrappers COMMAND ${CPPWG_COMMAND_LST})
 
 # Generate wrappers if they are missing
-if(NOT EXISTS ${PYCHASTE_WRAPPER_DIR}/lib/lib.main.cpp)
+if(NOT EXISTS ${PYCHASTE_WRAPPER_DIR}/lib/_pychaste_lib.main.cppwg.cpp)
     message(STATUS "Generating PyChaste wrappers")
     cppwg_command("${PYCHASTE_WRAPPER_DIR}")
     execute_process(COMMAND sh -c "${CPPWG_COMMAND_STR}")
@@ -118,8 +118,8 @@ endforeach()
 ##################################################
 # Build Python modules from wrappers
 ##################################################
-# Create a `_pychaste_lib` shared library. The library name is
-# the same as the module name in the main wrapper `lib.main.cpp`.
+# Create a `_pychaste_lib` shared library. The library name is the same
+# as the module name in the module wrapper `_pychaste_lib.main.cppwg.cpp`.
 # It is imported in Python code as `from chaste._pychaste_lib import *`.
 
 file(

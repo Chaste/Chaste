@@ -324,7 +324,7 @@ public:
             OutputCellPopulationParameters,
             rParamsFile);
     }
-    void SimulationSetupHook(::AbstractCellBasedSimulation<3, 3> * pSimulation) override
+    void SimulationSetupHook(::AbstractCellBasedSimulation<3> * pSimulation) override
     {
         PYBIND11_OVERRIDE(
             void,
@@ -545,7 +545,7 @@ void register_AbstractCellPopulation_3_3_class(py::module &m)
             (void(AbstractCellPopulation_3_3::*)(::out_stream &)) &AbstractCellPopulation_3_3::OutputCellPopulationParameters,
             " ", py::arg("rParamsFile"))
         .def("SimulationSetupHook",
-            (void(AbstractCellPopulation_3_3::*)(::AbstractCellBasedSimulation<3, 3> *)) &AbstractCellPopulation_3_3::SimulationSetupHook,
+            (void(AbstractCellPopulation_3_3::*)(::AbstractCellBasedSimulation<3> *)) &AbstractCellPopulation_3_3::SimulationSetupHook,
             " ", py::arg("pSimulation"))
         .def("GetOutputResultsForChasteVisualizer",
             (bool(AbstractCellPopulation_3_3::*)()) &AbstractCellPopulation_3_3::GetOutputResultsForChasteVisualizer,

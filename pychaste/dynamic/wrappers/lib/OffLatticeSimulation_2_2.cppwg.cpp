@@ -100,7 +100,7 @@ public:
 
 void register_OffLatticeSimulation_2_2_class(py::module &m)
 {
-    py::class_<OffLatticeSimulation_2_2, OffLatticeSimulation_2_2_Overrides, boost::shared_ptr<OffLatticeSimulation_2_2>, AbstractCellBasedSimulation<2, 2>>(m, "OffLatticeSimulation_2_2")
+    py::class_<OffLatticeSimulation_2_2, OffLatticeSimulation_2_2_Overrides, boost::shared_ptr<OffLatticeSimulation_2_2>, AbstractCellBasedSimulation<2>>(m, "OffLatticeSimulation_2_2")
         .def(py::init<::AbstractCellPopulation<2> &, bool, bool>(), py::arg("rCellPopulation"), py::arg("deleteCellPopulationInDestructor") = false, py::arg("initialiseCells") = true)
         .def("AddForce",
             (void(OffLatticeSimulation_2_2::*)(::boost::shared_ptr<AbstractForce<2, 2>>)) &OffLatticeSimulation_2_2::AddForce,

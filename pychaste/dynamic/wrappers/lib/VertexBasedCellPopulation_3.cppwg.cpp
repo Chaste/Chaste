@@ -321,7 +321,7 @@ public:
             WriteDataToVisualizerSetupFile,
             pVizSetupFile);
     }
-    void SimulationSetupHook(::AbstractCellBasedSimulation<3, 3> * pSimulation) override
+    void SimulationSetupHook(::AbstractCellBasedSimulation<3> * pSimulation) override
     {
         PYBIND11_OVERRIDE(
             void,
@@ -448,7 +448,7 @@ void register_VertexBasedCellPopulation_3_class(py::module &m)
             (void(VertexBasedCellPopulation_3::*)(::out_stream &)) &VertexBasedCellPopulation_3::WriteDataToVisualizerSetupFile,
             " ", py::arg("pVizSetupFile"))
         .def("SimulationSetupHook",
-            (void(VertexBasedCellPopulation_3::*)(::AbstractCellBasedSimulation<3, 3> *)) &VertexBasedCellPopulation_3::SimulationSetupHook,
+            (void(VertexBasedCellPopulation_3::*)(::AbstractCellBasedSimulation<3> *)) &VertexBasedCellPopulation_3::SimulationSetupHook,
             " ", py::arg("pSimulation"))
         .def("GetRestrictVertexMovementBoolean",
             (bool(VertexBasedCellPopulation_3::*)()) &VertexBasedCellPopulation_3::GetRestrictVertexMovementBoolean,

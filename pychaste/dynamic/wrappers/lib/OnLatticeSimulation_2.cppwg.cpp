@@ -92,7 +92,7 @@ public:
 
 void register_OnLatticeSimulation_2_class(py::module &m)
 {
-    py::class_<OnLatticeSimulation_2, OnLatticeSimulation_2_Overrides, boost::shared_ptr<OnLatticeSimulation_2>, AbstractCellBasedSimulation<2, 2>>(m, "OnLatticeSimulation_2")
+    py::class_<OnLatticeSimulation_2, OnLatticeSimulation_2_Overrides, boost::shared_ptr<OnLatticeSimulation_2>, AbstractCellBasedSimulation<2>>(m, "OnLatticeSimulation_2")
         .def(py::init<::AbstractCellPopulation<2> &, bool, bool>(), py::arg("rCellPopulation"), py::arg("deleteCellPopulationInDestructor") = false, py::arg("initialiseCells") = true)
         .def("AddUpdateRule",
             (void(OnLatticeSimulation_2::*)(::boost::shared_ptr<AbstractUpdateRule<2>>)) &OnLatticeSimulation_2::AddUpdateRule,
