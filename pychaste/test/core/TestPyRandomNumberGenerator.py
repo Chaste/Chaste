@@ -35,7 +35,7 @@ import unittest
 import chaste.core
 
 
-class TestRandomNumberGenerator(unittest.TestCase):
+class TestPyRandomNumberGenerator(unittest.TestCase):
 
     def test_make_some_numbers(self):
 

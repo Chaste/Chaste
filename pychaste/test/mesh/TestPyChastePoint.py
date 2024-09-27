@@ -37,7 +37,7 @@ import chaste.mesh
 import numpy as np
 
 
-class TestChastePoint(unittest.TestCase):
+class TestPyChastePoint(unittest.TestCase):
 
     def test_construct(self):
 

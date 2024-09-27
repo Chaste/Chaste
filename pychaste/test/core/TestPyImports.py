@@ -30,8 +30,8 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-import unittest
 import re
+import unittest
 
 import chaste
 import chaste.cell_based
@@ -40,8 +40,8 @@ import chaste.mesh
 import chaste.ode
 import chaste.pde
 import chaste.visualization
-
 from chaste import *
+from chaste._syntax import TemplatedClass
 from chaste.cell_based import *
 from chaste.core import *
 from chaste.mesh import *
@@ -49,14 +49,12 @@ from chaste.ode import *
 from chaste.pde import *
 from chaste.visualization import *
 
-from chaste._syntax import TemplatedClass
 
-
-class TestImports(unittest.TestCase):
+class TestPyImports(unittest.TestCase):
 
     def test_imports(self):
         module = "pychaste/dynamic/wrappers/lib/_pychaste_lib.main.cppwg.cpp"
-        classes = []
+        class_names = []
 
         class_regex = re.compile(r"^\s*register_(\w+)_class\(m\);\s*$")
         with open(module, "r") as f:
@@ -67,9 +65,9 @@ class TestImports(unittest.TestCase):
             if class_match:
                 class_name = class_match.groups(0)[0]
                 if not class_name.startswith("Abstract"):
-                    classes.append(class_name)
+                    class_names.append(class_name)
 
-        for class_name in classes:
+        for class_name in class_names:
             # Check that wrapped classes are imported in PyChaste
             clas = globals().get(class_name, None)
             self.assertTrue(
@@ -77,7 +75,7 @@ class TestImports(unittest.TestCase):
                 f"\nClass {class_name} is wrapped but not imported in PyChaste"
                 "\n-- to fix, add an import in the relevant PyChaste module"
                 " e.g. to add to pychaste core, update"
-                " pychaste/src/python/chaste/core/__init__.py",
+                " pychaste/src/py/chaste/core/__init__.py",
             )
 
             # Extra checks for templated classes
@@ -92,7 +90,7 @@ class TestImports(unittest.TestCase):
                     f"\nClass {class_name} does not have a corresponding TemplatedClass entry"
                     "\n-- to fix, add an entry in the relevant PyChaste module"
                     " e.g. to add to pychaste core, update"
-                    " pychaste/src/python/chaste/core/__init__.py",
+                    " pychaste/src/py/chaste/core/__init__.py",
                 )
 
                 # Check that the TemplatedClass returns the correct type
@@ -101,8 +99,8 @@ class TestImports(unittest.TestCase):
                     clas,
                     f"\nTemplatedClass {template_name}[{args}] does not return {class_name}"
                     "\n-- to fix, check the TemplatedClass initialisation for {class_name}"
-                    " in the relevant PyChaste module e.g. if the class in pychaste"
-                    " core, check pychaste/src/python/chaste/core/__init__.py",
+                    " in the relevant PyChaste module e.g. if the class is in pychaste"
+                    " core, check pychaste/src/py/chaste/core/__init__.py",
                 )
 
 

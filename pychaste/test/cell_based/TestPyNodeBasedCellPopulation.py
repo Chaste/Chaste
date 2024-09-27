@@ -37,7 +37,7 @@ import chaste.mesh
 import chaste.visualization
 
 
-class TestCell(chaste.cell_based.AbstractCellBasedTestSuite):
+class TestPyNodeBasedCellPopulation(chaste.cell_based.AbstractCellBasedTestSuite):
 
     def test_construct(self):
 

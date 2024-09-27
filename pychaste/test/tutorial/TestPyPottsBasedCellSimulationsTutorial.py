@@ -47,7 +47,7 @@ import chaste.mesh  # Contains meshes
 import chaste.visualization  # Visualization tools
 
 
-class TestRunningPottsBasedSimulationsTutorial(
+class TestPyPottsBasedCellSimulationsTutorial(
     chaste.cell_based.AbstractCellBasedTestSuite
 ):
     ## ### Test 1 - A basic node-based simulation

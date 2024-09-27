@@ -35,7 +35,7 @@ import unittest
 import chaste.core
 
 
-class TestTimer(unittest.TestCase):
+class TestPyTimer(unittest.TestCase):
 
     def test_start_stop(self):
 

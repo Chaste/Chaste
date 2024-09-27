@@ -53,7 +53,7 @@ import numpy as np  # Matrix tools
 # Set up MPI
 
 
-class TestCellSortingTutorial(chaste.cell_based.AbstractCellBasedTestSuite):
+class TestPyCellSortingTutorial(chaste.cell_based.AbstractCellBasedTestSuite):
 
     ## ### Test 1 - Cell sorting
     ## The next test generates a collection of cells, there are two types of cells, labelled ones and non labelled ones,

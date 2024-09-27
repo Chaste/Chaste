@@ -51,7 +51,7 @@ import numpy as np  # Matrix tools
 # Set up MPI
 
 
-class TestRunningMeshBasedSimulationsTutorial(
+class TestPyMeshBasedCellSimulationsTutorial(
     chaste.cell_based.AbstractCellBasedTestSuite
 ):
 

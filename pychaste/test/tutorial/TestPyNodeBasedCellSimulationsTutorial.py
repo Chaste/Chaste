@@ -50,7 +50,7 @@ import numpy as np  # Matrix tools
 # Set up MPI
 
 
-class TestRunningNodeBasedSimulationsTutorial(
+class TestPyNodeBasedCellSimulationsTutorial(
     chaste.cell_based.AbstractCellBasedTestSuite
 ):
     ## ### Test 1 - A basic node-based simulation

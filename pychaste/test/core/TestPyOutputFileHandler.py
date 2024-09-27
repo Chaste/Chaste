@@ -35,7 +35,7 @@ import unittest
 import chaste.core
 
 
-class TestFileHandler(unittest.TestCase):
+class TestPyOutputFileHandler(unittest.TestCase):
 
     def test_create_directory(self):
 

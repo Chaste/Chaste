@@ -52,7 +52,7 @@ import numpy as np  # Matrix tools
 # Set up MPI
 
 
-class TestRunningVertexBasedSimulationsTutorial(
+class TestPyVertexBasedCellSimulationsTutorial(
     chaste.cell_based.AbstractCellBasedTestSuite
 ):
     ## ### Test 1 - A basic vertex-based simulation

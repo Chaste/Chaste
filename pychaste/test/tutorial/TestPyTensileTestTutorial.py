@@ -53,7 +53,7 @@ import numpy as np  # Matrix tools
 # Set up MPI
 
 
-class TestTensileTestTutorial(chaste.cell_based.AbstractCellBasedTestSuite):
+class TestPyTensileTestTutorial(chaste.cell_based.AbstractCellBasedTestSuite):
 
     ## ### Test 1 - A 2D test
 

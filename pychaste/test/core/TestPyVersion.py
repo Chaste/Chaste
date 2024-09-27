@@ -35,7 +35,7 @@ import unittest
 import chaste.core
 
 
-class TestVersion(unittest.TestCase):
+class TestPyVersion(unittest.TestCase):
 
     def test_output_version_info(self):
 

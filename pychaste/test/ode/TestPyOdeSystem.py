@@ -34,35 +34,36 @@ import unittest
 
 import chaste.ode
 
+# TODO: Add ODE tests
 
-class MyOdeSystem(chaste.ode.AbstractOdeSystem):
+# class MyOdeSystem(chaste.ode.AbstractOdeSystem):
 
-    def __init__(self, OdeSystemInfo):
-        super(MyOdeSystem, self).__init__(1)
-        # self.SetSystemInfo(OdeSystemInfo)
+#     def __init__(self, OdeSystemInfo):
+#         super(MyOdeSystem, self).__init__(1)
+#         # self.SetSystemInfo(OdeSystemInfo)
 
-    def EvaluateYDerivatives(self, time, rY, rDy):
-        rDy[0] = rY[0] * rY[0] + time * time
-
-
-class MyOdeSystemInformation(chaste.ode.AbstractPythonOdeSystemInformation):
-
-    def __init__(self):
-        super(MyOdeSystemInformation, self).__init__()
-
-    def Initialise(self):
-        self.SetIsInitialised(True)
-        self.AddVariableName("myvar")
-        self.AddVariableUnit("dimensionless")
-        self.SetDefaultInitialConditions([1.0])
+#     def EvaluateYDerivatives(self, time, rY, rDy):
+#         rDy[0] = rY[0] * rY[0] + time * time
 
 
-class DontTestOdeSystem(unittest.TestCase):
+# class MyOdeSystemInformation(chaste.ode.AbstractPythonOdeSystemInformation):
 
-    def donttest_create_system(self):
-        my_ode_system_information = MyOdeSystemInformation()
-        my_ode_system_information.Initialise()
-        my_ode_system = MyOdeSystem(my_ode_system_information)
+#     def __init__(self):
+#         super(MyOdeSystemInformation, self).__init__()
+
+#     def Initialise(self):
+#         self.SetIsInitialised(True)
+#         self.AddVariableName("myvar")
+#         self.AddVariableUnit("dimensionless")
+#         self.SetDefaultInitialConditions([1.0])
+
+
+# class DontTestOdeSystem(unittest.TestCase):
+
+#     def donttest_create_system(self):
+#         my_ode_system_information = MyOdeSystemInformation()
+#         my_ode_system_information.Initialise()
+#         my_ode_system = MyOdeSystem(my_ode_system_information)
 
 
 if __name__ == "__main__":

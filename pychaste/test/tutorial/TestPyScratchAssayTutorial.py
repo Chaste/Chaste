@@ -58,7 +58,7 @@ import numpy as np  # Matrix tools
 # Set up MPI
 
 
-class TestScratchAssayTutorial(chaste.cell_based.AbstractCellBasedTestSuite):
+class TestPyScratchAssayTutorial(chaste.cell_based.AbstractCellBasedTestSuite):
 
     ## ### Test 1 - Scratch Assay
     ## In this test we will create a scratch along the middle of a domain and quantify the migration

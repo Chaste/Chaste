@@ -56,7 +56,7 @@ import numpy as np  # Matrix tools
 # Set up MPI
 
 
-class TestSpheroidTutorial(chaste.cell_based.AbstractCellBasedTestSuite):
+class TestPySpheroidTutorial(chaste.cell_based.AbstractCellBasedTestSuite):
 
     ## ### Test 1 - a 2D mesh-based spheroid
     ## In this test we set up a spheroid with a plentiful supply of oxygen on the boundary and watch it grow

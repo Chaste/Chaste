@@ -35,7 +35,7 @@ import unittest
 import chaste
 
 
-class TestPetscTools(unittest.TestCase):
+class TestPyPetscTools(unittest.TestCase):
 
     def test_some_vecs(self):
 

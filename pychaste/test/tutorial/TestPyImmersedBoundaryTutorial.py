@@ -75,7 +75,7 @@ from chaste.visualization import (
 # setup MPI
 
 
-class TestImmersedBoundaryTutorial(AbstractCellBasedTestSuite):
+class TestPyImmersedBoundaryTutorial(AbstractCellBasedTestSuite):
 
     ## ### 1. Simple Immersed Boundary Simulations
     ## We begin by exploring simulations containing a single cell. This will

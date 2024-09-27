@@ -37,7 +37,7 @@ import chaste.mesh
 import chaste.visualization
 
 
-class TestPottsMesh(chaste.cell_based.AbstractCellBasedTestSuite):
+class TestPyCaBasedCellPopulation(chaste.cell_based.AbstractCellBasedTestSuite):
 
     def test_construct(self):
         work_dir = "Python/TestCaBasedPopulationPython"

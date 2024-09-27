@@ -38,7 +38,7 @@ import chaste.mesh
 import chaste.visualization
 
 
-class TestJupyterNotebookManager(chaste.cell_based.AbstractCellBasedTestSuite):
+class TestPyJupyterNotebookManager(chaste.cell_based.AbstractCellBasedTestSuite):
     def test_vtk_show(self):
         file_handler = chaste.core.OutputFileHandler(
             "Python/TestVertexBasedCellPopulation"
