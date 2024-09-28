@@ -73,7 +73,7 @@ modules:
       - cell_based/src/mesh
       ##=== ode
       - ode/src
-      - cell_based/src/ode
+      - cell_based/src/odes
       ##=== pde
       - pde/src
       - cell_based/src/cell_based_pde
@@ -81,7 +81,7 @@ modules:
       - pychaste/src/cpp/visualization
 
     classes:
-      ##=== core: Chaste/global/src/
+      ##=== core: Chaste/global/src
       - name: RelativeTo # enum
         source_file: FileFinder.hpp
       - name: FileFinder
@@ -96,13 +96,13 @@ modules:
       - name: ChasteBuildInfo
         source_file: Version.hpp
 
-      ##=== core: Chaste/global/src/checkpointing/
+      ##=== core: Chaste/global/src/checkpointing
       - name: Identifiable
 
       ##=== core: Chaste/global/src/fortests
       - name: PetscSetupUtils
 
-      ##=== core: Chaste/global/src/parallel/
+      ##=== core: Chaste/global/src/parallel
       - name: PetscTools
         excluded_methods:
           - GetWorld # MPI not wrapped here
@@ -118,14 +118,14 @@ modules:
       - name: ReplicatableVector
         source_includes: *petsc_includes
 
-      ##=== core: Chaste/global/src/timing/
+      ##=== core: Chaste/global/src/timing
       - name: Timer
 
-      ##=== ode: Chaste/ode/src/common/
+      ##=== ode: Chaste/ode/src/common
       - name: AbstractOdeSystemInformation
       - name: AbstractOdeSystem
 
-      ##=== ode: Chaste/cell_based/src/ode/
+      ##=== ode: Chaste/cell_based/src/ode
       - name: DeltaNotchOdeSystem
       - name: DeltaNotchEdgeOdeSystem
       - name: DeltaNotchInteriorOdeSystem
@@ -137,12 +137,12 @@ modules:
       - name: CellwiseOdeSystemInformation
         excluded: True
 
-      #=== pde: Chaste/pde/src/common/
+      #=== pde: Chaste/pde/src/common
       - name: AbstractBoundaryCondition
       - name: ConstBoundaryCondition
       - name: PdeSimulationTime
 
-      #=== pde: Chaste/pde/src/problem/
+      #=== pde: Chaste/pde/src/problem
       - name: AbstractLinearPde
       - name: AbstractLinearParabolicPde
       - name: AbstractLinearEllipticPde
@@ -153,7 +153,7 @@ modules:
             replacement: [[2, 2, 1], [3, 3, 1]]
       - name: AbstractNonlinearEllipticPde
 
-      #=== pde: Chaste/cell_based/src/cell_based_pde/pdes/
+      #=== pde: Chaste/cell_based/src/cell_based_pde/pdes
       - name: CellwiseSourceEllipticPde
       - name: AveragedSourceEllipticPde
       - name: VolumeDependentAveragedSourceEllipticPde
@@ -162,7 +162,7 @@ modules:
       - name: UniformSourceParabolicPde
       - name: AveragedSourceParabolicPde
 
-      #=== pde: Chaste/cell_based/src/cell_based_pde/
+      #=== pde: Chaste/cell_based/src/cell_based_pde
       - name: CellBasedEllipticPdeSolver
         source_includes: *petsc_includes
       - name: CellBasedParabolicPdeSolver
@@ -192,12 +192,9 @@ modules:
         excluded_methods:
           - ConstructBoundaryConditionsContainer
 
-      #=== mesh: Chaste/mesh/src/common/
+      #=== mesh: Chaste/mesh/src/common
       - name: ChastePoint
       - name: AbstractChasteRegion
-
-      - name: ChasteCuboid # Chaste/mesh/src/utilities
-      - name: ChasteEllipsoid # Chaste/mesh/src/utilities
 
       - name: AbstractElement
         template_substitutions:
@@ -234,7 +231,7 @@ modules:
           - RescaleMeshFromBoundaryNode # method not found!
       - name: NodesOnlyMesh
 
-      #=== mesh: Chaste/mesh/src/immersed_boundary/
+      #=== mesh: Chaste/mesh/src/immersed_boundary
       - name: FluidSource
 
       - name: ImmersedBoundaryElement
@@ -248,7 +245,7 @@ modules:
       - name: ImmersedBoundaryHoneycombMeshGenerator
       - name: ImmersedBoundaryPalisadeMeshGenerator
 
-      #=== mesh: Chaste/mesh/src/mutable/
+      #=== mesh: Chaste/mesh/src/mutable
       - name: Cylindrical2dMesh
         excluded_methods:
           - GetInstanceOfMismatchedBoundaryNodes
@@ -266,7 +263,11 @@ modules:
       - name: CylindricalHoneycombMeshGenerator
       - name: ToroidalHoneycombMeshGenerator
 
-      #=== mesh: Chaste/mesh/src/vertex/
+      #=== mesh: Chaste/mesh/src/utilities
+      - name: ChasteCuboid
+      - name: ChasteEllipsoid
+
+      #=== mesh: Chaste/mesh/src/vertex
       - name: VertexMesh
         excluded_methods:
           - GetFace # dont have mixed dim elements
@@ -283,7 +284,7 @@ modules:
       - name: ToroidalHoneycombVertexMeshGenerator
       - name: VoronoiVertexMeshGenerator
 
-      #=== mesh: Chaste/cell_based/src/mesh/
+      #=== mesh: Chaste/cell_based/src/mesh
       - name: PottsElement
       - name: PottsMesh
       - name: PottsMeshGenerator
@@ -295,7 +296,7 @@ modules:
       - name: PottsElementData
         excluded: True
 
-      ##=== cell_based: Chaste/cell_based/src/cell/
+      ##=== cell_based: Chaste/cell_based/src/cell
       - name: Cell
         excluded_methods:
           - rGetCellPropertyCollection
@@ -325,7 +326,7 @@ modules:
       - name: null_deleter
         excluded: True
 
-      ##=== cell_based: Chaste/cell_based/src/cell/cycle/
+      ##=== cell_based: Chaste/cell_based/src/cell/cycle
       - name: AbstractCellCycleModel
       - name: AbstractPhaseBasedCellCycleModel
       - name: AbstractSimpleCellCycleModel
@@ -357,7 +358,7 @@ modules:
       - name: CellCycleTimesGenerator
         excluded: True
 
-      ##=== cell_based: Chaste/cell_based/src/cell_based/properties/
+      ##=== cell_based: Chaste/cell_based/src/cell_based/properties
       - name: AbstractCellProperty
         excluded_methods:
           - IsType # exclude templated method
@@ -378,12 +379,12 @@ modules:
       - name: CellVecData
         excluded: True
 
-      ##=== cell_based: Chaste/cell_based/src/common/
+      ##=== cell_based: Chaste/cell_based/src/common
       - name: SimulationTime
       - name: OdeLinearSystemSolver
         excluded: True
 
-      ##=== cell_based: Chaste/cell_based/src/population/
+      ##=== cell_based: Chaste/cell_based/src/population
       - name: AbstractCellPopulation
         excluded_methods:
           - rGetCells
@@ -516,7 +517,7 @@ modules:
       - name: CellwiseDataGradient
         excluded: True
 
-      ##=== cell_based: Chaste/cell_based/src/population/boundary_conditions/
+      ##=== cell_based: Chaste/cell_based/src/population/boundary_conditions
       - name: AbstractCellPopulationBoundaryCondition
 
       - name: PlaneBoundaryCondition
@@ -531,7 +532,7 @@ modules:
         source_includes:
           - PythonUblasObjectConverters.hpp
 
-      ##=== cell_based: Chaste/cell_based/src/population/division_rules/
+      ##=== cell_based: Chaste/cell_based/src/population/division_rules
       - name: AbstractCentreBasedDivisionRule
       - name: AbstractCaBasedDivisionRule
       - name: AbstractImmersedBoundaryDivisionRule
@@ -547,7 +548,7 @@ modules:
       - name: ShovingCaBasedDivisionRule
       - name: VonMisesVertexBasedDivisionRule
 
-      ##=== cell_based: Chaste/cell_based/src/population/forces/
+      ##=== cell_based: Chaste/cell_based/src/population/forces
       - name: AbstractForce
       - name: AbstractTwoBodyInteractionForce
       - name: AbstractImmersedBoundaryForce
@@ -581,7 +582,7 @@ modules:
       - name: DiscreteSystemForceCalculator
         excluded: True
 
-      ##=== cell_based: Chaste/cell_based/src/population/killers/
+      ##=== cell_based: Chaste/cell_based/src/population/killers
       - name: AbstractCellKiller
 
       - name: ApoptoticCellKiller
@@ -591,10 +592,10 @@ modules:
       - name: T2SwapCellKiller
       - name: TargetedCellKiller
 
-      ##=== cell_based: Chaste/cell_based/src/population/srn_update/
+      ##=== cell_based: Chaste/cell_based/src/population/srn_update
       - name: VertexBasedPopulationSrn
 
-      ##=== cell_based: Chaste/cell_based/src/population/update_rules/
+      ##=== cell_based: Chaste/cell_based/src/population/update_rules
       - name: AbstractUpdateRule
       - name: AbstractCaUpdateRule
       - name: AbstractPottsUpdateRule
@@ -608,21 +609,21 @@ modules:
       - name: SurfaceAreaConstraintPottsUpdateRule
       - name: VolumeConstraintPottsUpdateRule
 
-      ##=== cell_based: Chaste/cell_based/src/properties/mutations/
+      ##=== cell_based: Chaste/cell_based/src/properties/mutations
       - name: AbstractCellMutationState
       - name: ApcOneHitCellMutationState
       - name: ApcTwoHitCellMutationState
       - name: BetaCateninOneHitCellMutationState
       - name: WildTypeCellMutationState
 
-      ##=== cell_based: Chaste/cell_based/src/properties/proliferative_types/
+      ##=== cell_based: Chaste/cell_based/src/properties/proliferative_types
       - name: AbstractCellProliferativeType
       - name: StemCellProliferativeType
       - name: DefaultCellProliferativeType
       - name: TransitCellProliferativeType
       - name: DifferentiatedCellProliferativeType
 
-      ##=== cell_based: Chaste/cell_based/src/simulation/
+      ##=== cell_based: Chaste/cell_based/src/simulation
       - name: AbstractCellBasedSimulation
         template_substitutions:
           - signature: <unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
@@ -635,7 +636,7 @@ modules:
       - name: CellBasedSimulationArchiver
         excluded: True
 
-      ##=== cell_based: Chaste/cell_based/src/simulation/modifiers/
+      ##=== cell_based: Chaste/cell_based/src/simulation/modifiers
       - name: AbstractCellBasedSimulationModifier
       - name: AbstractTargetAreaModifier
 
@@ -651,13 +652,13 @@ modules:
       - name: TargetAreaLinearGrowthModifier
       - name: VolumeTrackingModifier
 
-      ##=== cell_based: Chaste/cell_based/src/simulation/numerical_methods/
+      ##=== cell_based: Chaste/cell_based/src/simulation/numerical_methods
       - name: AbstractNumericalMethod
       - name: ForwardEulerNumericalMethod
       - name: StepSizeException
         excluded: True
 
-      ##=== cell_based: Chaste/cell_based/src/srn/
+      ##=== cell_based: Chaste/cell_based/src/srn
       - name: AbstractSrnModel
       - name: AbstractOdeSrnModel
       - name: NullSrnModel
@@ -667,10 +668,10 @@ modules:
       - name: DeltaNotchInteriorSrnModel
       - name: Goldbeter1991SrnModel
 
-      ##=== cell_based: Chaste/cell_based/src/writers/
+      ##=== cell_based: Chaste/cell_based/src/writers
       - name: AbstractCellBasedWriter
 
-      ##=== cell_based: Chaste/cell_based/src/writers/cell_writers/
+      ##=== cell_based: Chaste/cell_based/src/writers/cell_writers
       - name: AbstractCellWriter
         source_includes:
           - AbstractCellPopulation.hpp
@@ -731,7 +732,7 @@ modules:
         source_includes:
           - AbstractCellPopulation.hpp
 
-      ##=== cell_based: Chaste/cell_based/src/writers/population_writers/
+      ##=== cell_based: Chaste/cell_based/src/writers/population_writers
       - name: AbstractCellPopulationWriter
         source_includes: &population_writer_includes
           - AbstractCellPopulation.hpp
@@ -768,7 +769,7 @@ modules:
       - name: VoronoiDataWriter
         source_includes: *population_writer_includes
 
-      ##=== cell_based: Chaste/cell_based/src/writers/population_count_writers/
+      ##=== cell_based: Chaste/cell_based/src/writers/population_count_writers
       - name: AbstractCellPopulationCountWriter
         source_includes: *population_writer_includes
       - name: CellMutationStatesCountWriter
@@ -778,7 +779,7 @@ modules:
       - name: CellProliferativeTypesCountWriter
         source_includes: *population_writer_includes
 
-      ##=== cell_based: Chaste/cell_based/src/writers/population_event_writers/
+      ##=== cell_based: Chaste/cell_based/src/writers/population_event_writers
       - name: AbstractCellPopulationEventWriter
         source_includes: *population_writer_includes
       - name: CellDivisionLocationsWriter
@@ -786,14 +787,14 @@ modules:
       - name: CellRemovalLocationsWriter
         source_includes: *population_writer_includes
 
-      ##=== cell_based: Chaste/pychaste/src/cpp/cell_based/
+      ##=== cell_based: Chaste/pychaste/src/cpp/cell_based
       - name: AttractingPlaneBoundaryCondition
         source_includes:
           - PythonUblasObjectConverters.hpp
       - name: VtkSceneModifier
       - name: PythonSimulationModifier
 
-      ##=== visualization: Chaste/pychaste/src/cpp/visualization/
+      ##=== visualization: Chaste/pychaste/src/cpp/visualization
       - name: VtkScene
       - name: AbstractPyChasteActorGenerator
       - name: CellPopulationPyChasteActorGenerator
