@@ -32,24 +32,38 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
+import inspect
+from collections.abc import Iterable
 from typing import Dict, Tuple, Type
 
 
-class TemplatedClass:
+class TemplateClassDict:
     """
-    Allows calling class syntax like Foo["2", "2"](...) in place of Foo_2_2(...)
+    Allows using class syntax like Foo[2, 2](...) in place of Foo_2_2(...)
 
     Usage:
-    >>> Foo = TemplatedClass({ ("2", "2"): Foo_2_2, ("3", "3"): Foo_3_3 })
+    >>> Foo = TemplateClassDict({ ("2", "2"): Foo_2_2, ("3", "3"): Foo_3_3 })
     """
 
     def __init__(self, template_dict: Dict[Tuple[str, ...], Type]):
         """
         :param template_dict: A dictionary mapping template arg tuples to classes
         """
-        self._dict = template_dict
+        self._dict = {}
+        for arg_tuple, cls in template_dict.items():
+            if not inspect.isclass(cls):
+                raise TypeError("Expected class, got {}".format(type(cls)))
+            if not isinstance(arg_tuple, Iterable):
+                arg_tuple = (arg_tuple,)
+            key = tuple(
+                arg.__name__ if inspect.isclass(arg) else str(arg) for arg in arg_tuple
+            )
+            self._dict[key] = cls
 
-    def __getitem__(self, key):
-        if not isinstance(key, tuple):
-            key = (key,)
-        return self._dict[tuple(map(str, key))]
+    def __getitem__(self, arg_tuple: Tuple[str, ...]) -> Type:
+        if not isinstance(arg_tuple, Iterable):
+            arg_tuple = (arg_tuple,)
+        key = tuple(
+            arg.__name__ if inspect.isclass(arg) else str(arg) for arg in arg_tuple
+        )
+        return self._dict[key]

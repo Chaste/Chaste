@@ -41,16 +41,16 @@ from chaste._pychaste_lib import (
     VtkScene_2,
     VtkScene_3,
 )
-from chaste._syntax import TemplatedClass
+from chaste._syntax import TemplateClassDict
 
-CellPopulationPyChasteActorGenerator = TemplatedClass(
+CellPopulationPyChasteActorGenerator = TemplateClassDict(
     {
         ("2",): CellPopulationPyChasteActorGenerator_2,
         ("3",): CellPopulationPyChasteActorGenerator_3,
     }
 )
 
-VtkScene = TemplatedClass(
+VtkScene = TemplateClassDict(
     {
         ("2",): VtkScene_2,
         ("3",): VtkScene_3,
@@ -67,7 +67,7 @@ else:
         JupyterSceneModifier_3,
     )
 
-    JupyterSceneModifier = TemplatedClass(
+    JupyterSceneModifier = TemplateClassDict(
         {
             ("2",): JupyterSceneModifier_2,
             ("3",): JupyterSceneModifier_3,

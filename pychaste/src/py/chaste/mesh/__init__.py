@@ -97,44 +97,44 @@ from chaste._pychaste_lib import (
     VertexMesh_3_3,
     VoronoiVertexMeshGenerator,
 )
-from chaste._syntax import TemplatedClass
+from chaste._syntax import TemplateClassDict
 
-ChasteCuboid = TemplatedClass(
+ChasteCuboid = TemplateClassDict(
     {
         ("2",): ChasteCuboid_2,
         ("3",): ChasteCuboid_3,
     }
 )
 
-ChasteEllipsoid = TemplatedClass(
+ChasteEllipsoid = TemplateClassDict(
     {
         ("2",): ChasteEllipsoid_2,
         ("3",): ChasteEllipsoid_3,
     }
 )
 
-ChastePoint = TemplatedClass(
+ChastePoint = TemplateClassDict(
     {
         ("2",): ChastePoint_2,
         ("3",): ChastePoint_3,
     }
 )
 
-Edge = TemplatedClass(
+Edge = TemplateClassDict(
     {
         ("2",): Edge_2,
         ("3",): Edge_3,
     }
 )
 
-EdgeHelper = TemplatedClass(
+EdgeHelper = TemplateClassDict(
     {
         ("2",): EdgeHelper_2,
         ("3",): EdgeHelper_3,
     }
 )
 
-Element = TemplatedClass(
+Element = TemplateClassDict(
     {
         ("2",): Element_2_2,
         ("2", "2"): Element_2_2,
@@ -143,14 +143,14 @@ Element = TemplatedClass(
     }
 )
 
-FluidSource = TemplatedClass(
+FluidSource = TemplateClassDict(
     {
         ("2",): FluidSource_2,
         ("3",): FluidSource_3,
     }
 )
 
-ImmersedBoundaryElement = TemplatedClass(
+ImmersedBoundaryElement = TemplateClassDict(
     {
         ("1", "2"): ImmersedBoundaryElement_1_2,
         ("2",): ImmersedBoundaryElement_2_2,
@@ -161,7 +161,7 @@ ImmersedBoundaryElement = TemplatedClass(
     }
 )
 
-ImmersedBoundaryMesh = TemplatedClass(
+ImmersedBoundaryMesh = TemplateClassDict(
     {
         ("2",): ImmersedBoundaryMesh_2_2,
         ("2", "2"): ImmersedBoundaryMesh_2_2,
@@ -170,7 +170,7 @@ ImmersedBoundaryMesh = TemplatedClass(
     }
 )
 
-MutableElement = TemplatedClass(
+MutableElement = TemplateClassDict(
     {
         ("1", "2"): MutableElement_1_2,
         ("2",): MutableElement_2_2,
@@ -181,7 +181,7 @@ MutableElement = TemplatedClass(
     }
 )
 
-MutableMesh = TemplatedClass(
+MutableMesh = TemplateClassDict(
     {
         ("2",): MutableMesh_2_2,
         ("2", "2"): MutableMesh_2_2,
@@ -190,7 +190,7 @@ MutableMesh = TemplatedClass(
     }
 )
 
-MutableVertexMesh = TemplatedClass(
+MutableVertexMesh = TemplateClassDict(
     {
         ("2",): MutableVertexMesh_2_2,
         ("2", "2"): MutableVertexMesh_2_2,
@@ -199,63 +199,63 @@ MutableVertexMesh = TemplatedClass(
     }
 )
 
-Node = TemplatedClass(
+Node = TemplateClassDict(
     {
         ("2",): Node_2,
         ("3",): Node_3,
     }
 )
 
-NodeAttributes = TemplatedClass(
+NodeAttributes = TemplateClassDict(
     {
         ("2",): NodeAttributes_2,
         ("3",): NodeAttributes_3,
     }
 )
 
-NodesOnlyMesh = TemplatedClass(
+NodesOnlyMesh = TemplateClassDict(
     {
         ("2",): NodesOnlyMesh_2,
         ("3",): NodesOnlyMesh_3,
     }
 )
 
-PeriodicNodesOnlyMesh = TemplatedClass(
+PeriodicNodesOnlyMesh = TemplateClassDict(
     {
         ("2",): PeriodicNodesOnlyMesh_2,
         ("3",): PeriodicNodesOnlyMesh_3,
     }
 )
 
-PottsElement = TemplatedClass(
+PottsElement = TemplateClassDict(
     {
         ("2",): PottsElement_2,
         ("3",): PottsElement_3,
     }
 )
 
-PottsMesh = TemplatedClass(
+PottsMesh = TemplateClassDict(
     {
         ("2",): PottsMesh_2,
         ("3",): PottsMesh_3,
     }
 )
 
-PottsMeshGenerator = TemplatedClass(
+PottsMeshGenerator = TemplateClassDict(
     {
         ("2",): PottsMeshGenerator_2,
         ("3",): PottsMeshGenerator_3,
     }
 )
 
-PottsMeshWriter = TemplatedClass(
+PottsMeshWriter = TemplateClassDict(
     {
         ("2",): PottsMeshWriter_2,
         ("3",): PottsMeshWriter_3,
     }
 )
 
-TetrahedralMesh = TemplatedClass(
+TetrahedralMesh = TemplateClassDict(
     {
         ("2",): TetrahedralMesh_2_2,
         ("2", "2"): TetrahedralMesh_2_2,
@@ -264,7 +264,7 @@ TetrahedralMesh = TemplatedClass(
     }
 )
 
-VertexMesh = TemplatedClass(
+VertexMesh = TemplateClassDict(
     {
         ("2",): VertexMesh_2_2,
         ("2", "2"): VertexMesh_2_2,

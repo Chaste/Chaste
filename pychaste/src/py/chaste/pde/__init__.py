@@ -63,79 +63,79 @@ from chaste._pychaste_lib import (
     VolumeDependentAveragedSourceEllipticPde_2,
     VolumeDependentAveragedSourceEllipticPde_3,
 )
-from chaste._syntax import TemplatedClass
+from chaste._syntax import TemplateClassDict
 
-AveragedSourceEllipticPde = TemplatedClass(
+AveragedSourceEllipticPde = TemplateClassDict(
     {
         ("2",): AveragedSourceEllipticPde_2,
         ("3",): AveragedSourceEllipticPde_3,
     }
 )
 
-AveragedSourceParabolicPde = TemplatedClass(
+AveragedSourceParabolicPde = TemplateClassDict(
     {
         ("2",): AveragedSourceParabolicPde_2,
         ("3",): AveragedSourceParabolicPde_3,
     }
 )
 
-CellBasedEllipticPdeSolver = TemplatedClass(
+CellBasedEllipticPdeSolver = TemplateClassDict(
     {
         ("2",): CellBasedEllipticPdeSolver_2,
         ("3",): CellBasedEllipticPdeSolver_3,
     }
 )
 
-CellBasedParabolicPdeSolver = TemplatedClass(
+CellBasedParabolicPdeSolver = TemplateClassDict(
     {
         ("2",): CellBasedParabolicPdeSolver_2,
         ("3",): CellBasedParabolicPdeSolver_3,
     }
 )
 
-CellwiseSourceEllipticPde = TemplatedClass(
+CellwiseSourceEllipticPde = TemplateClassDict(
     {
         ("2",): CellwiseSourceEllipticPde_2,
         ("3",): CellwiseSourceEllipticPde_3,
     }
 )
 
-CellwiseSourceParabolicPde = TemplatedClass(
+CellwiseSourceParabolicPde = TemplateClassDict(
     {
         ("2",): CellwiseSourceParabolicPde_2,
         ("3",): CellwiseSourceParabolicPde_3,
     }
 )
 
-ConstBoundaryCondition = TemplatedClass(
+ConstBoundaryCondition = TemplateClassDict(
     {
         ("2",): ConstBoundaryCondition_2,
         ("3",): ConstBoundaryCondition_3,
     }
 )
 
-EllipticBoxDomainPdeModifier = TemplatedClass(
+EllipticBoxDomainPdeModifier = TemplateClassDict(
     {
         ("2",): EllipticBoxDomainPdeModifier_2,
         ("3",): EllipticBoxDomainPdeModifier_3,
     }
 )
 
-EllipticGrowingDomainPdeModifier = TemplatedClass(
+EllipticGrowingDomainPdeModifier = TemplateClassDict(
     {
         ("2",): EllipticGrowingDomainPdeModifier_2,
         ("3",): EllipticGrowingDomainPdeModifier_3,
     }
 )
 
-ParabolicBoxDomainPdeModifier = TemplatedClass(
+ParabolicBoxDomainPdeModifier = TemplateClassDict(
     {
         ("2",): ParabolicBoxDomainPdeModifier_2,
         ("3",): ParabolicBoxDomainPdeModifier_3,
     }
 )
 
-ParabolicGrowingDomainPdeModifier = TemplatedClass(
+ParabolicGrowingDomainPdeModifier = TemplateClassDict(
     {
         ("2",): ParabolicGrowingDomainPdeModifier_2,
         ("3",): ParabolicGrowingDomainPdeModifier_3,
@@ -143,21 +143,21 @@ ParabolicGrowingDomainPdeModifier = TemplatedClass(
 )
 
 
-UniformSourceEllipticPde = TemplatedClass(
+UniformSourceEllipticPde = TemplateClassDict(
     {
         ("2",): UniformSourceEllipticPde_2,
         ("3",): UniformSourceEllipticPde_3,
     }
 )
 
-UniformSourceParabolicPde = TemplatedClass(
+UniformSourceParabolicPde = TemplateClassDict(
     {
         ("2",): UniformSourceParabolicPde_2,
         ("3",): UniformSourceParabolicPde_3,
     }
 )
 
-VolumeDependentAveragedSourceEllipticPde = TemplatedClass(
+VolumeDependentAveragedSourceEllipticPde = TemplateClassDict(
     {
         ("2",): VolumeDependentAveragedSourceEllipticPde_2,
         ("3",): VolumeDependentAveragedSourceEllipticPde_3,

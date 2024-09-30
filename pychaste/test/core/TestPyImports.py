@@ -41,7 +41,7 @@ import chaste.ode
 import chaste.pde
 import chaste.visualization
 from chaste import *
-from chaste._syntax import TemplatedClass
+from chaste._syntax import TemplateClassDict
 from chaste.cell_based import *
 from chaste.core import *
 from chaste.mesh import *
@@ -83,22 +83,22 @@ class TestPyImports(unittest.TestCase):
                 template_name, *args = class_name.split("_")
                 template = globals().get(template_name, None)
 
-                # Templated classes should have a TemplatedClass entry
-                defined = template and isinstance(template, TemplatedClass)
+                # Templated classes should have a TemplateClassDict entry
+                defined = template and isinstance(template, TemplateClassDict)
                 self.assertTrue(
                     defined,
-                    f"\nClass {class_name} does not have a corresponding TemplatedClass entry"
+                    f"\nClass {class_name} does not have a corresponding TemplateClassDict entry"
                     "\n-- to fix, add an entry in the relevant PyChaste module"
                     " e.g. to add to pychaste core, update"
                     " pychaste/src/py/chaste/core/__init__.py",
                 )
 
-                # Check that the TemplatedClass returns the correct type
+                # Check that the TemplateClassDict returns the correct type
                 self.assertEqual(
                     template[tuple(args)],
                     clas,
                     f"\nTemplatedClass {template_name}[{args}] does not return {class_name}"
-                    "\n-- to fix, check the TemplatedClass initialisation for {class_name}"
+                    "\n-- to fix, check the TemplateClassDict initialisation for {class_name}"
                     " in the relevant PyChaste module e.g. if the class is in pychaste"
                     " core, check pychaste/src/py/chaste/core/__init__.py",
                 )
