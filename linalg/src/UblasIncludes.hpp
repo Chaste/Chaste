@@ -40,15 +40,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Convenience header for including ublas types in default namespace
  */
 
+#include "ChastePragmas.hpp"
+
 #include "UblasVectorInclude.hpp"
 
 DISABLE_C_VECTOR_WARNING_BEGIN
 #include "UblasMatrixInclude.hpp"
 DISABLE_C_VECTOR_WARNING_END
 
+CHASTE_DISABLE_BOOST_DEPRECATION_WARNING_BEGIN
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <boost/numeric/ublas/matrix_expression.hpp>
 #include <boost/numeric/ublas/io.hpp>
+CHASTE_DISABLE_BOOST_DEPRECATION_WARNING_END
 
 namespace ublas = boost::numeric::ublas;
 

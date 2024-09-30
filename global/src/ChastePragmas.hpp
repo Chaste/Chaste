@@ -33,33 +33,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef DOXYGENMAINPAGE_HPP_
-#define DOXYGENMAINPAGE_HPP_
+#ifndef CHASTE_PRAGMAS_HPP_
+#define CHASTE_PRAGMAS_HPP_
 
-// Note: this header contains no code; it is purely here to contain the
-// front page content for the Doxygen generated documentation.
+#include <boost/version.hpp>
 
-/**
- * \mainpage
- *
- * <a href="https://chaste.github.io/">Chaste</a>
- * (<b>C</b>ancer, <b>H</b>eart <b>a</b>nd <b>S</b>oft <b>T</b>issue <b>E</b>nvironment) is a general
- * purpose simulation package aimed at multi-scale, computationally demanding problems arising in biology and
- * physiology. Current functionality includes tissue and cell level electrophysiology, discrete tissue modelling,
- * and soft tissue modelling. The package was originally created in the
- * the Department of Computer Science, University of Oxford, and is developed and maintained by active researchers,
- * academics and software engineers.  Development draws on expertise from
- * software engineering, high performance computing, mathematical modelling and scientific computing.
- *
- * These pages contain documentation automatically generated from the Chaste source code, describing the
- * programming interface to Chaste (the API).  They include details of all the classes, methods, functions, etc.
- * available.
- *
- * For higher-level documentation, including
- * <a href="https://chaste.github.io/docs/installguides/">installation guides</a>,
- * <a href="https://chaste.github.io/docs/user-tutorials/">tutorials</a> and more,
- * see the main Chaste website at
- * <a href="https://chaste.github.io/docs/">https://chaste.github.io/docs/</a>.
- */
+// This header contains macros that use compiler pragmas to ignore specific
+// warnings in a very targeted manner.
 
-#endif // DOXYGENMAINPAGE_HPP_
+// See https://github.com/Chaste/Chaste/issues/293
+// LLVM compilers warn about various deprecated declarations
+#if (defined(Chaste_COMPILER_IS_Clang) || defined(Chaste_COMPILER_IS_IntelLLVM)) && BOOST_VERSION < 108600
+#define CHASTE_DISABLE_BOOST_DEPRECATION_WARNING_BEGIN \
+    _Pragma("GCC diagnostic push") \
+    _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+#define CHASTE_DISABLE_BOOST_DEPRECATION_WARNING_END _Pragma("GCC diagnostic pop")
+#else // Define empty macros for other scenarios
+#define CHASTE_DISABLE_BOOST_DEPRECATION_WARNING_BEGIN
+#define CHASTE_DISABLE_BOOST_DEPRECATION_WARNING_END
+#endif
+
+#endif // CHASTE_PRAGMAS_HPP_
