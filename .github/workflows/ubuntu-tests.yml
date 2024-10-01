@@ -57,7 +57,7 @@ jobs:
     - name: Downgrade libexpat1 (native ubuntu-22.04 only)
       if: ${{ matrix.os == 'ubuntu-22.04' }}
       run: |
-        if dpkg -l | grep libexpat1-dev | grep 2.4.7-1ubuntu0.3; then
+        if dpkg -l | grep libexpat1-dev | grep 2.4.7-1ubuntu; then
           sudo apt-get install -y --allow-downgrades libexpat1=2.4.7-1 libexpat1-dev=2.4.7-1
         fi
 
