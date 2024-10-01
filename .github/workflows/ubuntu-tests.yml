@@ -33,6 +33,10 @@ jobs:
             codename: "jammy"
             cc: "icx"
             cxx: "icpx"
+          - os: "ubuntu-24.04"
+            codename: "noble"
+            cc: "gcc"
+            cxx: "g++"
 
     env:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
