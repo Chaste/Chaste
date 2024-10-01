@@ -292,11 +292,11 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DI
     {
         c_vector<double, SPACE_DIM> position;
         position = rMesh.GetNode(node_num)->rGetLocation();
-        if (SPACE_DIM == 2)
+        if constexpr (SPACE_DIM == 2)
         {
             p_pts->InsertPoint(node_num, position[0], position[1], 0.0);
         }
-        else if (SPACE_DIM == 3)
+        else if constexpr (SPACE_DIM == 3)
         {
             p_pts->InsertPoint(node_num, position[0], position[1], position[2]);
         }

@@ -446,8 +446,8 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
                 // Get node, index and location
                 Node<SPACE_DIM>* p_node = iter->GetNode(node_idx);
                 unsigned global_idx = p_node->GetIndex();
-                c_vector<double, SPACE_DIM> position = p_node->rGetLocation();
 
+                c_vector<double, SPACE_DIM> position = p_node->rGetLocation();
                 p_pts->InsertPoint(global_idx, position[0], position[1], 0.0);
 
                 p_cell_id_list->SetId(node_idx, global_idx);
