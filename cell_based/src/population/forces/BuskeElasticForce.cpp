@@ -69,13 +69,11 @@ c_vector<double, DIM> BuskeElasticForce<DIM>::CalculateForceBetweenNodes(unsigne
     Node<DIM>* p_node_b = rCellPopulation.GetNode(nodeBGlobalIndex);
 
     // Get the node locations
-    DISABLE_C_VECTOR_WARNING_BEGIN
     const c_vector<double, DIM>& r_node_a_location = p_node_a->rGetLocation();
     const c_vector<double, DIM>& r_node_b_location = p_node_b->rGetLocation();
 
     // Get the unit vector parallel to the line joining the two nodes (assuming no periodicities etc.)
     c_vector<double, DIM> unit_vector = r_node_b_location - r_node_a_location;
-    DISABLE_C_VECTOR_WARNING_END
 
     // Calculate the distance between the two nodes
     double distance_between_nodes = norm_2(unit_vector);

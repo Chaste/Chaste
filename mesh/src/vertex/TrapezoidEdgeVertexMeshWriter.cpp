@@ -109,9 +109,7 @@ void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh([[maybe_
         const unsigned n_vertices = rMesh.GetNumNodes();
         for (unsigned node_num = 0; node_num < rMesh.GetNumNodes(); node_num++)
         {
-            DISABLE_C_VECTOR_WARNING_BEGIN
             c_vector<double, SPACE_DIM> position = rMesh.GetNode(node_num)->rGetLocation();
-            DISABLE_C_VECTOR_WARNING_END
             p_pts->InsertPoint(node_num, position[0], position[1], 0.0);
         }
         /*
@@ -137,11 +135,9 @@ void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh([[maybe_
             const c_vector<double, SPACE_DIM> elem_centroid = rMesh.GetCentroidOfElement(elem->GetIndex());
             for (unsigned elem_node_num = 0; elem_node_num < num_elem_nodes; elem_node_num++)
             {
-                DISABLE_C_VECTOR_WARNING_BEGIN
                 c_vector<double, SPACE_DIM> node_position = elem->GetNode(elem_node_num)->rGetLocation();
                 const double new_x = (node_position[0] - elem_centroid[0]) * alpha + elem_centroid[0];
                 const double new_y = (node_position[1] - elem_centroid[1]) * alpha + elem_centroid[1];
-                DISABLE_C_VECTOR_WARNING_END
                 p_pts->InsertPoint(cell_offset_dist[elem->GetIndex()] + elem_node_num,
                                    new_x, new_y, 0.0);
             }

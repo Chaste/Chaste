@@ -171,7 +171,6 @@ c_vector<double, 3> LinearBasisFunction<3>::ComputeBasisFunctionDerivative(
     unsigned basisIndex)
 {
     assert(basisIndex <= 3);
-    DISABLE_C_VECTOR_WARNING_BEGIN
     c_vector<double, 3> gradN {};
     switch (basisIndex)
     {
@@ -198,7 +197,6 @@ c_vector<double, 3> LinearBasisFunction<3>::ComputeBasisFunctionDerivative(
         default:
            ; //not possible to get here because of assertions above
     }
-    DISABLE_C_VECTOR_WARNING_END
     return gradN;
 }
 
@@ -220,7 +218,6 @@ c_vector<double, 2> LinearBasisFunction<2>::ComputeBasisFunctionDerivative(
     unsigned basisIndex)
 {
     assert(basisIndex <= 2);
-    DISABLE_C_VECTOR_WARNING_BEGIN
     c_vector<double, 2> gradN {};
     switch (basisIndex)
     {
@@ -239,7 +236,6 @@ c_vector<double, 2> LinearBasisFunction<2>::ComputeBasisFunctionDerivative(
         default:
            ; //not possible to get here because of assertions above
     }
-    DISABLE_C_VECTOR_WARNING_END
     return gradN;
 }
 
@@ -261,7 +257,6 @@ c_vector<double,1> LinearBasisFunction<1>::ComputeBasisFunctionDerivative(
     unsigned basisIndex)
 {
     assert(basisIndex <= 1);
-    DISABLE_C_VECTOR_WARNING_BEGIN
     c_vector<double,1> gradN {};
     switch (basisIndex)
     {
@@ -274,7 +269,6 @@ c_vector<double,1> LinearBasisFunction<1>::ComputeBasisFunctionDerivative(
         default:
            ; //not possible to get here because of assertions above
     }
-    DISABLE_C_VECTOR_WARNING_END
     return gradN;
 }
 
@@ -324,13 +318,11 @@ void LinearBasisFunction<ELEMENT_DIM>::ComputeBasisFunctionDerivatives(const Cha
                                                                     c_matrix<double, ELEMENT_DIM, ELEMENT_DIM+1>& rReturnValue)
 {
     assert(ELEMENT_DIM < 4 && ELEMENT_DIM > 0);
-    DISABLE_C_VECTOR_WARNING_BEGIN
     for (unsigned j=0; j<ELEMENT_DIM+1; j++)
     {
         matrix_column<c_matrix<double, ELEMENT_DIM, ELEMENT_DIM+1> > column(rReturnValue, j);
         column = ComputeBasisFunctionDerivative(rPoint, j);
     }
-    DISABLE_C_VECTOR_WARNING_END
 }
 
 /**

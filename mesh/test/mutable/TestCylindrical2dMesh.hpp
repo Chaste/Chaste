@@ -357,7 +357,6 @@ public:
          node_iter != p_mesh->GetNodeIteratorEnd();
          ++node_iter)
         {
-            DISABLE_C_VECTOR_WARNING_BEGIN
             c_vector<double, 2> node_location = node_iter->rGetLocation();
 
             if (fabs(node_location(0)-1.0)<1e-5)
@@ -374,7 +373,6 @@ public:
             }
 
             node_iter->rGetModifiableLocation() = node_location;
-            DISABLE_C_VECTOR_WARNING_END
         }
 
         NodeMap map(p_mesh->GetNumNodes());

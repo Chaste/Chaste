@@ -56,10 +56,8 @@ private:
 
         for (unsigned i=0; i<num_nodes; i++)
         {
-            DISABLE_C_VECTOR_WARNING_BEGIN
             c_vector<double, 2> location = pMesh->GetNode(i)->rGetLocation();
             (*file) << location[0] << "\t" << location[1] << "\n" << std::flush;
-            DISABLE_C_VECTOR_WARNING_END
         }
 
         file->close();

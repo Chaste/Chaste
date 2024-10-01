@@ -248,7 +248,6 @@ ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingB
         {
             if (!rNodes[index]->IsDeleted())
             {
-                DISABLE_C_VECTOR_WARNING_BEGIN
                 c_vector<double, SPACE_DIM> position = rNodes[index]->rGetLocation();
 
                 // Update max/min
@@ -263,7 +262,6 @@ ChasteCuboid<SPACE_DIM> AbstractMesh<ELEMENT_DIM, SPACE_DIM>::CalculateBoundingB
                         maximum_point[i] = position[i];
                     }
                 }
-                DISABLE_C_VECTOR_WARNING_END
             }
         }
     }

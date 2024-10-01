@@ -1680,9 +1680,7 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::ReMesh(bool randomOrder)
     // Reposition fluid sources to the centroid of cells
     for (auto& p_source : mElementFluidSources)
     {
-        DISABLE_C_VECTOR_WARNING_BEGIN
         p_source->rGetModifiableLocation() = this->GetCentroidOfElement(p_source->GetAssociatedElementIndex());
-        DISABLE_C_VECTOR_WARNING_END
     }
 }
 

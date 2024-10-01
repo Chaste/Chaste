@@ -449,7 +449,6 @@ public:
         unsigned num_nodes_new_elem_before = p_elem_n->GetNumNodes();
         assert(num_nodes_new_elem_before == 4);
 
-        DISABLE_C_VECTOR_WARNING_BEGIN
         c_vector<double, 2> node_0_location_before = p_mesh->GetNode(0)->rGetLocation();
 
         // Perform the rosette rank increase
@@ -466,7 +465,6 @@ public:
         // The node with global index 0 should remain in the same location
         TS_ASSERT_DELTA(node_0_location_before[0], p_mesh->GetNode(0)->rGetLocation()[0], 1e-10);
         TS_ASSERT_DELTA(node_0_location_before[1], p_mesh->GetNode(0)->rGetLocation()[1], 1e-10);
-        DISABLE_C_VECTOR_WARNING_END
 
         // The node with global index 0 should now be included in the new element
         TS_ASSERT_LESS_THAN(p_elem_n->GetNodeLocalIndex(0), UINT_MAX);

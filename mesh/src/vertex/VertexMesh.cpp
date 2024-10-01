@@ -279,7 +279,6 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh,
 
                     normal_vector[0]= edge[1];
                     normal_vector[1]= -edge[0];
-                    DISABLE_C_VECTOR_WARNING_END
 
                     double dij = norm_2(normal_vector);
                     assert(dij>1e-5); //Sanity check
@@ -1259,7 +1258,6 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVectorFromAtoB(
     const c_vector<double, SPACE_DIM>& rLocationA, const c_vector<double, SPACE_DIM>& rLocationB)
 {
-    DISABLE_C_VECTOR_WARNING_BEGIN
     c_vector<double, SPACE_DIM> vector {};
     if (mpDelaunayMesh)
     {
@@ -1269,7 +1267,6 @@ c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVectorFromAto
     {
         vector = AbstractMesh<ELEMENT_DIM, SPACE_DIM>::GetVectorFromAtoB(rLocationA, rLocationB);
     }
-    DISABLE_C_VECTOR_WARNING_END
     return vector;
 }
 

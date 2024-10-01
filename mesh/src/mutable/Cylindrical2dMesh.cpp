@@ -129,11 +129,9 @@ void Cylindrical2dMesh::CreateMirrorNodes()
     // For each left original node, create an image node and record its new index
     for (unsigned i=0; i<mLeftOriginals.size(); i++)
     {
-        DISABLE_C_VECTOR_WARNING_BEGIN
         c_vector<double, 2> location {};
         location = mNodes[mLeftOriginals[i]]->rGetLocation();
         location[0] = location[0] + mWidth;
-        DISABLE_C_VECTOR_WARNING_END
 
         unsigned new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
         mLeftImages.push_back(new_node_index);
@@ -143,11 +141,9 @@ void Cylindrical2dMesh::CreateMirrorNodes()
     // For each right original node, create an image node and record its new index
     for (unsigned i=0; i<mRightOriginals.size(); i++)
     {
-        DISABLE_C_VECTOR_WARNING_BEGIN
         c_vector<double, 2> location {};
         location = mNodes[mRightOriginals[i]]->rGetLocation();
         location[0] = location[0] - mWidth;
-        DISABLE_C_VECTOR_WARNING_END
 
         unsigned new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
         mRightImages.push_back(new_node_index);

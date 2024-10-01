@@ -168,11 +168,9 @@ void Toroidal2dMesh::CreateMirrorNodes()
     // For each left original node, create an image node and record its new index
     for (unsigned i=0; i<mLeftOriginals.size(); i++)
     {
-        DISABLE_C_VECTOR_WARNING_BEGIN
         c_vector<double, 2> location {};
         location = mNodes[mLeftOriginals[i]]->rGetLocation();
         location[0] = location[0] + mWidth;
-        DISABLE_C_VECTOR_WARNING_END
 
         unsigned new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
         mLeftImages.push_back(new_node_index);
@@ -182,11 +180,9 @@ void Toroidal2dMesh::CreateMirrorNodes()
     // For each right original node, create an image node and record its new index
     for (unsigned i=0; i<mRightOriginals.size(); i++)
     {
-        DISABLE_C_VECTOR_WARNING_BEGIN
         c_vector<double, 2> location {};
         location = mNodes[mRightOriginals[i]]->rGetLocation();
         location[0] = location[0] - mWidth;
-        DISABLE_C_VECTOR_WARNING_END
 
         unsigned new_node_index = MutableMesh<2,2>::AddNode(new Node<2>(0, location));
         mRightImages.push_back(new_node_index);
@@ -257,7 +253,6 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
         {
             Node<2>* p_node = this->GetNode(elem_iter->GetNodeGlobalIndex(j));
 
-            DISABLE_C_VECTOR_WARNING_BEGIN
             c_vector<double, 2> location = p_node->rGetLocation();
             double this_node_x_location = location[0];
             double this_node_y_location = location[1];
@@ -269,7 +264,6 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
             {
                 num_nodes_outside++;
             }
-            DISABLE_C_VECTOR_WARNING_END
 
             if (num_nodes_outside==3)
             {
@@ -287,7 +281,6 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
         {
             Node<2>* p_node = this->GetNode((*elem_iter)->GetNodeGlobalIndex(j));
 
-            DISABLE_C_VECTOR_WARNING_BEGIN
             c_vector<double, 2> location = p_node->rGetLocation();
             double this_node_x_location = location[0];
             double this_node_y_location = location[1];
@@ -299,7 +292,6 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
             {
                 num_nodes_outside++;
             }
-            DISABLE_C_VECTOR_WARNING_END
 
             if (num_nodes_outside==2)
             {

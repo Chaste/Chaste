@@ -1651,7 +1651,6 @@ public:
 
     void TestCalculateBoundingBox()
     {
-        DISABLE_C_VECTOR_WARNING_BEGIN
         TetrahedralMesh<1,1> mesh1d;
         mesh1d.ConstructLinearMesh(3);
         ChasteCuboid<1> extremes1d = mesh1d.CalculateBoundingBox();
@@ -1689,7 +1688,6 @@ public:
         TS_ASSERT_DELTA(extremes3d.rGetUpperCorner()[1], 5.0, 1e-12);
         TS_ASSERT_DELTA(extremes3d.rGetLowerCorner()[2], 0.0, 1e-12);
         TS_ASSERT_DELTA(extremes3d.rGetUpperCorner()[2], 6.0, 1e-12);
-        DISABLE_C_VECTOR_WARNING_END
     }
 
     void TestArchiving()

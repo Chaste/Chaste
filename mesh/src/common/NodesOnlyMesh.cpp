@@ -540,7 +540,6 @@ bool NodesOnlyMesh<SPACE_DIM>::IsANodeCloseToDomainBoundary()
          node_iter != this->GetNodeIteratorEnd();
          ++node_iter)
     {
-        DISABLE_C_VECTOR_WARNING_BEGIN
         c_vector<double, SPACE_DIM> location = node_iter->rGetLocation();
 
         // We need to ignore periodic dimensions
@@ -558,7 +557,6 @@ bool NodesOnlyMesh<SPACE_DIM>::IsANodeCloseToDomainBoundary()
         {
             break;  // Saves checking every node if we find one close to the boundary
         }
-        DISABLE_C_VECTOR_WARNING_END
     }
 
     // Synchronise between processes

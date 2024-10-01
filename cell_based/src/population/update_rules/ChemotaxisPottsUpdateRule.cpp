@@ -53,7 +53,6 @@ double ChemotaxisPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned 
 {
     double delta_H = 0.0;
 
-    DISABLE_C_VECTOR_WARNING_BEGIN
     c_vector<double, DIM> current_location = rCellPopulation.GetNode(currentNodeIndex)->rGetLocation();
     c_vector<double, DIM> target_location = rCellPopulation.GetNode(targetNodeIndex)->rGetLocation();
 
@@ -68,7 +67,6 @@ double ChemotaxisPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned 
             delta_H += 0.2;
         }
     }
-    DISABLE_C_VECTOR_WARNING_END
 
     return delta_H;
 }

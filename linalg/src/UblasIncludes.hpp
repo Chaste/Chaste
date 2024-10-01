@@ -43,10 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChastePragmas.hpp"
 
 #include "UblasVectorInclude.hpp"
-
-DISABLE_C_VECTOR_WARNING_BEGIN
 #include "UblasMatrixInclude.hpp"
-DISABLE_C_VECTOR_WARNING_END
 
 CHASTE_DISABLE_BOOST_DEPRECATION_WARNING_BEGIN
 #include <boost/numeric/ublas/matrix_proxy.hpp>

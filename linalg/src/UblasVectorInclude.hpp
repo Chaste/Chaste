@@ -51,7 +51,4 @@ using boost::numeric::ublas::zero_vector;
 using boost::numeric::ublas::scalar_vector;
 using boost::numeric::ublas::unit_vector;
 
-#define DISABLE_C_VECTOR_WARNING_BEGIN
-#define DISABLE_C_VECTOR_WARNING_END
-
 #endif /*UBLASVECTORINCLUDE_HPP_*/
