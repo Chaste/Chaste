@@ -57,7 +57,7 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
     # The following macros allow us to ignore (in a judicious manner) some spurious GCC warnings about potentially
     # uninitialised c_vectors in Release mode. See https://github.com/Chaste/Chaste/issues/231 for full details.
     if (CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo|MinSizeRel"
-            AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 10
+            AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 9.4
             AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 14)
 
         if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 11.1)
