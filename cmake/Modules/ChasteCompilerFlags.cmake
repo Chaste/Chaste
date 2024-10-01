@@ -53,6 +53,20 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
     if (NOT (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7))
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wimplicit-fallthrough=2")  # See https://developers.redhat.com/blog/2017/03/10/wimplicit-fallthrough-in-gcc-7/
     endif (NOT (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7))
+
+    # The following macros allow us to ignore (in a judicious manner) some spurious GCC warnings about potentially
+    # uninitialised c_vectors in Release mode. See https://github.com/Chaste/Chaste/issues/231 for full details.
+    if (CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo|MinSizeRel"
+            AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 10
+            AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 14)
+
+        if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 11.1)
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-maybe-uninitialized -Wno-array-bounds -Wno-stringop-overflow")
+        else ()
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-maybe-uninitialized -Wno-array-bounds -Wno-stringop-overflow -Wno-stringop-overread")
+        endif ()
+    endif ()
+
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${default_flags}  -Wextra -Wno-unused-parameter -Wvla")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${default_shared_link_flags}")
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "IntelLLVM")
