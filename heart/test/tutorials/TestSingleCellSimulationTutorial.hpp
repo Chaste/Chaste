@@ -80,7 +80,8 @@ public:
     {
 /* CVODE is still an optional Chaste dependency, but it is highly recommended for
  * working with single cell simulations. This tutorial code will only run if CVODE is installed and enabled
- * (see InstallCvode and ChasteGuides/CmakeBuildGuide). */
+ * (see [InstallSundials](/docs/dev-guides/developer-install-guide/#sundials) for a manual installation if needed,
+ * and [CmakeBuildGuide](/docs/dev-guides/cmake-build-guide/)). */
 #ifdef CHASTE_CVODE
         /*
          * ### Defining a CVODE model
@@ -181,7 +182,7 @@ public:
          * You can also change any parameters that are labelled in the cell model.
          *
          * Instructions for annotating parameters can be found at
-         * [ChasteGuides/CodeGenerationFromCellML](https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CodeGenerationFromCellML)
+         * [ChasteGuides/CodeGenerationFromCellML](/docs/user-guides/code-generation-from-cellml/).
          *
          * Here we show how to change the parameter dictating the maximal conductance of the IKs current.
          * Note this call actually leaves it unchanged from the default,
@@ -239,7 +240,7 @@ public:
          * This call will add to the solution object the ODE system's labelled "derived quantities"
          * these are things that are not state variables, but are calculated from state variables
          * (e.g. currents), and have been tagged in the CellML file with metadata.
-         * See [CodeGenerationFromCellML](https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/CodeGenerationFromCellML)
+         * See [CodeGenerationFromCellML](/docs/user-guides/code-generation-from-cellml/)
          * for annotation instructions.
          */
         solution.CalculateDerivedQuantitiesAndParameters(p_model.get());
