@@ -2225,8 +2225,7 @@ void ImmersedBoundaryMesh<ELEMENT_DIM, SPACE_DIM>::UpdateNodeLocationsVoronoiDia
             for (const auto& pair : halo_ids_and_locations)
             {
                 const unsigned node_idx = pair.first;
-                c_vector<double, SPACE_DIM> location;
-                location = pair.second;
+                c_vector<double, SPACE_DIM> location = pair.second;
 
                 const int x_coord = ScaleUpToVoronoiCoordinate(location[0]);
                 const int y_coord = ScaleUpToVoronoiCoordinate(location[1]);

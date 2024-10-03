@@ -110,10 +110,9 @@ std::vector<double> OffLatticeRandomFieldGenerator<SPACE_DIM>::SampleRandomField
     const double time)
 {
     std::vector<double> samples(rNodes.size());
-    c_vector<double, SPACE_DIM> node_location;
     for (unsigned i = 0; i < samples.size(); ++i)
     {
-        node_location = rNodes[i]->rGetLocation();
+        const c_vector<double, SPACE_DIM> node_location = rNodes[i]->rGetLocation();
         switch (SPACE_DIM)
         {
             case 1:

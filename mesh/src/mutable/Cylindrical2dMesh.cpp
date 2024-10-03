@@ -129,7 +129,7 @@ void Cylindrical2dMesh::CreateMirrorNodes()
     // For each left original node, create an image node and record its new index
     for (unsigned i=0; i<mLeftOriginals.size(); i++)
     {
-        c_vector<double, 2> location;
+        c_vector<double, 2> location {};
         location = mNodes[mLeftOriginals[i]]->rGetLocation();
         location[0] = location[0] + mWidth;
 
@@ -141,7 +141,7 @@ void Cylindrical2dMesh::CreateMirrorNodes()
     // For each right original node, create an image node and record its new index
     for (unsigned i=0; i<mRightOriginals.size(); i++)
     {
-        c_vector<double, 2> location;
+        c_vector<double, 2> location {};
         location = mNodes[mRightOriginals[i]]->rGetLocation();
         location[0] = location[0] - mWidth;
 

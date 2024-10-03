@@ -53,11 +53,8 @@ double ChemotaxisPottsUpdateRule<DIM>::EvaluateHamiltonianContribution(unsigned 
 {
     double delta_H = 0.0;
 
-    // Note that we define these vectors before setting them as otherwise the profiling build will break (see #2367)
-    c_vector<double, DIM> current_location;
-    current_location = rCellPopulation.GetNode(currentNodeIndex)->rGetLocation();
-    c_vector<double, DIM> target_location;
-    target_location = rCellPopulation.GetNode(targetNodeIndex)->rGetLocation();
+    c_vector<double, DIM> current_location = rCellPopulation.GetNode(currentNodeIndex)->rGetLocation();
+    c_vector<double, DIM> target_location = rCellPopulation.GetNode(targetNodeIndex)->rGetLocation();
 
     for (unsigned dimension=0; dimension<DIM; dimension++)
     {

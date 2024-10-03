@@ -1258,7 +1258,7 @@ template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 c_vector<double, SPACE_DIM> VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetVectorFromAtoB(
     const c_vector<double, SPACE_DIM>& rLocationA, const c_vector<double, SPACE_DIM>& rLocationB)
 {
-    c_vector<double, SPACE_DIM> vector;
+    c_vector<double, SPACE_DIM> vector {};
     if (mpDelaunayMesh)
     {
         vector = mpDelaunayMesh->GetVectorFromAtoB(rLocationA, rLocationB);
