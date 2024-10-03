@@ -144,7 +144,9 @@ void TrapezoidEdgeVertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh([[maybe_
         }
         mpVtkUnstructedMesh->SetPoints(p_pts);
         p_pts->Delete(); // Reference counted
-        unsigned total_num_edges = 0;
+
+        // This is maybe unused because in release builds the assert below will be compiled out
+        [[maybe_unused]] unsigned total_num_edges = 0;
         for (auto elem = rMesh.GetElementIteratorBegin(); elem != elem_end; ++elem)
         {
             // First do the trapezoids for each edge
