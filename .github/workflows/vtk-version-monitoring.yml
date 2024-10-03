@@ -1,0 +1,47 @@
+# Workflow to monitor the state of VTK post libexpat1 upgrade which causes .vtu parsing errors.
+# See https://github.com/Chaste/Chaste/issues/324
+
+name: VTK version monitoring
+
+on:
+  workflow_dispatch:
+  # Run nightly (03:23 UTC) until workflow is disabled
+  schedule:
+    - cron: '23 3 * * *'
+
+jobs:
+
+  check-vtk-version:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: "ubuntu-24.04"
+            vtk: "libvtk9-dev"
+            expected: "9.1.0+really9.1.0+dfsg2-7.1build3"
+          - os: "ubuntu-22.04"
+            vtk: "libvtk9-dev"
+            expected: "9.1.0+really9.1.0+dfsg2-3build1"
+          - os: "ubuntu-22.04"
+            vtk: "libvtk7-dev"
+            expected: "7.1.1+dfsg2-10.1build1"
+
+    steps:
+    - name: install vtk
+      run: |
+        sudo apt update
+        sudo apt install -y ${{ matrix.vtk }}
+
+    - name: check vtk version
+      run: |
+        INSTALLED_VERSION=$(dpkg-query -W -f='${Version}' ${{ matrix.vtk }} 2>/dev/null)
+
+        if [ "$INSTALLED_VERSION" == "${{ matrix.expected }}" ]; then
+          echo "vtk version is as expected; no action required"
+          exit 0
+        else
+          echo "vtk version unexpected! Did they fix the libexpat problem?"
+          exit 1
+        fi
