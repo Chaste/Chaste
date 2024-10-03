@@ -152,6 +152,7 @@ template<unsigned DIM>
 double AveragedSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement) // now takes in element
 {
     assert(!mCellDensityOnCoarseElements.empty());
+    EXCEPT_IF(pElement == nullptr);
     return mLinearSourceCoefficient * mCellDensityOnCoarseElements[pElement->GetIndex()];
 }
 

@@ -210,35 +210,25 @@ unsigned ObsoleteBoxCollection<DIM>::GetLinearIndex(c_vector<int, DIM> gridIndic
 template<unsigned DIM>
 c_vector<unsigned, DIM> ObsoleteBoxCollection<DIM>::GetGridIndices(unsigned linearIndex)
 {
-    c_vector<unsigned, DIM> grid_indices;
+    c_vector<unsigned, DIM> grid_indices {};
 
-    switch (DIM)
+    if constexpr (DIM == 1)
     {
-        case 1:
-        {
-            grid_indices(0) = linearIndex;
-            break;
-        }
-        case 2:
-        {
-            unsigned num_x = mNumBoxesEachDirection(0);
-            grid_indices(0) = linearIndex % num_x;
-            grid_indices(1) = (linearIndex - grid_indices(0)) / num_x;
-            break;
-        }
-        case 3:
-        {
-            unsigned num_x = mNumBoxesEachDirection(0);
-            unsigned num_xy = mNumBoxesEachDirection(0)*mNumBoxesEachDirection(1);
-            grid_indices(0) = linearIndex % num_x;
-            grid_indices(1) = (linearIndex % num_xy - grid_indices(0)) / num_x;
-            grid_indices(2) = linearIndex / num_xy;
-            break;
-        }
-        default:
-        {
-            NEVER_REACHED;
-        }
+        grid_indices(0) = linearIndex;
+    }
+    else if constexpr (DIM == 2)
+    {
+        const unsigned num_x = mNumBoxesEachDirection(0);
+        grid_indices(0) = linearIndex % num_x;
+        grid_indices(1) = (linearIndex - grid_indices(0)) / num_x;
+    }
+    else if constexpr (DIM == 3)
+    {
+        const unsigned num_x = mNumBoxesEachDirection(0);
+        const unsigned num_xy = mNumBoxesEachDirection(0)*mNumBoxesEachDirection(1);
+        grid_indices(0) = linearIndex % num_x;
+        grid_indices(1) = (linearIndex % num_xy - grid_indices(0)) / num_x;
+        grid_indices(2) = linearIndex / num_xy;
     }
 
     return grid_indices;

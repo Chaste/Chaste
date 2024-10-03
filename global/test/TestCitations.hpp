@@ -125,6 +125,8 @@ public:
 // Check PETSc version - this is just because they reformatted their BibTex between versions, no change to function!
 #if PETSC_VERSION_GE(3, 19, 0) //PETSc 3.19.0 onwards
             FileFinder reference_citations("global/test/data/citations-2023.txt", RelativeTo::ChasteSourceRoot);
+#elif PETSC_VERSION_GE(3, 18, 0) //PETSc 3.18.0 onwards
+            FileFinder reference_citations("global/test/data/citations-2022.txt", RelativeTo::ChasteSourceRoot);
 #elif PETSC_VERSION_GE(3, 11, 2) //PETSc 3.11.2 onwards
             FileFinder reference_citations("global/test/data/citations-2019.txt", RelativeTo::ChasteSourceRoot);
 #elif (PETSC_VERSION_MAJOR == 3 && (PETSC_VERSION_MINOR == 9 || PETSC_VERSION_MINOR == 10 || PETSC_VERSION_MINOR == 11)) //PETSc 3.9, 3.10, 3.11.1

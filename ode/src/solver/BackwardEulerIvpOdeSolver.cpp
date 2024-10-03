@@ -173,21 +173,21 @@ void BackwardEulerIvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstract
     // Check the size of the ODE system matches the solvers expected
     assert(mSizeOfOdeSystem == pAbstractOdeSystem->GetNumberOfStateVariables());
 
-    unsigned counter = 0;
-//        const double eps = 1e-6 * rCurrentGuess[0]; // Our tolerance (should use min(guess) perhaps?)
     const double eps = 1e-6; // JonW tolerance
     double norm = 2*eps;
 
     std::vector<double> current_guess(mSizeOfOdeSystem);
     current_guess.assign(rCurrentYValues.begin(), rCurrentYValues.end());
 
-    while (norm > eps)
+    // Ensure no infinite loops by keeping a counter
+    // TODO should this limit of 20 be a function param?
+    unsigned counter = 0u;
+    const unsigned iter_limit = 20u;
+    while (norm > eps && counter < iter_limit)
     {
         // Calculate Jacobian and mResidual for current guess
         ComputeResidual(pAbstractOdeSystem, timeStep, time, rCurrentYValues, current_guess);
         ComputeJacobian(pAbstractOdeSystem, timeStep, time, rCurrentYValues, current_guess);
-//            // Update norm (our style)
-//            norm = ComputeNorm(mResidual);
 
         // Solve Newton linear system
         SolveLinearSystem();
@@ -202,8 +202,9 @@ void BackwardEulerIvpOdeSolver::CalculateNextYValue(AbstractOdeSystem* pAbstract
         }
 
         counter++;
-        assert(counter < 20); // avoid infinite loops
     }
+    assert(counter < iter_limit); // avoid infinite loops
+
     rNextYValues.assign(current_guess.begin(), current_guess.end());
 }
 

@@ -171,8 +171,7 @@ c_vector<double, 3> LinearBasisFunction<3>::ComputeBasisFunctionDerivative(
     unsigned basisIndex)
 {
     assert(basisIndex <= 3);
-
-    c_vector<double, 3> gradN;
+    c_vector<double, 3> gradN {};
     switch (basisIndex)
     {
         case 0:
@@ -219,8 +218,7 @@ c_vector<double, 2> LinearBasisFunction<2>::ComputeBasisFunctionDerivative(
     unsigned basisIndex)
 {
     assert(basisIndex <= 2);
-
-    c_vector<double, 2> gradN;
+    c_vector<double, 2> gradN {};
     switch (basisIndex)
     {
         case 0:
@@ -259,8 +257,7 @@ c_vector<double,1> LinearBasisFunction<1>::ComputeBasisFunctionDerivative(
     unsigned basisIndex)
 {
     assert(basisIndex <= 1);
-
-    c_vector<double,1> gradN;
+    c_vector<double,1> gradN {};
     switch (basisIndex)
     {
         case 0:
@@ -321,7 +318,6 @@ void LinearBasisFunction<ELEMENT_DIM>::ComputeBasisFunctionDerivatives(const Cha
                                                                     c_matrix<double, ELEMENT_DIM, ELEMENT_DIM+1>& rReturnValue)
 {
     assert(ELEMENT_DIM < 4 && ELEMENT_DIM > 0);
-
     for (unsigned j=0; j<ELEMENT_DIM+1; j++)
     {
         matrix_column<c_matrix<double, ELEMENT_DIM, ELEMENT_DIM+1> > column(rReturnValue, j);

@@ -129,7 +129,7 @@ void Cylindrical2dMesh::CreateMirrorNodes()
     // For each left original node, create an image node and record its new index
     for (unsigned i=0; i<mLeftOriginals.size(); i++)
     {
-        c_vector<double, 2> location;
+        c_vector<double, 2> location {};
         location = mNodes[mLeftOriginals[i]]->rGetLocation();
         location[0] = location[0] + mWidth;
 
@@ -141,7 +141,7 @@ void Cylindrical2dMesh::CreateMirrorNodes()
     // For each right original node, create an image node and record its new index
     for (unsigned i=0; i<mRightOriginals.size(); i++)
     {
-        c_vector<double, 2> location;
+        c_vector<double, 2> location {};
         location = mNodes[mRightOriginals[i]]->rGetLocation();
         location[0] = location[0] - mWidth;
 
@@ -737,9 +737,6 @@ void Cylindrical2dMesh::GenerateVectorsOfElementsStraddlingPeriodicBoundaries()
     mLeftPeriodicBoundaryElementIndices.clear();
     mRightPeriodicBoundaryElementIndices.clear();
 
-    unsigned incidences_of_zero_left_image_nodes = 0;
-    unsigned incidences_of_zero_right_image_nodes = 0;
-
     for (MutableMesh<2,2>::ElementIterator elem_iter = GetElementIteratorBegin();
          elem_iter != GetElementIteratorEnd();
          ++elem_iter)
@@ -760,15 +757,6 @@ void Cylindrical2dMesh::GenerateVectorsOfElementsStraddlingPeriodicBoundaries()
             {
                 number_of_right_image_nodes++;
             }
-        }
-
-        if ((number_of_left_image_nodes == 0) && (number_of_right_image_nodes == 1 || number_of_right_image_nodes == 2) )
-        {
-            incidences_of_zero_left_image_nodes++;
-        }
-        if ((number_of_right_image_nodes == 0) && (number_of_left_image_nodes == 1 || number_of_left_image_nodes == 2) )
-        {
-            incidences_of_zero_right_image_nodes++;
         }
 
         /* SJ - Have checked the following:

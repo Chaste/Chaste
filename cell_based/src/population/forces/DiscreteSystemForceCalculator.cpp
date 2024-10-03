@@ -250,8 +250,6 @@ double DiscreteSystemForceCalculator::GetLocalExtremum(unsigned index, double an
     assert(angle1 < angle2);
 
     double tolerance = 1e-5;
-    unsigned counter = 0;
-
     double previous_angle;
     double current_error;
     double current_angle = angle1;
@@ -265,7 +263,6 @@ double DiscreteSystemForceCalculator::GetLocalExtremum(unsigned index, double an
         current_ft_and_fn = CalculateFtAndFn(index, current_angle);
         current_angle -= current_ft_and_fn[0]/current_ft_and_fn[1];
         current_error = fabs(current_angle - previous_angle);
-        counter++;
     }
 
     assert(current_angle>angle1 && current_angle<angle2);

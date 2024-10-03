@@ -2350,8 +2350,7 @@ public:
                  iter != mesh_with_x_split.GetNodeIteratorEnd();
                  ++iter)
             {
-                c_vector<double, 2> pos;
-                pos = iter->rGetLocation();
+                c_vector<double, 2> pos = iter->rGetLocation();
                 max_x_with_x_split = std::max(max_x_with_x_split, pos[0]);
                 max_y_with_x_split = std::max(max_y_with_x_split, pos[1]);
             }
@@ -2372,8 +2371,7 @@ public:
                  iter != mesh_with_default_split.GetNodeIteratorEnd();
                  ++iter)
             {
-                c_vector<double, 2> pos;
-                pos = iter->rGetLocation();
+                c_vector<double, 2> pos = iter->rGetLocation();
                 max_x_with_default_split = std::max(max_x_with_default_split, pos[0]);
                 max_y_with_default_split = std::max(max_y_with_default_split, pos[1]);
             }

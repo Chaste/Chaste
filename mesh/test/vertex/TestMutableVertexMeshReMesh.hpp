@@ -276,7 +276,7 @@ public:
             }
         }
         TS_ASSERT_EQUALS(num_node_merges, 2u);
-        TS_ASSERT_EQUALS(num_node_merges, 2u);
+        TS_ASSERT_EQUALS(num_new_edges, 2u);
 
         // Test that each moved node has the correct location following the rearrangement
         TS_ASSERT_DELTA(vertex_mesh.GetNode(4)->rGetLocation()[0], 0.6, 1e-8);
