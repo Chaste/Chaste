@@ -38,6 +38,8 @@ jobs:
             extra-build-args: ""
           - image: chaste/runner:mantic.portability-system
             extra-build-args: ""
+          - image: chaste/runner:test
+            extra-build-args: ""
 
     runs-on: ubuntu-latest
 
