@@ -13,6 +13,7 @@ source_includes:
   - <map>
   - SmartPointers.hpp
   - UblasIncludes.hpp
+  - PythonUblasObjectConverters.hpp
 
 template_substitutions:
   - signature: <unsigned DIM>
@@ -521,16 +522,10 @@ modules:
       - name: AbstractCellPopulationBoundaryCondition
 
       - name: PlaneBoundaryCondition
-        source_includes:
-          - PythonUblasObjectConverters.hpp
 
       - name: SlidingBoundaryCondition
-        source_includes:
-          - PythonUblasObjectConverters.hpp
 
       - name: SphereGeometryBoundaryCondition
-        source_includes:
-          - PythonUblasObjectConverters.hpp
 
       ##=== cell_based: Chaste/cell_based/src/population/division_rules
       - name: AbstractCentreBasedDivisionRule
@@ -554,8 +549,10 @@ modules:
       - name: AbstractImmersedBoundaryForce
 
       - name: BuskeAdhesiveForce
+
       - name: BuskeCompressionForce
       - name: BuskeElasticForce
+
       - name: ChemotacticForce
       - name: DiffusionForce
       - name: FarhadifarForce
@@ -789,8 +786,6 @@ modules:
 
       ##=== cell_based: Chaste/pychaste/src/cpp/cell_based
       - name: AttractingPlaneBoundaryCondition
-        source_includes:
-          - PythonUblasObjectConverters.hpp
       - name: VtkSceneModifier
       - name: PythonSimulationModifier
 

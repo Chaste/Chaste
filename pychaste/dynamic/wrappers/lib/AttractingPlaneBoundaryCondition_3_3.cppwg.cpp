@@ -38,13 +38,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include "PythonUblasObjectConverters.hpp"
 #include <set>
 #include <vector>
 #include <string>
 #include <map>
 #include "SmartPointers.hpp"
 #include "UblasIncludes.hpp"
+#include "PythonUblasObjectConverters.hpp"
 #include "AttractingPlaneBoundaryCondition.hpp"
 
 #include "AttractingPlaneBoundaryCondition_3_3.cppwg.hpp"

@@ -60,6 +60,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include "SmartPointers.hpp"
 #include "UblasIncludes.hpp"
+#include "PythonUblasObjectConverters.hpp"
 #include "CellsGenerator.hpp"
 
 #include "CellsGenerator_TysonNovakCellCycleModel_3.cppwg.hpp"

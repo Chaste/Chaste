@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include "SmartPointers.hpp"
 #include "UblasIncludes.hpp"
+#include "PythonUblasObjectConverters.hpp"
 #include "Alarcon2004OxygenBasedCellCycleModel.hpp"
 
 #include "Alarcon2004OxygenBasedCellCycleModel.cppwg.hpp"
