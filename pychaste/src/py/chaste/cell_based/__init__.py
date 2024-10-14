@@ -1,4 +1,4 @@
-"""Cell Based Module"""
+"""Cell-Based Module"""
 
 __copyright__ = """Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.

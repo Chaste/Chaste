@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkOpenGLRenderer.h>
 #include <vtkPythonUtil.h>
 #include <vtkSmartPointer.h>
+#include <vtkUnsignedCharArray.h>
 
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>

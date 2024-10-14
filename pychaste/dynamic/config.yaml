@@ -796,6 +796,8 @@ modules:
 
       ##=== visualization: Chaste/pychaste/src/cpp/visualization
       - name: VtkScene
+        source_includes:
+          - PythonVtkObjectConverters.hpp
       - name: AbstractPyChasteActorGenerator
       - name: CellPopulationPyChasteActorGenerator
 
