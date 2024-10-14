@@ -206,7 +206,7 @@ class TestPyVertexBasedCellSimulationsTutorial(
         normal = np.array([0.0, -1.0])
 
         ## We can now make a PlaneBoundaryCondition (passing the point and normal to the plane) and pass it to the OffLatticeSimulation.
-        bc = chaste.cell_based.PlaneBoundaryCondition2_2(cell_population, point, normal)
+        bc = chaste.cell_based.PlaneBoundaryCondition_2_2(cell_population, point, normal)
         simulator.AddCellPopulationBoundaryCondition(bc)
 
         ## We now create one or more CellKillers, which determine how cells are removed from the simulation.
@@ -218,7 +218,7 @@ class TestPyVertexBasedCellSimulationsTutorial(
         normal = np.array([0.0, 1.0])
 
         ## Finally we now make a PlaneBasedCellKiller (passing the point and normal to the plane) and pass it to the OffLatticeSimulation.
-        killer = chaste.cell_based.PlaneBasedCellKiller2(cell_population, point, normal)
+        killer = chaste.cell_based.PlaneBasedCellKiller_2(cell_population, point, normal)
         simulator.AddCellKiller(killer)
 
         ## To run the simulation, we call `Solve()`.
