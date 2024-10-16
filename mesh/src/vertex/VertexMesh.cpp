@@ -153,10 +153,10 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nod
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
  */
 template <>
-VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, 
-                             bool isPeriodic, 
-                             bool isBounded, 
-                             bool scaleBoundByEdgeLength, 
+VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh,
+                             bool isPeriodic,
+                             bool isBounded,
+                             bool scaleBoundByEdgeLength,
                              double maxDelaunayEdgeLength,
                              bool offsetNewBoundaryNodes)
         : mpDelaunayMesh(&rMesh)
@@ -213,14 +213,14 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh,
 
         // Add new nodes
         unsigned new_node_index = mpDelaunayMesh->GetNumNodes();
-        
+
         // Lop over elements to work out boundary edges
         for (TetrahedralMesh<2,2>::ElementIterator elem_iter = mpDelaunayMesh->GetElementIteratorBegin();
             elem_iter != mpDelaunayMesh->GetElementIteratorEnd();
             ++elem_iter)
         {
             bool bad_element = false;
-            
+
             for (unsigned j=0; j<3; j++)
             {
                 Node<2>* p_node_a = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex(j));
@@ -266,15 +266,15 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh,
                     /*
                     * Here one or more of the edges in the element is longer than maxDelaunayEdgeLength so the other edges are boundary edges
                     */
-                   
+
                     assert(!is_boundary_edge); // We shouldnt have short edged which are in 2 elements.
                     is_boundary_edge = true;
                     // Here we're pointing in to the element
                     direction_of_normal = -1.0;
-                } 
+                }
 
                 if (is_boundary_edge)
-                {  
+                {
                     c_vector<double,2> normal_vector;
 
                     normal_vector[0]= edge[1];
@@ -299,15 +299,15 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh,
                         {
                             ratio = ((double)section+0.5)/((double)num_sections+1);
                         }
-                        else 
+                        else
                         {
                             ratio = ((double)section)/((double)num_sections);
                         }
-                        
+
                         assert(ratio>=0.0);
                         assert(ratio<=1.0);
                         c_vector<double,2> new_node_location = direction_of_normal * new_node_distance * normal_vector + ratio*p_node_a->rGetLocation() + (1-ratio)*p_node_b->rGetLocation();
-                        
+
                         //Check if near other nodes (could be inefficient)
                         double node_clearance = 0.01;
                         if (!IsNearExistingNodes(new_node_location,nodes,node_clearance))
@@ -319,8 +319,8 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh,
                 }
             }
         }
-        
-// // Plot new nodes 
+
+// // Plot new nodes
 // NodesOnlyMesh<2> temp_mesh;
 // temp_mesh.ConstructNodesWithoutMesh(nodes, 1.0);
 // VtkMeshWriter<2, 2> mesh_writer("tempMesh", "ExtendedMesh", false);

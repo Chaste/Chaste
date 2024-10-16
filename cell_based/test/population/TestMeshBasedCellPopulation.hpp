@@ -859,7 +859,7 @@ public:
         cell_population.SetScaleBoundByEdgeLength(true);
         cell_population.SetBoundedVoroniTesselationLengthCutoff(1.0);
         cell_population.SetOffsetNewBoundaryNodes(true);
-        
+
         TS_ASSERT_EQUALS(cell_population.GetWriteVtkAsPoints(), true);
         TS_ASSERT_EQUALS(cell_population.GetBoundVoronoiTessellation(), true);
         TS_ASSERT_EQUALS(cell_population.GetScaleBoundByEdgeLength(), true);

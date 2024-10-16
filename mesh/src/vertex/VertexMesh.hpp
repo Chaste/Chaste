@@ -272,8 +272,8 @@ public:
      * @param maxDelaunayEdgeLength the maximum edge length in the mesh. Edges longer than this are ignored in boundary calculation. Defaults to DBL_MAX so there ia no max length.
      * @param offsetNewBoundaryNodes whether to add new node towards the centre of the boundary edges or not. Defaults to false.
      */
-    VertexMesh(TetrahedralMesh<2, 2>& rMesh, 
-               bool isPeriodic = false, 
+    VertexMesh(TetrahedralMesh<2, 2>& rMesh,
+               bool isPeriodic = false,
                bool isBounded = false,
                bool scaleBoundByEdgeLength = true,
                double maxDelaunayEdgeLength = DBL_MAX,
@@ -639,13 +639,13 @@ public:
 
     /**
      * Helper method to determine if a point in space is near to any existing nodes. Used when making bounded Voronoi Tesselations
-     * 
+     *
      * @param newNodeLocation the location of the proposed node
      * @param nodesToCheck the nodes to check for proximity to the proposed node
      * @param minClearance the minimum clearance
-     * 
+     *
      * @return if the new node is near to any existing node
-     * 
+     *
      */
     bool IsNearExistingNodes(c_vector<double,SPACE_DIM> newNodeLocation, std::vector<Node<SPACE_DIM> *> nodesToCheck, double minClearance);
 

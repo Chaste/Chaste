@@ -95,7 +95,7 @@ private:
         archive & mAreaBasedDampingConstantParameter;
         archive & mWriteVtkAsPoints;
         archive & mBoundVoronoiTessellation;
-        archive & mScaleBoundByEdgeLength; 
+        archive & mScaleBoundByEdgeLength;
         archive & mBoundedVoroniTesselationLengthCutoff;
         archive & mOffsetNewBoundaryNodes;
         archive & mHasVariableRestLength;
