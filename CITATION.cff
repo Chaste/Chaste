@@ -11,7 +11,6 @@ url: 'https://chaste.github.io/'
 abstract: >-
   Chaste - a C++ library for computational physiology and biology simulations
 license: BSD-3-Clause
-commit: '69d202ca83a99895c17fb090d347fc19e1cc2515'
 version: '2024.1'
 date-released: '2024-02-21'
 preferred-citation:
