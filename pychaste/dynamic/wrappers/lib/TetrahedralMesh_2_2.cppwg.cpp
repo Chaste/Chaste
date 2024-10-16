@@ -1,0 +1,243 @@
+/*
+
+Copyright (c) 2005-2024, University of Oxford.
+All rights reserved.
+
+University of Oxford means the Chancellor, Masters and Scholars of the
+University of Oxford, having an administrative office at Wellington
+Square, Oxford OX1 2JD, UK.
+
+This file is part of Chaste.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+ * Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+ * Neither the name of the University of Oxford nor the names of its
+   contributors may be used to endorse or promote products derived from this
+   software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+*/
+
+// This file is auto-generated; manual changes will be overwritten.
+// To make enduring changes, see pychaste/dynamic/config.yaml.
+
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include <set>
+#include <vector>
+#include <string>
+#include <map>
+#include "SmartPointers.hpp"
+#include "UblasIncludes.hpp"
+#include "PythonUblasObjectConverters.hpp"
+#include "TetrahedralMesh.hpp"
+
+#include "TetrahedralMesh_2_2.cppwg.hpp"
+
+namespace py = pybind11;
+typedef TetrahedralMesh<2, 2> TetrahedralMesh_2_2;
+PYBIND11_DECLARE_HOLDER_TYPE(T, boost::shared_ptr<T>);
+typedef unsigned int unsignedint;
+typedef unsigned int unsignedint;
+typedef unsigned int unsignedint;
+
+class TetrahedralMesh_2_2_Overrides : public TetrahedralMesh_2_2
+{
+public:
+    using TetrahedralMesh_2_2::TetrahedralMesh;
+    void ConstructFromMeshReader(::AbstractMeshReader<2, 2> & rMeshReader) override
+    {
+        PYBIND11_OVERRIDE(
+            void,
+            TetrahedralMesh_2_2,
+            ConstructFromMeshReader,
+            rMeshReader);
+    }
+    void ReadNodesPerProcessorFile(::std::string const & rNodesPerProcessorFile) override
+    {
+        PYBIND11_OVERRIDE(
+            void,
+            TetrahedralMesh_2_2,
+            ReadNodesPerProcessorFile,
+            rNodesPerProcessorFile);
+    }
+    void RefreshMesh() override
+    {
+        PYBIND11_OVERRIDE(
+            void,
+            TetrahedralMesh_2_2,
+            RefreshMesh,
+            );
+    }
+    void PermuteNodes() override
+    {
+        PYBIND11_OVERRIDE(
+            void,
+            TetrahedralMesh_2_2,
+            PermuteNodes,
+            );
+    }
+    void Clear() override
+    {
+        PYBIND11_OVERRIDE(
+            void,
+            TetrahedralMesh_2_2,
+            Clear,
+            );
+    }
+    void RefreshJacobianCachedData() override
+    {
+        PYBIND11_OVERRIDE(
+            void,
+            TetrahedralMesh_2_2,
+            RefreshJacobianCachedData,
+            );
+    }
+    void GetJacobianForElement(unsigned int elementIndex, ::boost::numeric::ublas::c_matrix<double, 2, 2> & rJacobian, double & rJacobianDeterminant) const override
+    {
+        PYBIND11_OVERRIDE(
+            void,
+            TetrahedralMesh_2_2,
+            GetJacobianForElement,
+            elementIndex,
+            rJacobian,
+            rJacobianDeterminant);
+    }
+    void GetInverseJacobianForElement(unsigned int elementIndex, ::boost::numeric::ublas::c_matrix<double, 2, 2> & rJacobian, double & rJacobianDeterminant, ::boost::numeric::ublas::c_matrix<double, 2, 2> & rInverseJacobian) const override
+    {
+        PYBIND11_OVERRIDE(
+            void,
+            TetrahedralMesh_2_2,
+            GetInverseJacobianForElement,
+            elementIndex,
+            rJacobian,
+            rJacobianDeterminant,
+            rInverseJacobian);
+    }
+    void GetWeightedDirectionForElement(unsigned int elementIndex, ::boost::numeric::ublas::c_vector<double, 2> & rWeightedDirection, double & rJacobianDeterminant) const override
+    {
+        PYBIND11_OVERRIDE(
+            void,
+            TetrahedralMesh_2_2,
+            GetWeightedDirectionForElement,
+            elementIndex,
+            rWeightedDirection,
+            rJacobianDeterminant);
+    }
+    void GetWeightedDirectionForBoundaryElement(unsigned int elementIndex, ::boost::numeric::ublas::c_vector<double, 2> & rWeightedDirection, double & rJacobianDeterminant) const override
+    {
+        PYBIND11_OVERRIDE(
+            void,
+            TetrahedralMesh_2_2,
+            GetWeightedDirectionForBoundaryElement,
+            elementIndex,
+            rWeightedDirection,
+            rJacobianDeterminant);
+    }
+    unsigned int SolveNodeMapping(unsigned int index) const override
+    {
+        PYBIND11_OVERRIDE(
+            unsignedint,
+            TetrahedralMesh_2_2,
+            SolveNodeMapping,
+            index);
+    }
+    unsigned int SolveElementMapping(unsigned int index) const override
+    {
+        PYBIND11_OVERRIDE(
+            unsignedint,
+            TetrahedralMesh_2_2,
+            SolveElementMapping,
+            index);
+    }
+    unsigned int SolveBoundaryElementMapping(unsigned int index) const override
+    {
+        PYBIND11_OVERRIDE(
+            unsignedint,
+            TetrahedralMesh_2_2,
+            SolveBoundaryElementMapping,
+            index);
+    }
+};
+
+void register_TetrahedralMesh_2_2_class(py::module &m)
+{
+    py::class_<TetrahedralMesh_2_2, TetrahedralMesh_2_2_Overrides, boost::shared_ptr<TetrahedralMesh_2_2>, AbstractTetrahedralMesh<2, 2>>(m, "TetrahedralMesh_2_2")
+        .def(py::init<>())
+        .def("ConstructFromMeshReader",
+            (void(TetrahedralMesh_2_2::*)(::AbstractMeshReader<2, 2> &)) &TetrahedralMesh_2_2::ConstructFromMeshReader,
+            " ", py::arg("rMeshReader"))
+        .def("ReadNodesPerProcessorFile",
+            (void(TetrahedralMesh_2_2::*)(::std::string const &)) &TetrahedralMesh_2_2::ReadNodesPerProcessorFile,
+            " ", py::arg("rNodesPerProcessorFile"))
+        .def("CheckIsConforming",
+            (bool(TetrahedralMesh_2_2::*)()) &TetrahedralMesh_2_2::CheckIsConforming,
+            " ")
+        .def("GetVolume",
+            (double(TetrahedralMesh_2_2::*)()) &TetrahedralMesh_2_2::GetVolume,
+            " ")
+        .def("GetSurfaceArea",
+            (double(TetrahedralMesh_2_2::*)()) &TetrahedralMesh_2_2::GetSurfaceArea,
+            " ")
+        .def("RefreshMesh",
+            (void(TetrahedralMesh_2_2::*)()) &TetrahedralMesh_2_2::RefreshMesh,
+            " ")
+        .def("PermuteNodes",
+            (void(TetrahedralMesh_2_2::*)()) &TetrahedralMesh_2_2::PermuteNodes,
+            " ")
+        .def("PermuteNodes",
+            (void(TetrahedralMesh_2_2::*)(::std::vector<unsigned int> const &)) &TetrahedralMesh_2_2::PermuteNodes,
+            " ", py::arg("perm"))
+        .def("GetContainingElementIndexWithInitialGuess",
+            (unsigned int(TetrahedralMesh_2_2::*)(::ChastePoint<2> const &, unsigned int, bool)) &TetrahedralMesh_2_2::GetContainingElementIndexWithInitialGuess,
+            " ", py::arg("rTestPoint"), py::arg("startingElementGuess"), py::arg("strict") = false)
+        .def("GetNearestElementIndex",
+            (unsigned int(TetrahedralMesh_2_2::*)(::ChastePoint<2> const &)) &TetrahedralMesh_2_2::GetNearestElementIndex,
+            " ", py::arg("rTestPoint"))
+        .def("GetContainingElementIndices",
+            (::std::vector<unsigned int>(TetrahedralMesh_2_2::*)(::ChastePoint<2> const &)) &TetrahedralMesh_2_2::GetContainingElementIndices,
+            " ", py::arg("rTestPoint"))
+        .def("Clear",
+            (void(TetrahedralMesh_2_2::*)()) &TetrahedralMesh_2_2::Clear,
+            " ")
+        .def("GetAngleBetweenNodes",
+            (double(TetrahedralMesh_2_2::*)(unsigned int, unsigned int)) &TetrahedralMesh_2_2::GetAngleBetweenNodes,
+            " ", py::arg("indexA"), py::arg("indexB"))
+        .def("RefreshJacobianCachedData",
+            (void(TetrahedralMesh_2_2::*)()) &TetrahedralMesh_2_2::RefreshJacobianCachedData,
+            " ")
+        .def("GetJacobianForElement",
+            (void(TetrahedralMesh_2_2::*)(unsigned int, ::boost::numeric::ublas::c_matrix<double, 2, 2> &, double &) const) &TetrahedralMesh_2_2::GetJacobianForElement,
+            " ", py::arg("elementIndex"), py::arg("rJacobian"), py::arg("rJacobianDeterminant"))
+        .def("GetInverseJacobianForElement",
+            (void(TetrahedralMesh_2_2::*)(unsigned int, ::boost::numeric::ublas::c_matrix<double, 2, 2> &, double &, ::boost::numeric::ublas::c_matrix<double, 2, 2> &) const) &TetrahedralMesh_2_2::GetInverseJacobianForElement,
+            " ", py::arg("elementIndex"), py::arg("rJacobian"), py::arg("rJacobianDeterminant"), py::arg("rInverseJacobian"))
+        .def("GetWeightedDirectionForElement",
+            (void(TetrahedralMesh_2_2::*)(unsigned int, ::boost::numeric::ublas::c_vector<double, 2> &, double &) const) &TetrahedralMesh_2_2::GetWeightedDirectionForElement,
+            " ", py::arg("elementIndex"), py::arg("rWeightedDirection"), py::arg("rJacobianDeterminant"))
+        .def("GetWeightedDirectionForBoundaryElement",
+            (void(TetrahedralMesh_2_2::*)(unsigned int, ::boost::numeric::ublas::c_vector<double, 2> &, double &) const) &TetrahedralMesh_2_2::GetWeightedDirectionForBoundaryElement,
+            " ", py::arg("elementIndex"), py::arg("rWeightedDirection"), py::arg("rJacobianDeterminant"))
+        .def("EdgesBegin",
+            (::TetrahedralMesh<2, 2>::EdgeIterator(TetrahedralMesh_2_2::*)()) &TetrahedralMesh_2_2::EdgesBegin,
+            " ")
+        .def("EdgesEnd",
+            (::TetrahedralMesh<2, 2>::EdgeIterator(TetrahedralMesh_2_2::*)()) &TetrahedralMesh_2_2::EdgesEnd,
+            " ")
+    ;
+}

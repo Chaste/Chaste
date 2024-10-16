@@ -228,8 +228,8 @@ def InspectFile(fileName):
     if fileName[-21:] == 'CheckForCopyrights.py':
         # Can't really check this one, since it knows all the licences
         return True
-    if "codegen_python3_venv" in fileName:
-        # Can't really check the codegen virtual environment as it would start checking 3rd party packages
+    if "chaste_python3_venv" in fileName:
+        # Can't really check the chaste virtual environment as it would start checking 3rd party packages
         return True
     valid_notice = False
     if (CheckForCopyrightNotice(cpp_current_notice, file_in) or
@@ -291,7 +291,7 @@ def InspectFile(fileName):
 
 def ignore_dir(dir_to_check):
 
-    dir_ignores = ['Debug', 'Release', 'build', 'cxxtest', 'codegen_python3_venv',
+    dir_ignores = ['Debug', 'Release', 'build', 'cxxtest', 'chaste_python3_venv',
                    'testoutput', 'doc', 'projects', 'hierwikiplugin']
 
     dir_ignore_contains = ['Debug_', 'chaste-build', 'cmake-build', 'venv']

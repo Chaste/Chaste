@@ -1,0 +1,2 @@
+recursive-include chaste/ *.so
+recursive-include docs/tutorial/ *.ipynb

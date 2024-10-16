@@ -1,0 +1,74 @@
+name: PyChaste tests
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - "**"
+
+# Limit concurrent runs to one per branch
+concurrency:
+  group: pychaste-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pychaste-tests:
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+
+    runs-on: ubuntu-22.04
+    env:
+      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/testoutput
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Make build and test directories
+        run: |
+          mkdir -p build
+          mkdir -p ${CHASTE_TEST_OUTPUT}
+
+      - name: Install Chaste dependencies
+        run: |
+          sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
+          echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu jammy/' \
+            | sudo tee -a /etc/apt/sources.list.d/chaste.list
+          sudo apt-get update
+          sudo apt-get install chaste-dependencies
+
+      - name: Install additional PyChaste dependencies
+        run: |
+          sudo apt-get install -y \
+            python3-matplotlib \
+            python3-numpy \
+            python3-petsc4py \
+            python3-vtk7 \
+            python3-xvfbwrapper \
+            xvfb
+          sudo python3 -m pip install --upgrade pip
+          pip install --user jupyterlab
+
+      - name: Configure PyChaste
+        run: |
+          cmake -DCMAKE_BUILD_TYPE=Release -DChaste_ENABLE_PYCHASTE=ON ..
+        working-directory: build
+
+      - name: Check for wrapper changes
+        run: |
+          ctest -V -R TestPyWrapperChanges$
+        working-directory: build
+
+      - name: Build PyChaste
+        run: |
+          make -j $(nproc) pychaste
+        working-directory: build
+
+      - name: Install PyChaste
+        run: |
+          pip install --user --no-deps build/pychaste/package
+
+      - name: Run PyChaste tests
+        run: |
+          xvfb-run --server-args="-screen 0 1024x768x24" \
+            ctest -j $(nproc) -L pychaste --output-on-failure
+        working-directory: build
