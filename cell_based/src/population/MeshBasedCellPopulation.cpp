@@ -61,7 +61,7 @@ MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::MeshBasedCellPopulation(Mutable
           mAreaBasedDampingConstantParameter(0.1),
           mWriteVtkAsPoints(false),
           mBoundVoronoiTessellation(false),
-          mScaleBoundByEdgeLength(false), 
+          mScaleBoundByEdgeLength(false),
           mBoundedVoroniTesselationLengthCutoff(DBL_MAX),
           mOffsetNewBoundaryNodes(false),
           mHasVariableRestLength(false)
