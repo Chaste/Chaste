@@ -74,11 +74,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static const double M_TIME_FOR_SIMULATION = 1.0;
 static const double M_NUM_CELLS_ACROSS = 3; // this 3^3 initial cells
-static const double M_UPTAKE_RATE = -1.0;
+static const double M_CONSTANT_UPTAKE_RATE = 0.0;
+static const double M_LINEAR_UPTAKE_RATE = -1.0;
 static const double M_DIFFUSION_CONSTANT = 1.0;
 static const double M_DUDT_COEFFICIENT = 10.0;
 
-class TestSimulationWithParabolicBoxDomainPdeModifier : public AbstractCellBasedWithTimingsTestSuite
+class TestSimulationsWithParabolicBoxDomainPdeModifier : public AbstractCellBasedWithTimingsTestSuite
 {
 private:
 
@@ -136,7 +137,7 @@ public:
         // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE));
+        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, M_CONSTANT_UPTAKE_RATE, M_LINEAR_UPTAKE_RATE, M_DIFFUSION_CONSTANT, M_DUDT_COEFFICIENT));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -194,7 +195,7 @@ public:
         // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE));
+        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, M_CONSTANT_UPTAKE_RATE, M_LINEAR_UPTAKE_RATE, M_DIFFUSION_CONSTANT, M_DUDT_COEFFICIENT));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -252,7 +253,7 @@ public:
         // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE));
+        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, M_CONSTANT_UPTAKE_RATE, M_LINEAR_UPTAKE_RATE,M_DIFFUSION_CONSTANT, M_DUDT_COEFFICIENT));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -312,7 +313,7 @@ public:
         // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE));
+        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, M_CONSTANT_UPTAKE_RATE, M_LINEAR_UPTAKE_RATE, M_DIFFUSION_CONSTANT, M_DUDT_COEFFICIENT));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -373,7 +374,7 @@ public:
         // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE));
+        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, M_CONSTANT_UPTAKE_RATE, M_LINEAR_UPTAKE_RATE, M_DIFFUSION_CONSTANT, M_DUDT_COEFFICIENT));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE
@@ -441,7 +442,7 @@ public:
         // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)
 
         // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, M_DUDT_COEFFICIENT,M_DIFFUSION_CONSTANT,M_UPTAKE_RATE));
+        MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, M_CONSTANT_UPTAKE_RATE, M_LINEAR_UPTAKE_RATE, M_DIFFUSION_CONSTANT, M_DUDT_COEFFICIENT));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
         // Create a ChasteCuboid on which to base the finite element mesh used to solve the PDE

@@ -78,6 +78,9 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
     // Get the finite element mesh via the cell population. Set to NULL first in case mesh generation fails.
     this->mpFeMesh = nullptr;
     this->mpFeMesh = rCellPopulation.GetTetrahedralMeshForPdeModifier();
+
+    // initialise Dirichlet boundary node tracking
+    this->mIsDirichletBoundaryNode = std::vector<double>(this->mpFeMesh->GetNumNodes(), 0.0);
 }
 
 template<unsigned DIM>

@@ -48,9 +48,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * The PDE takes the form
  *
- * Grad.(Grad(u)) + k*u*rho(x) = 0,
+ * Grad.(D Grad(u)) + a*u*rho(x) + b*rho(x) = 0,
  *
- * where the scalar k is specified by the member mSourceCoefficient, whose value must
+ * where the scalars a and b are specified by the members mLinearSourceCoefficient, 
+ * and mConstantSourceCoefficient respectively, whose value must
  * be set in the constructor.
  *
  * For a node of the finite element mesh with location x, the function rho(x)
@@ -79,7 +80,10 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
        archive & boost::serialization::base_object<AbstractLinearEllipticPde<DIM, DIM> >(*this);
-       archive & mSourceCoefficient;
+       archive & mConstantSourceCoefficient;
+       archive & mLinearSourceCoefficient;
+       archive & mDiffusionCoefficient;
+       archive & mScaleByCellVolume;
     }
 
 protected:
@@ -87,8 +91,18 @@ protected:
     /** The cell population member. */
     AbstractCellPopulation<DIM, DIM>& mrCellPopulation;
 
-    /** Coefficient of the source term. */
-    double mSourceCoefficient;
+    /** Coefficient of constant source term. */
+    double mConstantSourceCoefficient;
+
+    /** Coefficient of linear source term. */
+    double mLinearSourceCoefficient;
+
+    /** Diffusion coefficient. */
+    double mDiffusionCoefficient;
+
+    /** Whether to scale tems by cell volume*/
+    bool mScaleByCellVolume;
+
 
 public:
 
@@ -96,9 +110,16 @@ public:
      * Constructor.
      *
      * @param rCellPopulation reference to the cell population
-     * @param sourceCoefficient the source term coefficient (defaults to 0.0)
+     * @param constantSourceCoefficient the constant source term coefficient (defaults to 0.0)
+     * @param linearSourceCoefficient the linear source term coefficient (defaults to 0.0)
+     * @param diffusionCoefficient the rate of diffusion (defaults to 1.0)
+     * @param scaleByCellVolume whether to scale by cell volume (defaults to)
      */
-    CellwiseSourceEllipticPde(AbstractCellPopulation<DIM, DIM>& rCellPopulation, double sourceCoefficient=0.0);
+    CellwiseSourceEllipticPde(AbstractCellPopulation<DIM, DIM>& rCellPopulation, 
+                              double constantSourceCoefficient=0.0, 
+                              double linearSourceCoefficient=0.0,
+                              double diffusionCoefficient=1.0, 
+                              bool scaleByCellVolume=false);
 
     /**
      * @return const reference to the cell population (used in archiving).
@@ -106,9 +127,24 @@ public:
     const AbstractCellPopulation<DIM>& rGetCellPopulation() const;
 
     /**
-     * @return mSourceCoefficient (used in archiving).
+     * @return mConstantSourceCoefficient
      */
-    double GetCoefficient() const;
+    double GetConstantCoefficient() const;
+
+    /**
+     * @return mLinearSourceCoefficient
+     */
+    double GetLinearCoefficient() const;
+        
+    /**
+     * @return mDiffusionCoefficient
+     */
+    double GetDiffusionCoefficient() const;
+
+    /**
+     * @return mScaleByCellVolume
+     */
+    bool GetScaleByCellVolume() const;
 
     /**
      * Overridden ComputeConstantInUSourceTerm() method.
@@ -140,6 +176,15 @@ public:
      *  Div(D Grad u)  +  f(x)u + g(x) = 0.
      */
     virtual double ComputeLinearInUCoeffInSourceTermAtNode(const Node<DIM>& rNode);
+
+    /**
+     * Overridden ComputeConstantInUCoeffInSourceTermAtNode() method.
+     *
+     * @param rNode reference to the node
+     * @return the constant part of the source term, i.e g(x) in
+     *  Div(D Grad u)  +  f(x)u + g(x) = 0.
+     */
+    virtual double ComputeConstantInUSourceTermAtNode(const Node<DIM>& rNode);
 
     /**
      * Overridden ComputeDiffusionTerm() method.

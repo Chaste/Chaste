@@ -195,14 +195,17 @@ public:
          * Next we instantiate an instance of the PDE class which we defined above.
          * This will be passed into the `OffLatticeSimulationWithPdes` object. The
          * `CellwiseSourceEllipticPde` is a `PDE` class which inherits from
-         * `AbstractLinearEllipticPde` and represents the PDE $u_{xx} + u_{yy} = k(x,y)u$,
-         * where $u(x,y)$ denotes the oxygen concentration at position $(x,y)$ and the function
-         * $k(x,y)$ specifies the rate of consumption by live cells there. Here $k(x,y)$
-         * takes the value $-0.03$ (the coefficient below) if the cell located at $(x,y)$ is a
+         * `AbstractLinearEllipticPde` and represents the PDE $u_{xx} + u_{yy} + a(x,y)u + b(x,y)$,
+         * where $u(x,y)$ denotes the oxygen concentration at position $(x,y)$ and the functions
+         * $a(x,y)$ and $b(x,y)$ specifies the linear and constant rate of consumption by live cells there. Here $a(x,y)$
+         * takes the value $-0.03$ (the coefficient below) and $b(x,y)$ takes the value $0$ (the coefficient below) if the cell located at $(x,y)$ is a
          * live cell, and zero if the cell has died due to oxygen deprivation.
          */
-        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, -0.03));
-
+        double constant_coefficient = 0.0;
+        double linear_coefficient = -0.03;
+        double diffusion_coefficient = 1.0;
+        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
+       
         /*
          * We also create a constant-valued boundary condition to associate with the PDE.
          * This boundary condition object takes in a single argument in its constructor,

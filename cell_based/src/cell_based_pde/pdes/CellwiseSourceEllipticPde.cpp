@@ -36,31 +36,57 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellwiseSourceEllipticPde.hpp"
 
 template<unsigned DIM>
-CellwiseSourceEllipticPde<DIM>::CellwiseSourceEllipticPde(AbstractCellPopulation<DIM,DIM>& rCellPopulation, double sourceCoefficient)
+CellwiseSourceEllipticPde<DIM>::CellwiseSourceEllipticPde(AbstractCellPopulation<DIM,DIM>& rCellPopulation, 
+                                                          double constantSourceCoefficient, 
+                                                          double linearSourceCoefficient, 
+                                                          double diffusionCoefficient,
+                                                          bool scaleByCellVolume)
     : mrCellPopulation(rCellPopulation),
-      mSourceCoefficient(sourceCoefficient)
+      mConstantSourceCoefficient(constantSourceCoefficient),
+      mLinearSourceCoefficient(linearSourceCoefficient),
+      mDiffusionCoefficient(diffusionCoefficient),
+      mScaleByCellVolume(scaleByCellVolume)
 {
 }
 
 template<unsigned DIM>
-const AbstractCellPopulation<DIM,DIM>& CellwiseSourceEllipticPde<DIM>::rGetCellPopulation() const
+const AbstractCellPopulation<DIM>& CellwiseSourceEllipticPde<DIM>::rGetCellPopulation() const
 {
     return mrCellPopulation;
 }
 
 template<unsigned DIM>
-double CellwiseSourceEllipticPde<DIM>::GetCoefficient() const
+double CellwiseSourceEllipticPde<DIM>::GetConstantCoefficient() const
 {
-    return mSourceCoefficient;
+    return mConstantSourceCoefficient;
 }
 
 template<unsigned DIM>
-double CellwiseSourceEllipticPde<DIM>::ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
+double CellwiseSourceEllipticPde<DIM>::GetLinearCoefficient() const
 {
-    return 0.0;
+    return mLinearSourceCoefficient;
+}
+
+template<unsigned DIM>
+double CellwiseSourceEllipticPde<DIM>::GetDiffusionCoefficient() const
+{
+    return mDiffusionCoefficient;
+}
+
+template<unsigned DIM>
+bool CellwiseSourceEllipticPde<DIM>::GetScaleByCellVolume() const
+{
+    return mScaleByCellVolume;
 }
 
 // LCOV_EXCL_START
+template<unsigned DIM>
+double CellwiseSourceEllipticPde<DIM>::ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
+{
+    NEVER_REACHED;
+    return 0.0;
+}
+
 template<unsigned DIM>
 double CellwiseSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
 {
@@ -72,20 +98,68 @@ double CellwiseSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTerm(const C
 template<unsigned DIM>
 double CellwiseSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTermAtNode(const Node<DIM>& rNode)
 {
-    double source_coefficient = 0.0;
+    double linear_source_coefficient = 0.0;
 
-    if (mrCellPopulation.IsPdeNodeAssociatedWithNonApoptoticCell(rNode.GetIndex()))
+    if (mLinearSourceCoefficient != 0.0)
     {
-        source_coefficient = mSourceCoefficient;
+        if (mrCellPopulation.IsPdeNodeAssociatedWithNonApoptoticCell(rNode.GetIndex()))
+        {
+            double cell_volume = 1.0;
+
+            // Scale by volume if wanted
+            if (mScaleByCellVolume)
+            {   
+                CellPtr p_cell = mrCellPopulation.GetCellUsingLocationIndex(rNode.GetIndex());
+                cell_volume = mrCellPopulation.GetVolumeOfCell(p_cell);
+                 
+                if (cell_volume <1e-6)
+                {
+                    EXCEPTION("The volume of one of the cells is " << cell_volume << 
+                              " and you are scaling by cell volume. Either turn scaling off or use"  
+                              " a cell model with non zero areas (i.e. a Bounded Voronoi Tesselation model).");
+                }
+            }
+            linear_source_coefficient = mLinearSourceCoefficient/cell_volume;
+        }
     }
 
-    return source_coefficient;
+    return linear_source_coefficient;
+}
+
+template<unsigned DIM>
+double CellwiseSourceEllipticPde<DIM>::ComputeConstantInUSourceTermAtNode(const Node<DIM>& rNode)
+{
+    double constant_source_coefficient = 0.0;
+
+    if (mConstantSourceCoefficient != 0.0)
+    {
+        if (mrCellPopulation.IsPdeNodeAssociatedWithNonApoptoticCell(rNode.GetIndex()))
+        {
+            double cell_volume = 1.0;
+
+            // Scale by volume if wanted
+            if (mScaleByCellVolume)
+            {   
+                CellPtr p_cell = mrCellPopulation.GetCellUsingLocationIndex(rNode.GetIndex());
+                cell_volume = mrCellPopulation.GetVolumeOfCell(p_cell);
+                if (cell_volume <1e-6)
+                {
+                    EXCEPTION("The volume of one of the cells is " << cell_volume << 
+                              " and you are scaling by cell volume. Either turn scaling off or use"
+                              " a cell model with non zero areas (i.e. a Bounded Voronoi Tesselation model).");
+                }
+            }
+            constant_source_coefficient = mConstantSourceCoefficient/cell_volume;
+        }
+    }
+
+    return constant_source_coefficient;
 }
 
 template<unsigned DIM>
 c_matrix<double,DIM,DIM> CellwiseSourceEllipticPde<DIM>::ComputeDiffusionTerm(const ChastePoint<DIM>& rX)
 {
-    return identity_matrix<double>(DIM);
+    return mDiffusionCoefficient*identity_matrix<double>(DIM);
 }
 
 // Explicit instantiation

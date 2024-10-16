@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractPdeModifier.hpp"
+#include "BoundaryConditionsContainer.hpp"
 
 /**
  * An abstract modifier class containing functionality common to EllipticBoxDomainPdeModifier
@@ -71,6 +72,9 @@ private:
         archive & mpMeshCuboid;
         archive & mStepSize;
         archive & mSetBcsOnBoxBoundary;
+        archive & mSetBcsOnBoundingSphere;
+        archive & mUseVoronoiCellsForInterpolation;
+        archive & mTypicalCellRadius;
     }
 
 protected:
@@ -95,6 +99,26 @@ protected:
      * Default to true.
      */
     bool mSetBcsOnBoxBoundary;
+    
+    /**
+     * Whether to set the boundary condition on a sphere which bounds the cell centres of the tissue. 
+     * Only used if mSetBcsOnBoxBoundary is false.
+     * Default to false.
+     */
+    bool mSetBcsOnBoundingSphere;
+
+    /**
+     * Whether to use a cell centres voroni region to interpolate the pde solution onto cells.
+     */
+    bool mUseVoronoiCellsForInterpolation;
+
+    /** 
+     * Used to define if a FE node is within a certain radius of a cell centre to help define
+     * boundary conditions when mSetBcsOnBoxBoundary and mSetBcsOnBoundingSphere are false 
+     * 
+     * defaults to 0.5 CD
+     */
+    double mTypicalCellRadius;
 
 public:
 
@@ -139,6 +163,53 @@ public:
     bool AreBcsSetOnBoxBoundary();
 
     /**
+     * Set mSetBcsOnBoundingSphere.
+     *
+     * @param setBcsOnBoxBoundary whether to set the boundary condition on the edge of the box domain rather than the cell population
+     */
+    void SetBcsOnBoundingSphere(bool setBcsOnBoxBoundary);
+
+    /**
+     * @return mSetBcsOnBoundingSphere.
+     */
+    bool AreBcsSetOnBoundingSphere();
+
+    /**
+     * Set mUseVoronoiCellsForInterpolation.
+     *
+     * @param useVoronoiCellsForInterpolation whether to use the voroni region of cells for interpolation 
+     * of the solution from the FE mesh to the cells.
+     */
+    void SetUseVoronoiCellsForInterpolation(bool useVoronoiCellsForInterpolation);
+
+    /**
+     * @return mUseVoronoiCellsForInterpolation.
+     */
+    bool GetUseVoronoiCellsForInterpolation();
+
+    /**
+     * Set mTypicalCellRadius.
+     *
+     * @param typicalCellRadius the radius to use for deining if FE nodes are near cells or not.
+     */
+    void SetTypicalCellRadius(double typicalCellRadius);
+
+    /**
+     * @return mTypicalCellRadius.
+     */
+    double GetTypicalCellRadius();
+
+
+    /**
+     * Helper method to construct the boundary conditions container for the PDE.
+     *
+     * @param rCellPopulation reference to the cell population
+     * @param pBcc the boundary conditions container to fill 
+     */
+    void ConstructBoundaryConditionsContainerHelper(AbstractCellPopulation<DIM,DIM>& rCellPopulation, 
+                                                    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > pBcc);
+
+    /**
      * Overridden SetupSolve() method.
      *
      * Specifies what to do in the simulation before the start of the time loop.
@@ -151,12 +222,21 @@ public:
     virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
 
     /**
-     * Helper method to generate the mesh.
+     * Helper method to generate the pde mesh for the first time.
      *
      * @param pMeshCuboid the outer boundary for the FE mesh.
      * @param stepSize the step size to be used in the FE mesh.
      */
     void GenerateFeMesh(boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid, double stepSize);
+
+    /**
+     * Helper method to generate a pde mesh.
+     *
+     * @param pMeshCuboid the outer boundary for the FE mesh.
+     * @param stepSize the step size to be used in the FE mesh.
+     * @param pMesh a pointer to the mesh to be created
+     */
+    void GenerateAndReturnFeMesh(boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid, double stepSize, TetrahedralMesh<DIM,DIM>* pMesh);
 
     /**
      * Helper method to copy the PDE solution to CellData
