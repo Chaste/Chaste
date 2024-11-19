@@ -39,6 +39,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
+#include <new>
+
 #include "CheckpointArchiveTypes.hpp"
 
 #include "Node.hpp"
@@ -321,6 +323,147 @@ public:
             delete p_node;
             delete p_node_1d;
         }
+    }
+
+
+    /*
+     * The following tests relate to some spurious GCC warnings about potentially uninitialised c_vectors
+     * in Release mode. See https://github.com/Chaste/Chaste/issues/231 for full details. These aim to
+     * verify that the warnings are indeed false positives.
+     *
+     * Note that the warnings can be reproduced by:
+     *  1. Compiling in Release mode, with GCC >= 9.4 (reproduced with GCC == 13.2.0 on 2024-10-02)
+     *  2. Turning warnings back on by adding the following to the Chaste_ADD_TEST macro in ChasteMacros.cmake,
+     *     after line 147:
+     *       if ("${_testname}" STREQUAL "TestNode")
+     *         set_source_files_properties("${_test_real_output_filename}" PROPERTIES COMPILE_FLAGS
+     *           "-Wmaybe-uninitialized -Warray-bounds -Wstringop-overflow -Wstringop-overread")
+     *       endif ()
+     */
+
+    void TestGccReleaseModeBehaviour1dSingleNode()
+    {
+        // When the spurious warnings are not ignored, this test should result in a compilation error along these lines:
+
+        // inlined from ‘virtual void TestDescription_TestNode_TestGccReleaseModeBehaviour1dSingleNode::runTest()’ at Chaste/Chaste/build/mesh/test/TestNode.cpp:67:73:
+        // Chaste/mesh/test/TestNode.hpp:350:9: error: ‘location_1d_from_node.boost::numeric::ublas::c_vector<double, 1>::data_[0]’ may be used uninitialized [-Werror=maybe-uninitialized]
+        // 350 |         TS_ASSERT(location_1d_from_node[0] == 1.23);
+        //     |         ^~~~~~~~~
+
+        Node<1> my_node_1d(0u, false, 1.23);
+        c_vector<double, 1> location_1d_from_node = my_node_1d.rGetLocation();
+
+        TS_ASSERT(location_1d_from_node[0] == 1.23);
+    }
+
+    void TestGccReleaseModeBehaviour2dSingleNode()
+    {
+        // When the spurious warnings are not ignored, this test should result in a compilation error along these lines:
+
+        // inlined from ‘virtual void TestDescription_TestNode_TestGccReleaseModeBehaviour2dSingleNode::runTest()’ at Chaste/Chaste/build/mesh/test/TestNode.cpp:67:73:
+        // Chaste/Chaste/mesh/test/TestNode.hpp:372:9: error: ‘location_2d_from_node.boost::numeric::ublas::c_vector<double, 2>::data_[0]’ may be used uninitialized [-Werror=maybe-uninitialized]
+        // 372 |         TS_ASSERT(location_2d_from_node[0] == 2.34);
+        //     |         ^~~~~~~~~
+
+        Node<2> my_node_2d(0u, false, 2.34, 3.45);
+        c_vector<double, 2> location_2d_from_node = my_node_2d.rGetLocation();
+
+        TS_ASSERT(location_2d_from_node[0] == 2.34);
+        TS_ASSERT(location_2d_from_node[1] == 3.45);
+    }
+
+    void TestGccReleaseModeBehaviour1dMultipleNodes()
+    {
+        // This test relates to a class of warnings that indicated a built-in copy operation was copying too much data,
+        // i.e. copying beyond the end of a c_vector. This test copy-constructs multiple c_vectors contiguously, to
+        // verify that no data is getting overwritten. We used placement new in an attempt to ensure no default
+        // initialization was occurring e.g. when creating a std::array or std::vector. This did not reproduce the
+        // warning, though, but this test still demonstrates that copy construction of c_vectors is working as intended.
+
+        Node<1> node_1(0u, false, 4.56);
+        Node<1> node_2(1u, false, 5.67);
+        Node<1> node_3(2u, false, 6.78);
+
+        // Allocate some raw memory so we get three contiguous c_vectors, copy-constructed from the node locations
+        void* raw_memory = operator new[](3 * sizeof(c_vector<double, 1>));
+        c_vector<double, 1>* loc1 = new (raw_memory) c_vector<double, 1>(node_1.rGetLocation());
+        c_vector<double, 1>* loc2 = new (loc1 + 1) c_vector<double, 1>(node_2.rGetLocation());
+        c_vector<double, 1>* loc3 = new (loc2 + 1) c_vector<double, 1>(node_3.rGetLocation());
+
+        // Test that none of these values has been clobbered by copy construction of the other elements
+        TS_ASSERT((*loc1)[0] == 4.56);
+        TS_ASSERT((*loc2)[0] == 5.67);
+        TS_ASSERT((*loc3)[0] == 6.78);
+
+        // Just for good measure, do some more copy construction and check again
+        c_vector<double, 1> loc1_2 = *loc1;
+        c_vector<double, 1> loc2_2 = *loc2;
+        c_vector<double, 1> loc3_2 = *loc3;
+
+        TS_ASSERT(loc1_2[0] == 4.56);
+        TS_ASSERT(loc2_2[0] == 5.67);
+        TS_ASSERT(loc3_2[0] == 6.78);
+
+        // Tidy up memory
+        loc1->~c_vector();
+        loc2->~c_vector();
+        loc3->~c_vector();
+        operator delete[](raw_memory);
+    }
+
+    void TestGccReleaseModeBehaviour3dMultipleNodes()
+    {
+        // This test relates to a class of warnings that indicated a built-in copy operation was copying too much data,
+        // i.e. copying beyond the end of a c_vector. This test copy-constructs multiple c_vectors contiguously, to
+        // verify that no data is getting overwritten. We used placement new in an attempt to ensure no default
+        // initialization was occurring e.g. when creating a std::array or std::vector. This did not reproduce the
+        // warning, though, but this test still demonstrates that copy construction of c_vectors is working as intended.
+
+        Node<3> node_1(0u, false, 12.3, 13.4, 14.5);
+        Node<3> node_2(1u, false, 15.6, 16.7, 17.8);
+        Node<3> node_3(2u, false, 21.2, 22.3, 23.4);
+
+        // Allocate some raw memory so we get three contiguous c_vectors, copy-constructed from the node locations
+        void* raw_memory = operator new[](3 * sizeof(c_vector<double, 3>));
+        c_vector<double, 3>* loc1 = new (raw_memory) c_vector<double, 3>(node_1.rGetLocation());
+        c_vector<double, 3>* loc2 = new (loc1 + 1) c_vector<double, 3>(node_2.rGetLocation());
+        c_vector<double, 3>* loc3 = new (loc2 + 1) c_vector<double, 3>(node_3.rGetLocation());
+
+        // Test that none of these values has been clobbered by copy construction of the other elements
+        TS_ASSERT((*loc1)[0] == 12.3);
+        TS_ASSERT((*loc1)[1] == 13.4);
+        TS_ASSERT((*loc1)[2] == 14.5);
+
+        TS_ASSERT((*loc2)[0] == 15.6);
+        TS_ASSERT((*loc2)[1] == 16.7);
+        TS_ASSERT((*loc2)[2] == 17.8);
+
+        TS_ASSERT((*loc3)[0] == 21.2);
+        TS_ASSERT((*loc3)[1] == 22.3);
+        TS_ASSERT((*loc3)[2] == 23.4);
+
+        // Just for good measure, do some more copy construction and check again
+        c_vector<double, 3> loc1_2 = *loc1;
+        c_vector<double, 3> loc2_2 = *loc2;
+        c_vector<double, 3> loc3_2 = *loc3;
+
+        TS_ASSERT(loc1_2[0] == 12.3);
+        TS_ASSERT(loc1_2[1] == 13.4);
+        TS_ASSERT(loc1_2[2] == 14.5);
+
+        TS_ASSERT(loc2_2[0] == 15.6);
+        TS_ASSERT(loc2_2[1] == 16.7);
+        TS_ASSERT(loc2_2[2] == 17.8);
+
+        TS_ASSERT(loc3_2[0] == 21.2);
+        TS_ASSERT(loc3_2[1] == 22.3);
+        TS_ASSERT(loc3_2[2] == 23.4);
+
+        // Tidy up memory
+        loc1->~c_vector();
+        loc2->~c_vector();
+        loc3->~c_vector();
+        operator delete[](raw_memory);
     }
 };
 

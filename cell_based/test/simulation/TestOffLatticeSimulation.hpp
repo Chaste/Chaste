@@ -132,6 +132,7 @@ public:
         // Record cell velocities
         TS_ASSERT_EQUALS(simulator.GetOutputCellVelocities(), false);
         simulator.SetOutputCellVelocities(true);
+        simulator.SetSamplingTimestepMultiple(12.0); // To test outputting every 12 steps ie 0.1 hours
 
         // Run simulation
         simulator.Solve();

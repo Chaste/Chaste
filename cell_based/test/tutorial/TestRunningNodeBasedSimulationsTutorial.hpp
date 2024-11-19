@@ -55,7 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * ### The test
  *
- * As in previous cell-based Chaste tutorials ([Running Mesh Based Simulations](/docs/user-tutorials/runningmeshbasedsimulations/)), we begin by including the necessary header files.
+ * As in previous cell-based Chaste tutorials ([Running Mesh Based Simulations](../runningmeshbasedsimulations/)), we begin by including the necessary header files.
  */
 #include <cxxtest/TestSuite.h>
 #include "CheckpointArchiveTypes.hpp"
@@ -65,7 +65,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 /* The remaining header files define classes that will be used in the cell population
  * simulation test. We encountered some of these header files in
- * [Running Mesh Based Simulations](/docs/user-tutorials/runningmeshbasedsimulations/). */
+ * [Running Mesh Based Simulations](../runningmeshbasedsimulations/). */
 #include "CellsGenerator.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "UniformCellCycleModel.hpp"
@@ -84,7 +84,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestRunningNodeBasedSimulationsTutorial : public AbstractCellBasedTestSuite
 {
 public:
-    /* 
+    /*
      * ### Test 1 - a basic node-based simulation
      *
      * In the first test, we run a simple node-based simulation, in which we create a monolayer
@@ -155,13 +155,13 @@ public:
 
     /*
      * To visualize the results, open a new terminal, `cd` to the Chaste directory,
-     * then `cd anim`. Then do `java Visualize2dCentreCells /tmp/$USER/testoutput/NodeBasedMonolayer/results_from_time_0`.
+     * then `cd anim`. Then do `java Visualize2dCentreCells $CHASTE_TEST_OUTPUT/NodeBasedMonolayer/results_from_time_0`.
      * We need to select the `Cells as circles` option to be able to visualize the cells, as opposed
      * to just the centres.
      * You may have to do: `javac Visualize2dCentreCells.java` beforehand to create the
      * java executable if you haven't done that before.
      *
-     * Alternatively, to view in Paraview, load the file `/tmp/$USER/testoutput/NodeBasedMonolayer/results_from_time_0/results.pvd`
+     * Alternatively, to view in Paraview, load the file `$CHASTE_TEST_OUTPUT/NodeBasedMonolayer/results_from_time_0/results.pvd`
      * and add glyphs to represent cells. An option is to use 3D spherical glyphs and then make a planar cut.
      * Note that, for larger simulations, you may need to unclick "Mask Points" (or similar) so as not to limit the number of glyphs
      * displayed by Paraview.
@@ -237,10 +237,10 @@ public:
 
     /*
      * Note that you **cannot view the results of a 3D simulation using the Java visualiser** but
-     * to visualize the results, use Paraview. 
-     * See the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview/) tutorial for more information.
+     * to visualize the results, use Paraview.
+     * See the [Visualizing With Paraview](../visualizingwithparaview/) tutorial for more information.
      *
-     * Load the file `/tmp/$USER/testoutput/NodeBasedSpheroid/results_from_time_0/results.pvd`,
+     * Load the file `$CHASTE_TEST_OUTPUT/NodeBasedSpheroid/results_from_time_0/results.pvd`,
      * and add spherical glyphs to represent cells.
      *
      * ### Test 3 - a node-based simulation on a restricted geometry
@@ -321,9 +321,9 @@ public:
     }
 };
 /*
- * To visualize the results, use Paraview. See the [Visualizing With Paraview](/docs/user-tutorials/visualizingwithparaview/) tutorial for more information.
+ * To visualize the results, use Paraview. See the [Visualizing With Paraview](../visualizingwithparaview/) tutorial for more information.
  *
- * Load the file `/tmp/$USER/testoutput/NodeBasedOnSphere/results_from_time_0/results.pvd`,
+ * Load the file `$CHASTE_TEST_OUTPUT/NodeBasedOnSphere/results_from_time_0/results.pvd`,
  * and add spherical glyphs to represent cells.
  */
 

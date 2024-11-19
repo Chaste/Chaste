@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTEQUIVALENTMONOANDBIDOMAINTUTORIAL_HPP_
 #define TESTEQUIVALENTMONOANDBIDOMAINTUTORIAL_HPP_
 
-/* 
+/*
  * ## How to run a Bidomain simulation and its equivalent Monodomain reduction
  *
  * ### Introduction
@@ -52,7 +52,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * In this tutorial we show how Chaste is used to run a standard mono and a standard bidomain simulation.
  * With equivalent parameters so that the bidomain could be reduced to the monodomain case.
  *
- * The bulk of this tutorial is the same as the tutorial [Running Bidomain Simulations](/docs/user-tutorials/runningbidomainsimulations/), 
+ * The bulk of this tutorial is the same as the tutorial [Running Bidomain Simulations](/docs/user-tutorials/runningbidomainsimulations/),
  * so for details of the following code block see that page.
  */
 

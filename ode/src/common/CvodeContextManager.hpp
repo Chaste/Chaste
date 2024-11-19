@@ -64,11 +64,11 @@ private:
 
     CvodeContextManager(const CvodeContextManager&) = delete; // disable copy constructor
     CvodeContextManager& operator=(const CvodeContextManager&) = delete; // disable copy assignment
-    
+
 public:
     /**
      * @return a reference to the managed context object.
-     * 
+     *
      */
     sundials::Context& GetSundialsContext();
 

@@ -172,7 +172,7 @@ public:
         return condition_satisfied;
     }
 
-    /* Just as we encountered in the tutorial [Creating And Using A New Cell Killer](/docs/user-tutorials/creatingandusinganewcellkiller/), here we must override
+    /* Just as we encountered in the tutorial [Creating And Using A New Cell Killer](../creatingandusinganewcellkiller/), here we must override
      * a method that outputs any member variables to a specified results file `rParamsFile`.
      * In our case, there are no parameters, so we simply call the method on the base class.
      * Nonetheless, we still need to override the method, since it is pure virtual in the base
@@ -345,7 +345,7 @@ public:
 /*
  * When you visualize the results with
  *
- * `java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMyBoundaryCondition/results_from_time_0`
+ * `java Visualize2dCentreCells $CHASTE_TEST_OUTPUT/TestOffLatticeSimulationWithMyBoundaryCondition/results_from_time_0`
  *
  * you should see that cells are restricted to the domain $0 \leqslant y \leqslant 5$.
  *

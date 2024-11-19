@@ -326,7 +326,7 @@ private:
      * @param expectedItemNumber  To check file syntax, what item is expected to be on the next line.
      * @param rDataPacket  Assumed to be of the right size but is allowed to contain dirty data on entry (returned).
      * @param rNumAttributes  The number of attributes per item that we expect to read. Either #mNumFaceAttributes or #mNumElementAttributes.
-     * @param rAttributes  Will be filled with the attribute values if rNumAttributes > 0, otherwise empty.  Note that floating point 
+     * @param rAttributes  Will be filled with the attribute values if rNumAttributes > 0, otherwise empty.  Note that floating point
      *                     attributes are now standard (returned)
      */
     template<class T_DATA>

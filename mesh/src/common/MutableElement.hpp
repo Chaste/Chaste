@@ -179,7 +179,7 @@ public:
 
     /**
      * Sets edge helper.
-     * 
+     *
      * @param pEdgeHelper pointer to an edge helper
      */
     void SetEdgeHelper(EdgeHelper<SPACE_DIM>* pEdgeHelper);
@@ -222,18 +222,18 @@ public:
 
     /**
      * Checks if the element contains an edge.
-     * 
+     *
      * @param pEdge pointer to an edge
-     * 
+     *
      * @return whether the element contains pEdge
      */
     bool ContainsEdge(const Edge<SPACE_DIM>* pEdge) const;
 
     /**
      * Return the local index of an edge.
-     * 
+     *
      * @param pEdge pointer to an edge
-     * 
+     *
      * @return -1 if pEdge was not found, else the local index of pEdge
      */
     long GetLocalEdgeIndex(const Edge<SPACE_DIM>* pEdge) const;
@@ -330,7 +330,7 @@ public:
 
     /**
      * Get the edge at localIndex.
-     * 
+     *
      * @param localIndex local index of an edge in this element
      * @return pointer to the edge with given local index
      */
@@ -338,9 +338,9 @@ public:
 
      /**
      * Check if the element contains an edge.
-     * 
+     *
      * @param pEdge pointer to an edge
-     * 
+     *
      * @return whether the element contains pEdge
      */
     bool ContainsEdge(const Edge<SPACE_DIM>* pEdge) const;
@@ -352,7 +352,7 @@ public:
 
     /**
      * Sets edge helper.
-     * 
+     *
      * @param pEdgeHelper pointer to an edge helper
      */
     void SetEdgeHelper(EdgeHelper<SPACE_DIM>* pEdgeHelper);
@@ -409,9 +409,9 @@ public:
 
     /**
      * Return the local index of an edge.
-     * 
+     *
      * @param pEdge pointer to an edge
-     * 
+     *
      * @return -1 if an edge was not found, else the local index of pEdge
      */
     long GetLocalEdgeIndex(const Edge<SPACE_DIM>* pEdge) const;

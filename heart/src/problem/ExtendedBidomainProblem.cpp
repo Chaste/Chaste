@@ -319,14 +319,14 @@ void ExtendedBidomainProblem<DIM>::WriteInfo(double time)
 
     double V_max_first_cell, V_min_first_cell, V_max_second_cell, V_min_second_cell, phi_e_min, phi_e_max;
 
-    VecStrideMax( this->mSolution, 0, PETSC_NULL, &V_max_first_cell );
-    VecStrideMin( this->mSolution, 0, PETSC_NULL, &V_min_first_cell );
+    VecStrideMax( this->mSolution, 0, CHASTE_PETSC_NULLPTR, &V_max_first_cell );
+    VecStrideMin( this->mSolution, 0, CHASTE_PETSC_NULLPTR, &V_min_first_cell );
 
-    VecStrideMax( this->mSolution, 1, PETSC_NULL, &V_max_second_cell );
-    VecStrideMin( this->mSolution, 1, PETSC_NULL, &V_min_second_cell );
+    VecStrideMax( this->mSolution, 1, CHASTE_PETSC_NULLPTR, &V_max_second_cell );
+    VecStrideMin( this->mSolution, 1, CHASTE_PETSC_NULLPTR, &V_min_second_cell );
 
-    VecStrideMax( this->mSolution, 2, PETSC_NULL, &phi_e_max );
-    VecStrideMin( this->mSolution, 2, PETSC_NULL, &phi_e_min );
+    VecStrideMax( this->mSolution, 2, CHASTE_PETSC_NULLPTR, &phi_e_max );
+    VecStrideMin( this->mSolution, 2, CHASTE_PETSC_NULLPTR, &phi_e_min );
 
     if (PetscTools::AmMaster())
     {

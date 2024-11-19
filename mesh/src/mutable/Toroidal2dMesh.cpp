@@ -168,7 +168,7 @@ void Toroidal2dMesh::CreateMirrorNodes()
     // For each left original node, create an image node and record its new index
     for (unsigned i=0; i<mLeftOriginals.size(); i++)
     {
-        c_vector<double, 2> location;
+        c_vector<double, 2> location {};
         location = mNodes[mLeftOriginals[i]]->rGetLocation();
         location[0] = location[0] + mWidth;
 
@@ -180,7 +180,7 @@ void Toroidal2dMesh::CreateMirrorNodes()
     // For each right original node, create an image node and record its new index
     for (unsigned i=0; i<mRightOriginals.size(); i++)
     {
-        c_vector<double, 2> location;
+        c_vector<double, 2> location {};
         location = mNodes[mRightOriginals[i]]->rGetLocation();
         location[0] = location[0] - mWidth;
 
@@ -253,8 +253,7 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
         {
             Node<2>* p_node = this->GetNode(elem_iter->GetNodeGlobalIndex(j));
 
-            c_vector<double, 2> location;
-            location = p_node->rGetLocation();
+            c_vector<double, 2> location = p_node->rGetLocation();
             double this_node_x_location = location[0];
             double this_node_y_location = location[1];
 
@@ -282,8 +281,7 @@ void Toroidal2dMesh::ReMesh(NodeMap& rMap)
         {
             Node<2>* p_node = this->GetNode((*elem_iter)->GetNodeGlobalIndex(j));
 
-            c_vector<double, 2> location;
-            location = p_node->rGetLocation();
+            c_vector<double, 2> location = p_node->rGetLocation();
             double this_node_x_location = location[0];
             double this_node_y_location = location[1];
 
@@ -1026,9 +1024,6 @@ void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingCylindricalPeriodicBound
     mLeftPeriodicBoundaryElementIndices.clear();
     mRightPeriodicBoundaryElementIndices.clear();
 
-    unsigned incidences_of_zero_left_image_nodes = 0;
-    unsigned incidences_of_zero_right_image_nodes = 0;
-
     for (MutableMesh<2,2>::ElementIterator elem_iter = GetElementIteratorBegin();
          elem_iter != GetElementIteratorEnd();
          ++elem_iter)
@@ -1049,15 +1044,6 @@ void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingCylindricalPeriodicBound
             {
                 number_of_right_image_nodes++;
             }
-        }
-
-        if ((number_of_left_image_nodes == 0) && (number_of_right_image_nodes == 1 || number_of_right_image_nodes == 2) )
-        {
-            incidences_of_zero_left_image_nodes++;
-        }
-        if ((number_of_right_image_nodes == 0) && (number_of_left_image_nodes == 1 || number_of_left_image_nodes == 2) )
-        {
-            incidences_of_zero_right_image_nodes++;
         }
 
         /* SJ - Have checked the following:
@@ -1119,9 +1105,6 @@ void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingToroidalPeriodicBoundari
     mBottomPeriodicBoundaryElementIndices.clear();
     mTopPeriodicBoundaryElementIndices.clear();
 
-    unsigned incidences_of_zero_bottom_image_nodes = 0;
-    unsigned incidences_of_zero_top_image_nodes = 0;
-
     for (MutableMesh<2,2>::ElementIterator elem_iter = GetElementIteratorBegin();
          elem_iter != GetElementIteratorEnd();
          ++elem_iter)
@@ -1142,15 +1125,6 @@ void Toroidal2dMesh::GenerateVectorsOfElementsStraddlingToroidalPeriodicBoundari
             {
                 number_of_top_image_nodes++;
             }
-        }
-
-        if ((number_of_bottom_image_nodes == 0) && (number_of_top_image_nodes == 1 || number_of_top_image_nodes == 2) )
-        {
-            incidences_of_zero_bottom_image_nodes++;
-        }
-        if ((number_of_top_image_nodes == 0) && (number_of_bottom_image_nodes == 1 || number_of_bottom_image_nodes == 2) )
-        {
-            incidences_of_zero_top_image_nodes++;
         }
 
         // Elements on the bottom hand side (images of top nodes)

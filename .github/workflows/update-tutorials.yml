@@ -21,7 +21,7 @@ jobs:
           fetch-depth: 0  # Fetch all history in order to get revision info for tutorial files
 
       - name: setup python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
@@ -31,7 +31,7 @@ jobs:
         working-directory: python/infra
 
       - name: Upload archive files
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: user-tutorial-markdown
           path: |
@@ -43,7 +43,7 @@ jobs:
     if: github.event_name == 'push'
     steps:
       - name: Download user-tutorial-to markdown
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: user-tutorial-markdown
           path: tutorials/UserTutorials

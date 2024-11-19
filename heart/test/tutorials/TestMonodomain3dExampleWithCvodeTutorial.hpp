@@ -47,9 +47,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * ## 3D monodomain example using CVODE for ODE solution
  *
- * This tutorial is based on [Monodomain 3D Example](/docs/user-tutorials/monodomain3dexample/) except this time we will
+ * This tutorial is based on [Monodomain 3D Example](../monodomain3dexample/) except this time we will
  * use CVODE solvers. To highlight the changes needed to run with CVODE we omit the usual
- * explanations of the rest of the code - see [Monodomain 3D Example](/docs/user-tutorials/monodomain3dexample/) for these.
+ * explanations of the rest of the code - see [Monodomain 3D Example](../monodomain3dexample/) for these.
  *
  * First include the headers
  */
@@ -61,7 +61,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *  2. via an `AbstractCvodeCell` instead of an `AbstractCardiacCell` - this class uses native CVODE vectors and is preferred.
  *
- * In order to generate CVODE cells please see [Code Generation From CellML](/docs/chaste-guides/code-generation-from-cell-ml/).
+ * In order to generate CVODE cells please see [Code Generation From CellML](../../user-guides/code-generation-from-cellml/).
  *
  * **NB:** recent improvements (available from release 2021.1) mean that
  * an *analytic jacobian* is automatically made available to CVODE via the

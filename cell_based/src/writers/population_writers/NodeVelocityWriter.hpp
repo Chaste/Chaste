@@ -140,6 +140,15 @@ public:
     virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
+     * Visit the population and write the data.
+     *
+     * This is an empty dummy function, since this class is not defined for use with a ImmersedBoundaryCellPopulation.
+     *
+     * @param pCellPopulation a pointer to the ImmersedBoundaryCellPopulation to visit.
+     */
+    virtual void Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation);
+
+    /**
      * Visit the population and write the location of each Node.
      *
      * Outputs a line of space-separated values of the form:

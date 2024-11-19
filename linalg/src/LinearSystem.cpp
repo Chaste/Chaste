@@ -1061,13 +1061,13 @@ Vec LinearSystem::Solve(Vec lhsGuess)
             }
     #if (PETSC_VERSION_MINOR >= 5) //PETSc 3.5 or later
             // From PETSc 3.5, KSPDefaultConverged became KSPConvergedDefault.
-            KSPSetConvergenceTest(mKspSolver, KSPConvergedDefault, &mpConvergenceTestContext, PETSC_NULL);
+            KSPSetConvergenceTest(mKspSolver, KSPConvergedDefault, &mpConvergenceTestContext, CHASTE_PETSC_NULLPTR);
     #else
-            KSPSetConvergenceTest(mKspSolver, KSPDefaultConverged, &mpConvergenceTestContext, PETSC_NULL);
+            KSPSetConvergenceTest(mKspSolver, KSPDefaultConverged, &mpConvergenceTestContext, CHASTE_PETSC_NULLPTR);
     #endif
 
 #else
-            KSPSetConvergenceTest(mKspSolver, KSPDefaultConverged, PETSC_NULL);
+            KSPSetConvergenceTest(mKspSolver, KSPDefaultConverged, CHASTE_PETSC_NULLPTR);
 #endif
 
             if (mUseAbsoluteTolerance)
@@ -1179,14 +1179,14 @@ Vec LinearSystem::Solve(Vec lhsGuess)
              * https://bitbucket.org/petsc/petsc/commits/eb70c44be3430b039effa3de7e1ca2fab9f75a57
              * This following line of code is actually valid from PETSc 3.5.
              */
-            KSPSetConvergenceTest(mKspSolver, KSPConvergedSkip, PETSC_NULL, PETSC_NULL);
+            KSPSetConvergenceTest(mKspSolver, KSPConvergedSkip, CHASTE_PETSC_NULLPTR, CHASTE_PETSC_NULLPTR);
     #endif
 #else
             KSPSetNormType(mKspSolver, KSP_NORM_NO);
 #endif
 
 #if (PETSC_VERSION_MAJOR == 2)
-            KSPSetConvergenceTest(mKspSolver, KSPSkipConverged, PETSC_NULL);
+            KSPSetConvergenceTest(mKspSolver, KSPSkipConverged, CHASTE_PETSC_NULLPTR);
 #endif
 
             PetscInt num_it;

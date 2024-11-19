@@ -94,7 +94,7 @@ template<unsigned SPACE_DIM>
 void EdgeHelper<SPACE_DIM>::RemoveDeletedEdges()
 {
     /*
-     * Remove any edges that have been marked for deletion and store all other 
+     * Remove any edges that have been marked for deletion and store all other
      * nodes in a temporary structure.
      */
     std::vector<std::unique_ptr<Edge<SPACE_DIM> > > live_edges;
@@ -107,13 +107,13 @@ void EdgeHelper<SPACE_DIM>::RemoveDeletedEdges()
           live_edges.push_back(std::move(p_edge));
       }
       /*
-       * Note: there's no need to manually delete the edge, because the 
+       * Note: there's no need to manually delete the edge, because the
        * unique_ptr automatically takes care of that when it goes out of scope.
        */
     }
 
     /*
-     * Repopulate the edges vector, using std::move to efficiently transfer 
+     * Repopulate the edges vector, using std::move to efficiently transfer
      * ownership of the pointers.
      */
     mEdges = std::move(live_edges);
@@ -132,7 +132,7 @@ void EdgeHelper<SPACE_DIM>::UpdateEdgesMapKey()
 {
     mEdgesMap.clear();
 
-    for (auto& p_edge : mEdges) 
+    for (auto& p_edge : mEdges)
     {
         mEdgesMap[p_edge->GetMapIndex()] = p_edge.get();
     }

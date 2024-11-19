@@ -1132,8 +1132,7 @@ public:
         ChastePoint<1> on_point(2.00);
         ChastePoint<1> out_point(1.25);
 
-        c_vector<double, 2> weights;
-        weights = element1d.CalculateInterpolationWeights(on_point);
+        c_vector<double, 2> weights = element1d.CalculateInterpolationWeights(on_point);
         TS_ASSERT_EQUALS(weights[0], 1.0);
         TS_ASSERT_EQUALS(weights[1], 0.0);
 

@@ -46,9 +46,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * ## Another example showing how to run a bidomain simulation
  *
  * In this tutorial we run another bidomain simulation,
- * showing:  
+ * showing:
  *
- * * i) an example using one of the source cell factories, 
+ * * i) an example using one of the source cell factories,
  * * ii) how to define and use fibre directions, and
  * * iii) mentioning how to write other output file formats.
  *
@@ -157,7 +157,7 @@ public:
         /* The results can now be visualised - the effect of the fibres changing direction at x=0.05
          * on the wave should be very clear.
          *
-         * Please see [Visualisation Guides](/docs/chaste-guides/visualisation-guides/) for details of using Meshalyzer/Cmgui/Paraview.
+         * Please see [Visualisation Guides](../../user-guides/visualisation-guides/) for details of using Meshalyzer/Cmgui/Paraview.
          *
          * We described in the previous tutorial how to access the latest voltage vector using
          * `ReplicatableVector`, here we illustrate how to access the voltage values using the

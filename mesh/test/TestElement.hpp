@@ -756,7 +756,7 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         BoundaryElement<0,1>* p_end_boundary = mesh.GetBoundaryElement(0);
-        c_vector<double, 1> dir;
+        c_vector<double, 1> dir {};
         double unit_det;
         p_end_boundary->CalculateWeightedDirection(dir, unit_det);
         TS_ASSERT_EQUALS(dir[0], 1.0);

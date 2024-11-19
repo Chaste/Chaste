@@ -48,9 +48,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 typedef boost::shared_ptr<AbstractSrnModel> AbstractSrnModelPtr;
 
 /**
- * SRN model at the cell level, has representation for edges internally. Also 
- * contains cell interior (cytoplasmic) SRN. Mostly serves to coordinate between 
- * interior/edge SRNs, in case these are specified. Functionality of SRNs is 
+ * SRN model at the cell level, has representation for edges internally. Also
+ * contains cell interior (cytoplasmic) SRN. Mostly serves to coordinate between
+ * interior/edge SRNs, in case these are specified. Functionality of SRNs is
  * defined in AbstractSrnModel class and user-defined SRN models.
  */
 class CellSrnModel : public AbstractSrnModel
@@ -179,14 +179,14 @@ public:
 
     /**
      * Adds a vector of SRN models to this cell.
-     * 
+     *
      * @param edgeSrns vector of SRN models. Index of each SRN corresponds to the local edge index
      */
     void AddEdgeSrn(std::vector<AbstractSrnModelPtr> edgeSrns);
 
     /**
      * Inserts edge SRN at the end of the list.
-     * 
+     *
      * @param pEdgeSrn the edge SRN to be inserted
      */
     void AddEdgeSrnModel(AbstractSrnModelPtr pEdgeSrn);
@@ -200,7 +200,7 @@ public:
 
     /**
      * Get edge SRN at an index.
-     * 
+     *
      * @param index of the SRN to return
      * @return SRN to be returned
      */
@@ -208,28 +208,28 @@ public:
 
     /**
      * Return all edge SRNs.
-     * 
+     *
      * @return vector of SRNs associated to this cell
      */
     const std::vector<AbstractSrnModelPtr>& GetEdges() const;
 
     /**
      * Set interior SRN.
-     * 
+     *
      * @param pInteriorSrn poiner to an interior SRN model
      */
     void SetInteriorSrnModel(AbstractSrnModelPtr pInteriorSrn);
 
     /**
      * Returns interior SRN.
-     * 
+     *
      * @return interior SRN
      */
     AbstractSrnModelPtr GetInteriorSrn() const;
 
     /**
      * Overriden method. We Set mpCell for each SRN contained in this cell.
-     * 
+     *
      * @param pCell pointer to a Cell
      */
     virtual void SetCell(CellPtr pCell);

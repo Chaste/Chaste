@@ -167,6 +167,15 @@ public:
     virtual void Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation);
 
     /**
+     * Visit the population and write the data.
+     *
+     * Just passes through to VisitAnyPopulation
+     *
+     * @param pCellPopulation a pointer to the ImmersedBoundaryCellPopulation to visit.
+     */
+    virtual void Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation);
+
+    /**
      * Visit the population and write the number of cells in the population that have each proliferative phase.
      *
      * Outputs a line of tab-separated values of the form:

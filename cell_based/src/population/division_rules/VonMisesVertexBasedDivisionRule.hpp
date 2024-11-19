@@ -46,8 +46,8 @@ template<unsigned SPACE_DIM> class VertexBasedCellPopulation;
 template<unsigned SPACE_DIM> class AbstractVertexBasedDivisionRule;
 
 /**
- * A class to generate a division vector of unit length that points in a direction 
- * randomly sampled from a von Mises distribution parameterised by mu (mean parameter) 
+ * A class to generate a division vector of unit length that points in a direction
+ * randomly sampled from a von Mises distribution parameterised by mu (mean parameter)
  * and kappa (concentration parameter).
  */
 template <unsigned SPACE_DIM>

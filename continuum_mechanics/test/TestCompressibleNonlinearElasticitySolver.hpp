@@ -722,6 +722,8 @@ public:
         {
             PetscVecTools::SetElement(test_vec, i, 1.0);
 
+            //Make sure test_vec is in good state for multiplication
+            PetscVecTools::Finalise(test_vec);
             MatMult(solver.mrJacobianMatrix,test_vec,product_vec);
             double vT_J_v = 0.0;
             VecDot(product_vec, test_vec, &vT_J_v);

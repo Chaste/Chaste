@@ -470,10 +470,10 @@ public:
         // Test the location of some Voronoi nodes
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(0)->rGetLocation()[0], 0.5, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(0)->rGetLocation()[1], -0.375, 1e-6);
-        
+
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(4)->rGetLocation()[0], 0.5, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(4)->rGetLocation()[1], 1.4433, 1e-3);
-        
+
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(9)->rGetLocation()[0], 2.0, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(9)->rGetLocation()[1], -0.6250, 1e-3);
 
@@ -482,7 +482,7 @@ public:
 
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(20)->rGetLocation()[0], 0.0, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(20)->rGetLocation()[1], 1.1547, 1e-3);
-        
+
         // Test the number of nodes owned by each Voronoi element and their areas
         for (unsigned elem_index=0; elem_index<8; elem_index++)
         {
@@ -506,7 +506,7 @@ public:
         unsigned thickness_of_ghost_layer = 0;
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
         boost::shared_ptr<Cylindrical2dMesh> p_delaunay_mesh = generator.GetCylindricalMesh();
-        
+
         // Move the top row of nodes up so that there is a void beteen two rows of nodes
         p_delaunay_mesh->GetNode(6)->rGetModifiableLocation()[1] = 5.0;
         p_delaunay_mesh->GetNode(7)->rGetModifiableLocation()[1] = 5.0;
@@ -514,7 +514,7 @@ public:
         p_delaunay_mesh->GetNode(9)->rGetModifiableLocation()[1] = 5.0 + sqrt(3.0) / 2.0;
         p_delaunay_mesh->GetNode(10)->rGetModifiableLocation()[1] = 5.0 + sqrt(3.0) / 2.0;
         p_delaunay_mesh->GetNode(11)->rGetModifiableLocation()[1] = 5.0 + sqrt(3.0) / 2.0;
-        
+
 
         TrianglesMeshWriter<2,2> mesh_writer("TestBoundedCylindricalVertexMeshWithVoid", "DelaunayMesh", false);
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(*p_delaunay_mesh));
@@ -542,10 +542,10 @@ public:
         // Test the location of some Voronoi nodes
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(0)->rGetLocation()[0], 1.0, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(0)->rGetLocation()[1], -0.625, 1e-6);
-        
+
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(4)->rGetLocation()[0], 0.5, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(4)->rGetLocation()[1], 1.4910, 1e-3);
-        
+
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(9)->rGetLocation()[0], 1.0, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(9)->rGetLocation()[1], 6.241, 1e-3);
 
@@ -554,7 +554,7 @@ public:
 
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(20)->rGetLocation()[0], 2.0, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(20)->rGetLocation()[1], -0.625, 1e-3);
-        
+
         // Test the number of nodes owned by each Voronoi element and their areas
         for (unsigned elem_index=0; elem_index<12; elem_index++)
         {
@@ -571,10 +571,10 @@ public:
         unsigned thickness_of_ghost_layer = 0;
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
         boost::shared_ptr<Cylindrical2dMesh> p_delaunay_mesh = generator.GetCylindricalMesh();
-        
+
         // Move the top row of nodes up so that two of the image nodes overlap
         p_delaunay_mesh->GetNode(7)->rGetModifiableLocation()[1] = sqrt(3) - 1 / sqrt(3);
-        
+
         TrianglesMeshWriter<2,2> mesh_writer("TestBoundedCylindricalVertexMeshWithOverlappingImageNode", "DelaunayMesh", false);
         TS_ASSERT_THROWS_NOTHING(mesh_writer.WriteFilesUsingMesh(*p_delaunay_mesh));
 
@@ -593,7 +593,7 @@ public:
         // TODO Check this file !
         TS_ASSERT_THROWS_NOTHING(vertexmesh_writer.WriteVtkUsingMesh(voronoi_mesh,"0"));
 
-        // Test the Voronoi tessellation has the correct number of nodes and elements. 
+        // Test the Voronoi tessellation has the correct number of nodes and elements.
         // Note this is diferent to the previous tests due ot the image nodes merging.
         TS_ASSERT_EQUALS(voronoi_mesh.GetWidth(0), 3u);
         TS_ASSERT_EQUALS(voronoi_mesh.GetNumElements(), 9u);
@@ -602,10 +602,10 @@ public:
         // Test the location of some Voronoi nodes
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(0)->rGetLocation()[0], 0.5, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(0)->rGetLocation()[1], -0.375, 1e-6);
-        
+
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(4)->rGetLocation()[0], 0.5, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(4)->rGetLocation()[1], 1.4433, 1e-3);
-        
+
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(9)->rGetLocation()[0], 2.0, 1e-6);
         TS_ASSERT_DELTA(voronoi_mesh.GetNode(9)->rGetLocation()[1], -0.6250, 1e-3);
 

@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
+#include "ImmersedBoundaryCellPopulation.hpp"
 #include "SemBasedCellPopulation.hpp"
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -96,6 +97,12 @@ void CellRemovalLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(PottsBasedCellPop
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void CellRemovalLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(VertexBasedCellPopulation<SPACE_DIM>* pCellPopulation)
+{
+    VisitAnyPopulation(pCellPopulation);
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void CellRemovalLocationsWriter<ELEMENT_DIM, SPACE_DIM>::Visit(ImmersedBoundaryCellPopulation<SPACE_DIM>* pCellPopulation)
 {
     VisitAnyPopulation(pCellPopulation);
 }

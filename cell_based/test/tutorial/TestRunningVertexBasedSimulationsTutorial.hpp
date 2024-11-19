@@ -98,7 +98,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestRunningVertexBasedSimulationsTutorial : public AbstractCellBasedTestSuite
 {
 public:
-    /* 
+    /*
     * ### Test 1 - a basic vertex-based simulation
     *
     * In the first test, we run a simple vertex-based simulation, in which we create a monolayer
@@ -181,7 +181,7 @@ public:
     /*
     *
     * To visualize the results, open a new terminal, `cd` to the Chaste directory,
-    * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/VertexBasedMonolayer/results_from_time_0`.
+    * then `cd` to `anim`. Then do: `java Visualize2dVertexCells $CHASTE_TEST_OUTPUT/VertexBasedMonolayer/results_from_time_0`.
     * We may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
     * java executable.
     *
@@ -279,9 +279,9 @@ public:
     }
 };
 /*
- * 
+ *
  * To visualize the results, open a new terminal, `cd` to the Chaste directory,
- * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/VertexBasedPeriodicMonolayer/results_from_time_0`.
+ * then `cd` to `anim`. Then do: `java Visualize2dVertexCells $CHASTE_TEST_OUTPUT/VertexBasedPeriodicMonolayer/results_from_time_0`.
  *
  * You should see that the edges of the mesh are identical on both sides; cells no
  * longer pass through the line y=0; and cells are removed at y=3.

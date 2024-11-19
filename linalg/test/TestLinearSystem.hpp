@@ -1073,10 +1073,10 @@ public:
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
             VecCreate(PETSC_COMM_WORLD, &new_vec);
-            VecSetType(new_vec, PETSC_NULL);
+            VecSetType(new_vec, CHASTE_PETSC_NULLPTR);
             VecLoad(new_vec, vec_viewer);
 #else
-            VecLoad(vec_viewer, PETSC_NULL, &new_vec);
+            VecLoad(vec_viewer, CHASTE_PETSC_NULLPTR, &new_vec);
 #endif
             PetscViewerDestroy(PETSC_DESTROY_PARAM(vec_viewer));
 
@@ -1103,10 +1103,10 @@ public:
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
             MatCreate(PETSC_COMM_WORLD, &new_mat);
-            MatSetType(new_mat, PETSC_NULL);
+            MatSetType(new_mat, CHASTE_PETSC_NULLPTR);
             MatLoad(new_mat, mat_viewer);
 #else
-            MatLoad(mat_viewer, PETSC_NULL, &new_mat);
+            MatLoad(mat_viewer, CHASTE_PETSC_NULLPTR, &new_mat);
 #endif
 
             PetscViewerDestroy(PETSC_DESTROY_PARAM(mat_viewer));

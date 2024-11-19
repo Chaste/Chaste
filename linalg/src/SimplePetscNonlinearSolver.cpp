@@ -111,7 +111,7 @@ Vec SimplePetscNonlinearSolver::Solve(PetscErrorCode (*pComputeResidual)(SNES,Ve
 #if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
     SNESSolve(snes, x);
 #else
-    SNESSolve(snes, PETSC_NULL, x);
+    SNESSolve(snes, CHASTE_PETSC_NULLPTR, x);
 #endif
     PetscTools::Destroy(residual);
     PetscTools::Destroy(jacobian); // Free Jacobian

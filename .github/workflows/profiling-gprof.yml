@@ -30,7 +30,7 @@ jobs:
         run: echo "datetime=$(date +%Y-%m-%d_%H-%M-%S)" >> $GITHUB_OUTPUT
 
       - name: checkout Chaste
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: Chaste/Chaste
           path: Chaste
@@ -48,11 +48,11 @@ jobs:
           mkdir -p ${CHASTE_TEST_OUTPUT}
 
       - name: cmake configure
-        run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_PROFILE_GPROF_CPUS=2 ..
+        run: cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_PROFILE_GPROF_CPUS=4 ..
         working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
       - name: build profiling test pack
-        run: cmake --build . --target Profile --parallel 2
+        run: cmake --build . --target Profile --parallel 4
         working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
       - name: run profiling tests
@@ -72,7 +72,7 @@ jobs:
         if: always()
         
       - name: checkout profiling-gprof
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: Chaste/profiling-gprof
           path: profiling-gprof
@@ -87,7 +87,7 @@ jobs:
         if: always() && steps.index-exists.outputs.index == 'True'
 
       - name: setup python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 

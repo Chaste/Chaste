@@ -502,7 +502,7 @@ unsigned NodesOnlyMesh<SPACE_DIM>::GetNextAvailableIndex()
     return index;
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::EnlargeBoxCollection()
 {
     assert(mpBoxCollection);
@@ -510,19 +510,20 @@ void NodesOnlyMesh<SPACE_DIM>::EnlargeBoxCollection()
     int num_local_rows = mpBoxCollection->GetNumLocalRows();
     int new_local_rows = num_local_rows + (int)(PetscTools::AmTopMost()) + (int)(PetscTools::AmMaster());
 
-    c_vector<double, 2*SPACE_DIM> current_domain_size = mpBoxCollection->rGetDomainSize();
-    c_vector<double, 2*SPACE_DIM> new_domain_size = current_domain_size;
+    c_vector<double, 2 * SPACE_DIM> current_domain_size = mpBoxCollection->rGetDomainSize();
+    c_vector<double, 2 * SPACE_DIM> new_domain_size;
+    new_domain_size = current_domain_size;
 
     double fudge = 1e-14;
     c_vector<bool, SPACE_DIM> is_periodic = mpBoxCollection->GetIsPeriodicAllDims();
-    for (unsigned d=0; d < SPACE_DIM; d++)
+    for (unsigned d = 0; d < SPACE_DIM; d++)
     {
         // We don't enlarge in periodic directions
-        if ( !is_periodic(d) )
-    {
-        new_domain_size[2*d] = current_domain_size[2*d] - (mMaximumInteractionDistance - fudge);
-        new_domain_size[2*d+1] = current_domain_size[2*d+1] + (mMaximumInteractionDistance - fudge);
-    }
+        if (!is_periodic(d))
+        {
+            new_domain_size[2 * d] = current_domain_size[2 * d] - (mMaximumInteractionDistance - fudge);
+            new_domain_size[2 * d + 1] = current_domain_size[2 * d + 1] + (mMaximumInteractionDistance - fudge);
+        }
     }
     SetUpBoxCollection(mMaximumInteractionDistance, new_domain_size, new_local_rows);
 }
@@ -539,9 +540,8 @@ bool NodesOnlyMesh<SPACE_DIM>::IsANodeCloseToDomainBoundary()
          node_iter != this->GetNodeIteratorEnd();
          ++node_iter)
     {
-        // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
-        c_vector<double, SPACE_DIM> location;
-        location = node_iter->rGetLocation();
+        c_vector<double, SPACE_DIM> location = node_iter->rGetLocation();
+
         // We need to ignore periodic dimensions
         c_vector<bool, SPACE_DIM> is_periodic = mpBoxCollection->GetIsPeriodicAllDims();
         for (unsigned d=0; d<SPACE_DIM; d++)

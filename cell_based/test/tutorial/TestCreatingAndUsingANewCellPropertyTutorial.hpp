@@ -50,10 +50,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * ### Introduction
  *
- * This tutorial assumes you have already read [Creating And Using A New Force](/docs/user-tutorials/creatingandusinganewforce/).
+ * This tutorial assumes you have already read [Creating And Using A New Force](../creatingandusinganewforce/).
  *
- * In the [Creating And Using A New Cell Mutation State](/docs/user-tutorials/creatingandusinganewcellmutationstate/) 
- * tutorial we showed how to create a new cell mutation state class, 
+ * In the [Creating And Using A New Cell Mutation State](../creatingandusinganewcellmutationstate/)
+ * tutorial we showed how to create a new cell mutation state class,
  * and how this can be used in a cell-based simulation. As well as
  * mutation states, cells may be given much more general properties, using the cell
  * property class hierarchy. In this tutorial, we show how to create a new cell property
@@ -97,7 +97,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * implementing some form of chemotaxis down an imposed chemoattractant gradient,
  * as occurs for example when macrophages migrate within a tumour towards high
  * concentrations of the vascular endothelial growth factor VEGF; for further
- * details, see for example 
+ * details, see for example
  * [Owen *et al.*, J. Theor. Biol. 226: 377-391 (2004).](https://doi.org/10.1016/j.jtbi.2003.09.004)
  *
  * Note that usually this code would be separated out into a separate declaration
@@ -221,7 +221,7 @@ public:
         }
     }
 
-    /* Just as we encountered in [Creating And Using A New Cell Killer](/docs/user-tutorials/creatingandusinganewcellkiller/), here we must override
+    /* Just as we encountered in [Creating And Using A New Cell Killer](../creatingandusinganewcellkiller/), here we must override
      * a method that outputs any member variables to a specified results file `rParamsFile`.
      * In our case, we output the member variable `mStrength`, then call the method on the base class.
      */
@@ -425,7 +425,7 @@ public:
 /*
  * When you visualize the results with
  *
- * `java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMotileCellProperty/results_from_time_0`
+ * `java Visualize2dCentreCells $CHASTE_TEST_OUTPUT/TestOffLatticeSimulationWithMotileCellProperty/results_from_time_0`
  *
  * you should see a collection of cells with the `MotileCellProperty` (labelled dark blue) moving towards the origin.
  */

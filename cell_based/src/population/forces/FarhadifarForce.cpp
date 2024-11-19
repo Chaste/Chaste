@@ -67,8 +67,8 @@ void FarhadifarForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCe
     unsigned num_elements = p_cell_population->GetNumElements();
 
     /*
-     * Check if a subclass of AbstractTargetAreaModifier is being used by 
-     * interrogating the first cell (assuming either all cells, or no cells, in 
+     * Check if a subclass of AbstractTargetAreaModifier is being used by
+     * interrogating the first cell (assuming either all cells, or no cells, in
      * the population have the CellData item "target area").
      */
     bool using_target_area_modifier = p_cell_population->Begin()->GetCellData()->HasItem("target area");

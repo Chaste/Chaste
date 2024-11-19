@@ -152,7 +152,7 @@ public:
     }
 };
 
-/* As mentioned in [Creating And Using A New Cell Cycle Model](/docs/user-tutorials/creatingandusinganewcellcyclemodel/), we need to include the next block
+/* As mentioned in [Creating And Using A New Cell Cycle Model](../creatingandusinganewcellcyclemodel/), we need to include the next block
  * of code to be able to archive the cell killer object in a cell-based
  * simulation, and to obtain a unique identifier for our new cell killer for writing
  * results to file.
@@ -343,7 +343,7 @@ public:
 /*
  * When you visualize the results with
  *
- * `java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMyCellKiller/results_from_time_0`
+ * `java Visualize2dCentreCells $CHASTE_TEST_OUTPUT/TestOffLatticeSimulationWithMyCellKiller/results_from_time_0`
  *
  * you should see that once cells move out of the ellipse they are removed from the simulation.
  *

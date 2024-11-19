@@ -43,8 +43,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/vector.hpp>
 
 /**
- * A boundary condition class that prevents nodes lying with a threshold distance from the 
- * left-hand boundary to move in the x direction, but which allows them to 'slide' along 
+ * A boundary condition class that prevents nodes lying with a threshold distance from the
+ * left-hand boundary to move in the x direction, but which allows them to 'slide' along
  * this boundary.
  */
 template<unsigned DIM>
@@ -53,7 +53,7 @@ class SlidingBoundaryCondition : public AbstractCellPopulationBoundaryCondition<
 private:
 
     /**
-     * Maximum distance from left-hand boundary at which condition is imposed on nodes. 
+     * Maximum distance from left-hand boundary at which condition is imposed on nodes.
      * Initialised to 0.8 in constructor.
      */
     double mThreshold;

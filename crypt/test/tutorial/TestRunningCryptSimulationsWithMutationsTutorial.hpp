@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * ### Introduction
  *
- * This tutorial assumes you have already read the tutorial [Running Mesh Based Simulations](/docs/user-tutorials/runningmeshbasedsimulations/).
+ * This tutorial assumes you have already read the tutorial [Running Mesh Based Simulations](../runningmeshbasedsimulations/).
  *
  * In this tutorial we show how Chaste can be used to simulate a cylindrical model of an
  * intestinal crypt with mutations using both mesh and vertex-based simulations.
@@ -138,7 +138,7 @@ public:
          * We need to do this using the `CellPropertyRegistry`, otherwise
          * the numbers of each type of mutation aren't correctly tracked. For
          * a list of possible mutations, see subclasses of `AbstractCellMutationState`.
-         * These can be found in the 
+         * These can be found in the
          * [inheritance diagram for AbstractCellMutationState](/doxygen-latest/classAbstractCellMutationState.html).
          * Each mutation has a different effect on the cell cycle models; see the class
          * documentation for details.
@@ -222,9 +222,9 @@ public:
     }
 };
 /* To visualize the results, open a new terminal, `cd` to the Chaste directory,
- * then `cd` to `anim`. Then do: `java Visualize2dCentreCells /tmp/$USER/testoutput/MeshBasedCryptWithMutations/results_from_time_0`.
+ * then `cd` to `anim`. Then do: `java Visualize2dCentreCells $CHASTE_TEST_OUTPUT/MeshBasedCryptWithMutations/results_from_time_0`.
  *
- * These are the results before we add the mutations do: `java Visualize2dCentreCells /tmp/$USER/testoutput/MeshBasedCryptWithMutations/results_from_time_10`
+ * These are the results before we add the mutations do: `java Visualize2dCentreCells $CHASTE_TEST_OUTPUT/MeshBasedCryptWithMutations/results_from_time_10`
  * to see the results from after the mutation has been added.
  *
  * We may have to do: `javac Visualize2dCentreCells.java` beforehand to create the

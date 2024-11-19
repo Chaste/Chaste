@@ -96,7 +96,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestVisualizingWithParaviewTutorial : public AbstractCellBasedTestSuite
 {
 public:
-    /* 
+    /*
      * ### Test 1 - a mesh-based cell centre monolayer simulation
      *
      * In the first test, we run a simple cell-based simulation using a `MeshBasedCellPopulation`,
@@ -250,7 +250,7 @@ public:
     {
         /* We set up the simulation in much the same way as above, except now using a `NodesOnlyMesh` and
          * `NodeBasedCellPopulation`. Further details on how to set up a node-based simulation can be found in
-         * [Running Node Based Simulations](/docs/user-tutorials/runningnodebasedsimulations/).
+         * [Running Node Based Simulations](../runningnodebasedsimulations/).
          */
         HoneycombMeshGenerator generator(10, 10, 0);
         boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();

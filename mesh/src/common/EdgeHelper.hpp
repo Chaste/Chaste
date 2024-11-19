@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EdgeRemapInfo.hpp"
 
 /**
- * Class for facilitating the creation and management of unique edges in a 
+ * Class for facilitating the creation and management of unique edges in a
  * vertex mesh.
  */
 template <unsigned SPACE_DIM>
@@ -78,7 +78,7 @@ public:
      * Get edge from the node pairs. Construct the edge if it has not been created
      * @param pNodeA pointer to first Node
      * @param pNodeB pointer to second Node
-     * 
+     *
      * @return the (new) Edge
      */
     Edge<SPACE_DIM>* GetEdgeFromNodes(Node<SPACE_DIM>* pNodeA,
@@ -89,7 +89,7 @@ public:
      * @param elementIndex the index of an element to which the edge belongs
      * @param pNodeA pointer to first Node
      * @param pNodeB pointer to second Node
-     * 
+     *
      * @return the Edge
      */
     Edge<SPACE_DIM>* GetEdgeFromNodes(unsigned elementIndex,
@@ -98,16 +98,16 @@ public:
 
     /**
      * @param index a global Edge index
-     * 
+     *
      * @return pointer the Edge with this global index
      */
     Edge<SPACE_DIM>* GetEdge(unsigned index) const;
 
     /**
      * Access operator.
-     * 
+     *
      * @param index Index of mEdges
-     * 
+     *
      * @return mEdges[index]
      */
     Edge<SPACE_DIM>* operator[](unsigned index) const;

@@ -132,7 +132,7 @@ public:
 
         // Test set/get methods
         std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<2> > >::iterator iter = simulator.GetSimulationModifiers()->begin();
-        TS_ASSERT(boost::static_pointer_cast<ExtrinsicPullModifier<2> >(*iter));        
+        TS_ASSERT(boost::static_pointer_cast<ExtrinsicPullModifier<2> >(*iter));
         boost::static_pointer_cast<ExtrinsicPullModifier<2> >(*iter)->SetApplyExtrinsicPullToAllNodes(true);
         boost::static_pointer_cast<ExtrinsicPullModifier<2> >(*iter)->SetSpeed(2.0);
 

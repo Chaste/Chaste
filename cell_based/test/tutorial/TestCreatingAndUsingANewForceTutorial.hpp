@@ -151,7 +151,7 @@ public:
         return mStrength;
     }
 
-    /* Just as we encountered in [Creating And Using A New Cell Killer](/docs/user-tutorials/creatingandusinganewcellkiller/), here we must override
+    /* Just as we encountered in [Creating And Using A New Cell Killer](../creatingandusinganewcellkiller/), here we must override
      * a method that outputs any member variables to a specified results file `rParamsFile`.
      * In our case, we output the member variable `mStrength`, then call the method on the base class.
      */
@@ -294,10 +294,10 @@ public:
         simulator.Solve();
     }
 };
-/* 
+/*
  * When you visualize the results with
  *
- * `java Visualize2dCentreCells /tmp/$USER/testoutput/TestOffLatticeSimulationWithMyForce/results_from_time_0`
+ * `java Visualize2dCentreCells $CHASTE_TEST_OUTPUT/TestOffLatticeSimulationWithMyForce/results_from_time_0`
  *
  * you should see a collection of cells moving downwards and proliferating.
  */

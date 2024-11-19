@@ -323,7 +323,7 @@ public:
         /* The elasticity solvers have two nonlinear solvers implemented, one hand-coded and one which uses PETSc's SNES
          * solver. The latter is not the default but can be more robust (and will probably be the default in later
          * versions). This is how it can be used. (This option can also be called if the compiled binary is run from
-         * the command line (see [Running Binaries From Command Line](/docs/user-guides/running-binaries-from-command-line/)) 
+         * the command line (see [Running Binaries From Command Line](/docs/user-guides/running-binaries-from-command-line/))
          * using the option "-mech_use_snes").
          */
         problem_defn.SetSolveUsingSnes();

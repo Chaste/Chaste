@@ -72,6 +72,12 @@ std::string ChasteComponentBuildDir(const std::string& rComponent);
 std::string ChasteBuildDirName();
 
 /**
+ * @return the default location of the test output. This can be overridden
+ * by setting env var CHASTE_TEST_OUTPUT.
+ */
+std::string DefaultChasteTestOutput();
+
+/**
  * @return the build type string used in building Chaste.
  */
 std::string ChasteBuildType();

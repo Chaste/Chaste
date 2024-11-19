@@ -305,8 +305,10 @@ void VertexMeshOperationRecorder<ELEMENT_DIM, SPACE_DIM>::RecordCellDivideOperat
     {
         old_split_edges[i] = i;
     }
-    unsigned counter_1 = 0;
-    unsigned counter_2 = 0;
+
+    // These are maybe unused because in release builds the asserts below will be compiled out
+    [[maybe_unused]] unsigned counter_1 = 0;
+    [[maybe_unused]] unsigned counter_2 = 0;
 
     // First find parent edges that correspond directly to daughter cells' edges
     // At the end of the loop, old_split_edges contains parent edge indices that are split

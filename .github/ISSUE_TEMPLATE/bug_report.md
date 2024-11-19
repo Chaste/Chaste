@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-Please see the [guides](https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides), and [discussions](https://github.com/Chaste/Chaste/discussions) for answers to common problems.
+Please see the [guides](https://chaste.github.io/docs/user-guides/), and [discussions](https://github.com/Chaste/Chaste/discussions) for answers to common problems.
 
 **Describe the bug**
 A clear and concise description of the problem.

@@ -370,7 +370,6 @@ MutableElement<1, SPACE_DIM>::MutableElement(unsigned index, const std::vector<N
     mEdgeHelper(nullptr)
 {
     // Sanity checking
-    assert(this->mNodes.size() == 2);
     assert(SPACE_DIM > 0);
 }
 

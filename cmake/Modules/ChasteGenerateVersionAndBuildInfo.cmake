@@ -86,8 +86,8 @@ foreach(project ${Chaste_PROJECTS})
     set(projects_modified "${projects_modified} modified[\"${project}\"] = \"${this_project_modified}\";\n")
 endforeach()
 
-find_package(PythonInterp QUIET)
-execute_process(COMMAND "${PYTHON_EXECUTABLE}" "-c" "from CheckForCopyrights import current_notice; print(current_notice)"
+find_package(Python3 QUIET)
+execute_process(COMMAND "${Python3_EXECUTABLE}" "-c" "from CheckForCopyrights import current_notice; print(current_notice)"
  WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/python/infra"
  OUTPUT_VARIABLE licence)
 string(REPLACE "\nThis file is part of Chaste.\n" "" licence "${licence}")

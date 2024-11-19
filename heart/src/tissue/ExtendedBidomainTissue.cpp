@@ -43,6 +43,31 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractChasteRegion.hpp"
 #include "HeartEventHandler.hpp"
 
+
+/**
+  * See https://github.com/Chaste/Chaste/issues/280
+  *
+  * This method resolves a GCC warning in Release mode for 1-dimensional c_vector copy assignments.
+  *
+  * @param rFrom reference to the c_vector to explicitly copy from
+  * @param rTo reference to the c_vector to explicitly copy to
+ */
+template <unsigned SPACE_DIM>
+void ExplicitCVectorCopy(c_vector<double, SPACE_DIM>& rFrom, c_vector<double, SPACE_DIM>& rTo)
+{
+    if constexpr (SPACE_DIM == 1u)
+    {
+        // In 1-D, explicitly copy the data
+        rTo[0] = rFrom[0];
+    }
+    else
+    {
+        // By default, use the standard copy-assignment overload
+        rTo = rFrom;
+    }
+}
+
+
 template <unsigned SPACE_DIM>
 ExtendedBidomainTissue<SPACE_DIM>::ExtendedBidomainTissue(AbstractCardiacCellFactory<SPACE_DIM>* pCellFactory,
                                                           AbstractCardiacCellFactory<SPACE_DIM>* pCellFactorySecondCell,
@@ -246,7 +271,11 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateIntracellularConductivityTensorSec
         try
         {
             assert(hetero_intra_conductivities.size()==0);
-            hetero_intra_conductivities.resize(num_elements, intra_conductivities);
+            hetero_intra_conductivities.resize(num_elements);
+            for(auto& elem : hetero_intra_conductivities)
+            {
+                ExplicitCVectorCopy<SPACE_DIM>(intra_conductivities, elem);
+            }
         }
         // LCOV_EXCL_START
         catch(std::bad_alloc &badAlloc)
@@ -329,7 +358,6 @@ const std::vector<boost::shared_ptr<AbstractStimulusFunction> >& ExtendedBidomai
     return mExtracellularStimuliDistributed;
 }
 
-
 template <unsigned SPACE_DIM>
 void ExtendedBidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
 {
@@ -383,7 +411,11 @@ void ExtendedBidomainTissue<SPACE_DIM>::CreateExtracellularConductivityTensors()
         {
             assert(hetero_extra_conductivities.size()==0);
             //initialise with the values of teh default conductivity tensor
-            hetero_extra_conductivities.resize(num_elements, extra_conductivities);
+            hetero_extra_conductivities.resize(num_elements);
+            for(auto& elem : hetero_extra_conductivities)
+            {
+                ExplicitCVectorCopy<SPACE_DIM>(extra_conductivities, elem);
+            }
         }
         // LCOV_EXCL_START
         catch(std::bad_alloc &badAlloc)

@@ -91,7 +91,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * between neighbouring cells in the cell population, subject to each vertex.
  */
 #include "NagaiHondaForce.hpp"
-/* In conjunction with the `NagaiHondaForce`, we choose to use a child class 
+/* In conjunction with the `NagaiHondaForce`, we choose to use a child class
  * of `AbstractTargetAreaModifier` to model cell growth between divisions.
  * Here, we use the `SimpleTargetAreaModifier`.
  */
@@ -101,7 +101,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestRunningVertexBasedCryptSimulationsTutorial : public AbstractCellBasedTestSuite
 {
 public:
-    /* 
+    /*
      * ### Test 1 - create a vertex-based crypt simulation
      *
      * The first test generates a crypt, in which we use a cylindrical vertex mesh,
@@ -147,10 +147,10 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_force);
         simulator.AddForce(p_force);
 
-        /* We next add a child class of `AbstractTargetAreaModifier` to the 
-         * simulation. This modifier assigns and updates target areas to each 
-         * cell throughout the simulation, modelling cell growth between 
-         * divisions. The target areas are in turn used by the force law to 
+        /* We next add a child class of `AbstractTargetAreaModifier` to the
+         * simulation. This modifier assigns and updates target areas to each
+         * cell throughout the simulation, modelling cell growth between
+         * divisions. The target areas are in turn used by the force law to
          * determine the pressure forces on each vertex.
          */
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
@@ -170,7 +170,7 @@ public:
 
     /*
      * To visualize the results, open a new terminal, `cd` to the Chaste directory,
-     * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/VertexCrypt/results_from_time_0`.
+     * then `cd` to `anim`. Then do: `java Visualize2dVertexCells $CHASTE_TEST_OUTPUT/VertexCrypt/results_from_time_0`.
      * You may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
      * java executable.
      *
@@ -206,7 +206,7 @@ public:
         /* Define the crypt length; this will be used for sloughing and calculating the Wnt gradient. */
         double crypt_length = 6.0;
 
-        /* Set up a `WntConcentration` object, as in the tutorial [Running Mesh Based Simulations](/docs/user-tutorials/runningmeshbasedsimulations/).*/
+        /* Set up a `WntConcentration` object, as in the tutorial [Running Mesh Based Simulations](../runningmeshbasedsimulations/).*/
         WntConcentration<2>::Instance()->SetType(LINEAR);
         WntConcentration<2>::Instance()->SetCellPopulation(crypt);
         WntConcentration<2>::Instance()->SetCryptLength(crypt_length);
@@ -235,7 +235,7 @@ public:
     /*
     *
     * To visualize the results, open a new terminal, `cd` to the Chaste directory,
-    * then `cd` to `anim`. Then do: `java Visualize2dVertexCells /tmp/$USER/testoutput/VertexCryptWithSimpleWntCellCycleModel/results_from_time_0`.
+    * then `cd` to `anim`. Then do: `java Visualize2dVertexCells $CHASTE_TEST_OUTPUT/VertexCryptWithSimpleWntCellCycleModel/results_from_time_0`.
     * You may have to do: `javac Visualize2dVertexCells.java` beforehand to create the
     * java executable.
     *

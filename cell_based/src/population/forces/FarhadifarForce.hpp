@@ -101,9 +101,9 @@ protected:
 
     /**
      * The target area. This term corresponds to A_0 in Farhadifar's paper.
-     * 
-     * Note: If a subclass of AbstractTargetAreaModifier is present in the 
-     * cell-based simulation, then we use the CellData item "target area" stored 
+     *
+     * Note: If a subclass of AbstractTargetAreaModifier is present in the
+     * cell-based simulation, then we use the CellData item "target area" stored
      * in each Cell in the force calculation instead of this parameter value.
      */
     double mTargetAreaParameter;

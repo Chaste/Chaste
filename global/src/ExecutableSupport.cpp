@@ -112,7 +112,7 @@ void ExecutableSupport::InitializePetsc(int* pArgc, char*** pArgv)
     CommandLineArguments::Instance()->p_argc = pArgc;
     CommandLineArguments::Instance()->p_argv = pArgv;
     // Initialise PETSc
-    PETSCEXCEPT(PetscInitialize(pArgc, pArgv, PETSC_NULL, PETSC_NULL));
+    PETSCEXCEPT(PetscInitialize(pArgc, pArgv, CHASTE_PETSC_NULLPTR, CHASTE_PETSC_NULLPTR));
     // Set default output folder
     if (!mOutputDirectory.IsPathSet())
     {
