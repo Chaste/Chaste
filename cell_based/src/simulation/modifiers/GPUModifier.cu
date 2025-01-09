@@ -121,6 +121,9 @@ GPUModifier<DIM>::~GPUModifier()
 template<unsigned DIM>
 void GPUModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
+    auto start_time = std::chrono::high_resolution_clock::now();
+    auto cpu_duration = std::chrono::duration_cast<std::chrono::milliseconds>(start_time - mTimePoint);
+
     // Reset the simulation
     mpFlameGPUSimulation->resetStepCounter();
 
@@ -145,8 +148,14 @@ void GPUModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rC
     // Create cell population for FlameGPU simulation
     mpFlameGPUSimulation->setPopulationData(*mpCellAgentVector);
 
+    auto host_device_transfer_complete_time = std::chrono::high_resolution_clock::now();
+    auto host_device_duration = std::chrono::duration_cast<std::chrono::milliseconds>(host_device_transfer_complete_time - start_time);
+
     // Run the simulation
     mpFlameGPUSimulation->simulate();
+
+    auto simulation_complete_time = std::chrono::high_resolution_clock::now();
+    auto simulation_duration = std::chrono::duration_cast<std::chrono::milliseconds>(simulation_complete_time - host_device_transfer_complete_time);
 
     // Extract results
     flamegpu::AgentVector out_pop(*mpCellAgentDescription);
@@ -159,6 +168,12 @@ void GPUModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rC
         iter->rGetModifiableLocation()[1] = cellVector[i].getVariable<float>("y");
         i++;
     }
+    auto device_host_transfer_complete_time = std::chrono::high_resolution_clock::now();
+    mTimePoint = device_host_transfer_complete_time;
+    auto device_host_duration = std::chrono::duration_cast<std::chrono::milliseconds>(device_host_transfer_complete_time - simulation_complete_time);
+    auto total_duration = host_device_duration + simulation_duration + device_host_duration;
+    std::cout << host_device_duration.count() << ", " << simulation_duration.count() << ", " << device_host_duration.count() << ", " << total_duration.count() << ", " << cpu_duration.count() << "\n";
+    
 }
 
 template<unsigned DIM>
@@ -200,7 +215,7 @@ void GPUModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulati
       
     // Construct a simulation object from the model and configure it to run for a single step
     mpFlameGPUSimulation = std::make_unique<flamegpu::CUDASimulation>(*mpFlameGPUModel);
-    mpFlameGPUSimulation->SimulationConfig().steps = 1;
+    mpFlameGPUSimulation->SimulationConfig().steps = 300;
     
     // Allocate a vector for transferring agent data between host & device
     mpCellAgentVector = std::make_unique<flamegpu::AgentVector>(*mpCellAgentDescription);
