@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2024, University of Oxford.
+# Copyright (c) 2005-2025, University of Oxford.
 # All rights reserved.
 # 
 # University of Oxford means the Chancellor, Masters and Scholars of the
@@ -52,9 +52,11 @@ message ("####################################\n")
 message(STATUS "CMake version: ${CMAKE_VERSION}")
 
 # Since CMake 3.0, version can be supplied to the project() command.  We set it directly, for users on older CMake
-project (Chaste VERSION 2024.1)
+project (Chaste VERSION 2024.2)
 set (Chaste_VERSION_MAJOR 2024 CACHE STRING "Chaste major version number")
-set (Chaste_VERSION_MINOR 1 CACHE STRING "Chaste minor version number")
+set (Chaste_VERSION_MINOR 2 CACHE STRING "Chaste minor version number")
+
+message(STATUS "Linker: ${CMAKE_LINKER}")
 
 include (ChasteHostOperatingSystem)
 include (ChasteBuildTypes)
@@ -184,6 +186,8 @@ option (Chaste_INSTALL_TESTS "Install Chaste Testing infrastructure" OFF)
 
 set (Chaste_CODEGEN_EXTRA_ARGS "" CACHE STRING "Add any extra arguments for chaste_codegen here")
 
+option (Chaste_ENABLE_PYCHASTE "Enable PyChaste" OFF)
+
 #Some Chaste-specific #defines
 add_definitions (-DCHASTE_CMAKE)
 
@@ -273,18 +277,23 @@ endif ()
 ################################
 ####  Find Python
 ################################
-find_package(Python3 3.5)
+if (Chaste_ENABLE_PYCHASTE)
+    find_package(Python3 3.5 COMPONENTS Interpreter Development)
+else ()
+    find_package(Python3 3.5)
+endif ()
+
 if (Python3_VERSION VERSION_LESS 3.5.0)
     message(FATAL_ERROR "Python 3.5 or higher is required; found v${Python3_VERSION} instead. Specify interpreter with -DPython_EXECUTABLE=/path/to/python3")
 endif ()
 
 # Install chaste_codegen in virtual environment
-set(codegen_python3_venv ${PROJECT_BINARY_DIR}/codegen_python3_venv/bin)
+set(chaste_python3_venv ${PROJECT_BINARY_DIR}/chaste_python3_venv/bin)
 
-if (NOT EXISTS ${codegen_python3_venv})
-    message (STATUS "Creating virtual environment for chaste_codegen in ${PROJECT_BINARY_DIR}/codegen_python3_venv")
+if (NOT EXISTS ${chaste_python3_venv})
+    message (STATUS "Creating virtual environment for chaste_codegen in ${PROJECT_BINARY_DIR}/chaste_python3_venv")
     execute_process(
-        COMMAND ${Python3_EXECUTABLE} -m venv codegen_python3_venv
+        COMMAND ${Python3_EXECUTABLE} -m venv chaste_python3_venv
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
     )
 endif ()
@@ -292,24 +301,51 @@ endif ()
 # Update pip setuptools and wheel
 message (STATUS "Updating pip setuptools and wheel")
 if (${Python3_VERSION} VERSION_LESS 3.6.0)
-    execute_process(COMMAND ${codegen_python3_venv}/pip install --no-cache-dir "pip>=20.0, <21.0")
-    execute_process(COMMAND ${codegen_python3_venv}/pip install --no-cache-dir --upgrade setuptools wheel)
+    execute_process(COMMAND ${chaste_python3_venv}/pip install --no-cache-dir "pip>=20.0, <21.0")
+    execute_process(COMMAND ${chaste_python3_venv}/pip install --no-cache-dir --upgrade setuptools wheel)
 else()
-    execute_process(COMMAND ${codegen_python3_venv}/pip install --no-cache-dir --upgrade pip setuptools wheel)
+    execute_process(COMMAND ${chaste_python3_venv}/pip install --no-cache-dir --upgrade pip setuptools wheel)
 endif()
 
 
 # Install chaste_codegen and chaste_codegen_sbml in virtual environment
 message (STATUS "Installing chaste_codegen")
-execute_process(COMMAND ${codegen_python3_venv}/pip install --no-cache-dir --upgrade -r ${CMAKE_SOURCE_DIR}/chaste_codegen.txt)
-execute_process(COMMAND ${codegen_python3_venv}/chaste_codegen --version
+execute_process(COMMAND ${chaste_python3_venv}/pip install --no-cache-dir --upgrade -r ${CMAKE_SOURCE_DIR}/chaste_codegen.txt)
+execute_process(COMMAND ${chaste_python3_venv}/chaste_codegen --version
         OUTPUT_VARIABLE Chaste_CODEGEN_VERSION
         OUTPUT_STRIP_TRAILING_WHITESPACE)
 message("Codegen version: ${Chaste_CODEGEN_VERSION}")
-execute_process(COMMAND ${codegen_python3_venv}/chaste_codegen_sbml --version
-        OUTPUT_VARIABLE Chaste_CODEGEN_SBML_VERSION
+
+# Get pychaste dependencies
+if (Chaste_ENABLE_PYCHASTE)
+    set(Chaste_USE_VTK ON)
+
+    # Get pybind11
+    include(FetchContent)
+    FetchContent_Declare(
+        pybind11
+        GIT_REPOSITORY https://github.com/pybind/pybind11
+        GIT_TAG stable
+        GIT_SHALLOW 1
+    )
+    FetchContent_MakeAvailable(pybind11)
+
+    # Install C++ wrapper generator (cppwg) in venv
+    message (STATUS "Installing C++ wrapper generator")
+    FetchContent_Declare(
+        cppwg
+        GIT_REPOSITORY https://github.com/Chaste/cppwg.git
+        GIT_TAG stable
+        GIT_SHALLOW 1
+    )
+    FetchContent_MakeAvailable(cppwg)
+
+    execute_process(COMMAND ${chaste_python3_venv}/pip install ${cppwg_SOURCE_DIR})
+    execute_process(COMMAND ${chaste_python3_venv}/cppwg --version
+        OUTPUT_VARIABLE Chaste_CPPWG_VERSION
         OUTPUT_STRIP_TRAILING_WHITESPACE)
-message("Codegen SBML version: ${Chaste_CODEGEN_SBML_VERSION}")
+    message("CPPWG version: ${Chaste_CPPWG_VERSION}")
+endif ()
 
 if (Chaste_ENABLE_TESTING AND Chaste_ACCEPTANCE)
     find_package (TextTest)
@@ -366,19 +402,47 @@ if (Chaste_USE_VTK)
     endif ()
 
     # Depending on the VTK version, we need different components.
+    set (_vtk_modules "")
     if (VTK_MAJOR_VERSION LESS 9)
-        find_package(
-                VTK COMPONENTS vtkCommonCore vtkCommonDataModel vtkFiltersCore vtkFiltersGeneral vtkFiltersGeneric
-                vtkFiltersGeometry vtkFiltersModeling vtkFiltersSources vtkIOCore vtkIOGeometry vtkIOLegacy
-                vtkIOParallelXML vtkIOXML REQUIRED
-        )
-    # VTK 9.0 and above require the following
+        list (APPEND _vtk_modules
+                vtkCommonCore vtkCommonDataModel vtkFiltersCore
+                vtkFiltersGeneral vtkFiltersGeneric vtkFiltersGeometry
+                vtkFiltersModeling vtkFiltersSources vtkIOCore vtkIOGeometry
+                vtkIOLegacy vtkIOParallelXML vtkIOXML
+             )
+        if (Chaste_ENABLE_PYCHASTE)
+            # Additional modules required by PyChaste
+            list (APPEND _vtk_modules
+                    vtkInteractionStyle vtkIOImage vtkIOMovie
+                    vtkRenderingAnnotation vtkRenderingCore vtkRenderingFreeType
+                    vtkWrappingPythonCore
+                 )
+            if (VTK_MAJOR_VERSION LESS 7)
+                list (APPEND _vtk_modules vtkRenderingOpenGL)
+            else ()
+                list (APPEND _vtk_modules
+                        vtkFiltersProgrammable vtkFiltersVerdict
+                        vtkRenderingOpenGL2
+                     )
+            endif ()
+        endif ()
     else ()
-        find_package(
-                VTK COMPONENTS CommonCore CommonDataModel FiltersCore FiltersGeneral FiltersGeneric FiltersGeometry
-                FiltersModeling FiltersSources IOCore IOGeometry IOLegacy IOParallelXML IOXML REQUIRED
-        )
+        # VTK 9.0 and above require the following
+        list (APPEND _vtk_modules
+                CommonCore CommonDataModel FiltersCore FiltersGeneral
+                FiltersGeneric FiltersGeometry FiltersModeling FiltersSources
+                IOCore IOGeometry IOLegacy IOParallelXML IOXML
+             )
+        if (Chaste_ENABLE_PYCHASTE)
+            # Additional modules required by PyChaste
+            list (APPEND _vtk_modules
+                    FiltersProgrammable FiltersVerdict InteractionStyle IOImage
+                    IOMovie IOOggTheora RenderingAnnotation RenderingCore
+                    RenderingFreeType RenderingOpenGL2 WrappingPythonCore
+                 )
+        endif ()
     endif ()
+    find_package (VTK COMPONENTS ${_vtk_modules} REQUIRED)
 
     add_definitions (-DCHASTE_VTK)
 endif ()
@@ -407,6 +471,10 @@ endif ()
 ################################
 ####  Find PETSc
 ################################
+if (Chaste_ENABLE_PYCHASTE)
+    find_package(PETSc4py REQUIRED)
+endif ()
+
 find_package (PETSc REQUIRED)
 list (APPEND Chaste_LINK_LIBRARIES "${PETSC_LIBRARIES}")
 
@@ -593,6 +661,10 @@ message ("####################################\n")
 
 # List the available Chaste components
 set (Chaste_COMPONENTS global io linalg mesh ode pde continuum_mechanics cell_based crypt)
+if (Chaste_ENABLE_PYCHASTE)
+    list (APPEND Chaste_COMPONENTS pychaste)
+endif ()
+
 if (NOT (WIN32 OR CYGWIN))
     set (Chaste_COMPONENTS ${Chaste_COMPONENTS} lung heart)
 endif ()
@@ -676,6 +748,9 @@ set (Chaste_DEPENDS_crypt cell_based pde ode mesh linalg io global)
 set (Chaste_DEPENDS_continuum_mechanics pde ode mesh linalg io global)
 set (Chaste_DEPENDS_heart ${Chaste_DEPENDS_continuum_mechanics} continuum_mechanics)
 set (Chaste_DEPENDS_lung ${Chaste_DEPENDS_continuum_mechanics} continuum_mechanics)
+if (Chaste_ENABLE_PYCHASTE)
+    set (Chaste_DEPENDS_pychaste cell_based)
+endif ()
 
 # These custom targets depend on other components but are not components themselves
 set (Chaste_DEPENDS_core global io linalg mesh ode pde continuum_mechanics)
@@ -1050,7 +1125,7 @@ set (CPACK_PACKAGE_DESCRIPTION "
  and scientific computing.
  .
  The main website for Chaste can be found at
- http://www.cs.ox.ac.uk/chaste
+ https://chaste.github.io
 ")
 set (CPACK_PACKAGE_VERSION_MAJOR "${Chaste_VERSION_MAJOR}")
 set (CPACK_PACKAGE_VERSION_MINOR "${Chaste_VERSION_MINOR}")

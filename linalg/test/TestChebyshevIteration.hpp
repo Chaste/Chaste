@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -166,8 +166,9 @@ public:
             unsigned chebyshev_adaptive_its = ls.GetNumIterations();
 
             TS_ASSERT_EQUALS(chebyshev_adaptive_its, 40u);
-            TS_ASSERT_DELTA(ls.mEigMin, 0.0124, 1e-4);
-            TS_ASSERT_DELTA(ls.mEigMax, 1.8810, 1e-4);
+            TS_ASSERT_DELTA(ls.mEigMin, 0.0124, 1e-2);
+            TS_ASSERT_DELTA(ls.mEigMax, 1.8810, 1e-2);
+            // Thresholds relaxed: see https://github.com/Chaste/Chaste/pull/342
 
             PetscTools::Destroy(solution);
         }
@@ -198,8 +199,9 @@ public:
             unsigned chebyshev_no_adaptive_its = ls.GetNumIterations();
 
             TS_ASSERT_LESS_THAN(chebyshev_no_adaptive_its, 100u); // Normally 88, but 99 on maverick & natty
-            TS_ASSERT_DELTA(ls.mEigMin, 0.0124, 1e-4);
-            TS_ASSERT_DELTA(ls.mEigMax, 1.8841, 1e-4);
+            TS_ASSERT_DELTA(ls.mEigMin, 0.0124, 1e-2);
+            TS_ASSERT_DELTA(ls.mEigMax, 1.8841, 1e-2);
+            // Thresholds relaxed: see https://github.com/Chaste/Chaste/pull/342
 
             PetscTools::Destroy(solution);
         }

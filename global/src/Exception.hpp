@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -170,6 +170,14 @@ private:
  */
 #define EXCEPT_IF_NOT(test) \
     if (!(test)) EXCEPTION("Assertion tripped: " BOOST_PP_STRINGIZE(test))
+
+/**
+ * Convenience macro for the opposite truth condition as EXCEPT_IF_NOT.
+ *
+ * @param test  the test that must always be false.
+ */
+#define EXCEPT_IF(test) \
+    if (test) EXCEPTION("Assertion tripped: " BOOST_PP_STRINGIZE(test))
 
 
 /**

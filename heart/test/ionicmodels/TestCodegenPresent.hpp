@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -54,8 +54,8 @@ class TestCodegenPresent : public CxxTest::TestSuite
 public:
     void TestChaste_codegenInstalled()
     {
-        FileFinder codegen("codegen_python3_venv/bin/chaste_codegen", RelativeTo::ChasteBuildRoot);
-        FileFinder python("codegen_python3_venv/bin/python", RelativeTo::ChasteBuildRoot);
+        FileFinder codegen("chaste_python3_venv/bin/chaste_codegen", RelativeTo::ChasteBuildRoot);
+        FileFinder python("chaste_python3_venv/bin/python", RelativeTo::ChasteBuildRoot);
 
         TS_ASSERT_EQUALS(codegen.IsFile(), true);
         TS_ASSERT_EQUALS(python.IsFile(), true);

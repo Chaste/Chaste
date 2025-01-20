@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,10 +36,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef IMMERSEDBOUNDARYARRAY_HPP_
 #define IMMERSEDBOUNDARYARRAY_HPP_
 
+#include "ChastePragmas.hpp"
+
 #include <complex>
 
 #define BOOST_DISABLE_ASSERTS
+CHASTE_DISABLE_BOOST_DEPRECATION_WARNING_BEGIN
 #include <boost/multi_array.hpp>
+CHASTE_DISABLE_BOOST_DEPRECATION_WARNING_END
 
 using boost::multi_array;
 using boost::extents;

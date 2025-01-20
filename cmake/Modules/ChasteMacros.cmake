@@ -75,7 +75,7 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
     endif()
     set(depends ${cellml_dir}/${cellml_file_name}.cellml)
     
-    execute_process(COMMAND "${codegen_python3_venv}/chaste_codegen" ${codegen_args} ${Chaste_CODEGEN_EXTRA_ARGS} --show-outputs ${cellml_file}
+    execute_process(COMMAND "${chaste_python3_venv}/chaste_codegen" ${codegen_args} ${Chaste_CODEGEN_EXTRA_ARGS} --show-outputs ${cellml_file}
         OUTPUT_VARIABLE ConvertCellModelDepends
         OUTPUT_STRIP_TRAILING_WHITESPACE
         )
@@ -88,7 +88,7 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
     endif()
 
     add_custom_command(OUTPUT ${output_files_hpp} ${output_files_cpp}
-        COMMAND "${codegen_python3_venv}/chaste_codegen" ${codegen_args} ${Chaste_CODEGEN_EXTRA_ARGS} ${cellml_file}
+        COMMAND "${chaste_python3_venv}/chaste_codegen" ${codegen_args} ${Chaste_CODEGEN_EXTRA_ARGS} ${cellml_file}
         DEPENDS ${depends}
         COMMENT "Processing CellML file ${cellml_file_rel}"
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
@@ -112,15 +112,6 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
         string(REGEX REPLACE "(Parallel)$" "" _testname "${_testTargetName}")
     else()
         set(parallel OFF)
-        set(_testname ${_testTargetName})
-    endif()
-
-    string(REGEX MATCH "^.*Codegen$" foundCodegen ${_testTargetName})
-    if (foundCodegen)
-        set(codegen ON)
-        string(REGEX REPLACE "(Codegen)$" "" _testname "${_testTargetName}")
-    else()
-        set(codegen OFF)
         set(_testname ${_testTargetName})
     endif()
 
@@ -321,6 +312,7 @@ macro(Chaste_DO_COMMON component)
         add_library(chaste_${component} ${Chaste_${component}_SOURCES} ${ARGN})
         target_link_libraries(chaste_${component} PRIVATE Chaste_COMMON_DEPS)
         if (BUILD_SHARED_LIBS)
+            target_link_options(chaste_${component} PRIVATE "${Chaste_SHARED_LINKER_FLAGS}")
             target_link_libraries(chaste_${component} LINK_PUBLIC ${Chaste_LIBRARIES})
             set(static_extension "a")
             set(keyword "")
@@ -531,6 +523,9 @@ macro(Chaste_DO_TEST_COMMON component)
     file(GLOB_RECURSE test_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
     if(test_sources)
         add_library(test${component} STATIC ${test_sources})
+        if (BUILD_SHARED_LIBS)
+            target_link_options(test${component} PRIVATE "${Chaste_SHARED_LINKER_FLAGS}")
+        endif ()
         target_link_libraries(test${component} PRIVATE Chaste_COMMON_DEPS)
         set(COMPONENT_LIBRARIES ${COMPONENT_LIBRARIES} test${component})
     endif()
@@ -575,14 +570,14 @@ macro(Chaste_DO_TEST_COMMON component)
                     set(testTargetName ${testTargetName}Parallel)
                     set(parallel ON)
                 endif()
-                set(codegen OFF)
-                set(exeTargetName ${testTargetName})
-                if (${type} STREQUAL "Codegen")
-                    set(testTargetName ${testTargetName}Codegen)
-                    set(codegen ON)
-                endif()
 
-                if (NOT DEFINED ${testTargetName})
+                if (DEFINED ${testTargetName})
+                    # if the test has already been defined, add it to this test pack
+                    get_property(test_labels TEST ${testTargetName} PROPERTY LABELS)
+                    list(APPEND test_labels ${type}_${component})
+                    set_property(TEST ${testTargetName} PROPERTY LABELS "${test_labels}")
+
+                else()
                     set(${testTargetName} ON)
                     chaste_add_test(${testTargetName} "${CMAKE_CURRENT_SOURCE_DIR}/${filename}")
 

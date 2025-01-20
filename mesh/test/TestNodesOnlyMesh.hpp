@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -708,7 +708,7 @@ public:
         }
 
         // Delete from interior
-        unsigned node_index;
+        unsigned node_index {};
         if (mesh.mpBoxCollection->IsOwned(nodes[0]))
         {
             AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();

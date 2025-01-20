@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -291,7 +291,7 @@ void RecursiveCopy(const fs::path& rFromPath, const fs::path& rToPath)
     if (fs::is_directory(rFromPath))
     {
         // Create the destination folder
-        EXCEPT_IF_NOT(!fs::exists(dest));
+        EXCEPT_IF(fs::exists(dest));
         fs::create_directory(dest);
         // Recursively copy our contents
         fs::directory_iterator end_iter;

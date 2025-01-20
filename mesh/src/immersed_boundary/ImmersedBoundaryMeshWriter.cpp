@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -35,11 +35,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ImmersedBoundaryMeshWriter.hpp"
 
+#include "ImmersedBoundaryArray.hpp"
 #include "MathsCustomFunctions.hpp"
 #include "UblasCustomFunctions.hpp"
 #include "Version.hpp"
-
-#include <boost/multi_array.hpp>
 
 /**
  * Convenience collection of iterators, primarily to get compilation to happen.
@@ -447,8 +446,8 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(ImmersedBou
                 // Get node, index and location
                 Node<SPACE_DIM>* p_node = iter->GetNode(node_idx);
                 unsigned global_idx = p_node->GetIndex();
-                c_vector<double, SPACE_DIM> position = p_node->rGetLocation();
 
+                c_vector<double, SPACE_DIM> position = p_node->rGetLocation();
                 p_pts->InsertPoint(global_idx, position[0], position[1], 0.0);
 
                 p_cell_id_list->SetId(node_idx, global_idx);

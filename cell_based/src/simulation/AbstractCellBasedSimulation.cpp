@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -457,9 +457,12 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
             UpdateCellPopulation();
         }
 
-        // Store whether we are sampling results at the current timestep
+        /*
+        * Store whether we are sampling results at the current timestep note we have +1 here as we caculate this
+        * before the timestep is increaced.
+        */
         SimulationTime* p_time = SimulationTime::Instance();
-        bool at_sampling_timestep = (p_time->GetTimeStepsElapsed()%this->mSamplingTimestepMultiple == 0);
+        bool at_sampling_timestep = ((p_time->GetTimeStepsElapsed()+1)%this->mSamplingTimestepMultiple == 0);
 
         /*
          * If required, store the current locations of cell centres. Note that we need to

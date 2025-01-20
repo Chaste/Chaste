@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractImmersedBoundaryForce.hpp"
 #include "ImmersedBoundaryCellPopulation.hpp"
 #include "ImmersedBoundaryMesh.hpp"
+#include "ImmersedBoundaryArray.hpp"
 #include "ImmersedBoundary2dArrays.hpp"
 #include "ImmersedBoundaryFftInterface.hpp"
 #include "UniformGridRandomFieldGenerator.hpp"
@@ -52,7 +53,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Other includes
 #include <complex>
 #include <boost/serialization/base_object.hpp>
-#include <boost/multi_array.hpp>
 
 /**
  * A modifier class which at each simulation time step implements the immersed

@@ -1,0 +1,28 @@
+cdt_name:
+  - cos7
+channel_sources:
+  - conda-forge
+  - pychaste
+channel_targets:
+  - pychaste main
+cxx_compiler:
+  - gxx
+cxx_compiler_version:
+  - "11"
+docker_image:
+  - quay.io/condaforge/linux-anvil-cos7-x86_64
+fortran_compiler:
+  - gfortran
+fortran_compiler_version:
+  - "11"
+pin_run_as_build:
+  python:
+    min_pin: x.x
+    max_pin: x.x
+python:
+  - 3.8.* *_cpython
+target_platform:
+  - linux-64
+zip_keys:
+  - - cxx_compiler_version
+    - fortran_compiler_version
