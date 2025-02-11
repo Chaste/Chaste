@@ -36,33 +36,39 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "GPUModifier.cuh"
 #include "MeshBasedCellPopulation.hpp"
 
-FLAMEGPU_AGENT_FUNCTION(output_location, flamegpu::MessageNone, flamegpu::MessageSpatial2D) {
+FLAMEGPU_AGENT_FUNCTION(output_location, flamegpu::MessageNone, flamegpu::MessageSpatial3D) {
     FLAMEGPU->message_out.setVariable<float>("x", FLAMEGPU->getVariable<float>("x"));
     FLAMEGPU->message_out.setVariable<float>("y", FLAMEGPU->getVariable<float>("y"));
+    FLAMEGPU->message_out.setVariable<float>("z", FLAMEGPU->getVariable<float>("z"));
     FLAMEGPU->message_out.setVariable<float>("radius", FLAMEGPU->getVariable<float>("radius"));
     return flamegpu::ALIVE;
 }
 
 // Models repulsion force without division/apoptosis
-FLAMEGPU_AGENT_FUNCTION(compute_force_meineke_spring, flamegpu::MessageSpatial2D, flamegpu::MessageNone) {
+FLAMEGPU_AGENT_FUNCTION(compute_force_meineke_spring, flamegpu::MessageSpatial3D, flamegpu::MessageNone) {
     const double x = FLAMEGPU->getVariable<float>("x");
     const double y = FLAMEGPU->getVariable<float>("y");
+    const double z = FLAMEGPU->getVariable<float>("z");
     float x_force = 0.0;
     float y_force = 0.0;
+    float z_force = 0.0;
     float radius = FLAMEGPU->getVariable<float>("radius");
 
-    for (const auto& message : FLAMEGPU->message_in(x, y)) {
+    for (const auto& message : FLAMEGPU->message_in(x, y, z)) {
         float other_x = message.getVariable<float>("x");
         float other_y = message.getVariable<float>("y");
+        float other_z = message.getVariable<float>("z");
         float other_radius = message.getVariable<float>("radius");
         
         // Compute unit distance
         float x_dist = other_x - x;
         float y_dist = other_y - y;
-        float distance_between_nodes = sqrt(x_dist * x_dist + y_dist * y_dist);
+        float z_dist = other_z - z;
+        float distance_between_nodes = sqrt(x_dist * x_dist + y_dist * y_dist + z_dist * z_dist);
 
         float unit_x = x_dist / distance_between_nodes;
         float unit_y = y_dist / distance_between_nodes;
+        float unit_z = z_dist / distance_between_nodes;
         
         // Only compute force if within cutoff distance and for positive distance
         const float cutoff_length = 1.5f;
@@ -88,12 +94,14 @@ FLAMEGPU_AGENT_FUNCTION(compute_force_meineke_spring, flamegpu::MessageSpatial2D
                 //assert(overlap > -rest_length_final);
                 x_force += multiplication_factor * spring_stiffness * unit_x * rest_length_final* log(1.0 + overlap/rest_length_final);
                 y_force  = multiplication_factor * spring_stiffness * unit_y * rest_length_final* log(1.0 + overlap/rest_length_final);
+                z_force  = multiplication_factor * spring_stiffness * unit_z * rest_length_final* log(1.0 + overlap/rest_length_final);
             }
             else
             {
                 double alpha = 5.0;
                 x_force += multiplication_factor * spring_stiffness * unit_x * overlap * exp(-alpha * overlap/rest_length_final);
                 y_force += multiplication_factor * spring_stiffness * unit_y * overlap * exp(-alpha * overlap/rest_length_final);
+                z_force += multiplication_factor * spring_stiffness * unit_z * overlap * exp(-alpha * overlap/rest_length_final);
             }
         }
 
@@ -101,6 +109,7 @@ FLAMEGPU_AGENT_FUNCTION(compute_force_meineke_spring, flamegpu::MessageSpatial2D
     }
     FLAMEGPU->setVariable<float>("x_force", x_force);        
     FLAMEGPU->setVariable<float>("y_force", y_force);        
+    FLAMEGPU->setVariable<float>("z_force", z_force);        
     return flamegpu::ALIVE;
 }
 
@@ -139,9 +148,11 @@ void GPUModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rC
     for (auto iter = rMesh.GetNodeIteratorBegin(); iter != rMesh.GetNodeIteratorEnd(); ++iter) {
       cellVector[i].setVariable<float>("x", iter->rGetLocation()[0]);
       cellVector[i].setVariable<float>("y", iter->rGetLocation()[1]);
+      cellVector[i].setVariable<float>("z", iter->rGetLocation()[2]);
       cellVector[i].setVariable<float>("radius", 1.5f);
       cellVector[i].setVariable<float>("x_force", 0.0f);
       cellVector[i].setVariable<float>("y_force", 0.0f);
+      cellVector[i].setVariable<float>("z_force", 0.0f);
       i++;
     }
 
@@ -166,6 +177,7 @@ void GPUModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rC
     for (auto iter = rMesh.GetNodeIteratorBegin(); iter != rMesh.GetNodeIteratorEnd(); ++iter) {
         iter->rGetModifiableLocation()[0] = cellVector[i].getVariable<float>("x");
         iter->rGetModifiableLocation()[1] = cellVector[i].getVariable<float>("y");
+        iter->rGetModifiableLocation()[2] = cellVector[i].getVariable<float>("z");
         i++;
     }
     auto device_host_transfer_complete_time = std::chrono::high_resolution_clock::now();
@@ -185,17 +197,20 @@ void GPUModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulati
     mpCellAgentDescription = std::make_unique<flamegpu::AgentDescription>(mpFlameGPUModel->newAgent("cell"));
     mpCellAgentDescription->newVariable<float>("x");
     mpCellAgentDescription->newVariable<float>("y");
+    mpCellAgentDescription->newVariable<float>("z");
     mpCellAgentDescription->newVariable<float>("radius");
     mpCellAgentDescription->newVariable<float>("x_force");
     mpCellAgentDescription->newVariable<float>("y_force");
+    mpCellAgentDescription->newVariable<float>("z_force");
     
     // Define the location message
-    flamegpu::MessageSpatial2D::Description location_message = mpFlameGPUModel->newMessage<flamegpu::MessageSpatial2D>("location_message");
+    flamegpu::MessageSpatial3D::Description location_message = mpFlameGPUModel->newMessage<flamegpu::MessageSpatial3D>("location_message");
     //location_message.newVariable<float>("x"); // Implicit for spatial message
     //location_message.newVariable<float>("y"); // Implicit for spatial message
+    //location_message.newVariable<float>("z"); // Implicit for spatial message
     location_message.newVariable<float>("radius");
-    location_message.setMin(-500.0, -500.0);
-    location_message.setMax(500.0, 500.0);
+    location_message.setMin(-500.0, -500.0, -500.0);
+    location_message.setMax(500.0, 500.0, 500.0);
     location_message.setRadius(1.5);
 
     // Agent functions
@@ -215,7 +230,7 @@ void GPUModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulati
       
     // Construct a simulation object from the model and configure it to run for a single step
     mpFlameGPUSimulation = std::make_unique<flamegpu::CUDASimulation>(*mpFlameGPUModel);
-    mpFlameGPUSimulation->SimulationConfig().steps = 300;
+    mpFlameGPUSimulation->SimulationConfig().steps = 1;
     
     // Allocate a vector for transferring agent data between host & device
     mpCellAgentVector = std::make_unique<flamegpu::AgentVector>(*mpCellAgentDescription);
