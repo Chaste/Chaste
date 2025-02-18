@@ -21,8 +21,8 @@ We no longer distribute cardiac executables due to difficulties getting compatib
 However the top level apps directory (and indeed the apps directory in any user project) can have stand-alone executables with their own int main() methods.
 to compile these as an executable:
 
-`cmake .. where .. is the source folder for Chaste` followed by
-`make <target name> -DCMAKE_BUILD_TYPE=Release` where is your build target e.g. Chaste, or a user project such as ApPredict
+`cmake ..` where `..` is the source folder for Chaste, followed by
+`make <target_name> -DCMAKE_BUILD_TYPE=Release` where `target_name` is your build target e.g. Chaste, or a user project such as ApPredict
 
 === Running the converter ===
 
