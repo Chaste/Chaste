@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -63,7 +63,7 @@ private:
     unsigned mIndex;
 
     /** The location of this node within the mesh. */
-    c_vector<double, SPACE_DIM> mLocation;
+    c_vector<double, SPACE_DIM> mLocation = {};
 
     /** A pointer to a NodeAttributes object associated with this node. */
     NodeAttributes<SPACE_DIM>* mpNodeAttributes;

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,20 +48,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * If you want to use parameters that are supplied in the command line, then
  *  (i) add lines such as "double x = CommandLineArguments::Instance()->GetDoubleCorrespondingToOption("-myparam");" below
- *  (ii) compile but do not run the test (see ChasteGuides/RunningBinariesFromCommandLine)
- *  (iii) run the compiled executable from the command line (see ChasteGuides/RunningBinariesFromCommandLine), with your parameter.
- *        If, at this step, you "undefined symbol:" errors then set your LD_LIBRARY_PATH (see ChasteGuides/RunningBinariesFromCommandLine)
+ *  (ii) compile but do not run the test,
+ *  (iii) run the compiled executable from the command line, with your parameter.
+ *        If, at this step, you "undefined symbol:" errors then set your LD_LIBRARY_PATH (see [Running Binaries from the Command Line](/docs/user-guides/running-binaries-from-command-line/))
  *
- *
- *
+ * 
+ * 
  *  For example:
  * `cmake ..` where .. is the Chaste source dir follwoed by 
  * make <target> -D<option=value> where target is the build target you are building (e.g. Cmake, Heart, or user project such as ApPredict,) and option and value are the designed build options.
- *
  * Note: error messages such as
  *   WARNING! There are options you set that were not used!
  *   WARNING! could be spelling mistake, etc!
- * are due to PETSc thinking the parameter must have been for it.
+ * are due to PETSc thinking the parameter must have been for it rather than Chaste, and can be ignored.
  *
  */
 class TestCommandLineArguments : public CxxTest::TestSuite

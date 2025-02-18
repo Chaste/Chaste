@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -714,8 +714,8 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
             electrics_solution = p_electrics_solver->Solve();
 
             PetscReal min_voltage, max_voltage;
-            VecMax(electrics_solution,PETSC_NULL,&max_voltage); //the second param is where the index would be returned
-            VecMin(electrics_solution,PETSC_NULL,&min_voltage);
+            VecMax(electrics_solution,CHASTE_PETSC_NULLPTR,&max_voltage); //the second param is where the index would be returned
+            VecMin(electrics_solution,CHASTE_PETSC_NULLPTR,&min_voltage);
             if (i==0)
             {
                 LOG(2, "  minimum and maximum voltage is " << min_voltage <<", "<<max_voltage);

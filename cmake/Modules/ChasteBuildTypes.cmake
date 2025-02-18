@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2019, University of Oxford.
+# Copyright (c) 2005-2024, University of Oxford.
 # All rights reserved.
 #
 # University of Oxford means the Chancellor, Masters and Scholars of the
@@ -84,7 +84,7 @@ SET(CMAKE_EXE_LINKER_FLAGS_AGGRESSIVEOPT
         "Flags used for linking binaries during release builds with more aggressive optimisation."
         FORCE)
 SET(CMAKE_SHARED_LINKER_FLAGS_AGGRESSIVEOPT
-        "${CMAKE_EXE_LINKER_FLAGS_RELEASE}" CACHE STRING
+        "${CMAKE_SHARED_LINKER_FLAGS_RELEASE}" CACHE STRING
         "Flags used by the shared libraries linker during release builds with more aggressive optimisation."
         FORCE)
 MARK_AS_ADVANCED(
@@ -117,7 +117,7 @@ SET(CMAKE_EXE_LINKER_FLAGS_DEBUGOPT
         "Flags used for linking binaries during debug builds in an edit-compile-debug workflow."
         FORCE)
 SET(CMAKE_SHARED_LINKER_FLAGS_DEBUGOPT
-        "${CMAKE_EXE_LINKER_FLAGS_RELEASE}" CACHE STRING
+        "${CMAKE_SHARED_LINKER_FLAGS_RELEASE}" CACHE STRING
         "Flags used by the shared libraries linker debug builds in an edit-compile-debug workflow."
         FORCE)
 MARK_AS_ADVANCED(

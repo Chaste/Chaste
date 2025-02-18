@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -70,6 +70,12 @@ std::string ChasteComponentBuildDir(const std::string& rComponent);
  * that contains the compiled files.
  */
 std::string ChasteBuildDirName();
+
+/**
+ * @return the default location of the test output. This can be overridden
+ * by setting env var CHASTE_TEST_OUTPUT.
+ */
+std::string DefaultChasteTestOutput();
 
 /**
  * @return the build type string used in building Chaste.

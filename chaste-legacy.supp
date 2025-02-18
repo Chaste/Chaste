@@ -1,0 +1,349 @@
+#############################################################
+# Suppressions of library errors in Ubuntu versions prior   #
+# to our current memory testing base (Ubuntu 22.04).        #
+#                                                           #
+# New suppressions should NOT BE ADDED HERE but rather to   #
+# the current suppression file "chaste.supp".               #
+#                                                           #
+# Some of these are very old but have been updated to use   #
+# the "..." syntax which is available to modern versions    #
+# of Valgrind.  If you spot suppressions of upsupported     #
+# library versions then please feel free to remove them.    #
+#############################################################
+
+
+
+# Miscellaneous (PETSc or Boost)
+################################
+{
+    Leak in nss_lookup_function
+    Memcheck:Leak
+    ...
+    fun:PetscGetUserName
+}
+{
+   Unset filename in HYPRE_BoomerAMG todo: should this be set?
+   Memcheck:Cond
+   ...
+   fun:hypre_BoomerAMGSetPlotFileName
+   ...
+   fun:PCSetFromOptions
+}
+{
+   leak due to boost bug (1)
+   Memcheck:Leak
+   fun:_Znwj
+   ...
+   fun:*WntConcentration*
+}
+{
+   leak due to boost bug (2)
+   Memcheck:Leak
+   fun:_Znwj
+   ...
+   fun:_ZN13ArchiveOpener*
+}
+{
+   leak due to boost bug (3)
+   Memcheck:Leak
+   fun:_Znwj
+   ...
+   fun:_ZN20OdeSystemInformation*Initialise*
+}
+{
+   leak due to boost bug (4)
+   Memcheck:Leak
+   fun:_Znwj
+   ...
+   fun:_ZN27CellBasedSimulationArchiver*
+}
+{
+   leak due to boost bug (5)
+   Memcheck:Leak
+   fun:_Znwj
+   ...
+   fun:_dl_init
+}
+{
+   keyval create (malloc)
+   Memcheck:Leak
+   fun:malloc
+   ...
+   fun:PMPI_Keyval_create
+}
+{
+   get-user-name-leak-generic
+   Memcheck:Leak
+   fun:malloc
+   ...
+   fun:_Z16PetscGetUserNamePc?
+}
+# OpenMPI https://github.com/cpmech/test-openmpi-valgrind
+{
+   OpenMPI/start_thread
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   ...
+   fun:clone
+}
+{
+   leak due to boost bug (6)
+   Memcheck:Leak
+   fun:malloc
+   fun:backtrace_symbols
+   ...
+   fun:_dl_fini
+}
+{
+   dlopen-addr2
+   Memcheck:Addr8
+   obj:/lib/ld-*.so
+   ...
+   fun:dlopen
+}
+{
+   dlsym-addr
+   Memcheck:Addr8
+   obj:/lib/ld-*.so
+   ...
+   fun:dlsym
+}
+# CVODE
+#######
+{
+   CVODE    CVode stopping event todo - check this
+   Memcheck:Cond
+   fun:CVode
+   fun:_ZN12CvodeAdaptor5SolveEP17AbstractOdeSystemRSt6vectorIdSaIdEEdddd
+   fun:_ZN16TestCvodeAdaptor*
+}
+# HDF5
+######
+{
+   H5F HDF5 file create
+   Memcheck:Leak
+   fun:malloc
+   ...
+   fun:H5F_open
+}
+# Obsolete syntax
+#{
+#   H5F: HDF5 write on closure
+#   Memcheck:Param
+#   pwritev(vector[...])
+#   ...
+#   fun:H5Fclose
+#}
+{
+   H5F: HDF5-free-lists-variant2
+   Memcheck:Param
+   write(buf)
+   ...
+   fun:H5Fclose
+}
+# PETSc/OpenMPI
+###############
+{
+   PetscFinalize    petsc finalize (malloc)
+   Memcheck:Leak
+   fun:malloc
+   ...
+   fun:*PetscFinalize*
+}
+{
+   PetscInitialize    OpenMPI PETSc init (invalid read 8)
+   Memcheck:Addr8
+   ...
+   fun:*PetscInitialize*
+}
+{
+   PetscInitialize    mpi_init (calloc)
+   Memcheck:Leak
+   fun:calloc
+   ...
+   fun:*PetscInitialize*
+}
+{
+   OpenMPI/PetscInitialize
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:calloc
+   ...
+   fun:PetscInitialize
+}
+{
+   PetscInitialize    mpi_init (malloc)
+   Memcheck:Leak
+   fun:malloc
+   ...
+   fun:*PetscInitialize*
+}
+{
+   PetscInitialize    get-user-name-4
+   Memcheck:Leak
+   fun:malloc
+   ...
+   fun:_Z15PetscInitializePiPPPcPKcS4_
+}
+{
+   PetscInitialize    OpenMPI PETSc init (invalid read 4)
+   Memcheck:Addr4
+   fun:opal_os_dirpath_create
+   ...
+   fun:*PetscInitialize*
+}
+{
+   PetscInitialize    mpi_init (realloc)
+   Memcheck:Leak
+   fun:realloc
+   ...
+   fun:*PetscInitialize*
+}
+{
+   PetscInitialize    get-user-name-2
+   Memcheck:Addr8
+   obj:/lib/ld-2.6.1.so
+   ...
+   fun:_Z15PetscInitializePiPPPcPKcS4_
+}
+{
+   PetscInitialize    get-user-name-6
+   Memcheck:Addr8
+   obj:/lib/ld-2.7.so
+   ...
+   fun:_Z15PetscInitializePiPPPcPKcS4_
+}
+{
+   PetscInitialize    mpi_init (sched)
+   Memcheck:Param
+   sched_setaffinity(mask)
+   ...
+   fun:*PetscInitialize*
+}
+{
+   PetscInitialize    mpi_init (writev)
+   Memcheck:Param
+   writev(vector[...])
+   ...
+   fun:*PetscInitialize*
+}
+# Boost
+#######
+{
+   boost-archive-reset-object-address-cond-v34-doubles
+   Memcheck:Cond
+   fun:_ZN5boost7archive6detail14basic_iarchive20reset_object_addressEPKvS4_
+   ...
+   fun:_ZN5boost7archive6detail21load_non_pointer_typeINS0_13text_iarchiveESt6vectorIdSaIdEEE13load_standard6invokeERS3_RS6_
+}
+{
+   boost-archive-reset-object-address-cond-v34-ints
+   Memcheck:Cond
+   fun:_ZN5boost7archive6detail14basic_iarchive20reset_object_addressEPKvS4_
+   ...
+   fun:_ZN5boost7archive6detail21load_non_pointer_typeINS0_13text_iarchiveESt6vectorIiSaIiEEE13load_standard6invokeERS3_RS6_
+}
+# Bug in Boost 1.44 - 1.46
+{
+   boost terminate bug
+   Memcheck:Addr4
+   fun:_ZNK5boost13serialization13typeid_system27extended_type_info_typeid_012is_less_thanERKNS0_18extended_type_infoE
+   ...
+   fun:__cxa_finalize
+}
+{
+   boost serialization error
+   Memcheck:Leak
+   fun:_Znw*
+   fun:_ZNK5boost13serialization16void_cast_detail11void_caster18recursive_registerEb
+}
+# Tetgen
+########
+{
+   tetgen    Memory problem in Tetgen with quadratic meshes
+   Memcheck:Cond
+   fun:_ZN6tetgen10tetgenmesh13pointtraverseEv
+   fun:_ZN6tetgen10tetgenmesh8outnodesEPNS_8tetgenioE
+   fun:_ZN6tetgen14tetrahedralizeEPNS_14tetgenbehaviorEPNS_8tetgenioES3_S3_S3_
+   fun:_ZN6tetgen14tetrahedralizeEPcPNS_8tetgenioES2_S2_S2_
+   fun:_ZN13QuadraticMeshILj3EE15ConstructCuboidEjjj
+   fun:_ZN23AbstractTetrahedralMeshILj3ELj3EE24ConstructRegularSlabMeshEdddd
+}
+{
+   tetgen    Memory problem in Tetgen with quadratic meshes - different entry point
+   Memcheck:Cond
+   fun:_ZN6tetgen10tetgenmesh13pointtraverseEv
+   fun:_ZN6tetgen10tetgenmesh8outnodesEPNS_8tetgenioE
+   fun:_ZN6tetgen14tetrahedralizeEPNS_14tetgenbehaviorEPNS_8tetgenioES3_S3_S3_
+   fun:_ZN6tetgen14tetrahedralizeEPcPNS_8tetgenioES2_S2_S2_
+   fun:_ZN13QuadraticMeshILj3EE29ConstructFromLinearMeshReaderER18AbstractMeshReaderILj3ELj3EE
+}
+# VTK
+#####
+{
+   vtk: VTK ExpandTable Writer UnRegister
+   Memcheck:Cond
+   fun:_ZN14vtkInformation11ExpandTableEv
+   ...
+      fun:_ZN16VertexMeshWriter*
+}
+{
+   vtk: VTK ExpandTable Writer
+   Memcheck:Cond
+   fun:_ZN14vtkInformation11ExpandTableEv
+   ...
+   fun:*MeshWriter*
+}
+{
+   vtk    VTK ExpandTable Reader
+   Memcheck:Cond
+   fun:_ZN14vtkInformation11ExpandTableEv
+   ...
+   fun:_ZN13VtkMeshReader*
+}
+{
+   vtk: VTK-information leak
+   Memcheck:Addr8
+   fun:_ZN14vtkInformation15SetAsObjectBaseEP17vtkInformationKeyP13vtkObjectBase
+   ...
+   fun:_ZN12vtkXMLWriter5WriteEv
+}
+{
+   vtk: VTK-information-copy
+   Memcheck:Cond
+   fun:_ZN14vtkInformation4CopyEPS_i
+   ...
+   fun:_ZN13VtkMeshReader*
+}
+{
+   vtk: VTK-information delete
+   Memcheck:Cond
+   fun:_ZN14vtkInformationD*Ev
+   ...
+   fun:*V*Mesh*er*
+}
+{
+   vtk: VTK ZLib
+   Memcheck:Cond
+   fun:inflateReset2
+   ...
+   fun:_ZN17vtkDataCompressor10UncompressEPKhmPhm
+}
+{
+   vtk: VTK ZLib with fewer inits
+   Memcheck:Cond
+   fun:inflateReset2
+   ...
+   fun:_ZN21vtkZLibDataCompressor16UncompressBufferEPKhmPhm
+}
+#
+# Xerces memory error
+#
+{
+   xerces-reader
+   Memcheck:Cond
+   fun:_ZN11xercesc_2_717XMLUTF8Transcoder13transcodeFromEPKhjPtjRjPh
+   fun:_ZN11xercesc_2_79XMLReader14xcodeMoreCharsEPtPhj
+   fun:_ZN11xercesc_2_79XMLReader17refreshCharBufferEv
+}

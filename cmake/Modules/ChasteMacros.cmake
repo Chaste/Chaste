@@ -75,7 +75,7 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
     endif()
     set(depends ${cellml_dir}/${cellml_file_name}.cellml)
     
-    execute_process(COMMAND "${codegen_python3_venv}/chaste_codegen" ${codegen_args} ${Chaste_CODEGEN_EXTRA_ARGS} --show-outputs ${cellml_file}
+    execute_process(COMMAND "${chaste_python3_venv}/chaste_codegen" ${codegen_args} ${Chaste_CODEGEN_EXTRA_ARGS} --show-outputs ${cellml_file}
         OUTPUT_VARIABLE ConvertCellModelDepends
         OUTPUT_STRIP_TRAILING_WHITESPACE
         )
@@ -88,7 +88,7 @@ macro(Chaste_DO_CELLML output_sources cellml_file dynamic)
     endif()
 
     add_custom_command(OUTPUT ${output_files_hpp} ${output_files_cpp}
-        COMMAND "${codegen_python3_venv}/chaste_codegen" ${codegen_args} ${Chaste_CODEGEN_EXTRA_ARGS} ${cellml_file}
+        COMMAND "${chaste_python3_venv}/chaste_codegen" ${codegen_args} ${Chaste_CODEGEN_EXTRA_ARGS} ${cellml_file}
         DEPENDS ${depends}
         COMMENT "Processing CellML file ${cellml_file_rel}"
         WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
@@ -115,15 +115,6 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
         set(_testname ${_testTargetName})
     endif()
 
-    string(REGEX MATCH "^.*Codegen$" foundCodegen ${_testTargetName})
-    if (foundCodegen)
-        set(codegen ON)
-        string(REGEX REPLACE "(Codegen)$" "" _testname "${_testTargetName}")
-    else()
-        set(codegen OFF)
-        set(_testname ${_testTargetName})
-    endif()
-
     if (${_filename} MATCHES ".py$")
         set(python ON)
     else()
@@ -132,7 +123,7 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
 
 
     if (python)
-        set(test_exe ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/python/infra/TestPythonCode.py ${_filename})
+        set(test_exe ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/python/infra/TestPythonCode.py ${_filename})
     else()
         set(_exeTargetName ${_testname})
 
@@ -141,12 +132,13 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
             add_custom_command(
                 OUTPUT "${_test_real_output_filename}"
                 DEPENDS ${_filename} ${ARGN}
-                COMMAND ${PYTHON_EXECUTABLE} ${CXXTEST_PYTHON_TESTGEN_EXECUTABLE} --error-printer -o "${_test_real_output_filename}" ${_filename} ${ARGN}
+                COMMAND ${Python3_EXECUTABLE} ${CXXTEST_PYTHON_TESTGEN_EXECUTABLE} --error-printer -o "${_test_real_output_filename}" ${_filename} ${ARGN}
                 )
 
             set_source_files_properties("${_test_real_output_filename}" PROPERTIES GENERATED true)
 
             add_executable(${exeTargetName} "${_test_real_output_filename}" ${_filename} ${ARGN})
+            target_link_libraries(${exeTargetName} PRIVATE Chaste_COMMON_DEPS)
         endif()
 
         set(test_exe $<TARGET_FILE:${exeTargetName}>)
@@ -318,7 +310,9 @@ macro(Chaste_DO_COMMON component)
     # Make component library, if component contains any source files
     if (NOT Chaste_${component}_SOURCES STREQUAL "")
         add_library(chaste_${component} ${Chaste_${component}_SOURCES} ${ARGN})
+        target_link_libraries(chaste_${component} PRIVATE Chaste_COMMON_DEPS)
         if (BUILD_SHARED_LIBS)
+            target_link_options(chaste_${component} PRIVATE "${Chaste_SHARED_LINKER_FLAGS}")
             target_link_libraries(chaste_${component} LINK_PUBLIC ${Chaste_LIBRARIES})
             set(static_extension "a")
             set(keyword "")
@@ -429,6 +423,7 @@ macro(Chaste_DO_APPS_COMMON component)
             set(component_library )
         endif()
         add_executable(${appName} ${app})
+        target_link_libraries(${appName} PRIVATE Chaste_COMMON_DEPS)
         #set_target_properties(${appName} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src)
 
         if (NOT ${component} STREQUAL "")
@@ -460,9 +455,9 @@ macro(Chaste_DO_APPS_COMMON component)
                 file(REMOVE_RECURSE ${texttest_output_dir})
                 file(MAKE_DIRECTORY ${texttest_report_dir})
                 file(MAKE_DIRECTORY ${texttest_output_dir})
-                execute_process(COMMAND  ${PYTHON_EXECUTABLE} ${TEXTTEST_PY} -d ${tests_dir} -b default -c ${CMAKE_BINARY_DIR} 
+                execute_process(COMMAND  ${Python3_EXECUTABLE} ${TEXTTEST_PY} -d ${tests_dir} -b default -c ${CMAKE_BINARY_DIR} 
                     RESULT_VARIABLE result)
-                execute_process(COMMAND  ${PYTHON_EXECUTABLE} ${TEXTTEST_PY} -d ${tests_dir} -b default -c ${CMAKE_BINARY_DIR} -coll web)
+                execute_process(COMMAND  ${Python3_EXECUTABLE} ${TEXTTEST_PY} -d ${tests_dir} -b default -c ${CMAKE_BINARY_DIR} -coll web)
                 if (result)
                     message(SEND_ERROR \"Error running acceptance test\")
                 endif()
@@ -528,6 +523,10 @@ macro(Chaste_DO_TEST_COMMON component)
     file(GLOB_RECURSE test_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
     if(test_sources)
         add_library(test${component} STATIC ${test_sources})
+        if (BUILD_SHARED_LIBS)
+            target_link_options(test${component} PRIVATE "${Chaste_SHARED_LINKER_FLAGS}")
+        endif ()
+        target_link_libraries(test${component} PRIVATE Chaste_COMMON_DEPS)
         set(COMPONENT_LIBRARIES ${COMPONENT_LIBRARIES} test${component})
     endif()
 
@@ -571,14 +570,14 @@ macro(Chaste_DO_TEST_COMMON component)
                     set(testTargetName ${testTargetName}Parallel)
                     set(parallel ON)
                 endif()
-                set(codegen OFF)
-                set(exeTargetName ${testTargetName})
-                if (${type} STREQUAL "Codegen")
-                    set(testTargetName ${testTargetName}Codegen)
-                    set(codegen ON)
-                endif()
 
-                if (NOT DEFINED ${testTargetName})
+                if (DEFINED ${testTargetName})
+                    # if the test has already been defined, add it to this test pack
+                    get_property(test_labels TEST ${testTargetName} PROPERTY LABELS)
+                    list(APPEND test_labels ${type}_${component})
+                    set_property(TEST ${testTargetName} PROPERTY LABELS "${test_labels}")
+
+                else()
                     set(${testTargetName} ON)
                     chaste_add_test(${testTargetName} "${CMAKE_CURRENT_SOURCE_DIR}/${filename}")
 
@@ -613,9 +612,9 @@ macro(Chaste_DO_TEST_COMMON component)
                         else()
                             set(revision_string "")
                         endif()
-                        set(out_filename  ${CMAKE_BINARY_DIR}/tutorials/UserTutorials/${CMAKE_MATCH_1})
+                        set(out_filename  ${CMAKE_BINARY_DIR}/tutorials/UserTutorials/${CMAKE_MATCH_1}.md)
                         add_custom_command(OUTPUT ${out_filename}
-                            COMMAND ${PYTHON_EXECUTABLE} ARGS ${Chaste_BINARY_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename} ${revision_string}
+                            COMMAND ${Python3_EXECUTABLE} ARGS ${Chaste_BINARY_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename} ${revision_string}
                             DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${filename}
                             COMMENT "Generating user tutorial ${out_filename}" VERBATIM)
                         add_custom_target(${CMAKE_MATCH_1} DEPENDS ${out_filename})
@@ -624,9 +623,9 @@ macro(Chaste_DO_TEST_COMMON component)
 
                     # filename is a paper tutorial
                     if(filename MATCHES "Test(.*)LiteratePaper.(hpp|py)") 
-                        set(out_filename  ${CMAKE_BINARY_DIR}/tutorials/PaperTutorials/${CMAKE_MATCH_1})
+                        set(out_filename  ${CMAKE_BINARY_DIR}/tutorials/PaperTutorials/${CMAKE_MATCH_1}.md)
                         add_custom_command(OUTPUT ${out_filename}
-                            COMMAND ${PYTHON_EXECUTABLE} ARGS ${Chaste_BINARY_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename} 
+                            COMMAND ${Python3_EXECUTABLE} ARGS ${Chaste_BINARY_DIR}/python/utils/CreateTutorial.py ${CMAKE_CURRENT_SOURCE_DIR}/${filename} ${out_filename} 
                             DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${filename}
                             COMMENT "Generating paper tutorial ${out_filename}" VERBATIM)
                         add_custom_target(${CMAKE_MATCH_1} DEPENDS ${out_filename})

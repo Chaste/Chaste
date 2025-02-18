@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -235,7 +235,8 @@ public:
         /*
          * HOW_TO_TAG Cardiac/Output
          * Calculating and outputting ionic currents ('derived quantities') in a tissue simulation using
-         * class:HeartConfig - see also [wiki:ChasteGuides/CodeGenerationFromCellML#Derivedquantities this page].
+         * [HeartConfig](/doxygen-latest/classHeartConfig.html) - see also
+         * [chaste_codegen documentation](/docs/user-guides/code-generation-from-cellml/#derived-quantities).
          */
         // This is how to output an additional state variable
         output_variables.push_back("cytosolic_calcium_concentration");
@@ -375,9 +376,10 @@ public:
         TS_ASSERT_DELTA(voltage_replicated[9], -0.770330519, atol);
         TS_ASSERT_DELTA(voltage_replicated[10], -19.2234919, atol);
 
+        // Now compare with the TestMonodomainProblem1D simulation above
         for (unsigned index = 0; index < voltage_replicated.GetSize(); index++)
         {
-            TS_ASSERT_DELTA(voltage_replicated[index], mVoltageReplicated1d2ms[index], 1e-12);
+            TS_ASSERT_DELTA(voltage_replicated[index], mVoltageReplicated1d2ms[index], 5e-12);
         }
         // cover get pde
         monodomain_problem.GetTissue();

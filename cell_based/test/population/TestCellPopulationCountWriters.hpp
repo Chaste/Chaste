@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "ArchiveOpener.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -56,6 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
+#include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 
 #include "MeshBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
@@ -65,6 +67,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulationWithParticles.hpp"
 #include "PottsBasedCellPopulation.hpp"
 #include "VertexBasedCellPopulation.hpp"
+#include "ImmersedBoundaryCellPopulation.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -78,7 +81,7 @@ public:
 
         // Create a simple 2D CaBasedCellPopulation
         PottsMeshGenerator<2> generator(5, 0, 0, 5, 0, 0);
-        PottsMesh<2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         cells_generator.GenerateBasic(cells, 5u);
@@ -175,6 +178,29 @@ public:
 
         FileComparison(results_dir + "cellcyclephases.dat", "cell_based/test/data/TestCellPopulationCountWriters/cellcyclephases.dat").CompareFiles();
 
+        // Coverage of the Visit() method when called with an ImmersedBoundaryCellPopulation
+        {
+            // Create an immersed boundary cell population object
+            ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
+            ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+
+            std::vector<CellPtr> cells;
+            CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+            ImmersedBoundaryCellPopulation<2> ib_cell_population(*p_mesh, cells);
+
+            CellProliferativePhasesCountWriter<2,2> ib_phases_count_writer;
+
+            ib_phases_count_writer.OpenOutputFile(output_file_handler);
+            ib_phases_count_writer.WriteTimeStamp();
+            ib_phases_count_writer.Visit(&ib_cell_population);
+            ib_phases_count_writer.WriteNewline();
+            ib_phases_count_writer.CloseFile();
+
+            FileComparison(results_dir + "cellcyclephases.dat", "cell_based/test/data/TestCellPopulationCountWriters/cellcyclephases.dat").CompareFiles();
+        }
+
         // Test that we can append to files
         phases_count_writer.OpenOutputFileForAppend(output_file_handler);
         phases_count_writer.WriteTimeStamp();
@@ -183,6 +209,7 @@ public:
         phases_count_writer.CloseFile();
 
         FileComparison(results_dir + "cellcyclephases.dat", "cell_based/test/data/TestCellPopulationCountWriters/cellcyclephases_twice.dat").CompareFiles();
+
     }
 
     void TestCellProliferativePhasesCountWriterArchiving()

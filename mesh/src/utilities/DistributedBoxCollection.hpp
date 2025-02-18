@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -78,7 +78,7 @@ private:
     std::map<unsigned, unsigned> mHaloBoxesMapping;
 
     /** The domain being partitioned. */
-    c_vector<double, 2*DIM> mDomainSize;
+    c_vector<double, 2*DIM> mDomainSize = {};
 
     /** The width of each box. */
     double mBoxWidth;
@@ -87,7 +87,7 @@ private:
     unsigned mNumBoxes;
 
     /** Number of boxes in each direction. */
-    c_vector<unsigned, DIM> mNumBoxesEachDirection;
+    c_vector<unsigned, DIM> mNumBoxesEachDirection = {};
 
     /** Number of boxes in a face (1 in 1d, mNumBoxesEachDirection(0) in 2d, mNumBoxesEachDirection(0)*mNumBoxesEachDirection(1) in 3d */
     unsigned mNumBoxesInAFace;
@@ -163,7 +163,7 @@ public:
      * if there are more than 3 processes the domain will be swollen to [(0,0,0), (3,3,num_procs)].  The
      * user is warned when this happens.
      */
-    DistributedBoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX = false, bool mIsPeriodicInY=false, bool mIsPeriodicInZ=false, int localRows = PETSC_DECIDE);
+    DistributedBoxCollection(double boxWidth, c_vector<double, 2*DIM> domainSize, bool isPeriodicInX = false, bool isPeriodicInY=false, bool isPeriodicInZ=false, int localRows = PETSC_DECIDE);
 
     /**
      * Destructor - frees memory allocated to distributed vector.

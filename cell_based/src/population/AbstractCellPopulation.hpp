@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -66,13 +66,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Forward declaration prevents circular include chain
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractCellBasedSimulation;
-
 /**
  * An abstract facade class encapsulating a cell population.
  *
  * Contains a group of cells and associated methods.
+ *
+ * @tparam ELEMENT_DIM Dimension of the elements.
+ * @tparam SPACE_DIM Dimension of the space. If not specified, it defaults to ELEMENT_DIM.
  */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+#ifdef DOXYGEN_CHASTE_ISSUE_199 // See https://github.com/Chaste/Chaste/issues/199
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+#else
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
+#endif
 class AbstractCellPopulation : public Identifiable
 {
 private:
@@ -594,6 +600,14 @@ public:
     virtual std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell)=0;
 
     /**
+     * Gets the local edge index of the neighbouring element
+     * @param pCell  Cell pointer
+     * @param pEdgeIndex Local edge index
+     * @return pair of element location and local edge index
+     */
+    virtual std::set<std::pair<unsigned, unsigned>> GetNeighbouringEdgeIndices(CellPtr pCell, unsigned pEdgeIndex);
+
+    /**
      * @return the centroid of the cell population.
      */
     c_vector<double, SPACE_DIM> GetCentroidOfCellPopulation();
@@ -624,7 +638,7 @@ public:
      *
      * The method also closes the .pvd output file if VTK is available.
      */
-    void CloseWritersFiles();
+    virtual void CloseWritersFiles();
 
     /**
      * Write results from the current cell population state to output files.
@@ -659,7 +673,7 @@ public:
      * As this method is pure virtual, it must be overridden
      * in subclasses.
      *
-     * @param pPopulationCountWriter the population count writer.
+     * @param pPopulationEventWriter the population event writer.
      */
     virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationEventWriter)=0;
 
@@ -780,7 +794,6 @@ public:
      * Add a cell population writer based on its type. Template parameters are inferred from the population.
      * The implementation of this function must be available in the header file.
      *
-     * @return This method returns void
      */
     template<template <unsigned, unsigned> class T>
     void AddPopulationWriter()
@@ -792,7 +805,6 @@ public:
      * Add a cell writer based on its type. Template parameters are inferred from the population.
      * The implementation of this function must be available in the header file.
      *
-     * @return This method returns void
      */
     template<template <unsigned, unsigned> class T>
     void AddCellWriter()
@@ -804,7 +816,6 @@ public:
      * Add a cell population count writer based on its type. Template parameters are inferred from the population.
      * The implementation of this function must be available in the header file.
      *
-     * @return This method returns void
      */
     template<template <unsigned, unsigned> class T>
     void AddCellPopulationCountWriter()
@@ -816,7 +827,6 @@ public:
      * Add a cell population event writer based on its type. Template parameters are inferred from the population.
      * The implementation of this function must be available in the header file.
      *
-     * @return This method returns void
      */
     template<template <unsigned, unsigned> class T>
     void AddCellPopulationEventWriter()
@@ -831,7 +841,6 @@ public:
      * with a non-default value for its member mFileName.
      *
      * @param pPopulationWriter shared pointer to a cell population writer
-     * @return This method returns void
      */
     void AddPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter)
     {
@@ -845,7 +854,6 @@ public:
      * with a non-default value for its member mFileName.
      *
      * @param pCellWriter shared pointer to a cell writer
-     * @return This method returns void
      */
     void AddCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter)
     {
@@ -859,7 +867,6 @@ public:
      * with a non-default value for its member mFileName.
      *
      * @param pCellPopulationCountWriter shared pointer to a cell population count writer
-     * @return This method returns void
      */
     void AddCellPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pCellPopulationCountWriter)
     {
@@ -873,7 +880,6 @@ public:
      * with a non-default value for its member mFileName.
      *
      * @param pCellPopulationEventWriter shared pointer to a cell population event writer
-     * @return This method returns void
      */
     void AddCellPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pCellPopulationEventWriter)
     {

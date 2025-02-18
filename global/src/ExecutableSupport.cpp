@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -112,7 +112,7 @@ void ExecutableSupport::InitializePetsc(int* pArgc, char*** pArgv)
     CommandLineArguments::Instance()->p_argc = pArgc;
     CommandLineArguments::Instance()->p_argv = pArgv;
     // Initialise PETSc
-    PETSCEXCEPT(PetscInitialize(pArgc, pArgv, PETSC_NULL, PETSC_NULL));
+    PETSCEXCEPT(PetscInitialize(pArgc, pArgv, CHASTE_PETSC_NULLPTR, CHASTE_PETSC_NULLPTR));
     // Set default output folder
     if (!mOutputDirectory.IsPathSet())
     {
@@ -376,6 +376,7 @@ void ExecutableSupport::GetBuildInfo(std::string& rInfo)
     output << "\t\t<BuildTime>" << ChasteBuildInfo::GetBuildTime() << "</BuildTime>\n";
     output << "\t\t<CurrentTime>" << ChasteGetCurrentTime() << "</CurrentTime>\n";
     output << "\t\t<BuilderUnameInfo>" << ChasteBuildInfo::GetBuilderUnameInfo() << "</BuilderUnameInfo>\n";
+    output << "\t\t<ChasteTestOutputDirectory>" << OutputFileHandler::GetChasteTestOutputDirectory() << "</ChasteTestOutputDirectory>\n";
 
     output << "\t\t<Projects>\n";
     {

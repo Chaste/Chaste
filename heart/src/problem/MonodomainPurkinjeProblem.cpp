@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -122,11 +122,11 @@ void MonodomainPurkinjeProblem<ELEMENT_DIM, SPACE_DIM>::WriteInfo(double time)
 
     double v_max, v_min, v_purk_max, v_purk_min;
 
-    VecStrideMax( this->mSolution, 0, PETSC_NULL, &v_max );
-    VecStrideMin( this->mSolution, 0, PETSC_NULL, &v_min );
+    VecStrideMax( this->mSolution, 0, CHASTE_PETSC_NULLPTR, &v_max );
+    VecStrideMin( this->mSolution, 0, CHASTE_PETSC_NULLPTR, &v_min );
 
-    VecStrideMax( this->mSolution, 1, PETSC_NULL, &v_purk_max );
-    VecStrideMin( this->mSolution, 1, PETSC_NULL, &v_purk_min );
+    VecStrideMax( this->mSolution, 1, CHASTE_PETSC_NULLPTR, &v_purk_max );
+    VecStrideMin( this->mSolution, 1, CHASTE_PETSC_NULLPTR, &v_purk_min );
 
     // avoid printing 1e-320 etc
     if(fabs(v_purk_min)<1e-20)

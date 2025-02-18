@@ -5,7 +5,7 @@
  
 # Compute paths
 
-cmake_minimum_required(VERSION 3.10.2)
+cmake_minimum_required (VERSION 3.16.3)
 if(COMMAND cmake_policy)
     cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy) 
@@ -37,7 +37,7 @@ if(NOT TARGET global AND NOT Chaste_BINARY_DIR)
         add_definitions(-DCHASTE_XERCES)
     endif()
 
-    find_package(PythonInterp REQUIRED)
+    find_package(Python3 REQUIRED)
     set(Chaste_PYTHON_DIR @EXPORT_Chaste_PYTHON_DIR@)
 
     option(BUILD_SHARED_LIBS

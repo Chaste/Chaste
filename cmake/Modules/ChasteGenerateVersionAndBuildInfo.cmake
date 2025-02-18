@@ -86,8 +86,8 @@ foreach(project ${Chaste_PROJECTS})
     set(projects_modified "${projects_modified} modified[\"${project}\"] = \"${this_project_modified}\";\n")
 endforeach()
 
-find_package(PythonInterp QUIET)
-execute_process(COMMAND "${PYTHON_EXECUTABLE}" "-c" "from CheckForCopyrights import current_notice; print(current_notice)"
+find_package(Python3 QUIET)
+execute_process(COMMAND "${Python3_EXECUTABLE}" "-c" "from CheckForCopyrights import current_notice; print(current_notice)"
  WORKING_DIRECTORY "${Chaste_SOURCE_DIR}/python/infra"
  OUTPUT_VARIABLE licence)
 string(REPLACE "\nThis file is part of Chaste.\n" "" licence "${licence}")
@@ -99,7 +99,7 @@ string(REGEX REPLACE "\\\\n$" "" licence "${licence}")
 # configure a header file to pass some of the CMake settings
 # to the source code
 configure_file (
-  "${Chaste_SOURCE_DIR}/global/src/Version_cmake.cpp.in"
+  "${Chaste_SOURCE_DIR}/global/src/Version.cpp.in"
   ${generate_dir}/Version.cpp
   )
 

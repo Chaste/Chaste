@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -167,7 +167,7 @@ Vec DistributedVectorFactory::CreateVec(unsigned stride)
     VecSetBlockSize(vec, stride);
     VecSetSizes(vec, stride*(mHi-mLo), stride*mProblemSize);
     VecSetType(vec,VECMPI);
-    //VecCreateMPIWithArray(PETSC_COMM_WORLD, stride, stride*(mHi-mLo), stride*mProblemSize, PETSC_NULL/*No array*/, &vec);
+    //VecCreateMPIWithArray(PETSC_COMM_WORLD, stride, stride*(mHi-mLo), stride*mProblemSize, CHASTE_PETSC_NULLPTR/*No array*/, &vec);
 #else
     VecCreateMPI(PETSC_COMM_WORLD, stride*(mHi-mLo), stride*mProblemSize, &vec);
     VecSetBlockSize(vec, stride);

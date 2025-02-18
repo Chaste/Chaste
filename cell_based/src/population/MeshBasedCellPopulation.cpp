@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -48,20 +48,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeVelocityWriter.hpp"
 #include "CellPopulationAreaWriter.hpp"
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::MeshBasedCellPopulation(MutableMesh<ELEMENT_DIM,SPACE_DIM>& rMesh,
-                                      std::vector<CellPtr>& rCells,
-                                      const std::vector<unsigned> locationIndices,
-                                      bool deleteMesh,
-                                      bool validate)
-    : AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>(rMesh, rCells, locationIndices),
-      mpVoronoiTessellation(nullptr),
-      mDeleteMesh(deleteMesh),
-      mUseAreaBasedDampingConstant(false),
-      mAreaBasedDampingConstantParameter(0.1),
-      mWriteVtkAsPoints(false),
-      mBoundVoronoiTessellation(false),
-      mHasVariableRestLength(false)
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::MeshBasedCellPopulation(MutableMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
+                                                                         std::vector<CellPtr>& rCells,
+                                                                         const std::vector<unsigned> locationIndices,
+                                                                         bool deleteMesh,
+                                                                         bool validate)
+        : AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>(rMesh, rCells, locationIndices),
+          mpVoronoiTessellation(nullptr),
+          mDeleteMesh(deleteMesh),
+          mUseAreaBasedDampingConstant(false),
+          mAreaBasedDampingConstantParameter(0.1),
+          mWriteVtkAsPoints(false),
+          mBoundVoronoiTessellation(false),
+          mScaleBoundByEdgeLength(false),
+          mBoundedVoroniTesselationLengthCutoff(DBL_MAX),
+          mOffsetNewBoundaryNodes(false),
+          mHasVariableRestLength(false)
 {
     mpMutableMesh = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>* >(&(this->mrMesh));
 
@@ -108,10 +111,17 @@ bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::UseAreaBasedDampingConstant
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetAreaBasedDampingConstant(bool useAreaBasedDampingConstant)
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetAreaBasedDampingConstant(
+    [[maybe_unused]] bool useAreaBasedDampingConstant) // [[maybe_unused]] due to unused-but-set-parameter warning in GCC 7,8,9
 {
-    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE
-    mUseAreaBasedDampingConstant = useAreaBasedDampingConstant;
+    if constexpr (SPACE_DIM == 2)
+    {
+        mUseAreaBasedDampingConstant = useAreaBasedDampingConstant;
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -146,28 +156,33 @@ double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetDampingConstant(unsign
          * where d0, d1 are parameters, A is the cell's area, and old_damping_const
          * is the damping constant if not using mUseAreaBasedDampingConstant
          */
-        assert(SPACE_DIM == 2); // LCOV_EXCL_LINE
+        if constexpr (SPACE_DIM == 2)
+        {
+            double rest_length = 1.0;
+            double d0 = mAreaBasedDampingConstantParameter;
 
-        double rest_length = 1.0;
-        double d0 = mAreaBasedDampingConstantParameter;
+            /**
+             * Compute the parameter d1 such that d0+A*d1=1, where A is the equilibrium area
+             * of a cell (this is equal to sqrt(3.0)/4, which is a third of the area of a regular
+             * hexagon of edge length 1)
+             */
+            double d1 = 2.0*(1.0 - d0)/(sqrt(3.0)*rest_length*rest_length);
 
-        /**
-         * Compute the parameter d1 such that d0+A*d1=1, where A is the equilibrium area
-         * of a cell (this is equal to sqrt(3.0)/4, which is a third of the area of a regular
-         * hexagon of edge length 1)
-         */
-        double d1 = 2.0*(1.0 - d0)/(sqrt(3.0)*rest_length*rest_length);
+            double area_cell = GetVolumeOfVoronoiElement(nodeIndex);
 
-        double area_cell = GetVolumeOfVoronoiElement(nodeIndex);
+            /**
+             * The cell area should not be too large - the next assertion is to avoid
+             * getting an infinite cell area, which may occur if area-based viscosity
+             * is chosen in the absence of ghost nodes.
+             */
+            assert(area_cell < 1000);
 
-        /**
-         * The cell area should not be too large - the next assertion is to avoid
-         * getting an infinite cell area, which may occur if area-based viscosity
-         * is chosen in the absence of ghost nodes.
-         */
-        assert(area_cell < 1000);
-
-        damping_multiplier = d0 + area_cell*d1;
+            damping_multiplier = d0 + area_cell*d1;
+        }
+        else
+        {
+            NEVER_REACHED;
+        }
     }
 
     return damping_multiplier;
@@ -443,68 +458,73 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::TessellateIfNeeded()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::DivideLongSprings(double springDivisionThreshold)
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::DivideLongSprings([[maybe_unused]] double springDivisionThreshold) // [[maybe_unused]] due to unused-but-set-parameter warning in GCC 7,8,9
 {
     // Only implemented for 2D elements
-    assert(ELEMENT_DIM == 2); // LCOV_EXCL_LINE
-
-    std::vector<c_vector<unsigned, 5> > new_nodes;
-    new_nodes = rGetMesh().SplitLongEdges(springDivisionThreshold);
-
-    // Add new cells onto new nodes
-    for (unsigned index=0; index<new_nodes.size(); index++)
+    if constexpr (ELEMENT_DIM == 2)
     {
-        // Copy the cell attached to one of the neighbouring nodes onto the new node
-        unsigned new_node_index = new_nodes[index][0];
-        unsigned node_a_index = new_nodes[index][1];
-        unsigned node_b_index = new_nodes[index][2];
+        std::vector<c_vector<unsigned, 5> > new_nodes;
+        new_nodes = rGetMesh().SplitLongEdges(springDivisionThreshold);
 
-         CellPtr p_neighbour_cell = this->GetCellUsingLocationIndex(node_a_index);
-
-        // Create copy of cell property collection to modify for daughter cell
-        CellPropertyCollection daughter_property_collection = p_neighbour_cell->rGetCellPropertyCollection();
-
-        // Remove the CellId from the daughter cell a new one will be assigned in the constructor
-        daughter_property_collection.RemoveProperty<CellId>();
-
-        CellPtr p_new_cell(new Cell(p_neighbour_cell->GetMutationState(),
-                                    p_neighbour_cell->GetCellCycleModel()->CreateCellCycleModel(),
-                                    p_neighbour_cell->GetSrnModel()->CreateSrnModel(),
-                                    false,
-                                    daughter_property_collection));
-
-        // Add new cell to cell population
-        this->mCells.push_back(p_new_cell);
-        this->AddCellUsingLocationIndex(new_node_index,p_new_cell);
-
-        // Update rest lengths
-
-        // Remove old node pair // note node_a_index < node_b_index
-        std::pair<unsigned,unsigned> node_pair = this->CreateOrderedPair(node_a_index, node_b_index);
-        double old_rest_length  = mSpringRestLengths[node_pair];
-
-        std::map<std::pair<unsigned,unsigned>, double>::iterator  iter = mSpringRestLengths.find(node_pair);
-        mSpringRestLengths.erase(iter);
-
-        // Add new pairs
-        node_pair = this->CreateOrderedPair(node_a_index, new_node_index);
-        mSpringRestLengths[node_pair] = 0.5*old_rest_length;
-
-        node_pair = this->CreateOrderedPair(node_b_index, new_node_index);
-        mSpringRestLengths[node_pair] = 0.5*old_rest_length;
-
-        // If necessary add other new spring rest lengths
-        for (unsigned pair_index=3; pair_index<5; pair_index++)
+        // Add new cells onto new nodes
+        for (unsigned index=0; index<new_nodes.size(); index++)
         {
-            unsigned other_node_index = new_nodes[index][pair_index];
+            // Copy the cell attached to one of the neighbouring nodes onto the new node
+            unsigned new_node_index = new_nodes[index][0];
+            unsigned node_a_index = new_nodes[index][1];
+            unsigned node_b_index = new_nodes[index][2];
 
-            if (other_node_index != UNSIGNED_UNSET)
+            CellPtr p_neighbour_cell = this->GetCellUsingLocationIndex(node_a_index);
+
+            // Create copy of cell property collection to modify for daughter cell
+            CellPropertyCollection daughter_property_collection = p_neighbour_cell->rGetCellPropertyCollection();
+
+            // Remove the CellId from the daughter cell a new one will be assigned in the constructor
+            daughter_property_collection.RemoveProperty<CellId>();
+
+            CellPtr p_new_cell(new Cell(p_neighbour_cell->GetMutationState(),
+                                        p_neighbour_cell->GetCellCycleModel()->CreateCellCycleModel(),
+                                        p_neighbour_cell->GetSrnModel()->CreateSrnModel(),
+                                        false,
+                                        daughter_property_collection));
+
+            // Add new cell to cell population
+            this->mCells.push_back(p_new_cell);
+            this->AddCellUsingLocationIndex(new_node_index,p_new_cell);
+
+            // Update rest lengths
+
+            // Remove old node pair // note node_a_index < node_b_index
+            std::pair<unsigned,unsigned> node_pair = this->CreateOrderedPair(node_a_index, node_b_index);
+            double old_rest_length  = mSpringRestLengths[node_pair];
+
+            std::map<std::pair<unsigned,unsigned>, double>::iterator  iter = mSpringRestLengths.find(node_pair);
+            mSpringRestLengths.erase(iter);
+
+            // Add new pairs
+            node_pair = this->CreateOrderedPair(node_a_index, new_node_index);
+            mSpringRestLengths[node_pair] = 0.5*old_rest_length;
+
+            node_pair = this->CreateOrderedPair(node_b_index, new_node_index);
+            mSpringRestLengths[node_pair] = 0.5*old_rest_length;
+
+            // If necessary add other new spring rest lengths
+            for (unsigned pair_index=3; pair_index<5; pair_index++)
             {
-                node_pair = this->CreateOrderedPair(other_node_index, new_node_index);
-                double new_rest_length = rGetMesh().GetDistanceBetweenNodes(new_node_index, other_node_index);
-                mSpringRestLengths[node_pair] = new_rest_length;
+                unsigned other_node_index = new_nodes[index][pair_index];
+
+                if (other_node_index != UNSIGNED_UNSET)
+                {
+                    node_pair = this->CreateOrderedPair(other_node_index, new_node_index);
+                    double new_rest_length = rGetMesh().GetDistanceBetweenNodes(new_node_index, other_node_index);
+                    mSpringRestLengths[node_pair] = new_rest_length;
+                }
             }
         }
+    }
+    else
+    {
+        NEVER_REACHED;
     }
 }
 
@@ -830,6 +850,45 @@ bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetBoundVoronoiTessellation
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetScaleBoundByEdgeLength(bool scaleBoundByEdgeLength)
+{
+    mScaleBoundByEdgeLength = scaleBoundByEdgeLength;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetScaleBoundByEdgeLength()
+{
+    return mScaleBoundByEdgeLength;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetBoundedVoroniTesselationLengthCutoff(double boundedVoroniTesselationLengthCutoff)
+{
+    assert(boundedVoroniTesselationLengthCutoff>0);
+    mBoundedVoroniTesselationLengthCutoff = boundedVoroniTesselationLengthCutoff;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetBoundedVoroniTesselationLengthCutoff()
+{
+    return mBoundedVoroniTesselationLengthCutoff;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetOffsetNewBoundaryNodes(bool offsetNewBoundaryNodes)
+{
+    mOffsetNewBoundaryNodes = offsetNewBoundaryNodes;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetOffsetNewBoundaryNodes()
+{
+    return mOffsetNewBoundaryNodes;
+}
+
+
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile)
 {
     if (bool(dynamic_cast<Cylindrical2dMesh*>(&(this->mrMesh))))
@@ -840,6 +899,59 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::WriteDataToVisualizerSetupF
     {
         *pVizSetupFile << "MeshWidth\t" << this->GetWidth(0) << "\n";
         *pVizSetupFile << "MeshHeight\t" << this->GetWidth(1) << "\n";
+    }
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::CreateVoronoiTessellation()
+{
+    if constexpr (ELEMENT_DIM == 1)
+    {
+        // The VoronoiTessellation class is only defined in 2D or 3D
+        NEVER_REACHED;
+    }
+    else if constexpr (ELEMENT_DIM == 2 && SPACE_DIM == 2)
+    {
+        delete mpVoronoiTessellation;
+
+        // Check if the mesh associated with this cell population is periodic
+        bool is_mesh_periodic = false;
+        if (dynamic_cast<Cylindrical2dMesh*>(&(this->mrMesh)))
+        {
+            if(mScaleBoundByEdgeLength || mBoundedVoroniTesselationLengthCutoff<DBL_MAX || mOffsetNewBoundaryNodes)
+            {
+                // Not implemented for Cylindrical meshes yet see Issue 305
+                NEVER_REACHED;
+            }
+            is_mesh_periodic = true;
+            mpVoronoiTessellation = new Cylindrical2dVertexMesh(static_cast<Cylindrical2dMesh&>(this->mrMesh), mBoundVoronoiTessellation);
+        }
+        else if (dynamic_cast<Toroidal2dMesh*>(&(this->mrMesh)))
+        {
+            if(mScaleBoundByEdgeLength || mBoundedVoroniTesselationLengthCutoff<DBL_MAX || mOffsetNewBoundaryNodes)
+            {
+                // Not implemented for Toroidal meshes yet see Issue 305
+                NEVER_REACHED;
+            }
+            is_mesh_periodic = true;
+            mpVoronoiTessellation = new Toroidal2dVertexMesh(static_cast<Toroidal2dMesh&>(this->mrMesh), mBoundVoronoiTessellation);
+        }
+        else
+        {
+            mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2>&>((this->mrMesh)), is_mesh_periodic, mBoundVoronoiTessellation, mScaleBoundByEdgeLength, mBoundedVoroniTesselationLengthCutoff, mOffsetNewBoundaryNodes);
+        }
+    }
+    else if constexpr (ELEMENT_DIM == 3)
+    {
+         // The cylindrical mesh is only defined in 2D, hence there is
+         // a separate definition for this method in 3D, which doesn't have the capability
+         // of dealing with periodic boundaries in 3D. This is \todo #1374.
+        delete mpVoronoiTessellation;
+        mpVoronoiTessellation = new VertexMesh<3, 3>(static_cast<MutableMesh<3, 3>&>(this->mrMesh));
+    }
+    else // ELEMENT_DIM == 2 && SPACE_DIM != 2
+    {
+        NEVER_REACHED;
     }
 }
 
@@ -930,96 +1042,6 @@ typename MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SpringIterator MeshBase
 {
     return SpringIterator(*this, static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>&>((this->mrMesh)).EdgesEnd());
 }
-
-/**
- *
- */
-template<>
-void MeshBasedCellPopulation<2>::CreateVoronoiTessellation()
-{
-    delete mpVoronoiTessellation;
-
-    // Check if the mesh associated with this cell population is periodic
-    bool is_mesh_periodic = false;
-    if (bool(dynamic_cast<Cylindrical2dMesh*>(&mrMesh)))
-    {
-        is_mesh_periodic = true;
-        mpVoronoiTessellation = new Cylindrical2dVertexMesh(static_cast<Cylindrical2dMesh &>(this->mrMesh), mBoundVoronoiTessellation);
-    }
-    else if (bool(dynamic_cast<Toroidal2dMesh*>(&(this->mrMesh))))
-    {
-        is_mesh_periodic = true;
-        mpVoronoiTessellation = new Toroidal2dVertexMesh(static_cast<Toroidal2dMesh &>(this->mrMesh), mBoundVoronoiTessellation);
-    }
-    else
-    {
-        mpVoronoiTessellation = new VertexMesh<2, 2>(static_cast<MutableMesh<2, 2> &>((this->mrMesh)), is_mesh_periodic, mBoundVoronoiTessellation);
-    }
-}
-
-/**
- * Can't tessellate 2d meshes in 3d space yet.
- */
-// LCOV_EXCL_START
-template<>
-void MeshBasedCellPopulation<2,3>::CreateVoronoiTessellation()
-{
-    // We don't allow tessellation yet.
-    NEVER_REACHED;
-}
-// LCOV_EXCL_STOP
-
-/**
- * The cylindrical mesh is only defined in 2D, hence there is
- * a separate definition for this method in 3D, which doesn't have the capability
- * of dealing with periodic boundaries in 3D. This is \todo #1374.
- */
-template<>
-void MeshBasedCellPopulation<3>::CreateVoronoiTessellation()
-{
-    delete mpVoronoiTessellation;
-    mpVoronoiTessellation = new VertexMesh<3, 3>(static_cast<MutableMesh<3, 3> &>((this->mrMesh)));
-}
-
-/**
- * The VoronoiTessellation class is only defined in 2D or 3D, hence there
- * are two definitions to this method (one templated and one not).
- */
-// LCOV_EXCL_START
-template<>
-void MeshBasedCellPopulation<1, 1>::CreateVoronoiTessellation()
-{
-    // No 1D Voronoi tessellation
-    NEVER_REACHED;
-}
-// LCOV_EXCL_STOP
-
-
-/**
- * The VoronoiTessellation class is only defined in 2D or 3D, hence there
- * are two definitions to this method (one templated and one not).
- */
-// LCOV_EXCL_START
-template<>
-void MeshBasedCellPopulation<1, 2>::CreateVoronoiTessellation()
-{
-    // No 1D Voronoi tessellation
-    NEVER_REACHED;
-}
-// LCOV_EXCL_STOP
-
-/**
- * The VoronoiTessellation class is only defined in 2D or 3D, hence there
- * are two definitions to this method (one templated and one not).
- */
-// LCOV_EXCL_START
-template<>
-void MeshBasedCellPopulation<1, 3>::CreateVoronoiTessellation()
-{
-    // No 1D Voronoi tessellation
-    NEVER_REACHED;
-}
-// LCOV_EXCL_STOP
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 VertexMesh<ELEMENT_DIM,SPACE_DIM>* MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetVoronoiTessellation()

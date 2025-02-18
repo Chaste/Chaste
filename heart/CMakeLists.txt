@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2023, University of Oxford.
+# Copyright (c) 2005-2025, University of Oxford.
 # All rights reserved.
 # 
 # University of Oxford means the Chancellor, Masters and Scholars of the
@@ -64,18 +64,19 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/dynamic)
 foreach(dyn_source ${dyn_sources})
     get_filename_component(dyn_source_name ${dyn_source} NAME_WE)
     add_library(${dyn_source_name} SHARED ${dyn_source})
-    set_property(TARGET ${dyn_source_name} PROPERTY CXX_STANDARD 14)
+    set_property(TARGET ${dyn_source_name} PROPERTY CXX_STANDARD 17)
     set_property(TARGET ${dyn_source_name} PROPERTY CXX_STANDARD_REQUIRED ON)
     set_property(TARGET ${dyn_source_name} PROPERTY CMAKE_CXX_EXTENSIONS OFF)
+
     if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-        target_link_libraries(${dyn_source_name} LINK_PRIVATE "-Wl,-undefined,dynamic_lookup")
-        #set_target_properties(${dyn_source_name} PROPERTIES LINK_FLAGS "-Wl,-undefined,dynamic_lookup")
+        target_link_options(${dyn_source_name} PRIVATE "-Wl,-undefined,dynamic_lookup")
     else()
-        #target_link_libraries(${dyn_source_name} LINK_PRIVATE "-Wl,--undefined")
-        set_target_properties(${dyn_source_name} PROPERTIES LINK_FLAGS "-Wl,--undefined")
+        target_link_options(${dyn_source_name} PRIVATE "-Wl,--allow-shlib-undefined")
     endif()
 
-    # add dynamic models to the heart_tests and Continuous targets
+    # add dynamic models to the heart_tests, Continuous, and individual test targets
     add_dependencies(heart ${dyn_source_name})
     add_dependencies(Continuous ${dyn_source_name})
+    add_dependencies(TestDynamicallyLoadedCellModels ${dyn_source_name})
+    add_dependencies(TestHeartConfig ${dyn_source_name})
 endforeach(dyn_source)

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,7 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <fstream>
 #include <set>
-
 #include "AbstractCellBasedSimulation.hpp"
 #include "CellBasedEventHandler.hpp"
 #include "LogFile.hpp"
@@ -288,6 +287,18 @@ std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, S
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::AddTopologyUpdateSimulationModifier(boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM,SPACE_DIM> > pSimulationModifier)
+{
+    mTopologyUpdateSimulationModifiers.push_back(pSimulationModifier);
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >* AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::GetTopologyUpdateSimulationModifiers()
+{
+    return &mTopologyUpdateSimulationModifiers;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 std::vector<double> AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::GetNodeLocation(const unsigned& rNodeIndex)
 {
     std::vector<double> location;
@@ -396,6 +407,14 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
         (*iter)->SetupSolve(this->mrCellPopulation,this->mSimulationOutputDirectory);
     }
 
+    // Call SetupSolve() on each topology update modifier
+    for (typename std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mTopologyUpdateSimulationModifiers.begin();
+            iter != mTopologyUpdateSimulationModifiers.end();
+            ++iter)
+    {
+        (*iter)->SetupSolve(this->mrCellPopulation,this->mSimulationOutputDirectory);
+    }
+
     /*
      * Age the cells to the correct time. Note that cells are created with
      * negative birth times so that some are initially almost ready to divide.
@@ -438,9 +457,12 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
             UpdateCellPopulation();
         }
 
-        // Store whether we are sampling results at the current timestep
+        /*
+        * Store whether we are sampling results at the current timestep note we have +1 here as we caculate this
+        * before the timestep is increaced.
+        */
         SimulationTime* p_time = SimulationTime::Instance();
-        bool at_sampling_timestep = (p_time->GetTimeStepsElapsed()%this->mSamplingTimestepMultiple == 0);
+        bool at_sampling_timestep = ((p_time->GetTimeStepsElapsed()+1)%this->mSamplingTimestepMultiple == 0);
 
         /*
          * If required, store the current locations of cell centres. Note that we need to
@@ -459,6 +481,16 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
                 old_cell_locations[*cell_iter] = mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
             }
         }
+
+        /* Call UpdateAtEndOfTimeStep() on each topology update modifier */
+        CellBasedEventHandler::BeginEvent(CellBasedEventHandler::UPDATESIMULATION);
+        for (typename std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mTopologyUpdateSimulationModifiers.begin();
+                iter != mTopologyUpdateSimulationModifiers.end();
+                ++iter)
+        {
+            (*iter)->UpdateAtEndOfTimeStep(this->mrCellPopulation);
+        }
+        CellBasedEventHandler::EndEvent(CellBasedEventHandler::UPDATESIMULATION);
 
         // Update cell locations and topology
         UpdateCellLocationsAndTopology();
@@ -499,11 +531,11 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
         // Increment simulation time here, so results files look sensible
         p_simulation_time->IncrementTimeOneStep();
 
-        // Call UpdateAtEndOfTimeStep() on each modifier
+        /* Call UpdateAtEndOfTimeStep() on each modifier */
         CellBasedEventHandler::BeginEvent(CellBasedEventHandler::UPDATESIMULATION);
         for (typename std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >::iterator iter = mSimulationModifiers.begin();
-             iter != mSimulationModifiers.end();
-             ++iter)
+                iter != mSimulationModifiers.end();
+                ++iter)
         {
             (*iter)->UpdateAtEndOfTimeStep(this->mrCellPopulation);
         }

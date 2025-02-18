@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -81,10 +81,6 @@ void Element<ELEMENT_DIM, SPACE_DIM>::MarkAsDeleted()
     }
 }
 
-/** Update node at the given index
- *  @param rIndex is an local index to which node to change
- *  @param pNode is a pointer to the replacement node
- */
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void Element<ELEMENT_DIM, SPACE_DIM>::UpdateNode(const unsigned& rIndex, Node<SPACE_DIM>* pNode)
 {
@@ -140,9 +136,9 @@ c_vector<double,SPACE_DIM+1> Element<ELEMENT_DIM, SPACE_DIM>::CalculateCircumsph
         rhs[j]=squared_location/2.0;
     }
 
-    c_vector<double, SPACE_DIM> centre;
+    c_vector<double, SPACE_DIM> centre = zero_vector<double>(SPACE_DIM);
     centre = prod(rhs, rInverseJacobian);
-    c_vector<double, SPACE_DIM+1> circum;
+    c_vector<double, SPACE_DIM+1> circum = zero_vector<double>(SPACE_DIM+1);
     double squared_radius = 0.0;
     for (unsigned i=0; i<SPACE_DIM; i++)
     {
@@ -295,11 +291,12 @@ c_vector<double, SPACE_DIM> Element<ELEMENT_DIM, SPACE_DIM>::CalculateXi(const C
     // Find the location with respect to node 0
 ///\todo: #1361 ComputeContainingElements and related methods, and methods called by that down to
 /// here, should really take in const c_vector& rather than ChastePoints.
-    c_vector<double, SPACE_DIM> test_location=rTestPoint.rGetLocation()-this->GetNodeLocation(0);
+    c_vector<double, SPACE_DIM> test_location = zero_vector<double>(SPACE_DIM);
+    test_location = rTestPoint.rGetLocation()-this->GetNodeLocation(0);
 
     //Multiply by inverse Jacobian
-    c_matrix<double, SPACE_DIM, ELEMENT_DIM> jacobian;
-    c_matrix<double, ELEMENT_DIM, SPACE_DIM> inverse_jacobian;
+    c_matrix<double, SPACE_DIM, ELEMENT_DIM> jacobian = zero_matrix<double>(SPACE_DIM, ELEMENT_DIM);
+    c_matrix<double, ELEMENT_DIM, SPACE_DIM> inverse_jacobian = zero_matrix<double>(ELEMENT_DIM, SPACE_DIM);
     double jacobian_determinant;
 
     ///\todo #1326 This method shouldn't need a new Jacobian inverse for every Xi

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -2186,7 +2186,7 @@ void AbstractNonlinearElasticitySolver<DIM>::SolveSnes()
 #if (PETSC_VERSION_MAJOR == 2 && PETSC_VERSION_MINOR == 2) //PETSc 2.2
     PetscErrorCode err = SNESSolve(snes, initial_guess);
 #else
-    PetscErrorCode err = SNESSolve(snes, PETSC_NULL, initial_guess);
+    PetscErrorCode err = SNESSolve(snes, CHASTE_PETSC_NULLPTR, initial_guess);
 #endif
 
     SNESConvergedReason reason;

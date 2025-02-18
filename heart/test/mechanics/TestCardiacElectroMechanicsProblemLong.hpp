@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -191,7 +191,7 @@ public:
      * * Remove "dont" from the tutorial
      * * Rerun it
      * * Copy output
-       cp /tmp/$USER/testoutput/TutorialFibreFiles/5by5by5_fibres.orthoquad heart/test/data/fibre_tests/5by5by5_fibres_by_quadpt.orthoquad
+       cp $CHASTE_TEST_OUTPUT/TutorialFibreFiles/5by5by5_fibres.orthoquad heart/test/data/fibre_tests/5by5by5_fibres_by_quadpt.orthoquad
      */
     void TestTwistingCube()
     {

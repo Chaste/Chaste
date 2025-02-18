@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -167,7 +167,7 @@ public:
         unsigned num_cells_depth = 2;
         unsigned num_cells_width = 2;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Set up cells, one for each node.
         std::vector<CellPtr> cells;
@@ -265,7 +265,7 @@ public:
         unsigned num_cells_depth = 5;
         unsigned num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -330,7 +330,7 @@ public:
         unsigned num_cells_depth = 5;
         unsigned num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Set up cells, one for each node. Give each a birth time of -node_index,
         // so the age = node_index
@@ -846,16 +846,25 @@ public:
         TS_ASSERT_EQUALS(cell_population.GetIdentifier(), "MeshBasedCellPopulation-2-2");
 
         // Test set/get methods
-        TS_ASSERT_EQUALS(cell_population.GetWriteVtkAsPoints(), false);
-        TS_ASSERT_EQUALS(cell_population.GetBoundVoronoiTessellation(), false);
+        TS_ASSERT_EQUALS(cell_population.GetWriteVtkAsPoints(), false); //Default
+        TS_ASSERT_EQUALS(cell_population.GetBoundVoronoiTessellation(), false); //Default
+        TS_ASSERT_EQUALS(cell_population.GetScaleBoundByEdgeLength(), false); //Default
+        TS_ASSERT_EQUALS(cell_population.GetBoundedVoroniTesselationLengthCutoff(), DBL_MAX); //Default
+        TS_ASSERT_EQUALS(cell_population.GetOffsetNewBoundaryNodes(), false); //Default
 
         cell_population.AddPopulationWriter<VoronoiDataWriter>();
         cell_population.AddCellWriter<CellIdWriter>();
         cell_population.SetWriteVtkAsPoints(true);
         cell_population.SetBoundVoronoiTessellation(true);
+        cell_population.SetScaleBoundByEdgeLength(true);
+        cell_population.SetBoundedVoroniTesselationLengthCutoff(1.0);
+        cell_population.SetOffsetNewBoundaryNodes(true);
 
         TS_ASSERT_EQUALS(cell_population.GetWriteVtkAsPoints(), true);
         TS_ASSERT_EQUALS(cell_population.GetBoundVoronoiTessellation(), true);
+        TS_ASSERT_EQUALS(cell_population.GetScaleBoundByEdgeLength(), true);
+        TS_ASSERT_EQUALS(cell_population.GetBoundedVoroniTesselationLengthCutoff(), 1.0);
+        TS_ASSERT_EQUALS(cell_population.GetOffsetNewBoundaryNodes(), true);
 
         // All presaved data uses infinite VT
         cell_population.SetBoundVoronoiTessellation(false);
@@ -1544,7 +1553,7 @@ public:
 
         // Create a simple mesh
         HoneycombMeshGenerator generator(4, 4, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -1578,7 +1587,7 @@ public:
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel
 
         HoneycombMeshGenerator generator(2, 2);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;

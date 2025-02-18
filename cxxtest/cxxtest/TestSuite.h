@@ -198,7 +198,6 @@ namespace CxxTest
 #       ifdef _CXXTEST_HAVE_STD
 #           define ___TSM_CATCH(f,l,m) \
                     catch(const std::exception &_e) { (CxxTest::tracker()).failedTest(f,l,_e.what()); } \
-                    catch(Exception &_e) { (CxxTest::tracker()).failedTest(f,l,_e.GetMessage().c_str()); } \
                     _TSM_LAST_CATCH(f,l,m)
 #       else // !_CXXTEST_HAVE_STD
 #           define ___TSM_CATCH(f,l,m) _TSM_LAST_CATCH(f,l,m)

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,7 +46,9 @@ mesh_writer.WriteFilesUsingMesh(*this);
 
 Cylindrical2dMesh::Cylindrical2dMesh(double width)
   : MutableMesh<2,2>(),
-    mWidth(width)
+    mWidth(width),
+    mHaloScalingFactor(2.0), // Default value
+    mHaloOffset(1.0) // Default value
 {
     assert(width > 0.0);
 }
@@ -57,7 +59,9 @@ Cylindrical2dMesh::~Cylindrical2dMesh()
 
 Cylindrical2dMesh::Cylindrical2dMesh(double width, std::vector<Node<2>* > nodes)
   : MutableMesh<2,2>(),
-    mWidth(width)
+    mWidth(width),
+    mHaloScalingFactor(2.0), // Default value
+    mHaloOffset(1.0) // Default value
 {
     assert(width > 0.0);
 //    mMismatchedBoundaryElements = false;
@@ -69,7 +73,6 @@ Cylindrical2dMesh::Cylindrical2dMesh(double width, std::vector<Node<2>* > nodes)
         assert( 0 <= x && x < width);
         mNodes.push_back(p_temp_node);
     }
-
     NodeMap node_map(nodes.size());
     ReMesh(node_map);
 }
@@ -126,7 +129,7 @@ void Cylindrical2dMesh::CreateMirrorNodes()
     // For each left original node, create an image node and record its new index
     for (unsigned i=0; i<mLeftOriginals.size(); i++)
     {
-        c_vector<double, 2> location;
+        c_vector<double, 2> location {};
         location = mNodes[mLeftOriginals[i]]->rGetLocation();
         location[0] = location[0] + mWidth;
 
@@ -138,7 +141,7 @@ void Cylindrical2dMesh::CreateMirrorNodes()
     // For each right original node, create an image node and record its new index
     for (unsigned i=0; i<mRightOriginals.size(); i++)
     {
-        c_vector<double, 2> location;
+        c_vector<double, 2> location {};
         location = mNodes[mRightOriginals[i]]->rGetLocation();
         location[0] = location[0] - mWidth;
 
@@ -160,15 +163,15 @@ void Cylindrical2dMesh::CreateHaloNodes()
     mTopHaloNodes.clear();
     mBottomHaloNodes.clear();
 
-    unsigned num_halo_nodes = (unsigned)(floor(mWidth*2.0));
-    double halo_node_separation = mWidth/((double)(num_halo_nodes));
-    double y_top_coordinate = mTop + halo_node_separation;
-    double y_bottom_coordinate = mBottom - halo_node_separation;
+    unsigned num_halo_nodes = static_cast<unsigned>(floor(mWidth * mHaloScalingFactor));
+    double halo_node_separation = mWidth / (static_cast<double>(num_halo_nodes));
+    double y_top_coordinate = mTop + mHaloOffset * halo_node_separation;
+    double y_bottom_coordinate = mBottom - mHaloOffset * halo_node_separation;
 
     c_vector<double, 2> location;
     for (unsigned i=0; i<num_halo_nodes; i++)
     {
-       double x_coordinate = 0.5*halo_node_separation + (double)(i)*halo_node_separation;
+       double x_coordinate = 0.5 * halo_node_separation + static_cast<double>(i) * halo_node_separation;
 
        // Inserting top halo node in mesh
        location[0] = x_coordinate;
@@ -734,9 +737,6 @@ void Cylindrical2dMesh::GenerateVectorsOfElementsStraddlingPeriodicBoundaries()
     mLeftPeriodicBoundaryElementIndices.clear();
     mRightPeriodicBoundaryElementIndices.clear();
 
-    unsigned incidences_of_zero_left_image_nodes = 0;
-    unsigned incidences_of_zero_right_image_nodes = 0;
-
     for (MutableMesh<2,2>::ElementIterator elem_iter = GetElementIteratorBegin();
          elem_iter != GetElementIteratorEnd();
          ++elem_iter)
@@ -757,15 +757,6 @@ void Cylindrical2dMesh::GenerateVectorsOfElementsStraddlingPeriodicBoundaries()
             {
                 number_of_right_image_nodes++;
             }
-        }
-
-        if ((number_of_left_image_nodes == 0) && (number_of_right_image_nodes == 1 || number_of_right_image_nodes == 2) )
-        {
-            incidences_of_zero_left_image_nodes++;
-        }
-        if ((number_of_right_image_nodes == 0) && (number_of_left_image_nodes == 1 || number_of_left_image_nodes == 2) )
-        {
-            incidences_of_zero_right_image_nodes++;
         }
 
         /* SJ - Have checked the following:
@@ -833,7 +824,7 @@ unsigned Cylindrical2dMesh::GetCorrespondingNodeIndex(unsigned nodeIndex)
                 std::vector<unsigned>::iterator left_im_iter = std::find(mLeftImages.begin(), mLeftImages.end(), nodeIndex);
                 if (left_im_iter != mLeftImages.end())
                 {
-                    corresponding_node_index = mLeftOriginals[left_im_iter - mLeftImages.begin()];
+                     corresponding_node_index = mLeftOriginals[left_im_iter - mLeftImages.begin()];
                 }
             }
         }
@@ -842,6 +833,28 @@ unsigned Cylindrical2dMesh::GetCorrespondingNodeIndex(unsigned nodeIndex)
     // We must have found the corresponding node index
     assert(corresponding_node_index != UINT_MAX);
     return corresponding_node_index;
+}
+
+double Cylindrical2dMesh::GetHaloScalingFactor() const
+{
+    return mHaloScalingFactor;
+}
+
+void Cylindrical2dMesh::SetHaloScalingFactor(double haloScalingFactor)
+{
+    assert(haloScalingFactor >= 0.0);
+    mHaloScalingFactor = haloScalingFactor;
+}
+
+double Cylindrical2dMesh::GetHaloOffset() const
+{
+    return mHaloOffset;
+}
+
+void Cylindrical2dMesh::SetHaloOffset(double haloOffset)
+{
+    assert(haloOffset >= 0.0);
+    mHaloOffset = haloOffset;
 }
 
 // Serialization for Boost >= 1.36

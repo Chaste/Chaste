@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "ArchiveOpener.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -56,11 +57,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
+#include "UniformCellCycleModel.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
+#include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 
 #include "MeshBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "CaBasedCellPopulation.hpp"
+#include "ImmersedBoundaryCellPopulation.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "NodeBasedCellPopulationWithBuskeUpdate.hpp"
 #include "NodeBasedCellPopulationWithParticles.hpp"
@@ -82,7 +86,7 @@ public:
 
         // Create a simple 2D VertexBasedCellPopulation
         HoneycombVertexMeshGenerator generator(4, 6);
-        MutableVertexMesh<2, 2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -116,7 +120,7 @@ public:
         {
             // Coverage of the Visit() method when called on a MeshBasedCellPopulation
             HoneycombMeshGenerator tet_generator(5, 5, 0);
-            MutableMesh<2, 2>* p_tet_mesh = tet_generator.GetMesh();
+            boost::shared_ptr<MutableMesh<2,2> > p_tet_mesh = tet_generator.GetMesh();
             std::vector<CellPtr> mesh_based_cells;
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> mesh_based_cells_generator;
             mesh_based_cells_generator.GenerateBasic(mesh_based_cells, p_tet_mesh->GetNumNodes());
@@ -128,7 +132,7 @@ public:
         {
             // Coverage of the Visit() method when called on a CaBasedCellPopulation
             PottsMeshGenerator<2> ca_based_generator(5, 0, 0, 5, 0, 0);
-            PottsMesh<2>* p_ca_based_mesh = ca_based_generator.GetMesh();
+            boost::shared_ptr<PottsMesh<2> > p_ca_based_mesh = ca_based_generator.GetMesh();
             std::vector<CellPtr> ca_based_cells;
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> ca_based_cells_generator;
             ca_based_cells_generator.GenerateBasic(ca_based_cells, 5);
@@ -165,13 +169,29 @@ public:
         {
             // Coverage of the Visit() method when called on a PottsBasedCellPopulation
             PottsMeshGenerator<2> potts_based_generator(4, 1, 2, 4, 1, 2);
-            PottsMesh<2>* p_potts_based_mesh = potts_based_generator.GetMesh();
+            boost::shared_ptr<PottsMesh<2> > p_potts_based_mesh = potts_based_generator.GetMesh();
             std::vector<CellPtr> potts_based_cells;
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> potts_based_cells_generator;
             potts_based_cells_generator.GenerateBasic(potts_based_cells, p_potts_based_mesh->GetNumElements());
             PottsBasedCellPopulation<2> potts_based_cell_population(*p_potts_based_mesh, potts_based_cells);
 
             TS_ASSERT_THROWS_NOTHING(division_writer.Visit(&potts_based_cell_population));
+        }
+
+        // Coverage of the Visit() method when called with an ImmersedBoundaryCellPopulation
+        {
+            // Create an immersed boundary cell population object
+            ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
+            ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+
+            ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+
+            TS_ASSERT_THROWS_NOTHING(division_writer.Visit(&cell_population));
         }
     }
 
@@ -205,7 +225,7 @@ public:
 
         // Create a simple 2D VertexBasedCellPopulation
         HoneycombVertexMeshGenerator generator(4, 6);
-        MutableVertexMesh<2, 2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         boost::shared_ptr<AbstractCellProperty> p_diff_type(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -239,7 +259,7 @@ public:
         {
             // Coverage of the Visit() method when called on a MeshBasedCellPopulation
             HoneycombMeshGenerator tet_generator(5, 5, 0);
-            MutableMesh<2, 2>* p_tet_mesh = tet_generator.GetMesh();
+            boost::shared_ptr<MutableMesh<2,2> > p_tet_mesh = tet_generator.GetMesh();
             std::vector<CellPtr> mesh_based_cells;
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> mesh_based_cells_generator;
             mesh_based_cells_generator.GenerateBasic(mesh_based_cells, p_tet_mesh->GetNumNodes());
@@ -251,7 +271,7 @@ public:
         {
             // Coverage of the Visit() method when called on a CaBasedCellPopulation
             PottsMeshGenerator<2> ca_based_generator(5, 0, 0, 5, 0, 0);
-            PottsMesh<2>* p_ca_based_mesh = ca_based_generator.GetMesh();
+            boost::shared_ptr<PottsMesh<2> > p_ca_based_mesh = ca_based_generator.GetMesh();
             std::vector<CellPtr> ca_based_cells;
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> ca_based_cells_generator;
             ca_based_cells_generator.GenerateBasic(ca_based_cells, 5);
@@ -288,7 +308,7 @@ public:
         {
             // Coverage of the Visit() method when called on a PottsBasedCellPopulation
             PottsMeshGenerator<2> potts_based_generator(4, 1, 2, 4, 1, 2);
-            PottsMesh<2>* p_potts_based_mesh = potts_based_generator.GetMesh();
+            boost::shared_ptr<PottsMesh<2> > p_potts_based_mesh = potts_based_generator.GetMesh();
             std::vector<CellPtr> potts_based_cells;
             CellsGenerator<FixedG1GenerationalCellCycleModel, 2> potts_based_cells_generator;
             potts_based_cells_generator.GenerateBasic(potts_based_cells, p_potts_based_mesh->GetNumElements());
@@ -296,6 +316,23 @@ public:
 
             TS_ASSERT_THROWS_NOTHING(removal_writer.Visit(&potts_based_cell_population));
         }
+
+        // Coverage of the Visit() method when called with an ImmersedBoundaryCellPopulation
+        {
+            // Create an immersed boundary cell population object
+            ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
+            ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
+
+            std::vector<CellPtr> cells;
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            CellsGenerator<UniformCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
+
+            ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
+
+            TS_ASSERT_THROWS_NOTHING(removal_writer.Visit(&cell_population));
+        }
+
     }
 
     void TestCellRemovalLocationsWriterArchiving()

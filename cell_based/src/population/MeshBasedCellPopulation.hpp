@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -52,8 +52,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Contains a group of cells and maintains the associations between cells and
  * nodes in the mesh.
+ *
+ * @tparam ELEMENT_DIM Dimension of the elements.
+ * @tparam SPACE_DIM Dimension of the space. If not specified, it defaults to ELEMENT_DIM.
  */
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+#ifdef DOXYGEN_CHASTE_ISSUE_199 // See https://github.com/Chaste/Chaste/issues/199
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+#else
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM = ELEMENT_DIM>
+#endif
 class MeshBasedCellPopulation : public AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>
 {
     friend class TestMeshBasedCellPopulation;
@@ -88,8 +95,10 @@ private:
         archive & mAreaBasedDampingConstantParameter;
         archive & mWriteVtkAsPoints;
         archive & mBoundVoronoiTessellation;
+        archive & mScaleBoundByEdgeLength;
+        archive & mBoundedVoroniTesselationLengthCutoff;
+        archive & mOffsetNewBoundaryNodes;
         archive & mHasVariableRestLength;
-
         this->Validate();
     }
 
@@ -137,6 +146,15 @@ protected:
     /** Whether to bound the voronoi tesselation to avoid infinite cells on boundary. */
     bool mBoundVoronoiTessellation;
 
+    /** Whether to scale the bound by edge lenght when using the bounded voronoi tesselation. */
+    bool mScaleBoundByEdgeLength;
+
+    /** Edges longer than this are ignored in boundary calculation for the bounded voronio tesselation. */
+    double mBoundedVoroniTesselationLengthCutoff;
+
+    /** whether to add new nodes towards the centre of the boundary edges for the bounded voronoi tesselation. */
+    bool mOffsetNewBoundaryNodes;
+
     /** Whether springs have variable rest lengths. */
     bool mHasVariableRestLength;
 
@@ -169,10 +187,10 @@ public:
      * @param validate whether to validate the cell population
      */
     MeshBasedCellPopulation(MutableMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
-                    std::vector<CellPtr>& rCells,
-                    const std::vector<unsigned> locationIndices=std::vector<unsigned>(),
-                    bool deleteMesh=false,
-                    bool validate=true);
+                            std::vector<CellPtr>& rCells,
+                            const std::vector<unsigned> locationIndices = {},
+                            bool deleteMesh = false,
+                            bool validate = true);
 
     /**
      * Constructor for use by the de-serializer.
@@ -571,6 +589,42 @@ public:
      * @return mBoundVoronoiTessellation.
      */
     bool GetBoundVoronoiTessellation();
+
+    /**
+     * Set mScaleBoundByEdgeLength.
+     *
+     * @param scaleBoundByEdgeLength whether to scale the bound with edge lenght in the Voronoi Tesselation.
+     */
+    void SetScaleBoundByEdgeLength(bool scaleBoundByEdgeLength);
+
+    /**
+     * @return mScaleBoundByEdgeLength.
+     */
+    bool GetScaleBoundByEdgeLength();
+
+    /**
+     * Set mBoundedVoroniTesselationLengthCutoff.
+     *
+     * @param boundedVoroniTesselationLengthCutoff whether to scale the bound with edge lenght in the Voronoi Tesselation.
+     */
+    void SetBoundedVoroniTesselationLengthCutoff(double boundedVoroniTesselationLengthCutoff);
+
+    /**
+     * @return mScaleBoundByEdgeLength.
+     */
+    double GetBoundedVoroniTesselationLengthCutoff();
+
+  /**
+     * Set mOffsetNewBoundaryNodes.
+     *
+     * @param offsetNewBoundaryNodes whether to add new nodes towards the centre of the boundary edges for the bounded voronoi tesselation.
+     */
+    void SetOffsetNewBoundaryNodes(bool offsetNewBoundaryNodes);
+
+    /**
+     * @return mOffsetNewBoundaryNodes.
+     */
+    bool GetOffsetNewBoundaryNodes();
 
     /**
      * Overridden GetNeighbouringNodeIndices() method.

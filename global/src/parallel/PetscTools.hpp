@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -54,6 +54,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define EXIT_IF_PARALLEL if(PetscTools::IsParallel()){TS_TRACE("This test does not pass in parallel yet.");return;}
 /** For use in tests that should ONLY be run in parallel. */
 #define EXIT_IF_SEQUENTIAL if(PetscTools::IsSequential()){TS_TRACE("This test is not meant to be executed in sequential.");return;}
+
+/**
+ * @def CHASTE_PETSC_NULLPTR
+ * @brief A macro to define PETSc null pointer based on the PETSc version.
+ *
+ * This macro is defined to handle the change in PETSc's null pointer definition
+ * between versions. For PETSc version 3.19.0 and later, it uses PETSC_NULLPTR.
+ * For older versions, it uses PETSC_NULL. See https://github.com/Chaste/Chaste/issues/263.
+ */
+#if PETSC_VERSION_GE(3, 19, 0)
+#define CHASTE_PETSC_NULLPTR PETSC_NULLPTR
+#else
+#define CHASTE_PETSC_NULLPTR PETSC_NULL
+#endif
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR < 2 || PETSC_VERSION_MAJOR<3 ) // Before PETSc 3.2
 /**

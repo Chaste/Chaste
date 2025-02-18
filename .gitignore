@@ -25,14 +25,12 @@ _local/
 # Temporary build folders for dynamically loaded models
 /heart/dynamic/tmp_*_*
 /heart/dynamic/luo_rudy_1991_dyn.*
-/codegen_python3_venv
+/chaste_python3_venv
+**/__pycache__/
 
 # Local hostconfig
 /python/hostconfig/local.py
 /python/hostconfig/machines/local.py
-
-# Test summary results
-/test_summary/*
 
 # Misc. in /
 /.settings
@@ -43,8 +41,10 @@ _local/
 /gmon.out
 /Chaste
 /doxygen
+/doxygen-*
 /.externalToolBuilders
 /testoutput
+/output/*
 
 # Misc in /anim/
 /anim/*.mpeg
@@ -69,5 +69,10 @@ appredict_lookup_table_manifest.txt
 # Build directories
 Debug
 Release
-cmake-build*
 chaste-build*
+
+**/.uuid
+
+venv
+
+tutorials

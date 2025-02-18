@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -103,7 +103,7 @@ void NodesOnlyMesh<SPACE_DIM>::ConstructNodesWithoutMesh(const std::vector<boost
 {
     // This is not efficient. It should replace the corresponding raw ptr method if SetUpBoxCollection and Chaste Cuboid methods are changed to take shared ptrs.
     std::vector<Node<SPACE_DIM>*> temp_nodes(rNodes.size());
-    for(unsigned idx=0; idx<rNodes.size(); idx++)
+    for (unsigned idx = 0; idx < rNodes.size(); idx++)
     {
         temp_nodes[idx] = rNodes[idx].get();
     }
@@ -502,7 +502,7 @@ unsigned NodesOnlyMesh<SPACE_DIM>::GetNextAvailableIndex()
     return index;
 }
 
-template<unsigned SPACE_DIM>
+template <unsigned SPACE_DIM>
 void NodesOnlyMesh<SPACE_DIM>::EnlargeBoxCollection()
 {
     assert(mpBoxCollection);
@@ -510,19 +510,20 @@ void NodesOnlyMesh<SPACE_DIM>::EnlargeBoxCollection()
     int num_local_rows = mpBoxCollection->GetNumLocalRows();
     int new_local_rows = num_local_rows + (int)(PetscTools::AmTopMost()) + (int)(PetscTools::AmMaster());
 
-    c_vector<double, 2*SPACE_DIM> current_domain_size = mpBoxCollection->rGetDomainSize();
-    c_vector<double, 2*SPACE_DIM> new_domain_size = current_domain_size;
+    c_vector<double, 2 * SPACE_DIM> current_domain_size = mpBoxCollection->rGetDomainSize();
+    c_vector<double, 2 * SPACE_DIM> new_domain_size;
+    new_domain_size = current_domain_size;
 
     double fudge = 1e-14;
     c_vector<bool, SPACE_DIM> is_periodic = mpBoxCollection->GetIsPeriodicAllDims();
-    for (unsigned d=0; d < SPACE_DIM; d++)
+    for (unsigned d = 0; d < SPACE_DIM; d++)
     {
         // We don't enlarge in periodic directions
-        if ( !is_periodic(d) )
-    {
-        new_domain_size[2*d] = current_domain_size[2*d] - (mMaximumInteractionDistance - fudge);
-        new_domain_size[2*d+1] = current_domain_size[2*d+1] + (mMaximumInteractionDistance - fudge);
-    }
+        if (!is_periodic(d))
+        {
+            new_domain_size[2 * d] = current_domain_size[2 * d] - (mMaximumInteractionDistance - fudge);
+            new_domain_size[2 * d + 1] = current_domain_size[2 * d + 1] + (mMaximumInteractionDistance - fudge);
+        }
     }
     SetUpBoxCollection(mMaximumInteractionDistance, new_domain_size, new_local_rows);
 }
@@ -539,9 +540,8 @@ bool NodesOnlyMesh<SPACE_DIM>::IsANodeCloseToDomainBoundary()
          node_iter != this->GetNodeIteratorEnd();
          ++node_iter)
     {
-        // Note that we define this vector before setting it as otherwise the profiling build will break (see #2367)
-        c_vector<double, SPACE_DIM> location;
-        location = node_iter->rGetLocation();
+        c_vector<double, SPACE_DIM> location = node_iter->rGetLocation();
+
         // We need to ignore periodic dimensions
         c_vector<bool, SPACE_DIM> is_periodic = mpBoxCollection->GetIsPeriodicAllDims();
         for (unsigned d=0; d<SPACE_DIM; d++)
@@ -589,11 +589,18 @@ void NodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(const std::vector<Node<SPACE_D
 
     ChasteCuboid<SPACE_DIM> bounding_box = this->CalculateBoundingBox(rNodes);
 
+    // Note that in circumstances where parts of the bounding box are a long way from the origin then
+    // a hard-coded "swell factor" of 1e-14 will not be noticed.
+    // For example 200*machine_epsilon = 200*2.2e-16 = 4.4e-14 which implies 200+1e-14 == 200.
+
+    double swell_factor = bounding_box.GetWidth(bounding_box.GetLongestAxis()); // Largest dimension
+    swell_factor = (1 + swell_factor) * 1e-14; // Make sure that it's non-zero
+
     c_vector<double, 2*SPACE_DIM> domain_size;
     for (unsigned i=0; i < SPACE_DIM; i++)
     {
-        domain_size[2*i] = bounding_box.rGetLowerCorner()[i] - 1e-14;
-        domain_size[2*i+1] = bounding_box.rGetUpperCorner()[i] + 1e-14;
+        domain_size[2*i] = bounding_box.rGetLowerCorner()[i] - swell_factor;
+        domain_size[2*i+1] = bounding_box.rGetUpperCorner()[i] + swell_factor;
     }
     SetUpBoxCollection(mMaximumInteractionDistance, domain_size);
 }

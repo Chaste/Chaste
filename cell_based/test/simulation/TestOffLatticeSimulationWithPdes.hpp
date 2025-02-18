@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2023, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -219,7 +219,7 @@ public:
 
         // Set up mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -315,7 +315,7 @@ public:
 
         // Set up mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -394,7 +394,7 @@ public:
 
         // Set up mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -474,7 +474,7 @@ public:
 
         // Set up mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -580,7 +580,7 @@ public:
 
         // Set up mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -733,7 +733,7 @@ public:
 
         // Set up mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -794,85 +794,89 @@ public:
     {
         EXIT_IF_PARALLEL;
 
-        // Set up mesh
-        HoneycombMeshGenerator generator(5, 5, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
-
-        // Set up cells
-        std::vector<CellPtr> cells;
-        MAKE_PTR(WildTypeCellMutationState, p_state);
-        MAKE_PTR(StemCellProliferativeType, p_stem_type);
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
         {
-            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
-            p_model->SetDimension(2);
+            // Set up mesh
+            HoneycombMeshGenerator generator(5, 5, 0);
+            boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
-            // Use non-default G1 durations
-            p_model->SetStemCellG1Duration(8.0);
-            p_model->SetTransitCellG1Duration(8.0);
+            // Set up cells
+            std::vector<CellPtr> cells;
+            MAKE_PTR(WildTypeCellMutationState, p_state);
+            MAKE_PTR(StemCellProliferativeType, p_stem_type);
+            for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+            {
+                SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
+                p_model->SetDimension(2);
 
-            CellPtr p_cell(new Cell(p_state, p_model));
-            p_cell->SetCellProliferativeType(p_stem_type);
-            double birth_time = -1.0 - ((double) i/p_mesh->GetNumNodes())*18.0;
-            p_cell->SetBirthTime(birth_time);
+                // Use non-default G1 durations
+                p_model->SetStemCellG1Duration(8.0);
+                p_model->SetTransitCellG1Duration(8.0);
 
-            cells.push_back(p_cell);
+                CellPtr p_cell(new Cell(p_state, p_model));
+                p_cell->SetCellProliferativeType(p_stem_type);
+                double birth_time = -1.0 - ((double) i/p_mesh->GetNumNodes())*18.0;
+                p_cell->SetBirthTime(birth_time);
+
+                cells.push_back(p_cell);
+            }
+
+            // Set up cell population
+            MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+            // Set up cell-based simulation
+            OffLatticeSimulation<2> simulator(cell_population);
+            simulator.SetOutputDirectory("OffLatticeSimulationWithPdesSaveAndLoad");
+            simulator.SetEndTime(0.2);
+
+            // Create PDE and boundary condition objects
+            MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
+            MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+
+            // Create a PDE modifier and set the name of the dependent variable in the PDE
+            MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+            p_pde_modifier->SetDependentVariableName("oxygen");
+
+            simulator.AddSimulationModifier(p_pde_modifier);
+
+            // Create a force law and pass it to the simulation
+            MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+            p_linear_force->SetCutOffLength(1.5);
+            simulator.AddForce(p_linear_force);
+
+            // Set up cell killer and pass into simulation
+            MAKE_PTR_ARGS(ApoptoticCellKiller<2>, p_killer, (&cell_population));
+            simulator.AddCellKiller(p_killer);
+
+            // Run cell-based simulation
+            simulator.Solve();
+
+            // Save cell-based simulation
+            CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Save(&simulator);
         }
 
-        // Set up cell population
-        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        {
+            OffLatticeSimulation<2>* p_simulator
+                = CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load("OffLatticeSimulationWithPdesSaveAndLoad", 0.2);
 
-        // Set up cell-based simulation
-        OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("OffLatticeSimulationWithPdesSaveAndLoad");
-        simulator.SetEndTime(0.2);
+            p_simulator->SetEndTime(0.5);
+            p_simulator->Solve();
 
-        // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(UniformSourceEllipticPde<2>, p_pde, (-0.1));
-        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+            // These results are from time 0.5 in TestWithOxygen.
+            std::vector<double> node_5_location = p_simulator->GetNodeLocation(5);
+            TS_ASSERT_DELTA(node_5_location[0], 0.4956, 1e-4);
+            TS_ASSERT_DELTA(node_5_location[1], 0.8658, 1e-4);
 
-        // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
-        p_pde_modifier->SetDependentVariableName("oxygen");
+            std::vector<double> node_15_location = p_simulator->GetNodeLocation(15);
+            TS_ASSERT_DELTA(node_15_location[0], 0.5014, 1e-4);
+            TS_ASSERT_DELTA(node_15_location[1], 2.6011, 1e-4);
 
-        simulator.AddSimulationModifier(p_pde_modifier);
+            // Test the CellData result
+            TS_ASSERT_DELTA((p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem("oxygen"), 0.9605, 1e-4);
+            TS_ASSERT_DELTA((p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(15))->GetCellData()->GetItem("oxygen"), 0.9586, 1e-4);
 
-        // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_linear_force);
-
-        // Set up cell killer and pass into simulation
-        MAKE_PTR_ARGS(ApoptoticCellKiller<2>, p_killer, (&cell_population));
-        simulator.AddCellKiller(p_killer);
-
-        // Run cell-based simulation
-        simulator.Solve();
-
-        // Save cell-based simulation
-        CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Save(&simulator);
-
-        OffLatticeSimulation<2>* p_simulator
-            = CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load("OffLatticeSimulationWithPdesSaveAndLoad", 0.2);
-
-        p_simulator->SetEndTime(0.5);
-        p_simulator->Solve();
-
-        // These results are from time 0.5 in TestWithOxygen.
-        std::vector<double> node_5_location = p_simulator->GetNodeLocation(5);
-        TS_ASSERT_DELTA(node_5_location[0], 0.4956, 1e-4);
-        TS_ASSERT_DELTA(node_5_location[1], 0.8658, 1e-4);
-
-        std::vector<double> node_15_location = p_simulator->GetNodeLocation(15);
-        TS_ASSERT_DELTA(node_15_location[0], 0.5014, 1e-4);
-        TS_ASSERT_DELTA(node_15_location[1], 2.6011, 1e-4);
-
-        // Test the CellData result
-        TS_ASSERT_DELTA((p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(5))->GetCellData()->GetItem("oxygen"), 0.9605, 1e-4);
-        TS_ASSERT_DELTA((p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(15))->GetCellData()->GetItem("oxygen"), 0.9586, 1e-4);
-
-        // Tidy up
-        delete p_simulator;
+            // Tidy up
+            delete p_simulator;
+        }
     }
 
     /**
@@ -885,72 +889,76 @@ public:
 
         std::string output_directory = "TestArchivingWithCellwisePde";
         double end_time = 0.1;
-
-        // Set up mesh
-        HoneycombMeshGenerator generator(5, 5, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
-
-        // Set up cells
-        std::vector<CellPtr> cells;
-        MAKE_PTR(WildTypeCellMutationState, p_state);
-        MAKE_PTR(StemCellProliferativeType, p_stem_type);
-        for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+        
         {
-            SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
-            p_model->SetDimension(2);
+            // Set up mesh
+            HoneycombMeshGenerator generator(5, 5, 0);
+            boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
-            // Use non-default G1 durations
-            p_model->SetStemCellG1Duration(8.0);
-            p_model->SetTransitCellG1Duration(8.0);
+            // Set up cells
+            std::vector<CellPtr> cells;
+            MAKE_PTR(WildTypeCellMutationState, p_state);
+            MAKE_PTR(StemCellProliferativeType, p_stem_type);
+            for (unsigned i=0; i<p_mesh->GetNumNodes(); i++)
+            {
+                SimpleOxygenBasedCellCycleModel* p_model = new SimpleOxygenBasedCellCycleModel();
+                p_model->SetDimension(2);
 
-            CellPtr p_cell(new Cell(p_state, p_model));
-            p_cell->SetCellProliferativeType(p_stem_type);
-            double birth_time = -1.0 - ((double) i/p_mesh->GetNumNodes())*18.0;
-            p_cell->SetBirthTime(birth_time);
+                // Use non-default G1 durations
+                p_model->SetStemCellG1Duration(8.0);
+                p_model->SetTransitCellG1Duration(8.0);
 
-            cells.push_back(p_cell);
+                CellPtr p_cell(new Cell(p_state, p_model));
+                p_cell->SetCellProliferativeType(p_stem_type);
+                double birth_time = -1.0 - ((double) i/p_mesh->GetNumNodes())*18.0;
+                p_cell->SetBirthTime(birth_time);
+
+                cells.push_back(p_cell);
+            }
+
+            // Set up cell population
+            MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+            // Set up cell-based simulation
+            OffLatticeSimulation<2> simulator(cell_population);
+            simulator.SetOutputDirectory(output_directory);
+            simulator.SetEndTime(end_time);
+
+            // Create PDE and boundary condition objects
+            MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, -0.03));
+            MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+
+            // Create a PDE modifier and set the name of the dependent variable in the PDE
+            MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
+            p_pde_modifier->SetDependentVariableName("oxygen");
+
+            simulator.AddSimulationModifier(p_pde_modifier);
+
+            // Create a force law and pass it to the simulation
+            MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+            p_linear_force->SetCutOffLength(3.0);
+            simulator.AddForce(p_linear_force);
+
+            // Run cell-based simulation
+            simulator.Solve();
+
+            // Save cell-based simulation
+            CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Save(&simulator);
         }
 
-        // Set up cell population
-        MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        {
+            // Load simulation
+            OffLatticeSimulation<2>* p_simulator
+                = CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load(output_directory, end_time);
 
-        // Set up cell-based simulation
-        OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory(output_directory);
-        simulator.SetEndTime(end_time);
+            p_simulator->SetEndTime(2.0*end_time);
 
-        // Create PDE and boundary condition objects
-        MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, -0.03));
-        MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
+            // Run cell-based simulation
+            TS_ASSERT_THROWS_NOTHING(p_simulator->Solve());
 
-        // Create a PDE modifier and set the name of the dependent variable in the PDE
-        MAKE_PTR_ARGS(EllipticGrowingDomainPdeModifier<2>, p_pde_modifier, (p_pde, p_bc, false));
-        p_pde_modifier->SetDependentVariableName("oxygen");
-
-        simulator.AddSimulationModifier(p_pde_modifier);
-
-        // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetCutOffLength(3.0);
-        simulator.AddForce(p_linear_force);
-
-        // Run cell-based simulation
-        simulator.Solve();
-
-        // Save cell-based simulation
-        CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Save(&simulator);
-
-        // Load simulation
-        OffLatticeSimulation<2>* p_simulator
-            = CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load(output_directory, end_time);
-
-        p_simulator->SetEndTime(2.0*end_time);
-
-        // Run cell-based simulation
-        TS_ASSERT_THROWS_NOTHING(p_simulator->Solve());
-
-        // Tidy up
-        delete p_simulator;
+            // Tidy up
+            delete p_simulator;
+        }
     }
 
     void Test3DOffLatticeSimulationWithPdes()
@@ -1085,7 +1093,7 @@ public:
 
         // Create a simple mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        MutableMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -1228,7 +1236,7 @@ public:
 
         /// Create a simple 2D VertexMesh
         HoneycombVertexMeshGenerator generator(5, 3);
-        MutableVertexMesh<2,2>* p_mesh = generator.GetMesh();
+        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -1263,7 +1271,7 @@ public:
         MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
         simulator.AddForce(p_nagai_honda_force);
 
-        // A NagaiHondaForce has to be used together with an AbstractTargetAreaModifier
+        // Pass a target area modifier to the simulation
         MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
         simulator.AddSimulationModifier(p_growth_modifier);
 
