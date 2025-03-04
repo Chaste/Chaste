@@ -54,8 +54,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * CellBasedSimulationArchiver handles the checkpointing (saving and loading)
  * of all the various AbstractCellBasedSimulation objects. It has no explicit constructor
  * (just uses a default one) and no member variables.
+ * 
+ * The template boolean flag ARCHIVE_IS_TEXT is allows for reading and writing of binary 
+ * archives instead of text-based archives by setting ARCHIVE_IS_TEXT to false.
+ * Default behavior is to output text-based archives for easier debugging and 
+ * human readability.
  */
-template<unsigned ELEMENT_DIM, class SIM, unsigned SPACE_DIM=ELEMENT_DIM>
+template<unsigned ELEMENT_DIM, class SIM, bool ARCHIVE_IS_TEXT=true, unsigned SPACE_DIM=ELEMENT_DIM>
 class CellBasedSimulationArchiver
 {
 public:
@@ -86,7 +91,7 @@ public:
     static void Save(SIM* pSim);
 };
 
-template<unsigned ELEMENT_DIM, class SIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, class SIM, bool ARCHIVE_IS_TEXT, unsigned SPACE_DIM>
 SIM* CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM>::Load(const std::string& rArchiveDirectory, const double& rTimeStamp)
 {
     /**
@@ -104,17 +109,28 @@ SIM* CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM>::Load(const std::s
     FileFinder archive_dir(rArchiveDirectory + "/archive/", RelativeTo::ChasteTestOutput);
     ArchiveLocationInfo::SetMeshPathname(archive_dir, mesh_filename);
 
-    // Create an input archive
-    ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_filename);
-    boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
-
-    // Load the simulation
     SIM* p_sim;
-    (*p_arch) >> p_sim;
+    if constexpr(ARCHIVE_IS_TEXT){
+      // Create a text-based input archive
+      ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_filename);
+      boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
+
+      // Load the simulation
+      (*p_arch) >> p_sim;
+    } 
+    else
+    {
+      // Create a binary input archive
+      ArchiveOpener<boost::archive::binary_iarchive, std::ifstream> arch_opener(archive_dir, archive_filename);
+      boost::archive::binary_iarchive* p_arch = arch_opener.GetCommonArchive();
+
+      // Load the simulation
+      (*p_arch) >> p_sim;
+    }
     return p_sim;
 }
 
-template<unsigned ELEMENT_DIM, class SIM, unsigned SPACE_DIM>
+template<unsigned ELEMENT_DIM, class SIM, bool ARCHIVE_IS_TEXT, unsigned SPACE_DIM>
 void CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM>::Save(SIM* pSim)
 {
     // Get the simulation time as a string
@@ -128,12 +144,24 @@ void CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM>::Save(SIM* pSim)
     std::string archive_filename = "cell_population_sim_at_time_" + time_stamp.str() + ".arch";
     ArchiveLocationInfo::SetMeshFilename(std::string("mesh_") + time_stamp.str());
 
-    // Create output archive
-    ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_filename);
-    boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
+    if constexpr(ARCHIVE_IS_TEXT)
+    {
+      // Create text-based output archive
+      ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_filename);
+      boost::archive::text_oarchive* p_arch = arch_opener.GetCommonArchive();
 
-    // Archive the simulation (const-ness would be a pain here)
-    (*p_arch) & pSim;
+      // Archive the simulation (const-ness would be a pain here)
+      (*p_arch) & pSim;
+    } 
+    else 
+    {
+      // Create binary output archive
+      ArchiveOpener<boost::archive::binary_oarchive, std::ofstream> arch_opener(archive_dir, archive_filename);
+      boost::archive::binary_oarchive* p_arch = arch_opener.GetCommonArchive();
+
+      // Archive the simulation (const-ness would be a pain here)
+      (*p_arch) & pSim;
+    }
 }
 
 #endif /*CELLBASEDSIMULATIONARCHIVER_HPP_*/
