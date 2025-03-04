@@ -58,6 +58,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Save typing, and allow the use of these in cxxtest macros
 typedef ArchiveOpener<boost::archive::text_iarchive, std::ifstream> InputArchiveOpener;
 typedef ArchiveOpener<boost::archive::text_oarchive, std::ofstream> OutputArchiveOpener;
+typedef ArchiveOpener<boost::archive::binary_iarchive, std::ifstream> InputBinaryArchiveOpener;
+typedef ArchiveOpener<boost::archive::binary_oarchive, std::ofstream> OutputBinaryArchiveOpener;
 
 class TestArchivingHelperClasses : public CxxTest::TestSuite
 {
@@ -199,6 +201,58 @@ public:
             // Read
             FileFinder save_bidomain_dir("apps/texttest/chaste/resume_bidomain/save_bidomain", RelativeTo::ChasteSourceRoot);
             InputArchiveOpener archive_opener_relative(save_bidomain_dir, "archive.arch");
+        }
+
+        PetscTools::Barrier(); // Make sure all processes have finished this test before proceeding
+    }
+
+    void TestBinaryArchiveOpenerReadAndWrite()
+    {
+        // Should this test fail with an exception involving
+        // apps/texttest/chaste/resume_bidomain/save_bidomain
+        // then look at TestCardiacSimulationArchiver
+        mArchiveDir = "archiving_helpers";
+        FileFinder archive_dir(mArchiveDir, RelativeTo::ChasteTestOutput);
+        std::string archive_file = "archive_opener.arch";
+        const unsigned test_int = 123;
+
+        // Write
+        {
+            OutputBinaryArchiveOpener archive_opener_out(archive_dir, archive_file);
+            boost::archive::binary_oarchive* p_arch = archive_opener_out.GetCommonArchive();
+            boost::archive::binary_oarchive* p_process_arch = ProcessSpecificArchive<boost::archive::binary_oarchive>::Get();
+
+            (*p_arch) & test_int; // All can write to the common archive - non-masters will write to /dev/null.
+            (*p_process_arch) & test_int;
+
+            // archive_opener_out will do a PetscTools::Barrier when it is destructed
+        }
+
+        // Read
+        {
+            TS_ASSERT_THROWS_THIS(ProcessSpecificArchive<boost::archive::binary_oarchive>::Get(),
+                                "A ProcessSpecificArchive has not been set up.");
+            TS_ASSERT_THROWS_THIS(ProcessSpecificArchive<boost::archive::binary_iarchive>::Get(),
+                                "A ProcessSpecificArchive has not been set up.");
+
+            InputBinaryArchiveOpener archive_opener_in(archive_dir, archive_file);
+            boost::archive::binary_iarchive* p_arch = archive_opener_in.GetCommonArchive();
+            boost::archive::binary_iarchive* p_process_arch = ProcessSpecificArchive<boost::archive::binary_iarchive>::Get();
+
+            unsigned test_int1, test_int2;
+            (*p_arch) & test_int1;
+            (*p_process_arch) & test_int2;
+
+            TS_ASSERT_EQUALS(test_int1, test_int);
+            TS_ASSERT_EQUALS(test_int2, test_int);
+        }
+
+        // Cover the case of an archive in the chaste folder (i.e. a path relative to the working directory)
+        if (PetscTools::IsSequential())
+        {
+            // Read
+            FileFinder save_bidomain_dir("apps/texttest/chaste/resume_bidomain/save_bidomain", RelativeTo::ChasteSourceRoot);
+            InputBinaryArchiveOpener archive_opener_relative(save_bidomain_dir, "archive.arch");
         }
 
         PetscTools::Barrier(); // Make sure all processes have finished this test before proceeding
