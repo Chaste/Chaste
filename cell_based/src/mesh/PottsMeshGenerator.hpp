@@ -71,6 +71,7 @@ public:
      * @param numNodesDeep  The number nodes deep for this mesh (defaults to 1)
      * @param numElementsDeep  The number of elements deep for this mesh (defaults to 1)
      * @param elementDepth  The number of rows of nodes in each element (defaults to 1)
+     * @param spacingBetweenElements  the number of spaces between elements (defaults to 0)
      * @param startAtBottomLeft  If true then the mesh starts in the bottom left corner
      *     of the domain rather than the centre, used for simple tests (defaults to false)
      * @param isPeriodicInX  If true then the mesh is periodic in the x dimension (defaults to false)
@@ -86,6 +87,7 @@ public:
                        unsigned numNodesDeep=1u,
                        unsigned numElementsDeep=1u,
                        unsigned elementDepth=1u,
+                       unsigned spacingBetweenElements=0u,
                        bool startAtBottomLeft = false,
                        bool isPeriodicInX = false,
                        bool isPeriodicInY = false,

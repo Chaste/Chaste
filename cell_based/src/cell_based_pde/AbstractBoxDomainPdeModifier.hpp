@@ -73,6 +73,7 @@ private:
         archive & mStepSize;
         archive & mSetBcsOnBoxBoundary;
         archive & mSetBcsOnBoundingSphere;
+        archive & mSetBcsOnConvexHull;
         archive & mUseVoronoiCellsForInterpolation;
         archive & mTypicalCellRadius;
     }
@@ -106,6 +107,13 @@ protected:
      * Default to false.
      */
     bool mSetBcsOnBoundingSphere;
+
+    /**
+     * Whether to set the boundary condition on a the convex hull which bounds the cell centres of the tissue. 
+     * Only used if mSetBcsOnBoxBoundary is false.
+     * Default to false.
+     */
+    bool mSetBcsOnConvexHull;
 
     /**
      * Whether to use a cell centres voroni region to interpolate the pde solution onto cells.
@@ -165,14 +173,26 @@ public:
     /**
      * Set mSetBcsOnBoundingSphere.
      *
-     * @param setBcsOnBoxBoundary whether to set the boundary condition on the edge of the box domain rather than the cell population
+     * @param setBcsOnBoundingSphere whether to set the boundary condition on the bounding spher of the cell population
      */
-    void SetBcsOnBoundingSphere(bool setBcsOnBoxBoundary);
+    void SetBcsOnBoundingSphere(bool setBcsOnBoundingSphere);
 
     /**
      * @return mSetBcsOnBoundingSphere.
      */
     bool AreBcsSetOnBoundingSphere();
+
+    /**
+     * Set mSetBcsOnConvexHull.
+     *
+     * @param setBcsOnConvexHull whether to set the boundary condition on the convex hull of than the cell population
+     */
+    void SetBcsOnConvexHull(bool setBcsOnConvexHull);
+
+    /**
+     * @return mSetBcsOnConvexHull.
+     */
+    bool AreBcsSetOnConvexHull();
 
     /**
      * Set mUseVoronoiCellsForInterpolation.

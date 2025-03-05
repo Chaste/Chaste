@@ -72,6 +72,7 @@ private:
         archive & mpBoundaryCondition;
         archive & mIsNeumannBoundaryCondition;
         archive & mDependentVariableName;
+        archive & mSolutionInterval;
 
         // Note that archiving of mSolution is handled by the methods save/load_construct_data
         archive & mOutputDirectory;
@@ -103,6 +104,9 @@ protected:
      * e.g. oxygen concentration.
      */
     std::string mDependentVariableName;
+
+    /**  Specify the interval between updating the pde solution. */
+    int mSolutionInterval;
 
     /** The solution to the PDE problem at the current time step. */
     Vec mSolution;
@@ -184,6 +188,20 @@ public:
      * @return the name
      */
     std::string& rGetDependentVariableName();
+
+    /**
+     * Set the PDE solution interval .
+     *
+     * @param solutionInterval the new solution interval.
+     */
+    void SetSolutionInterval(int solutionInterval);
+
+    /**
+     * Get the PDE solution interval.
+     *
+     * @return the solution interval.
+     */
+    int GetSolutionInterval();
 
     /**
      * @return whether the PDE has an averaged source

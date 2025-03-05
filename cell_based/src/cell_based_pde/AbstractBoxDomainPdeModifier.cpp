@@ -36,6 +36,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractBoxDomainPdeModifier.hpp"
 #include "ReplicatableVector.hpp"
 #include "LinearBasisFunction.hpp"
+#include "Debug.hpp"
+#include "VtkMeshWriter.hpp"
 
 template<unsigned DIM>
 AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
@@ -52,6 +54,7 @@ AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(boost::shared_pt
       mStepSize(stepSize),
       mSetBcsOnBoxBoundary(true),
       mSetBcsOnBoundingSphere(false),
+      mSetBcsOnConvexHull(false),
       mUseVoronoiCellsForInterpolation(false),
       mTypicalCellRadius(0.5) // defaults to 0.5
 {
@@ -101,6 +104,18 @@ bool AbstractBoxDomainPdeModifier<DIM>::AreBcsSetOnBoundingSphere()
 }
 
 template<unsigned DIM>
+void AbstractBoxDomainPdeModifier<DIM>::SetBcsOnConvexHull(bool setBcsOnConvexHull)
+{
+    mSetBcsOnConvexHull = setBcsOnConvexHull;
+}
+
+template<unsigned DIM>
+bool AbstractBoxDomainPdeModifier<DIM>::AreBcsSetOnConvexHull()
+{
+    return mSetBcsOnConvexHull;
+}
+
+template<unsigned DIM>
 void AbstractBoxDomainPdeModifier<DIM>::SetUseVoronoiCellsForInterpolation(bool useVoronoiCellsForInterpolation)
 {
     mUseVoronoiCellsForInterpolation = useVoronoiCellsForInterpolation;
@@ -129,11 +144,23 @@ template<unsigned DIM>
 void AbstractBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainerHelper(AbstractCellPopulation<DIM,DIM>& rCellPopulation,
                                                                                    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > pBcc)
 {
+    // Reset mIsDirichletBoundaryNode
+    for (unsigned i=0; i<this->mpFeMesh->GetNumNodes(); i++)
+    {
+       this->mIsDirichletBoundaryNode[i] = 0.0;
+    }
+
     if (!this->mSetBcsOnBoxBoundary)
     {
         // Here we approximate the cell population by the bounding spehere and apply the boundary conditions outside the sphere.
         if (this->mSetBcsOnBoundingSphere)
         {
+            //Cant apply on the convex hull and bounding sphere at same time 
+            if(this->mSetBcsOnConvexHull)
+            {
+                NEVER_REACHED;
+            }
+
             // First find the centre of the tissue by choosing the mid point of the extrema.
             c_vector<double, DIM> tissue_maxima = zero_vector<double>(DIM);
             c_vector<double, DIM> tissue_minima = zero_vector<double>(DIM);
@@ -184,6 +211,7 @@ void AbstractBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainerHelp
             // Apply boundary condition to the nodes outside the tissue_radius
             if (this->IsNeumannBoundaryCondition())
             {
+                // Neumann BSC not implemented yet for this geometry
                 NEVER_REACHED;
             }
             else
@@ -201,7 +229,40 @@ void AbstractBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainerHelp
                 }
             }
         }
-        else // Set pde nodes as boundary node if elements dont contain cells or nodes aren't within 0.5CD of a cell centre
+        // Here apply the dirichlet conditions to nodes outside the convex hull of the cell centres 
+        // (i.e its applied outside the mesh thats formed by the cetres)
+        else if (this->mSetBcsOnConvexHull) 
+        {
+            // Can't apply on the convex hull and bounding sphere at same time 
+            if(this->mSetBcsOnBoundingSphere)
+            {
+                NEVER_REACHED;
+            }
+
+            // Apply boundary condition to the nodes outside the convex hull
+            if (this->IsNeumannBoundaryCondition())
+            {
+                // Neumann BSC not implemented yet for this geometry
+                NEVER_REACHED;
+            }
+            else
+            {
+                TetrahedralMesh<DIM,DIM>* p_convex_mesh = rCellPopulation.GetTetrahedralMeshForPdeModifier();
+
+                // Impose any Dirichlet boundary conditions
+                for (unsigned i=0; i<this->mpFeMesh->GetNumNodes(); i++)
+                {
+                    std::vector<unsigned> containing_element_indices = p_convex_mesh->GetContainingElementIndices(this->mpFeMesh->GetNode(i)->rGetLocation());
+
+                    if (containing_element_indices.size()==0u)
+                    {
+                        pBcc->AddDirichletBoundaryCondition(this->mpFeMesh->GetNode(i), this->mpBoundaryCondition.get(), 0, false);
+                        this->mIsDirichletBoundaryNode[i] = 1.0;
+                    }
+                }
+            }
+        }
+        else // Set pde nodes as boundary node if elements dont contain cells or nodes aren't within a specified distance of a cell centre
         {
             // Get the set of coarse element indices that contain cells
             std::set<unsigned> coarse_element_indices_in_map;
@@ -271,6 +332,7 @@ void AbstractBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainerHelp
             // Apply boundary condition to the nodes in the set coarse_mesh_boundary_node_indices
             if (this->IsNeumannBoundaryCondition())
             {
+                // Neumann BSC not implemented yet for this geometry
                 NEVER_REACHED;
             }
             else
@@ -375,6 +437,7 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
 
     if (mUseVoronoiCellsForInterpolation) 
     {
+        NEVER_REACHED;
         unsigned num_nodes = rCellPopulation.GetNumNodes();
 
         std::vector<double> cell_data(num_nodes, -1);

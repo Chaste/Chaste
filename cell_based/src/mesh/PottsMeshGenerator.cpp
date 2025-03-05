@@ -42,16 +42,18 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned numElementsAcross, unsigned elementWidth,
                                             unsigned numNodesUp, unsigned numElementsUp, unsigned elementHeight,
-                                            unsigned numNodesDeep, unsigned numElementsDeep, unsigned elementDepth,
+                                            unsigned numNodesDeep, unsigned numElementsDeep, unsigned elementDepth, unsigned spacingBetweenElements,
                                             bool startAtBottomLeft, bool isPeriodicInX, bool isPeriodicInY ,bool isPeriodicInZ)
 {
     assert(numNodesAcross > 0);
     assert(numNodesUp > 0);
     assert(numNodesDeep > 0);
 
-    assert(numElementsAcross*elementWidth <= numNodesAcross);
-    assert(numElementsUp*elementHeight <= numNodesUp);
-    assert(numElementsDeep*elementDepth <= numNodesDeep);
+    assert(spacingBetweenElements>=0);
+
+    assert(numElementsAcross*elementWidth + (numElementsAcross-1)*spacingBetweenElements <= numNodesAcross);
+    assert(numElementsUp*elementHeight + (numNodesUp-1)*spacingBetweenElements <= numNodesUp);
+    assert(numElementsDeep*elementDepth + (numNodesDeep-1)*spacingBetweenElements <= numNodesDeep);
 
     std::vector<Node<DIM>*> nodes;
     std::vector<PottsElement<DIM>*>  elements;
@@ -69,9 +71,9 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
     if (!startAtBottomLeft) // Elements in centre of mesh
     {
         // Calculate the width of the medium on the edge and offset the node index so that the elements are in the centre of the mesh.
-        unsigned across_gap = (numNodesAcross -  numElementsAcross*elementWidth)/2;
-        unsigned up_gap = (numNodesUp -  numElementsUp*elementHeight)/2;
-        unsigned deep_gap = (numNodesDeep -  numElementsDeep*elementDepth)/2;
+        unsigned across_gap = (numNodesAcross -  numElementsAcross*elementWidth - (numElementsAcross-1)*spacingBetweenElements)/2;
+        unsigned up_gap = (numNodesUp -  numElementsUp*elementHeight - (numElementsUp-1)*spacingBetweenElements)/2;
+        unsigned deep_gap = (numNodesDeep -  numElementsDeep*elementDepth - (numElementsDeep-1)*spacingBetweenElements)/2;
 
         index_offset = deep_gap*numNodesAcross*numNodesUp + up_gap*numNodesAcross + across_gap;
     }
@@ -121,9 +123,9 @@ PottsMeshGenerator<DIM>::PottsMeshGenerator(unsigned numNodesAcross, unsigned nu
                     {
                         for (unsigned k=0; k<elementWidth; k++)
                         {
-                            node_indices[m*elementHeight*elementWidth + l*elementWidth + k] = n*elementDepth*numNodesUp*numNodesAcross +
-                                                                                              j*elementHeight*numNodesAcross +
-                                                                                              i*elementWidth +
+                            node_indices[m*elementHeight*elementWidth + l*elementWidth + k] = n*(elementDepth+spacingBetweenElements)*numNodesUp*numNodesAcross +
+                                                                                              j*(elementHeight+spacingBetweenElements)*numNodesAcross +
+                                                                                              i*(elementWidth+spacingBetweenElements) +
                                                                                               m*numNodesAcross*numNodesUp +
                                                                                               l*numNodesAcross +
                                                                                               k + index_offset;

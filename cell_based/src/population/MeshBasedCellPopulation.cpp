@@ -223,6 +223,8 @@ const MutableMesh<ELEMENT_DIM,SPACE_DIM>& MeshBasedCellPopulation<ELEMENT_DIM,SP
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::GetTetrahedralMeshForPdeModifier()
 {
+    // Incase cells have moved and made elements overlap. 
+    mpMutableMesh->ReMesh();
     return mpMutableMesh;
 }
 

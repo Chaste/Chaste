@@ -38,12 +38,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 AveragedSourceParabolicPde<DIM>::AveragedSourceParabolicPde(AbstractCellPopulation<DIM,DIM>& rCellPopulation,
+                                                            double constantCellSourceCoefficient, 
+                                                            double linearCellSourceCoefficient, 
                                                             double constantSourceCoefficient, 
                                                             double linearSourceCoefficient, 
                                                             double diffusionCoefficient,
                                                             double duDtCoefficient,
                                                             bool scaleByCellVolume)
     : mrCellPopulation(rCellPopulation),
+      mConstantCellSourceCoefficient(constantCellSourceCoefficient),
+      mLinearCellSourceCoefficient(linearCellSourceCoefficient),
       mConstantSourceCoefficient(constantSourceCoefficient),
       mLinearSourceCoefficient(linearSourceCoefficient),
       mDiffusionCoefficient(diffusionCoefficient),
@@ -56,6 +60,18 @@ template<unsigned DIM>
 const AbstractCellPopulation<DIM,DIM>& AveragedSourceParabolicPde<DIM>::rGetCellPopulation() const
 {
     return mrCellPopulation;
+}
+
+template<unsigned DIM>
+double AveragedSourceParabolicPde<DIM>::GetConstantCellCoefficient() const
+{
+    return mConstantCellSourceCoefficient;
+}
+
+template<unsigned DIM>
+double AveragedSourceParabolicPde<DIM>::GetLinearCellCoefficient() const
+{
+    return mLinearCellSourceCoefficient;
 }
 
 template<unsigned DIM>
@@ -98,44 +114,160 @@ void AveragedSourceParabolicPde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>&
         mCellDensityOnCoarseElements[elem_index] = 0.0;
     }
 
-    // Loop over cells, find which coarse element it is in, and add 1 to mSourceTermOnCoarseElements[elem_index]
-    for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = mrCellPopulation.Begin();
-         cell_iter != mrCellPopulation.End();
-         ++cell_iter)
+    // bool mSmallMesh = false;
+
+    // if(mSmallMesh)
+    // {
+    //     std::vector<unsigned> nearest_cell;
+    //     std::vector< std::set<unsigned> > voronoi_cell_node_indices;
+
+    //     // Allocate memory
+    //     nearest_cell.resize(rCoarseMesh.GetNumElements());
+    //     for (unsigned elem_index=0; elem_index<mCellDensityOnCoarseElements.size(); elem_index++)
+    //     {
+    //         nearest_cell[elem_index] = UNSIGNED_UNSET;
+    //     }
+
+    //     // Double check set cleared
+    //     voronoi_cell_node_indices.resize(mrCellPopulation.GetNumAllCells());
+    //     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = mrCellPopulation.Begin();
+    //         cell_iter != mrCellPopulation.End();
+    //         ++cell_iter)
+    //     {
+    //         unsigned cell_location_index = mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);   
+    //         voronoi_cell_node_indices[cell_location_index].clear(); 
+    //     }
+
+    //     // Loop over elements of the finite element mesh and work out which voronoi region the centre of the element is in.
+    //     for (typename TetrahedralMesh<DIM,DIM>::ElementIterator elem_iter = rCoarseMesh.GetElementIteratorBegin();
+    //      elem_iter != rCoarseMesh.GetElementIteratorEnd();
+    //      ++elem_iter)
+    //     {
+    //         unsigned element_index = elem_iter->GetIndex();
+
+    //         c_vector<double,DIM> element_centre_location = elem_iter->CalculateCentroid();
+
+    //         double closest_separation = DBL_MAX;
+    //         unsigned local_nearest_cell = UNSIGNED_UNSET;
+
+    //         for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = mrCellPopulation.Begin();
+    //             cell_iter != mrCellPopulation.End();
+    //             ++cell_iter)
+    //         {
+    //             c_vector<double, DIM> cell_location = mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
+
+    //             double separation = norm_2(element_centre_location - cell_location);
+
+    //             if (separation < closest_separation)
+    //             {
+    //                 closest_separation = separation;
+    //                 local_nearest_cell = mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);
+    //             }                
+    //         }
+    //         assert(closest_separation<DBL_MAX);
+
+    //         nearest_cell[element_index] = local_nearest_cell;
+
+    //         voronoi_cell_node_indices[local_nearest_cell].insert(element_index);
+    //     }   
+
+    //     // Loop over the cells and assign the weights to the FE Mesh elements
+    //     for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = mrCellPopulation.Begin();
+    //     cell_iter != mrCellPopulation.End();
+    //     ++cell_iter)
+    //     {
+    //         unsigned cell_location_index = mrCellPopulation.GetLocationIndexUsingCell(*cell_iter);   
+
+    //         unsigned number_of_contained_nodes = voronoi_cell_node_indices[cell_location_index].size();
+            
+    //         if (number_of_contained_nodes==0)
+    //         {
+    //             //EXCEPTION("One or more of the cells doesnt contain any pde nodes can't use mSmallMesh=true");
+
+    //             /*
+    //              * Cell doesnt contain any element centroids, probably as cells smaller than elements. 
+    //              * In this case assign all the weight to the element that contains the cell centre
+    //              */
+    //             unsigned elem_index = UNSIGNED_UNSET;
+    //             const ChastePoint<DIM>& r_position_of_cell = mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
+
+    //             if (pCellPdeElementMap != nullptr)
+    //             {
+    //                 elem_index = (*pCellPdeElementMap)[*cell_iter];
+    //             }
+    //             else
+    //             {
+    //                 elem_index = rCoarseMesh.GetContainingElementIndex(r_position_of_cell);
+    //             }
+
+    //             voronoi_cell_node_indices[cell_location_index].insert(elem_index);
+    //             number_of_contained_nodes = 1;
+    //         }
+
+    //         double cell_weight = 1.0;
+
+    //         if (mScaleByCellVolume)
+    //         {   
+    //             cell_weight = mrCellPopulation.GetVolumeOfCell(*cell_iter);
+
+    //             if (cell_weight <1e-6)
+    //             {
+    //                 EXCEPTION("The volume of one of the cells is " << cell_weight << 
+    //                         " and you are scaling by cell volume. Either turn scaling off or use"  
+    //                         " a cell model with non zero areas (i.e. a Bounded Voronoi Tesselation model).");
+    //             }
+    //         }
+
+    //         // Partition the cell between the containing elements
+    //         for (std::set<unsigned>::iterator iter =  voronoi_cell_node_indices[cell_location_index].begin();
+    //             iter !=  voronoi_cell_node_indices[cell_location_index].end();
+    //             ++iter)
+    //         {
+    //             mCellDensityOnCoarseElements[*iter] += cell_weight/(double) number_of_contained_nodes;
+    //         }
+            
+    //     }
+    // }
+    // else
     {
-        unsigned elem_index = 0;
-        const ChastePoint<DIM>& r_position_of_cell = mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
-
-        if (pCellPdeElementMap != nullptr)
+        // Loop over cells, find which coarse element it is in, and add 1 to mSourceTermOnCoarseElements[elem_index]
+        for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = mrCellPopulation.Begin();
+            cell_iter != mrCellPopulation.End();
+            ++cell_iter)
         {
-            elem_index = (*pCellPdeElementMap)[*cell_iter];
-        }
-        else
-        {
-            elem_index = rCoarseMesh.GetContainingElementIndex(r_position_of_cell);
-        }
+            unsigned elem_index = UNSIGNED_UNSET;
+            const ChastePoint<DIM>& r_position_of_cell = mrCellPopulation.GetLocationOfCellCentre(*cell_iter);
 
-        // Update element map if cell has moved
-        bool cell_is_apoptotic = cell_iter->template HasCellProperty<ApoptoticCellProperty>();
-
-        if (!cell_is_apoptotic)
-        {
-            double cell_weight = 1.0;
-
-            if (mScaleByCellVolume)
-            {   
-                // If scaling by cell volume then use volume her instead of cell count 
-                cell_weight = mrCellPopulation.GetVolumeOfCell(*cell_iter);
-
-                if (cell_weight <1e-6)
-                {
-                    EXCEPTION("The volume of one of the cells is " << cell_weight << 
-                              " and you are scaling by cell volume. Either turn scaling off or use"  
-                              " a cell model with non zero areas (i.e. a Bounded Voronoi Tesselation model).");
-                }
+            if (pCellPdeElementMap != nullptr)
+            {
+                elem_index = (*pCellPdeElementMap)[*cell_iter];
+            }
+            else
+            {
+                elem_index = rCoarseMesh.GetContainingElementIndex(r_position_of_cell);
             }
 
-            mCellDensityOnCoarseElements[elem_index] += cell_weight;
+            bool cell_is_apoptotic = cell_iter->template HasCellProperty<ApoptoticCellProperty>();
+
+            if (!cell_is_apoptotic)
+            {
+                double cell_weight = 1.0;
+
+                if (mScaleByCellVolume)
+                {   
+                    // If scaling by cell volume then use volume here instead of cell count 
+                    cell_weight = mrCellPopulation.GetVolumeOfCell(*cell_iter);
+
+                    if (cell_weight <1e-6)
+                    {
+                        EXCEPTION("The volume of one of the cells is " << cell_weight << 
+                                " and you are scaling by cell volume. Either turn scaling off or use"  
+                                " a cell model with non zero areas (i.e. a Bounded Voronoi Tesselation model).");
+                    }
+                }
+
+                mCellDensityOnCoarseElements[elem_index] += cell_weight;
+            }
         }
     }
 
@@ -160,10 +292,14 @@ double AveragedSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>
 {
     assert(!mCellDensityOnCoarseElements.empty());
 
-    // The source term is (a*u + b)*density
-    double source_term = (mLinearSourceCoefficient * u + mConstantSourceCoefficient) * mCellDensityOnCoarseElements[pElement->GetIndex()];
-   
+    // The source term is (a*density + c)*u + b*density + d
+    double constant_source_term = mConstantCellSourceCoefficient * mCellDensityOnCoarseElements[pElement->GetIndex()] + mConstantSourceCoefficient;
+    double linear_source_term_coeficient = mLinearCellSourceCoefficient * mCellDensityOnCoarseElements[pElement->GetIndex()] + mLinearSourceCoefficient;
+    
+    double source_term = constant_source_term + linear_source_term_coeficient * u;
+
     return source_term;
+    //return 25*mCellDensityOnCoarseElements[pElement->GetIndex()] - u;
 }
 
 // LCOV_EXCL_START
@@ -184,6 +320,7 @@ c_matrix<double,DIM,DIM> AveragedSourceParabolicPde<DIM>::ComputeDiffusionTerm(c
 template<unsigned DIM>
 double AveragedSourceParabolicPde<DIM>::GetUptakeRateForElement(unsigned elementIndex)
 {
+    NEVER_REACHED;
     return this->mCellDensityOnCoarseElements[elementIndex];
 }
 

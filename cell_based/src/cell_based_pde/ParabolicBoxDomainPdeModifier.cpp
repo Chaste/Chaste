@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleLinearParabolicSolver.hpp"
 #include "VtkMeshWriter.hpp"
 #include "MutableMesh.hpp"
+#include "PottsBasedCellPopulation.hpp"
 
 template<unsigned DIM>
 ParabolicBoxDomainPdeModifier<DIM>::ParabolicBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
@@ -101,6 +102,57 @@ void ParabolicBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopul
 
     // Now copy solution to cells
     this->UpdateCellData(rCellPopulation);
+
+    // If using a PottsBasedCellPopulation then copy the PDE solution to the lattice sites.
+    if (dynamic_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation))
+    {   
+        // Store the PDE solution in an accessible form
+        ReplicatableVector solution_repl(this->mSolution);
+
+        unsigned num_nodes = rCellPopulation.GetNumNodes();
+
+        std::vector<double> solution_on_lattice_sites(num_nodes, -1);
+
+        // Loop over the nodes of the PottsMesh and get solution values from the mpFeMesh 
+        for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = rCellPopulation.rGetMesh().GetNodeIteratorBegin();
+         node_iter != rCellPopulation.rGetMesh().GetNodeIteratorEnd();
+         ++node_iter)
+        {
+            unsigned node_index = node_iter->GetIndex();
+
+            const ChastePoint<DIM>& node_location = node_iter->rGetLocation();
+
+            // interpolate PDE solution from FEMesh to node_location 
+            // Find the element in the FE mesh that contains this PottsMesh node.
+            try
+            {
+                unsigned fe_elem_index = this->mpFeMesh->GetContainingElementIndex(node_location);
+            
+                // Now do the interpolation
+                Element<DIM,DIM>* p_fe_element = this->mpFeMesh->GetElement(fe_elem_index);
+                c_vector<double,DIM+1> weights;
+
+                weights = p_fe_element->CalculateInterpolationWeights(node_location);
+                
+                double solution_at_node = 0.0;
+                for (unsigned i=0; i<DIM+1; i++)
+                {
+                    double nodal_value = solution_repl[p_fe_element->GetNodeGlobalIndex(i)];
+                    solution_at_node += nodal_value * weights(i);
+                }
+                solution_on_lattice_sites[node_index] = solution_at_node;
+            }
+            catch (Exception &e)
+            {
+                // Potts node is not within the FEMesh 
+
+                assert(0);
+            }
+        }   
+        // Store the solution in the PottsBasedCellPopulation
+        static_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation)->SetPdeSolution(solution_on_lattice_sites);
+    }
+
 
     // Finally, if needed store the locations of cells to be used as old loactions in the next timestep
     if (mMoveSolutionWithCells)
@@ -274,8 +326,8 @@ Vec ParabolicBoxDomainPdeModifier<DIM>::InterpolateSolutionFromCellMovement(Abst
 
     // Loop over nodes of the mpFeMesh and get solution values from the deformed mesh
     for (typename TetrahedralMesh<DIM,DIM>::NodeIterator node_iter = this->mpFeMesh->GetNodeIteratorBegin();
-            node_iter != this->mpFeMesh->GetNodeIteratorEnd();
-            ++node_iter)
+         node_iter != this->mpFeMesh->GetNodeIteratorEnd();
+         ++node_iter)
     {
         unsigned node_index = node_iter->GetIndex();
 

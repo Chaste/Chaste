@@ -75,7 +75,7 @@ void PeriodicNodesOnlyMesh<SPACE_DIM>::SetUpBoxCollection(double cutOffLength, c
                 EXCEPTION("The periodic width must be a multiple of cut off length.");
             }
             // A width of two boxes gives different simulation results as some connections are considered twice.
-            else if ( mWidth[i]/cutOffLength <= (2.0+1e-14) )
+            else if ( mWidth[i]/cutOffLength < 2.0)//= (2.0+1e-14) )
             {
                 EXCEPTION( "The periodic domain width cannot be less than 2*CutOffLength." );
             }

@@ -49,6 +49,7 @@ AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<AbstractLinearPd
       mpPde(pPde),
       mpBoundaryCondition(pBoundaryCondition),
       mIsNeumannBoundaryCondition(isNeumannBoundaryCondition),
+      mSolutionInterval(1),
       mSolution(nullptr),
       mOutputDirectory(""),
       mOutputGradient(false),
@@ -103,6 +104,19 @@ std::string& AbstractPdeModifier<DIM>::rGetDependentVariableName()
 {
     return mDependentVariableName;
 }
+
+template<unsigned DIM>
+void AbstractPdeModifier<DIM>::SetSolutionInterval(int solutionInterval)
+{
+    mSolutionInterval = solutionInterval;
+}
+
+template<unsigned DIM>
+int AbstractPdeModifier<DIM>::GetSolutionInterval()
+{
+    return mSolutionInterval;
+}
+
 
 template<unsigned DIM>
 bool AbstractPdeModifier<DIM>::HasAveragedSourcePde()

@@ -35,6 +35,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "EllipticBoxDomainPdeModifier.hpp"
 #include "SimpleLinearEllipticSolver.hpp"
+#include "Debug.hpp"
 
 template<unsigned DIM>
 EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
@@ -60,30 +61,36 @@ EllipticBoxDomainPdeModifier<DIM>::~EllipticBoxDomainPdeModifier()
 template<unsigned DIM>
 void EllipticBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    // Set up boundary conditions
-    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = ConstructBoundaryConditionsContainer(rCellPopulation);
-
-    this->UpdateCellPdeElementMap(rCellPopulation);
-
-    // When using a PDE mesh which doesn't coincide with the cells, we must set up the source terms before solving the PDE.
-    // Pass in already updated CellPdeElementMap to speed up finding cells.
-    this->SetUpSourceTermsForAveragedSourcePde(this->mpFeMesh, &this->mCellPdeElementMap);
-
-    // Use SimpleLinearEllipticSolver as Averaged Source PDE
-    ///\todo allow other PDE classes to be used with this modifier
-    SimpleLinearEllipticSolver<DIM,DIM> solver(this->mpFeMesh,
-                                               boost::static_pointer_cast<AbstractLinearEllipticPde<DIM,DIM> >(this->GetPde()).get(),
-                                               p_bcc.get());
-
-    ///\todo Use solution at previous time step as an initial guess for Solve()
-    Vec old_solution_copy = this->mSolution;
-    this->mSolution = solver.Solve();
-    if (old_solution_copy != nullptr)
+    SimulationTime* p_simulation_time = SimulationTime::Instance();
+    
+    if (p_simulation_time->GetTimeStepsElapsed()%(this->mSolutionInterval) == 0)
     {
-        PetscTools::Destroy(old_solution_copy);
-    }
+      //PRINT_VARIABLE(p_simulation_time->GetTimeStepsElapsed());
+      //PRINT_VARIABLE((this->mSolutionInterval));
+        // Set up boundary conditions
+        std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > p_bcc = ConstructBoundaryConditionsContainer(rCellPopulation);
 
-    this->UpdateCellData(rCellPopulation);
+        this->UpdateCellPdeElementMap(rCellPopulation);
+
+        // When using a PDE mesh which doesn't coincide with the cells, we must set up the source terms before solving the PDE.
+        // Pass in already updated CellPdeElementMap to speed up finding cells.
+        this->SetUpSourceTermsForAveragedSourcePde(this->mpFeMesh, &this->mCellPdeElementMap);
+
+        // Use SimpleLinearEllipticSolver as Averaged Source PDE
+        ///\todo allow other PDE classes to be used with this modifier
+        SimpleLinearEllipticSolver<DIM,DIM> solver(this->mpFeMesh,
+                                                  boost::static_pointer_cast<AbstractLinearEllipticPde<DIM,DIM> >(this->GetPde()).get(),
+                                                  p_bcc.get());
+
+        // Use solution at previous time step as an initial guess for Solve()
+        Vec old_solution_copy = this->mSolution;
+        this->mSolution = solver.Solve();
+        if (old_solution_copy != nullptr)
+        {
+            PetscTools::Destroy(old_solution_copy);
+        }
+        this->UpdateCellData(rCellPopulation);
+    }
 }
 
 template<unsigned DIM>

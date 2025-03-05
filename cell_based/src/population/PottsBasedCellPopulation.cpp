@@ -89,6 +89,13 @@ PottsBasedCellPopulation<DIM>::PottsBasedCellPopulation(PottsMesh<DIM>& rMesh,
     {
         Validate();
     }
+
+    // Allocate memory
+    mPdeSolution.resize(GetNumNodes());
+    for (unsigned node_index=0; node_index<mPdeSolution.size(); node_index++)
+    {
+        mPdeSolution[node_index] = DOUBLE_UNSET;
+    }
 }
 
 template<unsigned DIM>
@@ -773,6 +780,22 @@ double PottsBasedCellPopulation<DIM>::GetCellDataItemAtPdeNode(
     CellPtr p_cell = this->GetCellUsingLocationIndex(pdeNodeIndex);
     double value = p_cell->GetCellData()->GetItem(rVariableName);
     return value;
+}
+
+template<unsigned DIM>
+void PottsBasedCellPopulation<DIM>::SetPdeSolution(std::vector<double> solution)
+{
+    assert(solution.size() == GetNumNodes());
+    
+    mPdeSolution = solution;
+}
+
+template<unsigned DIM>
+double PottsBasedCellPopulation<DIM>::GetPdeSolutionAtNode(unsigned nodeindex)
+{
+    assert(nodeindex<GetNumNodes());
+    
+    return mPdeSolution[nodeindex];
 }
 
 // Explicit instantiation

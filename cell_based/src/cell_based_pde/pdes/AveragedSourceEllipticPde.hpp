@@ -50,10 +50,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * The PDE takes the form
  *
- * Grad.(D*Grad(u)) + k*u*rho(x) = 0,
+ * Grad.(D*Grad(u)) + k_l*u*rho(x) + k_c*rho(x) + d_l*u + d_c = 0,
  *
- * where the scalars D and k are specified by the members mDiffusionCoefficient and
- * mSourceCoefficient, respectively. Their values must be set in the constructor.
+ * where the scalars D k_c, k_l, d_c, d_l are specified by the members mDiffusionCoefficient,
+ * mLinearCellSourceCoefficient, mConstantCellSourceCoefficient mLinearSourceCoefficient, 
+ * and mConstantSourceCoefficient respectively. Their values must be set in the constructor.
  *
  * The function rho(x) denotes the local density of non-apoptotic cells. This
  * quantity is computed for each element of a 'coarse' finite element mesh that is
@@ -83,6 +84,8 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
        archive & boost::serialization::base_object<AbstractLinearEllipticPde<DIM, DIM> >(*this);
+       archive & mConstantCellSourceCoefficient;
+       archive & mLinearCellSourceCoefficient;
        archive & mConstantSourceCoefficient;
        archive & mLinearSourceCoefficient;
        archive & mDiffusionCoefficient;
@@ -94,6 +97,13 @@ protected:
 
     /** The cell population member. */
     AbstractCellPopulation<DIM>& mrCellPopulation;
+
+
+    /** Coefficient of constant density dependent source term. */
+    double mConstantCellSourceCoefficient;
+
+    /** Coefficient of linear density dependent source term. */
+    double mLinearCellSourceCoefficient;
 
     /** Coefficient of constant source term. */
     double mConstantSourceCoefficient;
@@ -116,12 +126,16 @@ public:
      * Constructor.
      *
      * @param rCellPopulation reference to the cell population
+     * @param constantCellSourceCoefficient the constant density dependent source term coefficient (defaults to 0.0)
+     * @param linearCellSourceCoefficient the linear density dependent source term coefficient (defaults to 0.0)
      * @param constantSourceCoefficient the constant source term coefficient (defaults to 0.0)
      * @param linearSourceCoefficient the linear source term coefficient (defaults to 0.0)
      * @param diffusionCoefficient the rate of diffusion (defaults to 1.0)
      * @param scaleByCellVolume whether to scale by cell volume (defaults to)
      */
     AveragedSourceEllipticPde(AbstractCellPopulation<DIM>& rCellPopulation,
+                              double constantCellSourceCoefficient=0.0, 
+                              double linearCellSourceCoefficient=0.0,
                               double constantSourceCoefficient=0.0, 
                               double linearSourceCoefficient=0.0,
                               double diffusionCoefficient=1.0, 
@@ -133,6 +147,16 @@ public:
     const AbstractCellPopulation<DIM>& rGetCellPopulation() const;
 
     /**
+     * @return mConstantCellSourceCoefficient
+     */
+    double GetConstantCellCoefficient() const;
+
+    /**
+     * @return mLinearCellSourceCoefficient
+     */
+    double GetLinearCellCoefficient() const;
+        
+    /**
      * @return mConstantSourceCoefficient
      */
     double GetConstantCoefficient() const;
@@ -141,7 +165,7 @@ public:
      * @return mLinearSourceCoefficient
      */
     double GetLinearCoefficient() const;
-        
+
     /**
      * @return mDiffusionCoefficient
      */
@@ -155,6 +179,8 @@ public:
     /**
      * Set up the source terms.
      *
+     * \todo this is identical to the one in AveragedSourceParabolicPde so refactor.
+     * 
      * @param rCoarseMesh reference to the coarse mesh
      * @param pCellPdeElementMap optional pointer to the map from cells to coarse elements
      */

@@ -150,7 +150,30 @@ void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCondition(
             }
         }
     }
-    else
+    else if constexpr (SPACE_DIM == 1)
+    {
+        if (dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation))
+        {
+            for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
+                cell_iter != this->mpCellPopulation->End();
+                ++cell_iter)
+            {
+                unsigned node_index = this->mpCellPopulation->GetLocationIndexUsingCell(*cell_iter);
+                Node<SPACE_DIM>* p_node = this->mpCellPopulation->GetNode(node_index);
+
+                c_vector<double, SPACE_DIM> node_location = p_node->rGetLocation();
+                
+                double signed_distance = inner_prod(node_location - mPointOnPlane, mNormalToPlane);
+        
+                if (signed_distance > 0.0)
+                {
+                    // TODO Add Jiggle
+                    p_node->rGetModifiableLocation() = mPointOnPlane;
+                }
+            }
+        }
+    }
+    else 
     {
         NEVER_REACHED;
     }
@@ -163,7 +186,7 @@ bool PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::VerifyBoundaryCondition()
 
     if (SPACE_DIM == 1)
     {
-        EXCEPTION("PlaneBoundaryCondition is not implemented in 1D");
+        //EXCEPTION("PlaneBoundaryCondition is not implemented in 1D");
     }
     else
     {

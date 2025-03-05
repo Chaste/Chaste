@@ -54,7 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * between CellPtrs and elements in a specialised PottsMesh class.
  *
  * The code currently requires the PottsMesh object to be fixed,
- * in the sense that no new nodes or elements can be added.
+ * in the sense that no new nodes can be added.
  */
 template<unsigned DIM>
 class PottsBasedCellPopulation : public AbstractOnLatticeCellPopulation<DIM>
@@ -91,6 +91,11 @@ private:
      */
     unsigned mNumSweepsPerTimestep;
 
+    /**
+     * Variable to store the PDE solution at the nodes in the PottsMesh. (Initalised to zero)
+     */
+    std::vector<double> mPdeSolution;
+
     friend class boost::serialization::access;
     /**
      * Serialize the object and its member variables.
@@ -117,6 +122,7 @@ private:
 
         archive & mTemperature;
         archive & mNumSweepsPerTimestep;
+        archive & mPdeSolution;
     }
 
     /**
@@ -440,6 +446,24 @@ public:
                                             std::string& rVariableName,
                                             bool dirichletBoundaryConditionApplies=false,
                                             double dirichletBoundaryValue=0.0);
+    
+    /** 
+     * Method to store the solution of a PDE at the latice site nodes. 
+     * Used by the CellBasedPde Classes.
+     * 
+     * @param solution the solution (at the nodes of the PottsMesh) to store
+     */
+    void SetPdeSolution(std::vector<double> solution);
+
+    /** 
+     * Method to return the solution of a PDE at the latice site nodes. 
+     * Used by the CellBasedPde Classes.
+     * 
+     * @param nodeindex the index of the node  
+     * 
+     * @return the pde solution at the node.
+     */
+    double GetPdeSolutionAtNode(unsigned nodeindex);
 };
 
 #include "SerializationExportWrapper.hpp"
