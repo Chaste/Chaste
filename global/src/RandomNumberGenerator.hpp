@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -66,7 +66,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * http://www.boost.org/doc/libs/1_65_0/doc/html/boost_random.html
  *
  * Generally boost is consistent between our supported versions
- * (listed on https://chaste.cs.ox.ac.uk/trac/wiki/InstallGuides/DependencyVersions)
+ * (listed on https://chaste.github.io/docs/installguides/dependency-versions/)
  * but on a couple of occasions boost has broken backwards compatibility between random numbers
  * for a given seed.
  *

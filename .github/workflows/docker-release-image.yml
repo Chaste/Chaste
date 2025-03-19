@@ -14,6 +14,7 @@ on:
 jobs:
   build:
     runs-on: self-hosted-docker
+    timeout-minutes: 720  # Sets the timeout to 12 hours
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4

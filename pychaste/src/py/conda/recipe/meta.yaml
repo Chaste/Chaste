@@ -1,0 +1,104 @@
+{% set version = "2024.2" %}
+{% set build = 1 %}
+{% set build_string = "py{}h{}_{}".format(CONDA_PY, PKG_HASH, build) %}
+
+package:
+  name: chaste
+  version: {{ version }}
+
+source:
+  path: /tmp/Chaste
+
+build:
+  number: {{ build }}
+
+requirements:
+  build:
+    - {{ compiler('cxx') }}
+    - {{ compiler('fortran') }}
+    - {{ cdt('libice-devel') }}
+    - {{ cdt('libsm-devel') }}
+    - {{ cdt('libx11-devel') }}
+    - {{ cdt('libxext') }}
+    - {{ cdt('libxt-devel') }}
+    - boost-cpp
+    - cmake
+    - distro
+    - git
+    - hdf5
+    - hdf5 * mpi_mpich*
+    - libtiff
+    - make
+    - matplotlib
+    - metis
+    - mpi4py
+    - mpich
+    - numpy
+    - parmetis
+    - petsc
+    - petsc4py
+    - pip
+    - python
+    - sundials
+    - vtk
+    - xerces-c
+    - xsd
+    - xvfbwrapper
+
+  host:
+    - boost-cpp
+    - hdf5
+    - hdf5 * mpi_mpich*
+    - libtiff
+    - matplotlib
+    - metis
+    - mpi4py
+    - mpich
+    - numpy
+    - parmetis
+    - petsc
+    - petsc4py
+    - pip
+    - python
+    - sundials
+    - vtk
+    - xerces-c
+    - xsd
+    - xvfbwrapper
+
+  run:
+    - boost-cpp
+    - hdf5
+    - hdf5 * mpi_mpich*
+    - libtiff
+    - matplotlib
+    - metis
+    - mpi4py
+    - mpich
+    - numpy
+    - parmetis
+    - petsc
+    - petsc4py
+    - python
+    - sundials
+    - vtk
+    - xerces-c
+    - xsd
+    - xvfbwrapper
+
+test:
+  imports:
+    - chaste
+    - chaste.cell_based
+    - chaste.mesh
+    - chaste.ode
+    - chaste.pde
+    - chaste.visualization
+
+about:
+  home: https://chaste.github.io
+  license: BSD-3-Clause
+  summary: >
+    Chaste is a general purpose simulation package for computational biology.
+  dev_url: https://github.com/Chaste/Chaste/
+  doc_url: https://chaste.github.io/docs/

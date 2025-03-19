@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -935,6 +935,8 @@ public:
         mesh.ConstructFromMeshReader(mesh_reader);
 
         {
+            // N.B. Here we don't archive the abstract base class, but the derived class, 
+            // as there is special handling for serialization of the things in the abstract class.
             BoundaryConditionsContainer<2,2,2>* p_bcc = new BoundaryConditionsContainer<2,2,2>;
 
             // No BCs yet, so shouldn't validate

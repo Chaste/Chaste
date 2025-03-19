@@ -23,6 +23,7 @@ jobs:
         include:
           - project_org: "Chaste"
             project_repo: "CellBasedComparison2017"
+            ref: ""
             build_target: "project_CellBasedComparison2017"
             test_target: "project_CellBasedComparison2017"
 
@@ -45,6 +46,7 @@ jobs:
       with:
         repository: ${{ matrix.project_org }}/${{ matrix.project_repo }}
         path: projects/${{ matrix.project_repo }}
+        ref: ${{ matrix.ref }}
 
     - name: compiler version
       run: |

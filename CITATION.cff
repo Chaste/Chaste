@@ -18,62 +18,88 @@ preferred-citation:
   authors:
     - family-names: Cooper
       given-names: Fergus R.
+      orcid: https://orcid.org/0000-0002-6221-4288
     - family-names: Baker
       given-names: Ruth E.
+      orcid: https://orcid.org/0000-0002-6304-9333
     - family-names: Bernabeu
       given-names: Miguel O.
+      orcid: https://orcid.org/0000-0002-6456-3756
     - family-names: Bordas
       given-names: Rafel
+      orcid: https://orcid.org/0000-0002-0856-544X
     - family-names: Bowler
       given-names: Louise
+      orcid: https://orcid.org/0000-0002-4910-9205
     - family-names: Bueno-Orovio
       given-names: Alfonso
+      orcid: https://orcid.org/0000-0002-1634-3601
     - family-names: Byrne
       given-names: Helen M.
+      orcid: https://orcid.org/0000-0003-1771-5910
     - family-names: Carapella
       given-names: Valentina
+      orcid: https://orcid.org/0000-0001-9750-9425
     - family-names: Cardone-Noott
       given-names: Louie
     - family-names: Cooper
       given-names: Jonathan
+      orcid: https://orcid.org/0000-0001-6009-3542
     - family-names: Dutta
       given-names: Sara
     - family-names: Evans
       given-names: Benjamin D.
+      orcid: https://orcid.org/0000-0002-1734-6070
     - family-names: Fletcher
       given-names: Alexander G.
+      orcid: https://orcid.org/0000-0003-0525-4336
     - family-names: Grogan
       given-names: James A.
+      orcid: https://orcid.org/0000-0001-5478-7652
     - family-names: Guo
       given-names: Wenxian
+      orcid: https://orcid.org/0000-0001-8130-3326
     - family-names: Harvey
       given-names: Daniel G.
     - family-names: Hendrix
       given-names: Maurice
+      orcid: https://orcid.org/0000-0002-6621-7996
     - family-names: Kay
       given-names: David
+      orcid: https://orcid.org/0000-0003-4984-3669
     - family-names: Kursawe
       given-names: Jochen
+      orcid: https://orcid.org/0000-0002-0314-9623
     - family-names: Maini
       given-names: Philip K.
+      orcid: https://orcid.org/0000-0002-0146-9164
     - family-names: McMillan
       given-names: Beth
+      orcid: https://orcid.org/0000-0002-2605-1733
     - family-names: Mirams
       given-names: Gary R.
+      orcid: https://orcid.org/0000-0002-4569-4312
     - family-names: Osborne
       given-names: James M.
+      orcid: https://orcid.org/0000-0002-5622-0104
     - family-names: Pathmanathan
       given-names: Pras
+      orcid: https://orcid.org/0000-0003-2111-6689
     - family-names: Pitt-Francis
       given-names: Joe M.
+      orcid: https://orcid.org/0000-0002-5094-5403
     - family-names: Robinson
       given-names: Martin
+      orcid: https://orcid.org/0000-0002-1572-6782
     - family-names: Rodriguez
       given-names: Blanca
+      orcid: https://orcid.org/0000-0002-3435-7388
     - family-names: Spiteri
       given-names: Raymond J.
+      orcid: https://orcid.org/0000-0002-3513-6237
     - family-names: Gavaghan
       given-names: David J.
+      orcid: https://orcid.org/0000-0001-8311-3200
   title: "Chaste: Cancer, Heart and Soft Tissue Environment"
   year: 2020
   doi: 10.21105/joss.01848

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -1497,7 +1497,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
      *    process counts in the thousands.
      *  Hence BIN file element permuting is deprecated - we just read the file in order.
      *  See
-     *  https://chaste.cs.ox.ac.uk/trac/browser/trunk/mesh/src/common/DistributedTetrahedralMesh.cpp?rev=19291#L1459
+     *  https://github.com/Chaste/Old-Chaste-svn-mirror/blob/554dbbf5cb7e95105aa8a6f48ee57551edea2a8a/mesh/src/common/DistributedTetrahedralMesh.cpp#L1459
      */
 
     for (unsigned element_number = 0; element_number < mTotalNumElements; element_number++)

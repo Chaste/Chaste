@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -333,8 +333,10 @@ public:
         WntConcentration<3>::Destroy();
     }
 
-    void noTestArchiveSimpleWntCellCycleModel()
+    void TestArchiveSimpleWntCellCycleModel()
     {
+        EXIT_IF_PARALLEL;
+
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "simple_wnt_cell_cycle.arch";
 

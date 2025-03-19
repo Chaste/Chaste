@@ -25,7 +25,7 @@ We suggest you use the projects directory in this manner to store your own
 source and test files if you do not wish to modify the Chaste source code. 
 For more information, see the [User Projects webpage](https://chaste.github.io/docs/user-guides/user-projects/).
 
-For more information please refer to the Chaste website at: http://www.cs.ox.ac.uk/chaste/
+For more information please refer to the Chaste website at: https://chaste.github.io
 
 Information on changes in this release can be found on the [release notes webpage](https://chaste.github.io/docs/release-notes/release-notes/).
 

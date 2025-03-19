@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -196,7 +196,7 @@ public:
      * java executable.
      *
      * For further details on visualization, see
-     * [ChasteGuides/RunningCellBasedVisualization](https://chaste.cs.ox.ac.uk/trac/wiki/ChasteGuides/RunningCellBasedVisualization).
+     * [Chaste Visualisation Guides](/docs/user-guides/visualisation-guides/).
      *
      * You will notice that half of each cell cell around the edge is missing.
      * This is because the Voronoi region for nodes on the edge of the mesh can be

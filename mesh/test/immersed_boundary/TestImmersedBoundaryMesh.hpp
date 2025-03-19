@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -112,7 +112,7 @@ public:
             std::vector<ImmersedBoundaryElement<2, 2>*> elems;
             elems.push_back(new ImmersedBoundaryElement<2, 2>(0, nodes));
 
-            ImmersedBoundaryMesh<2,2>* p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems);
+            AbstractMesh<2,2>* p_mesh = new ImmersedBoundaryMesh<2, 2>(nodes, elems);
 
             // Write the nodes to file
             (*p_arch) << p_mesh;
@@ -124,12 +124,14 @@ public:
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
             boost::archive::text_iarchive* p_arch = arch_opener.GetCommonArchive();
 
-            ImmersedBoundaryMesh<2, 2>* p_mesh;
+            AbstractMesh<2, 2>* p_mesh;
             (*p_arch) >> p_mesh;
 
-            TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 4u);
-            TS_ASSERT_DELTA(p_mesh->mNodes[0]->GetPoint()[0], 0.0, 1e-6);
-            TS_ASSERT_DELTA(p_mesh->mNodes[1]->GetPoint()[0], 0.1, 1e-6);
+            ImmersedBoundaryMesh<2, 2>* p_ib_mesh = dynamic_cast<ImmersedBoundaryMesh<2, 2>*>(p_mesh);
+            TS_ASSERT(p_ib_mesh != nullptr);
+            TS_ASSERT_EQUALS(p_ib_mesh->GetNumNodes(), 4u);
+            TS_ASSERT_DELTA(p_ib_mesh->mNodes[0]->GetPoint()[0], 0.0, 1e-6);
+            TS_ASSERT_DELTA(p_ib_mesh->mNodes[1]->GetPoint()[0], 0.1, 1e-6);
 
             delete p_mesh;
         }

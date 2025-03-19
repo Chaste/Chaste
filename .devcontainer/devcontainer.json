@@ -3,13 +3,13 @@
 	"name": "Chaste",
 
 	// To start from an image with pre-built Chaste libraries from the develop branch, use the following line:
-	"image": "chaste/develop",
+	// "image": "chaste/develop",
 	// If you prefer to start with a container with the latest Chaste release pre-built, use the following line:
 	// "image": "chaste/release",
 	// Note: specific versions can be selected by adding one of the the tags listed on Docker Hub e.g.:
 	// "image": "chaste/release:2021.1",
 	// Otherwise, to start from a bare environment with no pre-built Chaste libraries, uncomment the following line:
-	// "image": "chaste/base",
+	"image": "chaste/base",
 
 	"mounts": [
 		{
@@ -27,14 +27,26 @@
 			"target": "/home/chaste/output",
 			// "target": "${containerEnv:CHASTE_TEST_OUTPUT}",
 			"type": "bind"
+			// NOTE: This can cause permissions problems when writing files on macOS.
+			// https://github.com/Chaste/chaste-docker/issues/25
 		}
 	],
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
-		"ghcr.io/devcontainers/features/common-utils:2": {},
+		// These are not needed as they are already included in the base image.
 		// "ghcr.io/devcontainers/features/git": {},
-		"ghcr.io/devcontainers/features/github-cli": {}
+		// "ghcr.io/devcontainers/features/github-cli": {},
+		// Coming soon when GPU support is complete...
+		// "ghcr.io/devcontainers/features/nvidia-cuda:1": {},
+		// "ghcr.io/iterative/features/nvtop:1": {},
+		// Coming sooner when PyChaste is merged...
+		// "ghcr.io/devcontainers/features/conda:1": {},
+		// Or the full distributiopn of Anaconda:
+		// "ghcr.io/devcontainers/features/anaconda:1": {},
+		// Or mamba:
+		// "ghcr.io/rocker-org/devcontainer-features/miniforge:2": {},
+		"ghcr.io/devcontainers/features/common-utils:2": {}
 	},
 
 	// Requires workspaceFolder be set as well. Overrides the default local mount point for the workspace when the container is created. 
@@ -76,6 +88,8 @@
 	// "postCreateCommand": "build_chaste.sh develop",
 	// "postStartCommand": "zsh"
 	"postAttachCommand": "bash",
+	// This could be changed to zsh if preferred (included with common-utils).
+	// "postAttachCommand": "zsh",
 
 	// Configure tool-specific properties.
 	"customizations": {
@@ -88,11 +102,16 @@
 			]
 		}
 	},
-
 	// TODO: https://github.com/microsoft/vscode-cmake-tools/blob/main/docs/cmake-presets.md
+	// https://github.com/Chaste/Chaste/issues/352
 
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
+	// "remoteUser": "root",
+
+	// https://code.visualstudio.com/remote/advancedcontainers/add-nonroot-user#_specifying-the-default-container-user
+	// By deafult, these are set to the default user in the Docker image.
+	// "containerUser": "chaste",
+	// "remoteUser": "chaste",
 
 	"hostRequirements": {
 		"memory": "4gb",

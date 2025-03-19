@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -637,94 +637,101 @@ public:
     {
         EXIT_IF_PARALLEL;
 
-        // Create a regular 2D VertexBasedCellPopulation
-        HoneycombVertexMeshGenerator generator(2, 2);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
-
-        // Initial condition for delta, notch
-        std::vector<double> initial_conditions;
-        initial_conditions.push_back(1.0);
-        initial_conditions.push_back(1.0);
-
-        // Create some cells, each with a cell-cycle model and SRN that incorporates a delta-notch ODE system
-        std::vector<CellPtr> cells;
-        MAKE_PTR(WildTypeCellMutationState, p_state);
-        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
-        {
-            UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
-            p_cc_model->SetDimension(2);
-
-            DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();
-            p_srn_model->SetInitialConditions(initial_conditions);
-            CellPtr p_cell(new Cell(p_state, p_cc_model, p_srn_model));
-            p_cell->SetCellProliferativeType(p_diff_type);
-            double birth_time = -1.0;
-            p_cell->SetBirthTime(birth_time);
-            cells.push_back(p_cell);
-        }
-
-        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddPopulationWriter<NodeVelocityWriter>();
-
-        // Create and configure cell-based simulation
-        OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestDeltaNotchTrackingModifierSaveAndLoad");
         double end_time = 0.01;
-        simulator.SetEndTime(end_time);
 
-        // Add Delta-Notch tracking modifier
-        MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
-        simulator.AddSimulationModifier(p_modifier);
+        {
+            // Create a regular 2D VertexBasedCellPopulation
+            HoneycombVertexMeshGenerator generator(2, 2);
+            boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
-        // Create a force law and pass it to the simulation
-        MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
-        simulator.AddForce(p_nagai_honda_force);
+            // Initial condition for delta, notch
+            std::vector<double> initial_conditions;
+            initial_conditions.push_back(1.0);
+            initial_conditions.push_back(1.0);
 
-        // Pass a target area modifier to the simulation
-        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
-        simulator.AddSimulationModifier(p_growth_modifier);
+            // Create some cells, each with a cell-cycle model and SRN that incorporates a delta-notch ODE system
+            std::vector<CellPtr> cells;
+            MAKE_PTR(WildTypeCellMutationState, p_state);
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
+            {
+                UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
+                p_cc_model->SetDimension(2);
 
-        // Run and save simulation
-        simulator.Solve();
+                DeltaNotchSrnModel* p_srn_model = new DeltaNotchSrnModel();
+                p_srn_model->SetInitialConditions(initial_conditions);
+                CellPtr p_cell(new Cell(p_state, p_cc_model, p_srn_model));
+                p_cell->SetCellProliferativeType(p_diff_type);
+                double birth_time = -1.0;
+                p_cell->SetBirthTime(birth_time);
+                cells.push_back(p_cell);
+            }
 
-        CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Save(&simulator);
+            VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+            cell_population.AddPopulationWriter<NodeVelocityWriter>();
 
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 4u);
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), 16u);
-        TS_ASSERT_EQUALS((static_cast<VertexBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation())))->GetNumElements(), 4u);
+            // Create and configure cell-based simulation
+            OffLatticeSimulation<2> simulator(cell_population);
+            simulator.SetOutputDirectory("TestDeltaNotchTrackingModifierSaveAndLoad");
+            
+            simulator.SetEndTime(end_time);
 
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.01, 1e-9);
-        CellPtr p_cell = simulator.rGetCellPopulation().GetCellUsingLocationIndex(3);
-        TS_ASSERT_DELTA(p_cell->GetAge(), 1.01, 1e-4);
+            // Add Delta-Notch tracking modifier
+            MAKE_PTR(DeltaNotchTrackingModifier<2>, p_modifier);
+            simulator.AddSimulationModifier(p_modifier);
 
-        SimulationTime::Destroy();
+            // Create a force law and pass it to the simulation
+            MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
+            simulator.AddForce(p_nagai_honda_force);
+
+            // Pass a target area modifier to the simulation
+            MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
+            simulator.AddSimulationModifier(p_growth_modifier);
+
+            // Run and save simulation
+            simulator.Solve();
+
+            CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Save(&simulator);
+
+            TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 4u);
+            TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), 16u);
+            TS_ASSERT_EQUALS((static_cast<VertexBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation())))->GetNumElements(), 4u);
+
+            TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.01, 1e-9);
+            CellPtr p_cell = simulator.rGetCellPopulation().GetCellUsingLocationIndex(3);
+            TS_ASSERT_DELTA(p_cell->GetAge(), 1.01, 1e-4);
+
+            SimulationTime::Destroy();
+        }
+        
         SimulationTime::Instance()->SetStartTime(0.0);
 
-        // Load simulation
-        OffLatticeSimulation<2>* p_simulator
-            = CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load("TestDeltaNotchTrackingModifierSaveAndLoad", end_time);
+        {
+            // Load simulation
+            OffLatticeSimulation<2>* p_simulator
+                = CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load("TestDeltaNotchTrackingModifierSaveAndLoad", end_time);
 
-        p_simulator->SetEndTime(0.2);
+            p_simulator->SetEndTime(0.2);
 
-        TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumRealCells(), 4u);
-        TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumNodes(), 16u);
-        TS_ASSERT_EQUALS((static_cast<VertexBasedCellPopulation<2>*>(&(p_simulator->rGetCellPopulation())))->GetNumElements(), 4u);
+            TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumRealCells(), 4u);
+            TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumNodes(), 16u);
+            TS_ASSERT_EQUALS((static_cast<VertexBasedCellPopulation<2>*>(&(p_simulator->rGetCellPopulation())))->GetNumElements(), 4u);
 
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.01, 1e-9);
-        CellPtr p_cell2 = p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(3);
-        TS_ASSERT_DELTA(p_cell2->GetAge(), 1.01, 1e-4);
+            TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.01, 1e-9);
+            CellPtr p_cell2 = p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(3);
+            TS_ASSERT_DELTA(p_cell2->GetAge(), 1.01, 1e-4);
 
-        // Run simulation
-        TS_ASSERT_THROWS_NOTHING(p_simulator->Solve());
+            // Run simulation
+            TS_ASSERT_THROWS_NOTHING(p_simulator->Solve());
 
-        // Tidy up
-        delete p_simulator;
+            // Tidy up
+            delete p_simulator;
 
-        // Test Warnings
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
-        Warnings::QuietDestroy();
+            // Test Warnings
+            TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+            TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
+            Warnings::QuietDestroy();
+        }
     }
 
     void TestDeltaNotchModifierOutputParameters()
@@ -754,123 +761,129 @@ public:
     {
         EXIT_IF_PARALLEL;
 
-        // Create a regular 2D VertexBasedCellPopulation
-        HoneycombVertexMeshGenerator generator(2, 2);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        double end_time = 0.01;
 
-        // Initial condition for delta, notch
-        std::vector<double> initial_conditions;
-        initial_conditions.push_back(1.0);
-        initial_conditions.push_back(1.0);
-
-        // Create some cells, each with a cell-cycle model and SRN that incorporates a delta-notch ODE system
-        std::vector<CellPtr> cells;
-        MAKE_PTR(WildTypeCellMutationState, p_state);
-        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
-            UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
-            p_cc_model->SetDimension(2);
+            // Create a regular 2D VertexBasedCellPopulation
+            HoneycombVertexMeshGenerator generator(2, 2);
+            boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
-            /* Initialise edge based SRN */
-            auto p_element = p_mesh->GetElement(elem_index);
+            // Initial condition for delta, notch
+            std::vector<double> initial_conditions;
+            initial_conditions.push_back(1.0);
+            initial_conditions.push_back(1.0);
 
-            auto p_cell_edge_srn_model = new CellSrnModel();
-
-            /* We choose to initialise the total concentrations to random levels */
-            auto delta_concentration = RandomNumberGenerator::Instance()->ranf();
-            auto notch_concentration = RandomNumberGenerator::Instance()->ranf();
-
-            double total_edge_length = 0.0;
-            for (unsigned i = 0; i < p_element->GetNumEdges(); i ++)
+            // Create some cells, each with a cell-cycle model and SRN that incorporates a delta-notch ODE system
+            std::vector<CellPtr> cells;
+            MAKE_PTR(WildTypeCellMutationState, p_state);
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
             {
-                total_edge_length += p_element->GetEdge(i)->rGetLength();
+                UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
+                p_cc_model->SetDimension(2);
+
+                /* Initialise edge based SRN */
+                auto p_element = p_mesh->GetElement(elem_index);
+
+                auto p_cell_edge_srn_model = new CellSrnModel();
+
+                /* We choose to initialise the total concentrations to random levels */
+                auto delta_concentration = RandomNumberGenerator::Instance()->ranf();
+                auto notch_concentration = RandomNumberGenerator::Instance()->ranf();
+
+                double total_edge_length = 0.0;
+                for (unsigned i = 0; i < p_element->GetNumEdges(); i ++)
+                {
+                    total_edge_length += p_element->GetEdge(i)->rGetLength();
+                }
+
+                /* Gets the edges of the element and create an SRN for each edge */
+                for (unsigned i = 0; i < p_element->GetNumEdges(); i ++)
+                {
+                    auto p_elem_edge = p_element->GetEdge(i);
+                    auto p_edge_length = p_elem_edge->rGetLength();
+                    std::vector<double> initial_conditions;
+
+                    /* Initial concentration of delta and notch vary depending on the edge length */
+                    initial_conditions.push_back( p_edge_length/total_edge_length * delta_concentration);
+                    initial_conditions.push_back( p_edge_length/total_edge_length * notch_concentration);
+
+                    MAKE_PTR(DeltaNotchEdgeSrnModel, p_srn_model);
+                    p_srn_model->SetInitialConditions(initial_conditions);
+                    p_cell_edge_srn_model->AddEdgeSrnModel(p_srn_model);
+                }
+
+                CellPtr p_cell(new Cell(p_state, p_cc_model, p_cell_edge_srn_model));
+                p_cell->SetCellProliferativeType(p_diff_type);
+
+                double birth_time = -1.0;
+                p_cell->SetBirthTime(birth_time);
+                cells.push_back(p_cell);
             }
 
-            /* Gets the edges of the element and create an SRN for each edge */
-            for (unsigned i = 0; i < p_element->GetNumEdges(); i ++)
-            {
-                auto p_elem_edge = p_element->GetEdge(i);
-                auto p_edge_length = p_elem_edge->rGetLength();
-                std::vector<double> initial_conditions;
+            VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+            cell_population.AddPopulationWriter<NodeVelocityWriter>();
 
-                /* Initial concentration of delta and notch vary depending on the edge length */
-                initial_conditions.push_back( p_edge_length/total_edge_length * delta_concentration);
-                initial_conditions.push_back( p_edge_length/total_edge_length * notch_concentration);
+            // Create and configure cell-based simulation
+            OffLatticeSimulation<2> simulator(cell_population);
+            simulator.SetOutputDirectory("TestDeltaNotchEdgeOnlyTrackingModifierSaveAndLoad");
+            simulator.SetEndTime(end_time);
 
-                MAKE_PTR(DeltaNotchEdgeSrnModel, p_srn_model);
-                p_srn_model->SetInitialConditions(initial_conditions);
-                p_cell_edge_srn_model->AddEdgeSrnModel(p_srn_model);
-            }
+            // Add Delta-Notch tracking modifier
+            MAKE_PTR(DeltaNotchEdgeTrackingModifier<2>, p_modifier);
+            simulator.AddSimulationModifier(p_modifier);
 
-            CellPtr p_cell(new Cell(p_state, p_cc_model, p_cell_edge_srn_model));
-            p_cell->SetCellProliferativeType(p_diff_type);
+            // Create a force law and pass it to the simulation
+            MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
+            simulator.AddForce(p_nagai_honda_force);
 
-            double birth_time = -1.0;
-            p_cell->SetBirthTime(birth_time);
-            cells.push_back(p_cell);
+            // Pass a target area modifier to the simulation
+            MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
+            simulator.AddSimulationModifier(p_growth_modifier);
+
+            // Run and save simulation
+            simulator.Solve();
+
+            CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Save(&simulator);
+
+            TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 4u);
+            TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), 16u);
+            TS_ASSERT_EQUALS((static_cast<VertexBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation())))->GetNumElements(), 4u);
+
+            TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.01, 1e-9);
+            CellPtr p_cell = simulator.rGetCellPopulation().GetCellUsingLocationIndex(3);
+            TS_ASSERT_DELTA(p_cell->GetAge(), 1.01, 1e-4);
+
+            SimulationTime::Destroy();
         }
 
-        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddPopulationWriter<NodeVelocityWriter>();
-
-        // Create and configure cell-based simulation
-        OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestDeltaNotchEdgeOnlyTrackingModifierSaveAndLoad");
-        double end_time = 0.01;
-        simulator.SetEndTime(end_time);
-
-        // Add Delta-Notch tracking modifier
-        MAKE_PTR(DeltaNotchEdgeTrackingModifier<2>, p_modifier);
-        simulator.AddSimulationModifier(p_modifier);
-
-        // Create a force law and pass it to the simulation
-        MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
-        simulator.AddForce(p_nagai_honda_force);
-
-        // Pass a target area modifier to the simulation
-        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
-        simulator.AddSimulationModifier(p_growth_modifier);
-
-        // Run and save simulation
-        simulator.Solve();
-
-        CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Save(&simulator);
-
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 4u);
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), 16u);
-        TS_ASSERT_EQUALS((static_cast<VertexBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation())))->GetNumElements(), 4u);
-
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.01, 1e-9);
-        CellPtr p_cell = simulator.rGetCellPopulation().GetCellUsingLocationIndex(3);
-        TS_ASSERT_DELTA(p_cell->GetAge(), 1.01, 1e-4);
-
-        SimulationTime::Destroy();
         SimulationTime::Instance()->SetStartTime(0.0);
 
-        // Load simulation
-        OffLatticeSimulation<2>* p_simulator
-        = CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load("TestDeltaNotchEdgeOnlyTrackingModifierSaveAndLoad", end_time);
+        {
+            // Load simulation
+            OffLatticeSimulation<2>* p_simulator
+            = CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load("TestDeltaNotchEdgeOnlyTrackingModifierSaveAndLoad", end_time);
 
-        p_simulator->SetEndTime(0.2);
+            p_simulator->SetEndTime(0.2);
 
-        TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumRealCells(), 4u);
-        TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumNodes(), 16u);
-        TS_ASSERT_EQUALS((static_cast<VertexBasedCellPopulation<2>*>(&(p_simulator->rGetCellPopulation())))->GetNumElements(), 4u);
+            TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumRealCells(), 4u);
+            TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumNodes(), 16u);
+            TS_ASSERT_EQUALS((static_cast<VertexBasedCellPopulation<2>*>(&(p_simulator->rGetCellPopulation())))->GetNumElements(), 4u);
 
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.01, 1e-9);
-        CellPtr p_cell2 = p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(3);
-        TS_ASSERT_DELTA(p_cell2->GetAge(), 1.01, 1e-4);
+            TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.01, 1e-9);
+            CellPtr p_cell2 = p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(3);
+            TS_ASSERT_DELTA(p_cell2->GetAge(), 1.01, 1e-4);
 
-        // Run simulation
-        TS_ASSERT_THROWS_NOTHING(p_simulator->Solve());
-        // Tidy up
-        delete p_simulator;
+            // Run simulation
+            TS_ASSERT_THROWS_NOTHING(p_simulator->Solve());
+            // Tidy up
+            delete p_simulator;
 
-        // Test Warnings
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
-        Warnings::QuietDestroy();
+            // Test Warnings
+            TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+            TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
+            Warnings::QuietDestroy();
+        }
     }
 
     void TestDeltaNotchEdgeOnlyModifierOutputParameters()
@@ -900,128 +913,134 @@ public:
     {
         EXIT_IF_PARALLEL;
 
-        // Create a regular 2D VertexBasedCellPopulation
-        HoneycombVertexMeshGenerator generator(2, 2);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        double end_time = 0.01;
 
-        // Initial condition for delta, notch
-        std::vector<double> initial_conditions;
-        initial_conditions.push_back(1.0);
-        initial_conditions.push_back(1.0);
-
-        // Create some cells, each with a cell-cycle model and SRN that incorporates a delta-notch ODE system
-        std::vector<CellPtr> cells;
-        MAKE_PTR(WildTypeCellMutationState, p_state);
-        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
-        for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
         {
-            UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
-            p_cc_model->SetDimension(2);
+            // Create a regular 2D VertexBasedCellPopulation
+            HoneycombVertexMeshGenerator generator(2, 2);
+            boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
-            /* Initialise edge based SRN */
-            auto p_element = p_mesh->GetElement(elem_index);
+            // Initial condition for delta, notch
+            std::vector<double> initial_conditions;
+            initial_conditions.push_back(1.0);
+            initial_conditions.push_back(1.0);
 
-            auto p_cell_edge_srn_model = new CellSrnModel();
-
-            /* We choose to initialise the total concentrations to random levels */
-            auto delta_concentration = RandomNumberGenerator::Instance()->ranf();
-            auto notch_concentration = RandomNumberGenerator::Instance()->ranf();
-
-            double total_edge_length = 0.0;
-            for (unsigned i = 0; i < p_element->GetNumEdges(); i ++)
+            // Create some cells, each with a cell-cycle model and SRN that incorporates a delta-notch ODE system
+            std::vector<CellPtr> cells;
+            MAKE_PTR(WildTypeCellMutationState, p_state);
+            MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
+            for (unsigned elem_index=0; elem_index<p_mesh->GetNumElements(); elem_index++)
             {
-                total_edge_length += p_element->GetEdge(i)->rGetLength();
+                UniformG1GenerationalCellCycleModel* p_cc_model = new UniformG1GenerationalCellCycleModel();
+                p_cc_model->SetDimension(2);
+
+                /* Initialise edge based SRN */
+                auto p_element = p_mesh->GetElement(elem_index);
+
+                auto p_cell_edge_srn_model = new CellSrnModel();
+
+                /* We choose to initialise the total concentrations to random levels */
+                auto delta_concentration = RandomNumberGenerator::Instance()->ranf();
+                auto notch_concentration = RandomNumberGenerator::Instance()->ranf();
+
+                double total_edge_length = 0.0;
+                for (unsigned i = 0; i < p_element->GetNumEdges(); i ++)
+                {
+                    total_edge_length += p_element->GetEdge(i)->rGetLength();
+                }
+
+                /* Gets the edges of the element and create an SRN for each edge */
+                for (unsigned i = 0; i < p_element->GetNumEdges(); i ++)
+                {
+                    auto p_elem_edge = p_element->GetEdge(i);
+                    auto p_edge_length = p_elem_edge->rGetLength();
+                    std::vector<double> initial_conditions;
+
+                    /* Initial concentration of delta and notch vary depending on the edge length */
+                    initial_conditions.push_back( p_edge_length/total_edge_length * delta_concentration);
+                    initial_conditions.push_back( p_edge_length/total_edge_length * notch_concentration);
+
+                    MAKE_PTR(DeltaNotchEdgeSrnModel, p_srn_model);
+                    p_srn_model->SetInitialConditions(initial_conditions);
+                    p_cell_edge_srn_model->AddEdgeSrnModel(p_srn_model);
+                }
+                MAKE_PTR(DeltaNotchInteriorSrnModel, p_cell_srn_model);
+                std::vector<double> zero_conditions(2);
+                p_cell_srn_model->SetInitialConditions(zero_conditions);
+                p_cell_edge_srn_model->SetInteriorSrnModel(p_cell_srn_model);
+
+                CellPtr p_cell(new Cell(p_state, p_cc_model, p_cell_edge_srn_model));
+                p_cell->SetCellProliferativeType(p_diff_type);
+
+                double birth_time = -1.0;
+                p_cell->SetBirthTime(birth_time);
+                cells.push_back(p_cell);
             }
 
-            /* Gets the edges of the element and create an SRN for each edge */
-            for (unsigned i = 0; i < p_element->GetNumEdges(); i ++)
-            {
-                auto p_elem_edge = p_element->GetEdge(i);
-                auto p_edge_length = p_elem_edge->rGetLength();
-                std::vector<double> initial_conditions;
+            VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
+            cell_population.AddPopulationWriter<NodeVelocityWriter>();
 
-                /* Initial concentration of delta and notch vary depending on the edge length */
-                initial_conditions.push_back( p_edge_length/total_edge_length * delta_concentration);
-                initial_conditions.push_back( p_edge_length/total_edge_length * notch_concentration);
+            // Create and configure cell-based simulation
+            OffLatticeSimulation<2> simulator(cell_population);
+            simulator.SetOutputDirectory("TestDeltaNotchEdgeInteriorTrackingModifierSaveAndLoad");
+            simulator.SetEndTime(end_time);
 
-                MAKE_PTR(DeltaNotchEdgeSrnModel, p_srn_model);
-                p_srn_model->SetInitialConditions(initial_conditions);
-                p_cell_edge_srn_model->AddEdgeSrnModel(p_srn_model);
-            }
-            MAKE_PTR(DeltaNotchInteriorSrnModel, p_cell_srn_model);
-            std::vector<double> zero_conditions(2);
-            p_cell_srn_model->SetInitialConditions(zero_conditions);
-            p_cell_edge_srn_model->SetInteriorSrnModel(p_cell_srn_model);
+            // Add Delta-Notch tracking modifier
+            MAKE_PTR(DeltaNotchEdgeInteriorTrackingModifier<2>, p_modifier);
+            simulator.AddSimulationModifier(p_modifier);
 
-            CellPtr p_cell(new Cell(p_state, p_cc_model, p_cell_edge_srn_model));
-            p_cell->SetCellProliferativeType(p_diff_type);
+            // Create a force law and pass it to the simulation
+            MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
+            simulator.AddForce(p_nagai_honda_force);
 
-            double birth_time = -1.0;
-            p_cell->SetBirthTime(birth_time);
-            cells.push_back(p_cell);
+            // Pass a target area modifier to the simulation
+            MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
+            simulator.AddSimulationModifier(p_growth_modifier);
+
+            // Run and save simulation
+            simulator.Solve();
+
+            CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Save(&simulator);
+
+            TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 4u);
+            TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), 16u);
+            TS_ASSERT_EQUALS((static_cast<VertexBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation())))->GetNumElements(), 4u);
+
+            TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.01, 1e-9);
+            CellPtr p_cell = simulator.rGetCellPopulation().GetCellUsingLocationIndex(3);
+            TS_ASSERT_DELTA(p_cell->GetAge(), 1.01, 1e-4);
+
+            SimulationTime::Destroy();
         }
 
-        VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.AddPopulationWriter<NodeVelocityWriter>();
-
-        // Create and configure cell-based simulation
-        OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("TestDeltaNotchEdgeInteriorTrackingModifierSaveAndLoad");
-        double end_time = 0.01;
-        simulator.SetEndTime(end_time);
-
-        // Add Delta-Notch tracking modifier
-        MAKE_PTR(DeltaNotchEdgeInteriorTrackingModifier<2>, p_modifier);
-        simulator.AddSimulationModifier(p_modifier);
-
-        // Create a force law and pass it to the simulation
-        MAKE_PTR(NagaiHondaForce<2>, p_nagai_honda_force);
-        simulator.AddForce(p_nagai_honda_force);
-
-        // Pass a target area modifier to the simulation
-        MAKE_PTR(SimpleTargetAreaModifier<2>, p_growth_modifier);
-        simulator.AddSimulationModifier(p_growth_modifier);
-
-        // Run and save simulation
-        simulator.Solve();
-
-        CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Save(&simulator);
-
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 4u);
-        TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), 16u);
-        TS_ASSERT_EQUALS((static_cast<VertexBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation())))->GetNumElements(), 4u);
-
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.01, 1e-9);
-        CellPtr p_cell = simulator.rGetCellPopulation().GetCellUsingLocationIndex(3);
-        TS_ASSERT_DELTA(p_cell->GetAge(), 1.01, 1e-4);
-
-        SimulationTime::Destroy();
         SimulationTime::Instance()->SetStartTime(0.0);
+        
+        {
+            // Load simulation
+            OffLatticeSimulation<2>* p_simulator = 
+                CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load("TestDeltaNotchEdgeInteriorTrackingModifierSaveAndLoad", end_time);
 
-        // Load simulation
-        OffLatticeSimulation<2>* p_simulator
-        = CellBasedSimulationArchiver<2, OffLatticeSimulation<2> >::Load("TestDeltaNotchEdgeInteriorTrackingModifierSaveAndLoad", end_time);
+            p_simulator->SetEndTime(0.2);
 
-        p_simulator->SetEndTime(0.2);
+            TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumRealCells(), 4u);
+            TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumNodes(), 16u);
+            TS_ASSERT_EQUALS((static_cast<VertexBasedCellPopulation<2>*>(&(p_simulator->rGetCellPopulation())))->GetNumElements(), 4u);
 
-        TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumRealCells(), 4u);
-        TS_ASSERT_EQUALS(p_simulator->rGetCellPopulation().GetNumNodes(), 16u);
-        TS_ASSERT_EQUALS((static_cast<VertexBasedCellPopulation<2>*>(&(p_simulator->rGetCellPopulation())))->GetNumElements(), 4u);
+            TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.01, 1e-9);
+            CellPtr p_cell2 = p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(3);
+            TS_ASSERT_DELTA(p_cell2->GetAge(), 1.01, 1e-4);
 
-        TS_ASSERT_DELTA(SimulationTime::Instance()->GetTime(), 0.01, 1e-9);
-        CellPtr p_cell2 = p_simulator->rGetCellPopulation().GetCellUsingLocationIndex(3);
-        TS_ASSERT_DELTA(p_cell2->GetAge(), 1.01, 1e-4);
+            // Run simulation
+            TS_ASSERT_THROWS_NOTHING(p_simulator->Solve());
 
-        // Run simulation
-        TS_ASSERT_THROWS_NOTHING(p_simulator->Solve());
+            // Tidy up
+            delete p_simulator;
 
-        // Tidy up
-        delete p_simulator;
-
-        // Test Warnings
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
-        Warnings::QuietDestroy();
+            // Test Warnings
+            TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+            TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
+            Warnings::QuietDestroy();
+        }
     }
 
     void TestDeltaNotchEdgeInteriorModifierOutputParameters()
