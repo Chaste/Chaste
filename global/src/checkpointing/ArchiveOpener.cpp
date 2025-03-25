@@ -34,17 +34,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 // Must be included before any other serialization headers
-#include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
 
-#include <sstream>
 #include <fstream>
+#include <sstream>
 
-#include "ArchiveOpener.hpp"
 #include "ArchiveLocationInfo.hpp"
-#include "ProcessSpecificArchive.hpp"
+#include "ArchiveOpener.hpp"
 #include "Exception.hpp"
 #include "OutputFileHandler.hpp"
+#include "ProcessSpecificArchive.hpp"
 
 /**
  * Specialization for input archives.
@@ -52,15 +52,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @param rFileNameBase
  * @param procId
  */
-template<>
-ArchiveOpener<boost::archive::text_iarchive, std::ifstream>::ArchiveOpener(
-        const FileFinder& rDirectory,
-        const std::string& rFileNameBase,
-        unsigned procId)
-    : mpCommonStream(nullptr),
-      mpPrivateStream(nullptr),
-      mpCommonArchive(nullptr),
-      mpPrivateArchive(nullptr)
+template <class InputArchive>
+ArchiveOpener<InputArchive, std::ifstream>::ArchiveOpener(
+    const FileFinder& rDirectory,
+    const std::string& rFileNameBase,
+    unsigned procId)
+        : mpCommonStream(nullptr),
+          mpPrivateStream(nullptr),
+          mpCommonArchive(nullptr),
+          mpPrivateArchive(nullptr)
 {
     // Figure out where things live
     ArchiveLocationInfo::SetArchiveDirectory(rDirectory);
@@ -78,7 +78,7 @@ ArchiveOpener<boost::archive::text_iarchive, std::ifstream>::ArchiveOpener(
 
     try
     {
-        mpCommonArchive = new boost::archive::text_iarchive(*mpCommonStream);
+        mpCommonArchive = new InputArchive(*mpCommonStream);
     }
     catch (boost::archive::archive_exception& boost_exception)
     {
@@ -105,14 +105,14 @@ ArchiveOpener<boost::archive::text_iarchive, std::ifstream>::ArchiveOpener(
         delete mpCommonStream;
         EXCEPTION("Cannot load secondary archive file: " + private_path);
     }
-    mpPrivateArchive = new boost::archive::text_iarchive(*mpPrivateStream);
-    ProcessSpecificArchive<boost::archive::text_iarchive>::Set(mpPrivateArchive);
+    mpPrivateArchive = new InputArchive(*mpPrivateStream);
+    ProcessSpecificArchive<InputArchive>::Set(mpPrivateArchive);
 }
 
-template<>
-ArchiveOpener<boost::archive::text_iarchive, std::ifstream>::~ArchiveOpener()
+template <class InputArchive>
+ArchiveOpener<InputArchive, std::ifstream>::~ArchiveOpener()
 {
-    ProcessSpecificArchive<boost::archive::text_iarchive>::Set(nullptr);
+    ProcessSpecificArchive<InputArchive>::Set(nullptr);
     delete mpPrivateArchive;
     delete mpPrivateStream;
     delete mpCommonArchive;
@@ -125,15 +125,15 @@ ArchiveOpener<boost::archive::text_iarchive, std::ifstream>::~ArchiveOpener()
  * @param rFileNameBase
  * @param procId
  */
-template<>
-ArchiveOpener<boost::archive::text_oarchive, std::ofstream>::ArchiveOpener(
-        const FileFinder& rDirectory,
-        const std::string& rFileNameBase,
-        unsigned procId)
-    : mpCommonStream(nullptr),
-      mpPrivateStream(nullptr),
-      mpCommonArchive(nullptr),
-      mpPrivateArchive(nullptr)
+template <class OutputArchive>
+ArchiveOpener<OutputArchive, std::ofstream>::ArchiveOpener(
+    const FileFinder& rDirectory,
+    const std::string& rFileNameBase,
+    unsigned procId)
+        : mpCommonStream(nullptr),
+          mpPrivateStream(nullptr),
+          mpCommonArchive(nullptr),
+          mpPrivateArchive(nullptr)
 {
     // Check for user error
     if (procId != PetscTools::GetMyRank())
@@ -178,7 +178,7 @@ ArchiveOpener<boost::archive::text_oarchive, std::ofstream>::ArchiveOpener(
         }
         // LCOV_EXCL_STOP
     }
-    mpCommonArchive = new boost::archive::text_oarchive(*mpCommonStream);
+    mpCommonArchive = new OutputArchive(*mpCommonStream);
 
     // Create secondary archive for distributed data
     mpPrivateStream = new std::ofstream(private_path.c_str(), std::ios::binary | std::ios::trunc);
@@ -189,14 +189,14 @@ ArchiveOpener<boost::archive::text_oarchive, std::ofstream>::ArchiveOpener(
         delete mpCommonStream;
         EXCEPTION("Failed to open secondary archive file for writing: " + private_path);
     }
-    mpPrivateArchive = new boost::archive::text_oarchive(*mpPrivateStream);
-    ProcessSpecificArchive<boost::archive::text_oarchive>::Set(mpPrivateArchive);
+    mpPrivateArchive = new OutputArchive(*mpPrivateStream);
+    ProcessSpecificArchive<OutputArchive>::Set(mpPrivateArchive);
 }
 
-template<>
-ArchiveOpener<boost::archive::text_oarchive, std::ofstream>::~ArchiveOpener()
+template <class OutputArchive>
+ArchiveOpener<OutputArchive, std::ofstream>::~ArchiveOpener()
 {
-    ProcessSpecificArchive<boost::archive::text_oarchive>::Set(nullptr);
+    ProcessSpecificArchive<OutputArchive>::Set(nullptr);
     delete mpPrivateArchive;
     delete mpPrivateStream;
     delete mpCommonArchive;
@@ -210,167 +210,8 @@ ArchiveOpener<boost::archive::text_oarchive, std::ofstream>::~ArchiveOpener()
     PetscTools::Barrier("~ArchiveOpener");
 }
 
-
-/**
- * Specialization for input binary archives.
- * @param rDirectory
- * @param rFileNameBase
- * @param procId
- */
-template<>
-ArchiveOpener<boost::archive::binary_iarchive, std::ifstream>::ArchiveOpener(
-        const FileFinder& rDirectory,
-        const std::string& rFileNameBase,
-        unsigned procId)
-    : mpCommonStream(nullptr),
-      mpPrivateStream(nullptr),
-      mpCommonArchive(nullptr),
-      mpPrivateArchive(nullptr)
-{
-    // Figure out where things live
-    ArchiveLocationInfo::SetArchiveDirectory(rDirectory);
-    std::string private_path = ArchiveLocationInfo::GetProcessUniqueFilePath(rFileNameBase, procId);
-    std::stringstream common_path;
-    common_path << ArchiveLocationInfo::GetArchiveDirectory() << rFileNameBase;
-
-    // Try to open the main archive for replicated data
-    mpCommonStream = new std::ifstream(common_path.str().c_str(), std::ios::binary);
-    if (!mpCommonStream->is_open())
-    {
-        delete mpCommonStream;
-        EXCEPTION("Cannot load main archive file: " + common_path.str());
-    }
-
-    try
-    {
-        mpCommonArchive = new boost::archive::binary_iarchive(*mpCommonStream);
-    }
-    catch (boost::archive::archive_exception& boost_exception)
-    {
-        if (boost_exception.code == boost::archive::archive_exception::unsupported_version)
-        {
-            // This is forward compatibility issue.  We can't open the archive because it's been written by a more recent Boost.
-            delete mpCommonArchive;
-            delete mpCommonStream;
-            EXCEPTION("Could not open Boost archive '" + common_path.str() + "' because it was written by a more recent Boost.  Check process-specific archives too");
-        }
-        else
-        {
-            // We don't understand the exception, so we shouldn't continue
-            throw boost_exception; // LCOV_EXCL_LINE
-        }
-    }
-
-    // Try to open the secondary archive for distributed data
-    mpPrivateStream = new std::ifstream(private_path.c_str(), std::ios::binary);
-    if (!mpPrivateStream->is_open())
-    {
-        delete mpPrivateStream;
-        delete mpCommonArchive;
-        delete mpCommonStream;
-        EXCEPTION("Cannot load secondary archive file: " + private_path);
-    }
-    mpPrivateArchive = new boost::archive::binary_iarchive(*mpPrivateStream);
-    ProcessSpecificArchive<boost::archive::binary_iarchive>::Set(mpPrivateArchive);
-}
-
-template<>
-ArchiveOpener<boost::archive::binary_iarchive, std::ifstream>::~ArchiveOpener()
-{
-    ProcessSpecificArchive<boost::archive::binary_iarchive>::Set(nullptr);
-    delete mpPrivateArchive;
-    delete mpPrivateStream;
-    delete mpCommonArchive;
-    delete mpCommonStream;
-}
-
-/**
- * Specialization for output binary archives.
- * @param rDirectory
- * @param rFileNameBase
- * @param procId
- */
-template<>
-ArchiveOpener<boost::archive::binary_oarchive, std::ofstream>::ArchiveOpener(
-        const FileFinder& rDirectory,
-        const std::string& rFileNameBase,
-        unsigned procId)
-    : mpCommonStream(nullptr),
-      mpPrivateStream(nullptr),
-      mpCommonArchive(nullptr),
-      mpPrivateArchive(nullptr)
-{
-    // Check for user error
-    if (procId != PetscTools::GetMyRank())
-    {
-        EXCEPTION("Specifying the secondary archive file ID doesn't make sense when writing.");
-    }
-
-    // Figure out where things live
-    ArchiveLocationInfo::SetArchiveDirectory(rDirectory);
-    if (ArchiveLocationInfo::GetIsDirRelativeToChasteTestOutput())
-    {
-        // Ensure the directory exists
-        OutputFileHandler handler(ArchiveLocationInfo::GetArchiveRelativePath(), false);
-    }
-    std::string private_path = ArchiveLocationInfo::GetProcessUniqueFilePath(rFileNameBase);
-    std::stringstream common_path;
-    common_path << ArchiveLocationInfo::GetArchiveDirectory() << rFileNameBase;
-
-    // Create master archive for replicated data
-    if (PetscTools::AmMaster())
-    {
-        mpCommonStream = new std::ofstream(common_path.str().c_str(), std::ios::binary | std::ios::trunc);
-        if (!mpCommonStream->is_open())
-        {
-            delete mpCommonStream;
-            EXCEPTION("Failed to open main archive file for writing: " + common_path.str());
-        }
-    }
-    else
-    {
-        // Non-master processes need to go through the serialization methods, but not write any data
-#ifdef _MSC_VER
-        mpCommonStream = new std::ofstream("NUL", std::ios::binary | std::ios::trunc);
-#else
-        mpCommonStream = new std::ofstream("/dev/null", std::ios::binary | std::ios::trunc);
-#endif
-        // LCOV_EXCL_START
-        if (!mpCommonStream->is_open())
-        {
-            delete mpCommonStream;
-            EXCEPTION("Failed to open dummy archive file '/dev/null' for writing");
-        }
-        // LCOV_EXCL_STOP
-    }
-    mpCommonArchive = new boost::archive::binary_oarchive(*mpCommonStream);
-
-    // Create secondary archive for distributed data
-    mpPrivateStream = new std::ofstream(private_path.c_str(), std::ios::binary | std::ios::trunc);
-    if (!mpPrivateStream->is_open())
-    {
-        delete mpPrivateStream;
-        delete mpCommonArchive;
-        delete mpCommonStream;
-        EXCEPTION("Failed to open secondary archive file for writing: " + private_path);
-    }
-    mpPrivateArchive = new boost::archive::binary_oarchive(*mpPrivateStream);
-    ProcessSpecificArchive<boost::archive::binary_oarchive>::Set(mpPrivateArchive);
-}
-
-template<>
-ArchiveOpener<boost::archive::binary_oarchive, std::ofstream>::~ArchiveOpener()
-{
-    ProcessSpecificArchive<boost::archive::binary_oarchive>::Set(nullptr);
-    delete mpPrivateArchive;
-    delete mpPrivateStream;
-    delete mpCommonArchive;
-    delete mpCommonStream;
-
-    /* In a parallel setting, make sure all processes have finished writing before
-     * continuing, to avoid nasty race conditions.
-     * For example, many tests will write an archive then immediately read it back
-     * in, which could easily break without this.
-     */
-    PetscTools::Barrier("~ArchiveOpener");
-}
+// Explicit instantiation
+template class ArchiveOpener<boost::archive::text_iarchive, std::ifstream>;
+template class ArchiveOpener<boost::archive::text_oarchive, std::ofstream>;
+template class ArchiveOpener<boost::archive::binary_iarchive, std::ifstream>;
+template class ArchiveOpener<boost::archive::binary_oarchive, std::ofstream>;
