@@ -45,7 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "DistributedVectorFactory.hpp"
 
-
 /*
  * Operator function to be called by H5Literate in TestListingDatasetsInAnHdf5File.
  */
@@ -97,8 +96,10 @@ private:
          * default file creation properties, and default file
          * access properties.
          */
-        file = H5Fcreate(h5file_name.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-
+        // Set up a property list saying how we'll open the file in parallel
+        hid_t plist_id = H5Pcreate(H5P_FILE_ACCESS);
+        H5Pset_fapl_mpio(plist_id, PETSC_COMM_WORLD, MPI_INFO_NULL);
+        file = H5Fcreate(h5file_name.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
         /*
          * Describe the size of the array and create the data space for fixed
          * size dataset.

@@ -80,7 +80,21 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractBoxDomainPdeModifier<DIM> >(*this);
+        archive & mMoveSolutionWithCells;
+        archive & mOldCellLocations;
     }
+
+    /**
+     * Whether to move the solution along with the cells in the cell population.
+     * Default to true.
+     */
+    bool mMoveSolutionWithCells;
+
+    /**
+     * Map used to calculate displacement of cells if moving pde solution with cells
+     */
+    std::map<CellPtr, c_vector<double, DIM> > mOldCellLocations;
+    
 
 public:
 
@@ -105,7 +119,7 @@ public:
     /**
      * Destructor.
      */
-    virtual ~ParabolicBoxDomainPdeModifier();
+    ~ParabolicBoxDomainPdeModifier() override = default;
 
     /**
      * Overridden UpdateAtEndOfTimeStep() method.
@@ -114,7 +128,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM, DIM>& rCellPopulation) override;
 
     /**
      * Overridden SetupSolve() method.
@@ -124,7 +138,7 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param outputDirectory the output directory, relative to where Chaste output is stored
      */
-    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
+    void SetupSolve(AbstractCellPopulation<DIM, DIM>& rCellPopulation, std::string outputDirectory) override;
 
     /**
      * Helper method to construct the boundary conditions container for the PDE.
@@ -138,11 +152,36 @@ public:
     /**
      * Helper method to initialise the PDE solution using the CellData.
      *
-     * Here we assume a homogeneous initial consition.
+     * Here we assume a homogeneous initial condition.
+     * 
+     * TODO use InterpolateSolutionFromCellMovement instead!
      *
      * @param rCellPopulation reference to the cell population
      */
     void SetupInitialSolutionVector(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+
+    /**
+     * Helper method to interpolate the PDE solution from cells using the CellData.
+     * Use the cells voronoi region as all fe nodes in a cell centre voronoi region are given the 
+     * value from cell data.
+     *
+     * @param rCellPopulation reference to the cell population
+     * 
+     * @return the solution interpolated onto the FE Mesh
+     */
+    Vec InterpolateSolutionFromCellMovement(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+
+    /**
+     * Set mMoveSolutionWithCells.
+     *
+     * @param moveSolutionWithCells whether to move the solution with cells. 
+     */
+    void SetMoveSolutionWithCells(bool moveSolutionWithCells);
+
+    /**
+     * @return mMoveSolutionWithCells.
+     */
+    bool GetMoveSolutionWithCells() const;
 
     /**
      * Overridden OutputSimulationModifierParameters() method.
@@ -150,7 +189,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputSimulationModifierParameters(out_stream& rParamsFile);
+    void OutputSimulationModifierParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

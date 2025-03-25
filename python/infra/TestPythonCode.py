@@ -70,10 +70,10 @@ except ImportError:
 class TestTest(unittest.TestCase):
     """A simple test case for testing the framework."""
     def TestOk(self):
-        self.failUnless(True)
+        self.assertTrue(True)
 
     def TestFail(self):
-        self.failIf(True)
+        self.assertFalse(True)
 
     def TestError(self):
         self.assertEqual(1, 1/0)

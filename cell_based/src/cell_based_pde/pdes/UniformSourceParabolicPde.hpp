@@ -47,10 +47,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * The PDE takes the form
  *
- * du/dt = Grad.(Grad(u)) + k,
+ * c*du/dt = D Grad.(Grad(u)) + a*u + b,
  *
- * where the scalar k is specified by the member mSourceCoefficient, whose value
- * must be set in the constructor.
+ * where the scalars c, a, b and D are specified by the members mDuDtCoefficient, mConstantSourceCoefficient,
+ * mLinearSourceCoefficient, and mDiffusionCoefficient respectively whose values must be set in the constructor.
  *
  * Thus, there is no direct coupling between the cell-based simulation and the
  * terms of the PDE; here, the cell population just defines the spatial domain
@@ -74,26 +74,60 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-       archive & boost::serialization::base_object<AbstractLinearParabolicPde<DIM,DIM> >(*this);
-       archive & mSourceCoefficient;
+        archive & boost::serialization::base_object<AbstractLinearParabolicPde<DIM,DIM> >(*this);
+        archive & mConstantSourceCoefficient;
+        archive & mLinearSourceCoefficient;
+        archive & mDiffusionCoefficient;
+        archive & mDuDtCoefficient;
     }
 
-    /** Constant source term (rate of production) of the dependent variable. */
-    double mSourceCoefficient;
+    /** Coefficient of constant source term. */
+    double mConstantSourceCoefficient;
+
+    /** Coefficient of linear source term. */
+    double mLinearSourceCoefficient;
+
+    /** Diffusion coefficient. */
+    double mDiffusionCoefficient;
+
+    /** Coefficient of rate of change term.  */
+    double mDuDtCoefficient;
 
 public:
 
     /**
      * Constructor.
      *
-     * @param sourceCoefficient the source term coefficient (defaults to 0.0)
+     * @param constantSourceCoefficient the constant source term coefficient (defaults to 0.0)
+     * @param linearSourceCoefficient the linear source term coefficient (defaults to 0.0)
+     * @param diffusionCoefficient the rate of diffusion (defaults to 1.0)
+     * @param duDtCoefficient rate of reaction (defaults to 1.0)
+     * 
      */
-    UniformSourceParabolicPde(double sourceCoefficient=0.0);
+    UniformSourceParabolicPde(double constantSourceCoefficient=0.0, 
+                              double linearSourceCoefficient=0.0,
+                              double diffusionCoefficient=1.0,
+                              double duDtCoefficient=1.0);
 
     /**
-     * @return mSourceCoefficient
+     * @return mConstantSourceCoefficient
      */
-    double GetCoefficient() const;
+    double GetConstantCoefficient() const;
+
+    /**
+     * @return mLinearSourceCoefficient
+     */
+    double GetLinearCoefficient() const;
+
+    /**
+     * @return mDiffusionCoefficient
+     */
+    double GetDiffusionCoefficient() const;
+
+    /**
+     * @return mDuDtCoefficient
+     */
+    double GetDuDtCoefficient() const;
 
     /**
      * Overridden ComputeSourceTerm() method.
@@ -102,9 +136,9 @@ public:
      * @param u the value of the dependent variable at the point
      * @param pElement The element
      *
-     * @return the the source term.
+     * @return the source term.
      */
-    double ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM,DIM>* pElement=NULL);
+    double ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM, DIM>* pElement = nullptr) override;
 
     /**
      * Overridden ComputeDiffusionTerm() method.
@@ -114,7 +148,7 @@ public:
      *
      * @return a matrix.
      */
-    c_matrix<double, DIM, DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement=NULL);
+    c_matrix<double, DIM, DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM, DIM>* pElement = nullptr) override;
 
     /**
      * Overridden ComputeDuDtCoefficientFunction() method.
@@ -123,7 +157,7 @@ public:
      *
      * @param rX the point in space at which the function c is computed
      */
-    double ComputeDuDtCoefficientFunction(const ChastePoint<DIM>& rX);
+    double ComputeDuDtCoefficientFunction(const ChastePoint<DIM>& rX) override;
 };
 
 #include "SerializationExportWrapper.hpp"

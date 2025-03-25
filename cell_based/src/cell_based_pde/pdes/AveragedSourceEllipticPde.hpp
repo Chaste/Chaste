@@ -83,8 +83,10 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
        archive & boost::serialization::base_object<AbstractLinearEllipticPde<DIM, DIM> >(*this);
-       archive & mSourceCoefficient;
+       archive & mConstantSourceCoefficient;
+       archive & mLinearSourceCoefficient;
        archive & mDiffusionCoefficient;
+       archive & mScaleByCellVolume;
        archive & mCellDensityOnCoarseElements;
     }
 
@@ -93,11 +95,17 @@ protected:
     /** The cell population member. */
     AbstractCellPopulation<DIM>& mrCellPopulation;
 
-    /** Coefficient of consumption of nutrient by cells. */
-    double mSourceCoefficient;
+    /** Coefficient of constant source term. */
+    double mConstantSourceCoefficient;
+
+    /** Coefficient of linear source term. */
+    double mLinearSourceCoefficient;
 
     /** Diffusion coefficient. */
     double mDiffusionCoefficient;
+
+    /** Whether to scale terms by cell volume. */
+    bool mScaleByCellVolume;
 
     /** Vector of averaged cell densities on elements of the coarse mesh. */
     std::vector<double> mCellDensityOnCoarseElements;
@@ -108,12 +116,16 @@ public:
      * Constructor.
      *
      * @param rCellPopulation reference to the cell population
-     * @param sourceCoefficient the source term coefficient (defaults to 0.0)
+     * @param constantSourceCoefficient the constant source term coefficient (defaults to 0.0)
+     * @param linearSourceCoefficient the linear source term coefficient (defaults to 0.0)
      * @param diffusionCoefficient the rate of diffusion (defaults to 1.0)
+     * @param scaleByCellVolume whether to scale by cell volume (defaults to)
      */
     AveragedSourceEllipticPde(AbstractCellPopulation<DIM>& rCellPopulation,
-                              double sourceCoefficient=0.0,
-                              double diffusionCoefficient=1.0);
+                              double constantSourceCoefficient=0.0, 
+                              double linearSourceCoefficient=0.0,
+                              double diffusionCoefficient=1.0, 
+                              bool scaleByCellVolume=false);
 
     /**
      * @return const reference to the cell population (used in archiving).
@@ -121,9 +133,24 @@ public:
     const AbstractCellPopulation<DIM>& rGetCellPopulation() const;
 
     /**
-     * @return mSourceCoefficient
+     * @return mConstantSourceCoefficient
      */
-    double GetCoefficient() const;
+    double GetConstantCoefficient() const;
+
+    /**
+     * @return mLinearSourceCoefficient
+     */
+    double GetLinearCoefficient() const;
+        
+    /**
+     * @return mDiffusionCoefficient
+     */
+    double GetDiffusionCoefficient() const;
+
+    /**
+     * @return mScaleByCellVolume
+     */
+    bool GetScaleByCellVolume() const;
 
     /**
      * Set up the source terms.
@@ -131,7 +158,7 @@ public:
      * @param rCoarseMesh reference to the coarse mesh
      * @param pCellPdeElementMap optional pointer to the map from cells to coarse elements
      */
-    void virtual SetupSourceTerms(TetrahedralMesh<DIM,DIM>& rCoarseMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap=nullptr);
+    void virtual SetupSourceTerms(TetrahedralMesh<DIM, DIM>& rCoarseMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap = nullptr);
 
     /**
      * Overridden ComputeConstantInUSourceTerm() method.
@@ -142,7 +169,7 @@ public:
      * @return the constant in u part of the source term, i.e g(x) in
      *  Div(D Grad u)  +  f(x)u + g(x) = 0.
      */
-    double ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement);
+    double ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX, Element<DIM, DIM>* pElement) override;
 
     /**
      * Overridden ComputeLinearInUCoeffInSourceTerm() method.
@@ -153,7 +180,7 @@ public:
      * @return the coefficient of u in the linear part of the source term, i.e f(x) in
      *  Div(D Grad u)  +  f(x)u + g(x) = 0.
      */
-    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement);
+    double ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM, DIM>* pElement) override;
 
     /**
      * Overridden ComputeDiffusionTerm() method.
@@ -162,7 +189,7 @@ public:
      *
      * @return a matrix.
      */
-    c_matrix<double,DIM,DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX);
+    c_matrix<double,DIM,DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX) override;
 
     /**
      * @return the uptake rate.

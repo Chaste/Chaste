@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MutableMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
+#include "Warnings.hpp"
 
 #include "VtkMeshWriter.hpp"
 #include "NodesOnlyMesh.hpp"
@@ -656,20 +657,32 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEdgeLength(unsigned elementIndex1,
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetElongationShapeFactorOfElement(unsigned index)
+double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetElongationShapeFactorOfElement([[maybe_unused]] const unsigned elementIndex)
 {
-    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE - code will be removed at compile time
+    if constexpr (SPACE_DIM == 2)
+    {
+        c_vector<double, 3> moments = CalculateMomentsOfElement(elementIndex);
 
-    c_vector<double, 3> moments = CalculateMomentsOfElement(index);
+        const double discriminant = sqrt((moments(0) - moments(1)) * (moments(0) - moments(1)) + 4.0 * moments(2) * moments(2));
 
-    double discriminant = sqrt((moments(0) - moments(1)) * (moments(0) - moments(1)) + 4.0 * moments(2) * moments(2));
+        // Note that as the matrix of second moments of area is symmetric, both its eigenvalues are real
+        // Use std::max to guard against floating point imprecision causing the smallest eigenvalue being small and negative
+        const double largest_eigenvalue = (moments(0) + moments(1) + discriminant) * 0.5;
+        const double smallest_eigenvalue = std::max(0.0, (moments(0) + moments(1) - discriminant) * 0.5);
 
-    // Note that as the matrix of second moments of area is symmetric, both its eigenvalues are real
-    double largest_eigenvalue = (moments(0) + moments(1) + discriminant) * 0.5;
-    double smallest_eigenvalue = (moments(0) + moments(1) - discriminant) * 0.5;
+        // Prevent division by zero
+        if (smallest_eigenvalue == 0.0)
+        {
+            WARNING("Infinite elongation shape factor: element likely to be co-linear");
+            return std::numeric_limits<double>::infinity();
+        }
 
-    double elongation_shape_factor = sqrt(largest_eigenvalue / smallest_eigenvalue);
-    return elongation_shape_factor;
+        return sqrt(largest_eigenvalue / smallest_eigenvalue);
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

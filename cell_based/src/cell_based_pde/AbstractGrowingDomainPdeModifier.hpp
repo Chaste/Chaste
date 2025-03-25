@@ -88,7 +88,7 @@ public:
     /**
      * Destructor.
      */
-    virtual ~AbstractGrowingDomainPdeModifier();
+    ~AbstractGrowingDomainPdeModifier() override = default;
 
     /**
      * Helper method to generate the mesh from the Cell population.
@@ -106,14 +106,13 @@ public:
      */
     void UpdateCellData(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
 
-
     /**
      * Overridden OutputSimulationModifierParameters() method.
      * Output any simulation modifier parameters to file.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputSimulationModifierParameters(out_stream& rParamsFile);
+    void OutputSimulationModifierParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

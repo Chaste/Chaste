@@ -131,6 +131,7 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > ParabolicGrowingDomainP
              ++node_iter)
         {
             p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpBoundaryCondition.get());
+            this->mIsDirichletBoundaryNode[(*node_iter)->GetIndex()] = 1.0;
         }
     }
 
@@ -149,23 +150,18 @@ void ParabolicGrowingDomainPdeModifier<DIM>::UpdateSolutionVector(AbstractCellPo
 
     std::string& variable_name = this->mDependentVariableName;
 
+    // Loop over nodes of the finite element mesh and get appropriate solution values from CellData
     for (typename TetrahedralMesh<DIM,DIM>::NodeIterator node_iter = this->mpFeMesh->GetNodeIteratorBegin();
-         node_iter != this->mpFeMesh->GetNodeIteratorEnd();
-         ++node_iter)
+            node_iter != this->mpFeMesh->GetNodeIteratorEnd();
+            ++node_iter)
     {
-        // Loop over nodes of the finite element mesh and get appropriate solution values from CellData
-        for (typename TetrahedralMesh<DIM,DIM>::NodeIterator node_iter = this->mpFeMesh->GetNodeIteratorBegin();
-             node_iter != this->mpFeMesh->GetNodeIteratorEnd();
-             ++node_iter)
-        {
-            unsigned node_index = node_iter->GetIndex();
-            bool dirichlet_bc_applies = (node_iter->IsBoundaryNode()) && (!(this->IsNeumannBoundaryCondition()));
-            double boundary_value = this->GetBoundaryCondition()->GetValue(node_iter->rGetLocation());
+        unsigned node_index = node_iter->GetIndex();
+        bool dirichlet_bc_applies = (node_iter->IsBoundaryNode()) && (!(this->IsNeumannBoundaryCondition()));
+        double boundary_value = this->GetBoundaryCondition()->GetValue(node_iter->rGetLocation());
 
-            double solution_at_node = rCellPopulation.GetCellDataItemAtPdeNode(node_index, variable_name, dirichlet_bc_applies, boundary_value);
+        double solution_at_node = rCellPopulation.GetCellDataItemAtPdeNode(node_index, variable_name, dirichlet_bc_applies, boundary_value);
 
-            PetscVecTools::SetElement(this->mSolution, node_index, solution_at_node);
-        }
+        PetscVecTools::SetElement(this->mSolution, node_index, solution_at_node);
     }
 }
 

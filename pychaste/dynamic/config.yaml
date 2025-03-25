@@ -166,7 +166,6 @@ modules:
       #=== pde: Chaste/cell_based/src/cell_based_pde/pdes
       - name: CellwiseSourceEllipticPde
       - name: AveragedSourceEllipticPde
-      - name: VolumeDependentAveragedSourceEllipticPde
       - name: UniformSourceEllipticPde
       - name: CellwiseSourceParabolicPde
       - name: UniformSourceParabolicPde

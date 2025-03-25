@@ -50,11 +50,6 @@ EllipticGrowingDomainPdeModifier<DIM>::EllipticGrowingDomainPdeModifier(boost::s
 }
 
 template<unsigned DIM>
-EllipticGrowingDomainPdeModifier<DIM>::~EllipticGrowingDomainPdeModifier()
-{
-}
-
-template<unsigned DIM>
 void EllipticGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     this->GenerateFeMesh(rCellPopulation);
@@ -67,7 +62,7 @@ void EllipticGrowingDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPo
     }
 
     // ...then record whether it is the correct size...
-    bool is_previous_solution_size_correct = (previous_solution_size == (int)this->mpFeMesh->GetNumNodes());
+    const bool is_previous_solution_size_correct = (previous_solution_size == static_cast<int>(this->mpFeMesh->GetNumNodes()));
 
     // ...and if it is, store it as an initial guess for the PDE solver
     Vec initial_guess;
@@ -132,11 +127,12 @@ std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > EllipticGrowingDomainPd
 
     // To be well-defined, elliptic PDE problems on growing domains require Dirichlet boundary conditions
     assert(!(this->IsNeumannBoundaryCondition()));
-    for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = this->mpFeMesh->GetBoundaryNodeIteratorBegin();
+    for (auto node_iter = this->mpFeMesh->GetBoundaryNodeIteratorBegin();
          node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
          ++node_iter)
     {
         p_bcc->AddDirichletBoundaryCondition(*node_iter, this->mpBoundaryCondition.get());
+        this->mIsDirichletBoundaryNode[(*node_iter)->GetIndex()] = 1.0;
     }
 
     return p_bcc;

@@ -40,6 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/base_object.hpp>
 
 #include "AbstractPdeModifier.hpp"
+#include "BoundaryConditionsContainer.hpp"
 
 /**
  * An abstract modifier class containing functionality common to EllipticBoxDomainPdeModifier
@@ -71,6 +72,9 @@ private:
         archive & mpMeshCuboid;
         archive & mStepSize;
         archive & mSetBcsOnBoxBoundary;
+        archive & mSetBcsOnBoundingSphere;
+        archive & mUseVoronoiCellsForInterpolation;
+        archive & mTypicalCellRadius;
     }
 
 protected:
@@ -96,6 +100,26 @@ protected:
      */
     bool mSetBcsOnBoxBoundary;
 
+    /**
+     * Whether to set the boundary condition on a sphere which bounds the cell centres of the tissue.
+     * Only used if mSetBcsOnBoxBoundary is false.
+     * Default to false.
+     */
+    bool mSetBcsOnBoundingSphere;
+
+    /**
+     * Whether to use a cell centres Voronoi region to interpolate the pde solution onto cells.
+     */
+    bool mUseVoronoiCellsForInterpolation;
+
+    /**
+     * Used to define if a FE node is within a certain radius of a cell centre to help define
+     * boundary conditions when mSetBcsOnBoxBoundary and mSetBcsOnBoundingSphere are false
+     *
+     * defaults to 0.5 CD
+     */
+    double mTypicalCellRadius;
+
 public:
 
     /**
@@ -119,12 +143,12 @@ public:
     /**
      * Destructor.
      */
-    virtual ~AbstractBoxDomainPdeModifier();
+    ~AbstractBoxDomainPdeModifier() override = default;
 
     /**
      * @return mStepSize.
      */
-    double GetStepSize();
+    double GetStepSize() const;
 
     /**
      * Set mSetBcsOnCoarseBoundary.
@@ -136,7 +160,54 @@ public:
     /**
      * @return mSetBcsOnCoarseBoundary.
      */
-    bool AreBcsSetOnBoxBoundary();
+    bool AreBcsSetOnBoxBoundary() const;
+
+    /**
+     * Set mSetBcsOnBoundingSphere.
+     *
+     * @param setBcsOnBoundingSphere whether to set the boundary condition on the edge of the box domain rather than the cell population
+     */
+    void SetBcsOnBoundingSphere(bool setBcsOnBoundingSphere);
+
+    /**
+     * @return mSetBcsOnBoundingSphere.
+     */
+    bool AreBcsSetOnBoundingSphere() const;
+
+    /**
+     * Set mUseVoronoiCellsForInterpolation.
+     *
+     * @param useVoronoiCellsForInterpolation whether to use the Voronoi region of cells for interpolation
+     * of the solution from the FE mesh to the cells.
+     */
+    void SetUseVoronoiCellsForInterpolation(bool useVoronoiCellsForInterpolation);
+
+    /**
+     * @return mUseVoronoiCellsForInterpolation.
+     */
+    bool GetUseVoronoiCellsForInterpolation() const;
+
+    /**
+     * Set mTypicalCellRadius.
+     *
+     * @param typicalCellRadius the radius to use for defining if FE nodes are near cells or not.
+     */
+    void SetTypicalCellRadius(double typicalCellRadius);
+
+    /**
+     * @return mTypicalCellRadius.
+     */
+    double GetTypicalCellRadius() const;
+
+
+    /**
+     * Helper method to construct the boundary conditions container for the PDE.
+     *
+     * @param rCellPopulation reference to the cell population
+     * @param pBcc the boundary conditions container to fill
+     */
+    void ConstructBoundaryConditionsContainerHelper(AbstractCellPopulation<DIM,DIM>& rCellPopulation,
+                                                    std::shared_ptr<BoundaryConditionsContainer<DIM,DIM,1> > pBcc);
 
     /**
      * Overridden SetupSolve() method.
@@ -148,15 +219,24 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param outputDirectory the output directory, relative to where Chaste output is stored
      */
-    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
+    void SetupSolve(AbstractCellPopulation<DIM, DIM>& rCellPopulation, std::string outputDirectory) override;
 
     /**
-     * Helper method to generate the mesh.
+     * Helper method to generate the pde mesh for the first time.
      *
      * @param pMeshCuboid the outer boundary for the FE mesh.
      * @param stepSize the step size to be used in the FE mesh.
      */
     void GenerateFeMesh(boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid, double stepSize);
+
+    /**
+     * Helper method to generate a pde mesh.
+     *
+     * @param pMeshCuboid the outer boundary for the FE mesh.
+     * @param stepSize the step size to be used in the FE mesh.
+     * @param pMesh a pointer to the mesh to be created
+     */
+    void GenerateAndReturnFeMesh(boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid, double stepSize, TetrahedralMesh<DIM,DIM>* pMesh);
 
     /**
      * Helper method to copy the PDE solution to CellData
@@ -190,7 +270,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputSimulationModifierParameters(out_stream& rParamsFile);
+    void OutputSimulationModifierParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

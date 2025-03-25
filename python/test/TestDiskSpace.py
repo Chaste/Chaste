@@ -64,8 +64,8 @@ class TestDiskSpace(unittest.TestCase):
         
         source_free_gb = du(__file__).free / gb
         print("Free space on Chaste source partition: %sGB" % source_free_gb)
-        self.failIf(source_free_gb < 5,
-                    "The disk containing the Chaste source tree has less than 5GB of space left.")
+        self.assertFalse(source_free_gb < 5,
+                         "The disk containing the Chaste source tree has less than 5GB of space left.")
 
         test_output_dir = os.path.abspath(os.getenv('CHASTE_TEST_OUTPUT', os.curdir))
         if not os.path.exists(test_output_dir):
@@ -76,5 +76,5 @@ class TestDiskSpace(unittest.TestCase):
                 return
         test_free_gb = du(test_output_dir).free / gb
         print("Free space on Chaste test output partition: %sGB" % test_free_gb)
-        self.failIf(test_free_gb < 5,
+        self.assertFalse(test_free_gb < 5,
                     "The disk containing the Chaste test output has less than 5GB of space left.")

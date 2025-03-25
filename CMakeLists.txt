@@ -451,21 +451,24 @@ endif ()
 ################################
 ####  Find Boost
 ################################
-add_definitions(-DBOOST_ALL_NO_LIB)
-if (BUILD_SHARED_LIBS)
-    set(Boost_USE_STATIC_LIBS OFF)
-    set(Boost_USE_STATIC_RUNTIME OFF)
-else ()
-    set(Boost_USE_STATIC_LIBS ON)
-    set(Boost_USE_STATIC_RUNTIME ON)
-endif ()
-find_package (Boost COMPONENTS filesystem system serialization program_options REQUIRED)
-list (APPEND Chaste_INCLUDES "${Boost_INCLUDE_DIR}")
-list (APPEND Chaste_LINK_LIBRARIES "${Boost_LIBRARIES}")
+find_package(Boost 1.71 REQUIRED COMPONENTS headers system serialization program_options CONFIG)
+message(STATUS "Boost version: ${Boost_VERSION}")
+
+# Turn off boost auto-linking, which is not required when using CMake
+target_compile_definitions(Chaste_COMMON_DEPS INTERFACE BOOST_ALL_NO_LIB)
+
 # Suppress boost deprecation notices in Boost 1.74.0 (shipped with Ubuntu 22.04), fixed in 1.75
 if (Boost_VERSION VERSION_GREATER_EQUAL 1.74.0 AND Boost_VERSION VERSION_LESS 1.75.0)
-    add_definitions(-DBOOST_ALLOW_DEPRECATED_HEADERS)
+    target_compile_definitions(Chaste_COMMON_DEPS INTERFACE BOOST_ALLOW_DEPRECATED_HEADERS)
 endif ()
+
+# Link the Boost targets onto Chaste_COMMON_DEPS
+target_link_libraries(Chaste_COMMON_DEPS INTERFACE
+        Boost::headers
+        Boost::system
+        Boost::serialization
+        Boost::program_options
+)
 
 
 ################################

@@ -44,7 +44,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChastePoint.hpp"
 #include "Node.hpp"
 #include "Element.hpp"
-#include <petscvec.h>
 
 /**
  * AbstractLinearEllipticPde class.
@@ -52,9 +51,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * A general PDE of the form:
  * 0 =   Grad.(DiffusionTerm(x)*Grad(u))
  *     + ComputeConstantInUSourceTerm(x)
- *     + ComputeLinearInUCoeffInSourceTerm(x, u)
+ *     + ComputeLinearInUCoeffInSourceTerm(x) * u
  *
- * Parabolic PDEs are be derived from this (AbstractLinearParabolicPde)
+ * Linear Elliptic PDEs are derived from this (AbstractLinearEllipticPde)
  */
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 class AbstractLinearEllipticPde : public AbstractLinearPde<ELEMENT_DIM, SPACE_DIM>
@@ -87,8 +86,7 @@ public:
     /**
      * Destructor.
      */
-    virtual ~AbstractLinearEllipticPde()
-    {}
+    ~AbstractLinearEllipticPde() override = default;
 
     /**
      * @return computed constant in u part of the source term, i.e g(x) in

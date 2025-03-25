@@ -38,13 +38,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 AveragedSourceParabolicPde<DIM>::AveragedSourceParabolicPde(AbstractCellPopulation<DIM,DIM>& rCellPopulation,
-                                                            double duDtCoefficient,
+                                                            double constantSourceCoefficient, 
+                                                            double linearSourceCoefficient, 
                                                             double diffusionCoefficient,
-                                                            double sourceCoefficient)
+                                                            double duDtCoefficient,
+                                                            bool scaleByCellVolume)
     : mrCellPopulation(rCellPopulation),
-      mDuDtCoefficient(duDtCoefficient),
+      mConstantSourceCoefficient(constantSourceCoefficient),
+      mLinearSourceCoefficient(linearSourceCoefficient),
       mDiffusionCoefficient(diffusionCoefficient),
-      mSourceCoefficient(sourceCoefficient)
+      mDuDtCoefficient(duDtCoefficient),
+      mScaleByCellVolume(scaleByCellVolume)
 {
 }
 
@@ -55,13 +59,43 @@ const AbstractCellPopulation<DIM,DIM>& AveragedSourceParabolicPde<DIM>::rGetCell
 }
 
 template<unsigned DIM>
+double AveragedSourceParabolicPde<DIM>::GetConstantCoefficient() const
+{
+    return mConstantSourceCoefficient;
+}
+
+template<unsigned DIM>
+double AveragedSourceParabolicPde<DIM>::GetLinearCoefficient() const
+{
+    return mLinearSourceCoefficient;
+}
+
+template<unsigned DIM>
+double AveragedSourceParabolicPde<DIM>::GetDiffusionCoefficient() const
+{
+    return mDiffusionCoefficient;
+}
+
+template<unsigned DIM>
+double AveragedSourceParabolicPde<DIM>::GetDuDtCoefficient() const
+{
+    return mDuDtCoefficient;
+}
+
+template<unsigned DIM>
+bool AveragedSourceParabolicPde<DIM>::GetScaleByCellVolume() const
+{
+    return mScaleByCellVolume;
+}
+
+template<unsigned DIM>
 void AveragedSourceParabolicPde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>& rCoarseMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap) // must be called before solve
 {
     // Allocate memory
     mCellDensityOnCoarseElements.resize(rCoarseMesh.GetNumElements());
-    for (unsigned elem_index=0; elem_index<mCellDensityOnCoarseElements.size(); elem_index++)
+    for (double & mCellDensityOnCoarseElement : mCellDensityOnCoarseElements)
     {
-        mCellDensityOnCoarseElements[elem_index] = 0.0;
+        mCellDensityOnCoarseElement = 0.0;
     }
 
     // Loop over cells, find which coarse element it is in, and add 1 to mSourceTermOnCoarseElements[elem_index]
@@ -86,7 +120,22 @@ void AveragedSourceParabolicPde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>&
 
         if (!cell_is_apoptotic)
         {
-            mCellDensityOnCoarseElements[elem_index] += 1.0;
+            double cell_weight = 1.0;
+
+            if (mScaleByCellVolume)
+            {   
+                // If scaling by cell volume then use volume her instead of cell count 
+                cell_weight = mrCellPopulation.GetVolumeOfCell(*cell_iter);
+
+                if (cell_weight <1e-6)
+                {
+                    EXCEPTION("The volume of one of the cells is " << cell_weight << 
+                              " and you are scaling by cell volume. Either turn scaling off or use"  
+                              " a cell model with non zero areas (i.e. a Bounded Voronoi Tesselation model).");
+                }
+            }
+
+            mCellDensityOnCoarseElements[elem_index] += cell_weight;
         }
     }
 
@@ -110,10 +159,11 @@ template<unsigned DIM>
 double AveragedSourceParabolicPde<DIM>::ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM,DIM>* pElement)
 {
     assert(!mCellDensityOnCoarseElements.empty());
-    double coefficient = mSourceCoefficient * mCellDensityOnCoarseElements[pElement->GetIndex()];
 
-    // The source term is C*u
-    return coefficient*u;
+    // The source term is (a*u + b)*density
+    double source_term = (mLinearSourceCoefficient * u + mConstantSourceCoefficient) * mCellDensityOnCoarseElements[pElement->GetIndex()];
+   
+    return source_term;
 }
 
 // LCOV_EXCL_START
@@ -121,7 +171,6 @@ template<unsigned DIM>
 double AveragedSourceParabolicPde<DIM>::ComputeSourceTermAtNode(const Node<DIM>& rNode, double u)
 {
     NEVER_REACHED;
-    return 0.0;
 }
 // LCOV_EXCL_STOP
 

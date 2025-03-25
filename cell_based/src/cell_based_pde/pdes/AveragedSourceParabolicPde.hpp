@@ -49,11 +49,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * The PDE takes the form
  *
- * c*du/dt = Grad.(D*Grad(u)) + k*u*rho(x),
+ * c*du/dt = Grad.(D*Grad(u)) + (a*u + b) * rho(x),
  *
- * where the scalars c, D and k are specified by the members mDuDtCoefficient,
- * mDiffusionCoefficient and mSourceCoefficient, respectively. Their values must
- * be set in the constructor.
+ * where the scalars c, D, a and b are specified by the members mDuDtCoefficient,
+ * mDiffusionCoefficient, mLinearSourceCoefficient and mConstantSourceCoefficient, 
+ * respectively. Their values must be set in the constructor.
  *
  * The function rho(x) denotes the local density of non-apoptotic cells. This
  * quantity is computed for each element of a 'coarse' finite element mesh that is
@@ -81,9 +81,11 @@ private:
     void serialize(Archive & archive, const unsigned int version)
     {
        archive & boost::serialization::base_object<AbstractLinearParabolicPde<DIM, DIM> >(*this);
-       archive & mDuDtCoefficient;
+       archive & mConstantSourceCoefficient;
+       archive & mLinearSourceCoefficient;
        archive & mDiffusionCoefficient;
-       archive & mSourceCoefficient;
+       archive & mDuDtCoefficient;
+       archive & mScaleByCellVolume;
        archive & mCellDensityOnCoarseElements;
     }
 
@@ -92,14 +94,20 @@ protected:
     /** The cell population member. */
     AbstractCellPopulation<DIM, DIM>& mrCellPopulation;
 
-    /** Coefficient of rate of change term.  */
-    double mDuDtCoefficient;
+    /** Coefficient of constant source term. */
+    double mConstantSourceCoefficient;
+
+    /** Coefficient of linear source term. */
+    double mLinearSourceCoefficient;
 
     /** Diffusion coefficient. */
     double mDiffusionCoefficient;
 
-    /** Coefficient of the rate of uptake of the dependent variable by non-apoptotic cells. */
-    double mSourceCoefficient;
+    /** Coefficient of rate of change term.  */
+    double mDuDtCoefficient;
+    
+    /** Whether to scale terms by cell volume */
+    bool mScaleByCellVolume;
 
     /** Vector of averaged cell densities on elements of the coarse mesh. */
     std::vector<double> mCellDensityOnCoarseElements;
@@ -110,19 +118,48 @@ public:
      * Constructor.
      *
      * @param rCellPopulation reference to the cell population
+     * @param constantSourceCoefficient the constant source term coefficient (defaults to 0.0)
+     * @param linearSourceCoefficient the linear source term coefficient (defaults to 0.0)
+     * @param diffusionCoefficient the rate of diffusion (defaults to 1.0)
      * @param duDtCoefficient rate of reaction (defaults to 1.0)
-     * @param diffusionCoefficient rate of diffusion (defaults to 1.0)
-     * @param sourceCoefficient the source term coefficient (defaults to 0.0)
+     * @param scaleByCellVolume whether to scale by cell volume (defaults to false)
      */
     AveragedSourceParabolicPde(AbstractCellPopulation<DIM, DIM>& rCellPopulation,
-                               double duDtCoefficient=1.0,
+                               double constantSourceCoefficient=0.0, 
+                               double linearSourceCoefficient=0.0,
                                double diffusionCoefficient=1.0,
-                               double sourceCoefficient=0.0);
+                               double duDtCoefficient=1.0,
+                               bool scaleByCellVolume=false);
 
     /**
      * @return const reference to the cell population (used in archiving).
      */
     const AbstractCellPopulation<DIM>& rGetCellPopulation() const;
+
+    /**
+     * @return mConstantSourceCoefficient
+     */
+    double GetConstantCoefficient() const;
+
+    /**
+     * @return mLinearSourceCoefficient
+     */
+    double GetLinearCoefficient() const;
+        
+    /**
+     * @return mDiffusionCoefficient
+     */
+    double GetDiffusionCoefficient() const;
+
+    /**
+     * @return mDuDtCoefficient
+     */
+    double GetDuDtCoefficient() const;
+
+    /**
+     * @return mScaleByCellVolume
+     */
+    bool GetScaleByCellVolume() const;
 
     /**
      * Set up the source terms.
@@ -132,7 +169,7 @@ public:
      * @param rCoarseMesh reference to the coarse mesh
      * @param pCellPdeElementMap optional pointer to the map from cells to coarse elements
      */
-    void virtual SetupSourceTerms(TetrahedralMesh<DIM,DIM>& rCoarseMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap=nullptr);
+    void virtual SetupSourceTerms(TetrahedralMesh<DIM, DIM>& rCoarseMesh, std::map<CellPtr, unsigned>* pCellPdeElementMap = nullptr);
 
     /**
      * Overridden ComputeDuDtCoefficientFunction() method.
@@ -141,7 +178,7 @@ public:
      *
      * @param rX the point in space at which the function c is computed
      */
-    virtual double ComputeDuDtCoefficientFunction(const ChastePoint<DIM>& rX);
+    double ComputeDuDtCoefficientFunction(const ChastePoint<DIM>& rX) override;
 
     /**
      * Overridden ComputeSourceTerm() method.
@@ -152,9 +189,9 @@ public:
      * @param u the value of the dependent variable at the point
      * @param pElement the mesh element that x is contained in (optional; defaults to NULL).
      */
-    virtual double ComputeSourceTerm(const ChastePoint<DIM>& rX,
-                                     double u,
-                                     Element<DIM,DIM>* pElement=NULL);
+    double ComputeSourceTerm(const ChastePoint<DIM>& rX,
+                             double u,
+                             Element<DIM, DIM>* pElement) override;
 
     /**
      * Overridden ComputeSourceTermAtNode() method. That is never called.
@@ -164,7 +201,7 @@ public:
      * @param rNode the node at which the nonlinear source term is computed
      * @param u the value of the dependent variable at the node
      */
-    virtual double ComputeSourceTermAtNode(const Node<DIM>& rNode, double u);
+    double ComputeSourceTermAtNode(const Node<DIM>& rNode, double u) override;
 
     /**
      * Overridden ComputeDiffusionTerm() method.
@@ -174,7 +211,7 @@ public:
      *
      * @return a matrix.
      */
-    virtual c_matrix<double,DIM,DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement=NULL);
+    c_matrix<double,DIM,DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM, DIM>* pElement = nullptr) override;
 
     /**
      * @return the uptake rate.

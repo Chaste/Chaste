@@ -36,23 +36,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractPdeModifier.hpp"
 #include "VtkMeshWriter.hpp"
 #include "ReplicatableVector.hpp"
+#include "UniformSourceEllipticPde.hpp"
 #include "AveragedSourceEllipticPde.hpp"
 #include "AveragedSourceParabolicPde.hpp"
 
 template<unsigned DIM>
 AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
                                               boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
-                                              bool isNeumannBoundaryCondition,
+                                              const bool isNeumannBoundaryCondition,
                                               Vec solution)
     : AbstractCellBasedSimulationModifier<DIM>(),
       mpPde(pPde),
       mpBoundaryCondition(pBoundaryCondition),
-      mIsNeumannBoundaryCondition(isNeumannBoundaryCondition),
-      mSolution(nullptr),
-      mOutputDirectory(""),
-      mOutputGradient(false),
-      mOutputSolutionAtPdeNodes(false),
-      mDeleteFeMesh(false)
+      mIsNeumannBoundaryCondition(isNeumannBoundaryCondition)
 {
     if (solution)
     {
@@ -86,7 +82,7 @@ boost::shared_ptr<AbstractBoundaryCondition<DIM> > AbstractPdeModifier<DIM>::Get
 }
 
 template<unsigned DIM>
-bool AbstractPdeModifier<DIM>::IsNeumannBoundaryCondition()
+bool AbstractPdeModifier<DIM>::IsNeumannBoundaryCondition() const
 {
     return mIsNeumannBoundaryCondition;
 }
@@ -107,7 +103,8 @@ template<unsigned DIM>
 bool AbstractPdeModifier<DIM>::HasAveragedSourcePde()
 {
     return ((boost::dynamic_pointer_cast<AveragedSourceEllipticPde<DIM> >(mpPde) != nullptr) ||
-            (boost::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPde) != nullptr));
+            (boost::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPde) != nullptr)||
+            (boost::dynamic_pointer_cast<UniformSourceEllipticPde<DIM> >(mpPde) != nullptr));
 }
 
 template<unsigned DIM>
@@ -121,6 +118,10 @@ void AbstractPdeModifier<DIM>::SetUpSourceTermsForAveragedSourcePde(TetrahedralM
     else if (boost::dynamic_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPde) != nullptr)
     {
         boost::static_pointer_cast<AveragedSourceParabolicPde<DIM> >(mpPde)->SetupSourceTerms(*pMesh, pCellPdeElementMap);
+    }
+    else if (boost::dynamic_pointer_cast<UniformSourceEllipticPde<DIM> >(mpPde) != nullptr)
+    {
+        //Don't do anything as don't need to set up source terms as just constant.
     }
 }
 
@@ -156,6 +157,9 @@ void AbstractPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCell
             mpVizPdeSolutionResultsFile = output_file_handler.OpenOutputFile("results.vizpdesolution");
         }
     }
+
+    // To make sure cell volume can be calculated
+    rCellPopulation.Update();
 }
 
 template<unsigned DIM>
@@ -168,7 +172,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
             (*mpVizPdeSolutionResultsFile) << SimulationTime::Instance()->GetTime() << "\t";
 
             assert(mpFeMesh != nullptr);
-            assert(mDependentVariableName != "");
+            assert(!mDependentVariableName.empty());
 
             for (unsigned i=0; i<mpFeMesh->GetNumNodes(); i++)
             {
@@ -193,7 +197,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
         std::ostringstream time_string;
         time_string << SimulationTime::Instance()->GetTimeStepsElapsed();
         std::string results_file = "pde_results_" + mDependentVariableName + "_" + time_string.str();
-        VtkMeshWriter<DIM,DIM>* p_vtk_mesh_writer = new VtkMeshWriter<DIM,DIM>(mOutputDirectory, results_file, false);
+        auto* p_vtk_mesh_writer = new VtkMeshWriter<DIM,DIM>(mOutputDirectory, results_file, false);
 
         ReplicatableVector solution_repl(mSolution);
         std::vector<double> pde_solution;
@@ -203,6 +207,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
         }
 
         p_vtk_mesh_writer->AddPointData(mDependentVariableName, pde_solution);
+        p_vtk_mesh_writer->AddPointData("IsDirichletBoundaryNode", mIsDirichletBoundaryNode);
 
         p_vtk_mesh_writer->WriteFilesUsingMesh(*mpFeMesh);
         delete p_vtk_mesh_writer;
@@ -223,7 +228,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfSolve(AbstractCellPopulation<DIM,DIM
 }
 
 template<unsigned DIM>
-bool AbstractPdeModifier<DIM>::GetOutputGradient()
+bool AbstractPdeModifier<DIM>::GetOutputGradient() const
 {
     return mOutputGradient;
 }

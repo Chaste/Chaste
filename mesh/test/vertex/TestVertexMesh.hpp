@@ -1715,6 +1715,22 @@ public:
         TS_ASSERT_DELTA(vertical_rectangle_elongation_shape_factor, 12.0/2.0, 1e-6);
     }
 
+    void TestInfiniteElongationShapeFactor()
+    {
+        // Test method with a single collinear element
+        std::vector<Node<2>*> collinear_nodes;
+        collinear_nodes.push_back(new Node<2>(0, false, 1.0, 0.0));
+        collinear_nodes.push_back(new Node<2>(1, false, 2.0, 0.0));
+        collinear_nodes.push_back(new Node<2>(2, false, 3.0, -1e-12));
+        std::vector<VertexElement<2,2>*> collinear_element;
+        collinear_element.push_back(new VertexElement<2,2>(0, collinear_nodes));
+        VertexMesh<2,2> mesh(collinear_nodes, collinear_element);
+
+        // The smallest eigenvalue should be zero, so the elongation shape factor should be infinite
+        const double esf = mesh.GetElongationShapeFactorOfElement(0);
+        TS_ASSERT(std::isinf(esf));
+    }
+
     void TestScaleAndTranslate()
     {
         // Create mesh

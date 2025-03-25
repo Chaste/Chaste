@@ -54,11 +54,6 @@ AbstractGrowingDomainPdeModifier<DIM>::AbstractGrowingDomainPdeModifier(boost::s
 }
 
 template<unsigned DIM>
-AbstractGrowingDomainPdeModifier<DIM>::~AbstractGrowingDomainPdeModifier()
-{
-}
-
-template<unsigned DIM>
 void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
     if (this->mDeleteFeMesh)
@@ -78,6 +73,9 @@ void AbstractGrowingDomainPdeModifier<DIM>::GenerateFeMesh(AbstractCellPopulatio
     // Get the finite element mesh via the cell population. Set to NULL first in case mesh generation fails.
     this->mpFeMesh = nullptr;
     this->mpFeMesh = rCellPopulation.GetTetrahedralMeshForPdeModifier();
+
+    // initialise Dirichlet boundary node tracking
+    this->mIsDirichletBoundaryNode = std::vector<double>(this->mpFeMesh->GetNumNodes(), 0.0);
 }
 
 template<unsigned DIM>
@@ -130,7 +128,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
                  element_iter != p_tet_node->ContainingElementsEnd();
                  ++element_iter)
             {
-                // Calculate the basis functions at any point (eg zero) in the element
+                // Calculate the basis functions at any point (e.g. zero) in the element
                 c_matrix<double, DIM, DIM> jacobian, inverse_jacobian;
                 double jacobian_det;
                 this->mpFeMesh->GetInverseJacobianForElement(*element_iter, jacobian, jacobian_det, inverse_jacobian);

@@ -128,7 +128,7 @@ public:
      * @return A matrix.
      */
     virtual c_matrix<double, SPACE_DIM, SPACE_DIM> ComputeDiffusionTerm(const ChastePoint<SPACE_DIM>& rX,
-                                                                        Element<ELEMENT_DIM,SPACE_DIM>* pElement=NULL)=0;
+                                                                        Element<ELEMENT_DIM,SPACE_DIM>* pElement)=0;
 };
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

@@ -60,8 +60,6 @@ from chaste._pychaste_all import (
     UniformSourceEllipticPde_3,
     UniformSourceParabolicPde_2,
     UniformSourceParabolicPde_3,
-    VolumeDependentAveragedSourceEllipticPde_2,
-    VolumeDependentAveragedSourceEllipticPde_3,
 )
 from chaste._syntax import DeprecatedClass, TemplateClassDict
 
@@ -158,13 +156,6 @@ UniformSourceParabolicPde = TemplateClassDict(
     }
 )
 
-VolumeDependentAveragedSourceEllipticPde = TemplateClassDict(
-    {
-        ("2",): VolumeDependentAveragedSourceEllipticPde_2,
-        ("3",): VolumeDependentAveragedSourceEllipticPde_3,
-    }
-)
-
 # Deprecated Class Syntax
 AveragedSourceEllipticPde2 = DeprecatedClass("AveragedSourceEllipticPde2", AveragedSourceEllipticPde_2)
 AveragedSourceEllipticPde3 = DeprecatedClass("AveragedSourceEllipticPde3", AveragedSourceEllipticPde_3)
@@ -192,5 +183,3 @@ UniformSourceEllipticPde2 = DeprecatedClass("UniformSourceEllipticPde2", Uniform
 UniformSourceEllipticPde3 = DeprecatedClass("UniformSourceEllipticPde3", UniformSourceEllipticPde_3)
 UniformSourceParabolicPde2 = DeprecatedClass("UniformSourceParabolicPde2", UniformSourceParabolicPde_2)
 UniformSourceParabolicPde3 = DeprecatedClass("UniformSourceParabolicPde3", UniformSourceParabolicPde_3)
-VolumeDependentAveragedSourceEllipticPde2 = DeprecatedClass("VolumeDependentAveragedSourceEllipticPde2", VolumeDependentAveragedSourceEllipticPde_2)
-VolumeDependentAveragedSourceEllipticPde3 = DeprecatedClass("VolumeDependentAveragedSourceEllipticPde3", VolumeDependentAveragedSourceEllipticPde_3)

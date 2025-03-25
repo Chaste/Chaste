@@ -38,11 +38,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 AveragedSourceEllipticPde<DIM>::AveragedSourceEllipticPde(AbstractCellPopulation<DIM>& rCellPopulation,
-                                                          double sourceCoefficient,
-                                                          double diffusionCoefficient)
+                                                          double constantSourceCoefficient, 
+                                                          double linearSourceCoefficient, 
+                                                          double diffusionCoefficient,
+                                                          bool scaleByCellVolume)
     : mrCellPopulation(rCellPopulation),
-      mSourceCoefficient(sourceCoefficient),
-      mDiffusionCoefficient(diffusionCoefficient)
+      mConstantSourceCoefficient(constantSourceCoefficient),
+      mLinearSourceCoefficient(linearSourceCoefficient),
+      mDiffusionCoefficient(diffusionCoefficient),
+      mScaleByCellVolume(scaleByCellVolume)
 {
 }
 
@@ -53,9 +57,27 @@ const AbstractCellPopulation<DIM>& AveragedSourceEllipticPde<DIM>::rGetCellPopul
 }
 
 template<unsigned DIM>
-double AveragedSourceEllipticPde<DIM>::GetCoefficient() const
+double AveragedSourceEllipticPde<DIM>::GetConstantCoefficient() const
 {
-    return mSourceCoefficient;
+    return mConstantSourceCoefficient;
+}
+
+template<unsigned DIM>
+double AveragedSourceEllipticPde<DIM>::GetLinearCoefficient() const
+{
+    return mLinearSourceCoefficient;
+}
+
+template<unsigned DIM>
+double AveragedSourceEllipticPde<DIM>::GetDiffusionCoefficient() const
+{
+    return mDiffusionCoefficient;
+}
+
+template<unsigned DIM>
+bool AveragedSourceEllipticPde<DIM>::GetScaleByCellVolume() const
+{
+    return mScaleByCellVolume;
 }
 
 template<unsigned DIM>
@@ -63,9 +85,9 @@ void AveragedSourceEllipticPde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>& 
 {
     // Allocate memory
     mCellDensityOnCoarseElements.resize(rCoarseMesh.GetNumElements());
-    for (unsigned elem_index=0; elem_index<mCellDensityOnCoarseElements.size(); elem_index++)
+    for (double & mCellDensityOnCoarseElement : mCellDensityOnCoarseElements)
     {
-        mCellDensityOnCoarseElements[elem_index] = 0.0;
+        mCellDensityOnCoarseElement = 0.0;
     }
 
     // Loop over cells, find which coarse element it is in, and add 1 to mSourceTermOnCoarseElements[elem_index]
@@ -90,7 +112,22 @@ void AveragedSourceEllipticPde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>& 
 
         if (!cell_is_apoptotic)
         {
-            mCellDensityOnCoarseElements[elem_index] += 1.0;
+            double cell_weight = 1.0;
+
+            if (mScaleByCellVolume)
+            {   
+                // If scaling by cell volume then use volume her instead of cell count 
+                cell_weight = mrCellPopulation.GetVolumeOfCell(*cell_iter);
+
+                if (cell_weight <1e-6)
+                {
+                    EXCEPTION("The volume of one of the cells is " << cell_weight << 
+                              " and you are scaling by cell volume. Either turn scaling off or use"  
+                              " a cell model with non zero areas (i.e. a Bounded Voronoi Tesselation model).");
+                }
+            }
+
+            mCellDensityOnCoarseElements[elem_index] += cell_weight;
         }
     }
 
@@ -107,7 +144,9 @@ void AveragedSourceEllipticPde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>& 
 template<unsigned DIM>
 double AveragedSourceEllipticPde<DIM>::ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
 {
-    return 0.0;
+    assert(!mCellDensityOnCoarseElements.empty());
+    EXCEPT_IF(pElement == nullptr);
+    return mConstantSourceCoefficient * mCellDensityOnCoarseElements[pElement->GetIndex()];
 }
 
 template<unsigned DIM>
@@ -115,7 +154,7 @@ double AveragedSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTerm(const C
 {
     assert(!mCellDensityOnCoarseElements.empty());
     EXCEPT_IF(pElement == nullptr);
-    return mSourceCoefficient * mCellDensityOnCoarseElements[pElement->GetIndex()];
+    return mLinearSourceCoefficient * mCellDensityOnCoarseElements[pElement->GetIndex()];
 }
 
 template<unsigned DIM>

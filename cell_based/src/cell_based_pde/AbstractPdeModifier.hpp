@@ -105,22 +105,22 @@ protected:
     std::string mDependentVariableName;
 
     /** The solution to the PDE problem at the current time step. */
-    Vec mSolution;
+    Vec mSolution = nullptr;
 
     /** Pointer to the finite element mesh on which to solve the PDE. */
-    TetrahedralMesh<DIM,DIM>* mpFeMesh;
+    TetrahedralMesh<DIM,DIM>* mpFeMesh = nullptr;
 
     /** Store the output directory name. */
-    std::string mOutputDirectory;
+    std::string mOutputDirectory{};
 
-    /** Whether or not to calculate and output the gradient of the solution. */
-    bool mOutputGradient;
+    /** Whether to calculate and output the gradient of the solution. */
+    bool mOutputGradient = false;
 
     /**
      * Whether to output the PDE solution at each node of the FE mesh at output time steps.
      * Defaults to false.
      */
-    bool mOutputSolutionAtPdeNodes;
+    bool mOutputSolutionAtPdeNodes = false;
 
     /** File that the values of the PDE solution are written out to. */
     out_stream mpVizPdeSolutionResultsFile;
@@ -128,7 +128,12 @@ protected:
     /**
      * Whether to delete the finite element mesh when we are destroyed.
      */
-    bool mDeleteFeMesh;
+    bool mDeleteFeMesh = false;
+
+    /** 
+     * Store the nodes that dirichlet boundary conditions on which are output with the solution.
+     */
+    std::vector<double> mIsDirichletBoundaryNode;
 
 public:
 
@@ -149,7 +154,7 @@ public:
     /**
      * Destructor.
      */
-    virtual ~AbstractPdeModifier();
+    ~AbstractPdeModifier() override;
 
     /**
      * @return mpPde
@@ -164,7 +169,7 @@ public:
     /**
      * @return mIsNeumannBoundaryCondition
      */
-    bool IsNeumannBoundaryCondition();
+    bool IsNeumannBoundaryCondition() const;
 
     /**
      * Set the name of the dependent variable.
@@ -218,7 +223,7 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param outputDirectory the output directory, relative to where Chaste output is stored
      */
-    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
+    void SetupSolve(AbstractCellPopulation<DIM, DIM>& rCellPopulation, std::string outputDirectory) override;
 
     /**
      * Overridden UpdateAtEndOfTimeStep() method.
@@ -227,7 +232,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)=0;
+    void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM, DIM>& rCellPopulation) override = 0;
 
     /**
      * Overridden UpdateAtEndOfOutputTimeStep() method,
@@ -238,7 +243,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void UpdateAtEndOfOutputTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    void UpdateAtEndOfOutputTimeStep(AbstractCellPopulation<DIM, DIM>& rCellPopulation) override;
 
     /**
      * Overridden UpdateAtEndOfSolve() method.
@@ -247,14 +252,14 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void UpdateAtEndOfSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    void UpdateAtEndOfSolve(AbstractCellPopulation<DIM, DIM>& rCellPopulation) override;
 
     /**
      * Set whether to calculate and save the gradient of the solution to CellData.
      *
      * @return mOutputGradient
      */
-    bool GetOutputGradient();
+    bool GetOutputGradient() const;
 
     /**
      * Set whether to calculate and save the gradient of the solution to CellData.
@@ -277,7 +282,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputSimulationModifierParameters(out_stream& rParamsFile);
+    void OutputSimulationModifierParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"
