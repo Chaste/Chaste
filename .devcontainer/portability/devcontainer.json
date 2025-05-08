@@ -1,0 +1,65 @@
+// For format details, see https://aka.ms/devcontainer.json.
+{
+	"name": "Chaste/Portability",
+
+	// Uncomment one of the following to use a different image from
+	// https://hub.docker.com/r/chaste/runner/tags
+	// "image": "chaste/runner:portability-01",
+	// "image": "chaste/runner:portability-02",
+	// "image": "chaste/runner:portability-03",
+	"image": "chaste/runner:portability-04",
+	// "image": "chaste/runner:portability-dev",
+
+	// This allows ptrace based debuggers like C++ to work in the container
+	"runArgs": [
+		"--cap-add=SYS_PTRACE",
+		"--security-opt",
+		"seccomp=unconfined"
+	],
+
+	// If you want to reference an existing container variable while setting this one (like updating the PATH), use remoteEnv instead.
+	"containerEnv": {
+		"RUNNER_OFF": "1",
+		"CMAKE_BUILD_TYPE": "Debug",
+		"Chaste_ERROR_ON_WARNING": "ON",
+		"Chaste_UPDATE_PROVENANCE": "OFF"
+	},
+
+	"onCreateCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
+
+	"postCreateCommand": {
+		"module-use": "sed -i '/^module use/i . /etc/profile.d/modules.sh' ~/.bashrc",
+		"module-load": "echo 'module avail; module load boost petsc_hdf5 sundials vtk xercesc xsd; module list' >> ~/.bashrc"
+	},
+
+	"postAttachCommand": "bash",
+
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-vscode.cpptools-extension-pack",
+				"ms-vscode.cpptools-themes",
+				"ms-vscode.cmake-tools",
+				"josetr.cmake-language-support-vscode",
+				"ms-vscode.python"
+			]
+		}
+	},
+
+	// Default container user for all processes
+	// By default, this is set to the default user in the Docker image.
+	// https://code.visualstudio.com/remote/advancedcontainers/add-nonroot-user
+	"containerUser": "runner",
+
+	// Default container user for VSCode
+	// By default, this is set to the default user in the Docker image.
+	// https://aka.ms/dev-containers-non-root.
+	"remoteUser": "runner",
+
+	"hostRequirements": {
+		"cpus": 2,
+		"memory": "4gb",
+		"storage": "8gb"
+	}
+}

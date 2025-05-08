@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -190,11 +190,11 @@ public:
             }
         }
         
-        // This node is attatched to appoptotic cell so no source
+        // This node is attached to apoptotic cell so no source
         Node<2>* p_node_0 = cell_population.GetNodeCorrespondingToCell(*(cell_population.Begin()));
         TS_ASSERT_DELTA(pde.ComputeSourceTermAtNode(*p_node_0,2.0), 0.0, 1e-6);
         
-        // This node is arttatched to non apoptotic cell
+        // This node is attached to non apoptotic cell
         Node<2>* p_node_1 = cell_population.GetNodeCorrespondingToCell(cell_population.GetCellUsingLocationIndex(1));
         TS_ASSERT_DELTA(pde.ComputeSourceTermAtNode(*p_node_1,2.0), 0.05 * 2.0 + 0.01, 1e-6);
         
@@ -215,12 +215,12 @@ public:
         
         // Checking internal node so has finite volume
         Node<2>* p_node_12 = cell_population.GetNodeCorrespondingToCell(cell_population.GetCellUsingLocationIndex(12));
-        TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_population.GetCellUsingLocationIndex(12)), 0.5*sqrt(3), 1e-6)
+        TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_population.GetCellUsingLocationIndex(12)), 0.5*sqrt(3), 1e-6);
         TS_ASSERT_DELTA(scaled_pde.ComputeSourceTermAtNode(*p_node_12, 2.0), (0.05 * 2.0 + 0.01)/0.5/sqrt(3), 1e-6);
         
         // Test Exceptions
         Node<2>* p_node_24 = cell_population.GetNodeCorrespondingToCell(cell_population.GetCellUsingLocationIndex(24));
-        TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_population.GetCellUsingLocationIndex(24)), 0.0, 1e-6)
+        TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_population.GetCellUsingLocationIndex(24)), 0.0, 1e-6);
         TS_ASSERT_THROWS_THIS(scaled_pde.ComputeSourceTermAtNode(*p_node_24, 2.0), "The volume of one of the cells is 0 and you are scaling by cell volume. Either turn scaling off or use a cell model with non zero areas (i.e. a Bounded Voronoi Tesselation model).");
     }
 

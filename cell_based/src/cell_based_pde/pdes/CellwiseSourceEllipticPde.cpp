@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -36,11 +36,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellwiseSourceEllipticPde.hpp"
 
 template<unsigned DIM>
-CellwiseSourceEllipticPde<DIM>::CellwiseSourceEllipticPde(AbstractCellPopulation<DIM,DIM>& rCellPopulation, 
-                                                          double constantSourceCoefficient, 
-                                                          double linearSourceCoefficient, 
-                                                          double diffusionCoefficient,
-                                                          bool scaleByCellVolume)
+CellwiseSourceEllipticPde<DIM>::CellwiseSourceEllipticPde(AbstractCellPopulation<DIM,DIM>& rCellPopulation,
+                                                          const double constantSourceCoefficient,
+                                                          const double linearSourceCoefficient,
+                                                          const double diffusionCoefficient,
+                                                          const bool scaleByCellVolume)
     : mrCellPopulation(rCellPopulation),
       mConstantSourceCoefficient(constantSourceCoefficient),
       mLinearSourceCoefficient(linearSourceCoefficient),
@@ -84,14 +84,12 @@ template<unsigned DIM>
 double CellwiseSourceEllipticPde<DIM>::ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
 {
     NEVER_REACHED;
-    return 0.0;
 }
 
 template<unsigned DIM>
 double CellwiseSourceEllipticPde<DIM>::ComputeLinearInUCoeffInSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
 {
     NEVER_REACHED;
-    return 0.0;
 }
 // LCOV_EXCL_STOP
 

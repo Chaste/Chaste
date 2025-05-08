@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -167,7 +167,7 @@ public:
      */
     void TestSimpleSimulation()
     {
-        /* The `HeartConfig` class is used to set various parameters (see the main ChasteGuides page
+        /* The `HeartConfig` class is used to set various parameters (see the main [ChasteGuides](/docs/user-guides/#miscellaneous-information) page
          * for information on default parameter values. Parameters in this file can be re-set
          * with `HeartConfig` if the user wishes, and other parameters such as end time must be set
          * using `HeartConfig`. Let us begin by setting the end time (in ms), the mesh to use, and the
@@ -243,7 +243,7 @@ public:
          *  * `/tmp/$USER/testoutput/BidomainTutorial/vtk_output` for Paraview (VTK)
          * where you should find the geometric mesh data and simulation output.
          *
-         * Please see ChasteGuides/VisualisationGuides for details of using Meshalyzer/Cmgui/Paraview.
+         * Please see [ChasteGuides/VisualisationGuides](/docs/user-guides/visualisation-guides/#cardiac-simulations) for details of using Meshalyzer/Cmgui/Paraview.
          *
          * Note: the easiest way to look at the resultant voltage values from the code
          * (for the last timestep - the data for the previous timesteps is written to file

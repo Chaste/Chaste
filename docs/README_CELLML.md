@@ -10,5 +10,5 @@ https://chaste.github.io/docs/user-guides/code-generation-from-cellml/
 
 Static versions of the guide accompanying Chaste releases are also available.
 See e.g.:
-https://chaste.github.io/releases/2024.1/user-guides/code-generation-from-cellml/
-for release 2041.1.
+https://chaste.github.io/releases/2024.2/user-guides/code-generation-from-cellml/
+for release 2024.2.

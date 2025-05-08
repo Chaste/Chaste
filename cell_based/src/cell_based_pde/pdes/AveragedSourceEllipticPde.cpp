@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -101,9 +101,9 @@ void AveragedSourceEllipticPde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>& 
 {
     // Allocate memory
     mCellDensityOnCoarseElements.resize(rCoarseMesh.GetNumElements());
-    for (unsigned elem_index=0; elem_index<mCellDensityOnCoarseElements.size(); elem_index++)
+    for (double & mCellDensityOnCoarseElement : mCellDensityOnCoarseElements)
     {
-        mCellDensityOnCoarseElements[elem_index] = 0.0;
+        mCellDensityOnCoarseElement = 0.0;
     }
 
     // Loop over cells, find which coarse element it is in, and add 1 to mSourceTermOnCoarseElements[elem_index]
@@ -161,7 +161,9 @@ template<unsigned DIM>
 double AveragedSourceEllipticPde<DIM>::ComputeConstantInUSourceTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement)
 {
     assert(!mCellDensityOnCoarseElements.empty());
+    EXCEPT_IF(pElement == nullptr);
     return mConstantCellSourceCoefficient * mCellDensityOnCoarseElements[pElement->GetIndex()] + mConstantSourceCoefficient;
+    
 }
 
 template<unsigned DIM>

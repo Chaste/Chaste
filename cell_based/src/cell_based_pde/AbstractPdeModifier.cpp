@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -43,7 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 AbstractPdeModifier<DIM>::AbstractPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
                                               boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
-                                              bool isNeumannBoundaryCondition,
+                                              const bool isNeumannBoundaryCondition,
                                               Vec solution)
     : AbstractCellBasedSimulationModifier<DIM>(),
       mpPde(pPde),
@@ -88,7 +88,7 @@ boost::shared_ptr<AbstractBoundaryCondition<DIM> > AbstractPdeModifier<DIM>::Get
 }
 
 template<unsigned DIM>
-bool AbstractPdeModifier<DIM>::IsNeumannBoundaryCondition()
+bool AbstractPdeModifier<DIM>::IsNeumannBoundaryCondition() const
 {
     return mIsNeumannBoundaryCondition;
 }
@@ -140,7 +140,7 @@ void AbstractPdeModifier<DIM>::SetUpSourceTermsForAveragedSourcePde(TetrahedralM
     }
     else if (boost::dynamic_pointer_cast<UniformSourceEllipticPde<DIM> >(mpPde) != nullptr)
     {
-        //Don't do anything as dont need to setup source terms as just constant.
+        //Don't do anything as don't need to set up source terms as just constant.
     }
 }
 
@@ -191,7 +191,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
             (*mpVizPdeSolutionResultsFile) << SimulationTime::Instance()->GetTime() << "\t";
 
             assert(mpFeMesh != nullptr);
-            assert(mDependentVariableName != "");
+            assert(!mDependentVariableName.empty());
 
             for (unsigned i=0; i<mpFeMesh->GetNumNodes(); i++)
             {
@@ -216,7 +216,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulatio
         std::ostringstream time_string;
         time_string << SimulationTime::Instance()->GetTimeStepsElapsed();
         std::string results_file = "pde_results_" + mDependentVariableName + "_" + time_string.str();
-        VtkMeshWriter<DIM,DIM>* p_vtk_mesh_writer = new VtkMeshWriter<DIM,DIM>(mOutputDirectory, results_file, false);
+        auto* p_vtk_mesh_writer = new VtkMeshWriter<DIM,DIM>(mOutputDirectory, results_file, false);
 
         ReplicatableVector solution_repl(mSolution);
         std::vector<double> pde_solution;
@@ -247,7 +247,7 @@ void AbstractPdeModifier<DIM>::UpdateAtEndOfSolve(AbstractCellPopulation<DIM,DIM
 }
 
 template<unsigned DIM>
-bool AbstractPdeModifier<DIM>::GetOutputGradient()
+bool AbstractPdeModifier<DIM>::GetOutputGradient() const
 {
     return mOutputGradient;
 }

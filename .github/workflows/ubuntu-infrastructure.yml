@@ -13,7 +13,7 @@ jobs:
   
   build-and-test:
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
 
@@ -28,7 +28,7 @@ jobs:
 
     - name: install dependencies
       run: |
-        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu focal/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu noble/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
         sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
         sudo apt update
         sudo apt install chaste-dependencies
@@ -44,6 +44,12 @@ jobs:
 
     - name: cmake configure
       run: cmake -DCMAKE_BUILD_TYPE=Debug ..
+      working-directory: chaste-build-dir
+
+    - name: run TestChasteBuildInfo
+      run: |
+        cmake --build . --target TestChasteBuildInfo --parallel 4
+        ctest -V -R TestChasteBuildInfo
       working-directory: chaste-build-dir
 
     - name: run infrastructure checks

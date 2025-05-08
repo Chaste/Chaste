@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -37,6 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MutableMesh.hpp"
 #include "RandomNumberGenerator.hpp"
 #include "UblasCustomFunctions.hpp"
+#include "Warnings.hpp"
 
 #include "VtkMeshWriter.hpp"
 #include "NodesOnlyMesh.hpp"
@@ -153,10 +154,10 @@ VertexMesh<ELEMENT_DIM, SPACE_DIM>::VertexMesh(std::vector<Node<SPACE_DIM>*> nod
  * Get Doxygen to ignore, since it's confused by explicit instantiation of templated methods
  */
 template <>
-VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh, 
-                             bool isPeriodic, 
-                             bool isBounded, 
-                             bool scaleBoundByEdgeLength, 
+VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh,
+                             bool isPeriodic,
+                             bool isBounded,
+                             bool scaleBoundByEdgeLength,
                              double maxDelaunayEdgeLength,
                              bool offsetNewBoundaryNodes)
         : mpDelaunayMesh(&rMesh)
@@ -213,14 +214,14 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh,
 
         // Add new nodes
         unsigned new_node_index = mpDelaunayMesh->GetNumNodes();
-        
+
         // Lop over elements to work out boundary edges
         for (TetrahedralMesh<2,2>::ElementIterator elem_iter = mpDelaunayMesh->GetElementIteratorBegin();
             elem_iter != mpDelaunayMesh->GetElementIteratorEnd();
             ++elem_iter)
         {
             bool bad_element = false;
-            
+
             for (unsigned j=0; j<3; j++)
             {
                 Node<2>* p_node_a = mpDelaunayMesh->GetNode(elem_iter->GetNodeGlobalIndex(j));
@@ -266,15 +267,15 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh,
                     /*
                     * Here one or more of the edges in the element is longer than maxDelaunayEdgeLength so the other edges are boundary edges
                     */
-                   
+
                     assert(!is_boundary_edge); // We shouldnt have short edged which are in 2 elements.
                     is_boundary_edge = true;
                     // Here we're pointing in to the element
                     direction_of_normal = -1.0;
-                } 
+                }
 
                 if (is_boundary_edge)
-                {  
+                {
                     c_vector<double,2> normal_vector;
 
                     normal_vector[0]= edge[1];
@@ -299,15 +300,15 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh,
                         {
                             ratio = ((double)section+0.5)/((double)num_sections+1);
                         }
-                        else 
+                        else
                         {
                             ratio = ((double)section)/((double)num_sections);
                         }
-                        
+
                         assert(ratio>=0.0);
                         assert(ratio<=1.0);
                         c_vector<double,2> new_node_location = direction_of_normal * new_node_distance * normal_vector + ratio*p_node_a->rGetLocation() + (1-ratio)*p_node_b->rGetLocation();
-                        
+
                         //Check if near other nodes (could be inefficient)
                         double node_clearance = 0.01;
                         if (!IsNearExistingNodes(new_node_location,nodes,node_clearance))
@@ -319,8 +320,8 @@ VertexMesh<2, 2>::VertexMesh(TetrahedralMesh<2, 2>& rMesh,
                 }
             }
         }
-        
-// // Plot new nodes 
+
+// // Plot new nodes
 // NodesOnlyMesh<2> temp_mesh;
 // temp_mesh.ConstructNodesWithoutMesh(nodes, 1.0);
 // VtkMeshWriter<2, 2> mesh_writer("tempMesh", "ExtendedMesh", false);
@@ -656,20 +657,32 @@ double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetEdgeLength(unsigned elementIndex1,
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetElongationShapeFactorOfElement(unsigned index)
+double VertexMesh<ELEMENT_DIM, SPACE_DIM>::GetElongationShapeFactorOfElement([[maybe_unused]] const unsigned elementIndex)
 {
-    assert(SPACE_DIM == 2); // LCOV_EXCL_LINE - code will be removed at compile time
+    if constexpr (SPACE_DIM == 2)
+    {
+        c_vector<double, 3> moments = CalculateMomentsOfElement(elementIndex);
 
-    c_vector<double, 3> moments = CalculateMomentsOfElement(index);
+        const double discriminant = sqrt((moments(0) - moments(1)) * (moments(0) - moments(1)) + 4.0 * moments(2) * moments(2));
 
-    double discriminant = sqrt((moments(0) - moments(1)) * (moments(0) - moments(1)) + 4.0 * moments(2) * moments(2));
+        // Note that as the matrix of second moments of area is symmetric, both its eigenvalues are real
+        // Use std::max to guard against floating point imprecision causing the smallest eigenvalue being small and negative
+        const double largest_eigenvalue = (moments(0) + moments(1) + discriminant) * 0.5;
+        const double smallest_eigenvalue = std::max(0.0, (moments(0) + moments(1) - discriminant) * 0.5);
 
-    // Note that as the matrix of second moments of area is symmetric, both its eigenvalues are real
-    double largest_eigenvalue = (moments(0) + moments(1) + discriminant) * 0.5;
-    double smallest_eigenvalue = (moments(0) + moments(1) - discriminant) * 0.5;
+        // Prevent division by zero
+        if (smallest_eigenvalue == 0.0)
+        {
+            WARNING("Infinite elongation shape factor: element likely to be co-linear");
+            return std::numeric_limits<double>::infinity();
+        }
 
-    double elongation_shape_factor = sqrt(largest_eigenvalue / smallest_eigenvalue);
-    return elongation_shape_factor;
+        return sqrt(largest_eigenvalue / smallest_eigenvalue);
+    }
+    else
+    {
+        NEVER_REACHED;
+    }
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

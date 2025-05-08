@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,11 +50,6 @@ AbstractGrowingDomainPdeModifier<DIM>::AbstractGrowingDomainPdeModifier(boost::s
                                    pBoundaryCondition,
                                    isNeumannBoundaryCondition,
                                    solution)
-{
-}
-
-template<unsigned DIM>
-AbstractGrowingDomainPdeModifier<DIM>::~AbstractGrowingDomainPdeModifier()
 {
 }
 
@@ -133,7 +128,7 @@ void AbstractGrowingDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulatio
                  element_iter != p_tet_node->ContainingElementsEnd();
                  ++element_iter)
             {
-                // Calculate the basis functions at any point (eg zero) in the element
+                // Calculate the basis functions at any point (e.g. zero) in the element
                 c_matrix<double, DIM, DIM> jacobian, inverse_jacobian;
                 double jacobian_det;
                 this->mpFeMesh->GetInverseJacobianForElement(*element_iter, jacobian, jacobian_det, inverse_jacobian);

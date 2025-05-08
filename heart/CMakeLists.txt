@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2024, University of Oxford.
+# Copyright (c) 2005-2025, University of Oxford.
 # All rights reserved.
 # 
 # University of Oxford means the Chancellor, Masters and Scholars of the
@@ -67,12 +67,11 @@ foreach(dyn_source ${dyn_sources})
     set_property(TARGET ${dyn_source_name} PROPERTY CXX_STANDARD 17)
     set_property(TARGET ${dyn_source_name} PROPERTY CXX_STANDARD_REQUIRED ON)
     set_property(TARGET ${dyn_source_name} PROPERTY CMAKE_CXX_EXTENSIONS OFF)
+
     if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-        target_link_libraries(${dyn_source_name} LINK_PRIVATE "-Wl,-undefined,dynamic_lookup")
-        #set_target_properties(${dyn_source_name} PROPERTIES LINK_FLAGS "-Wl,-undefined,dynamic_lookup")
+        target_link_options(${dyn_source_name} PRIVATE "-Wl,-undefined,dynamic_lookup")
     else()
-        #target_link_libraries(${dyn_source_name} LINK_PRIVATE "-Wl,--undefined")
-        set_target_properties(${dyn_source_name} PROPERTIES LINK_FLAGS "-Wl,--undefined")
+        target_link_options(${dyn_source_name} PRIVATE "-Wl,--allow-shlib-undefined")
     endif()
 
     # add dynamic models to the heart_tests, Continuous, and individual test targets

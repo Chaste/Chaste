@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -1073,7 +1073,6 @@ public:
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
             VecCreate(PETSC_COMM_WORLD, &new_vec);
-            VecSetType(new_vec, CHASTE_PETSC_NULLPTR);
             VecLoad(new_vec, vec_viewer);
 #else
             VecLoad(vec_viewer, CHASTE_PETSC_NULLPTR, &new_vec);
@@ -1103,7 +1102,6 @@ public:
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 2) //PETSc 3.2 or later
             MatCreate(PETSC_COMM_WORLD, &new_mat);
-            MatSetType(new_mat, CHASTE_PETSC_NULLPTR);
             MatLoad(new_mat, mat_viewer);
 #else
             MatLoad(mat_viewer, CHASTE_PETSC_NULLPTR, &new_mat);

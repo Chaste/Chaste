@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-"""Copyright (c) 2005-2024, University of Oxford.
+"""Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # that have the same name.
 
 exts = ['.cpp', '.hpp']
-dir_ignores = ['build', 'dynamic', 'data', 'codegen_python3_venv']
+dir_ignores = ['build', 'dynamic', 'data', 'chaste_python3_venv']
 startchar_ignores = ['_', '.']
 chaste_dir = '.'
 

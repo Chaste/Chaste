@@ -178,7 +178,7 @@ output:/[^ ]+/(Chaste|[_a-zA-Z0-9]+-[-_0-9]+){REPLACE <chaste_dir>}
 output:(/[^ ]*/)?heart/[^ ]*dynamic/tmp_[0-9]+_[0-9]+{REPLACE <build_path>}
 output:RunXsd\(\[.*\], \[(.*)\]\){REPLACE Run Xsd on \1}
 output:[^ ]*mpicxx .*(/[^/]+\.[a-zA-Z]+){REPLACE mpicxx <args> <path>\1}
-output:Running \['.*/codegen_python3_venv/bin/chaste_codegen', '-A', '-p', '--output-dir', '<chaste_dir>/<build_path>', '-y', '<build_path>/(.*).cellml'\]{REPLACE Running chaste_codegen on \1}
+output:Running \['.*/chaste_python3_venv/bin/chaste_codegen', '-A', '-p', '--output-dir', '<chaste_dir>/<build_path>', '-y', '<build_path>/(.*).cellml'\]{REPLACE Running chaste_codegen on \1}
 
 output:scons: building associated
 output:scons: Reading SConscript files ...{LINES 10}

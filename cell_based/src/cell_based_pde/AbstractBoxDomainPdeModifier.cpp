@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -63,48 +63,43 @@ AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(boost::shared_pt
         // We only need to generate mpFeMesh once, as it does not vary with time
         this->GenerateFeMesh(mpMeshCuboid, mStepSize);
         this->mDeleteFeMesh = true;
-        //initialise the boundary nodes
+        // Initialise the boundary nodes
         this->mIsDirichletBoundaryNode = std::vector<double>(this->mpFeMesh->GetNumNodes(), 0.0);
     }
 }
 
 template<unsigned DIM>
-AbstractBoxDomainPdeModifier<DIM>::~AbstractBoxDomainPdeModifier()
-{
-}
-
-template<unsigned DIM>
-double AbstractBoxDomainPdeModifier<DIM>::GetStepSize()
+double AbstractBoxDomainPdeModifier<DIM>::GetStepSize() const
 {
      return mStepSize;
 }
 
 template<unsigned DIM>
-void AbstractBoxDomainPdeModifier<DIM>::SetBcsOnBoxBoundary(bool setBcsOnBoxBoundary)
+void AbstractBoxDomainPdeModifier<DIM>::SetBcsOnBoxBoundary(const bool setBcsOnBoxBoundary)
 {
     mSetBcsOnBoxBoundary = setBcsOnBoxBoundary;
 }
 
 template<unsigned DIM>
-bool AbstractBoxDomainPdeModifier<DIM>::AreBcsSetOnBoxBoundary()
+bool AbstractBoxDomainPdeModifier<DIM>::AreBcsSetOnBoxBoundary() const
 {
     return mSetBcsOnBoxBoundary;
 }
 
 template<unsigned DIM>
-void AbstractBoxDomainPdeModifier<DIM>::SetBcsOnBoundingSphere(bool setBcsOnBoundingSphere)
+void AbstractBoxDomainPdeModifier<DIM>::SetBcsOnBoundingSphere(const bool setBcsOnBoundingSphere)
 {
     mSetBcsOnBoundingSphere = setBcsOnBoundingSphere;
 }
 
 template<unsigned DIM>
-bool AbstractBoxDomainPdeModifier<DIM>::AreBcsSetOnBoundingSphere()
+bool AbstractBoxDomainPdeModifier<DIM>::AreBcsSetOnBoundingSphere() const
 {
     return mSetBcsOnBoundingSphere;
 }
 
 template<unsigned DIM>
-void AbstractBoxDomainPdeModifier<DIM>::SetBcsOnConvexHull(bool setBcsOnConvexHull)
+void AbstractBoxDomainPdeModifier<DIM>::SetBcsOnConvexHull(const bool setBcsOnConvexHull)
 {
     mSetBcsOnConvexHull = setBcsOnConvexHull;
 }
@@ -116,26 +111,26 @@ bool AbstractBoxDomainPdeModifier<DIM>::AreBcsSetOnConvexHull()
 }
 
 template<unsigned DIM>
-void AbstractBoxDomainPdeModifier<DIM>::SetUseVoronoiCellsForInterpolation(bool useVoronoiCellsForInterpolation)
+void AbstractBoxDomainPdeModifier<DIM>::SetUseVoronoiCellsForInterpolation(const bool useVoronoiCellsForInterpolation)
 {
     mUseVoronoiCellsForInterpolation = useVoronoiCellsForInterpolation;
 }
 
 template<unsigned DIM>
-bool AbstractBoxDomainPdeModifier<DIM>::GetUseVoronoiCellsForInterpolation()
+bool AbstractBoxDomainPdeModifier<DIM>::GetUseVoronoiCellsForInterpolation() const
 {
     return mUseVoronoiCellsForInterpolation;
 }
 
 template<unsigned DIM>
-void AbstractBoxDomainPdeModifier<DIM>::SetTypicalCellRadius(double typicalCellRadius)
+void AbstractBoxDomainPdeModifier<DIM>::SetTypicalCellRadius(const double typicalCellRadius)
 {
     assert(mTypicalCellRadius>=0.0);
     mTypicalCellRadius = typicalCellRadius;
 }
 
 template<unsigned DIM>
-double AbstractBoxDomainPdeModifier<DIM>::GetTypicalCellRadius()
+double AbstractBoxDomainPdeModifier<DIM>::GetTypicalCellRadius() const
 {
     return mTypicalCellRadius;
 }
@@ -152,7 +147,7 @@ void AbstractBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainerHelp
 
     if (!this->mSetBcsOnBoxBoundary)
     {
-        // Here we approximate the cell population by the bounding spehere and apply the boundary conditions outside the sphere.
+        // Here we approximate the cell population by the bounding sphere and apply the boundary conditions outside the sphere.
         if (this->mSetBcsOnBoundingSphere)
         {
             //Cant apply on the convex hull and bounding sphere at same time 
@@ -161,7 +156,7 @@ void AbstractBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainerHelp
                 NEVER_REACHED;
             }
 
-            // First find the centre of the tissue by choosing the mid point of the extrema.
+            // First find the centre of the tissue by choosing the midpoint of the extrema.
             c_vector<double, DIM> tissue_maxima = zero_vector<double>(DIM);
             c_vector<double, DIM> tissue_minima = zero_vector<double>(DIM);
             for (unsigned i = 0; i < DIM; i++)
@@ -262,7 +257,7 @@ void AbstractBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainerHelp
                 }
             }
         }
-        else // Set pde nodes as boundary node if elements dont contain cells or nodes aren't within a specified distance of a cell centre
+        else// Set pde nodes as boundary node if elements don't contain cells or nodes aren't within 0.5CD of a cell centre
         {
             // Get the set of coarse element indices that contain cells
             std::set<unsigned> coarse_element_indices_in_map;
@@ -290,13 +285,11 @@ void AbstractBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainerHelp
 
             // Also remove nodes that are within the typical cell radius from the centre of a cell.
             std::set<unsigned> nearby_node_indices;
-            for (std::set<unsigned>::iterator node_iter = coarse_mesh_boundary_node_indices.begin();
-                node_iter != coarse_mesh_boundary_node_indices.end();
-                ++node_iter)
+            for (unsigned int coarse_mesh_boundary_node_idx : coarse_mesh_boundary_node_indices)
             {
                 bool remove_node = false;
 
-                c_vector<double,DIM> node_location = this->mpFeMesh->GetNode(*node_iter)->rGetLocation();
+                c_vector<double,DIM> node_location = this->mpFeMesh->GetNode(coarse_mesh_boundary_node_idx)->rGetLocation();
 
                 for (typename AbstractCellPopulation<DIM>::Iterator cell_iter = rCellPopulation.Begin();
                 cell_iter != rCellPopulation.End();
@@ -316,16 +309,14 @@ void AbstractBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainerHelp
                 if (remove_node)
                 {
                     // Node near cell so set it to be removed from boundary set
-                    nearby_node_indices.insert(*node_iter);
+                    nearby_node_indices.insert(coarse_mesh_boundary_node_idx);
                 }
             }
 
             // Remove nodes that are near cells from boundary set
-            for (std::set<unsigned>::iterator node_iter = nearby_node_indices.begin();
-                node_iter != nearby_node_indices.end();
-                ++node_iter)
+            for (unsigned int nearby_node_idx : nearby_node_indices)
             {
-                coarse_mesh_boundary_node_indices.erase(*node_iter);
+                coarse_mesh_boundary_node_indices.erase(nearby_node_idx);
             }
 
 
@@ -338,12 +329,10 @@ void AbstractBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainerHelp
             else
             {
                 // Impose any Dirichlet boundary conditions
-                for (std::set<unsigned>::iterator iter = coarse_mesh_boundary_node_indices.begin();
-                    iter != coarse_mesh_boundary_node_indices.end();
-                    ++iter)
+                for (unsigned int coarse_mesh_boundary_node_idx : coarse_mesh_boundary_node_indices)
                 {
-                    pBcc->AddDirichletBoundaryCondition(this->mpFeMesh->GetNode(*iter), this->mpBoundaryCondition.get(), 0, false);
-                    this->mIsDirichletBoundaryNode[*iter] = 1.0;
+                    pBcc->AddDirichletBoundaryCondition(this->mpFeMesh->GetNode(coarse_mesh_boundary_node_idx), this->mpBoundaryCondition.get(), 0, false);
+                    this->mIsDirichletBoundaryNode[coarse_mesh_boundary_node_idx] = 1.0;
                 }
             }
         }
@@ -353,7 +342,7 @@ void AbstractBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainerHelp
         if (this->IsNeumannBoundaryCondition())
         {
             // Impose any Neumann boundary conditions
-            for (typename TetrahedralMesh<DIM,DIM>::BoundaryElementIterator elem_iter = this->mpFeMesh->GetBoundaryElementIteratorBegin();
+            for (auto elem_iter = this->mpFeMesh->GetBoundaryElementIteratorBegin();
                  elem_iter != this->mpFeMesh->GetBoundaryElementIteratorEnd();
                  ++elem_iter)
             {
@@ -363,7 +352,7 @@ void AbstractBoxDomainPdeModifier<DIM>::ConstructBoundaryConditionsContainerHelp
         else
         {
             // Impose any Dirichlet boundary conditions
-            for (typename TetrahedralMesh<DIM,DIM>::BoundaryNodeIterator node_iter = this->mpFeMesh->GetBoundaryNodeIteratorBegin();
+            for (auto node_iter = this->mpFeMesh->GetBoundaryNodeIteratorBegin();
                  node_iter != this->mpFeMesh->GetBoundaryNodeIteratorEnd();
                  ++node_iter)
             {
@@ -494,7 +483,7 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
             
             if (num_cells[cell_location_index]==0)
             {
-                EXCEPTION("One or more of the cells doesnt contain any pde nodes so cant use voroni CellData calculation in the ");
+                EXCEPTION("One or more of the cells doesnt contain any pde nodes so cant use Voronoi CellData calculation in the ");
             }
 
             double  solution_at_cell = cell_data[cell_location_index]/num_cells[cell_location_index];
@@ -504,7 +493,7 @@ void AbstractBoxDomainPdeModifier<DIM>::UpdateCellData(AbstractCellPopulation<DI
 
         if (this->mOutputGradient)
         {
-            // This isnt implemented yet
+            // This is not implemented yet
             NEVER_REACHED;
         }
     }  

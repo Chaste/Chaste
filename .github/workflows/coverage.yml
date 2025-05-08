@@ -72,6 +72,12 @@ jobs:
           su -m runner -c "cmake --build . --target Continuous Parallel --parallel 4"
         working-directory: chaste-build-dir
 
+      - name: run TestChasteBuildInfo
+        run: |
+          source init.sh
+          su -m runner -c "ctest -V -R TestChasteBuildInfo"
+        working-directory: chaste-build-dir
+
       - name: run test suites
         run: |
           source init.sh

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -106,7 +106,7 @@ public:
     /**
      * Destructor.
      */
-    virtual ~EllipticBoxDomainPdeModifier();
+    ~EllipticBoxDomainPdeModifier() override = default;
 
     /**
      * Overridden UpdateAtEndOfTimeStep() method.
@@ -115,7 +115,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM, DIM>& rCellPopulation) override;
 
     /**
      * Overridden SetupSolve() method.
@@ -125,7 +125,7 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param outputDirectory the output directory, relative to where Chaste output is stored
      */
-    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
+    void SetupSolve(AbstractCellPopulation<DIM, DIM>& rCellPopulation, std::string outputDirectory) override;
 
     /**
      * Helper method to construct the boundary conditions container for the PDE.
@@ -142,7 +142,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputSimulationModifierParameters(out_stream& rParamsFile);
+    void OutputSimulationModifierParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

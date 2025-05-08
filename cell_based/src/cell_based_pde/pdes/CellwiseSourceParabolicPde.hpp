@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -102,7 +102,7 @@ protected:
     /** Coefficient of rate of change term.  */
     double mDuDtCoefficient;
     
-    /** Whether to scale tems by cell volume*/
+    /** Whether to scale terms by cell volume. */
     bool mScaleByCellVolume;
 
 
@@ -162,7 +162,7 @@ public:
      *
      * @param rX the point in space at which the function c is computed
      */
-    virtual double ComputeDuDtCoefficientFunction(const ChastePoint<DIM>& rX);
+    double ComputeDuDtCoefficientFunction(const ChastePoint<DIM>& rX) override;
 
     /**
      * Overridden ComputeSourceTerm() method. That is never called.
@@ -173,9 +173,9 @@ public:
      * @param u the value of the dependent variable at the point
      * @param pElement the mesh element that x is contained in (optional; defaults to NULL).
      */
-    virtual double ComputeSourceTerm(const ChastePoint<DIM>& rX,
-                                     double u,
-                                     Element<DIM,DIM>* pElement=NULL);
+    double ComputeSourceTerm(const ChastePoint<DIM>& rX,
+                             double u,
+                             Element<DIM, DIM>* pElement) override;
 
     /**
      * Overridden ComputeSourceTermAtNode() method.
@@ -188,7 +188,7 @@ public:
      * @param rNode the node at which the nonlinear source term is computed
      * @param u the value of the dependent variable at the node
      */
-    virtual double ComputeSourceTermAtNode(const Node<DIM>& rNode, double u);
+    double ComputeSourceTermAtNode(const Node<DIM>& rNode, double u) override;
 
     /**
      * Overridden ComputeDiffusionTerm() method.
@@ -198,7 +198,7 @@ public:
      *
      * @return a matrix.
      */
-    virtual c_matrix<double,DIM,DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement=NULL);
+    c_matrix<double,DIM,DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM, DIM>* pElement = nullptr) override;
 };
 
 #include "SerializationExportWrapper.hpp"

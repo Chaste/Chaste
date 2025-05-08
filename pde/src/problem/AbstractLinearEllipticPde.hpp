@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -44,7 +44,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChastePoint.hpp"
 #include "Node.hpp"
 #include "Element.hpp"
-#include <petscvec.h>
 
 /**
  * AbstractLinearEllipticPde class.
@@ -87,8 +86,7 @@ public:
     /**
      * Destructor.
      */
-    virtual ~AbstractLinearEllipticPde()
-    {}
+    ~AbstractLinearEllipticPde() override = default;
 
     /**
      * @return computed constant in u part of the source term, i.e g(x) in

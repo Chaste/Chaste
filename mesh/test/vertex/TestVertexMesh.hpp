@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -1715,6 +1715,22 @@ public:
         TS_ASSERT_DELTA(vertical_rectangle_elongation_shape_factor, 12.0/2.0, 1e-6);
     }
 
+    void TestInfiniteElongationShapeFactor()
+    {
+        // Test method with a single collinear element
+        std::vector<Node<2>*> collinear_nodes;
+        collinear_nodes.push_back(new Node<2>(0, false, 1.0, 0.0));
+        collinear_nodes.push_back(new Node<2>(1, false, 2.0, 0.0));
+        collinear_nodes.push_back(new Node<2>(2, false, 3.0, -1e-12));
+        std::vector<VertexElement<2,2>*> collinear_element;
+        collinear_element.push_back(new VertexElement<2,2>(0, collinear_nodes));
+        VertexMesh<2,2> mesh(collinear_nodes, collinear_element);
+
+        // The smallest eigenvalue should be zero, so the elongation shape factor should be infinite
+        const double esf = mesh.GetElongationShapeFactorOfElement(0);
+        TS_ASSERT(std::isinf(esf));
+    }
+
     void TestScaleAndTranslate()
     {
         // Create mesh
@@ -1992,7 +2008,7 @@ public:
         TS_ASSERT_EQUALS(delaunay_mesh.GetNumNodes(), 5u);
 
         {
-            // Create a vertex mesh, the bounded Voronoi tessellation, using the tetrahedral mesh        
+            // Create a vertex mesh, the bounded Voronoi tessellation, using the tetrahedral mesh
             bool is_bounded = true;
             VertexMesh<2,2> voronoi_mesh(delaunay_mesh, false, is_bounded);
 
@@ -2017,11 +2033,11 @@ public:
 
         // Now calculate the Voronoi tessellation using offset node to give more realistic shape.
         {
-            // Create a vertex mesh, the bounded Voronoi tessellation, using the tetrahedral mesh        
+            // Create a vertex mesh, the bounded Voronoi tessellation, using the tetrahedral mesh
             bool is_bounded = true;
             bool scale_bound_by_length = false; //default
             double max_delaunay_length = DBL_MAX; //default
-            bool offset_new_boundary_nodes = true; 
+            bool offset_new_boundary_nodes = true;
             VertexMesh<2,2> voronoi_mesh(delaunay_mesh, false, is_bounded, scale_bound_by_length, max_delaunay_length, offset_new_boundary_nodes);
 
             // Test the Voronoi tessellation has the correct number of nodes and elements
@@ -2122,7 +2138,7 @@ public:
             TS_ASSERT_EQUALS(voronoi_mesh.GetElement(4)->GetNumNodes(), 4u);
             TS_ASSERT_EQUALS(voronoi_mesh.GetElement(5)->GetNumNodes(), 6u); // note one node is stuck ontop of other node
             TS_ASSERT_EQUALS(voronoi_mesh.GetElement(6)->GetNumNodes(), 5u); // note one node is stuck ontop of other node
-            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(7)->GetNumNodes(), 4u); 
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(7)->GetNumNodes(), 4u);
 
             // Test element areas
             TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(0), 0.875, 1e-4);
@@ -2155,7 +2171,7 @@ public:
             TS_ASSERT_EQUALS(voronoi_mesh.GetElement(4)->GetNumNodes(), 4u);
             TS_ASSERT_EQUALS(voronoi_mesh.GetElement(5)->GetNumNodes(), 6u); // note one node is stuck ontop of other node
             TS_ASSERT_EQUALS(voronoi_mesh.GetElement(6)->GetNumNodes(), 5u); // note one node is stuck ontop of other node
-            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(7)->GetNumNodes(), 4u); 
+            TS_ASSERT_EQUALS(voronoi_mesh.GetElement(7)->GetNumNodes(), 4u);
 
             // Test element areas
             TS_ASSERT_DELTA(voronoi_mesh.GetVolumeOfElement(0), 0.875, 1e-4);

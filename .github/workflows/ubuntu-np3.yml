@@ -43,6 +43,11 @@ jobs:
       run: cmake --build . --parallel 10 --target Continuous
       working-directory: chaste-build-dir
 
+    - name: run TestChasteBuildInfo
+      run: |
+        ctest -V -R TestChasteBuildInfo
+      working-directory: chaste-build-dir
+
     - name: run continuous test pack
       run: ctest -L Continuous --output-on-failure
       working-directory: chaste-build-dir

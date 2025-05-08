@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-"""Copyright (c) 2005-2024, University of Oxford.
+"""Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,7 +50,7 @@ set = BuildTools.set
 chaste_dir = '.'
 
 suite_res = {'.hpp': re.compile(r'class\s+(\w+)\s*:\s*public\s+((::)?\s*CxxTest\s*::\s*)?\w*TestSuite\s+$'),
-             '.py': re.compile(r'class\s+\w+\(unittest\.TestCase\):\s+$')}
+             '.py': re.compile(r'class\s+\w+\s*\((unittest\.TestCase|(.*\.)?AbstractCellBasedTestSuite)\):\s*$')}
 
 # Should we check for orphans in projects too?
 projects_to_check = sys.argv[1:]

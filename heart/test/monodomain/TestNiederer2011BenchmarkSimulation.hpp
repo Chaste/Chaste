@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -64,7 +64,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Note: the obtain the results in this paper, the simulations are run with 'state-variable interpolation'
  * (SVI) switched on (which is not true by default). For full details on SVI, see the documentation page:
- * ChasteGuides -> Advanced -> StateVariableInterpolation
+ * [User Guides -> State Variable Interpolation](/docs/user-guides/state-variable-interpolation/)
  *
  * Also, a follow-up paper
  *

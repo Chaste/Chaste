@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -136,9 +136,9 @@ public:
      * @param u the value of the dependent variable at the point
      * @param pElement The element
      *
-     * @return the the source term.
+     * @return the source term.
      */
-    double ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM,DIM>* pElement=NULL);
+    double ComputeSourceTerm(const ChastePoint<DIM>& rX, double u, Element<DIM, DIM>* pElement = nullptr) override;
 
     /**
      * Overridden ComputeDiffusionTerm() method.
@@ -148,7 +148,7 @@ public:
      *
      * @return a matrix.
      */
-    c_matrix<double, DIM, DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM,DIM>* pElement=NULL);
+    c_matrix<double, DIM, DIM> ComputeDiffusionTerm(const ChastePoint<DIM>& rX, Element<DIM, DIM>* pElement = nullptr) override;
 
     /**
      * Overridden ComputeDuDtCoefficientFunction() method.
@@ -157,7 +157,7 @@ public:
      *
      * @param rX the point in space at which the function c is computed
      */
-    double ComputeDuDtCoefficientFunction(const ChastePoint<DIM>& rX);
+    double ComputeDuDtCoefficientFunction(const ChastePoint<DIM>& rX) override;
 };
 
 #include "SerializationExportWrapper.hpp"

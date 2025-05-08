@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -56,8 +56,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
 
-
-#include "Debug.hpp"
 
 class TestCellBasedEllipticPdes : public AbstractCellBasedTestSuite
 {
@@ -219,13 +217,13 @@ public:
 
         // Checking internal node so has finite volume
         Node<2>* p_node_12 = cell_population.GetNodeCorrespondingToCell(cell_population.GetCellUsingLocationIndex(12));
-        TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_population.GetCellUsingLocationIndex(12)), 0.5*sqrt(3), 1e-6)
+        TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_population.GetCellUsingLocationIndex(12)), 0.5*sqrt(3), 1e-6);
         TS_ASSERT_DELTA(scaled_pde.ComputeConstantInUSourceTermAtNode(*p_node_12), 0.01/0.5/sqrt(3), 1e-6);
         TS_ASSERT_DELTA(scaled_pde.ComputeLinearInUCoeffInSourceTermAtNode(*p_node_12), 0.05/0.5/sqrt(3), 1e-6);
         
         // Test Exceptions
         Node<2>* p_node_24 = cell_population.GetNodeCorrespondingToCell(cell_population.GetCellUsingLocationIndex(24));
-        TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_population.GetCellUsingLocationIndex(24)), 0.0, 1e-6)
+        TS_ASSERT_DELTA(cell_population.GetVolumeOfCell(cell_population.GetCellUsingLocationIndex(24)), 0.0, 1e-6);
         TS_ASSERT_THROWS_THIS(scaled_pde.ComputeConstantInUSourceTermAtNode(*p_node_24), "The volume of one of the cells is 0 and you are scaling by cell volume. Either turn scaling off or use a cell model with non zero areas (i.e. a Bounded Voronoi Tesselation model).");
         TS_ASSERT_THROWS_THIS(scaled_pde.ComputeLinearInUCoeffInSourceTermAtNode(*p_node_24), "The volume of one of the cells is 0 and you are scaling by cell volume. Either turn scaling off or use a cell model with non zero areas (i.e. a Bounded Voronoi Tesselation model).");
     }

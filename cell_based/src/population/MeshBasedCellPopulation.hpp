@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -95,7 +95,7 @@ private:
         archive & mAreaBasedDampingConstantParameter;
         archive & mWriteVtkAsPoints;
         archive & mBoundVoronoiTessellation;
-        archive & mScaleBoundByEdgeLength; 
+        archive & mScaleBoundByEdgeLength;
         archive & mBoundedVoroniTesselationLengthCutoff;
         archive & mOffsetNewBoundaryNodes;
         archive & mHasVariableRestLength;

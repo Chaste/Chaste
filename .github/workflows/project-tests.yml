@@ -23,6 +23,7 @@ jobs:
         include:
           - project_org: "Chaste"
             project_repo: "CellBasedComparison2017"
+            ref: ""
             build_target: "project_CellBasedComparison2017"
             test_target: "project_CellBasedComparison2017"
 
@@ -45,6 +46,7 @@ jobs:
       with:
         repository: ${{ matrix.project_org }}/${{ matrix.project_repo }}
         path: projects/${{ matrix.project_repo }}
+        ref: ${{ matrix.ref }}
 
     - name: compiler version
       run: |
@@ -57,6 +59,12 @@ jobs:
 
     - name: cmake configure
       run: cmake -DCMAKE_BUILD_TYPE=Release -DChaste_ERROR_ON_WARNING=OFF ..
+      working-directory: chaste-build-dir
+
+    - name: run TestChasteBuildInfo
+      run: |
+        cmake --build . --target TestChasteBuildInfo --parallel 4
+        ctest -V -R TestChasteBuildInfo
       working-directory: chaste-build-dir
 
     - name: build targets

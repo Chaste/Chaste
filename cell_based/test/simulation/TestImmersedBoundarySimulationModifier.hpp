@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -683,25 +683,29 @@ public:
         // Separate scope to write the archive
         {
             // Initialise a growth modifier and set a non-standard mature target area
-            ImmersedBoundarySimulationModifier<2> modifier;
+            AbstractCellBasedSimulationModifier<2>* p_modifier = new ImmersedBoundarySimulationModifier<2>();
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
             // Serialize
-            output_arch << modifier;
+            output_arch << p_modifier;
+
+            delete p_modifier;
         }
 
         // Separate scope to read the archive
         {
-            ImmersedBoundarySimulationModifier<2> modifier;
+            AbstractCellBasedSimulationModifier<2>* p_modifier;
 
             // Restore the modifier
             std::ifstream ifs(archive_filename.c_str());
             boost::archive::text_iarchive input_arch(ifs);
 
-            input_arch >> modifier;
+            input_arch >> p_modifier;
+
+            delete p_modifier;
         }
     }
 

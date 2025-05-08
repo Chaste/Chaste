@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -183,31 +183,37 @@ public:
         // Separate scope to write the archive
         {
             // Initialise a growth modifier and set a non-standard mature target area
-            ImmersedBoundarySvgWriter<2> writer;
-            writer.SetSamplingMultiple(10u);
-            writer.SetSvgSize(1200.0);
+            AbstractCellBasedSimulationModifier<2>* p_writer = new ImmersedBoundarySvgWriter<2>();
+            static_cast<ImmersedBoundarySvgWriter<2>*>(p_writer)->SetSamplingMultiple(10u);
+            static_cast<ImmersedBoundarySvgWriter<2>*>(p_writer)->SetSvgSize(1200.0);
 
             // Create an output archive
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
 
             // Serialize
-            output_arch << writer;
+            output_arch << p_writer;
+
+            delete p_writer;
         }
 
         // Separate scope to read the archive
         {
-            ImmersedBoundarySvgWriter<2> writer;
+            AbstractCellBasedSimulationModifier<2>* p_writer;
 
             // Restore the modifier
             std::ifstream ifs(archive_filename.c_str());
             boost::archive::text_iarchive input_arch(ifs);
 
-            input_arch >> writer;
+            input_arch >> p_writer;
 
-            TS_ASSERT_EQUALS(writer.GetSamplingMultiple(), 10u);
-            TS_ASSERT_EQUALS(writer.GetSvgSize(), 1200.0);
+            ImmersedBoundarySvgWriter<2>* p_concrete_writer = dynamic_cast<ImmersedBoundarySvgWriter<2>*>(p_writer);
 
+            TS_ASSERT(p_concrete_writer != nullptr);
+            TS_ASSERT_EQUALS(p_concrete_writer->GetSamplingMultiple(), 10u);
+            TS_ASSERT_EQUALS(p_concrete_writer->GetSvgSize(), 1200.0);
+
+            delete p_concrete_writer;
         }
     }
 

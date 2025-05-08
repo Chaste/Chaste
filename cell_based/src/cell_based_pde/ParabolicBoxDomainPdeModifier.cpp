@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -53,11 +53,6 @@ ParabolicBoxDomainPdeModifier<DIM>::ParabolicBoxDomainPdeModifier(boost::shared_
                                         stepSize,
                                         solution),
       mMoveSolutionWithCells(false)
-{
-}
-
-template<unsigned DIM>
-ParabolicBoxDomainPdeModifier<DIM>::~ParabolicBoxDomainPdeModifier()
 {
 }
 
@@ -154,7 +149,7 @@ void ParabolicBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopul
     }
 
 
-    // Finally, if needed store the locations of cells to be used as old loactions in the next timestep
+    // Finally, if needed store the locations of cells to be used as old locations in the next timestep
     if (mMoveSolutionWithCells)
     {
         /*
@@ -285,7 +280,7 @@ Vec ParabolicBoxDomainPdeModifier<DIM>::InterpolateSolutionFromCellMovement(Abst
     MutableMesh<DIM,DIM> cell_mesh(temp_nodes);
 
     // Make the deformed mesh. Based on the displacement of cells. 
-    TetrahedralMesh<DIM, DIM>* p_deformed_mesh = new TetrahedralMesh<DIM,DIM>();
+    auto* p_deformed_mesh = new TetrahedralMesh<DIM,DIM>();
     this->GenerateAndReturnFeMesh(this->mpMeshCuboid,this->mStepSize,p_deformed_mesh);
     
     for (typename TetrahedralMesh<DIM, DIM>::NodeIterator node_iter = p_deformed_mesh->GetNodeIteratorBegin();
@@ -311,7 +306,7 @@ Vec ParabolicBoxDomainPdeModifier<DIM>::InterpolateSolutionFromCellMovement(Abst
                 c_vector<double,DIM> interpolated_cell_displacement = zero_vector<double>(DIM);
                 for (unsigned i=0; i<DIM+1; i++)
                 {
-                    c_vector<double,DIM> nodal_value = cell_displacements[p_element->GetNodeGlobalIndex(i)];
+                    const c_vector<double,DIM>& nodal_value = cell_displacements[p_element->GetNodeGlobalIndex(i)];
                     interpolated_cell_displacement += nodal_value * weights(i);
                 }
                 new_node_location = node_location + interpolated_cell_displacement;
@@ -319,7 +314,7 @@ Vec ParabolicBoxDomainPdeModifier<DIM>::InterpolateSolutionFromCellMovement(Abst
             }
             catch (Exception&) // not_in_mesh
             {
-                //Don't do anything as these FE nodes are outside of the Cell mesh.               
+                // Don't do anything as these FE nodes are outside the Cell mesh, and it's fine to do nothing.
             }
         }   
     }
@@ -391,7 +386,7 @@ void ParabolicBoxDomainPdeModifier<DIM>::SetMoveSolutionWithCells(bool moveSolut
 }
 
 template<unsigned DIM>
-bool ParabolicBoxDomainPdeModifier<DIM>::GetMoveSolutionWithCells()
+bool ParabolicBoxDomainPdeModifier<DIM>::GetMoveSolutionWithCells() const
 {
     return mMoveSolutionWithCells;
 }

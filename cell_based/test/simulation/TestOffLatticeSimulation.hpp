@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -607,52 +607,57 @@ public:
     {
         EXIT_IF_PARALLEL;    // Cell population output doesn't work in parallel
 
-        // Load mesh
-        TrianglesMeshReader<2,3> mesh_reader("cell_based/test/data/Square2dMeshIn3d/Square2dMeshIn3d");
-        MutableMesh<2,3> mesh;
-        mesh.ConstructFromMeshReader(mesh_reader);
-
-        // Create cells (we use a NoCellCycleModel here for simplicity, since there is no proliferation)
-        std::vector<CellPtr> cells;
-        CellsGenerator<NoCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
-
-        // Create a cell population
-        MeshBasedCellPopulation<2,3> cell_population(mesh, cells);
-        cell_population.SetWriteVtkAsPoints(true);
-
-        // Add a writer
-        cell_population.AddCellWriter<CellIdWriter>();
-
-        // Set up cell-based simulation
-        OffLatticeSimulation<2,3> simulator(cell_population);
         std::string output_dir = "TestOffLatticeSimulationWith2dMeshIn3dArchive";
-        simulator.SetOutputDirectory(output_dir);
-        simulator.SetEndTime(1.0);
 
-        // Create a force law and pass it to the simulation
-        typedef GeneralisedLinearSpringForce<2,3> Force;
-        MAKE_PTR(Force, p_force);
-        p_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_force);
+        {
+            // Load mesh
+            TrianglesMeshReader<2,3> mesh_reader("cell_based/test/data/Square2dMeshIn3d/Square2dMeshIn3d");
+            MutableMesh<2,3> mesh;
+            mesh.ConstructFromMeshReader(mesh_reader);
 
-        // Stop remeshing, as this is not possible for 2d in 3d meshes
-        simulator.SetUpdateCellPopulationRule(false);
+            // Create cells (we use a NoCellCycleModel here for simplicity, since there is no proliferation)
+            std::vector<CellPtr> cells;
+            CellsGenerator<NoCellCycleModel, 2> cells_generator;
+            cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes());
 
-        CellBasedSimulationArchiver<2,OffLatticeSimulation<2,3>, 3>::Save(&simulator);
+            // Create a cell population
+            MeshBasedCellPopulation<2,3> cell_population(mesh, cells);
+            cell_population.SetWriteVtkAsPoints(true);
 
-        double start_time = 0.;
-        OffLatticeSimulation<2,3>* p_simulator = CellBasedSimulationArchiver<2, OffLatticeSimulation<2,3>, 3 >::Load(output_dir, start_time);
+            // Add a writer
+            cell_population.AddCellWriter<CellIdWriter>();
 
-        p_simulator->Solve();
+            // Set up cell-based simulation
+            OffLatticeSimulation<2,3> simulator(cell_population);
 
-        // Check that nodes are all sat at resting length  (1.0) apart.
-        TS_ASSERT_DELTA(norm_2(p_simulator->rGetCellPopulation().GetNode(0)->rGetLocation()-p_simulator->rGetCellPopulation().GetNode(1)->rGetLocation()),1.0,1e-5);
-        TS_ASSERT_DELTA(norm_2(p_simulator->rGetCellPopulation().GetNode(1)->rGetLocation()-p_simulator->rGetCellPopulation().GetNode(2)->rGetLocation()),1.0,1e-5);
-        TS_ASSERT_DELTA(norm_2(p_simulator->rGetCellPopulation().GetNode(2)->rGetLocation()-p_simulator->rGetCellPopulation().GetNode(0)->rGetLocation()),1.0,1e-5);
+            simulator.SetOutputDirectory(output_dir);
+            simulator.SetEndTime(1.0);
 
-        // Avoid memory leak
-        delete p_simulator;
+            // Create a force law and pass it to the simulation
+            typedef GeneralisedLinearSpringForce<2,3> Force;
+            MAKE_PTR(Force, p_force);
+            p_force->SetCutOffLength(1.5);
+            simulator.AddForce(p_force);
+
+            // Stop remeshing, as this is not possible for 2d in 3d meshes
+            simulator.SetUpdateCellPopulationRule(false);
+
+            CellBasedSimulationArchiver<2,OffLatticeSimulation<2,3>, 3>::Save(&simulator);
+        }
+        {
+            double start_time = 0;
+            OffLatticeSimulation<2,3>* p_simulator = CellBasedSimulationArchiver<2, OffLatticeSimulation<2,3>, 3 >::Load(output_dir, start_time);
+
+            p_simulator->Solve();
+
+            // Check that nodes are all sat at resting length  (1.0) apart.
+            TS_ASSERT_DELTA(norm_2(p_simulator->rGetCellPopulation().GetNode(0)->rGetLocation()-p_simulator->rGetCellPopulation().GetNode(1)->rGetLocation()),1.0,1e-5);
+            TS_ASSERT_DELTA(norm_2(p_simulator->rGetCellPopulation().GetNode(1)->rGetLocation()-p_simulator->rGetCellPopulation().GetNode(2)->rGetLocation()),1.0,1e-5);
+            TS_ASSERT_DELTA(norm_2(p_simulator->rGetCellPopulation().GetNode(2)->rGetLocation()-p_simulator->rGetCellPopulation().GetNode(0)->rGetLocation()),1.0,1e-5);
+
+            // Avoid memory leak
+            delete p_simulator;
+        }
     }
 
     /**

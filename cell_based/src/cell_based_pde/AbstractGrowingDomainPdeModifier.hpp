@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -88,7 +88,7 @@ public:
     /**
      * Destructor.
      */
-    virtual ~AbstractGrowingDomainPdeModifier();
+    ~AbstractGrowingDomainPdeModifier() override = default;
 
     /**
      * Helper method to generate the mesh from the Cell population.
@@ -112,7 +112,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    void OutputSimulationModifierParameters(out_stream& rParamsFile);
+    void OutputSimulationModifierParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

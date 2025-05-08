@@ -1,0 +1,89 @@
+name: PyChaste Ubuntu tests
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - "**"
+
+# Limit concurrent runs to one per branch
+concurrency:
+  group: pychaste-ubuntu-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pychaste-ubuntu-tests:
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-22.04", "ubuntu-24.04"]
+
+    runs-on: ${{ matrix.os }}
+
+    env:
+      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/testoutput
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Make build and test directories
+        run: |
+          mkdir -p build
+          mkdir -p ${CHASTE_TEST_OUTPUT}
+
+      - name: Install Chaste dependencies
+        run: |
+          codename=$(cat /etc/os-release | grep VERSION_CODENAME | cut -d= -f2)
+          sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
+          echo "deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu ${codename}/" \
+            | sudo tee -a /etc/apt/sources.list.d/chaste.list
+          sudo apt-get update
+          sudo apt-get install -y chaste-dependencies
+
+      - name: Install extra PyChaste dependencies
+        run: |
+          for vtk_ver in $(seq 7 9); do
+            installed=1
+            dpkg -s "libvtk${vtk_ver}-dev" || installed=0
+            if [ "${installed}" -eq 1 ]; then
+              break
+            fi
+          done
+
+          sudo apt-get install -y \
+            castxml \
+            clang \
+            python3-matplotlib \
+            python3-mpi4py \
+            python3-notebook \
+            python3-numpy \
+            python3-petsc4py-real \
+            python3-pip \
+            python3-vtk${vtk_ver} \
+            python3-xvfbwrapper \
+            xvfb
+
+      - name: Configure PyChaste
+        run: |
+          cmake -DCMAKE_BUILD_TYPE=Release -DChaste_ENABLE_PYCHASTE=ON ..
+        working-directory: build
+
+      - name: Build PyChaste
+        run: |
+          make -j $(nproc) pychaste
+        working-directory: build
+
+      - name: Install PyChaste
+        run: |
+          PIP_BREAK_SYSTEM_PACKAGES=1 \
+          python3 -m pip install -v --user pychaste/package
+        working-directory: build
+
+      - name: Run PyChaste tests
+        run: |
+          xvfb-run --server-args="-screen 0 1024x768x24" \
+            ctest -j $(nproc) -L pychaste --output-on-failure
+        working-directory: build

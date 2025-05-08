@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2024, University of Oxford.
+Copyright (c) 2005-2025, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -109,9 +109,9 @@ void AveragedSourceParabolicPde<DIM>::SetupSourceTerms(TetrahedralMesh<DIM,DIM>&
 {
     // Allocate memory
     mCellDensityOnCoarseElements.resize(rCoarseMesh.GetNumElements());
-    for (unsigned elem_index=0; elem_index<mCellDensityOnCoarseElements.size(); elem_index++)
+    for (double & mCellDensityOnCoarseElement : mCellDensityOnCoarseElements)
     {
-        mCellDensityOnCoarseElements[elem_index] = 0.0;
+        mCellDensityOnCoarseElement = 0.0;
     }
 
     // bool mSmallMesh = false;
@@ -307,7 +307,6 @@ template<unsigned DIM>
 double AveragedSourceParabolicPde<DIM>::ComputeSourceTermAtNode(const Node<DIM>& rNode, double u)
 {
     NEVER_REACHED;
-    return 0.0;
 }
 // LCOV_EXCL_STOP
 
