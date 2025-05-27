@@ -110,6 +110,7 @@ public:
     std::unique_ptr<flamegpu::CUDASimulation> mpFlameGPUSimulation;
     std::unique_ptr<flamegpu::AgentDescription> mpCellAgentDescription;
     std::unique_ptr<flamegpu::AgentVector> mpCellAgentVector;
+    std::vector<std::array<long, 7>> mTimingInfo;
     std::chrono::time_point<std::chrono::high_resolution_clock> mTimePoint;
 };
 

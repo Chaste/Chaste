@@ -145,11 +145,13 @@ void GPUModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rC
     auto& cellVector = *mpCellAgentVector; // Grab ref to vector for easier indexing
     unsigned int i = 0;
     for (auto iter = rMesh.GetNodeIteratorBegin(); iter != rMesh.GetNodeIteratorEnd(); ++iter) {
-      cellVector[i].setVariable<float>("x", iter->rGetLocation()[0]);
-      cellVector[i].setVariable<float>("y", iter->rGetLocation()[1]);
-      cellVector[i].setVariable<float>("radius", 0.5f);
-      cellVector[i].setVariable<float>("x_force", 0.0f);
-      cellVector[i].setVariable<float>("y_force", 0.0f);
+      auto cell = cellVector[i];
+      auto& loc = iter->rGetLocation();
+      cell.setVariable<float>("x", iter->rGetLocation()[0]);
+      cell.setVariable<float>("y", iter->rGetLocation()[1]);
+      cell.setVariable<float>("radius", 0.5f);
+      cell.setVariable<float>("x_force", 0.0f);
+      cell.setVariable<float>("y_force", 0.0f);
       i++;
     }
 
@@ -187,7 +189,7 @@ void GPUModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rC
 
     mTimePoint = device_host_wrangle_complete_time;
     auto total_duration = host_device_wrangle_duration + host_device_duration + simulation_duration + device_host_duration + device_host_wrangle_duration;
-    std::cout << host_device_wrangle_duration.count() << ", " << host_device_duration.count() << ", " << simulation_duration.count() << ", " << device_host_duration.count() << ", " << device_host_wrangle_duration.count() << ", " << total_duration.count() << ", " << cpu_duration.count() << "\n";
+    mTimingInfo.push_back(std::array<long, 7>{host_device_wrangle_duration.count(), host_device_duration.count(), simulation_duration.count(), device_host_duration.count(), device_host_wrangle_duration.count(), total_duration.count(), cpu_duration.count()});
     
 }
 
