@@ -450,6 +450,7 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
     {
         LOG(1, "--TIME = " << p_simulation_time->GetTime() << "\n");
 
+        auto start_time = std::chrono::high_resolution_clock::now();
 
         if (p_simulation_time->GetTimeStepsElapsed()%mUpdatingTimestepMultiple == 0)
         {
@@ -556,6 +557,11 @@ void AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>::Solve()
             }
         }
         CellBasedEventHandler::EndEvent(CellBasedEventHandler::OUTPUT);
+        
+        
+        auto end_time = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+        stepTimes.push_back(duration.count()); 
     }
 
     LOG(1, "--END TIME = " << p_simulation_time->GetTime() << "\n");

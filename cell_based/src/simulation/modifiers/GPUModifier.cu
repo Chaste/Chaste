@@ -43,6 +43,16 @@ FLAMEGPU_AGENT_FUNCTION(output_location, flamegpu::MessageNone, flamegpu::Messag
     return flamegpu::ALIVE;
 }
 
+FLAMEGPU_AGENT_FUNCTION(euler_integrate, flamegpu::MessageNone, flamegpu::MessageNone) {
+    float timestep = 1.0 / 120.0;
+    float x = FLAMEGPU->getVariable<float>("x");
+    float y = FLAMEGPU->getVariable<float>("y");
+    float x_force = FLAMEGPU->getVariable<float>("x_force");
+    float y_force = FLAMEGPU->getVariable<float>("y_force");
+    FLAMEGPU->setVariable<float>("x", x + x_force*timestep);
+    FLAMEGPU->setVariable<float>("y", y + y_force*timestep);
+}
+
 // Models repulsion force without division/apoptosis
 FLAMEGPU_AGENT_FUNCTION(compute_force_meineke_spring, flamegpu::MessageSpatial2D, flamegpu::MessageNone) {
     const double x = FLAMEGPU->getVariable<float>("x");
@@ -74,7 +84,6 @@ FLAMEGPU_AGENT_FUNCTION(compute_force_meineke_spring, flamegpu::MessageSpatial2D
             
             // TODO: Should check here if newly divided or apoptosis happening
 
-
             // Compute the force
             float overlap = distance_between_nodes - rest_length;
             bool is_closer_than_rest_length = (overlap <= 0);
@@ -87,7 +96,7 @@ FLAMEGPU_AGENT_FUNCTION(compute_force_meineke_spring, flamegpu::MessageSpatial2D
             {
                 //assert(overlap > -rest_length_final);
                 x_force += multiplication_factor * spring_stiffness * unit_x * rest_length_final* log(1.0 + overlap/rest_length_final);
-                y_force  = multiplication_factor * spring_stiffness * unit_y * rest_length_final* log(1.0 + overlap/rest_length_final);
+                y_force += multiplication_factor * spring_stiffness * unit_y * rest_length_final* log(1.0 + overlap/rest_length_final);
             }
             else
             {
@@ -96,11 +105,10 @@ FLAMEGPU_AGENT_FUNCTION(compute_force_meineke_spring, flamegpu::MessageSpatial2D
                 y_force += multiplication_factor * spring_stiffness * unit_y * overlap * exp(-alpha * overlap/rest_length_final);
             }
         }
-
-        
     }
-    FLAMEGPU->setVariable<float>("x_force", x_force);        
-    FLAMEGPU->setVariable<float>("y_force", y_force);        
+
+    FLAMEGPU->setVariable<float>("x_force", x_force);
+    FLAMEGPU->setVariable<float>("y_force", y_force);
     return flamegpu::ALIVE;
 }
 
@@ -139,17 +147,20 @@ void GPUModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rC
     for (auto iter = rMesh.GetNodeIteratorBegin(); iter != rMesh.GetNodeIteratorEnd(); ++iter) {
       cellVector[i].setVariable<float>("x", iter->rGetLocation()[0]);
       cellVector[i].setVariable<float>("y", iter->rGetLocation()[1]);
-      cellVector[i].setVariable<float>("radius", 1.5f);
+      cellVector[i].setVariable<float>("radius", 0.5f);
       cellVector[i].setVariable<float>("x_force", 0.0f);
       cellVector[i].setVariable<float>("y_force", 0.0f);
       i++;
     }
 
+    auto host_device_wrangle_complete_time = std::chrono::high_resolution_clock::now();
+    auto host_device_wrangle_duration = std::chrono::duration_cast<std::chrono::milliseconds>(host_device_wrangle_complete_time - start_time);
+
     // Create cell population for FlameGPU simulation
     mpFlameGPUSimulation->setPopulationData(*mpCellAgentVector);
 
     auto host_device_transfer_complete_time = std::chrono::high_resolution_clock::now();
-    auto host_device_duration = std::chrono::duration_cast<std::chrono::milliseconds>(host_device_transfer_complete_time - start_time);
+    auto host_device_duration = std::chrono::duration_cast<std::chrono::milliseconds>(host_device_transfer_complete_time - host_device_wrangle_complete_time);
 
     // Run the simulation
     mpFlameGPUSimulation->simulate();
@@ -161,6 +172,9 @@ void GPUModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rC
     flamegpu::AgentVector out_pop(*mpCellAgentDescription);
     mpFlameGPUSimulation->getPopulationData(*mpCellAgentVector);
 
+    auto device_host_transfer_complete_time = std::chrono::high_resolution_clock::now();
+    auto device_host_duration = std::chrono::duration_cast<std::chrono::milliseconds>(device_host_transfer_complete_time - simulation_complete_time);
+
     // Apply results to chaste - TODO: Assumes no change in pop size. Should always be true for force resolution?
     i = 0;
     for (auto iter = rMesh.GetNodeIteratorBegin(); iter != rMesh.GetNodeIteratorEnd(); ++iter) {
@@ -168,11 +182,12 @@ void GPUModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rC
         iter->rGetModifiableLocation()[1] = cellVector[i].getVariable<float>("y");
         i++;
     }
-    auto device_host_transfer_complete_time = std::chrono::high_resolution_clock::now();
-    mTimePoint = device_host_transfer_complete_time;
-    auto device_host_duration = std::chrono::duration_cast<std::chrono::milliseconds>(device_host_transfer_complete_time - simulation_complete_time);
-    auto total_duration = host_device_duration + simulation_duration + device_host_duration;
-    std::cout << host_device_duration.count() << ", " << simulation_duration.count() << ", " << device_host_duration.count() << ", " << total_duration.count() << ", " << cpu_duration.count() << "\n";
+    auto device_host_wrangle_complete_time = std::chrono::high_resolution_clock::now();
+    auto device_host_wrangle_duration = std::chrono::duration_cast<std::chrono::milliseconds>(device_host_wrangle_complete_time - device_host_transfer_complete_time);
+
+    mTimePoint = device_host_wrangle_complete_time;
+    auto total_duration = host_device_wrangle_duration + host_device_duration + simulation_duration + device_host_duration + device_host_wrangle_duration;
+    std::cout << host_device_wrangle_duration.count() << ", " << host_device_duration.count() << ", " << simulation_duration.count() << ", " << device_host_duration.count() << ", " << device_host_wrangle_duration.count() << ", " << total_duration.count() << ", " << cpu_duration.count() << "\n";
     
 }
 
@@ -202,11 +217,14 @@ void GPUModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulati
     flamegpu::AgentFunctionDescription output_location_desc = mpCellAgentDescription->newFunction("output_location", output_location);
     output_location_desc.setMessageOutput("location_message");
     
-    flamegpu::AgentFunctionDescription compute_force_desc = mpCellAgentDescription->newFunction("csfompute_force_meineke_spring", compute_force_meineke_spring);
+    flamegpu::AgentFunctionDescription compute_force_desc = mpCellAgentDescription->newFunction("compute_force_meineke_spring", compute_force_meineke_spring);
     compute_force_desc.setMessageInput("location_message");
 
     compute_force_desc.dependsOn(output_location_desc);
     
+    flamegpu::AgentFunctionDescription integrate_desc = mpCellAgentDescription->newFunction("euler_integrate", euler_integrate);
+    integrate_desc.dependsOn(compute_force_desc);
+
     // Set execution root
     mpFlameGPUModel->addExecutionRoot(output_location_desc);
     
@@ -215,7 +233,7 @@ void GPUModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulati
       
     // Construct a simulation object from the model and configure it to run for a single step
     mpFlameGPUSimulation = std::make_unique<flamegpu::CUDASimulation>(*mpFlameGPUModel);
-    mpFlameGPUSimulation->SimulationConfig().steps = 300;
+    mpFlameGPUSimulation->SimulationConfig().steps = 1;
     
     // Allocate a vector for transferring agent data between host & device
     mpCellAgentVector = std::make_unique<flamegpu::AgentVector>(*mpCellAgentDescription);

@@ -302,6 +302,8 @@ public:
      * @return the timestep of the simulation
      */
     double GetDt();
+    
+    std::vector<double> stepTimes;
 
     /**
      * @return the number of births that have occurred in the entire simulation (since t=0)

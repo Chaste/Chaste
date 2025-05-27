@@ -100,6 +100,8 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
 {
     CellBasedEventHandler::BeginEvent(CellBasedEventHandler::POSITION);
 
+    auto start_time = std::chrono::high_resolution_clock::now();
+
     double time_advanced_so_far = 0;
     double target_time_step  = this->mDt;
     double present_time_step = this->mDt;
@@ -151,6 +153,9 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
         }
     }
 
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+    mechTimes.push_back(duration.count());
     CellBasedEventHandler::EndEvent(CellBasedEventHandler::POSITION);
 }
 

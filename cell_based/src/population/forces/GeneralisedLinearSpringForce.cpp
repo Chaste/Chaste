@@ -76,6 +76,7 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>:
     // Get the node locations
     const c_vector<double, SPACE_DIM>& r_node_a_location = p_node_a->rGetLocation();
     const c_vector<double, SPACE_DIM>& r_node_b_location = p_node_b->rGetLocation();
+    
 
     // Get the node radii for a NodeBasedCellPopulation
     double node_a_radius = 0.0;

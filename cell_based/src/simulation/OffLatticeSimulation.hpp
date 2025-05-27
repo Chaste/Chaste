@@ -161,6 +161,8 @@ public:
      * Remove all the forces.
      */
     void RemoveAllForces();
+    
+    std::vector<double> mechTimes;
 
     /**
      * Add a cell population boundary condition to be used in this simulation.

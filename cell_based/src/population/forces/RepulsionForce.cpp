@@ -73,6 +73,7 @@ void RepulsionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCel
         c_vector<double, DIM> unit_difference;
 
         unit_difference = (static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation))->rGetMesh().GetVectorFromAtoB(r_node_a_location, r_node_b_location);
+        
 
         // Calculate the value of the rest length
         double rest_length = node_a_radius+node_b_radius;
