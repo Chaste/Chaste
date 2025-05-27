@@ -112,6 +112,94 @@ FLAMEGPU_AGENT_FUNCTION(compute_force_meineke_spring, flamegpu::MessageSpatial2D
     return flamegpu::ALIVE;
 }
 
+FLAMEGPU_AGENT_FUNCTION(output_location_3D, flamegpu::MessageNone, flamegpu::MessageSpatial3D) {
+    FLAMEGPU->message_out.setVariable<float>("x", FLAMEGPU->getVariable<float>("x"));
+    FLAMEGPU->message_out.setVariable<float>("y", FLAMEGPU->getVariable<float>("y"));
+    FLAMEGPU->message_out.setVariable<float>("z", FLAMEGPU->getVariable<float>("z"));
+    FLAMEGPU->message_out.setVariable<float>("radius", FLAMEGPU->getVariable<float>("radius"));
+    return flamegpu::ALIVE;
+}
+
+FLAMEGPU_AGENT_FUNCTION(euler_integrate_3D, flamegpu::MessageNone, flamegpu::MessageNone) {
+    float timestep = 1.0 / 120.0;
+    float x = FLAMEGPU->getVariable<float>("x");
+    float y = FLAMEGPU->getVariable<float>("y");
+    float z = FLAMEGPU->getVariable<float>("z");
+    float x_force = FLAMEGPU->getVariable<float>("x_force");
+    float y_force = FLAMEGPU->getVariable<float>("y_force");
+    float z_force = FLAMEGPU->getVariable<float>("z_force");
+    FLAMEGPU->setVariable<float>("x", x + x_force*timestep);
+    FLAMEGPU->setVariable<float>("y", y + y_force*timestep);
+    FLAMEGPU->setVariable<float>("z", z + z_force*timestep);
+}
+
+// Models repulsion force without division/apoptosis
+FLAMEGPU_AGENT_FUNCTION(compute_force_meineke_spring_3D, flamegpu::MessageSpatial3D, flamegpu::MessageNone) {
+    const double x = FLAMEGPU->getVariable<float>("x");
+    const double y = FLAMEGPU->getVariable<float>("y");
+    const double z = FLAMEGPU->getVariable<float>("z");
+    float x_force = 0.0;
+    float y_force = 0.0;
+    float z_force = 0.0;
+    float radius = FLAMEGPU->getVariable<float>("radius");
+
+    for (const auto& message : FLAMEGPU->message_in(x, y, z)) {
+        float other_x = message.getVariable<float>("x");
+        float other_y = message.getVariable<float>("y");
+        float other_z = message.getVariable<float>("z");
+        float other_radius = message.getVariable<float>("radius");
+        
+        // Compute unit distance
+        float x_dist = other_x - x;
+        float y_dist = other_y - y;
+        float z_dist = other_z - z;
+        float distance_between_nodes = sqrt(x_dist * x_dist + y_dist * y_dist + z_dist * z_dist);
+
+        float unit_x = x_dist / distance_between_nodes;
+        float unit_y = y_dist / distance_between_nodes;
+        float unit_z = z_dist / distance_between_nodes;
+        
+        // Only compute force if within cutoff distance and for positive distance
+        const float cutoff_length = 1.5f;
+        if (distance_between_nodes < cutoff_length && distance_between_nodes > 0.0f) {
+
+            // Compute rest length
+            const float rest_length = radius + other_radius; 
+            const float rest_length_final = rest_length;
+            
+            // TODO: Should check here if newly divided or apoptosis happening
+
+            // Compute the force
+            float overlap = distance_between_nodes - rest_length;
+            bool is_closer_than_rest_length = (overlap <= 0);
+            const float spring_stiffness = 15.0f;
+            const float multiplication_factor = 1.0f;
+
+            
+            // A reasonably stable simple force law
+            if (is_closer_than_rest_length) //overlap is negative
+            {
+                //assert(overlap > -rest_length_final);
+                x_force += multiplication_factor * spring_stiffness * unit_x * rest_length_final* log(1.0 + overlap/rest_length_final);
+                y_force += multiplication_factor * spring_stiffness * unit_y * rest_length_final* log(1.0 + overlap/rest_length_final);
+                z_force += multiplication_factor * spring_stiffness * unit_z * rest_length_final* log(1.0 + overlap/rest_length_final);
+            }
+            else
+            {
+                double alpha = 5.0;
+                x_force += multiplication_factor * spring_stiffness * unit_x * overlap * exp(-alpha * overlap/rest_length_final);
+                y_force += multiplication_factor * spring_stiffness * unit_y * overlap * exp(-alpha * overlap/rest_length_final);
+                z_force += multiplication_factor * spring_stiffness * unit_z * overlap * exp(-alpha * overlap/rest_length_final);
+            }
+        }
+    }
+
+    FLAMEGPU->setVariable<float>("x_force", x_force);
+    FLAMEGPU->setVariable<float>("y_force", y_force);
+    FLAMEGPU->setVariable<float>("z_force", z_force);
+    return flamegpu::ALIVE;
+}
+
 template<unsigned DIM>
 GPUModifier<DIM>::GPUModifier()
     : AbstractCellBasedSimulationModifier<DIM>(),
@@ -152,6 +240,12 @@ void GPUModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rC
       cell.setVariable<float>("radius", 0.5f);
       cell.setVariable<float>("x_force", 0.0f);
       cell.setVariable<float>("y_force", 0.0f);
+
+      if constexpr (DIM == 3) {
+        cell.setVariable<float>("z", iter->rGetLocation()[2]);
+        cell.setVariable<float>("z_force", 0.0f);
+      }
+      
       i++;
     }
 
@@ -182,6 +276,9 @@ void GPUModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rC
     for (auto iter = rMesh.GetNodeIteratorBegin(); iter != rMesh.GetNodeIteratorEnd(); ++iter) {
         iter->rGetModifiableLocation()[0] = cellVector[i].getVariable<float>("x");
         iter->rGetModifiableLocation()[1] = cellVector[i].getVariable<float>("y");
+        if constexpr (DIM == 3) {
+            iter->rGetModifiableLocation()[2] = cellVector[i].getVariable<float>("z");
+        }
         i++;
     }
     auto device_host_wrangle_complete_time = std::chrono::high_resolution_clock::now();
@@ -205,30 +302,49 @@ void GPUModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulati
     mpCellAgentDescription->newVariable<float>("radius");
     mpCellAgentDescription->newVariable<float>("x_force");
     mpCellAgentDescription->newVariable<float>("y_force");
+    if constexpr (DIM == 3) {
+        mpCellAgentDescription->newVariable<float>("z");
+        mpCellAgentDescription->newVariable<float>("z_force");
+    }
     
     // Define the location message
     flamegpu::MessageSpatial2D::Description location_message = mpFlameGPUModel->newMessage<flamegpu::MessageSpatial2D>("location_message");
-    //location_message.newVariable<float>("x"); // Implicit for spatial message
-    //location_message.newVariable<float>("y"); // Implicit for spatial message
+    flamegpu::MessageSpatial3D::Description location_message_3D = mpFlameGPUModel->newMessage<flamegpu::MessageSpatial3D>("location_message_3D");
     location_message.newVariable<float>("radius");
+    location_message_3D.newVariable<float>("radius");
+
     location_message.setMin(-500.0, -500.0);
     location_message.setMax(500.0, 500.0);
     location_message.setRadius(1.5);
 
+    location_message_3D.setMin(-500.0, -500.0, -500.0);
+    location_message_3D.setMax(500.0, 500.0, 500.0);
+    location_message_3D.setRadius(1.5);
+
     // Agent functions
     flamegpu::AgentFunctionDescription output_location_desc = mpCellAgentDescription->newFunction("output_location", output_location);
-    output_location_desc.setMessageOutput("location_message");
-    
     flamegpu::AgentFunctionDescription compute_force_desc = mpCellAgentDescription->newFunction("compute_force_meineke_spring", compute_force_meineke_spring);
-    compute_force_desc.setMessageInput("location_message");
-
     compute_force_desc.dependsOn(output_location_desc);
-    
     flamegpu::AgentFunctionDescription integrate_desc = mpCellAgentDescription->newFunction("euler_integrate", euler_integrate);
     integrate_desc.dependsOn(compute_force_desc);
+    output_location_desc.setMessageOutput("location_message");
+    compute_force_desc.setMessageInput("location_message");
+    
+    // Agent functions
+    flamegpu::AgentFunctionDescription output_location_desc_3D = mpCellAgentDescription->newFunction("output_location_3D", output_location_3D);
+    flamegpu::AgentFunctionDescription compute_force_desc_3D = mpCellAgentDescription->newFunction("compute_force_meineke_spring_3D", compute_force_meineke_spring_3D);
+    compute_force_desc_3D.dependsOn(output_location_desc_3D);
+    flamegpu::AgentFunctionDescription integrate_desc_3D = mpCellAgentDescription->newFunction("euler_integrate_3D", euler_integrate_3D);
+    integrate_desc_3D.dependsOn(compute_force_desc_3D);
+    output_location_desc_3D.setMessageOutput("location_message_3D");
+    compute_force_desc_3D.setMessageInput("location_message_3D");
 
     // Set execution root
-    mpFlameGPUModel->addExecutionRoot(output_location_desc);
+    if constexpr (DIM == 2) {
+        mpFlameGPUModel->addExecutionRoot(output_location_desc);
+    } else {
+        mpFlameGPUModel->addExecutionRoot(output_location_desc_3D);
+    }
     
     // Generate execution plan
     mpFlameGPUModel->generateLayers();
