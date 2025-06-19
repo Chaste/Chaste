@@ -41,7 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileFinder.hpp"
 #include "PetscTools.hpp"
 
-
 /**
  * A convenience class to assist with managing archives for parallel checkpointing.
  *
@@ -56,7 +55,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Note also that implementations of this templated class only exist for text archives, i.e.
  * Archive = boost::archive::text_iarchive (with Stream = std::ifstream), or
- * Archive = boost::archive::text_oarchive (with Stream = std::ofstream).
+ * Archive = boost::archive::text_oarchive (with Stream = std::ofstream) and for binary archives, i.e.
+ * Archive = boost::archive::binary_iarchive (with Stream = std::ifstream), or
+ * Archive = boost::archive::binary_oarchive (with Stream = std::ofstream).
  */
 template <class Archive, class Stream>
 class ArchiveOpener
