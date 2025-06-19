@@ -122,10 +122,6 @@ public:
     ~ArchiveOpener()
     {
         ProcessSpecificArchive<InputArchive>::Set(nullptr);
-        delete this->mpPrivateArchive;
-        delete this->mpPrivateStream;
-        delete this->mpCommonArchive;
-        delete this->mpCommonStream;
     }
 };
 
@@ -214,10 +210,6 @@ public:
     ~ArchiveOpener()
     {
         ProcessSpecificArchive<OutputArchive>::Set(nullptr);
-        delete this->mpPrivateArchive;
-        delete this->mpPrivateStream;
-        delete this->mpCommonArchive;
-        delete this->mpCommonStream;
 
         /* In a parallel setting, make sure all processes have finished writing before
          * continuing, to avoid nasty race conditions.

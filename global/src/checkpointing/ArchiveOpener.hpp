@@ -61,6 +61,14 @@ public:
         return mpCommonArchive;
     }
 
+    ~ArchiveOpener()
+    {
+        delete mpPrivateArchive;
+        delete mpPrivateStream;
+        delete mpCommonArchive;
+        delete mpCommonStream;
+    }
+
 protected:
     /** The file stream for the main archive. */
     Stream* mpCommonStream;
