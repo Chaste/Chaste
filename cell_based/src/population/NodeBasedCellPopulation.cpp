@@ -112,7 +112,7 @@ TetrahedralMesh<DIM, DIM>* NodeBasedCellPopulation<DIM>::GetTetrahedralMeshForPd
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::Clear()
 {
-    mNodePairs.clear();
+    this->mNodePairs.clear();
 }
 
 template<unsigned DIM>
@@ -166,11 +166,11 @@ void NodeBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 
     RefreshHaloCells();
 
-    mpNodesOnlyMesh->CalculateInteriorNodePairs(mNodePairs);
+    mpNodesOnlyMesh->CalculateInteriorNodePairs(this->mNodePairs);
 
     AddReceivedHaloCells();
 
-    mpNodesOnlyMesh->CalculateBoundaryNodePairs(mNodePairs);
+    mpNodesOnlyMesh->CalculateBoundaryNodePairs(this->mNodePairs);
 
     /*
      * Update cell radii based on CellData
@@ -283,12 +283,6 @@ CellPtr NodeBasedCellPopulation<DIM>::GetCellUsingLocationIndex(unsigned index)
 template<unsigned DIM>
 void NodeBasedCellPopulation<DIM>::UpdateParticlesAfterReMesh(NodeMap& rMap)
 {
-}
-
-template<unsigned DIM>
-std::vector< std::pair<Node<DIM>*, Node<DIM>* > >& NodeBasedCellPopulation<DIM>::rGetNodePairs()
-{
-    return mNodePairs;
 }
 
 template<unsigned DIM>

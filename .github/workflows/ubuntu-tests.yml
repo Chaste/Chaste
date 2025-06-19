@@ -115,3 +115,8 @@ jobs:
     - name: run Nightly test pack
       run: ctest -j4 -L Nightly --output-on-failure
       working-directory: chaste-build-dir
+
+    - name: run TestChasteBuildInfo
+      run: |
+        ctest -V -R TestChasteBuildInfo
+      working-directory: chaste-build-dir

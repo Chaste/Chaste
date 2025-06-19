@@ -355,6 +355,10 @@ show :
   # We are done with the temporary Makefile, calling PETSC_GET_VARIABLE after this point is invalid!
   file (REMOVE ${petsc_config_makefile})
 
+  if (petsc_mpiexec MATCHES " --oversubscribe\\s*$")
+    string(REGEX REPLACE " --oversubscribe\\s*$" "" petsc_mpiexec "${petsc_mpiexec}")
+  endif()
+
   include (ResolveCompilerPaths)
   # Extract include paths and libraries from compile command line
   resolve_includes (petsc_includes_all "${petsc_cpp_line}")

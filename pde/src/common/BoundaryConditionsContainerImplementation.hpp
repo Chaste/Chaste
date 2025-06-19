@@ -365,6 +365,7 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::ApplyDirich
                  *   -value*[0 a_21 a_31 .. a_N1]
                  * and will be added to the RHS.
                  */
+                PetscVecTools::Finalise(matrix_col); //PETSc 3.19 doesn't like mixing "set" mode (above) with "add" mode
                 PetscVecTools::AddScaledVector(rLinearSystem.rGetDirichletBoundaryConditionsVector(), matrix_col, minus_value);
                 PetscTools::Destroy(matrix_col);
             }

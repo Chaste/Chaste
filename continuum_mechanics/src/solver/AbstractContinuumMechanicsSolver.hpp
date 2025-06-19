@@ -750,6 +750,7 @@ void AbstractContinuumMechanicsSolver<DIM>::ApplyDirichletBoundaryConditions(App
             // E.g. for a boundary node at the zeroth node (x_0 = value), this is equal to
             //   -value*[0 a_21 a_31 .. a_N1]
             // and will be added to the RHS.
+            PetscVecTools::Finalise(matrix_col); //PETSc 3.19 doesn't like mixing "set" mode (above) with "add" mode
             PetscVecTools::AddScaledVector(mDirichletBoundaryConditionsVector, matrix_col, minus_value);
             PetscTools::Destroy(matrix_col);
         }

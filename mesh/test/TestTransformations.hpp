@@ -426,7 +426,7 @@ public:
 
         /*
         * Now try
-        tetview /tmp/chaste/testoutput/TransformedMesh
+        tetview $CHASTE_TEST_OUTPUT/TransformedMesh
         */
     }
 

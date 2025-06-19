@@ -93,6 +93,14 @@ protected:
     double mAbsoluteMovementThreshold;
 
     /**
+     * Node pairs that may interact, for force calculations.
+     *
+     * Some derived populations (e.g. VertexBased) do not use this, but others (e.g.
+     * NodeBased) need to provide pairs of nodes for force calculations.
+     */
+    std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> > mNodePairs = {};
+
+    /**
      * Constructor that just takes in a mesh.
      *
      * @param rMesh the mesh for the cell population.
@@ -208,6 +216,28 @@ public:
      * @return mDampingConstantMutant
      */
     double GetDampingConstantMutant();
+
+    /**
+     * Method to return the connected nodes in an off-lattice population.
+     *
+     * Note that the derived populations are responsible for updating this vector. If
+     * you call this method on a population that doesn't use mNodePairs, you will just
+     * receive a reference to an empty vector.
+     *
+     * @return A vector of pairs of nodes that may interact mechanically.
+     */
+    [[nodiscard]] virtual const std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rGetNodePairs() const;
+
+    /**
+     * Return modifiable mNodePairs vector.
+     *
+     * This method should only be used if you need to modify the underlying vector
+     * itself. To simply iterate over pairs of nodes, call the const rGetNodePairs
+     * method instead.
+     *
+     * @return A modifiable reference to mNodePairs.
+     */
+    [[nodiscard]] virtual std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& rGetModifiableNodePairs();
 
     /**
      * Overridden OutputCellPopulationParameters() method.

@@ -74,6 +74,11 @@ jobs:
         run: cmake --build . --target Continuous --parallel 4
         working-directory: ${{ env.CHASTE_BUILD_DIR }}
 
+      - name: run TestChasteBuildInfo
+        run: |
+          ctest -V -R TestChasteBuildInfo
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+
       - name: run memtest
         run: cmake --build . --target memtest --parallel 4
         working-directory: ${{ env.CHASTE_BUILD_DIR }}

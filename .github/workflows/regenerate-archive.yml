@@ -73,7 +73,7 @@ jobs:
         run: |
           source init.sh
           su -m runner -c "cmake --build . --target TestChasteBuildInfo --parallel 4"
-          su -m runner -c "ctest -V -R TestChasteBuildInfo --output-on-failure"
+          su -m runner -c "ctest -V -R TestChasteBuildInfo"
         working-directory: chaste-build-dir
 
       - name: build TestGenerateSteadyStateCrypt

@@ -88,7 +88,8 @@ public:
     /**
      * Static method for getting the test output directory (the directory where
      * chaste stores test output).  This is set from the environment variable
-     * CHASTE_TEST_OUTPUT, and defaults to "/tmp/$USER/testoutput" if it is not set.
+     * CHASTE_TEST_OUTPUT, and defaults to the "testoutput" folder within the build
+     * directory if it is not set.
      *
      * Attempts to return an absolute path, but may get confused by odd setups.
      *

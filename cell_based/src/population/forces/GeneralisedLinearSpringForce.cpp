@@ -35,7 +35,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "GeneralisedLinearSpringForce.hpp"
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+#include "AbstractCentreBasedCellPopulation.hpp"
+#include "MeshBasedCellPopulation.hpp"
+#include "NodeBasedCellPopulation.hpp"
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>::GeneralisedLinearSpringForce()
    : AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>(),
      mMeinekeSpringStiffness(15.0),        // denoted by mu in Meineke et al, 2001 (doi:10.1046/j.0960-7722.2001.00216.x)

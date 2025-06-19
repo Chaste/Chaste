@@ -35,6 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "BuskeAdhesiveForce.hpp"
 
+#include "NodeBasedCellPopulation.hpp"
+
 template<unsigned DIM>
 BuskeAdhesiveForce<DIM>::BuskeAdhesiveForce()
    : AbstractTwoBodyInteractionForce<DIM>(),

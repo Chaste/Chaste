@@ -50,17 +50,9 @@ void RepulsionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCel
         EXCEPTION("RepulsionForce is to be used with a NodeBasedCellPopulation only");
     }
 
-    std::vector< std::pair<Node<DIM>*, Node<DIM>* > >& r_node_pairs = (static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation))->rGetNodePairs();
-
-    for (typename std::vector< std::pair<Node<DIM>*, Node<DIM>* > >::iterator iter = r_node_pairs.begin();
-        iter != r_node_pairs.end();
-        iter++)
+    const std::vector< std::pair<Node<DIM>*, Node<DIM>* > >& r_node_pairs = (static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation))->rGetNodePairs();
+    for (const auto& [p_node_a, p_node_b] : r_node_pairs)
     {
-        std::pair<Node<DIM>*, Node<DIM>* > pair = *iter;
-
-        Node<DIM>* p_node_a = pair.first;
-        Node<DIM>* p_node_b = pair.second;
-
         // Get the node locations
         const c_vector<double, DIM>& r_node_a_location = p_node_a->rGetLocation();
         const c_vector<double, DIM>& r_node_b_location = p_node_b->rGetLocation();

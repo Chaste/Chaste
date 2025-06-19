@@ -123,12 +123,16 @@ public:
             PetscSetupUtils::CommonFinalize(); // This prints the citations to disk
 
 // Check PETSc version - this is just because they reformatted their BibTex between versions, no change to function!
-#if PETSC_VERSION_GE(3, 20, 0) //PETSc 3.20.0 onwards
-            FileFinder reference_citations("global/test/data/citations-2024.txt", RelativeTo::ChasteSourceRoot);
+#if PETSC_VERSION_GE(3, 22, 0) //PETSc 3.22.0 onwards
+            FileFinder reference_citations("global/test/data/citations-2024_1.txt", RelativeTo::ChasteSourceRoot);
+#elif PETSC_VERSION_GE(3, 21, 0) //PETSc 3.21.0 onwards
+            FileFinder reference_citations("global/test/data/citations-2024_0.txt", RelativeTo::ChasteSourceRoot);
+#elif PETSC_VERSION_GE(3, 20, 0) //PETSc 3.20.0 onwards
+            FileFinder reference_citations("global/test/data/citations-2023_1.txt", RelativeTo::ChasteSourceRoot);
 #elif PETSC_VERSION_GE(3, 19, 0) //PETSc 3.19.0 onwards
-            FileFinder reference_citations("global/test/data/citations-2023.txt", RelativeTo::ChasteSourceRoot);
+            FileFinder reference_citations("global/test/data/citations-2023_0.txt", RelativeTo::ChasteSourceRoot);
 #elif PETSC_VERSION_GE(3, 18, 0) //PETSc 3.18.0 onwards
-            FileFinder reference_citations("global/test/data/citations-2022.txt", RelativeTo::ChasteSourceRoot);
+            FileFinder reference_citations("global/test/data/citations-2022_1.txt", RelativeTo::ChasteSourceRoot);
 #elif PETSC_VERSION_GE(3, 17, 0) //PETSc 3.17.0 onwards
             FileFinder reference_citations("global/test/data/citations-2022_0.txt", RelativeTo::ChasteSourceRoot);
 #elif PETSC_VERSION_GE(3, 11, 2) //PETSc 3.11.2 onwards

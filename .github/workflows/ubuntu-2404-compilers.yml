@@ -98,3 +98,9 @@ jobs:
     - name: build lung
       run: cmake --build . --parallel 4 --target chaste_lung
       working-directory: chaste-build-dir
+
+    - name: run TestChasteBuildInfo
+      run: |
+        cmake --build . --target TestChasteBuildInfo --parallel 4
+        ctest -V -R TestChasteBuildInfo
+      working-directory: chaste-build-dir

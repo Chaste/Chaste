@@ -100,6 +100,18 @@ double AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetAbsoluteMove
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+const std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::rGetNodePairs() const
+{
+    return mNodePairs;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+std::vector<std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>*> >& AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::rGetModifiableNodePairs()
+{
+    return mNodePairs;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t<DampingConstantNormal>" << mDampingConstantNormal << "</DampingConstantNormal>\n";

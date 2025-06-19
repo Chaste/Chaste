@@ -46,6 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VanLeeuwen2009WntSwatCellCycleModelHypothesisTwo.hpp"
 #include "CylindricalHoneycombMeshGenerator.hpp"
 #include "LinearSpringWithVariableSpringConstantsForce.hpp"
+#include "NodeBasedCellPopulation.hpp"
 #include "WntConcentration.hpp"
 #include "CryptSimulation2d.hpp"
 #include "StemCellProliferativeType.hpp"

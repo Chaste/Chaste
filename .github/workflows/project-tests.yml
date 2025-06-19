@@ -61,6 +61,12 @@ jobs:
       run: cmake -DCMAKE_BUILD_TYPE=Release -DChaste_ERROR_ON_WARNING=OFF ..
       working-directory: chaste-build-dir
 
+    - name: run TestChasteBuildInfo
+      run: |
+        cmake --build . --target TestChasteBuildInfo --parallel 4
+        ctest -V -R TestChasteBuildInfo
+      working-directory: chaste-build-dir
+
     - name: build targets
       run: cmake --build . --parallel 4 --target ${{ matrix.build_target }}
       working-directory: chaste-build-dir
