@@ -164,7 +164,7 @@ public:
     /**
      * @return the main archive for replicated data.
      */
-    Archive* GetCommonArchive()
+    InputArchive* GetCommonArchive()
     {
         assert(this->mpCommonArchive != NULL);
         return this->mpCommonArchive;
@@ -261,7 +261,7 @@ public:
     /**
      * @return the main archive for replicated data.
      */
-    Archive* GetCommonArchive()
+    OutputArchive* GetCommonArchive()
     {
         assert(this->mpCommonArchive != NULL);
         return this->mpCommonArchive;
