@@ -76,7 +76,7 @@ public:
         return mpCommonArchive;
     }
 
-    ~ArchiveOpener()
+    ~ArchiveOpenerBase()
     {
         delete mpPrivateArchive;
         delete mpPrivateStream;
