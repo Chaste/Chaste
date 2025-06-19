@@ -143,12 +143,12 @@ void CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM>::Save(SIM* pSim)
  * Specialization of the CellBasedSimulationArchiver for text based formats to reduce requirement to set both archive type template parameters
  */
 template <unsigned ELEMENT_DIM, class SIM, unsigned SPACE_DIM = ELEMENT_DIM>
-using CellBasedSimulationArchiverText = CellBasedSimulationArchiver<unsigned ELEMENT_DIM, class SIM, unsigned SPACE_DIM = ELEMENT_DIM, class INPUT_ARCHIVE_TYPE = boost::archive::text_iarchive, class OUTPUT_ARCHIVE_TYPE = boost::archive::text_oarchive>;
+using CellBasedSimulationArchiverText = CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM, boost::archive::text_iarchive, boost::archive::text_oarchive>;
 
 /*
  * Specialization of the CellBasedSimulationArchiver for binary based formats to reduce requirement to set both archive type template parameters
  */
 template <unsigned ELEMENT_DIM, class SIM, unsigned SPACE_DIM = ELEMENT_DIM>
-using CellBasedSimulationArchiverBinary = CellBasedSimulationArchiver<unsigned ELEMENT_DIM, class SIM, unsigned SPACE_DIM = ELEMENT_DIM, class INPUT_ARCHIVE_TYPE = boost::archive::binary_iarchive, class OUTPUT_ARCHIVE_TYPE = boost::archive::binary_oarchive>;
+using CellBasedSimulationArchiverBinary = CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM, boost::archive::binary_iarchive, boost::archive::binary_oarchive>;
 
 #endif /*CELLBASEDSIMULATIONARCHIVER_HPP_*/
