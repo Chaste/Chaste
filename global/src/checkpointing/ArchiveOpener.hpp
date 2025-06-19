@@ -41,47 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileFinder.hpp"
 #include "PetscTools.hpp"
 
-template <class Archive, class Stream>
-class ArchiveOpenerBase
-{
-private:
-    friend class TestArchivingHelperClasses;
-
-public:
-    ArchiveOpenerBase() : mpCommonStream(nullptr),
-                          mpPrivateStream(nullptr),
-                          mpCommonArchive(nullptr),
-                          mpPrivateArchive(nullptr) {}
-    /**
-     * @return the main archive for replicated data.
-     */
-    Archive* GetCommonArchive()
-    {
-        assert(mpCommonArchive != NULL);
-        return mpCommonArchive;
-    }
-
-    ~ArchiveOpener()
-    {
-        delete mpPrivateArchive;
-        delete mpPrivateStream;
-        delete mpCommonArchive;
-        delete mpCommonStream;
-    }
-
-protected:
-    /** The file stream for the main archive. */
-    Stream* mpCommonStream;
-
-    /** The file stream for the secondary archive. */
-    Stream* mpPrivateStream;
-
-    /** The main archive. */
-    Archive* mpCommonArchive;
-
-    /** The secondary archive. */
-    Archive* mpPrivateArchive;
-};
 
 /**
  * A convenience class to assist with managing archives for parallel checkpointing.
@@ -100,7 +59,7 @@ protected:
  * Archive = boost::archive::text_oarchive (with Stream = std::ofstream).
  */
 template <class Archive, class Stream>
-class ArchiveOpener : ArchiveOpenerBase<Archive, Stream>
+class ArchiveOpener
 {
 private:
     friend class TestArchivingHelperClasses;
@@ -128,6 +87,11 @@ public:
     ArchiveOpener(const FileFinder& rDirectory,
                   const std::string& rFileNameBase,
                   unsigned procId = PetscTools::GetMyRank());
+
+    /**
+     * @return the main archive for replicated data.
+     */
+    Archive* GetCommonArchive();
 
     /**
      * Close the opened archives.

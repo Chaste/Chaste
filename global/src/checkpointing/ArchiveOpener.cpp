@@ -49,6 +49,56 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ProcessSpecificArchive.hpp"
 
 /**
+ * A helper class to add the same members and accessor functionality to all template
+ * specializations of the ArchiveOpener class.
+ *
+ * Was added, because class member specialization is not allowed and class
+ * specialization requires the members to be defined for all specializations.
+ * Added to reduce code duplication
+ */
+template <class Archive, class Stream>
+class ArchiveOpenerBase
+{
+private:
+    friend class TestArchivingHelperClasses;
+
+public:
+    ArchiveOpenerBase() : mpCommonStream(nullptr),
+                          mpPrivateStream(nullptr),
+                          mpCommonArchive(nullptr),
+                          mpPrivateArchive(nullptr) {}
+    /**
+     * @return the main archive for replicated data.
+     */
+    Archive* GetCommonArchive()
+    {
+        assert(mpCommonArchive != NULL);
+        return mpCommonArchive;
+    }
+
+    ~ArchiveOpener()
+    {
+        delete mpPrivateArchive;
+        delete mpPrivateStream;
+        delete mpCommonArchive;
+        delete mpCommonStream;
+    }
+
+protected:
+    /** The file stream for the main archive. */
+    Stream* mpCommonStream;
+
+    /** The file stream for the secondary archive. */
+    Stream* mpPrivateStream;
+
+    /** The main archive. */
+    Archive* mpCommonArchive;
+
+    /** The secondary archive. */
+    Archive* mpPrivateArchive;
+};
+
+/**
  * @brief Partial class specialization to specialize class members for input archives
  *
  * @tparam InputArchive Type of the input archive type, which can vary between text and binary input archives from boost::archive
