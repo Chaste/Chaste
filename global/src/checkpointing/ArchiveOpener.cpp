@@ -125,7 +125,7 @@ class ArchiveOpener<InputArchive, std::ifstream> : public AchiveOpenerBase<Input
         delete mpCommonArchive;
         delete mpCommonStream;
     }
-}
+};
 
 /**
  * @brief Partial class specialization to specialize class members for output archives
@@ -222,7 +222,8 @@ class ArchiveOpener<OutputArchive, std::ofstream> : public ArchiveOpenerBase<Out
          */
         PetscTools::Barrier("~ArchiveOpener");
     }
-}
+};
+
 // Explicit instantiation
 template class ArchiveOpener<boost::archive::text_iarchive, std::ifstream>;
 template class ArchiveOpener<boost::archive::text_oarchive, std::ofstream>;
