@@ -49,48 +49,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ProcessSpecificArchive.hpp"
 
 /**
- * A helper class to add the same members and accessor functionality to all template
- * specializations of the ArchiveOpener class.
- *
- * Was added, because class member specialization is not allowed and class
- * specialization requires the members to be defined for all specializations.
- * Added to reduce code duplication
- */
-template <class Archive, class Stream>
-class ArchiveOpenerBase
-{
-private:
-    friend class TestArchivingHelperClasses;
-
-public:
-    ArchiveOpenerBase() : mpCommonStream(nullptr),
-                          mpPrivateStream(nullptr),
-                          mpCommonArchive(nullptr),
-                          mpPrivateArchive(nullptr) {}
-
-    ~ArchiveOpenerBase()
-    {
-        delete mpPrivateArchive;
-        delete mpPrivateStream;
-        delete mpCommonArchive;
-        delete mpCommonStream;
-    }
-
-protected:
-    /** The file stream for the main archive. */
-    Stream* mpCommonStream;
-
-    /** The file stream for the secondary archive. */
-    Stream* mpPrivateStream;
-
-    /** The main archive. */
-    Archive* mpCommonArchive;
-
-    /** The secondary archive. */
-    Archive* mpPrivateArchive;
-};
-
-/**
  * @brief Partial class specialization to specialize class members for input archives
  *
  * @tparam InputArchive Type of the input archive type, which can vary between text and binary input archives from boost::archive
@@ -112,7 +70,10 @@ public:
         const FileFinder& rDirectory,
         const std::string& rFileNameBase,
         unsigned procId)
-            : ArchiveOpenerBase<InputArchive, std::ifstream>()
+            : mpCommonStream(nullptr),
+              mpPrivateStream(nullptr),
+              mpCommonArchive(nullptr),
+              mpPrivateArchive(nullptr)
     {
         // Figure out where things live
         ArchiveLocationInfo::SetArchiveDirectory(rDirectory);
@@ -173,7 +134,24 @@ public:
     ~ArchiveOpener()
     {
         ProcessSpecificArchive<InputArchive>::Set(nullptr);
+        delete mpPrivateArchive;
+        delete mpPrivateStream;
+        delete mpCommonArchive;
+        delete mpCommonStream;
     }
+
+private:
+    /** The file stream for the main archive. */
+    std::ifstream* mpCommonStream;
+
+    /** The file stream for the secondary archive. */
+    std::ifstream* mpPrivateStream;
+
+    /** The main archive. */
+    InputArchive* mpCommonArchive;
+
+    /** The secondary archive. */
+    InputArchive* mpPrivateArchive;
 };
 
 /**
@@ -198,7 +176,10 @@ public:
         const FileFinder& rDirectory,
         const std::string& rFileNameBase,
         unsigned procId)
-            : ArchiveOpenerBase<OutputArchive, std::ofstream>()
+            : mpCommonStream(nullptr),
+              mpPrivateStream(nullptr),
+              mpCommonArchive(nullptr),
+              mpPrivateArchive(nullptr)
     {
         // Check for user error
         if (procId != PetscTools::GetMyRank())
@@ -270,6 +251,10 @@ public:
     ~ArchiveOpener()
     {
         ProcessSpecificArchive<OutputArchive>::Set(nullptr);
+        delete mpPrivateArchive;
+        delete mpPrivateStream;
+        delete mpCommonArchive;
+        delete mpCommonStream;
 
         /* In a parallel setting, make sure all processes have finished writing before
          * continuing, to avoid nasty race conditions.
@@ -278,6 +263,19 @@ public:
          */
         PetscTools::Barrier("~ArchiveOpener");
     }
+
+private:
+    /** The file stream for the main archive. */
+    std::ofstream* mpCommonStream;
+
+    /** The file stream for the secondary archive. */
+    std::ofstream* mpPrivateStream;
+
+    /** The main archive. */
+    OutputArchive* mpCommonArchive;
+
+    /** The secondary archive. */
+    OutputArchive* mpPrivateArchive;
 };
 
 // Explicit instantiation
