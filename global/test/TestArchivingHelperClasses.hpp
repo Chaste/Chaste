@@ -215,7 +215,7 @@ public:
         // then look at TestCardiacSimulationArchiver
         mArchiveDir = "archiving_helpers";
         FileFinder archive_dir(mArchiveDir, RelativeTo::ChasteTestOutput);
-        std::string archive_file = "archive_opener.arch";
+        std::string archive_file = "archive_opener_binary.arch";
         const unsigned test_int = 123;
 
         // Write
