@@ -198,9 +198,6 @@ public:
         std::stringstream common_path;
         common_path << ArchiveLocationInfo::GetArchiveDirectory() << rFileNameBase;
 
-        std::cerr << "Archive output location: " << common_path.str() << std::endl;
-        std::cerr << "Private file path: " << private_path << std::endl;
-
         // Create master archive for replicated data
         if (PetscTools::AmMaster())
         {
