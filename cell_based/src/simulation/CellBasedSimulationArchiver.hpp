@@ -90,7 +90,7 @@ public:
 };
 
 template <unsigned ELEMENT_DIM, class SIM, unsigned SPACE_DIM, class INPUT_ARCHIVE_TYPE, class OUTPUT_ARCHIVE_TYPE>
-SIM* CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM>::Load(const std::string& rArchiveDirectory, const double& rTimeStamp)
+SIM* CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM, INPUT_ARCHIVE_TYPE, OUTPUT_ARCHIVE_TYPE>::Load(const std::string& rArchiveDirectory, const double& rTimeStamp)
 {
     /**
      * Find the right archive (and mesh) to load.  The files are contained within
@@ -118,7 +118,7 @@ SIM* CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM>::Load(const std::s
 }
 
 template <unsigned ELEMENT_DIM, class SIM, unsigned SPACE_DIM, class INPUT_ARCHIVE_TYPE, class OUTPUT_ARCHIVE_TYPE>
-void CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM>::Save(SIM* pSim)
+void CellBasedSimulationArchiver<ELEMENT_DIM, SIM, SPACE_DIM, INPUT_ARCHIVE_TYPE, OUTPUT_ARCHIVE_TYPE>::Save(SIM* pSim)
 {
     // Get the simulation time as a string
     const SimulationTime* p_sim_time = SimulationTime::Instance();
