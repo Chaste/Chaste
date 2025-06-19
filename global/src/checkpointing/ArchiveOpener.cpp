@@ -108,7 +108,7 @@ public:
 
         // Try to open the secondary archive for distributed data
         this->mpPrivateStream = new std::ifstream(private_path.c_str(), std::ios::binary);
-        if (!mpPrivateStream->is_open())
+        if (!this->mpPrivateStream->is_open())
         {
             delete this->mpPrivateStream;
             delete this->mpCommonArchive;
@@ -174,7 +174,7 @@ public:
         if (PetscTools::AmMaster())
         {
             this->mpCommonStream = new std::ofstream(common_path.str().c_str(), std::ios::binary | std::ios::trunc);
-            if (!mpCommonStream->is_open())
+            if (!this->mpCommonStream->is_open())
             {
                 delete this->mpCommonStream;
                 EXCEPTION("Failed to open main archive file for writing: " + common_path.str());
@@ -189,7 +189,7 @@ public:
             this->mpCommonStream = new std::ofstream("/dev/null", std::ios::binary | std::ios::trunc);
 #endif
             // LCOV_EXCL_START
-            if (!mpCommonStream->is_open())
+            if (!this->mpCommonStream->is_open())
             {
                 delete this->mpCommonStream;
                 EXCEPTION("Failed to open dummy archive file '/dev/null' for writing");
@@ -200,7 +200,7 @@ public:
 
         // Create secondary archive for distributed data
         this->mpPrivateStream = new std::ofstream(private_path.c_str(), std::ios::binary | std::ios::trunc);
-        if (!mpPrivateStream->is_open())
+        if (!this->mpPrivateStream->is_open())
         {
             delete this->mpPrivateStream;
             delete this->mpCommonArchive;
