@@ -41,6 +41,34 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscTools.hpp"
 #include "FileFinder.hpp"
 
+template <class Archive, class Stream>
+class AchiveOpenerBase{
+private:
+    friend class TestArchivingHelperClasses;
+public:
+    /**
+     * @return the main archive for replicated data.
+     */
+    Archive* GetCommonArchive()
+    {
+        assert(mpCommonArchive != NULL);
+        return mpCommonArchive;
+    }
+protected:
+
+    /** The file stream for the main archive. */
+    Stream* mpCommonStream;
+
+    /** The file stream for the secondary archive. */
+    Stream* mpPrivateStream;
+
+    /** The main archive. */
+    Archive* mpCommonArchive;
+
+    /** The secondary archive. */
+    Archive* mpPrivateArchive;
+}
+
 /**
  * A convenience class to assist with managing archives for parallel checkpointing.
  *
@@ -58,7 +86,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Archive = boost::archive::text_oarchive (with Stream = std::ofstream).
  */
 template <class Archive, class Stream>
-class ArchiveOpener
+class ArchiveOpener: AchiveOpenerBase<Archive, Stream>
 {
 private:
     friend class TestArchivingHelperClasses;
@@ -92,28 +120,7 @@ public:
      */
     ~ArchiveOpener();
 
-    /**
-     * @return the main archive for replicated data.
-     */
-    Archive* GetCommonArchive()
-    {
-        assert(mpCommonArchive != NULL);
-        return mpCommonArchive;
-    }
 
-private:
-
-    /** The file stream for the main archive. */
-    Stream* mpCommonStream;
-
-    /** The file stream for the secondary archive. */
-    Stream* mpPrivateStream;
-
-    /** The main archive. */
-    Archive* mpCommonArchive;
-
-    /** The secondary archive. */
-    Archive* mpPrivateArchive;
 };
 
 #endif /*ARCHIVEOPENER_HPP_*/
