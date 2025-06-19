@@ -67,14 +67,6 @@ public:
                           mpPrivateStream(nullptr),
                           mpCommonArchive(nullptr),
                           mpPrivateArchive(nullptr) {}
-    /**
-     * @return the main archive for replicated data.
-     */
-    Archive* GetCommonArchive()
-    {
-        assert(mpCommonArchive != NULL);
-        return mpCommonArchive;
-    }
 
     ~ArchiveOpenerBase()
     {
@@ -169,6 +161,15 @@ public:
         ProcessSpecificArchive<InputArchive>::Set(this->mpPrivateArchive);
     }
 
+    /**
+     * @return the main archive for replicated data.
+     */
+    Archive* GetCommonArchive()
+    {
+        assert(this->mpCommonArchive != NULL);
+        return this->mpCommonArchive;
+    }
+
     ~ArchiveOpener()
     {
         ProcessSpecificArchive<InputArchive>::Set(nullptr);
@@ -255,6 +256,15 @@ public:
         }
         this->mpPrivateArchive = new OutputArchive(*this->mpPrivateStream);
         ProcessSpecificArchive<OutputArchive>::Set(this->mpPrivateArchive);
+    }
+
+    /**
+     * @return the main archive for replicated data.
+     */
+    Archive* GetCommonArchive()
+    {
+        assert(this->mpCommonArchive != NULL);
+        return this->mpCommonArchive;
     }
 
     ~ArchiveOpener()
