@@ -82,24 +82,24 @@ public:
         common_path << ArchiveLocationInfo::GetArchiveDirectory() << rFileNameBase;
 
         // Try to open the main archive for replicated data
-        this->mpCommonStream = new std::ifstream(common_path.str().c_str(), std::ios::binary);
-        if (!this->mpCommonStream->is_open())
+        mpCommonStream = new std::ifstream(common_path.str().c_str(), std::ios::binary);
+        if (!mpCommonStream->is_open())
         {
-            delete this->mpCommonStream;
+            delete mpCommonStream;
             EXCEPTION("Cannot load main archive file: " + common_path.str());
         }
 
         try
         {
-            this->mpCommonArchive = new InputArchive(*this->mpCommonStream);
+            mpCommonArchive = new InputArchive(*mpCommonStream);
         }
         catch (boost::archive::archive_exception& boost_exception)
         {
             if (boost_exception.code == boost::archive::archive_exception::unsupported_version)
             {
                 // This is forward compatibility issue.  We can't open the archive because it's been written by a more recent Boost.
-                delete this->mpCommonArchive;
-                delete this->mpCommonStream;
+                delete mpCommonArchive;
+                delete mpCommonStream;
                 EXCEPTION("Could not open Boost archive '" + common_path.str() + "' because it was written by a more recent Boost. Check process-specific archives too");
             }
             else
@@ -110,16 +110,16 @@ public:
         }
 
         // Try to open the secondary archive for distributed data
-        this->mpPrivateStream = new std::ifstream(private_path.c_str(), std::ios::binary);
-        if (!this->mpPrivateStream->is_open())
+        mpPrivateStream = new std::ifstream(private_path.c_str(), std::ios::binary);
+        if (!mpPrivateStream->is_open())
         {
-            delete this->mpPrivateStream;
-            delete this->mpCommonArchive;
-            delete this->mpCommonStream;
+            delete mpPrivateStream;
+            delete mpCommonArchive;
+            delete mpCommonStream;
             EXCEPTION("Cannot load secondary archive file: " + private_path);
         }
-        this->mpPrivateArchive = new InputArchive(*this->mpPrivateStream);
-        ProcessSpecificArchive<InputArchive>::Set(this->mpPrivateArchive);
+        mpPrivateArchive = new InputArchive(*mpPrivateStream);
+        ProcessSpecificArchive<InputArchive>::Set(mpPrivateArchive);
     }
 
     /**
@@ -127,8 +127,8 @@ public:
      */
     InputArchive* GetCommonArchive()
     {
-        assert(this->mpCommonArchive != NULL);
-        return this->mpCommonArchive;
+        assert(mpCommonArchive != NULL);
+        return mpCommonArchive;
     }
 
     ~ArchiveOpener()
@@ -201,10 +201,10 @@ public:
         // Create master archive for replicated data
         if (PetscTools::AmMaster())
         {
-            this->mpCommonStream = new std::ofstream(common_path.str().c_str(), std::ios::binary | std::ios::trunc);
-            if (!this->mpCommonStream->is_open())
+            mpCommonStream = new std::ofstream(common_path.str().c_str(), std::ios::binary | std::ios::trunc);
+            if (!mpCommonStream->is_open())
             {
-                delete this->mpCommonStream;
+                delete mpCommonStream;
                 EXCEPTION("Failed to open main archive file for writing: " + common_path.str());
             }
         }
@@ -212,31 +212,31 @@ public:
         {
             // Non-master processes need to go through the serialization methods, but not write any data
 #ifdef _MSC_VER
-            this->mpCommonStream = new std::ofstream("NUL", std::ios::binary | std::ios::trunc);
+            mpCommonStream = new std::ofstream("NUL", std::ios::binary | std::ios::trunc);
 #else
-            this->mpCommonStream = new std::ofstream("/dev/null", std::ios::binary | std::ios::trunc);
+            mpCommonStream = new std::ofstream("/dev/null", std::ios::binary | std::ios::trunc);
 #endif
             // LCOV_EXCL_START
-            if (!this->mpCommonStream->is_open())
+            if (!mpCommonStream->is_open())
             {
-                delete this->mpCommonStream;
+                delete mpCommonStream;
                 EXCEPTION("Failed to open dummy archive file '/dev/null' for writing");
             }
             // LCOV_EXCL_STOP
         }
-        this->mpCommonArchive = new OutputArchive(*this->mpCommonStream);
+        mpCommonArchive = new OutputArchive(*mpCommonStream);
 
         // Create secondary archive for distributed data
-        this->mpPrivateStream = new std::ofstream(private_path.c_str(), std::ios::binary | std::ios::trunc);
-        if (!this->mpPrivateStream->is_open())
+        mpPrivateStream = new std::ofstream(private_path.c_str(), std::ios::binary | std::ios::trunc);
+        if (!mpPrivateStream->is_open())
         {
-            delete this->mpPrivateStream;
-            delete this->mpCommonArchive;
-            delete this->mpCommonStream;
+            delete mpPrivateStream;
+            delete mpCommonArchive;
+            delete mpCommonStream;
             EXCEPTION("Failed to open secondary archive file for writing: " + private_path);
         }
-        this->mpPrivateArchive = new OutputArchive(*this->mpPrivateStream);
-        ProcessSpecificArchive<OutputArchive>::Set(this->mpPrivateArchive);
+        mpPrivateArchive = new OutputArchive(*mpPrivateStream);
+        ProcessSpecificArchive<OutputArchive>::Set(mpPrivateArchive);
     }
 
     /**
@@ -244,8 +244,8 @@ public:
      */
     OutputArchive* GetCommonArchive()
     {
-        assert(this->mpCommonArchive != NULL);
-        return this->mpCommonArchive;
+        assert(mpCommonArchive != NULL);
+        return mpCommonArchive;
     }
 
     ~ArchiveOpener()
