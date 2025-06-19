@@ -48,6 +48,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "ProcessSpecificArchive.hpp"
 
+template <class InputArchive>
+ArchiveOpener<InputArchive, std::ifstream>;
+template <class OutputArchive>
+ArchiveOpener<OutputArchive, std::ofstream>;
+
 /**
  * Specialization for input archives.
  * @param rDirectory
