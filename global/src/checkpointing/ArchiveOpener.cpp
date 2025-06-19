@@ -79,25 +79,25 @@ public:
         common_path << ArchiveLocationInfo::GetArchiveDirectory() << rFileNameBase;
 
         // Try to open the main archive for replicated data
-        mpCommonStream = new std::ifstream(common_path.str().c_str(), std::ios::binary);
-        if (!mpCommonStream->is_open())
+        this->mpCommonStream = new std::ifstream(common_path.str().c_str(), std::ios::binary);
+        if (!this->mpCommonStream->is_open())
         {
-            delete mpCommonStream;
+            delete this->mpCommonStream;
             EXCEPTION("Cannot load main archive file: " + common_path.str());
         }
 
         try
         {
-            mpCommonArchive = new InputArchive(*mpCommonStream);
+            this->mpCommonArchive = new InputArchive(*this->mpCommonStream);
         }
         catch (boost::archive::archive_exception& boost_exception)
         {
             if (boost_exception.code == boost::archive::archive_exception::unsupported_version)
             {
                 // This is forward compatibility issue.  We can't open the archive because it's been written by a more recent Boost.
-                delete mpCommonArchive;
-                delete mpCommonStream;
-                EXCEPTION("Could not open Boost archive '" + common_path.str() + "' because it was written by a more recent Boost.  Check process-specific archives too");
+                delete this->mpCommonArchive;
+                delete this->mpCommonStream;
+                EXCEPTION("Could not open Boost archive '" + common_path.str() + "' because it was written by a more recent Boost. Check process-specific archives too");
             }
             else
             {
@@ -107,24 +107,25 @@ public:
         }
 
         // Try to open the secondary archive for distributed data
-        mpPrivateStream = new std::ifstream(private_path.c_str(), std::ios::binary);
+        this->mpPrivateStream = new std::ifstream(private_path.c_str(), std::ios::binary);
         if (!mpPrivateStream->is_open())
         {
-            delete mpPrivateStream;
-            delete mpCommonArchive;
-            delete mpCommonStream;
+            delete this->mpPrivateStream;
+            delete this->mpCommonArchive;
+            delete this->mpCommonStream;
             EXCEPTION("Cannot load secondary archive file: " + private_path);
         }
-        mpPrivateArchive = new InputArchive(*mpPrivateStream);
-        ProcessSpecificArchive<InputArchive>::Set(mpPrivateArchive);
+        this->mpPrivateArchive = new InputArchive(*this->mpPrivateStream);
+        ProcessSpecificArchive<InputArchive>::Set(this->mpPrivateArchive);
     }
+
     ~ArchiveOpener()
     {
         ProcessSpecificArchive<InputArchive>::Set(nullptr);
-        delete mpPrivateArchive;
-        delete mpPrivateStream;
-        delete mpCommonArchive;
-        delete mpCommonStream;
+        delete this->mpPrivateArchive;
+        delete this->mpPrivateStream;
+        delete this->mpCommonArchive;
+        delete this->mpCommonStream;
     }
 };
 
@@ -172,10 +173,10 @@ public:
         // Create master archive for replicated data
         if (PetscTools::AmMaster())
         {
-            mpCommonStream = new std::ofstream(common_path.str().c_str(), std::ios::binary | std::ios::trunc);
+            this->mpCommonStream = new std::ofstream(common_path.str().c_str(), std::ios::binary | std::ios::trunc);
             if (!mpCommonStream->is_open())
             {
-                delete mpCommonStream;
+                delete this->mpCommonStream;
                 EXCEPTION("Failed to open main archive file for writing: " + common_path.str());
             }
         }
@@ -183,39 +184,40 @@ public:
         {
             // Non-master processes need to go through the serialization methods, but not write any data
 #ifdef _MSC_VER
-            mpCommonStream = new std::ofstream("NUL", std::ios::binary | std::ios::trunc);
+            this->mpCommonStream = new std::ofstream("NUL", std::ios::binary | std::ios::trunc);
 #else
-            mpCommonStream = new std::ofstream("/dev/null", std::ios::binary | std::ios::trunc);
+            this->mpCommonStream = new std::ofstream("/dev/null", std::ios::binary | std::ios::trunc);
 #endif
             // LCOV_EXCL_START
             if (!mpCommonStream->is_open())
             {
-                delete mpCommonStream;
+                delete this->mpCommonStream;
                 EXCEPTION("Failed to open dummy archive file '/dev/null' for writing");
             }
             // LCOV_EXCL_STOP
         }
-        mpCommonArchive = new OutputArchive(*mpCommonStream);
+        this->mpCommonArchive = new OutputArchive(*this->mpCommonStream);
 
         // Create secondary archive for distributed data
-        mpPrivateStream = new std::ofstream(private_path.c_str(), std::ios::binary | std::ios::trunc);
+        this->mpPrivateStream = new std::ofstream(private_path.c_str(), std::ios::binary | std::ios::trunc);
         if (!mpPrivateStream->is_open())
         {
-            delete mpPrivateStream;
-            delete mpCommonArchive;
-            delete mpCommonStream;
+            delete this->mpPrivateStream;
+            delete this->mpCommonArchive;
+            delete this->mpCommonStream;
             EXCEPTION("Failed to open secondary archive file for writing: " + private_path);
         }
-        mpPrivateArchive = new OutputArchive(*mpPrivateStream);
-        ProcessSpecificArchive<OutputArchive>::Set(mpPrivateArchive);
+        this->mpPrivateArchive = new OutputArchive(*this->mpPrivateStream);
+        ProcessSpecificArchive<OutputArchive>::Set(this->mpPrivateArchive);
     }
+
     ~ArchiveOpener()
     {
         ProcessSpecificArchive<OutputArchive>::Set(nullptr);
-        delete mpPrivateArchive;
-        delete mpPrivateStream;
-        delete mpCommonArchive;
-        delete mpCommonStream;
+        delete this->mpPrivateArchive;
+        delete this->mpPrivateStream;
+        delete this->mpCommonArchive;
+        delete this->mpCommonStream;
 
         /* In a parallel setting, make sure all processes have finished writing before
          * continuing, to avoid nasty race conditions.
