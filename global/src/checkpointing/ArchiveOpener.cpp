@@ -54,7 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @tparam InputArchive Type of the input archive type, which can vary between text and binary input archives from boost::archive
  */
 template <class InputArchive>
-class ArchiveOpener<InputArchive, std::ifstream>
+class ArchiveOpener<InputArchive, std::ifstream>: public ArchiveOpener<InputArchive, std::ifstream>
 {
     /**
      * Specialization for input archives.
@@ -133,7 +133,7 @@ class ArchiveOpener<InputArchive, std::ifstream>
  * @tparam OutputArchive Type of the output archive type, which can vary between text and binary output archives from boost::archive
  */
 template <class OutputArchive>
-class ArchiveOpener<OutputArchive, std::ofstream>
+class ArchiveOpener<OutputArchive, std::ofstream>: public ArchiveOpener<OutputArchive, std::ofstream>
 {
     /**
      * Specialization for output archives.
