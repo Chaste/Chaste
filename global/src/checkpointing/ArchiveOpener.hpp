@@ -98,6 +98,19 @@ public:
      * Close the opened archives.
      */
     ~ArchiveOpener();
+
+private:
+    /** The file stream for the main archive. */
+    std::ofstream* mpCommonStream;
+
+    /** The file stream for the secondary archive. */
+    std::ofstream* mpPrivateStream;
+
+    /** The main archive. */
+    OutputArchive* mpCommonArchive;
+
+    /** The secondary archive. */
+    OutputArchive* mpPrivateArchive;
 };
 
 #endif /*ARCHIVEOPENER_HPP_*/
