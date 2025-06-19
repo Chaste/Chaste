@@ -70,10 +70,7 @@ public:
         const FileFinder& rDirectory,
         const std::string& rFileNameBase,
         unsigned procId)
-            : mpCommonStream(nullptr),
-              mpPrivateStream(nullptr),
-              mpCommonArchive(nullptr),
-              mpPrivateArchive(nullptr)
+            : ArchiveOpenerBase<InputArchive, std::ifstream>()
     {
         // Figure out where things live
         ArchiveLocationInfo::SetArchiveDirectory(rDirectory);
@@ -153,10 +150,7 @@ public:
         const FileFinder& rDirectory,
         const std::string& rFileNameBase,
         unsigned procId)
-            : mpCommonStream(nullptr),
-              mpPrivateStream(nullptr),
-              mpCommonArchive(nullptr),
-              mpPrivateArchive(nullptr)
+            : ArchiveOpenerBase<OutputArchive, std::ofstream>()
     {
         // Check for user error
         if (procId != PetscTools::GetMyRank())

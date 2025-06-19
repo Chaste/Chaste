@@ -35,17 +35,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ARCHIVEOPENER_HPP_
 #define ARCHIVEOPENER_HPP_
 
-#include <string>
 #include <cassert>
+#include <string>
 
-#include "PetscTools.hpp"
 #include "FileFinder.hpp"
+#include "PetscTools.hpp"
 
 template <class Archive, class Stream>
-class ArchiveOpenerBase{
+class ArchiveOpenerBase
+{
 private:
     friend class TestArchivingHelperClasses;
+
 public:
+    ArchiveOpenerBase() : mpCommonStream(nullptr),
+                          mpPrivateStream(nullptr),
+                          mpCommonArchive(nullptr),
+                          mpPrivateArchive(nullptr) {}
     /**
      * @return the main archive for replicated data.
      */
@@ -54,8 +60,8 @@ public:
         assert(mpCommonArchive != NULL);
         return mpCommonArchive;
     }
-protected:
 
+protected:
     /** The file stream for the main archive. */
     Stream* mpCommonStream;
 
@@ -68,7 +74,6 @@ protected:
     /** The secondary archive. */
     Archive* mpPrivateArchive;
 };
-
 
 /**
  * A convenience class to assist with managing archives for parallel checkpointing.
@@ -87,12 +92,12 @@ protected:
  * Archive = boost::archive::text_oarchive (with Stream = std::ofstream).
  */
 template <class Archive, class Stream>
-class ArchiveOpener: ArchiveOpenerBase<Archive, Stream>
+class ArchiveOpener : ArchiveOpenerBase<Archive, Stream>
 {
 private:
     friend class TestArchivingHelperClasses;
-public:
 
+public:
     /**
      * Open the archives for this process, either for reading or writing depending on the
      * template parameter Archive.
@@ -114,14 +119,12 @@ public:
      */
     ArchiveOpener(const FileFinder& rDirectory,
                   const std::string& rFileNameBase,
-                  unsigned procId=PetscTools::GetMyRank());
+                  unsigned procId = PetscTools::GetMyRank());
 
     /**
      * Close the opened archives.
      */
     ~ArchiveOpener();
-
-
 };
 
 #endif /*ARCHIVEOPENER_HPP_*/
