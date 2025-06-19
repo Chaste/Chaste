@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileFinder.hpp"
 
 template <class Archive, class Stream>
-class AchiveOpenerBase{
+class ArchiveOpenerBase{
 private:
     friend class TestArchivingHelperClasses;
 public:
@@ -87,7 +87,7 @@ protected:
  * Archive = boost::archive::text_oarchive (with Stream = std::ofstream).
  */
 template <class Archive, class Stream>
-class ArchiveOpener: AchiveOpenerBase<Archive, Stream>
+class ArchiveOpener: ArchiveOpenerBase<Archive, Stream>
 {
 private:
     friend class TestArchivingHelperClasses;

@@ -54,8 +54,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @tparam InputArchive Type of the input archive type, which can vary between text and binary input archives from boost::archive
  */
 template <class InputArchive>
-class ArchiveOpener<InputArchive, std::ifstream> : public AchiveOpenerBase<InputArchive, std::ifstream>
+class ArchiveOpener<InputArchive, std::ifstream> : public ArchiveOpenerBase<InputArchive, std::ifstream>
 {
+private:
+    friend class TestArchivingHelperClasses;
+
+public:
     /**
      * Specialization for input archives.
      * @param rDirectory
@@ -135,6 +139,10 @@ class ArchiveOpener<InputArchive, std::ifstream> : public AchiveOpenerBase<Input
 template <class OutputArchive>
 class ArchiveOpener<OutputArchive, std::ofstream> : public ArchiveOpenerBase<OutputArchive, std::ofstream>
 {
+private:
+    friend class TestArchivingHelperClasses;
+
+public:
     /**
      * Specialization for output archives.
      * @param rDirectory
