@@ -67,7 +67,8 @@ protected:
 
     /** The secondary archive. */
     Archive* mpPrivateArchive;
-}
+};
+
 
 /**
  * A convenience class to assist with managing archives for parallel checkpointing.
