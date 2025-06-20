@@ -250,12 +250,13 @@ public:
         }
 
         // Cover the case of an archive in the chaste folder (i.e. a path relative to the working directory)
-        if (PetscTools::IsSequential())
+        // TODO: We probably want to add a sample binary test file, but as it is not plattform agnostic, it does not seem doable.
+        /*if (PetscTools::IsSequential())
         {
             // Read
             FileFinder save_bidomain_dir("apps/texttest/chaste/resume_bidomain/save_bidomain", RelativeTo::ChasteSourceRoot);
             InputBinaryArchiveOpener archive_opener_relative(save_bidomain_dir, "archive.arch");
-        }
+        }*/
 
         PetscTools::Barrier(); // Make sure all processes have finished this test before proceeding
     }
