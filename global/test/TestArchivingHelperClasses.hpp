@@ -216,7 +216,7 @@ public:
         mArchiveDir = "archiving_helpers";
         FileFinder archive_dir(mArchiveDir, RelativeTo::ChasteTestOutput);
         std::string archive_file = "archive_opener_binary.arch";
-        const unsigned test_int = 123;
+        const unsigned test_int = 4444251;
 
         // Write
         {
