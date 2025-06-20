@@ -107,10 +107,10 @@ private:
     std::ofstream* mpPrivateStream;
 
     /** The main archive. */
-    OutputArchive* mpCommonArchive;
+    Archive* mpCommonArchive;
 
     /** The secondary archive. */
-    OutputArchive* mpPrivateArchive;
+    Archive* mpPrivateArchive;
 };
 
 #endif /*ARCHIVEOPENER_HPP_*/
