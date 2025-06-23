@@ -289,6 +289,6 @@ public:
  * you should see a collection of cells with the `MotileCellProperty` (labelled dark blue) moving towards the origin.
  *
  * Upon running this test, the output file `cellmotilityresults.dat` should be created in the folder
- * `tmp/$USER/testoutput/TestOffLatticeSimulationWithMotileCellPropertyAndWriters/results_from_time_0`.
+ * `$CHASTE_TEST_OUTPUT/TestOffLatticeSimulationWithMotileCellPropertyAndWriters/results_from_time_0`.
  */
 #endif /*TESTCREATINGANDUSINGNEWCELLBASEDWRITERSTUTORIAL_HPP_*/

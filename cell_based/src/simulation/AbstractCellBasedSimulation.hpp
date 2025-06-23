@@ -131,7 +131,7 @@ protected:
     /** Whether to update the topology of the cell population at each time step (defaults to true).*/
     bool mUpdateCellPopulation;
 
-    /** Output directory (a subfolder of tmp/[USERNAME]/testoutput). */
+    /** Output directory (a subfolder of $CHASTE_TEST_OUTPUT). */
     std::string mOutputDirectory;
 
     /** Simulation Output directory either the same as mOutputDirectory or includes mOutputDirectory/results_from_time_[TIME]. */

@@ -1,0 +1,84 @@
+name: Check basic compatibility
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - '**'
+  push:
+    branches:
+      - develop
+
+jobs:
+  
+  build-and-test:
+
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: "ubuntu-22.04"
+            codename: "jammy"
+          - os: "ubuntu-24.04"
+            codename: "noble"
+
+    env:
+      CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
+      CC: gcc
+      CXX: g++
+
+    steps:
+    - name: checkout repository
+      uses: actions/checkout@v4
+
+    - name: install dependencies
+      run: |
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu ${{ matrix.codename }}/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
+        sudo apt update
+        sudo apt install chaste-dependencies
+
+    - name: Downgrade libexpat1 (native ubuntu-22.04 only)
+      if: ${{ matrix.os == 'ubuntu-22.04' }}
+      run: |
+        if dpkg -l | grep libexpat1-dev | grep 2.4.7-1ubuntu; then
+          sudo apt-get install -y --allow-downgrades libexpat1=2.4.7-1 libexpat1-dev=2.4.7-1
+        fi
+
+    - name: compiler version
+      run: |
+        ${CXX} --version
+
+    - name: make build and test directories
+      run: |
+        mkdir -p chaste-build-dir
+        mkdir -p ${CHASTE_TEST_OUTPUT}
+
+    - name: cmake configure
+      run: cmake -DCMAKE_BUILD_TYPE=Debug ..
+      working-directory: chaste-build-dir
+
+    - name: build global test pack
+      run: cmake --build . --parallel 4 --target global
+      working-directory: chaste-build-dir
+
+    - name: run Continuous test pack
+      run: ctest -j4 -L Continuous_global --output-on-failure
+      working-directory: chaste-build-dir
+
+    - name: run Nightly test pack
+      run: ctest -j4 -L Nightly_global --output-on-failure
+      working-directory: chaste-build-dir
+
+    - name: run Parallel test pack
+      run: ctest -j4 -L Parallel_global --output-on-failure
+      working-directory: chaste-build-dir
+
+    - name: run TestChasteBuildInfo
+      run: |
+        ctest -V -R TestChasteBuildInfo
+      working-directory: chaste-build-dir
