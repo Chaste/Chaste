@@ -478,9 +478,11 @@ if (Chaste_ENABLE_PYCHASTE)
     find_package(PETSc4py REQUIRED)
 endif ()
 
-find_package (PETSc REQUIRED)
-list (APPEND Chaste_LINK_LIBRARIES "${PETSC_LIBRARIES}")
+include(FindPkgConfig REQUIRED)
 
+find_package (PETSc REQUIRED)
+message(STATUS "PETSc version: ${PETSc_VERSION}")
+target_link_libraries(Chaste_COMMON_DEPS INTERFACE PETSc::PETSc)
 
 ################################
 ####  Find HDF5
@@ -518,10 +520,6 @@ foreach (dir ${HDF5_LIBRARIES})
         list (APPEND Chaste_LINK_LIBRARIES "${dir}")
     endif ()
 endforeach ()
-
-# put petsc includes after hdf5 includes or else the hdf5 headers
-# in the petsc include dir will clobber those chosen on FindHdf5.cmake
-list (APPEND Chaste_INCLUDES "${PETSC_INCLUDES}")
 
 
 ################################
