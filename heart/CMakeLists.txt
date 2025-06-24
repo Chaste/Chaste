@@ -74,6 +74,8 @@ foreach(dyn_source ${dyn_sources})
         target_link_options(${dyn_source_name} PRIVATE "-Wl,--allow-shlib-undefined")
     endif()
 
+    target_link_libraries(${dyn_source_name} PRIVATE Chaste_COMMON_DEPS)
+
     # add dynamic models to the heart_tests, Continuous, and individual test targets
     add_dependencies(heart ${dyn_source_name})
     add_dependencies(Continuous ${dyn_source_name})
