@@ -879,62 +879,57 @@ foreach (project ${Chaste_PROJECTS})
     endif ()
 endforeach ()
 
-configure_file (${Chaste_SOURCE_DIR}/cmake/Config/ChasteConfig.cmake.in
-                "${Chaste_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/ChasteConfig.cmake" @ONLY)
-
 # Configure file for build dir
-set (EXPORT_Chaste_PYTHON_DIR "${Chaste_PYTHON_DIR}")
+set(EXPORT_Chaste_PYTHON_DIR "${Chaste_PYTHON_DIR}")
 foreach (component ${Chaste_COMPONENTS})
-    set (EXPORT_Chaste_${component}_INCLUDE_DIRS ${Chaste_${component}_INCLUDE_DIRS})
+    set(EXPORT_Chaste_${component}_INCLUDE_DIRS ${Chaste_${component}_INCLUDE_DIRS})
 endforeach (component)
 
-configure_file (${Chaste_SOURCE_DIR}/cmake/Config/ChasteConfig.cmake.in
-                "${Chaste_BINARY_DIR}/ChasteConfig.cmake" @ONLY)
+configure_file(${Chaste_SOURCE_DIR}/cmake/Config/ChasteConfig.cmake.in
+        "${Chaste_BINARY_DIR}/ChasteConfig.cmake" @ONLY)
 
-file (COPY ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteMacros.cmake
-      DESTINATION ${Chaste_BINARY_DIR}/cmake/Modules)
+file(COPY ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteMacros.cmake
+        DESTINATION ${Chaste_BINARY_DIR}/cmake/Modules)
 
-file (COPY ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteRunTestAndPostProcess.cmake
-      DESTINATION ${Chaste_BINARY_DIR}/cmake/Modules)
+file(COPY ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteRunTestAndPostProcess.cmake
+        DESTINATION ${Chaste_BINARY_DIR}/cmake/Modules)
 
-file (COPY ${Chaste_SOURCE_DIR}/python
-      DESTINATION ${Chaste_BINARY_DIR})
+file(COPY ${Chaste_SOURCE_DIR}/python
+        DESTINATION ${Chaste_BINARY_DIR})
 
-file (COPY ${Chaste_SOURCE_DIR}/cxxtest
-      DESTINATION ${Chaste_BINARY_DIR})
+file(COPY ${Chaste_SOURCE_DIR}/cxxtest
+        DESTINATION ${Chaste_BINARY_DIR})
 
 
-install (FILES
-         "${Chaste_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/ChasteConfig.cmake"
-         #    "${Chaste_BINARY_DIR}/ChasteTargets.cmake"
-         DESTINATION lib/chaste
-         COMPONENT Config)
+install(FILES
+        "${Chaste_BINARY_DIR}/ChasteConfig.cmake"
+        DESTINATION lib/chaste
+        COMPONENT Config)
 
-install (FILES
-         "${Chaste_BINARY_DIR}/cmake/Modules/ChasteMacros.cmake"
-         "${Chaste_BINARY_DIR}/cmake/Modules/ChasteRunTestAndPostProcess.cmake"
-         DESTINATION lib/chaste/cmake/Modules
-         COMPONENT Config)
+install(FILES
+        "${Chaste_BINARY_DIR}/cmake/Modules/ChasteMacros.cmake"
+        "${Chaste_BINARY_DIR}/cmake/Modules/ChasteRunTestAndPostProcess.cmake"
+        DESTINATION lib/chaste/cmake/Modules
+        COMPONENT Config)
 
 # CxxTest folder
-install (DIRECTORY ${Chaste_BINARY_DIR}/cxxtest
-         DESTINATION lib/chaste
-         USE_SOURCE_PERMISSIONS
-         COMPONENT CxxTest)
+install(DIRECTORY ${Chaste_BINARY_DIR}/cxxtest
+        DESTINATION lib/chaste
+        USE_SOURCE_PERMISSIONS
+        COMPONENT CxxTest)
 
 # Python folder
-install (DIRECTORY ${Chaste_BINARY_DIR}/python
-         DESTINATION lib/chaste
-         USE_SOURCE_PERMISSIONS
-         COMPONENT Python)
+install(DIRECTORY ${Chaste_BINARY_DIR}/python
+        DESTINATION lib/chaste
+        USE_SOURCE_PERMISSIONS
+        COMPONENT Python)
 
 # libraries
-install (EXPORT chaste-targets
-         DESTINATION lib/chaste
-         FILE ChasteTargets.cmake
-         #EXPORT_LINK_INTERFACE_LIBRARIES
-         COMPONENT ChasteTargets
-         )
+install(EXPORT chaste-targets
+        DESTINATION lib/chaste
+        FILE ChasteTargets.cmake
+        COMPONENT ChasteTargets
+)
 
 
 ####################
