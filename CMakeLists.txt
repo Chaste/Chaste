@@ -30,8 +30,8 @@
 # OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-# The version that ships with Ubuntu 20.04
-cmake_minimum_required (VERSION 3.16.3)
+# The version that ships with Ubuntu 22.04
+cmake_minimum_required (VERSION 3.22.1)
 
 # Set standard to C++17
 set(CMAKE_CXX_STANDARD 17)
