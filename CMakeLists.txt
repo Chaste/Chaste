@@ -483,6 +483,9 @@ include(FindPkgConfig REQUIRED)
 find_package (PETSc REQUIRED)
 message(STATUS "PETSc version: ${PETSc_VERSION}")
 target_link_libraries(Chaste_COMMON_DEPS INTERFACE PETSc::PETSc)
+list(APPEND Chaste_LINK_LIBRARIES "${PETSc_LIBRARIES}")
+list(APPEND Chaste_INCLUDES "${PETSc_INCLUDE_DIRS}")
+
 
 ################################
 ####  Find HDF5
