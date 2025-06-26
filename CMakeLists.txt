@@ -491,60 +491,27 @@ list(APPEND Chaste_INCLUDES "${PETSc_INCLUDE_DIRS}")
 ####  Find HDF5
 ################################
 
-# This alters the order that CMake looks for h5pcc h5cc (parallel h5pcc first)
-set (HDF5_PREFER_PARALLEL TRUE)
-
-# If we're using PETSc's HDF5 (ON by default, for more reliable MPI compatibility), we override HDF5_ROOT accordingly
-if (Chaste_USE_PETSC_HDF5)
-    if (EXISTS "${PETSC_DIR}/${PETSC_ARCH}/bin/h5diff")
-        set (ENV{HDF5_ROOT} "${PETSC_DIR}/${PETSC_ARCH}")
-    else ()
-        message (STATUS "No HDF5 found in ${PETSC_DIR}/${PETSC_ARCH}: looking for alternative HDF5 instead")
-    endif ()
-endif ()
-
-# Find the HDF5_C_COMPILER_EXECUTABLE to help the find_package call (else the system HDF5 will always be found)
-find_program (HDF5_C_COMPILER_EXECUTABLE
-              NAMES h5pcc h5cc
-              HINTS ENV HDF5_ROOT
-              PATH_SUFFIXES bin Bin
-              DOC "HDF5 Wrapper compiler.  Used only to detect HDF5 compile flags.")
-find_package (HDF5 REQUIRED)
+# Ensure the wrapper compiler h5pcc (parallel) is found instead of h5cc (serial) if both are in the same directory
+set(HDF5_PREFER_PARALLEL TRUE)
+find_package(HDF5 REQUIRED COMPONENTS C)
+message(STATUS "HDF5 version: ${HDF5_VERSION}")
+target_link_libraries(Chaste_COMMON_DEPS INTERFACE HDF5::HDF5)
 
 # Chaste requires a parallel HDF5 library
 if (NOT HDF5_IS_PARALLEL)
-    message (SEND_ERROR "Hdf5 library found was not build with --enable-parallel, use the HDF5_ROOT environment variable to specify a parallel hdf5 library. Note: include dirs are ${HDF5_INCLUDE_DIRS} and libraries are ${HDF5_LIBRARIES}")
+    message(SEND_ERROR "Hdf5 library found was not build with --enable-parallel, use the HDF5_ROOT environment variable to specify a parallel hdf5 library. Note: include dirs are ${HDF5_INCLUDE_DIRS} and libraries are ${HDF5_LIBRARIES}")
 endif ()
-list (APPEND Chaste_INCLUDES "${HDF5_INCLUDE_DIRS}")
-
-# for some reason the CMake in Homebrew returns a NOTFOUND entry in the Hdf5 libraries
-foreach (dir ${HDF5_LIBRARIES})
-    if (dir)
-        list (APPEND Chaste_LINK_LIBRARIES "${dir}")
-    endif ()
-endforeach ()
+list(APPEND Chaste_INCLUDES "${HDF5_INCLUDE_DIRS}")
 
 
 ################################
 ####  Find MPI
 ################################
-if (PETSC_COMPILER)
-    string (REPLACE mpicc mpicxx MPI_CXX_COMPILER ${PETSC_COMPILER})
-endif ()
 
-if (PETSC_MPIEXEC)
-    if (IS_ABSOLUTE ${PETSC_MPIEXEC})
-        set (MPIEXEC ${PETSC_MPIEXEC})  # MPIEXEC deprecated in newer FindMPI.cmake (#2967)
-        set (MPIEXEC_EXECUTABLE ${PETSC_MPIEXEC})
-    else ()
-        find_program (MPIEXEC ${PETSC_MPIEXEC})
-    endif ()
-endif ()
 find_package (MPI REQUIRED COMPONENTS CXX)
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MPI_CXX_COMPILE_FLAGS}")
-set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${MPI_C_COMPILE_FLAGS}")
-set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MPI_CXX_LINK_FLAGS}")
-list (APPEND Chaste_INCLUDES "${MPI_CXX_INCLUDE_PATH}")
+message(STATUS "MPI version: ${MPI_CXX_VERSION}")
+message(STATUS "MPI executable: ${MPIEXEC_EXECUTABLE}")
+target_link_libraries(Chaste_COMMON_DEPS INTERFACE MPI::MPI_CXX)
 
 if (Chaste_MEMORY_TESTING)
     get_filename_component (openmpi_supp_path ${MPIEXEC} PATH)
@@ -556,11 +523,6 @@ if (Chaste_MEMORY_TESTING)
         set (Chaste_MEMORY_TESTING_SUPPS "${Chaste_MEMORY_TESTING_SUPPS} --suppressions=${openmpi_supp_path}")
     endif ()
 endif ()
-
-message (STATUS "Found MPIEXEC_EXECUTABLE: ${MPIEXEC_EXECUTABLE}")
-message (STATUS "Found MPIEXEC: ${MPIEXEC}")
-message (STATUS "Found MPI_CXX_HEADER_DIR: ${MPI_CXX_HEADER_DIR}")
-message (STATUS "Found MPI_C_COMPILER: ${MPI_C_COMPILER}")
 
 
 ################################
