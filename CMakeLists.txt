@@ -512,6 +512,7 @@ find_package (MPI REQUIRED COMPONENTS CXX)
 message(STATUS "MPI version: ${MPI_CXX_VERSION}")
 message(STATUS "MPI executable: ${MPIEXEC_EXECUTABLE}")
 target_link_libraries(Chaste_COMMON_DEPS INTERFACE MPI::MPI_CXX)
+list(APPEND Chaste_INCLUDES "${MPI_CXX_INCLUDE_DIRS}")
 
 if (Chaste_MEMORY_TESTING)
     get_filename_component (openmpi_supp_path ${MPIEXEC} PATH)
