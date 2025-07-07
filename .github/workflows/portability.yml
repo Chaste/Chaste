@@ -31,8 +31,6 @@ jobs:
             extra-build-args: ""
           - image: portability-05
             extra-build-args: ""
-          - image: portability-focal
-            extra-build-args: ""
           - image: portability-jammy
             extra-build-args: ""
           - image: portability-lunar
