@@ -168,12 +168,14 @@ void AbstractPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCell
     // Cache the output directory
     this->mOutputDirectory = outputDirectory;
 
+    assert(!mDependentVariableName.empty());
+
     if (mOutputSolutionAtPdeNodes)
     {
         if (PetscTools::AmMaster())
         {
             OutputFileHandler output_file_handler(outputDirectory+"/", false);
-            mpVizPdeSolutionResultsFile = output_file_handler.OpenOutputFile("results.vizpdesolution");
+            mpVizPdeSolutionResultsFile = output_file_handler.OpenOutputFile("results.vizpdesolution"+mDependentVariableName);
         }
     }
 
