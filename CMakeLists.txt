@@ -52,7 +52,7 @@ message ("####################################\n")
 message(STATUS "CMake version: ${CMAKE_VERSION}")
 
 # Since CMake 3.0, version can be supplied to the project() command.  We set it directly, for users on older CMake
-project (Chaste VERSION 2024.2 LANGUAGES CUDA CXX)
+project (Chaste VERSION 2024.2 LANGUAGES CUDA C CXX)
 set (Chaste_VERSION_MAJOR 2024 CACHE STRING "Chaste major version number")
 set (Chaste_VERSION_MINOR 2 CACHE STRING "Chaste minor version number")
 
@@ -604,6 +604,7 @@ flamegpu_init_cuda_architectures(PROJECT Chaste)
 ## Include common rules from the FLAMEGPU/FLAMEGPU2 repositories CMake
 include(${FLAMEGPU_ROOT}/cmake/common.cmake)
 #        
+target_compile_options(flamegpu PRIVATE -Wno-error)
 target_link_libraries(Chaste_COMMON_DEPS INTERFACE flamegpu)
 
 ###########################################
