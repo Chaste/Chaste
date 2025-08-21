@@ -604,6 +604,7 @@ flamegpu_init_cuda_architectures(PROJECT Chaste)
 ## Include common rules from the FLAMEGPU/FLAMEGPU2 repositories CMake
 include(${FLAMEGPU_ROOT}/cmake/common.cmake)
 #        
+target_compile_options(flamegpu PRIVATE -Wno-error)
 target_link_libraries(Chaste_COMMON_DEPS INTERFACE flamegpu)
 
 ###########################################
