@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -269,6 +269,7 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsProble
         mpProblemDefinition(pProblemDefinition),
         mHasBath(false),
         mpMeshPair(NULL),
+        mpFineNodesCoarseNodesMeshPair(NULL),
         mNoElectricsOutput(false),
         mIsWatchedLocation(false),
         mWatchedElectricsNodeIndex(UNSIGNED_UNSET),
@@ -337,6 +338,10 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::~CardiacElectroMechanicsProbl
     delete mpElectricsProblem;
     delete mpCardiacMechSolver;
     delete mpMeshPair;
+    if (mWriteOutput)
+    {
+        delete mpFineNodesCoarseNodesMeshPair;
+    }
 
     LogFile::Close();
 }
@@ -434,6 +439,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
     unsigned num_quad_points = mpCardiacMechSolver->GetTotalNumQuadPoints();
     mInterpolatedCalciumConcs.assign(num_quad_points, 0.0);
     mInterpolatedVoltages.assign(num_quad_points, 0.0);
+    mInterpolatedVoltagesNodeWise.assign(mpMechanicsMesh->GetNumNodes(),0.0);
 
     if (mpProblemDefinition->ReadFibreSheetDirectionsFromFile())
     {
@@ -482,6 +488,21 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
         TrianglesMeshWriter<DIM,DIM> mesh_writer(mOutputDirectory,"electrics_mesh",false);
         mesh_writer.WriteFilesUsingMesh(*mpElectricsMesh);
     }
+
+    mpVtkWriter =  new VtkDeformedMeshWriter<DIM>("testing","results_",true);
+    mpVtkWriter->InitializeDeformableMesh(*mpMechanicsMesh);
+    mpVtkWriter->SetOutputBaseFileName("results_" + std::to_string(0));
+    //mpVtkWriter->AddPointData("V", mInterpolatedVoltagesNodeWise);
+    std::cout<<mInterpolatedVoltagesNodeWise.size()<<"              "<<mpMechanicsMesh->GetNumNodes()<<std::endl;
+    assert(mInterpolatedVoltagesNodeWise.size()==mpMechanicsMesh->GetNumNodes());
+    mpVtkWriter->WriteMyFiles();
+    
+    mpFineNodesCoarseNodesMeshPair = new FineCoarseMeshPair<DIM>(*mpElectricsMesh, *(mpVtkWriter->pGetDeformedMesh()));
+    mpFineNodesCoarseNodesMeshPair->SetUpBoxesOnFineMesh();
+    mpFineNodesCoarseNodesMeshPair->ComputeFineElementsAndWeightsForCoarseNodes(false);
+    mpFineNodesCoarseNodesMeshPair->DeleteFineBoxCollection();
+    assert(mpFineNodesCoarseNodesMeshPair->rGetElementsAndWeights().size()==mpMechanicsMesh->GetNumNodes());
+    
 }
 
 template<unsigned DIM, unsigned ELEC_PROB_DIM>
@@ -532,6 +553,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
                                                                "solution",
                                                                *(this->mpMechanicsMesh),
                                                                WRITE_QUADRATIC_MESH);
+
         variable_names.push_back("V");
         if (ELEC_PROB_DIM==2)
         {
@@ -760,7 +782,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         ReplicatableVector electrics_solution_repl(electrics_solution);//size=(number of electrics nodes)*ELEC_PROB_DIM
         ReplicatableVector calcium_repl(calcium_data);//size = number of electrics nodes
 
-        //interpolate values onto mechanics mesh
+        //interpolate values onto the quad points of the mechanics mesh
         for (unsigned i=0; i<mpMeshPair->rGetElementsAndWeights().size(); i++)
         {
             double interpolated_CaI = 0;
@@ -857,6 +879,30 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
             mpMechanicsSolver->WriteCurrentSpatialSolution("solution","nodes",mech_writer_counter);
 
             p_cmgui_writer->WriteDeformationPositions(rGetDeformedPosition(), counter);
+
+            
+            //VTK output. Determine voltage on coarse nodes 
+            for (unsigned i=0; i<mpFineNodesCoarseNodesMeshPair->rGetElementsAndWeights().size(); i++)
+            {
+                double interpolated_voltage = 0;
+
+                Element<DIM,DIM>& element = *(mpElectricsMesh->GetElement(mpFineNodesCoarseNodesMeshPair->rGetElementsAndWeights()[i].ElementNum));
+
+                for (unsigned node_index = 0; node_index<element.GetNumNodes(); node_index++)
+                {
+                    unsigned global_index = element.GetNodeGlobalIndex(node_index);
+                    //the following line assumes interleaved solution for ELEC_PROB_DIM>1 (e.g, [Vm_0, phi_e_0, Vm1, phi_e_1...])
+                    interpolated_voltage += electrics_solution_repl[global_index*ELEC_PROB_DIM]*mpFineNodesCoarseNodesMeshPair->rGetElementsAndWeights()[i].Weights(node_index);
+                }
+
+                assert(i<mInterpolatedVoltagesNodeWise.size());
+                mInterpolatedVoltagesNodeWise[i] = interpolated_voltage;
+            }
+            //Apply deformation solution to mechanics mesh (the one in the writer object)
+            mpVtkWriter->ApplyDeformation(rGetDeformedPosition());
+            mpVtkWriter->SetOutputBaseFileName("results_" + std::to_string(counter));
+            mpVtkWriter->AddPointData("V", mInterpolatedVoltagesNodeWise);
+            mpVtkWriter->WriteMyFiles();
 
             if (!mNoElectricsOutput)
             {

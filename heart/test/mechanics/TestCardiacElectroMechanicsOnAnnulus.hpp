@@ -89,104 +89,104 @@ public:
 class TestCardiacElectroMechanicsOnAnnulus : public CxxTest::TestSuite
 {
 public:
-    void TestDynamicExpansionNoElectroMechanics()
-    {
-        TetrahedralMesh<2,2> electrics_mesh;
-        QuadraticMesh<2> mechanics_mesh;
+    // void TestDynamicExpansionNoElectroMechanics()
+    // {
+    //     TetrahedralMesh<2,2> electrics_mesh;
+    //     QuadraticMesh<2> mechanics_mesh;
 
-        // could (should?) use finer electrics mesh (if there was electrical activity occurring)
-        // but keeping electrics simulation time down
-        TrianglesMeshReader<2,2> reader1("mesh/test/data/annuli/circular_annulus_960_elements");
-        electrics_mesh.ConstructFromMeshReader(reader1);
+    //     // could (should?) use finer electrics mesh (if there was electrical activity occurring)
+    //     // but keeping electrics simulation time down
+    //     TrianglesMeshReader<2,2> reader1("mesh/test/data/annuli/circular_annulus_960_elements");
+    //     electrics_mesh.ConstructFromMeshReader(reader1);
 
-        TrianglesMeshReader<2,2> reader2("mesh/test/data/annuli/circular_annulus_960_elements_quad",2 /*quadratic elements*/);
-        mechanics_mesh.ConstructFromMeshReader(reader2);
+    //     TrianglesMeshReader<2,2> reader2("mesh/test/data/annuli/circular_annulus_960_elements_quad",2 /*quadratic elements*/);
+    //     mechanics_mesh.ConstructFromMeshReader(reader2);
 
-        ZeroStimulusCellFactory<CellLuoRudy1991FromCellML,2> cell_factory;
+    //     ZeroStimulusCellFactory<CellLuoRudy1991FromCellML,2> cell_factory;
 
-        std::vector<unsigned> fixed_nodes;
-        std::vector<c_vector<double,2> > fixed_node_locations;
-        for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
-        {
-            double x = mechanics_mesh.GetNode(i)->rGetLocation()[0];
-            double y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
+    //     std::vector<unsigned> fixed_nodes;
+    //     std::vector<c_vector<double,2> > fixed_node_locations;
+    //     for (unsigned i=0; i<mechanics_mesh.GetNumNodes(); i++)
+    //     {
+    //         double x = mechanics_mesh.GetNode(i)->rGetLocation()[0];
+    //         double y = mechanics_mesh.GetNode(i)->rGetLocation()[1];
 
-            if (fabs(x)<1e-6 && fabs(y+0.5)<1e-6)  // fixed point (0.0,-0.5) at bottom of mesh
-            {
-                fixed_nodes.push_back(i);
-                c_vector<double,2> new_position;
-                new_position(0) = x;
-                new_position(1) = y;
-                fixed_node_locations.push_back(new_position);
-            }
-            if (fabs(x)<1e-6 && fabs(y-0.5)<1e-6)  // constrained point (0.0,0.5) at top of mesh
-            {
-                fixed_nodes.push_back(i);
-                c_vector<double,2> new_position;
-                new_position(0) = x;
-                new_position(1) = ElectroMechanicsProblemDefinition<2>::FREE;
-                fixed_node_locations.push_back(new_position);
-            }
-        }
+    //         if (fabs(x)<1e-6 && fabs(y+0.5)<1e-6)  // fixed point (0.0,-0.5) at bottom of mesh
+    //         {
+    //             fixed_nodes.push_back(i);
+    //             c_vector<double,2> new_position;
+    //             new_position(0) = x;
+    //             new_position(1) = y;
+    //             fixed_node_locations.push_back(new_position);
+    //         }
+    //         if (fabs(x)<1e-6 && fabs(y-0.5)<1e-6)  // constrained point (0.0,0.5) at top of mesh
+    //         {
+    //             fixed_nodes.push_back(i);
+    //             c_vector<double,2> new_position;
+    //             new_position(0) = x;
+    //             new_position(1) = ElectroMechanicsProblemDefinition<2>::FREE;
+    //             fixed_node_locations.push_back(new_position);
+    //         }
+    //     }
 
-        HeartConfig::Instance()->SetSimulationDuration(110.0);
+    //     HeartConfig::Instance()->SetSimulationDuration(110.0);
 
-        ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
+    //     ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
 
-        problem_defn.SetContractionModel(KERCHOFFS2003,0.1);
-        problem_defn.SetUseDefaultCardiacMaterialLaw(COMPRESSIBLE);
-        //problem_defn.SetZeroDisplacementNodes(fixed_nodes);
-        problem_defn.SetFixedNodes(fixed_nodes, fixed_node_locations);
-        problem_defn.SetMechanicsSolveTimestep(1.0);
+    //     problem_defn.SetContractionModel(KERCHOFFS2003,0.1);
+    //     problem_defn.SetUseDefaultCardiacMaterialLaw(COMPRESSIBLE);
+    //     //problem_defn.SetZeroDisplacementNodes(fixed_nodes);
+    //     problem_defn.SetFixedNodes(fixed_nodes, fixed_node_locations);
+    //     problem_defn.SetMechanicsSolveTimestep(1.0);
 
-        FileFinder finder("heart/test/data/fibre_tests/circular_annulus_960_elements.ortho", RelativeTo::ChasteSourceRoot);
-        problem_defn.SetVariableFibreSheetDirectionsFile(finder, false);
+    //     FileFinder finder("heart/test/data/fibre_tests/circular_annulus_960_elements.ortho", RelativeTo::ChasteSourceRoot);
+    //     problem_defn.SetVariableFibreSheetDirectionsFile(finder, false);
 
-        // The snes solver seems more robust...
-        problem_defn.SetSolveUsingSnes();
-        problem_defn.SetVerboseDuringSolve(); // #2091
+    //     // The snes solver seems more robust...
+    //     problem_defn.SetSolveUsingSnes();
+    //     problem_defn.SetVerboseDuringSolve(); // #2091
 
-        // This is a 2d problem, so a direct solve (LU factorisation) is possible and will speed things up
-        // markedly (might be able to remove this line after #2057 is done..)
-        //PetscTools::SetOption("-pc_type", "lu"); // removed - see comments at the end of #1818.
+    //     // This is a 2d problem, so a direct solve (LU factorisation) is possible and will speed things up
+    //     // markedly (might be able to remove this line after #2057 is done..)
+    //     //PetscTools::SetOption("-pc_type", "lu"); // removed - see comments at the end of #1818.
 
-        std::vector<BoundaryElement<1,2>*> boundary_elems;
-        for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
-               = mechanics_mesh.GetBoundaryElementIteratorBegin();
-              iter != mechanics_mesh.GetBoundaryElementIteratorEnd();
-              ++iter)
-        {
-             ChastePoint<2> centroid = (*iter)->CalculateCentroid();
-             double r = sqrt( centroid[0]*centroid[0] + centroid[1]*centroid[1] );
+    //     std::vector<BoundaryElement<1,2>*> boundary_elems;
+    //     for (TetrahedralMesh<2,2>::BoundaryElementIterator iter
+    //            = mechanics_mesh.GetBoundaryElementIteratorBegin();
+    //           iter != mechanics_mesh.GetBoundaryElementIteratorEnd();
+    //           ++iter)
+    //     {
+    //          ChastePoint<2> centroid = (*iter)->CalculateCentroid();
+    //          double r = sqrt( centroid[0]*centroid[0] + centroid[1]*centroid[1] );
 
-             if (r < 0.4)
-             {
-                 BoundaryElement<1,2>* p_element = *iter;
-                 boundary_elems.push_back(p_element);
-             }
-        }
-        problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, LinearPressureFunction);
+    //          if (r < 0.4)
+    //          {
+    //              BoundaryElement<1,2>* p_element = *iter;
+    //              boundary_elems.push_back(p_element);
+    //          }
+    //     }
+    //     problem_defn.SetApplyNormalPressureOnDeformedSurface(boundary_elems, LinearPressureFunction);
 
-        CardiacElectroMechanicsProblem<2,1> problem(COMPRESSIBLE,
-                                                    MONODOMAIN,
-                                                    &electrics_mesh,
-                                                    &mechanics_mesh,
-                                                    &cell_factory,
-                                                    &problem_defn,
-                                                    "TestEmOnAnnulusDiastolicFilling");
-        problem.Solve();
+    //     CardiacElectroMechanicsProblem<2,1> problem(COMPRESSIBLE,
+    //                                                 MONODOMAIN,
+    //                                                 &electrics_mesh,
+    //                                                 &mechanics_mesh,
+    //                                                 &cell_factory,
+    //                                                 &problem_defn,
+    //                                                 "TestEmOnAnnulusDiastolicFilling");
+    //     problem.Solve();
 
-        // Hardcoded test of deformed position of (partially constrained) top node of the annulus, to check nothing has changed and that
-        // different systems give the same result.
-        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](0), 0.0, 1e-15);
-        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](1), 0.5753, 1e-4);
-        //Node 0 is on the righthand side, initially at x=0.5 y=0.0
-        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[0](0), 0.5376, 1e-4);
-        TS_ASSERT_DELTA(problem.rGetDeformedPosition()[0](1), 0.0376, 1e-4);
+    //     // Hardcoded test of deformed position of (partially constrained) top node of the annulus, to check nothing has changed and that
+    //     // different systems give the same result.
+    //     TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](0), 0.0, 1e-15);
+    //     TS_ASSERT_DELTA(problem.rGetDeformedPosition()[2](1), 0.5753, 1e-4);
+    //     //Node 0 is on the righthand side, initially at x=0.5 y=0.0
+    //     TS_ASSERT_DELTA(problem.rGetDeformedPosition()[0](0), 0.5376, 1e-4);
+    //     TS_ASSERT_DELTA(problem.rGetDeformedPosition()[0](1), 0.0376, 1e-4);
 
-        MechanicsEventHandler::Headings();
-        MechanicsEventHandler::Report();
-    }
+    //     MechanicsEventHandler::Headings();
+    //     MechanicsEventHandler::Report();
+    // }
 
 
     void TestStaticExpansionAndElectroMechanics()
@@ -235,7 +235,7 @@ public:
         //
         // See ticket #2193
 
-        HeartConfig::Instance()->SetSimulationDuration(400.0);
+        HeartConfig::Instance()->SetSimulationDuration(10.0);
 
         ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
 

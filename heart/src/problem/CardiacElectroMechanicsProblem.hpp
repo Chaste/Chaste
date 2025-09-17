@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2024, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -51,6 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FineCoarseMeshPair.hpp"
 #include "AbstractConductivityModifier.hpp"
 #include "ElectroMechanicsProblemDefinition.hpp"
+#include "VtkDeformedMeshWriter.hpp"
 
 /**
  * Enumeration of the possible electrics problem types
@@ -129,6 +130,12 @@ protected :
      */
     std::vector<double> mInterpolatedVoltages;
 
+    /**
+     * A cache for the interpolated voltages from electrics to mechanics mesh but node-wise.
+     * Memory is allocated within Initialise(). Filled in during Solve() and used for VTK output
+     */
+    std::vector<double> mInterpolatedVoltagesNodeWise;
+
     /** The mesh for the electrics */
     TetrahedralMesh<DIM,DIM>* mpElectricsMesh;
     /** The mesh for the mechanics */
@@ -142,6 +149,8 @@ protected :
 
     /** Class wrapping both meshes, useful for transferring information */
     FineCoarseMeshPair<DIM>* mpMeshPair;
+
+    FineCoarseMeshPair<DIM>* mpFineNodesCoarseNodesMeshPair;
 
     /** Output directory, relative to TEST_OUTPUT */
     std::string mOutputDirectory;
@@ -191,7 +200,7 @@ protected :
      */
     void WriteWatchedLocationData(double time, Vec voltage);
 
-
+    VtkDeformedMeshWriter<DIM>* mpVtkWriter;
 public :
 
     /**

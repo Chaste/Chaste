@@ -107,6 +107,8 @@ private:
      */
     void AugmentCellData();
 
+    bool mInitialized;
+
 public:
 
     /**

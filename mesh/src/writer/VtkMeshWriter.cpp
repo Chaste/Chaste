@@ -58,6 +58,8 @@ VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::VtkMeshWriter(const std::string& rDirecto
 
     // Dubious, since we shouldn't yet know what any details of the mesh are.
     mpVtkUnstructedMesh = vtkUnstructuredGrid::New();
+
+    mInitialized=false;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -86,53 +88,57 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
     mpVtkUnstructedMesh->SetPoints(p_pts);
     p_pts->Delete(); //Reference counted
 
-    //Construct elements aka Cells
-    for (unsigned item_num=0; item_num<this->GetNumElements(); item_num++)
+    if (mInitialized == false)
     {
-        std::vector<unsigned> current_element = this->GetNextElement().NodeIndices; // this->mElementData[item_num];
+        //Construct elements aka Cells
+        for (unsigned item_num=0; item_num<this->GetNumElements(); item_num++)
+        {
+            std::vector<unsigned> current_element = this->GetNextElement().NodeIndices; // this->mElementData[item_num];
 
-        assert((current_element.size() == ELEMENT_DIM + 1) || (current_element.size() == (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2));
+            assert((current_element.size() == ELEMENT_DIM + 1) || (current_element.size() == (ELEMENT_DIM+1)*(ELEMENT_DIM+2)/2));
 
-        vtkCell* p_cell=nullptr;
-        if (ELEMENT_DIM == 3 && current_element.size() == 4)
-        {
-            p_cell = vtkTetra::New();
-        }
-        else if (ELEMENT_DIM == 3 && current_element.size() == 10)
-        {
-            p_cell = vtkQuadraticTetra::New();
-        }
-        else if (ELEMENT_DIM == 2 && current_element.size() == 3)
-        {
-            p_cell = vtkTriangle::New();
-        }
-        else if (ELEMENT_DIM == 2 && current_element.size() == 6)
-        {
-            p_cell = vtkQuadraticTriangle::New();
-        }
-        else if (ELEMENT_DIM == 1)
-        {
-            p_cell = vtkLine::New();
-        }
+            vtkCell* p_cell=nullptr;
+            if (ELEMENT_DIM == 3 && current_element.size() == 4)
+            {
+                p_cell = vtkTetra::New();
+            }
+            else if (ELEMENT_DIM == 3 && current_element.size() == 10)
+            {
+                p_cell = vtkQuadraticTetra::New();
+            }
+            else if (ELEMENT_DIM == 2 && current_element.size() == 3)
+            {
+                p_cell = vtkTriangle::New();
+            }
+            else if (ELEMENT_DIM == 2 && current_element.size() == 6)
+            {
+                p_cell = vtkQuadraticTriangle::New();
+            }
+            else if (ELEMENT_DIM == 1)
+            {
+                p_cell = vtkLine::New();
+            }
 
-        //Set the linear nodes
-        vtkIdList* p_cell_id_list = p_cell->GetPointIds();
-        for (unsigned j = 0; j < current_element.size(); ++j)
-        {
-            p_cell_id_list->SetId(j, current_element[j]);
-        }
+            //Set the linear nodes
+            vtkIdList* p_cell_id_list = p_cell->GetPointIds();
+            for (unsigned j = 0; j < current_element.size(); ++j)
+            {
+                p_cell_id_list->SetId(j, current_element[j]);
+            }
 
-        //VTK defines the node ordering in quadratic triangles differently to Chaste, so they must be treated as a special case
-        if (SPACE_DIM == 2 && current_element.size() == 6)
-        {
-            p_cell_id_list->SetId(3, current_element[5]);
-            p_cell_id_list->SetId(4, current_element[3]);
-            p_cell_id_list->SetId(5, current_element[4]);
-        }
+            //VTK defines the node ordering in quadratic triangles differently to Chaste, so they must be treated as a special case
+            if (SPACE_DIM == 2 && current_element.size() == 6)
+            {
+                p_cell_id_list->SetId(3, current_element[5]);
+                p_cell_id_list->SetId(4, current_element[3]);
+                p_cell_id_list->SetId(5, current_element[4]);
+            }
 
-        mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
-        p_cell->Delete(); //Reference counted
+            mpVtkUnstructedMesh->InsertNextCell(p_cell->GetCellType(), p_cell_id_list);
+            p_cell->Delete(); //Reference counted
+        }
     }
+    mInitialized=true;
 
     if (SPACE_DIM > 1)
     {
@@ -167,6 +173,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
         AddCellData("Cable radius", radii);
 
     }
+
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
