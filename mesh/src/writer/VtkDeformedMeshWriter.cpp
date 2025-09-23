@@ -34,23 +34,27 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "VtkDeformedMeshWriter.hpp"
-
+#include "DistributedTetrahedralMesh.hpp"
+#include "TetrahedralMesh.hpp"
 
 template<unsigned DIM>
-VtkDeformedMeshWriter<DIM>::VtkDeformedMeshWriter(
+VtkDeformedMeshWriter<DIM>::VtkDeformedMeshWriter(AbstractTetrahedralMesh<DIM,DIM>* pDeformedOutputMesh, 
     const std::string& rDirectory, 
     const std::string& rBaseName, 
     const bool& rCleanDirectory)
     : VtkMeshWriter<DIM,DIM>(rDirectory,rBaseName,rCleanDirectory)
 {
-
-}
-
-template<unsigned DIM>
-void VtkDeformedMeshWriter<DIM>::InitializeDeformableMesh(QuadraticMesh<DIM>& rQuadMesh)
-{
-    mpDeformedMesh = new QuadraticMesh<DIM>();
-    mpDeformedMesh->ConstructFromMesh(rQuadMesh);
+    // if (PetscTools::IsSequential())
+    // {
+        mpDeformedMesh = new TetrahedralMesh<DIM,DIM>();
+   // }
+    // else
+    // {
+    //     mpDeformedMesh = new DistributedTetrahedralMesh<DIM,DIM>();
+    //     this->SetParallelFiles(*mpDeformedMesh);
+    // }
+    
+    mpDeformedMesh->ConstructFromMesh(*pDeformedOutputMesh);
 }
 
 template<unsigned DIM>
@@ -60,24 +64,34 @@ void VtkDeformedMeshWriter<DIM>::SetOutputBaseFileName(const std::string& rOutpu
 }
 
 template<unsigned DIM>
-void VtkDeformedMeshWriter<DIM>::WriteMyFiles()
+void VtkDeformedMeshWriter<DIM>::WriteDeformedFiles()
 {
     this->WriteFilesUsingMesh(*mpDeformedMesh);
 }
 
 template<unsigned DIM>
-QuadraticMesh<DIM>* VtkDeformedMeshWriter<DIM>::pGetDeformedMesh()
-{
-    return mpDeformedMesh;
-}
-
-template<unsigned DIM>
 void VtkDeformedMeshWriter<DIM>::ApplyDeformation(std::vector<c_vector<double,DIM> >& rPositions)
 {
-    for (unsigned index=0; index<mpDeformedMesh->GetNumNodes(); index++)
+    // for (typename AbstractMesh<DIM,DIM>::NodeIterator node_iter = mpDeformedMesh->GetNodeIteratorBegin();
+    //      node_iter != mpDeformedMesh->GetNodeIteratorEnd();
+    //      ++node_iter)
+    for (unsigned node_index = 0u; node_index<rPositions.size();++node_index)
     {
-        ChastePoint<DIM> new_position(rPositions[index]);
-        mpDeformedMesh->GetNode(index)->SetPoint(new_position);
+        ChastePoint<DIM> new_position(rPositions[node_index]);
+        try{
+            //The next line will change node coordinates. 
+            //Note that we do not update element Jacobians (and related quantities)
+            //as this mesh is used only in this class for visualization purposes.
+            mpDeformedMesh->GetNode(node_index)->SetPoint(new_position);
+        }
+        // LCOV_EXCL_START
+        catch (Exception& e)
+        {
+            //PetscTools::ReplicateException(true);
+            //throw e;
+
+        }
+        // LCOV_EXCL_STOP
     }
 }
 // Explicit instantiation

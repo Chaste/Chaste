@@ -38,11 +38,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _TESTXMLMESHWRITERS_HPP_
 
 #include <cxxtest/TestSuite.h>
+#include "UblasCustomFunctions.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "TrianglesMeshWriter.hpp"
 #include "OutputFileHandler.hpp"
 #include "TetrahedralMesh.hpp"
 #include "VtkMeshWriter.hpp"
+#include "VtkDeformedMeshWriter.hpp"
 #include "XdmfMeshWriter.hpp"
 #include "DistributedTetrahedralMesh.hpp"
 #include "MixedDimensionMesh.hpp"
@@ -431,6 +433,162 @@ public:
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_VTK
     }
+
+
+
+
+
+
+
+
+
+
+
+
+    void TestDeformedVtkMeshWriter2D()
+    {
+#ifdef CHASTE_VTK
+// Requires  "sudo aptitude install libvtk5-dev" or similar
+        TrianglesMeshReader<2,2> reader("mesh/test/data/2D_0_to_1mm_200_elements");
+        TetrahedralMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(reader);
+        
+        std::string base_name = "2Dmesh";
+        //First, we test "standard functionality" with an undeformed mesh
+        VtkDeformedMeshWriter<2> writer(&mesh,"TestDeformedVtkMeshWriter", base_name, true);
+
+        // Add distance from origin into the node "point" data
+        std::vector<double> distance;
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            distance.push_back(norm_2(mesh.GetNode(i)->rGetLocation()));
+        }
+        writer.AddPointData("Distance from origin", distance);
+
+
+        // Add element quality into the element "cell" data
+        std::vector<double> quality;
+        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        {
+            quality.push_back(mesh.GetElement(i)->CalculateQuality());
+        }
+        writer.AddCellData("Quality", quality);
+
+        writer.WriteDeformedFiles();
+        {
+            // Check that the reader can see it
+            VtkMeshReader<2,2> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + "TestDeformedVtkMeshWriter/"+base_name+".vtu");
+            TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mesh.GetNumNodes());
+            TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mesh.GetNumElements());
+
+            // Check that it has the correct data
+            std::vector<double> distance_read;
+            vtk_reader.GetPointData("Distance from origin", distance_read);
+            for (unsigned i=0; i<distance_read.size(); i++)
+            {
+                TS_ASSERT_EQUALS(distance[i], distance_read[i]);
+            }
+
+            std::vector<double> quality_read;
+            vtk_reader.GetCellData("Quality", quality_read);
+            for (unsigned i=0; i<quality_read.size(); i++)
+            {
+                TS_ASSERT_EQUALS(quality[i], quality_read[i]);
+            }
+        }
+
+        //Next, we apply a deformation
+        std::vector<c_vector<double,2> > deformed_positions;
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            deformed_positions.push_back(mesh.GetNode(i)->rGetLocation());
+        }
+        //We change the location of the first node -> deformed to -1, -0.5
+        deformed_positions[0] = Create_c_vector(-1.0,-0.5);
+        writer.ApplyDeformation(deformed_positions);
+        writer.SetOutputBaseFileName(base_name+"_1");//do not overwrite the previous file
+        writer.SetWriteMeshCells(false);//Write already called. No need to write cells any longer
+
+        // Add some different data on the deformed mesh
+        std::vector<double> distance_2;
+        for (unsigned i=0; i<mesh.GetNumNodes(); i++)
+        {
+            distance_2.push_back(norm_2(mesh.GetNode(i)->rGetLocation())+1.0);//adding +1.0 to make it different
+        }
+        writer.AddPointData("Distance from origin", distance_2);
+
+        // Add element quality into the element "cell" data, but different from the previous file
+        std::vector<double> quality_2;
+        for (unsigned i=0; i<mesh.GetNumElements(); i++)
+        {
+            quality_2.push_back(mesh.GetElement(i)->CalculateQuality()+1.0);//adding +1.0 to make it different
+        }
+        writer.AddCellData("Quality", quality_2);
+
+        writer.WriteDeformedFiles();
+
+        {
+            // Check that the reader can see it
+            VtkMeshReader<2,2> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + "TestDeformedVtkMeshWriter/"+base_name+"_1.vtu");
+            TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mesh.GetNumNodes());
+            TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mesh.GetNumElements());
+
+            //check the deformed node (the first)...
+            std::vector<double> first_node = vtk_reader.GetNextNode();
+            TS_ASSERT_EQUALS(first_node.size(),3);//the GetNextNode always fills up 3 coordinates regardless of SPACE_DIM (not sure why)
+            TS_ASSERT_DELTA(first_node[0],-1.0,1e-9);
+            TS_ASSERT_DELTA(first_node[1],-0.5,1e-9);
+
+            //...others untouched, start the loop at 1
+            for (unsigned i = 1u; i < mesh.GetNumNodes(); ++i)
+            {
+                std::vector<double> next_node = vtk_reader.GetNextNode();
+                TS_ASSERT_EQUALS(next_node.size(),3);//the GetNextNode always fills up 3 coordinates regardless of SPACE_DIM (not sure why)
+                TS_ASSERT_DELTA(next_node[0],mesh.GetNode(i)->rGetLocation()[0],1e-9);
+                TS_ASSERT_DELTA(next_node[1],mesh.GetNode(i)->rGetLocation()[1],1e-9);
+            }
+
+            // Check that it has the correct data
+            std::vector<double> distance_read;
+            vtk_reader.GetPointData("Distance from origin", distance_read);
+            for (unsigned i=0; i<distance_read.size(); i++)
+            {
+                TS_ASSERT_EQUALS(distance_2[i], distance_read[i]);
+            }
+
+            std::vector<double> quality_read;
+            vtk_reader.GetCellData("Quality", quality_read);
+            for (unsigned i=0; i<quality_read.size(); i++)
+            {
+                TS_ASSERT_EQUALS(quality_2[i], quality_read[i]);
+            }
+        }
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
+#endif //CHASTE_VTK
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     void TestParallelVtkMeshWriter1d()
     {

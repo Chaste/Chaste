@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstring> 
 #include "VtkMeshWriter.hpp"
-#include "QuadraticMesh.hpp"
+#include "AbstractTetrahedralMesh.hpp"
 
 /**
  *  \
@@ -52,7 +52,7 @@ private:
 
 
     /** Pointer to the deformed mesh, used only for output here */
-    QuadraticMesh<DIM>* mpDeformedMesh;
+    AbstractTetrahedralMesh<DIM,DIM>* mpDeformedMesh;
 
 
 public:
@@ -61,17 +61,13 @@ public:
      *  Constructor
      *  @param 
      */
-    VtkDeformedMeshWriter(const std::string& rDirectory, const std::string& rBaseName, const bool& rCleanDirectory=true);
+    VtkDeformedMeshWriter(AbstractTetrahedralMesh<DIM,DIM>* pDeformedOutputMesh, const std::string& rDirectory, const std::string& rBaseName, const bool& rCleanDirectory=true);
 
     void SetOutputBaseFileName(const std::string& rOutputBaseFileName);
 
-    QuadraticMesh<DIM>* pGetDeformedMesh();
-    
-    void WriteMyFiles();
+    void WriteDeformedFiles();
 
     void ApplyDeformation(std::vector<c_vector<double,DIM> >& rPositions);
-
-    void InitializeDeformableMesh(QuadraticMesh<DIM>& rQuadMesh);
 };
 
 #endif // VTKNONLINEARELASTICITYSOLUTIONWRITER_HPP_

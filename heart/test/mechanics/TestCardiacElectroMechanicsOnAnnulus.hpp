@@ -235,7 +235,7 @@ public:
         //
         // See ticket #2193
 
-        HeartConfig::Instance()->SetSimulationDuration(10.0);
+        HeartConfig::Instance()->SetSimulationDuration(12.0);
 
         ElectroMechanicsProblemDefinition<2> problem_defn(mechanics_mesh);
 

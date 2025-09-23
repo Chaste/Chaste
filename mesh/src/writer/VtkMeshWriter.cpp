@@ -52,14 +52,15 @@ VtkMeshWriter<ELEMENT_DIM, SPACE_DIM>::VtkMeshWriter(const std::string& rDirecto
                      const std::string& rBaseName,
                      const bool& rCleanDirectory)
     : AbstractTetrahedralMeshWriter<ELEMENT_DIM, SPACE_DIM>(rDirectory, rBaseName, rCleanDirectory),
-      mWriteParallelFiles(false)
+      mWriteParallelFiles(false),
+      mWriteMeshCells(true)
 {
     this->mIndexFromZero = true;
 
     // Dubious, since we shouldn't yet know what any details of the mesh are.
     mpVtkUnstructedMesh = vtkUnstructuredGrid::New();
 
-    mInitialized=false;
+    
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -88,7 +89,7 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
     mpVtkUnstructedMesh->SetPoints(p_pts);
     p_pts->Delete(); //Reference counted
 
-    if (mInitialized == false)
+    if (mWriteMeshCells == true)
     {
         //Construct elements aka Cells
         for (unsigned item_num=0; item_num<this->GetNumElements(); item_num++)
@@ -138,7 +139,6 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
             p_cell->Delete(); //Reference counted
         }
     }
-    mInitialized=true;
 
     if (SPACE_DIM > 1)
     {
@@ -174,6 +174,12 @@ void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::MakeVtkMesh()
 
     }
 
+}
+
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VtkMeshWriter<ELEMENT_DIM,SPACE_DIM>::SetWriteMeshCells(bool writeMeshCells)
+{
+    mWriteMeshCells = writeMeshCells;
 }
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>

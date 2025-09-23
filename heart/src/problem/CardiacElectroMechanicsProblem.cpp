@@ -489,15 +489,14 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
         mesh_writer.WriteFilesUsingMesh(*mpElectricsMesh);
     }
 
-    mpVtkWriter =  new VtkDeformedMeshWriter<DIM>("testing","results_",true);
-    mpVtkWriter->InitializeDeformableMesh(*mpMechanicsMesh);
+    mpVtkWriter =  new VtkDeformedMeshWriter<DIM>(mpMechanicsMesh, "testing","results_",true);
     mpVtkWriter->SetOutputBaseFileName("results_" + std::to_string(0));
-    //mpVtkWriter->AddPointData("V", mInterpolatedVoltagesNodeWise);
+    mpVtkWriter->AddPointData("V", mInterpolatedVoltagesNodeWise);
     std::cout<<mInterpolatedVoltagesNodeWise.size()<<"              "<<mpMechanicsMesh->GetNumNodes()<<std::endl;
     assert(mInterpolatedVoltagesNodeWise.size()==mpMechanicsMesh->GetNumNodes());
-    mpVtkWriter->WriteMyFiles();
+    mpVtkWriter->WriteDeformedFiles();
     
-    mpFineNodesCoarseNodesMeshPair = new FineCoarseMeshPair<DIM>(*mpElectricsMesh, *(mpVtkWriter->pGetDeformedMesh()));
+    mpFineNodesCoarseNodesMeshPair = new FineCoarseMeshPair<DIM>(*mpElectricsMesh, *mpMechanicsMesh);
     mpFineNodesCoarseNodesMeshPair->SetUpBoxesOnFineMesh();
     mpFineNodesCoarseNodesMeshPair->ComputeFineElementsAndWeightsForCoarseNodes(false);
     mpFineNodesCoarseNodesMeshPair->DeleteFineBoxCollection();
@@ -901,8 +900,9 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
             //Apply deformation solution to mechanics mesh (the one in the writer object)
             mpVtkWriter->ApplyDeformation(rGetDeformedPosition());
             mpVtkWriter->SetOutputBaseFileName("results_" + std::to_string(counter));
+            mpVtkWriter->SetWriteMeshCells(false);
             mpVtkWriter->AddPointData("V", mInterpolatedVoltagesNodeWise);
-            mpVtkWriter->WriteMyFiles();
+            mpVtkWriter->WriteDeformedFiles();
 
             if (!mNoElectricsOutput)
             {
