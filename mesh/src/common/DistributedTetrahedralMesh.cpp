@@ -82,7 +82,7 @@ DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::DistributedTetrahedralMesh(D
 {
     if (ELEMENT_DIM == 1 && (partitioningMethod != DistributedTetrahedralMeshPartitionType::GEOMETRIC))
     {
-        //No METIS partition is possible - revert to DUMB
+        //No partition is possible - revert to DUMB
         mPartitioning = DistributedTetrahedralMeshPartitionType::DUMB;
     }
 }
@@ -113,8 +113,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
 {
     if (mPartitioning == DistributedTetrahedralMeshPartitionType::METIS_LIBRARY)
     {
-        WARNING("METIS partitioning is deprecated.  Switching to parMETIS");
-        mPartitioning = DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY;
+        EXCEPTION("METIS partitioning is deprecated.");
     }
     if (mPartitioning == DistributedTetrahedralMeshPartitionType::PETSC_MAT_PARTITION && !PetscTools::HasParMetis())
     {
@@ -1313,7 +1312,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
         std::vector<unsigned>& rProcessorsOffset)
 {
     assert(PetscTools::IsParallel());
-    assert(ELEMENT_DIM==2 || ELEMENT_DIM==3); // LCOV_EXCL_LINE // Metis works with triangles and tetras
+    assert(ELEMENT_DIM==2 || ELEMENT_DIM==3); // LCOV_EXCL_LINE // Partitioning works with triangles and tetras
 
     const unsigned num_elements = rMeshReader.GetNumElements();
     const unsigned num_procs = PetscTools::GetNumProcs();
@@ -1377,7 +1376,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
 
     rMeshReader.Reset();
 
-    idxtype numflag = 0; // METIS speak for C-style numbering
+    idxtype numflag = 0; // ParMETIS speak for C-style numbering
     /* Connectivity degree.
      * Specifically, an GRAPH EDGE is placed between any two elements if and only if they share
      * at least this many nodes.

@@ -136,7 +136,6 @@ public:
 
     /**
      * Specify the node distribution across processes.
-     * This also makes sure we don't try to use METIS to partition the mesh.
      *
      * @param pFactory a factory to use for this mesh
      */
