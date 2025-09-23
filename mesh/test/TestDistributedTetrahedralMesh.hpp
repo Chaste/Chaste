@@ -733,6 +733,7 @@ public:
             TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), mesh_reader.GetNumFaces());
 
             CheckEverythingIsAssigned<3,3>(mesh);
+            num_local_nodes_parmetis = mesh.GetNumLocalNodes();
         }
 
         unsigned max_local_nodes_petsc_parmetis;
@@ -748,7 +749,8 @@ public:
         }
         PetscTools::Barrier();
 
-        TS_ASSERT(num_local_nodes_petsc_parmetis <= max_local_nodes_parmetis);
+        TS_ASSERT(max_local_nodes_parmetis != 0u);
+        TS_ASSERT_LESS_THAN_EQUALS(num_local_nodes_petsc_parmetis, max_local_nodes_parmetis);
         //Watch out for dumb partition and warn about it
         if (PetscTools::IsParallel())
         {
