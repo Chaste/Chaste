@@ -59,12 +59,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "petscao.h"
 #include <parmetis.h>
-#if (PARMETIS_MAJOR_VERSION >= 4) //ParMETIS 4.x and above
-//Redefine the index type so that we can still use the old name "idxtype"
-#define idxtype idx_t
-#else
-//Old version of ParMETIS used "float" which may appear elsewhere in, for example, tetgen
-#define real_t float
+#if PARMETIS_MAJOR_VERSION != 4
+#error "ParMETIS version is not supported. Please use version 4."
 #endif
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -1321,7 +1317,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     /*
      *  Work out initial element distribution
      */
-    boost::scoped_array<idxtype> element_distribution(new idxtype[num_procs+1]);
+    boost::scoped_array<idx_t> element_distribution(new idx_t[num_procs+1]);
     boost::scoped_array<int> element_counts(new int[num_procs]);
 
     element_distribution[0] = 0;
@@ -1338,12 +1334,12 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     /*
      *  Create distributed mesh data structure
      */
-    idxtype first_local_element = element_distribution[local_proc_index];
-    idxtype last_plus_one_element = element_distribution[local_proc_index+1];
-    idxtype num_local_elements = last_plus_one_element - first_local_element;
+    idx_t first_local_element = element_distribution[local_proc_index];
+    idx_t last_plus_one_element = element_distribution[local_proc_index+1];
+    idx_t num_local_elements = last_plus_one_element - first_local_element;
 
-    boost::scoped_array<idxtype> eind(new idxtype[num_local_elements*(ELEMENT_DIM+1)]);
-    boost::scoped_array<idxtype> eptr(new idxtype[num_local_elements+1]);
+    boost::scoped_array<idx_t> eind(new idx_t[num_local_elements*(ELEMENT_DIM+1)]);
+    boost::scoped_array<idx_t> eptr(new idx_t[num_local_elements+1]);
 
     if (rMeshReader.IsFileFormatBinary() && first_local_element > 0)
     {
@@ -1353,14 +1349,14 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     else
     {
         // Advance the file pointer to the first element before the ones I own.
-        for (idxtype element_index = 0; element_index < first_local_element; element_index++)
+        for (idx_t element_index = 0; element_index < first_local_element; element_index++)
         {
             rMeshReader.GetNextElementData();
         }
     }
 
     unsigned counter = 0;
-    for (idxtype element_index = 0; element_index < num_local_elements; element_index++)
+    for (idx_t element_index = 0; element_index < num_local_elements; element_index++)
     {
         ElementData element_data;
 
@@ -1376,7 +1372,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
 
     rMeshReader.Reset();
 
-    idxtype numflag = 0; // ParMETIS speak for C-style numbering
+    idx_t numflag = 0; // ParMETIS speak for C-style numbering
     /* Connectivity degree.
      * Specifically, an GRAPH EDGE is placed between any two elements if and only if they share
      * at least this many nodes.
@@ -1384,7 +1380,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
      * Manual recommends "for meshes containing only triangular, tetrahedral,
      * hexahedral, or rectangular elements, this parameter can be set to two, three, four, or two, respectively.
      */
-    idxtype ncommonnodes = 3; //Linear tetrahedra
+    idx_t ncommonnodes = 3; //Linear tetrahedra
     if (ELEMENT_DIM == 2)
     {
         ncommonnodes = 2;
@@ -1392,8 +1388,8 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
 
     MPI_Comm communicator = PETSC_COMM_WORLD;
 
-    idxtype* xadj;
-    idxtype* adjncy;
+    idx_t* xadj;
+    idx_t* adjncy;
 
     Timer::Reset();
     ParMETIS_V3_Mesh2Dual(element_distribution.get(), eptr.get(), eind.get(),
@@ -1404,19 +1400,19 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     eind.reset();
     eptr.reset();
 
-    idxtype weight_flag = 0; // unweighted graph
-    idxtype n_constraints = 1; // number of weights that each vertex has (number of balance constraints)
-    idxtype n_subdomains = PetscTools::GetNumProcs();
-    idxtype options[3]; // extra options
+    idx_t weight_flag = 0; // unweighted graph
+    idx_t n_constraints = 1; // number of weights that each vertex has (number of balance constraints)
+    idx_t n_subdomains = PetscTools::GetNumProcs();
+    idx_t options[3]; // extra options
     options[0] = 0; // ignore extra options
-    idxtype edgecut;
+    idx_t edgecut;
     boost::scoped_array<real_t> tpwgts(new real_t[n_subdomains]);
     real_t ubvec_value = (real_t)1.05;
     for (unsigned proc=0; proc<PetscTools::GetNumProcs(); proc++)
     {
         tpwgts[proc] = ((real_t)1.0)/n_subdomains;
     }
-    boost::scoped_array<idxtype> local_partition(new idxtype[num_local_elements]);
+    boost::scoped_array<idx_t> local_partition(new idx_t[num_local_elements]);
 
 /*
  *  In order to use ParMETIS_V3_PartGeomKway, we need to sort out how to compute the coordinates of the
@@ -1438,21 +1434,21 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     //Timer::Print("ParMETIS PartKway");
     tpwgts.reset();
 
-    boost::scoped_array<idxtype> global_element_partition(new idxtype[num_elements]);
+    boost::scoped_array<idx_t> global_element_partition(new idx_t[num_elements]);
 
-    //idxtype is normally int (see metis-4.0/Lib/struct.h 17-22) but is 64bit on Windows
-    MPI_Datatype mpi_idxtype = MPI_LONG_LONG_INT;
-    if (sizeof(idxtype) == sizeof(int))
+    //idx_t is normally int (see metis-4.0/Lib/struct.h 17-22) but is 64bit on Windows
+    MPI_Datatype mpi_idx_t = MPI_LONG_LONG_INT;
+    if (sizeof(idx_t) == sizeof(int))
     {
-        mpi_idxtype = MPI_INT;
+        mpi_idx_t = MPI_INT;
     }
     boost::scoped_array<int> int_element_distribution(new int[num_procs+1]);
     for (unsigned i=0; i<num_procs+1; ++i)
     {
         int_element_distribution[i] = element_distribution[i];
     }
-    MPI_Allgatherv(local_partition.get(), num_local_elements, mpi_idxtype,
-                   global_element_partition.get(), element_counts.get(), int_element_distribution.get(), mpi_idxtype, PETSC_COMM_WORLD);
+    MPI_Allgatherv(local_partition.get(), num_local_elements, mpi_idx_t,
+                   global_element_partition.get(), element_counts.get(), int_element_distribution.get(), mpi_idx_t, PETSC_COMM_WORLD);
 
     local_partition.reset();
 
