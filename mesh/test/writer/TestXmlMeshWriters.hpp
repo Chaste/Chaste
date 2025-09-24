@@ -434,17 +434,6 @@ public:
 #endif //CHASTE_VTK
     }
 
-
-
-
-
-
-
-
-
-
-
-
     void TestDeformedVtkMeshWriter2D()
     {
 #ifdef CHASTE_VTK
@@ -475,6 +464,7 @@ public:
         writer.AddCellData("Quality", quality);
 
         writer.WriteDeformedFiles();
+        
         {
             // Check that the reader can see it
             VtkMeshReader<2,2> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + "TestDeformedVtkMeshWriter/"+base_name+".vtu");
@@ -527,6 +517,8 @@ public:
 
         writer.WriteDeformedFiles();
 
+        PetscTools::Barrier("Wait for files to be written");
+
         {
             // Check that the reader can see it
             VtkMeshReader<2,2> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + "TestDeformedVtkMeshWriter/"+base_name+"_1.vtu");
@@ -563,32 +555,15 @@ public:
                 TS_ASSERT_EQUALS(quality_2[i], quality_read[i]);
             }
         }
+        //coverage. Try apply a deformed vector with wrong size (empty in tis case)
+        std::vector<c_vector<double,2> > empty = {};
+        TS_ASSERT_THROWS_THIS(writer.ApplyDeformation(empty), 
+        "Deformed positions vector has 0 elements. The mesh has 121 nodes. The two must be the same.");
 #else
         std::cout << "This test was not run, as VTK is not enabled." << std::endl;
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
 #endif //CHASTE_VTK
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     void TestParallelVtkMeshWriter1d()
     {

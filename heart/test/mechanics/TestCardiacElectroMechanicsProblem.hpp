@@ -650,6 +650,7 @@ public:
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 
         HeartConfig::Instance()->SetSimulationDuration(20.0);
+        HeartConfig::Instance()->SetVisualizeWithVtk(true);
 
         CardiacElectroMechProbRegularGeom<2> problem(INCOMPRESSIBLE,
                                                      0.05, /* width (cm) */

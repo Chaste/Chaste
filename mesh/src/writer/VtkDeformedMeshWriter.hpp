@@ -33,41 +33,98 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef VtkDeformedMeshWriter_HPP_
-#define VtkDeformedMeshWriter_HPP_
+#ifndef VTKDEFORMEDMESHWRITER_HPP_
+#define VTKDEFORMEDMESHWRITER_HPP_
+
+#ifdef CHASTE_VTK
 
 #include <cstring> 
 #include "VtkMeshWriter.hpp"
 #include "AbstractTetrahedralMesh.hpp"
 
 /**
- *  \
+ * A class to write meshes in VTK format, allowing for specification of 
+ * a new set of node positions ("deformed mesh") and a new file name.
+ * The mesh that is passed in the constructor is not actually changed by this class
+ * Instead, a copy is made internally here (with unfortunate memory footprint), and the 
+ * internal copy is used for modifying nide locations and printing out files.
+ * 
+ * This class was designed with time-dependent simulations in mind, where,
+ * at every time step, one may want to write out a mesh that is being
+ * deformed in the time loop.
+ * 
+ * Typical usage:
+ *
+ *  VtkDeformedMeshWriter<DIM> writer(...);
+ *  //write undeformed mesh
+ *  writer.AddPointData("name of node-wise data", some_data);
+ *  writer.AddCellData("name of element-wise data", other_data);
+ *  writer.WriteDeformedFiles();
+ *
+ *  //apply deformation - lines below could be in a time loop
+ *  writer.ApplyDeformation(new_node_locations);
+ *  writer.SetWriteMeshCells(false); //cells have been alreday written
+ *  writer.SetOutputBaseFileName(new_name);//do not overwrite the previous file
+ *  writer.WriteDeformedFiles();      
  */
 template<unsigned DIM>
 class VtkDeformedMeshWriter : public VtkMeshWriter<DIM,DIM>
 {
 
-
 private:
 
-
-    /** Pointer to the deformed mesh, used only for output here */
+    /** 
+     * Pointer to the deformed mesh, used only for output here. 
+     * Initialized to a new mesh object and constructed upon construction of this writer object
+     */
     AbstractTetrahedralMesh<DIM,DIM>* mpDeformedMesh;
-
 
 public:
 
     /**
-     *  Constructor
-     *  @param 
+     * Constructor
+     * 
+     * @param pDeformedOutputMesh a pointer to the mesh object. Note that a copy of this mesh will be created within 
+     *                            the constructor.
+     * @param rDirectory  the directory in which to write the mesh to file
+     * @param rBaseName  the base name of the files in which to write the mesh data
+     * @param rCleanDirectory  whether to clean the directory (defaults to true)
      */
     VtkDeformedMeshWriter(AbstractTetrahedralMesh<DIM,DIM>* pDeformedOutputMesh, const std::string& rDirectory, const std::string& rBaseName, const bool& rCleanDirectory=true);
 
+    /**
+     * Destructor.
+     */
+    ~VtkDeformedMeshWriter();
+
+    /**
+     * Set the new file name to be used the next time WriteDeformedFiles() is called.
+     * The output file will then be rOutputBaseFileName.vtu
+     * 
+     * @param rOutputBaseFileName the base name of the next output file (".vtu" will be added)
+     */
     void SetOutputBaseFileName(const std::string& rOutputBaseFileName);
 
+
+    /**
+     * Write the VTK files using the internal mesh, with any deformation that has been applied.
+     * Internally, it calls WriteFilesUsingMesh().
+     * The output file name will be based on the latest call to SetOutputBaseFileName,
+     * or, if SetOutputBaseFileName was not called, the constructor parameter rBaseName
+     */
     void WriteDeformedFiles();
 
-    void ApplyDeformation(std::vector<c_vector<double,DIM> >& rPositions);
+    /**
+     * Modify the node locations of the mesh bya ssigning the coordinates
+     * according to rPositions. Note that only node coordinates are changed 
+     * (no Jacobians or othe rrelated quantities are modified)
+     * 
+     * @param rPositions the node positions to be applied to the mesh
+     */
+    void ApplyDeformation(const std::vector<c_vector<double,DIM> >& rPositions);
 };
 
-#endif // VTKNONLINEARELASTICITYSOLUTIONWRITER_HPP_
+#endif //CHASTE_VTK
+
+#endif /*VTKDEFORMEDMESHWRITER_HPP_*/
+
