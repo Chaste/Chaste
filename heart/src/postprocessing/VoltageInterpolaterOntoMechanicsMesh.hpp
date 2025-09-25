@@ -73,6 +73,11 @@ public:
      */
     VoltageInterpolaterOntoMechanicsMesh(TetrahedralMesh<DIM,DIM>& rElectricsMesh,
                                          QuadraticMesh<DIM>& rMechanicsMesh);
+
+    /**
+     * Destructor. 
+     */
+    ~VoltageInterpolaterOntoMechanicsMesh();
     
     /**
      * Does the actual interpolation. 
