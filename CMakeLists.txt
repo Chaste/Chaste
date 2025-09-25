@@ -527,7 +527,7 @@ endif ()
 
 
 ################################
-####  Find ParMETIS and METIS
+####  Find ParMETIS 
 ################################
 # If we're using PETSc's ParMETIS (ON by default, for more reliable MPI compatibility), override PARMETIS_ROOT accordingly
 if (Chaste_USE_PETSC_PARMETIS)
