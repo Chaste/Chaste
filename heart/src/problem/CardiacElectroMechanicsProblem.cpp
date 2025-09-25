@@ -965,12 +965,6 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 //                                                              "voltage", mpElectricsMesh,
 //                                                                HeartConfig::Instance()->GetOutputUsingOriginalNodeOrdering(),
 //                                                                HeartConfig::Instance()->GetVisualizerOutputPrecision() );
-
-        // convert output to CMGUI format
-        Hdf5ToCmguiConverter<DIM,DIM> cmgui_converter(FileFinder(input_dir, RelativeTo::ChasteTestOutput),
-                                                      "voltage", mpElectricsMesh, mHasBath,
-                                                      HeartConfig::Instance()->GetVisualizerOutputPrecision());
-
         // Write mesh in a suitable form for meshalyzer
         //std::string output_directory =  mOutputDirectory + "/electrics/output";
         // Write the mesh
@@ -979,11 +973,17 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
         // Write the parameters out
         //HeartConfig::Instance()->Write();
 
+        // convert output to CMGUI format
+        Hdf5ToCmguiConverter<DIM,DIM> cmgui_converter(FileFinder(input_dir, RelativeTo::ChasteTestOutput),
+                                                      "voltage", mpElectricsMesh, mHasBath,
+                                                      HeartConfig::Instance()->GetVisualizerOutputPrecision());
+
         // interpolate the electrical data onto the mechanics mesh nodes and write CMGUI...
         // Note: this calculates the data on ALL nodes of the mechanics mesh (incl internal,
         // non-vertex ones), which won't be used if linear CMGUI visualisation
         // of the mechanics solution is used.
-        VoltageInterpolaterOntoMechanicsMesh<DIM> converter(*mpElectricsMesh,*mpMechanicsMesh,variable_names,input_dir,"voltage");
+        VoltageInterpolaterOntoMechanicsMesh<DIM> converter(*mpElectricsMesh,*mpMechanicsMesh);
+        converter.OutputToCmgui(variable_names,input_dir,"voltage");
 
         // reset to the default value
         HeartConfig::Instance()->SetOutputDirectory(config_directory);

@@ -35,34 +35,62 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "VoltageInterpolaterOntoMechanicsMesh.hpp"
 #include "Hdf5ToCmguiConverter.hpp"
-#include "FineCoarseMeshPair.hpp"
-#include "ReplicatableVector.hpp"
 #include "HeartConfig.hpp"
 #include "Hdf5DataReader.hpp"
 #include "PetscTools.hpp"
 #include "Hdf5DataWriter.hpp"
 
+
 template<unsigned DIM>
 VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
                                      TetrahedralMesh<DIM,DIM>& rElectricsMesh,
-                                     QuadraticMesh<DIM>& rMechanicsMesh,
-                                     std::vector<std::string>& rVariableNames,
-                                     std::string directory,
-                                     std::string inputFileNamePrefix)
+                                     QuadraticMesh<DIM>& rMechanicsMesh)
+            : mrElectricsMesh(rElectricsMesh),
+              mrMechanicsMesh(rMechanicsMesh),
+              mpMeshPair(new FineCoarseMeshPair<DIM>(rElectricsMesh, rMechanicsMesh))
+              
 {
+    assert(mpMeshPair);
+    mpMeshPair->SetUpBoxesOnFineMesh();
+    mpMeshPair->ComputeFineElementsAndWeightsForCoarseNodes(true);
+    assert(mpMeshPair->rGetElementsAndWeights().size()==rMechanicsMesh.GetNumNodes());
+}
+
+template <unsigned DIM>
+void VoltageInterpolaterOntoMechanicsMesh<DIM>::InterpolateOnCoarseMesh(std::vector<double>& rValuesOnCoarseMesh, ReplicatableVector& rValuesOnFineMesh)
+{
+    assert(rValuesOnCoarseMesh.size() == mrMechanicsMesh.GetNumNodes());
+    for (unsigned i=0; i<mpMeshPair->rGetElementsAndWeights().size(); i++)
+    {
+        Element<DIM,DIM>& element = *(mrElectricsMesh.GetElement(mpMeshPair->rGetElementsAndWeights()[i].ElementNum));
+
+        double interpolated_value = 0;
+        for (unsigned node_index = 0; node_index<element.GetNumNodes(); node_index++)
+        {
+            unsigned global_node_index = element.GetNodeGlobalIndex(node_index);
+            interpolated_value += rValuesOnFineMesh[global_node_index]*mpMeshPair->rGetElementsAndWeights()[i].Weights(node_index);
+        }
+        rValuesOnCoarseMesh[i] = interpolated_value;
+    }
+
+}
+template<unsigned DIM>
+void VoltageInterpolaterOntoMechanicsMesh<DIM>::OutputToCmgui(std::vector<std::string>& rVariableNames,
+                                     std::string directory,
+                                     std::string inputFileNamePrefix)          
+{
+    assert(mpMeshPair);
+    mpMeshPair->SetUpBoxesOnFineMesh();
+    mpMeshPair->ComputeFineElementsAndWeightsForCoarseNodes(true);
+    assert(mpMeshPair->rGetElementsAndWeights().size()==mrMechanicsMesh.GetNumNodes());
+
     // Read the data from the HDF5 file
     Hdf5DataReader reader(directory,inputFileNamePrefix);
 
     unsigned num_timesteps = reader.GetUnlimitedDimensionValues().size();
 
-    // set up the elements and weights for the coarse nodes in the fine mesh
-    FineCoarseMeshPair<DIM> mesh_pair(rElectricsMesh, rMechanicsMesh);
-    mesh_pair.SetUpBoxesOnFineMesh();
-    mesh_pair.ComputeFineElementsAndWeightsForCoarseNodes(true);
-    assert(mesh_pair.rGetElementsAndWeights().size()==rMechanicsMesh.GetNumNodes());
-
     // create and setup a writer
-    Hdf5DataWriter* p_writer = new Hdf5DataWriter(*rMechanicsMesh.GetDistributedVectorFactory(),
+    Hdf5DataWriter* p_writer = new Hdf5DataWriter(*mrMechanicsMesh.GetDistributedVectorFactory(),
                                                   directory,
                                                   "voltage_mechanics_mesh",
                                                   false, //don't clean
@@ -76,15 +104,15 @@ VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
     }
 
     p_writer->DefineUnlimitedDimension("Time","msecs", num_timesteps);
-    p_writer->DefineFixedDimension( rMechanicsMesh.GetNumNodes() );
+    p_writer->DefineFixedDimension(mrMechanicsMesh.GetNumNodes() );
     p_writer->EndDefineMode();
 
     assert(columns_id.size() == rVariableNames.size());
 
     // set up a vector to read into
-    DistributedVectorFactory factory(rElectricsMesh.GetNumNodes());
+    DistributedVectorFactory factory(mrElectricsMesh.GetNumNodes());
     Vec voltage = factory.CreateVec();
-    std::vector<double> interpolated_voltages(rMechanicsMesh.GetNumNodes());
+    std::vector<double> interpolated_voltages(mrMechanicsMesh.GetNumNodes());
     Vec voltage_coarse = NULL;
 
     for (unsigned time_step=0; time_step<num_timesteps; time_step++)
@@ -96,20 +124,7 @@ VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
             reader.GetVariableOverNodes(voltage, var_name, time_step);
             ReplicatableVector voltage_repl(voltage);
 
-            // interpolate
-            for (unsigned i=0; i<mesh_pair.rGetElementsAndWeights().size(); i++)
-            {
-                double interpolated_voltage = 0;
-
-                Element<DIM,DIM>& element = *(rElectricsMesh.GetElement(mesh_pair.rGetElementsAndWeights()[i].ElementNum));
-                for (unsigned node_index = 0; node_index<element.GetNumNodes(); node_index++)
-                {
-                    unsigned global_node_index = element.GetNodeGlobalIndex(node_index);
-                    interpolated_voltage += voltage_repl[global_node_index]*mesh_pair.rGetElementsAndWeights()[i].Weights(node_index);
-                }
-
-                interpolated_voltages[i] = interpolated_voltage;
-            }
+            InterpolateOnCoarseMesh(interpolated_voltages, voltage_repl);
 
             if (voltage_coarse != NULL)
             {
@@ -139,7 +154,7 @@ VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
     HeartConfig::Instance()->SetOutputDirectory(directory);
     Hdf5ToCmguiConverter<DIM,DIM> converter(FileFinder(directory, RelativeTo::ChasteTestOutput),
                                             "voltage_mechanics_mesh",
-                                            &rMechanicsMesh,
+                                            &mrMechanicsMesh,
                                             false);
     HeartConfig::Instance()->SetOutputDirectory(config_directory);
 }
