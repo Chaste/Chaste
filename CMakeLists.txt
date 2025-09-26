@@ -539,6 +539,8 @@ if (Chaste_USE_PETSC_PARMETIS)
 endif ()
 find_package (ParMETIS REQUIRED)
 list (APPEND Chaste_LINK_LIBRARIES "${PARMETIS_LIBRARIES}")
+# libscotchparmetis-dev has a parmetis.h adapter include which is in a subdirectory
+list (APPEND Chaste_INCLUDES "${PARMETIS_INCLUDE_DIR}")
 
 
 ################################
