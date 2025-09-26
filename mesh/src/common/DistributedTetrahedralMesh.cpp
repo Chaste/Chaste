@@ -47,6 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BoundaryElement.hpp"
 
 #include "PetscTools.hpp"
+#include "PetscMatTools.hpp"
 #include "DistributedVectorFactory.hpp"
 #include "OutputFileHandler.hpp"
 #include "NodePartitioner.hpp"
@@ -62,6 +63,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #if PARMETIS_MAJOR_VERSION != 4
 #error "ParMETIS version is not supported. Please use version 4."
 #endif
+
+//#define HOMEMADE_MESH_TO_DUAL
 
 /////////////////////////////////////////////////////////////////////////////////////
 //   IMPLEMENTATION
@@ -1311,6 +1314,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     assert(ELEMENT_DIM==2 || ELEMENT_DIM==3); // LCOV_EXCL_LINE // Partitioning works with triangles and tetras
 
     const unsigned num_elements = rMeshReader.GetNumElements();
+    const unsigned num_nodes = rMeshReader.GetNumNodes();
     const unsigned num_procs = PetscTools::GetNumProcs();
     const unsigned local_proc_index = PetscTools::GetMyRank();
 
@@ -1355,6 +1359,11 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
         }
     }
 
+#ifdef HOMEMADE_MESH_TO_DUAL
+    Mat element_node_matrix;
+    PetscTools::SetupMat(element_node_matrix, num_elements, num_nodes, 4, num_local_elements);
+#endif
+    
     unsigned counter = 0;
     for (idx_t element_index = 0; element_index < num_local_elements; element_index++)
     {
@@ -1365,37 +1374,72 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
         eptr[element_index] = counter;
         for (unsigned i=0; i<ELEMENT_DIM+1; i++)
         {
+#ifdef HOMEMADE_MESH_TO_DUAL
+            MatSetValue(element_node_matrix, element_index+first_local_element, element_data.NodeIndices[i], 1.0, ADD_VALUES);
+#else
             eind[counter++] = element_data.NodeIndices[i];
-        }
+#endif
+	    }
     }
     eptr[num_local_elements] = counter;
 
     rMeshReader.Reset();
-
     idx_t numflag = 0; // ParMETIS speak for C-style numbering
+
+    MPI_Comm communicator = PETSC_COMM_WORLD;
+
+    idx_t* xadj;
+    idx_t* adjncy;
+ 
+    Timer::Reset();
+#ifdef HOMEMADE_MESH_TO_DUAL
+    PetscMatTools::Finalise(element_node_matrix);
+    std::vector<idx_t> my_xadj;
+    std::vector<idx_t> my_adjncy;
+
+    Mat node_element_matrix;
+    MatTranspose(element_node_matrix, MAT_INITIAL_MATRIX,  &node_element_matrix);
+    Mat element_element_matrix;
+    MatMatMult(element_node_matrix, node_element_matrix, MAT_INITIAL_MATRIX,  PETSC_DETERMINE, &element_element_matrix);
+    my_xadj.push_back(0);
+    PetscInt ncols;
+    const PetscInt *cols;
+    const PetscScalar *vals;
+    for (PetscInt el_index=first_local_element; el_index<last_plus_one_element; el_index++)
+    {
+         MatGetRow(element_element_matrix, el_index, &ncols, &cols, &vals);
+	     for (PetscInt i=0;i<ncols;i++)
+         {
+            if (std::lround(vals[i])==ELEMENT_DIM)
+            {
+                // Shared edge/face between two elements
+                my_adjncy.push_back(cols[i]);
+            }
+        }
+        MatRestoreRow(element_element_matrix, el_index, &ncols, &cols, NULL);
+        // Mark where next local element starts
+        my_xadj.push_back(my_adjncy.size());
+    }
+    MatDestroy(&element_node_matrix);
+    MatDestroy(&element_node_matrix);
+    MatDestroy(&element_node_matrix);
+    xadj = &my_xadj[0];
+    adjncy = &my_adjncy[0];
+
+#else
+    // The default behaviour is to use a ParMETIS (or possible Scotch) function to get the dual
     /* Connectivity degree.
-     * Specifically, an GRAPH EDGE is placed between any two elements if and only if they share
-     * at least this many nodes.
-     *
-     * Manual recommends "for meshes containing only triangular, tetrahedral,
-     * hexahedral, or rectangular elements, this parameter can be set to two, three, four, or two, respectively.
+     * GRAPH EDGE is placed between any two elements if and only if they share at least this many nodes.
      */
     idx_t ncommonnodes = 3; //Linear tetrahedra
     if (ELEMENT_DIM == 2)
     {
         ncommonnodes = 2;
     }
-
-    MPI_Comm communicator = PETSC_COMM_WORLD;
-
-    idx_t* xadj;
-    idx_t* adjncy;
-
-    Timer::Reset();
     ParMETIS_V3_Mesh2Dual(element_distribution.get(), eptr.get(), eind.get(),
                           &numflag, &ncommonnodes, &xadj, &adjncy, &communicator);
+#endif
     //Timer::Print("ParMETIS Mesh2Dual");
-
     // Be more memory efficient, and get rid of (maybe large) arrays as soon as they're no longer needed, rather than at end of scope
     eind.reset();
     eptr.reset();
@@ -1461,10 +1505,14 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     }
 
     rMeshReader.Reset();
+#ifdef HOMEMADE_MESH_TO_DUAL
+    // These are contained in std::vectors that are automatically freed
+    xadj = NULL;
+    adjncy = NULL;
+#endif
     free(xadj);
     free(adjncy);
-
-    unsigned num_nodes = rMeshReader.GetNumNodes();
+    //unsigned num_nodes = rMeshReader.GetNumNodes();
 
     // Initialise with no nodes known
     std::vector<unsigned> global_node_partition(num_nodes, UNASSIGNED_NODE);
