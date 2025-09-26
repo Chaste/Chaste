@@ -269,7 +269,7 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsProble
         mpProblemDefinition(pProblemDefinition),
         mHasBath(false),
         mpMeshPair(NULL),
-        mpFineNodesCoarseNodesMeshPair(NULL),
+        mpInterpolater(NULL),
         mNoElectricsOutput(false),
         mIsWatchedLocation(false),
         mWatchedElectricsNodeIndex(UNSIGNED_UNSET),
@@ -340,7 +340,7 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::~CardiacElectroMechanicsProbl
     delete mpMeshPair;
     if (mWriteOutput && HeartConfig::Instance()->GetVisualizeWithVtk())
     {
-        delete mpFineNodesCoarseNodesMeshPair;
+        delete mpInterpolater;
     }
 
     LogFile::Close();
@@ -488,34 +488,45 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
         mesh_writer.WriteFilesUsingMesh(*mpElectricsMesh);
 
         if (HeartConfig::Instance()->GetVisualizeWithVtk())
-        {            
-            //set up another fine coarse mesh pair (the other one is used to interpolate on gauss points
-            // this one is used to interpolate on nodes)
-            mpFineNodesCoarseNodesMeshPair = new FineCoarseMeshPair<DIM>(*mpElectricsMesh, *mpMechanicsMesh);
-            mpFineNodesCoarseNodesMeshPair->SetUpBoxesOnFineMesh();
-            mpFineNodesCoarseNodesMeshPair->ComputeFineElementsAndWeightsForCoarseNodes(false);
-            mpFineNodesCoarseNodesMeshPair->DeleteFineBoxCollection();
-            assert(mpFineNodesCoarseNodesMeshPair->rGetElementsAndWeights().size()==mpMechanicsMesh->GetNumNodes());
+        {   
+            mpVtkOutputMesh = new QuadraticMesh<DIM>();
+            mpVtkOutputMesh->ConstructFromMesh(*mpMechanicsMesh);
+            assert(mpVtkOutputMesh->GetNumNodes() == mpMechanicsMesh->GetNumNodes());
+            //cretae the writer, using the output mesh voltage and other quantities
+            mpVtkWriter =  new VtkDeformedMeshWriter<DIM>(mpVtkOutputMesh, mDeformationOutputDirectory + "/vtk","deformed_mechanics_mesh_",true);         
+            //set up voltage interpolating object
+            mpInterpolater = new VoltageInterpolaterOntoMechanicsMesh<DIM>(*mpElectricsMesh,*mpVtkOutputMesh);
+            mpVtkElastictyWriter = new VtkNonlinearElasticitySolutionWriter<DIM>(*mpMechanicsSolver);
 
-            mInterpolatedVoltagesNodeWise.assign(mpMechanicsMesh->GetNumNodes(),0.0);
-            for (unsigned i=0; i<mpFineNodesCoarseNodesMeshPair->rGetElementsAndWeights().size(); i++)
+            //allocate memory for the interpolated voltages (once on initialize)
+            mInterpolatedVoltagesNodeWise.assign(mpVtkOutputMesh->GetNumNodes(),0.0);
+            //allocate memory forelement-wise displacements
+            c_vector<double,DIM> no_displ;
+            if (DIM==1)
             {
-                double interpolated_voltage = 0;
-
-                Element<DIM,DIM>& element = *(mpElectricsMesh->GetElement(mpFineNodesCoarseNodesMeshPair->rGetElementsAndWeights()[i].ElementNum));
-
-                for (unsigned node_index = 0; node_index<element.GetNumNodes(); node_index++)
-                {
-                    unsigned global_index = element.GetNodeGlobalIndex(node_index);
-                    interpolated_voltage += mpElectricsProblem->GetTissue()->GetCardiacCell(global_index)->GetVoltage()*mpFineNodesCoarseNodesMeshPair->rGetElementsAndWeights()[i].Weights(node_index);
-                }
-                assert(i<mInterpolatedVoltagesNodeWise.size());
-                mInterpolatedVoltagesNodeWise[i] = interpolated_voltage;
+                no_displ = Create_c_vector(0.0);
             }
-            assert(mpMechanicsMesh);
-            mpVtkWriter =  new VtkDeformedMeshWriter<DIM>(mpMechanicsMesh, mDeformationOutputDirectory + "/vtk","deformed_mechanics_mesh_",true);
+            if (DIM==2)
+            {
+                no_displ = Create_c_vector(0.0,0.0);
+            }
+            if (DIM==3)
+            {
+                no_displ = Create_c_vector(0.0,0.0,0.0);
+            }
+            mDisplacements.assign(mpVtkOutputMesh->GetNumNodes(),no_displ);
+            //Create initial condition vector
+            ReplicatableVector init_cond(mpElectricsMesh->GetNumNodes());
+            for (unsigned node_index = 0u; node_index < mpElectricsMesh->GetNumNodes(); ++node_index)
+            {
+                //unsigned global_index = element.GetNodeGlobalIndex(node_index);
+                init_cond[node_index] = mpElectricsProblem->GetTissue()->GetCardiacCell(node_index)->GetVoltage();
+            }
+            mpInterpolater->InterpolateOnCoarseMesh(mInterpolatedVoltagesNodeWise,init_cond);
+            
             mpVtkWriter->SetOutputBaseFileName("deformed_mechanics_mesh_" + std::to_string(0));
             mpVtkWriter->AddPointData("V", mInterpolatedVoltagesNodeWise);
+            mpVtkWriter->AddPointData("Displacements", mDisplacements);
             assert(mInterpolatedVoltagesNodeWise.size()==mpMechanicsMesh->GetNumNodes());
             mpVtkWriter->WriteDeformedFiles();
         }
@@ -900,27 +911,15 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
             if (HeartConfig::Instance()->GetVisualizeWithVtk())
             {
                 //VTK output. Determine voltage on coarse nodes 
-                for (unsigned i=0; i<mpFineNodesCoarseNodesMeshPair->rGetElementsAndWeights().size(); i++)
-                {
-                    double interpolated_voltage = 0;
+                mpInterpolater->InterpolateOnCoarseMesh(mInterpolatedVoltagesNodeWise,electrics_solution_repl);
 
-                    Element<DIM,DIM>& element = *(mpElectricsMesh->GetElement(mpFineNodesCoarseNodesMeshPair->rGetElementsAndWeights()[i].ElementNum));
-
-                    for (unsigned node_index = 0; node_index<element.GetNumNodes(); node_index++)
-                    {
-                        unsigned global_index = element.GetNodeGlobalIndex(node_index);
-                        //the following line assumes interleaved solution for ELEC_PROB_DIM>1 (e.g, [Vm_0, phi_e_0, Vm1, phi_e_1...])
-                        interpolated_voltage += electrics_solution_repl[global_index*ELEC_PROB_DIM]*mpFineNodesCoarseNodesMeshPair->rGetElementsAndWeights()[i].Weights(node_index);
-                    }
-
-                    assert(i<mInterpolatedVoltagesNodeWise.size());
-                    mInterpolatedVoltagesNodeWise[i] = interpolated_voltage;
-                }
                 //Apply deformation solution to mechanics mesh (the one in the writer object)
                 mpVtkWriter->ApplyDeformation(rGetDeformedPosition());
                 mpVtkWriter->SetOutputBaseFileName("deformed_mechanics_mesh_" + std::to_string(counter));
                 mpVtkWriter->SetWriteMeshCells(false);
                 mpVtkWriter->AddPointData("V", mInterpolatedVoltagesNodeWise);
+                mpVtkElastictyWriter->CalculateDisplacements(mDisplacements);
+                mpVtkWriter->AddPointData("displacements", mDisplacements);
                 mpVtkWriter->WriteDeformedFiles();
             }
 

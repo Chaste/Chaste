@@ -36,6 +36,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "VtkNonlinearElasticitySolutionWriter.hpp"
 #include "VtkMeshWriter.hpp"
 
+
+template<unsigned DIM>
+VtkNonlinearElasticitySolutionWriter<DIM>::VtkNonlinearElasticitySolutionWriter(AbstractNonlinearElasticitySolver<DIM>& rSolver)
+        : mpSolver(&rSolver),
+          mWriteElementWiseStrains(false),
+          mWriteElemntWiseStresses(false)
+{
+    assert(mpSolver);
+    mDisplacements.resize(mpSolver->mrQuadMesh.GetNumNodes());
+    mTensorStrainData.resize(mpSolver->mrQuadMesh.GetNumElements());
+    mTensorStressData.resize(mpSolver->mrQuadMesh.GetNumElements());
+}
+
 template<unsigned DIM>
 void VtkNonlinearElasticitySolutionWriter<DIM>::Write()
 {
@@ -48,16 +61,8 @@ void VtkNonlinearElasticitySolutionWriter<DIM>::Write()
     VtkMeshWriter<DIM, DIM> mesh_writer(mpSolver->mOutputDirectory + "/vtk", "solution", true);
 
     // write the displacement
-    std::vector<c_vector<double,DIM> > displacement(mpSolver->mrQuadMesh.GetNumNodes());
-    std::vector<c_vector<double,DIM> >& r_spatial_solution = mpSolver->rGetSpatialSolution();
-    for (unsigned i=0; i<mpSolver->mrQuadMesh.GetNumNodes(); i++)
-    {
-        for (unsigned j=0; j<DIM; j++)
-        {
-            displacement[i](j) = r_spatial_solution[i](j)- mpSolver->mrQuadMesh.GetNode(i)->rGetLocation()[j];
-        }
-    }
-    mesh_writer.AddPointData("Displacement", displacement);
+    CalculateDisplacements(mDisplacements);
+    mesh_writer.AddPointData("Displacement", mDisplacements);
 
     // write pressures
     if (mpSolver->mCompressibilityType==INCOMPRESSIBLE)
@@ -78,53 +83,102 @@ void VtkNonlinearElasticitySolutionWriter<DIM>::Write()
     // write strains if requested
     if (mWriteElementWiseStrains)
     {
-        mTensorData.clear();
-        mTensorData.resize(mpSolver->mrQuadMesh.GetNumElements());
-
         std::string name;
-        switch(mElementWiseStrainType)
-        {
-            case DEFORMATION_GRADIENT_F:
-            {
-                name = "deformation_gradient_F";
-                break;
-            }
-            case DEFORMATION_TENSOR_C:
-            {
-                name = "deformation_tensor_C";
-                break;
-            }
-            case LAGRANGE_STRAIN_E:
-            {
-                name = "Lagrange_strain_E";
-                break;
-            }
-            default:
-            {
-                NEVER_REACHED;
-            }
-        }
-
-        for (typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter = mpSolver->mrQuadMesh.GetElementIteratorBegin();
-             iter != mpSolver->mrQuadMesh.GetElementIteratorEnd();
-             ++iter)
-        {
-            mpSolver->GetElementCentroidStrain(mElementWiseStrainType, *iter, mTensorData[iter->GetIndex()]);
-        }
-
-        mesh_writer.AddTensorCellData(name, mTensorData);
+        CalculateStrains(name,mTensorStrainData);//fill up name and data
+        mesh_writer.AddTensorCellData(name, mTensorStrainData);
     }
-//// Future..
-//        if (mWriteNodeWiseStresses)
-//        {
-//            std::vector<c_matrix<double,DIM,DIM> > tensor_data;
-//            // use recoverer
-//            mesh_writer.AddTensorCellData("Stress_NAME_ME", tensor_data);
-//        }
+
+    //write stress, if required
+    if (mWriteElemntWiseStresses)
+    {   
+        CalculateStresses(mTensorStressData);
+        mesh_writer.AddTensorCellData("average_stress",mTensorStressData);
+    }
 
     // final write
     mesh_writer.WriteFilesUsingMesh(mpSolver->mrQuadMesh);
 #endif // CHASTE_VTK
+}
+
+template<unsigned DIM>
+void VtkNonlinearElasticitySolutionWriter<DIM>::CalculateDisplacements(std::vector<c_vector<double,DIM> >& rDisplacements)
+{
+    assert(rDisplacements.size() == mpSolver->mrQuadMesh.GetNumNodes());
+    std::vector<c_vector<double,DIM> > spatial_solution = mpSolver->rGetSpatialSolution();
+    for (unsigned i=0; i<mpSolver->mrQuadMesh.GetNumNodes(); i++)
+    {
+        for (unsigned j=0; j<DIM; j++)
+        {
+            rDisplacements[i](j) = spatial_solution[i](j) - mpSolver->mrQuadMesh.GetNode(i)->rGetLocation()[j];
+        }
+    }
+}
+
+template<unsigned DIM>
+void VtkNonlinearElasticitySolutionWriter<DIM>::CalculateStresses(std::vector<c_matrix<double,DIM,DIM> >& rStresses)
+{
+    assert(rStresses.size() == mpSolver->mrQuadMesh.GetNumElements());
+    for (typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter = mpSolver->mrQuadMesh.GetElementIteratorBegin();
+            iter != mpSolver->mrQuadMesh.GetElementIteratorEnd();
+            ++iter)
+    {
+        unsigned elem_idx = iter->GetIndex();
+        for (unsigned i = 0; i < DIM; ++i)
+        {
+            for (unsigned j = 0; j < DIM; ++j)
+            {
+                rStresses[elem_idx](i,j) = mpSolver->GetAverageStressPerElement(elem_idx)(i,j);
+            }
+        }
+    }
+}
+
+template<unsigned DIM>
+void VtkNonlinearElasticitySolutionWriter<DIM>::CalculateStrains(std::string& name, std::vector<c_matrix<double,DIM,DIM> >& rStrains)
+{
+    assert(rStrains.size() == mpSolver->mrQuadMesh.GetNumElements());
+    switch(mElementWiseStrainType)
+    {
+        case DEFORMATION_GRADIENT_F:
+        {
+            name = "deformation_gradient_F";
+            break;
+        }
+        case DEFORMATION_TENSOR_C:
+        {
+            name = "deformation_tensor_C";
+            break;
+        }
+        case LAGRANGE_STRAIN_E:
+        {
+            name = "Lagrange_strain_E";
+            break;
+        }
+        default:
+        {
+            NEVER_REACHED;
+        }
+    }
+
+    for (typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter = mpSolver->mrQuadMesh.GetElementIteratorBegin();
+            iter != mpSolver->mrQuadMesh.GetElementIteratorEnd();
+            ++iter)
+    {
+        mpSolver->GetElementCentroidStrain(mElementWiseStrainType, *iter, rStrains[iter->GetIndex()]);
+    }
+}
+
+template<unsigned DIM>
+void VtkNonlinearElasticitySolutionWriter<DIM>::SetWriteElementWiseStrains(StrainType strainType)
+{
+    mWriteElementWiseStrains = true;
+    mElementWiseStrainType = strainType;
+}
+
+template<unsigned DIM>
+void VtkNonlinearElasticitySolutionWriter<DIM>::SetWriteElementWiseStresses(bool write)
+{
+    mWriteElemntWiseStresses = write;
 }
 
 // Explicit instantiation

@@ -84,8 +84,7 @@ public:
     /**
      * Constructor
      * 
-     * @param pDeformedOutputMesh a pointer to the mesh object. Note that a copy of this mesh will be created within 
-     *                            the constructor.
+     * @param pDeformedOutputMesh a pointer to the mesh objectto be used.
      * @param rDirectory  the directory in which to write the mesh to file
      * @param rBaseName  the base name of the files in which to write the mesh data
      * @param rCleanDirectory  whether to clean the directory (defaults to true)
@@ -122,6 +121,7 @@ public:
      * @param rPositions the node positions to be applied to the mesh
      */
     void ApplyDeformation(const std::vector<c_vector<double,DIM> >& rPositions);
+
 };
 
 #endif //CHASTE_VTK

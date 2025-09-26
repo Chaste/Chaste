@@ -52,6 +52,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AbstractConductivityModifier.hpp"
 #include "ElectroMechanicsProblemDefinition.hpp"
 #include "VtkDeformedMeshWriter.hpp"
+#include "VoltageInterpolaterOntoMechanicsMesh.hpp"
+#include "VtkNonlinearElasticitySolutionWriter.hpp"
 
 /**
  * Enumeration of the possible electrics problem types
@@ -136,6 +138,11 @@ protected :
      */
     std::vector<double> mInterpolatedVoltagesNodeWise;
 
+    std::vector<c_vector<double,DIM> > mDisplacements;
+
+    VtkNonlinearElasticitySolutionWriter<DIM>* mpVtkElastictyWriter;
+
+
     /** The mesh for the electrics */
     TetrahedralMesh<DIM,DIM>* mpElectricsMesh;
     /** The mesh for the mechanics */
@@ -150,7 +157,10 @@ protected :
     /** Class wrapping both meshes, useful for transferring information */
     FineCoarseMeshPair<DIM>* mpMeshPair;
 
-    FineCoarseMeshPair<DIM>* mpFineNodesCoarseNodesMeshPair;
+    /** Used to interpolate electrics solution onto mechanics mesh for VTK output*/
+    VoltageInterpolaterOntoMechanicsMesh<DIM>* mpInterpolater;
+
+    QuadraticMesh<DIM>* mpVtkOutputMesh;
 
     /** Output directory, relative to TEST_OUTPUT */
     std::string mOutputDirectory;

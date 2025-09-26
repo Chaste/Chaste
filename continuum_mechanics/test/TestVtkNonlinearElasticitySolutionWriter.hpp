@@ -87,6 +87,7 @@ public:
             problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
             problem_defn.SetZeroDisplacementNodes(fixed_nodes);
             IncompressibleNonlinearElasticitySolver<3> solver(bar_mesh,problem_defn,dir.str());
+            solver.SetComputeAverageStressPerElementDuringSolve(true);
             solver.Solve();
 
             // solution is currently no deformation. Hack into the solution and set it to be something known.
@@ -122,14 +123,39 @@ public:
 
             VtkNonlinearElasticitySolutionWriter<3> vtk_writer(solver);
             vtk_writer.SetWriteElementWiseStrains(strain_type);
+            vtk_writer.SetWriteElementWiseStresses(true);
             vtk_writer.Write();
 
             // .vtu files have been visualised, everything looks good.
             FileFinder vtk_file(dir.str() + "/vtk/solution.vtu", RelativeTo::ChasteTestOutput);
             TS_ASSERT(vtk_file.Exists());
+            
+            {
+                // Check that the reader can see it
+                VtkMeshReader<3,3> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + dir.str() + "/vtk/solution.vtu");
+                TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), bar_mesh.GetNumNodes());
+                TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), bar_mesh.GetNumElements());
 
+                // Check that it has the correct data
+                std::vector<c_vector<double,3> > displacement_read;
+                vtk_reader.GetPointData("Displacement", displacement_read);
+                for (unsigned i=0; i<displacement_read.size(); i++)
+                {
+                    TS_ASSERT_DELTA(vtk_writer.mDisplacements[i](0), displacement_read[i](0),1e-12);
+                    TS_ASSERT_DELTA(vtk_writer.mDisplacements[i](1), displacement_read[i](1),1e-12);
+                    TS_ASSERT_DELTA(vtk_writer.mDisplacements[i](2), displacement_read[i](2),1e-12);
+                }
 
-            // we can't really test the vtu file easily, but the strain data is stored in a member variable so we can
+                std::vector<double> pressure_read;
+                vtk_reader.GetPointData("Pressure", pressure_read);
+                for (unsigned i=0; i<pressure_read.size(); i++)
+                {
+                    TS_ASSERT_DELTA(solver.rGetPressures()[i], pressure_read[i],1e-12);
+                }
+            }
+
+            // It is difficult to test the content of tensor data as the VTK reader doesn't have a method (yet) 
+            // However, the strain data is stored in a member variable so we can
             // test it was computed correctly.
             for (unsigned i=0; i<bar_mesh.GetNumElements(); i++)
             {
@@ -145,7 +171,7 @@ public:
                         for (unsigned N=0; N<3; N++)
                         {
                             double value = (run==0 ? F[M][N] : (run==1 ? C[M][N] : E[M][N]) );
-                            TS_ASSERT_DELTA(vtk_writer.mTensorData[i](M,N), value, 1e-12);
+                            TS_ASSERT_DELTA(vtk_writer.mTensorStrainData[i](M,N), value, 1e-12);
                         }
                     }
                 }
@@ -160,10 +186,21 @@ public:
                         for (unsigned N=0; N<3; N++)
                         {
                             double value = (run==0 ? F[M][N] : (run==1 ? C[M][N] : E[M][N]) );
-                            TS_ASSERT_DELTA(vtk_writer.mTensorData[i](M,N), value, 1e-12);
+                            TS_ASSERT_DELTA(vtk_writer.mTensorStrainData[i](M,N), value, 1e-12);
                         }
                     }
                 }
+                
+                //solution is currently no deformation, so no stresses, better test needed?
+                TS_ASSERT_DELTA(vtk_writer.mTensorStressData[i](0,0), 0.0,1e-12);
+                TS_ASSERT_DELTA(vtk_writer.mTensorStressData[i](1,0), 0.0,1e-12);
+                TS_ASSERT_DELTA(vtk_writer.mTensorStressData[i](2,0), 0.0,1e-12);
+                TS_ASSERT_DELTA(vtk_writer.mTensorStressData[i](0,1), 0.0,1e-12);
+                TS_ASSERT_DELTA(vtk_writer.mTensorStressData[i](1,1), 0.0,1e-12);
+                TS_ASSERT_DELTA(vtk_writer.mTensorStressData[i](2,1), 0.0,1e-12);
+                TS_ASSERT_DELTA(vtk_writer.mTensorStressData[i](0,2), 0.0,1e-12);
+                TS_ASSERT_DELTA(vtk_writer.mTensorStressData[i](1,2), 0.0,1e-12);
+                TS_ASSERT_DELTA(vtk_writer.mTensorStressData[i](2,2), 0.0,1e-12);
             }
         }
 #endif //CHASTE_VTK

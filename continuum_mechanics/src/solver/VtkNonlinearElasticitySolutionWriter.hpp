@@ -52,11 +52,18 @@ private:
     AbstractNonlinearElasticitySolver<DIM>* mpSolver;
     /** Whether to write strains for each element */
     bool mWriteElementWiseStrains;
+    /** Whether to write stresses for each element*/
+    bool mWriteElemntWiseStresses;
     /** What type of strain to write for each element, from: F = dx/dX, C = F^T F, E = 1/2 (C-I) */
     StrainType mElementWiseStrainType;
 
-    /** Tensor data to be written to the .vtu file. This is a member variable only for testing reasons. */
-    std::vector<c_matrix<double,DIM,DIM> > mTensorData;
+    /** Tensor data to be written to the .vtu file. Used also for testing*/
+    std::vector<c_matrix<double,DIM,DIM> > mTensorStrainData;
+
+    /** TEnsor stress data to be written to the vtu file */
+    std::vector<c_matrix<double,DIM,DIM> > mTensorStressData;
+
+    std::vector<c_vector<double,DIM> > mDisplacements;
 
 
     //// For future..
@@ -69,21 +76,54 @@ public:
      *  Constructor
      *  @param rSolver mechanics solver which performed the calculation
      */
-    VtkNonlinearElasticitySolutionWriter(AbstractNonlinearElasticitySolver<DIM>& rSolver)
-        : mpSolver(&rSolver),
-          mWriteElementWiseStrains(false)
-    {
-    }
+    VtkNonlinearElasticitySolutionWriter(AbstractNonlinearElasticitySolver<DIM>& rSolver);
 
     /**
      *  Set write strains for each element. Can write any of: F = dx/dX, C = F^T F, E = 1/2 (C-I)
      *  @param strainType Which strain to write, choose one of: DEFORMATION_GRADIENT_F, DEFORMATION_TENSOR_C, LAGRANGE_STRAIN_E
      */
-    void SetWriteElementWiseStrains(StrainType strainType)
-    {
-        mWriteElementWiseStrains = true;
-        mElementWiseStrainType = strainType;
-    }
+    void SetWriteElementWiseStrains(StrainType strainType);
+
+    /**
+     *  Set whether or not to write out element-wise stresses (second PK).
+     *  Please note that you must call SetComputeAverageStressPerElementDuringSolve(true) 
+     *  before Solve() (solver will throw an exception otherwise)
+     * 
+     *  @param write true if you want the stresss data to be added
+     */
+    void SetWriteElementWiseStresses(bool write);
+
+    /**
+     * Stores the displacements in rDisplacements.
+     * Memory for rDisplacements must be alloctaed before calling this method, 
+     * which will check if rDisplacements is of the same size as the number of
+     * nodes in the quadratic mesh
+     * 
+     * @param rDisplacements the vector that wil be filled in with displacement values
+     */
+    void CalculateDisplacements(std::vector<c_vector<double,DIM> >& rDisplacements);
+
+    /**
+     * Stores the strains in the rStrains vector. The type of strain depends on
+     * the most recent call to SetWriteElementWiseStrains.
+     * Memory for rStrains must be allocated before calling this method,
+     * which will check if rStresses is of the same size as the number of
+     * elements in the quadratic mesh
+     * 
+     * @param name the name of the displacements, based on the most recent call to SetWriteElementWiseStrains
+     * @param rStrains the vector that will be filled with corresponding strain values
+     */
+    void CalculateStrains(std::string& name, std::vector<c_matrix<double,DIM,DIM> >& rStrains);
+
+    /**
+     * Stores the stresses (second PK from the solver) in the rStresses vector.
+     * Memory for rStresses must be allocated before calling this method,
+     * which will check if rStresses is of the same size as the number of
+     * elements in the quadratic mesh
+     * 
+     * @param rStresses the vector that will be filled with (second PK) stress values
+     */
+    void CalculateStresses(std::vector<c_matrix<double,DIM,DIM> >& rStresses);
 
     /** Write the .vtu file */
     void Write();

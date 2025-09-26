@@ -44,15 +44,14 @@ VtkDeformedMeshWriter<DIM>::VtkDeformedMeshWriter(AbstractTetrahedralMesh<DIM,DI
     const std::string& rBaseName, 
     const bool& rCleanDirectory)
     : VtkMeshWriter<DIM,DIM>(rDirectory,rBaseName,rCleanDirectory),
-      mpDeformedMesh(new TetrahedralMesh<DIM,DIM>())
+      mpDeformedMesh(pDeformedOutputMesh)
 {    
-    mpDeformedMesh->ConstructFromMesh(*pDeformedOutputMesh);
 }
 
 template<unsigned DIM>
 VtkDeformedMeshWriter<DIM>::~VtkDeformedMeshWriter()
 {
-    delete mpDeformedMesh;
+
 }
 
 template<unsigned DIM>
@@ -60,6 +59,8 @@ void VtkDeformedMeshWriter<DIM>::SetOutputBaseFileName(const std::string& rOutpu
 {
     this->mBaseName = rOutputBaseFileName;
 }
+
+
 
 template<unsigned DIM>
 void VtkDeformedMeshWriter<DIM>::WriteDeformedFiles()

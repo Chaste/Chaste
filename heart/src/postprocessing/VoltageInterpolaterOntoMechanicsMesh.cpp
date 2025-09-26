@@ -61,6 +61,7 @@ VoltageInterpolaterOntoMechanicsMesh<DIM>::~VoltageInterpolaterOntoMechanicsMesh
 {
     delete mpMeshPair;
 }
+
 template <unsigned DIM>
 void VoltageInterpolaterOntoMechanicsMesh<DIM>::InterpolateOnCoarseMesh(std::vector<double>& rValuesOnCoarseMesh, ReplicatableVector& rValuesOnFineMesh)
 {
