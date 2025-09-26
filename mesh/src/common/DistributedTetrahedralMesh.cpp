@@ -1360,8 +1360,10 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     }
 
 #ifdef HOMEMADE_MESH_TO_DUAL
+    // element_node_matrix is an encoding of the .ele file.  Each row is an element with the 
+    // 3 or 4 adjacent nodes indicated by a 1 in the approciate column
     Mat element_node_matrix;
-    PetscTools::SetupMat(element_node_matrix, num_elements, num_nodes, 4, num_local_elements);
+    PetscTools::SetupMat(element_node_matrix, num_elements, num_nodes, ELEMENT_DIM+1, num_local_elements);
 #endif
     
     unsigned counter = 0;
@@ -1375,7 +1377,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
         for (unsigned i=0; i<ELEMENT_DIM+1; i++)
         {
 #ifdef HOMEMADE_MESH_TO_DUAL
-            MatSetValue(element_node_matrix, element_index+first_local_element, element_data.NodeIndices[i], 1.0, ADD_VALUES);
+            PetscMatTools::SetElement(element_node_matrix, element_index+first_local_element, element_data.NodeIndices[i], 1.0);
 #else
             eind[counter++] = element_data.NodeIndices[i];
 #endif
@@ -1396,6 +1398,17 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     PetscMatTools::Finalise(element_node_matrix);
     std::vector<idx_t> my_xadj;
     std::vector<idx_t> my_adjncy;
+    /* The goal is for my_adjncy to contain, for each local element, a list of the
+     * elements that it is adjacent to. These are contiguous but my_xadj will contain the
+     * start index for the data of each local element.
+     * The element_node_matrix contains data on which nodes support each element.
+     * The dot-product of two rows of this matrix is an indication of how many nodes two elements share:
+     * ELEMENT_DIM+1 if they are the same row and ELEMENT_DIM if they are neighbours.
+     * These dot-products are achieved (slowly) with
+     * element_element_matrix = element_node_matrix * transpose(element_node_matrix)
+     * 
+     * Each entry of element_element_matrix shows how many nodes a pair of elements share.
+     */
 
     Mat node_element_matrix;
     MatTranspose(element_node_matrix, MAT_INITIAL_MATRIX,  &node_element_matrix);
@@ -1421,8 +1434,8 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
         my_xadj.push_back(my_adjncy.size());
     }
     MatDestroy(&element_node_matrix);
-    MatDestroy(&element_node_matrix);
-    MatDestroy(&element_node_matrix);
+    MatDestroy(&node_element_matrix);
+    MatDestroy(&element_element_matrix);
     xadj = &my_xadj[0];
     adjncy = &my_adjncy[0];
 
