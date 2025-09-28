@@ -51,9 +51,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FineCoarseMeshPair.hpp"
 #include "AbstractConductivityModifier.hpp"
 #include "ElectroMechanicsProblemDefinition.hpp"
-#include "VtkDeformedMeshWriter.hpp"
+#include "CardiacElectroMechanicsVtkHandler.hpp"
 #include "VoltageInterpolaterOntoMechanicsMesh.hpp"
-#include "VtkNonlinearElasticitySolutionWriter.hpp"
 
 /**
  * Enumeration of the possible electrics problem types
@@ -132,16 +131,6 @@ protected :
      */
     std::vector<double> mInterpolatedVoltages;
 
-    /**
-     * A cache for the interpolated voltages from electrics to mechanics mesh but node-wise.
-     * Memory is allocated within Initialise(). Filled in during Solve() and used for VTK output
-     */
-    std::vector<double> mInterpolatedVoltagesNodeWise;
-
-    std::vector<c_vector<double,DIM> > mDisplacements;
-
-    VtkNonlinearElasticitySolutionWriter<DIM>* mpVtkElastictyWriter;
-
 
     /** The mesh for the electrics */
     TetrahedralMesh<DIM,DIM>* mpElectricsMesh;
@@ -156,11 +145,6 @@ protected :
 
     /** Class wrapping both meshes, useful for transferring information */
     FineCoarseMeshPair<DIM>* mpMeshPair;
-
-    /** Used to interpolate electrics solution onto mechanics mesh for VTK output*/
-    VoltageInterpolaterOntoMechanicsMesh<DIM>* mpInterpolater;
-
-    QuadraticMesh<DIM>* mpVtkOutputMesh;
 
     /** Output directory, relative to TEST_OUTPUT */
     std::string mOutputDirectory;
@@ -210,7 +194,8 @@ protected :
      */
     void WriteWatchedLocationData(double time, Vec voltage);
 
-    VtkDeformedMeshWriter<DIM>* mpVtkWriter;
+    CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>* mpCardiacVtkWriter; 
+
 public :
 
     /**

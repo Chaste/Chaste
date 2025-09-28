@@ -45,9 +45,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A class to write meshes in VTK format, allowing for specification of 
  * a new set of node positions ("deformed mesh") and a new file name.
- * The mesh that is passed in the constructor is not actually changed by this class
- * Instead, a copy is made internally here (with unfortunate memory footprint), and the 
- * internal copy is used for modifying nide locations and printing out files.
  * 
  * This class was designed with time-dependent simulations in mind, where,
  * at every time step, one may want to write out a mesh that is being
@@ -65,7 +62,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  writer.ApplyDeformation(new_node_locations);
  *  writer.SetWriteMeshCells(false); //cells have been alreday written
  *  writer.SetOutputBaseFileName(new_name);//do not overwrite the previous file
- *  writer.WriteDeformedFiles();      
+ *  writer.WriteDeformedFiles();
+ * 
+ *  Note that the ApplyDeformation method actually changes
+ *  the mesh node coordinates. Use with caution as no other
+ *  quantities of the mesh (e.g., Jacobian) are actually modified!      
  */
 template<unsigned DIM>
 class VtkDeformedMeshWriter : public VtkMeshWriter<DIM,DIM>
@@ -114,9 +115,9 @@ public:
     void WriteDeformedFiles();
 
     /**
-     * Modify the node locations of the mesh bya ssigning the coordinates
+     * Modify the node locations of the mesh by assigning the coordinates
      * according to rPositions. Note that only node coordinates are changed 
-     * (no Jacobians or othe rrelated quantities are modified)
+     * (no Jacobians or other related quantities are modified). Use with caution!
      * 
      * @param rPositions the node positions to be applied to the mesh
      */
