@@ -58,19 +58,21 @@ CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsVtk
 
     //allocate memory for the interpolated voltages (once on initialize)
     mInterpolatedVoltagesNodeWise.assign(mpVtkOutputMesh->GetNumNodes(),0.0);
-    //allocate memory forelement-wise displacements
+    //allocate memory for displacements
     c_vector<double,DIM> no_displ;
-    if (DIM==2)
+    c_matrix<double,DIM,DIM> zero_strains;
+    for (unsigned i=0u ; i < DIM; ++i)
     {
-        no_displ = Create_c_vector(0.0,0.0);
-    }
-    if (DIM==3)
-    {
-        no_displ = Create_c_vector(0.0,0.0,0.0);
+        no_displ(i) = 0.0;
+        for (unsigned j=0u; j < DIM; ++j)
+        {
+            zero_strains(i,j) = 0.0;
+        } 
     }
     mDisplacements.assign(mpVtkOutputMesh->GetNumNodes(),no_displ);
+    mStrains.assign(mpVtkOutputMesh->GetNumElements(),zero_strains);
 
-    //Create initial condition vector
+    //Create initial condition vector for the voltages (from the cells)
     ReplicatableVector init_cond(rElectricsMesh.GetNumNodes());
     for (unsigned node_index = 0u; node_index < rElectricsMesh.GetNumNodes(); ++node_index)
     {
@@ -82,6 +84,7 @@ CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsVtk
     mpVtkWriter->SetOutputBaseFileName("deformed_mechanics_mesh_" + std::to_string(0));
     mpVtkWriter->AddPointData("V", mInterpolatedVoltagesNodeWise);
     mpVtkWriter->AddPointData("displacements", mDisplacements);
+    mpVtkWriter->AddTensorCellData("deformation_gradient_F", mStrains);
     assert(mInterpolatedVoltagesNodeWise.size()==rQuadMesh.GetNumNodes());
     mpVtkWriter->WriteDeformedFiles();
 }
@@ -97,16 +100,26 @@ CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::~CardiacElectroMechanicsVt
 template<unsigned DIM, unsigned ELEC_PROB_DIM>
 void CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::WriteSolution(unsigned counter, ReplicatableVector& rElectricsSolution)
 {
-    //VTK output. Determine voltage on coarse nodes 
-    mpInterpolater->InterpolateOnCoarseMesh(mInterpolatedVoltagesNodeWise,rElectricsSolution);
-
     //Apply deformation solution to mechanics mesh (the one in the writer object, not the one used by the solver!)
     mpVtkWriter->ApplyDeformation(mrMechanicsSolver.rGetDeformedPosition());
     mpVtkWriter->SetOutputBaseFileName("deformed_mechanics_mesh_" + std::to_string(counter));
     mpVtkWriter->SetWriteMeshCells(false);
+    
+    //voltage
+    mpInterpolater->InterpolateOnCoarseMesh(mInterpolatedVoltagesNodeWise,rElectricsSolution);//VTK output. Determine voltage on coarse nodes 
     mpVtkWriter->AddPointData("V", mInterpolatedVoltagesNodeWise);
+    
+    //displacement
     mpVtkElastictyWriter->CalculateDisplacements(mDisplacements);
     mpVtkWriter->AddPointData("displacements", mDisplacements);
+
+    //Strains
+    mpVtkElastictyWriter->SetWriteElementWiseStrains(DEFORMATION_GRADIENT_F);
+    std::string name;
+    mpVtkElastictyWriter->CalculateStrains(name, mStrains);
+    mpVtkWriter->AddTensorCellData(name,mStrains);
+
+    //write to file
     mpVtkWriter->WriteDeformedFiles();
 }
 

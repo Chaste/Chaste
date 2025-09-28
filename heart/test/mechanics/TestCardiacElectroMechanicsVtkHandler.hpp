@@ -146,6 +146,7 @@ public:
         p_mesh_pair->DeleteFineBoxCollection();
         
         mechanics_solver.SetFineCoarseMeshPair(p_mesh_pair);
+        mechanics_solver.SetComputeAverageStressPerElementDuringSolve(true);
         mechanics_solver.Initialise();
         
         CardiacElectroMechanicsVtkHandler<2> handler(mechanics_solver,
@@ -253,6 +254,7 @@ public:
         p_mesh_pair->DeleteFineBoxCollection();
         
         mechanics_solver.SetFineCoarseMeshPair(p_mesh_pair);
+        mechanics_solver.SetComputeAverageStressPerElementDuringSolve(true);
         mechanics_solver.Initialise();
         
         CardiacElectroMechanicsVtkHandler<3> handler(mechanics_solver,

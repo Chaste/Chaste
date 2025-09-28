@@ -261,6 +261,7 @@ public:
 
         HeartConfig::Instance()->SetSimulationDuration(10.0);
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(1500,1500,1500));
+        HeartConfig::Instance()->SetVisualizeWithVtk(true);
         //creates the EM problem with ELEC_PROB_DIM=2
         CardiacElectroMechanicsProblem<2,2> problem(COMPRESSIBLE,
                                                     BIDOMAIN,

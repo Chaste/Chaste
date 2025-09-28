@@ -123,7 +123,6 @@ public:
 
             VtkNonlinearElasticitySolutionWriter<3> vtk_writer(solver);
             vtk_writer.SetWriteElementWiseStrains(strain_type);
-            vtk_writer.SetWriteElementWiseStresses(true);
             vtk_writer.Write();
 
             // .vtu files have been visualised, everything looks good.
@@ -191,16 +190,6 @@ public:
                     }
                 }
                 
-                //solution is currently no deformation, so no stresses, better test needed?
-                TS_ASSERT_DELTA(vtk_writer.mTensorStressData[i](0,0), 0.0,1e-12);
-                TS_ASSERT_DELTA(vtk_writer.mTensorStressData[i](1,0), 0.0,1e-12);
-                TS_ASSERT_DELTA(vtk_writer.mTensorStressData[i](2,0), 0.0,1e-12);
-                TS_ASSERT_DELTA(vtk_writer.mTensorStressData[i](0,1), 0.0,1e-12);
-                TS_ASSERT_DELTA(vtk_writer.mTensorStressData[i](1,1), 0.0,1e-12);
-                TS_ASSERT_DELTA(vtk_writer.mTensorStressData[i](2,1), 0.0,1e-12);
-                TS_ASSERT_DELTA(vtk_writer.mTensorStressData[i](0,2), 0.0,1e-12);
-                TS_ASSERT_DELTA(vtk_writer.mTensorStressData[i](1,2), 0.0,1e-12);
-                TS_ASSERT_DELTA(vtk_writer.mTensorStressData[i](2,2), 0.0,1e-12);
             }
         }
 #endif //CHASTE_VTK

@@ -871,6 +871,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
             if (HeartConfig::Instance()->GetVisualizeWithVtk())
             {
+                mpMechanicsSolver->SetComputeAverageStressPerElementDuringSolve(true);
                 mpCardiacVtkWriter->WriteSolution(counter,electrics_solution_repl);//writer will pick up mech solution from solver
             }
 

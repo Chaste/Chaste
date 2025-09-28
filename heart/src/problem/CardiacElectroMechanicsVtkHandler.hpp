@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * electromechanics simulations. It makes use of various
  * other classes to compute mechanics qunatities, 
  * interpolate electrics quantities, and actually generate
- * files. It outputs voltage, displacements in VTU
+ * files. It outputs voltage, displacements, and deformation gradient in VTU
  * format to be shown in the deformed mechanics mesh.
  */
 template<unsigned DIM, unsigned ELEC_PROB_DIM=1>
@@ -72,6 +72,9 @@ private:
     
     /**< Vector of displacements to be written to file */
     std::vector<c_vector<double,DIM> > mDisplacements;
+
+    /**< vector to store strains to be printed out. */
+    std::vector<c_matrix<double,DIM,DIM> > mStrains;
 
     /**< Pointer to the mechanics solution writer class. Used to calculate some mechanics quantities */
     VtkNonlinearElasticitySolutionWriter<DIM>* mpVtkElastictyWriter;

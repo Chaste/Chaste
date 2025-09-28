@@ -40,13 +40,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM>
 VtkNonlinearElasticitySolutionWriter<DIM>::VtkNonlinearElasticitySolutionWriter(AbstractNonlinearElasticitySolver<DIM>& rSolver)
         : mpSolver(&rSolver),
-          mWriteElementWiseStrains(false),
-          mWriteElemntWiseStresses(false)
+          mWriteElementWiseStrains(false)
 {
     assert(mpSolver);
     mDisplacements.resize(mpSolver->mrQuadMesh.GetNumNodes());
     mTensorStrainData.resize(mpSolver->mrQuadMesh.GetNumElements());
-    mTensorStressData.resize(mpSolver->mrQuadMesh.GetNumElements());
 }
 
 template<unsigned DIM>
@@ -88,13 +86,6 @@ void VtkNonlinearElasticitySolutionWriter<DIM>::Write()
         mesh_writer.AddTensorCellData(name, mTensorStrainData);
     }
 
-    //write stress, if required
-    if (mWriteElemntWiseStresses)
-    {   
-        CalculateStresses(mTensorStressData);
-        mesh_writer.AddTensorCellData("average_stress",mTensorStressData);
-    }
-
     // final write
     mesh_writer.WriteFilesUsingMesh(mpSolver->mrQuadMesh);
 #endif // CHASTE_VTK
@@ -110,25 +101,6 @@ void VtkNonlinearElasticitySolutionWriter<DIM>::CalculateDisplacements(std::vect
         for (unsigned j=0; j<DIM; j++)
         {
             rDisplacements[i](j) = spatial_solution[i](j) - mpSolver->mrQuadMesh.GetNode(i)->rGetLocation()[j];
-        }
-    }
-}
-
-template<unsigned DIM>
-void VtkNonlinearElasticitySolutionWriter<DIM>::CalculateStresses(std::vector<c_matrix<double,DIM,DIM> >& rStresses)
-{
-    assert(rStresses.size() == mpSolver->mrQuadMesh.GetNumElements());
-    for (typename AbstractTetrahedralMesh<DIM,DIM>::ElementIterator iter = mpSolver->mrQuadMesh.GetElementIteratorBegin();
-            iter != mpSolver->mrQuadMesh.GetElementIteratorEnd();
-            ++iter)
-    {
-        unsigned elem_idx = iter->GetIndex();
-        for (unsigned i = 0; i < DIM; ++i)
-        {
-            for (unsigned j = 0; j < DIM; ++j)
-            {
-                rStresses[elem_idx](i,j) = mpSolver->GetAverageStressPerElement(elem_idx)(i,j);
-            }
         }
     }
 }
@@ -175,11 +147,7 @@ void VtkNonlinearElasticitySolutionWriter<DIM>::SetWriteElementWiseStrains(Strai
     mElementWiseStrainType = strainType;
 }
 
-template<unsigned DIM>
-void VtkNonlinearElasticitySolutionWriter<DIM>::SetWriteElementWiseStresses(bool write)
-{
-    mWriteElemntWiseStresses = write;
-}
+
 
 // Explicit instantiation
 template class VtkNonlinearElasticitySolutionWriter<2>;
