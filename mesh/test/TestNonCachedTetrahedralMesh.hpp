@@ -85,20 +85,20 @@ public:
 
     void TestConstruct3D()
     {
-        // TetrahedralMesh with Jacobian caching
-        unsigned cached_mem_usage;
-        {
-            TetrahedralMesh<3,3> mesh;
-            mesh.ConstructCuboid(30,30,30);
-            cached_mem_usage = GetMemoryUsage();
-        }
-
-        // No caching
+        // No caching - lightest memory use first
         unsigned non_cached_mem_usage;
         {
             NonCachedTetrahedralMesh<3,3> mesh;
             mesh.ConstructCuboid(30,30,30);
             non_cached_mem_usage = GetMemoryUsage();
+        }
+
+        // TetrahedralMesh with Jacobian caching - heavier memory use
+        unsigned cached_mem_usage;
+        {
+            TetrahedralMesh<3,3> mesh;
+            mesh.ConstructCuboid(30,30,30);
+            cached_mem_usage = GetMemoryUsage();
         }
 
         // compare mem usage
