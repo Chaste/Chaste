@@ -68,6 +68,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #else //ndef PARMETIS_MAJOR_VERSION
 // If there's no PARMETIS then assume we have Scotch
 #include <scotch/ptscotch.h>
+#include <scotch/scotch.h>
 #define idx_t SCOTCH_Num
 #define real_t float
 // Conditionally turn off the interface to ParMETIS_V3_Mesh2Dual which should be added into PTScotch at 7.0.9 
@@ -1493,6 +1494,10 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
 //    ParMETIS_V3_PartGeomKway(element_distribution, xadj, adjncy, NULL, NULL, &weight_flag, &numflag,
 //                             &n_dimensions, node_coordinates, &n_constraints, &n_subdomains, NULL, NULL,
 //                             options, &edgecut, local_partition, &communicator);
+#ifdef SCOTCH_VERSION
+    // Make the PT_Scotch partitioning predictable by resetting the random seed
+    SCOTCH_randomReset();
+#endif
 
     Timer::Reset();
     ParMETIS_V3_PartKway(element_distribution.get(), xadj, adjncy, nullptr, nullptr, &weight_flag, &numflag,
