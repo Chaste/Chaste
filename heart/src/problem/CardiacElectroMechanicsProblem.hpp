@@ -180,6 +180,9 @@ protected :
     /** Somewhere to store the modified conductivity tensor */
     c_matrix<double,DIM,DIM> mModifiedConductivityTensor;
 
+    /** Pointer to the VTK writer class. Initialized within Initialise() method*/
+    CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>* mpCardiacVtkWriter; 
+
     /**
      *  Determine which node is closest to the watched location
      */
@@ -194,7 +197,7 @@ protected :
      */
     void WriteWatchedLocationData(double time, Vec voltage);
 
-    CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>* mpCardiacVtkWriter; 
+    
 
 public :
 
