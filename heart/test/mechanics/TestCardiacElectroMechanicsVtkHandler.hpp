@@ -88,7 +88,7 @@ public:
 
 /**
 * The tests below build the VTK writer object
-* then tests whether it actually writeds valid VTK files 
+* then tests whether it actually writes valid VTK files 
 * with the expected data 
 */
 class TestCardiacElectroMechanicsVtkHandler : public CxxTest::TestSuite
@@ -97,6 +97,8 @@ public:
 
     void TestEMVtkOutput2D()
     {
+#ifdef CHASTE_VTK
+// Requires  "sudo aptitude install libvtk5-dev" or similar
         EntirelyStimulatedTissueCellFactory cell_factory;
 
         TetrahedralMesh<2,2> electrics_mesh;
@@ -197,11 +199,16 @@ public:
         }
         
         delete p_mesh_pair;
-
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
+#endif //CHASTE_VTK
     }
 
     void TestEMVtkOutput3D()
     {
+#ifdef CHASTE_VTK
+// Requires  "sudo aptitude install libvtk5-dev" or similar
         MechanicsEventHandler::Reset();//prevent some warnings
         HeartEventHandler::Reset();//prevent some warnings
         
@@ -306,6 +313,10 @@ public:
             }
         }
         delete p_mesh_pair;
+#else
+        std::cout << "This test was not run, as VTK is not enabled." << std::endl;
+        std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
+#endif //CHASTE_VTK
     }
   
 

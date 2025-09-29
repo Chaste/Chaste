@@ -497,7 +497,9 @@ public:
         deformed_positions[0] = Create_c_vector(-1.0,-0.5);
         writer.ApplyDeformation(deformed_positions);
         writer.SetOutputBaseFileName(base_name+"_1");//do not overwrite the previous file
-        writer.SetWriteMeshCells(false);//Write already called. No need to write cells any longer
+        //Write already called. No need to write cells any longer
+        //without the line below, the test fails as the cells accummulate (VTK error and assertion trip)
+        writer.SetWriteMeshCells(false);
 
         // Add some different data on the deformed mesh
         std::vector<double> distance_2;
@@ -528,8 +530,8 @@ public:
             //check the deformed node (the first)...
             std::vector<double> first_node = vtk_reader.GetNextNode();
             TS_ASSERT_EQUALS(first_node.size(),3);//the GetNextNode always fills up 3 coordinates regardless of SPACE_DIM (not sure why)
-            TS_ASSERT_DELTA(first_node[0],-1.0,1e-9);
-            TS_ASSERT_DELTA(first_node[1],-0.5,1e-9);
+            TS_ASSERT_DELTA(first_node[0],-1.0,1e-9);//node was moved to -1,-0.5
+            TS_ASSERT_DELTA(first_node[1],-0.5,1e-9);//node was moved to -1,-0.5
 
             //...others untouched, start the loop at 1
             for (unsigned i = 1u; i < mesh.GetNumNodes(); ++i)

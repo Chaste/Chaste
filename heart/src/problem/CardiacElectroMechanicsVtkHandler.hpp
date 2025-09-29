@@ -37,6 +37,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CARDIACELECTROMECHANICSVTKHANDLER_HPP_
 #define CARDIACELECTROMECHANICSVTKHANDLER_HPP_
 
+#ifdef CHASTE_VTK
+
 #include "AbstractCardiacProblem.hpp"
 #include "AbstractNonlinearElasticitySolver.hpp"
 #include "FineCoarseMeshPair.hpp"
@@ -59,9 +61,9 @@ class CardiacElectroMechanicsVtkHandler
 {
 
 private: 
-    /**< Cache for the mechanics solver (deformed solution is taken from this object)*/
+    /** Cache for the mechanics solver (deformed solution is taken from this object)*/
     AbstractNonlinearElasticitySolver<DIM>& mrMechanicsSolver;
-    /**< Cache for the electrics problem used in the EM problem*/
+    /** Cache for the electrics problem used in the EM problem*/
     AbstractCardiacProblem<DIM,DIM,ELEC_PROB_DIM>& mrElectricsProblem;
        
     /**
@@ -70,19 +72,19 @@ private:
      */
     std::vector<double> mInterpolatedVoltagesNodeWise;
     
-    /**< Vector of displacements to be written to file */
+    /** Vector of displacements to be written to file */
     std::vector<c_vector<double,DIM> > mDisplacements;
 
-    /**< vector to store strains to be printed out. */
+    /** vector to store strains to be printed out. */
     std::vector<c_matrix<double,DIM,DIM> > mStrains;
 
-    /**< Pointer to the mechanics solution writer class. Used to calculate some mechanics quantities */
+    /** Pointer to the mechanics solution writer class. Used to calculate some mechanics quantities */
     VtkNonlinearElasticitySolutionWriter<DIM>* mpVtkElastictyWriter;
 
-    /**< Poiunter to the actual mesh VTK writer. Initialized upon construction */
+    /** Poiunter to the actual mesh VTK writer. Initialized upon construction */
     VtkDeformedMeshWriter<DIM>* mpVtkWriter;
 
-    /**< Used to interpolate electrics solution onto mechanics mesh for VTK output*/
+    /** Used to interpolate electrics solution onto mechanics mesh for VTK output*/
     VoltageInterpolaterOntoMechanicsMesh<DIM>* mpInterpolater;
 
     /** 
@@ -117,14 +119,16 @@ public:
      
      /**
       * Write the solution to file. It will write to rOutputDir/vtk/deformed_mechanics_mesh_X.vtu where X=counter.
-      * it writes Voltage ("V"), displacements ("displacements") using the deformed mechanics mesh.
+      * it writes Voltage ("V"), displacements ("displacements"),
+      * and deformation gradient F ("deformation_gradient_F") using the deformed mechanics mesh.
       *
-      * @param counter. Used to name the file 
-      * @param rElectricsSolution. The solution of the electrcis problem. It will be interpolated
+      * @param counter Used to name the file 
+      * @param rElectricsSolution The solution of the electrcis problem. It will be interpolated
       *        onto the mechanics mesh within this method to outoput voltage V. 
       */
      void WriteSolution(unsigned counter, ReplicatableVector& rElectricsSolution);
 };
 
+#endif //CHATE_VTK
 
 #endif //CARDIACELECTROMECHANICSVTKHANDLER_HPP_

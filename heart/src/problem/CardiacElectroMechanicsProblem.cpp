@@ -337,11 +337,13 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::~CardiacElectroMechanicsProbl
     delete mpElectricsProblem;
     delete mpCardiacMechSolver;
     delete mpMeshPair;
+    
+#ifdef CHASTE_VTK
     if (mWriteOutput && HeartConfig::Instance()->GetVisualizeWithVtk())
     {
         delete mpCardiacVtkWriter;
     }
-
+#endif
     LogFile::Close();
 }
 
@@ -486,11 +488,13 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
         TrianglesMeshWriter<DIM,DIM> mesh_writer(mOutputDirectory,"electrics_mesh",false);
         mesh_writer.WriteFilesUsingMesh(*mpElectricsMesh);
 
+#ifdef CHASTE_VTK
         if (HeartConfig::Instance()->GetVisualizeWithVtk())
         {   
             mpCardiacVtkWriter = new CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>(*mpMechanicsSolver,
                 *mpMechanicsMesh,*mpElectricsMesh, *mpElectricsProblem, mDeformationOutputDirectory);
         }
+#endif
     }   
 }
 
@@ -869,12 +873,12 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
 
             p_cmgui_writer->WriteDeformationPositions(rGetDeformedPosition(), counter);
 
+#ifdef CHASTE_VTK
             if (HeartConfig::Instance()->GetVisualizeWithVtk())
             {
-                mpMechanicsSolver->SetComputeAverageStressPerElementDuringSolve(true);
                 mpCardiacVtkWriter->WriteSolution(counter,electrics_solution_repl);//writer will pick up mech solution from solver
             }
-
+#endif
             if (!mNoElectricsOutput)
             {
                 mpElectricsProblem->mpWriter->AdvanceAlongUnlimitedDimension();
