@@ -57,11 +57,11 @@ class VoltageInterpolaterOntoMechanicsMesh
 
 private:
 
-    /**< The fine mesh (values will be interpolated from this one)*/
+    /** The fine mesh (values will be interpolated from this one)*/
     TetrahedralMesh<DIM,DIM>& mrElectricsMesh;
-    /**< The coarse mesh (values will be interpolated onto this one)*/
+    /** The coarse mesh (values will be interpolated onto this one)*/
     QuadraticMesh<DIM>& mrMechanicsMesh;
-    /**< Mesh pair object. Initialized by the constructor using the two meshes passed in*/
+    /** Mesh pair object. Initialized by the constructor using the two meshes passed in*/
     FineCoarseMeshPair<DIM>* mpMeshPair;
 
 public:

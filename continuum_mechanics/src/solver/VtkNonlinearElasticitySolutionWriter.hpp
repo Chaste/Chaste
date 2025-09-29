@@ -59,7 +59,7 @@ private:
     /** Tensor data to be written to the .vtu file. Used also for testing*/
     std::vector<c_matrix<double,DIM,DIM> > mTensorStrainData;
 
-    /**< Vector to store displacements */
+    /** Vector to store displacements */
     std::vector<c_vector<double,DIM> > mDisplacements;
 
 
