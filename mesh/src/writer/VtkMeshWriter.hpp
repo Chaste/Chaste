@@ -79,7 +79,7 @@ private:
     /**
      * Whether or not the information on mesh cells (aka mesh elements) need to be printed. 
      * Defaults to true. When calling the "write" method multiple times, 
-     * you may need to set ti to false after the first time.
+     * you may need to set it to false after the first time.
      */
     bool mWriteMeshCells;
 

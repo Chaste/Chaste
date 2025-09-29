@@ -66,7 +66,7 @@ private:
 
 public:
     /**
-     *  Constructor. Stes up the Mesh Pair object used for the interpolation later.
+     *  Constructor. Sets up the Mesh Pair object used for the interpolation later.
      *
      *  @param rElectricsMesh The electrics mesh
      *  @param rMechanicsMesh The mechanics mesh

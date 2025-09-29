@@ -87,7 +87,7 @@ public:
             problem_defn.SetMaterialLaw(INCOMPRESSIBLE,&law);
             problem_defn.SetZeroDisplacementNodes(fixed_nodes);
             IncompressibleNonlinearElasticitySolver<3> solver(bar_mesh,problem_defn,dir.str());
-            solver.SetComputeAverageStressPerElementDuringSolve(true);
+            
             solver.Solve();
 
             // solution is currently no deformation. Hack into the solution and set it to be something known.
