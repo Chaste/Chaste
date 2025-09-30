@@ -70,9 +70,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <scotch/ptscotch.h>
 #define idx_t SCOTCH_Num
 #define real_t float
+#define CHASTE_SCOTCH_PARMETIS
 // Conditionally turn off the interface to ParMETIS_V3_Mesh2Dual which should be added into PTScotch at 7.0.9 
 #if ((SCOTCH_VERSION < 7) || (SCOTCH_RELEASE < 0) || (SCOTCH_PATCHLEVEL < 9))
-#define HOMEMADE_MESH_TO_DUAL
+#define CHASTE_HOMEMADE_MESH_TO_DUAL
 #endif
 #endif
 
@@ -1369,7 +1370,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
         }
     }
 
-#ifdef HOMEMADE_MESH_TO_DUAL
+#ifdef CHASTE_HOMEMADE_MESH_TO_DUAL
     // element_node_matrix is an encoding of the .ele file.  Each row is an element with the 
     // 3 or 4 adjacent nodes indicated by a 1 in the approciate column
     Mat element_node_matrix;
@@ -1386,7 +1387,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
         eptr[element_index] = counter;
         for (unsigned i=0; i<ELEMENT_DIM+1; i++)
         {
-#ifdef HOMEMADE_MESH_TO_DUAL
+#ifdef CHASTE_HOMEMADE_MESH_TO_DUAL
             PetscMatTools::SetElement(element_node_matrix, element_index+first_local_element, element_data.NodeIndices[i], 1.0);
 #else
             eind[counter++] = element_data.NodeIndices[i];
@@ -1404,7 +1405,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     idx_t* adjncy;
  
     Timer::Reset();
-#ifdef HOMEMADE_MESH_TO_DUAL
+#ifdef CHASTE_HOMEMADE_MESH_TO_DUAL
     PetscMatTools::Finalise(element_node_matrix);
     std::vector<idx_t> my_xadj;
     std::vector<idx_t> my_adjncy;
@@ -1528,7 +1529,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     }
 
     rMeshReader.Reset();
-#ifdef HOMEMADE_MESH_TO_DUAL
+#ifdef CHASTE_HOMEMADE_MESH_TO_DUAL
     // These are contained in std::vectors that are automatically freed
     xadj = NULL;
     adjncy = NULL;
