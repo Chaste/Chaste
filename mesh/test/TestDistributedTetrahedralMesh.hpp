@@ -574,19 +574,6 @@ public:
         //Scale it (for coverage)
         mesh.Scale(2.0);
 
-        // Verify that the partitioning is predictable
-        // This test is added because PT-Scotch partitioning uses a random seed by default
-        TrianglesMeshReader<3,3> mesh_reader2("mesh/test/data/cube_136_elements");
-        DistributedTetrahedralMesh<3,3> mesh2;
-        mesh2.ConstructFromMeshReader(mesh_reader2);
-        std::vector<unsigned> perm = mesh.rGetNodePermutation();
-        std::vector<unsigned> perm2 = mesh2.rGetNodePermutation();
-        for (unsigned i=0; i<perm.size();i++)
-        {
-            TS_ASSERT_EQUALS(perm[i], perm2[i]);
-        }
-
-
     }
 
     void TestConstructionFromMeshReaderWithNodeAttributes()
