@@ -544,7 +544,8 @@ public:
             HeartConfig::Instance()->SetMeshFileName("mesh/test/data/cube_136_elements");
 
             TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-            DistributedTetrahedralMesh<3,3> mesh;
+            // For libscotchparmetis turn off smart partitioning
+            DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
             mesh.ConstructFromMeshReader(mesh_reader);
 
             UnStimulatedCellFactory first_cell;
@@ -648,7 +649,8 @@ public:
             // Also, when testing in parallel, we use it to get the vector factory to loop over the nodes we own.
             // this is because  p_extended_tissue->pGetMesh()->GetDistributedVectorFactory() doesn't compile (discards qualifier stuff caused by use of const).
             TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
-            DistributedTetrahedralMesh<3,3> mesh;
+            // For libscotchparmetis turn off smart partitioning
+            DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
             mesh.ConstructFromMeshReader(mesh_reader);
 
             TS_ASSERT_EQUALS(mesh.GetNumNodes(), p_extended_tissue->pGetMesh()->GetNumNodes());//note: this is allowed because GetNumNodes has const in the signature
