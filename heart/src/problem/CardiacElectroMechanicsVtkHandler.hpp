@@ -63,9 +63,7 @@ class CardiacElectroMechanicsVtkHandler
 private: 
     /** Cache for the mechanics solver (deformed solution is taken from this object)*/
     AbstractNonlinearElasticitySolver<DIM>& mrMechanicsSolver;
-    /** Cache for the electrics problem used in the EM problem*/
-    AbstractCardiacProblem<DIM,DIM,ELEC_PROB_DIM>& mrElectricsProblem;
-       
+
     /**
      * A cache for the interpolated voltages from electrics to mechanics mesh but node-wise.
      * Memory is allocated within the constructor. Filled in when WriteSolution() is called.
@@ -102,7 +100,7 @@ public:
               that this class uses to write out a VRK deformed mesh is taken from this solver.
      * @param rQuadMesh The mesh used by the mechanics problem. A copy is made here.
      * @param rElectricsMesh The mesh used by the electrcis problem. 
-     * @param rElectricsProblem The actual electrics problem (used for initial conditions)
+     * @param rElectricsInitialCondition the initial value for all the cells in the electrics mesh (V and, if applicable, Phi_e)
      * @param rOutputDir The output directory where to write. 
      *        Files will be written (relative to CHASTE_TEST_OUTPUT) to rOutputDir/vtk/
      *        It will be cleared upon construction.
@@ -110,7 +108,7 @@ public:
     CardiacElectroMechanicsVtkHandler(AbstractNonlinearElasticitySolver<DIM>& rMechanicsSolver,
                                       QuadraticMesh<DIM>& rQuadMesh,
                                       TetrahedralMesh<DIM,DIM>& rElectricsMesh,
-                                      AbstractCardiacProblem<DIM,DIM,ELEC_PROB_DIM>& rElectricsProblem,
+                                      ReplicatableVector& rElectricsInitialCondition,
                                       const std::string& rOutputDir);
     /**
      * Destructor

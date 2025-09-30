@@ -40,12 +40,11 @@ template<unsigned DIM, unsigned ELEC_PROB_DIM>
 CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsVtkHandler(AbstractNonlinearElasticitySolver<DIM>& rMechanicsSolver,
     QuadraticMesh<DIM>& rQuadMesh,
     TetrahedralMesh<DIM,DIM>& rElectricsMesh,
-    AbstractCardiacProblem<DIM,DIM,ELEC_PROB_DIM>& rElectricsProblem,
+    ReplicatableVector& rElectricsInitialCondition,
     const std::string& rOutputDir)
-   : mrMechanicsSolver(rMechanicsSolver),
-     mrElectricsProblem(rElectricsProblem)
+   : mrMechanicsSolver(rMechanicsSolver)
 {
-    //create an internbal copy of the quadratic mesh (we will modify node locations for oputput)
+    //create an internal copy of the quadratic mesh (we will modify node locations for oputput)
     mpVtkOutputMesh = new QuadraticMesh<DIM>();
     mpVtkOutputMesh->ConstructFromMesh(rQuadMesh);
     assert(mpVtkOutputMesh->GetNumNodes() == rQuadMesh.GetNumNodes());
@@ -72,15 +71,15 @@ CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsVtk
     mDisplacements.assign(mpVtkOutputMesh->GetNumNodes(),no_displ);
     mStrains.assign(mpVtkOutputMesh->GetNumElements(),zero_strains);
 
-    //Create initial condition vector for the voltages (from the cells)
+    //Create initial condition vector for the voltages (passed in)
     ReplicatableVector init_cond(rElectricsMesh.GetNumNodes());
-    for (unsigned node_index = 0u; node_index < rElectricsMesh.GetNumNodes(); ++node_index)
+    for (unsigned i = 0u; i < init_cond.GetSize(); ++i)
     {
-        //unsigned global_index = element.GetNodeGlobalIndex(node_index);
-        init_cond[node_index] = rElectricsProblem.GetTissue()->GetCardiacCell(node_index)->GetVoltage();
+        //the following line assumes interleaved solution for ELEC_PROB_DIM>1 (e.g, [Vm_0, phi_e_0, Vm1, phi_e_1...])
+        init_cond[i] = rElectricsInitialCondition[ELEC_PROB_DIM*i];
     }
     mpInterpolater->InterpolateOnCoarseMesh(mInterpolatedVoltagesNodeWise,init_cond);
-    
+
     mpVtkWriter->SetOutputBaseFileName("deformed_mechanics_mesh_" + std::to_string(0));
     mpVtkWriter->AddPointData("V", mInterpolatedVoltagesNodeWise);
     mpVtkWriter->AddPointData("displacements", mDisplacements);

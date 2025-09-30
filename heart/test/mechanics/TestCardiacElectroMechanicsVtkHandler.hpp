@@ -151,10 +151,11 @@ public:
         mechanics_solver.SetComputeAverageStressPerElementDuringSolve(true);
         mechanics_solver.Initialise();
         
+        ReplicatableVector ic(mono_problem.CreateInitialCondition());
         CardiacElectroMechanicsVtkHandler<2> handler(mechanics_solver,
                                       mechanics_mesh,
                                       electrics_mesh,
-                                      mono_problem,
+                                      ic,
                                       output_dir);
         
         // fake a solution
@@ -264,10 +265,11 @@ public:
         mechanics_solver.SetComputeAverageStressPerElementDuringSolve(true);
         mechanics_solver.Initialise();
         
+        ReplicatableVector ic(mono_problem.CreateInitialCondition());
         CardiacElectroMechanicsVtkHandler<3> handler(mechanics_solver,
                                       mechanics_mesh,
                                       electrics_mesh,
-                                      mono_problem,
+                                      ic,
                                       output_dir);
         
         // fake a solution
