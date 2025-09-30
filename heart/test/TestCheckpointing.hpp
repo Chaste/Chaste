@@ -57,6 +57,12 @@ public:
      */
     void TestMultipleCallsToProblemSolve()
     {
+        // libscotchparmetis 
+        // Turn off any smart partitioning.  This is because PT-Scotch cannot be forced to always
+        // give the same partition of the same mesh twice running
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetMeshPartitioning(), DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
+        HeartConfig::Instance()->SetMeshPartitioning("dumb");
+
         HeartConfig::Instance()->SetMeshFileName("mesh/test/data/3D_0_to_1mm_6000_elements");
         HeartConfig::Instance()->SetOutputDirectory("Monodomain3d");
         HeartConfig::Instance()->SetOutputFilenamePrefix("monodomain3d");
@@ -100,6 +106,9 @@ public:
             TS_ASSERT_DELTA(single_vm[index], multiple_vm[index], 1e-8);
             TS_ASSERT_DELTA(single_phie[index], multiple_phie[index], 1e-8);
         }
+        // libscotchparmetis
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetMeshPartitioning(), DistributedTetrahedralMeshPartitionType::DUMB);
+        HeartConfig::Instance()->SetMeshPartitioning("parmetis");
     }
 
     void TestCheckpointingGeneratesMultipleDirectories()
