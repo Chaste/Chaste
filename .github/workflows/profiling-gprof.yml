@@ -114,7 +114,6 @@ jobs:
           path: profiling-gprof
           fetch-depth: 0
           token: ${{ secrets.PROFILING_GPROF_ACCESS }}
-        if: always() && steps.index-exists.outputs.index == 'True'
 
       - name: copy results
         run: |
