@@ -22,6 +22,10 @@ jobs:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
       CHASTE_BUILD_DIR: ${{ github.workspace }}/Chaste/chaste-build-dir
 
+    outputs:
+      index: ${{ steps.index-exists.outputs.index }}
+      datetime: ${{ steps.get-datetime.outputs.datetime }}
+
     steps:
 
       - name: get current datetime
@@ -90,7 +94,7 @@ jobs:
     needs: build-and-test
     runs-on: ubuntu-latest
     # only when index exists AND it's not a forked PR (or it's not a PR at all)
-    if: ${{ always() && needs.build-and-test.outputs.index == 'True' && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork) }}
+    if: ${{needs.build-and-test.outputs.index == 'True' && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork) }}
 
     env:
       GPROF_DIR: ${{ github.workspace }}/profiling-gprof
