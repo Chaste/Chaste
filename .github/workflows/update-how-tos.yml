@@ -37,7 +37,7 @@ jobs:
   upload-to-website:
     needs: generate-how-to-markdown
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.repository == 'Chaste/Chaste'
     steps:
       - name: Download how-to markdown
         uses: actions/download-artifact@v4
