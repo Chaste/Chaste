@@ -335,6 +335,20 @@ void SemMeshGenerator::GenerateSingleCell(std::array<double, 2> center, std::arr
             unsigned int new_node_index = mpMesh->GetNumNodes();
             std::vector<double> node_location = {x_location, y_location};
             Node<2>* new_node = new Node<2>(new_node_index, node_location, is_boundary_node);
+
+            new_node->SetRegion(0u);
+
+            if(node_location[0] > 0.0)
+            {
+                new_node->SetRegion(1u);
+            }
+
+            if(node_location[1] > 0.0)
+            {
+                new_node->SetRegion(2u);
+            }
+
+            new_node->SetRadius(0.05);
             
             // Add the node to the mesh
             mpMesh->AddNode(new_node);

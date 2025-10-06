@@ -67,7 +67,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileComparison.hpp"
 #include "SimpleTargetAreaModifier.hpp"
 #include "OffLatticeSimulation.hpp"
-#include "Warnings.hpp"
 
 #include "PetscSetupAndFinalize.hpp"
 
@@ -1915,13 +1914,10 @@ public:
         VertexBasedCellPopulation<2> cell_population(mesh, cells);
         cell_population.InitialiseCells();
 
-        // Test that a subclass of AbstractTwoBodyInteractionForce emits the appropraite warning
+        // Test that a subclass of AbstractTwoBodyInteractionForce throws the correct exception
         GeneralisedLinearSpringForce<2> spring_force;
-        Warnings::QuietDestroy(); // Clear any warnings before the expected one
-        spring_force.AddForceContribution(cell_population);
-        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),
-            "No node pairs found. Does this cell population support updating mNodePairs?"
-            " Currently this force class works only with NodeBased and MeshBased cell populations.");
+        TS_ASSERT_THROWS_THIS(spring_force.AddForceContribution(cell_population),
+                "AbstractTwoBodyInteractionForce can only be used with MeshBased, NodeBased or SemBased cell populations.");
 
         // Test that RepulsionForce throws the correct exception
         RepulsionForce<2> repulsion_force;

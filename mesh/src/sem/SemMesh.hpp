@@ -42,6 +42,7 @@ class SemMeshWriter;
 #include <algorithm>
 #include <iostream>
 #include <map>
+#include <memory>
 
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/split_member.hpp>
@@ -50,6 +51,7 @@ class SemMeshWriter;
 
 #include "AbstractMesh.hpp"
 #include "ArchiveLocationInfo.hpp"
+#include "DistributedBoxCollection.hpp"
 #include "SemElement.hpp"
 #include "Element.hpp"
 #include "SemMeshReader.hpp"
@@ -65,6 +67,19 @@ class SemMesh : public AbstractMesh<DIM, DIM>
 private:
     /** Vector of pointers to SemElements. */
     std::vector<SemElement<DIM>*> mElements;
+
+    /** Box collection to efficiently calculate node-node interactions. */
+    std::unique_ptr<DistributedBoxCollection<DIM>> mpBoxCollection;
+
+    /** Nodes separated by a distance less than mMaximumInteractionDistance are neighbours. */
+    double mMaximumInteractionDistance;
+
+    /**
+     * Set up a DistributedBoxCollection by calculating the correct domain size from the node locations.
+     *
+     * @param rNodes the nodes that will be contained in the box collection.
+     */
+    void SetUpBoxCollection(const std::vector<Node<DIM>*>& rNodes);
 
     /**
      * Solve node mapping method. This overridden method is required as it is 
@@ -135,6 +150,9 @@ private:
     }
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
+    /** @return mpBoxCollection */
+    DistributedBoxCollection<DIM>* GetBoxCollection();
+
 public:
     /** Forward declaration of SemElement iterator. */
     class SemElementIterator;
@@ -150,6 +168,16 @@ public:
      * @return an iterator to one past the last SemElement in the SemMesh.
      */
     inline SemElementIterator GetElementIteratorEnd();
+
+    /**
+     * Set up the box collection.
+     *
+     * @param cutOffLength the cut off length for node neighbours.
+     * @param domainSize the size of the domain containing the nodes.
+     * @param numLocalRows the number of rows that should be owned by this process.
+     * @param isDimPeriodic whether the DistributedBoxCollection should be periodic.
+     */
+    void SetUpBoxCollection(double cutOffLength, c_vector<double, 2 * DIM> domainSize, int numLocalRows = PETSC_DECIDE, c_vector<bool, DIM> isDimPeriodic = zero_vector<bool>(DIM));
 
     /**
      * Default constructor.
@@ -175,7 +203,24 @@ public:
      * @return the number of Nodes in the mesh.
      */
     virtual unsigned GetNumNodes() const;
-    
+
+    /**
+     * Update the node locations in the box collection.
+     */
+    void UpdateBoxCollection();
+
+    /**
+     * Iterate through each node and add it to its appropriate box.
+     */
+    void AddNodesToBoxes();
+
+    /**
+     * Calculate pairs of nodes using the BoxCollection.
+     *
+     * @param rNodePairs reference to the vector of node pairs to populate.
+     */
+    void CalculateNodePairs(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs);
+
     /**
      * Adds a node to the mesh
      * 
@@ -232,6 +277,9 @@ public:
      */
     virtual void Clear();
 
+    /**  Clear the BoxCollection  */
+    void ClearBoxCollection();
+
     /**
      * Get the volume (or area in 2D, or length in 1D) of an element.
      *
@@ -252,7 +300,19 @@ public:
      * @return a pointer to the vertex mesh
      */
     virtual SemMesh<DIM>* GetMeshForVtk();
-    
+
+    /**
+     * Set the maximum node interaction distance.
+     *
+     * @param maxDistance the new maximum distance.
+     */
+    void SetMaximumInteractionDistance(double maximumInteractionDistance);
+
+    /**
+     * @return mMaximumInteractionDistance.
+     */
+    double GetMaximumInteractionDistance() const;
+
     void DeleteNodePriorToReMesh(unsigned int node);
     void ReMesh(NodeMap map);
 

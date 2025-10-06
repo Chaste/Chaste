@@ -35,6 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "SemMesh.hpp"
 
+#include <cmath>
+
 template<unsigned DIM>
 SemMesh<DIM>::SemMesh(std::vector<Node<DIM>*> nodes,
                       std::vector<SemElement<DIM>*> semElements)
@@ -114,6 +116,112 @@ template<unsigned DIM>
 SemMesh<DIM>* SemMesh<DIM>::GetMeshForVtk()
 {
     return this;
+}
+
+template<unsigned DIM>
+DistributedBoxCollection<DIM>* SemMesh<DIM>::GetBoxCollection()
+{
+    return mpBoxCollection.get();
+}
+
+template<unsigned DIM>
+void SemMesh<DIM>::UpdateBoxCollection()
+{
+    assert(mpBoxCollection);
+
+    // Remove node pointers from boxes in BoxCollection.
+    mpBoxCollection->EmptyBoxes();
+
+    AddNodesToBoxes();
+}
+
+template<unsigned DIM>
+void SemMesh<DIM>::AddNodesToBoxes()
+{
+     // Put the nodes in the boxes.
+     for (typename AbstractMesh<DIM, DIM>::NodeIterator node_iter = this->GetNodeIteratorBegin();
+               node_iter != this->GetNodeIteratorEnd();
+               ++node_iter)
+     {
+          unsigned box_index = mpBoxCollection->CalculateContainingBox(&(*node_iter));
+          mpBoxCollection->rGetBox(box_index).AddNode(&(*node_iter));
+     }
+}
+
+template<unsigned DIM>
+void SemMesh<DIM>::CalculateNodePairs(std::vector<std::pair<Node<DIM>*, Node<DIM>*> >& rNodePairs)
+{
+    assert(mpBoxCollection);
+
+    mpBoxCollection->CalculateNodePairs(this->mNodes, rNodePairs);
+}
+
+template <unsigned DIM>
+void SemMesh<DIM>::SetUpBoxCollection(const std::vector<Node<DIM>*>& rNodes)
+{
+    ClearBoxCollection();
+
+    ChasteCuboid<DIM> bounding_box = this->CalculateBoundingBox(rNodes);
+
+    c_vector<double, 2 * DIM> domain_size;
+    for (unsigned i = 0; i < DIM; i++)
+    {
+        // Grow domain to next representable number to ensure all nodes are strictly inside
+        domain_size[2 * i] = std::nextafter(bounding_box.rGetLowerCorner()[i], -std::numeric_limits<double>::infinity());
+        domain_size[2 * i + 1] = std::nextafter(bounding_box.rGetUpperCorner()[i], std::numeric_limits<double>::infinity());
+    }
+
+    SetUpBoxCollection(mMaximumInteractionDistance, domain_size);
+}
+
+template<unsigned DIM>
+void SemMesh<DIM>::ClearBoxCollection()
+{
+    mpBoxCollection.reset();
+}
+
+template <unsigned DIM>
+void SemMesh<DIM>::SetUpBoxCollection(double cutOffLength, c_vector<double, 2 * DIM> domainSize, int numLocalRows, c_vector<bool, DIM> isDimPeriodic)
+{
+    ClearBoxCollection();
+
+    bool isPeriodicInX = false;
+    bool isPeriodicInY = false;
+    bool isPeriodicInZ = false;
+
+    for (unsigned i = 0; i < DIM; i++)
+    {
+        if (i == 0)
+        {
+            isPeriodicInX = isDimPeriodic(i);
+        }
+        if (i == 1)
+        {
+            isPeriodicInY = isDimPeriodic(i);
+        }
+        if (i == 2)
+        {
+            isPeriodicInZ = isDimPeriodic(i);
+        }
+    }
+    mpBoxCollection = std::make_unique<DistributedBoxCollection<DIM> >(cutOffLength, domainSize, isPeriodicInX, isPeriodicInY, isPeriodicInZ, numLocalRows);
+    mpBoxCollection->SetupLocalBoxesHalfOnly();
+
+    // Keep this false for now; in NodesOnlyMesh this is configured with mCalculateNodeNeighbours
+    mpBoxCollection->SetCalculateNodeNeighbours(false);
+}
+
+
+template<unsigned DIM>
+void SemMesh<DIM>::SetMaximumInteractionDistance(double maxDistance)
+{
+    mMaximumInteractionDistance = maxDistance;
+}
+
+template<unsigned DIM>
+double SemMesh<DIM>::GetMaximumInteractionDistance() const
+{
+    return mMaximumInteractionDistance;
 }
 
 template<unsigned DIM>

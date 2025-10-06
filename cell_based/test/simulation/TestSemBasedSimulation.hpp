@@ -74,8 +74,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DefaultCellProliferativeType.hpp"
 #include "ForwardEulerNumericalMethod.hpp"
 #include "SemBasedCellPopulation.hpp"
-#include "SemInterCellularForce.hpp"
-#include "SemIntraCellularForce.hpp"
+#include "SemRegionalForce.hpp"
 #include "NoCellCycleModel.hpp"
 #include "NodeLocationWriter.hpp"
 
@@ -97,6 +96,14 @@ public:
         SemMeshGenerator generator;
         generator.GenerateSingleCell({0.0, 0.0}, {0.5, 0.5}, {8, 8});
         auto p_mesh = generator.GetMesh();
+
+        c_vector<double, 4> boxCollectionDomain{};
+        boxCollectionDomain[0] = -1.0;
+        boxCollectionDomain[1] =  1.0;
+        boxCollectionDomain[2] = -1.0;
+        boxCollectionDomain[3] =  1.0;
+
+        p_mesh->SetUpBoxCollection(0.1, boxCollectionDomain);
 
         // Assertions
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 1);
@@ -126,16 +133,8 @@ public:
 
         std::cout << cell_population.GetNumRealCells() << std::endl;
         // Create some force laws and pass them to the simulation
-        MAKE_PTR(SemInterCellularForce<2>, p_inter_cellular_force);
-        simulator.AddForce(p_inter_cellular_force);
-
-        std::cout << cell_population.GetNumRealCells() << std::endl;
-        // Create some force laws and pass them to the simulation
-        MAKE_PTR(SemIntraCellularForce<2>, p_intra_cellular_force);
-        simulator.AddForce(p_intra_cellular_force);
-        
-        std::cout << cell_population.GetNumRealCells() << std::endl;
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 1);
+        MAKE_PTR(SemRegionalForce<2>, p_sem_force);
+        simulator.AddForce(p_sem_force);
 
         // Run the simulation
         simulator.Solve();

@@ -238,10 +238,14 @@ unsigned SemBasedCellPopulation<DIM>::RemoveDeadCells()
 {
     return 0;
 }
+
 template<unsigned DIM>
 void SemBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 {
+    mpSemMesh->UpdateBoxCollection();
+    mpSemMesh->CalculateNodePairs(this->mNodePairs);
 }
+
 template<unsigned DIM>
 double SemBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 {
