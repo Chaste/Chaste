@@ -73,6 +73,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EllipticBoxDomainPdeModifier.hpp"
 #include "EllipticGrowingDomainPdeModifier.hpp"
 #include "RadialCellDataDistributionWriter.hpp"
+#include "NodesOnlyMesh.hpp"
+#include "NodeBasedCellPopulation.hpp"
 
 class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
 {

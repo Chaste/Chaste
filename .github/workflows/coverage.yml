@@ -4,95 +4,129 @@ on:
   workflow_dispatch:
   pull_request:
     branches:
-      - '**'
+      - "**"
   push:
     branches:
       - develop
 
 jobs:
-  
   build-and-test:
-
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+
     container:
-      image: chaste/runner:jammy
+      image: chaste/runner:coverage-runner
       env:
         RUNNER_OFF: 1
-      volumes:
-        - runner_volume:/home/runner
       options: --user 0 --cpus 4
-      
+
     env:
       CC: gcc
       CXX: g++
-      
+
     defaults:
       run:
         shell: bash
-      
+
     steps:
-      - name: checkout repository
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
-      - name: compiler version
+
+      - name: Compiler version
         run: |
           ${CXX} --version
-          
-      - name: make build and test directories
+
+      - name: Make build and test directories
         run: |
           mkdir -p chaste-build-dir
           mkdir -p chaste-test-dir
           echo "CHASTE_TEST_OUTPUT=$(pwd)/chaste-test-dir" >> ${GITHUB_ENV}
 
-      - name: create initialisation script
+      - name: Create module loading script
         run: |
-          echo "source /etc/profile.d/modules.sh" > init.sh
-          echo "module purge" >> init.sh
-          echo "module use /home/runner/modules/modulefiles" >> init.sh
-          echo "module load petsc_hdf5" >> init.sh
+          cat > load_modules.sh << 'EOF'
+          #!/bin/bash
+          source /etc/profile.d/modules.sh
+          module use /home/runner/modules/modulefiles
+          module avail
+          module load boost petsc_hdf5 sundials vtk xercesc xsd
+          module list
+          EOF
         working-directory: chaste-build-dir
 
-      - name: set runner user privileges
+      - name: Authorize runner user
         run: |
           chown -R runner:runner .
-          
-      - name: cmake configure
+
+      - name: CMake Configure
         run: |
-          source init.sh
-          su -m runner -c "cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_COVERAGE_CPUS=4 .."
+          su runner << 'EOF'
+          source load_modules.sh
+          cmake -DCMAKE_BUILD_TYPE=Debug -DChaste_COVERAGE_CPUS=4 ..
+          EOF
         working-directory: chaste-build-dir
 
-      - name: build test suites
+      - name: Build Continuous
         run: |
-          source init.sh
-          su -m runner -c "cmake --build . --target Continuous Parallel --parallel 4"
+          su runner << 'EOF'
+          source load_modules.sh
+          cmake --build . --target Continuous --parallel 4
+          EOF
         working-directory: chaste-build-dir
 
-      - name: run test suites
+      - name: Build Parallel
         run: |
-          source init.sh
-          su -m runner -c "ctest -j4 -L Continuous --output-on-failure"
-          su -m runner -c "ctest -L Parallel  --output-on-failure"
+          su runner << 'EOF'
+          source load_modules.sh
+          cmake --build . --target Parallel --parallel 4
+          EOF
         working-directory: chaste-build-dir
 
-      - name: run coverage
+      - name: Run TestChasteBuildInfo
         run: |
-          su -m runner -c "lcov --config-file ../cmake/Config/lcovrc --directory . --capture --output-file coverage.info"
-          su -m runner -c "lcov --config-file ../cmake/Config/lcovrc --remove coverage.info '/usr/*' '*/fortests/*' '*/test/*' '*/3rdparty/*' '*/global/src/random/*' 'Debug/*' 'Debug_*/*' '*/cxxtest/*' --output-file coverage.info"
+          su runner << 'EOF'
+          source load_modules.sh
+          ctest -V -R TestChasteBuildInfo
+          EOF
         working-directory: chaste-build-dir
 
-      - name: upload to codecov
+      - name: Run Continuous
         run: |
-          su -m runner -c "curl -Os https://uploader.codecov.io/latest/linux/codecov"
-          su -m runner -c "chmod +x codecov"
-          su -m runner -c "./codecov"
+          su runner << 'EOF'
+          source load_modules.sh
+          ctest -j4 -L Continuous --output-on-failure
+          EOF
         working-directory: chaste-build-dir
 
-      - name: upload as artifact
+      - name: Run Parallel
+        run: |
+          su runner << 'EOF'
+          source load_modules.sh
+          ctest -L Parallel --output-on-failure
+          EOF
+        working-directory: chaste-build-dir
+
+      - name: Run coverage
+        run: |
+          su runner << 'EOF'
+          lcov --config-file ../cmake/Config/lcovrc --directory . --capture --output-file coverage.info
+          lcov --config-file ../cmake/Config/lcovrc --remove coverage.info '/usr/*' '*/fortests/*' '*/test/*' '*/3rdparty/*' '*/global/src/random/*' 'Debug/*' 'Debug_*/*' '*/cxxtest/*' --output-file coverage.info
+          EOF
+        working-directory: chaste-build-dir
+
+      - name: Upload to codecov
+        run: |
+          su runner << 'EOF'
+          curl -Os https://uploader.codecov.io/latest/linux/codecov
+          chmod +x codecov
+          ./codecov
+          EOF
+        working-directory: chaste-build-dir
+
+      - name: Upload as artifact
         uses: actions/upload-artifact@v4
         with:
           name: coverage-info

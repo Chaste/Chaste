@@ -1,4 +1,4 @@
-name: Ubuntu parallel
+name: Check basic compatibility
 
 on:
   workflow_dispatch:
@@ -15,21 +15,21 @@ jobs:
 
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
 
-    runs-on: ubuntu-22.04
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
         include:
-          - cc: "gcc"
-            cxx: "g++"
-          - cc: "icx"
-            cxx: "icpx"
+          - os: "ubuntu-22.04"
+            codename: "jammy"
+          - os: "ubuntu-24.04"
+            codename: "noble"
 
     env:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
-      CC: ${{ matrix.cc }}
-      CXX: ${{ matrix.cxx }}
+      CC: gcc
+      CXX: g++
 
     steps:
     - name: checkout repository
@@ -37,27 +37,17 @@ jobs:
 
     - name: install dependencies
       run: |
-        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu jammy/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu ${{ matrix.codename }}/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
         sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
         sudo apt update
         sudo apt install chaste-dependencies
 
     - name: Downgrade libexpat1 (native ubuntu-22.04 only)
-      # if: ${{ matrix.os == 'ubuntu-22.04' }}
+      if: ${{ matrix.os == 'ubuntu-22.04' }}
       run: |
         if dpkg -l | grep libexpat1-dev | grep 2.4.7-1ubuntu; then
           sudo apt-get install -y --allow-downgrades libexpat1=2.4.7-1 libexpat1-dev=2.4.7-1
         fi
-
-    - name: install and set up Intel LLVM compiler
-      run: |
-        echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-        sudo wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
-        sudo apt update
-        sudo apt install intel-oneapi-compiler-dpcpp-cpp
-        source /opt/intel/oneapi/setvars.sh
-        printenv >> $GITHUB_ENV
-      if: ${{ matrix.cc == 'icx' }}
 
     - name: compiler version
       run: |
@@ -69,13 +59,26 @@ jobs:
         mkdir -p ${CHASTE_TEST_OUTPUT}
 
     - name: cmake configure
-      run: cmake -DCMAKE_BUILD_TYPE=Release ..
+      run: cmake -DCMAKE_BUILD_TYPE=Debug ..
       working-directory: chaste-build-dir
 
-    - name: build parallel test pack
-      run: cmake --build . --parallel 4 --target Parallel
+    - name: build global test pack
+      run: cmake --build . --parallel 4 --target global
       working-directory: chaste-build-dir
 
-    - name: run parallel test pack
-      run: ctest -j4 -L Parallel --output-on-failure
+    - name: run Continuous test pack
+      run: ctest -j4 -L Continuous_global --output-on-failure
+      working-directory: chaste-build-dir
+
+    - name: run Nightly test pack
+      run: ctest -j4 -L Nightly_global --output-on-failure
+      working-directory: chaste-build-dir
+
+    - name: run Parallel test pack
+      run: ctest -j4 -L Parallel_global --output-on-failure
+      working-directory: chaste-build-dir
+
+    - name: run TestChasteBuildInfo
+      run: |
+        ctest -V -R TestChasteBuildInfo
       working-directory: chaste-build-dir

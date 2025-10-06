@@ -79,6 +79,7 @@ MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNode
         this->mIsGhostNode = std::vector<bool>(this->GetNumNodes(), false);
         Validate();
     }
+    this->UpdateNodePairs();
 }
 
 template<unsigned DIM>

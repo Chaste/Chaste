@@ -54,14 +54,24 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sunmatrix/sunmatrix_dense.h> /* access to dense SUNMatrix            */
 #endif
 
+#if CHASTE_SUNDIALS_VERSION >= 70000
+///\todo We should prefer sunrealtype in our own code in future
+#define realtype sunrealtype
+#endif
+
 /**
  * CVODE error handling function.
  *
  * Throw an Exception to report errors, rather than the CVODE approach of magic
  * return codes.
  */
+#if CHASTE_SUNDIALS_VERSION >= 70000
+void CvodeErrorHandler(int errorCode, const char* module, const char* function,
+                       const char* message, SUNErrCode errCode, void* pData, SUNContext sunContext);
+#else
 void CvodeErrorHandler(int errorCode, const char* module, const char* function,
                        char* message, void* pData);
+#endif
 // Note: declared here since it's also used by AbstractCvodeCell.
 
 /**

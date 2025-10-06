@@ -50,7 +50,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sundials/sundials_nvector.h>
 
 #if CHASTE_SUNDIALS_VERSION >= 30000
+#if CHASTE_SUNDIALS_VERSION < 70000
 #include <cvode/cvode_direct.h> /* access to CVDls interface            */
+#endif
 #include <sundials/sundials_types.h> /* defs. of realtype, sunindextype      */
 #include <sunlinsol/sunlinsol_dense.h> /* access to dense SUNLinearSolver      */
 #include <sunmatrix/sunmatrix_dense.h> /* access to dense SUNMatrix            */
@@ -431,7 +433,11 @@ void AbstractCvodeSystem::SetupCvode(N_Vector initialConditions,
             EXCEPTION("Failed to SetupCvode CVODE"); // LCOV_EXCL_LINE
 
         // Set error handler
+#if CHASTE_SUNDIALS_VERSION >= 70000
+	SUNContext_PushErrHandler(CvodeContextManager::Instance()->GetSundialsContext(),  CvodeErrorHandler, nullptr);
+#else
         CVodeSetErrHandlerFn(mpCvodeMem, CvodeErrorHandler, nullptr);
+#endif
 // Set the user data
 #if CHASTE_SUNDIALS_VERSION >= 20400
         CVodeSetUserData(mpCvodeMem, (void*)(this));

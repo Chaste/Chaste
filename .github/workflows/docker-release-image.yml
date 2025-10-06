@@ -14,6 +14,7 @@ on:
 jobs:
   build:
     runs-on: self-hosted-docker
+    if: github.repository == 'Chaste/Chaste'
     timeout-minutes: 720  # Sets the timeout to 12 hours
     steps:
     - name: Checkout repository

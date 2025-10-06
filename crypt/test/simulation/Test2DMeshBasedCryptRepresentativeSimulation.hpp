@@ -95,7 +95,7 @@ public:
         FileFinder test_data_directory("crypt/test/data/" + test_to_load +"/archive",RelativeTo::ChasteSourceRoot);
         TS_ASSERT(test_data_directory.IsDir());
 
-        // to the testoutput/archive directory to continue running the simulation
+        // to the $CHASTE_TEST_OUTPUT/archive directory to continue running the simulation
         OutputFileHandler archive_handler(test_to_profile + "/archive");
 
         // Following is done in two lines to avoid a bug in Intel compiler v12.0

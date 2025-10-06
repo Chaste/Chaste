@@ -39,10 +39,22 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 
 #include <nvector/nvector_serial.h>
-
+#include <sundials/sundials_types.h> // For SUN_COMM_NULL
 #include "CvodeContextManager.hpp"
 
-CvodeContextManager::CvodeContextManager() : mSundialsContext() {}
+CvodeContextManager::CvodeContextManager()
+{
+#if CHASTE_SUNDIALS_VERSION >= 70000
+    SUNContext_Create(SUN_COMM_NULL, &mSundialsContext);
+#else
+    SUNContext_Create(NULL, &mSundialsContext);  //"a pointer to the MPI communicator or NULL if not using MPI"
+#endif
+}
+
+CvodeContextManager::~CvodeContextManager()
+{
+    SUNContext_Free(&mSundialsContext);
+}
 
 CvodeContextManager* CvodeContextManager::Instance()
 {
@@ -51,7 +63,7 @@ CvodeContextManager* CvodeContextManager::Instance()
     return instance.get();
 }
 
-sundials::Context& CvodeContextManager::GetSundialsContext()
+SUNContext& CvodeContextManager::GetSundialsContext()
 {
     assert(mSundialsContext);
     return mSundialsContext;

@@ -226,8 +226,7 @@ public:
 
         cell_population.Update();
 
-        std::vector< std::pair<Node<2>*, Node<2>* > >& r_node_pairs = cell_population.rGetNodePairs();
-        r_node_pairs.clear();
+        cell_population.rGetModifiableNodePairs().clear();
 
         // Set a new cut-off
         if (PetscTools::IsSequential()) // This causes nodes to jump to different process in parallel

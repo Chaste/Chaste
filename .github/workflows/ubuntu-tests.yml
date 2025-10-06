@@ -108,10 +108,23 @@ jobs:
       run: cmake --build . --parallel 4 --target Nightly
       working-directory: chaste-build-dir
 
+    - name: build parallel test pack
+      run: cmake --build . --parallel 4 --target Parallel
+      working-directory: chaste-build-dir
+
     - name: run Continuous test pack
       run: ctest -j4 -L Continuous --output-on-failure
       working-directory: chaste-build-dir
 
     - name: run Nightly test pack
       run: ctest -j4 -L Nightly --output-on-failure
+      working-directory: chaste-build-dir
+
+    - name: run Parallel test pack
+      run: ctest -j4 -L Parallel --output-on-failure
+      working-directory: chaste-build-dir
+
+    - name: run TestChasteBuildInfo
+      run: |
+        ctest -V -R TestChasteBuildInfo
       working-directory: chaste-build-dir
