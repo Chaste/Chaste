@@ -75,6 +75,8 @@ MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>::MeshBasedCellPopulation(Mutable
         Validate();
     }
 
+    UpdateNodePairs();
+
     // Initialise the applied force at each node to zero
     for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->rGetMesh().GetNodeIteratorBegin();
          node_iter != this->rGetMesh().GetNodeIteratorEnd();
@@ -91,6 +93,7 @@ MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::MeshBasedCellPopulation(MutableM
     mpMutableMesh = static_cast<MutableMesh<ELEMENT_DIM,SPACE_DIM>* >(&(this->mrMesh));
     mpVoronoiTessellation = nullptr;
     mDeleteMesh = true;
+    UpdateNodePairs();
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -288,6 +291,16 @@ unsigned MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::RemoveDeadCells()
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::UpdateNodePairs()
+{
+    this->mNodePairs.clear();
+    for (SpringIterator spring_it = SpringsBegin(); spring_it != SpringsEnd(); ++spring_it)
+    {
+        this->mNodePairs.emplace_back(spring_it.GetNodeA(), spring_it.GetNodeB());
+    }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::Update(bool hasHadBirthsOrDeaths)
 {
     ///\todo check if there is a more efficient way of keeping track of node velocity information (#2404)
@@ -435,6 +448,9 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::Update(bool hasHadBirthsOrD
     {
         this->mMarkedSprings.erase(**spring_it);
     }
+
+    // Update node pairs. Note, this must happen after remeshing.
+    UpdateNodePairs();
 
     // Tessellate if needed
     TessellateIfNeeded();
@@ -1177,16 +1193,6 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SetAreaBasedDampingConstant
     assert(areaBasedDampingConstantParameter >= 0.0);
     mAreaBasedDampingConstantParameter = areaBasedDampingConstantParameter;
 }
-
-// LCOV_EXCL_START
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >& MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::rGetNodePairs()
-{
-    //mNodePairs.Clear();
-    NEVER_REACHED;
-    return mNodePairs;
-}
-// LCOV_EXCL_STOP
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::OutputCellPopulationParameters(out_stream& rParamsFile)

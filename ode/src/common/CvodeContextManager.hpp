@@ -54,7 +54,7 @@ class CvodeContextManager
 {
 private:
     /** The SUNContext **/
-    sundials::Context mSundialsContext;
+    SUNContext mSundialsContext;
 
     /**
      * Private constructor.
@@ -70,13 +70,18 @@ public:
      * @return a reference to the managed context object.
      *
      */
-    sundials::Context& GetSundialsContext();
+    SUNContext& GetSundialsContext();
 
     /**
      * @return a pointer to the context manager object.
      * The object is created the first time this method is called.
      */
     static CvodeContextManager* Instance();
+
+    /**
+     * Public destructor is only called when singleton goes out of scope (e.g. end of test-suite)
+     */
+    ~CvodeContextManager();
 };
 
 #endif // CHASTE_SUNDIALS_VERSION >= 60000

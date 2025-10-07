@@ -100,6 +100,7 @@ private:
         archive & mOffsetNewBoundaryNodes;
         archive & mHasVariableRestLength;
         this->Validate();
+        this->UpdateNodePairs();
     }
 
 protected:
@@ -158,8 +159,8 @@ protected:
     /** Whether springs have variable rest lengths. */
     bool mHasVariableRestLength;
 
-    /** Node pairs for force calculations. */
-    std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > > mNodePairs;
+    /** Update mNodePairs using the SpringIterator. */
+    virtual void UpdateNodePairs();
 
     /**
      * Update mIsGhostNode if required by a remesh.
@@ -551,13 +552,6 @@ public:
      * @param areaBasedDampingConstantParameter the new value of mAreaBasedDampingConstantParameter
      */
     void SetAreaBasedDampingConstantParameter(double areaBasedDampingConstantParameter);
-
-    /**
-     * Overridden rGetNodePairs method which uses the Delaunay triangulatiuon
-     *
-     * @return Node pairs for force calculation.
-     */
-    std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >& rGetNodePairs();
 
     /**
      * Outputs CellPopulation parameters to file

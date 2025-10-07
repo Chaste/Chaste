@@ -27,7 +27,9 @@ jobs:
             extra-build-args: ""
           - image: portability-03
             extra-build-args: ""
-          - image: portability-focal
+          - image: portability-04
+            extra-build-args: ""
+          - image: portability-05
             extra-build-args: ""
           - image: portability-jammy
             extra-build-args: ""
@@ -115,6 +117,14 @@ jobs:
           EOF
         working-directory: chaste-build-dir
 
+      - name: Build Parallel
+        run: |
+          su runner << 'EOF'
+          source load_modules.sh
+          cmake --build . --target Parallel --parallel $(nproc)
+          EOF
+        working-directory: chaste-build-dir
+
       - name: Run Continuous
         run: |
           su runner << 'EOF'
@@ -128,5 +138,13 @@ jobs:
           su runner << 'EOF'
           source load_modules.sh
           ctest -j $(nproc) -L Nightly --output-on-failure
+          EOF
+        working-directory: chaste-build-dir
+
+      - name: Run Parallel
+        run: |
+          su runner << 'EOF'
+          source load_modules.sh
+          ctest -L Parallel --output-on-failure
           EOF
         working-directory: chaste-build-dir

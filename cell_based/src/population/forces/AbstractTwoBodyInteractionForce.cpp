@@ -35,6 +35,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AbstractTwoBodyInteractionForce.hpp"
 
+#include "AbstractOffLatticeCellPopulation.hpp"
+#include "Warnings.hpp"
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::AbstractTwoBodyInteractionForce()
    : AbstractForce<ELEMENT_DIM,SPACE_DIM>(),
@@ -63,64 +66,32 @@ double AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::GetCutOffLength()
     return mMechanicsCutOffLength;
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::AddForceContribution(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation)
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>::AddForceContribution(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation)
 {
     // Throw an exception message if not using a subclass of AbstractCentreBasedCellPopulation
-    if (dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation) == nullptr)
+    if (dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation) == nullptr)
     {
-        EXCEPTION("Subclasses of AbstractTwoBodyInteractionForce are to be used with subclasses of AbstractCentreBasedCellPopulation only");
+        EXCEPTION("Subclasses of AbstractTwoBodyInteractionForce are to be used with subclasses of AbstractOffLatticeCellPopulation only");
     }
 
-    ///\todo this could be tidied by using the rGetNodePairs for all populations and moving the below calculation into the MutableMesh.
-    if (bool(dynamic_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation)))
+    const auto r_node_pairs = static_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation)->rGetNodePairs();
+    if (r_node_pairs.empty())
     {
-        MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>* p_static_cast_cell_population = static_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation);
-
-        // Iterate over all springs and add force contributions
-        for (typename MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::SpringIterator spring_iterator = p_static_cast_cell_population->SpringsBegin();
-             spring_iterator != p_static_cast_cell_population->SpringsEnd();
-             ++spring_iterator)
-        {
-            unsigned nodeA_global_index = spring_iterator.GetNodeA()->GetIndex();
-            unsigned nodeB_global_index = spring_iterator.GetNodeB()->GetIndex();
-
-            // Calculate the force between nodes
-            c_vector<double, SPACE_DIM> force = CalculateForceBetweenNodes(nodeA_global_index, nodeB_global_index, rCellPopulation);
-
-            // Add the force contribution to each node
-            c_vector<double, SPACE_DIM> negative_force = -1.0*force;
-            spring_iterator.GetNodeB()->AddAppliedForceContribution(negative_force);
-            spring_iterator.GetNodeA()->AddAppliedForceContribution(force);
-        }
+        WARN_ONCE_ONLY("No node pairs found. Does this cell population support updating mNodePairs?"
+                       " Currently this force class works only with NodeBased and MeshBased cell populations.");
     }
-    else    // This is a NodeBasedCellPopulation
+
+    for (const auto& [p_node_a, p_node_b] : r_node_pairs)
     {
-        AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>* p_static_cast_cell_population = static_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation);
+        unsigned node_a_index = p_node_a->GetIndex();
+        unsigned node_b_index = p_node_b->GetIndex();
 
-        std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >& r_node_pairs = p_static_cast_cell_population->rGetNodePairs();
+        c_vector<double, SPACE_DIM> force = CalculateForceBetweenNodes(node_a_index, node_b_index, rCellPopulation);
+        assert(std::none_of(force.begin(), force.end(), [](double x){ return std::isnan(x); }));
 
-        for (typename std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >::iterator iter = r_node_pairs.begin();
-            iter != r_node_pairs.end();
-            iter++)
-        {
-            std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > pair = *iter;
-
-            unsigned node_a_index = pair.first->GetIndex();
-            unsigned node_b_index = pair.second->GetIndex();
-
-            // Calculate the force between nodes
-            c_vector<double, SPACE_DIM> force = CalculateForceBetweenNodes(node_a_index, node_b_index, rCellPopulation);
-            for (unsigned j=0; j<SPACE_DIM; j++)
-            {
-                assert(!std::isnan(force[j]));
-            }
-
-            // Add the force contribution to each node
-            c_vector<double, SPACE_DIM> negative_force = -1.0*force;
-            pair.first->AddAppliedForceContribution(force);
-            pair.second->AddAppliedForceContribution(negative_force);
-        }
+        p_node_a->AddAppliedForceContribution(force);
+        p_node_b->AddAppliedForceContribution(-1.0 * force);
     }
 }
 

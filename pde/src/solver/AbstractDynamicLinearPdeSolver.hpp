@@ -109,7 +109,7 @@ protected:
      */
     bool mOutputToTxt;
 
-    /** Output directory (a subfolder of tmp/[USERNAME]/testoutput). */
+    /** Output directory (a subfolder of $CHASTE_TEST_OUTPUT). */
     std::string mOutputDirectory;
 
     /** Filename prefix for HDF5 and other files. */

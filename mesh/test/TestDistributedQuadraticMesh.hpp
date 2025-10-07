@@ -114,7 +114,8 @@ public:
         //QuadraticMesh<2> mesh0(0.01,1.0,1.0);
         //TrianglesMeshWriter<2,2> writer("", "quad_mesh");
         //writer.WriteFilesUsingMesh(mesh0);
-        //TrianglesMeshReader<2,2> mesh_reader("../../../../tmp/rafb/testoutput/quad_mesh",2,1,false);
+        //std::string results_path = OutputFileHandler::GetChasteTestOutputDirectory() + "quad_mesh";
+        //TrianglesMeshReader<2,2> mesh_reader(results_path,2,1,false);
 
         TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_128_elements_quadratic",2,1, false);
 

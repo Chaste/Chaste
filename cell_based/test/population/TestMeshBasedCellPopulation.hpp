@@ -1129,7 +1129,7 @@ public:
         TS_ASSERT_DELTA(ages_data[2], 2.0, 1e-9);
         TS_ASSERT_DELTA(ages_data[3], 3.0, 1e-9);
         TS_ASSERT_DELTA(ages_data[4], 4.0, 1e-9);
- #endif //CHASTE_VTK
+#endif //CHASTE_VTK
     }
 
     void TestCellPopulationWritersIn3d()
@@ -1608,6 +1608,41 @@ public:
         TS_ASSERT_DELTA(p_tet_mesh->GetNode(1)->rGetLocation()[1], 0.0, 1e-6);
         TS_ASSERT_DELTA(p_tet_mesh->GetNode(2)->rGetLocation()[0], 0.5, 1e-6);
         TS_ASSERT_DELTA(p_tet_mesh->GetNode(2)->rGetLocation()[1], 0.5*sqrt(3.0), 1e-6);
+    }
+
+    void TestGetNodePairs()
+    {
+        // Create a simple mesh
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
+        MutableMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Set up cells, one for each node. Give each a birth time of -node_index,
+        // so the age = node_index
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        // Create cell population
+        MeshBasedCellPopulation<2> cell_population(mesh, cells);
+
+        const auto& r_node_pairs = cell_population.rGetNodePairs();
+        TS_ASSERT_EQUALS(r_node_pairs.size(), 8ul);
+
+        auto vec_idx = 0ul;
+        for (auto spring_it = cell_population.SpringsBegin(); spring_it != cell_population.SpringsEnd(); ++spring_it)
+        {
+            const unsigned spring_it_node_a_idx = spring_it.GetNodeA()->GetIndex();
+            const unsigned spring_it_node_b_idx = spring_it.GetNodeB()->GetIndex();
+
+            const unsigned vec_node_a_idx = r_node_pairs[vec_idx].first->GetIndex();
+            const unsigned vec_node_b_idx = r_node_pairs[vec_idx].second->GetIndex();
+
+            TS_ASSERT_EQUALS(spring_it_node_a_idx, vec_node_a_idx);
+            TS_ASSERT_EQUALS(spring_it_node_b_idx, vec_node_b_idx);
+
+            vec_idx++;
+        }
     }
 };
 

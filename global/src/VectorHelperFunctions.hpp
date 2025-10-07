@@ -50,6 +50,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef CHASTE_CVODE
 // CVODE headers
 #include <nvector/nvector_serial.h>
+#if CHASTE_SUNDIALS_VERSION >= 70000
+///\todo We should prefer sunrealtype in our own code in future
+#define realtype sunrealtype
+#endif
 
 #if CHASTE_SUNDIALS_VERSION >= 60000
 #include "CvodeContextManager.hpp"  // access to shared SUNContext object required by Sundials 6.0+

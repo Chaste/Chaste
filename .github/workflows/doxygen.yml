@@ -14,7 +14,12 @@ on:
 jobs:
   on_pull_request:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'ci:off')
+
+    if: > 
+      github.event_name == 'pull_request' &&
+      !contains(github.event.pull_request.labels.*.name, 'ci:off') &&
+      github.repository == 'Chaste/Chaste'
+
     steps:
       - name: checkout code
         uses: actions/checkout@v4
@@ -47,7 +52,11 @@ jobs:
 
   on_push_to_develop:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+
+    if: >
+      github.event_name == 'push' &&
+      github.repository == 'Chaste/Chaste'
+
     steps:
       - name: checkout code
         uses: actions/checkout@v4
@@ -104,7 +113,11 @@ jobs:
 
   on_workflow_dispatch:
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'
+
+    if: >
+      github.event_name == 'workflow_dispatch' &&
+      github.repository == 'Chaste/Chaste'
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

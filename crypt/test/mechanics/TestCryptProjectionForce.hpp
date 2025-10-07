@@ -51,6 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "CryptProjectionForce.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
+#include "NodeBasedCellPopulation.hpp"
 #include "WntConcentration.hpp"
 #include "SimulationTime.hpp"
 #include "MutableMesh.hpp"
