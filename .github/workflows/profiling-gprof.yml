@@ -93,8 +93,8 @@ jobs:
     name: Publish results (non-fork PRs only)
     needs: build-and-test
     runs-on: ubuntu-latest
-    # only when index exists AND it's not a forked PR (or it's not a PR at all)
-    if: ${{needs.build-and-test.outputs.index == 'True' && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork) }}
+    # only when index exists AND it's being run from the primary repo (Chaste/Chaste)
+    if: ${{needs.build-and-test.outputs.index == 'True' && github.repository == 'Chaste/Chaste' }}
 
     env:
       GPROF_DIR: ${{ github.workspace }}/profiling-gprof
