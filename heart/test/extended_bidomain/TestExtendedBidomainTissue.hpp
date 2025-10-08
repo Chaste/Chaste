@@ -548,6 +548,8 @@ public:
             DistributedTetrahedralMesh<3,3> mesh;
 #else
             // For libscotchparmetis turn off smart partitioning
+            // PT-Scotch will produce good partitions but it cannot be forced to always
+            // give the same partition of the same mesh twice running.
             DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
 #endif
             mesh.ConstructFromMeshReader(mesh_reader);
@@ -657,6 +659,8 @@ public:
             DistributedTetrahedralMesh<3,3> mesh;
 #else
             // For libscotchparmetis turn off smart partitioning
+            // PT-Scotch will produce good partitions but it cannot be forced to always
+            // give the same partition of the same mesh twice running.
             DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
 #endif
             mesh.ConstructFromMeshReader(mesh_reader);

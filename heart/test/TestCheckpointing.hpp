@@ -58,8 +58,9 @@ public:
     void TestMultipleCallsToProblemSolve()
     {
 #ifdef CHASTE_SCOTCH_PARMETIS
-        // Turn off any smart partitioning.  This is because PT-Scotch cannot be forced to always
-        // give the same partition of the same mesh twice running
+        // Turn off smart partitioning.
+        // PT-Scotch will produce good partitions but it cannot be forced to always
+        // give the same partition of the same mesh twice running.
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetMeshPartitioning(), DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
         HeartConfig::Instance()->SetMeshPartitioning("dumb");
 #endif
@@ -108,6 +109,7 @@ public:
             TS_ASSERT_DELTA(single_phie[index], multiple_phie[index], 1e-8);
         }
 #ifdef CHASTE_SCOTCH_PARMETIS
+        // Make sure smart partitioning is switched back on.
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetMeshPartitioning(), DistributedTetrahedralMeshPartitionType::DUMB);
         HeartConfig::Instance()->SetMeshPartitioning("parmetis");
 #endif

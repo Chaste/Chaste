@@ -106,7 +106,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ComputeMeshPartitioning
 {
     if (mPartitioning == DistributedTetrahedralMeshPartitionType::METIS_LIBRARY)
     {
-        EXCEPTION("METIS partitioning is deprecated.");
+        EXCEPTION("METIS partitioning is deprecated.  Please use PARMETIS_LIBRARY for parMETIS (or the parMETIS interface to PT-Scotch).");
     }
     if (mPartitioning == DistributedTetrahedralMeshPartitionType::PETSC_MAT_PARTITION && !PetscTools::HasParMetis())
     {

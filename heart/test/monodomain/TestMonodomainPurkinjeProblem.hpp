@@ -249,8 +249,9 @@ public:
     void TestMonodomainPurkinjeProblemRunning()
     {
 #ifdef CHASTE_SCOTCH_PARMETIS
-        // Turn off any smart partitioning.  This is because PT-Scotch cannot be forced to always
-        // give the same partition of the same mesh twice running (for ortho and axi)
+        // Turn off smart partitioning.
+        // PT-Scotch will produce good partitions but it cannot be forced to always
+        // give the same partition of the same mesh twice running (for ortho and axi).
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetMeshPartitioning(), DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
         HeartConfig::Instance()->SetMeshPartitioning("dumb");
 #endif
@@ -340,6 +341,7 @@ public:
         purkinje_problem.Solve();
 
 #ifdef CHASTE_SCOTCH_PARMETIS
+        // Make sure smart partitioning is switched back on.
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetMeshPartitioning(), DistributedTetrahedralMeshPartitionType::DUMB);
         HeartConfig::Instance()->SetMeshPartitioning("parmetis");
 #endif

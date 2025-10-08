@@ -700,7 +700,7 @@ public:
             // Deprecation exception
             TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/3D_0_to_1mm_6000_elements");
             DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
-            TS_ASSERT_THROWS_THIS(mesh.ConstructFromMeshReader(mesh_reader),"METIS partitioning is deprecated.");
+            TS_ASSERT_THROWS_THIS(mesh.ConstructFromMeshReader(mesh_reader),"METIS partitioning is deprecated.  Please use PARMETIS_LIBRARY for parMETIS (or the parMETIS interface to PT-Scotch).");
         }
         if (PetscTools::HasParMetis())
         {
