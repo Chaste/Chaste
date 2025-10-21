@@ -694,21 +694,14 @@ public:
      */
     void TestComparePartitionQualities()
     {
-        unsigned num_local_nodes_petsc_parmetis, num_local_nodes_parmetis, num_local_nodes_metis_deprecated;
+        unsigned num_local_nodes_petsc_parmetis, num_local_nodes_parmetis;
 
         {
+            // Deprecation exception
             TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/3D_0_to_1mm_6000_elements");
-            //TrianglesMeshReader<3,3> mesh_reader("heart/test/data/heart");
             DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
-            TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
-            mesh.ConstructFromMeshReader(mesh_reader);
-            // There's warning because METIS is deprecated and this is actually a parMETIS partition
-            TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
-            Warnings::Instance()->QuietDestroy();
-
-            num_local_nodes_metis_deprecated = mesh.GetNumLocalNodes();
+            TS_ASSERT_THROWS_THIS(mesh.ConstructFromMeshReader(mesh_reader),"METIS partitioning is deprecated.  Please use PARMETIS_LIBRARY for parMETIS (or the parMETIS interface to PT-Scotch).");
         }
-
         if (PetscTools::HasParMetis())
         {
             TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/3D_0_to_1mm_6000_elements_binary");
@@ -740,9 +733,7 @@ public:
             TS_ASSERT_EQUALS(mesh.GetNumBoundaryElements(), mesh_reader.GetNumFaces());
 
             CheckEverythingIsAssigned<3,3>(mesh);
-
             num_local_nodes_parmetis = mesh.GetNumLocalNodes();
-            TS_ASSERT_EQUALS(num_local_nodes_metis_deprecated, num_local_nodes_parmetis); // METIS is deprecated so these are the same
         }
 
         unsigned max_local_nodes_petsc_parmetis;
@@ -758,7 +749,8 @@ public:
         }
         PetscTools::Barrier();
 
-        TS_ASSERT(num_local_nodes_petsc_parmetis <= max_local_nodes_parmetis);
+        TS_ASSERT(max_local_nodes_parmetis != 0u);
+        TS_ASSERT_LESS_THAN_EQUALS(num_local_nodes_petsc_parmetis, max_local_nodes_parmetis);
         //Watch out for dumb partition and warn about it
         if (PetscTools::IsParallel())
         {

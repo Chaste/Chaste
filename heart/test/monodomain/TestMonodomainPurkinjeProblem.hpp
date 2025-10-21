@@ -248,6 +248,14 @@ public:
     // This version uses the problem classes.  It also checks things still work with a permuted mesh.
     void TestMonodomainPurkinjeProblemRunning()
     {
+#ifdef CHASTE_SCOTCH_PARMETIS
+        // Turn off smart partitioning.
+        // PT-Scotch will produce good partitions but it cannot be forced to always
+        // give the same partition of the same mesh twice running (for ortho and axi).
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetMeshPartitioning(), DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
+        HeartConfig::Instance()->SetMeshPartitioning("dumb");
+#endif
+
         // Settings common to both problems
         HeartConfig::Instance()->SetUseAbsoluteTolerance(1e-12);
         HeartConfig::Instance()->SetOdePdeAndPrintingTimeSteps(0.01, 0.01, 0.1);
@@ -331,6 +339,12 @@ public:
         // For coverage, call Solve again to extend the solution
         HeartConfig::Instance()->SetSimulationDuration(1.1);
         purkinje_problem.Solve();
+
+#ifdef CHASTE_SCOTCH_PARMETIS
+        // Make sure smart partitioning is switched back on.
+        TS_ASSERT_EQUALS(HeartConfig::Instance()->GetMeshPartitioning(), DistributedTetrahedralMeshPartitionType::DUMB);
+        HeartConfig::Instance()->SetMeshPartitioning("parmetis");
+#endif
     }
 
     // Solve a Purkinje problem on a branched domain

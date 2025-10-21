@@ -50,8 +50,8 @@ class NodePartitioner
 public:
 
     /**
-      * Specialised method to compute a parallel partitioning of a given mesh
-      * (called by ComputeMeshPartitioning, based on the value of mMetisPartitioning)
+      * Method to compute a parallel partitioning of a given mesh based on 
+      * a DistributedVectorFactory in the mesh (if it exists) or else on rMesh.GetNumNodes().
       *
       * @param rMesh is the original mesh (so that we can set the DistributedVectorFactory up
       * @param rNodesOwned is an empty set to be filled with the indices of nodes owned by this process
