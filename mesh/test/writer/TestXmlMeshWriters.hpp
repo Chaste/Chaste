@@ -1068,7 +1068,7 @@ public:
     {
 #ifndef _MSC_VER
         TrianglesMeshReader<3,3> reader("mesh/test/data/simple_cube");
-        DistributedTetrahedralMesh<3,3> mesh;
+        DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
         mesh.ConstructFromMeshReader(reader);
 
         XdmfMeshWriter<3,3> writer_from_mesh("TestXdmfMeshWriter", "simple_cube_dist", false);

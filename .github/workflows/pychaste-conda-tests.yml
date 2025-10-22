@@ -20,7 +20,7 @@ jobs:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     env:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/testoutput
@@ -41,7 +41,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y castxml clang cmake libx11-dev xvfb
+          sudo apt-get install -y castxml clang cmake libosmesa6-dev libpthread-stubs0-dev libx11-dev pkg-config xvfb
 
       - name: Setup Miniconda Python ${{ matrix.python-version }}
         uses: conda-incubator/setup-miniconda@v3

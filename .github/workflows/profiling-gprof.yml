@@ -19,9 +19,12 @@ jobs:
 
     env:
       CHASTE_DIR: ${{ github.workspace }}/Chaste
-      GPROF_DIR: ${{ github.workspace }}/profiling-gprof
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
       CHASTE_BUILD_DIR: ${{ github.workspace }}/Chaste/chaste-build-dir
+
+    outputs:
+      index: ${{ steps.index-exists.outputs.index }}
+      datetime: ${{ steps.get-datetime.outputs.datetime }}
 
     steps:
 
@@ -76,7 +79,34 @@ jobs:
             echo "index=False"  >> $GITHUB_OUTPUT
           fi
         if: always()
-        
+
+      - name: upload profile artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: profile-files
+          path: ${{ env.CHASTE_BUILD_DIR }}/profile
+        if: always() && steps.index-exists.outputs.index == 'True'
+
+
+  publish-results:
+
+    name: Publish results (non-fork PRs only)
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    # only when index exists AND it's being run from the primary repo (Chaste/Chaste)
+    if: ${{needs.build-and-test.outputs.index == 'True' && github.repository == 'Chaste/Chaste' }}
+
+    env:
+      GPROF_DIR: ${{ github.workspace }}/profiling-gprof
+
+    steps:
+
+      - name: download profile artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: profile-files
+          path: ./profile
+
       - name: checkout profiling-gprof
         uses: actions/checkout@v4
         with:
@@ -84,13 +114,11 @@ jobs:
           path: profiling-gprof
           fetch-depth: 0
           token: ${{ secrets.PROFILING_GPROF_ACCESS }}
-        if: always() && steps.index-exists.outputs.index == 'True'
 
       - name: copy results
         run: |
-          mkdir ${GPROF_DIR}/log-files/${{ steps.get-datetime.outputs.datetime }}
-          cp ${CHASTE_BUILD_DIR}/profile/* ${GPROF_DIR}/log-files/${{ steps.get-datetime.outputs.datetime }}/
-        if: always() && steps.index-exists.outputs.index == 'True'
+          mkdir ${GPROF_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}
+          cp ./profile/* ${GPROF_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}/
 
       - name: setup python
         uses: actions/setup-python@v5
@@ -103,7 +131,6 @@ jobs:
           python -m pip install dominate
           python write_index.py
         working-directory: ${{ env.GPROF_DIR }}
-        if: always() && steps.index-exists.outputs.index == 'True'
 
       - name: commit and push results
         run: |
@@ -113,4 +140,7 @@ jobs:
           git commit -m "upload gprof profiling results" || echo "No changes to commit"
           git push
         working-directory: ${{ env.GPROF_DIR }}
-        if: always() && steps.index-exists.outputs.index == 'True'
+
+      - name: results URL on chaste.github.io
+        run: |
+          echo https://chaste.github.io/profiling-gprof/2025-09-29_15-55-53/${{ needs.build-and-test.outputs.datetime }}/index.html

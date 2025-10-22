@@ -40,7 +40,7 @@ jobs:
   upload-to-website:
     needs: generate-tutorial-markdown
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.repository == 'Chaste/Chaste'
     steps:
       - name: Download user-tutorial-to markdown
         uses: actions/download-artifact@v4

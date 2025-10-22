@@ -19,9 +19,12 @@ jobs:
 
     env:
       CHASTE_DIR: ${{ github.workspace }}/Chaste
-      MEMTEST_DIR: ${{ github.workspace }}/memory-testing
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/chaste-test-dir
       CHASTE_BUILD_DIR: ${{ github.workspace }}/Chaste/chaste-build-dir
+
+    outputs:
+      index: ${{ steps.index-exists.outputs.index }}
+      datetime: ${{ steps.get-datetime.outputs.datetime }}
 
     steps:
 
@@ -94,7 +97,34 @@ jobs:
             echo "index=False"  >> $GITHUB_OUTPUT
           fi
         if: always()
-        
+
+      - name: upload memtest artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: memtest-files
+          path: ${{ env.CHASTE_BUILD_DIR }}/memtest
+        if: always() && steps.index-exists.outputs.index == 'True'
+
+
+  publish-results:
+
+    name: Publish results (non-fork PRs only)
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    # only when index exists AND it's being run from the primary repo (Chaste/Chaste)
+    if: ${{ needs.build-and-test.outputs.index == 'True' && github.repository == 'Chaste/Chaste' }}
+
+    env:
+      MEMTEST_DIR: ${{ github.workspace }}/memory-testing
+
+    steps:
+
+      - name: download memtest artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: memtest-files
+          path: ./memtest
+
       - name: checkout memory-testing
         uses: actions/checkout@v4
         with:
@@ -102,13 +132,11 @@ jobs:
           path: memory-testing
           fetch-depth: 0
           token: ${{ secrets.MEMORY_TESTING_ACCESS }}
-        if: always() && steps.index-exists.outputs.index == 'True'
 
       - name: copy results
         run: |
-          mkdir ${MEMTEST_DIR}/log-files/${{ steps.get-datetime.outputs.datetime }}
-          cp ${CHASTE_BUILD_DIR}/memtest/* ${MEMTEST_DIR}/log-files/${{ steps.get-datetime.outputs.datetime }}/
-        if: always() && steps.index-exists.outputs.index == 'True'
+          mkdir ${MEMTEST_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}
+          cp ./memtest/* ${MEMTEST_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}/
 
       - name: setup python
         uses: actions/setup-python@v5
@@ -121,7 +149,6 @@ jobs:
           python -m pip install dominate
           python write_index.py
         working-directory: ${{ env.MEMTEST_DIR }}
-        if: always() && steps.index-exists.outputs.index == 'True'
 
       - name: commit and push results
         run: |
@@ -131,9 +158,7 @@ jobs:
           git commit -m "upload memtest results" || echo "No changes to commit"
           git push
         working-directory: ${{ env.MEMTEST_DIR }}
-        if: always() && steps.index-exists.outputs.index == 'True'
 
       - name: results URL on chaste.github.io
         run: |
           echo https://chaste.github.io/memory-testing/${{ steps.get-datetime.outputs.datetime }}/index.html
-        if: always() && steps.index-exists.outputs.index == 'True'
