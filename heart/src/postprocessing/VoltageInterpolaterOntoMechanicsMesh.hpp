@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  A class which can be used to convert the voltage from an electrics
  *  (or electromechanics) simulation onto a coarser mechanics mesh, by interpolation. The
  *  class provides a method to interpolate values from the fine mesh 
- *  onto the coarse mesh and the main meythod to output a HDF5 file corresponding to nodes 
+ *  onto the coarse mesh and the main method to output a HDF5 file corresponding to nodes 
  *  on the mechanics mesh, and convert it to CMGUI output.
  */
 template<unsigned DIM>

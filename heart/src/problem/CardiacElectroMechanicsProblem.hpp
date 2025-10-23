@@ -180,10 +180,9 @@ protected :
     /** Somewhere to store the modified conductivity tensor */
     c_matrix<double,DIM,DIM> mModifiedConductivityTensor;
 
-#ifdef CHASTE_VTK
-    /** Pointer to the VTK writer class. Initialized within Initialise() method*/
+    /** Pointer to the VTK writer class. Initialized to NULL upon construction. Object created within Initialise() method*/
     CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>* mpCardiacVtkWriter; 
-#endif
+
     /**
      *  Determine which node is closest to the watched location
      */

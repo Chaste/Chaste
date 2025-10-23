@@ -157,20 +157,14 @@ public:
                                       electrics_mesh,
                                       ic,
                                       output_dir);
-        
-        // fake a solution
-        Vec fake_solution = mono_problem.CreateInitialCondition();
-        ReplicatableVector fake_repl(fake_solution);
-        fake_repl[0] = 987.5;//put a different number just for variety
-        handler.WriteSolution(1u, fake_repl);
-
+        //The constructor is expected to write out the initial condition with a _0 suffix (and zero displacements)
         {
             // Check that the reader can see it
-            VtkMeshReader<2,2> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + output_dir+"/vtk/deformed_mechanics_mesh_1.vtu");
+            VtkMeshReader<2,2> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + output_dir+"/vtk/deformed_mechanics_mesh_0.vtu");
             TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mechanics_mesh.GetNumNodes());
             TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mechanics_mesh.GetNumElements());
 
-            //Check node locations (no deformation, no solve called)
+            //Check node locations (zero deformation as the initial condition)
             for (unsigned i = 0u; i < mechanics_mesh.GetNumNodes(); ++i)
             {
                 std::vector<double> next_node = vtk_reader.GetNextNode();
@@ -179,16 +173,16 @@ public:
                 TS_ASSERT_DELTA(next_node[1],mechanics_mesh.GetNode(i)->rGetLocation()[1],1e-9);
             }
 
-            // Check that it has the correct data
+            // Check that it has the correct data -> should be initial condition everywhere
             std::vector<double> voltage;
             vtk_reader.GetPointData("V", voltage);
             TS_ASSERT_EQUALS(voltage.size(),mechanics_mesh.GetNumNodes());
             for (unsigned i=0u; i < voltage.size(); ++i)
             {
-                TS_ASSERT_DELTA(fake_repl[i] , voltage[i], 1e-9);
+                TS_ASSERT_DELTA(ic[i] , voltage[i], 1e-9);
             }
             
-            // No displacement expected
+            // No displacement expected at the start
             std::vector< c_vector<double, 2> > displ;
             vtk_reader.GetPointData("displacements", displ);
             TS_ASSERT_EQUALS(displ.size(),mechanics_mesh.GetNumNodes());
@@ -196,6 +190,80 @@ public:
             {
                 TS_ASSERT_DELTA(displ[i](0) , 0.0, 1e-9);
                 TS_ASSERT_DELTA(displ[i](1) , 0.0, 1e-9);
+            }
+        }
+
+        // Now we test the write method, with some made-up solutions
+        Vec fake_solution = mono_problem.CreateInitialCondition();
+        ReplicatableVector fake_repl(fake_solution);
+
+        //we apply a voltage gradient along the x axis as a made-up solution
+        double voltage_scaling=50;
+        for (unsigned i=0u;i<fake_repl.GetSize();++i)
+        {
+            double x_coord = electrics_mesh.GetNode(i)->rGetLocation()(0);
+            fake_repl[i] += voltage_scaling*x_coord;
+        }
+
+        //To fake some displacement, we hack into the solver solution
+        //and fake a stretch of the mesh in the x direction
+        double scaling_factor=2;
+        for (unsigned i = 0u; i < mechanics_mesh.GetNumNodes(); ++i)
+        {
+            double x_coord = mechanics_mesh.GetNode(i)->rGetLocation()(0);
+            //hack into the solution, we only modify x coordinates.
+            //Note that, in the solver, mCurrentSolution is interleaved [x0,y0, x1,y1,....]
+            mechanics_solver.rGetCurrentSolution()[2*i] = scaling_factor*x_coord;
+
+            //check that the deformed position is reflected in the solver
+            TS_ASSERT_DELTA(mechanics_solver.rGetDeformedPosition()[i](0), x_coord + x_coord*scaling_factor,1e-9);
+        }        
+        //write this fake solution
+        handler.WriteSolution(1u, fake_repl);
+        {
+            // Check that the reader can see it
+            VtkMeshReader<2,2> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + output_dir+"/vtk/deformed_mechanics_mesh_1.vtu");
+            TS_ASSERT_EQUALS(vtk_reader.GetNumNodes(), mechanics_mesh.GetNumNodes());
+            TS_ASSERT_EQUALS(vtk_reader.GetNumElements(), mechanics_mesh.GetNumElements());
+
+            //Check node locations
+            for (unsigned i = 0u; i < mechanics_mesh.GetNumNodes(); ++i)
+            {
+                std::vector<double> next_node = vtk_reader.GetNextNode();
+                TS_ASSERT_EQUALS(next_node.size(),3);//the GetNextNode always fills up 3 coordinates regardless of SPACE_DIM (not sure why)
+                //check the actual expected number for the x direction
+                TS_ASSERT_DELTA(next_node[0],mechanics_mesh.GetNode(i)->rGetLocation()[0]*(1+scaling_factor),1e-9);
+                //...and that the internal mesh moved...
+                TS_ASSERT_DELTA(next_node[0],handler.mpVtkOutputMesh->GetNode(i)->rGetLocation()(0),1e-9);
+                
+                //unchanged for y direction
+                TS_ASSERT_DELTA(next_node[1],mechanics_mesh.GetNode(i)->rGetLocation()[1],1e-9);
+                TS_ASSERT_DELTA(next_node[1],handler.mpVtkOutputMesh->GetNode(i)->rGetLocation()(1),1e-9);
+            }
+
+            // Check that it has the correct voltage data
+            std::vector<double> voltage;
+            vtk_reader.GetPointData("V", voltage);
+            TS_ASSERT_EQUALS(voltage.size(),mechanics_mesh.GetNumNodes());
+
+            //The expected correct output data are the voltages interpolated onto the mechanics mesh
+            VoltageInterpolaterOntoMechanicsMesh<2> interpolater(electrics_mesh,mechanics_mesh);
+            std::vector<double> expected_interpolated_voltages(mechanics_mesh.GetNumNodes());
+            interpolater.InterpolateOnCoarseMesh(expected_interpolated_voltages,fake_repl);
+            for (unsigned i=0u; i < voltage.size(); ++i)
+            {
+                TS_ASSERT_DELTA(expected_interpolated_voltages[i] , voltage[i], 1e-9);
+            }
+            
+            // Check displacements
+            std::vector< c_vector<double, 2> > displ;
+            vtk_reader.GetPointData("displacements", displ);
+            TS_ASSERT_EQUALS(displ.size(),mechanics_mesh.GetNumNodes());
+            for (unsigned i=0u; i < displ.size(); ++i)
+            {
+                //expected value = deformed - undeformed
+                TS_ASSERT_DELTA(displ[i](0) , handler.mpVtkOutputMesh->GetNode(i)->rGetLocation()(0) -  mechanics_mesh.GetNode(i)->rGetLocation()[0], 1e-9);
+                TS_ASSERT_DELTA(displ[i](1) , 0.0, 1e-9);//no displacement in y direction
             }
         }
         

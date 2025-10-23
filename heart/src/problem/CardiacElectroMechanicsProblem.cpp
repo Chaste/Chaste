@@ -273,7 +273,8 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsProble
         mIsWatchedLocation(false),
         mWatchedElectricsNodeIndex(UNSIGNED_UNSET),
         mWatchedMechanicsNodeIndex(UNSIGNED_UNSET),
-        mNumTimestepsToOutputDeformationGradientsAndStress(UNSIGNED_UNSET)
+        mNumTimestepsToOutputDeformationGradientsAndStress(UNSIGNED_UNSET),
+        mpCardiacVtkWriter(NULL)
 {
     // Do some initial set up...
     // However, NOTE, we don't use either the passed in meshes or the problem_definition.
@@ -337,13 +338,8 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::~CardiacElectroMechanicsProbl
     delete mpElectricsProblem;
     delete mpCardiacMechSolver;
     delete mpMeshPair;
-    
-#ifdef CHASTE_VTK
-    if (mWriteOutput && HeartConfig::Instance()->GetVisualizeWithVtk())
-    {
-        delete mpCardiacVtkWriter;
-    }
-#endif
+    delete mpCardiacVtkWriter;
+
     LogFile::Close();
 }
 

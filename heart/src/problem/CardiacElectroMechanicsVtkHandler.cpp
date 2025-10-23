@@ -32,7 +32,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
-#ifdef CHASTE_VTK
+
 
 #include "CardiacElectroMechanicsVtkHandler.hpp"
 
@@ -42,8 +42,12 @@ CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsVtk
     TetrahedralMesh<DIM,DIM>& rElectricsMesh,
     ReplicatableVector& rElectricsInitialCondition,
     const std::string& rOutputDir)
-   : mrMechanicsSolver(rMechanicsSolver)
+   : mrMechanicsSolver(rMechanicsSolver),
+     mpVtkElastictyWriter(NULL),
+     mpInterpolater(NULL)
 {
+
+#ifdef CHASTE_VTK // Requires "sudo aptitude install libvtk5-dev" or similar
     //create an internal copy of the quadratic mesh (we will modify node locations for oputput)
     mpVtkOutputMesh = new QuadraticMesh<DIM>();
     mpVtkOutputMesh->ConstructFromMesh(rQuadMesh);
@@ -86,12 +90,16 @@ CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::CardiacElectroMechanicsVtk
     mpVtkWriter->AddTensorCellData("deformation_gradient_F", mStrains);
     assert(mInterpolatedVoltagesNodeWise.size()==rQuadMesh.GetNumNodes());
     mpVtkWriter->WriteDeformedFiles();
+
+#endif //CHASTE_VTK
 }
 
 template<unsigned DIM, unsigned ELEC_PROB_DIM>
 CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::~CardiacElectroMechanicsVtkHandler()
 {
+#ifdef CHASTE_VTK // Requires "sudo aptitude install libvtk5-dev" or similar
     delete mpVtkWriter;
+#endif
     delete mpInterpolater;
     delete mpVtkElastictyWriter;
 }
@@ -99,6 +107,7 @@ CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::~CardiacElectroMechanicsVt
 template<unsigned DIM, unsigned ELEC_PROB_DIM>
 void CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::WriteSolution(unsigned counter, ReplicatableVector& rElectricsSolution)
 {
+#ifdef CHASTE_VTK // Requires "sudo aptitude install libvtk5-dev" or similar
     //Apply deformation solution to mechanics mesh (the one in the writer object, not the one used by the solver!)
     mpVtkWriter->ApplyDeformation(mrMechanicsSolver.rGetDeformedPosition());
     mpVtkWriter->SetOutputBaseFileName("deformed_mechanics_mesh_" + std::to_string(counter));
@@ -120,6 +129,7 @@ void CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::WriteSolution(unsigne
 
     //write to file
     mpVtkWriter->WriteDeformedFiles();
+#endif
 }
 
 
@@ -128,5 +138,3 @@ template class CardiacElectroMechanicsVtkHandler<2,1>;
 template class CardiacElectroMechanicsVtkHandler<3,1>;
 template class CardiacElectroMechanicsVtkHandler<2,2>;
 template class CardiacElectroMechanicsVtkHandler<3,2>;
-
-#endif //CHATE_VTK

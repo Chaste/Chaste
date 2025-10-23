@@ -37,8 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CARDIACELECTROMECHANICSVTKHANDLER_HPP_
 #define CARDIACELECTROMECHANICSVTKHANDLER_HPP_
 
-#ifdef CHASTE_VTK
-
 #include "AbstractCardiacProblem.hpp"
 #include "AbstractNonlinearElasticitySolver.hpp"
 #include "FineCoarseMeshPair.hpp"
@@ -59,8 +57,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM, unsigned ELEC_PROB_DIM=1>
 class CardiacElectroMechanicsVtkHandler
 {
-
-private: 
+  friend class TestCardiacElectroMechanicsVtkHandler; // for testing 
+  
+  private: 
     /** Cache for the mechanics solver (deformed solution is taken from this object)*/
     AbstractNonlinearElasticitySolver<DIM>& mrMechanicsSolver;
 
@@ -79,8 +78,10 @@ private:
     /** Pointer to the mechanics solution writer class. Used to calculate some mechanics quantities */
     VtkNonlinearElasticitySolutionWriter<DIM>* mpVtkElastictyWriter;
 
+#ifdef CHASTE_VTK // Requires "sudo aptitude install libvtk5-dev" or similar
     /** Poiunter to the actual mesh VTK writer. Initialized upon construction */
     VtkDeformedMeshWriter<DIM>* mpVtkWriter;
+#endif
 
     /** Used to interpolate electrics solution onto mechanics mesh for VTK output*/
     VoltageInterpolaterOntoMechanicsMesh<DIM>* mpInterpolater;
@@ -92,7 +93,7 @@ private:
      */
     QuadraticMesh<DIM>* mpVtkOutputMesh; 
 
-public: 
+  public: 
 
     /**
      * Constructor. It creates all the necessary objects based on the input
@@ -126,7 +127,5 @@ public:
       */
      void WriteSolution(unsigned counter, ReplicatableVector& rElectricsSolution);
 };
-
-#endif //CHATE_VTK
 
 #endif //CARDIACELECTROMECHANICSVTKHANDLER_HPP_
