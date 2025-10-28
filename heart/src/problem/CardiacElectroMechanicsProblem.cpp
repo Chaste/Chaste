@@ -338,8 +338,11 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::~CardiacElectroMechanicsProbl
     delete mpElectricsProblem;
     delete mpCardiacMechSolver;
     delete mpMeshPair;
-    delete mpCardiacVtkWriter;
-
+    if (mpCardiacVtkWriter)
+    {
+        delete mpCardiacVtkWriter;
+    }
+    
     LogFile::Close();
 }
 
