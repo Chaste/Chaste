@@ -80,12 +80,9 @@ public:
         std::vector<std::string> variable_names;
         variable_names.push_back("V");
 
-        VoltageInterpolaterOntoMechanicsMesh<1> interpolater(mesh,
-                                                             mech_mesh,
-                                                             variable_names,
-                                                             "TestVoltageInterpolater1d",
-                                                             "MonodomainLR91_1d");
-
+        VoltageInterpolaterOntoMechanicsMesh<1> interpolater(mesh, mech_mesh);
+        interpolater.OutputToCmgui(variable_names,"TestVoltageInterpolater1d","MonodomainLR91_1d");
+        
         Hdf5DataReader fine_reader("TestVoltageInterpolater1d","MonodomainLR91_1d");
         DistributedVectorFactory factory1(mesh.GetNumNodes());
         Vec voltage_fine = factory1.CreateVec();
@@ -147,12 +144,8 @@ public:
 
         std::vector<std::string> variable_names;
         variable_names.push_back("V");
-        VoltageInterpolaterOntoMechanicsMesh<2> interpolater(mesh,
-                                                             mech_mesh,
-                                                             variable_names,
-                                                             "TestVoltageInterpolater2d",
-                                                             "Monodomain2d");
-
+        VoltageInterpolaterOntoMechanicsMesh<2> interpolater(mesh,mech_mesh);
+        interpolater.OutputToCmgui(variable_names,"TestVoltageInterpolater2d","Monodomain2d");
 
         Hdf5DataReader fine_reader("TestVoltageInterpolater2d","Monodomain2d");
         DistributedVectorFactory factory1(mesh.GetNumNodes());
@@ -196,11 +189,8 @@ public:
         std::vector<std::string> variable_names;
         variable_names.push_back("V");
         variable_names.push_back("Phi_e");
-        VoltageInterpolaterOntoMechanicsMesh<1> interpolater(mesh,
-                                                             mech_mesh,
-                                                             variable_names,
-                                                             "TestWithMultipleVariables1D",
-                                                             "1D_0_to_1_100_elements");
+        VoltageInterpolaterOntoMechanicsMesh<1> interpolater(mesh,mech_mesh);
+        interpolater.OutputToCmgui(variable_names,"TestWithMultipleVariables1D","1D_0_to_1_100_elements");
 
 
         Hdf5DataReader fine_reader("TestWithMultipleVariables1D","1D_0_to_1_100_elements");

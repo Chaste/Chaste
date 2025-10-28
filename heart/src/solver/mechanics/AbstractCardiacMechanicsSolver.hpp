@@ -80,6 +80,8 @@ typedef struct DataAtQuadraturePoint_
 template<class ELASTICITY_SOLVER, unsigned DIM>
 class AbstractCardiacMechanicsSolver : public ELASTICITY_SOLVER, public AbstractCardiacMechanicsSolverInterface<DIM>
 {
+    friend class TestCardiacElectroMechanicsVtkHandler; // for testing
+
 protected:
     static const unsigned NUM_VERTICES_PER_ELEMENT = ELASTICITY_SOLVER::NUM_VERTICES_PER_ELEMENT; /**< Useful const from base class */
 
