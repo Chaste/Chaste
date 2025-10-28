@@ -268,6 +268,7 @@ public:
         }
         
         delete p_mesh_pair;
+        PetscTools::Destroy(fake_solution);
 #else
         std::cout << "This test was not run, as VTK is not enabled." << std::endl;
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
@@ -383,6 +384,7 @@ public:
             }
         }
         delete p_mesh_pair;
+        PetscTools::Destroy(fake_solution);
 #else
         std::cout << "This test was not run, as VTK is not enabled." << std::endl;
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
