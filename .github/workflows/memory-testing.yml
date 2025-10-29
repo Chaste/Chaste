@@ -56,6 +56,7 @@ jobs:
           sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
           sudo apt update
           sudo apt install chaste-dependencies
+          sudo apt install elinks
 
       - name: Downgrade libexpat1 (native ubuntu-22.04 only)
         # if: ${{ matrix.os == 'ubuntu-22.04' }}
@@ -97,6 +98,18 @@ jobs:
             echo "index=False"  >> $GITHUB_OUTPUT
           fi
         if: always()
+
+      - name: display memtest index in terminal
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+        run: |
+          elinks -dump -dump-color-mode 3 -dump-width 180  --no-references --no-numbering memtest/index.html | head -n 30
+        if: always() && steps.index-exists.outputs.index == 'True'
+
+      - name: display memtest index in job summary
+        working-directory: ${{ env.CHASTE_BUILD_DIR }}
+        run: |
+          cat memtest/index.html >> $GITHUB_STEP_SUMMARY
+        if: always() && steps.index-exists.outputs.index == 'True'
 
       - name: upload memtest artifact
         uses: actions/upload-artifact@v4
