@@ -151,7 +151,8 @@ public:
         mechanics_solver.SetComputeAverageStressPerElementDuringSolve(true);
         mechanics_solver.Initialise();
         
-        ReplicatableVector ic(mono_problem.CreateInitialCondition());
+        Vec ics = mono_problem.CreateInitialCondition();
+        ReplicatableVector ic(ics);
         CardiacElectroMechanicsVtkHandler<2> handler(mechanics_solver,
                                       mechanics_mesh,
                                       electrics_mesh,
@@ -269,6 +270,7 @@ public:
         
         delete p_mesh_pair;
         PetscTools::Destroy(fake_solution);
+        PetscTools::Destroy(ics);
 #else
         std::cout << "This test was not run, as VTK is not enabled." << std::endl;
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
@@ -334,7 +336,8 @@ public:
         mechanics_solver.SetComputeAverageStressPerElementDuringSolve(true);
         mechanics_solver.Initialise();
         
-        ReplicatableVector ic(mono_problem.CreateInitialCondition());
+        Vec ics = mono_problem.CreateInitialCondition();
+        ReplicatableVector ic(ics);
         CardiacElectroMechanicsVtkHandler<3> handler(mechanics_solver,
                                       mechanics_mesh,
                                       electrics_mesh,
@@ -385,6 +388,7 @@ public:
         }
         delete p_mesh_pair;
         PetscTools::Destroy(fake_solution);
+        PetscTools::Destroy(ics);
 #else
         std::cout << "This test was not run, as VTK is not enabled." << std::endl;
         std::cout << "If required please install and alter your hostconfig settings to switch on chaste support." << std::endl;
