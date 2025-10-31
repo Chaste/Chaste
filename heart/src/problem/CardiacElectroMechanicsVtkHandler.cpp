@@ -99,6 +99,7 @@ CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>::~CardiacElectroMechanicsVt
 {
 #ifdef CHASTE_VTK // Requires "sudo aptitude install libvtk5-dev" or similar
     delete mpVtkWriter;
+    delete mpVtkOutputMesh;
 #endif
     delete mpInterpolater;
     delete mpVtkElastictyWriter;
