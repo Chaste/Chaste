@@ -41,6 +41,8 @@ jobs:
             extra-build-args: ""
           - image: portability-oracular
             extra-build-args: ""
+          - image: portability-plucky
+            extra-build-args: ""
 
     runs-on: ubuntu-latest
 
