@@ -410,6 +410,8 @@ public:
         // 1.76 => 19
         // 1.77 => 19
         // 1.78 => 19
+        // ...
+        // 1.88 => 20
 
 #ifndef BOOST_VERSION
         TS_FAIL("This test needs to know the version of Boost with which it was compiled.");
