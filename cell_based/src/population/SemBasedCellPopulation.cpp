@@ -191,6 +191,19 @@ template<unsigned DIM>
 void SemBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirectory)
 {
     SemMeshWriter<DIM> mesh_writer(rDirectory, "results", false);
+
+    if (mOutputNodeRegionToVtk)
+    {
+        std::vector<double> node_regions;
+        for (auto node_iter = mpSemMesh->GetNodeIteratorBegin();
+             node_iter != mpSemMesh->GetNodeIteratorEnd();
+             ++node_iter)
+        {
+            node_regions.push_back(static_cast<double>(node_iter->GetRegion()));
+        }
+        mesh_writer.AddPointData("Node Regions", node_regions);
+    }
+
     unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
     std::stringstream time;
     time << num_timesteps;
