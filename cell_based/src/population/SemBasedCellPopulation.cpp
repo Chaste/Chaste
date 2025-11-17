@@ -198,6 +198,18 @@ void SemBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDire
 }
 
 template<unsigned DIM>
+void SemBasedCellPopulation<DIM>::SetOutputNodeRegionToVtk(bool outputNodeRegionToVtk)
+{
+    mOutputNodeRegionToVtk = outputNodeRegionToVtk;
+}
+
+template<unsigned DIM>
+bool SemBasedCellPopulation<DIM>::GetOutputNodeRegionToVtk() const
+{
+    return mOutputNodeRegionToVtk;
+}
+
+template<unsigned DIM>
 TetrahedralMesh<DIM, DIM>* SemBasedCellPopulation<DIM>::GetTetrahedralMeshForPdeModifier() 
 {
     return nullptr;
