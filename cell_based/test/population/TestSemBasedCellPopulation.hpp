@@ -125,6 +125,38 @@ public:
     {
         ///\todo
     }
+
+    void TestGetAndSetMethods()
+    {
+        SemMeshGenerator generator;
+        generator.GenerateSingleCell({0.0, 0.0}, {0.5, 0.5}, {8, 8});
+        auto p_mesh = generator.GetMesh();
+
+        c_vector<double, 4> boxCollectionDomain{};
+        boxCollectionDomain[0] = -1.0;
+        boxCollectionDomain[1] =  1.0;
+        boxCollectionDomain[2] = -1.0;
+        boxCollectionDomain[3] =  1.0;
+
+        p_mesh->SetUpBoxCollection(0.1, boxCollectionDomain);
+
+        // Assertions
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 1);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 64);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        SemBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        // mOutputNodeRegionToVtk
+        {
+            // default value is ture
+            TS_ASSERT(cell_population.GetOutputNodeRegionToVtk())
+            cell_population.SetOutputNodeRegionToVtk(false);
+            TS_ASSERT(!cell_population.GetOutputNodeRegionToVtk());
+        }
+    }
 };
 
 #endif /*TESTSEMBASEDCELLPOPULATION_HPP_*/
