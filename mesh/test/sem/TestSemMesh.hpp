@@ -43,6 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "SemMesh.hpp"
 #include "ArchiveOpener.hpp"
+#include "SemSingleElementMeshGenerator.hpp"
 
 // This test is always run sequentially (never in parallel)
 #include "FakePetscSetup.hpp"
@@ -93,7 +94,33 @@ public:
     
     void TestGetCentroidOfElement()
     {
-        ///\todo
+        // 1D
+        {
+            SemSingleElementMeshGenerator<1> generator({5}, 2.0);
+            auto p_mesh = generator.GetMesh();
+
+            c_vector<double, 1> centroid = p_mesh->GetCentroidOfElement(0);
+            TS_ASSERT_DELTA(centroid[0], 0.8, 1e-6);
+        }
+        // 2D
+        {
+            SemSingleElementMeshGenerator<2> generator({5, 3}, 4.0);
+            auto p_mesh = generator.GetMesh();
+
+            c_vector<double, 2> centroid = p_mesh->GetCentroidOfElement(0);
+            TS_ASSERT_DELTA(centroid[0], 1.6, 1e-6);
+            TS_ASSERT_DELTA(centroid[1], 0.8, 1e-6);
+        }
+        // 2D
+        {
+            SemSingleElementMeshGenerator<3> generator({5, 3, 7}, 6.0);
+            auto p_mesh = generator.GetMesh();
+
+            c_vector<double, 3> centroid = p_mesh->GetCentroidOfElement(0);
+            TS_ASSERT_DELTA(centroid[0], 2.4, 1e-6);
+            TS_ASSERT_DELTA(centroid[1], 1.2, 1e-6);
+            TS_ASSERT_DELTA(centroid[2], 3.6, 1e-6);
+        }
     }
 
     void TestConstructFromMeshReader()

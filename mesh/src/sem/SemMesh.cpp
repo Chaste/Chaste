@@ -104,12 +104,22 @@ SemElement<DIM>* SemMesh<DIM>::GetElement(unsigned index) const
     return mElements[index];
 }
 
-template<unsigned DIM>
+template <unsigned DIM>
 c_vector<double, DIM> SemMesh<DIM>::GetCentroidOfElement(unsigned index)
 {
-    ///\todo
-    c_vector<double, DIM> centroid = zero_vector<double>(DIM);
-    return centroid;
+    SemElement<DIM>* p_element = GetElement(index);
+    unsigned num_nodes = p_element->GetNumNodes();
+
+    const c_vector<double, DIM> reference_location = p_element->GetNode(0u)->rGetLocation();
+
+    c_vector<double, DIM> displacement = zero_vector<double>(DIM);
+    for (unsigned i = 1u; i < num_nodes; ++i)
+    {
+        displacement += this->GetVectorFromAtoB(reference_location, p_element->GetNode(i)->rGetLocation());
+    }
+    displacement /= static_cast<double>(num_nodes);
+
+    return reference_location + displacement;
 }
 
 template<unsigned DIM>
