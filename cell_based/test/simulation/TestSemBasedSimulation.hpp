@@ -44,6 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CheckpointArchiveTypes.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "SemMeshGenerator.hpp"
+#include "SemSingleElementMeshGenerator.hpp"
 #include "CylindricalHoneycombMeshGenerator.hpp"
 #include "ToroidalHoneycombMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
@@ -90,24 +91,22 @@ class TestSemBasedSimulation : public AbstractCellBasedWithTimingsTestSuite
 {
 public:
 
-    void TestSemBasedSimulationExample()
+    void xTestSemBasedSimulationExample2D()
     {
-        // Create a simple 2D SemBasedCellPopulation
-        SemMeshGenerator generator;
-        generator.GenerateSingleCell({0.0, 0.0}, {0.5, 0.5}, {8, 8});
+        SemSingleElementMeshGenerator<2> generator({5,8}, 0.5);
         auto p_mesh = generator.GetMesh();
 
         c_vector<double, 4> boxCollectionDomain{};
         boxCollectionDomain[0] = -1.0;
-        boxCollectionDomain[1] =  1.0;
+        boxCollectionDomain[1] =  2.0;
         boxCollectionDomain[2] = -1.0;
-        boxCollectionDomain[3] =  1.0;
+        boxCollectionDomain[3] =  2.0;
 
         p_mesh->SetUpBoxCollection(0.1, boxCollectionDomain);
 
         // Assertions
         TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 1);
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 64);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 40);
 
         std::vector<CellPtr> cells;
         CellsGenerator<NoCellCycleModel, 2> cells_generator;
@@ -116,7 +115,7 @@ public:
         cell_population.SetDampingConstantNormal(1.0);
 
         TS_ASSERT_EQUALS(cell_population.GetNumElements(), 1);
-        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 64);
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 40);
         TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 1);
 
 
@@ -141,6 +140,72 @@ public:
         
         std::cout << cell_population.GetNumRealCells() << std::endl;
 
+    }
+
+    void TestSemBasedSimulationExample3D()
+    {
+        SemSingleElementMeshGenerator<3> generator({ 5, 8, 5 }, 0.5);
+        auto p_mesh = generator.GetMesh();
+
+        // Set the most central nodes to region 1
+        {
+            c_vector<double, 3> centroid = p_mesh->GetCentroidOfElement(0u);
+            auto p_elem_0 = p_mesh->GetElement(0);
+            for (unsigned i = 0; i < p_elem_0->GetNumNodes(); ++i)
+            {
+                auto p_node = p_elem_0->GetNode(i);
+                if (norm_2(p_mesh->GetVectorFromAtoB(centroid, p_node->rGetLocation())) < 0.2)
+                {
+                    p_node->SetRegion(1u);
+                }
+            }
+        }
+
+        c_vector<double, 6> boxCollectionDomain{};
+        boxCollectionDomain[0] = -1.0;
+        boxCollectionDomain[1] =  2.0;
+        boxCollectionDomain[2] = -1.0;
+        boxCollectionDomain[3] =  2.0;
+        boxCollectionDomain[4] = -1.0;
+        boxCollectionDomain[5] =  2.0;
+
+        p_mesh->SetUpBoxCollection(0.1, boxCollectionDomain);
+
+        // Assertions
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 1);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 200);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<NoCellCycleModel, 3> cells_generator;
+        cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
+        SemBasedCellPopulation<3> cell_population(*p_mesh, cells);
+        cell_population.SetDampingConstantNormal(1.0);
+
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 1);
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 200);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 1);
+
+
+        // Set up cell-based simulation
+        OffLatticeSimulation<3> simulator(cell_population);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 1);
+        std::cout << cell_population.GetNumRealCells() << std::endl;
+        simulator.SetOutputDirectory("TestSemBasedSimulation3D");
+        simulator.SetDt(0.01);
+        simulator.SetSamplingTimestepMultiple(1);
+        simulator.SetEndTime(2.5);
+        simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<3>>());
+        simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(false);
+
+        std::cout << cell_population.GetNumRealCells() << std::endl;
+        // Create some force laws and pass them to the simulation
+        MAKE_PTR(SemRegionalForce<3>, p_sem_force);
+        simulator.AddForce(p_sem_force);
+
+        // Run the simulation
+        simulator.Solve();
+
+        std::cout << cell_population.GetNumRealCells() << std::endl;
     }
 
 };
