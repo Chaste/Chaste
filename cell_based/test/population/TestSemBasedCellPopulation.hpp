@@ -36,9 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef TESTSEMBASEDCELLPOPULATION_HPP_
 #define TESTSEMBASEDCELLPOPULATION_HPP_
 
-#include <iostream>
-#include <fstream>
-#include <regex>
 
 #include <cxxtest/TestSuite.h>
 
@@ -46,6 +43,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_iarchive.hpp>
 
 #include "SemBasedCellPopulation.hpp"
+#include "SemMeshGenerator.hpp"
+#include "CellsGenerator.hpp"
+#include "NoCellCycleModel.hpp"
 
 #include "AbstractCellBasedTestSuite.hpp"
 
