@@ -104,8 +104,9 @@ public:
     /**
      * Constructor.
      *
-     * @param numNodes number of nodes in each direction (x, y, z)
-     * @param scaleFactor the target diameter of the element in the x-direction
+     * @param numNodesPerElem number of nodes per element in each direction (x, y, z)
+     * @param numElems number of elements in each direction (x, y, z)
+     * @param scaleFactor the target diameter of each element in the x-direction
      */
     SemMultiElementMeshGenerator(const std::array<unsigned, DIM>& numNodesPerElem,
         const std::array<unsigned, DIM>& numElems, double scaleFactor = 1.0);

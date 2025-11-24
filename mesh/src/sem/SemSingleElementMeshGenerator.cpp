@@ -144,6 +144,7 @@ template <unsigned DIM> void SemSingleElementMeshGenerator<DIM>::GenerateMesh(st
         Node<DIM>* new_node = new Node<DIM>(new_node_index, positions[i]);
         new_node->SetRegion(0u);
         new_node->SetRadius(0.05);
+        new_node->AddElement(new_element_id);
 
         // Add the node to the mesh
         mpMesh->AddNode(new_node);

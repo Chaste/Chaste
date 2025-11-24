@@ -199,7 +199,7 @@ std::vector<c_vector<double, DIM>> SemMultiElementMeshGenerator<DIM>::GenerateEl
 template <unsigned DIM> void SemMultiElementMeshGenerator<DIM>::GenerateMesh(
     std::vector<c_vector<double, DIM>> positions, std::vector<c_vector<double, DIM>> offsets)
 {
-    for (unsigned i = 0; i < offsets.size(); ++i)
+    for (const auto& elem_offset : offsets)
     {
         unsigned int new_element_id = mpMesh->GetNumElements();
         auto new_element = new SemElement<DIM>(new_element_id, {});
@@ -208,12 +208,13 @@ template <unsigned DIM> void SemMultiElementMeshGenerator<DIM>::GenerateMesh(
         std::vector<unsigned> all_node_indices;
         all_node_indices.reserve(mNumAllNodesPerElem);
 
-        for (unsigned i = 0; i < positions.size(); ++i)
+        for (const auto& node_pos: positions)
         {
             unsigned new_node_index = mpMesh->GetNumNodes();
-            Node<DIM>* new_node = new Node<DIM>(new_node_index, positions[i] + offsets[i]);
+            Node<DIM>* new_node = new Node<DIM>(new_node_index, node_pos + elem_offset);
             new_node->SetRegion(0u);
             new_node->SetRadius(0.05);
+            new_node->AddElement(new_element_id);
 
             // Add the node to the mesh
             mpMesh->AddNode(new_node);

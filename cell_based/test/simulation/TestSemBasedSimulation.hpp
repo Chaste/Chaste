@@ -45,6 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OffLatticeSimulation.hpp"
 #include "SemMeshGenerator.hpp"
 #include "SemSingleElementMeshGenerator.hpp"
+#include "SemMultiElementMeshGenerator.hpp"
 #include "CylindricalHoneycombMeshGenerator.hpp"
 #include "ToroidalHoneycombMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
@@ -144,7 +145,7 @@ public:
 
     void TestSemBasedSimulationExample3D()
     {
-        SemSingleElementMeshGenerator<3> generator({ 5, 8, 5 }, 0.5);
+        SemMultiElementMeshGenerator<3> generator({ 5, 8, 5 }, {3, 1, 1}, 0.5);
         auto p_mesh = generator.GetMesh();
 
         // Set the most central nodes to region 1
