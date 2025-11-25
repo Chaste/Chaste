@@ -43,6 +43,8 @@ jobs:
             extra-build-args: ""
           - image: portability-plucky
             extra-build-args: ""
+          - image: portability-questing
+            extra-build-args: ""
 
     runs-on: ubuntu-latest
 
