@@ -38,6 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
+#include "SemMultiElementMeshGenerator.hpp"
 #include "SemSingleElementMeshGenerator.hpp"
 #include "SemMesh.hpp"
 
@@ -49,67 +50,73 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TestSemMultiElementMeshGenerator : public CxxTest::TestSuite
 {
 public:
-    void Test1D()
+    void Test1DOneElem()
     {
-        SemSingleElementMeshGenerator<1> generator({5}, 2.0);
-        auto p_mesh = generator.GetMesh();
+        // Mesh should be identical to the single element generator when generating one element
 
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 5u);
+        SemSingleElementMeshGenerator<1> gen_1({5}, 2.0);
+        auto p_mesh_single = gen_1.GetMesh();
 
-        TS_ASSERT_DELTA(p_mesh->GetNode(0u)->rGetLocation()[0], 0.0, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetNode(1u)->rGetLocation()[0], 0.4, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetNode(2u)->rGetLocation()[0], 0.8, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetNode(3u)->rGetLocation()[0], 1.2, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetNode(4u)->rGetLocation()[0], 1.6, 1e-6);
+        SemMultiElementMeshGenerator<1> gen_2({5}, {1}, 2.0);
+        auto p_mesh_multi = gen_2.GetMesh();
+
+        TS_ASSERT_EQUALS(p_mesh_multi->GetNumNodes(), 5u);
+
+        for (unsigned i = 0; i < p_mesh_multi->GetNumAllNodes(); ++i)
+        {
+            TS_ASSERT_DELTA(p_mesh_single->GetNode(i)->rGetLocation()[0], p_mesh_multi->GetNode(i)->rGetLocation()[0], 1e-6);
+        }
     }
 
-    void Test2D()
+    void Test2DOneElem()
     {
-        SemSingleElementMeshGenerator<2> generator({4, 5}, 3.0);
-        auto p_mesh = generator.GetMesh();
+        // Mesh should be identical to the single element generator when generating one element
 
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 20u);
+        SemSingleElementMeshGenerator<2> gen_1({4, 5}, 3.0);
+        auto p_mesh_single = gen_1.GetMesh();
 
-        TS_ASSERT_DELTA(p_mesh->GetNode(0u)->rGetLocation()[0], 0.0, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetNode(0u)->rGetLocation()[1], 0.0, 1e-6);
+        SemMultiElementMeshGenerator<2> gen_2({4, 5}, {1, 1}, 3.0);
+        auto p_mesh_multi = gen_2.GetMesh();
 
-        TS_ASSERT_DELTA(p_mesh->GetNode(1u)->rGetLocation()[0], 0.75, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetNode(1u)->rGetLocation()[1], 0.0, 1e-6);
+        TS_ASSERT_EQUALS(p_mesh_multi->GetNumNodes(), 20u);
 
-        TS_ASSERT_DELTA(p_mesh->GetNode(6u)->rGetLocation()[0], 1.5, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetNode(6u)->rGetLocation()[1], 0.75, 1e-6);
-
-        TS_ASSERT_DELTA(p_mesh->GetNode(19u)->rGetLocation()[0], 2.25, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetNode(19u)->rGetLocation()[1], 3.0, 1e-6);
+        for (unsigned i = 0; i < p_mesh_multi->GetNumAllNodes(); ++i)
+        {
+            TS_ASSERT_DELTA(p_mesh_single->GetNode(i)->rGetLocation()[0], p_mesh_multi->GetNode(i)->rGetLocation()[0], 1e-6);
+            TS_ASSERT_DELTA(p_mesh_single->GetNode(i)->rGetLocation()[1], p_mesh_multi->GetNode(i)->rGetLocation()[1], 1e-6);
+        }
     }
 
-    void Test3D()
+    void Test3DOneElem()
     {
-        SemSingleElementMeshGenerator<3> generator({4, 3, 2}, 5.0);
-        auto p_mesh = generator.GetMesh();
+        // Mesh should be identical to the single element generator when generating one element
 
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 24u);
+        SemSingleElementMeshGenerator<3> gen_1({4, 3, 2}, 5.0);
+        auto p_mesh_single = gen_1.GetMesh();
 
-        TS_ASSERT_DELTA(p_mesh->GetNode(0u)->rGetLocation()[0], 0.0, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetNode(0u)->rGetLocation()[1], 0.0, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetNode(0u)->rGetLocation()[2], 0.0, 1e-6);
+        SemMultiElementMeshGenerator<3> gen_2({4, 3, 2}, {1, 1, 1}, 5.0);
+        auto p_mesh_multi = gen_2.GetMesh();
 
-        TS_ASSERT_DELTA(p_mesh->GetNode(17u)->rGetLocation()[0], 1.25, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetNode(17u)->rGetLocation()[1], 1.25, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetNode(17u)->rGetLocation()[2], 1.25, 1e-6);
+        TS_ASSERT_EQUALS(p_mesh_multi->GetNumNodes(), 24u);
 
-        TS_ASSERT_DELTA(p_mesh->GetNode(23u)->rGetLocation()[0], 3.75, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetNode(23u)->rGetLocation()[1], 2.5, 1e-6);
-        TS_ASSERT_DELTA(p_mesh->GetNode(23u)->rGetLocation()[2], 1.25, 1e-6);
+        for (unsigned i = 0; i < p_mesh_multi->GetNumAllNodes(); ++i)
+        {
+            TS_ASSERT_DELTA(p_mesh_single->GetNode(i)->rGetLocation()[0], p_mesh_multi->GetNode(i)->rGetLocation()[0], 1e-6);
+            TS_ASSERT_DELTA(p_mesh_single->GetNode(i)->rGetLocation()[1], p_mesh_multi->GetNode(i)->rGetLocation()[1], 1e-6);
+            TS_ASSERT_DELTA(p_mesh_single->GetNode(i)->rGetLocation()[2], p_mesh_multi->GetNode(i)->rGetLocation()[2], 1e-6);
+        }
     }
 
     void TestExceptions()
     {
-        TS_ASSERT_THROWS_THIS(SemSingleElementMeshGenerator<1>({0}, 1.0),
-            "SemSingleElementMeshGenerator: each entry of numNodes must be >= 1");
+        TS_ASSERT_THROWS_THIS(SemMultiElementMeshGenerator<1>({0}, {1}, 2.0),
+            "SemMultiElementMeshGenerator: each entry of numNodesPerElem must be >= 1");
 
-        TS_ASSERT_THROWS_THIS(SemSingleElementMeshGenerator<2>({2, 3}, -1.0),
-            "SemSingleElementMeshGenerator: scaleFactor must be positive");
+        TS_ASSERT_THROWS_THIS(SemMultiElementMeshGenerator<2>({1, 3}, {1, 0}, 3.0),
+            "SemMultiElementMeshGenerator: each entry of numElems must be >= 1");
+
+        TS_ASSERT_THROWS_THIS(SemMultiElementMeshGenerator<3>({2, 3, 4}, {1, 2, 3}, -1.0),
+            "SemMultiElementMeshGenerator: scaleFactor must be positive");
     }
 };
 
