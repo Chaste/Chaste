@@ -60,7 +60,7 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
     # uninitialised c_vectors in Release mode. See https://github.com/Chaste/Chaste/issues/231 for full details.
     if (CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo|MinSizeRel"
             AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 9.4
-            AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 15)
+            AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 16)
 
         if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 11.1)
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-maybe-uninitialized -Wno-array-bounds -Wno-stringop-overflow")
