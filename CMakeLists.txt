@@ -1140,6 +1140,16 @@ foreach (component ${Chaste_COMPONENTS})
 endforeach (component ${Chaste_COMPONENTS})
 
 
+message(STATUS "")
+message(STATUS "----------------------------------------------------------")
+message(STATUS "Chaste documentation and tutorials:")
+message(STATUS "    https://chaste.github.io/")
+message(STATUS "Ask questions and get help from the core development team:")
+message(STATUS "    https://github.com/Chaste/Chaste/discussions")
+message(STATUS "----------------------------------------------------------")
+message(STATUS "")
+
+
 set (CPACK_DEBIAN_PACKAGE_DEPENDS "cmake, g++, libopenmpi-dev, petsc-dev (>= 2.3.3-14), libhdf5-openmpi-dev, xsdcxx, libboost-serialization-dev, libboost-filesystem-dev, libparmetis-dev, libxerces-c3-dev, libsundials-serial-dev, libvtk5-dev, python-lxml, python-rdflib")
 set (CPACK_DEBIAN_PACKAGE_RECOMMENDS "valgrind, libfltk1.1")
 set (CPACK_DEBIAN_PACKAGE_SUGGESTS "libgoogle-perftools-dev, doxygen, graphviz, eclipse-cdt, gnuplot")
