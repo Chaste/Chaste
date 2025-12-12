@@ -451,7 +451,7 @@ endif ()
 ################################
 ####  Find Boost
 ################################
-find_package(Boost 1.71 REQUIRED COMPONENTS headers system serialization program_options CONFIG)
+find_package(Boost 1.71 REQUIRED COMPONENTS headers serialization program_options CONFIG)
 message(STATUS "Boost version: ${Boost_VERSION}")
 
 # Turn off boost auto-linking, which is not required when using CMake
@@ -465,7 +465,6 @@ endif ()
 # Link the Boost targets onto Chaste_COMMON_DEPS
 target_link_libraries(Chaste_COMMON_DEPS INTERFACE
         Boost::headers
-        Boost::system
         Boost::serialization
         Boost::program_options
 )
