@@ -1,6 +1,6 @@
 """Helper classes for visualization in Jupyter notebooks."""
 
-__copyright__ = """Copyright (c) 2005-2025, University of Oxford.
+__copyright__ = """Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
