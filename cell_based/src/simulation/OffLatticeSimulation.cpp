@@ -154,7 +154,6 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
             {
                 // If adaptivity is switched off, terminate with an error
                 EXCEPTION(e.what());
-                std::cout << "Reached here in Off Lattice Simulation 6\n" << std::endl;
             }
         }
     }
