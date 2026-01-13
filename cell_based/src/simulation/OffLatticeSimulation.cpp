@@ -138,21 +138,16 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
         {
             int adaptive_timer = 0;
             // Detects if a node has travelled too far in a single time step
-            if (mpNumericalMethod->HasAdaptiveTimestep())
+            if (mpNumericalMethod->HasAdaptiveTimestep() && adaptive_timer < 5 )
             {
                 // If adaptivity is switched on, revert node locations and choose a suitably smaller time step
                 RevertToOldLocations(old_node_locations);
-                if (adaptive_timer < 5 ){
                 present_time_step = std::min(e.GetSuggestedNewStep(), target_time_step - time_advanced_so_far);
                 adaptive_timer += 1;
-                } else {
-                // If adaptivity is not improving the issue, terminate with an error to prevent infinite loop
-                EXCEPTION(e.what());
-                }
             }
             else
             {
-                // If adaptivity is switched off, terminate with an error
+                // If adaptivity is switched off or we have reached the accepted number of adaptive attempts, terminate with an error
                 EXCEPTION(e.what());
             }
         }
