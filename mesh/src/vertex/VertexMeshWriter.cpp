@@ -292,11 +292,11 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::MakeVtkMesh(VertexMesh<ELEMENT_DI
     {
         c_vector<double, SPACE_DIM> position;
         position = rMesh.GetNode(node_num)->rGetLocation();
-        if constexpr (SPACE_DIM == 2)
+        if (SPACE_DIM == 2)
         {
             p_pts->InsertPoint(node_num, position[0], position[1], 0.0);
         }
-        else if constexpr (SPACE_DIM == 3)
+        else if (SPACE_DIM == 3)
         {
             p_pts->InsertPoint(node_num, position[0], position[1], position[2]);
         }
@@ -342,6 +342,50 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddCellData(std::string dataName,
     for (unsigned i=0; i<dataPayload.size(); i++)
     {
         p_scalars->InsertNextValue(dataPayload[i]);
+    }
+
+    vtkCellData* p_cell_data = mpVtkUnstructedMesh->GetCellData();
+    p_cell_data->AddArray(p_scalars);
+    p_scalars->Delete(); // Reference counted
+#endif //CHASTE_VTK
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddCellData(std::string dataName, std::vector<c_vector<double, SPACE_DIM> > dataPayload)
+{
+#ifdef CHASTE_VTK
+    vtkDoubleArray* p_scalars = vtkDoubleArray::New();
+    p_scalars->SetName(dataName.c_str());
+    for (unsigned i=0; i<dataPayload.size(); i++)
+    {
+        for (unsigned j=0; j<dataPayload.size(); j++){
+        p_scalars->InsertNextValue(dataPayload[i][j]);
+        }
+        for (unsigned j= SPACE_DIM; j<3; j++){
+        p_scalars->InsertNextValue(0.0);
+        }
+    }
+
+    vtkCellData* p_cell_data = mpVtkUnstructedMesh->GetCellData();
+    p_cell_data->AddArray(p_scalars);
+    p_scalars->Delete(); // Reference counted
+#endif //CHASTE_VTK
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::AddCellData(std::string dataName, std::vector<std::vector<double> > dataPayload)
+{
+#ifdef CHASTE_VTK
+    vtkDoubleArray* p_scalars = vtkDoubleArray::New();
+    p_scalars->SetName(dataName.c_str());
+    for (unsigned i=0; i<dataPayload.size(); i++)
+    {
+        for (unsigned j=0; j<dataPayload.size(); j++){
+        p_scalars->InsertNextValue(dataPayload[i][j]);
+        }
+        for (unsigned j= SPACE_DIM; j<3; j++){
+        p_scalars->InsertNextValue(0.0);
+        }
     }
 
     vtkCellData* p_cell_data = mpVtkUnstructedMesh->GetCellData();

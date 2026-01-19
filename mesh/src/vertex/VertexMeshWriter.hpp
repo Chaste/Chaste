@@ -32,6 +32,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
 #ifndef VERTEXMESHWRITER_HPP_
 #define VERTEXMESHWRITER_HPP_
 
@@ -140,6 +141,22 @@ public:
      * @param dataPayload a pay-load of length (number of elements)
      */
     void AddCellData(std::string dataName, std::vector<double> dataPayload);
+
+    /**
+     * Add data to a future VTK file.
+     *
+     * @param dataName a tag to go into the VTK file
+     * @param dataPayload a pay-load of length (number of elements)
+     */
+    void AddCellData(std::string dataName, std::vector<c_vector<double, SPACE_DIM> > dataPayload);
+
+     /**
+     * Add data to a future VTK file.
+     *
+     * @param dataName a tag to go into the VTK file
+     * @param dataPayload a pay-load of length (number of elements)
+     */
+    void AddCellData(std::string dataName, std::vector<std::vector<double> > dataPayload);
 
     /**
      * Add data to a future VTK file.
