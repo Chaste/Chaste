@@ -189,13 +189,13 @@ std::set<unsigned> VertexBasedCellPopulation<DIM>::GetNeighbouringLocationIndice
 
 template<unsigned DIM>
 std::set<std::pair<unsigned, unsigned>>
-VertexBasedCellPopulation<DIM>::GetNeighbouringEdgeIndices(CellPtr pCell, unsigned EdgeLocalIndex)
+VertexBasedCellPopulation<DIM>::GetNeighbouringEdgeIndices(CellPtr pCell, unsigned edgeLocalIndex)
 {
     std::set<std::pair<unsigned, unsigned>> neighbours;
     auto cellLocationIndex = this->GetLocationIndexUsingCell(pCell);
     auto p_element = this->GetElement(cellLocationIndex);
-    auto global_edge_index = p_element->GetEdgeGlobalIndex(EdgeLocalIndex);
-    auto neighbour_element_indices = p_element->GetNeighbouringElementAtEdgeIndex(EdgeLocalIndex);
+    auto global_edge_index = p_element->GetEdgeGlobalIndex(edgeLocalIndex);
+    auto neighbour_element_indices = p_element->GetNeighbouringElementAtEdgeIndex(edgeLocalIndex);
 
     // Normally there is only one neighbouring element
     for (auto neighbour_element_index : neighbour_element_indices)
@@ -205,7 +205,7 @@ VertexBasedCellPopulation<DIM>::GetNeighbouringEdgeIndices(CellPtr pCell, unsign
         // Iterate over neighbouring element indices
         for (unsigned elem_index = 0; elem_index < p_neighbour_element->GetNumEdges(); elem_index++)
         {
-            // If the neighbours edge matches EdgeLocalIndex
+            // If the neighbours edge matches edgeLocalIndex
             if (p_neighbour_element->GetEdge(elem_index)->GetIndex() == global_edge_index)
             {
                 neighbours.insert(std::pair<unsigned, unsigned>(neighbour_element_index, elem_index));
@@ -477,7 +477,7 @@ void VertexBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rD
 {
     // We avoid writing out CellData if the population is empty (i.e. no cells)
     unsigned num_cells = this->GetNumAllCells();
-    if (num_cells != 0)
+    if (num_cells>0)
     {
         /*
          * If edge SRNs are specified, then write VTK results into a mesh where 

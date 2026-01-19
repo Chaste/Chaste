@@ -290,11 +290,11 @@ public:
      * index.
      * 
      * @param pCell  Cell pointer
-     * @param pEdgeIndex Local edge index
+     * @param edgeLocalIndex Local edge index
      * 
      * @return set of pairs consisting of element index neighbouring pCell and local edge index
      */
-    std::set<std::pair<unsigned, unsigned>> GetNeighbouringEdgeIndices(CellPtr pCell, unsigned EdgeLocalIndex);
+    std::set<std::pair<unsigned, unsigned>> GetNeighbouringEdgeIndices(CellPtr pCell, unsigned edgeLocalIndex);
 
     /**
      * Overridden AddNode() method.
