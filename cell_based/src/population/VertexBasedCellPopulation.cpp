@@ -630,6 +630,8 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
         * CellVecData item(s). Note: when outputting any CellVecData, we assume 
         * that the first cell is representative of all cells.
         */
+
+      if(this->Begin()->HasCellVecData()){
         unsigned num_cell_vec_data_items = this->Begin()->GetCellVecData()->GetNumItems();
         std::vector<std::string> cell_vec_data_names = this->Begin()->GetCellVecData()->GetKeys();
         std::vector<std::vector<std::vector<double>>> cell_vec_data;
@@ -665,6 +667,7 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
             //mesh_writer.AddCellData(cell_data_names[var], cell_data[var]);
             mesh_writer.AddCellData(cell_vec_data_names[var], cell_vec_data[var]);
         }
+      }
     }
     unsigned num_timesteps = SimulationTime::Instance()->GetTimeStepsElapsed();
     std::stringstream time;
