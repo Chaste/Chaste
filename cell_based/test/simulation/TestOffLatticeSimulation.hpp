@@ -1375,6 +1375,7 @@ public:
         simulator.SetOutputDirectory("TestOffLatticeSimulationWithAdaptivity");
         simulator.SetEndTime(5.0);
         simulator.SetDt(0.1);
+        simulator.SetMaxAdaptiveTimeStep(3);
 
         // Pass an adaptive numerical method to the simulation
         boost::shared_ptr<AbstractNumericalMethod<2,2> > p_method(new ForwardEulerNumericalMethod<2,2>());
@@ -1393,6 +1394,7 @@ public:
         simulator.Solve();
 
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumRealCells(), 14u);
+        TS_ASSERT_EQUALS(simulator.GetMaxAdaptiveTimeStep(),3);
 
         // Check cells have moved to the correct location
         TS_ASSERT_DELTA(simulator.rGetCellPopulation().rGetMesh().GetNode(0)->rGetLocation()[0], 0.3169,1e-4);

@@ -45,7 +45,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::OffLatticeSimulation(AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
                                                 bool deleteCellPopulationInDestructor,
                                                 bool initialiseCells)
-    : AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>(rCellPopulation, deleteCellPopulationInDestructor, initialiseCells)
+    : AbstractCellBasedSimulation<ELEMENT_DIM,SPACE_DIM>(rCellPopulation, deleteCellPopulationInDestructor, initialiseCells),
+    mMaxAdaptiveTimeSteps(5)
 {
     if (!dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation))
     {
@@ -95,6 +96,21 @@ const std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >& O
     return mForceCollection;
 }
 
+// KARRIGAN
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetMaxAdaptiveTimeStep(unsigned pMaxAdaptiveTimeStep)
+{
+    mMaxAdaptiveTimeSteps = pMaxAdaptiveTimeStep;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::GetMaxAdaptiveTimeStep() 
+{
+    return mMaxAdaptiveTimeSteps;
+}
+
+// KARRIGAN
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology()
 {
@@ -138,7 +154,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
         {
             int adaptive_timer = 0;
             // Detects if a node has travelled too far in a single time step
-            if (mpNumericalMethod->HasAdaptiveTimestep() && adaptive_timer < 5 )
+            if (mpNumericalMethod->HasAdaptiveTimestep() && adaptive_timer < mMaxAdaptiveTimeSteps )
             {
                 // If adaptivity is switched on, revert node locations and choose a suitably smaller time step
                 RevertToOldLocations(old_node_locations);

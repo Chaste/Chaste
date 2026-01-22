@@ -103,6 +103,9 @@ protected:
     /** The numerical method to use in this simulation. Defaults to the explicit forward Euler method. */
     boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > mpNumericalMethod;
 
+    /** Variable for the allowed number of adaptive time step changes before outputting underlying exception. */
+    int mMaxAdaptiveTimeSteps;
+
     /**
      * Overridden UpdateCellLocationsAndTopology() method.
      *
@@ -185,6 +188,18 @@ public:
      * @return the current numerical method.
      */
     const boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > GetNumericalMethod() const;
+
+    /**
+     * Set the maximum number of adaptive timesteps that can be attempted before outputting the underlying exception.
+     *
+     * @param pMaxAdaptiveTimeStep max adaptive timestep parameter
+     */
+    void SetMaxAdaptiveTimeStep(unsigned pMaxAdaptiveTimeStep);
+
+    /**
+     * @return the maximum allowed number of attempted timestep reductions.
+     */
+    unsigned GetMaxAdaptiveTimeStep();
 
     /**
      * Overridden OutputAdditionalSimulationSetup() method.
