@@ -104,7 +104,7 @@ protected:
     boost::shared_ptr<AbstractNumericalMethod<ELEMENT_DIM, SPACE_DIM> > mpNumericalMethod;
 
     /** Variable for the allowed number of adaptive time step changes before outputting underlying exception. */
-    int mMaxAdaptiveTimeSteps;
+    unsigned mMaxAdaptiveTimeSteps = 5;
 
     /**
      * Overridden UpdateCellLocationsAndTopology() method.
@@ -192,14 +192,14 @@ public:
     /**
      * Set the maximum number of adaptive timesteps that can be attempted before outputting the underlying exception.
      *
-     * @param pMaxAdaptiveTimeStep max adaptive timestep parameter
+     * @param maxAdaptiveTimeStep max adaptive timestep parameter
      */
-    void SetMaxAdaptiveTimeStep(unsigned pMaxAdaptiveTimeStep);
+    void SetMaxAdaptiveTimeStep(const unsigned maxAdaptiveTimeStep);
 
     /**
      * @return the maximum allowed number of attempted timestep reductions.
      */
-    unsigned GetMaxAdaptiveTimeStep();
+    unsigned GetMaxAdaptiveTimeStep() const;
 
     /**
      * Overridden OutputAdditionalSimulationSetup() method.
