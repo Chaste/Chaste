@@ -240,6 +240,7 @@ def main(filepath, profile=False, lineProfile=False, numProcs=1):
     # Extract and run its tests
     SetTestOutput(module)
     module.CHASTE_NUM_PROCS = numProcs
+    module.CHASTE_BUILD_DIR = os.getenv('CHASTE_BUILD_DIR', '.')
     runner = ChasteTestRunner(profile=profile, lineProfile=lineProfile)
     if hasattr(module, 'MakeTestSuite') and callable(module.MakeTestSuite):
         suite = module.MakeTestSuite()

@@ -214,6 +214,7 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
     if (python)
         set_property(TEST ${_testTargetName} PROPERTY
             ENVIRONMENT "PYTHONPATH=$ENV{PYTHONPATH}:${Chaste_BINARY_DIR}/python"
+            ENVIRONMENT "CHASTE_BUILD_DIR=${Chaste_BINARY_DIR}"
             )
     endif()
 
