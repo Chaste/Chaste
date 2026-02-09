@@ -30,10 +30,13 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-import unittest
+import re
 import subprocess
+import unittest
 
 CHASTE_BUILD_DIR = "."
+
+NUM_RE = r"-?[0-9]+(.[0-9]*)?"
 
 # This Python script accompanies the TestCommandLineArgumentsTutorial.
 # This script will execute the TestCommandLineArgumentsTutorial
@@ -52,13 +55,25 @@ class TestPythonCommandLineArgumentsTutorial(unittest.TestCase):
         L = 3
         M = 4
 
+        # We will also declare a regular expression to extract the sum from the output.
+        search_re = rf"When we add .* we get ({NUM_RE})"
+
         # Here we set up a simple for loop over variables i, j and k based on the values of N, L and M.
-        for i in range(0, N+1):
-            for j in range(1, L+1):
-                for k in range(2, M+1):
+        for i in range(0, N + 1):
+            for j in range(1, L + 1):
+                for k in range(2, M + 1):
                     # Each loop runs an instance of the TestCommandLineArgumentsTutorial with
                     # opt1,opt2 and opt3 taking on the values of i, j and k respectively.
-                    subprocess.run([self.test_exe, "-opt1", f"{i}", "-opt2", f"{j}", "-opt3", f"{k}"], check=True)
+                    txt = subprocess.check_output([self.test_exe, "-opt1", f"{i}", "-opt2", f"{j}", "-opt3", f"{k}"])
+
+                    # We extract the sum from the output using our regular expression.
+                    txt = txt.decode("utf-8")
+                    search = re.search(search_re, txt)
+                    if search:
+                        sum = float(search.group(1))
+                        self.assertEqual(sum, i + j + k)
+                    else:
+                        self.fail(f"No sum in TestCommandLineDefaultTutorial output for {i}, {j}, {k}")
 
     def test_command_line_double_tutorial(self) -> None:
         # Now we will pass a vector to TestCommandLineDoubleTutorial without passing any
@@ -68,17 +83,30 @@ class TestPythonCommandLineArgumentsTutorial(unittest.TestCase):
         L = 3000
         M = 4000
 
+        # We will also declare a regular expression to extract the sum from the output.
+        search_re = rf"When we add .* together from our vector we get ({NUM_RE})"
+
         # Here we set up a simple for loop over variables i, j and k based on the values of N, L and M.
-        for i in range(1, N+1, 1000):
-            idouble = i/120.0
-            for j in range(1001, L+1, 1000):
-                jdouble = j/150.0
-                for k in range(2001, M+1, 1000):
-                    kdouble = k/180.0
+        for i in range(1, N + 1, 1000):
+            idouble = i / 120.0
+            for j in range(1001, L + 1, 1000):
+                jdouble = j / 150.0
+                for k in range(2001, M + 1, 1000):
+                    kdouble = k / 180.0
                     # Each loop runs an instance of the TestCommandLineArgumentsTutorial
                     # with a vector containing our variables.
-                    subprocess.run([self.test_exe, "--my-vector-of-arguments",
-                                   f"{idouble}", f"{jdouble}", f"{kdouble}"], check=True)
+                    txt = subprocess.check_output(
+                        [self.test_exe, "--my-vector-of-arguments", f"{idouble}", f"{jdouble}", f"{kdouble}"]
+                    )
+
+                    # We extract the sum from the output using our regular expression.
+                    txt = txt.decode("utf-8")
+                    search = re.search(search_re, txt)
+                    if search:
+                        sum = float(search.group(1))
+                        self.assertAlmostEqual(sum, idouble + jdouble + kdouble, places=3)
+                    else:
+                        self.fail(f"No sum in TestCommandLineDoubleTutorial output for {idouble}, {jdouble}, {kdouble}")
 
 
 if __name__ == "__main__":
