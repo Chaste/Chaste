@@ -550,7 +550,7 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
 
             ///\todo fix compilation error when code block below is uncommented
             // Add any vector data
-            if (p_cell_writer->GetOutputScalarData())
+            if (p_cell_writer->GetOutputVectorData())
             {
                 /*
                 * Create a vector to store vector data per cell for VTK output from 
@@ -576,13 +576,6 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
                     // Populate the vector of VTK cell data
                     vtk_cell_vec_data[elem_index] = p_cell_writer->GetVectorCellDataForVtkOutput(*cell_iter, this);    
 
-                    }else{
-
-                    // Get index of this element in the vertex mesh
-                    unsigned elem_index = this->GetLocationIndexUsingCell(*cell_iter);
-
-                    // Populate the vector of VTK cell data
-                    vtk_cell_vec_data[elem_index] = p_cell_writer->GetVectorCellDataForVtkOutput(*cell_iter, this);
                     }
                 }
 
