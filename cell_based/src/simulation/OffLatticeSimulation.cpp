@@ -95,6 +95,21 @@ const std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >& O
     return mForceCollection;
 }
 
+// KARRIGAN
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetMaxAdaptiveTimeStep(unsigned maxAdaptiveTimeStep)
+{
+    mMaxAdaptiveTimeSteps = maxAdaptiveTimeStep;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+unsigned OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::GetMaxAdaptiveTimeStep() const 
+{
+    return mMaxAdaptiveTimeSteps;
+}
+
+// KARRIGAN
+
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology()
 {
@@ -136,9 +151,9 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
         }
         catch (StepSizeException& e)
         {
-            int adaptive_timer = 0;
+            unsigned adaptive_timer = 0;
             // Detects if a node has travelled too far in a single time step
-            if (mpNumericalMethod->HasAdaptiveTimestep() && adaptive_timer < 5 )
+            if (mpNumericalMethod->HasAdaptiveTimestep() && adaptive_timer < mMaxAdaptiveTimeSteps )
             {
                 // If adaptivity is switched on, revert node locations and choose a suitably smaller time step
                 RevertToOldLocations(old_node_locations);
