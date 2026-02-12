@@ -297,7 +297,7 @@ public:
     /**
      * @return the number of ImmersedBoundaryElements in the mesh.
      */
-    virtual unsigned GetNumElements() const override;
+    virtual unsigned GetNumElements() const;
 
     /**
      * @return the number of ImmersedBoundaryElements in the mesh, including those marked as deleted.
@@ -462,7 +462,7 @@ public:
      *
      * @return (centroid_x, centroid_y).
      */
-    virtual c_vector<double, SPACE_DIM> GetCentroidOfElement(unsigned index) override;
+    virtual c_vector<double, SPACE_DIM> GetCentroidOfElement(unsigned index);
 
     /**
      * Construct the mesh using a MeshReader.
@@ -474,7 +474,7 @@ public:
     /**
      * Delete mNodes, mFaces and mElements.
      */
-    virtual void Clear() override;
+    virtual void Clear();
 
     /**
      * Get the volume (or area in 2D, or length in 1D) of an element.
@@ -485,7 +485,7 @@ public:
      *
      * @return the volume of the element
      */
-    virtual double GetVolumeOfElement(unsigned index) override;
+    virtual double GetVolumeOfElement(unsigned index);
 
     /**
      * Compute the surface area (or perimeter in 2D) of an element.
@@ -496,7 +496,7 @@ public:
      *
      * @return the surface area of the element
      */
-    virtual double GetSurfaceAreaOfElement(unsigned index) override;
+    virtual double GetSurfaceAreaOfElement(unsigned index);
 
     /**
      * Compute the surface area (or perimeter in 2D) of the Voronoi cell of an element.
@@ -555,7 +555,7 @@ public:
      *
      * @return (Ixx,Iyy,Ixy).
      */
-    virtual c_vector<double, 3> CalculateMomentsOfElement(unsigned index) override;
+    virtual c_vector<double, 3> CalculateMomentsOfElement(unsigned index);
 
     /**
      * Get the elongation shape factor of a given element.
