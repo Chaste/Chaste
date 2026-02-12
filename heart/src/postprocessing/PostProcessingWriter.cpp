@@ -80,9 +80,9 @@ void PostProcessingWriter<ELEMENT_DIM, SPACE_DIM>::WritePostProcessingFiles()
     {
         std::vector<std::pair<double,double> > apd_maps;
         HeartConfig::Instance()->GetApdMaps(apd_maps);
-        for (unsigned i=0; i<apd_maps.size(); i++)
+        for (const auto& [min_val, max_val] : apd_maps)
         {
-            WriteApdMapFile(apd_maps[i].first, apd_maps[i].second);
+            WriteApdMapFile(min_val, max_val);
         }
     }
 
