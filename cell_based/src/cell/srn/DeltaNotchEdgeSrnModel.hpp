@@ -222,7 +222,7 @@ public:
     virtual void SplitEdgeSrn(const double relativePosition);
 };
 
-typedef boost::shared_ptr<DeltaNotchEdgeSrnModel> DeltaNotchEdgeSrnModelPtr;
+using DeltaNotchEdgeSrnModelPtr = boost::shared_ptr<DeltaNotchEdgeSrnModel>;
 
 // Declare identifier for the serializer
 #include "SerializationExportWrapper.hpp"

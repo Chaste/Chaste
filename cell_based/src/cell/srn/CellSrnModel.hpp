@@ -45,7 +45,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellCycleModelOdeHandler.hpp"
 #include "SimulationTime.hpp"
 
-typedef boost::shared_ptr<AbstractSrnModel> AbstractSrnModelPtr;
+using AbstractSrnModelPtr = boost::shared_ptr<AbstractSrnModel>;
 
 /**
  * SRN model at the cell level, has representation for edges internally. Also

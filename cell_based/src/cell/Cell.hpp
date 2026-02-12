@@ -59,7 +59,7 @@ class AbstractSrnModel; // Circular definition (cells need to know about subcell
 class Cell;
 
 /** Cells shouldn't be copied - it doesn't make sense.  So all access is via this pointer type. */
-typedef boost::shared_ptr<Cell> CellPtr;
+using CellPtr = boost::shared_ptr<Cell>;
 
 /**
  * null_deleter means "doesn't delete" rather than "deletes nulls".

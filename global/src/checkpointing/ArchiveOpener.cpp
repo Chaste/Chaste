@@ -127,7 +127,7 @@ public:
      */
     InputArchive* GetCommonArchive()
     {
-        assert(mpCommonArchive != NULL);
+        assert(mpCommonArchive != nullptr);
         return mpCommonArchive;
     }
 
@@ -244,7 +244,7 @@ public:
      */
     OutputArchive* GetCommonArchive()
     {
-        assert(mpCommonArchive != NULL);
+        assert(mpCommonArchive != nullptr);
         return mpCommonArchive;
     }
 
