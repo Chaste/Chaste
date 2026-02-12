@@ -643,10 +643,7 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
 
             for (unsigned var = 0; var < num_cell_vec_data_items; ++var)
             {
-                /**
-                 * \todo Convert this CellVecData item from a Vec to a std::vector, 
-                 * or else change the type of cell_vec_data above.
-                 */
+                // As our CellVecData is originally stored in a Petsc Vector we need to convert it to a standard vector
 
                 std::vector<double> converted = ConvertPetscVecToVector(cell_iter->GetCellVecData()->GetItem(cell_vec_data_names[var]));
                 cell_vec_data[var][elem_index] = converted;
