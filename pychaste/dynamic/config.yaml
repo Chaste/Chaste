@@ -564,6 +564,7 @@ modules:
           - VertexT2SwapLocationsWriter.hpp
           - VertexT3SwapLocationsWriter.hpp
           - VoronoiDataWriter.hpp
+          - PybindPetscTypeCaster.hpp
 
       - name: ImmersedBoundaryCellPopulation
         excluded_methods:
