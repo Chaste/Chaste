@@ -76,7 +76,7 @@ void RepulsionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCel
             // Calculate the force between nodes
             c_vector<double, DIM> force = this->CalculateForceBetweenNodes(p_node_a->GetIndex(), p_node_b->GetIndex(), rCellPopulation);
             c_vector<double, DIM> negative_force = -1.0 * force;
-            assert(std::none_of(force.begin(), force.end(), [](double val) { return std::isnan(val); }));
+            assert(std::none_of(std::begin(force), std::end(force), [](double val) { return std::isnan(val); }));
             // Add the force contribution to each node
             p_node_a->AddAppliedForceContribution(force);
             p_node_b->AddAppliedForceContribution(negative_force);
