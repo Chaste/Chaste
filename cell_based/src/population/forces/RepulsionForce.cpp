@@ -36,7 +36,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RepulsionForce.hpp"
 #include <algorithm>
 #include <cmath>
-#include <cmath>
 
 template<unsigned DIM>
 RepulsionForce<DIM>::RepulsionForce()
