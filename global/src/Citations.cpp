@@ -35,6 +35,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Citations.hpp"
 #include "PetscTools.hpp"
+#include <algorithm>
+#include <iterator>
 
 // Initialise 'member' variables
 std::vector<const char*> Citations::mCitations;
@@ -90,10 +92,7 @@ void Citations::Print()
             (*p_output) << "If you publish results based on this computation please cite the following:" << std::endl;
             (*p_output) << "===========================================================================" << std::endl;
             /* Write citations */
-            for (unsigned i = 0; i < mCitations.size(); ++i)
-            {
-                (*p_output) << mCitations[i];
-            }
+            std::copy(mCitations.begin(), mCitations.end(), std::ostream_iterator<const char*>(*p_output, ""));
             /* Write footer */
             (*p_output) << "===========================================================================" << std::endl;
 

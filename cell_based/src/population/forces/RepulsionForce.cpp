@@ -34,6 +34,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "RepulsionForce.hpp"
+#include <algorithm>
+#include <cmath>
+#include <cmath>
 
 template<unsigned DIM>
 RepulsionForce<DIM>::RepulsionForce()
@@ -74,10 +77,7 @@ void RepulsionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCel
             // Calculate the force between nodes
             c_vector<double, DIM> force = this->CalculateForceBetweenNodes(p_node_a->GetIndex(), p_node_b->GetIndex(), rCellPopulation);
             c_vector<double, DIM> negative_force = -1.0 * force;
-            for (unsigned j=0; j<DIM; j++)
-            {
-                assert(!std::isnan(force[j]));
-            }
+            assert(std::none_of(force.begin(), force.end(), [](double val) { return std::isnan(val); }));
             // Add the force contribution to each node
             p_node_a->AddAppliedForceContribution(force);
             p_node_b->AddAppliedForceContribution(negative_force);
