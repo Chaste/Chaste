@@ -111,8 +111,7 @@ public:
     /**
      * This struct defines the state of the preconditioner (initialised data and objects to be reused).
      */
-    struct PCLDUFactorisationContext
-    {
+    typedef struct{
         Mat A11_matrix_subblock; /**< Mat object that stores the A11 subblock.*/
         Mat A22_matrix_subblock; /**< Mat object that stores the A22 subblock.*/
         Mat B_matrix_subblock; /**< Mat object that stores the B subblock.*/
@@ -134,7 +133,7 @@ public:
         double mGatherTime;/**< Time counter used for profiling gather operations*/
 #endif
 
-    };
+    } PCLDUFactorisationContext;
 
     PCLDUFactorisationContext mPCContext; /**< PC context, this will be passed to PCBlockDiagonalApply when PETSc returns control to our preconditioner subroutine.  See PCShellSetContext().*/
     PC mPetscPCObject;/**< Generic PETSc preconditioner object */

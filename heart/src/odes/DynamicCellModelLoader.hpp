@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class DynamicCellModelLoader;
 
 /** The main type for dealing with a loader instance. */
-using DynamicCellModelLoaderPtr = boost::shared_ptr<DynamicCellModelLoader>;
+typedef boost::shared_ptr<DynamicCellModelLoader> DynamicCellModelLoaderPtr;
 
 /**
  * This class takes care of loading cell models at run-time from .so files.
@@ -109,8 +109,8 @@ private:
      * @param pSolver  ODE solver used to simulate the cell
      * @param pStimulus  intracellular stimulus
      */
-    using CellCreationFunctionType = AbstractCardiacCellInterface*(*)(boost::shared_ptr<AbstractIvpOdeSolver> pSolver,
-                                                                       boost::shared_ptr<AbstractStimulusFunction> pStimulus);
+    typedef AbstractCardiacCellInterface* CellCreationFunctionType(boost::shared_ptr<AbstractIvpOdeSolver> pSolver,
+                                                                   boost::shared_ptr<AbstractStimulusFunction> pStimulus);
 
     /** Our cell creation function */
     CellCreationFunctionType* mpCreationFunction;

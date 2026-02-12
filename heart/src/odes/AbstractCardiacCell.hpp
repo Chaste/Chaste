@@ -54,7 +54,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 
-typedef enum CellModelState_
+typedef enum _CellModelState
 {
     STATE_UNSET = 0,
     FAST_VARS_ONLY,

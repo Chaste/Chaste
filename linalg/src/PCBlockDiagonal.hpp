@@ -89,8 +89,7 @@ public:
     /**
      * This struct defines the state of the preconditioner (initialised data and objects to be reused)
      */
-    struct PCBlockDiagonalContext
-    {
+    typedef struct{
         Mat A11_matrix_subblock; /**< Mat object that stores the A11 subblock*/
         Mat A22_matrix_subblock; /**< Mat object that stores the A22 subblock*/
         PC  PC_amg_A11; /**<  inv(A11) is approximated by an AMG cycle. We compute it with HYPRE via a PC object*/
@@ -108,7 +107,7 @@ public:
         double mGatherTime;/**< Time counter used for profiling gather operations*/
 #endif
 
-    };
+    } PCBlockDiagonalContext;
 
     PCBlockDiagonalContext mPCContext; /**< PC context, this will be passed to PCBlockDiagonalApply when PETSc returns control to our preconditioner subroutine.  See PCShellSetContext().*/
     PC mPetscPCObject;/**< Generic PETSc preconditioner object */

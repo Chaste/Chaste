@@ -90,8 +90,7 @@ public:
     /**
      * This struct defines the state of the preconditioner (initialised data and objects to be reused).
      */
-    struct PCTwoLevelsBlockDiagonalContext
-    {
+    typedef struct{
         Mat A11_matrix_subblock; /**< Mat object that stores the A11 subblock*/
         Mat A22_B1_matrix_subblock; /**< Mat object that stores the tissue part of the A22 subblock*/
         Mat A22_B2_matrix_subblock; /**< Mat object that stores the bath part of the A22 subblock*/
@@ -108,7 +107,7 @@ public:
         VecScatter A22_B1_scatter_ctx;/**< Scattering context: gather x21 from x and scatter y21 back into y*/
         VecScatter A22_B2_scatter_ctx;/**< Scattering context: gather x22 from x and scatter y22 back into y*/
 
-    };
+    } PCTwoLevelsBlockDiagonalContext;
 
     PCTwoLevelsBlockDiagonalContext mPCContext; /**< PC context, this will be passed to PCTwoLevelsBlockDiagonalApply when PETSc returns control to our preconditioner subroutine.  See PCShellSetContext().*/
     PC mPetscPCObject;/**< Generic PETSc preconditioner object */

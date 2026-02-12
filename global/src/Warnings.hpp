@@ -58,7 +58,7 @@ private:
     static Warnings* mpInstance; /**<  Pointer to the single instance. For use as singleton */
 
     /** Container type for warnings */
-    using WarningsContainerType = std::deque<std::pair<std::string, std::string> >;
+    typedef std::deque<std::pair<std::string, std::string> > WarningsContainerType;
 
     WarningsContainerType mWarningMessages; /**< Warnings messages.  First in pair is the context (line number etc.).  Second in pair is the actual warning, */
 

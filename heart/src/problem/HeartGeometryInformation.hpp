@@ -51,7 +51,7 @@ typedef enum HeartLayerType_
 } HeartLayerType;
 
 /** Type for region codes (LEFT/RIGHT VENTRICLE or SEPTUM) walls and surfaces */
-using HeartRegionType = unsigned;
+typedef unsigned HeartRegionType;
 
 
 /**

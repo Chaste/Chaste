@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <climits>
 
 /** Type for region codes */
-using HeartRegionType = unsigned;
+typedef unsigned HeartRegionType;
 
 /**
  * Codes that can be used to annotate regions of a cardiac mesh.

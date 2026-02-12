@@ -181,7 +181,7 @@ public:
      * Our type for specifying schema location properties: a map from namespace URI
      * to schema URI.  The default namespace is specified by an empty namespace URI.
      */
-    using SchemaLocationsMap = std::map<std::string, std::string>;
+    typedef std::map<std::string, std::string> SchemaLocationsMap;
 
 private:
     /**

@@ -292,7 +292,7 @@ public:
     /**
      * @return the number of Nodes in the mesh.
      */
-    virtual unsigned GetNumNodes() const override;
+    virtual unsigned GetNumNodes() const;
 
     /**
      * @return the number of ImmersedBoundaryElements in the mesh.

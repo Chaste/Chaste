@@ -81,7 +81,7 @@ protected:
         ChastePoint<DIM> &rX,
         c_vector<double,3> &rU,
         c_matrix<double,3,DIM> &rGradU /* not used */,
-        Element<DIM,DIM>* pElement) override;
+        Element<DIM,DIM>* pElement);
 
 public:
 
