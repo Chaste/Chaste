@@ -36,10 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SOLVERTYPE_HPP_
 #define SOLVERTYPE_HPP_
 
-enum class SolverType
+typedef enum SolverType_
 {
     EXPLICIT,
     IMPLICIT
-};
+} SolverType;
 
 #endif // SOLVERTYPE_HPP_

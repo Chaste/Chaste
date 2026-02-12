@@ -45,14 +45,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * G0 is a cell which stays in the G1 phase and is not going to divide. (i.e. quiescent or differentiated.)
  */
-enum class CellCyclePhase
+typedef enum CellCyclePhase_
 {
     G_ZERO_PHASE,
     G_ONE_PHASE,
     S_PHASE,
     G_TWO_PHASE,
     M_PHASE
-};
+} CellCyclePhase;
 
 static const unsigned NUM_CELL_CYCLE_PHASES=5;
 

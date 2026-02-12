@@ -64,12 +64,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Warnings.hpp"
 #include "Timer.hpp"
 
-enum class StimulusType
+typedef enum StimulusType_
 {
     PLANE=0,
     QUARTER,
     NEUMANN
-};
+} StimulusType;
 
 /**
  * RampedQuarterStimulusCellFactory stimulates a quarter of a mesh of width mMeshWidth

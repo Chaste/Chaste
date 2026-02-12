@@ -54,12 +54,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 
-enum class CellModelState
+typedef enum CellModelState_
 {
     STATE_UNSET = 0,
     FAST_VARS_ONLY,
     ALL_VARS
-};
+} CellModelState;
 
 /**
  * This is the base class for ode-based cardiac cell models.
