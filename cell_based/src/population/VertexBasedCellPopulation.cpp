@@ -548,7 +548,6 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
                 mesh_writer.AddCellData(p_cell_writer->GetVtkCellDataName(), vtk_cell_data);
             }
 
-            ///\todo fix compilation error when code block below is uncommented
             // Add any vector data
             if (p_cell_writer->GetOutputVectorData())
             {
