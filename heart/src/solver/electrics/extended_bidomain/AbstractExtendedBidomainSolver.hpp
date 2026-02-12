@@ -110,7 +110,7 @@ protected:
      *  a solution if and only if v.b=0 for all v in ker(A) (ie all v such that Av=b). The nullspace ker(A)
      *  is one dimensional with basis vector v = (0,0,1,0,0,1....0,0,1), so v.b = sum_{i=2,5,8..} b_i.
      */
-    virtual void CheckCompatibilityCondition() override;
+    virtual void CheckCompatibilityCondition();
 
 
     /**
@@ -139,7 +139,7 @@ protected:
      *  Called by FinaliseAssembleSystem to get the null basis to use for the particular
      *  formulation of the extended idomain equations used.
      */
-    virtual Vec GenerateNullBasis() const override;
+    virtual Vec GenerateNullBasis() const;
 
 public:
 

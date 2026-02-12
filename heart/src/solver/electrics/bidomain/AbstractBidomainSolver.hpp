@@ -95,7 +95,7 @@ protected:
      *  a solution if and only if v.b=0 for all v in ker(A) (ie all v such that Av=b). The nullspace ker(A)
      *  is one dimensional with basis vector v = (0,1,0,1....,0,1), so v.b = sum_{i=1,3,5..} b_i.
      */
-    virtual void CheckCompatibilityCondition() override;
+    virtual void CheckCompatibilityCondition();
 
     /**
      *  PrepareForSetupLinearSystem
@@ -130,7 +130,7 @@ protected:
      *  Called by FinaliseAssembleSystem to get the null basis to use for the particular
      *  formulation of the bidomain equations used.
      */
-    virtual Vec GenerateNullBasis() const override;
+    virtual Vec GenerateNullBasis() const;
 
     /**
      *  Apply any changes needed to the linear system for problems that
