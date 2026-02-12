@@ -117,8 +117,8 @@ protected:
      */
     void CheckForElectrodesIntersection();
 
-    /** typedef for basis function*/
-    typedef LinearBasisFunction<DIM> BasisFunction;
+    /** Using declaration for basis function*/
+    using BasisFunction = LinearBasisFunction<DIM>;
 
 
     /**

@@ -127,7 +127,7 @@ public:
      *
      *  @param initialSolution initial solution
      */
-    virtual void InitialiseForSolve(Vec initialSolution);
+    virtual void InitialiseForSolve(Vec initialSolution) override;
 
     /**
      * Constructor

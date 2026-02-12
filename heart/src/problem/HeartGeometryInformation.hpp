@@ -43,15 +43,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteCuboid.hpp"
 
 /** Names for layers in the heart wall */
-typedef enum HeartLayerType_
+enum class HeartLayerType
 {
     ENDO = 0,
     MID,
     EPI
-} HeartLayerType;
+};
 
 /** Type for region codes (LEFT/RIGHT VENTRICLE or SEPTUM) walls and surfaces */
-typedef unsigned HeartRegionType;
+using HeartRegionType = unsigned;
 
 
 /**

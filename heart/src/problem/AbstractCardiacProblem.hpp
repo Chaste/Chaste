@@ -117,8 +117,7 @@ class AbstractCardiacProblem : public AbstractUntemplatedCardiacProblem
     friend class TestCardiacSimulationArchiver;
 
     /** To save typing */
-    typedef typename boost::shared_ptr<BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM> >
-        BccType;
+    using BccType = typename boost::shared_ptr<BoundaryConditionsContainer<ELEMENT_DIM, SPACE_DIM, PROBLEM_DIM> >;
 
 private:
     /** Needed for serialization. */

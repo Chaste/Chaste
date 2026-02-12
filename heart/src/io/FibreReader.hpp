@@ -46,11 +46,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * Simple enumeration for use in FibreReader constructor
  */
-typedef enum FibreFileType_
+enum class FibreFileType
 {
     AXISYM=0,
     ORTHO
-} FibreFileType;
+};
 
 /**
  * A class for reading .axi files (files which define the fibre direction

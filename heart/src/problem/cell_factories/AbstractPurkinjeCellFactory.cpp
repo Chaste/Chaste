@@ -125,7 +125,7 @@ void AbstractPurkinjeCellFactory<ELEMENT_DIM,SPACE_DIM>::CreateJunction(const No
     if (pNode) // Should always be provided apart from low-level tests!
     {
         assert(mpMixedDimensionMesh);
-        typedef typename MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>::CableRangeAtNode CableRangeAtNode;
+        using CableRangeAtNode = typename MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>::CableRangeAtNode;
         CableRangeAtNode cable_range = mpMixedDimensionMesh->GetCablesAtNode(pNode);
         double total_cross_sectional_area = 0.0;
         for (typename MixedDimensionMesh<ELEMENT_DIM,SPACE_DIM>::NodeCableIterator iter=cable_range.first;

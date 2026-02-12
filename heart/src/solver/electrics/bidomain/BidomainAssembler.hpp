@@ -90,7 +90,7 @@ protected:
         ChastePoint<SPACE_DIM> &rX,
         c_vector<double,2> &rU,
         c_matrix<double, 2, SPACE_DIM> &rGradU /* not used */,
-        Element<ELEMENT_DIM,SPACE_DIM>* pElement);
+        Element<ELEMENT_DIM,SPACE_DIM>* pElement) override;
 
 public:
 

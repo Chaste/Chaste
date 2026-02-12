@@ -204,12 +204,12 @@ public:
     /**
      * @return the number of Nodes in the mesh.
      */
-    virtual unsigned GetNumNodes() const;
+    virtual unsigned GetNumNodes() const override;
 
     /**
      * @return the number of PottsElements in the mesh.
      */
-    virtual unsigned GetNumElements() const;
+    virtual unsigned GetNumElements() const override;
 
     /**
      * @return the number of PottsElements in the mesh, including those marked as deleted.
@@ -232,7 +232,7 @@ public:
      *
      * @return (centroid_x,centroid_y).
      */
-    virtual c_vector<double, DIM> GetCentroidOfElement(unsigned index);
+    virtual c_vector<double, DIM> GetCentroidOfElement(unsigned index) override;
 
     /**
      * Construct the mesh using a MeshReader.
@@ -244,7 +244,7 @@ public:
     /**
      * Delete mNodes and mElements.
      */
-    virtual void Clear();
+    virtual void Clear() override;
 
     /**
      * Get the volume (or area in 2D, or length in 1D) of a PottsElement.
@@ -255,7 +255,7 @@ public:
      *
      * @return the volume of the element
      */
-    virtual double GetVolumeOfElement(unsigned index);
+    virtual double GetVolumeOfElement(unsigned index) override;
 
     /**
      * Compute the surface area (or perimeter in 2D) of a PottsElement.
@@ -266,7 +266,7 @@ public:
      *
      * @return the surface area of the element
      */
-    virtual double GetSurfaceAreaOfElement(unsigned index);
+    virtual double GetSurfaceAreaOfElement(unsigned index) override;
 
     /**
      * Given a node, return a set containing the indices of its Moore neighbouring nodes.

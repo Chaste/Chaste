@@ -1514,8 +1514,8 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
     rMeshReader.Reset();
 #ifdef CHASTE_HOMEMADE_MESH_TO_DUAL
     // These are contained in std::vectors that are automatically freed
-    xadj = NULL;
-    adjncy = NULL;
+    xadj = nullptr;
+    adjncy = nullptr;
 #endif
     free(xadj);
     free(adjncy);

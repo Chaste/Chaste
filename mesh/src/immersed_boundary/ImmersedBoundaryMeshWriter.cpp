@@ -257,7 +257,7 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteVtkUsingMesh(Immer
 #endif
         // Uninitialised stuff arises (see #1079), but you can remove valgrind problems by removing compression:
         // **** REMOVE WITH CAUTION *****
-        p_writer->SetCompressor(NULL);
+        p_writer->SetCompressor(nullptr);
         // **** REMOVE WITH CAUTION *****
 
         std::string vtk_file_name = this->mpOutputFileHandler->GetOutputDirectoryFullPath() + this->mBaseName;

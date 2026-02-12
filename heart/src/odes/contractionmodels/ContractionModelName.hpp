@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  Options for the different contraction models (both stretch-dependent and independent, ditto stretch-rate)
  *  that have been implemented
  */
-typedef enum ContractionModelName_
+enum class ContractionModelName
 {
     CONSTANT,
     NASH2004,
@@ -49,7 +49,7 @@ typedef enum ContractionModelName_
     NONPHYSIOL1,
     NONPHYSIOL2,
     NONPHYSIOL3
-} ContractionModelName;
+};
 
 
 #endif // CONTRACTIONMODELNAME_HPP_

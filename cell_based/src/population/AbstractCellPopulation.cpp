@@ -480,13 +480,13 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::UpdateCellProcessLocation()
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CloseRoundRobinWritersFiles()
 {
-    typedef AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> cell_writer_t;
+    using cell_writer_t = AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>;
     BOOST_FOREACH(boost::shared_ptr<cell_writer_t> p_cell_writer, mCellWriters)
     {
         p_cell_writer->CloseFile();
     }
 
-    typedef AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> pop_writer_t;
+    using pop_writer_t = AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>;
     BOOST_FOREACH(boost::shared_ptr<pop_writer_t> p_pop_writer, mCellPopulationWriters)
     {
         p_pop_writer->CloseFile();
@@ -496,13 +496,13 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CloseRoundRobinWritersFiles
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::CloseWritersFiles()
 {
-    typedef AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> cell_writer_t;
+    using cell_writer_t = AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>;
     BOOST_FOREACH(boost::shared_ptr<cell_writer_t> p_cell_writer, mCellWriters)
     {
         p_cell_writer->CloseFile();
     }
 
-    typedef AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> pop_writer_t;
+    using pop_writer_t = AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>;
     BOOST_FOREACH(boost::shared_ptr<pop_writer_t> p_pop_writer, mCellPopulationWriters)
     {
         p_pop_writer->CloseFile();
@@ -546,14 +546,14 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(OutputFile
     }
 
     // Open output files for any cell writers
-    typedef AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> cell_writer_t;
+    using cell_writer_t = AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>;
     BOOST_FOREACH(boost::shared_ptr<cell_writer_t> p_cell_writer, mCellWriters)
     {
         p_cell_writer->OpenOutputFile(rOutputFileHandler);
     }
 
     // Open output files and write headers for any population writers
-    typedef AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> pop_writer_t;
+    using pop_writer_t = AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>;
     BOOST_FOREACH(boost::shared_ptr<pop_writer_t> p_pop_writer, mCellPopulationWriters)
     {
         p_pop_writer->OpenOutputFile(rOutputFileHandler);
@@ -561,7 +561,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(OutputFile
     }
 
     // Open output files and write headers for any population count writers
-    typedef AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> count_writer_t;
+    using count_writer_t = AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM>;
     BOOST_FOREACH(boost::shared_ptr<count_writer_t> p_count_writer, mCellPopulationCountWriters)
     {
         p_count_writer->OpenOutputFile(rOutputFileHandler);
@@ -569,7 +569,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(OutputFile
     }
 
     // Open output files and write headers for any population event writers
-    typedef AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> event_writer_t;
+    using event_writer_t = AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM>;
     BOOST_FOREACH(boost::shared_ptr<event_writer_t> p_event_writer, mCellPopulationEventWriters)
     {
         p_event_writer->OpenOutputFile(rOutputFileHandler);
@@ -580,8 +580,8 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenWritersFiles(OutputFile
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenRoundRobinWritersFilesForAppend(OutputFileHandler& rOutputFileHandler)
 {
-    typedef AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> cell_writer_t;
-    typedef AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> pop_writer_t;
+    using cell_writer_t = AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>;
+    using pop_writer_t = AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>;
     BOOST_FOREACH(boost::shared_ptr<cell_writer_t> p_cell_writer, mCellWriters)
     {
         p_cell_writer->OpenOutputFileForAppend(rOutputFileHandler);
@@ -595,8 +595,8 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::OpenRoundRobinWritersFilesF
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const std::string& rDirectory)
 {
-    typedef AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> cell_writer_t;
-    typedef AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> pop_writer_t;
+    using cell_writer_t = AbstractCellWriter<ELEMENT_DIM, SPACE_DIM>;
+    using pop_writer_t = AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM>;
     OutputFileHandler output_file_handler(rDirectory, false);
 
     if (!(mCellWriters.empty() && mCellPopulationWriters.empty() && mCellPopulationCountWriters.empty()))
@@ -647,7 +647,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const s
         PetscTools::EndRoundRobin();
 
         // Outside the round robin, deal with population count writers
-        typedef AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> count_writer_t;
+        using count_writer_t = AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM>;
 
         if (PetscTools::AmMaster())
         {
@@ -677,7 +677,7 @@ void AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::WriteResultsToFiles(const s
 
 
         // Outside the round robin, deal with population event writers
-        typedef AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> event_writer_t;
+        using event_writer_t = AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM>;
 
         if (PetscTools::AmMaster())
         {

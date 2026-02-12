@@ -58,13 +58,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Enumeration of the possible electrics problem types
  * to be used in an EM problem.
  */
-typedef enum ElectricsProblemType_
+enum class ElectricsProblemType
 {
     MONODOMAIN,//!< MONODOMAIN
     BIDOMAIN,   //!< BIDOMAIN
     BIDOMAIN_WITH_BATH
     //EXTENDED_BIDOMAIN
-} ElectricsProblemType;
+};
 
 /**
  *  CardiacElectroMechanicsProblem
