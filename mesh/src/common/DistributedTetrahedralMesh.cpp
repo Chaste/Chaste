@@ -1423,7 +1423,7 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
                 my_adjncy.push_back(cols[i]);
             }
         }
-        MatRestoreRow(element_element_matrix, el_index, &ncols, &cols, NULL);
+        MatRestoreRow(element_element_matrix, el_index, &ncols, &cols, nullptr);
         // Mark where next local element starts
         my_xadj.push_back(my_adjncy.size());
     }
@@ -1474,8 +1474,8 @@ void DistributedTetrahedralMesh<ELEMENT_DIM, SPACE_DIM>::ParMetisLibraryNodeAndE
 //    int n_dimensions = ELEMENT_DIM;
 //    float node_coordinates[num_local_elements*SPACE_DIM];
 //
-//    ParMETIS_V3_PartGeomKway(element_distribution, xadj, adjncy, NULL, NULL, &weight_flag, &numflag,
-//                             &n_dimensions, node_coordinates, &n_constraints, &n_subdomains, NULL, NULL,
+//    ParMETIS_V3_PartGeomKway(element_distribution, xadj, adjncy, nullptr, nullptr, &weight_flag, &numflag,
+//                             &n_dimensions, node_coordinates, &n_constraints, &n_subdomains, nullptr, nullptr,
 //                             options, &edgecut, local_partition, &communicator);
 
     Timer::Reset();

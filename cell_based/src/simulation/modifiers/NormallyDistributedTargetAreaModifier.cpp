@@ -74,7 +74,7 @@ void NormallyDistributedTargetAreaModifier<DIM>::UpdateTargetAreaOfCell(CellPtr 
     double growth_duration = mGrowthDuration;
     if (growth_duration == DOUBLE_UNSET)
     {
-        if (dynamic_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel()) == NULL)
+        if (dynamic_cast<AbstractPhaseBasedCellCycleModel*>(pCell->GetCellCycleModel()) == nullptr)
         {
             EXCEPTION("If SetGrowthDuration() has not been called, a subclass of AbstractPhaseBasedCellCycleModel must be used");
         }

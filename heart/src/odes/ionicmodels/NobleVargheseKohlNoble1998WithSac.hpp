@@ -86,7 +86,7 @@ public:
     /** @return the total ionic current
      * @param pStateVariables  state variable vector; if not given, use cell's internal state
      */
-    double GetIIonic(const std::vector<double>* pStateVariables=NULL);
+    double GetIIonic(const std::vector<double>* pStateVariables=nullptr);
 
     /**
      * Evaluate the RHS of this cell's ODE system.

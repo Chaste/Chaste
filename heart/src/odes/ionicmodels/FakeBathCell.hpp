@@ -99,7 +99,7 @@ public:
      * @param pStateVariables  unused
      * @return zero
      */
-    double GetIIonic(const std::vector<double>* pStateVariables=NULL);
+    double GetIIonic(const std::vector<double>* pStateVariables=nullptr);
 
     /**
      * There isn't really a cell here, so we override this method to do nothing.

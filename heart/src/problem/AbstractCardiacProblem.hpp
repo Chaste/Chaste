@@ -163,7 +163,7 @@ private:
         //archive & mpWriter; // Created by InitialiseWriter, called from Solve
         archive & mpCardiacTissue;
         //archive & mpSolver; // Only exists during calls to the Solve method
-        bool has_solution = (mSolution != NULL);
+        bool has_solution = (mSolution != nullptr);
         archive & has_solution;
         if (has_solution)
         {
@@ -244,7 +244,7 @@ private:
         }
         archive & mMeshFilename;
         archive & mpMesh;
-        assert(mpMesh != NULL); //If NULL then loading mesh has failed without an exception so Boost has given up on the mesh.  This would happen if a 2-dimensional mesh was successfully unarchived but mpMesh was expecting a 3-d mesh etc.
+        assert(mpMesh != nullptr); //If NULL then loading mesh has failed without an exception so Boost has given up on the mesh.  This would happen if a 2-dimensional mesh was successfully unarchived but mpMesh was expecting a 3-d mesh etc.
         //archive & mAllocatedMemoryForMesh; // Will always be true after a load
 
         if (version < 2)
@@ -432,7 +432,7 @@ protected:
      */
     double mCurrentTime;
 
-    /** Adaptivity controller (defaults to NULL). */
+    /** Adaptivity controller (defaults to nullptr). */
     AbstractTimeAdaptivityController* mpTimeAdaptivityController;
 
     /**
@@ -755,7 +755,7 @@ public:
      *  @param pController The controller (only relevant if useAdaptivity==true)
      */
     void SetUseTimeAdaptivityController(bool useAdaptivity,
-                                        AbstractTimeAdaptivityController* pController = NULL);
+                                        AbstractTimeAdaptivityController* pController = nullptr);
 
     /**
      * Used when loading a set of archives written by a parallel simulation onto a single process.

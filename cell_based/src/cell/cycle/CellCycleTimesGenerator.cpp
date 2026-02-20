@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Exception.hpp"
 #include "CellCycleTimesGenerator.hpp"
 
-CellCycleTimesGenerator* CellCycleTimesGenerator::mpInstance = NULL;
+CellCycleTimesGenerator* CellCycleTimesGenerator::mpInstance = nullptr;
 
 CellCycleTimesGenerator::CellCycleTimesGenerator()
     : mRandomSeed(0u),
@@ -44,12 +44,12 @@ CellCycleTimesGenerator::CellCycleTimesGenerator()
       mRate(1.0/2.0),
       mVectorCreated(false)
 {
-    assert(mpInstance == NULL); // Ensure correct serialization
+    assert(mpInstance == nullptr); // Ensure correct serialization
 }
 
 CellCycleTimesGenerator* CellCycleTimesGenerator::Instance()
 {
-    if (mpInstance == NULL)
+    if (mpInstance == nullptr)
     {
         mpInstance = new CellCycleTimesGenerator();
     }
@@ -61,7 +61,7 @@ void CellCycleTimesGenerator::Destroy()
     if (mpInstance)
     {
         delete mpInstance;
-        mpInstance = NULL;
+        mpInstance = nullptr;
     }
 }
 

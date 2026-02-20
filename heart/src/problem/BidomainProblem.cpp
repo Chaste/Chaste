@@ -164,7 +164,7 @@ template<unsigned DIM>
 BidomainProblem<DIM>::BidomainProblem(
             AbstractCardiacCellFactory<DIM>* pCellFactory, bool hasBath)
     : AbstractCardiacProblem<DIM,DIM, 2>(pCellFactory),
-      mpBidomainTissue(NULL),
+      mpBidomainTissue(nullptr),
       mRowForAverageOfPhiZeroed(INT_MAX),
       mHasBath(hasBath)
 {
@@ -174,7 +174,7 @@ BidomainProblem<DIM>::BidomainProblem(
 template<unsigned DIM>
 BidomainProblem<DIM>::BidomainProblem()
     : AbstractCardiacProblem<DIM, DIM, 2>(),
-      mpBidomainTissue(NULL),
+      mpBidomainTissue(nullptr),
       mRowForAverageOfPhiZeroed(INT_MAX)
 {
     mFixedExtracellularPotentialNodes.resize(0);
@@ -201,7 +201,7 @@ void BidomainProblem<DIM>::SetNodeForAverageOfPhiZeroed(unsigned node)
 template<unsigned DIM>
 BidomainTissue<DIM>* BidomainProblem<DIM>::GetBidomainTissue()
 {
-    assert(mpBidomainTissue!=NULL);
+    assert(mpBidomainTissue!=nullptr);
     return mpBidomainTissue;
 }
 
@@ -284,7 +284,7 @@ void BidomainProblem<DIM>::SetElectrodes()
         return;
     }
 
-    assert(this->mpMesh!=NULL);
+    assert(this->mpMesh!=nullptr);
 
     if (HeartConfig::Instance()->IsElectrodesPresent())
     {
@@ -314,7 +314,7 @@ void BidomainProblem<DIM>::AtBeginningOfTimestep(double time)
 
         // At t==0 or after checkpointing we won't have a system assembled at this stage: BCs will be applied once the matrix
         // is assembled. Dirichlet BCs will be present at the time of assembly and no null space will be created either.
-        if (mpSolver->GetLinearSystem() != NULL)
+        if (mpSolver->GetLinearSystem() != nullptr)
         {
             // System matrix is assembled once at the beginning of the simulation. After that, nobody will take care
             // of applying new BC to the system matrix. Must be triggered explicitly.

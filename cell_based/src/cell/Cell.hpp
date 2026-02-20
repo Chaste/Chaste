@@ -166,7 +166,7 @@ public:
      *      This MUST be allocated using new, and will be deleted when the cell is destroyed.
      *      (Defaults to NULL and is replcaed by a new NullSrnModel in the constructr)
      * @param archiving  whether this constructor is being called by the archiver - do things slightly differently! (defaults to false)
-     * @param cellPropertyCollection the cell property collection (defaults to NULL)
+     * @param cellPropertyCollection the cell property collection (defaults to nullptr)
      */
     Cell(boost::shared_ptr<AbstractCellProperty> pMutationState,
          AbstractCellCycleModel* pCellCycleModel,

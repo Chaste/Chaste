@@ -410,7 +410,7 @@ public:
          }
 
 #if (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR >= 7) // PETSc 3.7 or later
-         PetscOptionsSetValue(NULL, pOptionName, pOptionValue);
+         PetscOptionsSetValue(nullptr, pOptionName, pOptionValue);
 #else
          PetscOptionsSetValue(pOptionName, pOptionValue);
 #endif

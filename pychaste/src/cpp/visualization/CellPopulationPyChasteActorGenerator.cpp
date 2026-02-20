@@ -942,7 +942,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddMeshBasedCellPopulationActor(
         auto p_cell_color_reference_data = vtkSmartPointer<vtkDoubleArray>::New();
         p_cell_color_reference_data->SetName("CellColors");
 
-        if (p_cell_population->GetVoronoiTessellation() != NULL)
+        if (p_cell_population->GetVoronoiTessellation() != nullptr)
         {
             auto p_points = vtkSmartPointer<vtkPoints>::New();
             p_points->GetData()->SetName("Vertex positions");
