@@ -241,7 +241,7 @@ public:
 
         {
             // Create an output archive
-            SloughingCellKiller<2> cell_killer(NULL, 10.0, true, 5.0);
+            SloughingCellKiller<2> cell_killer(nullptr, 10.0, true, 5.0);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -351,7 +351,7 @@ public:
 
         {
             // Create an output archive
-            RadialSloughingCellKiller cell_killer(NULL, centre, radius);
+            RadialSloughingCellKiller cell_killer(nullptr, centre, radius);
 
             std::ofstream ofs(archive_filename.c_str());
             boost::archive::text_oarchive output_arch(ofs);
@@ -395,7 +395,7 @@ public:
        OutputFileHandler output_file_handler(output_directory, false);
 
        // Test with SloughingCellKiller
-       SloughingCellKiller<2> sloughing_cell_killer(NULL, 20.0, true, 10.0);
+       SloughingCellKiller<2> sloughing_cell_killer(nullptr, 20.0, true, 10.0);
        TS_ASSERT_EQUALS(sloughing_cell_killer.GetIdentifier(), "SloughingCellKiller-2");
 
        out_stream sloughing_cell_killer_parameter_file = output_file_handler.OpenOutputFile("sloughing_results.parameters");
@@ -410,7 +410,7 @@ public:
        centre[0] = 0.1;
        centre[1] = 0.2;
        double radius = 0.4;
-       RadialSloughingCellKiller radial_cell_killer(NULL, centre, radius);
+       RadialSloughingCellKiller radial_cell_killer(nullptr, centre, radius);
        TS_ASSERT_EQUALS(radial_cell_killer.GetIdentifier(), "RadialSloughingCellKiller");
 
        out_stream radial_cell_killer_parameter_file = output_file_handler.OpenOutputFile("radial_results.parameters");

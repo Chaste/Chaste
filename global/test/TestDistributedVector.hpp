@@ -417,7 +417,7 @@ public:
         unsigned lo = factory.GetLow();
         TS_ASSERT_EQUALS(factory.GetProblemSize(), TOTAL);
         TS_ASSERT_EQUALS(factory.GetNumProcs(), PetscTools::GetNumProcs());
-        TS_ASSERT(factory.GetOriginalFactory() == NULL);
+        TS_ASSERT(factory.GetOriginalFactory() == nullptr);
 
         // Where to archive
         OutputFileHandler handler("archive", false);
@@ -446,7 +446,7 @@ public:
             TS_ASSERT_EQUALS(p_new_factory->GetLow(), lo);
             TS_ASSERT_EQUALS(p_new_factory->GetLocalOwnership(), num_local_items);
             TS_ASSERT_EQUALS(p_new_factory->GetNumProcs(), PetscTools::GetNumProcs());
-            TS_ASSERT(p_new_factory->GetOriginalFactory() != NULL);
+            TS_ASSERT(p_new_factory->GetOriginalFactory() != nullptr);
             TS_ASSERT_EQUALS(p_new_factory->GetOriginalFactory()->GetProblemSize(), TOTAL);
             TS_ASSERT_EQUALS(p_new_factory->GetOriginalFactory()->GetHigh(), hi);
             TS_ASSERT_EQUALS(p_new_factory->GetOriginalFactory()->GetLow(), lo);
@@ -461,7 +461,7 @@ public:
             std::ifstream ifs("global/test/data/distributed_vector_factory.arch", std::ios::binary);
             boost::archive::text_iarchive input_arch(ifs);
 
-            DistributedVectorFactory* p_new_factory = NULL;
+            DistributedVectorFactory* p_new_factory = nullptr;
 
             if (PetscTools::IsSequential())
             {
@@ -472,7 +472,7 @@ public:
                 TS_ASSERT_EQUALS(p_new_factory->GetLow(), 0U);
                 TS_ASSERT_EQUALS(p_new_factory->GetLocalOwnership(), TOTAL);
                 TS_ASSERT_EQUALS(p_new_factory->GetNumProcs(), PetscTools::GetNumProcs());
-                TS_ASSERT(p_new_factory->GetOriginalFactory() != NULL);
+                TS_ASSERT(p_new_factory->GetOriginalFactory() != nullptr);
                 TS_ASSERT_EQUALS(p_new_factory->GetOriginalFactory()->GetProblemSize(), TOTAL);
                 TS_ASSERT_EQUALS(p_new_factory->GetOriginalFactory()->GetHigh(), TOTAL);
                 TS_ASSERT_EQUALS(p_new_factory->GetOriginalFactory()->GetLow(), 0U);
@@ -505,7 +505,7 @@ public:
             TS_ASSERT_EQUALS(p_new_factory->GetNumProcs(), PetscTools::GetNumProcs());
 
             DistributedVectorFactory* p_orig_factory = p_new_factory->GetOriginalFactory();
-            TS_ASSERT(p_orig_factory != NULL);
+            TS_ASSERT(p_orig_factory != nullptr);
             TS_ASSERT_EQUALS(p_orig_factory->GetProblemSize(), TOTAL);
             TS_ASSERT_EQUALS(p_orig_factory->GetLocalOwnership(), TOTAL/2);
             TS_ASSERT_EQUALS(p_orig_factory->GetNumProcs(), 2u);

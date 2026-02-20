@@ -138,7 +138,7 @@ public:
         box_collection.SetupAllLocalBoxes();
 
         // Coverage of IsOwned()
-        TS_ASSERT_EQUALS(box_collection.IsOwned(NULL), true);
+        TS_ASSERT_EQUALS(box_collection.IsOwned(nullptr), true);
         TS_ASSERT_EQUALS(box_collection.IsBoxOwned(0), true);
 
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)

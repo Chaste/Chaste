@@ -65,7 +65,7 @@ public:
             TS_ASSERT_DELTA(factory.GetAlpha0PrimeForGeneration(0), 0.011/98.0665, 1e-6);
             TS_ASSERT_DELTA(factory.GetN1ForGeneration(0), 0.5, 1e-6);
             TS_ASSERT_DELTA(factory.GetN2ForGeneration(0), 10.0, 1e-6);
-            TS_ASSERT_DELTA(factory.GetPleuralPressureForAirway(0, NULL), 0.0, 1e-6);
+            TS_ASSERT_DELTA(factory.GetPleuralPressureForAirway(0, nullptr), 0.0, 1e-6);
             TS_ASSERT_EQUALS(factory.GetMesh()->GetNumElements(), 7u);
 
             // The three bifurcation mesh should map onto equivalent generation 0, generation 8 and generation 16 Lambert airways
@@ -238,7 +238,7 @@ public:
             TS_ASSERT_DELTA(factory.Getk2ForGeneration(0), 1000.0, 1e-6);
             TS_ASSERT_DELTA(factory.Getk3ForGeneration(0), 20.0, 1e-6);
             TS_ASSERT_DELTA(factory.GetAlpha0ForGeneration(0), 0.882, 1e-6);
-            TS_ASSERT_DELTA(factory.GetPleuralPressureForAirway(0, NULL), 0.0, 1e-6);
+            TS_ASSERT_DELTA(factory.GetPleuralPressureForAirway(0, nullptr), 0.0, 1e-6);
 
             //The three bifurcation mesh should map onto equivalent generation 0, generation 8 and generation 16 Lambert airways
             { //generation 0
@@ -379,7 +379,7 @@ public:
             TS_ASSERT_DELTA(factory.GetC1ForGeneration(0), 179380.0, 1e-6);
             TS_ASSERT_DELTA(factory.GetC2ForGeneration(0), 101.9786, 1e-6);
             TS_ASSERT_DELTA(factory.GetAlpha0ForGeneration(0), 0.882, 1e-6);
-            TS_ASSERT_DELTA(factory.GetPleuralPressureForAirway(0, NULL), 0.0, 1e-6);
+            TS_ASSERT_DELTA(factory.GetPleuralPressureForAirway(0, nullptr), 0.0, 1e-6);
 
             //The three bifurcation mesh should map onto equivalent generation 0, generation 8 and generation 16 Lambert airways
             { //generation 0
