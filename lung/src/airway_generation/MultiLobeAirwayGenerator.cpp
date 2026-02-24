@@ -66,7 +66,7 @@ MultiLobeAirwayGenerator::MultiLobeAirwayGenerator(TetrahedralMesh<1,3>& rAirway
 MultiLobeAirwayGenerator::~MultiLobeAirwayGenerator()
 {
     // Deallocate the individual airway generators
-    typedef std::pair<AirwayGenerator*, LungLocation> pair_type;
+    using pair_type = std::pair<AirwayGenerator*, LungLocation>;
     for (std::vector<pair_type>::iterator generators_iter = mLobeGenerators.begin();
          generators_iter != mLobeGenerators.end();
          ++generators_iter)
@@ -101,7 +101,7 @@ unsigned MultiLobeAirwayGenerator::GetNumLobes(LungLocation lungLocation)
 {
     unsigned lobe_count = 0u;
 
-    typedef std::pair<AirwayGenerator*, LungLocation> pair_type;
+    using pair_type = std::pair<AirwayGenerator*, LungLocation>;
     for (std::vector<pair_type>::iterator generators_iter = mLobeGenerators.begin();
          generators_iter != mLobeGenerators.end();
          ++generators_iter)
@@ -117,7 +117,7 @@ unsigned MultiLobeAirwayGenerator::GetNumLobes(LungLocation lungLocation)
 
 void MultiLobeAirwayGenerator::AssignGrowthApices()
 {
-    typedef std::pair<AirwayGenerator*, LungLocation> pair_type;
+    using pair_type = std::pair<AirwayGenerator*, LungLocation>;
 
     // Create the initial growth apices for each major airways end point
     for (TetrahedralMesh<1,3>::NodeIterator iter = mAirwaysMesh.GetNodeIteratorBegin();
@@ -204,7 +204,7 @@ void MultiLobeAirwayGenerator::DistributePoints()
         lung_volumes[LEFT] = 0.0;
         lung_volumes[RIGHT] = 0.0;
 
-        typedef std::pair<AirwayGenerator*, LungLocation> pair_type;
+        using pair_type = std::pair<AirwayGenerator*, LungLocation>;
         for (std::vector<pair_type>::iterator generators_iter = mLobeGenerators.begin();
              generators_iter != mLobeGenerators.end();
              ++generators_iter)
@@ -223,7 +223,7 @@ void MultiLobeAirwayGenerator::DistributePoints()
     }
     else if (mNumberOfPointsPerLung == 0u && mPointVolume > 0.0)
     {
-        typedef std::pair<AirwayGenerator*, LungLocation> pair_type;
+        using pair_type = std::pair<AirwayGenerator*, LungLocation>;
         for (std::vector<pair_type>::iterator generators_iter = mLobeGenerators.begin();
              generators_iter != mLobeGenerators.end();
              ++generators_iter)
@@ -330,7 +330,7 @@ void MultiLobeAirwayGenerator::Generate(std::string rOutputDirectory, std::strin
 #endif
 
     // Loop over generators, generate and merge the results
-    typedef std::pair<AirwayGenerator*, LungLocation> pair_type;
+    using pair_type = std::pair<AirwayGenerator*, LungLocation>;
     for (std::vector<pair_type>::iterator generators_iter = mLobeGenerators.begin();
          generators_iter != mLobeGenerators.end();
          ++generators_iter)

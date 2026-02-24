@@ -522,13 +522,13 @@ void ImmersedBoundaryMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(Imm
     this->mNumElements = mpMesh->GetNumElements();
     mNumLaminas = mpMesh->GetNumLaminas();
 
-    typedef typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator NodeIterType;
+    using NodeIterType = typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator;
     mpIters->pNodeIter = new NodeIterType(mpMesh->GetNodeIteratorBegin());
 
-    typedef typename ImmersedBoundaryMesh<ELEMENT_DIM,SPACE_DIM>::ImmersedBoundaryElementIterator ElemIterType;
+    using ElemIterType = typename ImmersedBoundaryMesh<ELEMENT_DIM,SPACE_DIM>::ImmersedBoundaryElementIterator;
     mpIters->pElemIter = new ElemIterType(mpMesh->GetElementIteratorBegin());
 
-    typedef typename ImmersedBoundaryMesh<ELEMENT_DIM,SPACE_DIM>::ImmersedBoundaryLaminaIterator LamIterType;
+    using LamIterType = typename ImmersedBoundaryMesh<ELEMENT_DIM,SPACE_DIM>::ImmersedBoundaryLaminaIterator;
     mpIters->pLamIter = new LamIterType(mpMesh->GetLaminaIteratorBegin());
 
     WriteFiles();

@@ -64,7 +64,7 @@ protected:
     GaussianQuadratureRule<1>* mpCableQuadRule;
 
     /** Basis function for use with normal elements. */
-    typedef LinearBasisFunction<1> CableBasisFunction;
+    using CableBasisFunction = LinearBasisFunction<1>;
 
     /**
      * Compute the derivatives of all basis functions at a point within a cable element.

@@ -377,10 +377,10 @@ void VertexMeshWriter<ELEMENT_DIM, SPACE_DIM>::WriteFilesUsingMesh(VertexMesh<EL
     this->mNumNodes = mpMesh->GetNumNodes();
     this->mNumElements = mpMesh->GetNumElements();
 
-    typedef typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator NodeIterType;
+    using NodeIterType = typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator;
     mpIters->pNodeIter = new NodeIterType(mpMesh->GetNodeIteratorBegin());
 
-    typedef typename VertexMesh<ELEMENT_DIM,SPACE_DIM>::VertexElementIterator ElemIterType;
+    using ElemIterType = typename VertexMesh<ELEMENT_DIM,SPACE_DIM>::VertexElementIterator;
     mpIters->pElemIter = new ElemIterType(mpMesh->GetElementIteratorBegin());
 
     // Set up node map if we might have deleted nodes

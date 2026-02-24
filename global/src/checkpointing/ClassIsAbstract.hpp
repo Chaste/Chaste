@@ -112,7 +112,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #define TEMPLATED_CLASS_IS_ABSTRACT_DEFN \
     { \
-        typedef mpl::bool_<true> type; \
+        using type = mpl::bool_<true>; \
         BOOST_STATIC_CONSTANT(bool, value = true); \
     };
 

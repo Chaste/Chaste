@@ -303,7 +303,7 @@ void CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
     //Nodes first
     out_stream p_node_file = OpenNodeFile(true);
 
-    typedef typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator NodeIterType;
+    using NodeIterType = typename AbstractMesh<ELEMENT_DIM,SPACE_DIM>::NodeIterator;
 
     for (NodeIterType iter = this->mpDistributedMesh->GetNodeIteratorBegin();
          iter != this->mpDistributedMesh->GetNodeIteratorEnd();
@@ -324,7 +324,7 @@ void CmguiMeshWriter<ELEMENT_DIM, SPACE_DIM>::AppendLocalDataToFiles()
     //Now Element files
 
     std::vector<boost::shared_ptr<std::ofstream> > elem_files = OpenElementFiles(true);
-    typedef typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator ElemIterType;
+    using ElemIterType = typename AbstractTetrahedralMesh<ELEMENT_DIM,SPACE_DIM>::ElementIterator;
 
     for (ElemIterType iter = this->mpDistributedMesh->GetElementIteratorBegin();
          iter != this->mpDistributedMesh->GetElementIteratorEnd();

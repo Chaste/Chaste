@@ -69,11 +69,10 @@ class BoundaryConditionsContainer : public AbstractBoundaryConditionsContainer<E
 public:
 
     /** Type of a read-only iterator over Neumann boundary conditions. */
-    typedef typename std::map< const BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>*, const AbstractBoundaryCondition<SPACE_DIM>* >::const_iterator
-        NeumannMapIterator;
+using NeumannMapIterator = typename std::map< const BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>*, const AbstractBoundaryCondition<SPACE_DIM>* >::const_iterator;
 
     /** Base class type. */
-    typedef AbstractBoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM> BaseClassType;
+    using BaseClassType = AbstractBoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>;
 
 private:
 
@@ -398,7 +397,7 @@ template<class Archive>
 void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::save(
         Archive & archive, const unsigned int version) const
 {
-    typedef typename std::map<unsigned, const AbstractBoundaryCondition<SPACE_DIM> *> archive_map_type;
+    using archive_map_type = typename std::map<unsigned, const AbstractBoundaryCondition<SPACE_DIM> *>;
 
     // Save Dirichlet conditions
     for (unsigned index_of_unknown=0; index_of_unknown<PROBLEM_DIM; index_of_unknown++)
@@ -439,7 +438,7 @@ void BoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>::MergeFromAr
 {
     mLoadedFromArchive = true;
 
-    typedef typename std::map<unsigned, AbstractBoundaryCondition<SPACE_DIM>*> archive_map_type;
+    using archive_map_type = typename std::map<unsigned, AbstractBoundaryCondition<SPACE_DIM>*>;
 
     // Keep track of conditions that might need deleting
     std::set<const AbstractBoundaryCondition<SPACE_DIM>*> maybe_unused_bcs;

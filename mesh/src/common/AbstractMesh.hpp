@@ -145,7 +145,7 @@ public:
     //////////////////////////////////////////////////////////////////////
 
     /** Definition of boundary node Iterator type. */
-    typedef typename std::vector<Node<SPACE_DIM> *>::const_iterator BoundaryNodeIterator;
+    using BoundaryNodeIterator = typename std::vector<Node<SPACE_DIM> *>::const_iterator;
 
     /** Forward declaration */
     class NodeIterator;

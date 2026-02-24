@@ -1012,7 +1012,7 @@ bool MutableMesh<ELEMENT_DIM, SPACE_DIM>::CheckIsVoronoi(Element<ELEMENT_DIM, SP
     neighbouring_elements.erase(pElement);
 
     // For each neighbouring element find the supporting nodes
-    typedef typename std::set<Element<ELEMENT_DIM,SPACE_DIM> *>::const_iterator ElementIterator;
+    using ElementIterator = typename std::set<Element<ELEMENT_DIM,SPACE_DIM> *>::const_iterator;
 
     for (ElementIterator it = neighbouring_elements.begin();
          it != neighbouring_elements.end();
