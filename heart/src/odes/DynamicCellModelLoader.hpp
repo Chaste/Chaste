@@ -109,7 +109,8 @@ private:
      * @param pSolver  ODE solver used to simulate the cell
      * @param pStimulus  intracellular stimulus
      */
-using CellCreationFunctionType = AbstractCardiacCellInterface*(boost::shared_ptr<AbstractIvpOdeSolver> pSolver, boost::shared_ptr<AbstractStimulusFunction> pStimulus);
+    using CellCreationFunctionType = AbstractCardiacCellInterface*(boost::shared_ptr<AbstractIvpOdeSolver> pSolver,
+                                                                    boost::shared_ptr<AbstractStimulusFunction> pStimulus);
 
     /** Our cell creation function */
     CellCreationFunctionType* mpCreationFunction;

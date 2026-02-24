@@ -69,7 +69,8 @@ class BoundaryConditionsContainer : public AbstractBoundaryConditionsContainer<E
 public:
 
     /** Type of a read-only iterator over Neumann boundary conditions. */
-using NeumannMapIterator = typename std::map< const BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>*, const AbstractBoundaryCondition<SPACE_DIM>* >::const_iterator;
+    using NeumannMapIterator = typename std::map< const BoundaryElement<ELEMENT_DIM-1, SPACE_DIM>*,
+                                                   const AbstractBoundaryCondition<SPACE_DIM>* >::const_iterator;
 
     /** Base class type. */
     using BaseClassType = AbstractBoundaryConditionsContainer<ELEMENT_DIM,SPACE_DIM,PROBLEM_DIM>;

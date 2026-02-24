@@ -74,11 +74,15 @@ class AbstractBoundaryConditionsContainer : boost::noncopyable
 protected:
 
     /** To save typing */
-using DirichletMapType = typename std::map< const Node<SPACE_DIM> *, const AbstractBoundaryCondition<SPACE_DIM>*, LessThanNode<SPACE_DIM> >;
+    using DirichletMapType = typename std::map< const Node<SPACE_DIM> *,
+                                                 const AbstractBoundaryCondition<SPACE_DIM>*,
+                                                 LessThanNode<SPACE_DIM> >;
     DirichletMapType* mpDirichletMap[PROBLEM_DIM]; /**< List (map) of Dirichlet boundary conditions */
 
     /** To save typing */
-using DirichletIteratorType = typename std::map< const Node<SPACE_DIM> *, const AbstractBoundaryCondition<SPACE_DIM>*, LessThanNode<SPACE_DIM> >::const_iterator;
+    using DirichletIteratorType = typename std::map< const Node<SPACE_DIM> *,
+                                                      const AbstractBoundaryCondition<SPACE_DIM>*,
+                                                      LessThanNode<SPACE_DIM> >::const_iterator;
     DirichletIteratorType mDirichIterator; /**< Internal iterator over Dirichlet boundary conditions */
 
     /** @return true if there are any Dirichlet BCs anywhere on the mesh*/
