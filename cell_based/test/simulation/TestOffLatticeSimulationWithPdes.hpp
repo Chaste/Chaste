@@ -517,7 +517,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.AddPopulationWriter<CellPopulationAreaWriter>(); // record the spheroid radius and apoptotic radius
 
-        typedef RadialCellDataDistributionWriter<2,2> RadWriter;
+        using RadWriter = RadialCellDataDistributionWriter<2,2>;
         MAKE_PTR(RadWriter, p_radial_writer);
         p_radial_writer->SetVariableName("oxygen");
         p_radial_writer->SetNumRadialBins(5);

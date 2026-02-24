@@ -132,7 +132,7 @@ public:
 
     void TestMethods()
     {
-        typedef CellCycleModelOdeSolver<TysonNovakCellCycleModel,RungeKutta4IvpOdeSolver> RkSolver;
+        using RkSolver = CellCycleModelOdeSolver<TysonNovakCellCycleModel,RungeKutta4IvpOdeSolver>;
 
         // Check we can create an instance
         boost::shared_ptr<RkSolver> p_solver = RkSolver::Instance();
@@ -172,7 +172,7 @@ public:
 
     void TestWithBackwardEulerIvpOdeSolver()
     {
-        typedef CellCycleModelOdeSolver<TysonNovakCellCycleModel, BackwardEulerIvpOdeSolver> EulerSolver;
+        using EulerSolver = CellCycleModelOdeSolver<TysonNovakCellCycleModel, BackwardEulerIvpOdeSolver>;
 
         // Check we can create an instance
         boost::shared_ptr<EulerSolver> p_solver = EulerSolver::Instance();
@@ -219,7 +219,7 @@ public:
     void TestWithCvodeAdaptor()
     {
 #ifdef CHASTE_CVODE
-        typedef CellCycleModelOdeSolver<TysonNovakCellCycleModel, CvodeAdaptor> CvodeSolver;
+        using CvodeSolver = CellCycleModelOdeSolver<TysonNovakCellCycleModel, CvodeAdaptor>;
 
         // Check we can create an instance
         boost::shared_ptr<CvodeSolver> p_solver = CvodeSolver::Instance();
@@ -245,7 +245,7 @@ public:
         OutputFileHandler handler("archive", false);
         std::string archive_filename = handler.GetOutputDirectoryFullPath() + "ode_solver.arch";
 
-        typedef CellCycleModelOdeSolver<Alarcon2004OxygenBasedCellCycleModel, BackwardEulerIvpOdeSolver> EulerSolver;
+        using EulerSolver = CellCycleModelOdeSolver<Alarcon2004OxygenBasedCellCycleModel, BackwardEulerIvpOdeSolver>;
 
         // Create an output archive
         {

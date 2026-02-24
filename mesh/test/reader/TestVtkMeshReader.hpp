@@ -69,7 +69,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #ifdef CHASTE_VTK
-typedef VtkMeshReader<3,3> MESH_READER3;
+using MESH_READER3 = VtkMeshReader<3,3>;
 #endif //CHASTE_VTK
 
 class TestVtkMeshReader : public CxxTest::TestSuite

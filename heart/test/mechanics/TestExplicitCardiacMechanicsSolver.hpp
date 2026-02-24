@@ -48,9 +48,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ReplicatableVector.hpp"
 
 // some useful typedefs
-typedef ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2> IncompressibleExplicitSolver2d;
-typedef ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<3>,3> IncompressibleExplicitSolver3d;
-typedef ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2> IncompressibleImplicitSolver2d;
+using IncompressibleExplicitSolver2d = ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2>;
+using IncompressibleExplicitSolver3d = ExplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<3>,3>;
+using IncompressibleImplicitSolver2d = ImplicitCardiacMechanicsSolver<IncompressibleNonlinearElasticitySolver<2>,2>;
 
 class TestExplicitCardiacMechanicsSolver : public CxxTest::TestSuite
 {

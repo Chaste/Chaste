@@ -44,7 +44,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DistributedTetrahedralMesh.hpp"
 #include "PetscSetupAndFinalize.hpp"
 
-typedef AxisymmetricConductivityTensors<2,2> AXI_2D;
+using AXI_2D = AxisymmetricConductivityTensors<2,2>;
 
 class TestConductivityTensors : public CxxTest::TestSuite
 {

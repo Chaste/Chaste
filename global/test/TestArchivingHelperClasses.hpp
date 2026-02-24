@@ -58,10 +58,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PetscSetupAndFinalize.hpp"
 
 // Save typing, and allow the use of these in cxxtest macros
-typedef ArchiveOpener<boost::archive::text_iarchive, std::ifstream> InputArchiveOpener;
-typedef ArchiveOpener<boost::archive::text_oarchive, std::ofstream> OutputArchiveOpener;
-typedef ArchiveOpener<boost::archive::binary_iarchive, std::ifstream> InputBinaryArchiveOpener;
-typedef ArchiveOpener<boost::archive::binary_oarchive, std::ofstream> OutputBinaryArchiveOpener;
+using InputArchiveOpener = ArchiveOpener<boost::archive::text_iarchive, std::ifstream>;
+using OutputArchiveOpener = ArchiveOpener<boost::archive::text_oarchive, std::ofstream>;
+using InputBinaryArchiveOpener = ArchiveOpener<boost::archive::binary_iarchive, std::ifstream>;
+using OutputBinaryArchiveOpener = ArchiveOpener<boost::archive::binary_oarchive, std::ofstream>;
 
 class TestArchivingHelperClasses : public CxxTest::TestSuite
 {

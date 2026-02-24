@@ -1057,7 +1057,7 @@ public:
             }
             else
             {
-                typedef ArchiveOpener<boost::archive::text_iarchive, std::ifstream> InputArchiveOpener;
+                using InputArchiveOpener = ArchiveOpener<boost::archive::text_iarchive, std::ifstream>;
                 if (PetscTools::GetMyRank() > 0)
                 {
                     // Should not read this archive because none exists here.

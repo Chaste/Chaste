@@ -54,8 +54,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MonodomainProblem.hpp"
 #include "MonodomainPurkinjeProblem.hpp"
 
-typedef MonodomainPurkinjeSolver<2,2> MonodomainPurkinjeSolver2d;
-typedef MonodomainPurkinjeCableAssembler<2,2> MonodomainPurkinjeCableAssembler2d;
+using MonodomainPurkinjeSolver2d = MonodomainPurkinjeSolver<2,2>;
+using MonodomainPurkinjeCableAssembler2d = MonodomainPurkinjeCableAssembler<2,2>;
 
 class NonPurkinjeCellFactory : public AbstractCardiacCellFactory<2>
 {

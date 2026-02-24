@@ -406,7 +406,7 @@ public:
         new_cell_location[0] = 2;
         new_cell_location[1] = 2;
 
-        typedef FixedCentreBasedDivisionRule<2,2> FixedRule;
+        using FixedRule = FixedCentreBasedDivisionRule<2,2>;
         MAKE_PTR_ARGS(FixedRule, p_div_rule, (new_cell_location));
         cell_population.SetCentreBasedDivisionRule(p_div_rule);
 
@@ -1041,7 +1041,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
         cell_population.InitialiseCells();
 
-        typedef VoronoiDataWriter<2, 2> VorWriter;
+        using VorWriter = VoronoiDataWriter<2, 2>;
         MAKE_PTR(VorWriter, p_voronoi_writer);
         p_voronoi_writer->SetFileName("new_voronoi.dat");
         cell_population.AddPopulationWriter(p_voronoi_writer);
@@ -1052,17 +1052,17 @@ public:
         // Test set methods
         cell_population.SetOutputResultsForChasteVisualizer(true);
 
-        typedef CellMutationStatesCountWriter<2, 2> MutWriter;
+        using MutWriter = CellMutationStatesCountWriter<2, 2>;
         MAKE_PTR(MutWriter, p_count_writer);
         p_count_writer->SetFileName("new_cellmutationstates.dat");
         cell_population.AddCellPopulationCountWriter(p_count_writer);
 
-        typedef CellDivisionLocationsWriter<2, 2> DivWriter;
+        using DivWriter = CellDivisionLocationsWriter<2, 2>;
         MAKE_PTR(DivWriter, p_event_writer);
         p_event_writer->SetFileName("new_divisions.dat");
         cell_population.AddCellPopulationEventWriter(p_event_writer);
 
-        typedef CellAgesWriter<2, 2> AgWriter;
+        using AgWriter = CellAgesWriter<2, 2>;
         MAKE_PTR(AgWriter, p_ages_writer);
         p_ages_writer->SetFileName("new_cellages.dat");
         p_ages_writer->SetVtkCellDataName("New Ages");
