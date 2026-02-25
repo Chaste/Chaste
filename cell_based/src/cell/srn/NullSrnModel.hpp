@@ -125,7 +125,7 @@ public:
      *
      * @return new SRN model
      */
-    AbstractSrnModel* CreateSrnModel();
+    [[nodiscard]] AbstractSrnModel* CreateSrnModel();
 };
 
 // Declare identifier for the serializer

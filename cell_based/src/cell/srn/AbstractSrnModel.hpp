@@ -229,7 +229,7 @@ public:
      *
      *  @return new SRN model
      */
-    virtual AbstractSrnModel* CreateSrnModel()=0;
+    [[nodiscard]] virtual AbstractSrnModel* CreateSrnModel()=0;
 
     /**
      * Output SRN model used in the simulation to file and then call

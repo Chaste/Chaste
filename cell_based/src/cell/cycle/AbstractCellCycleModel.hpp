@@ -261,7 +261,7 @@ public:
      *
      * @return new cell-cycle model
      */
-    virtual AbstractCellCycleModel* CreateCellCycleModel()=0;
+    [[nodiscard]] virtual AbstractCellCycleModel* CreateCellCycleModel()=0;
 
     /**
      *  @return whether a cell with this cell-cycle model is able to fully (terminally) differentiate.

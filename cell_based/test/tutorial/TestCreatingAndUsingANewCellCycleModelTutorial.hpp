@@ -193,7 +193,7 @@ public:
      * the new cell-cycle model; this occurs when the associated cell has called its
      * `Divide()` method.
      */
-    AbstractCellCycleModel* CreateCellCycleModel()
+    [[nodiscard]] AbstractCellCycleModel* CreateCellCycleModel()
     {
         MyCellCycleModel* p_model = new MyCellCycleModel();
 

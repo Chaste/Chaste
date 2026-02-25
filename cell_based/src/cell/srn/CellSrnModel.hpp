@@ -175,7 +175,7 @@ public:
      * Called in Cell::Divide()
      * @return
      */
-    virtual AbstractSrnModel* CreateSrnModel();
+    [[nodiscard]] virtual AbstractSrnModel* CreateSrnModel();
 
     /**
      * Adds a vector of SRN models to this cell.

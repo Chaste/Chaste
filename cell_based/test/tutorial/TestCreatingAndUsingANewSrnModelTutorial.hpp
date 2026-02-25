@@ -228,7 +228,7 @@ public:
      * the (protected) copy constructor which creates a copy of the cell cycle model.
      *
      */
-    AbstractSrnModel* CreateSrnModel()
+    [[nodiscard]] AbstractSrnModel* CreateSrnModel()
     {
         return new MySrnModel(*this);
     }

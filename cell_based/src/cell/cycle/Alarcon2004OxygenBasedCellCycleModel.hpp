@@ -117,7 +117,7 @@ public:
      * @return new cell-cycle model
      *
      */
-    AbstractCellCycleModel* CreateCellCycleModel();
+    [[nodiscard]] AbstractCellCycleModel* CreateCellCycleModel();
 
     /**
      * Initialise the cell-cycle model at the start of a simulation.
