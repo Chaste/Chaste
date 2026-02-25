@@ -245,16 +245,16 @@ unsigned MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::RemoveDeadCells()
                  it1 != this->mMarkedSprings.end();
                  ++it1)
             {
-                const std::pair<CellPtr,CellPtr>& r_pair = *it1;
+                auto [p_cell_1, p_cell_2] = *it1;
 
                 for (unsigned i=0; i<2; i++)
                 {
-                    CellPtr p_cell = (i==0 ? r_pair.first : r_pair.second);
+                    CellPtr p_cell = (i==0 ? p_cell_1 : p_cell_2);
 
                     if (p_cell == *it)
                     {
                         // Remember to purge this spring
-                        pairs_to_remove.push_back(&r_pair);
+                        pairs_to_remove.push_back(&(*it1));
                         break;
                     }
                 }
@@ -1139,11 +1139,11 @@ void MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>::CheckCellPointers()
          it1 != this->mMarkedSprings.end();
          ++it1)
     {
-        const std::pair<CellPtr,CellPtr>& r_pair = *it1;
+        auto [p_cell_1, p_cell_2] = *it1;
 
         for (unsigned i=0; i<2; i++)
         {
-            CellPtr p_cell = (i==0 ? r_pair.first : r_pair.second);
+            CellPtr p_cell = (i==0 ? p_cell_1 : p_cell_2);
 
             assert(p_cell);
             AbstractCellCycleModel* p_model = p_cell->GetCellCycleModel();
