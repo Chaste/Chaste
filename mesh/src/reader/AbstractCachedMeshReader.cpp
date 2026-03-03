@@ -107,7 +107,7 @@ unsigned AbstractCachedMeshReader<ELEMENT_DIM, SPACE_DIM>::GetMaxNodeIndex()
 
     for (const auto& indices : mElementData)
     {
-        max_node_index = std::max(max_node_index, *std::max_element(indices.begin(), indices.begin() + ELEMENT_DIM+1));
+        max_node_index = std::max(max_node_index, *std::max_element(indices.begin(), indices.begin() + (ELEMENT_DIM+1)));
     }
 
     return max_node_index;
@@ -120,7 +120,7 @@ unsigned AbstractCachedMeshReader<ELEMENT_DIM, SPACE_DIM>::GetMinNodeIndex()
 
     for (const auto& indices : mElementData)
     {
-        min_node_index = std::min(min_node_index, *std::min_element(indices.begin(), indices.begin() + ELEMENT_DIM+1));
+        min_node_index = std::min(min_node_index, *std::min_element(indices.begin(), indices.begin() + (ELEMENT_DIM+1)));
     }
 
     return min_node_index;
