@@ -44,8 +44,6 @@ to map macros back to host functions.
 #undef CHASTE_CAP
 #undef CHASTE_EXP_VOLT
 #undef CHASTE_CONST
-#undef CHASTE_VEC_GET
-#undef CHASTE_MATRIX_GET
 #undef CHASTE_THIS
 
 #define CHASTE_MATH ChasteCpu

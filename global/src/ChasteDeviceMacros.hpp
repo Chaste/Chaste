@@ -47,8 +47,6 @@ provided to be remapped if the GPU features are upgraded to allow data clamps
 #undef CHASTE_CAP
 #undef CHASTE_EXP_VOLT
 #undef CHASTE_CONST
-#undef CHASTE_VEC_GET
-#undef CHASTE_MATRIX_GET
 #undef CHASTE_THIS
 
 #define CHASTE_MATH ChasteDevice
