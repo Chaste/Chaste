@@ -84,7 +84,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	#define GLOBAL __global__
 	#define FORCE_INLINE __forceinline__
 
-	#if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__) // Only defined during device code compilation phase of nvcc run, need to do same for HIP
+    // Only defined during device code compilation phase of nvcc/hipcc run
+	#if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__)
 		#define IN_DEVICE_PASS 1
 	#else
 		#define IN_DEVICE_PASS 0
