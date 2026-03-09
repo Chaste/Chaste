@@ -79,6 +79,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SemRegionalForce.hpp"
 #include "NoCellCycleModel.hpp"
 #include "NodeLocationWriter.hpp"
+#include "NodeRegionPointDataWriter.hpp"
+#include "ElementIdNodePointDataWriter.hpp"
 
 // Cell population writers
 #include "CellMutationStatesCountWriter.hpp"
@@ -173,23 +175,24 @@ public:
         p_mesh->SetUpBoxCollection(0.1, boxCollectionDomain);
 
         // Assertions
-        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 1);
-        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 200);
+        TS_ASSERT_EQUALS(p_mesh->GetNumElements(), 3);
+        TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), 600);
 
         std::vector<CellPtr> cells;
         CellsGenerator<NoCellCycleModel, 3> cells_generator;
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements());
         SemBasedCellPopulation<3> cell_population(*p_mesh, cells);
         cell_population.SetDampingConstantNormal(1.0);
+        cell_population.AddNodePointDataWriter<NodeRegionPointDataWriter>();
+        cell_population.AddNodePointDataWriter<ElementIdNodePointDataWriter>();
 
-        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 1);
-        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 200);
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 1);
+        TS_ASSERT_EQUALS(cell_population.GetNumElements(), 3);
+        TS_ASSERT_EQUALS(cell_population.GetNumNodes(), 600);
+        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 3);
 
 
         // Set up cell-based simulation
         OffLatticeSimulation<3> simulator(cell_population);
-        TS_ASSERT_EQUALS(cell_population.GetNumRealCells(), 1);
         std::cout << cell_population.GetNumRealCells() << std::endl;
         simulator.SetOutputDirectory("TestSemBasedSimulation3D");
         simulator.SetDt(0.01);
