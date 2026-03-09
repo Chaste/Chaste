@@ -61,9 +61,6 @@ private:
      */
     bool mDeleteMesh;
 
-    /** Whether to output node regions to VTK. */
-    bool mOutputNodeRegionToVtk = true;
-
     /**
      * A static cast of the AbstractMesh from AbstractCellPopulation for use in 
      * this class.
@@ -241,18 +238,6 @@ public:
      * @param rParamsFile the file stream to which the parameters are output
      */
     void OutputCellPopulationParameters(out_stream& rParamsFile) override;
-
-    /**
-     * Set whether to output node regions to VTK.
-     *
-     * @param outputNodeRegionToVtk whether to output node regions to VTK
-     */
-    void SetOutputNodeRegionToVtk(bool outputNodeRegionToVtk);
-
-    /**
-     * @return whether to output node regions to VTK
-     */
-    bool GetOutputNodeRegionToVtk() const;
 
     
     void WriteVtkResultsToFile(const std::string& rDirectory) override;
