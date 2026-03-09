@@ -46,9 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class AbstractOffLatticeCellPopulation;
 
 /**
- * Abstract class for a writer that provides node-wise point data from an AbstractOffLatticeCellPopulation.
- * This is used, for instance, to output node regions to VTK, and is used by cell populations such as
- * ImmersedBoundary and SEM.
+ * Instance of an AbstractNodePointDataWriter that provides the region of each node in the population.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM> class NodeRegionPointDataWriter : public AbstractNodePointDataWriter<ELEMENT_DIM, SPACE_DIM>
 {
@@ -85,5 +83,8 @@ public:
      */
     [[nodiscard]] virtual std::vector<double> GetPointData(AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation) const override;
 };
+
+#include "SerializationExportWrapper.hpp"
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(NodeRegionPointDataWriter)
 
 #endif /*NODEREGIONPOINTDATAWRITER_HPP_*/

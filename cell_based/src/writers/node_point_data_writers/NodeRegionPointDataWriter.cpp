@@ -68,3 +68,6 @@ template class NodeRegionPointDataWriter<2,2>;
 template class NodeRegionPointDataWriter<1,3>;
 template class NodeRegionPointDataWriter<2,3>;
 template class NodeRegionPointDataWriter<3,3>;
+
+#include "SerializationExportWrapperForCpp.hpp"
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(NodeRegionPointDataWriter)
