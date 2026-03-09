@@ -489,6 +489,11 @@ void VertexBasedCellPopulation<DIM>::WriteCellVtkResultsToFile(const std::string
     // Create mesh writer for VTK output
     VertexMeshWriter<DIM, DIM> mesh_writer(rDirectory, "results", false);
 
+    for (const auto& p_writer : this->mNodePointDataWriters)
+    {
+        mesh_writer.AddPointData(p_writer->rGetFieldName(), p_writer->GetPointData(this));
+    }
+
     // We avoid writing out CellData if the population is empty (i.e. no cells).
     unsigned num_cells = this->GetNumAllCells();
 
