@@ -60,6 +60,7 @@ population/TestNodeBasedCellPopulation.hpp
 population/TestNodeBasedCellPopulationParallelMethods.hpp
 population/TestNodeBasedCellPopulationWithBuskeUpdate.hpp
 population/TestNodeBasedCellPopulationWithParticles.hpp
+population/TestNodePointDataWriters.hpp
 population/TestPeriodicNodeBasedCellPopulationParallelMethods.hpp
 population/TestPottsBasedCellPopulation.hpp
 population/TestPottsUpdateRules.hpp
