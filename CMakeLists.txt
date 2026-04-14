@@ -1140,6 +1140,20 @@ foreach (component ${Chaste_COMPONENTS})
 endforeach (component ${Chaste_COMPONENTS})
 
 
+# CMake 4.1.0-4.1.4 and 4.2.0-4.2.1 emit spurious "Could not find a package configuration file provided by nvpl"
+# warnings while searching for BLAS/LAPACK (triggered when finding PETSc and SUNDIALS). These warnings are harmless and
+# can safely be ignored.
+# The issue was fixed in CMake 4.1.5 and 4.2.2 respectively:
+# https://gitlab.kitware.com/cmake/cmake/-/work_items/27451
+# https://github.com/Chaste/Chaste/issues/477
+if ((CMAKE_VERSION VERSION_GREATER_EQUAL "4.1.0" AND CMAKE_VERSION VERSION_LESS "4.1.5") OR
+(CMAKE_VERSION VERSION_GREATER_EQUAL "4.2.0" AND CMAKE_VERSION VERSION_LESS "4.2.2"))
+    message(STATUS "NOTE: CMake ${CMAKE_VERSION} is known to emit spurious warnings related to 'nvpl' when searching "
+            "for BLAS/LAPACK. These warnings are harmless and can safely be ignored. Upgrade to CMake >= 4.1.5 or >= "
+            "4.2.2 to suppress them.")
+endif ()
+
+
 message(STATUS "")
 message(STATUS "----------------------------------------------------------")
 message(STATUS "Chaste documentation and tutorials:")
