@@ -52,7 +52,7 @@ message ("####################################\n")
 message(STATUS "CMake version: ${CMAKE_VERSION}")
 
 # Since CMake 3.0, version can be supplied to the project() command.  We set it directly, for users on older CMake
-project (Chaste VERSION 2024.2)
+project (Chaste VERSION 2024.2 LANGUAGES CUDA CXX)
 set (Chaste_VERSION_MAJOR 2024 CACHE STRING "Chaste major version number")
 set (Chaste_VERSION_MINOR 2 CACHE STRING "Chaste minor version number")
 
@@ -621,6 +621,32 @@ if (Chaste_ENABLE_TESTING)
     list (APPEND CMAKE_INCLUDE_PATH "${Chaste_SOURCE_DIR}/cxxtest")
     find_package (CxxTest)
 endif ()
+
+####################
+# FIND FLAMEGPU 2 #
+####################
+#t # Minimum CMake version 3.18 for CUDA --std=c++17 
+cmake_minimum_required(VERSION 3.18...3.25 FATAL_ERROR)
+#
+## Optionaly set the version of flamegpu which should be used, ideally a tag (i.e. `v2.0.0-rc`) or branch name, or potentially a commit hash.
+set(FLAMEGPU_VERSION "master" CACHE STRING "FLAMEGPU/FLAMEGPU2 git branch or tag to use")
+## If the above version is a hash instead, also set FLAMEGPU_VERSION_ALLOW_HASH to ON
+# set(FLAMEGPU_VERSION_ALLOW_HASH "ON")
+#
+## Manually specify the FLAMEGPU_VISUALISATION option to provide it prior to original configuration and allow the default to be overridden in the downstream project
+option(FLAMEGPU_VISUALISATION "Enable FLAMEGPU visualisation support" OFF)
+#
+## Our core dependency is FLAMEGPU2 l:warningsib, first lets find it
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/flamegpu2.cmake)
+#
+## Handle CMAKE_CUDA_ARCHITECTURES gracefully, passign the project name for code-injection
+include(${FLAMEGPU_ROOT}/cmake/CUDAArchitectures.cmake)
+flamegpu_init_cuda_architectures(PROJECT Chaste)
+#
+## Include common rules from the FLAMEGPU/FLAMEGPU2 repositories CMake
+include(${FLAMEGPU_ROOT}/cmake/common.cmake)
+#        
+target_link_libraries(Chaste_COMMON_DEPS INTERFACE flamegpu)
 
 ###########################################
 # SETUP AVAILABLE COMPONENTS AND PROJECTS #

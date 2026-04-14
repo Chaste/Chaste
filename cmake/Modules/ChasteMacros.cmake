@@ -128,7 +128,7 @@ macro(Chaste_ADD_TEST _testTargetName _filename)
         set(_exeTargetName ${_testname})
 
         if (NOT TARGET ${exeTargetName})
-            set(_test_real_output_filename "${CMAKE_CURRENT_BINARY_DIR}/${_testname}.cpp")
+            set(_test_real_output_filename "${CMAKE_CURRENT_BINARY_DIR}/${_testname}.cu")
             add_custom_command(
                 OUTPUT "${_test_real_output_filename}"
                 DEPENDS ${_filename} ${ARGN}
@@ -282,6 +282,8 @@ macro(Chaste_DO_COMMON component)
     file(GLOB_RECURSE Chaste_${component}_SOURCES 
         RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cu
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cuh
         ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp)
 
     # Generate additional source files from cellml
@@ -410,11 +412,20 @@ endmacro(Chaste_DO_PROJECT)
 # process the apps folder
 ##########################################################
 macro(Chaste_DO_APPS_COMMON component)
+    message("Configuring apps folder for ${component}")
     include_directories(SYSTEM "${Chaste_THIRD_PARTY_INCLUDE_DIRS}" "${Chaste_INCLUDE_DIRS}")
     include_directories(SYSTEM "${CXXTEST_INCLUDES}")
-    file(GLOB_RECURSE Chaste_${component}_APPS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.cpp)
+    message("Directory is ${CMAKE_CURRENT_SOURCE_DIR}")
+    file(GLOB_RECURSE Chaste_${component}_APPS 
+         RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+         ${CMAKE_CURRENT_SOURCE_DIR}/src *.cpp *.cu *.cuh)
     foreach(app ${Chaste_${component}_APPS})
-        string(REGEX REPLACE ".*/([a-zA-Z0-9_]+)[.]cpp" "\\1" appName "${app}")
+        message("Now processing app ${app}")
+        string(REPLACE "src/" "" appNameNoSrc "${app}")
+        string(REGEX REPLACE ".*/([a-zA-Z0-9_-]+)[.]cpp" "\\1" appName "${appNameNoSrc}")
+        string(REGEX REPLACE ".*/([a-zA-Z0-9_-]+)[.]cu" "\\1" appName "${appNameNoSrc}")
+        string(REGEX REPLACE ".*/([a-zA-Z0-9_-]+)[.]cuh" "\\1" appName "${appNameNoSrc}")
+        message("appName is now ${appName}")
         if (${component} MATCHES "project_")
             message("Configuring ${appName} app for ${component}")
             set(component_library chaste_${component})
@@ -483,10 +494,10 @@ endmacro(Chaste_DO_APPS_COMMON)
 # these wrap chaste_do_apps_common for both the main
 # Chaste apps directory and external project apps dirs
 ##########################################################
-macro(Chaste_DO_APPS_PROJECT projectName)
+macro(chaste_do_apps_project projectName)
     message("Configuring apps for project ${projectName}")
     Chaste_DO_APPS_COMMON(project_${projectName})
-endmacro(Chaste_DO_APPS_PROJECT)
+endmacro(chaste_do_apps_project)
 
 macro(Chaste_DO_APPS_MAIN)
     message("Configuring main Chaste apps")
@@ -520,7 +531,7 @@ macro(Chaste_DO_TEST_COMMON component)
     else()
         set(COMPONENT_LIBRARIES ${Chaste_LIBRARIES})
     endif()
-    file(GLOB_RECURSE test_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp)
+    file(GLOB_RECURSE test_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp *.cu *.cuh)
     if(test_sources)
         add_library(test${component} STATIC ${test_sources})
         if (BUILD_SHARED_LIBS)
@@ -590,6 +601,14 @@ macro(Chaste_DO_TEST_COMMON component)
                         set_target_properties(${exeTargetName} PROPERTIES LINK_FLAGS "${LINKER_FLAGS}")
                     endif()
 
+                    if (filename MATCHES ".cuh$")
+                        if (BUILD_SHARED_LIBS)
+                            target_link_libraries(${exeTargetName} LINK_PUBLIC ${COMPONENT_LIBRARIES})
+                        else()
+                            target_link_libraries(${exeTargetName} LINK_PUBLIC ${COMPONENT_LIBRARIES} ${Chaste_LIBRARIES} ${Chaste_THIRD_PARTY_LIBRARIES} )
+                        endif()
+                        set_target_properties(${exeTargetName} PROPERTIES LINK_FLAGS "${LINKER_FLAGS}")
+                    endif()
 
                     set_property(TEST ${testTargetName} PROPERTY LABELS ${type}_${component})
 

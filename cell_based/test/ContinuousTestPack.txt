@@ -70,6 +70,7 @@ simulation/Test2dVertexBasedSimulationWithSrnModels.hpp
 simulation/TestDeltaNotchModifier.hpp
 simulation/TestDivisionBiasTrackingModifier.hpp
 simulation/TestExtrinsicPullModifier.hpp
+simulation/TestFlameGPU2.cuh
 simulation/TestNumericalMethods.hpp
 simulation/TestImmersedBoundarySimulationModifier.hpp
 simulation/TestImmersedBoundarySvgWriter.hpp
