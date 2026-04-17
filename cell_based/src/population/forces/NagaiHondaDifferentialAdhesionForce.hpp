@@ -122,7 +122,7 @@ public:
      *
      * @return the adhesion parameter for this edge.
      */
-    virtual double GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB, VertexBasedCellPopulation<DIM>& rVertexCellPopulation);
+    virtual double GetAdhesionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB, VertexBasedCellPopulation<DIM>& rVertexCellPopulation) override;
 
     /**
      * @return mNagaiHondaLabelledCellCellAdhesionEnergyParameter

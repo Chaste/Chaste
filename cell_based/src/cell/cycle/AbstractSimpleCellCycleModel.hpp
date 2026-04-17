@@ -114,7 +114,7 @@ public:
     virtual bool ReadyToDivide();
 
     /** See AbstractCellCycleModel::ResetForDivision() */
-    virtual void ResetForDivision();
+    virtual void ResetForDivision() override;
 
     /**
      * Overridden InitialiseDaughterCell() method.
@@ -128,7 +128,7 @@ public:
      *
      * Calls SetCellCycleDuration() defined in child classes.
      */
-    virtual void Initialise();
+    virtual void Initialise() override;
 
     /**
      * This method is implemented in Subclasses to set the cell cycle duration of the cell.

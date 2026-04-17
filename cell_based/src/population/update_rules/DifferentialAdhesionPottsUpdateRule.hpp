@@ -111,7 +111,7 @@ public:
      *
      * @return The cell cell interaction adhesion energy between the two cells
      */
-    virtual double GetCellCellAdhesionEnergy(CellPtr pCellA, CellPtr pCellB);
+    virtual double GetCellCellAdhesionEnergy(CellPtr pCellA, CellPtr pCellB) override;
 
     /**
      * Overridden GetCellBoundaryAdhesionEnergy method to implement differential adhesion.
@@ -120,7 +120,7 @@ public:
      *
      * @return Cell boundary interaction adhesion energy for the cell
      */
-    virtual double GetCellBoundaryAdhesionEnergy(CellPtr pCell);
+    virtual double GetCellBoundaryAdhesionEnergy(CellPtr pCell) override;
 
     /**
      * @return mLabelledCellLabelledCellAdhesionEnergyParameter

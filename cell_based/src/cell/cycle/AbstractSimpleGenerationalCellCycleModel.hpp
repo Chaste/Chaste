@@ -145,7 +145,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 CLASS_IS_ABSTRACT(AbstractSimpleGenerationalCellCycleModel)
