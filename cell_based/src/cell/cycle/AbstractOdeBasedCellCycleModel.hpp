@@ -145,7 +145,7 @@ public:
      * subclasses. But most models should override this function and then
      * call AbstractOdeBasedCellCycleModel::ResetForDivision() from inside their version.
      */
-    virtual void ResetForDivision() override;
+    virtual void ResetForDivision();
 
     /**
      * Outputs cell cycle model parameters to file.

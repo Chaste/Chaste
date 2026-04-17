@@ -109,7 +109,7 @@ public:
     virtual ~AbstractSimplePhaseBasedCellCycleModel();
 
     /** See AbstractPhaseBasedCellCycleModel::ResetForDivision() */
-    virtual void ResetForDivision() override;
+    virtual void ResetForDivision();
 
     /**
      * Default UpdateCellCyclePhase() method for a simple cell-cycle model.
@@ -125,7 +125,7 @@ public:
     void InitialiseDaughterCell();
 
     /** See AbstractPhaseBasedCellCycleModel::Initialise() */
-    virtual void Initialise() override;
+    virtual void Initialise();
 
     /**
      * Overridden OutputCellCycleModelParameters() method.

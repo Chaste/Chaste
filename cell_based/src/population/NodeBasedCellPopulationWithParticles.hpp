@@ -63,7 +63,7 @@ protected:
      * Calls #AcceptCellWriter() across the whole population,
      * iterating in an appropriate way to skip particle nodes.
      */
-    virtual void AcceptCellWritersAcrossPopulation() override;
+    virtual void AcceptCellWritersAcrossPopulation();
 
 private:
 
@@ -156,7 +156,7 @@ public:
      *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
-    virtual void WriteVtkResultsToFile(const std::string& rDirectory) override;
+    virtual void WriteVtkResultsToFile(const std::string& rDirectory);
 
     /**
      * Outputs CellPopulation parameters to file

@@ -157,14 +157,14 @@ public:
     /**
      * Initialize constituent SRN models.
      */
-    virtual void Initialise() override;
+    virtual void Initialise();
 
     /**
      * Calls SRN model specific behaviour at the time of cell division.
      * All constituent SRNs models (edge and/or interior, if there are any) call their
      * implementation of this method.
      */
-    virtual void ResetForDivision() override;
+    virtual void ResetForDivision();
 
     /**
      * Simulate SRN models.
@@ -232,7 +232,7 @@ public:
      *
      * @param pCell pointer to a Cell
      */
-    virtual void SetCell(CellPtr pCell) override;
+    virtual void SetCell(CellPtr pCell);
 };
 
 // Declare identifier for the serializer

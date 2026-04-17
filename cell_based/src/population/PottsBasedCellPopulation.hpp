@@ -299,14 +299,14 @@ public:
      *
      * @param rOutputFileHandler handler for the directory in which to open this file.
      */
-    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler) override;
+    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler);
 
     /**
      * Overridden WriteResultsToFiles() method.
      *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
-    virtual void WriteResultsToFiles(const std::string& rDirectory) override;
+    virtual void WriteResultsToFiles(const std::string& rDirectory);
 
     /**
      * A virtual method to accept a cell population writer so it can

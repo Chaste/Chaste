@@ -138,7 +138,7 @@ public:
      * subclasses. But most models should override this function and then
      * call AbstractSrnModel::ResetForDivision() from inside their version.
      */
-    virtual void ResetForDivision() override;
+    virtual void ResetForDivision();
 
     /**
      * Set mInitialConditions. Used in CreateSrnModel().
@@ -153,7 +153,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputSrnModelParameters(out_stream& rParamsFile) override;
+    virtual void OutputSrnModelParameters(out_stream& rParamsFile);
 
     /**
      * Scales all ODE variables by factor theta. Used for example to scale model
@@ -161,7 +161,7 @@ public:
      *
      * @param theta factor by which to scale all ODE variables.
      */
-    virtual void ScaleSrnVariables(const double theta) override;
+    virtual void ScaleSrnVariables(const double theta);
 };
 
 CLASS_IS_ABSTRACT(AbstractOdeSrnModel)

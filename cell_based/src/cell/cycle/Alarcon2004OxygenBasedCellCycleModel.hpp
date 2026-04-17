@@ -108,7 +108,7 @@ public:
      *
      * Should only be called by the Cell Divide() method.
      */
-    virtual void ResetForDivision() override;
+    virtual void ResetForDivision();
 
     /**
      * Overridden builder method to create new copies of
@@ -131,7 +131,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
+    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
 };
 
 // Declare identifier for the serializer

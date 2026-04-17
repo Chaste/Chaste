@@ -162,7 +162,7 @@ public:
     virtual bool ReadyToDivide();
 
     /** See AbstractCellCycleModel::ResetForDivision() */
-    virtual void ResetForDivision() override;
+    virtual void ResetForDivision();
 
     /**
      * Set the phase the cell-cycle model is currently in. This method is called

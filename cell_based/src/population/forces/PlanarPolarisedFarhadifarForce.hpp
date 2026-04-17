@@ -102,7 +102,7 @@ public:
      *
      * @return the line tension parameter for this edge.
      */
-    virtual double GetLineTensionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB, VertexBasedCellPopulation<DIM>& rVertexCellPopulation) override;
+    virtual double GetLineTensionParameter(Node<DIM>* pNodeA, Node<DIM>* pNodeB, VertexBasedCellPopulation<DIM>& rVertexCellPopulation);
 
     /**
      * @return mPlanarPolarisedLineTensionMultiplier

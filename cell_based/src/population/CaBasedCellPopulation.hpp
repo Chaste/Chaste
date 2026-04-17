@@ -309,7 +309,7 @@ public:
      *
      * @param rOutputFileHandler handler for the directory in which to open this file.
      */
-    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler) override;
+    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler);
 
     /**
      * Overridden UpdateCellLocations() method.
@@ -445,7 +445,7 @@ public:
      *
      * @return the update rule collection
      */
-    virtual const std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > GetUpdateRuleCollection() const override;
+    virtual const std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > GetUpdateRuleCollection() const;
 
     /**
      * Overridden GetCellDataItemAtPdeNode() method.
@@ -476,7 +476,7 @@ public:
      *         with a PDE modifier, is associated with a non-apoptotic cell.
      * This method can be called by PDE classes.
      */
-    virtual bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex) override;
+    virtual bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex);
 };
 
 #include "SerializationExportWrapper.hpp"
