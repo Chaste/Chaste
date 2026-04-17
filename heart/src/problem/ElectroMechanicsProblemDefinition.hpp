@@ -398,7 +398,7 @@ public:
      * Check all variables are set appropriately. Exceptions are thrown if any are not.
      * Derived classes can override but should call this version as well.
      */
-    virtual void Validate();
+    virtual void Validate() override;
 };
 
 #endif // ELECTROMECHANICSPROBLEMDEFINITION_HPP_
