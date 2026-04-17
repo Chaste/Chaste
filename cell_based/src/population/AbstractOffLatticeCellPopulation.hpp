@@ -244,7 +244,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellPopulationParameters(out_stream& rParamsFile);
+    void OutputCellPopulationParameters(out_stream& rParamsFile) override;
 };
 
 #endif /*ABSTRACTOFFLATTICECELLPOPULATION_HPP_*/

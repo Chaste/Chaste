@@ -126,7 +126,7 @@ public:
      *
      * Can be overridden if they should do something more subtle.
      */
-    virtual void UpdateCellCyclePhase();
+    void UpdateCellCyclePhase() override;
 
     /**
      * Get the time at which the ODE stopping event occurred.
@@ -150,14 +150,14 @@ public:
      * subclasses. But most models should override this function and then
      * call AbstractOdeBasedPhaseBasedCellCycleModel::ResetForDivision() from inside their version.
      */
-    virtual void ResetForDivision();
+    void ResetForDivision() override;
 
     /**
      * Outputs cell cycle model parameters to file.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 CLASS_IS_ABSTRACT(AbstractOdeBasedPhaseBasedCellCycleModel)

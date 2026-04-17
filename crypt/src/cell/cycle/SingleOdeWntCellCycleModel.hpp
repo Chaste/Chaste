@@ -97,7 +97,7 @@ private:
      *
      * @param currentTime  the time up to which the system will be solved.
      */
-    virtual void AdjustOdeParameters(double currentTime);
+    void AdjustOdeParameters(double currentTime) override;
 
 protected:
 
@@ -169,7 +169,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 // Declare identifier for the serializer

@@ -309,7 +309,7 @@ public:
      *
      * @return the maximum node index.
      */
-    virtual unsigned GetMaximumNodeIndex();
+    unsigned GetMaximumNodeIndex() override;
 
     /**
      * Set the maximum node interaction distance.

@@ -96,7 +96,7 @@ public:
      * The user must create, configure and return an Acinar model. The created
      * model is subsequently used in the ventilation simulation.
      */
-    virtual AbstractAcinarUnit* CreateAcinarUnitForNode(Node<3>* pNode)
+    AbstractAcinarUnit* CreateAcinarUnitForNode(Node<3>* pNode) override
     {
         /*
          * Here we use the simplest possible acinar model: a linear elastic balloon.
@@ -123,7 +123,7 @@ public:
      * calls this method to determine what the current pleural pressure is. Here
      * we specify a spatially homogeneous oscillating pressure in the tidal breathing range.
      */
-    virtual double GetPleuralPressureForNode(double time, Node<3>* pNode)
+    double GetPleuralPressureForNode(double time, Node<3>* pNode) override
     {
         return -750 - 250*sin(2*M_PI*mFrequency*(time - 0.25));
     }

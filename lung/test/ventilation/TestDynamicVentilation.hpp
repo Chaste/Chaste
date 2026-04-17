@@ -69,7 +69,7 @@ public:
                                                       mFrequency(frequency)
     {}
 
-    virtual AbstractAcinarUnit* CreateAcinarUnitForNode(Node<3>* pNode)
+    AbstractAcinarUnit* CreateAcinarUnitForNode(Node<3>* pNode) override
     {
         ACINAR_UNIT* p_acinus = new ACINAR_UNIT;
 
@@ -78,7 +78,7 @@ public:
         return p_acinus;
     }
 
-    virtual double GetPleuralPressureForNode(double time, Node<3>* pNode)
+    double GetPleuralPressureForNode(double time, Node<3>* pNode) override
     {
         return -mPleuralPressureAmplitude*sin(2*M_PI*mFrequency*time);
     }

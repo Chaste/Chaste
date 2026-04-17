@@ -68,7 +68,7 @@ protected:
      * Here we don't do anything clever - we just gradually drift to the steady state,
      * defined by < 1e-6 change in the norm of state variables between 1 (or 2 - see #mTwoPaceScan) beats.
      */
-    virtual void RunToSteadyStateImplementation();
+    void RunToSteadyStateImplementation() override;
 
 public:
     /**

@@ -96,7 +96,7 @@ public:
      *
      * By default calls the base class version; it is defined here so that specializations can override it.
      */
-    virtual bool IsAdaptive();
+    bool IsAdaptive() override;
 
     /** Reset the instance. */
     void Reset();

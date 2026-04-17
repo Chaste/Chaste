@@ -97,7 +97,7 @@ public:
     /**
      * Loop over cells and kills cells outside boundary.
      */
-    virtual void CheckAndLabelCellsForApoptosisOrDeath();
+    void CheckAndLabelCellsForApoptosisOrDeath() override;
 
     /**
      * Outputs cell killer parameters to file

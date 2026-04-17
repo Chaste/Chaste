@@ -165,7 +165,7 @@ public:
      * @param tStart  beginning of the time interval to simulate
      * @param tEnd  end of the time interval to simulate
      */
-    virtual void SolveAndUpdateState(double tStart, double tEnd);
+    void SolveAndUpdateState(double tStart, double tEnd) override;
 
     /**
      * Simulates this cell's behaviour between the time interval [tStart, tEnd],

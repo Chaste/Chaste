@@ -99,7 +99,7 @@ public:
      *
      * @param dt the time step
      */
-    virtual void UpdateNodeLocations(double dt);
+    void UpdateNodeLocations(double dt) override;
 
     /**
      * Outputs CellPopulation parameters to file

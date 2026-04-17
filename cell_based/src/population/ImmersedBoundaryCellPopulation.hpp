@@ -115,7 +115,7 @@ private:
      * @param rDirectory  pathname of the output directory, relative to where
      *     Chaste output is stored
      */
-    virtual void WriteVtkResultsToFile(const std::string& rDirectory);
+    void WriteVtkResultsToFile(const std::string& rDirectory) override;
 
     friend class boost::serialization::access;
     /**
@@ -429,31 +429,31 @@ public:
      * @param rOutputFileHandler handler for the directory in which to open this
      *     file.
      */
-    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler);
+    void OpenWritersFiles(OutputFileHandler& rOutputFileHandler) override;
 
     /**
      * Overridden AcceptPopulationWriter() method.
      *
      * @param pPopulationWriter the population writer.
      */
-    virtual void AcceptPopulationWriter(
-        boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
+    void AcceptPopulationWriter(
+        boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter) override;
 
     /**
      * Overridden AcceptPopulationWriter() method.
      *
      * @param pPopulationEventWriter the population event writer.
      */
-    virtual void AcceptPopulationEventWriter(
-        boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter);
+    void AcceptPopulationEventWriter(
+        boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter) override;
 
     /**
      * Overridden AcceptPopulationCountWriter() method.
      *
      * @param pPopulationCountWriter the population count writer.
      */
-    virtual void AcceptPopulationCountWriter(
-        boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
+    void AcceptPopulationCountWriter(
+        boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter) override;
 
     /**
      * Overridden AcceptCellWriter() method.
@@ -461,9 +461,9 @@ public:
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
      */
-    virtual void AcceptCellWriter(
+    void AcceptCellWriter(
         boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter,
-        CellPtr pCell);
+        CellPtr pCell) override;
 
     /**
      * Overridden GetVolumeOfCell() method.
@@ -511,7 +511,7 @@ public:
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */
-    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
+    TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier() override;
 
     /**
      * Overridden IsPdeNodeAssociatedWithNonApoptoticCell() method.
@@ -523,7 +523,7 @@ public:
      *         with a PDE modifier, is associated with a non-apoptotic cell.
      * This method can be called by PDE classes.
      */
-    virtual bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex);
+    bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex) override;
 
     /**
      * Overridden GetCellDataItemAtPdeNode() method.
@@ -542,10 +542,10 @@ public:
      *
      * This method can be called by PDE modifier classes.
      */
-    virtual double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
+    double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
                                             std::string& rVariableName,
                                             bool dirichletBoundaryConditionApplies = false,
-                                            double dirichletBoundaryValue = 0.0);
+                                            double dirichletBoundaryValue = 0.0) override;
 
     /**
      * @return The division rule that is currently being used.
@@ -598,10 +598,10 @@ public:
      * @param rDisplacement Movement vector of the node at this time step
      * @param dt Current time step size
      */
-    virtual void CheckForStepSizeException(
+    void CheckForStepSizeException(
         unsigned nodeIndex,
         c_vector<double, DIM>& rDisplacement,
-        double dt);
+        double dt) override;
 
     /**
      * Overridden GetDefaultTimeStep() method.
@@ -613,7 +613,7 @@ public:
      * can be reset by calling SetDt() on the simulation object used to simulate
      * the cell population.
      */
-    virtual double GetDefaultTimeStep();
+    double GetDefaultTimeStep() override;
 };
 
 #include "SerializationExportWrapper.hpp"

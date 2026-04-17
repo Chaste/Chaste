@@ -217,7 +217,7 @@ protected:
     /**
      * Check consistency of our internal data structures.
      */
-    virtual void Validate();
+    void Validate() override;
 
 private:
 
@@ -226,7 +226,7 @@ private:
      *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
-    virtual void WriteVtkResultsToFile(const std::string& rDirectory);
+    void WriteVtkResultsToFile(const std::string& rDirectory) override;
 
     /**
      * Helper method to calculate the message tags between processors
@@ -297,7 +297,7 @@ public:
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */
-    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
+    TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier() override;
 
     /**
      * @return the number of nodes in the cell population.
@@ -311,7 +311,7 @@ public:
      * @param index the global index of the node assocaited with a cell
      * @return the (set of) cells to which the node is attached.
      */
-    virtual CellPtr GetCellUsingLocationIndex(unsigned index);
+    CellPtr GetCellUsingLocationIndex(unsigned index) override;
 
     /**
      * Overridden GetNode() method.
@@ -361,7 +361,7 @@ public:
      *
      * @param pPopulationWriter the population writer.
      */
-    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
+    void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter) override;
 
     /**
      * A virtual method to accept a cell population count writer so it can
@@ -369,7 +369,7 @@ public:
      *
      * @param pPopulationCountWriter the population count writer.
      */
-    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
+    void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter) override;
 
     /**
      * A virtual method to accept a cell population event writer so it can
@@ -377,7 +377,7 @@ public:
      *
      * @param pPopulationEventWriter the population event writer.
      */
-    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter);
+    void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter) override;
 
     /**
      * A virtual method to accept a cell writer so it can
@@ -386,7 +386,7 @@ public:
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
      */
-    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
+    void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell) override;
 
     /**
      * @return the maximum interaction distance between cells, defined in NodesOnlyMesh.
@@ -469,7 +469,7 @@ public:
      *
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    virtual CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell);
+    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell) override;
 
     /**
      * Overridden GetVolumeOfCell() method.
@@ -520,7 +520,7 @@ public:
     /**
      * Update which process each cell is owned by.
      */
-    virtual void UpdateCellProcessLocation();
+    void UpdateCellProcessLocation() override;
 };
 
 #include "SerializationExportWrapper.hpp"

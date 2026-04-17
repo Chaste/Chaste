@@ -170,7 +170,7 @@ public:
      * Check all variables are set appropriately. Exceptions are thrown if any are not.
      * Derived classes can override but should call this version as well.
      */
-    virtual void Validate();
+    void Validate() override;
 
     ///////////////////////////////////////////////////////////////////////////
     // The following methods set parameters used by the solver class

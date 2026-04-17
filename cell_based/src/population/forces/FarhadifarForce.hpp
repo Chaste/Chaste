@@ -128,7 +128,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
+    void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation) override;
 
     /**
      * Get the line tension parameter for the edge between two given nodes.

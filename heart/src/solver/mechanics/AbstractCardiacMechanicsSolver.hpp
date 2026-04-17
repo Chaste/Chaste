@@ -246,7 +246,7 @@ public:
     }
 
     /** @return the quadrature rule used in the elements. */
-    virtual GaussianQuadratureRule<DIM>* GetQuadratureRule()
+    GaussianQuadratureRule<DIM>* GetQuadratureRule() override
     {
         return this->mpQuadratureRule;
     }

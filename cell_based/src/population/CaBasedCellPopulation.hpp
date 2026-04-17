@@ -126,7 +126,7 @@ private:
      *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
-    virtual void WriteVtkResultsToFile(const std::string& rDirectory);
+    void WriteVtkResultsToFile(const std::string& rDirectory) override;
 
 public:
 
@@ -197,7 +197,7 @@ public:
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */
-    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
+    TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier() override;
 
     /**
      * Overridden GetNode() method.
@@ -309,7 +309,7 @@ public:
      *
      * @param rOutputFileHandler handler for the directory in which to open this file.
      */
-    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler);
+    void OpenWritersFiles(OutputFileHandler& rOutputFileHandler) override;
 
     /**
      * Overridden UpdateCellLocations() method.
@@ -341,7 +341,7 @@ public:
      *
      * @param pPopulationWriter the population writer.
      */
-    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
+    void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter) override;
 
     /**
      * A virtual method to accept a cell population count writer so it can
@@ -349,7 +349,7 @@ public:
      *
      * @param pPopulationCountWriter the population count writer.
      */
-    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
+    void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter) override;
 
     /**
      * A virtual method to accept a cell population event writer so it can
@@ -357,7 +357,7 @@ public:
      *
      * @param pPopulationEventWriter the population event writer.
      */
-    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter);
+    void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter) override;
 
     /**
      * A virtual method to accept a cell writer so it can
@@ -366,7 +366,7 @@ public:
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
      */
-    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
+    void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell) override;
 
     /**
      * Overridden GetVolumeOfCell() method.
@@ -434,7 +434,7 @@ public:
      *
      * @param pUpdateRule pointer to an update rule
      */
-    virtual void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
+    void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule) override;
 
     /**
      * Overridden AddUpdateRule() method.
@@ -445,7 +445,7 @@ public:
      *
      * @return the update rule collection
      */
-    virtual const std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > GetUpdateRuleCollection() const;
+    const std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > GetUpdateRuleCollection() const override;
 
     /**
      * Overridden GetCellDataItemAtPdeNode() method.
@@ -462,10 +462,10 @@ public:
      *         specified by its index in a tetrahedral mesh for use with a PDE modifier.
      * This method can be called by PDE modifier classes.
      */
-    virtual double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
+    double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
                                             std::string& rVariableName,
                                             bool dirichletBoundaryConditionApplies=false,
-                                            double dirichletBoundaryValue=0.0);
+                                            double dirichletBoundaryValue=0.0) override;
 
     /**
      * Overridden IsPdeNodeAssociatedWithNonApoptoticCell() method.
@@ -476,7 +476,7 @@ public:
      *         with a PDE modifier, is associated with a non-apoptotic cell.
      * This method can be called by PDE classes.
      */
-    virtual bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex);
+    bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex) override;
 };
 
 #include "SerializationExportWrapper.hpp"

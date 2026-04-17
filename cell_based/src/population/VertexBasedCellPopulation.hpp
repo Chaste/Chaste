@@ -135,7 +135,7 @@ private:
      * otherwise WriteCellVtkResultsToFile() is used to represent entire cells.
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
-    virtual void WriteVtkResultsToFile(const std::string& rDirectory);
+    void WriteVtkResultsToFile(const std::string& rDirectory) override;
 
     /**
      * Writes a representation of cells to file.
@@ -316,7 +316,7 @@ public:
      * @param rDisplacement Movement vector of the node at this time step
      * @param dt Current time step size
      */
-    virtual void CheckForStepSizeException(unsigned nodeIndex, c_vector<double,DIM>& rDisplacement, double dt);
+    void CheckForStepSizeException(unsigned nodeIndex, c_vector<double,DIM>& rDisplacement, double dt) override;
 
     /**
      * Overridden SetNode() method.
@@ -384,7 +384,7 @@ public:
      *
      * @param rOutputFileHandler handler for the directory in which to open this file.
     */
-    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler);
+    void OpenWritersFiles(OutputFileHandler& rOutputFileHandler) override;
 
     /**
      * A virtual method to accept a cell population writer so it can
@@ -392,7 +392,7 @@ public:
      *
      * @param pPopulationWriter the population writer.
      */
-    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter);
+    void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter) override;
 
     /**
      * A virtual method to accept a cell population count writer so it can
@@ -400,7 +400,7 @@ public:
      *
      * @param pPopulationCountWriter the population count writer.
      */
-    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter);
+    void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter) override;
 
     /**
      * A virtual method to accept a cell population event writer so it can
@@ -408,7 +408,7 @@ public:
      *
      * @param pPopulationEventWriter the population event writer.
      */
-    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter);
+    void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter) override;
 
     /**
      * A virtual method to accept a cell writer so it can
@@ -417,7 +417,7 @@ public:
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
      */
-    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell);
+    void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell) override;
 
     /**
      * Get the "rosette rank" of a cell.
@@ -517,7 +517,7 @@ public:
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */
-    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
+    TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier() override;
 
     /**
      * Overridden IsPdeNodeAssociatedWithNonApoptoticCell() method.
@@ -528,7 +528,7 @@ public:
      *         with a PDE modifier, is associated with a non-apoptotic cell.
      * This method can be called by PDE classes.
      */
-    virtual bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex);
+    bool IsPdeNodeAssociatedWithNonApoptoticCell(unsigned pdeNodeIndex) override;
 
     /**
      * Overridden GetCellDataItemAtPdeNode() method.
@@ -545,10 +545,10 @@ public:
      *         specified by its index in a tetrahedral mesh for use with a PDE modifier.
      * This method can be called by PDE modifier classes.
      */
-    virtual double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
+    double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
                                             std::string& rVariableName,
                                             bool dirichletBoundaryConditionApplies=false,
-                                            double dirichletBoundaryValue=0.0);
+                                            double dirichletBoundaryValue=0.0) override;
 
     /**
      * @return The Vertex division rule that is currently being used.
@@ -572,7 +572,7 @@ public:
      * step can be reset by calling SetDt() on the simulation object used to
      * simulate the cell population.
      */
-    virtual double GetDefaultTimeStep();
+    double GetDefaultTimeStep() override;
 
     /**
      * Overridden WriteDataToVisualizerSetupFile() method.
@@ -581,7 +581,7 @@ public:
      *
      * @param pVizSetupFile a visualization setup file
      */
-    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
+    void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile) override;
 
     /**
      * Overridden SimulationSetupHook() method.
@@ -596,7 +596,7 @@ public:
      *
      * @param pSimulation pointer to a cell-based simulation object
      */
-    virtual void SimulationSetupHook(AbstractCellBasedSimulation<DIM, DIM>* pSimulation);
+    void SimulationSetupHook(AbstractCellBasedSimulation<DIM, DIM>* pSimulation) override;
 
     /**
      * Get the value of the mRestrictVertexMovement boolean.

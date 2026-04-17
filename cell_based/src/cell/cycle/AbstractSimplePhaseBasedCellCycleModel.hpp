@@ -109,14 +109,14 @@ public:
     virtual ~AbstractSimplePhaseBasedCellCycleModel();
 
     /** See AbstractPhaseBasedCellCycleModel::ResetForDivision() */
-    virtual void ResetForDivision();
+    void ResetForDivision() override;
 
     /**
      * Default UpdateCellCyclePhase() method for a simple cell-cycle model.
      *
      * Can be overridden if they should do something more subtle.
      */
-    virtual void UpdateCellCyclePhase();
+    void UpdateCellCyclePhase() override;
 
     /**
      * Set the new cell's G1 duration once it has been created after division.
@@ -125,14 +125,14 @@ public:
     void InitialiseDaughterCell();
 
     /** See AbstractPhaseBasedCellCycleModel::Initialise() */
-    virtual void Initialise();
+    void Initialise() override;
 
     /**
      * Overridden OutputCellCycleModelParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 CLASS_IS_ABSTRACT(AbstractSimplePhaseBasedCellCycleModel)

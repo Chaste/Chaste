@@ -135,12 +135,12 @@ public:
      * each of those vectors contains the solution for one variable of the ODE
      * system at those times.
      */
-    virtual OdeSolution Solve(AbstractOdeSystem* pAbstractOdeSystem,
+    OdeSolution Solve(AbstractOdeSystem* pAbstractOdeSystem,
                               std::vector<double>& rYValues,
                               double startTime,
                               double endTime,
                               double timeStep,
-                              double timeSampling);
+                              double timeSampling) override;
 
     /**
      * Second version of Solve. Solves a system of ODEs using a specified one-step

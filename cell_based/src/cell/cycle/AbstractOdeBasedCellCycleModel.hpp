@@ -138,21 +138,21 @@ public:
      *
      * @return whether the cell is ready to divide (enter M phase).
      */
-    virtual bool ReadyToDivide();
+    bool ReadyToDivide() override;
 
     /**
      * For a naturally cycling model this does not need to be overridden in the
      * subclasses. But most models should override this function and then
      * call AbstractOdeBasedCellCycleModel::ResetForDivision() from inside their version.
      */
-    virtual void ResetForDivision();
+    void ResetForDivision() override;
 
     /**
      * Outputs cell cycle model parameters to file.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 CLASS_IS_ABSTRACT(AbstractOdeBasedCellCycleModel)

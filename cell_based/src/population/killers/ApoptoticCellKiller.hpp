@@ -82,7 +82,7 @@ public:
     /**
      * Loop over cells and call CheckAndLabelSingleCellForApoptosis() on each cell.
      */
-    virtual void CheckAndLabelCellsForApoptosisOrDeath();
+    void CheckAndLabelCellsForApoptosisOrDeath() override;
 
     /**
      * Overridden OutputCellKillerParameters() method.

@@ -322,7 +322,7 @@ public:
     /**
      * @return the number of Nodes in the mesh.
      */
-    virtual unsigned GetNumNodes() const;
+    unsigned GetNumNodes() const override;
 
     /**
      * @return the number of VertexElements in the mesh.
@@ -420,8 +420,8 @@ public:
      *
      * @return c_vector from location A to location B.
      */
-    virtual c_vector<double, SPACE_DIM> GetVectorFromAtoB(const c_vector<double, SPACE_DIM>& rLocationA,
-                                                          const c_vector<double, SPACE_DIM>& rLocationB);
+    c_vector<double, SPACE_DIM> GetVectorFromAtoB(const c_vector<double, SPACE_DIM>& rLocationA,
+                                                          const c_vector<double, SPACE_DIM>& rLocationB) override;
 
     /**
      * Get the volume (or area in 2D, or length in 1D) of an element.

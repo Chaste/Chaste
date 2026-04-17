@@ -302,7 +302,7 @@ public:
      * @param rJacobianDeterminant the determinant of the Jacobian matrix (returned)
      * @param rInverseJacobian the inverse Jacobian matrix (returned)
      */
-    virtual void GetInverseJacobianForElement(unsigned elementIndex, c_matrix<double, SPACE_DIM, ELEMENT_DIM>& rJacobian, double& rJacobianDeterminant, c_matrix<double, ELEMENT_DIM, SPACE_DIM>& rInverseJacobian) const;
+    void GetInverseJacobianForElement(unsigned elementIndex, c_matrix<double, SPACE_DIM, ELEMENT_DIM>& rJacobian, double& rJacobianDeterminant, c_matrix<double, ELEMENT_DIM, SPACE_DIM>& rInverseJacobian) const override;
 
     /**
      * Returns the weighted direction and the determinant of the Jacobian for a given element (via arguments).
@@ -320,7 +320,7 @@ public:
      * @param rWeightedDirection the weighted direction (returned)
      * @param rJacobianDeterminant the determinant of the Jacobian matrix (returned)
      */
-    virtual void GetWeightedDirectionForBoundaryElement(unsigned elementIndex, c_vector<double, SPACE_DIM>& rWeightedDirection, double& rJacobianDeterminant) const;
+    void GetWeightedDirectionForBoundaryElement(unsigned elementIndex, c_vector<double, SPACE_DIM>& rWeightedDirection, double& rJacobianDeterminant) const override;
 
     /**
      * Iterator over edges in the mesh.

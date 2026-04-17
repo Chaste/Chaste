@@ -111,10 +111,10 @@ public:
      *
      * @return whether the cell is ready to divide (enter M phase).
      */
-    virtual bool ReadyToDivide();
+    bool ReadyToDivide() override;
 
     /** See AbstractCellCycleModel::ResetForDivision() */
-    virtual void ResetForDivision();
+    void ResetForDivision() override;
 
     /**
      * Overridden InitialiseDaughterCell() method.
@@ -128,7 +128,7 @@ public:
      *
      * Calls SetCellCycleDuration() defined in child classes.
      */
-    virtual void Initialise();
+    void Initialise() override;
 
     /**
      * This method is implemented in Subclasses to set the cell cycle duration of the cell.

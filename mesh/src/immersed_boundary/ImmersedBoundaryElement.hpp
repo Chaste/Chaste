@@ -139,7 +139,7 @@ public:
      *
      * @return whether or not the element is on the boundary.
      */
-    virtual bool IsElementOnBoundary() const;
+    bool IsElementOnBoundary() const override;
 
     /** @param isBoundaryElement whether the element is on the boundary */
     void SetIsBoundaryElement(bool isBoundaryElement);

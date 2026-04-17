@@ -173,7 +173,7 @@ protected:
      * Check consistency of our internal data structures. Each node must
      * have a cell associated with it.
      */
-    virtual void Validate();
+    void Validate() override;
 
 public:
     /**
@@ -222,7 +222,7 @@ public:
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */
-    virtual TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* GetTetrahedralMeshForPdeModifier();
+    TetrahedralMesh<ELEMENT_DIM, SPACE_DIM>* GetTetrahedralMeshForPdeModifier() override;
 
     /** @return mUseAreaBasedDampingConstant. */
     bool UseAreaBasedDampingConstant();
@@ -270,7 +270,7 @@ public:
      *
      * @param rOutputFileHandler handler for the directory in which to open this file.
      */
-    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler);
+    void OpenWritersFiles(OutputFileHandler& rOutputFileHandler) override;
 
     /**
      * Remove all cells that are labelled as dead.
@@ -284,7 +284,7 @@ public:
      *
      * @return number of cells removed.
      */
-    virtual unsigned RemoveDeadCells();
+    unsigned RemoveDeadCells() override;
 
     /**
      * Overridden AddCell() method.
@@ -297,14 +297,14 @@ public:
      *
      * @return address of cell as it appears in the cell list (internal of this method uses a copy constructor along the way)
      */
-    virtual CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell);
+    CellPtr AddCell(CellPtr pNewCell, CellPtr pParentCell) override;
 
     /**
      * Overridden WriteResultsToFiles() method.
      *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
-    virtual void WriteResultsToFiles(const std::string& rDirectory);
+    void WriteResultsToFiles(const std::string& rDirectory) override;
 
     /**
      * A virtual method to accept a cell population writer so it can
@@ -312,7 +312,7 @@ public:
      *
      * @param pPopulationWriter the population writer.
      */
-    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter);
+    void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter) override;
 
     /**
      * A virtual method to accept a cell population count writer so it can
@@ -320,7 +320,7 @@ public:
      *
      * @param pPopulationCountWriter the population count writer.
      */
-    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter);
+    void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter) override;
 
     /**
      * A virtual method to accept a cell population event writer so it can
@@ -328,7 +328,7 @@ public:
      *
      * @param pPopulationEventWriter the population event writer.
      */
-    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationEventWriter);
+    void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationEventWriter) override;
 
     /**
      * A virtual method to accept a cell writer so it can
@@ -337,7 +337,7 @@ public:
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
      */
-    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell);
+    void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell) override;
 
     /**
      * Overridden Update(bool hasHadBirthsOrDeaths) method.
@@ -346,7 +346,7 @@ public:
      * @param hasHadBirthsOrDeaths - a bool saying whether cell population has had Births Or Deaths
      * not needed in this cell population class
      */
-    virtual void Update(bool hasHadBirthsOrDeaths=true);
+    void Update(bool hasHadBirthsOrDeaths=true) override;
 
     /**
      *  Tessellates when required: if areas or volumes are needed for
@@ -384,7 +384,7 @@ public:
      *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
-    virtual void WriteVtkResultsToFile(const std::string& rDirectory);
+    void WriteVtkResultsToFile(const std::string& rDirectory) override;
 
     /**
      * Overridden GetVolumeOfCell() method.
@@ -461,7 +461,7 @@ public:
      *
      * @param pVizSetupFile a visualization setup file
      */
-    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
+    void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile) override;
 
     /**
      * Iterator over edges in the mesh, which correspond to springs between cells.

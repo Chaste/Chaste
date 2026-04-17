@@ -131,14 +131,14 @@ public:
     /**
      * Here we solve the ODEs associated with the SRN.
      */
-    virtual void SimulateToCurrentTime();
+    void SimulateToCurrentTime() override;
 
      /**
      * For a naturally cycling model this does not need to be overridden in the
      * subclasses. But most models should override this function and then
      * call AbstractSrnModel::ResetForDivision() from inside their version.
      */
-    virtual void ResetForDivision();
+    void ResetForDivision() override;
 
     /**
      * Set mInitialConditions. Used in CreateSrnModel().
@@ -153,7 +153,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputSrnModelParameters(out_stream& rParamsFile);
+    void OutputSrnModelParameters(out_stream& rParamsFile) override;
 
     /**
      * Scales all ODE variables by factor theta. Used for example to scale model
@@ -161,7 +161,7 @@ public:
      *
      * @param theta factor by which to scale all ODE variables.
      */
-    virtual void ScaleSrnVariables(const double theta);
+    void ScaleSrnVariables(const double theta) override;
 };
 
 CLASS_IS_ABSTRACT(AbstractOdeSrnModel)

@@ -82,12 +82,12 @@ protected:
      * @param endTime  time to solve to
      * @param timeStep  dt
      */
-    virtual void InternalSolve(AbstractOdeSystem* pAbstractOdeSystem,
+    void InternalSolve(AbstractOdeSystem* pAbstractOdeSystem,
                                std::vector<double>& rCurrentYValues,
                                std::vector<double>& rWorkingMemory,
                                double startTime,
                                double endTime,
-                               double timeStep);
+                               double timeStep) override;
 
 public:
 

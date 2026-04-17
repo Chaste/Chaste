@@ -84,7 +84,7 @@ public:
      *
      * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
-    virtual void Visit([[maybe_unused]] MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+    void Visit([[maybe_unused]] MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation) override;
 
     /**
      * Visit the population and write the areas (or volume, in 3D) occupied by the

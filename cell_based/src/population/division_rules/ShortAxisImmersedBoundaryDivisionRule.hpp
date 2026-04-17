@@ -98,9 +98,9 @@ public:
      *
      * @return the division vector.
      */
-    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(
+    c_vector<double, SPACE_DIM> CalculateCellDivisionVector(
         CellPtr pParentCell,
-        ImmersedBoundaryCellPopulation<SPACE_DIM>& rCellPopulation);
+        ImmersedBoundaryCellPopulation<SPACE_DIM>& rCellPopulation) override;
 };
 
 #include "SerializationExportWrapper.hpp"

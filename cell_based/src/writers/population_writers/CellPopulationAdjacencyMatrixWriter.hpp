@@ -100,7 +100,7 @@ public:
      *
      * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
-    virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+    void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation) override;
 
     /**
      * Visit the population and write the adjacency matrix (as a long vector).

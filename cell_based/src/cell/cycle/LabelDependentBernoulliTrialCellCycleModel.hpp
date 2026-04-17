@@ -127,7 +127,7 @@ public:
      *
      * @return whether the cell is ready to divide.
      */
-    virtual bool ReadyToDivide();
+    bool ReadyToDivide() override;
 
     /**
      * Overridden builder method to create new instances of
@@ -198,7 +198,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 // Declare identifier for the serializer

@@ -289,7 +289,7 @@ public:
      * @param nextTime  when to simulate the cells until
      * @param updateVoltage (unused here)
      */
-    virtual void SolveCellSystems(Vec existingSolution, double time, double nextTime, bool updateVoltage = false);
+    void SolveCellSystems(Vec existingSolution, double time, double nextTime, bool updateVoltage = false) override;
 
     /**
      * Convenience method for intracellular conductivity tensors creation for the second cell

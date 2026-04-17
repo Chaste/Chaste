@@ -105,9 +105,9 @@ public:
      * @param pCell a cell
      * @param pCellPopulation a pointer to the cell population owning the cell
      */
-    virtual void VisitCell(
+    void VisitCell(
         CellPtr pCell,
-        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+        AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation) override;
 };
 
 #include "SerializationExportWrapper.hpp"

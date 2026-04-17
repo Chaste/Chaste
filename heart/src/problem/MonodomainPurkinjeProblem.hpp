@@ -81,7 +81,7 @@ protected:
     AbstractDynamicLinearPdeSolver<ELEMENT_DIM, SPACE_DIM, 2>* CreateSolver();
 
     /** Create suitable (MixedDimensionMesh) mesh for monodomain problems with Purkinje. */
-    virtual void CreateMeshFromHeartConfig();
+    void CreateMeshFromHeartConfig() override;
 
     /**
      *  Overridden method which creates initial condition using Purkinje initial voltages
@@ -118,7 +118,7 @@ public:
      * Define what variables are written to the primary results file.
      * @param extending  whether we are extending an existing results file
      */
-    virtual void DefineWriterColumns(bool extending);
+    void DefineWriterColumns(bool extending) override;
 
     /**
      * Write one timestep of output data to the primary results file.
@@ -127,7 +127,7 @@ public:
      * @param time  the current time
      * @param voltageVec  the solution vector to write
      */
-    virtual void WriteOneStep(double time, Vec voltageVec);
+    void WriteOneStep(double time, Vec voltageVec) override;
 
 };
 

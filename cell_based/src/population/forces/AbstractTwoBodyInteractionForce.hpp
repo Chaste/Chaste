@@ -134,7 +134,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputForceParameters(out_stream& rParamsFile);
+    void OutputForceParameters(out_stream& rParamsFile) override;
 
     /**
      * Overridden WriteDataToVisualizerSetupFile() method.
@@ -143,7 +143,7 @@ public:
      *
      * @param pVizSetupFile a visualization setup file
      */
-    virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
+    void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile) override;
 };
 
 #endif /*ABSTRACTTWOBODYINTERACTIONFORCE_HPP_*/

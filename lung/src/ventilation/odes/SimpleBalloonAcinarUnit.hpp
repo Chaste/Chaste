@@ -72,20 +72,20 @@ public:
      * @param tStart  beginning of the time interval to simulate
      * @param tEnd  end of the time interval to simulate
      */
-    virtual void SolveAndUpdateState(double tStart, double tEnd);
+    void SolveAndUpdateState(double tStart, double tEnd) override;
 
     /**
      * Simulate this acinar's behaviour between the time interval [tStart, tEnd],
      * with timestep #mDt. The flow into the acinus, and so its volume, are kept fixed.
      */
-    virtual void ComputeExceptFlow(double tStart, double tEnd);
+    void ComputeExceptFlow(double tStart, double tEnd) override;
 
     /**
      * Update the flow to the acinus across a time interval.
      * Note that this will update the acinus' volume and other
      * state variables.
      */
-    virtual void UpdateFlow(double tStart, double tEnd);
+    void UpdateFlow(double tStart, double tEnd) override;
 
 
     /** Set the air flow

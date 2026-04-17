@@ -181,7 +181,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellPopulationParameters(out_stream& rParamsFile);
+    void OutputCellPopulationParameters(out_stream& rParamsFile) override;
 
     /**
      * Overridden GetDefaultTimeStep() method.
@@ -193,7 +193,7 @@ public:
      * step can be reset by calling SetDt() on the simulation object used to
      * simulate the cell population.
      */
-    virtual double GetDefaultTimeStep();
+    double GetDefaultTimeStep() override;
 
     /**
      * Add an update rule to be used with this population.

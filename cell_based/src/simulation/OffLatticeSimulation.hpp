@@ -111,7 +111,7 @@ protected:
      *
      * Calculate forces and update node positions.
      */
-    virtual void UpdateCellLocationsAndTopology();
+    void UpdateCellLocationsAndTopology() override;
 
     /**
      * Sends nodes back to the positions given in the input map. Used after a failed step
@@ -131,12 +131,12 @@ protected:
     /**
      * Overridden SetupSolve() method to clear the forces applied to the nodes.
      */
-    virtual void SetupSolve();
+    void SetupSolve() override;
 
     /**
      * Overridden WriteVisualizerSetupFile() method.
      */
-    virtual void WriteVisualizerSetupFile();
+    void WriteVisualizerSetupFile() override;
 
 public:
 
@@ -215,7 +215,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputSimulationParameters(out_stream& rParamsFile);
+    void OutputSimulationParameters(out_stream& rParamsFile) override;
 
     /**
      * Directly access the forces attached to this simulation, to allow their manipulation after archiving.

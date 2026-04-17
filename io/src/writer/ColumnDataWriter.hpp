@@ -202,12 +202,12 @@ public:
     /**
      * End the define mode of the DataWriter.
      */
-    virtual void EndDefineMode();
+    void EndDefineMode() override;
 
     /**
      *  Dummy function for DoAdvanceAlongUnlimitedDimension.
      */
-    virtual void AdvanceAlongUnlimitedDimension();
+    void AdvanceAlongUnlimitedDimension() override;
 
     /**
      * Input the variable value to the output file or ancillary file.
@@ -217,12 +217,12 @@ public:
      * @param dimensionPosition  The position in column (defaults to -1). This is required if
      *      there is a fixed dimension, and will be the position along that dimension
      */
-    virtual void PutVariable(int variableID, double variableValue, long dimensionPosition = -1);
+    void PutVariable(int variableID, double variableValue, long dimensionPosition = -1) override;
 
     /**
      * Close any open files.
      */
-    virtual void Close();
+    void Close() override;
 
     /**
      * @return the full pathname of the directory where we're writing files.

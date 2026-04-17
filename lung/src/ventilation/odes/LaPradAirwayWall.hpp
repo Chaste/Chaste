@@ -64,7 +64,7 @@ public:
      *
      * @param dt  the timestep
      */
-    virtual void SetTimestep(double dt);
+    void SetTimestep(double dt) override;
 
     /**
      * Simulate this airway wall's behaviour between the time interval [tStart, tEnd],
@@ -73,22 +73,22 @@ public:
      * @param tStart  beginning of the time interval to simulate
      * @param tEnd  end of the time interval to simulate
      */
-    virtual void SolveAndUpdateState(double tStart, double tEnd);
+    void SolveAndUpdateState(double tStart, double tEnd) override;
 
     /**
      * @return the current value of the lumen radius.
      */
-    virtual double GetLumenRadius();
+    double GetLumenRadius() override;
 
     /** Set the air pressure
      * @param pressure new value
      */
-    virtual void SetAirwayPressure(double pressure);
+    void SetAirwayPressure(double pressure) override;
 
     /** Set the pleural pressure
      * @param pressure new value
      */
-    virtual void SetPleuralPressure(double pressure);
+    void SetPleuralPressure(double pressure) override;
 
     /**
      * @param RIn The parameter RIn

@@ -96,7 +96,7 @@ public:
      * @param time  time at which to return the stimulus
      * @return  Magnitude of stimulus at time 'time'.
      */
-     virtual double GetStimulus(double time);
+     double GetStimulus(double time) override;
 
      /**
       * Clear is responsible for managing the memory of

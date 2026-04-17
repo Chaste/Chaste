@@ -87,7 +87,7 @@ public:
 class DynamicSubclass : public DynamicBaseclass
 {
 public:
-    virtual int Method(int x)
+    int Method(int x) override
     {
         return x+1;
     }
@@ -99,7 +99,7 @@ public:
 class DynamicSubsubclass : public DynamicSubclass
 {
 public:
-    virtual int Method(int x)
+    int Method(int x) override
     {
         return x+2;
     }
@@ -111,7 +111,7 @@ public:
 class DynamicSubsubsubclass : public DynamicSubsubclass
 {
 public:
-    virtual int Method(int x)
+    int Method(int x) override
     {
         return x+3;
     }

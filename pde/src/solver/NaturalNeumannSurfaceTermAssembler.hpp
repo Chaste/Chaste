@@ -80,10 +80,10 @@ protected:
      * @param rPhi The basis functions, rPhi(i) = phi_i, i=1..numBases
      * @param rX The point in space
      */
-    virtual c_vector<double, PROBLEM_DIM*ELEMENT_DIM> ComputeVectorSurfaceTerm(
+    c_vector<double, PROBLEM_DIM*ELEMENT_DIM> ComputeVectorSurfaceTerm(
         const BoundaryElement<ELEMENT_DIM-1,SPACE_DIM>& rSurfaceElement,
         c_vector<double, ELEMENT_DIM>& rPhi,
-        ChastePoint<SPACE_DIM>& rX);
+        ChastePoint<SPACE_DIM>& rX) override;
 
 public:
     /**

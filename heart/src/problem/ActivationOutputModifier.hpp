@@ -115,12 +115,12 @@ public:
      * @param pVectorFactory  The vector factory which is associated with the calling problem's mesh
      * @param rNodePermutation The permutation associated with the calling problem's mesh (when running with parallel partitioning)
      */
-    virtual void InitialiseAtStart(DistributedVectorFactory* pVectorFactory, const std::vector<unsigned>& rNodePermutation);
+    void InitialiseAtStart(DistributedVectorFactory* pVectorFactory, const std::vector<unsigned>& rNodePermutation) override;
 
     /**
      * Finalise the modifier (write all results to the file)
      */
-    virtual void FinaliseAtEnd();
+    void FinaliseAtEnd() override;
 
     /**
      * Process a solution time-step (memorise all new activations)
@@ -128,7 +128,7 @@ public:
      * @param solution  A working copy of the solution at the current time-step.  This is the PETSc vector which is distributed across the processes.
      * @param problemDim  The calling problem dimension. Used here to avoid probing the size of the solution vector
      */
-    virtual void ProcessSolutionAtTimeStep(double time, Vec solution, unsigned problemDim);
+    void ProcessSolutionAtTimeStep(double time, Vec solution, unsigned problemDim) override;
 };
 
 #include "SerializationExportWrapper.hpp"

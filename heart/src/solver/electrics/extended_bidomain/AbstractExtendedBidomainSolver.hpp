@@ -130,7 +130,7 @@ protected:
      *  pinning nodes, using a null space, or using an "average phi_e = 0" row.
      *  @param existingSolution Solution at current time
      */
-    virtual void FinaliseLinearSystem(Vec existingSolution);
+    void FinaliseLinearSystem(Vec existingSolution) override;
 
 
     /**

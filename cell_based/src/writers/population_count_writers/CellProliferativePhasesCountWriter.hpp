@@ -100,7 +100,7 @@ public:
      *
      * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
-    virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+    void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation) override;
 
     /**
      * Visit the population and write the number of cells in the population that have each proliferative phase.

@@ -100,8 +100,8 @@ public:
      * @param rCellPopulation  The CA-based cell population
      * @return if the site is available.
      */
-    virtual bool IsRoomToDivide(CellPtr pParentCell,
-                                CaBasedCellPopulation<2>& rCellPopulation);
+    bool IsRoomToDivide(CellPtr pParentCell,
+                                CaBasedCellPopulation<2>& rCellPopulation) override;
 
     /**
      * Return the index for the Daughter node.
@@ -114,9 +114,9 @@ public:
      * @param rCellPopulation  The CA-based cell population
      * @return the node index for the daughter cell.
      */
-    virtual unsigned CalculateDaughterNodeIndex(CellPtr pNewCell,
+    unsigned CalculateDaughterNodeIndex(CellPtr pNewCell,
                                                 CellPtr pParentCell,
-                                                CaBasedCellPopulation<2>& rCellPopulation);
+                                                CaBasedCellPopulation<2>& rCellPopulation) override;
 };
 
 #include "SerializationExportWrapper.hpp"

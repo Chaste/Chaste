@@ -104,7 +104,7 @@ public:
      * @param numLocalRows the number of rows of the collection that this process should own.
      * @param isDimPeriodic whether the box collection should be periodic in the x y and/or z direction.
      */
-    virtual void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows = PETSC_DECIDE,  c_vector<bool,SPACE_DIM> isDimPeriodic = zero_vector<bool>(SPACE_DIM));
+    void SetUpBoxCollection(double cutOffLength, c_vector<double, 2*SPACE_DIM> domainSize, int numLocalRows = PETSC_DECIDE,  c_vector<bool,SPACE_DIM> isDimPeriodic = zero_vector<bool>(SPACE_DIM)) override;
 
     /**
      * Overridden GetVectorFromAtoB() method.

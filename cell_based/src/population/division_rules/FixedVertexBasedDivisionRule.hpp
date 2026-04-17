@@ -105,8 +105,8 @@ public:
      * @param rCellPopulation  The vertex-based cell population
      * @return mDivisionVector.
      */
-    virtual c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell,
-        VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation);
+    c_vector<double, SPACE_DIM> CalculateCellDivisionVector(CellPtr pParentCell,
+        VertexBasedCellPopulation<SPACE_DIM>& rCellPopulation) override;
 };
 
 #include "SerializationExportWrapper.hpp"

@@ -103,7 +103,7 @@ public:
      *
      * @param pCell pointer to the cell
      */
-    virtual void UpdateTargetAreaOfCell(const CellPtr pCell);
+    void UpdateTargetAreaOfCell(const CellPtr pCell) override;
 
     /**
      * @return #mGrowthDuration

@@ -179,7 +179,7 @@ public:
      * @param tStart  beginning of the time interval to simulate
      * @param tEnd  end of the time interval to simulate
      */
-    virtual void SolveAndUpdateState(double tStart, double tEnd);
+    void SolveAndUpdateState(double tStart, double tEnd) override;
 
     /**
      * Simulates this cell's behaviour between the time interval [tStart, tEnd],
@@ -190,7 +190,7 @@ public:
      * @param tSamp  sampling interval for returned results (defaults to #mDt)
      * @return solution object
      */
-    virtual OdeSolution Compute(double tStart, double tEnd, double tSamp=0.0);
+    OdeSolution Compute(double tStart, double tEnd, double tSamp=0.0) override;
 
     /**
      * Simulates this cell's behaviour between the time interval [tStart, tEnd],
@@ -199,7 +199,7 @@ public:
      * @param tStart  beginning of the time interval to simulate
      * @param tEnd  end of the time interval to simulate
      */
-    virtual void ComputeExceptVoltage(double tStart, double tEnd);
+    void ComputeExceptVoltage(double tStart, double tEnd) override;
 
     /** Set the transmembrane potential
      * @param voltage  new value

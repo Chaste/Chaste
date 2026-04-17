@@ -119,7 +119,7 @@ protected:
      * iterating in an appropriate way for this type of
      * cell population.
      */
-    virtual void AcceptCellWritersAcrossPopulation();
+    void AcceptCellWritersAcrossPopulation() override;
 
 public:
 
@@ -168,10 +168,10 @@ public:
      *         specified by its index in a tetrahedral mesh for use with a PDE modifier.
      * This method can be called by PDE modifier classes.
      */
-    virtual double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
+    double GetCellDataItemAtPdeNode(unsigned pdeNodeIndex,
                                             std::string& rVariableName,
                                             bool dirichletBoundaryConditionApplies=false,
-                                            double dirichletBoundaryValue=0.0);
+                                            double dirichletBoundaryValue=0.0) override;
 
     /**
      * Add a new cell to the cell population.
@@ -232,7 +232,7 @@ public:
      * @param pCell a cell
      * @return the set of neighbouring location indices.
      */
-    virtual std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell);
+    std::set<unsigned> GetNeighbouringLocationIndices(CellPtr pCell) override;
 
     /**
      * Checks whether a given node displacement violates the movement threshold
@@ -243,7 +243,7 @@ public:
      * @param rDisplacement Movement vector of the node at this time step
      * @param dt Current time step size
      */
-    virtual void CheckForStepSizeException(unsigned nodeIndex, c_vector<double,SPACE_DIM>& rDisplacement, double dt);
+    void CheckForStepSizeException(unsigned nodeIndex, c_vector<double,SPACE_DIM>& rDisplacement, double dt) override;
 
     /**
      * Overridden GetDampingConstant() method.
@@ -261,7 +261,7 @@ public:
      * @param nodeIndex the global index of this node
      * @return the damping constant at the Cell associated with this node
      */
-    virtual double GetDampingConstant(unsigned nodeIndex);
+    double GetDampingConstant(unsigned nodeIndex) override;
 
     /**
      * Find if a given node is a ghost node. The method always returns false
@@ -312,7 +312,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellPopulationParameters(out_stream& rParamsFile);
+    void OutputCellPopulationParameters(out_stream& rParamsFile) override;
 
     /**
      * Overridden GetDefaultTimeStep() method.
@@ -324,7 +324,7 @@ public:
      * step can be reset by calling SetDt() on the simulation object used to
      * simulate the cell population.
      */
-    virtual double GetDefaultTimeStep();
+    double GetDefaultTimeStep() override;
 };
 
 #endif /*ABSTRACTCENTREBASEDCELLPOPULATION_HPP_*/

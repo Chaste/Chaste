@@ -68,10 +68,10 @@ protected:
      * @return stencil vector
      */
 
-    virtual c_vector<double, 3*ELEMENT_DIM> ComputeVectorSurfaceTerm(
+    c_vector<double, 3*ELEMENT_DIM> ComputeVectorSurfaceTerm(
         const BoundaryElement<ELEMENT_DIM-1,SPACE_DIM> &rSurfaceElement,
         c_vector<double,ELEMENT_DIM> &rPhi,
-        ChastePoint<SPACE_DIM> &rX);
+        ChastePoint<SPACE_DIM> &rX) override;
 
 public:
     /**

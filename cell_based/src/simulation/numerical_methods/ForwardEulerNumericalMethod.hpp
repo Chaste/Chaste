@@ -93,7 +93,7 @@ public:
      *
      * @param rParamsFile Reference to the parameter output filestream
      */
-    virtual void OutputNumericalMethodParameters(out_stream& rParamsFile);
+    void OutputNumericalMethodParameters(out_stream& rParamsFile) override;
 };
 
 // Serialization for Boost >= 1.36

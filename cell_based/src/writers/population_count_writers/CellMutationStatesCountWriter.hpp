@@ -77,7 +77,7 @@ public:
      *
      * @param pCellPopulation a pointer to the population to be written.
      */
-    virtual void WriteHeader(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+    void WriteHeader(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation) override;
 
     /**
      * A general method for writing to any population.
@@ -102,7 +102,7 @@ public:
      *
      * @param pCellPopulation a pointer to the MeshBasedCellPopulation to visit.
      */
-    virtual void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation);
+    void Visit(MeshBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>* pCellPopulation) override;
 
     /**
      * Visit the population and write the number of cells in the population that have each mutation state.

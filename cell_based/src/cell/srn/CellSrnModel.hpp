@@ -157,25 +157,25 @@ public:
     /**
      * Initialize constituent SRN models.
      */
-    virtual void Initialise();
+    void Initialise() override;
 
     /**
      * Calls SRN model specific behaviour at the time of cell division.
      * All constituent SRNs models (edge and/or interior, if there are any) call their
      * implementation of this method.
      */
-    virtual void ResetForDivision();
+    void ResetForDivision() override;
 
     /**
      * Simulate SRN models.
      */
-    virtual void SimulateToCurrentTime();
+    void SimulateToCurrentTime() override;
 
     /**
      * Called in Cell::Divide()
      * @return
      */
-    virtual AbstractSrnModel* CreateSrnModel();
+    AbstractSrnModel* CreateSrnModel() override;
 
     /**
      * Adds a vector of SRN models to this cell.
@@ -232,7 +232,7 @@ public:
      *
      * @param pCell pointer to a Cell
      */
-    virtual void SetCell(CellPtr pCell);
+    void SetCell(CellPtr pCell) override;
 };
 
 // Declare identifier for the serializer

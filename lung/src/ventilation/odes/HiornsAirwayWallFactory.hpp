@@ -73,7 +73,7 @@ public:
      * @param pNode  Pointer to node object.
      * @return An airway wall object parameterised for this airway
      */
-    virtual HiornsAirwayWall* CreateAirwayWallForElement(Element<1,3>* pElement);
+    HiornsAirwayWall* CreateAirwayWallForElement(Element<1,3>* pElement) override;
 
     /**
      * Creates a new Hiorns airway wall.
@@ -133,12 +133,12 @@ public:
      * @param pNode Pointer to node object.
      * @return The pleural pressure at the given node at the given time
      */
-    virtual double GetPleuralPressureForAirway(double time, Element<1,3>* pElement);
+    double GetPleuralPressureForAirway(double time, Element<1,3>* pElement) override;
 
     /**
      * @param pMesh  the mesh for which to create acinar units.
      */
-    virtual void SetMesh(AbstractTetrahedralMesh<1,3>* pMesh);
+    void SetMesh(AbstractTetrahedralMesh<1,3>* pMesh) override;
 
 private:
     /** Walker to determine order of airway elements */

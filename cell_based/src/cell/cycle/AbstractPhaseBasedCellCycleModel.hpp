@@ -159,10 +159,10 @@ public:
      *
      * @return whether the cell is ready to divide (enter M phase).
      */
-    virtual bool ReadyToDivide();
+    bool ReadyToDivide() override;
 
     /** See AbstractCellCycleModel::ResetForDivision() */
-    virtual void ResetForDivision();
+    void ResetForDivision() override;
 
     /**
      * Set the phase the cell-cycle model is currently in. This method is called
@@ -254,13 +254,13 @@ public:
      * @return the typical cell cycle duration for a transit cell, in hours.
      * This method is overridden in some subclasses.
      */
-    virtual double GetAverageTransitCellCycleTime();
+    double GetAverageTransitCellCycleTime() override;
 
     /**
      * @return the typical cell cycle duration for a stem cell, in hours.
      * This method is overridden in some subclasses.
      */
-    virtual double GetAverageStemCellCycleTime();
+    double GetAverageStemCellCycleTime() override;
 
     /**
      * @return mMinimumGapDuration

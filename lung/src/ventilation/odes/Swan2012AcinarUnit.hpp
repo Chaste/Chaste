@@ -75,7 +75,7 @@ public:
      * @param tStart  beginning of the time interval to simulate
      * @param tEnd  end of the time interval to simulate
      */
-    virtual void SolveAndUpdateState(double tStart, double tEnd);
+    void SolveAndUpdateState(double tStart, double tEnd) override;
 
     /**
      * Simulate this acinar's behaviour between the time interval [tStart, tEnd],
@@ -84,7 +84,7 @@ public:
      * @param tStart The starting time
      * @param tEnd The ending time
      */
-    virtual void ComputeExceptFlow(double tStart, double tEnd);
+    void ComputeExceptFlow(double tStart, double tEnd) override;
 
     /**
      * Update the flow to the acinus across a time interval.
@@ -94,7 +94,7 @@ public:
      * @param tStart The starting time
      * @param tEnd The ending time
      */
-    virtual void UpdateFlow(double tStart, double tEnd);
+    void UpdateFlow(double tStart, double tEnd) override;
 
 
     /** Set the air flow

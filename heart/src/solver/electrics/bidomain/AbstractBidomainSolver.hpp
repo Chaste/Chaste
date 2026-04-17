@@ -122,7 +122,7 @@ protected:
      *
      *  @param existingSolution Solution at current time
      */
-    virtual void FinaliseLinearSystem(Vec existingSolution);
+    void FinaliseLinearSystem(Vec existingSolution) override;
 
     /**
      *  @return null basis vector

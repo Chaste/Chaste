@@ -120,7 +120,7 @@ protected:
      * Calls #AcceptCellWriter across the whole population,
      * iterating in an appropriate way to skip ghost nodes.
      */
-    virtual void AcceptCellWritersAcrossPopulation();
+    void AcceptCellWritersAcrossPopulation() override;
 
 public:
 
@@ -168,7 +168,7 @@ public:
      *
      * This method is called by AbstractGrowingDomainPdeModifier.
      */
-    virtual TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier();
+    TetrahedralMesh<DIM, DIM>* GetTetrahedralMeshForPdeModifier() override;
 
     /**
      * Overridden GetNeighbouringLocationIndices() method.
@@ -256,14 +256,14 @@ public:
      *
      * @param rOutputFileHandler handler for the directory in which to open this file.
      */
-    virtual void OpenWritersFiles(OutputFileHandler& rOutputFileHandler);
+    void OpenWritersFiles(OutputFileHandler& rOutputFileHandler) override;
 
     /**
      * Overridden WriteVtkResultsToFile() method.
      *
      * @param rDirectory  pathname of the output directory, relative to where Chaste output is stored
      */
-    virtual void WriteVtkResultsToFile(const std::string& rDirectory);
+    void WriteVtkResultsToFile(const std::string& rDirectory) override;
 
     /**
      * Outputs CellPopulation parameters to file

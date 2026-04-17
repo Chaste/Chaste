@@ -89,7 +89,7 @@ public:
      *
      * @param rCellPopulation reference to the cell population
      */
-    virtual void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+    void UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation) override;
 
     /**
      * Overridden SetupSolve() method.
@@ -99,7 +99,7 @@ public:
      * @param rCellPopulation reference to the cell population
      * @param outputDirectory the output directory, relative to where Chaste output is stored
      */
-    virtual void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory);
+    void SetupSolve(AbstractCellPopulation<DIM,DIM>& rCellPopulation, std::string outputDirectory) override;
 
     /**
      * Get the reference target area.
@@ -138,7 +138,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputSimulationModifierParameters(out_stream& rParamsFile);
+    void OutputSimulationModifierParameters(out_stream& rParamsFile) override;
 };
 
 TEMPLATED_CLASS_IS_ABSTRACT_1_UNSIGNED(AbstractTargetAreaModifier)

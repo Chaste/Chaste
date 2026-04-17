@@ -88,7 +88,7 @@ public:
      * @param time  the current simulation time
      * @return the new value for the quantity which is being modified
      */
-    virtual double Calc(double param, double time);
+    double Calc(double param, double time) override;
 };
 
 #include "SerializationExportWrapper.hpp"

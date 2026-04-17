@@ -207,7 +207,7 @@ public:
      * @param time at which to calculate the Jacobian.
      * @param timeStep used to calculate the Jacobian.
      */
-    virtual void AnalyticJacobian(const std::vector<double>& rSolutionGuess, double** jacobian, double time, double timeStep);
+    void AnalyticJacobian(const std::vector<double>& rSolutionGuess, double** jacobian, double time, double timeStep) override;
 };
 
 // Declare identifier for the serializer

@@ -97,7 +97,7 @@ public:
      *
      * @param rParamsFile a file stream
      */
-    virtual void OutputUpdateRuleParameters(out_stream& rParamsFile);
+    void OutputUpdateRuleParameters(out_stream& rParamsFile) override;
 };
 
 #endif /*ABSTRACTPOTTSUPDATERULE_HPP_*/

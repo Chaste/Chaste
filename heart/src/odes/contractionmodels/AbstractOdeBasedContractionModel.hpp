@@ -90,7 +90,7 @@ public:
      *  @param endTime end time
      *  @param timeStep timestep for integrating ODEs
      */
-    virtual void RunDoNotUpdate(double startTime, double endTime, double timeStep)
+    void RunDoNotUpdate(double startTime, double endTime, double timeStep) override
     {
         // save the state variables
         if (mTemporaryStateVariables.size() > 0)

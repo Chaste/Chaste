@@ -140,12 +140,12 @@ public:
     /**
      * Overridden UpdateCellCyclePhase() method.
      */
-    virtual void UpdateCellCyclePhase();
+    void UpdateCellCyclePhase() override;
 
     /**
      * Overridden InitialiseDaughterCell() method.
      */
-    virtual void InitialiseDaughterCell();
+    void InitialiseDaughterCell() override;
 
     /**
      * Overridden builder method to create new copies of
@@ -153,7 +153,7 @@ public:
      *
      * @return the new cell-cycle model
      */
-    virtual AbstractCellCycleModel* CreateCellCycleModel();
+    AbstractCellCycleModel* CreateCellCycleModel() override;
 
     /**
      * @return mUseCellProliferativeTypeDependentG1Duration
@@ -171,7 +171,7 @@ public:
      * Overridden CanCellTerminallyDifferentiate() method.
      * @return whether cell can terminally differentiate
      */
-    virtual bool CanCellTerminallyDifferentiate();
+    bool CanCellTerminallyDifferentiate() override;
 
     /**
      * @return mWntStemThreshold
@@ -214,7 +214,7 @@ public:
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
-    virtual void OutputCellCycleModelParameters(out_stream& rParamsFile);
+    void OutputCellCycleModelParameters(out_stream& rParamsFile) override;
 };
 
 #include "SerializationExportWrapper.hpp"

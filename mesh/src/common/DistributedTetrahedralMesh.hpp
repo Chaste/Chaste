@@ -163,7 +163,7 @@ public:
      *
      * @param rMeshReader the mesh reader
      */
-    virtual void ConstructFromMeshReader(AbstractMeshReader<ELEMENT_DIM,SPACE_DIM>& rMeshReader);
+    void ConstructFromMeshReader(AbstractMeshReader<ELEMENT_DIM,SPACE_DIM>& rMeshReader) override;
 
     /**
      * @return the number of nodes that are entirely owned by the local process.
@@ -295,7 +295,7 @@ public:
      * @param yFactor is the scale in the y-direction (defaults to 1.0)
      * @param zFactor is the scale in the z-direction (defaults to 1.0)
      */
-    virtual void Scale(const double xFactor=1.0, const double yFactor=1.0, const double zFactor=1.0);
+    void Scale(const double xFactor=1.0, const double yFactor=1.0, const double zFactor=1.0) override;
 
     /**
      * @return the local pointer to a node which is
@@ -315,7 +315,7 @@ public:
      * @return The minimum and maximum co-ordinates of any node in each dimension
      *
      */
-    virtual ChasteCuboid<SPACE_DIM> CalculateBoundingBox() const;
+    ChasteCuboid<SPACE_DIM> CalculateBoundingBox() const override;
 
     /** GetNearestNodeIndex iterates through all nodes in the mesh and returns the global index
       * with the smallest distance to the provided point.
@@ -325,7 +325,7 @@ public:
       * @param rTestPoint reference to the point
       * @return node index
       */
-    virtual unsigned GetNearestNodeIndex(const ChastePoint<SPACE_DIM>& rTestPoint);
+    unsigned GetNearestNodeIndex(const ChastePoint<SPACE_DIM>& rTestPoint) override;
 
     /**
      * Computes the minimum and maximum lengths of the edges in the mesh.
@@ -335,7 +335,7 @@ public:
      * @return The minimum and maximum edge lengths in the mesh
      *
      */
-    virtual c_vector<double, 2> CalculateMinMaxEdgeLengths();
+    c_vector<double, 2> CalculateMinMaxEdgeLengths() override;
 
     /**
      * Do a general mesh rotation with a positive determinant orthonormal rotation matrix.
