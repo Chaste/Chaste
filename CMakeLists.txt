@@ -447,6 +447,11 @@ if (Chaste_USE_VTK)
     add_definitions (-DCHASTE_VTK)
 endif ()
 
+################################
+####  Find OpenMP
+################################
+find_package(OpenMP REQUIRED)
+target_link_libraries(Chaste_COMMON_DEPS INTERFACE OpenMP::OpenMP_CXX)
 
 ################################
 ####  Find Boost
