@@ -33,17 +33,13 @@ jobs:
             extra-build-args: ""
           - image: portability-jammy
             extra-build-args: ""
-          - image: portability-lunar
-            extra-build-args: ""
-          - image: portability-mantic
-            extra-build-args: ""
           - image: portability-noble
-            extra-build-args: ""
-          - image: portability-oracular
             extra-build-args: ""
           - image: portability-plucky
             extra-build-args: ""
           - image: portability-questing
+            extra-build-args: ""
+          - image: portability-resolute
             extra-build-args: ""
 
     runs-on: ubuntu-latest
