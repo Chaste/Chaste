@@ -55,7 +55,6 @@ jobs:
     - name: run infrastructure checks
       run: cmake --build . --target infrastructure
       working-directory: chaste-build-dir
-      working-directory: chaste-build-dir
 
     - name: run check for tabs and trailing whitespace
       run: |
