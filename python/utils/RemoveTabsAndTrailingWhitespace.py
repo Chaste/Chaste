@@ -43,46 +43,42 @@ from pathlib import Path
 
 # List of files to include, and the number of spaces to replace tabs with (None means ignore tabs)
 include_filenames: dict[str, str] = {
-    'CMakeLists.txt': ' ' * 4,
-    'Makefile': None,
+    '.clang-format': None,
+    '.clang-tidy': None,
     '.gitignore': None,
+    'CITATION.cff': ' ' * 2,
+    'CMakeLists.txt': ' ' * 4,
+    'ChasteBuildInfo_cmake.cpp.in': ' ' * 4,
+    'ChasteConfig.cmake.in': ' ' * 4,
     'Dockerfile': None,
     'Doxyfile': None,
-    'ChasteConfig.cmake.in': ' ' * 4,
-    'ChasteBuildInfo_cmake.cpp.in': ' ' * 4,
-    'Version.cpp.in': ' ' * 4,
-    'CITATION.cff': ' ' * 2,
+    'Makefile': None,
     'README': ' ' * 4,
-    '.clang-tidy': None,
-    '.clang-format': None,
+    'Version.cpp.in': ' ' * 4,
 }
 
 # List of file extensions to include, and the number of spaces to replace tabs with (None means ignore tabs)
 include_extensions: dict[str, str] = {
-    '.hpp': ' ' * 4,
-    '.cpp': ' ' * 4,
-    '.py': ' ' * 4,
-    '.ipynb': ' ' * 4,
-    '.md': ' ' * 4,
+    '.cellml': 3,
+    '.cfg': None,
     '.cmake': ' ' * 4,
-    '.xml': ' ' * 4,
+    '.cpp': ' ' * 4,
+    '.hpp': ' ' * 4,
+    '.ipynb': ' ' * 4,
+    '.java': ' ' * 4,
     '.json': ' ' * 4,
-    '.yml': ' ' * 2,
-    '.yaml': ' ' * 2,
-    '.rst': ' ' * 4,
+    '.m': ' ' * 3,
+    '.md': ' ' * 4,
+    '.py': ' ' * 4,
     '.rst': ' ' * 4,
     '.sh': ' ' * 2,
-    '.xsd': ' ' * 2,
-    '.m': ' ' * 3,
-    '.java': ' ' * 4,
-    '.txt': None,
-    '.cellml': 3,
-    '.cellml': 3,
     '.toml': None,
-    '.cfg': None,
+    '.txt': None,
+    '.xml': ' ' * 4,
+    '.xsd': ' ' * 2,
+    '.yaml': ' ' * 2,
+    '.yml': ' ' * 2,
 }
-
-
 
 dir_ignores = ['cxxtest', 'docs', 'data', 'third_party_libs', '3rdparty', 'external', 'texttest']
 
