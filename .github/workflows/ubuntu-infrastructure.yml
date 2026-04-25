@@ -60,7 +60,7 @@ jobs:
       run: |
         cmake --build . --target infrastructure_whitespace
         if ! git diff --quiet --exit-code; then
-          echo 
+          echo
           echo "Error: check for tabs and trailing whitespace failed."
           echo "Run python/infra/RemoveTabsAndTrailingWhitespace.py and commit the results."
           echo "The following files have problems:"
