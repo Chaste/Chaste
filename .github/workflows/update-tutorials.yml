@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  
+
   generate-tutorial-markdown:
     runs-on: ubuntu-latest
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}

@@ -308,7 +308,7 @@
     </xs:annotation>
     <xs:attribute name="node_number" type="xs:nonNegativeInteger" use="required"/>
   </xs:complexType>
-  
+
   <xs:simpleType name="media_type">
     <xs:annotation>
       <xs:documentation>The conductivity media of the tissue. This is taken from an enumeration:
@@ -468,7 +468,7 @@
       <xs:documentation>Defines a heterogeneity in a set of cells in a given location (cuboid or
         transmural layer). This heterogeneity is defined by scaling certain (potassium) currents
         from their CellML default values.
-        
+
         As of version 2.1 of Chaste, any named parameter in the CellML file may also be modified within
         a defined region.  Named parameters are those annotated with a pycml:modifiable-parameter=yes
         RDF annotation.  The name of the parameter is the cmeta:id of the annotated variable.</xs:documentation>
@@ -478,7 +478,7 @@
         <xs:annotation>
           <xs:documentation>Scales the Gks slow delayed rectifier potassium current. (A value of 1.0
             will reset to the default value in the CellML definition.)
-            
+
             This heterogeneity is only supported for some cell models:
             either those with a parameter named ScaleFactorGks, or with
             support hardcoded into Chaste.</xs:documentation>
@@ -488,7 +488,7 @@
         <xs:annotation>
           <xs:documentation>Scales the Ito transient outward potassium current. (A value of 1.0 will
             reset to the default value in the CellML definition.)
-            
+
             This heterogeneity is only supported for some cell models:
             either those with a parameter named ScaleFactorIto, or with
             support hardcoded into Chaste.</xs:documentation>
@@ -498,7 +498,7 @@
         <xs:annotation>
           <xs:documentation>Scales the Gkr rapid delayed rectifier potassium current. (A value of
             1.0 will reset to the default value in the CellML definition.)
-            
+
             This heterogeneity is only supported for some cell models:
             either those with a parameter named ScaleFactorGkr, or with
             support hardcoded into Chaste.</xs:documentation>
@@ -801,14 +801,14 @@
       <xs:enumeration value="cg"/>
       <xs:enumeration value="symmlq"/>
       <xs:enumeration value="gmres"/>
-      <xs:enumeration value="chebychev"/>      
+      <xs:enumeration value="chebychev"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="ksp_preconditioner_type">
     <xs:annotation>
-      <xs:documentation>Type of KSP preconditioner to use. It can specified as jacobi (jaccobi), 
-        block jacobi (bjacobi), algebraic multigrid (hypre), multi-level preconditioning (ml), 
-        sparse approximate inverse preconditioner (spai), block diagonal (blockdiagonal), 
+      <xs:documentation>Type of KSP preconditioner to use. It can specified as jacobi (jaccobi),
+        block jacobi (bjacobi), algebraic multigrid (hypre), multi-level preconditioning (ml),
+        sparse approximate inverse preconditioner (spai), block diagonal (blockdiagonal),
         ldu factorization (ldufactorization), two levels block diagonal (twolevelsblockdiagonal)
         or no preconditioner (none).
         Note that some of these may only work if you have compiled PETSc with support for them
@@ -827,7 +827,7 @@
       <xs:enumeration value="none"/>
     </xs:restriction>
   </xs:simpleType>
-  
+
   <xs:simpleType name="mesh_partitioning_type">
     <xs:annotation>
       <xs:documentation>The method to use when partitioning a mesh for parallel simulation.</xs:documentation>
@@ -839,7 +839,7 @@
       <xs:enumeration value="petsc"/>
     </xs:restriction>
   </xs:simpleType>
-  
+
   <xs:complexType name="checkpoint_type">
     <xs:annotation>
       <xs:documentation>Type for specification of a checkpoint in a simulation. It stores
@@ -1040,7 +1040,7 @@ Note that in parallel the output meshes may be renumbered from the original inpu
             It stores information on how frequently to checkpoint (timestep),
             and the maximum number of checkpoints to keep on disk.
             Note that the checkpoint timestep should be a multiple of the printing step.
-            
+
             See the release notes for more information on checkpointing.
           </xs:documentation>
         </xs:annotation>
@@ -1206,7 +1206,7 @@ situations.  See https://chaste.github.io/docs/user-guides/state-variable-interp
           <xs:documentation>Optional list of requests for conduction velocities at each mesh node for a given source node.</xs:documentation>
         </xs:annotation>
       </xs:element>
-      
+
       <xs:element name="TimeTraceAtNode" type="node_number_type" minOccurs="0"
         maxOccurs="unbounded">
         <xs:annotation>
@@ -1215,7 +1215,7 @@ situations.  See https://chaste.github.io/docs/user-guides/state-variable-interp
           results may or may not correspond to the original numbering  </xs:documentation>
         </xs:annotation>
       </xs:element>
-      
+
       <xs:element name="PseudoEcgElectrodePosition" type="point_type" minOccurs="0" maxOccurs="unbounded">
         <xs:annotation>
           <xs:documentation>Optional list of requests to calculate a pseudo-ECG using an electrode at the given position.</xs:documentation>

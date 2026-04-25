@@ -6,11 +6,11 @@ on:
       - none
 
 jobs:
-  
+
   build-and-test:
     name: Test on macOS 10.15
     runs-on: macos-latest
-    
+
     steps:
 
     - uses: actions/checkout@v4

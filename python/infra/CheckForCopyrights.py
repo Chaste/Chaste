@@ -248,9 +248,9 @@ def InspectFile(fileName):
         CheckForCopyrightNotice(triangle_notice, file_in) or
         CheckForCopyrightNotice(tetgen_predicates_notice, file_in) or
         CheckForCopyrightNotice(tetgen_notice, file_in) or
-        CheckForCopyrightNotice(py_lgpl_notice, file_in) or 
-        CheckForCopyrightNotice(opensimplex_notice, file_in) or 
-        CheckForCopyrightNotice(smtk_notice, file_in) or 
+        CheckForCopyrightNotice(py_lgpl_notice, file_in) or
+        CheckForCopyrightNotice(opensimplex_notice, file_in) or
+        CheckForCopyrightNotice(smtk_notice, file_in) or
         CheckForCopyrightNotice(dolfinx_notice, file_in)):
         # print('Found 3rd party notice in %s' % file_name)
         if valid_notice:
