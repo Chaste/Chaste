@@ -108,7 +108,7 @@ cpp_current_notice = '/*\n\n'+current_notice+'\n*/'
 
 
 def AddHashesToBeginningOfLines(message):
-    message = '# ' + message.replace("\n", "\n# ")
+    message = ('# ' + message.replace("\n", "\n# ")).replace("\n# \n", "\n#\n")
     return message[:-2]
 
 
