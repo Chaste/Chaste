@@ -33,7 +33,7 @@ jobs:
         run: echo "datetime=$(date +%Y-%m-%d_%H-%M-%S)" >> $GITHUB_OUTPUT
 
       - name: checkout Chaste
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: Chaste/Chaste
           path: Chaste
@@ -81,7 +81,7 @@ jobs:
         if: always()
 
       - name: upload profile artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: profile-files
           path: ${{ env.CHASTE_BUILD_DIR }}/profile
@@ -102,13 +102,13 @@ jobs:
     steps:
 
       - name: download profile artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: profile-files
           path: ./profile
 
       - name: checkout profiling-gprof
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: Chaste/profiling-gprof
           path: profiling-gprof
@@ -121,7 +121,7 @@ jobs:
           cp ./profile/* ${GPROF_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}/
 
       - name: setup python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.x'
 
