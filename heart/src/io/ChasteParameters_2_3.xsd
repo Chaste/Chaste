@@ -507,7 +507,7 @@
       <xs:documentation>Defines a heterogeneity in a set of cells in a given location (cuboid or
         transmural layer). This heterogeneity is defined by scaling certain (potassium) currents
         from their CellML default values.
-
+        
         As of version 2.1 of Chaste, any named parameter in the CellML file may also be modified within
         a defined region.  Named parameters are those annotated with a pycml:modifiable-parameter=yes
         RDF annotation.  The name of the parameter is the cmeta:id of the annotated variable.</xs:documentation>
@@ -517,7 +517,7 @@
         <xs:annotation>
           <xs:documentation>Scales the Gks slow delayed rectifier potassium current. (A value of 1.0
             will reset to the default value in the CellML definition.)
-
+            
             This heterogeneity is only supported for some cell models:
             either those with a parameter named ScaleFactorGks, or with
             support hardcoded into Chaste.</xs:documentation>
@@ -527,7 +527,7 @@
         <xs:annotation>
           <xs:documentation>Scales the Ito transient outward potassium current. (A value of 1.0 will
             reset to the default value in the CellML definition.)
-
+            
             This heterogeneity is only supported for some cell models:
             either those with a parameter named ScaleFactorIto, or with
             support hardcoded into Chaste.</xs:documentation>
@@ -537,7 +537,7 @@
         <xs:annotation>
           <xs:documentation>Scales the Gkr rapid delayed rectifier potassium current. (A value of
             1.0 will reset to the default value in the CellML definition.)
-
+            
             This heterogeneity is only supported for some cell models:
             either those with a parameter named ScaleFactorGkr, or with
             support hardcoded into Chaste.</xs:documentation>
@@ -845,9 +845,9 @@
   </xs:simpleType>
   <xs:simpleType name="ksp_preconditioner_type">
     <xs:annotation>
-      <xs:documentation>Type of KSP preconditioner to use. It can specified as jacobi (jaccobi),
-        block jacobi (bjacobi), algebraic multigrid (hypre), multi-level preconditioning (ml),
-        sparse approximate inverse preconditioner (spai), block diagonal (blockdiagonal),
+      <xs:documentation>Type of KSP preconditioner to use. It can specified as jacobi (jaccobi), 
+        block jacobi (bjacobi), algebraic multigrid (hypre), multi-level preconditioning (ml), 
+        sparse approximate inverse preconditioner (spai), block diagonal (blockdiagonal), 
         ldu factorization (ldufactorization), two levels block diagonal (twolevelsblockdiagonal)
         or no preconditioner (none).
         Note that some of these may only work if you have compiled PETSc with support for them
@@ -1079,7 +1079,7 @@ Note that in parallel the output meshes may be renumbered from the original inpu
             It stores information on how frequently to checkpoint (timestep),
             and the maximum number of checkpoints to keep on disk.
             Note that the checkpoint timestep should be a multiple of the printing step.
-
+            
             See the release notes for more information on checkpointing.
           </xs:documentation>
         </xs:annotation>

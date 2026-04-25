@@ -855,7 +855,7 @@ Note that in parallel the output meshes may be renumbered from the original inpu
             It stores information on how frequently to checkpoint (timestep),
             and the maximum number of checkpoints to keep on disk.
             Note that the checkpoint timestep should be a multiple of the printing step.
-
+            
             See the release notes for more information on checkpointing.
           </xs:documentation>
         </xs:annotation>

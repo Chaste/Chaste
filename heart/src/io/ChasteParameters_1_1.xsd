@@ -8,54 +8,54 @@
         </xs:extension>
       </xs:simpleContent>
   </xs:complexType>
-
+  
   <xs:complexType name="dimensionless_type">
       <xs:simpleContent>
-          <xs:extension base="xs:decimal">
+          <xs:extension base="xs:decimal">        
           <xs:attribute name="unit" type="xs:string" use="required" fixed="dimensionless"/>
-        </xs:extension>
+        </xs:extension>    
       </xs:simpleContent>
   </xs:complexType>
-
+  
   <xs:complexType name="conductivity_type">
       <xs:simpleContent>
-          <xs:extension base="xs:decimal">
+          <xs:extension base="xs:decimal">        
           <xs:attribute name="unit" type="xs:string" use="required" fixed="mS/cm"/>
-        </xs:extension>
+        </xs:extension>    
       </xs:simpleContent>
   </xs:complexType>
-
+  
   <xs:complexType name="stimulus_strength_type">
       <xs:simpleContent>
-          <xs:extension base="xs:decimal">
+          <xs:extension base="xs:decimal">        
           <xs:attribute name="unit" type="xs:string" use="required" fixed="uA/cm^3"/>
-        </xs:extension>
+        </xs:extension>    
       </xs:simpleContent>
   </xs:complexType>
-
+  
   <xs:complexType name="inverse_length_type">
       <xs:simpleContent>
-          <xs:extension base="xs:decimal">
+          <xs:extension base="xs:decimal">        
           <xs:attribute name="unit" type="xs:string" use="required" fixed="1/cm"/>
-        </xs:extension>
+        </xs:extension>    
       </xs:simpleContent>
   </xs:complexType>
-
+  
   <xs:complexType name="capacitance_type">
       <xs:simpleContent>
-          <xs:extension base="xs:decimal">
+          <xs:extension base="xs:decimal">        
           <xs:attribute name="unit" type="xs:string" use="required" fixed="uF/cm^2"/>
-        </xs:extension>
+        </xs:extension>    
       </xs:simpleContent>
   </xs:complexType>
-
+  
   <xs:complexType name="location_type">
       <xs:choice>
       <xs:element name="Cuboid" type="box_type"/>
     </xs:choice>
     <xs:attribute name="unit" type="xs:string" use="required" fixed="cm"/>
   </xs:complexType>
-
+  
   <xs:simpleType name="domain_type">
     <xs:restriction base="xs:string">
       <xs:enumeration value="Mono"/>
@@ -90,26 +90,26 @@
         <xs:element name="Region" type="ionic_model_region_type" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
-
+  
   <xs:complexType name="apd_map_type">
     <xs:attribute name="repolarisation_percentage" type="xs:double" use="required"/>
     <xs:attribute name="threshold" type="xs:double" use="required"/>
     <xs:attribute name="threshold_unit" type="xs:string" use="required" fixed="mV"/>
   </xs:complexType>
-
+  
   <xs:complexType name="upstrokes_map_type">
     <xs:attribute name="threshold" type="xs:double" use="required"/>
     <xs:attribute name="threshold_unit" type="xs:string" use="required" fixed="mV"/>
   </xs:complexType>
-
-  <!-- Type with no content or attributes -->
+    
+  <!-- Type with no content or attributes -->    
   <xs:complexType name="empty_type">
   </xs:complexType>
-
+  
   <xs:complexType name="conduction_velocity_map_type">
     <xs:attribute name="origin_node" type="xs:nonNegativeInteger" use="required"/>
   </xs:complexType>
-
+  
   <xs:simpleType name="media_type">
     <xs:restriction base="xs:string">
       <xs:enumeration value="Orthotropic"/>
@@ -117,20 +117,20 @@
       <xs:enumeration value="NoFibreOrientation"/>
     </xs:restriction>
   </xs:simpleType>
-
+  
   <xs:complexType name="point_type">
     <xs:attribute name="x" type="xs:double" use="required"/>
     <xs:attribute name="y" type="xs:double" use="required"/>
     <xs:attribute name="z" type="xs:double" use="required"/>
   </xs:complexType>
-
+  
   <xs:complexType name="box_type">
     <xs:sequence>
       <xs:element name="LowerCoordinates" type="point_type"/>
       <xs:element name="UpperCoordinates" type="point_type"/>
     </xs:sequence>
   </xs:complexType>
-
+  
   <xs:complexType name="stimulus_type">
     <xs:sequence>
       <xs:element name="Strength" type="stimulus_strength_type"/>
@@ -150,7 +150,7 @@
   </xs:complexType>
 
   <xs:complexType name="conductivity_heterogeneity_type">
-    <xs:all>
+    <xs:all>      
       <xs:element name="IntracellularConductivities" type="conductivities_type" minOccurs="0"/>
       <xs:element name="ExtracellularConductivities" type="conductivities_type" minOccurs="0"/>
       <xs:element name="Location" type="location_type"/>
@@ -169,12 +169,12 @@
     <xs:attribute name="y" type="xs:double" use="required"/>
     <xs:attribute name="inter_node_space" type="xs:double" use="required"/>
   </xs:complexType>
-
+  
   <xs:complexType name="fibre_type">
     <xs:attribute name="x" type="xs:double" use="required"/>
     <xs:attribute name="inter_node_space" type="xs:double" use="required"/>
   </xs:complexType>
-
+  
   <xs:complexType name="load_mesh_type">
       <xs:attribute name="name" type="xs:string" use="required"/>
       <xs:attribute name="conductivity_media" type="media_type" use="required"/>
@@ -190,18 +190,18 @@
     </xs:choice>
     <xs:attribute name="unit" type="xs:string" use="required" fixed="cm"/>
   </xs:complexType>
-
+  
   <xs:complexType name="conductivities_type">
     <xs:attribute name="longi" type="xs:double" use="required"/>
     <xs:attribute name="trans" type="xs:double" use="required"/>
-    <xs:attribute name="normal" type="xs:double" use="required"/>
+    <xs:attribute name="normal" type="xs:double" use="required"/>  
     <xs:attribute name="unit" type="xs:string" use="required" fixed="mS/cm"/>
   </xs:complexType>
 
   <xs:complexType name="time_steps_type">
     <xs:attribute name="ode" type="xs:double" use="required"/>
     <xs:attribute name="pde" type="xs:double" use="required"/>
-    <xs:attribute name="printing" type="xs:double" use="required"/>
+    <xs:attribute name="printing" type="xs:double" use="required"/>    
     <xs:attribute name="unit" type="xs:string" use="required" fixed="ms"/>
   </xs:complexType>
 
@@ -218,12 +218,12 @@
       <xs:element name="KSPAbsolute" type="xs:double"/>
     </xs:choice>
   </xs:complexType>
-
+  
   <xs:simpleType name="ksp_solver_type">
     <xs:restriction base="xs:string">
       <xs:enumeration value="cg"/>
       <xs:enumeration value="symmlq"/>
-      <xs:enumeration value="gmres"/>
+      <xs:enumeration value="gmres"/>      
     </xs:restriction>
   </xs:simpleType>
 
@@ -236,8 +236,8 @@
       <xs:enumeration value="blockdiagonal"/>
       <xs:enumeration value="none"/>
     </xs:restriction>
-  </xs:simpleType>
-
+  </xs:simpleType>   
+      
   <xs:complexType name="simulation_type">
     <xs:all>
       <xs:element name="SpaceDimension" type="xs:integer" minOccurs="0"/>
@@ -246,7 +246,7 @@
       <xs:element name="Mesh" type="mesh_type" minOccurs="0"/>
 
       <xs:element name="IonicModels" type="ionic_models_type" minOccurs="0"/>
-
+      
       <xs:element name="Stimuli" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
@@ -258,7 +258,7 @@
       <xs:element name="CellHeterogeneities" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="CellHeterogeneity" type="cell_heterogeneity_type" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="CellHeterogeneity" type="cell_heterogeneity_type" minOccurs="0" maxOccurs="unbounded" />            
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -266,15 +266,15 @@
       <xs:element name="ConductivityHeterogeneities" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-              <xs:element name="ConductivityHeterogeneity" type="conductivity_heterogeneity_type" minOccurs="0" maxOccurs="unbounded" />
+              <xs:element name="ConductivityHeterogeneity" type="conductivity_heterogeneity_type" minOccurs="0" maxOccurs="unbounded" />            
           </xs:sequence>
         </xs:complexType>
       </xs:element>
 
       <xs:element name="OutputDirectory" type="xs:string" minOccurs="0"/>
-      <xs:element name="OutputFilenamePrefix" type="xs:string" minOccurs="0"/>
+      <xs:element name="OutputFilenamePrefix" type="xs:string" minOccurs="0"/>      
     </xs:all>
-  </xs:complexType>
+  </xs:complexType>    
 
   <xs:complexType name="physiological_type">
     <xs:all>
@@ -283,28 +283,28 @@
       <xs:element name="BathConductivity" type="conductivity_type" minOccurs="0"/>
       <xs:element name="SurfaceAreaToVolumeRatio" type="inverse_length_type" minOccurs="0"/>
       <xs:element name="Capacitance" type="capacitance_type" minOccurs="0"/>
-    </xs:all>
-  </xs:complexType>
+    </xs:all>      
+  </xs:complexType>    
 
   <xs:complexType name="numerical_type">
-    <xs:all>
+    <xs:all>  
       <xs:element name="TimeSteps" type="time_steps_type" minOccurs="0"/>
       <xs:element name="KSPTolerances" type="ksp_tolerances_type" minOccurs="0"/>
       <xs:element name="KSPSolver" type="ksp_solver_type" minOccurs="0"/>
       <xs:element name="KSPPreconditioner" type="ksp_preconditioner_type" minOccurs="0"/>
-    </xs:all>
-  </xs:complexType>
-
-
+    </xs:all>      
+  </xs:complexType>    
+  
+  
   <xs:complexType name="postprocessing_type">
-    <xs:sequence>
+    <xs:sequence>  
       <xs:element name="ActionPotentialDurationMap" type="apd_map_type" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="UpstrokeTimeMap" type="upstrokes_map_type" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="MaxUpstrokeVelocityMap" type="empty_type" minOccurs="0"/>
       <xs:element name="ConductionVelocityMap" type="conduction_velocity_map_type" minOccurs="0" maxOccurs="unbounded"/>
-    </xs:sequence>
-  </xs:complexType>
-
+    </xs:sequence>      
+  </xs:complexType> 
+  
   <xs:complexType name="chaste_parameters_type">
     <xs:sequence>
       <xs:element name="Simulation" type="simulation_type"/>

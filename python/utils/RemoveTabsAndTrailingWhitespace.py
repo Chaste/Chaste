@@ -75,7 +75,6 @@ include_extensions: dict[str, str] = {
     '.toml': None,
     '.txt': None,
     '.xml': ' ' * 4,
-    '.xsd': ' ' * 2,
     '.yaml': ' ' * 2,
     '.yml': ' ' * 2,
 }
