@@ -1072,7 +1072,7 @@ add_custom_target (infrastructure
                    VERBATIM)
 
 add_custom_target (infrastructure_whitespace
-                   COMMAND ${Python3_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/RemoveTabsAndTrailingWhitespace.py
+                   COMMAND ${Python3_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/utils/RemoveTabsAndTrailingWhitespace.py
 
                    WORKING_DIRECTORY ${Chaste_SOURCE_DIR}
                    VERBATIM)
