@@ -175,7 +175,7 @@ void AbstractPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& rCell
         if (PetscTools::AmMaster())
         {
             OutputFileHandler output_file_handler(outputDirectory+"/", false);
-            mpVizPdeSolutionResultsFile = output_file_handler.OpenOutputFile("results.vizpdesolution"+mDependentVariableName);
+            mpVizPdeSolutionResultsFile = output_file_handler.OpenOutputFile("results.vizpdesolution_"+mDependentVariableName);
         }
     }
 
