@@ -158,7 +158,12 @@ void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCondition(
             EXCEPTION("PlaneBoundaryCondition requires a subclass of AbstractOffLatticeCellPopulation.");
         }
 
-        assert(dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation));
+        /*
+         * As for the 2d case deal with centre based ones differently to vertex based ones, as center based ones
+         * may use ghoist nodes which we dont want to apply the boundary condition to, whereas vertex based ones
+         * will not have ghost nodes and we want to apply the boundary condition to all nodes.
+         */
+        assert((dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation)));
 
         for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
             cell_iter != this->mpCellPopulation->End();
