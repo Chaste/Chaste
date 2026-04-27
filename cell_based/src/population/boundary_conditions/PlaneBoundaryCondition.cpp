@@ -45,6 +45,11 @@ PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::PlaneBoundaryCondition(AbstractCe
           mPointOnPlane(point),
           mUseJiggledNodesOnPlane(false)
 {
+    if (dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation)==nullptr)
+    {
+        EXCEPTION("PlaneBoundaryCondition requires a subclass of AbstractOffLatticeCellPopulation.");
+    }
+
     assert(norm_2(normal) > 0.0);
     mNormalToPlane = normal/norm_2(normal);
 }
@@ -80,11 +85,6 @@ void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCondition(
 {
     if constexpr ((SPACE_DIM == 2) || (SPACE_DIM == 3))
     {
-        ///\todo Move this to constructor. If this is in the constructor then Exception always throws.
-        if (dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation)==nullptr)
-        {
-            EXCEPTION("PlaneBoundaryCondition requires a subclass of AbstractOffLatticeCellPopulation.");
-        }
 
         assert((dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation))
                 || (SPACE_DIM==ELEMENT_DIM && (dynamic_cast<VertexBasedCellPopulation<SPACE_DIM>*>(this->mpCellPopulation))) );
@@ -152,16 +152,13 @@ void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCondition(
     }
     else if constexpr (SPACE_DIM == 1)
     {
-        ///\todo Move this to constructor. If this is in the constructor then Exception always throws.
-        if (dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation)==nullptr)
-        {
-            EXCEPTION("PlaneBoundaryCondition requires a subclass of AbstractOffLatticeCellPopulation.");
-        }
 
         /*
          * As for the 2d case deal with centre based ones differently to vertex based ones, as center based ones
-         * may use ghoist nodes which we dont want to apply the boundary condition to, whereas vertex based ones
+         * may use ghost nodes which we dont want to apply the boundary condition to, whereas vertex based ones
          * will not have ghost nodes and we want to apply the boundary condition to all nodes.
+         * 
+         * Note we currently only deal with centre modes as there are currently no 1D non centre models implemented.
          */
         assert((dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation)));
 
