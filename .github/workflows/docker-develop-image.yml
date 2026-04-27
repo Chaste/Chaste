@@ -2,7 +2,7 @@ name: Build chaste/develop
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "test_docker_builds_with_updated_actions" ]
   # Schedule a weekly build on Sunday at 1am after rebuilding the base image
   schedule:
     - cron: '0 1 * * 0'
