@@ -154,11 +154,8 @@ void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCondition(
     {
 
         /*
-         * As for the 2d case deal with centre based ones differently to vertex based ones, as center based ones
-         * may use ghost nodes which we dont want to apply the boundary condition to, whereas vertex based ones
-         * will not have ghost nodes and we want to apply the boundary condition to all nodes.
-         * 
-         * Note we currently only deal with centre modes as there are currently no 1D non centre models implemented.
+         * In 1D, this boundary condition is currently applied only to centre-based cell populations.
+         * We therefore iterate over cells and update the location of the node associated with each cell.
          */
         assert((dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation)));
 
