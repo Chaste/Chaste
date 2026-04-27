@@ -346,21 +346,48 @@ public:
         // Test VerifyBoundaryCondition() method
         TS_ASSERT_EQUALS(boundary_condition.VerifyBoundaryCondition(), true);
 
-        // Test 2: Boundary at x=2.0, normal=-1 (constraint: x >= 2.0)
-        c_vector<double,1> point2 = zero_vector<double>(1);
-        point2(0) = 2.0;
-        PlaneBoundaryCondition<1> boundary_condition2(&cell_population, point2, normal);
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
+    }
 
-        std::map<Node<1>*, c_vector<double,1> > old_locations2;
+    void TestPlaneBoundaryConditionWithNodeBasedCellPopulation1dNonZeroPoint()
+    {
+        // Create a fresh 1D mesh with nodes at x = -1.0, 0.5, 1.5, 2.5
+        std::vector<Node<1>*> nodes;
+        nodes.push_back(new Node<1>(0, false, -1.0));
+        nodes.push_back(new Node<1>(1, false,  0.5));
+        nodes.push_back(new Node<1>(2, false,  1.5));
+        nodes.push_back(new Node<1>(3, false,  2.5));
+
+        NodesOnlyMesh<1> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 1.5);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 1> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        NodeBasedCellPopulation<1> cell_population(mesh, cells);
+
+        // Boundary at x=2.0, normal=-1 (constraint: x >= 2.0)
+        c_vector<double,1> point = zero_vector<double>(1);
+        point(0) = 2.0;
+        c_vector<double,1> normal = zero_vector<double>(1);
+        normal(0) = -1.0;
+        PlaneBoundaryCondition<1> boundary_condition(&cell_population, point, normal);
+
+        // Impose boundary condition
+        std::map<Node<1>*, c_vector<double,1> > old_locations;
         for (std::list<CellPtr>::iterator cell_iter = cell_population.rGetCells().begin();
              cell_iter != cell_population.rGetCells().end();
              ++cell_iter)
         {
             Node<1>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
-            old_locations2[p_node] = p_node->rGetLocation();
+            old_locations[p_node] = p_node->rGetLocation();
         }
 
-        boundary_condition2.ImposeBoundaryCondition(old_locations2);
+        boundary_condition.ImposeBoundaryCondition(old_locations);
 
         // Test that all nodes satisfy the boundary condition (x >= 2.0)
         for (std::list<CellPtr>::iterator cell_iter = cell_population.rGetCells().begin();
@@ -369,18 +396,18 @@ public:
         {
             Node<1>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
             c_vector<double,1> location = p_node->rGetLocation();
-            if (old_locations2[p_node][0] < 2.0)
+            if (old_locations[p_node][0] < 2.0)
             {
                 TS_ASSERT_DELTA(2.0, location[0], 1e-6);
             }
             else
             {
-                TS_ASSERT_DELTA(location[0], old_locations2[p_node][0], 1e-6);
+                TS_ASSERT_DELTA(location[0], old_locations[p_node][0], 1e-6);
             }
         }
 
         // Test VerifyBoundaryCondition() method
-        TS_ASSERT_EQUALS(boundary_condition2.VerifyBoundaryCondition(), true);
+        TS_ASSERT_EQUALS(boundary_condition.VerifyBoundaryCondition(), true);
 
         for (unsigned i=0; i<nodes.size(); i++)
         {
