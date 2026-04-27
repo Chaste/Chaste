@@ -95,7 +95,6 @@ const std::vector<boost::shared_ptr<AbstractForce<ELEMENT_DIM, SPACE_DIM> > >& O
     return mForceCollection;
 }
 
-// KARRIGAN
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetMaxAdaptiveTimeStep(unsigned maxAdaptiveTimeStep)
 {
@@ -103,12 +102,10 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetMaxAdaptiveTimeStep(unsigne
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::GetMaxAdaptiveTimeStep() const 
+unsigned OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::GetMaxAdaptiveTimeStep() const
 {
     return mMaxAdaptiveTimeSteps;
 }
-
-// KARRIGAN
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology()
@@ -118,6 +115,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
     double time_advanced_so_far = 0;
     double target_time_step  = this->mDt;
     double present_time_step = this->mDt;
+    unsigned adaptive_timer = 0;
 
     while (time_advanced_so_far < target_time_step)
     {
@@ -139,6 +137,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
 
             // Successful time step! Update time_advanced_so_far
             time_advanced_so_far += present_time_step;
+            adaptive_timer = 0;
 
             // If using adaptive timestep, then increase the present_time_step (by 1% for now)
             if (mpNumericalMethod->HasAdaptiveTimestep())
@@ -151,9 +150,8 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
         }
         catch (StepSizeException& e)
         {
-            unsigned adaptive_timer = 0;
             // Detects if a node has travelled too far in a single time step
-            if (mpNumericalMethod->HasAdaptiveTimestep() && adaptive_timer < mMaxAdaptiveTimeSteps )
+            if (mpNumericalMethod->HasAdaptiveTimestep() && adaptive_timer < mMaxAdaptiveTimeSteps)
             {
                 // If adaptivity is switched on, revert node locations and choose a suitably smaller time step
                 RevertToOldLocations(old_node_locations);

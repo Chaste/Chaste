@@ -66,6 +66,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PopulationTestingForce.hpp"
 #include "PlaneBoundaryCondition.hpp"
 #include "ForwardEulerNumericalMethod.hpp"
+#include "RK4NumericalMethod.hpp"
 #include "Warnings.hpp"
 
 
@@ -553,6 +554,91 @@ public:
         // Set mUseUpdateNodeLocation to true and check
         p_fe_method->SetUseUpdateNodeLocation(true);
         TS_ASSERT(p_fe_method->GetUseUpdateNodeLocation());
+    }
+
+    void TestUpdateAllNodePositionsRK4WithMeshBased()
+    {
+        // Create a simple mesh
+        TrianglesMeshReader<2,2> mesh_reader("mesh/test/data/square_4_elements");
+        MutableMesh<2,2> mesh;
+        mesh.ConstructFromMeshReader(mesh_reader);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        // Create a cell population
+        MeshBasedCellPopulation<2> cell_population(mesh, cells);
+        cell_population.SetDampingConstantNormal(1.1);
+
+        // Create a force collection
+        std::vector<boost::shared_ptr<AbstractForce<2,2> > > force_collection;
+        MAKE_PTR(PopulationTestingForce<2>, p_test_force);
+        force_collection.push_back(p_test_force);
+
+        // Create an empty boundary condition collection
+        std::vector<boost::shared_ptr<AbstractCellPopulationBoundaryCondition<2,2> > > boundary_condition_collection;
+
+        // Create RK4 numerical method for testing
+        MAKE_PTR(RK4NumericalMethod<2>, p_rk4_method);
+
+        double dt = 0.01;
+
+        p_rk4_method->SetCellPopulation(&cell_population);
+        p_rk4_method->SetForceCollection(&force_collection);
+        p_rk4_method->SetBoundaryConditions(&boundary_condition_collection);
+
+        // Save starting positions
+        std::vector<c_vector<double, 2> > old_posns(cell_population.GetNumNodes());
+        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        {
+            old_posns[j][0] = cell_population.GetNode(j)->rGetLocation()[0];
+            old_posns[j][1] = cell_population.GetNode(j)->rGetLocation()[1];
+        }
+
+        // Update positions and check the answer
+        p_rk4_method->UpdateAllNodePositions(dt);
+
+        for (unsigned j=0; j<cell_population.GetNumNodes(); j++)
+        {
+            c_vector<double, 2> actual_location = cell_population.GetNode(j)->rGetLocation();
+
+            double damping = cell_population.GetDampingConstant(j);
+            c_vector<double, 2> expected_location;
+            expected_location = p_test_force->GetExpectedOneStepLocationRK4(j, damping, old_posns[j], dt);
+
+            TS_ASSERT_DELTA(norm_2(actual_location - expected_location), 0, 1e-6);
+        }
+    }
+
+    void TestRK4ArchivingOfNumericalMethod()
+    {
+        EXIT_IF_PARALLEL;
+
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "RK4NumericalMethod.arch";
+
+        {
+            RK4NumericalMethod<2> rk4_method;
+            rk4_method.SetUseAdaptiveTimestep(true);
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            output_arch << static_cast<const RK4NumericalMethod<2>&>(rk4_method);
+        }
+
+        {
+            RK4NumericalMethod<2> rk4_method;
+
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            input_arch >> rk4_method;
+
+            TS_ASSERT_EQUALS(rk4_method.HasAdaptiveTimestep(), true);
+        }
     }
 };
 
