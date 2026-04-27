@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -54,15 +54,14 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if ((VTK_MAJOR_VERSION >= 5 && VTK_MINOR_VERSION >= 6) || VTK_MAJOR_VERSION >= 6)
 
-#include "vtkGeometryFilter.h"
 #include "vtkDoubleArray.h"
+#include <vtkClipPolyData.h>
 #include "vtkPlane.h"
 #include "vtkPoints.h"
 #include "vtkPointData.h"
 #include "vtkPolyVertex.h"
 #include "vtkMassProperties.h"
 #include "vtkMath.h"
-#include "vtkTableBasedClipDataSet.h"
 #include "vtkCellArray.h"
 #include "vtkLine.h"
 #include "vtkUnsignedIntArray.h"
@@ -235,26 +234,19 @@ vtkSmartPointer<vtkPolyData> AirwayGenerator::SplitPointCloud(vtkSmartPointer<vt
                                                               double rOrigin[3],
                                                               bool insideOut)
 {
-    vtkSmartPointer<vtkPlane> clip_plane = vtkSmartPointer<vtkPlane>::New();
+    auto clip_plane = vtkSmartPointer<vtkPlane>::New();
     clip_plane->SetNormal(rNormal);
     clip_plane->SetOrigin(rOrigin);
 
-    vtkSmartPointer<vtkTableBasedClipDataSet > clipper = vtkSmartPointer<vtkTableBasedClipDataSet >::New();
-#if VTK_MAJOR_VERSION >= 6
+    auto clipper = vtkSmartPointer<vtkClipPolyData>::New();
     clipper->SetInputData(pointCloud);
-#else
-    clipper->SetInputConnection(pointCloud->GetProducerPort());
-#endif
     clipper->SetClipFunction(clip_plane);
-    clipper->GenerateClippedOutputOff();
+    clipper->SetGenerateClipScalars(1);
     clipper->SetInsideOut(insideOut);
+    clipper->GenerateClippedOutputOff();
     clipper->Update();
 
-    vtkSmartPointer<vtkGeometryFilter> filter = vtkSmartPointer<vtkGeometryFilter>::New();
-    filter->SetInputConnection(clipper->GetOutputPort());
-    filter->Update();
-
-    return filter->GetOutput();
+    return clipper->GetOutput();
 }
 
 void AirwayGenerator::AddInitialApex(double rStartLocation[3],

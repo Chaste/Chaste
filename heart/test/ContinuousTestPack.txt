@@ -29,6 +29,7 @@ ionicmodels/TestModifiers.hpp
 ionicmodels/TestCodegen.hpp
 ionicmodels/TestRushLarsen.hpp
 ionicmodels/TestSteadyStateRunner.hpp
+mechanics/TestCardiacElectroMechanicsVtkHandler.hpp
 mechanics/TestCardiacElectroMechanicsProblem.hpp
 mechanics/TestCardiacElectroMechanicsFurtherFunctionality.hpp
 mechanics/TestContractionModels.hpp

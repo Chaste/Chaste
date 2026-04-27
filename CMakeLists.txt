@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2025, University of Oxford.
+# Copyright (c) 2005-2026, University of Oxford.
 # All rights reserved.
 # 
 # University of Oxford means the Chancellor, Masters and Scholars of the
@@ -451,7 +451,7 @@ endif ()
 ################################
 ####  Find Boost
 ################################
-find_package(Boost 1.71 REQUIRED COMPONENTS headers system serialization program_options CONFIG)
+find_package(Boost 1.71 REQUIRED COMPONENTS headers serialization program_options CONFIG)
 message(STATUS "Boost version: ${Boost_VERSION}")
 
 # Turn off boost auto-linking, which is not required when using CMake
@@ -465,7 +465,6 @@ endif ()
 # Link the Boost targets onto Chaste_COMMON_DEPS
 target_link_libraries(Chaste_COMMON_DEPS INTERFACE
         Boost::headers
-        Boost::system
         Boost::serialization
         Boost::program_options
 )
@@ -527,7 +526,7 @@ endif ()
 
 
 ################################
-####  Find ParMETIS and METIS
+####  Find ParMETIS 
 ################################
 # If we're using PETSc's ParMETIS (ON by default, for more reliable MPI compatibility), override PARMETIS_ROOT accordingly
 if (Chaste_USE_PETSC_PARMETIS)
@@ -539,6 +538,8 @@ if (Chaste_USE_PETSC_PARMETIS)
 endif ()
 find_package (ParMETIS REQUIRED)
 list (APPEND Chaste_LINK_LIBRARIES "${PARMETIS_LIBRARIES}")
+# libscotchparmetis-dev has a parmetis.h adapter include which is in a subdirectory
+list (APPEND Chaste_INCLUDES "${PARMETIS_INCLUDE_DIR}")
 
 
 ################################
@@ -1137,6 +1138,30 @@ foreach (component ${Chaste_COMPONENTS})
     endforeach (depend_component Chaste_DEPENDS_${component})
 
 endforeach (component ${Chaste_COMPONENTS})
+
+
+# CMake 4.1.0-4.1.4 and 4.2.0-4.2.1 emit spurious "Could not find a package configuration file provided by nvpl"
+# warnings while searching for BLAS/LAPACK (triggered when finding PETSc and SUNDIALS). These warnings are harmless and
+# can safely be ignored.
+# The issue was fixed in CMake 4.1.5 and 4.2.2 respectively:
+# https://gitlab.kitware.com/cmake/cmake/-/work_items/27451
+# https://github.com/Chaste/Chaste/issues/477
+if ((CMAKE_VERSION VERSION_GREATER_EQUAL "4.1.0" AND CMAKE_VERSION VERSION_LESS "4.1.5") OR
+(CMAKE_VERSION VERSION_GREATER_EQUAL "4.2.0" AND CMAKE_VERSION VERSION_LESS "4.2.2"))
+    message(STATUS "NOTE: CMake ${CMAKE_VERSION} is known to emit spurious warnings related to 'nvpl' when searching "
+            "for BLAS/LAPACK. These warnings are harmless and can safely be ignored. Upgrade to CMake >= 4.1.5 or >= "
+            "4.2.2 to suppress them.")
+endif ()
+
+
+message(STATUS "")
+message(STATUS "----------------------------------------------------------")
+message(STATUS "Chaste documentation and tutorials:")
+message(STATUS "    https://chaste.github.io/")
+message(STATUS "Ask questions and get help from the core development team:")
+message(STATUS "    https://github.com/Chaste/Chaste/discussions")
+message(STATUS "----------------------------------------------------------")
+message(STATUS "")
 
 
 set (CPACK_DEBIAN_PACKAGE_DEPENDS "cmake, g++, libopenmpi-dev, petsc-dev (>= 2.3.3-14), libhdf5-openmpi-dev, xsdcxx, libboost-serialization-dev, libboost-filesystem-dev, libparmetis-dev, libxerces-c3-dev, libsundials-serial-dev, libvtk5-dev, python-lxml, python-rdflib")

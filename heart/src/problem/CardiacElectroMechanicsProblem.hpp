@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -51,6 +51,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FineCoarseMeshPair.hpp"
 #include "AbstractConductivityModifier.hpp"
 #include "ElectroMechanicsProblemDefinition.hpp"
+#include "CardiacElectroMechanicsVtkHandler.hpp"
+#include "VoltageInterpolaterOntoMechanicsMesh.hpp"
 
 /**
  * Enumeration of the possible electrics problem types
@@ -129,6 +131,7 @@ protected :
      */
     std::vector<double> mInterpolatedVoltages;
 
+
     /** The mesh for the electrics */
     TetrahedralMesh<DIM,DIM>* mpElectricsMesh;
     /** The mesh for the mechanics */
@@ -177,6 +180,9 @@ protected :
     /** Somewhere to store the modified conductivity tensor */
     c_matrix<double,DIM,DIM> mModifiedConductivityTensor;
 
+    /** Pointer to the VTK writer class. Initialized to NULL upon construction. Object created within Initialise() method*/
+    CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>* mpCardiacVtkWriter; 
+
     /**
      *  Determine which node is closest to the watched location
      */
@@ -191,6 +197,7 @@ protected :
      */
     void WriteWatchedLocationData(double time, Vec voltage);
 
+    
 
 public :
 
