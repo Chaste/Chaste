@@ -7,6 +7,8 @@ on:
   schedule:
     - cron: '0 1 * * 0'
 
+  workflow_dispatch:
+
 jobs:
   build:
     runs-on: self-hosted-docker
@@ -59,6 +61,7 @@ jobs:
             'Chaste_ERROR_ON_WARNING="ON"'
             'Chaste_UPDATE_PROVENANCE="OFF"'
         platforms: 'amd64,arm64'
-        push: true
+        load: true
+        push: false
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
