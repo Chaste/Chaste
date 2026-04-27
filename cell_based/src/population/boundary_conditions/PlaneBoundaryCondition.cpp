@@ -150,6 +150,33 @@ void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCondition(
             }
         }
     }
+    else if constexpr (SPACE_DIM == 1)
+    {
+        ///\todo Move this to constructor. If this is in the constructor then Exception always throws.
+        if (dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation)==nullptr)
+        {
+            EXCEPTION("PlaneBoundaryCondition requires a subclass of AbstractOffLatticeCellPopulation.");
+        }
+
+        assert(dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation));
+
+        for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
+            cell_iter != this->mpCellPopulation->End();
+            ++cell_iter)
+        {
+            unsigned node_index = this->mpCellPopulation->GetLocationIndexUsingCell(*cell_iter);
+            Node<SPACE_DIM>* p_node = this->mpCellPopulation->GetNode(node_index);
+
+            c_vector<double, SPACE_DIM> node_location = p_node->rGetLocation();
+
+            double signed_distance = inner_prod(node_location - mPointOnPlane, mNormalToPlane);
+            if (signed_distance > 0.0)
+            {
+                c_vector<double, SPACE_DIM> nearest_point = node_location - signed_distance*mNormalToPlane;
+                p_node->rGetModifiableLocation() = nearest_point;
+            }
+        }
+    }
     else
     {
         NEVER_REACHED;
@@ -161,23 +188,16 @@ bool PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::VerifyBoundaryCondition()
 {
     bool condition_satisfied = true;
 
-    if (SPACE_DIM == 1)
+    for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
+         cell_iter != this->mpCellPopulation->End();
+         ++cell_iter)
     {
-        EXCEPTION("PlaneBoundaryCondition is not implemented in 1D");
-    }
-    else
-    {
-        for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
-             cell_iter != this->mpCellPopulation->End();
-             ++cell_iter)
-        {
-            c_vector<double, SPACE_DIM> cell_location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
+        c_vector<double, SPACE_DIM> cell_location = this->mpCellPopulation->GetLocationOfCellCentre(*cell_iter);
 
-            if (inner_prod(cell_location - mPointOnPlane, mNormalToPlane) > 0.0)
-            {
-                condition_satisfied = false;
-                break;
-            }
+        if (inner_prod(cell_location - mPointOnPlane, mNormalToPlane) > 0.0)
+        {
+            condition_satisfied = false;
+            break;
         }
     }
 
