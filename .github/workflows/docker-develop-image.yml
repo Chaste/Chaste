@@ -61,7 +61,7 @@ jobs:
             'Chaste_ERROR_ON_WARNING="ON"'
             'Chaste_UPDATE_PROVENANCE="OFF"'
         platforms: 'amd64,arm64'
-        load: true
+        outputs: type=local,dest=.
         push: false
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
