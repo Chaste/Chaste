@@ -52,9 +52,9 @@ message ("####################################\n")
 message(STATUS "CMake version: ${CMAKE_VERSION}")
 
 # Since CMake 3.0, version can be supplied to the project() command.  We set it directly, for users on older CMake
-project (Chaste VERSION 2024.2)
-set (Chaste_VERSION_MAJOR 2024 CACHE STRING "Chaste major version number")
-set (Chaste_VERSION_MINOR 2 CACHE STRING "Chaste minor version number")
+project (Chaste VERSION 2026.1)
+set (Chaste_VERSION_MAJOR 2026 CACHE STRING "Chaste major version number")
+set (Chaste_VERSION_MINOR 1 CACHE STRING "Chaste minor version number")
 
 message(STATUS "Linker: ${CMAKE_LINKER}")
 
