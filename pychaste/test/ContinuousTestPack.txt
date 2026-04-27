@@ -16,6 +16,7 @@ tutorial/TestPyCellSortingTutorial.py
 tutorial/TestPyImmersedBoundaryTutorial.py
 tutorial/TestPyMeshBasedCellSimulationsTutorial.py
 tutorial/TestPyNodeBasedCellSimulationsTutorial.py
+tutorial/TestPyNumericalMethodsTutorial.py
 tutorial/TestPyPottsBasedCellSimulationsTutorial.py
 tutorial/TestPyScratchAssayTutorial.py
 tutorial/TestPySpheroidTutorial.py
