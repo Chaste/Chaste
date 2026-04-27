@@ -264,6 +264,8 @@ from chaste._pychaste_all import (
     RandomDirectionCentreBasedDivisionRule_3_3,
     RandomDirectionVertexBasedDivisionRule_2,
     RandomDirectionVertexBasedDivisionRule_3,
+    RK4NumericalMethod_2_2,
+    RK4NumericalMethod_3_3,
     RepulsionForce_2,
     RepulsionForce_3,
     ShortAxisImmersedBoundaryDivisionRule_2,
@@ -826,6 +828,15 @@ ForwardEulerNumericalMethod = TemplateClassDict(
         ("2", "2"): ForwardEulerNumericalMethod_2_2,
         ("3",): ForwardEulerNumericalMethod_3_3,
         ("3", "3"): ForwardEulerNumericalMethod_3_3,
+    }
+)
+
+RK4NumericalMethod = TemplateClassDict(
+    {
+        ("2",): RK4NumericalMethod_2_2,
+        ("2", "2"): RK4NumericalMethod_2_2,
+        ("3",): RK4NumericalMethod_3_3,
+        ("3", "3"): RK4NumericalMethod_3_3,
     }
 )
 

@@ -831,6 +831,7 @@ modules:
       ##=== cell_based: Chaste/cell_based/src/simulation/numerical_methods
       - name: AbstractNumericalMethod
       - name: ForwardEulerNumericalMethod
+      - name: RK4NumericalMethod
 
       - name: StepSizeException
         excluded: True
