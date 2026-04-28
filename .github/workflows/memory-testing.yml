@@ -45,7 +45,7 @@ jobs:
         if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch')
 
       - name: checkout Chaste
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: Chaste/Chaste
           path: Chaste
@@ -117,7 +117,7 @@ jobs:
         if: always() && steps.index-exists.outputs.github_summary == 'True'
 
       - name: upload memtest artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: memtest-files
           path: ${{ env.CHASTE_BUILD_DIR }}/memtest
@@ -138,13 +138,13 @@ jobs:
     steps:
 
       - name: download memtest artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: memtest-files
           path: ./memtest
 
       - name: checkout memory-testing
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: Chaste/memory-testing
           path: memory-testing
@@ -157,7 +157,7 @@ jobs:
           cp ./memtest/* ${MEMTEST_DIR}/log-files/${{ needs.build-and-test.outputs.datetime }}/
 
       - name: setup python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.x'
 
