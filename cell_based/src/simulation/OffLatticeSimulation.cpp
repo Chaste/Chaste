@@ -115,7 +115,6 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
     double time_advanced_so_far = 0;
     double target_time_step  = this->mDt;
     double present_time_step = this->mDt;
-    unsigned adaptive_timer = 0;
 
     while (time_advanced_so_far < target_time_step)
     {
@@ -149,8 +148,8 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
         }
         catch (StepSizeException& e)
         {
-            adaptive_timer = 0;
-            
+            unsigned adaptive_timer = 0;
+
             // Detects if a node has travelled too far in a single time step
             if (mpNumericalMethod->HasAdaptiveTimestep() && adaptive_timer < mMaxAdaptiveTimeSteps)
             {
