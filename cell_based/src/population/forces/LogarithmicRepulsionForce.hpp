@@ -33,36 +33,28 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef GENERALISEDLINEARSPRINGFORCE_HPP_
-#define GENERALISEDLINEARSPRINGFORCE_HPP_
+#ifndef LOGARITHMICREPULSIONFORCE_HPP_
+#define LOGARITHMICREPULSIONFORCE_HPP_
 
 #include "LinearSpringForce.hpp"
+#include "NodeBasedCellPopulation.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
 /**
- * A force law that combines a linear spring (Meineke et al, 2001) for
- * MeshBasedCellPopulation and an exponential attraction / logarithmic repulsion
- * model (Pathmanathan et al, 2009) for NodeBasedCellPopulation.
+ * A class for a simple logarithmic repulsion force law.
+ * Designed for use in node-based simulations.
  *
- * For MeshBasedCellPopulation, the force is:
- * \f[
- * \mathbf{F}_{i}(t) = \sum_{j} \mu_{i,j} ( || \mathbf{r}_{i,j} || - s_{i,j}(t) ) \hat{\mathbf{r}}_{i,j}.
- * \f]
- *
- * For NodeBasedCellPopulation, see Pathmanathan et al (2009)
- * (doi:10.1088/1478-3975/6/3/036001).
- *
- * @deprecated Consider using LinearSpringForce (for any population type) or
- * PathmanathanTwoBodyInteractionForce (for NodeBasedCellPopulation) instead.
+ * This force applies a logarithmic repulsive force between pairs of cells that
+ * overlap (i.e. whose separation is less than the sum of their radii). No
+ * attractive force is applied. The repulsive force law is the logarithmic model
+ * from Pathmanathan et al (2009) (doi:10.1088/1478-3975/6/3/036001).
  */
-template<unsigned  ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
-class GeneralisedLinearSpringForce : public LinearSpringForce<ELEMENT_DIM, SPACE_DIM>
+template<unsigned DIM>
+class LogarithmicRepulsionForce : public LinearSpringForce<DIM>
 {
-    friend class TestForces;
-
-private:
+private :
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -75,40 +67,45 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<LinearSpringForce<ELEMENT_DIM, SPACE_DIM> >(*this);
+        archive & boost::serialization::base_object<LinearSpringForce<DIM> >(*this);
     }
 
-public:
+public :
 
     /**
      * Constructor.
      */
-    GeneralisedLinearSpringForce();
-
-    /**
-     * Destructor.
-     */
-    virtual ~GeneralisedLinearSpringForce();
+    LogarithmicRepulsionForce();
 
     /**
      * Overridden CalculateForceBetweenNodes() method.
      *
-     * Calculates the force between two nodes, using a linear spring for
-     * MeshBasedCellPopulation and the Pathmanathan model for NodeBasedCellPopulation.
-     *
-     * Note that this assumes they are connected and is called by AddForceContribution()
+     * Uses the logarithmic repulsion model from Pathmanathan et al (2009)
+     * (doi:10.1088/1478-3975/6/3/036001).
      *
      * @param nodeAGlobalIndex index of one neighbouring node
      * @param nodeBGlobalIndex index of the other neighbouring node
      * @param rCellPopulation the cell population
      * @return The force exerted on Node A by Node B.
      */
-    c_vector<double, SPACE_DIM> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
+    c_vector<double, DIM> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
                                                      unsigned nodeBGlobalIndex,
-                                                     AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation);
+                                                     AbstractCellPopulation<DIM>& rCellPopulation);
 
     /**
-     * Overridden OutputForceParameters() method.
+     * Overridden AddForceContribution() method.
+     *
+     * Only applies the repulsive force between pairs of cells that overlap.
+     *
+     * @param rCellPopulation reference to the CellPopulation
+     */
+    void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
+
+    /**
+     * Outputs force Parameters to file
+     *
+     * As this method is pure virtual, it must be overridden
+     * in subclasses.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
@@ -116,6 +113,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(GeneralisedLinearSpringForce)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(LogarithmicRepulsionForce)
 
-#endif /*GENERALISEDLINEARSPRINGFORCE_HPP_*/
+#endif /*LOGARITHMICREPULSIONFORCE_HPP_*/

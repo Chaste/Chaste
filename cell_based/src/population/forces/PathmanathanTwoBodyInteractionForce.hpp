@@ -33,32 +33,39 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef GENERALISEDLINEARSPRINGFORCE_HPP_
-#define GENERALISEDLINEARSPRINGFORCE_HPP_
+#ifndef PATHMANATHANTWOBODYINTERACTIONFORCE_HPP_
+#define PATHMANATHANTWOBODYINTERACTIONFORCE_HPP_
 
-#include "LinearSpringForce.hpp"
+#include "AbstractTwoBodyInteractionForce.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
 /**
- * A force law that combines a linear spring (Meineke et al, 2001) for
- * MeshBasedCellPopulation and an exponential attraction / logarithmic repulsion
- * model (Pathmanathan et al, 2009) for NodeBasedCellPopulation.
+ * A two-body force law implementing the model from Pathmanathan et al (2009)
+ * (doi:10.1088/1478-3975/6/3/036001), also described in Osborne et al (2017)
+ * (doi:10.1242/dev.126359).
  *
- * For MeshBasedCellPopulation, the force is:
+ * For two cells whose separation is less than the sum of their radii
+ * (i.e. overlap > 0, cells are compressed), a logarithmic repulsion force is used:
  * \f[
- * \mathbf{F}_{i}(t) = \sum_{j} \mu_{i,j} ( || \mathbf{r}_{i,j} || - s_{i,j}(t) ) \hat{\mathbf{r}}_{i,j}.
+ * \mathbf{F} = \mu \hat{\mathbf{r}} s \ln\!\left(1 + \frac{d - s}{s}\right)
  * \f]
  *
- * For NodeBasedCellPopulation, see Pathmanathan et al (2009)
- * (doi:10.1088/1478-3975/6/3/036001).
+ * For two cells whose separation is greater than the sum of their radii
+ * (i.e. overlap < 0, cells are stretched), an exponential attraction force is used:
+ * \f[
+ * \mathbf{F} = \mu \hat{\mathbf{r}} (d - s) e^{-\alpha(d-s)/s}
+ * \f]
  *
- * @deprecated Consider using LinearSpringForce (for any population type) or
- * PathmanathanTwoBodyInteractionForce (for NodeBasedCellPopulation) instead.
+ * Here \f$\mu\f$ is the spring stiffness, \f$s\f$ is the rest length (sum of cell radii),
+ * \f$d\f$ is the distance between cell centres, and \f$\alpha\f$ controls the
+ * range of attraction.
+ *
+ * This force is designed for use with NodeBasedCellPopulation.
  */
-template<unsigned  ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
-class GeneralisedLinearSpringForce : public LinearSpringForce<ELEMENT_DIM, SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+class PathmanathanTwoBodyInteractionForce : public AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>
 {
     friend class TestForces;
 
@@ -75,26 +82,42 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<LinearSpringForce<ELEMENT_DIM, SPACE_DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM> >(*this);
+        archive & mSpringStiffness;
+        archive & mAlpha;
     }
+
+protected:
+
+    /**
+     * Spring stiffness (denoted mu in Pathmanathan et al (2009),
+     * doi:10.1088/1478-3975/6/3/036001).
+     */
+    double mSpringStiffness;
+
+    /**
+     * Parameter controlling the range of attraction between cells.
+     * A larger value makes the attractive force decay more rapidly with distance.
+     * Defaults to 5.0.
+     */
+    double mAlpha;
 
 public:
 
     /**
      * Constructor.
      */
-    GeneralisedLinearSpringForce();
+    PathmanathanTwoBodyInteractionForce();
 
     /**
      * Destructor.
      */
-    virtual ~GeneralisedLinearSpringForce();
+    virtual ~PathmanathanTwoBodyInteractionForce();
 
     /**
      * Overridden CalculateForceBetweenNodes() method.
      *
-     * Calculates the force between two nodes, using a linear spring for
-     * MeshBasedCellPopulation and the Pathmanathan model for NodeBasedCellPopulation.
+     * Calculates the Pathmanathan force between two nodes.
      *
      * Note that this assumes they are connected and is called by AddForceContribution()
      *
@@ -108,6 +131,30 @@ public:
                                                      AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation);
 
     /**
+     * @return mSpringStiffness
+     */
+    double GetSpringStiffness();
+
+    /**
+     * Set mSpringStiffness.
+     *
+     * @param springStiffness the new value of mSpringStiffness
+     */
+    void SetSpringStiffness(double springStiffness);
+
+    /**
+     * @return mAlpha
+     */
+    double GetAlpha();
+
+    /**
+     * Set mAlpha.
+     *
+     * @param alpha the new value of mAlpha
+     */
+    void SetAlpha(double alpha);
+
+    /**
      * Overridden OutputForceParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
@@ -116,6 +163,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(GeneralisedLinearSpringForce)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(PathmanathanTwoBodyInteractionForce)
 
-#endif /*GENERALISEDLINEARSPRINGFORCE_HPP_*/
+#endif /*PATHMANATHANTWOBODYINTERACTIONFORCE_HPP_*/

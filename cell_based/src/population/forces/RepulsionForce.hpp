@@ -36,19 +36,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef REPULSIONFORCE_HPP_
 #define REPULSIONFORCE_HPP_
 
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LogarithmicRepulsionForce.hpp"
 #include "NodeBasedCellPopulation.hpp"
+
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
 
 /**
  * A class for a simple two-body repulsion force law. Designed
- * for use in node-based simulations
+ * for use in node-based simulations.
  *
- * The force just creates a linear repulsive force between cells
- * with a nonlinear separation less than 2. This force does not
- * take a cell's age or cell cycle phase into account.
+ * @deprecated Use LogarithmicRepulsionForce instead.
  */
 template<unsigned DIM>
-class RepulsionForce : public GeneralisedLinearSpringForce<DIM>
+class RepulsionForce : public LogarithmicRepulsionForce<DIM>
 {
 private :
 
@@ -63,7 +64,7 @@ private :
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<GeneralisedLinearSpringForce<DIM> >(*this);
+        archive & boost::serialization::base_object<LogarithmicRepulsionForce<DIM> >(*this);
     }
 
 public :
@@ -72,13 +73,6 @@ public :
      * Constructor.
      */
     RepulsionForce();
-
-    /**
-     * Overridden AddForceContribution() method.
-     *
-     * @param rCellPopulation reference to the CellPopulation
-     */
-    void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
 
     /**
      * Outputs force Parameters to file

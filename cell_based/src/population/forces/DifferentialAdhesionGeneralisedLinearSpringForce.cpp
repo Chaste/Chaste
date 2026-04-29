@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 DifferentialAdhesionGeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::DifferentialAdhesionGeneralisedLinearSpringForce()
-   : GeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>(),
+   : LinearSpringForce<ELEMENT_DIM, SPACE_DIM>(),
      mHomotypicLabelledSpringConstantMultiplier(1.0),
      mHeterotypicSpringConstantMultiplier(1.0)
 {
@@ -119,7 +119,7 @@ void DifferentialAdhesionGeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::O
     *rParamsFile << "\t\t\t<HeterotypicSpringConstantMultiplier>" << mHeterotypicSpringConstantMultiplier << "</HeterotypicSpringConstantMultiplier>\n";
 
     // Call direct parent class
-    GeneralisedLinearSpringForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(rParamsFile);
+    LinearSpringForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(rParamsFile);
 }
 
 // Explicit instantiation

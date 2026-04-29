@@ -188,6 +188,21 @@ from chaste._pychaste_all import (
     GammaG1CellCycleModel,
     GeneralisedLinearSpringForce_2_2,
     GeneralisedLinearSpringForce_3_3,
+    LinearSpringForce_1_1,
+    LinearSpringForce_1_2,
+    LinearSpringForce_2_2,
+    LinearSpringForce_1_3,
+    LinearSpringForce_2_3,
+    LinearSpringForce_3_3,
+    PathmanathanTwoBodyInteractionForce_1_1,
+    PathmanathanTwoBodyInteractionForce_1_2,
+    PathmanathanTwoBodyInteractionForce_2_2,
+    PathmanathanTwoBodyInteractionForce_1_3,
+    PathmanathanTwoBodyInteractionForce_2_3,
+    PathmanathanTwoBodyInteractionForce_3_3,
+    LogarithmicRepulsionForce_1,
+    LogarithmicRepulsionForce_2,
+    LogarithmicRepulsionForce_3,
     Goldbeter1991SrnModel,
     HeterotypicBoundaryLengthWriter_2_2,
     HeterotypicBoundaryLengthWriter_3_3,
@@ -835,6 +850,42 @@ GeneralisedLinearSpringForce = TemplateClassDict(
         ("2", "2"): GeneralisedLinearSpringForce_2_2,
         ("3",): GeneralisedLinearSpringForce_3_3,
         ("3", "3"): GeneralisedLinearSpringForce_3_3,
+    }
+)
+
+LinearSpringForce = TemplateClassDict(
+    {
+        ("1",): LinearSpringForce_1_1,
+        ("1", "1"): LinearSpringForce_1_1,
+        ("1", "2"): LinearSpringForce_1_2,
+        ("2",): LinearSpringForce_2_2,
+        ("2", "2"): LinearSpringForce_2_2,
+        ("1", "3"): LinearSpringForce_1_3,
+        ("2", "3"): LinearSpringForce_2_3,
+        ("3",): LinearSpringForce_3_3,
+        ("3", "3"): LinearSpringForce_3_3,
+    }
+)
+
+PathmanathanTwoBodyInteractionForce = TemplateClassDict(
+    {
+        ("1",): PathmanathanTwoBodyInteractionForce_1_1,
+        ("1", "1"): PathmanathanTwoBodyInteractionForce_1_1,
+        ("1", "2"): PathmanathanTwoBodyInteractionForce_1_2,
+        ("2",): PathmanathanTwoBodyInteractionForce_2_2,
+        ("2", "2"): PathmanathanTwoBodyInteractionForce_2_2,
+        ("1", "3"): PathmanathanTwoBodyInteractionForce_1_3,
+        ("2", "3"): PathmanathanTwoBodyInteractionForce_2_3,
+        ("3",): PathmanathanTwoBodyInteractionForce_3_3,
+        ("3", "3"): PathmanathanTwoBodyInteractionForce_3_3,
+    }
+)
+
+LogarithmicRepulsionForce = TemplateClassDict(
+    {
+        ("1",): LogarithmicRepulsionForce_1,
+        ("2",): LogarithmicRepulsionForce_2,
+        ("3",): LogarithmicRepulsionForce_3,
     }
 )
 

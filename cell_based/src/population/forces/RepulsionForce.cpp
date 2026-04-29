@@ -37,59 +37,15 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 template<unsigned DIM>
 RepulsionForce<DIM>::RepulsionForce()
-   : GeneralisedLinearSpringForce<DIM>()
+   : LogarithmicRepulsionForce<DIM>()
 {
-}
-
-template<unsigned DIM>
-void RepulsionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
-{
-    // Throw an exception message if not using a NodeBasedCellPopulation
-    if (dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) == nullptr)
-    {
-        EXCEPTION("RepulsionForce is to be used with a NodeBasedCellPopulation only");
-    }
-
-    const std::vector< std::pair<Node<DIM>*, Node<DIM>* > >& r_node_pairs = (static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation))->rGetNodePairs();
-    for (const auto& [p_node_a, p_node_b] : r_node_pairs)
-    {
-        // Get the node locations
-        const c_vector<double, DIM>& r_node_a_location = p_node_a->rGetLocation();
-        const c_vector<double, DIM>& r_node_b_location = p_node_b->rGetLocation();
-
-        // Get the node radii
-        double node_a_radius = p_node_a->GetRadius();
-        double node_b_radius = p_node_b->GetRadius();
-
-        // Get the unit vector parallel to the line joining the two nodes
-        c_vector<double, DIM> unit_difference;
-
-        unit_difference = (static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation))->rGetMesh().GetVectorFromAtoB(r_node_a_location, r_node_b_location);
-
-        // Calculate the value of the rest length
-        double rest_length = node_a_radius+node_b_radius;
-
-        if (norm_2(unit_difference) < rest_length)
-        {
-            // Calculate the force between nodes
-            c_vector<double, DIM> force = this->CalculateForceBetweenNodes(p_node_a->GetIndex(), p_node_b->GetIndex(), rCellPopulation);
-            c_vector<double, DIM> negative_force = -1.0 * force;
-            for (unsigned j=0; j<DIM; j++)
-            {
-                assert(!std::isnan(force[j]));
-            }
-            // Add the force contribution to each node
-            p_node_a->AddAppliedForceContribution(force);
-            p_node_b->AddAppliedForceContribution(negative_force);
-        }
-    }
 }
 
 template<unsigned DIM>
 void RepulsionForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
     // Call direct parent class
-    GeneralisedLinearSpringForce<DIM>::OutputForceParameters(rParamsFile);
+    LogarithmicRepulsionForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
 // Explicit instantiation

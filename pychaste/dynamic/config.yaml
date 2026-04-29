@@ -718,6 +718,16 @@ modules:
         source_includes:
           - PybindUblasTypeCaster.hpp
 
+      - name: LinearSpringForce
+        source_includes:
+          - PybindUblasTypeCaster.hpp
+
+      - name: PathmanathanTwoBodyInteractionForce
+        source_includes:
+          - PybindUblasTypeCaster.hpp
+
+      - name: LogarithmicRepulsionForce
+
       - name: ImmersedBoundaryKinematicFeedbackForce
       - name: ImmersedBoundaryLinearDifferentialAdhesionForce
       - name: ImmersedBoundaryLinearInteractionForce

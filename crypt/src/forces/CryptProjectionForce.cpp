@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 
 CryptProjectionForce::CryptProjectionForce()
-    : GeneralisedLinearSpringForce<2>(),
+    : LinearSpringForce<2>(),
       mIncludeWntChemotaxis(false),
       mWntChemotaxisStrength(100.0)
 {
@@ -303,7 +303,7 @@ void CryptProjectionForce::OutputForceParameters(out_stream& rParamsFile)
     *rParamsFile << "\t\t\t<WntChemotaxisStrength>" << mWntChemotaxisStrength << "</WntChemotaxisStrength>\n";
 
     // Call method on direct parent class
-    GeneralisedLinearSpringForce<2>::OutputForceParameters(rParamsFile);
+    LinearSpringForce<2>::OutputForceParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36
