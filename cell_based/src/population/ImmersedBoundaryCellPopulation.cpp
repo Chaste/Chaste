@@ -582,23 +582,27 @@ void ImmersedBoundaryCellPopulation<DIM>::CheckForStepSizeException(
 {
     double length = boost::numeric::ublas::norm_2(rDisplacement);
 
+    /* There are two reasons ot adjust movement in a imersed boundary model 
+     * - either the movement is large enough to cause a rearangement.
+     * or the movement is too large (i.e larger than AbsoluteMovementThreshold), 
+     * 
+     * In the first case we want to restrict movement but not throw an exception just a warning.
+     * in the second case we want to throw an exception which can be used by the adaptivie timestepper, 
+     * This is handled in the parent class AbstractCentreBasedCellPopulation, which checks for movement above the AbsoluteMovementThreshold and throws an exception. In this class we check for movement above half the CellRearrangementThreshold and restrict movement if this is the case, but only throw an exception if movement is above the AbsoluteMovementThreshold. 
+     */
+
+
     if (length > 0.5*mpImmersedBoundaryMesh->GetCellRearrangementThreshold())
     {
         rDisplacement *= 0.5*mpImmersedBoundaryMesh->GetCellRearrangementThreshold()/length;
 
-        std::ostringstream message;
-        message << "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted ";
-        message << "so the motion has been restricted. Use a smaller timestep to avoid these warnings.";
-
-        double suggested_step = 0.95*dt*((0.5*mpImmersedBoundaryMesh->GetCellRearrangementThreshold())/length);
-
-        // The first time we see this behaviour, throw a StepSizeException, but not more than once
-        if(mThrowStepSizeException)
-        {
-            mThrowStepSizeException = false;
-            throw StepSizeException(suggested_step, message.str(), false);
-        }
+        WARN_ONCE_ONLY("Vertices are moving more than the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
     }
+
+    // Check for movement above the AbsoluteMovementThreshold and throw an exception if this is the case
+    // Call method on parent class
+    AbstractOffLatticeCellPopulation<DIM, DIM>::CheckForStepSizeException(nodeIndex, rDisplacement, dt);
+
 }
 
 template <unsigned DIM>

@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "AbstractOffLatticeCellPopulation.hpp"
+#include "StepSizeException.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractOffLatticeCellPopulation( AbstractMesh<ELEMENT_DIM, SPACE_DIM>& rMesh,
@@ -51,6 +52,26 @@ AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::AbstractOffLatticeCell
     : AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>(rMesh)
 {
 }
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::CheckForStepSizeException(unsigned nodeIndex, c_vector<double,SPACE_DIM>& rDisplacement, double dt)
+{
+    double length = norm_2(rDisplacement);
+
+    if (length > this->mAbsoluteMovementThreshold)
+    {
+        std::ostringstream message;
+        message << "Cells are moving by " << length;
+        message << ", which is more than the AbsoluteMovementThreshold: use a smaller timestep to avoid this exception.";
+
+        // Halve the time step
+        double new_step = 0.95*dt*(this->mAbsoluteMovementThreshold/length);
+
+        throw StepSizeException(new_step, message.str(), true); // terminate
+    }
+}
+
+
 
 // LCOV_EXCL_START
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
