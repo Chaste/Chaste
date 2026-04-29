@@ -126,7 +126,7 @@ c_vector<double,2> CryptProjectionForce::CalculateForceBetweenNodes(unsigned nod
     c_vector<double,2> node_a_location_2d = rCellPopulation.GetNode(nodeAGlobalIndex)->rGetLocation();
     c_vector<double,2> node_b_location_2d = rCellPopulation.GetNode(nodeBGlobalIndex)->rGetLocation();
 
-    // "Get the unit vector parallel to the line joining the two nodes" [GeneralisedLinearSpringForce]
+    // "Get the unit vector parallel to the line joining the two nodes" [LinearSpringForce]
 
     // Create a unit vector in the direction of the 3D spring
     c_vector<double,3> unit_difference = mNode3dLocationMap[nodeBGlobalIndex] - mNode3dLocationMap[nodeAGlobalIndex];

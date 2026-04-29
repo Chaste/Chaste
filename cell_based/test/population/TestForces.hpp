@@ -40,12 +40,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "CheckpointArchiveTypes.hpp"
 
-#include "GeneralisedLinearSpringForce.hpp"
 #include "LinearSpringForce.hpp"
 #include "LinearRepulsionForce.hpp"
 #include "PathmanathanTwoBodyInteractionForce.hpp"
 #include "LogarithmicRepulsionForce.hpp"
-#include "DifferentialAdhesionGeneralisedLinearSpringForce.hpp"
 #include "DifferentialAdhesionLinearSpringForce.hpp"
 #include "DifferentialAdhesionPathmanathanTwoBodyInteractionForce.hpp"
 #include "CellsGenerator.hpp"
@@ -55,7 +53,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "ChemotacticForce.hpp"
-#include "RepulsionForce.hpp"
 #include "NagaiHondaForce.hpp"
 #include "NagaiHondaDifferentialAdhesionForce.hpp"
 #include "WelikyOsterForce.hpp"
@@ -81,135 +78,7 @@ class TestForces : public AbstractCellBasedTestSuite
 {
 public:
 
-    void TestGeneralisedLinearSpringForceMethods()
-    {
-        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
-
-        unsigned cells_across = 7;
-        unsigned cells_up = 5;
-        unsigned thickness_of_ghost_layer = 3;
-
-        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
-
-        HoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
-        std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
-
-        // Create cells
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, location_indices.size(), location_indices);
-
-        // Create cell population
-        MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
-
-        // Create force
-        GeneralisedLinearSpringForce<2> linear_force;
-
-        // Test set/get method
-        TS_ASSERT_DELTA(linear_force.GetMeinekeDivisionRestingSpringLength(), 0.5, 1e-6);
-        TS_ASSERT_DELTA(linear_force.GetMeinekeSpringStiffness(), 15.0, 1e-6);
-        TS_ASSERT_DELTA(linear_force.GetMeinekeSpringGrowthDuration(), 1.0, 1e-6);
-        TS_ASSERT_EQUALS(linear_force.GetUseCutOffLength(), false);
-        TS_ASSERT_DELTA(linear_force.GetCutOffLength(), DBL_MAX, 1e-6);
-
-        linear_force.SetMeinekeDivisionRestingSpringLength(0.8);
-        linear_force.SetMeinekeSpringStiffness(20.0);
-        linear_force.SetMeinekeSpringGrowthDuration(2.0);
-        linear_force.SetCutOffLength(1.5);
-
-        TS_ASSERT_DELTA(linear_force.GetMeinekeDivisionRestingSpringLength(), 0.8, 1e-6);
-        TS_ASSERT_DELTA(linear_force.GetMeinekeSpringStiffness(), 20.0, 1e-6);
-        TS_ASSERT_DELTA(linear_force.GetMeinekeSpringGrowthDuration(), 2.0, 1e-6);
-        TS_ASSERT_EQUALS(linear_force.GetUseCutOffLength(), true);
-        TS_ASSERT_DELTA(linear_force.GetCutOffLength(), 1.5, 1e-6);
-
-        linear_force.SetMeinekeDivisionRestingSpringLength(0.5);
-        linear_force.SetMeinekeSpringStiffness(15.0);
-        linear_force.SetMeinekeSpringGrowthDuration(1.0);
-
-        // Reset cut off length
-        linear_force.SetCutOffLength(DBL_MAX);
-
-        // Initialise a vector of node forces
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
-        {
-             cell_population.GetNode(i)->ClearAppliedForce();
-        }
-
-        // Test node force calculation
-        linear_force.AddForceContribution(cell_population);
-
-        // Test forces on non-ghost nodes
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            unsigned node_index = cell_population.GetLocationIndexUsingCell(*cell_iter);
-
-            TS_ASSERT_DELTA(cell_population.GetNode(node_index)->rGetAppliedForce()[0], 0.0, 1e-4);
-            TS_ASSERT_DELTA(cell_population.GetNode(node_index)->rGetAppliedForce()[1], 0.0, 1e-4);
-        }
-
-        // Move a node along the x-axis and calculate the force exerted on a neighbour
-        c_vector<double,2> old_point;
-        old_point = p_mesh->GetNode(59)->rGetLocation();
-        ChastePoint<2> new_point;
-        new_point.rGetLocation()[0] = old_point[0]+0.5;
-        new_point.rGetLocation()[1] = old_point[1];
-
-        p_mesh->SetNode(59, new_point, false);
-
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
-        {
-            cell_population.GetNode(i)->ClearAppliedForce();
-        }
-        linear_force.AddForceContribution(cell_population);
-
-        TS_ASSERT_DELTA(cell_population.GetNode(60)->rGetAppliedForce()[0], 0.5*linear_force.GetMeinekeSpringStiffness(), 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(60)->rGetAppliedForce()[1], 0.0, 1e-4);
-
-        TS_ASSERT_DELTA(cell_population.GetNode(59)->rGetAppliedForce()[0], (-3+4.0/sqrt(7.0))*linear_force.GetMeinekeSpringStiffness(), 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(59)->rGetAppliedForce()[1], 0.0, 1e-4);
-
-        TS_ASSERT_DELTA(cell_population.GetNode(58)->rGetAppliedForce()[0], 0.5*linear_force.GetMeinekeSpringStiffness(), 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(58)->rGetAppliedForce()[1], 0.0, 1e-4);
-
-        // Test spring force calculation
-        c_vector<double,2> force_on_spring; // between nodes 59 and 60
-
-        // Find one of the elements that nodes 59 and 60 live on
-        ChastePoint<2> new_point2;
-        new_point2.rGetLocation()[0] = new_point[0] + 0.01;
-        new_point2.rGetLocation()[1] = new_point[1] + 0.01;
-
-        unsigned elem_index = p_mesh->GetContainingElementIndex(new_point2, false);
-        Element<2,2>* p_element = p_mesh->GetElement(elem_index);
-
-        force_on_spring = linear_force.CalculateForceBetweenNodes(p_element->GetNodeGlobalIndex(1),
-                                                                  p_element->GetNodeGlobalIndex(0),
-                                                                  cell_population);
-
-        TS_ASSERT_DELTA(force_on_spring[0], 0.5*linear_force.GetMeinekeSpringStiffness(), 1e-4);
-        TS_ASSERT_DELTA(force_on_spring[1], 0.0, 1e-4);
-
-        // Test force with cutoff point
-        double dist = norm_2( p_mesh->GetVectorFromAtoB(p_element->GetNode(0)->rGetLocation(),
-                              p_element->GetNode(1)->rGetLocation()) );
-
-        linear_force.SetCutOffLength(dist-0.1);
-
-        // Coverage
-        TS_ASSERT_DELTA(linear_force.GetCutOffLength(), dist-0.1, 1e-4);
-
-        force_on_spring = linear_force.CalculateForceBetweenNodes(p_element->GetNodeGlobalIndex(1),
-                                                                  p_element->GetNodeGlobalIndex(0),
-                                                                  cell_population);
-        TS_ASSERT_DELTA(force_on_spring[0], 0.0, 1e-4);
-        TS_ASSERT_DELTA(force_on_spring[1], 0.0, 1e-4);
-    }
-
-    void TestGeneralisedLinearSpringForceCalculationIn1d()
+    void TestLinearSpringForceCalculationIn1d()
     {
         // Create a 1D mesh with nodes equally spaced a unit distance apart
         MutableMesh<1,1> mesh;
@@ -226,7 +95,7 @@ public:
         MeshBasedCellPopulation<1> cell_population(mesh, cells);
 
         // Create force law object
-        GeneralisedLinearSpringForce<1> linear_force;
+        LinearSpringForce<1> linear_force;
 
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
         {
@@ -285,7 +154,7 @@ public:
         mesh2.ConstructLinearMesh(5);
 
         MeshBasedCellPopulation<1> cell_population2(mesh2, cells_copy);
-        GeneralisedLinearSpringForce<1> linear_force2;
+        LinearSpringForce<1> linear_force2;
 
         // Move one node and check that forces are correctly calculated
         ChastePoint<1> shifted_point;
@@ -308,7 +177,7 @@ public:
         TS_ASSERT_DELTA(cell_population2.GetNode(2)->rGetAppliedForce()[0], -linear_force.GetMeinekeSpringStiffness(), 1e-6);
     }
 
-    void TestGeneralisedLinearSpringForceCalculationIn3d()
+    void TestLinearSpringForceCalculationIn3d()
     {
         SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
 
@@ -327,7 +196,7 @@ public:
 
         std::vector<CellPtr> cells_copy(cells);
         MeshBasedCellPopulation<3> cell_population(mesh, cells);
-        GeneralisedLinearSpringForce<3> linear_force;
+        LinearSpringForce<3> linear_force;
 
         // Test forces on springs
         unsigned nodeA = 0, nodeB = 1;
@@ -388,7 +257,7 @@ public:
         mesh2.ConstructFromMeshReader(mesh_reader);
 
         MeshBasedCellPopulation<3> cell_population2(mesh2, cells_copy);
-        GeneralisedLinearSpringForce<3> linear_force2;
+        LinearSpringForce<3> linear_force2;
 
         c_vector<double,3> old_point = mesh2.GetNode(0)->rGetLocation();
         ChastePoint<3> new_point;
@@ -421,153 +290,11 @@ public:
         }
     }
 
-    void TestDifferentialAdhesionGeneralisedLinearSpringForceMethods()
-    {
-        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
-
-        unsigned cells_across = 7;
-        unsigned cells_up = 5;
-        unsigned thickness_of_ghost_layer = 3;
-
-        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
-
-        HoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
-        std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
-
-        // Create cells
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, location_indices.size(), location_indices);
-
-        // Create cell population
-        MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
-
-        // Create force
-        DifferentialAdhesionGeneralisedLinearSpringForce<2> force;
-
-        // Test set/get method
-        TS_ASSERT_DELTA(force.GetHomotypicLabelledSpringConstantMultiplier(), 1.0, 1e-6);
-        TS_ASSERT_DELTA(force.GetHeterotypicSpringConstantMultiplier(), 1.0, 1e-6);
-
-        force.SetHomotypicLabelledSpringConstantMultiplier(2.0);
-        force.SetHeterotypicSpringConstantMultiplier(4.0);
-
-        TS_ASSERT_DELTA(force.GetHomotypicLabelledSpringConstantMultiplier(), 2.0, 1e-6);
-        TS_ASSERT_DELTA(force.GetHeterotypicSpringConstantMultiplier(), 4.0, 1e-6);
-
-        // Initialise a vector of node forces
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
-        {
-             cell_population.GetNode(i)->ClearAppliedForce();
-        }
-
-        // Move a node along the x-axis and calculate the force exerted on a neighbour
-        c_vector<double,2> old_point;
-        old_point = p_mesh->GetNode(59)->rGetLocation();
-        ChastePoint<2> new_point;
-        new_point.rGetLocation()[0] = old_point[0]+0.5;
-        new_point.rGetLocation()[1] = old_point[1];
-        p_mesh->SetNode(59, new_point, false);
-
-        double spring_stiffness = force.GetMeinekeSpringStiffness();
-
-        // Test the case where node 59 and its neighbours are unlabelled
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
-        {
-            cell_population.GetNode(i)->ClearAppliedForce();
-        }
-        force.AddForceContribution(cell_population);
-
-        TS_ASSERT_DELTA(cell_population.GetNode(58)->rGetAppliedForce()[0], 0.5*spring_stiffness, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(58)->rGetAppliedForce()[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(59)->rGetAppliedForce()[0], (-3+4.0/sqrt(7.0))*spring_stiffness, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(59)->rGetAppliedForce()[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(60)->rGetAppliedForce()[0], 0.5*spring_stiffness, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(60)->rGetAppliedForce()[1], 0.0, 1e-4);
-
-        // Next, test the case where node 59 is labelled but its neighbours are not...
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
-        {
-            cell_population.GetNode(i)->ClearAppliedForce();
-        }
-
-        boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
-        cell_population.GetCellUsingLocationIndex(59)->AddCellProperty(p_label);
-
-        force.AddForceContribution(cell_population);
-
-        // ...for which the force magnitude should be increased by 4, our chosen multiplier for heterotypic interactions under attraction
-        TS_ASSERT_DELTA(cell_population.GetNode(58)->rGetAppliedForce()[0], 4.0*0.5*spring_stiffness, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(58)->rGetAppliedForce()[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(59)->rGetAppliedForce()[0], -0.5*spring_stiffness+4.0*(4.0/sqrt(7.0)-2.5)*spring_stiffness, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(59)->rGetAppliedForce()[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(60)->rGetAppliedForce()[0], 0.5*spring_stiffness, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(60)->rGetAppliedForce()[1], 0.0, 1e-4);
-
-        // Finally, test the case where node 59 and its neighbours are labelled...
-        for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
-        {
-            cell_population.GetNode(i)->ClearAppliedForce();
-        }
-
-        for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
-             cell_iter != cell_population.End();
-             ++cell_iter)
-        {
-            cell_iter->AddCellProperty(p_label);
-        }
-
-        force.AddForceContribution(cell_population);
-
-        // ...for which the force magnitude should be increased by 2, our chosen multiplier for homotypic labelled interactions, again only for attractive interactions
-        TS_ASSERT_DELTA(cell_population.GetNode(58)->rGetAppliedForce()[0], 2.0*0.5*spring_stiffness, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(58)->rGetAppliedForce()[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(59)->rGetAppliedForce()[0], -0.5*spring_stiffness+2.0*(4.0/sqrt(7.0)-2.5)*spring_stiffness, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(59)->rGetAppliedForce()[1], 0.0, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(60)->rGetAppliedForce()[0], 0.5*spring_stiffness, 1e-4);
-        TS_ASSERT_DELTA(cell_population.GetNode(60)->rGetAppliedForce()[1], 0.0, 1e-4);
-    }
-
     void TestForceOutputParameters()
     {
         EXIT_IF_PARALLEL;
         std::string output_directory = "TestForcesOutputParameters";
         OutputFileHandler output_file_handler(output_directory, false);
-
-        // Test with GeneralisedLinearSpringForce
-        GeneralisedLinearSpringForce<2> linear_force;
-        linear_force.SetCutOffLength(1.5);
-        TS_ASSERT_EQUALS(linear_force.GetIdentifier(), "GeneralisedLinearSpringForce-2-2");
-
-        out_stream linear_force_parameter_file = output_file_handler.OpenOutputFile("linear_results.parameters");
-        linear_force.OutputForceParameters(linear_force_parameter_file);
-        linear_force_parameter_file->close();
-
-        {
-            FileFinder generated_file = output_file_handler.FindFile("linear_results.parameters");
-            FileFinder reference_file("cell_based/test/data/TestForces/linear_results.parameters",
-                                      RelativeTo::ChasteSourceRoot);
-            FileComparison comparer(generated_file,reference_file);
-            TS_ASSERT(comparer.CompareFiles());
-        }
-
-        // Test with DifferentialAdhesionGeneralisedLinearSpringForce
-        DifferentialAdhesionGeneralisedLinearSpringForce<2> differential_linear_force;
-        differential_linear_force.SetCutOffLength(1.5);
-        TS_ASSERT_EQUALS(differential_linear_force.GetIdentifier(), "DifferentialAdhesionGeneralisedLinearSpringForce-2-2");
-
-        out_stream differential_linear_force_parameter_file = output_file_handler.OpenOutputFile("differential_linear_results.parameters");
-        differential_linear_force.OutputForceParameters(differential_linear_force_parameter_file);
-        differential_linear_force_parameter_file->close();
-
-        {
-            FileFinder generated_file = output_file_handler.FindFile("differential_linear_results.parameters");
-            FileFinder reference_file("cell_based/test/data/TestForces/differential_linear_results.parameters",
-                                      RelativeTo::ChasteSourceRoot);
-            FileComparison comparer(generated_file,reference_file);
-            TS_ASSERT(comparer.CompareFiles());
-        }
 
         // Test with ChemotacticForce
         ChemotacticForce<2> chemotactic_force;
@@ -580,22 +307,6 @@ public:
         {
             FileFinder generated_file = output_file_handler.FindFile("chemotactic_results.parameters");
             FileFinder reference_file("cell_based/test/data/TestForces/chemotactic_results.parameters",
-                                      RelativeTo::ChasteSourceRoot);
-            FileComparison comparer(generated_file,reference_file);
-            TS_ASSERT(comparer.CompareFiles());
-        }
-
-        // Test with RepulsionForce
-        RepulsionForce<2> repulsion_force;
-        TS_ASSERT_EQUALS(repulsion_force.GetIdentifier(), "RepulsionForce-2");
-
-        out_stream repulsion_force_parameter_file = output_file_handler.OpenOutputFile("repulsion_results.parameters");
-        repulsion_force.OutputForceParameters(repulsion_force_parameter_file);
-        repulsion_force_parameter_file->close();
-
-        {
-            FileFinder generated_file = output_file_handler.FindFile("repulsion_results.parameters");
-            FileFinder reference_file("cell_based/test/data/TestForces/repulsion_results.parameters",
                                       RelativeTo::ChasteSourceRoot);
             FileComparison comparer(generated_file,reference_file);
             TS_ASSERT(comparer.CompareFiles());
@@ -698,96 +409,6 @@ public:
         }
     }
 
-    void TestGeneralisedLinearSpringForceArchiving()
-    {
-        EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
-        OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "GeneralisedLinearSpringForce.arch";
-
-        {
-            GeneralisedLinearSpringForce<2> force;
-
-            std::ofstream ofs(archive_filename.c_str());
-            boost::archive::text_oarchive output_arch(ofs);
-
-            // Set member variables
-            force.SetMeinekeSpringStiffness(12.34);
-            force.SetMeinekeDivisionRestingSpringLength(0.856);
-            force.SetMeinekeSpringGrowthDuration(2.593);
-
-            // Serialize via pointer to most abstract class possible
-            AbstractForce<2>* const p_force = &force;
-            output_arch << p_force;
-        }
-
-        {
-            AbstractForce<2>* p_force;
-
-            // Create an input archive
-            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
-            boost::archive::text_iarchive input_arch(ifs);
-
-            // Restore from the archive
-            input_arch >> p_force;
-
-            // Test member variables
-            TS_ASSERT_DELTA((static_cast<GeneralisedLinearSpringForce<2>*>(p_force))->GetMeinekeSpringStiffness(), 12.34, 1e-6);
-            TS_ASSERT_DELTA((static_cast<GeneralisedLinearSpringForce<2>*>(p_force))->GetMeinekeDivisionRestingSpringLength(), 0.856, 1e-6);
-            TS_ASSERT_DELTA((static_cast<GeneralisedLinearSpringForce<2>*>(p_force))->GetMeinekeSpringGrowthDuration(), 2.593, 1e-6);
-
-            // Tidy up
-            delete p_force;
-        }
-    }
-
-    void TestDifferentialAdhesionGeneralisedLinearSpringForceArchiving()
-    {
-        EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
-        OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "DifferentialAdhesionGeneralisedLinearSpringForce.arch";
-
-        {
-            DifferentialAdhesionGeneralisedLinearSpringForce<2> force;
-
-            std::ofstream ofs(archive_filename.c_str());
-            boost::archive::text_oarchive output_arch(ofs);
-
-            // Set member variables
-            force.SetMeinekeSpringStiffness(12.34);
-            force.SetMeinekeDivisionRestingSpringLength(0.856);
-            force.SetMeinekeSpringGrowthDuration(2.593);
-            force.SetHomotypicLabelledSpringConstantMultiplier(0.051);
-            force.SetHeterotypicSpringConstantMultiplier(1.348);
-
-            // Serialize via pointer to most abstract class possible
-            AbstractForce<2>* const p_force = &force;
-            output_arch << p_force;
-        }
-
-        {
-            AbstractForce<2>* p_force;
-
-            // Create an input archive
-            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
-            boost::archive::text_iarchive input_arch(ifs);
-
-            // Restore from the archive
-            input_arch >> p_force;
-
-            // Test member variables
-            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionGeneralisedLinearSpringForce<2>*>(p_force))->GetMeinekeSpringStiffness(), 12.34, 1e-6);
-            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionGeneralisedLinearSpringForce<2>*>(p_force))->GetMeinekeDivisionRestingSpringLength(), 0.856, 1e-6);
-            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionGeneralisedLinearSpringForce<2>*>(p_force))->GetMeinekeSpringGrowthDuration(), 2.593, 1e-6);
-            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionGeneralisedLinearSpringForce<2>*>(p_force))->GetMeinekeDivisionRestingSpringLength(), 0.856, 1e-6);
-            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionGeneralisedLinearSpringForce<2>*>(p_force))->GetMeinekeSpringGrowthDuration(), 2.593, 1e-6);
-            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionGeneralisedLinearSpringForce<2>*>(p_force))->GetHomotypicLabelledSpringConstantMultiplier(), 0.051, 1e-6);
-            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionGeneralisedLinearSpringForce<2>*>(p_force))->GetHeterotypicSpringConstantMultiplier(), 1.348, 1e-6);
-
-            // Tidy up
-            delete p_force;
-        }
-    }
-
     void TestChemotacticForceMethods()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
@@ -878,145 +499,6 @@ public:
 
             // No member variables to test, so just test a method
             TS_ASSERT_DELTA((static_cast<ChemotacticForce<2>*>(p_force))->GetChemotacticForceMagnitude(12.0, 3.5), 12.0, 1e-6);
-
-            // Tidy up
-            delete p_force;
-        }
-    }
-
-    void TestRepulsionForceMethods()
-    {
-        // Create a NodeBasedCellPopulation
-        std::vector<Node<2>*> nodes;
-        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
-        nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
-        nodes.push_back(new Node<2>(2, true, 3.0, 0.0));
-
-        // Convert this to a NodesOnlyMesh
-        NodesOnlyMesh<2> mesh;
-        mesh.ConstructNodesWithoutMesh(nodes, 100.0);
-
-        std::vector<CellPtr> cells;
-        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
-
-        NodeBasedCellPopulation<2> cell_population(mesh, cells);
-        cell_population.Update(); //Needs to be called separately as not in a simulation
-
-        RepulsionForce<2> repulsion_force;
-
-        for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
-                node_iter != mesh.GetNodeIteratorEnd();
-                ++node_iter)
-        {
-            node_iter->ClearAppliedForce();
-        }
-        repulsion_force.AddForceContribution(cell_population);
-
-        /*
-         * First two cells repel each other and second 2 cells are too far apart.
-         * The radius of the cells is the default value, 0.5.
-         */
-        if (PetscTools::AmMaster())    // All cells in this test lie on the master process.
-        {
-            unsigned zero_index = 0;
-            unsigned one_index = PetscTools::GetNumProcs();
-            unsigned two_index = 2*PetscTools::GetNumProcs();
-            TS_ASSERT_DELTA(cell_population.GetNode(zero_index)->rGetAppliedForce()[0], -34.5387, 1e-4);
-            TS_ASSERT_DELTA(cell_population.GetNode(zero_index)->rGetAppliedForce()[1], 0.0, 1e-4);
-            TS_ASSERT_DELTA(cell_population.GetNode(one_index)->rGetAppliedForce()[0], 34.5387, 1e-4);
-            TS_ASSERT_DELTA(cell_population.GetNode(one_index)->rGetAppliedForce()[1], 0.0, 1e-4);
-            TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[0], 0.0, 1e-4);
-            TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[1], 0.0, 1e-4);
-
-            // Tests the calculation of the force with different cell radii
-            mesh.GetNode(zero_index)->SetRadius(10);
-            mesh.GetNode(one_index)->SetRadius(10);
-            mesh.GetNode(two_index)->SetRadius(10);
-
-            // Reset the vector of node forces
-            for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
-                    node_iter != mesh.GetNodeIteratorEnd();
-                    ++node_iter)
-            {
-                node_iter->ClearAppliedForce();
-            }
-
-            repulsion_force.AddForceContribution(cell_population);
-
-            // All cells repel each other
-            TS_ASSERT_DELTA(cell_population.GetNode(zero_index)->rGetAppliedForce()[0], 15.0 * 20.0 * log(1 - 19.9/20)+15.0 * 20.0 * log(1 - 17.0/20), 1e-4);
-            TS_ASSERT_DELTA(cell_population.GetNode(zero_index)->rGetAppliedForce()[1], 0.0, 1e-4);
-            TS_ASSERT_DELTA(cell_population.GetNode(one_index)->rGetAppliedForce()[0], -15.0 * 20.0 * log(1 - 19.9/20)+15.0 * 20.0 * log(1 - 17.1/20), 1e-4);
-            TS_ASSERT_DELTA(cell_population.GetNode(one_index)->rGetAppliedForce()[1], 0.0, 1e-4);
-            TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[0], -15.0 * 20.0 * log(1 - 17.1/20)-15.0 * 20.0 * log(1 - 17.0/20), 1e-4);
-            TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[1], 0.0, 1e-4);
-
-            // Tests the calculation of the force with different cell radii
-            mesh.GetNode(zero_index)->SetRadius(0.2);
-            mesh.GetNode(one_index)->SetRadius(0.2);
-            mesh.GetNode(two_index)->SetRadius(0.2);
-
-            // Reset the vector of node forces
-            for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
-                    node_iter != mesh.GetNodeIteratorEnd();
-                    ++node_iter)
-            {
-                node_iter->ClearAppliedForce();
-            }
-
-            repulsion_force.AddForceContribution(cell_population);
-
-            /*
-             * First two cells repel each other and second 2 cells are too far apart.
-             * The overlap is -0.3 and the spring stiffness is the default value 15.0.
-             */
-            TS_ASSERT_DELTA(cell_population.GetNode(zero_index)->rGetAppliedForce()[0], 15.0 * 0.4 * log(1 -0.3/0.4), 1e-4);
-            TS_ASSERT_DELTA(cell_population.GetNode(zero_index)->rGetAppliedForce()[1], 0.0, 1e-4);
-            TS_ASSERT_DELTA(cell_population.GetNode(one_index)->rGetAppliedForce()[0], -15.0 * 0.4 * log(1 -0.3/0.4), 1e-4);
-            TS_ASSERT_DELTA(cell_population.GetNode(one_index)->rGetAppliedForce()[1], 0.0, 1e-4);
-            TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[0], 0.0, 1e-4);
-            TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[1], 0.0, 1e-4);
-        }
-
-        for (unsigned i=0; i<nodes.size(); i++)
-        {
-            delete nodes[i];
-        }
-    }
-
-    void TestRepulsionForceArchiving()
-    {
-        EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
-        OutputFileHandler handler("archive", false);
-        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "RepulsionForce.arch";
-
-        {
-            RepulsionForce<2> force;
-
-            std::ofstream ofs(archive_filename.c_str());
-            boost::archive::text_oarchive output_arch(ofs);
-
-            // No extra member variables, so set member variables on parent class
-            force.SetSpringStiffness(12.35);
-
-            // Serialize via pointer to most abstract class possible
-            AbstractForce<2>* const p_force = &force;
-            output_arch << p_force;
-        }
-
-        {
-            AbstractForce<2>* p_force;
-
-            // Create an input archive
-            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
-            boost::archive::text_iarchive input_arch(ifs);
-
-            // Restore from the archive
-            input_arch >> p_force;
-
-            // No extra member variables, so test member variables on parent class
-            TS_ASSERT_DELTA((static_cast<RepulsionForce<2>*>(p_force))->GetSpringStiffness(), 12.35, 1e-6);
 
             // Tidy up
             delete p_force;
@@ -1918,17 +1400,17 @@ public:
         cell_population.InitialiseCells();
 
         // Test that a subclass of AbstractTwoBodyInteractionForce emits the appropraite warning
-        GeneralisedLinearSpringForce<2> spring_force;
+        LinearSpringForce<2> spring_force;
         Warnings::QuietDestroy(); // Clear any warnings before the expected one
         spring_force.AddForceContribution(cell_population);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(),
             "No node pairs found. Does this cell population support updating mNodePairs?"
             " Currently this force class works only with NodeBased and MeshBased cell populations.");
 
-        // Test that RepulsionForce throws the correct exception
-        RepulsionForce<2> repulsion_force;
-        TS_ASSERT_THROWS_THIS(repulsion_force.AddForceContribution(cell_population),
-                 "RepulsionForce is to be used with a NodeBasedCellPopulation only");
+        // Test that LogarithmicRepulsionForce throws the correct exception
+        LogarithmicRepulsionForce<2> logarithmic_repulsion_force;
+        TS_ASSERT_THROWS_THIS(logarithmic_repulsion_force.AddForceContribution(cell_population),
+                 "LogarithmicRepulsionForce is to be used with a NodeBasedCellPopulation only");
     }
 
     void TestIncorrectForcesWithNodeBasedCellPopulation()

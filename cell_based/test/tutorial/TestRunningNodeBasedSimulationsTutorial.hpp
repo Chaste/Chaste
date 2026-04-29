@@ -70,7 +70,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TransitCellProliferativeType.hpp"
 #include "UniformCellCycleModel.hpp"
 #include "HoneycombMeshGenerator.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 #include "OffLatticeSimulation.hpp"
 #include "SmartPointers.hpp"
 /* The next header file defines the class for storing the spatial information of cells. */
@@ -141,7 +141,7 @@ public:
         simulator.SetEndTime(10.0);
 
         /* We now pass a force law to the simulation. */
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         simulator.AddForce(p_force);
 
         /* To run the simulation, we call `Solve()`. */
@@ -217,7 +217,7 @@ public:
         simulator.SetEndTime(10.0);
 
         /* Again we create a force law (this time with dimension 3), and pass it to the `OffLatticeSimulation`.*/
-        MAKE_PTR(GeneralisedLinearSpringForce<3>, p_force);
+        MAKE_PTR(LinearSpringForce<3>, p_force);
         simulator.AddForce(p_force);
 
         /* To run the simulation, we call `Solve()`. */
@@ -282,7 +282,7 @@ public:
         simulator.SetEndTime(10.0);
 
         /* As before, we create a linear spring force and pass it to the simulation object. */
-        MAKE_PTR(GeneralisedLinearSpringForce<3>, p_force);
+        MAKE_PTR(LinearSpringForce<3>, p_force);
         simulator.AddForce(p_force);
 
         /*

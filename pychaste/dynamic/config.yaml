@@ -714,10 +714,6 @@ modules:
       - name: DiffusionForce
       - name: FarhadifarForce
 
-      - name: GeneralisedLinearSpringForce
-        source_includes:
-          - PybindUblasTypeCaster.hpp
-
       - name: LinearSpringForce
         source_includes:
           - PybindUblasTypeCaster.hpp
@@ -738,13 +734,10 @@ modules:
       - name: ImmersedBoundaryMorseMembraneForce
       
       - name: NagaiHondaForce
-      - name: RepulsionForce
 
       - name: WelikyOsterForce
         excluded_methods:
           - GetLineTensionParameter
-
-      - name: DifferentialAdhesionGeneralisedLinearSpringForce
 
       - name: DifferentialAdhesionLinearSpringForce
 

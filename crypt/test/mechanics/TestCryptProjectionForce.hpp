@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "CryptProjectionForce.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "WntConcentration.hpp"
 #include "SimulationTime.hpp"
@@ -220,7 +220,7 @@ public:
         WntConcentration<2>::Instance()->SetCryptProjectionParameterA(0.001);
         WntConcentration<2>::Instance()->SetCryptProjectionParameterB(0.001);
         CryptProjectionForce flat_crypt_projection_force;
-        GeneralisedLinearSpringForce<2> linear_force;
+        LinearSpringForce<2> linear_force;
 
         // Normally this would be set up at the start of rCalculateforcesOfEachNode
         flat_crypt_projection_force.UpdateNode3dLocationMap(cell_population);
@@ -483,7 +483,7 @@ public:
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
 
         // Create two different force laws and add to a std::vector
-        GeneralisedLinearSpringForce<2> linear_force;
+        LinearSpringForce<2> linear_force;
 
         WntConcentration<2>::Instance()->SetCryptProjectionParameterA(0.0001);
         WntConcentration<2>::Instance()->SetCryptProjectionParameterB(0.0001);

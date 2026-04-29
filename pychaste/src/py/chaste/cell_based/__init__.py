@@ -159,8 +159,6 @@ from chaste._pychaste_all import (
     DeltaNotchSrnModel,
     DeltaNotchTrackingModifier_2,
     DeltaNotchTrackingModifier_3,
-    DifferentialAdhesionGeneralisedLinearSpringForce_2_2,
-    DifferentialAdhesionGeneralisedLinearSpringForce_3_3,
     DifferentialAdhesionLinearSpringForce_1_1,
     DifferentialAdhesionLinearSpringForce_1_2,
     DifferentialAdhesionLinearSpringForce_2_2,
@@ -198,8 +196,6 @@ from chaste._pychaste_all import (
     ForwardEulerNumericalMethod_2_2,
     ForwardEulerNumericalMethod_3_3,
     GammaG1CellCycleModel,
-    GeneralisedLinearSpringForce_2_2,
-    GeneralisedLinearSpringForce_3_3,
     LinearSpringForce_1_1,
     LinearSpringForce_1_2,
     LinearSpringForce_2_2,
@@ -294,8 +290,6 @@ from chaste._pychaste_all import (
     RandomDirectionCentreBasedDivisionRule_3_3,
     RandomDirectionVertexBasedDivisionRule_2,
     RandomDirectionVertexBasedDivisionRule_3,
-    RepulsionForce_2,
-    RepulsionForce_3,
     ShortAxisImmersedBoundaryDivisionRule_2,
     ShortAxisImmersedBoundaryDivisionRule_3,
     ShortAxisVertexBasedDivisionRule_2,
@@ -776,15 +770,6 @@ DeltaNotchEdgeTrackingModifier = TemplateClassDict(
     }
 )
 
-DifferentialAdhesionGeneralisedLinearSpringForce = TemplateClassDict(
-    {
-        ("2",): DifferentialAdhesionGeneralisedLinearSpringForce_2_2,
-        ("2", "2"): DifferentialAdhesionGeneralisedLinearSpringForce_2_2,
-        ("3",): DifferentialAdhesionGeneralisedLinearSpringForce_3_3,
-        ("3", "3"): DifferentialAdhesionGeneralisedLinearSpringForce_3_3,
-    }
-)
-
 DifferentialAdhesionLinearSpringForce = TemplateClassDict(
     {
         ("1",): DifferentialAdhesionLinearSpringForce_1_1,
@@ -884,15 +869,6 @@ ForwardEulerNumericalMethod = TemplateClassDict(
         ("2", "2"): ForwardEulerNumericalMethod_2_2,
         ("3",): ForwardEulerNumericalMethod_3_3,
         ("3", "3"): ForwardEulerNumericalMethod_3_3,
-    }
-)
-
-GeneralisedLinearSpringForce = TemplateClassDict(
-    {
-        ("2",): GeneralisedLinearSpringForce_2_2,
-        ("2", "2"): GeneralisedLinearSpringForce_2_2,
-        ("3",): GeneralisedLinearSpringForce_3_3,
-        ("3", "3"): GeneralisedLinearSpringForce_3_3,
     }
 )
 
@@ -1214,13 +1190,6 @@ RandomDirectionVertexBasedDivisionRule = TemplateClassDict(
     }
 )
 
-RepulsionForce = TemplateClassDict(
-    {
-        ("2",): RepulsionForce_2,
-        ("3",): RepulsionForce_3,
-    }
-)
-
 ShortAxisImmersedBoundaryDivisionRule = TemplateClassDict(
     {
         ("2",): ShortAxisImmersedBoundaryDivisionRule_2,
@@ -1490,8 +1459,6 @@ DeltaNotchEdgeTrackingModifier2 = DeprecatedClass("DeltaNotchEdgeTrackingModifie
 DeltaNotchEdgeTrackingModifier3 = DeprecatedClass("DeltaNotchEdgeTrackingModifier3", DeltaNotchEdgeTrackingModifier_3)
 DeltaNotchTrackingModifier2 = DeprecatedClass("DeltaNotchTrackingModifier2", DeltaNotchTrackingModifier_2)
 DeltaNotchTrackingModifier3 = DeprecatedClass("DeltaNotchTrackingModifier3", DeltaNotchTrackingModifier_3)
-DifferentialAdhesionGeneralisedLinearSpringForce2_2 = DeprecatedClass("DifferentialAdhesionGeneralisedLinearSpringForce2_2", DifferentialAdhesionGeneralisedLinearSpringForce_2_2)
-DifferentialAdhesionGeneralisedLinearSpringForce3_3 = DeprecatedClass("DifferentialAdhesionGeneralisedLinearSpringForce3_3", DifferentialAdhesionGeneralisedLinearSpringForce_3_3)
 DifferentialAdhesionPottsUpdateRule2 = DeprecatedClass("DifferentialAdhesionPottsUpdateRule2", DifferentialAdhesionPottsUpdateRule_2)
 DifferentialAdhesionPottsUpdateRule3 = DeprecatedClass("DifferentialAdhesionPottsUpdateRule3", DifferentialAdhesionPottsUpdateRule_3)
 DiffusionCaUpdateRule2 = DeprecatedClass("DiffusionCaUpdateRule2", DiffusionCaUpdateRule_2)
@@ -1512,8 +1479,6 @@ FixedVertexBasedDivisionRule2 = DeprecatedClass("FixedVertexBasedDivisionRule2",
 FixedVertexBasedDivisionRule3 = DeprecatedClass("FixedVertexBasedDivisionRule3", FixedVertexBasedDivisionRule_3)
 ForwardEulerNumericalMethod2_2 = DeprecatedClass("ForwardEulerNumericalMethod2_2", ForwardEulerNumericalMethod_2_2)
 ForwardEulerNumericalMethod3_3 = DeprecatedClass("ForwardEulerNumericalMethod3_3", ForwardEulerNumericalMethod_3_3)
-GeneralisedLinearSpringForce2_2 = DeprecatedClass("GeneralisedLinearSpringForce2_2", GeneralisedLinearSpringForce_2_2)
-GeneralisedLinearSpringForce3_3 = DeprecatedClass("GeneralisedLinearSpringForce3_3", GeneralisedLinearSpringForce_3_3)
 HeterotypicBoundaryLengthWriter2_2 = DeprecatedClass("HeterotypicBoundaryLengthWriter2_2", HeterotypicBoundaryLengthWriter_2_2)
 HeterotypicBoundaryLengthWriter3_3 = DeprecatedClass("HeterotypicBoundaryLengthWriter3_3", HeterotypicBoundaryLengthWriter_3_3)
 ImmersedBoundaryBoundaryCellWriter2_2 = DeprecatedClass("ImmersedBoundaryBoundaryCellWriter2_2", ImmersedBoundaryBoundaryCellWriter_2_2)
@@ -1586,8 +1551,6 @@ RandomDirectionCentreBasedDivisionRule2_2 = DeprecatedClass("RandomDirectionCent
 RandomDirectionCentreBasedDivisionRule3_3 = DeprecatedClass("RandomDirectionCentreBasedDivisionRule3_3", RandomDirectionCentreBasedDivisionRule_3_3)
 RandomDirectionVertexBasedDivisionRule2 = DeprecatedClass("RandomDirectionVertexBasedDivisionRule2", RandomDirectionVertexBasedDivisionRule_2)
 RandomDirectionVertexBasedDivisionRule3 = DeprecatedClass("RandomDirectionVertexBasedDivisionRule3", RandomDirectionVertexBasedDivisionRule_3)
-RepulsionForce2 = DeprecatedClass("RepulsionForce2", RepulsionForce_2)
-RepulsionForce3 = DeprecatedClass("RepulsionForce3", RepulsionForce_3)
 ShortAxisImmersedBoundaryDivisionRule2 = DeprecatedClass("ShortAxisImmersedBoundaryDivisionRule2", ShortAxisImmersedBoundaryDivisionRule_2)
 ShortAxisImmersedBoundaryDivisionRule3 = DeprecatedClass("ShortAxisImmersedBoundaryDivisionRule3", ShortAxisImmersedBoundaryDivisionRule_3)
 ShortAxisVertexBasedDivisionRule2 = DeprecatedClass("ShortAxisVertexBasedDivisionRule2", ShortAxisVertexBasedDivisionRule_2)

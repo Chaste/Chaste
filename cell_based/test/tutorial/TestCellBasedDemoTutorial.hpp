@@ -71,7 +71,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AdhesionPottsUpdateRule.hpp"
 #include "CellsGenerator.hpp"
 #include "CylindricalHoneycombMeshGenerator.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
@@ -84,7 +84,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsBasedCellPopulation.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "RandomCellKiller.hpp"
-#include "RepulsionForce.hpp"
+#include "LogarithmicRepulsionForce.hpp"
 #include "UniformG1GenerationalCellCycleModel.hpp"
 #include "SurfaceAreaConstraintPottsUpdateRule.hpp"
 #include "TysonNovakCellCycleModel.hpp"
@@ -221,7 +221,7 @@ public:
 
         /* We use a different `Force` which is suitable for node based simulations.
          */
-        MAKE_PTR(RepulsionForce<2>, p_force); //**Changed**//
+        MAKE_PTR(LogarithmicRepulsionForce<2>, p_force); //**Changed**//
         simulator.AddForce(p_force);
 
         /* In all types of simulation you may specify how cells are removed from the simulation by specifying
@@ -286,7 +286,7 @@ public:
         simulator.SetEndTime(20.0);
 
         /* We use a different `Force` which is suitable for mesh based simulations.*/
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force); //**Changed**//
+        MAKE_PTR(LinearSpringForce<2>, p_force); //**Changed**//
         simulator.AddForce(p_force);
 
         /* Again we call the `Solve` method on the simulation to run the simulation.*/
@@ -342,7 +342,7 @@ public:
         simulator.SetEndTime(2.0); //**Changed**//
 
         /* We use the same `Force` as before and run the simulation in the same way.*/
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         simulator.AddForce(p_force);
         simulator.Solve();
 
@@ -386,7 +386,7 @@ public:
         simulator.SetSamplingTimestepMultiple(12);
         simulator.SetEndTime(20.0); //**Changed**//
 
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         simulator.AddForce(p_force);
 
         simulator.Solve();
@@ -427,7 +427,7 @@ public:
         simulator.SetSamplingTimestepMultiple(50);
         simulator.SetEndTime(20.0);
 
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         simulator.AddForce(p_force);
 
         /* We now want to impose the condition y>0 on the cells. To do this we create a "shared pointer" to a `PlaneBoundaryCondition`.
