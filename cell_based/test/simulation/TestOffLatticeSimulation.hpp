@@ -343,17 +343,18 @@ public:
 
 
     /**
-     * Test a cell-based simulation with multiple cell killers.
+     * Test a cell-based simulation with multiple cell killers. Cellc placed copressed between two plane killers and are removed.
      */
     void TestOffLatticeSimulationWithMultipleCellKillers()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
-        // Create a simple 2D MeshBasedCellPopulation
+        // Create a simple 2D MeshBasedCellPopulation abd translate it so some cells are killed by the plane killers
         int num_cells_depth = 5;
         int num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
         boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        p_mesh->Translate(-0.1, -0.1);
 
         std::vector<CellPtr> cells;
         MAKE_PTR(TransitCellProliferativeType, p_transit_type);
@@ -361,6 +362,11 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type);
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+
+        
+        cell_population.SetWriteVtkAsPoints(true);
+
+    
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -390,8 +396,8 @@ public:
         // Check that the number of nodes is equal to the number of cells
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
 
-        //Check that the correct number of cells are killed
-        unsigned num_deaths = 6u; // sensitive to changes in random number generation
+        //Check that the correct number of cells are killed all cels on left ot bottom of 3x5 block
+        unsigned num_deaths = 7u; 
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), num_deaths);
 
         // Now remove the killers and check no more cells are killed
@@ -1367,9 +1373,10 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumNodes(), p_transit_type);
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
+        cell_population.SetWriteVtkAsPoints(true);
 
         // Use smaller movement threshold to maintain smooth motion
-        cell_population.SetAbsoluteMovementThreshold(0.1);
+        cell_population.SetAbsoluteMovementThreshold(0.01);
 
         OffLatticeSimulation<2> simulator(cell_population);
         simulator.SetOutputDirectory("TestOffLatticeSimulationWithAdaptivity");
@@ -1397,8 +1404,8 @@ public:
         TS_ASSERT_EQUALS(simulator.GetMaxAdaptiveTimeStep(), 3u);
 
         // Check cells have moved to the correct location
-        TS_ASSERT_DELTA(simulator.rGetCellPopulation().rGetMesh().GetNode(0)->rGetLocation()[0], 0.3169,1e-4);
-        TS_ASSERT_DELTA(simulator.rGetCellPopulation().rGetMesh().GetNode(0)->rGetLocation()[1], 0.0592,1e-4);
+        TS_ASSERT_DELTA(simulator.rGetCellPopulation().rGetMesh().GetNode(0)->rGetLocation()[0], 0.3137,1e-4);
+        TS_ASSERT_DELTA(simulator.rGetCellPopulation().rGetMesh().GetNode(0)->rGetLocation()[1], 0.0599,1e-4);
     }
 };
 

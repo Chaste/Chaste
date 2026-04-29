@@ -68,6 +68,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileComparison.hpp"
 #include "ImmersedBoundaryEnumerations.hpp"
 #include "OffLatticeSimulation.hpp"
+#include "Warnings.hpp"
 #include "ShortAxisImmersedBoundaryDivisionRule.hpp"
 #include "SmartPointers.hpp"
 #include "UniformCellCycleModel.hpp"
@@ -246,12 +247,19 @@ public:
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetThrowsStepSizeException(true);
 
+        // This displacemnt is larger than half the CellRearrangementThreshold, so should cause a warning to be thrown.
         c_vector<double, 2> displacement;
         displacement[0] = 0.8;
         displacement[1] = 0.8;
-        TS_ASSERT_THROWS_ANYTHING(cell_population.CheckForStepSizeException(0, displacement, 0.1));
-    }
 
+        // Test Warnings 
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
+        TS_ASSERT_THROWS_NOTHING(cell_population.CheckForStepSizeException(0, displacement, 0.1));
+        TS_ASSERT_DELTA(norm_2(displacement), 0.5 * p_mesh->GetCellRearrangementThreshold(), 1e-12);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
+        TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
+        Warnings::QuietDestroy();
+    }
     void TestValidateException()
     {
         // Create an immersed boundary cell population object
