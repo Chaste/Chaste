@@ -106,7 +106,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* Standard cell-based simulation headers. */
 #include "CellsGenerator.hpp"
-#include "TransitCellProliferativeType.hpp"
+#include "DifferentiatedCellProliferativeType.hpp"
 #include "UniformCellCycleModel.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
@@ -148,9 +148,9 @@ public:
 
         /* Create one cell per node using a uniform cell-cycle model. */
         std::vector<CellPtr> cells;
-        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<UniformCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_diff_type);
 
         /* Assemble the cell population. */
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
@@ -236,9 +236,9 @@ public:
 
         /* Create one cell per node. */
         std::vector<CellPtr> cells;
-        MAKE_PTR(TransitCellProliferativeType, p_transit_type);
+        MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<UniformCellCycleModel, 2> cells_generator;
-        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_transit_type);
+        cells_generator.GenerateBasicRandom(cells, mesh.GetNumNodes(), p_diff_type);
 
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
 
