@@ -137,8 +137,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
 
             // Successful time step! Update time_advanced_so_far
             time_advanced_so_far += present_time_step;
-            adaptive_timer = 0;
-
+            
             // If using adaptive timestep, then increase the present_time_step (by 1% for now)
             // if (mpNumericalMethod->HasAdaptiveTimestep())
             // {
@@ -150,6 +149,8 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
         }
         catch (StepSizeException& e)
         {
+            adaptive_timer = 0;
+            
             // Detects if a node has travelled too far in a single time step
             if (mpNumericalMethod->HasAdaptiveTimestep() && adaptive_timer < mMaxAdaptiveTimeSteps)
             {
