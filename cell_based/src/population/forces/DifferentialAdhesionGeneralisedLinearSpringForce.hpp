@@ -36,7 +36,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef DIFFERENTIALADHESIONGENERALISEDLINEARSPRINGFORCE_HPP_
 #define DIFFERENTIALADHESIONGENERALISEDLINEARSPRINGFORCE_HPP_
 
-#include "LinearSpringForce.hpp"
+#include "DifferentialAdhesionLinearSpringForce.hpp"
+
+#include "ChasteSerialization.hpp"
+#include <boost/serialization/base_object.hpp>
 
 /**
  * A class for a simple two-body differential adhesion force law between
@@ -45,36 +48,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Designed for use in node and mesh-based simulations.
  *
- * \todo #2266 - throw exceptions if using other cell population objects?
- * \todo #2266 - override CalculateForceBetweenNodes() to use a default rest length of 1.0 for all springs?
+ * @deprecated Use DifferentialAdhesionLinearSpringForce instead.
  */
-template<unsigned  ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
-class DifferentialAdhesionGeneralisedLinearSpringForce : public LinearSpringForce<ELEMENT_DIM, SPACE_DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+class DifferentialAdhesionGeneralisedLinearSpringForce : public DifferentialAdhesionLinearSpringForce<ELEMENT_DIM, SPACE_DIM>
 {
 private :
-
-    /**
-     * A scalar determining the relative spring constant for homotypic
-     * interactions between neighbouring labelled cells, used in the
-     * overridden method VariableSpringConstantMultiplicationFactor().
-     *
-     * Defaults to 1.0 in the constructor.
-     *
-     * Note that for homotypic interactions between neighbouring
-     * unlabelled cells, we use the multiplier value 1.0 that is
-     * returned by the method VariableSpringConstantMultiplicationFactor()
-     * in the parent class LinearSpringForce.
-     */
-    double mHomotypicLabelledSpringConstantMultiplier;
-
-    /**
-     * A scalar determining the relative spring constant for heterotypic
-     * (labelled-unlabelled) interactions between neighbouring cells, used
-     * in the overridden method VariableSpringConstantMultiplicationFactor().
-     *
-     * Defaults to 1.0 in the constructor.
-     */
-    double mHeterotypicSpringConstantMultiplier;
 
     /** Needed for serialization. */
     friend class boost::serialization::access;
@@ -87,9 +66,7 @@ private :
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<LinearSpringForce<ELEMENT_DIM, SPACE_DIM> >(*this);
-        archive & mHomotypicLabelledSpringConstantMultiplier;
-        archive & mHeterotypicSpringConstantMultiplier;
+        archive & boost::serialization::base_object<DifferentialAdhesionLinearSpringForce<ELEMENT_DIM, SPACE_DIM> >(*this);
     }
 
 public :
@@ -98,50 +75,6 @@ public :
      * Constructor.
      */
     DifferentialAdhesionGeneralisedLinearSpringForce();
-
-    /**
-     * Overridden VariableSpringConstantMultiplicationFactor() method.
-     *
-     * This method takes account of the distinct spring constants present
-     * for homotypic (labelled-labelled and unlabelled-unlabelled) and
-     * heterotypic (labelled-unlabelled) interactions between neighbouring
-     * cells.
-     *
-     * @param nodeAGlobalIndex index of one neighbouring node
-     * @param nodeBGlobalIndex index of the other neighbouring node
-     * @param rCellPopulation the cell population
-     * @param isCloserThanRestLength whether the neighbouring nodes lie closer than the rest length of their connecting spring
-     *
-     * @return the multiplication factor.
-     */
-    double VariableSpringConstantMultiplicationFactor(unsigned nodeAGlobalIndex,
-                                                      unsigned nodeBGlobalIndex,
-                                                      AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
-                                                      bool isCloserThanRestLength);
-
-    /**
-     * @return #mHomotypicLabelledSpringConstantMultiplier.
-     */
-    double GetHomotypicLabelledSpringConstantMultiplier();
-
-    /**
-     * Set mHomotypicLabelledSpringConstantMultiplier.
-     *
-     * @param labelledSpringConstantMultiplier the new value of mHomotypicLabelledSpringConstantMultiplier
-     */
-    void SetHomotypicLabelledSpringConstantMultiplier(double labelledSpringConstantMultiplier);
-
-    /**
-     * @return #mHeterotypicSpringConstantMultiplier.
-     */
-    double GetHeterotypicSpringConstantMultiplier();
-
-    /**
-     * Set mHeterotypicSpringConstantMultiplier.
-     *
-     * @param heterotypicSpringConstantMultiplier the new value of mHeterotypicSpringConstantMultiplier
-     */
-    void SetHeterotypicSpringConstantMultiplier(double heterotypicSpringConstantMultiplier);
 
     /**
      * Overridden OutputForceParameters() method.

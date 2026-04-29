@@ -33,63 +33,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "LogarithmicRepulsionForce.hpp"
+#include "LinearRepulsionForce.hpp"
 
 template<unsigned DIM>
-LogarithmicRepulsionForce<DIM>::LogarithmicRepulsionForce()
-   : PathmanathanTwoBodyInteractionForce<DIM>()
+LinearRepulsionForce<DIM>::LinearRepulsionForce()
+   : LinearSpringForce<DIM>()
 {
 }
 
 template<unsigned DIM>
-c_vector<double, DIM> LogarithmicRepulsionForce<DIM>::CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
-                                                                                  unsigned nodeBGlobalIndex,
-                                                                                  AbstractCellPopulation<DIM>& rCellPopulation)
-{
-    // We should only ever calculate the force between two distinct nodes
-    assert(nodeAGlobalIndex != nodeBGlobalIndex);
-
-    Node<DIM>* p_node_a = rCellPopulation.GetNode(nodeAGlobalIndex);
-    Node<DIM>* p_node_b = rCellPopulation.GetNode(nodeBGlobalIndex);
-
-    // Get the node locations
-    const c_vector<double, DIM>& r_node_a_location = p_node_a->rGetLocation();
-    const c_vector<double, DIM>& r_node_b_location = p_node_b->rGetLocation();
-
-    // Get the node radii
-    double node_a_radius = p_node_a->GetRadius();
-    double node_b_radius = p_node_b->GetRadius();
-    assert(node_a_radius > 0 && node_b_radius > 0);
-
-    // Get the unit vector parallel to the line joining the two nodes
-    c_vector<double, DIM> unit_difference;
-    unit_difference = rCellPopulation.rGetMesh().GetVectorFromAtoB(r_node_a_location, r_node_b_location);
-
-    // Calculate the distance between the two nodes
-    double distance_between_nodes = norm_2(unit_difference);
-    assert(distance_between_nodes > 0);
-    assert(!std::isnan(distance_between_nodes));
-
-    unit_difference /= distance_between_nodes;
-
-    // Rest length is the sum of the two cell radii
-    double rest_length = node_a_radius + node_b_radius;
-
-    double overlap = distance_between_nodes - rest_length;
-
-    // Logarithmic repulsion (overlap is negative, cells are compressed)
-    //log(x+1) is undefined for x<=-1
-    assert(overlap > -rest_length);
-    return this->mSpringStiffness * unit_difference * rest_length * log(1.0 + overlap/rest_length);
-}
-
-template<unsigned DIM>
-void LogarithmicRepulsionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
+void LinearRepulsionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation)
 {
     // Throw an exception message if not using a NodeBasedCellPopulation
     if (dynamic_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation) == nullptr)
     {
-        EXCEPTION("LogarithmicRepulsionForce is to be used with a NodeBasedCellPopulation only");
+        EXCEPTION("LinearRepulsionForce is to be used with a NodeBasedCellPopulation only");
     }
 
     const std::vector< std::pair<Node<DIM>*, Node<DIM>* > >& r_node_pairs = (static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation))->rGetNodePairs();
@@ -109,11 +67,11 @@ void LogarithmicRepulsionForce<DIM>::AddForceContribution(AbstractCellPopulation
         unit_difference = (static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation))->rGetMesh().GetVectorFromAtoB(r_node_a_location, r_node_b_location);
 
         // Calculate the value of the rest length
-        double rest_length = node_a_radius+node_b_radius;
+        double rest_length = node_a_radius + node_b_radius;
 
         if (norm_2(unit_difference) < rest_length)
         {
-            // Calculate the force between nodes
+            // Calculate the force between nodes (linear spring repulsion)
             c_vector<double, DIM> force = this->CalculateForceBetweenNodes(p_node_a->GetIndex(), p_node_b->GetIndex(), rCellPopulation);
             c_vector<double, DIM> negative_force = -1.0 * force;
             for (unsigned j=0; j<DIM; j++)
@@ -128,17 +86,17 @@ void LogarithmicRepulsionForce<DIM>::AddForceContribution(AbstractCellPopulation
 }
 
 template<unsigned DIM>
-void LogarithmicRepulsionForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
+void LinearRepulsionForce<DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
     // Call direct parent class
-    PathmanathanTwoBodyInteractionForce<DIM>::OutputForceParameters(rParamsFile);
+    LinearSpringForce<DIM>::OutputForceParameters(rParamsFile);
 }
 
 // Explicit instantiation
-template class LogarithmicRepulsionForce<1>;
-template class LogarithmicRepulsionForce<2>;
-template class LogarithmicRepulsionForce<3>;
+template class LinearRepulsionForce<1>;
+template class LinearRepulsionForce<2>;
+template class LinearRepulsionForce<3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(LogarithmicRepulsionForce)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(LinearRepulsionForce)

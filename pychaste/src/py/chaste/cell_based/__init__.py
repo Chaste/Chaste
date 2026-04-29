@@ -161,6 +161,18 @@ from chaste._pychaste_all import (
     DeltaNotchTrackingModifier_3,
     DifferentialAdhesionGeneralisedLinearSpringForce_2_2,
     DifferentialAdhesionGeneralisedLinearSpringForce_3_3,
+    DifferentialAdhesionLinearSpringForce_1_1,
+    DifferentialAdhesionLinearSpringForce_1_2,
+    DifferentialAdhesionLinearSpringForce_2_2,
+    DifferentialAdhesionLinearSpringForce_1_3,
+    DifferentialAdhesionLinearSpringForce_2_3,
+    DifferentialAdhesionLinearSpringForce_3_3,
+    DifferentialAdhesionPathmanathanTwoBodyInteractionForce_1_1,
+    DifferentialAdhesionPathmanathanTwoBodyInteractionForce_1_2,
+    DifferentialAdhesionPathmanathanTwoBodyInteractionForce_2_2,
+    DifferentialAdhesionPathmanathanTwoBodyInteractionForce_1_3,
+    DifferentialAdhesionPathmanathanTwoBodyInteractionForce_2_3,
+    DifferentialAdhesionPathmanathanTwoBodyInteractionForce_3_3,
     DifferentialAdhesionPottsUpdateRule_2,
     DifferentialAdhesionPottsUpdateRule_3,
     DifferentiatedCellProliferativeType,
@@ -203,6 +215,9 @@ from chaste._pychaste_all import (
     LogarithmicRepulsionForce_1,
     LogarithmicRepulsionForce_2,
     LogarithmicRepulsionForce_3,
+    LinearRepulsionForce_1,
+    LinearRepulsionForce_2,
+    LinearRepulsionForce_3,
     Goldbeter1991SrnModel,
     HeterotypicBoundaryLengthWriter_2_2,
     HeterotypicBoundaryLengthWriter_3_3,
@@ -770,6 +785,34 @@ DifferentialAdhesionGeneralisedLinearSpringForce = TemplateClassDict(
     }
 )
 
+DifferentialAdhesionLinearSpringForce = TemplateClassDict(
+    {
+        ("1",): DifferentialAdhesionLinearSpringForce_1_1,
+        ("1", "1"): DifferentialAdhesionLinearSpringForce_1_1,
+        ("1", "2"): DifferentialAdhesionLinearSpringForce_1_2,
+        ("2",): DifferentialAdhesionLinearSpringForce_2_2,
+        ("2", "2"): DifferentialAdhesionLinearSpringForce_2_2,
+        ("1", "3"): DifferentialAdhesionLinearSpringForce_1_3,
+        ("2", "3"): DifferentialAdhesionLinearSpringForce_2_3,
+        ("3",): DifferentialAdhesionLinearSpringForce_3_3,
+        ("3", "3"): DifferentialAdhesionLinearSpringForce_3_3,
+    }
+)
+
+DifferentialAdhesionPathmanathanTwoBodyInteractionForce = TemplateClassDict(
+    {
+        ("1",): DifferentialAdhesionPathmanathanTwoBodyInteractionForce_1_1,
+        ("1", "1"): DifferentialAdhesionPathmanathanTwoBodyInteractionForce_1_1,
+        ("1", "2"): DifferentialAdhesionPathmanathanTwoBodyInteractionForce_1_2,
+        ("2",): DifferentialAdhesionPathmanathanTwoBodyInteractionForce_2_2,
+        ("2", "2"): DifferentialAdhesionPathmanathanTwoBodyInteractionForce_2_2,
+        ("1", "3"): DifferentialAdhesionPathmanathanTwoBodyInteractionForce_1_3,
+        ("2", "3"): DifferentialAdhesionPathmanathanTwoBodyInteractionForce_2_3,
+        ("3",): DifferentialAdhesionPathmanathanTwoBodyInteractionForce_3_3,
+        ("3", "3"): DifferentialAdhesionPathmanathanTwoBodyInteractionForce_3_3,
+    }
+)
+
 DifferentialAdhesionPottsUpdateRule = TemplateClassDict(
     {
         ("2",): DifferentialAdhesionPottsUpdateRule_2,
@@ -886,6 +929,14 @@ LogarithmicRepulsionForce = TemplateClassDict(
         ("1",): LogarithmicRepulsionForce_1,
         ("2",): LogarithmicRepulsionForce_2,
         ("3",): LogarithmicRepulsionForce_3,
+    }
+)
+
+LinearRepulsionForce = TemplateClassDict(
+    {
+        ("1",): LinearRepulsionForce_1,
+        ("2",): LinearRepulsionForce_2,
+        ("3",): LinearRepulsionForce_3,
     }
 )
 

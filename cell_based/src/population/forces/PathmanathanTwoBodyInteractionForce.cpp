@@ -102,18 +102,30 @@ c_vector<double, SPACE_DIM> PathmanathanTwoBodyInteractionForce<ELEMENT_DIM,SPAC
 
     double overlap = distance_between_nodes - rest_length;
 
+    bool is_closer_than_rest_length = (overlap <= 0);
+    double multiplication_factor = VariableSpringConstantMultiplicationFactor(nodeAGlobalIndex, nodeBGlobalIndex, rCellPopulation, is_closer_than_rest_length);
+
     // Logarithmic repulsion (cells closer than rest length, overlap is negative)
     if (overlap <= 0)
     {
         //log(x+1) is undefined for x<=-1
         assert(overlap > -rest_length);
-        return mSpringStiffness * unit_difference * rest_length * log(1.0 + overlap/rest_length);
+        return multiplication_factor * mSpringStiffness * unit_difference * rest_length * log(1.0 + overlap/rest_length);
     }
     else
     {
         // Exponential attraction (cells further than rest length, overlap is positive)
-        return mSpringStiffness * unit_difference * overlap * exp(-mAlpha * overlap/rest_length);
+        return multiplication_factor * mSpringStiffness * unit_difference * overlap * exp(-mAlpha * overlap/rest_length);
     }
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double PathmanathanTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::VariableSpringConstantMultiplicationFactor(unsigned nodeAGlobalIndex,
+                                                                                                              unsigned nodeBGlobalIndex,
+                                                                                                              AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
+                                                                                                              bool isCloserThanRestLength)
+{
+    return 1.0;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>

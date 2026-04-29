@@ -33,26 +33,26 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef LOGARITHMICREPULSIONFORCE_HPP_
-#define LOGARITHMICREPULSIONFORCE_HPP_
+#ifndef LINEARREPULSIONFORCE_HPP_
+#define LINEARREPULSIONFORCE_HPP_
 
-#include "PathmanathanTwoBodyInteractionForce.hpp"
+#include "LinearSpringForce.hpp"
 #include "NodeBasedCellPopulation.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
 /**
- * A class for a simple logarithmic repulsion force law.
+ * A class for a simple linear repulsion-only force law.
  * Designed for use in node-based simulations.
  *
- * This force applies a logarithmic repulsive force between pairs of cells that
+ * This force applies a linear repulsive force between pairs of cells that
  * overlap (i.e. whose separation is less than the sum of their radii). No
- * attractive force is applied. The repulsive force law is the logarithmic model
- * from Pathmanathan et al (2009) (doi:10.1088/1478-3975/6/3/036001).
+ * attractive force is applied. The repulsive force is the linear model
+ * from Meineke et al (2001) (doi:10.1046/j.0960-7722.2001.00216.x).
  */
 template<unsigned DIM>
-class LogarithmicRepulsionForce : public PathmanathanTwoBodyInteractionForce<DIM>
+class LinearRepulsionForce : public LinearSpringForce<DIM>
 {
 private :
 
@@ -67,7 +67,7 @@ private :
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<PathmanathanTwoBodyInteractionForce<DIM> >(*this);
+        archive & boost::serialization::base_object<LinearSpringForce<DIM> >(*this);
     }
 
 public :
@@ -75,37 +75,20 @@ public :
     /**
      * Constructor.
      */
-    LogarithmicRepulsionForce();
-
-    /**
-     * Overridden CalculateForceBetweenNodes() method.
-     *
-     * Uses the logarithmic repulsion model from Pathmanathan et al (2009)
-     * (doi:10.1088/1478-3975/6/3/036001).
-     *
-     * @param nodeAGlobalIndex index of one neighbouring node
-     * @param nodeBGlobalIndex index of the other neighbouring node
-     * @param rCellPopulation the cell population
-     * @return The force exerted on Node A by Node B.
-     */
-    c_vector<double, DIM> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
-                                                     unsigned nodeBGlobalIndex,
-                                                     AbstractCellPopulation<DIM>& rCellPopulation);
+    LinearRepulsionForce();
 
     /**
      * Overridden AddForceContribution() method.
      *
-     * Only applies the repulsive force between pairs of cells that overlap.
+     * Only applies the repulsive (compressive) linear spring force between
+     * pairs of cells that overlap.
      *
      * @param rCellPopulation reference to the CellPopulation
      */
     void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
 
     /**
-     * Outputs force Parameters to file
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * Overridden OutputForceParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
@@ -113,6 +96,6 @@ public :
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(LogarithmicRepulsionForce)
+EXPORT_TEMPLATE_CLASS_SAME_DIMS(LinearRepulsionForce)
 
-#endif /*LOGARITHMICREPULSIONFORCE_HPP_*/
+#endif /*LINEARREPULSIONFORCE_HPP_*/

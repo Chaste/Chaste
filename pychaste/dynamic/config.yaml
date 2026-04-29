@@ -728,6 +728,8 @@ modules:
 
       - name: LogarithmicRepulsionForce
 
+      - name: LinearRepulsionForce
+
       - name: ImmersedBoundaryKinematicFeedbackForce
       - name: ImmersedBoundaryLinearDifferentialAdhesionForce
       - name: ImmersedBoundaryLinearInteractionForce
@@ -743,6 +745,10 @@ modules:
           - GetLineTensionParameter
 
       - name: DifferentialAdhesionGeneralisedLinearSpringForce
+
+      - name: DifferentialAdhesionLinearSpringForce
+
+      - name: DifferentialAdhesionPathmanathanTwoBodyInteractionForce
 
       - name: NagaiHondaDifferentialAdhesionForce
         excluded_methods:

@@ -42,9 +42,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "GeneralisedLinearSpringForce.hpp"
 #include "LinearSpringForce.hpp"
+#include "LinearRepulsionForce.hpp"
 #include "PathmanathanTwoBodyInteractionForce.hpp"
 #include "LogarithmicRepulsionForce.hpp"
 #include "DifferentialAdhesionGeneralisedLinearSpringForce.hpp"
+#include "DifferentialAdhesionLinearSpringForce.hpp"
+#include "DifferentialAdhesionPathmanathanTwoBodyInteractionForce.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
@@ -995,9 +998,7 @@ public:
             boost::archive::text_oarchive output_arch(ofs);
 
             // No extra member variables, so set member variables on parent class
-            force.SetMeinekeSpringStiffness(12.35);
-            force.SetMeinekeDivisionRestingSpringLength(0.756);
-            force.SetMeinekeSpringGrowthDuration(2.693);
+            force.SetSpringStiffness(12.35);
 
             // Serialize via pointer to most abstract class possible
             AbstractForce<2>* const p_force = &force;
@@ -1015,9 +1016,7 @@ public:
             input_arch >> p_force;
 
             // No extra member variables, so test member variables on parent class
-            TS_ASSERT_DELTA((static_cast<RepulsionForce<2>*>(p_force))->GetMeinekeSpringStiffness(), 12.35, 1e-6);
-            TS_ASSERT_DELTA((static_cast<RepulsionForce<2>*>(p_force))->GetMeinekeDivisionRestingSpringLength(), 0.756, 1e-6);
-            TS_ASSERT_DELTA((static_cast<RepulsionForce<2>*>(p_force))->GetMeinekeSpringGrowthDuration(), 2.693, 1e-6);
+            TS_ASSERT_DELTA((static_cast<RepulsionForce<2>*>(p_force))->GetSpringStiffness(), 12.35, 1e-6);
 
             // Tidy up
             delete p_force;
@@ -2606,9 +2605,7 @@ public:
             boost::archive::text_oarchive output_arch(ofs);
 
             // Set member variables on parent class
-            force.SetMeinekeSpringStiffness(12.35);
-            force.SetMeinekeDivisionRestingSpringLength(0.756);
-            force.SetMeinekeSpringGrowthDuration(2.693);
+            force.SetSpringStiffness(12.35);
 
             // Serialize via pointer to most abstract class possible
             AbstractForce<2>* const p_force = &force;
@@ -2626,9 +2623,7 @@ public:
             input_arch >> p_force;
 
             // Test member variables on parent class
-            TS_ASSERT_DELTA((static_cast<LogarithmicRepulsionForce<2>*>(p_force))->GetMeinekeSpringStiffness(), 12.35, 1e-6);
-            TS_ASSERT_DELTA((static_cast<LogarithmicRepulsionForce<2>*>(p_force))->GetMeinekeDivisionRestingSpringLength(), 0.756, 1e-6);
-            TS_ASSERT_DELTA((static_cast<LogarithmicRepulsionForce<2>*>(p_force))->GetMeinekeSpringGrowthDuration(), 2.693, 1e-6);
+            TS_ASSERT_DELTA((static_cast<LogarithmicRepulsionForce<2>*>(p_force))->GetSpringStiffness(), 12.35, 1e-6);
 
             // Tidy up
             delete p_force;
@@ -2688,6 +2683,307 @@ public:
                                       RelativeTo::ChasteSourceRoot);
             FileComparison comparer(generated_file,reference_file);
             TS_ASSERT(comparer.CompareFiles());
+        }
+
+        // Test with LinearRepulsionForce
+        LinearRepulsionForce<2> linear_repulsion_force;
+        TS_ASSERT_EQUALS(linear_repulsion_force.GetIdentifier(), "LinearRepulsionForce-2");
+
+        out_stream linear_repulsion_force_parameter_file = output_file_handler.OpenOutputFile("linear_repulsion_results.parameters");
+        linear_repulsion_force.OutputForceParameters(linear_repulsion_force_parameter_file);
+        linear_repulsion_force_parameter_file->close();
+
+        {
+            FileFinder generated_file = output_file_handler.FindFile("linear_repulsion_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestForces/linear_repulsion_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+
+        // Test with DifferentialAdhesionLinearSpringForce
+        DifferentialAdhesionLinearSpringForce<2> diff_adhesion_linear_force;
+        diff_adhesion_linear_force.SetCutOffLength(1.5);
+        TS_ASSERT_EQUALS(diff_adhesion_linear_force.GetIdentifier(), "DifferentialAdhesionLinearSpringForce-2-2");
+
+        out_stream diff_adhesion_linear_force_parameter_file = output_file_handler.OpenOutputFile("differential_adhesion_linear_results.parameters");
+        diff_adhesion_linear_force.OutputForceParameters(diff_adhesion_linear_force_parameter_file);
+        diff_adhesion_linear_force_parameter_file->close();
+
+        {
+            FileFinder generated_file = output_file_handler.FindFile("differential_adhesion_linear_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestForces/differential_adhesion_linear_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+
+        // Test with DifferentialAdhesionPathmanathanTwoBodyInteractionForce
+        DifferentialAdhesionPathmanathanTwoBodyInteractionForce<2> diff_adhesion_pathmanathan_force;
+        TS_ASSERT_EQUALS(diff_adhesion_pathmanathan_force.GetIdentifier(), "DifferentialAdhesionPathmanathanTwoBodyInteractionForce-2-2");
+
+        out_stream diff_adhesion_pathmanathan_force_parameter_file = output_file_handler.OpenOutputFile("differential_adhesion_pathmanathan_results.parameters");
+        diff_adhesion_pathmanathan_force.OutputForceParameters(diff_adhesion_pathmanathan_force_parameter_file);
+        diff_adhesion_pathmanathan_force_parameter_file->close();
+
+        {
+            FileFinder generated_file = output_file_handler.FindFile("differential_adhesion_pathmanathan_results.parameters");
+            FileFinder reference_file("cell_based/test/data/TestForces/differential_adhesion_pathmanathan_results.parameters",
+                                      RelativeTo::ChasteSourceRoot);
+            FileComparison comparer(generated_file,reference_file);
+            TS_ASSERT(comparer.CompareFiles());
+        }
+    }
+
+    void TestDifferentialAdhesionLinearSpringForceMethods()
+    {
+        EXIT_IF_PARALLEL;    // HoneycombMeshGenerator doesn't work in parallel.
+
+        unsigned cells_across = 7;
+        unsigned cells_up = 5;
+        unsigned thickness_of_ghost_layer = 3;
+
+        SimulationTime::Instance()->SetEndTimeAndNumberOfTimeSteps(1.0,1);
+
+        HoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
+        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, location_indices.size(), location_indices);
+
+        // Create cell population
+        MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
+
+        // Create force (the new canonical class)
+        DifferentialAdhesionLinearSpringForce<2> force;
+
+        TS_ASSERT_DELTA(force.GetHomotypicLabelledSpringConstantMultiplier(), 1.0, 1e-6);
+        TS_ASSERT_DELTA(force.GetHeterotypicSpringConstantMultiplier(), 1.0, 1e-6);
+
+        force.SetHomotypicLabelledSpringConstantMultiplier(2.0);
+        force.SetHeterotypicSpringConstantMultiplier(2.5);
+
+        TS_ASSERT_DELTA(force.GetHomotypicLabelledSpringConstantMultiplier(), 2.0, 1e-6);
+        TS_ASSERT_DELTA(force.GetHeterotypicSpringConstantMultiplier(), 2.5, 1e-6);
+    }
+
+    void TestDifferentialAdhesionLinearSpringForceArchiving()
+    {
+        EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "DifferentialAdhesionLinearSpringForce.arch";
+
+        {
+            DifferentialAdhesionLinearSpringForce<2> force;
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            force.SetMeinekeSpringStiffness(12.34);
+            force.SetMeinekeDivisionRestingSpringLength(0.856);
+            force.SetMeinekeSpringGrowthDuration(2.593);
+            force.SetHomotypicLabelledSpringConstantMultiplier(0.051);
+            force.SetHeterotypicSpringConstantMultiplier(1.348);
+
+            // Serialize via pointer to most abstract class possible
+            AbstractForce<2>* const p_force = &force;
+            output_arch << p_force;
+        }
+
+        {
+            AbstractForce<2>* p_force;
+
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            // Restore from the archive
+            input_arch >> p_force;
+
+            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionLinearSpringForce<2>*>(p_force))->GetMeinekeSpringStiffness(), 12.34, 1e-6);
+            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionLinearSpringForce<2>*>(p_force))->GetMeinekeDivisionRestingSpringLength(), 0.856, 1e-6);
+            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionLinearSpringForce<2>*>(p_force))->GetMeinekeSpringGrowthDuration(), 2.593, 1e-6);
+            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionLinearSpringForce<2>*>(p_force))->GetHomotypicLabelledSpringConstantMultiplier(), 0.051, 1e-6);
+            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionLinearSpringForce<2>*>(p_force))->GetHeterotypicSpringConstantMultiplier(), 1.348, 1e-6);
+
+            // Tidy up
+            delete p_force;
+        }
+    }
+
+    void TestDifferentialAdhesionPathmanathanTwoBodyInteractionForceMethods()
+    {
+        // Create a NodeBasedCellPopulation
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 0.5, 0.0));
+
+        // Convert this to a NodesOnlyMesh
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 100.0);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+
+        DifferentialAdhesionPathmanathanTwoBodyInteractionForce<2> force;
+
+        TS_ASSERT_DELTA(force.GetHomotypicLabelledSpringConstantMultiplier(), 1.0, 1e-6);
+        TS_ASSERT_DELTA(force.GetHeterotypicSpringConstantMultiplier(), 1.0, 1e-6);
+
+        force.SetHomotypicLabelledSpringConstantMultiplier(2.0);
+        force.SetHeterotypicSpringConstantMultiplier(2.5);
+
+        TS_ASSERT_DELTA(force.GetHomotypicLabelledSpringConstantMultiplier(), 2.0, 1e-6);
+        TS_ASSERT_DELTA(force.GetHeterotypicSpringConstantMultiplier(), 2.5, 1e-6);
+
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
+    }
+
+    void TestDifferentialAdhesionPathmanathanTwoBodyInteractionForceArchiving()
+    {
+        EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "DifferentialAdhesionPathmanathanTwoBodyInteractionForce.arch";
+
+        {
+            DifferentialAdhesionPathmanathanTwoBodyInteractionForce<2> force;
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            force.SetSpringStiffness(12.34);
+            force.SetAlpha(3.5);
+            force.SetHomotypicLabelledSpringConstantMultiplier(0.051);
+            force.SetHeterotypicSpringConstantMultiplier(1.348);
+
+            // Serialize via pointer to most abstract class possible
+            AbstractForce<2>* const p_force = &force;
+            output_arch << p_force;
+        }
+
+        {
+            AbstractForce<2>* p_force;
+
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            // Restore from the archive
+            input_arch >> p_force;
+
+            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionPathmanathanTwoBodyInteractionForce<2>*>(p_force))->GetSpringStiffness(), 12.34, 1e-6);
+            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionPathmanathanTwoBodyInteractionForce<2>*>(p_force))->GetAlpha(), 3.5, 1e-6);
+            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionPathmanathanTwoBodyInteractionForce<2>*>(p_force))->GetHomotypicLabelledSpringConstantMultiplier(), 0.051, 1e-6);
+            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionPathmanathanTwoBodyInteractionForce<2>*>(p_force))->GetHeterotypicSpringConstantMultiplier(), 1.348, 1e-6);
+
+            // Tidy up
+            delete p_force;
+        }
+    }
+
+    void TestLinearRepulsionForceMethods()
+    {
+        // Create a NodeBasedCellPopulation
+        std::vector<Node<2>*> nodes;
+        nodes.push_back(new Node<2>(0, true, 0.0, 0.0));
+        nodes.push_back(new Node<2>(1, true, 0.1, 0.0));
+        nodes.push_back(new Node<2>(2, true, 3.0, 0.0));
+
+        // Convert this to a NodesOnlyMesh
+        NodesOnlyMesh<2> mesh;
+        mesh.ConstructNodesWithoutMesh(nodes, 100.0);
+
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
+
+        NodeBasedCellPopulation<2> cell_population(mesh, cells);
+        cell_population.Update(); // Needs to be called separately as not in a simulation
+
+        LinearRepulsionForce<2> linear_repulsion_force;
+
+        for (AbstractMesh<2,2>::NodeIterator node_iter = mesh.GetNodeIteratorBegin();
+                node_iter != mesh.GetNodeIteratorEnd();
+                ++node_iter)
+        {
+            node_iter->ClearAppliedForce();
+        }
+        linear_repulsion_force.AddForceContribution(cell_population);
+
+        /*
+         * First two cells repel each other and second 2 cells are too far apart.
+         * The radius of the cells is the default value, 0.5.
+         * The linear spring force: F = k * overlap * unit_vec
+         * overlap = d - rest_length = 0.1 - 1.0 = -0.9
+         * F = 15.0 * (-0.9) * 1 = -13.5 (repulsion)
+         */
+        if (PetscTools::AmMaster())    // All cells in this test lie on the master process.
+        {
+            unsigned zero_index = 0;
+            unsigned one_index = PetscTools::GetNumProcs();
+            unsigned two_index = 2*PetscTools::GetNumProcs();
+            TS_ASSERT_DELTA(cell_population.GetNode(zero_index)->rGetAppliedForce()[0], 15.0 * (0.1 - 1.0), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(zero_index)->rGetAppliedForce()[1], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(one_index)->rGetAppliedForce()[0], -15.0 * (0.1 - 1.0), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(one_index)->rGetAppliedForce()[1], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[0], 0.0, 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[1], 0.0, 1e-4);
+        }
+
+        for (unsigned i=0; i<nodes.size(); i++)
+        {
+            delete nodes[i];
+        }
+    }
+
+    void TestLinearRepulsionForceArchiving()
+    {
+        EXIT_IF_PARALLEL; // Beware of processes overwriting the identical archives of other processes
+        OutputFileHandler handler("archive", false);
+        std::string archive_filename = handler.GetOutputDirectoryFullPath() + "LinearRepulsionForce.arch";
+
+        {
+            LinearRepulsionForce<2> force;
+
+            std::ofstream ofs(archive_filename.c_str());
+            boost::archive::text_oarchive output_arch(ofs);
+
+            // Set member variables on parent class
+            force.SetMeinekeSpringStiffness(12.35);
+            force.SetMeinekeDivisionRestingSpringLength(0.756);
+            force.SetMeinekeSpringGrowthDuration(2.693);
+
+            // Serialize via pointer to most abstract class possible
+            AbstractForce<2>* const p_force = &force;
+            output_arch << p_force;
+        }
+
+        {
+            AbstractForce<2>* p_force;
+
+            // Create an input archive
+            std::ifstream ifs(archive_filename.c_str(), std::ios::binary);
+            boost::archive::text_iarchive input_arch(ifs);
+
+            // Restore from the archive
+            input_arch >> p_force;
+
+            // Test member variables on parent class
+            TS_ASSERT_DELTA((static_cast<LinearRepulsionForce<2>*>(p_force))->GetMeinekeSpringStiffness(), 12.35, 1e-6);
+            TS_ASSERT_DELTA((static_cast<LinearRepulsionForce<2>*>(p_force))->GetMeinekeDivisionRestingSpringLength(), 0.756, 1e-6);
+            TS_ASSERT_DELTA((static_cast<LinearRepulsionForce<2>*>(p_force))->GetMeinekeSpringGrowthDuration(), 2.693, 1e-6);
+
+            // Tidy up
+            delete p_force;
         }
     }
 };
