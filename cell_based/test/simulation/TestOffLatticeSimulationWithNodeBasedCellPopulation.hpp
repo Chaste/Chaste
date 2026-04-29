@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FileComparison.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "ForwardEulerNumericalMethod.hpp"
-#include "LinearSpringForce.hpp"
+#include "PathmanathanTwoBodyInteractionForce.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "LogFile.hpp"
 #include "NodeBasedCellPopulation.hpp"
@@ -134,9 +134,9 @@ public:
         simulator.SetEndTime(0.5);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_linear_force);
+        MAKE_PTR(PathmanathanTwoBodyInteractionForce<2>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
 
         simulator.Solve();
 
@@ -192,9 +192,9 @@ public:
         simulator.SetEndTime(10.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_linear_force);
+        MAKE_PTR(PathmanathanTwoBodyInteractionForce<2>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
 
         simulator.Solve();
 
@@ -225,7 +225,7 @@ public:
         simulator_2.SetEndTime(10.0);
 
         // Pass the same force law to the simulation
-        simulator_2.AddForce(p_linear_force);
+        simulator_2.AddForce(p_force);
 
         simulator_2.Solve();
 
@@ -271,9 +271,9 @@ public:
         simulator.SetEndTime(10.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_linear_force);
+        MAKE_PTR(PathmanathanTwoBodyInteractionForce<2>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
 
         simulator.Solve();
 
@@ -315,7 +315,7 @@ public:
         simulator_2.SetEndTime(10.0);
 
         // Pass the same force law to the simulation
-        simulator_2.AddForce(p_linear_force);
+        simulator_2.AddForce(p_force);
 
         simulator_2.Solve();
 
@@ -345,7 +345,7 @@ public:
         simulator_3.SetEndTime(10.0);
 
         // Pass the same force law to the simulation
-        simulator_3.AddForce(p_linear_force);
+        simulator_3.AddForce(p_force);
 
         simulator_3.Solve();
 
@@ -410,9 +410,9 @@ public:
         simulator.SetEndTime(10.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_linear_force);
+        MAKE_PTR(PathmanathanTwoBodyInteractionForce<2>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
 
         simulator.Solve();
 
@@ -454,7 +454,7 @@ public:
         simulator_2.SetEndTime(10.0);
 
         // Pass the same force law to the simulation
-        simulator_2.AddForce(p_linear_force);
+        simulator_2.AddForce(p_force);
 
         simulator_2.Solve();
 
@@ -484,7 +484,7 @@ public:
         simulator_3.SetEndTime(10.0);
 
         // Pass the same force law to the simulation
-        simulator_3.AddForce(p_linear_force);
+        simulator_3.AddForce(p_force);
 
         simulator_3.Solve();
 
@@ -551,9 +551,9 @@ public:
         simulator.SetEndTime(10.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_linear_force);
+        MAKE_PTR(PathmanathanTwoBodyInteractionForce<2>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
 
         simulator.Solve();
 
@@ -595,7 +595,7 @@ public:
         simulator_2.SetEndTime(10.0);
 
         // Pass the same force law to the simulation
-        simulator_2.AddForce(p_linear_force);
+        simulator_2.AddForce(p_force);
 
         simulator_2.Solve();
 
@@ -672,9 +672,9 @@ public:
         simulator.SetEndTime(12.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetCutOffLength(5.0); // Different as bigger cells
-        simulator.AddForce(p_linear_force);
+        MAKE_PTR(PathmanathanTwoBodyInteractionForce<2>, p_force);
+        p_force->SetCutOffLength(5.0); // Different as bigger cells
+        simulator.AddForce(p_force);
 
         simulator.Solve();
 
@@ -738,9 +738,9 @@ public:
         simulator.SetEndTime(10.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetCutOffLength(5.0); // Different as bigger cells
-        simulator.AddForce(p_linear_force);
+        MAKE_PTR(PathmanathanTwoBodyInteractionForce<2>, p_force);
+        p_force->SetCutOffLength(5.0); // Different as bigger cells
+        simulator.AddForce(p_force);
 
         simulator.Solve();
 
@@ -815,9 +815,9 @@ public:
         simulator.SetEndTime(1.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_linear_force);
+        MAKE_PTR(PathmanathanTwoBodyInteractionForce<2>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
 
         TS_ASSERT_THROWS_NOTHING(simulator.Solve());
 
@@ -871,9 +871,9 @@ public:
         simulator.SetEndTime(0.5);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_linear_force);
+        MAKE_PTR(PathmanathanTwoBodyInteractionForce<2>, p_force);
+        //p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
 
         // Add cell killer
         MAKE_PTR_ARGS(RandomCellKiller<2>, p_killer, (&node_based_cell_population, 0.997877574));
@@ -945,9 +945,9 @@ public:
         simulator.SetEndTime(1.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_linear_force);
+        MAKE_PTR(PathmanathanTwoBodyInteractionForce<2>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
 
         // Add cell killer
         c_vector<double, 2> normal = zero_vector<double>(2);
@@ -1012,9 +1012,9 @@ public:
         simulator.SetEndTime(2.5);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_linear_force);
+        MAKE_PTR(PathmanathanTwoBodyInteractionForce<2>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
 
         // Create some boundary conditions and pass them to the simulation
         c_vector<double,2> normal = zero_vector<double>(2);
@@ -1069,9 +1069,9 @@ public:
         simulator.SetEndTime(0.1);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_linear_force);
+        MAKE_PTR(PathmanathanTwoBodyInteractionForce<2>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
 
         // Create some boundary conditions and pass them to the simulation
         c_vector<double,2> normal = zero_vector<double>(2);
@@ -1164,9 +1164,9 @@ public:
         simulator.SetOutputDirectory("TestOffLatticeSimulationWithNodeBasedCellPopulationThreshold");
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetCutOffLength(1.5);
-        simulator.AddForce(p_linear_force);
+        MAKE_PTR(PathmanathanTwoBodyInteractionForce<2>, p_force);
+        p_force->SetCutOffLength(1.5);
+        simulator.AddForce(p_force);
 
         // Solve
         TS_ASSERT_THROWS_CONTAINS(simulator.Solve(),
@@ -1260,9 +1260,9 @@ public:
             simulator.SetEndTime(0.5);
 
             // Create a force law and pass it to the simulation
-            MAKE_PTR(LinearSpringForce<2>, p_linear_force);
-            p_linear_force->SetCutOffLength(1.5);
-            simulator.AddForce(p_linear_force);
+            MAKE_PTR(PathmanathanTwoBodyInteractionForce<2>, p_force);
+            p_force->SetCutOffLength(1.5);
+            simulator.AddForce(p_force);
 
             // Add cell killer
             MAKE_PTR_ARGS(RandomCellKiller<2>, p_killer, (&node_based_cell_population, 0.9));  //Probability of death in one hour
