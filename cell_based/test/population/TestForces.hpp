@@ -2532,7 +2532,7 @@ public:
         cells_generator.GenerateBasic(cells, mesh.GetNumNodes());
 
         NodeBasedCellPopulation<2> cell_population(mesh, cells);
-        cell_population.Update(); //Needs to be called separately as not in a simulation
+        cell_population.Update(); // Needs to be called separately as not in a simulation
 
         LogarithmicRepulsionForce<2> logarithmic_force;
 

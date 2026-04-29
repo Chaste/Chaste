@@ -135,7 +135,7 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>:
      * If the cells are both newly divided, then the rest length of the spring
      * connecting them grows linearly with time, until 1 hour after division.
      */
-    if (ageA < mMeinekeSpringGrowthDuration && ageB < mMeinekeSpringGrowthDuration)
+    if (ageA < this->mMeinekeSpringGrowthDuration && ageB < this->mMeinekeSpringGrowthDuration)
     {
         AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>* p_static_cast_cell_population = static_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation);
 
@@ -144,10 +144,10 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>:
         if (p_static_cast_cell_population->IsMarkedSpring(cell_pair))
         {
             // Spring rest length increases from a small value to the normal rest length over 1 hour
-            double lambda = mMeinekeDivisionRestingSpringLength;
-            rest_length = lambda + (rest_length_final - lambda) * ageA/mMeinekeSpringGrowthDuration;
+            double lambda = this->mMeinekeDivisionRestingSpringLength;
+            rest_length = lambda + (rest_length_final - lambda) * ageA/this->mMeinekeSpringGrowthDuration;
         }
-        if (ageA + SimulationTime::Instance()->GetTimeStep() >= mMeinekeSpringGrowthDuration)
+        if (ageA + SimulationTime::Instance()->GetTimeStep() >= this->mMeinekeSpringGrowthDuration)
         {
             // This spring is about to go out of scope
             p_static_cast_cell_population->UnmarkSpring(cell_pair);
@@ -190,7 +190,7 @@ c_vector<double, SPACE_DIM> GeneralisedLinearSpringForce<ELEMENT_DIM,SPACE_DIM>:
     double overlap = distance_between_nodes - rest_length;
     bool is_closer_than_rest_length = (overlap <= 0);
     double multiplication_factor = VariableSpringConstantMultiplicationFactor(nodeAGlobalIndex, nodeBGlobalIndex, rCellPopulation, is_closer_than_rest_length);
-    double spring_stiffness = mMeinekeSpringStiffness;
+    double spring_stiffness = this->mMeinekeSpringStiffness;
 
     if (bool(dynamic_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation)))
     {

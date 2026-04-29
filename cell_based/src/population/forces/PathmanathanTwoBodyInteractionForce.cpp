@@ -35,8 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PathmanathanTwoBodyInteractionForce.hpp"
 
-#include "NodeBasedCellPopulation.hpp"
-
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 PathmanathanTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::PathmanathanTwoBodyInteractionForce()
    : AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>(),
