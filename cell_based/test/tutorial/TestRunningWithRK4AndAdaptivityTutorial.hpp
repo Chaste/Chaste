@@ -73,15 +73,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * #### Adaptive time-stepping
  *
  * When cells overlap or a node moves too far in a single step, the numerical method
- * calls `AbstractCellPopulation::CheckForStepSizeException()`, which throws a
+ * calls `AbstractOffLatticeCellPopulation::CheckForStepSizeException()`, which throws a
  * `StepSizeException` carrying a suggested smaller step size.
  *
  * The control loop inside `OffLatticeSimulation::UpdateCellLocationsAndTopology()` then
  *
- *  1. reverts all node positions to their state at the start of the sub-step,
- *  2. retries the step with the suggested smaller sub-step size, and
- *  3. gently increases the sub-step (by 1%) after each success so the scheme
- *     gradually recovers toward the full macro step size.
+ *  1. reverts all node positions to their state at the start of the sub-step, and
+ *  2. retries the step with the suggested smaller sub-step size.
  *
  * Each macro time step `dt` may therefore be completed in several sub-steps that sum to
  * `dt`. If more than `mMaxAdaptiveTimeSteps` consecutive sub-steps fail, the simulation
@@ -117,8 +115,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodesOnlyMesh.hpp"
 #include "NodeBasedCellPopulation.hpp"
 
-/* The following headers give us the two numerical methods used in this tutorial. */
-#include "ForwardEulerNumericalMethod.hpp"
+/* The following header gives us the RK4 numerical method used in this tutorial. */
 #include "RK4NumericalMethod.hpp"
 
 /*
@@ -211,8 +208,6 @@ public:
      *         apply boundary conditions
      *         time_advanced += sub_step
      *         adaptive_timer = 0                 // reset counter after success
-     *         sub_step = min(1.01 * sub_step,    // gently recover toward full step
-     *                        dt - time_advanced)
      *
      *     catch StepSizeException e:
      *         if adaptive_timer < max_adaptive_steps:
@@ -224,7 +219,7 @@ public:
      * ```
      *
      * The `StepSizeException` is raised inside the numerical method whenever
-     * `AbstractCellPopulation::CheckForStepSizeException()` detects that a node
+     * `AbstractOffLatticeCellPopulation::CheckForStepSizeException()` detects that a node
      * would move further than its permitted maximum displacement.  The exception
      * carries a smaller suggested step size.
      */
@@ -275,8 +270,7 @@ public:
         simulator.AddForce(p_force);
 
         /* Run the simulation.  The adaptive loop will silently reduce the sub-step
-         * whenever cells come too close, and gradually increase it again after a
-         * successful sub-step. */
+         * whenever cells come too close and retry until the step succeeds. */
         simulator.Solve();
 
         /* The next two lines are for test purposes only and are not part of this tutorial.
