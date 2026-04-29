@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CryptSimulation2d.hpp"
 #include "CryptCellsGenerator.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 #include "CylindricalHoneycombMeshGenerator.hpp"
 #include "SloughingCellKiller.hpp"
 #include "StochasticWntCellCycleModel.hpp"
@@ -115,7 +115,7 @@ public:
         simulator.SetEndTime(time_of_each_run);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&simulator.rGetCellPopulation(), crypt_length));

@@ -76,7 +76,7 @@ class TestPyMeshBasedCellPopulation(chaste.cell_based.AbstractCellBasedTestSuite
         simulator.SetEndTime(5.0)
         simulator.SetSamplingTimestepMultiple(12)
 
-        force = chaste.cell_based.GeneralisedLinearSpringForce[2, 2]()
+        force = chaste.cell_based.LinearSpringForce[2, 2]()
         simulator.AddForce(force)
         simulator.AddSimulationModifier(modifier)
         simulator.Solve()

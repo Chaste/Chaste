@@ -46,7 +46,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DiscreteSystemForceCalculator.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "CellsGenerator.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "SmartPointers.hpp"
 #include "NumericFileComparison.hpp"
@@ -70,7 +70,7 @@ public:
         MeshBasedCellPopulationWithGhostNodes<2> cell_population(*p_mesh, cells, location_indices);
 
         // Create the force law and pass in to a std::list
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         std::vector<boost::shared_ptr<AbstractTwoBodyInteractionForce<2> > > force_collection;
         force_collection.push_back(p_force);
 
@@ -159,7 +159,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create the force law and pass in to a std::list
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         std::vector<boost::shared_ptr<AbstractTwoBodyInteractionForce<2> > > force_collection;
         force_collection.push_back(p_force);
 
@@ -228,7 +228,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Create the force law and pass in to a std::list
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         std::vector<boost::shared_ptr<AbstractTwoBodyInteractionForce<2> > > force_collection;
         force_collection.push_back(p_force);
 
@@ -272,7 +272,7 @@ public:
 
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         std::vector<boost::shared_ptr<AbstractTwoBodyInteractionForce<2> > > force_collection;
         force_collection.push_back(p_force);
 

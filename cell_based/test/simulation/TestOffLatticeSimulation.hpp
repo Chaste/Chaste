@@ -50,7 +50,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "UniformCellCycleModel.hpp"
 #include "NoCellCycleModel.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 #include "ChemotacticForce.hpp"
 #include "RandomCellKiller.hpp"
 #include "PlaneBasedCellKiller.hpp"
@@ -110,7 +110,7 @@ public:
         simulator.SetEndTime(1.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 
@@ -210,7 +210,7 @@ public:
         simulator.SetEndTime(0.5);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 
@@ -268,7 +268,7 @@ public:
         simulator.SetEndTime(0.5);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 
@@ -320,7 +320,7 @@ public:
         simulator.SetEndTime(0.5);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 
@@ -368,7 +368,7 @@ public:
         simulator.SetEndTime(0.5);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 
@@ -427,7 +427,7 @@ public:
         simulator.SetEndTime(0.5);
 
         // Create some force laws and pass them to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Need to set this up for the chemotactic force.
@@ -492,7 +492,7 @@ public:
         simulator.SetUpdateCellPopulationRule(false);
 
         // Create some force laws and pass them to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         simulator.Solve();
@@ -584,7 +584,7 @@ public:
         simulator.SetEndTime(1.0);
 
         // Create a force law and pass it to the simulation
-        typedef GeneralisedLinearSpringForce<2,3> Force;
+        typedef LinearSpringForce<2,3> Force;
         MAKE_PTR(Force, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
@@ -634,7 +634,7 @@ public:
             simulator.SetEndTime(1.0);
 
             // Create a force law and pass it to the simulation
-            typedef GeneralisedLinearSpringForce<2,3> Force;
+            typedef LinearSpringForce<2,3> Force;
             MAKE_PTR(Force, p_force);
             p_force->SetCutOffLength(1.5);
             simulator.AddForce(p_force);
@@ -692,7 +692,7 @@ public:
         simulator.SetEndTime(0.5);
 
         // Create some force laws and pass them to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         simulator.Solve();
@@ -739,7 +739,7 @@ public:
         simulator.SetEndTime(0.5);
 
         // Create some force laws and pass them to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         simulator.Solve();
@@ -782,7 +782,7 @@ public:
         simulator.SetEndTime(0.5);
 
         // Create some force laws and pass them to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Create some boundary conditions and pass them to the simulation
@@ -914,7 +914,7 @@ public:
         simulator.SetEndTime(10.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
@@ -953,7 +953,7 @@ public:
         simulator.SetEndTime(1.0);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(1.5);
         simulator.AddForce(p_linear_force);
 
@@ -1118,7 +1118,7 @@ public:
         simulator.SetEndTime(0.6);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<1>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<1>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         unsigned initial_num_cells = simulator.rGetCellPopulation().GetNumRealCells();
@@ -1270,7 +1270,7 @@ public:
         simulator.SetEndTime(0.5);
 
         // Create a force law and pass them to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         simulator.AddForce(p_linear_force);
 
         // Add a modifier
@@ -1331,7 +1331,7 @@ public:
         simulator.SetSamplingTimestepMultiple(12);
         simulator.SetEndTime(15);
 
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(3);
         simulator.AddForce(p_linear_force);
 
@@ -1383,7 +1383,7 @@ public:
         simulator.SetNumericalMethod(p_method);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 

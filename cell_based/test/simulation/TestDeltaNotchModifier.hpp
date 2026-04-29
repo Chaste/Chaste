@@ -48,7 +48,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 #include "NagaiHondaForce.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "OffLatticeSimulation.hpp"
@@ -342,7 +342,7 @@ public:
         simulator.AddSimulationModifier(p_modifier);
 
         // Define the radius of interaction as we're dealing with a node-based simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         p_linear_force->SetCutOffLength(0.75);
         simulator.AddForce(p_linear_force);
 
@@ -486,7 +486,7 @@ public:
         simulator.AddSimulationModifier(p_modifier);
 
         // Set up force law and add to simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 

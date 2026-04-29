@@ -58,7 +58,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "OffLatticeSimulation.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 #include "DivisionBiasTrackingModifier.hpp"
 #include "FarhadifarForce.hpp"
 #include "SimpleTargetAreaModifier.hpp"
@@ -112,7 +112,7 @@ public:
         simulator.AddSimulationModifier(p_modifier);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 
@@ -191,7 +191,7 @@ public:
         simulator.AddSimulationModifier(p_modifier);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 
@@ -271,7 +271,7 @@ public:
         simulator.AddSimulationModifier(p_modifier);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 
@@ -453,7 +453,7 @@ public:
         simulator.AddSimulationModifier(p_modifier);
 
         // Create a force law and pass it to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
+        MAKE_PTR(LinearSpringForce<2>, p_force);
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 

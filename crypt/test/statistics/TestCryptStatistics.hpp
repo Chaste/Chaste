@@ -47,7 +47,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CryptStatistics.hpp"
 #include "CryptSimulation2d.hpp"
 #include "CryptCellsGenerator.hpp"
-#include "GeneralisedLinearSpringForce.hpp"
+#include "LinearSpringForce.hpp"
 #include "CylindricalHoneycombMeshGenerator.hpp"
 #include "SloughingCellKiller.hpp"
 #include "ApcOneHitCellMutationState.hpp"
@@ -213,7 +213,7 @@ public:
         simulator.SetEndTime(time_of_each_run);
 
         // Create a force law and cell killer and pass then to the simulation
-        MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
         p_linear_force->SetMeinekeSpringStiffness(30.0); // normally 15.0;
         simulator.AddForce(p_linear_force);
         MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&simulator.rGetCellPopulation(), crypt_length));
@@ -418,7 +418,7 @@ public:
             simulator.SetEndTime(time_of_each_run);
 
             // Create a force laws and pass it to the simulation
-            MAKE_PTR(GeneralisedLinearSpringForce<2>, p_linear_force);
+            MAKE_PTR(LinearSpringForce<2>, p_linear_force);
             p_linear_force->SetMeinekeSpringStiffness(30.0); // normally 15.0;
             simulator.AddForce(p_linear_force);
 
