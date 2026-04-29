@@ -596,7 +596,7 @@ void ImmersedBoundaryCellPopulation<DIM>::CheckForStepSizeException(
     {
         rDisplacement *= 0.5*mpImmersedBoundaryMesh->GetCellRearrangementThreshold()/length;
 
-        WARN_ONCE_ONLY("Vertices are moving more than the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
+        WARN_ONCE_ONLY("Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
     }
 
     // Check for movement above the AbsoluteMovementThreshold and throw an exception if this is the case

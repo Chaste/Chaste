@@ -313,17 +313,15 @@ public:
                 RunMonolayer(initial_dt, /*rk4=*/false, /*adaptive=*/true, amts[i], initial_dt,
                              out_dir.str());
             errors[i] = MaxPositionError(adaptive, ref);
-
-            // std::cout << "AMT=" << amts[i] << " error=" << errors[i] << std::endl;
         }
 
         // Data from a run with adaptive FE:
-        // AMT=0.1  error=0.0198828
-        // AMT=0.01 error=0.00249277
-        // AMT=0.001 error=0.000201459
-        TS_ASSERT_DELTA(errors[0], 0.0198828,   1e-6);
-        TS_ASSERT_DELTA(errors[1], 0.00249277,  1e-6);
-        TS_ASSERT_DELTA(errors[2], 0.000201459, 1e-6);
+        // AMT=0.1  error=0.0190764
+        // AMT=0.01 error=0.00108604
+        // AMT=0.001 error=0.000135077
+        TS_ASSERT_DELTA(errors[0], 0.0190764,   1e-6);
+        TS_ASSERT_DELTA(errors[1], 0.00108604,  1e-6);
+        TS_ASSERT_DELTA(errors[2], 0.000135077, 1e-6);
     }
 
     /**
@@ -358,17 +356,15 @@ public:
                              out_dir.str());
 
             errors[i] = MaxPositionError(adaptive, ref);
-
-            // std::cout << "AMT=" << amts[i] << " error=" << errors[i] << std::endl;
         }
 
         // Data from a run with adaptive RK4:
-        // AMT=0.1  error=0.0164251
-        // AMT=0.01 error=0.00110789
-        // AMT=0.001 error=0.000110299
-        TS_ASSERT_DELTA(errors[0], 0.0164251,   1e-6);
-        TS_ASSERT_DELTA(errors[1], 0.00110789,  1e-6);
-        TS_ASSERT_DELTA(errors[2], 0.000110299, 1e-6);
+        // AMT=0.1  error=1.16722e-05
+        // AMT=0.01 error=3.49773e-10
+        // AMT=0.001 error=1.24127e-16
+        TS_ASSERT_DELTA(errors[0], 1.16722e-05,  1e-9);
+        TS_ASSERT_DELTA(errors[1], 3.49773e-10,  1e-12);
+        TS_ASSERT_DELTA(errors[2], 1.24127e-16,  1e-16);// note this is close to machine precision for double, so we are using 1e-16 to allow for some numerical noise
     }
 };
 

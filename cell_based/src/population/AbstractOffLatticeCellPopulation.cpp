@@ -64,8 +64,16 @@ void AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>::CheckForStepSizeE
         message << "Cells are moving by " << length;
         message << ", which is more than the AbsoluteMovementThreshold: use a smaller timestep to avoid this exception.";
 
-        // Halve the time step
-        double new_step = 0.95*dt*(this->mAbsoluteMovementThreshold/length);
+        /* Divide dt by the smallest power of 2 such that the node moves less than the threshold
+         * Note that this is the optimal poser of 2 to divide by for the Forward Euler Method. 
+         * For higher order methods, the optimal divisor may be different, but this is a an upper bound that works for all methods.
+         */
+        double divisor = 1.0;
+        while (length / divisor >= this->mAbsoluteMovementThreshold)
+        {
+            divisor *= 2.0;
+        }
+        double new_step = dt / divisor;
 
         throw StepSizeException(new_step, message.str(), true); // terminate
     }
