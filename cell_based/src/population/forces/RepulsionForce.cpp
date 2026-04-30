@@ -51,6 +51,7 @@ void RepulsionForce<DIM>::AddForceContribution(AbstractCellPopulation<DIM>& rCel
     }
 
     const std::vector< std::pair<Node<DIM>*, Node<DIM>* > >& r_node_pairs = (static_cast<NodeBasedCellPopulation<DIM>*>(&rCellPopulation))->rGetNodePairs();
+    #pragma omp parallel for
     for (const auto& [p_node_a, p_node_b] : r_node_pairs)
     {
         // Get the node locations
