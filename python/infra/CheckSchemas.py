@@ -102,7 +102,7 @@ for (path, file) in files_to_check:
     else:
         if file in exception_tests:
           num_good+=1
-        else:  
+        else:
           print('%s is an orphan.  There is no reference schema with that name.' % file_name)
           num_bad+=1
 

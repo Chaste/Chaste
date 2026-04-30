@@ -48,7 +48,7 @@ class TestTest(unittest.TestCase):
         self.assertEqual(2, 1+1)
         self.assertNotEqual(1, 1+1, "You can also give messages")
         self.assertAlmostEqual(1.005, 1.006, 2)
-    
+
     def TestStrings(self):
         s = "123"
         self.assertRaises(ValueError, s.index, "4")

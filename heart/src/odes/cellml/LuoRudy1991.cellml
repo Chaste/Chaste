@@ -53,7 +53,7 @@ The complete original paper reference is cited below:
 <para>
 <ulink url="http://circres.ahajournals.org/cgi/content/abstract/68/6/1501">A Model of the Ventricular Cardiac Action Potential - Depolarisation, Repolarisation and Their Interaction</ulink>, Ching-hsing Luo and Yoram Rudy, 1991 <ulink url="http://circres.ahajournals.org/">
             <emphasis>Circulation Research</emphasis>
-          </ulink>, 68, 1501-1526.  <ulink url="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;list_uids=1709839&amp;dopt=Abstract">PubMed ID: 1709839</ulink> 
+          </ulink>, 68, 1501-1526.  <ulink url="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;list_uids=1709839&amp;dopt=Abstract">PubMed ID: 1709839</ulink>
 </para>
 
 <informalfigure float="0" id="fig_cell_diagram">
@@ -202,7 +202,7 @@ The breakdown of the model into components and the definition of encapsulation a
                <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_stimulus_current_amplitude"/>
             </rdf:Description>
          </rdf:RDF>
-      </variable>    
+      </variable>
       <math xmlns="http://www.w3.org/1998/Math/MathML">
          <apply><eq/>
             <ci>FonRT</ci>
@@ -813,8 +813,8 @@ The breakdown of the model into components and the definition of encapsulation a
       </math>
    </component>
    <component name="slow_inward_current">
-	  <variable name="i_si" units="microA_per_cm2" public_interface="out"/>
- 	  <variable name="P_si" units="milliS_per_cm2" initial_value="0.09" cmeta:id="membrane_L_type_calcium_current_conductance">
+      <variable name="i_si" units="microA_per_cm2" public_interface="out"/>
+       <variable name="P_si" units="milliS_per_cm2" initial_value="0.09" cmeta:id="membrane_L_type_calcium_current_conductance">
          <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
             <rdf:Description rdf:about="#membrane_L_type_calcium_current_conductance">
                <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
@@ -2081,7 +2081,7 @@ The breakdown of the model into components and the definition of encapsulation a
   </rdf:Description>
   <rdf:Description rdf:about="#Cai">
     <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#cytosolic_calcium_concentration"/>
-  </rdf:Description>  
+  </rdf:Description>
   <rdf:Description rdf:about="#membrane_rapid_delayed_rectifier_potassium_current_conductance">
     <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
     <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_rapid_delayed_rectifier_potassium_current_conductance"/>

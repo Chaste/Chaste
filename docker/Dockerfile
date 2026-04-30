@@ -16,7 +16,7 @@ RUN build_chaste.sh ${GIT_TAG}
 VOLUME "${CHASTE_DIR}"
 
 # Optionally run a test suite before finalising the image.
-# NOTE: These test outputs will not appear in the volume. 
+# NOTE: These test outputs will not appear in the volume.
 ARG TEST_SUITE=-
 ENV TEST_SUITE=${TEST_SUITE}
 RUN test.sh ${TEST_SUITE}

@@ -181,7 +181,7 @@ protected :
     c_matrix<double,DIM,DIM> mModifiedConductivityTensor;
 
     /** Pointer to the VTK writer class. Initialized to NULL upon construction. Object created within Initialise() method*/
-    CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>* mpCardiacVtkWriter; 
+    CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>* mpCardiacVtkWriter;
 
     /**
      *  Determine which node is closest to the watched location
@@ -197,7 +197,7 @@ protected :
      */
     void WriteWatchedLocationData(double time, Vec voltage);
 
-    
+
 
 public :
 

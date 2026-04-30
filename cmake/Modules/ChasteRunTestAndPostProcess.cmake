@@ -6,7 +6,7 @@ if( NOT post_cmd )
    message( FATAL_ERROR "Variable post_cmd not defined" )
 endif( NOT post_cmd )
 
-# output_file contains the name of the output file the post_cmd will produce 
+# output_file contains the name of the output file the post_cmd will produce
 if( NOT output_file )
     message( FATAL_ERROR "Variable output_file not defined" )
 endif( NOT output_file )

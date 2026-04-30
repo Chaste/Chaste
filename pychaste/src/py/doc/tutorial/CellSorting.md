@@ -15,7 +15,7 @@ This test is a demonstration of cell sorting using a Cellular Potts based framew
 It shows:
  * How to set up a Potts simulation
  * Working with labels
- 
+
 ## The Test
 
 ```python
