@@ -60,7 +60,7 @@ typedef MonodomainPurkinjeCableAssembler<2,2> MonodomainPurkinjeCableAssembler2d
 class NonPurkinjeCellFactory : public AbstractCardiacCellFactory<2>
 {
 private:
-    boost::shared_ptr<SimpleStimulus> mpStimulus;
+    std::shared_ptr<SimpleStimulus> mpStimulus;
 
 public:
     NonPurkinjeCellFactory()
@@ -88,7 +88,7 @@ public:
 class PurkinjeCellFactory : public AbstractPurkinjeCellFactory<2> //inherits from different base
 {
 private:
-    boost::shared_ptr<SimpleStimulus> mpStimulus;
+    std::shared_ptr<SimpleStimulus> mpStimulus;
 
 public:
     PurkinjeCellFactory()

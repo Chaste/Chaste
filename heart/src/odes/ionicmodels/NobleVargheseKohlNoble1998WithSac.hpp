@@ -77,8 +77,8 @@ public:
      * @param pSolver  ODE solver to use
      * @param pIntracellularStimulus  intracellular stimulus to apply
      */
-    CML_noble_varghese_kohl_noble_1998_basic_with_sac(boost::shared_ptr<AbstractIvpOdeSolver> pSolver,
-                                                      boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus);
+    CML_noble_varghese_kohl_noble_1998_basic_with_sac(std::shared_ptr<AbstractIvpOdeSolver> pSolver,
+                                                      std::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus);
 
     /** Destructor. */
     ~CML_noble_varghese_kohl_noble_1998_basic_with_sac();
@@ -144,8 +144,8 @@ namespace boost
         inline void save_construct_data(
             Archive & ar, const CML_noble_varghese_kohl_noble_1998_basic_with_sac * t, const unsigned int fileVersion)
         {
-            const boost::shared_ptr<AbstractIvpOdeSolver> p_solver = t->GetSolver();
-            const boost::shared_ptr<AbstractStimulusFunction> p_stimulus = t->GetStimulusFunction();
+            const std::shared_ptr<AbstractIvpOdeSolver> p_solver = t->GetSolver();
+            const std::shared_ptr<AbstractStimulusFunction> p_stimulus = t->GetStimulusFunction();
             ar << p_solver;
             ar << p_stimulus;
         }
@@ -160,8 +160,8 @@ namespace boost
         inline void load_construct_data(
             Archive & ar, CML_noble_varghese_kohl_noble_1998_basic_with_sac * t, const unsigned int fileVersion)
         {
-            boost::shared_ptr<AbstractIvpOdeSolver> p_solver;
-            boost::shared_ptr<AbstractStimulusFunction> p_stimulus;
+            std::shared_ptr<AbstractIvpOdeSolver> p_solver;
+            std::shared_ptr<AbstractStimulusFunction> p_stimulus;
             ar >> p_solver;
             ar >> p_stimulus;
             ::new(t)CML_noble_varghese_kohl_noble_1998_basic_with_sac(p_solver, p_stimulus);

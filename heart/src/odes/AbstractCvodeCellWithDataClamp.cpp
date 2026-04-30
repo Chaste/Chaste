@@ -46,10 +46,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 
 
-AbstractCvodeCellWithDataClamp::AbstractCvodeCellWithDataClamp(boost::shared_ptr<AbstractIvpOdeSolver> pSolver/* unused */,
+AbstractCvodeCellWithDataClamp::AbstractCvodeCellWithDataClamp(std::shared_ptr<AbstractIvpOdeSolver> pSolver/* unused */,
                                                                unsigned numberOfStateVariables,
                                                                unsigned voltageIndex,
-                                                               boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
+                                                               std::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
     : AbstractCvodeCell(pSolver, numberOfStateVariables, voltageIndex, pIntracellularStimulus),
       mDataAvailable(false),
       mDataClampIsOn(false)

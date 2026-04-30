@@ -318,12 +318,12 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                     if (IsSiteAvailable(*iter, *cell_iter))
                     {
                         // Iterating over the update rule
-                        for (typename std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > >::iterator iter_rule = this->mUpdateRuleCollection.begin();
+                        for (typename std::vector<std::shared_ptr<AbstractUpdateRule<DIM> > >::iterator iter_rule = this->mUpdateRuleCollection.begin();
                              iter_rule != this->mUpdateRuleCollection.end();
                              ++iter_rule)
                         {
                             // This static cast is fine, since we assert the update rule must be a CA update rule in AddUpdateRule()
-                            double p = (boost::static_pointer_cast<AbstractCaUpdateRule<DIM> >(*iter_rule))->EvaluateProbability(node_index, *iter, *this, dt, 1, *cell_iter);
+                            double p = (std::static_pointer_cast<AbstractCaUpdateRule<DIM> >(*iter_rule))->EvaluateProbability(node_index, *iter, *this, dt, 1, *cell_iter);
                             probability_of_moving += p;
                             if (probability_of_moving < 0)
                             {
@@ -434,12 +434,12 @@ void CaBasedCellPopulation<DIM>::UpdateCellLocations(double dt)
                     double probability_of_switch = 0.0;
 
                     // Now add contributions to the probability from each CA switching update rule
-                    for (typename std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > >::iterator iter_rule = mSwitchingUpdateRuleCollection.begin();
+                    for (typename std::vector<std::shared_ptr<AbstractUpdateRule<DIM> > >::iterator iter_rule = mSwitchingUpdateRuleCollection.begin();
                          iter_rule != mSwitchingUpdateRuleCollection.end();
                          ++iter_rule)
                     {
                         // This static cast is fine, since we assert the update rule must be a CA switching update rule in AddUpdateRule()
-                        double p = (boost::static_pointer_cast<AbstractCaSwitchingUpdateRule<DIM> >(*iter_rule))->EvaluateSwitchingProbability(node_index, neighbour_location_index, *this, dt, 1);
+                        double p = (std::static_pointer_cast<AbstractCaSwitchingUpdateRule<DIM> >(*iter_rule))->EvaluateSwitchingProbability(node_index, neighbour_location_index, *this, dt, 1);
                         probability_of_switch += p;
                     }
 
@@ -502,25 +502,25 @@ void CaBasedCellPopulation<DIM>::Update(bool hasHadBirthsOrDeaths)
 }
 
 template<unsigned DIM>
-void CaBasedCellPopulation<DIM>::AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
+void CaBasedCellPopulation<DIM>::AcceptPopulationWriter(std::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
 {
     pPopulationWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void CaBasedCellPopulation<DIM>::AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
+void CaBasedCellPopulation<DIM>::AcceptPopulationCountWriter(std::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
 {
     pPopulationCountWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void CaBasedCellPopulation<DIM>::AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter)
+void CaBasedCellPopulation<DIM>::AcceptPopulationEventWriter(std::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter)
 {
     pPopulationEventWriter->Visit(this);
 }
 
 template<unsigned DIM>
-void CaBasedCellPopulation<DIM>::AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
+void CaBasedCellPopulation<DIM>::AcceptCellWriter(std::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
 {
     pCellWriter->VisitCell(pCell, this);
 }
@@ -554,7 +554,7 @@ double CaBasedCellPopulation<DIM>::GetWidth(const unsigned& rDimension)
 }
 
 template<unsigned DIM>
-void CaBasedCellPopulation<DIM>::AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule)
+void CaBasedCellPopulation<DIM>::AddUpdateRule(std::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule)
 {
     // The update rule must be derived from AbstractCaUpdateRule or AbstractCaSwitchingUpdateRule
     assert(bool(dynamic_cast<AbstractCaUpdateRule<DIM>*>(pUpdateRule.get())) ||
@@ -581,9 +581,9 @@ void CaBasedCellPopulation<DIM>::RemoveAllUpdateRules()
 }
 
 template<unsigned DIM>
-const std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > CaBasedCellPopulation<DIM>::GetUpdateRuleCollection() const
+const std::vector<std::shared_ptr<AbstractUpdateRule<DIM> > > CaBasedCellPopulation<DIM>::GetUpdateRuleCollection() const
 {
-    std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > update_rules;
+    std::vector<std::shared_ptr<AbstractUpdateRule<DIM> > > update_rules;
 
     for (unsigned i=0; i<this->mUpdateRuleCollection.size(); i++)
     {
@@ -598,13 +598,13 @@ const std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > CaBasedCellPopul
 }
 
 template<unsigned DIM>
-boost::shared_ptr<AbstractCaBasedDivisionRule<DIM> > CaBasedCellPopulation<DIM>::GetCaBasedDivisionRule()
+std::shared_ptr<AbstractCaBasedDivisionRule<DIM> > CaBasedCellPopulation<DIM>::GetCaBasedDivisionRule()
 {
     return mpCaBasedDivisionRule;
 }
 
 template<unsigned DIM>
-void CaBasedCellPopulation<DIM>::SetCaBasedDivisionRule(boost::shared_ptr<AbstractCaBasedDivisionRule<DIM> > pCaBasedDivisionRule)
+void CaBasedCellPopulation<DIM>::SetCaBasedDivisionRule(std::shared_ptr<AbstractCaBasedDivisionRule<DIM> > pCaBasedDivisionRule)
 {
     mpCaBasedDivisionRule = pCaBasedDivisionRule;
 }
@@ -706,7 +706,7 @@ void CaBasedCellPopulation<DIM>::WriteVtkResultsToFile(const std::string& rDirec
     }
 
     // Iterate over any cell writers that are present
-    for (typename std::vector<boost::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
+    for (typename std::vector<std::shared_ptr<AbstractCellWriter<DIM, DIM> > >::iterator cell_writer_iter = this->mCellWriters.begin();
          cell_writer_iter != this->mCellWriters.end();
          ++cell_writer_iter)
     {

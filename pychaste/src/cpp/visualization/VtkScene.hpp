@@ -130,7 +130,7 @@ class VtkScene
     /**
      * The cell population
      */
-    boost::shared_ptr<CellPopulationPyChasteActorGenerator<DIM> > mpCellPopulationGenerator;
+    std::shared_ptr<CellPopulationPyChasteActorGenerator<DIM> > mpCellPopulationGenerator;
 
 public:
     /**
@@ -165,7 +165,7 @@ public:
      * Get the cell population actor generator
      * @return the cell population actor generator
      */
-    boost::shared_ptr<CellPopulationPyChasteActorGenerator<DIM> > GetCellPopulationActorGenerator();
+    std::shared_ptr<CellPopulationPyChasteActorGenerator<DIM> > GetCellPopulationActorGenerator();
 
     /**
      * Update the renderer, this will update the population actor and write output images
@@ -182,7 +182,7 @@ public:
      * Set the cell population
      * @param pCellPopulation the cell population for rendering
      */
-    void SetCellPopulation(boost::shared_ptr<AbstractCellPopulation<DIM> > pCellPopulation);
+    void SetCellPopulation(std::shared_ptr<AbstractCellPopulation<DIM> > pCellPopulation);
 
     /**
      * Set the path for output

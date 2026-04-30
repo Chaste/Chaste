@@ -69,7 +69,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* Required for setting up the numerical method */
 #include "ForwardEulerNumericalMethod.hpp"
-#include <boost/make_shared.hpp>
+#include <memory>
 
 /* This test is never run in parallel */
 #include "FakePetscSetup.hpp"
@@ -127,7 +127,7 @@ public:
          * and end time.
          * Additionally, we tell the numerical method that we want the cell population to update node locations.*/
         OffLatticeSimulation<2> simulator(cell_population);
-        simulator.SetNumericalMethod(boost::make_shared<ForwardEulerNumericalMethod<2,2> >());
+        simulator.SetNumericalMethod(std::make_shared<ForwardEulerNumericalMethod<2,2> >());
         simulator.GetNumericalMethod()->SetUseUpdateNodeLocation(true);
 
         double dt = 0.01;

@@ -38,7 +38,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef CHASTE_CVODE
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "AbstractCvodeCell.hpp"
 #include "Exception.hpp"
 #include "RegularStimulus.hpp"
@@ -59,7 +59,7 @@ private:
 
 protected:
     /** The cell model to run to steady state */
-    boost::shared_ptr<AbstractCvodeCell> mpModel;
+    std::shared_ptr<AbstractCvodeCell> mpModel;
 
     /** The number of evaluations that it took */
     unsigned mNumEvaluations;
@@ -88,7 +88,7 @@ public:
      *
      * @param pModel  The cell model to run to steady state.
      */
-    AbstractSteadyStateRunner(boost::shared_ptr<AbstractCvodeCell> pModel);
+    AbstractSteadyStateRunner(std::shared_ptr<AbstractCvodeCell> pModel);
 
     /**
      * Destructor (empty)

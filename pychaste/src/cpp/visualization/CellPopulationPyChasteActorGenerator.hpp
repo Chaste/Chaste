@@ -55,7 +55,7 @@ class CellPopulationPyChasteActorGenerator : public AbstractPyChasteActorGenerat
     /**
      * The CellPopulation
      */
-    boost::shared_ptr<AbstractCellPopulation<DIM> > mpCellPopulation;
+    std::shared_ptr<AbstractCellPopulation<DIM> > mpCellPopulation;
 
     /**
      * Show mutable mesh edges for Mesh Based populations
@@ -158,7 +158,7 @@ public:
      * Set the CellPopulation
      * @param pCellPopulation the CellPopulation to render
      */
-    void SetCellPopulation(boost::shared_ptr<AbstractCellPopulation<DIM> > pCellPopulation);
+    void SetCellPopulation(std::shared_ptr<AbstractCellPopulation<DIM> > pCellPopulation);
 
     /**
      * @param showEdges show the voronoi mesh

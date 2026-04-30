@@ -41,11 +41,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <set>
 #include <boost/utility.hpp>
-#include <boost/weak_ptr.hpp>
 #include "DynamicCellModelLoader.hpp"
 #include "FileFinder.hpp"
 
-typedef boost::weak_ptr<DynamicCellModelLoader> DynamicCellModelLoaderWeakPtr;
+typedef std::weak_ptr<DynamicCellModelLoader> DynamicCellModelLoaderWeakPtr;
 
 /**
  * This class provides a static registry to keep track of the cell model loaders used,

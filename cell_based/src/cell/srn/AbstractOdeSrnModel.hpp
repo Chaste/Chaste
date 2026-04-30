@@ -121,7 +121,7 @@ public:
      *                   object (allows the use of different ODE solvers).
      */
     AbstractOdeSrnModel(unsigned stateSize,
-                        boost::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = boost::shared_ptr<AbstractCellCycleModelOdeSolver>());
+                        std::shared_ptr<AbstractCellCycleModelOdeSolver> pOdeSolver = std::shared_ptr<AbstractCellCycleModelOdeSolver>());
 
     /**
      * Destructor.

@@ -79,7 +79,7 @@ public:
         EXIT_IF_PARALLEL;
         /* First we create a regular vertex mesh. */
         HoneycombVertexMeshGenerator generator(6, 6);
-        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);
@@ -172,7 +172,7 @@ public:
     {
         /* First we create a regular vertex mesh. */
         HoneycombVertexMeshGenerator generator(6, 6);
-        boost::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2, 2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         MAKE_PTR(WildTypeCellMutationState, p_state);

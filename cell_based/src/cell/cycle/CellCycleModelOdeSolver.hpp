@@ -59,7 +59,7 @@ class CellCycleModelOdeSolver : public AbstractCellCycleModelOdeSolver, private 
 {
 private:
     /** The single instance of this class, for this ODE_SOLVER. */
-    static boost::shared_ptr<CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER> > mpInstance;
+    static std::shared_ptr<CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER> > mpInstance;
 
     /** Default constructor. Not user accessible; to obtain an instance of this class use the Instance method. */
     CellCycleModelOdeSolver();
@@ -81,7 +81,7 @@ private:
 
 public:
     /** @return a pointer to the singleton instance, creating it if necessary. */
-    static boost::shared_ptr<CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER> > Instance();
+    static std::shared_ptr<CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER> > Instance();
 
     /** @return whether the instance in existence and fully set up. */
     bool IsSetUp();
@@ -104,7 +104,7 @@ public:
 
 /** Definition of the instance static member. */
 template<class CELL_CYCLE_MODEL, class ODE_SOLVER>
-boost::shared_ptr<CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER> > CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER>::mpInstance;
+std::shared_ptr<CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER> > CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER>::mpInstance;
 
 
 template<class CELL_CYCLE_MODEL, class ODE_SOLVER>
@@ -121,7 +121,7 @@ CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER>::CellCycleModelOdeSolver()
 }
 
 template<class CELL_CYCLE_MODEL, class ODE_SOLVER>
-boost::shared_ptr<CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER> > CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER>::Instance()
+std::shared_ptr<CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER> > CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER>::Instance()
 {
     if (!mpInstance)
     {
@@ -144,9 +144,9 @@ void CellCycleModelOdeSolver<CELL_CYCLE_MODEL, ODE_SOLVER>::Initialise()
     // the fact this is a singleton will lead to all sorts of problems
     // as CVODE will have the internal state for the wrong ODE system!
 #ifdef CHASTE_CVODE
-    if (boost::dynamic_pointer_cast<CvodeAdaptor>(mpOdeSolver))
+    if (std::dynamic_pointer_cast<CvodeAdaptor>(mpOdeSolver))
     {
-        (boost::static_pointer_cast<CvodeAdaptor>(mpOdeSolver))->SetForceReset(true);
+        (std::static_pointer_cast<CvodeAdaptor>(mpOdeSolver))->SetForceReset(true);
     }
 #endif //CHASTE_CVODE
 }
@@ -172,7 +172,7 @@ class CellCycleModelOdeSolver<CELL_CYCLE_MODEL, BackwardEulerIvpOdeSolver> : pub
 {
 private:
     /** The single instance of this class, for this ODE_SOLVER. */
-    static boost::shared_ptr<CellCycleModelOdeSolver<CELL_CYCLE_MODEL, BackwardEulerIvpOdeSolver> > mpInstance;
+    static std::shared_ptr<CellCycleModelOdeSolver<CELL_CYCLE_MODEL, BackwardEulerIvpOdeSolver> > mpInstance;
 
     /** Default constructor. Not user accessible; to obtain an instance of this class use the Instance method. */
     CellCycleModelOdeSolver();
@@ -194,7 +194,7 @@ private:
 
 public:
     /** @return a pointer to the singleton instance, creating it if necessary. */
-    static boost::shared_ptr<CellCycleModelOdeSolver<CELL_CYCLE_MODEL, BackwardEulerIvpOdeSolver> > Instance();
+    static std::shared_ptr<CellCycleModelOdeSolver<CELL_CYCLE_MODEL, BackwardEulerIvpOdeSolver> > Instance();
 
     /** @return whether the instance in existence and fully set up. */
     bool IsSetUp();
@@ -207,7 +207,7 @@ public:
 };
 
 template<class CELL_CYCLE_MODEL>
-boost::shared_ptr<CellCycleModelOdeSolver<CELL_CYCLE_MODEL, BackwardEulerIvpOdeSolver> > CellCycleModelOdeSolver<CELL_CYCLE_MODEL, BackwardEulerIvpOdeSolver>::mpInstance;
+std::shared_ptr<CellCycleModelOdeSolver<CELL_CYCLE_MODEL, BackwardEulerIvpOdeSolver> > CellCycleModelOdeSolver<CELL_CYCLE_MODEL, BackwardEulerIvpOdeSolver>::mpInstance;
 
 template<class CELL_CYCLE_MODEL>
 CellCycleModelOdeSolver<CELL_CYCLE_MODEL, BackwardEulerIvpOdeSolver>::CellCycleModelOdeSolver()
@@ -216,7 +216,7 @@ CellCycleModelOdeSolver<CELL_CYCLE_MODEL, BackwardEulerIvpOdeSolver>::CellCycleM
 }
 
 template<class CELL_CYCLE_MODEL>
-boost::shared_ptr<CellCycleModelOdeSolver<CELL_CYCLE_MODEL, BackwardEulerIvpOdeSolver> > CellCycleModelOdeSolver<CELL_CYCLE_MODEL, BackwardEulerIvpOdeSolver>::Instance()
+std::shared_ptr<CellCycleModelOdeSolver<CELL_CYCLE_MODEL, BackwardEulerIvpOdeSolver> > CellCycleModelOdeSolver<CELL_CYCLE_MODEL, BackwardEulerIvpOdeSolver>::Instance()
 {
     if (!mpInstance)
     {

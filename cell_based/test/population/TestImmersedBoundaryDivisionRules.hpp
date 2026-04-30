@@ -84,7 +84,7 @@ public:
         CellPtr p_cell0 = cell_population.GetCellUsingLocationIndex(0);
 
         // Get the division rule back from the population
-        boost::shared_ptr<AbstractImmersedBoundaryDivisionRule<2> > p_division_rule = cell_population.GetImmersedBoundaryDivisionRule();
+        std::shared_ptr<AbstractImmersedBoundaryDivisionRule<2> > p_division_rule = cell_population.GetImmersedBoundaryDivisionRule();
         c_vector<double, 2> short_axis = p_division_rule->CalculateCellDivisionVector(p_cell0, cell_population);
 
         TS_ASSERT_DELTA(short_axis[0], 1.0 / sqrt(2.0), 1e-9);
@@ -98,7 +98,7 @@ public:
 
         // Create data structures to store variables to test for equality here
         {
-            boost::shared_ptr<AbstractImmersedBoundaryDivisionRule<2> > p_division_rule(new ShortAxisImmersedBoundaryDivisionRule<2>());
+            std::shared_ptr<AbstractImmersedBoundaryDivisionRule<2> > p_division_rule(new ShortAxisImmersedBoundaryDivisionRule<2>());
 
             // Create output archive
             ArchiveOpener<boost::archive::text_oarchive, std::ofstream> arch_opener(archive_dir, archive_file);
@@ -109,7 +109,7 @@ public:
         }
 
         {
-            boost::shared_ptr<AbstractImmersedBoundaryDivisionRule<2> > p_division_rule;
+            std::shared_ptr<AbstractImmersedBoundaryDivisionRule<2> > p_division_rule;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);

@@ -246,8 +246,8 @@ public:
         mesh.Translate(-0.5,-0.5);
 
         std::vector<CellPtr> cells;
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
-        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+        std::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             WntCellCycleModel* p_model = new WntCellCycleModel();
@@ -430,8 +430,8 @@ public:
         std::vector<WntCellCycleModel*> models;
 
         std::vector<CellPtr> cells;
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
-        boost::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
+        std::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        std::shared_ptr<AbstractCellProperty> p_stem_type(new StemCellProliferativeType);
         for (unsigned i=0; i<mesh.GetNumNodes(); i++)
         {
             WntCellCycleModel* p_model = new WntCellCycleModel();

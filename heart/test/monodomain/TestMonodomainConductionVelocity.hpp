@@ -86,8 +86,8 @@ public:
 
         HeartConfig::Instance()->SetSurfaceAreaToVolumeRatio(1.0);
         HeartConfig::Instance()->SetCapacitance(1.0);
-        boost::shared_ptr<ActivationOutputModifier> activation_map_0(new ActivationOutputModifier("activation_map_0.0.txt", 0.0));
-        boost::shared_ptr<ActivationOutputModifier> activation_map_minus70(new ActivationOutputModifier("activation_map_-70.0.txt", -70.0));
+        std::shared_ptr<ActivationOutputModifier> activation_map_0(new ActivationOutputModifier("activation_map_0.0.txt", 0.0));
+        std::shared_ptr<ActivationOutputModifier> activation_map_minus70(new ActivationOutputModifier("activation_map_-70.0.txt", -70.0));
         monodomain_problem.AddOutputModifier(activation_map_0);
         monodomain_problem.AddOutputModifier(activation_map_minus70);
 

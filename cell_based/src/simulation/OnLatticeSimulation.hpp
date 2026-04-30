@@ -110,7 +110,7 @@ public:
      *
      * @param pUpdateRule shared pointer to an update rule law
      */
-    void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
+    void AddUpdateRule(std::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule);
 
     /**
      * Remove any update rules that have previously been passed to the cell population.

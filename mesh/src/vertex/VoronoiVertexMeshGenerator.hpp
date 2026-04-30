@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 #include <vector>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "MutableVertexMesh.hpp"
 #include "Toroidal2dVertexMesh.hpp"
 #include "RandomNumberGenerator.hpp"
@@ -62,10 +62,10 @@ class VoronoiVertexMeshGenerator
 protected:
 
     /** A pointer to the mesh that this class creates. */
-    boost::shared_ptr<MutableVertexMesh<2,2> > mpMesh;
+    std::shared_ptr<MutableVertexMesh<2,2> > mpMesh;
 
     /** A pointer to a toroidal vertex mesh (allowing for doubly periodic boundaries), whose creation is optional. */
-    boost::shared_ptr<Toroidal2dVertexMesh > mpTorMesh;
+    std::shared_ptr<Toroidal2dVertexMesh > mpTorMesh;
 
     /** The number of elements requested across the mesh. */
     unsigned mNumElementsX;
@@ -207,17 +207,17 @@ public:
     /**
      * @return A pointer to a 2D mutable vertex mesh
      */
-    virtual boost::shared_ptr<MutableVertexMesh<2,2> > GetMesh();
+    virtual std::shared_ptr<MutableVertexMesh<2,2> > GetMesh();
 
     /**
      * @return A pointer to a 2D mutable vertex mesh, after ReMesh() has been called to remove short edges
      */
-    virtual boost::shared_ptr<MutableVertexMesh<2,2> > GetMeshAfterReMesh();
+    virtual std::shared_ptr<MutableVertexMesh<2,2> > GetMeshAfterReMesh();
 
     /**
      * @return A pointer to a 2D toroidal vertex mesh with periodic boundaries
      */
-    virtual boost::shared_ptr<Toroidal2dVertexMesh> GetToroidalMesh();
+    virtual std::shared_ptr<Toroidal2dVertexMesh> GetToroidalMesh();
 
     /**
      * @return A vector representing the polygon distribution of the generated mesh, triangles upwards

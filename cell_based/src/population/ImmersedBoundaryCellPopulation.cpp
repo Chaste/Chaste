@@ -603,28 +603,28 @@ void ImmersedBoundaryCellPopulation<DIM>::CheckForStepSizeException(
 
 template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::AcceptPopulationWriter(
-    boost::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
+    std::shared_ptr<AbstractCellPopulationWriter<DIM, DIM> > pPopulationWriter)
 {
     pPopulationWriter->Visit(this);
 }
 
 template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::AcceptPopulationEventWriter(
-    boost::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter)
+    std::shared_ptr<AbstractCellPopulationEventWriter<DIM, DIM> > pPopulationEventWriter)
 {
     pPopulationEventWriter->Visit(this);
 }
 
 template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::AcceptPopulationCountWriter(
-    boost::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
+    std::shared_ptr<AbstractCellPopulationCountWriter<DIM, DIM> > pPopulationCountWriter)
 {
     pPopulationCountWriter->Visit(this);
 }
 
 template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::AcceptCellWriter(
-    boost::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
+    std::shared_ptr<AbstractCellWriter<DIM, DIM> > pCellWriter, CellPtr pCell)
 {
     pCellWriter->VisitCell(pCell, this);
 }
@@ -1067,14 +1067,14 @@ double ImmersedBoundaryCellPopulation<DIM>::GetCellDataItemAtPdeNode(
 }
 
 template <unsigned DIM>
-boost::shared_ptr<AbstractImmersedBoundaryDivisionRule<DIM> > ImmersedBoundaryCellPopulation<DIM>::GetImmersedBoundaryDivisionRule()
+std::shared_ptr<AbstractImmersedBoundaryDivisionRule<DIM> > ImmersedBoundaryCellPopulation<DIM>::GetImmersedBoundaryDivisionRule()
 {
     return mpImmersedBoundaryDivisionRule;
 }
 
 template <unsigned DIM>
 void ImmersedBoundaryCellPopulation<DIM>::SetImmersedBoundaryDivisionRule(
-    boost::shared_ptr<AbstractImmersedBoundaryDivisionRule<DIM> > pImmersedBoundaryDivisionRule)
+    std::shared_ptr<AbstractImmersedBoundaryDivisionRule<DIM> > pImmersedBoundaryDivisionRule)
 {
     mpImmersedBoundaryDivisionRule = pImmersedBoundaryDivisionRule;
 }

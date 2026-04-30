@@ -101,7 +101,7 @@ void ContactInhibitionCellCycleModel::UpdateCellCyclePhase()
              * a new CellPropertyRegistry. In this case the CellLabel's cell count would be incorrect.
              * We must therefore access the CellLabel via the cell's CellPropertyCollection.
              */
-            boost::shared_ptr<AbstractCellProperty> p_label =
+            std::shared_ptr<AbstractCellProperty> p_label =
                 mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<CellLabel>();
             mpCell->AddCellProperty(p_label);
         }

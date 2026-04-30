@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 #include <vector>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "Cylindrical2dVertexMesh.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
 
@@ -71,12 +71,12 @@ public:
     /**
      * @return a 2D honeycomb mesh
      */
-    boost::shared_ptr<MutableVertexMesh<2,2> > GetMesh();
+    std::shared_ptr<MutableVertexMesh<2,2> > GetMesh();
 
     /**
      * @return a 2D honeycomb mesh with periodic left/right boundaries
      */
-    boost::shared_ptr<Cylindrical2dVertexMesh> GetCylindricalMesh();
+    std::shared_ptr<Cylindrical2dVertexMesh> GetCylindricalMesh();
 };
 
 #endif /*CYLINDRICALHONEYCOMBVERTEXMESHGENERATOR_HPP_*/

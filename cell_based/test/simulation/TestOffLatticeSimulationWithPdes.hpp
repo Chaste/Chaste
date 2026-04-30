@@ -220,7 +220,7 @@ public:
 
         // Set up mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -319,7 +319,7 @@ public:
 
         // Set up mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -401,7 +401,7 @@ public:
 
         // Set up mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -484,7 +484,7 @@ public:
 
         // Set up mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -593,7 +593,7 @@ public:
 
         // Set up mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -752,7 +752,7 @@ public:
 
         // Set up mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;
@@ -819,7 +819,7 @@ public:
         {
             // Set up mesh
             HoneycombMeshGenerator generator(5, 5, 0);
-            boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+            std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
             // Set up cells
             std::vector<CellPtr> cells;
@@ -918,7 +918,7 @@ public:
         {
             // Set up mesh
             HoneycombMeshGenerator generator(5, 5, 0);
-            boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+            std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
             // Set up cells
             std::vector<CellPtr> cells;
@@ -1124,7 +1124,7 @@ public:
 
         // Create a simple mesh
         HoneycombMeshGenerator generator(5, 5, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Set up cells
         std::vector<CellPtr> cells;
@@ -1273,7 +1273,7 @@ public:
 
         /// Create a simple 2D VertexMesh
         HoneycombVertexMeshGenerator generator(5, 3);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         // Create cells
         std::vector<CellPtr> cells;

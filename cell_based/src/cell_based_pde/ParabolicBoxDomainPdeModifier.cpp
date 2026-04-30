@@ -39,10 +39,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "MutableMesh.hpp"
 
 template<unsigned DIM>
-ParabolicBoxDomainPdeModifier<DIM>::ParabolicBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
-                                                                  boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
+ParabolicBoxDomainPdeModifier<DIM>::ParabolicBoxDomainPdeModifier(std::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
+                                                                  std::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
                                                                   bool isNeumannBoundaryCondition,
-                                                                  boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid,
+                                                                  std::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid,
                                                                   double stepSize,
                                                                   Vec solution)
     : AbstractBoxDomainPdeModifier<DIM>(pPde,
@@ -69,7 +69,7 @@ void ParabolicBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopul
 
     // Use SimpleLinearParabolicSolver as averaged Source PDE
     SimpleLinearParabolicSolver<DIM,DIM> solver(this->mpFeMesh,
-                                                boost::static_pointer_cast<AbstractLinearParabolicPde<DIM,DIM> >(this->GetPde()).get(),
+                                                std::static_pointer_cast<AbstractLinearParabolicPde<DIM,DIM> >(this->GetPde()).get(),
                                                 p_bcc.get());
 
     ///\todo Investigate more than one PDE time step per spatial step

@@ -44,8 +44,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 AbstractRushLarsenCardiacCell::AbstractRushLarsenCardiacCell(unsigned numberOfStateVariables,
                                                              unsigned voltageIndex,
-                                                             boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
-    : AbstractCardiacCell(boost::shared_ptr<AbstractIvpOdeSolver>(),
+                                                             std::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus)
+    : AbstractCardiacCell(std::shared_ptr<AbstractIvpOdeSolver>(),
                           numberOfStateVariables,
                           voltageIndex,
                           pIntracellularStimulus)

@@ -116,7 +116,7 @@ public:
          * periodicity.
          */
          CylindricalHoneycombVertexMeshGenerator generator(6, 9);
-         boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
+         std::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         /* Having created a mesh, we now create a `std::vector` of `CellPtr`s.
          * To do this, we the `CryptCellsGenerator` helper class, which is templated over the type
@@ -189,7 +189,7 @@ public:
     {
         /* Create a cylindrical mesh, and get the cell location indices, as before. */
         CylindricalHoneycombVertexMeshGenerator generator(6, 9);
-        boost::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
+        std::shared_ptr<Cylindrical2dVertexMesh> p_mesh = generator.GetCylindricalMesh();
 
         /* Create a `std::vector` of `CellPtr`s.
          * Generate cells, which are assigned a `SimpleWntCellCycleModel` using

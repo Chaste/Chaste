@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <list>
 #include <map>
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include "ChasteSerialization.hpp"
 #include "ClassIsAbstract.hpp"
@@ -145,22 +145,22 @@ protected:
     out_stream mpVtkMetaFile;
 
     /** Cell property registry. */
-    boost::shared_ptr<CellPropertyRegistry> mpCellPropertyRegistry;
+    std::shared_ptr<CellPropertyRegistry> mpCellPropertyRegistry;
 
     /** Whether to write results to file for visualization using the Chaste java visualizer (defaults to true). */
     bool mOutputResultsForChasteVisualizer;
 
     /** A list of cell writers. */
-    std::vector<boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > > mCellWriters;
+    std::vector<std::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > > mCellWriters;
 
     /** A list of cell population writers. */
-    std::vector<boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > > mCellPopulationWriters;
+    std::vector<std::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > > mCellPopulationWriters;
 
     /** A list of cell population count writers. */
-    std::vector<boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > > mCellPopulationCountWriters;
+    std::vector<std::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > > mCellPopulationCountWriters;
 
     /** A list of cell population event writers. */
-    std::vector<boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > > mCellPopulationEventWriters;
+    std::vector<std::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > > mCellPopulationEventWriters;
 
     /**
      * Details of cell divisions, to be used by CellDivisionLocationsWriter
@@ -549,7 +549,7 @@ public:
     /**
      * @return registry of cell properties used in this cell population.
      */
-    boost::shared_ptr<CellPropertyRegistry> GetCellPropertyRegistry();
+    std::shared_ptr<CellPropertyRegistry> GetCellPropertyRegistry();
 
     /**
      * Set a default ordering on cell mutation states and cell proliferative types, so that
@@ -655,7 +655,7 @@ public:
      *
      * @param pPopulationWriter the population writer.
      */
-    virtual void AcceptPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter)=0;
+    virtual void AcceptPopulationWriter(std::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter)=0;
 
     /**
      * Accept a cell population count writer so it can write data from this object to file.
@@ -665,7 +665,7 @@ public:
      *
      * @param pPopulationCountWriter the population count writer.
      */
-    virtual void AcceptPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter)=0;
+    virtual void AcceptPopulationCountWriter(std::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationCountWriter)=0;
 
     /**
      * Accept a cell population event writer so it can write data from this object to file.
@@ -675,7 +675,7 @@ public:
      *
      * @param pPopulationEventWriter the population event writer.
      */
-    virtual void AcceptPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationEventWriter)=0;
+    virtual void AcceptPopulationEventWriter(std::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationEventWriter)=0;
 
     /**
      * Accept a cell writer so it can write data from this object to file.
@@ -686,7 +686,7 @@ public:
      * @param pCellWriter the population writer.
      * @param pCell the cell whose data are being written.
      */
-    virtual void AcceptCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell) = 0;
+    virtual void AcceptCellWriter(std::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter, CellPtr pCell) = 0;
 
     /**
      * Return details of all divisions since the last sampling time step.
@@ -798,7 +798,7 @@ public:
     template<template <unsigned, unsigned> class T>
     void AddPopulationWriter()
     {
-        mCellPopulationWriters.push_back(boost::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
+        mCellPopulationWriters.push_back(std::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
     }
 
     /**
@@ -809,7 +809,7 @@ public:
     template<template <unsigned, unsigned> class T>
     void AddCellWriter()
     {
-        mCellWriters.push_back(boost::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
+        mCellWriters.push_back(std::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
     }
 
     /**
@@ -820,7 +820,7 @@ public:
     template<template <unsigned, unsigned> class T>
     void AddCellPopulationCountWriter()
     {
-        mCellPopulationCountWriters.push_back(boost::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
+        mCellPopulationCountWriters.push_back(std::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
     }
 
     /**
@@ -831,7 +831,7 @@ public:
     template<template <unsigned, unsigned> class T>
     void AddCellPopulationEventWriter()
     {
-        mCellPopulationEventWriters.push_back(boost::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
+        mCellPopulationEventWriters.push_back(std::shared_ptr< T<ELEMENT_DIM, SPACE_DIM> >(new T<ELEMENT_DIM, SPACE_DIM> ));
     }
 
     /**
@@ -842,7 +842,7 @@ public:
      *
      * @param pPopulationWriter shared pointer to a cell population writer
      */
-    void AddPopulationWriter(boost::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter)
+    void AddPopulationWriter(std::shared_ptr<AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> > pPopulationWriter)
     {
         mCellPopulationWriters.push_back(pPopulationWriter);
     }
@@ -855,7 +855,7 @@ public:
      *
      * @param pCellWriter shared pointer to a cell writer
      */
-    void AddCellWriter(boost::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter)
+    void AddCellWriter(std::shared_ptr<AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> > pCellWriter)
     {
         mCellWriters.push_back(pCellWriter);
     }
@@ -868,7 +868,7 @@ public:
      *
      * @param pCellPopulationCountWriter shared pointer to a cell population count writer
      */
-    void AddCellPopulationCountWriter(boost::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pCellPopulationCountWriter)
+    void AddCellPopulationCountWriter(std::shared_ptr<AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> > pCellPopulationCountWriter)
     {
         mCellPopulationCountWriters.push_back(pCellPopulationCountWriter);
     }
@@ -881,7 +881,7 @@ public:
      *
      * @param pCellPopulationEventWriter shared pointer to a cell population event writer
      */
-    void AddCellPopulationEventWriter(boost::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pCellPopulationEventWriter)
+    void AddCellPopulationEventWriter(std::shared_ptr<AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> > pCellPopulationEventWriter)
     {
         mCellPopulationEventWriters.push_back(pCellPopulationEventWriter);
     }
@@ -895,7 +895,7 @@ public:
     bool HasWriter() const
     {
         typedef AbstractCellPopulationWriter<ELEMENT_DIM, SPACE_DIM> population_writer_t;
-        BOOST_FOREACH(boost::shared_ptr<population_writer_t> p_pop_writer, mCellPopulationWriters)
+        BOOST_FOREACH(std::shared_ptr<population_writer_t> p_pop_writer, mCellPopulationWriters)
         {
             if (dynamic_cast<T<ELEMENT_DIM, SPACE_DIM>* >(p_pop_writer.get()))
             {
@@ -903,7 +903,7 @@ public:
             }
         }
         typedef AbstractCellWriter<ELEMENT_DIM, SPACE_DIM> cell_writer_t;
-        BOOST_FOREACH(boost::shared_ptr<cell_writer_t> p_cell_writer, mCellWriters)
+        BOOST_FOREACH(std::shared_ptr<cell_writer_t> p_cell_writer, mCellWriters)
         {
             if (dynamic_cast<T<ELEMENT_DIM, SPACE_DIM>* >(p_cell_writer.get()))
             {
@@ -911,7 +911,7 @@ public:
             }
         }
         typedef AbstractCellPopulationCountWriter<ELEMENT_DIM, SPACE_DIM> count_writer_t;
-        BOOST_FOREACH(boost::shared_ptr<count_writer_t> p_count_writer, mCellPopulationCountWriters)
+        BOOST_FOREACH(std::shared_ptr<count_writer_t> p_count_writer, mCellPopulationCountWriters)
         {
             if (dynamic_cast<T<ELEMENT_DIM, SPACE_DIM>* >(p_count_writer.get()))
             {
@@ -919,7 +919,7 @@ public:
             }
         }
         typedef AbstractCellPopulationEventWriter<ELEMENT_DIM, SPACE_DIM> event_writer_t;
-        BOOST_FOREACH(boost::shared_ptr<event_writer_t> p_event_writer, mCellPopulationEventWriters)
+        BOOST_FOREACH(std::shared_ptr<event_writer_t> p_event_writer, mCellPopulationEventWriters)
         {
             if (dynamic_cast<T<ELEMENT_DIM, SPACE_DIM>* >(p_event_writer.get()))
             {

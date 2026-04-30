@@ -302,7 +302,7 @@ public:
         // Check that a single cell reaches apoptosis
         TS_ASSERT_EQUALS((*r_cells.begin())->HasApoptosisBegun(), false);
 
-        boost::shared_ptr<AbstractCellProperty> p_apoptotic_state(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>());
+        std::shared_ptr<AbstractCellProperty> p_apoptotic_state(CellPropertyRegistry::Instance()->Get<ApoptoticCellProperty>());
         (*r_cells.begin())->AddCellProperty(p_apoptotic_state);
         oxygen_based_cell_killer.CheckAndLabelCellsForApoptosisOrDeath();
 
@@ -506,7 +506,7 @@ public:
 
         // Create a vertex-based cell population
         HoneycombVertexMeshGenerator generator(4, 3);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -515,7 +515,7 @@ public:
         VertexBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         // Label cells 0 and 1 (which are neighbours) and 3 (which is isolated
-        boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+        std::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
         cell_population.GetCellUsingLocationIndex(0)->AddCellProperty(p_label);
         cell_population.GetCellUsingLocationIndex(1)->AddCellProperty(p_label);
         cell_population.GetCellUsingLocationIndex(3)->AddCellProperty(p_label);
@@ -725,7 +725,7 @@ public:
 
         {
             HoneycombVertexMeshGenerator generator(4,4);
-            boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+            std::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
             std::vector<CellPtr> cells;
             MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
@@ -837,7 +837,7 @@ public:
 
         // Test with IsolatedLabelledCellKiller
         HoneycombVertexMeshGenerator generator(4,4);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
         std::vector<CellPtr> cells;
         MAKE_PTR(DifferentiatedCellProliferativeType, p_diff_type);
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;

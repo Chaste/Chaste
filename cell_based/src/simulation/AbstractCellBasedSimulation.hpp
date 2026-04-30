@@ -162,15 +162,15 @@ protected:
     out_stream mpCellVelocitiesFile;
 
     /** List of cell killers. */
-    std::vector<boost::shared_ptr<AbstractCellKiller<SPACE_DIM> > > mCellKillers;
+    std::vector<std::shared_ptr<AbstractCellKiller<SPACE_DIM> > > mCellKillers;
 
     /** List of SimulationModifier rules. */
-    std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > > mSimulationModifiers;
+    std::vector<std::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > > mSimulationModifiers;
 
     /** List of SimulationModifier rules that need to be applied before locations or topology are updated.
      *  For example, junctional tension may change after Remeshing in Vertex Based Models.
      */
-    std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > > mTopologyUpdateSimulationModifiers;
+    std::vector<std::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > > mTopologyUpdateSimulationModifiers;
 
     /**
      * The ratio of the number of actual timesteps to the number
@@ -381,7 +381,7 @@ public:
      *
      * @param pCellKiller pointer to a cell killer
      */
-    void AddCellKiller(boost::shared_ptr<AbstractCellKiller<SPACE_DIM> > pCellKiller);
+    void AddCellKiller(std::shared_ptr<AbstractCellKiller<SPACE_DIM> > pCellKiller);
 
     /**
      * Method to remove all the cell killers.
@@ -393,12 +393,12 @@ public:
      *
      * @param pSimulationModifier pointer to a SimulationModifier
      */
-    void AddSimulationModifier(boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM,SPACE_DIM> > pSimulationModifier);
+    void AddSimulationModifier(std::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM,SPACE_DIM> > pSimulationModifier);
 
     /**
      * @return a pointer to the vector of SimulationModifiers used in this simulation.
      */
-    std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >* GetSimulationModifiers();
+    std::vector<std::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >* GetSimulationModifiers();
 
     /**
      * Add a Topology SimulationModifier to be used in this simulation. This modifier updates cell population after topology has been
@@ -406,12 +406,12 @@ public:
      * This can be useful when a topology update (e.g. cell division) influences movement of cells.
      * @param pSimulationModifier pointer to a SimulationModifier
      */
-    void AddTopologyUpdateSimulationModifier(boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM,SPACE_DIM> > pSimulationModifier);
+    void AddTopologyUpdateSimulationModifier(std::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM,SPACE_DIM> > pSimulationModifier);
 
     /**
      * @return a pointer to the vector of SimulationModifiers that influence topology update in this simulation.
      */
-    std::vector<boost::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >* GetTopologyUpdateSimulationModifiers();
+    std::vector<std::shared_ptr<AbstractCellBasedSimulationModifier<ELEMENT_DIM, SPACE_DIM> > >* GetTopologyUpdateSimulationModifiers();
 
     /**
      * Main Solve() method, used to evolve the cell population. Note that prior to calling Solve()

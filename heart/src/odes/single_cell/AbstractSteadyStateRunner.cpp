@@ -37,7 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef CHASTE_CVODE
 
-AbstractSteadyStateRunner::AbstractSteadyStateRunner(boost::shared_ptr<AbstractCvodeCell> pModel)
+AbstractSteadyStateRunner::AbstractSteadyStateRunner(std::shared_ptr<AbstractCvodeCell> pModel)
         : mpModel(pModel),
           mNumEvaluations(0u),
           mMaxNumPaces(10000u),
@@ -48,7 +48,7 @@ AbstractSteadyStateRunner::AbstractSteadyStateRunner(boost::shared_ptr<AbstractC
 bool AbstractSteadyStateRunner::RunToSteadyState()
 {
     // Get timing information from the cell stimulus (only works for regular stimuli)
-    if (!boost::dynamic_pointer_cast<RegularStimulus>(mpModel->GetStimulusFunction()))
+    if (!std::dynamic_pointer_cast<RegularStimulus>(mpModel->GetStimulusFunction()))
     {
         EXCEPTION("Steady State approximations only work for models with RegularStimulus objects.");
     }

@@ -80,7 +80,7 @@ public:
         OutputFileHandler file_handler = OutputFileHandler("TestVtkSceneWithCaBasedPopulation/2d");
 
         PottsMeshGenerator<2> generator(10, 0, 0, 10, 0, 0);
-        boost::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<2> > p_mesh = generator.GetMesh();
 
         // Fill with cells
         std::vector<unsigned> location_indices;
@@ -94,15 +94,15 @@ public:
         cells_generator.GenerateBasic(cells, location_indices.size());
 
         // Create cell population
-        auto p_cell_population = boost::make_shared<CaBasedCellPopulation<2> >(*p_mesh, cells, location_indices);
+        auto p_cell_population = std::make_shared<CaBasedCellPopulation<2> >(*p_mesh, cells, location_indices);
 
-        auto p_scene = boost::make_shared<VtkScene<2> >();
+        auto p_scene = std::make_shared<VtkScene<2> >();
         p_scene->SetCellPopulation(p_cell_population);
         p_scene->SetSaveAsImages(true);
         p_scene->SetOutputFilePath(file_handler.GetOutputDirectoryFullPath()+"/cell_population");
         p_scene->GetCellPopulationActorGenerator()->SetShowPottsMeshEdges(true);
 
-        auto p_scene_modifier = boost::make_shared<VtkSceneModifier<2> >();
+        auto p_scene_modifier = std::make_shared<VtkSceneModifier<2> >();
         p_scene_modifier->SetVtkScene(p_scene);
 
         p_scene->Start();
@@ -118,7 +118,7 @@ public:
     {
         OutputFileHandler file_handler1 = OutputFileHandler("TestVtkSceneWithCaBasedPopulation/3d");
         PottsMeshGenerator<3> generator(10, 0, 0, 10, 0, 0, 3, 0, 0);
-        boost::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
+        std::shared_ptr<PottsMesh<3> > p_mesh = generator.GetMesh();
         std::vector<unsigned> location_indices;
         for(unsigned idx=0; idx<100; idx++)
         {
@@ -130,15 +130,15 @@ public:
         cells_generator.GenerateBasic(cells, location_indices.size());
 
         // Create cell population
-        auto p_cell_population = boost::make_shared<CaBasedCellPopulation<3> >(*p_mesh, cells, location_indices);
+        auto p_cell_population = std::make_shared<CaBasedCellPopulation<3> >(*p_mesh, cells, location_indices);
 
-        auto p_scene = boost::make_shared<VtkScene<3> >();
+        auto p_scene = std::make_shared<VtkScene<3> >();
         p_scene->SetCellPopulation(p_cell_population);
         p_scene->SetSaveAsImages(true);
         p_scene->GetCellPopulationActorGenerator()->SetShowPottsMeshEdges(true);
         p_scene->SetOutputFilePath(file_handler1.GetOutputDirectoryFullPath()+"/cell_population");
 
-        auto p_scene_modifier = boost::make_shared<VtkSceneModifier<3> >();
+        auto p_scene_modifier = std::make_shared<VtkSceneModifier<3> >();
         p_scene_modifier->SetVtkScene(p_scene);
 
         p_scene->Start();

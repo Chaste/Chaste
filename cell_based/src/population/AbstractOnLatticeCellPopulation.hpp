@@ -70,7 +70,7 @@ protected:
      * The update rules used to determine the new location of the cells.
      * These rules specify how individual cells move into free spaces.
      */
-    std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > mUpdateRuleCollection;
+    std::vector<std::shared_ptr<AbstractUpdateRule<DIM> > > mUpdateRuleCollection;
 
     /**
      * Whether to delete the mesh when we are destroyed.
@@ -203,7 +203,7 @@ public:
      *
      * @param pUpdateRule pointer to an update rule
      */
-    virtual void AddUpdateRule(boost::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule)=0;
+    virtual void AddUpdateRule(std::shared_ptr<AbstractUpdateRule<DIM> > pUpdateRule)=0;
 
     /**
      * Remove any update rules previously passed to this population.
@@ -215,7 +215,7 @@ public:
      *
      * @return the update rule collection
      */
-    virtual const std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > GetUpdateRuleCollection() const;
+    virtual const std::vector<std::shared_ptr<AbstractUpdateRule<DIM> > > GetUpdateRuleCollection() const;
 };
 
 #endif /*ABSTRACTONLATTICECELLPOPULATION_HPP_*/

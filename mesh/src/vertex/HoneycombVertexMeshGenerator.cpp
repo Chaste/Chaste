@@ -34,8 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "HoneycombVertexMeshGenerator.hpp"
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsAcross,
                                                            unsigned numElementsUp,
@@ -199,14 +198,14 @@ HoneycombVertexMeshGenerator::HoneycombVertexMeshGenerator(unsigned numElementsA
         }
     }
 
-    mpMesh = boost::make_shared<MutableVertexMesh<2,2> >(nodes, elements, cellRearrangementThreshold, t2Threshold);
+    mpMesh = std::make_shared<MutableVertexMesh<2,2> >(nodes, elements, cellRearrangementThreshold, t2Threshold);
 
 
     // Scale the mesh so that each element's area takes the value elementArea
     mpMesh->Scale(sqrt(elementArea*2.0/sqrt(3.0)), sqrt(elementArea*2.0/sqrt(3.0)));
 }
 
-boost::shared_ptr<MutableVertexMesh<2,2> > HoneycombVertexMeshGenerator::GetMesh()
+std::shared_ptr<MutableVertexMesh<2,2> > HoneycombVertexMeshGenerator::GetMesh()
 {
     return mpMesh;
 }

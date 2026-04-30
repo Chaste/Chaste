@@ -214,7 +214,7 @@ public:
     {
         /* We use the honeycomb mesh generator to create a honeycomb mesh. */
         HoneycombMeshGenerator generator(20, 20, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         /* We then construct and initialise some cells, each with a
          * `FixedG1GenerationalCellCycleModel`, using the helper class
@@ -310,7 +310,7 @@ public:
     {
         /* We proceed as before, creating a mesh-based cell population. */
         HoneycombMeshGenerator generator(20, 20, 0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = generator.GetMesh();
 
         std::vector<CellPtr> cells;
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
@@ -319,7 +319,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
         /* We now use the cell population to construct a cell killer object. This object
-         * must be added to the cell-based simulation as a boost::shared_ptr, so we make
+         * must be added to the cell-based simulation as a std::shared_ptr, so we make
          * use of the macro `MAKE_PTR_ARG` (defined in the header `SmartPointers.hpp`).*/
         MAKE_PTR_ARGS(MyCellKiller, p_killer, (&cell_population));
 

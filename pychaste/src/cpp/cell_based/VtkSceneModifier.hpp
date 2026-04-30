@@ -66,7 +66,7 @@ class VtkSceneModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
     /**
      * The scene
      */
-    boost::shared_ptr<VtkScene<DIM> > mpScene;
+    std::shared_ptr<VtkScene<DIM> > mpScene;
 
     /**
      * The scene update frequency
@@ -89,7 +89,7 @@ public:
      * Get the scene
      * @return the scene
      */
-    boost::shared_ptr<VtkScene<DIM> > GetVtkScene();
+    std::shared_ptr<VtkScene<DIM> > GetVtkScene();
 
     /**
      * Overridden UpdateAtEndOfTimeStep() method.
@@ -114,7 +114,7 @@ public:
      * Set the scene
      * @param pScene the scene
      */
-    void SetVtkScene(boost::shared_ptr<VtkScene<DIM> > pScene);
+    void SetVtkScene(std::shared_ptr<VtkScene<DIM> > pScene);
 
     /**
      * Helper method to compute the mean level of Delta in each cell's neighbours and store these in the CellData.

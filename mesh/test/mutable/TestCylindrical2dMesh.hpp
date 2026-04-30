@@ -41,7 +41,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/serialization/shared_ptr.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include <algorithm>
 
@@ -69,7 +69,7 @@ public:
         unsigned thickness_of_ghost_layer = 0;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
-        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
+        std::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Reset the mesh
         p_mesh = generator.GetCylindricalMesh();
@@ -126,7 +126,7 @@ public:
 
         // Set up a mesh which can be mirrored (no ghost nodes in this case)
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
+        std::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Create a mirrored load of nodes for the normal remesher to work with
         p_mesh->CreateMirrorNodes();
@@ -238,7 +238,7 @@ public:
 
         // Set up a mesh which can be mirrored (no ghosts in this case)
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
+        std::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         NodeMap map(p_mesh->GetNumNodes());
         p_mesh->ReMesh(map);
@@ -280,7 +280,7 @@ public:
 
         // Set up a mesh which can be mirrored (no ghosts in this case)
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
+        std::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         unsigned num_old_nodes = p_mesh->GetNumNodes();
 
@@ -317,7 +317,7 @@ public:
 
         // Set up a mesh which can be mirrored (no ghosts in this case)
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
+        std::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         NodeMap map(p_mesh->GetNumNodes());
         p_mesh->ReMesh(map);
@@ -340,7 +340,7 @@ public:
 
         // Set up a mesh (no ghosts in this case)
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
+        std::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Change the halo parameters so still get longer edges.
         TS_ASSERT_EQUALS(p_mesh->GetHaloScalingFactor(),2.0);
@@ -392,7 +392,7 @@ public:
 
         // Set up a mesh which can be mirrored (no ghosts in this case)
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
+        std::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         c_vector<double, 2> location1 = p_mesh->GetNode(1)->rGetLocation();
         c_vector<double, 2> location2 = p_mesh->GetNode(4)->rGetLocation();
@@ -461,7 +461,7 @@ public:
         unsigned thickness_of_ghost_layer = 2;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
-        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
+        std::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         /*
          * New test to check that the top and bottom rows move together
@@ -524,7 +524,7 @@ public:
 
         // Set up a mesh which can be mirrored (no ghosts in this case)
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer);
-        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
+        std::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         // Check that there are the correct number of everything
         TS_ASSERT_EQUALS(p_mesh->GetNumNodes(), cells_across * cells_up);
@@ -565,7 +565,7 @@ public:
         unsigned thickness_of_ghost_layer = 0;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
-        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
+        std::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         c_vector<double,2>& rLocation1 = p_mesh->GetNode(1)->rGetModifiableLocation();
         rLocation1[1] -= 0.5;
@@ -615,7 +615,7 @@ public:
         unsigned thickness_of_ghost_layer = 0;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
-        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
+        std::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         c_vector<double,2>& rLocation1 = p_mesh->GetNode(1)->rGetModifiableLocation();
         rLocation1[1] -= 0.5;
@@ -658,10 +658,10 @@ public:
         unsigned thickness_of_ghost_layer = 0;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up, thickness_of_ghost_layer, crypt_width/cells_across);
-        boost::shared_ptr<AbstractTetrahedralMesh<2,2> > const p_mesh = boost::static_pointer_cast<AbstractTetrahedralMesh<2,2> >(generator.GetCylindricalMesh());
+        std::shared_ptr<AbstractTetrahedralMesh<2,2> > const p_mesh = std::static_pointer_cast<AbstractTetrahedralMesh<2,2> >(generator.GetCylindricalMesh());
 
-        boost::static_pointer_cast<Cylindrical2dMesh>(p_mesh)->SetHaloScalingFactor(0.5);
-        boost::static_pointer_cast<Cylindrical2dMesh>(p_mesh)->SetHaloOffset(5.0);
+        std::static_pointer_cast<Cylindrical2dMesh>(p_mesh)->SetHaloScalingFactor(0.5);
+        std::static_pointer_cast<Cylindrical2dMesh>(p_mesh)->SetHaloOffset(5.0);
 
         /*
          * You need the const above to stop a BOOST_STATIC_ASSERTION failure.
@@ -688,7 +688,7 @@ public:
 
         {
             // De-serialize and compare
-            boost::shared_ptr<AbstractTetrahedralMesh<2,2> > p_mesh2;
+            std::shared_ptr<AbstractTetrahedralMesh<2,2> > p_mesh2;
 
             // Create an input archive
             ArchiveOpener<boost::archive::text_iarchive, std::ifstream> arch_opener(archive_dir, archive_file);
@@ -724,8 +724,8 @@ public:
             TS_ASSERT_EQUALS(p_mesh->GetNumBoundaryElements(), p_mesh2->GetNumBoundaryElements());
             TS_ASSERT_EQUALS(p_mesh->GetNumAllBoundaryElements(), p_mesh2->GetNumAllBoundaryElements());
 
-            TS_ASSERT_EQUALS(boost::static_pointer_cast<Cylindrical2dMesh>(p_mesh2)->GetHaloScalingFactor(),0.5);
-            TS_ASSERT_EQUALS(boost::static_pointer_cast<Cylindrical2dMesh>(p_mesh2)->GetHaloOffset(),5.0);
+            TS_ASSERT_EQUALS(std::static_pointer_cast<Cylindrical2dMesh>(p_mesh2)->GetHaloScalingFactor(),0.5);
+            TS_ASSERT_EQUALS(std::static_pointer_cast<Cylindrical2dMesh>(p_mesh2)->GetHaloOffset(),5.0);
 
             AbstractTetrahedralMesh<2,2>::ElementIterator iter2 = p_mesh2->GetElementIteratorBegin();
 
@@ -970,7 +970,7 @@ public:
         unsigned thickness_of_ghost_layer = 0;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up,thickness_of_ghost_layer, crypt_width/cells_across);
-        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
+        std::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
 
         TS_ASSERT_EQUALS(p_mesh->CheckIsVoronoi(), true);
 

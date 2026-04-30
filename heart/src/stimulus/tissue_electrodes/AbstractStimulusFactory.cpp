@@ -38,10 +38,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-boost::shared_ptr<AbstractStimulusFunction>  AbstractStimulusFactory<ELEMENT_DIM,SPACE_DIM>::CreateStimulusForNode(Node<SPACE_DIM>* pNode)
+std::shared_ptr<AbstractStimulusFunction>  AbstractStimulusFactory<ELEMENT_DIM,SPACE_DIM>::CreateStimulusForNode(Node<SPACE_DIM>* pNode)
 {
     //this is the default implementation
-    boost::shared_ptr<ZeroStimulus> p_stim (  new ZeroStimulus() );
+    std::shared_ptr<ZeroStimulus> p_stim (  new ZeroStimulus() );
     return p_stim;
 }
 

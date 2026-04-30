@@ -105,7 +105,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddCaBasedCellPopulationActor(vt
     auto p_potts_grid = vtkSmartPointer<vtkImageData>::New();
     auto p_geom_filter = vtkSmartPointer<vtkGeometryFilter>::New();
 
-    boost::shared_ptr<CaBasedCellPopulation<DIM> > p_ca_population = boost::dynamic_pointer_cast<CaBasedCellPopulation<DIM> >(mpCellPopulation);
+    std::shared_ptr<CaBasedCellPopulation<DIM> > p_ca_population = std::dynamic_pointer_cast<CaBasedCellPopulation<DIM> >(mpCellPopulation);
 
     if (p_ca_population && mShowPottsMeshEdges)
     {
@@ -174,7 +174,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddPottsBasedCellPopulationActor
 {
     auto p_potts_grid = vtkSmartPointer<vtkImageData>::New();
 
-    boost::shared_ptr<PottsBasedCellPopulation<DIM> > p_potts_population = boost::dynamic_pointer_cast<PottsBasedCellPopulation<DIM> >(mpCellPopulation);
+    std::shared_ptr<PottsBasedCellPopulation<DIM> > p_potts_population = std::dynamic_pointer_cast<PottsBasedCellPopulation<DIM> >(mpCellPopulation);
 
     if (p_potts_population && mShowPottsMeshEdges)
     {
@@ -273,7 +273,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddPottsBasedCellPopulationActor
 
                     if (label_collection.GetSize() == 1)
                     {
-                        boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(label_collection.GetProperty());
+                        std::shared_ptr<CellLabel> p_label = std::static_pointer_cast<CellLabel>(label_collection.GetProperty());
                         mutation_state = p_label->GetColour();
                     }
                     p_element_ids->InsertNextTuple1(mutation_state);
@@ -284,7 +284,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddPottsBasedCellPopulationActor
                     if ((*cell_iter)->template HasCellProperty<CellLabel>())
                     {
                         CellPropertyCollection collection = (*cell_iter)->rGetCellPropertyCollection().template GetProperties<CellLabel>();
-                        boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
+                        std::shared_ptr<CellLabel> p_label = std::static_pointer_cast<CellLabel>(collection.GetProperty());
                         label = p_label->GetColour();
                     }
                     p_element_ids->InsertNextTuple1(label);
@@ -406,7 +406,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddActor(vtkSmartPointer<vtkRend
     }
 
     // Show cell centres if requested
-    if (mShowCellCentres || boost::dynamic_pointer_cast<CaBasedCellPopulation<DIM> >(mpCellPopulation) || boost::dynamic_pointer_cast<NodeBasedCellPopulation<DIM> >(mpCellPopulation))
+    if (mShowCellCentres || std::dynamic_pointer_cast<CaBasedCellPopulation<DIM> >(mpCellPopulation) || std::dynamic_pointer_cast<NodeBasedCellPopulation<DIM> >(mpCellPopulation))
     {
         auto p_points = vtkSmartPointer<vtkPoints>::New();
         auto p_cell_color_reference_data = vtkSmartPointer<vtkDoubleArray>::New();
@@ -451,7 +451,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddActor(vtkSmartPointer<vtkRend
 
                 if (label_collection.GetSize() == 1)
                 {
-                    boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(label_collection.GetProperty());
+                    std::shared_ptr<CellLabel> p_label = std::static_pointer_cast<CellLabel>(label_collection.GetProperty());
                     mutation_state = p_label->GetColour();
                 }
                 p_cell_color_reference_data->InsertNextTuple1(mutation_state);
@@ -462,7 +462,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddActor(vtkSmartPointer<vtkRend
                 if ((*cell_iter)->template HasCellProperty<CellLabel>())
                 {
                     CellPropertyCollection collection = (*cell_iter)->rGetCellPropertyCollection().template GetProperties<CellLabel>();
-                    boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
+                    std::shared_ptr<CellLabel> p_label = std::static_pointer_cast<CellLabel>(collection.GetProperty());
                     label = p_label->GetColour();
                 }
                 p_cell_color_reference_data->InsertNextTuple1(label);
@@ -537,23 +537,23 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddActor(vtkSmartPointer<vtkRend
         }
     }
 
-    if (boost::dynamic_pointer_cast<MeshBasedCellPopulation<DIM> >(mpCellPopulation) && (mShowMutableMeshEdges || mShowVoronoiMeshEdges))
+    if (std::dynamic_pointer_cast<MeshBasedCellPopulation<DIM> >(mpCellPopulation) && (mShowMutableMeshEdges || mShowVoronoiMeshEdges))
     {
         AddMeshBasedCellPopulationActor(pRenderer);
     }
-    else if (boost::dynamic_pointer_cast<VertexBasedCellPopulation<DIM> >(mpCellPopulation) && mShowVoronoiMeshEdges)
+    else if (std::dynamic_pointer_cast<VertexBasedCellPopulation<DIM> >(mpCellPopulation) && mShowVoronoiMeshEdges)
     {
         AddVertexBasedCellPopulationActor(pRenderer);
     }
-    else if (boost::dynamic_pointer_cast<PottsBasedCellPopulation<DIM> >(mpCellPopulation) && (mShowPottsMeshEdges || mShowPottsMeshOutlines))
+    else if (std::dynamic_pointer_cast<PottsBasedCellPopulation<DIM> >(mpCellPopulation) && (mShowPottsMeshEdges || mShowPottsMeshOutlines))
     {
         AddPottsBasedCellPopulationActor(pRenderer);
     }
-    else if (boost::dynamic_pointer_cast<CaBasedCellPopulation<DIM> >(mpCellPopulation) && mShowPottsMeshEdges)
+    else if (std::dynamic_pointer_cast<CaBasedCellPopulation<DIM> >(mpCellPopulation) && mShowPottsMeshEdges)
     {
         AddCaBasedCellPopulationActor(pRenderer);
     }
-    else if (boost::dynamic_pointer_cast<ImmersedBoundaryCellPopulation<DIM> >(mpCellPopulation))
+    else if (std::dynamic_pointer_cast<ImmersedBoundaryCellPopulation<DIM> >(mpCellPopulation))
     {
         AddImmersedBoundaryCellPopulationActor(pRenderer);
     }
@@ -562,7 +562,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddActor(vtkSmartPointer<vtkRend
 template <unsigned DIM>
 void CellPopulationPyChasteActorGenerator<DIM>::AddVertexBasedCellPopulationActor(vtkSmartPointer<vtkRenderer> pRenderer)
 {
-    boost::shared_ptr<VertexBasedCellPopulation<DIM> > p_cell_population = boost::dynamic_pointer_cast<VertexBasedCellPopulation<DIM> >(mpCellPopulation);
+    std::shared_ptr<VertexBasedCellPopulation<DIM> > p_cell_population = std::dynamic_pointer_cast<VertexBasedCellPopulation<DIM> >(mpCellPopulation);
 
     if (!p_cell_population)
     {
@@ -641,7 +641,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddVertexBasedCellPopulationActo
 
                 if (label_collection.GetSize() == 1)
                 {
-                    boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(label_collection.GetProperty());
+                    std::shared_ptr<CellLabel> p_label = std::static_pointer_cast<CellLabel>(label_collection.GetProperty());
                     mutation_state = p_label->GetColour();
                 }
                 p_cell_color_reference_data->InsertNextTuple1(mutation_state);
@@ -652,7 +652,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddVertexBasedCellPopulationActo
                 if (p_biological_cell->HasCellProperty<CellLabel>())
                 {
                     CellPropertyCollection collection = p_biological_cell->rGetCellPropertyCollection().GetProperties<CellLabel>();
-                    boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
+                    std::shared_ptr<CellLabel> p_label = std::static_pointer_cast<CellLabel>(collection.GetProperty());
                     label = p_label->GetColour();
                 }
                 p_cell_color_reference_data->InsertNextTuple1(label);
@@ -744,7 +744,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddVertexBasedCellPopulationActo
 template <unsigned DIM>
 void CellPopulationPyChasteActorGenerator<DIM>::AddImmersedBoundaryCellPopulationActor(vtkSmartPointer<vtkRenderer> pRenderer)
 {
-    boost::shared_ptr<ImmersedBoundaryCellPopulation<DIM> > p_cell_population = boost::dynamic_pointer_cast<ImmersedBoundaryCellPopulation<DIM> >(mpCellPopulation);
+    std::shared_ptr<ImmersedBoundaryCellPopulation<DIM> > p_cell_population = std::dynamic_pointer_cast<ImmersedBoundaryCellPopulation<DIM> >(mpCellPopulation);
 
     if (!p_cell_population)
     {
@@ -823,7 +823,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddImmersedBoundaryCellPopulatio
 
                 if (label_collection.GetSize() == 1)
                 {
-                    boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(label_collection.GetProperty());
+                    std::shared_ptr<CellLabel> p_label = std::static_pointer_cast<CellLabel>(label_collection.GetProperty());
                     mutation_state = p_label->GetColour();
                 }
                 p_cell_color_reference_data->InsertNextTuple1(mutation_state);
@@ -834,7 +834,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddImmersedBoundaryCellPopulatio
                 if (p_biological_cell->HasCellProperty<CellLabel>())
                 {
                     CellPropertyCollection collection = p_biological_cell->rGetCellPropertyCollection().GetProperties<CellLabel>();
-                    boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
+                    std::shared_ptr<CellLabel> p_label = std::static_pointer_cast<CellLabel>(collection.GetProperty());
                     label = p_label->GetColour();
                 }
                 p_cell_color_reference_data->InsertNextTuple1(label);
@@ -926,8 +926,8 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddImmersedBoundaryCellPopulatio
 template <unsigned DIM>
 void CellPopulationPyChasteActorGenerator<DIM>::AddMeshBasedCellPopulationActor(vtkSmartPointer<vtkRenderer> pRenderer)
 {
-    boost::shared_ptr<MeshBasedCellPopulation<DIM> > p_cell_population = boost::dynamic_pointer_cast<MeshBasedCellPopulation<DIM> >(mpCellPopulation);
-    boost::shared_ptr<MeshBasedCellPopulationWithGhostNodes<DIM> > p_cell_population_with_ghost = boost::dynamic_pointer_cast<MeshBasedCellPopulationWithGhostNodes<DIM> >(mpCellPopulation);
+    std::shared_ptr<MeshBasedCellPopulation<DIM> > p_cell_population = std::dynamic_pointer_cast<MeshBasedCellPopulation<DIM> >(mpCellPopulation);
+    std::shared_ptr<MeshBasedCellPopulationWithGhostNodes<DIM> > p_cell_population_with_ghost = std::dynamic_pointer_cast<MeshBasedCellPopulationWithGhostNodes<DIM> >(mpCellPopulation);
 
     if (!p_cell_population)
     {
@@ -1018,7 +1018,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddMeshBasedCellPopulationActor(
 
                         if (label_collection.GetSize() == 1)
                         {
-                            boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(label_collection.GetProperty());
+                            std::shared_ptr<CellLabel> p_label = std::static_pointer_cast<CellLabel>(label_collection.GetProperty());
                             mutation_state = p_label->GetColour();
                         }
                         p_cell_color_reference_data->InsertNextTuple1(mutation_state);
@@ -1029,7 +1029,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddMeshBasedCellPopulationActor(
                         if (p_biological_cell->HasCellProperty<CellLabel>())
                         {
                             CellPropertyCollection collection = p_biological_cell->rGetCellPropertyCollection().GetProperties<CellLabel>();
-                            boost::shared_ptr<CellLabel> p_label = boost::static_pointer_cast<CellLabel>(collection.GetProperty());
+                            std::shared_ptr<CellLabel> p_label = std::static_pointer_cast<CellLabel>(collection.GetProperty());
                             label = p_label->GetColour();
                         }
                         p_cell_color_reference_data->InsertNextTuple1(label);
@@ -1216,7 +1216,7 @@ void CellPopulationPyChasteActorGenerator<DIM>::AddMeshBasedCellPopulationActor(
 }
 
 template <unsigned DIM>
-void CellPopulationPyChasteActorGenerator<DIM>::SetCellPopulation(boost::shared_ptr<AbstractCellPopulation<DIM> > pCellPopulation)
+void CellPopulationPyChasteActorGenerator<DIM>::SetCellPopulation(std::shared_ptr<AbstractCellPopulation<DIM> > pCellPopulation)
 {
     this->mpCellPopulation = pCellPopulation;
 }

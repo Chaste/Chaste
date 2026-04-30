@@ -80,8 +80,8 @@ public:
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
      * @param solution solution vector (defaults to NULL)
      */
-    AbstractGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=boost::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
-                                     boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
+    AbstractGrowingDomainPdeModifier(std::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=std::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
+                                     std::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=std::shared_ptr<AbstractBoundaryCondition<DIM> >(),
                                      bool isNeumannBoundaryCondition=true,
                                      Vec solution=nullptr);
 

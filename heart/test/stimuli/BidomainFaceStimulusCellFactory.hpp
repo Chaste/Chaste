@@ -45,8 +45,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class BidomainFaceStimulusCellFactory : public AbstractCardiacCellFactory<3>
 {
 private:
-    boost::shared_ptr<SimpleStimulus> mpStimulus;
-    boost::shared_ptr<RegularStimulus> mpRegStimulus;
+    std::shared_ptr<SimpleStimulus> mpStimulus;
+    std::shared_ptr<RegularStimulus> mpRegStimulus;
 
 public:
     //Pdetime step is (by default) 0.01

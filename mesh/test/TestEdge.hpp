@@ -40,7 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include "ArchiveOpener.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
@@ -134,7 +134,7 @@ public:
 
         // Also test constructors in honeycomb mesh (MutableVertexMesh)
         HoneycombVertexMeshGenerator generator(2, 2);
-        boost::shared_ptr<MutableVertexMesh<2, 2> > honeycombMesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2, 2> > honeycombMesh = generator.GetMesh();
         TS_ASSERT_EQUALS(honeycombMesh->GetNumEdges(), 19u);
     }
 

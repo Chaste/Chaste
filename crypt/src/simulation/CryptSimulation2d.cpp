@@ -111,7 +111,7 @@ void CryptSimulation2d::SetupSolve()
 void CryptSimulation2d::UseJiggledBottomCells()
 {
     // The CryptSimulationBoundaryCondition object is the first element of mBoundaryConditions
-    boost::static_pointer_cast<CryptSimulationBoundaryCondition<2> >(mBoundaryConditions[0])->SetUseJiggledBottomCells(true);
+    std::static_pointer_cast<CryptSimulationBoundaryCondition<2> >(mBoundaryConditions[0])->SetUseJiggledBottomCells(true);
 }
 
 void CryptSimulation2d::SetBottomCellAncestors()
@@ -146,7 +146,7 @@ void CryptSimulation2d::SetBottomCellAncestors()
 void CryptSimulation2d::OutputSimulationParameters(out_stream& rParamsFile)
 {
     double width = mrCellPopulation.GetWidth(0);
-    bool use_jiggled_bottom_cells = boost::static_pointer_cast<CryptSimulationBoundaryCondition<2> >(mBoundaryConditions[0])->GetUseJiggledBottomCells();
+    bool use_jiggled_bottom_cells = std::static_pointer_cast<CryptSimulationBoundaryCondition<2> >(mBoundaryConditions[0])->GetUseJiggledBottomCells();
 
     *rParamsFile << "\t\t<CryptCircumference>" << width << "</CryptCircumference>\n";
     *rParamsFile << "\t\t<UseJiggledBottomCells>" << use_jiggled_bottom_cells << "</UseJiggledBottomCells>\n";

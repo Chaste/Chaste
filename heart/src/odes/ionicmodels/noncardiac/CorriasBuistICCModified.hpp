@@ -214,7 +214,7 @@ public:
     * @param pSolver is a pointer to the ODE solver
     * @param pIntracellularStimulus is a pointer to the intracellular stimulus
     */
-     CorriasBuistICCModified(boost::shared_ptr<AbstractIvpOdeSolver> pSolver, boost::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus);
+     CorriasBuistICCModified(std::shared_ptr<AbstractIvpOdeSolver> pSolver, std::shared_ptr<AbstractStimulusFunction> pIntracellularStimulus);
 
     /**
      * Destructor
@@ -291,8 +291,8 @@ namespace boost
         inline void save_construct_data(
             Archive & ar, const CorriasBuistICCModified * t, const unsigned int fileVersion)
         {
-            const boost::shared_ptr<AbstractIvpOdeSolver> p_solver = t->GetSolver();
-            const boost::shared_ptr<AbstractStimulusFunction> p_stimulus = t->GetStimulusFunction();
+            const std::shared_ptr<AbstractIvpOdeSolver> p_solver = t->GetSolver();
+            const std::shared_ptr<AbstractStimulusFunction> p_stimulus = t->GetStimulusFunction();
             ar << p_solver;
             ar << p_stimulus;
         }
@@ -301,8 +301,8 @@ namespace boost
         inline void load_construct_data(
             Archive & ar, CorriasBuistICCModified * t, const unsigned int fileVersion)
         {
-            boost::shared_ptr<AbstractIvpOdeSolver> p_solver;
-            boost::shared_ptr<AbstractStimulusFunction> p_stimulus;
+            std::shared_ptr<AbstractIvpOdeSolver> p_solver;
+            std::shared_ptr<AbstractStimulusFunction> p_stimulus;
             ar >> p_solver;
             ar >> p_stimulus;
             ::new(t)CorriasBuistICCModified(p_solver, p_stimulus);

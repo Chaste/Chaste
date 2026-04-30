@@ -129,7 +129,7 @@ public:
         cell_population.SetOutputNodeRegionToVtk(true);
         TS_ASSERT_EQUALS(cell_population.mOutputNodeRegionToVtk, true);
 
-        auto division_rule = boost::shared_ptr<ShortAxisImmersedBoundaryDivisionRule<2>>(new ShortAxisImmersedBoundaryDivisionRule<2>());
+        auto division_rule = std::shared_ptr<ShortAxisImmersedBoundaryDivisionRule<2>>(new ShortAxisImmersedBoundaryDivisionRule<2>());
         cell_population.SetImmersedBoundaryDivisionRule(division_rule);
         TS_ASSERT_EQUALS(cell_population.GetImmersedBoundaryDivisionRule().get(), division_rule.get());
     }
@@ -220,7 +220,7 @@ public:
         TS_ASSERT_THROWS_CONTAINS(cell_population_3d.GetTetrahedralMeshForPdeModifier(), "only implemented in 2D");
 
         // Test adding new cell
-        boost::shared_ptr<AbstractCellProperty> p_wildtype(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_wildtype(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
         UniformCellCycleModel* p_model = new UniformCellCycleModel();
         CellPtr p_cell(new Cell(p_wildtype, p_model));
         TS_ASSERT_THROWS_NOTHING(cell_population.AddCell(p_cell, *(cell_population.rGetCells().begin())));
@@ -447,10 +447,10 @@ public:
         ImmersedBoundaryPalisadeMeshGenerator gen(5, 100, 0.2, 2.0, 0.15, true);
         ImmersedBoundaryMesh<2,2>* p_mesh = gen.GetMesh();
 
-        boost::shared_ptr<AbstractCellProperty> p_stem(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
-        boost::shared_ptr<AbstractCellProperty> p_transit(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
-        boost::shared_ptr<AbstractCellProperty> p_diff(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
-        boost::shared_ptr<AbstractCellProperty> p_wildtype(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_stem(CellPropertyRegistry::Instance()->Get<StemCellProliferativeType>());
+        std::shared_ptr<AbstractCellProperty> p_transit(CellPropertyRegistry::Instance()->Get<TransitCellProliferativeType>());
+        std::shared_ptr<AbstractCellProperty> p_diff(CellPropertyRegistry::Instance()->Get<DifferentiatedCellProliferativeType>());
+        std::shared_ptr<AbstractCellProperty> p_wildtype(CellPropertyRegistry::Instance()->Get<WildTypeCellMutationState>());
 
         std::vector<CellPtr> cells;
         for (unsigned elem_index = 0; elem_index < p_mesh->GetNumElements(); ++elem_index)
@@ -483,11 +483,11 @@ public:
 
         // Allocate some cells to have a different cell mutation state, cell label or apoptotic cell property
         cell_population.GetCellPropertyRegistry()->Get<WildTypeCellMutationState>();
-        boost::shared_ptr<AbstractCellProperty> p_apc1(cell_population.GetCellPropertyRegistry()->Get<ApcOneHitCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_apc2(cell_population.GetCellPropertyRegistry()->Get<ApcTwoHitCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_bcat1(cell_population.GetCellPropertyRegistry()->Get<BetaCateninOneHitCellMutationState>());
-        boost::shared_ptr<AbstractCellProperty> p_apoptotic_state(cell_population.GetCellPropertyRegistry()->Get<ApoptoticCellProperty>());
-        boost::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
+        std::shared_ptr<AbstractCellProperty> p_apc1(cell_population.GetCellPropertyRegistry()->Get<ApcOneHitCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_apc2(cell_population.GetCellPropertyRegistry()->Get<ApcTwoHitCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_bcat1(cell_population.GetCellPropertyRegistry()->Get<BetaCateninOneHitCellMutationState>());
+        std::shared_ptr<AbstractCellProperty> p_apoptotic_state(cell_population.GetCellPropertyRegistry()->Get<ApoptoticCellProperty>());
+        std::shared_ptr<AbstractCellProperty> p_label(cell_population.GetCellPropertyRegistry()->Get<CellLabel>());
 
         cell_population.GetCellUsingLocationIndex(0)->AddCellProperty(p_label);
         cell_population.GetCellUsingLocationIndex(1)->SetMutationState(p_apc1);

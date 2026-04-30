@@ -60,7 +60,7 @@ public:
     {
         // Set up a cell population
         HoneycombMeshGenerator mesh_generator(7, 5, 0, 2.0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = mesh_generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = mesh_generator.GetMesh();
         std::vector<unsigned> location_indices = mesh_generator.GetCellLocationIndices();
 
         CellsGenerator<FixedG1GenerationalCellCycleModel,2> cells_generator;
@@ -71,7 +71,7 @@ public:
 
         // Create the force law and pass in to a std::list
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
-        std::vector<boost::shared_ptr<AbstractTwoBodyInteractionForce<2> > > force_collection;
+        std::vector<std::shared_ptr<AbstractTwoBodyInteractionForce<2> > > force_collection;
         force_collection.push_back(p_force);
 
         // Create a force calculator
@@ -150,7 +150,7 @@ public:
     {
         // Set up a cell population
         HoneycombMeshGenerator mesh_generator(7, 5, 0, 2.0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = mesh_generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = mesh_generator.GetMesh();
 
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;
@@ -160,7 +160,7 @@ public:
 
         // Create the force law and pass in to a std::list
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
-        std::vector<boost::shared_ptr<AbstractTwoBodyInteractionForce<2> > > force_collection;
+        std::vector<std::shared_ptr<AbstractTwoBodyInteractionForce<2> > > force_collection;
         force_collection.push_back(p_force);
 
         // Create a force calculator
@@ -219,7 +219,7 @@ public:
         // Set up a cell population
 
         HoneycombMeshGenerator mesh_generator(7, 5, 0, 2.0);
-        boost::shared_ptr<MutableMesh<2,2> > p_mesh = mesh_generator.GetMesh();
+        std::shared_ptr<MutableMesh<2,2> > p_mesh = mesh_generator.GetMesh();
 
         CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
         std::vector<CellPtr> cells;
@@ -229,7 +229,7 @@ public:
 
         // Create the force law and pass in to a std::list
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
-        std::vector<boost::shared_ptr<AbstractTwoBodyInteractionForce<2> > > force_collection;
+        std::vector<std::shared_ptr<AbstractTwoBodyInteractionForce<2> > > force_collection;
         force_collection.push_back(p_force);
 
         // Create a force calculator
@@ -273,7 +273,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(mesh, cells);
 
         MAKE_PTR(GeneralisedLinearSpringForce<2>, p_force);
-        std::vector<boost::shared_ptr<AbstractTwoBodyInteractionForce<2> > > force_collection;
+        std::vector<std::shared_ptr<AbstractTwoBodyInteractionForce<2> > > force_collection;
         force_collection.push_back(p_force);
 
         DiscreteSystemForceCalculator calculator(cell_population, force_collection);

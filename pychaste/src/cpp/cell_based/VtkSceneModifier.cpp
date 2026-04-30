@@ -70,13 +70,13 @@ void VtkSceneModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopulation<DIM,DIM
 }
 
 template<unsigned DIM>
-boost::shared_ptr<VtkScene<DIM> > VtkSceneModifier<DIM>::GetVtkScene()
+std::shared_ptr<VtkScene<DIM> > VtkSceneModifier<DIM>::GetVtkScene()
 {
     return mpScene;
 }
 
 template<unsigned DIM>
-void VtkSceneModifier<DIM>::SetVtkScene(boost::shared_ptr<VtkScene<DIM> > pScene)
+void VtkSceneModifier<DIM>::SetVtkScene(std::shared_ptr<VtkScene<DIM> > pScene)
 {
     mpScene = pScene;
 }

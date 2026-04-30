@@ -42,8 +42,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LinearBasisFunction.hpp"
 
 template <unsigned DIM>
-AbstractGrowingDomainPdeModifier<DIM>::AbstractGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM, DIM> > pPde,
-                                                                        boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
+AbstractGrowingDomainPdeModifier<DIM>::AbstractGrowingDomainPdeModifier(std::shared_ptr<AbstractLinearPde<DIM, DIM> > pPde,
+                                                                        std::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
                                                                         bool isNeumannBoundaryCondition,
                                                                         Vec solution)
         : AbstractPdeModifier<DIM>(pPde,

@@ -606,7 +606,7 @@ protected:
      *
      * @param append whether to clear (append=false) or to append (append=true). False by default. It applies to all files.
      */
-    std::vector<boost::shared_ptr<std::ofstream> > OpenElementFiles(bool append = false);
+    std::vector<std::shared_ptr<std::ofstream> > OpenElementFiles(bool append = false);
 
     /**
      *  Write the header part of a node file, depending on the dimension. Short helper method,
@@ -621,7 +621,7 @@ protected:
      *
      * @param rElemFiles vector of pointers to file streams
      */
-    void WriteElementsFileHeader(std::vector<boost::shared_ptr<std::ofstream> >& rElemFiles);
+    void WriteElementsFileHeader(std::vector<std::shared_ptr<std::ofstream> >& rElemFiles);
 
 
     /**

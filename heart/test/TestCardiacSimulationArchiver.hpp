@@ -760,7 +760,7 @@ public:
         TS_ASSERT( ! p_problem->mpBoundaryConditionsContainer);
         // Problem's BCC will be created first time BidomainProblem::Solve() is called,
         // so check the Electrodes' BCC directly
-        boost::shared_ptr<BoundaryConditionsContainer<2,2,2> > p_bcc = p_problem->mpElectrodes->GetBoundaryConditionsContainer();
+        std::shared_ptr<BoundaryConditionsContainer<2,2,2> > p_bcc = p_problem->mpElectrodes->GetBoundaryConditionsContainer();
         // We have neumann boundary conditions from the electrodes
         TS_ASSERT(p_bcc->AnyNonZeroNeumannConditions());
         for (BoundaryConditionsContainer<2,2,2>::NeumannMapIterator it = p_bcc->BeginNeumann();
@@ -1062,7 +1062,7 @@ public:
         // Test bccs
         TS_ASSERT(p_problem->mpDefaultBoundaryConditionsContainer); /// \todo: see todo in BidomainProblem.cpp:344
         TS_ASSERT(p_problem->mpBoundaryConditionsContainer);
-        boost::shared_ptr<BoundaryConditionsContainer<2,2,2> > p_bcc = p_problem->mpBoundaryConditionsContainer;
+        std::shared_ptr<BoundaryConditionsContainer<2,2,2> > p_bcc = p_problem->mpBoundaryConditionsContainer;
         // We have neumann and dirichlet boundary conditions from the electrodes (at least on some processes)
         if (PetscTools::IsSequential())
         {
@@ -1219,7 +1219,7 @@ public:
         unsigned rhs_index = 10u;
         if (p_factory->IsGlobalIndexLocal(rhs_index))
         {
-            boost::shared_ptr<BoundaryConditionsContainer<1,1,2> > p_bcc(new BoundaryConditionsContainer<1,1,2>);
+            std::shared_ptr<BoundaryConditionsContainer<1,1,2> > p_bcc(new BoundaryConditionsContainer<1,1,2>);
             ConstBoundaryCondition<1>* p_zero_stim = new ConstBoundaryCondition<1>(0.0);
             Node<1>* p_node = mesh.GetNode(rhs_index);
             p_bcc->AddDirichletBoundaryCondition(p_node, p_zero_stim, 1u);
@@ -1243,7 +1243,7 @@ public:
 
         // Test the bccs - zero dirichlet on RHS only
         TS_ASSERT(! p_problem->mpDefaultBoundaryConditionsContainer);
-        boost::shared_ptr<BoundaryConditionsContainer<1,1,2> > p_bcc = p_problem->mpBoundaryConditionsContainer;
+        std::shared_ptr<BoundaryConditionsContainer<1,1,2> > p_bcc = p_problem->mpBoundaryConditionsContainer;
         // If running on 2 procs we now don't migrate, so process 0 doesn't have a BCC.
         if (PetscTools::GetNumProcs() != 2)
         {
@@ -1325,7 +1325,7 @@ public:
 
         // Test the bccs - zero neumann on the boundary
         TS_ASSERT( p_problem->mpDefaultBoundaryConditionsContainer);
-        boost::shared_ptr<BoundaryConditionsContainer<1,1,1> > p_bcc = p_problem->mpBoundaryConditionsContainer;
+        std::shared_ptr<BoundaryConditionsContainer<1,1,1> > p_bcc = p_problem->mpBoundaryConditionsContainer;
         TS_ASSERT(p_bcc);
         TS_ASSERT_EQUALS(p_bcc, p_problem->mpDefaultBoundaryConditionsContainer);
         TS_ASSERT(! p_bcc->AnyNonZeroNeumannConditions());

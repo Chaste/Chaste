@@ -122,7 +122,7 @@ double AbstractOnLatticeCellPopulation<DIM>::GetDefaultTimeStep()
 }
 
 template<unsigned DIM>
-const std::vector<boost::shared_ptr<AbstractUpdateRule<DIM> > > AbstractOnLatticeCellPopulation<DIM>::GetUpdateRuleCollection() const
+const std::vector<std::shared_ptr<AbstractUpdateRule<DIM> > > AbstractOnLatticeCellPopulation<DIM>::GetUpdateRuleCollection() const
 {
     return mUpdateRuleCollection;
 }

@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "MultiStimulus.hpp"
 
-void MultiStimulus::AddStimulus(boost::shared_ptr<AbstractStimulusFunction> pStimulus)
+void MultiStimulus::AddStimulus(std::shared_ptr<AbstractStimulusFunction> pStimulus)
 {
     mStimuli.push_back(pStimulus);
 }

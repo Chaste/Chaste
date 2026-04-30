@@ -37,10 +37,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SimpleLinearEllipticSolver.hpp"
 
 template<unsigned DIM>
-EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
-                                                                boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
+EllipticBoxDomainPdeModifier<DIM>::EllipticBoxDomainPdeModifier(std::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
+                                                                std::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
                                                                 bool isNeumannBoundaryCondition,
-                                                                boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid,
+                                                                std::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid,
                                                                 double stepSize,
                                                                 Vec solution)
     : AbstractBoxDomainPdeModifier<DIM>(pPde,
@@ -67,7 +67,7 @@ void EllipticBoxDomainPdeModifier<DIM>::UpdateAtEndOfTimeStep(AbstractCellPopula
     // Use SimpleLinearEllipticSolver as Averaged Source PDE
     ///\todo allow other PDE classes to be used with this modifier
     SimpleLinearEllipticSolver<DIM,DIM> solver(this->mpFeMesh,
-                                               boost::static_pointer_cast<AbstractLinearEllipticPde<DIM,DIM> >(this->GetPde()).get(),
+                                               std::static_pointer_cast<AbstractLinearEllipticPde<DIM,DIM> >(this->GetPde()).get(),
                                                p_bcc.get());
 
     ///\todo Use solution at previous time step as an initial guess for Solve()

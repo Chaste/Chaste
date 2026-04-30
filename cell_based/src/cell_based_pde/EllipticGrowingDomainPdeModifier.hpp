@@ -90,8 +90,8 @@ public:
      * @param isNeumannBoundaryCondition Whether the boundary condition is Neumann (defaults to true)
      * @param solution solution vector (defaults to NULL)
      */
-    EllipticGrowingDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=boost::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
-                                     boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
+    EllipticGrowingDomainPdeModifier(std::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=std::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
+                                     std::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=std::shared_ptr<AbstractBoundaryCondition<DIM> >(),
                                      bool isNeumannBoundaryCondition=true,
                                      Vec solution=nullptr);
 
@@ -167,8 +167,8 @@ inline void load_construct_data(
         PetscTools::ReadPetscObject(solution, archive_filename);
     }
 
-    ::new(t)EllipticGrowingDomainPdeModifier<DIM>(boost::shared_ptr<AbstractLinearPde<DIM, DIM> >(),
-                                                  boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
+    ::new(t)EllipticGrowingDomainPdeModifier<DIM>(std::shared_ptr<AbstractLinearPde<DIM, DIM> >(),
+                                                  std::shared_ptr<AbstractBoundaryCondition<DIM> >(),
                                                   true,
                                                   solution);
 }

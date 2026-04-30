@@ -107,7 +107,7 @@ public:
         TS_ASSERT_DELTA(initial_conditions[20], 2.235636835087720e+00, 1e-7);
         TS_ASSERT_DELTA(initial_conditions[21], 1.000000000000000e+00, 1e-7);
 
-        boost::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_state(new WildTypeCellMutationState);
         wnt_cell_cycle_system.SetMutationState(p_state);    // for coverage
         wnt_cell_cycle_system.EvaluateYDerivatives(time, initial_conditions, derivs);
 
@@ -187,7 +187,7 @@ public:
     {
         double time = 0.0;
         double wnt_level = 0.0;
-        boost::shared_ptr<AbstractCellMutationState> p_wt_state(new WildTypeCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_wt_state(new WildTypeCellMutationState);
         VanLeeuwen2009WntSwatCellCycleOdeSystem wnt_cell_cycle_system2(1, wnt_level, p_wt_state);
         std::vector<double> initial_conditions = wnt_cell_cycle_system2.GetInitialConditions();
         std::vector<double> derivs(initial_conditions.size());
@@ -241,7 +241,7 @@ public:
         double time = 0.0;
         double wnt_level = 0.5;
 
-        boost::shared_ptr<AbstractCellMutationState> p_apc1(new ApcOneHitCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_apc1(new ApcOneHitCellMutationState);
 
         VanLeeuwen2009WntSwatCellCycleOdeSystem wnt_cell_cycle_system3(1, wnt_level, p_apc1);
 
@@ -296,7 +296,7 @@ public:
         double time = 0.0;
         double wnt_level = 1.0;
 
-        boost::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
 
         VanLeeuwen2009WntSwatCellCycleOdeSystem wnt_cell_cycle_system4(1, wnt_level, p_bcat1);
 
@@ -357,7 +357,7 @@ public:
         double time = 0.0;
         double wnt_level = 1.0;
 
-        boost::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
 
         VanLeeuwen2009WntSwatCellCycleOdeSystem wnt_cell_cycle_system5(1, wnt_level, p_apc2);
 
@@ -407,7 +407,7 @@ public:
     void TestVanLeeuwen2009WntSwatCellCycleSolver()
     {
         double wnt_level = 1.0;
-        boost::shared_ptr<AbstractCellMutationState> p_wt_state(new WildTypeCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_wt_state(new WildTypeCellMutationState);
         VanLeeuwen2009WntSwatCellCycleOdeSystem wnt_system(1, wnt_level, p_wt_state);
 
         // Solve system using rk4 solver
@@ -463,7 +463,7 @@ public:
     void TestVanLeeuwen2009WntSwatCellCycleSolverWithAPCSingleHit()
     {
         double wnt_level = 1.0;
-        boost::shared_ptr<AbstractCellMutationState> p_apc1(new ApcOneHitCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_apc1(new ApcOneHitCellMutationState);
         VanLeeuwen2009WntSwatCellCycleOdeSystem wnt_system(1, wnt_level, p_apc1);
 
         // Solve system using rk4 solver
@@ -514,7 +514,7 @@ public:
     void TestVanLeeuwen2009WntSwatCellCycleSolverWithBetaCateninHit()
     {
         double wnt_level = 1.0;
-        boost::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
         VanLeeuwen2009WntSwatCellCycleOdeSystem wnt_system(1, wnt_level, p_bcat1);
 
         // Solve system using rk4 solver
@@ -565,7 +565,7 @@ public:
     void TestVanLeeuwen2009WntSwatCellCycleSolverWithAPCDoubleHit()
     {
         double wnt_level = 1.0;
-        boost::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
+        std::shared_ptr<AbstractCellMutationState> p_apc2(new ApcTwoHitCellMutationState);
         VanLeeuwen2009WntSwatCellCycleOdeSystem wnt_system(1, wnt_level, p_apc2);
 
         // Solve system using rk4 solver
@@ -629,7 +629,7 @@ public:
         unsigned thickness_of_ghost_layer = 3;
 
         CylindricalHoneycombMeshGenerator generator(cells_across, cells_up,thickness_of_ghost_layer, crypt_width/cells_across);
-        boost::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
+        std::shared_ptr<Cylindrical2dMesh> p_mesh = generator.GetCylindricalMesh();
         std::vector<unsigned> location_indices = generator.GetCellLocationIndices();
 
         SimulationTime* p_simulation_time = SimulationTime::Instance();
@@ -683,7 +683,7 @@ public:
 
         {
             double wnt_level = 1.0;
-            boost::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
+            std::shared_ptr<AbstractCellMutationState> p_bcat1(new BetaCateninOneHitCellMutationState);
             VanLeeuwen2009WntSwatCellCycleOdeSystem ode_system(1, wnt_level, p_bcat1);
 
             TS_ASSERT_DELTA(ode_system.GetWntLevel(), 1.0, 1e-6);

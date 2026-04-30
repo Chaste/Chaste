@@ -213,7 +213,7 @@ protected:
 public:
 
     MySrnModel()
-        : AbstractOdeSrnModel(2, boost::shared_ptr<AbstractCellCycleModelOdeSolver>())
+        : AbstractOdeSrnModel(2, std::shared_ptr<AbstractCellCycleModelOdeSolver>())
     {
 
         mpOdeSolver = CellCycleModelOdeSolver<MySrnModel, RungeKutta4IvpOdeSolver>::Instance();
@@ -426,7 +426,7 @@ public:
         /* We use the honeycomb vertex mesh generator to create a vertex mesh.
          */
         HoneycombVertexMeshGenerator generator(2, 2);
-        boost::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
+        std::shared_ptr<MutableVertexMesh<2,2> > p_mesh = generator.GetMesh();
 
         /* Next, we create some cells. First, define the cells vector. */
         std::vector<CellPtr> cells;

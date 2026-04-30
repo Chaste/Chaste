@@ -38,10 +38,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "LinearBasisFunction.hpp"
 
 template<unsigned DIM>
-AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
-                                                                boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
+AbstractBoxDomainPdeModifier<DIM>::AbstractBoxDomainPdeModifier(std::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde,
+                                                                std::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition,
                                                                 bool isNeumannBoundaryCondition,
-                                                                boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid,
+                                                                std::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid,
                                                                 double stepSize,
                                                                 Vec solution)
     : AbstractPdeModifier<DIM>(pPde,
@@ -312,7 +312,7 @@ void AbstractBoxDomainPdeModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DI
 }
 
 template<unsigned DIM>
-void AbstractBoxDomainPdeModifier<DIM>::GenerateFeMesh(boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid, double stepSize)
+void AbstractBoxDomainPdeModifier<DIM>::GenerateFeMesh(std::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid, double stepSize)
 {
     // Create a regular coarse tetrahedral mesh
     this->mpFeMesh = new TetrahedralMesh<DIM,DIM>();
@@ -321,7 +321,7 @@ void AbstractBoxDomainPdeModifier<DIM>::GenerateFeMesh(boost::shared_ptr<ChasteC
 }
 
 template<unsigned DIM>
-void AbstractBoxDomainPdeModifier<DIM>::GenerateAndReturnFeMesh(boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid, double stepSize, TetrahedralMesh<DIM,DIM>* pMesh)
+void AbstractBoxDomainPdeModifier<DIM>::GenerateAndReturnFeMesh(std::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid, double stepSize, TetrahedralMesh<DIM,DIM>* pMesh)
 {
     // Create a regular coarse tetrahedral mesh
     switch (DIM)

@@ -51,7 +51,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class EntirelyStimulatedTissueCellFactory : public AbstractCardiacCellFactory<2>
 {
 private:
-    boost::shared_ptr<SimpleStimulus> mpStimulus;
+    std::shared_ptr<SimpleStimulus> mpStimulus;
 
 public:
     EntirelyStimulatedTissueCellFactory()
@@ -71,7 +71,7 @@ public:
 class EntirelyStimulatedTissueCellFactory3D : public AbstractCardiacCellFactory<3>
 {
 private:
-    boost::shared_ptr<SimpleStimulus> mpStimulus;
+    std::shared_ptr<SimpleStimulus> mpStimulus;
 
 public:
     EntirelyStimulatedTissueCellFactory3D()

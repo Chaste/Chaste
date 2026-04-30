@@ -112,7 +112,7 @@ private:
     }
     BOOST_SERIALIZATION_SPLIT_MEMBER()
     /** Vector of shared-pointers to halo nodes used by this process. */
-    std::vector<boost::shared_ptr<Node<SPACE_DIM> > > mHaloNodes;
+    std::vector<std::shared_ptr<Node<SPACE_DIM> > > mHaloNodes;
 
     /** Nodes separated by a distance less than mMaximumInteractionDistance are neighbours. */
     double mMaximumInteractionDistance;
@@ -256,7 +256,7 @@ public:
      * @param rNodes a vector of shared pointers to nodes.
      * @param maxInteractionDistance the distance that defines node neighbours in CalculateNodePairs.
      */
-    void ConstructNodesWithoutMesh(const std::vector<boost::shared_ptr<Node<SPACE_DIM> > >& rNodes, double maxInteractionDistance);
+    void ConstructNodesWithoutMesh(const std::vector<std::shared_ptr<Node<SPACE_DIM> > >& rNodes, double maxInteractionDistance);
 
     /**
      * A Helper method to enable you to construct a nodes-only mesh by stripping the nodes
@@ -425,7 +425,7 @@ public:
      * Add a temporary halo node on this process.
      * @param pNewNode a shared pointer to the new node to add.
      */
-    void AddHaloNode(boost::shared_ptr<Node<SPACE_DIM> > pNewNode);
+    void AddHaloNode(std::shared_ptr<Node<SPACE_DIM> > pNewNode);
 
     /**
      * Delete all the halo nodes on this process.
@@ -453,7 +453,7 @@ public:
      * Add a node to this process that has moved from another process.
      * @param pMovedNode the node to add to this mesh.
      */
-    void AddMovedNode(boost::shared_ptr<Node<SPACE_DIM> > pMovedNode);
+    void AddMovedNode(std::shared_ptr<Node<SPACE_DIM> > pMovedNode);
 
     /**
      * Overridden DeleteNode() method.

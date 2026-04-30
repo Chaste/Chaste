@@ -37,8 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 
 #include <boost/foreach.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "TrianglesMeshReader.hpp"
 #include "OutputFileHandler.hpp"
 #include "RandomNumberGenerator.hpp"
@@ -217,7 +216,7 @@ HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsi
     // Nested scope so the reader closes files before we try deleting them below the scope.
     {
         TrianglesMeshReader<2,2> mesh_reader(output_dir + mMeshFilename);
-        mpMesh = boost::make_shared<MutableMesh<2,2> >();
+        mpMesh = std::make_shared<MutableMesh<2,2> >();
         mpMesh->ConstructFromMeshReader(mesh_reader);
     }
 
@@ -228,7 +227,7 @@ HoneycombMeshGenerator::HoneycombMeshGenerator(unsigned numNodesAlongWidth, unsi
     mpMesh->SetMeshHasChangedSinceLoading();
 }
 
-boost::shared_ptr<MutableMesh<2,2> > HoneycombMeshGenerator::GetMesh()
+std::shared_ptr<MutableMesh<2,2> > HoneycombMeshGenerator::GetMesh()
 {
     return mpMesh;
 }
@@ -247,7 +246,7 @@ std::vector<unsigned> HoneycombMeshGenerator::GetCellLocationIndices()
     return location_indices;
 }
 
-boost::shared_ptr<MutableMesh<2,2> > HoneycombMeshGenerator::GetCircularMesh(double radius)
+std::shared_ptr<MutableMesh<2,2> > HoneycombMeshGenerator::GetCircularMesh(double radius)
 {
     if (!mGhostNodeIndices.empty())
     {

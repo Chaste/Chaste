@@ -57,7 +57,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class NonPurkinjeCellFactory : public AbstractCardiacCellFactory<2>
 {
 private:
-    boost::shared_ptr<SimpleStimulus> mpStimulus;
+    std::shared_ptr<SimpleStimulus> mpStimulus;
 
 public:
     NonPurkinjeCellFactory()
@@ -86,7 +86,7 @@ class PurkinjeCellFactory : public AbstractPurkinjeCellFactory<2> //inherits fro
 {
     friend class TestMonodomainPurkinjeProblem;
 private:
-    boost::shared_ptr<SimpleStimulus> mpStimulus;
+    std::shared_ptr<SimpleStimulus> mpStimulus;
     bool mStimulatePurkinje;
     bool mMakeJunction;
 
@@ -140,7 +140,7 @@ class PurkinjeStarCellFactory : public AbstractPurkinjeCellFactory<2>
 {
     friend class TestMonodomainPurkinjeProblem;
 private:
-    boost::shared_ptr<SimpleStimulus> mpStimulus;
+    std::shared_ptr<SimpleStimulus> mpStimulus;
     bool mStimulatePurkinje;
     bool mMakeJunction;
 
@@ -197,7 +197,7 @@ class PurkinjeStarCellFactoryFromFile : public AbstractPurkinjeCellFactory<2>
 {
     friend class TestMonodomainPurkinjeProblem;
 private:
-    boost::shared_ptr<SimpleStimulus> mpStimulus;
+    std::shared_ptr<SimpleStimulus> mpStimulus;
     bool mStimulatePurkinje;
     bool mMakeJunction;
 
@@ -615,26 +615,26 @@ public:
     //Sets up a PVJ stimulus between two independent (not in tissue) cell models
     void TestPVJStimulusTwoCellModels()
     {
-        boost::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
+        std::shared_ptr<EulerIvpOdeSolver> p_solver(new EulerIvpOdeSolver);
 
         double magnitude_stimulus = -100;  // uA/cm2
         double duration_stimulus = 1;  // ms
         double start_stimulus = 0.0;   // ms
-        boost::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(
+        std::shared_ptr<SimpleStimulus> p_stimulus(new SimpleStimulus(
                 magnitude_stimulus,
                 duration_stimulus,
                 start_stimulus));
 
         //Create PVJ stimuli & multi stimuli
         double pvj_resistance = 10; //kilo Ohms
-        boost::shared_ptr<PurkinjeVentricularJunctionStimulus> p_pvj_ventricular_stim(new PurkinjeVentricularJunctionStimulus(pvj_resistance));
-        boost::shared_ptr<PurkinjeVentricularJunctionStimulus> p_pvj_purkinje_stim(new PurkinjeVentricularJunctionStimulus(pvj_resistance));
+        std::shared_ptr<PurkinjeVentricularJunctionStimulus> p_pvj_ventricular_stim(new PurkinjeVentricularJunctionStimulus(pvj_resistance));
+        std::shared_ptr<PurkinjeVentricularJunctionStimulus> p_pvj_purkinje_stim(new PurkinjeVentricularJunctionStimulus(pvj_resistance));
         p_pvj_purkinje_stim->SetAppliedToPurkinjeCellModel();
 
-        boost::shared_ptr<MultiStimulus> p_multi_stim_ventricular(new MultiStimulus);
+        std::shared_ptr<MultiStimulus> p_multi_stim_ventricular(new MultiStimulus);
         p_multi_stim_ventricular->AddStimulus(p_pvj_ventricular_stim);
 
-        boost::shared_ptr<MultiStimulus> p_multi_stim_purkinje(new MultiStimulus);
+        std::shared_ptr<MultiStimulus> p_multi_stim_purkinje(new MultiStimulus);
         p_multi_stim_purkinje->AddStimulus(p_stimulus);
         p_multi_stim_purkinje->AddStimulus(p_pvj_purkinje_stim);
 
@@ -678,9 +678,9 @@ public:
 
 
         // Now try setting up the junction using the cell factory's helper method, instead of doing it manually
-        boost::shared_ptr<ZeroStimulus> p_zero_stimulus(new ZeroStimulus);
-        boost::shared_ptr<AbstractCardiacCell> p_purkinje_cell2(new CellLuoRudy1991FromCellML(p_solver, p_stimulus));
-        boost::shared_ptr<AbstractCardiacCell> p_myocardial_cell2(new CellLuoRudy1991FromCellML(p_solver, p_zero_stimulus));
+        std::shared_ptr<ZeroStimulus> p_zero_stimulus(new ZeroStimulus);
+        std::shared_ptr<AbstractCardiacCell> p_purkinje_cell2(new CellLuoRudy1991FromCellML(p_solver, p_stimulus));
+        std::shared_ptr<AbstractCardiacCell> p_myocardial_cell2(new CellLuoRudy1991FromCellML(p_solver, p_zero_stimulus));
         PurkinjeCellFactory cell_factory;
         cell_factory.CreateJunction(NULL, p_purkinje_cell2.get(), p_myocardial_cell2.get(), pvj_resistance);
 

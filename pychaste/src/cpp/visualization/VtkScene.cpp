@@ -116,7 +116,7 @@ VtkScene<DIM>::VtkScene()
           mHasStarted(false),
           mAddAnnotations(false),
           mOutputFrequency(1),
-          mpCellPopulationGenerator(boost::make_shared<CellPopulationPyChasteActorGenerator<DIM> >())
+          mpCellPopulationGenerator(std::make_shared<CellPopulationPyChasteActorGenerator<DIM> >())
 {
     mpRenderer->SetBackground(1.0, 1.0, 1.0);
     mpRenderWindow->AddRenderer(mpRenderer);
@@ -133,7 +133,7 @@ VtkScene<DIM>::~VtkScene()
 }
 
 template <unsigned DIM>
-boost::shared_ptr<CellPopulationPyChasteActorGenerator<DIM> > VtkScene<DIM>::GetCellPopulationActorGenerator()
+std::shared_ptr<CellPopulationPyChasteActorGenerator<DIM> > VtkScene<DIM>::GetCellPopulationActorGenerator()
 {
     return mpCellPopulationGenerator;
 }
@@ -244,7 +244,7 @@ void VtkScene<DIM>::SetSaveAsAnimation(bool saveAsAnimation)
 }
 
 template <unsigned DIM>
-void VtkScene<DIM>::SetCellPopulation(boost::shared_ptr<AbstractCellPopulation<DIM> > pCellPopulation)
+void VtkScene<DIM>::SetCellPopulation(std::shared_ptr<AbstractCellPopulation<DIM> > pCellPopulation)
 {
     mpCellPopulationGenerator->SetCellPopulation(pCellPopulation);
 }

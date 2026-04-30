@@ -96,10 +96,10 @@ public:
      * @param stepSize step size to be used in the FE mesh (defaults to 1.0, i.e. the default cell size)
      * @param solution solution vector (defaults to NULL)
      */
-    EllipticBoxDomainPdeModifier(boost::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=boost::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
-                                 boost::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
+    EllipticBoxDomainPdeModifier(std::shared_ptr<AbstractLinearPde<DIM,DIM> > pPde=std::shared_ptr<AbstractLinearPde<DIM,DIM> >(),
+                                 std::shared_ptr<AbstractBoundaryCondition<DIM> > pBoundaryCondition=std::shared_ptr<AbstractBoundaryCondition<DIM> >(),
                                  bool isNeumannBoundaryCondition=true,
-                                 boost::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid=boost::shared_ptr<ChasteCuboid<DIM> >(),
+                                 std::shared_ptr<ChasteCuboid<DIM> > pMeshCuboid=std::shared_ptr<ChasteCuboid<DIM> >(),
                                  double stepSize=1.0,
                                  Vec solution=nullptr);
 
@@ -177,10 +177,10 @@ inline void load_construct_data(
         PetscTools::ReadPetscObject(solution, archive_filename);
     }
 
-    ::new(t)EllipticBoxDomainPdeModifier<DIM>(boost::shared_ptr<AbstractLinearPde<DIM, DIM> >(),
-                                              boost::shared_ptr<AbstractBoundaryCondition<DIM> >(),
+    ::new(t)EllipticBoxDomainPdeModifier<DIM>(std::shared_ptr<AbstractLinearPde<DIM, DIM> >(),
+                                              std::shared_ptr<AbstractBoundaryCondition<DIM> >(),
                                               true,
-                                              boost::shared_ptr<ChasteCuboid<DIM> >(),
+                                              std::shared_ptr<ChasteCuboid<DIM> >(),
                                               1.0,
                                               solution);
 }
