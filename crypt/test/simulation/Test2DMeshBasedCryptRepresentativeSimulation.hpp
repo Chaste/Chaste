@@ -38,7 +38,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cxxtest/TestSuite.h>
 
-#include <boost/foreach.hpp>
 
 // Must be included before any other cell_based or crypt headers
 #include "CellBasedSimulationArchiver.hpp"
@@ -100,7 +99,7 @@ public:
 
         // Following is done in two lines to avoid a bug in Intel compiler v12.0
         std::vector<FileFinder> temp_files = test_data_directory.FindMatches("*");
-        BOOST_FOREACH(FileFinder temp_file, temp_files)
+        for (FileFinder temp_file : temp_files)
         {
             archive_handler.CopyFileTo(temp_file);
         }
