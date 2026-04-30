@@ -324,7 +324,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 CellPtr AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::GetCellUsingLocationIndex(unsigned index)
 {
     // Get the set of pointers to cells corresponding to this location index
-    std::set<CellPtr> cells = mLocationCellMap[index];
+    std::set<CellPtr>& cells = mLocationCellMap[index];
 
     // If there is only one cell attached return the cell. Note currently only one cell per index.
     if (cells.size() == 1)
