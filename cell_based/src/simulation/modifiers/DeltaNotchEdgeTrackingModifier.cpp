@@ -35,7 +35,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "DeltaNotchEdgeTrackingModifier.hpp"
 #include "CellSrnModel.hpp"
-#include "DeltaNotchInteriorSrnModel.hpp"
 #include "DeltaNotchEdgeSrnModel.hpp"
 
 template<unsigned DIM>

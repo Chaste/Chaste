@@ -60,7 +60,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OrthotropicConductivityTensors.hpp"
 #include "TetrahedralMesh.hpp"
 #include "DistributedTetrahedralMesh.hpp"
-#include "PetscSetupAndFinalize.hpp"
 
 
 // cell factory for creating 2 cells with both intra and extracellular stimuli

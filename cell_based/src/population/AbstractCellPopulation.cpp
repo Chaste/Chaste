@@ -49,9 +49,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellRemovalLocationsWriter.hpp"
 
 // Cell population writers
-#include "CellMutationStatesCountWriter.hpp"
-#include "CellProliferativePhasesCountWriter.hpp"
-#include "CellProliferativeTypesCountWriter.hpp"
 #include "NodeLocationWriter.hpp"
 
 // These #includes are needed for SetDefaultCellMutationStateAndProliferativeTypeOrdering()

@@ -101,7 +101,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/serialization/extended_type_info.hpp> // We get compile errors without this...
 #include <boost/serialization/export.hpp>
 #ifdef CHASTE_SERIALIZATION_CPP
-#include "CheckpointArchiveTypes.hpp"
 #endif // CHASTE_SERIALIZATION_CPP
 
 #endif

@@ -69,7 +69,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 #include "CellPopulationAreaWriter.hpp"
-#include "PetscSetupAndFinalize.hpp"
 #include "EllipticBoxDomainPdeModifier.hpp"
 #include "EllipticGrowingDomainPdeModifier.hpp"
 #include "RadialCellDataDistributionWriter.hpp"

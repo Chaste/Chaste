@@ -437,7 +437,6 @@ public:
          * Time various aspects of a cell-based simulation using `CellBasedEventHandler`.
 
            Do not forget
-            #include "CellBasedEventHandler.hpp"
            and to call
             CellBasedEventHandler::Enable();
            at the top of the test.
