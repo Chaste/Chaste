@@ -41,6 +41,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
 
+enum class PopulationType {
+    UNSET,
+    NodeBased,
+    MeshBased,
+};
 /**
  * A force law employed by Meineke et al (2001) in their off-lattice
  * model of the intestinal crypt (doi:10.1046/j.0960-7722.2001.00216.x).
@@ -61,6 +66,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Length is scaled by natural length.
  * Time is in hours.
  */
+
 template<unsigned  ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
 class GeneralisedLinearSpringForce : public AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>
 {
@@ -155,6 +161,10 @@ public:
      * @param rCellPopulation the cell population
      * @return The force exerted on Node A by Node B.
      */
+    PopulationType populationType = PopulationType::UNSET;
+
+    void SetPopulationType(AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation);
+
     c_vector<double, SPACE_DIM> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
                                                      unsigned nodeBGlobalIndex,
                                                      AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation);
