@@ -94,11 +94,17 @@ void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCondition(
 
         if (dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation))
         {
+            std::vector<unsigned int> node_indices;
             for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
                 cell_iter != this->mpCellPopulation->End();
-                ++cell_iter)
+                ++cell_iter) {
+                
+                node_indices.push_back(this->mpCellPopulation->GetLocationIndexUsingCell(*cell_iter));
+            }
+                
+            #pragma omp parallel for
+            for (unsigned int node_index : node_indices)
             {
-                unsigned node_index = this->mpCellPopulation->GetLocationIndexUsingCell(*cell_iter);
                 Node<SPACE_DIM>* p_node = this->mpCellPopulation->GetNode(node_index);
 
                 c_vector<double, SPACE_DIM> node_location = p_node->rGetLocation();
@@ -127,6 +133,7 @@ void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCondition(
 
             // Iterate over all nodes and update their positions according to the boundary conditions
             unsigned num_nodes = this->mpCellPopulation->GetNumNodes();
+            #pragma omp parallel for
             for (unsigned node_index=0; node_index<num_nodes; node_index++)
             {
                 Node<SPACE_DIM>* p_node = this->mpCellPopulation->GetNode(node_index);
