@@ -84,6 +84,8 @@ private:
     {
         archive & boost::serialization::base_object<AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM> >(*this);
         archive & mSpringStiffness;
+        archive & mDivisionRestingSpringLength;
+        archive & mSpringGrowthDuration;
         archive & mAlpha;
     }
 
@@ -94,6 +96,19 @@ protected:
      * doi:10.1088/1478-3975/6/3/036001).
      */
     double mSpringStiffness;
+
+    /**
+     * Initial resting spring length after cell division.
+     * Has units of cell size at equilibrium rest length.
+     */
+    double mDivisionRestingSpringLength;
+
+    /**
+     * The time it takes for the spring rest length to increase from
+     * mDivisionRestingSpringLength to its natural length.
+     * Defaults to 1.0.
+     */
+    double mSpringGrowthDuration;
 
     /**
      * Parameter controlling the range of attraction between cells.
@@ -154,11 +169,35 @@ public:
     double GetSpringStiffness();
 
     /**
+     * @return mDivisionRestingSpringLength
+     */
+    double GetDivisionRestingSpringLength();
+
+    /**
+     * @return mSpringGrowthDuration
+     */
+    double GetSpringGrowthDuration();
+
+    /**
      * Set mSpringStiffness.
      *
      * @param springStiffness the new value of mSpringStiffness
      */
     void SetSpringStiffness(double springStiffness);
+
+    /**
+     * Set mDivisionRestingSpringLength.
+     *
+     * @param divisionRestingSpringLength the new value of mDivisionRestingSpringLength
+     */
+    void SetDivisionRestingSpringLength(double divisionRestingSpringLength);
+
+    /**
+     * Set mSpringGrowthDuration.
+     *
+     * @param springGrowthDuration the new value of mSpringGrowthDuration
+     */
+    void SetSpringGrowthDuration(double springGrowthDuration);
 
     /**
      * @return mAlpha

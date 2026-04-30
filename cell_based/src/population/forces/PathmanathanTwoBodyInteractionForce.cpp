@@ -35,17 +35,36 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PathmanathanTwoBodyInteractionForce.hpp"
 
+#include "AbstractCentreBasedCellPopulation.hpp"
+#include "MeshBasedCellPopulation.hpp"
+#include "NodeBasedCellPopulation.hpp"
+
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 PathmanathanTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::PathmanathanTwoBodyInteractionForce()
    : AbstractTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>(),
      mSpringStiffness(15.0),
+     mDivisionRestingSpringLength(0.5),
+     mSpringGrowthDuration(1.0),
      mAlpha(5.0)
 {
+    if (SPACE_DIM == 1)
+    {
+        mSpringStiffness = 30.0;
+    }
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 PathmanathanTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::~PathmanathanTwoBodyInteractionForce()
 {
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double PathmanathanTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::VariableSpringConstantMultiplicationFactor(unsigned nodeAGlobalIndex,
+                                                                                                              unsigned nodeBGlobalIndex,
+                                                                                                              AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
+                                                                                                              bool isCloserThanRestLength)
+{
+    return 1.0;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -63,10 +82,15 @@ c_vector<double, SPACE_DIM> PathmanathanTwoBodyInteractionForce<ELEMENT_DIM,SPAC
     const c_vector<double, SPACE_DIM>& r_node_a_location = p_node_a->rGetLocation();
     const c_vector<double, SPACE_DIM>& r_node_b_location = p_node_b->rGetLocation();
 
-    // Get the node radii
-    double node_a_radius = p_node_a->GetRadius();
-    double node_b_radius = p_node_b->GetRadius();
-    assert(node_a_radius > 0 && node_b_radius > 0);
+    // Get the node radii for a NodeBasedCellPopulation
+    double node_a_radius = 0.0;
+    double node_b_radius = 0.0;
+
+    if (bool(dynamic_cast<NodeBasedCellPopulation<SPACE_DIM>*>(&rCellPopulation)))
+    {
+        node_a_radius = p_node_a->GetRadius();
+        node_b_radius = p_node_b->GetRadius();
+    }
 
     // Get the unit vector parallel to the line joining the two nodes
     c_vector<double, SPACE_DIM> unit_difference;
@@ -97,35 +121,101 @@ c_vector<double, SPACE_DIM> PathmanathanTwoBodyInteractionForce<ELEMENT_DIM,SPAC
         }
     }
 
-    // Rest length is the sum of the two cell radii
-    double rest_length = node_a_radius + node_b_radius;
+    /*
+     * Calculate the rest length of the spring connecting the two nodes with a default
+     * value of 1.0.
+     */
+    double rest_length_final = 1.0;
+
+    if (bool(dynamic_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation)))
+    {
+        rest_length_final = static_cast<MeshBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation)->GetRestLength(nodeAGlobalIndex, nodeBGlobalIndex);
+    }
+    else if (bool(dynamic_cast<NodeBasedCellPopulation<SPACE_DIM>*>(&rCellPopulation)))
+    {
+        assert(node_a_radius > 0 && node_b_radius > 0);
+        rest_length_final = node_a_radius + node_b_radius;
+    }
+
+    double rest_length = rest_length_final;
+
+    CellPtr p_cell_A = rCellPopulation.GetCellUsingLocationIndex(nodeAGlobalIndex);
+    CellPtr p_cell_B = rCellPopulation.GetCellUsingLocationIndex(nodeBGlobalIndex);
+
+    double ageA = p_cell_A->GetAge();
+    double ageB = p_cell_B->GetAge();
+
+    assert(!std::isnan(ageA));
+    assert(!std::isnan(ageB));
+
+    /*
+     * If the cells are both newly divided, then the rest length of the spring
+     * connecting them grows linearly with time, until 1 hour after division.
+     */
+    if (ageA < mSpringGrowthDuration && ageB < mSpringGrowthDuration)
+    {
+        AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>* p_static_cast_cell_population = static_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(&rCellPopulation);
+
+        std::pair<CellPtr,CellPtr> cell_pair = p_static_cast_cell_population->CreateCellPair(p_cell_A, p_cell_B);
+
+        if (p_static_cast_cell_population->IsMarkedSpring(cell_pair))
+        {
+            // Spring rest length increases from a small value to the normal rest length over 1 hour
+            double lambda = mDivisionRestingSpringLength;
+            rest_length = lambda + (rest_length_final - lambda) * ageA/mSpringGrowthDuration;
+        }
+        if (ageA + SimulationTime::Instance()->GetTimeStep() >= mSpringGrowthDuration)
+        {
+            // This spring is about to go out of scope
+            p_static_cast_cell_population->UnmarkSpring(cell_pair);
+        }
+    }
+
+    /*
+     * For apoptosis, progressively reduce the radius of the cell
+     */
+    double a_rest_length = rest_length*0.5;
+    double b_rest_length = a_rest_length;
+
+    if (bool(dynamic_cast<NodeBasedCellPopulation<SPACE_DIM>*>(&rCellPopulation)))
+    {
+        assert(node_a_radius > 0 && node_b_radius > 0);
+        a_rest_length = (node_a_radius/(node_a_radius+node_b_radius))*rest_length;
+        b_rest_length = (node_b_radius/(node_a_radius+node_b_radius))*rest_length;
+    }
+
+    /*
+     * If either of the cells has begun apoptosis, then the length of the spring
+     * connecting them decreases linearly with time.
+     */
+    if (p_cell_A->HasApoptosisBegun())
+    {
+        double time_until_death_a = p_cell_A->GetTimeUntilDeath();
+        a_rest_length = a_rest_length * time_until_death_a / p_cell_A->GetApoptosisTime();
+    }
+    if (p_cell_B->HasApoptosisBegun())
+    {
+        double time_until_death_b = p_cell_B->GetTimeUntilDeath();
+        b_rest_length = b_rest_length * time_until_death_b / p_cell_B->GetApoptosisTime();
+    }
+
+    rest_length = a_rest_length + b_rest_length;
 
     double overlap = distance_between_nodes - rest_length;
-
     bool is_closer_than_rest_length = (overlap <= 0);
     double multiplication_factor = VariableSpringConstantMultiplicationFactor(nodeAGlobalIndex, nodeBGlobalIndex, rCellPopulation, is_closer_than_rest_length);
+    double spring_stiffness = mSpringStiffness;
 
-    // Logarithmic repulsion (cells closer than rest length, overlap is negative)
+    // Pathmanathan force: logarithmic repulsion / exponential attraction
     if (overlap <= 0)
     {
-        //log(x+1) is undefined for x<=-1
         assert(overlap > -rest_length);
-        return multiplication_factor * mSpringStiffness * unit_difference * rest_length * log(1.0 + overlap/rest_length);
+        return multiplication_factor * spring_stiffness * unit_difference * rest_length * log(1.0 + overlap/rest_length);
     }
     else
     {
-        // Exponential attraction (cells further than rest length, overlap is positive)
-        return multiplication_factor * mSpringStiffness * unit_difference * overlap * exp(-mAlpha * overlap/rest_length);
+        return multiplication_factor * spring_stiffness * unit_difference * overlap * exp(-mAlpha * overlap/rest_length);
     }
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double PathmanathanTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::VariableSpringConstantMultiplicationFactor(unsigned nodeAGlobalIndex,
-                                                                                                              unsigned nodeBGlobalIndex,
-                                                                                                              AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
-                                                                                                              bool isCloserThanRestLength)
-{
-    return 1.0;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -135,10 +225,39 @@ double PathmanathanTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::GetSpringStif
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double PathmanathanTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::GetDivisionRestingSpringLength()
+{
+    return mDivisionRestingSpringLength;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+double PathmanathanTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::GetSpringGrowthDuration()
+{
+    return mSpringGrowthDuration;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PathmanathanTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::SetSpringStiffness(double springStiffness)
 {
     assert(springStiffness > 0.0);
     mSpringStiffness = springStiffness;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void PathmanathanTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::SetDivisionRestingSpringLength(double divisionRestingSpringLength)
+{
+    assert(divisionRestingSpringLength <= 1.0);
+    assert(divisionRestingSpringLength >= 0.0);
+
+    mDivisionRestingSpringLength = divisionRestingSpringLength;
+}
+
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void PathmanathanTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::SetSpringGrowthDuration(double springGrowthDuration)
+{
+    assert(springGrowthDuration >= 0.0);
+
+    mSpringGrowthDuration = springGrowthDuration;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -158,6 +277,8 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PathmanathanTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<SpringStiffness>" << mSpringStiffness << "</SpringStiffness>\n";
+    *rParamsFile << "\t\t\t<DivisionRestingSpringLength>" << mDivisionRestingSpringLength << "</DivisionRestingSpringLength>\n";
+    *rParamsFile << "\t\t\t<SpringGrowthDuration>" << mSpringGrowthDuration << "</SpringGrowthDuration>\n";
     *rParamsFile << "\t\t\t<Alpha>" << mAlpha << "</Alpha>\n";
 
     // Call method on direct parent class

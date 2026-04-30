@@ -872,7 +872,7 @@ public:
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(PathmanathanTwoBodyInteractionForce<2>, p_force);
-        //p_force->SetCutOffLength(1.5);
+        p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
 
         // Add cell killer
