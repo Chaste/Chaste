@@ -98,6 +98,13 @@ public:
      * Return a multiplication factor for the spring constant.
      *
      * Subclasses may override this method.
+     * 
+     * @param nodeAGlobalIndex index of one neighbouring node
+     * @param nodeBGlobalIndex index of the other neighbouring node
+     * @param rCellPopulation the cell population
+     * @param isCloserThanRestLength whether the nodes are currently closer than the rest length
+     * @return the multiplication factor for the spring constant
+     * 
      */
     virtual double VariableSpringConstantMultiplicationFactor(unsigned nodeAGlobalIndex,
                                                               unsigned nodeBGlobalIndex,
@@ -110,6 +117,11 @@ public:
      * This computes the geometry/rest length logic shared by variable-size
      * interactions and then delegates the final force-law expression to
      * CalculateLinkInteraction().
+     * 
+     * @param nodeAGlobalIndex index of one neighbouring node
+     * @param nodeBGlobalIndex index of the other neighbouring node
+     * @param rCellPopulation the cell population
+     * @return the force exerted on Node A by Node B    
      */
     c_vector<double, SPACE_DIM> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
                                                            unsigned nodeBGlobalIndex,
@@ -118,6 +130,14 @@ public:
     /**
      * Calculate the force between two linked nodes after overlap/rest length
      * have been computed.
+     * 
+     * @param overlap the amount by which the distance between nodes is less than the rest length
+     * @param restLength the rest length of the spring between the nodes
+     * @param rUnitDifference the unit vector pointing from one node to the other
+     * @param multiplicationFactor a multiplication factor for the spring constant
+     * @return the force vector between the two nodes
+     * 
+     * As this method is pure virtual, it must be overridden in subclasses.
      */
     virtual c_vector<double, SPACE_DIM> CalculateLinkInteraction(double overlap,
                                                                  double restLength,
@@ -141,16 +161,22 @@ public:
 
     /**
      * Set mSpringStiffness.
+     * 
+     * @param springStiffness the new value of mSpringStiffness
      */
     void SetSpringStiffness(double springStiffness);
 
     /**
      * Set mDivisionRestingSpringLength.
+     * 
+     * @param divisionRestingSpringLength the new value of mDivisionRestingSpringLength
      */
     void SetDivisionRestingSpringLength(double divisionRestingSpringLength);
 
     /**
      * Set mSpringGrowthDuration.
+     * 
+     * @param springGrowthDuration the new value of mSpringGrowthDuration   
      */
     void SetSpringGrowthDuration(double springGrowthDuration);
 
