@@ -1,7 +1,7 @@
 function PlotCols(x,y,data,labels,plottype)
 % PLOTCOLS    Plot the columns of a matrix of data
-%    PLOT(X,Y,DATA) plots column Y of data against column X. Y can be a vector if 
-%    columns are to be plotted (in which case different colours are used (if 
+%    PLOT(X,Y,DATA) plots column Y of data against column X. Y can be a vector if
+%    columns are to be plotted (in which case different colours are used (if
 %    length(Y)<8)).
 %
 %    PLOT(X,Y,DATA,LABELS), where LABELS is a vectors of strings, uses these strings
@@ -14,7 +14,7 @@ function PlotCols(x,y,data,labels,plottype)
 %    Examples (here 'data' is a n-by-4 matrix, 'labels' a 4 by 1 array of strings):
 %       PlotCols(1,2,data);                     % plot column 2 against column 1
 %       PlotCols(1,[2,3],data);                 % plot columns 2 and 3 against column 1
-%       PlotCols(1,[2,4],data,[],{'b-','k*'});  % plot columns 2 (blue) and 4 (black stars) 
+%       PlotCols(1,[2,4],data,[],{'b-','k*'});  % plot columns 2 (blue) and 4 (black stars)
 %                                               % against column 1
 %       PlotCols(1,[2,3],data,labels);          % labels the axes
 %
@@ -30,8 +30,8 @@ if x<=0 || x>size(data,2)
    error('X too large or not positive, should be a index for a column of the matrix DATA');
 end;
 
-if nargin > 3 
-   if (length(labels)>0) 
+if nargin > 3
+   if (length(labels)>0)
       if length(labels)~=size(data,2)
          error('Size of LABELS does not match number of columns in DATA')
       end;
@@ -45,7 +45,7 @@ if nargin > 4
 else
    plottypes = {'b','k','r','g','c','y','m'};
    if(length(y)>7)
-      % too many grpahs to be drawm, but user didn't specify plottypes explicity, 
+      % too many grpahs to be drawm, but user didn't specify plottypes explicity,
       % just draw them all blue
       for i=8:length(y)
          plottypes = {plottypes{1:end}, 'b'};
@@ -70,8 +70,8 @@ end;
 
 % use the headers, if given, to label the axes (or create a legend if several columns were
 % plotted)
-if nargin > 3 
-   if (length(labels)>0) 
+if nargin > 3
+   if (length(labels)>0)
       if (length(y)==1)
          xlabel(labels(x),'fontsize',16);
          ylabel(labels(y(1)),'fontsize',16);

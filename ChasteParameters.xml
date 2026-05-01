@@ -11,8 +11,8 @@
     -->
 
     <Simulation>
-        <!-- 
-            Problem definition 
+        <!--
+            Problem definition
         -->
         <SpaceDimension>3</SpaceDimension>
         <SimulationDuration unit="ms">50.0</SimulationDuration>
@@ -23,15 +23,15 @@
             </Default>
         </IonicModels>
 
-        <!-- 
-            Mesh definition 
+        <!--
+            Mesh definition
         -->
         <Mesh unit="cm">
             <Slab x="4.0" y="0.1" z="2.0" inter_node_space="0.1"/>
         </Mesh>
 
-        <!-- 
-            Stimuli (as many <Stimulus> definitions as needed) 
+        <!--
+            Stimuli (as many <Stimulus> definitions as needed)
            -->
         <Stimuli>
             <Stimulus>
@@ -48,8 +48,8 @@
             </Stimulus>
         </Stimuli>
 
-        <!-- 
-            Ionic cell model heterogeneities (as many <CellHeterogeneity> definitions as needed) 
+        <!--
+            Ionic cell model heterogeneities (as many <CellHeterogeneity> definitions as needed)
            -->
         <CellHeterogeneities>
             <CellHeterogeneity>
@@ -92,8 +92,8 @@
             </CellHeterogeneity>
         </CellHeterogeneities>
 
-        <!-- 
-            Output 
+        <!--
+            Output
         -->
         <OutputDirectory>ChasteResults</OutputDirectory>
         <OutputFilenamePrefix>SimulationResults</OutputFilenamePrefix>

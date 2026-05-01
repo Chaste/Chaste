@@ -42,7 +42,7 @@ The complete original paper reference is cited below:
 <para>
 <ulink url="http://circres.ahajournals.org/cgi/content/abstract/68/6/1501">A Model of the Ventricular Cardiac Action Potential - Depolarisation, Repolarisation and Their Interaction</ulink>, Ching-hsing Luo and Yoram Rudy, 1991 <ulink url="http://circres.ahajournals.org/">
             <emphasis>Circulation Research</emphasis>
-          </ulink>, 68, 1501-1526.  <ulink url="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;list_uids=1709839&amp;dopt=Abstract">PubMed ID: 1709839</ulink> 
+          </ulink>, 68, 1501-1526.  <ulink url="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;list_uids=1709839&amp;dopt=Abstract">PubMed ID: 1709839</ulink>
 </para>
 
 <informalfigure float="0" id="fig_cell_diagram">
@@ -134,7 +134,7 @@ The breakdown of the model into components and the definition of encapsulation a
           <bqbiol:is rdf:resource="https://chaste.comlab.ox.ac.uk/cellml/ns/oxford-metadata#membrane_voltage"/>
         </rdf:Description>
       </rdf:RDF>
-    </variable>     
+    </variable>
       <variable units="joule_per_kilomole_kelvin" public_interface="out" name="R" initial_value="8314"/>
       <variable units="kelvin" public_interface="out" name="T" initial_value="310"/>
       <variable units="coulomb_per_mole" public_interface="out" name="F" initial_value="96484.6"/>

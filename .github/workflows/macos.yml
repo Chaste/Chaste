@@ -6,14 +6,14 @@ on:
       - none
 
 jobs:
-  
+
   build-and-test:
     name: Test on macOS 10.15
     runs-on: macos-latest
-    
+
     steps:
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
 
     - name: checkout submodule
       run: git submodule update --init
