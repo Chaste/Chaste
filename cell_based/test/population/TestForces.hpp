@@ -171,7 +171,7 @@ public:
         TS_ASSERT_DELTA(cell_population.GetNode(5)->rGetAppliedForce()[0], 0.5*linear_force.GetSpringStiffness(), 1e-4);
         TS_ASSERT_DELTA(cell_population.GetNode(5)->rGetAppliedForce()[1], 0.0, 1e-4);
 
-        // Test spring force calculation 
+        // Test spring force calculation
         c_vector<double,2> force_on_spring; // between nodes 59 and 60
 
         // Find one of the elements that nodes 4 and 5 live on
@@ -205,8 +205,8 @@ public:
         TS_ASSERT_DELTA(force_on_spring[1], 0.0, 1e-4);
     }
 
-    /* 
-     * Note that this is equivalent to the previous test, but we repeat 
+    /*
+     * Note that this is equivalent to the previous test, but we repeat
      * it for node-based cell populations to check that the force calculations
      * are consistent across different cell population types.
      */
@@ -238,7 +238,7 @@ public:
         LinearSpringForce<2> linear_force;
 
         // Don't need to test set/get methods as these are tested in the previous test.
-       
+
         linear_force.SetDivisionRestingSpringLength(1.0);
         linear_force.SetSpringStiffness(15.0);
         linear_force.SetSpringGrowthDuration(1.0);
@@ -601,7 +601,7 @@ public:
         TS_ASSERT_DELTA(cell_population.GetNode(5)->rGetAppliedForce()[0], -pathmanathan_force.GetSpringStiffness() * log(0.5), 1e-4);
         TS_ASSERT_DELTA(cell_population.GetNode(5)->rGetAppliedForce()[1], 0.0, 1e-4);
 
-        // Test spring force calculation 
+        // Test spring force calculation
         c_vector<double,2> force_on_spring; // between nodes 59 and 60
 
         // Find one of the elements that nodes 4 and 5 live on
@@ -635,8 +635,8 @@ public:
         TS_ASSERT_DELTA(force_on_spring[1], 0.0, 1e-4);
     }
 
-    /* 
-     * Note that this is equivalent to the previous test, but we repeat 
+    /*
+     * Note that this is equivalent to the previous test, but we repeat
      * it for node-based cell populations to check that the force calculations
      * are consistent across different cell population types.
      */

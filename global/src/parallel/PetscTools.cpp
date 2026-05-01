@@ -377,7 +377,7 @@ void PetscTools::ReadPetscObject(Mat& rMat, const std::string& rOutputFileFullPa
         // Create an empty matrix with non-default parallel layout
         PetscInt num_rows, num_local_rows;
         VecGetSize(rParallelLayout, &num_rows);
-        VecGetLocalSize(rParallelLayout, &num_local_rows);       
+        VecGetLocalSize(rParallelLayout, &num_local_rows);
         /// \todo: #1082 work out appropriate nz allocation.
         PetscTools::SetupMat(rMat, num_rows, num_rows, 100, num_local_rows, num_local_rows, false);
 
@@ -386,7 +386,7 @@ void PetscTools::ReadPetscObject(Mat& rMat, const std::string& rOutputFileFullPa
     {
         // Create an empty matrix with default parallel layout
         MatCreate(PETSC_COMM_WORLD, &rMat);
-        MatSetType(rMat, MATMPIAIJ);   
+        MatSetType(rMat, MATMPIAIJ);
     }
 
     // Read into parallel matrix

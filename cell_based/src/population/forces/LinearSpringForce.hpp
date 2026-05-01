@@ -103,7 +103,7 @@ public:
      *
      * Calculates the linear spring force after shared rest-length mechanics
      * have been computed by AbstractVariableSizeTwoBodyInteractionForce.
-     *  
+     *
      *  @param overlap the amount by which the distance between nodes is less than the rest length
      *  @param restLength the rest length of the spring between the nodes
      *  @param rUnitDifference the unit vector pointing from one node to the other

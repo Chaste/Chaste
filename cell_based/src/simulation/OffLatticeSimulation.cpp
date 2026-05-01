@@ -103,7 +103,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::SetMaxAdaptiveTimeStep(unsigne
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-unsigned OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::GetMaxAdaptiveTimeStep() const 
+unsigned OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::GetMaxAdaptiveTimeStep() const
 {
     return mMaxAdaptiveTimeSteps;
 }
