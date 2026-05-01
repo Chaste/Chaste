@@ -85,7 +85,7 @@ public:
 
     void TestParabolicConstructor()
     {
-        // Create PDE and boundary condition objects 
+        // Create PDE and boundary condition objects
         double constant_coefficient = -0.1;
         double linear_coefficient = -0.2;
         double diffusion_coefficient = 0.1;

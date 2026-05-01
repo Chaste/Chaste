@@ -15,23 +15,23 @@ jobs:
       volumes:
         - runner_volume:/home/runner
       options: --user 0 --cpus 4
-      
+
     env:
       CC: gcc
       CXX: g++
-      
+
     defaults:
       run:
         shell: bash
-      
+
     steps:
       - name: checkout repository
-        uses: actions/checkout@v4
-          
+        uses: actions/checkout@v6
+
       - name: compiler version
         run: |
           ${CXX} --version
-          
+
       - name: make build and test directories
         run: |
           mkdir -p chaste-build-dir
@@ -54,7 +54,7 @@ jobs:
       - name: set runner user privileges
         run: |
           chown -R runner:runner .
-          
+
       - name: cmake configure
         run: |
           source init.sh
@@ -89,7 +89,7 @@ jobs:
         working-directory: chaste-build-dir
 
       - name: Upload archive files
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: crypt-archive
           path: |

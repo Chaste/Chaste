@@ -16,7 +16,7 @@ demonstrates:
  * Working with vertex based off lattice populations
  * Applying boundary conditions
  * Working with forces
- 
+
 ## The Test
 
 ```python
