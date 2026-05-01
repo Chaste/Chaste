@@ -1296,7 +1296,7 @@ public:
             boost::archive::text_oarchive output_arch(ofs);
 
             // Set member variables
-            force.SetSpringStiffness(12.35);
+            force.SetRepulsionParameter(12.35);
 
             // Serialize via pointer to most abstract class possible
             AbstractForce<2>* const p_force = &force;
@@ -1314,7 +1314,7 @@ public:
             input_arch >> p_force;
 
             // Test member variables
-            TS_ASSERT_DELTA((static_cast<SimpleLogarithmicRepulsionForce<2>*>(p_force))->GetSpringStiffness(), 12.35, 1e-6);
+            TS_ASSERT_DELTA((static_cast<SimpleLogarithmicRepulsionForce<2>*>(p_force))->GetRepulsionParameter(), 12.35, 1e-6);
 
             // Tidy up
             delete p_force;

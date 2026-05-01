@@ -38,21 +38,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 SimpleLogarithmicRepulsionForce<ELEMENT_DIM, SPACE_DIM>::SimpleLogarithmicRepulsionForce()
     : AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>(),
-      mSpringStiffness(15.0)
+      mRepulsionParameter(15.0)
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double SimpleLogarithmicRepulsionForce<ELEMENT_DIM, SPACE_DIM>::GetSpringStiffness()
+double SimpleLogarithmicRepulsionForce<ELEMENT_DIM, SPACE_DIM>::GetRepulsionParameter()
 {
-    return mSpringStiffness;
+    return mRepulsionParameter;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void SimpleLogarithmicRepulsionForce<ELEMENT_DIM, SPACE_DIM>::SetSpringStiffness(double springStiffness)
+void SimpleLogarithmicRepulsionForce<ELEMENT_DIM, SPACE_DIM>::SetRepulsionParameter(double repulsionParameter)
 {
-    assert(springStiffness > 0.0);
-    mSpringStiffness = springStiffness;
+    assert(repulsionParameter > 0.0);
+    mRepulsionParameter = repulsionParameter;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
@@ -87,13 +87,13 @@ c_vector<double, SPACE_DIM> SimpleLogarithmicRepulsionForce<ELEMENT_DIM, SPACE_D
     // Logarithmic repulsion (overlap is negative, cells are compressed)
     // log(x+1) is undefined for x<=-1; overlap/rest_length > -1 since distance > 0
     assert(overlap > -rest_length);
-    return mSpringStiffness * unit_difference * rest_length * log(1.0 + overlap/rest_length);
+    return mRepulsionParameter * unit_difference * rest_length * log(1.0 + overlap/rest_length);
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void SimpleLogarithmicRepulsionForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<SpringStiffness>" << mSpringStiffness << "</SpringStiffness>\n";
+    *rParamsFile << "\t\t\t<RepulsionParameter>" << mRepulsionParameter << "</RepulsionParameter>\n";
 
     // Call direct parent class
     AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(rParamsFile);

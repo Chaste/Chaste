@@ -65,13 +65,13 @@ private :
     void serialize(Archive & archive, const unsigned int version)
     {
         archive & boost::serialization::base_object<AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM> >(*this);
-        archive & mSpringStiffness;
+        archive & mRepulsionParameter;
     }
 
 protected:
 
-    /** Spring stiffness. Defaults to 15.0. */
-    double mSpringStiffness;
+    /** Repulsion parameter. Defaults to 15.0. */
+    double mRepulsionParameter;
 
 public :
 
@@ -81,16 +81,16 @@ public :
     SimpleLogarithmicRepulsionForce();
 
     /**
-     * @return mSpringStiffness
+     * @return mRepulsionParameter
      */
-    double GetSpringStiffness();
+    double GetRepulsionParameter();
 
     /**
-     * Set mSpringStiffness.
+     * Set mRepulsionParameter.
      *
-     * @param springStiffness the new value of mSpringStiffness
+     * @param repulsionParameter the new value of mRepulsionParameter
      */
-    void SetSpringStiffness(double springStiffness);
+    void SetRepulsionParameter(double repulsionParameter);
 
     /**
      * Overridden CalculateForceBetweenNodes() method.
