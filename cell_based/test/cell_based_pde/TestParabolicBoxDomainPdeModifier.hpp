@@ -145,7 +145,7 @@ public:
 
         // Separate scope to write the archive
         {
-            
+
             // Create PDE and boundary condition objects
             double constant_coefficient = -0.1;
             double linear_coefficient = -0.2;
@@ -248,7 +248,7 @@ public:
         double linear_coefficient = -1.0;
         double diffusion_coefficient = 1.0;
         double rate_coefficient = 0.1;
-        bool scale_by_cell_volume = false;  
+        bool scale_by_cell_volume = false;
         MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient, scale_by_cell_volume));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
@@ -277,12 +277,12 @@ public:
         CellPtr p_cell_55 = cell_population.GetCellUsingLocationIndex(55);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[0], 5.5, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[1], 4.3301, 1e-4);
-        
+
         TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable"), 0.0799, 1e-4);
         TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable_grad_x"), -0.0734, 1e-4);
         TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable_grad_y"), -0.001, 1e-4);
 
-        // Check this was for bcs on box boundary 
+        // Check this was for bcs on box boundary
         TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoxBoundary(), true);
     }
 
@@ -322,7 +322,7 @@ public:
         double linear_coefficient = -1.0;
         double diffusion_coefficient = 1.0;
         double rate_coefficient = 0.1;
-        bool scale_by_cell_volume = false;  
+        bool scale_by_cell_volume = false;
         MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient, scale_by_cell_volume));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
@@ -336,7 +336,7 @@ public:
         p_pde_modifier->SetDependentVariableName("variable");
 
         // Change where BCS are appied here we want the bcs applied on the boundary of the cells.
-        // Good for compact tissues 
+        // Good for compact tissues
         TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoxBoundary(), true);
         p_pde_modifier->SetBcsOnBoxBoundary(false);
         TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoxBoundary(), false);
@@ -363,7 +363,7 @@ public:
         CellPtr p_cell_55 = cell_population.GetCellUsingLocationIndex(55);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[0], 5.5, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[1], 4.3301, 1e-4);
-    
+
         TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable"), 0.1028, 1e-4);
         TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable_grad_x"), -0.0819, 1e-4);
         TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable_grad_y"), 0.0008, 1e-4);
@@ -406,7 +406,7 @@ void TestMeshBasedSquareMonolayerWithBCsOnBoundingSpehre()
         double linear_coefficient = -1.0;
         double diffusion_coefficient = 1.0;
         double rate_coefficient = 0.1;
-        bool scale_by_cell_volume = false;  
+        bool scale_by_cell_volume = false;
         MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient, scale_by_cell_volume));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
@@ -420,7 +420,7 @@ void TestMeshBasedSquareMonolayerWithBCsOnBoundingSpehre()
         p_pde_modifier->SetDependentVariableName("variable");
 
         // Change where BCS are appied here we want the bcs applied on the boundary of the cells.
-        // Good for compact tissues 
+        // Good for compact tissues
         TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoxBoundary(), true);
         p_pde_modifier->SetBcsOnBoxBoundary(false);
         TS_ASSERT_EQUALS(p_pde_modifier->AreBcsSetOnBoxBoundary(), false);
@@ -447,7 +447,7 @@ void TestMeshBasedSquareMonolayerWithBCsOnBoundingSpehre()
         CellPtr p_cell_55 = cell_population.GetCellUsingLocationIndex(55);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[0], 5.5, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[1], 4.3301, 1e-4);
-        
+
         TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable"), 0.0914, 1e-4);
         TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable_grad_x"), -0.0764, 1e-4);
         TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable_grad_y"), 0.0004, 1e-4);
@@ -456,7 +456,7 @@ void TestMeshBasedSquareMonolayerWithBCsOnBoundingSpehre()
 
 
     // Only difference from above tests (TestMeshBasedSquareMonolayer) is the use of Neuman BCs here.
-    // Note we can only do this on the box not on the cells or the bounding sphere    
+    // Note we can only do this on the box not on the cells or the bounding sphere
     void TestMeshBasedSquareMonolayerWithNeumanBcs()
     {
         HoneycombMeshGenerator generator(10,10,0);
@@ -494,7 +494,7 @@ void TestMeshBasedSquareMonolayerWithBCsOnBoundingSpehre()
         double linear_coefficient = -1.0;
         double diffusion_coefficient = 1.0;
         double rate_coefficient = 0.1;
-        bool scale_by_cell_volume = false;  
+        bool scale_by_cell_volume = false;
         MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient, scale_by_cell_volume));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
@@ -523,7 +523,7 @@ void TestMeshBasedSquareMonolayerWithBCsOnBoundingSpehre()
         CellPtr p_cell_55 = cell_population.GetCellUsingLocationIndex(55);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[0], 5.5, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[1], 4.3301, 1e-4);
-        
+
         TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable"), 0.121, 1e-4);
         TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable_grad_x"), -0.1028, 1e-4);
         TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable_grad_y"), -0.0053, 1e-4);
@@ -567,7 +567,7 @@ void TestMeshBasedSquareMonolayerWithBCsOnBoundingSpehre()
         double linear_coefficient = -1.0;
         double diffusion_coefficient = 1.0;
         double rate_coefficient = 0.1;
-        bool scale_by_cell_volume = false;  
+        bool scale_by_cell_volume = false;
         MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient, scale_by_cell_volume));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
@@ -596,10 +596,10 @@ void TestMeshBasedSquareMonolayerWithBCsOnBoundingSpehre()
         CellPtr p_cell_55 = cell_population.GetCellUsingLocationIndex(55);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[0], 5.5, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[1], 4.3301, 1e-4);
-        
+
         // Exactly the same as all Off Lattice models as same cell cetres
         TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable"), 0.0799, 1e-4);
-        
+
         // Clear memory
         delete p_mesh;
     }
@@ -643,7 +643,7 @@ void TestMeshBasedSquareMonolayerWithBCsOnBoundingSpehre()
         double linear_coefficient = -1.0;
         double diffusion_coefficient = 1.0;
         double rate_coefficient = 0.1;
-        bool scale_by_cell_volume = false;  
+        bool scale_by_cell_volume = false;
         MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient, scale_by_cell_volume));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
@@ -672,7 +672,7 @@ void TestMeshBasedSquareMonolayerWithBCsOnBoundingSpehre()
         CellPtr p_cell_55 = cell_population.GetCellUsingLocationIndex(55);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[0], 5.5, 1e-4);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[1], 4.3301, 1e-4);
-        
+
         // Exactly the same as all Off Lattice models as same cell cetres
         TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable"), 0.0799, 1e-4);
     }
@@ -718,7 +718,7 @@ void TestMeshBasedSquareMonolayerWithBCsOnBoundingSpehre()
         double linear_coefficient = -1.0;
         double diffusion_coefficient = 1.0;
         double rate_coefficient = 0.1;
-        bool scale_by_cell_volume = false;  
+        bool scale_by_cell_volume = false;
         MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient, scale_by_cell_volume));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
@@ -747,7 +747,7 @@ void TestMeshBasedSquareMonolayerWithBCsOnBoundingSpehre()
         CellPtr p_cell_55 = cell_population.GetCellUsingLocationIndex(55);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[0], 5, 1e-4); //5.5 in Off Lattice
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[1], 4.3301, 1e-4);
-        
+
         // Similar to all Off Lattice models as different cell cetres
         TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable"), 0.0799, 1e-2);
 
@@ -801,7 +801,7 @@ void TestMeshBasedSquareMonolayerWithBCsOnBoundingSpehre()
         double linear_coefficient = -1.0;
         double diffusion_coefficient = 1.0;
         double rate_coefficient = 0.1;
-        bool scale_by_cell_volume = false;  
+        bool scale_by_cell_volume = false;
         MAKE_PTR_ARGS(AveragedSourceParabolicPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient, rate_coefficient, scale_by_cell_volume));
         MAKE_PTR_ARGS(ConstBoundaryCondition<2>, p_bc, (1.0));
 
@@ -830,7 +830,7 @@ void TestMeshBasedSquareMonolayerWithBCsOnBoundingSpehre()
         CellPtr p_cell_55 = cell_population.GetCellUsingLocationIndex(55);
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[0], 5, 1e-4); //5.5 in Off Lattice
         TS_ASSERT_DELTA(cell_population.GetLocationOfCellCentre(p_cell_55)[1], 4.3301, 1e-4);
-        
+
         // Similar to all Off Lattice models as different cell cetres
         TS_ASSERT_DELTA( p_cell_55->GetCellData()->GetItem("variable"), 0.0799, 1e-2);
 

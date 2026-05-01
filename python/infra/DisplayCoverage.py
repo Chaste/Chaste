@@ -126,12 +126,12 @@ for src_dir in src_dirs:
 
 def coverage_ignore(src_file):
     """Whether to ignore the fact that a source file is not used.
-    
-    If a file contains only typedefs, for example, this is not an error. 
+
+    If a file contains only typedefs, for example, this is not an error.
     For .hpp files we check this by looking for the presence of either
     'template' or 'class' at the start of a line.  If neither are found,
     we assume the file contains no real code.
-    
+
     This will only work if header files don't contain non-template function
     definitions, which should be the case if we're being good programmers.
     Unfortunately the boost serialization tweaking file "SerializationExportWrapper.hpp"
@@ -272,7 +272,7 @@ for src_file in src_files:
     if coverage_ignore(src_file):
         # All special case ignorable files (not just ones with partial coverage)
         status = ''
-    
+
     # Close all files
     [fp.close() for fp in gcov_fps]
     out_file.close()

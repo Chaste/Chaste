@@ -15,14 +15,14 @@ jobs:
   on_pull_request:
     runs-on: ubuntu-latest
 
-    if: > 
+    if: >
       github.event_name == 'pull_request' &&
       !contains(github.event.pull_request.labels.*.name, 'ci:off') &&
       github.repository == 'Chaste/Chaste'
 
     steps:
       - name: checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: install dependencies
         run: |
@@ -59,7 +59,7 @@ jobs:
 
     steps:
       - name: checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: install dependencies
         run: |
@@ -88,7 +88,7 @@ jobs:
           done
 
       - name: checkout doxygen-latest
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: Chaste/doxygen-latest
           path: doxygen-latest
@@ -120,7 +120,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: install dependencies
         run: |
@@ -150,7 +150,7 @@ jobs:
 
       - name: Upload Documentation as Artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: doxygen-html
           path: doxygen/html/

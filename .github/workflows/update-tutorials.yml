@@ -10,18 +10,18 @@ on:
   workflow_dispatch:
 
 jobs:
-  
+
   generate-tutorial-markdown:
     runs-on: ubuntu-latest
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
     steps:
       - name: checkout Chaste
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0  # Fetch all history in order to get revision info for tutorial files
 
       - name: setup python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.x'
 
@@ -31,7 +31,7 @@ jobs:
         working-directory: python/infra
 
       - name: Upload archive files
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: user-tutorial-markdown
           path: |
@@ -43,13 +43,13 @@ jobs:
     if: github.event_name == 'push' && github.repository == 'Chaste/Chaste'
     steps:
       - name: Download user-tutorial-to markdown
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: user-tutorial-markdown
           path: tutorials/UserTutorials
 
       - name: Checkout website repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: Chaste/Chaste.github.io
           token: ${{ secrets.WEBSITE_ACCESS }}

@@ -10,7 +10,7 @@ on:
       - develop
 
 jobs:
-  
+
   build-and-test:
 
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
@@ -33,7 +33,7 @@ jobs:
 
     steps:
     - name: checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: install dependencies
       run: |

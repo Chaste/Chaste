@@ -1,6 +1,6 @@
 file(READ build_timestamp build_time)
 file(READ Version.cpp version_cpp)
-string(REGEX REPLACE "GetBuildTime\\(\\)[\r\n\t ]*{[^}]*}" 
+string(REGEX REPLACE "GetBuildTime\\(\\)[\r\n\t ]*{[^}]*}"
 "GetBuildTime()
 {
     return \"${build_time}\";

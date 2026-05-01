@@ -20,7 +20,7 @@ representation of cells. It will cover the following techniques:
  * Generating cells and adding them to the mesh
  * Simulating cell migration on the mesh
  * Real-time visualization of the cell population and plotting of population statistics
- 
+
 ## The Test
 
 ```python

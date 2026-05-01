@@ -1,6 +1,6 @@
 function plot_chaste_triangle_mesh(mesh)
-% 
-% Simple code to read in a triangle mesh and plot it in matlab, 
+%
+% Simple code to read in a triangle mesh and plot it in matlab,
 % useful for debugging without 'showme'
 %
 % NOT REGULARLY TESTED OR ROBUST!
