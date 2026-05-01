@@ -456,18 +456,8 @@ public:
         c_vector<double,1> normal_1d = zero_vector<double>(1);
         normal_1d(0) = -1.0;
         PlaneBoundaryCondition<1> bc_1d_jiggle(&cell_population_1d, point_1d, normal_1d);
-        bc_1d_jiggle.SetUseJiggledNodesOnPlane(true);
 
-        std::map<Node<1>*, c_vector<double,1> > old_locations_1d;
-        for (std::list<CellPtr>::iterator cell_iter = cell_population_1d.rGetCells().begin();
-             cell_iter != cell_population_1d.rGetCells().end();
-             ++cell_iter)
-        {
-            Node<1>* p_node = cell_population_1d.GetNodeCorrespondingToCell(*cell_iter);
-            old_locations_1d[p_node] = p_node->rGetLocation();
-        }
-
-        TS_ASSERT_THROWS_THIS(bc_1d_jiggle.ImposeBoundaryCondition(old_locations_1d),
+        TS_ASSERT_THROWS_THIS(bc_1d_jiggle.SetUseJiggledNodesOnPlane(true),
             "Jiggling of nodes is not supported in 1D.");
 
         for (unsigned i=0; i<nodes_1d.size(); i++)

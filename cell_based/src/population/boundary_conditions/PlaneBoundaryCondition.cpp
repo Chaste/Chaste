@@ -70,6 +70,13 @@ const c_vector<double, SPACE_DIM>& PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::SetUseJiggledNodesOnPlane(bool useJiggledNodesOnPlane)
 {
+    if constexpr (SPACE_DIM == 1)
+    {
+        if (useJiggledNodesOnPlane)
+        {
+            EXCEPTION("Jiggling of nodes is not supported in 1D.");
+        }
+    }
     mUseJiggledNodesOnPlane = useJiggledNodesOnPlane;
 }
 
@@ -158,11 +165,6 @@ void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCondition(
          * We therefore iterate over cells and update the location of the node associated with each cell.
          */
         assert((dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation)));
-
-        if (mUseJiggledNodesOnPlane)
-        {
-            EXCEPTION("Jiggling of nodes is not supported in 1D.");
-        }
 
         for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
             cell_iter != this->mpCellPopulation->End();
