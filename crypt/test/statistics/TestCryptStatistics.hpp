@@ -214,7 +214,7 @@ public:
 
         // Create a force law and cell killer and pass then to the simulation
         MAKE_PTR(LinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetMeinekeSpringStiffness(30.0); // normally 15.0;
+        p_linear_force->SetSpringStiffness(30.0); // normally 15.0;
         simulator.AddForce(p_linear_force);
         MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&simulator.rGetCellPopulation(), crypt_length));
         simulator.AddCellKiller(p_killer);
@@ -419,7 +419,7 @@ public:
 
             // Create a force laws and pass it to the simulation
             MAKE_PTR(LinearSpringForce<2>, p_linear_force);
-            p_linear_force->SetMeinekeSpringStiffness(30.0); // normally 15.0;
+            p_linear_force->SetSpringStiffness(30.0); // normally 15.0;
             simulator.AddForce(p_linear_force);
 
             // Set up cell killer

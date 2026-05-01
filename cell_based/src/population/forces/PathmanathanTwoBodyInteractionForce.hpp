@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PATHMANATHANTWOBODYINTERACTIONFORCE_HPP_
 #define PATHMANATHANTWOBODYINTERACTIONFORCE_HPP_
 
-#include "AbstractTwoBodyInteractionForce.hpp"
+#include "AbstractVariableSizeTwoBodyInteractionForce.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -65,7 +65,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * This force is designed for use with NodeBasedCellPopulation.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
-class PathmanathanTwoBodyInteractionForce : public AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>
+class PathmanathanTwoBodyInteractionForce : public AbstractVariableSizeTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>
 {
     friend class TestForces;
 
@@ -82,33 +82,11 @@ private:
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM> >(*this);
-        archive & mSpringStiffness;
-        archive & mDivisionRestingSpringLength;
-        archive & mSpringGrowthDuration;
+        archive & boost::serialization::base_object<AbstractVariableSizeTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM> >(*this);
         archive & mAlpha;
     }
 
 protected:
-
-    /**
-     * Spring stiffness (denoted mu in Pathmanathan et al (2009),
-     * doi:10.1088/1478-3975/6/3/036001).
-     */
-    double mSpringStiffness;
-
-    /**
-     * Initial resting spring length after cell division.
-     * Has units of cell size at equilibrium rest length.
-     */
-    double mDivisionRestingSpringLength;
-
-    /**
-     * The time it takes for the spring rest length to increase from
-     * mDivisionRestingSpringLength to its natural length.
-     * Defaults to 1.0.
-     */
-    double mSpringGrowthDuration;
 
     /**
      * Parameter controlling the range of attraction between cells.
@@ -116,6 +94,17 @@ protected:
      * Defaults to 5.0.
      */
     double mAlpha;
+
+  /**
+   * Overridden CalculateLinkInteraction() method.
+   *
+   * Calculates the Pathmanathan force law expression after shared
+   * rest-length mechanics have been computed by the parent class.
+   */
+  c_vector<double, SPACE_DIM> CalculateLinkInteraction(double overlap,
+                             double restLength,
+                             const c_vector<double, SPACE_DIM>& rUnitDifference,
+                             double multiplicationFactor);
 
 public:
 
@@ -128,76 +117,6 @@ public:
      * Destructor.
      */
     virtual ~PathmanathanTwoBodyInteractionForce();
-
-    /**
-     * Return a multiplication factor for the spring constant, which
-     * returns a default value of 1.
-     *
-     * This method may be overridden in subclasses.
-     *
-     * @param nodeAGlobalIndex index of one neighbouring node
-     * @param nodeBGlobalIndex index of the other neighbouring node
-     * @param rCellPopulation the cell population
-     * @param isCloserThanRestLength whether the neighbouring nodes lie closer than the rest length of their connecting spring
-     *
-     * @return the multiplication factor.
-     */
-    virtual double VariableSpringConstantMultiplicationFactor(unsigned nodeAGlobalIndex,
-                                                              unsigned nodeBGlobalIndex,
-                                                              AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation,
-                                                              bool isCloserThanRestLength);
-
-    /**
-     * Overridden CalculateForceBetweenNodes() method.
-     *
-     * Calculates the Pathmanathan force between two nodes.
-     *
-     * Note that this assumes they are connected and is called by AddForceContribution()
-     *
-     * @param nodeAGlobalIndex index of one neighbouring node
-     * @param nodeBGlobalIndex index of the other neighbouring node
-     * @param rCellPopulation the cell population
-     * @return The force exerted on Node A by Node B.
-     */
-    c_vector<double, SPACE_DIM> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
-                                                     unsigned nodeBGlobalIndex,
-                                                     AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>& rCellPopulation);
-
-    /**
-     * @return mSpringStiffness
-     */
-    double GetSpringStiffness();
-
-    /**
-     * @return mDivisionRestingSpringLength
-     */
-    double GetDivisionRestingSpringLength();
-
-    /**
-     * @return mSpringGrowthDuration
-     */
-    double GetSpringGrowthDuration();
-
-    /**
-     * Set mSpringStiffness.
-     *
-     * @param springStiffness the new value of mSpringStiffness
-     */
-    void SetSpringStiffness(double springStiffness);
-
-    /**
-     * Set mDivisionRestingSpringLength.
-     *
-     * @param divisionRestingSpringLength the new value of mDivisionRestingSpringLength
-     */
-    void SetDivisionRestingSpringLength(double divisionRestingSpringLength);
-
-    /**
-     * Set mSpringGrowthDuration.
-     *
-     * @param springGrowthDuration the new value of mSpringGrowthDuration
-     */
-    void SetSpringGrowthDuration(double springGrowthDuration);
 
     /**
      * @return mAlpha

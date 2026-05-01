@@ -186,8 +186,8 @@ double LinearSpringWithVariableSpringConstantsForce<DIM>::VariableSpringConstant
 
         if (cell_A_is_apoptotic || cell_B_is_apoptotic)
         {
-            double spring_a_stiffness = 2.0 * this->GetMeinekeSpringStiffness();
-            double spring_b_stiffness = 2.0 * this->GetMeinekeSpringStiffness();
+            double spring_a_stiffness = 2.0 * this->GetSpringStiffness();
+            double spring_b_stiffness = 2.0 * this->GetSpringStiffness();
 
             if (cell_A_is_apoptotic)
             {
@@ -212,7 +212,7 @@ double LinearSpringWithVariableSpringConstantsForce<DIM>::VariableSpringConstant
                 }
             }
 
-            multiplication_factor /= (1.0/spring_a_stiffness + 1.0/spring_b_stiffness)*this->GetMeinekeSpringStiffness();
+            multiplication_factor /= (1.0/spring_a_stiffness + 1.0/spring_b_stiffness)*this->GetSpringStiffness();
         }
     }
 

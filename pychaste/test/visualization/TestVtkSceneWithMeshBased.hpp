@@ -147,7 +147,7 @@ public:
         simulator.SetSamplingTimestepMultiple(100);
 
         MAKE_PTR(LinearSpringForce<3>, p_force);
-        p_force->SetMeinekeSpringStiffness(30.0); // default is 15.0;
+        p_force->SetSpringStiffness(30.0); // default is 15.0;
         p_force->SetCutOffLength(1.5);
         simulator.AddForce(p_force);
         simulator.AddSimulationModifier(p_scene_modifier);

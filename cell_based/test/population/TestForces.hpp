@@ -104,26 +104,26 @@ public:
         LinearSpringForce<2> linear_force;
 
         // Test set/get method
-        TS_ASSERT_DELTA(linear_force.GetMeinekeDivisionRestingSpringLength(), 0.5, 1e-6);
-        TS_ASSERT_DELTA(linear_force.GetMeinekeSpringStiffness(), 15.0, 1e-6);
-        TS_ASSERT_DELTA(linear_force.GetMeinekeSpringGrowthDuration(), 1.0, 1e-6);
+        TS_ASSERT_DELTA(linear_force.GetDivisionRestingSpringLength(), 0.5, 1e-6);
+        TS_ASSERT_DELTA(linear_force.GetSpringStiffness(), 15.0, 1e-6);
+        TS_ASSERT_DELTA(linear_force.GetSpringGrowthDuration(), 1.0, 1e-6);
         TS_ASSERT_EQUALS(linear_force.GetUseCutOffLength(), false);
         TS_ASSERT_DELTA(linear_force.GetCutOffLength(), DBL_MAX, 1e-6);
 
-        linear_force.SetMeinekeDivisionRestingSpringLength(0.8);
-        linear_force.SetMeinekeSpringStiffness(20.0);
-        linear_force.SetMeinekeSpringGrowthDuration(2.0);
+        linear_force.SetDivisionRestingSpringLength(0.8);
+        linear_force.SetSpringStiffness(20.0);
+        linear_force.SetSpringGrowthDuration(2.0);
         linear_force.SetCutOffLength(1.5);
 
-        TS_ASSERT_DELTA(linear_force.GetMeinekeDivisionRestingSpringLength(), 0.8, 1e-6);
-        TS_ASSERT_DELTA(linear_force.GetMeinekeSpringStiffness(), 20.0, 1e-6);
-        TS_ASSERT_DELTA(linear_force.GetMeinekeSpringGrowthDuration(), 2.0, 1e-6);
+        TS_ASSERT_DELTA(linear_force.GetDivisionRestingSpringLength(), 0.8, 1e-6);
+        TS_ASSERT_DELTA(linear_force.GetSpringStiffness(), 20.0, 1e-6);
+        TS_ASSERT_DELTA(linear_force.GetSpringGrowthDuration(), 2.0, 1e-6);
         TS_ASSERT_EQUALS(linear_force.GetUseCutOffLength(), true);
         TS_ASSERT_DELTA(linear_force.GetCutOffLength(), 1.5, 1e-6);
 
-        linear_force.SetMeinekeDivisionRestingSpringLength(0.5);
-        linear_force.SetMeinekeSpringStiffness(15.0);
-        linear_force.SetMeinekeSpringGrowthDuration(1.0);
+        linear_force.SetDivisionRestingSpringLength(0.5);
+        linear_force.SetSpringStiffness(15.0);
+        linear_force.SetSpringGrowthDuration(1.0);
 
         // Reset cut off length
         linear_force.SetCutOffLength(DBL_MAX);
@@ -163,13 +163,13 @@ public:
         }
         linear_force.AddForceContribution(cell_population);
 
-        TS_ASSERT_DELTA(cell_population.GetNode(3)->rGetAppliedForce()[0], 0.5*linear_force.GetMeinekeSpringStiffness(), 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(3)->rGetAppliedForce()[0], 0.5*linear_force.GetSpringStiffness(), 1e-4);
         TS_ASSERT_DELTA(cell_population.GetNode(3)->rGetAppliedForce()[1], 0.0, 1e-4);
 
-        TS_ASSERT_DELTA(cell_population.GetNode(4)->rGetAppliedForce()[0], (-3+4.0/sqrt(7.0))*linear_force.GetMeinekeSpringStiffness(), 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(4)->rGetAppliedForce()[0], (-3+4.0/sqrt(7.0))*linear_force.GetSpringStiffness(), 1e-4);
         TS_ASSERT_DELTA(cell_population.GetNode(4)->rGetAppliedForce()[1], 0.0, 1e-4);
 
-        TS_ASSERT_DELTA(cell_population.GetNode(5)->rGetAppliedForce()[0], 0.5*linear_force.GetMeinekeSpringStiffness(), 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(5)->rGetAppliedForce()[0], 0.5*linear_force.GetSpringStiffness(), 1e-4);
         TS_ASSERT_DELTA(cell_population.GetNode(5)->rGetAppliedForce()[1], 0.0, 1e-4);
 
         // Test spring force calculation 
@@ -187,7 +187,7 @@ public:
                                                                   p_element->GetNodeGlobalIndex(0),
                                                                   cell_population);
 
-        TS_ASSERT_DELTA(force_on_spring[0], 0.5*linear_force.GetMeinekeSpringStiffness(), 1e-4);
+        TS_ASSERT_DELTA(force_on_spring[0], 0.5*linear_force.GetSpringStiffness(), 1e-4);
         TS_ASSERT_DELTA(force_on_spring[1], 0.0, 1e-4);
 
         // Test force with cutoff point
@@ -240,9 +240,9 @@ public:
 
         // Don't need to test set/get methods as these are tested in the previous test.
        
-        linear_force.SetMeinekeDivisionRestingSpringLength(1.0);
-        linear_force.SetMeinekeSpringStiffness(15.0);
-        linear_force.SetMeinekeSpringGrowthDuration(1.0);
+        linear_force.SetDivisionRestingSpringLength(1.0);
+        linear_force.SetSpringStiffness(15.0);
+        linear_force.SetSpringGrowthDuration(1.0);
 
         // set cut off length so no long connections but captures the force on the moved node below (>1.5). Needed here as nearest neighbour interactions
         linear_force.SetCutOffLength(1.51);
@@ -282,13 +282,13 @@ public:
         }
         linear_force.AddForceContribution(cell_population);
 
-        TS_ASSERT_DELTA(cell_population.GetNode(3)->rGetAppliedForce()[0], 0.5*linear_force.GetMeinekeSpringStiffness(), 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(3)->rGetAppliedForce()[0], 0.5*linear_force.GetSpringStiffness(), 1e-4);
         TS_ASSERT_DELTA(cell_population.GetNode(3)->rGetAppliedForce()[1], 0.0, 1e-4);
 
-        TS_ASSERT_DELTA(cell_population.GetNode(4)->rGetAppliedForce()[0], (-3+4.0/sqrt(7.0))*linear_force.GetMeinekeSpringStiffness(), 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(4)->rGetAppliedForce()[0], (-3+4.0/sqrt(7.0))*linear_force.GetSpringStiffness(), 1e-4);
         TS_ASSERT_DELTA(cell_population.GetNode(4)->rGetAppliedForce()[1], 0.0, 1e-4);
 
-        TS_ASSERT_DELTA(cell_population.GetNode(5)->rGetAppliedForce()[0], 0.5*linear_force.GetMeinekeSpringStiffness(), 1e-4);
+        TS_ASSERT_DELTA(cell_population.GetNode(5)->rGetAppliedForce()[0], 0.5*linear_force.GetSpringStiffness(), 1e-4);
         TS_ASSERT_DELTA(cell_population.GetNode(5)->rGetAppliedForce()[1], 0.0, 1e-4);
     }
 
@@ -349,12 +349,12 @@ public:
             if (node_index == 0)
             {
                 // The first node only experiences a force from its neighbour to the right
-                TS_ASSERT_DELTA(cell_population.GetNode(node_index)->rGetAppliedForce()[0], linear_force.GetMeinekeSpringStiffness()*(scale_factor-1), 1e-6);
+                TS_ASSERT_DELTA(cell_population.GetNode(node_index)->rGetAppliedForce()[0], linear_force.GetSpringStiffness()*(scale_factor-1), 1e-6);
             }
             else if (node_index == cell_population.GetNumNodes()-1)
             {
                 // The last node only experiences a force from its neighbour to the left
-                TS_ASSERT_DELTA(cell_population.GetNode(node_index)->rGetAppliedForce()[0], -linear_force.GetMeinekeSpringStiffness()*(scale_factor-1), 1e-6);
+                TS_ASSERT_DELTA(cell_population.GetNode(node_index)->rGetAppliedForce()[0], -linear_force.GetSpringStiffness()*(scale_factor-1), 1e-6);
             }
             else
             {
@@ -376,10 +376,10 @@ public:
         mesh2.SetNode(2, shifted_point);
 
         c_vector<double,1> force_between_1_and_2 = linear_force2.CalculateForceBetweenNodes(1, 2, cell_population2);
-        TS_ASSERT_DELTA(force_between_1_and_2[0], linear_force.GetMeinekeSpringStiffness()*0.5, 1e-6);
+        TS_ASSERT_DELTA(force_between_1_and_2[0], linear_force.GetSpringStiffness()*0.5, 1e-6);
 
         c_vector<double,1> force_between_2_and_3 = linear_force2.CalculateForceBetweenNodes(2, 3, cell_population2);
-        TS_ASSERT_DELTA(force_between_2_and_3[0], -linear_force.GetMeinekeSpringStiffness()*0.5, 1e-6);
+        TS_ASSERT_DELTA(force_between_2_and_3[0], -linear_force.GetSpringStiffness()*0.5, 1e-6);
 
         for (unsigned i=0; i<cell_population2.GetNumNodes(); i++)
         {
@@ -388,7 +388,7 @@ public:
 
         linear_force2.AddForceContribution(cell_population2);
 
-        TS_ASSERT_DELTA(cell_population2.GetNode(2)->rGetAppliedForce()[0], -linear_force.GetMeinekeSpringStiffness(), 1e-6);
+        TS_ASSERT_DELTA(cell_population2.GetNode(2)->rGetAppliedForce()[0], -linear_force.GetSpringStiffness(), 1e-6);
     }
 
     void TestLinearSpringForceCalculationIn3d()
@@ -462,7 +462,7 @@ public:
         {
             for (unsigned k=0; k<3; k++)
             {
-                TS_ASSERT_DELTA(fabs(cell_population.GetNode(j)->rGetAppliedForce()[k]), linear_force.GetMeinekeSpringStiffness()*(scale_factor-1)*sqrt(2.0),1e-6);
+                TS_ASSERT_DELTA(fabs(cell_population.GetNode(j)->rGetAppliedForce()[k]), linear_force.GetSpringStiffness()*(scale_factor-1)*sqrt(2.0),1e-6);
             }
         }
 
@@ -488,7 +488,7 @@ public:
 
         for (unsigned i=0; i<3; i++)
         {
-            TS_ASSERT_DELTA(fabs(force2[i]),linear_force.GetMeinekeSpringStiffness()*(1 - sqrt(3.0)/(2*sqrt(2.0)))/sqrt(3.0),1e-6);
+            TS_ASSERT_DELTA(fabs(force2[i]),linear_force.GetSpringStiffness()*(1 - sqrt(3.0)/(2*sqrt(2.0)))/sqrt(3.0),1e-6);
         }
 
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
@@ -500,7 +500,7 @@ public:
 
         for (unsigned i=0; i<3; i++)
         {
-            TS_ASSERT_DELTA(cell_population2.GetNode(0)->rGetAppliedForce()[i],linear_force.GetMeinekeSpringStiffness()*(1 - sqrt(3.0)/(2*sqrt(2.0)))/sqrt(3.0),1e-6);
+            TS_ASSERT_DELTA(cell_population2.GetNode(0)->rGetAppliedForce()[i],linear_force.GetSpringStiffness()*(1 - sqrt(3.0)/(2*sqrt(2.0)))/sqrt(3.0),1e-6);
         }
     }
 
@@ -769,7 +769,7 @@ public:
         new_point.rGetLocation()[1] = old_point[1];
         p_mesh->SetNode(59, new_point, false);
 
-        double spring_stiffness = force.GetMeinekeSpringStiffness();
+        double spring_stiffness = force.GetSpringStiffness();
 
         // Test the case where node 59 and its neighbours are unlabelled
         for (unsigned i=0; i<cell_population.GetNumNodes(); i++)
@@ -1010,9 +1010,9 @@ public:
             boost::archive::text_oarchive output_arch(ofs);
 
             // Set member variables
-            force.SetMeinekeSpringStiffness(12.34);
-            force.SetMeinekeDivisionRestingSpringLength(0.856);
-            force.SetMeinekeSpringGrowthDuration(2.593);
+            force.SetSpringStiffness(12.34);
+            force.SetDivisionRestingSpringLength(0.856);
+            force.SetSpringGrowthDuration(2.593);
 
             // Serialize via pointer to most abstract class possible
             AbstractForce<2>* const p_force = &force;
@@ -1030,9 +1030,9 @@ public:
             input_arch >> p_force;
 
             // Test member variables
-            TS_ASSERT_DELTA((static_cast<LinearSpringForce<2>*>(p_force))->GetMeinekeSpringStiffness(), 12.34, 1e-6);
-            TS_ASSERT_DELTA((static_cast<LinearSpringForce<2>*>(p_force))->GetMeinekeDivisionRestingSpringLength(), 0.856, 1e-6);
-            TS_ASSERT_DELTA((static_cast<LinearSpringForce<2>*>(p_force))->GetMeinekeSpringGrowthDuration(), 2.593, 1e-6);
+            TS_ASSERT_DELTA((static_cast<LinearSpringForce<2>*>(p_force))->GetSpringStiffness(), 12.34, 1e-6);
+            TS_ASSERT_DELTA((static_cast<LinearSpringForce<2>*>(p_force))->GetDivisionRestingSpringLength(), 0.856, 1e-6);
+            TS_ASSERT_DELTA((static_cast<LinearSpringForce<2>*>(p_force))->GetSpringGrowthDuration(), 2.593, 1e-6);
 
             // Tidy up
             delete p_force;
@@ -1052,9 +1052,9 @@ public:
             boost::archive::text_oarchive output_arch(ofs);
 
             // Set member variables
-            force.SetMeinekeSpringStiffness(12.34);
-            force.SetMeinekeDivisionRestingSpringLength(0.856);
-            force.SetMeinekeSpringGrowthDuration(2.593);
+            force.SetSpringStiffness(12.34);
+            force.SetDivisionRestingSpringLength(0.856);
+            force.SetSpringGrowthDuration(2.593);
             force.SetHomotypicLabelledSpringConstantMultiplier(0.051);
             force.SetHeterotypicSpringConstantMultiplier(1.348);
 
@@ -1074,11 +1074,11 @@ public:
             input_arch >> p_force;
 
             // Test member variables
-            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionLinearSpringForce<2>*>(p_force))->GetMeinekeSpringStiffness(), 12.34, 1e-6);
-            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionLinearSpringForce<2>*>(p_force))->GetMeinekeDivisionRestingSpringLength(), 0.856, 1e-6);
-            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionLinearSpringForce<2>*>(p_force))->GetMeinekeSpringGrowthDuration(), 2.593, 1e-6);
-            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionLinearSpringForce<2>*>(p_force))->GetMeinekeDivisionRestingSpringLength(), 0.856, 1e-6);
-            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionLinearSpringForce<2>*>(p_force))->GetMeinekeSpringGrowthDuration(), 2.593, 1e-6);
+            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionLinearSpringForce<2>*>(p_force))->GetSpringStiffness(), 12.34, 1e-6);
+            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionLinearSpringForce<2>*>(p_force))->GetDivisionRestingSpringLength(), 0.856, 1e-6);
+            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionLinearSpringForce<2>*>(p_force))->GetSpringGrowthDuration(), 2.593, 1e-6);
+            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionLinearSpringForce<2>*>(p_force))->GetDivisionRestingSpringLength(), 0.856, 1e-6);
+            TS_ASSERT_DELTA((static_cast<DifferentialAdhesionLinearSpringForce<2>*>(p_force))->GetSpringGrowthDuration(), 2.593, 1e-6);
             TS_ASSERT_DELTA((static_cast<DifferentialAdhesionLinearSpringForce<2>*>(p_force))->GetHomotypicLabelledSpringConstantMultiplier(), 0.051, 1e-6);
             TS_ASSERT_DELTA((static_cast<DifferentialAdhesionLinearSpringForce<2>*>(p_force))->GetHeterotypicSpringConstantMultiplier(), 1.348, 1e-6);
 
@@ -1221,9 +1221,9 @@ public:
             unsigned zero_index = 0;
             unsigned one_index = PetscTools::GetNumProcs();
             unsigned two_index = 2*PetscTools::GetNumProcs();
-            TS_ASSERT_DELTA(cell_population.GetNode(zero_index)->rGetAppliedForce()[0], repulsion_force.GetMeinekeSpringStiffness() * (0.1 - 1.0), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(zero_index)->rGetAppliedForce()[0], repulsion_force.GetSpringStiffness() * (0.1 - 1.0), 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(zero_index)->rGetAppliedForce()[1], 0.0, 1e-4);
-            TS_ASSERT_DELTA(cell_population.GetNode(one_index)->rGetAppliedForce()[0], repulsion_force.GetMeinekeSpringStiffness() * (1.0 - 0.1), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(one_index)->rGetAppliedForce()[0], repulsion_force.GetSpringStiffness() * (1.0 - 0.1), 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(one_index)->rGetAppliedForce()[1], 0.0, 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[0], 0.0, 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[1], 0.0, 1e-4);
@@ -1244,11 +1244,11 @@ public:
             repulsion_force.AddForceContribution(cell_population);
 
             // All cells repel each other
-            TS_ASSERT_DELTA(cell_population.GetNode(zero_index)->rGetAppliedForce()[0], repulsion_force.GetMeinekeSpringStiffness() * ((0.1 - 20.0) + (3.0 - 20.0)), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(zero_index)->rGetAppliedForce()[0], repulsion_force.GetSpringStiffness() * ((0.1 - 20.0) + (3.0 - 20.0)), 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(zero_index)->rGetAppliedForce()[1], 0.0, 1e-4);
-            TS_ASSERT_DELTA(cell_population.GetNode(one_index)->rGetAppliedForce()[0], repulsion_force.GetMeinekeSpringStiffness() * ((20.0 - 0.1) + (2.9 - 20.0)), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(one_index)->rGetAppliedForce()[0], repulsion_force.GetSpringStiffness() * ((20.0 - 0.1) + (2.9 - 20.0)), 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(one_index)->rGetAppliedForce()[1], 0.0, 1e-4);
-            TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[0], repulsion_force.GetMeinekeSpringStiffness() * ((20.0 - 3.0) + (20.0 - 2.9)), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[0], repulsion_force.GetSpringStiffness() * ((20.0 - 3.0) + (20.0 - 2.9)), 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[1], 0.0, 1e-4);
 
             // Tests the calculation of the force with different cell radii
@@ -1270,9 +1270,9 @@ public:
              * First two cells repel each other and second 2 cells are too far apart.
              * The overlap is -0.3 and the spring stiffness is the default value 15.0.
              */
-            TS_ASSERT_DELTA(cell_population.GetNode(zero_index)->rGetAppliedForce()[0], repulsion_force.GetMeinekeSpringStiffness() * (0.1 - 0.4), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(zero_index)->rGetAppliedForce()[0], repulsion_force.GetSpringStiffness() * (0.1 - 0.4), 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(zero_index)->rGetAppliedForce()[1], 0.0, 1e-4);
-            TS_ASSERT_DELTA(cell_population.GetNode(one_index)->rGetAppliedForce()[0], repulsion_force.GetMeinekeSpringStiffness() * (0.4 - 0.1), 1e-4);
+            TS_ASSERT_DELTA(cell_population.GetNode(one_index)->rGetAppliedForce()[0], repulsion_force.GetSpringStiffness() * (0.4 - 0.1), 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(one_index)->rGetAppliedForce()[1], 0.0, 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[0], 0.0, 1e-4);
             TS_ASSERT_DELTA(cell_population.GetNode(two_index)->rGetAppliedForce()[1], 0.0, 1e-4);
@@ -1296,9 +1296,9 @@ public:
             boost::archive::text_oarchive output_arch(ofs);
 
             // No extra member variables, so set member variables on parent class
-            force.SetMeinekeSpringStiffness(12.35);
-            force.SetMeinekeDivisionRestingSpringLength(0.756);
-            force.SetMeinekeSpringGrowthDuration(2.693);
+            force.SetSpringStiffness(12.35);
+            force.SetDivisionRestingSpringLength(0.756);
+            force.SetSpringGrowthDuration(2.693);
 
             // Serialize via pointer to most abstract class possible
             AbstractForce<2>* const p_force = &force;
@@ -1316,9 +1316,9 @@ public:
             input_arch >> p_force;
 
             // No extra member variables, so test member variables on parent class
-            TS_ASSERT_DELTA((static_cast<LinearRepulsionForce<2>*>(p_force))->GetMeinekeSpringStiffness(), 12.35, 1e-6);
-            TS_ASSERT_DELTA((static_cast<LinearRepulsionForce<2>*>(p_force))->GetMeinekeDivisionRestingSpringLength(), 0.756, 1e-6);
-            TS_ASSERT_DELTA((static_cast<LinearRepulsionForce<2>*>(p_force))->GetMeinekeSpringGrowthDuration(), 2.693, 1e-6);
+            TS_ASSERT_DELTA((static_cast<LinearRepulsionForce<2>*>(p_force))->GetSpringStiffness(), 12.35, 1e-6);
+            TS_ASSERT_DELTA((static_cast<LinearRepulsionForce<2>*>(p_force))->GetDivisionRestingSpringLength(), 0.756, 1e-6);
+            TS_ASSERT_DELTA((static_cast<LinearRepulsionForce<2>*>(p_force))->GetSpringGrowthDuration(), 2.693, 1e-6);
 
             // Tidy up
             delete p_force;

@@ -122,7 +122,7 @@ public:
         simulator.AddCellKiller(p_killer);
 
         // UNUSUAL SET UP HERE /////////////////////////////////////
-        p_linear_force->SetMeinekeSpringStiffness(30.0); //normally 15.0;
+        p_linear_force->SetSpringStiffness(30.0); //normally 15.0;
         // 0.3/30 = 0.01 (i.e. Meineke's values)
 
         simulator.UseJiggledBottomCells();

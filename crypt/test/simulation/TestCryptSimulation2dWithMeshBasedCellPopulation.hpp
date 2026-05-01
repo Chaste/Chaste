@@ -1267,7 +1267,7 @@ public:
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(LinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetMeinekeDivisionRestingSpringLength(0.9); // coverage
+        p_linear_force->SetDivisionRestingSpringLength(0.9); // coverage
         simulator.AddForce(p_linear_force);
 
         MeshBasedCellPopulation<2>* p_cast_population = static_cast<MeshBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation()));
@@ -1910,7 +1910,7 @@ public:
 
         // Create a force law and pass it to the simulation
         MAKE_PTR(LinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetMeinekeSpringStiffness(30.0); //normally 15.0;
+        p_linear_force->SetSpringStiffness(30.0); //normally 15.0;
         simulator.AddForce(p_linear_force);
 
         // Create cell killer and pass in to crypt simulation
