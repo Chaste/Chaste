@@ -56,7 +56,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HoneycombMeshGenerator.hpp"
 #include "LinearSpringForce.hpp"
 #include "NodeBasedCellPopulation.hpp"
-#include "LogarithmicRepulsionForce.hpp"
+#include "SimpleLogarithmicRepulsionForce.hpp"
 #include "CellLabel.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "HoneycombVertexMeshGenerator.hpp"
@@ -183,7 +183,7 @@ public:
         simulator.SetSamplingTimestepMultiple(120);
         simulator.SetEndTime(M_TIME_FOR_SIMULATION);
 
-        MAKE_PTR(LogarithmicRepulsionForce<2>, p_force);
+        MAKE_PTR(SimpleLogarithmicRepulsionForce<2>, p_force);
         simulator.AddForce(p_force);
 
         // Create a PDE modifier and pass it to the simulation Add this first so in place for SimpleTargetArea one (calls cell pop update)

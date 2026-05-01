@@ -84,7 +84,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "PottsBasedCellPopulation.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "RandomCellKiller.hpp"
-#include "LogarithmicRepulsionForce.hpp"
+#include "SimpleLogarithmicRepulsionForce.hpp"
 #include "UniformG1GenerationalCellCycleModel.hpp"
 #include "SurfaceAreaConstraintPottsUpdateRule.hpp"
 #include "TysonNovakCellCycleModel.hpp"
@@ -221,7 +221,7 @@ public:
 
         /* We use a different `Force` which is suitable for node based simulations.
          */
-        MAKE_PTR(LogarithmicRepulsionForce<2>, p_force); //**Changed**//
+        MAKE_PTR(SimpleLogarithmicRepulsionForce<2>, p_force); //**Changed**//
         simulator.AddForce(p_force);
 
         /* In all types of simulation you may specify how cells are removed from the simulation by specifying

@@ -722,9 +722,9 @@ modules:
         source_includes:
           - PybindUblasTypeCaster.hpp
 
-      - name: LogarithmicRepulsionForce
-
-      - name: LinearRepulsionForce
+      - name: SimpleLogarithmicRepulsionForce
+        source_includes:
+          - PybindUblasTypeCaster.hpp
 
       - name: ImmersedBoundaryKinematicFeedbackForce
       - name: ImmersedBoundaryLinearDifferentialAdhesionForce

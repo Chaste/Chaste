@@ -208,12 +208,12 @@ from chaste._pychaste_all import (
     PathmanathanTwoBodyInteractionForce_1_3,
     PathmanathanTwoBodyInteractionForce_2_3,
     PathmanathanTwoBodyInteractionForce_3_3,
-    LogarithmicRepulsionForce_1,
-    LogarithmicRepulsionForce_2,
-    LogarithmicRepulsionForce_3,
-    LinearRepulsionForce_1,
-    LinearRepulsionForce_2,
-    LinearRepulsionForce_3,
+    SimpleLogarithmicRepulsionForce_1_1,
+    SimpleLogarithmicRepulsionForce_1_2,
+    SimpleLogarithmicRepulsionForce_2_2,
+    SimpleLogarithmicRepulsionForce_1_3,
+    SimpleLogarithmicRepulsionForce_2_3,
+    SimpleLogarithmicRepulsionForce_3_3,
     Goldbeter1991SrnModel,
     HeterotypicBoundaryLengthWriter_2_2,
     HeterotypicBoundaryLengthWriter_3_3,
@@ -900,19 +900,17 @@ PathmanathanTwoBodyInteractionForce = TemplateClassDict(
     }
 )
 
-LogarithmicRepulsionForce = TemplateClassDict(
+SimpleLogarithmicRepulsionForce = TemplateClassDict(
     {
-        ("1",): LogarithmicRepulsionForce_1,
-        ("2",): LogarithmicRepulsionForce_2,
-        ("3",): LogarithmicRepulsionForce_3,
-    }
-)
-
-LinearRepulsionForce = TemplateClassDict(
-    {
-        ("1",): LinearRepulsionForce_1,
-        ("2",): LinearRepulsionForce_2,
-        ("3",): LinearRepulsionForce_3,
+        ("1",): SimpleLogarithmicRepulsionForce_1_1,
+        ("1", "1"): SimpleLogarithmicRepulsionForce_1_1,
+        ("1", "2"): SimpleLogarithmicRepulsionForce_1_2,
+        ("2",): SimpleLogarithmicRepulsionForce_2_2,
+        ("2", "2"): SimpleLogarithmicRepulsionForce_2_2,
+        ("1", "3"): SimpleLogarithmicRepulsionForce_1_3,
+        ("2", "3"): SimpleLogarithmicRepulsionForce_2_3,
+        ("3",): SimpleLogarithmicRepulsionForce_3_3,
+        ("3", "3"): SimpleLogarithmicRepulsionForce_3_3,
     }
 )
 

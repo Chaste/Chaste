@@ -33,26 +33,23 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef LOGARITHMICREPULSIONFORCE_HPP_
-#define LOGARITHMICREPULSIONFORCE_HPP_
+#ifndef SIMPLELOGARITHMICREPULSIONFORCE_HPP_
+#define SIMPLELOGARITHMICREPULSIONFORCE_HPP_
 
-#include "PathmanathanTwoBodyInteractionForce.hpp"
+#include "AbstractTwoBodyInteractionForce.hpp"
 #include "NodeBasedCellPopulation.hpp"
 
-#include "ChasteSerialization.hpp"
-#include <boost/serialization/base_object.hpp>
-
 /**
- * A class for a simple logarithmic repulsion force law.
- * Designed for use in node-based simulations.
+ * A class for a simple two-body repulsion force law. Designed
+ * for use in node-based simulations.
  *
- * This force applies a logarithmic repulsive force between pairs of cells that
- * overlap (i.e. whose separation is less than the sum of their radii). No
- * attractive force is applied. The repulsive force law is the logarithmic model
- * from Pathmanathan et al (2009) (doi:10.1088/1478-3975/6/3/036001).
+ * A linear repulsive force is applied between cells that overlap
+ * (i.e. whose separation is less than the sum of their radii).
+ * No attractive force is applied, and no cell-age or cell-cycle
+ * effects are included.
  */
-template<unsigned DIM>
-class LogarithmicRepulsionForce : public PathmanathanTwoBodyInteractionForce<DIM>
+template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
+class SimpleLogarithmicRepulsionForce : public AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>
 {
 private :
 
@@ -67,45 +64,50 @@ private :
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<PathmanathanTwoBodyInteractionForce<DIM> >(*this);
+        archive & boost::serialization::base_object<AbstractTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM> >(*this);
+        archive & mSpringStiffness;
     }
+
+protected:
+
+    /** Spring stiffness. Defaults to 15.0. */
+    double mSpringStiffness;
 
 public :
 
     /**
      * Constructor.
      */
-    LogarithmicRepulsionForce();
+    SimpleLogarithmicRepulsionForce();
+
+    /**
+     * @return mSpringStiffness
+     */
+    double GetSpringStiffness();
+
+    /**
+     * Set mSpringStiffness.
+     *
+     * @param springStiffness the new value of mSpringStiffness
+     */
+    void SetSpringStiffness(double springStiffness);
 
     /**
      * Overridden CalculateForceBetweenNodes() method.
      *
-     * Uses the logarithmic repulsion model from Pathmanathan et al (2009)
-     * (doi:10.1088/1478-3975/6/3/036001).
+     * Returns a linear repulsive force when nodes overlap, and zero otherwise.
      *
      * @param nodeAGlobalIndex index of one neighbouring node
      * @param nodeBGlobalIndex index of the other neighbouring node
      * @param rCellPopulation the cell population
      * @return The force exerted on Node A by Node B.
      */
-    c_vector<double, DIM> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
-                                                     unsigned nodeBGlobalIndex,
-                                                     AbstractCellPopulation<DIM>& rCellPopulation);
+    c_vector<double, SPACE_DIM> CalculateForceBetweenNodes(unsigned nodeAGlobalIndex,
+                                                           unsigned nodeBGlobalIndex,
+                                                           AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation);
 
     /**
-     * Overridden AddForceContribution() method.
-     *
-     * Only applies the repulsive force between pairs of cells that overlap.
-     *
-     * @param rCellPopulation reference to the CellPopulation
-     */
-    void AddForceContribution(AbstractCellPopulation<DIM>& rCellPopulation);
-
-    /**
-     * Outputs force Parameters to file
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
+     * Overridden OutputForceParameters() method.
      *
      * @param rParamsFile the file stream to which the parameters are output
      */
@@ -113,6 +115,6 @@ public :
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_SAME_DIMS(LogarithmicRepulsionForce)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(SimpleLogarithmicRepulsionForce)
 
-#endif /*LOGARITHMICREPULSIONFORCE_HPP_*/
+#endif /*SIMPLELOGARITHMICREPULSIONFORCE_HPP_*/
