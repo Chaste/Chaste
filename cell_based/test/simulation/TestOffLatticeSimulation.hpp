@@ -396,7 +396,7 @@ public:
         // Check that the number of nodes is equal to the number of cells
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
 
-        //Check that the correct number of cells are killed all cells on left ot bottom of 3x5 block
+        // Check that the correct number of cells are killed all cells on left or bottom of 3x5 block
         unsigned num_deaths = 7u; 
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), num_deaths);
 
