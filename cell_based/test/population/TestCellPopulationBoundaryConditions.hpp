@@ -346,6 +346,10 @@ public:
         // Test VerifyBoundaryCondition() method
         TS_ASSERT_EQUALS(boundary_condition.VerifyBoundaryCondition(), true);
 
+        // Test that jiggling nodes throws an exception in 1D
+        TS_ASSERT_THROWS_THIS(boundary_condition.SetUseJiggledNodesOnPlane(true),
+            "Jiggling of nodes is not supported in 1D.");
+
         for (unsigned i=0; i<nodes.size(); i++)
         {
             delete nodes[i];
@@ -437,33 +441,6 @@ public:
 
         TS_ASSERT_THROWS_THIS(PlaneBoundaryCondition<2> plane_boundary_condition(&potts_cell_population, point, normal),
             "PlaneBoundaryCondition requires a subclass of AbstractOffLatticeCellPopulation.");
-
-        // Test that jiggling nodes throws an exception in 1D
-        std::vector<Node<1>*> nodes_1d;
-        nodes_1d.push_back(new Node<1>(0, false, 0.5));
-        nodes_1d.push_back(new Node<1>(1, false, 1.5));
-
-        NodesOnlyMesh<1> mesh_1d;
-        mesh_1d.ConstructNodesWithoutMesh(nodes_1d, 1.5);
-
-        std::vector<CellPtr> cells_1d;
-        CellsGenerator<FixedG1GenerationalCellCycleModel, 1> cells_generator_1d;
-        cells_generator_1d.GenerateBasic(cells_1d, mesh_1d.GetNumNodes());
-
-        NodeBasedCellPopulation<1> cell_population_1d(mesh_1d, cells_1d);
-
-        c_vector<double,1> point_1d = zero_vector<double>(1);
-        c_vector<double,1> normal_1d = zero_vector<double>(1);
-        normal_1d(0) = -1.0;
-        PlaneBoundaryCondition<1> bc_1d_jiggle(&cell_population_1d, point_1d, normal_1d);
-
-        TS_ASSERT_THROWS_THIS(bc_1d_jiggle.SetUseJiggledNodesOnPlane(true),
-            "Jiggling of nodes is not supported in 1D.");
-
-        for (unsigned i=0; i<nodes_1d.size(); i++)
-        {
-            delete nodes_1d[i];
-        }
     }
 
     void TestSphereGeometryBoundaryCondition()
