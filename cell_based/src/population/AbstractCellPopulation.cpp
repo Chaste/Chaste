@@ -352,7 +352,7 @@ template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 bool AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::IsCellAttachedToLocationIndex(unsigned index)
 {
     // Get the set of pointers to cells corresponding to this location index
-    std::set<CellPtr> cells = mLocationCellMap[index];
+    std::set<CellPtr>& cells = mLocationCellMap[index];
 
     // Return whether there is a cell attached to the location index
     return !(cells.empty());
