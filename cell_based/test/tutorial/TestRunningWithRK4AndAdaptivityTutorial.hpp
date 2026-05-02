@@ -79,7 +79,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * The control loop inside `OffLatticeSimulation::UpdateCellLocationsAndTopology()` then
  *
  *  1. reverts all node positions to their state at the start of the sub-step, and
- *  2. retries the step with the suggested smaller sub-step size.
+ *  2. retries the step with the suggested smaller sub-step size which is a power of 2 smaller.
+ *     i.e. the timestep is halved until the movement threshold met.
  *
  * Each macro time step `dt` may therefore be completed in several sub-steps that sum to
  * `dt`. If more than `mMaxAdaptiveTimeSteps` consecutive sub-steps fail, the simulation
@@ -88,6 +89,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Adaptive time-stepping is enabled by calling
  *
  *   p_numerical_method->SetUseAdaptiveTimestep(true);
+ * 
+ * The maximum movement threshold for a single sub-step can be set with
+ * 
+ *   population.SetAbsoluteMovementThreshold(maxMovement);
  *
  * The maximum number of consecutive failed sub-steps can be set with
  *
@@ -207,14 +212,10 @@ public:
      *         apply boundary conditions
      *         time_advanced += sub_step
      *
-     *     catch StepSizeException e:
-     *         adaptive_timer = 0                 // counter for this exception scope
-     *         if adaptive_timer < max_adaptive_steps:
-     *             revert nodes to saved positions
-     *             sub_step = e.GetSuggestedNewStep()
-     *             adaptive_timer += 1
-     *         else:
-     *             throw                          // too many failures, abort
+     *     catch StepSizeException e (i.e. node movement too large):
+     *         revert nodes to saved positions
+     *         sub_step = e.GetSuggestedNewStep()
+     * 
      * ```
      *
      * The `StepSizeException` is raised inside the numerical method whenever
@@ -246,7 +247,7 @@ public:
         simulator.SetOutputDirectory("NodeBasedRK4Adaptive");
         simulator.SetSamplingTimestepMultiple(10);
         simulator.SetEndTime(2.0);
-        simulator.SetDt(0.1);
+        simulator.SetDt(0.1); // This is the macro time step that the simulation will try to take at each iteration.  The adaptive loop will reduce this as needed.
 
         /* Create an RK4 numerical method and **enable adaptive time-stepping**.
          *
@@ -258,6 +259,9 @@ public:
             = boost::make_shared<RK4NumericalMethod<2> >();
         p_numerical_method->SetUseAdaptiveTimestep(true);
         simulator.SetNumericalMethod(p_numerical_method);
+
+        /* Set a small movement threshold to trigger adaptivity.  Here we allow a maximum movement of 0.001 cell diameters per sub-step. */
+        simulator.SetAdaptiveTimestepMovementThreshold(0.001);
 
         /* Optionally increase the maximum number of consecutive failed sub-steps
          * from the default of 5.  Here we allow up to 10 retries so that the
@@ -280,7 +284,8 @@ public:
 };
 
 /*
- * To visualize the results, use Paraview. See the [Visualizing With Paraview](../visualizingwithparaview/) tutorial for more information.
+ * To visualize the results, use Paraview. See the [Visualizing With Paraview](../visualizingwithparaview/) tutorial for more information. 
+ * Note data is only output at the end of each macro time step, so the adaptive sub-steps are not visible in the output files. 
  *
  * Load the file `$CHASTE_TEST_OUTPUT/NodeBasedRK4/results_from_time_0/results.pvd`
  * and add glyphs to represent cells.
