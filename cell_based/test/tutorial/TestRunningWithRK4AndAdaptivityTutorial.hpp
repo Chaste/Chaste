@@ -199,7 +199,6 @@ public:
      * ```
      * time_advanced = 0
      * sub_step = dt              // start with the full macro step
-     * adaptive_timer = 0         // counts consecutive failures
      *
      * while (time_advanced < dt):
      *
@@ -207,9 +206,9 @@ public:
      *         move nodes by sub_step             // may throw StepSizeException
      *         apply boundary conditions
      *         time_advanced += sub_step
-     *         adaptive_timer = 0                 // reset counter after success
      *
      *     catch StepSizeException e:
+     *         adaptive_timer = 0                 // counter for this exception scope
      *         if adaptive_timer < max_adaptive_steps:
      *             revert nodes to saved positions
      *             sub_step = e.GetSuggestedNewStep()

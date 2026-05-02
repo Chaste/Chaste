@@ -52,18 +52,18 @@ void RK4NumericalMethod<ELEMENT_DIM,SPACE_DIM>::UpdateAllNodePositions(double dt
     if (!this->mUseUpdateNodeLocation)
     {
         // Store initial node locations
-        std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > old_node_locations = this->SaveCurrentNodeLocations();
+        auto old_node_locations = this->SaveCurrentNodeLocations();
 
         // Apply boundary conditions to the initial positions, then resave
         this->ImposeBoundaryConditions(old_node_locations);
         old_node_locations = this->SaveCurrentNodeLocations();
 
         // Compute k1 = F(r^t) / nu
-        std::vector<c_vector<double, SPACE_DIM> > k1 = this->ComputeForcesIncludingDamping();
+        auto k1 = this->ComputeForcesIncludingDamping();
 
         // Update to r^t + dt*k1/2 and compute k2
         unsigned index = 0;
-        for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
+        for (auto node_iter = this->mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
              node_iter != this->mpCellPopulation->rGetMesh().GetNodeIteratorEnd();
              ++node_iter, ++index)
         {
@@ -73,11 +73,11 @@ void RK4NumericalMethod<ELEMENT_DIM,SPACE_DIM>::UpdateAllNodePositions(double dt
         this->ImposeBoundaryConditions(old_node_locations);
 
         // Compute k2 = F(r^t + dt*k1/2) / nu
-        std::vector<c_vector<double, SPACE_DIM> > k2 = this->ComputeForcesIncludingDamping();
+        auto k2 = this->ComputeForcesIncludingDamping();
 
         // Update to r^t + dt*k2/2 (from old locations) and compute k3
         index = 0;
-        for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
+        for (auto node_iter = this->mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
              node_iter != this->mpCellPopulation->rGetMesh().GetNodeIteratorEnd();
              ++node_iter, ++index)
         {
@@ -88,11 +88,11 @@ void RK4NumericalMethod<ELEMENT_DIM,SPACE_DIM>::UpdateAllNodePositions(double dt
         this->ImposeBoundaryConditions(old_node_locations);
 
         // Compute k3 = F(r^t + dt*k2/2) / nu
-        std::vector<c_vector<double, SPACE_DIM> > k3 = this->ComputeForcesIncludingDamping();
+        auto k3 = this->ComputeForcesIncludingDamping();
 
         // Update to r^t + dt*k3 (from old locations) and compute k4
         index = 0;
-        for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
+        for (auto node_iter = this->mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
              node_iter != this->mpCellPopulation->rGetMesh().GetNodeIteratorEnd();
              ++node_iter, ++index)
         {
@@ -103,11 +103,11 @@ void RK4NumericalMethod<ELEMENT_DIM,SPACE_DIM>::UpdateAllNodePositions(double dt
         this->ImposeBoundaryConditions(old_node_locations);
 
         // Compute k4 = F(r^t + dt*k3) / nu
-        std::vector<c_vector<double, SPACE_DIM> > k4 = this->ComputeForcesIncludingDamping();
+        auto k4 = this->ComputeForcesIncludingDamping();
 
         // Final RK4 position update: r^(t+1) = r^t + (dt/6)*(k1 + 2*k2 + 2*k3 + k4)
         index = 0;
-        for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
+        for (auto node_iter = this->mpCellPopulation->rGetMesh().GetNodeIteratorBegin();
              node_iter != this->mpCellPopulation->rGetMesh().GetNodeIteratorEnd();
              ++node_iter, ++index)
         {

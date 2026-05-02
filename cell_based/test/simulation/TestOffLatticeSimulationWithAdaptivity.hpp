@@ -225,10 +225,6 @@ public:
 
             fe_errors[k]  = MaxPositionError(fe_pos, ref);
             rk4_errors[k] = MaxPositionError(rk4_pos, ref);
-
-            // std::cout << "dt=2^-" << (k + 4)
-            //           << " FE error=" << fe_errors[k]
-            //           << " RK4 error=" << rk4_errors[k] << std::endl;
         }
 
         // Data from a run with no adaptivity:

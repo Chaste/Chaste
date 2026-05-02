@@ -121,7 +121,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
         // Store the initial node positions (these may be needed when applying boundary conditions)
         std::map<Node<SPACE_DIM>*, c_vector<double, SPACE_DIM> > old_node_locations;
 
-        for (typename AbstractMesh<ELEMENT_DIM, SPACE_DIM>::NodeIterator node_iter = this->mrCellPopulation.rGetMesh().GetNodeIteratorBegin();
+        for (auto node_iter = this->mrCellPopulation.rGetMesh().GetNodeIteratorBegin();
              node_iter != this->mrCellPopulation.rGetMesh().GetNodeIteratorEnd();
              ++node_iter)
         {

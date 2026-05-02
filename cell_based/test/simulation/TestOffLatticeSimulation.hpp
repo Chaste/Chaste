@@ -343,13 +343,13 @@ public:
 
 
     /**
-     * Test a cell-based simulation with multiple cell killers. Cellc placed copressed between two plane killers and are removed.
+     * Test a cell-based simulation with multiple cell killers.
      */
     void TestOffLatticeSimulationWithMultipleCellKillers()
     {
         EXIT_IF_PARALLEL;    // HoneycombMeshGenerator does not work in parallel
 
-        // Create a simple 2D MeshBasedCellPopulation abd translate it so some cells are killed by the plane killers
+        // Create a simple 2D MeshBasedCellPopulation and translate it so some cells are killed by the plane killers.
         int num_cells_depth = 5;
         int num_cells_width = 5;
         HoneycombMeshGenerator generator(num_cells_width, num_cells_depth, 0);
@@ -396,8 +396,8 @@ public:
         // Check that the number of nodes is equal to the number of cells
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
 
-        //Check that the correct number of cells are killed all cels on left ot bottom of 3x5 block
-        unsigned num_deaths = 7u;
+        // Check that the correct number of cells are killed all cells on left or bottom of 3x5 block
+        unsigned num_deaths = 7u; 
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), num_deaths);
 
         // Now remove the killers and check no more cells are killed
