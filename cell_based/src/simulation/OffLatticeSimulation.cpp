@@ -136,7 +136,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
 
             // Successful time step! Update time_advanced_so_far
             time_advanced_so_far += present_time_step;
-            
+
             // If using adaptive timestep, then increase the present_time_step (by 1% for now)
             // if (mpNumericalMethod->HasAdaptiveTimestep())
             // {

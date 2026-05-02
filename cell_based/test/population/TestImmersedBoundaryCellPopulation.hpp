@@ -252,7 +252,7 @@ public:
         displacement[0] = 0.8;
         displacement[1] = 0.8;
 
-        // Test Warnings 
+        // Test Warnings
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
         TS_ASSERT_THROWS_NOTHING(cell_population.CheckForStepSizeException(0, displacement, 0.1));
         TS_ASSERT_DELTA(norm_2(displacement), 0.5 * p_mesh->GetCellRearrangementThreshold(), 1e-12);

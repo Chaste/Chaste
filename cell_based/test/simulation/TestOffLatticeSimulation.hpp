@@ -363,10 +363,10 @@ public:
 
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells);
 
-        
+
         cell_population.SetWriteVtkAsPoints(true);
 
-    
+
 
         // Set up cell-based simulation
         OffLatticeSimulation<2> simulator(cell_population);
@@ -397,7 +397,7 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
 
         //Check that the correct number of cells are killed all cels on left ot bottom of 3x5 block
-        unsigned num_deaths = 7u; 
+        unsigned num_deaths = 7u;
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), num_deaths);
 
         // Now remove the killers and check no more cells are killed

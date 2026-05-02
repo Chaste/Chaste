@@ -582,13 +582,13 @@ void ImmersedBoundaryCellPopulation<DIM>::CheckForStepSizeException(
 {
     double length = boost::numeric::ublas::norm_2(rDisplacement);
 
-    /* There are two reasons ot adjust movement in a imersed boundary model 
+    /* There are two reasons ot adjust movement in a imersed boundary model
      * - either the movement is large enough to cause a rearangement.
-     * or the movement is too large (i.e larger than AbsoluteMovementThreshold), 
-     * 
+     * or the movement is too large (i.e larger than AbsoluteMovementThreshold),
+     *
      * In the first case we want to restrict movement but not throw an exception just a warning.
-     * in the second case we want to throw an exception which can be used by the adaptivie timestepper, 
-     * This is handled in the parent class AbstractCentreBasedCellPopulation, which checks for movement above the AbsoluteMovementThreshold and throws an exception. In this class we check for movement above half the CellRearrangementThreshold and restrict movement if this is the case, but only throw an exception if movement is above the AbsoluteMovementThreshold. 
+     * in the second case we want to throw an exception which can be used by the adaptivie timestepper,
+     * This is handled in the parent class AbstractCentreBasedCellPopulation, which checks for movement above the AbsoluteMovementThreshold and throws an exception. In this class we check for movement above half the CellRearrangementThreshold and restrict movement if this is the case, but only throw an exception if movement is above the AbsoluteMovementThreshold.
      */
 
 

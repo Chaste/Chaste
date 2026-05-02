@@ -273,7 +273,7 @@ public:
         {
             TS_ASSERT_LESS_THAN(1.5*fe_errors[k], fe_errors[k - 1]);
         }
-        
+
         // Each halving of dt should reduce the RK4 error by ~16× (fourth order).
         // In practice numerical noise limits this so we are using 10.
         for (unsigned k = 1; k < n_levels; ++k)

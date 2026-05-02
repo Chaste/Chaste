@@ -303,26 +303,26 @@ void VertexBasedCellPopulation<DIM>::CheckForStepSizeException(unsigned nodeInde
 {
     double length = norm_2(rDisplacement);
 
-    /* There are two reasons ot adjust movement in a vertex model 
+    /* There are two reasons ot adjust movement in a vertex model
      * - either the movement the movement is large enough to cause a T2 swap.
-     * or the movement is too large (i.e larger than AbsoluteMovementThreshold), 
+     * or the movement is too large (i.e larger than AbsoluteMovementThreshold),
      * o
      * In the first case we want to restrict movement but not throw an exception just a warning.
-     * in the second case we want to throw an exception which can be used by the adaptivie timestepper, 
-     * This is handled in the parent class AbstractCentreBasedCellPopulation, which checks for movement above the AbsoluteMovementThreshold and throws an exception. In this class we check for movement above half the CellRearrangementThreshold and restrict movement if this is the case, but only throw an exception if movement is above the AbsoluteMovementThreshold. 
+     * in the second case we want to throw an exception which can be used by the adaptivie timestepper,
+     * This is handled in the parent class AbstractCentreBasedCellPopulation, which checks for movement above the AbsoluteMovementThreshold and throws an exception. In this class we check for movement above half the CellRearrangementThreshold and restrict movement if this is the case, but only throw an exception if movement is above the AbsoluteMovementThreshold.
      */
-    
+
     if(mRestrictVertexMovement)
     {
         if (length > 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold())
         {
-            // restrict the movement  
+            // restrict the movement
             rDisplacement *= 0.5*mpMutableVertexMesh->GetCellRearrangementThreshold()/length;
 
             WARN_ONCE_ONLY("Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
         }
     }
-    
+
     // Check for movement above the AbsoluteMovementThreshold and throw an exception if this is the case
     // Call method on parent class
     AbstractOffLatticeCellPopulation<DIM, DIM>::CheckForStepSizeException(nodeIndex, rDisplacement, dt);
