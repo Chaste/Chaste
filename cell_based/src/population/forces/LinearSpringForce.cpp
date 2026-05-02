@@ -58,9 +58,9 @@ c_vector<double, SPACE_DIM> LinearSpringForce<ELEMENT_DIM,SPACE_DIM>::CalculateL
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
 void LinearSpringForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<MeinekeSpringStiffness>" << this->mSpringStiffness << "</MeinekeSpringStiffness>\n";
-    *rParamsFile << "\t\t\t<MeinekeDivisionRestingSpringLength>" << this->mDivisionRestingSpringLength << "</MeinekeDivisionRestingSpringLength>\n";
-    *rParamsFile << "\t\t\t<MeinekeSpringGrowthDuration>" << this->mSpringGrowthDuration << "</MeinekeSpringGrowthDuration>\n";
+    *rParamsFile << "\t\t\t<SpringStiffness>" << this->mSpringStiffness << "</SpringStiffness>\n";
+    *rParamsFile << "\t\t\t<DivisionRestingSpringLength>" << this->mDivisionRestingSpringLength << "</DivisionRestingSpringLength>\n";
+    *rParamsFile << "\t\t\t<SpringGrowthDuration>" << this->mSpringGrowthDuration << "</SpringGrowthDuration>\n";
 
     // Call method on direct parent class
     AbstractVariableSizeTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParameters(rParamsFile);
