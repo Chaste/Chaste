@@ -209,7 +209,7 @@ c_vector<double, SPACE_DIM> AbstractVariableSizeTwoBodyInteractionForce<ELEMENT_
                                                                               rCellPopulation,
                                                                               is_closer_than_rest_length);
 
-    // TODO issue 1017 This should be rest_length not rest_length_final, keeping it the same for now to maintain backwards compatibility with existing force laws, but we should eventually change it and update the force laws accordingly. 
+    // TODO issue 1017 This should be rest_length not rest_length_final, keeping it the same for now to maintain backwards compatibility with existing force laws, but we should eventually change it and update the force laws accordingly.
     return CalculateLinkInteraction(overlap, rest_length_final, unit_difference, multiplication_factor);
 }
 
