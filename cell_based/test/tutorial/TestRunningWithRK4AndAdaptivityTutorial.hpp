@@ -261,7 +261,7 @@ public:
         simulator.SetNumericalMethod(p_numerical_method);
 
         /* Set a small movement threshold to trigger adaptivity.  Here we allow a maximum movement of 0.001 cell diameters per sub-step. */
-        simulator.SetAdaptiveTimestepMovementThreshold(0.001);
+        cell_population.SetAbsoluteMovementThreshold(0.001);
 
         /* Optionally increase the maximum number of consecutive failed sub-steps
          * from the default of 5.  Here we allow up to 10 retries so that the
