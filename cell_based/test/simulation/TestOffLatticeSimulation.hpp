@@ -397,7 +397,7 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
 
         // Check that the correct number of cells are killed all cells on left or bottom of 3x5 block
-        unsigned num_deaths = 7u; 
+        unsigned num_deaths = 7u;
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), num_deaths);
 
         // Now remove the killers and check no more cells are killed
