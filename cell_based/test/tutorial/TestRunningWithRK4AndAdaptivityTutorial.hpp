@@ -89,9 +89,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Adaptive time-stepping is enabled by calling
  *
  *   p_numerical_method->SetUseAdaptiveTimestep(true);
- * 
+ *
  * The maximum movement threshold for a single sub-step can be set with
- * 
+ *
  *   population.SetAbsoluteMovementThreshold(maxMovement);
  *
  * The maximum number of consecutive failed sub-steps can be set with
@@ -215,7 +215,7 @@ public:
      *     catch StepSizeException e (i.e. node movement too large):
      *         revert nodes to saved positions
      *         sub_step = e.GetSuggestedNewStep()
-     * 
+     *
      * ```
      *
      * The `StepSizeException` is raised inside the numerical method whenever
@@ -284,8 +284,8 @@ public:
 };
 
 /*
- * To visualize the results, use Paraview. See the [Visualizing With Paraview](../visualizingwithparaview/) tutorial for more information. 
- * Note data is only output at the end of each macro time step, so the adaptive sub-steps are not visible in the output files. 
+ * To visualize the results, use Paraview. See the [Visualizing With Paraview](../visualizingwithparaview/) tutorial for more information.
+ * Note data is only output at the end of each macro time step, so the adaptive sub-steps are not visible in the output files.
  *
  * Load the file `$CHASTE_TEST_OUTPUT/NodeBasedRK4/results_from_time_0/results.pvd`
  * and add glyphs to represent cells.
