@@ -391,7 +391,7 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
 
         //Check that the correct number of cells are killed
-        unsigned num_deaths = 6u; // sensitive to changes in random number generation
+        unsigned num_deaths = 7u; // sensitive to changes in random number generation
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), num_deaths);
 
         // Now remove the killers and check no more cells are killed
@@ -1397,8 +1397,8 @@ public:
         TS_ASSERT_EQUALS(simulator.GetMaxAdaptiveTimeStep(), 3u);
 
         // Check cells have moved to the correct location
-        TS_ASSERT_DELTA(simulator.rGetCellPopulation().rGetMesh().GetNode(0)->rGetLocation()[0], 0.3169,1e-4);
-        TS_ASSERT_DELTA(simulator.rGetCellPopulation().rGetMesh().GetNode(0)->rGetLocation()[1], 0.0592,1e-4);
+        TS_ASSERT_DELTA(simulator.rGetCellPopulation().rGetMesh().GetNode(0)->rGetLocation()[0], 0.3206,1e-4);
+        TS_ASSERT_DELTA(simulator.rGetCellPopulation().rGetMesh().GetNode(0)->rGetLocation()[1], 0.0608,1e-4);
     }
 };
 

@@ -49,6 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodeBasedCellPopulation.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
 #include "LinearSpringForce.hpp"
+#include "PathmanathanInteractionForce.hpp"
 #include "NagaiHondaForce.hpp"
 #include "VertexBasedCellPopulation.hpp"
 #include "OffLatticeSimulation.hpp"
@@ -342,9 +343,9 @@ public:
         simulator.AddSimulationModifier(p_modifier);
 
         // Define the radius of interaction as we're dealing with a node-based simulation
-        MAKE_PTR(LinearSpringForce<2>, p_linear_force);
-        p_linear_force->SetCutOffLength(0.75);
-        simulator.AddForce(p_linear_force);
+        MAKE_PTR(PathmanathanInteractionForce<2>, p_force);
+        p_force->SetCutOffLength(0.75);
+        simulator.AddForce(p_force);
 
         simulator.Solve();
 
