@@ -42,7 +42,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "LinearSpringForce.hpp"
 #include "DifferentialAdhesionLinearSpringForce.hpp"
-#include "PathmanathanTwoBodyInteractionForce.hpp"
+#include "PathmanathanInteractionForce.hpp"
 #include "CellsGenerator.hpp"
 #include "FixedG1GenerationalCellCycleModel.hpp"
 #include "MeshBasedCellPopulationWithGhostNodes.hpp"
@@ -526,7 +526,7 @@ public:
         MeshBasedCellPopulation<2> cell_population(*p_mesh, cells, location_indices);
 
         // Create force
-        PathmanathanTwoBodyInteractionForce<2> pathmanathan_force;
+        PathmanathanInteractionForce<2> pathmanathan_force;
 
         // Test set/get method
         TS_ASSERT_DELTA(pathmanathan_force.GetSpringStiffness(), 15.0, 1e-6);
@@ -665,7 +665,7 @@ public:
         cell_population.Update(); // Need to call Update() to get mNodePairs populated, which is needed for the force calculation.
 
         // Create force
-        PathmanathanTwoBodyInteractionForce<2> pathmanathan_force;
+        PathmanathanInteractionForce<2> pathmanathan_force;
 
         // Don't need to test set/get methods as these are tested in the previous test.
 

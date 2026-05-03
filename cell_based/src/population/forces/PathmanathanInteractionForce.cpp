@@ -33,21 +33,21 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "PathmanathanTwoBodyInteractionForce.hpp"
+#include "PathmanathanInteractionForce.hpp"
 
 template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-PathmanathanTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::PathmanathanTwoBodyInteractionForce()
+PathmanathanInteractionForce<ELEMENT_DIM,SPACE_DIM>::PathmanathanInteractionForce()
    : AbstractVariableSizeTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>(),
      mAlpha(5.0)
 {}
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-PathmanathanTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::~PathmanathanTwoBodyInteractionForce()
+PathmanathanInteractionForce<ELEMENT_DIM,SPACE_DIM>::~PathmanathanInteractionForce()
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-c_vector<double, SPACE_DIM> PathmanathanTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::CalculateLinkInteraction(double overlap,
+c_vector<double, SPACE_DIM> PathmanathanInteractionForce<ELEMENT_DIM,SPACE_DIM>::CalculateLinkInteraction(double overlap,
                                                                                                                    double restLength,
                                                                                                                    const c_vector<double, SPACE_DIM>& rUnitDifference,
                                                                                                                    double multiplicationFactor)
@@ -65,20 +65,20 @@ c_vector<double, SPACE_DIM> PathmanathanTwoBodyInteractionForce<ELEMENT_DIM,SPAC
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double PathmanathanTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::GetAlpha()
+double PathmanathanInteractionForce<ELEMENT_DIM,SPACE_DIM>::GetAlpha()
 {
     return mAlpha;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void PathmanathanTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::SetAlpha(double alpha)
+void PathmanathanInteractionForce<ELEMENT_DIM,SPACE_DIM>::SetAlpha(double alpha)
 {
     assert(alpha > 0.0);
     mAlpha = alpha;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void PathmanathanTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParameters(out_stream& rParamsFile)
+void PathmanathanInteractionForce<ELEMENT_DIM,SPACE_DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<SpringStiffness>" << this->mSpringStiffness << "</SpringStiffness>\n";
     *rParamsFile << "\t\t\t<DivisionRestingSpringLength>" << this->mDivisionRestingSpringLength << "</DivisionRestingSpringLength>\n";
@@ -90,13 +90,13 @@ void PathmanathanTwoBodyInteractionForce<ELEMENT_DIM,SPACE_DIM>::OutputForcePara
 }
 
 // Explicit instantiation
-template class PathmanathanTwoBodyInteractionForce<1,1>;
-template class PathmanathanTwoBodyInteractionForce<1,2>;
-template class PathmanathanTwoBodyInteractionForce<2,2>;
-template class PathmanathanTwoBodyInteractionForce<1,3>;
-template class PathmanathanTwoBodyInteractionForce<2,3>;
-template class PathmanathanTwoBodyInteractionForce<3,3>;
+template class PathmanathanInteractionForce<1,1>;
+template class PathmanathanInteractionForce<1,2>;
+template class PathmanathanInteractionForce<2,2>;
+template class PathmanathanInteractionForce<1,3>;
+template class PathmanathanInteractionForce<2,3>;
+template class PathmanathanInteractionForce<3,3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(PathmanathanTwoBodyInteractionForce)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(PathmanathanInteractionForce)

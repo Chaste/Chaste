@@ -718,7 +718,7 @@ modules:
         source_includes:
           - PybindUblasTypeCaster.hpp
 
-      - name: PathmanathanTwoBodyInteractionForce
+      - name: PathmanathanInteractionForce
         source_includes:
           - PybindUblasTypeCaster.hpp
 
@@ -741,7 +741,7 @@ modules:
 
       - name: DifferentialAdhesionLinearSpringForce
 
-      - name: DifferentialAdhesionPathmanathanTwoBodyInteractionForce
+      - name: DifferentialAdhesionPathmanathanInteractionForce
 
       - name: NagaiHondaDifferentialAdhesionForce
         excluded_methods:

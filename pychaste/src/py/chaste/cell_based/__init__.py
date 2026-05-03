@@ -165,12 +165,12 @@ from chaste._pychaste_all import (
     DifferentialAdhesionLinearSpringForce_1_3,
     DifferentialAdhesionLinearSpringForce_2_3,
     DifferentialAdhesionLinearSpringForce_3_3,
-    DifferentialAdhesionPathmanathanTwoBodyInteractionForce_1_1,
-    DifferentialAdhesionPathmanathanTwoBodyInteractionForce_1_2,
-    DifferentialAdhesionPathmanathanTwoBodyInteractionForce_2_2,
-    DifferentialAdhesionPathmanathanTwoBodyInteractionForce_1_3,
-    DifferentialAdhesionPathmanathanTwoBodyInteractionForce_2_3,
-    DifferentialAdhesionPathmanathanTwoBodyInteractionForce_3_3,
+    DifferentialAdhesionPathmanathanInteractionForce_1_1,
+    DifferentialAdhesionPathmanathanInteractionForce_1_2,
+    DifferentialAdhesionPathmanathanInteractionForce_2_2,
+    DifferentialAdhesionPathmanathanInteractionForce_1_3,
+    DifferentialAdhesionPathmanathanInteractionForce_2_3,
+    DifferentialAdhesionPathmanathanInteractionForce_3_3,
     DifferentialAdhesionPottsUpdateRule_2,
     DifferentialAdhesionPottsUpdateRule_3,
     DifferentiatedCellProliferativeType,
@@ -202,12 +202,12 @@ from chaste._pychaste_all import (
     LinearSpringForce_1_3,
     LinearSpringForce_2_3,
     LinearSpringForce_3_3,
-    PathmanathanTwoBodyInteractionForce_1_1,
-    PathmanathanTwoBodyInteractionForce_1_2,
-    PathmanathanTwoBodyInteractionForce_2_2,
-    PathmanathanTwoBodyInteractionForce_1_3,
-    PathmanathanTwoBodyInteractionForce_2_3,
-    PathmanathanTwoBodyInteractionForce_3_3,
+    PathmanathanInteractionForce_1_1,
+    PathmanathanInteractionForce_1_2,
+    PathmanathanInteractionForce_2_2,
+    PathmanathanInteractionForce_1_3,
+    PathmanathanInteractionForce_2_3,
+    PathmanathanInteractionForce_3_3,
     SimpleLogarithmicRepulsionForce_1_1,
     SimpleLogarithmicRepulsionForce_1_2,
     SimpleLogarithmicRepulsionForce_2_2,
@@ -784,17 +784,17 @@ DifferentialAdhesionLinearSpringForce = TemplateClassDict(
     }
 )
 
-DifferentialAdhesionPathmanathanTwoBodyInteractionForce = TemplateClassDict(
+DifferentialAdhesionPathmanathanInteractionForce = TemplateClassDict(
     {
-        ("1",): DifferentialAdhesionPathmanathanTwoBodyInteractionForce_1_1,
-        ("1", "1"): DifferentialAdhesionPathmanathanTwoBodyInteractionForce_1_1,
-        ("1", "2"): DifferentialAdhesionPathmanathanTwoBodyInteractionForce_1_2,
-        ("2",): DifferentialAdhesionPathmanathanTwoBodyInteractionForce_2_2,
-        ("2", "2"): DifferentialAdhesionPathmanathanTwoBodyInteractionForce_2_2,
-        ("1", "3"): DifferentialAdhesionPathmanathanTwoBodyInteractionForce_1_3,
-        ("2", "3"): DifferentialAdhesionPathmanathanTwoBodyInteractionForce_2_3,
-        ("3",): DifferentialAdhesionPathmanathanTwoBodyInteractionForce_3_3,
-        ("3", "3"): DifferentialAdhesionPathmanathanTwoBodyInteractionForce_3_3,
+        ("1",): DifferentialAdhesionPathmanathanInteractionForce_1_1,
+        ("1", "1"): DifferentialAdhesionPathmanathanInteractionForce_1_1,
+        ("1", "2"): DifferentialAdhesionPathmanathanInteractionForce_1_2,
+        ("2",): DifferentialAdhesionPathmanathanInteractionForce_2_2,
+        ("2", "2"): DifferentialAdhesionPathmanathanInteractionForce_2_2,
+        ("1", "3"): DifferentialAdhesionPathmanathanInteractionForce_1_3,
+        ("2", "3"): DifferentialAdhesionPathmanathanInteractionForce_2_3,
+        ("3",): DifferentialAdhesionPathmanathanInteractionForce_3_3,
+        ("3", "3"): DifferentialAdhesionPathmanathanInteractionForce_3_3,
     }
 )
 
@@ -886,17 +886,17 @@ LinearSpringForce = TemplateClassDict(
     }
 )
 
-PathmanathanTwoBodyInteractionForce = TemplateClassDict(
+PathmanathanInteractionForce = TemplateClassDict(
     {
-        ("1",): PathmanathanTwoBodyInteractionForce_1_1,
-        ("1", "1"): PathmanathanTwoBodyInteractionForce_1_1,
-        ("1", "2"): PathmanathanTwoBodyInteractionForce_1_2,
-        ("2",): PathmanathanTwoBodyInteractionForce_2_2,
-        ("2", "2"): PathmanathanTwoBodyInteractionForce_2_2,
-        ("1", "3"): PathmanathanTwoBodyInteractionForce_1_3,
-        ("2", "3"): PathmanathanTwoBodyInteractionForce_2_3,
-        ("3",): PathmanathanTwoBodyInteractionForce_3_3,
-        ("3", "3"): PathmanathanTwoBodyInteractionForce_3_3,
+        ("1",): PathmanathanInteractionForce_1_1,
+        ("1", "1"): PathmanathanInteractionForce_1_1,
+        ("1", "2"): PathmanathanInteractionForce_1_2,
+        ("2",): PathmanathanInteractionForce_2_2,
+        ("2", "2"): PathmanathanInteractionForce_2_2,
+        ("1", "3"): PathmanathanInteractionForce_1_3,
+        ("2", "3"): PathmanathanInteractionForce_2_3,
+        ("3",): PathmanathanInteractionForce_3_3,
+        ("3", "3"): PathmanathanInteractionForce_3_3,
     }
 )
 

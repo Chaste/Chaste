@@ -33,10 +33,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef DIFFERENTIALADHESIONPATHMANATHANTWOBODYINTERACTIONFORCE_HPP_
-#define DIFFERENTIALADHESIONPATHMANATHANTWOBODYINTERACTIONFORCE_HPP_
+#ifndef DIFFERENTIALADHESIONPATHMANATHANINTERACTIONFORCE_HPP_
+#define DIFFERENTIALADHESIONPATHMANATHANINTERACTIONFORCE_HPP_
 
-#include "PathmanathanTwoBodyInteractionForce.hpp"
+#include "PathmanathanInteractionForce.hpp"
 
 #include "ChasteSerialization.hpp"
 #include <boost/serialization/base_object.hpp>
@@ -44,12 +44,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A class for a two-body differential adhesion force law between
  * labelled and unlabelled cells (as defined by the CellLabel cell
- * property). Inherits from PathmanathanTwoBodyInteractionForce.
+ * property). Inherits from PathmanathanInteractionForce.
  *
  * Designed for use in node-based simulations.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
-class DifferentialAdhesionPathmanathanTwoBodyInteractionForce : public PathmanathanTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>
+class DifferentialAdhesionPathmanathanInteractionForce : public PathmanathanInteractionForce<ELEMENT_DIM, SPACE_DIM>
 {
 private :
 
@@ -63,7 +63,7 @@ private :
      * Note that for homotypic interactions between neighbouring
      * unlabelled cells, we use the multiplier value 1.0 that is
      * returned by the method VariableSpringConstantMultiplicationFactor()
-     * in the parent class PathmanathanTwoBodyInteractionForce.
+     * in the parent class PathmanathanInteractionForce.
      */
     double mHomotypicLabelledSpringConstantMultiplier;
 
@@ -87,7 +87,7 @@ private :
     template<class Archive>
     void serialize(Archive & archive, const unsigned int version)
     {
-        archive & boost::serialization::base_object<PathmanathanTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM> >(*this);
+        archive & boost::serialization::base_object<PathmanathanInteractionForce<ELEMENT_DIM, SPACE_DIM> >(*this);
         archive & mHomotypicLabelledSpringConstantMultiplier;
         archive & mHeterotypicSpringConstantMultiplier;
     }
@@ -97,7 +97,7 @@ public :
     /**
      * Constructor.
      */
-    DifferentialAdhesionPathmanathanTwoBodyInteractionForce();
+    DifferentialAdhesionPathmanathanInteractionForce();
 
     /**
      * Overridden VariableSpringConstantMultiplicationFactor() method.
@@ -152,6 +152,6 @@ public :
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(DifferentialAdhesionPathmanathanTwoBodyInteractionForce)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(DifferentialAdhesionPathmanathanInteractionForce)
 
-#endif /*DIFFERENTIALADHESIONPATHMANATHANTWOBODYINTERACTIONFORCE_HPP_*/
+#endif /*DIFFERENTIALADHESIONPATHMANATHANINTERACTIONFORCE_HPP_*/

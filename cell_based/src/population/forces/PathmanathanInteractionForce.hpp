@@ -33,8 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef PATHMANATHANTWOBODYINTERACTIONFORCE_HPP_
-#define PATHMANATHANTWOBODYINTERACTIONFORCE_HPP_
+#ifndef PATHMANATHANINTERACTIONFORCE_HPP_
+#define PATHMANATHANINTERACTIONFORCE_HPP_
 
 #include "AbstractVariableSizeTwoBodyInteractionForce.hpp"
 
@@ -65,7 +65,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * This force is designed for use with NodeBasedCellPopulation.
  */
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM=ELEMENT_DIM>
-class PathmanathanTwoBodyInteractionForce : public AbstractVariableSizeTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>
+class PathmanathanInteractionForce : public AbstractVariableSizeTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>
 {
     friend class TestForces;
 
@@ -117,12 +117,12 @@ public:
     /**
      * Constructor.
      */
-    PathmanathanTwoBodyInteractionForce();
+    PathmanathanInteractionForce();
 
     /**
      * Destructor.
      */
-    virtual ~PathmanathanTwoBodyInteractionForce();
+    virtual ~PathmanathanInteractionForce();
 
     /**
      * @return mAlpha
@@ -145,6 +145,6 @@ public:
 };
 
 #include "SerializationExportWrapper.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(PathmanathanTwoBodyInteractionForce)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(PathmanathanInteractionForce)
 
-#endif /*PATHMANATHANTWOBODYINTERACTIONFORCE_HPP_*/
+#endif /*PATHMANATHANINTERACTIONFORCE_HPP_*/

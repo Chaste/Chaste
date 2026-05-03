@@ -33,19 +33,19 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "DifferentialAdhesionPathmanathanTwoBodyInteractionForce.hpp"
+#include "DifferentialAdhesionPathmanathanInteractionForce.hpp"
 #include "CellLabel.hpp"
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-DifferentialAdhesionPathmanathanTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>::DifferentialAdhesionPathmanathanTwoBodyInteractionForce()
-   : PathmanathanTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>(),
+DifferentialAdhesionPathmanathanInteractionForce<ELEMENT_DIM, SPACE_DIM>::DifferentialAdhesionPathmanathanInteractionForce()
+   : PathmanathanInteractionForce<ELEMENT_DIM, SPACE_DIM>(),
      mHomotypicLabelledSpringConstantMultiplier(1.0),
      mHeterotypicSpringConstantMultiplier(1.0)
 {
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double DifferentialAdhesionPathmanathanTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>::VariableSpringConstantMultiplicationFactor(
+double DifferentialAdhesionPathmanathanInteractionForce<ELEMENT_DIM, SPACE_DIM>::VariableSpringConstantMultiplicationFactor(
     unsigned nodeAGlobalIndex,
     unsigned nodeBGlobalIndex,
     AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>& rCellPopulation,
@@ -86,49 +86,49 @@ double DifferentialAdhesionPathmanathanTwoBodyInteractionForce<ELEMENT_DIM, SPAC
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double DifferentialAdhesionPathmanathanTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>::GetHomotypicLabelledSpringConstantMultiplier()
+double DifferentialAdhesionPathmanathanInteractionForce<ELEMENT_DIM, SPACE_DIM>::GetHomotypicLabelledSpringConstantMultiplier()
 {
     return mHomotypicLabelledSpringConstantMultiplier;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void DifferentialAdhesionPathmanathanTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>::SetHomotypicLabelledSpringConstantMultiplier(double labelledSpringConstantMultiplier)
+void DifferentialAdhesionPathmanathanInteractionForce<ELEMENT_DIM, SPACE_DIM>::SetHomotypicLabelledSpringConstantMultiplier(double labelledSpringConstantMultiplier)
 {
     assert(labelledSpringConstantMultiplier > 0.0);
     mHomotypicLabelledSpringConstantMultiplier = labelledSpringConstantMultiplier;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-double DifferentialAdhesionPathmanathanTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>::GetHeterotypicSpringConstantMultiplier()
+double DifferentialAdhesionPathmanathanInteractionForce<ELEMENT_DIM, SPACE_DIM>::GetHeterotypicSpringConstantMultiplier()
 {
     return mHeterotypicSpringConstantMultiplier;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void DifferentialAdhesionPathmanathanTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>::SetHeterotypicSpringConstantMultiplier(double heterotypicSpringConstantMultiplier)
+void DifferentialAdhesionPathmanathanInteractionForce<ELEMENT_DIM, SPACE_DIM>::SetHeterotypicSpringConstantMultiplier(double heterotypicSpringConstantMultiplier)
 {
     assert(heterotypicSpringConstantMultiplier > 0.0);
     mHeterotypicSpringConstantMultiplier = heterotypicSpringConstantMultiplier;
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void DifferentialAdhesionPathmanathanTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(out_stream& rParamsFile)
+void DifferentialAdhesionPathmanathanInteractionForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(out_stream& rParamsFile)
 {
     *rParamsFile << "\t\t\t<HomotypicLabelledSpringConstantMultiplier>" << mHomotypicLabelledSpringConstantMultiplier << "</HomotypicLabelledSpringConstantMultiplier>\n";
     *rParamsFile << "\t\t\t<HeterotypicSpringConstantMultiplier>" << mHeterotypicSpringConstantMultiplier << "</HeterotypicSpringConstantMultiplier>\n";
 
     // Call direct parent class
-    PathmanathanTwoBodyInteractionForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(rParamsFile);
+    PathmanathanInteractionForce<ELEMENT_DIM, SPACE_DIM>::OutputForceParameters(rParamsFile);
 }
 
 // Explicit instantiation
-template class DifferentialAdhesionPathmanathanTwoBodyInteractionForce<1,1>;
-template class DifferentialAdhesionPathmanathanTwoBodyInteractionForce<1,2>;
-template class DifferentialAdhesionPathmanathanTwoBodyInteractionForce<2,2>;
-template class DifferentialAdhesionPathmanathanTwoBodyInteractionForce<1,3>;
-template class DifferentialAdhesionPathmanathanTwoBodyInteractionForce<2,3>;
-template class DifferentialAdhesionPathmanathanTwoBodyInteractionForce<3,3>;
+template class DifferentialAdhesionPathmanathanInteractionForce<1,1>;
+template class DifferentialAdhesionPathmanathanInteractionForce<1,2>;
+template class DifferentialAdhesionPathmanathanInteractionForce<2,2>;
+template class DifferentialAdhesionPathmanathanInteractionForce<1,3>;
+template class DifferentialAdhesionPathmanathanInteractionForce<2,3>;
+template class DifferentialAdhesionPathmanathanInteractionForce<3,3>;
 
 // Serialization for Boost >= 1.36
 #include "SerializationExportWrapperForCpp.hpp"
-EXPORT_TEMPLATE_CLASS_ALL_DIMS(DifferentialAdhesionPathmanathanTwoBodyInteractionForce)
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(DifferentialAdhesionPathmanathanInteractionForce)
