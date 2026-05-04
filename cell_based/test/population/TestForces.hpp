@@ -289,6 +289,9 @@ public:
 
         TS_ASSERT_DELTA(cell_population.GetNode(5)->rGetAppliedForce()[0], 0.5*linear_force.GetSpringStiffness(), 1e-4);
         TS_ASSERT_DELTA(cell_population.GetNode(5)->rGetAppliedForce()[1], 0.0, 1e-4);
+
+        // Clear memory
+        delete p_mesh;
     }
 
     void TestLinearSpringForceCalculationIn1d()
@@ -717,6 +720,9 @@ public:
 
         TS_ASSERT_DELTA(cell_population.GetNode(5)->rGetAppliedForce()[0], -pathmanathan_force.GetSpringStiffness() * log(0.5), 1e-4);
         TS_ASSERT_DELTA(cell_population.GetNode(5)->rGetAppliedForce()[1], 0.0, 1e-4);
+
+        // Clear memory
+        delete p_mesh;
     }
 
     void TestDifferentialAdhesionLinearSpringForceMethods()
