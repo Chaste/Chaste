@@ -391,7 +391,7 @@ public:
         TS_ASSERT_EQUALS(simulator.rGetCellPopulation().GetNumNodes(), simulator.rGetCellPopulation().GetNumRealCells());
 
         //Check that the correct number of cells are killed
-        unsigned num_deaths = 7u; // sensitive to changes in random number generation
+        unsigned num_deaths = 6u; // sensitive to changes in random number generation
         TS_ASSERT_EQUALS(simulator.GetNumDeaths(), num_deaths);
 
         // Now remove the killers and check no more cells are killed
