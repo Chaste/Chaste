@@ -102,9 +102,9 @@ public:
      * @param linearSourceCoefficient the linear source term coefficient (defaults to 0.0)
      * @param diffusionCoefficient the rate of diffusion (defaults to 1.0)
      * @param duDtCoefficient rate of reaction (defaults to 1.0)
-     * 
+     *
      */
-    UniformSourceParabolicPde(double constantSourceCoefficient=0.0, 
+    UniformSourceParabolicPde(double constantSourceCoefficient=0.0,
                               double linearSourceCoefficient=0.0,
                               double diffusionCoefficient=1.0,
                               double duDtCoefficient=1.0);

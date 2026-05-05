@@ -45,7 +45,7 @@ The complete original paper reference is cited below:
 </para>
 
 <para>
-Since the model was published in 1994, it has been updated several times, incorporating new experimental data taken from papers written by other authors.  These modifications have been considered in the model presented here.  To illustrate how the Luo-Rudy II dynamic model has been developed, see the sequence of diagrams (<xref linkend="fig_cell_diagram_LR_II"/>, <xref linkend="fig_cell_diagram_zeng"/>, <xref linkend="fig_cell_diagram_shaw"/> and <xref linkend="fig_cell_diagram_faber"/>) below.  The 1997 Shaw and Rudy model diagram is identical to the 1999 Viswanathan model diagram since the only difference between the two models is that the Viswanathan model introduces a second activation gate (X<subscript>s2</subscript>) into the formulation of I<subscript>Ks</subscript>.  In addition, the development of the Luo-Rudy II model has been documented by Case Western Reserve University (To view this website, follow this link: <ulink url="http://www.cwru.edu/med/CBRTC/LRdOnline/development.htm"> http://www.cwru.edu/med/CBRTC/LRdOnline/development.htm</ulink>  
+Since the model was published in 1994, it has been updated several times, incorporating new experimental data taken from papers written by other authors.  These modifications have been considered in the model presented here.  To illustrate how the Luo-Rudy II dynamic model has been developed, see the sequence of diagrams (<xref linkend="fig_cell_diagram_LR_II"/>, <xref linkend="fig_cell_diagram_zeng"/>, <xref linkend="fig_cell_diagram_shaw"/> and <xref linkend="fig_cell_diagram_faber"/>) below.  The 1997 Shaw and Rudy model diagram is identical to the 1999 Viswanathan model diagram since the only difference between the two models is that the Viswanathan model introduces a second activation gate (X<subscript>s2</subscript>) into the formulation of I<subscript>Ks</subscript>.  In addition, the development of the Luo-Rudy II model has been documented by Case Western Reserve University (To view this website, follow this link: <ulink url="http://www.cwru.edu/med/CBRTC/LRdOnline/development.htm"> http://www.cwru.edu/med/CBRTC/LRdOnline/development.htm</ulink>
 </para>
 
 <informalfigure float="0" id="fig_cell_diagram_LR_II">
@@ -92,25 +92,25 @@ All the original paper references are cited below:
 <para>
 <ulink url="http://circres.ahajournals.org/cgi/content/abstract/77/1/140">Two Components of the Delayed Rectifier K<superscript>+</superscript> Current in Ventricular Myocytes of the Guinea Pig Type</ulink>, Jinglin Zeng, Kenneth R. Laurita, David S. Rosenbaum and Yoram Rudy, 1995, <ulink url="http://circres.ahajournals.org/">
             <emphasis>Circulation Research</emphasis>
-          </ulink>, 77, 140-152.  (The <ulink url="http://circres.ahajournals.org/cgi/content/full/77/1/140">full text</ulink> version of the article is available for Journal Members on the Circulation Research website.)  <ulink url="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;list_uids=7788872&amp;dopt=Abstract">PubMed ID: 7788872</ulink>  
+          </ulink>, 77, 140-152.  (The <ulink url="http://circres.ahajournals.org/cgi/content/full/77/1/140">full text</ulink> version of the article is available for Journal Members on the Circulation Research website.)  <ulink url="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;list_uids=7788872&amp;dopt=Abstract">PubMed ID: 7788872</ulink>
 </para>
 
 <para>
 <ulink url="http://www.sciencedirect.com/science?_ob=ArticleURL&amp;_udi=B6T14-3R37WSS-17&amp;_user=140507&amp;_coverDate=08%2F31%2F1997&amp;_alid=185463716&amp;_rdoc=1&amp;_fmt=summary&amp;_orig=search&amp;_qd=1&amp;_cdi=4880&amp;_sort=d&amp;_docanchor=&amp;view=c&amp;_acct=C000011498&amp;_version=1&amp;_urlVersion=0&amp;_userid=140507&amp;md5=ad03ef8fddd6cc6d11f8484e421991f2">Electrophysiological effects of acute myocardial ischemia: a theoretical study of altered cell excitability and action potential duration</ulink>, Robin M. Shaw and Yoram Rudy, 1997, <ulink url="http://www.sciencedirect.com/science?_ob=JournalURL&amp;_cdi=4880&amp;_auth=y&amp;_acct=C000011498&amp;_version=1&amp;_urlVersion=0&amp;_userid=140507&amp;md5=845774525765eaf31dec5d2fc2a614f6">
             <emphasis>Cardiovascular Research</emphasis>
-          </ulink>, 35, 256-272.  <ulink url="http://www.sciencedirect.com/science?_ob=ArticleURL&amp;_udi=B6T14-3R37WSS-17&amp;_coverDate=08%2F31%2F1997&amp;_alid=185463716&amp;_rdoc=1&amp;_fmt=&amp;_orig=search&amp;_qd=1&amp;_cdi=4880&amp;_sort=d&amp;view=c&amp;_acct=C000011498&amp;_version=1&amp;_urlVersion=0&amp;_userid=140507&amp;md5=2b061b7dec7050a8c72e2eba382d5e97">Full text</ulink> and PDF versions of the article are available to subscribers on the Science Direct website.  <ulink url="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;list_uids=9349389&amp;dopt=Abstract">PubMed ID: 9349389</ulink>    
+          </ulink>, 35, 256-272.  <ulink url="http://www.sciencedirect.com/science?_ob=ArticleURL&amp;_udi=B6T14-3R37WSS-17&amp;_coverDate=08%2F31%2F1997&amp;_alid=185463716&amp;_rdoc=1&amp;_fmt=&amp;_orig=search&amp;_qd=1&amp;_cdi=4880&amp;_sort=d&amp;view=c&amp;_acct=C000011498&amp;_version=1&amp;_urlVersion=0&amp;_userid=140507&amp;md5=2b061b7dec7050a8c72e2eba382d5e97">Full text</ulink> and PDF versions of the article are available to subscribers on the Science Direct website.  <ulink url="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;list_uids=9349389&amp;dopt=Abstract">PubMed ID: 9349389</ulink>
 </para>
 
 <para>
 <ulink url="http://circ.ahajournals.org/cgi/content/abstract/99/18/2466">Effects of I<subscript>Kr</subscript> and I<subscript>Ks</subscript> Heterogeneity on Action Potential Duration and Its Rate Dependence: A Simulation Study</ulink>, Prakash C. Viswanathan, BE; Robin M. Shaw, PhD; and Yoram Rudy, PhD, 1999, <ulink url="http://circ.ahajournals.org/">
             <emphasis>Circulation</emphasis>
-          </ulink>, 99, 2466-2474.  (<ulink url="http://www.circ.ahajournals.org/cgi/content/full/99/18/2466">Full text</ulink> and <ulink url="http://www.circ.ahajournals.org/cgi/reprint/99/18/2466.pdf">PDF</ulink> versions of the article are available for Journal Members on the Circulation website.)  <ulink url="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;list_uids=10318671&amp;dopt=Abstract">PubMed ID: 10318671</ulink>      
+          </ulink>, 99, 2466-2474.  (<ulink url="http://www.circ.ahajournals.org/cgi/content/full/99/18/2466">Full text</ulink> and <ulink url="http://www.circ.ahajournals.org/cgi/reprint/99/18/2466.pdf">PDF</ulink> versions of the article are available for Journal Members on the Circulation website.)  <ulink url="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;list_uids=10318671&amp;dopt=Abstract">PubMed ID: 10318671</ulink>
 </para>
 
 <para>
 <ulink url="http://www.biophysj.org/cgi/content/abstract/78/5/2392">Action Potential and Contractility in [Na<superscript>+</superscript>]<subscript>i</subscript> Overloaded Cardiac Myocytes</ulink>, Gregory M. Faber and Yoram Rudy, 2000, <ulink url="http://www.biophysj.org/">
             <emphasis>Biophysical Journal</emphasis>
-          </ulink>, 78, 2392-2404.  (<ulink url="http://www.biophysj.org/cgi/content/full/78/5/2392">Full text</ulink> and <ulink url="http://www.biophysj.org/cgi/reprint/78/5/2392.pdf">PDF</ulink> versions of the article are available for Journal Members on the Biophysical Journal website.)  <ulink url="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;list_uids=10777735&amp;dopt=Abstract">PubMed ID: 10777735</ulink>   
+          </ulink>, 78, 2392-2404.  (<ulink url="http://www.biophysj.org/cgi/content/full/78/5/2392">Full text</ulink> and <ulink url="http://www.biophysj.org/cgi/reprint/78/5/2392.pdf">PDF</ulink> versions of the article are available for Journal Members on the Biophysical Journal website.)  <ulink url="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;list_uids=10777735&amp;dopt=Abstract">PubMed ID: 10777735</ulink>
 </para>
 
 <informalfigure float="0" id="fig_cell_diagram_faber">
@@ -1751,11 +1751,11 @@ All the original paper references are cited below:
       <variable units="microA_per_microF" public_interface="out" name="i_Kr"/>
       <variable units="milliS_per_microF" name="g_Kr"/>
       <variable units="dimensionless" name="ScaleFactorGkr" initial_value="1.0" cmeta:id="ScaleFactorGkr">
-        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">      
-	      <rdf:Description rdf:about="#ScaleFactorGkr">
-		      <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+          <rdf:Description rdf:about="#ScaleFactorGkr">
+              <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
           </rdf:Description>
-        </rdf:RDF>          
+        </rdf:RDF>
       </variable>
       <variable units="dimensionless" name="Rect"/>
       <variable units="millivolt" public_interface="in" name="E_K"/>
@@ -1951,11 +1951,11 @@ All the original paper references are cited below:
       <variable units="microA_per_microF" public_interface="out" name="i_Ks"/>
       <variable units="milliS_per_microF" name="g_Ks"/>
       <variable units="dimensionless" name="ScaleFactorGks" initial_value="1.0" cmeta:id="ScaleFactorGks">
-        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">      
-	      <rdf:Description rdf:about="#ScaleFactorGks">
-		      <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+          <rdf:Description rdf:about="#ScaleFactorGks">
+              <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
           </rdf:Description>
-        </rdf:RDF>          
+        </rdf:RDF>
       </variable>
       <variable units="millivolt" name="E_Ks"/>
       <variable units="dimensionless" name="PNaK" initial_value="0.01833"/>
@@ -2723,11 +2723,11 @@ All the original paper references are cited below:
       <variable units="microA_per_microF" public_interface="out" name="i_to"/>
       <variable units="milliS_per_microF" name="g_to"/>
       <variable units="dimensionless" name="ScaleFactorIto" initial_value="0.0" cmeta:id="ScaleFactorIto">
-        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">      
-	      <rdf:Description rdf:about="#ScaleFactorIto">
-		      <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+          <rdf:Description rdf:about="#ScaleFactorIto">
+              <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
           </rdf:Description>
-        </rdf:RDF>          
+        </rdf:RDF>
       </variable>
       <variable units="millivolt" public_interface="in" name="E_K"/>
       <variable units="millivolt" public_interface="in" private_interface="out" name="V"/>

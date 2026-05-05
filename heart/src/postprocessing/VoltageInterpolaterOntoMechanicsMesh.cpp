@@ -48,7 +48,7 @@ VoltageInterpolaterOntoMechanicsMesh<DIM>::VoltageInterpolaterOntoMechanicsMesh(
             : mrElectricsMesh(rElectricsMesh),
               mrMechanicsMesh(rMechanicsMesh),
               mpMeshPair(new FineCoarseMeshPair<DIM>(rElectricsMesh, rMechanicsMesh))
-              
+
 {
     assert(mpMeshPair);
     mpMeshPair->SetUpBoxesOnFineMesh();
@@ -83,7 +83,7 @@ void VoltageInterpolaterOntoMechanicsMesh<DIM>::InterpolateOnCoarseMesh(std::vec
 template<unsigned DIM>
 void VoltageInterpolaterOntoMechanicsMesh<DIM>::OutputToCmgui(std::vector<std::string>& rVariableNames,
                                      std::string directory,
-                                     std::string inputFileNamePrefix)          
+                                     std::string inputFileNamePrefix)
 {
     assert(mpMeshPair);
     mpMeshPair->SetUpBoxesOnFineMesh();

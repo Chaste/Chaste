@@ -130,7 +130,7 @@ protected:
      */
     bool mDeleteFeMesh = false;
 
-    /** 
+    /**
      * Store the nodes that dirichlet boundary conditions on which are output with the solution.
      */
     std::vector<double> mIsDirichletBoundaryNode;

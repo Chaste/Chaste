@@ -97,9 +97,9 @@ public:
      * @param constantSourceCoefficient the constant source term coefficient (defaults to 0.0)
      * @param linearSourceCoefficient the linear source term coefficient (defaults to 0.0)
      * @param diffusionCoefficient the rate of diffusion (defaults to 1.0)
-     * 
+     *
      */
-    UniformSourceEllipticPde(double constantSourceCoefficient=0.0, 
+    UniformSourceEllipticPde(double constantSourceCoefficient=0.0,
                              double linearSourceCoefficient=0.0,
                              double diffusionCoefficient=1.0);
 

@@ -53,16 +53,16 @@ try:
 except AttributeError:
     def relpath(path, start=os.path.curdir):
         """Return a relative version of a path"""
-    
+
         if not path:
             raise ValueError("no path specified")
-        
+
         start_list = os.path.abspath(start).split(os.path.sep)
         path_list = os.path.abspath(path).split(os.path.sep)
-        
+
         # Work out how much of the filepath is shared by start and path.
         i = len(os.path.commonprefix([start_list, path_list]))
-    
+
         rel_list = [os.path.pardir] * (len(start_list)-i) + path_list[i:]
         return os.path.join(*rel_list)
 
@@ -70,7 +70,7 @@ except AttributeError:
 
 def GetTestsInTestPacks(testRootDir, packNames=[], returnFoundPacks=False, subfolder=''):
     """Generate a set of all test files listed in test pack files under the given folder.
-    
+
     If packNames is non-empty, only test packs with matching names will be considered.
     If subfolder is given, only test packs under that folder will be considered.
     """

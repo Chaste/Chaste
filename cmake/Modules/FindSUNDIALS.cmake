@@ -1,12 +1,12 @@
 # =============================================================================
 #  CADET - The Chromatography Analysis and Design Toolkit
-#  
+#
 #  Copyright © 2008-2015: Eric von Lieres¹, Joel Andersson,
 #                         Andreas Puettmann¹, Sebastian Schnittert¹,
 #                         Samuel Leweke¹
-#                                      
+#
 #    ¹ Forschungszentrum Juelich GmbH, IBG-1, Juelich, Germany.
-#  
+#
 #  All rights reserved. This program and the accompanying materials
 #  are made available under the terms of the GNU Public License v3.0 (or, at
 #  your option, any later version) which accompanies this distribution, and
@@ -31,7 +31,7 @@
 #
 # This module will define the following variables:
 #  SUNDIALS_INCLUDE_DIRS - Location of the SUNDIALS includes
-#  SUNDIALS_VERSION_MAJOR 
+#  SUNDIALS_VERSION_MAJOR
 #  SUNDIALS_VERSION_MINOR
 #  SUNDIALS_VERSION_SUBMINOR
 #  SUNDIALS_FOUND - true if SUNDIALS was found on the system
@@ -161,7 +161,7 @@ else()
     set(BLA_STATIC ON)
     find_package(LAPACK)
 endif()
-    
+
 
 list(APPEND SUNDIALS_LIBRARIES ${LAPACK_LIBRARIES})
 

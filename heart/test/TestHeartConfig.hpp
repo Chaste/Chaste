@@ -1163,13 +1163,13 @@ public:
         // Mesh partitioning method
         HeartConfig::Instance()->SetMeshPartitioning("dumb");
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetMeshPartitioning(), DistributedTetrahedralMeshPartitionType::DUMB);
-        
+
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
         HeartConfig::Instance()->SetMeshPartitioning("metis"); //
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetMeshPartitioning(), DistributedTetrahedralMeshPartitionType::METIS_LIBRARY);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u); // Deprecation warning
         Warnings::Instance()->QuietDestroy();
-        
+
         HeartConfig::Instance()->SetMeshPartitioning("parmetis");
         TS_ASSERT_EQUALS(HeartConfig::Instance()->GetMeshPartitioning(), DistributedTetrahedralMeshPartitionType::PARMETIS_LIBRARY);
         HeartConfig::Instance()->SetMeshPartitioning("petsc");

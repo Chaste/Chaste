@@ -39,15 +39,14 @@ except ImportError as e:
 
 import os
 import warnings
+
+from importlib import resources
 from io import StringIO
 
 import vtk
 import xvfbwrapper
-from pkg_resources import resource_filename
 
 from chaste.cell_based import VtkSceneModifier_2, VtkSceneModifier_3
-
-# TODO: pkg_resources is deprecated in Python 3.12.
 
 
 class JupyterNotebookManager:
@@ -77,7 +76,7 @@ class JupyterNotebookManager:
         self.renderWindow = vtk.vtkRenderWindow()
 
         self.interactive_plotting_loaded = False
-        self.three_js_dir = resource_filename("chaste", os.path.join("external"))
+        self.three_js_dir = resources.files("chaste").joinpath("external")
         self.container_id = 0
 
     def _interactive_plot_init(self):
@@ -100,11 +99,11 @@ class JupyterNotebookManager:
 
             # Include three.js
             for library in three_js_libraries:
-                with open(os.path.join(self.three_js_dir, library)) as infile:
+                with self.three_js_dir.joinpath(library).open() as infile:
                     library_javascript.write(infile.read())
 
             # Include internal plotting functions
-            with open(os.path.join(self.three_js_dir, "plotting_script.js")) as infile:
+            with self.three_js_dir.joinpath("plotting_script.js").open() as infile:
                 library_javascript.write(infile.read())
 
             self.interactive_plotting_loaded = True

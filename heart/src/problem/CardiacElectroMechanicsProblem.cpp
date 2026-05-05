@@ -339,7 +339,7 @@ CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::~CardiacElectroMechanicsProbl
     delete mpCardiacMechSolver;
     delete mpMeshPair;
     delete mpCardiacVtkWriter;
-    
+
     LogFile::Close();
 }
 
@@ -436,7 +436,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
     unsigned num_quad_points = mpCardiacMechSolver->GetTotalNumQuadPoints();
     mInterpolatedCalciumConcs.assign(num_quad_points, 0.0);
     mInterpolatedVoltages.assign(num_quad_points, 0.0);
-    
+
     if (mpProblemDefinition->ReadFibreSheetDirectionsFromFile())
     {
        mpCardiacMechSolver->SetVariableFibreSheetDirections(mpProblemDefinition->GetFibreSheetDirectionsFile(),
@@ -483,7 +483,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Initialise()
     {
         TrianglesMeshWriter<DIM,DIM> mesh_writer(mOutputDirectory,"electrics_mesh",false);
         mesh_writer.WriteFilesUsingMesh(*mpElectricsMesh);
-    }   
+    }
 }
 
 template<unsigned DIM, unsigned ELEC_PROB_DIM>
@@ -529,7 +529,7 @@ void CardiacElectroMechanicsProblem<DIM,ELEC_PROB_DIM>::Solve()
     {
 #ifdef CHASTE_VTK
         if (HeartConfig::Instance()->GetVisualizeWithVtk())
-        {   
+        {
             ReplicatableVector ic(initial_voltage);
             mpCardiacVtkWriter = new CardiacElectroMechanicsVtkHandler<DIM,ELEC_PROB_DIM>(*mpMechanicsSolver,
                 *mpMechanicsMesh,*mpElectricsMesh, ic, mDeformationOutputDirectory);
