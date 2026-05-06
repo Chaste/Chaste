@@ -1,7 +1,7 @@
 #URLs to Third party libraries needed by Chaste
 
 # Specify the urls of the libraries you want to build separated by spaces and/or newlines, or as separate strings.
-# Note that the URLS of PARMETIS, METIS, F2CBLAS, F2CLAPACK are all automatically obtained from the
+# Note that the URLS of PARMETIS, F2CBLAS, F2CLAPACK are all automatically obtained from the
 # PETSc distribution once it has been downloaded and unzipped. So, there is no need to manually
 # specify the URLs for these libraries 
 set(PETSC_URLS "http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.3-p6.tar.gz")

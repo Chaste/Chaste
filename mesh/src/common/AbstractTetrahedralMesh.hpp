@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -46,7 +46,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <string>
 #include <cassert>
-#include <boost/foreach.hpp>
 
 #include "AbstractMesh.hpp"
 #include "BoundaryElement.hpp"
@@ -160,7 +159,7 @@ private:
                     std::string mesh_leaf_name = mesh_base.GetLeafNameNoExtension();
                     std::vector<FileFinder> mesh_files = mesh_folder.FindMatches(mesh_leaf_name + ".*");
                     FileFinder dest_dir(ArchiveLocationInfo::GetArchiveDirectory());
-                    BOOST_FOREACH(const FileFinder& r_mesh_file, mesh_files)
+                    for (const FileFinder& r_mesh_file : mesh_files)
                     {
                         FileFinder dest_file(ArchiveLocationInfo::GetMeshFilename() + r_mesh_file.GetExtension(),
                                              dest_dir);

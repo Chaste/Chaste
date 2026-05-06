@@ -16,6 +16,6 @@ echo "Cleaning up previous results files"
 echo "Compiling results files"
 for (( i=$first_experiment ; i<=$last_experiment ; i=i+5 ))
 do
-	echo "results $i"
-	more $results/results_from_time_"$i"/results.vizvoronoi >> $results/All_results
+    echo "results $i"
+    more $results/results_from_time_"$i"/results.vizvoronoi >> $results/All_results
 done

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -544,7 +544,14 @@ public:
             HeartConfig::Instance()->SetMeshFileName("mesh/test/data/cube_136_elements");
 
             TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
+#ifndef CHASTE_SCOTCH_PARMETIS
             DistributedTetrahedralMesh<3,3> mesh;
+#else
+            // For libscotchparmetis turn off smart partitioning
+            // PT-Scotch will produce good partitions but it cannot be forced to always
+            // give the same partition of the same mesh twice running.
+            DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+#endif
             mesh.ConstructFromMeshReader(mesh_reader);
 
             UnStimulatedCellFactory first_cell;
@@ -648,7 +655,14 @@ public:
             // Also, when testing in parallel, we use it to get the vector factory to loop over the nodes we own.
             // this is because  p_extended_tissue->pGetMesh()->GetDistributedVectorFactory() doesn't compile (discards qualifier stuff caused by use of const).
             TrianglesMeshReader<3,3> mesh_reader("mesh/test/data/cube_136_elements");
+#ifndef CHASTE_SCOTCH_PARMETIS
             DistributedTetrahedralMesh<3,3> mesh;
+#else
+            // For libscotchparmetis turn off smart partitioning
+            // PT-Scotch will produce good partitions but it cannot be forced to always
+            // give the same partition of the same mesh twice running.
+            DistributedTetrahedralMesh<3,3> mesh(DistributedTetrahedralMeshPartitionType::DUMB);
+#endif
             mesh.ConstructFromMeshReader(mesh_reader);
 
             TS_ASSERT_EQUALS(mesh.GetNumNodes(), p_extended_tissue->pGetMesh()->GetNumNodes());//note: this is allowed because GetNumNodes has const in the signature

@@ -15,12 +15,50 @@ fortran_compiler:
   - gfortran
 fortran_compiler_version:
   - "11"
+boostcpp:
+  - ">=1.70,<1.84"
+hdf5:
+  - ">=1.10,<1.14"
+metis:
+  - ">=4.0,<6.0"
+mpich:
+  - ">=4.0,<5.0"
+parmetis:
+  - ">=4.0,<6.0"
+petsc:
+  - ">=3.12,<3.20"
+petsc4py:
+  - ">=3.12,<3.20"
+python:
+  - 3.11.* *_cpython
+sundials:
+  - ">=3.0,<7.0"
+vtk:
+  - ">=7.1,<9.4"
+xercesc:
+  - ">=3.0,<4.0"
 pin_run_as_build:
+  boost-cpp:
+    min_pin: x.x
+    max_pin: x.x
+  libtiff:
+    min_pin: x.x
+    max_pin: x.x
+  petsc:
+    min_pin: x.x
+    max_pin: x.x
+  petsc4py:
+    min_pin: x.x
+    max_pin: x.x
   python:
     min_pin: x.x
     max_pin: x.x
-python:
-  - 3.11.* *_cpython
+  sundials:
+    min_pin: x.x
+    max_pin: x.x
+  vtk:
+    min_pin: x.x
+    max_pin: x.x
 target_platform:
   - linux-64
 zip_keys:

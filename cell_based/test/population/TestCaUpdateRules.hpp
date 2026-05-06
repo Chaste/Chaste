@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -52,12 +52,12 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WildTypeCellMutationState.hpp"
 #include "CellLabel.hpp"
 #include "PottsMeshGenerator.hpp"
-#include "NodesOnlyMesh.hpp"
 #include "NodeBasedCellPopulation.hpp"
 #include "SmartPointers.hpp"
 #include "FileComparison.hpp"
 
-#include "PetscSetupAndFinalize.hpp"
+//This test is always run sequentially (never in parallel)
+#include "FakePetscSetup.hpp"
 
 class TestCaUpdateRules : public AbstractCellBasedTestSuite
 {

@@ -67,8 +67,8 @@ cmake-build*
 appredict_lookup_table_manifest.txt
 
 # Build directories
-Debug
-Release
+Debug*
+Release*
 chaste-build*
 
 **/.uuid

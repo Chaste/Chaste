@@ -1,7 +1,7 @@
 macro (ENSURE_OUT_OF_SOURCE_BUILD)
     get_filename_component(srcdir "${CMAKE_SOURCE_DIR}" REALPATH)
     get_filename_component(bindir "${CMAKE_BINARY_DIR}" REALPATH)
-    
+
     if("${srcdir}" STREQUAL "${bindir}")
             message("**************************************************************************")
             message("* Chaste should not be configured and build in the source directory.     *")

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -261,6 +261,7 @@ public:
 
         HeartConfig::Instance()->SetSimulationDuration(10.0);
         HeartConfig::Instance()->SetExtracellularConductivities(Create_c_vector(1500,1500,1500));
+        HeartConfig::Instance()->SetVisualizeWithVtk(true);
         //creates the EM problem with ELEC_PROB_DIM=2
         CardiacElectroMechanicsProblem<2,2> problem(COMPRESSIBLE,
                                                     BIDOMAIN,
@@ -650,6 +651,7 @@ public:
         PlaneStimulusCellFactory<CellLuoRudy1991FromCellML, 2> cell_factory(-1000*1000);
 
         HeartConfig::Instance()->SetSimulationDuration(20.0);
+        HeartConfig::Instance()->SetVisualizeWithVtk(true);
 
         CardiacElectroMechProbRegularGeom<2> problem(INCOMPRESSIBLE,
                                                      0.05, /* width (cm) */

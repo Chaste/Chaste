@@ -1,4 +1,4 @@
-"""Copyright (c) 2005-2025, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -217,7 +217,7 @@ class TestPyVertexBasedCellSimulationsTutorial(AbstractCellBasedTestSuite):
         simulator.AddCellKiller(killer)
 
         ## To run the simulation, we call `Solve()`.
-        
+
         simulator.Solve()
 
         ## The next two lines are for test purposes only and are not part of this tutorial.

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Copyright (c) 2005-2025, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -70,10 +70,10 @@ except ImportError:
 class TestTest(unittest.TestCase):
     """A simple test case for testing the framework."""
     def TestOk(self):
-        self.failUnless(True)
+        self.assertTrue(True)
 
     def TestFail(self):
-        self.failIf(True)
+        self.assertFalse(True)
 
     def TestError(self):
         self.assertEqual(1, 1/0)

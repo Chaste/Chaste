@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -50,8 +50,13 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  (i) add lines such as "double x = CommandLineArguments::Instance()->GetDoubleCorrespondingToOption("-myparam");" below
  *  (ii) compile but do not run the test,
  *  (iii) run the compiled executable from the command line, with your parameter.
- *        If, at this step, you "undefined symbol:" errors then set your LD_LIBRARY_PATH (see [Running Binaries from the Command Line](/docs/user-guides/running-binaries-from-command-line/))
+ *        If, at this step, you get "undefined symbol:" errors then set your LD_LIBRARY_PATH (see [Running Binaries from the Command Line](/docs/user-guides/running-binaries-from-command-line/))
  *
+ *
+ *
+ * For example:
+ * `cmake ..` where `..` is the Chaste source directory, followed by
+ * `make <target> -D<option=value>` where `target` is the build target you are building (e.g. Chaste, heart, or a user project such as ApPredict), and `option` and `value` pairs set build options.
  * Note: error messages such as
  *   WARNING! There are options you set that were not used!
  *   WARNING! could be spelling mistake, etc!

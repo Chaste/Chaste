@@ -15,10 +15,10 @@ jobs:
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
     steps:
       - name: checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: setup python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.x'
 
@@ -28,7 +28,7 @@ jobs:
         working-directory: python/infra
 
       - name: Upload archive files
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: how-to-markdown
           path: |
@@ -37,15 +37,15 @@ jobs:
   upload-to-website:
     needs: generate-how-to-markdown
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.repository == 'Chaste/Chaste'
     steps:
       - name: Download how-to markdown
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: how-to-markdown
 
       - name: Checkout website repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: Chaste/Chaste.github.io
           token: ${{ secrets.WEBSITE_ACCESS }}

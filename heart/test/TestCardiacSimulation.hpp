@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -344,7 +344,7 @@ public:
         TS_ASSERT(file.Exists());
         /* If you want to update the .h5 results for this test for any reason, you need to stop the following test adding to them.
          * So uncomment the assert(), run the test, and then do:
-         cp /tmp/chaste/testoutput/SaveBidomainShort/SimulationResults.h5 heart/test/data/cardiac_simulations/save_bidomain_short_results.h5
+         cp $CHASTE_TEST_OUTPUT/SaveBidomainShort/SimulationResults.h5 heart/test/data/cardiac_simulations/save_bidomain_short_results.h5
          */
         //assert(0);
     }
@@ -382,7 +382,7 @@ public:
         TS_ASSERT(file.Exists());
         /* If you want to update the .h5 results for this test for any reason, you need to stop the following test adding to them.
          * So uncomment the assert(), run the test, and then do:
-         cp /tmp/chaste/testoutput/SaveMonodomainShort/SimulationResults.h5 heart/test/data/cardiac_simulations/save_monodomain_short_results.h5
+         cp $CHASTE_TEST_OUTPUT/SaveMonodomainShort/SimulationResults.h5 heart/test/data/cardiac_simulations/save_monodomain_short_results.h5
          */
         //assert(0);
     }
@@ -419,7 +419,7 @@ public:
 
         /* If you want to update the .h5 results for this test for any reason, you need to stop the following lines adding to them.
          * So uncomment the assert(), run the test, and then do:
-         cp /tmp/chaste/testoutput/SaveMonodomainDynamic/SimulationResults.h5 heart/test/data/cardiac_simulations/save_monodomain_dynamic.h5
+         cp $CHASTE_TEST_OUTPUT/SaveMonodomainDynamic/SimulationResults.h5 heart/test/data/cardiac_simulations/save_monodomain_dynamic.h5
          */
         //assert(0);
 

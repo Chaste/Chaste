@@ -165,7 +165,7 @@ stiff the cell boundary is.
 
  **Practice** Experiment with adjusting the spring constant to
  change the force behaviour between nodes of the cell boundary.
- 
+
 Next, we set the simulation properties
 
 ```python
@@ -228,7 +228,7 @@ Laminas can also interact with the fluid field, and can be made
 to model a permeable boundary.
 
  **Practice** Try changing the 6th constructor parameter to create a lamina.
- 
+
 #### Cell Variations
 Apart from using the 3rd and 4th constructor parameters to modify
 the cell shapes, we can also introduce variation between cells by
@@ -236,7 +236,7 @@ modifying the 5th parameter.
 
  **Practice** Try adjusting the 3rd and 4th constructor parameters to
  introduce cell variations.
- 
+
 Next, we generate the mesh and set the fluid grid resolution
 
 ```python
@@ -385,10 +385,10 @@ Finally, we must tell the cell population that fluid sources are present.
 #### Varying the Source Location and Strength
  **Practice** You can experiment with the source location. Try moving it
  closer to and further away from the cells.
- 
+
  **Practice** Try modifying the source strength to see what impact this
  has on the cell shapes.
- 
+
 Below, we visualize the cell population
 
 ```python
@@ -431,7 +431,7 @@ Add an inter-cellular force law
  **Practice** Try adding a second fluid source. You will need to
  use a unique index, and attach it to a different element as
  each element can only manage a single fluid source.
- 
+
 Next, we set the simulation properties
 
 ```python

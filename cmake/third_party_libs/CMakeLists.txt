@@ -1,12 +1,12 @@
-# Copyright (c) 2005-2025, University of Oxford.
+# Copyright (c) 2005-2026, University of Oxford.
 # All rights reserved.
-# 
+#
 # University of Oxford means the Chancellor, Masters and Scholars of the
 # University of Oxford, having an administrative office at Wellington
 # Square, Oxford OX1 2JD, UK.
-# 
+#
 # This file is part of Chaste.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #  * Redistributions of source code must retain the above copyright notice,
@@ -17,7 +17,7 @@
 #  * Neither the name of the University of Oxford nor the names of its
 #    contributors may be used to endorse or promote products derived from this
 #    software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -349,13 +349,14 @@ foreach(url ${PETSC_URLS})
 
     if(parmetis_url STREQUAL "")
         message(FATAL_ERROR "Could not locate PARMETIS URL in ${DOWNLOAD_DIR}/petsc/${basicname}/config/PETSc/packages/parmetis.py")
-      else()
-          set(url "${parmetis_url}")
-          download_from_url(${url} "parmetis")
-          set(parmetis_basicname "${bname}")
-      endif()
+    else()
+        set(url "${parmetis_url}")
+        download_from_url(${url} "parmetis")
+        set(parmetis_basicname "${bname}")
+    endif()
 
 
+    # Todo - METIS is no longer required
     file(STRINGS "${DOWNLOAD_DIR}/petsc/${basicname}/config/PETSc/packages/metis.py" metispy)
     set(metis_url "")
     foreach(s ${metispy})
@@ -367,6 +368,7 @@ foreach(url ${PETSC_URLS})
     endif()
     endforeach()
 
+    # Todo - METIS is no longer required
     if(metis_url STREQUAL "")
         message(FATAL_ERROR "Could not locate METIS URL in ${DOWNLOAD_DIR}/petsc/${basicname}/config/PETSc/packages/metis.py")
     else()
@@ -375,13 +377,13 @@ foreach(url ${PETSC_URLS})
           set(metis_basicname "${bname}")
       endif()
 
-          #patch the PARMETIS CMakeLists.txt
-          file(READ "${DOWNLOAD_DIR}/parmetis/${parmetis_basicname}/CMakeLists.txt" parcmake)
+    #patch the PARMETIS CMakeLists.txt
+    file(READ "${DOWNLOAD_DIR}/parmetis/${parmetis_basicname}/CMakeLists.txt" parcmake)
 
-          #check whether we have patched this already
-        string(FIND "${parcmake}" "${patch_message}" patched)
-        if(patched EQUAL -1)#not patched yet
-          string(REPLACE "project(ParMETIS)" "project(ParMETIS)
+    #check whether we have patched this already
+    string(FIND "${parcmake}" "${patch_message}" patched)
+    if(patched EQUAL -1)#not patched yet
+         string(REPLACE "project(ParMETIS)" "project(ParMETIS)
 
 #Use gk_regex.h instead of regex.h and a bunch of other flags for GKlib and metis
 add_definitions(-DUSE_GKREGEX -DWIN32 -DMSC -D_CRT_SECURE_NO_DEPRECATE)

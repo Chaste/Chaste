@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Copyright (c) 2005-2025, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -70,7 +70,7 @@ deprecated_notice = re.compile(r"""(# ){0,1}Copyright \(c\) 2005-\d{4}, Universi
 """, re.MULTILINE)
 
 
-current_notice = """Copyright (c) 2005-2025, University of Oxford.
+current_notice = """Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -108,7 +108,7 @@ cpp_current_notice = '/*\n\n'+current_notice+'\n*/'
 
 
 def AddHashesToBeginningOfLines(message):
-    message = '# ' + message.replace("\n", "\n# ")
+    message = ('# ' + message.replace("\n", "\n# ")).replace("\n# \n", "\n#\n")
     return message[:-2]
 
 
@@ -248,9 +248,9 @@ def InspectFile(fileName):
         CheckForCopyrightNotice(triangle_notice, file_in) or
         CheckForCopyrightNotice(tetgen_predicates_notice, file_in) or
         CheckForCopyrightNotice(tetgen_notice, file_in) or
-        CheckForCopyrightNotice(py_lgpl_notice, file_in) or 
-        CheckForCopyrightNotice(opensimplex_notice, file_in) or 
-        CheckForCopyrightNotice(smtk_notice, file_in) or 
+        CheckForCopyrightNotice(py_lgpl_notice, file_in) or
+        CheckForCopyrightNotice(opensimplex_notice, file_in) or
+        CheckForCopyrightNotice(smtk_notice, file_in) or
         CheckForCopyrightNotice(dolfinx_notice, file_in)):
         # print('Found 3rd party notice in %s' % file_name)
         if valid_notice:

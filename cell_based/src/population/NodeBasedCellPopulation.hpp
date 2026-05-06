@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -67,9 +67,6 @@ private:
 
     /** Vector of maximal spatial positions in each dimension. */
     c_vector<double, DIM> mMaxSpatialPositions;
-
-    /** Node pairs for force calculations. */
-    std::vector< std::pair<Node<DIM>*, Node<DIM>* > > mNodePairs;
 
     /** Whether to delete the nodes-only mesh (taken in one of the constructors, defaults to false). */
     bool mDeleteMesh;
@@ -347,13 +344,6 @@ public:
      * @param hasHadBirthsOrDeaths whether cell population has had Births Or Deaths
      */
     void Update(bool hasHadBirthsOrDeaths=true);
-
-    /**
-     * Overridden rGetNodePairs method
-     *
-     * @return Node pairs for force calculation.
-     */
-    std::vector< std::pair<Node<DIM>*, Node<DIM>* > >& rGetNodePairs();
 
     /**
      * Outputs CellPopulation parameters to file

@@ -10,7 +10,7 @@ on:
       - develop
 
 jobs:
-  
+
   compiler-all-libs:
 
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
@@ -47,7 +47,7 @@ jobs:
 
     steps:
     - name: checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: install dependencies
       run: |
@@ -97,4 +97,10 @@ jobs:
 
     - name: build lung
       run: cmake --build . --parallel 4 --target chaste_lung
+      working-directory: chaste-build-dir
+
+    - name: run TestChasteBuildInfo
+      run: |
+        cmake --build . --target TestChasteBuildInfo --parallel 4
+        ctest -V -R TestChasteBuildInfo
       working-directory: chaste-build-dir

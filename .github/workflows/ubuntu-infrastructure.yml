@@ -10,10 +10,10 @@ on:
       - develop
 
 jobs:
-  
+
   build-and-test:
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
 
@@ -24,11 +24,11 @@ jobs:
 
     steps:
     - name: checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: install dependencies
       run: |
-        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu focal/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
+        echo 'deb [signed-by=/usr/share/keyrings/chaste.asc] https://chaste.github.io/ubuntu noble/' | sudo tee -a /etc/apt/sources.list.d/chaste.list
         sudo wget -O /usr/share/keyrings/chaste.asc https://chaste.github.io/chaste.asc
         sudo apt update
         sudo apt install chaste-dependencies
@@ -46,6 +46,26 @@ jobs:
       run: cmake -DCMAKE_BUILD_TYPE=Debug ..
       working-directory: chaste-build-dir
 
+    - name: run TestChasteBuildInfo
+      run: |
+        cmake --build . --target TestChasteBuildInfo --parallel 4
+        ctest -V -R TestChasteBuildInfo
+      working-directory: chaste-build-dir
+
     - name: run infrastructure checks
       run: cmake --build . --target infrastructure
+      working-directory: chaste-build-dir
+
+    - name: run check for tabs and trailing whitespace
+      run: |
+        cmake --build . --target infrastructure_whitespace
+        if ! git diff --quiet --exit-code; then
+          echo
+          echo "Error: check for tabs and trailing whitespace failed."
+          echo "Run python/infra/RemoveTabsAndTrailingWhitespace.py and commit the results."
+          echo "The following files have problems:"
+          echo
+          git status
+          exit 1
+        fi
       working-directory: chaste-build-dir

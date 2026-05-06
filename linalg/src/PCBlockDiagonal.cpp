@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -209,7 +209,7 @@ void PCBlockDiagonal::PCBlockDiagonalSetUp()
 
     // We are expecting an error from PETSC on systems that don't have the hypre library, so suppress it
     // in case it aborts
-    PetscPushErrorHandler(PetscIgnoreErrorHandler, nullptr);
+    PetscPushErrorHandler(PetscReturnErrorHandler, nullptr);
     PetscErrorCode pc_set_error = PCSetType(mPCContext.PC_amg_A11, PCHYPRE);
     if (pc_set_error != 0)
     {
@@ -243,7 +243,7 @@ void PCBlockDiagonal::PCBlockDiagonalSetUp()
     PCCreate(PETSC_COMM_WORLD, &(mPCContext.PC_amg_A22));
 
     /* Full AMG in the block */
-    PetscPushErrorHandler(PetscIgnoreErrorHandler, nullptr);
+    PetscPushErrorHandler(PetscReturnErrorHandler, nullptr);
     PCSetType(mPCContext.PC_amg_A22, PCHYPRE);
     // Stop supressing error
     PetscPopErrorHandler();

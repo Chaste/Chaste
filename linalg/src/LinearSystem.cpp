@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -281,14 +281,17 @@ LinearSystem::~LinearSystem()
         PetscTools::Destroy(mDirichletBoundaryConditionsVector);
     }
 
-#if (PETSC_VERSION_MAJOR == 3) //PETSc 3.x.x
+#if (PETSC_VERSION_MAJOR == 3) // PETSc 3.x.x
     if (mpConvergenceTestContext)
     {
-#if (PETSC_VERSION_MINOR >= 5) //PETSc 3.5 or later
+#if (PETSC_VERSION_MINOR >= 24) // PETSc 3.24 or later
+        KSPConvergedDefaultDestroy(&mpConvergenceTestContext);
+#elif (PETSC_VERSION_MINOR >= 5) // PETSc 3.5 to 3.23
         KSPConvergedDefaultDestroy(mpConvergenceTestContext);
 #else
         KSPDefaultConvergedDestroy(mpConvergenceTestContext);
 #endif
+        mpConvergenceTestContext = nullptr;
     }
 #endif
 

@@ -1,4 +1,4 @@
-"""Copyright (c) 2005-2025, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -40,28 +40,88 @@ class PopulationWriterCustomTemplate(cppwg.templates.custom.Custom):
 
     def get_class_cpp_def_code(self, class_name):
         """
-        Creates custom wrapper code for adding population and cell writers.
+        Custom wrapper code for adding writers to cell populations.
         """
-        population_writers = ["VoronoiDataWriter"]
 
-        cell_writers = ["CellLabelWriter"]
+        code = ""
 
-        population_writer_template = """\
-        .def("AddPopulationWriter{writer}", &{class_name}::AddPopulationWriter<{writer}>)
-"""
+        # Add cell writers
+        cell_writers = [
+            "CellAgesWriter",
+            "CellAncestorWriter",
+            "CellAppliedForceWriter",
+            "CellCycleModelProteinConcentrationsWriter",
+            "CellDataItemWriter",
+            "CellDeltaNotchWriter",
+            "CellIdWriter",
+            "CellLabelWriter",
+            "CellLocationIndexWriter",
+            "CellMutationStatesWriter",
+            "CellProliferativePhasesWriter",
+            "CellProliferativeTypesWriter",
+            "CellRadiusWriter",
+            "CellRosetteRankWriter",
+            "CellVolumesWriter",
+            "LegacyCellProliferativeTypesWriter",
+        ]
 
         cell_writer_template = """\
         .def("AddCellWriter{writer}", &{class_name}::AddCellWriter<{writer}>)
 """
 
-        code = ""
-
-        for writer in population_writers:
-            replacements = {"class_name": class_name, "writer": writer}
-            code += population_writer_template.format(**replacements)
-
         for writer in cell_writers:
             replacements = {"class_name": class_name, "writer": writer}
             code += cell_writer_template.format(**replacements)
+
+        # Add cell population count writers
+        cell_population_count_writers = [
+            "CellMutationStatesCountWriter",
+            "CellProliferativeTypesCountWriter",
+            "CellProliferativePhasesCountWriter",
+        ]
+
+        cell_population_count_writer_template = """\
+        .def("AddCellPopulationCountWriter{writer}", &{class_name}::AddCellPopulationCountWriter<{writer}>)
+"""
+        for writer in cell_population_count_writers:
+            replacements = {"class_name": class_name, "writer": writer}
+            code += cell_population_count_writer_template.format(**replacements)
+
+        # Add cell population event writers
+        cell_population_event_writers = [
+            "CellDivisionLocationsWriter",
+            "CellRemovalLocationsWriter",
+        ]
+
+        cell_population_event_writer_template = """\
+        .def("AddCellPopulationEventWriter{writer}", &{class_name}::AddCellPopulationEventWriter<{writer}>)
+"""
+        for writer in cell_population_event_writers:
+            replacements = {"class_name": class_name, "writer": writer}
+            code += cell_population_event_writer_template.format(**replacements)
+
+        # Add population writers
+        population_writers = [
+            "BoundaryNodeWriter",
+            "CellPopulationAdjacencyMatrixWriter",
+            "CellPopulationAreaWriter",
+            "CellPopulationElementWriter",
+            "HeterotypicBoundaryLengthWriter",
+            "NodeLocationWriter",
+            "NodeVelocityWriter",
+            "RadialCellDataDistributionWriter",
+            "VertexIntersectionSwapLocationsWriter",
+            "VertexT1SwapLocationsWriter",
+            "VertexT2SwapLocationsWriter",
+            "VertexT3SwapLocationsWriter",
+            "VoronoiDataWriter",
+        ]
+
+        population_writer_template = """\
+        .def("AddPopulationWriter{writer}", &{class_name}::AddPopulationWriter<{writer}>)
+"""
+        for writer in population_writers:
+            replacements = {"class_name": class_name, "writer": writer}
+            code += population_writer_template.format(**replacements)
 
         return code

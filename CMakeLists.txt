@@ -1,12 +1,12 @@
-# Copyright (c) 2005-2025, University of Oxford.
+# Copyright (c) 2005-2026, University of Oxford.
 # All rights reserved.
-# 
+#
 # University of Oxford means the Chancellor, Masters and Scholars of the
 # University of Oxford, having an administrative office at Wellington
 # Square, Oxford OX1 2JD, UK.
-# 
+#
 # This file is part of Chaste.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #  * Redistributions of source code must retain the above copyright notice,
@@ -17,7 +17,7 @@
 #  * Neither the name of the University of Oxford nor the names of its
 #    contributors may be used to endorse or promote products derived from this
 #    software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,8 +30,8 @@
 # OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-# The version that ships with Ubuntu 20.04
-cmake_minimum_required (VERSION 3.16.3)
+# The version that ships with Ubuntu 22.04
+cmake_minimum_required (VERSION 3.22.1)
 
 # Set standard to C++17
 set(CMAKE_CXX_STANDARD 17)
@@ -52,9 +52,9 @@ message ("####################################\n")
 message(STATUS "CMake version: ${CMAKE_VERSION}")
 
 # Since CMake 3.0, version can be supplied to the project() command.  We set it directly, for users on older CMake
-project (Chaste VERSION 2024.2)
-set (Chaste_VERSION_MAJOR 2024 CACHE STRING "Chaste major version number")
-set (Chaste_VERSION_MINOR 2 CACHE STRING "Chaste minor version number")
+project (Chaste VERSION 2026.1)
+set (Chaste_VERSION_MAJOR 2026 CACHE STRING "Chaste major version number")
+set (Chaste_VERSION_MINOR 1 CACHE STRING "Chaste minor version number")
 
 message(STATUS "Linker: ${CMAKE_LINKER}")
 
@@ -451,21 +451,23 @@ endif ()
 ################################
 ####  Find Boost
 ################################
-add_definitions(-DBOOST_ALL_NO_LIB)
-if (BUILD_SHARED_LIBS)
-    set(Boost_USE_STATIC_LIBS OFF)
-    set(Boost_USE_STATIC_RUNTIME OFF)
-else ()
-    set(Boost_USE_STATIC_LIBS ON)
-    set(Boost_USE_STATIC_RUNTIME ON)
-endif ()
-find_package (Boost COMPONENTS filesystem system serialization program_options REQUIRED)
-list (APPEND Chaste_INCLUDES "${Boost_INCLUDE_DIR}")
-list (APPEND Chaste_LINK_LIBRARIES "${Boost_LIBRARIES}")
+find_package(Boost 1.71 REQUIRED COMPONENTS headers serialization program_options CONFIG)
+message(STATUS "Boost version: ${Boost_VERSION}")
+
+# Turn off boost auto-linking, which is not required when using CMake
+target_compile_definitions(Chaste_COMMON_DEPS INTERFACE BOOST_ALL_NO_LIB)
+
 # Suppress boost deprecation notices in Boost 1.74.0 (shipped with Ubuntu 22.04), fixed in 1.75
 if (Boost_VERSION VERSION_GREATER_EQUAL 1.74.0 AND Boost_VERSION VERSION_LESS 1.75.0)
-    add_definitions(-DBOOST_ALLOW_DEPRECATED_HEADERS)
+    target_compile_definitions(Chaste_COMMON_DEPS INTERFACE BOOST_ALLOW_DEPRECATED_HEADERS)
 endif ()
+
+# Link the Boost targets onto Chaste_COMMON_DEPS
+target_link_libraries(Chaste_COMMON_DEPS INTERFACE
+        Boost::headers
+        Boost::serialization
+        Boost::program_options
+)
 
 
 ################################
@@ -475,72 +477,41 @@ if (Chaste_ENABLE_PYCHASTE)
     find_package(PETSc4py REQUIRED)
 endif ()
 
+include(FindPkgConfig REQUIRED)
 find_package (PETSc REQUIRED)
-list (APPEND Chaste_LINK_LIBRARIES "${PETSC_LIBRARIES}")
+
+message(STATUS "PETSc version: ${PETSc_VERSION}")
+target_link_libraries(Chaste_COMMON_DEPS INTERFACE PETSc::PETSc)
+#list(APPEND Chaste_LINK_LIBRARIES "${PETSc_LIBRARIES}")
+list(APPEND Chaste_INCLUDES "${PETSc_INCLUDE_DIRS}")
 
 
 ################################
 ####  Find HDF5
 ################################
 
-# This alters the order that CMake looks for h5pcc h5cc (parallel h5pcc first)
-set (HDF5_PREFER_PARALLEL TRUE)
-
-# If we're using PETSc's HDF5 (ON by default, for more reliable MPI compatibility), we override HDF5_ROOT accordingly
-if (Chaste_USE_PETSC_HDF5)
-    if (EXISTS "${PETSC_DIR}/${PETSC_ARCH}/bin/h5diff")
-        set (ENV{HDF5_ROOT} "${PETSC_DIR}/${PETSC_ARCH}")
-    else ()
-        message (STATUS "No HDF5 found in ${PETSC_DIR}/${PETSC_ARCH}: looking for alternative HDF5 instead")
-    endif ()
-endif ()
-
-# Find the HDF5_C_COMPILER_EXECUTABLE to help the find_package call (else the system HDF5 will always be found)
-find_program (HDF5_C_COMPILER_EXECUTABLE
-              NAMES h5pcc h5cc
-              HINTS ENV HDF5_ROOT
-              PATH_SUFFIXES bin Bin
-              DOC "HDF5 Wrapper compiler.  Used only to detect HDF5 compile flags.")
-find_package (HDF5 REQUIRED)
+# Ensure the wrapper compiler h5pcc (parallel) is found instead of h5cc (serial) if both are in the same directory
+set(HDF5_PREFER_PARALLEL TRUE)
+find_package(HDF5 REQUIRED COMPONENTS C)
+message(STATUS "HDF5 version: ${HDF5_VERSION}")
+target_link_libraries(Chaste_COMMON_DEPS INTERFACE HDF5::HDF5)
 
 # Chaste requires a parallel HDF5 library
 if (NOT HDF5_IS_PARALLEL)
-    message (SEND_ERROR "Hdf5 library found was not build with --enable-parallel, use the HDF5_ROOT environment variable to specify a parallel hdf5 library. Note: include dirs are ${HDF5_INCLUDE_DIRS} and libraries are ${HDF5_LIBRARIES}")
+    message(SEND_ERROR "Hdf5 library found was not build with --enable-parallel, use the HDF5_ROOT environment variable to specify a parallel hdf5 library. Note: include dirs are ${HDF5_INCLUDE_DIRS} and libraries are ${HDF5_LIBRARIES}")
 endif ()
-list (APPEND Chaste_INCLUDES "${HDF5_INCLUDE_DIRS}")
-
-# for some reason the CMake in Homebrew returns a NOTFOUND entry in the Hdf5 libraries
-foreach (dir ${HDF5_LIBRARIES})
-    if (dir)
-        list (APPEND Chaste_LINK_LIBRARIES "${dir}")
-    endif ()
-endforeach ()
-
-# put petsc includes after hdf5 includes or else the hdf5 headers
-# in the petsc include dir will clobber those chosen on FindHdf5.cmake
-list (APPEND Chaste_INCLUDES "${PETSC_INCLUDES}")
+list(APPEND Chaste_INCLUDES "${HDF5_INCLUDE_DIRS}")
 
 
 ################################
 ####  Find MPI
 ################################
-if (PETSC_COMPILER)
-    string (REPLACE mpicc mpicxx MPI_CXX_COMPILER ${PETSC_COMPILER})
-endif ()
 
-if (PETSC_MPIEXEC)
-    if (IS_ABSOLUTE ${PETSC_MPIEXEC})
-        set (MPIEXEC ${PETSC_MPIEXEC})  # MPIEXEC deprecated in newer FindMPI.cmake (#2967)
-        set (MPIEXEC_EXECUTABLE ${PETSC_MPIEXEC})
-    else ()
-        find_program (MPIEXEC ${PETSC_MPIEXEC})
-    endif ()
-endif ()
 find_package (MPI REQUIRED COMPONENTS CXX)
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MPI_CXX_COMPILE_FLAGS}")
-set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${MPI_C_COMPILE_FLAGS}")
-set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MPI_CXX_LINK_FLAGS}")
-list (APPEND Chaste_INCLUDES "${MPI_CXX_INCLUDE_PATH}")
+message(STATUS "MPI version: ${MPI_CXX_VERSION}")
+message(STATUS "MPI executable: ${MPIEXEC_EXECUTABLE}")
+target_link_libraries(Chaste_COMMON_DEPS INTERFACE MPI::MPI_CXX)
+list(APPEND Chaste_INCLUDES "${MPI_CXX_INCLUDE_DIRS}")
 
 if (Chaste_MEMORY_TESTING)
     get_filename_component (openmpi_supp_path ${MPIEXEC} PATH)
@@ -553,14 +524,9 @@ if (Chaste_MEMORY_TESTING)
     endif ()
 endif ()
 
-message (STATUS "Found MPIEXEC_EXECUTABLE: ${MPIEXEC_EXECUTABLE}")
-message (STATUS "Found MPIEXEC: ${MPIEXEC}")
-message (STATUS "Found MPI_CXX_HEADER_DIR: ${MPI_CXX_HEADER_DIR}")
-message (STATUS "Found MPI_C_COMPILER: ${MPI_C_COMPILER}")
-
 
 ################################
-####  Find ParMETIS and METIS
+####  Find ParMETIS
 ################################
 # If we're using PETSc's ParMETIS (ON by default, for more reliable MPI compatibility), override PARMETIS_ROOT accordingly
 if (Chaste_USE_PETSC_PARMETIS)
@@ -572,6 +538,8 @@ if (Chaste_USE_PETSC_PARMETIS)
 endif ()
 find_package (ParMETIS REQUIRED)
 list (APPEND Chaste_LINK_LIBRARIES "${PARMETIS_LIBRARIES}")
+# libscotchparmetis-dev has a parmetis.h adapter include which is in a subdirectory
+list (APPEND Chaste_INCLUDES "${PARMETIS_INCLUDE_DIR}")
 
 
 ################################
@@ -583,7 +551,10 @@ if (Chaste_USE_CVODE)
     else ()
         set (SUNDIALS_USE_STATIC_LIBRARIES ON)
     endif ()
-    find_package (SUNDIALS COMPONENTS sundials_cvode sundials_nvecserial REQUIRED)
+    find_package (SUNDIALS COMPONENTS  sundials_cvode sundials_nvecserial REQUIRED)
+    if (SUNDIALS_VERSION_MAJOR GREATER_EQUAL 7) # Newer CVODE requires a core sundials library to be linked in
+        find_package (SUNDIALS COMPONENTS  sundials_core REQUIRED)
+    endif ()
     list (APPEND Chaste_INCLUDES "${SUNDIALS_INCLUDE_DIRS}")
     #chaste_add_libraries(Chaste_LINK_LIBRARIES Chaste_THIRD_PARTY_STATIC_LIBRARIES Chaste_LINK_LIBRARIES)
     list (APPEND Chaste_LINK_LIBRARIES "${SUNDIALS_LIBRARIES}")
@@ -875,62 +846,57 @@ foreach (project ${Chaste_PROJECTS})
     endif ()
 endforeach ()
 
-configure_file (${Chaste_SOURCE_DIR}/cmake/Config/ChasteConfig.cmake.in
-                "${Chaste_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/ChasteConfig.cmake" @ONLY)
-
 # Configure file for build dir
-set (EXPORT_Chaste_PYTHON_DIR "${Chaste_PYTHON_DIR}")
+set(EXPORT_Chaste_PYTHON_DIR "${Chaste_PYTHON_DIR}")
 foreach (component ${Chaste_COMPONENTS})
-    set (EXPORT_Chaste_${component}_INCLUDE_DIRS ${Chaste_${component}_INCLUDE_DIRS})
+    set(EXPORT_Chaste_${component}_INCLUDE_DIRS ${Chaste_${component}_INCLUDE_DIRS})
 endforeach (component)
 
-configure_file (${Chaste_SOURCE_DIR}/cmake/Config/ChasteConfig.cmake.in
-                "${Chaste_BINARY_DIR}/ChasteConfig.cmake" @ONLY)
+configure_file(${Chaste_SOURCE_DIR}/cmake/Config/ChasteConfig.cmake.in
+        "${Chaste_BINARY_DIR}/ChasteConfig.cmake" @ONLY)
 
-file (COPY ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteMacros.cmake
-      DESTINATION ${Chaste_BINARY_DIR}/cmake/Modules)
+file(COPY ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteMacros.cmake
+        DESTINATION ${Chaste_BINARY_DIR}/cmake/Modules)
 
-file (COPY ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteRunTestAndPostProcess.cmake
-      DESTINATION ${Chaste_BINARY_DIR}/cmake/Modules)
+file(COPY ${Chaste_SOURCE_DIR}/cmake/Modules/ChasteRunTestAndPostProcess.cmake
+        DESTINATION ${Chaste_BINARY_DIR}/cmake/Modules)
 
-file (COPY ${Chaste_SOURCE_DIR}/python
-      DESTINATION ${Chaste_BINARY_DIR})
+file(COPY ${Chaste_SOURCE_DIR}/python
+        DESTINATION ${Chaste_BINARY_DIR})
 
-file (COPY ${Chaste_SOURCE_DIR}/cxxtest
-      DESTINATION ${Chaste_BINARY_DIR})
+file(COPY ${Chaste_SOURCE_DIR}/cxxtest
+        DESTINATION ${Chaste_BINARY_DIR})
 
 
-install (FILES
-         "${Chaste_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/ChasteConfig.cmake"
-         #    "${Chaste_BINARY_DIR}/ChasteTargets.cmake"
-         DESTINATION lib/chaste
-         COMPONENT Config)
+install(FILES
+        "${Chaste_BINARY_DIR}/ChasteConfig.cmake"
+        DESTINATION lib/chaste
+        COMPONENT Config)
 
-install (FILES
-         "${Chaste_BINARY_DIR}/cmake/Modules/ChasteMacros.cmake"
-         "${Chaste_BINARY_DIR}/cmake/Modules/ChasteRunTestAndPostProcess.cmake"
-         DESTINATION lib/chaste/cmake/Modules
-         COMPONENT Config)
+install(FILES
+        "${Chaste_BINARY_DIR}/cmake/Modules/ChasteMacros.cmake"
+        "${Chaste_BINARY_DIR}/cmake/Modules/ChasteRunTestAndPostProcess.cmake"
+        DESTINATION lib/chaste/cmake/Modules
+        COMPONENT Config)
 
 # CxxTest folder
-install (DIRECTORY ${Chaste_BINARY_DIR}/cxxtest
-         DESTINATION lib/chaste
-         USE_SOURCE_PERMISSIONS
-         COMPONENT CxxTest)
+install(DIRECTORY ${Chaste_BINARY_DIR}/cxxtest
+        DESTINATION lib/chaste
+        USE_SOURCE_PERMISSIONS
+        COMPONENT CxxTest)
 
 # Python folder
-install (DIRECTORY ${Chaste_BINARY_DIR}/python
-         DESTINATION lib/chaste
-         USE_SOURCE_PERMISSIONS
-         COMPONENT Python)
+install(DIRECTORY ${Chaste_BINARY_DIR}/python
+        DESTINATION lib/chaste
+        USE_SOURCE_PERMISSIONS
+        COMPONENT Python)
 
 # libraries
-install (EXPORT chaste-targets
-         DESTINATION lib/chaste
-         FILE ChasteTargets.cmake
-         #EXPORT_LINK_INTERFACE_LIBRARIES
-         COMPONENT ChasteTargets
-         )
+install(EXPORT chaste-targets
+        DESTINATION lib/chaste
+        FILE ChasteTargets.cmake
+        COMPONENT ChasteTargets
+)
 
 
 ####################
@@ -1105,6 +1071,12 @@ add_custom_target (infrastructure
                    WORKING_DIRECTORY ${Chaste_SOURCE_DIR}
                    VERBATIM)
 
+add_custom_target (infrastructure_whitespace
+                   COMMAND ${Python3_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/utils/RemoveTabsAndTrailingWhitespace.py
+
+                   WORKING_DIRECTORY ${Chaste_SOURCE_DIR}
+                   VERBATIM)
+
 
 ####################
 #    PACKAGING     #
@@ -1172,6 +1144,30 @@ foreach (component ${Chaste_COMPONENTS})
     endforeach (depend_component Chaste_DEPENDS_${component})
 
 endforeach (component ${Chaste_COMPONENTS})
+
+
+# CMake 4.1.0-4.1.4 and 4.2.0-4.2.1 emit spurious "Could not find a package configuration file provided by nvpl"
+# warnings while searching for BLAS/LAPACK (triggered when finding PETSc and SUNDIALS). These warnings are harmless and
+# can safely be ignored.
+# The issue was fixed in CMake 4.1.5 and 4.2.2 respectively:
+# https://gitlab.kitware.com/cmake/cmake/-/work_items/27451
+# https://github.com/Chaste/Chaste/issues/477
+if ((CMAKE_VERSION VERSION_GREATER_EQUAL "4.1.0" AND CMAKE_VERSION VERSION_LESS "4.1.5") OR
+(CMAKE_VERSION VERSION_GREATER_EQUAL "4.2.0" AND CMAKE_VERSION VERSION_LESS "4.2.2"))
+    message(STATUS "NOTE: CMake ${CMAKE_VERSION} is known to emit spurious warnings related to 'nvpl' when searching "
+            "for BLAS/LAPACK. These warnings are harmless and can safely be ignored. Upgrade to CMake >= 4.1.5 or >= "
+            "4.2.2 to suppress them.")
+endif ()
+
+
+message(STATUS "")
+message(STATUS "----------------------------------------------------------")
+message(STATUS "Chaste documentation and tutorials:")
+message(STATUS "    https://chaste.github.io/")
+message(STATUS "Ask questions and get help from the core development team:")
+message(STATUS "    https://github.com/Chaste/Chaste/discussions")
+message(STATUS "----------------------------------------------------------")
+message(STATUS "")
 
 
 set (CPACK_DEBIAN_PACKAGE_DEPENDS "cmake, g++, libopenmpi-dev, petsc-dev (>= 2.3.3-14), libhdf5-openmpi-dev, xsdcxx, libboost-serialization-dev, libboost-filesystem-dev, libparmetis-dev, libxerces-c3-dev, libsundials-serial-dev, libvtk5-dev, python-lxml, python-rdflib")

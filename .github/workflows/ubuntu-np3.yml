@@ -10,7 +10,7 @@ on:
       - develop
 
 jobs:
-  
+
   build-and-test:
 
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
@@ -24,7 +24,7 @@ jobs:
 
     steps:
     - name: checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: compiler version
       run: |
@@ -41,6 +41,11 @@ jobs:
 
     - name: build continuous test pack
       run: cmake --build . --parallel 10 --target Continuous
+      working-directory: chaste-build-dir
+
+    - name: run TestChasteBuildInfo
+      run: |
+        ctest -V -R TestChasteBuildInfo
       working-directory: chaste-build-dir
 
     - name: run continuous test pack

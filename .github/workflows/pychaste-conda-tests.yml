@@ -18,9 +18,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     env:
       CHASTE_TEST_OUTPUT: ${{ github.workspace }}/testoutput
@@ -31,7 +31,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Make build and test directories
         run: |
@@ -41,27 +41,30 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y castxml clang cmake xvfb
+          sudo apt-get install -y castxml clang cmake libosmesa6-dev libpthread-stubs0-dev libx11-dev pkg-config xvfb
 
       - name: Setup Miniconda Python ${{ matrix.python-version }}
-        uses: conda-incubator/setup-miniconda@v3
+        uses: conda-incubator/setup-miniconda@v4
         with:
           auto-update-conda: true
           use-mamba: true
           miniforge-version: latest
-          environment-file: pychaste/src/py/conda/environment.yml
+          environment-file: pychaste/src/py/conda/envs/env_python${{ matrix.python-version }}.yaml
           python-version: ${{ matrix.python-version }}
           channels: conda-forge,pychaste
+
+      - name: Show environment packages
+        run: conda list
 
       - name: Configure PyChaste
         run: |
           cmake \
             -DChaste_ENABLE_PYCHASTE=ON \
             -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_SHARED_LIBS=ON \
             -DCMAKE_INSTALL_PREFIX="${CONDA_PREFIX}" \
             -DCMAKE_PREFIX_PATH="${CONDA_PREFIX}" \
             -DCMAKE_LIBRARY_PATH="${CONDA_PREFIX}/lib" \
-            -DBUILD_SHARED_LIBS=ON \
             -DBOOST_ROOT="${CONDA_PREFIX}" \
             -DHDF5_C_COMPILER_EXECUTABLE="${CONDA_PREFIX}/bin/h5pcc" \
             -DPETSC_DIR="${CONDA_PREFIX}" \

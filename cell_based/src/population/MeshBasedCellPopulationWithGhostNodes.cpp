@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -79,6 +79,7 @@ MeshBasedCellPopulationWithGhostNodes<DIM>::MeshBasedCellPopulationWithGhostNode
         this->mIsGhostNode = std::vector<bool>(this->GetNumNodes(), false);
         Validate();
     }
+    this->UpdateNodePairs();
 }
 
 template<unsigned DIM>

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-"""Copyright (c) 2005-2025, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -70,7 +70,7 @@ def IsTestFile(test_dir, test_file_path):
         fp.close()
     #print("%s %s %s %s" % (test_dir, test_file, test_ext, is_test))
     return is_test
-    
+
 test_packs  = set()  # Names of test packs found
 orphans     = set()  # Names of any orphaned test files
 found_tests = set()  # Names of tests found in test packs
@@ -85,11 +85,11 @@ for test_dir in sorted(test_dirs):
     tf, pn = BuildTools.GetTestsInTestPacks(test_dir, returnFoundPacks=True)
     found_tests.update(tf)
     test_packs.update(pn)
-    
+
     # Make a list of parallel and continuous tests
     parallel = BuildTools.GetTestsInTestPacks(test_dir,['Parallel'])
     continuous = BuildTools.GetTestsInTestPacks(test_dir,['Continuous'])
-    
+
     # Check that parallel tests are a subset of continuous (coverage just runs continuous in parallel!)
     if not parallel.issubset(continuous):
         not_tested_continuous_too = parallel.difference(continuous)
@@ -123,7 +123,7 @@ if test_packs:
     for test_pack in sorted(test_packs):
         print("   %s" % test_pack)
     print()
-    
+
 # Compute a list of tests listed in test packs without .hpp files
 not_found = []
 for test_dir in local_found_tests.keys():
@@ -155,4 +155,4 @@ if orphans or not_found or parallel_not_tested_continuous_too:
     sys.exit(n_orphans + len(not_found) + len(parallel_not_tested_continuous_too))
 else:
     print("Infrastructure test passed ok.")
-  
+

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -80,6 +80,8 @@ typedef struct DataAtQuadraturePoint_
 template<class ELASTICITY_SOLVER, unsigned DIM>
 class AbstractCardiacMechanicsSolver : public ELASTICITY_SOLVER, public AbstractCardiacMechanicsSolverInterface<DIM>
 {
+    friend class TestCardiacElectroMechanicsVtkHandler; // for testing
+
 protected:
     static const unsigned NUM_VERTICES_PER_ELEMENT = ELASTICITY_SOLVER::NUM_VERTICES_PER_ELEMENT; /**< Useful const from base class */
 

@@ -1,4 +1,4 @@
-"""Copyright (c) 2005-2025, University of Oxford.
+"""Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -101,7 +101,7 @@ class TestPyTensileTestTutorial(chaste.cell_based.AbstractCellBasedTestSuite):
         normal = np.array([0.0, -1.0])
         bc = chaste.cell_based.AttractingPlaneBoundaryCondition[2, 2](cell_population, my_point, normal)
         simulator.AddCellPopulationBoundaryCondition(bc)
-        
+
         point = np.array([0.0, 15.5])
         normal = np.array([0.0, -1.0])
         bc2 = chaste.cell_based.AttractingPlaneBoundaryCondition[2, 2](cell_population, point, normal)

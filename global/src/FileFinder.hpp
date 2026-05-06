@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -316,9 +316,9 @@ private:
 
     /**
      * This is code common to Remove() and DangerousRemove(). Should remain private and not to be called from elsewhere.
-     * Remove() is only allowed to delete things with a .chaste_deletable_folder in the testoutput directory.
+     * Remove() is only allowed to delete things with a .chaste_deletable_folder in the $CHASTE_TEST_OUTPUT directory.
      *
-     * DangerousRemove() is allowed to delete anything in the source or testoutput directories.
+     * DangerousRemove() is allowed to delete anything in the source or $CHASTE_TEST_OUTPUT directories.
      *
      * @param dangerous  whether we are doing a dangerous remove.
      */

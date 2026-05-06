@@ -6,7 +6,7 @@ Copyright (C) Fujitsu Laboratories of Europe, 2009
 
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -161,6 +161,11 @@ void VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::CommonConstructor()
         mpVtkGeometryFilter->SetInputData(mpVtkUnstructuredGrid);
 #else
         mpVtkGeometryFilter->SetInput(mpVtkUnstructuredGrid);
+#endif
+
+#if (VTK_MAJOR_VERSION >= 9 && VTK_MINOR_VERSION >= 1)
+        // Change to indexing in vtkGeometryFilter happened in VTK 9.1
+        mpVtkGeometryFilter->SetPassThroughPointIds(1);
 #endif
         mpVtkGeometryFilter->Update();
 
@@ -376,16 +381,25 @@ ElementData VtkMeshReader<ELEMENT_DIM,SPACE_DIM>::GetNextFaceData()
     }
 
     ElementData next_face_data;
-
     if (ELEMENT_DIM == 3u)
     {
+#if (VTK_MAJOR_VERSION >= 9 && VTK_MINOR_VERSION >= 1)
+        // Change to indexing in vtkGeometryFilter happened in VTK 9.1
+        vtkDataArray *original_ids = mpVtkGeometryFilter->GetOutput()->GetPointData()->GetArray("vtkOriginalPointIds");
+#endif
         while (mpVtkGeometryFilter->GetOutput()->GetCellType(mBoundaryFacesRead + mBoundaryFacesSkipped) == VTK_LINE)
         {
             mBoundaryFacesSkipped++;
         }
         for (unsigned i = 0; i < (mNodesPerElement-1); i++)
         {
-            next_face_data.NodeIndices.push_back(mpVtkGeometryFilter->GetOutput()->GetCell(mBoundaryFacesRead + mBoundaryFacesSkipped)->GetPointId(i));
+            unsigned id = mpVtkGeometryFilter->GetOutput()->GetCell(mBoundaryFacesRead + mBoundaryFacesSkipped)->GetPointId(i);
+#if (VTK_MAJOR_VERSION >= 9 && VTK_MINOR_VERSION >= 1)
+            // Change to indexing in vtkGeometryFilter happened in VTK 9.1
+            next_face_data.NodeIndices.push_back(original_ids->GetTuple1(id));
+#else
+            next_face_data.NodeIndices.push_back(id);
+#endif
         }
     }
     else if (ELEMENT_DIM == 2u)

@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -282,16 +282,6 @@ public:
      * @return whether the node is a particle
      */
     virtual bool IsParticle(unsigned index);
-
-    /**
-     * Method to return the connected nodes in  a centre based simulation.
-     *
-     * As this method is pure virtual, it must be overridden
-     * in subclasses.
-     *
-     * @return Node pairs for force calculation.
-     */
-    virtual std::vector< std::pair<Node<SPACE_DIM>*, Node<SPACE_DIM>* > >& rGetNodePairs()=0;
 
     /**
      * @return mMeinekeDivisionSeparation

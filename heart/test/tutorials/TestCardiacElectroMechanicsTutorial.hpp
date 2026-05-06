@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2025, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -115,7 +115,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*
  * HOW_TO_TAG Cardiac/Electro-mechanics
- * Run basic electro-mechanics simulations; specify different models, boundary conditions, fibres
+ * Run basic electro-mechanics simulations; specify different models, boundary conditions, fibres,
+ * visualize electro-mechanics output with VTK (Paraview)
  */
 
 /*
@@ -283,7 +284,27 @@ public:
                                                     &cell_factory,
                                                     &problem_defn,
                                                     "TestCardiacElectroMechanicsExample2");
-
+        /* In this second example, we ask for VTK output as well, to be visualized using, for example,
+         * Paraview. Having specified TestCardiacElectroMechanicsExample2 as output
+         * directory in the problem class (relative to CHASTE_TEST_OUTPUT), you will find the VTK files in
+         * the directory TestCardiacElectroMechanicsExample2/deformation/vtk/
+         * The files will be called deformed_mechanics_mesh_X.vtu, where X=0 will contain
+         * the initial conditions and X=n cprresponds to the n-th step.
+         * Each of those VTU files contains information on the node locations of the mechanics mesh,
+         * voltage solution interpolated onto the nodes of the mechanics mesh, displacement vectors
+         * at each node of the mechanics mesh, and deformation gradient tensor (F) at each element
+         * of the mechanics mesh.
+         *
+         * To visualize with Paraview, click on "Open", navigate to the directory mentioned above,
+         * and select the .vtu files, which will appear as a group (because of how they are named).
+         * You can then click on the "eye" icon in the pipeline browser on the left next to the files
+         * just loaded. The drop-down menus on top allows you to choose what to see
+         * (voltage, displacements, etc) and on what visual entity (surface, nodes, etc).
+         * The properties of the spectrum can also be adjusted. By pressing the "Play"
+         * button you will see the mesh deforming over time with the chosen variable
+         * plotted with the color according to the spectrum.
+         */
+        HeartConfig::Instance()->SetVisualizeWithVtk(true);
         problem.Solve();
         /* Visualise as above.
          *
