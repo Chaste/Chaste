@@ -43,6 +43,8 @@ jobs:
             extra-build-args: ""
           - image: portability-resolute
             extra-build-args: ""
+          - image: portability-dev
+            extra-build-args: ""
 
     runs-on: ubuntu-latest
 
