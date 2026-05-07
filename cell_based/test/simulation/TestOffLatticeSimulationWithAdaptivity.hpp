@@ -88,7 +88,7 @@ static std::vector<c_vector<double,2> > RunMonolayer(
     SimulationTime::Instance()->SetStartTime(0.0);
 
     // -----------------------------------------------------------------------
-    // Build a compressed 3x3 hexagonal grid (spacing 0.8, natural length 1.0)
+    // Build a compressed 3x3 hexagonal grid (spacing 0.1, natural length 1.0)
     // so that cells experience net repulsive forces throughout the run.
     // -----------------------------------------------------------------------
 
