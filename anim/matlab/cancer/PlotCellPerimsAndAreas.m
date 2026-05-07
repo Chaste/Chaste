@@ -1,7 +1,7 @@
 % PlotCellPerimsAndAreas.m
-% It reads in the positions of all cells at the beginning and end of a 
-% Meineke-stlye labelling experiment and plots the percentages of cells 
-% that are labelled in ranges 
+% It reads in the positions of all cells at the beginning and end of a
+% Meineke-stlye labelling experiment and plots the percentages of cells
+% that are labelled in ranges
 %
 
 %  close all
@@ -24,7 +24,7 @@ colour4 = 'k.';
 path = path3;
 colour = colour3;
 
-addpath('../');	% Adds the LoadNonConstantLengthData function.
+addpath('../');    % Adds the LoadNonConstantLengthData function.
 
 Voronoi_data = LoadNonConstantLengthData([path 'All_results']);
 
@@ -36,47 +36,47 @@ Perimeters = [];
 
 buckets = 0:1:24;
 for i = 1:length(buckets)-1
-	Area_in_bucket{i} = [];
-	Perim_in_bucket{i} = [];
-	
-	temp_Area_in_bucket{i} = [];
-	temp_Perim_in_bucket{i} = [];
+    Area_in_bucket{i} = [];
+    Perim_in_bucket{i} = [];
+
+    temp_Area_in_bucket{i} = [];
+    temp_Perim_in_bucket{i} = [];
 end
 
 for i=1:length(Voronoi_data) % time loop
-	num_cells = (length(Voronoi_data{i})-1)/5;
-	
-	for j = 1:num_cells
-		Y = Voronoi_data{i}(5*j-1);
-		for k = 1:length(buckets)-1
-			if Y >= buckets(k) && Y < buckets(k+1)
-				temp_Area_in_bucket{k} = [temp_Area_in_bucket{k} Voronoi_data{i}(5*j)];
-				temp_Perim_in_bucket{k} = [temp_Perim_in_bucket{k} (Voronoi_data{i}(5*j+1))^2/Voronoi_data{i}(5*j)]; % shape index perim^2/ area
-				break
-			end
-		end
-	end
-	if mod(i,50) == 0
-		disp(i)
-	end
-	
-	for k = 1:length(buckets)-1
-		Area_in_bucket{k} = [Area_in_bucket{k} temp_Area_in_bucket{k}];
-		Perim_in_bucket{k} = [Perim_in_bucket{k} temp_Perim_in_bucket{k}];
-		
-		temp_Area_in_bucket{k} = [];
-		temp_Perim_in_bucket{k} = [];
-	end
+    num_cells = (length(Voronoi_data{i})-1)/5;
+
+    for j = 1:num_cells
+        Y = Voronoi_data{i}(5*j-1);
+        for k = 1:length(buckets)-1
+            if Y >= buckets(k) && Y < buckets(k+1)
+                temp_Area_in_bucket{k} = [temp_Area_in_bucket{k} Voronoi_data{i}(5*j)];
+                temp_Perim_in_bucket{k} = [temp_Perim_in_bucket{k} (Voronoi_data{i}(5*j+1))^2/Voronoi_data{i}(5*j)]; % shape index perim^2/ area
+                break
+            end
+        end
+    end
+    if mod(i,50) == 0
+        disp(i)
+    end
+
+    for k = 1:length(buckets)-1
+        Area_in_bucket{k} = [Area_in_bucket{k} temp_Area_in_bucket{k}];
+        Perim_in_bucket{k} = [Perim_in_bucket{k} temp_Perim_in_bucket{k}];
+
+        temp_Area_in_bucket{k} = [];
+        temp_Perim_in_bucket{k} = [];
+    end
 end
 
 for j = 1:length(Area_in_bucket)
-	if length(Area_in_bucket{j}) ~= 0
-		average_area(j) = mean(Area_in_bucket{j});
-		average_perim(j) = mean(Perim_in_bucket{j});
-	else
-		average_area(j) = 0;
-		average_perim(j) = 0;
-	end
+    if length(Area_in_bucket{j}) ~= 0
+        average_area(j) = mean(Area_in_bucket{j});
+        average_perim(j) = mean(Perim_in_bucket{j});
+    else
+        average_area(j) = 0;
+        average_perim(j) = 0;
+    end
 end
 
 subplot(3,1,1)
@@ -96,30 +96,30 @@ plot(buckets(1:end-2)+0.5*(buckets(2) - buckets(1)), average_perim(1:end-1),colo
 
 %  buckets = 0:1:24;
 %  for i = 1:length(buckets)-1
-%  	Area_in_bucket{i} = [];
-%  	Perim_in_bucket{i} = [];
+%      Area_in_bucket{i} = [];
+%      Perim_in_bucket{i} = [];
 %  end
-%  
+%
 %  for i = 1:length(X)
-%  	for k = 1:length(buckets)-1
-%  		if Y(i) >= buckets(k) && Y(i) < buckets(k+1)
-%  			Area_in_bucket{k} = [Area_in_bucket{k} Area(i)];
-%  			Perim_in_bucket{k} = [Perim_in_bucket{k} Perimeters(i)];
-%  			break
-%  		end
-%  	end
+%      for k = 1:length(buckets)-1
+%          if Y(i) >= buckets(k) && Y(i) < buckets(k+1)
+%              Area_in_bucket{k} = [Area_in_bucket{k} Area(i)];
+%              Perim_in_bucket{k} = [Perim_in_bucket{k} Perimeters(i)];
+%              break
+%          end
+%      end
 %  end
-%  
+%
 %  for j = 1:length(Area_in_bucket)
-%  	if length(Area_in_bucket{j}) ~= 0
-%  		average_area(j) = mean(Area_in_bucket{j});
-%  		average_perim(j) = mean(Perim_in_bucket{j});
-%  	else
-%  		average_area(j) = 0;
-%  		average_perim(j) = 0;
-%  	end
+%      if length(Area_in_bucket{j}) ~= 0
+%          average_area(j) = mean(Area_in_bucket{j});
+%          average_perim(j) = mean(Perim_in_bucket{j});
+%      else
+%          average_area(j) = 0;
+%          average_perim(j) = 0;
+%      end
 %  end
-%  
+%
 %  figure
 %  plot(buckets(1:end-2)+0.5*(buckets(2) - buckets(1)), average_area(1:end-1),'r');
 %  figure;

@@ -42,7 +42,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CellBasedSimulationArchiver.hpp"
 
 #include <iomanip>
-#include <boost/foreach.hpp>
 #include "CryptSimulation2d.hpp"
 #include "GeneralisedLinearSpringForce.hpp"
 #include "CylindricalHoneycombMeshGenerator.hpp"
@@ -120,7 +119,7 @@ public:
 
         // Following is done in two lines to avoid a bug in Intel compiler v12.0
         std::vector<FileFinder> temp_files = test_data_directory.FindMatches("*");
-        BOOST_FOREACH(FileFinder temp_file, temp_files)
+        for (FileFinder temp_file : temp_files)
         {
             archive_handler.CopyFileTo(temp_file);
         }

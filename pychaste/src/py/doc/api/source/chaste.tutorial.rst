@@ -11,4 +11,3 @@ Module contents
 
 .. autoclass:: chaste.tutorial.Hello
     :members:
-    
