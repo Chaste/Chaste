@@ -184,7 +184,7 @@ public:
     /**
      * TestFixedTimestepConvergence
      *
-     * Runs the monolayer with ForwardEuler and RK4 at dt = 2^-4, ..., 2^-12
+     * Runs the monolayer with ForwardEuler and RK4 at dt = 2^-4, ..., 2^-9
      * and compares to a reference RK4 solution at dt = 2^-14.  Checks that observed convergence orders are consistent with the expected first-order and fourth-order for FE and RK4 respectively, and that errors reduce as dt is reduced.
      */
     void TestFixedTimestepConvergence()
@@ -204,7 +204,7 @@ public:
                          ref_dir);
 
         // --------------------------------------------------------------------
-        // Collect errors at dt = 2^-4, ..., 2^-10
+        // Collect errors at dt = 2^-4, ..., 2^-9
         // --------------------------------------------------------------------
         const unsigned n_levels = 6;
         std::vector<double> fe_errors(n_levels);
@@ -212,7 +212,7 @@ public:
 
         for (unsigned k = 0; k < n_levels; ++k)
         {
-            double dt = 1.0 / std::pow(2.0, static_cast<double>(k + 4)); // 2^-4 ... 2^-10
+            double dt = 1.0 / std::pow(2.0, static_cast<double>(k + 4)); // 2^-4 ... 2^-9
 
             std::ostringstream fe_dir, rk4_dir;
             fe_dir  << "TestAdaptivity/FE_dt_2pow_neg"  << (k + 4);

@@ -80,6 +80,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ImmersedBoundaryPalisadeMeshGenerator.hpp"
 #include "ImmersedBoundaryLinearMembraneForce.hpp"
 #include "ImmersedBoundaryLinearInteractionForce.hpp"
+#include "StepSizeException.hpp"
 
 // This test is never run in parallel
 #include "FakePetscSetup.hpp"
@@ -251,13 +252,22 @@ public:
         displacement[0] = 0.8;
         displacement[1] = 0.8;
 
-        // Test Warnings
+        // Test Warnings: displacement > half CellRearrangementThreshold but below AbsoluteMovementThreshold
+        // should clamp the displacement and issue a warning, but NOT throw.
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 0u);
         TS_ASSERT_THROWS_NOTHING(cell_population.CheckForStepSizeException(0, displacement, 0.1));
         TS_ASSERT_DELTA(norm_2(displacement), 0.5 * p_mesh->GetCellRearrangementThreshold(), 1e-12);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNumWarnings(), 1u);
         TS_ASSERT_EQUALS(Warnings::Instance()->GetNextWarningMessage(), "Vertices are moving more than half the CellRearrangementThreshold. This could cause elements to become inverted so the motion has been restricted. Use a smaller timestep to avoid these warnings.");
         Warnings::QuietDestroy();
+
+        // Test StepSizeException: displacement exceeding the AbsoluteMovementThreshold (default 2.0)
+        // should throw a StepSizeException via the base-class check.
+        c_vector<double, 2> large_displacement;
+        large_displacement[0] = 2.0;
+        large_displacement[1] = 2.0;
+        TS_ASSERT_THROWS(cell_population.CheckForStepSizeException(0, large_displacement, 0.1),
+                         const StepSizeException&);
     }
     void TestValidateException()
     {
