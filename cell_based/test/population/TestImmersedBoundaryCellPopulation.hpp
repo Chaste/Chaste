@@ -263,6 +263,7 @@ public:
 
         // Test StepSizeException: displacement exceeding the AbsoluteMovementThreshold (default 2.0)
         // should throw a StepSizeException via the base-class check.
+        // norm_2 of (2.0, 2.0) = sqrt(8) ≈ 2.83, which exceeds the default threshold of 2.0.
         c_vector<double, 2> large_displacement;
         large_displacement[0] = 2.0;
         large_displacement[1] = 2.0;
