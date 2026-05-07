@@ -47,8 +47,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  *  A class which can be used to convert the voltage from an electrics
  *  (or electromechanics) simulation onto a coarser mechanics mesh, by interpolation. The
- *  class provides a method to interpolate values from the fine mesh 
- *  onto the coarse mesh and the main method to output a HDF5 file corresponding to nodes 
+ *  class provides a method to interpolate values from the fine mesh
+ *  onto the coarse mesh and the main method to output a HDF5 file corresponding to nodes
  *  on the mechanics mesh, and convert it to CMGUI output.
  */
 template<unsigned DIM>
@@ -75,15 +75,15 @@ public:
                                          QuadraticMesh<DIM>& rMechanicsMesh);
 
     /**
-     * Destructor. 
+     * Destructor.
      */
     ~VoltageInterpolaterOntoMechanicsMesh();
-    
+
     /**
-     * Does the actual interpolation. 
-     * 
-     * @param rValuesOnCoarseMesh It will be filled with the interpolated values. Memory must 
-     *                            have been allocated before (this method checks): the vector must be of 
+     * Does the actual interpolation.
+     *
+     * @param rValuesOnCoarseMesh It will be filled with the interpolated values. Memory must
+     *                            have been allocated before (this method checks): the vector must be of
      *                            the same size as the number of nodes of the coarser mesh
      * @param rValuesOnFineMesh The values on the fine mesh to be interpolated onto the coarser mesh
      */
@@ -93,10 +93,10 @@ public:
     /**
      * The main method of the class. It reads the h5 files in directory (filename prefix inputFileNamePrefix)
      * It then considers all the variables whose name is specified in rVariableNames, does
-     * the interplation using  InterpolateOnCoarseMesh, and creates output for all the variables over 
-     * all the time steps included in the h5 file. It does so by first writing out to h5 
+     * the interplation using  InterpolateOnCoarseMesh, and creates output for all the variables over
+     * all the time steps included in the h5 file. It does so by first writing out to h5
      * and then converting to CMGUI.
-     *  
+     *
      *  @param rVariableNames vector of names of variables contained in the input h5 file and
      *                        that you want to be interpolated.
      *  @param directory Directory the voltage file is in

@@ -1,7 +1,6 @@
-#!/usr/bin/env python
+/*
 
-
-"""Copyright (c) 2005-2026, University of Oxford.
+Copyright (c) 2005-2026, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -31,47 +30,50 @@ GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-"""
 
+*/
 
-# This test is specific to a semaphore-based implementation of MPI.
-# Its purpose it to provide a early warning when system semaphore are being
-# used up, due to parallel tests aborting.
+#ifndef TESTCHASTEXSDVERSION_HPP_
+#define TESTCHASTEXSDVERSION_HPP_
 
-# CLEANING UP
-# Look at  testoutput/$HOSTNAME.BUILD_TYPE/Semaphores...
-#
-# There are 16 semaphores open, owned by 1 users:
-# chaste (16)
-# etc.
-# On the relevant machine and with the relevant user:
-# ~/mpi/sbin/cleanipcs
-# e.g. If you want to clean "spud" on the build server
-# sudo su spud ~/mpi/sbin/cleanipcs
+#include <cxxtest/TestSuite.h>
 
-import os
-from pwd import getpwuid
+#include "ChasteXsdVersion.hpp"
 
+class TestChasteXsdVersion : public CxxTest::TestSuite
+{
+public:
 
-max_semaphore_arrays=int(os.popen('ipcs -l | awk \'/max number of arrays/\'').read().split()[-1])
-#On the build server (and other Ubuntu machines) the value is max_semaphore_arrays==128
-#MPI starts to fail when the number of semaphores reaches 128
-semaphore_limit = max_semaphore_arrays/2
+    /*
+     * This test is performed entirely at compile time, so this test has passed if this test suite compiles
+     */
+    void TestChasteXsdVersionAtLeast()
+    {
+#pragma push_macro("CHASTE_XSD_VERSION_MAJOR")
+#pragma push_macro("CHASTE_XSD_VERSION_MINOR")
+#pragma push_macro("CHASTE_XSD_VERSION_PATCH")
 
-semaphore_data=os.popen('tail -n +2 /proc/sysvipc/sem  |awk \'{print $5}\'| sort | uniq -c').readlines()
+#undef CHASTE_XSD_VERSION_MAJOR
+#undef CHASTE_XSD_VERSION_MINOR
+#undef CHASTE_XSD_VERSION_PATCH
 
-total_open = 0
-names = []
-for entry in semaphore_data:
-  total_open += int(entry.split()[0])
-  names.append( getpwuid(int(entry.split()[1]))[0] + ' (' + entry.split()[0] +')' )
+#define CHASTE_XSD_VERSION_MAJOR 4
+#define CHASTE_XSD_VERSION_MINOR 2
+#define CHASTE_XSD_VERSION_PATCH 0
 
-# Let the test summary script know
-print("There are %s semaphores open, owned by %s users:" % (total_open, len(semaphore_data)))
-for name in names:
-    print("\t%s" % name)
-print("The next line is for the benefit of the test summary scripts.")
-if total_open > semaphore_limit:
-    print("Failed %s of %s tests" % (total_open, total_open))
-else:
-    print("Infrastructure test passed ok.")
+static_assert(CHASTE_XSD_VERSION_AT_LEAST(4, 0, 0));
+static_assert(CHASTE_XSD_VERSION_AT_LEAST(4, 2, 0));
+static_assert(CHASTE_XSD_VERSION_AT_LEAST(4, 1, 9));
+static_assert(CHASTE_XSD_VERSION_AT_LEAST(3, 9, 9));
+static_assert(!CHASTE_XSD_VERSION_AT_LEAST(4, 2, 1));
+static_assert(!CHASTE_XSD_VERSION_AT_LEAST(4, 3, 0));
+static_assert(!CHASTE_XSD_VERSION_AT_LEAST(5, 0, 0));
+
+// Restore original values.
+#pragma pop_macro("CHASTE_XSD_VERSION_PATCH")
+#pragma pop_macro("CHASTE_XSD_VERSION_MINOR")
+#pragma pop_macro("CHASTE_XSD_VERSION_MAJOR")
+    }
+};
+
+#endif /*TESTCHASTEXSDVERSION_HPP_*/

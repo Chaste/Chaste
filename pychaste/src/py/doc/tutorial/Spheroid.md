@@ -17,7 +17,7 @@ It covers:
  * Setting up a cell cycle model with oxygen dependence
  * Setting up and solving an oxygen transport PDE
  * Setting up a cell killer
- 
+
 ## The Test
 
 ```python

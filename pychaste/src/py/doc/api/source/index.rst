@@ -7,12 +7,12 @@ PyChaste API documentation
 ==========================
 
 Contents:
- 
+
 .. toctree::
    :maxdepth: 3
-    
+
    chaste
- 
+
 Indices and tables
 ==================
 * :ref:`genindex`

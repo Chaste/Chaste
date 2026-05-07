@@ -206,7 +206,7 @@ public:
         double linear_coefficient = -0.03;
         double diffusion_coefficient = 1.0;
         MAKE_PTR_ARGS(CellwiseSourceEllipticPde<2>, p_pde, (cell_population, constant_coefficient, linear_coefficient, diffusion_coefficient));
-       
+
         /*
          * We also create a constant-valued boundary condition to associate with the PDE.
          * This boundary condition object takes in a single argument in its constructor,
