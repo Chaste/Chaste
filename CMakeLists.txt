@@ -1,12 +1,12 @@
 # Copyright (c) 2005-2026, University of Oxford.
 # All rights reserved.
-# 
+#
 # University of Oxford means the Chancellor, Masters and Scholars of the
 # University of Oxford, having an administrative office at Wellington
 # Square, Oxford OX1 2JD, UK.
-# 
+#
 # This file is part of Chaste.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #  * Redistributions of source code must retain the above copyright notice,
@@ -17,7 +17,7 @@
 #  * Neither the name of the University of Oxford nor the names of its
 #    contributors may be used to endorse or promote products derived from this
 #    software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -52,9 +52,9 @@ message ("####################################\n")
 message(STATUS "CMake version: ${CMAKE_VERSION}")
 
 # Since CMake 3.0, version can be supplied to the project() command.  We set it directly, for users on older CMake
-project (Chaste VERSION 2024.2)
-set (Chaste_VERSION_MAJOR 2024 CACHE STRING "Chaste major version number")
-set (Chaste_VERSION_MINOR 2 CACHE STRING "Chaste minor version number")
+project (Chaste VERSION 2026.1)
+set (Chaste_VERSION_MAJOR 2026 CACHE STRING "Chaste major version number")
+set (Chaste_VERSION_MINOR 1 CACHE STRING "Chaste minor version number")
 
 message(STATUS "Linker: ${CMAKE_LINKER}")
 
@@ -526,7 +526,7 @@ endif ()
 
 
 ################################
-####  Find ParMETIS 
+####  Find ParMETIS
 ################################
 # If we're using PETSc's ParMETIS (ON by default, for more reliable MPI compatibility), override PARMETIS_ROOT accordingly
 if (Chaste_USE_PETSC_PARMETIS)
@@ -1067,6 +1067,12 @@ add_custom_target (infrastructure
                    COMMAND ${Python3_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckForDuplicateFileNames.py
                    COMMAND ${Python3_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckForOrphanedTests.py
                    COMMAND ${Python3_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/infra/CheckSchemas.py
+
+                   WORKING_DIRECTORY ${Chaste_SOURCE_DIR}
+                   VERBATIM)
+
+add_custom_target (infrastructure_whitespace
+                   COMMAND ${Python3_EXECUTABLE} ${Chaste_SOURCE_DIR}/python/utils/RemoveTabsAndTrailingWhitespace.py
 
                    WORKING_DIRECTORY ${Chaste_SOURCE_DIR}
                    VERBATIM)

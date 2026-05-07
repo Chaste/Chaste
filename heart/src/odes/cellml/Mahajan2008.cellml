@@ -1783,8 +1783,8 @@ gto,slow = 0.11;   % mS/uF"
       </variable>
       <variable units="dimensionless" name="ScaleFactorGkr" initial_value="1.0" cmeta:id="ScaleFactorGkr">
         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">      
-	      <rdf:Description rdf:about="#ScaleFactorGkr">
-		      <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+          <rdf:Description rdf:about="#ScaleFactorGkr">
+              <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
           </rdf:Description>
         </rdf:RDF>          
       </variable>
@@ -2026,8 +2026,8 @@ gto,slow = 0.11;   % mS/uF"
       <variable name="gks" units="uS_per_nF" initial_value="0.1386"/>
       <variable units="dimensionless" name="ScaleFactorGks" initial_value="1.0" cmeta:id="ScaleFactorGks">
         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">      
-	      <rdf:Description rdf:about="#ScaleFactorGks">
-		      <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+          <rdf:Description rdf:about="#ScaleFactorGks">
+              <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
           </rdf:Description>
         </rdf:RDF>          
       </variable>
@@ -2287,8 +2287,8 @@ gto,slow = 0.11;   % mS/uF"
       <variable name="gtos" units="uS_per_nF" initial_value="0.11"/>
       <variable units="dimensionless" name="ScaleFactorIto" initial_value="1.0" cmeta:id="ScaleFactorIto">
         <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">      
-	      <rdf:Description rdf:about="#ScaleFactorIto">
-		      <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
+          <rdf:Description rdf:about="#ScaleFactorIto">
+              <modifiable-parameter xmlns="https://chaste.comlab.ox.ac.uk/cellml/ns/pycml#">yes</modifiable-parameter>
           </rdf:Description>
         </rdf:RDF>          
       </variable>

@@ -1,18 +1,18 @@
 function PlotCellPerimeters(y0, y1)
 %
 % PLOTCELLPERIMETERS
-% 
+%
 %   PlotCellPerimeters(y0,y1) loads 'VoronoiAreaAndPerimeter.dat'
-%   and plots the average perimeter for each cell who's y value 
+%   and plots the average perimeter for each cell who's y value
 %   is between y0 and y1.
- 
+
 data = LoadNonConstantLengthData('VoronoiAreaAndPerimeter.dat');
 
 times = [];
 average_perims = [];
 for i=1:length(data)
     num_nodes = (length(data{i})-1)/5;
-    
+
     av_perim = 0;
     num_cells_in_range = 0;
     for j=1:num_nodes

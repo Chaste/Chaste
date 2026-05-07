@@ -166,7 +166,7 @@ if(GIT_EXECUTABLE)
     else()
       set(${prefix}_WC_MODIFIED true)
     endif()
-    
+
 
   endmacro(GIT_WC_INFO)
 endif(GIT_EXECUTABLE)

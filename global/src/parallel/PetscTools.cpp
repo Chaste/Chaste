@@ -492,7 +492,7 @@ bool PetscTools::HasParMetis()
 
     // We are expecting an error from PETSC on systems that don't have the interface, so suppress it
     // in case it aborts
-    PetscPushErrorHandler(PetscIgnoreErrorHandler, nullptr);
+    PetscPushErrorHandler(PetscReturnErrorHandler, nullptr);
 
 #if (PETSC_VERSION_MAJOR == 2 || (PETSC_VERSION_MAJOR == 3 && PETSC_VERSION_MINOR < 2))
     PetscErrorCode parmetis_installed_error = MatPartitioningSetType(part, MAT_PARTITIONING_PARMETIS);

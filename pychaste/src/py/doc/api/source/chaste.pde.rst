@@ -8,7 +8,7 @@ Module contents
     :members:
     :undoc-members:
     :show-inheritance:
-    
+
 .. autoclass:: chaste.pde.AbstractLinearPde3_3
     :members:
 
