@@ -58,7 +58,6 @@ ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(
       mPopulationHasActiveSources(false),
       mOutputNodeRegionToVtk(false),
       mReMeshFrequency(UINT_MAX),
-      mThrowStepSizeException(true),
       mCellRearrangementThreshold(0.5)
 {
     mpImmersedBoundaryMesh = static_cast<ImmersedBoundaryMesh<DIM, DIM>*>(&(this->mrMesh));
@@ -98,7 +97,6 @@ ImmersedBoundaryCellPopulation<DIM>::ImmersedBoundaryCellPopulation(
       mPopulationHasActiveSources(false),
       mOutputNodeRegionToVtk(false),
       mReMeshFrequency(UINT_MAX),
-      mThrowStepSizeException(true),
       mCellRearrangementThreshold(0.5)
 {
     mpImmersedBoundaryMesh = static_cast<ImmersedBoundaryMesh<DIM, DIM>*>(&(this->mrMesh));
@@ -211,18 +209,6 @@ template <unsigned DIM>
 double ImmersedBoundaryCellPopulation<DIM>::GetCellRearrangementThreshold() const
 {
     return mCellRearrangementThreshold;
-}
-
-template <unsigned DIM>
-void ImmersedBoundaryCellPopulation<DIM>::SetThrowsStepSizeException(bool throws)
-{
-    mThrowStepSizeException = throws;
-}
-
-template <unsigned DIM>
-bool ImmersedBoundaryCellPopulation<DIM>::ThrowsStepSizeException() const
-{
-    return mThrowStepSizeException;
 }
 
 template <unsigned DIM>

@@ -245,7 +245,6 @@ public:
         cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_diff_type);
 
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetThrowsStepSizeException(true);
 
         // This displacemnt is larger than half the CellRearrangementThreshold, so should cause a warning to be thrown.
         c_vector<double, 2> displacement;

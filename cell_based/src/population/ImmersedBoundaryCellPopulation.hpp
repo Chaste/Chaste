@@ -100,9 +100,6 @@ private:
     /** Call ReMesh every ReMeshFrequency number of time steps. */
     unsigned mReMeshFrequency;
 
-    /** Used to ensure step size exception is only thrown once. */
-    bool mThrowStepSizeException;
-
     /**
      * Distance above which a vertex movement will trigger a step size
      * exception.
@@ -138,7 +135,6 @@ private:
         archive& mPopulationHasActiveSources;
         archive& mInteractionDistance;
         archive& mReMeshFrequency;
-        archive& mThrowStepSizeException;
         archive& mCellRearrangementThreshold;
     }
 
@@ -279,19 +275,6 @@ public:
      * @return mReMeshFrequency.
      */
     unsigned GetReMeshFrequency() const;
-
-    /**
-     * Sets whether an exception will be thrown if nodes move too far within
-     * a single timestep.
-     *
-     * @param throws whether an exception should be thrown
-     */
-    void SetThrowsStepSizeException(bool throws);
-
-    /**
-     * @return mThrowsStepSizeException.
-     */
-    bool ThrowsStepSizeException() const;
 
     /**
      * @return the intrinsic node spacing
@@ -636,7 +619,6 @@ namespace serialization
         ar& t->DoesPopulationHaveActiveSources();
         ar& t->GetInteractionDistance();
         ar& t->GetReMeshFrequency();
-        ar& t->ThrowsStepSizeException();
         ar& t->GetCellRearrangementThreshold();
     }
 
@@ -657,8 +639,6 @@ namespace serialization
         ar >> interactionDistance;
         unsigned int reMeshFrequency = 1;
         ar >> reMeshFrequency;
-        bool throwStepSizeException = false;
-        ar >> throwStepSizeException;
         double cellRearrangementThreshold = 0.5;
         ar >> cellRearrangementThreshold;
 
@@ -667,7 +647,6 @@ namespace serialization
         t->SetIfPopulationHasActiveSources(hasActiveSources);
         t->SetInteractionDistance(interactionDistance);
         t->SetReMeshFrequency(reMeshFrequency);
-        t->SetThrowsStepSizeException(true);
         t->SetCellRearrangementThreshold(cellRearrangementThreshold);
     }
 }
