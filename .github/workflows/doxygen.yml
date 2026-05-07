@@ -15,7 +15,7 @@ jobs:
   on_pull_request:
     runs-on: ubuntu-latest
 
-    if: > 
+    if: >
       github.event_name == 'pull_request' &&
       !contains(github.event.pull_request.labels.*.name, 'ci:off') &&
       github.repository == 'Chaste/Chaste'
