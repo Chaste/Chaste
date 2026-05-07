@@ -146,4 +146,7 @@ public:
     virtual void WriteDataToVisualizerSetupFile(out_stream& pVizSetupFile);
 };
 
+#include "SerializationExportWrapper.hpp"
+EXPORT_TEMPLATE_CLASS_ALL_DIMS(AbstractTwoBodyInteractionForce)
+
 #endif /*ABSTRACTTWOBODYINTERACTIONFORCE_HPP_*/
