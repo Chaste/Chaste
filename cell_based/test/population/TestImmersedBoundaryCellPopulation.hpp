@@ -246,7 +246,7 @@ public:
 
         ImmersedBoundaryCellPopulation<2> cell_population(*p_mesh, cells);
 
-        // This displacemnt is larger than half the CellRearrangementThreshold, so should cause a warning to be thrown.
+        // This displacement is larger than half the CellRearrangementThreshold, so should cause a warning to be thrown.
         c_vector<double, 2> displacement;
         displacement[0] = 0.8;
         displacement[1] = 0.8;
