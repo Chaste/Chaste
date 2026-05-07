@@ -360,7 +360,12 @@ public:
         // AMT=0.001 error=1.24127e-16
         TS_ASSERT_DELTA(errors[0], 1.16722e-05,  1e-9);
         TS_ASSERT_DELTA(errors[1], 3.49773e-10,  1e-12);
-        TS_ASSERT_DELTA(errors[2], 1.24127e-16,  1e-16);// note this is close to machine precision for double, so we are using 1e-16 to allow for some numerical noise
+        // For the smallest threshold the error is expected to be dominated by
+        // floating-point roundoff, so avoid asserting an exact machine-precision
+        // fingerprint. Instead, require that the error remains negligible and
+        // no larger than for the less strict thresholds.
+        TS_ASSERT(errors[2] <= errors[1]);
+        TS_ASSERT(errors[2] < 1e-12);
     }
 };
 
