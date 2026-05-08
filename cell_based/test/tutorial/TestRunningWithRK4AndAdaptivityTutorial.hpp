@@ -204,6 +204,7 @@ public:
      * ```
      * time_advanced = 0
      * sub_step = dt              // start with the full macro step
+     * adaptive_timer = 0         // counts consecutive failures
      *
      * while (time_advanced < dt):
      *
@@ -211,17 +212,23 @@ public:
      *         move nodes by sub_step             // may throw StepSizeException
      *         apply boundary conditions
      *         time_advanced += sub_step
+     *         adaptive_timer = 0                 // reset on success
      *
      *     catch StepSizeException e (i.e. node movement too large):
-     *         revert nodes to saved positions
-     *         sub_step = e.GetSuggestedNewStep()
+     *         if adaptive_timer < max_adaptive_steps:
+     *             revert nodes to saved positions
+     *             sub_step = e.GetSuggestedNewStep()
+     *             adaptive_timer += 1
+     *         else:
+     *             EXCEPTION (too many consecutive failures)
      *
      * ```
      *
      * The `StepSizeException` is raised inside the numerical method whenever
      * `AbstractOffLatticeCellPopulation::CheckForStepSizeException()` detects that a node
      * would move further than its permitted maximum displacement.  The exception
-     * carries a smaller suggested step size.
+     * carries a smaller suggested step size.  `SetMaxAdaptiveTimeStep(n)` controls
+     * how many consecutive failures are tolerated before the simulation aborts.
      */
     void TestAdaptiveTimestepWithRK4()
     {

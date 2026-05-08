@@ -116,6 +116,7 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
     double target_time_step  = this->mDt;
     double present_time_step = this->mDt;
 
+    unsigned adaptive_timer = 0;
     while (time_advanced_so_far < target_time_step)
     {
         // Store the initial node positions (these may be needed when applying boundary conditions)
@@ -134,13 +135,12 @@ void OffLatticeSimulation<ELEMENT_DIM,SPACE_DIM>::UpdateCellLocationsAndTopology
             mpNumericalMethod->UpdateAllNodePositions(present_time_step);
             ApplyBoundaries(old_node_locations);
 
-            // Successful time step! Update time_advanced_so_far
+            // Successful time step: update time_advanced_so_far and reset the adaptive failure counter
             time_advanced_so_far += present_time_step;
+            adaptive_timer = 0;
         }
         catch (StepSizeException& e)
         {
-            unsigned adaptive_timer = 0;
-
             // Detects if a node has travelled too far in a single time step
             if (mpNumericalMethod->HasAdaptiveTimestep() && adaptive_timer < mMaxAdaptiveTimeSteps)
             {
