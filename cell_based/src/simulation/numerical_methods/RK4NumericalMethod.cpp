@@ -124,12 +124,11 @@ void RK4NumericalMethod<ELEMENT_DIM,SPACE_DIM>::UpdateAllNodePositions(double dt
     else
     {
         /*
-         * If this type of cell population does not support the new numerical methods, delegate
-         * updating node positions to the population itself.
-         *
-         * This only applies to NodeBasedCellPopulationWithBuskeUpdates.
+         * RK4 is not compatible with NodeBasedCellPopulationWithBuskeUpdate, which requires the
+         * population to handle its own position updates. Throw an informative exception rather
+         * than reaching unreachable code.
          */
-        NEVER_REACHED;
+        EXCEPTION("RK4NumericalMethod does not support NodeBasedCellPopulationWithBuskeUpdate. Use ForwardEulerNumericalMethod instead.");
     }
 }
 

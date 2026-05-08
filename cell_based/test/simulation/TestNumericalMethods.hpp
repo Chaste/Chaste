@@ -612,6 +612,39 @@ public:
         }
     }
 
+    void TestRK4UpdateAllNodePositionsWithNodeBasedWithBuskeUpdate()
+    {
+        EXIT_IF_PARALLEL;    // This test doesn't work in parallel.
+
+        HoneycombMeshGenerator generator(3, 3, 0);
+        boost::shared_ptr<TetrahedralMesh<2,2> > p_generating_mesh = generator.GetMesh();
+
+        // Convert this to a NodesOnlyMesh
+        MAKE_PTR(NodesOnlyMesh<2>, p_mesh);
+        p_mesh->ConstructNodesWithoutMesh(*p_generating_mesh, 2.0);
+
+        // Create cells
+        std::vector<CellPtr> cells;
+        CellsGenerator<FixedG1GenerationalCellCycleModel, 2> cells_generator;
+        cells_generator.GenerateBasic(cells, p_mesh->GetNumNodes());
+
+        NodeBasedCellPopulationWithBuskeUpdate<2> cell_population(*p_mesh, cells);
+
+        // Create numerical method for testing
+        MAKE_PTR(RK4NumericalMethod<2>, p_rk4_method);
+
+        double dt = 0.01;
+
+        p_rk4_method->SetCellPopulation(&cell_population);
+
+        // Suppress the warning issued by SetCellPopulation for non-Euler methods
+        Warnings::QuietDestroy();
+
+        // RK4 does not support NodeBasedCellPopulationWithBuskeUpdate; an exception should be thrown
+        TS_ASSERT_THROWS_THIS(p_rk4_method->UpdateAllNodePositions(dt),
+            "RK4NumericalMethod does not support NodeBasedCellPopulationWithBuskeUpdate. Use ForwardEulerNumericalMethod instead.");
+    }
+
     void TestRK4ArchivingOfNumericalMethod()
     {
         EXIT_IF_PARALLEL;
