@@ -45,7 +45,7 @@ PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::PlaneBoundaryCondition(AbstractCe
           mPointOnPlane(point),
           mUseJiggledNodesOnPlane(false)
 {
-    if (dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation)==nullptr)
+    if (dynamic_cast<AbstractOffLatticeCellPopulation<ELEMENT_DIM, SPACE_DIM>*>(this->mpCellPopulation) == nullptr)
     {
         EXCEPTION("PlaneBoundaryCondition requires a subclass of AbstractOffLatticeCellPopulation.");
     }
@@ -66,9 +66,8 @@ const c_vector<double, SPACE_DIM>& PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>
     return mNormalToPlane;
 }
 
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::SetUseJiggledNodesOnPlane(bool useJiggledNodesOnPlane)
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::SetUseJiggledNodesOnPlane(bool useJiggledNodesOnPlane)
 {
     if constexpr (SPACE_DIM == 1)
     {
@@ -163,11 +162,11 @@ void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCondition(
          * In 1D, this boundary condition is currently applied only to centre-based cell populations.
          * We therefore iterate over cells and update the location of the node associated with each cell.
          */
-        assert((dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM,SPACE_DIM>*>(this->mpCellPopulation)));
+        assert((dynamic_cast<AbstractCentreBasedCellPopulation<ELEMENT_DIM, SPACE_DIM>*>(this->mpCellPopulation)));
 
-        for (typename AbstractCellPopulation<ELEMENT_DIM,SPACE_DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
-            cell_iter != this->mpCellPopulation->End();
-            ++cell_iter)
+        for (typename AbstractCellPopulation<ELEMENT_DIM, SPACE_DIM>::Iterator cell_iter = this->mpCellPopulation->Begin();
+             cell_iter != this->mpCellPopulation->End();
+             ++cell_iter)
         {
             unsigned node_index = this->mpCellPopulation->GetLocationIndexUsingCell(*cell_iter);
             Node<SPACE_DIM>* p_node = this->mpCellPopulation->GetNode(node_index);
@@ -177,7 +176,7 @@ void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCondition(
             double signed_distance = inner_prod(node_location - mPointOnPlane, mNormalToPlane);
             if (signed_distance > 0.0)
             {
-                c_vector<double, SPACE_DIM> nearest_point = node_location - signed_distance*mNormalToPlane;
+                c_vector<double, SPACE_DIM> nearest_point = node_location - signed_distance * mNormalToPlane;
                 p_node->rGetModifiableLocation() = nearest_point;
             }
         }
@@ -188,8 +187,8 @@ void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCondition(
     }
 }
 
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-bool PlaneBoundaryCondition<ELEMENT_DIM,SPACE_DIM>::VerifyBoundaryCondition()
+template <unsigned ELEMENT_DIM, unsigned SPACE_DIM>
+bool PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::VerifyBoundaryCondition()
 {
     bool condition_satisfied = true;
 

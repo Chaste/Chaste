@@ -293,9 +293,9 @@ public:
         // Create a 1D mesh with nodes at x = -1.0, 0.5, 1.5, 2.5
         std::vector<Node<1>*> nodes;
         nodes.push_back(new Node<1>(0, false, -1.0));
-        nodes.push_back(new Node<1>(1, false,  0.5));
-        nodes.push_back(new Node<1>(2, false,  1.5));
-        nodes.push_back(new Node<1>(3, false,  2.5));
+        nodes.push_back(new Node<1>(1, false, 0.5));
+        nodes.push_back(new Node<1>(2, false, 1.5));
+        nodes.push_back(new Node<1>(3, false, 2.5));
 
         NodesOnlyMesh<1> mesh;
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
@@ -307,15 +307,15 @@ public:
         NodeBasedCellPopulation<1> cell_population(mesh, cells);
 
         // Test 1: Boundary at x=0, normal=-1 (constraint: x >= 0)
-        c_vector<double,1> point = zero_vector<double>(1);
-        c_vector<double,1> normal = zero_vector<double>(1);
+        c_vector<double, 1> point = zero_vector<double>(1);
+        c_vector<double, 1> normal = zero_vector<double>(1);
         normal(0) = -1.0;
         PlaneBoundaryCondition<1> boundary_condition(&cell_population, point, normal);
 
         TS_ASSERT_EQUALS(boundary_condition.GetIdentifier(), "PlaneBoundaryCondition-1-1");
 
         // Impose boundary condition
-        std::map<Node<1>*, c_vector<double,1> > old_locations;
+        std::map<Node<1>*, c_vector<double, 1> > old_locations;
         for (std::list<CellPtr>::iterator cell_iter = cell_population.rGetCells().begin();
              cell_iter != cell_population.rGetCells().end();
              ++cell_iter)
@@ -332,7 +332,7 @@ public:
              ++cell_iter)
         {
             Node<1>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
-            c_vector<double,1> location = p_node->rGetLocation();
+            c_vector<double, 1> location = p_node->rGetLocation();
             if (old_locations[p_node][0] < 0.0)
             {
                 TS_ASSERT_DELTA(0.0, location[0], 1e-6);
@@ -348,9 +348,9 @@ public:
 
         // Test that jiggling nodes throws an exception in 1D
         TS_ASSERT_THROWS_THIS(boundary_condition.SetUseJiggledNodesOnPlane(true),
-            "Jiggling of nodes is not supported in 1D.");
+                              "Jiggling of nodes is not supported in 1D.");
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); i++)
         {
             delete nodes[i];
         }
@@ -361,9 +361,9 @@ public:
         // Create a fresh 1D mesh with nodes at x = -1.0, 0.5, 1.5, 2.5
         std::vector<Node<1>*> nodes;
         nodes.push_back(new Node<1>(0, false, -1.0));
-        nodes.push_back(new Node<1>(1, false,  0.5));
-        nodes.push_back(new Node<1>(2, false,  1.5));
-        nodes.push_back(new Node<1>(3, false,  2.5));
+        nodes.push_back(new Node<1>(1, false, 0.5));
+        nodes.push_back(new Node<1>(2, false, 1.5));
+        nodes.push_back(new Node<1>(3, false, 2.5));
 
         NodesOnlyMesh<1> mesh;
         mesh.ConstructNodesWithoutMesh(nodes, 1.5);
@@ -375,14 +375,14 @@ public:
         NodeBasedCellPopulation<1> cell_population(mesh, cells);
 
         // Boundary at x=2.0, normal=-1 (constraint: x >= 2.0)
-        c_vector<double,1> point = zero_vector<double>(1);
+        c_vector<double, 1> point = zero_vector<double>(1);
         point(0) = 2.0;
-        c_vector<double,1> normal = zero_vector<double>(1);
+        c_vector<double, 1> normal = zero_vector<double>(1);
         normal(0) = -1.0;
         PlaneBoundaryCondition<1> boundary_condition(&cell_population, point, normal);
 
         // Impose boundary condition
-        std::map<Node<1>*, c_vector<double,1> > old_locations;
+        std::map<Node<1>*, c_vector<double, 1> > old_locations;
         for (std::list<CellPtr>::iterator cell_iter = cell_population.rGetCells().begin();
              cell_iter != cell_population.rGetCells().end();
              ++cell_iter)
@@ -399,7 +399,7 @@ public:
              ++cell_iter)
         {
             Node<1>* p_node = cell_population.GetNodeCorrespondingToCell(*cell_iter);
-            c_vector<double,1> location = p_node->rGetLocation();
+            c_vector<double, 1> location = p_node->rGetLocation();
             if (old_locations[p_node][0] < 2.0)
             {
                 TS_ASSERT_DELTA(2.0, location[0], 1e-6);
@@ -413,7 +413,7 @@ public:
         // Test VerifyBoundaryCondition() method
         TS_ASSERT_EQUALS(boundary_condition.VerifyBoundaryCondition(), true);
 
-        for (unsigned i=0; i<nodes.size(); i++)
+        for (unsigned i = 0; i < nodes.size(); i++)
         {
             delete nodes[i];
         }
