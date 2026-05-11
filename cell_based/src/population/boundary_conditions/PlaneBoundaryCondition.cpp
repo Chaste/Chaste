@@ -159,7 +159,6 @@ void PlaneBoundaryCondition<ELEMENT_DIM, SPACE_DIM>::ImposeBoundaryCondition(
     }
     else if constexpr (SPACE_DIM == 1)
     {
-
         /*
          * In 1D, this boundary condition is currently applied only to centre-based cell populations.
          * We therefore iterate over cells and update the location of the node associated with each cell.
