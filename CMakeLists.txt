@@ -497,7 +497,14 @@ message(STATUS "HDF5 version: ${HDF5_VERSION}")
 target_link_libraries(Chaste_COMMON_DEPS INTERFACE HDF5::HDF5)
 
 # Chaste requires a parallel HDF5 library
-if (NOT HDF5_IS_PARALLEL)
+set(HDF5_HAS_PARALLEL FALSE)
+if (HDF5_VERSION VERSION_LESS "2.0.0")
+    set(HDF5_HAS_PARALLEL ${HDF5_IS_PARALLEL})
+else ()
+    set(HDF5_HAS_PARALLEL ${HDF5_PROVIDES_PARALLEL})
+endif ()
+
+if (NOT HDF5_HAS_PARALLEL)
     message(SEND_ERROR "Hdf5 library found was not build with --enable-parallel, use the HDF5_ROOT environment variable to specify a parallel hdf5 library. Note: include dirs are ${HDF5_INCLUDE_DIRS} and libraries are ${HDF5_LIBRARIES}")
 endif ()
 list(APPEND Chaste_INCLUDES "${HDF5_INCLUDE_DIRS}")
