@@ -106,6 +106,10 @@ public:
         steady_runner.SetMaxNumPaces(1u);
         result = steady_runner.RunToSteadyState();
 
+        steady_runner.SuppressWarnings(true);
+        result = steady_runner.RunToSteadyState();
+        steady_runner.SuppressWarnings(false);
+
         TS_ASSERT_EQUALS(result, false);
 
         // Here we do reach the steady state OK.
