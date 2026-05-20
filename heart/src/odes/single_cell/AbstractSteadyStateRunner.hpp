@@ -117,7 +117,7 @@ public:
     void SuppressOutput(bool suppress = true);
 
     /**
-     * Stop class, and subclasses printing warnings
+     * Prevent this class and subclasses from emitting warnings
      *
      * @param  suppress  whether to suppress warnings.
      */
