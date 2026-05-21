@@ -70,6 +70,9 @@ protected:
     /** Whether to suppress output from this class (defaults to false) */
     bool mSuppressOutput;
 
+    /** Whether to suppress warnings from this class (defaults to false) */
+    bool mSuppressWarnings;
+
     /**
      * Run the cell model to steady state
      * (defined by a small change in state variables between beats)
@@ -112,6 +115,13 @@ public:
      * @param  suppress  whether to suppress output.
      */
     void SuppressOutput(bool suppress = true);
+
+    /**
+     * Prevent this class and subclasses from emitting warnings
+     *
+     * @param  suppress  whether to suppress warnings.
+     */
+    void SuppressWarnings(bool suppress = true);
 
     /**
      * @return The number of cell model 'paces/beats' that had to be evaluated.
