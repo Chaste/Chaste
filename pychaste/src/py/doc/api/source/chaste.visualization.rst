@@ -20,7 +20,7 @@ Module contents
     :members:
     :undoc-members:
     :show-inheritance:
-    
+
 .. autoclass:: chaste.visualization.VtkScene3
     :members:
 

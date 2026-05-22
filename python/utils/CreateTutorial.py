@@ -36,7 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Script to convert a tutorial test file into wiki code
 
-Notes: 
+Notes:
 1. The script starts converting everything after the first #define line
 2. The script stops converting after the final #endif.  It is assumed that there
    will be a #if line immediately after the first #define, and a count is kept of
@@ -44,7 +44,7 @@ Notes:
    the converted section.
 3. All C-style block comments '/*' to '*/' are converted to wiki text.
 4. All other lines, including C++ style comments '//', are kept as code lines
-5. In C-block comments (ie wiki text), whitespace is removed. Bulleted lists 
+5. In C-block comments (ie wiki text), whitespace is removed. Bulleted lists
    will work but nested bulleted lists won't.
 6. To print an empty line in the wiki page, just leave a blank line between paragraphs
    in the comment, as for wiki pages.  The older style of writing EMPTYLINE in a
@@ -95,16 +95,16 @@ def ConvertFileToWikiText(fileobj, filepath):
     code_store = [] # A store of every code-line, to print at the end
     line_store = [] # A copy of the input lines, in case we don't find anything wiki-like
     last_line = ''
-    
+
     for line in fileobj:
         line = line.rstrip() # Note: also removes '\n'
         line_store.append(line)
         # Remove all whitespace and save to a new string.
         # We don't remove the initial whitespace as it will be needed for code lines.
         stripped_line = line.strip()
-        
-        
-        
+
+
+
         # We stop processing input after an #endif matching the initial include guard
         if stripped_line.startswith('#endif'):
             assert ifdefs_seen > 0, "#endif seen before #if"
@@ -114,13 +114,13 @@ def ConvertFileToWikiText(fileobj, filepath):
                     # close code block
                     output.append('```\n')
                 parsing = False
-    
+
         # If in Parsing mode
         if parsing:
             if status in [ST_TEXT, ST_HOWTO]:
                 # We are still in a comment line, so strip it
                 line = stripped_line
-            
+
             # Check if the line is a new text line
             comment_started = False
             if StartsComment(stripped_line):
@@ -139,17 +139,17 @@ def ConvertFileToWikiText(fileobj, filepath):
                 # Line has content and isn't a comment => it's code
                 output.append(code_block_opener)
                 status = ST_CODE
-                
+
             # convert trac wiki style header
             heading = HEADING_REGEX.match(stripped_line)
             if heading:
                 lead = heading.group(1)
                 body = heading.group(2)
                 stripped_line = line = len(lead) * '#' + body
-                
+
             # convert trac wiki inline code
             line, _ = INLINE_CODE_REGEX.subn(f'`\\1`{{.{Hightlight(filepath)}}}', line)
-            
+
             # Check if comment ends
             if EndsComment(stripped_line) and (not comment_started or end_can_be_start):
                 # If it's not a Doxygen comment, switch state to unknown
@@ -157,7 +157,7 @@ def ConvertFileToWikiText(fileobj, filepath):
                     # get rid of whitespace and '*/'
                     stripped_line = line = CleanEndComment(stripped_line)
                     status = ST_NONE
-            
+
             # Check for (and strip) HOWTO tagging
             if status is ST_TEXT and stripped_line.startswith(HOWTO_TAG):
                 status = ST_HOWTO
@@ -166,7 +166,7 @@ def ConvertFileToWikiText(fileobj, filepath):
                     status = ST_TEXT # Blank comment line ends tagging
                 else:
                     stripped_line = line = '' # Strip tag content
-            
+
             if status is ST_TEXT and stripped_line and stripped_line[0] == '*':
                 # It's a list, so needs some indentation!
                 in_list = True
@@ -174,27 +174,27 @@ def ConvertFileToWikiText(fileobj, filepath):
                 line = ' '+line
             if in_list and (len(stripped_line) == 0 or status is not ST_TEXT):
                 in_list = False
-    
+
             # If the line is a comment just saying 'EMPTYLINE', we'll print a blank line
             if stripped_line == 'EMPTYLINE':
                 stripped_line = line = ''
             # We print the line unless we'd get 2 empty lines
             if len(stripped_line) > 0 or len(last_line) > 0:
                 output.append(line+'\n')
-            
+
             # If the line is a code line we store it,
             # unless there would be two consecutive empty lines
             if status is ST_CODE:
                 if len(stripped_line) > 0 or len(code_store[-1].strip()) > 0:
                     code_store.append(line)
-    
+
         # We start processing lines AFTER the first #define..
         if stripped_line.startswith('#define'):
             parsing = True
         if stripped_line.startswith('#if'):
             ifdefs_seen += 1
         last_line = stripped_line
-    
+
     if not output:
         # It's probably not C++ or Python, so let's include it all just as raw 'code'
         code_store = line_store
@@ -234,7 +234,7 @@ def get_title_from_file_name(file_name):
 
 def ConvertTutorialToHugoMd(test_file_path, test_file, other_files, revision=''):
     """Convert a tutorial, possibly comprised of multiple files, to hugo markdown.
-    
+
     test_file is the content of the tutorial test .hpp file, as an object which will
     return each line in turn when iterated.
     other_files is a list of subsidiary files, which may be empty.  Each entry should
@@ -295,19 +295,19 @@ def ParseOptions():
     parser.add_option('-f', '--real-file-path',
                       help="The real path of the test file, if it is being piped in")
     (options, args) = parser.parse_args()
-    
+
     if len(args) != 2:
         parser.error("You must specify input and output files")
-    
+
     return options, args
 
 
 if __name__ == '__main__':
     options, args = ParseOptions()
-    
+
     test_file = args[0]
     out_file_name = args[1]
-    
+
     if options.real_file_path:
         real_file_path = options.real_file_path
     else:
@@ -316,7 +316,7 @@ if __name__ == '__main__':
     # We're interested in the path relative to the root of the Chaste directory
     chaste_build_dir_root = os.path.abspath(os.path.join(os.getcwd(), '..', '..', '..'))
     real_file_path = os.path.relpath(test_file, chaste_build_dir_root)
-    
+
     if test_file == '-':
         # Read from stdin (pipe mode)
         in_file = sys.stdin
@@ -325,20 +325,20 @@ if __name__ == '__main__':
         sys.exit(1)
     else:
         in_file = open(test_file)
-    
+
     if out_file_name == '-':
         # Write to stdout (pipe mode)
         out_file = sys.stdout
     else:
         out_file = open(out_file_name, 'w')
-    
+
     # Do the conversion
     out_file.write(ConvertTutorialToHugoMd(real_file_path, in_file, [], options.revision))
-    
+
     # Close files
     if in_file is not sys.stdin:
         in_file.close()
-    
+
     if out_file is not sys.stdout:
         out_file.close()
 

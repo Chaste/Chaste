@@ -1,5 +1,5 @@
 # Acknowledgement: This file is based on the FindGperftools.cmake file from the GitHub repo https://github.com/mavam/vast (License below)
-# 
+#
 # Copyright (c) 2014, Matthias Vallentin
 # All rights reserved.
 #
@@ -28,7 +28,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-# 
+#
 # Tries to find Gperftools.
 #
 # Usage of this module as follows:

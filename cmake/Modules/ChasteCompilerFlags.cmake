@@ -92,10 +92,10 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
     set(Intel_flags
         # Not available on 10.0
         -Wnon-virtual-dtor -Woverloaded-virtual -Wno-unused-parameter
-        
+
         -wr2304 #2304: non-explicit constructor with single argument
-        
-        # Switch these ones on for compatibility 
+
+        # Switch these ones on for compatibility
         -wr271 #271: trailing comma is nonstandard
 
         #Following doesn't seem to play
@@ -141,7 +141,7 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
          #2305: declaration of 'explicit' constructor without a single argument is redundant
         )
     string (REPLACE ";" " " Intel_flags_str "${Intel_flags}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${default_flags} ${Intel_flags_str}") 
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${default_flags} ${Intel_flags_str}")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${default_flags} ${Intel_flags_str}")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${default_exe_linker_flags}")
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")

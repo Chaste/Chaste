@@ -49,7 +49,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * A convenience class to handle the VTK output of cardiac
  * electromechanics simulations. It makes use of various
- * other classes to compute mechanics qunatities, 
+ * other classes to compute mechanics qunatities,
  * interpolate electrics quantities, and actually generate
  * files. It outputs voltage, displacements, and deformation gradient in VTU
  * format to be shown in the deformed mechanics mesh.
@@ -57,9 +57,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 template<unsigned DIM, unsigned ELEC_PROB_DIM=1>
 class CardiacElectroMechanicsVtkHandler
 {
-  friend class TestCardiacElectroMechanicsVtkHandler; // for testing 
-  
-  private: 
+  friend class TestCardiacElectroMechanicsVtkHandler; // for testing
+
+  private:
     /** Cache for the mechanics solver (deformed solution is taken from this object)*/
     AbstractNonlinearElasticitySolver<DIM>& mrMechanicsSolver;
 
@@ -68,7 +68,7 @@ class CardiacElectroMechanicsVtkHandler
      * Memory is allocated within the constructor. Filled in when WriteSolution() is called.
      */
     std::vector<double> mInterpolatedVoltagesNodeWise;
-    
+
     /** Vector of displacements to be written to file */
     std::vector<c_vector<double,DIM> > mDisplacements;
 
@@ -86,23 +86,23 @@ class CardiacElectroMechanicsVtkHandler
     /** Used to interpolate electrics solution onto mechanics mesh for VTK output*/
     VoltageInterpolaterOntoMechanicsMesh<DIM>* mpInterpolater;
 
-    /** 
-     * Local cache of the mechanics mesh. 
+    /**
+     * Local cache of the mechanics mesh.
      * Object created within the constructor as a local copy of the
      * mesh onto which apply deformation by changing node coordinates.
      */
-    QuadraticMesh<DIM>* mpVtkOutputMesh; 
+    QuadraticMesh<DIM>* mpVtkOutputMesh;
 
-  public: 
+  public:
 
     /**
      * Constructor. It creates all the necessary objects based on the input
      * @param rMechanicsSolver the mechanics solver used by the EM problem. The deformation
               that this class uses to write out a VRK deformed mesh is taken from this solver.
      * @param rQuadMesh The mesh used by the mechanics problem. A copy is made here.
-     * @param rElectricsMesh The mesh used by the electrcis problem. 
+     * @param rElectricsMesh The mesh used by the electrcis problem.
      * @param rElectricsInitialCondition the initial value for all the cells in the electrics mesh (V and, if applicable, Phi_e)
-     * @param rOutputDir The output directory where to write. 
+     * @param rOutputDir The output directory where to write.
      *        Files will be written (relative to CHASTE_TEST_OUTPUT) to rOutputDir/vtk/
      *        It will be cleared upon construction.
      */
@@ -115,15 +115,15 @@ class CardiacElectroMechanicsVtkHandler
      * Destructor
      */
      ~CardiacElectroMechanicsVtkHandler();
-     
+
      /**
       * Write the solution to file. It will write to rOutputDir/vtk/deformed_mechanics_mesh_X.vtu where X=counter.
       * it writes Voltage ("V"), displacements ("displacements"),
       * and deformation gradient F ("deformation_gradient_F") using the deformed mechanics mesh.
       *
-      * @param counter Used to name the file 
+      * @param counter Used to name the file
       * @param rElectricsSolution The solution of the electrcis problem. It will be interpolated
-      *        onto the mechanics mesh within this method to outoput voltage V. 
+      *        onto the mechanics mesh within this method to outoput voltage V.
       */
      void WriteSolution(unsigned counter, ReplicatableVector& rElectricsSolution);
 };

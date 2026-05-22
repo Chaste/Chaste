@@ -10,7 +10,7 @@ on:
       - develop
 
 jobs:
-  
+
   build-and-test:
 
     runs-on: ubuntu-24.04
@@ -54,4 +54,18 @@ jobs:
 
     - name: run infrastructure checks
       run: cmake --build . --target infrastructure
+      working-directory: chaste-build-dir
+
+    - name: run check for tabs and trailing whitespace
+      run: |
+        cmake --build . --target infrastructure_whitespace
+        if ! git diff --quiet --exit-code; then
+          echo
+          echo "Error: check for tabs and trailing whitespace failed."
+          echo "Run python/infra/RemoveTabsAndTrailingWhitespace.py and commit the results."
+          echo "The following files have problems:"
+          echo
+          git status
+          exit 1
+        fi
       working-directory: chaste-build-dir

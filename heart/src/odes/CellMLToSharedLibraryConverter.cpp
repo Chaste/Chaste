@@ -41,7 +41,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstring> // For strerror()
 #include <cerrno> // For errno
 
-#include <boost/foreach.hpp>
 
 #include "ChasteSyscalls.hpp"
 #include "Exception.hpp"
@@ -191,7 +190,7 @@ void CellMLToSharedLibraryConverter::ConvertCellmlToSo(const std::string& rCellm
             std::string cellml_leaf_name = cellml_file.GetLeafNameNoExtension();
             std::vector<FileFinder> cellml_files = cellml_folder.FindMatches(cellml_leaf_name + "*");
 
-            BOOST_FOREACH(const FileFinder& r_cellml_file, cellml_files)
+            for (const FileFinder& r_cellml_file : cellml_files)
             {
                 r_cellml_file.CopyTo(tmp_folder);
             }

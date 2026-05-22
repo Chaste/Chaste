@@ -10,7 +10,7 @@ on:
       - develop
 
 jobs:
-  
+
   build-and-test:
 
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'ci:off') }}
