@@ -39,7 +39,7 @@ jobs:
           'Chaste_ERROR_ON_WARNING="ON"'
           'Chaste_UPDATE_PROVENANCE="OFF"'
       platforms: linux/amd64,linux/arm64
-      output: local
+      output: image
       push: false
       distribute: true
       sign: auto
