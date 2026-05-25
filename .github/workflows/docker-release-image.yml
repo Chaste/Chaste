@@ -29,9 +29,7 @@ jobs:
       meta-flavor: latest=true
       meta-tags: |
         type=schedule,pattern={{date 'YYYYMMDD'}}
-        # type=semver,pattern={{raw}}
         type=semver,pattern={{version}}
-        # type=match,pattern=release_(\d.\d)
         type=ref,event=tag
       labels: |
         org.opencontainers.image.title=Chaste Release Image
