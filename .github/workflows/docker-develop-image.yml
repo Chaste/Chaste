@@ -2,7 +2,7 @@ name: Build chaste/develop
 
 on:
   push:
-    branches: [ "test_docker_builds_with_updated_actions" ]
+    branches: [ "develop" ]
   # Schedule a weekly build on Sunday at 1am after rebuilding the base image
   schedule:
     - cron: '0 1 * * 0'
@@ -40,7 +40,7 @@ jobs:
           'Chaste_UPDATE_PROVENANCE="OFF"'
       platforms: linux/amd64,linux/arm64
       output: image
-      push: false
+      push: true
       distribute: true
       sign: auto
     secrets:

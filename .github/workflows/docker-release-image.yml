@@ -4,7 +4,6 @@ on:
   release:
     types: [ published ]
   push:
-    branches: ["test_docker_builds_with_updated_actions"]
     # Sequence of patterns matched against refs/tags
     tags:
       - '*' # 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
@@ -45,7 +44,7 @@ jobs:
         'Chaste_UPDATE_PROVENANCE="ON"'
       platforms: linux/amd64,linux/arm64
       output: image
-      push: false
+      push: true
       distribute: true
       sign: auto
     secrets:
