@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "CryptSimulation2d.hpp"
+#include "AbstractVanLeeuwen2009WntSwatCellCycleModel.hpp"
 #include "CellAncestor.hpp"
 #include "CellBetaCateninWriter.hpp"
 #include "MeshBasedCellPopulation.hpp"
