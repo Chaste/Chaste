@@ -75,6 +75,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "NodesOnlyMesh.hpp"
 #include "NodeBasedCellPopulation.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
+
 class SimplePdeForTesting : public AbstractLinearEllipticPde<2,2>
 {
 public:

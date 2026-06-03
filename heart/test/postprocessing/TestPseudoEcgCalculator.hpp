@@ -49,10 +49,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OutputFileHandler.hpp"
 #include "TrianglesMeshReader.hpp"
 #include "HeartConfig.hpp"
-#include "PetscSetupAndFinalize.hpp"
 #include "FileComparison.hpp"
 #include "SimpleBathProblemSetup.hpp"
 #include "BidomainWithBathProblem.hpp"
+
+#include "PetscSetupAndFinalize.hpp"
 
 /* HOW_TO_TAG Cardiac/Post-processing
  * Compute pseudo-ECGs

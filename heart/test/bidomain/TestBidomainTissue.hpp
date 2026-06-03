@@ -61,6 +61,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "TetrahedralMesh.hpp"
 #include "DistributedTetrahedralMesh.hpp"
 
+#include "PetscSetupAndFinalize.hpp"
 
 // cell factory for creating 2 cells with both intra and extracellular stimuli
 template <unsigned PROBLEM_DIM=1>
