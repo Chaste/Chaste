@@ -65,7 +65,7 @@ from chaste.cell_based import (
 )
 
 from chaste.mesh import (
-    FluidSource, 
+    FluidSource,
     ImmersedBoundaryPalisadeMeshGenerator,
 )
 

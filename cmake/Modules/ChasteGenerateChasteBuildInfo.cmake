@@ -1,7 +1,7 @@
 if(MSVC)
     set(additional
     "
-    //This has been put here to satisfy an MSVC linker issue 
+    //This has been put here to satisfy an MSVC linker issue
     int __cdecl _purecall(void){return 0;}
     ")
 endif()

@@ -441,7 +441,7 @@ public:
         TrianglesMeshReader<2,2> reader("mesh/test/data/2D_0_to_1mm_200_elements");
         TetrahedralMesh<2,2> mesh;
         mesh.ConstructFromMeshReader(reader);
-        
+
         std::string base_name = "2Dmesh";
         //First, we test "standard functionality" with an undeformed mesh
         VtkDeformedMeshWriter<2> writer(&mesh,"TestDeformedVtkMeshWriter", base_name, true);
@@ -464,7 +464,7 @@ public:
         writer.AddCellData("Quality", quality);
 
         writer.WriteDeformedFiles();
-        
+
         {
             // Check that the reader can see it
             VtkMeshReader<2,2> vtk_reader(OutputFileHandler::GetChasteTestOutputDirectory() + "TestDeformedVtkMeshWriter/"+base_name+".vtu");
@@ -559,7 +559,7 @@ public:
         }
         //coverage. Try apply a deformed vector with wrong size (empty in tis case)
         std::vector<c_vector<double,2> > empty = {};
-        TS_ASSERT_THROWS_THIS(writer.ApplyDeformation(empty), 
+        TS_ASSERT_THROWS_THIS(writer.ApplyDeformation(empty),
         "Deformed positions vector has 0 elements. The mesh has 121 nodes. The two must be the same.");
 #else
         std::cout << "This test was not run, as VTK is not enabled." << std::endl;

@@ -1,13 +1,13 @@
-#include "ChasteBuildRoot.hpp" 
+#include "ChasteBuildRoot.hpp"
 
-const char* ChasteBuildRootDir() 
-{ 
-    return "${Chaste_BINARY_DIR}/"; 
+const char* ChasteBuildRootDir()
+{
+    return "${Chaste_BINARY_DIR}/";
 }
 
-const char* ChasteSourceRootDir() 
-{ 
-    return "${Chaste_SOURCE_DIR}/"; 
+const char* ChasteSourceRootDir()
+{
+    return "${Chaste_SOURCE_DIR}/";
 }
 
 std::string ChasteComponentBuildDir(const std::string& rComponent)
