@@ -91,18 +91,6 @@ public:
 
     void TestTensorException()
     {
-        c_vector<double, 1> constant_conductivities_1d(Create_c_vector(2.1));
-        c_vector<double, 2> constant_conductivities_2d(Create_c_vector(2.1, 0.8));
-        c_vector<double, 3> constant_conductivities_3d(Create_c_vector(2.1, 0.8, 0.0));
-
-        OrthotropicConductivityTensors<1,1> ortho_1d_tensors;
-        TS_ASSERT_THROWS_THIS(ortho_1d_tensors.SetConstantConductivities(constant_conductivities_2d),"Wrong number of conductivities provided");
-        TS_ASSERT_THROWS_THIS(ortho_1d_tensors.SetConstantConductivities(constant_conductivities_3d),"Wrong number of conductivities provided");
-
-        OrthotropicConductivityTensors<3,3> ortho_3d_tensors;
-        TS_ASSERT_THROWS_THIS(ortho_3d_tensors.SetConstantConductivities(constant_conductivities_1d),"Wrong number of conductivities provided");
-        TS_ASSERT_THROWS_THIS(ortho_3d_tensors.SetConstantConductivities(constant_conductivities_2d),"Wrong number of conductivities provided");
-
         // AxisymmetricConductivityTensors only makes sense in 3D problems
         TS_ASSERT_THROWS_THIS(AXI_2D axi_tensor,"Axisymmetric anisotropic conductivity only makes sense in 3D");
 

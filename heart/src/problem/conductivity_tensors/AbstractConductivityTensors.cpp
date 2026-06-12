@@ -65,37 +65,8 @@ void AbstractConductivityTensors<ELEMENT_DIM,SPACE_DIM>::SetFibreOrientationFile
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractConductivityTensors<ELEMENT_DIM,SPACE_DIM>::SetConstantConductivities(c_vector<double, 1> constantConductivities)
+void AbstractConductivityTensors<ELEMENT_DIM,SPACE_DIM>::SetConstantConductivities(c_vector<double, SPACE_DIM> constantConductivities)
 {
-    if (SPACE_DIM != 1)
-    {
-        EXCEPTION("Wrong number of conductivities provided");
-    }
-
-    mUseNonConstantConductivities = false;
-    mConstantConductivities = constantConductivities;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractConductivityTensors<ELEMENT_DIM,SPACE_DIM>::SetConstantConductivities(c_vector<double, 2> constantConductivities)
-{
-    if (SPACE_DIM != 2)
-    {
-        EXCEPTION("Wrong number of conductivities provided");
-    }
-
-    mUseNonConstantConductivities = false;
-    mConstantConductivities = constantConductivities;
-}
-
-template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AbstractConductivityTensors<ELEMENT_DIM,SPACE_DIM>::SetConstantConductivities(c_vector<double, 3> constantConductivities)
-{
-    if (SPACE_DIM != 3)
-    {
-        EXCEPTION("Wrong number of conductivities provided");
-    }
-
     mUseNonConstantConductivities = false;
     mConstantConductivities = constantConductivities;
 }

@@ -53,7 +53,7 @@ public:
      *  Sets constant conductivities for all the elements of the mesh.
      *  @param constantConductivities Longitudinal, Transverse (y axis) and Normal conductivity (z axis)
      */
-     void SetConstantConductivities(c_vector<double, 3> constantConductivities);
+     void SetConstantConductivities(c_vector<double, SPACE_DIM> constantConductivities) override;
 
     /**
      * Set up the tensors.

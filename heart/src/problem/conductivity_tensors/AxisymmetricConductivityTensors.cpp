@@ -49,7 +49,7 @@ AxisymmetricConductivityTensors<ELEMENT_DIM, SPACE_DIM>::AxisymmetricConductivit
 }
 
 template<unsigned ELEMENT_DIM, unsigned SPACE_DIM>
-void AxisymmetricConductivityTensors<ELEMENT_DIM, SPACE_DIM>::SetConstantConductivities(c_vector<double, 3> constantConductivities)
+void AxisymmetricConductivityTensors<ELEMENT_DIM, SPACE_DIM>::SetConstantConductivities(c_vector<double, SPACE_DIM> constantConductivities)
 {
     //assert(SPACE_DIM == 3);//Otherwise constructor would have thrown
     if (constantConductivities[1] != constantConductivities[2])
